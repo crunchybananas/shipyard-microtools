@@ -53,6 +53,23 @@ let simulation = null;
 let svg = null;
 let g = null;
 
+async function fetchJson(url, label) {
+  try {
+    console.log(`[API] ${label} → ${url}`);
+    const resp = await fetch(url);
+    console.log(`[API] ${label} status`, resp.status);
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => '');
+      console.error(`[API] ${label} error body`, text);
+      throw new Error(`API returned ${resp.status}`);
+    }
+    return await resp.json();
+  } catch (e) {
+    console.error(`[API] ${label} failed`, e, e?.stack);
+    throw e;
+  }
+}
+
 // Fetch all ships with pagination
 async function fetchAllShips() {
   const ships = [];
@@ -61,9 +78,7 @@ async function fetchAllShips() {
   const apiBase = getApiBase();
   
   while (true) {
-    const resp = await fetch(`${apiBase}/ships?limit=${limit}&offset=${offset}`);
-    if (!resp.ok) throw new Error(`API returned ${resp.status}`);
-    const data = await resp.json();
+    const data = await fetchJson(`${apiBase}/ships?limit=${limit}&offset=${offset}`, `ships page ${offset}`);
     
     if (!data.ships || data.ships.length === 0) break;
     ships.push(...data.ships);
@@ -79,11 +94,9 @@ async function fetchAllShips() {
 async function fetchShipDetails(shipId) {
   try {
     const apiBase = getApiBase();
-    const resp = await fetch(`${apiBase}/ships/${shipId}`);
-    if (!resp.ok) return null;
-    return await resp.json();
+    return await fetchJson(`${apiBase}/ships/${shipId}`, `ship ${shipId}`);
   } catch (e) {
-    console.error(`Failed to fetch ship ${shipId}:`, e);
+    console.error(`Failed to fetch ship ${shipId}:`, e, e?.stack);
     return null;
   }
 }
@@ -411,7 +424,7 @@ async function loadData() {
     renderGraph();
     elements.loading.classList.add('hidden');
   } catch (e) {
-    console.error('Failed to load data:', e);
+    console.error('Failed to load data:', e, e?.stack);
     
     // Check if it's likely a CORS error
     const isCorsError = e.message.includes('Failed to fetch') || 
