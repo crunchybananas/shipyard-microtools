@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Token Lens — JWT Decoder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <h1>Token Lens</h1>
+        <p>JWT decode + verify. Runs 100% in your browser. No data is stored or sent.</p>
+      </header>
+
+      <section class="input">
+        <label>JWT</label>
+        <textarea id="jwtInput" placeholder="paste your JWT here..."></textarea>
+        <div class="actions">
+          <button id="decodeBtn" class="btn primary">Decode</button>
+          <button id="clearBtn" class="btn">Clear</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div>
+          <h3>Header</h3>
+          <pre id="headerOutput">—</pre>
+        </div>
+        <div>
+          <h3>Payload</h3>
+          <pre id="payloadOutput">—</pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div>
+          <h3>Signature</h3>
+          <pre id="signatureOutput">—</pre>
+        </div>
+        <div>
+          <h3>Verification (HS256)</h3>
+          <input id="secretInput" type="text" placeholder="optional secret" />
+          <button id="verifyBtn" class="btn">Verify</button>
+          <p id="verifyStatus" class="muted">No verification attempted.</p>
+        </div>
+      </section>
+
+      <section class="meta">
+        <div class="meta-card">
+          <h4>Times</h4>
+          <p>Issued at: <span id="iat">—</span></p>
+          <p>Expires at: <span id="exp">—</span></p>
+        </div>
+        <div class="meta-card">
+          <h4>Privacy</h4>
+          <p>All decoding happens locally. Nothing is stored or transmitted.</p>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      Built for Shipyard • shipyard.bot
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
