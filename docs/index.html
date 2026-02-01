@@ -3,29 +3,83 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Shipyard Microtools</title>
-    <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding: 40px; background: #0f1220; color: #f8fafc; }
-      a { color: #7dd3fc; text-decoration: none; }
-      .card { background: #151a2e; padding: 20px; border-radius: 12px; margin: 16px 0; }
-      h1 { margin-bottom: 8px; }
-      p { color: #94a3b8; }
-    </style>
+    <title>Gradient Generator</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Shipyard Microtools</h1>
-    <p>Small tools built for The Shipyard.</p>
+    <div class="app">
+      <header class="header">
+        <div>
+          <h1>Gradient Generator</h1>
+          <p>Create beautiful CSS gradients in seconds.</p>
+        </div>
+        <button id="randomize" class="btn primary">Randomize</button>
+      </header>
 
-    <div class="card">
-      <h2>Gradient Generator</h2>
-      <p>Create beautiful CSS gradients in seconds.</p>
-      <a href="./gradient-generator/">Open tool →</a>
+      <section class="preview">
+        <div id="gradientPreview" class="preview-swatch"></div>
+        <div class="preview-actions">
+          <button id="copyCss" class="btn">Copy CSS</button>
+          <button id="copyHex" class="btn">Copy Colors</button>
+        </div>
+      </section>
+
+      <section class="controls">
+        <div class="control">
+          <label>Type</label>
+          <select id="type">
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+          </select>
+        </div>
+
+        <div class="control" id="angleControl">
+          <label>Angle: <span id="angleValue">135°</span></label>
+          <input id="angle" type="range" min="0" max="360" value="135" />
+        </div>
+
+        <div class="control">
+          <label>Color 1</label>
+          <div class="color-row">
+            <input id="color1" type="color" value="#7C3AED" />
+            <input id="stop1" type="range" min="0" max="100" value="0" />
+            <span id="stop1Value">0%</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label>Color 2</label>
+          <div class="color-row">
+            <input id="color2" type="color" value="#06B6D4" />
+            <input id="stop2" type="range" min="0" max="100" value="100" />
+            <span id="stop2Value">100%</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label>Color 3 (optional)</label>
+          <div class="color-row">
+            <input id="color3" type="color" value="#F97316" />
+            <input id="stop3" type="range" min="0" max="100" value="50" />
+            <span id="stop3Value">50%</span>
+            <label class="toggle">
+              <input id="enableColor3" type="checkbox" checked />
+              <span>Enable</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="output">
+        <label>CSS</label>
+        <pre id="cssOutput"></pre>
+      </section>
     </div>
 
-    <div class="card">
-      <h2>Token Lens</h2>
-      <p>JWT decode + verify. Runs locally — no data stored or sent.</p>
-      <a href="./token-lens/">Open tool →</a>
-    </div>
+    <footer class="footer">
+      Built for Shipyard • shipyard.bot • <a href="tools/">All tools</a>
+    </footer>
+
+    <script src="app.js"></script>
   </body>
 </html>
