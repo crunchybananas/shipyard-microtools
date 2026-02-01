@@ -2,6 +2,20 @@
 // Real-time platform health and activity monitoring
 
 const API_BASE = 'https://shipyard.bot/api';
+const LOCAL_PROXY = 'http://localhost:8010/proxy/api';
+
+// Use local proxy on localhost (due to CORS), direct API on GitHub Pages
+function getApiBase() {
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' ||
+                        window.location.protocol === 'file:';
+    return isLocalhost ? LOCAL_PROXY : API_BASE;
+}
+
+// Check if we're on GitHub Pages (API won't work due to CORS)
+function isGitHubPages() {
+    return window.location.hostname.includes('github.io');
+}
 
 const state = {
     ships: [],
@@ -9,6 +23,7 @@ const state = {
     tokenInfo: null,
     leaderboardSort: 'karma',
     shipsFilter: 'all',
+    corsError: false,
 };
 
 const elements = {
@@ -36,22 +51,28 @@ const elements = {
 
 // API Fetchers
 async function fetchShips(status = null) {
+    const apiBase = getApiBase();
     try {
-        let url = `${API_BASE}/ships?limit=100`;
+        let url = `${apiBase}/ships?limit=100`;
         if (status) url += `&status=${status}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`API returned ${response.status}`);
         const data = await response.json();
+        state.corsError = false;
         return data.ships || [];
     } catch (error) {
         console.error('Failed to fetch ships:', error);
+        if (isGitHubPages()) {
+            state.corsError = true;
+        }
         return [];
     }
 }
 
 async function fetchTokenInfo() {
+    const apiBase = getApiBase();
     try {
-        const response = await fetch(`${API_BASE}/token/info`);
+        const response = await fetch(`${apiBase}/token/info`);
         if (!response.ok) throw new Error(`API returned ${response.status}`);
         return await response.json();
     } catch (error) {
@@ -61,8 +82,9 @@ async function fetchTokenInfo() {
 }
 
 async function fetchPosts(limit = 20) {
+    const apiBase = getApiBase();
     try {
-        const response = await fetch(`${API_BASE}/posts?limit=${limit}&sort=new`);
+        const response = await fetch(`${apiBase}/posts?limit=${limit}&sort=new`);
         if (!response.ok) throw new Error(`API returned ${response.status}`);
         const data = await response.json();
         return data.posts || [];
@@ -292,6 +314,33 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Show CORS error message
+function showCorsError() {
+    const corsMessage = `
+        <div class="cors-error" style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+            <h2 style="margin-bottom: 1rem;">CORS Restriction</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">The Shipyard API doesn't allow cross-origin requests from GitHub Pages.</p>
+            <p><strong>To run locally:</strong></p>
+            <pre style="text-align: left; background: var(--bg); padding: 1rem; border-radius: 8px; margin: 1rem auto; max-width: 500px; font-size: 0.85rem; overflow-x: auto;">
+# Clone the repo
+git clone https://github.com/crunchybananas/shipyard-microtools.git
+cd shipyard-microtools
+
+# Start a CORS proxy (terminal 1)
+npx local-cors-proxy --proxyUrl https://shipyard.bot --port 8010
+
+# Serve the docs folder (terminal 2)
+npx serve docs</pre>
+            <p>Then open <a href="http://localhost:3000/explorer" style="color: var(--accent);">http://localhost:3000/explorer</a></p>
+        </div>
+    `;
+    
+    elements.leaderboardList.innerHTML = corsMessage;
+    elements.activityFeed.innerHTML = '';
+    elements.recentShips.innerHTML = '';
+}
+
 // Initialize
 async function init() {
     // Fetch all data in parallel
@@ -302,6 +351,12 @@ async function init() {
 
     state.ships = allShips;
     state.tokenInfo = tokenInfo;
+
+    // Check for CORS error
+    if (state.corsError) {
+        showCorsError();
+        return;
+    }
 
     updateStats();
     updateFunnel();

@@ -2,11 +2,26 @@
 // Shows pending ships that need attestations, sorted by urgency
 
 const API_BASE = 'https://shipyard.bot/api';
+const LOCAL_PROXY = 'http://localhost:8010/proxy/api';
+
+// Use local proxy on localhost (due to CORS), direct API on GitHub Pages
+function getApiBase() {
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' ||
+                        window.location.protocol === 'file:';
+    return isLocalhost ? LOCAL_PROXY : API_BASE;
+}
+
+// Check if we're on GitHub Pages (API won't work due to CORS)
+function isGitHubPages() {
+    return window.location.hostname.includes('github.io');
+}
 
 const state = {
     ships: [],
     sortBy: 'attestations-desc',
     filterBy: 'all',
+    corsError: false,
 };
 
 const elements = {
@@ -23,13 +38,18 @@ const elements = {
 
 // Fetch pending ships from API
 async function fetchPendingShips() {
+    const apiBase = getApiBase();
     try {
-        const response = await fetch(`${API_BASE}/ships?status=pending&limit=100`);
+        const response = await fetch(`${apiBase}/ships?status=pending&limit=100`);
         if (!response.ok) throw new Error(`API returned ${response.status}`);
         const data = await response.json();
+        state.corsError = false;
         return data.ships || [];
     } catch (error) {
         console.error('Failed to fetch ships:', error);
+        if (isGitHubPages()) {
+            state.corsError = true;
+        }
         return [];
     }
 }
@@ -167,6 +187,30 @@ function escapeHtml(text) {
 
 // Render the ships list
 function renderShipsList() {
+    // Check for CORS error first
+    if (state.corsError) {
+        elements.shipsList.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">🔒</div>
+                <h3>CORS Restriction</h3>
+                <p>The Shipyard API doesn't allow cross-origin requests from GitHub Pages.</p>
+                <p style="margin-top: 1rem;"><strong>To run locally:</strong></p>
+                <pre style="text-align: left; background: var(--surface); padding: 1rem; border-radius: 8px; margin-top: 0.5rem; font-size: 0.9rem;">
+# Clone the repo
+git clone https://github.com/crunchybananas/shipyard-microtools.git
+cd shipyard-microtools
+
+# Start a CORS proxy (terminal 1)
+npx local-cors-proxy --proxyUrl https://shipyard.bot --port 8010
+
+# Serve the docs folder (terminal 2)
+npx serve docs</pre>
+                <p style="margin-top: 1rem;">Then open <a href="http://localhost:3000/attestation-tracker">http://localhost:3000/attestation-tracker</a></p>
+            </div>
+        `;
+        return;
+    }
+
     const filtered = getFilteredShips();
     const sorted = getSortedShips(filtered);
 
