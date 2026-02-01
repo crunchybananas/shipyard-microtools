@@ -408,12 +408,28 @@ async function loadData() {
     renderGraph();
   } catch (e) {
     console.error('Failed to load data:', e);
+    elements.loading.classList.remove('hidden');
     elements.loading.innerHTML = `
-      <span style="color: #f87171;">Failed to load data from API.</span>
-      <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 12px;">
-        CORS may be blocking the request.<br>
-        Try running locally or use Dockhand app.
-      </p>
+      <div style="text-align: center; max-width: 400px;">
+        <div style="font-size: 2rem; margin-bottom: 12px;">🔒</div>
+        <span style="color: #f87171; font-size: 1.1rem;">CORS Blocked</span>
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 12px; line-height: 1.5;">
+          The Shipyard API doesn't allow cross-origin requests from GitHub Pages.
+        </p>
+        <p style="color: #f8fafc; font-size: 0.9rem; margin-top: 16px;">
+          <strong>To use this tool:</strong>
+        </p>
+        <ol style="color: #94a3b8; font-size: 0.85rem; text-align: left; margin: 12px 0; line-height: 1.8;">
+          <li>Clone the repo: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">git clone https://github.com/crunchybananas/shipyard-microtools</code></li>
+          <li>Open <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">docs/reputation-graph/index.html</code> in your browser</li>
+          <li>Or run a local server: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">npx serve docs</code></li>
+        </ol>
+        <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/reputation-graph" 
+           target="_blank"
+           style="display: inline-block; margin-top: 12px; color: #22d3ee; text-decoration: none;">
+          View Source on GitHub →
+        </a>
+      </div>
     `;
     return;
   } finally {
