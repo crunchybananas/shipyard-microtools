@@ -5,7 +5,14 @@ const API_BASE = 'https://shipyard.bot/api';
 const LOCAL_PROXY = 'http://localhost:8010/proxy/api';
 
 // Use local proxy on localhost, direct API otherwise
+// Native apps (Dockhand) set __DOCKHAND_NATIVE__ to bypass CORS detection
 function getApiBase() {
+  // Native app bypasses CORS
+  if (window.__DOCKHAND_NATIVE__) {
+    console.log('Using direct API (Dockhand native)');
+    return API_BASE;
+  }
+  
   const isLocalhost = window.location.hostname === 'localhost' || 
                       window.location.hostname === '127.0.0.1' ||
                       window.location.protocol === 'file:';
