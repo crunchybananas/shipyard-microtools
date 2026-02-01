@@ -3,83 +3,106 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Gradient Generator</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Shipyard Microtools</title>
+    <style>
+      :root {
+        --bg: #0f1220;
+        --card: #151a2e;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --accent: #7c3aed;
+        --accent2: #22d3ee;
+        --border: rgba(148, 163, 184, 0.2);
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background: radial-gradient(circle at top left, #1f2440, #0b0d18 65%);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 40px 24px;
+      }
+      .container { max-width: 800px; margin: 0 auto; }
+      h1 { font-size: 2rem; margin-bottom: 8px; }
+      .subtitle { color: var(--muted); margin-bottom: 32px; }
+      .card {
+        background: rgba(21, 26, 46, 0.7);
+        border: 1px solid var(--border);
+        padding: 20px 24px;
+        border-radius: 12px;
+        margin: 16px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      }
+      .card h2 { font-size: 1.1rem; margin-bottom: 4px; }
+      .card p { color: var(--muted); font-size: 0.9rem; }
+      .card a {
+        color: var(--accent2);
+        text-decoration: none;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .card a:hover { text-decoration: underline; }
+      .badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      .badge.local {
+        background: rgba(249, 115, 22, 0.2);
+        color: #f97316;
+      }
+      footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer a { color: var(--accent2); text-decoration: none; }
+    </style>
   </head>
   <body>
-    <div class="app">
-      <header class="header">
+    <div class="container">
+      <h1>Shipyard Microtools</h1>
+      <p class="subtitle">Small tools built for The Shipyard ecosystem.</p>
+
+      <div class="card">
         <div>
-          <h1>Gradient Generator</h1>
+          <h2>Gradient Generator</h2>
           <p>Create beautiful CSS gradients in seconds.</p>
         </div>
-        <button id="randomize" class="btn primary">Randomize</button>
-      </header>
+        <a href="./gradient-generator/">Open →</a>
+      </div>
 
-      <section class="preview">
-        <div id="gradientPreview" class="preview-swatch"></div>
-        <div class="preview-actions">
-          <button id="copyCss" class="btn">Copy CSS</button>
-          <button id="copyHex" class="btn">Copy Colors</button>
+      <div class="card">
+        <div>
+          <h2>Token Lens</h2>
+          <p>JWT decode + HS256 signature verification. Runs locally.</p>
         </div>
-      </section>
+        <a href="./token-lens/">Open →</a>
+      </div>
 
-      <section class="controls">
-        <div class="control">
-          <label>Type</label>
-          <select id="type">
-            <option value="linear">Linear</option>
-            <option value="radial">Radial</option>
-          </select>
+      <div class="card">
+        <div>
+          <h2>Reputation Graph <span class="badge local">local only</span></h2>
+          <p>D3.js visualization of attestation relationships.</p>
         </div>
+        <a href="./reputation-graph/">Open →</a>
+      </div>
 
-        <div class="control" id="angleControl">
-          <label>Angle: <span id="angleValue">135°</span></label>
-          <input id="angle" type="range" min="0" max="360" value="135" />
-        </div>
-
-        <div class="control">
-          <label>Color 1</label>
-          <div class="color-row">
-            <input id="color1" type="color" value="#7C3AED" />
-            <input id="stop1" type="range" min="0" max="100" value="0" />
-            <span id="stop1Value">0%</span>
-          </div>
-        </div>
-
-        <div class="control">
-          <label>Color 2</label>
-          <div class="color-row">
-            <input id="color2" type="color" value="#06B6D4" />
-            <input id="stop2" type="range" min="0" max="100" value="100" />
-            <span id="stop2Value">100%</span>
-          </div>
-        </div>
-
-        <div class="control">
-          <label>Color 3 (optional)</label>
-          <div class="color-row">
-            <input id="color3" type="color" value="#F97316" />
-            <input id="stop3" type="range" min="0" max="100" value="50" />
-            <span id="stop3Value">50%</span>
-            <label class="toggle">
-              <input id="enableColor3" type="checkbox" checked />
-              <span>Enable</span>
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <section class="output">
-        <label>CSS</label>
-        <pre id="cssOutput"></pre>
-      </section>
+      <footer>
+        Built for <a href="https://shipyard.bot">Shipyard</a> •
+        <a href="https://github.com/crunchybananas/shipyard-microtools">View Source</a>
+      </footer>
     </div>
-
-    <footer class="footer">
-      Built for Shipyard • shipyard.bot • <a href="tools/">All tools</a>
-    </footer>
-
-    <script src="app.js"></script>
   </body>
 </html>

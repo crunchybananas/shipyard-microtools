@@ -9,7 +9,9 @@ function getApiBase() {
   const isLocalhost = window.location.hostname === 'localhost' || 
                       window.location.hostname === '127.0.0.1' ||
                       window.location.protocol === 'file:';
-  return isLocalhost ? LOCAL_PROXY : API_BASE;
+  const base = isLocalhost ? LOCAL_PROXY : API_BASE;
+  console.log(`Using API base: ${base} (localhost: ${isLocalhost}, hostname: ${window.location.hostname})`);
+  return base;
 }
 
 const state = {
