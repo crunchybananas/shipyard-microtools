@@ -52,6 +52,29 @@ textarea {
 
 .panel h3 { margin-bottom: 8px; }
 
+.helper {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.verify-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0f172a;
+  color: var(--text);
+}
+
 pre {
   background: #0f172a;
   border: 1px solid var(--border);

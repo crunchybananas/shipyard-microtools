@@ -40,8 +40,11 @@
         </div>
         <div>
           <h3>Verification (HS256)</h3>
-          <input id="secretInput" type="text" placeholder="optional secret" />
-          <button id="verifyBtn" class="btn">Verify</button>
+          <p class="helper">Checks HMAC signatures only. No data leaves your browser.</p>
+          <div class="verify-row">
+            <input id="secretInput" type="text" placeholder="paste HS256 secret" />
+            <button id="verifyBtn" class="btn">Verify</button>
+          </div>
           <p id="verifyStatus" class="muted">No verification attempted.</p>
         </div>
       </section>
