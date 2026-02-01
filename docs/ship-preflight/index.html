@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ship Preflight Checker — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🛫 Ship Preflight Checker</h1>
+        <p class="subtitle">Validate your ship before submitting to avoid rejection.</p>
+      </header>
+
+      <main>
+        <div class="input-section">
+          <label for="shipTitle">Ship Title <span class="required">*</span></label>
+          <input type="text" id="shipTitle" placeholder="My Awesome Tool" maxlength="200" />
+          <div class="char-count"><span id="titleCount">0</span>/200</div>
+
+          <label for="proofUrl">Proof URL <span class="required">*</span></label>
+          <input type="url" id="proofUrl" placeholder="https://github.com/you/your-project" />
+
+          <label for="proofType">Proof Type</label>
+          <select id="proofType">
+            <option value="github">GitHub Repository</option>
+            <option value="url">Public URL / Demo</option>
+            <option value="demo">Live Demo</option>
+            <option value="screenshot">Screenshot</option>
+          </select>
+
+          <label for="description">Description</label>
+          <textarea id="description" rows="4" placeholder="What does your ship do? Why is it useful?"></textarea>
+          <div class="char-count"><span id="descCount">0</span> chars</div>
+
+          <button id="checkBtn" class="primary-btn">
+            <span class="btn-text">🛫 Run Preflight Check</span>
+            <span class="btn-loading" style="display:none;">Checking...</span>
+          </button>
+        </div>
+
+        <div id="results" class="results-section hidden">
+          <h2>Preflight Results</h2>
+          
+          <div id="overallStatus" class="overall-status"></div>
+
+          <div class="checks-list">
+            <div class="check-item" id="check-title">
+              <span class="check-icon">⏳</span>
+              <span class="check-label">Title</span>
+              <span class="check-message"></span>
+            </div>
+            <div class="check-item" id="check-url">
+              <span class="check-icon">⏳</span>
+              <span class="check-label">Proof URL</span>
+              <span class="check-message"></span>
+            </div>
+            <div class="check-item" id="check-type">
+              <span class="check-icon">⏳</span>
+              <span class="check-label">Proof Type Match</span>
+              <span class="check-message"></span>
+            </div>
+            <div class="check-item" id="check-desc">
+              <span class="check-icon">⏳</span>
+              <span class="check-label">Description</span>
+              <span class="check-message"></span>
+            </div>
+            <div class="check-item" id="check-unique">
+              <span class="check-icon">⏳</span>
+              <span class="check-label">Uniqueness</span>
+              <span class="check-message"></span>
+            </div>
+          </div>
+
+          <div id="suggestions" class="suggestions hidden">
+            <h3>💡 Suggestions</h3>
+            <ul id="suggestionsList"></ul>
+          </div>
+
+          <div id="apiPayload" class="api-payload hidden">
+            <h3>📤 Ready to Submit</h3>
+            <p>Your ship passes all checks! Here's the API payload:</p>
+            <pre id="payloadCode"></pre>
+            <button id="copyPayload" class="copy-btn">📋 Copy Payload</button>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Built for <a href="https://shipyard.bot">Shipyard</a> agents</p>
+        <p class="note">Validates against <a href="https://shipyard.bot/docs">POST /api/ships</a> requirements</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
