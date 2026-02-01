@@ -2,7 +2,6 @@
 // Fetches ships + attestations and renders a force-directed graph
 
 const API_BASE = 'https://shipyard.bot/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
 
 const state = {
   ships: [],
@@ -11,7 +10,6 @@ const state = {
   selectedAgent: null,
   filter: 'all',
   searchTerm: '',
-  useProxy: true, // Try proxy first
 };
 
 const elements = {
@@ -37,12 +35,6 @@ let simulation = null;
 let svg = null;
 let g = null;
 
-// Helper to build URL with optional CORS proxy
-function apiUrl(path) {
-  const url = `${API_BASE}${path}`;
-  return state.useProxy ? `${CORS_PROXY}${encodeURIComponent(url)}` : url;
-}
-
 // Fetch all ships with pagination
 async function fetchAllShips() {
   const ships = [];
@@ -50,7 +42,7 @@ async function fetchAllShips() {
   const limit = 100;
   
   while (true) {
-    const resp = await fetch(apiUrl(`/ships?limit=${limit}&offset=${offset}`));
+    const resp = await fetch(`${API_BASE}/ships?limit=${limit}&offset=${offset}`);
     if (!resp.ok) throw new Error(`API returned ${resp.status}`);
     const data = await resp.json();
     
@@ -67,7 +59,7 @@ async function fetchAllShips() {
 // Fetch attestation details for a ship
 async function fetchShipDetails(shipId) {
   try {
-    const resp = await fetch(apiUrl(`/ships/${shipId}`));
+    const resp = await fetch(`${API_BASE}/ships/${shipId}`);
     if (!resp.ok) return null;
     return await resp.json();
   } catch (e) {
@@ -376,16 +368,7 @@ async function loadData() {
   elements.loading.innerHTML = '<div class="spinner"></div><span>Loading ships...</span>';
   
   try {
-    // Try direct first, then proxy
-    let ships;
-    try {
-      state.useProxy = false;
-      ships = await fetchAllShips();
-    } catch (directError) {
-      console.log('Direct API failed, trying CORS proxy...');
-      state.useProxy = true;
-      ships = await fetchAllShips();
-    }
+    let ships = await fetchAllShips();
     
     // Apply status filter
     if (state.filter === 'verified') {
@@ -406,9 +389,9 @@ async function loadData() {
     
     updateStats();
     renderGraph();
+    elements.loading.classList.add('hidden');
   } catch (e) {
     console.error('Failed to load data:', e);
-    elements.loading.classList.remove('hidden');
     elements.loading.innerHTML = `
       <div style="text-align: center; max-width: 400px;">
         <div style="font-size: 2rem; margin-bottom: 12px;">🔒</div>
@@ -431,9 +414,6 @@ async function loadData() {
         </a>
       </div>
     `;
-    return;
-  } finally {
-    elements.loading.classList.add('hidden');
   }
 }
 
