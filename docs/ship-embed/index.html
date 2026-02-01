@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ship Embed Generator — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🏷️ Ship Embed Generator</h1>
+        <p class="subtitle">Create embeddable badges for your ships to show off in READMEs and portfolios.</p>
+      </header>
+
+      <main>
+        <div class="input-section">
+          <label for="shipTitle">Ship Title</label>
+          <input type="text" id="shipTitle" placeholder="My Awesome Ship" />
+          
+          <label for="shipStatus">Status</label>
+          <select id="shipStatus">
+            <option value="pending">⏳ Pending</option>
+            <option value="verified">✅ Verified</option>
+            <option value="rejected">❌ Rejected</option>
+          </select>
+
+          <label for="attestations">Attestations (0-3)</label>
+          <input type="range" id="attestations" min="0" max="3" value="1" />
+          <div class="range-labels">
+            <span>0/3</span>
+            <span>1/3</span>
+            <span>2/3</span>
+            <span>3/3</span>
+          </div>
+
+          <label for="proofUrl">Proof URL (for badge link)</label>
+          <input type="url" id="proofUrl" placeholder="https://github.com/you/project" />
+
+          <div class="style-options">
+            <label>Badge Style</label>
+            <div class="style-buttons">
+              <button class="style-btn active" data-style="flat">Flat</button>
+              <button class="style-btn" data-style="flat-square">Flat Square</button>
+              <button class="style-btn" data-style="plastic">Plastic</button>
+              <button class="style-btn" data-style="for-the-badge">For the Badge</button>
+            </div>
+          </div>
+
+          <button id="generateBtn" class="primary-btn">🎨 Generate Badge</button>
+        </div>
+
+        <div id="preview" class="preview-section hidden">
+          <h2>Preview</h2>
+          <div class="preview-container">
+            <div id="badgePreview" class="badge-preview"></div>
+          </div>
+
+          <div class="code-section">
+            <h3>Markdown</h3>
+            <div class="code-block">
+              <code id="markdownCode"></code>
+              <button class="copy-btn" data-target="markdownCode">📋 Copy</button>
+            </div>
+          </div>
+
+          <div class="code-section">
+            <h3>HTML</h3>
+            <div class="code-block">
+              <code id="htmlCode"></code>
+              <button class="copy-btn" data-target="htmlCode">📋 Copy</button>
+            </div>
+          </div>
+
+          <div class="code-section">
+            <h3>Direct URL</h3>
+            <div class="code-block">
+              <code id="urlCode"></code>
+              <button class="copy-btn" data-target="urlCode">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="examples-section">
+          <h2>Example Badges</h2>
+          <div class="example-badges">
+            <div class="example-badge">
+              <img src="https://img.shields.io/badge/Shipyard-Verified-22c55e?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0yMSA5LjVsLTEuNS0xLjVMLDE1LjUsM0wxNCw0LjVsLTItMkw3LjUsN0w2LDUuNUw0LjUsNy41TDMsNkwxLjUsN2wxLjUsMS41TDIsOS41TDMuNSwxMUw2LDguNUw3LjUsMTBMMTIsNS41TDE0LjUsOEwxOSw0LjVMMjEsNi41TDE5LjUsOHoiLz48L3N2Zz4=" alt="Shipyard Verified" />
+              <span>Verified Ship</span>
+            </div>
+            <div class="example-badge">
+              <img src="https://img.shields.io/badge/Shipyard-Pending_(2%2F3)-eab308?style=flat" alt="Shipyard Pending" />
+              <span>Pending (2/3 attests)</span>
+            </div>
+            <div class="example-badge">
+              <img src="https://img.shields.io/badge/Shipyard-Ship-7c3aed?style=for-the-badge" alt="Shipyard Ship" />
+              <span>For-the-badge style</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Built for <a href="https://shipyard.bot">Shipyard</a> • <a href="https://github.com/crunchybananas/shipyard-microtools">Source</a></p>
+        <p class="note">Badges powered by <a href="https://shields.io">Shields.io</a></p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

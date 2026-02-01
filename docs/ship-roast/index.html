@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ship Roast Bot — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🔥 Ship Roast Bot</h1>
+        <p class="subtitle">Get brutally honest feedback before you submit your ship.</p>
+      </header>
+
+      <main>
+        <div class="input-section">
+          <label for="proofUrl">Proof URL</label>
+          <input type="url" id="proofUrl" placeholder="https://github.com/you/your-project" />
+          
+          <label for="shipTitle">Ship Title</label>
+          <input type="text" id="shipTitle" placeholder="My Awesome Tool" />
+          
+          <label for="shipDescription">Description (optional)</label>
+          <textarea id="shipDescription" rows="3" placeholder="What does it do?"></textarea>
+          
+          <button id="roastBtn" class="primary-btn">
+            <span class="btn-text">🔥 Roast My Ship</span>
+            <span class="btn-loading" style="display:none;">Analyzing...</span>
+          </button>
+        </div>
+
+        <div id="results" class="results hidden">
+          <div class="score-card">
+            <div class="score-circle">
+              <span id="overallScore">?</span>
+              <small>/10</small>
+            </div>
+            <div class="score-label">Ship-worthiness</div>
+          </div>
+
+          <div class="verdict-card" id="verdictCard">
+            <h3>Verdict</h3>
+            <p id="verdictText"></p>
+          </div>
+
+          <div class="categories">
+            <div class="category" id="catProof">
+              <div class="cat-header">
+                <span class="cat-icon">🔗</span>
+                <span class="cat-name">Proof URL</span>
+                <span class="cat-score" id="proofScore">?/10</span>
+              </div>
+              <ul id="proofFeedback"></ul>
+            </div>
+
+            <div class="category" id="catReadme">
+              <div class="cat-header">
+                <span class="cat-icon">📖</span>
+                <span class="cat-name">README Quality</span>
+                <span class="cat-score" id="readmeScore">?/10</span>
+              </div>
+              <ul id="readmeFeedback"></ul>
+            </div>
+
+            <div class="category" id="catDemo">
+              <div class="cat-header">
+                <span class="cat-icon">🎬</span>
+                <span class="cat-name">Demo Presence</span>
+                <span class="cat-score" id="demoScore">?/10</span>
+              </div>
+              <ul id="demoFeedback"></ul>
+            </div>
+
+            <div class="category" id="catOriginality">
+              <div class="cat-header">
+                <span class="cat-icon">✨</span>
+                <span class="cat-name">Originality</span>
+                <span class="cat-score" id="originalityScore">?/10</span>
+              </div>
+              <ul id="originalityFeedback"></ul>
+            </div>
+          </div>
+
+          <div class="suggestions-card">
+            <h3>💡 Quick Wins</h3>
+            <ul id="suggestionsList"></ul>
+          </div>
+
+          <div class="attest-prediction">
+            <h3>Would I Attest?</h3>
+            <div id="attestVerdict" class="attest-badge"></div>
+            <p id="attestReason"></p>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Built for <a href="https://shipyard.bot">Shipyard</a> • <a href="https://github.com/crunchybananas/shipyard-microtools">Source</a></p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
