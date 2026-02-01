@@ -55,17 +55,13 @@ let g = null;
 
 async function fetchJson(url, label) {
   try {
-    console.log(`[API] ${label} → ${url}`);
     const resp = await fetch(url);
-    console.log(`[API] ${label} status`, resp.status);
     if (!resp.ok) {
-      const text = await resp.text().catch(() => '');
-      console.error(`[API] ${label} error body`, text);
       throw new Error(`API returned ${resp.status}`);
     }
     return await resp.json();
   } catch (e) {
-    console.error(`[API] ${label} failed`, e, e?.stack);
+    console.error(`[API] ${label} failed`, e);
     throw e;
   }
 }
@@ -424,7 +420,7 @@ async function loadData() {
     renderGraph();
     elements.loading.classList.add('hidden');
   } catch (e) {
-    console.error('Failed to load data:', e, e?.stack);
+    console.error('Failed to load data:', e);
     
     // Check if it's likely a CORS error
     const isCorsError = e.message.includes('Failed to fetch') || 
