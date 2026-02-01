@@ -2,6 +2,15 @@
 // Fetches ships + attestations and renders a force-directed graph
 
 const API_BASE = 'https://shipyard.bot/api';
+const LOCAL_PROXY = 'http://localhost:8010/proxy/api';
+
+// Use local proxy on localhost, direct API otherwise
+function getApiBase() {
+  const isLocalhost = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' ||
+                      window.location.protocol === 'file:';
+  return isLocalhost ? LOCAL_PROXY : API_BASE;
+}
 
 const state = {
   ships: [],
@@ -40,9 +49,10 @@ async function fetchAllShips() {
   const ships = [];
   let offset = 0;
   const limit = 100;
+  const apiBase = getApiBase();
   
   while (true) {
-    const resp = await fetch(`${API_BASE}/ships?limit=${limit}&offset=${offset}`);
+    const resp = await fetch(`${apiBase}/ships?limit=${limit}&offset=${offset}`);
     if (!resp.ok) throw new Error(`API returned ${resp.status}`);
     const data = await resp.json();
     
@@ -59,7 +69,8 @@ async function fetchAllShips() {
 // Fetch attestation details for a ship
 async function fetchShipDetails(shipId) {
   try {
-    const resp = await fetch(`${API_BASE}/ships/${shipId}`);
+    const apiBase = getApiBase();
+    const resp = await fetch(`${apiBase}/ships/${shipId}`);
     if (!resp.ok) return null;
     return await resp.json();
   } catch (e) {
@@ -399,24 +410,40 @@ async function loadData() {
                         e.message.includes('NetworkError');
     
     if (isCorsError) {
+      const isLocalhost = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+      
+      const localInstructions = isLocalhost ? `
+        <p style="color: #f8fafc; font-size: 0.9rem; margin-top: 16px;">
+          <strong>Start the CORS proxy in another terminal:</strong>
+        </p>
+        <code style="display: block; background: #1e293b; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 0.85rem;">
+          npx local-cors-proxy --proxyUrl https://shipyard.bot --port 8010
+        </code>
+        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 12px;">Then refresh this page.</p>
+      ` : `
+        <p style="color: #f8fafc; font-size: 0.9rem; margin-top: 16px;">
+          <strong>To use this tool:</strong>
+        </p>
+        <ol style="color: #94a3b8; font-size: 0.85rem; text-align: left; margin: 12px 0; line-height: 1.8;">
+          <li>Clone: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">git clone https://github.com/crunchybananas/shipyard-microtools</code></li>
+          <li>Start proxy: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">npx local-cors-proxy --proxyUrl https://shipyard.bot --port 8010</code></li>
+          <li>Serve site: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">npx serve docs</code></li>
+          <li>Open <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">http://localhost:3000/reputation-graph</code></li>
+        </ol>
+      `;
+      
       elements.loading.innerHTML = `
-        <div style="text-align: center; max-width: 400px;">
+        <div style="text-align: center; max-width: 420px;">
           <div style="font-size: 2rem; margin-bottom: 12px;">🔒</div>
           <span style="color: #f87171; font-size: 1.1rem;">CORS Blocked</span>
           <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 12px; line-height: 1.5;">
-            The Shipyard API doesn't allow cross-origin requests from GitHub Pages.
+            The Shipyard API requires a local CORS proxy.
           </p>
-          <p style="color: #f8fafc; font-size: 0.9rem; margin-top: 16px;">
-            <strong>To use this tool:</strong>
-          </p>
-          <ol style="color: #94a3b8; font-size: 0.85rem; text-align: left; margin: 12px 0; line-height: 1.8;">
-            <li>Clone the repo: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">git clone https://github.com/crunchybananas/shipyard-microtools</code></li>
-            <li>Run a local server: <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">npx serve docs</code></li>
-            <li>Open <code style="background: #1e293b; padding: 2px 6px; border-radius: 4px;">http://localhost:3000/reputation-graph</code></li>
-          </ol>
+          ${localInstructions}
           <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/reputation-graph" 
              target="_blank"
-             style="display: inline-block; margin-top: 12px; color: #22d3ee; text-decoration: none;">
+             style="display: inline-block; margin-top: 16px; color: #22d3ee; text-decoration: none;">
             View Source on GitHub →
           </a>
         </div>
