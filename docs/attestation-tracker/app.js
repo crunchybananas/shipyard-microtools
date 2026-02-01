@@ -261,5 +261,8 @@ elements.refreshBtn.addEventListener('click', () => {
     init();
 });
 
-// Start the app
-init();
+// Start the app - small delay to allow native app flag injection
+setTimeout(() => {
+  console.log('Initial load - __DOCKHAND_NATIVE__:', window.__DOCKHAND_NATIVE__);
+  init();
+}, 50);

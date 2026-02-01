@@ -389,5 +389,8 @@ elements.refreshActivity.addEventListener('click', () => {
 // Auto-refresh every 30 seconds
 setInterval(init, 30000);
 
-// Start
-init();
+// Start - small delay to allow native app flag injection
+setTimeout(() => {
+  console.log('Initial load - __DOCKHAND_NATIVE__:', window.__DOCKHAND_NATIVE__);
+  init();
+}, 50);

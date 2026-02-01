@@ -490,5 +490,8 @@ window.addEventListener('resize', () => {
   }
 });
 
-// Initial load
-loadData();
+// Initial load - small delay to allow native app flag injection
+setTimeout(() => {
+  console.log('Initial load - __DOCKHAND_NATIVE__:', window.__DOCKHAND_NATIVE__);
+  loadData();
+}, 50);
