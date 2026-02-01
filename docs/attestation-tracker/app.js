@@ -2,13 +2,14 @@
 // Shows pending ships that need attestations, sorted by urgency
 
 const API_BASE = 'https://shipyard.bot/api';
+const DOCKHAND_PROXY = 'shipyard-proxy://shipyard.bot/api';
 const LOCAL_PROXY = 'http://localhost:8010/proxy/api';
 
 // Use local proxy on localhost (due to CORS), direct API on GitHub Pages
 // Native apps (Dockhand) set __DOCKHAND_NATIVE__ to bypass CORS detection
 function getApiBase() {
     // Native app bypasses CORS
-    if (window.__DOCKHAND_NATIVE__) return API_BASE;
+    if (window.__DOCKHAND_NATIVE__) return DOCKHAND_PROXY;
     
     const isLocalhost = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' ||
