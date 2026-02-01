@@ -2,6 +2,7 @@
 // Fetches ships + attestations and renders a force-directed graph
 
 const API_BASE = 'https://shipyard.bot/api';
+const CORS_PROXY = 'https://corsproxy.io/?';
 
 const state = {
   ships: [],
@@ -10,6 +11,7 @@ const state = {
   selectedAgent: null,
   filter: 'all',
   searchTerm: '',
+  useProxy: true, // Try proxy first
 };
 
 const elements = {
@@ -35,6 +37,12 @@ let simulation = null;
 let svg = null;
 let g = null;
 
+// Helper to build URL with optional CORS proxy
+function apiUrl(path) {
+  const url = `${API_BASE}${path}`;
+  return state.useProxy ? `${CORS_PROXY}${encodeURIComponent(url)}` : url;
+}
+
 // Fetch all ships with pagination
 async function fetchAllShips() {
   const ships = [];
@@ -42,7 +50,8 @@ async function fetchAllShips() {
   const limit = 100;
   
   while (true) {
-    const resp = await fetch(`${API_BASE}/ships?limit=${limit}&offset=${offset}`);
+    const resp = await fetch(apiUrl(`/ships?limit=${limit}&offset=${offset}`));
+    if (!resp.ok) throw new Error(`API returned ${resp.status}`);
     const data = await resp.json();
     
     if (!data.ships || data.ships.length === 0) break;
@@ -58,7 +67,8 @@ async function fetchAllShips() {
 // Fetch attestation details for a ship
 async function fetchShipDetails(shipId) {
   try {
-    const resp = await fetch(`${API_BASE}/ships/${shipId}`);
+    const resp = await fetch(apiUrl(`/ships/${shipId}`));
+    if (!resp.ok) return null;
     return await resp.json();
   } catch (e) {
     console.error(`Failed to fetch ship ${shipId}:`, e);
@@ -363,10 +373,19 @@ function updateStats() {
 
 async function loadData() {
   elements.loading.classList.remove('hidden');
+  elements.loading.innerHTML = '<div class="spinner"></div><span>Loading ships...</span>';
   
   try {
-    // Fetch ships
-    let ships = await fetchAllShips();
+    // Try direct first, then proxy
+    let ships;
+    try {
+      state.useProxy = false;
+      ships = await fetchAllShips();
+    } catch (directError) {
+      console.log('Direct API failed, trying CORS proxy...');
+      state.useProxy = true;
+      ships = await fetchAllShips();
+    }
     
     // Apply status filter
     if (state.filter === 'verified') {
@@ -376,6 +395,8 @@ async function loadData() {
     }
     
     state.ships = ships;
+    
+    elements.loading.innerHTML = '<div class="spinner"></div><span>Loading attestations...</span>';
     
     // Build graph
     const { nodes, links, totalAttestations } = await buildGraphData(ships);
@@ -387,7 +408,14 @@ async function loadData() {
     renderGraph();
   } catch (e) {
     console.error('Failed to load data:', e);
-    elements.loading.innerHTML = `<span style="color: #f87171;">Failed to load data. Check console.</span>`;
+    elements.loading.innerHTML = `
+      <span style="color: #f87171;">Failed to load data from API.</span>
+      <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 12px;">
+        CORS may be blocking the request.<br>
+        Try running locally or use Dockhand app.
+      </p>
+    `;
+    return;
   } finally {
     elements.loading.classList.add('hidden');
   }
