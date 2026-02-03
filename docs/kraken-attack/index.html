@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kraken Attack — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🦑 Kraken Attack</h1>
+        <p class="subtitle">Circle the beast. Dodge tentacles. Aim for the eyes!</p>
+      </header>
+
+      <main>
+        <div class="game-container">
+          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          
+          <div id="startScreen" class="overlay">
+            <h2>🦑 Kraken Attack</h2>
+            <p>The legendary Kraken rises from the depths!</p>
+            <div class="controls-info">
+              <p><strong>← →</strong> or <strong>A D</strong> — Circle around</p>
+              <p><strong>Space</strong> — Fire cannons</p>
+              <p><strong>Aim for the eyes</strong> when they glow!</p>
+            </div>
+            <button id="startBtn" class="play-btn">⚔️ Battle!</button>
+          </div>
+
+          <div id="victoryScreen" class="overlay hidden">
+            <h2>🏆 Victory!</h2>
+            <p>You defeated the Kraken!</p>
+            <p>Final Score: <span id="victoryScore">0</span></p>
+            <button id="playAgainBtn" class="play-btn">🦑 Fight Again</button>
+          </div>
+
+          <div id="gameOverScreen" class="overlay hidden">
+            <h2>💀 Defeated!</h2>
+            <p>The Kraken drags you to the depths...</p>
+            <p>Score: <span id="finalScore">0</span></p>
+            <button id="restartBtn" class="play-btn">🔄 Try Again</button>
+          </div>
+
+          <div id="hud" class="hud hidden">
+            <div class="hud-item">
+              <span class="hud-label">Score</span>
+              <span id="score" class="hud-value">0</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">Kraken</span>
+              <div id="bossBar" class="boss-bar">
+                <div id="bossFill" class="boss-fill"></div>
+              </div>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">Ship</span>
+              <div id="healthBar" class="health-bar">
+                <div id="healthFill" class="health-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

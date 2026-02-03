@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Harbor Master — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🚢 Harbor Master</h1>
+        <p class="subtitle">Draw paths to guide ships to matching docks. Don't let them collide!</p>
+      </header>
+
+      <main>
+        <div class="game-container">
+          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          
+          <div id="startScreen" class="overlay">
+            <h2>🚢 Harbor Master</h2>
+            <p>Guide incoming ships to their matching colored docks!</p>
+            <div class="controls-info">
+              <p><strong>Click & Drag</strong> from a ship to draw its path</p>
+              <p><strong>Match colors</strong> — Red ships → Red dock</p>
+              <p><strong>Avoid collisions</strong> — Game over if ships crash!</p>
+            </div>
+            <button id="startBtn" class="play-btn">▶ Start Game</button>
+          </div>
+
+          <div id="gameOverScreen" class="overlay hidden">
+            <h2>💥 Collision!</h2>
+            <p>Ships Docked: <span id="finalScore">0</span></p>
+            <p>High Score: <span id="highScore">0</span></p>
+            <button id="restartBtn" class="play-btn">🔄 Play Again</button>
+          </div>
+
+          <div id="hud" class="hud hidden">
+            <div class="hud-item">
+              <span class="hud-label">Docked</span>
+              <span id="score" class="hud-value">0</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">Ships</span>
+              <span id="shipCount" class="hud-value">0</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

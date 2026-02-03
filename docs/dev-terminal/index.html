@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Developer's Journey — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>💻 The Developer's Journey</h1>
+        <p class="subtitle">A text adventure about coding, AI, and finding your place in a changing world.</p>
+      </header>
+
+      <main>
+        <div class="terminal">
+          <div class="terminal-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="terminal-title">~/developer-journey</span>
+          </div>
+          <div id="output" class="terminal-output"></div>
+          <div class="input-line">
+            <span class="prompt">></span>
+            <input type="text" id="input" placeholder="Type a command..." autocomplete="off" autofocus />
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
