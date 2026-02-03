@@ -867,9 +867,15 @@ const Game = {
         ${hasKey ? `
         <!-- Rusty key glint -->
         <g data-action="pickup" data-target="rusty_key" class="interactive-item">
+          <!-- Larger hit area -->
+          <rect x="200" y="605" width="40" height="40" fill="transparent" class="hit-area"/>
           <ellipse cx="220" cy="625" rx="12" ry="6" fill="#8b4513"/>
           <circle cx="220" cy="625" r="3" fill="#ffd700" opacity="0.8">
             <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="220" cy="625" r="15" fill="none" stroke="#ffd700" stroke-width="2" opacity="0">
+            <animate attributeName="opacity" values="0;0.5;0" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="15;25;15" dur="2s" repeatCount="indefinite"/>
           </circle>
         </g>
         ` : ''}
@@ -1025,6 +1031,8 @@ const Game = {
         ${hasGear ? `
         <!-- Gear glinting in hollow -->
         <g data-action="pickup" data-target="gear1" class="interactive-item">
+          <!-- Larger hit area -->
+          <rect x="725" y="635" width="50" height="50" fill="transparent" class="hit-area"/>
           <circle cx="750" cy="660" r="12" fill="#8b7355"/>
           <circle cx="750" cy="660" r="8" fill="#a08060"/>
           <!-- Gear teeth -->
@@ -1035,8 +1043,9 @@ const Game = {
             <rect x="759" y="656" width="6" height="8"/>
           </g>
           <circle cx="750" cy="660" r="3" fill="#5c4a3d"/>
-          <circle cx="753" cy="657" r="2" fill="#ffd700" opacity="0.7">
-            <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/>
+          <circle cx="750" cy="660" r="20" fill="none" stroke="#ffd700" stroke-width="2" opacity="0">
+            <animate attributeName="opacity" values="0;0.4;0" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="20;30;20" dur="2s" repeatCount="indefinite"/>
           </circle>
         </g>
         ` : ''}
@@ -1178,12 +1187,15 @@ const Game = {
         ${hasJournal ? `
         <!-- Journal page on altar -->
         <g data-action="pickup" data-target="journal_page1" class="interactive-item">
+          <!-- Larger hit area -->
+          <rect x="560" y="485" width="80" height="60" fill="transparent" class="hit-area"/>
           <rect x="575" y="500" width="50" height="35" fill="#d4c4a8" transform="rotate(-5, 600, 517)"/>
           <line x1="580" y1="510" x2="615" y2="508" stroke="#4a4a4a" stroke-width="1"/>
           <line x1="580" y1="518" x2="620" y2="516" stroke="#4a4a4a" stroke-width="1"/>
           <line x1="580" y1="526" x2="610" y2="524" stroke="#4a4a4a" stroke-width="1"/>
-          <circle cx="615" cy="505" r="3" fill="#ffd700" opacity="0.7">
-            <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/>
+          <circle cx="600" cy="517" r="20" fill="none" stroke="#ffd700" stroke-width="2" opacity="0">
+            <animate attributeName="opacity" values="0;0.4;0" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="20;35;20" dur="2s" repeatCount="indefinite"/>
           </circle>
         </g>
         ` : ''}
@@ -1354,10 +1366,13 @@ const Game = {
         ${hasGear2 ? `
         <!-- Gear hidden in rocks -->
         <g data-action="pickup" data-target="gear2" class="interactive-item">
+          <!-- Larger hit area -->
+          <rect x="355" y="615" width="50" height="50" fill="transparent" class="hit-area"/>
           <circle cx="380" cy="640" r="15" fill="#6a5a4a"/>
           <circle cx="380" cy="640" r="10" fill="#8b7355"/>
-          <circle cx="383" cy="637" r="3" fill="#ffd700" opacity="0.7">
-            <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/>
+          <circle cx="380" cy="640" r="22" fill="none" stroke="#ffd700" stroke-width="2" opacity="0">
+            <animate attributeName="opacity" values="0;0.4;0" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="22;32;22" dur="2s" repeatCount="indefinite"/>
           </circle>
         </g>
         ` : ''}

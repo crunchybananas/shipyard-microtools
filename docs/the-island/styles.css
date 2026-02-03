@@ -168,19 +168,20 @@ body {
 
 [data-action] {
   cursor: pointer;
+  transition: filter var(--transition-fast);
 }
 
 [data-action]:hover {
-  filter: brightness(1.2);
+  filter: brightness(1.2) drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
 }
 
 .interactive-item {
   cursor: pointer;
-  transition: transform var(--transition-fast);
+  transition: filter var(--transition-fast);
 }
 
 .interactive-item:hover {
-  transform: scale(1.1);
+  filter: brightness(1.4) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
 }
 
 .interactive-item.collected {
@@ -206,16 +207,19 @@ body {
 /* Gear slots */
 .gear-slot {
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: filter var(--transition-fast);
 }
 
 .gear-slot:hover {
-  filter: brightness(1.3);
-  transform: scale(1.05);
+  filter: brightness(1.4) drop-shadow(0 0 6px rgba(255, 215, 0, 0.5));
 }
 
 .gear-slot.filled {
   cursor: default;
+}
+
+.gear-slot.filled:hover {
+  filter: none;
 }
 
 /* ============================================
@@ -348,8 +352,8 @@ body {
 
 .inventory-item:hover {
   border-color: var(--text-highlight);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--shadow-color);
+  background: var(--bg-mid);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
 }
 
 .item-icon {
