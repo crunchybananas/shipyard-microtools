@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HTTP Status Codes — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🚦 HTTP Status Codes</h1>
+        <p class="subtitle">Look up any HTTP status code with fun messages.</p>
+      </header>
+
+      <main>
+        <div class="input-section">
+          <label for="codeInput">Enter Status Code</label>
+          <input type="number" id="codeInput" placeholder="404" min="100" max="599" />
+          
+          <button id="lookupBtn" class="primary-btn">
+            <span class="btn-text">🔍 Look Up Code</span>
+          </button>
+        </div>
+
+        <div id="result" class="result-card hidden">
+          <div class="status-header">
+            <span id="statusEmoji" class="status-emoji">👻</span>
+            <div class="status-info">
+              <span id="statusCode" class="status-code">404</span>
+              <span id="statusName" class="status-name">Not Found</span>
+            </div>
+          </div>
+          <p id="statusMessage" class="status-message">This is not the endpoint you are looking for.</p>
+          <div class="status-meta">
+            <span id="statusCategory" class="category-badge">Client Error</span>
+          </div>
+        </div>
+
+        <div class="categories-section">
+          <h3>Browse by Category</h3>
+          
+          <div class="category-group">
+            <h4 class="category-title informational">1xx — Informational</h4>
+            <div class="codes-grid" id="codes-1xx"></div>
+          </div>
+          
+          <div class="category-group">
+            <h4 class="category-title success">2xx — Success</h4>
+            <div class="codes-grid" id="codes-2xx"></div>
+          </div>
+          
+          <div class="category-group">
+            <h4 class="category-title redirect">3xx — Redirection</h4>
+            <div class="codes-grid" id="codes-3xx"></div>
+          </div>
+          
+          <div class="category-group">
+            <h4 class="category-title client-error">4xx — Client Error</h4>
+            <div class="codes-grid" id="codes-4xx"></div>
+          </div>
+          
+          <div class="category-group">
+            <h4 class="category-title server-error">5xx — Server Error</h4>
+            <div class="codes-grid" id="codes-5xx"></div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cron Parser — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>⏰ Cron Parser</h1>
+        <p class="subtitle">Explains cron expressions in plain English.</p>
+      </header>
+
+      <main>
+        <div class="input-section">
+          <label for="cronInput">Cron Expression</label>
+          <input type="text" id="cronInput" placeholder="*/15 * * * *" value="*/15 * * * *" />
+          
+          <div class="field-hints">
+            <span>minute</span>
+            <span>hour</span>
+            <span>day</span>
+            <span>month</span>
+            <span>weekday</span>
+          </div>
+
+          <button id="parseBtn" class="primary-btn">
+            <span class="btn-text">🔍 Parse Expression</span>
+          </button>
+        </div>
+
+        <div id="results" class="results">
+          <div class="result-card">
+            <h3>Human Readable</h3>
+            <p id="humanReadable" class="highlight-text">Enter a cron expression above</p>
+          </div>
+
+          <div class="result-card">
+            <h3>Field Breakdown</h3>
+            <div id="fieldBreakdown" class="field-grid">
+              <div class="field-item"><span class="field-name">Minute</span><span class="field-value">—</span></div>
+              <div class="field-item"><span class="field-name">Hour</span><span class="field-value">—</span></div>
+              <div class="field-item"><span class="field-name">Day of Month</span><span class="field-value">—</span></div>
+              <div class="field-item"><span class="field-name">Month</span><span class="field-value">—</span></div>
+              <div class="field-item"><span class="field-name">Day of Week</span><span class="field-value">—</span></div>
+            </div>
+          </div>
+
+          <div class="result-card">
+            <h3>Next 5 Runs</h3>
+            <ul id="nextRuns" class="next-runs-list">
+              <li>—</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="examples-section">
+          <h3>Common Examples</h3>
+          <div class="examples-grid">
+            <button class="example-btn" data-cron="* * * * *">Every minute</button>
+            <button class="example-btn" data-cron="*/5 * * * *">Every 5 minutes</button>
+            <button class="example-btn" data-cron="0 * * * *">Every hour</button>
+            <button class="example-btn" data-cron="0 0 * * *">Daily at midnight</button>
+            <button class="example-btn" data-cron="0 9 * * 1-5">Weekdays at 9am</button>
+            <button class="example-btn" data-cron="0 0 1 * *">First of month</button>
+            <button class="example-btn" data-cron="30 4 * * 0">Sundays at 4:30am</button>
+            <button class="example-btn" data-cron="0 */2 * * *">Every 2 hours</button>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
