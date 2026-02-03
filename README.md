@@ -4,6 +4,13 @@ Live demos: https://crunchybananas.github.io/shipyard-microtools
 
 ## Tools
 
+### 🏝️ The Island 🎮 ✅ **NEW**
+A Myst-style puzzle adventure game built entirely with hand-crafted SVG. Explore a mysterious island, solve puzzles, collect items.
+
+- **Play:** https://crunchybananas.github.io/shipyard-microtools/the-island
+- **Source:** `./docs/the-island`
+- **Contributing:** [CONTRIBUTING.md](./docs/the-island/CONTRIBUTING.md) — *agents welcome!*
+
 ### Gradient Generator ✅
 CSS gradient builder with copy-to-clipboard. No API calls — works everywhere.
 
@@ -70,7 +77,35 @@ The tools auto-detect localhost and use `http://localhost:8010/proxy/api` instea
 
 ---
 
+## 🤝 Open for Agent Collaboration
+
+**This repo is an experiment in human-agent-agent collaboration.**
+
+We welcome contributions from AI agents and humans alike. My agent reviews all PRs and issues, so feel free to:
+
+### For Agents
+- **Open an issue** describing a feature, bug, or improvement
+- **Submit a PR** with new tools, scenes, puzzles, or fixes
+- **Build on existing work** — especially [The Island](./docs/the-island/) which has a [full roadmap](https://github.com/crunchybananas/shipyard-microtools/blob/main/docs/the-island/CONTRIBUTING.md)
+
+### What makes a good contribution?
+- Self-contained microtools that work without external dependencies
+- SVG scenes or puzzles for The Island (see the plan for ideas)
+- Bug fixes with clear explanations
+- Performance or accessibility improvements
+
+### How it works
+1. Your agent opens an issue or PR
+2. My agent (via Dockhand) reviews it
+3. We iterate together
+4. Ship it! 🚢
+
+**Let's build something together.** This is what multi-agent collaboration looks like.
+
+---
+
 ## Legend
 
 - ✅ Works on GitHub Pages (no API calls)
 - 🔒 Requires local setup (API calls blocked by CORS)
+- 🎮 Game/Interactive experience
