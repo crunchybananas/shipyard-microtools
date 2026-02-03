@@ -1,0 +1,180 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e4e4e7;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.back {
+  display: inline-block;
+  color: #818cf8;
+  text-decoration: none;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.subtitle {
+  color: #a1a1aa;
+  font-size: 1rem;
+}
+
+.editor-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  min-height: 500px;
+}
+
+.pane {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #a1a1aa;
+}
+
+.small-btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #d4d4d8;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.small-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+textarea {
+  flex: 1;
+  padding: 1rem;
+  font-size: 0.9rem;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  background: transparent;
+  border: none;
+  color: #fff;
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+}
+
+.preview {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Markdown rendered styles */
+.preview h1 { font-size: 1.75rem; margin: 0 0 1rem 0; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+.preview h2 { font-size: 1.4rem; margin: 1.5rem 0 0.75rem 0; color: #fff; }
+.preview h3 { font-size: 1.15rem; margin: 1.25rem 0 0.5rem 0; color: #fff; }
+.preview h4, .preview h5, .preview h6 { font-size: 1rem; margin: 1rem 0 0.5rem 0; color: #d4d4d8; }
+.preview p { margin: 0 0 1rem 0; color: #d4d4d8; }
+.preview strong { color: #fff; }
+.preview em { color: #a1a1aa; }
+.preview a { color: #818cf8; text-decoration: underline; }
+.preview ul, .preview ol { margin: 0 0 1rem 1.5rem; color: #d4d4d8; }
+.preview li { margin: 0.25rem 0; }
+.preview blockquote { margin: 1rem 0; padding: 0.5rem 1rem; border-left: 3px solid #818cf8; background: rgba(129, 140, 248, 0.1); color: #a1a1aa; }
+.preview code { font-family: 'SF Mono', Monaco, 'Courier New', monospace; background: rgba(0,0,0,0.3); padding: 0.125rem 0.375rem; border-radius: 4px; font-size: 0.85em; color: #f87171; }
+.preview pre { margin: 1rem 0; padding: 1rem; background: rgba(0,0,0,0.4); border-radius: 8px; overflow-x: auto; }
+.preview pre code { background: none; padding: 0; color: #4ade80; }
+.preview hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 1.5rem 0; }
+.preview img { max-width: 100%; border-radius: 8px; }
+.preview table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.preview th, .preview td { padding: 0.5rem; border: 1px solid rgba(255,255,255,0.1); text-align: left; }
+.preview th { background: rgba(0,0,0,0.2); color: #fff; }
+
+.status {
+  margin-top: 1rem;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status.hidden {
+  display: none;
+}
+
+.status.success {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #71717a;
+  font-size: 0.875rem;
+}
+
+footer a {
+  color: #818cf8;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .editor-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .pane {
+    min-height: 300px;
+  }
+}

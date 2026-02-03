@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text Diff — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>📊 Text Diff</h1>
+        <p class="subtitle">Compare two text snippets and see the differences.</p>
+      </header>
+
+      <main>
+        <div class="input-row">
+          <div class="input-section">
+            <label for="textA">Original</label>
+            <textarea id="textA" rows="12" placeholder="Paste original text here..."></textarea>
+          </div>
+
+          <div class="input-section">
+            <label for="textB">Modified</label>
+            <textarea id="textB" rows="12" placeholder="Paste modified text here..."></textarea>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="diffBtn" class="primary-btn">🔍 Compare</button>
+          <button id="swapBtn" class="secondary-btn">⇄ Swap</button>
+          <button id="clearBtn" class="secondary-btn">Clear</button>
+        </div>
+
+        <div id="results" class="results hidden">
+          <div class="stats-bar">
+            <span id="addedCount" class="stat added">+0 added</span>
+            <span id="removedCount" class="stat removed">-0 removed</span>
+            <span id="unchangedCount" class="stat">0 unchanged</span>
+          </div>
+          <div id="diffOutput" class="diff-output"></div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
