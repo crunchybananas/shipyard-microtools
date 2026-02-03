@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmos - Procedural Universe Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="cosmos"></canvas>
+    
+    <header id="header">
+      <h1>🌌 COSMOS</h1>
+      <div class="header-actions">
+        <button id="bookmarkBtn" title="Bookmark this location">☆ Bookmark</button>
+        <button id="bookmarksBtn" title="View bookmarks">📚 Bookmarks</button>
+      </div>
+    </header>
+    
+    <div id="info-panel">
+      <div id="location-info">
+        <div class="info-title">Exploring the Universe</div>
+        <div class="info-subtitle">Scroll to zoom • Drag to pan • Click to focus</div>
+      </div>
+      <div id="object-info"></div>
+      <div id="coordinates">
+        <span id="coords-display">0, 0</span>
+        <span class="zoom-label">Zoom:</span>
+        <div class="zoom-bar">
+          <div id="zoom-fill"></div>
+        </div>
+        <button id="copyCoords" title="Copy coordinates">📋</button>
+      </div>
+    </div>
+    
+    <div id="scale-indicator">
+      <span id="scale-name">Universe</span>
+    </div>
+    
+    <div id="bookmarks-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📚 Bookmarks</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div id="bookmarks-list"></div>
+      </div>
+    </div>
+    
+    <div id="toast" class="hidden"></div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

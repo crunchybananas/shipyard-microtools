@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowForge - Visual Node-Based Programming</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header id="header">
+      <div class="header-left">
+        <h1>🔗 FLOWFORGE</h1>
+      </div>
+      <div class="header-actions">
+        <button id="newBtn" title="New flow">New</button>
+        <button id="saveBtn" title="Save flow">Save</button>
+        <button id="loadBtn" title="Load flow">Load</button>
+        <div class="divider"></div>
+        <button id="runBtn" class="primary" title="Run flow">▶ Run</button>
+        <button id="stepBtn" title="Step through flow">⏭ Step</button>
+        <button id="clearBtn" title="Clear results">Clear</button>
+      </div>
+    </header>
+    
+    <div id="main">
+      <aside id="palette">
+        <div class="palette-section">
+          <div class="palette-header">📥 Input</div>
+          <div class="palette-nodes">
+            <div class="palette-node" data-type="json-input">JSON</div>
+            <div class="palette-node" data-type="text-input">Text</div>
+            <div class="palette-node" data-type="number-input">Number</div>
+            <div class="palette-node" data-type="http-input">HTTP</div>
+          </div>
+        </div>
+        
+        <div class="palette-section">
+          <div class="palette-header">🔄 Transform</div>
+          <div class="palette-nodes">
+            <div class="palette-node" data-type="map">Map</div>
+            <div class="palette-node" data-type="filter">Filter</div>
+            <div class="palette-node" data-type="jsonpath">JSONPath</div>
+            <div class="palette-node" data-type="merge">Merge</div>
+          </div>
+        </div>
+        
+        <div class="palette-section">
+          <div class="palette-header">❓ Logic</div>
+          <div class="palette-nodes">
+            <div class="palette-node" data-type="if-else">If/Else</div>
+            <div class="palette-node" data-type="switch">Switch</div>
+            <div class="palette-node" data-type="math">Math</div>
+            <div class="palette-node" data-type="compare">Compare</div>
+          </div>
+        </div>
+        
+        <div class="palette-section">
+          <div class="palette-header">📤 Output</div>
+          <div class="palette-nodes">
+            <div class="palette-node" data-type="display">Display</div>
+            <div class="palette-node" data-type="console">Console</div>
+            <div class="palette-node" data-type="download">Download</div>
+          </div>
+        </div>
+        
+        <div class="palette-section">
+          <div class="palette-header">📂 Examples</div>
+          <div class="palette-examples">
+            <button class="example-btn" data-example="json-transform">JSON Transform</button>
+            <button class="example-btn" data-example="math-calc">Math Calculator</button>
+            <button class="example-btn" data-example="filter-data">Filter Data</button>
+          </div>
+        </div>
+      </aside>
+      
+      <div id="canvas-container">
+        <svg id="connections"></svg>
+        <div id="canvas"></div>
+        
+        <div id="minimap">
+          <canvas id="minimap-canvas"></canvas>
+        </div>
+      </div>
+      
+      <aside id="preview-panel">
+        <div class="preview-header">
+          <span>DATA PREVIEW</span>
+          <button id="closePreview" class="icon-btn">×</button>
+        </div>
+        <div id="preview-content">
+          <div class="preview-empty">Select a node or run the flow to see data</div>
+        </div>
+      </aside>
+    </div>
+    
+    <div id="context-menu" class="hidden">
+      <div class="context-item" data-action="delete">Delete Node</div>
+      <div class="context-item" data-action="duplicate">Duplicate</div>
+      <div class="context-item" data-action="disconnect">Disconnect All</div>
+    </div>
+    
+    <div id="save-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Save Flow</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label>Flow Name</label>
+          <input type="text" id="save-name" placeholder="My Flow">
+          <button id="save-confirm" class="primary">Save</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="load-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Load Flow</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body" id="saved-flows">
+          <div class="preview-empty">No saved flows</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="toast" class="hidden"></div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
