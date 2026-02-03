@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ship Wreckers — Shipyard Microtools</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>⛵ Ship Wreckers</h1>
+        <p class="subtitle">Dodge rocks, blast pirates, collect cargo. How long can you survive?</p>
+      </header>
+
+      <main>
+        <div class="game-container">
+          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          
+          <div id="startScreen" class="overlay">
+            <h2>⛵ Ship Wreckers</h2>
+            <p>Navigate the treacherous waters!</p>
+            <div class="controls-info">
+              <p><strong>WASD</strong> or <strong>Arrow Keys</strong> — Move</p>
+              <p><strong>Space</strong> — Fire cannons</p>
+            </div>
+            <button id="startBtn" class="play-btn">▶ Start Game</button>
+          </div>
+
+          <div id="gameOverScreen" class="overlay hidden">
+            <h2>💀 Ship Wrecked!</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <p>Cargo Collected: <span id="finalCargo">0</span></p>
+            <button id="restartBtn" class="play-btn">🔄 Play Again</button>
+          </div>
+
+          <div id="hud" class="hud hidden">
+            <div class="hud-item">
+              <span class="hud-label">Score</span>
+              <span id="score" class="hud-value">0</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">Cargo</span>
+              <span id="cargo" class="hud-value">0</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">Health</span>
+              <div id="healthBar" class="health-bar">
+                <div id="healthFill" class="health-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
