@@ -1,0 +1,580 @@
+/**
+ * The Island - Myst-Style SVG Adventure
+ * Styles & Animations
+ */
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+  --bg-dark: #0a0a12;
+  --bg-mid: #1a1a2e;
+  --bg-light: #2a2a3e;
+  --text-primary: #d4c4a8;
+  --text-secondary: #8b8b9b;
+  --text-highlight: #ffd700;
+  --accent-blue: #4a7a9a;
+  --accent-teal: #2a5a5a;
+  --border-color: #3a3a4a;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.4s ease;
+  --transition-slow: 0.8s ease;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* ============================================
+   GAME CONTAINER
+   ============================================ */
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--bg-dark);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-dark) 100%);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.game-title {
+  font-size: 1.5rem;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+  color: var(--text-highlight);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.location-name {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.menu-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.menu-btn {
+  padding: 0.4rem 0.8rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.menu-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   MAIN GAME AREA
+   ============================================ */
+.game-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   SCENE CONTAINER
+   ============================================ */
+#scene-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: var(--bg-dark);
+  overflow: hidden;
+}
+
+.scene-svg {
+  width: 100%;
+  height: 100%;
+  max-height: calc(100vh - 200px);
+  object-fit: contain;
+}
+
+/* Scene transitions */
+#scene-container.scene-exit {
+  animation: sceneExit 0.3s ease forwards;
+}
+
+#scene-container.scene-enter {
+  animation: sceneEnter 0.5s ease forwards;
+}
+
+@keyframes sceneExit {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes sceneEnter {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================
+   INTERACTIVE ELEMENTS
+   ============================================ */
+.hotspot {
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.hotspot:hover {
+  opacity: 0.8;
+}
+
+[data-action] {
+  cursor: pointer;
+}
+
+[data-action]:hover {
+  filter: brightness(1.2);
+}
+
+.interactive-item {
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.interactive-item:hover {
+  transform: scale(1.1);
+}
+
+.interactive-item.collected {
+  animation: collectItem 0.5s ease forwards;
+}
+
+@keyframes collectItem {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3) translateY(-20px); opacity: 0.8; }
+  100% { transform: scale(0) translateY(-40px); opacity: 0; }
+}
+
+/* Standing stones hover effect */
+.standing-stone {
+  cursor: pointer;
+  transition: filter var(--transition-fast);
+}
+
+.standing-stone:hover {
+  filter: brightness(1.3);
+}
+
+/* Gear slots */
+.gear-slot {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.gear-slot:hover {
+  filter: brightness(1.3);
+  transform: scale(1.05);
+}
+
+.gear-slot.filled {
+  cursor: default;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.navigation {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(10, 10, 18, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.nav-btn {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.nav-btn:hover:not(.hidden):not(.locked) {
+  color: var(--text-highlight);
+  border-color: var(--text-highlight);
+  background: rgba(255, 215, 0, 0.1);
+  transform: scale(1.05);
+}
+
+.nav-btn.hidden {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.nav-btn.locked {
+  color: #8b4513;
+  border-color: #8b4513;
+  cursor: not-allowed;
+}
+
+.nav-btn.locked::after {
+  content: '🔒';
+  position: absolute;
+  font-size: 0.7rem;
+  bottom: 2px;
+  right: 2px;
+}
+
+/* ============================================
+   MESSAGE BOX
+   ============================================ */
+#game-message {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 600px;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: rgba(10, 10, 18, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-medium);
+  text-align: center;
+  box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+#game-message.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================
+   INVENTORY
+   ============================================ */
+.inventory-panel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(0deg, var(--bg-mid) 0%, var(--bg-dark) 100%);
+  border-top: 1px solid var(--border-color);
+}
+
+.inventory-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+#inventory-items {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 50px;
+  padding: 0.25rem;
+}
+
+.inventory-item {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  animation: itemAppear 0.3s ease;
+}
+
+.inventory-item:hover {
+  border-color: var(--text-highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.item-icon {
+  font-size: 1.5rem;
+}
+
+@keyframes itemAppear {
+  from { transform: scale(0) rotate(-180deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* ============================================
+   PUZZLE OVERLAY
+   ============================================ */
+.puzzle-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  animation: overlayFadeIn 0.3s ease;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.puzzle-container {
+  max-width: 500px;
+  padding: 2rem;
+  background: var(--bg-mid);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 40px var(--shadow-color);
+}
+
+.puzzle-container h2 {
+  margin-bottom: 1rem;
+  font-weight: normal;
+  color: var(--text-highlight);
+  letter-spacing: 0.1em;
+}
+
+.puzzle-container p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.mirror-puzzle-svg {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin: 1rem 0;
+  background: var(--bg-dark);
+  border-radius: 8px;
+}
+
+.mirror-puzzle-svg .mirror {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mirror-puzzle-svg .mirror:hover {
+  filter: brightness(1.3);
+}
+
+.mirror-puzzle-svg .mirror-hit {
+  fill: transparent;
+}
+
+.mirror-puzzle-svg .target.hit {
+  animation: targetHit 0.5s ease;
+}
+
+@keyframes targetHit {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(2); }
+}
+
+.puzzle-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.puzzle-close {
+  margin-top: 1rem;
+  padding: 0.6rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.puzzle-close:hover {
+  border-color: var(--text-highlight);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+/* ============================================
+   SVG ANIMATIONS
+   ============================================ */
+.waves path {
+  animation: waveMotion 4s ease-in-out infinite;
+}
+
+.fireflies circle {
+  animation: fireflyFloat 3s ease-in-out infinite;
+}
+
+@keyframes fireflyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.light-rays line {
+  animation: rayPulse 3s ease-in-out infinite;
+}
+
+@keyframes rayPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .game-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .game-title {
+    font-size: 1.2rem;
+  }
+  
+  .navigation {
+    bottom: 0.5rem;
+  }
+  
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  #game-message {
+    max-width: 90%;
+    bottom: 80px;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .inventory-panel {
+    padding: 0.5rem 1rem;
+  }
+  
+  .inventory-item {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .item-icon {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+  }
+  
+  .menu-buttons {
+    gap: 0.25rem;
+  }
+  
+  .menu-btn {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ============================================
+   INTRO ANIMATION
+   ============================================ */
+.game-wrapper.intro #scene-container {
+  animation: introFade 2s ease forwards;
+}
+
+@keyframes introFade {
+  0% { opacity: 0; filter: blur(10px); }
+  100% { opacity: 1; filter: blur(0); }
+}

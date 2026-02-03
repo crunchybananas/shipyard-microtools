@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Island - A Myst-Style Adventure</title>
+  <meta name="description" content="A first-person puzzle adventure game with hand-crafted SVG scenes. Explore a mysterious island and solve interconnected puzzles to escape.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏝️</text></svg>">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Preload hint for better performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+  <div class="game-wrapper intro">
+    <!-- Header -->
+    <header class="game-header">
+      <h1 class="game-title">THE ISLAND</h1>
+      <span id="location-name" class="location-name">The Beach</span>
+      <div class="menu-buttons">
+        <button id="btn-save" class="menu-btn">Save</button>
+        <button id="btn-load" class="menu-btn">Load</button>
+        <button id="btn-new" class="menu-btn">New Game</button>
+      </div>
+    </header>
+    
+    <!-- Main Game Area -->
+    <main class="game-main">
+      <!-- Scene Container (SVG renders here) -->
+      <div id="scene-container">
+        <!-- SVG scene will be injected by JavaScript -->
+        <noscript>
+          <p style="color: #d4c4a8; text-align: center; padding: 2rem;">
+            This game requires JavaScript to play. Please enable JavaScript and refresh the page.
+          </p>
+        </noscript>
+      </div>
+      
+      <!-- Navigation Controls -->
+      <nav class="navigation">
+        <button class="nav-btn hidden" data-direction="up" title="Go Up">↑</button>
+        <button class="nav-btn hidden" data-direction="north" title="Go North">⬆</button>
+        <button class="nav-btn hidden" data-direction="down" title="Go Down">↓</button>
+        <button class="nav-btn hidden" data-direction="west" title="Go West">⬅</button>
+        <button class="nav-btn hidden" data-direction="east" title="Go East">➡</button>
+        <button class="nav-btn hidden" data-direction="south" title="Go South">⬇</button>
+      </nav>
+      
+      <!-- Message Display -->
+      <div id="game-message" aria-live="polite"></div>
+    </main>
+    
+    <!-- Inventory Panel -->
+    <footer class="inventory-panel">
+      <span class="inventory-label">Inventory</span>
+      <div id="inventory-items" role="list" aria-label="Inventory items">
+        <!-- Inventory items render here -->
+      </div>
+    </footer>
+  </div>
+  
+  <!-- Game Engine -->
+  <script src="app.js"></script>
+  
+  <!-- Remove intro class after load -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelector('.game-wrapper').classList.remove('intro');
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
