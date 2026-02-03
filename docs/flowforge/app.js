@@ -14,7 +14,7 @@ const NODE_TYPES = {
     inputs: [],
     outputs: [{ name: 'out', type: 'any' }],
     fields: [
-      { name: 'value', type: 'textarea', default: '{\n  "items": [1, 2, 3]\n}' }
+      { name: 'value', type: 'textarea', default: '[\n  { "name": "Alice", "age": 25 },\n  { "name": "Bob", "age": 30 }\n]' }
     ],
     execute: (inputs, fields) => {
       try {
@@ -73,7 +73,7 @@ const NODE_TYPES = {
     inputs: [{ name: 'array', type: 'array' }],
     outputs: [{ name: 'result', type: 'array' }],
     fields: [
-      { name: 'expression', type: 'text', default: 'item.name', placeholder: 'item.property' }
+      { name: 'expression', type: 'text', default: 'item', placeholder: 'e.g. item.name or item * 2' }
     ],
     execute: (inputs, fields) => {
       const arr = Array.isArray(inputs.array) ? inputs.array : [inputs.array];
@@ -96,7 +96,7 @@ const NODE_TYPES = {
     inputs: [{ name: 'array', type: 'array' }],
     outputs: [{ name: 'result', type: 'array' }],
     fields: [
-      { name: 'condition', type: 'text', default: 'item > 1', placeholder: 'item.age > 18' }
+      { name: 'condition', type: 'text', default: 'item.age > 18', placeholder: 'e.g. item > 5 or item.active' }
     ],
     execute: (inputs, fields) => {
       const arr = Array.isArray(inputs.array) ? inputs.array : [inputs.array];
@@ -1189,131 +1189,139 @@ function showLoadModal() {
 // EXAMPLES
 // ============================================
 
+// Helper to create a node and update its fields without relying on global array indices
+function createExampleNode(type, x, y, fieldOverrides = {}) {
+  const node = createNode(type, x, y);
+  if (fieldOverrides && Object.keys(fieldOverrides).length > 0) {
+    Object.assign(node.fields, fieldOverrides);
+    document.getElementById(node.id)?.remove();
+    renderNode(node);
+  }
+  return node;
+}
+
+// Helper to connect two nodes by reference
+function connectNodes(fromNode, fromPort, toNode, toPort) {
+  connections.push({
+    from: { nodeId: fromNode.id, portName: fromPort, portType: 'any', isOutput: true },
+    to: { nodeId: toNode.id, portName: toPort, portType: 'any', isOutput: false }
+  });
+}
+
 const EXAMPLES = {
   'json-transform': () => {
-    createNode('json-input', 100, 100);
-    nodes[nodes.length - 1].fields.value = '{\n  "users": [\n    {"name": "Alice", "age": 25},\n    {"name": "Bob", "age": 30}\n  ]\n}';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    // JSON with users -> extract users array -> map to names -> display
+    const input = createExampleNode('json-input', 80, 120, {
+      value: '{\n  "users": [\n    { "name": "Alice", "age": 25 },\n    { "name": "Bob", "age": 30 },\n    { "name": "Carol", "age": 22 }\n  ]\n}'
+    });
     
-    createNode('jsonpath', 350, 100);
-    nodes[nodes.length - 1].fields.path = 'users';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    const extract = createExampleNode('jsonpath', 340, 120, {
+      path: 'users'
+    });
     
-    createNode('map', 600, 100);
-    nodes[nodes.length - 1].fields.expression = 'item.name';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    const map = createExampleNode('map', 560, 120, {
+      expression: 'item.name'
+    });
     
-    createNode('display', 850, 100);
+    const display = createExampleNode('display', 780, 120);
     
-    // Connect
     setTimeout(() => {
-      connections.push({
-        from: { nodeId: nodes[0].id, portName: 'out', portType: 'any', isOutput: true },
-        to: { nodeId: nodes[1].id, portName: 'json', portType: 'any', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[1].id, portName: 'result', portType: 'any', isOutput: true },
-        to: { nodeId: nodes[2].id, portName: 'array', portType: 'array', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[2].id, portName: 'result', portType: 'array', isOutput: true },
-        to: { nodeId: nodes[3].id, portName: 'data', portType: 'any', isOutput: false }
-      });
+      connectNodes(input, 'out', extract, 'json');
+      connectNodes(extract, 'result', map, 'array');
+      connectNodes(map, 'result', display, 'data');
       updateConnections();
-    }, 100);
+    }, 50);
   },
   
   'math-calc': () => {
-    createNode('number-input', 100, 80);
-    nodes[nodes.length - 1].fields.value = '10';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    // (10 + 5) * 2 = 30
+    const num1 = createExampleNode('number-input', 80, 80, { value: '10' });
+    const num2 = createExampleNode('number-input', 80, 200, { value: '5' });
+    const add = createExampleNode('math', 300, 120, { op: '+' });
     
-    createNode('number-input', 100, 220);
-    nodes[nodes.length - 1].fields.value = '5';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    const num3 = createExampleNode('number-input', 80, 340, { value: '2' });
+    const mult = createExampleNode('math', 500, 200, { op: '*' });
     
-    createNode('math', 350, 130);
-    
-    createNode('number-input', 100, 360);
-    nodes[nodes.length - 1].fields.value = '2';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
-    
-    createNode('math', 550, 200);
-    nodes[nodes.length - 1].fields.op = '*';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
-    
-    createNode('display', 750, 200);
+    const display = createExampleNode('display', 700, 200);
     
     setTimeout(() => {
-      connections.push({
-        from: { nodeId: nodes[0].id, portName: 'out', portType: 'number', isOutput: true },
-        to: { nodeId: nodes[2].id, portName: 'a', portType: 'number', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[1].id, portName: 'out', portType: 'number', isOutput: true },
-        to: { nodeId: nodes[2].id, portName: 'b', portType: 'number', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[2].id, portName: 'result', portType: 'number', isOutput: true },
-        to: { nodeId: nodes[4].id, portName: 'a', portType: 'number', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[3].id, portName: 'out', portType: 'number', isOutput: true },
-        to: { nodeId: nodes[4].id, portName: 'b', portType: 'number', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[4].id, portName: 'result', portType: 'number', isOutput: true },
-        to: { nodeId: nodes[5].id, portName: 'data', portType: 'any', isOutput: false }
-      });
+      connectNodes(num1, 'out', add, 'a');
+      connectNodes(num2, 'out', add, 'b');
+      connectNodes(add, 'result', mult, 'a');
+      connectNodes(num3, 'out', mult, 'b');
+      connectNodes(mult, 'result', display, 'data');
       updateConnections();
-    }, 100);
+    }, 50);
   },
   
   'filter-data': () => {
-    createNode('json-input', 100, 100);
-    nodes[nodes.length - 1].fields.value = '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    // Filter numbers greater than 5
+    const input = createExampleNode('json-input', 80, 120, {
+      value: '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]'
+    });
     
-    createNode('filter', 350, 100);
-    nodes[nodes.length - 1].fields.condition = 'item > 5';
-    document.getElementById(nodes[nodes.length - 1].id).remove();
-    renderNode(nodes[nodes.length - 1]);
+    const filter = createExampleNode('filter', 340, 120, {
+      condition: 'item > 5'
+    });
     
-    createNode('display', 600, 100);
+    const display = createExampleNode('display', 580, 120);
     
     setTimeout(() => {
-      connections.push({
-        from: { nodeId: nodes[0].id, portName: 'out', portType: 'any', isOutput: true },
-        to: { nodeId: nodes[1].id, portName: 'array', portType: 'array', isOutput: false }
-      });
-      connections.push({
-        from: { nodeId: nodes[1].id, portName: 'result', portType: 'array', isOutput: true },
-        to: { nodeId: nodes[2].id, portName: 'data', portType: 'any', isOutput: false }
-      });
+      connectNodes(input, 'out', filter, 'array');
+      connectNodes(filter, 'result', display, 'data');
       updateConnections();
-    }, 100);
+    }, 50);
+  },
+  
+  'http-fetch': () => {
+    // Fetch user from API and extract name
+    const http = createExampleNode('http-input', 80, 120, {
+      url: 'https://jsonplaceholder.typicode.com/users/1',
+      method: 'GET'
+    });
+    
+    const extract = createExampleNode('jsonpath', 340, 120, {
+      path: 'name'
+    });
+    
+    const display = createExampleNode('display', 560, 120);
+    
+    setTimeout(() => {
+      connectNodes(http, 'response', extract, 'json');
+      connectNodes(extract, 'result', display, 'data');
+      updateConnections();
+    }, 50);
   }
 };
 
 document.querySelectorAll('.example-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    // Clear
-    nodes.forEach(n => document.getElementById(n.id)?.remove());
+    // Clear all existing nodes from DOM
+    document.querySelectorAll('.node').forEach(el => el.remove());
+    
+    // Reset state
     nodes = [];
     connections = [];
     nodeIdCounter = 1;
-    clearResults();
+    executionResults.clear();
+    
+    // Clear SVG connections
+    connectionsEl.querySelectorAll('path').forEach(p => p.remove());
+    
+    // Clear preview
+    previewContent.innerHTML = '<div class="preview-empty">Select a node or run the flow to see data</div>';
     
     // Load example
-    EXAMPLES[btn.dataset.example]?.();
+    const exampleName = btn.dataset.example;
+    if (EXAMPLES[exampleName]) {
+      EXAMPLES[exampleName]();
+      
+      // Auto-run after connections are made
+      setTimeout(() => {
+        executeFlow();
+      }, 150);
+    }
+    
     updateMinimap();
   });
 });
@@ -1400,8 +1408,11 @@ canvasContainer.scrollTop = 1500;
 
 updateMinimap();
 
-// Show welcome example
+// Show welcome example and auto-run it
 setTimeout(() => {
   EXAMPLES['json-transform']();
-  showToast('Welcome! Double-click nodes to add, or drag from palette.');
+  showToast('Welcome! Click ▶ Run to execute, or try the examples.');
+  
+  // Auto-run so user sees output immediately
+  setTimeout(() => executeFlow(), 150);
 }, 500);
