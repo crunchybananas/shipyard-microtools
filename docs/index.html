@@ -99,6 +99,16 @@
         gap: 12px;
         flex-wrap: wrap;
       }
+      .card-links a + a {
+        position: relative;
+        padding-left: 12px;
+      }
+      .card-links a + a::before {
+        content: "|";
+        position: absolute;
+        left: 0;
+        color: var(--muted);
+      }
       .card a {
         color: var(--accent2);
         text-decoration: none;
@@ -149,7 +159,7 @@
             <p>Narrative survival game. Forage, craft, explore—every choice matters.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./the-island/">Play →</a>
+                <a href="./the-island/">Play</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/the-island">Source</a>
               </div>
             </div>
@@ -159,7 +169,7 @@
             <p>Procedural universe explorer. Zoom seamlessly from galaxies to planets.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./cosmos/">Explore →</a>
+                <a href="./cosmos/">Explore</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/cosmos">Source</a>
               </div>
             </div>
@@ -169,7 +179,7 @@
             <p>Epic boss battle! Circle the beast, dodge tentacles, aim for the eyes.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./kraken-attack/">Play →</a>
+                <a href="./kraken-attack/">Play</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/kraken-attack">Source</a>
               </div>
             </div>
@@ -179,7 +189,7 @@
             <p>Classic Tetris with shipping containers. Load the deck, clear rows!</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./cargo-tetris/">Play →</a>
+                <a href="./cargo-tetris/">Play</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/cargo-tetris">Source</a>
               </div>
             </div>
@@ -189,7 +199,7 @@
             <p>Asteroids-style boat game. Dodge rocks, blast pirates, collect cargo!</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./ship-wreckers/">Play →</a>
+                <a href="./ship-wreckers/">Play</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/ship-wreckers">Source</a>
               </div>
             </div>
@@ -199,7 +209,7 @@
             <p>Guide incoming ships to matching docks. Don't let them crash!</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./harbor-master/">Play →</a>
+                <a href="./harbor-master/">Play</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/harbor-master">Source</a>
               </div>
             </div>
@@ -209,7 +219,7 @@
             <p>A Zork-style text adventure about coding and coming to terms with AI.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./dev-terminal/">Play →</a>
+                <a href="./dev-terminal/">Play</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/dev-terminal">Source</a>
               </div>
             </div>
@@ -226,8 +236,8 @@
             <p>Browser-based music synthesizer with sequencer and drum machine.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./synth-studio/">Vanilla →</a>
-                <a href="./ember/synth-studio/">Ember →</a>
+                <a href="./synth-studio/">Vanilla</a>
+                <a href="./ember/synth-studio/">Ember</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/synth-studio">Vanilla Source</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/synth-studio">Ember Source</a>
               </div>
@@ -238,8 +248,8 @@
             <p>Visual node-based programming. Connect nodes, execute flows.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./flowforge/">Vanilla →</a>
-                <a href="./ember/flowforge/">Ember →</a>
+                <a href="./flowforge/">Vanilla</a>
+                <a href="./ember/flowforge/">Ember</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/flowforge">Vanilla Source</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/flowforge">Ember Source</a>
               </div>
@@ -250,7 +260,7 @@
             <p>Create beautiful CSS gradients in seconds.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./gradient-generator/">Open →</a>
+                <a href="./gradient-generator/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/gradient-generator">Source</a>
               </div>
             </div>
@@ -260,8 +270,10 @@
             <p>Live markdown preview with syntax highlighting.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./markdown-preview/">Open →</a>
-                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/markdown-preview">Source</a>
+                <a href="./markdown-preview/">Vanilla</a>
+                <a href="./ember/markdown-preview/">Ember</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/markdown-preview">Vanilla Source</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/markdown-preview">Ember Source</a>
               </div>
             </div>
           </div>
@@ -277,7 +289,7 @@
             <p>Format, validate, and minify JSON with syntax highlighting.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./json-formatter/">Open →</a>
+                <a href="./json-formatter/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/json-formatter">Source</a>
               </div>
             </div>
@@ -287,7 +299,7 @@
             <p>JWT decode + HS256 signature verification. Runs locally.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./token-lens/">Open →</a>
+                <a href="./token-lens/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/token-lens">Source</a>
               </div>
             </div>
@@ -297,7 +309,7 @@
             <p>Encode/decode text, files, and images to/from Base64.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./base64-tools/">Open →</a>
+                <a href="./base64-tools/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/base64-tools">Source</a>
               </div>
             </div>
@@ -307,7 +319,7 @@
             <p>Generate UUID v4, v7, Nano IDs, and bulk random identifiers.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./uuid-generator/">Open →</a>
+                <a href="./uuid-generator/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/uuid-generator">Source</a>
               </div>
             </div>
@@ -317,7 +329,7 @@
             <p>Explains cron expressions in plain English with next run times.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./cron-parser/">Open →</a>
+                <a href="./cron-parser/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/cron-parser">Source</a>
               </div>
             </div>
@@ -327,7 +339,7 @@
             <p>Look up any HTTP status code with fun developer messages.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./http-status/">Open →</a>
+                <a href="./http-status/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/http-status">Source</a>
               </div>
             </div>
@@ -337,7 +349,7 @@
             <p>Compare two text snippets and see line-by-line differences.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./text-diff/">Open →</a>
+                <a href="./text-diff/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/text-diff">Source</a>
               </div>
             </div>
@@ -347,7 +359,7 @@
             <p>Batch validate proof URLs for SSL, status codes, and load times.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./url-health/">Open →</a>
+                <a href="./url-health/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/url-health">Source</a>
               </div>
             </div>
@@ -365,7 +377,7 @@
             <p>Real-time platform health, leaderboard, and activity feed.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./explorer/">Open →</a>
+                <a href="./explorer/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/explorer">Source</a>
               </div>
             </div>
@@ -375,7 +387,7 @@
             <p>Find ships one attestation away from verification. +5 tokens!</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./attest-queue/">Open →</a>
+                <a href="./attest-queue/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/attest-queue">Source</a>
               </div>
             </div>
@@ -385,7 +397,7 @@
             <p>Find ships that need your attestation to get verified.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./attestation-tracker/">Open →</a>
+                <a href="./attestation-tracker/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/attestation-tracker">Source</a>
               </div>
             </div>
@@ -395,7 +407,7 @@
             <p>D3.js visualization of attestation relationships.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./reputation-graph/">Open →</a>
+                <a href="./reputation-graph/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/reputation-graph">Source</a>
               </div>
             </div>
@@ -405,7 +417,7 @@
             <p>Validate your ship before submitting to avoid rejection.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./ship-preflight/">Open →</a>
+                <a href="./ship-preflight/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/ship-preflight">Source</a>
               </div>
             </div>
@@ -415,7 +427,7 @@
             <p>Track posts/comments to avoid the 90% karma penalty.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./rate-limit/">Open →</a>
+                <a href="./rate-limit/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/rate-limit">Source</a>
               </div>
             </div>
@@ -425,7 +437,7 @@
             <p>Heuristic-based feedback before you submit your ship.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./ship-roast/">Open →</a>
+                <a href="./ship-roast/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/ship-roast">Source</a>
               </div>
             </div>
@@ -435,7 +447,7 @@
             <p>Embeddable badges for your README and portfolio.</p>
             <div class="card-footer">
               <div class="card-links">
-                <a href="./ship-embed/">Open →</a>
+                <a href="./ship-embed/">Open</a>
                 <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/ship-embed">Source</a>
               </div>
             </div>
