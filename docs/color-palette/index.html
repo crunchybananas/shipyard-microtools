@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Color Palette Generator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <h1>🎨 Color Palette Generator</h1>
+          <p>Generate beautiful color harmonies with accessibility insights.</p>
+        </div>
+        <div class="header-actions">
+          <button id="generate" class="btn primary">Generate</button>
+          <button id="export" class="btn">Export</button>
+        </div>
+      </header>
+
+      <section class="controls">
+        <div class="control-group">
+          <div class="control">
+            <label for="baseColor">Base Color</label>
+            <div class="color-input-group">
+              <input id="baseColor" type="color" value="#7C3AED" />
+              <input id="baseColorHex" type="text" value="#7C3AED" maxlength="7" placeholder="#RRGGBB" />
+            </div>
+          </div>
+
+          <div class="control">
+            <label for="harmony">Harmony Rule</label>
+            <select id="harmony">
+              <option value="monochromatic">Monochromatic</option>
+              <option value="complementary">Complementary</option>
+              <option value="analogous" selected>Analogous</option>
+              <option value="triadic">Triadic</option>
+              <option value="tetradic">Tetradic</option>
+              <option value="split-complementary">Split Complementary</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label for="count">Colors: <span id="countValue">5</span></label>
+            <input id="count" type="range" min="3" max="10" value="5" />
+          </div>
+
+          <div class="control">
+            <label class="checkbox">
+              <input id="includeShades" type="checkbox" checked />
+              <span>Include Shades & Tints</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="palette" id="palette"></section>
+
+      <section class="accessibility">
+        <h2>Accessibility Check</h2>
+        <p class="subtitle">Check color contrast ratios for WCAG compliance</p>
+        <div class="a11y-grid" id="a11yGrid"></div>
+      </section>
+
+      <section class="export-formats">
+        <h2>Export Formats</h2>
+        <div class="tabs">
+          <button class="tab active" data-format="css">CSS</button>
+          <button class="tab" data-format="scss">SCSS</button>
+          <button class="tab" data-format="tailwind">Tailwind</button>
+          <button class="tab" data-format="json">JSON</button>
+        </div>
+        <pre id="exportOutput"></pre>
+        <button id="copyExport" class="btn">Copy to Clipboard</button>
+      </section>
+    </div>
+
+    <footer class="footer">
+      Built for Shipyard • shipyard.bot
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Regex Tester</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <h1>🔍 Regex Tester</h1>
+          <p>Test and debug regular expressions with real-time matching.</p>
+        </div>
+        <div class="header-actions">
+          <button id="clearAll" class="btn">Clear All</button>
+          <button id="savePattern" class="btn primary">Save Pattern</button>
+        </div>
+      </header>
+
+      <section class="pattern-section">
+        <div class="pattern-input-group">
+          <label for="pattern">Regular Expression</label>
+          <div class="regex-input-wrapper">
+            <span class="regex-delimiter">/</span>
+            <input 
+              id="pattern" 
+              type="text" 
+              placeholder="[A-Z][a-z]+" 
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <span class="regex-delimiter">/</span>
+            <div class="flags">
+              <label class="flag-label" title="Global">
+                <input type="checkbox" id="flagG" value="g" checked />
+                <span>g</span>
+              </label>
+              <label class="flag-label" title="Case Insensitive">
+                <input type="checkbox" id="flagI" value="i" />
+                <span>i</span>
+              </label>
+              <label class="flag-label" title="Multiline">
+                <input type="checkbox" id="flagM" value="m" />
+                <span>m</span>
+              </label>
+              <label class="flag-label" title="Dotall">
+                <input type="checkbox" id="flagS" value="s" />
+                <span>s</span>
+              </label>
+              <label class="flag-label" title="Unicode">
+                <input type="checkbox" id="flagU" value="u" />
+                <span>u</span>
+              </label>
+            </div>
+          </div>
+          <div id="patternError" class="error-message"></div>
+        </div>
+
+        <div class="quick-patterns">
+          <label>Quick Patterns:</label>
+          <div class="pattern-buttons">
+            <button class="pattern-btn" data-pattern="\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b" data-flags="i">Email</button>
+            <button class="pattern-btn" data-pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)" data-flags="g">URL</button>
+            <button class="pattern-btn" data-pattern="^(?:(?:\+|00)(\d{1,3}))?[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$" data-flags="">Phone</button>
+            <button class="pattern-btn" data-pattern="#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})" data-flags="g">Hex Color</button>
+            <button class="pattern-btn" data-pattern="\b(?:\d{1,3}\.){3}\d{1,3}\b" data-flags="g">IPv4</button>
+            <button class="pattern-btn" data-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" data-flags="">Strong Password</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="test-section">
+        <label for="testString">Test String</label>
+        <textarea 
+          id="testString" 
+          placeholder="Enter text to test against your regex pattern...&#10;&#10;Try multiple lines!&#10;Add emails: test@example.com&#10;URLs: https://example.com&#10;Or any other patterns you want to match."
+        ></textarea>
+        <div class="match-info" id="matchInfo"></div>
+      </section>
+
+      <section class="results-section">
+        <div class="results-header">
+          <h2>Matches</h2>
+          <span id="matchCount" class="match-count">0 matches</span>
+        </div>
+        <div id="highlightedText" class="highlighted-text"></div>
+        <div id="matchDetails" class="match-details"></div>
+      </section>
+
+      <section class="substitution-section">
+        <h2>Substitution</h2>
+        <div class="substitution-controls">
+          <div class="control">
+            <label for="replacement">Replacement Pattern</label>
+            <input 
+              id="replacement" 
+              type="text" 
+              placeholder="$1, $2, etc."
+              autocomplete="off"
+            />
+          </div>
+        </div>
+        <div class="substitution-result">
+          <label>Result:</label>
+          <pre id="substitutionResult"></pre>
+          <button id="copySubstitution" class="btn">Copy Result</button>
+        </div>
+      </section>
+
+      <section class="reference-section">
+        <h2>Quick Reference</h2>
+        <div class="reference-grid">
+          <div class="reference-card">
+            <h3>Character Classes</h3>
+            <ul>
+              <li><code>.</code> - Any character except newline</li>
+              <li><code>\w</code> - Word character [A-Za-z0-9_]</li>
+              <li><code>\d</code> - Digit [0-9]</li>
+              <li><code>\s</code> - Whitespace</li>
+              <li><code>[abc]</code> - Any of a, b, or c</li>
+              <li><code>[^abc]</code> - Not a, b, or c</li>
+            </ul>
+          </div>
+          <div class="reference-card">
+            <h3>Quantifiers</h3>
+            <ul>
+              <li><code>*</code> - 0 or more</li>
+              <li><code>+</code> - 1 or more</li>
+              <li><code>?</code> - 0 or 1</li>
+              <li><code>{n}</code> - Exactly n</li>
+              <li><code>{n,}</code> - n or more</li>
+              <li><code>{n,m}</code> - Between n and m</li>
+            </ul>
+          </div>
+          <div class="reference-card">
+            <h3>Anchors</h3>
+            <ul>
+              <li><code>^</code> - Start of string/line</li>
+              <li><code>$</code> - End of string/line</li>
+              <li><code>\b</code> - Word boundary</li>
+              <li><code>\B</code> - Not word boundary</li>
+            </ul>
+          </div>
+          <div class="reference-card">
+            <h3>Groups</h3>
+            <ul>
+              <li><code>(abc)</code> - Capturing group</li>
+              <li><code>(?:abc)</code> - Non-capturing group</li>
+              <li><code>(?&lt;name&gt;abc)</code> - Named group</li>
+              <li><code>(a|b)</code> - Either a or b</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="saved-patterns-section">
+        <h2>Saved Patterns</h2>
+        <div id="savedPatterns" class="saved-patterns"></div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      Built for Shipyard • shipyard.bot
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

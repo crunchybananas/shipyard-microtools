@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data Forge</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <h1>⚒️ Data Forge</h1>
+          <p>Generate realistic mock data for testing and development.</p>
+        </div>
+        <div class="header-actions">
+          <button id="generate" class="btn primary">Generate Data</button>
+          <button id="copyAll" class="btn">Copy All</button>
+        </div>
+      </header>
+
+      <section class="config-section">
+        <h2>Data Configuration</h2>
+        
+        <div class="config-grid">
+          <div class="config-card">
+            <label for="recordCount">Number of Records</label>
+            <input id="recordCount" type="number" min="1" max="10000" value="10" />
+          </div>
+
+          <div class="config-card">
+            <label for="format">Output Format</label>
+            <select id="format">
+              <option value="json">JSON</option>
+              <option value="csv">CSV</option>
+              <option value="sql">SQL Insert</option>
+              <option value="xml">XML</option>
+              <option value="yaml">YAML</option>
+            </select>
+          </div>
+
+          <div class="config-card">
+            <label for="locale">Locale</label>
+            <select id="locale">
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="ja">Japanese</option>
+            </select>
+          </div>
+
+          <div class="config-card">
+            <label class="checkbox">
+              <input id="prettyPrint" type="checkbox" checked />
+              <span>Pretty Print</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="fields-section">
+        <div class="section-header">
+          <h2>Data Fields</h2>
+          <button id="addField" class="btn">+ Add Field</button>
+        </div>
+
+        <div class="field-templates">
+          <label>Quick Templates:</label>
+          <div class="template-buttons">
+            <button class="template-btn" data-template="user">👤 User Profile</button>
+            <button class="template-btn" data-template="product">🛍️ E-commerce Product</button>
+            <button class="template-btn" data-template="transaction">💳 Transaction</button>
+            <button class="template-btn" data-template="blog">📝 Blog Post</button>
+            <button class="template-btn" data-template="company">🏢 Company</button>
+            <button class="template-btn" data-template="event">📅 Event</button>
+          </div>
+        </div>
+
+        <div id="fieldsList" class="fields-list"></div>
+      </section>
+
+      <section class="preview-section">
+        <div class="section-header">
+          <h2>Preview</h2>
+          <div class="preview-controls">
+            <button id="downloadData" class="btn">💾 Download</button>
+            <button id="refreshPreview" class="btn">🔄 Refresh</button>
+          </div>
+        </div>
+        <pre id="dataPreview"></pre>
+      </section>
+
+      <section class="reference-section">
+        <h2>Available Data Types</h2>
+        <div class="types-grid">
+          <div class="type-card">
+            <h3>Personal</h3>
+            <ul>
+              <li><code>firstName</code> - First name</li>
+              <li><code>lastName</code> - Last name</li>
+              <li><code>fullName</code> - Full name</li>
+              <li><code>email</code> - Email address</li>
+              <li><code>phone</code> - Phone number</li>
+              <li><code>avatar</code> - Avatar URL</li>
+              <li><code>dateOfBirth</code> - Date of birth</li>
+              <li><code>age</code> - Age (18-80)</li>
+              <li><code>gender</code> - Gender</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Address</h3>
+            <ul>
+              <li><code>street</code> - Street address</li>
+              <li><code>city</code> - City name</li>
+              <li><code>state</code> - State/province</li>
+              <li><code>zipCode</code> - ZIP/postal code</li>
+              <li><code>country</code> - Country</li>
+              <li><code>latitude</code> - Latitude</li>
+              <li><code>longitude</code> - Longitude</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Internet</h3>
+            <ul>
+              <li><code>username</code> - Username</li>
+              <li><code>url</code> - Website URL</li>
+              <li><code>domain</code> - Domain name</li>
+              <li><code>ipv4</code> - IPv4 address</li>
+              <li><code>ipv6</code> - IPv6 address</li>
+              <li><code>userAgent</code> - User agent</li>
+              <li><code>mac</code> - MAC address</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Commerce</h3>
+            <ul>
+              <li><code>productName</code> - Product name</li>
+              <li><code>price</code> - Price ($)</li>
+              <li><code>sku</code> - SKU code</li>
+              <li><code>barcode</code> - Barcode</li>
+              <li><code>category</code> - Category</li>
+              <li><code>creditCard</code> - CC number</li>
+              <li><code>currency</code> - Currency code</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Company</h3>
+            <ul>
+              <li><code>companyName</code> - Company name</li>
+              <li><code>jobTitle</code> - Job title</li>
+              <li><code>department</code> - Department</li>
+              <li><code>industry</code> - Industry</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Text</h3>
+            <ul>
+              <li><code>sentence</code> - Sentence</li>
+              <li><code>paragraph</code> - Paragraph</li>
+              <li><code>words</code> - Random words</li>
+              <li><code>slug</code> - URL slug</li>
+              <li><code>title</code> - Title text</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Date & Time</h3>
+            <ul>
+              <li><code>date</code> - Date</li>
+              <li><code>time</code> - Time</li>
+              <li><code>datetime</code> - Date & time</li>
+              <li><code>timestamp</code> - Unix timestamp</li>
+              <li><code>timezone</code> - Timezone</li>
+            </ul>
+          </div>
+
+          <div class="type-card">
+            <h3>Other</h3>
+            <ul>
+              <li><code>uuid</code> - UUID v4</li>
+              <li><code>boolean</code> - True/false</li>
+              <li><code>number</code> - Random number</li>
+              <li><code>color</code> - Hex color</li>
+              <li><code>emoji</code> - Random emoji</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      Built for Shipyard • shipyard.bot
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
