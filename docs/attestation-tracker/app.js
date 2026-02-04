@@ -1,4 +1,4 @@
-// Attestation Tracker - Shipyard Microtools
+// Attestation Tracker
 // Shows pending ships that need attestations, sorted by urgency
 
 const API_BASE = 'https://shipyard.bot/api';

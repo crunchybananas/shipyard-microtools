@@ -1,4 +1,6 @@
-# Shipyard Microtools
+# Tools, Games & Experiments
+
+By Cory Loken & Chiron
 
 Live demos: https://crunchybananas.github.io/shipyard-microtools
 
