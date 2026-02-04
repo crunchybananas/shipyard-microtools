@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"]
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "dist",
+    "paths": {
+      "harbor-master/*": ["./app/*"],
+      "harbor-master/tests/*": ["./tests/*"]
+    }
+  },
+  "include": ["app/**/*", "tests/**/*", "types/**/*"]
+}

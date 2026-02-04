@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-  max-width: 500px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
@@ -59,6 +59,7 @@ h1 {
 
 canvas {
   display: block;
+  cursor: crosshair;
 }
 
 .overlay {
@@ -81,7 +82,7 @@ canvas {
 }
 
 .overlay h2 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
   color: #fff;
 }
@@ -108,7 +109,7 @@ canvas {
   padding: 1rem 2.5rem;
   font-size: 1.1rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -118,7 +119,7 @@ canvas {
 
 .play-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .hud {
@@ -128,8 +129,8 @@ canvas {
   right: 0;
   display: flex;
   justify-content: space-around;
-  padding: 0.5rem 0.75rem;
-  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
 }
 
 .hud.hidden {
@@ -143,44 +144,16 @@ canvas {
 }
 
 .hud-label {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .hud-value {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #fff;
-}
-
-.next-piece {
-  position: absolute;
-  top: 50px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.next-piece.hidden {
-  display: none;
-}
-
-.next-label {
-  font-size: 0.6rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 4px;
-}
-
-#nextCanvas {
-  background: transparent;
 }
 
 footer {
