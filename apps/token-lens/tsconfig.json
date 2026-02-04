@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"]
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "dist",
+    "paths": {
+      "token-lens/*": ["./app/*"],
+      "token-lens/tests/*": ["./tests/*"]
+    }
+  },
+  "include": ["app/**/*", "tests/**/*", "types/**/*"]
+}

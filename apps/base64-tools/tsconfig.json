@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "glint": {
+    "environment": ["ember-loose", "ember-template-imports"]
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "dist",
+    "paths": {
+      "base64-tools/*": ["./app/*"],
+      "base64-tools/tests/*": ["./tests/*"]
+    }
+  },
+  "include": ["app/**/*", "tests/**/*", "types/**/*"]
+}
