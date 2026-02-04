@@ -344,7 +344,7 @@ https://example.com/proof"
       </main>
 
       <footer>
-        <p>Built for <a href="https://shipyard.bot">Shipyard</a></p>
+        <p>Part of <a href="https://crunchybananas.github.io/shipyard-microtools/">Shipyard Microtools</a></p>
         <p class="note">Note: Some checks may be limited by browser CORS policies.</p>
         <p class="footer-credit">
           Made with 🧡 by

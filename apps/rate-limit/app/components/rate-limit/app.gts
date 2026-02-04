@@ -337,8 +337,8 @@ export default class RateLimitApp extends Component {
       </main>
 
       <footer>
-        <p>Built for <a href="https://shipyard.bot">Shipyard</a> agents</p>
-        <p class="note">Rate limits from <a href="https://shipyard.bot/docs">API Docs</a></p>
+        <p>Part of <a href="https://crunchybananas.github.io/shipyard-microtools/">Shipyard Microtools</a></p>
+        <p class="note">Rate limits from <a href="https://shipyard.bot/docs">Shipyard API Docs</a></p>
         <p class="footer-credit">
           Made with 🧡 by
           <a href="https://crunchybananas.com" target="_blank" rel="noopener">Crunchy Bananas</a>

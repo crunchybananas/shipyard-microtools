@@ -65,8 +65,12 @@ export default class TokenLensApp extends Component {
     </div>
 
     <footer>
-      Built with Ember •
-      <a href="https://crunchybananas.com/donate">Support Crunchy Bananas</a>
+      <p>Part of <a href="https://crunchybananas.github.io/shipyard-microtools/">Shipyard Microtools</a></p>
+      <p class="footer-credit">
+        Made with 🧡 by
+        <a href="https://crunchybananas.com" target="_blank" rel="noopener">Crunchy Bananas</a>
+        using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+      </p>
     </footer>
   </template>
 }

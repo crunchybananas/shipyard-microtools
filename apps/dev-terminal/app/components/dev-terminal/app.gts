@@ -515,7 +515,7 @@ export default class DevTerminalApp extends Component {
       </main>
 
       <footer>
-        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+        <p>Part of <a href="https://crunchybananas.github.io/shipyard-microtools/">Shipyard Microtools</a></p>
         <p class="footer-credit">
           Made with 🧡 by
           <a href="https://crunchybananas.com" target="_blank" rel="noopener">Crunchy Bananas</a>
