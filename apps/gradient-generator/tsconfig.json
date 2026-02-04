@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "gradient-generator/*": ["app/*"],
+      "gradient-generator/tests/*": ["tests/*"]
+    }
+  },
+  "glint": {
+    "environment": "ember-loose"
+  }
+}

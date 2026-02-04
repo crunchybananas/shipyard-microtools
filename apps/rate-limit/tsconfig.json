@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "rate-limit/*": ["app/*"],
+      "rate-limit/tests/*": ["tests/*"]
+    }
+  },
+  "glint": {
+    "environment": "ember-loose"
+  }
+}
