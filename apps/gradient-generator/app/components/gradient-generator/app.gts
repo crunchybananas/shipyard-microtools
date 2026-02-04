@@ -219,10 +219,9 @@ export default class GradientGeneratorApp extends Component {
       </section>
 
       <footer class="footer">
-        <p>Part of <a href="https://crunchybananas.github.io/shipyard-microtools/">Shipyard Microtools</a></p>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.com" target="_blank" rel="noopener">Crunchy Bananas</a>
+          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
           using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
         </p>
       </footer>
