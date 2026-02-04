@@ -4,8 +4,8 @@ module.exports = function (environment) {
   const ENV = {
     modulePrefix: "uuid-generator",
     environment,
-    rootURL: "/",
-    locationType: "history",
+    rootURL: "./",
+    locationType: "hash",
     EmberENV: {
       EXTEND_PROTOTYPES: false,
       FEATURES: {},

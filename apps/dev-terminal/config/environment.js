@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
 module.exports = function (environment) {
   const ENV = {
-    modulePrefix: 'dev-terminal',
+    modulePrefix: "dev-terminal",
     environment,
-    rootURL: '/',
-    locationType: 'history',
+    rootURL: "./",
+    locationType: "hash",
     EmberENV: {
       EXTEND_PROTOTYPES: false,
       FEATURES: {},
@@ -13,11 +13,11 @@ module.exports = function (environment) {
     APP: {},
   };
 
-  if (environment === 'test') {
-    ENV.locationType = 'none';
+  if (environment === "test") {
+    ENV.locationType = "none";
     ENV.APP.LOG_ACTIVE_GENERATION = false;
     ENV.APP.LOG_VIEW_LOOKUPS = false;
-    ENV.APP.rootElement = '#ember-testing';
+    ENV.APP.rootElement = "#ember-testing";
     ENV.APP.autoboot = false;
   }
 
