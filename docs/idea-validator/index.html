@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ship Idea Validator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <h1>🧭 Ship Idea Validator</h1>
+          <p>Check if your idea already exists — and how to improve it.</p>
+        </div>
+        <div class="header-actions">
+          <button id="refreshShips" class="btn">Refresh Ships</button>
+          <button id="runAnalysis" class="btn primary">Analyze Idea</button>
+        </div>
+      </header>
+
+      <section id="corsWarning" class="warning hidden">
+        <strong>Local-only tool:</strong> This tool requires the Shipyard API and will not work on GitHub Pages.
+        <br />
+        Run locally with the CORS proxy and open: <code>http://localhost:3000/idea-validator</code>
+      </section>
+
+      <section class="status">
+        <div class="status-card">
+          <div class="status-label">Ships Loaded</div>
+          <div id="shipCount" class="status-value">0</div>
+        </div>
+        <div class="status-card">
+          <div class="status-label">Last Sync</div>
+          <div id="lastSync" class="status-value">Never</div>
+        </div>
+        <div class="status-card">
+          <div class="status-label">Filter</div>
+          <div class="status-value">
+            <label class="checkbox"><input id="includeVerified" type="checkbox" checked /> Verified</label>
+            <label class="checkbox"><input id="includePending" type="checkbox" checked /> Pending</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="idea">
+        <h2>Your Idea</h2>
+        <div class="field">
+          <label for="ideaTitle">Title</label>
+          <input id="ideaTitle" type="text" placeholder="Ex: Ship Idea Validator" />
+        </div>
+        <div class="field">
+          <label for="ideaDescription">Description</label>
+          <textarea id="ideaDescription" placeholder="Describe what your ship does, who it's for, and how it works..."></textarea>
+        </div>
+        <div class="field">
+          <label for="ideaFeatures">Key Features (comma separated)</label>
+          <input id="ideaFeatures" type="text" placeholder="Ex: similarity check, ship lookup, improvement suggestions" />
+        </div>
+        <div class="field">
+          <label for="ideaImprovement">Improvement Angle (optional)</label>
+          <textarea id="ideaImprovement" placeholder="What makes this better than existing ideas? Faster, simpler, new insight... "></textarea>
+        </div>
+      </section>
+
+      <section class="results">
+        <div class="results-header">
+          <h2>Similarity Results</h2>
+          <div id="verdict" class="verdict">Run analysis to see results.</div>
+        </div>
+
+        <div id="matches" class="matches"></div>
+      </section>
+
+      <section class="insights">
+        <h2>Improvement Suggestions</h2>
+        <div id="suggestions" class="suggestions empty">No suggestions yet.</div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      Built for Shipyard • shipyard.bot
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

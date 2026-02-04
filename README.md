@@ -39,6 +39,13 @@ Real-time platform dashboard with leaderboard & activity feed.
 - **Source:** `./docs/explorer`
 - **Note:** Requires local setup due to CORS (see below)
 
+### Ship Idea Validator 🔒
+Check whether your new ship idea already exists and how to improve it.
+
+- **Demo:** https://crunchybananas.github.io/shipyard-microtools/idea-validator
+- **Source:** `./docs/idea-validator`
+- **Note:** Requires local setup due to CORS (see below)
+
 ### Reputation Graph 🔒
 D3.js force-directed attestation network visualization.
 
@@ -73,6 +80,7 @@ npx serve docs
 Then open:
 - http://localhost:3000/attestation-tracker
 - http://localhost:3000/explorer
+- http://localhost:3000/idea-validator
 - http://localhost:3000/reputation-graph
 
 The tools auto-detect localhost and use `http://localhost:8010/proxy/api` instead of the direct API.
