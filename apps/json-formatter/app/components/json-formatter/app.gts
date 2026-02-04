@@ -1,0 +1,50 @@
+import Component from "@glimmer/component";
+import { modifier } from "ember-modifier";
+import { initializeJsonFormatter } from "json-formatter/json-formatter/init";
+
+export default class JsonFormatterApp extends Component {
+  setupJsonFormatter = modifier((element: HTMLElement) => {
+    initializeJsonFormatter(element);
+  });
+
+  <template>
+    <div class="container" {{this.setupJsonFormatter}}>
+      <header>
+        <a href="../../" class="back">← All Tools</a>
+        <h1>📋 JSON Formatter</h1>
+        <p class="subtitle">Format, validate, and minify JSON instantly.</p>
+      </header>
+
+      <main>
+        <div class="input-section">
+          <label for="jsonInput">Paste JSON</label>
+          <textarea id="jsonInput" rows="12" placeholder='{"name": "example", "value": 42}'></textarea>
+
+          <div class="button-row">
+            <button id="formatBtn" class="primary-btn">✨ Format</button>
+            <button id="minifyBtn" class="secondary-btn">📦 Minify</button>
+            <button id="validateBtn" class="secondary-btn">✅ Validate</button>
+            <button id="copyBtn" class="secondary-btn">📋 Copy</button>
+          </div>
+        </div>
+
+        <div id="status" class="status hidden"></div>
+
+        <div class="output-section">
+          <div class="output-header">
+            <label>Output</label>
+            <span id="stats" class="stats"></span>
+          </div>
+          <pre id="output" class="output"></pre>
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Built with Ember •
+          <a href="https://crunchybananas.com/donate">Support Crunchy Bananas</a>
+        </p>
+      </footer>
+    </div>
+  </template>
+}
