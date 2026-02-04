@@ -1,16 +1,12 @@
 import Application from "@ember/application";
+import compatModules from "@embroider/virtual/compat-modules";
 import Resolver from "ember-resolver";
 import loadInitializers from "ember-load-initializers";
-import config from "url-health/config/environment";
-import "url-health/url-health/init";
+import config from "./config/environment";
 
 export default class App extends Application {
   modulePrefix = config.modulePrefix;
-  Resolver = Resolver;
+  Resolver = Resolver.withModules(compatModules);
 }
 
-loadInitializers(App, config.modulePrefix);
-
-const app = new App();
-app.rootElement = document.body;
-app.visit("/");
+loadInitializers(App, config.modulePrefix, compatModules);

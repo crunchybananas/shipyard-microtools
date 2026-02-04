@@ -1,6 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
+import { on } from "@ember/modifier";
 import { htmlSafe } from "@ember/template";
 import type { SafeString } from "@ember/template/-private/handlebars";
 

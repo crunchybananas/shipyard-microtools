@@ -64,7 +64,15 @@
     "typescript": "^5.8.3",
     "vite": "catalog:"
   },
+  "dependencies": {
+    "@ember/string": "^4.0.1",
+    "ember-modifier": "^4.2.2"
+  },
   "ember": {
     "edition": "octane"
+  },
+  "exports": {
+    "./tests/*": "./tests/*",
+    "./*": "./app/*"
   }
 }

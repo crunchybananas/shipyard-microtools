@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "glint": {
+    "environment": "ember-loose"
+  },
+  "compilerOptions": {
+    "declarationDir": "declarations",
+    "baseUrl": ".",
+    "paths": {
+      "dev-terminal/tests/*": ["tests/*"],
+      "dev-terminal/*": ["app/*"]
+    }
+  },
+  "include": ["app/**/*", "types/**/*"]
+}
