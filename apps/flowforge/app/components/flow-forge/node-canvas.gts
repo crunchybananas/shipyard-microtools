@@ -56,6 +56,14 @@ interface PanState {
   startOffsetY: number;
 }
 
+// Modifier to sync input value without losing focus
+const syncValue = modifier((element: HTMLInputElement | HTMLTextAreaElement, [value]: [string]) => {
+  // Only update if the element is not focused (user isn't typing)
+  if (document.activeElement !== element && element.value !== value) {
+    element.value = value ?? "";
+  }
+});
+
 export default class NodeCanvas extends Component<NodeCanvasSignature> {
   @service declare flowEngine: FlowEngineService;
 
@@ -588,8 +596,8 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
                     <label>{{field.name}}</label>
                     {{#if (eq field.type "textarea")}}
                       <textarea
-                        value={{this.getNodeFieldValue node field.name}}
                         placeholder={{field.placeholder}}
+                        {{syncValue (this.getNodeFieldValue node field.name)}}
                         {{on "input" (fn this.handleNodeFieldInput node.id field.name)}}
                       ></textarea>
                     {{else if (eq field.type "select")}}
@@ -608,8 +616,8 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
                     {{else}}
                       <input
                         type={{if (eq field.type "number") "number" "text"}}
-                        value={{this.getNodeFieldValue node field.name}}
                         placeholder={{field.placeholder}}
+                        {{syncValue (this.getNodeFieldValue node field.name)}}
                         {{on "input" (fn this.handleNodeFieldInput node.id field.name)}}
                       />
                     {{/if}}

@@ -2,6 +2,7 @@ import Component from "@glimmer/component";
 import { on } from "@ember/modifier";
 import { fn } from "@ember/helper";
 import { service } from "@ember/service";
+import { modifier } from "ember-modifier";
 
 import type { NodeTypeRef, FlowNode } from "flowforge/types/flow";
 import type { NodeTypeDefinition } from "flowforge/types/node-types";
@@ -16,6 +17,14 @@ export interface SidebarSignature {
     onFieldChange: (nodeId: string, fieldName: string, value: string) => void;
   };
 }
+
+// Modifier to sync input value without losing focus
+const syncValue = modifier((element: HTMLInputElement | HTMLTextAreaElement, [value]: [string]) => {
+  // Only update if the element is not focused (user isn't typing)
+  if (document.activeElement !== element && element.value !== value) {
+    element.value = value ?? "";
+  }
+});
 
 export default class Sidebar extends Component<SidebarSignature> {
   @service declare flowEngine: FlowEngineService;
@@ -95,8 +104,8 @@ export default class Sidebar extends Component<SidebarSignature> {
                   {{#if (eq field.type "textarea")}}
                     <textarea
                       class="field-input field-textarea"
-                      value={{get @selectedNode.fields field.name}}
                       placeholder={{field.placeholder}}
+                      {{syncValue (get @selectedNode.fields field.name)}}
                       {{on "input" (fn this.handleFieldInput field.name)}}
                     ></textarea>
                   {{else if (eq field.type "select")}}
@@ -117,8 +126,8 @@ export default class Sidebar extends Component<SidebarSignature> {
                     <input
                       type={{if (eq field.type "number") "number" "text"}}
                       class="field-input"
-                      value={{get @selectedNode.fields field.name}}
                       placeholder={{field.placeholder}}
+                      {{syncValue (get @selectedNode.fields field.name)}}
                       {{on "input" (fn this.handleFieldInput field.name)}}
                     />
                   {{/if}}
