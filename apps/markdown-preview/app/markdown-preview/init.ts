@@ -131,7 +131,7 @@ console.log(ship);
 
 ---
 
-Built for [Shipyard](https://shipyard.bot) 🛠️
+Built with **Ember** • [Support Crunchy Bananas](https://crunchybananas.com/donate)
 `;
 
   updatePreview();

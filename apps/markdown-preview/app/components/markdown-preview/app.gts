@@ -52,7 +52,10 @@ console.log(greeting);
       </main>
 
       <footer>
-        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+        <p>
+          Built with Ember •
+          <a href="https://crunchybananas.com/donate">Support Crunchy Bananas</a>
+        </p>
       </footer>
     </div>
   </template>
