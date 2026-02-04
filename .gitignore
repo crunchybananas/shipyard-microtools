@@ -1,1 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.vite/
+tmp/
+
+# Ember
+.ember-cli
+.env*
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Built Ember apps (regenerated on CI)
+docs/ember/*/
+!docs/ember/.gitkeep

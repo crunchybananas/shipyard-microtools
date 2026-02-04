@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_docs": "Base TypeScript config for Ember apps",
+  "extends": ["@ember/app-tsconfig", "./tsconfig.base.json"],
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": [
+      "@types/qunit",
+      "qunit-dom",
+      "@embroider/core/virtual",
+      "ember-source/types"
+    ]
+  }
+}

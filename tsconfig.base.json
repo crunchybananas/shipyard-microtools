@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "_docs": "Shared TypeScript settings for all packages in the crunchy-bananas monorepo",
+  "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+    "noImplicitAny": true,
+    "useUnknownInCatchVariables": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "types": ["ember-source/types"]
+  }
+}

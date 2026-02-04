@@ -1,0 +1,30 @@
+{
+  "name": "crunchy-bananas",
+  "private": true,
+  "scripts": {
+    "lint:fix": "pnpm run --filter '*' lint:fix",
+    "lint": "pnpm run --filter '*' lint",
+    "build": "pnpm run --filter './apps/*' build",
+    "dev": "pnpm run --filter './apps/*' dev"
+  },
+  "peerDependencyRules": {
+    "allowAny": [
+      "typescript",
+      "ember-source"
+    ]
+  },
+  "resolutions": {
+    "ember-source": "catalog:",
+    "@glint/template": "catalog:glint",
+    "@babel/core": "catalog:",
+    "ember-cli-babel": "^8.2.0"
+  },
+  "packageManager": "pnpm@9.12.2",
+  "dependencies": {
+    "@embroider/addon-dev": "8.1.0",
+    "@glint/ember-tsc": "catalog:glint",
+    "@glint/template": "catalog:glint",
+    "@glint/tsserver-plugin": "catalog:glint",
+    "@ember/app-tsconfig": "catalog:"
+  }
+}

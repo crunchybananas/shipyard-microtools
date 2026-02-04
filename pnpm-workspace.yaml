@@ -1,0 +1,23 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+catalog:
+  ember-source: 6.10.0
+  ember-cli: 6.9.1
+  typescript: ^5.9.3
+  vite: 7.2.4
+  "@babel/core": 7.28.5
+  "@ember/test-helpers": ^5.4.1
+  "@ember/app-tsconfig": 2.0.0
+
+catalogs:
+  glint:
+    "@glint/ember-tsc": 1.0.8
+    "@glint/template": 1.7.3
+    "@glint/tsserver-plugin": 2.0.8
+    ember-template-lint: ^7.9.3
+  lint:
+    eslint: ^9.39.1
+    eslint-config-prettier: ^9.1.2
+    eslint-plugin-ember: ^12.7.4
