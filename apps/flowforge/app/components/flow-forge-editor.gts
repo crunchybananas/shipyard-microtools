@@ -225,6 +225,12 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
           @executionResults={{this.executionResults}}
         />
       </div>
+      <footer class="app-footer">
+        <p>
+          Built with Ember •
+          <a href="https://crunchybananas.com/donate">Support Crunchy Bananas</a>
+        </p>
+      </footer>
     </div>
   </template>
 }

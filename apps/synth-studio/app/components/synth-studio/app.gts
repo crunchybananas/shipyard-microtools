@@ -312,6 +312,13 @@ export default class SynthStudioApp extends Component {
 
         <div class="recording-indicator hidden" id="recording-indicator">● Recording</div>
       </main>
+
+      <footer class="app-footer">
+        <p>
+          Built with Ember •
+          <a href="https://crunchybananas.com/donate">Support Crunchy Bananas</a>
+        </p>
+      </footer>
     </div>
   </template>
 }
