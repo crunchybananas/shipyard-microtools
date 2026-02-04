@@ -10,7 +10,7 @@ export default class MarkdownPreviewApp extends Component {
   <template>
     <div class="container" {{this.setupMarkdownPreview}}>
       <header>
-        <a href="../" class="back">← All Tools</a>
+        <a href="../../" class="back">← All Tools</a>
         <h1>📝 Markdown Preview</h1>
         <p class="subtitle">Live preview your Markdown with syntax highlighting.</p>
       </header>
