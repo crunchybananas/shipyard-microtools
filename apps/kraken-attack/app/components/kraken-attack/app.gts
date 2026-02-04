@@ -5,12 +5,7 @@ import { modifier } from "ember-modifier";
 import { service } from "@ember/service";
 import type GameEngineService from "kraken-attack/services/game-engine";
 
-export interface KrakenAttackAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class KrakenAttackApp extends Component<KrakenAttackAppSignature> {
+export default class KrakenAttackApp extends Component {
   @service declare gameEngine: GameEngineService;
 
   @tracked canvasElement: HTMLCanvasElement | null = null;

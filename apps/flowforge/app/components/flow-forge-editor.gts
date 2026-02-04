@@ -12,12 +12,7 @@ import type FlowEngineService from "flowforge/services/flow-engine";
 import type { FlowNode, Connection, NodeTypeRef } from "flowforge/types/flow";
 import { toNodeTypeRef } from "flowforge/types/flow";
 
-export interface FlowForgeEditorSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class FlowForgeEditor extends Component<FlowForgeEditorSignature> {
+export default class FlowForgeEditor extends Component {
   @service declare flowEngine: FlowEngineService;
 
   @tracked nodes: FlowNode[] = [];
@@ -26,7 +21,7 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
 
   storageKey = "flowforge-state";
 
-  constructor(owner: Owner, args: FlowForgeEditorSignature["Args"]) {
+  constructor(owner: Owner, args: Record<string, never>) {
     super(owner, args);
     this.loadFromStorage();
   }

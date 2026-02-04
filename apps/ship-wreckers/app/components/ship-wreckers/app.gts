@@ -4,12 +4,7 @@ import { modifier } from "ember-modifier";
 import { service } from "@ember/service";
 import type GameEngineService from "ship-wreckers/services/game-engine";
 
-export interface ShipWreckersAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class ShipWreckersApp extends Component<ShipWreckersAppSignature> {
+export default class ShipWreckersApp extends Component {
   @service declare gameEngine: GameEngineService;
   canvasElement: HTMLCanvasElement | null = null;
 

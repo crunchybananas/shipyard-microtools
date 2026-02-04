@@ -14,12 +14,7 @@ import {
 } from "harbor-master/services/game-engine";
 import type { Ship, Dock } from "harbor-master/services/game-engine";
 
-export interface HarborMasterAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class HarborMasterApp extends Component<HarborMasterAppSignature> {
+export default class HarborMasterApp extends Component {
   @tracked gameRunning = false;
   @tracked score = 0;
   @tracked highScore = parseInt(localStorage.getItem("harborHighScore") ?? "0");
@@ -38,7 +33,7 @@ export default class HarborMasterApp extends Component<HarborMasterAppSignature>
   private lastTime = 0;
   private animationId: number | null = null;
 
-  constructor(owner: Owner, args: HarborMasterAppSignature["Args"]) {
+  constructor(owner: Owner, args: Record<string, never>) {
     super(owner, args);
   }
 

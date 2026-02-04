@@ -10,11 +10,6 @@ import add from "explorer/helpers/add";
 import type ShipyardApiService from "explorer/services/shipyard-api";
 import type { Agent, Ship } from "explorer/services/shipyard-api";
 
-export interface ExplorerAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
 function formatNumber(num: number): string {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
   if (num >= 1000) return (num / 1000).toFixed(1) + "K";
@@ -36,7 +31,7 @@ function formatRelativeTime(dateString: string): string {
   return "Just now";
 }
 
-export default class ExplorerApp extends Component<ExplorerAppSignature> {
+export default class ExplorerApp extends Component {
   @service declare shipyardApi: ShipyardApiService;
 
   @tracked leaderboardSort: "karma" | "ships" = "karma";
@@ -44,7 +39,7 @@ export default class ExplorerApp extends Component<ExplorerAppSignature> {
 
   refreshInterval: ReturnType<typeof setInterval> | null = null;
 
-  constructor(owner: Owner, args: ExplorerAppSignature["Args"]) {
+  constructor(owner: Owner, args: Record<string, never>) {
     super(owner, args);
     this.loadData();
 

@@ -4,11 +4,6 @@ import { on } from "@ember/modifier";
 import { htmlSafe, type SafeString } from "@ember/template";
 import type Owner from "@ember/owner";
 
-export interface DevTerminalAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
 interface GameState {
   location: string;
   inventory: string[];
@@ -100,7 +95,7 @@ A bench sits empty, inviting contemplation.`,
   },
 };
 
-export default class DevTerminalApp extends Component<DevTerminalAppSignature> {
+export default class DevTerminalApp extends Component {
   @tracked outputHtml = "";
   @tracked inputValue = "";
 

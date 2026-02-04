@@ -5,12 +5,7 @@ import { modifier } from "ember-modifier";
 import type GameEngineService from "cargo-tetris/services/game-engine";
 import CargoTetrisHud from "./hud";
 
-export interface CargoTetrisAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class CargoTetrisApp extends Component<CargoTetrisAppSignature> {
+export default class CargoTetrisApp extends Component {
   @service declare gameEngine: GameEngineService;
 
   setupCanvas = modifier((element: HTMLElement) => {

@@ -44,7 +44,7 @@ export default class Navigation extends Component<NavigationSignature> {
     return false;
   }
 
-  getButtonClass(direction: Direction): string {
+  getButtonClass = (direction: Direction): string => {
     const classes = ["nav-btn"];
     if (!this.isExitAvailable(direction)) {
       classes.push("hidden");
@@ -52,7 +52,7 @@ export default class Navigation extends Component<NavigationSignature> {
       classes.push("locked");
     }
     return classes.join(" ");
-  }
+  };
 
   handleClick = (direction: Direction): void => {
     if (this.isExitAvailable(direction)) {

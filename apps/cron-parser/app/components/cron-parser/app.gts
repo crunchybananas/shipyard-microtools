@@ -4,11 +4,6 @@ import { on } from "@ember/modifier";
 import { fn } from "@ember/helper";
 import type Owner from "@ember/owner";
 
-export interface CronParserAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
 const FIELDS = ["minute", "hour", "day of month", "month", "day of week"];
 const FIELD_NAMES = ["Minute", "Hour", "Day of Month", "Month", "Day of Week"];
 const MONTHS = [
@@ -52,7 +47,7 @@ const EXAMPLES = [
   { cron: "0 */2 * * *", label: "Every 2 hours" },
 ];
 
-export default class CronParserApp extends Component<CronParserAppSignature> {
+export default class CronParserApp extends Component {
   @tracked cronInput = "*/15 * * * *";
   @tracked humanReadable = "Enter a cron expression above";
   @tracked fieldBreakdown: FieldBreakdownItem[] = FIELD_NAMES.map((name) => ({
@@ -64,7 +59,7 @@ export default class CronParserApp extends Component<CronParserAppSignature> {
 
   examples = EXAMPLES;
 
-  constructor(owner: Owner, args: CronParserAppSignature["Args"]) {
+  constructor(owner: Owner, args: Record<string, never>) {
     super(owner, args);
     this.parseCron();
   }

@@ -2,12 +2,7 @@ import Component from "@glimmer/component";
 import { modifier } from "ember-modifier";
 import { initializeSynthStudio } from "synth-studio/synth-studio/init";
 
-export interface SynthStudioAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class SynthStudioApp extends Component<SynthStudioAppSignature> {
+export default class SynthStudioApp extends Component {
   setupSynthStudio = modifier((element: HTMLElement) => {
     initializeSynthStudio(element);
   });

@@ -13,12 +13,7 @@ interface RateLimitState {
   resetTime: number;
 }
 
-export interface RateLimitAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class RateLimitApp extends Component<RateLimitAppSignature> {
+export default class RateLimitApp extends Component {
   @tracked posts = 0;
   @tracked comments = 0;
   @tracked resetTime = Date.now() + 3600000;
@@ -30,7 +25,7 @@ export default class RateLimitApp extends Component<RateLimitAppSignature> {
 
   private timerId: number | null = null;
 
-  constructor(owner: Owner, args: RateLimitAppSignature["Args"]) {
+  constructor(owner: Owner, args: Record<string, never>) {
     super(owner, args);
     this.loadState();
     this.startTimer();

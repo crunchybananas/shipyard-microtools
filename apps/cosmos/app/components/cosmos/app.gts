@@ -24,11 +24,6 @@ import {
   saveBookmark,
 } from "cosmos/services/bookmark-manager";
 
-export interface CosmosAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
 interface Camera {
   x: number;
   y: number;
@@ -38,7 +33,7 @@ interface Camera {
   targetY: number;
 }
 
-export default class CosmosApp extends Component<CosmosAppSignature> {
+export default class CosmosApp extends Component {
   @tracked isDragging = false;
   @tracked showBookmarksModal = false;
   @tracked toastMessage = "";

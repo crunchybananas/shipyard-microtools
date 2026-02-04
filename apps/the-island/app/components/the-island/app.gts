@@ -18,27 +18,24 @@ import Inventory from "./inventory";
 import MessageLog from "./message-log";
 import Navigation from "./navigation";
 import MirrorPuzzle from "./mirror-puzzle";
+import SignalDeck from "./signal-deck";
 
 type Direction = "north" | "south" | "east" | "west" | "up" | "down";
 
-interface TheIslandAppSignature {
-  Element: HTMLDivElement;
-  Args: Record<string, never>;
-}
-
-export default class TheIslandApp extends Component<TheIslandAppSignature> {
+export default class TheIslandApp extends Component {
   @service declare gameState: GameStateService;
   @service declare audioEngine: AudioEngineService;
 
   @tracked message: string = "";
   @tracked messageVisible: boolean = false;
   @tracked showMirrorPuzzle: boolean = false;
+  @tracked showSignalDeck: boolean = false;
   @tracked isIntro: boolean = true;
   @tracked audioInitialized: boolean = false;
 
   private messageTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(owner: Owner, args: TheIslandAppSignature["Args"]) {
+  constructor(owner: Owner, args: Record<string, never>) {
     super(owner, args);
     this.initGame();
   }
@@ -292,6 +289,16 @@ export default class TheIslandApp extends Component<TheIslandAppSignature> {
   }
 
   @action
+  openSignalDeck(): void {
+    this.showSignalDeck = true;
+  }
+
+  @action
+  closeSignalDeck(): void {
+    this.showSignalDeck = false;
+  }
+
+  @action
   navigate(direction: Direction): void {
     this.initializeAudio();
 
@@ -374,6 +381,7 @@ export default class TheIslandApp extends Component<TheIslandAppSignature> {
           <button type="button" class="menu-btn" {{on "click" this.saveGame}}>Save</button>
           <button type="button" class="menu-btn" {{on "click" this.loadGame}}>Load</button>
           <button type="button" class="menu-btn" {{on "click" this.newGame}}>New Game</button>
+          <button type="button" class="menu-btn" {{on "click" this.openSignalDeck}}>Signal Deck</button>
         </div>
       </header>
 
@@ -410,6 +418,10 @@ export default class TheIslandApp extends Component<TheIslandAppSignature> {
           @onClose={{this.closePuzzle}}
           @isSolved={{this.isLighthousePuzzleSolved}}
         />
+      {{/if}}
+
+      {{#if this.showSignalDeck}}
+        <SignalDeck @scene={{this.currentScene}} @onClose={{this.closeSignalDeck}} />
       {{/if}}
     </div>
   </template>
