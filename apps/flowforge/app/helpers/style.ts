@@ -10,10 +10,12 @@ const toKebabCase = (value: string) => {
 
 export default helper(function style(
   _positional: unknown[],
-  named: Record<string, unknown>
+  named: Record<string, unknown>,
 ) {
   const declarations = Object.entries(named)
-    .filter(([, value]) => value !== null && value !== undefined && value !== "")
+    .filter(
+      ([, value]) => value !== null && value !== undefined && value !== "",
+    )
     .map(([key, value]) => `${toKebabCase(key)}: ${String(value)};`)
     .join(" ");
 

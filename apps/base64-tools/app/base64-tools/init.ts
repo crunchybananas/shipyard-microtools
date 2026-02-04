@@ -3,22 +3,53 @@ export function initializeBase64Tools(_element: HTMLElement) {
   const panels = document.querySelectorAll<HTMLElement>(".panel");
   const status = document.getElementById("status") as HTMLDivElement | null;
 
-  const textInput = document.getElementById("textInput") as HTMLTextAreaElement | null;
-  const base64Input = document.getElementById("base64Input") as HTMLTextAreaElement | null;
-  const encodeTextBtn = document.getElementById("encodeTextBtn") as HTMLButtonElement | null;
-  const decodeTextBtn = document.getElementById("decodeTextBtn") as HTMLButtonElement | null;
+  const textInput = document.getElementById(
+    "textInput",
+  ) as HTMLTextAreaElement | null;
+  const base64Input = document.getElementById(
+    "base64Input",
+  ) as HTMLTextAreaElement | null;
+  const encodeTextBtn = document.getElementById(
+    "encodeTextBtn",
+  ) as HTMLButtonElement | null;
+  const decodeTextBtn = document.getElementById(
+    "decodeTextBtn",
+  ) as HTMLButtonElement | null;
 
   const dropZone = document.getElementById("dropZone") as HTMLDivElement | null;
-  const fileInput = document.getElementById("fileInput") as HTMLInputElement | null;
-  const filePreview = document.getElementById("filePreview") as HTMLDivElement | null;
-  const previewImg = document.getElementById("previewImg") as HTMLImageElement | null;
-  const fileName = document.getElementById("fileName") as HTMLParagraphElement | null;
-  const fileBase64Output = document.getElementById("fileBase64Output") as HTMLTextAreaElement | null;
-  const copyBase64Btn = document.getElementById("copyBase64Btn") as HTMLButtonElement | null;
-  const copyDataUrlBtn = document.getElementById("copyDataUrlBtn") as HTMLButtonElement | null;
+  const fileInput = document.getElementById(
+    "fileInput",
+  ) as HTMLInputElement | null;
+  const filePreview = document.getElementById(
+    "filePreview",
+  ) as HTMLDivElement | null;
+  const previewImg = document.getElementById(
+    "previewImg",
+  ) as HTMLImageElement | null;
+  const fileName = document.getElementById(
+    "fileName",
+  ) as HTMLParagraphElement | null;
+  const fileBase64Output = document.getElementById(
+    "fileBase64Output",
+  ) as HTMLTextAreaElement | null;
+  const copyBase64Btn = document.getElementById(
+    "copyBase64Btn",
+  ) as HTMLButtonElement | null;
+  const copyDataUrlBtn = document.getElementById(
+    "copyDataUrlBtn",
+  ) as HTMLButtonElement | null;
 
-  if (!status || !textInput || !base64Input || !encodeTextBtn || !decodeTextBtn) return;
-  if (!dropZone || !fileInput || !filePreview || !previewImg || !fileName || !fileBase64Output) return;
+  if (!status || !textInput || !base64Input || !encodeTextBtn || !decodeTextBtn)
+    return;
+  if (
+    !dropZone ||
+    !fileInput ||
+    !filePreview ||
+    !previewImg ||
+    !fileName ||
+    !fileBase64Output
+  )
+    return;
   if (!copyBase64Btn || !copyDataUrlBtn) return;
 
   let currentDataUrl = "";

@@ -7,7 +7,10 @@ import { service } from "@ember/service";
 import style from "flowforge/helpers/style";
 
 import type { FlowNode, Connection } from "flowforge/types/flow";
-import type { ExecutionResult, NodeTypeDefinition } from "flowforge/types/node-types";
+import type {
+  ExecutionResult,
+  NodeTypeDefinition,
+} from "flowforge/types/node-types";
 import type FlowEngineService from "flowforge/services/flow-engine";
 
 export interface NodeCanvasSignature {
@@ -24,7 +27,7 @@ export interface NodeCanvasSignature {
       sourceNodeId: string,
       sourcePort: string,
       targetNodeId: string,
-      targetPort: string
+      targetPort: string,
     ) => void;
     onDisconnect: (connectionId: string) => void;
     onAddNode: (typeId: string, x: number, y: number) => void;
@@ -57,12 +60,14 @@ interface PanState {
 }
 
 // Modifier to sync input value without losing focus
-const syncValue = modifier((element: HTMLInputElement | HTMLTextAreaElement, [value]: [string]) => {
-  // Only update if the element is not focused (user isn't typing)
-  if (document.activeElement !== element && element.value !== value) {
-    element.value = value ?? "";
-  }
-});
+const syncValue = modifier(
+  (element: HTMLInputElement | HTMLTextAreaElement, [value]: [string]) => {
+    // Only update if the element is not focused (user isn't typing)
+    if (document.activeElement !== element && element.value !== value) {
+      element.value = value ?? "";
+    }
+  },
+);
 
 export default class NodeCanvas extends Component<NodeCanvasSignature> {
   @service declare flowEngine: FlowEngineService;
@@ -150,7 +155,10 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
         const portName = el.dataset.portName;
         const isOutput = el.dataset.isOutput === "true";
         if (!nodeId || !portName) return false;
-        if (nodeId === this.pendingConnection?.nodeId && portName === this.pendingConnection?.portName) {
+        if (
+          nodeId === this.pendingConnection?.nodeId &&
+          portName === this.pendingConnection?.portName
+        ) {
           return false;
         }
         return isOutput !== this.pendingConnection?.isOutput;
@@ -185,14 +193,14 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
               this.pendingConnection.nodeId,
               this.pendingConnection.portName,
               nodeId,
-              portName
+              portName,
             );
           } else {
             this.args.onConnect(
               nodeId,
               portName,
               this.pendingConnection.nodeId,
-              this.pendingConnection.portName
+              this.pendingConnection.portName,
             );
           }
         } else {
@@ -261,7 +269,6 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
   getNodeDef = (node: FlowNode): NodeTypeDefinition | undefined => {
     return this.flowEngine.getNodeType(node.type);
   };
-
 
   get layerTransformValue() {
     return `translate(${this.viewOffset.x}px, ${this.viewOffset.y}px) scale(${this.viewScale})`;
@@ -350,7 +357,7 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     portType: string,
     isOutput: boolean,
     portIndex: number,
-    event: PointerEvent
+    event: PointerEvent,
   ) => {
     event.stopPropagation();
     event.preventDefault();
@@ -388,7 +395,10 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
   };
 
   handleNodeFieldInput = (nodeId: string, fieldName: string, event: Event) => {
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const target = event.target as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement;
     this.args.onFieldChange(nodeId, fieldName, target.value);
   };
 
@@ -401,7 +411,7 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     node: FlowNode,
     isOutput: boolean,
     portIndex: number,
-    portName?: string
+    portName?: string,
   ) => {
     if (portName) {
       const domPos = this.getPortPositionFromDom(node.id, portName, isOutput);
@@ -419,10 +429,10 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
 
   getConnectionPath = (connection: Connection) => {
     const sourceNode = this.args.nodes.find(
-      (n) => n.id === connection.sourceNodeId
+      (n) => n.id === connection.sourceNodeId,
     );
     const targetNode = this.args.nodes.find(
-      (n) => n.id === connection.targetNodeId
+      (n) => n.id === connection.targetNodeId,
     );
 
     if (!sourceNode || !targetNode) return "";
@@ -431,24 +441,23 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     const sourceDef = this.getNodeDef(sourceNode);
     const targetDef = this.getNodeDef(targetNode);
 
-    const sourcePortIndex = sourceDef?.outputs.findIndex(
-      (p) => p.name === connection.sourcePort
-    ) ?? 0;
-    const targetPortIndex = targetDef?.inputs.findIndex(
-      (p) => p.name === connection.targetPort
-    ) ?? 0;
+    const sourcePortIndex =
+      sourceDef?.outputs.findIndex((p) => p.name === connection.sourcePort) ??
+      0;
+    const targetPortIndex =
+      targetDef?.inputs.findIndex((p) => p.name === connection.targetPort) ?? 0;
 
     const start = this.getPortPosition(
       sourceNode,
       true,
       sourcePortIndex,
-      connection.sourcePort
+      connection.sourcePort,
     );
     const end = this.getPortPosition(
       targetNode,
       false,
       targetPortIndex,
-      connection.targetPort
+      connection.targetPort,
     );
 
     return this.createBezierPath(start.x, start.y, end.x, end.y);
@@ -456,7 +465,7 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
 
   getConnectionColor = (connection: Connection) => {
     const sourceNode = this.args.nodes.find(
-      (n) => n.id === connection.sourceNodeId
+      (n) => n.id === connection.sourceNodeId,
     );
     if (!sourceNode) return PORT_TYPE_COLORS.any;
     const sourceDef = this.getNodeDef(sourceNode);
@@ -476,29 +485,36 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
         startX,
         startY,
         this.mousePos.x,
-        this.mousePos.y
+        this.mousePos.y,
       );
     } else {
       return this.createBezierPath(
         this.mousePos.x,
         this.mousePos.y,
         startX,
-        startY
+        startY,
       );
     }
   }
 
   get pendingConnectionColor() {
     if (!this.pendingConnection) return PORT_TYPE_COLORS.any;
-    return PORT_TYPE_COLORS[this.pendingConnection.portType] ?? PORT_TYPE_COLORS.any;
+    return (
+      PORT_TYPE_COLORS[this.pendingConnection.portType] ?? PORT_TYPE_COLORS.any
+    );
   }
 
   isPortConnected = (nodeId: string, portName: string, isOutput: boolean) => {
     return this.args.connections.some((connection) => {
       if (isOutput) {
-        return connection.sourceNodeId === nodeId && connection.sourcePort === portName;
+        return (
+          connection.sourceNodeId === nodeId &&
+          connection.sourcePort === portName
+        );
       }
-      return connection.targetNodeId === nodeId && connection.targetPort === portName;
+      return (
+        connection.targetNodeId === nodeId && connection.targetPort === portName
+      );
     });
   };
 
@@ -531,7 +547,11 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     };
   };
 
-  getPortPositionFromDom = (nodeId: string, portName: string, isOutput: boolean) => {
+  getPortPositionFromDom = (
+    nodeId: string,
+    portName: string,
+    isOutput: boolean,
+  ) => {
     if (!this.canvasElement) return null;
     const escapedNodeId = cssEscape(nodeId);
     const escapedPortName = cssEscape(portName);
@@ -539,7 +559,9 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
       `.port[data-node-id="${escapedNodeId}"]` +
       `[data-port-name="${escapedPortName}"]` +
       `[data-is-output="${isOutput}"] .port-dot`;
-    const dot = this.canvasElement.querySelector(selector) as HTMLElement | null;
+    const dot = this.canvasElement.querySelector(
+      selector,
+    ) as HTMLElement | null;
     if (!dot) return null;
     const dotRect = dot.getBoundingClientRect();
     const canvasRect = this.canvasElement.getBoundingClientRect();
@@ -574,14 +596,26 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
         {{/if}}
       </svg>
 
-      <div class="nodes-layer" style={{style transform=this.layerTransformValue}}>
+      <div
+        class="nodes-layer"
+        style={{style transform=this.layerTransformValue}}
+      >
         {{#each @nodes as |node|}}
           <div
             class="flow-node
               {{if (eq @selectedNodeId node.id) 'selected'}}
-              {{if (eq (this.getExecutionStatus node.id) 'success') 'status-success'}}
-              {{if (eq (this.getExecutionStatus node.id) 'error') 'status-error'}}
-              {{if (eq (this.getExecutionStatus node.id) 'running') 'status-running'}}"
+              {{if
+                (eq (this.getExecutionStatus node.id) 'success')
+                'status-success'
+              }}
+              {{if
+                (eq (this.getExecutionStatus node.id) 'error')
+                'status-error'
+              }}
+              {{if
+                (eq (this.getExecutionStatus node.id) 'running')
+                'status-running'
+              }}"
             style={{style left=(concat node.x "px") top=(concat node.y "px")}}
             {{on "mousedown" (fn this.handleNodeMouseDown node.id)}}
           >
@@ -598,16 +632,25 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
                       <textarea
                         placeholder={{field.placeholder}}
                         {{syncValue (this.getNodeFieldValue node field.name)}}
-                        {{on "input" (fn this.handleNodeFieldInput node.id field.name)}}
+                        {{on
+                          "input"
+                          (fn this.handleNodeFieldInput node.id field.name)
+                        }}
                       ></textarea>
                     {{else if (eq field.type "select")}}
                       <select
-                        {{on "change" (fn this.handleNodeFieldInput node.id field.name)}}
+                        {{on
+                          "change"
+                          (fn this.handleNodeFieldInput node.id field.name)
+                        }}
                       >
                         {{#each field.options as |opt|}}
                           <option
                             value={{opt}}
-                            selected={{eq opt (this.getNodeFieldValue node field.name)}}
+                            selected={{eq
+                              opt
+                              (this.getNodeFieldValue node field.name)
+                            }}
                           >
                             {{opt}}
                           </option>
@@ -618,7 +661,10 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
                         type={{if (eq field.type "number") "number" "text"}}
                         placeholder={{field.placeholder}}
                         {{syncValue (this.getNodeFieldValue node field.name)}}
-                        {{on "input" (fn this.handleNodeFieldInput node.id field.name)}}
+                        {{on
+                          "input"
+                          (fn this.handleNodeFieldInput node.id field.name)
+                        }}
                       />
                     {{/if}}
                   </div>
@@ -634,9 +680,25 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
                     data-port-name={{port.name}}
                     data-port-type={{port.type}}
                     data-is-output="false"
-                    {{on "pointerdown" (fn this.handlePortPointerDown node.id port.name port.type false index)}}
+                    {{on
+                      "pointerdown"
+                      (fn
+                        this.handlePortPointerDown
+                        node.id
+                        port.name
+                        port.type
+                        false
+                        index
+                      )
+                    }}
                   >
-                    <div class="port-dot {{if (this.isPortConnected node.id port.name false) 'connected'}}"></div>
+                    <div
+                      class="port-dot
+                        {{if
+                          (this.isPortConnected node.id port.name false)
+                          'connected'
+                        }}"
+                    ></div>
                     <span class="port-label">{{port.name}}</span>
                   </div>
                 {{/each}}
@@ -649,10 +711,26 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
                     data-port-name={{port.name}}
                     data-port-type={{port.type}}
                     data-is-output="true"
-                    {{on "pointerdown" (fn this.handlePortPointerDown node.id port.name port.type true index)}}
+                    {{on
+                      "pointerdown"
+                      (fn
+                        this.handlePortPointerDown
+                        node.id
+                        port.name
+                        port.type
+                        true
+                        index
+                      )
+                    }}
                   >
                     <span class="port-label">{{port.name}}</span>
-                    <div class="port-dot {{if (this.isPortConnected node.id port.name true) 'connected'}}"></div>
+                    <div
+                      class="port-dot
+                        {{if
+                          (this.isPortConnected node.id port.name true)
+                          'connected'
+                        }}"
+                    ></div>
                   </div>
                 {{/each}}
               </div>

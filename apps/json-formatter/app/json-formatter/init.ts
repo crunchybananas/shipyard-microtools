@@ -1,15 +1,34 @@
 export function initializeJsonFormatter(_element: HTMLElement) {
-  const jsonInput = document.getElementById("jsonInput") as HTMLTextAreaElement | null;
+  const jsonInput = document.getElementById(
+    "jsonInput",
+  ) as HTMLTextAreaElement | null;
   const output = document.getElementById("output") as HTMLPreElement | null;
   const status = document.getElementById("status") as HTMLDivElement | null;
   const stats = document.getElementById("stats") as HTMLSpanElement | null;
 
-  const formatBtn = document.getElementById("formatBtn") as HTMLButtonElement | null;
-  const minifyBtn = document.getElementById("minifyBtn") as HTMLButtonElement | null;
-  const validateBtn = document.getElementById("validateBtn") as HTMLButtonElement | null;
-  const copyBtn = document.getElementById("copyBtn") as HTMLButtonElement | null;
+  const formatBtn = document.getElementById(
+    "formatBtn",
+  ) as HTMLButtonElement | null;
+  const minifyBtn = document.getElementById(
+    "minifyBtn",
+  ) as HTMLButtonElement | null;
+  const validateBtn = document.getElementById(
+    "validateBtn",
+  ) as HTMLButtonElement | null;
+  const copyBtn = document.getElementById(
+    "copyBtn",
+  ) as HTMLButtonElement | null;
 
-  if (!jsonInput || !output || !status || !stats || !formatBtn || !minifyBtn || !validateBtn || !copyBtn) {
+  if (
+    !jsonInput ||
+    !output ||
+    !status ||
+    !stats ||
+    !formatBtn ||
+    !minifyBtn ||
+    !validateBtn ||
+    !copyBtn
+  ) {
     return;
   }
 
@@ -22,9 +41,12 @@ export function initializeJsonFormatter(_element: HTMLElement) {
   };
 
   const syntaxHighlight = (json: string) => {
-    const escaped = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const escaped = json
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
     return escaped.replace(
-      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
       (match) => {
         let cls = "number";
         if (/^"/.test(match)) {
@@ -39,7 +61,7 @@ export function initializeJsonFormatter(_element: HTMLElement) {
           cls = "null";
         }
         return `<span class="${cls}">${match}</span>`;
-      }
+      },
     );
   };
 
@@ -86,7 +108,10 @@ export function initializeJsonFormatter(_element: HTMLElement) {
       const minified = JSON.stringify(parsed);
       output.innerHTML = syntaxHighlight(minified);
       updateStats(minified);
-      showStatus(`✓ Minified: ${input.length} → ${minified.length} chars`, "success");
+      showStatus(
+        `✓ Minified: ${input.length} → ${minified.length} chars`,
+        "success",
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       output.textContent = "";

@@ -2,7 +2,12 @@ import Component from "@glimmer/component";
 import { modifier } from "ember-modifier";
 import { initializeSynthStudio } from "synth-studio/synth-studio/init";
 
-export default class SynthStudioApp extends Component {
+export interface SynthStudioAppSignature {
+  Element: HTMLDivElement;
+  Args: Record<string, never>;
+}
+
+export default class SynthStudioApp extends Component<SynthStudioAppSignature> {
   setupSynthStudio = modifier((element: HTMLElement) => {
     initializeSynthStudio(element);
   });
@@ -21,8 +26,8 @@ export default class SynthStudioApp extends Component {
             <option value="brass">Brass</option>
             <option value="strings">Strings</option>
           </select>
-          <button id="save-btn" class="btn">Save</button>
-          <button id="export-btn" class="btn btn-primary">Export WAV</button>
+          <button id="save-btn" class="btn" type="button">Save</button>
+          <button id="export-btn" class="btn btn-primary" type="button">Export WAV</button>
         </div>
       </header>
 
@@ -31,14 +36,37 @@ export default class SynthStudioApp extends Component {
           <section class="panel oscillator-panel">
             <h2>OSCILLATOR</h2>
             <div class="waveform-selector">
-              <button class="wave-btn active" data-wave="sine" title="Sine">∿</button>
-              <button class="wave-btn" data-wave="square" title="Square">□</button>
-              <button class="wave-btn" data-wave="sawtooth" title="Sawtooth">⊿</button>
-              <button class="wave-btn" data-wave="triangle" title="Triangle">△</button>
+              <button
+                class="wave-btn active"
+                data-wave="sine"
+                title="Sine" type="button"
+              >∿</button>
+              <button
+                class="wave-btn"
+                data-wave="square"
+                title="Square" type="button"
+              >□</button>
+              <button
+                class="wave-btn"
+                data-wave="sawtooth"
+                title="Sawtooth" type="button"
+              >⊿</button>
+              <button
+                class="wave-btn"
+                data-wave="triangle"
+                title="Triangle" type="button"
+              >△</button>
             </div>
             <div class="control-group">
               <label>Octave</label>
-              <input type="range" id="octave" min="-2" max="2" value="0" step="1" />
+              <input
+                type="range"
+                id="octave"
+                min="-2"
+                max="2"
+                value="0"
+                step="1"
+              />
               <span class="value" id="octave-value">0</span>
             </div>
             <div class="control-group">
@@ -52,17 +80,37 @@ export default class SynthStudioApp extends Component {
             <h2>FILTER</h2>
             <div class="control-group">
               <label>Cutoff</label>
-              <input type="range" id="filter-cutoff" min="20" max="20000" value="5000" class="log-slider" />
+              <input
+                type="range"
+                id="filter-cutoff"
+                min="20"
+                max="20000"
+                value="5000"
+                class="log-slider"
+              />
               <span class="value" id="filter-cutoff-value">5000 Hz</span>
             </div>
             <div class="control-group">
               <label>Resonance</label>
-              <input type="range" id="filter-resonance" min="0" max="30" value="1" step="0.1" />
+              <input
+                type="range"
+                id="filter-resonance"
+                min="0"
+                max="30"
+                value="1"
+                step="0.1"
+              />
               <span class="value" id="filter-resonance-value">1</span>
             </div>
             <div class="control-group">
               <label>Env Amt</label>
-              <input type="range" id="filter-env-amount" min="0" max="10000" value="0" />
+              <input
+                type="range"
+                id="filter-env-amount"
+                min="0"
+                max="10000"
+                value="0"
+              />
               <span class="value" id="filter-env-amount-value">0</span>
             </div>
           </section>
@@ -74,8 +122,11 @@ export default class SynthStudioApp extends Component {
               <canvas id="spectrum-canvas" width="300" height="80"></canvas>
             </div>
             <div class="viz-toggle">
-              <button class="viz-btn active" data-viz="waveform">Waveform</button>
-              <button class="viz-btn" data-viz="spectrum">Spectrum</button>
+              <button
+                class="viz-btn active"
+                data-viz="waveform" type="button"
+              >Waveform</button>
+              <button class="viz-btn" data-viz="spectrum" type="button">Spectrum</button>
             </div>
           </section>
         </div>
@@ -95,7 +146,7 @@ export default class SynthStudioApp extends Component {
                   max="2"
                   value="0.01"
                   step="0.001"
-                  orient="vertical"
+                  data-orient="vertical"
                 />
                 <label>A</label>
                 <span class="value" id="attack-value">10ms</span>
@@ -108,7 +159,7 @@ export default class SynthStudioApp extends Component {
                   max="2"
                   value="0.1"
                   step="0.001"
-                  orient="vertical"
+                  data-orient="vertical"
                 />
                 <label>D</label>
                 <span class="value" id="decay-value">100ms</span>
@@ -121,7 +172,7 @@ export default class SynthStudioApp extends Component {
                   max="1"
                   value="0.7"
                   step="0.01"
-                  orient="vertical"
+                  data-orient="vertical"
                 />
                 <label>S</label>
                 <span class="value" id="sustain-value">70%</span>
@@ -134,7 +185,7 @@ export default class SynthStudioApp extends Component {
                   max="3"
                   value="0.3"
                   step="0.001"
-                  orient="vertical"
+                  data-orient="vertical"
                 />
                 <label>R</label>
                 <span class="value" id="release-value">300ms</span>
@@ -151,15 +202,36 @@ export default class SynthStudioApp extends Component {
               </div>
               <div class="effect-controls">
                 <div class="mini-control">
-                  <input type="range" id="delay-time" min="0.05" max="1" value="0.3" step="0.01" />
+                  <input
+                    type="range"
+                    id="delay-time"
+                    min="0.05"
+                    max="1"
+                    value="0.3"
+                    step="0.01"
+                  />
                   <span>Time</span>
                 </div>
                 <div class="mini-control">
-                  <input type="range" id="delay-feedback" min="0" max="0.9" value="0.4" step="0.01" />
+                  <input
+                    type="range"
+                    id="delay-feedback"
+                    min="0"
+                    max="0.9"
+                    value="0.4"
+                    step="0.01"
+                  />
                   <span>Feedback</span>
                 </div>
                 <div class="mini-control">
-                  <input type="range" id="delay-mix" min="0" max="1" value="0.3" step="0.01" />
+                  <input
+                    type="range"
+                    id="delay-mix"
+                    min="0"
+                    max="1"
+                    value="0.3"
+                    step="0.01"
+                  />
                   <span>Mix</span>
                 </div>
               </div>
@@ -171,11 +243,25 @@ export default class SynthStudioApp extends Component {
               </div>
               <div class="effect-controls">
                 <div class="mini-control">
-                  <input type="range" id="reverb-decay" min="0.1" max="5" value="2" step="0.1" />
+                  <input
+                    type="range"
+                    id="reverb-decay"
+                    min="0.1"
+                    max="5"
+                    value="2"
+                    step="0.1"
+                  />
                   <span>Decay</span>
                 </div>
                 <div class="mini-control">
-                  <input type="range" id="reverb-mix" min="0" max="1" value="0.3" step="0.01" />
+                  <input
+                    type="range"
+                    id="reverb-mix"
+                    min="0"
+                    max="1"
+                    value="0.3"
+                    step="0.01"
+                  />
                   <span>Mix</span>
                 </div>
               </div>
@@ -187,7 +273,13 @@ export default class SynthStudioApp extends Component {
               </div>
               <div class="effect-controls">
                 <div class="mini-control">
-                  <input type="range" id="distortion-amount" min="0" max="100" value="20" />
+                  <input
+                    type="range"
+                    id="distortion-amount"
+                    min="0"
+                    max="100"
+                    value="20"
+                  />
                   <span>Amount</span>
                 </div>
               </div>
@@ -198,7 +290,14 @@ export default class SynthStudioApp extends Component {
             <h2>LFO</h2>
             <div class="control-group">
               <label>Rate</label>
-              <input type="range" id="lfo-rate" min="0.1" max="20" value="5" step="0.1" />
+              <input
+                type="range"
+                id="lfo-rate"
+                min="0.1"
+                max="20"
+                value="5"
+                step="0.1"
+              />
               <span class="value" id="lfo-rate-value">5 Hz</span>
             </div>
             <div class="control-group">
@@ -207,9 +306,15 @@ export default class SynthStudioApp extends Component {
               <span class="value" id="lfo-depth-value">0</span>
             </div>
             <div class="lfo-target">
-              <button class="lfo-target-btn active" data-target="none">Off</button>
-              <button class="lfo-target-btn" data-target="pitch">Pitch</button>
-              <button class="lfo-target-btn" data-target="filter">Filter</button>
+              <button
+                class="lfo-target-btn active"
+                data-target="none" type="button"
+              >Off</button>
+              <button class="lfo-target-btn" data-target="pitch" type="button">Pitch</button>
+              <button
+                class="lfo-target-btn"
+                data-target="filter" type="button"
+              >Filter</button>
             </div>
           </section>
 
@@ -217,7 +322,14 @@ export default class SynthStudioApp extends Component {
             <h2>MASTER</h2>
             <div class="control-group">
               <label>Volume</label>
-              <input type="range" id="master-volume" min="0" max="1" value="0.7" step="0.01" />
+              <input
+                type="range"
+                id="master-volume"
+                min="0"
+                max="1"
+                value="0.7"
+                step="0.01"
+              />
               <span class="value" id="master-volume-value">70%</span>
             </div>
             <div class="level-meter">
@@ -227,7 +339,8 @@ export default class SynthStudioApp extends Component {
         </div>
 
         <section class="keyboard-section">
-          <h2>KEYBOARD <span class="keyboard-hint">(Use computer keys A-L or click)</span></h2>
+          <h2>KEYBOARD
+            <span class="keyboard-hint">(Use computer keys A-L or click)</span></h2>
           <div class="keyboard" id="keyboard"></div>
         </section>
 
@@ -241,12 +354,31 @@ export default class SynthStudioApp extends Component {
               </div>
               <div class="swing-control">
                 <label>Swing</label>
-                <input type="range" id="swing" min="0" max="0.5" value="0" step="0.01" />
+                <input
+                  type="range"
+                  id="swing"
+                  min="0"
+                  max="0.5"
+                  value="0"
+                  step="0.01"
+                />
               </div>
               <div class="transport">
-                <button class="transport-btn" id="play-btn" title="Play">▶</button>
-                <button class="transport-btn" id="stop-btn" title="Stop">⏹</button>
-                <button class="transport-btn" id="record-btn" title="Record">⏺</button>
+                <button
+                  class="transport-btn"
+                  id="play-btn"
+                  title="Play" type="button"
+                >▶</button>
+                <button
+                  class="transport-btn"
+                  id="stop-btn"
+                  title="Stop" type="button"
+                >⏹</button>
+                <button
+                  class="transport-btn"
+                  id="record-btn"
+                  title="Record" type="button"
+                >⏺</button>
               </div>
             </div>
           </div>
@@ -310,14 +442,19 @@ export default class SynthStudioApp extends Component {
           <div class="step-indicator" id="step-indicator"></div>
         </section>
 
-        <div class="recording-indicator hidden" id="recording-indicator">● Recording</div>
+        <div class="recording-indicator hidden" id="recording-indicator">●
+          Recording</div>
       </main>
 
       <footer class="app-footer">
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank" rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a href="https://emberjs.com" target="_blank" rel="noopener noreferrer">Ember</a>
         </p>
       </footer>
     </div>

@@ -131,7 +131,7 @@ export function initializeSynthStudio(_element: HTMLElement) {
       await initAudio();
       await resumeAudio();
     },
-    { once: true }
+    { once: true },
   );
 
   document.body.addEventListener(
@@ -140,7 +140,7 @@ export function initializeSynthStudio(_element: HTMLElement) {
       await initAudio();
       await resumeAudio();
     },
-    { once: true }
+    { once: true },
   );
 }
 
@@ -148,7 +148,11 @@ async function initAudio() {
   if (isAudioInitialized) return;
 
   try {
-    audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    audioContext = new (
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext
+    )();
 
     masterGain = audioContext.createGain();
     masterGain.gain.value = 0.7;
@@ -177,7 +181,7 @@ async function initAudio() {
     visualizer.init(
       document.getElementById("waveform-canvas") as HTMLCanvasElement,
       document.getElementById("spectrum-canvas") as HTMLCanvasElement,
-      document.getElementById("adsr-canvas") as HTMLCanvasElement
+      document.getElementById("adsr-canvas") as HTMLCanvasElement,
     );
 
     sequencer.onSynthTrigger = (note, velocity) => {
@@ -308,7 +312,9 @@ function setupKeyboardInput() {
     if (key === "z" && synth) {
       const octave = Math.max(-2, synth.params.octave - 1);
       synth.setParam("octave", octave);
-      const octaveSlider = document.getElementById("octave") as HTMLInputElement | null;
+      const octaveSlider = document.getElementById(
+        "octave",
+      ) as HTMLInputElement | null;
       const octaveValue = document.getElementById("octave-value");
       if (octaveSlider) octaveSlider.value = octave.toString();
       if (octaveValue) octaveValue.textContent = octave.toString();
@@ -317,7 +323,9 @@ function setupKeyboardInput() {
     if (key === "x" && synth) {
       const octave = Math.min(2, synth.params.octave + 1);
       synth.setParam("octave", octave);
-      const octaveSlider = document.getElementById("octave") as HTMLInputElement | null;
+      const octaveSlider = document.getElementById(
+        "octave",
+      ) as HTMLInputElement | null;
       const octaveValue = document.getElementById("octave-value");
       if (octaveSlider) octaveSlider.value = octave.toString();
       if (octaveValue) octaveValue.textContent = octave.toString();
@@ -377,7 +385,9 @@ function setupSequencerGrid() {
       stepsContainer.appendChild(step);
     }
 
-    const noteSelect = track.querySelector(".track-note") as HTMLSelectElement | null;
+    const noteSelect = track.querySelector(
+      ".track-note",
+    ) as HTMLSelectElement | null;
     if (noteSelect) {
       noteSelect.addEventListener("change", () => {
         if (!sequencer) return;
@@ -416,18 +426,29 @@ function updateStepIndicator(step: number) {
 function setupControls() {
   document.querySelectorAll(".wave-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".wave-btn").forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".wave-btn")
+        .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      if (synth) synth.setParam("waveform", (btn as HTMLElement).dataset.wave ?? "sine");
+      if (synth)
+        synth.setParam("waveform", (btn as HTMLElement).dataset.wave ?? "sine");
     });
   });
 
   setupSlider("octave", "octave", (value) => value, 0);
   setupSlider("detune", "detune", (value) => value, 0);
 
-  setupSlider("filter-cutoff", "filterCutoff", (value) => `${Math.round(value)} Hz`);
-  setupSlider("filter-resonance", "filterResonance", (value) => value.toFixed(1));
-  setupSlider("filter-env-amount", "filterEnvAmount", (value) => Math.round(value));
+  setupSlider(
+    "filter-cutoff",
+    "filterCutoff",
+    (value) => `${Math.round(value)} Hz`,
+  );
+  setupSlider("filter-resonance", "filterResonance", (value) =>
+    value.toFixed(1),
+  );
+  setupSlider("filter-env-amount", "filterEnvAmount", (value) =>
+    Math.round(value),
+  );
 
   setupSlider("attack", "attack", (value) => `${Math.round(value * 1000)}ms`);
   setupSlider("decay", "decay", (value) => `${Math.round(value * 1000)}ms`);
@@ -439,13 +460,21 @@ function setupControls() {
 
   document.querySelectorAll(".lfo-target-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".lfo-target-btn").forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".lfo-target-btn")
+        .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      if (synth) synth.setParam("lfoTarget", (btn as HTMLElement).dataset.target ?? "none");
+      if (synth)
+        synth.setParam(
+          "lfoTarget",
+          (btn as HTMLElement).dataset.target ?? "none",
+        );
     });
   });
 
-  const masterSlider = document.getElementById("master-volume") as HTMLInputElement | null;
+  const masterSlider = document.getElementById(
+    "master-volume",
+  ) as HTMLInputElement | null;
   masterSlider?.addEventListener("input", () => {
     const value = parseFloat(masterSlider.value);
     if (masterGain) masterGain.gain.value = value;
@@ -457,10 +486,16 @@ function setupControls() {
 
   document.querySelectorAll(".viz-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".viz-btn").forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".viz-btn")
+        .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       if (visualizer) {
-        visualizer.setMode(((btn as HTMLElement).dataset.viz ?? "waveform") as "waveform" | "spectrum");
+        visualizer.setMode(
+          ((btn as HTMLElement).dataset.viz ?? "waveform") as
+            | "waveform"
+            | "spectrum",
+        );
       }
     });
   });
@@ -470,20 +505,29 @@ function setupControls() {
     if (sequencer) sequencer.setBPM(parseInt(bpmInput.value, 10));
   });
 
-  const swingSlider = document.getElementById("swing") as HTMLInputElement | null;
+  const swingSlider = document.getElementById(
+    "swing",
+  ) as HTMLInputElement | null;
   swingSlider?.addEventListener("input", () => {
     if (sequencer) sequencer.setSwing(parseFloat(swingSlider.value));
   });
 
-  document.getElementById("play-btn")?.addEventListener("click", togglePlayback);
+  document
+    .getElementById("play-btn")
+    ?.addEventListener("click", togglePlayback);
   document.getElementById("stop-btn")?.addEventListener("click", stopPlayback);
-  document.getElementById("record-btn")?.addEventListener("click", toggleRecording);
+  document
+    .getElementById("record-btn")
+    ?.addEventListener("click", toggleRecording);
 
-  const presetSelect = document.getElementById("preset-select") as HTMLSelectElement | null;
+  const presetSelect = document.getElementById(
+    "preset-select",
+  ) as HTMLSelectElement | null;
   presetSelect?.addEventListener("change", (event) => {
     const target = event.target as HTMLSelectElement;
-    if (target.value && PRESETS[target.value]) {
-      loadPreset(PRESETS[target.value]);
+    const preset = PRESETS[target.value];
+    if (target.value && preset) {
+      loadPreset(preset);
     }
   });
 
@@ -497,7 +541,7 @@ function setupSlider(
   id: string,
   param: string,
   format: (value: number) => string | number,
-  _defaultVal: number | null = null
+  _defaultVal: number | null = null,
 ) {
   const slider = document.getElementById(id) as HTMLInputElement | null;
   const valueDisplay = document.getElementById(`${id}-value`);
@@ -514,7 +558,9 @@ function setupSlider(
 }
 
 function setupEffectControls() {
-  const delayEnabled = document.getElementById("delay-enabled") as HTMLInputElement | null;
+  const delayEnabled = document.getElementById(
+    "delay-enabled",
+  ) as HTMLInputElement | null;
   delayEnabled?.addEventListener("change", () => {
     if (effects) effects.setDelayEnabled(delayEnabled.checked);
   });
@@ -523,7 +569,9 @@ function setupEffectControls() {
     document.getElementById(id)?.addEventListener("input", updateDelay);
   });
 
-  const reverbEnabled = document.getElementById("reverb-enabled") as HTMLInputElement | null;
+  const reverbEnabled = document.getElementById(
+    "reverb-enabled",
+  ) as HTMLInputElement | null;
   reverbEnabled?.addEventListener("change", () => {
     if (effects) effects.setReverbEnabled(reverbEnabled.checked);
   });
@@ -532,43 +580,64 @@ function setupEffectControls() {
     document.getElementById(id)?.addEventListener("input", updateReverb);
   });
 
-  const distortionEnabled = document.getElementById("distortion-enabled") as HTMLInputElement | null;
+  const distortionEnabled = document.getElementById(
+    "distortion-enabled",
+  ) as HTMLInputElement | null;
   distortionEnabled?.addEventListener("change", () => {
     if (effects) effects.setDistortionEnabled(distortionEnabled.checked);
   });
 
-  document.getElementById("distortion-amount")?.addEventListener("input", () => {
-    const amount = parseFloat(
-      (document.getElementById("distortion-amount") as HTMLInputElement).value
-    );
-    if (effects) effects.setDistortionAmount(amount);
-  });
+  document
+    .getElementById("distortion-amount")
+    ?.addEventListener("input", () => {
+      const amount = parseFloat(
+        (document.getElementById("distortion-amount") as HTMLInputElement)
+          .value,
+      );
+      if (effects) effects.setDistortionAmount(amount);
+    });
 }
 
 function updateDelay() {
   if (!effects) return;
-  const time = parseFloat((document.getElementById("delay-time") as HTMLInputElement).value);
-  const feedback = parseFloat(
-    (document.getElementById("delay-feedback") as HTMLInputElement).value
+  const time = parseFloat(
+    (document.getElementById("delay-time") as HTMLInputElement).value,
   );
-  const mix = parseFloat((document.getElementById("delay-mix") as HTMLInputElement).value);
+  const feedback = parseFloat(
+    (document.getElementById("delay-feedback") as HTMLInputElement).value,
+  );
+  const mix = parseFloat(
+    (document.getElementById("delay-mix") as HTMLInputElement).value,
+  );
   effects.setDelayParams(time, feedback, mix);
 }
 
 function updateReverb() {
   if (!effects) return;
-  const decay = parseFloat((document.getElementById("reverb-decay") as HTMLInputElement).value);
-  const mix = parseFloat((document.getElementById("reverb-mix") as HTMLInputElement).value);
+  const decay = parseFloat(
+    (document.getElementById("reverb-decay") as HTMLInputElement).value,
+  );
+  const mix = parseFloat(
+    (document.getElementById("reverb-mix") as HTMLInputElement).value,
+  );
   effects.setReverbParams(decay, mix);
 }
 
 function updateADSRVisualization() {
   if (!visualizer) return;
 
-  const attack = parseFloat((document.getElementById("attack") as HTMLInputElement).value);
-  const decay = parseFloat((document.getElementById("decay") as HTMLInputElement).value);
-  const sustain = parseFloat((document.getElementById("sustain") as HTMLInputElement).value);
-  const release = parseFloat((document.getElementById("release") as HTMLInputElement).value);
+  const attack = parseFloat(
+    (document.getElementById("attack") as HTMLInputElement).value,
+  );
+  const decay = parseFloat(
+    (document.getElementById("decay") as HTMLInputElement).value,
+  );
+  const sustain = parseFloat(
+    (document.getElementById("sustain") as HTMLInputElement).value,
+  );
+  const release = parseFloat(
+    (document.getElementById("release") as HTMLInputElement).value,
+  );
 
   visualizer.drawADSR(attack, decay, sustain, release);
 }
@@ -583,7 +652,9 @@ function updateLevelMeter() {
 function togglePlayback() {
   if (!sequencer) return;
 
-  const playBtn = document.getElementById("play-btn") as HTMLButtonElement | null;
+  const playBtn = document.getElementById(
+    "play-btn",
+  ) as HTMLButtonElement | null;
 
   if (sequencer.isPlaying) {
     sequencer.stop();
@@ -604,8 +675,12 @@ function stopPlayback() {
   playBtn?.classList.remove("playing");
   if (playBtn) playBtn.textContent = "▶";
 
-  document.querySelectorAll(".step").forEach((step) => step.classList.remove("current"));
-  document.querySelectorAll(".step-indicator .dot").forEach((dot) => dot.classList.remove("active"));
+  document
+    .querySelectorAll(".step")
+    .forEach((step) => step.classList.remove("current"));
+  document
+    .querySelectorAll(".step-indicator .dot")
+    .forEach((dot) => dot.classList.remove("active"));
 }
 
 async function toggleRecording() {
@@ -661,7 +736,11 @@ async function exportWAV() {
 
   const duration = (60 / sequencer.bpm) * 4;
   const sampleRate = audioContext.sampleRate;
-  const offlineCtx = new OfflineAudioContext(2, sampleRate * duration, sampleRate);
+  const offlineCtx = new OfflineAudioContext(
+    2,
+    sampleRate * duration,
+    sampleRate,
+  );
 
   const offlineSynth = new Synthesizer(offlineCtx);
   const offlineDrums = new DrumMachine(offlineCtx);
@@ -676,18 +755,32 @@ async function exportWAV() {
   offlineDrums.connect(offlineMaster);
   offlineMaster.connect(offlineCtx.destination);
 
-  const delayEnabled = (document.getElementById("delay-enabled") as HTMLInputElement).checked;
+  const delayEnabled = (
+    document.getElementById("delay-enabled") as HTMLInputElement
+  ).checked;
   offlineEffects.setDelayEnabled(delayEnabled);
   offlineEffects.setDelayParams(
-    parseFloat((document.getElementById("delay-time") as HTMLInputElement).value),
-    parseFloat((document.getElementById("delay-feedback") as HTMLInputElement).value),
-    parseFloat((document.getElementById("delay-mix") as HTMLInputElement).value)
+    parseFloat(
+      (document.getElementById("delay-time") as HTMLInputElement).value,
+    ),
+    parseFloat(
+      (document.getElementById("delay-feedback") as HTMLInputElement).value,
+    ),
+    parseFloat(
+      (document.getElementById("delay-mix") as HTMLInputElement).value,
+    ),
   );
-  const reverbEnabled = (document.getElementById("reverb-enabled") as HTMLInputElement).checked;
+  const reverbEnabled = (
+    document.getElementById("reverb-enabled") as HTMLInputElement
+  ).checked;
   offlineEffects.setReverbEnabled(reverbEnabled);
   offlineEffects.setReverbParams(
-    parseFloat((document.getElementById("reverb-decay") as HTMLInputElement).value),
-    parseFloat((document.getElementById("reverb-mix") as HTMLInputElement).value)
+    parseFloat(
+      (document.getElementById("reverb-decay") as HTMLInputElement).value,
+    ),
+    parseFloat(
+      (document.getElementById("reverb-mix") as HTMLInputElement).value,
+    ),
   );
 
   const stepDuration = 60 / sequencer.bpm / 4;
@@ -759,7 +852,8 @@ function audioBufferToWav(buffer: AudioBuffer) {
   let offset = 44;
   for (let i = 0; i < samples; i++) {
     for (let channel = 0; channel < numChannels; channel++) {
-      const sample = Math.max(-1, Math.min(1, channels[channel][i]));
+      const channelData = channels[channel]!;
+      const sample = Math.max(-1, Math.min(1, channelData[i]!));
       const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
       view.setInt16(offset, intSample, true);
       offset += 2;
@@ -784,11 +878,14 @@ function loadPreset(preset: Record<string, number | string>) {
 
   if (preset.waveform) {
     document.querySelectorAll(".wave-btn").forEach((btn) => {
-      btn.classList.toggle("active", (btn as HTMLElement).dataset.wave === preset.waveform);
+      btn.classList.toggle(
+        "active",
+        (btn as HTMLElement).dataset.wave === preset.waveform,
+      );
     });
   }
 
-  const updates: Record<string, number | string> = {
+  const updates: Record<string, number | string | undefined> = {
     octave: preset.octave,
     detune: preset.detune,
     attack: preset.attack,
@@ -820,18 +917,33 @@ function saveProject() {
     synth: { ...synth.params },
     sequencer: sequencer.getState(),
     effects: {
-      delayEnabled: (document.getElementById("delay-enabled") as HTMLInputElement).checked,
-      delayTime: parseFloat((document.getElementById("delay-time") as HTMLInputElement).value),
-      delayFeedback: parseFloat(
-        (document.getElementById("delay-feedback") as HTMLInputElement).value
+      delayEnabled: (
+        document.getElementById("delay-enabled") as HTMLInputElement
+      ).checked,
+      delayTime: parseFloat(
+        (document.getElementById("delay-time") as HTMLInputElement).value,
       ),
-      delayMix: parseFloat((document.getElementById("delay-mix") as HTMLInputElement).value),
-      reverbEnabled: (document.getElementById("reverb-enabled") as HTMLInputElement).checked,
-      reverbDecay: parseFloat((document.getElementById("reverb-decay") as HTMLInputElement).value),
-      reverbMix: parseFloat((document.getElementById("reverb-mix") as HTMLInputElement).value),
-      distortionEnabled: (document.getElementById("distortion-enabled") as HTMLInputElement).checked,
+      delayFeedback: parseFloat(
+        (document.getElementById("delay-feedback") as HTMLInputElement).value,
+      ),
+      delayMix: parseFloat(
+        (document.getElementById("delay-mix") as HTMLInputElement).value,
+      ),
+      reverbEnabled: (
+        document.getElementById("reverb-enabled") as HTMLInputElement
+      ).checked,
+      reverbDecay: parseFloat(
+        (document.getElementById("reverb-decay") as HTMLInputElement).value,
+      ),
+      reverbMix: parseFloat(
+        (document.getElementById("reverb-mix") as HTMLInputElement).value,
+      ),
+      distortionEnabled: (
+        document.getElementById("distortion-enabled") as HTMLInputElement
+      ).checked,
       distortionAmount: parseFloat(
-        (document.getElementById("distortion-amount") as HTMLInputElement).value
+        (document.getElementById("distortion-amount") as HTMLInputElement)
+          .value,
       ),
     },
   };

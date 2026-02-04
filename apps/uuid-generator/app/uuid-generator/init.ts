@@ -23,7 +23,7 @@ export function initializeUuidGenerator(_element: HTMLElement) {
     const random = Array.from({ length: 4 }, () =>
       Math.floor(Math.random() * 65536)
         .toString(16)
-        .padStart(4, "0")
+        .padStart(4, "0"),
     ).join("");
 
     return `${timestamp.slice(0, 8)}-${timestamp.slice(8, 12)}-7${random.slice(0, 3)}-${(
@@ -33,21 +33,23 @@ export function initializeUuidGenerator(_element: HTMLElement) {
   };
 
   const generateNanoId = (size = 21) => {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    const alphabet =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     let id = "";
     const bytes = crypto.getRandomValues(new Uint8Array(size));
     for (let i = 0; i < size; i += 1) {
-      id += alphabet[bytes[i] % alphabet.length];
+      id += alphabet[bytes[i]! % alphabet.length];
     }
     return id;
   };
 
   const generateShortId = () => {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const alphabet =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let id = "";
     const bytes = crypto.getRandomValues(new Uint8Array(8));
     for (let i = 0; i < 8; i += 1) {
-      id += alphabet[bytes[i] % alphabet.length];
+      id += alphabet[bytes[i]! % alphabet.length];
     }
     return id;
   };
@@ -60,42 +62,60 @@ export function initializeUuidGenerator(_element: HTMLElement) {
   } as const;
 
   const generateAll = () => {
-    (Object.keys(generators) as Array<keyof typeof generators>).forEach((type) => {
-      const input = document.getElementById(type) as HTMLInputElement | null;
-      if (input) {
-        input.value = generators[type]();
-      }
-    });
+    (Object.keys(generators) as Array<keyof typeof generators>).forEach(
+      (type) => {
+        const input = document.getElementById(type) as HTMLInputElement | null;
+        if (input) {
+          input.value = generators[type]();
+        }
+      },
+    );
   };
 
-  document.querySelectorAll<HTMLButtonElement>(".regen-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const type = button.dataset.type as keyof typeof generators | undefined;
-      if (!type) return;
-      const input = document.getElementById(type) as HTMLInputElement | null;
-      if (input) {
-        input.value = generators[type]();
-      }
-    });
-  });
-
-  document.querySelectorAll<HTMLButtonElement>(".copy-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const target = button.dataset.target;
-      if (!target) return;
-      const input = document.getElementById(target) as HTMLInputElement | null;
-      if (!input) return;
-      navigator.clipboard.writeText(input.value).then(() => {
-        showStatus("✓ Copied to clipboard");
+  document
+    .querySelectorAll<HTMLButtonElement>(".regen-btn")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const type = button.dataset.type as keyof typeof generators | undefined;
+        if (!type) return;
+        const input = document.getElementById(type) as HTMLInputElement | null;
+        if (input) {
+          input.value = generators[type]();
+        }
       });
     });
-  });
 
-  const bulkType = document.getElementById("bulkType") as HTMLSelectElement | null;
-  const bulkCount = document.getElementById("bulkCount") as HTMLInputElement | null;
-  const bulkOutput = document.getElementById("bulkOutput") as HTMLTextAreaElement | null;
-  const bulkGenBtn = document.getElementById("bulkGenBtn") as HTMLButtonElement | null;
-  const copyBulkBtn = document.getElementById("copyBulkBtn") as HTMLButtonElement | null;
+  document
+    .querySelectorAll<HTMLButtonElement>(".copy-btn")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.target;
+        if (!target) return;
+        const input = document.getElementById(
+          target,
+        ) as HTMLInputElement | null;
+        if (!input) return;
+        navigator.clipboard.writeText(input.value).then(() => {
+          showStatus("✓ Copied to clipboard");
+        });
+      });
+    });
+
+  const bulkType = document.getElementById(
+    "bulkType",
+  ) as HTMLSelectElement | null;
+  const bulkCount = document.getElementById(
+    "bulkCount",
+  ) as HTMLInputElement | null;
+  const bulkOutput = document.getElementById(
+    "bulkOutput",
+  ) as HTMLTextAreaElement | null;
+  const bulkGenBtn = document.getElementById(
+    "bulkGenBtn",
+  ) as HTMLButtonElement | null;
+  const copyBulkBtn = document.getElementById(
+    "copyBulkBtn",
+  ) as HTMLButtonElement | null;
 
   if (bulkType && bulkCount && bulkOutput && bulkGenBtn && copyBulkBtn) {
     bulkGenBtn.addEventListener("click", () => {

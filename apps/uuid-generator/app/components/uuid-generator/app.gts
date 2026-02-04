@@ -22,9 +22,14 @@ export default class UuidGeneratorApp extends Component {
             <p class="desc">Random 128-bit identifier</p>
             <div class="output-row">
               <input type="text" id="uuid4" readonly />
-              <button class="copy-btn" data-target="uuid4">📋</button>
+              <button
+                class="copy-btn"
+                data-target="uuid4"
+                type="button"
+              >📋</button>
             </div>
-            <button class="regen-btn" data-type="uuid4">🔄 Regenerate</button>
+            <button class="regen-btn" data-type="uuid4" type="button">🔄
+              Regenerate</button>
           </div>
 
           <div class="generator-card">
@@ -32,9 +37,14 @@ export default class UuidGeneratorApp extends Component {
             <p class="desc">Time-ordered, sortable UUID</p>
             <div class="output-row">
               <input type="text" id="uuid7" readonly />
-              <button class="copy-btn" data-target="uuid7">📋</button>
+              <button
+                class="copy-btn"
+                data-target="uuid7"
+                type="button"
+              >📋</button>
             </div>
-            <button class="regen-btn" data-type="uuid7">🔄 Regenerate</button>
+            <button class="regen-btn" data-type="uuid7" type="button">🔄
+              Regenerate</button>
           </div>
 
           <div class="generator-card">
@@ -42,9 +52,14 @@ export default class UuidGeneratorApp extends Component {
             <p class="desc">Compact URL-safe ID (21 chars)</p>
             <div class="output-row">
               <input type="text" id="nanoid" readonly />
-              <button class="copy-btn" data-target="nanoid">📋</button>
+              <button
+                class="copy-btn"
+                data-target="nanoid"
+                type="button"
+              >📋</button>
             </div>
-            <button class="regen-btn" data-type="nanoid">🔄 Regenerate</button>
+            <button class="regen-btn" data-type="nanoid" type="button">🔄
+              Regenerate</button>
           </div>
 
           <div class="generator-card">
@@ -52,9 +67,14 @@ export default class UuidGeneratorApp extends Component {
             <p class="desc">8-character alphanumeric</p>
             <div class="output-row">
               <input type="text" id="shortid" readonly />
-              <button class="copy-btn" data-target="shortid">📋</button>
+              <button
+                class="copy-btn"
+                data-target="shortid"
+                type="button"
+              >📋</button>
             </div>
-            <button class="regen-btn" data-type="shortid">🔄 Regenerate</button>
+            <button class="regen-btn" data-type="shortid" type="button">🔄
+              Regenerate</button>
           </div>
         </div>
 
@@ -68,10 +88,20 @@ export default class UuidGeneratorApp extends Component {
               <option value="shortid">Short ID</option>
             </select>
             <input type="number" id="bulkCount" value="10" min="1" max="100" />
-            <button id="bulkGenBtn" class="primary-btn">Generate</button>
+            <button
+              id="bulkGenBtn"
+              class="primary-btn"
+              type="button"
+            >Generate</button>
           </div>
-          <textarea id="bulkOutput" rows="8" readonly placeholder="Bulk IDs will appear here..."></textarea>
-          <button id="copyBulkBtn" class="secondary-btn">📋 Copy All</button>
+          <textarea
+            id="bulkOutput"
+            rows="8"
+            readonly
+            placeholder="Bulk IDs will appear here..."
+          ></textarea>
+          <button id="copyBulkBtn" class="secondary-btn" type="button">📋 Copy
+            All</button>
         </div>
 
         <div id="status" class="status hidden"></div>
@@ -80,8 +110,17 @@ export default class UuidGeneratorApp extends Component {
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

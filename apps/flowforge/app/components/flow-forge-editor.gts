@@ -41,7 +41,10 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
 
   get selectedNodeTitle() {
     if (!this.selectedNode) return null;
-    return this.flowEngine.getNodeType(this.selectedNode.type)?.title ?? this.selectedNode.type;
+    return (
+      this.flowEngine.getNodeType(this.selectedNode.type)?.title ??
+      this.selectedNode.type
+    );
   }
 
   get executionResults() {
@@ -66,7 +69,7 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
 
   updateNodePosition = (nodeId: string, x: number, y: number) => {
     this.nodes = this.nodes.map((node) =>
-      node.id === nodeId ? { ...node, x, y } : node
+      node.id === nodeId ? { ...node, x, y } : node,
     );
     this.saveToStorage();
   };
@@ -75,7 +78,7 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
     this.nodes = this.nodes.map((node) =>
       node.id === nodeId
         ? { ...node, fields: { ...node.fields, [fieldName]: value } }
-        : node
+        : node,
     );
     this.saveToStorage();
   };
@@ -87,7 +90,7 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
   deleteNode = (nodeId: string) => {
     this.nodes = this.nodes.filter((n) => n.id !== nodeId);
     this.connections = this.connections.filter(
-      (c) => c.sourceNodeId !== nodeId && c.targetNodeId !== nodeId
+      (c) => c.sourceNodeId !== nodeId && c.targetNodeId !== nodeId,
     );
     if (this.selectedNodeId === nodeId) {
       this.selectedNodeId = null;
@@ -99,7 +102,7 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
     sourceNodeId: string,
     sourcePort: string,
     targetNodeId: string,
-    targetPort: string
+    targetPort: string,
   ) => {
     console.debug("[flowforge] addConnection", {
       sourceNodeId,
@@ -108,7 +111,7 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
       targetPort,
     });
     const withoutTarget = this.connections.filter(
-      (c) => !(c.targetNodeId === targetNodeId && c.targetPort === targetPort)
+      (c) => !(c.targetNodeId === targetNodeId && c.targetPort === targetPort),
     );
 
     const newConnection: Connection = {
@@ -181,7 +184,10 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
         "nodes" in parsed &&
         "connections" in parsed
       ) {
-        const payload = parsed as { nodes: FlowNode[]; connections: Connection[] };
+        const payload = parsed as {
+          nodes: FlowNode[];
+          connections: Connection[];
+        };
         this.nodes = payload.nodes;
         this.connections = payload.connections;
       }
@@ -228,8 +234,17 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
       <footer class="app-footer">
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>
@@ -237,7 +252,10 @@ export default class FlowForgeEditor extends Component<FlowForgeEditorSignature>
 }
 
 // Example flows
-const EXAMPLES: Record<string, { nodes: FlowNode[]; connections: Connection[] }> = {
+const EXAMPLES: Record<
+  string,
+  { nodes: FlowNode[]; connections: Connection[] }
+> = {
   "json-transform": {
     nodes: [
       {

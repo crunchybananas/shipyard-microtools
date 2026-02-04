@@ -12,26 +12,37 @@ export default class Base64ToolsApp extends Component {
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>🔐 Base64 Tools</h1>
-        <p class="subtitle">Encode and decode text, files, and images to/from Base64.</p>
+        <p class="subtitle">Encode and decode text, files, and images to/from
+          Base64.</p>
       </header>
 
       <main>
         <div class="tabs">
-          <button class="tab active" data-tab="text">Text</button>
-          <button class="tab" data-tab="file">File/Image</button>
+          <button class="tab active" data-tab="text" type="button">Text</button>
+          <button class="tab" data-tab="file" type="button">File/Image</button>
         </div>
 
         <div id="text-panel" class="panel active">
           <div class="input-section">
             <label for="textInput">Plain Text</label>
-            <textarea id="textInput" rows="4" placeholder="Enter text to encode..."></textarea>
-            <button id="encodeTextBtn" class="primary-btn">Encode →</button>
+            <textarea
+              id="textInput"
+              rows="4"
+              placeholder="Enter text to encode..."
+            ></textarea>
+            <button id="encodeTextBtn" class="primary-btn" type="button">Encode
+              →</button>
           </div>
 
           <div class="input-section">
             <label for="base64Input">Base64</label>
-            <textarea id="base64Input" rows="4" placeholder="Enter Base64 to decode..."></textarea>
-            <button id="decodeTextBtn" class="primary-btn">← Decode</button>
+            <textarea
+              id="base64Input"
+              rows="4"
+              placeholder="Enter Base64 to decode..."
+            ></textarea>
+            <button id="decodeTextBtn" class="primary-btn" type="button">←
+              Decode</button>
           </div>
         </div>
 
@@ -55,10 +66,17 @@ export default class Base64ToolsApp extends Component {
 
           <div class="input-section">
             <label for="fileBase64Output">Base64 Output</label>
-            <textarea id="fileBase64Output" rows="6" readonly placeholder="Base64 will appear here..."></textarea>
+            <textarea
+              id="fileBase64Output"
+              rows="6"
+              readonly
+              placeholder="Base64 will appear here..."
+            ></textarea>
             <div class="button-row">
-              <button id="copyBase64Btn" class="secondary-btn">📋 Copy</button>
-              <button id="copyDataUrlBtn" class="secondary-btn">🔗 Copy as Data URL</button>
+              <button id="copyBase64Btn" class="secondary-btn" type="button">📋
+                Copy</button>
+              <button id="copyDataUrlBtn" class="secondary-btn" type="button">🔗
+                Copy as Data URL</button>
             </div>
           </div>
         </div>
@@ -69,8 +87,17 @@ export default class Base64ToolsApp extends Component {
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

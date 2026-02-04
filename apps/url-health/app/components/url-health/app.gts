@@ -1,6 +1,5 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
 
 interface UrlIssue {
@@ -33,23 +32,19 @@ export default class UrlHealthApp extends Component {
     return this.results.length;
   }
 
-  @action
-  updateUrls(event: Event): void {
+  updateUrls = (event: Event): void => {
     this.urlsInput = (event.target as HTMLTextAreaElement).value;
-  }
+  };
 
-  @action
-  toggleSsl(): void {
+  toggleSsl = (): void => {
     this.checkSsl = !this.checkSsl;
-  }
+  };
 
-  @action
-  toggleSpeed(): void {
+  toggleSpeed = (): void => {
     this.checkSpeed = !this.checkSpeed;
-  }
+  };
 
-  @action
-  async checkAllUrls(): Promise<void> {
+  checkAllUrls = async (): Promise<void> => {
     const urlsText = this.urlsInput.trim();
     if (!urlsText) {
       alert("Please enter at least one URL");
@@ -104,7 +99,7 @@ export default class UrlHealthApp extends Component {
     }
 
     this.isChecking = false;
-  }
+  };
 
   async checkUrl(url: string): Promise<UrlResult> {
     const result: UrlResult = {
@@ -251,7 +246,8 @@ export default class UrlHealthApp extends Component {
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>🏥 Proof URL Health Checker</h1>
-        <p class="subtitle">Batch validate your proof URLs before ships go stale.</p>
+        <p class="subtitle">Batch validate your proof URLs before ships go
+          stale.</p>
       </header>
 
       <main>
@@ -268,11 +264,19 @@ https://example.com/proof"
 
           <div class="options">
             <label class="checkbox-label">
-              <input type="checkbox" checked={{this.checkSsl}} {{on "change" this.toggleSsl}} />
+              <input
+                type="checkbox"
+                checked={{this.checkSsl}}
+                {{on "change" this.toggleSsl}}
+              />
               Check SSL certificate
             </label>
             <label class="checkbox-label">
-              <input type="checkbox" checked={{this.checkSpeed}} {{on "change" this.toggleSpeed}} />
+              <input
+                type="checkbox"
+                checked={{this.checkSpeed}}
+                {{on "change" this.toggleSpeed}}
+              />
               Measure load time
             </label>
           </div>
@@ -344,11 +348,21 @@ https://example.com/proof"
       </main>
 
       <footer>
-        <p class="note">Note: Some checks may be limited by browser CORS policies.</p>
+        <p class="note">Note: Some checks may be limited by browser CORS
+          policies.</p>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

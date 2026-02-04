@@ -1,8 +1,8 @@
 export class Visualizer {
   ctx: AudioContext;
   analyser: AnalyserNode;
-  waveformData: Uint8Array;
-  spectrumData: Uint8Array;
+  waveformData: Uint8Array<ArrayBuffer>;
+  spectrumData: Uint8Array<ArrayBuffer>;
   waveformCanvas: HTMLCanvasElement | null = null;
   spectrumCanvas: HTMLCanvasElement | null = null;
   adsrCanvas: HTMLCanvasElement | null = null;
@@ -23,14 +23,18 @@ export class Visualizer {
     this.analyser = this.ctx.createAnalyser();
     this.analyser.fftSize = 2048;
     this.analyser.smoothingTimeConstant = 0.8;
-    this.waveformData = new Uint8Array(this.analyser.frequencyBinCount);
-    this.spectrumData = new Uint8Array(this.analyser.frequencyBinCount);
+    this.waveformData = new Uint8Array(
+      this.analyser.frequencyBinCount,
+    ) as Uint8Array<ArrayBuffer>;
+    this.spectrumData = new Uint8Array(
+      this.analyser.frequencyBinCount,
+    ) as Uint8Array<ArrayBuffer>;
   }
 
   init(
     waveformCanvas: HTMLCanvasElement | null,
     spectrumCanvas: HTMLCanvasElement | null,
-    adsrCanvas: HTMLCanvasElement | null
+    adsrCanvas: HTMLCanvasElement | null,
   ) {
     this.waveformCanvas = waveformCanvas;
     this.spectrumCanvas = spectrumCanvas;
@@ -106,7 +110,7 @@ export class Visualizer {
     let x = 0;
 
     for (let i = 0; i < this.waveformData.length; i++) {
-      const v = this.waveformData[i] / 128.0;
+      const v = this.waveformData[i]! / 128.0;
       const y = (v * height) / 2;
 
       if (i === 0) {
@@ -144,12 +148,16 @@ export class Visualizer {
     const gap = 2;
 
     for (let i = 0; i < barCount; i++) {
-      const startBin = Math.floor((i / barCount) * this.spectrumData.length * 0.5);
-      const endBin = Math.floor(((i + 1) / barCount) * this.spectrumData.length * 0.5);
+      const startBin = Math.floor(
+        (i / barCount) * this.spectrumData.length * 0.5,
+      );
+      const endBin = Math.floor(
+        ((i + 1) / barCount) * this.spectrumData.length * 0.5,
+      );
 
       let sum = 0;
       for (let j = startBin; j < endBin; j++) {
-        sum += this.spectrumData[j];
+        sum += this.spectrumData[j]!;
       }
       const average = sum / (endBin - startBin);
 
@@ -158,9 +166,9 @@ export class Visualizer {
       const y = height - barHeight;
 
       const gradient = ctx.createLinearGradient(0, height, 0, 0);
-      gradient.addColorStop(0, this.colors.spectrumGradient[0]);
-      gradient.addColorStop(0.5, this.colors.spectrumGradient[1]);
-      gradient.addColorStop(1, this.colors.spectrumGradient[2]);
+      gradient.addColorStop(0, this.colors.spectrumGradient[0]!);
+      gradient.addColorStop(0.5, this.colors.spectrumGradient[1]!);
+      gradient.addColorStop(1, this.colors.spectrumGradient[2]!);
 
       ctx.fillStyle = gradient;
       ctx.fillRect(x + gap / 2, y, barWidth - gap, barHeight);
@@ -223,7 +231,7 @@ export class Visualizer {
 
     points.forEach(([x, y]) => {
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.arc(x!, y!, 4, 0, Math.PI * 2);
       ctx.fill();
     });
   }
@@ -242,8 +250,8 @@ export class Visualizer {
 
     let max = 0;
     for (let i = 0; i < this.spectrumData.length; i++) {
-      if (this.spectrumData[i] > max) {
-        max = this.spectrumData[i];
+      if (this.spectrumData[i]! > max) {
+        max = this.spectrumData[i]!;
       }
     }
 

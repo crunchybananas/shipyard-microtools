@@ -21,10 +21,13 @@
   },
   "packageManager": "pnpm@9.12.2",
   "dependencies": {
+    "@ember/app-tsconfig": "catalog:",
     "@embroider/addon-dev": "8.1.0",
     "@glint/ember-tsc": "catalog:glint",
     "@glint/template": "catalog:glint",
-    "@glint/tsserver-plugin": "catalog:glint",
-    "@ember/app-tsconfig": "catalog:"
+    "@glint/tsserver-plugin": "catalog:glint"
+  },
+  "devDependencies": {
+    "ember-eslint-parser": "^0.5.13"
   }
 }

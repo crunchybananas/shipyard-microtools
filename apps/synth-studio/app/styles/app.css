@@ -27,7 +27,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Mono", "Fira Code", Consolas, monospace;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Mono", "Fira Code", Consolas,
+    monospace;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
@@ -176,6 +178,7 @@ select {
   flex: 1;
   height: 6px;
   -webkit-appearance: none;
+  appearance: none;
   background: var(--bg-tertiary);
   border-radius: 3px;
   cursor: pointer;
@@ -395,7 +398,12 @@ select {
 .meter-bar {
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+  background: linear-gradient(
+    90deg,
+    var(--success),
+    var(--warning),
+    var(--danger)
+  );
   transition: width 0.05s;
 }
 

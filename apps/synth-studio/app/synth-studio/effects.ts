@@ -1,5 +1,5 @@
 export class EffectsChain {
-  ctx: AudioContext;
+  ctx: BaseAudioContext;
   input: GainNode;
   output: GainNode;
   dryGain: GainNode;
@@ -28,7 +28,7 @@ export class EffectsChain {
   delayMix = 0;
   reverbMix = 0;
 
-  constructor(audioContext: AudioContext) {
+  constructor(audioContext: BaseAudioContext) {
     this.ctx = audioContext;
 
     this.input = this.ctx.createGain();
@@ -95,10 +95,10 @@ export class EffectsChain {
     for (let channel = 0; channel < 2; channel++) {
       const channelData = impulse.getChannelData(channel);
       for (let i = 0; i < length; i++) {
-        const decay = Math.exp(-3 * i / length);
+        const decay = Math.exp((-3 * i) / length);
         const earlyReflections =
           i < sampleRate * 0.05
-            ? Math.sin(i * 0.1) * 0.3 * Math.exp(-10 * i / sampleRate)
+            ? Math.sin(i * 0.1) * 0.3 * Math.exp((-10 * i) / sampleRate)
             : 0;
         channelData[i] = (Math.random() * 2 - 1) * decay + earlyReflections;
       }
@@ -140,7 +140,8 @@ export class EffectsChain {
 
     for (let i = 0; i < samples; i++) {
       const x = (i * 2) / samples - 1;
-      curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+      curve[i] =
+        ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
     }
 
     return curve;
@@ -171,7 +172,7 @@ export class EffectsChain {
   setDelayParams(time: number, feedback: number, mix: number) {
     this.delay.node.delayTime.linearRampToValueAtTime(
       time,
-      this.ctx.currentTime + 0.1
+      this.ctx.currentTime + 0.1,
     );
     this.delay.feedback.gain.value = Math.min(feedback, 0.95);
     this.delayMix = mix;

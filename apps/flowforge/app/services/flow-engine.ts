@@ -49,7 +49,10 @@ export default class FlowEngineService extends Service {
    * Build a dependency graph and return nodes in topological order.
    * Returns null if there's a cycle.
    */
-  topologicalSort(nodes: FlowNode[], connections: Connection[]): FlowNode[] | null {
+  topologicalSort(
+    nodes: FlowNode[],
+    connections: Connection[],
+  ): FlowNode[] | null {
     // Build adjacency list (node -> nodes it depends on)
     const inDegree = new Map<string, number>();
     const dependsOn = new Map<string, Set<string>>();
@@ -64,7 +67,10 @@ export default class FlowEngineService extends Service {
       const targetDeps = dependsOn.get(conn.targetNodeId);
       if (targetDeps && !targetDeps.has(conn.sourceNodeId)) {
         targetDeps.add(conn.sourceNodeId);
-        inDegree.set(conn.targetNodeId, (inDegree.get(conn.targetNodeId) ?? 0) + 1);
+        inDegree.set(
+          conn.targetNodeId,
+          (inDegree.get(conn.targetNodeId) ?? 0) + 1,
+        );
       }
     }
 
@@ -108,10 +114,7 @@ export default class FlowEngineService extends Service {
   /**
    * Execute the entire flow
    */
-  runFlow = async (
-    nodes: FlowNode[],
-    connections: Connection[]
-  ) => {
+  runFlow = async (nodes: FlowNode[], connections: Connection[]) => {
     console.debug("[flowforge] runFlow start", {
       nodes: nodes.map((node) => ({ id: node.id, type: node.type })),
       connections: connections.map((connection) => ({
@@ -137,9 +140,15 @@ export default class FlowEngineService extends Service {
     const nodeOutputs = new Map<string, Record<string, unknown>>();
 
     for (const node of sortedNodes) {
-      console.debug("[flowforge] execute node", { nodeId: node.id, type: node.type });
+      console.debug("[flowforge] execute node", {
+        nodeId: node.id,
+        type: node.type,
+      });
       const result = await this.executeNode(node, connections, nodeOutputs);
-      this.executionResults = new Map(this.executionResults).set(node.id, result);
+      this.executionResults = new Map(this.executionResults).set(
+        node.id,
+        result,
+      );
 
       if (result.outputs) {
         nodeOutputs.set(node.id, result.outputs);
@@ -169,7 +178,7 @@ export default class FlowEngineService extends Service {
       displayOutputs: this.displayOutputs.length,
     });
     return this.executionResults;
-  }
+  };
 
   /**
    * Execute a single node
@@ -177,7 +186,7 @@ export default class FlowEngineService extends Service {
   private async executeNode(
     node: FlowNode,
     connections: Connection[],
-    nodeOutputs: Map<string, Record<string, unknown>>
+    nodeOutputs: Map<string, Record<string, unknown>>,
   ): Promise<ExecutionResult> {
     const nodeDef = NODE_TYPES[node.type];
     if (!nodeDef) {

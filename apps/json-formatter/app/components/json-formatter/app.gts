@@ -18,13 +18,17 @@ export default class JsonFormatterApp extends Component {
       <main>
         <div class="input-section">
           <label for="jsonInput">Paste JSON</label>
-          <textarea id="jsonInput" rows="12" placeholder='{"name": "example", "value": 42}'></textarea>
+          <textarea
+            id="jsonInput"
+            rows="12"
+            placeholder='{"name": "example", "value": 42}'
+          ></textarea>
 
           <div class="button-row">
-            <button id="formatBtn" class="primary-btn">✨ Format</button>
-            <button id="minifyBtn" class="secondary-btn">📦 Minify</button>
-            <button id="validateBtn" class="secondary-btn">✅ Validate</button>
-            <button id="copyBtn" class="secondary-btn">📋 Copy</button>
+            <button id="formatBtn" class="primary-btn" type="button">✨ Format</button>
+            <button id="minifyBtn" class="secondary-btn" type="button">📦 Minify</button>
+            <button id="validateBtn" class="secondary-btn" type="button">✅ Validate</button>
+            <button id="copyBtn" class="secondary-btn" type="button">📋 Copy</button>
           </div>
         </div>
 
@@ -42,8 +46,12 @@ export default class JsonFormatterApp extends Component {
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank" rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a href="https://emberjs.com" target="_blank" rel="noopener noreferrer">Ember</a>
         </p>
       </footer>
     </div>

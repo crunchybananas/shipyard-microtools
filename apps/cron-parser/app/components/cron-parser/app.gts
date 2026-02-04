@@ -1,8 +1,13 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
 import { fn } from "@ember/helper";
+import type Owner from "@ember/owner";
+
+export interface CronParserAppSignature {
+  Element: HTMLDivElement;
+  Args: Record<string, never>;
+}
 
 const FIELDS = ["minute", "hour", "day of month", "month", "day of week"];
 const FIELD_NAMES = ["Minute", "Hour", "Day of Month", "Month", "Day of Week"];
@@ -47,7 +52,7 @@ const EXAMPLES = [
   { cron: "0 */2 * * *", label: "Every 2 hours" },
 ];
 
-export default class CronParserApp extends Component {
+export default class CronParserApp extends Component<CronParserAppSignature> {
   @tracked cronInput = "*/15 * * * *";
   @tracked humanReadable = "Enter a cron expression above";
   @tracked fieldBreakdown: FieldBreakdownItem[] = FIELD_NAMES.map((name) => ({
@@ -59,31 +64,27 @@ export default class CronParserApp extends Component {
 
   examples = EXAMPLES;
 
-  constructor(owner: unknown, args: object) {
+  constructor(owner: Owner, args: CronParserAppSignature["Args"]) {
     super(owner, args);
     this.parseCron();
   }
 
-  @action
-  updateInput(event: Event): void {
+  updateInput = (event: Event): void => {
     this.cronInput = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  handleKeydown(event: KeyboardEvent): void {
+  handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === "Enter") {
       this.parseCron();
     }
-  }
+  };
 
-  @action
-  useExample(cron: string): void {
+  useExample = (cron: string): void => {
     this.cronInput = cron;
     this.parseCron();
-  }
+  };
 
-  @action
-  parseCron(): void {
+  parseCron = (): void => {
     const cron = this.cronInput.trim();
     const parts = cron.split(/\s+/);
 
@@ -110,7 +111,7 @@ export default class CronParserApp extends Component {
     if (this.nextRuns.length === 0) {
       this.nextRuns = ["Could not calculate"];
     }
-  }
+  };
 
   parseField(field: string, index: number): string {
     if (field === "*") return "every";
@@ -332,7 +333,11 @@ export default class CronParserApp extends Component {
             <span>weekday</span>
           </div>
 
-          <button type="button" class="primary-btn" {{on "click" this.parseCron}}>
+          <button
+            type="button"
+            class="primary-btn"
+            {{on "click" this.parseCron}}
+          >
             <span class="btn-text">🔍 Parse Expression</span>
           </button>
         </div>
@@ -384,8 +389,17 @@ export default class CronParserApp extends Component {
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

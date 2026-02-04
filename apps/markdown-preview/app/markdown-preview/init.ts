@@ -1,11 +1,18 @@
 export function initializeMarkdownPreview(_element: HTMLElement) {
-  const markdownInput = document.getElementById("markdownInput") as HTMLTextAreaElement | null;
+  const markdownInput = document.getElementById(
+    "markdownInput",
+  ) as HTMLTextAreaElement | null;
   const preview = document.getElementById("preview") as HTMLDivElement | null;
-  const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement | null;
-  const copyHtmlBtn = document.getElementById("copyHtmlBtn") as HTMLButtonElement | null;
+  const clearBtn = document.getElementById(
+    "clearBtn",
+  ) as HTMLButtonElement | null;
+  const copyHtmlBtn = document.getElementById(
+    "copyHtmlBtn",
+  ) as HTMLButtonElement | null;
   const status = document.getElementById("status") as HTMLDivElement | null;
 
-  if (!markdownInput || !preview || !clearBtn || !copyHtmlBtn || !status) return;
+  if (!markdownInput || !preview || !clearBtn || !copyHtmlBtn || !status)
+    return;
 
   const showStatus = (message: string) => {
     status.textContent = message;
@@ -16,7 +23,10 @@ export function initializeMarkdownPreview(_element: HTMLElement) {
   const parseMarkdown = (markdown: string) => {
     let html = markdown;
 
-    html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    html = html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
     html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_match, lang, code) => {
       return `<pre><code class="language-${lang}">${code.trim()}</code></pre>`;
@@ -40,15 +50,21 @@ export function initializeMarkdownPreview(_element: HTMLElement) {
 
     html = html.replace(/~~(.+?)~~/g, "<del>$1</del>");
 
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    html = html.replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      '<a href="$2" target="_blank">$1</a>',
+    );
 
-    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+    html = html.replace(
+      /!\[([^\]]*)\]\(([^)]+)\)/g,
+      '<img src="$2" alt="$1" />',
+    );
 
     html = html.replace(/^&gt; (.+)$/gm, "<blockquote>$1</blockquote>");
 
     html = html.replace(/^(-{3,}|\*{3,}|_{3,})$/gm, "<hr />");
 
-    html = html.replace(/^[\*\-\+] (.+)$/gm, "<li>$1</li>");
+    html = html.replace(/^[*\-+] (.+)$/gm, "<li>$1</li>");
     html = html.replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>");
 
     html = html.replace(/^\d+\. (.+)$/gm, "<li>$1</li>");

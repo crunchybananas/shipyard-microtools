@@ -1,9 +1,9 @@
 export class DrumMachine {
-  ctx: AudioContext;
+  ctx: BaseAudioContext;
   output: GainNode;
   compressor: DynamicsCompressorNode;
 
-  constructor(audioContext: AudioContext) {
+  constructor(audioContext: BaseAudioContext) {
     this.ctx = audioContext;
     this.output = this.ctx.createGain();
     this.output.gain.value = 0.8;
@@ -243,7 +243,11 @@ export class DrumMachine {
   }
 
   createNoiseBuffer(duration: number) {
-    const buffer = this.ctx.createBuffer(1, this.ctx.sampleRate * duration, this.ctx.sampleRate);
+    const buffer = this.ctx.createBuffer(
+      1,
+      this.ctx.sampleRate * duration,
+      this.ctx.sampleRate,
+    );
     const data = buffer.getChannelData(0);
     for (let i = 0; i < data.length; i++) {
       data[i] = Math.random() * 2 - 1;

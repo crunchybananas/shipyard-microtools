@@ -1,15 +1,16 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../tsconfig.app.json",
   "glint": {
-    "environment": "ember-loose"
+    "environment": ["ember-loose", "ember-template-imports"]
   },
   "compilerOptions": {
-    "declarationDir": "declarations",
     "baseUrl": ".",
+    "rootDir": ".",
+    "outDir": "dist",
     "paths": {
-      "dev-terminal/tests/*": ["tests/*"],
-      "dev-terminal/*": ["app/*"]
+      "dev-terminal/*": ["./app/*"],
+      "dev-terminal/tests/*": ["./tests/*"]
     }
   },
-  "include": ["app/**/*", "types/**/*"]
+  "include": ["app/**/*", "tests/**/*", "types/**/*"]
 }

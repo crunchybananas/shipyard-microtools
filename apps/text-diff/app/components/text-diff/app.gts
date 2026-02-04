@@ -1,9 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
-import { htmlSafe } from "@ember/template";
-import type { SafeString } from "@ember/template/-private/handlebars";
+import { htmlSafe, type SafeString } from "@ember/template";
 
 interface DiffItem {
   type: "added" | "removed" | "unchanged";
@@ -19,18 +17,15 @@ export default class TextDiffApp extends Component {
   @tracked removedCount = 0;
   @tracked unchangedCount = 0;
 
-  @action
-  updateTextA(event: Event): void {
+  updateTextA = (event: Event): void => {
     this.textA = (event.target as HTMLTextAreaElement).value;
-  }
+  };
 
-  @action
-  updateTextB(event: Event): void {
+  updateTextB = (event: Event): void => {
     this.textB = (event.target as HTMLTextAreaElement).value;
-  }
+  };
 
-  @action
-  compare(): void {
+  compare = (): void => {
     if (!this.textA && !this.textB) {
       alert("Enter text in both fields to compare");
       return;
@@ -45,22 +40,20 @@ export default class TextDiffApp extends Component {
       (d) => d.type === "unchanged",
     ).length;
     this.showResults = true;
-  }
+  };
 
-  @action
-  swap(): void {
+  swap = (): void => {
     const temp = this.textA;
     this.textA = this.textB;
     this.textB = temp;
-  }
+  };
 
-  @action
-  clear(): void {
+  clear = (): void => {
     this.textA = "";
     this.textB = "";
     this.showResults = false;
     this.diffLines = [];
-  }
+  };
 
   computeDiff(a: string, b: string): DiffItem[] {
     const linesA = a.split("\n");
@@ -148,9 +141,18 @@ export default class TextDiffApp extends Component {
         </div>
 
         <div class="button-row">
-          <button type="button" class="primary-btn" {{on "click" this.compare}}>🔍 Compare</button>
-          <button type="button" class="secondary-btn" {{on "click" this.swap}}>⇄ Swap</button>
-          <button type="button" class="secondary-btn" {{on "click" this.clear}}>Clear</button>
+          <button
+            type="button"
+            class="primary-btn"
+            {{on "click" this.compare}}
+          >🔍 Compare</button>
+          <button type="button" class="secondary-btn" {{on "click" this.swap}}>⇄
+            Swap</button>
+          <button
+            type="button"
+            class="secondary-btn"
+            {{on "click" this.clear}}
+          >Clear</button>
         </div>
 
         {{#if this.showResults}}
@@ -162,7 +164,10 @@ export default class TextDiffApp extends Component {
             </div>
             <div class="diff-output">
               {{#each this.diffLines as |item index|}}
-                <div class="diff-line {{item.type}}">{{this.renderDiffLine item index}}</div>
+                <div class="diff-line {{item.type}}">{{this.renderDiffLine
+                    item
+                    index
+                  }}</div>
               {{/each}}
             </div>
           </div>
@@ -172,8 +177,17 @@ export default class TextDiffApp extends Component {
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

@@ -19,12 +19,14 @@ export interface SidebarSignature {
 }
 
 // Modifier to sync input value without losing focus
-const syncValue = modifier((element: HTMLInputElement | HTMLTextAreaElement, [value]: [string]) => {
-  // Only update if the element is not focused (user isn't typing)
-  if (document.activeElement !== element && element.value !== value) {
-    element.value = value ?? "";
-  }
-});
+const syncValue = modifier(
+  (element: HTMLInputElement | HTMLTextAreaElement, [value]: [string]) => {
+    // Only update if the element is not focused (user isn't typing)
+    if (document.activeElement !== element && element.value !== value) {
+      element.value = value ?? "";
+    }
+  },
+);
 
 export default class Sidebar extends Component<SidebarSignature> {
   @service declare flowEngine: FlowEngineService;
@@ -34,9 +36,16 @@ export default class Sidebar extends Component<SidebarSignature> {
   };
 
   handleFieldInput = (fieldName: string, event: Event) => {
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const target = event.target as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement;
     if (this.args.selectedNode) {
-      this.args.onFieldChange(this.args.selectedNode.id, fieldName, target.value);
+      this.args.onFieldChange(
+        this.args.selectedNode.id,
+        fieldName,
+        target.value,
+      );
     }
   };
 
@@ -90,7 +99,8 @@ export default class Sidebar extends Component<SidebarSignature> {
               <label>Type</label>
               <span class="property-value">
                 {{#if this.selectedNodeDef}}
-                  {{this.selectedNodeDef.icon}} {{this.selectedNodeDef.title}}
+                  {{this.selectedNodeDef.icon}}
+                  {{this.selectedNodeDef.title}}
                 {{else}}
                   {{@selectedNode.type}}
                 {{/if}}
@@ -116,7 +126,10 @@ export default class Sidebar extends Component<SidebarSignature> {
                       {{#each field.options as |opt|}}
                         <option
                           value={{opt}}
-                          selected={{eq opt (get @selectedNode.fields field.name)}}
+                          selected={{eq
+                            opt
+                            (get @selectedNode.fields field.name)
+                          }}
                         >
                           {{opt}}
                         </option>
@@ -143,7 +156,6 @@ export default class Sidebar extends Component<SidebarSignature> {
         </div>
       {{/if}}
     </div>
-
   </template>
 }
 
@@ -151,6 +163,9 @@ function eq(a: unknown, b: unknown): boolean {
   return a === b;
 }
 
-function get<T extends Record<string, unknown>, K extends keyof T>(obj: T, key: K): T[K] {
+function get<T extends Record<string, unknown>, K extends keyof T>(
+  obj: T,
+  key: K,
+): T[K] {
   return obj[key];
 }

@@ -6,7 +6,10 @@ export interface PreviewPanelSignature {
     outputs: Array<{ nodeId: string; data: unknown }>;
     selectedNode: { id: string; type: string } | null;
     selectedNodeTitle: string | null;
-    executionResults: Map<string, { outputs?: Record<string, unknown>; error?: string }>;
+    executionResults: Map<
+      string,
+      { outputs?: Record<string, unknown>; error?: string }
+    >;
   };
 }
 
@@ -54,13 +57,17 @@ export default class PreviewPanel extends Component<PreviewPanelSignature> {
             {{else if this.selectedResult.outputs._display}}
               <div class="preview-section">
                 <div class="preview-label">Output</div>
-                <pre class="preview-data">{{this.formatValue this.selectedResult.outputs._display}}</pre>
+                <pre class="preview-data">{{this.formatValue
+                    this.selectedResult.outputs._display
+                  }}</pre>
               </div>
             {{else}}
               {{#each this.selectedOutputEntries as |entry|}}
                 <div class="preview-section">
                   <div class="preview-label">{{entry.key}}</div>
-                  <pre class="preview-data">{{this.formatValue entry.value}}</pre>
+                  <pre class="preview-data">{{this.formatValue
+                      entry.value
+                    }}</pre>
                 </div>
               {{/each}}
               {{#unless this.selectedOutputEntries.length}}

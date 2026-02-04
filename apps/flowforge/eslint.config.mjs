@@ -1,49 +1,62 @@
-import globals from "globals";
+// eslint.config.mjs
+
+import { FlatCompat } from "@eslint/eslintrc";
+import typescriptEslintParser from "@typescript-eslint/parser";
+import emberPlugin from "eslint-plugin-ember";
+import typescriptEslintPlugin from "@typescript-eslint/eslint-plugin";
+import prettierPlugin from "eslint-plugin-prettier";
 import js from "@eslint/js";
-import ts from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
-import ember from "eslint-plugin-ember";
-import prettier from "eslint-config-prettier";
+import globals from "globals";
+
+const compat = new FlatCompat({
+  baseDirectory: import.meta.url,
+  resolvePluginsRelativeTo: import.meta.url,
+  recommendedConfig: js.configs.recommended,
+});
 
 export default [
-  js.configs.recommended,
-  prettier,
   {
-    ignores: ["dist/", "node_modules/", "declarations/"],
-  },
-  {
-    files: ["**/*.{js,ts,gjs,gts}"],
-    plugins: {
-      "@typescript-eslint": ts,
-      ember: ember,
-    },
+    files: ["**/*.ts", "**/*.js"],
     languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        project: "./tsconfig.json",
-        extraFileExtensions: [".gts", ".gjs"],
-      },
+      parser: typescriptEslintParser,
+      ecmaVersion: "latest",
+      sourceType: "module",
       globals: {
         ...globals.browser,
-        ...globals.es2021,
       },
     },
+    plugins: {
+      ember: emberPlugin,
+      "@typescript-eslint": typescriptEslintPlugin,
+      prettier: prettierPlugin,
+    },
     rules: {
-      "no-unused-vars": "off",
+      "prettier/prettier": "error",
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_" },
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
       ],
     },
   },
+  ...compat.extends(
+    "eslint:recommended",
+    "plugin:ember/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+  ),
   {
-    files: ["config/**/*.js"],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
+    ignores: [
+      "node_modules/",
+      "dist/",
+      "declarations/",
+      ".template-lintrc.cjs",
+      "config/environment.js",
+      "babel.config.cjs",
+    ],
   },
 ];

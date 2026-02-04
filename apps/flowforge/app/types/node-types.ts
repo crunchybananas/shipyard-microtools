@@ -23,7 +23,7 @@ export interface NodeTypeDefinition {
   fields: FieldDefinition[];
   execute: (
     inputs: Record<string, unknown>,
-    fields: Record<string, string>
+    fields: Record<string, string>,
   ) => Promise<Record<string, unknown>> | Record<string, unknown>;
 }
 
@@ -88,7 +88,9 @@ export const NODE_TYPES: Record<string, NodeTypeDefinition> = {
     inputs: [],
     outputs: [{ name: "out", type: "number" }],
     fields: [{ name: "value", type: "number", default: "42" }],
-    execute: (_inputs, fields) => ({ out: parseFloat(fields.value ?? "0") || 0 }),
+    execute: (_inputs, fields) => ({
+      out: parseFloat(fields.value ?? "0") || 0,
+    }),
   },
 
   "http-input": {
@@ -104,10 +106,17 @@ export const NODE_TYPES: Record<string, NodeTypeDefinition> = {
         type: "text",
         default: "https://jsonplaceholder.typicode.com/users/1",
       },
-      { name: "method", type: "select", options: ["GET", "POST"], default: "GET" },
+      {
+        name: "method",
+        type: "select",
+        options: ["GET", "POST"],
+        default: "GET",
+      },
     ],
     execute: async (_inputs, fields) => {
-      const res = await fetch(fields.url ?? "", { method: fields.method ?? "GET" });
+      const res = await fetch(fields.url ?? "", {
+        method: fields.method ?? "GET",
+      });
       const data = await res.json();
       return { response: data };
     },
@@ -179,7 +188,12 @@ export const NODE_TYPES: Record<string, NodeTypeDefinition> = {
     inputs: [{ name: "json", type: "any" }],
     outputs: [{ name: "result", type: "any" }],
     fields: [
-      { name: "path", type: "text", default: "items", placeholder: "data.items[0]" },
+      {
+        name: "path",
+        type: "text",
+        default: "items",
+        placeholder: "data.items[0]",
+      },
     ],
     execute: (inputs, fields) => {
       const path = (fields.path ?? "").trim();

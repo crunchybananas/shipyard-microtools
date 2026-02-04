@@ -1,9 +1,13 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
-import { htmlSafe } from "@ember/template";
-import type { SafeString } from "@ember/template/-private/handlebars";
+import { htmlSafe, type SafeString } from "@ember/template";
+import type Owner from "@ember/owner";
+
+export interface DevTerminalAppSignature {
+  Element: HTMLDivElement;
+  Args: Record<string, never>;
+}
 
 interface GameState {
   location: string;
@@ -41,7 +45,12 @@ A notification pops up: "GitHub Copilot adoption mandatory starting next month."
 
 Your coffee mug is empty. The office hums with the usual keyboard clatter.`,
     items: ["laptop", "empty coffee mug", "stack of programming books"],
-    exits: { north: "kitchen", east: "meeting_room", south: "lobby", west: "senior_desk" }
+    exits: {
+      north: "kitchen",
+      east: "meeting_room",
+      south: "lobby",
+      west: "senior_desk",
+    },
   },
   kitchen: {
     name: "Office Kitchen",
@@ -49,7 +58,7 @@ Your coffee mug is empty. The office hums with the usual keyboard clatter.`,
 
 The coffee machine gurgles ominously. A whiteboard shows the sprint burndown chart — you're behind.`,
     items: ["coffee machine", "whiteboard"],
-    exits: { south: "office" }
+    exits: { south: "office" },
   },
   meeting_room: {
     name: "Glass Meeting Room",
@@ -57,7 +66,7 @@ The coffee machine gurgles ominously. A whiteboard shows the sprint burndown cha
 
 Through the glass, you can see your manager setting up a presentation titled "AI: Transforming Our Workflow."`,
     items: ["presentation slides", "conference phone"],
-    exits: { west: "office" }
+    exits: { west: "office" },
   },
   lobby: {
     name: "Office Lobby",
@@ -69,7 +78,7 @@ Through the glass, you can see your manager setting up a presentation titled "AI
 
 The receptionist doesn't look up from their screen.`,
     items: ["tech news screen", "uncomfortable couch"],
-    exits: { north: "office", outside: "park" }
+    exits: { north: "office", outside: "park" },
   },
   senior_desk: {
     name: "Senior Developer's Corner",
@@ -77,7 +86,7 @@ The receptionist doesn't look up from their screen.`,
 
 She's been coding for 25 years. Survived the dot-com bust, the mobile revolution, the cloud migration. Now she's reading something intently.`,
     items: ["rubber duck", "vintage keyboard"],
-    exits: { east: "office" }
+    exits: { east: "office" },
   },
   park: {
     name: "Nearby Park",
@@ -87,11 +96,11 @@ The trees don't care about AI. The birds never learned to code in the first plac
 
 A bench sits empty, inviting contemplation.`,
     items: ["park bench", "birds"],
-    exits: { inside: "lobby" }
-  }
+    exits: { inside: "lobby" },
+  },
 };
 
-export default class DevTerminalApp extends Component {
+export default class DevTerminalApp extends Component<DevTerminalAppSignature> {
   @tracked outputHtml = "";
   @tracked inputValue = "";
 
@@ -109,28 +118,26 @@ export default class DevTerminalApp extends Component {
       builtTraditional: false,
       attendedMeeting: false,
       foundPerspective: false,
-      ending: null
+      ending: null,
     },
     chapter: 1,
-    mood: 50
+    mood: 50,
   };
 
-  constructor(owner: unknown, args: object) {
+  constructor(owner: Owner, args: DevTerminalAppSignature["Args"]) {
     super(owner, args);
-    this.init();
+    this.initGame();
   }
 
   get safeOutput(): SafeString {
     return htmlSafe(this.outputHtml);
   }
 
-  @action
-  updateInput(event: Event): void {
+  updateInput = (event: Event): void => {
     this.inputValue = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  handleKeydown(event: KeyboardEvent): void {
+  handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === "Enter" && this.inputValue.trim()) {
       const cmd = this.inputValue.trim();
       this.addOutput(`<p class="command">> ${cmd}</p>`);
@@ -138,13 +145,15 @@ export default class DevTerminalApp extends Component {
       const lowerCmd = cmd.toLowerCase();
       if (lowerCmd === "code with ai") {
         this.state.flags.builtWithAI = true;
-        this.addOutput(`<p>You type a comment describing what you need. Copilot fills in the rest.</p>
+        this
+          .addOutput(`<p>You type a comment describing what you need. Copilot fills in the rest.</p>
           <p>The code appears like magic. It works on the first try.</p>
           <p class="thought">You feel efficient. And somehow... empty. Where's the satisfaction of solving it yourself?</p>
           <p class="thought">But the ticket is done in 20 minutes instead of 2 hours. Isn't that good?</p>`);
       } else if (lowerCmd === "code traditional") {
         this.state.flags.builtTraditional = true;
-        this.addOutput(`<p>You write the code yourself. Every function, every edge case, thought through and typed.</p>
+        this
+          .addOutput(`<p>You write the code yourself. Every function, every edge case, thought through and typed.</p>
           <p>It takes two hours. You have to look up the CSV library syntax. There's a bug with Unicode characters.</p>
           <p>But when the tests pass, you smile. You UNDERSTAND this code. Every line is yours.</p>
           <p class="thought">Is this pride? Or is it stubbornness masquerading as craftsmanship?</p>`);
@@ -154,16 +163,32 @@ export default class DevTerminalApp extends Component {
 
       this.inputValue = "";
     }
-  }
+  };
 
   processCommand(cmd: string): string {
     const command = cmd.toLowerCase().trim();
     const words = command.split(" ");
-    const verb = words[0];
-    const noun = words.slice(1).join(" ");
+    const verb = words[0] ?? "";
+    const noun = words.slice(1).join(" ") || "";
 
-    if (["go", "walk", "move", "n", "s", "e", "w", "north", "south", "east", "west", "inside", "outside"].includes(verb)) {
-      return this.handleMovement(verb === "go" ? noun : verb);
+    if (
+      [
+        "go",
+        "walk",
+        "move",
+        "n",
+        "s",
+        "e",
+        "w",
+        "north",
+        "south",
+        "east",
+        "west",
+        "inside",
+        "outside",
+      ].includes(verb)
+    ) {
+      return this.handleMovement(verb === "go" ? noun || verb : verb);
     }
 
     if (["look", "l", "examine", "read", "inspect"].includes(verb)) {
@@ -172,11 +197,11 @@ export default class DevTerminalApp extends Component {
     }
 
     if (["talk", "speak", "ask", "chat"].includes(verb)) {
-      return this.handleTalk(noun);
+      return this.handleTalk(noun || "no one");
     }
 
     if (["use", "drink", "take", "get", "try"].includes(verb)) {
-      return this.handleUse(noun);
+      return this.handleUse(noun || "nothing");
     }
 
     if (["sit", "think", "reflect", "contemplate"].includes(verb)) {
@@ -204,18 +229,27 @@ export default class DevTerminalApp extends Component {
 
   handleMovement(direction: string): string {
     const dirMap: Record<string, string> = {
-      n: "north", north: "north",
-      s: "south", south: "south",
-      e: "east", east: "east",
-      w: "west", west: "west",
-      inside: "inside", outside: "outside"
+      n: "north",
+      north: "north",
+      s: "south",
+      south: "south",
+      e: "east",
+      east: "east",
+      w: "west",
+      west: "west",
+      inside: "inside",
+      outside: "outside",
     };
 
     const dir = dirMap[direction];
-    const exits = locations[this.state.location].exits;
+    const location = locations[this.state.location];
+    if (!location) {
+      return `<p class="error">You seem to be lost.</p>`;
+    }
+    const exits = location.exits;
 
     if (dir && exits[dir]) {
-      this.state.location = exits[dir];
+      this.state.location = exits[dir]!;
       return this.describeLook();
     }
 
@@ -224,6 +258,9 @@ export default class DevTerminalApp extends Component {
 
   describeLook(): string {
     const loc = locations[this.state.location];
+    if (!loc) {
+      return `<p class="error">You seem to be in an unknown place.</p>`;
+    }
     let text = `<p class="location">${loc.name}</p>`;
     text += `<p class="description">${loc.description}</p>`;
 
@@ -298,13 +335,13 @@ export default class DevTerminalApp extends Component {
         <p class="hint">TALK TO ALEX.</p>`,
 
       maya: `<p>Maya types steadily, her expression calm. 25 years in tech. She's seen trends come and go.</p>
-        <p class="hint">TALK TO MAYA.</p>`
+        <p class="hint">TALK TO MAYA.</p>`,
     };
 
-    const key = Object.keys(examinations).find(k => obj.includes(k));
+    const key = Object.keys(examinations).find((k) => obj.includes(k));
     if (key) {
       const result = examinations[key];
-      return typeof result === "function" ? result() : result;
+      return typeof result === "function" ? result() : result ?? "";
     }
 
     return `<p>You don't see anything special about that.</p>`;
@@ -419,10 +456,13 @@ export default class DevTerminalApp extends Component {
   showInventory(): string {
     const items: string[] = [];
     if (this.state.flags.hadCoffee) items.push("warm coffee (comforting)");
-    if (this.state.flags.triedCopilot) items.push("Copilot experience (conflicting)");
-    if (this.state.flags.readArticle) items.push("existential dread (unwanted)");
+    if (this.state.flags.triedCopilot)
+      items.push("Copilot experience (conflicting)");
+    if (this.state.flags.readArticle)
+      items.push("existential dread (unwanted)");
     if (this.state.flags.talkedToSenior) items.push("Maya's wisdom (valuable)");
-    if (this.state.flags.foundPerspective) items.push("new perspective (hard-won)");
+    if (this.state.flags.foundPerspective)
+      items.push("new perspective (hard-won)");
 
     if (items.length === 0) {
       return `<p>You're not carrying anything noteworthy. Just your usual developer anxiety.</p>`;
@@ -445,7 +485,11 @@ export default class DevTerminalApp extends Component {
   }
 
   checkEnding(): string | null {
-    if (this.state.flags.foundPerspective && this.state.flags.talkedToSenior && this.state.flags.talkedToJunior) {
+    if (
+      this.state.flags.foundPerspective &&
+      this.state.flags.talkedToSenior &&
+      this.state.flags.talkedToJunior
+    ) {
       return `<div class="achievement">
         <p class="success">🏆 ENDING UNLOCKED: "The Mentor"</p>
         <p>You found perspective. You'll help guide the next generation through this transition, just as Maya guided you.</p>
@@ -473,7 +517,7 @@ export default class DevTerminalApp extends Component {
     }, 0);
   }
 
-  init(): void {
+  initGame(): void {
     this.addOutput(`<p class="success">THE DEVELOPER'S JOURNEY</p>
       <p class="hint">A text adventure about coding, AI, and finding your place.</p>
       <p class="hint">Type HELP for commands.</p>
@@ -486,7 +530,8 @@ export default class DevTerminalApp extends Component {
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>💻 The Developer's Journey</h1>
-        <p class="subtitle">A text adventure about coding, AI, and finding your place in a changing world.</p>
+        <p class="subtitle">A text adventure about coding, AI, and finding your
+          place in a changing world.</p>
       </header>
 
       <main>
@@ -517,8 +562,17 @@ export default class DevTerminalApp extends Component {
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

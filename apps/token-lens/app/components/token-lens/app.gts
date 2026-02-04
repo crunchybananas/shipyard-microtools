@@ -12,15 +12,16 @@ export default class TokenLensApp extends Component {
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>Token Lens</h1>
-        <p>JWT decode + verify. Runs 100% in your browser. No data is stored or sent.</p>
+        <p>JWT decode + verify. Runs 100% in your browser. No data is stored or
+          sent.</p>
       </header>
 
       <section class="input">
         <label>JWT</label>
         <textarea id="jwtInput" placeholder="paste your JWT here..."></textarea>
         <div class="actions">
-          <button id="decodeBtn" class="btn primary">Decode</button>
-          <button id="clearBtn" class="btn">Clear</button>
+          <button id="decodeBtn" class="btn primary" type="button">Decode</button>
+          <button id="clearBtn" class="btn" type="button">Clear</button>
         </div>
       </section>
 
@@ -42,10 +43,15 @@ export default class TokenLensApp extends Component {
         </div>
         <div>
           <h3>Verification (HS256)</h3>
-          <p class="helper">Checks HMAC signatures only. No data leaves your browser.</p>
+          <p class="helper">Checks HMAC signatures only. No data leaves your
+            browser.</p>
           <div class="verify-row">
-            <input id="secretInput" type="text" placeholder="paste HS256 secret" />
-            <button id="verifyBtn" class="btn">Verify</button>
+            <input
+              id="secretInput"
+              type="text"
+              placeholder="paste HS256 secret"
+            />
+            <button id="verifyBtn" class="btn" type="button">Verify</button>
           </div>
           <p id="verifyStatus" class="muted">No verification attempted.</p>
         </div>
@@ -67,8 +73,12 @@ export default class TokenLensApp extends Component {
     <footer>
       <p class="footer-credit">
         Made with 🧡 by
-        <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-        using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+        <a
+          href="https://crunchybananas.github.io"
+          target="_blank" rel="noopener noreferrer"
+        >Cory Loken & Chiron</a>
+        using
+        <a href="https://emberjs.com" target="_blank" rel="noopener noreferrer">Ember</a>
       </p>
     </footer>
   </template>

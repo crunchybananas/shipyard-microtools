@@ -93,11 +93,14 @@ export class Sequencer {
     const actualTime = time + swingOffset;
 
     const displayTime = (actualTime - this.ctx.currentTime) * 1000;
-    setTimeout(() => {
-      if (this.onStep) {
-        this.onStep(step);
-      }
-    }, Math.max(0, displayTime));
+    setTimeout(
+      () => {
+        if (this.onStep) {
+          this.onStep(step);
+        }
+      },
+      Math.max(0, displayTime),
+    );
 
     for (const [trackId, track] of Object.entries(this.tracks)) {
       if (track.steps[step]) {
@@ -170,7 +173,10 @@ export class Sequencer {
   }
 
   getPattern() {
-    const pattern: Record<string, { steps: boolean[]; note?: string; velocity: number }> = {};
+    const pattern: Record<
+      string,
+      { steps: boolean[]; note?: string; velocity: number }
+    > = {};
     for (const [trackId, track] of Object.entries(this.tracks)) {
       pattern[trackId] = {
         steps: [...track.steps],
@@ -181,7 +187,12 @@ export class Sequencer {
     return pattern;
   }
 
-  loadPattern(pattern: Record<string, { steps: boolean[]; note?: string; velocity: number }>) {
+  loadPattern(
+    pattern: Record<
+      string,
+      { steps: boolean[]; note?: string; velocity: number }
+    >,
+  ) {
     for (const [trackId, data] of Object.entries(pattern)) {
       if (this.tracks[trackId]) {
         this.tracks[trackId].steps = [...data.steps];
@@ -205,7 +216,14 @@ export class Sequencer {
     };
   }
 
-  loadState(state: { bpm?: number; swing?: number; pattern?: Record<string, { steps: boolean[]; note?: string; velocity: number }> }) {
+  loadState(state: {
+    bpm?: number;
+    swing?: number;
+    pattern?: Record<
+      string,
+      { steps: boolean[]; note?: string; velocity: number }
+    >;
+  }) {
     if (state.bpm) this.bpm = state.bpm;
     if (state.swing) this.swing = state.swing;
     if (state.pattern) this.loadPattern(state.pattern);
@@ -214,24 +232,271 @@ export class Sequencer {
 
 export const PRESET_PATTERNS = {
   basic: {
-    kick: { steps: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false] },
-    snare: { steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false] },
-    hihat: { steps: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false] },
+    kick: {
+      steps: [
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
+    snare: {
+      steps: [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
+    hihat: {
+      steps: [
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+      ],
+    },
   },
   house: {
-    kick: { steps: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false] },
-    snare: { steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false] },
-    hihat: { steps: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false] },
-    clap: { steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, true] },
+    kick: {
+      steps: [
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
+    snare: {
+      steps: [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
+    hihat: {
+      steps: [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+      ],
+    },
+    clap: {
+      steps: [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+      ],
+    },
   },
   hiphop: {
-    kick: { steps: [true, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false] },
-    snare: { steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false] },
-    hihat: { steps: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true] },
+    kick: {
+      steps: [
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+      ],
+    },
+    snare: {
+      steps: [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
+    hihat: {
+      steps: [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+      ],
+    },
   },
   techno: {
-    kick: { steps: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false] },
-    hihat: { steps: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false] },
-    clap: { steps: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false] },
+    kick: {
+      steps: [
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
+    hihat: {
+      steps: [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+      ],
+    },
+    clap: {
+      steps: [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+    },
   },
 };

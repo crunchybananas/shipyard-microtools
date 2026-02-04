@@ -1,9 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
-import { htmlSafe } from "@ember/template";
-import type { SafeString } from "@ember/template/-private/handlebars";
+import { htmlSafe, type SafeString } from "@ember/template";
 
 export default class GradientGeneratorApp extends Component {
   @tracked type: "linear" | "radial" = "linear";
@@ -47,53 +45,45 @@ export default class GradientGeneratorApp extends Component {
     return htmlSafe(`opacity: ${this.type === "radial" ? "0.3" : "1"};`);
   }
 
-  @action
-  updateType(event: Event): void {
-    this.type = (event.target as HTMLSelectElement).value as "linear" | "radial";
-  }
+  updateType = (event: Event): void => {
+    this.type = (event.target as HTMLSelectElement).value as
+      | "linear"
+      | "radial";
+  };
 
-  @action
-  updateAngle(event: Event): void {
+  updateAngle = (event: Event): void => {
     this.angle = parseInt((event.target as HTMLInputElement).value);
-  }
+  };
 
-  @action
-  updateColor1(event: Event): void {
+  updateColor1 = (event: Event): void => {
     this.color1 = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  updateColor2(event: Event): void {
+  updateColor2 = (event: Event): void => {
     this.color2 = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  updateColor3(event: Event): void {
+  updateColor3 = (event: Event): void => {
     this.color3 = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  updateStop1(event: Event): void {
+  updateStop1 = (event: Event): void => {
     this.stop1 = parseInt((event.target as HTMLInputElement).value);
-  }
+  };
 
-  @action
-  updateStop2(event: Event): void {
+  updateStop2 = (event: Event): void => {
     this.stop2 = parseInt((event.target as HTMLInputElement).value);
-  }
+  };
 
-  @action
-  updateStop3(event: Event): void {
+  updateStop3 = (event: Event): void => {
     this.stop3 = parseInt((event.target as HTMLInputElement).value);
-  }
+  };
 
-  @action
-  toggleColor3(): void {
+  toggleColor3 = (): void => {
     this.enableColor3 = !this.enableColor3;
-  }
+  };
 
-  @action
-  randomize(): void {
+  randomize = (): void => {
     this.color1 = this.randomColor();
     this.color2 = this.randomColor();
     this.color3 = this.randomColor();
@@ -102,19 +92,17 @@ export default class GradientGeneratorApp extends Component {
     this.stop3 = 50;
     this.enableColor3 = Math.random() > 0.3;
     this.angle = Math.floor(Math.random() * 360);
-  }
+  };
 
-  @action
-  copyCss(): void {
+  copyCss = (): void => {
     navigator.clipboard.writeText(this.cssOutput);
-  }
+  };
 
-  @action
-  copyColors(): void {
+  copyColors = (): void => {
     const colors = [this.color1, this.color2];
     if (this.enableColor3) colors.push(this.color3);
     navigator.clipboard.writeText(colors.join(", "));
-  }
+  };
 
   randomColor(): string {
     return `#${Math.floor(Math.random() * 16777215)
@@ -131,7 +119,11 @@ export default class GradientGeneratorApp extends Component {
             <h1>🎨 Gradient Generator</h1>
             <p>Create beautiful CSS gradients in seconds.</p>
           </div>
-          <button type="button" class="btn primary" {{on "click" this.randomize}}>Randomize</button>
+          <button
+            type="button"
+            class="btn primary"
+            {{on "click" this.randomize}}
+          >Randomize</button>
         </div>
       </header>
 
@@ -139,7 +131,8 @@ export default class GradientGeneratorApp extends Component {
         <div class="preview-swatch" style={{this.previewStyle}}></div>
         <div class="preview-actions">
           <button type="button" class="btn" {{on "click" this.copyCss}}>Copy CSS</button>
-          <button type="button" class="btn" {{on "click" this.copyColors}}>Copy Colors</button>
+          <button type="button" class="btn" {{on "click" this.copyColors}}>Copy
+            Colors</button>
         </div>
       </section>
 
@@ -147,8 +140,14 @@ export default class GradientGeneratorApp extends Component {
         <div class="control">
           <label>Type</label>
           <select {{on "change" this.updateType}}>
-            <option value="linear" selected={{eq this.type "linear"}}>Linear</option>
-            <option value="radial" selected={{eq this.type "radial"}}>Radial</option>
+            <option
+              value="linear"
+              selected={{eq this.type "linear"}}
+            >Linear</option>
+            <option
+              value="radial"
+              selected={{eq this.type "radial"}}
+            >Radial</option>
           </select>
         </div>
 
@@ -166,7 +165,11 @@ export default class GradientGeneratorApp extends Component {
         <div class="control">
           <label>Color 1</label>
           <div class="color-row">
-            <input type="color" value={{this.color1}} {{on "input" this.updateColor1}} />
+            <input
+              type="color"
+              value={{this.color1}}
+              {{on "input" this.updateColor1}}
+            />
             <input
               type="range"
               min="0"
@@ -181,7 +184,11 @@ export default class GradientGeneratorApp extends Component {
         <div class="control">
           <label>Color 2</label>
           <div class="color-row">
-            <input type="color" value={{this.color2}} {{on "input" this.updateColor2}} />
+            <input
+              type="color"
+              value={{this.color2}}
+              {{on "input" this.updateColor2}}
+            />
             <input
               type="range"
               min="0"
@@ -196,7 +203,11 @@ export default class GradientGeneratorApp extends Component {
         <div class="control">
           <label>Color 3 (optional)</label>
           <div class="color-row">
-            <input type="color" value={{this.color3}} {{on "input" this.updateColor3}} />
+            <input
+              type="color"
+              value={{this.color3}}
+              {{on "input" this.updateColor3}}
+            />
             <input
               type="range"
               min="0"
@@ -206,7 +217,11 @@ export default class GradientGeneratorApp extends Component {
             />
             <span>{{this.stop3}}%</span>
             <label class="toggle">
-              <input type="checkbox" checked={{this.enableColor3}} {{on "change" this.toggleColor3}} />
+              <input
+                type="checkbox"
+                checked={{this.enableColor3}}
+                {{on "change" this.toggleColor3}}
+              />
               <span>Enable</span>
             </label>
           </div>
@@ -221,8 +236,17 @@ export default class GradientGeneratorApp extends Component {
       <footer class="footer">
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

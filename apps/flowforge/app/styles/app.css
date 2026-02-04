@@ -28,7 +28,7 @@
   --accent-green: var(--success);
   --accent-red: var(--error);
   --accent-yellow: var(--warning);
-  
+
   --port-string: #4ade80;
   --port-number: #60a5fa;
   --port-boolean: #f472b6;
@@ -40,7 +40,12 @@
 body {
   background: var(--bg-darker);
   color: var(--text);
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   height: 100vh;
   overflow: hidden;
 }
@@ -342,9 +347,24 @@ body {
   overflow: hidden;
   background:
     radial-gradient(circle at center, var(--bg-dark) 0%, var(--bg-darker) 100%),
-    repeating-linear-gradient(0deg, transparent, transparent 19px, var(--border) 19px, var(--border) 20px),
-    repeating-linear-gradient(90deg, transparent, transparent 19px, var(--border) 19px, var(--border) 20px);
-  background-size: 100% 100%, 20px 20px, 20px 20px;
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      var(--border) 19px,
+      var(--border) 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 19px,
+      var(--border) 19px,
+      var(--border) 20px
+    );
+  background-size:
+    100% 100%,
+    20px 20px,
+    20px 20px;
 }
 
 .connections-layer {
@@ -393,7 +413,9 @@ body {
   cursor: move;
   user-select: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .flow-node:hover {
@@ -402,7 +424,9 @@ body {
 
 .flow-node.selected {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 0 0 2px rgba(74, 158, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .flow-node.status-success {
@@ -419,8 +443,13 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3); }
-  50% { box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.1); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.1);
+  }
 }
 
 .node-header {
@@ -530,12 +559,24 @@ body {
   transition: transform 0.15s;
 }
 
-.port[data-port-type="string"] .port-dot { background: var(--port-string); }
-.port[data-port-type="number"] .port-dot { background: var(--port-number); }
-.port[data-port-type="boolean"] .port-dot { background: var(--port-boolean); }
-.port[data-port-type="array"] .port-dot { background: var(--port-array); }
-.port[data-port-type="object"] .port-dot { background: var(--port-object); }
-.port[data-port-type="any"] .port-dot { background: var(--port-any); }
+.port[data-port-type="string"] .port-dot {
+  background: var(--port-string);
+}
+.port[data-port-type="number"] .port-dot {
+  background: var(--port-number);
+}
+.port[data-port-type="boolean"] .port-dot {
+  background: var(--port-boolean);
+}
+.port[data-port-type="array"] .port-dot {
+  background: var(--port-array);
+}
+.port[data-port-type="object"] .port-dot {
+  background: var(--port-object);
+}
+.port[data-port-type="any"] .port-dot {
+  background: var(--port-any);
+}
 
 .port-dot.connected {
   box-shadow: 0 0 6px currentColor;
@@ -583,7 +624,7 @@ body {
 }
 
 .header-actions button {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 8px 16px;
@@ -594,7 +635,7 @@ body {
 }
 
 .header-actions button:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent);
 }
 
@@ -713,11 +754,26 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: 
+  background:
     radial-gradient(circle at center, var(--bg-dark) 0%, var(--bg-darker) 100%),
-    repeating-linear-gradient(0deg, transparent, transparent 19px, var(--border) 19px, var(--border) 20px),
-    repeating-linear-gradient(90deg, transparent, transparent 19px, var(--border) 19px, var(--border) 20px);
-  background-size: 100% 100%, 20px 20px, 20px 20px;
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      var(--border) 19px,
+      var(--border) 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 19px,
+      var(--border) 19px,
+      var(--border) 20px
+    );
+  background-size:
+    100% 100%,
+    20px 20px,
+    20px 20px;
 }
 
 #canvas {
@@ -752,9 +808,11 @@ body {
   border: 2px solid var(--border);
   border-radius: 8px;
   min-width: 180px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 10;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .node:hover {
@@ -763,7 +821,9 @@ body {
 
 .node.selected {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.3), 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow:
+    0 0 0 2px rgba(74, 158, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .node.running {
@@ -780,8 +840,13 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3); }
-  50% { box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.1); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.1);
+  }
 }
 
 .node-header {
@@ -789,7 +854,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 6px 6px 0 0;
   cursor: move;
 }
@@ -834,7 +899,7 @@ body {
   padding: 8px;
   border-radius: 4px;
   font-size: 12px;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
 }
 
 .node-field textarea {
@@ -856,7 +921,8 @@ body {
   padding: 8px 0;
 }
 
-.ports-in, .ports-out {
+.ports-in,
+.ports-out {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -890,12 +956,24 @@ body {
   transform: scale(1.3);
 }
 
-.port-dot.string { background: var(--port-string); }
-.port-dot.number { background: var(--port-number); }
-.port-dot.boolean { background: var(--port-boolean); }
-.port-dot.array { background: var(--port-array); }
-.port-dot.object { background: var(--port-object); }
-.port-dot.any { background: var(--port-any); }
+.port-dot.string {
+  background: var(--port-string);
+}
+.port-dot.number {
+  background: var(--port-number);
+}
+.port-dot.boolean {
+  background: var(--port-boolean);
+}
+.port-dot.array {
+  background: var(--port-array);
+}
+.port-dot.object {
+  background: var(--port-object);
+}
+.port-dot.any {
+  background: var(--port-any);
+}
 
 .port-dot.connected {
   box-shadow: 0 0 6px currentColor;
@@ -937,7 +1015,7 @@ body {
   right: 20px;
   width: 150px;
   height: 100px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
@@ -1018,7 +1096,7 @@ body {
   background: var(--bg-dark);
   border-radius: 4px;
   padding: 10px;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
   font-size: 11px;
   white-space: pre-wrap;
   word-break: break-all;
@@ -1032,7 +1110,7 @@ body {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   z-index: 1000;
   min-width: 150px;
 }
@@ -1049,7 +1127,7 @@ body {
 }
 
 .context-item:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .context-item:first-child {
@@ -1064,7 +1142,7 @@ body {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,13 +1,16 @@
 export class Synthesizer {
-  ctx: AudioContext;
-  voices = new Map<string, {
-    oscillator: OscillatorNode;
-    filter: BiquadFilterNode;
-    envelope: GainNode;
-    startTime: number;
-    note: string;
-    velocity: number;
-  }>();
+  ctx: BaseAudioContext;
+  voices = new Map<
+    string,
+    {
+      oscillator: OscillatorNode;
+      filter: BiquadFilterNode;
+      envelope: GainNode;
+      startTime: number;
+      note: string;
+      velocity: number;
+    }
+  >();
   maxVoices = 16;
   params = {
     waveform: "sine",
@@ -29,7 +32,7 @@ export class Synthesizer {
   lfoGain: GainNode;
   output: GainNode;
 
-  constructor(audioContext: AudioContext) {
+  constructor(audioContext: BaseAudioContext) {
     this.ctx = audioContext;
 
     this.lfo = this.ctx.createOscillator();
@@ -67,9 +70,9 @@ export class Synthesizer {
     const match = note.match(/^([A-G]#?)(\d+)$/);
     if (!match) return 440;
 
-    const noteName = match[1];
-    const octave = parseInt(match[2]);
-    const semitonesFromA4 = (notes[noteName] - 9) + (octave - 4) * 12;
+    const noteName = match[1]!;
+    const octave = parseInt(match[2]!);
+    const semitonesFromA4 = notes[noteName]! - 9 + (octave - 4) * 12;
     const totalSemitones = semitonesFromA4 + this.params.octave * 12;
 
     return 440 * Math.pow(2, totalSemitones / 12);
@@ -122,11 +125,14 @@ export class Synthesizer {
     if (this.params.filterEnvAmount > 0) {
       const filterPeak = Math.min(
         this.params.filterCutoff + this.params.filterEnvAmount,
-        20000
+        20000,
       );
       filter.frequency.setValueAtTime(this.params.filterCutoff, now);
       filter.frequency.linearRampToValueAtTime(filterPeak, attackEnd);
-      filter.frequency.linearRampToValueAtTime(this.params.filterCutoff, decayEnd);
+      filter.frequency.linearRampToValueAtTime(
+        this.params.filterCutoff,
+        decayEnd,
+      );
     }
 
     return {
@@ -168,11 +174,14 @@ export class Synthesizer {
     voice.oscillator.stop(releaseEnd + 0.1);
     this.voices.delete(note);
 
-    setTimeout(() => {
-      voice.oscillator.disconnect();
-      voice.filter.disconnect();
-      voice.envelope.disconnect();
-    }, (this.params.release + 0.2) * 1000);
+    setTimeout(
+      () => {
+        voice.oscillator.disconnect();
+        voice.filter.disconnect();
+        voice.envelope.disconnect();
+      },
+      (this.params.release + 0.2) * 1000,
+    );
   }
 
   allNotesOff() {

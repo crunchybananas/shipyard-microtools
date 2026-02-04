@@ -1,21 +1,49 @@
 export function initializeTokenLens(_element: HTMLElement) {
-  const jwtInput = document.getElementById("jwtInput") as HTMLTextAreaElement | null;
-  const headerOutput = document.getElementById("headerOutput") as HTMLPreElement | null;
-  const payloadOutput = document.getElementById("payloadOutput") as HTMLPreElement | null;
-  const signatureOutput = document.getElementById("signatureOutput") as HTMLPreElement | null;
+  const jwtInput = document.getElementById(
+    "jwtInput",
+  ) as HTMLTextAreaElement | null;
+  const headerOutput = document.getElementById(
+    "headerOutput",
+  ) as HTMLPreElement | null;
+  const payloadOutput = document.getElementById(
+    "payloadOutput",
+  ) as HTMLPreElement | null;
+  const signatureOutput = document.getElementById(
+    "signatureOutput",
+  ) as HTMLPreElement | null;
   const iatOutput = document.getElementById("iat") as HTMLSpanElement | null;
   const expOutput = document.getElementById("exp") as HTMLSpanElement | null;
-  const decodeBtn = document.getElementById("decodeBtn") as HTMLButtonElement | null;
-  const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement | null;
-  const verifyBtn = document.getElementById("verifyBtn") as HTMLButtonElement | null;
-  const secretInput = document.getElementById("secretInput") as HTMLInputElement | null;
-  const verifyStatus = document.getElementById("verifyStatus") as HTMLParagraphElement | null;
+  const decodeBtn = document.getElementById(
+    "decodeBtn",
+  ) as HTMLButtonElement | null;
+  const clearBtn = document.getElementById(
+    "clearBtn",
+  ) as HTMLButtonElement | null;
+  const verifyBtn = document.getElementById(
+    "verifyBtn",
+  ) as HTMLButtonElement | null;
+  const secretInput = document.getElementById(
+    "secretInput",
+  ) as HTMLInputElement | null;
+  const verifyStatus = document.getElementById(
+    "verifyStatus",
+  ) as HTMLParagraphElement | null;
 
-  if (!jwtInput || !headerOutput || !payloadOutput || !signatureOutput || !iatOutput || !expOutput) return;
-  if (!decodeBtn || !clearBtn || !verifyBtn || !secretInput || !verifyStatus) return;
+  if (
+    !jwtInput ||
+    !headerOutput ||
+    !payloadOutput ||
+    !signatureOutput ||
+    !iatOutput ||
+    !expOutput
+  )
+    return;
+  if (!decodeBtn || !clearBtn || !verifyBtn || !secretInput || !verifyStatus)
+    return;
 
   const base64UrlDecode = (value: string) => {
-    const pad = value.length % 4 === 0 ? "" : "=".repeat(4 - (value.length % 4));
+    const pad =
+      value.length % 4 === 0 ? "" : "=".repeat(4 - (value.length % 4));
     const base64 = (value + pad).replace(/-/g, "+").replace(/_/g, "/");
     return atob(base64);
   };
@@ -39,7 +67,10 @@ export function initializeTokenLens(_element: HTMLElement) {
       return;
     }
 
-    const [header, payload, signature] = token.split(".");
+    const parts = token.split(".");
+    const header = parts[0] ?? "";
+    const payload = parts[1] ?? "";
+    const signature = parts[2];
     try {
       const headerJson = JSON.parse(base64UrlDecode(header));
       const payloadJson = JSON.parse(base64UrlDecode(payload));
@@ -68,7 +99,13 @@ export function initializeTokenLens(_element: HTMLElement) {
     const data = new TextEncoder().encode(`${header}.${payload}`);
     const keyData = new TextEncoder().encode(secret);
 
-    const key = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
     const signatureBuffer = await crypto.subtle.sign("HMAC", key, data);
     const signatureBytes = new Uint8Array(signatureBuffer);
     const computed = btoa(String.fromCharCode(...signatureBytes))
@@ -76,7 +113,8 @@ export function initializeTokenLens(_element: HTMLElement) {
       .replace(/\//g, "_")
       .replace(/=+$/, "");
 
-    verifyStatus.textContent = computed === signature ? "Signature valid ✅" : "Signature invalid ❌";
+    verifyStatus.textContent =
+      computed === signature ? "Signature valid ✅" : "Signature invalid ❌";
   };
 
   const clearAll = () => {

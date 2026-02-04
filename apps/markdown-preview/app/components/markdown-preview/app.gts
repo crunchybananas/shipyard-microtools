@@ -20,7 +20,11 @@ export default class MarkdownPreviewApp extends Component {
           <div class="pane">
             <div class="pane-header">
               <span>Markdown</span>
-              <button id="clearBtn" class="small-btn">Clear</button>
+              <button
+                id="clearBtn"
+                class="small-btn"
+                type="button"
+              >Clear</button>
             </div>
             <textarea
               id="markdownInput"
@@ -42,7 +46,7 @@ console.log(greeting);
           <div class="pane">
             <div class="pane-header">
               <span>Preview</span>
-              <button id="copyHtmlBtn" class="small-btn">Copy HTML</button>
+              <button id="copyHtmlBtn" class="small-btn" type="button">Copy HTML</button>
             </div>
             <div id="preview" class="preview"></div>
           </div>
@@ -54,8 +58,17 @@ console.log(greeting);
       <footer>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

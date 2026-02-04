@@ -27,3 +27,4 @@ Thumbs.db
 # Built Ember apps (regenerated on CI)
 docs/ember/*/
 !docs/ember/.gitkeep
+.eslintcache

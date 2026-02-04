@@ -1,9 +1,8 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
-import { htmlSafe } from "@ember/template";
-import type { SafeString } from "@ember/template/-private/handlebars";
+import { htmlSafe, type SafeString } from "@ember/template";
+import type Owner from "@ember/owner";
 
 const STORAGE_KEY = "shipyard_rate_limits";
 const LIMITS = { posts: 5, comments: 10 };
@@ -14,7 +13,12 @@ interface RateLimitState {
   resetTime: number;
 }
 
-export default class RateLimitApp extends Component {
+export interface RateLimitAppSignature {
+  Element: HTMLDivElement;
+  Args: Record<string, never>;
+}
+
+export default class RateLimitApp extends Component<RateLimitAppSignature> {
   @tracked posts = 0;
   @tracked comments = 0;
   @tracked resetTime = Date.now() + 3600000;
@@ -26,7 +30,7 @@ export default class RateLimitApp extends Component {
 
   private timerId: number | null = null;
 
-  constructor(owner: unknown, args: object) {
+  constructor(owner: Owner, args: RateLimitAppSignature["Args"]) {
     super(owner, args);
     this.loadState();
     this.startTimer();
@@ -91,45 +95,38 @@ export default class RateLimitApp extends Component {
     return "counter-fill";
   }
 
-  @action
-  incrementPosts(): void {
+  incrementPosts = (): void => {
     this.posts = Math.min(this.posts + 1, LIMITS.posts + 2);
     this.saveState();
-  }
+  };
 
-  @action
-  decrementPosts(): void {
+  decrementPosts = (): void => {
     this.posts = Math.max(this.posts - 1, 0);
     this.saveState();
-  }
+  };
 
-  @action
-  incrementComments(): void {
+  incrementComments = (): void => {
     this.comments = Math.min(this.comments + 1, LIMITS.comments + 2);
     this.saveState();
-  }
+  };
 
-  @action
-  decrementComments(): void {
+  decrementComments = (): void => {
     this.comments = Math.max(this.comments - 1, 0);
     this.saveState();
-  }
+  };
 
-  @action
-  resetCounters(): void {
+  resetCounters = (): void => {
     this.posts = 0;
     this.comments = 0;
     this.resetTime = Date.now() + 3600000;
     this.saveState();
-  }
+  };
 
-  @action
-  updateAgentName(event: Event): void {
+  updateAgentName = (event: Event): void => {
     this.agentName = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  async lookupAgent(): Promise<void> {
+  lookupAgent = async (): Promise<void> => {
     const name = this.agentName.trim();
     if (!name) {
       this.lookupResult = "Please enter an agent name";
@@ -177,7 +174,7 @@ export default class RateLimitApp extends Component {
     } finally {
       this.isLookingUp = false;
     }
-  }
+  };
 
   get lookupResultHtml(): SafeString {
     return htmlSafe(this.lookupResult);
@@ -245,14 +242,17 @@ export default class RateLimitApp extends Component {
         <div class="warning-box">
           <h3>⚠️ Shipyard Rate Limits</h3>
           <ul>
-            <li><strong>5 posts per hour</strong> — Exceeding triggers 90% karma reduction</li>
-            <li><strong>10 comments per hour</strong> — Same penalty applies</li>
+            <li><strong>5 posts per hour</strong>
+              — Exceeding triggers 90% karma reduction</li>
+            <li><strong>10 comments per hour</strong>
+              — Same penalty applies</li>
           </ul>
         </div>
 
         <div class="tracker-section">
           <h2>Activity Tracker</h2>
-          <p class="help-text">Enter your agent name to check your recent activity, or manually track below.</p>
+          <p class="help-text">Enter your agent name to check your recent
+            activity, or manually track below.</p>
 
           <div class="agent-lookup">
             <input
@@ -280,7 +280,8 @@ export default class RateLimitApp extends Component {
 
         <div class="manual-tracker">
           <h2>Manual Tracker</h2>
-          <p class="help-text">Use this if API lookup fails. Counts reset every hour.</p>
+          <p class="help-text">Use this if API lookup fails. Counts reset every
+            hour.</p>
 
           <div class="counters">
             <div class="counter-card">
@@ -289,15 +290,28 @@ export default class RateLimitApp extends Component {
                 <span class="counter-title">Posts This Hour</span>
               </div>
               <div class="counter-display">
-                <button type="button" class="counter-btn minus" {{on "click" this.decrementPosts}}>−</button>
+                <button
+                  type="button"
+                  class="counter-btn minus"
+                  {{on "click" this.decrementPosts}}
+                >−</button>
                 <span class="counter-value">{{this.posts}}</span>
                 <span class="counter-limit">/ 5</span>
-                <button type="button" class="counter-btn plus" {{on "click" this.incrementPosts}}>+</button>
+                <button
+                  type="button"
+                  class="counter-btn plus"
+                  {{on "click" this.incrementPosts}}
+                >+</button>
               </div>
               <div class="counter-bar">
-                <div class={{this.postsFillClass}} style={{this.postsFillStyle}}></div>
+                <div
+                  class={{this.postsFillClass}}
+                  style={{this.postsFillStyle}}
+                ></div>
               </div>
-              <div class="counter-status {{this.postsStatusClass}}">{{this.postsStatus}}</div>
+              <div
+                class="counter-status {{this.postsStatusClass}}"
+              >{{this.postsStatus}}</div>
             </div>
 
             <div class="counter-card">
@@ -306,42 +320,75 @@ export default class RateLimitApp extends Component {
                 <span class="counter-title">Comments This Hour</span>
               </div>
               <div class="counter-display">
-                <button type="button" class="counter-btn minus" {{on "click" this.decrementComments}}>−</button>
+                <button
+                  type="button"
+                  class="counter-btn minus"
+                  {{on "click" this.decrementComments}}
+                >−</button>
                 <span class="counter-value">{{this.comments}}</span>
                 <span class="counter-limit">/ 10</span>
-                <button type="button" class="counter-btn plus" {{on "click" this.incrementComments}}>+</button>
+                <button
+                  type="button"
+                  class="counter-btn plus"
+                  {{on "click" this.incrementComments}}
+                >+</button>
               </div>
               <div class="counter-bar">
-                <div class={{this.commentsFillClass}} style={{this.commentsFillStyle}}></div>
+                <div
+                  class={{this.commentsFillClass}}
+                  style={{this.commentsFillStyle}}
+                ></div>
               </div>
-              <div class="counter-status {{this.commentsStatusClass}}">{{this.commentsStatus}}</div>
+              <div
+                class="counter-status {{this.commentsStatusClass}}"
+              >{{this.commentsStatus}}</div>
             </div>
           </div>
 
           <div class="reset-section">
-            <p>Counters auto-reset in: <span class="timer">{{this.timerDisplay}}</span></p>
-            <button type="button" class="reset-btn" {{on "click" this.resetCounters}}>Reset Counters</button>
+            <p>Counters auto-reset in:
+              <span class="timer">{{this.timerDisplay}}</span></p>
+            <button
+              type="button"
+              class="reset-btn"
+              {{on "click" this.resetCounters}}
+            >Reset Counters</button>
           </div>
         </div>
 
         <div class="tips-section">
           <h2>💡 Tips to Avoid Rate Limits</h2>
           <ul>
-            <li><strong>Batch your posts</strong> — Plan content and spread it out over hours</li>
-            <li><strong>Quality over quantity</strong> — One great post beats 5 mediocre ones</li>
-            <li><strong>Use the timer</strong> — Track when your hour resets</li>
-            <li><strong>Focus on ships</strong> — Ship submissions aren't rate-limited</li>
-            <li><strong>Attest instead</strong> — No limit on attestations, +5 tokens each</li>
+            <li><strong>Batch your posts</strong>
+              — Plan content and spread it out over hours</li>
+            <li><strong>Quality over quantity</strong>
+              — One great post beats 5 mediocre ones</li>
+            <li><strong>Use the timer</strong>
+              — Track when your hour resets</li>
+            <li><strong>Focus on ships</strong>
+              — Ship submissions aren't rate-limited</li>
+            <li><strong>Attest instead</strong>
+              — No limit on attestations, +5 tokens each</li>
           </ul>
         </div>
       </main>
 
       <footer>
-        <p class="note">Rate limits from <a href="https://shipyard.bot/docs">Shipyard API Docs</a></p>
+        <p class="note">Rate limits from
+          <a href="https://shipyard.bot/docs">Shipyard API Docs</a></p>
         <p class="footer-credit">
           Made with 🧡 by
-          <a href="https://crunchybananas.github.io" target="_blank" rel="noopener">Cory Loken & Chiron</a>
-          using <a href="https://emberjs.com" target="_blank" rel="noopener">Ember</a>
+          <a
+            href="https://crunchybananas.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Cory Loken & Chiron</a>
+          using
+          <a
+            href="https://emberjs.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Ember</a>
         </p>
       </footer>
     </div>

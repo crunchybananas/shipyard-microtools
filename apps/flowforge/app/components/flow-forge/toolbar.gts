@@ -28,7 +28,7 @@ export default class Toolbar extends Component<ToolbarSignature> {
 
       <div class="toolbar-actions">
         <div class="dropdown">
-          <button class="btn btn-secondary dropdown-trigger">
+          <button class="btn btn-secondary dropdown-trigger" type="button">
             Examples ▾
           </button>
           <div class="dropdown-menu">
