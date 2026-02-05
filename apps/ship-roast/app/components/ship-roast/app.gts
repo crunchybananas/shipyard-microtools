@@ -1,6 +1,5 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
 import { service } from "@ember/service";
 import type AnalyzerService from "ship-roast/services/analyzer";
@@ -24,23 +23,19 @@ export default class ShipRoastApp extends Component {
     return "poor";
   }
 
-  @action
-  updateProofUrl(event: Event): void {
+  updateProofUrl = (event: Event): void => {
     this.proofUrl = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  updateShipTitle(event: Event): void {
+  updateShipTitle = (event: Event): void => {
     this.shipTitle = (event.target as HTMLInputElement).value;
-  }
+  };
 
-  @action
-  updateShipDescription(event: Event): void {
+  updateShipDescription = (event: Event): void => {
     this.shipDescription = (event.target as HTMLTextAreaElement).value;
-  }
+  };
 
-  @action
-  async roastShip(): Promise<void> {
+  roastShip = async (): Promise<void> => {
     if (!this.proofUrl.trim()) {
       alert("Please enter a proof URL");
       return;

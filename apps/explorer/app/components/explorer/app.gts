@@ -2,7 +2,7 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { service } from "@ember/service";
 import { on } from "@ember/modifier";
-import type Owner from "@ember/owner";
+import { modifier } from "ember-modifier";
 import StatsGrid from "./stats-grid";
 import ActivityFeed from "./activity-feed";
 import eq from "explorer/helpers/eq";
@@ -39,22 +39,20 @@ export default class ExplorerApp extends Component {
 
   refreshInterval: ReturnType<typeof setInterval> | null = null;
 
-  constructor(owner: Owner, args: Record<string, never>) {
-    super(owner, args);
+  setup = modifier(() => {
     this.loadData();
 
     // Auto-refresh every 30 seconds
     this.refreshInterval = setInterval(() => {
       this.loadData();
     }, 30000);
-  }
 
-  willDestroy(): void {
-    super.willDestroy();
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
-    }
-  }
+    return () => {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval);
+      }
+    };
+  });
 
   loadData = async (): Promise<void> => {
     await this.shipyardApi.loadData();
@@ -122,7 +120,7 @@ export default class ExplorerApp extends Component {
   };
 
   <template>
-    <div class="container" ...attributes>
+    <div class="container" {{this.setup}} ...attributes>
       <header>
         <h1>🚢 Shipyard Explorer</h1>
         <p class="subtitle">Real-time platform health and activity dashboard</p>

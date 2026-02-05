@@ -1,8 +1,8 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
+import { modifier } from "ember-modifier";
 import { htmlSafe, type SafeString } from "@ember/template";
-import type Owner from "@ember/owner";
 
 const STORAGE_KEY = "shipyard_rate_limits";
 const LIMITS = { posts: 5, comments: 10 };
@@ -25,18 +25,16 @@ export default class RateLimitApp extends Component {
 
   private timerId: number | null = null;
 
-  constructor(owner: Owner, args: Record<string, never>) {
-    super(owner, args);
+  setup = modifier(() => {
     this.loadState();
     this.startTimer();
-  }
 
-  willDestroy(): void {
-    super.willDestroy();
-    if (this.timerId) {
-      clearInterval(this.timerId);
-    }
-  }
+    return () => {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+      }
+    };
+  });
 
   get postsPercent(): number {
     return Math.min((this.posts / LIMITS.posts) * 100, 100);
@@ -226,7 +224,7 @@ export default class RateLimitApp extends Component {
   }
 
   <template>
-    <div class="container">
+    <div class="container" {{this.setup}}>
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>⏱️ Rate Limit Monitor</h1>

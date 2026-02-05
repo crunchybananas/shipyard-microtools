@@ -2,7 +2,6 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
 import { modifier } from "ember-modifier";
-import type Owner from "@ember/owner";
 import {
   type Point,
   initDocks,
@@ -32,10 +31,6 @@ export default class HarborMasterApp extends Component {
   private drawingPath: Point[] = [];
   private lastTime = 0;
   private animationId: number | null = null;
-
-  constructor(owner: Owner, args: Record<string, never>) {
-    super(owner, args);
-  }
 
   setupCanvas = modifier((element: HTMLCanvasElement) => {
     this.canvas = element;

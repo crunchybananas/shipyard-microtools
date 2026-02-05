@@ -1,7 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { service } from "@ember/service";
-import type Owner from "@ember/owner";
+import { modifier } from "ember-modifier";
 
 import NodeCanvas from "./flow-forge/node-canvas";
 import Sidebar from "./flow-forge/sidebar";
@@ -21,10 +21,9 @@ export default class FlowForgeEditor extends Component {
 
   storageKey = "flowforge-state";
 
-  constructor(owner: Owner, args: Record<string, never>) {
-    super(owner, args);
+  setup = modifier(() => {
     this.loadFromStorage();
-  }
+  });
 
   get nodeTypesForPalette(): NodeTypeRef[] {
     return this.flowEngine.nodeTypes.map(toNodeTypeRef);
@@ -192,7 +191,7 @@ export default class FlowForgeEditor extends Component {
   };
 
   <template>
-    <div class="flow-forge-editor" ...attributes>
+    <div class="flow-forge-editor" {{this.setup}} ...attributes>
       <Toolbar
         @onRun={{this.runFlow}}
         @onClear={{this.clearAll}}

@@ -1,6 +1,5 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
 import type { Scene } from "the-island/services/game-state";
 
@@ -87,8 +86,7 @@ export default class SignalDeck extends Component<SignalDeckSignature> {
     return "Resonant";
   }
 
-  @action
-  handleMouseMove(event: MouseEvent): void {
+  handleMouseMove = (event: MouseEvent): void => {
     const target = event.currentTarget as HTMLElement | null;
     if (!target) return;
     const rect = target.getBoundingClientRect();
@@ -96,36 +94,31 @@ export default class SignalDeck extends Component<SignalDeckSignature> {
     const y = ((event.clientY - rect.top) / rect.height) * 100;
     this.cursorX = Math.max(0, Math.min(100, x));
     this.cursorY = Math.max(0, Math.min(100, y));
-  }
+  };
 
-  @action
-  resetCursor(): void {
+  resetCursor = (): void => {
     this.cursorX = 50;
     this.cursorY = 50;
-  }
+  };
 
-  @action
-  updateTide(event: Event): void {
+  updateTide = (event: Event): void => {
     const value = Number((event.target as HTMLInputElement).value);
     this.tide = Number.isFinite(value) ? value : this.tide;
-  }
+  };
 
-  @action
-  updateSky(event: Event): void {
+  updateSky = (event: Event): void => {
     const value = Number((event.target as HTMLInputElement).value);
     this.sky = Number.isFinite(value) ? value : this.sky;
-  }
+  };
 
-  @action
-  updateResonance(event: Event): void {
+  updateResonance = (event: Event): void => {
     const value = Number((event.target as HTMLInputElement).value);
     this.resonance = Number.isFinite(value) ? value : this.resonance;
-  }
+  };
 
-  @action
-  close(): void {
+  close = (): void => {
     this.args.onClose();
-  }
+  };
 
   <template>
     <div

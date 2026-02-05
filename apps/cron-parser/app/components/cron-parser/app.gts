@@ -1,8 +1,8 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
+import { modifier } from "ember-modifier";
 import { fn } from "@ember/helper";
-import type Owner from "@ember/owner";
 
 const FIELDS = ["minute", "hour", "day of month", "month", "day of week"];
 const FIELD_NAMES = ["Minute", "Hour", "Day of Month", "Month", "Day of Week"];
@@ -59,10 +59,9 @@ export default class CronParserApp extends Component {
 
   examples = EXAMPLES;
 
-  constructor(owner: Owner, args: Record<string, never>) {
-    super(owner, args);
+  setup = modifier(() => {
     this.parseCron();
-  }
+  });
 
   updateInput = (event: Event): void => {
     this.cronInput = (event.target as HTMLInputElement).value;
@@ -301,7 +300,7 @@ export default class CronParserApp extends Component {
   }
 
   <template>
-    <div class="container">
+    <div class="container" {{this.setup}}>
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>⏰ Cron Parser</h1>

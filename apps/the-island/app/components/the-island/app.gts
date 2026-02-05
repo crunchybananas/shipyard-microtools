@@ -1,9 +1,8 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { service } from "@ember/service";
-import { action } from "@ember/object";
 import { on } from "@ember/modifier";
-import type Owner from "@ember/owner";
+import { modifier } from "ember-modifier";
 import type GameStateService from "the-island/services/game-state";
 import type AudioEngineService from "the-island/services/audio-engine";
 import {
@@ -35,10 +34,9 @@ export default class TheIslandApp extends Component {
 
   private messageTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(owner: Owner, args: Record<string, never>) {
-    super(owner, args);
+  setup = modifier(() => {
     this.initGame();
-  }
+  });
 
   initGame(): void {
     const loaded = this.gameState.loadGame();
@@ -97,17 +95,15 @@ export default class TheIslandApp extends Component {
     }, 5000);
   }
 
-  @action
-  initializeAudio(): void {
+  initializeAudio = (): void => {
     if (!this.audioInitialized) {
       this.audioEngine.initAudio();
       this.audioEngine.playAmbient(this.currentScene.ambient);
       this.audioInitialized = true;
     }
-  }
+  };
 
-  @action
-  handleSceneClick(event: MouseEvent): void {
+  handleSceneClick = (event: MouseEvent): void => {
     // Initialize audio on first click
     this.initializeAudio();
 
@@ -191,14 +187,13 @@ export default class TheIslandApp extends Component {
     this.audioEngine.playSound("pickup");
   }
 
-  @action
-  examineItem(itemId: string): void {
+  examineItem = (itemId: string): void => {
     const item = ITEMS[itemId];
     if (item) {
       this.showMessage(`${item.name}: ${item.description}`);
       this.audioEngine.playSound("click");
     }
-  }
+  };
 
   useItem(target: string): void {
     // Context-specific item use
@@ -259,15 +254,14 @@ export default class TheIslandApp extends Component {
     }
   }
 
-  @action
-  rotateMirror(index: number): void {
+  rotateMirror = (index: number): void => {
     this.gameState.rotateMirror(index);
     this.audioEngine.playSound("mirror");
 
     if (this.gameState.checkMirrorSolution()) {
       this.solveMirrorPuzzle();
     }
-  }
+  };
 
   solveMirrorPuzzle(): void {
     if (this.gameState.isPuzzleSolved("lighthouse")) return;
@@ -283,23 +277,19 @@ export default class TheIslandApp extends Component {
     }, 1000);
   }
 
-  @action
-  closePuzzle(): void {
+  closePuzzle = (): void => {
     this.showMirrorPuzzle = false;
-  }
+  };
 
-  @action
-  openSignalDeck(): void {
+  openSignalDeck = (): void => {
     this.showSignalDeck = true;
-  }
+  };
 
-  @action
-  closeSignalDeck(): void {
+  closeSignalDeck = (): void => {
     this.showSignalDeck = false;
-  }
+  };
 
-  @action
-  navigate(direction: Direction): void {
+  navigate = (direction: Direction): void => {
     this.initializeAudio();
 
     const scene = SCENES[this.gameState.currentScene];
@@ -343,24 +333,21 @@ export default class TheIslandApp extends Component {
     this.showMessage(scene.description);
   }
 
-  @action
-  saveGame(): void {
+  saveGame = (): void => {
     this.gameState.saveGame();
     this.showMessage("Game saved.");
-  }
+  };
 
-  @action
-  loadGame(): void {
+  loadGame = (): void => {
     if (this.gameState.loadGame()) {
       this.showMessage("Game loaded.");
       this.audioEngine.playAmbient(this.currentScene.ambient);
     } else {
       this.showMessage("No saved game found.");
     }
-  }
+  };
 
-  @action
-  newGame(): void {
+  newGame = (): void => {
     // eslint-disable-next-line no-alert
     if (confirm("Start a new game? Your progress will be lost.")) {
       this.gameState.resetGame();
@@ -372,7 +359,7 @@ export default class TheIslandApp extends Component {
   }
 
   <template>
-    <div class={{this.wrapperClass}}>
+    <div class={{this.wrapperClass}} {{this.setup}}>
       {{! Header }}
       <header class="game-header">
         <h1 class="game-title">THE ISLAND</h1>

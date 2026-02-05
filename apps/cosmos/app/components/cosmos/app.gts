@@ -1,7 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
-import type Owner from "@ember/owner";
+import { modifier } from "ember-modifier";
 import InfoPanel from "cosmos/components/cosmos/info-panel";
 import BookmarksModal from "cosmos/components/cosmos/bookmarks-modal";
 import {
@@ -64,11 +64,6 @@ export default class CosmosApp extends Component {
   private cachedStars: Star[] = [];
   private cachedSystem: CachedSystem | null = null;
 
-  constructor(owner: Owner, args: CosmosAppSignature["Args"]) {
-    super(owner, args);
-    this.checkUrlParams();
-  }
-
   private checkUrlParams(): void {
     const params = new URLSearchParams(window.location.search);
     if (params.has("coords")) {
@@ -84,21 +79,21 @@ export default class CosmosApp extends Component {
     }
   }
 
-  setupCanvas = (element: HTMLCanvasElement): void => {
+  setupCanvas = modifier((element: HTMLCanvasElement) => {
+    this.checkUrlParams();
     this.canvas = element;
     this.ctx = element.getContext("2d");
     this.resizeCanvas();
     window.addEventListener("resize", this.resizeCanvas);
     this.startRenderLoop();
-  };
 
-  willDestroy(): void {
-    super.willDestroy();
-    window.removeEventListener("resize", this.resizeCanvas);
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-    }
-  }
+    return () => {
+      window.removeEventListener("resize", this.resizeCanvas);
+      if (this.animationId !== null) {
+        cancelAnimationFrame(this.animationId);
+      }
+    };
+  });
 
   private resizeCanvas = (): void => {
     if (this.canvas) {
@@ -772,7 +767,7 @@ export default class CosmosApp extends Component {
       {{! template-lint-disable no-invalid-interactive no-pointer-down-event-binding }}
       <canvas
         class="cosmos-canvas {{if this.isDragging 'grabbing'}}"
-        {{this.registerCanvas}}
+        {{this.setupCanvas}}
         {{on "wheel" this.handleWheel}}
         {{on "mousedown" this.handleMouseDown}}
         {{on "mousemove" this.handleMouseMove}}
@@ -818,8 +813,4 @@ export default class CosmosApp extends Component {
       {{/if}}
     </div>
   </template>
-
-  registerCanvas = (element: HTMLCanvasElement): void => {
-    this.setupCanvas(element);
-  };
 }
