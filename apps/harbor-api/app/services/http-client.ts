@@ -257,9 +257,3 @@ export default class HttpClientService extends Service {
     }
   }
 }
-
-declare module "@ember/service" {
-  interface Registry {
-    "http-client": HttpClientService;
-  }
-}
