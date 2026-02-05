@@ -125,6 +125,18 @@ Health check your ship's configuration.
 
 ## 🛠️ Developer Tools
 
+### Harbor API ⚓ 🆕
+Hoppscotch-style API client built with pure Ember modifiers — zero wrapper addons.
+
+| | Ember |
+|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/harbor-api/) |
+| **Source** | `apps/harbor-api/` |
+
+**Features:** Tabbed requests, CodeMirror 6 body/response editor, Chart.js response time sparkline, environments with variable interpolation, request history
+
+**Tech:** CodeMirror 6, Chart.js — both wired via `ember-modifier`, no wrapper addons
+
 ### JSON Formatter
 Pretty-print and validate JSON with syntax highlighting.
 

@@ -976,6 +976,35 @@ export class GameEngine {
     this.onStateChange?.();
   }
 
+  // Wall collision - check if position is inside any valid corridor
+  private isValidPosition(x: number, z: number): boolean {
+    const PLAYER_RADIUS = 0.5;
+    const HALF_WIDTH = CORRIDOR_WIDTH / 2 - PLAYER_RADIUS;
+
+    // Define corridor bounds (matching generateCorridors)
+    const corridors = [
+      // Main corridor (north-south) at x=0
+      { minX: -HALF_WIDTH, maxX: HALF_WIDTH, minZ: -30, maxZ: 30 },
+      // Side corridor at z=20 (east-west)
+      { minX: -20, maxX: 20, minZ: 20 - HALF_WIDTH, maxZ: 20 + HALF_WIDTH },
+      // Side corridor at z=-20 (east-west)
+      { minX: -20, maxX: 20, minZ: -20 - HALF_WIDTH, maxZ: -20 + HALF_WIDTH },
+      // East corridor at x=20 (north-south)
+      { minX: 20 - HALF_WIDTH, maxX: 20 + HALF_WIDTH, minZ: -25, maxZ: 25 },
+      // West corridor at x=-20 (north-south)
+      { minX: -20 - HALF_WIDTH, maxX: -20 + HALF_WIDTH, minZ: -25, maxZ: 25 },
+    ];
+
+    // Check if position is inside any corridor
+    for (const c of corridors) {
+      if (x >= c.minX && x <= c.maxX && z >= c.minZ && z <= c.maxZ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private updateEnemies(delta: number): void {
     for (const enemy of this.enemies) {
       if (!enemy.mesh) continue;
@@ -1103,8 +1132,22 @@ export class GameEngine {
     const moveX = moveDir.x * cos - moveDir.z * sin;
     const moveZ = moveDir.x * sin + moveDir.z * cos;
 
-    this.player.position.x += moveX * PLAYER_SPEED * delta;
-    this.player.position.z += moveZ * PLAYER_SPEED * delta;
+    // Calculate new position
+    const newX = this.player.position.x + moveX * PLAYER_SPEED * delta;
+    const newZ = this.player.position.z + moveZ * PLAYER_SPEED * delta;
+
+    // Wall collision detection - check against corridor bounds
+    if (this.isValidPosition(newX, newZ)) {
+      this.player.position.x = newX;
+      this.player.position.z = newZ;
+    } else {
+      // Try sliding along walls
+      if (this.isValidPosition(newX, this.player.position.z)) {
+        this.player.position.x = newX;
+      } else if (this.isValidPosition(this.player.position.x, newZ)) {
+        this.player.position.z = newZ;
+      }
+    }
 
     // Jump & Gravity
     if (this.input.jump && this.player.onGround) {
