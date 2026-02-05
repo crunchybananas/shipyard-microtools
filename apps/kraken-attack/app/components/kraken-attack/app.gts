@@ -51,6 +51,8 @@ export default class KrakenAttackApp extends Component {
     this.gameEngine.startGame();
     this.lastTime = performance.now();
     this.gameLoop(this.lastTime);
+    // Ensure canvas has focus for keyboard input
+    this.canvasElement?.focus();
   };
 
   gameLoop = (timestamp: number): void => {

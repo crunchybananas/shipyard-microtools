@@ -392,6 +392,31 @@ export default class GameEngineService extends Service {
       }
     }
 
+    // Bullets vs crates (penalty for destroying cargo!)
+    for (const b of this.bullets) {
+      for (const c of this.crates) {
+        if (
+          this.circleRect(
+            b.x,
+            b.y,
+            b.radius,
+            c.x - c.size / 2,
+            c.y - c.size / 2,
+            c.size,
+            c.size,
+          )
+        ) {
+          b.dead = true;
+          c.dead = true;
+          this.score = Math.max(0, this.score - 50);
+          // Red particles to show it was bad
+          for (let i = 0; i < 8; i++) {
+            this.particles.push(this.createParticle(c.x, c.y, "#ef4444"));
+          }
+        }
+      }
+    }
+
     // Player vs rocks
     for (const r of this.rocks) {
       if (
