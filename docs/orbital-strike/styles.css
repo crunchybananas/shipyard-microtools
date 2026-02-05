@@ -1,0 +1,446 @@
+/* Orbital Strike - Marathon-inspired FPS */
+
+:root {
+  --bg: #050508;
+  --text: #00ff88;
+  --text-dim: #006644;
+  --accent: #ff3366;
+  --accent2: #3366ff;
+  --hud-bg: rgba(0, 20, 10, 0.7);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Courier New', monospace;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  cursor: none;
+}
+
+.game-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.back-link {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.8rem;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.back-link:hover { color: var(--text); }
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Overlays */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 5, 8, 0.95);
+  z-index: 100;
+}
+
+.game-title {
+  font-size: 4rem;
+  font-weight: bold;
+  letter-spacing: 0.5em;
+  color: var(--text);
+  text-shadow: 0 0 30px var(--text), 0 0 60px var(--text);
+  animation: pulse 2s infinite;
+}
+
+.game-subtitle {
+  font-size: 1.2rem;
+  letter-spacing: 0.3em;
+  color: var(--text-dim);
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+.start-button {
+  padding: 15px 50px;
+  font-family: inherit;
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  background: transparent;
+  border: 2px solid var(--text);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.start-button:hover {
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: 0 0 30px var(--text);
+}
+
+.controls-hint {
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 2;
+}
+
+kbd {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 0 2px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--text-dim);
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.game-over-title {
+  font-size: 3rem;
+  color: var(--accent);
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 30px var(--accent);
+  margin-bottom: 20px;
+}
+
+.final-score {
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 40px;
+  text-align: center;
+  line-height: 2;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* HUD */
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Crosshair */
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.crosshair-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--text);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--text);
+}
+
+/* Wave Info */
+.wave-info {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.wave-number {
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  color: var(--text-dim);
+}
+
+.wave-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text);
+  text-shadow: 0 0 20px var(--text);
+}
+
+.enemies-remaining {
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-top: 5px;
+}
+
+/* Radar */
+.radar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 120px;
+  height: 120px;
+  background: var(--hud-bg);
+  border: 2px solid var(--text);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.radar-sweep {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--text), transparent);
+  transform-origin: left center;
+  animation: sweep 2s linear infinite;
+}
+
+.radar-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: var(--text);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.radar-blip {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: blink 0.5s infinite;
+}
+
+@keyframes sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Health Bar */
+.health-bar {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.health-icon { font-size: 1.5rem; }
+
+.health-track {
+  width: 200px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--text);
+  overflow: hidden;
+}
+
+.health-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--text));
+  transition: width 0.3s;
+}
+
+.health-text {
+  font-size: 1.2rem;
+  min-width: 40px;
+}
+
+/* Ammo Display */
+.ammo-display {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  text-align: right;
+}
+
+.weapon-name {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+}
+
+.ammo-count {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text);
+  text-shadow: 0 0 20px var(--text);
+}
+
+.ammo-reserve {
+  font-size: 1rem;
+  color: var(--text-dim);
+}
+
+.weapon-icon {
+  position: absolute;
+  bottom: 100px;
+  right: 30px;
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+/* Pickup Notification */
+.pickup-notification {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: var(--text);
+  text-shadow: 0 0 20px var(--text);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.pickup-notification.visible {
+  opacity: 1;
+}
+
+/* Damage Flash */
+.damage-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+
+.damage-flash.active {
+  opacity: 0.3;
+}
+
+/* Scanlines */
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+}
+
+/* Vignette */
+.vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+  pointer-events: none;
+}
+
+/* Terminal Overlay */
+.terminal-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  max-width: 90%;
+  background: rgba(0, 20, 10, 0.95);
+  border: 2px solid var(--text);
+  z-index: 200;
+  pointer-events: auto;
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--text-dim);
+}
+
+.terminal-title {
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  color: var(--text);
+}
+
+.terminal-close {
+  background: none;
+  border: 1px solid var(--text-dim);
+  color: var(--text-dim);
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.terminal-close:hover {
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.terminal-content {
+  padding: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.terminal-text {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  color: var(--text);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-dim);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text);
+}

@@ -359,6 +359,290 @@ importers:
         specifier: 'catalog:'
         version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
 
+  apps/challenge-arena:
+    dependencies:
+      '@ember/string':
+        specifier: ^4.0.1
+        version: 4.0.1
+      ember-modifier:
+        specifier: ^4.2.2
+        version: 4.3.0(@babel/core@7.28.5)
+    devDependencies:
+      '@babel/core':
+        specifier: 7.28.5
+        version: 7.28.5
+      '@babel/eslint-parser':
+        specifier: ^7.28.4
+        version: 7.28.6(@babel/core@7.28.5)(eslint@9.39.2(jiti@2.4.2))
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.28.0
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.28.3
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-typescript':
+        specifier: ^7.28.0
+        version: 7.28.6(@babel/core@7.28.5)
+      '@ember/optional-features':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@ember/test-helpers':
+        specifier: 'catalog:'
+        version: 5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3)
+      '@embroider/compat':
+        specifier: ^4.1.12
+        version: 4.1.12(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)
+      '@embroider/config-meta-loader':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@embroider/core':
+        specifier: ^4.4.2
+        version: 4.4.2(@glint/template@1.7.3)
+      '@embroider/vite':
+        specifier: 1.5.0
+        version: 1.5.0(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)(rollup@4.57.1)(vite@7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0))
+      '@glimmer/component':
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@glimmer/tracking':
+        specifier: ^1.1.2
+        version: 1.1.2
+      '@glint/ember-tsc':
+        specifier: catalog:glint
+        version: 1.0.8(typescript@5.9.3)
+      '@glint/template':
+        specifier: 1.7.3
+        version: 1.7.3
+      '@glint/tsserver-plugin':
+        specifier: catalog:glint
+        version: 2.0.8
+      '@rollup/plugin-babel':
+        specifier: ^6.1.0
+        version: 6.1.0(@babel/core@7.28.5)(rollup@4.57.1)
+      '@types/qunit':
+        specifier: ^2.19.13
+        version: 2.19.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.46.1
+        version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.46.1
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      babel-plugin-ember-template-compilation:
+        specifier: ^2.4.1
+        version: 2.4.1
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.1
+      decorator-transforms:
+        specifier: ^2.3.0
+        version: 2.3.1(@babel/core@7.28.5)
+      ember-cli:
+        specifier: 'catalog:'
+        version: 6.9.1(@types/node@25.2.0)(handlebars@4.7.8)(underscore@1.13.7)
+      ember-cli-babel:
+        specifier: ^8.2.0
+        version: 8.3.1(@babel/core@7.28.5)
+      ember-load-initializers:
+        specifier: ^3.0.1
+        version: 3.0.1(ember-source@6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5))
+      ember-qunit:
+        specifier: ^9.0.4
+        version: 9.0.4(@babel/core@7.28.5)(@ember/test-helpers@5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3))(@glint/template@1.7.3)(qunit@2.25.0)
+      ember-resolver:
+        specifier: ^13.1.1
+        version: 13.1.1(@babel/core@7.28.5)
+      ember-source:
+        specifier: 6.10.0
+        version: 6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5)
+      ember-template-lint:
+        specifier: catalog:glint
+        version: 7.9.3
+      eslint:
+        specifier: catalog:lint
+        version: 9.39.2(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: catalog:lint
+        version: 9.1.2(eslint@9.39.2(jiti@2.4.2))
+      eslint-plugin-ember:
+        specifier: catalog:lint
+        version: 12.7.5(@babel/core@7.28.5)(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.5(@types/eslint@8.56.12)(eslint-config-prettier@9.1.2(eslint@9.39.2(jiti@2.4.2)))(eslint@9.39.2(jiti@2.4.2))(prettier@3.8.1)
+      globals:
+        specifier: ^15.15.0
+        version: 15.15.0
+      loader.js:
+        specifier: ^4.7.0
+        version: 4.7.0
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      prettier-plugin-ember-template-tag:
+        specifier: ^2.1.1
+        version: 2.1.3(prettier@3.8.1)
+      qunit:
+        specifier: ^2.24.1
+        version: 2.25.0
+      qunit-dom:
+        specifier: ^3.4.1
+        version: 3.5.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.54.0
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
+
+  apps/chronicle:
+    dependencies:
+      '@ember/string':
+        specifier: ^4.0.1
+        version: 4.0.1
+      ember-modifier:
+        specifier: ^4.2.2
+        version: 4.3.0(@babel/core@7.28.5)
+    devDependencies:
+      '@babel/core':
+        specifier: 7.28.5
+        version: 7.28.5
+      '@babel/eslint-parser':
+        specifier: ^7.28.4
+        version: 7.28.6(@babel/core@7.28.5)(eslint@9.39.2(jiti@2.4.2))
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.28.0
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.28.3
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-typescript':
+        specifier: ^7.28.0
+        version: 7.28.6(@babel/core@7.28.5)
+      '@ember/optional-features':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@ember/test-helpers':
+        specifier: 'catalog:'
+        version: 5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3)
+      '@embroider/compat':
+        specifier: ^4.1.12
+        version: 4.1.12(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)
+      '@embroider/config-meta-loader':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@embroider/core':
+        specifier: ^4.4.2
+        version: 4.4.2(@glint/template@1.7.3)
+      '@embroider/vite':
+        specifier: 1.5.0
+        version: 1.5.0(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)(rollup@4.57.1)(vite@7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0))
+      '@glimmer/component':
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@glimmer/tracking':
+        specifier: ^1.1.2
+        version: 1.1.2
+      '@glint/ember-tsc':
+        specifier: catalog:glint
+        version: 1.0.8(typescript@5.9.3)
+      '@glint/template':
+        specifier: 1.7.3
+        version: 1.7.3
+      '@glint/tsserver-plugin':
+        specifier: catalog:glint
+        version: 2.0.8
+      '@rollup/plugin-babel':
+        specifier: ^6.1.0
+        version: 6.1.0(@babel/core@7.28.5)(rollup@4.57.1)
+      '@types/qunit':
+        specifier: ^2.19.13
+        version: 2.19.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.46.1
+        version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.46.1
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      babel-plugin-ember-template-compilation:
+        specifier: ^2.4.1
+        version: 2.4.1
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.1
+      decorator-transforms:
+        specifier: ^2.3.0
+        version: 2.3.1(@babel/core@7.28.5)
+      ember-cli:
+        specifier: 'catalog:'
+        version: 6.9.1(@types/node@25.2.0)(handlebars@4.7.8)(underscore@1.13.7)
+      ember-cli-babel:
+        specifier: ^8.2.0
+        version: 8.3.1(@babel/core@7.28.5)
+      ember-load-initializers:
+        specifier: ^3.0.1
+        version: 3.0.1(ember-source@6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5))
+      ember-qunit:
+        specifier: ^9.0.4
+        version: 9.0.4(@babel/core@7.28.5)(@ember/test-helpers@5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3))(@glint/template@1.7.3)(qunit@2.25.0)
+      ember-resolver:
+        specifier: ^13.1.1
+        version: 13.1.1(@babel/core@7.28.5)
+      ember-source:
+        specifier: 6.10.0
+        version: 6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5)
+      ember-template-lint:
+        specifier: catalog:glint
+        version: 7.9.3
+      eslint:
+        specifier: catalog:lint
+        version: 9.39.2(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: catalog:lint
+        version: 9.1.2(eslint@9.39.2(jiti@2.4.2))
+      eslint-plugin-ember:
+        specifier: catalog:lint
+        version: 12.7.5(@babel/core@7.28.5)(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.5(@types/eslint@8.56.12)(eslint-config-prettier@9.1.2(eslint@9.39.2(jiti@2.4.2)))(eslint@9.39.2(jiti@2.4.2))(prettier@3.8.1)
+      globals:
+        specifier: ^15.15.0
+        version: 15.15.0
+      loader.js:
+        specifier: ^4.7.0
+        version: 4.7.0
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      prettier-plugin-ember-template-tag:
+        specifier: ^2.1.1
+        version: 2.1.3(prettier@3.8.1)
+      qunit:
+        specifier: ^2.24.1
+        version: 2.25.0
+      qunit-dom:
+        specifier: ^3.4.1
+        version: 3.5.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.54.0
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
+
   apps/cosmos:
     dependencies:
       '@ember/string':
@@ -1930,6 +2214,290 @@ importers:
         specifier: 'catalog:'
         version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
 
+  apps/orbital-strike:
+    dependencies:
+      '@ember/string':
+        specifier: ^4.0.1
+        version: 4.0.1
+      ember-modifier:
+        specifier: ^4.2.2
+        version: 4.3.0(@babel/core@7.28.5)
+    devDependencies:
+      '@babel/core':
+        specifier: 7.28.5
+        version: 7.28.5
+      '@babel/eslint-parser':
+        specifier: ^7.28.4
+        version: 7.28.6(@babel/core@7.28.5)(eslint@9.39.2(jiti@2.4.2))
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.28.0
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.28.3
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-typescript':
+        specifier: ^7.28.0
+        version: 7.28.6(@babel/core@7.28.5)
+      '@ember/optional-features':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@ember/test-helpers':
+        specifier: 'catalog:'
+        version: 5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3)
+      '@embroider/compat':
+        specifier: ^4.1.12
+        version: 4.1.12(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)
+      '@embroider/config-meta-loader':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@embroider/core':
+        specifier: ^4.4.2
+        version: 4.4.2(@glint/template@1.7.3)
+      '@embroider/vite':
+        specifier: 1.5.0
+        version: 1.5.0(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)(rollup@4.57.1)(vite@7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0))
+      '@glimmer/component':
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@glimmer/tracking':
+        specifier: ^1.1.2
+        version: 1.1.2
+      '@glint/ember-tsc':
+        specifier: catalog:glint
+        version: 1.0.8(typescript@5.9.3)
+      '@glint/template':
+        specifier: 1.7.3
+        version: 1.7.3
+      '@glint/tsserver-plugin':
+        specifier: catalog:glint
+        version: 2.0.8
+      '@rollup/plugin-babel':
+        specifier: ^6.1.0
+        version: 6.1.0(@babel/core@7.28.5)(rollup@4.57.1)
+      '@types/qunit':
+        specifier: ^2.19.13
+        version: 2.19.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.46.1
+        version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.46.1
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      babel-plugin-ember-template-compilation:
+        specifier: ^2.4.1
+        version: 2.4.1
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.1
+      decorator-transforms:
+        specifier: ^2.3.0
+        version: 2.3.1(@babel/core@7.28.5)
+      ember-cli:
+        specifier: 'catalog:'
+        version: 6.9.1(@types/node@25.2.0)(handlebars@4.7.8)(underscore@1.13.7)
+      ember-cli-babel:
+        specifier: ^8.2.0
+        version: 8.3.1(@babel/core@7.28.5)
+      ember-load-initializers:
+        specifier: ^3.0.1
+        version: 3.0.1(ember-source@6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5))
+      ember-qunit:
+        specifier: ^9.0.4
+        version: 9.0.4(@babel/core@7.28.5)(@ember/test-helpers@5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3))(@glint/template@1.7.3)(qunit@2.25.0)
+      ember-resolver:
+        specifier: ^13.1.1
+        version: 13.1.1(@babel/core@7.28.5)
+      ember-source:
+        specifier: 6.10.0
+        version: 6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5)
+      ember-template-lint:
+        specifier: catalog:glint
+        version: 7.9.3
+      eslint:
+        specifier: catalog:lint
+        version: 9.39.2(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: catalog:lint
+        version: 9.1.2(eslint@9.39.2(jiti@2.4.2))
+      eslint-plugin-ember:
+        specifier: catalog:lint
+        version: 12.7.5(@babel/core@7.28.5)(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.5(@types/eslint@8.56.12)(eslint-config-prettier@9.1.2(eslint@9.39.2(jiti@2.4.2)))(eslint@9.39.2(jiti@2.4.2))(prettier@3.8.1)
+      globals:
+        specifier: ^15.15.0
+        version: 15.15.0
+      loader.js:
+        specifier: ^4.7.0
+        version: 4.7.0
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      prettier-plugin-ember-template-tag:
+        specifier: ^2.1.1
+        version: 2.1.3(prettier@3.8.1)
+      qunit:
+        specifier: ^2.24.1
+        version: 2.25.0
+      qunit-dom:
+        specifier: ^3.4.1
+        version: 3.5.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.54.0
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
+
+  apps/proof-insights:
+    dependencies:
+      '@ember/string':
+        specifier: ^4.0.1
+        version: 4.0.1
+      ember-modifier:
+        specifier: ^4.2.2
+        version: 4.3.0(@babel/core@7.28.5)
+    devDependencies:
+      '@babel/core':
+        specifier: 7.28.5
+        version: 7.28.5
+      '@babel/eslint-parser':
+        specifier: ^7.28.4
+        version: 7.28.6(@babel/core@7.28.5)(eslint@9.39.2(jiti@2.4.2))
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.28.0
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.28.3
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-typescript':
+        specifier: ^7.28.0
+        version: 7.28.6(@babel/core@7.28.5)
+      '@ember/optional-features':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@ember/test-helpers':
+        specifier: 'catalog:'
+        version: 5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3)
+      '@embroider/compat':
+        specifier: ^4.1.12
+        version: 4.1.12(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)
+      '@embroider/config-meta-loader':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@embroider/core':
+        specifier: ^4.4.2
+        version: 4.4.2(@glint/template@1.7.3)
+      '@embroider/vite':
+        specifier: 1.5.0
+        version: 1.5.0(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)(rollup@4.57.1)(vite@7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0))
+      '@glimmer/component':
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@glimmer/tracking':
+        specifier: ^1.1.2
+        version: 1.1.2
+      '@glint/ember-tsc':
+        specifier: catalog:glint
+        version: 1.0.8(typescript@5.9.3)
+      '@glint/template':
+        specifier: 1.7.3
+        version: 1.7.3
+      '@glint/tsserver-plugin':
+        specifier: catalog:glint
+        version: 2.0.8
+      '@rollup/plugin-babel':
+        specifier: ^6.1.0
+        version: 6.1.0(@babel/core@7.28.5)(rollup@4.57.1)
+      '@types/qunit':
+        specifier: ^2.19.13
+        version: 2.19.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.46.1
+        version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.46.1
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      babel-plugin-ember-template-compilation:
+        specifier: ^2.4.1
+        version: 2.4.1
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.1
+      decorator-transforms:
+        specifier: ^2.3.0
+        version: 2.3.1(@babel/core@7.28.5)
+      ember-cli:
+        specifier: 'catalog:'
+        version: 6.9.1(@types/node@25.2.0)(handlebars@4.7.8)(underscore@1.13.7)
+      ember-cli-babel:
+        specifier: ^8.2.0
+        version: 8.3.1(@babel/core@7.28.5)
+      ember-load-initializers:
+        specifier: ^3.0.1
+        version: 3.0.1(ember-source@6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5))
+      ember-qunit:
+        specifier: ^9.0.4
+        version: 9.0.4(@babel/core@7.28.5)(@ember/test-helpers@5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3))(@glint/template@1.7.3)(qunit@2.25.0)
+      ember-resolver:
+        specifier: ^13.1.1
+        version: 13.1.1(@babel/core@7.28.5)
+      ember-source:
+        specifier: 6.10.0
+        version: 6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5)
+      ember-template-lint:
+        specifier: catalog:glint
+        version: 7.9.3
+      eslint:
+        specifier: catalog:lint
+        version: 9.39.2(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: catalog:lint
+        version: 9.1.2(eslint@9.39.2(jiti@2.4.2))
+      eslint-plugin-ember:
+        specifier: catalog:lint
+        version: 12.7.5(@babel/core@7.28.5)(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.5(@types/eslint@8.56.12)(eslint-config-prettier@9.1.2(eslint@9.39.2(jiti@2.4.2)))(eslint@9.39.2(jiti@2.4.2))(prettier@3.8.1)
+      globals:
+        specifier: ^15.15.0
+        version: 15.15.0
+      loader.js:
+        specifier: ^4.7.0
+        version: 4.7.0
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      prettier-plugin-ember-template-tag:
+        specifier: ^2.1.1
+        version: 2.1.3(prettier@3.8.1)
+      qunit:
+        specifier: ^2.24.1
+        version: 2.25.0
+      qunit-dom:
+        specifier: ^3.4.1
+        version: 3.5.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.54.0
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
+
   apps/rate-limit:
     dependencies:
       '@ember/string':
@@ -2073,6 +2641,148 @@ importers:
         version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
 
   apps/ship-diagnostics:
+    dependencies:
+      '@ember/string':
+        specifier: ^4.0.1
+        version: 4.0.1
+      ember-modifier:
+        specifier: ^4.2.2
+        version: 4.3.0(@babel/core@7.28.5)
+    devDependencies:
+      '@babel/core':
+        specifier: 7.28.5
+        version: 7.28.5
+      '@babel/eslint-parser':
+        specifier: ^7.28.4
+        version: 7.28.6(@babel/core@7.28.5)(eslint@9.39.2(jiti@2.4.2))
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.28.0
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.28.3
+        version: 7.29.0(@babel/core@7.28.5)
+      '@babel/plugin-transform-typescript':
+        specifier: ^7.28.0
+        version: 7.28.6(@babel/core@7.28.5)
+      '@ember/optional-features':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@ember/test-helpers':
+        specifier: 'catalog:'
+        version: 5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3)
+      '@embroider/compat':
+        specifier: ^4.1.12
+        version: 4.1.12(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)
+      '@embroider/config-meta-loader':
+        specifier: ^1.0.0
+        version: 1.0.0
+      '@embroider/core':
+        specifier: ^4.4.2
+        version: 4.4.2(@glint/template@1.7.3)
+      '@embroider/vite':
+        specifier: 1.5.0
+        version: 1.5.0(@embroider/core@4.4.2(@glint/template@1.7.3))(@glint/template@1.7.3)(rollup@4.57.1)(vite@7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0))
+      '@glimmer/component':
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@glimmer/tracking':
+        specifier: ^1.1.2
+        version: 1.1.2
+      '@glint/ember-tsc':
+        specifier: catalog:glint
+        version: 1.0.8(typescript@5.9.3)
+      '@glint/template':
+        specifier: 1.7.3
+        version: 1.7.3
+      '@glint/tsserver-plugin':
+        specifier: catalog:glint
+        version: 2.0.8
+      '@rollup/plugin-babel':
+        specifier: ^6.1.0
+        version: 6.1.0(@babel/core@7.28.5)(rollup@4.57.1)
+      '@types/qunit':
+        specifier: ^2.19.13
+        version: 2.19.13
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.46.1
+        version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.46.1
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      babel-plugin-ember-template-compilation:
+        specifier: ^2.4.1
+        version: 2.4.1
+      concurrently:
+        specifier: ^9.2.1
+        version: 9.2.1
+      decorator-transforms:
+        specifier: ^2.3.0
+        version: 2.3.1(@babel/core@7.28.5)
+      ember-cli:
+        specifier: 'catalog:'
+        version: 6.9.1(@types/node@25.2.0)(handlebars@4.7.8)(underscore@1.13.7)
+      ember-cli-babel:
+        specifier: ^8.2.0
+        version: 8.3.1(@babel/core@7.28.5)
+      ember-load-initializers:
+        specifier: ^3.0.1
+        version: 3.0.1(ember-source@6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5))
+      ember-qunit:
+        specifier: ^9.0.4
+        version: 9.0.4(@babel/core@7.28.5)(@ember/test-helpers@5.4.1(@babel/core@7.28.5)(@glint/template@1.7.3))(@glint/template@1.7.3)(qunit@2.25.0)
+      ember-resolver:
+        specifier: ^13.1.1
+        version: 13.1.1(@babel/core@7.28.5)
+      ember-source:
+        specifier: 6.10.0
+        version: 6.10.0(@glimmer/component@2.0.0)(rsvp@4.8.5)
+      ember-template-lint:
+        specifier: catalog:glint
+        version: 7.9.3
+      eslint:
+        specifier: catalog:lint
+        version: 9.39.2(jiti@2.4.2)
+      eslint-config-prettier:
+        specifier: catalog:lint
+        version: 9.1.2(eslint@9.39.2(jiti@2.4.2))
+      eslint-plugin-ember:
+        specifier: catalog:lint
+        version: 12.7.5(@babel/core@7.28.5)(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3))(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      eslint-plugin-prettier:
+        specifier: ^5.5.4
+        version: 5.5.5(@types/eslint@8.56.12)(eslint-config-prettier@9.1.2(eslint@9.39.2(jiti@2.4.2)))(eslint@9.39.2(jiti@2.4.2))(prettier@3.8.1)
+      globals:
+        specifier: ^15.15.0
+        version: 15.15.0
+      loader.js:
+        specifier: ^4.7.0
+        version: 4.7.0
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      prettier-plugin-ember-template-tag:
+        specifier: ^2.1.1
+        version: 2.1.3(prettier@3.8.1)
+      qunit:
+        specifier: ^2.24.1
+        version: 2.25.0
+      qunit-dom:
+        specifier: ^3.4.1
+        version: 3.5.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.54.0
+        version: 8.54.0(eslint@9.39.2(jiti@2.4.2))(typescript@5.9.3)
+      vite:
+        specifier: 'catalog:'
+        version: 7.2.4(@types/node@25.2.0)(jiti@2.4.2)(terser@5.46.0)
+
+  apps/ship-forecast:
     dependencies:
       '@ember/string':
         specifier: ^4.0.1

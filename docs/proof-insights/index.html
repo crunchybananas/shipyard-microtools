@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proof Insights</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>📊 Proof Insights</h1>
+        <p class="subtitle">Personal analytics dashboard for your proof patterns.</p>
+      </header>
+
+      <div class="tabs" id="tabs">
+        <button type="button" class="tab active" data-tab="overview">📊 Overview</button>
+        <button type="button" class="tab" data-tab="skills">🎯 Skills</button>
+        <button type="button" class="tab" data-tab="patterns">📅 Patterns</button>
+        <button type="button" class="tab" data-tab="portfolio">📋 Portfolio</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="tab-overview" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalProofs">0</div>
+            <div class="stat-label">Total Proofs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="skillAreas">0</div>
+            <div class="stat-label">Skill Areas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="insightsCount">0</div>
+            <div class="stat-label">Insights</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Proof Types</h3>
+          <div class="proof-types" id="proofTypes"></div>
+        </div>
+
+        <div class="card">
+          <h3>Insights</h3>
+          <div class="insights-list" id="insightsList"></div>
+        </div>
+      </div>
+
+      <!-- Skills Tab -->
+      <div id="tab-skills" class="tab-content">
+        <div class="card">
+          <h3>Skills Radar</h3>
+          <div class="skills-container">
+            <div class="radar-chart">
+              <canvas id="radarCanvas" width="300" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Skill Breakdown</h3>
+          <div class="proof-types" id="skillBreakdown"></div>
+        </div>
+      </div>
+
+      <!-- Patterns Tab -->
+      <div id="tab-patterns" class="tab-content">
+        <div class="card">
+          <h3>Activity Heatmap</h3>
+          <p class="heatmap-desc">When you ship proofs (based on timestamp data)</p>
+          <div class="heatmap" id="heatmap"></div>
+        </div>
+
+        <div class="card">
+          <h3>Import Proofs</h3>
+          <div class="import-section">
+            <textarea id="importText" placeholder="Paste proof URLs (one per line, optionally with comma-separated title)&#10;https://github.com/user/repo, My Project&#10;https://myapp.com" rows="4"></textarea>
+            <div class="import-actions">
+              <button type="button" class="btn" id="importBtn">Import Proofs</button>
+              <button type="button" class="btn btn-secondary" id="loadSampleBtn">Load Sample Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Tab -->
+      <div id="tab-portfolio" class="tab-content">
+        <div class="card">
+          <h3>Export Portfolio</h3>
+          <p class="export-desc">Generate a markdown summary of your proofs for sharing.</p>
+          <div class="portfolio-preview" id="portfolioPreview"></div>
+          <button type="button" class="btn" id="copyPortfolioBtn">📋 Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

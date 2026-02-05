@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ship Forecast</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>📈 Ship Forecast</h1>
+        <p class="subtitle">Track proof velocity and predict ship completion dates</p>
+      </header>
+
+      <div class="alert-banner" id="alertBanner" style="display: none;">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-content">
+          <div class="alert-title" id="alertTitle">0 Stalled Ships</div>
+          <div class="alert-message" id="alertMessage"></div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="activeShips">0</div>
+          <div class="stat-label">Active Ships</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value healthy" id="healthyCount">0</div>
+          <div class="stat-label">Healthy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value at-risk" id="atRiskCount">0</div>
+          <div class="stat-label">At Risk</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stalled" id="stalledCount">0</div>
+          <div class="stat-label">Stalled</div>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button type="button" class="tab active" data-tab="overview">📊 Overview</button>
+        <button type="button" class="tab" data-tab="ships">⛵ Ships</button>
+        <button type="button" class="tab" data-tab="burndown">📉 Burndown</button>
+        <button type="button" class="tab" data-tab="compare">🔄 Compare</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="tab-overview" class="tab-content active">
+        <div class="card">
+          <h3>Weekly Proof Velocity</h3>
+          <div class="chart-container">
+            <canvas id="velocityChart" width="600" height="200"></canvas>
+          </div>
+        </div>
+
+        <div class="forecast-details">
+          <div class="forecast-item">
+            <div class="forecast-icon">⚡</div>
+            <div class="forecast-value" id="avgVelocity">0</div>
+            <div class="forecast-label">Avg Proofs/Week</div>
+          </div>
+          <div class="forecast-item">
+            <div class="forecast-icon">📋</div>
+            <div class="forecast-value" id="totalProofs">0</div>
+            <div class="forecast-label">Total Proofs</div>
+          </div>
+          <div class="forecast-item">
+            <div class="forecast-icon">🎯</div>
+            <div class="forecast-value" id="shipsWithEta">0</div>
+            <div class="forecast-label">Ships with ETA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ships Tab -->
+      <div id="tab-ships" class="tab-content">
+        <div class="card">
+          <h3>Ship Health Status</h3>
+          <div class="ship-list" id="shipList"></div>
+        </div>
+      </div>
+
+      <!-- Burndown Tab -->
+      <div id="tab-burndown" class="tab-content">
+        <div class="card">
+          <h3>Select Ship</h3>
+          <div class="ship-selector" id="shipSelector"></div>
+        </div>
+
+        <div class="card">
+          <h3>Burndown Chart - <span id="selectedShipName">Select a ship</span></h3>
+          <div class="burndown-chart">
+            <canvas id="burndownChart" width="600" height="200"></canvas>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3>Current Status</h3>
+            <div class="status-grid">
+              <div class="status-item">
+                <div class="status-icon">📊</div>
+                <div class="status-value" id="progressPercent">0%</div>
+                <div class="status-label">Complete</div>
+              </div>
+              <div class="status-item">
+                <div class="status-icon">📅</div>
+                <div class="status-value" id="etaDate">TBD</div>
+                <div class="status-label">Predicted ETA</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Velocity Stats</h3>
+            <div class="status-grid">
+              <div class="status-item">
+                <div class="status-icon">⚡</div>
+                <div class="status-value" id="shipVelocity">0</div>
+                <div class="status-label">Per Week</div>
+              </div>
+              <div class="status-item">
+                <div class="status-icon" id="trendIcon">→</div>
+                <div class="status-value" id="trendLabel">Flat</div>
+                <div class="status-label">Trend</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compare Tab -->
+      <div id="tab-compare" class="tab-content">
+        <div class="card">
+          <h3>Ship Comparison</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Ship</th>
+                <th>Progress</th>
+                <th>Velocity</th>
+                <th>ETA</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

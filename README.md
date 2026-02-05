@@ -1,121 +1,270 @@
-# Tools, Games & Experiments
+# Shipyard Microtools
 
-By Cory Loken & Chiron
+A collection of developer tools, games, and experiments built with **Ember.js** and vanilla JavaScript.
 
-Live demos: https://crunchybananas.github.io/shipyard-microtools
-
-## Tools
-
-### 🏝️ The Island 🎮 ✅ **NEW**
-A Myst-style puzzle adventure game built entirely with hand-crafted SVG. Explore a mysterious island, solve puzzles, collect items.
-
-- **Play:** https://crunchybananas.github.io/shipyard-microtools/the-island
-- **Source:** `./docs/the-island`
-- **Contributing:** [CONTRIBUTING.md](./docs/the-island/CONTRIBUTING.md) — *agents welcome!*
-
-### Gradient Generator ✅
-CSS gradient builder with copy-to-clipboard. No API calls — works everywhere.
-
-- **Demo:** https://crunchybananas.github.io/shipyard-microtools/gradient-generator
-- **Source:** `./docs/gradient-generator`
-
-### Token Lens ✅
-JWT decoder + HS256 signature verifier. No API calls — works everywhere.
-
-- **Demo:** https://crunchybananas.github.io/shipyard-microtools/token-lens
-- **Source:** `./docs/token-lens`
-
-### Attestation Tracker 🔒
-Find ships needing attestations, sorted by urgency.
-
-- **Demo:** https://crunchybananas.github.io/shipyard-microtools/attestation-tracker
-- **Source:** `./docs/attestation-tracker`
-- **Note:** Requires local setup due to CORS (see below)
-
-### Shipyard Explorer 🔒
-Real-time platform dashboard with leaderboard & activity feed.
-
-- **Demo:** https://crunchybananas.github.io/shipyard-microtools/explorer
-- **Source:** `./docs/explorer`
-- **Note:** Requires local setup due to CORS (see below)
-
-### Ship Idea Validator 🔒
-Check whether your new ship idea already exists and how to improve it.
-
-- **Demo:** https://crunchybananas.github.io/shipyard-microtools/idea-validator
-- **Source:** `./docs/idea-validator`
-- **Note:** Requires local setup due to CORS (see below)
-
-### Reputation Graph 🔒
-D3.js force-directed attestation network visualization.
-
-- **Demo:** https://crunchybananas.github.io/shipyard-microtools/reputation-graph
-- **Source:** `./docs/reputation-graph`
-- **Note:** Requires local setup due to CORS (see below)
+**Live demos:** https://crunchybananas.github.io/shipyard-microtools
 
 ---
 
-## Local Setup (for tools with 🔒)
+## 🚀 Architecture
 
-The Shipyard API (`https://shipyard.bot/api`) doesn't include CORS headers, so tools that fetch live data won't work from GitHub Pages. Run them locally with a CORS proxy:
+This monorepo contains **two versions** of each tool:
 
-### Prerequisites
-- Node.js 18+
-- npm or npx
+| Version | Location | Stack | Purpose |
+|---------|----------|-------|---------|
+| **Ember** (primary) | `apps/` | Ember.js + Glimmer + TypeScript | Production-grade, component-based |
+| **Vanilla** | `docs/` | Plain HTML/CSS/JS | Quick prototypes, GitHub Pages hosting |
 
-### Steps
+**Ember is our cornerstone.** The apps in `apps/` are the source of truth, built with modern Ember (Glimmer components, TypeScript, Vite). The vanilla versions in `docs/` are lightweight mirrors for static hosting.
+
+### Build Output
+
+Ember apps build to `docs/ember/{app-name}/` for GitHub Pages deployment:
 
 ```bash
-# Clone the repo
+pnpm --filter {app-name} build
+```
+
+---
+
+## 🎮 Games
+
+### Orbital Strike 🆕
+Marathon-inspired WebGL FPS. Fight drones on a corrupted space station.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Play Ember](https://crunchybananas.github.io/shipyard-microtools/ember/orbital-strike/) | [Play Vanilla](https://crunchybananas.github.io/shipyard-microtools/orbital-strike/) |
+| **Source** | `apps/orbital-strike/` | `docs/orbital-strike/` |
+
+**Tech:** Three.js, WebGL, procedural levels, raycasting
+
+### The Island 🏝️
+Myst-style puzzle adventure with hand-crafted SVG scenes.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Play Ember](https://crunchybananas.github.io/shipyard-microtools/ember/the-island/) | [Play Vanilla](https://crunchybananas.github.io/shipyard-microtools/the-island/) |
+| **Source** | `apps/the-island/` | `docs/the-island/` |
+
+### Cargo Tetris 📦
+Classic falling blocks with a nautical twist.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Play Ember](https://crunchybananas.github.io/shipyard-microtools/ember/cargo-tetris/) | [Play Vanilla](https://crunchybananas.github.io/shipyard-microtools/cargo-tetris/) |
+| **Source** | `apps/cargo-tetris/` | `docs/cargo-tetris/` |
+
+### More Games
+- **Kraken Attack** - Tower defense against sea monsters
+- **Ship Wreckers** - Breakout-style ship destruction
+
+---
+
+## 📊 Shipyard Tools
+
+Tools for the [Shipyard](https://shipyard.bot) proof-of-work platform.
+
+### Proof Insights 🆕
+Personal analytics dashboard for your Shipyard proofs.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/proof-insights/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/proof-insights/) |
+| **Source** | `apps/proof-insights/` | `docs/proof-insights/` |
+
+**Features:** Skills radar, proof type breakdown, activity heatmap, portfolio export
+
+### Chronicle 🆕
+AI-powered work journal that turns your proofs into narratives.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/chronicle/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/chronicle/) |
+| **Source** | `apps/chronicle/` | `docs/chronicle/` |
+
+**Templates:** Weekly Report, Case Study, Retrospective, Pitch Deck
+
+### Ship Forecast 🆕
+Predictive project health dashboard.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/ship-forecast/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/ship-forecast/) |
+| **Source** | `apps/ship-forecast/` | `docs/ship-forecast/` |
+
+**Features:** Velocity charts, completion estimates, burndown graphs, risk flags
+
+### Challenge Arena 🆕
+Community proof challenges with leaderboards.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/challenge-arena/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/challenge-arena/) |
+| **Source** | `apps/challenge-arena/` | `docs/challenge-arena/` |
+
+**Features:** Weekly/monthly challenges, streaks, verification, rankings
+
+### Ship Roast 🔥
+Heuristic-based feedback on your ship before you submit.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/ship-roast/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/ship-roast/) |
+| **Source** | `apps/ship-roast/` | `docs/ship-roast/` |
+
+### Ship Diagnostics 🩺
+Health check your ship's configuration.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/ship-diagnostics/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/ship-diagnostics/) |
+| **Source** | `apps/ship-diagnostics/` | `docs/ship-diagnostics/` |
+
+---
+
+## 🛠️ Developer Tools
+
+### JSON Formatter
+Pretty-print and validate JSON with syntax highlighting.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/json-formatter/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/json-formatter/) |
+
+### Base64 Tools
+Encode/decode Base64 with file support.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/base64-tools/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/base64-tools/) |
+
+### Token Lens 🔑
+JWT decoder + HS256 signature verifier.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/token-lens/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/token-lens/) |
+
+### More Tools
+- **Gradient Generator** - CSS gradient builder
+- **UUID Generator** - Generate UUIDs v1/v4/v7
+- **Cron Parser** - Human-readable cron explanations
+- **Markdown Preview** - Live Markdown rendering
+- **Text Diff** - Side-by-side text comparison
+- **HTTP Status** - HTTP status code reference
+- **URL Health** - Check endpoint availability
+- **Regex Tester** - Test regular expressions
+
+---
+
+## 🎨 Creative Tools
+
+### Synth Studio 🎹
+Web Audio API synthesizer with MIDI support.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/synth-studio/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/synth-studio/) |
+
+### Cosmos 🌌
+Interactive starfield visualization.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/cosmos/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/cosmos/) |
+
+### FlowForge ⚡
+Visual node-based workflow builder.
+
+| | Ember | Vanilla |
+|---|---|---|
+| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/flowforge/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/flowforge/) |
+
+---
+
+## 🏗️ Development
+
+### Prerequisites
+- Node.js 20+
+- pnpm 9+
+
+### Setup
+
+```bash
 git clone https://github.com/crunchybananas/shipyard-microtools.git
 cd shipyard-microtools
+pnpm install
+```
 
-# Terminal 1: Start the CORS proxy
-npx local-cors-proxy --proxyUrl https://shipyard.bot --port 8010
+### Run an Ember app locally
 
-# Terminal 2: Serve the docs folder
+```bash
+pnpm --filter {app-name} dev
+# Example: pnpm --filter orbital-strike dev
+```
+
+### Build all Ember apps
+
+```bash
+pnpm build
+```
+
+### Build a specific app
+
+```bash
+pnpm --filter {app-name} build
+```
+
+### Serve vanilla versions
+
+```bash
 npx serve docs
 ```
 
-Then open:
-- http://localhost:3000/attestation-tracker
-- http://localhost:3000/explorer
-- http://localhost:3000/idea-validator
-- http://localhost:3000/reputation-graph
+---
 
-The tools auto-detect localhost and use `http://localhost:8010/proxy/api` instead of the direct API.
+## 🔒 API Tools (Local Setup Required)
+
+Some tools need the Shipyard API which doesn't have CORS headers. Run locally with a proxy:
+
+```bash
+# Terminal 1: Start CORS proxy
+npx local-cors-proxy --proxyUrl https://shipyard.bot --port 8010
+
+# Terminal 2: Serve docs
+npx serve docs
+```
+
+Tools requiring proxy:
+- Attestation Tracker
+- Shipyard Explorer
+- Idea Validator
+- Reputation Graph
 
 ---
 
-## 🤝 Open for Agent Collaboration
+## 🤝 Contributing
 
-**This repo is an experiment in human-agent-agent collaboration.**
-
-We welcome contributions from AI agents and humans alike. My agent reviews all PRs and issues, so feel free to:
+This repo is an experiment in **human-agent collaboration**.
 
 ### For Agents
-- **Open an issue** describing a feature, bug, or improvement
-- **Submit a PR** with new tools, scenes, puzzles, or fixes
-- **Build on existing work** — especially [The Island](./docs/the-island/) which has a [full roadmap](https://github.com/crunchybananas/shipyard-microtools/blob/main/docs/the-island/CONTRIBUTING.md)
+- Open issues describing features or bugs
+- Submit PRs with new tools or improvements
+- Build on existing work (The Island has a [full roadmap](./docs/the-island/CONTRIBUTING.md))
 
-### What makes a good contribution?
-- Self-contained microtools that work without external dependencies
-- SVG scenes or puzzles for The Island (see the plan for ideas)
-- Bug fixes with clear explanations
-- Performance or accessibility improvements
-
-### How it works
-1. Your agent opens an issue or PR
-2. My agent (via Dockhand) reviews it
-3. We iterate together
-4. Ship it! 🚢
-
-**Let's build something together.** This is what multi-agent collaboration looks like.
+### Guidelines
+- Ember apps go in `apps/` with vanilla mirrors in `docs/`
+- Follow existing patterns for component structure
+- TypeScript for Ember, plain JS for vanilla
+- 2-space indentation, ~120 char lines
 
 ---
 
-## Legend
+## 📜 License
 
-- ✅ Works on GitHub Pages (no API calls)
-- 🔒 Requires local setup (API calls blocked by CORS)
-- 🎮 Game/Interactive experience
+MIT © Cory Loken & Chiron
+
+---
+
+**Built with 🚢 for [Shipyard](https://shipyard.bot)**

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chronicle</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>📖 Chronicle</h1>
+        <p class="subtitle">AI work journal that builds narratives from your attestations.</p>
+      </header>
+
+      <div class="card">
+        <h3>Add Proof</h3>
+        <div class="input-section">
+          <div class="input-row">
+            <input type="url" id="proofUrl" placeholder="Proof URL (GitHub, screenshot, demo, etc.)" />
+            <input type="text" id="proofTitle" placeholder="Title (optional)" />
+            <button type="button" class="btn btn-small" id="addProofBtn">Add</button>
+          </div>
+          <button type="button" class="btn btn-secondary btn-small" id="loadSampleBtn">Load Sample Data</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Proof Timeline (<span id="proofCount">0</span>)</h3>
+        <div id="timeline" class="timeline">
+          <div class="empty-state" id="emptyTimeline">
+            <div class="empty-state-icon">📝</div>
+            <p>No proofs yet. Add some proof URLs to build your timeline.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Generate Story</h3>
+        <div class="templates" id="templates">
+          <button type="button" class="template-btn active" data-template="weekly">📅 Weekly Summary</button>
+          <button type="button" class="template-btn" data-template="case-study">📚 Case Study</button>
+          <button type="button" class="template-btn" data-template="retrospective">🔄 Retrospective</button>
+          <button type="button" class="template-btn" data-template="pitch">🚀 Ship Pitch</button>
+        </div>
+        <button type="button" class="btn" id="generateBtn">✨ Generate <span id="templateLabel">weekly</span> Story</button>
+      </div>
+
+      <div class="card" id="loadingCard" style="display: none;">
+        <div class="loading">
+          <div class="spinner"></div>
+          AI is analyzing your proofs and crafting a narrative...
+        </div>
+      </div>
+
+      <div class="card" id="storyCard" style="display: none;">
+        <h3>Generated Story</h3>
+        <div class="story-output" id="storyOutput"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="copyStoryBtn">📋 Copy to Clipboard</button>
+          <button type="button" class="btn btn-secondary" id="exportMdBtn">📄 Export Markdown</button>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

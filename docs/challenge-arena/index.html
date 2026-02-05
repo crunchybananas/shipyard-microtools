@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Challenge Arena</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="../" class="back">← All Tools</a>
+        <h1>🏆 Challenge Arena</h1>
+        <p class="subtitle">Weekly &amp; monthly community proof challenges</p>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value active" id="activeChallenges">0</div>
+          <div class="stat-label">Active Challenges</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalSubmissions">0</div>
+          <div class="stat-label">Total Submissions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value pending" id="pendingSubmissions">0</div>
+          <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value completed" id="verifiedSubmissions">0</div>
+          <div class="stat-label">Verified</div>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button type="button" class="tab active" data-tab="challenges">🎯 Challenges</button>
+        <button type="button" class="tab" data-tab="leaderboard">🏆 Leaderboard</button>
+        <button type="button" class="tab" data-tab="submit">📤 Submit Proof</button>
+        <button type="button" class="tab" data-tab="archive">📚 Archive</button>
+      </div>
+
+      <!-- Challenges Tab -->
+      <div id="tab-challenges" class="tab-content active">
+        <div class="two-col">
+          <div>
+            <div class="card">
+              <h3>🔥 Weekly Challenges</h3>
+              <div class="challenge-list" id="weeklyChallenges"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <h3>🌟 Monthly Challenges</h3>
+              <div class="challenge-list" id="monthlyChallenges"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Tab -->
+      <div id="tab-leaderboard" class="tab-content">
+        <div class="card">
+          <h3>🏆 Top Builders</h3>
+          <div class="leaderboard" id="leaderboard"></div>
+        </div>
+      </div>
+
+      <!-- Submit Tab -->
+      <div id="tab-submit" class="tab-content">
+        <div class="card">
+          <h3>Submit Proof</h3>
+          <div class="submit-form">
+            <div class="form-group">
+              <label for="challengeSelect">Challenge</label>
+              <select id="challengeSelect"></select>
+            </div>
+            <div class="form-group">
+              <label for="proofType">Proof Type</label>
+              <select id="proofType">
+                <option value="github">🔗 GitHub Link</option>
+                <option value="url">🌐 Website URL</option>
+                <option value="screenshot">📸 Screenshot</option>
+                <option value="demo">🎮 Live Demo</option>
+                <option value="video">🎬 Video</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="proofUrl">Proof URL</label>
+              <input type="url" id="proofUrl" placeholder="https://..." />
+            </div>
+            <div class="form-group">
+              <label for="description">Description (min 10 chars)</label>
+              <textarea id="description" rows="3" placeholder="Describe how your proof meets the challenge requirements..."></textarea>
+            </div>
+            <button type="button" class="btn" id="submitBtn">📤 Submit Proof</button>
+            
+            <div id="submitResult" class="submit-result" style="display: none;"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Your Recent Submissions</h3>
+          <div id="userSubmissions" class="submissions-list"></div>
+        </div>
+      </div>
+
+      <!-- Archive Tab -->
+      <div id="tab-archive" class="tab-content">
+        <div class="card">
+          <h3>📚 Past Challenges</h3>
+          <div class="archive-list" id="archiveList"></div>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

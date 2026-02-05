@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orbital Strike</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+  <body>
+    <div class="game-wrapper">
+      <a href="../" class="back-link">← All Tools</a>
+      
+      <div id="game-canvas"></div>
+      
+      <!-- Start Screen -->
+      <div id="startScreen" class="overlay">
+        <div class="game-title">ORBITAL STRIKE</div>
+        <div class="game-subtitle">STATION THETA-7</div>
+        <button class="start-button" id="startBtn">BEGIN MISSION</button>
+        <div class="controls-hint">
+          <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move<br>
+          <kbd>MOUSE</kbd> Aim &nbsp;|&nbsp; <kbd>CLICK</kbd> Shoot<br>
+          <kbd>SPACE</kbd> Jump &nbsp;|&nbsp; <kbd>Q</kbd> Switch Weapon<br>
+          <kbd>E</kbd> Interact with Terminals
+        </div>
+      </div>
+      
+      <!-- Game Over Screen -->
+      <div id="gameOverScreen" class="overlay" style="display: none;">
+        <div class="game-over-title">MISSION FAILED</div>
+        <div class="final-score">
+          FINAL SCORE: <span id="finalScore">0</span><br>
+          WAVES SURVIVED: <span id="finalWave">0</span>
+        </div>
+        <button class="start-button" id="restartBtn">TRY AGAIN</button>
+      </div>
+      
+      <!-- HUD -->
+      <div id="hud" style="display: none;">
+        <!-- Crosshair -->
+        <div class="crosshair">
+          <div class="crosshair-dot"></div>
+        </div>
+        
+        <!-- Wave Info -->
+        <div class="wave-info">
+          <div class="wave-number">WAVE</div>
+          <div class="wave-value" id="waveNumber">1</div>
+          <div class="enemies-remaining"><span id="enemiesRemaining">0</span> HOSTILES REMAINING</div>
+        </div>
+        
+        <!-- Radar -->
+        <div class="radar">
+          <div class="radar-sweep"></div>
+          <div class="radar-center"></div>
+          <div id="radarBlips"></div>
+        </div>
+        
+        <!-- Health Bar -->
+        <div class="health-bar">
+          <span class="health-icon">❤️</span>
+          <div class="health-track">
+            <div class="health-fill" id="healthFill"></div>
+          </div>
+          <span class="health-text" id="healthText">100</span>
+        </div>
+        
+        <!-- Ammo Display -->
+        <div class="ammo-display">
+          <div class="weapon-name" id="weaponName">PULSE PISTOL</div>
+          <div class="ammo-count" id="ammoCount">50</div>
+          <div class="ammo-reserve">/ <span id="maxAmmo">100</span></div>
+        </div>
+        
+        <!-- Weapon Icon -->
+        <div class="weapon-icon" id="weaponIcon">🔫</div>
+        
+        <!-- Pickup Notification -->
+        <div class="pickup-notification" id="pickupNotification"></div>
+        
+        <!-- Damage Flash -->
+        <div class="damage-flash" id="damageFlash"></div>
+        
+        <!-- Scanlines -->
+        <div class="scanlines"></div>
+        
+        <!-- Vignette -->
+        <div class="vignette"></div>
+      </div>
+      
+      <!-- Terminal Overlay -->
+      <div id="terminalOverlay" class="terminal-overlay" style="display: none;">
+        <div class="terminal-header">
+          <span class="terminal-title">TERMINAL ACCESS</span>
+          <button class="terminal-close" id="closeTerminalBtn">[ESC] CLOSE</button>
+        </div>
+        <div class="terminal-content">
+          <div class="terminal-text" id="terminalText"></div>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
