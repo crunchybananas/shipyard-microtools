@@ -331,7 +331,7 @@ export default class KrakenAttackApp extends Component {
             autofocus
             {{on "keydown" this.handleKeydown}}
             {{on "keyup" this.handleKeyup}}
-            {{(this.setupCanvasModifier)}}
+            {{this.setupCanvas}}
           ></canvas>
 
           {{#if this.isStartScreen}}
@@ -405,12 +405,4 @@ export default class KrakenAttackApp extends Component {
       </footer>
     </div>
   </template>
-
-  get setupCanvasModifier() {
-    const self = this;
-    return function (element: HTMLCanvasElement) {
-      self.setupCanvas(element);
-      element.focus();
-    };
-  }
 }
