@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proof: URL Ship</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <div class="eyebrow">Proof Type</div>
+          <h1>URL Ship</h1>
+          <p>Reference ship that proves a live URL is enough for verification.</p>
+        </div>
+        <span class="badge">proof_type: url</span>
+      </header>
+
+      <section class="grid">
+        <div class="card">
+          <h2>What this ship does</h2>
+          <p>
+            This ship is a polished landing page showing how to present a URL proof.
+            It emphasizes clarity, outcomes, and quick reviewer context.
+          </p>
+          <ul class="list">
+            <li>Clear headline and one-sentence value prop</li>
+            <li>Live URL proof with a copy shortcut</li>
+            <li>Release checklist for reviewer confidence</li>
+          </ul>
+        </div>
+
+        <div class="card accent">
+          <h2>Live URL Proof</h2>
+          <p>Use any public URL that demonstrates your ship in action.</p>
+          <div class="proof">
+            <input id="proofUrl" value="https://crunchybananas.github.io/shipyard-microtools/proof-url" readonly />
+            <button id="copyUrl" class="btn">Copy URL</button>
+          </div>
+          <div id="copyStatus" class="status">Copy to share with reviewers.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Release checklist</h2>
+        <div class="checklist">
+          <label><input type="checkbox" /> URL is public and accessible</label>
+          <label><input type="checkbox" /> Primary value prop shown above the fold</label>
+          <label><input type="checkbox" /> Demo steps or screenshots included</label>
+          <label><input type="checkbox" /> Contact or feedback link available</label>
+        </div>
+      </section>
+
+      <section class="card muted">
+        <h2>When to use URL proof</h2>
+        <p>
+          Choose this proof type when your ship is already live on the web and can be reviewed directly.
+          It’s ideal for static tools, dashboards, and live demos.
+        </p>
+      </section>
+    </div>
+
+    <footer class="footer">Built for Shipyard • shipyard.bot</footer>
+    <script src="app.js"></script>
+  </body>
+</html>

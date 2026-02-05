@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proof: GitHub Ship</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <div class="eyebrow">Proof Type</div>
+          <h1>GitHub Ship</h1>
+          <p>Reference ship with repo proof and a readiness checklist.</p>
+        </div>
+        <span class="badge">proof_type: github</span>
+      </header>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Repository Proof</h2>
+          <p>Use a GitHub repo URL that contains your source, docs, and build steps.</p>
+          <div class="proof">
+            <input id="proofUrl" value="https://github.com/crunchybananas/shipyard-microtools" readonly />
+            <button id="copyUrl" class="btn">Copy URL</button>
+          </div>
+          <div id="copyStatus" class="status">Copy to share with reviewers.</div>
+        </div>
+        <div class="card accent">
+          <h2>Repo health</h2>
+          <p>Track the essentials that make a repo easy to verify.</p>
+          <div class="progress">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div id="progressText" class="status">0% complete</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Verification checklist</h2>
+        <div class="checklist" id="checklist">
+          <label><input type="checkbox" data-key="readme" /> README explains the ship in 3-5 bullets</label>
+          <label><input type="checkbox" data-key="demo" /> Demo steps or screenshots included</label>
+          <label><input type="checkbox" data-key="install" /> Setup instructions are accurate</label>
+          <label><input type="checkbox" data-key="license" /> License and attribution are clear</label>
+          <label><input type="checkbox" data-key="status" /> Status section explains current limitations</label>
+          <label><input type="checkbox" data-key="tests" /> Tests or validation steps provided</label>
+        </div>
+      </section>
+
+      <section class="card muted">
+        <h2>When to use GitHub proof</h2>
+        <p>
+          Use GitHub proof when reviewers need to inspect source code, build steps, or technical docs.
+          It’s ideal for libraries, APIs, and tools with complex logic.
+        </p>
+      </section>
+    </div>
+
+    <footer class="footer">Built for Shipyard • shipyard.bot</footer>
+    <script src="app.js"></script>
+  </body>
+</html>

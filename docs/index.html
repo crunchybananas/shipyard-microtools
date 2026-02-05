@@ -26,6 +26,40 @@
       h1 { font-size: 2rem; margin-bottom: 8px; }
       .subtitle { color: var(--muted); margin-bottom: 24px; }
 
+      .filters {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+      .filters input[type="search"] {
+        flex: 1 1 280px;
+        min-width: 220px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.05);
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+      .filters input[type="search"]::placeholder { color: var(--muted); }
+      .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        background: rgba(255,255,255,0.04);
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+      .toggle input {
+        width: 14px;
+        height: 14px;
+      }
+
       /* Navigation */
       nav {
         display: flex;
@@ -141,6 +175,14 @@
     <div class="container">
       <h1>Crunchy Bananas 🍌</h1>
       <p class="subtitle">Tools, games, and experiments built by humans + AI.</p>
+
+      <div class="filters">
+        <input id="searchInput" type="search" placeholder="Search tools, games, and shipyard apps..." />
+        <label class="toggle">
+          <input id="localOnlyToggle" type="checkbox" />
+          <span>Local-only</span>
+        </label>
+      </div>
 
       <nav>
         <button class="active" data-cat="all">All</button>
@@ -475,6 +517,56 @@
             </div>
           </div>
           <div class="card">
+            <h3>Ship Idea Validator <span class="badge local">local only</span> <span class="badge new">NEW</span></h3>
+            <p>Compare your idea against existing ships and get improvement cues.</p>
+            <div class="card-footer">
+              <div class="card-links">
+                <a href="./idea-validator/">Open</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/idea-validator">Source</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Proof: URL Ship <span class="badge new">NEW</span></h3>
+            <p>Reference ship with URL proof type and a polished landing page.</p>
+            <div class="card-footer">
+              <div class="card-links">
+                <a href="./proof-url/">Open</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/proof-url">Source</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Proof: GitHub Ship <span class="badge new">NEW</span></h3>
+            <p>Reference ship with GitHub proof type and repo checklist.</p>
+            <div class="card-footer">
+              <div class="card-links">
+                <a href="./proof-github/">Open</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/proof-github">Source</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Proof: Demo Ship <span class="badge new">NEW</span></h3>
+            <p>Reference ship with demo proof type and interactive flow.</p>
+            <div class="card-footer">
+              <div class="card-links">
+                <a href="./proof-demo/">Open</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/proof-demo">Source</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Proof: Screenshot Ship <span class="badge new">NEW</span></h3>
+            <p>Reference ship with screenshot proof type and annotated snapshot.</p>
+            <div class="card-footer">
+              <div class="card-links">
+                <a href="./proof-screenshot/">Open</a>
+                <a href="https://github.com/crunchybananas/shipyard-microtools/tree/main/docs/proof-screenshot">Source</a>
+              </div>
+            </div>
+          </div>
+          <div class="card">
             <h3>Rate Limit Monitor</h3>
             <p>Track posts/comments to avoid the 90% karma penalty.</p>
             <div class="card-footer">
@@ -521,25 +613,56 @@
     <script>
       const nav = document.querySelector('nav');
       const sections = document.querySelectorAll('.section');
+      const searchInput = document.getElementById('searchInput');
+      const localOnlyToggle = document.getElementById('localOnlyToggle');
+
+      const state = {
+        category: 'all',
+        query: '',
+        localOnly: false
+      };
+
+      function cardMatches(card) {
+        const text = card.textContent.toLowerCase();
+        const queryOk = !state.query || text.includes(state.query);
+        const localOk = !state.localOnly || card.querySelector('.badge.local');
+        return queryOk && localOk;
+      }
+
+      function updateView() {
+        sections.forEach(section => {
+          const inCat = state.category === 'all' || section.dataset.cat === state.category;
+          let visibleCards = 0;
+
+          section.querySelectorAll('.card').forEach(card => {
+            const show = inCat && cardMatches(card);
+            card.style.display = show ? '' : 'none';
+            if (show) visibleCards += 1;
+          });
+
+          section.classList.toggle('visible', inCat && visibleCards > 0);
+        });
+      }
 
       nav.addEventListener('click', (e) => {
         if (e.target.tagName !== 'BUTTON') return;
-        
-        // Update active button
         nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
-        
-        const cat = e.target.dataset.cat;
-        
-        // Show/hide sections
-        sections.forEach(s => {
-          if (cat === 'all' || s.dataset.cat === cat) {
-            s.classList.add('visible');
-          } else {
-            s.classList.remove('visible');
-          }
-        });
+        state.category = e.target.dataset.cat;
+        updateView();
       });
+
+      searchInput.addEventListener('input', (e) => {
+        state.query = e.target.value.trim().toLowerCase();
+        updateView();
+      });
+
+      localOnlyToggle.addEventListener('change', (e) => {
+        state.localOnly = e.target.checked;
+        updateView();
+      });
+
+      updateView();
     </script>
   </body>
 </html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proof: Screenshot Ship</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <div class="eyebrow">Proof Type</div>
+          <h1>Screenshot Ship</h1>
+          <p>Reference ship with an annotated screenshot proof.</p>
+        </div>
+        <span class="badge">proof_type: screenshot</span>
+      </header>
+
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Proof Snapshot</h2>
+            <p>Provide a screenshot that clearly demonstrates the core experience.</p>
+          </div>
+          <button id="toggleAnnotations" class="btn ghost">Toggle annotations</button>
+        </div>
+        <div class="preview">
+          <img id="proofImage" src="proof-shot.svg" alt="Screenshot proof" />
+        </div>
+        <div class="proof">
+          <input id="proofUrl" value="https://crunchybananas.github.io/shipyard-microtools/proof-screenshot/proof-shot.svg" readonly />
+          <button id="copyUrl" class="btn">Copy URL</button>
+          <a class="btn ghost" href="proof-shot.svg" download>Download</a>
+        </div>
+        <div id="copyStatus" class="status">Copy to share with reviewers.</div>
+      </section>
+
+      <section class="card accent">
+        <h2>Screenshot checklist</h2>
+        <div class="checklist">
+          <label><input type="checkbox" /> Primary UI visible without scrolling</label>
+          <label><input type="checkbox" /> Key metrics or outputs highlighted</label>
+          <label><input type="checkbox" /> Navigation and brand visible</label>
+          <label><input type="checkbox" /> No sensitive data shown</label>
+        </div>
+      </section>
+
+      <section class="card muted">
+        <h2>When to use screenshot proof</h2>
+        <p>
+          Use screenshot proof when a still snapshot clearly demonstrates the ship.
+          It’s great for designs, prototypes, or early-stage concepts.
+        </p>
+      </section>
+    </div>
+
+    <footer class="footer">Built for Shipyard • shipyard.bot</footer>
+    <script src="app.js"></script>
+  </body>
+</html>

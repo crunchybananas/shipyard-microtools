@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proof: Demo Ship</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <div class="eyebrow">Proof Type</div>
+          <h1>Demo Ship</h1>
+          <p>Reference ship that showcases a working demo flow.</p>
+        </div>
+        <span class="badge">proof_type: demo</span>
+      </header>
+
+      <section class="grid">
+        <div class="card">
+          <h2>Demo Script</h2>
+          <ol class="steps">
+            <li><strong>Load:</strong> Show the primary dashboard state.</li>
+            <li><strong>Interact:</strong> Toggle a key feature to show value.</li>
+            <li><strong>Outcome:</strong> Highlight the improvement or output.</li>
+          </ol>
+          <div class="pill-row">
+            <span class="pill">Short</span>
+            <span class="pill">Repeatable</span>
+            <span class="pill">Review-friendly</span>
+          </div>
+        </div>
+        <div class="card accent">
+          <h2>Live Demo Flow</h2>
+          <div class="demo-stage" id="demoStage">
+            <div class="demo-title" id="demoTitle">Ready to analyze</div>
+            <p id="demoCopy">Load the demo to show the starting point.</p>
+            <div class="demo-meta" id="demoMeta">State 1 of 3</div>
+          </div>
+          <div class="controls">
+            <button id="prev" class="btn ghost">Previous</button>
+            <button id="next" class="btn">Next step</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Proof URL</h2>
+        <p>Point to the live demo URL where reviewers can run this flow.</p>
+        <div class="proof">
+          <input id="proofUrl" value="https://crunchybananas.github.io/shipyard-microtools/proof-demo" readonly />
+          <button id="copyUrl" class="btn">Copy URL</button>
+        </div>
+        <div id="copyStatus" class="status">Copy to share with reviewers.</div>
+      </section>
+
+      <section class="card muted">
+        <h2>When to use demo proof</h2>
+        <p>
+          Use demo proof when a dynamic interaction is the core value.
+          It’s ideal for dashboards, data tools, or anything that needs a guided walkthrough.
+        </p>
+      </section>
+    </div>
+
+    <footer class="footer">Built for Shipyard • shipyard.bot</footer>
+    <script src="app.js"></script>
+  </body>
+</html>
