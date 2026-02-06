@@ -405,9 +405,3 @@ export default class GameEngineService extends Service {
     return Math.max(0, (this.kraken.health / this.kraken.maxHealth) * 100);
   }
 }
-
-declare module "@ember/service" {
-  interface Registry {
-    "game-engine": GameEngineService;
-  }
-}

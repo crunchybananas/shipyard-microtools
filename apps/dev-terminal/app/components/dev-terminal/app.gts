@@ -2,7 +2,6 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
 import { htmlSafe, type SafeString } from "@ember/template";
-import type Owner from "@ember/owner";
 
 interface GameState {
   location: string;
@@ -96,7 +95,6 @@ A bench sits empty, inviting contemplation.`,
 };
 
 export default class DevTerminalApp extends Component {
-  @tracked outputHtml = "";
   @tracked inputValue = "";
 
   state: GameState = {
@@ -119,10 +117,11 @@ export default class DevTerminalApp extends Component {
     mood: 50,
   };
 
-  constructor(owner: Owner, args: DevTerminalAppSignature["Args"]) {
-    super(owner, args);
-    this.initGame();
-  }
+  @tracked outputHtml = `<p class="success">THE DEVELOPER'S JOURNEY</p>
+      <p class="hint">A text adventure about coding, AI, and finding your place.</p>
+      <p class="hint">Type HELP for commands.</p>
+      <hr style="border-color: #2d2d3d; margin: 1rem 0;">
+      ${this.describeLook()}`;
 
   get safeOutput(): SafeString {
     return htmlSafe(this.outputHtml);

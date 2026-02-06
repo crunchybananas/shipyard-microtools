@@ -188,9 +188,3 @@ export default class AudioEngineService extends Service {
     }
   }
 }
-
-declare module "@ember/service" {
-  interface Registry {
-    "audio-engine": AudioEngineService;
-  }
-}

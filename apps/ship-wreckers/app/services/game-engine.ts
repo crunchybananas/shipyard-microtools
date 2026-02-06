@@ -731,9 +731,3 @@ export default class GameEngineService extends Service {
     this.stopGame();
   }
 }
-
-declare module "@ember/service" {
-  interface Registry {
-    "game-engine": GameEngineService;
-  }
-}

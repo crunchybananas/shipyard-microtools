@@ -4,7 +4,7 @@ import { on } from "@ember/modifier";
 import { concat, fn } from "@ember/helper";
 import { modifier } from "ember-modifier";
 import { service } from "@ember/service";
-import style from "flowforge/helpers/style";
+import { style } from "flowforge/helpers/style";
 
 import type { FlowNode, Connection } from "flowforge/types/flow";
 import type {

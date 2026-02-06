@@ -350,9 +350,3 @@ export default class GameStateService extends Service {
     return this.flags.mirrorAngles[0] === 45;
   }
 }
-
-declare module "@ember/service" {
-  interface Registry {
-    "game-state": GameStateService;
-  }
-}

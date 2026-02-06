@@ -1,4 +1,3 @@
-import { helper } from "@ember/component/helper";
 import { htmlSafe } from "@ember/template";
 
 const toKebabCase = (value: string) => {
@@ -8,10 +7,7 @@ const toKebabCase = (value: string) => {
     .toLowerCase();
 };
 
-export default helper(function style(
-  _positional: unknown[],
-  named: Record<string, unknown>,
-) {
+export function style(named: Record<string, unknown>) {
   const declarations = Object.entries(named)
     .filter(
       ([, value]) => value !== null && value !== undefined && value !== "",
@@ -20,4 +16,4 @@ export default helper(function style(
     .join(" ");
 
   return htmlSafe(declarations);
-});
+}

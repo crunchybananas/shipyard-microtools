@@ -257,9 +257,3 @@ export default class FlowEngineService extends Service {
     this.displayOutputs = [];
   };
 }
-
-declare module "@ember/service" {
-  interface Registry {
-    "flow-engine": FlowEngineService;
-  }
-}
