@@ -61,14 +61,18 @@ export default class DriftApp extends Component {
   // ── Canvas setup modifier ────────────────────────────────────
 
   setupCanvas = modifier((canvas: HTMLCanvasElement) => {
+    // Use literal defaults — NOT tracked properties. Reading @tracked
+    // values here would cause the modifier to re-run (and clear the
+    // canvas) whenever any control changes. All live updates go through
+    // the engine's setter methods instead.
     this.engine = new DriftEngine(canvas, {
-      palette: this.palette,
-      particleCount: this.particleCount,
-      noiseScale: this.noiseScale,
-      speed: this.speed,
-      trailAlpha: this.trailAlpha,
-      wellStrength: this.wellStrength,
-      attractMode: this.attractMode,
+      palette: "aurora",
+      particleCount: 3000,
+      noiseScale: 0.003,
+      speed: 1.5,
+      trailAlpha: 0.92,
+      wellStrength: 150,
+      attractMode: true,
     });
 
     this.engine.start();
