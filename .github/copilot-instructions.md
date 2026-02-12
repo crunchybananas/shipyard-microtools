@@ -1,19 +1,23 @@
 # GitHub Copilot Instructions for shipyard-microtools
 
-## Agent Skills (modern patterns)
-- Reference: https://github.com/NullVoxPopuli/agent-skills
-- Prefer modern Ember + Embroider patterns over classic Ember CLI.
-- Default to TypeScript + Glimmer components (`.gts`) and colocated styles.
-- Use services for app/game state; keep rendering logic inside components.
-- Avoid legacy patterns (classic components, computed properties, `EmberObject.extend`).
+**Full instructions:** see `../.copilot-instructions.md` at the repo root.
+
+## Quick Reference
+- **Ember 6.10** with Embroider v2 + Vite, `.gts` only, pnpm only.
+- **No thin wrappers** — no `init.ts` with `getElementById`. Use Ember components.
+- **Fat arrows** for handlers, not `@action`.
+- **Component composition** with `@args` and typed `Signature` interfaces.
+- **Data-driven rendering** with `{{#each}}` over registries, not copy-pasted HTML.
 
 ## Ember Build + Routing
-- Ember version: 6.10 (Embroider + Vite).
-- `config/environment.js` should use:
-  - `locationType: "hash"`
-  - `rootURL: "./"`
-- Each app must include `app/config/environment.js` using `@embroider/config-meta-loader`.
-- Vite build output: `../../docs/ember/<app-name>` and `base: "./"`.
+- `config/environment.js`: `locationType: "hash"`, `rootURL: "./"`.
+- Each app needs `app/config/environment.js` using `@embroider/config-meta-loader`.
+- Vite output: `../../docs/ember/<app-name>` with `base: "./"`.
+
+## CI & Deploy
+- GitHub Pages source: **GitHub Actions** (not branch).
+- Build with `--workspace-concurrency=1` to avoid `@embroider/vite` race conditions.
+- Build artifacts (`docs/ember/`) are NOT committed to git.
 
 ## Repo Conventions
 - 2-space indentation.
