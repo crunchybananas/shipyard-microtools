@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Aether</title>
+    <meta name="description" content="Real-time GPU fluid dynamics — Navier-Stokes in your browser" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>" />
+    <link integrity="" rel="stylesheet" href="./app/styles/app.css" />
+
+    {{content-for "head"}}
+  </head>
+  <body>
+    {{content-for "body"}}
+
+    <script type="module">
+      import Application from "./app/app";
+      import environment from "./app/config/environment";
+
+      Application.create(environment.APP);
+    </script>
+
+    {{content-for "body-footer"}}
+  </body>
+</html>
