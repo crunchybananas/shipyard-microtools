@@ -109,85 +109,198 @@ interface GravityWell {
 
 // ── Engine ───────────────────────────────────────────────────────
 
-export function initializeDrift(_element: HTMLElement) {
-  const canvas = document.getElementById("drift-canvas") as HTMLCanvasElement | null;
-  if (!canvas) return;
+export interface DriftConfig {
+  palette: string;
+  particleCount: number;
+  noiseScale: number;
+  speed: number;
+  trailAlpha: number;
+  wellStrength: number;
+  attractMode: boolean;
+}
 
-  const ctx = canvas.getContext("2d", { willReadFrequently: false })!;
-  const status = document.getElementById("status") as HTMLDivElement | null;
+export class DriftEngine {
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private particles: Particle[] = [];
+  private wells: GravityWell[] = [];
+  private animationId = 0;
+  private time = 0;
+  private paletteKey: string;
+  private particleCount: number;
+  private noiseScale: number;
+  private speed: number;
+  private trailAlpha: number;
+  private wellStrength: number;
+  private attractMode: boolean;
+  private resizeHandler: (() => void) | null = null;
+  private clickHandler: ((e: MouseEvent) => void) | null = null;
+  private contextHandler: ((e: MouseEvent) => void) | null = null;
 
-  // State
-  let particles: Particle[] = [];
-  let wells: GravityWell[] = [];
-  let animationId = 0;
-  let time = 0;
-  let paletteKey = "aurora";
-  let particleCount = 3000;
-  let noiseScale = 0.003;
-  let speed = 1.5;
-  let trailAlpha = 0.92;
-  let wellStrength = 150;
-  let attractMode = true;
-  let controlsVisible = true;
-
-  // ── Canvas sizing ────────────────────────────────────────────
-
-  function resize() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas!.width = window.innerWidth * dpr;
-    canvas!.height = window.innerHeight * dpr;
-    canvas!.style.width = window.innerWidth + "px";
-    canvas!.style.height = window.innerHeight + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  constructor(canvas: HTMLCanvasElement, config: DriftConfig) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d", { willReadFrequently: false })!;
+    this.paletteKey = config.palette;
+    this.particleCount = config.particleCount;
+    this.noiseScale = config.noiseScale;
+    this.speed = config.speed;
+    this.trailAlpha = config.trailAlpha;
+    this.wellStrength = config.wellStrength;
+    this.attractMode = config.attractMode;
   }
 
-  // ── Particle factory ────────────────────────────────────────
+  // ── Public API (called from Ember component) ────────────────
 
-  function randomColor(): string {
-    const palette = PALETTES[paletteKey] ?? PALETTES["aurora"]!;
+  start() {
+    seedNoise();
+    this.resize();
+
+    this.resizeHandler = () => this.resize();
+    window.addEventListener("resize", this.resizeHandler);
+
+    // Canvas interactions
+    this.clickHandler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest(".controls-panel")) return;
+      this.wells.push({
+        x: e.clientX,
+        y: e.clientY,
+        strength: this.attractMode ? this.wellStrength : -this.wellStrength,
+        radius: 300,
+        born: this.time,
+      });
+    };
+    this.canvas.addEventListener("click", this.clickHandler);
+
+    this.contextHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      if (this.wells.length === 0) return;
+      let nearestIdx = 0;
+      let nearestDist = Infinity;
+      for (let i = 0; i < this.wells.length; i++) {
+        const dx = this.wells[i]!.x - e.clientX;
+        const dy = this.wells[i]!.y - e.clientY;
+        const d = dx * dx + dy * dy;
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearestIdx = i;
+        }
+      }
+      this.wells.splice(nearestIdx, 1);
+    };
+    this.canvas.addEventListener("contextmenu", this.contextHandler);
+
+    // Clear to dark
+    this.ctx.fillStyle = "rgb(8, 8, 18)";
+    this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+    this.spawnParticles();
+    this.animationId = requestAnimationFrame((t) => this.loop(t));
+  }
+
+  destroy() {
+    cancelAnimationFrame(this.animationId);
+    if (this.resizeHandler) window.removeEventListener("resize", this.resizeHandler);
+    if (this.clickHandler) this.canvas.removeEventListener("click", this.clickHandler);
+    if (this.contextHandler) this.canvas.removeEventListener("contextmenu", this.contextHandler);
+  }
+
+  setPalette(key: string) {
+    this.paletteKey = key;
+    // Re-color every 3rd particle for a gradual blend
+    for (let i = 0; i < this.particles.length; i += 3) {
+      this.particles[i]!.color = this.randomColor();
+    }
+  }
+
+  setParticleCount(count: number) {
+    if (count > this.particleCount) {
+      for (let i = this.particleCount; i < count; i++) {
+        this.particles.push(this.createParticle());
+      }
+    } else {
+      this.particles.length = count;
+    }
+    this.particleCount = count;
+  }
+
+  setNoiseScale(value: number) { this.noiseScale = value; }
+  setSpeed(value: number) { this.speed = value; }
+  setTrailAlpha(value: number) { this.trailAlpha = value; }
+  setWellStrength(value: number) { this.wellStrength = value; }
+  setAttractMode(attract: boolean) { this.attractMode = attract; }
+
+  clearWells() { this.wells = []; }
+
+  reset() {
+    this.wells = [];
+    seedNoise();
+    this.spawnParticles();
+    this.ctx.fillStyle = "rgb(8, 8, 18)";
+    this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+
+  exportPNG() {
+    const link = document.createElement("a");
+    link.download = `drift-${Date.now()}.png`;
+    link.href = this.canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  // ── Private ──────────────────────────────────────────────────
+
+  private resize() {
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.width = window.innerWidth * dpr;
+    this.canvas.height = window.innerHeight * dpr;
+    this.canvas.style.width = window.innerWidth + "px";
+    this.canvas.style.height = window.innerHeight + "px";
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  private randomColor(): string {
+    const palette = PALETTES[this.paletteKey] ?? PALETTES["aurora"]!;
     const c = palette[Math.floor(Math.random() * palette.length)]!;
     const hJitter = c.h + (Math.random() - 0.5) * 20;
     const lJitter = c.l + (Math.random() - 0.5) * 10;
     return `hsl(${hJitter}, ${c.s}%, ${lJitter}%)`;
   }
 
-  function createParticle(): Particle {
+  private createParticle(): Particle {
     return {
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
       vx: 0,
       vy: 0,
-      color: randomColor(),
+      color: this.randomColor(),
       alpha: 0.4 + Math.random() * 0.6,
       size: 0.5 + Math.random() * 1.5,
     };
   }
 
-  function spawnParticles() {
-    particles = [];
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(createParticle());
+  private spawnParticles() {
+    this.particles = [];
+    for (let i = 0; i < this.particleCount; i++) {
+      this.particles.push(this.createParticle());
     }
   }
 
-  // ── Physics ──────────────────────────────────────────────────
-
-  function updateParticles() {
+  private updateParticles() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const t = time * 0.0003;
+    const t = this.time * 0.0003;
 
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i]!;
+    for (let i = 0; i < this.particles.length; i++) {
+      const p = this.particles[i]!;
 
       // Noise-driven flow field
-      const angle = noise2D(p.x * noiseScale + t, p.y * noiseScale + t) * Math.PI * 4;
-      p.vx += Math.cos(angle) * speed * 0.15;
-      p.vy += Math.sin(angle) * speed * 0.15;
+      const angle = noise2D(p.x * this.noiseScale + t, p.y * this.noiseScale + t) * Math.PI * 4;
+      p.vx += Math.cos(angle) * this.speed * 0.15;
+      p.vy += Math.sin(angle) * this.speed * 0.15;
 
       // Gravity wells
-      for (let j = 0; j < wells.length; j++) {
-        const well = wells[j]!;
+      for (let j = 0; j < this.wells.length; j++) {
+        const well = this.wells[j]!;
         const dx = well.x - p.x;
         const dy = well.y - p.y;
         const distSq = dx * dx + dy * dy + 1;
@@ -204,7 +317,7 @@ export function initializeDrift(_element: HTMLElement) {
       p.vy *= 0.97;
 
       // Clamp velocity
-      const maxV = speed * 3;
+      const maxV = this.speed * 3;
       const vm = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
       if (vm > maxV) {
         p.vx = (p.vx / vm) * maxV;
@@ -223,200 +336,44 @@ export function initializeDrift(_element: HTMLElement) {
     }
   }
 
-  // ── Rendering ────────────────────────────────────────────────
-
-  function render() {
+  private render() {
     const w = window.innerWidth;
     const h = window.innerHeight;
 
     // Semi-transparent overlay for trails
-    ctx.fillStyle = `rgba(8, 8, 18, ${1 - trailAlpha})`;
-    ctx.fillRect(0, 0, w, h);
+    this.ctx.fillStyle = `rgba(8, 8, 18, ${1 - this.trailAlpha})`;
+    this.ctx.fillRect(0, 0, w, h);
 
     // Draw particles
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i]!;
-      ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+    for (let i = 0; i < this.particles.length; i++) {
+      const p = this.particles[i]!;
+      this.ctx.globalAlpha = p.alpha;
+      this.ctx.fillStyle = p.color;
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      this.ctx.fill();
     }
 
     // Draw well indicators (subtle rings)
-    ctx.globalAlpha = 0.15;
-    for (let j = 0; j < wells.length; j++) {
-      const well = wells[j]!;
-      const age = (time - well.born) * 0.001;
+    this.ctx.globalAlpha = 0.15;
+    for (let j = 0; j < this.wells.length; j++) {
+      const well = this.wells[j]!;
+      const age = (this.time - well.born) * 0.001;
       const pulse = 1 + Math.sin(age * 3) * 0.1;
-      ctx.strokeStyle = well.strength > 0 ? "#818cf8" : "#f87171";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(well.x, well.y, 20 * pulse, 0, Math.PI * 2);
-      ctx.stroke();
+      this.ctx.strokeStyle = well.strength > 0 ? "#818cf8" : "#f87171";
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.arc(well.x, well.y, 20 * pulse, 0, Math.PI * 2);
+      this.ctx.stroke();
     }
 
-    ctx.globalAlpha = 1;
+    this.ctx.globalAlpha = 1;
   }
 
-  // ── Loop ─────────────────────────────────────────────────────
-
-  function loop(timestamp: number) {
-    time = timestamp;
-    updateParticles();
-    render();
-    animationId = requestAnimationFrame(loop);
+  private loop(timestamp: number) {
+    this.time = timestamp;
+    this.updateParticles();
+    this.render();
+    this.animationId = requestAnimationFrame((t) => this.loop(t));
   }
-
-  // ── Status helper ────────────────────────────────────────────
-
-  function showStatus(message: string) {
-    if (!status) return;
-    status.textContent = message;
-    status.className = "status success";
-    setTimeout(() => status.classList.add("hidden"), 2000);
-  }
-
-  // ── Controls wiring ─────────────────────────────────────────
-
-  function wireControls() {
-    const paletteSelect = document.getElementById("palette") as HTMLSelectElement;
-    const particleSlider = document.getElementById("particleCount") as HTMLInputElement;
-    const noiseSlider = document.getElementById("noiseScale") as HTMLInputElement;
-    const speedSlider = document.getElementById("speed") as HTMLInputElement;
-    const trailSlider = document.getElementById("trailLength") as HTMLInputElement;
-    const wellSlider = document.getElementById("wellStrength") as HTMLInputElement;
-    const toggleWellBtn = document.getElementById("toggleWellMode") as HTMLButtonElement;
-    const clearWellsBtn = document.getElementById("clearWells") as HTMLButtonElement;
-    const resetBtn = document.getElementById("resetBtn") as HTMLButtonElement;
-    const exportBtn = document.getElementById("exportBtn") as HTMLButtonElement;
-    const toggleCtrlBtn = document.getElementById("toggleControls") as HTMLButtonElement;
-    const controlsPanel = document.getElementById("controls") as HTMLDivElement;
-
-    paletteSelect?.addEventListener("change", () => {
-      paletteKey = paletteSelect.value;
-      // Re-color existing particles gradually
-      for (let i = 0; i < particles.length; i += 3) {
-        particles[i]!.color = randomColor();
-      }
-    });
-
-    particleSlider?.addEventListener("input", () => {
-      const val = parseInt(particleSlider.value);
-      document.getElementById("particleCountVal")!.textContent = String(val);
-      if (val > particleCount) {
-        for (let i = particleCount; i < val; i++) particles.push(createParticle());
-      } else {
-        particles.length = val;
-      }
-      particleCount = val;
-    });
-
-    noiseSlider?.addEventListener("input", () => {
-      noiseScale = parseFloat(noiseSlider.value);
-      document.getElementById("noiseScaleVal")!.textContent = noiseScale.toFixed(3);
-    });
-
-    speedSlider?.addEventListener("input", () => {
-      speed = parseFloat(speedSlider.value);
-      document.getElementById("speedVal")!.textContent = speed.toFixed(1);
-    });
-
-    trailSlider?.addEventListener("input", () => {
-      trailAlpha = parseFloat(trailSlider.value);
-      document.getElementById("trailLengthVal")!.textContent = trailAlpha.toFixed(2);
-    });
-
-    wellSlider?.addEventListener("input", () => {
-      wellStrength = parseInt(wellSlider.value);
-      document.getElementById("wellStrengthVal")!.textContent = String(wellStrength);
-    });
-
-    toggleWellBtn?.addEventListener("click", () => {
-      attractMode = !attractMode;
-      toggleWellBtn.textContent = attractMode ? "🧲 Attract" : "💨 Repel";
-    });
-
-    clearWellsBtn?.addEventListener("click", () => {
-      wells = [];
-      showStatus("Wells cleared");
-    });
-
-    resetBtn?.addEventListener("click", () => {
-      wells = [];
-      seedNoise();
-      spawnParticles();
-      // Clear canvas fully
-      ctx.fillStyle = "rgb(8, 8, 18)";
-      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      showStatus("Canvas reset");
-    });
-
-    exportBtn?.addEventListener("click", () => {
-      // Temporarily hide UI and export
-      const link = document.createElement("a");
-      link.download = `drift-${Date.now()}.png`;
-      link.href = canvas!.toDataURL("image/png");
-      link.click();
-      showStatus("Exported PNG");
-    });
-
-    toggleCtrlBtn?.addEventListener("click", () => {
-      controlsVisible = !controlsVisible;
-      controlsPanel.classList.toggle("collapsed", !controlsVisible);
-    });
-
-    // Canvas click → add gravity well
-    canvas!.addEventListener("click", (e: MouseEvent) => {
-      // Ignore if click is on controls
-      const target = e.target as HTMLElement;
-      if (target.closest(".controls-panel")) return;
-
-      wells.push({
-        x: e.clientX,
-        y: e.clientY,
-        strength: attractMode ? wellStrength : -wellStrength,
-        radius: 300,
-        born: time,
-      });
-    });
-
-    // Right-click → remove nearest well
-    canvas!.addEventListener("contextmenu", (e: MouseEvent) => {
-      e.preventDefault();
-      if (wells.length === 0) return;
-      let nearestIdx = 0;
-      let nearestDist = Infinity;
-      for (let i = 0; i < wells.length; i++) {
-        const dx = wells[i]!.x - e.clientX;
-        const dy = wells[i]!.y - e.clientY;
-        const d = dx * dx + dy * dy;
-        if (d < nearestDist) {
-          nearestDist = d;
-          nearestIdx = i;
-        }
-      }
-      wells.splice(nearestIdx, 1);
-    });
-  }
-
-  // ── Init ─────────────────────────────────────────────────────
-
-  seedNoise();
-  resize();
-  window.addEventListener("resize", resize);
-
-  // Clear to dark
-  ctx.fillStyle = "rgb(8, 8, 18)";
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-
-  spawnParticles();
-  wireControls();
-  animationId = requestAnimationFrame(loop);
-
-  // Cleanup if element is destroyed
-  return () => {
-    cancelAnimationFrame(animationId);
-    window.removeEventListener("resize", resize);
-  };
 }
