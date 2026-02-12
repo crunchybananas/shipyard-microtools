@@ -44,6 +44,8 @@ export interface CascadeCallbacks {
 export class CascadeEngine {
   private destroyFn: (() => void) | null = null;
   private startGameFn: (() => void) | null = null;
+  private moveFn: ((dir: "up" | "down" | "left" | "right") => boolean) | null = null;
+  private splatFn: ((x: number, y: number, dx: number, dy: number, color: [number, number, number]) => void) | null = null;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -771,99 +773,6 @@ export class CascadeEngine {
       initFBOs(); // Clear the fluid canvas too
     }
 
-    // ── Input handling ───────────────────────────────────────────
-
-    const keyHandler = (e: KeyboardEvent) => {
-      const map: Record<string, "up" | "down" | "left" | "right"> = {
-        ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right",
-        w: "up", s: "down", a: "left", d: "right",
-      };
-      const dir = map[e.key];
-      if (dir) {
-        e.preventDefault();
-        move(dir);
-      }
-    };
-    document.addEventListener("keydown", keyHandler);
-
-    // Touch / swipe support
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    const touchStartHandler = (e: TouchEvent) => {
-      const t = e.touches[0]!;
-      touchStartX = t.clientX;
-      touchStartY = t.clientY;
-    };
-
-    const touchEndHandler = (e: TouchEvent) => {
-      const t = e.changedTouches[0]!;
-      const dx = t.clientX - touchStartX;
-      const dy = t.clientY - touchStartY;
-      const absDx = Math.abs(dx);
-      const absDy = Math.abs(dy);
-
-      if (Math.max(absDx, absDy) < 30) return; // Too small
-      e.preventDefault();
-
-      if (absDx > absDy) {
-        move(dx > 0 ? "right" : "left");
-      } else {
-        move(dy > 0 ? "down" : "up");
-      }
-    };
-
-    canvas.addEventListener("touchstart", touchStartHandler, { passive: true });
-    canvas.addEventListener("touchend", touchEndHandler);
-
-    // Mouse drag on canvas for fluid painting
-    let mouseDown = false;
-    let prevMX = 0;
-    let prevMY = 0;
-
-    const mouseDownHandler = (e: MouseEvent) => {
-      mouseDown = true;
-      prevMX = e.offsetX / canvas!.clientWidth;
-      prevMY = 1 - e.offsetY / canvas!.clientHeight;
-    };
-
-    const mouseMoveHandler = (e: MouseEvent) => {
-      if (!mouseDown) return;
-      const mx = e.offsetX / canvas!.clientWidth;
-      const my = 1 - e.offsetY / canvas!.clientHeight;
-      const dx = mx - prevMX;
-      const dy = my - prevMY;
-      if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
-        const hue = (performance.now() * 0.0002) % 1;
-        const color = hsvToRgb(hue, 0.8, 0.5);
-        splat(mx, my, dx, dy, color);
-      }
-      prevMX = mx;
-      prevMY = my;
-    };
-
-    const mouseUpHandler = () => { mouseDown = false; };
-
-    canvas.addEventListener("mousedown", mouseDownHandler);
-    canvas.addEventListener("mousemove", mouseMoveHandler);
-    canvas.addEventListener("mouseup", mouseUpHandler);
-
-    function hsvToRgb(h: number, s: number, v: number): [number, number, number] {
-      const i = Math.floor(h * 6);
-      const f = h * 6 - i;
-      const p = v * (1 - s);
-      const q = v * (1 - f * s);
-      const t = v * (1 - (1 - f) * s);
-      switch (i % 6) {
-        case 0: return [v, t, p];
-        case 1: return [q, v, p];
-        case 2: return [p, v, t];
-        case 3: return [p, q, v];
-        case 4: return [t, p, v];
-        default: return [v, p, q];
-      }
-    }
-
     // ── Main loop ────────────────────────────────────────────────
 
     let lastTime = performance.now();
@@ -891,15 +800,11 @@ export class CascadeEngine {
 
     // Store refs for class API
     this.startGameFn = startGame;
+    this.moveFn = move;
+    this.splatFn = splat;
     this.destroyFn = () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resizeCanvas);
-      document.removeEventListener("keydown", keyHandler);
-      canvas.removeEventListener("touchstart", touchStartHandler);
-      canvas.removeEventListener("touchend", touchEndHandler);
-      canvas.removeEventListener("mousedown", mouseDownHandler);
-      canvas.removeEventListener("mousemove", mouseMoveHandler);
-      canvas.removeEventListener("mouseup", mouseUpHandler);
     };
   }
 
@@ -907,7 +812,34 @@ export class CascadeEngine {
     this.startGameFn?.();
   }
 
+  move(direction: "up" | "down" | "left" | "right") {
+    this.moveFn?.(direction);
+  }
+
+  paint(x: number, y: number, dx: number, dy: number) {
+    if (!this.splatFn) return;
+    const hue = (performance.now() * 0.0002) % 1;
+    const color = hsvToRgb(hue, 0.8, 0.5);
+    this.splatFn(x, y, dx, dy, color);
+  }
+
   destroy() {
     this.destroyFn?.();
+  }
+}
+
+function hsvToRgb(h: number, s: number, v: number): [number, number, number] {
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0: return [v, t, p];
+    case 1: return [q, v, p];
+    case 2: return [p, v, t];
+    case 3: return [p, q, v];
+    case 4: return [t, p, v];
+    default: return [v, p, q];
   }
 }

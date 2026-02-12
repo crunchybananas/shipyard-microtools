@@ -4,6 +4,11 @@ import { modifier } from "ember-modifier";
 import { on } from "@ember/modifier";
 import { CascadeEngine } from "cascade/cascade/init";
 
+const KEY_MAP: Record<string, "up" | "down" | "left" | "right"> = {
+  ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right",
+  w: "up", s: "down", a: "left", d: "right",
+};
+
 export default class CascadeApp extends Component {
   // ── Tracked state ────────────────────────────────────────────
 
@@ -13,6 +18,13 @@ export default class CascadeApp extends Component {
   @tracked messageVisible = false;
 
   engine: CascadeEngine | null = null;
+
+  // Input state (not tracked — no template dependency)
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private mouseDown = false;
+  private prevMX = 0;
+  private prevMY = 0;
 
   // ── Computed ─────────────────────────────────────────────────
 
@@ -45,17 +57,88 @@ export default class CascadeApp extends Component {
     };
   });
 
+  // Document-level keyboard modifier (attach/teardown lifecycle)
+  setupKeyboard = modifier((element: Element) => {
+    const handler = this.onKeyDown;
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  });
+
   // ── Event handlers (fat arrows) ──────────────────────────────
 
   newGame = () => {
     this.engine?.startGame();
   };
 
+  onKeyDown = (e: KeyboardEvent) => {
+    const dir = KEY_MAP[e.key];
+    if (dir) {
+      e.preventDefault();
+      this.engine?.move(dir);
+    }
+  };
+
+  onTouchStart = (e: TouchEvent) => {
+    const t = e.touches[0]!;
+    this.touchStartX = t.clientX;
+    this.touchStartY = t.clientY;
+  };
+
+  onTouchEnd = (e: TouchEvent) => {
+    const t = e.changedTouches[0]!;
+    const dx = t.clientX - this.touchStartX;
+    const dy = t.clientY - this.touchStartY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (Math.max(absDx, absDy) < 30) return;
+    e.preventDefault();
+
+    if (absDx > absDy) {
+      this.engine?.move(dx > 0 ? "right" : "left");
+    } else {
+      this.engine?.move(dy > 0 ? "down" : "up");
+    }
+  };
+
+  onMouseDown = (e: MouseEvent) => {
+    const canvas = e.currentTarget as HTMLCanvasElement;
+    this.mouseDown = true;
+    this.prevMX = e.offsetX / canvas.clientWidth;
+    this.prevMY = 1 - e.offsetY / canvas.clientHeight;
+  };
+
+  onMouseMove = (e: MouseEvent) => {
+    if (!this.mouseDown) return;
+    const canvas = e.currentTarget as HTMLCanvasElement;
+    const mx = e.offsetX / canvas.clientWidth;
+    const my = 1 - e.offsetY / canvas.clientHeight;
+    const dx = mx - this.prevMX;
+    const dy = my - this.prevMY;
+    if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
+      this.engine?.paint(mx, my, dx, dy);
+    }
+    this.prevMX = mx;
+    this.prevMY = my;
+  };
+
+  onMouseUp = () => {
+    this.mouseDown = false;
+  };
+
   // ── Template ─────────────────────────────────────────────────
 
   <template>
-    <div class="cascade-root">
-      <canvas id="cascade-canvas" {{this.setupCanvas}}></canvas>
+    <div class="cascade-root" {{this.setupKeyboard}}>
+      <canvas
+        id="cascade-canvas"
+        {{this.setupCanvas}}
+        {{on "touchstart" this.onTouchStart}}
+        {{on "touchend" this.onTouchEnd}}
+        {{on "mousedown" this.onMouseDown}}
+        {{on "mousemove" this.onMouseMove}}
+        {{on "mouseup" this.onMouseUp}}
+      ></canvas>
 
       <div class="game-container">
         <div class="header">
