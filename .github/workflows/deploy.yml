@@ -35,7 +35,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Ember apps
-        run: pnpm build
+        run: pnpm run --filter './apps/*' --workspace-concurrency=1 build
 
       - name: Prepare deployment
         run: |
