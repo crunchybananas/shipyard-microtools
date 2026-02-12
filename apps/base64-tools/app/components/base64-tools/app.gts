@@ -1,14 +1,63 @@
 import Component from "@glimmer/component";
-import { modifier } from "ember-modifier";
-import { initializeBase64Tools } from "base64-tools/base64-tools/init";
+import { tracked } from "@glimmer/tracking";
+import { on } from "@ember/modifier";
+import { fn } from "@ember/helper";
+import TextPanel from "./text-panel";
+import FilePanel from "./file-panel";
+import StatusMessage from "./status-message";
+
+// ── Tab definitions (data-driven) ──────────────────────────────
+
+const TABS = [
+  { id: "text", label: "Text" },
+  { id: "file", label: "File/Image" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+// ── Component ──────────────────────────────────────────────────
 
 export default class Base64ToolsApp extends Component {
-  setupBase64Tools = modifier((element: HTMLElement) => {
-    initializeBase64Tools(element);
-  });
+  @tracked activeTab: TabId = "text";
+  @tracked statusText = "";
+  @tracked statusType: "success" | "error" | "" = "";
+
+  private statusTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ── Computed ─────────────────────────────────────────────────
+
+  get isTextTab() {
+    return this.activeTab === "text";
+  }
+
+  get isFileTab() {
+    return this.activeTab === "file";
+  }
+
+  // ── Event handlers (fat arrows) ──────────────────────────────
+
+  switchTab = (tabId: TabId) => {
+    this.activeTab = tabId;
+  };
+
+  showStatus = (message: string, type: "success" | "error") => {
+    if (this.statusTimer) clearTimeout(this.statusTimer);
+    this.statusText = message;
+    this.statusType = type;
+    this.statusTimer = setTimeout(() => {
+      this.statusText = "";
+      this.statusType = "";
+    }, 3000);
+  };
+
+  tabClass = (tabId: TabId) => {
+    return this.activeTab === tabId ? "tab active" : "tab";
+  };
+
+  // ── Template ─────────────────────────────────────────────────
 
   <template>
-    <div class="container" {{this.setupBase64Tools}}>
+    <div class="container">
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>🔐 Base64 Tools</h1>
@@ -18,70 +67,24 @@ export default class Base64ToolsApp extends Component {
 
       <main>
         <div class="tabs">
-          <button class="tab active" data-tab="text" type="button">Text</button>
-          <button class="tab" data-tab="file" type="button">File/Image</button>
+          {{#each TABS as |tab|}}
+            <button
+              class={{this.tabClass tab.id}}
+              type="button"
+              {{on "click" (fn this.switchTab tab.id)}}
+            >{{tab.label}}</button>
+          {{/each}}
         </div>
 
-        <div id="text-panel" class="panel active">
-          <div class="input-section">
-            <label for="textInput">Plain Text</label>
-            <textarea
-              id="textInput"
-              rows="4"
-              placeholder="Enter text to encode..."
-            ></textarea>
-            <button id="encodeTextBtn" class="primary-btn" type="button">Encode
-              →</button>
-          </div>
+        {{#if this.isTextTab}}
+          <TextPanel @onStatus={{this.showStatus}} />
+        {{/if}}
 
-          <div class="input-section">
-            <label for="base64Input">Base64</label>
-            <textarea
-              id="base64Input"
-              rows="4"
-              placeholder="Enter Base64 to decode..."
-            ></textarea>
-            <button id="decodeTextBtn" class="primary-btn" type="button">←
-              Decode</button>
-          </div>
-        </div>
+        {{#if this.isFileTab}}
+          <FilePanel @onStatus={{this.showStatus}} />
+        {{/if}}
 
-        <div id="file-panel" class="panel">
-          <div class="input-section">
-            <label>Upload File or Image</label>
-            <div class="drop-zone" id="dropZone">
-              <p>
-                📁 Drop a file here or
-                <label class="file-label">
-                  browse
-                  <input type="file" id="fileInput" />
-                </label>
-              </p>
-            </div>
-            <div id="filePreview" class="file-preview hidden">
-              <img id="previewImg" alt="Preview" />
-              <p id="fileName"></p>
-            </div>
-          </div>
-
-          <div class="input-section">
-            <label for="fileBase64Output">Base64 Output</label>
-            <textarea
-              id="fileBase64Output"
-              rows="6"
-              readonly
-              placeholder="Base64 will appear here..."
-            ></textarea>
-            <div class="button-row">
-              <button id="copyBase64Btn" class="secondary-btn" type="button">📋
-                Copy</button>
-              <button id="copyDataUrlBtn" class="secondary-btn" type="button">🔗
-                Copy as Data URL</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="status" class="status hidden"></div>
+        <StatusMessage @text={{this.statusText}} @type={{this.statusType}} />
       </main>
 
       <footer>

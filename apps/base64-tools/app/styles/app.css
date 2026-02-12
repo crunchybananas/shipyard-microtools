@@ -85,10 +85,6 @@ main {
 }
 
 .panel {
-  display: none;
-}
-
-.panel.active {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -207,10 +203,6 @@ textarea[readonly] {
 .file-preview {
   margin-top: 1rem;
   text-align: center;
-}
-
-.file-preview.hidden {
-  display: none;
 }
 
 .file-preview img {
