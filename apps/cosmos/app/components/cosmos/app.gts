@@ -16,13 +16,18 @@ import {
   generateGalaxy,
   generateStar,
   generatePlanet,
-  lightenColor,
-  darkenColor,
 } from "cosmos/services/universe-generator";
 import {
   type Bookmark,
   saveBookmark,
 } from "cosmos/services/bookmark-manager";
+import {
+  CosmosEngine,
+  ParticleBuilder,
+  hexToRGB,
+  hslToRGB,
+  planetTypeToIndex,
+} from "cosmos/cosmos/cosmos-engine";
 
 interface Camera {
   x: number;
@@ -44,8 +49,15 @@ export default class CosmosApp extends Component {
   @tracked currentScale: Scale = getCurrentScale(1);
   @tracked selectedObject: Galaxy | Star | Planet | null = null;
 
-  private canvas: HTMLCanvasElement | null = null;
-  private ctx: CanvasRenderingContext2D | null = null;
+  // WebGL engine + particle builder
+  private engine = new CosmosEngine();
+  private particles = new ParticleBuilder();
+
+  // Canvas overlay for text labels & rings
+  private overlayCanvas: HTMLCanvasElement | null = null;
+  private overlayCtx: CanvasRenderingContext2D | null = null;
+
+  private glCanvas: HTMLCanvasElement | null = null;
   private animationId: number | null = null;
   private lastMouseX = 0;
   private lastMouseY = 0;
@@ -84,24 +96,50 @@ export default class CosmosApp extends Component {
 
   setupCanvas = modifier((element: HTMLCanvasElement) => {
     this.checkUrlParams();
-    this.canvas = element;
-    this.ctx = element.getContext("2d");
-    this.resizeCanvas();
-    window.addEventListener("resize", this.resizeCanvas);
+
+    // Element is the WebGL canvas
+    this.glCanvas = element;
+
+    // Find overlay canvas (sibling)
+    const container = element.parentElement;
+    this.overlayCanvas = container?.querySelector(".cosmos-overlay") as HTMLCanvasElement | null;
+    if (this.overlayCanvas) {
+      this.overlayCtx = this.overlayCanvas.getContext("2d");
+    }
+
+    // Init WebGL engine
+    const success = this.engine.init(element);
+    if (!success) {
+      console.error("WebGL2 init failed");
+      return;
+    }
+
+    this.resizeCanvases();
+    window.addEventListener("resize", this.resizeCanvases);
     this.startRenderLoop();
 
     return () => {
-      window.removeEventListener("resize", this.resizeCanvas);
+      window.removeEventListener("resize", this.resizeCanvases);
       if (this.animationId !== null) {
         cancelAnimationFrame(this.animationId);
       }
+      this.engine.destroy();
     };
   });
 
-  private resizeCanvas = (): void => {
-    if (this.canvas) {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
+  private resizeCanvases = (): void => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    if (this.glCanvas) {
+      this.glCanvas.style.width = `${w}px`;
+      this.glCanvas.style.height = `${h}px`;
+      this.engine.resize();
+    }
+
+    if (this.overlayCanvas) {
+      this.overlayCanvas.width = w;
+      this.overlayCanvas.height = h;
     }
   };
 
@@ -114,11 +152,6 @@ export default class CosmosApp extends Component {
   }
 
   private renderFrame(): void {
-    if (!this.canvas || !this.ctx) return;
-
-    const ctx = this.ctx;
-    const canvas = this.canvas;
-
     // Smooth camera
     this.camera.zoom += (this.camera.targetZoom - this.camera.zoom) * 0.1;
     this.camera.x += (this.camera.targetX - this.camera.x) * 0.1;
@@ -132,80 +165,61 @@ export default class CosmosApp extends Component {
 
     this.time += 0.016;
 
-    this.drawBackground(ctx, canvas);
-
-    // Calculate visible area
-    const viewWidth = canvas.width / this.camera.zoom;
-    const viewHeight = canvas.height / this.camera.zoom;
+    // Calculate visible area (CSS pixels)
+    const cssW = this.overlayCanvas?.width ?? window.innerWidth;
+    const cssH = this.overlayCanvas?.height ?? window.innerHeight;
+    const viewWidth = cssW / this.camera.zoom;
+    const viewHeight = cssH / this.camera.zoom;
     const left = this.camera.x - viewWidth / 2;
     const right = this.camera.x + viewWidth / 2;
     const top = this.camera.y - viewHeight / 2;
     const bottom = this.camera.y + viewHeight / 2;
 
+    // Clear overlay
+    if (this.overlayCtx && this.overlayCanvas) {
+      this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+    }
+
+    // WebGL rendering
+    this.engine.beginFrame();
+    this.engine.drawBackground();
+
     if (this.camera.zoom < 50) {
-      this.renderGalaxies(ctx, canvas, left, right, top, bottom);
+      this.renderGalaxiesWebGL(left, right, top, bottom);
     } else if (this.camera.zoom < 5000) {
-      this.renderStars(ctx, canvas, left, right, top, bottom);
+      this.renderStarsWebGL(left, right, top, bottom);
     } else {
-      this.renderSystem(ctx, canvas);
+      this.renderSystemWebGL();
     }
+
+    this.engine.endFrame();
   }
 
-  private drawBackground(
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
-  ): void {
-    const gradient = ctx.createRadialGradient(
-      canvas.width / 2,
-      canvas.height / 2,
-      0,
-      canvas.width / 2,
-      canvas.height / 2,
-      Math.max(canvas.width, canvas.height)
-    );
-    gradient.addColorStop(0, "#0a0a1a");
-    gradient.addColorStop(0.5, "#050510");
-    gradient.addColorStop(1, "#000005");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // ─── World → Screen (CSS pixel space for overlay) ────────────────────────
 
-    // Background stars
-    const bgRng = new SeededRandom(12345);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-    for (let i = 0; i < 200; i++) {
-      const x = bgRng.next() * canvas.width;
-      const y = bgRng.next() * canvas.height;
-      const size = bgRng.range(0.5, 1.5);
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  private worldToScreen(
-    wx: number,
-    wy: number,
-    canvas: HTMLCanvasElement
-  ): { x: number; y: number } {
+  private worldToScreen(wx: number, wy: number): { x: number; y: number } {
+    const cssW = this.overlayCanvas?.width ?? window.innerWidth;
+    const cssH = this.overlayCanvas?.height ?? window.innerHeight;
     return {
-      x: (wx - this.camera.x) * this.camera.zoom + canvas.width / 2,
-      y: (wy - this.camera.y) * this.camera.zoom + canvas.height / 2,
+      x: (wx - this.camera.x) * this.camera.zoom + cssW / 2,
+      y: (wy - this.camera.y) * this.camera.zoom + cssH / 2,
     };
   }
 
-  private renderGalaxies(
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement,
-    left: number,
-    right: number,
-    top: number,
-    bottom: number
+  // ─── Galaxy Rendering (WebGL instanced + overlay labels) ────────────────
+
+  private renderGalaxiesWebGL(
+    left: number, right: number, top: number, bottom: number
   ): void {
     const gridSize = 200;
     const startX = Math.floor(left / gridSize) * gridSize;
     const startY = Math.floor(top / gridSize) * gridSize;
 
+    this.particles.reset();
     this.cachedGalaxies = [];
+
+    const cssW = this.overlayCanvas?.width ?? window.innerWidth;
+    const cssH = this.overlayCanvas?.height ?? window.innerHeight;
 
     for (let x = startX; x < right + gridSize; x += gridSize) {
       for (let y = startY; y < bottom + gridSize; y += gridSize) {
@@ -218,132 +232,101 @@ export default class CosmosApp extends Component {
         const gx = x + rng.range(20, gridSize - 20);
         const gy = y + rng.range(20, gridSize - 20);
 
-        const screen = this.worldToScreen(gx, gy, canvas);
+        const screen = this.worldToScreen(gx, gy);
         const size = 30 * galaxy.size * this.camera.zoom;
 
         if (
-          screen.x > -size &&
-          screen.x < canvas.width + size &&
-          screen.y > -size &&
-          screen.y < canvas.height + size
+          screen.x > -size && screen.x < cssW + size &&
+          screen.y > -size && screen.y < cssH + size
         ) {
-          this.drawGalaxy(ctx, galaxy, screen.x, screen.y, size);
+          this.addGalaxyParticles(galaxy, gx, gy, 30 * galaxy.size);
 
           this.cachedGalaxies.push({
             ...galaxy,
-            worldX: gx,
-            worldY: gy,
-            screenX: screen.x,
-            screenY: screen.y,
-            screenSize: size,
+            worldX: gx, worldY: gy,
+            screenX: screen.x, screenY: screen.y, screenSize: size,
           });
 
-          if (this.camera.zoom > 10 && size > 40) {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-            ctx.font = "12px SF Pro Display, sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText(galaxy.name, screen.x, screen.y + size + 20);
+          if (this.camera.zoom > 10 && size > 40 && this.overlayCtx) {
+            this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.7)";
+            this.overlayCtx.font = "12px SF Pro Display, sans-serif";
+            this.overlayCtx.textAlign = "center";
+            this.overlayCtx.fillText(galaxy.name, screen.x, screen.y + size + 20);
           }
         }
       }
     }
+
+    this.engine.drawParticles(
+      this.particles.getData(),
+      this.camera.x, this.camera.y, this.camera.zoom
+    );
   }
 
-  private drawGalaxy(
-    ctx: CanvasRenderingContext2D,
-    galaxy: Galaxy,
-    x: number,
-    y: number,
-    size: number
+  private addGalaxyParticles(
+    galaxy: Galaxy, worldX: number, worldY: number, worldSize: number
   ): void {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(galaxy.rotation);
-    ctx.scale(1, galaxy.tilt);
-
     const rng = new SeededRandom(galaxy.seed);
 
     if (galaxy.type === "spiral" || galaxy.type === "barred_spiral") {
       for (let arm = 0; arm < galaxy.arms; arm++) {
         const armAngle = (arm / galaxy.arms) * Math.PI * 2;
-
-        for (let i = 0; i < galaxy.starCount / galaxy.arms; i++) {
-          const t = i / (galaxy.starCount / galaxy.arms);
-          const distance = t * size;
-          const spread = rng.range(-size * 0.15, size * 0.15);
-          const angle = armAngle + t * 3 + spread * 0.01;
-
-          const px = Math.cos(angle) * distance + rng.range(-5, 5);
-          const py = Math.sin(angle) * distance + rng.range(-5, 5);
-
+        const perArm = galaxy.starCount / galaxy.arms;
+        for (let i = 0; i < perArm; i++) {
+          const t = i / perArm;
+          const distance = t * worldSize;
+          const spread = rng.range(-worldSize * 0.15, worldSize * 0.15);
+          const angle = armAngle + t * 3 + spread * 0.01 + galaxy.rotation;
+          const px = worldX + Math.cos(angle) * distance + rng.range(-0.5, 0.5);
+          const py = worldY + Math.sin(angle) * distance * galaxy.tilt + rng.range(-0.5, 0.5);
           const brightness = (1 - t * 0.7) * rng.range(0.3, 1);
-          const starSize = rng.range(0.5, 2) * (1 - t * 0.5);
-
-          ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.6})`;
-          ctx.beginPath();
-          ctx.arc(px, py, starSize, 0, Math.PI * 2);
-          ctx.fill();
+          const starSize = rng.range(0.3, 1.2) * (1 - t * 0.5);
+          this.particles.add(px, py, starSize, 1, 1, 1, brightness * 0.6, brightness * 0.3);
         }
       }
     } else if (galaxy.type === "elliptical") {
       for (let i = 0; i < galaxy.starCount; i++) {
         const angle = rng.range(0, Math.PI * 2);
-        const dist = rng.range(0, 1) * rng.range(0, 1) * size;
-        const px = Math.cos(angle) * dist * 1.5;
-        const py = Math.sin(angle) * dist;
-
-        const brightness = (1 - dist / size) * rng.range(0.3, 1);
-        ctx.fillStyle = `rgba(255, 220, 180, ${brightness * 0.5})`;
-        ctx.beginPath();
-        ctx.arc(px, py, rng.range(0.5, 1.5), 0, Math.PI * 2);
-        ctx.fill();
+        const dist = rng.range(0, 1) * rng.range(0, 1) * worldSize;
+        const px = worldX + Math.cos(angle) * dist * 1.5;
+        const py = worldY + Math.sin(angle) * dist;
+        const brightness = (1 - dist / worldSize) * rng.range(0.3, 1);
+        this.particles.add(px, py, rng.range(0.3, 1.0), 1, 0.86, 0.7, brightness * 0.5, brightness * 0.2);
       }
     } else {
       for (let i = 0; i < galaxy.starCount; i++) {
-        const px = rng.range(-size, size) * rng.range(0.3, 1);
-        const py = rng.range(-size * 0.6, size * 0.6) * rng.range(0.3, 1);
-
+        const px = worldX + rng.range(-worldSize, worldSize) * rng.range(0.3, 1);
+        const py = worldY + rng.range(-worldSize * 0.6, worldSize * 0.6) * rng.range(0.3, 1);
         const brightness = rng.range(0.2, 0.8);
-        ctx.fillStyle = `rgba(200, 220, 255, ${brightness * 0.5})`;
-        ctx.beginPath();
-        ctx.arc(px, py, rng.range(0.5, 1.5), 0, Math.PI * 2);
-        ctx.fill();
+        this.particles.add(px, py, rng.range(0.3, 1.0), 0.78, 0.86, 1, brightness * 0.5, brightness * 0.2);
       }
     }
 
     // Bright core
-    const coreGradient = ctx.createRadialGradient(
-      0,
-      0,
-      0,
-      0,
-      0,
-      size * 0.25
-    );
-    coreGradient.addColorStop(0, "rgba(255, 255, 220, 0.8)");
-    coreGradient.addColorStop(0.5, "rgba(255, 240, 200, 0.3)");
-    coreGradient.addColorStop(1, "rgba(255, 230, 180, 0)");
-    ctx.fillStyle = coreGradient;
-    ctx.beginPath();
-    ctx.arc(0, 0, size * 0.25, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    for (let i = 0; i < 30; i++) {
+      const angle = rng.range(0, Math.PI * 2);
+      const dist = rng.range(0, worldSize * 0.15) * rng.range(0, 1);
+      const px = worldX + Math.cos(angle) * dist;
+      const py = worldY + Math.sin(angle) * dist * galaxy.tilt;
+      const brightness = rng.range(0.5, 1.0);
+      this.particles.add(px, py, rng.range(0.5, 2.0), 1, 0.96, 0.86, brightness * 0.8, 1.0);
+    }
   }
 
-  private renderStars(
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement,
-    left: number,
-    right: number,
-    top: number,
-    bottom: number
+  // ─── Star Rendering (WebGL instanced + overlay labels) ──────────────────
+
+  private renderStarsWebGL(
+    left: number, right: number, top: number, bottom: number
   ): void {
     const gridSize = 50;
     const startX = Math.floor(left / gridSize) * gridSize;
     const startY = Math.floor(top / gridSize) * gridSize;
 
+    this.particles.reset();
     this.cachedStars = [];
+
+    const cssW = this.overlayCanvas?.width ?? window.innerWidth;
+    const cssH = this.overlayCanvas?.height ?? window.innerHeight;
 
     for (let x = startX; x < right + gridSize; x += gridSize) {
       for (let y = startY; y < bottom + gridSize; y += gridSize) {
@@ -356,83 +339,42 @@ export default class CosmosApp extends Component {
         const sx = x + rng.range(5, gridSize - 5);
         const sy = y + rng.range(5, gridSize - 5);
 
-        const screen = this.worldToScreen(sx, sy, canvas);
+        const screen = this.worldToScreen(sx, sy);
         const baseSize = 2 + star.radius * 2;
-        const size = baseSize * (this.camera.zoom / 100);
+        const screenSize = baseSize * (this.camera.zoom / 100);
 
         if (
-          screen.x > -size * 3 &&
-          screen.x < canvas.width + size * 3 &&
-          screen.y > -size * 3 &&
-          screen.y < canvas.height + size * 3
+          screen.x > -screenSize * 3 && screen.x < cssW + screenSize * 3 &&
+          screen.y > -screenSize * 3 && screen.y < cssH + screenSize * 3
         ) {
-          this.drawStar(ctx, star, screen.x, screen.y, Math.max(1, size));
+          const [r, g, b] = hexToRGB(star.color);
+          this.particles.add(sx, sy, baseSize, r, g, b, 1.0, 1.0);
 
           this.cachedStars.push({
             ...star,
-            worldX: sx,
-            worldY: sy,
-            screenX: screen.x,
-            screenY: screen.y,
-            screenSize: size,
+            worldX: sx, worldY: sy,
+            screenX: screen.x, screenY: screen.y, screenSize,
           });
 
-          if (this.camera.zoom > 1000 && size > 3) {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-            ctx.font = "11px SF Pro Display, sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText(star.name, screen.x, screen.y + size * 3 + 15);
+          if (this.camera.zoom > 1000 && screenSize > 3 && this.overlayCtx) {
+            this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.6)";
+            this.overlayCtx.font = "11px SF Pro Display, sans-serif";
+            this.overlayCtx.textAlign = "center";
+            this.overlayCtx.fillText(star.name, screen.x, screen.y + screenSize * 3 + 15);
           }
         }
       }
     }
-  }
 
-  private drawStar(
-    ctx: CanvasRenderingContext2D,
-    star: Star,
-    x: number,
-    y: number,
-    size: number
-  ): void {
-    // Glow
-    const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, size * 3);
-    glowGradient.addColorStop(0, star.color);
-    glowGradient.addColorStop(0.3, star.color + "80");
-    glowGradient.addColorStop(1, star.color + "00");
-    ctx.fillStyle = glowGradient;
-    ctx.beginPath();
-    ctx.arc(x, y, size * 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Core
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Main body
-    const bodyGradient = ctx.createRadialGradient(
-      x - size * 0.2,
-      y - size * 0.2,
-      0,
-      x,
-      y,
-      size
+    this.engine.drawParticles(
+      this.particles.getData(),
+      this.camera.x, this.camera.y, this.camera.zoom
     );
-    bodyGradient.addColorStop(0, "#fff");
-    bodyGradient.addColorStop(0.5, star.color);
-    bodyGradient.addColorStop(1, star.color + "cc");
-    ctx.fillStyle = bodyGradient;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
   }
 
-  private renderSystem(
-    ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
-  ): void {
+  // ─── System Rendering (WebGL planets + overlay text) ─────────────────────
+
+  private renderSystemWebGL(): void {
     if (!this.cachedSystem || this.cachedStars.length === 0) {
       const seed = getSeed(
         Math.floor(this.camera.x / 50),
@@ -450,204 +392,106 @@ export default class CosmosApp extends Component {
     }
 
     const { star, planets } = this.cachedSystem;
-    const starSize = 40 * (this.camera.zoom / 10000);
+    const cssW = this.overlayCanvas?.width ?? window.innerWidth;
+    const cssH = this.overlayCanvas?.height ?? window.innerHeight;
+    const [resW] = this.engine.getResolution();
+    const dpr = resW / cssW;
 
-    // Star glow
-    const glowGradient = ctx.createRadialGradient(
-      canvas.width / 2,
-      canvas.height / 2,
-      0,
-      canvas.width / 2,
-      canvas.height / 2,
-      starSize * 5
+    // Star as bright particles
+    this.particles.reset();
+    const starWorldSize = 40 / 10000;
+    const [sr, sg, sb] = hexToRGB(star.color);
+    const starCenterX = this.camera.x;
+    const starCenterY = this.camera.y;
+
+    for (let i = 0; i < 5; i++) {
+      const scale = 1 + i * 0.8;
+      const alpha = 1.0 - i * 0.18;
+      this.particles.add(
+        starCenterX, starCenterY, starWorldSize * scale * 3,
+        sr, sg, sb, alpha, 1.5 - i * 0.2
+      );
+    }
+    this.particles.add(starCenterX, starCenterY, starWorldSize * 0.5, 1, 1, 1, 1.0, 0.5);
+
+    this.engine.drawParticles(
+      this.particles.getData(),
+      this.camera.x, this.camera.y, this.camera.zoom
     );
-    glowGradient.addColorStop(0, star.color);
-    glowGradient.addColorStop(0.2, star.color + "60");
-    glowGradient.addColorStop(1, "transparent");
-    ctx.fillStyle = glowGradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    this.drawStar(ctx, star, canvas.width / 2, canvas.height / 2, starSize);
-
-    // Draw planets
+    // Planets
     planets.forEach((planet) => {
       const orbitScale = this.camera.zoom / 5000;
       const orbitRadius = planet.orbitRadius * orbitScale;
 
-      // Draw orbit path
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(
-        canvas.width / 2,
-        canvas.height / 2,
-        orbitRadius,
-        0,
-        Math.PI * 2
-      );
-      ctx.stroke();
-
-      // Calculate planet position
       const angle = planet.orbitOffset + this.time * planet.orbitSpeed * 100;
-      const px = canvas.width / 2 + Math.cos(angle) * orbitRadius;
-      const py = canvas.height / 2 + Math.sin(angle) * orbitRadius;
-
+      const px = cssW / 2 + Math.cos(angle) * orbitRadius;
+      const py = cssH / 2 + Math.sin(angle) * orbitRadius;
       const planetSize = Math.max(3, planet.radius * 3 * orbitScale);
 
-      this.drawPlanet(
-        ctx,
-        planet,
-        px,
-        py,
-        planetSize,
-        this.camera.zoom > 20000
-      );
+      // Orbit path on overlay
+      if (this.overlayCtx) {
+        this.overlayCtx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        this.overlayCtx.lineWidth = 1;
+        this.overlayCtx.beginPath();
+        this.overlayCtx.arc(cssW / 2, cssH / 2, orbitRadius, 0, Math.PI * 2);
+        this.overlayCtx.stroke();
+      }
 
-      if (planetSize > 5) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-        ctx.font = "11px SF Pro Display, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(planet.name, px, py + planetSize + 15);
+      // Light direction
+      const dx = px - cssW / 2;
+      const dy = py - cssH / 2;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const lightDir: [number, number, number] = [-dx / dist, -dy / dist, 0.5];
+
+      const [pr, pg, pb] = hexToRGB(planet.color);
+      const atmosColor = planet.atmosphere
+        ? hslToRGB(planet.atmosphereColor)
+        : [0, 0, 0] as [number, number, number];
+
+      // Ring behind (overlay)
+      if (planet.hasRings && this.overlayCtx) {
+        this.engine.drawRing(this.overlayCtx, px, py, planetSize, planet.ringColor, true);
+      }
+
+      // Planet sphere (WebGL)
+      if (planetSize > 2) {
+        this.engine.drawPlanetSphere(
+          px * dpr, py * dpr, planetSize * dpr,
+          [pr, pg, pb], lightDir,
+          planet.atmosphere, atmosColor,
+          planetTypeToIndex(planet.type), planet.seed,
+        );
+      }
+
+      // Ring in front (overlay)
+      if (planet.hasRings && this.overlayCtx) {
+        this.engine.drawRing(this.overlayCtx, px, py, planetSize, planet.ringColor, false);
+      }
+
+      // Label
+      if (planetSize > 5 && this.overlayCtx) {
+        this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        this.overlayCtx.font = "11px SF Pro Display, sans-serif";
+        this.overlayCtx.textAlign = "center";
+        this.overlayCtx.fillText(planet.name, px, py + planetSize + 15);
       }
     });
 
-    // Star label
-    ctx.fillStyle = "#fff";
-    ctx.font = "14px SF Pro Display, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(star.name, canvas.width / 2, canvas.height / 2 + starSize + 25);
-    ctx.font = "11px SF Pro Display, sans-serif";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.fillText(
-      `${star.spectralClass}-type • ${star.temperature}K`,
-      canvas.width / 2,
-      canvas.height / 2 + starSize + 42
-    );
-  }
-
-  private drawPlanet(
-    ctx: CanvasRenderingContext2D,
-    planet: Planet,
-    x: number,
-    y: number,
-    size: number,
-    showDetail: boolean
-  ): void {
-    ctx.save();
-
-    // Atmosphere glow
-    if (planet.atmosphere && showDetail) {
-      const atmosGradient = ctx.createRadialGradient(
-        x,
-        y,
-        size * 0.9,
-        x,
-        y,
-        size * 1.3
+    // Star label on overlay
+    if (this.overlayCtx) {
+      const starSize = 40 * (this.camera.zoom / 10000);
+      this.overlayCtx.fillStyle = "#fff";
+      this.overlayCtx.font = "14px SF Pro Display, sans-serif";
+      this.overlayCtx.textAlign = "center";
+      this.overlayCtx.fillText(star.name, cssW / 2, cssH / 2 + starSize + 25);
+      this.overlayCtx.font = "11px SF Pro Display, sans-serif";
+      this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.5)";
+      this.overlayCtx.fillText(
+        `${star.spectralClass}-type • ${star.temperature}K`,
+        cssW / 2, cssH / 2 + starSize + 42
       );
-      atmosGradient.addColorStop(0, planet.atmosphereColor);
-      atmosGradient.addColorStop(1, "transparent");
-      ctx.fillStyle = atmosGradient;
-      ctx.beginPath();
-      ctx.arc(x, y, size * 1.3, 0, Math.PI * 2);
-      ctx.fill();
     }
-
-    // Rings (behind planet)
-    if (planet.hasRings) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(1, 0.3);
-      ctx.strokeStyle = planet.ringColor;
-      ctx.lineWidth = size * 0.3;
-      ctx.beginPath();
-      ctx.arc(0, 0, size * 1.8, Math.PI, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Planet body
-    const planetGradient = ctx.createRadialGradient(
-      x - size * 0.3,
-      y - size * 0.3,
-      0,
-      x,
-      y,
-      size
-    );
-    planetGradient.addColorStop(0, lightenColor(planet.color, 30));
-    planetGradient.addColorStop(0.7, planet.color);
-    planetGradient.addColorStop(1, darkenColor(planet.color, 30));
-    ctx.fillStyle = planetGradient;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Surface features for detailed view
-    if (showDetail && size > 20) {
-      const rng = new SeededRandom(planet.seed);
-      ctx.globalAlpha = 0.3;
-
-      if (planet.type === "gas_giant" || planet.type === "ice_giant") {
-        for (let i = 0; i < 5; i++) {
-          const bandY = y - size + (i + 0.5) * ((size * 2) / 5);
-          ctx.fillStyle =
-            i % 2 === 0
-              ? darkenColor(planet.color, 15)
-              : lightenColor(planet.color, 10);
-          ctx.beginPath();
-          const bandWidth =
-            Math.cos(Math.asin((bandY - y) / size)) * size || size * 0.1;
-          ctx.ellipse(x, bandY, bandWidth, size * 0.15, 0, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      } else if (planet.type === "earth_like" || planet.type === "ocean") {
-        for (let i = 0; i < 8; i++) {
-          const cx = x + rng.range(-size * 0.6, size * 0.6);
-          const cy = y + rng.range(-size * 0.6, size * 0.6);
-          const cr = rng.range(size * 0.1, size * 0.3);
-
-          if (Math.sqrt((cx - x) ** 2 + (cy - y) ** 2) + cr < size) {
-            ctx.fillStyle = planet.type === "ocean" ? "#fff" : "#228b22";
-            ctx.beginPath();
-            ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-      }
-
-      ctx.globalAlpha = 1;
-    }
-
-    // Rings (in front of planet)
-    if (planet.hasRings) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(1, 0.3);
-      ctx.strokeStyle = planet.ringColor;
-      ctx.lineWidth = size * 0.3;
-      ctx.beginPath();
-      ctx.arc(0, 0, size * 1.8, 0, Math.PI);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Shadow
-    const shadowGradient = ctx.createLinearGradient(
-      x - size,
-      y,
-      x + size,
-      y
-    );
-    shadowGradient.addColorStop(0, "transparent");
-    shadowGradient.addColorStop(0.5, "transparent");
-    shadowGradient.addColorStop(1, "rgba(0, 0, 0, 0.6)");
-    ctx.fillStyle = shadowGradient;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
   }
 
   // Event handlers
@@ -809,6 +653,7 @@ export default class CosmosApp extends Component {
         {{on "pointercancel" this.handlePointerUp}}
         {{on "click" this.handleClick}}
       ></canvas>
+      <canvas class="cosmos-overlay"></canvas>
 
       <header class="cosmos-header">
         <h1>🌌 COSMOS</h1>
