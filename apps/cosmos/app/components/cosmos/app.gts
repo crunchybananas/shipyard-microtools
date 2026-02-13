@@ -206,6 +206,16 @@ export default class CosmosApp extends Component {
       this.renderGalaxiesWebGL(left, right, top, bottom);
     } else if (this.camera.zoom < 5000) {
       this.renderStarsWebGL(left, right, top, bottom);
+      // Nebulae visible at galaxy/sector scale
+      const nebulaIntensity = this.camera.zoom < 500
+        ? (this.camera.zoom - 50) / 450 // Fade in from cluster → galaxy
+        : Math.max(0, 1 - (this.camera.zoom - 500) / 4500); // Fade out sector → system
+      if (nebulaIntensity > 0.01) {
+        this.engine.drawNebula(
+          this.camera.x, this.camera.y, this.camera.zoom,
+          nebulaIntensity * 0.8,
+        );
+      }
     } else if (this.camera.zoom < 500000) {
       this.renderSystemWebGL();
     } else {
