@@ -12,14 +12,35 @@ import { type InputManager, type MovementVector } from './input-manager';
 
 export type CameraMode = 'space' | 'surface';
 
+/** Named speed tiers for surface exploration. */
+export interface SpeedTier {
+  name: string;
+  speed: number;
+}
+
+const SPEED_TIERS: SpeedTier[] = [
+  { name: 'Creep', speed: 0.08 },
+  { name: 'Walk', speed: 0.25 },
+  { name: 'Jog', speed: 0.55 },
+  { name: 'Run', speed: 1.2 },
+  { name: 'Sprint', speed: 2.5 },
+  { name: 'Fly', speed: 6.0 },
+];
+
 /** Read-only snapshot of controller state for the current frame. */
 export interface SurfaceCamera {
   /** Horizontal look direction in radians. */
   lookAngle: number;
   /** Vertical look pitch (−π/4 … π/6). */
   lookPitch: number;
-  /** Movement speed multiplier (0 = stationary). */
+  /** Current speed magnitude. */
   speed: number;
+  /** Current speed tier name. */
+  speedTierName: string;
+  /** Current speed tier index (0-based). */
+  speedTierIndex: number;
+  /** Total number of speed tiers. */
+  speedTierCount: number;
 }
 
 const SURFACE_ZOOM_THRESHOLD = 500_000;
@@ -31,8 +52,8 @@ export class CameraController {
   /** Vertical look pitch. */
   lookPitch = -0.08;
 
-  private walkSpeed = 0.35;
-  private sprintMultiplier = 2.5;
+  private speedTierIndex = 2; // Start at "Jog"
+  private sprintMultiplier = 2.0;
   private turnSpeed = 1.8; // radians · s⁻¹ via keyboard Q/E
 
   /** Damped velocity for smooth starts/stops. */
@@ -45,6 +66,14 @@ export class CameraController {
   /** Current camera mode based on zoom level. */
   mode(zoom: number): CameraMode {
     return zoom >= SURFACE_ZOOM_THRESHOLD ? 'surface' : 'space';
+  }
+
+  /** Cycle speed tier up (+1) or down (−1). Returns true if changed. */
+  adjustSpeed(direction: number): boolean {
+    const next = this.speedTierIndex + (direction > 0 ? 1 : -1);
+    if (next < 0 || next >= SPEED_TIERS.length) return false;
+    this.speedTierIndex = next;
+    return true;
   }
 
   /**
@@ -65,7 +94,8 @@ export class CameraController {
     }
 
     const mv: MovementVector = input.getMovement();
-    const speed = this.walkSpeed * (input.sprint ? this.sprintMultiplier : 1);
+    const tier = SPEED_TIERS[this.speedTierIndex]!;
+    const speed = tier.speed * (input.sprint ? this.sprintMultiplier : 1);
 
     // Rotate look via Q / E
     if (input.isDown('q')) this.lookAngle -= this.turnSpeed * dt;
@@ -108,12 +138,15 @@ export class CameraController {
     );
   }
 
-  /** Snapshot for the shader uniforms. */
+  /** Snapshot for the shader uniforms and HUD. */
   getSurfaceCamera(): SurfaceCamera {
     return {
       lookAngle: this.lookAngle,
       lookPitch: this.lookPitch,
       speed: Math.sqrt(this.velocityX ** 2 + this.velocityZ ** 2),
+      speedTierName: SPEED_TIERS[this.speedTierIndex]!.name,
+      speedTierIndex: this.speedTierIndex,
+      speedTierCount: SPEED_TIERS.length,
     };
   }
 
@@ -123,5 +156,6 @@ export class CameraController {
     this.lookPitch = -0.08;
     this.velocityX = 0;
     this.velocityZ = 0;
+    this.speedTierIndex = 2; // Reset to "Jog"
   }
 }

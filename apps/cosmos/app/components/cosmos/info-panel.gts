@@ -12,6 +12,7 @@ export interface InfoPanelSignature {
     cameraY: number;
     cameraZoom: number;
     onCopyCoords: () => void;
+    isSurface?: boolean;
   };
 }
 
@@ -27,7 +28,13 @@ export default class InfoPanel extends Component<InfoPanelSignature> {
     if (this.args.selectedObject) {
       return getObjectDescription(this.args.selectedObject);
     }
-    return "Scroll to zoom • Drag to pan • Click to focus";
+    if (this.args.isSurface) {
+      return "WASD to move · Drag to look · Scroll to adjust speed";
+    }
+    if (this.args.cameraZoom >= 3000) {
+      return "Click a planet to land on its surface";
+    }
+    return "Scroll to zoom · Drag to pan · Click to focus";
   }
 
   get coordsDisplay(): string {

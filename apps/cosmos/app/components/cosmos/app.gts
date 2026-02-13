@@ -61,6 +61,7 @@ export default class CosmosApp extends Component {
   @tracked cosmicTime = 0.6; // Default: present era (normalized 0-1)
   @tracked cosmicEraName = "Present Era";
   @tracked cosmicYears = "8.3";
+  @tracked isSurfaceMode = false;
 
   // WebGL engine + particle builder
   private engine = new CosmosEngine();
@@ -189,6 +190,7 @@ export default class CosmosApp extends Component {
       this.cameraController.reset(); // entering surface for the first time
     }
     this.wasSurface = isSurface;
+    this.isSurfaceMode = isSurface;
 
     const movement = this.cameraController.update(this.inputManager, this.camera.targetZoom, dt);
     if (movement.dx !== 0 || movement.dy !== 0) {
@@ -616,20 +618,42 @@ export default class CosmosApp extends Component {
   // ─── Surface / Terrain / Atmosphere Rendering ─────────────────────────────
 
   private renderSurfaceWebGL(): void {
-    // We need a focused planet to render surface. If none, pick one.
+    // We need a focused planet to render surface. If none, pick one from the system.
     if (!this.focusedPlanet) {
-      // Generate default planet from camera position
-      const seed = getSeed(
-        Math.floor(this.camera.x / 50),
-        Math.floor(this.camera.y / 50),
-        1
-      );
-      const star = generateStar(seed);
-      if (star.planets > 0) {
-        this.focusedPlanet = generatePlanet(seed + 100, 0, star);
+      // Build or reuse the cached system for this position
+      if (!this.cachedSystem) {
+        const seed = getSeed(
+          Math.floor(this.camera.x / 50),
+          Math.floor(this.camera.y / 50),
+          1,
+        );
+        const star = generateStar(seed);
+        const planets: Planet[] = [];
+        for (let i = 0; i < star.planets; i++) {
+          planets.push(generatePlanet(seed + i + 100, i, star));
+        }
+        this.cachedSystem = { star, planets };
+      }
+
+      const { star, planets } = this.cachedSystem;
+      if (planets.length > 0) {
+        // Pick the planet whose orbit is closest to screen center
+        // Use a deterministic fallback based on camera position so
+        // different locations yield different planets
+        const posHash = Math.abs(
+          Math.floor(this.camera.x * 7.3 + this.camera.y * 13.7),
+        );
+        const idx = posHash % planets.length;
+        this.focusedPlanet = planets[idx]!;
         this.focusedPlanetStar = star;
       } else {
-        // No planet — fall back to rocky world
+        // Star with no planets — fabricate one
+        const seed = getSeed(
+          Math.floor(this.camera.x / 50),
+          Math.floor(this.camera.y / 50),
+          1,
+        );
+        const star = generateStar(seed);
         this.focusedPlanet = generatePlanet(seed + 42, 0, star);
         this.focusedPlanetStar = star;
       }
@@ -699,8 +723,36 @@ export default class CosmosApp extends Component {
       const cssW = this.overlayCanvas.width;
       const cssH = this.overlayCanvas.height;
       const ctx = this.overlayCtx;
+      const surfCam2 = this.cameraController.getSurfaceCamera();
 
-      // Planet name & type
+      // ── Crosshair ──────────────────────────────────────────────────
+      if (zoom >= 2000000) {
+        const cx2 = cssW / 2;
+        const cy2 = cssH / 2;
+        const gap = 6;
+        const arm = 14;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.lineWidth = 1;
+        // Horizontal
+        ctx.beginPath();
+        ctx.moveTo(cx2 - arm, cy2);
+        ctx.lineTo(cx2 - gap, cy2);
+        ctx.moveTo(cx2 + gap, cy2);
+        ctx.lineTo(cx2 + arm, cy2);
+        // Vertical
+        ctx.moveTo(cx2, cy2 - arm);
+        ctx.lineTo(cx2, cy2 - gap);
+        ctx.moveTo(cx2, cy2 + gap);
+        ctx.lineTo(cx2, cy2 + arm);
+        ctx.stroke();
+        // Center dot
+        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.beginPath();
+        ctx.arc(cx2, cy2, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ── Planet name & type ─────────────────────────────────────────
       ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
       ctx.font = "16px SF Pro Display, sans-serif";
       ctx.textAlign = "left";
@@ -713,7 +765,7 @@ export default class CosmosApp extends Component {
       ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
       ctx.fillText(typeName, 20, cssH - 42);
 
-      // Altitude indicator
+      // ── Altitude indicator ─────────────────────────────────────────
       const altKm = altitude < 1
         ? Math.floor((1 - altitude) * 100) + " km"
         : "Surface";
@@ -722,14 +774,44 @@ export default class CosmosApp extends Component {
       ctx.textAlign = "right";
       ctx.fillText(`ALT: ${altKm}`, cssW - 20, cssH - 60);
 
-      // Compass rose — rotated to match current look direction
+      // ── Speed gauge ────────────────────────────────────────────────
       if (zoom >= 2000000) {
-        const surfCam2 = this.cameraController.getSurfaceCamera();
+        const gaugeX = cssW - 20;
+        const gaugeY = cssH - 140;
+        const tierCount = surfCam2.speedTierCount;
+        const tierIdx = surfCam2.speedTierIndex;
+
+        // Speed tier label
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.font = "10px SF Mono, monospace";
+        ctx.textAlign = "right";
+        ctx.fillText(surfCam2.speedTierName.toUpperCase(), gaugeX, gaugeY - 8);
+
+        // Speed bar (vertical dots)
+        for (let i = 0; i < tierCount; i++) {
+          const dotY = gaugeY + (tierCount - 1 - i) * 10;
+          const active = i <= tierIdx;
+          ctx.fillStyle = active
+            ? "rgba(100, 200, 255, 0.7)"
+            : "rgba(255, 255, 255, 0.15)";
+          ctx.beginPath();
+          ctx.arc(gaugeX - 4, dotY, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Scroll hint
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.font = "8px SF Pro Display, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText("scroll ↕", gaugeX, gaugeY + tierCount * 10 + 4);
+      }
+
+      // ── Compass rose ───────────────────────────────────────────────
+      if (zoom >= 2000000) {
         const cx = cssW - 40;
         const cy = cssH - 100;
         const angle = -surfCam2.lookAngle;
 
-        // Outer ring
         ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -744,7 +826,7 @@ export default class CosmosApp extends Component {
         ctx.lineTo(cx + Math.sin(angle) * 13, cy - Math.cos(angle) * 13);
         ctx.stroke();
 
-        // Cardinal labels rotated with heading
+        // Cardinal labels
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         ctx.font = "8px SF Pro Display, sans-serif";
         ctx.textAlign = "center";
@@ -758,16 +840,15 @@ export default class CosmosApp extends Component {
         }
       }
 
-      // Surface keyboard controls hint (shown briefly or when moving)
+      // ── Controls hint ──────────────────────────────────────────────
       if (zoom >= 2000000) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
         ctx.font = "10px SF Mono, monospace";
         ctx.textAlign = "center";
-        ctx.fillText("WASD — walk · Q/E — turn · Drag — look", cssW / 2, cssH - 16);
-        if (this.inputManager.sprint) {
-          ctx.fillStyle = "rgba(255, 200, 100, 0.5)";
-          ctx.fillText("⚡ SPRINT", cssW / 2, cssH - 30);
-        }
+        ctx.fillText(
+          "WASD walk · Q/E turn · Drag look · Scroll speed",
+          cssW / 2, cssH - 16,
+        );
       }
     }
   }
@@ -775,6 +856,13 @@ export default class CosmosApp extends Component {
   // Event handlers
   handleWheel = (event: WheelEvent): void => {
     event.preventDefault();
+
+    // On the surface, scroll adjusts movement speed instead of zoom
+    if (this.camera.zoom >= 500000) {
+      const dir = event.deltaY > 0 ? -1 : 1;
+      this.cameraController.adjustSpeed(dir);
+      return;
+    }
 
     const zoomFactor = event.deltaY > 0 ? 0.85 : 1.18;
     this.camera.targetZoom = Math.max(
@@ -1019,6 +1107,7 @@ export default class CosmosApp extends Component {
         @cameraY={{this.cameraY}}
         @cameraZoom={{this.cameraZoom}}
         @onCopyCoords={{this.handleCopyCoords}}
+        @isSurface={{this.isSurfaceMode}}
       />
 
       <div class="scale-indicator">
