@@ -857,8 +857,9 @@ export default class CosmosApp extends Component {
   handleWheel = (event: WheelEvent): void => {
     event.preventDefault();
 
-    // On the surface, scroll adjusts movement speed instead of zoom
-    if (this.camera.zoom >= 500000) {
+    // On the terrain surface (zoom ≥ 5M, fully past atmosphere),
+    // scroll adjusts walk speed. Hold Alt/Option to zoom out instead.
+    if (this.camera.targetZoom >= 5000000 && !event.altKey) {
       const dir = event.deltaY > 0 ? -1 : 1;
       this.cameraController.adjustSpeed(dir);
       return;
