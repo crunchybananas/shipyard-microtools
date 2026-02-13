@@ -30,6 +30,11 @@ import {
 } from "cosmos/cosmos/cosmos-engine";
 import { getBiomeConfig } from "cosmos/cosmos/terrain-generator";
 import { CosmicSoundscape } from "cosmos/cosmos/cosmic-soundscape";
+import {
+  getCosmicProperties,
+  getStarEvolution,
+  getGalaxyEvolution,
+} from "cosmos/cosmos/cosmic-time";
 
 interface Camera {
   x: number;
@@ -51,6 +56,9 @@ export default class CosmosApp extends Component {
   @tracked currentScale: Scale = getCurrentScale(1);
   @tracked selectedObject: Galaxy | Star | Planet | null = null;
   @tracked soundEnabled = false;
+  @tracked cosmicTime = 0.6; // Default: present era (normalized 0-1)
+  @tracked cosmicEraName = "Present Era";
+  @tracked cosmicYears = "8.3";
 
   // WebGL engine + particle builder
   private engine = new CosmosEngine();
@@ -226,6 +234,7 @@ export default class CosmosApp extends Component {
     const gridSize = 200;
     const startX = Math.floor(left / gridSize) * gridSize;
     const startY = Math.floor(top / gridSize) * gridSize;
+    const galaxyEvo = getGalaxyEvolution(this.cosmicTime);
 
     this.particles.reset();
     this.cachedGalaxies = [];
@@ -251,7 +260,15 @@ export default class CosmosApp extends Component {
           screen.x > -size && screen.x < cssW + size &&
           screen.y > -size && screen.y < cssH + size
         ) {
-          this.addGalaxyParticles(galaxy, gx, gy, 30 * galaxy.size);
+          // Skip galaxies that don't exist yet in the current era
+          if (galaxyEvo.brightness < 0.01) continue;
+
+          this.addGalaxyParticles(
+            galaxy, gx, gy,
+            30 * galaxy.size * galaxyEvo.sizeMultiplier,
+            galaxyEvo.brightness,
+            galaxyEvo.armDefinition,
+          );
 
           this.cachedGalaxies.push({
             ...galaxy,
@@ -276,24 +293,27 @@ export default class CosmosApp extends Component {
   }
 
   private addGalaxyParticles(
-    galaxy: Galaxy, worldX: number, worldY: number, worldSize: number
+    galaxy: Galaxy, worldX: number, worldY: number, worldSize: number,
+    brightness = 1.0, armDef = 1.0,
   ): void {
     const rng = new SeededRandom(galaxy.seed);
 
-    if (galaxy.type === "spiral" || galaxy.type === "barred_spiral") {
+    if ((galaxy.type === "spiral" || galaxy.type === "barred_spiral") && armDef > 0.1) {
       for (let arm = 0; arm < galaxy.arms; arm++) {
         const armAngle = (arm / galaxy.arms) * Math.PI * 2;
         const perArm = galaxy.starCount / galaxy.arms;
         for (let i = 0; i < perArm; i++) {
           const t = i / perArm;
           const distance = t * worldSize;
-          const spread = rng.range(-worldSize * 0.15, worldSize * 0.15);
-          const angle = armAngle + t * 3 + spread * 0.01 + galaxy.rotation;
+          const baseSpread = worldSize * 0.15;
+          // More spread with less arm definition
+          const spread = rng.range(-baseSpread, baseSpread) * (2 - armDef);
+          const angle = armAngle + t * 3 * armDef + spread * 0.01 + galaxy.rotation;
           const px = worldX + Math.cos(angle) * distance + rng.range(-0.5, 0.5);
           const py = worldY + Math.sin(angle) * distance * galaxy.tilt + rng.range(-0.5, 0.5);
-          const brightness = (1 - t * 0.7) * rng.range(0.3, 1);
+          const b = (1 - t * 0.7) * rng.range(0.3, 1) * brightness;
           const starSize = rng.range(0.3, 1.2) * (1 - t * 0.5);
-          this.particles.add(px, py, starSize, 1, 1, 1, brightness * 0.6, brightness * 0.3);
+          this.particles.add(px, py, starSize, 1, 1, 1, b * 0.6, b * 0.3);
         }
       }
     } else if (galaxy.type === "elliptical") {
@@ -302,15 +322,15 @@ export default class CosmosApp extends Component {
         const dist = rng.range(0, 1) * rng.range(0, 1) * worldSize;
         const px = worldX + Math.cos(angle) * dist * 1.5;
         const py = worldY + Math.sin(angle) * dist;
-        const brightness = (1 - dist / worldSize) * rng.range(0.3, 1);
-        this.particles.add(px, py, rng.range(0.3, 1.0), 1, 0.86, 0.7, brightness * 0.5, brightness * 0.2);
+        const b = (1 - dist / worldSize) * rng.range(0.3, 1) * brightness;
+        this.particles.add(px, py, rng.range(0.3, 1.0), 1, 0.86, 0.7, b * 0.5, b * 0.2);
       }
     } else {
       for (let i = 0; i < galaxy.starCount; i++) {
         const px = worldX + rng.range(-worldSize, worldSize) * rng.range(0.3, 1);
         const py = worldY + rng.range(-worldSize * 0.6, worldSize * 0.6) * rng.range(0.3, 1);
-        const brightness = rng.range(0.2, 0.8);
-        this.particles.add(px, py, rng.range(0.3, 1.0), 0.78, 0.86, 1, brightness * 0.5, brightness * 0.2);
+        const b = rng.range(0.2, 0.8) * brightness;
+        this.particles.add(px, py, rng.range(0.3, 1.0), 0.78, 0.86, 1, b * 0.5, b * 0.2);
       }
     }
 
@@ -320,8 +340,8 @@ export default class CosmosApp extends Component {
       const dist = rng.range(0, worldSize * 0.15) * rng.range(0, 1);
       const px = worldX + Math.cos(angle) * dist;
       const py = worldY + Math.sin(angle) * dist * galaxy.tilt;
-      const brightness = rng.range(0.5, 1.0);
-      this.particles.add(px, py, rng.range(0.5, 2.0), 1, 0.96, 0.86, brightness * 0.8, 1.0);
+      const b = rng.range(0.5, 1.0) * brightness;
+      this.particles.add(px, py, rng.range(0.5, 2.0), 1, 0.96, 0.86, b * 0.8, 1.0);
     }
   }
 
@@ -333,6 +353,7 @@ export default class CosmosApp extends Component {
     const gridSize = 50;
     const startX = Math.floor(left / gridSize) * gridSize;
     const startY = Math.floor(top / gridSize) * gridSize;
+    const starEvo = getStarEvolution(this.cosmicTime);
 
     this.particles.reset();
     this.cachedStars = [];
@@ -347,6 +368,9 @@ export default class CosmosApp extends Component {
 
         if (rng.next() > 0.3) continue;
 
+        // Skip stars based on cosmic time (fewer stars in early/late universe)
+        if (rng.next() > starEvo.countMultiplier) continue;
+
         const star = generateStar(seed);
         const sx = x + rng.range(5, gridSize - 5);
         const sy = y + rng.range(5, gridSize - 5);
@@ -360,7 +384,10 @@ export default class CosmosApp extends Component {
           screen.y > -screenSize * 3 && screen.y < cssH + screenSize * 3
         ) {
           const [r, g, b] = hexToRGB(star.color);
-          this.particles.add(sx, sy, baseSize, r, g, b, 1.0, 1.0);
+          const evoAlpha = starEvo.brightnessMult;
+          this.particles.add(
+            sx, sy, baseSize * starEvo.sizeMultiplier, r, g, b, evoAlpha, 1.0,
+          );
 
           this.cachedStars.push({
             ...star,
@@ -798,6 +825,14 @@ export default class CosmosApp extends Component {
     }
   };
 
+  handleTimeChange = (event: Event): void => {
+    const input = event.target as HTMLInputElement;
+    this.cosmicTime = parseFloat(input.value);
+    const props = getCosmicProperties(this.cosmicTime);
+    this.cosmicEraName = props.era.name;
+    this.cosmicYears = props.yearsBillion.toFixed(1);
+  };
+
   private showToast(message: string): void {
     this.toastMessage = message;
     this.toastVisible = true;
@@ -852,6 +887,27 @@ export default class CosmosApp extends Component {
 
       <div class="scale-indicator">
         <span>{{this.currentScale.name}}</span>
+      </div>
+
+      <div class="time-scrubber">
+        <div class="time-label">
+          <span class="time-era">{{this.cosmicEraName}}</span>
+          <span class="time-years">{{this.cosmicYears}} Gyr</span>
+        </div>
+        {{! template-lint-disable no-inline-styles }}
+        <input
+          type="range"
+          class="time-slider"
+          min="0"
+          max="1"
+          step="0.005"
+          value={{this.cosmicTime}}
+          {{on "input" this.handleTimeChange}}
+        />
+        <div class="time-endpoints">
+          <span>Big Bang</span>
+          <span>Heat Death</span>
+        </div>
       </div>
 
       {{#if this.showBookmarksModal}}
