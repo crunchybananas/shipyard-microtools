@@ -831,7 +831,7 @@ export class CosmosEngine {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
-    // GL resources will be garbage collected with context
+    this.deleteFBOs();
     this.gl = null;
     this.canvas = null;
   }
@@ -1242,25 +1242,56 @@ export class CosmosEngine {
   }
 
   private createFBOs(): void {
-    if (!this.gl || this.width === 0) return;
+    if (!this.gl || this.width === 0 || this.height === 0) return;
+
+    // Clean up old FBOs before creating new ones
+    this.deleteFBOs();
+
+    const halfW = Math.floor(this.width / 2);
+    const halfH = Math.floor(this.height / 2);
 
     this.sceneFBO = this.createFBO(this.width, this.height);
-    this.brightFBO = this.createFBO(this.width / 2, this.height / 2);
-    this.blurFBOs = [
-      this.createFBO(this.width / 2, this.height / 2)!,
-      this.createFBO(this.width / 2, this.height / 2)!,
-    ];
+    this.brightFBO = this.createFBO(halfW, halfH);
+    this.blurFBOs = [];
+    const blur0 = this.createFBO(halfW, halfH);
+    const blur1 = this.createFBO(halfW, halfH);
+    if (blur0 && blur1) {
+      this.blurFBOs = [blur0, blur1];
+    }
+  }
+
+  private deleteFBOs(): void {
+    const gl = this.gl;
+    if (!gl) return;
+    const fbos = [this.sceneFBO, this.brightFBO, ...this.blurFBOs];
+    for (const fbo of fbos) {
+      if (fbo) {
+        gl.deleteFramebuffer(fbo.framebuffer);
+        gl.deleteTexture(fbo.texture);
+      }
+    }
+    this.sceneFBO = null;
+    this.brightFBO = null;
+    this.blurFBOs = [];
   }
 
   // ─── Private: Bloom Post-Processing ──────────────────────────────────────
 
   private applyBloom(): void {
     const gl = this.gl!;
-    if (!this.sceneFBO || !this.brightFBO || this.blurFBOs.length < 2) return;
+    if (!this.sceneFBO || !this.brightFBO || this.blurFBOs.length < 2 ||
+      !this.blurFBOs[0] || !this.blurFBOs[1]) return;
+
+    // Disable blending for all bloom passes — critical for RGBA16F FBOs
+    // where accumulated particle alpha > 1.0 would create negative blend
+    // factors and subtract light instead of adding it.
+    gl.disable(gl.BLEND);
 
     // 1. Extract bright pixels
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.brightFBO.framebuffer);
     gl.viewport(0, 0, this.brightFBO.width, this.brightFBO.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(this.bloomBrightProgram!.program);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.sceneFBO.texture);
@@ -1310,6 +1341,10 @@ export class CosmosEngine {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     gl.bindVertexArray(null);
+
+    // Restore blending for next frame's scene rendering
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   }
 }
 
