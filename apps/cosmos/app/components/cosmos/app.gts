@@ -29,6 +29,7 @@ import {
   planetTypeToIndex,
 } from "cosmos/cosmos/cosmos-engine";
 import { getBiomeConfig } from "cosmos/cosmos/terrain-generator";
+import { CosmicSoundscape } from "cosmos/cosmos/cosmic-soundscape";
 
 interface Camera {
   x: number;
@@ -49,10 +50,12 @@ export default class CosmosApp extends Component {
   @tracked cameraZoom = 1;
   @tracked currentScale: Scale = getCurrentScale(1);
   @tracked selectedObject: Galaxy | Star | Planet | null = null;
+  @tracked soundEnabled = false;
 
   // WebGL engine + particle builder
   private engine = new CosmosEngine();
   private particles = new ParticleBuilder();
+  private soundscape = new CosmicSoundscape();
 
   // Canvas overlay for text labels & rings
   private overlayCanvas: HTMLCanvasElement | null = null;
@@ -127,6 +130,7 @@ export default class CosmosApp extends Component {
         cancelAnimationFrame(this.animationId);
       }
       this.engine.destroy();
+      this.soundscape.destroy();
     };
   });
 
@@ -167,6 +171,9 @@ export default class CosmosApp extends Component {
     this.currentScale = getCurrentScale(this.camera.zoom);
 
     this.time += 0.016;
+
+    // Update soundscape with current zoom/position
+    this.soundscape.update(this.camera.zoom, this.camera.x, this.camera.y);
 
     // Calculate visible area (CSS pixels)
     const cssW = this.overlayCanvas?.width ?? window.innerWidth;
@@ -781,6 +788,16 @@ export default class CosmosApp extends Component {
     this.showToast("Coordinates copied!");
   };
 
+  handleToggleSound = async (): Promise<void> => {
+    if (this.soundEnabled) {
+      this.soundscape.stop();
+      this.soundEnabled = false;
+    } else {
+      await this.soundscape.start();
+      this.soundEnabled = true;
+    }
+  };
+
   private showToast(message: string): void {
     this.toastMessage = message;
     this.toastVisible = true;
@@ -808,6 +825,13 @@ export default class CosmosApp extends Component {
       <header class="cosmos-header">
         <h1>🌌 COSMOS</h1>
         <div class="header-actions">
+          <button
+            type="button"
+            title="{{if this.soundEnabled 'Mute cosmic soundscape' 'Enable cosmic soundscape'}}"
+            {{on "click" this.handleToggleSound}}
+          >
+            {{if this.soundEnabled "🔊 Sound" "🔇 Sound"}}
+          </button>
           <button type="button" title="Bookmark this location" {{on "click" this.handleBookmark}}>
             ☆ Bookmark
           </button>
