@@ -92,6 +92,7 @@ export default class CosmosApp extends Component {
   private cachedSystem: CachedSystem | null = null;
   private focusedPlanet: Planet | null = null;
   private focusedPlanetStar: Star | null = null;
+  private cachedPlanetScreenPositions: { planet: Planet; px: number; py: number; size: number }[] = [];
 
   private checkUrlParams(): void {
     const params = new URLSearchParams(window.location.search);
@@ -202,23 +203,36 @@ export default class CosmosApp extends Component {
     this.engine.beginFrame();
     this.engine.drawBackground();
 
-    if (this.camera.zoom < 50) {
+    const zoom = this.camera.zoom;
+
+    // Render layers with crossfade zones for smooth transitions
+    // Galaxy scale: 0.5 → 80 (fade out 50-80)
+    if (zoom < 80) {
       this.renderGalaxiesWebGL(left, right, top, bottom);
-    } else if (this.camera.zoom < 5000) {
+    }
+
+    // Star scale: 30 → 8000 (fade in 30-60, fade out 4000-8000)
+    if (zoom >= 30 && zoom < 8000) {
       this.renderStarsWebGL(left, right, top, bottom);
       // Nebulae visible at galaxy/sector scale
-      const nebulaIntensity = this.camera.zoom < 500
-        ? (this.camera.zoom - 50) / 450 // Fade in from cluster → galaxy
-        : Math.max(0, 1 - (this.camera.zoom - 500) / 4500); // Fade out sector → system
+      const nebulaIntensity = zoom < 500
+        ? (zoom - 50) / 450
+        : Math.max(0, 1 - (zoom - 500) / 4500);
       if (nebulaIntensity > 0.01) {
         this.engine.drawNebula(
-          this.camera.x, this.camera.y, this.camera.zoom,
+          this.camera.x, this.camera.y, zoom,
           nebulaIntensity * 0.8,
         );
       }
-    } else if (this.camera.zoom < 500000) {
+    }
+
+    // System scale: 3000 → 500K (fade in 3000-6000)
+    if (zoom >= 3000 && zoom < 500000) {
       this.renderSystemWebGL();
-    } else {
+    }
+
+    // Surface scale: 500K+
+    if (zoom >= 500000) {
       this.renderSurfaceWebGL();
     }
 
@@ -469,6 +483,7 @@ export default class CosmosApp extends Component {
     );
 
     // Planets
+    this.cachedPlanetScreenPositions = [];
     planets.forEach((planet) => {
       const orbitScale = this.camera.zoom / 5000;
       const orbitRadius = planet.orbitRadius * orbitScale;
@@ -477,6 +492,9 @@ export default class CosmosApp extends Component {
       const px = cssW / 2 + Math.cos(angle) * orbitRadius;
       const py = cssH / 2 + Math.sin(angle) * orbitRadius;
       const planetSize = Math.max(3, planet.radius * 3 * orbitScale);
+
+      // Cache for click detection
+      this.cachedPlanetScreenPositions.push({ planet, px, py, size: planetSize });
 
       // Orbit path on overlay
       if (this.overlayCtx) {
@@ -518,12 +536,29 @@ export default class CosmosApp extends Component {
         this.engine.drawRing(this.overlayCtx, px, py, planetSize, planet.ringColor, false);
       }
 
-      // Label
+      // Label + click hint
       if (planetSize > 5 && this.overlayCtx) {
-        this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        // Highlight focused planet
+        if (this.focusedPlanet && this.focusedPlanet.seed === planet.seed) {
+          this.overlayCtx.strokeStyle = "rgba(100, 180, 255, 0.5)";
+          this.overlayCtx.lineWidth = 1.5;
+          this.overlayCtx.beginPath();
+          this.overlayCtx.arc(px, py, planetSize + 4, 0, Math.PI * 2);
+          this.overlayCtx.stroke();
+        }
+
+        this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.7)";
         this.overlayCtx.font = "11px SF Pro Display, sans-serif";
         this.overlayCtx.textAlign = "center";
         this.overlayCtx.fillText(planet.name, px, py + planetSize + 15);
+
+        // Type + click hint
+        if (planetSize > 12) {
+          const typeName = planet.type.replace("_", " ");
+          this.overlayCtx.fillStyle = "rgba(255, 255, 255, 0.35)";
+          this.overlayCtx.font = "9px SF Pro Display, sans-serif";
+          this.overlayCtx.fillText(typeName, px, py + planetSize + 27);
+        }
       }
 
       // Track closest planet for surface dive
@@ -687,15 +722,16 @@ export default class CosmosApp extends Component {
       Math.min(500000000, this.camera.targetZoom * zoomFactor)
     );
 
-    if (this.camera.targetZoom < 5000) {
+    if (this.camera.targetZoom < 3000) {
       this.cachedSystem = null;
-      this.focusedPlanet = null;
-      this.focusedPlanetStar = null;
+      this.cachedPlanetScreenPositions = [];
     }
     if (this.camera.targetZoom < 500000) {
-      // Reset focused planet if zooming back above atmosphere
-      this.focusedPlanet = null;
-      this.focusedPlanetStar = null;
+      // Only clear focused planet when zooming OUT past atmosphere
+      if (zoomFactor < 1) {
+        this.focusedPlanet = null;
+        this.focusedPlanetStar = null;
+      }
     }
   };
 
@@ -725,15 +761,29 @@ export default class CosmosApp extends Component {
       if (this.pinchStartDist > 0) {
         const scale = dist / this.pinchStartDist;
         this.camera.targetZoom = Math.max(0.5, Math.min(500000000, this.pinchStartZoom * scale));
-        if (this.camera.targetZoom < 5000) this.cachedSystem = null;
-        if (this.camera.targetZoom < 500000) {
-          this.focusedPlanet = null;
-          this.focusedPlanetStar = null;
+        if (this.camera.targetZoom < 3000) {
+          this.cachedSystem = null;
+          this.cachedPlanetScreenPositions = [];
         }
       }
     } else if (this.isDragging) {
-      const dx = (event.clientX - this.lastMouseX) / this.camera.zoom;
-      const dy = (event.clientY - this.lastMouseY) / this.camera.zoom;
+      const rawDx = event.clientX - this.lastMouseX;
+      const rawDy = event.clientY - this.lastMouseY;
+
+      // At surface/terrain zoom levels, pan controls the camera view direction
+      // rather than world position — use a fixed sensitivity
+      let dx: number;
+      let dy: number;
+      if (this.camera.zoom >= 500000) {
+        // Surface scale: fixed pan speed independent of zoom
+        const surfaceSensitivity = 0.15;
+        dx = rawDx * surfaceSensitivity;
+        dy = rawDy * surfaceSensitivity;
+      } else {
+        dx = rawDx / this.camera.zoom;
+        dy = rawDy / this.camera.zoom;
+      }
+
       this.camera.targetX -= dx;
       this.camera.targetY -= dy;
       this.camera.x = this.camera.targetX;
@@ -789,6 +839,23 @@ export default class CosmosApp extends Component {
         return;
       }
     }
+
+    // Check planets (system view)
+    for (const entry of this.cachedPlanetScreenPositions) {
+      const dist = Math.sqrt(
+        (mx - entry.px) ** 2 + (my - entry.py) ** 2
+      );
+      if (dist < Math.max(entry.size * 2.5, 15)) {
+        // Focus on this planet and zoom to surface
+        this.focusedPlanet = entry.planet;
+        if (this.cachedSystem) {
+          this.focusedPlanetStar = this.cachedSystem.star;
+        }
+        this.selectedObject = entry.planet;
+        this.camera.targetZoom = Math.min(500000000, this.camera.zoom * 5);
+        return;
+      }
+    }
   };
 
   private focusOn(x: number, y: number, zoom: number): void {
@@ -796,6 +863,7 @@ export default class CosmosApp extends Component {
     this.camera.targetY = y;
     this.camera.targetZoom = Math.min(500000000, zoom);
     this.cachedSystem = null;
+    this.cachedPlanetScreenPositions = [];
   }
 
   handleBookmark = (): void => {
