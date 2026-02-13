@@ -735,6 +735,7 @@ export class CosmosEngine {
   private bloomEnabled = true;
   private bloomStrength = 0.35;
   private bloomThreshold = 0.4;
+  private canRenderToFloat = false;
 
   // Max particles we can render in one draw call
   private maxParticles = 200000;
@@ -756,6 +757,10 @@ export class CosmosEngine {
     }
 
     this.gl = gl;
+
+    // Enable float framebuffer rendering if supported
+    this.canRenderToFloat = !!gl.getExtension('EXT_color_buffer_float');
+
     this.resize();
 
     // Compile all shader programs
@@ -802,7 +807,6 @@ export class CosmosEngine {
     this.setupFullscreenQuad();
     this.setupParticleBuffers();
     this.setupPlanetGeometry();
-    this.createFBOs();
 
     // GL state
     gl.enable(gl.BLEND);
@@ -1212,7 +1216,11 @@ export class CosmosEngine {
 
     const texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.HALF_FLOAT, null);
+    if (this.canRenderToFloat) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.HALF_FLOAT, null);
+    } else {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

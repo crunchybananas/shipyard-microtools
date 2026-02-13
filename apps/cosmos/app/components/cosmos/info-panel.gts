@@ -1,4 +1,5 @@
 import Component from "@glimmer/component";
+import { htmlSafe } from "@ember/template";
 import type { Scale, Galaxy, Star, Planet } from "cosmos/services/universe-generator";
 import { getObjectDescription } from "cosmos/services/universe-generator";
 
@@ -41,6 +42,10 @@ export default class InfoPanel extends Component<InfoPanelSignature> {
     return ((currentZoom - minZoom) / (maxZoom - minZoom)) * 100;
   }
 
+  get zoomStyle(): ReturnType<typeof htmlSafe> {
+    return htmlSafe(`width: ${this.zoomPercent}%`);
+  }
+
   <template>
     <div class="info-panel" ...attributes>
       <div class="location-info">
@@ -51,8 +56,7 @@ export default class InfoPanel extends Component<InfoPanelSignature> {
         <span class="coords-display">{{this.coordsDisplay}}</span>
         <span class="zoom-label">Zoom:</span>
         <div class="zoom-bar">
-          {{! template-lint-disable no-inline-styles style-concatenation }}
-          <div class="zoom-fill" style="width: {{this.zoomPercent}}%"></div>
+          <div class="zoom-fill" style={{this.zoomStyle}}></div>
         </div>
         <button
           class="copy-coords"
