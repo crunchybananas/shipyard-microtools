@@ -456,18 +456,35 @@ uniform vec3 uLightDir;
 uniform float uAtmosphereDensity;
 uniform float uAtmosphereHue;
 
-// 3D value noise
+// ─── Noise ──────────────────────────────────────────────────────────────────
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(443.8975, 397.2973));
+  p += dot(p, p + 19.19);
+  return fract(p.x * p.y);
+}
+
 float hash31(vec3 p) {
   p = fract(p * vec3(443.8975, 397.2973, 491.1871));
   p += dot(p, p.yzx + 19.19);
   return fract((p.x + p.y) * p.z);
 }
 
+float noise2(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1, 0));
+  float c = hash21(i + vec2(0, 1));
+  float d = hash21(i + vec2(1, 1));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
 float noise3(vec3 p) {
   vec3 i = floor(p);
   vec3 f = fract(p);
   f = f * f * (3.0 - 2.0 * f);
-
   float a = hash31(i);
   float b = hash31(i + vec3(1,0,0));
   float c = hash31(i + vec3(0,1,0));
@@ -476,7 +493,6 @@ float noise3(vec3 p) {
   float ff = hash31(i + vec3(1,0,1));
   float g = hash31(i + vec3(0,1,1));
   float h = hash31(i + vec3(1,1,1));
-
   return mix(
     mix(mix(a, b, f.x), mix(c, d, f.x), f.y),
     mix(mix(e, ff, f.x), mix(g, h, f.x), f.y),
@@ -484,90 +500,306 @@ float noise3(vec3 p) {
   );
 }
 
-float fbm(vec3 p, float roughness) {
+// Terrain heightmap: position + seed → height
+float terrainHeight(vec2 p) {
+  vec3 sp = vec3(p, uSeed * 7.31);
   float val = 0.0;
   float amp = 0.5;
   float freq = 1.0;
-  for (int i = 0; i < 8; i++) {
-    val += noise3(p * freq) * amp;
-    freq *= 2.1;
-    amp *= 0.5 * (0.5 + roughness * 0.5);
+  for (int i = 0; i < 10; i++) {
+    val += noise3(sp * freq) * amp;
+    freq *= 2.03;
+    amp *= 0.5 * (0.4 + uRoughness * 0.6);
   }
+  // Ridge features for mountain realism
+  float ridge = 1.0 - abs(noise3(sp * 3.7 + 100.0) * 2.0 - 1.0);
+  ridge *= ridge;
+  val += ridge * 0.15 * uRoughness;
   return val;
 }
 
-void main() {
-  // World coordinates from screen
-  vec2 worldPos = (gl_FragCoord.xy - uResolution * 0.5) / uZoom + uCameraPos;
-  vec3 samplePos = vec3(worldPos * 800.0, uSeed * 0.1);
+// ─── Sky ────────────────────────────────────────────────────────────────────
 
-  // Height from FBM
-  float height = fbm(samplePos, uRoughness);
-
-  // Compute normal via height differences for lighting
-  float eps = 0.001;
-  float hx = fbm(vec3(samplePos.x + eps, samplePos.yz), uRoughness);
-  float hy = fbm(vec3(samplePos.x, samplePos.y + eps, samplePos.z), uRoughness);
-  vec3 normal = normalize(vec3(height - hx, height - hy, eps * 2.0));
-
-  vec3 color;
-
-  if (height < uWaterLevel) {
-    // Water
-    float depth = 1.0 - height / max(uWaterLevel, 0.001);
-    color = uWaterColor * (1.0 - depth * 0.3);
-
-    // Water specular
-    vec3 viewDir = vec3(0.0, 0.0, 1.0);
-    vec3 halfDir = normalize(normalize(uLightDir) + viewDir);
-    float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfDir), 0.0), 64.0);
-    color += vec3(spec * 0.3);
-
-    // Animated caustics
-    float caustic = noise3(samplePos * 40.0 + vec3(uTime * 0.3, uTime * 0.2, 0.0));
-    color += vec3(caustic * 0.05);
-  } else {
-    // Terrain
-    float normalizedH = (height - uWaterLevel) / max(1.0 - uWaterLevel, 0.001);
-    color = mix(uBaseColor, uAccentColor, normalizedH);
-
-    // Vegetation band
-    if (uHasVegetation > 0.5 && normalizedH > 0.05 && normalizedH < 0.4) {
-      float vegStrength = 1.0 - abs(normalizedH - 0.2) / 0.2;
-      color = mix(color, uVegetationColor, vegStrength * 0.7);
-    }
-
-    // Snow caps
-    if (normalizedH > 0.75) {
-      float snow = (normalizedH - 0.75) / 0.25;
-      color = mix(color, vec3(0.95, 0.97, 1.0), snow);
-    }
-
-    // Lighting
-    float diffuse = max(dot(normal, normalize(uLightDir)), 0.0);
-    color *= 0.15 + diffuse * 0.85;
-
-    // Shoreline foam
-    float edgeDist = (height - uWaterLevel) / max(1.0 - uWaterLevel, 0.001);
-    if (edgeDist < 0.02 && uWaterLevel > 0.01) {
-      float foam = smoothstep(0.02, 0.0, edgeDist);
-      float foamPattern = noise3(samplePos * 100.0 + vec3(uTime * 0.5, 0.0, 0.0));
-      color = mix(color, vec3(0.9, 0.95, 1.0), foam * foamPattern * 0.6);
-    }
-  }
-
-  // Atmospheric haze (distance-based fade)
-  float distFromCenter = length(gl_FragCoord.xy / uResolution - 0.5) * 2.0;
-  float haze = smoothstep(0.6, 1.2, distFromCenter) * uAtmosphereDensity;
+vec3 getSkyColor(vec3 rd, vec3 sunDir) {
   float hRad = uAtmosphereHue / 360.0;
-  vec3 hazeColor = vec3(
+  vec3 skyZenith = vec3(
     0.5 + 0.5 * cos(6.28318 * (hRad + 0.0)),
     0.5 + 0.5 * cos(6.28318 * (hRad + 0.333)),
     0.5 + 0.5 * cos(6.28318 * (hRad + 0.667))
-  ) * 0.6;
-  color = mix(color, hazeColor, haze * 0.4);
+  ) * 0.55 * uAtmosphereDensity;
 
-  fragColor = vec4(color, 1.0);
+  vec3 skyHorizon = mix(skyZenith * 1.6, vec3(0.85, 0.75, 0.6), 0.35);
+
+  // Vertical gradient: horizon → zenith
+  float vert = max(rd.y, 0.0);
+  vec3 sky = mix(skyHorizon, skyZenith, sqrt(vert));
+
+  // Sun disc and glow
+  float sunDot = max(dot(rd, sunDir), 0.0);
+  // Sun disc
+  sky += vec3(1.0, 0.95, 0.8) * pow(sunDot, 256.0) * 2.0;
+  // Inner glow
+  sky += vec3(1.0, 0.8, 0.5) * pow(sunDot, 32.0) * 0.4;
+  // Outer glow
+  sky += vec3(1.0, 0.6, 0.3) * pow(sunDot, 4.0) * 0.15 * uAtmosphereDensity;
+
+  // Stars in thin atmospheres
+  if (uAtmosphereDensity < 0.3) {
+    float starVis = (0.3 - uAtmosphereDensity) / 0.3;
+    vec2 starUV = rd.xz / (rd.y + 0.01) * 300.0;
+    float star = step(0.992, hash21(floor(starUV)));
+    sky += vec3(star * starVis * 0.6);
+  }
+
+  return sky;
+}
+
+// ─── Clouds ─────────────────────────────────────────────────────────────────
+
+float cloudDensity(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  vec2 q = p;
+  for (int i = 0; i < 5; i++) {
+    v += noise2(q) * a;
+    q = q * 2.1 + vec2(1.7, 3.2);
+    a *= 0.5;
+  }
+  return v;
+}
+
+// ─── Main Raymarcher ────────────────────────────────────────────────────────
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uResolution;
+  vec2 ndc = uv * 2.0 - 1.0;
+  ndc.x *= uResolution.x / uResolution.y;
+
+  // Camera setup: first-person on the terrain surface
+  float camScale = 0.3;
+  vec2 camWorld = uCameraPos * camScale;
+
+  // Camera height: sample terrain below camera + eye height
+  float camTerrainH = terrainHeight(camWorld);
+  float eyeHeight = 0.04;
+  float camY = max(camTerrainH, uWaterLevel) + eyeHeight;
+
+  vec3 camPos = vec3(camWorld.x, camY, camWorld.y);
+
+  // Look direction: slight downward tilt for landscape view
+  float lookAngle = uTime * 0.01; // Slow auto-pan
+  vec3 forward = normalize(vec3(cos(lookAngle), -0.08, sin(lookAngle)));
+  vec3 right = normalize(cross(forward, vec3(0, 1, 0)));
+  vec3 up = cross(right, forward);
+
+  // FOV ~75 degrees
+  float fov = 1.2;
+  vec3 rd = normalize(forward * fov + right * ndc.x + up * ndc.y);
+
+  // Sun direction
+  vec3 sunDir = normalize(uLightDir);
+  if (sunDir.y < 0.05) sunDir.y = 0.05; // Keep sun above horizon
+
+  // ─── Raymarching the heightfield ─────────────────────────────────────
+
+  vec3 color = getSkyColor(rd, sunDir);
+  float hitDist = -1.0;
+  vec3 hitPos = vec3(0.0);
+
+  if (rd.y < 0.3) { // Only raymarch if looking toward ground
+    float t = 0.0;
+    float dt = 0.005;
+    bool hit = false;
+    vec3 p;
+
+    for (int i = 0; i < 200; i++) {
+      p = camPos + rd * t;
+      float h = terrainHeight(p.xz);
+
+      // Water acts as a floor
+      h = max(h, uWaterLevel);
+
+      if (p.y < h) {
+        // Binary search for precise intersection
+        float tLo = t - dt;
+        float tHi = t;
+        for (int j = 0; j < 8; j++) {
+          float tMid = (tLo + tHi) * 0.5;
+          vec3 pm = camPos + rd * tMid;
+          float hm = max(terrainHeight(pm.xz), uWaterLevel);
+          if (pm.y < hm) { tHi = tMid; } else { tLo = tMid; }
+        }
+        t = (tLo + tHi) * 0.5;
+        hitPos = camPos + rd * t;
+        hitDist = t;
+        hit = true;
+        break;
+      }
+
+      // Adaptive step: bigger steps when far from terrain
+      dt = max(0.005, (p.y - h) * 0.4);
+      t += dt;
+      if (t > 30.0) break;
+    }
+
+    if (hit) {
+      float rawHeight = terrainHeight(hitPos.xz);
+      bool isWater = rawHeight < uWaterLevel;
+
+      // ─── Compute normal ──────────────────────────────────────────
+
+      vec3 normal;
+      float eps = 0.002;
+
+      if (isWater) {
+        // Water normal with gentle waves
+        float wave1 = noise2(hitPos.xz * 60.0 + uTime * vec2(0.3, 0.2)) * 0.002;
+        float wave2 = noise2(hitPos.xz * 120.0 - uTime * vec2(0.2, 0.4)) * 0.001;
+        float waveH = wave1 + wave2;
+
+        float wx = noise2((hitPos.xz + vec2(eps, 0.0)) * 60.0 + uTime * vec2(0.3, 0.2)) * 0.002
+                  + noise2((hitPos.xz + vec2(eps, 0.0)) * 120.0 - uTime * vec2(0.2, 0.4)) * 0.001;
+        float wz = noise2((hitPos.xz + vec2(0.0, eps)) * 60.0 + uTime * vec2(0.3, 0.2)) * 0.002
+                  + noise2((hitPos.xz + vec2(0.0, eps)) * 120.0 - uTime * vec2(0.2, 0.4)) * 0.001;
+        normal = normalize(vec3(waveH - wx, eps, waveH - wz));
+      } else {
+        float hx = terrainHeight(hitPos.xz + vec2(eps, 0.0));
+        float hz = terrainHeight(hitPos.xz + vec2(0.0, eps));
+        normal = normalize(vec3(rawHeight - hx, eps, rawHeight - hz));
+      }
+
+      // ─── Shading ─────────────────────────────────────────────────
+
+      float diffuse = max(dot(normal, sunDir), 0.0);
+      float ambient = 0.12;
+
+      if (isWater) {
+        // ─── Water surface ─────────────────────────────────────────
+        float depth = (uWaterLevel - rawHeight) * 4.0;
+        vec3 deepWater = uWaterColor * 0.5;
+        vec3 shallowWater = uWaterColor * 1.3 + vec3(0.05, 0.1, 0.05);
+        color = mix(shallowWater, deepWater, clamp(depth, 0.0, 1.0));
+
+        // Fresnel reflection
+        float fresnel = pow(1.0 - max(dot(normal, -rd), 0.0), 4.0);
+        vec3 reflected = getSkyColor(reflect(rd, normal), sunDir);
+        color = mix(color, reflected, fresnel * 0.6);
+
+        // Specular highlight
+        vec3 halfDir = normalize(sunDir - rd);
+        float spec = pow(max(dot(normal, halfDir), 0.0), 128.0);
+        color += vec3(1.0, 0.95, 0.8) * spec * 0.8;
+
+        // Sun path on water
+        float sunRefl = pow(max(dot(reflect(rd, vec3(0,1,0)), sunDir), 0.0), 64.0);
+        color += vec3(1.0, 0.85, 0.6) * sunRefl * 0.3;
+
+        color *= (ambient + diffuse * 0.7);
+
+        // Caustic shimmer
+        float caustic = noise2(hitPos.xz * 80.0 + uTime * vec2(0.5, 0.3));
+        color += vec3(0.03, 0.05, 0.08) * caustic;
+      } else {
+        // ─── Land surface ──────────────────────────────────────────
+        float normalizedH = (rawHeight - uWaterLevel) / max(1.0 - uWaterLevel, 0.001);
+        float slope = 1.0 - normal.y; // Steepness
+
+        // Base terrain color from height
+        color = mix(uBaseColor, uAccentColor, smoothstep(0.0, 0.8, normalizedH));
+
+        // Vegetation
+        if (uHasVegetation > 0.5 && normalizedH > 0.02 && normalizedH < 0.45 && slope < 0.5) {
+          float vegNoise = noise2(hitPos.xz * 30.0 + uSeed);
+          float vegStrength = smoothstep(0.02, 0.15, normalizedH)
+                            * smoothstep(0.45, 0.25, normalizedH)
+                            * smoothstep(0.5, 0.2, slope);
+          color = mix(color, uVegetationColor * (0.8 + vegNoise * 0.4), vegStrength * 0.8);
+        }
+
+        // Rocky exposed on steep slopes
+        if (slope > 0.3) {
+          float rockMix = smoothstep(0.3, 0.6, slope);
+          vec3 rockColor = uAccentColor * 0.6;
+          color = mix(color, rockColor, rockMix * 0.7);
+        }
+
+        // Snow caps
+        if (normalizedH > 0.6) {
+          float snowLine = smoothstep(0.6, 0.8, normalizedH);
+          float snowSlope = smoothstep(0.5, 0.2, slope); // Less snow on steep faces
+          float snowNoise = noise2(hitPos.xz * 50.0) * 0.3;
+          color = mix(color, vec3(0.92, 0.95, 1.0), snowLine * snowSlope * (0.7 + snowNoise));
+        }
+
+        // Beach / shore
+        if (uWaterLevel > 0.01 && normalizedH < 0.04) {
+          float beachMix = smoothstep(0.04, 0.0, normalizedH);
+          vec3 sandColor = vec3(0.82, 0.76, 0.6);
+          color = mix(color, sandColor, beachMix);
+        }
+
+        // Lighting
+        color *= ambient + diffuse * 0.88;
+
+        // Shadow side gets sky color bounce
+        if (diffuse < 0.1) {
+          float hRad = uAtmosphereHue / 360.0;
+          vec3 skyBounce = vec3(
+            0.5 + 0.5 * cos(6.28318 * (hRad + 0.0)),
+            0.5 + 0.5 * cos(6.28318 * (hRad + 0.333)),
+            0.5 + 0.5 * cos(6.28318 * (hRad + 0.667))
+          ) * 0.08 * uAtmosphereDensity;
+          color += skyBounce * (1.0 - diffuse / 0.1);
+        }
+
+        // Terrain detail noise to break up flatness
+        float detail = noise2(hitPos.xz * 200.0) * 0.08 - 0.04;
+        color += detail;
+      }
+
+      // ─── Atmospheric fog (distance-based) ──────────────────────────
+
+      float fogDist = hitDist / 30.0;
+      float fog = 1.0 - exp(-fogDist * fogDist * 3.0 * uAtmosphereDensity);
+      vec3 fogColor = getSkyColor(rd, sunDir);
+      color = mix(color, fogColor, clamp(fog, 0.0, 0.95));
+    }
+  }
+
+  // ─── Clouds (rendered above terrain) ─────────────────────────────────
+
+  if (uAtmosphereDensity > 0.15 && rd.y > 0.0) {
+    // Clouds at a fixed altitude above camera
+    float cloudAlt = camY + 1.5;
+    float tCloud = (cloudAlt - camPos.y) / rd.y;
+    if (tCloud > 0.0 && (hitDist < 0.0 || tCloud < hitDist)) {
+      vec3 cloudPos = camPos + rd * tCloud;
+      vec2 cloudUV = cloudPos.xz * 2.0 + vec2(uTime * 0.015, uTime * 0.008);
+      float density = cloudDensity(cloudUV);
+      float cloudShape = smoothstep(0.42, 0.7, density);
+
+      // Cloud lighting
+      float cloudShadow = smoothstep(0.6, 0.4, cloudDensity(cloudUV + sunDir.xz * 0.05));
+      vec3 cloudColor = mix(vec3(0.6, 0.6, 0.65), vec3(1.0, 0.98, 0.95), cloudShadow);
+
+      // Sun-side illumination
+      float cloudSunDot = max(dot(rd, sunDir), 0.0);
+      cloudColor += vec3(1.0, 0.9, 0.7) * pow(cloudSunDot, 8.0) * 0.2;
+
+      float cloudAlpha = cloudShape * uAtmosphereDensity * 0.7;
+
+      // Distance fade
+      float cloudDist = tCloud / 25.0;
+      cloudAlpha *= exp(-cloudDist * cloudDist);
+
+      color = mix(color, cloudColor, clamp(cloudAlpha, 0.0, 0.85));
+    }
+  }
+
+  // Gamma correction
+  color = pow(color, vec3(1.0 / 2.2));
+
+  fragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }`;
 
 const ATMOSPHERE_FRAG = `#version 300 es
@@ -581,9 +813,8 @@ uniform float uDensity;
 uniform float uHue;
 uniform vec3 uStarColor;
 uniform float uTime;
-uniform float uPlanetRadius; // visual radius in screen pixels (normalized)
+uniform float uPlanetRadius;
 
-// Simple cloud noise
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
@@ -612,38 +843,47 @@ float cloudFBM(vec2 p) {
 
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution;
-  vec2 center = vec2(0.5);
-  float distFromCenter = length(uv - center) * 2.0;
+  vec2 ndc = uv * 2.0 - 1.0;
+  ndc.x *= uResolution.x / uResolution.y;
+  float distFromCenter = length(ndc);
 
   // Sky color from hue
   float hRad = uHue / 360.0;
-  vec3 skyColor = vec3(
+  vec3 skyZenith = vec3(
     0.5 + 0.5 * cos(6.28318 * (hRad + 0.0)),
     0.5 + 0.5 * cos(6.28318 * (hRad + 0.333)),
     0.5 + 0.5 * cos(6.28318 * (hRad + 0.667))
   ) * 0.5;
 
+  vec3 skyHorizon = mix(skyZenith * 1.5, uStarColor * 0.7, 0.3);
+
   // How much sky vs space
   float skyAlpha = uAltitude * uDensity;
 
-  // Planet curvature: limb darkening at edges when altitude < 1
-  float limbDist = distFromCenter;
+  // Planet curvature: shows planet rim from orbit, then opens to sky
   float limb = 1.0;
   if (uAltitude < 0.7) {
-    // Show planet horizon as curved rim
-    float horizonRadius = mix(0.3, 1.5, uAltitude);
-    limb = smoothstep(horizonRadius + 0.2, horizonRadius - 0.1, limbDist);
+    float horizonRadius = mix(0.3, 2.5, uAltitude);
+    limb = smoothstep(horizonRadius + 0.15, horizonRadius - 0.1, distFromCenter);
   }
 
-  // Rayleigh scattering gradient (blue zenith, orange/red horizon)
-  float horizonGlow = pow(max(distFromCenter - 0.3, 0.0), 2.0);
-  vec3 horizonColor = mix(skyColor, uStarColor * 0.8, 0.4);
+  // Simulate looking down at planet → horizon → sky transition
+  // At low altitude, lower portion = planet surface, upper = sky
+  float horizonLine = mix(-0.5, 0.3, uAltitude);
+  float skyGradient = smoothstep(horizonLine - 0.3, horizonLine + 0.5, ndc.y);
 
-  vec3 atmosphere = mix(skyColor, horizonColor, horizonGlow);
+  // Atmosphere gradient
+  vec3 atmosphere = mix(skyHorizon, skyZenith, sqrt(max(skyGradient, 0.0)));
+
+  // Horizon glow (warm band near horizon line)
+  float horizonDist = abs(ndc.y - horizonLine);
+  float horizonGlow = exp(-horizonDist * horizonDist * 8.0) * uDensity;
+  atmosphere += uStarColor * horizonGlow * 0.3;
+
   atmosphere *= limb;
 
   // Stars visible through thin atmosphere
-  float starVisibility = 1.0 - skyAlpha;
+  float starVisibility = (1.0 - skyAlpha) * smoothstep(horizonLine, horizonLine + 0.5, ndc.y);
   vec2 starUV = uv * uResolution / 3.0;
   vec2 cell = floor(starUV);
   float starHash = hash(cell);
@@ -654,19 +894,32 @@ void main() {
     starBrightness = 0.3 * smoothstep(1.5, 0.0, d) * starVisibility;
   }
 
-  // Cloud layer (when entering atmosphere)
+  // Cloud layers visible from above during descent
   float cloudAlpha = 0.0;
-  if (uDensity > 0.2 && uAltitude > 0.3) {
-    vec2 cloudUV = uv * 8.0 + vec2(uTime * 0.02, uTime * 0.01);
+  if (uDensity > 0.2 && uAltitude > 0.2) {
+    vec2 cloudUV = uv * 6.0 + vec2(uTime * 0.015, uTime * 0.008);
     float clouds = cloudFBM(cloudUV);
-    cloudAlpha = smoothstep(0.4, 0.7, clouds) * uAltitude * uDensity * 0.5;
+    // Clouds visible below horizon when looking down from orbit
+    float cloudBand = smoothstep(horizonLine + 0.1, horizonLine - 0.3, ndc.y);
+    cloudAlpha = smoothstep(0.4, 0.65, clouds) * uDensity * cloudBand * 0.6;
+
+    // Cloud shadow / lighting
+    float cloudLit = cloudFBM(cloudUV + vec2(0.03, 0.02));
+    vec3 cloudColor = mix(vec3(0.6), vec3(1.0, 0.98, 0.95), smoothstep(0.5, 0.4, cloudLit));
+    atmosphere = mix(atmosphere, cloudColor, cloudAlpha);
+  }
+
+  // Entry heat effect at high speed (low altitude, high density)
+  if (uAltitude > 0.4 && uAltitude < 0.8) {
+    float entryIntensity = smoothstep(0.4, 0.6, uAltitude) * smoothstep(0.8, 0.6, uAltitude);
+    float edgeGlow = smoothstep(0.7, 1.2, distFromCenter) * entryIntensity;
+    atmosphere += vec3(1.0, 0.4, 0.1) * edgeGlow * 0.3 * uDensity;
   }
 
   vec3 finalColor = atmosphere * skyAlpha + vec3(starBrightness);
-  finalColor = mix(finalColor, vec3(0.95, 0.97, 1.0), cloudAlpha);
 
-  // Black space behind planet limb
-  float alpha = max(skyAlpha * limb, starBrightness + cloudAlpha);
+  float alpha = max(skyAlpha * limb, starBrightness);
+  alpha = max(alpha, cloudAlpha);
 
   fragColor = vec4(finalColor, clamp(alpha, 0.0, 1.0));
 }`;

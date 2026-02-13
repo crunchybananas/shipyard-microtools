@@ -591,12 +591,12 @@ export default class CosmosApp extends Component {
       ? hexToRGB(star.color)
       : [1, 0.95, 0.85];
 
-    // Compute light direction (based on star position — simplified)
+    // Compute light direction — sun position above horizon
     const lightAngle = this.time * 0.005;
     const lightDir: [number, number, number] = [
-      Math.cos(lightAngle) * 0.7,
-      -0.3,
-      Math.sin(lightAngle) * 0.7 + 0.3,
+      Math.cos(lightAngle) * 0.6,
+      0.35 + Math.sin(this.time * 0.002) * 0.15,
+      Math.sin(lightAngle) * 0.6,
     ];
 
     if (altitude < 1) {
@@ -610,8 +610,8 @@ export default class CosmosApp extends Component {
       );
     }
 
-    if (zoom >= 5000000) {
-      // Surface/terrain — draw procedural terrain
+    if (zoom >= 2000000) {
+      // Surface/terrain — draw procedural landscape
       this.engine.drawTerrain(
         this.camera.x, this.camera.y, zoom,
         planet.seed,
@@ -657,7 +657,7 @@ export default class CosmosApp extends Component {
       ctx.fillText(`ALT: ${altKm}`, cssW - 20, cssH - 60);
 
       // Compass rose
-      if (zoom >= 5000000) {
+      if (zoom >= 2000000) {
         const cx = cssW - 40;
         const cy = cssH - 100;
         ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
