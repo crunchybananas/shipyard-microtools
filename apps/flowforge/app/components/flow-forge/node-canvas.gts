@@ -81,6 +81,9 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
   @tracked isSpacePressed = false;
 
   canvasElement: HTMLElement | null = null;
+  private touchPointers = new Map<number, { x: number; y: number }>();
+  private pinchStartDist = 0;
+  private pinchStartScale = 1;
 
   setupCanvas = modifier((element: HTMLElement) => {
     this.canvasElement = element;
@@ -99,6 +102,18 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     };
 
     const handlePointerMove = (e: PointerEvent) => {
+      // Track touch pointers for pinch
+      if (e.pointerType === "touch") {
+        this.touchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (this.touchPointers.size === 2 && this.pinchStartDist > 0) {
+          const pts = [...this.touchPointers.values()];
+          const dist = Math.hypot(pts[1]!.x - pts[0]!.x, pts[1]!.y - pts[0]!.y);
+          const scale = dist / this.pinchStartDist;
+          this.viewScale = clamp(this.pinchStartScale * scale, 0.4, 2.5);
+          return;
+        }
+      }
+
       if (this.panState) {
         const dx = e.clientX - this.panState.startX;
         const dy = e.clientY - this.panState.startY;
@@ -116,8 +131,26 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     };
 
     const handlePointerDown = (e: PointerEvent) => {
-      if (e.button === 1 || (e.button === 0 && this.isSpacePressed)) {
-        if (e.target === element) {
+      // Track touches for pinch zoom
+      if (e.pointerType === "touch") {
+        this.touchPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (this.touchPointers.size === 2) {
+          const pts = [...this.touchPointers.values()];
+          this.pinchStartDist = Math.hypot(pts[1]!.x - pts[0]!.x, pts[1]!.y - pts[0]!.y);
+          this.pinchStartScale = this.viewScale;
+          this.panState = null; // Cancel any pan
+          return;
+        }
+      }
+
+      // Pan: middle-click, space+click, or single-finger touch on canvas background
+      const shouldPan =
+        e.button === 1 ||
+        (e.button === 0 && this.isSpacePressed) ||
+        (e.pointerType === "touch" && e.target === element);
+
+      if (shouldPan) {
+        if (e.target === element || e.pointerType === "touch") {
           e.preventDefault();
           this.panState = {
             startX: e.clientX,
@@ -130,6 +163,11 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     };
 
     const handlePointerUp = (e: PointerEvent) => {
+      if (e.pointerType === "touch") {
+        this.touchPointers.delete(e.pointerId);
+        if (this.touchPointers.size < 2) this.pinchStartDist = 0;
+      }
+
       if (this.panState) {
         this.panState = null;
       }
@@ -312,7 +350,7 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
     }
   };
 
-  handleNodeMouseDown = (nodeId: string, event: MouseEvent) => {
+  handleNodeMouseDown = (nodeId: string, event: PointerEvent | MouseEvent) => {
     // Don't start drag if clicking on a port
     const target = event.target as HTMLElement;
     if (target.closest(".port")) return;
@@ -332,7 +370,7 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
 
     this.args.onNodeSelect(nodeId);
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMove = (e: PointerEvent | MouseEvent) => {
       if (this.dragState) {
         const pointerMove = this.screenToWorld(e.clientX, e.clientY);
         const newX = pointerMove.x - this.dragState.offsetX;
@@ -341,14 +379,19 @@ export default class NodeCanvas extends Component<NodeCanvasSignature> {
       }
     };
 
-    const handleMouseUp = () => {
+    const handleUp = () => {
       this.dragState = null;
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+    // Keep mouse fallback for safety
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
   };
 
   handlePortPointerDown = (

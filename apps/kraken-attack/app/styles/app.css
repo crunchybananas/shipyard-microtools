@@ -197,3 +197,72 @@ footer a {
 footer a:hover {
   text-decoration: underline;
 }
+
+/* ── Touch controls (mobile only) ──────── */
+
+.touch-controls {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .game-container {
+    width: 100%;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 600 / 500;
+  }
+
+  .touch-controls {
+    position: fixed;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    z-index: 100;
+    padding: 0 16px;
+  }
+
+  .touch-btn {
+    width: 72px;
+    height: 64px;
+    border: 2px solid rgba(167, 139, 250, 0.5);
+    border-radius: 14px;
+    background: rgba(167, 139, 250, 0.15);
+    color: #a78bfa;
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .touch-btn:active {
+    background: rgba(167, 139, 250, 0.35);
+    transform: scale(0.92);
+  }
+
+  .touch-btn-fire {
+    width: 88px;
+    border-color: rgba(248, 113, 113, 0.6);
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+    font-size: 1.8rem;
+  }
+
+  .touch-btn-fire:active {
+    background: rgba(248, 113, 113, 0.4);
+  }
+
+  .controls-info {
+    display: none;
+  }
+}

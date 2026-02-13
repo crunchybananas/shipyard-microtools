@@ -1,5 +1,6 @@
 import Component from "@glimmer/component";
 import { on } from "@ember/modifier";
+import { fn } from "@ember/helper";
 import { modifier } from "ember-modifier";
 import { service } from "@ember/service";
 import type GameEngineService from "ship-wreckers/services/game-engine";
@@ -7,6 +8,16 @@ import type GameEngineService from "ship-wreckers/services/game-engine";
 export default class ShipWreckersApp extends Component {
   @service declare gameEngine: GameEngineService;
   canvasElement: HTMLCanvasElement | null = null;
+
+  touchDown = (code: string, e: Event) => {
+    e.preventDefault();
+    this.gameEngine.handleKeyDown(code);
+  };
+
+  touchUp = (code: string, e: Event) => {
+    e.preventDefault();
+    this.gameEngine.handleKeyUp(code);
+  };
 
   setupCanvas = modifier((element: HTMLElement) => {
     const canvas = element.querySelector("#gameCanvas") as HTMLCanvasElement | null;
@@ -110,7 +121,7 @@ export default class ShipWreckersApp extends Component {
           autofocus
           {{this.setupCanvas}}
         >
-          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          <canvas id="gameCanvas" width="600" height="500" style="touch-action:none"></canvas>
 
           {{#if this.isStartScreen}}
             <div class="overlay">
@@ -164,6 +175,38 @@ export default class ShipWreckersApp extends Component {
                   ></div>
                 </div>
               </div>
+            </div>
+
+            <div class="touch-controls">
+              <div class="touch-dpad">
+                <button class="touch-btn dpad-up" type="button"
+                  {{on "touchstart" (fn this.touchDown "ArrowUp")}}
+                  {{on "touchend" (fn this.touchUp "ArrowUp")}}
+                  {{on "touchcancel" (fn this.touchUp "ArrowUp")}}
+                >▲</button>
+                <div class="dpad-middle">
+                  <button class="touch-btn" type="button"
+                    {{on "touchstart" (fn this.touchDown "ArrowLeft")}}
+                    {{on "touchend" (fn this.touchUp "ArrowLeft")}}
+                    {{on "touchcancel" (fn this.touchUp "ArrowLeft")}}
+                  >◀</button>
+                  <button class="touch-btn" type="button"
+                    {{on "touchstart" (fn this.touchDown "ArrowRight")}}
+                    {{on "touchend" (fn this.touchUp "ArrowRight")}}
+                    {{on "touchcancel" (fn this.touchUp "ArrowRight")}}
+                  >▶</button>
+                </div>
+                <button class="touch-btn dpad-down" type="button"
+                  {{on "touchstart" (fn this.touchDown "ArrowDown")}}
+                  {{on "touchend" (fn this.touchUp "ArrowDown")}}
+                  {{on "touchcancel" (fn this.touchUp "ArrowDown")}}
+                >▼</button>
+              </div>
+              <button class="touch-btn touch-btn-fire" type="button"
+                {{on "touchstart" (fn this.touchDown "Space")}}
+                {{on "touchend" (fn this.touchUp "Space")}}
+                {{on "touchcancel" (fn this.touchUp "Space")}}
+              >💣</button>
             </div>
           {{/if}}
         </div>

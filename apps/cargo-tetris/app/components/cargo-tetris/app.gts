@@ -1,6 +1,8 @@
 import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { service } from "@ember/service";
 import { on } from "@ember/modifier";
+import { fn } from "@ember/helper";
 import { modifier } from "ember-modifier";
 import type GameEngineService from "cargo-tetris/services/game-engine";
 import CargoTetrisHud from "./hud";
@@ -35,6 +37,24 @@ export default class CargoTetrisApp extends Component {
 
   startGame = (): void => {
     this.gameEngine.startGame();
+  };
+
+  @tracked private repeatTimer: ReturnType<typeof setInterval> | null = null;
+
+  touchAction = (code: string, e: Event) => {
+    e.preventDefault();
+    this.gameEngine.handleKeydown(code);
+  };
+
+  touchRepeatStart = (code: string, e: Event) => {
+    e.preventDefault();
+    this.gameEngine.handleKeydown(code);
+    this.repeatTimer = setInterval(() => this.gameEngine.handleKeydown(code), 100);
+  };
+
+  touchRepeatEnd = (e: Event) => {
+    e.preventDefault();
+    if (this.repeatTimer) { clearInterval(this.repeatTimer); this.repeatTimer = null; }
   };
 
   get isStartScreen(): boolean {
@@ -78,7 +98,7 @@ export default class CargoTetrisApp extends Component {
           {{on "keydown" this.handleKeydown}}
           {{this.setupCanvas}}
         >
-          <canvas id="gameCanvas" width="360" height="500"></canvas>
+          <canvas id="gameCanvas" width="360" height="500" style="touch-action:none"></canvas>
 
           {{#if this.isStartScreen}}
             <div class="overlay">
@@ -123,6 +143,46 @@ export default class CargoTetrisApp extends Component {
             <span class="next-label">NEXT</span>
             <canvas id="nextCanvas" width="100" height="80"></canvas>
           </div>
+
+          {{#if this.isPlaying}}
+            <div class="touch-controls">
+              <div class="touch-row">
+                <button
+                  class="touch-btn"
+                  type="button"
+                  {{on "touchstart" (fn this.touchRepeatStart "ArrowLeft")}}
+                  {{on "touchend" this.touchRepeatEnd}}
+                  {{on "touchcancel" this.touchRepeatEnd}}
+                >◀</button>
+                <button
+                  class="touch-btn"
+                  type="button"
+                  {{on "touchstart" (fn this.touchRepeatStart "ArrowDown")}}
+                  {{on "touchend" this.touchRepeatEnd}}
+                  {{on "touchcancel" this.touchRepeatEnd}}
+                >▼</button>
+                <button
+                  class="touch-btn"
+                  type="button"
+                  {{on "touchstart" (fn this.touchRepeatStart "ArrowRight")}}
+                  {{on "touchend" this.touchRepeatEnd}}
+                  {{on "touchcancel" this.touchRepeatEnd}}
+                >▶</button>
+              </div>
+              <div class="touch-row">
+                <button
+                  class="touch-btn touch-btn-wide"
+                  type="button"
+                  {{on "touchstart" (fn this.touchAction "ArrowUp")}}
+                >↻ Rotate</button>
+                <button
+                  class="touch-btn touch-btn-wide"
+                  type="button"
+                  {{on "touchstart" (fn this.touchAction "Space")}}
+                >⤓ Drop</button>
+              </div>
+            </div>
+          {{/if}}
         </div>
       </main>
 

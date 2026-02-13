@@ -49,6 +49,9 @@ export default class CosmosApp extends Component {
   private animationId: number | null = null;
   private lastMouseX = 0;
   private lastMouseY = 0;
+  private pinchStartDist = 0;
+  private pinchStartZoom = 1;
+  private activePointers = new Map<number, { x: number; y: number }>();
   private time = 0;
 
   private camera: Camera = {
@@ -662,14 +665,35 @@ export default class CosmosApp extends Component {
     }
   };
 
-  handleMouseDown = (event: MouseEvent): void => {
-    this.isDragging = true;
-    this.lastMouseX = event.clientX;
-    this.lastMouseY = event.clientY;
+  handlePointerDown = (event: PointerEvent): void => {
+    this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (this.activePointers.size === 2) {
+      // Start pinch
+      const pts = [...this.activePointers.values()];
+      this.pinchStartDist = Math.hypot(pts[1]!.x - pts[0]!.x, pts[1]!.y - pts[0]!.y);
+      this.pinchStartZoom = this.camera.targetZoom;
+      this.isDragging = false;
+    } else if (this.activePointers.size === 1) {
+      this.isDragging = true;
+      this.lastMouseX = event.clientX;
+      this.lastMouseY = event.clientY;
+    }
   };
 
-  handleMouseMove = (event: MouseEvent): void => {
-    if (this.isDragging) {
+  handlePointerMove = (event: PointerEvent): void => {
+    this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (this.activePointers.size === 2) {
+      // Pinch zoom
+      const pts = [...this.activePointers.values()];
+      const dist = Math.hypot(pts[1]!.x - pts[0]!.x, pts[1]!.y - pts[0]!.y);
+      if (this.pinchStartDist > 0) {
+        const scale = dist / this.pinchStartDist;
+        this.camera.targetZoom = Math.max(0.5, Math.min(500000, this.pinchStartZoom * scale));
+        if (this.camera.targetZoom < 5000) this.cachedSystem = null;
+      }
+    } else if (this.isDragging) {
       const dx = (event.clientX - this.lastMouseX) / this.camera.zoom;
       const dy = (event.clientY - this.lastMouseY) / this.camera.zoom;
       this.camera.targetX -= dx;
@@ -681,16 +705,25 @@ export default class CosmosApp extends Component {
     }
   };
 
-  handleMouseUp = (): void => {
-    this.isDragging = false;
+  handlePointerUp = (event: PointerEvent): void => {
+    this.activePointers.delete(event.pointerId);
+    if (this.activePointers.size < 2) {
+      this.pinchStartDist = 0;
+    }
+    if (this.activePointers.size === 0) {
+      this.isDragging = false;
+    }
   };
 
-  handleMouseLeave = (): void => {
-    this.isDragging = false;
+  handlePointerLeave = (event: PointerEvent): void => {
+    this.activePointers.delete(event.pointerId);
+    if (this.activePointers.size === 0) {
+      this.isDragging = false;
+    }
   };
 
   handleClick = (event: MouseEvent): void => {
-    if (this.isDragging) return;
+    if (this.isDragging || this.activePointers.size > 1) return;
 
     const mx = event.clientX;
     const my = event.clientY;
@@ -769,10 +802,11 @@ export default class CosmosApp extends Component {
         class="cosmos-canvas {{if this.isDragging 'grabbing'}}"
         {{this.setupCanvas}}
         {{on "wheel" this.handleWheel}}
-        {{on "mousedown" this.handleMouseDown}}
-        {{on "mousemove" this.handleMouseMove}}
-        {{on "mouseup" this.handleMouseUp}}
-        {{on "mouseleave" this.handleMouseLeave}}
+        {{on "pointerdown" this.handlePointerDown}}
+        {{on "pointermove" this.handlePointerMove}}
+        {{on "pointerup" this.handlePointerUp}}
+        {{on "pointerleave" this.handlePointerLeave}}
+        {{on "pointercancel" this.handlePointerUp}}
         {{on "click" this.handleClick}}
       ></canvas>
 

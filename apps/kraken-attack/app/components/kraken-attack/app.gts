@@ -1,6 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
+import { fn } from "@ember/helper";
 import { modifier } from "ember-modifier";
 import { service } from "@ember/service";
 import type GameEngineService from "kraken-attack/services/game-engine";
@@ -11,6 +12,16 @@ export default class KrakenAttackApp extends Component {
   @tracked canvasElement: HTMLCanvasElement | null = null;
   @tracked animationId: number | null = null;
   @tracked lastTime = 0;
+
+  touchDown = (code: string, e: Event) => {
+    e.preventDefault();
+    this.gameEngine.handleKeyDown(code);
+  };
+
+  touchUp = (code: string, e: Event) => {
+    e.preventDefault();
+    this.gameEngine.handleKeyUp(code);
+  };
 
   setupCanvas = modifier((element: HTMLElement) => {
     const canvas = element as HTMLCanvasElement;
@@ -329,6 +340,7 @@ export default class KrakenAttackApp extends Component {
           <canvas
             width="600"
             height="500"
+            style="touch-action:none"
             tabindex="0"
             autofocus
             {{on "keydown" this.handleKeydown}}
@@ -397,6 +409,30 @@ export default class KrakenAttackApp extends Component {
                   ></div>
                 </div>
               </div>
+            </div>
+
+            <div class="touch-controls">
+              <button
+                class="touch-btn"
+                type="button"
+                {{on "touchstart" (fn this.touchDown "ArrowLeft")}}
+                {{on "touchend" (fn this.touchUp "ArrowLeft")}}
+                {{on "touchcancel" (fn this.touchUp "ArrowLeft")}}
+              >◀</button>
+              <button
+                class="touch-btn touch-btn-fire"
+                type="button"
+                {{on "touchstart" (fn this.touchDown "Space")}}
+                {{on "touchend" (fn this.touchUp "Space")}}
+                {{on "touchcancel" (fn this.touchUp "Space")}}
+              >💥</button>
+              <button
+                class="touch-btn"
+                type="button"
+                {{on "touchstart" (fn this.touchDown "ArrowRight")}}
+                {{on "touchend" (fn this.touchUp "ArrowRight")}}
+                {{on "touchcancel" (fn this.touchUp "ArrowRight")}}
+              >▶</button>
             </div>
           {{/if}}
         </div>

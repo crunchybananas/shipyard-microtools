@@ -345,6 +345,7 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
+  touch-action: none;
   background:
     radial-gradient(circle at center, var(--bg-dark) 0%, var(--bg-darker) 100%),
     repeating-linear-gradient(

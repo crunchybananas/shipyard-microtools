@@ -152,6 +152,15 @@ export default class OrbitalStrikeApp extends Component {
 
   <template>
     <div class="orbital-strike-container">
+      <div class="mobile-notice">
+        <div class="mobile-notice-content">
+          <div class="mobile-notice-icon">🖥️</div>
+          <h2>Desktop Only</h2>
+          <p>Orbital Strike requires a keyboard &amp; mouse for FPS controls (pointer lock, WASD movement, mouse aiming).</p>
+          <p>Please play on a desktop or laptop computer.</p>
+          <a href="../../" class="mobile-notice-btn">← Back to All Tools</a>
+        </div>
+      </div>
       <canvas class="game-canvas" {{this.setupGame}}></canvas>
 
       {{#if this.gameStarted}}

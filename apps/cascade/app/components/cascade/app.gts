@@ -23,6 +23,7 @@ export default class CascadeApp extends Component {
   private touchStartX = 0;
   private touchStartY = 0;
   private mouseDown = false;
+  private touchPainting = false;
   private prevMX = 0;
   private prevMY = 0;
 
@@ -82,9 +83,41 @@ export default class CascadeApp extends Component {
     const t = e.touches[0]!;
     this.touchStartX = t.clientX;
     this.touchStartY = t.clientY;
+    // Start paint tracking for canvas fluid
+    const canvas = e.currentTarget as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    this.prevMX = (t.clientX - rect.left) / canvas.clientWidth;
+    this.prevMY = 1 - (t.clientY - rect.top) / canvas.clientHeight;
+    this.touchPainting = false;
+  };
+
+  onTouchMove = (e: TouchEvent) => {
+    const t = e.touches[0]!;
+    const dx = Math.abs(t.clientX - this.touchStartX);
+    const dy = Math.abs(t.clientY - this.touchStartY);
+    // After moving enough, treat as paint rather than swipe
+    if (dx > 15 || dy > 15) {
+      this.touchPainting = true;
+      e.preventDefault();
+      const canvas = e.currentTarget as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const mx = (t.clientX - rect.left) / canvas.clientWidth;
+      const my = 1 - (t.clientY - rect.top) / canvas.clientHeight;
+      const ddx = mx - this.prevMX;
+      const ddy = my - this.prevMY;
+      if (Math.abs(ddx) > 0 || Math.abs(ddy) > 0) {
+        this.engine?.paint(mx, my, ddx, ddy);
+      }
+      this.prevMX = mx;
+      this.prevMY = my;
+    }
   };
 
   onTouchEnd = (e: TouchEvent) => {
+    if (this.touchPainting) {
+      this.touchPainting = false;
+      return;
+    }
     const t = e.changedTouches[0]!;
     const dx = t.clientX - this.touchStartX;
     const dy = t.clientY - this.touchStartY;
@@ -134,6 +167,7 @@ export default class CascadeApp extends Component {
         id="cascade-canvas"
         {{this.setupCanvas}}
         {{on "touchstart" this.onTouchStart}}
+        {{on "touchmove" this.onTouchMove}}
         {{on "touchend" this.onTouchEnd}}
         {{on "mousedown" this.onMouseDown}}
         {{on "mousemove" this.onMouseMove}}

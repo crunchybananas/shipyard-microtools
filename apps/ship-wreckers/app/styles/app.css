@@ -200,3 +200,96 @@ footer a:hover {
     height: auto;
   }
 }
+
+/* ── Touch controls (mobile only) ──────── */
+
+.touch-controls {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .game-container {
+    width: 100%;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 600 / 500;
+  }
+
+  .touch-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 24px;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .touch-dpad, .touch-btn-fire {
+    pointer-events: auto;
+  }
+
+  .touch-dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dpad-middle {
+    display: flex;
+    gap: 4px;
+  }
+
+  .touch-btn {
+    width: 56px;
+    height: 52px;
+    border: 2px solid rgba(96, 165, 250, 0.5);
+    border-radius: 12px;
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .touch-btn:active {
+    background: rgba(96, 165, 250, 0.35);
+    transform: scale(0.92);
+  }
+
+  .dpad-up, .dpad-down {
+    width: 56px;
+  }
+
+  .touch-btn-fire {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border-color: rgba(248, 113, 113, 0.6);
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+    font-size: 2rem;
+    margin-bottom: 16px;
+  }
+
+  .touch-btn-fire:active {
+    background: rgba(248, 113, 113, 0.4);
+  }
+
+  .controls-info {
+    display: none;
+  }
+}
