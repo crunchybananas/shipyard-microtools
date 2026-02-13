@@ -28,6 +28,7 @@ import {
   hslToRGB,
   planetTypeToIndex,
 } from "cosmos/cosmos/cosmos-engine";
+import { getBiomeConfig } from "cosmos/cosmos/terrain-generator";
 
 interface Camera {
   x: number;
@@ -78,6 +79,8 @@ export default class CosmosApp extends Component {
   private cachedGalaxies: Galaxy[] = [];
   private cachedStars: Star[] = [];
   private cachedSystem: CachedSystem | null = null;
+  private focusedPlanet: Planet | null = null;
+  private focusedPlanetStar: Star | null = null;
 
   private checkUrlParams(): void {
     const params = new URLSearchParams(window.location.search);
@@ -188,8 +191,10 @@ export default class CosmosApp extends Component {
       this.renderGalaxiesWebGL(left, right, top, bottom);
     } else if (this.camera.zoom < 5000) {
       this.renderStarsWebGL(left, right, top, bottom);
-    } else {
+    } else if (this.camera.zoom < 500000) {
       this.renderSystemWebGL();
+    } else {
+      this.renderSurfaceWebGL();
     }
 
     this.engine.endFrame();
@@ -476,6 +481,13 @@ export default class CosmosApp extends Component {
         this.overlayCtx.textAlign = "center";
         this.overlayCtx.fillText(planet.name, px, py + planetSize + 15);
       }
+
+      // Track closest planet for surface dive
+      const distToCenter = Math.sqrt((px - cssW / 2) ** 2 + (py - cssH / 2) ** 2);
+      if (distToCenter < planetSize * 2 || (this.camera.zoom > 100000 && distToCenter < 200)) {
+        this.focusedPlanet = planet;
+        this.focusedPlanetStar = star;
+      }
     });
 
     // Star label on overlay
@@ -494,6 +506,133 @@ export default class CosmosApp extends Component {
     }
   }
 
+  // ─── Surface / Terrain / Atmosphere Rendering ─────────────────────────────
+
+  private renderSurfaceWebGL(): void {
+    // We need a focused planet to render surface. If none, pick one.
+    if (!this.focusedPlanet) {
+      // Generate default planet from camera position
+      const seed = getSeed(
+        Math.floor(this.camera.x / 50),
+        Math.floor(this.camera.y / 50),
+        1
+      );
+      const star = generateStar(seed);
+      if (star.planets > 0) {
+        this.focusedPlanet = generatePlanet(seed + 100, 0, star);
+        this.focusedPlanetStar = star;
+      } else {
+        // No planet — fall back to rocky world
+        this.focusedPlanet = generatePlanet(seed + 42, 0, star);
+        this.focusedPlanetStar = star;
+      }
+    }
+
+    const planet = this.focusedPlanet!;
+    const star = this.focusedPlanetStar;
+    const biome = getBiomeConfig(planet.type);
+
+    // Compute altitude: how deep into surface we are (0=orbit, 1=ground)
+    // ATMOSPHERE: 500K → 5M zoom, SURFACE: 5M → 50M, TERRAIN: 50M → 500M
+    const zoom = this.camera.zoom;
+    let altitude: number;
+    if (zoom < 5000000) {
+      // Atmosphere phase: 500K→5M
+      altitude = (zoom - 500000) / (5000000 - 500000); // 0→1
+    } else {
+      altitude = 1;
+    }
+
+    const starColorRGB: [number, number, number] = star
+      ? hexToRGB(star.color)
+      : [1, 0.95, 0.85];
+
+    // Compute light direction (based on star position — simplified)
+    const lightAngle = this.time * 0.005;
+    const lightDir: [number, number, number] = [
+      Math.cos(lightAngle) * 0.7,
+      -0.3,
+      Math.sin(lightAngle) * 0.7 + 0.3,
+    ];
+
+    if (altitude < 1) {
+      // In atmosphere — draw atmosphere effect
+      this.engine.drawAtmosphere(
+        altitude,
+        biome.atmosphereDensity,
+        biome.atmosphereHue,
+        starColorRGB,
+        0.5,
+      );
+    }
+
+    if (zoom >= 5000000) {
+      // Surface/terrain — draw procedural terrain
+      this.engine.drawTerrain(
+        this.camera.x, this.camera.y, zoom,
+        planet.seed,
+        biome.baseColor,
+        biome.accentColor,
+        biome.waterLevel,
+        biome.waterColor,
+        biome.hasVegetation,
+        biome.vegetationColor,
+        biome.roughness,
+        lightDir,
+        biome.atmosphereDensity,
+        biome.atmosphereHue,
+      );
+    }
+
+    // Overlay HUD for surface view
+    if (this.overlayCtx && this.overlayCanvas) {
+      const cssW = this.overlayCanvas.width;
+      const cssH = this.overlayCanvas.height;
+      const ctx = this.overlayCtx;
+
+      // Planet name & type
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.font = "16px SF Pro Display, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(planet.name, 20, cssH - 60);
+
+      const typeName = planet.type
+        .replace("_", " ")
+        .replace(/\b\w/g, (c: string) => c.toUpperCase());
+      ctx.font = "12px SF Pro Display, sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+      ctx.fillText(typeName, 20, cssH - 42);
+
+      // Altitude indicator
+      const altKm = altitude < 1
+        ? Math.floor((1 - altitude) * 100) + " km"
+        : "Surface";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.font = "11px SF Mono, monospace";
+      ctx.textAlign = "right";
+      ctx.fillText(`ALT: ${altKm}`, cssW - 20, cssH - 60);
+
+      // Compass rose
+      if (zoom >= 5000000) {
+        const cx = cssW - 40;
+        const cy = cssH - 100;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 15, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.font = "8px SF Pro Display, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("N", cx, cy - 18);
+        ctx.fillText("S", cx, cy + 24);
+        ctx.fillText("E", cx + 22, cy + 4);
+        ctx.fillText("W", cx - 22, cy + 4);
+      }
+    }
+  }
+
   // Event handlers
   handleWheel = (event: WheelEvent): void => {
     event.preventDefault();
@@ -501,11 +640,18 @@ export default class CosmosApp extends Component {
     const zoomFactor = event.deltaY > 0 ? 0.85 : 1.18;
     this.camera.targetZoom = Math.max(
       0.5,
-      Math.min(500000, this.camera.targetZoom * zoomFactor)
+      Math.min(500000000, this.camera.targetZoom * zoomFactor)
     );
 
     if (this.camera.targetZoom < 5000) {
       this.cachedSystem = null;
+      this.focusedPlanet = null;
+      this.focusedPlanetStar = null;
+    }
+    if (this.camera.targetZoom < 500000) {
+      // Reset focused planet if zooming back above atmosphere
+      this.focusedPlanet = null;
+      this.focusedPlanetStar = null;
     }
   };
 
@@ -534,8 +680,12 @@ export default class CosmosApp extends Component {
       const dist = Math.hypot(pts[1]!.x - pts[0]!.x, pts[1]!.y - pts[0]!.y);
       if (this.pinchStartDist > 0) {
         const scale = dist / this.pinchStartDist;
-        this.camera.targetZoom = Math.max(0.5, Math.min(500000, this.pinchStartZoom * scale));
+        this.camera.targetZoom = Math.max(0.5, Math.min(500000000, this.pinchStartZoom * scale));
         if (this.camera.targetZoom < 5000) this.cachedSystem = null;
+        if (this.camera.targetZoom < 500000) {
+          this.focusedPlanet = null;
+          this.focusedPlanetStar = null;
+        }
       }
     } else if (this.isDragging) {
       const dx = (event.clientX - this.lastMouseX) / this.camera.zoom;
@@ -600,7 +750,7 @@ export default class CosmosApp extends Component {
   private focusOn(x: number, y: number, zoom: number): void {
     this.camera.targetX = x;
     this.camera.targetY = y;
-    this.camera.targetZoom = Math.min(500000, zoom);
+    this.camera.targetZoom = Math.min(500000000, zoom);
     this.cachedSystem = null;
   }
 

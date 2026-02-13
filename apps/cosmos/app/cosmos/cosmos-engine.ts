@@ -350,6 +350,244 @@ void main() {
   fragColor = vec4(color, 1.0);
 }`;
 
+// ─── Terrain Shaders ─────────────────────────────────────────────────────────
+
+const TERRAIN_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV;
+out vec4 fragColor;
+
+uniform vec2 uResolution;
+uniform vec2 uCameraPos;
+uniform float uZoom;
+uniform float uSeed;
+uniform float uTime;
+uniform vec3 uBaseColor;
+uniform vec3 uAccentColor;
+uniform float uWaterLevel;
+uniform vec3 uWaterColor;
+uniform float uHasVegetation;
+uniform vec3 uVegetationColor;
+uniform float uRoughness;
+uniform vec3 uLightDir;
+uniform float uAtmosphereDensity;
+uniform float uAtmosphereHue;
+
+// 3D value noise
+float hash31(vec3 p) {
+  p = fract(p * vec3(443.8975, 397.2973, 491.1871));
+  p += dot(p, p.yzx + 19.19);
+  return fract((p.x + p.y) * p.z);
+}
+
+float noise3(vec3 p) {
+  vec3 i = floor(p);
+  vec3 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+
+  float a = hash31(i);
+  float b = hash31(i + vec3(1,0,0));
+  float c = hash31(i + vec3(0,1,0));
+  float d = hash31(i + vec3(1,1,0));
+  float e = hash31(i + vec3(0,0,1));
+  float ff = hash31(i + vec3(1,0,1));
+  float g = hash31(i + vec3(0,1,1));
+  float h = hash31(i + vec3(1,1,1));
+
+  return mix(
+    mix(mix(a, b, f.x), mix(c, d, f.x), f.y),
+    mix(mix(e, ff, f.x), mix(g, h, f.x), f.y),
+    f.z
+  );
+}
+
+float fbm(vec3 p, float roughness) {
+  float val = 0.0;
+  float amp = 0.5;
+  float freq = 1.0;
+  for (int i = 0; i < 8; i++) {
+    val += noise3(p * freq) * amp;
+    freq *= 2.1;
+    amp *= 0.5 * (0.5 + roughness * 0.5);
+  }
+  return val;
+}
+
+void main() {
+  // World coordinates from screen
+  vec2 worldPos = (gl_FragCoord.xy - uResolution * 0.5) / uZoom + uCameraPos;
+  vec3 samplePos = vec3(worldPos * 800.0, uSeed * 0.1);
+
+  // Height from FBM
+  float height = fbm(samplePos, uRoughness);
+
+  // Compute normal via height differences for lighting
+  float eps = 0.001;
+  float hx = fbm(vec3(samplePos.x + eps, samplePos.yz), uRoughness);
+  float hy = fbm(vec3(samplePos.x, samplePos.y + eps, samplePos.z), uRoughness);
+  vec3 normal = normalize(vec3(height - hx, height - hy, eps * 2.0));
+
+  vec3 color;
+
+  if (height < uWaterLevel) {
+    // Water
+    float depth = 1.0 - height / max(uWaterLevel, 0.001);
+    color = uWaterColor * (1.0 - depth * 0.3);
+
+    // Water specular
+    vec3 viewDir = vec3(0.0, 0.0, 1.0);
+    vec3 halfDir = normalize(normalize(uLightDir) + viewDir);
+    float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfDir), 0.0), 64.0);
+    color += vec3(spec * 0.3);
+
+    // Animated caustics
+    float caustic = noise3(samplePos * 40.0 + vec3(uTime * 0.3, uTime * 0.2, 0.0));
+    color += vec3(caustic * 0.05);
+  } else {
+    // Terrain
+    float normalizedH = (height - uWaterLevel) / max(1.0 - uWaterLevel, 0.001);
+    color = mix(uBaseColor, uAccentColor, normalizedH);
+
+    // Vegetation band
+    if (uHasVegetation > 0.5 && normalizedH > 0.05 && normalizedH < 0.4) {
+      float vegStrength = 1.0 - abs(normalizedH - 0.2) / 0.2;
+      color = mix(color, uVegetationColor, vegStrength * 0.7);
+    }
+
+    // Snow caps
+    if (normalizedH > 0.75) {
+      float snow = (normalizedH - 0.75) / 0.25;
+      color = mix(color, vec3(0.95, 0.97, 1.0), snow);
+    }
+
+    // Lighting
+    float diffuse = max(dot(normal, normalize(uLightDir)), 0.0);
+    color *= 0.15 + diffuse * 0.85;
+
+    // Shoreline foam
+    float edgeDist = (height - uWaterLevel) / max(1.0 - uWaterLevel, 0.001);
+    if (edgeDist < 0.02 && uWaterLevel > 0.01) {
+      float foam = smoothstep(0.02, 0.0, edgeDist);
+      float foamPattern = noise3(samplePos * 100.0 + vec3(uTime * 0.5, 0.0, 0.0));
+      color = mix(color, vec3(0.9, 0.95, 1.0), foam * foamPattern * 0.6);
+    }
+  }
+
+  // Atmospheric haze (distance-based fade)
+  float distFromCenter = length(gl_FragCoord.xy / uResolution - 0.5) * 2.0;
+  float haze = smoothstep(0.6, 1.2, distFromCenter) * uAtmosphereDensity;
+  float hRad = uAtmosphereHue / 360.0;
+  vec3 hazeColor = vec3(
+    0.5 + 0.5 * cos(6.28318 * (hRad + 0.0)),
+    0.5 + 0.5 * cos(6.28318 * (hRad + 0.333)),
+    0.5 + 0.5 * cos(6.28318 * (hRad + 0.667))
+  ) * 0.6;
+  color = mix(color, hazeColor, haze * 0.4);
+
+  fragColor = vec4(color, 1.0);
+}`;
+
+const ATMOSPHERE_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUV;
+out vec4 fragColor;
+
+uniform vec2 uResolution;
+uniform float uAltitude; // 0 = space, 1 = surface
+uniform float uDensity;
+uniform float uHue;
+uniform vec3 uStarColor;
+uniform float uTime;
+uniform float uPlanetRadius; // visual radius in screen pixels (normalized)
+
+// Simple cloud noise
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash(i);
+  float b = hash(i + vec2(1, 0));
+  float c = hash(i + vec2(0, 1));
+  float d = hash(i + vec2(1, 1));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float cloudFBM(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += vnoise(p) * a;
+    p *= 2.1;
+    a *= 0.5;
+  }
+  return v;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uResolution;
+  vec2 center = vec2(0.5);
+  float distFromCenter = length(uv - center) * 2.0;
+
+  // Sky color from hue
+  float hRad = uHue / 360.0;
+  vec3 skyColor = vec3(
+    0.5 + 0.5 * cos(6.28318 * (hRad + 0.0)),
+    0.5 + 0.5 * cos(6.28318 * (hRad + 0.333)),
+    0.5 + 0.5 * cos(6.28318 * (hRad + 0.667))
+  ) * 0.5;
+
+  // How much sky vs space
+  float skyAlpha = uAltitude * uDensity;
+
+  // Planet curvature: limb darkening at edges when altitude < 1
+  float limbDist = distFromCenter;
+  float limb = 1.0;
+  if (uAltitude < 0.7) {
+    // Show planet horizon as curved rim
+    float horizonRadius = mix(0.3, 1.5, uAltitude);
+    limb = smoothstep(horizonRadius + 0.2, horizonRadius - 0.1, limbDist);
+  }
+
+  // Rayleigh scattering gradient (blue zenith, orange/red horizon)
+  float horizonGlow = pow(max(distFromCenter - 0.3, 0.0), 2.0);
+  vec3 horizonColor = mix(skyColor, uStarColor * 0.8, 0.4);
+
+  vec3 atmosphere = mix(skyColor, horizonColor, horizonGlow);
+  atmosphere *= limb;
+
+  // Stars visible through thin atmosphere
+  float starVisibility = 1.0 - skyAlpha;
+  vec2 starUV = uv * uResolution / 3.0;
+  vec2 cell = floor(starUV);
+  float starHash = hash(cell);
+  float starBrightness = 0.0;
+  if (starHash > 0.985) {
+    vec2 starPos = (cell + vec2(hash(cell + 1.0), hash(cell + 2.0))) / (uResolution / 3.0);
+    float d = length(uv - starPos) * uResolution.x / 3.0;
+    starBrightness = 0.3 * smoothstep(1.5, 0.0, d) * starVisibility;
+  }
+
+  // Cloud layer (when entering atmosphere)
+  float cloudAlpha = 0.0;
+  if (uDensity > 0.2 && uAltitude > 0.3) {
+    vec2 cloudUV = uv * 8.0 + vec2(uTime * 0.02, uTime * 0.01);
+    float clouds = cloudFBM(cloudUV);
+    cloudAlpha = smoothstep(0.4, 0.7, clouds) * uAltitude * uDensity * 0.5;
+  }
+
+  vec3 finalColor = atmosphere * skyAlpha + vec3(starBrightness);
+  finalColor = mix(finalColor, vec3(0.95, 0.97, 1.0), cloudAlpha);
+
+  // Black space behind planet limb
+  float alpha = max(skyAlpha * limb, starBrightness + cloudAlpha);
+
+  fragColor = vec4(finalColor, clamp(alpha, 0.0, 1.0));
+}`;
+
 // ─── WebGL Helpers ───────────────────────────────────────────────────────────
 
 interface ShaderProgram {
@@ -387,6 +625,8 @@ export class CosmosEngine {
   private bloomBlurProgram: ShaderProgram | null = null;
   private bloomCompositeProgram: ShaderProgram | null = null;
   private planetProgram: ShaderProgram | null = null;
+  private terrainProgram: ShaderProgram | null = null;
+  private atmosphereProgram: ShaderProgram | null = null;
 
   // Geometry
   private quadVAO: WebGLVertexArrayObject | null = null;
@@ -451,8 +691,21 @@ export class CosmosEngine {
         'uHasAtmosphere', 'uAtmosphereColor', 'uPlanetType', 'uSeed', 'uTime'],
       ['aPosition']);
 
+    this.terrainProgram = this.createProgram(FULLSCREEN_VERT, TERRAIN_FRAG,
+      ['uResolution', 'uCameraPos', 'uZoom', 'uSeed', 'uTime',
+        'uBaseColor', 'uAccentColor', 'uWaterLevel', 'uWaterColor',
+        'uHasVegetation', 'uVegetationColor', 'uRoughness', 'uLightDir',
+        'uAtmosphereDensity', 'uAtmosphereHue'],
+      []);
+
+    this.atmosphereProgram = this.createProgram(FULLSCREEN_VERT, ATMOSPHERE_FRAG,
+      ['uResolution', 'uAltitude', 'uDensity', 'uHue', 'uStarColor',
+        'uTime', 'uPlanetRadius'],
+      []);
+
     if (!this.bgProgram || !this.particleProgram || !this.bloomBrightProgram ||
-      !this.bloomBlurProgram || !this.bloomCompositeProgram || !this.planetProgram) {
+      !this.bloomBlurProgram || !this.bloomCompositeProgram || !this.planetProgram ||
+      !this.terrainProgram || !this.atmosphereProgram) {
       console.error('Failed to compile shaders');
       return false;
     }
@@ -620,6 +873,71 @@ export class CosmosEngine {
     }
     ctx.stroke();
     ctx.restore();
+  }
+
+  drawTerrain(
+    cameraX: number, cameraY: number, zoom: number,
+    seed: number,
+    baseColor: [number, number, number],
+    accentColor: [number, number, number],
+    waterLevel: number,
+    waterColor: [number, number, number],
+    hasVegetation: boolean,
+    vegetationColor: [number, number, number],
+    roughness: number,
+    lightDir: [number, number, number],
+    atmosphereDensity: number,
+    atmosphereHue: number,
+  ): void {
+    if (!this.gl || !this.terrainProgram) return;
+    const gl = this.gl;
+    const p = this.terrainProgram;
+
+    gl.useProgram(p.program);
+    gl.uniform2f(p.uniforms.uResolution!, this.width, this.height);
+    gl.uniform2f(p.uniforms.uCameraPos!, cameraX, cameraY);
+    gl.uniform1f(p.uniforms.uZoom!, zoom);
+    gl.uniform1f(p.uniforms.uSeed!, seed);
+    gl.uniform1f(p.uniforms.uTime!, this.time);
+    gl.uniform3f(p.uniforms.uBaseColor!, baseColor[0], baseColor[1], baseColor[2]);
+    gl.uniform3f(p.uniforms.uAccentColor!, accentColor[0], accentColor[1], accentColor[2]);
+    gl.uniform1f(p.uniforms.uWaterLevel!, waterLevel);
+    gl.uniform3f(p.uniforms.uWaterColor!, waterColor[0], waterColor[1], waterColor[2]);
+    gl.uniform1f(p.uniforms.uHasVegetation!, hasVegetation ? 1.0 : 0.0);
+    gl.uniform3f(p.uniforms.uVegetationColor!, vegetationColor[0], vegetationColor[1], vegetationColor[2]);
+    gl.uniform1f(p.uniforms.uRoughness!, roughness);
+    gl.uniform3f(p.uniforms.uLightDir!, lightDir[0], lightDir[1], lightDir[2]);
+    gl.uniform1f(p.uniforms.uAtmosphereDensity!, atmosphereDensity);
+    gl.uniform1f(p.uniforms.uAtmosphereHue!, atmosphereHue);
+
+    gl.bindVertexArray(this.quadVAO);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindVertexArray(null);
+  }
+
+  drawAtmosphere(
+    altitude: number,
+    density: number,
+    hue: number,
+    starColor: [number, number, number],
+    planetRadius: number,
+  ): void {
+    if (!this.gl || !this.atmosphereProgram) return;
+    const gl = this.gl;
+    const p = this.atmosphereProgram;
+
+    gl.useProgram(p.program);
+    gl.uniform2f(p.uniforms.uResolution!, this.width, this.height);
+    gl.uniform1f(p.uniforms.uAltitude!, altitude);
+    gl.uniform1f(p.uniforms.uDensity!, density);
+    gl.uniform1f(p.uniforms.uHue!, hue);
+    gl.uniform3f(p.uniforms.uStarColor!, starColor[0], starColor[1], starColor[2]);
+    gl.uniform1f(p.uniforms.uTime!, this.time);
+    gl.uniform1f(p.uniforms.uPlanetRadius!, planetRadius);
+
+    gl.bindVertexArray(this.quadVAO);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindVertexArray(null);
   }
 
   endFrame(): void {

@@ -235,6 +235,9 @@ export const SCALES: Record<string, Scale> = {
   SECTOR: { name: "Sector", minZoom: 500, maxZoom: 5000 },
   SYSTEM: { name: "Star System", minZoom: 5000, maxZoom: 50000 },
   PLANET: { name: "Planet", minZoom: 50000, maxZoom: 500000 },
+  ATMOSPHERE: { name: "Atmosphere", minZoom: 500000, maxZoom: 5000000 },
+  SURFACE: { name: "Surface", minZoom: 5000000, maxZoom: 50000000 },
+  TERRAIN: { name: "Terrain", minZoom: 50000000, maxZoom: 500000000 },
 };
 
 export function getCurrentScale(zoom: number): Scale {
@@ -243,7 +246,10 @@ export function getCurrentScale(zoom: number): Scale {
   if (zoom < 500) return SCALES.GALAXY!;
   if (zoom < 5000) return SCALES.SECTOR!;
   if (zoom < 50000) return SCALES.SYSTEM!;
-  return SCALES.PLANET!;
+  if (zoom < 500000) return SCALES.PLANET!;
+  if (zoom < 5000000) return SCALES.ATMOSPHERE!;
+  if (zoom < 50000000) return SCALES.SURFACE!;
+  return SCALES.TERRAIN!;
 }
 
 // Generated object types

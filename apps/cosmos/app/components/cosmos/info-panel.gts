@@ -36,7 +36,7 @@ export default class InfoPanel extends Component<InfoPanelSignature> {
 
   get zoomPercent(): number {
     const minZoom = Math.log10(0.5);
-    const maxZoom = Math.log10(500000);
+    const maxZoom = Math.log10(500000000);
     const currentZoom = Math.log10(this.args.cameraZoom);
     return ((currentZoom - minZoom) / (maxZoom - minZoom)) * 100;
   }
