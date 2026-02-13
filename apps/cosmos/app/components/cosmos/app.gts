@@ -30,6 +30,8 @@ import {
 } from "cosmos/cosmos/cosmos-engine";
 import { getBiomeConfig } from "cosmos/cosmos/terrain-generator";
 import { CosmicSoundscape } from "cosmos/cosmos/cosmic-soundscape";
+import { InputManager } from "cosmos/cosmos/input-manager";
+import { CameraController } from "cosmos/cosmos/camera-controller";
 import {
   getCosmicProperties,
   getStarEvolution,
@@ -64,6 +66,10 @@ export default class CosmosApp extends Component {
   private engine = new CosmosEngine();
   private particles = new ParticleBuilder();
   private soundscape = new CosmicSoundscape();
+  private inputManager = new InputManager();
+  private cameraController = new CameraController();
+  private lastFrameTime = 0;
+  private wasSurface = false;
 
   // Canvas overlay for text labels & rings
   private overlayCanvas: HTMLCanvasElement | null = null;
@@ -129,6 +135,9 @@ export default class CosmosApp extends Component {
       return;
     }
 
+    // Attach keyboard input to the canvas
+    this.inputManager.attach(element);
+
     this.resizeCanvases();
     window.addEventListener("resize", this.resizeCanvases);
     this.startRenderLoop();
@@ -138,6 +147,7 @@ export default class CosmosApp extends Component {
       if (this.animationId !== null) {
         cancelAnimationFrame(this.animationId);
       }
+      this.inputManager.destroy();
       this.engine.destroy();
       this.soundscape.destroy();
     };
@@ -168,6 +178,24 @@ export default class CosmosApp extends Component {
   }
 
   private renderFrame(): void {
+    // Delta time for frame-rate-independent movement
+    const now = performance.now() / 1000;
+    const dt = this.lastFrameTime > 0 ? Math.min(now - this.lastFrameTime, 0.1) : 0.016;
+    this.lastFrameTime = now;
+
+    // Keyboard-driven surface movement via CameraController
+    const isSurface = this.cameraController.mode(this.camera.targetZoom) === 'surface';
+    if (isSurface && !this.wasSurface) {
+      this.cameraController.reset(); // entering surface for the first time
+    }
+    this.wasSurface = isSurface;
+
+    const movement = this.cameraController.update(this.inputManager, this.camera.targetZoom, dt);
+    if (movement.dx !== 0 || movement.dy !== 0) {
+      this.camera.targetX += movement.dx;
+      this.camera.targetY += movement.dy;
+    }
+
     // Smooth camera
     this.camera.zoom += (this.camera.targetZoom - this.camera.zoom) * 0.1;
     this.camera.x += (this.camera.targetX - this.camera.x) * 0.1;
@@ -647,6 +675,7 @@ export default class CosmosApp extends Component {
 
     if (zoom >= 2000000) {
       // Surface/terrain — draw procedural landscape
+      const surfCam = this.cameraController.getSurfaceCamera();
       this.engine.drawTerrain(
         this.camera.x, this.camera.y, zoom,
         planet.seed,
@@ -660,6 +689,8 @@ export default class CosmosApp extends Component {
         lightDir,
         biome.atmosphereDensity,
         biome.atmosphereHue,
+        surfCam.lookAngle,
+        surfCam.lookPitch,
       );
     }
 
@@ -691,23 +722,52 @@ export default class CosmosApp extends Component {
       ctx.textAlign = "right";
       ctx.fillText(`ALT: ${altKm}`, cssW - 20, cssH - 60);
 
-      // Compass rose
+      // Compass rose — rotated to match current look direction
       if (zoom >= 2000000) {
+        const surfCam2 = this.cameraController.getSurfaceCamera();
         const cx = cssW - 40;
         const cy = cssH - 100;
+        const angle = -surfCam2.lookAngle;
+
+        // Outer ring
         ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(cx, cy, 15, 0, Math.PI * 2);
         ctx.stroke();
 
+        // Heading needle
+        ctx.strokeStyle = "rgba(255, 120, 120, 0.7)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.sin(angle) * 13, cy - Math.cos(angle) * 13);
+        ctx.stroke();
+
+        // Cardinal labels rotated with heading
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         ctx.font = "8px SF Pro Display, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("N", cx, cy - 18);
-        ctx.fillText("S", cx, cy + 24);
-        ctx.fillText("E", cx + 22, cy + 4);
-        ctx.fillText("W", cx - 22, cy + 4);
+        const labels = [
+          { t: "N", a: 0 }, { t: "E", a: Math.PI / 2 },
+          { t: "S", a: Math.PI }, { t: "W", a: -Math.PI / 2 },
+        ];
+        for (const l of labels) {
+          const la = l.a + angle;
+          ctx.fillText(l.t, cx + Math.sin(la) * 22, cy - Math.cos(la) * 22 + 3);
+        }
+      }
+
+      // Surface keyboard controls hint (shown briefly or when moving)
+      if (zoom >= 2000000) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.font = "10px SF Mono, monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("WASD — walk · Q/E — turn · Drag — look", cssW / 2, cssH - 16);
+        if (this.inputManager.sprint) {
+          ctx.fillStyle = "rgba(255, 200, 100, 0.5)";
+          ctx.fillText("⚡ SPRINT", cssW / 2, cssH - 30);
+        }
       }
     }
   }
@@ -736,6 +796,9 @@ export default class CosmosApp extends Component {
   };
 
   handlePointerDown = (event: PointerEvent): void => {
+    // Ensure canvas has keyboard focus for WASD controls
+    (event.currentTarget as HTMLElement)?.focus();
+
     this.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
     if (this.activePointers.size === 2) {
@@ -770,24 +833,19 @@ export default class CosmosApp extends Component {
       const rawDx = event.clientX - this.lastMouseX;
       const rawDy = event.clientY - this.lastMouseY;
 
-      // At surface/terrain zoom levels, pan controls the camera view direction
-      // rather than world position — use a fixed sensitivity
-      let dx: number;
-      let dy: number;
       if (this.camera.zoom >= 500000) {
-        // Surface scale: fixed pan speed independent of zoom
-        const surfaceSensitivity = 0.15;
-        dx = rawDx * surfaceSensitivity;
-        dy = rawDy * surfaceSensitivity;
+        // Surface scale: mouse drag rotates the view (FPS-style)
+        this.cameraController.applyMouseLook(rawDx, rawDy);
       } else {
-        dx = rawDx / this.camera.zoom;
-        dy = rawDy / this.camera.zoom;
+        // Space scale: drag pans the camera in world space
+        const dx = rawDx / this.camera.zoom;
+        const dy = rawDy / this.camera.zoom;
+        this.camera.targetX -= dx;
+        this.camera.targetY -= dy;
+        this.camera.x = this.camera.targetX;
+        this.camera.y = this.camera.targetY;
       }
 
-      this.camera.targetX -= dx;
-      this.camera.targetY -= dy;
-      this.camera.x = this.camera.targetX;
-      this.camera.y = this.camera.targetY;
       this.lastMouseX = event.clientX;
       this.lastMouseY = event.clientY;
     }

@@ -455,6 +455,8 @@ uniform float uRoughness;
 uniform vec3 uLightDir;
 uniform float uAtmosphereDensity;
 uniform float uAtmosphereHue;
+uniform float uLookAngle;
+uniform float uLookPitch;
 
 // ─── Noise ──────────────────────────────────────────────────────────────────
 
@@ -586,9 +588,9 @@ void main() {
 
   vec3 camPos = vec3(camWorld.x, camY, camWorld.y);
 
-  // Look direction: slight downward tilt for landscape view
-  float lookAngle = uTime * 0.01; // Slow auto-pan
-  vec3 forward = normalize(vec3(cos(lookAngle), -0.08, sin(lookAngle)));
+  // Look direction: controlled by keyboard / mouse
+  float lookAngle = uLookAngle;
+  vec3 forward = normalize(vec3(cos(lookAngle), uLookPitch, sin(lookAngle)));
   vec3 right = normalize(cross(forward, vec3(0, 1, 0)));
   vec3 up = cross(right, forward);
 
@@ -1037,7 +1039,7 @@ export class CosmosEngine {
       ['uResolution', 'uCameraPos', 'uZoom', 'uSeed', 'uTime',
         'uBaseColor', 'uAccentColor', 'uWaterLevel', 'uWaterColor',
         'uHasVegetation', 'uVegetationColor', 'uRoughness', 'uLightDir',
-        'uAtmosphereDensity', 'uAtmosphereHue'],
+        'uAtmosphereDensity', 'uAtmosphereHue', 'uLookAngle', 'uLookPitch'],
       []);
 
     this.atmosphereProgram = this.createProgram(FULLSCREEN_VERT, ATMOSPHERE_FRAG,
@@ -1233,6 +1235,8 @@ export class CosmosEngine {
     lightDir: [number, number, number],
     atmosphereDensity: number,
     atmosphereHue: number,
+    lookAngle: number,
+    lookPitch: number,
   ): void {
     if (!this.gl || !this.terrainProgram) return;
     const gl = this.gl;
@@ -1254,6 +1258,8 @@ export class CosmosEngine {
     gl.uniform3f(p.uniforms.uLightDir!, lightDir[0], lightDir[1], lightDir[2]);
     gl.uniform1f(p.uniforms.uAtmosphereDensity!, atmosphereDensity);
     gl.uniform1f(p.uniforms.uAtmosphereHue!, atmosphereHue);
+    gl.uniform1f(p.uniforms.uLookAngle!, lookAngle);
+    gl.uniform1f(p.uniforms.uLookPitch!, lookPitch);
 
     gl.bindVertexArray(this.quadVAO);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
