@@ -270,11 +270,15 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
   finishTextEdit = () => {
     if (this.editingTextId) {
       const input = document.querySelector('.canvas-text-input') as HTMLInputElement;
+      const id = this.editingTextId;
       if (input) {
-        this.designStore.updateElement(this.editingTextId, { text: input.value });
+        this.designStore.updateElement(id, { text: input.value });
       }
       this.designStore.pushHistory();
-      this.editingTextId = null;
+      // Schedule after render to avoid Glimmer auto-tracking assertion
+      Promise.resolve().then(() => {
+        this.editingTextId = null;
+      });
     }
   };
 
