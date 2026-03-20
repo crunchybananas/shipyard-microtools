@@ -6,7 +6,9 @@ import { inject as service } from "@ember/service";
 import { modifier } from "ember-modifier";
 import type DesignStoreService from "atelier/services/design-store";
 import type AiServiceService from "atelier/services/ai-service";
+import type CommandPaletteService from "atelier/services/command-palette";
 import type { DesignElement, ToolType, Point } from "atelier/services/design-store";
+import type { ConversationMessage, AgentStep } from "atelier/services/ai-service";
 
 // SVG icon helpers as inline template-only components
 const IconCursor = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l7 17 2.5-6.5L20 12z"/></svg></template>;
@@ -55,7 +57,10 @@ const PRESET_COLORS = [
 export default class AtelierApp extends Component {
   @service declare designStore: DesignStoreService;
   @service declare aiService: AiServiceService;
+  @service declare commandPalette: CommandPaletteService;
 
+  @tracked showLayersView: boolean = true; // true = layers, false = AI chat
+  @tracked showModelDropdown: boolean = false;
   @tracked drawStart: Point | null = null;
   @tracked drawCurrent: Point | null = null;
   @tracked dragOffset: { dx: number; dy: number }[] = [];
@@ -70,6 +75,11 @@ export default class AtelierApp extends Component {
   @tracked editingTextId: string | null = null;
   @tracked toastMessage: string | null = null;
   @tracked aiPrompt: string = "";
+
+  // Auto-focus modifier for command palette
+  autoFocus = modifier((element: Element) => {
+    (element as HTMLInputElement).focus();
+  });
 
   // Canvas element ref
   private canvasEl: SVGSVGElement | null = null;
@@ -384,9 +394,41 @@ export default class AtelierApp extends Component {
 
   onKeyDown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
-
     const cmd = e.metaKey || e.ctrlKey;
+
+    // Cmd+K always works for command palette
+    if (cmd && e.key === "k") {
+      e.preventDefault();
+      this.commandPalette.toggle();
+      return;
+    }
+
+    // Command palette keyboard navigation
+    if (this.commandPalette.isOpen) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        this.commandPalette.close();
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        this.commandPalette.moveUp();
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        this.commandPalette.moveDown();
+        return;
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        this.commandPalette.executeSelected();
+        return;
+      }
+      return; // Let typing happen in the palette input
+    }
+
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
 
     // Tool shortcuts
     if (!cmd && !e.shiftKey) {
@@ -499,6 +541,10 @@ export default class AtelierApp extends Component {
 
     // Escape
     if (e.key === "Escape") {
+      if (this.commandPalette.isOpen) {
+        this.commandPalette.close();
+        return;
+      }
       this.designStore.deselectAll();
       this.designStore.activeTool = "select";
       this.designStore.showAiModal = false;
@@ -732,6 +778,90 @@ export default class AtelierApp extends Component {
     this.openAiModal();
   };
 
+  // ---- Layers/Chat toggle ----
+
+  toggleLayersView = () => {
+    this.showLayersView = true;
+    this.aiService.showConversation = false;
+  };
+
+  toggleChatView = () => {
+    this.showLayersView = false;
+    this.aiService.showConversation = true;
+  };
+
+  // ---- Model selector ----
+
+  toggleModelDropdown = () => {
+    this.showModelDropdown = !this.showModelDropdown;
+  };
+
+  selectModel = (model: string) => {
+    this.aiService.selectedModel = model;
+    this.showModelDropdown = false;
+  };
+
+  get modelLabel(): string {
+    return this.aiService.selectedModel === "atelier-v1" ? "Atelier v1" : "Atelier Pro";
+  }
+
+  get isProModel(): boolean {
+    return this.aiService.selectedModel === "atelier-pro";
+  }
+
+  // ---- Agent log ----
+
+  toggleAgentLog = () => {
+    this.aiService.showAgentLog = !this.aiService.showAgentLog;
+  };
+
+  // ---- Command Palette ----
+
+  onPaletteInput = (e: Event) => {
+    this.commandPalette.query = (e.target as HTMLInputElement).value;
+    this.commandPalette.selectedIndex = 0;
+  };
+
+  onPaletteKeydown = (e: KeyboardEvent) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      this.commandPalette.moveUp();
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      this.commandPalette.moveDown();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      this.commandPalette.executeSelected();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      this.commandPalette.close();
+    }
+  };
+
+  closePalette = () => {
+    this.commandPalette.close();
+  };
+
+  executeCommand = (id: string) => {
+    this.commandPalette.execute(id);
+  };
+
+  isPaletteItemSelected = (index: number): boolean => {
+    return this.commandPalette.selectedIndex === index;
+  };
+
+  formatTimestamp = (date: Date): string => {
+    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  };
+
+  isAgentStepComplete = (step: AgentStep): boolean => {
+    return step.status === "complete";
+  };
+
+  isUserMessage = (msg: ConversationMessage): boolean => {
+    return msg.role === "user";
+  };
+
   // ---- Inline prompt bar ----
 
   @tracked designFormat: "web" | "app" = "web";
@@ -917,7 +1047,7 @@ export default class AtelierApp extends Component {
 
       {{! ---- Top Bar ---- }}
       <div class="topbar">
-        <a href="../../" class="topbar-back" title="All Tools">
+        <a href="#/" class="topbar-back" title="All Projects">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         </a>
         <div class="topbar-logo">
@@ -986,73 +1116,115 @@ export default class AtelierApp extends Component {
       {{! ---- Layers Panel ---- }}
       <div class="layers-panel">
         <div class="panel-header">
-          <span class="panel-title">Layers</span>
+          <div class="panel-tabs">
+            <button
+              class="panel-tab {{if this.showLayersView 'active'}}"
+              type="button"
+              {{on "click" this.toggleLayersView}}
+            >Layers</button>
+            <button
+              class="panel-tab {{unless this.showLayersView 'active'}}"
+              type="button"
+              {{on "click" this.toggleChatView}}
+            >AI Chat</button>
+          </div>
           <div class="panel-actions">
-            <button class="panel-action-btn" type="button" title="Select All" {{on "click" this.designStore.selectAll}}>
-              <IconLayers />
-            </button>
+            {{#if this.showLayersView}}
+              <button class="panel-action-btn" type="button" title="Select All" {{on "click" this.designStore.selectAll}}>
+                <IconLayers />
+              </button>
+            {{/if}}
           </div>
         </div>
-        <div class="layers-list">
-          {{#if this.designStore.elements.length}}
-            {{#each this.reversedElements as |el|}}
-              <div
-                class="layer-item
-                  {{if (this.isSelected el.id) 'selected'}}
-                  {{if (this.isHovered el.id) 'hovered'}}"
-                role="button"
-                {{on "click" (fn this.onLayerClick el.id)}}
-                {{on "dblclick" (fn this.onLayerDoubleClick el.id)}}
-              >
-                <span class="layer-icon">
-                  {{#if (this.isType el "rectangle")}}
-                    <IconRect />
-                  {{else if (this.isType el "ellipse")}}
-                    <IconEllipse />
-                  {{else if (this.isType el "text")}}
-                    <IconText />
-                  {{else if (this.isType el "line")}}
-                    <IconLine />
-                  {{else if (this.isType el "frame")}}
-                    <IconFrame />
-                  {{else}}
-                    <IconRect />
-                  {{/if}}
-                </span>
 
-                {{#if (this.isEditing el.id)}}
-                  <input
-                    class="layer-name-input"
-                    type="text"
-                    value={{el.name}}
-                    {{on "change" (fn this.onLayerNameChange el.id)}}
-                    {{on "keydown" (fn this.onLayerNameKeydown el.id)}}
-                    {{on "blur" (fn this.onLayerNameChange el.id)}}
-                  />
-                {{else}}
-                  <span class="layer-name">{{el.name}}</span>
-                {{/if}}
-
-                <button
-                  class="layer-visibility {{unless el.visible 'hidden'}}"
-                  type="button"
-                  {{on "click" (fn this.toggleVisibility el.id)}}
+        {{#if this.showLayersView}}
+          <div class="layers-list">
+            {{#if this.designStore.elements.length}}
+              {{#each this.reversedElements as |el|}}
+                <div
+                  class="layer-item
+                    {{if (this.isSelected el.id) 'selected'}}
+                    {{if (this.isHovered el.id) 'hovered'}}"
+                  role="button"
+                  {{on "click" (fn this.onLayerClick el.id)}}
+                  {{on "dblclick" (fn this.onLayerDoubleClick el.id)}}
                 >
-                  {{#if el.visible}}
-                    <IconEye />
+                  <span class="layer-icon">
+                    {{#if (this.isType el "rectangle")}}
+                      <IconRect />
+                    {{else if (this.isType el "ellipse")}}
+                      <IconEllipse />
+                    {{else if (this.isType el "text")}}
+                      <IconText />
+                    {{else if (this.isType el "line")}}
+                      <IconLine />
+                    {{else if (this.isType el "frame")}}
+                      <IconFrame />
+                    {{else}}
+                      <IconRect />
+                    {{/if}}
+                  </span>
+
+                  {{#if (this.isEditing el.id)}}
+                    <input
+                      class="layer-name-input"
+                      type="text"
+                      value={{el.name}}
+                      {{on "change" (fn this.onLayerNameChange el.id)}}
+                      {{on "keydown" (fn this.onLayerNameKeydown el.id)}}
+                      {{on "blur" (fn this.onLayerNameChange el.id)}}
+                    />
                   {{else}}
-                    <IconEyeOff />
+                    <span class="layer-name">{{el.name}}</span>
                   {{/if}}
-                </button>
+
+                  <button
+                    class="layer-visibility {{unless el.visible 'hidden'}}"
+                    type="button"
+                    {{on "click" (fn this.toggleVisibility el.id)}}
+                  >
+                    {{#if el.visible}}
+                      <IconEye />
+                    {{else}}
+                      <IconEyeOff />
+                    {{/if}}
+                  </button>
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="layers-empty">
+                <IconLayers />
+                <span class="layers-empty-text">No layers yet.<br/>Draw something on the canvas<br/>or use AI Generate.</span>
               </div>
-            {{/each}}
-          {{else}}
-            <div class="layers-empty">
-              <IconLayers />
-              <span class="layers-empty-text">No layers yet.<br/>Draw something on the canvas<br/>or use AI Generate.</span>
-            </div>
-          {{/if}}
-        </div>
+            {{/if}}
+          </div>
+        {{else}}
+          {{! AI Conversation View }}
+          <div class="chat-list">
+            {{#if this.aiService.conversationHistory.length}}
+              {{#each this.aiService.conversationHistory as |msg|}}
+                <div class="chat-message {{if (this.isUserMessage msg) 'chat-user' 'chat-assistant'}}">
+                  <div class="chat-avatar">
+                    {{#if (this.isUserMessage msg)}}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    {{else}}
+                      <IconSparkles />
+                    {{/if}}
+                  </div>
+                  <div class="chat-bubble">
+                    <div class="chat-content">{{msg.content}}</div>
+                    <div class="chat-time">{{this.formatTimestamp msg.timestamp}}</div>
+                  </div>
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="chat-empty">
+                <IconSparkles />
+                <span class="chat-empty-text">No conversations yet.<br/>Generate a design with AI<br/>to start a conversation.</span>
+              </div>
+            {{/if}}
+          </div>
+        {{/if}}
       </div>
 
       {{! ---- Canvas ---- }}
@@ -1368,6 +1540,24 @@ export default class AtelierApp extends Component {
                 <button class="ai-prompt-chip" type="button" {{on "click" (fn this.quickGenerate "An analytics dashboard with charts, stats cards, and data table")}}>Dashboard</button>
               </div>
               <div class="ai-prompt-bar-inner">
+                <div class="ai-prompt-model-selector">
+                  <button class="model-selector-btn" type="button" {{on "click" this.toggleModelDropdown}}>
+                    <span class="model-selector-label">{{this.modelLabel}}</span>
+                    <span class="model-selector-sparkle">&#10022;</span>
+                    <IconChevronDown />
+                  </button>
+                  {{#if this.showModelDropdown}}
+                    <div class="model-dropdown">
+                      <button class="model-dropdown-item {{if (this.isModelSelected 'atelier-v1') 'active'}}" type="button" {{on "click" (fn this.selectModel "atelier-v1")}}>
+                        <span>Atelier v1</span>
+                      </button>
+                      <button class="model-dropdown-item {{if (this.isModelSelected 'atelier-pro') 'active'}}" type="button" {{on "click" (fn this.selectModel "atelier-pro")}}>
+                        <span>Atelier Pro</span>
+                        <span class="model-pro-badge">PRO</span>
+                      </button>
+                    </div>
+                  {{/if}}
+                </div>
                 <div class="ai-prompt-format-toggle">
                   <button class="format-toggle-btn {{if this.isWebFormat 'active'}}" type="button" {{on "click" (fn this.setFormat "web")}}>
                     <IconFrame />
@@ -1820,6 +2010,72 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
         </div>
       {{/if}}
 
+      {{! ---- Agent Log ---- }}
+      {{#if this.aiService.agentSteps.length}}
+        <div class="agent-log {{if this.aiService.showAgentLog 'expanded'}}">
+          <button class="agent-log-toggle" type="button" {{on "click" this.toggleAgentLog}}>
+            <span class="agent-log-label">Agent log</span>
+            <svg class="agent-log-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          {{#if this.aiService.showAgentLog}}
+            <div class="agent-log-steps">
+              {{#each this.aiService.agentSteps as |step|}}
+                <div class="agent-step {{if (this.isAgentStepComplete step) 'complete'}}">
+                  {{#if (this.isAgentStepComplete step)}}
+                    <svg class="agent-step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{else}}
+                    <div class="agent-step-spinner"></div>
+                  {{/if}}
+                  <span class="agent-step-text">{{step.message}}</span>
+                </div>
+              {{/each}}
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      {{! ---- Command Palette ---- }}
+      {{#if this.commandPalette.isOpen}}
+        <div class="cmd-overlay" role="button" {{on "click" this.closePalette}}></div>
+        <div class="cmd-palette">
+          <div class="cmd-search">
+            <svg class="cmd-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input
+              class="cmd-input"
+              type="text"
+              placeholder="Type a command..."
+              value={{this.commandPalette.query}}
+              {{this.autoFocus}}
+              {{on "input" this.onPaletteInput}}
+              {{on "keydown" this.onPaletteKeydown}}
+            />
+            <span class="cmd-shortcut-badge">esc</span>
+          </div>
+          <div class="cmd-results">
+            {{#each this.commandPalette.groupedCommands as |group|}}
+              <div class="cmd-group">
+                <div class="cmd-group-label">{{group.category}}</div>
+                {{#each group.commands as |cmd|}}
+                  <button
+                    class="cmd-item {{if (this.isPaletteItemIndex cmd) 'selected'}}"
+                    type="button"
+                    {{on "click" (fn this.executeCommand cmd.id)}}
+                  >
+                    <span class="cmd-item-label">{{cmd.label}}</span>
+                    {{#if cmd.shortcut}}
+                      <span class="cmd-item-shortcut">{{cmd.shortcut}}</span>
+                    {{/if}}
+                  </button>
+                {{/each}}
+              </div>
+            {{/each}}
+            {{#unless this.commandPalette.filteredCommands.length}}
+              <div class="cmd-empty">No commands found</div>
+            {{/unless}}
+          </div>
+        </div>
+      {{/if}}
+
       {{! ---- Toast ---- }}
       {{#if this.toastMessage}}
         <div class="toast">{{this.toastMessage}}</div>
@@ -2029,5 +2285,15 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
 
   stopPropagation = (e: MouseEvent) => {
     e.stopPropagation();
+  };
+
+  isModelSelected = (model: string): boolean => {
+    return this.aiService.selectedModel === model;
+  };
+
+  isPaletteItemIndex = (cmd: { id: string }): boolean => {
+    const allFiltered = this.commandPalette.filteredCommands;
+    const idx = allFiltered.findIndex((c) => c.id === cmd.id);
+    return idx === this.commandPalette.selectedIndex;
   };
 }

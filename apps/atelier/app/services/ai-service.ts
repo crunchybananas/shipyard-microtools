@@ -9,6 +9,17 @@ interface AiTemplate {
   elements: Partial<DesignElement>[];
 }
 
+export interface ConversationMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
+export interface AgentStep {
+  message: string;
+  status: "pending" | "complete";
+}
+
 const TEMPLATES: Record<string, AiTemplate> = {
   "landing page": {
     name: "Landing Page",
@@ -165,7 +176,7 @@ const TEMPLATES: Record<string, AiTemplate> = {
       // Chart area
       { type: "rectangle", x: 280, y: 220, width: 840, height: 380, fill: "#1a1a36", cornerRadius: 12, stroke: "#2a2a4a", strokeWidth: 1, name: "Chart Card" },
       { type: "text", x: 304, y: 240, width: 200, height: 24, text: "Revenue Overview", fontSize: 18, fontWeight: "600", fill: "#ffffff", name: "Chart Title" },
-      // Chart bars (simplified bar chart)
+      // Chart bars
       { type: "rectangle", x: 340, y: 460, width: 52, height: 100, fill: "#818cf8", cornerRadius: 4, name: "Bar Jan" },
       { type: "rectangle", x: 408, y: 420, width: 52, height: 140, fill: "#818cf8", cornerRadius: 4, name: "Bar Feb" },
       { type: "rectangle", x: 476, y: 380, width: 52, height: 180, fill: "#818cf8", cornerRadius: 4, name: "Bar Mar" },
@@ -223,14 +234,38 @@ export default class AiServiceService extends Service {
   @service declare designStore: DesignStoreService;
 
   @tracked lastPrompt: string = "";
+  @tracked conversationHistory: ConversationMessage[] = [];
+  @tracked showConversation: boolean = false;
+  @tracked agentSteps: AgentStep[] = [];
+  @tracked showAgentLog: boolean = false;
+  @tracked selectedModel: string = "atelier-v1";
 
   get availableTemplates(): string[] {
     return Object.keys(TEMPLATES);
   }
 
+  private async addAgentStep(message: string): Promise<void> {
+    this.agentSteps = [...this.agentSteps, { message, status: "pending" }];
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    this.agentSteps = this.agentSteps.map((step, i) =>
+      i === this.agentSteps.length - 1 ? { ...step, status: "complete" as const } : step,
+    );
+  }
+
   async generateFromPrompt(prompt: string): Promise<void> {
     this.lastPrompt = prompt;
     this.designStore.aiGenerating = true;
+    this.agentSteps = [];
+    this.showAgentLog = true;
+
+    // Push user message to conversation
+    this.conversationHistory = [
+      ...this.conversationHistory,
+      { role: "user", content: prompt, timestamp: new Date() },
+    ];
+
+    // Agent steps
+    await this.addAgentStep("Analyzing prompt...");
 
     // Find best matching template
     const lowerPrompt = prompt.toLowerCase();
@@ -242,14 +277,14 @@ export default class AiServiceService extends Service {
       bestMatch = "dashboard";
     }
 
-    // Simulate AI processing time with progress
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await this.addAgentStep(`Selecting template: ${TEMPLATES[bestMatch]!.name}...`);
+    await this.addAgentStep("Generating layout...");
 
     const template = TEMPLATES[bestMatch]!;
     this.designStore.pushHistory();
     this.designStore.clearCanvas();
+
+    await this.addAgentStep("Placing elements...");
 
     // Add elements one batch at a time for visual effect
     const batchSize = 5;
@@ -263,6 +298,32 @@ export default class AiServiceService extends Service {
       }
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
+
+    await this.addAgentStep("Applying styles...");
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Mark final step complete
+    await this.addAgentStep("Generation complete");
+
+    const elementCount = template.elements.length;
+
+    // Build a description of what was generated
+    const typeBreakdown: Record<string, number> = {};
+    for (const el of template.elements) {
+      const t = el.type || "unknown";
+      typeBreakdown[t] = (typeBreakdown[t] || 0) + 1;
+    }
+    const breakdown = Object.entries(typeBreakdown)
+      .map(([type, count]) => `${count} ${type}${count > 1 ? "s" : ""}`)
+      .join(", ");
+
+    const assistantContent = `Generated a ${template.name.toLowerCase()} with ${elementCount} elements including ${breakdown}.`;
+
+    // Push assistant message to conversation
+    this.conversationHistory = [
+      ...this.conversationHistory,
+      { role: "assistant", content: assistantContent, timestamp: new Date() },
+    ];
 
     this.designStore.aiGenerating = false;
     this.designStore.showAiModal = false;
