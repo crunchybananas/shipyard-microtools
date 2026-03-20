@@ -137,6 +137,17 @@ export default class AtelierApp extends Component {
     const pt = this.screenToCanvas(e.clientX, e.clientY);
     const tool = this.designStore.activeTool;
 
+    // If editing text inline, close edit unless clicking on the same text element
+    if (this.editingTextId) {
+      const hit = this.hitTest(pt);
+      if (!hit || hit.id !== this.editingTextId) {
+        this.finishTextEdit();
+      } else {
+        // Clicking on the element being edited - do nothing, let the input handle it
+        return;
+      }
+    }
+
     if (tool === "select") {
       // Check if clicked on an element
       const hitElement = this.hitTest(pt);
@@ -267,6 +278,83 @@ export default class AtelierApp extends Component {
       this.designStore.selectElement(hit.id);
     }
     this.designStore.contextMenuPos = { x: e.clientX, y: e.clientY };
+  };
+
+  // ---- Inline text editing on canvas ----
+
+  onCanvasDoubleClick = (e: MouseEvent) => {
+    // Cancel any in-progress drag from the first click of the double-click
+    this.designStore.isDragging = false;
+    this.designStore.dragStartPoint = null;
+
+    const pt = this.screenToCanvas(e.clientX, e.clientY);
+    const hit = this.hitTest(pt);
+    if (hit && hit.type === "text" && !hit.locked) {
+      this.editingTextId = hit.id;
+      this.designStore.selectElement(hit.id);
+      // Focus the input after render
+      setTimeout(() => {
+        const input = document.querySelector('.canvas-text-input') as HTMLInputElement;
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 50);
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  isEditingText = (id: string): boolean => {
+    return this.editingTextId === id;
+  };
+
+  onCanvasTextBlur = (id: string, e: Event) => {
+    const value = (e.target as HTMLInputElement).value;
+    if (this.editingTextId === id) {
+      this.designStore.pushHistory();
+      this.designStore.updateElement(id, { text: value });
+      this.editingTextId = null;
+    }
+  };
+
+  onCanvasTextKeydown = (id: string, e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const value = (e.target as HTMLInputElement).value;
+      this.designStore.pushHistory();
+      this.designStore.updateElement(id, { text: value });
+      this.editingTextId = null;
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      this.editingTextId = null;
+    }
+    // Stop propagation so keyboard shortcuts don't fire while editing text
+    e.stopPropagation();
+  };
+
+  finishTextEdit = () => {
+    if (this.editingTextId) {
+      // Commit current input value
+      const input = document.querySelector('.canvas-text-input') as HTMLInputElement;
+      if (input) {
+        this.designStore.updateElement(this.editingTextId, { text: input.value });
+      }
+      this.designStore.pushHistory();
+      this.editingTextId = null;
+    }
+  };
+
+  textEditWidth = (el: DesignElement): number => {
+    return Math.max(el.width, 100);
+  };
+
+  textEditHeight = (el: DesignElement): number => {
+    return Math.max(el.height, (el.fontSize || 24) + 12);
+  };
+
+  textEditStyle = (el: DesignElement): string => {
+    return `width:100%;height:100%;border:none;outline:2px solid #818cf8;background:rgba(0,0,0,0.3);color:${el.fill};font-size:${el.fontSize || 24}px;font-weight:${el.fontWeight || '400'};font-family:${el.fontFamily || 'Inter, system-ui, sans-serif'};padding:2px 4px;border-radius:4px;box-sizing:border-box;`;
   };
 
   // ---- Hit testing ----
@@ -428,7 +516,7 @@ export default class AtelierApp extends Component {
       return; // Let typing happen in the palette input
     }
 
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || this.editingTextId) return;
 
     // Tool shortcuts
     if (!cmd && !e.shiftKey) {
@@ -1271,6 +1359,7 @@ export default class AtelierApp extends Component {
           {{on "mousedown" this.onCanvasMouseDown}}
           {{on "mousemove" this.onCanvasMouseMove}}
           {{on "mouseup" this.onCanvasMouseUp}}
+          {{on "dblclick" this.onCanvasDoubleClick}}
           {{on "contextmenu" this.onCanvasContextMenu}}
         >
           <g transform={{this.canvasTransform}}>
@@ -1341,17 +1430,36 @@ export default class AtelierApp extends Component {
                     transform={{this.elementTransform el}}
                   />
                 {{else if (this.isType el "text")}}
-                  <text
-                    class="design-element {{if el.locked 'locked'}}"
-                    x={{el.x}}
-                    y={{this.textBaselineY el}}
-                    font-size={{el.fontSize}}
-                    font-weight={{el.fontWeight}}
-                    font-family={{el.fontFamily}}
-                    fill={{el.fill}}
-                    opacity={{el.opacity}}
-                    transform={{this.elementTransform el}}
-                  >{{el.text}}</text>
+                  {{#if (this.isEditingText el.id)}}
+                    <foreignObject
+                      x={{el.x}}
+                      y={{el.y}}
+                      width={{this.textEditWidth el}}
+                      height={{this.textEditHeight el}}
+                    >
+                      <input
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        class="canvas-text-input"
+                        type="text"
+                        value={{el.text}}
+                        style={{this.textEditStyle el}}
+                        {{on "blur" (fn this.onCanvasTextBlur el.id)}}
+                        {{on "keydown" (fn this.onCanvasTextKeydown el.id)}}
+                      />
+                    </foreignObject>
+                  {{else}}
+                    <text
+                      class="design-element {{if el.locked 'locked'}}"
+                      x={{el.x}}
+                      y={{this.textBaselineY el}}
+                      font-size={{el.fontSize}}
+                      font-weight={{el.fontWeight}}
+                      font-family={{el.fontFamily}}
+                      fill={{el.fill}}
+                      opacity={{el.opacity}}
+                      transform={{this.elementTransform el}}
+                    >{{el.text}}</text>
+                  {{/if}}
                   {{! Invisible hit area for text }}
                   <rect
                     x={{el.x}}
