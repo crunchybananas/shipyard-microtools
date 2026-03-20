@@ -191,7 +191,7 @@ export default class DesignStoreService extends Service {
       width: type === "line" ? 200 : 200,
       height: type === "line" ? 0 : 150,
       rotation: 0,
-      fill: type === "frame" ? "#ffffff" : type === "text" ? "transparent" : "#818cf8",
+      fill: type === "frame" ? "#ffffff" : type === "text" ? "#e4e4e7" : "#818cf8",
       stroke: type === "frame" ? "#e4e4e7" : "transparent",
       strokeWidth: type === "frame" ? 1 : 0,
       opacity: 1,

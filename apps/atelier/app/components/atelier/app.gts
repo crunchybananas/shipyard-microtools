@@ -1525,7 +1525,7 @@ export default class AtelierApp extends Component {
                   class="props-input"
                   type="text"
                   value={{this.selectedElement.text}}
-                  {{on "change" (fn this.updateProp "text")}}
+                  {{on "input" (fn this.updateProp "text")}}
                 />
               </div>
               <div class="props-row">

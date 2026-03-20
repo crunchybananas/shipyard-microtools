@@ -498,7 +498,7 @@ html, body {
 }
 
 .props-section {
-  padding: 12px;
+  padding: 10px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -514,7 +514,7 @@ html, body {
 .props-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 6px;
 }
 
@@ -523,17 +523,18 @@ html, body {
 }
 
 .props-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-dim);
-  min-width: 28px;
+  min-width: 20px;
   text-align: right;
   flex-shrink: 0;
 }
 
 .props-input {
   flex: 1;
+  min-width: 0;
   height: 28px;
-  padding: 0 8px;
+  padding: 0 6px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg-panel);
@@ -601,8 +602,9 @@ html, body {
 
 .props-select {
   flex: 1;
+  min-width: 0;
   height: 28px;
-  padding: 0 8px;
+  padding: 0 6px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg-panel);
@@ -667,6 +669,10 @@ html, body {
 
 .props-btn {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   height: 28px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -676,6 +682,13 @@ html, body {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
+  overflow: hidden;
+}
+
+.props-btn svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .props-btn:hover {
@@ -1332,8 +1345,9 @@ html, body {
 /* ---- Color Picker ---- */
 
 .color-picker-popup {
-  position: absolute;
+  position: fixed;
   right: 292px;
+  top: 180px;
   background: var(--bg-dark);
   border: 1px solid var(--border);
   border-radius: 12px;
