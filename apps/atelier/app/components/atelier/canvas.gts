@@ -32,8 +32,10 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
   @tracked drawStart: Point | null = null;
   @tracked drawCurrent: Point | null = null;
   @tracked dragOffset: { dx: number; dy: number }[] = [];
+  @tracked dragLineOffsets: { dx1: number; dy1: number; dx2: number; dy2: number }[] = [];
   @tracked resizeHandle: string | null = null;
   @tracked resizeStart: { x: number; y: number; el: DesignElement } | null = null;
+  @tracked lineEndpointDrag: { endpoint: "start" | "end"; el: DesignElement } | null = null;
   @tracked isPanning: boolean = false;
   @tracked panStart: Point | null = null;
   @tracked panStartOffset: Point | null = null;
@@ -106,6 +108,12 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
           dx: el.x - pt.x,
           dy: el.y - pt.y,
         }));
+        this.dragLineOffsets = this.designStore.selectedElements.map((el) => ({
+          dx1: (el.x1 ?? el.x) - pt.x,
+          dy1: (el.y1 ?? el.y) - pt.y,
+          dx2: (el.x2 ?? el.x + el.width) - pt.x,
+          dy2: (el.y2 ?? el.y + el.height) - pt.y,
+        }));
       } else {
         if (!e.shiftKey) this.designStore.deselectAll();
         this.marqueeStart = pt;
@@ -133,6 +141,11 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
       return;
     }
 
+    if (this.lineEndpointDrag) {
+      this.handleLineEndpointDrag(pt);
+      return;
+    }
+
     if (this.resizeHandle && this.resizeStart) {
       this.handleResize(pt);
       return;
@@ -143,10 +156,19 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
       for (let i = 0; i < selected.length; i++) {
         const el = selected[i]!;
         const offset = this.dragOffset[i]!;
-        this.designStore.updateElement(el.id, {
+        const updates: Partial<DesignElement> = {
           x: this.designStore.snapValue(pt.x + offset.dx),
           y: this.designStore.snapValue(pt.y + offset.dy),
-        });
+        };
+        // Also move line endpoints
+        if (el.type === "line") {
+          const lineOffset = this.dragLineOffsets[i]!;
+          updates.x1 = this.designStore.snapValue(pt.x + lineOffset.dx1);
+          updates.y1 = this.designStore.snapValue(pt.y + lineOffset.dy1);
+          updates.x2 = this.designStore.snapValue(pt.x + lineOffset.dx2);
+          updates.y2 = this.designStore.snapValue(pt.y + lineOffset.dy2);
+        }
+        this.designStore.updateElement(el.id, updates);
       }
       return;
     }
@@ -172,6 +194,12 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
       this.isPanning = false;
       this.panStart = null;
       this.panStartOffset = null;
+      return;
+    }
+
+    if (this.lineEndpointDrag) {
+      this.designStore.pushHistory();
+      this.lineEndpointDrag = null;
       return;
     }
 
@@ -318,6 +346,35 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
     if (!this.drawStart || !this.drawCurrent) return;
     const tool = this.designStore.activeTool;
 
+    this.designStore.pushHistory();
+
+    if (tool === "line") {
+      const lx1 = this.designStore.snapValue(this.drawStart.x);
+      const ly1 = this.designStore.snapValue(this.drawStart.y);
+      let lx2 = this.designStore.snapValue(this.drawCurrent.x);
+      let ly2 = this.designStore.snapValue(this.drawCurrent.y);
+
+      // If click without drag, create a horizontal line
+      if (Math.abs(lx2 - lx1) < 5 && Math.abs(ly2 - ly1) < 5) {
+        lx2 = lx1 + 200;
+        ly2 = ly1;
+      }
+
+      const el = this.designStore.createElement("line", {
+        x1: lx1,
+        y1: ly1,
+        x2: lx2,
+        y2: ly2,
+      });
+
+      this.designStore.selectElement(el.id);
+      this.designStore.activeTool = "select";
+      this.drawStart = null;
+      this.drawCurrent = null;
+      this.designStore.isDrawing = false;
+      return;
+    }
+
     let x = Math.min(this.drawStart.x, this.drawCurrent.x);
     let y = Math.min(this.drawStart.y, this.drawCurrent.y);
     let w = Math.abs(this.drawCurrent.x - this.drawStart.x);
@@ -333,26 +390,19 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
     w = this.designStore.snapValue(w);
     h = this.designStore.snapValue(h);
 
-    this.designStore.pushHistory();
-
     const type = tool === "rectangle"
       ? "rectangle"
       : tool === "ellipse"
         ? "ellipse"
-        : tool === "line"
-          ? "line"
-          : tool === "frame"
-            ? "frame"
-            : "text";
+        : tool === "frame"
+          ? "frame"
+          : "text";
 
     const el = this.designStore.createElement(type as DesignElement["type"], {
       x,
       y,
       width: w,
       height: h,
-      ...(tool === "line"
-        ? { x2: this.drawCurrent.x, y2: this.drawCurrent.y }
-        : {}),
     });
 
     this.designStore.selectElement(el.id);
@@ -411,6 +461,33 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
       width: this.designStore.snapValue(w),
       height: this.designStore.snapValue(h),
     });
+  }
+
+  // ---- Line endpoint drag ----
+
+  onLineEndpointDown = (endpoint: "start" | "end", e: MouseEvent) => {
+    e.stopPropagation();
+    const el = this.designStore.singleSelection;
+    if (!el || el.type !== "line") return;
+    this.lineEndpointDrag = { endpoint, el: { ...el } };
+  };
+
+  handleLineEndpointDrag(pt: Point): void {
+    if (!this.lineEndpointDrag) return;
+    const el = this.designStore.singleSelection;
+    if (!el) return;
+
+    if (this.lineEndpointDrag.endpoint === "start") {
+      this.designStore.updateElement(el.id, {
+        x1: this.designStore.snapValue(pt.x),
+        y1: this.designStore.snapValue(pt.y),
+      });
+    } else {
+      this.designStore.updateElement(el.id, {
+        x2: this.designStore.snapValue(pt.x),
+        y2: this.designStore.snapValue(pt.y),
+      });
+    }
   }
 
   // ---- Wheel zoom/pan ----
@@ -490,6 +567,15 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
     return this.designStore.activeTool === "ellipse";
   }
 
+  get isDrawingLine(): boolean {
+    return this.designStore.activeTool === "line";
+  }
+
+  get isSelectedLine(): boolean {
+    const el = this.selectedElement;
+    return el?.type === "line";
+  }
+
   get drawPreviewCX(): number {
     const p = this.drawPreview;
     return p ? p.x + p.width / 2 : 0;
@@ -525,10 +611,21 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
   halfHeight = (el: DesignElement): number => el.height / 2;
   textBaselineY = (el: DesignElement): number => el.y + (el.fontSize || 24);
   frameNameY = (el: DesignElement): number => el.y - 6;
+  lineX1 = (el: DesignElement): number => el.x1 ?? el.x;
+  lineY1 = (el: DesignElement): number => el.y1 ?? el.y;
   lineX2 = (el: DesignElement): number => el.x2 ?? el.x + el.width;
   lineY2 = (el: DesignElement): number => el.y2 ?? el.y + el.height;
   lineStroke = (el: DesignElement): string => el.stroke === "transparent" ? el.fill : el.stroke;
   lineStrokeWidth = (el: DesignElement): number => el.strokeWidth || 2;
+  lineDashArray = (el: DesignElement): string => el.lineType === "dashed" ? "8 4" : "none";
+  lineMarkerEnd = (el: DesignElement): string => {
+    if (el.lineType === "arrow" || el.lineType === "arrow-both") return "url(#arrowhead-end)";
+    return "";
+  };
+  lineMarkerStart = (el: DesignElement): string => {
+    if (el.lineType === "arrow-both") return "url(#arrowhead-start)";
+    return "";
+  };
 
   elementTransform = (el: DesignElement): string => {
     if (!el.rotation) return "";
@@ -611,9 +708,9 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
         {{on "contextmenu" this.onCanvasContextMenu}}
       >
         <g transform={{this.canvasTransform}}>
-          {{! Grid }}
-          {{#if this.designStore.showGrid}}
-            <defs>
+          {{! Defs: grid patterns and arrowhead markers }}
+          <defs>
+            {{#if this.designStore.showGrid}}
               <pattern id="grid-small" width={{this.designStore.gridSize}} height={{this.designStore.gridSize}} patternUnits="userSpaceOnUse">
                 <path d="M {{this.designStore.gridSize}} 0 L 0 0 0 {{this.designStore.gridSize}}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
               </pattern>
@@ -621,7 +718,15 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
                 <rect width={{this.largeGridSize}} height={{this.largeGridSize}} fill="url(#grid-small)"/>
                 <path d="M {{this.largeGridSize}} 0 L 0 0 0 {{this.largeGridSize}}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
               </pattern>
-            </defs>
+            {{/if}}
+            <marker id="arrowhead-end" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+              <polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+            </marker>
+            <marker id="arrowhead-start" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="strokeWidth">
+              <polygon points="10 0, 0 3.5, 10 7" fill="context-stroke" />
+            </marker>
+          </defs>
+          {{#if this.designStore.showGrid}}
             <rect x="-10000" y="-10000" width="20000" height="20000" fill="url(#grid-large)" class="grid-pattern"/>
           {{/if}}
 
@@ -720,22 +825,25 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
               {{else if (this.isType el "line")}}
                 <line
                   class="design-element {{if el.locked 'locked'}}"
-                  x1={{el.x}}
-                  y1={{el.y}}
+                  x1={{this.lineX1 el}}
+                  y1={{this.lineY1 el}}
                   x2={{this.lineX2 el}}
                   y2={{this.lineY2 el}}
                   stroke={{this.lineStroke el}}
                   stroke-width={{this.lineStrokeWidth el}}
+                  stroke-dasharray={{this.lineDashArray el}}
+                  marker-end={{this.lineMarkerEnd el}}
+                  marker-start={{this.lineMarkerStart el}}
                   opacity={{el.opacity}}
                 />
                 {{! Hit area for line }}
                 <line
-                  x1={{el.x}}
-                  y1={{el.y}}
+                  x1={{this.lineX1 el}}
+                  y1={{this.lineY1 el}}
                   x2={{this.lineX2 el}}
                   y2={{this.lineY2 el}}
                   stroke="transparent"
-                  stroke-width="10"
+                  stroke-width="12"
                   class="design-element"
                 />
               {{/if}}
@@ -745,107 +853,154 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
           {{! Hover outline }}
           {{#if this.hoverElement}}
             {{#unless (this.isSelected this.hoverElement.id)}}
-              <rect
-                class="hover-outline"
-                x={{this.hoverElement.x}}
-                y={{this.hoverElement.y}}
-                width={{this.hoverElement.width}}
-                height={{this.hoverElement.height}}
-                rx={{this.hoverElement.cornerRadius}}
-              />
+              {{#if (this.isType this.hoverElement "line")}}
+                <line
+                  class="hover-outline-line"
+                  x1={{this.lineX1 this.hoverElement}}
+                  y1={{this.lineY1 this.hoverElement}}
+                  x2={{this.lineX2 this.hoverElement}}
+                  y2={{this.lineY2 this.hoverElement}}
+                />
+              {{else}}
+                <rect
+                  class="hover-outline"
+                  x={{this.hoverElement.x}}
+                  y={{this.hoverElement.y}}
+                  width={{this.hoverElement.width}}
+                  height={{this.hoverElement.height}}
+                  rx={{this.hoverElement.cornerRadius}}
+                />
+              {{/if}}
             {{/unless}}
           {{/if}}
 
           {{! Selection boxes and handles }}
           {{#each this.designStore.selectedElements as |el|}}
-            <rect
-              class="selection-box"
-              x={{el.x}}
-              y={{el.y}}
-              width={{el.width}}
-              height={{el.height}}
-            />
+            {{#if (this.isType el "line")}}
+              {{! Line selection: highlight the line itself }}
+              <line
+                class="line-selection-outline"
+                x1={{this.lineX1 el}}
+                y1={{this.lineY1 el}}
+                x2={{this.lineX2 el}}
+                y2={{this.lineY2 el}}
+              />
+            {{else}}
+              <rect
+                class="selection-box"
+                x={{el.x}}
+                y={{el.y}}
+                width={{el.width}}
+                height={{el.height}}
+              />
+            {{/if}}
           {{/each}}
 
           {{! Resize handles for single selection }}
           {{#if this.selectedElement}}
-            <rect
-              class="selection-handle top-left"
-              x={{this.handleX this.selectedElement "left"}}
-              y={{this.handleY this.selectedElement "top"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "top-left")}}
-            />
-            <rect
-              class="selection-handle top-right"
-              x={{this.handleX this.selectedElement "right"}}
-              y={{this.handleY this.selectedElement "top"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "top-right")}}
-            />
-            <rect
-              class="selection-handle bottom-left"
-              x={{this.handleX this.selectedElement "left"}}
-              y={{this.handleY this.selectedElement "bottom"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "bottom-left")}}
-            />
-            <rect
-              class="selection-handle bottom-right"
-              x={{this.handleX this.selectedElement "right"}}
-              y={{this.handleY this.selectedElement "bottom"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "bottom-right")}}
-            />
-            <rect
-              class="selection-handle top"
-              x={{this.handleX this.selectedElement "center"}}
-              y={{this.handleY this.selectedElement "top"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "top")}}
-            />
-            <rect
-              class="selection-handle bottom"
-              x={{this.handleX this.selectedElement "center"}}
-              y={{this.handleY this.selectedElement "bottom"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "bottom")}}
-            />
-            <rect
-              class="selection-handle left"
-              x={{this.handleX this.selectedElement "left"}}
-              y={{this.handleY this.selectedElement "middle"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "left")}}
-            />
-            <rect
-              class="selection-handle right"
-              x={{this.handleX this.selectedElement "right"}}
-              y={{this.handleY this.selectedElement "middle"}}
-              width="8"
-              height="8"
-              rx="1"
-              {{on "mousedown" (fn this.onResizeHandleDown "right")}}
-            />
+            {{#if this.isSelectedLine}}
+              {{! Line endpoint handles }}
+              <circle
+                class="line-endpoint-handle"
+                cx={{this.lineX1 this.selectedElement}}
+                cy={{this.lineY1 this.selectedElement}}
+                r="6"
+                {{on "mousedown" (fn this.onLineEndpointDown "start")}}
+              />
+              <circle
+                class="line-endpoint-handle"
+                cx={{this.lineX2 this.selectedElement}}
+                cy={{this.lineY2 this.selectedElement}}
+                r="6"
+                {{on "mousedown" (fn this.onLineEndpointDown "end")}}
+              />
+            {{else}}
+              <rect
+                class="selection-handle top-left"
+                x={{this.handleX this.selectedElement "left"}}
+                y={{this.handleY this.selectedElement "top"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "top-left")}}
+              />
+              <rect
+                class="selection-handle top-right"
+                x={{this.handleX this.selectedElement "right"}}
+                y={{this.handleY this.selectedElement "top"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "top-right")}}
+              />
+              <rect
+                class="selection-handle bottom-left"
+                x={{this.handleX this.selectedElement "left"}}
+                y={{this.handleY this.selectedElement "bottom"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "bottom-left")}}
+              />
+              <rect
+                class="selection-handle bottom-right"
+                x={{this.handleX this.selectedElement "right"}}
+                y={{this.handleY this.selectedElement "bottom"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "bottom-right")}}
+              />
+              <rect
+                class="selection-handle top"
+                x={{this.handleX this.selectedElement "center"}}
+                y={{this.handleY this.selectedElement "top"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "top")}}
+              />
+              <rect
+                class="selection-handle bottom"
+                x={{this.handleX this.selectedElement "center"}}
+                y={{this.handleY this.selectedElement "bottom"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "bottom")}}
+              />
+              <rect
+                class="selection-handle left"
+                x={{this.handleX this.selectedElement "left"}}
+                y={{this.handleY this.selectedElement "middle"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "left")}}
+              />
+              <rect
+                class="selection-handle right"
+                x={{this.handleX this.selectedElement "right"}}
+                y={{this.handleY this.selectedElement "middle"}}
+                width="8"
+                height="8"
+                rx="1"
+                {{on "mousedown" (fn this.onResizeHandleDown "right")}}
+              />
+            {{/if}}
           {{/if}}
 
           {{! Draw preview }}
           {{#if this.drawPreview}}
-            {{#if (this.isDrawingEllipse)}}
+            {{#if this.isDrawingLine}}
+              <line
+                class="draw-preview-line"
+                x1={{this.drawStart.x}}
+                y1={{this.drawStart.y}}
+                x2={{this.drawCurrent.x}}
+                y2={{this.drawCurrent.y}}
+              />
+            {{else if (this.isDrawingEllipse)}}
               <ellipse
                 class="draw-preview"
                 cx={{this.drawPreviewCX}}

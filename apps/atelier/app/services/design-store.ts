@@ -30,8 +30,11 @@ export interface DesignElement {
   fontFamily?: string;
   textAlign?: "left" | "center" | "right";
   // line-specific
+  x1?: number;
+  y1?: number;
   x2?: number;
   y2?: number;
+  lineType?: "solid" | "dashed" | "arrow" | "arrow-both";
   // image-specific
   imageUrl?: string;
   // shadow
@@ -183,17 +186,33 @@ export default class DesignStoreService extends Service {
     };
     const count = this.elements.filter((el) => el.type === type).length + 1;
 
+    const lineDefaults = type === "line"
+      ? {
+          x1: overrides.x1 ?? 100,
+          y1: overrides.y1 ?? 100,
+          x2: overrides.x2 ?? 300,
+          y2: overrides.y2 ?? 100,
+          lineType: overrides.lineType ?? ("solid" as const),
+        }
+      : {};
+
+    // For lines, derive bounding box from endpoints
+    const lineX1 = lineDefaults.x1 ?? 100;
+    const lineY1 = lineDefaults.y1 ?? 100;
+    const lineX2 = lineDefaults.x2 ?? 300;
+    const lineY2 = lineDefaults.y2 ?? 100;
+
     const element: DesignElement = {
       id,
       type,
-      x: 100,
-      y: 100,
-      width: type === "line" ? 200 : 200,
-      height: type === "line" ? 0 : 150,
+      x: type === "line" ? Math.min(lineX1, lineX2) : 100,
+      y: type === "line" ? Math.min(lineY1, lineY2) : 100,
+      width: type === "line" ? Math.abs(lineX2 - lineX1) || 1 : 200,
+      height: type === "line" ? Math.abs(lineY2 - lineY1) || 1 : 150,
       rotation: 0,
       fill: type === "frame" ? "#ffffff" : type === "text" ? "#e4e4e7" : "#818cf8",
-      stroke: type === "frame" ? "#e4e4e7" : "transparent",
-      strokeWidth: type === "frame" ? 1 : 0,
+      stroke: type === "frame" ? "#e4e4e7" : type === "line" ? "#818cf8" : "transparent",
+      strokeWidth: type === "frame" ? 1 : type === "line" ? 2 : 0,
       opacity: 1,
       cornerRadius: 0,
       visible: true,
@@ -209,8 +228,17 @@ export default class DesignStoreService extends Service {
             textAlign: "left" as const,
           }
         : {}),
-      ...(type === "line" ? { x2: 300, y2: 200 } : {}),
+      ...lineDefaults,
       ...overrides,
+      // Re-derive bounding box after overrides for lines
+      ...(type === "line"
+        ? {
+            x: Math.min(overrides.x1 ?? lineX1, overrides.x2 ?? lineX2),
+            y: Math.min(overrides.y1 ?? lineY1, overrides.y2 ?? lineY2),
+            width: Math.abs((overrides.x2 ?? lineX2) - (overrides.x1 ?? lineX1)) || 1,
+            height: Math.abs((overrides.y2 ?? lineY2) - (overrides.y1 ?? lineY1)) || 1,
+          }
+        : {}),
     };
 
     this.elements = [...this.elements, element];
@@ -222,9 +250,18 @@ export default class DesignStoreService extends Service {
   }
 
   updateElement(id: string, updates: Partial<DesignElement>): void {
-    this.elements = this.elements.map((el) =>
-      el.id === id ? { ...el, ...updates } : el,
-    );
+    this.elements = this.elements.map((el) => {
+      if (el.id !== id) return el;
+      const updated = { ...el, ...updates };
+      // Re-derive bounding box for lines when endpoints change
+      if (updated.type === "line" && updated.x1 != null && updated.y1 != null && updated.x2 != null && updated.y2 != null) {
+        updated.x = Math.min(updated.x1, updated.x2);
+        updated.y = Math.min(updated.y1, updated.y2);
+        updated.width = Math.abs(updated.x2 - updated.x1) || 1;
+        updated.height = Math.abs(updated.y2 - updated.y1) || 1;
+      }
+      return updated;
+    });
   }
 
   deleteSelected(): void {
@@ -290,7 +327,14 @@ export default class DesignStoreService extends Service {
     const pasted = this.clipboard.map((el) => {
       const newId = generateId();
       newIds.push(newId);
-      return { ...el, id: newId, x: el.x + 20, y: el.y + 20 };
+      const pasted: DesignElement = { ...el, id: newId, x: el.x + 20, y: el.y + 20 };
+      if (pasted.type === "line") {
+        if (pasted.x1 != null) pasted.x1 += 20;
+        if (pasted.y1 != null) pasted.y1 += 20;
+        if (pasted.x2 != null) pasted.x2 += 20;
+        if (pasted.y2 != null) pasted.y2 += 20;
+      }
+      return pasted;
     });
     this.elements = [...this.elements, ...pasted];
     this.selectedIds = newIds;
@@ -477,7 +521,20 @@ export default class DesignStoreService extends Service {
     const width = maxX - minX;
     const height = maxY - minY;
 
+    const hasArrows = this.elements.some((el) => el.type === "line" && (el.lineType === "arrow" || el.lineType === "arrow-both"));
+
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${width} ${height}" width="${width}" height="${height}">\n`;
+
+    if (hasArrows) {
+      svg += `  <defs>\n`;
+      svg += `    <marker id="arrowhead-export" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">\n`;
+      svg += `      <polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />\n`;
+      svg += `    </marker>\n`;
+      svg += `    <marker id="arrowhead-start-export" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="strokeWidth">\n`;
+      svg += `      <polygon points="10 0, 0 3.5, 10 7" fill="context-stroke" />\n`;
+      svg += `    </marker>\n`;
+      svg += `  </defs>\n`;
+    }
 
     for (const el of this.elements) {
       if (!el.visible) continue;
@@ -494,9 +551,23 @@ export default class DesignStoreService extends Service {
         case "text":
           svg += `  <text x="${el.x}" y="${el.y + (el.fontSize || 24)}" font-size="${el.fontSize}" font-family="${el.fontFamily}" font-weight="${el.fontWeight}" fill="${el.fill}" opacity="${el.opacity}">${el.text}</text>\n`;
           break;
-        case "line":
-          svg += `  <line x1="${el.x}" y1="${el.y}" x2="${el.x2 || el.x + el.width}" y2="${el.y2 || el.y + el.height}" style="stroke:${el.stroke};stroke-width:${el.strokeWidth};opacity:${el.opacity}" />\n`;
+        case "line": {
+          const lx1 = el.x1 ?? el.x;
+          const ly1 = el.y1 ?? el.y;
+          const lx2 = el.x2 ?? el.x + el.width;
+          const ly2 = el.y2 ?? el.y + el.height;
+          const lineColor = el.stroke !== "transparent" ? el.stroke : el.fill;
+          const sw = el.strokeWidth || 2;
+          const dash = el.lineType === "dashed" ? ` stroke-dasharray="8 4"` : "";
+          let markers = "";
+          if (el.lineType === "arrow") {
+            markers = ` marker-end="url(#arrowhead-export)"`;
+          } else if (el.lineType === "arrow-both") {
+            markers = ` marker-start="url(#arrowhead-start-export)" marker-end="url(#arrowhead-export)"`;
+          }
+          svg += `  <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="${lineColor}" stroke-width="${sw}" opacity="${el.opacity}"${dash}${markers} />\n`;
           break;
+        }
       }
     }
 

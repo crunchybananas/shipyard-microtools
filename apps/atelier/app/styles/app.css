@@ -780,6 +780,40 @@ html, body {
 .selection-handle.left { cursor: ew-resize; }
 .selection-handle.right { cursor: ew-resize; }
 
+/* Line selection */
+.line-selection-outline {
+  fill: none;
+  stroke: var(--selection);
+  stroke-width: 3;
+  pointer-events: none;
+}
+
+.line-endpoint-handle {
+  fill: #fff;
+  stroke: var(--selection);
+  stroke-width: 1.5;
+  cursor: crosshair;
+}
+
+.line-endpoint-handle:hover {
+  fill: var(--selection);
+}
+
+.hover-outline-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.draw-preview-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 3;
+}
+
 .marquee-rect {
   fill: rgba(129, 140, 248, 0.08);
   stroke: var(--accent);

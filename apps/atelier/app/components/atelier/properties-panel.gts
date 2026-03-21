@@ -51,13 +51,25 @@ export default class AtelierPropertiesPanel extends Component {
 
   // ---- Properties ----
 
+  get isLine(): boolean {
+    return this.selectedElement?.type === "line";
+  }
+
+  get isNotLine(): boolean {
+    return this.selectedElement?.type !== "line";
+  }
+
+  isLineType = (type: string): boolean => {
+    return (this.selectedElement?.lineType || "solid") === type;
+  };
+
   updateProp = (prop: string, e: Event) => {
     const el = this.designStore.singleSelection;
     if (!el) return;
     const target = e.target as HTMLInputElement;
     let value: string | number = target.value;
 
-    if (["x", "y", "width", "height", "cornerRadius", "strokeWidth", "fontSize", "rotation"].includes(prop)) {
+    if (["x", "y", "width", "height", "cornerRadius", "strokeWidth", "fontSize", "rotation", "x1", "y1", "x2", "y2"].includes(prop)) {
       value = parseFloat(value) || 0;
     }
     if (prop === "opacity") {
@@ -138,24 +150,77 @@ export default class AtelierPropertiesPanel extends Component {
               {{on "change" (fn this.updateProp "height")}}
             />
           </div>
-          <div class="props-row">
-            <span class="props-label">R</span>
-            <input
-              class="props-input"
-              type="number"
-              value={{this.selectedElement.rotation}}
-              {{on "change" (fn this.updateProp "rotation")}}
-            />
-            <span class="props-label"></span>
-            <input
-              class="props-input"
-              type="number"
-              value={{this.selectedElement.cornerRadius}}
-              placeholder="Radius"
-              {{on "change" (fn this.updateProp "cornerRadius")}}
-            />
-          </div>
+          {{#if this.isNotLine}}
+            <div class="props-row">
+              <span class="props-label">R</span>
+              <input
+                class="props-input"
+                type="number"
+                value={{this.selectedElement.rotation}}
+                {{on "change" (fn this.updateProp "rotation")}}
+              />
+              <span class="props-label"></span>
+              <input
+                class="props-input"
+                type="number"
+                value={{this.selectedElement.cornerRadius}}
+                placeholder="Radius"
+                {{on "change" (fn this.updateProp "cornerRadius")}}
+              />
+            </div>
+          {{/if}}
         </div>
+
+        {{! Line properties }}
+        {{#if this.isLine}}
+          <div class="props-section">
+            <div class="props-section-title">Line</div>
+            <div class="props-row">
+              <span class="props-label">Type</span>
+              <select
+                class="props-select"
+                {{on "change" (fn this.updateProp "lineType")}}
+              >
+                <option value="solid" selected={{this.isLineType "solid"}}>Solid</option>
+                <option value="dashed" selected={{this.isLineType "dashed"}}>Dashed</option>
+                <option value="arrow" selected={{this.isLineType "arrow"}}>Arrow</option>
+                <option value="arrow-both" selected={{this.isLineType "arrow-both"}}>Double Arrow</option>
+              </select>
+            </div>
+            <div class="props-row">
+              <span class="props-label">X1</span>
+              <input
+                class="props-input"
+                type="number"
+                value={{this.selectedElement.x1}}
+                {{on "change" (fn this.updateProp "x1")}}
+              />
+              <span class="props-label">Y1</span>
+              <input
+                class="props-input"
+                type="number"
+                value={{this.selectedElement.y1}}
+                {{on "change" (fn this.updateProp "y1")}}
+              />
+            </div>
+            <div class="props-row">
+              <span class="props-label">X2</span>
+              <input
+                class="props-input"
+                type="number"
+                value={{this.selectedElement.x2}}
+                {{on "change" (fn this.updateProp "x2")}}
+              />
+              <span class="props-label">Y2</span>
+              <input
+                class="props-input"
+                type="number"
+                value={{this.selectedElement.y2}}
+                {{on "change" (fn this.updateProp "y2")}}
+              />
+            </div>
+          </div>
+        {{/if}}
 
         {{! Appearance }}
         <div class="props-section">
