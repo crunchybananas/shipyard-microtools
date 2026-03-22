@@ -61,6 +61,7 @@ export default class ProjectStoreService extends Service {
   @tracked sharedProjects: Project[] = [];
   @tracked currentProjectId: string | null = null;
   @tracked isSyncing: boolean = false;
+  @tracked isInitialLoading: boolean = true;
   @tracked activeTab: "my" | "shared" = "my";
 
   private _migrated = false;
@@ -133,9 +134,11 @@ export default class ProjectStoreService extends Service {
         this.loadLocalProjects();
       } finally {
         this.isSyncing = false;
+        this.isInitialLoading = false;
       }
     } else {
       this.loadLocalProjects();
+      this.isInitialLoading = false;
     }
   }
 

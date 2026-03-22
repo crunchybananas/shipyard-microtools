@@ -189,7 +189,10 @@ export default class AtelierModals extends Component<ModalsSignature> {
   }
 
   get colorPickerPosition(): string {
-    return "top: 200px;";
+    const anchorY = this.designStore.colorPickerAnchorY ?? 200;
+    // Clamp so the picker (approx 360px tall) doesn't overflow the viewport
+    const maxY = Math.max(60, Math.min(anchorY, window.innerHeight - 380));
+    return `top: ${maxY}px;`;
   }
 
   get presetColors(): string[] {
@@ -473,6 +476,9 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
         <div class="export-modal" role="dialog" {{on "click" this.stopPropagation}}>
           <div class="export-modal-header">
             <div class="export-modal-title">Export Design</div>
+            <button class="ai-modal-close" type="button" {{on "click" this.closeExport}}>
+              <IconX />
+            </button>
           </div>
           <div class="export-preview">
             <pre>{{this.svgContent}}</pre>

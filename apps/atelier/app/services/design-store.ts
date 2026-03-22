@@ -90,6 +90,7 @@ export default class DesignStoreService extends Service {
   @tracked fileName: string = "Untitled";
   @tracked showColorPicker: boolean = false;
   @tracked colorPickerTarget: "fill" | "stroke" = "fill";
+  @tracked colorPickerAnchorY: number = 200;
   @tracked contextMenuPos: Point | null = null;
   @tracked hoveredElementId: string | null = null;
   @tracked dragStartPoint: Point | null = null;

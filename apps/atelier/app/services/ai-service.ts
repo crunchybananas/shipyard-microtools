@@ -332,5 +332,10 @@ export default class AiServiceService extends Service {
     setTimeout(() => {
       this.designStore.zoomToFit();
     }, 100);
+
+    // Auto-collapse agent log after 3 seconds
+    setTimeout(() => {
+      this.showAgentLog = false;
+    }, 3000);
   }
 }

@@ -183,6 +183,11 @@ html, body {
   height: 16px;
 }
 
+.topbar-btn.icon-only {
+  width: 30px;
+  padding: 0;
+}
+
 .topbar-btn.primary {
   background: var(--accent);
   color: #fff;
@@ -902,6 +907,11 @@ html, body {
   color: var(--text);
 }
 
+.zoom-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* ---- AI Modal ---- */
 
 .modal-overlay {
@@ -1135,6 +1145,9 @@ html, body {
 
 .export-modal-header {
   padding: 20px 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .export-modal-title {
@@ -1381,7 +1394,6 @@ html, body {
 .color-picker-popup {
   position: fixed;
   right: 292px;
-  top: 180px;
   background: var(--bg-dark);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -3434,7 +3446,7 @@ html, body {
   color: var(--text-faint);
   cursor: pointer;
   transition: all 0.1s;
-  opacity: 0;
+  opacity: 0.6;
   flex-shrink: 0;
   padding: 0;
 }

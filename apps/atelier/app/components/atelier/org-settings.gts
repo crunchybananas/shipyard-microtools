@@ -192,7 +192,7 @@ export default class AtelierOrgSettings extends Component {
           <div class="os-section">
             <div class="os-section-header">
               <h2 class="os-section-title">Members</h2>
-              <span class="os-section-count">{{this.members.length}} members</span>
+              <span class="os-section-count">{{this.members.length}} {{if this.isSingleMember "member" "members"}}</span>
             </div>
 
             <div class="os-members-list">
@@ -203,7 +203,7 @@ export default class AtelierOrgSettings extends Component {
                   </div>
                   <div class="os-member-info">
                     <div class="os-member-email">{{member.email}}</div>
-                    <div class="os-member-joined">Joined {{member.joinedAt}}</div>
+                    <div class="os-member-joined">Joined {{this.formatJoinedDate member.joinedAt}}</div>
                   </div>
                   <span class={{this.getRoleBadgeClass member.role}}>{{member.role}}</span>
                   {{#if this.isOwner}}
@@ -324,4 +324,15 @@ export default class AtelierOrgSettings extends Component {
   get isEditorRole(): boolean {
     return this.inviteRole === "editor";
   }
+
+  get isSingleMember(): boolean {
+    return this.members.length === 1;
+  }
+
+  formatJoinedDate = (dateStr: string): string => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
 }

@@ -82,10 +82,19 @@ export default class AtelierPropertiesPanel extends Component {
 
   // ---- Color picker ----
 
-  openColorPicker = (target: "fill" | "stroke") => {
-    this.designStore.colorPickerTarget = target;
-    this.designStore.showColorPicker = !this.designStore.showColorPicker ||
-      this.designStore.colorPickerTarget !== target;
+  openColorPicker = (target: "fill" | "stroke", e?: MouseEvent) => {
+    const sameTarget = this.designStore.colorPickerTarget === target;
+    if (this.designStore.showColorPicker && sameTarget) {
+      this.designStore.showColorPicker = false;
+    } else {
+      this.designStore.colorPickerTarget = target;
+      this.designStore.showColorPicker = true;
+      if (e) {
+        const btn = (e.currentTarget as HTMLElement);
+        const rect = btn.getBoundingClientRect();
+        this.designStore.colorPickerAnchorY = rect.top;
+      }
+    }
   };
 
   // ---- Actions ----
