@@ -1,5 +1,7 @@
-import Service from "@ember/service";
+import Service, { inject as service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
+import type ProjectStoreService from "atelier/services/project-store";
+import type AuthService from "atelier/services/auth-service";
 
 export interface Point {
   x: number;
@@ -65,6 +67,9 @@ function generateId(): string {
 }
 
 export default class DesignStoreService extends Service {
+  @service declare projectStore: ProjectStoreService;
+  @service declare authService: AuthService;
+
   @tracked elements: DesignElement[] = [];
   @tracked selectedIds: string[] = [];
   @tracked activeTool: ToolType = "select";
@@ -88,10 +93,72 @@ export default class DesignStoreService extends Service {
   @tracked hoveredElementId: string | null = null;
   @tracked dragStartPoint: Point | null = null;
   @tracked showOnboarding: boolean = true;
+  @tracked currentProjectId: string | null = null;
 
   private history: HistoryEntry[] = [];
   private historyIndex: number = -1;
   private maxHistory = 100;
+  private _saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private _isSaving = false;
+
+  // --- Auto-save ---
+
+  scheduleSave(): void {
+    if (!this.currentProjectId) return;
+    if (!this.authService.isAuthenticated) return;
+
+    if (this._saveTimer) {
+      clearTimeout(this._saveTimer);
+    }
+    this._saveTimer = setTimeout(() => {
+      this._saveTimer = null;
+      void this._performSave();
+    }, 1000);
+  }
+
+  private async _performSave(): Promise<void> {
+    if (this._isSaving) return;
+    if (!this.currentProjectId) return;
+
+    this._isSaving = true;
+    try {
+      await this.projectStore.saveProject(
+        this.currentProjectId,
+        JSON.parse(JSON.stringify(this.elements)),
+      );
+    } catch (e) {
+      console.error("Auto-save failed:", e);
+    } finally {
+      this._isSaving = false;
+    }
+  }
+
+  async loadProject(projectId: string): Promise<void> {
+    this.currentProjectId = projectId;
+    const elements = await this.projectStore.loadProject(projectId);
+    this.elements = elements;
+    this.selectedIds = [];
+    this.history = [];
+    this.historyIndex = -1;
+    this.pushHistory();
+
+    const project = this.projectStore.getProject(projectId);
+    if (project) {
+      this.fileName = project.name;
+    }
+  }
+
+  unloadProject(): void {
+    // Flush any pending save
+    if (this._saveTimer) {
+      clearTimeout(this._saveTimer);
+      this._saveTimer = null;
+      if (this.currentProjectId && this.authService.isAuthenticated) {
+        void this._performSave();
+      }
+    }
+    this.currentProjectId = null;
+  }
 
   get selectedElements(): DesignElement[] {
     return this.elements.filter((el) => this.selectedIds.includes(el.id));
@@ -161,6 +228,7 @@ export default class DesignStoreService extends Service {
     const entry = this.history[this.historyIndex]!;
     this.elements = JSON.parse(JSON.stringify(entry.elements));
     this.selectedIds = [...entry.selectedIds];
+    this.scheduleSave();
   }
 
   redo(): void {
@@ -169,6 +237,7 @@ export default class DesignStoreService extends Service {
     const entry = this.history[this.historyIndex]!;
     this.elements = JSON.parse(JSON.stringify(entry.elements));
     this.selectedIds = [...entry.selectedIds];
+    this.scheduleSave();
   }
 
   createElement(
@@ -242,11 +311,13 @@ export default class DesignStoreService extends Service {
     };
 
     this.elements = [...this.elements, element];
+    this.scheduleSave();
     return element;
   }
 
   addElement(element: DesignElement): void {
     this.elements = [...this.elements, element];
+    this.scheduleSave();
   }
 
   updateElement(id: string, updates: Partial<DesignElement>): void {
@@ -262,6 +333,7 @@ export default class DesignStoreService extends Service {
       }
       return updated;
     });
+    this.scheduleSave();
   }
 
   deleteSelected(): void {
@@ -271,6 +343,7 @@ export default class DesignStoreService extends Service {
       (el) => !this.selectedIds.includes(el.id),
     );
     this.selectedIds = [];
+    this.scheduleSave();
   }
 
   selectElement(id: string, addToSelection: boolean = false): void {
@@ -339,6 +412,7 @@ export default class DesignStoreService extends Service {
     this.elements = [...this.elements, ...pasted];
     this.selectedIds = newIds;
     this.clipboard = JSON.parse(JSON.stringify(pasted));
+    this.scheduleSave();
   }
 
   duplicateSelected(): void {
@@ -356,6 +430,7 @@ export default class DesignStoreService extends Service {
       (el) => !this.selectedIds.includes(el.id),
     );
     this.elements = [...rest, ...selected];
+    this.scheduleSave();
   }
 
   sendToBack(): void {
@@ -368,6 +443,7 @@ export default class DesignStoreService extends Service {
       (el) => !this.selectedIds.includes(el.id),
     );
     this.elements = [...selected, ...rest];
+    this.scheduleSave();
   }
 
   moveUp(id: string): void {
@@ -380,6 +456,7 @@ export default class DesignStoreService extends Service {
         newElements[idx]!,
       ];
       this.elements = newElements;
+      this.scheduleSave();
     }
   }
 
@@ -393,6 +470,7 @@ export default class DesignStoreService extends Service {
         newElements[idx]!,
       ];
       this.elements = newElements;
+      this.scheduleSave();
     }
   }
 
@@ -422,6 +500,7 @@ export default class DesignStoreService extends Service {
           return el;
       }
     });
+    this.scheduleSave();
   }
 
   distributeSelected(direction: "horizontal" | "vertical"): void {
@@ -458,6 +537,7 @@ export default class DesignStoreService extends Service {
         currentY += sorted[i]!.height + gap;
       }
     }
+    this.scheduleSave();
   }
 
   snapValue(value: number): number {
@@ -579,6 +659,7 @@ export default class DesignStoreService extends Service {
     this.pushHistory();
     this.elements = [];
     this.selectedIds = [];
+    this.scheduleSave();
   }
 
   groupSelected(): void {
@@ -602,5 +683,6 @@ export default class DesignStoreService extends Service {
     );
 
     this.selectedIds = [frame.id];
+    this.scheduleSave();
   }
 }

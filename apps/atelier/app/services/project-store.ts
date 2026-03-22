@@ -1,5 +1,14 @@
-import Service from "@ember/service";
+import Service, { inject as service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
+import type AuthService from "atelier/services/auth-service";
+import type { DesignElement } from "atelier/services/design-store";
+import {
+  listProjects as fsListProjects,
+  getProject as fsGetProject,
+  createProject as fsCreateProject,
+  saveProject as fsSaveProject,
+  deleteProject as fsDeleteProject,
+} from "atelier/utils/firestore-adapter";
 
 export interface Project {
   id: string;
@@ -10,6 +19,7 @@ export interface Project {
 }
 
 const STORAGE_KEY = "atelier-projects";
+const ELEMENTS_KEY_PREFIX = "atelier-elements-";
 
 const SEED_PROJECTS: Project[] = [
   {
@@ -36,29 +46,37 @@ const SEED_PROJECTS: Project[] = [
 ];
 
 export default class ProjectStoreService extends Service {
+  @service declare authService: AuthService;
+
   @tracked projects: Project[] = [];
+  @tracked currentProjectId: string | null = null;
+  @tracked isSyncing: boolean = false;
+
+  private _migrated = false;
 
   constructor(properties: object | undefined) {
     super(properties);
-    this.loadProjects();
+    this.loadLocalProjects();
   }
 
-  private loadProjects(): void {
+  // --- localStorage helpers ---
+
+  private loadLocalProjects(): void {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         this.projects = JSON.parse(raw);
       } else {
         this.projects = [...SEED_PROJECTS];
-        this.save();
+        this.saveLocal();
       }
     } catch {
       this.projects = [...SEED_PROJECTS];
-      this.save();
+      this.saveLocal();
     }
   }
 
-  private save(): void {
+  private saveLocal(): void {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.projects));
     } catch {
@@ -66,26 +84,101 @@ export default class ProjectStoreService extends Service {
     }
   }
 
-  createProject(name?: string): Project {
-    const project: Project = {
-      id: `proj_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      name: name || "Untitled Project",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      elementCount: 0,
-    };
-    this.projects = [project, ...this.projects];
-    this.save();
-    return project;
+  private getLocalElements(projectId: string): DesignElement[] {
+    try {
+      const raw = localStorage.getItem(ELEMENTS_KEY_PREFIX + projectId);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private setLocalElements(projectId: string, elements: DesignElement[]): void {
+    try {
+      localStorage.setItem(ELEMENTS_KEY_PREFIX + projectId, JSON.stringify(elements));
+    } catch {
+      // ignore
+    }
+  }
+
+  // --- Public API ---
+
+  async loadProjects(): Promise<void> {
+    if (this.authService.isAuthenticated && this.authService.uid) {
+      this.isSyncing = true;
+      try {
+        // Migrate localStorage projects on first sign-in
+        if (!this._migrated) {
+          await this.migrateLocalToFirestore();
+          this._migrated = true;
+        }
+        const firestoreProjects = await fsListProjects(this.authService.uid);
+        this.projects = firestoreProjects;
+      } catch (e) {
+        console.error("Failed to load projects from Firestore:", e);
+        // Fall back to local
+        this.loadLocalProjects();
+      } finally {
+        this.isSyncing = false;
+      }
+    } else {
+      this.loadLocalProjects();
+    }
+  }
+
+  async createProject(name?: string): Promise<Project> {
+    const projectName = name || "Untitled Project";
+
+    if (this.authService.isAuthenticated && this.authService.uid) {
+      this.isSyncing = true;
+      try {
+        const id = await fsCreateProject(this.authService.uid, projectName);
+        const project: Project = {
+          id,
+          name: projectName,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          elementCount: 0,
+        };
+        this.projects = [project, ...this.projects];
+        return project;
+      } finally {
+        this.isSyncing = false;
+      }
+    } else {
+      const project: Project = {
+        id: `proj_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        name: projectName,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        elementCount: 0,
+      };
+      this.projects = [project, ...this.projects];
+      this.saveLocal();
+      return project;
+    }
   }
 
   listProjects(): Project[] {
     return this.projects;
   }
 
-  deleteProject(id: string): void {
+  async deleteProject(id: string): Promise<void> {
+    if (this.authService.isAuthenticated) {
+      try {
+        await fsDeleteProject(id);
+      } catch (e) {
+        console.error("Failed to delete project from Firestore:", e);
+      }
+    } else {
+      try {
+        localStorage.removeItem(ELEMENTS_KEY_PREFIX + id);
+      } catch {
+        // ignore
+      }
+    }
     this.projects = this.projects.filter((p) => p.id !== id);
-    this.save();
+    this.saveLocal();
   }
 
   getProject(id: string): Project | undefined {
@@ -96,6 +189,65 @@ export default class ProjectStoreService extends Service {
     this.projects = this.projects.map((p) =>
       p.id === id ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p,
     );
-    this.save();
+    if (!this.authService.isAuthenticated) {
+      this.saveLocal();
+    }
+  }
+
+  async loadProject(id: string): Promise<DesignElement[]> {
+    if (this.authService.isAuthenticated) {
+      try {
+        const result = await fsGetProject(id);
+        if (result) return result.elements;
+        return [];
+      } catch (e) {
+        console.error("Failed to load project from Firestore:", e);
+        return this.getLocalElements(id);
+      }
+    } else {
+      return this.getLocalElements(id);
+    }
+  }
+
+  async saveProject(id: string, elements: DesignElement[]): Promise<void> {
+    // Update local project metadata
+    this.updateProject(id, { elementCount: elements.length });
+
+    if (this.authService.isAuthenticated) {
+      try {
+        await fsSaveProject(id, elements);
+      } catch (e) {
+        console.error("Failed to save project to Firestore:", e);
+        // Fall back to local save
+        this.setLocalElements(id, elements);
+      }
+    } else {
+      this.setLocalElements(id, elements);
+    }
+  }
+
+  // --- Migration ---
+
+  private async migrateLocalToFirestore(): Promise<void> {
+    if (!this.authService.uid) return;
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      const localProjects: Project[] = JSON.parse(raw);
+      if (localProjects.length === 0) return;
+
+      // Check if user already has Firestore projects
+      const existing = await fsListProjects(this.authService.uid);
+      if (existing.length > 0) return; // Already has projects, skip migration
+
+      for (const project of localProjects) {
+        const elements = this.getLocalElements(project.id);
+        await fsCreateProject(this.authService.uid, project.name, elements);
+      }
+    } catch (e) {
+      console.error("Migration failed:", e);
+    }
   }
 }

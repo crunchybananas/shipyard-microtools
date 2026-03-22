@@ -1,7 +1,9 @@
 import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
 import { inject as service } from "@ember/service";
 import type DesignStoreService from "atelier/services/design-store";
+import type AuthService from "atelier/services/auth-service";
 import {
   IconSparkles,
   IconUndo,
@@ -10,6 +12,8 @@ import {
   IconMagnet,
   IconExport,
 } from "atelier/components/atelier/icons";
+
+const IconSignOut = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></template>;
 
 export interface TopbarSignature {
   Args: {
@@ -20,6 +24,9 @@ export interface TopbarSignature {
 
 export default class AtelierTopbar extends Component<TopbarSignature> {
   @service declare designStore: DesignStoreService;
+  @service declare authService: AuthService;
+
+  @tracked showUserDropdown: boolean = false;
 
   onFileNameChange = (e: Event) => {
     this.designStore.fileName = (e.target as HTMLInputElement).value || "Untitled";
@@ -31,6 +38,16 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
 
   toggleSnap = () => {
     this.designStore.snapToGrid = !this.designStore.snapToGrid;
+  };
+
+  toggleUserDropdown = () => {
+    this.showUserDropdown = !this.showUserDropdown;
+  };
+
+  signOut = async () => {
+    this.showUserDropdown = false;
+    await this.authService.signOut();
+    window.location.hash = "#/";
   };
 
   <template>
@@ -98,6 +115,32 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
           <IconSparkles />
           AI Generate
         </button>
+
+        {{#if this.authService.isAuthenticated}}
+          <div class="topbar-separator"></div>
+          <div class="topbar-user-wrapper">
+            <button class="topbar-user-btn" type="button" {{on "click" this.toggleUserDropdown}}>
+              {{#if this.authService.photoURL}}
+                <img class="topbar-user-avatar" src={{this.authService.photoURL}} alt="avatar" />
+              {{else}}
+                <span class="topbar-user-initials">{{this.authService.initials}}</span>
+              {{/if}}
+            </button>
+            {{#if this.showUserDropdown}}
+              <div class="topbar-user-dropdown">
+                <div class="topbar-user-dropdown-header">
+                  <div class="topbar-user-dropdown-name">{{this.authService.displayName}}</div>
+                  <div class="topbar-user-dropdown-email">{{this.authService.email}}</div>
+                </div>
+                <div class="topbar-user-dropdown-divider"></div>
+                <button class="topbar-user-dropdown-item" type="button" {{on "click" this.signOut}}>
+                  <IconSignOut />
+                  Sign out
+                </button>
+              </div>
+            {{/if}}
+          </div>
+        {{/if}}
       </div>
     </div>
   </template>

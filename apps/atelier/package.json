@@ -67,7 +67,8 @@
   },
   "dependencies": {
     "@ember/string": "^4.0.1",
-    "ember-modifier": "^4.2.2"
+    "ember-modifier": "^4.2.2",
+    "firebase": "^12.11.0"
   },
   "ember": {
     "edition": "octane"
