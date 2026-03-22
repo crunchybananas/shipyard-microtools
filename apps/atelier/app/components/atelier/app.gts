@@ -171,6 +171,10 @@ export default class AtelierApp extends Component {
     this.designStore.showAiModal = true;
   };
 
+  openShareModal = () => {
+    this.designStore.showShareModal = true;
+  };
+
   // ---- Toast ----
 
   showToast = (message: string) => {
@@ -193,6 +197,7 @@ export default class AtelierApp extends Component {
       <AtelierTopbar
         @onOpenExport={{this.openExport}}
         @onOpenAiModal={{this.openAiModal}}
+        @onOpenShareModal={{this.openShareModal}}
       />
 
       <AtelierLayersPanel />

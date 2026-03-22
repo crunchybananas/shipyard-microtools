@@ -1,13 +1,18 @@
 import Service, { inject as service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
 import type AuthService from "atelier/services/auth-service";
+import type OrgService from "atelier/services/org-service";
 import type { DesignElement } from "atelier/services/design-store";
 import {
   listProjects as fsListProjects,
+  listSharedProjects as fsListSharedProjects,
   getProject as fsGetProject,
   createProject as fsCreateProject,
   saveProject as fsSaveProject,
   deleteProject as fsDeleteProject,
+  shareProject as fsShareProject,
+  unshareProject as fsUnshareProject,
+  getProjectCollaborators as fsGetProjectCollaborators,
 } from "atelier/utils/firestore-adapter";
 
 export interface Project {
@@ -16,6 +21,9 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   elementCount: number;
+  orgId?: string | null;
+  ownerId?: string;
+  collaboratorEmails?: string[];
 }
 
 const STORAGE_KEY = "atelier-projects";
@@ -47,10 +55,13 @@ const SEED_PROJECTS: Project[] = [
 
 export default class ProjectStoreService extends Service {
   @service declare authService: AuthService;
+  @service declare orgService: OrgService;
 
   @tracked projects: Project[] = [];
+  @tracked sharedProjects: Project[] = [];
   @tracked currentProjectId: string | null = null;
   @tracked isSyncing: boolean = false;
+  @tracked activeTab: "my" | "shared" = "my";
 
   private _migrated = false;
 
@@ -112,7 +123,9 @@ export default class ProjectStoreService extends Service {
           await this.migrateLocalToFirestore();
           this._migrated = true;
         }
-        const firestoreProjects = await fsListProjects(this.authService.uid);
+
+        const orgId = this.orgService.activeOrgId;
+        const firestoreProjects = await fsListProjects(this.authService.uid, orgId);
         this.projects = firestoreProjects;
       } catch (e) {
         console.error("Failed to load projects from Firestore:", e);
@@ -126,19 +139,36 @@ export default class ProjectStoreService extends Service {
     }
   }
 
+  async loadSharedProjects(): Promise<void> {
+    if (!this.authService.isAuthenticated || !this.authService.email) {
+      this.sharedProjects = [];
+      return;
+    }
+
+    try {
+      const shared = await fsListSharedProjects(this.authService.email);
+      this.sharedProjects = shared;
+    } catch (e) {
+      console.error("Failed to load shared projects:", e);
+      this.sharedProjects = [];
+    }
+  }
+
   async createProject(name?: string): Promise<Project> {
     const projectName = name || "Untitled Project";
 
     if (this.authService.isAuthenticated && this.authService.uid) {
       this.isSyncing = true;
       try {
-        const id = await fsCreateProject(this.authService.uid, projectName);
+        const orgId = this.orgService.activeOrgId;
+        const id = await fsCreateProject(this.authService.uid, projectName, [], orgId);
         const project: Project = {
           id,
           name: projectName,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           elementCount: 0,
+          orgId,
         };
         this.projects = [project, ...this.projects];
         return project;
@@ -182,7 +212,7 @@ export default class ProjectStoreService extends Service {
   }
 
   getProject(id: string): Project | undefined {
-    return this.projects.find((p) => p.id === id);
+    return this.projects.find((p) => p.id === id) ?? this.sharedProjects.find((p) => p.id === id);
   }
 
   updateProject(id: string, updates: Partial<Project>): void {
@@ -223,6 +253,33 @@ export default class ProjectStoreService extends Service {
       }
     } else {
       this.setLocalElements(id, elements);
+    }
+  }
+
+  // --- Sharing ---
+
+  async shareProject(projectId: string, email: string): Promise<void> {
+    try {
+      await fsShareProject(projectId, email);
+    } catch (e) {
+      console.error("Failed to share project:", e);
+    }
+  }
+
+  async unshareProject(projectId: string, email: string): Promise<void> {
+    try {
+      await fsUnshareProject(projectId, email);
+    } catch (e) {
+      console.error("Failed to unshare project:", e);
+    }
+  }
+
+  async getProjectCollaborators(projectId: string): Promise<string[]> {
+    try {
+      return await fsGetProjectCollaborators(projectId);
+    } catch (e) {
+      console.error("Failed to get collaborators:", e);
+      return [];
     }
   }
 

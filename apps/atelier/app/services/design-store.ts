@@ -86,6 +86,7 @@ export default class DesignStoreService extends Service {
   @tracked isResizing: boolean = false;
   @tracked isDrawing: boolean = false;
   @tracked showExportModal: boolean = false;
+  @tracked showShareModal: boolean = false;
   @tracked fileName: string = "Untitled";
   @tracked showColorPicker: boolean = false;
   @tracked colorPickerTarget: "fill" | "stroke" = "fill";

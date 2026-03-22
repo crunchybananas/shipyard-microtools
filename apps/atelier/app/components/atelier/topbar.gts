@@ -14,11 +14,20 @@ import {
 } from "atelier/components/atelier/icons";
 
 const IconSignOut = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></template>;
+const IconShare = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></template>;
+
+// Mock presence avatars data
+const MOCK_PRESENCE = [
+  { initials: "CL", color: "#818cf8", name: "Cory Loken" },
+  { initials: "AJ", color: "#f472b6", name: "Alex Johnson" },
+  { initials: "MK", color: "#4ade80", name: "Maria Kim" },
+];
 
 export interface TopbarSignature {
   Args: {
     onOpenExport: () => void;
     onOpenAiModal: () => void;
+    onOpenShareModal?: () => void;
   };
 }
 
@@ -49,6 +58,16 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
     await this.authService.signOut();
     window.location.hash = "#/";
   };
+
+  openShareModal = () => {
+    if (this.args.onOpenShareModal) {
+      this.args.onOpenShareModal();
+    }
+  };
+
+  get presenceAvatars() {
+    return MOCK_PRESENCE;
+  }
 
   <template>
     <div class="topbar">
@@ -117,6 +136,27 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
         </button>
 
         {{#if this.authService.isAuthenticated}}
+          <div class="topbar-separator"></div>
+
+          {{! Presence Avatars }}
+          <div class="topbar-presence">
+            {{#each this.presenceAvatars as |user|}}
+              <div
+                class="topbar-presence-avatar"
+                style="background: {{user.color}}"
+                title={{user.name}}
+              >
+                {{user.initials}}
+              </div>
+            {{/each}}
+          </div>
+
+          {{! Share Button }}
+          <button class="topbar-btn topbar-share-btn" type="button" {{on "click" this.openShareModal}}>
+            <IconShare />
+            Share
+          </button>
+
           <div class="topbar-separator"></div>
           <div class="topbar-user-wrapper">
             <button class="topbar-user-btn" type="button" {{on "click" this.toggleUserDropdown}}>

@@ -8,4 +8,5 @@ export default class Router extends EmberRouter {
 
 Router.map(function () {
   this.route('editor', { path: '/editor/:project_id' });
+  this.route('org-settings', { path: '/org/:org_id/settings' });
 });
