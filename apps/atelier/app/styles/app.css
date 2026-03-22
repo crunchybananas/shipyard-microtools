@@ -1903,6 +1903,34 @@ html, body {
 .ph-section-count {
   font-size: 13px;
   color: var(--text-dim);
+  margin-left: auto;
+}
+
+.ph-org-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-left: 12px;
+}
+
+.ph-org-settings-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.ph-org-settings-btn svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* Projects Grid */
