@@ -83,15 +83,15 @@ export async function listProjects(userId: string, orgId?: string | null): Promi
       orderBy("updatedAt", "desc"),
     );
   } else {
+    // Personal workspace: get user's own projects, filter out org projects client-side
     q = query(
       collection(db, "projects"),
       where("ownerId", "==", userId),
-      where("orgId", "==", null),
       orderBy("updatedAt", "desc"),
     );
   }
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((docSnap) => {
+  let results = snapshot.docs.map((docSnap) => {
     const data = docSnap.data() as FirestoreProjectDoc;
     return {
       id: docSnap.id,
@@ -105,6 +105,11 @@ export async function listProjects(userId: string, orgId?: string | null): Promi
       collaboratorEmails: data.collaboratorEmails ?? [],
     };
   });
+  // For personal workspace, filter out org projects client-side
+  if (!orgId) {
+    results = results.filter((p) => !p.orgId);
+  }
+  return results;
 }
 
 export async function listSharedProjects(email: string): Promise<FirestoreProject[]> {
