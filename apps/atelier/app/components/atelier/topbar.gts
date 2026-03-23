@@ -4,6 +4,7 @@ import { on } from "@ember/modifier";
 import { inject as service } from "@ember/service";
 import type DesignStoreService from "atelier/services/design-store";
 import type AuthService from "atelier/services/auth-service";
+import type RouterService from "@ember/routing/router-service";
 import {
   IconSparkles,
   IconUndo,
@@ -28,11 +29,16 @@ export interface TopbarSignature {
 export default class AtelierTopbar extends Component<TopbarSignature> {
   @service declare designStore: DesignStoreService;
   @service declare authService: AuthService;
+  @service declare router: RouterService;
 
   @tracked showUserDropdown: boolean = false;
 
   onFileNameChange = (e: Event) => {
     this.designStore.fileName = (e.target as HTMLInputElement).value || "Untitled";
+  };
+
+  goHome = () => {
+    this.router.transitionTo('index');
   };
 
   toggleGrid = () => {
@@ -50,7 +56,7 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
   signOut = async () => {
     this.showUserDropdown = false;
     await this.authService.signOut();
-    window.location.hash = "#/";
+    this.router.transitionTo('index');
   };
 
   openShareModal = () => {
@@ -62,9 +68,9 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
 
   <template>
     <div class="topbar">
-      <a href="#/" class="topbar-back" title="All Projects">
+      <button class="topbar-back" type="button" title="All Projects" {{on "click" this.goHome}}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      </a>
+      </button>
       <div class="topbar-logo">
         <IconSparkles />
         Atelier

@@ -2,6 +2,8 @@ import Service, { inject as service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
 import type ProjectStoreService from "atelier/services/project-store";
 import type AuthService from "atelier/services/auth-service";
+import { generateEmberComponent, generateEmberComponentTailwind } from "atelier/utils/export-ember-component";
+import type TokenRegistryService from "atelier/services/token-registry";
 
 export interface Point {
   x: number;
@@ -69,6 +71,7 @@ function generateId(): string {
 export default class DesignStoreService extends Service {
   @service declare projectStore: ProjectStoreService;
   @service declare authService: AuthService;
+  @service declare tokenRegistry: TokenRegistryService;
 
   @tracked elements: DesignElement[] = [];
   @tracked selectedIds: string[] = [];
@@ -86,6 +89,7 @@ export default class DesignStoreService extends Service {
   @tracked isResizing: boolean = false;
   @tracked isDrawing: boolean = false;
   @tracked showExportModal: boolean = false;
+  @tracked exportFormat: "svg" | "ember" | "tailwind" = "svg";
   @tracked showShareModal: boolean = false;
   @tracked fileName: string = "Untitled";
   @tracked showColorPicker: boolean = false;
@@ -655,6 +659,14 @@ export default class DesignStoreService extends Service {
 
     svg += "</svg>";
     return svg;
+  }
+
+  exportEmberComponent(): string {
+    return generateEmberComponent(this.elements, this.fileName);
+  }
+
+  exportEmberComponentTailwind(): string {
+    return generateEmberComponentTailwind(this.elements, this.fileName, this.tokenRegistry);
   }
 
   clearCanvas(): void {

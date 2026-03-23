@@ -14,7 +14,13 @@ const IconTrash = <template><svg viewBox="0 0 24 24" fill="none" stroke="current
 const IconUserPlus = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></template>;
 const IconX = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></template>;
 
-export default class AtelierOrgSettings extends Component {
+export interface OrgSettingsSignature {
+  Args: {
+    orgId: string;
+  };
+}
+
+export default class AtelierOrgSettings extends Component<OrgSettingsSignature> {
   @service declare orgService: OrgService;
   @service declare authService: AuthService;
   @service declare router: RouterService;
@@ -26,10 +32,7 @@ export default class AtelierOrgSettings extends Component {
   @tracked showDeleteConfirm: boolean = false;
 
   get orgId(): string {
-    // Extract org_id from URL hash
-    const hash = window.location.hash;
-    const match = hash.match(/\/org\/([^/]+)\/settings/);
-    return match?.[1] ?? "";
+    return this.args.orgId ?? "";
   }
 
   get org() {
@@ -53,7 +56,7 @@ export default class AtelierOrgSettings extends Component {
   }
 
   goBack = () => {
-    window.location.hash = "#/";
+    this.router.transitionTo('index');
   };
 
   // Name editing
@@ -119,7 +122,7 @@ export default class AtelierOrgSettings extends Component {
   confirmDelete = async () => {
     if (!this.orgId) return;
     await this.orgService.deleteOrganization(this.orgId);
-    window.location.hash = "#/";
+    this.router.transitionTo('index');
   };
 
   getRoleBadgeClass = (role: string): string => {

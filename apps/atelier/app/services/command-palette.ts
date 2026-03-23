@@ -1,6 +1,7 @@
 import Service from "@ember/service";
 import { inject as service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
+import type RouterService from "@ember/routing/router-service";
 import type DesignStoreService from "./design-store";
 
 export interface Command {
@@ -13,6 +14,7 @@ export interface Command {
 
 export default class CommandPaletteService extends Service {
   @service declare designStore: DesignStoreService;
+  @service declare router: RouterService;
 
   @tracked isOpen: boolean = false;
   @tracked query: string = "";
@@ -51,9 +53,11 @@ export default class CommandPaletteService extends Service {
       // AI
       { id: "ai-generate", label: "AI Generate Design", shortcut: "", category: "AI", action: () => { this.designStore.showAiModal = true; } },
       // File
-      { id: "file-export", label: "Export Design", shortcut: "", category: "File", action: () => { this.designStore.showExportModal = true; } },
+      { id: "file-export", label: "Export Design", shortcut: "", category: "File", action: () => { this.designStore.exportFormat = "svg"; this.designStore.showExportModal = true; } },
+      { id: "file-export-ember", label: "Export as Ember Component", shortcut: "", category: "File", action: () => { this.designStore.exportFormat = "ember"; this.designStore.showExportModal = true; } },
+      { id: "file-export-tailwind", label: "Export with Tailwind CSS", shortcut: "", category: "File", action: () => { this.designStore.exportFormat = "tailwind"; this.designStore.showExportModal = true; } },
       { id: "file-clear", label: "Clear Canvas", shortcut: "", category: "File", action: () => { this.designStore.clearCanvas(); } },
-      { id: "file-home", label: "Back to Projects", shortcut: "", category: "File", action: () => { window.location.hash = "#/"; } },
+      { id: "file-home", label: "Back to Projects", shortcut: "", category: "File", action: () => { this.router.transitionTo('index'); } },
     ];
   }
 

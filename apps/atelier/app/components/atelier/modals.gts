@@ -8,6 +8,7 @@ import type DesignStoreService from "atelier/services/design-store";
 import type AiServiceService from "atelier/services/ai-service";
 import type CommandPaletteService from "atelier/services/command-palette";
 import type ProjectStoreService from "atelier/services/project-store";
+import type TokenRegistryService from "atelier/services/token-registry";
 import type { DesignElement } from "atelier/services/design-store";
 import {
   IconSparkles,
@@ -39,8 +40,12 @@ export default class AtelierModals extends Component<ModalsSignature> {
   @service declare aiService: AiServiceService;
   @service declare commandPalette: CommandPaletteService;
   @service declare projectStore: ProjectStoreService;
+  @service declare tokenRegistry: TokenRegistryService;
 
   @tracked aiPrompt: string = "";
+  @tracked tokenConfigInput: string = "";
+  @tracked tokenImportMessage: string = "";
+  @tracked showTokenConfig: boolean = false;
   @tracked shareEmail: string = "";
   @tracked shareRole: string = "editor";
   @tracked shareCollaborators: string[] = [];
@@ -78,6 +83,7 @@ export default class AtelierModals extends Component<ModalsSignature> {
 
   closeExport = () => {
     this.designStore.showExportModal = false;
+    this.designStore.exportFormat = "svg";
   };
 
   downloadSVG = () => {
@@ -102,6 +108,101 @@ export default class AtelierModals extends Component<ModalsSignature> {
   get svgContent(): string {
     return this.designStore.exportSVG();
   }
+
+  // Export format tabs
+  get isSvgExport(): boolean {
+    return this.designStore.exportFormat === "svg";
+  }
+
+  get isEmberExport(): boolean {
+    return this.designStore.exportFormat === "ember";
+  }
+
+  get isTailwindExport(): boolean {
+    return this.designStore.exportFormat === "tailwind";
+  }
+
+  get isComponentExport(): boolean {
+    return this.isEmberExport || this.isTailwindExport;
+  }
+
+  setExportSvg = () => {
+    this.designStore.exportFormat = "svg";
+  };
+
+  setExportEmber = () => {
+    this.designStore.exportFormat = "ember";
+  };
+
+  setExportTailwind = () => {
+    this.designStore.exportFormat = "tailwind";
+  };
+
+  get emberComponentContent(): string {
+    return this.designStore.exportEmberComponent();
+  }
+
+  get tailwindComponentContent(): string {
+    return this.designStore.exportEmberComponentTailwind();
+  }
+
+  get activeComponentContent(): string {
+    return this.isTailwindExport ? this.tailwindComponentContent : this.emberComponentContent;
+  }
+
+  get activeExportLabel(): string {
+    return this.isTailwindExport ? "Tailwind" : "Ember";
+  }
+
+  downloadComponent = () => {
+    const content = this.activeComponentContent;
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeName = this.designStore.fileName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "component";
+    a.download = `${safeName}.gts`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.designStore.showExportModal = false;
+    this.args.onShowToast(`Exported ${this.activeExportLabel} component`);
+  };
+
+  copyComponent = () => {
+    const content = this.activeComponentContent;
+    navigator.clipboard.writeText(content);
+    this.args.onShowToast(`${this.activeExportLabel} component copied to clipboard`);
+  };
+
+  // ---- Token Config Import ----
+
+  toggleTokenConfig = () => {
+    this.showTokenConfig = !this.showTokenConfig;
+    this.tokenImportMessage = "";
+  };
+
+  onTokenConfigInput = (e: Event) => {
+    this.tokenConfigInput = (e.target as HTMLTextAreaElement).value;
+  };
+
+  importTokenConfig = () => {
+    if (!this.tokenConfigInput.trim()) return;
+    const result = this.tokenRegistry.importFromJSON(this.tokenConfigInput);
+    this.tokenImportMessage = result.message;
+    if (result.success) {
+      this.tokenConfigInput = "";
+      setTimeout(() => {
+        this.tokenImportMessage = "";
+        this.showTokenConfig = false;
+      }, 2000);
+    }
+  };
+
+  clearCustomTokens = () => {
+    this.tokenRegistry.clearCustomTokens();
+    this.tokenImportMessage = "Custom tokens cleared";
+    setTimeout(() => { this.tokenImportMessage = ""; }, 2000);
+  };
 
   // ---- Share Modal ----
 
@@ -480,16 +581,92 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
               <IconX />
             </button>
           </div>
-          <div class="export-preview">
-            <pre>{{this.svgContent}}</pre>
-          </div>
-          <div class="export-modal-footer">
-            <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
-            <button class="export-btn" type="button" {{on "click" this.copySVG}}>Copy SVG</button>
-            <button class="export-btn primary" type="button" {{on "click" this.downloadSVG}}>
-              <IconDownload /> Download SVG
+
+          <div class="export-tabs">
+            <button
+              class="export-tab {{if this.isSvgExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportSvg}}
+            >
+              SVG
+            </button>
+            <button
+              class="export-tab {{if this.isEmberExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportEmber}}
+            >
+              Ember
+            </button>
+            <button
+              class="export-tab {{if this.isTailwindExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportTailwind}}
+            >
+              Tailwind
             </button>
           </div>
+
+          {{#if this.isSvgExport}}
+            <div class="export-preview">
+              <pre>{{this.svgContent}}</pre>
+            </div>
+            <div class="export-modal-footer">
+              <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
+              <button class="export-btn" type="button" {{on "click" this.copySVG}}>Copy SVG</button>
+              <button class="export-btn primary" type="button" {{on "click" this.downloadSVG}}>
+                <IconDownload /> Download SVG
+              </button>
+            </div>
+          {{else}}
+            {{! Tailwind token config toggle }}
+            {{#if this.isTailwindExport}}
+              <div class="export-token-bar">
+                <button class="export-token-toggle" type="button" {{on "click" this.toggleTokenConfig}}>
+                  {{if this.showTokenConfig "Hide" "Import"}} Tailwind Config
+                </button>
+                {{#if this.tokenRegistry.hasCustomTokens}}
+                  <span class="export-token-badge">Custom tokens active</span>
+                  <button class="export-token-clear" type="button" {{on "click" this.clearCustomTokens}}>Clear</button>
+                {{/if}}
+              </div>
+
+              {{#if this.showTokenConfig}}
+                <div class="export-token-config">
+                  <textarea
+                    class="export-token-textarea"
+                    placeholder='Paste your Tailwind theme config as JSON:
+{
+  "colors": {
+    "brand": { "50": "#fef2f2", "500": "#ef4444" },
+    "accent": "#818cf8"
+  },
+  "borderRadius": { "card": "12px" },
+  "fontSize": { "hero": "48px" }
+}'
+                    value={{this.tokenConfigInput}}
+                    {{on "input" this.onTokenConfigInput}}
+                  ></textarea>
+                  {{#if this.tokenImportMessage}}
+                    <div class="export-token-message">{{this.tokenImportMessage}}</div>
+                  {{/if}}
+                  <button class="export-btn primary" type="button" {{on "click" this.importTokenConfig}}>
+                    Import Tokens
+                  </button>
+                </div>
+              {{/if}}
+            {{/if}}
+
+            <div class="export-preview export-preview-code">
+              <pre>{{this.activeComponentContent}}</pre>
+            </div>
+            <div class="export-modal-footer">
+              <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
+              <button class="export-btn" type="button" {{on "click" this.copyComponent}}>Copy .gts</button>
+              <button class="export-btn primary" type="button" {{on "click" this.downloadComponent}}>
+                <IconDownload /> Download .gts
+              </button>
+            </div>
+          {{/if}}
         </div>
       </div>
     {{/if}}

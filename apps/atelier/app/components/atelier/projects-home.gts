@@ -7,6 +7,7 @@ import type ProjectStoreService from "atelier/services/project-store";
 import type { Project } from "atelier/services/project-store";
 import type AuthService from "atelier/services/auth-service";
 import type OrgService from "atelier/services/org-service";
+import type RouterService from "@ember/routing/router-service";
 
 const IconSparkles = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/><path d="M19 15l.5 2 2 .5-2 .5-.5 2-.5-2-2-.5 2-.5.5-2z"/></svg></template>;
 const IconPlus = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></template>;
@@ -26,6 +27,7 @@ export default class ProjectsHome extends Component {
   @service declare projectStore: ProjectStoreService;
   @service declare authService: AuthService;
   @service declare orgService: OrgService;
+  @service declare router: RouterService;
 
   @tracked searchQuery: string = "";
   @tracked authMode: "signin" | "signup" = "signin";
@@ -100,11 +102,11 @@ export default class ProjectsHome extends Component {
 
   createNewProject = async () => {
     const project = await this.projectStore.createProject();
-    window.location.hash = `#/editor/${project.id}`;
+    this.router.transitionTo('editor', project.id);
   };
 
   openProject = (id: string) => {
-    window.location.hash = `#/editor/${id}`;
+    this.router.transitionTo('editor', id);
   };
 
   deleteProject = async (id: string, e: MouseEvent) => {
@@ -125,7 +127,7 @@ export default class ProjectsHome extends Component {
     } catch {
       // ignore
     }
-    window.location.hash = `#/editor/${project.id}`;
+    this.router.transitionTo('editor', project.id);
   };
 
   // Workspace switcher
@@ -154,13 +156,13 @@ export default class ProjectsHome extends Component {
   openOrgSettings = (orgId: string, e: MouseEvent) => {
     e.stopPropagation();
     this.showWorkspaceSwitcher = false;
-    window.location.hash = `#/org/${orgId}/settings`;
+    this.router.transitionTo('org-settings', orgId);
   };
 
   goToOrgSettings = () => {
     const orgId = this.orgService.activeOrgId;
     if (orgId) {
-      window.location.hash = `#/org/${orgId}/settings`;
+      this.router.transitionTo('org-settings', orgId);
     }
   };
 

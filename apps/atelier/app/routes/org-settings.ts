@@ -1,9 +1,11 @@
 import Route from "@ember/routing/route";
 import { inject as service } from "@ember/service";
+import type RouterService from "@ember/routing/router-service";
 import type OrgService from "atelier/services/org-service";
 import type AuthService from "atelier/services/auth-service";
 
 export default class OrgSettingsRoute extends Route {
+  @service declare router: RouterService;
   @service declare orgService: OrgService;
   @service declare authService: AuthService;
 
@@ -11,7 +13,7 @@ export default class OrgSettingsRoute extends Route {
     await this.authService.authReady;
 
     if (!this.authService.isAuthenticated) {
-      window.location.hash = "#/";
+      this.router.transitionTo('index');
       return null;
     }
 

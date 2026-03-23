@@ -164,6 +164,7 @@ export default class AtelierApp extends Component {
   // ---- Export / AI modal openers ----
 
   openExport = () => {
+    this.designStore.exportFormat = "svg";
     this.designStore.showExportModal = true;
   };
 
