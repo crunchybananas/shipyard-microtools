@@ -3,26 +3,26 @@
    ======================================== */
 
 :root {
-  --bg-darkest: #0a0a1a;
-  --bg-dark: #111127;
-  --bg-panel: #1a1a36;
-  --bg-surface: #222244;
-  --bg-hover: #2a2a52;
-  --bg-active: #323264;
-  --border: #2a2a4a;
-  --border-light: #3a3a5a;
+  --bg-darkest: #0a0a0e;
+  --bg-dark: #111116;
+  --bg-panel: #1a1a1f;
+  --bg-surface: #222228;
+  --bg-hover: #2a2a32;
+  --bg-active: #32323c;
+  --border: #2a2a32;
+  --border-light: #3a3a44;
   --text: #e4e4e7;
   --text-muted: #a1a1aa;
   --text-dim: #71717a;
   --text-faint: #52525b;
-  --accent: #818cf8;
-  --accent-hover: #6366f1;
-  --accent-dim: #312e81;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-dim: #064e3b;
   --danger: #f87171;
   --success: #4ade80;
   --warning: #fbbf24;
-  --canvas-bg: #1e1e2e;
-  --selection: #818cf8;
+  --canvas-bg: #18181e;
+  --selection: #10b981;
   --handle-size: 8px;
 }
 
@@ -827,14 +827,14 @@ html, body {
 }
 
 .marquee-rect {
-  fill: rgba(129, 140, 248, 0.08);
+  fill: rgba(16, 185, 129, 0.08);
   stroke: var(--accent);
   stroke-width: 1;
   stroke-dasharray: 4 4;
 }
 
 .draw-preview {
-  fill: rgba(129, 140, 248, 0.15);
+  fill: rgba(16, 185, 129, 0.15);
   stroke: var(--accent);
   stroke-width: 1.5;
   stroke-dasharray: 6 3;
@@ -964,7 +964,7 @@ html, body {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1454,7 +1454,7 @@ html, body {
   height: 64px;
   margin: 0 auto 16px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1782,15 +1782,15 @@ html, body {
   background: rgba(26, 26, 54, 0.85);
   backdrop-filter: blur(20px) saturate(1.5);
   -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid rgba(129, 140, 248, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(129, 140, 248, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(16, 185, 129, 0.05);
   transition: border-color 0.2s;
 }
 
 .ai-prompt-bar-inner:focus-within {
-  border-color: rgba(129, 140, 248, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(129, 140, 248, 0.08);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.08);
 }
 
 .ai-prompt-input {
@@ -1831,8 +1831,8 @@ html, body {
 }
 
 .ai-prompt-chip:hover {
-  background: rgba(129, 140, 248, 0.1);
-  border-color: rgba(129, 140, 248, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
   color: var(--accent);
 }
 
@@ -1894,7 +1894,7 @@ html, body {
 }
 
 .format-toggle-btn.active {
-  background: rgba(129, 140, 248, 0.2);
+  background: rgba(16, 185, 129, 0.2);
   color: var(--accent);
 }
 
@@ -1918,7 +1918,7 @@ html, body {
   background: rgba(26, 26, 54, 0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(129, 140, 248, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   animation: slideUp 0.2s ease-out;
@@ -2005,7 +2005,7 @@ html, body {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2041,7 +2041,7 @@ html, body {
 .ph-btn-primary:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(129, 140, 248, 0.3);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
 }
 
 .ph-btn-primary svg {
@@ -2138,7 +2138,7 @@ html, body {
 .ph-search-input:focus {
   border-color: var(--accent);
   background: var(--bg-panel);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .ph-search-input::placeholder {
@@ -2333,7 +2333,7 @@ html, body {
 
 .ph-card-new:hover {
   border-color: var(--accent);
-  background: rgba(129, 140, 248, 0.05);
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .ph-card-new-icon {
@@ -2386,7 +2386,7 @@ html, body {
 .ph-example-card:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(129, 140, 248, 0.1);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
 }
 
 .ph-example-preview {
@@ -2834,7 +2834,7 @@ html, body {
 }
 
 .chat-assistant .chat-avatar {
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   color: white;
 }
 
@@ -2848,7 +2848,7 @@ html, body {
 
 .chat-user .chat-bubble {
   background: var(--accent-dim);
-  border-color: rgba(129, 140, 248, 0.2);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .chat-content {
@@ -3007,7 +3007,7 @@ html, body {
   border-radius: 16px;
   overflow: hidden;
   z-index: 2001;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(129, 140, 248, 0.1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(16, 185, 129, 0.1);
   animation: slideUp 0.15s ease-out;
 }
 
@@ -3146,8 +3146,8 @@ html, body {
 }
 
 .model-selector-btn:hover {
-  background: rgba(129, 140, 248, 0.1);
-  border-color: rgba(129, 140, 248, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
   color: var(--accent);
 }
 
@@ -3241,7 +3241,7 @@ html, body {
 }
 
 .ai-prompt-voice.recording {
-  background: rgba(129, 140, 248, 0.2);
+  background: rgba(16, 185, 129, 0.2);
   color: #a78bfa;
   animation: voice-pulse 1.5s ease-in-out infinite;
 }
@@ -3258,11 +3258,11 @@ html, body {
 
 @keyframes voice-pulse {
   0%, 100% {
-    background: rgba(129, 140, 248, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.3);
   }
   50% {
-    background: rgba(129, 140, 248, 0.35);
+    background: rgba(16, 185, 129, 0.35);
     box-shadow: 0 0 12px 2px rgba(167, 139, 250, 0.25);
   }
 }
@@ -3384,7 +3384,7 @@ html, body {
 
 .ph-auth-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .ph-auth-input::placeholder {
@@ -3417,7 +3417,7 @@ html, body {
 .ph-auth-submit:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(129, 140, 248, 0.3);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 
 .ph-auth-toggle {
@@ -3712,7 +3712,7 @@ html, body {
 }
 
 .ws-org-icon {
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -3924,7 +3924,7 @@ html, body {
 
 .create-org-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .create-org-input::placeholder {
@@ -4142,7 +4142,7 @@ html, body {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4173,7 +4173,7 @@ html, body {
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   color: #fff;
   font-size: 22px;
   font-weight: 700;
@@ -4374,9 +4374,9 @@ html, body {
 }
 
 .os-role-editor {
-  background: rgba(129, 140, 248, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: #818cf8;
-  border: 1px solid rgba(129, 140, 248, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .os-role-viewer {
@@ -4954,8 +4954,8 @@ html, body {
 .mk-hero-badge {
   display: inline-block;
   padding: 6px 16px;
-  background: rgba(129, 140, 248, 0.15);
-  border: 1px solid rgba(129, 140, 248, 0.3);
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 20px;
   color: var(--accent);
   font-size: 13px;
@@ -4974,7 +4974,7 @@ html, body {
 }
 
 .mk-hero-accent {
-  background: linear-gradient(135deg, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #10b981, #06b6d4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -5008,9 +5008,9 @@ html, body {
 }
 
 .mk-cta-primary:hover {
-  background: #6366f1;
+  background: #059669;
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(129, 140, 248, 0.3);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
 }
 
 .mk-cta-secondary {
@@ -5105,15 +5105,15 @@ html, body {
 }
 
 .mk-feature-highlight {
-  border-color: rgba(129, 140, 248, 0.3);
-  background: rgba(129, 140, 248, 0.05);
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .mk-feature-icon {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: rgba(129, 140, 248, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -5163,8 +5163,8 @@ html, body {
 
 .mk-price-featured {
   border-color: var(--accent);
-  background: rgba(129, 140, 248, 0.05);
-  box-shadow: 0 0 40px rgba(129, 140, 248, 0.1);
+  background: rgba(16, 185, 129, 0.05);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
 }
 
 .mk-price-badge {
@@ -5245,6 +5245,6 @@ html, body {
 }
 
 .mk-price-cta-primary:hover {
-  background: #6366f1;
-  border-color: #6366f1;
+  background: #059669;
+  border-color: #059669;
 }
