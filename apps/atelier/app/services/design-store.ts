@@ -3,6 +3,8 @@ import { tracked } from "@glimmer/tracking";
 import type ProjectStoreService from "atelier/services/project-store";
 import type AuthService from "atelier/services/auth-service";
 import { generateEmberComponent, generateEmberComponentTailwind } from "atelier/utils/export-ember-component";
+import { generateReactComponent } from "atelier/utils/export-react-component";
+import { generateSwiftUIView } from "atelier/utils/export-swiftui";
 import type TokenRegistryService from "atelier/services/token-registry";
 
 export interface Point {
@@ -41,6 +43,8 @@ export interface DesignElement {
   lineType?: "solid" | "dashed" | "arrow" | "arrow-both";
   // image-specific
   imageUrl?: string;
+  // semantic role for export
+  elementRole?: "auto" | "button" | "link" | "input" | "container" | "heading" | "image";
   // shadow
   shadowColor?: string;
   shadowBlur?: number;
@@ -89,7 +93,7 @@ export default class DesignStoreService extends Service {
   @tracked isResizing: boolean = false;
   @tracked isDrawing: boolean = false;
   @tracked showExportModal: boolean = false;
-  @tracked exportFormat: "svg" | "ember" | "tailwind" = "svg";
+  @tracked exportFormat: "svg" | "ember" | "tailwind" | "react" | "swiftui" = "svg";
   @tracked showShareModal: boolean = false;
   @tracked fileName: string = "Untitled";
   @tracked showColorPicker: boolean = false;
@@ -667,6 +671,14 @@ export default class DesignStoreService extends Service {
 
   exportEmberComponentTailwind(): string {
     return generateEmberComponentTailwind(this.elements, this.fileName, this.tokenRegistry);
+  }
+
+  exportReactComponent(): string {
+    return generateReactComponent(this.elements, this.fileName, this.tokenRegistry);
+  }
+
+  exportSwiftUIView(): string {
+    return generateSwiftUIView(this.elements, this.fileName);
   }
 
   clearCanvas(): void {

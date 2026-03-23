@@ -105,6 +105,10 @@ export default class ProjectsHome extends Component {
     this.router.transitionTo('editor', project.id);
   };
 
+  scrollToFeatures = () => {
+    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   openProject = (id: string) => {
     this.router.transitionTo('editor', id);
   };
@@ -120,6 +124,10 @@ export default class ProjectsHome extends Component {
       "landing": "Landing Page",
       "mobile": "Mobile App",
       "dashboard": "Dashboard",
+      "pricing": "Pricing Page",
+      "signup": "Signup Form",
+      "ecommerce": "Product Page",
+      "blog": "Blog Layout",
     };
     const project = await this.projectStore.createProject(names[type] || "New Project");
     try {
@@ -385,16 +393,134 @@ export default class ProjectsHome extends Component {
       </nav>
 
       {{! Hero Section }}
-      <div class="ph-hero">
-        <div class="ph-hero-content">
-          <h1 class="ph-hero-title">
-            Welcome to <span class="ph-hero-accent">Atelier</span>
-          </h1>
-          <p class="ph-hero-subtitle">
-            Design beautiful interfaces with AI-powered generation. Start from scratch or pick a template below.
-          </p>
+      {{#if this.authService.isAuthenticated}}
+        <div class="ph-hero">
+          <div class="ph-hero-content">
+            <h1 class="ph-hero-title">
+              Welcome to <span class="ph-hero-accent">Atelier</span>
+            </h1>
+            <p class="ph-hero-subtitle">
+              Design beautiful interfaces with AI-powered generation. Start from scratch or pick a template below.
+            </p>
+          </div>
         </div>
-      </div>
+      {{else}}
+        {{! Marketing Landing Page }}
+        <div class="mk-hero">
+          <div class="mk-hero-badge">AI-native design tool</div>
+          <h1 class="mk-hero-title">
+            Design at the speed<br/>of <span class="mk-hero-accent">thought</span>
+          </h1>
+          <p class="mk-hero-subtitle">
+            Voice-powered AI design that exports production-ready Ember, React, and SwiftUI components with real Tailwind classes. Not mockups — real code.
+          </p>
+          <div class="mk-hero-ctas">
+            <button class="mk-cta-primary" type="button" {{on "click" this.createNewProject}}>
+              Start designing — it's free
+            </button>
+            <button class="mk-cta-secondary" type="button" {{on "click" this.scrollToFeatures}}>
+              See how it works
+            </button>
+          </div>
+          <div class="mk-hero-stats">
+            <div class="mk-stat">
+              <span class="mk-stat-number">5</span>
+              <span class="mk-stat-label">Export formats</span>
+            </div>
+            <div class="mk-stat-divider"></div>
+            <div class="mk-stat">
+              <span class="mk-stat-number">7</span>
+              <span class="mk-stat-label">Starter templates</span>
+            </div>
+            <div class="mk-stat-divider"></div>
+            <div class="mk-stat">
+              <span class="mk-stat-number">AI</span>
+              <span class="mk-stat-label">Voice + text</span>
+            </div>
+          </div>
+        </div>
+
+        {{! Features Section }}
+        <div class="mk-features" id="features">
+          <h2 class="mk-section-title">Everything Figma does.<br/>Plus everything it doesn't.</h2>
+          <div class="mk-features-grid">
+            <div class="mk-feature-card mk-feature-highlight">
+              <div class="mk-feature-icon">AI</div>
+              <h3 class="mk-feature-title">AI Design Generation</h3>
+              <p class="mk-feature-desc">Describe any UI in text or voice. Claude generates a complete, editable design with proper hierarchy and spacing.</p>
+            </div>
+            <div class="mk-feature-card">
+              <div class="mk-feature-icon">{'<>'}</div>
+              <h3 class="mk-feature-title">Real Code Export</h3>
+              <p class="mk-feature-desc">Export to Ember, React, and SwiftUI with smart layout detection. Flex, grid, and semantic HTML — not absolute positioning.</p>
+            </div>
+            <div class="mk-feature-card">
+              <div class="mk-feature-icon">TW</div>
+              <h3 class="mk-feature-title">Tailwind Native</h3>
+              <p class="mk-feature-desc">Import your tailwind.config.js. Every color, spacing value, and font maps to your actual design tokens.</p>
+            </div>
+            <div class="mk-feature-card">
+              <div class="mk-feature-icon">MIC</div>
+              <h3 class="mk-feature-title">Voice Builder</h3>
+              <p class="mk-feature-desc">"Add a navbar with 3 links and a signup button." Speak your design into existence with browser-native voice input.</p>
+            </div>
+            <div class="mk-feature-card">
+              <div class="mk-feature-icon">SW</div>
+              <h3 class="mk-feature-title">SwiftUI Export</h3>
+              <p class="mk-feature-desc">Design once, ship to iOS. Generates HStack, VStack, LazyVGrid with proper modifiers and #Preview blocks.</p>
+            </div>
+            <div class="mk-feature-card">
+              <div class="mk-feature-icon">LIVE</div>
+              <h3 class="mk-feature-title">Live Preview</h3>
+              <p class="mk-feature-desc">See your exported component rendered in a real iframe with Tailwind CDN. What you see is what you ship.</p>
+            </div>
+          </div>
+        </div>
+
+        {{! Pricing Section }}
+        <div class="mk-pricing">
+          <h2 class="mk-section-title">Simple, transparent pricing</h2>
+          <p class="mk-section-subtitle">Start free. Upgrade when you need more power.</p>
+          <div class="mk-pricing-grid">
+            <div class="mk-price-card">
+              <div class="mk-price-tier">Free</div>
+              <div class="mk-price-amount"><span class="mk-price-dollar">$0</span><span class="mk-price-period">/mo</span></div>
+              <ul class="mk-price-features">
+                <li>3 projects</li>
+                <li>SVG + Ember export</li>
+                <li>Template generation</li>
+                <li>Community support</li>
+              </ul>
+              <button class="mk-price-cta" type="button" {{on "click" this.createNewProject}}>Get started</button>
+            </div>
+            <div class="mk-price-card mk-price-featured">
+              <div class="mk-price-badge">Most Popular</div>
+              <div class="mk-price-tier">Pro</div>
+              <div class="mk-price-amount"><span class="mk-price-dollar">$12</span><span class="mk-price-period">/mo</span></div>
+              <ul class="mk-price-features">
+                <li>Unlimited projects</li>
+                <li>All 5 export formats</li>
+                <li>Claude AI generation</li>
+                <li>Custom Tailwind tokens</li>
+                <li>Priority support</li>
+              </ul>
+              <button class="mk-price-cta mk-price-cta-primary" type="button" {{on "click" this.signInWithGoogle}}>Start free trial</button>
+            </div>
+            <div class="mk-price-card">
+              <div class="mk-price-tier">Team</div>
+              <div class="mk-price-amount"><span class="mk-price-dollar">$29</span><span class="mk-price-period">/user/mo</span></div>
+              <ul class="mk-price-features">
+                <li>Everything in Pro</li>
+                <li>Team collaboration</li>
+                <li>Shared design systems</li>
+                <li>Version history</li>
+                <li>SSO + admin controls</li>
+              </ul>
+              <button class="mk-price-cta" type="button" {{on "click" this.signInWithGoogle}}>Contact sales</button>
+            </div>
+          </div>
+        </div>
+      {{/if}}
 
       {{! Auth Section - shown when not authenticated }}
       {{#unless this.authService.isAuthenticated}}
@@ -676,6 +802,79 @@ export default class ProjectsHome extends Component {
                   <div>
                     <div class="ph-example-name">Dashboard</div>
                     <div class="ph-example-desc">Analytics with charts, stats, data table</div>
+                  </div>
+                </div>
+              </button>
+
+              <button class="ph-example-card" type="button" {{on "click" (fn this.createFromExample "pricing")}}>
+                <div class="ph-example-preview ph-example-pricing">
+                  <div class="ph-ex-pricing-title"></div>
+                  <div class="ph-ex-pricing-cards">
+                    <div class="ph-ex-pricing-card"></div>
+                    <div class="ph-ex-pricing-card ph-ex-pricing-featured"></div>
+                    <div class="ph-ex-pricing-card"></div>
+                  </div>
+                </div>
+                <div class="ph-example-info">
+                  <div class="ph-example-icon"><IconFrame /></div>
+                  <div>
+                    <div class="ph-example-name">Pricing Page</div>
+                    <div class="ph-example-desc">Free, Pro, Team tier comparison</div>
+                  </div>
+                </div>
+              </button>
+
+              <button class="ph-example-card" type="button" {{on "click" (fn this.createFromExample "signup")}}>
+                <div class="ph-example-preview ph-example-signup">
+                  <div class="ph-ex-signup-left"></div>
+                  <div class="ph-ex-signup-right">
+                    <div class="ph-ex-signup-field"></div>
+                    <div class="ph-ex-signup-field"></div>
+                    <div class="ph-ex-signup-field"></div>
+                    <div class="ph-ex-signup-btn"></div>
+                  </div>
+                </div>
+                <div class="ph-example-info">
+                  <div class="ph-example-icon"><IconRect /></div>
+                  <div>
+                    <div class="ph-example-name">Signup Form</div>
+                    <div class="ph-example-desc">Auth page with branding + form fields</div>
+                  </div>
+                </div>
+              </button>
+
+              <button class="ph-example-card" type="button" {{on "click" (fn this.createFromExample "ecommerce")}}>
+                <div class="ph-example-preview ph-example-ecommerce">
+                  <div class="ph-ex-product-img"></div>
+                  <div class="ph-ex-product-details">
+                    <div class="ph-ex-product-title"></div>
+                    <div class="ph-ex-product-price"></div>
+                    <div class="ph-ex-product-cta"></div>
+                  </div>
+                </div>
+                <div class="ph-example-info">
+                  <div class="ph-example-icon"><IconShare /></div>
+                  <div>
+                    <div class="ph-example-name">Product Page</div>
+                    <div class="ph-example-desc">E-commerce product with gallery, CTA</div>
+                  </div>
+                </div>
+              </button>
+
+              <button class="ph-example-card" type="button" {{on "click" (fn this.createFromExample "blog")}}>
+                <div class="ph-example-preview ph-example-blog">
+                  <div class="ph-ex-blog-featured"></div>
+                  <div class="ph-ex-blog-grid">
+                    <div class="ph-ex-blog-card"></div>
+                    <div class="ph-ex-blog-card"></div>
+                    <div class="ph-ex-blog-card"></div>
+                  </div>
+                </div>
+                <div class="ph-example-info">
+                  <div class="ph-example-icon"><IconGrid /></div>
+                  <div>
+                    <div class="ph-example-name">Blog Layout</div>
+                    <div class="ph-example-desc">Featured article + article grid</div>
                   </div>
                 </div>
               </button>

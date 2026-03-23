@@ -228,7 +228,188 @@ const TEMPLATES: Record<string, AiTemplate> = {
       { type: "text", x: 1000, y: 804, width: 120, height: 20, text: "$89.99", fontSize: 14, fontWeight: "600", fill: "#e4e4e7", name: "Row 3 Amount" },
     ],
   },
+  "pricing page": {
+    name: "Pricing Page",
+    elements: [
+      { type: "frame", x: 0, y: 0, width: 1440, height: 900, fill: "#0f0f23", stroke: "transparent", name: "Pricing Section", cornerRadius: 0 },
+      { type: "text", x: 460, y: 60, width: 520, height: 48, text: "Simple pricing", fontSize: 48, fontWeight: "800", fill: "#ffffff", name: "Pricing Title" },
+      { type: "text", x: 400, y: 120, width: 640, height: 28, text: "Choose the plan that works best for your team", fontSize: 18, fontWeight: "400", fill: "#71717a", name: "Pricing Subtitle" },
+      // Free plan
+      { type: "rectangle", x: 140, y: 200, width: 360, height: 520, fill: "#1a1a36", cornerRadius: 16, stroke: "#2a2a4a", strokeWidth: 1, name: "Free Card" },
+      { type: "text", x: 172, y: 232, width: 200, height: 28, text: "Free", fontSize: 22, fontWeight: "600", fill: "#e4e4e7", name: "Free Label" },
+      { type: "text", x: 172, y: 272, width: 200, height: 48, text: "$0", fontSize: 42, fontWeight: "800", fill: "#ffffff", name: "Free Price" },
+      { type: "text", x: 172, y: 320, width: 200, height: 20, text: "per month", fontSize: 14, fontWeight: "400", fill: "#71717a", name: "Free Period" },
+      { type: "text", x: 172, y: 368, width: 280, height: 20, text: "3 projects", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Free F1" },
+      { type: "text", x: 172, y: 400, width: 280, height: 20, text: "Basic export (SVG)", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Free F2" },
+      { type: "text", x: 172, y: 432, width: 280, height: 20, text: "Community templates", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Free F3" },
+      { type: "rectangle", x: 172, y: 620, width: 296, height: 48, fill: "transparent", cornerRadius: 10, stroke: "#52525b", strokeWidth: 2, name: "Free CTA", elementRole: "button" },
+      { type: "text", x: 262, y: 630, width: 120, height: 24, text: "Get Started", fontSize: 16, fontWeight: "600", fill: "#e4e4e7", name: "Free CTA Text" },
+      // Pro plan
+      { type: "rectangle", x: 540, y: 180, width: 360, height: 560, fill: "#1e1e3a", cornerRadius: 16, stroke: "#818cf8", strokeWidth: 2, name: "Pro Card" },
+      { type: "rectangle", x: 780, y: 206, width: 88, height: 24, fill: "#312e81", cornerRadius: 12, name: "Pro Badge" },
+      { type: "text", x: 790, y: 208, width: 68, height: 18, text: "Popular", fontSize: 12, fontWeight: "600", fill: "#818cf8", name: "Pro Badge Text" },
+      { type: "text", x: 572, y: 232, width: 200, height: 28, text: "Pro", fontSize: 22, fontWeight: "600", fill: "#818cf8", name: "Pro Label" },
+      { type: "text", x: 572, y: 272, width: 200, height: 48, text: "$12", fontSize: 42, fontWeight: "800", fill: "#ffffff", name: "Pro Price" },
+      { type: "text", x: 572, y: 320, width: 200, height: 20, text: "per month", fontSize: 14, fontWeight: "400", fill: "#71717a", name: "Pro Period" },
+      { type: "text", x: 572, y: 368, width: 280, height: 20, text: "Unlimited projects", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Pro F1" },
+      { type: "text", x: 572, y: 400, width: 280, height: 20, text: "All export formats", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Pro F2" },
+      { type: "text", x: 572, y: 432, width: 280, height: 20, text: "AI design generation", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Pro F3" },
+      { type: "text", x: 572, y: 464, width: 280, height: 20, text: "Custom Tailwind tokens", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Pro F4" },
+      { type: "text", x: 572, y: 496, width: 280, height: 20, text: "Priority support", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Pro F5" },
+      { type: "rectangle", x: 572, y: 640, width: 296, height: 48, fill: "#818cf8", cornerRadius: 10, name: "Pro CTA", elementRole: "button" },
+      { type: "text", x: 656, y: 650, width: 140, height: 24, text: "Start Free Trial", fontSize: 16, fontWeight: "600", fill: "#ffffff", name: "Pro CTA Text" },
+      // Team plan
+      { type: "rectangle", x: 940, y: 200, width: 360, height: 520, fill: "#1a1a36", cornerRadius: 16, stroke: "#2a2a4a", strokeWidth: 1, name: "Team Card" },
+      { type: "text", x: 972, y: 232, width: 200, height: 28, text: "Team", fontSize: 22, fontWeight: "600", fill: "#e4e4e7", name: "Team Label" },
+      { type: "text", x: 972, y: 272, width: 200, height: 48, text: "$29", fontSize: 42, fontWeight: "800", fill: "#ffffff", name: "Team Price" },
+      { type: "text", x: 972, y: 320, width: 200, height: 20, text: "per user / month", fontSize: 14, fontWeight: "400", fill: "#71717a", name: "Team Period" },
+      { type: "text", x: 972, y: 368, width: 280, height: 20, text: "Everything in Pro", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Team F1" },
+      { type: "text", x: 972, y: 400, width: 280, height: 20, text: "Team collaboration", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Team F2" },
+      { type: "text", x: 972, y: 432, width: 280, height: 20, text: "Design system sync", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Team F3" },
+      { type: "text", x: 972, y: 464, width: 280, height: 20, text: "Version history", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Team F4" },
+      { type: "text", x: 972, y: 496, width: 280, height: 20, text: "SSO & admin controls", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Team F5" },
+      { type: "rectangle", x: 972, y: 620, width: 296, height: 48, fill: "transparent", cornerRadius: 10, stroke: "#52525b", strokeWidth: 2, name: "Team CTA", elementRole: "button" },
+      { type: "text", x: 1058, y: 630, width: 140, height: 24, text: "Contact Sales", fontSize: 16, fontWeight: "600", fill: "#e4e4e7", name: "Team CTA Text" },
+    ],
+  },
+  "signup": {
+    name: "Signup Form",
+    elements: [
+      { type: "frame", x: 0, y: 0, width: 1440, height: 900, fill: "#0f0f23", stroke: "transparent", name: "Auth Page", cornerRadius: 0 },
+      // Left side — branding
+      { type: "rectangle", x: 0, y: 0, width: 720, height: 900, fill: "#111130", name: "Left Panel" },
+      { type: "text", x: 80, y: 80, width: 200, height: 36, text: "Atelier", fontSize: 32, fontWeight: "700", fill: "#818cf8", name: "Logo" },
+      { type: "text", x: 80, y: 360, width: 560, height: 60, text: "Design at the speed", fontSize: 48, fontWeight: "800", fill: "#ffffff", name: "Tagline L1" },
+      { type: "text", x: 80, y: 420, width: 560, height: 60, text: "of thought.", fontSize: 48, fontWeight: "800", fill: "#818cf8", name: "Tagline L2" },
+      { type: "text", x: 80, y: 500, width: 500, height: 28, text: "Join 10,000+ designers creating with AI", fontSize: 18, fontWeight: "400", fill: "#71717a", name: "Social Proof" },
+      // Right side — form
+      { type: "text", x: 840, y: 200, width: 400, height: 36, text: "Create your account", fontSize: 28, fontWeight: "700", fill: "#ffffff", name: "Form Title" },
+      { type: "text", x: 840, y: 244, width: 400, height: 24, text: "Start your free 14-day trial", fontSize: 16, fontWeight: "400", fill: "#71717a", name: "Form Subtitle" },
+      { type: "rectangle", x: 840, y: 300, width: 440, height: 48, fill: "#1a1a36", cornerRadius: 10, stroke: "#2a2a4a", strokeWidth: 1, name: "Google Button", elementRole: "button" },
+      { type: "text", x: 960, y: 312, width: 200, height: 24, text: "Continue with Google", fontSize: 15, fontWeight: "500", fill: "#e4e4e7", name: "Google Text" },
+      { type: "line", x: 840, y: 380, width: 440, height: 1, stroke: "#2a2a4a", strokeWidth: 1, x1: 840, y1: 380, x2: 1280, y2: 380, name: "Divider" },
+      { type: "text", x: 840, y: 410, width: 440, height: 18, text: "Full name", fontSize: 13, fontWeight: "500", fill: "#a1a1aa", name: "Name Label" },
+      { type: "rectangle", x: 840, y: 432, width: 440, height: 44, fill: "#1a1a36", cornerRadius: 8, stroke: "#2a2a4a", strokeWidth: 1, name: "Name Input", elementRole: "input" },
+      { type: "text", x: 840, y: 500, width: 440, height: 18, text: "Email", fontSize: 13, fontWeight: "500", fill: "#a1a1aa", name: "Email Label" },
+      { type: "rectangle", x: 840, y: 522, width: 440, height: 44, fill: "#1a1a36", cornerRadius: 8, stroke: "#2a2a4a", strokeWidth: 1, name: "Email Input", elementRole: "input" },
+      { type: "text", x: 840, y: 590, width: 440, height: 18, text: "Password", fontSize: 13, fontWeight: "500", fill: "#a1a1aa", name: "Password Label" },
+      { type: "rectangle", x: 840, y: 612, width: 440, height: 44, fill: "#1a1a36", cornerRadius: 8, stroke: "#2a2a4a", strokeWidth: 1, name: "Password Input", elementRole: "input" },
+      { type: "rectangle", x: 840, y: 688, width: 440, height: 48, fill: "#818cf8", cornerRadius: 10, name: "Submit Button", elementRole: "button" },
+      { type: "text", x: 992, y: 698, width: 140, height: 24, text: "Create Account", fontSize: 16, fontWeight: "600", fill: "#ffffff", name: "Submit Text" },
+      { type: "text", x: 920, y: 756, width: 280, height: 20, text: "Already have an account? Sign in", fontSize: 14, fontWeight: "400", fill: "#818cf8", name: "Signin Link", elementRole: "link" },
+    ],
+  },
+  "ecommerce": {
+    name: "Product Page",
+    elements: [
+      { type: "frame", x: 0, y: 0, width: 1440, height: 900, fill: "#0f0f23", stroke: "transparent", name: "Product Page", cornerRadius: 0 },
+      // Nav
+      { type: "rectangle", x: 0, y: 0, width: 1440, height: 64, fill: "#111127", name: "Nav" },
+      { type: "text", x: 40, y: 18, width: 120, height: 28, text: "STORE", fontSize: 20, fontWeight: "700", fill: "#818cf8", name: "Store Logo" },
+      { type: "text", x: 600, y: 22, width: 60, height: 20, text: "Shop", fontSize: 14, fontWeight: "500", fill: "#e4e4e7", name: "Nav 1", elementRole: "link" },
+      { type: "text", x: 700, y: 22, width: 80, height: 20, text: "Categories", fontSize: 14, fontWeight: "500", fill: "#e4e4e7", name: "Nav 2", elementRole: "link" },
+      { type: "text", x: 820, y: 22, width: 60, height: 20, text: "Sale", fontSize: 14, fontWeight: "500", fill: "#f87171", name: "Nav 3", elementRole: "link" },
+      { type: "ellipse", x: 1360, y: 16, width: 32, height: 32, fill: "#1e1e3a", name: "Cart Icon" },
+      // Product image area
+      { type: "rectangle", x: 80, y: 100, width: 640, height: 640, fill: "#1a1a36", cornerRadius: 16, name: "Product Image" },
+      { type: "rectangle", x: 80, y: 760, width: 148, height: 100, fill: "#1a1a36", cornerRadius: 8, stroke: "#818cf8", strokeWidth: 2, name: "Thumb 1" },
+      { type: "rectangle", x: 244, y: 760, width: 148, height: 100, fill: "#1a1a36", cornerRadius: 8, name: "Thumb 2" },
+      { type: "rectangle", x: 408, y: 760, width: 148, height: 100, fill: "#1a1a36", cornerRadius: 8, name: "Thumb 3" },
+      { type: "rectangle", x: 572, y: 760, width: 148, height: 100, fill: "#1a1a36", cornerRadius: 8, name: "Thumb 4" },
+      // Product details
+      { type: "text", x: 800, y: 120, width: 560, height: 20, text: "New Collection", fontSize: 14, fontWeight: "500", fill: "#818cf8", name: "Category" },
+      { type: "text", x: 800, y: 152, width: 560, height: 44, text: "Premium Wireless Headphones", fontSize: 36, fontWeight: "700", fill: "#ffffff", name: "Product Name" },
+      { type: "text", x: 800, y: 220, width: 560, height: 36, text: "$299.00", fontSize: 32, fontWeight: "700", fill: "#818cf8", name: "Price" },
+      { type: "text", x: 900, y: 228, width: 80, height: 20, text: "$399.00", fontSize: 16, fontWeight: "400", fill: "#52525b", name: "Original Price" },
+      { type: "rectangle", x: 990, y: 224, width: 64, height: 28, fill: "#052e16", cornerRadius: 6, name: "Discount Badge" },
+      { type: "text", x: 1000, y: 228, width: 44, height: 20, text: "-25%", fontSize: 13, fontWeight: "600", fill: "#4ade80", name: "Discount Text" },
+      // Rating
+      { type: "text", x: 800, y: 280, width: 200, height: 20, text: "4.8 (2,456 reviews)", fontSize: 14, fontWeight: "500", fill: "#fbbf24", name: "Rating" },
+      // Description
+      { type: "text", x: 800, y: 320, width: 540, height: 60, text: "Experience studio-quality sound with active noise cancellation, 30-hour battery life, and premium materials crafted for all-day comfort.", fontSize: 15, fontWeight: "400", fill: "#a1a1aa", name: "Description" },
+      // Size selector
+      { type: "text", x: 800, y: 410, width: 100, height: 20, text: "Color", fontSize: 14, fontWeight: "600", fill: "#e4e4e7", name: "Color Label" },
+      { type: "ellipse", x: 800, y: 440, width: 36, height: 36, fill: "#1e1e2e", stroke: "#818cf8", strokeWidth: 2, name: "Color 1" },
+      { type: "ellipse", x: 848, y: 440, width: 36, height: 36, fill: "#818cf8", name: "Color 2" },
+      { type: "ellipse", x: 896, y: 440, width: 36, height: 36, fill: "#e4e4e7", name: "Color 3" },
+      // CTA
+      { type: "rectangle", x: 800, y: 520, width: 320, height: 52, fill: "#818cf8", cornerRadius: 12, name: "Add to Cart", elementRole: "button" },
+      { type: "text", x: 892, y: 530, width: 140, height: 28, text: "Add to Cart", fontSize: 17, fontWeight: "600", fill: "#ffffff", name: "Cart CTA Text" },
+      { type: "rectangle", x: 1136, y: 520, width: 52, height: 52, fill: "transparent", cornerRadius: 12, stroke: "#52525b", strokeWidth: 2, name: "Wishlist Btn", elementRole: "button" },
+    ],
+  },
+  "blog": {
+    name: "Blog Layout",
+    elements: [
+      { type: "frame", x: 0, y: 0, width: 1440, height: 1200, fill: "#0f0f23", stroke: "transparent", name: "Blog Page", cornerRadius: 0 },
+      // Header
+      { type: "rectangle", x: 0, y: 0, width: 1440, height: 64, fill: "#111127", name: "Header" },
+      { type: "text", x: 80, y: 18, width: 120, height: 28, text: "BLOG", fontSize: 22, fontWeight: "700", fill: "#818cf8", name: "Logo" },
+      { type: "rectangle", x: 1260, y: 14, width: 120, height: 36, fill: "#818cf8", cornerRadius: 8, name: "Subscribe Btn", elementRole: "button" },
+      { type: "text", x: 1277, y: 20, width: 86, height: 24, text: "Subscribe", fontSize: 14, fontWeight: "600", fill: "#ffffff", name: "Subscribe Text" },
+      // Featured article
+      { type: "rectangle", x: 80, y: 100, width: 880, height: 400, fill: "#1a1a36", cornerRadius: 16, name: "Featured Image" },
+      { type: "rectangle", x: 100, y: 420, width: 100, height: 28, fill: "#312e81", cornerRadius: 14, name: "Featured Tag" },
+      { type: "text", x: 112, y: 424, width: 76, height: 20, text: "Featured", fontSize: 12, fontWeight: "600", fill: "#818cf8", name: "Featured Tag Text" },
+      { type: "text", x: 80, y: 470, width: 840, height: 40, text: "The Future of Design: AI-Powered Tools", fontSize: 32, fontWeight: "700", fill: "#ffffff", name: "Featured Title" },
+      { type: "text", x: 80, y: 520, width: 840, height: 48, text: "How artificial intelligence is transforming the way designers create, iterate, and ship products faster than ever before.", fontSize: 16, fontWeight: "400", fill: "#a1a1aa", name: "Featured Excerpt" },
+      { type: "text", x: 80, y: 580, width: 200, height: 20, text: "Mar 15, 2024 · 8 min read", fontSize: 13, fontWeight: "400", fill: "#52525b", name: "Featured Meta" },
+      // Sidebar
+      { type: "text", x: 1000, y: 100, width: 360, height: 28, text: "Trending", fontSize: 20, fontWeight: "600", fill: "#ffffff", name: "Sidebar Title" },
+      { type: "rectangle", x: 1000, y: 144, width: 360, height: 80, fill: "#1a1a36", cornerRadius: 10, name: "Trending 1" },
+      { type: "text", x: 1020, y: 156, width: 320, height: 20, text: "Getting Started with Atelier", fontSize: 15, fontWeight: "500", fill: "#e4e4e7", name: "Trending 1 Title" },
+      { type: "text", x: 1020, y: 182, width: 200, height: 18, text: "5 min read", fontSize: 12, fontWeight: "400", fill: "#52525b", name: "Trending 1 Meta" },
+      { type: "rectangle", x: 1000, y: 236, width: 360, height: 80, fill: "#1a1a36", cornerRadius: 10, name: "Trending 2" },
+      { type: "text", x: 1020, y: 248, width: 320, height: 20, text: "Design Tokens Best Practices", fontSize: 15, fontWeight: "500", fill: "#e4e4e7", name: "Trending 2 Title" },
+      { type: "text", x: 1020, y: 274, width: 200, height: 18, text: "12 min read", fontSize: 12, fontWeight: "400", fill: "#52525b", name: "Trending 2 Meta" },
+      { type: "rectangle", x: 1000, y: 328, width: 360, height: 80, fill: "#1a1a36", cornerRadius: 10, name: "Trending 3" },
+      { type: "text", x: 1020, y: 340, width: 320, height: 20, text: "Voice Design: The Next Frontier", fontSize: 15, fontWeight: "500", fill: "#e4e4e7", name: "Trending 3 Title" },
+      { type: "text", x: 1020, y: 366, width: 200, height: 18, text: "7 min read", fontSize: 12, fontWeight: "400", fill: "#52525b", name: "Trending 3 Meta" },
+      // Article grid
+      { type: "text", x: 80, y: 640, width: 300, height: 28, text: "Latest Articles", fontSize: 22, fontWeight: "600", fill: "#ffffff", name: "Grid Title" },
+      { type: "rectangle", x: 80, y: 690, width: 400, height: 240, fill: "#1a1a36", cornerRadius: 12, name: "Article 1 Image" },
+      { type: "text", x: 80, y: 944, width: 400, height: 24, text: "Component Libraries That Scale", fontSize: 18, fontWeight: "600", fill: "#ffffff", name: "Article 1 Title" },
+      { type: "text", x: 80, y: 974, width: 400, height: 18, text: "Mar 12 · 6 min read", fontSize: 12, fontWeight: "400", fill: "#52525b", name: "Article 1 Meta" },
+      { type: "rectangle", x: 520, y: 690, width: 400, height: 240, fill: "#1a1a36", cornerRadius: 12, name: "Article 2 Image" },
+      { type: "text", x: 520, y: 944, width: 400, height: 24, text: "From Figma to Code in Seconds", fontSize: 18, fontWeight: "600", fill: "#ffffff", name: "Article 2 Title" },
+      { type: "text", x: 520, y: 974, width: 400, height: 18, text: "Mar 10 · 4 min read", fontSize: 12, fontWeight: "400", fill: "#52525b", name: "Article 2 Meta" },
+      { type: "rectangle", x: 960, y: 690, width: 400, height: 240, fill: "#1a1a36", cornerRadius: 12, name: "Article 3 Image" },
+      { type: "text", x: 960, y: 944, width: 400, height: 24, text: "Dark Mode Design Patterns", fontSize: 18, fontWeight: "600", fill: "#ffffff", name: "Article 3 Title" },
+      { type: "text", x: 960, y: 974, width: 400, height: 18, text: "Mar 8 · 9 min read", fontSize: 12, fontWeight: "400", fill: "#52525b", name: "Article 3 Meta" },
+    ],
+  },
 };
+
+const AI_SYSTEM_PROMPT = `You are Atelier's design AI. You generate UI designs as JSON arrays of design elements.
+
+Each element has these properties:
+- type: "rectangle" | "ellipse" | "line" | "text" | "frame" | "image"
+- x, y: position in pixels (canvas is 1440px wide)
+- width, height: size in pixels
+- fill: hex color string (e.g. "#818cf8") or "transparent"
+- stroke: hex color or "transparent"
+- strokeWidth: number (0 for none)
+- cornerRadius: number (0 for sharp)
+- opacity: 0-1
+- name: descriptive label (e.g. "Hero Title", "Nav Bar")
+- text: (for type "text") the text content
+- fontSize: (for type "text") size in px
+- fontWeight: "300" | "400" | "500" | "600" | "700" | "800"
+- fill: (for text) this is the text color
+- parentId: null (for top-level) or parent element's name (for nesting in frames)
+- elementRole: "auto" | "button" | "link" | "input" | "container" | "heading" | "image"
+
+Design guidelines:
+- Use a dark theme with background #0f0f23, cards #1a1a36, borders #2a2a4a
+- Primary accent: #818cf8 (indigo), secondary: #a78bfa (violet)
+- Text: #ffffff for headings, #e4e4e7 for body, #71717a for muted, #a1a1aa for descriptions
+- Success: #4ade80, Warning: #fbbf24, Error: #f87171
+- Standard widths: 1440px (desktop), 390px (mobile)
+- Use "frame" type for sections/containers
+- Set elementRole for interactive elements (buttons, links, inputs)
+- Create realistic, production-quality designs with proper spacing and hierarchy
+
+IMPORTANT: Return ONLY a JSON array of element objects. No markdown, no explanation, just the JSON array.`;
 
 export default class AiServiceService extends Service {
   @service declare designStore: DesignStoreService;
@@ -239,6 +420,27 @@ export default class AiServiceService extends Service {
   @tracked agentSteps: AgentStep[] = [];
   @tracked showAgentLog: boolean = false;
   @tracked selectedModel: string = "atelier-v1";
+  @tracked apiKey: string = "";
+  @tracked showApiKeyModal: boolean = false;
+
+  constructor(properties: object | undefined) {
+    super(properties);
+    // Load API key from localStorage
+    this.apiKey = localStorage.getItem("atelier-api-key") ?? "";
+  }
+
+  get hasApiKey(): boolean {
+    return this.apiKey.trim().length > 0;
+  }
+
+  setApiKey(key: string): void {
+    this.apiKey = key.trim();
+    if (key.trim()) {
+      localStorage.setItem("atelier-api-key", key.trim());
+    } else {
+      localStorage.removeItem("atelier-api-key");
+    }
+  }
 
   get availableTemplates(): string[] {
     return Object.keys(TEMPLATES);
@@ -258,16 +460,112 @@ export default class AiServiceService extends Service {
     this.agentSteps = [];
     this.showAgentLog = true;
 
-    // Push user message to conversation
     this.conversationHistory = [
       ...this.conversationHistory,
       { role: "user", content: prompt, timestamp: new Date() },
     ];
 
-    // Agent steps
     await this.addAgentStep("Analyzing prompt...");
 
-    // Find best matching template
+    // Try Claude API if key is available and Pro model selected
+    if (this.hasApiKey && this.selectedModel === "atelier-pro") {
+      try {
+        await this.generateWithClaude(prompt);
+        return;
+      } catch (e) {
+        console.error("Claude API failed, falling back to templates:", e);
+        await this.addAgentStep("API unavailable, using templates...");
+      }
+    }
+
+    // Fallback: template matching
+    await this.generateFromTemplate(prompt);
+  }
+
+  private async generateWithClaude(prompt: string): Promise<void> {
+    await this.addAgentStep("Connecting to Claude...");
+
+    // Build messages from conversation history for context
+    const messages = this.conversationHistory.slice(-6).map((msg) => ({
+      role: msg.role as "user" | "assistant",
+      content: msg.content,
+    }));
+
+    // Ensure the last message is the current prompt
+    if (messages.length === 0 || messages[messages.length - 1]!.content !== prompt) {
+      messages.push({ role: "user", content: `Generate a UI design for: ${prompt}` });
+    }
+
+    await this.addAgentStep("Generating with Claude...");
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 8192,
+        system: AI_SYSTEM_PROMPT,
+        messages,
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`API error ${response.status}: ${err}`);
+    }
+
+    const data = await response.json();
+    const content = data.content?.[0]?.text ?? "";
+
+    await this.addAgentStep("Parsing design elements...");
+
+    // Extract JSON array from response (handle possible markdown wrapping)
+    let jsonStr = content.trim();
+    const jsonMatch = jsonStr.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[0];
+    }
+
+    const elements: Partial<DesignElement>[] = JSON.parse(jsonStr);
+
+    if (!Array.isArray(elements) || elements.length === 0) {
+      throw new Error("Invalid response: not an array of elements");
+    }
+
+    await this.addAgentStep(`Placing ${elements.length} elements...`);
+
+    this.designStore.pushHistory();
+    this.designStore.clearCanvas();
+
+    const batchSize = 5;
+    for (let i = 0; i < elements.length; i += batchSize) {
+      const batch = elements.slice(i, i + batchSize);
+      for (const elData of batch) {
+        this.designStore.createElement(elData.type as DesignElement["type"], elData);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    }
+
+    await this.addAgentStep("Generation complete");
+
+    const assistantContent = `Generated ${elements.length} elements from AI.`;
+    this.conversationHistory = [
+      ...this.conversationHistory,
+      { role: "assistant", content: assistantContent, timestamp: new Date() },
+    ];
+
+    this.designStore.aiGenerating = false;
+    this.designStore.showAiModal = false;
+    setTimeout(() => { this.designStore.zoomToFit(); }, 100);
+    setTimeout(() => { this.showAgentLog = false; }, 3000);
+  }
+
+  private async generateFromTemplate(prompt: string): Promise<void> {
     const lowerPrompt = prompt.toLowerCase();
     let bestMatch = "landing page";
 
@@ -275,6 +573,14 @@ export default class AiServiceService extends Service {
       bestMatch = "mobile app";
     } else if (lowerPrompt.includes("dashboard") || lowerPrompt.includes("admin") || lowerPrompt.includes("analytics") || lowerPrompt.includes("data") || lowerPrompt.includes("chart")) {
       bestMatch = "dashboard";
+    } else if (lowerPrompt.includes("pricing") || lowerPrompt.includes("plan") || lowerPrompt.includes("subscription")) {
+      bestMatch = "pricing page";
+    } else if (lowerPrompt.includes("signup") || lowerPrompt.includes("sign up") || lowerPrompt.includes("login") || lowerPrompt.includes("register") || lowerPrompt.includes("auth")) {
+      bestMatch = "signup";
+    } else if (lowerPrompt.includes("product") || lowerPrompt.includes("ecommerce") || lowerPrompt.includes("e-commerce") || lowerPrompt.includes("shop") || lowerPrompt.includes("store")) {
+      bestMatch = "ecommerce";
+    } else if (lowerPrompt.includes("blog") || lowerPrompt.includes("article") || lowerPrompt.includes("post") || lowerPrompt.includes("content")) {
+      bestMatch = "blog";
     }
 
     await this.addAgentStep(`Selecting template: ${TEMPLATES[bestMatch]!.name}...`);
@@ -286,28 +592,20 @@ export default class AiServiceService extends Service {
 
     await this.addAgentStep("Placing elements...");
 
-    // Add elements one batch at a time for visual effect
     const batchSize = 5;
     for (let i = 0; i < template.elements.length; i += batchSize) {
       const batch = template.elements.slice(i, i + batchSize);
       for (const elData of batch) {
-        this.designStore.createElement(
-          elData.type as any,
-          elData,
-        );
+        this.designStore.createElement(elData.type as DesignElement["type"], elData);
       }
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
 
     await this.addAgentStep("Applying styles...");
     await new Promise((resolve) => setTimeout(resolve, 300));
-
-    // Mark final step complete
     await this.addAgentStep("Generation complete");
 
     const elementCount = template.elements.length;
-
-    // Build a description of what was generated
     const typeBreakdown: Record<string, number> = {};
     for (const el of template.elements) {
       const t = el.type || "unknown";
@@ -319,7 +617,6 @@ export default class AiServiceService extends Service {
 
     const assistantContent = `Generated a ${template.name.toLowerCase()} with ${elementCount} elements including ${breakdown}.`;
 
-    // Push assistant message to conversation
     this.conversationHistory = [
       ...this.conversationHistory,
       { role: "assistant", content: assistantContent, timestamp: new Date() },
@@ -327,15 +624,7 @@ export default class AiServiceService extends Service {
 
     this.designStore.aiGenerating = false;
     this.designStore.showAiModal = false;
-
-    // Zoom to fit the generated content
-    setTimeout(() => {
-      this.designStore.zoomToFit();
-    }, 100);
-
-    // Auto-collapse agent log after 3 seconds
-    setTimeout(() => {
-      this.showAgentLog = false;
-    }, 3000);
+    setTimeout(() => { this.designStore.zoomToFit(); }, 100);
+    setTimeout(() => { this.showAgentLog = false; }, 3000);
   }
 }

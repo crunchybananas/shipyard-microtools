@@ -121,6 +121,10 @@ export default class AtelierPropertiesPanel extends Component {
     return this.selectedElement?.textAlign === align;
   };
 
+  isElementRole = (role: string): boolean => {
+    return (this.selectedElement?.elementRole || "auto") === role;
+  };
+
   <template>
     <div class="properties-panel">
       {{#if this.selectedElement}}
@@ -337,6 +341,35 @@ export default class AtelierPropertiesPanel extends Component {
             </div>
           </div>
         {{/if}}
+
+        {{! Element Role }}
+        <div class="props-section">
+          <div class="props-section-title">Export Role</div>
+          <div class="props-row">
+            <span class="props-label">Role</span>
+            <select
+              class="props-select"
+              {{on "change" (fn this.updateProp "elementRole")}}
+            >
+              <option value="auto" selected={{this.isElementRole "auto"}}>Auto</option>
+              <option value="button" selected={{this.isElementRole "button"}}>Button</option>
+              <option value="link" selected={{this.isElementRole "link"}}>Link</option>
+              <option value="input" selected={{this.isElementRole "input"}}>Input</option>
+              <option value="container" selected={{this.isElementRole "container"}}>Container</option>
+              <option value="heading" selected={{this.isElementRole "heading"}}>Heading</option>
+              <option value="image" selected={{this.isElementRole "image"}}>Image</option>
+            </select>
+          </div>
+          {{#if (this.isElementRole "button")}}
+            <div class="props-role-hint">Exports as button with click handler</div>
+          {{else if (this.isElementRole "link")}}
+            <div class="props-role-hint">Exports as anchor with href + click</div>
+          {{else if (this.isElementRole "input")}}
+            <div class="props-role-hint">Exports as input with tracked value</div>
+          {{else if (this.isElementRole "container")}}
+            <div class="props-role-hint">Exports as section container</div>
+          {{/if}}
+        </div>
 
         {{! Alignment }}
         {{#if this.showAlignment}}

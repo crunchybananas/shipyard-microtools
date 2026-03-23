@@ -30,6 +30,8 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   @tracked aiPrompt: string = "";
   @tracked designFormat: "web" | "app" = "web";
   @tracked toastMessage: string | null = null;
+  @tracked showApiKeyInput: boolean = false;
+  @tracked apiKeyDraft: string = "";
 
   get isWebFormat(): boolean {
     return this.designFormat === "web";
@@ -44,7 +46,9 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   }
 
   get modelLabel(): string {
-    return this.aiService.selectedModel === "atelier-v1" ? "Atelier v1" : "Atelier Pro";
+    if (this.aiService.selectedModel === "atelier-pro" && this.aiService.hasApiKey) return "Claude Pro";
+    if (this.aiService.selectedModel === "atelier-pro") return "Atelier Pro";
+    return "Atelier v1";
   }
 
   get isProModel(): boolean {
@@ -78,8 +82,38 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   };
 
   selectModel = (model: string) => {
+    if (model === "atelier-pro" && !this.aiService.hasApiKey) {
+      this.showApiKeyInput = true;
+      this.apiKeyDraft = "";
+      this.showModelDropdown = false;
+      return;
+    }
     this.aiService.selectedModel = model;
     this.showModelDropdown = false;
+  };
+
+  onApiKeyInput = (e: Event) => {
+    this.apiKeyDraft = (e.target as HTMLInputElement).value;
+  };
+
+  saveApiKey = () => {
+    this.aiService.setApiKey(this.apiKeyDraft);
+    this.showApiKeyInput = false;
+    if (this.aiService.hasApiKey) {
+      this.aiService.selectedModel = "atelier-pro";
+      this.showToast("API key saved — Pro mode active");
+    }
+  };
+
+  closeApiKeyInput = () => {
+    this.showApiKeyInput = false;
+  };
+
+  clearApiKey = () => {
+    this.aiService.setApiKey("");
+    this.aiService.selectedModel = "atelier-v1";
+    this.showApiKeyInput = false;
+    this.showToast("API key cleared");
   };
 
   isModelSelected = (model: string): boolean => {
@@ -134,6 +168,10 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
       this.toastMessage = null;
     }, 1500);
   }
+
+  stopPropagation = (e: MouseEvent) => {
+    e.stopPropagation();
+  };
 
   // ---- Agent log ----
 
@@ -242,6 +280,32 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
             {{/each}}
           </div>
         {{/if}}
+      </div>
+    {{/if}}
+
+    {{! ---- API Key Input ---- }}
+    {{#if this.showApiKeyInput}}
+      <div class="api-key-overlay" role="button" {{on "click" this.closeApiKeyInput}}>
+        <div class="api-key-modal" role="dialog" {{on "click" this.stopPropagation}}>
+          <div class="api-key-header">
+            <span class="api-key-title">Atelier Pro — Claude AI</span>
+          </div>
+          <p class="api-key-desc">Enter your Anthropic API key to enable AI-powered design generation. Your key is stored locally and never sent to our servers.</p>
+          <input
+            class="api-key-input"
+            type="password"
+            placeholder="sk-ant-..."
+            value={{this.apiKeyDraft}}
+            {{on "input" this.onApiKeyInput}}
+          />
+          <div class="api-key-actions">
+            {{#if this.aiService.hasApiKey}}
+              <button class="api-key-btn danger" type="button" {{on "click" this.clearApiKey}}>Remove Key</button>
+            {{/if}}
+            <button class="api-key-btn" type="button" {{on "click" this.closeApiKeyInput}}>Cancel</button>
+            <button class="api-key-btn primary" type="button" {{on "click" this.saveApiKey}}>Save & Activate</button>
+          </div>
+        </div>
       </div>
     {{/if}}
 

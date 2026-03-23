@@ -122,20 +122,41 @@ export default class AtelierModals extends Component<ModalsSignature> {
     return this.designStore.exportFormat === "tailwind";
   }
 
+  get isReactExport(): boolean {
+    return this.designStore.exportFormat === "react";
+  }
+
+  get isSwiftUIExport(): boolean {
+    return this.designStore.exportFormat === "swiftui";
+  }
+
   get isComponentExport(): boolean {
-    return this.isEmberExport || this.isTailwindExport;
+    return this.isEmberExport || this.isTailwindExport || this.isReactExport || this.isSwiftUIExport;
   }
 
   setExportSvg = () => {
     this.designStore.exportFormat = "svg";
+    this.previewTab = "preview";
   };
 
   setExportEmber = () => {
     this.designStore.exportFormat = "ember";
+    this.previewTab = "preview";
   };
 
   setExportTailwind = () => {
     this.designStore.exportFormat = "tailwind";
+    this.previewTab = "preview";
+  };
+
+  setExportReact = () => {
+    this.designStore.exportFormat = "react";
+    this.previewTab = "preview";
+  };
+
+  setExportSwiftUI = () => {
+    this.designStore.exportFormat = "swiftui";
+    this.previewTab = "code";
   };
 
   get emberComponentContent(): string {
@@ -146,13 +167,87 @@ export default class AtelierModals extends Component<ModalsSignature> {
     return this.designStore.exportEmberComponentTailwind();
   }
 
+  get reactComponentContent(): string {
+    return this.designStore.exportReactComponent();
+  }
+
+  get swiftuiComponentContent(): string {
+    return this.designStore.exportSwiftUIView();
+  }
+
   get activeComponentContent(): string {
-    return this.isTailwindExport ? this.tailwindComponentContent : this.emberComponentContent;
+    if (this.isReactExport) return this.reactComponentContent;
+    if (this.isSwiftUIExport) return this.swiftuiComponentContent;
+    if (this.isTailwindExport) return this.tailwindComponentContent;
+    return this.emberComponentContent;
   }
 
   get activeExportLabel(): string {
-    return this.isTailwindExport ? "Tailwind" : "Ember";
+    if (this.isReactExport) return "React";
+    if (this.isSwiftUIExport) return "SwiftUI";
+    if (this.isTailwindExport) return "Tailwind";
+    return "Ember";
   }
+
+  get activeFileExtension(): string {
+    if (this.isSwiftUIExport) return ".swift";
+    if (this.isReactExport) return ".tsx";
+    return ".gts";
+  }
+
+  @tracked previewTab: "preview" | "code" = "preview";
+
+  setPreviewTab = () => { this.previewTab = "preview"; };
+  setCodeTab = () => { this.previewTab = "code"; };
+
+  get isPreviewTab(): boolean { return this.previewTab === "preview"; }
+  get isCodeTab(): boolean { return this.previewTab === "code"; }
+
+  /**
+   * Extract the template HTML from the generated component and wrap it in
+   * a standalone HTML document with Tailwind CDN for iframe preview.
+   */
+  get livePreviewSrcdoc(): string {
+    const code = this.activeComponentContent;
+    // Extract content between <template> and </template>
+    const match = code.match(/<template>\s*([\s\S]*?)\s*<\/template>/);
+    const templateHTML = match ? match[1]! : "<p>No preview available</p>";
+    // Strip Glimmer expressions like {{on "click" this.handleClick}} for static preview
+    const staticHTML = templateHTML
+      .replace(/\{\{[^}]*\}\}/g, "")
+      .replace(/value=\s*/g, "");
+
+    const bgColor = this.isTailwindExport ? "#f8fafc" : "#ffffff";
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      background: ${bgColor};
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  ${staticHTML}
+</body>
+</html>`;
+  }
+
+  previewIframeModifier = modifier((element: Element) => {
+    // The srcdoc is set via attribute, nothing extra needed
+    // But we set sandbox for security
+    (element as HTMLIFrameElement).sandbox.add("allow-scripts");
+  });
 
   downloadComponent = () => {
     const content = this.activeComponentContent;
@@ -161,7 +256,7 @@ export default class AtelierModals extends Component<ModalsSignature> {
     const a = document.createElement("a");
     a.href = url;
     const safeName = this.designStore.fileName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "component";
-    a.download = `${safeName}.gts`;
+    a.download = `${safeName}${this.activeFileExtension}`;
     a.click();
     URL.revokeObjectURL(url);
     this.designStore.showExportModal = false;
@@ -604,6 +699,20 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
             >
               Tailwind
             </button>
+            <button
+              class="export-tab {{if this.isReactExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportReact}}
+            >
+              React
+            </button>
+            <button
+              class="export-tab {{if this.isSwiftUIExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportSwiftUI}}
+            >
+              SwiftUI
+            </button>
           </div>
 
           {{#if this.isSvgExport}}
@@ -618,7 +727,7 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
               </button>
             </div>
           {{else}}
-            {{! Tailwind token config toggle }}
+            {{! Tailwind token config toggle (show for Tailwind-based exports) }}
             {{#if this.isTailwindExport}}
               <div class="export-token-bar">
                 <button class="export-token-toggle" type="button" {{on "click" this.toggleTokenConfig}}>
@@ -656,14 +765,42 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
               {{/if}}
             {{/if}}
 
-            <div class="export-preview export-preview-code">
-              <pre>{{this.activeComponentContent}}</pre>
+            <div class="export-view-tabs">
+              <button
+                class="export-view-tab {{if this.isPreviewTab 'active'}}"
+                type="button"
+                {{on "click" this.setPreviewTab}}
+              >
+                Preview
+              </button>
+              <button
+                class="export-view-tab {{if this.isCodeTab 'active'}}"
+                type="button"
+                {{on "click" this.setCodeTab}}
+              >
+                Code
+              </button>
             </div>
+
+            {{#if this.isPreviewTab}}
+              <div class="export-preview export-preview-live">
+                <iframe
+                  class="export-preview-iframe"
+                  srcdoc={{this.livePreviewSrcdoc}}
+                  sandbox="allow-scripts"
+                  title="Component preview"
+                ></iframe>
+              </div>
+            {{else}}
+              <div class="export-preview export-preview-code">
+                <pre>{{this.activeComponentContent}}</pre>
+              </div>
+            {{/if}}
             <div class="export-modal-footer">
               <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
-              <button class="export-btn" type="button" {{on "click" this.copyComponent}}>Copy .gts</button>
+              <button class="export-btn" type="button" {{on "click" this.copyComponent}}>Copy {{this.activeFileExtension}}</button>
               <button class="export-btn primary" type="button" {{on "click" this.downloadComponent}}>
-                <IconDownload /> Download .gts
+                <IconDownload /> Download {{this.activeFileExtension}}
               </button>
             </div>
           {{/if}}
