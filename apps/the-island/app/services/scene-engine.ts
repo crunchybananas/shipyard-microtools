@@ -20,6 +20,7 @@ import type { CreatureState, CreatureRenderer } from "the-island/creatures/types
 import { CrabRenderer } from "the-island/creatures/crab";
 import { OwlRenderer } from "the-island/creatures/owl";
 import { CatRenderer } from "the-island/creatures/cat";
+import { FishRenderer } from "the-island/creatures/fish";
 
 export type HotspotCallback = (action: HotspotAction, target: string) => void;
 
@@ -70,6 +71,9 @@ export default class SceneEngineService extends Service {
           break;
         case "cat":
           this.creatureRenderers.set(type, new CatRenderer());
+          break;
+        case "fish":
+          this.creatureRenderers.set(type, new FishRenderer());
           break;
         default:
           // Placeholder renderer for unimplemented creatures
