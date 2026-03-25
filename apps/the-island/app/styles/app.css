@@ -109,9 +109,9 @@ body {
    ============================================ */
 .game-main {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -119,39 +119,52 @@ body {
    SCENE CONTAINER
    ============================================ */
 .scene-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  width: 100%;
+  height: 100%;
   background: var(--bg-dark);
-  overflow: hidden;
 }
 
 .scene-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  max-height: calc(100vh - 200px);
-  object-fit: contain;
 }
 
-/* Scene transitions */
-.scene-container.scene-exit {
-  animation: sceneExit 0.3s ease forwards;
+.scene-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.scene-container.scene-enter {
-  animation: sceneEnter 0.5s ease forwards;
+.game-bottom-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.3rem 0;
+  gap: 0.15rem;
 }
 
-@keyframes sceneExit {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.98); }
+/* Scene transitions — this div is the grid child */
+.scene-fade-in,
+.scene-fade-out {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
 }
 
-@keyframes sceneEnter {
-  from { opacity: 0; transform: scale(1.02); }
-  to { opacity: 1; transform: scale(1); }
+.scene-fade-in {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.scene-fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 /* ============================================
@@ -226,26 +239,19 @@ body {
    NAVIGATION
    ============================================ */
 .navigation {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(10, 10, 18, 0.8);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
 }
 
 .nav-btn {
-  width: 50px;
-  height: 50px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  gap: 2px;
+  padding: 0.4rem 0.8rem;
+  min-width: 56px;
   color: var(--text-secondary);
   background: transparent;
   border: 1px solid var(--border-color);
@@ -255,16 +261,27 @@ body {
   position: relative;
 }
 
-.nav-btn:hover:not(.hidden):not(.locked) {
+.nav-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.nav-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.nav-btn:hover:not(.locked) {
   color: var(--text-highlight);
   border-color: var(--text-highlight);
   background: rgba(255, 215, 0, 0.1);
   transform: scale(1.05);
 }
 
-.nav-btn.hidden {
-  opacity: 0.2;
-  pointer-events: none;
+.nav-btn:hover:not(.locked) .nav-label {
+  opacity: 1;
 }
 
 .nav-btn.locked {
@@ -276,8 +293,8 @@ body {
 .nav-btn.locked::after {
   content: '🔒';
   position: absolute;
-  font-size: 0.7rem;
-  bottom: 2px;
+  font-size: 0.6rem;
+  top: 2px;
   right: 2px;
 }
 
@@ -285,29 +302,19 @@ body {
    MESSAGE BOX
    ============================================ */
 .game-message {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 600px;
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  line-height: 1.5;
+  width: 100%;
+  max-width: 640px;
+  padding: 0.4rem 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
   color: var(--text-primary);
-  background: rgba(10, 10, 18, 0.95);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-  opacity: 0;
-  visibility: hidden;
-  transition: all var(--transition-medium);
   text-align: center;
-  box-shadow: 0 4px 20px var(--shadow-color);
+  opacity: 0;
+  transition: opacity var(--transition-medium);
 }
 
 .game-message.visible {
   opacity: 1;
-  visibility: visible;
 }
 
 /* ============================================
@@ -688,12 +695,15 @@ body {
   color: var(--text-secondary);
 }
 
+.mirror-puzzle-container {
+  max-width: 560px;
+}
+
 .mirror-puzzle-svg {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   height: auto;
   margin: 1rem 0;
-  background: var(--bg-dark);
   border-radius: 8px;
 }
 
@@ -743,6 +753,13 @@ body {
   background: rgba(255, 215, 0, 0.1);
 }
 
+.confirm-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
 /* ============================================
    SVG ANIMATIONS
    ============================================ */
@@ -787,16 +804,18 @@ body {
   }
 
   .nav-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    min-width: 44px;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .nav-icon {
+    font-size: 1rem;
   }
 
   .game-message {
     max-width: 90%;
-    bottom: 80px;
-    font-size: 0.9rem;
-    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
   }
 
   .inventory-panel {

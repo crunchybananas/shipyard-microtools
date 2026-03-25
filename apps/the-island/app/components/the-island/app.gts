@@ -1,10 +1,14 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { service } from "@ember/service";
+import { fn } from "@ember/helper";
 import { on } from "@ember/modifier";
 import { modifier } from "ember-modifier";
 import type GameStateService from "the-island/services/game-state";
 import type AudioEngineService from "the-island/services/audio-engine";
+import type SceneEngineService from "the-island/services/scene-engine";
+import type KingdomStateService from "the-island/services/kingdom-state";
+import type MusicEngineService from "the-island/services/music-engine";
 import {
   SCENES,
   ITEMS,
@@ -13,6 +17,7 @@ import {
   type GameFlags,
 } from "the-island/services/game-state";
 import SceneRenderer from "./scene-renderer";
+import CanvasRenderer from "./canvas-renderer";
 import Inventory from "./inventory";
 import MessageLog from "./message-log";
 import Navigation from "./navigation";
@@ -24,28 +29,211 @@ type Direction = "north" | "south" | "east" | "west" | "up" | "down";
 export default class TheIslandApp extends Component {
   @service declare gameState: GameStateService;
   @service declare audioEngine: AudioEngineService;
+  @service declare sceneEngine: SceneEngineService;
+  @service declare kingdomState: KingdomStateService;
+  @service declare musicEngine: MusicEngineService;
 
   @tracked message: string = "";
   @tracked messageVisible: boolean = false;
   @tracked showMirrorPuzzle: boolean = false;
   @tracked showSignalDeck: boolean = false;
+  @tracked showNewGameConfirm: boolean = false;
   @tracked isIntro: boolean = true;
   @tracked audioInitialized: boolean = false;
+  @tracked sceneTransition: boolean = false;
+  @tracked useCanvas: boolean = true; // Canvas is the only mode now
 
-  private messageTimeout: ReturnType<typeof setTimeout> | null = null;
+  @tracked canvasSceneId = "misty_shore";
+
+  kingdomNewGame = (): void => {
+    this.showNewGameConfirm = true;
+  };
+
+  confirmKingdomNewGame = (): void => {
+    this.showNewGameConfirm = false;
+    this.kingdomState.reset();
+    this.canvasSceneId = "misty_shore";
+    this.sceneEngine.loadScene("misty_shore", 0);
+    this.showMessage("You wash ashore in a gray, lifeless land. The kingdom has been cursed...");
+  };
+
+  get canvasExits(): Array<{ direction: string; icon: string; label: string; locked: boolean }> {
+    const dirIcons: Record<string, { icon: string; label: string }> = {
+      north: { icon: "⬆", label: "North" },
+      south: { icon: "⬇", label: "South" },
+      east: { icon: "➡", label: "East" },
+      west: { icon: "⬅", label: "West" },
+      up: { icon: "↑", label: "Up" },
+      down: { icon: "↓", label: "Down" },
+    };
+    return this.kingdomState.getAvailableExits().map((exit) => ({
+      direction: exit.direction,
+      icon: dirIcons[exit.direction]?.icon ?? "•",
+      label: dirIcons[exit.direction]?.label ?? exit.direction,
+      locked: exit.locked,
+    }));
+  }
+
+  testRestore = (): void => {
+    if (this.useCanvas) {
+      const sceneId = this.kingdomState.currentScene;
+      this.kingdomState.restoreScene(sceneId);
+      this.sceneEngine.triggerRestoration();
+      this.musicEngine.playCrescendo();
+
+      // Show restored description
+      const scene = this.sceneEngine.getActiveScene();
+      this.showMessage(scene?.restoredDescription ?? "The curse lifts! Color returns to the world...");
+    }
+  };
+
+  canvasNavigate = (direction: string): void => {
+    if (!this.useCanvas) return;
+
+    if (!this.kingdomState.canNavigate(direction)) {
+      this.showMessage("The way is blocked. Perhaps there's something to solve first?");
+      this.musicEngine.playClick();
+      return;
+    }
+
+    const targetSceneId = this.kingdomState.getExitScene(direction);
+    if (!targetSceneId) return;
+
+    this.musicEngine.playClick();
+
+    // Update kingdom state
+    this.kingdomState.setScene(targetSceneId);
+    this.canvasSceneId = targetSceneId;
+
+    // Transition canvas engine
+    const restoration = this.kingdomState.getRestoration(targetSceneId);
+    this.sceneEngine.transitionTo(targetSceneId, restoration);
+
+    // Show scene description
+    setTimeout(() => {
+      const scene = this.sceneEngine.getActiveScene();
+      if (scene) {
+        const desc = restoration > 0.5 ? scene.restoredDescription : scene.cursedDescription;
+        this.showMessage(desc);
+      }
+    }, 500);
+  };
+
+  handleCanvasInteraction = (action: string, target: string): void => {
+    if (!this.useCanvas) return;
+    this.musicEngine.initAudio(); // ensure audio context on first interaction
+
+    switch (action) {
+      case "examine":
+        this.canvasExamine(target);
+        break;
+      case "pickup":
+        this.canvasPickup(target);
+        break;
+      case "puzzle":
+        this.canvasPuzzle(target);
+        break;
+    }
+  };
+
+  private canvasExamine(target: string): void {
+    this.musicEngine.playClick();
+    const texts: Record<string, string> = {
+      rocks: "Worn smooth by ancient tides. Shells might be hidden in the sand nearby...",
+      waves: "The waves whisper secrets of a world once full of color.",
+      log: "A hollow log lies across the path. Something glints inside.",
+      mushrooms: "Strange mushrooms grow in clusters. They pulse faintly with inner light.",
+      pool: "A still pool reflects nothing. Or does it?",
+      books: "Dusty tomes line the shelves. Titles in a language you almost understand.",
+      fireplace: "The hearth is cold and dark. It yearns for warmth.",
+      shore: "Smooth pebbles line the shore. The ice above creaks ominously.",
+      chasm: "A bottomless abyss. Mist swirls up from unseen depths.",
+      windows: "Tall stained glass windows, their colors drained to gray. They depict scenes of a world alive with magic.",
+      columns: "Massive stone columns stretch upward into shadow. They've stood here for centuries.",
+    };
+    this.showMessage(texts[target] ?? "You examine it closely, but find nothing unusual.");
+  }
+
+  private canvasPickup(target: string): void {
+    if (this.kingdomState.hasItem(target)) return;
+    if (this.kingdomState.addItem(target)) {
+      this.musicEngine.playPickup();
+      this.sceneEngine.burst(600, 400, "#ffd700", 15);
+      this.showMessage(`Picked up: ${target.replace(/_/g, " ")}`);
+    }
+  }
+
+  private canvasPuzzle(target: string): void {
+    const sceneId = this.kingdomState.currentScene;
+    if (this.kingdomState.getRestoration(sceneId) >= 1) {
+      this.showMessage("This area has already been restored!");
+      return;
+    }
+
+    // Route to scene-specific puzzle logic
+    switch (sceneId) {
+      case "misty_shore":
+        this.shellPuzzle(target);
+        break;
+      default:
+        // Fallback: auto-solve for scenes without custom puzzle logic yet
+        this.testRestore();
+        break;
+    }
+  }
+
+  private shellPuzzle(_target: string): void {
+    // Shell discovery puzzle — find 3 shells hidden in the sand
+    const shells = this.kingdomState.getFlag("shellsFound");
+    const shellId = `shell_${shells.length + 1}`;
+
+    // Check if this shell was already found
+    if (shells.includes(shellId)) {
+      this.showMessage("You already found a shell here.");
+      return;
+    }
+
+    // Find the shell!
+    const newShells = [...shells, shellId];
+    this.kingdomState.setFlag("shellsFound", newShells);
+    this.musicEngine.playPickup();
+    this.sceneEngine.burst(600, 400, "#ffd700", 20);
+
+    const messages = [
+      "You brush away the sand and find a glowing shell! It pulses with faint warmth. (1/3)",
+      "Another shell! This one hums with a soft melody when you hold it to your ear. (2/3)",
+      "The third shell! All three shells begin to glow brightly...",
+    ];
+    this.showMessage(messages[newShells.length - 1] ?? "You found a shell!");
+
+    // After finding all 3, trigger restoration
+    if (newShells.length >= 3) {
+      setTimeout(() => {
+        this.showMessage("The three shells resonate together. A wave of warmth flows outward from your hands...");
+        setTimeout(() => {
+          this.testRestore();
+        }, 1500);
+      }, 2000);
+    }
+  }
 
   setup = modifier(() => {
     this.initGame();
   });
 
   initGame(): void {
-    const loaded = this.gameState.loadGame();
+    // Load kingdom state
+    const loaded = this.kingdomState.load();
+    this.canvasSceneId = this.kingdomState.currentScene;
+
     if (!loaded) {
       this.showMessage(
-        "You wake on a strange beach, waves lapping at your feet...",
+        "You wash ashore in a gray, lifeless land. The kingdom has been cursed...",
       );
     } else {
-      this.showMessage(this.gameState.currentSceneData.description);
+      this.showMessage(
+        `You return to the ${this.kingdomState.sceneName}...`,
+      );
     }
 
     // Remove intro animation after delay
@@ -82,17 +270,13 @@ export default class TheIslandApp extends Component {
     return this.isIntro ? "game-wrapper intro" : "game-wrapper";
   }
 
+  get sceneContainerClass(): string {
+    return this.sceneTransition ? "scene-fade-out" : "scene-fade-in";
+  }
+
   showMessage(text: string): void {
     this.message = text;
     this.messageVisible = true;
-
-    if (this.messageTimeout) {
-      clearTimeout(this.messageTimeout);
-    }
-
-    this.messageTimeout = setTimeout(() => {
-      this.messageVisible = false;
-    }, 5000);
   }
 
   initializeAudio = (): void => {
@@ -141,9 +325,12 @@ export default class TheIslandApp extends Component {
     this.audioEngine.playSound("click");
 
     const examinations: Record<string, string> = {
+      // Act 1
       rocks:
         "Worn smooth by countless tides. Something metallic glints beneath one...",
-      waves: "The endless rhythm of the sea. Cold and deep.",
+      waves: this.gameState.flags.tideOut
+        ? "The tide has pulled far back, exposing a dark cave mouth to the west..."
+        : "The endless rhythm of the sea. Cold and deep.",
       trees: "Ancient oaks, their branches twisted by centuries of wind.",
       stones:
         'The carvings depict stars, gears, and a lighthouse. A poem reads: "Four turn as one, light reveals the path."',
@@ -155,6 +342,25 @@ export default class TheIslandApp extends Component {
       lens: "A massive Fresnel lens. It focuses and magnifies light tremendously.",
       view: "From here you can see the entire island. On the distant cliffs... is that writing?",
       gear_slots: `${this.gameState.flags.gearsPlaced}/4 gears have been placed in the mechanism.`,
+      // Act 2
+      paintings:
+        "Ancient paintings cover the cave wall. A constellation of five stars connected by lines, forming an arrow pointing downward. Human figures stand beneath, arms raised.",
+      equipment:
+        "A corroded diving helmet and air hose. The brass nameplate reads 'Dr. Elara Voss, Station 7.' Someone lived here.",
+      lamp:
+        "An oil lamp on a wall bracket. Long cold. The passage continues north toward a faint hum.",
+      radio: this.gameState.flags.powerRestored
+        ? "The radio hums softly. A faint signal crackles through static..."
+        : "A shortwave radio, its guts spilled across the workbench. The frequency dial is stuck at 0. It could be repaired with the right parts and the right frequency.",
+      observatory_door:
+        "A heavy steel door. 'OBSERVATORY' is stenciled above in faded paint.",
+      telescope:
+        "A large refracting telescope pointed at a gap in the dome. Through the eyepiece, stars blaze with impossible clarity.",
+      vault_hatch: this.gameState.puzzlesSolved.constellation
+        ? "The hatch is open. Stone steps descend into golden light."
+        : "A steel hatch set into the floor. A star-shaped lock mechanism holds it shut. The star chart on the wall might hold the key.",
+      pedestal:
+        "A stone pedestal in the center of the vault. On it rests a leather-bound journal — the final account of what happened on this island.",
     };
 
     this.showMessage(examinations[target] ?? "You see nothing unusual.");
@@ -177,6 +383,15 @@ export default class TheIslandApp extends Component {
       this.gameState.flags.lighthouseDoorOpen
     ) {
       this.gameState.setFlag("foundGear2", true);
+    }
+    if (itemId === "gear3") {
+      this.gameState.setFlag("foundGear3", true);
+    }
+    if (itemId === "gear4") {
+      this.gameState.setFlag("foundGear4", true);
+    }
+    if (itemId === "cave_rubbing") {
+      this.gameState.setFlag("hasRubbing", true);
     }
 
     // Add to inventory
@@ -202,7 +417,35 @@ export default class TheIslandApp extends Component {
       this.gameState.currentScene === "lighthouse_base"
     ) {
       this.useGearOnSlot();
+    } else if (
+      target === "repair_radio" &&
+      this.gameState.currentScene === "research_station"
+    ) {
+      this.repairRadio();
     }
+  }
+
+  repairRadio(): void {
+    if (this.gameState.flags.powerRestored) {
+      this.showMessage("The radio is already repaired and humming.");
+      return;
+    }
+    if (!this.gameState.hasItem("radio_parts")) {
+      this.showMessage("The radio is broken. You need components to repair it.");
+      return;
+    }
+    if (!this.gameState.hasItem("journal_page2")) {
+      this.showMessage("You have the parts but don't know the right frequency. There must be a clue somewhere...");
+      return;
+    }
+    // Player has both parts and knows the frequency
+    this.gameState.removeFromInventory("radio_parts");
+    this.gameState.setFlag("powerRestored", true);
+    this.gameState.solvePuzzle("radio");
+    this.audioEngine.playSound("solve");
+    this.showMessage(
+      'You wire the vacuum tubes into place and dial to frequency 7.3. Static... then a faint voice: "Station 7, this is Mainland. The vault. Open the vault. The stars will show you."',
+    );
   }
 
   useGearOnSlot(): void {
@@ -251,7 +494,32 @@ export default class TheIslandApp extends Component {
         return;
       }
       this.showMirrorPuzzle = true;
+    } else if (puzzleId === "constellation") {
+      if (this.gameState.isPuzzleSolved("constellation")) {
+        this.showMessage(
+          "The constellation is already traced on the star chart. The vault hatch is open.",
+        );
+        return;
+      }
+      // Check if player has the cave rubbing (which shows the constellation pattern)
+      if (!this.gameState.hasItem("cave_rubbing")) {
+        this.showMessage(
+          "The star chart shows hundreds of stars. Without knowing which pattern to trace, this could take forever.",
+        );
+        return;
+      }
+      // Auto-solve: if player has the rubbing, they know the pattern
+      this.solveConstellationPuzzle();
     }
+  }
+
+  solveConstellationPuzzle(): void {
+    this.gameState.solvePuzzle("constellation");
+    this.gameState.setFlag("vaultOpen", true);
+    this.audioEngine.playSound("solve");
+    this.showMessage(
+      "You trace the constellation from the cave rubbing onto the star chart. The five stars glow golden. A deep grinding sound echoes — the vault hatch slides open!",
+    );
   }
 
   rotateMirror = (index: number): void => {
@@ -267,12 +535,13 @@ export default class TheIslandApp extends Component {
     if (this.gameState.isPuzzleSolved("lighthouse")) return;
 
     this.gameState.solvePuzzle("lighthouse");
+    this.gameState.setFlag("tideOut", true);
     this.audioEngine.playSound("solve");
 
     setTimeout(() => {
       this.showMirrorPuzzle = false;
       this.showMessage(
-        'The beam illuminates the distant cliffs! Ancient text becomes visible: "TIDE REVEALS THE CAVE AT DAWN"',
+        'The beam illuminates the distant cliffs! Ancient text becomes visible: "TIDE REVEALS THE CAVE AT DAWN." Something shifts in the distance — the tide is pulling back...',
       );
     }, 1000);
   }
@@ -324,13 +593,19 @@ export default class TheIslandApp extends Component {
     const scene = SCENES[sceneId];
     if (!scene) return;
 
-    this.gameState.setScene(sceneId);
+    // Fade out
+    this.sceneTransition = true;
 
-    // Update ambient audio
-    this.audioEngine.playAmbient(scene.ambient);
+    setTimeout(() => {
+      this.gameState.setScene(sceneId);
+      this.audioEngine.playAmbient(scene.ambient);
+      this.showMessage(scene.description);
 
-    // Show description
-    this.showMessage(scene.description);
+      // Fade in
+      setTimeout(() => {
+        this.sceneTransition = false;
+      }, 50);
+    }, 300);
   }
 
   saveGame = (): void => {
@@ -348,27 +623,31 @@ export default class TheIslandApp extends Component {
   };
 
   newGame = (): void => {
-    // eslint-disable-next-line no-alert
-    if (confirm("Start a new game? Your progress will be lost.")) {
-      this.gameState.resetGame();
-      this.showMessage(
-        "You wake on a strange beach, waves lapping at your feet...",
-      );
-      this.audioEngine.playAmbient(this.currentScene.ambient);
-    }
+    this.showNewGameConfirm = true;
+  };
+
+  confirmNewGame = (): void => {
+    this.showNewGameConfirm = false;
+    this.gameState.resetGame();
+    this.showMessage(
+      "You wake on a strange beach, waves lapping at your feet...",
+    );
+    this.audioEngine.playAmbient(this.currentScene.ambient);
+  };
+
+  cancelNewGame = (): void => {
+    this.showNewGameConfirm = false;
   }
 
   <template>
     <div class={{this.wrapperClass}} {{this.setup}}>
       {{! Header }}
       <header class="game-header">
-        <h1 class="game-title">THE ISLAND</h1>
-        <span class="location-name">{{this.currentScene.name}}</span>
+        <h1 class="game-title">THE FADING KINGDOM</h1>
+        <span class="location-name">{{this.kingdomState.sceneName}}</span>
         <div class="menu-buttons">
-          <button type="button" class="menu-btn" {{on "click" this.saveGame}}>Save</button>
-          <button type="button" class="menu-btn" {{on "click" this.loadGame}}>Load</button>
-          <button type="button" class="menu-btn" {{on "click" this.newGame}}>New Game</button>
-          <button type="button" class="menu-btn" {{on "click" this.openSignalDeck}}>Signal Deck</button>
+          <button type="button" class="menu-btn" {{on "click" this.kingdomNewGame}}>New Game</button>
+          <button type="button" class="menu-btn" {{on "click" this.testRestore}}>Restore</button>
         </div>
       </header>
 
@@ -376,39 +655,50 @@ export default class TheIslandApp extends Component {
       <main class="game-main">
         {{! Scene Container }}
         {{! template-lint-disable no-invalid-interactive }}
-        <div {{on "click" this.handleSceneClick}}>
-          <SceneRenderer
-            @sceneId={{this.sceneId}}
-            @onInteraction={{this.handleInteraction}}
+        <div class={{this.sceneContainerClass}}>
+          <CanvasRenderer
+            @sceneId={{this.canvasSceneId}}
+            @restorationProgress={{0}}
+            @onInteraction={{this.handleCanvasInteraction}}
           />
         </div>
 
-        {{! Navigation Controls }}
-        <Navigation
-          @scene={{this.currentScene}}
-          @flags={{this.flags}}
-          @onNavigate={{this.navigate}}
-        />
-
-        {{! Message Display }}
-        <MessageLog @message={{this.message}} @visible={{this.messageVisible}} />
+        {{! Bottom bar: message + navigation }}
+        <div class="game-bottom-bar">
+          <MessageLog @message={{this.message}} @visible={{this.messageVisible}} />
+          <nav class="navigation">
+            {{#each this.canvasExits as |exit|}}
+              <button
+                type="button"
+                class="nav-btn {{if exit.locked 'locked'}}"
+                {{on "click" (fn this.canvasNavigate exit.direction)}}
+              >
+                <span class="nav-icon">{{exit.icon}}</span>
+                <span class="nav-label">{{exit.label}}</span>
+              </button>
+            {{/each}}
+          </nav>
+        </div>
       </main>
 
       {{! Inventory Panel }}
-      <Inventory @items={{this.inventory}} @onExamineItem={{this.examineItem}} />
+      <Inventory @items={{this.kingdomState.inventory}} @onExamineItem={{this.examineItem}} />
 
-      {{! Mirror Puzzle Overlay }}
-      {{#if this.showMirrorPuzzle}}
-        <MirrorPuzzle
-          @mirrorAngles={{this.mirrorAngles}}
-          @onRotateMirror={{this.rotateMirror}}
-          @onClose={{this.closePuzzle}}
-          @isSolved={{this.isLighthousePuzzleSolved}}
-        />
-      {{/if}}
-
-      {{#if this.showSignalDeck}}
-        <SignalDeck @scene={{this.currentScene}} @onClose={{this.closeSignalDeck}} />
+      {{#if this.showNewGameConfirm}}
+        <div class="puzzle-overlay">
+          <div class="puzzle-container">
+            <h2>Start Over?</h2>
+            <p>Your progress will be lost. Are you sure?</p>
+            <div class="confirm-buttons">
+              <button type="button" class="puzzle-close" {{on "click" this.confirmKingdomNewGame}}>
+                Yes, Start New Game
+              </button>
+              <button type="button" class="puzzle-close" {{on "click" this.cancelNewGame}}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       {{/if}}
     </div>
   </template>

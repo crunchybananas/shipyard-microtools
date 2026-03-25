@@ -7,6 +7,10 @@ export interface PuzzlesSolved {
   gears: boolean;
   stars: boolean;
   finalDoor: boolean;
+  cavePainting: boolean;
+  radio: boolean;
+  constellation: boolean;
+  vault: boolean;
 }
 
 export interface GameFlags {
@@ -21,6 +25,15 @@ export interface GameFlags {
   mirrorAngles: [number, number, number, number];
   examinedStones: boolean;
   readJournal1: boolean;
+  // Act 2 flags
+  caveOpen: boolean;
+  powerRestored: boolean;
+  radioFrequency: number;
+  constellationNodes: number[];
+  vaultOpen: boolean;
+  readJournal2: boolean;
+  readJournal3: boolean;
+  hasRubbing: boolean;
 }
 
 export interface GameStateData {
@@ -40,7 +53,7 @@ export interface SceneExit {
 export interface Scene {
   id: string;
   name: string;
-  ambient: "ocean" | "forest" | "cave";
+  ambient: "ocean" | "forest" | "cave" | "station";
   exits: Record<string, string | SceneExit>;
   items: string[];
   description: string;
@@ -67,6 +80,10 @@ const DEFAULT_STATE: GameStateData = {
     gears: false,
     stars: false,
     finalDoor: false,
+    cavePainting: false,
+    radio: false,
+    constellation: false,
+    vault: false,
   },
   flags: {
     lanternLit: false,
@@ -80,6 +97,15 @@ const DEFAULT_STATE: GameStateData = {
     mirrorAngles: [0, 0, 0, 0],
     examinedStones: false,
     readJournal1: false,
+    // Act 2
+    caveOpen: false,
+    powerRestored: false,
+    radioFrequency: 0,
+    constellationNodes: [],
+    vaultOpen: false,
+    readJournal2: false,
+    readJournal3: false,
+    hasRubbing: false,
   },
   journalEntries: [],
 };
@@ -91,6 +117,7 @@ export const SCENES: Record<string, Scene> = {
     ambient: "ocean",
     exits: {
       north: "forest",
+      west: { scene: "tidal_cave", requires: "tideOut" },
     },
     items: ["rusty_key"],
     description:
@@ -142,6 +169,68 @@ export const SCENES: Record<string, Scene> = {
     items: [],
     description:
       "The lantern room offers a stunning view of the island. Four mirrors surround a central lens. Something glints on the distant cliffs.",
+  },
+
+  // === ACT 2 ===
+
+  tidal_cave: {
+    id: "tidal_cave",
+    name: "Tidal Cave",
+    ambient: "cave",
+    exits: {
+      east: "beach",
+      north: { scene: "underwater_passage", requires: "hasRubbing" },
+    },
+    items: ["gear3", "cave_rubbing"],
+    description:
+      "The tide has retreated, revealing a gaping cave mouth in the cliff face. Bioluminescent algae cast an eerie blue-green glow on ancient paintings that cover the walls.",
+  },
+  underwater_passage: {
+    id: "underwater_passage",
+    name: "Underwater Passage",
+    ambient: "cave",
+    exits: {
+      south: "tidal_cave",
+      north: "research_station",
+    },
+    items: [],
+    description:
+      "A narrow passage carved through living rock. Seawater seeps through cracks, and old diving equipment hangs from rusted hooks. Someone came this way often.",
+  },
+  research_station: {
+    id: "research_station",
+    name: "Research Station",
+    ambient: "station",
+    exits: {
+      south: "underwater_passage",
+      east: "observatory",
+    },
+    items: ["gear4", "journal_page2", "radio_parts"],
+    description:
+      "An abandoned research outpost. Papers are scattered across steel desks. A dead radio sits on a workbench, its wires torn loose. A door to the east reads OBSERVATORY.",
+  },
+  observatory: {
+    id: "observatory",
+    name: "Observatory",
+    ambient: "station",
+    exits: {
+      west: "research_station",
+      north: { scene: "vault", requires: "vaultOpen" },
+    },
+    items: ["journal_page3"],
+    description:
+      "A domed room with a massive telescope pointed at the sky. A star chart covers one wall. Below the chart, a locked steel hatch is set into the floor — or is it a door?",
+  },
+  vault: {
+    id: "vault",
+    name: "The Vault",
+    ambient: "cave",
+    exits: {
+      south: "observatory",
+    },
+    items: [],
+    description:
+      "You descend into a chamber carved from the bedrock of the island itself. In the center, a pedestal holds a final journal — the complete account of what happened here.",
   },
 };
 
@@ -196,6 +285,38 @@ export const ITEMS: Record<string, Item> = {
     description: "An oil lantern. It casts a warm glow when lit.",
     icon: "🏮",
   },
+
+  // Act 2 items
+  cave_rubbing: {
+    id: "cave_rubbing",
+    name: "Cave Painting Rubbing",
+    description:
+      "A charcoal rubbing of the cave paintings. It shows a constellation pattern — five stars connected by lines forming an arrow pointing down.",
+    icon: "🖼️",
+  },
+  journal_page2: {
+    id: "journal_page2",
+    name: "Research Log",
+    description:
+      '"Day 147. The radio is our only link to the mainland. Frequency 7.3 — the only one that cuts through the island\'s interference. They stopped answering weeks ago."',
+    icon: "📜",
+    isJournal: true,
+  },
+  journal_page3: {
+    id: "journal_page3",
+    name: "Final Entry",
+    description:
+      '"The stars told us everything. Match the constellation from the cave to the chart, and the vault opens. What we found inside... I leave that for whoever comes next."',
+    icon: "📜",
+    isJournal: true,
+  },
+  radio_parts: {
+    id: "radio_parts",
+    name: "Radio Components",
+    description:
+      "Spare vacuum tubes and copper wire. Enough to repair a shortwave radio if you know the right frequency.",
+    icon: "📻",
+  },
 };
 
 export default class GameStateService extends Service {
@@ -222,17 +343,26 @@ export default class GameStateService extends Service {
         this.currentScene = data.currentScene;
         this.previousScene = data.previousScene;
         this.inventory = [...data.inventory];
-        this.puzzlesSolved = { ...data.puzzlesSolved };
+        // Merge with defaults so new fields from updates don't break old saves
+        this.puzzlesSolved = {
+          ...DEFAULT_STATE.puzzlesSolved,
+          ...data.puzzlesSolved,
+        };
         this.flags = {
+          ...DEFAULT_STATE.flags,
           ...data.flags,
-          mirrorAngles: [...data.flags.mirrorAngles] as [
+          mirrorAngles: [...(data.flags.mirrorAngles ?? [0, 0, 0, 0])] as [
             number,
             number,
             number,
             number,
           ],
+          constellationNodes: [
+            ...(data.flags.constellationNodes ??
+              DEFAULT_STATE.flags.constellationNodes),
+          ],
         };
-        this.journalEntries = [...data.journalEntries];
+        this.journalEntries = [...(data.journalEntries ?? [])];
         return true;
       }
     } catch (e) {

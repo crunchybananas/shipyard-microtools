@@ -20,18 +20,20 @@ interface NavButton {
   title: string;
 }
 
-export default class Navigation extends Component<NavigationSignature> {
-  directions: NavButton[] = [
-    { direction: "up", icon: "↑", title: "Go Up" },
-    { direction: "north", icon: "⬆", title: "Go North" },
-    { direction: "down", icon: "↓", title: "Go Down" },
-    { direction: "west", icon: "⬅", title: "Go West" },
-    { direction: "east", icon: "➡", title: "Go East" },
-    { direction: "south", icon: "⬇", title: "Go South" },
-  ];
+const ALL_DIRECTIONS: NavButton[] = [
+  { direction: "up", icon: "↑", title: "Go Up" },
+  { direction: "north", icon: "⬆", title: "North" },
+  { direction: "south", icon: "⬇", title: "South" },
+  { direction: "west", icon: "⬅", title: "West" },
+  { direction: "east", icon: "➡", title: "East" },
+  { direction: "down", icon: "↓", title: "Go Down" },
+];
 
-  isExitAvailable(direction: Direction): boolean {
-    return !!this.args.scene.exits[direction];
+export default class Navigation extends Component<NavigationSignature> {
+  get availableDirections(): NavButton[] {
+    return ALL_DIRECTIONS.filter(
+      (btn) => !!this.args.scene.exits[btn.direction],
+    );
   }
 
   isExitLocked(direction: Direction): boolean {
@@ -45,31 +47,24 @@ export default class Navigation extends Component<NavigationSignature> {
   }
 
   getButtonClass = (direction: Direction): string => {
-    const classes = ["nav-btn"];
-    if (!this.isExitAvailable(direction)) {
-      classes.push("hidden");
-    } else if (this.isExitLocked(direction)) {
-      classes.push("locked");
-    }
-    return classes.join(" ");
+    return this.isExitLocked(direction) ? "nav-btn locked" : "nav-btn";
   };
 
   handleClick = (direction: Direction): void => {
-    if (this.isExitAvailable(direction)) {
-      this.args.onNavigate(direction);
-    }
+    this.args.onNavigate(direction);
   };
 
   <template>
     <nav class="navigation" ...attributes>
-      {{#each this.directions as |btn|}}
+      {{#each this.availableDirections as |btn|}}
         <button
           type="button"
           class={{this.getButtonClass btn.direction}}
           title={{btn.title}}
           {{on "click" (fn this.handleClick btn.direction)}}
         >
-          {{btn.icon}}
+          <span class="nav-icon">{{btn.icon}}</span>
+          <span class="nav-label">{{btn.title}}</span>
         </button>
       {{/each}}
     </nav>
