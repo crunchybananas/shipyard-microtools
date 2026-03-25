@@ -175,6 +175,12 @@ export default class TheIslandApp extends Component {
       case "misty_shore":
         this.shellPuzzle(target);
         break;
+      case "whispering_woods":
+        this.owlCagePuzzle();
+        break;
+      case "crystal_caverns":
+        this.crystalPuzzle();
+        break;
       default:
         // Fallback: auto-solve for scenes without custom puzzle logic yet
         this.testRestore();
@@ -210,6 +216,61 @@ export default class TheIslandApp extends Component {
     if (newShells.length >= 3) {
       setTimeout(() => {
         this.showMessage("The three shells resonate together. A wave of warmth flows outward from your hands...");
+        setTimeout(() => {
+          this.testRestore();
+        }, 1500);
+      }, 2000);
+    }
+  }
+
+  private owlCageClickCount = 0;
+
+  private owlCagePuzzle(): void {
+    this.owlCageClickCount++;
+    this.musicEngine.playClick();
+    this.sceneEngine.burst(600, 350, "#8888ff", 10);
+
+    const messages = [
+      "You tug at the rusted lock. It groans but holds. The owl's eyes flicker open for a moment.",
+      "The lock is weakening! Rust flakes away. The owl watches you now, golden eyes barely open.",
+      "With a final wrench, the lock shatters! The cage door swings open...",
+    ];
+    this.showMessage(messages[Math.min(this.owlCageClickCount - 1, 2)] ?? "");
+
+    if (this.owlCageClickCount >= 3) {
+      this.owlCageClickCount = 0;
+      setTimeout(() => {
+        this.showMessage("The owl spreads its wings wide. For a breathless moment it hovers — then settles onto a branch, free at last. The forest sighs with relief.");
+        setTimeout(() => {
+          this.testRestore();
+        }, 1500);
+      }, 2000);
+    }
+  }
+
+  private crystalClickCount = 0;
+
+  private crystalPuzzle(): void {
+    this.crystalClickCount++;
+    this.musicEngine.playClick();
+
+    const colors = ["#ff00ff", "#00ffff", "#ffff00", "#ff8800", "#00ff88"];
+    const color = colors[(this.crystalClickCount - 1) % colors.length] ?? "#ffffff";
+    this.sceneEngine.burst(600, 380, color, 15);
+
+    const messages = [
+      "You touch the first crystal. It hums and emits a faint violet glow.",
+      "A second crystal responds! Blue light arcs between them.",
+      "Three crystals now pulse in harmony. The cave walls begin to shimmer.",
+      "Four crystals blazing! Prisms of light bounce between them, painting the walls.",
+      "The fifth crystal ignites! A cascade of rainbow light fills the cavern!",
+    ];
+    this.showMessage(messages[Math.min(this.crystalClickCount - 1, 4)] ?? "");
+
+    if (this.crystalClickCount >= 5) {
+      this.crystalClickCount = 0;
+      setTimeout(() => {
+        this.showMessage("Every surface blazes with refracted light. The cave has become a cathedral of crystal and color. From the deepest shadow, a fox with amber eyes steps forward.");
         setTimeout(() => {
           this.testRestore();
         }, 1500);
