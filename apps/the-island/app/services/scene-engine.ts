@@ -469,9 +469,6 @@ export default class SceneEngineService extends Service {
     const rect = this.canvas.getBoundingClientRect();
     const nx = (e.clientX - rect.left) / rect.width;
     const ny = (e.clientY - rect.top) / rect.height;
-    const sceneX = nx * 1200;
-    const sceneY = ny * 500 + 180;
-
     const hotspot = this.hitTestHotspot(nx, ny);
     if (hotspot) {
       this.onHotspotClick(hotspot.action, hotspot.target);
