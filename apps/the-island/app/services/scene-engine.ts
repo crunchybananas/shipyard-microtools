@@ -469,6 +469,8 @@ export default class SceneEngineService extends Service {
     const rect = this.canvas.getBoundingClientRect();
     const nx = (e.clientX - rect.left) / rect.width;
     const ny = (e.clientY - rect.top) / rect.height;
+    const sceneX = nx * 1200;
+    const sceneY = ny * 500 + 180;
 
     const hotspot = this.hitTestHotspot(nx, ny);
     if (hotspot) {
@@ -489,13 +491,10 @@ export default class SceneEngineService extends Service {
     const sceneX = nx * 1200;
     const sceneY = ny * 500 + 180;
 
-    for (const hotspot of this.activeScene.hotspots) {
-      // Check visibility
-      if (hotspot.isVisible) {
-        // We'd need flags here — for now, always visible if no check
-        // This will be wired up properly when game-state is connected
-      }
+    // Two-pass: puzzle/pickup first (higher priority), then examine
+    let examineHit: Hotspot | null = null;
 
+    for (const hotspot of this.activeScene.hotspots) {
       const b = hotspot.bounds;
       if (
         sceneX >= b.x &&
@@ -503,11 +502,16 @@ export default class SceneEngineService extends Service {
         sceneY >= b.y &&
         sceneY <= b.y + b.height
       ) {
-        return hotspot;
+        if (hotspot.action === "puzzle" || hotspot.action === "pickup" || hotspot.action === "use") {
+          return hotspot; // High priority — return immediately
+        }
+        if (!examineHit) {
+          examineHit = hotspot; // Low priority — save for later
+        }
       }
     }
 
-    return null;
+    return examineHit;
   }
 
   // ============================================
