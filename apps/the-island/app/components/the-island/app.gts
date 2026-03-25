@@ -18,6 +18,9 @@ import {
 } from "the-island/services/game-state";
 import SceneRenderer from "./scene-renderer";
 import CanvasRenderer from "./canvas-renderer";
+import ShellMemory from "the-island/puzzles/shell-memory";
+import SymbolLock from "the-island/puzzles/symbol-lock";
+import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
 import Inventory from "./inventory";
 import MessageLog from "./message-log";
 import Navigation from "./navigation";
@@ -42,6 +45,7 @@ export default class TheIslandApp extends Component {
   @tracked audioInitialized: boolean = false;
   @tracked sceneTransition: boolean = false;
   @tracked useCanvas: boolean = true; // Canvas is the only mode now
+  @tracked activePuzzle: string | null = null;
 
   @tracked canvasSceneId = "misty_shore";
 
@@ -61,6 +65,25 @@ export default class TheIslandApp extends Component {
         this.showMessage(scene.cursedDescription);
       }
     }, 300);
+  };
+
+  get showShellMemory(): boolean { return this.activePuzzle === "shell_memory"; }
+  get showSymbolLock(): boolean { return this.activePuzzle === "symbol_lock"; }
+  get showMelodyPuzzle(): boolean { return this.activePuzzle === "melody"; }
+
+  handlePuzzleSolve = (): void => {
+    this.activePuzzle = null;
+    // Trigger restoration for current scene
+    const sceneId = this.kingdomState.currentScene;
+    this.kingdomState.restoreScene(sceneId);
+    this.sceneEngine.triggerRestoration();
+    this.musicEngine.playCrescendo();
+    const scene = this.sceneEngine.getActiveScene();
+    this.showMessage(scene?.restoredDescription ?? "The curse lifts!");
+  };
+
+  handlePuzzleClose = (): void => {
+    this.activePuzzle = null;
   };
 
   get progressDots(): Array<{ name: string; icon: string; restored: boolean }> {
@@ -209,13 +232,18 @@ export default class TheIslandApp extends Component {
     }
 
     // Route to scene-specific puzzle logic
+    // Scenes with real puzzle overlays
     switch (sceneId) {
       case "misty_shore":
-        this.shellPuzzle(target);
+        this.activePuzzle = "shell_memory";
         break;
       case "whispering_woods":
-        this.owlCagePuzzle();
+        this.activePuzzle = "symbol_lock";
         break;
+      case "wizards_tower":
+        this.activePuzzle = "melody";
+        break;
+      // Scenes with click-based puzzles (to be upgraded later)
       case "crystal_caverns":
         this.crystalPuzzle();
         break;
@@ -224,9 +252,6 @@ export default class TheIslandApp extends Component {
         break;
       case "rainbow_bridge":
         this.bridgePuzzle();
-        break;
-      case "wizards_tower":
-        this.towerPuzzle();
         break;
       case "starfall_lake":
         this.lakePuzzle();
@@ -939,6 +964,17 @@ export default class TheIslandApp extends Component {
 
       {{! Inventory Panel }}
       <Inventory @items={{this.kingdomState.inventory}} @onExamineItem={{this.examineItem}} />
+
+      {{! Puzzle Overlays }}
+      {{#if this.showShellMemory}}
+        <ShellMemory @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+      {{#if this.showSymbolLock}}
+        <SymbolLock @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+      {{#if this.showMelodyPuzzle}}
+        <MelodyPuzzle @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
 
       {{#if this.showNewGameConfirm}}
         <div class="puzzle-overlay">
