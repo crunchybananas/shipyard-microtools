@@ -162,8 +162,8 @@ function drawClouds(rc: SceneRenderContext): void {
 export const rainbowBridge: SceneDefinition = {
   id: "rainbow_bridge",
   name: "Rainbow Bridge",
-  cursedDescription: "A shattered bridge spans a bottomless chasm. Gray mist swirls up from the abyss. The far side is unreachable.",
-  restoredDescription: "A magnificent rainbow bridge arcs across the chasm! Seven bands of pure color shimmer and pulse with life. Fluffy clouds drift below. A phoenix soars overhead, trailing golden sparks.",
+  cursedDescription: "The bridge is broken. Massive stone pillars jut from either side of a chasm so deep that mist rises from it like breath from a sleeping god. The far side — tantalizingly close — holds the rest of the kingdom. But the gap is absolute.",
+  restoredDescription: "Seven bands of pure light arc across the void — red, orange, yellow, green, blue, indigo, violet — a bridge made of the spectrum itself. Above it, a phoenix wheels in circles of golden fire, and below, clouds have gathered like an audience at a miracle.",
   exits: {
     south: "the_meadow",
     north: { scene: "wizards_tower", requires: "bridgeComplete" },

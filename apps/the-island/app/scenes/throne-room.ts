@@ -216,8 +216,8 @@ function drawBanner(rc: SceneRenderContext): void {
 export const throneRoom: SceneDefinition = {
   id: "throne_room",
   name: "The Throne Room",
-  cursedDescription: "A vast, dark hall. Stone columns rise into shadow. An altar stands in the center, seven empty circles etched into its surface. This is where it ends — or begins again.",
-  restoredDescription: "The throne room blazes with glory! Colored light streams through stained glass. Every guardian creature has gathered here. The altar pulses with golden light. The kingdom is restored!",
+  cursedDescription: "The heart of the kingdom. Stone columns rise into a darkness that seems to breathe. In the center, an altar waits — seven empty circles etched into its surface, each one a promise or a wound. This is where it all began. This is where it ends.",
+  restoredDescription: "The throne room blazes with every color you have gathered. Stained glass windows throw cathedral light across the stone. The altar hums with golden warmth. And they are all here — crab, owl, fox, unicorn, phoenix, cat, and fish — the guardians of a kingdom reborn. You are home.",
   exits: {
     south: "starfall_lake",
   },

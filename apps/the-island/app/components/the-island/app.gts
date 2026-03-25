@@ -882,7 +882,6 @@ export default class TheIslandApp extends Component {
         <span class="location-name">{{this.kingdomState.sceneName}}</span>
         <div class="menu-buttons">
           <button type="button" class="menu-btn" {{on "click" this.kingdomNewGame}}>New Game</button>
-          <button type="button" class="menu-btn" {{on "click" this.testRestore}}>Restore</button>
         </div>
       </header>
 

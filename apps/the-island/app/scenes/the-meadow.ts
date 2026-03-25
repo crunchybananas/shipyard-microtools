@@ -152,8 +152,8 @@ function drawRainbow(rc: SceneRenderContext): void {
 export const theMeadow: SceneDefinition = {
   id: "the_meadow",
   name: "The Meadow",
-  cursedDescription: "A vast dead meadow stretches to the horizon. Brown grass lies flat and still. The sky presses down like a gray ceiling.",
-  restoredDescription: "The meadow erupts with color! Wildflowers sway in a warm breeze, butterflies spiral upward, and a rainbow arcs across a blue sky. A white unicorn grazes peacefully.",
+  cursedDescription: "A meadow that forgot it was alive. The grass lies flat and brown, like hair on a sleeping giant who may never wake. The sky presses low, the color of old tin. Somewhere beneath this dead earth, seeds are waiting.",
+  restoredDescription: "The meadow remembers spring. Wildflowers erupt in waves — crimson, gold, violet, azure — as if the earth is laughing. Butterflies spiral up from the petals like living confetti. And there, at the meadow's heart, a unicorn grazes in a pool of light, its horn catching every color the world has to offer.",
   exits: {
     west: "crystal_caverns",
     north: "rainbow_bridge",
