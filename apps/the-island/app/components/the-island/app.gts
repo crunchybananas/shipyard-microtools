@@ -23,6 +23,8 @@ import SymbolLock from "the-island/puzzles/symbol-lock";
 import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
 import LightBeam from "the-island/puzzles/light-beam";
 import ColorSort from "the-island/puzzles/color-sort";
+import PotionRecipe from "the-island/puzzles/potion-recipe";
+import RuneTrace from "the-island/puzzles/rune-trace";
 import Inventory from "./inventory";
 import MessageLog from "./message-log";
 import Navigation from "./navigation";
@@ -74,6 +76,8 @@ export default class TheIslandApp extends Component {
   get showMelodyPuzzle(): boolean { return this.activePuzzle === "melody"; }
   get showLightBeam(): boolean { return this.activePuzzle === "light_beam"; }
   get showColorSort(): boolean { return this.activePuzzle === "color_sort"; }
+  get showPotionRecipe(): boolean { return this.activePuzzle === "potion_recipe"; }
+  get showRuneTrace(): boolean { return this.activePuzzle === "rune_trace"; }
 
   handlePuzzleSolve = (): void => {
     this.activePuzzle = null;
@@ -257,13 +261,13 @@ export default class TheIslandApp extends Component {
         this.activePuzzle = "light_beam";
         break;
       case "the_meadow":
-        this.meadowPuzzle();
+        this.activePuzzle = "potion_recipe";
         break;
       case "rainbow_bridge":
         this.activePuzzle = "color_sort";
         break;
       case "starfall_lake":
-        this.lakePuzzle();
+        this.activePuzzle = "rune_trace";
         break;
       case "throne_room":
         this.thronePuzzle();
@@ -989,6 +993,12 @@ export default class TheIslandApp extends Component {
       {{/if}}
       {{#if this.showColorSort}}
         <ColorSort @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+      {{#if this.showPotionRecipe}}
+        <PotionRecipe @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+      {{#if this.showRuneTrace}}
+        <RuneTrace @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
       {{/if}}
 
       {{#if this.showNewGameConfirm}}
