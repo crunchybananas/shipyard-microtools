@@ -178,7 +178,7 @@ function drawShore(rc: SceneRenderContext): void {
 export const starfallLake: SceneDefinition = {
   id: "starfall_lake",
   name: "Starfall Lake",
-  cursedDescription: "A lake frozen not by winter but by sorrow. Its surface is cracked gray ice, and the bare trees around it stand like mourners at a funeral that never ended. Above, stars shine — but the lake refuses to reflect them. It has forgotten how to mirror the sky.",
+  cursedDescription: "A frozen lake under a sky full of stars it refuses to reflect. The ice is cracked but holds. Ancient runes are carved into the shore — a pattern of warmth that might melt the curse. Trace the rune on the ice to break it.",
   restoredDescription: "The ice dissolves like a bad dream. The lake opens its dark eye and sees the sky — and every star above finds its twin below, doubled, shimmering. Fish leap in silver arcs, breaking the surface into rings of light. The trees burst into leaf. The lake remembers joy.",
   exits: {
     west: "wizards_tower",

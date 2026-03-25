@@ -152,7 +152,7 @@ function drawRainbow(rc: SceneRenderContext): void {
 export const theMeadow: SceneDefinition = {
   id: "the_meadow",
   name: "The Meadow",
-  cursedDescription: "A meadow that forgot it was alive. The grass lies flat and brown, like hair on a sleeping giant who may never wake. The sky presses low, the color of old tin. Somewhere beneath this dead earth, seeds are waiting.",
+  cursedDescription: "A dead meadow under a tin sky. But look — faint glimmers in the grass. Three ingredients for a healing potion hide here: moonpetal, starroot, and dewdrop. Search the glowing spots to gather them.",
   restoredDescription: "The meadow remembers spring. Wildflowers erupt in waves — crimson, gold, violet, azure — as if the earth is laughing. Butterflies spiral up from the petals like living confetti. And there, at the meadow's heart, a unicorn grazes in a pool of light, its horn catching every color the world has to offer.",
   exits: {
     west: "crystal_caverns",

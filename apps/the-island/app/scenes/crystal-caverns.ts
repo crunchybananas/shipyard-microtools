@@ -139,7 +139,7 @@ function drawCaveFloor(rc: SceneRenderContext): void {
 export const crystalCaverns: SceneDefinition = {
   id: "crystal_caverns",
   name: "Crystal Caverns",
-  cursedDescription: "Darkness presses against you like a living thing. Water drips in a slow, hollow rhythm — the cave's only heartbeat. Crystal formations jut from the walls like teeth, gray and dead. Each one should hold a universe of color, but the curse has swallowed every last photon.",
+  cursedDescription: "Darkness presses in. Crystal formations jut from the walls, gray and dead — but they still hum faintly when you're near. Touch the crystals to wake them. Each one holds a color the cave has forgotten.",
   restoredDescription: "The cavern ignites. Every crystal catches the light and throws it further — violet to blue to green to gold — until the walls are a cathedral of living color. From the deepest shadow, a fox with amber eyes steps forward, its fur rippling with reflected prisms.",
   exits: {
     south: "whispering_woods",

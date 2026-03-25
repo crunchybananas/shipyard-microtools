@@ -349,7 +349,7 @@ export const mistyShore: SceneDefinition = {
   name: "Misty Shore",
 
   cursedDescription:
-    "You wake on cold, colorless sand. Rain falls from a sky the shade of ash. The waves sound hollow, as though the sea itself has forgotten how to sing. Somewhere in the mist, a faint light pulses — a lighthouse on a distant headland, still holding on.",
+    "You wake on cold, colorless sand. Rain falls from a sky the shade of ash. The waves sound hollow, as though the sea itself has forgotten how to sing. But wait — faint golden glimmers in the sand. Three shells, perhaps, hidden where the tide once played. Touch the sand to search...",
   restoredDescription:
     "Warmth floods back like a held breath released. The ocean remembers its blue, the sand its gold, and the sun its place in the sky. A little crab appears from behind a rock, claws raised in triumph. The shore is alive again.",
 

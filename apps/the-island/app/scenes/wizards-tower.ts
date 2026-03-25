@@ -226,7 +226,7 @@ function drawWindow(rc: SceneRenderContext): void {
 export const wizardsTower: SceneDefinition = {
   id: "wizards_tower",
   name: "Wizard's Tower",
-  cursedDescription: "Dust hangs frozen in still air. A wizard's study, abandoned mid-thought — books lie open on desks, a quill rests in dried ink. The fireplace is cold and dark. On a workbench, a music box sits silent, its mechanism stiff. Someone left in a hurry and never came back.",
+  cursedDescription: "A wizard's dusty study. The fireplace is cold, books lie scattered. On a workbench, a music box sits silent — its keys still intact. Perhaps if you play the right notes, the tower will remember its warmth. Click the music box to try.",
   restoredDescription: "The fire crackles to life and the tower remembers. Books settle comfortably on their shelves, embers drift like tiny stars, and the music box begins to play — a melody so tender it makes the walls hum. By the hearth, a gray cat has appeared from nowhere, curled up and purring as though it never left.",
   exits: {
     south: "rainbow_bridge",

@@ -54,7 +54,13 @@ export default class TheIslandApp extends Component {
     this.kingdomState.reset();
     this.canvasSceneId = "misty_shore";
     this.sceneEngine.loadScene("misty_shore", 0);
-    this.showMessage("You wash ashore in a gray, lifeless land. The kingdom has been cursed...");
+    // Show the scene's actual description which includes puzzle hints
+    setTimeout(() => {
+      const scene = this.sceneEngine.getActiveScene();
+      if (scene) {
+        this.showMessage(scene.cursedDescription);
+      }
+    }, 300);
   };
 
   get canvasExits(): Array<{ direction: string; icon: string; label: string; locked: boolean }> {
@@ -461,15 +467,16 @@ export default class TheIslandApp extends Component {
     const loaded = this.kingdomState.load();
     this.canvasSceneId = this.kingdomState.currentScene;
 
-    if (!loaded) {
-      this.showMessage(
-        "You wash ashore in a gray, lifeless land. The kingdom has been cursed...",
-      );
-    } else {
-      this.showMessage(
-        `You return to the ${this.kingdomState.sceneName}...`,
-      );
-    }
+    // Show scene description after canvas loads
+    setTimeout(() => {
+      const scene = this.sceneEngine.getActiveScene();
+      if (scene) {
+        const restoration = this.kingdomState.getRestoration(this.canvasSceneId);
+        this.showMessage(restoration > 0.5 ? scene.restoredDescription : scene.cursedDescription);
+      } else if (!loaded) {
+        this.showMessage("You wash ashore in a gray, lifeless land. The kingdom has been cursed...");
+      }
+    }, 500);
 
     // Remove intro animation after delay
     setTimeout(() => {

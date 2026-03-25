@@ -287,7 +287,7 @@ export const whisperingWoods: SceneDefinition = {
   name: "Whispering Woods",
 
   cursedDescription:
-    "The forest holds its breath. Gray trees stand like pillars of stone, their branches bare and reaching. In the hush, you spot a rusted iron cage hanging from a branch — inside, an owl sits still as death, its eyes sealed shut. Something ancient waits here.",
+    "The forest holds its breath. Gray trees stand like pillars of stone. In the hush, you spot a rusted iron cage — inside, an owl sits still as death. The lock looks old and brittle. Click on the cage to try to free it.",
   restoredDescription:
     "The forest exhales. Green surges through every branch like a river finding its bed. Fireflies spark into existence, each one a tiny lantern. The owl spreads its wings and turns its golden eyes toward you — not in fear, but recognition. You are remembered here.",
 

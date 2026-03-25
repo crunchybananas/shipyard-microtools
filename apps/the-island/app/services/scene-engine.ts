@@ -402,8 +402,10 @@ export default class SceneEngineService extends Service {
     if (!this.activeScene) return;
 
     for (const hotspot of this.activeScene.hotspots) {
+      // Only show hints for puzzle and pickup actions (not examine)
+      if (hotspot.action === "examine") continue;
+
       const b = hotspot.bounds;
-      // Convert scene coords to canvas
       const x = (b.x / 1200) * rc.width;
       const y = ((b.y - 180) / 500) * rc.height;
       const w = (b.width / 1200) * rc.width;
@@ -411,15 +413,36 @@ export default class SceneEngineService extends Service {
       const cx = x + w / 2;
       const cy = y + h / 2;
 
-      // Subtle pulsing glow
-      const pulse = Math.sin(rc.time * 2 + b.x * 0.01) * 0.3 + 0.7;
-      rc.ctx.globalAlpha = 0.06 * pulse;
+      // Pulsing golden glow — clearly visible
+      const pulse = Math.sin(rc.time * 2.5 + b.x * 0.01) * 0.4 + 0.6;
 
-      const grad = rc.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.6);
-      grad.addColorStop(0, "#ffd700");
-      grad.addColorStop(1, "transparent");
-      rc.ctx.fillStyle = grad;
+      // Outer glow
+      rc.ctx.globalAlpha = 0.15 * pulse;
+      const outerGrad = rc.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.5);
+      outerGrad.addColorStop(0, "#ffd700");
+      outerGrad.addColorStop(0.6, "#ffd70044");
+      outerGrad.addColorStop(1, "transparent");
+      rc.ctx.fillStyle = outerGrad;
       rc.ctx.fillRect(cx - w, cy - h, w * 2, h * 2);
+
+      // Center sparkle dot
+      rc.ctx.globalAlpha = 0.4 * pulse;
+      rc.ctx.fillStyle = "#ffd700";
+      rc.ctx.beginPath();
+      rc.ctx.arc(cx, cy, 3 * (rc.width / 1200), 0, Math.PI * 2);
+      rc.ctx.fill();
+
+      // Small cross sparkle
+      rc.ctx.strokeStyle = "#ffd700";
+      rc.ctx.lineWidth = 1;
+      rc.ctx.globalAlpha = 0.25 * pulse;
+      const sparkleSize = 8 * (rc.width / 1200);
+      rc.ctx.beginPath();
+      rc.ctx.moveTo(cx - sparkleSize, cy);
+      rc.ctx.lineTo(cx + sparkleSize, cy);
+      rc.ctx.moveTo(cx, cy - sparkleSize);
+      rc.ctx.lineTo(cx, cy + sparkleSize);
+      rc.ctx.stroke();
     }
     rc.ctx.globalAlpha = 1;
   }
