@@ -21,6 +21,7 @@ import CanvasRenderer from "./canvas-renderer";
 import ShellMemory from "the-island/puzzles/shell-memory";
 import SymbolLock from "the-island/puzzles/symbol-lock";
 import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
+import LightBeam from "the-island/puzzles/light-beam";
 import Inventory from "./inventory";
 import MessageLog from "./message-log";
 import Navigation from "./navigation";
@@ -70,6 +71,7 @@ export default class TheIslandApp extends Component {
   get showShellMemory(): boolean { return this.activePuzzle === "shell_memory"; }
   get showSymbolLock(): boolean { return this.activePuzzle === "symbol_lock"; }
   get showMelodyPuzzle(): boolean { return this.activePuzzle === "melody"; }
+  get showLightBeam(): boolean { return this.activePuzzle === "light_beam"; }
 
   handlePuzzleSolve = (): void => {
     this.activePuzzle = null;
@@ -243,9 +245,8 @@ export default class TheIslandApp extends Component {
       case "wizards_tower":
         this.activePuzzle = "melody";
         break;
-      // Scenes with click-based puzzles (to be upgraded later)
       case "crystal_caverns":
-        this.crystalPuzzle();
+        this.activePuzzle = "light_beam";
         break;
       case "the_meadow":
         this.meadowPuzzle();
@@ -974,6 +975,9 @@ export default class TheIslandApp extends Component {
       {{/if}}
       {{#if this.showMelodyPuzzle}}
         <MelodyPuzzle @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+      {{#if this.showLightBeam}}
+        <LightBeam @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
       {{/if}}
 
       {{#if this.showNewGameConfirm}}
