@@ -22,6 +22,7 @@ import ShellMemory from "the-island/puzzles/shell-memory";
 import SymbolLock from "the-island/puzzles/symbol-lock";
 import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
 import LightBeam from "the-island/puzzles/light-beam";
+import ColorSort from "the-island/puzzles/color-sort";
 import Inventory from "./inventory";
 import MessageLog from "./message-log";
 import Navigation from "./navigation";
@@ -72,6 +73,7 @@ export default class TheIslandApp extends Component {
   get showSymbolLock(): boolean { return this.activePuzzle === "symbol_lock"; }
   get showMelodyPuzzle(): boolean { return this.activePuzzle === "melody"; }
   get showLightBeam(): boolean { return this.activePuzzle === "light_beam"; }
+  get showColorSort(): boolean { return this.activePuzzle === "color_sort"; }
 
   handlePuzzleSolve = (): void => {
     this.activePuzzle = null;
@@ -80,6 +82,12 @@ export default class TheIslandApp extends Component {
     this.kingdomState.restoreScene(sceneId);
     this.sceneEngine.triggerRestoration();
     this.musicEngine.playCrescendo();
+
+    // Scene-specific flags
+    if (sceneId === "rainbow_bridge") {
+      this.kingdomState.setFlag("bridgeComplete", true);
+    }
+
     const scene = this.sceneEngine.getActiveScene();
     this.showMessage(scene?.restoredDescription ?? "The curse lifts!");
   };
@@ -252,7 +260,7 @@ export default class TheIslandApp extends Component {
         this.meadowPuzzle();
         break;
       case "rainbow_bridge":
-        this.bridgePuzzle();
+        this.activePuzzle = "color_sort";
         break;
       case "starfall_lake":
         this.lakePuzzle();
@@ -978,6 +986,9 @@ export default class TheIslandApp extends Component {
       {{/if}}
       {{#if this.showLightBeam}}
         <LightBeam @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+      {{#if this.showColorSort}}
+        <ColorSort @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
       {{/if}}
 
       {{#if this.showNewGameConfirm}}
