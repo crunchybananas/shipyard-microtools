@@ -63,6 +63,22 @@ export default class TheIslandApp extends Component {
     }, 300);
   };
 
+  get progressDots(): Array<{ name: string; icon: string; restored: boolean }> {
+    const scenes = [
+      { id: "misty_shore", name: "Shore", icon: "🐚" },
+      { id: "whispering_woods", name: "Woods", icon: "🦉" },
+      { id: "crystal_caverns", name: "Caverns", icon: "💎" },
+      { id: "the_meadow", name: "Meadow", icon: "🦄" },
+      { id: "rainbow_bridge", name: "Bridge", icon: "🌈" },
+      { id: "wizards_tower", name: "Tower", icon: "🐱" },
+      { id: "starfall_lake", name: "Lake", icon: "🐟" },
+    ];
+    return scenes.map((s) => ({
+      ...s,
+      restored: this.kingdomState.getRestoration(s.id) >= 1,
+    }));
+  }
+
   get canvasExits(): Array<{ direction: string; icon: string; label: string; locked: boolean }> {
     const dirIcons: Record<string, { icon: string; label: string }> = {
       north: { icon: "⬆", label: "North" },
@@ -886,6 +902,13 @@ export default class TheIslandApp extends Component {
       {{! Header }}
       <header class="game-header">
         <h1 class="game-title">THE FADING KINGDOM</h1>
+        <div class="progress-tracker">
+          {{#each this.progressDots as |dot|}}
+            <span class="progress-dot {{if dot.restored 'restored'}}" title={{dot.name}}>
+              {{dot.icon}}
+            </span>
+          {{/each}}
+        </div>
         <span class="location-name">{{this.kingdomState.sceneName}}</span>
         <div class="menu-buttons">
           <button type="button" class="menu-btn" {{on "click" this.kingdomNewGame}}>New Game</button>

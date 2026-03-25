@@ -403,7 +403,9 @@ export default class SceneEngineService extends Service {
 
     for (const hotspot of this.activeScene.hotspots) {
       // Only show hints for puzzle and pickup actions (not examine)
+      // Hide hints on restored scenes (puzzles already solved)
       if (hotspot.action === "examine") continue;
+      if (this.restorationCurrent >= 0.9) continue;
 
       const b = hotspot.bounds;
       const x = (b.x / 1200) * rc.width;
