@@ -349,12 +349,14 @@ export const mistyShore: SceneDefinition = {
   name: "Misty Shore",
 
   cursedDescription:
-    "You wake on cold, colorless sand. Rain falls from a sky the shade of ash. The waves sound hollow, as though the sea itself has forgotten how to sing. But wait — faint golden glimmers in the sand. Three shells, perhaps, hidden where the tide once played. Touch the sand to search...",
+    "You wake on cold, colorless sand. Rain falls from a sky the shade of ash. Three paths lead from this shore — north into dark woods, east across dead fields, west toward a frozen lake. But first: faint golden glimmers in the sand. Three shells hide here. Touch the glowing spots to search...",
   restoredDescription:
     "Warmth floods back like a held breath released. The ocean remembers its blue, the sand its gold, and the sun its place in the sky. A little crab appears from behind a rock, claws raised in triumph. The shore is alive again.",
 
   exits: {
     north: "whispering_woods",
+    east: "the_meadow",
+    west: "starfall_lake",
   },
 
   items: ["shell_1", "shell_2", "shell_3"],

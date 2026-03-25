@@ -518,11 +518,19 @@ export default class TheIslandApp extends Component {
 
   initGame(): void {
     // Load kingdom state
-    const loaded = this.kingdomState.load();
+    this.kingdomState.load();
     this.canvasSceneId = this.kingdomState.currentScene;
 
-    // Show scene description immediately
-    this.showMessage("You wash ashore in a gray, lifeless land. The kingdom has been cursed...");
+    // Show scene description once canvas is ready
+    setTimeout(() => {
+      const scene = this.sceneEngine.getActiveScene();
+      const restoration = this.kingdomState.getRestoration(this.canvasSceneId);
+      if (scene) {
+        this.showMessage(restoration > 0.5 ? scene.restoredDescription : scene.cursedDescription);
+      } else {
+        this.showMessage("You wash ashore in a gray, lifeless land. The kingdom has been cursed...");
+      }
+    }, 600);
 
     // Remove intro animation after delay
     setTimeout(() => {

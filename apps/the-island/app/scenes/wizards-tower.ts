@@ -229,8 +229,8 @@ export const wizardsTower: SceneDefinition = {
   cursedDescription: "A wizard's dusty study. The fireplace is cold, books lie scattered. On a workbench, a music box sits silent — its keys still intact. Perhaps if you play the right notes, the tower will remember its warmth. Click the music box to try.",
   restoredDescription: "The fire crackles to life and the tower remembers. Books settle comfortably on their shelves, embers drift like tiny stars, and the music box begins to play — a melody so tender it makes the walls hum. By the hearth, a gray cat has appeared from nowhere, curled up and purring as though it never left.",
   exits: {
-    south: "rainbow_bridge",
     east: "starfall_lake",
+    west: "throne_room",
   },
   items: [],
   layers: [

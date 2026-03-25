@@ -143,7 +143,7 @@ export const crystalCaverns: SceneDefinition = {
   restoredDescription: "The cavern ignites. Every crystal catches the light and throws it further — violet to blue to green to gold — until the walls are a cathedral of living color. From the deepest shadow, a fox with amber eyes steps forward, its fur rippling with reflected prisms.",
   exits: {
     south: "whispering_woods",
-    east: "the_meadow",
+    north: "throne_room",
   },
   items: [],
   layers: [

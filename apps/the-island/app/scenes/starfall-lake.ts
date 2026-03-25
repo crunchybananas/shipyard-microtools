@@ -181,8 +181,8 @@ export const starfallLake: SceneDefinition = {
   cursedDescription: "A frozen lake under a sky full of stars it refuses to reflect. The ice is cracked but holds. Ancient runes are carved into the shore — a pattern of warmth that might melt the curse. Trace the rune on the ice to break it.",
   restoredDescription: "The ice dissolves like a bad dream. The lake opens its dark eye and sees the sky — and every star above finds its twin below, doubled, shimmering. Fish leap in silver arcs, breaking the surface into rings of light. The trees burst into leaf. The lake remembers joy.",
   exits: {
+    east: "misty_shore",
     west: "wizards_tower",
-    north: "throne_room",
   },
   items: [],
   layers: [

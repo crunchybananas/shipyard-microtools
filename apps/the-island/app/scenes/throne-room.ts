@@ -219,7 +219,9 @@ export const throneRoom: SceneDefinition = {
   cursedDescription: "The heart of the kingdom. An altar waits in the center, seven empty circles etched into its surface — one for each region you must restore. Place all seven tokens here to break the curse forever. Click the altar when you are ready.",
   restoredDescription: "The throne room blazes with every color you have gathered. Stained glass windows throw cathedral light across the stone. The altar hums with golden warmth. And they are all here — crab, owl, fox, unicorn, phoenix, cat, and fish — the guardians of a kingdom reborn. You are home.",
   exits: {
-    south: "starfall_lake",
+    south: "crystal_caverns",
+    west: "rainbow_bridge",
+    east: "wizards_tower",
   },
   items: [],
   layers: [

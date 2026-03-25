@@ -45,12 +45,29 @@ export interface KingdomScene {
   exits: Record<string, string | { scene: string; requires: string }>;
 }
 
+/**
+ * Non-linear scene graph — hub-and-spoke from the Shore.
+ *
+ * The Shore connects to 3 regions. Each region has 2 scenes.
+ * The Throne Room requires all 7 tokens.
+ *
+ *                    Throne Room
+ *                   /     |      \
+ *           Tower—Lake  Bridge—Meadow  Caverns—Woods
+ *                   \     |      /
+ *                    Misty Shore (hub)
+ */
 export const KINGDOM_SCENES: Record<string, KingdomScene> = {
   misty_shore: {
     id: "misty_shore",
     name: "Misty Shore",
-    exits: { north: "whispering_woods" },
+    exits: {
+      north: "whispering_woods",
+      east: "the_meadow",
+      west: "starfall_lake",
+    },
   },
+  // === NORTH PATH ===
   whispering_woods: {
     id: "whispering_woods",
     name: "Whispering Woods",
@@ -59,35 +76,39 @@ export const KINGDOM_SCENES: Record<string, KingdomScene> = {
   crystal_caverns: {
     id: "crystal_caverns",
     name: "Crystal Caverns",
-    exits: { south: "whispering_woods", east: "the_meadow" },
+    exits: { south: "whispering_woods", north: "throne_room" },
   },
+  // === EAST PATH ===
   the_meadow: {
     id: "the_meadow",
     name: "The Meadow",
-    exits: { west: "crystal_caverns", north: "rainbow_bridge" },
+    exits: { west: "misty_shore", east: "rainbow_bridge" },
   },
   rainbow_bridge: {
     id: "rainbow_bridge",
     name: "Rainbow Bridge",
-    exits: {
-      south: "the_meadow",
-      north: { scene: "wizards_tower", requires: "bridgeComplete" },
-    },
+    exits: { west: "the_meadow", east: "throne_room" },
+  },
+  // === WEST PATH ===
+  starfall_lake: {
+    id: "starfall_lake",
+    name: "Starfall Lake",
+    exits: { east: "misty_shore", west: "wizards_tower" },
   },
   wizards_tower: {
     id: "wizards_tower",
     name: "Wizard's Tower",
-    exits: { south: "rainbow_bridge", east: "starfall_lake" },
+    exits: { east: "starfall_lake", west: "throne_room" },
   },
-  starfall_lake: {
-    id: "starfall_lake",
-    name: "Starfall Lake",
-    exits: { west: "wizards_tower", north: "throne_room" },
-  },
+  // === ENDGAME ===
   throne_room: {
     id: "throne_room",
     name: "The Throne Room",
-    exits: { south: "starfall_lake" },
+    exits: {
+      south: "crystal_caverns",
+      west: "rainbow_bridge",
+      east: "wizards_tower",
+    },
   },
 };
 

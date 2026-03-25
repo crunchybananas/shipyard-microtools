@@ -165,8 +165,8 @@ export const rainbowBridge: SceneDefinition = {
   cursedDescription: "A shattered bridge over a bottomless chasm. The far side is tantalizingly close. Scattered along the cliff edge, seven colored shards of light flicker — fragments of the rainbow that once spanned this gap. Collect them all to rebuild the bridge.",
   restoredDescription: "Seven bands of pure light arc across the void — red, orange, yellow, green, blue, indigo, violet — a bridge made of the spectrum itself. Above it, a phoenix wheels in circles of golden fire, and below, clouds have gathered like an audience at a miracle.",
   exits: {
-    south: "the_meadow",
-    north: { scene: "wizards_tower", requires: "bridgeComplete" },
+    west: "the_meadow",
+    east: "throne_room",
   },
   items: [],
   layers: [
