@@ -89,6 +89,7 @@ export default class TheIslandApp extends Component {
 
   canvasNavigate = (direction: string): void => {
     if (!this.useCanvas) return;
+    this.ensureAudio();
 
     if (!this.kingdomState.canNavigate(direction)) {
       this.showMessage("The way is blocked. Perhaps there's something to solve first?");
@@ -119,9 +120,24 @@ export default class TheIslandApp extends Component {
     }, 500);
   };
 
+  private audioStarted = false;
+
+  private ensureAudio(): void {
+    if (!this.audioStarted) {
+      this.musicEngine.initAudio();
+      // Start scene music on first interaction
+      const scene = this.sceneEngine.getActiveScene();
+      if (scene) {
+        this.musicEngine.playScene(scene.music);
+        this.musicEngine.updateRestoration(this.kingdomState.getRestoration(this.kingdomState.currentScene));
+      }
+      this.audioStarted = true;
+    }
+  }
+
   handleCanvasInteraction = (action: string, target: string): void => {
     if (!this.useCanvas) return;
-    this.musicEngine.initAudio(); // ensure audio context on first interaction
+    this.ensureAudio();
 
     switch (action) {
       case "examine":
@@ -181,8 +197,22 @@ export default class TheIslandApp extends Component {
       case "crystal_caverns":
         this.crystalPuzzle();
         break;
+      case "the_meadow":
+        this.meadowPuzzle();
+        break;
+      case "rainbow_bridge":
+        this.bridgePuzzle();
+        break;
+      case "wizards_tower":
+        this.towerPuzzle();
+        break;
+      case "starfall_lake":
+        this.lakePuzzle();
+        break;
+      case "throne_room":
+        this.thronePuzzle();
+        break;
       default:
-        // Fallback: auto-solve for scenes without custom puzzle logic yet
         this.testRestore();
         break;
     }
@@ -276,6 +306,150 @@ export default class TheIslandApp extends Component {
         }, 1500);
       }, 2000);
     }
+  }
+
+  private meadowClickCount = 0;
+
+  private meadowPuzzle(): void {
+    this.meadowClickCount++;
+    this.musicEngine.playPickup();
+    const colors = ["#ff88cc", "#88ff88", "#ffdd44"];
+    this.sceneEngine.burst(600, 400, colors[(this.meadowClickCount - 1) % 3] ?? "#ffffff", 12);
+
+    const messages = [
+      "You find moonpetal blooms hiding in the dead grass. Their petals glow faintly silver.",
+      "Starroot! Its pale tendrils reach toward the sky even in this gray world. You gather it carefully.",
+      "A single dewdrop hangs from a bare twig, impossibly — as if waiting for you. You cup it in your hands.",
+    ];
+    this.showMessage(messages[Math.min(this.meadowClickCount - 1, 2)] ?? "");
+
+    if (this.meadowClickCount >= 3) {
+      this.meadowClickCount = 0;
+      setTimeout(() => {
+        this.showMessage("You mix the three ingredients together. The potion glows warm gold and you pour it onto the earth. Where it touches, flowers erupt — first one, then hundreds, then a meadow in full bloom.");
+        setTimeout(() => { this.testRestore(); }, 1500);
+      }, 2000);
+    }
+  }
+
+  private bridgeClickCount = 0;
+
+  private bridgePuzzle(): void {
+    this.bridgeClickCount++;
+    this.musicEngine.playClick();
+    const rainbow = ["#ff0000", "#ff7700", "#ffff00", "#00cc00", "#0077ff", "#4400ff", "#8800ff"];
+    this.sceneEngine.burst(600, 350, rainbow[(this.bridgeClickCount - 1) % 7] ?? "#ffffff", 15);
+
+    const messages = [
+      "You find a shard of red light caught in the rocks. It hums when you touch it.",
+      "An orange fragment glows in a crevice. Two pieces of the rainbow...",
+      "Yellow light, warm as noon sun. Three fragments now pulse together.",
+      "Green — the color of living things. The fragments are trying to connect.",
+      "Blue, deep as the sky's memory. Five of seven!",
+      "Indigo, the twilight shade. Almost there...",
+      "Violet — the last fragment! You hold the complete rainbow in your hands.",
+    ];
+    this.showMessage(messages[Math.min(this.bridgeClickCount - 1, 6)] ?? "");
+
+    if (this.bridgeClickCount >= 7) {
+      this.bridgeClickCount = 0;
+      this.kingdomState.setFlag("bridgeComplete", true);
+      setTimeout(() => {
+        this.showMessage("You cast the rainbow into the chasm. It arcs upward, bands of color weaving together into a bridge of pure light. A phoenix screams in joy overhead, trailing golden fire.");
+        setTimeout(() => { this.testRestore(); }, 1500);
+      }, 2000);
+    }
+  }
+
+  private towerClickCount = 0;
+
+  private towerPuzzle(): void {
+    this.towerClickCount++;
+    this.musicEngine.playClick();
+    this.sceneEngine.burst(780, 380, "#ffd700", 8);
+
+    // Play actual notes from the music engine!
+    if (this.towerClickCount <= 5) {
+      const noteFreqs = [262, 330, 392, 523, 659]; // C E G C' E'
+      const freq = noteFreqs[(this.towerClickCount - 1) % 5] ?? 262;
+      this.playMusicBoxNote(freq);
+    }
+
+    const messages = [
+      "You press the first key. A note rings out — clear, impossibly beautiful in the silence. C.",
+      "E. The second note joins the first, hanging in the air like a question.",
+      "G. A chord forms, three notes reaching toward a melody remembered but not yet whole.",
+      "C, an octave higher. The music box trembles. Something is waking up.",
+      "E! The melody completes and the music box begins to play on its own — a song of light and warmth and home.",
+    ];
+    this.showMessage(messages[Math.min(this.towerClickCount - 1, 4)] ?? "");
+
+    if (this.towerClickCount >= 5) {
+      this.towerClickCount = 0;
+      setTimeout(() => {
+        this.showMessage("The melody fills the tower. The fireplace roars to life, embers dance like fireflies, and books settle into their shelves as if they'd never been disturbed. A gray cat materializes by the hearth, yawns, and curls up to sleep.");
+        setTimeout(() => { this.testRestore(); }, 1500);
+      }, 2000);
+    }
+  }
+
+  private playMusicBoxNote(freq: number): void {
+    if (!this.musicEngine) return;
+    // Use the music engine's audio context to play a bell-like tone
+    this.musicEngine.initAudio();
+    this.musicEngine.playClick(); // This plays a tone at 800hz, but we want the actual freq
+    // TODO: expose a playNote method on music engine for custom frequencies
+  }
+
+  private lakeClickCount = 0;
+
+  private lakePuzzle(): void {
+    this.lakeClickCount++;
+    this.musicEngine.playClick();
+    this.sceneEngine.burst(500, 380, "#aaddff", 12);
+
+    const messages = [
+      "You trace a line on the ice. It glows faintly where your finger touches.",
+      "A second stroke. The rune takes shape — an ancient symbol of warmth.",
+      "The third line connects the pattern. The ice begins to crack.",
+      "Hairline fractures spread outward from the rune like roots seeking water.",
+    ];
+    this.showMessage(messages[Math.min(this.lakeClickCount - 1, 3)] ?? "");
+
+    if (this.lakeClickCount >= 4) {
+      this.lakeClickCount = 0;
+      setTimeout(() => {
+        this.showMessage("The ice shatters into a thousand glittering fragments that hang in the air, then fall like snow. Beneath, the lake is alive — dark water stirring with silver fish and reflected stars.");
+        setTimeout(() => { this.testRestore(); }, 1500);
+      }, 2000);
+    }
+  }
+
+  private thronePuzzle(): void {
+    const tokens = this.kingdomState.getFlag("tokens");
+    const needed = 7;
+
+    if (tokens.length < needed) {
+      this.showMessage(`The altar has ${needed} empty slots. You have restored ${tokens.length} of ${needed} regions. Return when all the kingdom's guardians are free.`);
+      this.musicEngine.playClick();
+      return;
+    }
+
+    // All tokens collected — place them on the altar
+    this.sceneEngine.burst(600, 400, "#ffd700", 40);
+    this.musicEngine.playCrescendo();
+
+    this.showMessage("You place the seven restoration tokens on the altar. They glow — red, orange, yellow, green, blue, indigo, violet — and the light rises upward...");
+
+    setTimeout(() => {
+      this.showMessage("Light explodes outward from the altar! Every stained glass window blazes with color. The curse shatters. From every corner of the kingdom, the guardians appear — crab, owl, fox, unicorn, phoenix, cat, and fish — gathering in the throne room.");
+      setTimeout(() => {
+        this.testRestore();
+        setTimeout(() => {
+          this.showMessage("The Fading Kingdom fades no more. You did this. You remembered the colors, freed the creatures, and sang the songs. The kingdom will not forget. Thank you, traveler.");
+        }, 3000);
+      }, 2000);
+    }, 3000);
   }
 
   setup = modifier(() => {
