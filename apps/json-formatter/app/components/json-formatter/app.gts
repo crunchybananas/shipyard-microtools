@@ -683,6 +683,49 @@ interface ParseError {
   pos: number;
 }
 
+interface HashState {
+  i?: string;
+  v?: "tree" | "raw" | "ts" | "zod" | "diff";
+  q?: string;
+  c?: string;
+}
+
+function encodeHashState(state: HashState): string {
+  try {
+    const json = JSON.stringify(state);
+    // UTF-8 safe base64
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/=+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function decodeHashState(encoded: string): HashState | null {
+  if (!encoded) return null;
+  try {
+    const padded = encoded + "=".repeat((4 - (encoded.length % 4)) % 4);
+    const bin = atob(padded);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const parsed = JSON.parse(json);
+    if (typeof parsed !== "object" || parsed === null) return null;
+    return parsed as HashState;
+  } catch {
+    return null;
+  }
+}
+
+function readHashState(): HashState | null {
+  if (typeof location === "undefined") return null;
+  const hash = location.hash.replace(/^#/, "");
+  if (!hash) return null;
+  return decodeHashState(hash);
+}
+
 export default class JsonFormatterApp extends Component {
   @tracked input = "";
   @tracked parsed: unknown = undefined;
@@ -696,9 +739,85 @@ export default class JsonFormatterApp extends Component {
   @tracked expandedPaths: Set<string> = new Set(["$"]);
   @tracked parseError: ParseError | null = null;
   @tracked filterQuery = "";
+  @tracked shareNotice = "";
 
   private statusTimer: ReturnType<typeof setTimeout> | null = null;
   private textareaEl: HTMLTextAreaElement | null = null;
+  private hashWriteTimer: ReturnType<typeof setTimeout> | null = null;
+  private suppressHashWrite = false;
+
+  constructor(...args: ConstructorParameters<typeof Component>) {
+    super(...args);
+    const initial = readHashState();
+    if (initial) {
+      if (typeof initial.i === "string") this.input = initial.i;
+      const viewFromHash =
+        initial.v === "tree" ||
+        initial.v === "raw" ||
+        initial.v === "ts" ||
+        initial.v === "zod" ||
+        initial.v === "diff"
+          ? initial.v
+          : null;
+      if (viewFromHash) this.viewMode = viewFromHash;
+      if (typeof initial.q === "string") this.filterQuery = initial.q;
+      if (typeof initial.c === "string") this.compareInput = initial.c;
+      // Auto-format on hydration; re-apply the saved view since format() resets it.
+      if (this.input) {
+        queueMicrotask(() => {
+          this.format();
+          if (viewFromHash) this.viewMode = viewFromHash;
+        });
+      }
+    }
+    if (typeof window !== "undefined") {
+      window.addEventListener("hashchange", this.onHashChange);
+    }
+  }
+
+  willDestroy() {
+    super.willDestroy();
+    if (typeof window !== "undefined") {
+      window.removeEventListener("hashchange", this.onHashChange);
+    }
+    if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
+  }
+
+  private onHashChange = () => {
+    if (this.suppressHashWrite) return;
+    const state = readHashState();
+    if (!state) return;
+    if (typeof state.i === "string" && state.i !== this.input) {
+      this.input = state.i;
+      if (state.i) queueMicrotask(() => this.format());
+    }
+    if (state.v && state.v !== this.viewMode) this.viewMode = state.v;
+    if (typeof state.q === "string") this.filterQuery = state.q;
+    if (typeof state.c === "string") this.compareInput = state.c;
+  };
+
+  private scheduleHashWrite() {
+    if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
+    this.hashWriteTimer = setTimeout(() => this.writeHash(), 250);
+  }
+
+  private writeHash() {
+    if (typeof window === "undefined") return;
+    const state: HashState = {};
+    if (this.input) state.i = this.input;
+    if (this.viewMode !== "tree") state.v = this.viewMode;
+    if (this.filterQuery) state.q = this.filterQuery;
+    if (this.compareInput) state.c = this.compareInput;
+    const encoded = Object.keys(state).length ? encodeHashState(state) : "";
+    const nextHash = encoded ? `#${encoded}` : "";
+    if (location.hash === nextHash) return;
+    this.suppressHashWrite = true;
+    history.replaceState(null, "", location.pathname + location.search + nextHash);
+    // Reset flag on next tick so external hashchange events still work.
+    setTimeout(() => {
+      this.suppressHashWrite = false;
+    }, 0);
+  }
 
   get statusClass() {
     if (!this.statusType) return "status hidden";
@@ -826,6 +945,7 @@ export default class JsonFormatterApp extends Component {
     this.input = this.textareaEl.value;
     // Clear the error badge while the user edits
     if (this.parseError) this.parseError = null;
+    this.scheduleHashWrite();
   };
 
   onPaste = () => {
@@ -881,10 +1001,12 @@ export default class JsonFormatterApp extends Component {
 
   onFilterInput = (e: Event) => {
     this.filterQuery = (e.target as HTMLInputElement).value;
+    this.scheduleHashWrite();
   };
 
   clearFilter = () => {
     this.filterQuery = "";
+    this.scheduleHashWrite();
   };
 
   private buildAllPaths(value: unknown, path: string, out: string[]): void {
@@ -1058,26 +1180,42 @@ export default class JsonFormatterApp extends Component {
 
   showTree = () => {
     this.viewMode = "tree";
+    this.scheduleHashWrite();
   };
 
   showRaw = () => {
     this.viewMode = "raw";
+    this.scheduleHashWrite();
   };
 
   showTs = () => {
     this.viewMode = "ts";
+    this.scheduleHashWrite();
   };
 
   showZod = () => {
     this.viewMode = "zod";
+    this.scheduleHashWrite();
   };
 
   showDiff = () => {
     this.viewMode = "diff";
+    this.scheduleHashWrite();
   };
 
   onCompareInput = (e: Event) => {
     this.compareInput = (e.target as HTMLTextAreaElement).value;
+    this.scheduleHashWrite();
+  };
+
+  sharePermalink = async () => {
+    this.writeHash();
+    try {
+      await navigator.clipboard.writeText(location.href);
+      this.showStatus("✓ Permalink copied", "success");
+    } catch {
+      this.showStatus("Failed to copy URL", "error");
+    }
   };
 
   copyTs = async () => {
@@ -1197,7 +1335,7 @@ export default class JsonFormatterApp extends Component {
             placeholder='{"name": "example", "value": 42}'
             {{on "input" this.onInput}}
             {{on "paste" this.onPaste}}
-          ></textarea>
+          >{{this.input}}</textarea>
 
           {{#if this.parseError}}
             <div class="parse-error">
@@ -1212,6 +1350,7 @@ export default class JsonFormatterApp extends Component {
             <button class="secondary-btn" type="button" {{on "click" this.minify}}>📦 Minify</button>
             <button class="secondary-btn" type="button" {{on "click" this.validate}}>✅ Validate</button>
             <button class="secondary-btn" type="button" {{on "click" this.copy}}>📋 Copy</button>
+            <button class="secondary-btn" type="button" title="Copy a shareable permalink" {{on "click" this.sharePermalink}}>🔗 Share</button>
           </div>
         </div>
 
