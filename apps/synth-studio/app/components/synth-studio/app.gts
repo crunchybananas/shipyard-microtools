@@ -3,8 +3,47 @@ import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
 import { modifier } from "ember-modifier";
 import { fn } from "@ember/helper";
-import { AudioManager, KEY_MAP, type EffectState } from "synth-studio/synth-studio/audio-manager";
+import {
+  AudioManager,
+  KEY_MAP,
+  type EffectState,
+  type CompactHashState,
+} from "synth-studio/synth-studio/audio-manager";
 import { PATTERN_SLOT_LABELS, PATTERN_SLOT_COUNT } from "synth-studio/synth-studio/sequencer";
+
+function encodeHashState(state: CompactHashState): string {
+  try {
+    const json = JSON.stringify(state);
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/=+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function decodeHashState(encoded: string): CompactHashState | null {
+  if (!encoded) return null;
+  try {
+    const padded = encoded + "=".repeat((4 - (encoded.length % 4)) % 4);
+    const bin = atob(padded);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const parsed = JSON.parse(json);
+    if (!parsed || parsed.v !== 1) return null;
+    return parsed as CompactHashState;
+  } catch {
+    return null;
+  }
+}
+
+function readHashState(): CompactHashState | null {
+  if (typeof location === "undefined") return null;
+  const hash = location.hash.replace(/^#/, "");
+  return hash ? decodeHashState(hash) : null;
+}
 
 // ── Helpers (strict-mode safe) ─────────────────────────────────
 
@@ -109,6 +148,9 @@ export default class SynthStudioApp extends Component {
   private audio = new AudioManager();
   private activeComputerKeys = new Set<string>();
   private meterInterval: ReturnType<typeof setInterval> | null = null;
+  private hashWriteTimer: ReturnType<typeof setTimeout> | null = null;
+  private suppressHashWrite = false;
+  private pendingHashState: CompactHashState | null = readHashState();
 
   // ── Tracked state ────────────────────────────────────────────
 
@@ -342,20 +384,94 @@ export default class SynthStudioApp extends Component {
     // Eager-init audio context (not resumed — that still waits for gesture).
     // This ensures track-note edits made before first click reach the sequencer.
     void this.audio.init().then(() => {
-      // Push initial UI note state into the sequencer
-      for (const [trackId, note] of Object.entries(this.trackNotes)) {
-        this.audio.setTrackNote(trackId, note);
+      // Hydrate from URL hash if present (applies before any defaults that
+      // would otherwise overwrite state).
+      if (this.pendingHashState) {
+        this.audio.loadHashState(this.pendingHashState);
+        this.pendingHashState = null;
+        // Pull values back into reactive UI state
+        this.bpm = this.audio.getBpm();
+        const seqSwing = (this.audio as unknown as {
+          sequencer: { swing: number } | null;
+        }).sequencer?.swing;
+        if (typeof seqSwing === "number") this.swing = seqSwing;
+        this.activeSlot = this.audio.getActiveSlot();
+        this.refreshFilledSlots();
+        // Song chain + mode
+        const seq = (this.audio as unknown as {
+          sequencer: { songChain: number[]; songMode: boolean } | null;
+        }).sequencer;
+        if (seq) {
+          this.songChain = [...seq.songChain];
+          this.songMode = seq.songMode;
+        }
+        this.syncGridFromAudio();
+      } else {
+        // Default: push initial UI note state into the sequencer
+        for (const [trackId, note] of Object.entries(this.trackNotes)) {
+          this.audio.setTrackNote(trackId, note);
+        }
       }
       tryInitViz();
     });
+
+    // Outside hash changes (back/forward, direct URL edit)
+    const onHashChange = () => {
+      if (this.suppressHashWrite) return;
+      const state = readHashState();
+      if (!state) return;
+      this.audio.loadHashState(state);
+      this.bpm = this.audio.getBpm();
+      this.activeSlot = this.audio.getActiveSlot();
+      this.refreshFilledSlots();
+      const seq = (this.audio as unknown as {
+        sequencer: { songChain: number[]; songMode: boolean } | null;
+      }).sequencer;
+      if (seq) {
+        this.songChain = [...seq.songChain];
+        this.songMode = seq.songMode;
+      }
+      this.syncGridFromAudio();
+    };
+    window.addEventListener("hashchange", onHashChange);
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("hashchange", onHashChange);
       if (this.meterInterval) clearInterval(this.meterInterval);
+      if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
     };
   });
+
+  private scheduleHashWrite() {
+    if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
+    this.hashWriteTimer = setTimeout(() => this.writeHash(), 300);
+  }
+
+  private writeHash() {
+    if (typeof window === "undefined") return;
+    const state = this.audio.getHashState();
+    if (!state) return;
+    const encoded = encodeHashState(state);
+    const nextHash = encoded ? `#${encoded}` : "";
+    if (location.hash === nextHash) return;
+    this.suppressHashWrite = true;
+    history.replaceState(null, "", location.pathname + location.search + nextHash);
+    setTimeout(() => {
+      this.suppressHashWrite = false;
+    }, 0);
+  }
+
+  sharePermalink = async () => {
+    this.writeHash();
+    try {
+      await navigator.clipboard.writeText(location.href);
+    } catch {
+      // swallow — the URL is already in the address bar
+    }
+  };
 
   // ── Note playing ─────────────────────────────────────────────
 
@@ -438,8 +554,8 @@ export default class SynthStudioApp extends Component {
 
   // ── Sequencer ────────────────────────────────────────────────
 
-  onBpmChange = (e: Event) => { this.bpm = parseInt((e.target as HTMLInputElement).value, 10); this.audio.setBPM(this.bpm); };
-  onSwingChange = (e: Event) => { this.swing = parseFloat((e.target as HTMLInputElement).value); this.audio.setSwing(this.swing); };
+  onBpmChange = (e: Event) => { this.bpm = parseInt((e.target as HTMLInputElement).value, 10); this.audio.setBPM(this.bpm); this.scheduleHashWrite(); };
+  onSwingChange = (e: Event) => { this.swing = parseFloat((e.target as HTMLInputElement).value); this.audio.setSwing(this.swing); this.scheduleHashWrite(); };
 
   togglePlayback = () => {
     if (this.isPlaying) { this.audio.stopSequencer(); this.isPlaying = false; this.currentStep = -1; }
@@ -458,12 +574,14 @@ export default class SynthStudioApp extends Component {
     const track = [...(this.stepGrid[trackId] ?? [])];
     track[stepIdx] = isActive;
     this.stepGrid = { ...this.stepGrid, [trackId]: track };
+    this.scheduleHashWrite();
   };
 
   onTrackNoteChange = (trackId: string, e: Event) => {
     const v = (e.target as HTMLSelectElement).value;
     this.audio.setTrackNote(trackId, v);
     this.trackNotes = { ...this.trackNotes, [trackId]: v };
+    this.scheduleHashWrite();
   };
 
   // ── Pattern bank + song chain ────────────────────────────────
@@ -531,6 +649,7 @@ export default class SynthStudioApp extends Component {
         this.audio.loadPatternSlot(slot);
         this.syncGridFromAudio();
       }
+      this.scheduleHashWrite();
     });
   };
 
@@ -542,6 +661,7 @@ export default class SynthStudioApp extends Component {
       }
       this.audio.savePatternSlot(this.activeSlot);
       this.refreshFilledSlots();
+      this.scheduleHashWrite();
     });
   };
 
@@ -549,6 +669,7 @@ export default class SynthStudioApp extends Component {
     void this.ensureInit().then(() => {
       this.audio.clearPatternSlot(this.activeSlot);
       this.refreshFilledSlots();
+      this.scheduleHashWrite();
     });
   };
 
@@ -565,6 +686,7 @@ export default class SynthStudioApp extends Component {
       this.activeSlot = target;
       this.audio.savePatternSlot(target);
       this.refreshFilledSlots();
+      this.scheduleHashWrite();
     });
   };
 
@@ -572,11 +694,13 @@ export default class SynthStudioApp extends Component {
     if (!this.filledSlots[this.activeSlot]) return;
     this.songChain = [...this.songChain, this.activeSlot];
     this.audio.setSongChain(this.songChain);
+    this.scheduleHashWrite();
   };
 
   removeFromChain = (pos: number) => {
     this.songChain = this.songChain.filter((_, i) => i !== pos);
     this.audio.setSongChain(this.songChain);
+    this.scheduleHashWrite();
   };
 
   moveChainItem = (pos: number, delta: number) => {
@@ -588,11 +712,13 @@ export default class SynthStudioApp extends Component {
     next.splice(target, 0, item);
     this.songChain = next;
     this.audio.setSongChain(this.songChain);
+    this.scheduleHashWrite();
   };
 
   clearChain = () => {
     this.songChain = [];
     this.audio.setSongChain([]);
+    this.scheduleHashWrite();
   };
 
   toggleSongMode = () => {
@@ -602,6 +728,7 @@ export default class SynthStudioApp extends Component {
       this.syncGridFromAudio();
       this.activeSlot = this.songChain[0] ?? 0;
     }
+    this.scheduleHashWrite();
   };
 
   exportMidi = async () => {
@@ -704,6 +831,7 @@ export default class SynthStudioApp extends Component {
           </select>
           <button class="btn" type="button" {{on "click" this.saveProject}}>Save</button>
           <button class="btn" type="button" {{on "click" this.loadProject}}>Load</button>
+          <button class="btn" type="button" {{on "click" this.sharePermalink}} title="Copy a shareable permalink">🔗 Share</button>
           <button class="btn" type="button" {{on "click" this.importMidi}}>Import MIDI</button>
           <button class="btn" type="button" {{on "click" this.exportMidi}}>Export MIDI</button>
           <button class="btn btn-primary" type="button" {{on "click" this.exportWav}}>Export WAV</button>
@@ -921,11 +1049,11 @@ export default class SynthStudioApp extends Component {
             <div class="sequencer-controls">
               <div class="bpm-control">
                 <label>BPM</label>
-                <input type="number" value="120" min="40" max="240" {{on "change" this.onBpmChange}} />
+                <input type="number" value={{this.bpm}} min="40" max="240" {{on "change" this.onBpmChange}} />
               </div>
               <div class="swing-control">
                 <label>Swing</label>
-                <input type="range" min="0" max="0.5" value="0" step="0.01" {{on "input" this.onSwingChange}} />
+                <input type="range" min="0" max="0.5" value={{this.swing}} step="0.01" {{on "input" this.onSwingChange}} />
               </div>
               <div class="transport">
                 <button class={{this.playClass}} title="Play" type="button" {{on "click" this.togglePlayback}}>{{this.playLabel}}</button>

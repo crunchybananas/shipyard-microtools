@@ -104,6 +104,74 @@ function audioBufferToWav(buffer: AudioBuffer): ArrayBuffer {
   return arrayBuffer;
 }
 
+// ── Compact state for URL permalinks ───────────────────────────
+
+export interface CompactTrack {
+  m: number; // bitmask of 16 steps
+  n?: string; // optional note name for synth tracks
+  v?: number; // optional velocity 0-1 rounded to 2 decimals
+}
+
+export type CompactSlot = Record<string, CompactTrack>;
+
+export interface CompactHashState {
+  v: 1;
+  bpm: number;
+  swing: number;
+  bank: (CompactSlot | null)[];
+  cur: CompactSlot;
+  as: number;
+  sc: number[];
+  sm: 0 | 1;
+}
+
+function compactPattern(p: PatternData): CompactSlot {
+  const out: CompactSlot = {};
+  for (const [trackId, track] of Object.entries(p)) {
+    let mask = 0;
+    track.steps.forEach((on, i) => {
+      if (on) mask |= 1 << i;
+    });
+    const compact: CompactTrack = { m: mask };
+    if (trackId === "synth1" || trackId === "synth2") {
+      if (track.note) compact.n = track.note;
+    }
+    if (typeof track.velocity === "number") {
+      compact.v = Math.round(track.velocity * 100) / 100;
+    }
+    out[trackId] = compact;
+  }
+  return out;
+}
+
+function expandPattern(slot: CompactSlot): PatternData {
+  const defaults: Record<string, { note?: string; velocity: number }> = {
+    synth1: { note: "C4", velocity: 0.8 },
+    synth2: { note: "E3", velocity: 0.8 },
+    kick: { velocity: 0.9 },
+    snare: { velocity: 0.8 },
+    hihat: { velocity: 0.6 },
+    clap: { velocity: 0.7 },
+  };
+  const out: PatternData = {};
+  for (const trackId of Object.keys(defaults)) {
+    const def = defaults[trackId]!;
+    const incoming = slot[trackId];
+    const steps = new Array<boolean>(16).fill(false);
+    if (incoming) {
+      for (let i = 0; i < 16; i++) {
+        if (incoming.m & (1 << i)) steps[i] = true;
+      }
+    }
+    out[trackId] = {
+      steps,
+      note: incoming?.n ?? def.note,
+      velocity: incoming?.v ?? def.velocity,
+    };
+  }
+  return out;
+}
+
 // ── Effect state snapshot (for WAV export) ─────────────────────
 
 export interface EffectState {
@@ -292,6 +360,49 @@ export class AudioManager {
 
   getBpm(): number {
     return this.sequencer?.bpm ?? 120;
+  }
+
+  // ── Compact hash state (URL permalinks) ─────────────────────
+
+  getHashState(): CompactHashState | null {
+    if (!this.sequencer) return null;
+    const seq = this.sequencer;
+    const bank: (CompactSlot | null)[] = seq.patternSlots.map((p) =>
+      p ? compactPattern(p) : null,
+    );
+    return {
+      v: 1,
+      bpm: seq.bpm,
+      swing: Number(seq.swing.toFixed(3)),
+      bank,
+      cur: compactPattern(seq.tracks),
+      as: seq.activeSlot,
+      sc: [...seq.songChain],
+      sm: seq.songMode ? 1 : 0,
+    };
+  }
+
+  loadHashState(state: CompactHashState): void {
+    if (!this.sequencer || state.v !== 1) return;
+    const seq = this.sequencer;
+    if (typeof state.bpm === "number") seq.setBPM(state.bpm);
+    if (typeof state.swing === "number") seq.setSwing(state.swing);
+    if (Array.isArray(state.bank)) {
+      for (let i = 0; i < seq.patternSlots.length; i++) {
+        const incoming = state.bank[i] ?? null;
+        seq.patternSlots[i] = incoming ? expandPattern(incoming) : null;
+      }
+    }
+    if (state.cur) {
+      seq.tracks = expandPattern(state.cur);
+    }
+    if (typeof state.as === "number") {
+      seq.activeSlot = Math.max(0, Math.min(7, state.as));
+    }
+    if (Array.isArray(state.sc)) {
+      seq.setSongChain(state.sc.filter((n) => typeof n === "number"));
+    }
+    if (state.sm) seq.songMode = true;
   }
 
   // ── MIDI import ──────────────────────────────────────────────
