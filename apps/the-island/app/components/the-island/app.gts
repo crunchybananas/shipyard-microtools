@@ -28,6 +28,101 @@ interface SharedKingdomState {
   restoration?: Record<string, number>;
 }
 
+// ── Chronicle (restoration journal) ────────────────────────────
+
+interface ChronicleEntry {
+  sceneId: string;
+  sceneName: string;
+  text: string;
+  at: string;
+}
+
+const CHRONICLE_TEMPLATES: Record<string, { name: string; texts: string[] }> = {
+  misty_shore: {
+    name: "Misty Shore",
+    texts: [
+      "The tide turned golden the day the three shells sang together. Mist lifted from the rocks for the first time in an age.",
+      "At the Misty Shore, warmth returned to the sand. Crab's eyes opened, and he scuttled toward the tideline bearing no fear.",
+    ],
+  },
+  whispering_woods: {
+    name: "Whispering Woods",
+    texts: [
+      "The woods remembered their names. Owl's cage shattered under my hands and she climbed the wind without looking back.",
+      "Symbols aligned among the trees of the Whispering Woods, and the forest exhaled a secret it had held for a hundred years.",
+    ],
+  },
+  crystal_caverns: {
+    name: "Crystal Caverns",
+    texts: [
+      "Light threaded through the caverns like a living thing. Each crystal answered the beam with a color I had no word for.",
+      "The Crystal Caverns lit from within. A fox padded out of the dark to lead me back, then vanished into a seam of starlight.",
+    ],
+  },
+  the_meadow: {
+    name: "The Meadow",
+    texts: [
+      "Wildflowers tilted toward me as I mixed the potion. The meadow turned green in a slow breath, and a unicorn bowed at the treeline.",
+      "A recipe half-remembered, ingredients half-found — and The Meadow forgave my fumbling with a field of bloom.",
+    ],
+  },
+  rainbow_bridge: {
+    name: "Rainbow Bridge",
+    texts: [
+      "I sorted the colors and the bridge caught fire — not burned, but lit, every plank a different flame.",
+      "The Rainbow Bridge sang seven tones at once. A phoenix lifted off the keystone and circled me twice before climbing into the sky.",
+    ],
+  },
+  wizards_tower: {
+    name: "Wizard's Tower",
+    texts: [
+      "Five notes, always the same, until I heard them. The tower answered with a chord I felt in my teeth. The cat watched, approving.",
+      "At the Wizard's Tower the old music came back. The stairs climbed themselves for a moment, lifting me.",
+    ],
+  },
+  starfall_lake: {
+    name: "Starfall Lake",
+    texts: [
+      "I traced the rune until it glowed. Starfall Lake rang like a bell, and a fish surfaced with a star on its back that was not there before.",
+      "The rune took shape under my fingertip and the lake lit up from below. Fallen stars rose through the water like slow lanterns.",
+    ],
+  },
+  throne_room: {
+    name: "The Throne Room",
+    texts: [
+      "With all seven tokens in hand, I entered the Throne Room. The kingdom knew me, and the curse that had held it let go, forever.",
+      "Every creature gathered at the threshold. Together we walked into the Throne Room, and the Fading Kingdom faded no more.",
+    ],
+  },
+};
+
+const CHRONICLE_STORAGE_KEY = "fadingKingdom_chronicle";
+
+function loadChronicleEntries(): ChronicleEntry[] {
+  try {
+    const raw = localStorage.getItem(CHRONICLE_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (e): e is ChronicleEntry =>
+        typeof e?.sceneId === "string" &&
+        typeof e?.text === "string" &&
+        typeof e?.at === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveChronicleEntries(entries: ChronicleEntry[]): void {
+  try {
+    localStorage.setItem(CHRONICLE_STORAGE_KEY, JSON.stringify(entries));
+  } catch {
+    // private mode / quota — silently ignore
+  }
+}
+
 function decodeSharedKingdom(encoded: string): SharedKingdomState | null {
   if (!encoded) return null;
   try {
@@ -97,6 +192,8 @@ export default class TheIslandApp extends Component {
   @tracked showMap = false;
   @tracked visitedScenes: Record<string, boolean> = { misty_shore: true };
   @tracked sharedKingdom: SharedKingdomState | null = readSharedHash();
+  @tracked chronicleEntries: ChronicleEntry[] = loadChronicleEntries();
+  @tracked showChronicle = false;
 
   constructor(...args: ConstructorParameters<typeof Component>) {
     super(...args);
@@ -232,6 +329,8 @@ export default class TheIslandApp extends Component {
   confirmKingdomNewGame = (): void => {
     this.showNewGameConfirm = false;
     this.kingdomState.reset();
+    this.chronicleEntries = [];
+    saveChronicleEntries([]);
     this.canvasSceneId = "misty_shore";
     this.sceneEngine.loadScene("misty_shore", 0);
     // Show the scene's actual description which includes puzzle hints
@@ -255,7 +354,9 @@ export default class TheIslandApp extends Component {
     this.activePuzzle = null;
     // Trigger restoration for current scene
     const sceneId = this.kingdomState.currentScene;
+    const wasAlreadyRestored = this.kingdomState.getRestoration(sceneId) >= 1;
     this.kingdomState.restoreScene(sceneId);
+    if (!wasAlreadyRestored) this.appendChronicleEntry(sceneId);
     this.sceneEngine.triggerRestoration();
     this.musicEngine.playCrescendo();
 
@@ -267,6 +368,54 @@ export default class TheIslandApp extends Component {
     const scene = this.sceneEngine.getActiveScene();
     this.showMessage(scene?.restoredDescription ?? "The curse lifts!");
   };
+
+  private appendChronicleEntry(sceneId: string): void {
+    const template = CHRONICLE_TEMPLATES[sceneId];
+    if (!template) return;
+    const priorCount = this.chronicleEntries.filter(
+      (e) => e.sceneId === sceneId,
+    ).length;
+    const text = template.texts[priorCount % template.texts.length]!;
+    const entry: ChronicleEntry = {
+      sceneId,
+      sceneName: template.name,
+      text,
+      at: new Date().toISOString(),
+    };
+    const next = [...this.chronicleEntries, entry];
+    this.chronicleEntries = next;
+    saveChronicleEntries(next);
+  }
+
+  openChronicle = (): void => {
+    this.showMap = false;
+    this.showChronicle = true;
+  };
+
+  closeChronicle = (): void => {
+    this.showChronicle = false;
+  };
+
+  get chronicleView(): Array<{
+    sceneName: string;
+    text: string;
+    label: string;
+  }> {
+    return this.chronicleEntries.map((e) => {
+      const d = new Date(e.at);
+      const label = isNaN(d.getTime())
+        ? ""
+        : d.toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+          });
+      return { sceneName: e.sceneName, text: e.text, label };
+    });
+  }
+
+  get hasChronicleEntries(): boolean {
+    return this.chronicleEntries.length > 0;
+  }
 
   handlePuzzleClose = (): void => {
     this.activePuzzle = null;
@@ -308,7 +457,9 @@ export default class TheIslandApp extends Component {
   testRestore = (): void => {
     if (this.useCanvas) {
       const sceneId = this.kingdomState.currentScene;
+      const wasAlreadyRestored = this.kingdomState.getRestoration(sceneId) >= 1;
       this.kingdomState.restoreScene(sceneId);
+      if (!wasAlreadyRestored) this.appendChronicleEntry(sceneId);
       this.sceneEngine.triggerRestoration();
       this.musicEngine.playCrescendo();
 
@@ -1194,7 +1345,37 @@ export default class TheIslandApp extends Component {
           @onTravel={{this.travelFromMap}}
           @onShare={{this.shareCurrentKingdom}}
           @onExitShared={{this.exitSharedView}}
+          @onOpenChronicle={{this.openChronicle}}
+          @chronicleCount={{this.chronicleEntries.length}}
         />
+      {{/if}}
+
+      {{#if this.showChronicle}}
+        <div class="chronicle-overlay" role="dialog">
+          <div class="chronicle-scroll">
+            <header class="chronicle-header">
+              <h2>📖 Chronicle of the Kingdom</h2>
+              <button type="button" class="chronicle-close" {{on "click" this.closeChronicle}}>Close</button>
+            </header>
+            {{#if this.hasChronicleEntries}}
+              <ol class="chronicle-entries">
+                {{#each this.chronicleView as |entry|}}
+                  <li class="chronicle-entry">
+                    <div class="chronicle-entry-meta">
+                      <span class="chronicle-entry-scene">{{entry.sceneName}}</span>
+                      {{#if entry.label}}
+                        <span class="chronicle-entry-date">{{entry.label}}</span>
+                      {{/if}}
+                    </div>
+                    <p class="chronicle-entry-text">{{entry.text}}</p>
+                  </li>
+                {{/each}}
+              </ol>
+            {{else}}
+              <p class="chronicle-empty">The chronicle is blank. Restore a scene to begin recording its tale.</p>
+            {{/if}}
+          </div>
+        </div>
       {{/if}}
 
       {{#if this.showNewGameConfirm}}

@@ -159,6 +159,8 @@ interface MapViewSignature {
     sharedName?: string;
     onShare?: () => void;
     onExitShared?: () => void;
+    onOpenChronicle?: () => void;
+    chronicleCount?: number;
   };
 }
 
@@ -768,6 +770,19 @@ export default class MapView extends Component<MapViewSignature> {
     this.args.onExitShared?.();
   };
 
+  openChronicle = () => {
+    this.args.onOpenChronicle?.();
+  };
+
+  get hasChronicle(): boolean {
+    return (this.args.chronicleCount ?? 0) > 0;
+  }
+
+  get chronicleBtnLabel(): string {
+    const n = this.args.chronicleCount ?? 0;
+    return n > 0 ? `📖 Chronicle (${n})` : "📖 Chronicle";
+  }
+
   get isShared(): boolean {
     return !!this.args.sharedMode;
   }
@@ -904,6 +919,13 @@ export default class MapView extends Component<MapViewSignature> {
               class="map-btn"
               {{on "click" this.shareLink}}
             >🔗 Share Link</button>
+            {{#if this.hasChronicle}}
+              <button
+                type="button"
+                class="map-btn"
+                {{on "click" this.openChronicle}}
+              >{{this.chronicleBtnLabel}}</button>
+            {{/if}}
           {{/unless}}
           <button
             type="button"
