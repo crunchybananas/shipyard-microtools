@@ -1,8 +1,14 @@
 import { Synthesizer } from "./synth";
 import { EffectsChain } from "./effects";
 import { DrumMachine } from "./drums";
-import { Sequencer } from "./sequencer";
+import { Sequencer, type PatternData } from "./sequencer";
 import { Visualizer } from "./visualizer";
+import {
+  buildMidiFile,
+  downloadMidi,
+  parseMidiFile,
+  midiToPattern,
+} from "./midi-export";
 
 // ── Presets ────────────────────────────────────────────────────
 
@@ -128,6 +134,7 @@ export class AudioManager {
   private recordedChunks: Blob[] = [];
 
   onStep: ((step: number) => void) | null = null;
+  onPatternSwitch: ((slotIdx: number) => void) | null = null;
 
   get isReady() { return this.initialized; }
 
@@ -174,6 +181,10 @@ export class AudioManager {
 
     this.sequencer.onStep = (step) => {
       this.onStep?.(step);
+    };
+
+    this.sequencer.onPatternSwitch = (slot) => {
+      this.onPatternSwitch?.(slot);
     };
 
     this.initialized = true;
@@ -232,6 +243,86 @@ export class AudioManager {
   }
 
   get isSequencerPlaying() { return this.sequencer?.isPlaying ?? false; }
+
+  // ── Pattern bank ─────────────────────────────────────────────
+
+  savePatternSlot(slot: number) {
+    this.sequencer?.savePatternToSlot(slot);
+  }
+
+  loadPatternSlot(slot: number): boolean {
+    return this.sequencer?.loadPatternFromSlot(slot) ?? false;
+  }
+
+  clearPatternSlot(slot: number) {
+    this.sequencer?.clearSlot(slot);
+  }
+
+  getCurrentTracks(): PatternData | null {
+    return this.sequencer?.tracks ?? null;
+  }
+
+  getPatternSlot(slot: number): PatternData | null {
+    return this.sequencer?.patternSlots[slot] ?? null;
+  }
+
+  setSongChain(chain: number[]) {
+    this.sequencer?.setSongChain(chain);
+  }
+
+  setTrackMuted(trackId: string, muted: boolean) {
+    this.sequencer?.setTrackMuted(trackId, muted);
+  }
+
+  setTrackSolo(trackId: string, solo: boolean) {
+    this.sequencer?.setTrackSolo(trackId, solo);
+  }
+
+  setSongMode(enabled: boolean) {
+    this.sequencer?.setSongMode(enabled);
+  }
+
+  getSongChainPos(): number {
+    return this.sequencer?.songChainPos ?? 0;
+  }
+
+  getActiveSlot(): number {
+    return this.sequencer?.activeSlot ?? 0;
+  }
+
+  getBpm(): number {
+    return this.sequencer?.bpm ?? 120;
+  }
+
+  // ── MIDI import ──────────────────────────────────────────────
+
+  importMidi(data: Uint8Array): boolean {
+    if (!this.sequencer) return false;
+    const parsed = parseMidiFile(data);
+    if (!parsed) return false;
+    const { pattern, bpm } = midiToPattern(parsed);
+    this.sequencer.tracks = pattern;
+    this.sequencer.setBPM(bpm);
+    return true;
+  }
+
+  // ── MIDI export ──────────────────────────────────────────────
+
+  exportMidi(filename: string) {
+    if (!this.sequencer) return;
+    const patterns: PatternData[] = [];
+    if (this.sequencer.songMode && this.sequencer.songChain.length > 0) {
+      for (const slot of this.sequencer.songChain) {
+        const pat = this.sequencer.patternSlots[slot];
+        if (pat) patterns.push(pat);
+      }
+    }
+    if (patterns.length === 0) {
+      patterns.push(this.sequencer.tracks);
+    }
+    const data = buildMidiFile({ bpm: this.sequencer.bpm, patterns });
+    downloadMidi(data, filename);
+  }
 
   // ── Visualizer ───────────────────────────────────────────────
 
@@ -339,14 +430,96 @@ export class AudioManager {
     URL.revokeObjectURL(url);
   }
 
-  // ── Save project ─────────────────────────────────────────────
+  // ── Save / load project ──────────────────────────────────────
 
   getProjectState(effectState: EffectState): object | null {
     if (!this.synth || !this.sequencer) return null;
     return {
+      version: 2,
       synth: { ...this.synth.params },
       sequencer: this.sequencer.getState(),
+      bank: {
+        slots: this.sequencer.patternSlots.map((p) =>
+          p
+            ? Object.fromEntries(
+                Object.entries(p).map(([k, v]) => [
+                  k,
+                  { steps: [...v.steps], note: v.note, velocity: v.velocity },
+                ]),
+              )
+            : null,
+        ),
+        activeSlot: this.sequencer.activeSlot,
+        songChain: [...this.sequencer.songChain],
+        songMode: this.sequencer.songMode,
+      },
       effects: effectState,
     };
+  }
+
+  loadProjectState(state: {
+    synth?: Record<string, number | string>;
+    sequencer?: {
+      bpm?: number;
+      swing?: number;
+      pattern?: PatternData;
+    };
+    bank?: {
+      slots?: (PatternData | null)[];
+      activeSlot?: number;
+      songChain?: number[];
+      songMode?: boolean;
+    };
+    effects?: EffectState;
+  }): EffectState | null {
+    if (!this.synth || !this.sequencer) return null;
+    if (state.synth) {
+      for (const [k, v] of Object.entries(state.synth)) {
+        this.synth.setParam(k, v);
+      }
+    }
+    if (state.sequencer) {
+      this.sequencer.loadState(state.sequencer);
+    }
+    if (state.bank) {
+      const slots = state.bank.slots ?? [];
+      for (let i = 0; i < this.sequencer.patternSlots.length; i++) {
+        const incoming = slots[i];
+        if (incoming) {
+          this.sequencer.patternSlots[i] = Object.fromEntries(
+            Object.entries(incoming).map(([k, v]) => [
+              k,
+              { steps: [...v.steps], note: v.note, velocity: v.velocity },
+            ]),
+          );
+        } else {
+          this.sequencer.patternSlots[i] = null;
+        }
+      }
+      if (typeof state.bank.activeSlot === "number") {
+        this.sequencer.activeSlot = state.bank.activeSlot;
+      }
+      this.sequencer.setSongChain(state.bank.songChain ?? []);
+      if (state.bank.songMode) {
+        // Activate song mode without auto-switching slots
+        this.sequencer.songMode = true;
+      }
+    }
+    if (state.effects && this.effects) {
+      this.effects.setDelayEnabled(state.effects.delayEnabled);
+      this.effects.setDelayParams(
+        state.effects.delayTime,
+        state.effects.delayFeedback,
+        state.effects.delayMix,
+      );
+      this.effects.setReverbEnabled(state.effects.reverbEnabled);
+      this.effects.setReverbParams(
+        state.effects.reverbDecay,
+        state.effects.reverbMix,
+      );
+      this.effects.setDistortionEnabled(state.effects.distortionEnabled);
+      this.effects.setDistortionAmount(state.effects.distortionAmount);
+    }
+    return state.effects ?? null;
   }
 }

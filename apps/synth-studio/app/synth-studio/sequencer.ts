@@ -1,3 +1,37 @@
+export type PatternData = Record<
+  string,
+  { steps: boolean[]; note?: string; velocity: number }
+>;
+
+export const PATTERN_SLOT_COUNT = 8;
+export const PATTERN_SLOT_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
+function makeEmptyTracks(): PatternData {
+  return {
+    synth1: { steps: new Array(16).fill(false), note: "C4", velocity: 0.8 },
+    synth2: { steps: new Array(16).fill(false), note: "E3", velocity: 0.8 },
+    kick: { steps: new Array(16).fill(false), velocity: 0.9 },
+    snare: { steps: new Array(16).fill(false), velocity: 0.8 },
+    hihat: { steps: new Array(16).fill(false), velocity: 0.6 },
+    clap: { steps: new Array(16).fill(false), velocity: 0.7 },
+  };
+}
+
+function clonePattern(p: PatternData): PatternData {
+  const out: PatternData = {};
+  for (const [k, v] of Object.entries(p)) {
+    out[k] = { steps: [...v.steps], note: v.note, velocity: v.velocity };
+  }
+  return out;
+}
+
+function isPatternEmpty(p: PatternData): boolean {
+  for (const v of Object.values(p)) {
+    if (v.steps.some((s) => s)) return false;
+  }
+  return true;
+}
+
 export class Sequencer {
   ctx: AudioContext;
   bpm = 120;
@@ -12,19 +46,21 @@ export class Sequencer {
   lookahead = 25;
   scheduleAhead = 0.1;
 
-  tracks: Record<
-    string,
-    { steps: boolean[]; note?: string; velocity: number }
-  > = {
-    synth1: { steps: new Array(16).fill(false), note: "C4", velocity: 0.8 },
-    synth2: { steps: new Array(16).fill(false), note: "E3", velocity: 0.8 },
-    kick: { steps: new Array(16).fill(false), velocity: 0.9 },
-    snare: { steps: new Array(16).fill(false), velocity: 0.8 },
-    hihat: { steps: new Array(16).fill(false), velocity: 0.6 },
-    clap: { steps: new Array(16).fill(false), velocity: 0.7 },
-  };
+  tracks: PatternData = makeEmptyTracks();
+
+  patternSlots: (PatternData | null)[] = new Array(PATTERN_SLOT_COUNT).fill(
+    null,
+  );
+  activeSlot = 0;
+  songChain: number[] = [];
+  songMode = false;
+  songChainPos = 0;
+
+  mutedTracks = new Set<string>();
+  soloedTracks = new Set<string>();
 
   onStep: ((step: number) => void) | null = null;
+  onPatternSwitch: ((slotIdx: number) => void) | null = null;
   onSynthTrigger:
     | ((note: string, velocity: number, time: number) => void)
     | null = null;
@@ -88,6 +124,13 @@ export class Sequencer {
     this.stepInterval = setTimeout(() => this.schedule(), this.lookahead);
   }
 
+  private isAudibleTrack(trackId: string): boolean {
+    if (this.soloedTracks.size > 0) {
+      return this.soloedTracks.has(trackId);
+    }
+    return !this.mutedTracks.has(trackId);
+  }
+
   scheduleStep(step: number, time: number) {
     const swingOffset = this.getSwingOffset(step);
     const actualTime = time + swingOffset;
@@ -103,23 +146,84 @@ export class Sequencer {
     );
 
     for (const [trackId, track] of Object.entries(this.tracks)) {
-      if (track.steps[step]) {
-        if (trackId.startsWith("synth")) {
-          if (this.onSynthTrigger && track.note) {
-            this.onSynthTrigger(track.note, track.velocity, actualTime);
-          }
-        } else {
-          if (this.onDrumTrigger) {
-            this.onDrumTrigger(trackId, track.velocity, actualTime);
-          }
+      if (!track.steps[step]) continue;
+      if (!this.isAudibleTrack(trackId)) continue;
+      if (trackId.startsWith("synth")) {
+        if (this.onSynthTrigger && track.note) {
+          this.onSynthTrigger(track.note, track.velocity, actualTime);
+        }
+      } else {
+        if (this.onDrumTrigger) {
+          this.onDrumTrigger(trackId, track.velocity, actualTime);
         }
       }
     }
   }
 
+  setTrackMuted(trackId: string, muted: boolean) {
+    if (muted) this.mutedTracks.add(trackId);
+    else this.mutedTracks.delete(trackId);
+  }
+
+  setTrackSolo(trackId: string, solo: boolean) {
+    if (solo) this.soloedTracks.add(trackId);
+    else this.soloedTracks.delete(trackId);
+  }
+
   advanceStep() {
     this.nextStepTime += this.getStepDuration();
-    this.currentStep = (this.currentStep + 1) % this.steps;
+    const next = (this.currentStep + 1) % this.steps;
+    this.currentStep = next;
+    if (next === 0 && this.songMode && this.songChain.length > 0) {
+      this.songChainPos = (this.songChainPos + 1) % this.songChain.length;
+      const slot = this.songChain[this.songChainPos];
+      if (slot !== undefined) this.switchToSlot(slot);
+    }
+  }
+
+  savePatternToSlot(slot: number) {
+    if (slot < 0 || slot >= PATTERN_SLOT_COUNT) return;
+    this.patternSlots[slot] = clonePattern(this.tracks);
+    this.activeSlot = slot;
+  }
+
+  loadPatternFromSlot(slot: number): boolean {
+    if (slot < 0 || slot >= PATTERN_SLOT_COUNT) return false;
+    const pat = this.patternSlots[slot];
+    if (!pat) return false;
+    this.tracks = clonePattern(pat);
+    this.activeSlot = slot;
+    return true;
+  }
+
+  switchToSlot(slot: number) {
+    if (this.loadPatternFromSlot(slot)) {
+      this.onPatternSwitch?.(slot);
+    }
+  }
+
+  clearSlot(slot: number) {
+    if (slot < 0 || slot >= PATTERN_SLOT_COUNT) return;
+    this.patternSlots[slot] = null;
+  }
+
+  slotIsEmpty(slot: number): boolean {
+    const p = this.patternSlots[slot];
+    return !p || isPatternEmpty(p);
+  }
+
+  setSongChain(chain: number[]) {
+    this.songChain = [...chain];
+    this.songChainPos = 0;
+  }
+
+  setSongMode(enabled: boolean) {
+    this.songMode = enabled;
+    this.songChainPos = 0;
+    if (enabled && this.songChain.length > 0) {
+      const first = this.songChain[0];
+      if (first !== undefined) this.switchToSlot(first);
+    }
   }
 
   setBPM(bpm: number) {

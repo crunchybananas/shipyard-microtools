@@ -18,6 +18,7 @@ import {
 } from "the-island/services/game-state";
 import SceneRenderer from "./scene-renderer";
 import CanvasRenderer from "./canvas-renderer";
+import MapView from "./map-view";
 import ShellMemory from "the-island/puzzles/shell-memory";
 import SymbolLock from "the-island/puzzles/symbol-lock";
 import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
@@ -52,6 +53,41 @@ export default class TheIslandApp extends Component {
   @tracked activePuzzle: string | null = null;
 
   @tracked canvasSceneId = "misty_shore";
+  @tracked showMap = false;
+  @tracked visitedScenes: Record<string, boolean> = { misty_shore: true };
+
+  get restorationMap(): Record<string, number> {
+    return this.kingdomState.flags.restoration;
+  }
+
+  openMap = (): void => {
+    this.visitedScenes = {
+      ...this.visitedScenes,
+      [this.kingdomState.currentScene]: true,
+    };
+    this.showMap = true;
+  };
+
+  closeMap = (): void => {
+    this.showMap = false;
+  };
+
+  travelFromMap = (sceneId: string): void => {
+    this.showMap = false;
+    this.kingdomState.setScene(sceneId);
+    this.canvasSceneId = sceneId;
+    this.visitedScenes = { ...this.visitedScenes, [sceneId]: true };
+    const restoration = this.kingdomState.getRestoration(sceneId);
+    this.sceneEngine.transitionTo(sceneId, restoration);
+    setTimeout(() => {
+      const scene = this.sceneEngine.getActiveScene();
+      if (scene) {
+        const desc =
+          restoration > 0.5 ? scene.restoredDescription : scene.cursedDescription;
+        this.showMessage(desc);
+      }
+    }, 500);
+  };
 
   kingdomNewGame = (): void => {
     this.showNewGameConfirm = true;
@@ -164,6 +200,7 @@ export default class TheIslandApp extends Component {
     // Update kingdom state
     this.kingdomState.setScene(targetSceneId);
     this.canvasSceneId = targetSceneId;
+    this.visitedScenes = { ...this.visitedScenes, [targetSceneId]: true };
 
     // Transition canvas engine
     const restoration = this.kingdomState.getRestoration(targetSceneId);
@@ -949,6 +986,7 @@ export default class TheIslandApp extends Component {
         </div>
         <span class="location-name">{{this.kingdomState.sceneName}}</span>
         <div class="menu-buttons">
+          <button type="button" class="menu-btn" {{on "click" this.openMap}}>🗺 Map</button>
           <button type="button" class="menu-btn" {{on "click" this.kingdomNewGame}}>New Game</button>
         </div>
       </header>
@@ -1007,6 +1045,16 @@ export default class TheIslandApp extends Component {
       {{/if}}
       {{#if this.showRuneTrace}}
         <RuneTrace @onSolve={{this.handlePuzzleSolve}} @onClose={{this.handlePuzzleClose}} />
+      {{/if}}
+
+      {{#if this.showMap}}
+        <MapView
+          @currentSceneId={{this.kingdomState.currentScene}}
+          @restoration={{this.restorationMap}}
+          @visited={{this.visitedScenes}}
+          @onClose={{this.closeMap}}
+          @onTravel={{this.travelFromMap}}
+        />
       {{/if}}
 
       {{#if this.showNewGameConfirm}}

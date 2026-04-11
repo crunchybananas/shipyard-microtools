@@ -906,3 +906,215 @@ body {
   0% { opacity: 0; filter: blur(10px); }
   100% { opacity: 1; filter: blur(0); }
 }
+
+/* ============================================
+   MAP OF THE FADING KINGDOM
+   ============================================ */
+.map-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 1300;
+  animation: overlayFadeIn 0.35s ease;
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 1100px;
+  width: 100%;
+  align-items: center;
+}
+
+.map-canvas-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.map-canvas {
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
+  aspect-ratio: 10 / 7;
+  border-radius: 6px;
+  border: 2px solid rgba(70, 40, 15, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 200, 0.15),
+    0 0 80px rgba(90, 50, 20, 0.35),
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    inset 0 0 40px rgba(90, 50, 20, 0.2);
+  image-rendering: auto;
+  display: block;
+}
+
+.map-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(250, 230, 190, 0.97);
+  border: 1.5px solid rgba(70, 40, 15, 0.8);
+  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  max-width: 240px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  color: #3a2410;
+  font-family: "Georgia", "Times New Roman", serif;
+  z-index: 10;
+}
+
+.map-tooltip-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(70, 40, 15, 0.3);
+  padding-bottom: 0.2rem;
+}
+
+.map-tooltip-desc {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  font-style: italic;
+  color: #5a3818;
+}
+
+.map-tour-banner {
+  position: absolute;
+  left: 50%;
+  bottom: 2.5%;
+  transform: translateX(-50%);
+  max-width: 78%;
+  padding: 0.85rem 1.4rem;
+  background: rgba(250, 230, 190, 0.97);
+  border: 2px solid rgba(70, 40, 15, 0.85);
+  border-radius: 8px;
+  box-shadow:
+    0 0 40px rgba(255, 220, 140, 0.3),
+    0 12px 30px rgba(0, 0, 0, 0.6);
+  color: #3a2410;
+  font-family: "Georgia", "Times New Roman", serif;
+  text-align: center;
+  animation: tourFade 0.4s ease;
+  pointer-events: none;
+}
+
+@keyframes tourFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.map-tour-step {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8b5a24;
+  margin-bottom: 0.25rem;
+}
+
+.map-tour-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.map-tour-desc {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: #5a3818;
+}
+
+.map-hint {
+  color: rgba(255, 250, 230, 0.7);
+  font-size: 0.85rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.map-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.map-btn {
+  padding: 0.65rem 1.25rem;
+  background: rgba(255, 220, 160, 0.12);
+  border: 1px solid rgba(255, 220, 160, 0.45);
+  border-radius: 8px;
+  color: #fff7e0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+
+.map-btn:hover {
+  background: rgba(255, 220, 160, 0.2);
+  border-color: rgba(255, 220, 160, 0.7);
+  transform: translateY(-1px);
+}
+
+.map-btn-close {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.map-btn-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.map-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.85rem;
+  background: rgba(250, 230, 190, 0.08);
+  border: 1px solid rgba(250, 230, 190, 0.2);
+  border-radius: 6px;
+}
+
+.map-name-label {
+  font-size: 0.75rem;
+  color: rgba(255, 250, 230, 0.75);
+  letter-spacing: 0.04em;
+  font-family: "Georgia", serif;
+  font-style: italic;
+}
+
+.map-name-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 240, 200, 0.35);
+  border-radius: 4px;
+  padding: 0.35rem 0.6rem;
+  color: #fff7e0;
+  font-family: "Georgia", serif;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.map-name-input:focus {
+  border-color: rgba(255, 220, 120, 0.8);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.map-name-input::placeholder {
+  color: rgba(255, 250, 230, 0.35);
+  font-style: italic;
+}

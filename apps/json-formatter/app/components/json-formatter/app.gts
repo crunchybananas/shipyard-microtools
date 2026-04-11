@@ -2,9 +2,8 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
 import { htmlSafe } from "@ember/template";
-import type { SafeString } from "@ember/template/-private/handlebars";
 
-// ── Pure utility: syntax highlight JSON ────────────────────────
+type SafeString = ReturnType<typeof htmlSafe>;
 
 function syntaxHighlight(json: string): string {
   const escaped = json
@@ -27,29 +26,790 @@ function syntaxHighlight(json: string): string {
   );
 }
 
-// ── Component ──────────────────────────────────────────────────
+function childPathFor(parent: string, key: string | number): string {
+  const base = parent || "$";
+  if (typeof key === "number") return `${base}[${key}]`;
+  if (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)) return `${base}.${key}`;
+  return `${base}[${JSON.stringify(key)}]`;
+}
+
+// ── TypeScript type generator ──────────────────────────────────
+
+type TypeNode =
+  | { kind: "null" }
+  | { kind: "boolean" }
+  | { kind: "number" }
+  | { kind: "string" }
+  | { kind: "unknown" }
+  | { kind: "array"; element: TypeNode }
+  | { kind: "object"; fields: TypeField[] }
+  | { kind: "union"; variants: TypeNode[] };
+
+interface TypeField {
+  key: string;
+  type: TypeNode;
+  optional: boolean;
+}
+
+function inferType(value: unknown): TypeNode {
+  if (value === null) return { kind: "null" };
+  if (typeof value === "boolean") return { kind: "boolean" };
+  if (typeof value === "number") return { kind: "number" };
+  if (typeof value === "string") return { kind: "string" };
+  if (Array.isArray(value)) {
+    if (value.length === 0)
+      return { kind: "array", element: { kind: "unknown" } };
+    const elementTypes = value.map((v) => inferType(v));
+    return { kind: "array", element: mergeTypes(elementTypes) };
+  }
+  if (typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const fields: TypeField[] = [];
+    for (const [k, v] of Object.entries(obj)) {
+      fields.push({ key: k, type: inferType(v), optional: false });
+    }
+    return { kind: "object", fields };
+  }
+  return { kind: "unknown" };
+}
+
+function typeKey(node: TypeNode): string {
+  switch (node.kind) {
+    case "array":
+      return `array<${typeKey(node.element)}>`;
+    case "object":
+      return `{${node.fields.map((f) => `${f.key}${f.optional ? "?" : ""}:${typeKey(f.type)}`).join(",")}}`;
+    case "union":
+      return `(${[...new Set(node.variants.map(typeKey))].sort().join("|")})`;
+    default:
+      return node.kind;
+  }
+}
+
+function mergeTypes(types: TypeNode[]): TypeNode {
+  if (types.length === 0) return { kind: "unknown" };
+  if (types.length === 1) return types[0]!;
+  const allObjects = types.every((t) => t.kind === "object");
+  if (allObjects) {
+    const objects = types as Array<{ kind: "object"; fields: TypeField[] }>;
+    const fieldTypes = new Map<string, { types: TypeNode[]; presence: number }>();
+    for (const o of objects) {
+      for (const f of o.fields) {
+        const entry =
+          fieldTypes.get(f.key) ?? { types: [], presence: 0 };
+        entry.types.push(f.type);
+        entry.presence++;
+        fieldTypes.set(f.key, entry);
+      }
+    }
+    const merged: TypeField[] = [];
+    for (const [key, entry] of fieldTypes) {
+      merged.push({
+        key,
+        type: mergeTypes(entry.types),
+        optional: entry.presence < objects.length,
+      });
+    }
+    return { kind: "object", fields: merged };
+  }
+  const allArrays = types.every((t) => t.kind === "array");
+  if (allArrays) {
+    const arrs = types as Array<{ kind: "array"; element: TypeNode }>;
+    return { kind: "array", element: mergeTypes(arrs.map((a) => a.element)) };
+  }
+  // Deduplicate scalar kinds
+  const seen = new Set<string>();
+  const variants: TypeNode[] = [];
+  for (const t of types) {
+    const key = typeKey(t);
+    if (!seen.has(key)) {
+      seen.add(key);
+      variants.push(t);
+    }
+  }
+  if (variants.length === 1) return variants[0]!;
+  return { kind: "union", variants };
+}
+
+function renderTypeNode(node: TypeNode, indent: number): string {
+  const pad = "  ".repeat(indent);
+  switch (node.kind) {
+    case "null":
+      return "null";
+    case "boolean":
+      return "boolean";
+    case "number":
+      return "number";
+    case "string":
+      return "string";
+    case "unknown":
+      return "unknown";
+    case "array": {
+      const inner = renderTypeNode(node.element, indent);
+      // Wrap unions and objects in parens so `[]` binds correctly
+      if (node.element.kind === "union") return `Array<${inner}>`;
+      if (node.element.kind === "object") return `Array<${inner}>`;
+      return `${inner}[]`;
+    }
+    case "object": {
+      if (node.fields.length === 0) return "{}";
+      const lines: string[] = ["{"];
+      for (const f of node.fields) {
+        const safeKey = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(f.key)
+          ? f.key
+          : JSON.stringify(f.key);
+        lines.push(
+          `${pad}  ${safeKey}${f.optional ? "?" : ""}: ${renderTypeNode(f.type, indent + 1)};`,
+        );
+      }
+      lines.push(`${pad}}`);
+      return lines.join("\n");
+    }
+    case "union":
+      return node.variants.map((v) => renderTypeNode(v, indent)).join(" | ");
+  }
+}
+
+function generateTypeScript(value: unknown, rootName = "Root"): string {
+  const node = inferType(value);
+  if (node.kind === "object") {
+    return `export interface ${rootName} ${renderTypeNode(node, 0)}`;
+  }
+  return `export type ${rootName} = ${renderTypeNode(node, 0)};`;
+}
+
+// ── Zod schema generator ───────────────────────────────────────
+
+function renderZodNode(node: TypeNode, indent: number): string {
+  const pad = "  ".repeat(indent);
+  switch (node.kind) {
+    case "null":
+      return "z.null()";
+    case "boolean":
+      return "z.boolean()";
+    case "number":
+      return "z.number()";
+    case "string":
+      return "z.string()";
+    case "unknown":
+      return "z.unknown()";
+    case "array":
+      return `z.array(${renderZodNode(node.element, indent)})`;
+    case "object": {
+      if (node.fields.length === 0) return "z.object({})";
+      const lines: string[] = ["z.object({"];
+      for (const f of node.fields) {
+        const safeKey = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(f.key)
+          ? f.key
+          : JSON.stringify(f.key);
+        const inner = renderZodNode(f.type, indent + 1);
+        const optional = f.optional ? ".optional()" : "";
+        lines.push(`${pad}  ${safeKey}: ${inner}${optional},`);
+      }
+      lines.push(`${pad}})`);
+      return lines.join("\n");
+    }
+    case "union":
+      return `z.union([${node.variants.map((v) => renderZodNode(v, indent)).join(", ")}])`;
+  }
+}
+
+function generateZod(value: unknown, rootName = "Root"): string {
+  const node = inferType(value);
+  const schemaName = rootName + "Schema";
+  return `import { z } from "zod";\n\nexport const ${schemaName} = ${renderZodNode(node, 0)};\n\nexport type ${rootName} = z.infer<typeof ${schemaName}>;`;
+}
+
+// ── Structural diff ────────────────────────────────────────────
+
+type DiffChange = "added" | "removed" | "changed";
+
+interface DiffEntry {
+  path: string;
+  change: DiffChange;
+  leftValue?: unknown;
+  rightValue?: unknown;
+}
+
+function structurallyEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a === null || b === null) return false;
+  if (typeof a !== "object") return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a)) {
+    const arrB = b as unknown[];
+    if (a.length !== arrB.length) return false;
+    return a.every((v, i) => structurallyEqual(v, arrB[i]));
+  }
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((k) => structurallyEqual(objA[k], objB[k]));
+}
+
+function formatDiffValue(value: unknown): string {
+  if (value === undefined) return "";
+  try {
+    const s = JSON.stringify(value);
+    if (s.length > 120) return s.slice(0, 117) + "…";
+    return s;
+  } catch {
+    return String(value);
+  }
+}
+
+function computeDiff(left: unknown, right: unknown, path = "$"): DiffEntry[] {
+  if (structurallyEqual(left, right)) return [];
+  const leftIsObj =
+    left !== null && typeof left === "object" && !Array.isArray(left);
+  const rightIsObj =
+    right !== null && typeof right === "object" && !Array.isArray(right);
+  const leftIsArr = Array.isArray(left);
+  const rightIsArr = Array.isArray(right);
+
+  if ((leftIsObj && rightIsObj) || (leftIsArr && rightIsArr)) {
+    const entries: DiffEntry[] = [];
+    if (leftIsArr) {
+      const arrL = left as unknown[];
+      const arrR = right as unknown[];
+      const maxLen = Math.max(arrL.length, arrR.length);
+      for (let i = 0; i < maxLen; i++) {
+        const subPath = childPathFor(path, i);
+        if (i >= arrL.length) {
+          entries.push({ path: subPath, change: "added", rightValue: arrR[i] });
+        } else if (i >= arrR.length) {
+          entries.push({ path: subPath, change: "removed", leftValue: arrL[i] });
+        } else {
+          entries.push(...computeDiff(arrL[i], arrR[i], subPath));
+        }
+      }
+      return entries;
+    }
+    const objL = left as Record<string, unknown>;
+    const objR = right as Record<string, unknown>;
+    const keys = new Set([...Object.keys(objL), ...Object.keys(objR)]);
+    for (const key of keys) {
+      const subPath = childPathFor(path, key);
+      if (!(key in objL)) {
+        entries.push({ path: subPath, change: "added", rightValue: objR[key] });
+      } else if (!(key in objR)) {
+        entries.push({ path: subPath, change: "removed", leftValue: objL[key] });
+      } else {
+        entries.push(...computeDiff(objL[key], objR[key], subPath));
+      }
+    }
+    return entries;
+  }
+
+  return [{ path, change: "changed", leftValue: left, rightValue: right }];
+}
+
+// ── Hand-rolled JSON error locator ─────────────────────────────
+
+interface LocatedError {
+  pos: number;
+  line: number;
+  col: number;
+  message: string;
+}
+
+function findJsonParseError(src: string): LocatedError | null {
+  let i = 0;
+  const len = src.length;
+  let line = 1;
+  let col = 1;
+
+  const advance = (n = 1) => {
+    for (let k = 0; k < n && i < len; k++) {
+      if (src[i] === "\n") {
+        line++;
+        col = 1;
+      } else {
+        col++;
+      }
+      i++;
+    }
+  };
+
+  const at = (msg: string): LocatedError => ({ pos: i, line, col, message: msg });
+
+  const skipWs = () => {
+    while (i < len) {
+      const c = src[i]!;
+      if (c === " " || c === "\t" || c === "\n" || c === "\r") advance();
+      else break;
+    }
+  };
+
+  const parseString = (): LocatedError | null => {
+    advance(); // opening quote
+    while (i < len) {
+      const c = src[i]!;
+      if (c === "\\") {
+        if (i + 1 >= len) return at("Unterminated string");
+        advance(2);
+        continue;
+      }
+      if (c === '"') {
+        advance();
+        return null;
+      }
+      if (c === "\n") return at("Unterminated string (newline in string)");
+      advance();
+    }
+    return at("Unterminated string");
+  };
+
+  const parseNumber = (): LocatedError | null => {
+    const m = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/.exec(
+      src.slice(i),
+    );
+    if (!m) return at("Invalid number");
+    advance(m[0].length);
+    return null;
+  };
+
+  const parseValue = (): LocatedError | null => {
+    skipWs();
+    if (i >= len) return at("Unexpected end of input");
+    const c = src[i]!;
+    if (c === "{") return parseObject();
+    if (c === "[") return parseArray();
+    if (c === '"') return parseString();
+    if (c === "-" || (c >= "0" && c <= "9")) return parseNumber();
+    if (src.slice(i, i + 4) === "true") {
+      advance(4);
+      return null;
+    }
+    if (src.slice(i, i + 5) === "false") {
+      advance(5);
+      return null;
+    }
+    if (src.slice(i, i + 4) === "null") {
+      advance(4);
+      return null;
+    }
+    return at(`Unexpected token '${c}'`);
+  };
+
+  const parseObject = (): LocatedError | null => {
+    advance(); // {
+    skipWs();
+    if (src[i] === "}") {
+      advance();
+      return null;
+    }
+    while (true) {
+      skipWs();
+      if (src[i] !== '"') {
+        return at(
+          `Expected string key, got '${src[i] ?? "end of input"}'`,
+        );
+      }
+      const keyErr = parseString();
+      if (keyErr) return keyErr;
+      skipWs();
+      if (src[i] !== ":") {
+        return at(
+          `Expected ':' after key, got '${src[i] ?? "end of input"}'`,
+        );
+      }
+      advance();
+      const valErr = parseValue();
+      if (valErr) return valErr;
+      skipWs();
+      if (src[i] === ",") {
+        advance();
+        skipWs();
+        if (src[i] === "}")
+          return at("Trailing comma before '}' — JSON does not allow this");
+        continue;
+      }
+      if (src[i] === "}") {
+        advance();
+        return null;
+      }
+      return at(
+        `Expected ',' or '}' in object, got '${src[i] ?? "end of input"}'`,
+      );
+    }
+  };
+
+  const parseArray = (): LocatedError | null => {
+    advance(); // [
+    skipWs();
+    if (src[i] === "]") {
+      advance();
+      return null;
+    }
+    while (true) {
+      const valErr = parseValue();
+      if (valErr) return valErr;
+      skipWs();
+      if (src[i] === ",") {
+        advance();
+        skipWs();
+        if (src[i] === "]")
+          return at("Trailing comma before ']' — JSON does not allow this");
+        continue;
+      }
+      if (src[i] === "]") {
+        advance();
+        return null;
+      }
+      return at(
+        `Expected ',' or ']' in array, got '${src[i] ?? "end of input"}'`,
+      );
+    }
+  };
+
+  const topErr = parseValue();
+  if (topErr) return topErr;
+  skipWs();
+  if (i < len) return at(`Unexpected trailing character '${src[i]}'`);
+  return null;
+}
+
+type TreeEntry = {
+  key: string | number;
+  value: unknown;
+  path: string;
+  isLast: boolean;
+};
+
+interface TreeNodeSignature {
+  Args: {
+    value: unknown;
+    nodeKey?: string | number;
+    path: string;
+    isLast?: boolean;
+    expandedPaths: Set<string>;
+    toggleExpanded: (path: string) => void;
+    copyPath: (path: string) => void;
+    matchedPaths: Set<string> | null;
+    ancestorPaths: Set<string> | null;
+  };
+}
+
+class TreeNode extends Component<TreeNodeSignature> {
+  get isArray() {
+    return Array.isArray(this.args.value);
+  }
+
+  get isObject() {
+    return (
+      this.args.value !== null &&
+      typeof this.args.value === "object" &&
+      !Array.isArray(this.args.value)
+    );
+  }
+
+  get isContainer() {
+    return this.isArray || this.isObject;
+  }
+
+  get isExpanded() {
+    return this.args.expandedPaths.has(this.args.path);
+  }
+
+  get caretClass() {
+    return this.isExpanded ? "tn-caret open" : "tn-caret";
+  }
+
+  get entries(): TreeEntry[] {
+    const parent = this.args.path;
+    if (this.isArray) {
+      const arr = this.args.value as unknown[];
+      return arr.map((v, i) => ({
+        key: i,
+        value: v,
+        path: childPathFor(parent, i),
+        isLast: i === arr.length - 1,
+      }));
+    }
+    if (this.isObject) {
+      const obj = this.args.value as Record<string, unknown>;
+      const keys = Object.keys(obj);
+      return keys.map((k, i) => ({
+        key: k,
+        value: obj[k],
+        path: childPathFor(parent, k),
+        isLast: i === keys.length - 1,
+      }));
+    }
+    return [];
+  }
+
+  get childCount() {
+    return this.entries.length;
+  }
+
+  get summary() {
+    if (this.isArray) return `Array(${this.childCount})`;
+    if (this.isObject) return `Object(${this.childCount})`;
+    return "";
+  }
+
+  get openBrace() {
+    return this.isArray ? "[" : "{";
+  }
+
+  get closeBrace() {
+    return this.isArray ? "]" : "}";
+  }
+
+  get isLast() {
+    return this.args.isLast ?? true;
+  }
+
+  get filterClass(): string {
+    if (!this.args.matchedPaths) return "";
+    if (this.args.matchedPaths.has(this.args.path)) return "matched";
+    if (this.args.ancestorPaths?.has(this.args.path)) return "match-ancestor";
+    return "dimmed";
+  }
+
+  get hasKey() {
+    return this.args.nodeKey !== undefined;
+  }
+
+  get keyDisplay() {
+    if (this.args.nodeKey === undefined) return "";
+    if (typeof this.args.nodeKey === "number") return String(this.args.nodeKey);
+    return `"${this.args.nodeKey}"`;
+  }
+
+  get valueClass() {
+    const v = this.args.value;
+    if (v === null) return "tn-value null";
+    const t = typeof v;
+    if (t === "string") return "tn-value string";
+    if (t === "number") return "tn-value number";
+    if (t === "boolean") return "tn-value boolean";
+    return "tn-value";
+  }
+
+  get valueDisplay() {
+    const v = this.args.value;
+    if (v === null) return "null";
+    if (typeof v === "string") return JSON.stringify(v);
+    if (typeof v === "number" || typeof v === "boolean") return String(v);
+    return String(v);
+  }
+
+  toggle = () => {
+    this.args.toggleExpanded(this.args.path);
+  };
+
+  copy = (e: Event) => {
+    e.stopPropagation();
+    this.args.copyPath(this.args.path);
+  };
+
+  <template>
+    {{#if this.isContainer}}
+      <div class="tn {{this.filterClass}}">
+        <div class="tn-row" role="button" {{on "click" this.toggle}}>
+          <span class={{this.caretClass}}>▸</span>
+          {{#if this.hasKey}}
+            <span
+              class="tn-key clickable"
+              title="Click to copy JSONPath"
+              {{on "click" this.copy}}
+            >{{this.keyDisplay}}</span>
+            <span class="tn-colon">:</span>
+          {{/if}}
+          <span class="tn-brace">{{this.openBrace}}</span>
+          {{#unless this.isExpanded}}
+            <span class="tn-summary">{{this.summary}}</span>
+            <span class="tn-brace">{{this.closeBrace}}</span>
+            {{#unless this.isLast}}<span class="tn-comma">,</span>{{/unless}}
+          {{/unless}}
+        </div>
+        {{#if this.isExpanded}}
+          <div class="tn-children">
+            {{#each this.entries as |entry|}}
+              <TreeNode
+                @value={{entry.value}}
+                @nodeKey={{entry.key}}
+                @path={{entry.path}}
+                @isLast={{entry.isLast}}
+                @expandedPaths={{@expandedPaths}}
+                @toggleExpanded={{@toggleExpanded}}
+                @copyPath={{@copyPath}}
+                @matchedPaths={{@matchedPaths}}
+                @ancestorPaths={{@ancestorPaths}}
+              />
+            {{/each}}
+          </div>
+          <div class="tn-row tn-close">
+            <span class="tn-caret-spacer"></span>
+            <span class="tn-brace">{{this.closeBrace}}</span>
+            {{#unless this.isLast}}<span class="tn-comma">,</span>{{/unless}}
+          </div>
+        {{/if}}
+      </div>
+    {{else}}
+      <div class="tn tn-leaf {{this.filterClass}}">
+        <div class="tn-row">
+          <span class="tn-caret-spacer"></span>
+          {{#if this.hasKey}}
+            <span
+              class="tn-key clickable"
+              title="Click to copy JSONPath"
+              {{on "click" this.copy}}
+            >{{this.keyDisplay}}</span>
+            <span class="tn-colon">:</span>
+          {{/if}}
+          <span
+            class="{{this.valueClass}} clickable"
+            title="Click to copy JSONPath"
+            {{on "click" this.copy}}
+          >{{this.valueDisplay}}</span>
+          {{#unless this.isLast}}<span class="tn-comma">,</span>{{/unless}}
+        </div>
+      </div>
+    {{/if}}
+  </template>
+}
+
+interface ParseError {
+  message: string;
+  line: number;
+  col: number;
+  pos: number;
+}
 
 export default class JsonFormatterApp extends Component {
   @tracked input = "";
-  @tracked outputHtml = "";
+  @tracked parsed: unknown = undefined;
+  @tracked hasParsed = false;
+  @tracked rawFormatted = "";
   @tracked statsText = "";
   @tracked statusText = "";
   @tracked statusType: "success" | "error" | "" = "";
+  @tracked viewMode: "tree" | "raw" | "ts" | "zod" | "diff" = "tree";
+  @tracked compareInput = "";
+  @tracked expandedPaths: Set<string> = new Set(["$"]);
+  @tracked parseError: ParseError | null = null;
+  @tracked filterQuery = "";
 
   private statusTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // ── Computed ─────────────────────────────────────────────────
+  private textareaEl: HTMLTextAreaElement | null = null;
 
   get statusClass() {
     if (!this.statusType) return "status hidden";
     return `status ${this.statusType}`;
   }
 
-  get safeOutputHtml(): SafeString {
-    return htmlSafe(this.outputHtml);
+  get safeRawHtml(): SafeString {
+    return htmlSafe(syntaxHighlight(this.rawFormatted));
   }
 
-  // ── Status toast ─────────────────────────────────────────────
+  get isTreeView() {
+    return this.viewMode === "tree";
+  }
+
+  get isRawView() {
+    return this.viewMode === "raw";
+  }
+
+  get treeBtnClass() {
+    return this.isTreeView ? "view-btn active" : "view-btn";
+  }
+
+  get rawBtnClass() {
+    return this.isRawView ? "view-btn active" : "view-btn";
+  }
+
+  get isTsView() {
+    return this.viewMode === "ts";
+  }
+
+  get isZodView() {
+    return this.viewMode === "zod";
+  }
+
+  get isDiffView() {
+    return this.viewMode === "diff";
+  }
+
+  get diffBtnClass() {
+    return this.isDiffView ? "view-btn active" : "view-btn";
+  }
+
+  get compareParseError(): string | null {
+    const raw = this.compareInput.trim();
+    if (!raw) return null;
+    try {
+      JSON.parse(raw);
+      return null;
+    } catch (e) {
+      return e instanceof Error ? e.message : "Invalid JSON";
+    }
+  }
+
+  get diffEntries(): DiffEntry[] {
+    if (!this.hasParsed) return [];
+    const raw = this.compareInput.trim();
+    if (!raw) return [];
+    try {
+      const other = JSON.parse(raw);
+      return computeDiff(this.parsed, other);
+    } catch {
+      return [];
+    }
+  }
+
+  get diffView(): Array<{
+    path: string;
+    cls: string;
+    symbol: string;
+    leftText: string;
+    rightText: string;
+  }> {
+    return this.diffEntries.map((e) => ({
+      path: e.path,
+      cls: `diff-row diff-${e.change}`,
+      symbol: e.change === "added" ? "+" : e.change === "removed" ? "−" : "~",
+      leftText: formatDiffValue(e.leftValue),
+      rightText: formatDiffValue(e.rightValue),
+    }));
+  }
+
+  get diffSummary(): string {
+    const entries = this.diffEntries;
+    if (entries.length === 0) {
+      return this.compareInput.trim()
+        ? "✓ No differences"
+        : "Paste JSON to compare";
+    }
+    const added = entries.filter((e) => e.change === "added").length;
+    const removed = entries.filter((e) => e.change === "removed").length;
+    const changed = entries.filter((e) => e.change === "changed").length;
+    return `${added} added · ${removed} removed · ${changed} changed`;
+  }
+
+  get tsBtnClass() {
+    return this.isTsView ? "view-btn active" : "view-btn";
+  }
+
+  get zodBtnClass() {
+    return this.isZodView ? "view-btn active" : "view-btn";
+  }
+
+  get tsOutput(): string {
+    if (!this.hasParsed) return "";
+    return generateTypeScript(this.parsed, "Root");
+  }
+
+  get zodOutput(): string {
+    if (!this.hasParsed) return "";
+    return generateZod(this.parsed, "Root");
+  }
 
   showStatus = (message: string, type: "success" | "error") => {
     if (this.statusTimer) clearTimeout(this.statusTimer);
@@ -61,16 +821,156 @@ export default class JsonFormatterApp extends Component {
     }, 3000);
   };
 
-  // ── Event handlers (fat arrows) ──────────────────────────────
-
   onInput = (e: Event) => {
-    this.input = (e.target as HTMLTextAreaElement).value;
+    this.textareaEl = e.target as HTMLTextAreaElement;
+    this.input = this.textareaEl.value;
+    // Clear the error badge while the user edits
+    if (this.parseError) this.parseError = null;
   };
 
   onPaste = () => {
-    // Defer so textarea value is updated
     setTimeout(() => this.format(), 50);
   };
+
+  private recordParseError(raw: string, err: unknown) {
+    const source = this.input;
+    // Our hand-rolled locator operates on the full input (with leading
+    // whitespace) so pos/line/col line up with the textarea selection.
+    const located = findJsonParseError(source);
+    if (located) {
+      this.parseError = located;
+      return;
+    }
+    // Fallback: use JSON.parse's message and attempt to read a position hint.
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    const posMatch = msg.match(/(?:at position |column )(\d+)/);
+    const pos = posMatch ? parseInt(posMatch[1]!, 10) : 0;
+    const safePos = Math.min(pos, source.length);
+    let line = 1;
+    let col = 1;
+    for (let i = 0; i < safePos; i++) {
+      if (source[i] === "\n") {
+        line++;
+        col = 1;
+      } else {
+        col++;
+      }
+    }
+    this.parseError = { message: msg, line, col, pos: safePos };
+    void raw;
+  }
+
+  jumpToError = () => {
+    if (!this.parseError || !this.textareaEl) return;
+    const el = this.textareaEl;
+    el.focus();
+    el.setSelectionRange(this.parseError.pos, this.parseError.pos + 1);
+    // Scroll caret into view by nudging
+    const before = el.value.slice(0, this.parseError.pos);
+    const lineCount = before.split("\n").length;
+    const approxLineHeight = parseFloat(
+      getComputedStyle(el).lineHeight || "18",
+    );
+    el.scrollTop = Math.max(0, (lineCount - 3) * approxLineHeight);
+  };
+
+  get parseErrorDetail(): string {
+    if (!this.parseError) return "";
+    return `Line ${this.parseError.line}, col ${this.parseError.col}: ${this.parseError.message}`;
+  }
+
+  onFilterInput = (e: Event) => {
+    this.filterQuery = (e.target as HTMLInputElement).value;
+  };
+
+  clearFilter = () => {
+    this.filterQuery = "";
+  };
+
+  private buildAllPaths(value: unknown, path: string, out: string[]): void {
+    out.push(path);
+    if (value === null || typeof value !== "object") return;
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => this.buildAllPaths(v, childPathFor(path, i), out));
+      return;
+    }
+    Object.entries(value as Record<string, unknown>).forEach(([k, v]) =>
+      this.buildAllPaths(v, childPathFor(path, k), out),
+    );
+  }
+
+  private queryToRegex(query: string): RegExp {
+    const parts = query.split("*");
+    const escaped = parts
+      .map((p) => p.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
+      .join("[^.\\[\\]]*");
+    if (query.startsWith("$")) {
+      return new RegExp("^" + escaped + "(?:$|[.\\[])");
+    }
+    return new RegExp(escaped);
+  }
+
+  get matchedPaths(): Set<string> | null {
+    const q = this.filterQuery.trim();
+    if (!q || !this.hasParsed) return null;
+    const all: string[] = [];
+    this.buildAllPaths(this.parsed, "$", all);
+    try {
+      const re = this.queryToRegex(q);
+      return new Set(all.filter((p) => re.test(p)));
+    } catch {
+      return new Set();
+    }
+  }
+
+  get ancestorPaths(): Set<string> | null {
+    const matches = this.matchedPaths;
+    if (!matches) return null;
+    const ancestors = new Set<string>();
+    for (const path of matches) {
+      let cur = "";
+      let i = 0;
+      while (i < path.length) {
+        if (path[i] === "$") {
+          cur = "$";
+          i++;
+        } else if (path[i] === ".") {
+          let end = i + 1;
+          while (end < path.length && path[end] !== "." && path[end] !== "[") end++;
+          cur += path.slice(i, end);
+          i = end;
+        } else if (path[i] === "[") {
+          const end = path.indexOf("]", i) + 1;
+          cur += path.slice(i, end);
+          i = end;
+        } else {
+          i++;
+        }
+        if (cur && cur !== path) ancestors.add(cur);
+      }
+    }
+    return ancestors;
+  }
+
+  get autoExpandedPaths(): Set<string> {
+    const ancestors = this.ancestorPaths;
+    if (!ancestors) return this.expandedPaths;
+    const combined = new Set(this.expandedPaths);
+    ancestors.forEach((p) => combined.add(p));
+    // Also expand matched paths themselves (to reveal their children if containers)
+    this.matchedPaths?.forEach((p) => combined.add(p));
+    return combined;
+  }
+
+  get filterStatus(): string {
+    const matches = this.matchedPaths;
+    if (!matches) return "";
+    return `${matches.size} match${matches.size === 1 ? "" : "es"}`;
+  }
+
+  get isFiltering(): boolean {
+    return !!this.matchedPaths;
+  }
 
   format = () => {
     const raw = this.input.trim();
@@ -80,13 +980,19 @@ export default class JsonFormatterApp extends Component {
     }
     try {
       const parsed = JSON.parse(raw);
-      const formatted = JSON.stringify(parsed, null, 2);
-      this.outputHtml = syntaxHighlight(formatted);
-      this.updateStats(formatted);
+      this.parsed = parsed;
+      this.hasParsed = true;
+      this.parseError = null;
+      this.rawFormatted = JSON.stringify(parsed, null, 2);
+      this.expandedPaths = new Set(this.collectInitialExpanded(parsed, "$", 2));
+      this.viewMode = "tree";
+      this.updateStats(this.rawFormatted);
       this.showStatus("✓ Formatted successfully", "success");
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Unknown error";
-      this.outputHtml = "";
+      this.hasParsed = false;
+      this.rawFormatted = "";
+      this.recordParseError(raw, error);
       this.showStatus(`Invalid JSON: ${msg}`, "error");
     }
   };
@@ -99,8 +1005,12 @@ export default class JsonFormatterApp extends Component {
     }
     try {
       const parsed = JSON.parse(raw);
+      this.parsed = parsed;
+      this.hasParsed = true;
+      this.parseError = null;
       const minified = JSON.stringify(parsed);
-      this.outputHtml = syntaxHighlight(minified);
+      this.rawFormatted = minified;
+      this.viewMode = "raw";
       this.updateStats(minified);
       this.showStatus(
         `✓ Minified: ${raw.length} → ${minified.length} chars`,
@@ -108,7 +1018,9 @@ export default class JsonFormatterApp extends Component {
       );
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Unknown error";
-      this.outputHtml = "";
+      this.hasParsed = false;
+      this.rawFormatted = "";
+      this.recordParseError(raw, error);
       this.showStatus(`Invalid JSON: ${msg}`, "error");
     }
   };
@@ -121,18 +1033,17 @@ export default class JsonFormatterApp extends Component {
     }
     try {
       JSON.parse(raw);
+      this.parseError = null;
       this.showStatus("✓ Valid JSON!", "success");
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Unknown error";
+      this.recordParseError(raw, error);
       this.showStatus(`✗ Invalid: ${msg}`, "error");
     }
   };
 
   copy = async () => {
-    // Extract text content from highlighted HTML
-    const tmp = document.createElement("div");
-    tmp.innerHTML = this.outputHtml;
-    const text = tmp.textContent ?? "";
+    const text = this.rawFormatted;
     if (!text) {
       this.showStatus("Nothing to copy", "error");
       return;
@@ -145,7 +1056,120 @@ export default class JsonFormatterApp extends Component {
     }
   };
 
-  // ── Private ──────────────────────────────────────────────────
+  showTree = () => {
+    this.viewMode = "tree";
+  };
+
+  showRaw = () => {
+    this.viewMode = "raw";
+  };
+
+  showTs = () => {
+    this.viewMode = "ts";
+  };
+
+  showZod = () => {
+    this.viewMode = "zod";
+  };
+
+  showDiff = () => {
+    this.viewMode = "diff";
+  };
+
+  onCompareInput = (e: Event) => {
+    this.compareInput = (e.target as HTMLTextAreaElement).value;
+  };
+
+  copyTs = async () => {
+    const text = this.tsOutput;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      this.showStatus("✓ Copied TypeScript type", "success");
+    } catch {
+      this.showStatus("Failed to copy", "error");
+    }
+  };
+
+  copyZod = async () => {
+    const text = this.zodOutput;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      this.showStatus("✓ Copied Zod schema", "success");
+    } catch {
+      this.showStatus("Failed to copy", "error");
+    }
+  };
+
+  toggleExpanded = (path: string) => {
+    const next = new Set(this.expandedPaths);
+    if (next.has(path)) next.delete(path);
+    else next.add(path);
+    this.expandedPaths = next;
+  };
+
+  copyPath = async (path: string) => {
+    try {
+      await navigator.clipboard.writeText(path);
+      this.showStatus(`✓ Copied path: ${path}`, "success");
+    } catch {
+      this.showStatus("Failed to copy path", "error");
+    }
+  };
+
+  expandAll = () => {
+    if (!this.hasParsed) return;
+    const all: string[] = [];
+    this.collectAllPaths(this.parsed, "$", all);
+    this.expandedPaths = new Set(all);
+  };
+
+  collapseAll = () => {
+    this.expandedPaths = new Set(["$"]);
+  };
+
+  private collectAllPaths(
+    value: unknown,
+    path: string,
+    out: string[],
+  ): void {
+    if (value === null || typeof value !== "object") return;
+    out.push(path);
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => {
+        this.collectAllPaths(v, childPathFor(path, i), out);
+      });
+      return;
+    }
+    Object.entries(value as Record<string, unknown>).forEach(([k, v]) => {
+      this.collectAllPaths(v, childPathFor(path, k), out);
+    });
+  }
+
+  private collectInitialExpanded(
+    value: unknown,
+    path: string,
+    depth: number,
+  ): string[] {
+    if (value === null || typeof value !== "object") return [path];
+    if (depth <= 0) return [];
+    const paths: string[] = [path];
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => {
+        paths.push(
+          ...this.collectInitialExpanded(v, childPathFor(path, i), depth - 1),
+        );
+      });
+      return paths;
+    }
+    Object.entries(value as Record<string, unknown>).forEach(([k, v]) => {
+      paths.push(
+        ...this.collectInitialExpanded(v, childPathFor(path, k), depth - 1),
+      );
+    });
+    return paths;
+  }
 
   private updateStats(json: string) {
     try {
@@ -157,14 +1181,12 @@ export default class JsonFormatterApp extends Component {
     }
   }
 
-  // ── Template ─────────────────────────────────────────────────
-
   <template>
     <div class="container">
       <header>
         <a href="../../" class="back">← All Tools</a>
         <h1>📋 JSON Formatter</h1>
-        <p class="subtitle">Format, validate, and minify JSON instantly.</p>
+        <p class="subtitle">Format, validate, and explore JSON with a clickable tree.</p>
       </header>
 
       <main>
@@ -177,6 +1199,14 @@ export default class JsonFormatterApp extends Component {
             {{on "paste" this.onPaste}}
           ></textarea>
 
+          {{#if this.parseError}}
+            <div class="parse-error">
+              <span class="parse-error-badge">⚠ Line {{this.parseError.line}}, col {{this.parseError.col}}</span>
+              <span class="parse-error-msg">{{this.parseError.message}}</span>
+              <button type="button" class="parse-error-jump" {{on "click" this.jumpToError}}>Jump to error</button>
+            </div>
+          {{/if}}
+
           <div class="button-row">
             <button class="primary-btn" type="button" {{on "click" this.format}}>✨ Format</button>
             <button class="secondary-btn" type="button" {{on "click" this.minify}}>📦 Minify</button>
@@ -187,15 +1217,118 @@ export default class JsonFormatterApp extends Component {
 
         <div class={{this.statusClass}}>{{this.statusText}}</div>
 
-        <div class="output-section">
-          <div class="output-header">
-            <label>Output</label>
-            {{#if this.statsText}}
-              <span class="stats">{{this.statsText}}</span>
+        {{#if this.hasParsed}}
+          <div class="output-section">
+            <div class="output-header">
+              <label>Output</label>
+              <div class="view-toggle">
+                <button
+                  class={{this.treeBtnClass}}
+                  type="button"
+                  {{on "click" this.showTree}}
+                >🌳 Tree</button>
+                <button
+                  class={{this.rawBtnClass}}
+                  type="button"
+                  {{on "click" this.showRaw}}
+                >📝 Raw</button>
+                <button
+                  class={{this.tsBtnClass}}
+                  type="button"
+                  {{on "click" this.showTs}}
+                >📐 TS</button>
+                <button
+                  class={{this.zodBtnClass}}
+                  type="button"
+                  {{on "click" this.showZod}}
+                >🛡 Zod</button>
+                <button
+                  class={{this.diffBtnClass}}
+                  type="button"
+                  {{on "click" this.showDiff}}
+                >📊 Diff</button>
+              </div>
+              {{#if this.statsText}}
+                <span class="stats">{{this.statsText}}</span>
+              {{/if}}
+            </div>
+
+            {{#if this.isTreeView}}
+              <div class="tree-toolbar">
+                <button class="ghost-btn" type="button" {{on "click" this.expandAll}}>Expand all</button>
+                <button class="ghost-btn" type="button" {{on "click" this.collapseAll}}>Collapse all</button>
+                <span class="tree-hint">Click any key or value to copy its JSONPath</span>
+              </div>
+              <div class="query-bar">
+                <span class="query-prefix">🔎</span>
+                <input
+                  type="text"
+                  class="query-input"
+                  placeholder='Filter: $.user.name  •  $..id  •  $.items[*].price  •  name'
+                  value={{this.filterQuery}}
+                  {{on "input" this.onFilterInput}}
+                />
+                {{#if this.isFiltering}}
+                  <span class="query-status">{{this.filterStatus}}</span>
+                  <button type="button" class="ghost-btn" {{on "click" this.clearFilter}}>Clear</button>
+                {{/if}}
+              </div>
+              <div class="tree {{if this.isFiltering 'filtering'}}">
+                <TreeNode
+                  @value={{this.parsed}}
+                  @path="$"
+                  @expandedPaths={{this.autoExpandedPaths}}
+                  @toggleExpanded={{this.toggleExpanded}}
+                  @copyPath={{this.copyPath}}
+                  @matchedPaths={{this.matchedPaths}}
+                  @ancestorPaths={{this.ancestorPaths}}
+                />
+              </div>
+            {{else if this.isRawView}}
+              <pre class="output">{{{this.safeRawHtml}}}</pre>
+            {{else if this.isTsView}}
+              <div class="ts-toolbar">
+                <span class="ts-hint">Generated TypeScript interface</span>
+                <button class="ghost-btn" type="button" {{on "click" this.copyTs}}>Copy</button>
+              </div>
+              <pre class="output ts-output">{{this.tsOutput}}</pre>
+            {{else if this.isZodView}}
+              <div class="ts-toolbar">
+                <span class="ts-hint">Generated Zod schema</span>
+                <button class="ghost-btn" type="button" {{on "click" this.copyZod}}>Copy</button>
+              </div>
+              <pre class="output ts-output">{{this.zodOutput}}</pre>
+            {{else}}
+              <div class="diff-panel">
+                <label class="diff-label">Compare against</label>
+                <textarea
+                  rows="6"
+                  class="diff-textarea"
+                  placeholder='Paste the other JSON here…'
+                  {{on "input" this.onCompareInput}}
+                >{{this.compareInput}}</textarea>
+                <div class="diff-summary">{{this.diffSummary}}</div>
+                {{#if this.diffView.length}}
+                  <div class="diff-list">
+                    {{#each this.diffView as |row|}}
+                      <div class={{row.cls}}>
+                        <span class="diff-symbol">{{row.symbol}}</span>
+                        <span class="diff-path">{{row.path}}</span>
+                        {{#if row.leftText}}
+                          <span class="diff-left">{{row.leftText}}</span>
+                        {{/if}}
+                        {{#if row.rightText}}
+                          <span class="diff-arrow">→</span>
+                          <span class="diff-right">{{row.rightText}}</span>
+                        {{/if}}
+                      </div>
+                    {{/each}}
+                  </div>
+                {{/if}}
+              </div>
             {{/if}}
           </div>
-          <pre class="output">{{{this.safeOutputHtml}}}</pre>
-        </div>
+        {{/if}}
       </main>
 
       <footer>

@@ -4,6 +4,7 @@ import { on } from "@ember/modifier";
 import { modifier } from "ember-modifier";
 import { fn } from "@ember/helper";
 import { AudioManager, KEY_MAP, type EffectState } from "synth-studio/synth-studio/audio-manager";
+import { PATTERN_SLOT_LABELS, PATTERN_SLOT_COUNT } from "synth-studio/synth-studio/sequencer";
 
 // ── Helpers (strict-mode safe) ─────────────────────────────────
 
@@ -99,6 +100,9 @@ const TRACKS: TrackDef[] = [
 
 const STEP_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
+interface SlotView { idx: number; label: string }
+const PATTERN_SLOTS: SlotView[] = PATTERN_SLOT_LABELS.map((label, idx) => ({ idx, label }));
+
 // ── Component ──────────────────────────────────────────────────
 
 export default class SynthStudioApp extends Component {
@@ -152,6 +156,15 @@ export default class SynthStudioApp extends Component {
     clap: new Array(16).fill(false),
   };
 
+  @tracked activeSlot = 0;
+  @tracked filledSlots: boolean[] = new Array(PATTERN_SLOT_COUNT).fill(false);
+  @tracked songChain: number[] = [];
+  @tracked songMode = false;
+  @tracked playingChainPos = 0;
+  @tracked trackNotes: Record<string, string> = { synth1: "C4", synth2: "E3" };
+  @tracked mutedTracks: Record<string, boolean> = {};
+  @tracked soloedTracks: Record<string, boolean> = {};
+
   // ── Computed display values ──────────────────────────────────
 
   get octaveDisplay() { return String(this.octave); }
@@ -172,6 +185,80 @@ export default class SynthStudioApp extends Component {
   get recordClass() { return this.isRecording ? "transport-btn recording" : "transport-btn"; }
   get recordingIndicatorClass() { return this.isRecording ? "recording-indicator" : "recording-indicator hidden"; }
 
+  get songModeClass() { return this.songMode ? "btn btn-toggle active" : "btn btn-toggle"; }
+  get hasChain() { return this.songChain.length > 0; }
+  get chainView() {
+    return this.songChain.map((slotIdx, pos) => ({
+      pos,
+      slotIdx,
+      label: PATTERN_SLOT_LABELS[slotIdx] ?? "?",
+      cls:
+        "chain-item" +
+        (this.songMode && this.isPlaying && pos === this.playingChainPos
+          ? " playing"
+          : ""),
+    }));
+  }
+  get slotsView() {
+    return PATTERN_SLOTS.map((s) => {
+      const isActive = s.idx === this.activeSlot;
+      const filled = this.filledSlots[s.idx] ?? false;
+      const isPlayingSlot =
+        this.songMode &&
+        this.isPlaying &&
+        this.songChain[this.playingChainPos] === s.idx;
+      return {
+        idx: s.idx,
+        label: s.label,
+        filled,
+        active: isActive,
+        bars: filled ? this.signatureFor(s.idx) : null,
+        cls:
+          "pattern-slot" +
+          (isActive ? " active" : "") +
+          (filled ? " filled" : "") +
+          (isPlayingSlot ? " playing" : ""),
+      };
+    });
+  }
+
+  private signatureFor(
+    slotIdx: number,
+  ): Array<{ x: number; y: number; h: number; color: string }> | null {
+    const pat = this.audio.getPatternSlot(slotIdx);
+    if (!pat) return null;
+    // For each of 16 steps, pick the highest-priority track active on it.
+    // Priority (color): kick > snare > clap > hihat > synth2 > synth1
+    const priority: Array<[string, string]> = [
+      ["kick", "#ff7b72"],
+      ["snare", "#ffa657"],
+      ["clap", "#d2a8ff"],
+      ["hihat", "#79c0ff"],
+      ["synth2", "#56d4dd"],
+      ["synth1", "#7ee787"],
+    ];
+    const counts: number[] = new Array(16).fill(0);
+    for (const track of Object.values(pat)) {
+      track.steps.forEach((on, i) => {
+        if (on) counts[i]!++;
+      });
+    }
+    const maxCount = Math.max(1, ...counts);
+    return counts.map((c, i) => {
+      if (c === 0) return { x: i * 2, y: 12, h: 0, color: "transparent" };
+      // Color: pick the first priority track that fires at this step
+      let color = "#7ee787";
+      for (const [trackId, col] of priority) {
+        if (pat[trackId]?.steps[i]) {
+          color = col;
+          break;
+        }
+      }
+      const h = Math.max(2, Math.round((c / maxCount) * 12));
+      return { x: i * 2, y: 12 - h, h, color };
+    });
+  }
+
   get effectState(): EffectState {
     return {
       delayEnabled: this.delayEnabled,
@@ -191,6 +278,10 @@ export default class SynthStudioApp extends Component {
   private async ensureAudio() {
     await this.audio.init();
     await this.audio.resume();
+  }
+
+  private async ensureInit() {
+    await this.audio.init();
   }
 
   // ── Modifier: setup canvases + keyboard listener + meter ─────
@@ -242,6 +333,21 @@ export default class SynthStudioApp extends Component {
 
     this.meterInterval = setInterval(() => { this.meterLevel = this.audio.getPeakLevel(); }, 50);
     this.audio.onStep = (step) => { this.currentStep = step; };
+    this.audio.onPatternSwitch = (slot) => {
+      this.activeSlot = slot;
+      this.playingChainPos = this.audio.getSongChainPos();
+      this.syncGridFromAudio();
+    };
+
+    // Eager-init audio context (not resumed — that still waits for gesture).
+    // This ensures track-note edits made before first click reach the sequencer.
+    void this.audio.init().then(() => {
+      // Push initial UI note state into the sequencer
+      for (const [trackId, note] of Object.entries(this.trackNotes)) {
+        this.audio.setTrackNote(trackId, note);
+      }
+      tryInitViz();
+    });
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
@@ -355,12 +461,178 @@ export default class SynthStudioApp extends Component {
   };
 
   onTrackNoteChange = (trackId: string, e: Event) => {
-    this.audio.setTrackNote(trackId, (e.target as HTMLSelectElement).value);
+    const v = (e.target as HTMLSelectElement).value;
+    this.audio.setTrackNote(trackId, v);
+    this.trackNotes = { ...this.trackNotes, [trackId]: v };
+  };
+
+  // ── Pattern bank + song chain ────────────────────────────────
+
+  private syncGridFromAudio() {
+    const tracks = this.audio.getCurrentTracks();
+    if (!tracks) return;
+    const grid: Record<string, boolean[]> = {};
+    const notes: Record<string, string> = { ...this.trackNotes };
+    for (const [trackId, t] of Object.entries(tracks)) {
+      grid[trackId] = [...t.steps];
+      if (trackId === "synth1" || trackId === "synth2") {
+        notes[trackId] = t.note ?? notes[trackId] ?? "C4";
+      }
+    }
+    this.stepGrid = grid;
+    this.trackNotes = notes;
+  }
+
+  get tracksView() {
+    return TRACKS.map((t) => ({
+      id: t.id,
+      label: t.label,
+      notes: t.notes
+        ? t.notes.map((n) => ({
+            value: n,
+            selected: this.trackNotes[t.id] === n,
+          }))
+        : null,
+      muteCls:
+        "track-btn track-btn-mute" + (this.mutedTracks[t.id] ? " active" : ""),
+      soloCls:
+        "track-btn track-btn-solo" + (this.soloedTracks[t.id] ? " active" : ""),
+    }));
+  }
+
+  toggleMute = (trackId: string) => {
+    const next = !this.mutedTracks[trackId];
+    this.mutedTracks = { ...this.mutedTracks, [trackId]: next };
+    void this.ensureInit().then(() => {
+      this.audio.setTrackMuted(trackId, next);
+    });
+  };
+
+  toggleSolo = (trackId: string) => {
+    const next = !this.soloedTracks[trackId];
+    this.soloedTracks = { ...this.soloedTracks, [trackId]: next };
+    void this.ensureInit().then(() => {
+      this.audio.setTrackSolo(trackId, next);
+    });
+  };
+
+  private refreshFilledSlots() {
+    const filled = new Array(PATTERN_SLOT_COUNT).fill(false);
+    for (let i = 0; i < PATTERN_SLOT_COUNT; i++) {
+      filled[i] = this.audio.getPatternSlot(i) !== null;
+    }
+    this.filledSlots = filled;
+  }
+
+  selectSlot = (slot: number) => {
+    this.activeSlot = slot;
+    void this.ensureInit().then(() => {
+      if (this.audio.getPatternSlot(slot)) {
+        this.audio.loadPatternSlot(slot);
+        this.syncGridFromAudio();
+      }
+    });
+  };
+
+  saveSlot = () => {
+    void this.ensureInit().then(() => {
+      // Flush current UI note selections to sequencer so the snapshot captures them
+      for (const [trackId, note] of Object.entries(this.trackNotes)) {
+        this.audio.setTrackNote(trackId, note);
+      }
+      this.audio.savePatternSlot(this.activeSlot);
+      this.refreshFilledSlots();
+    });
+  };
+
+  clearSlot = () => {
+    void this.ensureInit().then(() => {
+      this.audio.clearPatternSlot(this.activeSlot);
+      this.refreshFilledSlots();
+    });
+  };
+
+  duplicateSlot = () => {
+    void this.ensureInit().then(() => {
+      let target = -1;
+      for (let i = 0; i < PATTERN_SLOT_COUNT; i++) {
+        if (!this.audio.getPatternSlot(i)) {
+          target = i;
+          break;
+        }
+      }
+      if (target < 0) return;
+      this.activeSlot = target;
+      this.audio.savePatternSlot(target);
+      this.refreshFilledSlots();
+    });
+  };
+
+  addToChain = () => {
+    if (!this.filledSlots[this.activeSlot]) return;
+    this.songChain = [...this.songChain, this.activeSlot];
+    this.audio.setSongChain(this.songChain);
+  };
+
+  removeFromChain = (pos: number) => {
+    this.songChain = this.songChain.filter((_, i) => i !== pos);
+    this.audio.setSongChain(this.songChain);
+  };
+
+  moveChainItem = (pos: number, delta: number) => {
+    const target = pos + delta;
+    if (target < 0 || target >= this.songChain.length) return;
+    const next = [...this.songChain];
+    const [item] = next.splice(pos, 1);
+    if (item === undefined) return;
+    next.splice(target, 0, item);
+    this.songChain = next;
+    this.audio.setSongChain(this.songChain);
+  };
+
+  clearChain = () => {
+    this.songChain = [];
+    this.audio.setSongChain([]);
+  };
+
+  toggleSongMode = () => {
+    this.songMode = !this.songMode;
+    this.audio.setSongMode(this.songMode);
+    if (this.songMode && this.songChain.length > 0) {
+      this.syncGridFromAudio();
+      this.activeSlot = this.songChain[0] ?? 0;
+    }
+  };
+
+  exportMidi = async () => {
+    await this.ensureInit();
+    this.audio.exportMidi("synth-studio.mid");
+  };
+
+  importMidi = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".mid,.midi,audio/midi,audio/x-midi";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      await this.ensureInit();
+      const buffer = await file.arrayBuffer();
+      const ok = this.audio.importMidi(new Uint8Array(buffer));
+      if (ok) {
+        const bpm = this.audio.getBpm();
+        if (bpm) this.bpm = bpm;
+        this.syncGridFromAudio();
+        this.refreshFilledSlots();
+      }
+    };
+    input.click();
   };
 
   // ── Header actions ───────────────────────────────────────────
 
-  saveProject = () => {
+  saveProject = async () => {
+    await this.ensureInit();
     const project = this.audio.getProjectState(this.effectState);
     if (!project) return;
     const json = JSON.stringify(project, null, 2);
@@ -372,6 +644,50 @@ export default class SynthStudioApp extends Component {
     link.click();
     URL.revokeObjectURL(url);
   };
+
+  loadProject = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json,.json";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        await this.ensureInit();
+        const loaded = this.audio.loadProjectState(data);
+        if (loaded) this.applyEffectState(loaded);
+        // Hydrate reactive UI state
+        if (data?.sequencer) {
+          if (typeof data.sequencer.bpm === "number") this.bpm = data.sequencer.bpm;
+          if (typeof data.sequencer.swing === "number") this.swing = data.sequencer.swing;
+        }
+        this.syncGridFromAudio();
+        this.refreshFilledSlots();
+        this.songChain = [...(data?.bank?.songChain ?? [])];
+        this.songMode = !!data?.bank?.songMode;
+        if (typeof data?.bank?.activeSlot === "number") {
+          this.activeSlot = data.bank.activeSlot;
+        }
+      } catch (err) {
+        console.error("Failed to load project:", err);
+      }
+    };
+    input.click();
+  };
+
+  private applyEffectState(e: EffectState) {
+    this.delayEnabled = e.delayEnabled;
+    this.delayTime = e.delayTime;
+    this.delayFeedback = e.delayFeedback;
+    this.delayMix = e.delayMix;
+    this.reverbEnabled = e.reverbEnabled;
+    this.reverbDecay = e.reverbDecay;
+    this.reverbMix = e.reverbMix;
+    this.distortionEnabled = e.distortionEnabled;
+    this.distortionAmount = e.distortionAmount;
+  }
 
   exportWav = () => { this.audio.exportWAV(this.effectState); };
 
@@ -387,6 +703,9 @@ export default class SynthStudioApp extends Component {
             {{/each}}
           </select>
           <button class="btn" type="button" {{on "click" this.saveProject}}>Save</button>
+          <button class="btn" type="button" {{on "click" this.loadProject}}>Load</button>
+          <button class="btn" type="button" {{on "click" this.importMidi}}>Import MIDI</button>
+          <button class="btn" type="button" {{on "click" this.exportMidi}}>Export MIDI</button>
           <button class="btn btn-primary" type="button" {{on "click" this.exportWav}}>Export WAV</button>
         </div>
       </header>
@@ -616,20 +935,70 @@ export default class SynthStudioApp extends Component {
             </div>
           </div>
 
+          <div class="pattern-bank">
+            <div class="pattern-bank-row">
+              <span class="bank-label">Pattern</span>
+              <div class="pattern-slots">
+                {{#each this.slotsView as |slot|}}
+                  <button
+                    class={{slot.cls}}
+                    type="button"
+                    title="Click to load slot"
+                    {{on "click" (fn this.selectSlot slot.idx)}}
+                  >
+                    <span class="slot-label">{{slot.label}}</span>
+                    {{#if slot.bars}}
+                      <svg class="slot-spark" viewBox="0 0 32 12" preserveAspectRatio="none">
+                        {{#each slot.bars as |bar|}}
+                          <rect x={{bar.x}} y={{bar.y}} width="1.4" height={{bar.h}} fill={{bar.color}} rx="0.3" />
+                        {{/each}}
+                      </svg>
+                    {{/if}}
+                  </button>
+                {{/each}}
+              </div>
+              <button class="btn btn-small" type="button" title="Save current grid to active slot" {{on "click" this.saveSlot}}>Save</button>
+              <button class="btn btn-small" type="button" title="Duplicate current grid to next empty slot" {{on "click" this.duplicateSlot}}>Duplicate</button>
+              <button class="btn btn-small" type="button" title="Clear active slot" {{on "click" this.clearSlot}}>Clear</button>
+            </div>
+            <div class="pattern-bank-row">
+              <span class="bank-label">Song</span>
+              <div class="song-chain">
+                {{#each this.chainView as |entry|}}
+                  <div class={{entry.cls}}>
+                    <button type="button" class="chain-nudge" title="Move left" {{on "click" (fn this.moveChainItem entry.pos -1)}}>◀</button>
+                    <button type="button" class="chain-label" title="Remove" {{on "click" (fn this.removeFromChain entry.pos)}}>{{entry.label}}</button>
+                    <button type="button" class="chain-nudge" title="Move right" {{on "click" (fn this.moveChainItem entry.pos 1)}}>▶</button>
+                  </div>
+                {{/each}}
+                {{#unless this.hasChain}}
+                  <span class="chain-empty">Empty — select a saved slot and press +</span>
+                {{/unless}}
+              </div>
+              <button class="btn btn-small" type="button" {{on "click" this.addToChain}}>+</button>
+              <button class="btn btn-small" type="button" {{on "click" this.clearChain}}>Clear</button>
+              <button class={{this.songModeClass}} type="button" {{on "click" this.toggleSongMode}}>Song Mode</button>
+            </div>
+          </div>
+
           <div class="sequencer-grid">
-            {{#each TRACKS as |track|}}
+            {{#each this.tracksView as |track|}}
               <div class="seq-track">
                 <div class="track-label">
                   {{#if track.notes}}
                     <span>{{track.label}}</span>
                     <select class="track-note" {{on "change" (fn this.onTrackNoteChange track.id)}}>
                       {{#each track.notes as |n|}}
-                        <option value={{n}}>{{n}}</option>
+                        <option value={{n.value}} selected={{n.selected}}>{{n.value}}</option>
                       {{/each}}
                     </select>
                   {{else}}
-                    {{track.label}}
+                    <span>{{track.label}}</span>
                   {{/if}}
+                  <div class="track-ms">
+                    <button type="button" class={{track.muteCls}} title="Mute" {{on "click" (fn this.toggleMute track.id)}}>M</button>
+                    <button type="button" class={{track.soloCls}} title="Solo" {{on "click" (fn this.toggleSolo track.id)}}>S</button>
+                  </div>
                 </div>
                 <div class="track-steps">
                   {{#each STEP_INDICES as |stepIdx|}}
