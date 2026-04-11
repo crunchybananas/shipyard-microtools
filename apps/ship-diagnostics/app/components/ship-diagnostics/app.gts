@@ -23,6 +23,50 @@ const INITIAL_DATASETS: Dataset[] = Object.entries(sampleSets).map(
   ([name, logs]) => ({ name, logs }),
 );
 
+// ── URL hash state ─────────────────────────────────────────────
+
+interface HashState {
+  v: 1;
+  d?: string;
+  l?: string;
+  s?: string;
+  q?: string;
+  t?: [number, number];
+}
+
+function encodeHashState(state: HashState): string {
+  try {
+    const json = JSON.stringify(state);
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/=+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function decodeHashState(encoded: string): HashState | null {
+  if (!encoded) return null;
+  try {
+    const padded = encoded + "=".repeat((4 - (encoded.length % 4)) % 4);
+    const bin = atob(padded);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const parsed = JSON.parse(json);
+    if (!parsed || parsed.v !== 1) return null;
+    return parsed as HashState;
+  } catch {
+    return null;
+  }
+}
+
+function readHashState(): HashState | null {
+  if (typeof location === "undefined") return null;
+  return decodeHashState(location.hash.replace(/^#/, ""));
+}
+
 // ── Component ──────────────────────────────────────────────────
 
 export default class ShipDiagnosticsApp extends Component {
@@ -38,6 +82,99 @@ export default class ShipDiagnosticsApp extends Component {
   private liveTimer: ReturnType<typeof setTimeout> | null = null;
   private logListEl: HTMLElement | null = null;
   private liveCounter = 0;
+  private hashWriteTimer: ReturnType<typeof setTimeout> | null = null;
+  private suppressHashWrite = false;
+
+  constructor(...args: ConstructorParameters<typeof Component>) {
+    super(...args);
+    const state = readHashState();
+    if (state) {
+      if (state.d && this.datasets.find((d) => d.name === state.d)) {
+        this.activeDatasetName = state.d;
+      }
+      if (
+        state.l === "all" ||
+        state.l === "info" ||
+        state.l === "warn" ||
+        state.l === "error"
+      ) {
+        this.levelFilter = state.l;
+      }
+      if (typeof state.s === "string") this.serviceFilter = state.s;
+      if (typeof state.q === "string") this.searchQuery = state.q;
+      if (
+        Array.isArray(state.t) &&
+        state.t.length === 2 &&
+        typeof state.t[0] === "number" &&
+        typeof state.t[1] === "number"
+      ) {
+        this.timeRange = [state.t[0], state.t[1]];
+      }
+    }
+    if (typeof window !== "undefined") {
+      window.addEventListener("hashchange", this.onHashChange);
+    }
+  }
+
+  willDestroy() {
+    super.willDestroy();
+    if (typeof window !== "undefined") {
+      window.removeEventListener("hashchange", this.onHashChange);
+    }
+    if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
+  }
+
+  private onHashChange = () => {
+    if (this.suppressHashWrite) return;
+    const state = readHashState();
+    if (!state) return;
+    if (state.d && this.datasets.find((d) => d.name === state.d)) {
+      this.activeDatasetName = state.d;
+    }
+    if (state.l) this.levelFilter = state.l;
+    if (typeof state.s === "string") this.serviceFilter = state.s;
+    if (typeof state.q === "string") this.searchQuery = state.q;
+    if (Array.isArray(state.t) && state.t.length === 2) {
+      this.timeRange = [state.t[0]!, state.t[1]!];
+    } else {
+      this.timeRange = null;
+    }
+  };
+
+  private scheduleHashWrite() {
+    if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
+    this.hashWriteTimer = setTimeout(() => this.writeHash(), 300);
+  }
+
+  private writeHash() {
+    if (typeof window === "undefined") return;
+    const state: HashState = { v: 1 };
+    if (this.activeDatasetName && this.activeDatasetName !== INITIAL_DATASETS[0]?.name) {
+      state.d = this.activeDatasetName;
+    }
+    if (this.levelFilter !== "all") state.l = this.levelFilter;
+    if (this.serviceFilter !== "all") state.s = this.serviceFilter;
+    if (this.searchQuery) state.q = this.searchQuery;
+    if (this.timeRange) state.t = this.timeRange;
+    const hasState = Object.keys(state).length > 1; // v is always present
+    const encoded = hasState ? encodeHashState(state) : "";
+    const nextHash = encoded ? `#${encoded}` : "";
+    if (location.hash === nextHash) return;
+    this.suppressHashWrite = true;
+    history.replaceState(null, "", location.pathname + location.search + nextHash);
+    setTimeout(() => {
+      this.suppressHashWrite = false;
+    }, 0);
+  }
+
+  sharePermalink = async () => {
+    this.writeHash();
+    try {
+      await navigator.clipboard.writeText(location.href);
+    } catch {
+      // no-op: URL is still in the address bar
+    }
+  };
 
   // ── Computed (auto-tracked) ──────────────────────────────────
 
@@ -162,6 +299,7 @@ export default class ShipDiagnosticsApp extends Component {
     this.serviceFilter = "all";
     this.searchQuery = "";
     this.selectedId = this.activeLogs[0]?.id ?? null;
+    this.scheduleHashWrite();
   };
 
   onFileUpload = (e: Event) => {
@@ -190,14 +328,17 @@ export default class ShipDiagnosticsApp extends Component {
 
   onLevelChange = (e: Event) => {
     this.levelFilter = (e.target as HTMLSelectElement).value;
+    this.scheduleHashWrite();
   };
 
   onServiceChange = (e: Event) => {
     this.serviceFilter = (e.target as HTMLSelectElement).value;
+    this.scheduleHashWrite();
   };
 
   onSearchInput = (e: Event) => {
     this.searchQuery = (e.target as HTMLInputElement).value;
+    this.scheduleHashWrite();
   };
 
   selectLog = (log: LogEntry) => {
@@ -209,10 +350,12 @@ export default class ShipDiagnosticsApp extends Component {
     this.serviceFilter = "all";
     this.searchQuery = "";
     this.timeRange = null;
+    this.scheduleHashWrite();
   };
 
   setTimeRange = (range: [number, number] | null) => {
     this.timeRange = range;
+    this.scheduleHashWrite();
   };
 
   setupLogList = modifier((element: HTMLElement) => {
@@ -445,17 +588,17 @@ export default class ShipDiagnosticsApp extends Component {
             <h2>Filters</h2>
             <label>Level</label>
             <select {{on "change" this.onLevelChange}}>
-              <option value="all">All</option>
-              <option value="info">Info</option>
-              <option value="warn">Warn</option>
-              <option value="error">Error</option>
+              <option value="all" selected={{eq this.levelFilter "all"}}>All</option>
+              <option value="info" selected={{eq this.levelFilter "info"}}>Info</option>
+              <option value="warn" selected={{eq this.levelFilter "warn"}}>Warn</option>
+              <option value="error" selected={{eq this.levelFilter "error"}}>Error</option>
             </select>
 
             <label>Service</label>
             <select {{on "change" this.onServiceChange}}>
-              <option value="all">All</option>
+              <option value="all" selected={{eq this.serviceFilter "all"}}>All</option>
               {{#each this.services as |svc|}}
-                <option value={{svc}}>{{svc}}</option>
+                <option value={{svc}} selected={{eq svc this.serviceFilter}}>{{svc}}</option>
               {{/each}}
             </select>
 
@@ -469,6 +612,7 @@ export default class ShipDiagnosticsApp extends Component {
 
             <div class="button-row">
               <button class="secondary" type="button" {{on "click" this.clearFilters}}>Clear</button>
+              <button class="secondary" type="button" title="Copy a shareable permalink" {{on "click" this.sharePermalink}}>🔗 Share</button>
               <button class="primary" type="button" {{on "click" this.exportJson}}>Export JSON</button>
             </div>
             <div class="button-row">
