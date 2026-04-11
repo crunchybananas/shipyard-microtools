@@ -155,6 +155,10 @@ interface MapViewSignature {
     visited: Record<string, boolean>;
     onClose: () => void;
     onTravel: (sceneId: string) => void;
+    sharedMode?: boolean;
+    sharedName?: string;
+    onShare?: () => void;
+    onExitShared?: () => void;
   };
 }
 
@@ -609,8 +613,12 @@ export default class MapView extends Component<MapViewSignature> {
     ctx.fillStyle = "#3a2410";
     ctx.shadowColor = "rgba(90, 50, 20, 0.35)";
     ctx.shadowBlur = 3;
-    const name = this.kingdomName.trim();
-    const title = name ? `The ${name}` : "Map of the Fading Kingdom";
+    const localName = this.kingdomName.trim();
+    const effectiveName = (this.args.sharedName || localName).trim();
+    const title = effectiveName
+      ? `The ${effectiveName}`
+      : "Map of the Fading Kingdom";
+    const name = effectiveName;
     ctx.fillText(title, MAP_WIDTH / 2, 55);
     ctx.font = "italic 15px 'Georgia', serif";
     ctx.fillStyle = "#5a3818";
@@ -752,6 +760,18 @@ export default class MapView extends Component<MapViewSignature> {
     this.args.onClose();
   };
 
+  shareLink = () => {
+    this.args.onShare?.();
+  };
+
+  exitShared = () => {
+    this.args.onExitShared?.();
+  };
+
+  get isShared(): boolean {
+    return !!this.args.sharedMode;
+  }
+
   onKingdomNameInput = (e: Event) => {
     const next = (e.target as HTMLInputElement).value.slice(0, 28);
     this.kingdomName = next;
@@ -839,19 +859,33 @@ export default class MapView extends Component<MapViewSignature> {
             </div>
           {{/if}}
         </div>
-        <div class="map-name-row">
-          <label class="map-name-label">Name your kingdom</label>
-          <input
-            type="text"
-            class="map-name-input"
-            maxlength="28"
-            placeholder="e.g. Fading Kingdom of Ilvar"
-            value={{this.kingdomName}}
-            {{on "input" this.onKingdomNameInput}}
-          />
-        </div>
+        {{#if this.isShared}}
+          <div class="map-shared-banner">
+            <span class="map-shared-icon">✉️</span>
+            <span class="map-shared-text">
+              You're viewing a shared kingdom{{#if @sharedName}} — <em>{{@sharedName}}</em>{{/if}}. Your own progress is untouched.
+            </span>
+            <button type="button" class="map-btn" {{on "click" this.exitShared}}>Return to your kingdom</button>
+          </div>
+        {{else}}
+          <div class="map-name-row">
+            <label class="map-name-label">Name your kingdom</label>
+            <input
+              type="text"
+              class="map-name-input"
+              maxlength="28"
+              placeholder="e.g. Fading Kingdom of Ilvar"
+              value={{this.kingdomName}}
+              {{on "input" this.onKingdomNameInput}}
+            />
+          </div>
+        {{/if}}
         <div class="map-hint">
-          Click any visited region to travel there.
+          {{#if this.isShared}}
+            Click any region to exit shared view and return to your own game.
+          {{else}}
+            Click any visited region to travel there.
+          {{/if}}
         </div>
         <div class="map-actions">
           <button
@@ -864,6 +898,13 @@ export default class MapView extends Component<MapViewSignature> {
             class="map-btn"
             {{on "click" this.saveAsPostcard}}
           >📸 Save Postcard</button>
+          {{#unless this.isShared}}
+            <button
+              type="button"
+              class="map-btn"
+              {{on "click" this.shareLink}}
+            >🔗 Share Link</button>
+          {{/unless}}
           <button
             type="button"
             class="map-btn map-btn-close"

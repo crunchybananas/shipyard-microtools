@@ -1118,3 +1118,31 @@ body {
   color: rgba(255, 250, 230, 0.35);
   font-style: italic;
 }
+
+.map-shared-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  background: rgba(255, 220, 140, 0.12);
+  border: 1px solid rgba(255, 220, 140, 0.4);
+  border-radius: 8px;
+  color: #fff7e0;
+  font-family: "Georgia", serif;
+}
+
+.map-shared-icon {
+  font-size: 1.1rem;
+}
+
+.map-shared-text {
+  flex: 1;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.map-shared-text em {
+  color: #ffd77a;
+  font-style: italic;
+  font-weight: 600;
+}

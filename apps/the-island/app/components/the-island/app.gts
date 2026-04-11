@@ -19,6 +19,47 @@ import {
 import SceneRenderer from "./scene-renderer";
 import CanvasRenderer from "./canvas-renderer";
 import MapView from "./map-view";
+
+interface SharedKingdomState {
+  v: 1;
+  name?: string;
+  cur?: string;
+  visited?: string[];
+  restoration?: Record<string, number>;
+}
+
+function decodeSharedKingdom(encoded: string): SharedKingdomState | null {
+  if (!encoded) return null;
+  try {
+    const padded = encoded + "=".repeat((4 - (encoded.length % 4)) % 4);
+    const bin = atob(padded);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const parsed = JSON.parse(json);
+    if (!parsed || parsed.v !== 1) return null;
+    return parsed as SharedKingdomState;
+  } catch {
+    return null;
+  }
+}
+
+function encodeSharedKingdom(state: SharedKingdomState): string {
+  try {
+    const json = JSON.stringify(state);
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/=+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function readSharedHash(): SharedKingdomState | null {
+  if (typeof location === "undefined") return null;
+  return decodeSharedKingdom(location.hash.replace(/^#/, ""));
+}
 import ShellMemory from "the-island/puzzles/shell-memory";
 import SymbolLock from "the-island/puzzles/symbol-lock";
 import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
@@ -55,10 +96,100 @@ export default class TheIslandApp extends Component {
   @tracked canvasSceneId = "misty_shore";
   @tracked showMap = false;
   @tracked visitedScenes: Record<string, boolean> = { misty_shore: true };
+  @tracked sharedKingdom: SharedKingdomState | null = readSharedHash();
+
+  constructor(...args: ConstructorParameters<typeof Component>) {
+    super(...args);
+    if (this.sharedKingdom) {
+      // Auto-open the map in shared-view mode
+      this.showMap = true;
+    }
+    if (typeof window !== "undefined") {
+      window.addEventListener("hashchange", this.onHashChange);
+    }
+  }
+
+  willDestroy() {
+    super.willDestroy();
+    if (typeof window !== "undefined") {
+      window.removeEventListener("hashchange", this.onHashChange);
+    }
+  }
+
+  onHashChange = () => {
+    const next = readSharedHash();
+    if (next) {
+      this.sharedKingdom = next;
+      this.showMap = true;
+    } else if (this.sharedKingdom) {
+      this.sharedKingdom = null;
+    }
+  };
 
   get restorationMap(): Record<string, number> {
+    if (this.sharedKingdom?.restoration) return this.sharedKingdom.restoration;
     return this.kingdomState.flags.restoration;
   }
+
+  get visibleVisitedMap(): Record<string, boolean> {
+    if (this.sharedKingdom?.visited) {
+      const map: Record<string, boolean> = {};
+      for (const id of this.sharedKingdom.visited) map[id] = true;
+      return map;
+    }
+    return this.visitedScenes;
+  }
+
+  get visibleCurrentSceneId(): string {
+    return (
+      this.sharedKingdom?.cur ?? this.kingdomState.currentScene ?? "misty_shore"
+    );
+  }
+
+  get visibleKingdomName(): string {
+    if (this.sharedKingdom?.name) return this.sharedKingdom.name;
+    return "";
+  }
+
+  get isSharedKingdom(): boolean {
+    return !!this.sharedKingdom;
+  }
+
+  shareCurrentKingdom = async (): Promise<void> => {
+    const visitedList = Object.keys(this.visitedScenes).filter(
+      (k) => this.visitedScenes[k],
+    );
+    const state: SharedKingdomState = {
+      v: 1,
+      cur: this.kingdomState.currentScene,
+      visited: visitedList,
+      restoration: { ...this.kingdomState.flags.restoration },
+    };
+    const localName = (() => {
+      try {
+        return localStorage.getItem("fadingKingdom_name") ?? "";
+      } catch {
+        return "";
+      }
+    })();
+    if (localName) state.name = localName;
+    const encoded = encodeSharedKingdom(state);
+    const url = `${location.origin}${location.pathname}${location.search}#${encoded}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      this.showMessage("Shareable kingdom link copied to clipboard.");
+    } catch {
+      this.showMessage("Failed to copy link.");
+    }
+  };
+
+  exitSharedView = (): void => {
+    this.sharedKingdom = null;
+    if (typeof window !== "undefined") {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+    this.showMap = false;
+  };
 
   openMap = (): void => {
     this.visitedScenes = {
@@ -74,6 +205,11 @@ export default class TheIslandApp extends Component {
 
   travelFromMap = (sceneId: string): void => {
     this.showMap = false;
+    // Shared view: exit back into the player's own game rather than mutate it
+    if (this.sharedKingdom) {
+      this.exitSharedView();
+      return;
+    }
     this.kingdomState.setScene(sceneId);
     this.canvasSceneId = sceneId;
     this.visitedScenes = { ...this.visitedScenes, [sceneId]: true };
@@ -1049,11 +1185,15 @@ export default class TheIslandApp extends Component {
 
       {{#if this.showMap}}
         <MapView
-          @currentSceneId={{this.kingdomState.currentScene}}
+          @currentSceneId={{this.visibleCurrentSceneId}}
           @restoration={{this.restorationMap}}
-          @visited={{this.visitedScenes}}
+          @visited={{this.visibleVisitedMap}}
+          @sharedMode={{this.isSharedKingdom}}
+          @sharedName={{this.visibleKingdomName}}
           @onClose={{this.closeMap}}
           @onTravel={{this.travelFromMap}}
+          @onShare={{this.shareCurrentKingdom}}
+          @onExitShared={{this.exitSharedView}}
         />
       {{/if}}
 
