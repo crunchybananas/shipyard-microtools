@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resourceEmoji } from './state.js';
+import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound } from './audio.js';
 
@@ -70,18 +71,22 @@ export function updateProduction() {
     const interval = 120;
     if (b.prodTimer >= interval) {
       b.prodTimer = 0;
+      // Apply event multipliers
+      const adjustedProd = {};
+      for (const [k,v] of Object.entries(def.prod)) {
+        adjustedProd[k] = Math.round(v * getProductionMultiplier(k));
+      }
       // If a worker is available to carry, set produced flag
       const carrier = b.workers.find(w => w.state === 'working');
       if (carrier) {
-        b.produced = { ...def.prod };
+        b.produced = { ...adjustedProd };
       } else {
-        // No worker at station — auto-collect
-        for (const [k,v] of Object.entries(def.prod)) {
+        for (const [k,v] of Object.entries(adjustedProd)) {
           G.resources[k] = (G.resources[k]||0) + v;
         }
       }
       // Floating particle either way
-      for (const [k,v] of Object.entries(def.prod)) {
+      for (const [k,v] of Object.entries(adjustedProd)) {
         G.particles.push({
           tx: b.x, ty: b.y, offsetY: 0,
           text: `+${v} ${resourceEmoji(k)}`,
@@ -104,7 +109,7 @@ export function updateProduction() {
       const def = BUILDINGS[b.type];
       if (def.happiness) hBonus += def.happiness;
     }
-    G.happiness = Math.min(100, Math.max(10, 50 + hBonus - Math.max(0, G.population - G.maxPop) * 5));
+    G.happiness = Math.min(100, Math.max(10, 50 + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
   }
 
   // Food consumption

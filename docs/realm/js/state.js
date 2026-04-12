@@ -62,7 +62,9 @@ export const G = {
   audioCtx: null,
   researchedTechs: new Set(['agriculture', 'forestry']),
   currentResearch: null,
-  caravans: [], // { x, y, tx, ty, phase:'outbound'|'returning', gold, building, speed }
+  caravans: [],
+  activeEvent: null,    // { id, name, desc, color, endDay }
+  eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0 },
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────

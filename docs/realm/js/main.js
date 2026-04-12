@@ -12,6 +12,7 @@ import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
 import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel } from './ui.js';
 import { updateResearch } from './tech.js';
+import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
 
 // ── Init ───────────────────────────────────────────────────
@@ -43,6 +44,7 @@ function updateTime() {
     G.dayPhase = 0;
     G.day++;
     checkRaids();
+    checkRandomEvents();
   }
 }
 

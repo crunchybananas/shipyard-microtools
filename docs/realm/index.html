@@ -59,6 +59,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 /* Minimap */
 #minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:160px;height:160px;border:1px solid var(--border);border-radius:6px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated}
 
+/* Event banner */
+#event-banner{position:fixed;top:2.6rem;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:0.8rem;padding:0.4rem 1rem;background:var(--panel);border:1px solid var(--gold);border-radius:8px;z-index:10;backdrop-filter:blur(10px);font-size:0.75rem;max-width:min(500px,90vw);white-space:nowrap}
+#event-banner span:nth-child(2){opacity:0.7;overflow:hidden;text-overflow:ellipsis}
+.eb-days{font-size:0.65rem;padding:0.15rem 0.4rem;background:rgba(255,255,255,0.08);border-radius:4px;flex-shrink:0;font-variant-numeric:tabular-nums}
+
 /* HUD button */
 .hud-btn{background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text);padding:0.25rem 0.6rem;border-radius:5px;font-size:0.72rem;cursor:pointer;font-family:inherit;transition:background 0.15s}
 .hud-btn:hover{background:rgba(255,255,255,0.15)}
@@ -126,6 +131,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>
 </div>
 
+<div id="event-banner" style="display:none"></div>
 <div id="build-bar"></div>
 
 <div id="missions">

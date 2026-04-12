@@ -39,6 +39,8 @@ export function saveGame() {
       missions: missions.map(m => ({ id: m.id, done: m.done })),
       researchedTechs: [...G.researchedTechs],
       currentResearch: G.currentResearch ? { ...G.currentResearch } : null,
+      activeEvent: G.activeEvent ? { ...G.activeEvent } : null,
+      eventModifiers: { ...G.eventModifiers },
       caravans: G.caravans.map(c => ({
         x:c.x, y:c.y, tx:c.tx, ty:c.ty,
         homeX:c.homeX, homeY:c.homeY,
@@ -106,6 +108,10 @@ export function loadGame() {
       G.researchedTechs = new Set(s.researchedTechs);
     }
     G.currentResearch = s.currentResearch || null;
+
+    // Restore events
+    G.activeEvent = s.activeEvent || null;
+    G.eventModifiers = s.eventModifiers || { foodProd: 1, goldProd: 1, happinessOffset: 0 };
 
     // Restore caravans
     G.caravans = (s.caravans || []).map(c => ({
