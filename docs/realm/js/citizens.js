@@ -97,13 +97,39 @@ function runStateMachine(c) {
         c.state = 'walk_to_work';
         pathTo(c, c.jobBuilding.x, c.jobBuilding.y);
       } else {
-        // Wander randomly near center
-        const cx = MAP_W/2, cy = MAP_H/2;
-        const wx = cx + rngRange(-5, 5);
-        const wy = cy + rngRange(-5, 5);
-        pathTo(c, Math.round(wx), Math.round(wy));
-        c.state = 'idle';
-        c.stateTimer = 60 + rngInt(0, 60);
+        // No building job — forage from nearby resource tiles
+        const gx = Math.round(c.x), gy = Math.round(c.y);
+        let forageTarget = null;
+        let forageDist = Infinity;
+        const searchR = 6;
+        for (let dy = -searchR; dy <= searchR; dy++) {
+          for (let dx = -searchR; dx <= searchR; dx++) {
+            const nx = gx+dx, ny = gy+dy;
+            if (nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
+            if (!G.fog[ny][nx]) continue;
+            const tile = G.map[ny][nx];
+            // Forage from forest, stone, or sand (berries)
+            if (tile === 3 || tile === 4 || tile === 1) {
+              const d = Math.abs(dx)+Math.abs(dy);
+              if (d < forageDist && !G.buildingGrid[ny]?.[nx]) {
+                forageDist = d;
+                forageTarget = { x: nx, y: ny, tile };
+              }
+            }
+          }
+        }
+
+        if (forageTarget && rng() < 0.6) {
+          c.state = 'foraging';
+          c.forageTarget = forageTarget;
+          pathTo(c, forageTarget.x, forageTarget.y);
+        } else {
+          // Truly idle — wander near center
+          const cx = MAP_W/2, cy = MAP_H/2;
+          pathTo(c, Math.round(cx + rngRange(-4, 4)), Math.round(cy + rngRange(-4, 4)));
+          c.state = 'idle';
+          c.stateTimer = 60 + rngInt(0, 60);
+        }
       }
       break;
 
@@ -159,6 +185,27 @@ function runStateMachine(c) {
       c.carryAmount = 0;
       c.state = 'find_job';
       c.stateTimer = 5;
+      break;
+
+    case 'foraging':
+      // Arrived at forage tile — gather a small amount
+      if (c.forageTarget) {
+        const t = c.forageTarget.tile;
+        const res = t === 3 ? 'wood' : t === 4 ? 'stone' : 'food'; // forest=wood, stone=stone, sand=food(berries)
+        const amount = 1;
+        G.resources[res] = (G.resources[res] || 0) + amount;
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: 0,
+          text: `+${amount} ${resEmoji(res)}`,
+          alpha: 1.2, vy: -0.3, type: 'text',
+        });
+        c.carrying = res;
+        c.carryAmount = 0; // visual only, already added to resources
+      }
+      c.forageTarget = null;
+      c.state = 'find_job';
+      c.stateTimer = 40 + rngInt(0, 30); // short rest then look for work again
+      c.path = null;
       break;
 
     case 'eating':

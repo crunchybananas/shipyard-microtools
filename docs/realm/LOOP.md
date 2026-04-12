@@ -14,23 +14,22 @@
 11. Schedule next wake
 
 ## Last Completed
-- Fixed camera starting position (was at x:768 y:0, should be x:0 y:768)
-- Camera fix placed in generateWorld() so it runs at init regardless of cached defaults
-- Verified: island visible, house placed (wood 60→45, pop 3→6), farm placed
-- Verified: citizen AI works (1 citizen pathfinding to farm job), production ticks, particles visible
-- Verified: missions complete, food economy creates tension
+- Idle citizens now FORAGE from nearby resource tiles (forest→wood, stone→stone, sand→food)
+- They pathfind to the nearest resource tile within 6 tiles, gather +1, show floating particle
+- Settlement feels alive — 5 of 6 citizens now actively moving even without building jobs
+- Mission UI now refreshes each game tick (was only rendering at init before)
+- Verified by injecting foraging targets live: 5 citizens immediately started moving to resource tiles
 
 ## Known Issues (fix in order)
-1. **Second farm click often fails silently** — clicking near-center after placing one building often hits the same tile or a non-grass tile. Need better visual feedback: show the actual tile that would be built on, flash red if invalid.
-2. **Most citizens idle** — only 1 farm so only 1 worker needed. Early game needs more building variety guidance. Consider: auto-assign idle citizens to gather nearby resources even without buildings.
-3. **Food economy too tight** — 80 starting food lasts ~15 days with 6 citizens. Player MUST build farms immediately or starve. Starting food could be 100, or slow consumption more.
-4. **No tutorial/guidance** — new player has no idea what to do. Need at minimum a "Build a house first!" prompt.
-5. **Smoke particles pile up** — with many buildings, particle count grows. Already capped at 200 but verify performance.
-6. **Night too dark** — at minimum daylight the game is barely visible. Lighten the night floor.
-7. **Minimap click doesn't work** — the import() in input.js for minimap click is async and broken.
+1. **ES module caching** — browser caches old module versions aggressively. Fixes work on fresh loads (production) but not during dev testing session. Consider: add version query params to sub-module imports, or switch to a dev server with cache-control headers.
+2. **No tutorial/guidance** — new player has no idea what to do. Need "Build a house!" prompt on start.
+3. **Build placement feedback** — clicking an invalid tile does nothing. Need flash/tooltip/sound for "can't build here".
+4. **Night too dark** — game nearly invisible during night phase. Raise floor.
+5. **Minimap click broken** — async import() in input.js doesn't resolve correctly.
+6. **Missions not triggering** — may be a module identity issue where missions.js imports a different G than main.js uses. Need to verify on a fresh load.
 
 ## Next Priority
-Pick #1 (build feedback) or #4 (tutorial) — both improve new-player experience significantly.
+#2 (tutorial) or #3 (build feedback) — both critical for new-player experience. Also investigate #1 (module caching) since it blocks dev testing.
 
 ## Shipped Features
 See MISSION.md for the complete feature list with checkmarks.

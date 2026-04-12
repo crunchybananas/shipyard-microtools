@@ -61,7 +61,8 @@ function gameLoop() {
       updateResearch();
       if (G.gameTick % 60 === 0) {
         checkMissions();
-        renderResearchPanel(); // refresh progress bar
+        renderMissions(); // refresh mission list UI
+        renderResearchPanel();
       }
     }
     if (G.gameTick % 30 === 0) {
