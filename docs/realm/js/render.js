@@ -512,11 +512,17 @@ function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   ctx.globalAlpha = daylight;
 
-  // Shadow
+  // Shadow (scaled)
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y+4, 14, 6, 0, 0, Math.PI*2);
+  ctx.ellipse(s.x, s.y+5, 18, 7, 0, 0, Math.PI*2);
   ctx.fill();
+
+  // Scale up buildings by 1.3x for visual presence
+  ctx.save();
+  ctx.translate(s.x, s.y);
+  ctx.scale(1.3, 1.3);
+  ctx.translate(-s.x, -s.y);
 
   switch (b.type) {
     case 'house': drawHouse(ctx, s); break;
@@ -538,6 +544,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'school': drawSchool(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
   }
+  ctx.restore(); // undo the 1.3x scale
 
   // Snow cap on roofs in winter
   if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
