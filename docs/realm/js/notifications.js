@@ -23,6 +23,18 @@ export function notify(text, type = 'info') {
 
   // Update badge
   updateLogBadge();
+
+  // Activity feed (persistent on-screen ticker)
+  const feed = document.getElementById('activity-feed');
+  if (feed) {
+    const item = document.createElement('div');
+    item.className = `feed-item ${type}`;
+    item.innerHTML = `<span class="feed-day">D${G.day}</span>${text}`;
+    feed.appendChild(item);
+    while (feed.children.length > 5) feed.removeChild(feed.firstChild);
+    setTimeout(() => item.classList.add('fade'), 8000);
+    setTimeout(() => { if (item.parentNode) item.remove(); }, 9000);
+  }
 }
 
 function updateLogBadge() {
