@@ -28,6 +28,7 @@ export const ACHIEVEMENTS = [
   { id:'scholar',         icon:'📚', name:'Scholar',            desc:'Build a school',                        check:()=>G.buildings.some(b=>b.type==='school') },
   { id:'faithful',        icon:'⛪', name:'Faithful',           desc:'Build a church',                        check:()=>G.buildings.some(b=>b.type==='church') },
   { id:'prepared',        icon:'🏺', name:'Prepared',           desc:'Build a granary before winter',         check:()=>G.buildings.some(b=>b.type==='granary') },
+  { id:'victory',         icon:'👑', name:'Realm Complete',     desc:'Build a Castle and claim your realm',   check:()=>G.won },
 ];
 
 let unlocked = new Set();

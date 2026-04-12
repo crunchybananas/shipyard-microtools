@@ -36,6 +36,11 @@ export function placeBuilding(type, tx, ty) {
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
   playSound('build');
+  // Victory check
+  if (type === 'castle' && !G.won) {
+    G.won = true;
+    setTimeout(() => showVictoryScreen(), 500);
+  }
   return true;
 }
 
@@ -259,6 +264,18 @@ function updateCaravans() {
       }
     }
   }
+}
+
+function showVictoryScreen() {
+  const el = document.getElementById('victory-screen');
+  if (!el) return;
+  el.style.display = 'flex';
+  el.querySelector('.vic-day').textContent = `Day ${G.day}`;
+  el.querySelector('.vic-pop').textContent = `${G.population} citizens`;
+  el.querySelector('.vic-buildings').textContent = `${G.buildings.length} buildings`;
+  el.querySelector('.vic-techs').textContent = `${G.researchedTechs.size} technologies`;
+  const ach = document.querySelectorAll ? document.querySelectorAll('.ach-item.done').length : 0;
+  el.querySelector('.vic-achievements').textContent = `${ach} achievements`;
 }
 
 // Imported from ui.js to avoid circular — using a simple global

@@ -59,6 +59,21 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 /* Minimap */
 #minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:160px;height:160px;border:1px solid var(--border);border-radius:6px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated}
 
+/* Victory screen */
+#victory-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:200;backdrop-filter:blur(8px);animation:vicFadeIn 1s ease}
+@keyframes vicFadeIn{from{opacity:0}to{opacity:1}}
+.vic-card{text-align:center;max-width:380px;padding:2.5rem 2rem;background:linear-gradient(180deg,rgba(25,25,50,0.95),rgba(15,15,30,0.98));border:2px solid var(--gold);border-radius:16px;box-shadow:0 0 80px rgba(255,209,102,0.2),0 20px 60px rgba(0,0,0,0.6)}
+.vic-crown{font-size:4rem;margin-bottom:0.5rem;animation:vicBounce 1.5s ease infinite}
+@keyframes vicBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.vic-title{font-size:2.2rem;color:var(--gold);margin:0 0 0.3rem;letter-spacing:0.05em}
+.vic-subtitle{color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0 0 1.5rem}
+.vic-stats{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem}
+.vic-stat{display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.85rem}
+.vic-label{color:rgba(255,255,255,0.5)}
+.vic-stat span:last-child{font-weight:700;color:var(--gold)}
+.vic-btn{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:0.7rem 2rem;border-radius:8px;font-size:1rem;cursor:pointer;font-family:inherit;font-weight:600;transition:background 0.2s}
+.vic-btn:hover{background:rgba(255,209,102,0.12)}
+
 /* Achievement toast */
 #achievement-toast{position:fixed;bottom:5rem;right:1rem;display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1rem;background:rgba(15,15,30,0.95);border:1.5px solid var(--gold);border-radius:10px;z-index:100;font-size:0.8rem;pointer-events:none;opacity:0;transition:opacity 0.4s,transform 0.4s;transform:translateX(20px);max-width:300px;backdrop-filter:blur(10px)}
 #achievement-toast.show{opacity:1;transform:translateX(0)}
@@ -204,6 +219,22 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <div id="achievements-panel" style="display:none">
   <div class="rp-header"><h3>🏆 Achievements</h3><button class="rp-close" onclick="toggleAchievements()">✕</button></div>
   <div id="achievements-content" class="research-content"></div>
+</div>
+
+<div id="victory-screen" style="display:none">
+  <div class="vic-card">
+    <div class="vic-crown">👑</div>
+    <h2 class="vic-title">Victory!</h2>
+    <p class="vic-subtitle">Your castle stands tall. The realm is yours.</p>
+    <div class="vic-stats">
+      <div class="vic-stat"><span class="vic-label">Time</span><span class="vic-day">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Population</span><span class="vic-pop">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Buildings</span><span class="vic-buildings">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Research</span><span class="vic-techs">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Achievements</span><span class="vic-achievements">—</span></div>
+    </div>
+    <button class="vic-btn" onclick="this.closest('#victory-screen').style.display='none'">Continue Playing</button>
+  </div>
 </div>
 
 <div id="toast"></div>

@@ -477,6 +477,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'wall': drawWall(ctx, s); break;
     case 'road': drawRoad(ctx, s); break;
     case 'tradingpost': drawTradingPost(ctx, s, b); break;
+    case 'castle': drawCastle(ctx, s); break;
     case 'granary': drawGranary(ctx, s); break;
     case 'church': drawChurch(ctx, s); break;
     case 'school': drawSchool(ctx, s); break;
@@ -788,6 +789,71 @@ function drawTradingPost(ctx, s, b) {
     ctx.textAlign = 'center';
     ctx.fillText('⛵ en route', s.x, s.y - 28);
   }
+}
+
+function drawCastle(ctx, s) {
+  // Grand multi-tower castle
+  // Main keep
+  ctx.fillStyle = '#8a8a9a';
+  ctx.fillRect(s.x-14, s.y-32, 28, 28);
+  ctx.fillStyle = '#7a7a8a';
+  ctx.beginPath();
+  ctx.moveTo(s.x+14, s.y-32); ctx.lineTo(s.x+18, s.y-28);
+  ctx.lineTo(s.x+18, s.y); ctx.lineTo(s.x+14, s.y-4);
+  ctx.closePath();
+  ctx.fill();
+  // Crenellations on keep
+  ctx.fillStyle = '#9a9aaa';
+  for (let i = -12; i < 14; i += 5) {
+    ctx.fillRect(s.x + i, s.y - 36, 3, 4);
+  }
+  // Left tower
+  ctx.fillStyle = '#8a8a9a';
+  ctx.fillRect(s.x-20, s.y-40, 10, 36);
+  ctx.fillStyle = '#9a9aaa';
+  for (let i = -19; i < -10; i += 4) {
+    ctx.fillRect(s.x + i, s.y - 44, 3, 4);
+  }
+  // Right tower
+  ctx.fillStyle = '#8a8a9a';
+  ctx.fillRect(s.x+10, s.y-40, 10, 36);
+  ctx.fillStyle = '#9a9aaa';
+  for (let i = 11; i < 20; i += 4) {
+    ctx.fillRect(s.x + i, s.y - 44, 3, 4);
+  }
+  // Gate
+  ctx.fillStyle = '#3a3a44';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 10, 5, Math.PI, 0);
+  ctx.lineTo(s.x + 5, s.y - 4);
+  ctx.lineTo(s.x - 5, s.y - 4);
+  ctx.closePath();
+  ctx.fill();
+  // Portcullis lines
+  ctx.strokeStyle = '#5a5a64';
+  ctx.lineWidth = 0.8;
+  for (let i = -3; i <= 3; i += 2) {
+    ctx.beginPath();
+    ctx.moveTo(s.x + i, s.y - 14); ctx.lineTo(s.x + i, s.y - 4);
+    ctx.stroke();
+  }
+  // Flags on towers
+  ctx.fillStyle = '#ffd166';
+  ctx.fillRect(s.x - 16, s.y - 50, 2, 10);
+  ctx.fillRect(s.x + 14, s.y - 50, 2, 10);
+  ctx.fillStyle = '#e74c3c';
+  ctx.beginPath();
+  ctx.moveTo(s.x-14, s.y-50); ctx.lineTo(s.x-6, s.y-47); ctx.lineTo(s.x-14, s.y-44);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(s.x+16, s.y-50); ctx.lineTo(s.x+24, s.y-47); ctx.lineTo(s.x+16, s.y-44);
+  ctx.closePath(); ctx.fill();
+  // Windows
+  ctx.fillStyle = '#ffeebb';
+  ctx.fillRect(s.x-6, s.y-26, 3, 4);
+  ctx.fillRect(s.x+3, s.y-26, 3, 4);
+  ctx.fillRect(s.x-6, s.y-18, 3, 4);
+  ctx.fillRect(s.x+3, s.y-18, 3, 4);
 }
 
 function drawGranary(ctx, s) {

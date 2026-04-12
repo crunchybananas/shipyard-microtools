@@ -78,6 +78,15 @@ export const TECHS = {
     icon: '🍺',
     prereq: 'commerce',
   },
+  architecture: {
+    name: 'Architecture',
+    desc: 'The pinnacle of knowledge. Unlocks the Castle — build it to win!',
+    cost: { gold: 50, stone: 30, iron: 10 },
+    time: 800,
+    unlocks: ['castle'],
+    icon: '🏰',
+    prereq: 'military',
+  },
 };
 
 // Which building types require NO tech (always available)
