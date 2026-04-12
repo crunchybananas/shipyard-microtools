@@ -87,6 +87,17 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 /* Minimap */
 #minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:160px;height:160px;border:1px solid var(--border);border-radius:6px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated}
 
+/* Notification log */
+#log-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,90vw);max-height:70vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
+.log-entry{display:flex;gap:0.5rem;padding:0.35rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.75rem;align-items:baseline}
+.log-day{font-size:0.65rem;color:rgba(255,255,255,0.3);font-family:'SF Mono',Monaco,monospace;flex-shrink:0;min-width:48px}
+.log-text{color:rgba(255,255,255,0.7)}
+.log-danger .log-text{color:var(--danger)}
+.log-event .log-text{color:var(--gold)}
+.log-mission .log-text{color:var(--food)}
+.log-empty{padding:1rem;text-align:center;color:rgba(255,255,255,0.3);font-style:italic}
+.log-badge{color:var(--gold);font-size:1.2rem;line-height:0;vertical-align:super;margin-left:-0.1rem}
+
 /* Help overlay */
 #help-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:60;backdrop-filter:blur(6px)}
 .help-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;max-width:380px;width:90vw;backdrop-filter:blur(12px)}
@@ -243,6 +254,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>
   <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()">🔊</button>
   <button class="hud-btn" onclick="toggleAchievements()">🏆</button>
+  <button class="hud-btn" onclick="toggleLog()">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
 </div>
 
 <div id="tutorial-tip" style="display:none"></div>
@@ -289,6 +301,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <div id="achievements-panel" style="display:none">
   <div class="rp-header"><h3>🏆 Achievements</h3><button class="rp-close" onclick="toggleAchievements()">✕</button></div>
   <div id="achievements-content" class="research-content"></div>
+</div>
+
+<div id="log-panel" style="display:none">
+  <div class="rp-header"><h3>📜 Event Log</h3><button class="rp-close" onclick="toggleLog()">✕</button></div>
+  <div id="log-content" class="research-content"></div>
 </div>
 
 <div id="pop-panel" style="display:none">

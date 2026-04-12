@@ -7,6 +7,7 @@ import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound } from './audio.js';
 import { spawnDust } from './particles.js';
+import { notify } from './notifications.js';
 
 export function canPlace(type, tx, ty) {
   if (tx<0||tx>=MAP_W||ty<0||ty>=MAP_H) return false;
@@ -137,7 +138,7 @@ export function updateProduction() {
         const c = G.citizens.pop();
         if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w=>w!==c);
         G.population--;
-        showToast('A settler has left due to starvation!', true);
+        notify('A settler has left due to starvation!', 'danger');
       }
     }
   }
@@ -160,7 +161,7 @@ export function updateProduction() {
   // Immigration (once per day)
   if (G.gameTick % G.dayLength === 0 && G.happiness > 60 && G.population < G.maxPop) {
     trySpawnSettlers(1);
-    if (G.population > 3) showToast('A new settler arrives!');
+    if (G.population > 3) notify('A new settler arrives!');
   }
 }
 
@@ -176,13 +177,13 @@ export function checkRaids() {
         target.hp -= dmg;
         if (target.hp <= 0) {
           demolishBuilding(target);
-          showToast(`Raiders destroyed the ${BUILDINGS[target.type].name}!`, true);
+          notify(`Raiders destroyed the ${BUILDINGS[target.type].name}!`, 'danger');
         } else {
-          showToast(`Raiders attacked! ${G.defense>0?'Defenses held partially.':'No defenses!'}`, true);
+          notify(`Raiders attacked! ${G.defense>0?'Defenses held partially.':'No defenses!'}`, 'danger');
         }
       }
     } else {
-      showToast('Raiders repelled by your defenses!');
+      notify('Raiders repelled by your defenses!');
     }
     G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
     G.raidInterval = Math.max(4, G.raidInterval - 1);
@@ -280,13 +281,4 @@ function showVictoryScreen() {
   el.querySelector('.vic-achievements').textContent = `${ach} achievements`;
 }
 
-// Imported from ui.js to avoid circular — using a simple global
-function showToast(msg, danger=false) {
-  const el = document.getElementById('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = danger ? 'var(--danger)' : 'var(--gold)';
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(()=>el.classList.remove('show'), 2500);
-}
+// notify() is now imported from notifications.js

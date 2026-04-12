@@ -73,6 +73,7 @@ export const G = {
   won: false,
   difficulty: 'normal', // easy, normal, hard
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
+  notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
   lastResources: null, // snapshot for rate calculation
 };
 

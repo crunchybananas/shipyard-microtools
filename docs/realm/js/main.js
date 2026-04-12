@@ -15,6 +15,7 @@ import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
 import { updateAmbient, toggleAmbient, isAmbientEnabled } from './audio.js';
+import { toggleNotificationLog, notify } from './notifications.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 
 // ── Init ───────────────────────────────────────────────────
@@ -44,7 +45,7 @@ function beginGame() {
   renderBuildBar();
   renderMissions();
   updateUI();
-  showToast('Welcome to Realm. Build your settlement!');
+  notify('Welcome to Realm. Build your settlement!');
   gameLoop();
 }
 
@@ -81,6 +82,7 @@ window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
 window.dismissTutorial = dismissTutorial;
+window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   if (!confirm('Start a new game? Current unsaved progress will be lost.')) return;
   // Reset all state
@@ -99,7 +101,7 @@ window.newGame = () => {
   G.lastResources = null;
   generateWorld();
   renderBuildBar(); renderMissions(); updateUI();
-  showToast('New game started!');
+  notify('New game started!');
 };
 window.togglePopPanel = togglePopPanel;
 window.toggleAchievements = () => {
@@ -127,7 +129,7 @@ function updateTime() {
     checkRandomEvents();
     if (updateSeason()) {
       const s = getSeasonData();
-      showToast(`Season changed: ${s.name}`);
+      notify(`Season changed: ${s.name}`, 'event');
     }
   }
 }
@@ -178,13 +180,4 @@ function gameLoop() {
 
 // Game loop starts when player clicks New Game or Continue from the title screen.
 
-// ── Toast helper (globally accessible) ─────────────────────
-function showToast(msg, danger = false) {
-  const el = document.getElementById('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = danger ? 'var(--danger)' : 'var(--gold)';
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 2500);
-}
+// notify() imported from notifications.js replaces the old showToast
