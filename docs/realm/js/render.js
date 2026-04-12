@@ -433,6 +433,15 @@ export function render() {
   ctx.globalAlpha = 1;
   ctx.restore();
 
+  // ── Screen-space vignette (atmospheric edge fog) ──────────
+  const vw = C.width, vh = C.height;
+  const vigSize = Math.min(vw, vh) * 0.4;
+  const vig = ctx.createRadialGradient(vw/2, vh/2, Math.min(vw,vh)*0.3, vw/2, vh/2, Math.max(vw,vh)*0.7);
+  vig.addColorStop(0, 'rgba(10,14,26,0)');
+  vig.addColorStop(1, 'rgba(10,14,26,0.5)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, vw, vh);
+
   // ── Minimap ───────────────────────────────────────────────
   renderMinimap();
 
@@ -516,6 +525,43 @@ function drawBuilding(ctx, b, s, daylight) {
     for (let i = -snowW + 3; i < snowW; i += 4) {
       ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
     }
+  }
+
+  // Night window glow — warm light from inhabited buildings at night
+  const daylight = getDaylight();
+  if (daylight < 0.75 && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
+    const glowAlpha = (0.75 - daylight) * 2; // brighter as it gets darker
+    ctx.globalAlpha = glowAlpha;
+    // Warm point light around the building
+    const glowR = b.type === 'castle' ? 28 : b.type === 'church' ? 22 : 16;
+    const glowY = b.type === 'tower' ? s.y - 22 : b.type === 'castle' ? s.y - 20 : s.y - 14;
+    const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
+    glow.addColorStop(0, 'rgba(255,220,140,0.35)');
+    glow.addColorStop(1, 'rgba(255,220,140,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(s.x, glowY, glowR, 0, Math.PI * 2);
+    ctx.fill();
+    // Bright window dots
+    ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
+    if (b.type === 'house') {
+      ctx.fillRect(s.x+4, s.y-18, 3, 3);
+    } else if (b.type === 'tavern') {
+      ctx.fillRect(s.x-5, s.y-18, 4, 3);
+      ctx.fillRect(s.x+3, s.y-18, 4, 3);
+    } else if (b.type === 'castle') {
+      for (const ox of [-6,3]) for (const oy of [-26,-18]) ctx.fillRect(s.x+ox, s.y+oy, 3, 4);
+    } else if (b.type === 'school') {
+      for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-16, 3, 3);
+    } else if (b.type === 'church') {
+      ctx.fillStyle = `rgba(100,160,255,${glowAlpha * 0.7})`; // blue stained glass
+      ctx.beginPath();
+      ctx.arc(s.x, s.y-14, 3, Math.PI, 0);
+      ctx.fill();
+    } else if (b.type === 'barracks') {
+      ctx.fillRect(s.x-3, s.y-14, 2, 3);
+    }
+    ctx.globalAlpha = daylight;
   }
 
   // Worker count indicator for buildings that need workers
