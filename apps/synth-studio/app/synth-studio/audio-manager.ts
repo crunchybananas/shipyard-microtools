@@ -346,6 +346,38 @@ export class AudioManager {
     this.sequencer?.setTrackSolo(trackId, solo);
   }
 
+  // ── Drum sample loading ─────────────────────────────────────
+
+  async loadDrumSample(
+    trackId: string,
+    file: File,
+  ): Promise<{ ok: boolean; error?: string }> {
+    if (!this.ctx || !this.drums) return { ok: false, error: "Audio not initialized" };
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = await this.ctx.decodeAudioData(arrayBuffer.slice(0));
+      this.drums.setSample(trackId, buffer, file.name);
+      return { ok: true };
+    } catch (e) {
+      return {
+        ok: false,
+        error: e instanceof Error ? e.message : "Failed to decode audio",
+      };
+    }
+  }
+
+  clearDrumSample(trackId: string): void {
+    this.drums?.clearSample(trackId);
+  }
+
+  hasDrumSample(trackId: string): boolean {
+    return this.drums?.hasSample(trackId) ?? false;
+  }
+
+  getDrumSampleName(trackId: string): string | null {
+    return this.drums?.getSampleName(trackId) ?? null;
+  }
+
   setSongMode(enabled: boolean) {
     this.sequencer?.setSongMode(enabled);
   }

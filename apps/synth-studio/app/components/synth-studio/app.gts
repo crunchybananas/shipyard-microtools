@@ -206,6 +206,8 @@ export default class SynthStudioApp extends Component {
   @tracked trackNotes: Record<string, string> = { synth1: "C4", synth2: "E3" };
   @tracked mutedTracks: Record<string, boolean> = {};
   @tracked soloedTracks: Record<string, boolean> = {};
+  @tracked drumSamples: Record<string, string> = {};
+  @tracked dragOverTrack: string | null = null;
 
   // ── Computed display values ──────────────────────────────────
 
@@ -602,21 +604,100 @@ export default class SynthStudioApp extends Component {
   }
 
   get tracksView() {
-    return TRACKS.map((t) => ({
-      id: t.id,
-      label: t.label,
-      notes: t.notes
-        ? t.notes.map((n) => ({
-            value: n,
-            selected: this.trackNotes[t.id] === n,
-          }))
-        : null,
-      muteCls:
-        "track-btn track-btn-mute" + (this.mutedTracks[t.id] ? " active" : ""),
-      soloCls:
-        "track-btn track-btn-solo" + (this.soloedTracks[t.id] ? " active" : ""),
-    }));
+    return TRACKS.map((t) => {
+      const sampleName = this.drumSamples[t.id] ?? null;
+      const droppable = !t.notes; // synth tracks don't accept samples
+      return {
+        id: t.id,
+        label: t.label,
+        notes: t.notes
+          ? t.notes.map((n) => ({
+              value: n,
+              selected: this.trackNotes[t.id] === n,
+            }))
+          : null,
+        muteCls:
+          "track-btn track-btn-mute" + (this.mutedTracks[t.id] ? " active" : ""),
+        soloCls:
+          "track-btn track-btn-solo" + (this.soloedTracks[t.id] ? " active" : ""),
+        sampleName,
+        hasSample: !!sampleName,
+        droppable,
+        rowCls:
+          "seq-track" +
+          (sampleName ? " has-sample" : "") +
+          (this.dragOverTrack === t.id ? " drag-over" : ""),
+      };
+    });
   }
+
+  // ── Drum sample drag & drop ──────────────────────────────────
+
+  setupDropTarget = modifier((element: HTMLElement) => {
+    const trackId = element.getAttribute("data-track-id") ?? "";
+    const isDrop = trackId !== "synth1" && trackId !== "synth2" && trackId !== "";
+    (window as unknown as { __dropSetup: number }).__dropSetup =
+      ((window as unknown as { __dropSetup?: number }).__dropSetup ?? 0) + 1;
+
+    const onDragOver = (e: DragEvent) => {
+      if (!isDrop) return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+      if (this.dragOverTrack !== trackId) this.dragOverTrack = trackId;
+    };
+
+    const onDragLeave = () => {
+      if (this.dragOverTrack === trackId) this.dragOverTrack = null;
+    };
+
+    const onDrop = async (e: DragEvent) => {
+      if (!isDrop) return;
+      e.preventDefault();
+      this.dragOverTrack = null;
+      const file = e.dataTransfer?.files?.[0];
+      if (!file) return;
+      await this.loadDrumFile(trackId, file);
+    };
+
+    element.addEventListener("dragover", onDragOver);
+    element.addEventListener("dragleave", onDragLeave);
+    element.addEventListener("drop", onDrop);
+
+    return () => {
+      element.removeEventListener("dragover", onDragOver);
+      element.removeEventListener("dragleave", onDragLeave);
+      element.removeEventListener("drop", onDrop);
+    };
+  });
+
+  clearDrumSample = (trackId: string) => {
+    this.audio.clearDrumSample(trackId);
+    const next = { ...this.drumSamples };
+    delete next[trackId];
+    this.drumSamples = next;
+  };
+
+  async loadDrumFile(trackId: string, file: File): Promise<boolean> {
+    await this.ensureInit();
+    const result = await this.audio.loadDrumSample(trackId, file);
+    if (result.ok) {
+      this.drumSamples = { ...this.drumSamples, [trackId]: file.name };
+      return true;
+    }
+    console.warn(`Failed to load drum sample: ${result.error ?? "unknown"}`);
+    return false;
+  }
+
+  pickDrumFile = (trackId: string) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "audio/*";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (file) await this.loadDrumFile(trackId, file);
+    };
+    input.click();
+  };
 
   toggleMute = (trackId: string) => {
     const next = !this.mutedTracks[trackId];
@@ -1111,7 +1192,11 @@ export default class SynthStudioApp extends Component {
 
           <div class="sequencer-grid">
             {{#each this.tracksView as |track|}}
-              <div class="seq-track">
+              <div
+                class={{track.rowCls}}
+                data-track-id={{track.id}}
+                {{this.setupDropTarget}}
+              >
                 <div class="track-label">
                   {{#if track.notes}}
                     <span>{{track.label}}</span>
@@ -1122,6 +1207,16 @@ export default class SynthStudioApp extends Component {
                     </select>
                   {{else}}
                     <span>{{track.label}}</span>
+                  {{/if}}
+                  {{#if track.droppable}}
+                    {{#if track.hasSample}}
+                      <span class="track-sample" title={{track.sampleName}}>
+                        🎵
+                        <button type="button" class="track-sample-clear" title="Clear sample" {{on "click" (fn this.clearDrumSample track.id)}}>×</button>
+                      </span>
+                    {{else}}
+                      <button type="button" class="track-load-sample" title="Load WAV (or drag a file onto the row)" {{on "click" (fn this.pickDrumFile track.id)}}>🎵</button>
+                    {{/if}}
                   {{/if}}
                   <div class="track-ms">
                     <button type="button" class={{track.muteCls}} title="Mute" {{on "click" (fn this.toggleMute track.id)}}>M</button>

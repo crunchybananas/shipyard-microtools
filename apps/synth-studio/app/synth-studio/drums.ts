@@ -2,6 +2,7 @@ export class DrumMachine {
   ctx: BaseAudioContext;
   output: GainNode;
   compressor: DynamicsCompressorNode;
+  samples: Record<string, { buffer: AudioBuffer; name: string }> = {};
 
   constructor(audioContext: BaseAudioContext) {
     this.ctx = audioContext;
@@ -18,9 +19,42 @@ export class DrumMachine {
     this.compressor.connect(this.output);
   }
 
+  setSample(drumType: string, buffer: AudioBuffer, name: string): void {
+    this.samples[drumType] = { buffer, name };
+  }
+
+  clearSample(drumType: string): void {
+    delete this.samples[drumType];
+  }
+
+  hasSample(drumType: string): boolean {
+    return drumType in this.samples;
+  }
+
+  getSampleName(drumType: string): string | null {
+    return this.samples[drumType]?.name ?? null;
+  }
+
+  private playSample(drumType: string, time: number, velocity: number): void {
+    const sample = this.samples[drumType];
+    if (!sample) return;
+    const source = this.ctx.createBufferSource();
+    source.buffer = sample.buffer;
+    const gain = this.ctx.createGain();
+    gain.gain.value = velocity;
+    source.connect(gain);
+    gain.connect(this.compressor);
+    source.start(time);
+  }
+
   play(drumType: string, velocity = 1, time: number | null = null) {
     const startTime = time || this.ctx.currentTime;
     const vel = Math.min(Math.max(velocity, 0), 1);
+
+    if (this.samples[drumType]) {
+      this.playSample(drumType, startTime, vel);
+      return;
+    }
 
     switch (drumType) {
       case "kick":
