@@ -15,6 +15,7 @@ import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
 import { updateAmbient, toggleAmbient, isAmbientEnabled } from './audio.js';
+import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -30,12 +31,20 @@ renderBuildBar();
 renderMissions();
 updateUI();
 setupSaveButtons();
+loadAchievements();
 
 // Expose for inline onclick handlers and console debugging
 window.G = G;
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
+window.toggleAchievements = () => {
+  const p = document.getElementById('achievements-panel');
+  if (!p) return;
+  const open = p.style.display !== 'none';
+  p.style.display = open ? 'none' : 'block';
+  if (!open) renderAchievementsPanel();
+};
 window.toggleAmbientSound = () => {
   const on = toggleAmbient();
   const btn = document.getElementById('btn-ambient');
@@ -81,7 +90,7 @@ function simTick() {
     renderBuildBar();
     updateTutorialTip();
   }
-  if (G.gameTick % 60 === 0) updateAmbient();
+  if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); }
   if (G.gameTick % 3600 === 0) saveGame();
 }
 

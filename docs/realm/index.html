@@ -59,6 +59,23 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 /* Minimap */
 #minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:160px;height:160px;border:1px solid var(--border);border-radius:6px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated}
 
+/* Achievement toast */
+#achievement-toast{position:fixed;bottom:5rem;right:1rem;display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1rem;background:rgba(15,15,30,0.95);border:1.5px solid var(--gold);border-radius:10px;z-index:100;font-size:0.8rem;pointer-events:none;opacity:0;transition:opacity 0.4s,transform 0.4s;transform:translateX(20px);max-width:300px;backdrop-filter:blur(10px)}
+#achievement-toast.show{opacity:1;transform:translateX(0)}
+.at-icon{font-size:1.8rem}
+.at-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:0.1rem}
+.at-name{font-weight:700;font-size:0.9rem;color:#fff}
+.at-desc{font-size:0.7rem;color:rgba(255,255,255,0.6)}
+/* Achievement panel items */
+#achievements-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(420px,90vw);max-height:80vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
+.ach-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.6rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:8px;font-size:0.75rem}
+.ach-item.done{background:rgba(255,209,102,0.06);border-color:rgba(255,209,102,0.15)}
+.ach-item:not(.done){opacity:0.4}
+.ach-icon{font-size:1.3rem;flex-shrink:0;width:28px;text-align:center}
+.ach-info{flex:1}
+.ach-name{font-weight:700;font-size:0.8rem;margin-bottom:0.1rem}
+.ach-desc{font-size:0.68rem;color:rgba(255,255,255,0.5)}
+
 /* Tutorial tip */
 #tutorial-tip{position:fixed;top:2.6rem;left:50%;transform:translateX(-50%);padding:0.5rem 1.2rem;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.5);border-radius:8px;z-index:10;backdrop-filter:blur(10px);font-size:0.82rem;color:#c7d2fe;max-width:min(500px,90vw);text-align:center;animation:tipPulse 2s ease-in-out infinite}
 @keyframes tipPulse{0%,100%{border-color:rgba(129,140,248,0.5)}50%{border-color:rgba(129,140,248,0.9)}}
@@ -134,6 +151,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>
   <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()">🔊</button>
+  <button class="hud-btn" onclick="toggleAchievements()">🏆</button>
 </div>
 
 <div id="tutorial-tip" style="display:none"></div>
@@ -172,6 +190,13 @@ canvas#game{display:block;position:absolute;top:0;left:0}
     <button class="rp-close" onclick="toggleResearch()">✕</button>
   </div>
   <div class="research-content"></div>
+</div>
+
+<div id="achievement-toast"></div>
+
+<div id="achievements-panel" style="display:none">
+  <div class="rp-header"><h3>🏆 Achievements</h3><button class="rp-close" onclick="toggleAchievements()">✕</button></div>
+  <div id="achievements-content" class="research-content"></div>
 </div>
 
 <div id="toast"></div>
