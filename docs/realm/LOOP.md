@@ -36,8 +36,16 @@
 - Game loop uses setTimeout fallback when tab is hidden — game runs even in background tabs
 - To bust module cache: clear site data from Chrome DevTools > Application tab, or open an incognito window
 
+## Testing Note
+MCP tabs are always "hidden" — Chrome throttles rAF and setTimeout. The game loop batches 60 ticks per call to compensate but may stall under heavy load. For testing: use `window.G` to read state, call simTick manually, or set `g.speed=4` then wait. Real users in visible tabs get smooth 60fps.
+
 ## Next Priority
-Play a 30+ day session to verify end-to-end game loop. Then focus on making more buildings available earlier + more visual feedback.
+Game is playable for real users. Focus on gameplay depth:
+- More building visual variety (each building type more distinct)
+- Better citizen rendering (scale with zoom, names on hover)
+- Sound polish (ambient, different build sounds per type)
+- More events and missions
+- Seasons system (visual + gameplay changes per quarter)
 
 ## Shipped Features
 See MISSION.md for the complete feature list with checkmarks.
