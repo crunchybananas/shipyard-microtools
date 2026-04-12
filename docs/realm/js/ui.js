@@ -362,7 +362,8 @@ function renderPopPanel() {
       <span class="pop-hunger" title="Hunger ${hungerBar}%">
         <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
       </span>
-      <button class="pop-unassign" title="Unassign from job" data-idx="${i}">✕</button>`;
+      <button class="pop-unassign" title="Unassign from job" data-idx="${i}">✕</button>
+      ${!c.jobBuilding ? `<select class="pop-assign" data-idx="${i}"><option value="">Assign to...</option></select>` : ''}`;
     el.appendChild(div);
   }
 
@@ -381,11 +382,40 @@ function renderPopPanel() {
     };
   });
 
-  // Understaffed buildings list
+  // Assignment dropdowns — populate with understaffed buildings
   const understaffed = G.buildings.filter(b => {
     const def = BUILDINGS[b.type];
     return def.workers && b.workers.length < def.workers;
   });
+  el.querySelectorAll('.pop-assign').forEach(sel => {
+    for (const b of understaffed) {
+      const def = BUILDINGS[b.type];
+      const opt = document.createElement('option');
+      opt.value = G.buildings.indexOf(b);
+      opt.textContent = `${def.icon} ${def.name} (${b.workers.length}/${def.workers})`;
+      sel.appendChild(opt);
+    }
+    sel.onchange = () => {
+      const cIdx = parseInt(sel.dataset.idx);
+      const bIdx = parseInt(sel.value);
+      const c = G.citizens[cIdx];
+      const b = G.buildings[bIdx];
+      if (c && b) {
+        // Unassign from old job if any
+        if (c.jobBuilding) {
+          c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+        }
+        c.jobBuilding = b;
+        b.workers.push(c);
+        c.state = 'walk_to_work';
+        c.path = null;
+        c.stateTimer = 0;
+        renderPopPanel();
+      }
+    };
+  });
+
+  // Understaffed buildings list
   if (understaffed.length > 0) {
     const sec = document.createElement('div');
     sec.className = 'pop-section';

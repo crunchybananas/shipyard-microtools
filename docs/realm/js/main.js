@@ -78,6 +78,7 @@ window.loadAndStart = () => {
 
 // Expose for inline onclick handlers and console debugging
 window.G = G;
+window.forceRender = render;
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
@@ -117,7 +118,7 @@ window.toggleAmbientSound = () => {
   if (btn) btn.textContent = on ? '🔊' : '🔇';
 };
 
-showToast('Welcome to Realm. Build your settlement!');
+notify('Welcome to Realm. Build your settlement!', 'info');
 
 // ── Day/Night ──────────────────────────────────────────────
 function updateTime() {
@@ -167,9 +168,8 @@ function gameLoop() {
       render();
       requestAnimationFrame(gameLoop);
     } else {
-      // Hidden tab: Chrome throttles setTimeout to ~1/sec.
-      // Batch 60 sim ticks per call to keep game running at full speed.
       for (let i = 0; i < 60; i++) simTick();
+      render();
       setTimeout(gameLoop, 16);
     }
   } catch (e) {
