@@ -166,28 +166,58 @@ export function updateProduction() {
 }
 
 export function checkRaids() {
+  // Warning: 2 days before raid
+  const daysUntilRaid = G.nextRaidDay - G.day;
+  if (daysUntilRaid === 2 && G.dayPhase < 5) {
+    notify('⚠️ Scouts report raiders approaching! Raid expected in 2 days.', 'danger');
+    playSound('raid');
+  }
+  if (daysUntilRaid === 1 && G.dayPhase < 5) {
+    notify('🚨 Raiders will attack tomorrow! Build defenses NOW!', 'danger');
+  }
+
+  // Raid happens
   if (G.day >= G.nextRaidDay && G.dayPhase < 5) {
     const raiders = Math.floor((2 + G.day/5) * getDifficulty().raidMult);
-    const dmg = Math.max(0, raiders * 10 - G.defense);
+    const totalAttack = raiders * 10;
+    const dmg = Math.max(0, totalAttack - G.defense);
     playSound('raid');
+
+    // Detailed raid report
+    const report = [`⚔️ RAID: ${raiders} raiders (attack: ${totalAttack}, your defense: ${G.defense})`];
+
     if (dmg > 0) {
       const damageable = G.buildings.filter(b => b.type !== 'road' && b.type !== 'wall');
       if (damageable.length > 0) {
         const target = damageable[rngInt(0, damageable.length-1)];
         target.hp -= dmg;
         if (target.hp <= 0) {
+          report.push(`💥 ${BUILDINGS[target.type].name} was destroyed!`);
           demolishBuilding(target);
-          notify(`Raiders destroyed the ${BUILDINGS[target.type].name}!`, 'danger');
         } else {
-          notify(`Raiders attacked! ${G.defense>0?'Defenses held partially.':'No defenses!'}`, 'danger');
+          report.push(`🔨 ${BUILDINGS[target.type].name} damaged (${target.hp}% HP remaining)`);
         }
       }
+      report.push(G.defense > 0 ? 'Defenses absorbed some damage.' : '⚠️ No defenses! Build walls, barracks, or towers.');
     } else {
-      notify('Raiders repelled by your defenses!');
+      report.push('✅ Your defenses held! No damage taken.');
     }
+
+    // Show full report
+    for (const line of report) {
+      notify(line, dmg > 0 ? 'danger' : 'event');
+    }
+
     G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
     G.raidInterval = Math.max(4, G.raidInterval - 1);
   }
+}
+
+// Show raid countdown in HUD
+export function getRaidCountdown() {
+  const days = G.nextRaidDay - G.day;
+  if (days <= 3 && days > 0) return days;
+  return null;
 }
 
 // ── Caravan system ─────────────────────────────────────────

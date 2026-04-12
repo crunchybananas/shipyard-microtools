@@ -51,7 +51,7 @@ export const G = {
   defense: 0,
   day: 1,
   dayPhase: 0,
-  dayLength: 1800, // ~30 seconds per day at 1x speed (was 600 = 10s)
+  dayLength: 3600, // ~60 seconds per day at 1x speed — deliberate pacing
   gameTick: 0,
   speed: 1,
   camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1 },

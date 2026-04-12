@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js';
-import { canAfford } from './economy.js';
+import { canAfford, getRaidCountdown } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
 
@@ -46,7 +46,9 @@ export function updateUI() {
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
   const season = getSeasonData();
   const diffLabel = DIFFICULTY[G.difficulty]?.label?.split(' ')[0] || '';
-  $('day-display').textContent = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}% ${diffLabel}`;
+  const raidDays = getRaidCountdown();
+  const raidWarn = raidDays ? ` · ⚔️${raidDays}d` : '';
+  $('day-display').textContent = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
 }
 
 export function renderBuildBar() {
@@ -335,7 +337,15 @@ function renderPopPanel() {
   const stateLabel = { idle:'Idle', find_job:'Seeking work', walk_to_work:'Going to work',
     working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
     foraging:'Foraging', eating:'Eating' };
-  for (const c of G.citizens) {
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.className = 'pop-row pop-header';
+  hdr.innerHTML = `<span>Name</span><span>Job</span><span>State</span><span>Hunger</span><span></span>`;
+  el.appendChild(hdr);
+
+  for (let i = 0; i < G.citizens.length; i++) {
+    const c = G.citizens[i];
     const job = c.jobBuilding ? BUILDINGS[c.jobBuilding.type]?.name : 'None';
     const state = stateLabel[c.state] || c.state;
     const hungerBar = Math.round(c.hunger);
@@ -347,8 +357,43 @@ function renderPopPanel() {
       <span class="pop-state">${state}</span>
       <span class="pop-hunger" title="Hunger ${hungerBar}%">
         <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
-      </span>`;
+      </span>
+      <button class="pop-unassign" title="Unassign from job" data-idx="${i}">✕</button>`;
     el.appendChild(div);
+  }
+
+  // Unassign buttons
+  el.querySelectorAll('.pop-unassign').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.idx);
+      const c = G.citizens[idx];
+      if (c && c.jobBuilding) {
+        c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+        c.jobBuilding = null;
+        c.state = 'idle';
+        c.path = null;
+        renderPopPanel();
+      }
+    };
+  });
+
+  // Understaffed buildings list
+  const understaffed = G.buildings.filter(b => {
+    const def = BUILDINGS[b.type];
+    return def.workers && b.workers.length < def.workers;
+  });
+  if (understaffed.length > 0) {
+    const sec = document.createElement('div');
+    sec.className = 'pop-section';
+    sec.innerHTML = `<div class="pop-section-title">⚠️ Understaffed Buildings</div>`;
+    for (const b of understaffed) {
+      const def = BUILDINGS[b.type];
+      const div = document.createElement('div');
+      div.className = 'pop-understaffed';
+      div.innerHTML = `<span>${def.icon} ${def.name} — ${b.workers.length}/${def.workers} workers</span>`;
+      sec.appendChild(div);
+    }
+    el.appendChild(sec);
   }
 }
 
