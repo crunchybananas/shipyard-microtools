@@ -247,6 +247,18 @@ export function render() {
     ctx.arc(s.x, cy - 13.5, 2, Math.PI * 0.8, Math.PI * 2.2);
     ctx.fill();
 
+    // Emote bubble above head
+    const emote = c.state==='idle' ? '💤' : c.state==='eating' ? '🍎' :
+      c.state==='working' ? '⚒️' : c.state==='foraging' ? '🌿' :
+      (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
+    if (emote && G.gameTick % 120 < 80) { // show emote 80 of every 120 ticks (flicker)
+      ctx.globalAlpha = 0.7;
+      ctx.font = '8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(emote, s.x, cy - 18);
+      ctx.globalAlpha = daylight;
+    }
+
     // Hover highlight ring
     if (c === hoveredCitizen) {
       ctx.strokeStyle = 'rgba(255,209,102,0.7)';
@@ -367,6 +379,12 @@ export function render() {
       ctx.fillStyle = `rgba(180,180,200,${ctx.globalAlpha * 0.6})`;
       ctx.beginPath();
       ctx.arc(s.x, s.y + p.offsetY - 20, sz, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.type === 'dust') {
+      const sz = p.size || 2;
+      ctx.fillStyle = `rgba(180,160,120,${ctx.globalAlpha * 0.8})`;
+      ctx.beginPath();
+      ctx.arc(s.x + (p.vx||0) * G.gameTick * 0.3, s.y + p.offsetY, sz, 0, Math.PI * 2);
       ctx.fill();
     } else if (p.type === 'snow') {
       const sz = p.size || 1.5;

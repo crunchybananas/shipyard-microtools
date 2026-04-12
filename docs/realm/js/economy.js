@@ -6,6 +6,7 @@ import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resource
 import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound } from './audio.js';
+import { spawnDust } from './particles.js';
 
 export function canPlace(type, tx, ty) {
   if (tx<0||tx>=MAP_W||ty<0||ty>=MAP_H) return false;
@@ -36,6 +37,7 @@ export function placeBuilding(type, tx, ty) {
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
   playSound('build');
+  spawnDust(tx, ty);
   // Victory check
   if (type === 'castle' && !G.won) {
     G.won = true;

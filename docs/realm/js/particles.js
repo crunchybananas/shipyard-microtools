@@ -9,10 +9,13 @@ export function updateParticles() {
     const p = G.particles[i];
     p.offsetY += p.vy;
     p.alpha -= p.decay || 0.012;
-    // Smoke drifts sideways
     if (p.type === 'smoke') {
       p.tx += (Math.sin(G.gameTick * 0.01 + p.tx) * 0.002);
       p.size = (p.size || 2) + 0.015;
+    }
+    if (p.type === 'dust') {
+      p.tx += (p.vx || 0) * 0.02;
+      p.size = (p.size || 2) * 0.995;
     }
     if (p.alpha <= 0) G.particles.splice(i, 1);
   }
@@ -34,6 +37,23 @@ export function spawnSmoke(tx, ty) {
     type: 'smoke',
     size: 1.5 + Math.random(),
   });
+}
+
+export function spawnDust(tx, ty) {
+  for (let i = 0; i < 8; i++) {
+    G.particles.push({
+      tx: tx + (Math.random() - 0.5) * 0.6,
+      ty: ty + (Math.random() - 0.5) * 0.6,
+      offsetY: -5 - Math.random() * 10,
+      text: null,
+      alpha: 0.5 + Math.random() * 0.3,
+      vy: -0.2 - Math.random() * 0.15,
+      decay: 0.008 + Math.random() * 0.005,
+      type: 'dust',
+      size: 1.5 + Math.random() * 2,
+      vx: (Math.random() - 0.5) * 0.3,
+    });
+  }
 }
 
 export function updateSmokeEmitters() {
