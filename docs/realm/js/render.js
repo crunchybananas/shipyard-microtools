@@ -380,6 +380,26 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x, s.y + p.offsetY - 20, sz, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'speech') {
+      ctx.font = 'bold 8px -apple-system,sans-serif';
+      const tw = ctx.measureText(p.text).width + 8;
+      const px = s.x, py = s.y + p.offsetY;
+      // Bubble background
+      ctx.fillStyle = `rgba(255,255,255,${ctx.globalAlpha * 0.92})`;
+      ctx.beginPath();
+      ctx.roundRect(px - tw/2, py - 7, tw, 14, 3);
+      ctx.fill();
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(px - 3, py + 7);
+      ctx.lineTo(px, py + 11);
+      ctx.lineTo(px + 3, py + 7);
+      ctx.closePath();
+      ctx.fill();
+      // Text
+      ctx.fillStyle = `rgba(50,50,70,${ctx.globalAlpha})`;
+      ctx.textAlign = 'center';
+      ctx.fillText(p.text, px, py + 3);
     } else if (p.type === 'dust') {
       const sz = p.size || 2;
       ctx.fillStyle = `rgba(180,160,120,${ctx.globalAlpha * 0.8})`;

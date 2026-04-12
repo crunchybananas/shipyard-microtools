@@ -174,11 +174,17 @@ function runStateMachine(c) {
     case 'deliver':
       if (c.carrying && c.carryAmount > 0) {
         G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
-        // Spawn floating particle
+        // Resource number float
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: 0,
           text: `+${c.carryAmount} ${resEmoji(c.carrying)}`,
-          alpha: 1.5, vy: -0.3,
+          alpha: 1.5, vy: -0.3, type: 'text',
+        });
+        // Speech bubble
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -28,
+          text: 'Delivered!',
+          alpha: 1.2, vy: -0.12, decay: 0.018, type: 'speech',
         });
       }
       c.carrying = null;
@@ -191,7 +197,7 @@ function runStateMachine(c) {
       // Arrived at forage tile — gather a small amount
       if (c.forageTarget) {
         const t = c.forageTarget.tile;
-        const res = t === 3 ? 'wood' : t === 4 ? 'stone' : 'food'; // forest=wood, stone=stone, sand=food(berries)
+        const res = t === 3 ? 'wood' : t === 4 ? 'stone' : 'food';
         const amount = 1;
         G.resources[res] = (G.resources[res] || 0) + amount;
         G.particles.push({
@@ -199,8 +205,13 @@ function runStateMachine(c) {
           text: `+${amount} ${resEmoji(res)}`,
           alpha: 1.2, vy: -0.3, type: 'text',
         });
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -25,
+          text: 'Found!',
+          alpha: 0.9, vy: -0.1, decay: 0.02, type: 'speech',
+        });
         c.carrying = res;
-        c.carryAmount = 0; // visual only, already added to resources
+        c.carryAmount = 0;
       }
       c.forageTarget = null;
       c.state = 'find_job';
