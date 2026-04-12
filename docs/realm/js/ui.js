@@ -189,25 +189,104 @@ export function renderHappinessPanel() {
     `<div class="hp-row hp-total"><span class="hp-label">Total</span><span class="hp-val">${total}%</span></div>`;
 }
 
-// ── Tutorial tips ──────────────────────────────────────────
-let lastTipId = '';
-const TIPS = [
-  { id:'start', check:()=>G.buildings.length===0, text:'👋 Welcome! Press 1 or click House to build shelter for your settlers.' },
-  { id:'house', check:()=>G.buildings.some(b=>b.type==='house') && !G.buildings.some(b=>b.type==='farm'), text:'🌾 Great! Now build a Farm (press 2) to produce food before your settlers starve.' },
-  { id:'farm', check:()=>G.buildings.some(b=>b.type==='farm') && G.resources.food<30 && G.day>5, text:'⚠️ Food is running low! Build more farms or your settlers will leave.' },
-  { id:'research', check:()=>G.buildings.length>=3 && G.researchedTechs.size<=2, text:'🔬 Open Research (top bar) to unlock new building types like Quarry and Market.' },
-  { id:'lumber', check:()=>G.researchedTechs.has('forestry') && !G.buildings.some(b=>b.type==='lumber') && G.resources.wood<20, text:'🪓 Wood is low! Build a Lumber Mill on a forest tile to produce wood.' },
-  { id:'raid', check:()=>G.day>=6 && G.defense===0, text:'⚔️ Raiders are coming! Research Military tech and build defenses.' },
+// ── Tutorial system ────────────────────────────────────────
+const TUTORIAL_STEPS = [
+  {
+    id: 'welcome',
+    text: '👋 Welcome to Realm! You have 3 settlers on an island. Let\'s build a settlement.',
+    action: 'Click anywhere to continue',
+    check: () => G.gameTick > 30,
+  },
+  {
+    id: 'build_house',
+    text: '🏠 First, build a House for shelter. Click the House button below (or press 1).',
+    action: 'Select House from the build bar ↓',
+    check: () => G.selectedBuild === 'house',
+    highlight: '.build-btn',
+  },
+  {
+    id: 'place_house',
+    text: '🏠 Now click on a green tile to place your house.',
+    action: 'Click a grass tile on the island',
+    check: () => G.buildings.some(b => b.type === 'house'),
+  },
+  {
+    id: 'build_farm',
+    text: '🌾 Settlers need food! Build a Farm to produce it. Click Farm (or press 2).',
+    action: 'Select Farm from the build bar ↓',
+    check: () => G.selectedBuild === 'farm' || G.buildings.some(b => b.type === 'farm'),
+    highlight: '.build-btn',
+  },
+  {
+    id: 'place_farm',
+    text: '🌾 Place the farm on any grass tile. Build 2 farms to keep up with food demand!',
+    action: 'Click grass tiles to place farms',
+    check: () => G.buildings.filter(b => b.type === 'farm').length >= 2,
+  },
+  {
+    id: 'speed',
+    text: '⏩ Nice! Use the speed controls (top-left) or try 4× speed to watch your settlement grow.',
+    action: 'Try pressing the ▶▶▶ button',
+    check: () => G.speed >= 2 || G.day >= 2,
+  },
+  {
+    id: 'research',
+    text: '🔬 Click Research in the top bar to unlock new buildings like Quarry, Market, and more!',
+    action: 'Open the Research panel',
+    check: () => G.researchedTechs.size > 2,
+    highlight: '.hud-btn',
+  },
+  {
+    id: 'done',
+    text: '🎉 You\'re on your own now! Build, research, trade, and survive the seasons. Watch out for raiders!',
+    action: '',
+    check: () => G.gameTick > 99999, // stays until dismissed
+  },
 ];
+
+let tutorialStep = 0;
+let tutorialDismissed = false;
 
 export function updateTutorialTip() {
   const tipEl = document.getElementById('tutorial-tip');
   if (!tipEl) return;
-  for (const tip of TIPS) {
-    if (tip.id === lastTipId) continue;
-    try { if (tip.check()) { lastTipId = tip.id; tipEl.textContent = tip.text; tipEl.style.display = 'block'; return; } } catch {}
+  if (tutorialDismissed || tutorialStep >= TUTORIAL_STEPS.length) {
+    tipEl.style.display = 'none';
+    return;
   }
-  tipEl.style.display = 'none';
+
+  const step = TUTORIAL_STEPS[tutorialStep];
+
+  // Auto-advance if check passes
+  try {
+    if (step.check()) {
+      tutorialStep++;
+      if (tutorialStep >= TUTORIAL_STEPS.length) { tipEl.style.display = 'none'; return; }
+    }
+  } catch {}
+
+  const current = TUTORIAL_STEPS[Math.min(tutorialStep, TUTORIAL_STEPS.length - 1)];
+  tipEl.innerHTML = `
+    <div class="tut-text">${current.text}</div>
+    ${current.action ? `<div class="tut-action">${current.action}</div>` : ''}
+    <div class="tut-progress">${tutorialStep + 1} / ${TUTORIAL_STEPS.length}</div>
+    <button class="tut-skip" onclick="dismissTutorial()">Skip tutorial</button>
+  `;
+  tipEl.style.display = 'block';
+
+  // Highlight relevant UI element
+  document.querySelectorAll('.tut-highlight').forEach(e => e.classList.remove('tut-highlight'));
+  if (current.highlight) {
+    const el = document.querySelector(current.highlight);
+    if (el) el.classList.add('tut-highlight');
+  }
+}
+
+export function dismissTutorial() {
+  tutorialDismissed = true;
+  document.querySelectorAll('.tut-highlight').forEach(e => e.classList.remove('tut-highlight'));
+  const tipEl = document.getElementById('tutorial-tip');
+  if (tipEl) tipEl.style.display = 'none';
 }
 
 export function setupSaveButtons() {

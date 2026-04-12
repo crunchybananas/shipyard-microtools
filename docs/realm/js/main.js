@@ -10,7 +10,7 @@ import { updateProduction, checkRaids } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip } from './ui.js';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial } from './ui.js';
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
@@ -38,6 +38,7 @@ window.G = G;
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
+window.dismissTutorial = dismissTutorial;
 window.toggleAchievements = () => {
   const p = document.getElementById('achievements-panel');
   if (!p) return;
