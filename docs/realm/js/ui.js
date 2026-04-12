@@ -61,7 +61,11 @@ export function renderBuildBar() {
     const btn = document.createElement('button');
     btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
     const costStr = Object.entries(def.cost).map(([k,v]) => `${v}${k[0].toUpperCase()}`).join(' ');
-    btn.innerHTML = `<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>`;
+    // Show terrain requirement if applicable
+    const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
+    const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
+    const terrainTag = terrainReq ? `<span class="cost terrain">⬡ ${terrainReq}</span>` : '';
+    btn.innerHTML = `<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>${terrainTag}`;
     btn.onclick = () => {
       G.selectedBuild = G.selectedBuild === key ? null : key;
       G.selectedBuilding = null;

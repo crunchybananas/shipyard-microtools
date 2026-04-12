@@ -40,13 +40,24 @@ export function setupInput(canvas) {
         renderMissions();
         updateUI();
       } else {
-        // Build failed — show feedback
+        // Build failed — show specific reason
         playSound('click');
-        // Flash the hovered tile red briefly via a temporary particle
+        let reason = "Can't build here";
+        const def = BUILDINGS[G.selectedBuild];
+        if (t.x < 0 || t.x >= MAP_W || t.y < 0 || t.y >= MAP_H) reason = 'Out of bounds';
+        else if (!G.fog[t.y]?.[t.x]) reason = 'Unexplored area';
+        else if (G.map[t.y]?.[t.x] === 0) reason = 'Can\'t build on water';
+        else if (G.map[t.y]?.[t.x] === 6) reason = 'Can\'t build on mountains';
+        else if (G.buildingGrid[t.y]?.[t.x]) reason = 'Tile already occupied';
+        else if (def?.on && !def.on.includes(G.map[t.y]?.[t.x])) {
+          const names = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
+          const needed = def.on.map(n => names[n]).join('/');
+          reason = `Requires ${needed} tile`;
+        }
         G.particles.push({
           tx: t.x, ty: t.y, offsetY: -10,
-          text: '❌ Can\'t build here',
-          alpha: 1.2, vy: -0.3, decay: 0.025, type: 'text',
+          text: `❌ ${reason}`,
+          alpha: 1.4, vy: -0.25, decay: 0.018, type: 'text',
         });
       }
       return;
