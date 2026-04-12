@@ -13,7 +13,7 @@
 10. Update this file with what was done and what's next
 11. Schedule next wake
 
-## Last Completed (verified on FRESH module load)
+## Last Completed
 - ✅ Camera centers on island at (0, 768) — generateWorld sets it at runtime
 - ✅ Foraging: 2 of 6 citizens actively foraging from resource tiles
 - ✅ Build fail feedback: "❌ Can't build here" particle on invalid placement
@@ -25,17 +25,19 @@
 - Verified by playing: house placed (wood 60→45, pop 3→6), farm placed, 2 citizens foraging, fail feedback on duplicate build
 
 ## Known Issues (fix in order)
-1. **Missions not completing visually** — missions may need more game time to trigger (check runs every 60 ticks). Verify on a longer play session.
-2. **Minimap click broken** — async import() in input.js doesn't resolve correctly.
-3. **Workers should be visible at buildings** — citizens assigned to farms should visibly stand near the farm, not wander away.
-4. **No sound on production** — verify SFX fires when farms/buildings produce.
-5. **Research panel may need more play testing** — verify tech unlocks work end-to-end.
+1. **Browser module caching** — old module versions stick in Chrome. Must open a FRESH tab + clear site data to test new code. Use `window.G` (exposed from main.js) instead of importing state.js from console.
+2. **Play a long session** — now that rAF fallback is fixed, verify 30+ day play with missions/raids/research.
+3. **Minimap click broken** — async import() in input.js doesn't resolve.
+4. **Workers should be visible at buildings** — citizens assigned to farms should visibly stand near the farm.
+5. **Sound on production** — verify SFX fires.
 
 ## Dev Testing Note
-Use import map version bumping: change `?v=5` to `?v=6` etc. in index.html to bust browser module cache. Or clear site data from Chrome DevTools.
+- `window.G` gives you the real game state from the console (no import needed)
+- Game loop uses setTimeout fallback when tab is hidden — game runs even in background tabs
+- To bust module cache: clear site data from Chrome DevTools > Application tab, or open an incognito window
 
 ## Next Priority
-Play a longer session (30+ days) at 4x speed to verify missions, raids, production, and research end-to-end.
+Play a 30+ day session to verify end-to-end game loop. Then focus on making more buildings available earlier + more visual feedback.
 
 ## Shipped Features
 See MISSION.md for the complete feature list with checkmarks.

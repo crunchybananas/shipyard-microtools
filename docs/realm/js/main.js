@@ -30,7 +30,8 @@ renderMissions();
 updateUI();
 setupSaveButtons();
 
-// Expose for inline onclick handlers
+// Expose for inline onclick handlers and console debugging
+window.G = G;
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
@@ -50,31 +51,39 @@ function updateTime() {
 
 // ── Game Loop ──────────────────────────────────────────────
 function gameLoop() {
-  if (G.speed > 0) {
-    for (let i = 0; i < G.speed; i++) {
-      G.gameTick++;
-      updateTime();
-      updateCitizens();
-      updateProduction();
-      updateParticles();
-      updateSmokeEmitters();
-      updateResearch();
-      if (G.gameTick % 60 === 0) {
-        checkMissions();
-        renderMissions(); // refresh mission list UI
-        renderResearchPanel();
+  try {
+    if (G.speed > 0) {
+      for (let i = 0; i < G.speed; i++) {
+        G.gameTick++;
+        updateTime();
+        updateCitizens();
+        updateProduction();
+        updateParticles();
+        updateSmokeEmitters();
+        updateResearch();
+        if (G.gameTick % 60 === 0) {
+          checkMissions();
+          renderMissions();
+          renderResearchPanel();
+        }
       }
+      if (G.gameTick % 30 === 0) {
+        updateUI();
+        renderBuildBar();
+        updateTutorialTip();
+      }
+      if (G.gameTick % 3600 === 0) saveGame();
     }
-    if (G.gameTick % 30 === 0) {
-      updateUI();
-      renderBuildBar();
-      updateTutorialTip();
-    }
-    // Auto-save every ~60s at speed 1
-    if (G.gameTick % 3600 === 0) saveGame();
+    render();
+  } catch (e) {
+    console.error('Game loop error:', e);
   }
-  render();
-  requestAnimationFrame(gameLoop);
+  // Use rAF when visible, setTimeout when hidden (Chrome pauses rAF for hidden tabs)
+  if (document.visibilityState === 'visible') {
+    requestAnimationFrame(gameLoop);
+  } else {
+    setTimeout(gameLoop, 1000 / 60);
+  }
 }
 
 gameLoop();
