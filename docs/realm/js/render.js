@@ -121,6 +121,29 @@ export function render() {
         }
       }
 
+      // Winter frost overlay on land tiles
+      if (G.season === 'winter' && tile !== TILE.WATER && tile !== TILE.SAND) {
+        ctx.fillStyle = 'rgba(200,220,255,0.18)';
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y - TH/2);
+        ctx.lineTo(s.x + TW/2, s.y);
+        ctx.lineTo(s.x, s.y + TH/2);
+        ctx.lineTo(s.x - TW/2, s.y);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Autumn leaf specks on grass
+      if (G.season === 'autumn' && tile === TILE.GRASS) {
+        const lh = ((x*17 + y*31) & 0xff);
+        if (lh < 40) {
+          ctx.fillStyle = ['#c06020','#d4a030','#a05020'][lh % 3];
+          ctx.globalAlpha = daylight * 0.5;
+          ctx.fillRect(s.x - 4 + (lh%8), s.y - 2 + ((lh>>3)%5), 2, 1.5);
+          ctx.globalAlpha = daylight;
+        }
+      }
+
       // Tile features
       if (tile === TILE.FOREST) drawTree(ctx, s.x, s.y-8, daylight, seasonShift);
       else if (tile === TILE.STONE) drawRock(ctx, s.x, s.y-4, daylight);
@@ -345,6 +368,13 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x, s.y + p.offsetY - 20, sz, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'snow') {
+      const sz = p.size || 1.5;
+      const drift = Math.sin(G.gameTick * 0.015 + p.tx * 2) * 3;
+      ctx.fillStyle = `rgba(230,240,255,${ctx.globalAlpha})`;
+      ctx.beginPath();
+      ctx.arc(s.x + drift, s.y + p.offsetY, sz, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 11px -apple-system,sans-serif';
@@ -451,6 +481,22 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'church': drawChurch(ctx, s); break;
     case 'school': drawSchool(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
+  }
+
+  // Snow cap on roofs in winter
+  if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
+    ctx.fillStyle = 'rgba(230,240,255,0.85)';
+    // Snow sits on top of the building — approximate roof peak
+    const snowY = b.type === 'tower' ? s.y - 38 : b.type === 'church' ? s.y - 42 : s.y - 28;
+    const snowW = b.type === 'tower' ? 8 : b.type === 'church' ? 10 : 14;
+    ctx.beginPath();
+    ctx.ellipse(s.x, snowY, snowW, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Icicles
+    ctx.fillStyle = 'rgba(200,220,255,0.6)';
+    for (let i = -snowW + 3; i < snowW; i += 4) {
+      ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
+    }
   }
 
   // HP bar

@@ -37,12 +37,25 @@ export function spawnSmoke(tx, ty) {
 }
 
 export function updateSmokeEmitters() {
-  if (G.gameTick % 8 !== 0) return; // emit every 8 ticks
+  if (G.gameTick % 8 !== 0) return;
   for (const b of G.buildings) {
     if (b.type === 'house' || b.type === 'tavern' || b.type === 'lumber') {
-      if (G.particles.length < 200) { // cap total particles
-        spawnSmoke(b.x, b.y);
-      }
+      if (G.particles.length < 200) spawnSmoke(b.x, b.y);
     }
+  }
+  // Snowflakes in winter
+  if (G.season === 'winter' && G.gameTick % 4 === 0 && G.particles.length < 250) {
+    const cx = G.camera.x / 32, cy = G.camera.y / 16;
+    G.particles.push({
+      tx: cx + (Math.random() - 0.5) * 20,
+      ty: cy + (Math.random() - 0.5) * 15,
+      offsetY: -60 - Math.random() * 20,
+      text: null,
+      alpha: 0.4 + Math.random() * 0.3,
+      vy: 0.15 + Math.random() * 0.1,
+      decay: 0.002,
+      type: 'snow',
+      size: 1 + Math.random() * 1.5,
+    });
   }
 }
