@@ -25,13 +25,42 @@ initRenderer(canvas, minimap);
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-generateWorld();
-setupInput(canvas);
-renderBuildBar();
-renderMissions();
-updateUI();
+initRenderer(canvas, minimap);
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 setupSaveButtons();
 loadAchievements();
+
+// Check for existing save to show Continue button
+const hasSaveData = !!localStorage.getItem('realm-save-v2');
+if (hasSaveData) {
+  const loadBtn = document.getElementById('title-load');
+  if (loadBtn) loadBtn.style.display = 'inline-block';
+}
+
+function beginGame() {
+  document.getElementById('title-screen').style.display = 'none';
+  setupInput(canvas);
+  renderBuildBar();
+  renderMissions();
+  updateUI();
+  showToast('Welcome to Realm. Build your settlement!');
+  gameLoop();
+}
+
+window.startNewGame = () => {
+  generateWorld();
+  beginGame();
+};
+
+window.loadAndStart = () => {
+  generateWorld();
+  if (loadGame()) {
+    renderBuildBar();
+    updateUI();
+  }
+  beginGame();
+};
 
 // Expose for inline onclick handlers and console debugging
 window.G = G;
@@ -134,7 +163,7 @@ function gameLoop() {
   }
 }
 
-gameLoop();
+// Game loop starts when player clicks New Game or Continue from the title screen.
 
 // ── Toast helper (globally accessible) ─────────────────────
 function showToast(msg, danger = false) {

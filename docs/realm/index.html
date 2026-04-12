@@ -10,6 +10,24 @@
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;height:100vh;user-select:none;-webkit-user-select:none}
 canvas#game{display:block;position:absolute;top:0;left:0}
 
+/* Title screen */
+#title-screen{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center}
+.title-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,#1a2a4a 0%,#0a0e1a 70%)}
+.title-content{position:relative;text-align:center;max-width:480px;padding:2rem;animation:titleFadeIn 1.5s ease}
+@keyframes titleFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.title-icon{font-size:5rem;margin-bottom:0.5rem;filter:drop-shadow(0 4px 20px rgba(255,209,102,0.3));animation:titleFloat 3s ease-in-out infinite}
+@keyframes titleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.title-name{font-size:3.5rem;font-weight:800;letter-spacing:0.15em;color:#ffd166;margin:0;text-shadow:0 0 40px rgba(255,209,102,0.3)}
+.title-sub{font-size:1.1rem;color:rgba(255,255,255,0.5);margin:0.3rem 0 1.2rem;letter-spacing:0.08em}
+.title-desc{font-size:0.9rem;color:rgba(255,255,255,0.6);line-height:1.7;margin:0 0 1.8rem}
+.title-buttons{display:flex;gap:0.8rem;justify-content:center;margin-bottom:1.5rem}
+.title-btn{padding:0.8rem 2rem;font-size:1rem;font-weight:700;border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.title-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.4);transform:translateY(-1px)}
+.title-btn.primary{border-color:var(--gold);color:var(--gold)}
+.title-btn.primary:hover{background:rgba(255,209,102,0.12);box-shadow:0 4px 20px rgba(255,209,102,0.2)}
+.title-features{display:flex;flex-wrap:wrap;gap:0.5rem 1rem;justify-content:center;font-size:0.75rem;color:rgba(255,255,255,0.35);margin-bottom:1.5rem}
+.title-credit{font-size:0.7rem;color:rgba(255,255,255,0.2)}
+
 /* HUD */
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
 .res{display:flex;align-items:center;gap:0.35rem;font-weight:600}
@@ -183,6 +201,24 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 </style>
 </head>
 <body>
+
+<div id="title-screen">
+  <div class="title-bg"></div>
+  <div class="title-content">
+    <div class="title-icon">🏰</div>
+    <h1 class="title-name">REALM</h1>
+    <p class="title-sub">A Settlement Builder</p>
+    <p class="title-desc">Build, research, trade, and survive the seasons.<br>Grow your village into a kingdom.</p>
+    <div class="title-buttons">
+      <button class="title-btn primary" onclick="startNewGame()">⚔️ New Game</button>
+      <button class="title-btn" id="title-load" onclick="loadAndStart()" style="display:none">📂 Continue</button>
+    </div>
+    <div class="title-features">
+      <span>🏠 17 Buildings</span><span>🔬 9 Technologies</span><span>🌱 4 Seasons</span><span>🏆 21 Achievements</span>
+    </div>
+    <p class="title-credit">Made with 🧡 by Cory Loken & Claude · Zero dependencies</p>
+  </div>
+</div>
 
 <canvas id="game"></canvas>
 
