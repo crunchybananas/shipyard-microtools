@@ -358,4 +358,5 @@ export function setupSaveButtons() {
       updateUI();
     }
   });
+  document.getElementById('btn-newgame')?.addEventListener('click', () => window.newGame?.());
 }

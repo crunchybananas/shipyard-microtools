@@ -39,6 +39,26 @@ window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
 window.dismissTutorial = dismissTutorial;
+window.newGame = () => {
+  if (!confirm('Start a new game? Current unsaved progress will be lost.')) return;
+  // Reset all state
+  G.buildings = []; G.citizens = []; G.caravans = []; G.particles = [];
+  G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
+  G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
+  G.day = 1; G.dayPhase = 0; G.gameTick = 0; G.speed = 1;
+  G.selectedBuild = null; G.selectedBuilding = null;
+  G.nextRaidDay = 8; G.raidInterval = 8;
+  G.researchedTechs = new Set(['agriculture','forestry']);
+  G.currentResearch = null;
+  G.activeEvent = null;
+  G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0 };
+  G.season = 'spring'; G.won = false;
+  G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
+  G.lastResources = null;
+  generateWorld();
+  renderBuildBar(); renderMissions(); updateUI();
+  showToast('New game started!');
+};
 window.togglePopPanel = togglePopPanel;
 window.toggleAchievements = () => {
   const p = document.getElementById('achievements-panel');

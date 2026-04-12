@@ -500,6 +500,20 @@ function drawBuilding(ctx, b, s, daylight) {
     }
   }
 
+  // Worker count indicator for buildings that need workers
+  const needed = def.workers || 0;
+  if (needed > 0) {
+    const have = b.workers.length;
+    const full = have >= needed;
+    ctx.globalAlpha = 0.85;
+    ctx.font = '8px -apple-system,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
+    const wy = b.type === 'tower' ? s.y - 48 : b.type === 'church' ? s.y - 50 : b.type === 'castle' ? s.y - 54 : s.y - 38;
+    ctx.fillText(`${have}/${needed}👤`, s.x, wy);
+    ctx.globalAlpha = daylight;
+  }
+
   // HP bar
   if (b.hp < 100) {
     ctx.globalAlpha = 1;
