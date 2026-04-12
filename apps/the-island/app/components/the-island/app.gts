@@ -155,6 +155,39 @@ function readSharedHash(): SharedKingdomState | null {
   if (typeof location === "undefined") return null;
   return decodeSharedKingdom(location.hash.replace(/^#/, ""));
 }
+
+function scoreMatch(haystack: string, needle: string): number {
+  if (!needle) return 1;
+  if (haystack === needle) return 100;
+  if (haystack.startsWith(needle)) return 80;
+  const idx = haystack.indexOf(needle);
+  if (idx >= 0) return 60 - idx;
+  let h = 0;
+  for (let n = 0; n < needle.length; n++) {
+    const ch = needle[n]!;
+    let found = -1;
+    for (; h < haystack.length; h++) {
+      if (haystack[h] === ch) {
+        found = h;
+        h++;
+        break;
+      }
+    }
+    if (found < 0) return 0;
+  }
+  return 20;
+}
+
+const KINGDOM_SCENE_LABELS: Record<string, string> = {
+  misty_shore: "Misty Shore",
+  whispering_woods: "Whispering Woods",
+  crystal_caverns: "Crystal Caverns",
+  the_meadow: "The Meadow",
+  rainbow_bridge: "Rainbow Bridge",
+  wizards_tower: "Wizard's Tower",
+  starfall_lake: "Starfall Lake",
+  throne_room: "The Throne Room",
+};
 import ShellMemory from "the-island/puzzles/shell-memory";
 import SymbolLock from "the-island/puzzles/symbol-lock";
 import MelodyPuzzle from "the-island/puzzles/melody-puzzle";
@@ -194,6 +227,9 @@ export default class TheIslandApp extends Component {
   @tracked sharedKingdom: SharedKingdomState | null = readSharedHash();
   @tracked chronicleEntries: ChronicleEntry[] = loadChronicleEntries();
   @tracked showChronicle = false;
+  @tracked paletteOpen = false;
+  @tracked paletteQuery = "";
+  @tracked paletteSelectedIdx = 0;
 
   constructor(...args: ConstructorParameters<typeof Component>) {
     super(...args);
@@ -203,6 +239,7 @@ export default class TheIslandApp extends Component {
     }
     if (typeof window !== "undefined") {
       window.addEventListener("hashchange", this.onHashChange);
+      window.addEventListener("keydown", this.onGlobalKeyDown);
     }
   }
 
@@ -210,8 +247,176 @@ export default class TheIslandApp extends Component {
     super.willDestroy();
     if (typeof window !== "undefined") {
       window.removeEventListener("hashchange", this.onHashChange);
+      window.removeEventListener("keydown", this.onGlobalKeyDown);
     }
   }
+
+  // ── Command palette ──────────────────────────────────────────
+
+  private get paletteAllowed(): boolean {
+    // Don't open palette while a puzzle modal or new-game confirm is showing
+    if (this.activePuzzle) return false;
+    if (this.showNewGameConfirm) return false;
+    if (this.showMirrorPuzzle || this.showSignalDeck) return false;
+    return true;
+  }
+
+  get paletteActions(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+  }> {
+    const actions: Array<{
+      id: string;
+      label: string;
+      hint?: string;
+      run: () => void;
+    }> = [];
+
+    if (this.showMap) {
+      actions.push({
+        id: "close-map",
+        label: "Close Map",
+        run: () => this.closeMap(),
+      });
+    } else {
+      actions.push({
+        id: "open-map",
+        label: "Open Map",
+        hint: "View the kingdom",
+        run: () => this.openMap(),
+      });
+    }
+
+    if (this.chronicleEntries.length > 0) {
+      actions.push({
+        id: "open-chronicle",
+        label: `Open Chronicle (${this.chronicleEntries.length})`,
+        run: () => this.openChronicle(),
+      });
+    }
+
+    actions.push(
+      {
+        id: "share",
+        label: "Share kingdom permalink",
+        hint: "Copy a URL of your kingdom",
+        run: () => {
+          void this.shareCurrentKingdom();
+        },
+      },
+      {
+        id: "new-game",
+        label: "New Game",
+        hint: "Reset all progress",
+        run: () => this.kingdomNewGame(),
+      },
+    );
+
+    // Per-scene fast travel for visited scenes
+    const visited = Object.keys(this.visitedScenes).filter(
+      (k) => this.visitedScenes[k],
+    );
+    for (const sceneId of visited) {
+      const name = KINGDOM_SCENE_LABELS[sceneId] ?? sceneId;
+      const isCurrent = sceneId === this.kingdomState.currentScene;
+      if (isCurrent) continue;
+      actions.push({
+        id: `travel-${sceneId}`,
+        label: `Travel: ${name}`,
+        run: () => this.travelFromMap(sceneId),
+      });
+    }
+
+    return actions;
+  }
+
+  get paletteResults(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+    selected: boolean;
+  }> {
+    const q = this.paletteQuery.trim().toLowerCase();
+    const all = this.paletteActions;
+    const filtered = q
+      ? all
+          .map((a) => ({ a, score: scoreMatch(a.label.toLowerCase(), q) }))
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((x) => x.a)
+      : all;
+    return filtered.map((a, i) => ({
+      ...a,
+      selected: i === this.paletteSelectedIdx,
+    }));
+  }
+
+  openPalette = (): void => {
+    if (!this.paletteAllowed) return;
+    this.paletteOpen = true;
+    this.paletteQuery = "";
+    this.paletteSelectedIdx = 0;
+  };
+
+  closePalette = (): void => {
+    this.paletteOpen = false;
+  };
+
+  onPaletteInput = (e: Event): void => {
+    this.paletteQuery = (e.target as HTMLInputElement).value;
+    this.paletteSelectedIdx = 0;
+  };
+
+  onPaletteKeyDown = (e: KeyboardEvent): void => {
+    const results = this.paletteResults;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.min(
+        results.length - 1,
+        this.paletteSelectedIdx + 1,
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.max(0, this.paletteSelectedIdx - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const target = results[this.paletteSelectedIdx];
+      if (target) {
+        target.run();
+        this.closePalette();
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      this.closePalette();
+    }
+  };
+
+  runPaletteAction = (id: string): void => {
+    const action = this.paletteActions.find((a) => a.id === id);
+    if (action) {
+      action.run();
+      this.closePalette();
+    }
+  };
+
+  stopClickPropagation = (e: Event): void => {
+    e.stopPropagation();
+  };
+
+  private onGlobalKeyDown = (e: KeyboardEvent): void => {
+    const isCmdK = (e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey);
+    if (isCmdK) {
+      if (!this.paletteAllowed && !this.paletteOpen) return;
+      e.preventDefault();
+      if (this.paletteOpen) this.closePalette();
+      else this.openPalette();
+    } else if (e.key === "Escape" && this.paletteOpen) {
+      this.closePalette();
+    }
+  };
 
   onHashChange = () => {
     const next = readSharedHash();
@@ -1374,6 +1579,50 @@ export default class TheIslandApp extends Component {
             {{else}}
               <p class="chronicle-empty">The chronicle is blank. Restore a scene to begin recording its tale.</p>
             {{/if}}
+          </div>
+        </div>
+      {{/if}}
+
+      {{#if this.paletteOpen}}
+        <div
+          class="palette-overlay"
+          role="dialog"
+          {{on "click" this.closePalette}}
+        >
+          <div class="palette-card" role="presentation" {{on "click" this.stopClickPropagation}}>
+            {{! template-lint-disable no-autofocus-attribute }}
+            <input
+              type="text"
+              class="palette-input"
+              placeholder="Type a command…"
+              autofocus
+              value={{this.paletteQuery}}
+              {{on "input" this.onPaletteInput}}
+              {{on "keydown" this.onPaletteKeyDown}}
+            />
+            <ul class="palette-list">
+              {{#each this.paletteResults as |row|}}
+                <li class="palette-row {{if row.selected 'selected'}}">
+                  <button
+                    type="button"
+                    class="palette-row-btn"
+                    {{on "click" (fn this.runPaletteAction row.id)}}
+                  >
+                    <span class="palette-row-label">{{row.label}}</span>
+                    {{#if row.hint}}
+                      <span class="palette-row-hint">{{row.hint}}</span>
+                    {{/if}}
+                  </button>
+                </li>
+              {{else}}
+                <li class="palette-empty">No matching commands</li>
+              {{/each}}
+            </ul>
+            <div class="palette-foot">
+              <span>↑↓ navigate</span>
+              <span>↵ run</span>
+              <span>esc close</span>
+            </div>
           </div>
         </div>
       {{/if}}

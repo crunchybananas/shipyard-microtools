@@ -1275,3 +1275,118 @@ body {
   font-style: italic;
   margin: 0;
 }
+
+/* ── Command palette ───────────────────────────── */
+
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  z-index: 2000;
+  animation: paletteFade 0.18s ease;
+}
+
+@keyframes paletteFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.palette-card {
+  width: min(560px, 92vw);
+  background: linear-gradient(180deg, #f4e4c1 0%, #e8d3a0 100%);
+  border: 2px solid rgba(70, 40, 15, 0.7);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow:
+    0 0 60px rgba(255, 220, 140, 0.25),
+    0 30px 80px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #3a2410;
+}
+
+.palette-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1.1rem 1.25rem;
+  font-size: 1.05rem;
+  color: #3a2410;
+  font-family: inherit;
+  outline: none;
+  border-bottom: 1px solid rgba(70, 40, 15, 0.3);
+}
+
+.palette-input::placeholder {
+  color: rgba(90, 56, 24, 0.55);
+  font-style: italic;
+}
+
+.palette-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.palette-row {
+  margin: 0;
+  padding: 0;
+}
+
+.palette-row-btn {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #3a2410;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.palette-row.selected .palette-row-btn,
+.palette-row-btn:hover {
+  background: rgba(139, 90, 36, 0.18);
+  color: #2a1808;
+}
+
+.palette-row-label {
+  font-weight: 700;
+}
+
+.palette-row-hint {
+  font-size: 0.78rem;
+  color: rgba(90, 56, 24, 0.7);
+  margin-left: auto;
+  font-style: italic;
+}
+
+.palette-empty {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  color: rgba(90, 56, 24, 0.7);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.palette-foot {
+  display: flex;
+  gap: 1rem;
+  padding: 0.55rem 1.25rem;
+  border-top: 1px solid rgba(70, 40, 15, 0.3);
+  font-size: 0.7rem;
+  color: rgba(90, 56, 24, 0.7);
+  font-family: "SF Mono", Monaco, monospace;
+}
