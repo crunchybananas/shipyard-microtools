@@ -261,6 +261,245 @@ function formatDiffValue(value: unknown): string {
   }
 }
 
+// ── Mini JSON Schema validator ─────────────────────────────────
+
+type SchemaTypeName =
+  | "string"
+  | "number"
+  | "integer"
+  | "boolean"
+  | "null"
+  | "array"
+  | "object";
+
+interface JsonSchemaNode {
+  type?: SchemaTypeName | SchemaTypeName[];
+  required?: string[];
+  properties?: Record<string, JsonSchemaNode>;
+  items?: JsonSchemaNode;
+  enum?: unknown[];
+  const?: unknown;
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  format?: "email" | "url" | "uri" | "date-time" | "date" | "uuid" | "ipv4";
+  pattern?: string;
+  minItems?: number;
+  maxItems?: number;
+  description?: string;
+}
+
+interface SchemaError {
+  path: string;
+  message: string;
+}
+
+function actualType(value: unknown): SchemaTypeName | "undefined" {
+  if (value === null) return "null";
+  if (Array.isArray(value)) return "array";
+  if (value === undefined) return "undefined";
+  const t = typeof value;
+  if (t === "object") return "object";
+  if (t === "string") return "string";
+  if (t === "number") return "number";
+  if (t === "boolean") return "boolean";
+  return "object";
+}
+
+function valueMatchesType(value: unknown, type: SchemaTypeName): boolean {
+  switch (type) {
+    case "null":
+      return value === null;
+    case "boolean":
+      return typeof value === "boolean";
+    case "integer":
+      return typeof value === "number" && Number.isInteger(value);
+    case "number":
+      return typeof value === "number" && !Number.isNaN(value);
+    case "string":
+      return typeof value === "string";
+    case "array":
+      return Array.isArray(value);
+    case "object":
+      return (
+        typeof value === "object" && value !== null && !Array.isArray(value)
+      );
+  }
+}
+
+function checkFormat(value: string, format: string): boolean {
+  switch (format) {
+    case "email":
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    case "url":
+    case "uri":
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        return false;
+      }
+    case "date-time":
+      return !Number.isNaN(Date.parse(value));
+    case "date":
+      return /^\d{4}-\d{2}-\d{2}$/.test(value);
+    case "uuid":
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        value,
+      );
+    case "ipv4":
+      return /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+        value,
+      );
+    default:
+      return true;
+  }
+}
+
+function validateAgainstSchema(
+  value: unknown,
+  schema: JsonSchemaNode,
+  path = "$",
+): SchemaError[] {
+  const errors: SchemaError[] = [];
+
+  // Type
+  if (schema.type !== undefined) {
+    const types = Array.isArray(schema.type) ? schema.type : [schema.type];
+    if (!types.some((t) => valueMatchesType(value, t))) {
+      errors.push({
+        path,
+        message: `Expected type ${types.join(" | ")}, got ${actualType(value)}`,
+      });
+      // Stop deeper validation; would just produce noise.
+      return errors;
+    }
+  }
+
+  // const
+  if (schema.const !== undefined && !structurallyEqual(value, schema.const)) {
+    errors.push({
+      path,
+      message: `Must equal ${JSON.stringify(schema.const)}`,
+    });
+  }
+
+  // enum
+  if (Array.isArray(schema.enum)) {
+    if (!schema.enum.some((e) => structurallyEqual(e, value))) {
+      const opts = schema.enum.map((e) => JSON.stringify(e)).join(", ");
+      errors.push({ path, message: `Must be one of: ${opts}` });
+    }
+  }
+
+  // String constraints
+  if (typeof value === "string") {
+    if (
+      typeof schema.minLength === "number" &&
+      value.length < schema.minLength
+    ) {
+      errors.push({
+        path,
+        message: `String shorter than minLength ${schema.minLength} (got ${value.length})`,
+      });
+    }
+    if (
+      typeof schema.maxLength === "number" &&
+      value.length > schema.maxLength
+    ) {
+      errors.push({
+        path,
+        message: `String longer than maxLength ${schema.maxLength} (got ${value.length})`,
+      });
+    }
+    if (schema.format && !checkFormat(value, schema.format)) {
+      errors.push({ path, message: `Invalid ${schema.format} format` });
+    }
+    if (schema.pattern) {
+      try {
+        if (!new RegExp(schema.pattern).test(value)) {
+          errors.push({
+            path,
+            message: `Does not match pattern /${schema.pattern}/`,
+          });
+        }
+      } catch {
+        errors.push({ path, message: `Invalid pattern in schema` });
+      }
+    }
+  }
+
+  // Number constraints
+  if (typeof value === "number") {
+    if (typeof schema.minimum === "number" && value < schema.minimum) {
+      errors.push({
+        path,
+        message: `Below minimum ${schema.minimum} (got ${value})`,
+      });
+    }
+    if (typeof schema.maximum === "number" && value > schema.maximum) {
+      errors.push({
+        path,
+        message: `Above maximum ${schema.maximum} (got ${value})`,
+      });
+    }
+  }
+
+  // Object: required + properties
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value)
+  ) {
+    const obj = value as Record<string, unknown>;
+    if (Array.isArray(schema.required)) {
+      for (const key of schema.required) {
+        if (!(key in obj)) {
+          errors.push({
+            path,
+            message: `Missing required property: ${key}`,
+          });
+        }
+      }
+    }
+    if (schema.properties) {
+      for (const [key, sub] of Object.entries(schema.properties)) {
+        if (key in obj) {
+          errors.push(
+            ...validateAgainstSchema(obj[key], sub, childPathFor(path, key)),
+          );
+        }
+      }
+    }
+  }
+
+  // Array: items
+  if (Array.isArray(value)) {
+    if (typeof schema.minItems === "number" && value.length < schema.minItems) {
+      errors.push({
+        path,
+        message: `Too few items: ${value.length} < ${schema.minItems}`,
+      });
+    }
+    if (typeof schema.maxItems === "number" && value.length > schema.maxItems) {
+      errors.push({
+        path,
+        message: `Too many items: ${value.length} > ${schema.maxItems}`,
+      });
+    }
+    if (schema.items) {
+      value.forEach((item, i) => {
+        errors.push(
+          ...validateAgainstSchema(item, schema.items!, childPathFor(path, i)),
+        );
+      });
+    }
+  }
+
+  return errors;
+}
+
 function computeDiff(left: unknown, right: unknown, path = "$"): DiffEntry[] {
   if (structurallyEqual(left, right)) return [];
   const leftIsObj =
@@ -685,7 +924,7 @@ interface ParseError {
 
 interface HashState {
   i?: string;
-  v?: "tree" | "raw" | "ts" | "zod" | "diff";
+  v?: "tree" | "raw" | "ts" | "zod" | "diff" | "validate";
   q?: string;
   c?: string;
 }
@@ -734,8 +973,9 @@ export default class JsonFormatterApp extends Component {
   @tracked statsText = "";
   @tracked statusText = "";
   @tracked statusType: "success" | "error" | "" = "";
-  @tracked viewMode: "tree" | "raw" | "ts" | "zod" | "diff" = "tree";
+  @tracked viewMode: "tree" | "raw" | "ts" | "zod" | "diff" | "validate" = "tree";
   @tracked compareInput = "";
+  @tracked schemaInput = "";
   @tracked expandedPaths: Set<string> = new Set(["$"]);
   @tracked parseError: ParseError | null = null;
   @tracked filterQuery = "";
@@ -756,7 +996,8 @@ export default class JsonFormatterApp extends Component {
         initial.v === "raw" ||
         initial.v === "ts" ||
         initial.v === "zod" ||
-        initial.v === "diff"
+        initial.v === "diff" ||
+        initial.v === "validate"
           ? initial.v
           : null;
       if (viewFromHash) this.viewMode = viewFromHash;
@@ -856,8 +1097,58 @@ export default class JsonFormatterApp extends Component {
     return this.viewMode === "diff";
   }
 
+  get isValidateView() {
+    return this.viewMode === "validate";
+  }
+
   get diffBtnClass() {
     return this.isDiffView ? "view-btn active" : "view-btn";
+  }
+
+  get validateBtnClass() {
+    return this.isValidateView ? "view-btn active" : "view-btn";
+  }
+
+  get schemaParseError(): string | null {
+    const raw = this.schemaInput.trim();
+    if (!raw) return null;
+    try {
+      JSON.parse(raw);
+      return null;
+    } catch (e) {
+      return e instanceof Error ? e.message : "Invalid schema JSON";
+    }
+  }
+
+  get schemaErrors(): SchemaError[] {
+    if (!this.hasParsed) return [];
+    const raw = this.schemaInput.trim();
+    if (!raw) return [];
+    try {
+      const schema = JSON.parse(raw) as JsonSchemaNode;
+      return validateAgainstSchema(this.parsed, schema);
+    } catch {
+      return [];
+    }
+  }
+
+  get validateSummary(): string {
+    if (!this.hasParsed) return "Format some JSON first to validate against a schema.";
+    const raw = this.schemaInput.trim();
+    if (!raw) return "Paste a JSON Schema above to validate.";
+    if (this.schemaParseError) return `Schema parse error: ${this.schemaParseError}`;
+    const errs = this.schemaErrors;
+    if (errs.length === 0) return "✓ Valid against schema";
+    return `${errs.length} validation issue${errs.length === 1 ? "" : "s"}`;
+  }
+
+  get validateOk(): boolean {
+    return (
+      this.hasParsed &&
+      !!this.schemaInput.trim() &&
+      !this.schemaParseError &&
+      this.schemaErrors.length === 0
+    );
   }
 
   get compareParseError(): string | null {
@@ -1203,9 +1494,35 @@ export default class JsonFormatterApp extends Component {
     this.scheduleHashWrite();
   };
 
+  showValidate = () => {
+    this.viewMode = "validate";
+  };
+
   onCompareInput = (e: Event) => {
     this.compareInput = (e.target as HTMLTextAreaElement).value;
     this.scheduleHashWrite();
+  };
+
+  onSchemaInput = (e: Event) => {
+    this.schemaInput = (e.target as HTMLTextAreaElement).value;
+  };
+
+  loadExampleSchema = () => {
+    this.schemaInput = JSON.stringify(
+      {
+        type: "object",
+        required: ["id", "name", "email"],
+        properties: {
+          id: { type: "integer", minimum: 1 },
+          name: { type: "string", minLength: 1 },
+          email: { type: "string", format: "email" },
+          tags: { type: "array", items: { type: "string" } },
+          age: { type: "integer", minimum: 0, maximum: 130 },
+        },
+      },
+      null,
+      2,
+    );
   };
 
   sharePermalink = async () => {
@@ -1386,6 +1703,11 @@ export default class JsonFormatterApp extends Component {
                   type="button"
                   {{on "click" this.showDiff}}
                 >📊 Diff</button>
+                <button
+                  class={{this.validateBtnClass}}
+                  type="button"
+                  {{on "click" this.showValidate}}
+                >✓ Validate</button>
               </div>
               {{#if this.statsText}}
                 <span class="stats">{{this.statsText}}</span>
@@ -1437,7 +1759,7 @@ export default class JsonFormatterApp extends Component {
                 <button class="ghost-btn" type="button" {{on "click" this.copyZod}}>Copy</button>
               </div>
               <pre class="output ts-output">{{this.zodOutput}}</pre>
-            {{else}}
+            {{else if this.isDiffView}}
               <div class="diff-panel">
                 <label class="diff-label">Compare against</label>
                 <textarea
@@ -1460,6 +1782,31 @@ export default class JsonFormatterApp extends Component {
                           <span class="diff-arrow">→</span>
                           <span class="diff-right">{{row.rightText}}</span>
                         {{/if}}
+                      </div>
+                    {{/each}}
+                  </div>
+                {{/if}}
+              </div>
+            {{else}}
+              <div class="diff-panel">
+                <div class="ts-toolbar">
+                  <label class="diff-label">JSON Schema</label>
+                  <button class="ghost-btn" type="button" {{on "click" this.loadExampleSchema}}>Load example</button>
+                </div>
+                <textarea
+                  rows="8"
+                  class="diff-textarea"
+                  placeholder='{"type":"object","required":["id"],"properties":{"id":{"type":"integer","minimum":1}}}'
+                  {{on "input" this.onSchemaInput}}
+                >{{this.schemaInput}}</textarea>
+                <div class="diff-summary {{if this.validateOk 'validate-ok'}}">{{this.validateSummary}}</div>
+                {{#if this.schemaErrors.length}}
+                  <div class="diff-list">
+                    {{#each this.schemaErrors as |err|}}
+                      <div class="diff-row diff-changed">
+                        <span class="diff-symbol">!</span>
+                        <span class="diff-path">{{err.path}}</span>
+                        <span class="diff-right">{{err.message}}</span>
                       </div>
                     {{/each}}
                   </div>
