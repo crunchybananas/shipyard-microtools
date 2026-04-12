@@ -1,6 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
+import { fn } from "@ember/helper";
 import { modifier } from "ember-modifier";
 import type { LogEntry, LogLevel } from "ship-diagnostics/ship-diagnostics/data/sample-logs";
 import { sampleSets } from "ship-diagnostics/ship-diagnostics/data/sample-logs";
@@ -67,6 +68,28 @@ function readHashState(): HashState | null {
   return decodeHashState(location.hash.replace(/^#/, ""));
 }
 
+function scoreMatch(haystack: string, needle: string): number {
+  if (!needle) return 1;
+  if (haystack === needle) return 100;
+  if (haystack.startsWith(needle)) return 80;
+  const idx = haystack.indexOf(needle);
+  if (idx >= 0) return 60 - idx;
+  let h = 0;
+  for (let n = 0; n < needle.length; n++) {
+    const ch = needle[n]!;
+    let found = -1;
+    for (; h < haystack.length; h++) {
+      if (haystack[h] === ch) {
+        found = h;
+        h++;
+        break;
+      }
+    }
+    if (found < 0) return 0;
+  }
+  return 20;
+}
+
 // ── Component ──────────────────────────────────────────────────
 
 export default class ShipDiagnosticsApp extends Component {
@@ -82,6 +105,9 @@ export default class ShipDiagnosticsApp extends Component {
   @tracked sseUrl = "";
   @tracked sseStatus: "idle" | "connecting" | "connected" | "error" = "idle";
   @tracked sseStatusText = "";
+  @tracked paletteOpen = false;
+  @tracked paletteQuery = "";
+  @tracked paletteSelectedIdx = 0;
   private liveTimer: ReturnType<typeof setTimeout> | null = null;
   private logListEl: HTMLElement | null = null;
   private liveCounter = 0;
@@ -118,6 +144,7 @@ export default class ShipDiagnosticsApp extends Component {
     }
     if (typeof window !== "undefined") {
       window.addEventListener("hashchange", this.onHashChange);
+      window.addEventListener("keydown", this.onGlobalKeyDown);
     }
   }
 
@@ -125,6 +152,7 @@ export default class ShipDiagnosticsApp extends Component {
     super.willDestroy();
     if (typeof window !== "undefined") {
       window.removeEventListener("hashchange", this.onHashChange);
+      window.removeEventListener("keydown", this.onGlobalKeyDown);
     }
     if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
     if (this.sseEventSource) {
@@ -132,6 +160,197 @@ export default class ShipDiagnosticsApp extends Component {
       this.sseEventSource = null;
     }
   }
+
+  // ── Command palette ──────────────────────────────────────────
+
+  get paletteActions(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+  }> {
+    const actions: Array<{
+      id: string;
+      label: string;
+      hint?: string;
+      run: () => void;
+    }> = [];
+
+    // Dynamic: switch dataset
+    for (const ds of this.datasets) {
+      actions.push({
+        id: `dataset-${ds.name}`,
+        label: `Dataset: ${ds.name}`,
+        hint: `${ds.logs.length} logs`,
+        run: () => {
+          this.activeDatasetName = ds.name;
+          this.timeRange = null;
+          this.scheduleHashWrite();
+        },
+      });
+    }
+
+    // Level filters
+    for (const lvl of ["all", "info", "warn", "error"]) {
+      actions.push({
+        id: `level-${lvl}`,
+        label: `Level: ${lvl}`,
+        run: () => {
+          this.levelFilter = lvl;
+          this.scheduleHashWrite();
+        },
+      });
+    }
+
+    // Service filters
+    actions.push({
+      id: `service-all`,
+      label: `Service: all`,
+      run: () => {
+        this.serviceFilter = "all";
+        this.scheduleHashWrite();
+      },
+    });
+    for (const svc of this.services) {
+      actions.push({
+        id: `service-${svc}`,
+        label: `Service: ${svc}`,
+        run: () => {
+          this.serviceFilter = svc;
+          this.scheduleHashWrite();
+        },
+      });
+    }
+
+    // Static actions
+    actions.push(
+      {
+        id: "clear-filters",
+        label: "Clear all filters",
+        run: () => this.clearFilters(),
+      },
+      {
+        id: "share",
+        label: "Share permalink",
+        hint: "Copy URL with current filter state",
+        run: () => this.sharePermalink(),
+      },
+      {
+        id: "export-json",
+        label: "Export filtered logs as JSON",
+        run: () => this.exportJson(),
+      },
+      {
+        id: "live-toggle",
+        label: this.isLive ? "Stop synthetic live tail" : "Start synthetic live tail",
+        run: () => this.toggleLive(),
+      },
+      {
+        id: "sse-toggle",
+        label: this.isSseConnected ? "Disconnect SSE endpoint" : "Connect SSE endpoint",
+        hint: this.sseUrl || "set URL in sidebar first",
+        run: () => this.toggleSse(),
+      },
+      {
+        id: "jump-error",
+        label: "Jump to first error",
+        run: () => this.jumpToFirstError(),
+      },
+    );
+
+    return actions;
+  }
+
+  get paletteResults(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+    selected: boolean;
+  }> {
+    const q = this.paletteQuery.trim().toLowerCase();
+    const all = this.paletteActions;
+    const filtered = q
+      ? all
+          .map((a) => ({ a, score: scoreMatch(a.label.toLowerCase(), q) }))
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((x) => x.a)
+      : all;
+    return filtered.map((a, i) => ({
+      ...a,
+      selected: i === this.paletteSelectedIdx,
+    }));
+  }
+
+  openPalette = () => {
+    this.paletteOpen = true;
+    this.paletteQuery = "";
+    this.paletteSelectedIdx = 0;
+  };
+
+  closePalette = () => {
+    this.paletteOpen = false;
+  };
+
+  onPaletteInput = (e: Event) => {
+    this.paletteQuery = (e.target as HTMLInputElement).value;
+    this.paletteSelectedIdx = 0;
+  };
+
+  onPaletteKeyDown = (e: KeyboardEvent) => {
+    const results = this.paletteResults;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.min(
+        results.length - 1,
+        this.paletteSelectedIdx + 1,
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.max(0, this.paletteSelectedIdx - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const target = results[this.paletteSelectedIdx];
+      if (target) {
+        target.run();
+        this.closePalette();
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      this.closePalette();
+    }
+  };
+
+  runPaletteAction = (id: string) => {
+    const action = this.paletteActions.find((a) => a.id === id);
+    if (action) {
+      action.run();
+      this.closePalette();
+    }
+  };
+
+  stopClickPropagation = (e: Event) => {
+    e.stopPropagation();
+  };
+
+  jumpToFirstError = () => {
+    const firstError = this.filteredLogs.find((l) => l.level === "error");
+    if (firstError) {
+      this.selectedId = firstError.id;
+    }
+  };
+
+  private onGlobalKeyDown = (e: KeyboardEvent) => {
+    const isCmdK = (e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey);
+    if (isCmdK) {
+      e.preventDefault();
+      if (this.paletteOpen) this.closePalette();
+      else this.openPalette();
+    } else if (e.key === "Escape" && this.paletteOpen) {
+      this.closePalette();
+    }
+  };
 
   private onHashChange = () => {
     if (this.suppressHashWrite) return;
@@ -822,6 +1041,50 @@ export default class ShipDiagnosticsApp extends Component {
           {{/if}}
         </aside>
       </main>
+
+      {{#if this.paletteOpen}}
+        <div
+          class="palette-overlay"
+          role="dialog"
+          {{on "click" this.closePalette}}
+        >
+          <div class="palette-card" role="presentation" {{on "click" this.stopClickPropagation}}>
+            {{! template-lint-disable no-autofocus-attribute }}
+            <input
+              type="text"
+              class="palette-input"
+              placeholder="Type a command…"
+              autofocus
+              value={{this.paletteQuery}}
+              {{on "input" this.onPaletteInput}}
+              {{on "keydown" this.onPaletteKeyDown}}
+            />
+            <ul class="palette-list">
+              {{#each this.paletteResults as |row|}}
+                <li class="palette-row {{if row.selected 'selected'}}">
+                  <button
+                    type="button"
+                    class="palette-row-btn"
+                    {{on "click" (fn this.runPaletteAction row.id)}}
+                  >
+                    <span class="palette-row-label">{{row.label}}</span>
+                    {{#if row.hint}}
+                      <span class="palette-row-hint">{{row.hint}}</span>
+                    {{/if}}
+                  </button>
+                </li>
+              {{else}}
+                <li class="palette-empty">No matching commands</li>
+              {{/each}}
+            </ul>
+            <div class="palette-foot">
+              <span>↑↓ navigate</span>
+              <span>↵ run</span>
+              <span>esc close</span>
+            </div>
+          </div>
+        </div>
+      {{/if}}
 
       <footer>
         <p class="footer-credit">
