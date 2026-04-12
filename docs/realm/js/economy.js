@@ -122,6 +122,18 @@ export function updateProduction() {
     }
   }
 
+  // Passive gold income: +1 per 5 population each day cycle
+  if (G.gameTick % G.dayLength === 0 && G.population >= 5) {
+    const goldIncome = Math.floor(G.population / 5);
+    G.resources.gold += goldIncome;
+    if (goldIncome > 0) {
+      G.particles.push({
+        tx: MAP_W / 2, ty: MAP_H / 2, offsetY: 0,
+        text: `+${goldIncome} 🪙 taxes`, alpha: 1.8, vy: -0.3, type: 'text',
+      });
+    }
+  }
+
   // Immigration
   if (G.gameTick % 300 === 0 && G.happiness > 60 && G.population < G.maxPop) {
     trySpawnSettlers(1);

@@ -63,6 +63,20 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .hud-btn{background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text);padding:0.25rem 0.6rem;border-radius:5px;font-size:0.72rem;cursor:pointer;font-family:inherit;transition:background 0.15s}
 .hud-btn:hover{background:rgba(255,255,255,0.15)}
 
+/* Happiness panel */
+#happiness-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(340px,88vw);max-height:70vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
+.hp-header{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;border-bottom:1px solid var(--border)}
+.hp-header h3{margin:0;font-size:0.95rem;color:var(--food)}
+#happiness-content{padding:0.7rem 0.9rem;overflow-y:auto;flex:1;font-size:0.78rem}
+.hp-row{display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.hp-row:last-child{border-bottom:none}
+.hp-row .hp-label{color:rgba(255,255,255,0.7)}
+.hp-row .hp-val{font-weight:700;font-variant-numeric:tabular-nums}
+.hp-row .hp-val.pos{color:var(--food)}
+.hp-row .hp-val.neg{color:var(--danger)}
+.hp-row.hp-total{border-top:2px solid var(--border);margin-top:0.3rem;padding-top:0.5rem;font-weight:700;font-size:0.85rem}
+.hp-row.hp-total .hp-val{color:var(--gold);font-size:0.95rem}
+
 /* Research panel */
 #research-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(420px,90vw);max-height:80vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
 .rp-header{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;border-bottom:1px solid var(--border)}
@@ -109,6 +123,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <span id="pop-display">👤 3</span>
   <span id="day-display">Day 1</span>
   <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
+  <button class="hud-btn" onclick="toggleHappiness()">😊</button>
 </div>
 
 <div id="build-bar"></div>
@@ -133,6 +148,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 <div id="info-panel"></div>
 <canvas id="minimap" width="160" height="160"></canvas>
+
+<div id="happiness-panel" style="display:none">
+  <div class="hp-header"><h3>😊 Happiness Breakdown</h3><button class="rp-close" onclick="toggleHappiness()">✕</button></div>
+  <div id="happiness-content"></div>
+</div>
 
 <div id="research-panel" style="display:none">
   <div class="rp-header">

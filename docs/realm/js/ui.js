@@ -141,6 +141,53 @@ export function setSpeed(s) {
   });
 }
 
+export function toggleHappinessPanel() {
+  const panel = document.getElementById('happiness-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderHappinessPanel();
+}
+
+export function renderHappinessPanel() {
+  const el = document.getElementById('happiness-content');
+  if (!el) return;
+  const factors = [];
+  factors.push({ label: 'Base happiness', val: 50 });
+
+  // Building bonuses
+  const bCounts = {};
+  for (const b of G.buildings) {
+    const def = BUILDINGS[b.type];
+    if (def.happiness) {
+      bCounts[b.type] = (bCounts[b.type] || 0) + 1;
+    }
+  }
+  for (const [type, count] of Object.entries(bCounts)) {
+    const def = BUILDINGS[type];
+    factors.push({ label: `${def.icon} ${def.name} ×${count}`, val: def.happiness * count });
+  }
+
+  // Overcrowding
+  const excess = Math.max(0, G.population - G.maxPop);
+  if (excess > 0) factors.push({ label: `Overcrowding (${excess} homeless)`, val: -excess * 5 });
+
+  // Starvation
+  if (G.resources.food <= 0) factors.push({ label: 'Starvation (no food)', val: -10 });
+
+  // Low food warning
+  if (G.resources.food > 0 && G.resources.food < G.population) {
+    factors.push({ label: 'Food shortage', val: -3 });
+  }
+
+  const total = Math.min(100, Math.max(0, factors.reduce((s, f) => s + f.val, 0)));
+
+  el.innerHTML = factors.map(f =>
+    `<div class="hp-row"><span class="hp-label">${f.label}</span><span class="hp-val ${f.val >= 0 ? 'pos' : 'neg'}">${f.val >= 0 ? '+' : ''}${f.val}</span></div>`
+  ).join('') +
+    `<div class="hp-row hp-total"><span class="hp-label">Total</span><span class="hp-val">${total}%</span></div>`;
+}
+
 export function setupSaveButtons() {
   document.getElementById('btn-save')?.addEventListener('click', saveGame);
   document.getElementById('btn-load')?.addEventListener('click', () => {

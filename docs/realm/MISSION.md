@@ -48,7 +48,8 @@ docs/realm/
 - [ ] **Save/Load** — full state to localStorage. Auto-save every 60s. Rebuild all cross-references on load.
 - [x] **Technology Tree** — 8 techs with prerequisites: Agriculture/Forestry (free, pre-researched) → Masonry → Engineering/Metallurgy, Commerce → Brewing, Metallurgy → Military. Research panel overlay with progress bar. Build bar auto-filters to unlocked buildings only. Persisted in save/load.
 - [ ] **Trade Routes** — send caravans between your settlement and map-edge trading posts. Risk/reward.
-- [ ] **Happiness Detail** — breakdown panel showing positive (tavern, well) and negative (overcrowding, starvation) factors.
+- [x] **Happiness Detail** — 😊 button opens breakdown panel: base 50, per-building bonuses (tavern +10, well +5), overcrowding penalty (-5 per excess), starvation (-10), food shortage (-3). Styled total row. Toggle open/close.
+- [x] **Passive Gold Income** — +1 gold per 5 population each day cycle ("taxes"), with floating particle notification. Gives the player a gold progression path before markets.
 
 ### Phase 4: Content (make it deep)
 - [ ] **More Missions** — 25+ missions across 5 tiers. Each tier unlocks after completing 3 from the previous.

@@ -10,7 +10,7 @@ import { updateProduction, checkRaids } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel } from './ui.js';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel } from './ui.js';
 import { updateResearch } from './tech.js';
 import { saveGame } from './save.js';
 
@@ -32,6 +32,7 @@ setupSaveButtons();
 // Expose for inline onclick handlers
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
+window.toggleHappiness = toggleHappinessPanel;
 
 showToast('Welcome to Realm. Build your settlement!');
 
