@@ -14,6 +14,7 @@ import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPan
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
+import { updateAmbient, toggleAmbient, isAmbientEnabled } from './audio.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -35,6 +36,11 @@ window.G = G;
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
+window.toggleAmbientSound = () => {
+  const on = toggleAmbient();
+  const btn = document.getElementById('btn-ambient');
+  if (btn) btn.textContent = on ? '🔊' : '🔇';
+};
 
 showToast('Welcome to Realm. Build your settlement!');
 
@@ -75,6 +81,7 @@ function simTick() {
     renderBuildBar();
     updateTutorialTip();
   }
+  if (G.gameTick % 60 === 0) updateAmbient();
   if (G.gameTick % 3600 === 0) saveGame();
 }
 
