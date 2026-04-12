@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, updateSeason, getSeasonData } from './state.js';
+import { G, updateSeason, getSeasonData, getDifficulty, DIFFICULTY } from './state.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
@@ -48,8 +48,21 @@ function beginGame() {
   gameLoop();
 }
 
+window.setDifficulty = (d) => {
+  G.difficulty = d;
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.diff === d);
+  });
+};
+
 window.startNewGame = () => {
+  // Apply difficulty settings to starting resources
+  const diff = getDifficulty();
   generateWorld();
+  G.resources.food = diff.startFood;
+  G.resources.wood = diff.startWood;
+  G.resources.gold = diff.startGold;
+  G.nextRaidDay = diff.raidStart;
   beginGame();
 };
 

@@ -71,6 +71,7 @@ export const G = {
   eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0 },
   season: 'spring',
   won: false,
+  difficulty: 'normal', // easy, normal, hard
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
   lastResources: null, // snapshot for rate calculation
 };
@@ -89,6 +90,14 @@ const LAST = ['Stone','Brook','Field','Hill','Dale','Wood','Lake','Ridge','Vale'
 export function randomName() { return FIRST[rngInt(0,FIRST.length-1)]+' '+LAST[rngInt(0,LAST.length-1)]; }
 
 export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️'}[k]||k; }
+
+export const DIFFICULTY = {
+  easy:   { label:'🟢 Easy',   startFood:120, startWood:80, startGold:40, foodMult:0.6, raidMult:0.5, raidStart:12 },
+  normal: { label:'🟡 Normal', startFood:80,  startWood:60, startGold:25, foodMult:1.0, raidMult:1.0, raidStart:8 },
+  hard:   { label:'🔴 Hard',   startFood:50,  startWood:40, startGold:15, foodMult:1.5, raidMult:1.5, raidStart:5 },
+};
+
+export function getDifficulty() { return DIFFICULTY[G.difficulty] || DIFFICULTY.normal; }
 
 // ── Seasons ────────────────────────────────────────────────
 export const SEASONS = {

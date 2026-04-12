@@ -20,6 +20,10 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .title-name{font-size:3.5rem;font-weight:800;letter-spacing:0.15em;color:#ffd166;margin:0;text-shadow:0 0 40px rgba(255,209,102,0.3)}
 .title-sub{font-size:1.1rem;color:rgba(255,255,255,0.5);margin:0.3rem 0 1.2rem;letter-spacing:0.08em}
 .title-desc{font-size:0.9rem;color:rgba(255,255,255,0.6);line-height:1.7;margin:0 0 1.8rem}
+.title-difficulty{display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem}
+.diff-btn{padding:0.45rem 1rem;font-size:0.82rem;border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);border-radius:6px;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.diff-btn:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.3)}
+.diff-btn.active{color:#fff;border-color:var(--accent);background:rgba(129,140,248,0.15)}
 .title-buttons{display:flex;gap:0.8rem;justify-content:center;margin-bottom:1.5rem}
 .title-btn{padding:0.8rem 2rem;font-size:1rem;font-weight:700;border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
 .title-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.4);transform:translateY(-1px)}
@@ -209,6 +213,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
     <h1 class="title-name">REALM</h1>
     <p class="title-sub">A Settlement Builder</p>
     <p class="title-desc">Build, research, trade, and survive the seasons.<br>Grow your village into a kingdom.</p>
+    <div class="title-difficulty">
+      <button class="diff-btn active" data-diff="easy" onclick="setDifficulty('easy')">🟢 Easy</button>
+      <button class="diff-btn" data-diff="normal" onclick="setDifficulty('normal')">🟡 Normal</button>
+      <button class="diff-btn" data-diff="hard" onclick="setDifficulty('hard')">🔴 Hard</button>
+    </div>
     <div class="title-buttons">
       <button class="title-btn primary" onclick="startNewGame()">⚔️ New Game</button>
       <button class="title-btn" id="title-load" onclick="loadAndStart()" style="display:none">📂 Continue</button>

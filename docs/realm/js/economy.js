@@ -2,7 +2,7 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData } from './state.js';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js';
 import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound } from './audio.js';
@@ -122,7 +122,7 @@ export function updateProduction() {
 
   // Food consumption (every half-day = dayLength/2)
   if (G.gameTick % Math.floor(G.dayLength / 2) === 0) {
-    let foodNeeded = Math.ceil(G.population * 0.5);
+    let foodNeeded = Math.ceil(G.population * 0.5 * getDifficulty().foodMult);
     // Granaries halve food consumption in winter
     if (G.season === 'winter') {
       const granaries = G.buildings.filter(b => b.type === 'granary').length;
@@ -164,7 +164,7 @@ export function updateProduction() {
 
 export function checkRaids() {
   if (G.day >= G.nextRaidDay && G.dayPhase < 5) {
-    const raiders = Math.floor(2 + G.day/5);
+    const raiders = Math.floor((2 + G.day/5) * getDifficulty().raidMult);
     const dmg = Math.max(0, raiders * 10 - G.defense);
     playSound('raid');
     if (dmg > 0) {
