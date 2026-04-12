@@ -154,6 +154,21 @@ export function render() {
   }
 
   // ── Citizens ──────────────────────────────────────────────
+  // Find hovered citizen (closest to mouse in screen space)
+  let hoveredCitizen = null;
+  if (G.hoveredTile) {
+    let bestDist = 20; // pixel radius threshold
+    for (const c of G.citizens) {
+      const cs = toScreen(c.x, c.y);
+      // Convert mouse from world-tile to screen using camera transform
+      const mx = G.hoveredTile.x, my = G.hoveredTile.y;
+      const ms = toScreen(mx, my);
+      const dx = cs.x - ms.x, dy = cs.y - ms.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < bestDist) { bestDist = d; hoveredCitizen = c; }
+    }
+  }
+
   for (const c of G.citizens) {
     const s = toScreen(c.x, c.y);
     ctx.globalAlpha = daylight;
@@ -209,6 +224,15 @@ export function render() {
     ctx.arc(s.x, cy - 13.5, 2, Math.PI * 0.8, Math.PI * 2.2);
     ctx.fill();
 
+    // Hover highlight ring
+    if (c === hoveredCitizen) {
+      ctx.strokeStyle = 'rgba(255,209,102,0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(s.x, cy - 6, 6, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
     // Carrying indicator (resource on shoulder)
     if (c.carrying) {
       const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
@@ -217,6 +241,42 @@ export function render() {
       ctx.fillStyle = 'rgba(0,0,0,0.2)';
       ctx.fillRect(s.x + 2, cy - 10, 3, 1);
     }
+  }
+
+  // ── Citizen hover tooltip ──────────────────────────────────
+  if (hoveredCitizen) {
+    const hs = toScreen(hoveredCitizen.x, hoveredCitizen.y);
+    const name = hoveredCitizen.name;
+    const stateLabel = {
+      idle:'Idle', find_job:'Looking for work', walk_to_work:'Going to work',
+      working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
+      foraging:'Foraging', eating:'Eating',
+    }[hoveredCitizen.state] || hoveredCitizen.state;
+    const jobLabel = hoveredCitizen.jobBuilding ? BUILDINGS[hoveredCitizen.jobBuilding.type]?.name : null;
+    const line2 = jobLabel ? `${stateLabel} · ${jobLabel}` : stateLabel;
+
+    ctx.globalAlpha = 0.92;
+    ctx.font = 'bold 10px -apple-system,sans-serif';
+    const tw = Math.max(ctx.measureText(name).width, ctx.measureText(line2).width) + 12;
+    const th = 28;
+    const tx = hs.x - tw/2, ty = hs.y - 40;
+    // Background
+    ctx.fillStyle = 'rgba(10,14,26,0.88)';
+    ctx.beginPath();
+    ctx.roundRect(tx, ty, tw, th, 4);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    // Name
+    ctx.fillStyle = '#ffd166';
+    ctx.textAlign = 'center';
+    ctx.fillText(name, hs.x, ty + 11);
+    // State
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = '9px -apple-system,sans-serif';
+    ctx.fillText(line2, hs.x, ty + 23);
+    ctx.globalAlpha = 1;
   }
 
   // ── Caravans ──────────────────────────────────────────────

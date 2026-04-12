@@ -145,17 +145,16 @@ export function setupInput(canvas) {
     }
   });
 
-  // Minimap click
+  // Minimap click — jump camera to clicked position
   const minimap = document.getElementById('minimap');
   if (minimap) {
     minimap.addEventListener('click', e => {
       const rect = minimap.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) / 160 * MAP_W;
-      const my = (e.clientY - rect.top) / 160 * MAP_H;
-      const { toScreen } = import('./render.js').then ? {} : {};
-      // Direct import to avoid async
-      G.camera.x = (mx - my) * 32;
-      G.camera.y = (mx + my) * 16;
+      const tileX = (e.clientX - rect.left) / rect.width * MAP_W;
+      const tileY = (e.clientY - rect.top) / rect.height * MAP_H;
+      // Iso projection: toScreen(tx,ty) = { x:(tx-ty)*TW/2, y:(tx+ty)*TH/2 }
+      G.camera.x = (tileX - tileY) * 32;
+      G.camera.y = (tileX + tileY) * 16;
     });
   }
 }
