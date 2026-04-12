@@ -56,7 +56,7 @@ export const TECHS = {
     desc: 'Unlocks markets for gold generation',
     cost: { gold: 20, wood: 15 },
     time: 350,
-    unlocks: ['market'],
+    unlocks: ['market', 'tradingpost'],
     icon: '🏪',
     prereq: null,
   },

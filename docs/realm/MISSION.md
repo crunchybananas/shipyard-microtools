@@ -47,7 +47,7 @@ docs/realm/
 - [ ] **Building Selection & Info** — click building → info panel (HP, workers, rate). Right-click demolish with half refund.
 - [ ] **Save/Load** — full state to localStorage. Auto-save every 60s. Rebuild all cross-references on load.
 - [x] **Technology Tree** — 8 techs with prerequisites: Agriculture/Forestry (free, pre-researched) → Masonry → Engineering/Metallurgy, Commerce → Brewing, Metallurgy → Military. Research panel overlay with progress bar. Build bar auto-filters to unlocked buildings only. Persisted in save/load.
-- [ ] **Trade Routes** — send caravans between your settlement and map-edge trading posts. Risk/reward.
+- [x] **Trade Routes** — Trading Post building (sand tiles, Commerce tech). Spawns a caravan every 2 day cycles that walks to the nearest map edge and returns with 5-15 gold. Cart rendered with wheels, cargo, driver, direction arrow. Building shows "⛵ en route" when busy. Caravans persisted in save/load.
 - [x] **Happiness Detail** — 😊 button opens breakdown panel: base 50, per-building bonuses (tavern +10, well +5), overcrowding penalty (-5 per excess), starvation (-10), food shortage (-3). Styled total row. Toggle open/close.
 - [x] **Passive Gold Income** — +1 gold per 5 population each day cycle ("taxes"), with floating particle notification. Gives the player a gold progression path before markets.
 

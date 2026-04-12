@@ -122,6 +122,9 @@ export function updateProduction() {
     }
   }
 
+  // ── Caravans ──────────────────────────────────────────────
+  updateCaravans();
+
   // Passive gold income: +1 per 5 population each day cycle
   if (G.gameTick % G.dayLength === 0 && G.population >= 5) {
     const goldIncome = Math.floor(G.population / 5);
@@ -163,6 +166,85 @@ export function checkRaids() {
     }
     G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
     G.raidInterval = Math.max(4, G.raidInterval - 1);
+  }
+}
+
+// ── Caravan system ─────────────────────────────────────────
+function findMapEdge(bx, by) {
+  // Find nearest walkable tile on the map edge
+  let bestDist = Infinity, bestX = 0, bestY = 0;
+  for (let x = 0; x < MAP_W; x++) {
+    for (const y of [1, MAP_H - 2]) {
+      if (G.map[y][x] !== 0 && G.map[y][x] !== 6) {
+        const d = Math.abs(x - bx) + Math.abs(y - by);
+        if (d < bestDist) { bestDist = d; bestX = x; bestY = y; }
+      }
+    }
+  }
+  for (let y = 0; y < MAP_H; y++) {
+    for (const x of [1, MAP_W - 2]) {
+      if (G.map[y][x] !== 0 && G.map[y][x] !== 6) {
+        const d = Math.abs(x - bx) + Math.abs(y - by);
+        if (d < bestDist) { bestDist = d; bestX = x; bestY = y; }
+      }
+    }
+  }
+  return { x: bestX, y: bestY, dist: bestDist };
+}
+
+function spawnCaravan(b) {
+  const edge = findMapEdge(b.x, b.y);
+  const gold = 5 + Math.floor(edge.dist * 0.4) + rngInt(0, 5);
+  G.caravans.push({
+    x: b.x, y: b.y,
+    tx: edge.x, ty: edge.y,
+    homeX: b.x, homeY: b.y,
+    phase: 'outbound',
+    gold,
+    building: b,
+    speed: 0.03,
+  });
+  b.caravanOut = true;
+}
+
+function updateCaravans() {
+  // Spawn caravans from idle trading posts every 2 day cycles
+  if (G.gameTick % (G.dayLength * 2) === 0) {
+    for (const b of G.buildings) {
+      if (b.type !== 'tradingpost') continue;
+      if (b.caravanOut) continue;
+      if (b.workers.length < 1) continue;
+      spawnCaravan(b);
+    }
+  }
+
+  // Move caravans
+  for (let i = G.caravans.length - 1; i >= 0; i--) {
+    const c = G.caravans[i];
+    const dx = c.tx - c.x, dy = c.ty - c.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 0.15) {
+      const spd = c.speed * G.speed;
+      c.x += (dx / dist) * Math.min(spd, dist);
+      c.y += (dy / dist) * Math.min(spd, dist);
+    } else {
+      if (c.phase === 'outbound') {
+        // Reached edge — turn around with gold
+        c.phase = 'returning';
+        c.tx = c.homeX;
+        c.ty = c.homeY;
+      } else {
+        // Returned home — deliver gold
+        G.resources.gold += c.gold;
+        G.particles.push({
+          tx: c.homeX, ty: c.homeY, offsetY: 0,
+          text: `+${c.gold} 🪙 trade`, alpha: 1.8, vy: -0.3, type: 'text',
+        });
+        playSound('produce');
+        if (c.building) c.building.caravanOut = false;
+        G.caravans.splice(i, 1);
+      }
+    }
   }
 }
 

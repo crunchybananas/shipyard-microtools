@@ -39,6 +39,12 @@ export function saveGame() {
       missions: missions.map(m => ({ id: m.id, done: m.done })),
       researchedTechs: [...G.researchedTechs],
       currentResearch: G.currentResearch ? { ...G.currentResearch } : null,
+      caravans: G.caravans.map(c => ({
+        x:c.x, y:c.y, tx:c.tx, ty:c.ty,
+        homeX:c.homeX, homeY:c.homeY,
+        phase:c.phase, gold:c.gold, speed:c.speed,
+        buildingIdx: G.buildings.indexOf(c.building),
+      })),
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     showToast('Game saved.');
@@ -100,6 +106,12 @@ export function loadGame() {
       G.researchedTechs = new Set(s.researchedTechs);
     }
     G.currentResearch = s.currentResearch || null;
+
+    // Restore caravans
+    G.caravans = (s.caravans || []).map(c => ({
+      ...c,
+      building: c.buildingIdx >= 0 ? G.buildings[c.buildingIdx] : null,
+    }));
 
     G.particles = [];
     showToast('Game loaded.');

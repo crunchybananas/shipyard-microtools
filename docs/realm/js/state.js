@@ -29,6 +29,7 @@ export const BUILDINGS = {
   tavern:    { name:'Tavern',      icon:'🍺', cost:{wood:20,gold:10},  happiness:10, workers:1, desc:'Entertainment, big happiness boost' },
   wall:      { name:'Wall',        icon:'🧱', cost:{stone:8},          defense:5, desc:'Fortification segment' },
   road:      { name:'Road',        icon:'🛤️', cost:{stone:3},          speedBonus:true, desc:'Citizens move faster on roads' },
+  tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
 };
 
 // ── Mutable game state (single source of truth) ───────────
@@ -60,7 +61,8 @@ export const G = {
   raidInterval: 8,
   audioCtx: null,
   researchedTechs: new Set(['agriculture', 'forestry']),
-  currentResearch: null, // { techId, progress, total }
+  currentResearch: null,
+  caravans: [], // { x, y, tx, ty, phase:'outbound'|'returning', gold, building, speed }
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────

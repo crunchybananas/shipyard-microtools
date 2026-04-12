@@ -210,6 +210,61 @@ export function render() {
     }
   }
 
+  // ── Caravans ──────────────────────────────────────────────
+  for (const c of G.caravans) {
+    const s = toScreen(c.x, c.y);
+    ctx.globalAlpha = daylight;
+    const bob = Math.sin(G.gameTick * 0.2 + c.x * 2) * 1;
+
+    // Cart shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + bob + 3, 7, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cart body
+    ctx.fillStyle = '#8b6914';
+    ctx.fillRect(s.x - 6, s.y + bob - 5, 12, 6);
+    // Wheels
+    ctx.fillStyle = '#5a3a1a';
+    ctx.beginPath();
+    ctx.arc(s.x - 4, s.y + bob + 2, 2, 0, Math.PI * 2);
+    ctx.arc(s.x + 4, s.y + bob + 2, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Gold cargo (when returning)
+    if (c.phase === 'returning') {
+      ctx.fillStyle = '#ffd166';
+      ctx.fillRect(s.x - 3, s.y + bob - 8, 6, 3);
+      ctx.fillStyle = '#e8b830';
+      ctx.fillRect(s.x - 2, s.y + bob - 7, 4, 1);
+    }
+
+    // Driver
+    ctx.fillStyle = '#d4a030';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y + bob - 10, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffe0c0';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y + bob - 14, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Direction arrow
+    ctx.fillStyle = c.phase === 'outbound' ? 'rgba(255,100,100,0.5)' : 'rgba(100,255,100,0.5)';
+    const angle = Math.atan2(c.ty - c.y, c.tx - c.x);
+    ctx.save();
+    ctx.translate(s.x, s.y + bob - 18);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(6, 0);
+    ctx.lineTo(0, -2);
+    ctx.lineTo(0, 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
   // ── Particles ─────────────────────────────────────────────
   for (const p of G.particles) {
     const s = toScreen(p.tx, p.ty);
@@ -322,6 +377,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'tavern': drawTavern(ctx, s); break;
     case 'wall': drawWall(ctx, s); break;
     case 'road': drawRoad(ctx, s); break;
+    case 'tradingpost': drawTradingPost(ctx, s, b); break;
     default: drawGeneric(ctx, s, def); break;
   }
 
@@ -580,6 +636,40 @@ function drawRoad(ctx, s) {
   ctx.lineTo(s.x, s.y+TH/4); ctx.lineTo(s.x-TW/4, s.y);
   ctx.closePath();
   ctx.fill();
+}
+
+function drawTradingPost(ctx, s, b) {
+  // Dock platform
+  ctx.fillStyle = '#8b6a4e';
+  ctx.fillRect(s.x - 14, s.y - 6, 28, 6);
+  ctx.fillStyle = '#6a5040';
+  ctx.fillRect(s.x - 14, s.y - 8, 28, 2);
+  // Pier posts
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s.x - 12, s.y - 2, 2, 6);
+  ctx.fillRect(s.x + 10, s.y - 2, 2, 6);
+  // Sail/flag
+  ctx.fillStyle = '#d4a030';
+  ctx.fillRect(s.x + 6, s.y - 24, 2, 18);
+  ctx.fillStyle = b.caravanOut ? '#999' : '#e8c060';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 8, s.y - 22);
+  ctx.lineTo(s.x + 18, s.y - 18);
+  ctx.lineTo(s.x + 8, s.y - 14);
+  ctx.closePath();
+  ctx.fill();
+  // Crates
+  ctx.fillStyle = '#a3714f';
+  ctx.fillRect(s.x - 8, s.y - 12, 5, 4);
+  ctx.fillStyle = '#8b6a4e';
+  ctx.fillRect(s.x - 3, s.y - 11, 4, 3);
+  // Status indicator
+  if (b.caravanOut) {
+    ctx.fillStyle = 'rgba(255,200,50,0.5)';
+    ctx.font = '8px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⛵ en route', s.x, s.y - 28);
+  }
 }
 
 function drawGeneric(ctx, s, def) {
