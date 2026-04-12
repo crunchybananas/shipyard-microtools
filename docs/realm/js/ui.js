@@ -28,11 +28,20 @@ export function updateUI() {
     G.lastResources = { ...G.resources };
   }
 
-  $('r-wood').innerHTML = Math.floor(G.resources.wood) + rateStr(G.resourceRates.wood);
-  $('r-stone').innerHTML = Math.floor(G.resources.stone) + rateStr(G.resourceRates.stone);
-  $('r-food').innerHTML = Math.floor(G.resources.food) + rateStr(G.resourceRates.food);
-  $('r-gold').innerHTML = Math.floor(G.resources.gold) + rateStr(G.resourceRates.gold);
-  $('r-iron').innerHTML = Math.floor(G.resources.iron) + rateStr(G.resourceRates.iron);
+  const warn = (el, val, threshold) => {
+    if (!el) return;
+    if (val <= threshold && val >= 0) { el.closest('.res')?.classList.add('res-warn'); }
+    else { el.closest('.res')?.classList.remove('res-warn'); }
+  };
+  const wEl = $('r-wood'), sEl = $('r-stone'), fEl = $('r-food'), gEl = $('r-gold'), iEl = $('r-iron');
+  wEl.innerHTML = Math.floor(G.resources.wood) + rateStr(G.resourceRates.wood);
+  sEl.innerHTML = Math.floor(G.resources.stone) + rateStr(G.resourceRates.stone);
+  fEl.innerHTML = Math.floor(G.resources.food) + rateStr(G.resourceRates.food);
+  gEl.innerHTML = Math.floor(G.resources.gold) + rateStr(G.resourceRates.gold);
+  iEl.innerHTML = Math.floor(G.resources.iron) + rateStr(G.resourceRates.iron);
+  warn(wEl, G.resources.wood, 5);
+  warn(fEl, G.resources.food, 10);
+  warn(gEl, G.resources.gold, 0);
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
   const season = getSeasonData();
   $('day-display').textContent = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%`;

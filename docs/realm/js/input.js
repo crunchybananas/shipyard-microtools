@@ -135,6 +135,11 @@ export function setupInput(canvas) {
   // Keyboard
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { G.selectedBuild = null; G.selectedBuilding = null; hideInfoPanel(); renderBuildBar(); }
+    if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+      const h = document.getElementById('help-overlay');
+      if (h) h.style.display = h.style.display === 'none' ? 'flex' : 'none';
+      return;
+    }
     if (e.key >= '1' && e.key <= '9') {
       const keys = Object.keys(BUILDINGS);
       const idx = parseInt(e.key) - 1;
