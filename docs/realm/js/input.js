@@ -39,6 +39,15 @@ export function setupInput(canvas) {
         renderBuildBar();
         renderMissions();
         updateUI();
+      } else {
+        // Build failed — show feedback
+        playSound('click');
+        // Flash the hovered tile red briefly via a temporary particle
+        G.particles.push({
+          tx: t.x, ty: t.y, offsetY: -10,
+          text: '❌ Can\'t build here',
+          alpha: 1.2, vy: -0.3, decay: 0.025, type: 'text',
+        });
       }
       return;
     }

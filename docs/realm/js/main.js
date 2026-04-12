@@ -10,7 +10,7 @@ import { updateProduction, checkRaids } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel } from './ui.js';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip } from './ui.js';
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
@@ -67,7 +67,8 @@ function gameLoop() {
     }
     if (G.gameTick % 30 === 0) {
       updateUI();
-      renderBuildBar(); // refresh affordability
+      renderBuildBar();
+      updateTutorialTip();
     }
     // Auto-save every ~60s at speed 1
     if (G.gameTick % 3600 === 0) saveGame();

@@ -204,7 +204,7 @@ function runStateMachine(c) {
       }
       c.forageTarget = null;
       c.state = 'find_job';
-      c.stateTimer = 40 + rngInt(0, 30); // short rest then look for work again
+      c.stateTimer = 0; // immediately look for building jobs
       c.path = null;
       break;
 

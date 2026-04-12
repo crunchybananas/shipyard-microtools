@@ -13,23 +13,29 @@
 10. Update this file with what was done and what's next
 11. Schedule next wake
 
-## Last Completed
-- Idle citizens now FORAGE from nearby resource tiles (forest→wood, stone→stone, sand→food)
-- They pathfind to the nearest resource tile within 6 tiles, gather +1, show floating particle
-- Settlement feels alive — 5 of 6 citizens now actively moving even without building jobs
-- Mission UI now refreshes each game tick (was only rendering at init before)
-- Verified by injecting foraging targets live: 5 citizens immediately started moving to resource tiles
+## Last Completed (verified on FRESH module load)
+- ✅ Camera centers on island at (0, 768) — generateWorld sets it at runtime
+- ✅ Foraging: 2 of 6 citizens actively foraging from resource tiles
+- ✅ Build fail feedback: "❌ Can't build here" particle on invalid placement
+- ✅ Night raised to 0.55 floor (was 0.3, too dark to play)
+- ✅ Tutorial tips system: 6 contextual tips based on game state
+- ✅ Import map in index.html for cache-busting module versions
+- ✅ Fixed foraging→job priority: citizens now re-check for building jobs immediately after foraging
+- ✅ Mission UI refreshes every 60 ticks
+- Verified by playing: house placed (wood 60→45, pop 3→6), farm placed, 2 citizens foraging, fail feedback on duplicate build
 
 ## Known Issues (fix in order)
-1. **ES module caching** — browser caches old module versions aggressively. Fixes work on fresh loads (production) but not during dev testing session. Consider: add version query params to sub-module imports, or switch to a dev server with cache-control headers.
-2. **No tutorial/guidance** — new player has no idea what to do. Need "Build a house!" prompt on start.
-3. **Build placement feedback** — clicking an invalid tile does nothing. Need flash/tooltip/sound for "can't build here".
-4. **Night too dark** — game nearly invisible during night phase. Raise floor.
-5. **Minimap click broken** — async import() in input.js doesn't resolve correctly.
-6. **Missions not triggering** — may be a module identity issue where missions.js imports a different G than main.js uses. Need to verify on a fresh load.
+1. **Missions not completing visually** — missions may need more game time to trigger (check runs every 60 ticks). Verify on a longer play session.
+2. **Minimap click broken** — async import() in input.js doesn't resolve correctly.
+3. **Workers should be visible at buildings** — citizens assigned to farms should visibly stand near the farm, not wander away.
+4. **No sound on production** — verify SFX fires when farms/buildings produce.
+5. **Research panel may need more play testing** — verify tech unlocks work end-to-end.
+
+## Dev Testing Note
+Use import map version bumping: change `?v=5` to `?v=6` etc. in index.html to bust browser module cache. Or clear site data from Chrome DevTools.
 
 ## Next Priority
-#2 (tutorial) or #3 (build feedback) — both critical for new-player experience. Also investigate #1 (module caching) since it blocks dev testing.
+Play a longer session (30+ days) at 4x speed to verify missions, raids, production, and research end-to-end.
 
 ## Shipped Features
 See MISSION.md for the complete feature list with checkmarks.

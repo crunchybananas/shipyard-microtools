@@ -36,10 +36,10 @@ export function screenToWorld(mx, my) {
 
 function getDaylight() {
   const t = G.dayPhase / G.dayLength;
-  if (t < 0.15) return 0.3 + (t/0.15)*0.7;
-  if (t < 0.6) return 1;
-  if (t < 0.75) return 1 - ((t-0.6)/0.15)*0.5;
-  return 0.5 - ((t-0.75)/0.25)*0.2;
+  if (t < 0.1) return 0.55 + (t/0.1)*0.45;  // dawn
+  if (t < 0.6) return 1;                      // day
+  if (t < 0.75) return 1 - ((t-0.6)/0.15)*0.35; // dusk
+  return 0.65 - ((t-0.75)/0.25)*0.1;          // night (floor 0.55)
 }
 
 export function render() {

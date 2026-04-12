@@ -188,6 +188,27 @@ export function renderHappinessPanel() {
     `<div class="hp-row hp-total"><span class="hp-label">Total</span><span class="hp-val">${total}%</span></div>`;
 }
 
+// ── Tutorial tips ──────────────────────────────────────────
+let lastTipId = '';
+const TIPS = [
+  { id:'start', check:()=>G.buildings.length===0, text:'👋 Welcome! Press 1 or click House to build shelter for your settlers.' },
+  { id:'house', check:()=>G.buildings.some(b=>b.type==='house') && !G.buildings.some(b=>b.type==='farm'), text:'🌾 Great! Now build a Farm (press 2) to produce food before your settlers starve.' },
+  { id:'farm', check:()=>G.buildings.some(b=>b.type==='farm') && G.resources.food<30 && G.day>5, text:'⚠️ Food is running low! Build more farms or your settlers will leave.' },
+  { id:'research', check:()=>G.buildings.length>=3 && G.researchedTechs.size<=2, text:'🔬 Open Research (top bar) to unlock new building types like Quarry and Market.' },
+  { id:'lumber', check:()=>G.researchedTechs.has('forestry') && !G.buildings.some(b=>b.type==='lumber') && G.resources.wood<20, text:'🪓 Wood is low! Build a Lumber Mill on a forest tile to produce wood.' },
+  { id:'raid', check:()=>G.day>=6 && G.defense===0, text:'⚔️ Raiders are coming! Research Military tech and build defenses.' },
+];
+
+export function updateTutorialTip() {
+  const tipEl = document.getElementById('tutorial-tip');
+  if (!tipEl) return;
+  for (const tip of TIPS) {
+    if (tip.id === lastTipId) continue;
+    try { if (tip.check()) { lastTipId = tip.id; tipEl.textContent = tip.text; tipEl.style.display = 'block'; return; } } catch {}
+  }
+  tipEl.style.display = 'none';
+}
+
 export function setupSaveButtons() {
   document.getElementById('btn-save')?.addEventListener('click', saveGame);
   document.getElementById('btn-load')?.addEventListener('click', () => {
