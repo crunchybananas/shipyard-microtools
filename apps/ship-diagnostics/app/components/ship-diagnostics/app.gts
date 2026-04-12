@@ -79,9 +79,14 @@ export default class ShipDiagnosticsApp extends Component {
   @tracked timeRange: [number, number] | null = null;
   @tracked isLive = false;
   @tracked unseenLive = 0;
+  @tracked sseUrl = "";
+  @tracked sseStatus: "idle" | "connecting" | "connected" | "error" = "idle";
+  @tracked sseStatusText = "";
   private liveTimer: ReturnType<typeof setTimeout> | null = null;
   private logListEl: HTMLElement | null = null;
   private liveCounter = 0;
+  private sseEventSource: EventSource | null = null;
+  private sseCounter = 0;
   private hashWriteTimer: ReturnType<typeof setTimeout> | null = null;
   private suppressHashWrite = false;
 
@@ -122,6 +127,10 @@ export default class ShipDiagnosticsApp extends Component {
       window.removeEventListener("hashchange", this.onHashChange);
     }
     if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
+    if (this.sseEventSource) {
+      this.sseEventSource.close();
+      this.sseEventSource = null;
+    }
   }
 
   private onHashChange = () => {
@@ -501,6 +510,146 @@ export default class ShipDiagnosticsApp extends Component {
     };
   }
 
+  // ── Live SSE endpoint ────────────────────────────────────────
+
+  get isSseConnected(): boolean {
+    return this.sseStatus === "connected" || this.sseStatus === "connecting";
+  }
+
+  get sseStatusClass(): string {
+    return `sse-status sse-${this.sseStatus}`;
+  }
+
+  get sseBtnLabel(): string {
+    if (this.sseStatus === "connecting") return "Connecting…";
+    if (this.sseStatus === "connected") return "Disconnect";
+    return "Connect";
+  }
+
+  onSseUrlInput = (e: Event) => {
+    this.sseUrl = (e.target as HTMLInputElement).value;
+  };
+
+  toggleSse = () => {
+    if (this.isSseConnected) {
+      this.disconnectSse();
+    } else {
+      this.connectSse();
+    }
+  };
+
+  private datasetNameForSse(url: string): string {
+    try {
+      const u = new URL(url);
+      return `Live SSE: ${u.host}${u.pathname}`;
+    } catch {
+      return `Live SSE: ${url || "endpoint"}`;
+    }
+  }
+
+  connectSse = () => {
+    const url = this.sseUrl.trim();
+    if (!url) return;
+    this.disconnectSse();
+    this.sseStatus = "connecting";
+    this.sseStatusText = "";
+
+    const datasetName = this.datasetNameForSse(url);
+    if (!this.datasets.find((d) => d.name === datasetName)) {
+      this.datasets = [...this.datasets, { name: datasetName, logs: [] }];
+    }
+    this.activeDatasetName = datasetName;
+    this.timeRange = null;
+
+    let es: EventSource;
+    try {
+      es = new EventSource(url);
+    } catch (err) {
+      this.sseStatus = "error";
+      this.sseStatusText = err instanceof Error ? err.message : "Failed to open";
+      return;
+    }
+    this.sseEventSource = es;
+
+    es.onopen = () => {
+      this.sseStatus = "connected";
+      this.sseStatusText = "Streaming";
+    };
+    es.onerror = () => {
+      this.sseStatus = "error";
+      this.sseStatusText = "Connection lost";
+    };
+    es.onmessage = (ev: MessageEvent) => {
+      const entry = this.parseSseMessage(ev.data, datasetName);
+      this.datasets = this.datasets.map((d) =>
+        d.name === datasetName ? { ...d, logs: [...d.logs, entry] } : d,
+      );
+      // Auto-scroll if at bottom
+      queueMicrotask(() => {
+        if (!this.logListEl) return;
+        const atBottom =
+          this.logListEl.scrollHeight -
+            (this.logListEl.scrollTop + this.logListEl.clientHeight) <
+          40;
+        if (atBottom) {
+          this.logListEl.scrollTop = this.logListEl.scrollHeight;
+        } else {
+          this.unseenLive++;
+        }
+      });
+    };
+  };
+
+  disconnectSse = () => {
+    if (this.sseEventSource) {
+      this.sseEventSource.close();
+      this.sseEventSource = null;
+    }
+    if (this.sseStatus !== "error") {
+      this.sseStatus = "idle";
+      this.sseStatusText = "";
+    }
+  };
+
+  private parseSseMessage(data: string, datasetName: string): LogEntry {
+    this.sseCounter++;
+    const id = `sse-${this.sseCounter}-${Date.now()}`;
+    const fallback: LogEntry = {
+      id,
+      timestamp: new Date().toISOString(),
+      level: "info",
+      service: datasetName,
+      message: data,
+    };
+    try {
+      const obj = JSON.parse(data) as Record<string, unknown>;
+      if (typeof obj !== "object" || obj === null) return fallback;
+      const level: LogLevel =
+        obj.level === "error" || obj.level === "warn" ? obj.level : "info";
+      return {
+        id,
+        timestamp:
+          typeof obj.timestamp === "string"
+            ? obj.timestamp
+            : new Date().toISOString(),
+        level,
+        service:
+          typeof obj.service === "string" ? obj.service : datasetName,
+        message:
+          typeof obj.message === "string" ? obj.message : JSON.stringify(obj),
+        tags: Array.isArray(obj.tags)
+          ? (obj.tags.filter((t) => typeof t === "string") as string[])
+          : undefined,
+        context:
+          typeof obj.context === "object" && obj.context !== null
+            ? (obj.context as Record<string, unknown>)
+            : undefined,
+      };
+    } catch {
+      return fallback;
+    }
+  }
+
   get isLiveBtnClass() {
     return this.isLive ? "primary live-on" : "primary";
   }
@@ -617,6 +766,20 @@ export default class ShipDiagnosticsApp extends Component {
             </div>
             <div class="button-row">
               <button class={{this.isLiveBtnClass}} type="button" {{on "click" this.toggleLive}}>{{this.liveBtnLabel}}</button>
+            </div>
+
+            <label>Live SSE endpoint</label>
+            <input
+              type="url"
+              placeholder="https://example.com/logs/stream"
+              value={{this.sseUrl}}
+              {{on "input" this.onSseUrlInput}}
+            />
+            <div class="button-row">
+              <button class="secondary" type="button" {{on "click" this.toggleSse}}>{{this.sseBtnLabel}}</button>
+              {{#if this.sseStatusText}}
+                <span class={{this.sseStatusClass}}>{{this.sseStatusText}}</span>
+              {{/if}}
             </div>
           </div>
         </aside>

@@ -499,3 +499,39 @@ footer {
   font-family: "SF Mono", Menlo, monospace;
   font-size: 0.75rem;
 }
+
+/* ── SSE status ────────────────────────────── */
+
+.sse-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-family: "SF Mono", Menlo, monospace;
+  letter-spacing: 0.04em;
+}
+
+.sse-status.sse-idle {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sse-status.sse-connecting {
+  background: rgba(95, 211, 255, 0.15);
+  color: #5fd3ff;
+  border: 1px solid rgba(95, 211, 255, 0.4);
+}
+
+.sse-status.sse-connected {
+  background: rgba(52, 211, 153, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+}
+
+.sse-status.sse-error {
+  background: rgba(255, 107, 107, 0.18);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+}
