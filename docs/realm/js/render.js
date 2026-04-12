@@ -69,14 +69,16 @@ export function render() {
   const daylight = getDaylight();
 
   // ── Tiles ─────────────────────────────────────────────────
-  // Viewport culling
-  const tl = screenToWorld(0, 0);
-  const br = screenToWorld(C.width, C.height);
-  const pad = 4;
-  const minX = Math.max(0, Math.floor(tl.x) - pad);
-  const maxX = Math.min(MAP_W-1, Math.ceil(br.x) + pad);
-  const minY = Math.max(0, Math.floor(tl.y) - pad);
-  const maxY = Math.min(MAP_H-1, Math.ceil(br.y) + pad);
+  // Viewport culling — isometric needs all 4 screen corners
+  const c0 = screenToWorld(0, 0);
+  const c1 = screenToWorld(C.width, 0);
+  const c2 = screenToWorld(0, C.height);
+  const c3 = screenToWorld(C.width, C.height);
+  const pad = 2;
+  const minX = Math.max(0, Math.floor(Math.min(c0.x, c1.x, c2.x, c3.x)) - pad);
+  const maxX = Math.min(MAP_W-1, Math.ceil(Math.max(c0.x, c1.x, c2.x, c3.x)) + pad);
+  const minY = Math.max(0, Math.floor(Math.min(c0.y, c1.y, c2.y, c3.y)) - pad);
+  const maxY = Math.min(MAP_H-1, Math.ceil(Math.max(c0.y, c1.y, c2.y, c3.y)) + pad);
 
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
