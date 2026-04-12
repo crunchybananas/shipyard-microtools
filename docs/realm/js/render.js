@@ -69,7 +69,18 @@ export function render() {
       const tile = G.map[y][x];
       const s = toScreen(x, y);
       const colors = TILE_COLORS[tile];
-      ctx.fillStyle = colors[(x+y)%2];
+      let tileColor = colors[(x+y)%2];
+
+      // Grass shade variation via position hash
+      if (tile === TILE.GRASS || tile === TILE.SAND) {
+        const h = ((x * 374761 + y * 668265) & 0xff) / 255;
+        const shade = tile === TILE.GRASS
+          ? (h < 0.33 ? '#3d6b42' : h < 0.66 ? '#4a7c4f' : '#558c5a')
+          : (h < 0.5 ? '#d4a76a' : '#c99a5c');
+        tileColor = shade;
+      }
+
+      ctx.fillStyle = tileColor;
       ctx.globalAlpha = daylight;
 
       ctx.beginPath();
@@ -79,6 +90,27 @@ export function render() {
       ctx.lineTo(s.x - TW/2, s.y);
       ctx.closePath();
       ctx.fill();
+
+      // Beach edge shimmer on sand tiles adjacent to water
+      if (tile === TILE.SAND) {
+        const hasWater = (
+          (x>0 && G.map[y][x-1]===TILE.WATER) ||
+          (x<MAP_W-1 && G.map[y][x+1]===TILE.WATER) ||
+          (y>0 && G.map[y-1][x]===TILE.WATER) ||
+          (y<MAP_H-1 && G.map[y+1][x]===TILE.WATER)
+        );
+        if (hasWater) {
+          const shimmer = 0.08 + 0.04 * Math.sin(G.gameTick * 0.03 + x + y);
+          ctx.fillStyle = `rgba(120,180,255,${shimmer})`;
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y - TH/2);
+          ctx.lineTo(s.x + TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x - TW/2, s.y);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
 
       // Tile features
       if (tile === TILE.FOREST) drawTree(ctx, s.x, s.y-8, daylight);
@@ -117,30 +149,64 @@ export function render() {
     const s = toScreen(c.x, c.y);
     ctx.globalAlpha = daylight;
 
+    // Walking bob when moving
+    const isMoving = c.path && c.pathIdx < (c.path?.length ?? 0);
+    const bob = isMoving ? Math.sin(G.gameTick * 0.25 + c.x * 3) * 1.5 : 0;
+    const cy = s.y + bob;
+
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.ellipse(s.x, s.y+2, 4, 2, 0, 0, Math.PI*2);
+    ctx.ellipse(s.x, cy+2, 4, 2, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // Body (color by state)
-    const bodyColor = c.state==='working' ? '#f0c040' : c.state==='eating' ? '#4ade80' : c.carrying ? '#60a5fa' : '#ddd';
+    // Legs (when walking)
+    if (isMoving) {
+      const legSwing = Math.sin(G.gameTick * 0.3 + c.x * 3) * 2;
+      ctx.fillStyle = '#555';
+      ctx.fillRect(s.x - 2, cy - 2, 1.5, 3 + legSwing * 0.3);
+      ctx.fillRect(s.x + 0.5, cy - 2, 1.5, 3 - legSwing * 0.3);
+    }
+
+    // Body — job-colored clothing
+    let bodyColor = '#bbb'; // idle: grey
+    if (c.jobBuilding) {
+      const jt = c.jobBuilding.type;
+      if (jt === 'farm') bodyColor = '#7cb342';
+      else if (jt === 'lumber') bodyColor = '#a3714f';
+      else if (jt === 'quarry' || jt === 'mine') bodyColor = '#6a7a8a';
+      else if (jt === 'market') bodyColor = '#e8a040';
+      else if (jt === 'barracks') bodyColor = '#5a6a7a';
+      else if (jt === 'tavern') bodyColor = '#c07040';
+      else bodyColor = '#8899aa';
+    }
+    if (c.state === 'eating') bodyColor = '#4ade80';
+
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
-    ctx.arc(s.x, s.y-6, 3, 0, Math.PI*2);
+    ctx.arc(s.x, cy - 6, 3, 0, Math.PI * 2);
     ctx.fill();
 
     // Head
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
-    ctx.arc(s.x, s.y-12, 2.5, 0, Math.PI*2);
+    ctx.arc(s.x, cy - 12, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Carrying indicator
+    // Hair (tiny variation)
+    const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
+    ctx.fillStyle = ['#3a2a1a','#8a6a3a','#2a2a2a','#c08050'][hairHash];
+    ctx.beginPath();
+    ctx.arc(s.x, cy - 13.5, 2, Math.PI * 0.8, Math.PI * 2.2);
+    ctx.fill();
+
+    // Carrying indicator (resource on shoulder)
     if (c.carrying) {
       const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
       ctx.fillStyle = cc;
-      ctx.fillRect(s.x-2, s.y-5, 4, 4);
+      ctx.fillRect(s.x + 2, cy - 10, 3, 3);
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.fillRect(s.x + 2, cy - 10, 3, 1);
     }
   }
 
@@ -148,13 +214,22 @@ export function render() {
   for (const p of G.particles) {
     const s = toScreen(p.tx, p.ty);
     ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 11px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 3;
-    ctx.fillText(p.text, s.x, s.y + p.offsetY - 20);
-    ctx.shadowBlur = 0;
+
+    if (p.type === 'smoke') {
+      const sz = p.size || 2;
+      ctx.fillStyle = `rgba(180,180,200,${ctx.globalAlpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y + p.offsetY - 20, sz, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px -apple-system,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 3;
+      ctx.fillText(p.text, s.x, s.y + p.offsetY - 20);
+      ctx.shadowBlur = 0;
+    }
   }
 
   // ── Build ghost ───────────────────────────────────────────

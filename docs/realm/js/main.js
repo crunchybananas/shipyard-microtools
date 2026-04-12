@@ -8,7 +8,7 @@ import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
 import { updateProduction, checkRaids } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
-import { updateParticles } from './particles.js';
+import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
 import { updateUI, renderBuildBar, setSpeed, setupSaveButtons } from './ui.js';
 import { saveGame } from './save.js';
@@ -52,6 +52,7 @@ function gameLoop() {
       updateCitizens();
       updateProduction();
       updateParticles();
+      updateSmokeEmitters();
       if (G.gameTick % 60 === 0) checkMissions();
     }
     if (G.gameTick % 30 === 0) {

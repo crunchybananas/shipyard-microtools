@@ -37,11 +37,11 @@ docs/realm/
 - [ ] **Web Audio SFX** — build click, production ding, raid alarm, mission fanfare. Pure oscillator synthesis.
 
 ### Phase 2: Visual Polish (make it beautiful)
-- [ ] **Isometric Building Sprites** — each of 12 types drawn as proper canvas path art. Houses with peaked roofs/chimneys, farms with field patterns, towers with crenellations, etc. NO emoji — pure drawn art.
-- [ ] **Minimap** — 160x160 corner canvas. Full island, building markers, citizen dots, camera viewport rect. Click to jump.
-- [ ] **Terrain Polish** — beach wave edges, grass variation, shadow on elevation changes, water animation.
-- [ ] **Citizen Variety** — different colored clothing per job, walking animation (bob), tool carrying.
-- [ ] **Particle Effects** — smoke from chimneys, sparkles from production, dust on construction.
+- [x] **Isometric Building Sprites** — each of 12 types drawn as proper canvas path art. Houses with peaked roofs/chimneys, farms with field patterns, towers with crenellations, etc. NO emoji — pure drawn art.
+- [x] **Minimap** — 160x160 corner canvas. Full island, building markers, citizen dots, camera viewport rect. Click to jump.
+- [x] **Terrain Polish** — beach wave edges on sand tiles adjacent to water, grass shade variation per tile via position hash (3 shades), animated water ripples.
+- [x] **Citizen Variety** — job-colored clothing (green=farm, brown=lumber, grey=quarry, gold=market, etc.), walking bob animation (sin-based vertical oscillation), leg swing, hair variety per name hash, shoulder-mounted resource carrying.
+- [x] **Particle Effects** — smoke rising from chimneys (houses, taverns, lumber mills), drifts sideways, grows and fades. Capped at 200 particles.
 
 ### Phase 3: Depth (make it strategic)
 - [ ] **Building Selection & Info** — click building → info panel (HP, workers, rate). Right-click demolish with half refund.
