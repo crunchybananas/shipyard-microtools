@@ -228,7 +228,7 @@ export function render() {
         ctx.fillRect(s.x + 4 - rh%5, s.y - 1, 1.5, 1.5);
       }
       else if (tile === TILE.IRON) drawIronOre(ctx, s.x, s.y-4, daylight);
-      else if (tile === TILE.WATER) drawWater(ctx, s.x, s.y, daylight);
+      else if (tile === TILE.WATER) drawWater(ctx, s.x, s.y, daylight, x, y);
       else if (tile === TILE.MOUNTAIN) {
         const mh = ((x * 37 + y * 53) & 0xff);
         // Shadow at base
@@ -1298,74 +1298,178 @@ function drawIronOre(ctx, x, y, a) {
   ctx.fillRect(x+2, y-1, 2, 2);
 }
 
-function drawWater(ctx, x, y, a) {
-  const t = G.gameTick * 0.015;
-  // Animated highlight shimmer
-  ctx.globalAlpha = a * 0.5;
-  const shimmer = 0.15 + 0.08 * Math.sin(t + x * 0.1 + y * 0.07);
-  ctx.fillStyle = `rgba(100,180,255,${shimmer})`;
+function drawWater(ctx, x, y, a, tx, ty) {
+  // tx/ty = tile grid coords for per-tile variation and foam detection
+  const t = G.gameTick * 0.018;
+  // Per-tile phase offset so neighbouring tiles don't animate in lockstep
+  const phase = (tx * 2.3 + ty * 1.7) % (Math.PI * 2);
+
+  // ── Layer 1: deep colour gradient across the diamond ────────
+  // Shift between deep navy and rich cobalt with a gentle pulse
+  const depthPulse = 0.12 + 0.06 * Math.sin(t * 0.6 + phase);
+  ctx.globalAlpha = a * (0.55 + depthPulse);
+  ctx.fillStyle = 'rgba(20,90,170,1)';   // deep base
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
   ctx.fill();
-  // Wave lines
-  ctx.globalAlpha = a * 0.45;
-  ctx.strokeStyle = 'rgba(180,220,255,0.4)';
+
+  // ── Layer 2: mid-water colour tint (lighter cobalt) ─────────
+  ctx.globalAlpha = a * (0.35 + 0.1 * Math.sin(t * 0.9 + phase + 1));
+  ctx.fillStyle = 'rgba(60,150,220,1)';
+  ctx.beginPath();
+  ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
+  ctx.closePath();
+  ctx.fill();
+
+  // ── Layer 3: animated wave crests (sinusoidal stripes) ──────
+  // Three wave bands spaced vertically across the tile
   ctx.lineWidth = 1;
-  for (let i = -12; i <= 12; i += 8) {
+  const waveRows = [-8, 0, 8];
+  for (let i = 0; i < waveRows.length; i++) {
+    const rowY = waveRows[i];
+    // Alternate direction so adjacent rows look natural
+    const dir = (i % 2 === 0) ? 1 : -1;
+    const wAlpha = 0.22 + 0.12 * Math.sin(t * 1.4 + phase + i * 1.1);
+    ctx.globalAlpha = a * wAlpha;
+    ctx.strokeStyle = `rgba(160,215,255,1)`;
     ctx.beginPath();
-    for (let dx = -14; dx <= 14; dx += 3) {
+    // Clip wave to the diamond by stepping through isometric x-range
+    // The diamond at row offset rowY spans from -halfW to +halfW
+    // where halfW = 32 * (1 - |rowY|/16)
+    const halfW = 32 * (1 - Math.abs(rowY) / 18);
+    const step = 4;
+    let started = false;
+    for (let dx = -halfW; dx <= halfW; dx += step) {
       const wx = x + dx;
-      const wy = y + i * 0.5 + Math.sin(t * 1.3 + dx * 0.15 + i) * 2;
-      dx === -14 ? ctx.moveTo(wx, wy) : ctx.lineTo(wx, wy);
+      // Two overlapping sine waves travelling in opposite directions
+      const wy = y + rowY * 0.5
+        + Math.sin(t * 1.6 * dir + dx * 0.22 + phase + i) * 1.8
+        + Math.sin(t * 0.9 + dx * 0.14 + phase * 0.5) * 1.0;
+      if (!started) { ctx.moveTo(wx, wy); started = true; }
+      else ctx.lineTo(wx, wy);
     }
     ctx.stroke();
   }
-  // Specular highlight dot
-  const sx = Math.sin(t * 0.7 + x) * 6;
-  const sy = Math.cos(t * 0.5 + y) * 3;
-  ctx.fillStyle = `rgba(220,240,255,${0.15 + 0.1 * Math.sin(t * 2)})`;
-  ctx.beginPath();
-  ctx.arc(x + sx, y + sy, 2, 0, Math.PI * 2);
-  ctx.fill();
+
+  // ── Layer 4: bright specular glints (2–3 tiny sparkles) ────
+  const numGlints = 2 + ((tx * 3 + ty * 7) & 1); // 2 or 3 per tile
+  for (let g = 0; g < numGlints; g++) {
+    // Deterministic but animated position
+    const gPhase = phase + g * 2.1;
+    const gx = x + Math.sin(t * 0.8 + gPhase) * 14;
+    const gy = y + Math.cos(t * 0.6 + gPhase) * 7;
+    const gSize = 1.2 + 0.8 * Math.sin(t * 2.5 + gPhase);
+    const gAlpha = 0.3 + 0.25 * Math.sin(t * 3.0 + gPhase);
+    ctx.globalAlpha = a * Math.max(0, gAlpha);
+    ctx.fillStyle = 'rgba(230,245,255,1)';
+    ctx.beginPath();
+    ctx.arc(gx, gy, gSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ── Layer 5: foam at land-adjacent edges ────────────────────
+  // Check all 4 cardinal neighbours; draw a white arc on each land edge
+  const neighbours = [
+    { dx:  0, dy: -1, ex: x,      ey: y - 16, ax: x - 32, ay: y,      bx: x + 32, by: y      }, // top
+    { dx:  1, dy:  0, ex: x + 32, ey: y,      ax: x,      ay: y - 16, bx: x,      by: y + 16 }, // right
+    { dx:  0, dy:  1, ex: x,      ey: y + 16, ax: x - 32, ay: y,      bx: x + 32, by: y      }, // bottom
+    { dx: -1, dy:  0, ex: x - 32, ey: y,      ax: x,      ay: y - 16, bx: x,      by: y + 16 }, // left
+  ];
+  const foamPulse = 0.55 + 0.2 * Math.sin(t * 1.2 + phase);
+  ctx.lineWidth = 1.5;
+  for (const n of neighbours) {
+    const nx = tx + n.dx, ny = ty + n.dy;
+    const isLand = nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H
+      && G.map[ny][nx] !== TILE.WATER;
+    if (!isLand) continue;
+    // Draw a short foamy stroke along the shared edge using a midpoint
+    ctx.globalAlpha = a * foamPulse;
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    // Midpoints of the two half-edges that form the shared diamond side
+    const m1x = (n.ex + n.ax) / 2, m1y = (n.ey + n.ay) / 2;
+    const m2x = (n.ex + n.bx) / 2, m2y = (n.ey + n.by) / 2;
+    ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
+    ctx.stroke();
+    // Secondary softer foam halo
+    ctx.globalAlpha = a * foamPulse * 0.35;
+    ctx.strokeStyle = 'rgba(200,235,255,1)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
+    ctx.stroke();
+    ctx.lineWidth = 1.5;
+  }
+
+  ctx.globalAlpha = a; // restore
 }
 
 // ── Minimap ─────────────────────────────────────────────────
-const MINI_COLORS = {0:'#1e3a5f',1:'#d4a76a',2:'#4a7c4f',3:'#2d5a30',4:'#6b7280',5:'#4b6fa0',6:'#4a4a5a'};
+const MINI_COLORS = {0:'#1a6aaa',1:'#d4a76a',2:'#4a7c4f',3:'#2d5a30',4:'#6b7280',5:'#4b6fa0',6:'#4a4a5a'};
+const MINI_BUILD = {
+  house:'#e8a060', farm:'#7cb342', lumber:'#a3714f', quarry:'#9ca3af',
+  mine:'#5577aa', market:'#fbbf24', barracks:'#ef4444', tower:'#f87171',
+  wall:'#9ca3af', road:'#6b7280', tradingpost:'#f59e0b', granary:'#d4a76a',
+  church:'#e0e0ff', school:'#93c5fd', castle:'#ffd166', tavern:'#c084fc',
+  well:'#60a5fa',
+};
 
 function renderMinimap() {
   const mc = minimapCtx;
-  const mw = 160, mh = 160;
-  const sx = mw/MAP_W, sy = mh/MAP_H;
-  mc.fillStyle = '#0a0e1a';
-  mc.fillRect(0,0,mw,mh);
+  const mw = minimapC.width, mh = minimapC.height;
+  const sx = mw / MAP_W, sy = mh / MAP_H;
 
-  for (let y=0;y<MAP_H;y++) for (let x=0;x<MAP_W;x++) {
-    if (!G.fog[y][x]) continue;
-    mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#000';
-    mc.fillRect(x*sx, y*sy, Math.ceil(sx), Math.ceil(sy));
+  // Background
+  mc.fillStyle = '#08090f';
+  mc.fillRect(0, 0, mw, mh);
+
+  // Terrain tiles — explored only
+  for (let y = 0; y < MAP_H; y++) {
+    for (let x = 0; x < MAP_W; x++) {
+      if (!G.fog[y][x]) continue;
+      mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
+      mc.fillRect(x * sx, y * sy, Math.ceil(sx), Math.ceil(sy));
+    }
   }
 
-  const MINI_BUILD = {
-    house:'#e8a060', farm:'#7cb342', lumber:'#a3714f', quarry:'#888',
-    mine:'#5577aa', market:'#e8a040', barracks:'#aa3333', tower:'#aa3333',
-    wall:'#777', road:'#555', tradingpost:'#d4a030', granary:'#c09060',
-    church:'#ddd', school:'#88aacc', castle:'#ffd166',
-  };
+  // Buildings as colored circle dots with a dark halo so they pop against terrain
   for (const b of G.buildings) {
+    const bx = (b.x + 0.5) * sx;
+    const by = (b.y + 0.5) * sy;
+    const r = b.type === 'castle' ? 3.5 : b.type === 'tower' || b.type === 'church' ? 2.5 : 2;
+    mc.beginPath();
+    mc.arc(bx, by, r + 1, 0, Math.PI * 2);
+    mc.fillStyle = 'rgba(0,0,0,0.65)';
+    mc.fill();
+    mc.beginPath();
+    mc.arc(bx, by, r, 0, Math.PI * 2);
     mc.fillStyle = MINI_BUILD[b.type] || '#fff';
-    mc.fillRect(b.x*sx, b.y*sy, Math.ceil(sx)+1, Math.ceil(sy)+1);
+    mc.fill();
   }
 
-  mc.fillStyle = '#ff0';
+  // Citizens as tiny bright yellow dots
+  mc.fillStyle = '#facc15';
   for (const c of G.citizens) {
-    mc.fillRect(Math.floor(c.x*sx), Math.floor(c.y*sy), 2, 2);
+    mc.fillRect(Math.round(c.x * sx) - 0.5, Math.round(c.y * sy) - 0.5, 2, 2);
   }
 
-  // Camera viewport
+  // Camera viewport — dark shadow stroke then bright white outline
   const tl = screenToWorld(0, 50);
-  const br = screenToWorld(C.width, C.height-50);
-  mc.strokeStyle = 'rgba(255,255,255,0.6)';
-  mc.lineWidth = 1;
-  mc.strokeRect(tl.x*sx, tl.y*sy, (br.x-tl.x)*sx, (br.y-tl.y)*sy);
+  const br = screenToWorld(C.width, C.height - 50);
+  const vx = tl.x * sx, vy = tl.y * sy;
+  const vw = (br.x - tl.x) * sx, vh = (br.y - tl.y) * sy;
+  mc.strokeStyle = 'rgba(0,0,0,0.5)';
+  mc.lineWidth = 3;
+  mc.strokeRect(vx, vy, vw, vh);
+  mc.strokeStyle = 'rgba(255,255,255,0.85)';
+  mc.lineWidth = 1.5;
+  mc.strokeRect(vx, vy, vw, vh);
+
+  // Subtle inner vignette for depth
+  const vign = mc.createRadialGradient(mw / 2, mh / 2, mw * 0.3, mw / 2, mh / 2, mw * 0.72);
+  vign.addColorStop(0, 'rgba(0,0,0,0)');
+  vign.addColorStop(1, 'rgba(0,0,0,0.35)');
+  mc.fillStyle = vign;
+  mc.fillRect(0, 0, mw, mh);
 }

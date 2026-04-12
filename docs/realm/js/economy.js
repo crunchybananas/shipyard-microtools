@@ -30,7 +30,7 @@ export function placeBuilding(type, tx, ty) {
   if (!canPlace(type,tx,ty) || !canAfford(type)) return false;
   const def = BUILDINGS[type];
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] -= v;
-  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null };
+  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null, prodShowCount:0 };
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
   if (def.pop) { G.maxPop += def.pop; trySpawnSettlers(def.pop); }
@@ -96,13 +96,16 @@ export function updateProduction() {
           G.resources[k] = (G.resources[k]||0) + v;
         }
       }
-      // Floating particle either way
-      for (const [k,v] of Object.entries(adjustedProd)) {
-        G.particles.push({
-          tx: b.x, ty: b.y, offsetY: 0,
-          text: `+${v} ${resourceEmoji(k)}`,
-          alpha: 1.5, vy: -0.3,
-        });
+      // Floating particle — show every 3rd production cycle to keep it subtle
+      b.prodShowCount = (b.prodShowCount || 0) + 1;
+      if (b.prodShowCount % 3 === 0) {
+        for (const [k,v] of Object.entries(adjustedProd)) {
+          if (v > 0) G.particles.push({
+            tx: b.x, ty: b.y, offsetY: 0,
+            text: `+${v} ${resourceEmoji(k)}`,
+            alpha: 1.5, vy: -0.4, type: 'text',
+          });
+        }
       }
       playSound('produce');
     }

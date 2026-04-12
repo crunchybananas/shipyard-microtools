@@ -92,7 +92,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #info-panel{position:fixed;top:3rem;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;z-index:15;backdrop-filter:blur(10px);font-size:0.78rem;line-height:1.6;display:none;min-width:180px;text-align:center}
 
 /* Minimap */
-#minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:160px;height:160px;border:1px solid var(--border);border-radius:6px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated}
+#minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:200px;height:200px;border:2px solid rgba(129,140,248,0.35);border-radius:8px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated;box-shadow:0 0 0 1px rgba(0,0,0,0.6),0 4px 16px rgba(0,0,0,0.5),inset 0 0 8px rgba(0,0,0,0.4)}
 
 /* Notification log */
 #log-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,90vw);max-height:70vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
@@ -224,7 +224,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   .build-btn{min-width:52px;padding:0.35rem 0.45rem;font-size:0.62rem}
   .build-btn .icon{font-size:1.1rem}
   #missions{width:170px;font-size:0.68rem;top:2.5rem;right:0.4rem}
-  #minimap{width:120px;height:120px;bottom:3.5rem}
+  #minimap{width:150px;height:150px;bottom:3.5rem}
 }
 </style>
 </head>
@@ -294,7 +294,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 </div>
 
 <div id="info-panel"></div>
-<canvas id="minimap" width="160" height="160"></canvas>
+<canvas id="minimap" width="200" height="200"></canvas>
 
 <div id="happiness-panel" style="display:none">
   <div class="hp-header"><h3>😊 Happiness Breakdown</h3><button class="rp-close" onclick="toggleHappiness()">✕</button></div>
