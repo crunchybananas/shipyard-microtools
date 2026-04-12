@@ -612,15 +612,108 @@ export function render() {
     ctx.fillText(BUILDINGS[G.selectedBuild].icon, s.x, s.y-4);
   }
 
-  // Night overlay
+  // Night overlay — gradient instead of flat fill
   if (daylight < 0.8) {
-    ctx.globalAlpha = (1-daylight) * 0.4;
-    ctx.fillStyle = '#0a0e2e';
+    const overlayAlpha = (1-daylight) * 0.45;
+    ctx.globalAlpha = overlayAlpha;
+    // Radial gradient: deeper blue at edges, slightly lighter center
+    const nightGrad = ctx.createRadialGradient(0, -2000, 500, 0, 0, 7000);
+    nightGrad.addColorStop(0, 'rgba(8,10,30,0.6)');
+    nightGrad.addColorStop(0.5, 'rgba(5,8,25,0.85)');
+    nightGrad.addColorStop(1, 'rgba(2,4,18,1)');
+    ctx.fillStyle = nightGrad;
     ctx.fillRect(-5000,-5000,10000,10000);
+  }
+
+  // Sunset/sunrise horizon glow (dawn: t<0.1, dusk: t 0.6–0.75)
+  const dayT = G.dayPhase / G.dayLength;
+  let horizonAlpha = 0;
+  let horizonColor = '255,120,60';
+  if (dayT < 0.1) {
+    // Dawn: fade in then out quickly
+    horizonAlpha = Math.sin((dayT / 0.1) * Math.PI) * 0.55;
+    horizonColor = '255,140,60'; // warm orange-gold dawn
+  } else if (dayT >= 0.6 && dayT < 0.75) {
+    // Dusk: fade in then out
+    horizonAlpha = Math.sin(((dayT - 0.6) / 0.15) * Math.PI) * 0.65;
+    horizonColor = '220,80,30'; // deeper red-orange dusk
+  }
+  if (horizonAlpha > 0) {
+    // Draw in world-space: a wide horizontal band near the horizon line
+    ctx.globalAlpha = horizonAlpha;
+    const horizonGrad = ctx.createLinearGradient(0, -600, 0, 600);
+    horizonGrad.addColorStop(0, `rgba(${horizonColor},0)`);
+    horizonGrad.addColorStop(0.35, `rgba(${horizonColor},0.6)`);
+    horizonGrad.addColorStop(0.5, `rgba(${horizonColor},0.85)`);
+    horizonGrad.addColorStop(0.65, `rgba(${horizonColor},0.6)`);
+    horizonGrad.addColorStop(1, `rgba(${horizonColor},0)`);
+    ctx.fillStyle = horizonGrad;
+    ctx.fillRect(-5000, -600, 10000, 1200);
   }
 
   ctx.globalAlpha = 1;
   ctx.restore();
+
+  // ── Stars & Moon (screen space, drawn during night/dawn/dusk) ─
+  const nightStrength = Math.max(0, (0.8 - daylight) / 0.25); // 0→1 as daylight 0.8→0.55
+  if (nightStrength > 0) {
+    // ── Stars ──────────────────────────────────────────────────
+    // Generate a stable star field seeded by index (no RNG each frame)
+    const STAR_COUNT = 180;
+    ctx.save();
+    for (let i = 0; i < STAR_COUNT; i++) {
+      // Pseudo-random but stable positions via deterministic hash
+      const px = ((i * 2971 + 7) % 997) / 997;   // 0..1
+      const py = ((i * 1867 + 13) % 883) / 883;  // 0..1
+      // Keep stars in upper ~65% of screen (sky area)
+      const sx = px * C.width;
+      const sy = py * C.height * 0.65;
+      // Twinkle: each star has its own phase offset
+      const phase = (i * 0.37) % (Math.PI * 2);
+      const twinkle = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(G.gameTick * 0.04 + phase));
+      // Vary star sizes: most tiny, some slightly larger
+      const baseSize = i % 11 === 0 ? 1.6 : i % 5 === 0 ? 1.2 : 0.8;
+      const alpha = nightStrength * twinkle * (0.55 + 0.45 * Math.sin(phase * 2));
+      ctx.globalAlpha = Math.min(1, alpha);
+      // Slight blue-white color variation
+      const bright = Math.floor(200 + 55 * twinkle);
+      const blueShift = i % 3 === 0 ? 255 : bright;
+      ctx.fillStyle = `rgb(${bright},${bright},${blueShift})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, baseSize, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // ── Moon ───────────────────────────────────────────────────
+    ctx.save();
+    const moonX = C.width * 0.82;
+    const moonY = C.height * 0.14;
+    const moonR = 22;
+    const moonAlpha = nightStrength * 0.92;
+    ctx.globalAlpha = moonAlpha;
+    // Soft glow halo
+    const moonGlow = ctx.createRadialGradient(moonX, moonY, moonR * 0.8, moonX, moonY, moonR * 2.8);
+    moonGlow.addColorStop(0, 'rgba(200,210,255,0.18)');
+    moonGlow.addColorStop(1, 'rgba(200,210,255,0)');
+    ctx.fillStyle = moonGlow;
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, moonR * 2.8, 0, Math.PI * 2);
+    ctx.fill();
+    // Moon body (pale silver-white)
+    ctx.fillStyle = 'rgb(230,235,255)';
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+    ctx.fill();
+    // Crescent shadow: offset circle to carve the crescent
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.92)';
+    ctx.beginPath();
+    ctx.arc(moonX + moonR * 0.55, moonY - moonR * 0.05, moonR * 0.88, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
+  }
 
   // ── Screen-space vignette (atmospheric edge fog) ──────────
   const vw = C.width, vh = C.height;

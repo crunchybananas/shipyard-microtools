@@ -85,6 +85,8 @@ export function setupInput(canvas) {
 
   C.addEventListener('mousemove', e => {
     if (G.dragging) {
+      // Safety: if no mouse button is held (e.g. mouseup missed by automation), stop dragging
+      if (e.buttons === 0) { G.dragging = false; return; }
       G.camera.x = G.camStart.x - (e.clientX - G.dragStart.x) / G.camera.zoom;
       G.camera.y = G.camStart.y - (e.clientY - G.dragStart.y) / G.camera.zoom;
     }
@@ -92,6 +94,8 @@ export function setupInput(canvas) {
   });
 
   C.addEventListener('mouseup', () => { G.dragging = false; });
+  C.addEventListener('mouseleave', () => { G.dragging = false; });
+  window.addEventListener('mouseup', () => { G.dragging = false; });
 
   C.addEventListener('wheel', e => {
     e.preventDefault();

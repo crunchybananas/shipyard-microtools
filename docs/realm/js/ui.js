@@ -55,6 +55,7 @@ export function renderBuildBar() {
   const bar = document.getElementById('build-bar');
   if (!bar) return;
   bar.innerHTML = '';
+  const allKeys = Object.keys(BUILDINGS);
   for (const [key, def] of Object.entries(BUILDINGS)) {
     if (!isBuildingUnlocked(key)) continue; // hide locked buildings
     const affordable = canAfford(key);
@@ -65,7 +66,10 @@ export function renderBuildBar() {
     const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
     const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
     const terrainTag = terrainReq ? `<span class="cost terrain">⬡ ${terrainReq}</span>` : '';
-    btn.innerHTML = `<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>${terrainTag}`;
+    // Keyboard shortcut number (1-based index in BUILDINGS declaration order)
+    const shortcutNum = allKeys.indexOf(key) + 1;
+    const shortcutBadge = shortcutNum <= 9 ? `<span class="build-btn-shortcut">${shortcutNum}</span>` : '';
+    btn.innerHTML = `${shortcutBadge}<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>${terrainTag}`;
     btn.onclick = () => {
       G.selectedBuild = G.selectedBuild === key ? null : key;
       G.selectedBuilding = null;
