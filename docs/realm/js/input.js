@@ -2,7 +2,7 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
 import { screenToWorld } from './render.js';
 import { placeBuilding, demolishBuilding } from './economy.js';
 import { initAudio, playSound } from './audio.js';
@@ -162,4 +162,26 @@ export function setupInput(canvas) {
       G.camera.y = (tileX + tileY) * 16;
     });
   }
+
+  // Edge-scroll: move mouse to screen edge to pan camera (classic RTS)
+  const EDGE_SIZE = 30; // pixels from edge to trigger
+  const EDGE_SPEED = 4; // camera units per frame
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+  function edgeScrollTick() {
+    if (G.speed === 0) { requestAnimationFrame(edgeScrollTick); return; }
+    const w = window.innerWidth, h = window.innerHeight;
+    let dx = 0, dy = 0;
+    if (mouseX < EDGE_SIZE) dx = -EDGE_SPEED;
+    else if (mouseX > w - EDGE_SIZE) dx = EDGE_SPEED;
+    if (mouseY < EDGE_SIZE + 40) dy = -EDGE_SPEED; // +40 to avoid HUD
+    else if (mouseY > h - EDGE_SIZE - 50) dy = EDGE_SPEED; // -50 to avoid build bar
+    if ((dx || dy) && !G.dragging) {
+      G.camera.x += dx / G.camera.zoom;
+      G.camera.y += dy / G.camera.zoom;
+    }
+    requestAnimationFrame(edgeScrollTick);
+  }
+  if (document.visibilityState === 'visible') edgeScrollTick();
 }
