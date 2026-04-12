@@ -50,39 +50,45 @@ function updateTime() {
 }
 
 // ── Game Loop ──────────────────────────────────────────────
+function simTick() {
+  if (G.speed <= 0) return;
+  for (let i = 0; i < G.speed; i++) {
+    G.gameTick++;
+    updateTime();
+    updateCitizens();
+    updateProduction();
+    updateParticles();
+    updateSmokeEmitters();
+    updateResearch();
+    if (G.gameTick % 60 === 0) {
+      checkMissions();
+      renderMissions();
+      renderResearchPanel();
+    }
+  }
+  if (G.gameTick % 30 === 0) {
+    updateUI();
+    renderBuildBar();
+    updateTutorialTip();
+  }
+  if (G.gameTick % 3600 === 0) saveGame();
+}
+
 function gameLoop() {
   try {
-    if (G.speed > 0) {
-      for (let i = 0; i < G.speed; i++) {
-        G.gameTick++;
-        updateTime();
-        updateCitizens();
-        updateProduction();
-        updateParticles();
-        updateSmokeEmitters();
-        updateResearch();
-        if (G.gameTick % 60 === 0) {
-          checkMissions();
-          renderMissions();
-          renderResearchPanel();
-        }
-      }
-      if (G.gameTick % 30 === 0) {
-        updateUI();
-        renderBuildBar();
-        updateTutorialTip();
-      }
-      if (G.gameTick % 3600 === 0) saveGame();
+    if (document.visibilityState === 'visible') {
+      simTick();
+      render();
+      requestAnimationFrame(gameLoop);
+    } else {
+      // Hidden tab: Chrome throttles setTimeout to ~1/sec.
+      // Batch 60 sim ticks per call to keep game running at full speed.
+      for (let i = 0; i < 60; i++) simTick();
+      setTimeout(gameLoop, 16);
     }
-    render();
   } catch (e) {
     console.error('Game loop error:', e);
-  }
-  // Use rAF when visible, setTimeout when hidden (Chrome pauses rAF for hidden tabs)
-  if (document.visibilityState === 'visible') {
-    requestAnimationFrame(gameLoop);
-  } else {
-    setTimeout(gameLoop, 1000 / 60);
+    setTimeout(gameLoop, 100); // retry after error
   }
 }
 
