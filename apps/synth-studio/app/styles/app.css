@@ -1024,6 +1024,160 @@ select {
   }
 }
 
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.1rem;
+  }
+
+  .header-controls {
+    gap: 0.25rem;
+  }
+
+  .header-controls .btn {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  .panel h2 {
+    font-size: 0.8rem;
+  }
+
+  .control-group label {
+    font-size: 0.7rem;
+  }
+
+  .keyboard-section h2 .keyboard-hint {
+    display: none;
+  }
+
+  .keyboard {
+    height: 90px;
+  }
+
+  .white-key .note-label,
+  .key-hint {
+    font-size: 0.5rem;
+  }
+
+  .pattern-bank {
+    padding: 0.4rem 0.55rem;
+  }
+
+  .pattern-bank-row {
+    gap: 0.35rem;
+  }
+
+  .bank-label {
+    width: 42px;
+    font-size: 0.62rem;
+  }
+
+  .pattern-slot {
+    width: 36px;
+    height: 34px;
+    font-size: 0.7rem;
+    padding: 2px 3px;
+  }
+
+  .slot-spark {
+    height: 10px;
+  }
+
+  .btn-small {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.65rem;
+  }
+
+  .btn-toggle {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .track-label {
+    width: 44px;
+    font-size: 0.58rem;
+    flex-wrap: wrap;
+    gap: 1px;
+  }
+
+  .track-note {
+    font-size: 0.55rem;
+    padding: 0.1rem;
+  }
+
+  .track-ms {
+    display: none;
+  }
+
+  .track-sample,
+  .track-load-sample {
+    display: none;
+  }
+
+  .track-steps {
+    gap: 2px;
+  }
+
+  .step {
+    border-radius: 2px;
+  }
+
+  .sequencer-controls {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .bpm-control input,
+  .swing-control input {
+    width: 60px;
+  }
+
+  .transport button {
+    padding: 0.35rem 0.7rem;
+    font-size: 1rem;
+  }
+
+  .chain-item {
+    height: 22px;
+  }
+
+  .chain-nudge {
+    width: 12px;
+    font-size: 0.45rem;
+  }
+
+  .chain-label {
+    font-size: 0.65rem;
+    padding: 0 0.3rem;
+  }
+
+  .chain-empty {
+    font-size: 0.6rem;
+  }
+
+  .adsr-controls {
+    gap: 0.25rem;
+  }
+
+  .mini-control span {
+    font-size: 0.6rem;
+  }
+
+  .effect-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .level-meter {
+    height: 6px;
+  }
+
+  .step-indicator .dot {
+    width: 4px;
+    height: 4px;
+  }
+}
+
 /* ── Command palette ───────────────────────────── */
 
 .palette-overlay {
