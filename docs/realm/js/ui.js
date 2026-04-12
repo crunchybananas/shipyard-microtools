@@ -9,8 +9,9 @@ import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgr
 
 function rateStr(val) {
   if (val === 0) return '';
-  const sign = val > 0 ? '+' : '';
-  return ` <span class="rate ${val>0?'pos':'neg'}">${sign}${val}/d</span>`;
+  const arrow = val > 0 ? '▲' : '▼';
+  const abs = Math.abs(val);
+  return ` <span class="rate ${val>0?'pos':'neg'}">${arrow}${abs}</span>`;
 }
 
 export function updateUI() {

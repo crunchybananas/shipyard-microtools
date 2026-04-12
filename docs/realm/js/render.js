@@ -1096,8 +1096,14 @@ function renderMinimap() {
     mc.fillRect(x*sx, y*sy, Math.ceil(sx), Math.ceil(sy));
   }
 
-  mc.fillStyle = '#fff';
+  const MINI_BUILD = {
+    house:'#e8a060', farm:'#7cb342', lumber:'#a3714f', quarry:'#888',
+    mine:'#5577aa', market:'#e8a040', barracks:'#aa3333', tower:'#aa3333',
+    wall:'#777', road:'#555', tradingpost:'#d4a030', granary:'#c09060',
+    church:'#ddd', school:'#88aacc', castle:'#ffd166',
+  };
   for (const b of G.buildings) {
+    mc.fillStyle = MINI_BUILD[b.type] || '#fff';
     mc.fillRect(b.x*sx, b.y*sy, Math.ceil(sx)+1, Math.ceil(sy)+1);
   }
 
