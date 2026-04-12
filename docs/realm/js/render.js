@@ -34,12 +34,19 @@ export function screenToWorld(mx, my) {
   return { x: Math.floor(w.x), y: Math.floor(w.y) };
 }
 
-function shiftColor(hex, shift) {
-  // Shift an RGB hex color by [dr, dg, db]
-  const r = Math.max(0, Math.min(255, parseInt(hex.slice(1,3),16) + shift[0]));
-  const g = Math.max(0, Math.min(255, parseInt(hex.slice(3,5),16) + shift[1]));
-  const b = Math.max(0, Math.min(255, parseInt(hex.slice(5,7),16) + shift[2]));
-  return `rgb(${r},${g},${b})`;
+function shiftColor(color, shift) {
+  let r, g, b;
+  if (color.startsWith('#')) {
+    r = parseInt(color.slice(1,3),16);
+    g = parseInt(color.slice(3,5),16);
+    b = parseInt(color.slice(5,7),16);
+  } else if (color.startsWith('rgb')) {
+    const m = color.match(/(\d+)/g);
+    r = +m[0]; g = +m[1]; b = +m[2];
+  } else {
+    return color;
+  }
+  return `rgb(${Math.max(0,Math.min(255,r+shift[0]))},${Math.max(0,Math.min(255,g+shift[1]))},${Math.max(0,Math.min(255,b+shift[2]))})`;
 }
 
 function getDaylight() {
