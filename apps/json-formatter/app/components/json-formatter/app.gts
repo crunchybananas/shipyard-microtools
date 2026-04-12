@@ -1,6 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
+import { fn } from "@ember/helper";
 import { htmlSafe } from "@ember/template";
 
 type SafeString = ReturnType<typeof htmlSafe>;
@@ -24,6 +25,29 @@ function syntaxHighlight(json: string): string {
       return `<span class="${cls}">${match}</span>`;
     },
   );
+}
+
+function scoreMatch(haystack: string, needle: string): number {
+  if (!needle) return 1;
+  if (haystack === needle) return 100;
+  if (haystack.startsWith(needle)) return 80;
+  const idx = haystack.indexOf(needle);
+  if (idx >= 0) return 60 - idx;
+  // Subsequence fuzzy match
+  let h = 0;
+  for (let n = 0; n < needle.length; n++) {
+    const ch = needle[n]!;
+    let found = -1;
+    for (; h < haystack.length; h++) {
+      if (haystack[h] === ch) {
+        found = h;
+        h++;
+        break;
+      }
+    }
+    if (found < 0) return 0;
+  }
+  return 20;
 }
 
 function childPathFor(parent: string, key: string | number): string {
@@ -976,6 +1000,9 @@ export default class JsonFormatterApp extends Component {
   @tracked viewMode: "tree" | "raw" | "ts" | "zod" | "diff" | "validate" = "tree";
   @tracked compareInput = "";
   @tracked schemaInput = "";
+  @tracked paletteOpen = false;
+  @tracked paletteQuery = "";
+  @tracked paletteSelectedIdx = 0;
   @tracked expandedPaths: Set<string> = new Set(["$"]);
   @tracked parseError: ParseError | null = null;
   @tracked filterQuery = "";
@@ -1013,6 +1040,7 @@ export default class JsonFormatterApp extends Component {
     }
     if (typeof window !== "undefined") {
       window.addEventListener("hashchange", this.onHashChange);
+      window.addEventListener("keydown", this.onGlobalKeyDown);
     }
   }
 
@@ -1020,9 +1048,128 @@ export default class JsonFormatterApp extends Component {
     super.willDestroy();
     if (typeof window !== "undefined") {
       window.removeEventListener("hashchange", this.onHashChange);
+      window.removeEventListener("keydown", this.onGlobalKeyDown);
     }
     if (this.hashWriteTimer) clearTimeout(this.hashWriteTimer);
   }
+
+  // ── Command palette ──────────────────────────────────────────
+
+  get paletteActions(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+  }> {
+    return [
+      { id: "format", label: "Format", hint: "Parse + pretty-print", run: () => this.format() },
+      { id: "minify", label: "Minify", hint: "Strip whitespace", run: () => this.minify() },
+      { id: "validate", label: "Validate JSON", hint: "Just check parseable", run: () => this.validate() },
+      { id: "copy", label: "Copy formatted", hint: "Copy formatted output to clipboard", run: () => this.copy() },
+      { id: "share", label: "Share permalink", hint: "Copy URL with current state", run: () => this.sharePermalink() },
+      { id: "view-tree", label: "View: Tree", hint: "Interactive collapsible tree", run: () => this.showTree() },
+      { id: "view-raw", label: "View: Raw", hint: "Highlighted text output", run: () => this.showRaw() },
+      { id: "view-ts", label: "View: TypeScript", hint: "Generated interface", run: () => this.showTs() },
+      { id: "view-zod", label: "View: Zod", hint: "Generated schema", run: () => this.showZod() },
+      { id: "view-diff", label: "View: Diff", hint: "Compare against another JSON", run: () => this.showDiff() },
+      { id: "view-validate", label: "View: Validate against schema", hint: "Check against JSON Schema", run: () => this.showValidate() },
+      { id: "expand-all", label: "Tree: Expand all", run: () => this.expandAll() },
+      { id: "collapse-all", label: "Tree: Collapse all", run: () => this.collapseAll() },
+      { id: "copy-ts", label: "Copy TypeScript output", run: () => this.copyTs() },
+      { id: "copy-zod", label: "Copy Zod output", run: () => this.copyZod() },
+      { id: "load-schema", label: "Load example JSON Schema", run: () => this.loadExampleSchema() },
+      {
+        id: "jump-error",
+        label: "Jump to parse error",
+        hint: "Move caret to the error location",
+        run: () => this.jumpToError(),
+      },
+    ];
+  }
+
+  get paletteResults(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+    selected: boolean;
+  }> {
+    const q = this.paletteQuery.trim().toLowerCase();
+    const all = this.paletteActions;
+    const filtered = q
+      ? all
+          .map((a) => ({ a, score: scoreMatch(a.label.toLowerCase(), q) }))
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((x) => x.a)
+      : all;
+    return filtered.map((a, i) => ({
+      ...a,
+      selected: i === this.paletteSelectedIdx,
+    }));
+  }
+
+  openPalette = () => {
+    this.paletteOpen = true;
+    this.paletteQuery = "";
+    this.paletteSelectedIdx = 0;
+  };
+
+  closePalette = () => {
+    this.paletteOpen = false;
+  };
+
+  onPaletteInput = (e: Event) => {
+    this.paletteQuery = (e.target as HTMLInputElement).value;
+    this.paletteSelectedIdx = 0;
+  };
+
+  onPaletteKeyDown = (e: KeyboardEvent) => {
+    const results = this.paletteResults;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.min(
+        results.length - 1,
+        this.paletteSelectedIdx + 1,
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.max(0, this.paletteSelectedIdx - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const target = results[this.paletteSelectedIdx];
+      if (target) {
+        target.run();
+        this.closePalette();
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      this.closePalette();
+    }
+  };
+
+  runPaletteAction = (id: string) => {
+    const action = this.paletteActions.find((a) => a.id === id);
+    if (action) {
+      action.run();
+      this.closePalette();
+    }
+  };
+
+  stopClickPropagation = (e: Event) => {
+    e.stopPropagation();
+  };
+
+  private onGlobalKeyDown = (e: KeyboardEvent) => {
+    const isCmdK = (e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey);
+    if (isCmdK) {
+      e.preventDefault();
+      if (this.paletteOpen) this.closePalette();
+      else this.openPalette();
+    } else if (e.key === "Escape" && this.paletteOpen) {
+      this.closePalette();
+    }
+  };
 
   private onHashChange = () => {
     if (this.suppressHashWrite) return;
@@ -1816,6 +1963,50 @@ export default class JsonFormatterApp extends Component {
           </div>
         {{/if}}
       </main>
+
+      {{#if this.paletteOpen}}
+        <div
+          class="palette-overlay"
+          role="dialog"
+          {{on "click" this.closePalette}}
+        >
+          <div class="palette-card" role="presentation" {{on "click" this.stopClickPropagation}}>
+            {{! template-lint-disable no-autofocus-attribute }}
+            <input
+              type="text"
+              class="palette-input"
+              placeholder="Type a command…"
+              autofocus
+              value={{this.paletteQuery}}
+              {{on "input" this.onPaletteInput}}
+              {{on "keydown" this.onPaletteKeyDown}}
+            />
+            <ul class="palette-list">
+              {{#each this.paletteResults as |row|}}
+                <li class="palette-row {{if row.selected 'selected'}}">
+                  <button
+                    type="button"
+                    class="palette-row-btn"
+                    {{on "click" (fn this.runPaletteAction row.id)}}
+                  >
+                    <span class="palette-row-label">{{row.label}}</span>
+                    {{#if row.hint}}
+                      <span class="palette-row-hint">{{row.hint}}</span>
+                    {{/if}}
+                  </button>
+                </li>
+              {{else}}
+                <li class="palette-empty">No matching commands</li>
+              {{/each}}
+            </ul>
+            <div class="palette-foot">
+              <span>↑↓ to navigate</span>
+              <span>↵ to run</span>
+              <span>esc to close</span>
+            </div>
+          </div>
+        </div>
+      {{/if}}
 
       <footer>
         <p class="footer-credit">

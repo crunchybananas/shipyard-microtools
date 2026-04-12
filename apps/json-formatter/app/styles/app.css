@@ -573,6 +573,119 @@ textarea:focus {
   border: 1px solid rgba(34, 197, 94, 0.35);
 }
 
+/* ── Command palette ────────────────────────────────────────── */
+
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  z-index: 2000;
+  animation: paletteFade 0.18s ease;
+}
+
+@keyframes paletteFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.palette-card {
+  width: min(560px, 92vw);
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+.palette-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1.1rem 1.25rem;
+  font-size: 1.05rem;
+  color: #f4f4f5;
+  font-family: inherit;
+  outline: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.palette-input::placeholder {
+  color: #71717a;
+}
+
+.palette-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.palette-row {
+  margin: 0;
+  padding: 0;
+}
+
+.palette-row-btn {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #e4e4e7;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.palette-row.selected .palette-row-btn,
+.palette-row-btn:hover {
+  background: rgba(129, 140, 248, 0.2);
+  color: #fff;
+}
+
+.palette-row-label {
+  font-weight: 600;
+}
+
+.palette-row-hint {
+  font-size: 0.78rem;
+  color: #71717a;
+  margin-left: auto;
+}
+
+.palette-empty {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  color: #71717a;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.palette-foot {
+  display: flex;
+  gap: 1rem;
+  padding: 0.55rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.7rem;
+  color: #71717a;
+  font-family: "SF Mono", Monaco, monospace;
+}
+
 .diff-list {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
