@@ -39,7 +39,7 @@ export const G = {
   citizens: [],
   buildingGrid: [],    // MAP_H x MAP_W, null or building ref
   particles: [],
-  resources: { wood:50, stone:30, food:40, gold:10, iron:0 },
+  resources: { wood:60, stone:30, food:40, gold:25, iron:0 },
   population: 3,
   maxPop: 3,
   happiness: 50,
@@ -59,6 +59,8 @@ export const G = {
   nextRaidDay: 8,
   raidInterval: 8,
   audioCtx: null,
+  researchedTechs: new Set(['agriculture', 'forestry']),
+  currentResearch: null, // { techId, progress, total }
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────

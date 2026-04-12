@@ -5,6 +5,7 @@
 import { G, BUILDINGS } from './state.js';
 import { canAfford } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
 
 export function updateUI() {
   const $ = id => document.getElementById(id);
@@ -22,6 +23,7 @@ export function renderBuildBar() {
   if (!bar) return;
   bar.innerHTML = '';
   for (const [key, def] of Object.entries(BUILDINGS)) {
+    if (!isBuildingUnlocked(key)) continue; // hide locked buildings
     const affordable = canAfford(key);
     const btn = document.createElement('button');
     btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
@@ -37,6 +39,61 @@ export function renderBuildBar() {
     btn.onmouseleave = hideTooltip;
     bar.appendChild(btn);
   }
+}
+
+export function renderResearchPanel() {
+  const panel = document.getElementById('research-panel');
+  if (!panel) return;
+  const content = panel.querySelector('.research-content');
+  if (!content) return;
+  content.innerHTML = '';
+
+  // Current research progress bar
+  const prog = getResearchProgress();
+  if (prog) {
+    const progDiv = document.createElement('div');
+    progDiv.className = 'research-progress';
+    progDiv.innerHTML = `
+      <div class="rp-label">Researching: <strong>${prog.name}</strong></div>
+      <div class="rp-bar"><div class="rp-fill" style="width:${Math.round(prog.fraction*100)}%"></div></div>
+      <div class="rp-pct">${Math.round(prog.fraction*100)}%</div>`;
+    content.appendChild(progDiv);
+  }
+
+  // Tech list
+  for (const [id, tech] of Object.entries(TECHS)) {
+    const researched = G.researchedTechs.has(id);
+    const available = canResearch(id);
+    const prereqMet = !tech.prereq || G.researchedTechs.has(tech.prereq);
+    const isActive = G.currentResearch?.techId === id;
+
+    const div = document.createElement('div');
+    div.className = 'tech-item' + (researched ? ' done' : '') + (isActive ? ' active' : '') + (!prereqMet ? ' locked' : '');
+    const costStr = Object.entries(tech.cost).filter(([,v])=>v>0).map(([k,v])=>`${v} ${k}`).join(', ') || 'Free';
+    div.innerHTML = `
+      <span class="tech-icon">${tech.icon}</span>
+      <div class="tech-info">
+        <div class="tech-name">${tech.name}</div>
+        <div class="tech-desc">${tech.desc}</div>
+        <div class="tech-cost">${researched ? '✓ Researched' : isActive ? '🔬 In progress...' : costStr}${tech.prereq && !prereqMet ? ' · Requires ' + TECHS[tech.prereq].name : ''}</div>
+      </div>`;
+    if (available && !isActive) {
+      const btn = document.createElement('button');
+      btn.className = 'tech-btn';
+      btn.textContent = 'Research';
+      btn.onclick = () => { startResearch(id); renderResearchPanel(); renderBuildBar(); };
+      div.appendChild(btn);
+    }
+    content.appendChild(div);
+  }
+}
+
+export function toggleResearchPanel() {
+  const panel = document.getElementById('research-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderResearchPanel();
 }
 
 export function showInfoPanel(b) {

@@ -46,7 +46,7 @@ docs/realm/
 ### Phase 3: Depth (make it strategic)
 - [ ] **Building Selection & Info** — click building → info panel (HP, workers, rate). Right-click demolish with half refund.
 - [ ] **Save/Load** — full state to localStorage. Auto-save every 60s. Rebuild all cross-references on load.
-- [ ] **Technology Tree** — research panel. Masonry → stone buildings. Metallurgy → iron. Commerce → market. Military → barracks. Each costs gold + time.
+- [x] **Technology Tree** — 8 techs with prerequisites: Agriculture/Forestry (free, pre-researched) → Masonry → Engineering/Metallurgy, Commerce → Brewing, Metallurgy → Military. Research panel overlay with progress bar. Build bar auto-filters to unlocked buildings only. Persisted in save/load.
 - [ ] **Trade Routes** — send caravans between your settlement and map-edge trading posts. Risk/reward.
 - [ ] **Happiness Detail** — breakdown panel showing positive (tavern, well) and negative (overcrowding, starvation) factors.
 

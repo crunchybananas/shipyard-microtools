@@ -10,7 +10,8 @@ import { updateProduction, checkRaids } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons } from './ui.js';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel } from './ui.js';
+import { updateResearch } from './tech.js';
 import { saveGame } from './save.js';
 
 // ── Init ───────────────────────────────────────────────────
@@ -28,8 +29,9 @@ renderMissions();
 updateUI();
 setupSaveButtons();
 
-// Expose setSpeed for inline onclick handlers
+// Expose for inline onclick handlers
 window.setSpeed = setSpeed;
+window.toggleResearch = toggleResearchPanel;
 
 showToast('Welcome to Realm. Build your settlement!');
 
@@ -53,7 +55,11 @@ function gameLoop() {
       updateProduction();
       updateParticles();
       updateSmokeEmitters();
-      if (G.gameTick % 60 === 0) checkMissions();
+      updateResearch();
+      if (G.gameTick % 60 === 0) {
+        checkMissions();
+        renderResearchPanel(); // refresh progress bar
+      }
     }
     if (G.gameTick % 30 === 0) {
       updateUI();

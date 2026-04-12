@@ -37,6 +37,8 @@ export function saveGame() {
       raidInterval: G.raidInterval,
       seed: getSeed(),
       missions: missions.map(m => ({ id: m.id, done: m.done })),
+      researchedTechs: [...G.researchedTechs],
+      currentResearch: G.currentResearch ? { ...G.currentResearch } : null,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     showToast('Game saved.');
@@ -92,6 +94,12 @@ export function loadGame() {
       const m = missions.find(x => x.id === ms.id);
       if (m) m.done = ms.done;
     }
+
+    // Restore research
+    if (Array.isArray(s.researchedTechs)) {
+      G.researchedTechs = new Set(s.researchedTechs);
+    }
+    G.currentResearch = s.currentResearch || null;
 
     G.particles = [];
     showToast('Game loaded.');
