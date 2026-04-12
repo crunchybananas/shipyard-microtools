@@ -11,7 +11,7 @@ export const TECHS = {
     desc: 'Unlocks farms for food production',
     cost: { gold: 0 },
     time: 0,
-    unlocks: ['farm'],
+    unlocks: ['farm', 'granary'],
     icon: '🌾',
     prereq: null,
   },
@@ -29,7 +29,7 @@ export const TECHS = {
     desc: 'Unlocks quarries and stone walls',
     cost: { gold: 15, wood: 20 },
     time: 300,
-    unlocks: ['quarry', 'wall'],
+    unlocks: ['quarry', 'wall', 'church'],
     icon: '🧱',
     prereq: null,
   },
@@ -56,7 +56,7 @@ export const TECHS = {
     desc: 'Unlocks markets for gold generation',
     cost: { gold: 20, wood: 15 },
     time: 350,
-    unlocks: ['market', 'tradingpost'],
+    unlocks: ['market', 'tradingpost', 'school'],
     icon: '🏪',
     prereq: null,
   },
@@ -118,7 +118,10 @@ export function startResearch(techId) {
 
 export function updateResearch() {
   if (!G.currentResearch) return;
-  G.currentResearch.progress += G.speed;
+  // Schools boost research speed by 50% each (multiplicative)
+  const schools = G.buildings.filter(b => b.type === 'school' && b.workers.length > 0).length;
+  const speedMult = 1 + schools * 0.5;
+  G.currentResearch.progress += G.speed * speedMult;
   if (G.currentResearch.progress >= G.currentResearch.total) {
     const techId = G.currentResearch.techId;
     G.researchedTechs.add(techId);

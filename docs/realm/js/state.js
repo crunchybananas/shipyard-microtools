@@ -30,6 +30,9 @@ export const BUILDINGS = {
   wall:      { name:'Wall',        icon:'🧱', cost:{stone:8},          defense:5, desc:'Fortification segment' },
   road:      { name:'Road',        icon:'🛤️', cost:{stone:3},          speedBonus:true, desc:'Citizens move faster on roads' },
   tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
+  granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
+  church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, desc:'Major happiness boost for your settlement' },
+  school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
 };
 
 // ── Mutable game state (single source of truth) ───────────

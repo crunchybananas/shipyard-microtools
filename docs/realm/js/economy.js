@@ -117,7 +117,12 @@ export function updateProduction() {
 
   // Food consumption (every half-day = dayLength/2)
   if (G.gameTick % Math.floor(G.dayLength / 2) === 0) {
-    const foodNeeded = Math.ceil(G.population * 0.5);
+    let foodNeeded = Math.ceil(G.population * 0.5);
+    // Granaries halve food consumption in winter
+    if (G.season === 'winter') {
+      const granaries = G.buildings.filter(b => b.type === 'granary').length;
+      if (granaries > 0) foodNeeded = Math.ceil(foodNeeded * 0.5);
+    }
     G.resources.food = Math.max(0, G.resources.food - foodNeeded);
     if (G.resources.food <= 0 && G.population > 1) {
       G.happiness = Math.max(0, G.happiness - 10);

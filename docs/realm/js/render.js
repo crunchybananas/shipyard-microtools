@@ -447,6 +447,9 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'wall': drawWall(ctx, s); break;
     case 'road': drawRoad(ctx, s); break;
     case 'tradingpost': drawTradingPost(ctx, s, b); break;
+    case 'granary': drawGranary(ctx, s); break;
+    case 'church': drawChurch(ctx, s); break;
+    case 'school': drawSchool(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
   }
 
@@ -739,6 +742,103 @@ function drawTradingPost(ctx, s, b) {
     ctx.textAlign = 'center';
     ctx.fillText('⛵ en route', s.x, s.y - 28);
   }
+}
+
+function drawGranary(ctx, s) {
+  // Round clay storage building
+  ctx.fillStyle = '#c09060';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 10, 10, Math.PI, 0);
+  ctx.lineTo(s.x + 10, s.y - 2);
+  ctx.lineTo(s.x - 10, s.y - 2);
+  ctx.closePath();
+  ctx.fill();
+  // Dome top
+  ctx.fillStyle = '#a07848';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 10, 10, Math.PI, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Door
+  ctx.fillStyle = '#5a3a1a';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 4, 3, Math.PI, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Grain texture dots
+  ctx.fillStyle = '#d4a870';
+  for (let i = -5; i <= 5; i += 3) {
+    ctx.fillRect(s.x + i, s.y - 14 + Math.abs(i) * 0.3, 1.5, 1.5);
+  }
+}
+
+function drawChurch(ctx, s) {
+  // Main body
+  ctx.fillStyle = '#d4d0c8';
+  ctx.fillRect(s.x - 10, s.y - 22, 20, 18);
+  ctx.fillStyle = '#b8b0a8';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 10, s.y - 22); ctx.lineTo(s.x + 14, s.y - 19);
+  ctx.lineTo(s.x + 14, s.y - 1); ctx.lineTo(s.x + 10, s.y - 4);
+  ctx.closePath();
+  ctx.fill();
+  // Peaked roof
+  ctx.fillStyle = '#6a5a4a';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 12, s.y - 22); ctx.lineTo(s.x, s.y - 32);
+  ctx.lineTo(s.x + 12, s.y - 22); ctx.closePath();
+  ctx.fill();
+  // Steeple
+  ctx.fillStyle = '#8a7a6a';
+  ctx.fillRect(s.x - 2, s.y - 42, 4, 12);
+  // Cross
+  ctx.fillStyle = '#ffd166';
+  ctx.fillRect(s.x - 0.5, s.y - 46, 1, 6);
+  ctx.fillRect(s.x - 2, s.y - 44, 4, 1);
+  // Window (stained glass)
+  ctx.fillStyle = '#4488cc';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 14, 3, Math.PI, 0);
+  ctx.lineTo(s.x + 3, s.y - 9);
+  ctx.lineTo(s.x - 3, s.y - 9);
+  ctx.closePath();
+  ctx.fill();
+  // Door
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s.x - 3, s.y - 8, 6, 4);
+}
+
+function drawSchool(ctx, s) {
+  // Main building
+  ctx.fillStyle = '#c4a882';
+  ctx.fillRect(s.x - 12, s.y - 18, 24, 14);
+  ctx.fillStyle = '#a89070';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 12, s.y - 18); ctx.lineTo(s.x + 15, s.y - 15);
+  ctx.lineTo(s.x + 15, s.y - 1); ctx.lineTo(s.x + 12, s.y - 4);
+  ctx.closePath();
+  ctx.fill();
+  // Flat roof with slight overhang
+  ctx.fillStyle = '#7a6a5a';
+  ctx.fillRect(s.x - 14, s.y - 20, 28, 3);
+  // Windows (multiple, suggesting classrooms)
+  ctx.fillStyle = '#ffeebb';
+  for (let i = -8; i <= 6; i += 5) {
+    ctx.fillRect(s.x + i, s.y - 16, 3, 3);
+  }
+  // Door
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(s.x - 2, s.y - 8, 5, 4);
+  // Bell tower
+  ctx.fillStyle = '#8a7a6a';
+  ctx.fillRect(s.x + 7, s.y - 28, 4, 10);
+  ctx.fillStyle = '#ffd166';
+  ctx.beginPath();
+  ctx.arc(s.x + 9, s.y - 25, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  // Book icon on front
+  ctx.fillStyle = '#4a6080';
+  ctx.fillRect(s.x - 8, s.y - 12, 4, 3);
 }
 
 function drawGeneric(ctx, s, def) {
