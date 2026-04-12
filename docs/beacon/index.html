@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beacon — A Lighthouse Signal Game</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;color:#e0e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+canvas{display:block;border-radius:8px;cursor:default}
+#ui{position:fixed;bottom:1.5rem;display:flex;gap:0.6rem;z-index:10}
+.sig-btn{width:56px;height:56px;border-radius:50%;border:3px solid rgba(255,255,255,0.3);font-size:0.7rem;font-weight:700;cursor:pointer;transition:transform 0.1s,box-shadow 0.15s;text-transform:uppercase;letter-spacing:0.06em;display:flex;align-items:center;justify-content:center}
+.sig-btn:active{transform:scale(0.9)}
+#btn-g{background:rgba(34,197,94,0.85);color:#fff;border-color:rgba(34,197,94,0.6)}
+#btn-r{background:rgba(239,68,68,0.85);color:#fff;border-color:rgba(239,68,68,0.6)}
+#btn-w{background:rgba(250,250,250,0.9);color:#333;border-color:rgba(200,200,200,0.6)}
+.sig-btn.flash{box-shadow:0 0 40px currentColor;transform:scale(1.15)}
+#hud{position:fixed;top:1rem;left:50%;transform:translateX(-50%);display:flex;gap:2rem;font-size:0.85rem;font-family:'SF Mono',Monaco,monospace;z-index:10;background:rgba(0,0,0,0.5);padding:0.5rem 1.2rem;border-radius:999px;backdrop-filter:blur(6px)}
+#hud span{opacity:0.8}
+#hud .val{opacity:1;font-weight:700}
+#guide{position:fixed;top:4rem;left:50%;transform:translateX(-50%);font-size:0.72rem;color:rgba(255,255,255,0.55);text-align:center;line-height:1.6;z-index:10;pointer-events:none;transition:opacity 0.5s}
+#start-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,14,26,0.95);z-index:100;text-align:center;gap:1.5rem}
+#start-screen h1{font-size:3rem;letter-spacing:0.08em;color:#ffeebb}
+#start-screen p{max-width:420px;line-height:1.7;color:rgba(255,255,255,0.7);font-size:0.95rem}
+#start-screen button{padding:0.9rem 2.5rem;font-size:1.1rem;font-weight:700;border:2px solid rgba(255,238,187,0.6);background:transparent;color:#ffeebb;border-radius:8px;cursor:pointer;transition:background 0.2s}
+#start-screen button:hover{background:rgba(255,238,187,0.12)}
+.legend{display:flex;flex-wrap:wrap;gap:0.5rem 1.2rem;justify-content:center;font-size:0.78rem;color:rgba(255,255,255,0.6)}
+.legend span{display:inline-flex;align-items:center;gap:0.3rem}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dot.g{background:#22c55e}.dot.r{background:#ef4444}.dot.w{background:#fafafa}
+#game-over{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,14,26,0.92);z-index:100;text-align:center;gap:1.5rem}
+#game-over h2{font-size:2rem;color:#ffeebb}
+#game-over .stat{font-size:1.2rem;color:rgba(255,255,255,0.7)}
+#game-over button{padding:0.8rem 2rem;font-size:1rem;border:2px solid rgba(255,238,187,0.6);background:transparent;color:#ffeebb;border-radius:8px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="start-screen">
+  <h1>BEACON</h1>
+  <p>You are the keeper of the last lighthouse. Ships approach through the fog — you can only see them when your beam sweeps past. Identify each vessel and flash the correct signal before it reaches the rocks.</p>
+  <div class="legend">
+    <span><span class="dot g"></span><span class="dot g"></span> Cargo</span>
+    <span><span class="dot g"></span> Passenger</span>
+    <span><span class="dot r"></span><span class="dot g"></span><span class="dot r"></span> Military</span>
+    <span><span class="dot w"></span> Fishing</span>
+    <span><span class="dot r"></span><span class="dot r"></span><span class="dot r"></span> Pirate</span>
+  </div>
+  <button onclick="startGame()">Begin Watch</button>
+  <p style="font-size:0.7rem;opacity:0.4">Keys: G R W to signal · ←→ adjust beam speed</p>
+</div>
+
+<div id="game-over">
+  <h2>Watch Ended</h2>
+  <div class="stat" id="go-score"></div>
+  <div class="stat" id="go-saved"></div>
+  <div class="stat" id="go-wrecks"></div>
+  <button onclick="startGame()">Keep Watch Again</button>
+</div>
+
+<div id="hud">
+  <span>Score <span class="val" id="hud-score">0</span></span>
+  <span>Saved <span class="val" id="hud-saved">0</span></span>
+  <span>Wrecks <span class="val" id="hud-wrecks">0</span>/5</span>
+  <span>Wave <span class="val" id="hud-wave">1</span></span>
+</div>
+
+<div id="guide">Identify ships as the beam reveals them · flash the correct signal</div>
+
+<canvas id="c"></canvas>
+
+<div id="ui">
+  <button class="sig-btn" id="btn-g" onclick="flashSignal('green')">Green</button>
+  <button class="sig-btn" id="btn-r" onclick="flashSignal('red')">Red</button>
+  <button class="sig-btn" id="btn-w" onclick="flashSignal('white')">White</button>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// ── Ship definitions ──────────────────────────────────────
+const SHIP_TYPES = {
+  cargo:     { name:'Cargo',     signal:['green','green'],         color:'#8b6914', w:60, h:28, draw: drawCargo },
+  passenger: { name:'Passenger', signal:['green'],                 color:'#3b82f6', w:70, h:22, draw: drawPassenger },
+  military:  { name:'Military',  signal:['red','green','red'],     color:'#475569', w:55, h:18, draw: drawMilitary },
+  fishing:   { name:'Fishing',   signal:['white'],                 color:'#a3e635', w:35, h:20, draw: drawFishing },
+  pirate:    { name:'Pirate',    signal:['red','red','red'],       color:'#ef4444', w:50, h:30, draw: drawPirate },
+};
+const TYPE_KEYS = Object.keys(SHIP_TYPES);
+
+// ── Game state ────────────────────────────────────────────
+let beam = { angle: 0, speed: 0.012, width: 0.28 };
+let ships = [];
+let signalQueue = [];
+let signalFlashTimer = 0;
+let signalFlashColor = null;
+let score = 0, saved = 0, wrecks = 0, maxWrecks = 5, wave = 1;
+let spawnTimer = 0, spawnInterval = 180;
+let running = false, gameOver = false;
+let time = 0;
+let stars = [];
+let waves = [];
+
+// ── Resize ────────────────────────────────────────────────
+function resize() {
+  const s = Math.min(window.innerWidth, window.innerHeight - 120, 900);
+  canvas.width = s; canvas.height = s;
+  stars = [];
+  for (let i = 0; i < 120; i++) {
+    stars.push({ x: Math.random()*s, y: Math.random()*s*0.5, r: 0.3+Math.random()*1.2, phase: Math.random()*Math.PI*2 });
+  }
+  waves = [];
+  for (let i = 0; i < 8; i++) {
+    waves.push({ y: s*0.55 + i*18, amp: 2+Math.random()*3, freq: 0.015+Math.random()*0.01, phase: Math.random()*Math.PI*2 });
+  }
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── Ship drawing (silhouettes) ────────────────────────────
+function drawCargo(ctx, x, y, scale) {
+  ctx.beginPath();
+  ctx.moveTo(x-30*scale, y+10*scale);
+  ctx.lineTo(x-28*scale, y-8*scale);
+  ctx.lineTo(x-10*scale, y-8*scale);
+  ctx.lineTo(x-8*scale, y-18*scale);
+  ctx.lineTo(x+5*scale, y-18*scale);
+  ctx.lineTo(x+7*scale, y-8*scale);
+  ctx.lineTo(x+15*scale, y-8*scale);
+  ctx.lineTo(x+15*scale, y-14*scale);
+  ctx.lineTo(x+22*scale, y-14*scale);
+  ctx.lineTo(x+22*scale, y-8*scale);
+  ctx.lineTo(x+30*scale, y-5*scale);
+  ctx.lineTo(x+28*scale, y+10*scale);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawPassenger(ctx, x, y, scale) {
+  ctx.beginPath();
+  ctx.moveTo(x-35*scale, y+8*scale);
+  ctx.lineTo(x-30*scale, y-5*scale);
+  ctx.lineTo(x-25*scale, y-10*scale);
+  ctx.lineTo(x+20*scale, y-10*scale);
+  ctx.lineTo(x+25*scale, y-5*scale);
+  ctx.lineTo(x+35*scale, y+2*scale);
+  ctx.lineTo(x+30*scale, y+8*scale);
+  ctx.closePath();
+  ctx.fill();
+  // Windows
+  ctx.fillStyle = 'rgba(255,255,180,0.3)';
+  for (let i = -20; i < 18; i += 6) {
+    ctx.fillRect(x+i*scale, y-8*scale, 3*scale, 3*scale);
+  }
+}
+
+function drawMilitary(ctx, x, y, scale) {
+  ctx.beginPath();
+  ctx.moveTo(x-28*scale, y+6*scale);
+  ctx.lineTo(x-24*scale, y-4*scale);
+  ctx.lineTo(x-5*scale, y-4*scale);
+  ctx.lineTo(x-3*scale, y-14*scale);
+  ctx.lineTo(x+3*scale, y-14*scale);
+  ctx.lineTo(x+5*scale, y-4*scale);
+  ctx.lineTo(x+28*scale, y+2*scale);
+  ctx.lineTo(x+25*scale, y+6*scale);
+  ctx.closePath();
+  ctx.fill();
+  // Turret
+  ctx.beginPath();
+  ctx.arc(x+12*scale, y-2*scale, 4*scale, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawFishing(ctx, x, y, scale) {
+  ctx.beginPath();
+  ctx.moveTo(x-18*scale, y+8*scale);
+  ctx.lineTo(x-14*scale, y-2*scale);
+  ctx.lineTo(x+2*scale, y-2*scale);
+  ctx.lineTo(x+4*scale, y-16*scale); // mast
+  ctx.lineTo(x+6*scale, y-16*scale);
+  ctx.lineTo(x+6*scale, y-2*scale);
+  ctx.lineTo(x+18*scale, y+4*scale);
+  ctx.lineTo(x+15*scale, y+8*scale);
+  ctx.closePath();
+  ctx.fill();
+  // Net lines
+  ctx.strokeStyle = ctx.fillStyle;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x+5*scale, y-14*scale);
+  ctx.lineTo(x+18*scale, y+2*scale);
+  ctx.moveTo(x+5*scale, y-10*scale);
+  ctx.lineTo(x+16*scale, y+2*scale);
+  ctx.stroke();
+}
+
+function drawPirate(ctx, x, y, scale) {
+  ctx.beginPath();
+  ctx.moveTo(x-25*scale, y+10*scale);
+  ctx.lineTo(x-20*scale, y-2*scale);
+  ctx.lineTo(x-3*scale, y-2*scale);
+  ctx.lineTo(x-2*scale, y-22*scale); // tall mast
+  ctx.lineTo(x+2*scale, y-22*scale);
+  ctx.lineTo(x+2*scale, y-2*scale);
+  ctx.lineTo(x+25*scale, y+6*scale);
+  ctx.lineTo(x+20*scale, y+10*scale);
+  ctx.closePath();
+  ctx.fill();
+  // Sail (ragged)
+  ctx.beginPath();
+  ctx.moveTo(x*1, y-20*scale);
+  ctx.lineTo(x+16*scale, y-14*scale);
+  ctx.lineTo(x+14*scale, y-10*scale);
+  ctx.lineTo(x+12*scale, y-11*scale);
+  ctx.lineTo(x+8*scale, y-8*scale);
+  ctx.lineTo(x*1, y-6*scale);
+  ctx.closePath();
+  ctx.globalAlpha *= 0.7;
+  ctx.fill();
+  ctx.globalAlpha /= 0.7;
+  // Skull hint
+  ctx.beginPath();
+  ctx.arc(x+8*scale, y-14*scale, 2*scale, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fill();
+}
+
+// ── Spawn ─────────────────────────────────────────────────
+function spawnShip() {
+  const typeIdx = Math.floor(Math.random() * Math.min(TYPE_KEYS.length, 2 + Math.floor(wave / 2)));
+  const typeKey = TYPE_KEYS[typeIdx];
+  const type = SHIP_TYPES[typeKey];
+  const angle = Math.random() * Math.PI * 2;
+  const s = canvas.width;
+  ships.push({
+    typeKey, type,
+    angle,
+    distance: s * 0.52,
+    speed: 0.15 + Math.random() * 0.15 + wave * 0.02,
+    lit: 0, // how visible (0-1, decays)
+    signaled: false,
+    wrecked: false,
+    safeDistance: s * 0.14,
+    opacity: 1,
+  });
+}
+
+// ── Signal ────────────────────────────────────────────────
+function flashSignal(color) {
+  signalQueue.push(color);
+  signalFlashColor = color;
+  signalFlashTimer = 12;
+  const btn = document.getElementById('btn-' + color[0]);
+  btn.classList.add('flash');
+  setTimeout(() => btn.classList.remove('flash'), 200);
+  checkSignals();
+}
+
+function checkSignals() {
+  // Try to match the signal queue against the nearest unserved ship
+  const nearestUnsignaled = ships
+    .filter(s => !s.signaled && !s.wrecked && s.lit > 0.1)
+    .sort((a, b) => a.distance - b.distance)[0];
+  if (!nearestUnsignaled) return;
+
+  const required = nearestUnsignaled.type.signal;
+  if (signalQueue.length < required.length) return;
+
+  const tail = signalQueue.slice(-required.length);
+  const match = required.every((c, i) => tail[i] === c);
+  if (match) {
+    nearestUnsignaled.signaled = true;
+    score += 100 * wave;
+    saved++;
+    signalQueue = [];
+    updateHUD();
+  } else if (signalQueue.length >= required.length + 2) {
+    // Too many wrong signals — clear and penalize
+    signalQueue = [];
+  }
+}
+
+// ── Update ────────────────────────────────────────────────
+function update() {
+  const s = canvas.width;
+  time++;
+
+  // Beam rotation
+  beam.angle += beam.speed;
+  if (beam.angle > Math.PI * 2) beam.angle -= Math.PI * 2;
+
+  // Ship movement + beam intersection
+  for (const ship of ships) {
+    if (ship.signaled) {
+      ship.opacity = Math.max(0, ship.opacity - 0.02);
+      continue;
+    }
+    ship.distance -= ship.speed;
+
+    // Check if in beam
+    let angleDiff = ((ship.angle - beam.angle) % (Math.PI*2) + Math.PI*3) % (Math.PI*2) - Math.PI;
+    if (Math.abs(angleDiff) < beam.width / 2) {
+      ship.lit = Math.min(1, ship.lit + 0.15);
+    } else {
+      ship.lit = Math.max(0, ship.lit - 0.008);
+    }
+
+    // Wreck check
+    if (ship.distance <= ship.safeDistance && !ship.wrecked) {
+      ship.wrecked = true;
+      wrecks++;
+      updateHUD();
+      if (wrecks >= maxWrecks) endGame();
+    }
+  }
+
+  // Remove faded ships
+  ships = ships.filter(s => s.opacity > 0.01 && (!s.wrecked || s.opacity > 0));
+  if (ships.some(s => s.wrecked)) {
+    ships = ships.map(s => s.wrecked ? {...s, opacity: Math.max(0, s.opacity - 0.015)} : s);
+  }
+
+  // Spawn
+  spawnTimer++;
+  if (spawnTimer >= spawnInterval) {
+    spawnTimer = 0;
+    spawnShip();
+    // Wave progression
+    if (saved > 0 && saved % 5 === 0) {
+      wave++;
+      spawnInterval = Math.max(60, spawnInterval - 12);
+      document.getElementById('hud-wave').textContent = wave;
+    }
+  }
+
+  // Signal flash decay
+  if (signalFlashTimer > 0) signalFlashTimer--;
+  else signalFlashColor = null;
+}
+
+// ── Render ────────────────────────────────────────────────
+function render() {
+  const s = canvas.width;
+  const cx = s / 2, cy = s * 0.82;
+  ctx.clearRect(0, 0, s, s);
+
+  // Sky
+  const sky = ctx.createLinearGradient(0, 0, 0, s * 0.6);
+  sky.addColorStop(0, '#060a18');
+  sky.addColorStop(1, '#0e1525');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, s, s * 0.6);
+
+  // Stars
+  for (const st of stars) {
+    const a = 0.3 + 0.3 * Math.sin(time * 0.03 + st.phase);
+    ctx.fillStyle = `rgba(255,240,220,${a})`;
+    ctx.beginPath();
+    ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Ocean
+  const ocean = ctx.createLinearGradient(0, s * 0.5, 0, s);
+  ocean.addColorStop(0, '#0a1628');
+  ocean.addColorStop(1, '#060e1e');
+  ctx.fillStyle = ocean;
+  ctx.fillRect(0, s * 0.5, s, s * 0.5);
+
+  // Wave lines
+  ctx.strokeStyle = 'rgba(60,100,160,0.15)';
+  ctx.lineWidth = 1;
+  for (const w of waves) {
+    ctx.beginPath();
+    for (let x = 0; x < s; x += 4) {
+      const y = w.y + Math.sin(x * w.freq + time * 0.02 + w.phase) * w.amp;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Rocks (danger zone indicator)
+  ctx.beginPath();
+  ctx.arc(cx, cy, s * 0.13, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(239,68,68,0.15)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 8]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Ships (drawn BEFORE beam so beam illuminates them)
+  for (const ship of ships) {
+    const sx = cx + Math.cos(ship.angle - Math.PI/2) * ship.distance;
+    const sy = cy + Math.sin(ship.angle - Math.PI/2) * ship.distance;
+    const vis = ship.lit * ship.opacity;
+    if (vis < 0.02) continue;
+
+    ctx.save();
+    ctx.globalAlpha = vis;
+    const scale = 0.8 + (1 - ship.distance / (s * 0.52)) * 0.4;
+
+    if (ship.wrecked) {
+      ctx.fillStyle = '#ef4444';
+      ctx.globalAlpha *= 0.6;
+    } else if (ship.signaled) {
+      ctx.fillStyle = '#22c55e';
+    } else {
+      ctx.fillStyle = '#c0c8d8';
+    }
+    ship.type.draw(ctx, sx, sy, scale);
+
+    // Ship type label when well-lit
+    if (vis > 0.5 && !ship.signaled && !ship.wrecked) {
+      ctx.fillStyle = `rgba(255,255,255,${vis * 0.7})`;
+      ctx.font = `${10 * scale}px -apple-system,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(ship.type.name, sx, sy + 22 * scale);
+      // Required signal dots
+      const sig = ship.type.signal;
+      const dotStart = sx - (sig.length * 8) / 2;
+      sig.forEach((c, i) => {
+        ctx.beginPath();
+        ctx.arc(dotStart + i * 8 + 4, sy + 32 * scale, 3, 0, Math.PI * 2);
+        ctx.fillStyle = c === 'green' ? '#22c55e' : c === 'red' ? '#ef4444' : '#fafafa';
+        ctx.globalAlpha = vis * 0.85;
+        ctx.fill();
+      });
+    }
+    ctx.restore();
+  }
+
+  // Beam
+  ctx.save();
+  const beamLen = s * 0.55;
+  const beamX = cx + Math.cos(beam.angle - Math.PI/2) * beamLen;
+  const beamY = cy + Math.sin(beam.angle - Math.PI/2) * beamLen;
+  const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, beamLen);
+
+  let beamColor = 'rgba(255,238,180,';
+  if (signalFlashColor === 'green') beamColor = 'rgba(34,197,94,';
+  else if (signalFlashColor === 'red') beamColor = 'rgba(239,68,68,';
+  else if (signalFlashColor === 'white') beamColor = 'rgba(255,255,255,';
+
+  grad.addColorStop(0, beamColor + '0.5)');
+  grad.addColorStop(0.3, beamColor + '0.2)');
+  grad.addColorStop(1, beamColor + '0)');
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, beamLen, beam.angle - Math.PI/2 - beam.width/2, beam.angle - Math.PI/2 + beam.width/2);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.restore();
+
+  // Fog overlay (thicker at edges)
+  const fog = ctx.createRadialGradient(cx, cy, s * 0.15, cx, cy, s * 0.55);
+  const fogDensity = Math.min(0.7, 0.3 + wave * 0.04);
+  fog.addColorStop(0, 'rgba(15,20,35,0)');
+  fog.addColorStop(0.5, `rgba(15,20,35,${fogDensity * 0.3})`);
+  fog.addColorStop(1, `rgba(15,20,35,${fogDensity})`);
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, 0, s, s);
+
+  // Lighthouse
+  ctx.save();
+  // Tower
+  ctx.fillStyle = '#d4d4d4';
+  ctx.beginPath();
+  ctx.moveTo(cx - 8, cy);
+  ctx.lineTo(cx - 5, cy - 30);
+  ctx.lineTo(cx + 5, cy - 30);
+  ctx.lineTo(cx + 8, cy);
+  ctx.closePath();
+  ctx.fill();
+  // Lamp room
+  ctx.fillStyle = '#ffeebb';
+  ctx.beginPath();
+  ctx.arc(cx, cy - 34, 7, 0, Math.PI * 2);
+  ctx.fill();
+  // Lamp glow
+  const lampGlow = ctx.createRadialGradient(cx, cy - 34, 3, cx, cy - 34, 30);
+  lampGlow.addColorStop(0, 'rgba(255,238,180,0.6)');
+  lampGlow.addColorStop(1, 'rgba(255,238,180,0)');
+  ctx.fillStyle = lampGlow;
+  ctx.beginPath();
+  ctx.arc(cx, cy - 34, 30, 0, Math.PI * 2);
+  ctx.fill();
+  // Base rock
+  ctx.fillStyle = '#2a2a35';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 4, 20, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// ── HUD ───────────────────────────────────────────────────
+function updateHUD() {
+  document.getElementById('hud-score').textContent = score;
+  document.getElementById('hud-saved').textContent = saved;
+  document.getElementById('hud-wrecks').textContent = wrecks + '/' + maxWrecks;
+}
+
+// ── Game loop ─────────────────────────────────────────────
+let rafId = null;
+function loop() {
+  if (!running) return;
+  update();
+  render();
+  rafId = requestAnimationFrame(loop);
+}
+
+function startGame() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-over').style.display = 'none';
+  ships = []; signalQueue = []; score = 0; saved = 0; wrecks = 0; wave = 1;
+  spawnTimer = 0; spawnInterval = 180; time = 0; beam.angle = 0;
+  running = true; gameOver = false;
+  updateHUD();
+  document.getElementById('hud-wave').textContent = '1';
+  // Initial ship
+  setTimeout(spawnShip, 500);
+  if (rafId) cancelAnimationFrame(rafId);
+  loop();
+  // Fade guide
+  setTimeout(() => { document.getElementById('guide').style.opacity = '0'; }, 6000);
+}
+
+function endGame() {
+  running = false;
+  gameOver = true;
+  document.getElementById('game-over').style.display = 'flex';
+  document.getElementById('go-score').textContent = `Score: ${score}`;
+  document.getElementById('go-saved').textContent = `Ships saved: ${saved}`;
+  document.getElementById('go-wrecks').textContent = `Ships wrecked: ${wrecks}`;
+}
+
+// ── Input ─────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (!running) return;
+  if (e.key === 'g' || e.key === 'G') flashSignal('green');
+  else if (e.key === 'r' || e.key === 'R') flashSignal('red');
+  else if (e.key === 'w' || e.key === 'W') flashSignal('white');
+  else if (e.key === 'ArrowLeft') beam.speed = Math.max(0.004, beam.speed - 0.002);
+  else if (e.key === 'ArrowRight') beam.speed = Math.min(0.03, beam.speed + 0.002);
+});
+
+// Render start screen background
+(function renderBg() {
+  resize();
+  beam.angle += 0.005;
+  render();
+  if (!running) requestAnimationFrame(renderBg);
+})();
+</script>
+</body>
+</html>
