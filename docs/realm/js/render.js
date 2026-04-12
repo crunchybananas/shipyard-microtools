@@ -150,9 +150,44 @@ export function render() {
 
       // Tile features
       if (tile === TILE.FOREST) drawTree(ctx, s.x, s.y-8, daylight, seasonShift);
-      else if (tile === TILE.STONE) drawRock(ctx, s.x, s.y-4, daylight);
+      else if (tile === TILE.STONE) {
+        drawRock(ctx, s.x, s.y-4, daylight);
+        // Extra rubble dots for texture
+        ctx.globalAlpha = daylight * 0.4;
+        ctx.fillStyle = '#aaa';
+        const rh = ((x*7+y*13) & 0xf);
+        ctx.fillRect(s.x - 8 + rh, s.y + 2, 2, 1.5);
+        ctx.fillRect(s.x + 4 - rh%5, s.y - 1, 1.5, 1.5);
+      }
       else if (tile === TILE.IRON) drawIronOre(ctx, s.x, s.y-4, daylight);
       else if (tile === TILE.WATER) drawWater(ctx, s.x, s.y, daylight);
+      else if (tile === TILE.MOUNTAIN) {
+        // Mountain ridge lines
+        ctx.globalAlpha = daylight * 0.5;
+        ctx.fillStyle = '#8a8a9a';
+        ctx.beginPath();
+        ctx.moveTo(s.x - 6, s.y + 2); ctx.lineTo(s.x - 2, s.y - 8);
+        ctx.lineTo(s.x + 3, s.y - 5); ctx.lineTo(s.x + 7, s.y - 10);
+        ctx.lineTo(s.x + 10, s.y + 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#6a6a7a';
+        ctx.beginPath();
+        ctx.moveTo(s.x - 3, s.y + 3); ctx.lineTo(s.x, s.y - 4);
+        ctx.lineTo(s.x + 5, s.y + 3);
+        ctx.closePath();
+        ctx.fill();
+      }
+      else if (tile === TILE.SAND) {
+        // Sand grain dots for beach texture
+        ctx.globalAlpha = daylight * 0.3;
+        ctx.fillStyle = '#c8a050';
+        const sh = ((x*11+y*7) & 0x1f);
+        if (sh < 8) {
+          ctx.fillRect(s.x - 5 + sh, s.y + (sh%3) - 1, 1.5, 1);
+          ctx.fillRect(s.x + 3 - sh%4, s.y - 2 + sh%3, 1, 1.5);
+        }
+      }
 
       // Hover
       if (G.hoveredTile && G.hoveredTile.x===x && G.hoveredTile.y===y) {
@@ -1112,16 +1147,35 @@ function drawIronOre(ctx, x, y, a) {
 }
 
 function drawWater(ctx, x, y, a) {
-  ctx.globalAlpha = a * 0.3;
-  const t = G.gameTick * 0.02;
-  ctx.strokeStyle = 'rgba(150,200,255,0.25)';
-  ctx.lineWidth = 0.5;
-  for (let i = -8; i < 8; i += 6) {
+  const t = G.gameTick * 0.015;
+  // Animated highlight shimmer
+  ctx.globalAlpha = a * 0.5;
+  const shimmer = 0.15 + 0.08 * Math.sin(t + x * 0.1 + y * 0.07);
+  ctx.fillStyle = `rgba(100,180,255,${shimmer})`;
+  ctx.beginPath();
+  ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
+  ctx.closePath();
+  ctx.fill();
+  // Wave lines
+  ctx.globalAlpha = a * 0.45;
+  ctx.strokeStyle = 'rgba(180,220,255,0.4)';
+  ctx.lineWidth = 1;
+  for (let i = -12; i <= 12; i += 8) {
     ctx.beginPath();
-    ctx.moveTo(x+i, y + Math.sin(t+i)*1.5);
-    ctx.lineTo(x+i+4, y + Math.sin(t+i+2)*1.5);
+    for (let dx = -14; dx <= 14; dx += 3) {
+      const wx = x + dx;
+      const wy = y + i * 0.5 + Math.sin(t * 1.3 + dx * 0.15 + i) * 2;
+      dx === -14 ? ctx.moveTo(wx, wy) : ctx.lineTo(wx, wy);
+    }
     ctx.stroke();
   }
+  // Specular highlight dot
+  const sx = Math.sin(t * 0.7 + x) * 6;
+  const sy = Math.cos(t * 0.5 + y) * 3;
+  ctx.fillStyle = `rgba(220,240,255,${0.15 + 0.1 * Math.sin(t * 2)})`;
+  ctx.beginPath();
+  ctx.arc(x + sx, y + sy, 2, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 // ── Minimap ─────────────────────────────────────────────────
