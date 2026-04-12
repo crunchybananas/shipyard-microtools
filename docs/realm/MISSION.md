@@ -54,7 +54,7 @@ docs/realm/
 ### Phase 4: Content (make it deep)
 - [ ] **More Missions** — 25+ missions across 5 tiers. Each tier unlocks after completing 3 from the previous.
 - [x] **Events** — 8 random events: drought (food ×0.5), bountiful harvest (food ×2), gold rush (gold ×1.5), plague (happiness −20), festival (happiness +15), migration wave (+5 settlers), bandit sighting (early raid), iron discovery (+10 iron). 8% chance per day after day 4, one active at a time, banner shows name + desc + countdown. Production multipliers + happiness offsets applied in economy. Persisted in save/load.
-- [ ] **Seasons** — visual + gameplay: winter slows farms, summer boosts growth, autumn harvest bonus.
+- [x] **Seasons** — spring(+20% food)/summer(+50% food, +10% speed)/autumn(-20% food)/winter(-70% food, -20% speed). Tile color shifts per season. Season changes every 7 days with toast notification. HUD shows current season. Day length tripled to 30s for deliberate pacing.
 - [ ] **Advanced Buildings** — church, school, castle, harbor, granary, warehouse, aqueduct.
 - [ ] **Military Units** — train soldiers at barracks, assign to towers, sally forth during raids.
 

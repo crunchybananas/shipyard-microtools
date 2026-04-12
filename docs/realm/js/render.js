@@ -2,7 +2,7 @@
 // Renderer — isometric canvas, building sprites, minimap
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H } from './state.js';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData } from './state.js';
 
 let C, ctx, minimapC, minimapCtx;
 
@@ -32,6 +32,14 @@ export function screenToWorld(mx, my) {
   const sy = (my - C.height/2)/G.camera.zoom + G.camera.y;
   const w = toWorld(sx, sy);
   return { x: Math.floor(w.x), y: Math.floor(w.y) };
+}
+
+function shiftColor(hex, shift) {
+  // Shift an RGB hex color by [dr, dg, db]
+  const r = Math.max(0, Math.min(255, parseInt(hex.slice(1,3),16) + shift[0]));
+  const g = Math.max(0, Math.min(255, parseInt(hex.slice(3,5),16) + shift[1]));
+  const b = Math.max(0, Math.min(255, parseInt(hex.slice(5,7),16) + shift[2]));
+  return `rgb(${r},${g},${b})`;
 }
 
 function getDaylight() {
@@ -70,14 +78,15 @@ export function render() {
       const s = toScreen(x, y);
       const colors = TILE_COLORS[tile];
       let tileColor = colors[(x+y)%2];
+      const seasonShift = getSeasonData().tileShift;
 
-      // Grass shade variation via position hash
+      // Grass shade variation via position hash + season tint
       if (tile === TILE.GRASS || tile === TILE.SAND) {
         const h = ((x * 374761 + y * 668265) & 0xff) / 255;
         const shade = tile === TILE.GRASS
           ? (h < 0.33 ? '#3d6b42' : h < 0.66 ? '#4a7c4f' : '#558c5a')
           : (h < 0.5 ? '#d4a76a' : '#c99a5c');
-        tileColor = shade;
+        tileColor = shiftColor(shade, seasonShift);
       }
 
       ctx.fillStyle = tileColor;
@@ -113,7 +122,7 @@ export function render() {
       }
 
       // Tile features
-      if (tile === TILE.FOREST) drawTree(ctx, s.x, s.y-8, daylight);
+      if (tile === TILE.FOREST) drawTree(ctx, s.x, s.y-8, daylight, seasonShift);
       else if (tile === TILE.STONE) drawRock(ctx, s.x, s.y-4, daylight);
       else if (tile === TILE.IRON) drawIronOre(ctx, s.x, s.y-4, daylight);
       else if (tile === TILE.WATER) drawWater(ctx, s.x, s.y, daylight);
@@ -681,11 +690,11 @@ function drawGeneric(ctx, s, def) {
 }
 
 // ── Terrain details ─────────────────────────────────────────
-function drawTree(ctx, x, y, a) {
+function drawTree(ctx, x, y, a, seasonShift) {
   ctx.globalAlpha = a;
-  ctx.fillStyle = '#1a4a1f';
+  ctx.fillStyle = seasonShift ? shiftColor('#1a4a1f', seasonShift) : '#1a4a1f';
   ctx.beginPath(); ctx.moveTo(x,y-16); ctx.lineTo(x+7,y); ctx.lineTo(x-7,y); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#1f5525';
+  ctx.fillStyle = seasonShift ? shiftColor('#1f5525', seasonShift) : '#1f5525';
   ctx.beginPath(); ctx.moveTo(x,y-20); ctx.lineTo(x+5,y-8); ctx.lineTo(x-5,y-8); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(x-1.5, y, 3, 5);

@@ -2,7 +2,7 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange } from './state.js';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData } from './state.js';
 import { findPath } from './pathfinding.js';
 
 function dist2(ax, ay, bx, by) {
@@ -28,7 +28,7 @@ export function updateCitizens() {
       if (d < 0.15) {
         c.pathIdx++;
       } else {
-        let spd = c.speed * G.speed;
+        let spd = c.speed * G.speed * getSeasonData().speedMult;
         // Road speed bonus
         const gx = Math.round(c.x), gy = Math.round(c.y);
         if (gx >= 0 && gx < MAP_W && gy >= 0 && gy < MAP_H) {

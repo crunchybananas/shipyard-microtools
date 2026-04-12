@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js';
+import { G, updateSeason, getSeasonData } from './state.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
@@ -46,6 +46,10 @@ function updateTime() {
     G.day++;
     checkRaids();
     checkRandomEvents();
+    if (updateSeason()) {
+      const s = getSeasonData();
+      showToast(`Season changed: ${s.name}`);
+    }
   }
 }
 

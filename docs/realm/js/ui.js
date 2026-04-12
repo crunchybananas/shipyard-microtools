@@ -2,7 +2,7 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js';
+import { G, BUILDINGS, getSeasonData } from './state.js';
 import { canAfford } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
@@ -15,7 +15,8 @@ export function updateUI() {
   $('r-gold').textContent = Math.floor(G.resources.gold);
   $('r-iron').textContent = Math.floor(G.resources.iron);
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
-  $('day-display').textContent = `Day ${G.day} · ☀️${Math.round(G.happiness)}%`;
+  const season = getSeasonData();
+  $('day-display').textContent = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%`;
 }
 
 export function renderBuildBar() {

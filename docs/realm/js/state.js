@@ -47,7 +47,7 @@ export const G = {
   defense: 0,
   day: 1,
   dayPhase: 0,
-  dayLength: 600,
+  dayLength: 1800, // ~30 seconds per day at 1x speed (was 600 = 10s)
   gameTick: 0,
   speed: 1,
   camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1 },
@@ -63,8 +63,9 @@ export const G = {
   researchedTechs: new Set(['agriculture', 'forestry']),
   currentResearch: null,
   caravans: [],
-  activeEvent: null,    // { id, name, desc, color, endDay }
+  activeEvent: null,
   eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0 },
+  season: 'spring', // spring → summer → autumn → winter, changes every 7 days
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────
@@ -81,3 +82,26 @@ const LAST = ['Stone','Brook','Field','Hill','Dale','Wood','Lake','Ridge','Vale'
 export function randomName() { return FIRST[rngInt(0,FIRST.length-1)]+' '+LAST[rngInt(0,LAST.length-1)]; }
 
 export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️'}[k]||k; }
+
+// ── Seasons ────────────────────────────────────────────────
+export const SEASONS = {
+  spring: { name:'🌱 Spring', foodMult:1.2, speedMult:1.0, tileShift:[0,12,0],   label:'Spring' },
+  summer: { name:'☀️ Summer', foodMult:1.5, speedMult:1.1, tileShift:[8,5,-5],   label:'Summer' },
+  autumn: { name:'🍂 Autumn', foodMult:0.8, speedMult:1.0, tileShift:[15,-5,-10], label:'Autumn' },
+  winter: { name:'❄️ Winter', foodMult:0.3, speedMult:0.8, tileShift:[-10,-5,15], label:'Winter' },
+};
+const SEASON_ORDER = ['spring','summer','autumn','winter'];
+
+export function updateSeason() {
+  const idx = Math.floor((G.day - 1) / 7) % 4;
+  const newSeason = SEASON_ORDER[idx];
+  if (newSeason !== G.season) {
+    G.season = newSeason;
+    return true; // season changed
+  }
+  return false;
+}
+
+export function getSeasonData() {
+  return SEASONS[G.season] || SEASONS.spring;
+}

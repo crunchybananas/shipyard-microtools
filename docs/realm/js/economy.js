@@ -2,7 +2,7 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resourceEmoji } from './state.js';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData } from './state.js';
 import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound } from './audio.js';
@@ -68,13 +68,16 @@ export function updateProduction() {
     if (b.workers.length < needed) continue;
 
     b.prodTimer++;
-    const interval = 120;
+    const interval = Math.floor(G.dayLength / 5); // produce ~5 times per day
     if (b.prodTimer >= interval) {
       b.prodTimer = 0;
-      // Apply event multipliers
+      // Apply event + season multipliers
+      const season = getSeasonData();
       const adjustedProd = {};
       for (const [k,v] of Object.entries(def.prod)) {
-        adjustedProd[k] = Math.round(v * getProductionMultiplier(k));
+        let mult = getProductionMultiplier(k);
+        if (k === 'food') mult *= season.foodMult;
+        adjustedProd[k] = Math.round(v * mult);
       }
       // If a worker is available to carry, set produced flag
       const carrier = b.workers.find(w => w.state === 'working');
@@ -97,13 +100,13 @@ export function updateProduction() {
     }
   }
 
-  // Hunger
-  if (G.gameTick % 60 === 0) {
+  // Hunger (10 times per day)
+  if (G.gameTick % Math.floor(G.dayLength / 10) === 0) {
     for (const c of G.citizens) c.hunger = Math.min(100, c.hunger + 3);
   }
 
-  // Happiness
-  if (G.gameTick % 120 === 0) {
+  // Happiness (5 times per day)
+  if (G.gameTick % Math.floor(G.dayLength / 5) === 0) {
     let hBonus = 0;
     for (const b of G.buildings) {
       const def = BUILDINGS[b.type];
@@ -112,8 +115,8 @@ export function updateProduction() {
     G.happiness = Math.min(100, Math.max(10, 50 + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
   }
 
-  // Food consumption (every half-day)
-  if (G.gameTick % 300 === 0) {
+  // Food consumption (every half-day = dayLength/2)
+  if (G.gameTick % Math.floor(G.dayLength / 2) === 0) {
     const foodNeeded = Math.ceil(G.population * 0.5);
     G.resources.food = Math.max(0, G.resources.food - foodNeeded);
     if (G.resources.food <= 0 && G.population > 1) {
@@ -142,8 +145,8 @@ export function updateProduction() {
     }
   }
 
-  // Immigration
-  if (G.gameTick % 300 === 0 && G.happiness > 60 && G.population < G.maxPop) {
+  // Immigration (once per day)
+  if (G.gameTick % G.dayLength === 0 && G.happiness > 60 && G.population < G.maxPop) {
     trySpawnSettlers(1);
     if (G.population > 3) showToast('A new settler arrives!');
   }
