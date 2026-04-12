@@ -112,8 +112,8 @@ export function updateProduction() {
     G.happiness = Math.min(100, Math.max(10, 50 + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
   }
 
-  // Food consumption
-  if (G.gameTick % 180 === 0) {
+  // Food consumption (every half-day)
+  if (G.gameTick % 300 === 0) {
     const foodNeeded = Math.ceil(G.population * 0.5);
     G.resources.food = Math.max(0, G.resources.food - foodNeeded);
     if (G.resources.food <= 0 && G.population > 1) {

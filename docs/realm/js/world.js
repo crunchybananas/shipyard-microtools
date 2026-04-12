@@ -88,4 +88,10 @@ export function generateWorld(){
   for(let i=0;i<3;i++){
     G.citizens.push(makeCitizen(sx+rngRange(-1,1), sy+rngRange(-1,1)));
   }
+
+  // Center camera on the island (critical — iso projection)
+  const centerScreen = { x: (sx-sy)*(64/2), y: (sx+sy)*(32/2) };
+  G.camera.x = centerScreen.x;
+  G.camera.y = centerScreen.y;
+  G.camera.zoom = 1;
 }

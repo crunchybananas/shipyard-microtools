@@ -40,7 +40,7 @@ export const G = {
   citizens: [],
   buildingGrid: [],    // MAP_H x MAP_W, null or building ref
   particles: [],
-  resources: { wood:60, stone:30, food:40, gold:25, iron:0 },
+  resources: { wood:60, stone:30, food:80, gold:25, iron:0 },
   population: 3,
   maxPop: 3,
   happiness: 50,
@@ -50,7 +50,7 @@ export const G = {
   dayLength: 600,
   gameTick: 0,
   speed: 1,
-  camera: { x: MAP_W/2 * TW/2, y: 0, zoom: 1 },
+  camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1 },
   selectedBuild: null,
   selectedBuilding: null,
   hoveredTile: null,
