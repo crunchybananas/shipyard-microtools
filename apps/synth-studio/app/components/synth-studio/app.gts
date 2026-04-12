@@ -45,6 +45,28 @@ function readHashState(): CompactHashState | null {
   return hash ? decodeHashState(hash) : null;
 }
 
+function scoreMatch(haystack: string, needle: string): number {
+  if (!needle) return 1;
+  if (haystack === needle) return 100;
+  if (haystack.startsWith(needle)) return 80;
+  const idx = haystack.indexOf(needle);
+  if (idx >= 0) return 60 - idx;
+  let h = 0;
+  for (let n = 0; n < needle.length; n++) {
+    const ch = needle[n]!;
+    let found = -1;
+    for (; h < haystack.length; h++) {
+      if (haystack[h] === ch) {
+        found = h;
+        h++;
+        break;
+      }
+    }
+    if (found < 0) return 0;
+  }
+  return 20;
+}
+
 // ── Helpers (strict-mode safe) ─────────────────────────────────
 
 const eq = (a: unknown, b: unknown) => a === b;
@@ -208,6 +230,9 @@ export default class SynthStudioApp extends Component {
   @tracked soloedTracks: Record<string, boolean> = {};
   @tracked drumSamples: Record<string, string> = {};
   @tracked dragOverTrack: string | null = null;
+  @tracked paletteOpen = false;
+  @tracked paletteQuery = "";
+  @tracked paletteSelectedIdx = 0;
 
   // ── Computed display values ──────────────────────────────────
 
@@ -343,7 +368,16 @@ export default class SynthStudioApp extends Component {
     };
 
     const onKeyDown = async (e: KeyboardEvent) => {
+      // Cmd/Ctrl+K toggles palette regardless of focus
+      if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        if (this.paletteOpen) this.closePalette();
+        else this.openPalette();
+        return;
+      }
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
+      // Esc closes palette only (don't intercept other shortcuts)
+      if (this.paletteOpen) return;
       const key = e.key.toLowerCase();
       if (this.activeComputerKeys.has(key)) return;
       if (KEY_MAP[key]) {
@@ -697,6 +731,116 @@ export default class SynthStudioApp extends Component {
       if (file) await this.loadDrumFile(trackId, file);
     };
     input.click();
+  };
+
+  // ── Command palette ──────────────────────────────────────────
+
+  get paletteActions(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+  }> {
+    return [
+      { id: "play-stop", label: "Transport: Play/Stop", hint: "Space", run: () => this.togglePlayback() },
+      { id: "stop", label: "Transport: Stop", run: () => this.stopPlayback() },
+      { id: "song-mode", label: "Toggle Song Mode", run: () => this.toggleSongMode() },
+      { id: "slot-save", label: "Slot: Save current to active slot", run: () => this.saveSlot() },
+      { id: "slot-duplicate", label: "Slot: Duplicate to next empty", run: () => this.duplicateSlot() },
+      { id: "slot-clear", label: "Slot: Clear active", run: () => this.clearSlot() },
+      { id: "chain-add", label: "Chain: Add active slot", run: () => this.addToChain() },
+      { id: "chain-clear", label: "Chain: Clear", run: () => this.clearChain() },
+      { id: "mute-kick", label: "Mute: Kick", run: () => this.toggleMute("kick") },
+      { id: "mute-snare", label: "Mute: Snare", run: () => this.toggleMute("snare") },
+      { id: "mute-hihat", label: "Mute: Hi-hat", run: () => this.toggleMute("hihat") },
+      { id: "mute-clap", label: "Mute: Clap", run: () => this.toggleMute("clap") },
+      { id: "mute-synth1", label: "Mute: Synth 1", run: () => this.toggleMute("synth1") },
+      { id: "mute-synth2", label: "Mute: Synth 2", run: () => this.toggleMute("synth2") },
+      { id: "solo-kick", label: "Solo: Kick", run: () => this.toggleSolo("kick") },
+      { id: "solo-snare", label: "Solo: Snare", run: () => this.toggleSolo("snare") },
+      { id: "solo-hihat", label: "Solo: Hi-hat", run: () => this.toggleSolo("hihat") },
+      { id: "solo-synth1", label: "Solo: Synth 1", run: () => this.toggleSolo("synth1") },
+      { id: "share", label: "Share permalink", hint: "Copy URL with current state", run: () => this.sharePermalink() },
+      { id: "save-project", label: "Project: Save JSON", run: () => this.saveProject() },
+      { id: "load-project", label: "Project: Load JSON", run: () => this.loadProject() },
+      { id: "import-midi", label: "Import MIDI file", run: () => this.importMidi() },
+      { id: "export-midi", label: "Export MIDI file", run: () => this.exportMidi() },
+      { id: "export-wav", label: "Export WAV", run: () => this.exportWav() },
+      { id: "record", label: "Record output", run: () => this.toggleRecording() },
+    ];
+  }
+
+  get paletteResults(): Array<{
+    id: string;
+    label: string;
+    hint?: string;
+    run: () => void;
+    selected: boolean;
+  }> {
+    const q = this.paletteQuery.trim().toLowerCase();
+    const all = this.paletteActions;
+    const filtered = q
+      ? all
+          .map((a) => ({ a, score: scoreMatch(a.label.toLowerCase(), q) }))
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map((x) => x.a)
+      : all;
+    return filtered.map((a, i) => ({
+      ...a,
+      selected: i === this.paletteSelectedIdx,
+    }));
+  }
+
+  openPalette = () => {
+    this.paletteOpen = true;
+    this.paletteQuery = "";
+    this.paletteSelectedIdx = 0;
+  };
+
+  closePalette = () => {
+    this.paletteOpen = false;
+  };
+
+  onPaletteInput = (e: Event) => {
+    this.paletteQuery = (e.target as HTMLInputElement).value;
+    this.paletteSelectedIdx = 0;
+  };
+
+  onPaletteKeyDown = (e: KeyboardEvent) => {
+    const results = this.paletteResults;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.min(
+        results.length - 1,
+        this.paletteSelectedIdx + 1,
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      this.paletteSelectedIdx = Math.max(0, this.paletteSelectedIdx - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const target = results[this.paletteSelectedIdx];
+      if (target) {
+        target.run();
+        this.closePalette();
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      this.closePalette();
+    }
+  };
+
+  runPaletteAction = (id: string) => {
+    const action = this.paletteActions.find((a) => a.id === id);
+    if (action) {
+      action.run();
+      this.closePalette();
+    }
+  };
+
+  stopClickPropagation = (e: Event) => {
+    e.stopPropagation();
   };
 
   toggleMute = (trackId: string) => {
@@ -1245,6 +1389,50 @@ export default class SynthStudioApp extends Component {
 
         <div class={{this.recordingIndicatorClass}}>● Recording</div>
       </main>
+
+      {{#if this.paletteOpen}}
+        <div
+          class="palette-overlay"
+          role="dialog"
+          {{on "click" this.closePalette}}
+        >
+          <div class="palette-card" role="presentation" {{on "click" this.stopClickPropagation}}>
+            {{! template-lint-disable no-autofocus-attribute }}
+            <input
+              type="text"
+              class="palette-input"
+              placeholder="Type a command…"
+              autofocus
+              value={{this.paletteQuery}}
+              {{on "input" this.onPaletteInput}}
+              {{on "keydown" this.onPaletteKeyDown}}
+            />
+            <ul class="palette-list">
+              {{#each this.paletteResults as |row|}}
+                <li class="palette-row {{if row.selected 'selected'}}">
+                  <button
+                    type="button"
+                    class="palette-row-btn"
+                    {{on "click" (fn this.runPaletteAction row.id)}}
+                  >
+                    <span class="palette-row-label">{{row.label}}</span>
+                    {{#if row.hint}}
+                      <span class="palette-row-hint">{{row.hint}}</span>
+                    {{/if}}
+                  </button>
+                </li>
+              {{else}}
+                <li class="palette-empty">No matching commands</li>
+              {{/each}}
+            </ul>
+            <div class="palette-foot">
+              <span>↑↓ navigate</span>
+              <span>↵ run</span>
+              <span>esc close</span>
+            </div>
+          </div>
+        </div>
+      {{/if}}
 
       <footer class="app-footer">
         <p class="footer-credit">
