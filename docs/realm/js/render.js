@@ -84,8 +84,8 @@ export function render() {
       if (tile === TILE.GRASS || tile === TILE.SAND) {
         const h = ((x * 374761 + y * 668265) & 0xff) / 255;
         const shade = tile === TILE.GRASS
-          ? (h < 0.33 ? '#3d6b42' : h < 0.66 ? '#4a7c4f' : '#558c5a')
-          : (h < 0.5 ? '#d4a76a' : '#c99a5c');
+          ? (h < 0.25 ? '#4a8a50' : h < 0.5 ? '#5a9c5f' : h < 0.75 ? '#52944a' : '#62a568')
+          : (h < 0.5 ? '#e8c07a' : '#ddb46e');
         tileColor = shiftColor(shade, seasonShift);
       }
 
@@ -99,6 +99,10 @@ export function render() {
       ctx.lineTo(s.x - TW/2, s.y);
       ctx.closePath();
       ctx.fill();
+      // Subtle grid border
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
 
       // Beach edge shimmer on sand tiles adjacent to water
       if (tile === TILE.SAND) {
@@ -231,13 +235,17 @@ export function render() {
 
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
-    ctx.arc(s.x, cy - 6, 3, 0, Math.PI * 2);
+    ctx.arc(s.x, cy - 7, 4, 0, Math.PI * 2);
     ctx.fill();
+    // Body outline for readability
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
 
     // Head
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
-    ctx.arc(s.x, cy - 12, 2.5, 0, Math.PI * 2);
+    ctx.arc(s.x, cy - 14, 3, 0, Math.PI * 2);
     ctx.fill();
 
     // Hair (tiny variation)
@@ -548,7 +556,6 @@ function drawBuilding(ctx, b, s, daylight) {
   }
 
   // Night window glow — warm light from inhabited buildings at night
-  const daylight = getDaylight();
   if (daylight < 0.75 && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
     const glowAlpha = (0.75 - daylight) * 2; // brighter as it gets darker
     ctx.globalAlpha = glowAlpha;
@@ -1062,12 +1069,22 @@ function drawGeneric(ctx, s, def) {
 // ── Terrain details ─────────────────────────────────────────
 function drawTree(ctx, x, y, a, seasonShift) {
   ctx.globalAlpha = a;
-  ctx.fillStyle = seasonShift ? shiftColor('#1a4a1f', seasonShift) : '#1a4a1f';
-  ctx.beginPath(); ctx.moveTo(x,y-16); ctx.lineTo(x+7,y); ctx.lineTo(x-7,y); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = seasonShift ? shiftColor('#1f5525', seasonShift) : '#1f5525';
-  ctx.beginPath(); ctx.moveTo(x,y-20); ctx.lineTo(x+5,y-8); ctx.lineTo(x-5,y-8); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(x-1.5, y, 3, 5);
+  // Bigger, lusher tree with multiple layers
+  const c1 = seasonShift ? shiftColor('#2a6a30', seasonShift) : '#2a6a30';
+  const c2 = seasonShift ? shiftColor('#358a3a', seasonShift) : '#358a3a';
+  const c3 = seasonShift ? shiftColor('#1e5524', seasonShift) : '#1e5524';
+  // Trunk
+  ctx.fillStyle = '#6a4a2a';
+  ctx.fillRect(x-2, y-2, 4, 7);
+  // Bottom canopy (widest)
+  ctx.fillStyle = c1;
+  ctx.beginPath(); ctx.moveTo(x,y-10); ctx.lineTo(x+10,y); ctx.lineTo(x-10,y); ctx.closePath(); ctx.fill();
+  // Middle canopy
+  ctx.fillStyle = c2;
+  ctx.beginPath(); ctx.moveTo(x,y-18); ctx.lineTo(x+8,y-6); ctx.lineTo(x-8,y-6); ctx.closePath(); ctx.fill();
+  // Top canopy
+  ctx.fillStyle = c3;
+  ctx.beginPath(); ctx.moveTo(x,y-24); ctx.lineTo(x+5,y-12); ctx.lineTo(x-5,y-12); ctx.closePath(); ctx.fill();
 }
 
 function drawRock(ctx, x, y, a) {
