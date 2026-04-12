@@ -13,7 +13,7 @@
 10. Update this file with what was done and what's next
 11. Schedule next wake
 
-## Last Completed (e999b27)
+## Last Completed (37d0b91)
 - ✅ Camera centers on island at (0, 768) — generateWorld sets it at runtime
 - ✅ Foraging: 2 of 6 citizens actively foraging from resource tiles
 - ✅ Build fail feedback: "❌ Can't build here" particle on invalid placement

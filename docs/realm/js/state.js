@@ -71,6 +71,8 @@ export const G = {
   eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0 },
   season: 'spring',
   won: false,
+  resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
+  lastResources: null, // snapshot for rate calculation
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────

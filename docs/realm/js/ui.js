@@ -7,13 +7,32 @@ import { canAfford } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
 
+function rateStr(val) {
+  if (val === 0) return '';
+  const sign = val > 0 ? '+' : '';
+  return ` <span class="rate ${val>0?'pos':'neg'}">${sign}${val}/d</span>`;
+}
+
 export function updateUI() {
   const $ = id => document.getElementById(id);
-  $('r-wood').textContent = Math.floor(G.resources.wood);
-  $('r-stone').textContent = Math.floor(G.resources.stone);
-  $('r-food').textContent = Math.floor(G.resources.food);
-  $('r-gold').textContent = Math.floor(G.resources.gold);
-  $('r-iron').textContent = Math.floor(G.resources.iron);
+
+  // Compute rates: compare resources to snapshot taken half a day ago
+  const interval = Math.floor(G.dayLength / 2);
+  if (G.gameTick % interval === 0 && G.gameTick > 0) {
+    if (G.lastResources) {
+      for (const k of ['wood','stone','food','gold','iron']) {
+        // Scale to per-day: measured over half a day, so multiply by 2
+        G.resourceRates[k] = Math.round((G.resources[k] - G.lastResources[k]) * 2);
+      }
+    }
+    G.lastResources = { ...G.resources };
+  }
+
+  $('r-wood').innerHTML = Math.floor(G.resources.wood) + rateStr(G.resourceRates.wood);
+  $('r-stone').innerHTML = Math.floor(G.resources.stone) + rateStr(G.resourceRates.stone);
+  $('r-food').innerHTML = Math.floor(G.resources.food) + rateStr(G.resourceRates.food);
+  $('r-gold').innerHTML = Math.floor(G.resources.gold) + rateStr(G.resourceRates.gold);
+  $('r-iron').innerHTML = Math.floor(G.resources.iron) + rateStr(G.resourceRates.iron);
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
   const season = getSeasonData();
   $('day-display').textContent = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%`;
@@ -287,6 +306,39 @@ export function dismissTutorial() {
   document.querySelectorAll('.tut-highlight').forEach(e => e.classList.remove('tut-highlight'));
   const tipEl = document.getElementById('tutorial-tip');
   if (tipEl) tipEl.style.display = 'none';
+}
+
+// ── Population panel ──────────────────────────────────────
+export function togglePopPanel() {
+  const p = document.getElementById('pop-panel');
+  if (!p) return;
+  const open = p.style.display !== 'none';
+  p.style.display = open ? 'none' : 'block';
+  if (!open) renderPopPanel();
+}
+
+function renderPopPanel() {
+  const el = document.getElementById('pop-content');
+  if (!el) return;
+  el.innerHTML = '';
+  const stateLabel = { idle:'Idle', find_job:'Seeking work', walk_to_work:'Going to work',
+    working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
+    foraging:'Foraging', eating:'Eating' };
+  for (const c of G.citizens) {
+    const job = c.jobBuilding ? BUILDINGS[c.jobBuilding.type]?.name : 'None';
+    const state = stateLabel[c.state] || c.state;
+    const hungerBar = Math.round(c.hunger);
+    const div = document.createElement('div');
+    div.className = 'pop-row';
+    div.innerHTML = `
+      <span class="pop-name">${c.name}</span>
+      <span class="pop-job">${job}</span>
+      <span class="pop-state">${state}</span>
+      <span class="pop-hunger" title="Hunger ${hungerBar}%">
+        <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
+      </span>`;
+    el.appendChild(div);
+  }
 }
 
 export function setupSaveButtons() {
