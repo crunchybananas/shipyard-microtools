@@ -5,6 +5,7 @@
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData } from './state.js';
 
 let C, ctx, minimapC, minimapCtx;
+let logicalW, logicalH;
 
 export function initRenderer(canvas, minimap) {
   C = canvas;
@@ -14,8 +15,14 @@ export function initRenderer(canvas, minimap) {
 }
 
 export function resizeCanvas() {
-  C.width = window.innerWidth;
-  C.height = window.innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+  logicalW = window.innerWidth;
+  logicalH = window.innerHeight;
+  C.width = logicalW * dpr;
+  C.height = logicalH * dpr;
+  C.style.width = logicalW + 'px';
+  C.style.height = logicalH + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 export function toScreen(tx, ty) {
@@ -29,10 +36,10 @@ export function toWorld(sx, sy) {
 
 export function screenToWorld(mx, my) {
   const rect = C.getBoundingClientRect();
-  const cx = (mx - rect.left) * (C.width / rect.width);
-  const cy = (my - rect.top) * (C.height / rect.height);
-  const sx = (cx - C.width/2)/G.camera.zoom + G.camera.x;
-  const sy = (cy - C.height/2)/G.camera.zoom + G.camera.y;
+  const cx = (mx - rect.left) * (logicalW / rect.width);
+  const cy = (my - rect.top) * (logicalH / rect.height);
+  const sx = (cx - logicalW/2)/G.camera.zoom + G.camera.x;
+  const sy = (cy - logicalH/2)/G.camera.zoom + G.camera.y;
   const w = toWorld(sx, sy);
   return { x: Math.round(w.x), y: Math.round(w.y) };
 }
@@ -62,10 +69,10 @@ function getDaylight() {
 
 export function render() {
   ctx.fillStyle = '#0a0e1a';
-  ctx.fillRect(0, 0, C.width, C.height);
+  ctx.fillRect(0, 0, logicalW, logicalH);
 
   ctx.save();
-  ctx.translate(C.width/2, C.height/2);
+  ctx.translate(logicalW/2, logicalH/2);
   ctx.scale(G.camera.zoom, G.camera.zoom);
   ctx.translate(-G.camera.x, -G.camera.y);
 
@@ -74,9 +81,9 @@ export function render() {
   // ── Tiles ─────────────────────────────────────────────────
   // Viewport culling — isometric needs all 4 screen corners
   const c0 = screenToWorld(0, 0);
-  const c1 = screenToWorld(C.width, 0);
-  const c2 = screenToWorld(0, C.height);
-  const c3 = screenToWorld(C.width, C.height);
+  const c1 = screenToWorld(logicalW, 0);
+  const c2 = screenToWorld(0, logicalH);
+  const c3 = screenToWorld(logicalW, logicalH);
   const pad = 2;
   const minX = Math.max(0, Math.floor(Math.min(c0.x, c1.x, c2.x, c3.x)) - pad);
   const maxX = Math.min(MAP_W-1, Math.ceil(Math.max(c0.x, c1.x, c2.x, c3.x)) + pad);
@@ -115,6 +122,18 @@ export function render() {
       ctx.lineTo(s.x - TW/2, s.y);
       ctx.closePath();
       ctx.fill();
+
+      // Tile texture — subtle noise pattern for visual richness
+      if (tile !== TILE.WATER) {
+        ctx.globalAlpha = daylight * 0.08;
+        for (let i = 0; i < 3; i++) {
+          const nx = s.x + ((x * 7 + i * 13) % 20) - 10;
+          const ny = s.y + ((y * 11 + i * 17) % 12) - 6;
+          ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+          ctx.fillRect(nx, ny, 1.5, 1);
+        }
+        ctx.globalAlpha = daylight;
+      }
 
       // Terrain blend: if neighbor is different biome, paint a soft spot at the edge
       if (showDetails && tile >= TILE.SAND && tile <= TILE.FOREST) {
@@ -820,8 +839,8 @@ export function render() {
       const px = ((i * 2971 + 7) % 997) / 997;   // 0..1
       const py = ((i * 1867 + 13) % 883) / 883;  // 0..1
       // Keep stars in upper ~65% of screen (sky area)
-      const sx = px * C.width;
-      const sy = py * C.height * 0.65;
+      const sx = px * logicalW;
+      const sy = py * logicalH * 0.65;
       // Twinkle: each star has its own phase offset
       const phase = (i * 0.37) % (Math.PI * 2);
       const twinkle = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(G.gameTick * 0.04 + phase));
@@ -841,8 +860,8 @@ export function render() {
 
     // ── Moon ───────────────────────────────────────────────────
     ctx.save();
-    const moonX = C.width * 0.82;
-    const moonY = C.height * 0.14;
+    const moonX = logicalW * 0.82;
+    const moonY = logicalH * 0.14;
     const moonR = 22;
     const moonAlpha = nightStrength * 0.92;
     ctx.globalAlpha = moonAlpha;
@@ -870,7 +889,7 @@ export function render() {
   }
 
   // ── Screen-space vignette (atmospheric edge fog) ──────────
-  const vw = C.width, vh = C.height;
+  const vw = logicalW, vh = logicalH;
   const vigSize = Math.min(vw, vh) * 0.4;
   const vig = ctx.createRadialGradient(vw/2, vh/2, Math.min(vw,vh)*0.3, vw/2, vh/2, Math.max(vw,vh)*0.7);
   vig.addColorStop(0, 'rgba(10,14,26,0)');
@@ -1014,18 +1033,28 @@ function drawBuilding(ctx, b, s, daylight) {
 }
 
 function drawHouse(ctx, s) {
-  // Walls
-  ctx.fillStyle = '#c89460';
+  // Walls — gradient for depth
+  const wallGrad = ctx.createLinearGradient(s.x, s.y-20, s.x, s.y-4);
+  wallGrad.addColorStop(0, '#d4a068');
+  wallGrad.addColorStop(1, '#b8844c');
+  ctx.fillStyle = wallGrad;
   ctx.fillRect(s.x-9, s.y-20, 18, 16);
-  // Side wall (iso depth)
+  // Highlight along top edge of wall
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-9, s.y-20); ctx.lineTo(s.x+9, s.y-20); ctx.stroke();
+  // Side wall (iso depth — keep flat, it's in shadow)
   ctx.fillStyle = '#a87c4e';
   ctx.beginPath();
   ctx.moveTo(s.x+9, s.y-20); ctx.lineTo(s.x+14, s.y-17);
   ctx.lineTo(s.x+14, s.y-1); ctx.lineTo(s.x+9, s.y-4);
   ctx.closePath();
   ctx.fill();
-  // Roof
-  ctx.fillStyle = '#c43527';
+  // Roof — gradient for shininess
+  const roofGrad = ctx.createLinearGradient(s.x, s.y-32, s.x, s.y-20);
+  roofGrad.addColorStop(0, '#d44030');
+  roofGrad.addColorStop(1, '#a02820');
+  ctx.fillStyle = roofGrad;
   ctx.beginPath();
   ctx.moveTo(s.x-12, s.y-20); ctx.lineTo(s.x, s.y-32);
   ctx.lineTo(s.x+12, s.y-20); ctx.closePath();
@@ -1135,13 +1164,20 @@ function drawMarket(ctx, s) {
   // Counter
   ctx.fillStyle = '#c89460';
   ctx.fillRect(s.x-12, s.y-8, 24, 6);
-  // Awning
-  ctx.fillStyle = '#e74c3c';
+  // Awning — subtle top-to-bottom gradient
+  const awningGrad = ctx.createLinearGradient(s.x, s.y-20, s.x, s.y-8);
+  awningGrad.addColorStop(0, '#f05545');
+  awningGrad.addColorStop(1, '#c0302090');
+  ctx.fillStyle = awningGrad;
   ctx.beginPath();
   ctx.moveTo(s.x-14, s.y-20); ctx.lineTo(s.x+14, s.y-20);
   ctx.lineTo(s.x+16, s.y-8); ctx.lineTo(s.x-16, s.y-8);
   ctx.closePath();
   ctx.fill();
+  // Highlight along top edge of awning
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-14, s.y-20); ctx.lineTo(s.x+14, s.y-20); ctx.stroke();
   // Stripes
   ctx.fillStyle = '#fff';
   for (let i = -12; i < 14; i += 6) {
@@ -1205,8 +1241,16 @@ function drawBarracks(ctx, s) {
 }
 
 function drawTower(ctx, s) {
-  ctx.fillStyle = '#8a8a9a';
+  // Tower body — darker gradient on stone
+  const towerGrad = ctx.createLinearGradient(s.x, s.y-40, s.x, s.y);
+  towerGrad.addColorStop(0, '#8a8a98');
+  towerGrad.addColorStop(1, '#5a5a68');
+  ctx.fillStyle = towerGrad;
   ctx.fillRect(s.x-6, s.y-34, 12, 30);
+  // Highlight along top edge
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-6, s.y-34); ctx.lineTo(s.x+6, s.y-34); ctx.stroke();
   ctx.fillStyle = '#7a7a8a';
   ctx.beginPath();
   ctx.moveTo(s.x+6, s.y-34); ctx.lineTo(s.x+9, s.y-31);
@@ -1255,8 +1299,16 @@ function drawWell(ctx, s) {
 }
 
 function drawTavern(ctx, s) {
-  ctx.fillStyle = '#b8905e';
+  // Walls — warm wood gradient, lighter at top
+  const woodGrad = ctx.createLinearGradient(s.x, s.y-22, s.x, s.y-4);
+  woodGrad.addColorStop(0, '#b88a50');
+  woodGrad.addColorStop(1, '#8a6030');
+  ctx.fillStyle = woodGrad;
   ctx.fillRect(s.x-10, s.y-20, 20, 16);
+  // Highlight along top edge
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-10, s.y-20); ctx.lineTo(s.x+10, s.y-20); ctx.stroke();
   ctx.fillStyle = '#a07848';
   ctx.beginPath();
   ctx.moveTo(s.x+10, s.y-20); ctx.lineTo(s.x+14, s.y-17);
@@ -1450,9 +1502,16 @@ function drawGranary(ctx, s) {
 }
 
 function drawChurch(ctx, s) {
-  // Main body
-  ctx.fillStyle = '#d4d0c8';
+  // Main body — stone wall gradient
+  const stoneGrad = ctx.createLinearGradient(s.x, s.y-26, s.x, s.y-4);
+  stoneGrad.addColorStop(0, '#e8e0d8');
+  stoneGrad.addColorStop(1, '#c8c0b8');
+  ctx.fillStyle = stoneGrad;
   ctx.fillRect(s.x - 10, s.y - 22, 20, 18);
+  // Highlight along top edge
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-10, s.y-22); ctx.lineTo(s.x+10, s.y-22); ctx.stroke();
   ctx.fillStyle = '#b8b0a8';
   ctx.beginPath();
   ctx.moveTo(s.x + 10, s.y - 22); ctx.lineTo(s.x + 14, s.y - 19);
@@ -1559,43 +1618,89 @@ function drawTree(ctx, x, y, a, seasonShift) {
   const c3 = seasonShift ? shiftColor('#236b28', seasonShift) : '#236b28';
   const c4 = seasonShift ? shiftColor('#55b55a', seasonShift) : '#55b55a';
 
-  // Shadow on ground
+  // Pick variant based on position
+  const variant = ((Math.abs(Math.round(x)) * 7 + Math.abs(Math.round(y)) * 13) % 3);
+
+  // Size variation
+  const size = 0.85 + ((Math.abs(Math.round(x)) * 374761 + Math.abs(Math.round(y)) * 668265) & 0xff) / 255 * 0.35;
+
+  // Shadow
   ctx.globalAlpha = a * 0.15;
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.ellipse(x + 4, y + 5, 12, 5, 0.3, 0, Math.PI * 2);
+  ctx.ellipse(x + 3, y + 4, 10*size, 4*size, 0.3, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = a;
 
-  // Trunk with bark texture
+  // Trunk
   ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(x - 3, y - 3, 6, 11);
+  ctx.fillRect(x - 2, y - 2, 4, 10);
   ctx.fillStyle = '#6a4a2a';
-  ctx.fillRect(x - 1, y - 2, 3, 9);
+  ctx.fillRect(x - 1, y, 2, 7);
 
-  // Rounded canopy layers using arcs for organic look
-  ctx.fillStyle = c1;
-  ctx.beginPath();
-  ctx.arc(x, y - 6, 14, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = c2;
-  ctx.beginPath();
-  ctx.arc(x - 3, y - 14, 11, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = c3;
-  ctx.beginPath();
-  ctx.arc(x + 3, y - 20, 8, 0, Math.PI * 2);
-  ctx.fill();
-  // Highlight spots for volume
-  ctx.fillStyle = c4;
-  ctx.globalAlpha = a * 0.5;
-  ctx.beginPath();
-  ctx.arc(x - 4, y - 17, 4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(x + 2, y - 9, 5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = a;
+  if (variant === 0) {
+    // Round deciduous tree (original but with gradient)
+    const grad = ctx.createRadialGradient(x-2, y-10, 2, x, y-4, 14*size);
+    grad.addColorStop(0, c4);
+    grad.addColorStop(0.5, c2);
+    grad.addColorStop(1, c3);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y - 4, 14*size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = c1;
+    ctx.beginPath();
+    ctx.arc(x - 2, y - 12*size, 9*size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 2, y - 16*size, 6*size, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (variant === 1) {
+    // Conical pine/spruce tree
+    ctx.fillStyle = c3;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 22*size);
+    ctx.lineTo(x - 10*size, y - 2);
+    ctx.lineTo(x + 10*size, y - 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = c2;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 22*size);
+    ctx.lineTo(x - 7*size, y - 8);
+    ctx.lineTo(x + 7*size, y - 8);
+    ctx.closePath();
+    ctx.fill();
+    // Snow tip or light highlight
+    ctx.fillStyle = c4;
+    ctx.globalAlpha = a * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 22*size);
+    ctx.lineTo(x - 3*size, y - 16*size);
+    ctx.lineTo(x + 3*size, y - 16*size);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = a;
+  } else {
+    // Bushy/wide oak
+    ctx.fillStyle = c1;
+    ctx.beginPath();
+    ctx.ellipse(x, y - 6, 16*size, 10*size, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = c2;
+    ctx.beginPath();
+    ctx.ellipse(x - 4, y - 10, 10*size, 7*size, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = c4;
+    ctx.globalAlpha = a * 0.4;
+    ctx.beginPath();
+    ctx.arc(x + 5, y - 8, 5*size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x - 6, y - 5, 4*size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = a;
+  }
 }
 
 function drawRock(ctx, x, y, a) {
@@ -1780,7 +1885,7 @@ function renderMinimap() {
 
   // Camera viewport — dark shadow stroke then bright cyan outline for visibility
   const tl = screenToWorld(0, 50);
-  const br = screenToWorld(C.width, C.height - 50);
+  const br = screenToWorld(logicalW, logicalH - 50);
   const vx = tl.x * sx, vy = tl.y * sy;
   const vw = (br.x - tl.x) * sx, vh = (br.y - tl.y) * sy;
   mc.strokeStyle = 'rgba(0,0,0,0.6)';
