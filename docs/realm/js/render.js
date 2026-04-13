@@ -34,7 +34,7 @@ export function screenToWorld(mx, my) {
   const sx = (cx - C.width/2)/G.camera.zoom + G.camera.x;
   const sy = (cy - C.height/2)/G.camera.zoom + G.camera.y;
   const w = toWorld(sx, sy);
-  return { x: Math.floor(w.x), y: Math.floor(w.y) };
+  return { x: Math.round(w.x), y: Math.round(w.y) };
 }
 
 function shiftColor(color, shift) {
