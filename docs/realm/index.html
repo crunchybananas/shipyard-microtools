@@ -46,6 +46,9 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .rate.pos{color:var(--food)}
 .rate.neg{color:var(--danger)}
 #day-display{color:rgba(255,255,255,0.5);font-size:0.72rem}
+.raid-warn{color:var(--danger);font-weight:600}
+.raid-warn-urgent{color:var(--danger);font-weight:700;animation:raidPulse 0.7s ease-in-out infinite}
+@keyframes raidPulse{0%,100%{opacity:1;text-shadow:0 0 6px rgba(248,113,113,0.8)}50%{opacity:0.5;text-shadow:none}}
 
 /* Build bar */
 #build-bar{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:stretch;justify-content:flex-start;gap:0.4rem;padding:0.5rem 0.8rem;background:var(--panel);border-top:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent}
@@ -62,6 +65,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .build-btn .icon{font-size:1.4rem;line-height:1}
 .build-btn .cost{font-size:0.6rem;color:rgba(255,255,255,0.5)}
 .build-btn .terrain{color:var(--food);font-size:0.55rem;display:block;margin-top:0.1rem}
+.build-cat{color:rgba(255,255,255,0.35);font-size:0.55rem;text-transform:uppercase;letter-spacing:0.08em;writing-mode:vertical-lr;padding:0 0.2rem;display:flex;align-items:center;user-select:none}
 
 /* Mission panel */
 #missions{position:fixed;top:3rem;right:0.8rem;width:220px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.8rem;z-index:10;backdrop-filter:blur(10px);font-size:0.75rem}
@@ -86,9 +90,13 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .feed-item .feed-day{color:rgba(255,255,255,0.4);margin-right:4px;font-size:0.65rem}
 
 /* Tooltip */
-#tooltip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.72rem;z-index:20;display:none;max-width:200px;backdrop-filter:blur(8px)}
-#tooltip .tt-title{font-weight:700;margin-bottom:0.15rem}
-#tooltip .tt-body{color:rgba(255,255,255,0.6)}
+#tooltip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:0.45rem 0.65rem;font-size:0.72rem;z-index:20;display:none;max-width:230px;backdrop-filter:blur(8px)}
+#tooltip .tt-title{font-weight:700;margin-bottom:0.3rem;font-size:0.78rem}
+#tooltip .tt-body{color:rgba(255,255,255,0.75);display:flex;flex-direction:column;gap:0.18rem}
+#tooltip .tt-desc{color:rgba(255,255,255,0.5);font-style:italic;margin-bottom:0.1rem;display:block}
+#tooltip .tt-row{display:flex;align-items:baseline;gap:0.35rem;white-space:nowrap}
+#tooltip .tt-lbl{color:rgba(255,255,255,0.4);font-size:0.65rem;min-width:52px}
+#tooltip .tt-terrain{color:var(--food);font-size:0.68rem}
 
 /* Speed + save controls */
 #controls{position:fixed;top:3rem;left:0.8rem;display:flex;flex-direction:column;gap:0.3rem;z-index:10}

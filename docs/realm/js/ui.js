@@ -47,38 +47,64 @@ export function updateUI() {
   const season = getSeasonData();
   const diffLabel = DIFFICULTY[G.difficulty]?.label?.split(' ')[0] || '';
   const raidDays = getRaidCountdown();
-  const raidWarn = raidDays ? ` · ⚔️${raidDays}d` : '';
-  $('day-display').textContent = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
+  let raidWarn = '';
+  if (raidDays) {
+    const urgent = raidDays <= 2;
+    raidWarn = ` · <span class="${urgent ? 'raid-warn-urgent' : 'raid-warn'}">⚔️${raidDays}d</span>`;
+  }
+  $('day-display').innerHTML = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
 }
+
+const CATEGORIES = [
+  { name: 'Housing',        keys: ['house'] },
+  { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine'] },
+  { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
+  { name: 'Defense',        keys: ['barracks', 'tower', 'wall'] },
+  { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },
+  { name: 'Culture',        keys: ['tavern', 'church'] },
+  { name: 'Victory',        keys: ['castle'] },
+];
 
 export function renderBuildBar() {
   const bar = document.getElementById('build-bar');
   if (!bar) return;
   bar.innerHTML = '';
   const allKeys = Object.keys(BUILDINGS);
-  for (const [key, def] of Object.entries(BUILDINGS)) {
-    if (!isBuildingUnlocked(key)) continue; // hide locked buildings
-    const affordable = canAfford(key);
-    const btn = document.createElement('button');
-    btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
-    const costStr = Object.entries(def.cost).map(([k,v]) => `${v}${k[0].toUpperCase()}`).join(' ');
-    // Show terrain requirement if applicable
-    const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
-    const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
-    const terrainTag = terrainReq ? `<span class="cost terrain">⬡ ${terrainReq}</span>` : '';
-    // Keyboard shortcut number (1-based index in BUILDINGS declaration order)
-    const shortcutNum = allKeys.indexOf(key) + 1;
-    const shortcutBadge = shortcutNum <= 9 ? `<span class="build-btn-shortcut">${shortcutNum}</span>` : '';
-    btn.innerHTML = `${shortcutBadge}<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>${terrainTag}`;
-    btn.onclick = () => {
-      G.selectedBuild = G.selectedBuild === key ? null : key;
-      G.selectedBuilding = null;
-      hideInfoPanel();
-      renderBuildBar();
-    };
-    btn.onmouseenter = () => showTooltip(btn, def.name, def.desc);
-    btn.onmouseleave = hideTooltip;
-    bar.appendChild(btn);
+  const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
+
+  for (const cat of CATEGORIES) {
+    const unlockedKeys = cat.keys.filter(key => BUILDINGS[key] && isBuildingUnlocked(key));
+    if (unlockedKeys.length === 0) continue;
+
+    // Category label divider
+    const divider = document.createElement('div');
+    divider.className = 'build-cat';
+    divider.textContent = cat.name;
+    bar.appendChild(divider);
+
+    for (const key of unlockedKeys) {
+      const def = BUILDINGS[key];
+      const affordable = canAfford(key);
+      const btn = document.createElement('button');
+      btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
+      const costStr = Object.entries(def.cost).map(([k,v]) => `${v}${k[0].toUpperCase()}`).join(' ');
+      // Show terrain requirement if applicable
+      const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
+      const terrainTag = terrainReq ? `<span class="cost terrain">⬡ ${terrainReq}</span>` : '';
+      // Keyboard shortcut number (1-based index in BUILDINGS declaration order)
+      const shortcutNum = allKeys.indexOf(key) + 1;
+      const shortcutBadge = shortcutNum <= 9 ? `<span class="build-btn-shortcut">${shortcutNum}</span>` : '';
+      btn.innerHTML = `${shortcutBadge}<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>${terrainTag}`;
+      btn.onclick = () => {
+        G.selectedBuild = G.selectedBuild === key ? null : key;
+        G.selectedBuilding = null;
+        hideInfoPanel();
+        renderBuildBar();
+      };
+      btn.onmouseenter = () => showTooltip(btn, key, def);
+      btn.onmouseleave = hideTooltip;
+      bar.appendChild(btn);
+    }
   }
 }
 
@@ -254,15 +280,68 @@ export function hideInfoPanel() {
   if (panel) { panel.style.display = 'none'; panel.classList.remove('ip-visible'); }
 }
 
-function showTooltip(anchor, title, body) {
+function showTooltip(anchor, key, def) {
   const tt = document.getElementById('tooltip');
   if (!tt) return;
-  const rect = anchor.getBoundingClientRect();
-  tt.querySelector('.tt-title').textContent = title;
-  tt.querySelector('.tt-body').textContent = body;
+
+  tt.querySelector('.tt-title').textContent = `${def.icon} ${def.name}`;
+
+  const lines = [];
+
+  // Description
+  if (def.desc) lines.push(`<span class="tt-desc">${def.desc}</span>`);
+
+  // Cost breakdown with emoji icons
+  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+  const costParts = Object.entries(def.cost).map(([k,v]) => `${resEmoji[k]||k} ${v}`).join('  ');
+  lines.push(`<span class="tt-row"><span class="tt-lbl">Cost</span> ${costParts}</span>`);
+
+  // Worker requirements
+  if (def.workers) {
+    lines.push(`<span class="tt-row"><span class="tt-lbl">Workers</span> 👷 ${def.workers}</span>`);
+  }
+
+  // Production output
+  if (def.prod) {
+    const prodStr = Object.entries(def.prod).map(([k,v]) => `${resEmoji[k]||k} ${v}/cycle`).join('  ');
+    lines.push(`<span class="tt-row"><span class="tt-lbl">Produces</span> ${prodStr}</span>`);
+  }
+
+  // Housing
+  if (def.pop) {
+    lines.push(`<span class="tt-row"><span class="tt-lbl">Housing</span> 🏠 +${def.pop} pop</span>`);
+  }
+
+  // Defense bonus
+  if (def.defense) {
+    lines.push(`<span class="tt-row"><span class="tt-lbl">Defense</span> 🛡 +${def.defense}</span>`);
+  }
+
+  // Happiness bonus
+  if (def.happiness) {
+    lines.push(`<span class="tt-row"><span class="tt-lbl">Happiness</span> 😊 +${def.happiness}</span>`);
+  }
+
+  // Terrain requirement
+  if (def.on) {
+    const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
+    const terrainStr = def.on.map(t => terrainNames[t] || '?').join(' or ');
+    lines.push(`<span class="tt-row tt-terrain">⬡ Requires ${terrainStr} tile</span>`);
+  }
+
+  tt.querySelector('.tt-body').innerHTML = lines.join('');
+
   tt.style.display = 'block';
-  tt.style.left = rect.left + 'px';
-  tt.style.top = (rect.top - tt.offsetHeight - 8) + 'px';
+  const rect = anchor.getBoundingClientRect();
+  // Position above the button, clamp to viewport
+  const ttH = tt.offsetHeight;
+  const ttW = tt.offsetWidth;
+  let left = rect.left;
+  let top = rect.top - ttH - 8;
+  if (left + ttW > window.innerWidth - 8) left = window.innerWidth - ttW - 8;
+  if (top < 8) top = rect.bottom + 8;
+  tt.style.left = left + 'px';
+  tt.style.top = top + 'px';
 }
 
 function hideTooltip() {

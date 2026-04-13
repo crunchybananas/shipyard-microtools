@@ -1030,6 +1030,15 @@ export function render() {
   ctx.globalAlpha = 1;
   ctx.restore();
 
+  // ── Raid flash overlay (screen space) ────────────────────────
+  if (G.raidFlash > 0) {
+    ctx.globalAlpha = G.raidFlash * 0.45;
+    ctx.fillStyle = 'rgba(220,30,30,1)';
+    ctx.fillRect(0, 0, logicalW, logicalH);
+    ctx.globalAlpha = 1;
+    G.raidFlash = Math.max(0, G.raidFlash - 0.018);
+  }
+
   // ── Stars & Moon (screen space, drawn during night/dawn/dusk) ─
   const nightStrength = Math.max(0, (0.8 - daylight) / 0.25); // 0→1 as daylight 0.8→0.55
   if (nightStrength > 0) {

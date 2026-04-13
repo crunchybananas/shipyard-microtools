@@ -88,6 +88,7 @@ export const G = {
   researchedTechs: new Set(['agriculture', 'forestry']),
   currentResearch: null,
   caravans: [],
+  raidFlash: 0,
   activeEvent: null,
   eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0 },
   season: 'spring',

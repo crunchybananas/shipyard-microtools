@@ -214,6 +214,22 @@ export function checkRaids() {
       notify(line, dmg > 0 ? 'danger' : 'event');
     }
 
+    // Raid visual effects — dramatic particles at settlement center
+    for (let i = 0; i < 15; i++) {
+      G.particles.push({
+        tx: MAP_W/2 + (Math.random()-0.5)*10,
+        ty: MAP_H/2 + (Math.random()-0.5)*10,
+        offsetY: -10 - Math.random()*20,
+        text: ['⚔️','💥','🔥'][Math.floor(Math.random()*3)],
+        alpha: 1.5,
+        vy: -0.2 - Math.random()*0.15,
+        decay: 0.01,
+        type: 'text',
+      });
+    }
+    // Screen flash — add a brief red overlay particle at map center
+    G.raidFlash = 1.0;
+
     G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
     G.raidInterval = Math.max(4, G.raidInterval - 1);
   }
