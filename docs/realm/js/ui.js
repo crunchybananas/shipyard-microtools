@@ -141,44 +141,107 @@ export function showInfoPanel(b) {
   const def = BUILDINGS[b.type];
   const panel = document.getElementById('info-panel');
   if (!panel) return;
-  panel.style.display = 'block';
+
   const workerCount = def.workers || 0;
-
-  // Level display: stars for levels 1-3
   const level = b.level || 1;
-  const levelStars = '★'.repeat(level) + '☆'.repeat(3 - level);
-  const levelLabel = def.upgrades ? ` <span style="color:#f5c542;letter-spacing:1px" title="Building level">${levelStars}</span>` : '';
 
-  const lines = [`<strong>${def.icon} ${def.name}</strong>${levelLabel}`];
-  lines.push(`HP: ${b.hp}/100`);
-  if (workerCount > 0) lines.push(`Workers: ${b.workers.length}/${workerCount}`);
-  if (def.prod) {
-    // Show effective production (with level multiplier applied)
-    const upgrades = def.upgrades || [];
-    const levelMult = level >= 2 ? (upgrades[level - 2]?.prodMult ?? 1) : 1;
-    const effectiveProd = Object.entries(def.prod).map(([k,v]) => `${Math.round(v * levelMult)} ${k}`).join(', ');
-    lines.push(`Produces: ${effectiveProd}`);
+  // Level stars: ★★☆ for level 2 of 3
+  const maxLevel = def.upgrades ? def.upgrades.length + 1 : 1;
+  const levelStars = def.upgrades
+    ? '★'.repeat(level) + '☆'.repeat(maxLevel - level)
+    : '';
+  const levelLabel = def.upgrades
+    ? `<span class="ip-stars" title="Level ${level}/${maxLevel}">${levelStars}</span>`
+    : '';
+
+  // Effective production multiplier for current level
+  const upgrades = def.upgrades || [];
+  const levelMult = level >= 2 ? (upgrades[level - 2]?.prodMult ?? 1) : 1;
+
+  // HP bar
+  const hp = Math.max(0, Math.min(100, b.hp ?? 100));
+  const hpPct = hp;
+  const hpColor = hp > 60 ? '#4ade80' : hp > 30 ? '#facc15' : '#f87171';
+
+  // Build header
+  let html = `
+    <div class="ip-header">
+      <span class="ip-title">${def.icon} ${def.name}${levelLabel ? ' ' + levelLabel : ''}</span>
+      <button class="ip-close" onclick="hideInfoPanel()" title="Close">✕</button>
+    </div>`;
+
+  // Description
+  if (def.desc) {
+    html += `<div class="ip-desc">${def.desc}</div>`;
   }
-  if (def.defense) lines.push(`Defense: +${def.defense}`);
-  if (def.pop) lines.push(`Housing: +${def.pop}`);
-  if (def.happiness) lines.push(`Happiness: +${def.happiness}`);
-  lines.push('<small style="opacity:0.5">Right-click to demolish (50% refund)</small>');
-  panel.innerHTML = lines.join('<br>');
+
+  // HP bar
+  html += `
+    <div class="ip-row">
+      <span class="ip-label">HP</span>
+      <span class="ip-hpbar">
+        <span class="ip-hpfill" style="width:${hpPct}%;background:${hpColor}"></span>
+      </span>
+      <span class="ip-hpval">${hp}/100</span>
+    </div>`;
+
+  // Workers
+  if (workerCount > 0) {
+    const staffed = b.workers.length;
+    const workerDots = '●'.repeat(staffed) + '○'.repeat(workerCount - staffed);
+    html += `<div class="ip-row"><span class="ip-label">Workers</span><span class="ip-val">${workerDots} ${staffed}/${workerCount}</span></div>`;
+  }
+
+  // Production (per cycle and per day)
+  if (def.prod) {
+    const effectiveProd = Object.entries(def.prod)
+      .map(([k, v]) => {
+        const perCycle = Math.round(v * levelMult * 10) / 10;
+        const perDay = Math.round(perCycle * 4 * 10) / 10; // ~4 cycles per day
+        return `${perCycle} ${k}<span class="ip-perday"> (${perDay}/day)</span>`;
+      }).join(', ');
+    html += `<div class="ip-row"><span class="ip-label">Produces</span><span class="ip-val">${effectiveProd}</span></div>`;
+  }
+
+  // Defense
+  if (def.defense) {
+    html += `<div class="ip-row"><span class="ip-label">Defense</span><span class="ip-val ip-defense">🛡 +${def.defense}</span></div>`;
+  }
+
+  // Housing
+  if (def.pop) {
+    html += `<div class="ip-row"><span class="ip-label">Housing</span><span class="ip-val">🏠 +${def.pop} pop</span></div>`;
+  }
+
+  // Happiness
+  if (def.happiness) {
+    html += `<div class="ip-row"><span class="ip-label">Happiness</span><span class="ip-val ip-happy">😊 +${def.happiness}</span></div>`;
+  }
+
+  html += `<div class="ip-hint">Right-click to demolish (50% refund)</div>`;
+
+  panel.innerHTML = html;
+
+  // Position below missions panel to avoid overlap
+  const missions = document.getElementById('missions');
+  if (missions) {
+    const mRect = missions.getBoundingClientRect();
+    panel.style.top = (mRect.bottom + 8) + 'px';
+  }
+
+  panel.style.display = 'block';
+  // Trigger slide-in animation
+  panel.classList.remove('ip-visible');
+  requestAnimationFrame(() => panel.classList.add('ip-visible'));
 
   // Upgrade button — show if upgrades exist and not at max level
   const nextUpgrade = def.upgrades?.[level - 1];
   if (nextUpgrade) {
     const costStr = Object.entries(nextUpgrade.cost).map(([k,v]) => `${v} ${k[0].toUpperCase()}`).join(' ');
-    // Check if player can afford it
     const canAffordUpgrade = Object.entries(nextUpgrade.cost).every(([k,v]) => (G.resources[k] || 0) >= v);
     const btn = document.createElement('button');
     btn.className = 'upgrade-btn' + (canAffordUpgrade ? '' : ' disabled');
-    btn.style.cssText = 'display:block;margin-top:6px;width:100%;padding:4px 6px;background:' +
-      (canAffordUpgrade ? '#5a9c5f' : '#555') +
-      ';color:#fff;border:none;border-radius:4px;cursor:' +
-      (canAffordUpgrade ? 'pointer' : 'not-allowed') +
-      ';font-size:11px;';
-    btn.innerHTML = `⬆ Upgrade to ${nextUpgrade.name} (×${nextUpgrade.prodMult})<br><small style="opacity:0.8">${costStr}</small>`;
+    btn.innerHTML = `⬆ Upgrade → ${nextUpgrade.name} <small style="opacity:0.75">(×${nextUpgrade.prodMult} prod)</small><br><small class="ip-hint" style="opacity:0.8">${costStr}</small>`;
     btn.onclick = () => {
       if (upgradeBuilding(b)) showInfoPanel(b);
     };
@@ -188,7 +251,7 @@ export function showInfoPanel(b) {
 
 export function hideInfoPanel() {
   const panel = document.getElementById('info-panel');
-  if (panel) panel.style.display = 'none';
+  if (panel) { panel.style.display = 'none'; panel.classList.remove('ip-visible'); }
 }
 
 function showTooltip(anchor, title, body) {

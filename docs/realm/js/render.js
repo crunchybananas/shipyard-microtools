@@ -80,6 +80,8 @@ export function render() {
   const minY = Math.max(0, Math.floor(Math.min(c0.y, c1.y, c2.y, c3.y)) - pad);
   const maxY = Math.min(MAP_H-1, Math.ceil(Math.max(c0.y, c1.y, c2.y, c3.y)) + pad);
 
+  const showDetails = G.camera.zoom >= 0.8;
+
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
       if (!G.fog[y][x]) continue;
@@ -112,7 +114,7 @@ export function render() {
       ctx.fill();
 
       // Terrain blend: if neighbor is different biome, paint a soft spot at the edge
-      if (tile >= TILE.SAND && tile <= TILE.FOREST) {
+      if (showDetails && tile >= TILE.SAND && tile <= TILE.FOREST) {
         for (const [dx2, dy2] of [[-1,0],[1,0],[0,-1],[0,1]]) {
           const nx = x+dx2, ny = y+dy2;
           if (nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
@@ -193,6 +195,7 @@ export function render() {
         }
       }
 
+      if (showDetails) {
       // Grass tufts and tiny flowers on grass tiles
       if (tile === TILE.GRASS && G.season !== 'winter') {
         const gh = ((x * 271 + y * 619) & 0xff);
@@ -269,9 +272,21 @@ export function render() {
           }
         }
       }
+      } // end showDetails
 
       // Tile features
-      if (tile === TILE.FOREST) drawTree(ctx, s.x, s.y-8, daylight, seasonShift);
+      if (tile === TILE.FOREST) {
+        if (G.camera.zoom < 0.6) {
+          // Simple green dot for far zoom
+          ctx.fillStyle = '#3a8a40';
+          ctx.globalAlpha = daylight;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y - 6, 8, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          drawTree(ctx, s.x, s.y-8, daylight, seasonShift);
+        }
+      }
       else if (tile === TILE.STONE) {
         drawRock(ctx, s.x, s.y-4, daylight);
         // Extra rubble dots for texture
@@ -533,17 +548,28 @@ export function render() {
     ctx.arc(s.x, cy - 13.5, 2, Math.PI * 0.8, Math.PI * 2.2);
     ctx.fill();
 
-    // Emote bubble above head
-    const emote = c.state==='idle' ? '💤' : c.state==='eating' ? '🍎' :
-      c.state==='working' ? '⚒️' : c.state==='foraging' ? '🌿' :
-      (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
-    if (emote && G.gameTick % 120 < 80) { // show emote 80 of every 120 ticks (flicker)
-      ctx.globalAlpha = 0.7;
-      ctx.font = '8px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(emote, s.x, cy - 18);
-      ctx.globalAlpha = daylight;
-    }
+    if (G.camera.zoom >= 0.7) {
+      // Emote bubble above head
+      const emote = c.state==='idle' ? '💤' : c.state==='eating' ? '🍎' :
+        c.state==='working' ? '⚒️' : c.state==='foraging' ? '🌿' :
+        (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
+      if (emote && G.gameTick % 120 < 80) { // show emote 80 of every 120 ticks (flicker)
+        ctx.globalAlpha = 0.7;
+        ctx.font = '8px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(emote, s.x, cy - 18);
+        ctx.globalAlpha = daylight;
+      }
+
+      // Carrying indicator (resource on shoulder)
+      if (c.carrying) {
+        const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
+        ctx.fillStyle = cc;
+        ctx.fillRect(s.x + 2, cy - 10, 3, 3);
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillRect(s.x + 2, cy - 10, 3, 1);
+      }
+    } // end zoom >= 0.7
 
     // Hover highlight ring
     if (c === hoveredCitizen) {
@@ -552,15 +578,6 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x, cy - 6, 6, 0, Math.PI * 2);
       ctx.stroke();
-    }
-
-    // Carrying indicator (resource on shoulder)
-    if (c.carrying) {
-      const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
-      ctx.fillStyle = cc;
-      ctx.fillRect(s.x + 2, cy - 10, 3, 3);
-      ctx.fillStyle = 'rgba(0,0,0,0.2)';
-      ctx.fillRect(s.x + 2, cy - 10, 3, 1);
     }
   }
 
@@ -905,71 +922,73 @@ function drawBuilding(ctx, b, s, daylight) {
   }
   ctx.restore(); // undo the 1.3x scale
 
-  // Snow cap on roofs in winter
-  if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
-    ctx.fillStyle = 'rgba(230,240,255,0.85)';
-    // Snow sits on top of the building — approximate roof peak
-    const snowY = b.type === 'tower' ? s.y - 34 : b.type === 'church' ? s.y - 38 : s.y - 24;
-    const snowW = b.type === 'tower' ? 8 : b.type === 'church' ? 10 : 14;
-    ctx.beginPath();
-    ctx.ellipse(s.x, snowY, snowW, 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Icicles
-    ctx.fillStyle = 'rgba(200,220,255,0.6)';
-    for (let i = -snowW + 3; i < snowW; i += 4) {
-      ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
-    }
-  }
-
-  // Night window glow — warm light from inhabited buildings at night
-  if (daylight < 0.75 && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
-    const glowAlpha = (0.75 - daylight) * 2; // brighter as it gets darker
-    ctx.globalAlpha = glowAlpha;
-    // Warm point light around the building
-    const glowR = b.type === 'castle' ? 40 : b.type === 'church' ? 32 : 24;
-    const glowY = b.type === 'tower' ? s.y - 18 : b.type === 'castle' ? s.y - 16 : s.y - 10;
-    const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
-    glow.addColorStop(0, 'rgba(255,220,140,0.55)');
-    glow.addColorStop(1, 'rgba(255,220,140,0)');
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(s.x, glowY, glowR, 0, Math.PI * 2);
-    ctx.fill();
-    // Bright window dots
-    ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
-    if (b.type === 'house') {
-      ctx.fillRect(s.x+3, s.y-15, 5, 5);
-    } else if (b.type === 'tavern') {
-      ctx.fillRect(s.x-6, s.y-15, 6, 5);
-      ctx.fillRect(s.x+2, s.y-15, 6, 5);
-    } else if (b.type === 'castle') {
-      for (const ox of [-6,3]) for (const oy of [-22,-14]) ctx.fillRect(s.x+ox, s.y+oy, 5, 6);
-    } else if (b.type === 'school') {
-      for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-13, 4, 5);
-    } else if (b.type === 'church') {
-      ctx.fillStyle = `rgba(100,160,255,${glowAlpha * 0.7})`; // blue stained glass
+  if (G.camera.zoom >= 0.5) {
+    // Snow cap on roofs in winter
+    if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
+      ctx.fillStyle = 'rgba(230,240,255,0.85)';
+      // Snow sits on top of the building — approximate roof peak
+      const snowY = b.type === 'tower' ? s.y - 34 : b.type === 'church' ? s.y - 38 : s.y - 24;
+      const snowW = b.type === 'tower' ? 8 : b.type === 'church' ? 10 : 14;
       ctx.beginPath();
-      ctx.arc(s.x, s.y-10, 5, Math.PI, 0);
+      ctx.ellipse(s.x, snowY, snowW, 3, 0, 0, Math.PI * 2);
       ctx.fill();
-    } else if (b.type === 'barracks') {
-      ctx.fillRect(s.x-4, s.y-11, 4, 5);
+      // Icicles
+      ctx.fillStyle = 'rgba(200,220,255,0.6)';
+      for (let i = -snowW + 3; i < snowW; i += 4) {
+        ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
+      }
     }
-    ctx.globalAlpha = daylight;
-  }
 
-  // Worker count indicator for buildings that need workers
-  const needed = def.workers || 0;
-  if (needed > 0) {
-    const have = b.workers.length;
-    const full = have >= needed;
-    ctx.globalAlpha = 0.85;
-    ctx.font = '8px -apple-system,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
-    const wy = b.type === 'tower' ? s.y - 44 : b.type === 'church' ? s.y - 46 : b.type === 'castle' ? s.y - 50 : s.y - 34;
-    ctx.fillText(`${have}/${needed}👤`, s.x, wy);
-    ctx.globalAlpha = daylight;
-  }
+    // Night window glow — warm light from inhabited buildings at night
+    if (daylight < 0.75 && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
+      const glowAlpha = (0.75 - daylight) * 2; // brighter as it gets darker
+      ctx.globalAlpha = glowAlpha;
+      // Warm point light around the building
+      const glowR = b.type === 'castle' ? 40 : b.type === 'church' ? 32 : 24;
+      const glowY = b.type === 'tower' ? s.y - 18 : b.type === 'castle' ? s.y - 16 : s.y - 10;
+      const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
+      glow.addColorStop(0, 'rgba(255,220,140,0.55)');
+      glow.addColorStop(1, 'rgba(255,220,140,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(s.x, glowY, glowR, 0, Math.PI * 2);
+      ctx.fill();
+      // Bright window dots
+      ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
+      if (b.type === 'house') {
+        ctx.fillRect(s.x+3, s.y-15, 5, 5);
+      } else if (b.type === 'tavern') {
+        ctx.fillRect(s.x-6, s.y-15, 6, 5);
+        ctx.fillRect(s.x+2, s.y-15, 6, 5);
+      } else if (b.type === 'castle') {
+        for (const ox of [-6,3]) for (const oy of [-22,-14]) ctx.fillRect(s.x+ox, s.y+oy, 5, 6);
+      } else if (b.type === 'school') {
+        for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-13, 4, 5);
+      } else if (b.type === 'church') {
+        ctx.fillStyle = `rgba(100,160,255,${glowAlpha * 0.7})`; // blue stained glass
+        ctx.beginPath();
+        ctx.arc(s.x, s.y-10, 5, Math.PI, 0);
+        ctx.fill();
+      } else if (b.type === 'barracks') {
+        ctx.fillRect(s.x-4, s.y-11, 4, 5);
+      }
+      ctx.globalAlpha = daylight;
+    }
+
+    // Worker count indicator for buildings that need workers
+    const needed = def.workers || 0;
+    if (needed > 0) {
+      const have = b.workers.length;
+      const full = have >= needed;
+      ctx.globalAlpha = 0.85;
+      ctx.font = '8px -apple-system,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
+      const wy = b.type === 'tower' ? s.y - 44 : b.type === 'church' ? s.y - 46 : b.type === 'castle' ? s.y - 50 : s.y - 34;
+      ctx.fillText(`${have}/${needed}👤`, s.x, wy);
+      ctx.globalAlpha = daylight;
+    }
+  } // end zoom >= 0.5
 
   // HP bar
   if (b.hp < 100) {
@@ -1119,11 +1138,31 @@ function drawMarket(ctx, s) {
     ctx.closePath();
     ctx.fill();
   }
-  // Goods
+  // Counter shelf edge highlight
+  ctx.fillStyle = '#a07040';
+  ctx.fillRect(s.x-12, s.y-9, 24, 1);
+  // Goods on counter
   ctx.fillStyle = '#ffd166';
   ctx.fillRect(s.x-6, s.y-12, 4, 3);
   ctx.fillStyle = '#4ade80';
   ctx.fillRect(s.x+2, s.y-12, 4, 3);
+  // Extra awning stripe detail (thin red border along bottom edge)
+  ctx.fillStyle = '#c0392b';
+  ctx.fillRect(s.x-16, s.y-9, 32, 1);
+  // Barrel prop beside stall (left side)
+  ctx.fillStyle = '#8b6a4e';
+  ctx.beginPath();
+  ctx.arc(s.x-15, s.y-5, 3, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#6a5040';
+  ctx.fillRect(s.x-18, s.y-6, 6, 1);
+  ctx.fillRect(s.x-18, s.y-4, 6, 1);
+  // Small crate prop (right side)
+  ctx.fillStyle = '#a3714f';
+  ctx.fillRect(s.x+12, s.y-8, 5, 4);
+  ctx.strokeStyle = '#6a5040';
+  ctx.lineWidth = 0.6;
+  ctx.strokeRect(s.x+12, s.y-8, 5, 4);
 }
 
 function drawBarracks(ctx, s) {
@@ -1161,14 +1200,30 @@ function drawTower(ctx, s) {
   ctx.lineTo(s.x+9, s.y-1); ctx.lineTo(s.x+6, s.y-4);
   ctx.closePath();
   ctx.fill();
-  // Crenellations
+  // Crenellations (battlements) — wider base + notched tops
   ctx.fillStyle = '#9a9aaa';
+  ctx.fillRect(s.x-6, s.y-38, 12, 4);
+  ctx.fillStyle = '#8a8a9a';
   for (let i = -5; i < 6; i += 4) {
-    ctx.fillRect(s.x+i, s.y-38, 3, 4);
+    ctx.fillRect(s.x+i, s.y-42, 3, 5);
   }
-  // Window slit
+  // Arrow slits (thin dark rectangles on tower body)
   ctx.fillStyle = '#2a2a3a';
-  ctx.fillRect(s.x-1, s.y-22, 2, 5);
+  ctx.fillRect(s.x-1, s.y-28, 2, 5);
+  ctx.fillRect(s.x-1, s.y-18, 2, 4);
+  // Doorway at base (arched)
+  ctx.fillStyle = '#3a3a4a';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y-6, 3, Math.PI, 0);
+  ctx.lineTo(s.x+3, s.y-4); ctx.lineTo(s.x-3, s.y-4);
+  ctx.closePath();
+  ctx.fill();
+  // Stone texture lines on tower face
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 0.6;
+  for (let sy = s.y-32; sy < s.y-4; sy += 5) {
+    ctx.beginPath(); ctx.moveTo(s.x-6, sy); ctx.lineTo(s.x+6, sy); ctx.stroke();
+  }
 }
 
 function drawWell(ctx, s) {
@@ -1201,15 +1256,33 @@ function drawTavern(ctx, s) {
   ctx.moveTo(s.x-13, s.y-20); ctx.lineTo(s.x, s.y-30);
   ctx.lineTo(s.x+13, s.y-20); ctx.closePath();
   ctx.fill();
-  // Sign
+  // Wood plank texture on front wall (horizontal lines)
+  ctx.strokeStyle = 'rgba(80,50,20,0.25)';
+  ctx.lineWidth = 0.8;
+  for (let py = s.y-18; py < s.y-4; py += 3) {
+    ctx.beginPath(); ctx.moveTo(s.x-10, py); ctx.lineTo(s.x+10, py); ctx.stroke();
+  }
+  // Sign bracket + hanging sign board
   ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(s.x-12, s.y-14, 2, 8);
-  ctx.fillStyle = '#e8c060';
-  ctx.fillRect(s.x-16, s.y-14, 6, 4);
+  ctx.fillRect(s.x-12, s.y-16, 2, 8);
+  ctx.fillRect(s.x-16, s.y-16, 7, 1);
+  ctx.fillStyle = '#c8922a';
+  ctx.fillRect(s.x-17, s.y-15, 8, 5);
+  ctx.fillStyle = '#ffd166';
+  ctx.fillRect(s.x-16, s.y-14, 6, 1);
   // Windows (warm glow)
   ctx.fillStyle = '#ffe088';
   ctx.fillRect(s.x-5, s.y-18, 4, 3);
   ctx.fillRect(s.x+3, s.y-18, 4, 3);
+  // Warm door light glow (orange gradient)
+  const tavernGlow = ctx.createRadialGradient(s.x, s.y-5, 0, s.x, s.y-5, 8);
+  tavernGlow.addColorStop(0, 'rgba(255,150,30,0.40)');
+  tavernGlow.addColorStop(1, 'rgba(255,150,30,0)');
+  ctx.fillStyle = tavernGlow;
+  ctx.fillRect(s.x-8, s.y-13, 16, 11);
+  // Door
+  ctx.fillStyle = '#3a2010';
+  ctx.fillRect(s.x-3, s.y-12, 6, 8);
 }
 
 function drawWall(ctx, s) {
@@ -1386,7 +1459,13 @@ function drawChurch(ctx, s) {
   ctx.fillStyle = '#ffd166';
   ctx.fillRect(s.x - 0.5, s.y - 46, 1, 6);
   ctx.fillRect(s.x - 2, s.y - 44, 4, 1);
-  // Window (stained glass)
+  // Stone wall texture (subtle horizontal lines)
+  ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+  ctx.lineWidth = 0.7;
+  for (let sy = s.y-20; sy < s.y-4; sy += 4) {
+    ctx.beginPath(); ctx.moveTo(s.x-10, sy); ctx.lineTo(s.x+10, sy); ctx.stroke();
+  }
+  // Detailed stained glass window (multi-color arched)
   ctx.fillStyle = '#4488cc';
   ctx.beginPath();
   ctx.arc(s.x, s.y - 14, 3, Math.PI, 0);
@@ -1394,6 +1473,25 @@ function drawChurch(ctx, s) {
   ctx.lineTo(s.x - 3, s.y - 9);
   ctx.closePath();
   ctx.fill();
+  // Red pane left, gold pane right
+  ctx.fillStyle = '#cc4444';
+  ctx.beginPath();
+  ctx.arc(s.x - 1, s.y - 14, 1.5, Math.PI, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#ddaa22';
+  ctx.beginPath();
+  ctx.arc(s.x + 1, s.y - 14, 1.5, Math.PI, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Small bell inside steeple opening
+  ctx.fillStyle = '#c8a030';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 36, 2, 0, Math.PI);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#a08020';
+  ctx.fillRect(s.x - 0.5, s.y - 35, 1, 2);
   // Door
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(s.x - 3, s.y - 8, 6, 4);

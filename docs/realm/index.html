@@ -99,7 +99,29 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #save-controls button:hover{background:rgba(255,255,255,0.12)}
 
 /* Info panel */
-#info-panel{position:fixed;top:3rem;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;z-index:15;backdrop-filter:blur(10px);font-size:0.78rem;line-height:1.6;display:none;min-width:180px;text-align:center}
+#info-panel{position:fixed;top:calc(3rem + 240px);right:0.8rem;width:230px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:0.75rem 0.9rem;z-index:15;backdrop-filter:blur(12px);font-size:0.78rem;line-height:1.5;display:none;box-shadow:0 4px 24px rgba(0,0,0,0.5);transform:translateX(20px);opacity:0;transition:transform 0.2s ease,opacity 0.2s ease}
+#info-panel.ip-visible{transform:translateX(0);opacity:1}
+.ip-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem}
+.ip-title{font-weight:700;font-size:0.85rem}
+.ip-stars{color:#f5c542;letter-spacing:2px;font-size:0.8rem;margin-left:4px}
+.ip-close{background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.8rem;cursor:pointer;padding:0 0.1rem;line-height:1;font-family:inherit;transition:color 0.15s}
+.ip-close:hover{color:rgba(255,255,255,0.8)}
+.ip-desc{color:rgba(255,255,255,0.5);font-size:0.72rem;margin-bottom:0.5rem;font-style:italic}
+.ip-row{display:flex;align-items:center;gap:0.4rem;padding:0.18rem 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.ip-row:last-of-type{border-bottom:none}
+.ip-label{color:rgba(255,255,255,0.4);font-size:0.7rem;min-width:58px;flex-shrink:0}
+.ip-val{color:var(--text);font-size:0.78rem}
+.ip-perday{color:rgba(255,255,255,0.4);font-size:0.68rem}
+.ip-defense{color:#93c5fd}
+.ip-happy{color:#86efac}
+.ip-hpbar{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden}
+.ip-hpfill{height:100%;border-radius:3px;transition:width 0.3s}
+.ip-hpval{font-size:0.7rem;color:rgba(255,255,255,0.5);min-width:36px;text-align:right}
+.ip-hint{color:rgba(255,255,255,0.28);font-size:0.66rem;margin-top:0.45rem;text-align:center}
+.upgrade-btn{display:block;margin-top:0.5rem;width:100%;padding:0.35rem 0.5rem;background:#3d7a42;color:#fff;border:1px solid #5a9c5f;border-radius:6px;cursor:pointer;font-size:0.75rem;font-family:inherit;text-align:left;line-height:1.4;transition:background 0.15s}
+.upgrade-btn:hover{background:#4e8f54}
+.upgrade-btn.disabled{background:#3a3a3a;border-color:#555;cursor:not-allowed;opacity:0.6}
+@media(max-width:600px){#info-panel{top:auto;bottom:5.5rem;right:0.4rem;width:200px;font-size:0.72rem}}
 
 /* Minimap */
 #minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:220px;height:220px;border:2px solid rgba(129,140,248,0.55);border-radius:10px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated;box-shadow:0 0 0 1px rgba(0,0,0,0.6),0 4px 20px rgba(0,0,0,0.6),inset 0 0 8px rgba(0,0,0,0.4)}
