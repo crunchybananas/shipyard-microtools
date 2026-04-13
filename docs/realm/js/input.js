@@ -16,6 +16,7 @@ export function setupInput(canvas) {
   C.addEventListener('contextmenu', e => e.preventDefault());
 
   C.addEventListener('mousedown', e => {
+    if (e.target !== C) return;
     initAudio();
 
     // Right-click demolish
@@ -105,6 +106,7 @@ export function setupInput(canvas) {
 
   // Touch
   C.addEventListener('touchstart', e => {
+    if (e.target !== C) return;
     initAudio();
     if (e.touches.length === 1) {
       const t = e.touches[0];

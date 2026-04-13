@@ -56,10 +56,10 @@ export function generateWorld(){
     const height = n - dist*1.1;
     if(height<0.05) G.map[y][x]=TILE.WATER;
     else if(height<0.12) G.map[y][x]=TILE.SAND;
-    else if(height<0.30) G.map[y][x]=TILE.GRASS;
-    else if(height<0.42) { const r=rng(); G.map[y][x]=r<0.55?TILE.FOREST:TILE.GRASS; }
-    else if(height<0.50) { const r=rng(); G.map[y][x]=r<0.35?TILE.STONE:r<0.45?TILE.IRON:r<0.7?TILE.FOREST:TILE.GRASS; }
-    else if(height<0.58) { const r=rng(); G.map[y][x]=r<0.4?TILE.STONE:r<0.5?TILE.MOUNTAIN:TILE.FOREST; }
+    else if(height<0.35) G.map[y][x]=TILE.GRASS;
+    else if(height<0.48) { const r=rng(); G.map[y][x]=r<0.70?TILE.FOREST:TILE.GRASS; }
+    else if(height<0.55) { const r=rng(); G.map[y][x]=r<0.25?TILE.STONE:r<0.35?TILE.IRON:r<0.75?TILE.FOREST:TILE.GRASS; }
+    else if(height<0.60) { const r=rng(); G.map[y][x]=r<0.35?TILE.STONE:r<0.45?TILE.MOUNTAIN:TILE.FOREST; }
     else G.map[y][x]=TILE.MOUNTAIN;
   }
 

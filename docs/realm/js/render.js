@@ -769,14 +769,16 @@ function drawBuilding(ctx, b, s, daylight) {
   // Shadow (scaled)
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y+5, 18, 7, 0, 0, Math.PI*2);
+  ctx.ellipse(s.x, s.y+9, 18, 7, 0, 0, Math.PI*2);
   ctx.fill();
 
   // Scale up buildings by 1.3x for visual presence
+  // groundY shifts the anchor down so buildings sit on the tile surface
+  const groundY = s.y + 4;
   ctx.save();
-  ctx.translate(s.x, s.y);
+  ctx.translate(s.x, groundY);
   ctx.scale(1.3, 1.3);
-  ctx.translate(-s.x, -s.y);
+  ctx.translate(-s.x, -groundY);
 
   switch (b.type) {
     case 'house': drawHouse(ctx, s); break;
@@ -804,7 +806,7 @@ function drawBuilding(ctx, b, s, daylight) {
   if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
     ctx.fillStyle = 'rgba(230,240,255,0.85)';
     // Snow sits on top of the building — approximate roof peak
-    const snowY = b.type === 'tower' ? s.y - 38 : b.type === 'church' ? s.y - 42 : s.y - 28;
+    const snowY = b.type === 'tower' ? s.y - 34 : b.type === 'church' ? s.y - 38 : s.y - 24;
     const snowW = b.type === 'tower' ? 8 : b.type === 'church' ? 10 : 14;
     ctx.beginPath();
     ctx.ellipse(s.x, snowY, snowW, 3, 0, 0, Math.PI * 2);
@@ -822,7 +824,7 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.globalAlpha = glowAlpha;
     // Warm point light around the building
     const glowR = b.type === 'castle' ? 28 : b.type === 'church' ? 22 : 16;
-    const glowY = b.type === 'tower' ? s.y - 22 : b.type === 'castle' ? s.y - 20 : s.y - 14;
+    const glowY = b.type === 'tower' ? s.y - 18 : b.type === 'castle' ? s.y - 16 : s.y - 10;
     const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
     glow.addColorStop(0, 'rgba(255,220,140,0.35)');
     glow.addColorStop(1, 'rgba(255,220,140,0)');
@@ -833,21 +835,21 @@ function drawBuilding(ctx, b, s, daylight) {
     // Bright window dots
     ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
     if (b.type === 'house') {
-      ctx.fillRect(s.x+4, s.y-18, 3, 3);
+      ctx.fillRect(s.x+4, s.y-14, 3, 3);
     } else if (b.type === 'tavern') {
-      ctx.fillRect(s.x-5, s.y-18, 4, 3);
-      ctx.fillRect(s.x+3, s.y-18, 4, 3);
+      ctx.fillRect(s.x-5, s.y-14, 4, 3);
+      ctx.fillRect(s.x+3, s.y-14, 4, 3);
     } else if (b.type === 'castle') {
-      for (const ox of [-6,3]) for (const oy of [-26,-18]) ctx.fillRect(s.x+ox, s.y+oy, 3, 4);
+      for (const ox of [-6,3]) for (const oy of [-22,-14]) ctx.fillRect(s.x+ox, s.y+oy, 3, 4);
     } else if (b.type === 'school') {
-      for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-16, 3, 3);
+      for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-12, 3, 3);
     } else if (b.type === 'church') {
       ctx.fillStyle = `rgba(100,160,255,${glowAlpha * 0.7})`; // blue stained glass
       ctx.beginPath();
-      ctx.arc(s.x, s.y-14, 3, Math.PI, 0);
+      ctx.arc(s.x, s.y-10, 3, Math.PI, 0);
       ctx.fill();
     } else if (b.type === 'barracks') {
-      ctx.fillRect(s.x-3, s.y-14, 2, 3);
+      ctx.fillRect(s.x-3, s.y-10, 2, 3);
     }
     ctx.globalAlpha = daylight;
   }
@@ -861,7 +863,7 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.font = '8px -apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
-    const wy = b.type === 'tower' ? s.y - 48 : b.type === 'church' ? s.y - 50 : b.type === 'castle' ? s.y - 54 : s.y - 38;
+    const wy = b.type === 'tower' ? s.y - 44 : b.type === 'church' ? s.y - 46 : b.type === 'castle' ? s.y - 50 : s.y - 34;
     ctx.fillText(`${have}/${needed}👤`, s.x, wy);
     ctx.globalAlpha = daylight;
   }
@@ -870,9 +872,9 @@ function drawBuilding(ctx, b, s, daylight) {
   if (b.hp < 100) {
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(s.x-12, s.y-38, 24, 3);
+    ctx.fillRect(s.x-12, s.y-34, 24, 3);
     ctx.fillStyle = b.hp > 50 ? '#4ade80' : '#f87171';
-    ctx.fillRect(s.x-12, s.y-38, 24*(b.hp/100), 3);
+    ctx.fillRect(s.x-12, s.y-34, 24*(b.hp/100), 3);
   }
 }
 
@@ -1339,37 +1341,37 @@ function drawTree(ctx, x, y, a, seasonShift) {
   ctx.globalAlpha = a * 0.15;
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.ellipse(x + 3, y + 4, 8, 3, 0.3, 0, Math.PI * 2);
+  ctx.ellipse(x + 4, y + 5, 12, 5, 0.3, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = a;
 
   // Trunk with bark texture
   ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(x - 2, y - 2, 4, 8);
+  ctx.fillRect(x - 3, y - 3, 6, 11);
   ctx.fillStyle = '#6a4a2a';
-  ctx.fillRect(x - 1, y - 1, 2, 6);
+  ctx.fillRect(x - 1, y - 2, 3, 9);
 
   // Rounded canopy layers using arcs for organic look
   ctx.fillStyle = c1;
   ctx.beginPath();
-  ctx.arc(x, y - 4, 10, 0, Math.PI * 2);
+  ctx.arc(x, y - 6, 14, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = c2;
   ctx.beginPath();
-  ctx.arc(x - 2, y - 10, 8, 0, Math.PI * 2);
+  ctx.arc(x - 3, y - 14, 11, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = c3;
   ctx.beginPath();
-  ctx.arc(x + 2, y - 14, 6, 0, Math.PI * 2);
+  ctx.arc(x + 3, y - 20, 8, 0, Math.PI * 2);
   ctx.fill();
   // Highlight spots for volume
   ctx.fillStyle = c4;
   ctx.globalAlpha = a * 0.5;
   ctx.beginPath();
-  ctx.arc(x - 3, y - 12, 3, 0, Math.PI * 2);
+  ctx.arc(x - 4, y - 17, 4, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(x + 1, y - 6, 3.5, 0, Math.PI * 2);
+  ctx.arc(x + 2, y - 9, 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = a;
 }

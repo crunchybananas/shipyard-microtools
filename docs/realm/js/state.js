@@ -11,7 +11,7 @@ export const TILE_COLORS = {
   [TILE.SAND]:    ['#e8c07a','#ddb46e'],
   [TILE.GRASS]:   ['#5a9c5f','#4e8b52'],
   [TILE.FOREST]:  ['#3a7a3f','#327035'],
-  [TILE.STONE]:   ['#8a8e9a','#7a7e8d'],
+  [TILE.STONE]:   ['#9a9490','#8a8480'],
   [TILE.IRON]:    ['#5a85b8','#4e78aa'],
   [TILE.MOUNTAIN]:['#6a6a7a','#5e5e6e'],
 };
