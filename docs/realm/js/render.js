@@ -306,21 +306,52 @@ export function render() {
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
       if (G.fog[y]?.[x]) {
-        // Check if this revealed tile borders unexplored tiles
-        const adjUnexplored =
-          (x > 0 && !G.fog[y][x-1]) || (x < MAP_W-1 && !G.fog[y][x+1]) ||
-          (y > 0 && !G.fog[y-1]?.[x]) || (y < MAP_H-1 && !G.fog[y+1]?.[x]);
-        if (adjUnexplored) {
+        const fogN = y > 0 && !G.fog[y-1]?.[x];
+        const fogS = y < MAP_H-1 && !G.fog[y+1]?.[x];
+        const fogW = x > 0 && !G.fog[y][x-1];
+        const fogE = x < MAP_W-1 && !G.fog[y][x+1];
+        if (fogN || fogS || fogW || fogE) {
           const s = toScreen(x, y);
-          ctx.fillStyle = 'rgba(10,14,26,0.18)';
-          ctx.globalAlpha = 1;
+          const hw = TW / 2, hh = TH / 2;
+          // Clip to the diamond shape of this tile
+          ctx.save();
           ctx.beginPath();
-          ctx.moveTo(s.x, s.y - TH/2);
-          ctx.lineTo(s.x + TW/2, s.y);
-          ctx.lineTo(s.x, s.y + TH/2);
-          ctx.lineTo(s.x - TW/2, s.y);
+          ctx.moveTo(s.x, s.y - hh);
+          ctx.lineTo(s.x + hw, s.y);
+          ctx.lineTo(s.x, s.y + hh);
+          ctx.lineTo(s.x - hw, s.y);
           ctx.closePath();
-          ctx.fill();
+          ctx.clip();
+          // Draw a directional gradient toward each unexplored neighbor
+          if (fogN) {
+            const g = ctx.createLinearGradient(s.x, s.y - hh, s.x, s.y);
+            g.addColorStop(0, 'rgba(10,14,26,0.72)');
+            g.addColorStop(1, 'rgba(10,14,26,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(s.x - hw, s.y - hh, TW, hh);
+          }
+          if (fogS) {
+            const g = ctx.createLinearGradient(s.x, s.y + hh, s.x, s.y);
+            g.addColorStop(0, 'rgba(10,14,26,0.72)');
+            g.addColorStop(1, 'rgba(10,14,26,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(s.x - hw, s.y, TW, hh);
+          }
+          if (fogW) {
+            const g = ctx.createLinearGradient(s.x - hw, s.y, s.x, s.y);
+            g.addColorStop(0, 'rgba(10,14,26,0.72)');
+            g.addColorStop(1, 'rgba(10,14,26,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(s.x - hw, s.y - hh, hw, TH);
+          }
+          if (fogE) {
+            const g = ctx.createLinearGradient(s.x + hw, s.y, s.x, s.y);
+            g.addColorStop(0, 'rgba(10,14,26,0.72)');
+            g.addColorStop(1, 'rgba(10,14,26,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(s.x, s.y - hh, hw, TH);
+          }
+          ctx.restore();
         }
       }
     }
@@ -638,7 +669,7 @@ export function render() {
 
   // Night overlay — gradient instead of flat fill
   if (daylight < 0.8) {
-    const overlayAlpha = (1-daylight) * 0.45;
+    const overlayAlpha = (1-daylight) * 0.7;
     ctx.globalAlpha = overlayAlpha;
     // Radial gradient: deeper blue at edges, slightly lighter center
     const nightGrad = ctx.createRadialGradient(0, -2000, 500, 0, 0, 7000);
@@ -696,8 +727,8 @@ export function render() {
       const phase = (i * 0.37) % (Math.PI * 2);
       const twinkle = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(G.gameTick * 0.04 + phase));
       // Vary star sizes: most tiny, some slightly larger
-      const baseSize = i % 11 === 0 ? 1.6 : i % 5 === 0 ? 1.2 : 0.8;
-      const alpha = nightStrength * twinkle * (0.55 + 0.45 * Math.sin(phase * 2));
+      const baseSize = i % 11 === 0 ? 2.0 : i % 5 === 0 ? 1.5 : 1.0;
+      const alpha = nightStrength * twinkle * (0.7 + 0.3 * Math.sin(phase * 2));
       ctx.globalAlpha = Math.min(1, alpha);
       // Slight blue-white color variation
       const bright = Math.floor(200 + 55 * twinkle);
@@ -718,7 +749,7 @@ export function render() {
     ctx.globalAlpha = moonAlpha;
     // Soft glow halo
     const moonGlow = ctx.createRadialGradient(moonX, moonY, moonR * 0.8, moonX, moonY, moonR * 2.8);
-    moonGlow.addColorStop(0, 'rgba(200,210,255,0.18)');
+    moonGlow.addColorStop(0, 'rgba(200,210,255,0.35)');
     moonGlow.addColorStop(1, 'rgba(200,210,255,0)');
     ctx.fillStyle = moonGlow;
     ctx.beginPath();
@@ -826,10 +857,10 @@ function drawBuilding(ctx, b, s, daylight) {
     const glowAlpha = (0.75 - daylight) * 2; // brighter as it gets darker
     ctx.globalAlpha = glowAlpha;
     // Warm point light around the building
-    const glowR = b.type === 'castle' ? 28 : b.type === 'church' ? 22 : 16;
+    const glowR = b.type === 'castle' ? 40 : b.type === 'church' ? 32 : 24;
     const glowY = b.type === 'tower' ? s.y - 18 : b.type === 'castle' ? s.y - 16 : s.y - 10;
     const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
-    glow.addColorStop(0, 'rgba(255,220,140,0.35)');
+    glow.addColorStop(0, 'rgba(255,220,140,0.55)');
     glow.addColorStop(1, 'rgba(255,220,140,0)');
     ctx.fillStyle = glow;
     ctx.beginPath();
@@ -838,21 +869,21 @@ function drawBuilding(ctx, b, s, daylight) {
     // Bright window dots
     ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
     if (b.type === 'house') {
-      ctx.fillRect(s.x+4, s.y-14, 3, 3);
+      ctx.fillRect(s.x+3, s.y-15, 5, 5);
     } else if (b.type === 'tavern') {
-      ctx.fillRect(s.x-5, s.y-14, 4, 3);
-      ctx.fillRect(s.x+3, s.y-14, 4, 3);
+      ctx.fillRect(s.x-6, s.y-15, 6, 5);
+      ctx.fillRect(s.x+2, s.y-15, 6, 5);
     } else if (b.type === 'castle') {
-      for (const ox of [-6,3]) for (const oy of [-22,-14]) ctx.fillRect(s.x+ox, s.y+oy, 3, 4);
+      for (const ox of [-6,3]) for (const oy of [-22,-14]) ctx.fillRect(s.x+ox, s.y+oy, 5, 6);
     } else if (b.type === 'school') {
-      for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-12, 3, 3);
+      for (let i=-8;i<=6;i+=5) ctx.fillRect(s.x+i, s.y-13, 4, 5);
     } else if (b.type === 'church') {
       ctx.fillStyle = `rgba(100,160,255,${glowAlpha * 0.7})`; // blue stained glass
       ctx.beginPath();
-      ctx.arc(s.x, s.y-10, 3, Math.PI, 0);
+      ctx.arc(s.x, s.y-10, 5, Math.PI, 0);
       ctx.fill();
     } else if (b.type === 'barracks') {
-      ctx.fillRect(s.x-3, s.y-10, 2, 3);
+      ctx.fillRect(s.x-4, s.y-11, 4, 5);
     }
     ctx.globalAlpha = daylight;
   }
@@ -1532,22 +1563,27 @@ function renderMinimap() {
   mc.fillStyle = '#08090f';
   mc.fillRect(0, 0, mw, mh);
 
-  // Terrain tiles — explored only
+  // Terrain tiles — explored and unexplored (fog = dark)
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
-      if (!G.fog[y][x]) continue;
-      mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
+      if (G.fog[y][x]) {
+        mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
+      } else {
+        mc.fillStyle = '#0d0f1a';
+      }
       mc.fillRect(x * sx, y * sy, Math.ceil(sx), Math.ceil(sy));
     }
   }
 
   // Buildings as colored circle dots with a dark halo so they pop against terrain
+  // Only show buildings on explored tiles
   for (const b of G.buildings) {
+    if (!G.fog[b.y]?.[b.x]) continue;
     const bx = (b.x + 0.5) * sx;
     const by = (b.y + 0.5) * sy;
-    const r = b.type === 'castle' ? 3.5 : b.type === 'tower' || b.type === 'church' ? 2.5 : 2;
+    const r = b.type === 'castle' ? 4 : b.type === 'tower' || b.type === 'church' ? 3.5 : 3;
     mc.beginPath();
-    mc.arc(bx, by, r + 1, 0, Math.PI * 2);
+    mc.arc(bx, by, r + 1.5, 0, Math.PI * 2);
     mc.fillStyle = 'rgba(0,0,0,0.65)';
     mc.fill();
     mc.beginPath();
@@ -1562,15 +1598,15 @@ function renderMinimap() {
     mc.fillRect(Math.round(c.x * sx) - 0.5, Math.round(c.y * sy) - 0.5, 2, 2);
   }
 
-  // Camera viewport — dark shadow stroke then bright white outline
+  // Camera viewport — dark shadow stroke then bright cyan outline for visibility
   const tl = screenToWorld(0, 50);
   const br = screenToWorld(C.width, C.height - 50);
   const vx = tl.x * sx, vy = tl.y * sy;
   const vw = (br.x - tl.x) * sx, vh = (br.y - tl.y) * sy;
-  mc.strokeStyle = 'rgba(0,0,0,0.5)';
-  mc.lineWidth = 3;
+  mc.strokeStyle = 'rgba(0,0,0,0.6)';
+  mc.lineWidth = 3.5;
   mc.strokeRect(vx, vy, vw, vh);
-  mc.strokeStyle = 'rgba(255,255,255,0.85)';
+  mc.strokeStyle = 'rgba(100,220,255,0.95)';
   mc.lineWidth = 1.5;
   mc.strokeRect(vx, vy, vw, vh);
 

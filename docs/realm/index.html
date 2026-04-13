@@ -36,6 +36,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
 .res{display:flex;align-items:center;gap:0.35rem;font-weight:600}
 .res-icon{width:16px;height:16px;border-radius:3px;display:inline-block}
+.res-emoji{font-size:1rem;line-height:1}
 .res .val{font-variant-numeric:tabular-nums}
 #pop-display{color:var(--accent)}
 .res-warn{animation:resWarn 0.8s ease-in-out infinite}
@@ -98,7 +99,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #info-panel{position:fixed;top:3rem;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;z-index:15;backdrop-filter:blur(10px);font-size:0.78rem;line-height:1.6;display:none;min-width:180px;text-align:center}
 
 /* Minimap */
-#minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:200px;height:200px;border:2px solid rgba(129,140,248,0.35);border-radius:8px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated;box-shadow:0 0 0 1px rgba(0,0,0,0.6),0 4px 16px rgba(0,0,0,0.5),inset 0 0 8px rgba(0,0,0,0.4)}
+#minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:220px;height:220px;border:2px solid rgba(129,140,248,0.55);border-radius:10px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated;box-shadow:0 0 0 1px rgba(0,0,0,0.6),0 4px 20px rgba(0,0,0,0.6),inset 0 0 8px rgba(0,0,0,0.4)}
 
 /* Notification log */
 #log-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,90vw);max-height:70vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
@@ -262,11 +263,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <canvas id="game"></canvas>
 
 <div id="hud">
-  <div class="res"><span class="res-icon" style="background:var(--wood)"></span><span class="val" id="r-wood">50</span></div>
-  <div class="res"><span class="res-icon" style="background:var(--stone)"></span><span class="val" id="r-stone">30</span></div>
-  <div class="res"><span class="res-icon" style="background:var(--food)"></span><span class="val" id="r-food">40</span></div>
-  <div class="res"><span class="res-icon" style="background:var(--gold)"></span><span class="val" id="r-gold">10</span></div>
-  <div class="res"><span class="res-icon" style="background:var(--iron)"></span><span class="val" id="r-iron">0</span></div>
+  <div class="res"><span class="res-emoji">🪵</span><span class="val" id="r-wood">50</span></div>
+  <div class="res"><span class="res-emoji">🪨</span><span class="val" id="r-stone">30</span></div>
+  <div class="res"><span class="res-emoji">🍎</span><span class="val" id="r-food">40</span></div>
+  <div class="res"><span class="res-emoji">🪙</span><span class="val" id="r-gold">10</span></div>
+  <div class="res"><span class="res-emoji">⚙️</span><span class="val" id="r-iron">0</span></div>
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
   <span id="day-display">Day 1</span>
   <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
@@ -300,7 +301,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 </div>
 
 <div id="info-panel"></div>
-<canvas id="minimap" width="200" height="200"></canvas>
+<canvas id="minimap" width="220" height="220"></canvas>
 
 <div id="happiness-panel" style="display:none">
   <div class="hp-header"><h3>😊 Happiness Breakdown</h3><button class="rp-close" onclick="toggleHappiness()">✕</button></div>
