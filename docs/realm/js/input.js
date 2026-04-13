@@ -150,6 +150,14 @@ export function setupInput(canvas) {
   // Keyboard
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { G.selectedBuild = null; G.selectedBuilding = null; hideInfoPanel(); renderBuildBar(); }
+    if (e.key === 'Home' || e.key === 'h') {
+      // Recenter camera on island center
+      const cx = MAP_W / 2, cy = MAP_H / 2;
+      G.camera.x = (cx - cy) * TW / 2;
+      G.camera.y = (cx + cy) * TH / 2;
+      G.camera.zoom = 1;
+      return;
+    }
     if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
       const h = document.getElementById('help-overlay');
       if (h) h.style.display = h.style.display === 'none' ? 'flex' : 'none';

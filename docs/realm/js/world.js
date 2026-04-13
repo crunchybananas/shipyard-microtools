@@ -63,10 +63,10 @@ export function generateWorld(){
     else G.map[y][x]=TILE.MOUNTAIN;
   }
 
-  for(let i=0;i<12;i++){
+  for(let i=0;i<20;i++){
     const px=rngInt(8,MAP_W-8), py=rngInt(8,MAP_H-8);
     const type = rng()<0.5 ? TILE.STONE : (rng()<0.5 ? TILE.IRON : TILE.FOREST);
-    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+    for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){
       const nx=px+dx,ny=py+dy;
       if(nx>=0&&nx<MAP_W&&ny>=0&&ny<MAP_H&&G.map[ny][nx]!==TILE.WATER&&G.map[ny][nx]!==TILE.MOUNTAIN&&rng()<0.7){
         G.map[ny][nx]=type;
@@ -83,7 +83,7 @@ export function generateWorld(){
       revealAround(nx,ny,1);
     }
   }
-  revealAround(sx,sy,5);
+  revealAround(sx,sy,7);
 
   G.citizens = [];
   for(let i=0;i<3;i++){

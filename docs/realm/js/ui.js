@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js';
-import { canAfford, getRaidCountdown } from './economy.js';
+import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
 
@@ -143,15 +143,47 @@ export function showInfoPanel(b) {
   if (!panel) return;
   panel.style.display = 'block';
   const workerCount = def.workers || 0;
-  const lines = [`<strong>${def.icon} ${def.name}</strong>`];
+
+  // Level display: stars for levels 1-3
+  const level = b.level || 1;
+  const levelStars = '★'.repeat(level) + '☆'.repeat(3 - level);
+  const levelLabel = def.upgrades ? ` <span style="color:#f5c542;letter-spacing:1px" title="Building level">${levelStars}</span>` : '';
+
+  const lines = [`<strong>${def.icon} ${def.name}</strong>${levelLabel}`];
   lines.push(`HP: ${b.hp}/100`);
   if (workerCount > 0) lines.push(`Workers: ${b.workers.length}/${workerCount}`);
-  if (def.prod) lines.push('Produces: ' + Object.entries(def.prod).map(([k,v]) => `${v} ${k}`).join(', '));
+  if (def.prod) {
+    // Show effective production (with level multiplier applied)
+    const upgrades = def.upgrades || [];
+    const levelMult = level >= 2 ? (upgrades[level - 2]?.prodMult ?? 1) : 1;
+    const effectiveProd = Object.entries(def.prod).map(([k,v]) => `${Math.round(v * levelMult)} ${k}`).join(', ');
+    lines.push(`Produces: ${effectiveProd}`);
+  }
   if (def.defense) lines.push(`Defense: +${def.defense}`);
   if (def.pop) lines.push(`Housing: +${def.pop}`);
   if (def.happiness) lines.push(`Happiness: +${def.happiness}`);
   lines.push('<small style="opacity:0.5">Right-click to demolish (50% refund)</small>');
   panel.innerHTML = lines.join('<br>');
+
+  // Upgrade button — show if upgrades exist and not at max level
+  const nextUpgrade = def.upgrades?.[level - 1];
+  if (nextUpgrade) {
+    const costStr = Object.entries(nextUpgrade.cost).map(([k,v]) => `${v} ${k[0].toUpperCase()}`).join(' ');
+    // Check if player can afford it
+    const canAffordUpgrade = Object.entries(nextUpgrade.cost).every(([k,v]) => (G.resources[k] || 0) >= v);
+    const btn = document.createElement('button');
+    btn.className = 'upgrade-btn' + (canAffordUpgrade ? '' : ' disabled');
+    btn.style.cssText = 'display:block;margin-top:6px;width:100%;padding:4px 6px;background:' +
+      (canAffordUpgrade ? '#5a9c5f' : '#555') +
+      ';color:#fff;border:none;border-radius:4px;cursor:' +
+      (canAffordUpgrade ? 'pointer' : 'not-allowed') +
+      ';font-size:11px;';
+    btn.innerHTML = `⬆ Upgrade to ${nextUpgrade.name} (×${nextUpgrade.prodMult})<br><small style="opacity:0.8">${costStr}</small>`;
+    btn.onclick = () => {
+      if (upgradeBuilding(b)) showInfoPanel(b);
+    };
+    panel.appendChild(btn);
+  }
 }
 
 export function hideInfoPanel() {

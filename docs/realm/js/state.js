@@ -4,7 +4,7 @@
 
 export const TILE = { WATER:0, SAND:1, GRASS:2, FOREST:3, STONE:4, IRON:5, MOUNTAIN:6 };
 export const TW = 64, TH = 32;
-export const MAP_W = 48, MAP_H = 48;
+export const MAP_W = 80, MAP_H = 80;
 
 export const TILE_COLORS = {
   [TILE.WATER]:   ['#1a6aaa','#1558a0'],
@@ -18,11 +18,31 @@ export const TILE_COLORS = {
 
 export const BUILDINGS = {
   house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:3, desc:'Shelters 3 settlers' },
-  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:2}, workers:1, desc:'Produces food each cycle' },
-  lumber:    { name:'Lumber Mill',  icon:'🪓', cost:{wood:5,stone:10}, prod:{wood:3}, workers:1, on:[TILE.FOREST], desc:'Harvests wood from forest' },
-  quarry:    { name:'Quarry',      icon:'⛏️', cost:{wood:10},          prod:{stone:2}, workers:1, on:[TILE.STONE], desc:'Extracts stone' },
-  mine:      { name:'Iron Mine',   icon:'🏭', cost:{wood:15,stone:15}, prod:{iron:1}, workers:2, on:[TILE.IRON], desc:'Mines iron ore' },
-  market:    { name:'Market',      icon:'🏪', cost:{wood:20,stone:15}, prod:{gold:2}, workers:1, desc:'Generates gold from trade' },
+  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:2}, workers:1, desc:'Produces food each cycle',
+    upgrades: [
+      { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },
+      { cost:{wood:25,stone:20,iron:5},  prodMult:2.0, name:'Level 3' },
+    ] },
+  lumber:    { name:'Lumber Mill',  icon:'🪓', cost:{wood:5,stone:10}, prod:{wood:3}, workers:1, on:[TILE.FOREST], desc:'Harvests wood from forest',
+    upgrades: [
+      { cost:{wood:8,stone:15},          prodMult:1.5, name:'Level 2' },
+      { cost:{wood:15,stone:25,iron:5},  prodMult:2.0, name:'Level 3' },
+    ] },
+  quarry:    { name:'Quarry',      icon:'⛏️', cost:{wood:10},          prod:{stone:2}, workers:1, on:[TILE.STONE], desc:'Extracts stone',
+    upgrades: [
+      { cost:{wood:15,stone:10},         prodMult:1.5, name:'Level 2' },
+      { cost:{wood:25,stone:20,iron:5},  prodMult:2.0, name:'Level 3' },
+    ] },
+  mine:      { name:'Iron Mine',   icon:'🏭', cost:{wood:15,stone:15}, prod:{iron:1}, workers:2, on:[TILE.IRON], desc:'Mines iron ore',
+    upgrades: [
+      { cost:{wood:22,stone:22,iron:3},  prodMult:1.5, name:'Level 2' },
+      { cost:{wood:38,stone:38,iron:8},  prodMult:2.0, name:'Level 3' },
+    ] },
+  market:    { name:'Market',      icon:'🏪', cost:{wood:20,stone:15}, prod:{gold:2}, workers:1, desc:'Generates gold from trade',
+    upgrades: [
+      { cost:{wood:30,stone:22,gold:10}, prodMult:1.5, name:'Level 2' },
+      { cost:{wood:50,stone:38,gold:25,iron:5}, prodMult:2.0, name:'Level 3' },
+    ] },
   barracks:  { name:'Barracks',    icon:'⚔️', cost:{wood:20,stone:20,iron:5}, defense:10, workers:2, desc:'Trains soldiers for defense' },
   tower:     { name:'Watch Tower', icon:'🗼', cost:{stone:25,iron:5},  defense:15, reveal:4, desc:'Reveals fog and defends' },
   well:      { name:'Well',        icon:'🪣', cost:{stone:10},         happiness:5, desc:'Provides water, boosts happiness' },

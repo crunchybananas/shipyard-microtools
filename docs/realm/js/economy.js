@@ -30,7 +30,7 @@ export function placeBuilding(type, tx, ty) {
   if (!canPlace(type,tx,ty) || !canAfford(type)) return false;
   const def = BUILDINGS[type];
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] -= v;
-  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null, prodShowCount:0 };
+  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null, prodShowCount:0, level:1 };
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
   if (def.pop) { G.maxPop += def.pop; trySpawnSettlers(def.pop); }
@@ -81,9 +81,12 @@ export function updateProduction() {
       b.prodTimer = 0;
       // Apply event + season multipliers
       const season = getSeasonData();
+      // Level multiplier: use the prodMult from the upgrade that was applied (level 1 = 1.0, level 2+ = upgrade's prodMult)
+      const upgrades = def.upgrades || [];
+      const levelMult = b.level >= 2 ? (upgrades[b.level - 2]?.prodMult ?? 1) : 1;
       const adjustedProd = {};
       for (const [k,v] of Object.entries(def.prod)) {
-        let mult = getProductionMultiplier(k);
+        let mult = getProductionMultiplier(k) * levelMult;
         if (k === 'food') mult *= season.foodMult;
         adjustedProd[k] = Math.round(v * mult);
       }
@@ -300,6 +303,32 @@ function updateCaravans() {
       }
     }
   }
+}
+
+export function upgradeBuilding(b) {
+  const def = BUILDINGS[b.type];
+  if (!def.upgrades) return false;
+  const nextUpgrade = def.upgrades[b.level - 1];
+  if (!nextUpgrade) return false; // already at max level
+
+  // Check affordability
+  for (const [k, v] of Object.entries(nextUpgrade.cost)) {
+    if ((G.resources[k] || 0) < v) {
+      const costStr = Object.entries(nextUpgrade.cost).map(([k,v]) => `${v} ${resourceEmoji(k)}`).join(', ');
+      notify(`Not enough resources to upgrade! Need: ${costStr}`, 'danger');
+      return false;
+    }
+  }
+
+  // Deduct cost
+  for (const [k, v] of Object.entries(nextUpgrade.cost)) G.resources[k] -= v;
+
+  b.level++;
+  playSound('build');
+  spawnDust(b.x, b.y);
+  const costStr = Object.entries(nextUpgrade.cost).map(([k,v]) => `${v} ${resourceEmoji(k)}`).join(', ');
+  notify(`${def.icon} ${def.name} upgraded to ${nextUpgrade.name}! Production ×${nextUpgrade.prodMult}`, 'event');
+  return true;
 }
 
 function showVictoryScreen() {
