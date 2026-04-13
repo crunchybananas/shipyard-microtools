@@ -768,29 +768,42 @@ export function render() {
     ctx.lineTo(s.x + torsoW + 1.5, torsoTop + 4 - armSwing);
     ctx.stroke();
 
-    // Head — skin tone, radius 3.5
+    // Facing direction — determine from movement or path target
+    let faceX = 0; // -1 = left, 0 = center, 1 = right
+    if (c.path && c.pathIdx < (c.path?.length ?? 0)) {
+      const wp = c.path[c.pathIdx];
+      const fdx = wp.x - c.x;
+      faceX = fdx > 0.1 ? 1 : fdx < -0.1 ? -1 : 0;
+    } else if (Math.abs(c.tx - c.x) > 0.1) {
+      faceX = c.tx > c.x ? 1 : -1;
+    }
+
+    // Head — skin tone, radius 3.5, shifted slightly in facing direction
+    const headX = s.x + faceX * 0.8;
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
-    ctx.arc(s.x, cy - 17, 3.5, 0, Math.PI * 2);
+    ctx.arc(headX, cy - 17, 3.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.15)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
-    // Hair — better coverage over top of head
+    // Hair — covers back of head (opposite to facing direction)
     const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
     ctx.fillStyle = ['#3a2a1a','#8a6a3a','#2a2a2a','#c08050'][hairHash];
     ctx.beginPath();
-    ctx.arc(s.x, cy - 17.5, 3.2, Math.PI * 0.65, Math.PI * 2.35);
+    const hairCenter = headX - faceX * 0.6;
+    ctx.arc(hairCenter, cy - 17.5, 3.2, Math.PI * 0.65, Math.PI * 2.35);
     ctx.closePath();
     ctx.fill();
 
-    // Eyes — only when zoomed in enough
+    // Eyes — on the facing side of the head
     if (G.camera.zoom >= 1.2) {
       ctx.fillStyle = '#2a1a0a';
+      const eyeBase = headX + faceX * 0.5;
       ctx.beginPath();
-      ctx.arc(s.x - 1.3, cy - 17, 0.55, 0, Math.PI * 2);
-      ctx.arc(s.x + 1.3, cy - 17, 0.55, 0, Math.PI * 2);
+      ctx.arc(eyeBase - 1.0, cy - 16.8, 0.55, 0, Math.PI * 2);
+      ctx.arc(eyeBase + 1.0, cy - 16.8, 0.55, 0, Math.PI * 2);
       ctx.fill();
     }
 
