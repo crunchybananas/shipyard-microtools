@@ -91,6 +91,16 @@ function showCitizenPanel(c) {
   requestAnimationFrame(() => panel.classList.add('ip-visible'));
 }
 
+function tryPlaceAt(tx, ty) {
+  if (placeBuilding(G.selectedBuild, tx, ty)) {
+    renderBuildBar();
+    renderMissions();
+    updateUI();
+    return true;
+  }
+  return false;
+}
+
 export function setupInput(canvas) {
   const C = canvas;
   let touchDist = 0;
@@ -114,33 +124,15 @@ export function setupInput(canvas) {
       return;
     }
 
-    // Left-click build
+    // Left-click build (+ drag-to-paint for roads/walls)
     if (e.button === 0 && G.selectedBuild) {
       const t = screenToWorld(e.clientX, e.clientY);
-      if (placeBuilding(G.selectedBuild, t.x, t.y)) {
-        renderBuildBar();
-        renderMissions();
-        updateUI();
-      } else {
-        // Build failed — show specific reason
-        playSound('click');
-        let reason = "Can't build here";
-        const def = BUILDINGS[G.selectedBuild];
-        if (t.x < 0 || t.x >= MAP_W || t.y < 0 || t.y >= MAP_H) reason = 'Out of bounds';
-        else if (!G.fog[t.y]?.[t.x]) reason = 'Unexplored area';
-        else if (G.map[t.y]?.[t.x] === 0) reason = 'Can\'t build on water';
-        else if (G.map[t.y]?.[t.x] === 6) reason = 'Can\'t build on mountains';
-        else if (G.buildingGrid[t.y]?.[t.x]) reason = 'Tile already occupied';
-        else if (def?.on && !def.on.includes(G.map[t.y]?.[t.x])) {
-          const names = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
-          const needed = def.on.map(n => names[n]).join('/');
-          reason = `Requires ${needed} tile`;
-        }
-        G.particles.push({
-          tx: t.x, ty: t.y, offsetY: -10,
-          text: `❌ ${reason}`,
-          alpha: 1.4, vy: -0.25, decay: 0.018, type: 'text',
-        });
+      tryPlaceAt(t.x, t.y);
+      // Enable drag-painting for cheap repeatable buildings
+      const paintable = G.selectedBuild === 'road' || G.selectedBuild === 'wall';
+      if (paintable) {
+        G._paintMode = true;
+        G._lastPaintTile = { x: t.x, y: t.y };
       }
       return;
     }
@@ -175,18 +167,26 @@ export function setupInput(canvas) {
   });
 
   C.addEventListener('mousemove', e => {
+    // Drag-to-paint roads/walls
+    if (G._paintMode && G.selectedBuild && e.buttons === 1) {
+      const t = screenToWorld(e.clientX, e.clientY);
+      if (!G._lastPaintTile || t.x !== G._lastPaintTile.x || t.y !== G._lastPaintTile.y) {
+        tryPlaceAt(t.x, t.y);
+        G._lastPaintTile = { x: t.x, y: t.y };
+      }
+    }
     if (G.dragging) {
       // Safety: if no mouse button is held (e.g. mouseup missed by automation), stop dragging
-      if (e.buttons === 0) { G.dragging = false; return; }
+      if (e.buttons === 0) { G.dragging = false; G._paintMode = false; return; }
       G.camera.x = G.camStart.x - (e.clientX - G.dragStart.x) / G.camera.zoom;
       G.camera.y = G.camStart.y - (e.clientY - G.dragStart.y) / G.camera.zoom;
     }
     G.hoveredTile = screenToWorld(e.clientX, e.clientY);
   });
 
-  C.addEventListener('mouseup', () => { G.dragging = false; });
-  C.addEventListener('mouseleave', () => { G.dragging = false; });
-  window.addEventListener('mouseup', () => { G.dragging = false; });
+  C.addEventListener('mouseup', () => { G.dragging = false; G._paintMode = false; });
+  C.addEventListener('mouseleave', () => { G.dragging = false; G._paintMode = false; });
+  window.addEventListener('mouseup', () => { G.dragging = false; G._paintMode = false; });
 
   C.addEventListener('wheel', e => {
     e.preventDefault();
