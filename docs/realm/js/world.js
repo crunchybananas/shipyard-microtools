@@ -74,16 +74,38 @@ export function generateWorld(){
     }
   }
 
-  const sx=Math.floor(cx), sy=Math.floor(cy);
-  for(let dy=-3;dy<=3;dy++) for(let dx=-3;dx<=3;dx++){
-    const nx=sx+dx, ny=sy+dy;
-    if(nx>=0&&nx<MAP_W&&ny>=0&&ny<MAP_H){
-      if(Math.abs(dx)<=1&&Math.abs(dy)<=1) G.map[ny][nx]=TILE.GRASS;
-      else if(G.map[ny][nx]===TILE.WATER) G.map[ny][nx]=TILE.SAND;
-      revealAround(nx,ny,1);
+  // Starting clearing — larger area for initial building
+  const sx = Math.floor(cx), sy = Math.floor(cy);
+  for (let dy = -5; dy <= 5; dy++) for (let dx = -5; dx <= 5; dx++) {
+    const nx = sx + dx, ny = sy + dy;
+    if (nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H) {
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist <= 3) G.map[ny][nx] = TILE.GRASS;
+      else if (dist <= 5 && G.map[ny][nx] === TILE.WATER) G.map[ny][nx] = TILE.SAND;
+      else if (dist <= 5 && (G.map[ny][nx] === TILE.MOUNTAIN || G.map[ny][nx] === TILE.STONE)) G.map[ny][nx] = TILE.GRASS;
     }
   }
-  revealAround(sx,sy,7);
+
+  // River — carve from near center toward coast
+  let rx = sx + 4, ry = sy;
+  for (let step = 0; step < 35; step++) {
+    if (rx < 1 || rx >= MAP_W-1 || ry < 1 || ry >= MAP_H-1) break;
+    if (G.map[ry][rx] === TILE.WATER) break;
+    // River tile
+    G.map[ry][rx] = TILE.WATER;
+    // Sand banks
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const bx = rx+dx, by = ry+dy;
+      if (bx>=0 && bx<MAP_W && by>=0 && by<MAP_H && G.map[by][bx] !== TILE.WATER) {
+        if (G.map[by][bx] !== TILE.SAND) G.map[by][bx] = TILE.SAND;
+      }
+    }
+    // Flow generally toward the nearest edge with some meandering
+    rx += 1;
+    ry += Math.round(rng() * 2 - 1);
+  }
+
+  revealAround(sx, sy, 9);
 
   G.citizens = [];
   for(let i=0;i<3;i++){

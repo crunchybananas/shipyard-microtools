@@ -294,10 +294,11 @@ export function render() {
       // Hover
       if (G.hoveredTile && G.hoveredTile.x===x && G.hoveredTile.y===y) {
         const valid = G.selectedBuild ? canPlaceCheck(G.selectedBuild, x, y) : true;
+        const hasBuilding = !G.selectedBuild && G.buildings.some(b => b.x===x && b.y===y);
         ctx.strokeStyle = G.selectedBuild
           ? (valid ? 'rgba(34,197,94,0.8)' : 'rgba(239,68,68,0.8)')
-          : 'rgba(255,255,255,0.35)';
-        ctx.lineWidth = 2;
+          : (hasBuilding ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.35)');
+        ctx.lineWidth = hasBuilding ? 2.5 : 2;
         ctx.globalAlpha = 1;
         ctx.beginPath();
         ctx.moveTo(s.x, s.y - TH/2);
@@ -306,6 +307,12 @@ export function render() {
         ctx.lineTo(s.x - TW/2, s.y);
         ctx.closePath();
         ctx.stroke();
+        if (hasBuilding) {
+          ctx.globalAlpha = 0.08;
+          ctx.fillStyle = 'rgba(255,255,255,1)';
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
       }
     }
   }
@@ -339,6 +346,31 @@ export function render() {
   for (const b of sorted) {
     const s = toScreen(b.x, b.y);
     drawBuilding(ctx, b, s, daylight);
+  }
+
+  // ── Selected building highlight ─────────────────────────
+  if (G.selectedBuilding) {
+    const sb = G.selectedBuilding;
+    const ss = toScreen(sb.x, sb.y);
+    const pulse = 0.5 + 0.3 * Math.sin(G.gameTick * 0.08);
+
+    // Pulsing gold diamond outline
+    ctx.globalAlpha = pulse;
+    ctx.strokeStyle = '#ffd166';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(ss.x, ss.y - TH/2 - 2);
+    ctx.lineTo(ss.x + TW/2 + 2, ss.y);
+    ctx.lineTo(ss.x, ss.y + TH/2 + 2);
+    ctx.lineTo(ss.x - TW/2 - 2, ss.y);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Inner glow
+    ctx.globalAlpha = pulse * 0.3;
+    ctx.fillStyle = 'rgba(255,209,102,0.15)';
+    ctx.fill();
+    ctx.globalAlpha = daylight;
   }
 
   // ── Citizens ──────────────────────────────────────────────
@@ -595,10 +627,13 @@ export function render() {
 
   // ── Build ghost ───────────────────────────────────────────
   if (G.selectedBuild && G.hoveredTile) {
-    const s = toScreen(G.hoveredTile.x, G.hoveredTile.y);
-    const valid = canPlaceCheck(G.selectedBuild, G.hoveredTile.x, G.hoveredTile.y);
-    ctx.globalAlpha = 0.45;
-    ctx.fillStyle = valid ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+    const ghostX = G.hoveredTile.x, ghostY = G.hoveredTile.y;
+    const s = toScreen(ghostX, ghostY);
+    const valid = canPlaceCheck(G.selectedBuild, ghostX, ghostY);
+
+    // Tile highlight diamond
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = valid ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
     ctx.beginPath();
     ctx.moveTo(s.x, s.y - TH/2);
     ctx.lineTo(s.x + TW/2, s.y);
@@ -606,10 +641,14 @@ export function render() {
     ctx.lineTo(s.x - TW/2, s.y);
     ctx.closePath();
     ctx.fill();
-    ctx.globalAlpha = 0.7;
-    ctx.font = '18px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(BUILDINGS[G.selectedBuild].icon, s.x, s.y-4);
+    ctx.strokeStyle = valid ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Render actual building sprite as ghost
+    const ghostBuilding = { type: G.selectedBuild, level: 1, workers: [], hp: 100, maxHp: 100 };
+    drawBuilding(ctx, ghostBuilding, s, valid ? 0.45 : 0.25);
+    ctx.globalAlpha = daylight;
   }
 
   // Night overlay — gradient instead of flat fill
@@ -727,27 +766,6 @@ export function render() {
   // ── Minimap ───────────────────────────────────────────────
   renderMinimap();
 
-  // ── Selected building highlight ───────────────────────────
-  if (G.selectedBuilding) {
-    const sb = G.selectedBuilding;
-    ctx.save();
-    ctx.translate(C.width/2, C.height/2);
-    ctx.scale(G.camera.zoom, G.camera.zoom);
-    ctx.translate(-G.camera.x, -G.camera.y);
-    const s = toScreen(sb.x, sb.y);
-    ctx.strokeStyle = 'rgba(129,140,248,0.8)';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([4,4]);
-    ctx.beginPath();
-    ctx.moveTo(s.x, s.y - TH/2 - 2);
-    ctx.lineTo(s.x + TW/2 + 2, s.y);
-    ctx.lineTo(s.x, s.y + TH/2 + 2);
-    ctx.lineTo(s.x - TW/2 - 2, s.y);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-  }
 }
 
 function canPlaceCheck(type, x, y) {
