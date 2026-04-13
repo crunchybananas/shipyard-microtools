@@ -7,10 +7,10 @@ export const TW = 64, TH = 32;
 export const MAP_W = 80, MAP_H = 80;
 
 export const TILE_COLORS = {
-  [TILE.WATER]:   ['#1a6aaa','#1558a0'],
-  [TILE.SAND]:    ['#e8c07a','#ddb46e'],
-  [TILE.GRASS]:   ['#5a9c5f','#4e8b52'],
-  [TILE.FOREST]:  ['#3a7a3f','#327035'],
+  [TILE.WATER]:   ['#1872b8','#1260a8'],
+  [TILE.SAND]:    ['#e8c87a','#ddb870'],
+  [TILE.GRASS]:   ['#4da854','#459a4a'],
+  [TILE.FOREST]:  ['#2d7a35','#256e2d'],
   [TILE.STONE]:   ['#9a9490','#8a8480'],
   [TILE.IRON]:    ['#5a85b8','#4e78aa'],
   [TILE.MOUNTAIN]:['#6a6a7a','#5e5e6e'],

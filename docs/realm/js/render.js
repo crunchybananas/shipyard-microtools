@@ -93,7 +93,7 @@ export function render() {
       if (tile === TILE.GRASS || tile === TILE.SAND) {
         const h = ((x * 374761 + y * 668265) & 0xff) / 255;
         const shade = tile === TILE.GRASS
-          ? (h < 0.25 ? '#4a8a50' : h < 0.5 ? '#5a9c5f' : h < 0.75 ? '#52944a' : '#62a568')
+          ? (h < 0.25 ? '#3d8f45' : h < 0.5 ? '#4da854' : h < 0.75 ? '#45a04a' : '#55b558')
           : (h < 0.5 ? '#e8c07a' : '#ddb46e');
         tileColor = shiftColor(shade, seasonShift);
       }
@@ -131,21 +131,6 @@ export function render() {
       ctx.closePath();
       ctx.fill();
 
-      // Subtle top edge highlight
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(s.x - TW/2, s.y);
-      ctx.lineTo(s.x, s.y - TH/2);
-      ctx.lineTo(s.x + TW/2, s.y);
-      ctx.stroke();
-      // Subtle bottom edge
-      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-      ctx.beginPath();
-      ctx.moveTo(s.x - TW/2, s.y);
-      ctx.lineTo(s.x, s.y + TH/2);
-      ctx.lineTo(s.x + TW/2, s.y);
-      ctx.stroke();
 
       // Beach edge shimmer on sand tiles adjacent to water
       if (tile === TILE.SAND) {
@@ -327,7 +312,7 @@ export function render() {
           (y > 0 && !G.fog[y-1]?.[x]) || (y < MAP_H-1 && !G.fog[y+1]?.[x]);
         if (adjUnexplored) {
           const s = toScreen(x, y);
-          ctx.fillStyle = 'rgba(10,14,26,0.35)';
+          ctx.fillStyle = 'rgba(10,14,26,0.18)';
           ctx.globalAlpha = 1;
           ctx.beginPath();
           ctx.moveTo(s.x, s.y - TH/2);
@@ -785,9 +770,9 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.globalAlpha = daylight;
 
   // Shadow (scaled)
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y+9, 18, 7, 0, 0, Math.PI*2);
+  ctx.ellipse(s.x, s.y+9, 20, 8, 0, 0, Math.PI*2);
   ctx.fill();
 
   // Scale up buildings by 1.3x for visual presence
@@ -898,17 +883,17 @@ function drawBuilding(ctx, b, s, daylight) {
 
 function drawHouse(ctx, s) {
   // Walls
-  ctx.fillStyle = '#d4a574';
+  ctx.fillStyle = '#c89460';
   ctx.fillRect(s.x-9, s.y-20, 18, 16);
   // Side wall (iso depth)
-  ctx.fillStyle = '#b8905e';
+  ctx.fillStyle = '#a87c4e';
   ctx.beginPath();
   ctx.moveTo(s.x+9, s.y-20); ctx.lineTo(s.x+14, s.y-17);
   ctx.lineTo(s.x+14, s.y-1); ctx.lineTo(s.x+9, s.y-4);
   ctx.closePath();
   ctx.fill();
   // Roof
-  ctx.fillStyle = '#c0392b';
+  ctx.fillStyle = '#c43527';
   ctx.beginPath();
   ctx.moveTo(s.x-12, s.y-20); ctx.lineTo(s.x, s.y-32);
   ctx.lineTo(s.x+12, s.y-20); ctx.closePath();
@@ -920,7 +905,7 @@ function drawHouse(ctx, s) {
   ctx.closePath();
   ctx.fill();
   // Door
-  ctx.fillStyle = '#5a3a1a';
+  ctx.fillStyle = '#4a2a12';
   ctx.fillRect(s.x-3, s.y-10, 6, 6);
   // Window
   ctx.fillStyle = '#ffeebb';
@@ -931,20 +916,28 @@ function drawHouse(ctx, s) {
 }
 
 function drawFarm(ctx, s) {
-  // Fence posts
-  ctx.fillStyle = '#8b6914';
+  // Fence posts — richer warm wood tone
+  ctx.fillStyle = '#7a4e0e';
   ctx.fillRect(s.x-14, s.y-6, 2, 6);
   ctx.fillRect(s.x+12, s.y-6, 2, 6);
-  ctx.fillRect(s.x-14, s.y+2, 28, 1);
-  // Field rows
-  ctx.fillStyle = '#6b4e1a';
+  ctx.fillRect(s.x-14, s.y+2, 28, 2);
+  // Additional fence posts for detail
+  ctx.fillRect(s.x-5, s.y-6, 2, 6);
+  ctx.fillRect(s.x+4, s.y-6, 2, 6);
+  // Field rows — darker richer soil
+  ctx.fillStyle = '#4e3210';
   for (let i = -12; i < 12; i += 4) {
     ctx.fillRect(s.x+i, s.y-4, 3, 6);
   }
-  // Crop tops
-  ctx.fillStyle = '#7cb342';
+  // Crop tops — more vivid green
+  ctx.fillStyle = '#5aab1e';
   for (let i = -11; i < 12; i += 4) {
     ctx.fillRect(s.x+i, s.y-8, 2, 4);
+  }
+  // Golden ripe crop tips
+  ctx.fillStyle = '#d4a017';
+  for (let i = -11; i < 12; i += 8) {
+    ctx.fillRect(s.x+i, s.y-10, 2, 2);
   }
 }
 
@@ -1008,7 +1001,7 @@ function drawMine(ctx, s) {
 
 function drawMarket(ctx, s) {
   // Counter
-  ctx.fillStyle = '#d4a574';
+  ctx.fillStyle = '#c89460';
   ctx.fillRect(s.x-12, s.y-8, 24, 6);
   // Awning
   ctx.fillStyle = '#e74c3c';
@@ -1350,10 +1343,10 @@ function drawGeneric(ctx, s, def) {
 // ── Terrain details ─────────────────────────────────────────
 function drawTree(ctx, x, y, a, seasonShift) {
   ctx.globalAlpha = a;
-  const c1 = seasonShift ? shiftColor('#2a6a30', seasonShift) : '#2a6a30';
-  const c2 = seasonShift ? shiftColor('#358a3a', seasonShift) : '#358a3a';
-  const c3 = seasonShift ? shiftColor('#1e5524', seasonShift) : '#1e5524';
-  const c4 = seasonShift ? shiftColor('#4a9a50', seasonShift) : '#4a9a50';
+  const c1 = seasonShift ? shiftColor('#2e7e35', seasonShift) : '#2e7e35';
+  const c2 = seasonShift ? shiftColor('#3d9e42', seasonShift) : '#3d9e42';
+  const c3 = seasonShift ? shiftColor('#236b28', seasonShift) : '#236b28';
+  const c4 = seasonShift ? shiftColor('#55b55a', seasonShift) : '#55b55a';
 
   // Shadow on ground
   ctx.globalAlpha = a * 0.15;
@@ -1403,11 +1396,13 @@ function drawRock(ctx, x, y, a) {
 }
 
 function drawIronOre(ctx, x, y, a) {
-  ctx.globalAlpha = a*0.9;
-  ctx.fillStyle = '#5577aa';
+  ctx.globalAlpha = a*0.95;
+  ctx.fillStyle = '#4a6cb8';
   ctx.beginPath(); ctx.moveTo(x-5,y+2); ctx.lineTo(x-3,y-5); ctx.lineTo(x+4,y-4); ctx.lineTo(x+5,y+2); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#88bbff';
-  ctx.fillRect(x-1, y-3, 2, 2);
+  // Metallic sheen — brighter highlight
+  ctx.globalAlpha = a*0.75;
+  ctx.fillStyle = '#a8d4ff';
+  ctx.fillRect(x-1, y-4, 3, 3);
   ctx.fillRect(x+2, y-1, 2, 2);
 }
 
@@ -1421,7 +1416,7 @@ function drawWater(ctx, x, y, a, tx, ty) {
   // Shift between deep navy and rich cobalt with a gentle pulse
   const depthPulse = 0.12 + 0.06 * Math.sin(t * 0.6 + phase);
   ctx.globalAlpha = a * (0.55 + depthPulse);
-  ctx.fillStyle = 'rgba(20,90,170,1)';   // deep base
+  ctx.fillStyle = 'rgba(18,100,195,1)';   // deep base
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
@@ -1429,7 +1424,7 @@ function drawWater(ctx, x, y, a, tx, ty) {
 
   // ── Layer 2: mid-water colour tint (lighter cobalt) ─────────
   ctx.globalAlpha = a * (0.35 + 0.1 * Math.sin(t * 0.9 + phase + 1));
-  ctx.fillStyle = 'rgba(60,150,220,1)';
+  ctx.fillStyle = 'rgba(55,165,245,1)';
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
@@ -1443,9 +1438,9 @@ function drawWater(ctx, x, y, a, tx, ty) {
     const rowY = waveRows[i];
     // Alternate direction so adjacent rows look natural
     const dir = (i % 2 === 0) ? 1 : -1;
-    const wAlpha = 0.22 + 0.12 * Math.sin(t * 1.4 + phase + i * 1.1);
+    const wAlpha = 0.28 + 0.14 * Math.sin(t * 1.4 + phase + i * 1.1);
     ctx.globalAlpha = a * wAlpha;
-    ctx.strokeStyle = `rgba(160,215,255,1)`;
+    ctx.strokeStyle = `rgba(200,235,255,1)`;
     ctx.beginPath();
     // Clip wave to the diamond by stepping through isometric x-range
     // The diamond at row offset rowY spans from -halfW to +halfW
@@ -1472,10 +1467,10 @@ function drawWater(ctx, x, y, a, tx, ty) {
     const gPhase = phase + g * 2.1;
     const gx = x + Math.sin(t * 0.8 + gPhase) * 14;
     const gy = y + Math.cos(t * 0.6 + gPhase) * 7;
-    const gSize = 1.2 + 0.8 * Math.sin(t * 2.5 + gPhase);
-    const gAlpha = 0.3 + 0.25 * Math.sin(t * 3.0 + gPhase);
+    const gSize = 1.5 + 1.0 * Math.sin(t * 2.5 + gPhase);
+    const gAlpha = 0.45 + 0.35 * Math.sin(t * 3.0 + gPhase);
     ctx.globalAlpha = a * Math.max(0, gAlpha);
-    ctx.fillStyle = 'rgba(230,245,255,1)';
+    ctx.fillStyle = 'rgba(240,252,255,1)';
     ctx.beginPath();
     ctx.arc(gx, gy, gSize, 0, Math.PI * 2);
     ctx.fill();
