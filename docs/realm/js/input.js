@@ -157,7 +157,7 @@ export function setupInput(canvas) {
       const cx = MAP_W / 2, cy = MAP_H / 2;
       G.camera.x = (cx - cy) * TW / 2;
       G.camera.y = (cx + cy) * TH / 2;
-      G.camera.zoom = 1;
+      G.camera.zoom = 1.3;
       return;
     }
     if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
@@ -187,5 +187,32 @@ export function setupInput(canvas) {
       G.camera.y = (tileX + tileY) * 16;
     });
   }
+
+  // WASD + arrow key camera movement
+  const heldKeys = new Set();
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    heldKeys.add(e.key.toLowerCase());
+  });
+  document.addEventListener('keyup', e => {
+    heldKeys.delete(e.key.toLowerCase());
+  });
+
+  function keyPanTick() {
+    if (G.speed >= 0) { // even when paused, allow camera movement
+      const panSpeed = 6 / G.camera.zoom;
+      let dx = 0, dy = 0;
+      if (heldKeys.has('w') || heldKeys.has('arrowup')) dy = -panSpeed;
+      if (heldKeys.has('s') || heldKeys.has('arrowdown')) dy = panSpeed;
+      if (heldKeys.has('a') || heldKeys.has('arrowleft')) dx = -panSpeed;
+      if (heldKeys.has('d') || heldKeys.has('arrowright')) dx = panSpeed;
+      if (dx || dy) {
+        G.camera.x += dx;
+        G.camera.y += dy;
+      }
+    }
+    requestAnimationFrame(keyPanTick);
+  }
+  keyPanTick();
 
 }

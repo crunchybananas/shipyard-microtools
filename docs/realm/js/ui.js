@@ -332,6 +332,11 @@ export function updateTutorialTip() {
   // Auto-advance if check passes
   try {
     if (step.check()) {
+      // Auto-dismiss after the player places their first building
+      if (step.id === 'place_house') {
+        dismissTutorial();
+        return;
+      }
       tutorialStep++;
       if (tutorialStep >= TUTORIAL_STEPS.length) { tipEl.style.display = 'none'; return; }
     }

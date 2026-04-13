@@ -117,6 +117,14 @@ window.toggleAmbientSound = () => {
   const btn = document.getElementById('btn-ambient');
   if (btn) btn.textContent = on ? '🔊' : '🔇';
 };
+window.toggleMissions = () => {
+  const c = document.getElementById('missions-content');
+  const t = document.getElementById('missions-toggle');
+  if (!c) return;
+  const open = c.style.display !== 'none';
+  c.style.display = open ? 'none' : 'block';
+  if (t) t.textContent = open ? '▶' : '▼';
+};
 
 notify('Welcome to Realm. Build your settlement!', 'info');
 

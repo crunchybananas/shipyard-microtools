@@ -116,5 +116,5 @@ export function generateWorld(){
   const centerScreen = { x: (sx-sy)*(64/2), y: (sx+sy)*(32/2) };
   G.camera.x = centerScreen.x;
   G.camera.y = centerScreen.y;
-  G.camera.zoom = 1;
+  G.camera.zoom = 1.3;
 }

@@ -64,8 +64,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .build-btn .terrain{color:var(--food);font-size:0.55rem;display:block;margin-top:0.1rem}
 
 /* Mission panel */
-#missions{position:fixed;top:3rem;right:0.8rem;width:220px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.8rem;z-index:10;backdrop-filter:blur(10px);font-size:0.75rem;max-height:60vh;overflow-y:auto}
-#missions h3{font-size:0.8rem;margin-bottom:0.5rem;color:var(--gold);letter-spacing:0.05em;text-transform:uppercase}
+#missions{position:fixed;top:3rem;right:0.8rem;width:220px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.8rem;z-index:10;backdrop-filter:blur(10px);font-size:0.75rem}
+#missions h3{font-size:0.8rem;margin-bottom:0.5rem;color:var(--gold);letter-spacing:0.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;user-select:none}
+#missions h3:hover{opacity:0.85}
+#missions-toggle{font-size:0.65rem;opacity:0.6;margin-left:0.4rem}
+#missions-content{max-height:280px;overflow-y:auto}
 .mission{padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:0.4rem}
 .mission:last-child{border-bottom:none}
 .mission.done{opacity:0.4;text-decoration:line-through}
@@ -75,8 +78,8 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 /* Toast */
 #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.88);color:var(--gold);padding:1rem 2rem;border-radius:10px;font-size:1.1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.4s;z-index:100;text-align:center;border:1px solid rgba(255,209,102,0.3)}
 #toast.show{opacity:1}
-#activity-feed{position:fixed;bottom:60px;left:10px;width:280px;pointer-events:none;z-index:30;display:flex;flex-direction:column;gap:2px}
-.feed-item{background:rgba(10,14,26,0.75);color:rgba(255,255,255,0.8);padding:4px 8px;border-radius:4px;font-size:0.72rem;line-height:1.3;border-left:2px solid var(--gold);opacity:1;transition:opacity 0.6s}
+#activity-feed{position:fixed;bottom:60px;left:10px;width:240px;pointer-events:none;z-index:30;display:flex;flex-direction:column;gap:2px;opacity:0.82}
+.feed-item{background:rgba(10,14,26,0.6);color:rgba(255,255,255,0.65);padding:3px 7px;border-radius:4px;font-size:0.65rem;line-height:1.3;border-left:2px solid var(--gold);opacity:1;transition:opacity 0.6s}
 .feed-item.fade{opacity:0}
 .feed-item.danger{border-left-color:var(--danger);color:var(--danger)}
 .feed-item.event{border-left-color:#a78bfa}
@@ -282,8 +285,10 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <div id="build-bar"></div>
 
 <div id="missions">
-  <h3>📜 Missions</h3>
-  <div id="mission-list"></div>
+  <h3 onclick="toggleMissions()" style="cursor:pointer">📜 Missions <span id="missions-toggle">▼</span></h3>
+  <div id="missions-content">
+    <div id="mission-list"></div>
+  </div>
 </div>
 
 <div id="controls">

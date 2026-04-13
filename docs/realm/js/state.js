@@ -74,7 +74,7 @@ export const G = {
   dayLength: 3600, // ~60 seconds per day at 1x speed — deliberate pacing
   gameTick: 0,
   speed: 1,
-  camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1 },
+  camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1.3 },
   selectedBuild: null,
   selectedBuilding: null,
   hoveredTile: null,

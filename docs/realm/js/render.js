@@ -111,6 +111,23 @@ export function render() {
       ctx.closePath();
       ctx.fill();
 
+      // Terrain blend: if neighbor is different biome, paint a soft spot at the edge
+      if (tile >= TILE.SAND && tile <= TILE.FOREST) {
+        for (const [dx2, dy2] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+          const nx = x+dx2, ny = y+dy2;
+          if (nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
+          const nTile = G.map[ny][nx];
+          if (nTile === tile || nTile === TILE.WATER || nTile === TILE.MOUNTAIN) continue;
+          const nColors = TILE_COLORS[nTile];
+          ctx.globalAlpha = daylight * 0.12;
+          ctx.fillStyle = nColors[0];
+          ctx.beginPath();
+          ctx.arc(s.x + dx2*12, s.y + dy2*6, 8, 0, Math.PI*2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = daylight;
+      }
+
       // Right side face (darker)
       ctx.fillStyle = shiftColor(tileColor, [-30, -30, -30]);
       ctx.beginPath();
@@ -179,26 +196,78 @@ export function render() {
       // Grass tufts and tiny flowers on grass tiles
       if (tile === TILE.GRASS && G.season !== 'winter') {
         const gh = ((x * 271 + y * 619) & 0xff);
+        const sway = Math.sin(G.gameTick * 0.02 + x * 0.5 + y * 0.3) * 1.5;
         ctx.globalAlpha = daylight * 0.6;
-        if (gh < 60) {
+        if (gh < 80) {
           ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
-          const gx = s.x - 8 + (gh % 16), gy = s.y - 4 + ((gh >> 4) % 6);
+          const gx = s.x - 8 + (gh % 16) + sway, gy = s.y - 4 + ((gh >> 4) % 6);
           ctx.beginPath();
-          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1, gy - 3); ctx.lineTo(gx + 1, gy - 2);
+          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1 + sway * 0.5, gy - 3); ctx.lineTo(gx + 1, gy - 2);
           ctx.fill();
           ctx.beginPath();
-          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3, gy - 4); ctx.lineTo(gx + 4, gy - 1);
+          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3 + sway * 0.5, gy - 4); ctx.lineTo(gx + 4, gy - 1);
           ctx.fill();
         }
         if (gh > 220 && G.season === 'spring') {
           ctx.fillStyle = ['#f0a0c0','#ffe066','#a0c0f0'][gh % 3];
           ctx.globalAlpha = daylight * 0.7;
-          const fx = s.x - 6 + (gh % 12), fy = s.y - 2 + ((gh >> 3) % 5);
+          const fx = s.x - 6 + (gh % 12) + sway * 0.5, fy = s.y - 2 + ((gh >> 3) % 5);
           ctx.beginPath();
           ctx.arc(fx, fy, 1.2, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = daylight;
+      }
+
+      // Pebbles on stone tiles
+      if (tile === TILE.STONE) {
+        const ph = ((x * 193 + y * 457) & 0xff);
+        if (ph < 90) {
+          ctx.globalAlpha = daylight * 0.45;
+          ctx.fillStyle = ph < 45 ? '#c0bdb8' : '#a8a5a0';
+          const px1 = s.x - 10 + (ph % 20), py1 = s.y - 1 + ((ph >> 4) % 5);
+          ctx.beginPath();
+          ctx.ellipse(px1, py1, 2.5, 1.5, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          if (ph < 50) {
+            const px2 = s.x + 3 + (ph % 7), py2 = s.y + 2 - ((ph >> 3) % 4);
+            ctx.beginPath();
+            ctx.ellipse(px2, py2, 1.8, 1.1, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = daylight;
+        }
+      }
+
+      // Occasional mushrooms on forest tile edges
+      if (tile === TILE.FOREST) {
+        const fh = ((x * 317 + y * 541) & 0xff);
+        if (fh > 230) {
+          const hasGrass = (
+            (x>0 && G.map[y][x-1]===TILE.GRASS) ||
+            (x<MAP_W-1 && G.map[y][x+1]===TILE.GRASS) ||
+            (y>0 && G.map[y-1][x]===TILE.GRASS) ||
+            (y<MAP_H-1 && G.map[y+1][x]===TILE.GRASS)
+          );
+          if (hasGrass) {
+            const mx = s.x - 10 + (fh % 20), my = s.y - 1 + ((fh >> 4) % 5);
+            ctx.globalAlpha = daylight * 0.85;
+            // Stem
+            ctx.fillStyle = '#e8d8b0';
+            ctx.fillRect(mx - 1, my - 4, 2, 4);
+            // Cap
+            ctx.fillStyle = fh % 2 === 0 ? '#c03020' : '#8b4513';
+            ctx.beginPath();
+            ctx.ellipse(mx, my - 4, 4, 2.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Cap highlight
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.ellipse(mx - 1, my - 5, 1.5, 1, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = daylight;
+          }
+        }
       }
 
       // Tile features
