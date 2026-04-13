@@ -124,16 +124,11 @@ export function setupInput(canvas) {
       return;
     }
 
-    // Left-click build (+ drag-to-paint for roads/walls)
+    // Left-click build
     if (e.button === 0 && G.selectedBuild) {
       const t = screenToWorld(e.clientX, e.clientY);
       tryPlaceAt(t.x, t.y);
-      // Enable drag-painting for cheap repeatable buildings
-      const paintable = G.selectedBuild === 'road' || G.selectedBuild === 'wall';
-      if (paintable) {
-        G._paintMode = true;
-        G._lastPaintTile = { x: t.x, y: t.y };
-      }
+      G._lastPaintTile = { x: t.x, y: t.y };
       return;
     }
 
@@ -167,8 +162,8 @@ export function setupInput(canvas) {
   });
 
   C.addEventListener('mousemove', e => {
-    // Drag-to-paint roads/walls
-    if (G._paintMode && G.selectedBuild && e.buttons === 1) {
+    // Drag-to-paint: hold mouse and drag to place roads/walls continuously
+    if (G.selectedBuild && e.buttons === 1 && (G.selectedBuild === 'road' || G.selectedBuild === 'wall')) {
       const t = screenToWorld(e.clientX, e.clientY);
       if (!G._lastPaintTile || t.x !== G._lastPaintTile.x || t.y !== G._lastPaintTile.y) {
         tryPlaceAt(t.x, t.y);
@@ -177,16 +172,16 @@ export function setupInput(canvas) {
     }
     if (G.dragging) {
       // Safety: if no mouse button is held (e.g. mouseup missed by automation), stop dragging
-      if (e.buttons === 0) { G.dragging = false; G._paintMode = false; return; }
+      if (e.buttons === 0) { G.dragging = false; return; }
       G.camera.x = G.camStart.x - (e.clientX - G.dragStart.x) / G.camera.zoom;
       G.camera.y = G.camStart.y - (e.clientY - G.dragStart.y) / G.camera.zoom;
     }
     G.hoveredTile = screenToWorld(e.clientX, e.clientY);
   });
 
-  C.addEventListener('mouseup', () => { G.dragging = false; G._paintMode = false; });
-  C.addEventListener('mouseleave', () => { G.dragging = false; G._paintMode = false; });
-  window.addEventListener('mouseup', () => { G.dragging = false; G._paintMode = false; });
+  C.addEventListener('mouseup', () => { G.dragging = false; });
+  C.addEventListener('mouseleave', () => { G.dragging = false; });
+  window.addEventListener('mouseup', () => { G.dragging = false; });
 
   C.addEventListener('wheel', e => {
     e.preventDefault();
