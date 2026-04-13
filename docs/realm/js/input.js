@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
-import { screenToWorld, toScreen } from './render.js';
+import { screenToWorld, toScreen, toggleFPS } from './render.js';
 import { placeBuilding, demolishBuilding } from './economy.js';
 import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js';
@@ -277,6 +277,11 @@ export function setupInput(canvas) {
       const idx = speeds.indexOf(G.speed);
       G.speed = speeds[(idx + 1) % speeds.length];
       setSpeed(G.speed);
+      return;
+    }
+    if (e.key === 'F3') {
+      e.preventDefault();
+      toggleFPS();
       return;
     }
   });

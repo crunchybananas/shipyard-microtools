@@ -7,6 +7,11 @@ import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, g
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
 
+// ── FPS counter ───────────────────────────────────────────────
+let fpsFrames = 0, fpsTime = 0, fpsDisplay = 0;
+export let showFPS = false;
+export function toggleFPS() { showFPS = !showFPS; }
+
 // ── Performance caches ────────────────────────────────────────
 // Fog-of-war gradient cache keyed by direction ('N'|'S'|'E'|'W')
 // These are relative gradients that are re-applied via translate, so they
@@ -1226,6 +1231,22 @@ export function render() {
 
   // Screen-space vignette removed — handled by WebGL post-processing (postfx.js)
 
+  // ── FPS counter ───────────────────────────────────────────
+  fpsFrames++;
+  if (performance.now() - fpsTime > 1000) {
+    fpsDisplay = fpsFrames;
+    fpsFrames = 0;
+    fpsTime = performance.now();
+  }
+  if (showFPS) {
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(4, logicalH - 20, 50, 16);
+    ctx.fillStyle = fpsDisplay >= 50 ? '#4ade80' : fpsDisplay >= 30 ? '#ffd166' : '#f87171';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${fpsDisplay} FPS`, 8, logicalH - 8);
+  }
+
   // ── Minimap ───────────────────────────────────────────────
   renderMinimap();
 
@@ -1428,29 +1449,106 @@ function drawHouse(ctx, s) {
 }
 
 function drawFarm(ctx, s) {
-  // Fence posts — richer warm wood tone
-  ctx.fillStyle = '#7a4e0e';
-  ctx.fillRect(s.x-14, s.y-6, 2, 6);
-  ctx.fillRect(s.x+12, s.y-6, 2, 6);
-  ctx.fillRect(s.x-14, s.y+2, 28, 2);
-  // Additional fence posts for detail
-  ctx.fillRect(s.x-5, s.y-6, 2, 6);
-  ctx.fillRect(s.x+4, s.y-6, 2, 6);
-  // Field rows — darker richer soil
-  ctx.fillStyle = '#4e3210';
-  for (let i = -12; i < 12; i += 4) {
-    ctx.fillRect(s.x+i, s.y-4, 3, 6);
+  // --- Ground base — flat tilled earth diamond ---
+  ctx.fillStyle = '#3d2408';
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - TH/2 + 2);
+  ctx.lineTo(s.x + TW/2 - 2, s.y);
+  ctx.lineTo(s.x, s.y + TH/2 - 2);
+  ctx.lineTo(s.x - TW/2 + 2, s.y);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- Plowed soil rows — alternating dark furrows ---
+  const rowColors = ['#2a1705', '#3d2408', '#4a2d0a'];
+  for (let row = -3; row <= 3; row++) {
+    const ry = s.y + row * 2.8;
+    const halfW = 14 - Math.abs(row) * 1.5;
+    ctx.fillStyle = rowColors[(row + 3) % 3];
+    ctx.fillRect(s.x - halfW, ry - 1, halfW * 2, 1.8);
   }
-  // Crop tops — more vivid green
-  ctx.fillStyle = '#5aab1e';
-  for (let i = -11; i < 12; i += 4) {
-    ctx.fillRect(s.x+i, s.y-8, 2, 4);
+
+  // --- Irrigation channel — right side, blue-grey strip ---
+  ctx.strokeStyle = '#4a7a9b';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 8, s.y - 8);
+  ctx.lineTo(s.x + 14, s.y - 2);
+  ctx.lineTo(s.x + 10, s.y + 4);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(120,190,230,0.5)';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 9, s.y - 6);
+  ctx.lineTo(s.x + 13, s.y - 1);
+  ctx.stroke();
+
+  // --- Crops: alternate green (growing) and golden (ripe) columns ---
+  const cropCols = [-10, -5, 0, 5];
+  for (let ci = 0; ci < cropCols.length; ci++) {
+    const cx = s.x + cropCols[ci];
+    const isRipe = ci % 2 === 1;
+    ctx.strokeStyle = isRipe ? '#8b7020' : '#3a7a10';
+    ctx.lineWidth = 1;
+    for (let row = -3; row <= 2; row++) {
+      const cy = s.y + row * 2.8;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + 1);
+      ctx.lineTo(cx, cy - 3);
+      ctx.stroke();
+      if (isRipe) {
+        ctx.fillStyle = '#d4a017';
+        ctx.fillRect(cx - 1, cy - 5, 2, 2);
+        ctx.fillStyle = '#c8901a';
+        ctx.fillRect(cx - 1, cy - 3, 2, 1);
+      } else {
+        ctx.fillStyle = '#4db820';
+        ctx.fillRect(cx - 2, cy - 5, 4, 2);
+        ctx.fillStyle = '#3aaa10';
+        ctx.fillRect(cx - 1, cy - 3, 2, 1);
+      }
+    }
   }
-  // Golden ripe crop tips
-  ctx.fillStyle = '#d4a017';
-  for (let i = -11; i < 12; i += 8) {
-    ctx.fillRect(s.x+i, s.y-10, 2, 2);
+
+  // --- Fence — posts with two connected horizontal rails ---
+  const postXL = s.x - 16, postXR = s.x + 14;
+  const postYTop = s.y - 10, postYBot = s.y + 2;
+  ctx.strokeStyle = '#7a4e0e';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(postXL, postYTop - 3);
+  ctx.lineTo(postXR, postYTop - 3);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(postXL, postYBot - 1);
+  ctx.lineTo(postXR, postYBot - 1);
+  ctx.stroke();
+  const fencePosts = [
+    [postXL, postYTop], [postXL + 9, postYTop - 2],
+    [postXR - 9, postYTop - 2], [postXR, postYTop],
+  ];
+  for (const [px, py] of fencePosts) {
+    ctx.fillStyle = '#8a5518';
+    ctx.fillRect(px - 1, py - 9, 2.5, 1.5);
+    ctx.fillStyle = '#6b3f0b';
+    ctx.fillRect(px - 1, py - 8, 2.5, 10);
   }
+
+  // --- Scarecrow in back-left corner ---
+  const scx = s.x - 11, scy = s.y - 10;
+  ctx.strokeStyle = '#5a3808';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(scx, scy + 4); ctx.lineTo(scx, scy - 8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(scx - 4, scy - 3); ctx.lineTo(scx + 4, scy - 3); ctx.stroke();
+  ctx.fillStyle = 'rgba(160,110,60,0.75)';
+  ctx.beginPath();
+  ctx.moveTo(scx - 4, scy - 3); ctx.lineTo(scx + 4, scy - 3);
+  ctx.lineTo(scx, scy + 1); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#d4a87a';
+  ctx.beginPath(); ctx.arc(scx, scy - 9, 2.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#5a3808';
+  ctx.fillRect(scx - 3, scy - 11, 6, 1.5);
+  ctx.fillRect(scx - 1.5, scy - 14, 3, 3);
 }
 
 function drawLumber(ctx, s) {
@@ -1530,20 +1628,153 @@ function drawLumber(ctx, s) {
 }
 
 function drawQuarry(ctx, s) {
-  // Pit
-  ctx.fillStyle = '#3a3a44';
+  // === Open-pit stone quarry — concave terraced excavation ===
+
+  // --- Outermost rim: ground-level stone surround ---
+  ctx.fillStyle = '#7a7870';
   ctx.beginPath();
-  ctx.moveTo(s.x, s.y-TH/2+4); ctx.lineTo(s.x+TW/4, s.y);
-  ctx.lineTo(s.x, s.y+TH/2-4); ctx.lineTo(s.x-TW/4, s.y);
+  ctx.moveTo(s.x,        s.y - TH/2 + 1);
+  ctx.lineTo(s.x + TW/2 - 2, s.y);
+  ctx.lineTo(s.x,        s.y + TH/2 - 1);
+  ctx.lineTo(s.x - TW/2 + 2, s.y);
   ctx.closePath();
   ctx.fill();
-  // Rubble
-  ctx.fillStyle = '#7a7a88';
-  for (let i = 0; i < 4; i++) {
+
+  // --- Terrace level 1 (outermost step) — medium grey stone ---
+  ctx.fillStyle = '#626058';
+  ctx.beginPath();
+  ctx.moveTo(s.x,      s.y - 11);
+  ctx.lineTo(s.x + 20, s.y - 2);
+  ctx.lineTo(s.x,      s.y + 9);
+  ctx.lineTo(s.x - 20, s.y - 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- Terrace level 2 (mid step) — darker stone, deeper in ---
+  ctx.fillStyle = '#4e4c46';
+  ctx.beginPath();
+  ctx.moveTo(s.x,      s.y - 7);
+  ctx.lineTo(s.x + 13, s.y - 1);
+  ctx.lineTo(s.x,      s.y + 5);
+  ctx.lineTo(s.x - 13, s.y - 1);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- Pit floor (deepest level) — near-black stone with slight blue tint ---
+  const pitFloor = ctx.createRadialGradient(s.x, s.y - 1, 1, s.x, s.y - 1, 8);
+  pitFloor.addColorStop(0, '#2a2826');
+  pitFloor.addColorStop(1, '#1a1816');
+  ctx.fillStyle = pitFloor;
+  ctx.beginPath();
+  ctx.moveTo(s.x,     s.y - 4);
+  ctx.lineTo(s.x + 7, s.y - 0);
+  ctx.lineTo(s.x,     s.y + 3);
+  ctx.lineTo(s.x - 7, s.y - 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- Terrace ledge lines — step edges with highlights ---
+  ctx.strokeStyle = 'rgba(200,195,185,0.45)';
+  ctx.lineWidth = 0.8;
+  // Outer ledge highlight
+  ctx.beginPath();
+  ctx.moveTo(s.x - 20, s.y - 2);
+  ctx.lineTo(s.x, s.y - 11);
+  ctx.lineTo(s.x + 20, s.y - 2);
+  ctx.stroke();
+  // Mid ledge highlight
+  ctx.strokeStyle = 'rgba(180,175,165,0.35)';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 13, s.y - 1);
+  ctx.lineTo(s.x, s.y - 7);
+  ctx.lineTo(s.x + 13, s.y - 1);
+  ctx.stroke();
+  // Shadow under ledges (south sides)
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 20, s.y - 2);
+  ctx.lineTo(s.x, s.y + 9);
+  ctx.lineTo(s.x + 20, s.y - 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(s.x - 13, s.y - 1);
+  ctx.lineTo(s.x, s.y + 5);
+  ctx.lineTo(s.x + 13, s.y - 1);
+  ctx.stroke();
+
+  // --- Stone blocks stacked on the rim (top-right, ready for transport) ---
+  const blockColors = ['#8a8878', '#7a786a', '#9a9888'];
+  const blockPositions = [[14, -9], [19, -6], [14, -5], [22, -9]];
+  for (let bi = 0; bi < blockPositions.length; bi++) {
+    const [bx, by] = blockPositions[bi];
+    ctx.fillStyle = blockColors[bi % 3];
+    ctx.fillRect(s.x + bx, s.y + by, 5, 3);
+    // Top face (lighter)
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(s.x + bx, s.y + by, 5, 1);
+    // Shadow edge
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(s.x + bx + 4, s.y + by, 1, 3);
+  }
+
+  // --- Rubble and stone chips scattered on outer rim ---
+  const chipData = [
+    [-18, -6, 2.5, 1.5, 0.2],
+    [-14, -8, 2, 1.2, -0.3],
+    [-8, -12, 3, 1.8, 0.5],
+    [6, -12, 2, 1.3, 0.1],
+    [10, -10, 2.5, 1.5, -0.2],
+    [-16, 3, 2, 1.2, 0.4],
+    [12, 2, 2.5, 1.6, -0.1],
+    [-4, -14, 1.8, 1, 0.3],
+  ];
+  const chipColors = ['#8a8878', '#7a786a', '#6a6860', '#9a9888'];
+  for (let ci = 0; ci < chipData.length; ci++) {
+    const [cx, cy, rx, ry, rot] = chipData[ci];
+    ctx.fillStyle = chipColors[ci % 4];
     ctx.beginPath();
-    ctx.arc(s.x-5+i*3, s.y-2+((i%2)*3), 2, 0, Math.PI*2);
+    ctx.ellipse(s.x + cx, s.y + cy, rx, ry, rot, 0, Math.PI*2);
     ctx.fill();
   }
+
+  // --- Wooden derrick / crane frame (left rim) ---
+  // Two angled legs forming an A-frame
+  ctx.strokeStyle = '#7a5530';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 22, s.y - 1);   // left foot
+  ctx.lineTo(s.x - 14, s.y - 18);  // apex
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(s.x - 8,  s.y - 7);   // right foot (on rim)
+  ctx.lineTo(s.x - 14, s.y - 18);  // apex
+  ctx.stroke();
+  // Cross brace
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 20, s.y - 8);
+  ctx.lineTo(s.x - 10, s.y - 10);
+  ctx.stroke();
+  // Boom arm extending over the pit
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 14, s.y - 18);
+  ctx.lineTo(s.x - 4,  s.y - 20);  // boom tip
+  ctx.stroke();
+  // Rope hanging from boom tip
+  ctx.strokeStyle = '#c8a870';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 4, s.y - 20);
+  ctx.lineTo(s.x - 4, s.y - 10);
+  ctx.stroke();
+  // Hook at rope end
+  ctx.strokeStyle = '#5a5a6a';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(s.x - 4, s.y - 9, 1.5, 0, Math.PI);
+  ctx.stroke();
 }
 
 function drawMine(ctx, s) {
@@ -1832,18 +2063,126 @@ function drawTower(ctx, s) {
 }
 
 function drawWell(ctx, s) {
-  ctx.fillStyle = '#8a8a94';
+  // Cobblestone base — isometric diamond shape
+  ctx.fillStyle = '#9a9088';
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y-4, 8, 5, 0, 0, Math.PI*2);
+  ctx.moveTo(s.x, s.y + 2);
+  ctx.lineTo(s.x + 13, s.y - 4);
+  ctx.lineTo(s.x, s.y - 10);
+  ctx.lineTo(s.x - 13, s.y - 4);
+  ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#2a5a8a';
+  // Cobblestone texture
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 0.6;
+  for (let ci = -2; ci <= 2; ci++) {
+    ctx.beginPath();
+    ctx.arc(s.x + ci * 4, s.y - 4 + (Math.abs(ci) % 2) * 2, 1.5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Stone rim — outer ring (isometric ellipse, gradient)
+  const rimGrad = ctx.createLinearGradient(s.x - 9, s.y - 10, s.x + 9, s.y - 10);
+  rimGrad.addColorStop(0, '#b0a898');
+  rimGrad.addColorStop(0.5, '#d0c8bc');
+  rimGrad.addColorStop(1, '#8a8078');
+  ctx.fillStyle = rimGrad;
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y-4, 5, 3, 0, 0, Math.PI*2);
+  ctx.ellipse(s.x, s.y - 10, 9, 5.5, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Rope post
-  ctx.fillStyle = '#6a5a4a';
-  ctx.fillRect(s.x+5, s.y-16, 2, 12);
-  ctx.fillRect(s.x-2, s.y-16, 9, 2);
+  // Stone rim — inner ring (slightly darker)
+  ctx.fillStyle = '#7a7068';
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y - 10, 6, 3.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Dark water inside
+  const waterGrad = ctx.createRadialGradient(s.x - 1, s.y - 11, 0, s.x, s.y - 10, 5.5);
+  waterGrad.addColorStop(0, '#3a6898');
+  waterGrad.addColorStop(1, '#1a3858');
+  ctx.fillStyle = waterGrad;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y - 10, 5.5, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Water shimmer
+  ctx.strokeStyle = 'rgba(120,180,255,0.35)';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.ellipse(s.x - 1, s.y - 10.5, 2.5, 1.2, -0.2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Stone rim wall cylinder (front arc)
+  ctx.fillStyle = '#c8c0b4';
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y - 10, 9, 5.5, 0, 0, Math.PI);
+  ctx.lineTo(s.x - 9, s.y - 7);
+  ctx.ellipse(s.x, s.y - 7, 9, 5.5, 0, Math.PI, 0, true);
+  ctx.closePath();
+  ctx.fill();
+  // Stone mortar lines on rim wall
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 0.6;
+  for (let mx = -7; mx <= 7; mx += 3.5) {
+    ctx.beginPath();
+    ctx.moveTo(s.x + mx, s.y - 7);
+    ctx.lineTo(s.x + mx, s.y - 10);
+    ctx.stroke();
+  }
+
+  // Left wooden post
+  const postGrad = ctx.createLinearGradient(s.x - 8, 0, s.x - 6, 0);
+  postGrad.addColorStop(0, '#7a5a38');
+  postGrad.addColorStop(1, '#5a3a18');
+  ctx.fillStyle = postGrad;
+  ctx.fillRect(s.x - 8, s.y - 24, 2.5, 15);
+  // Right wooden post
+  ctx.fillStyle = postGrad;
+  ctx.fillRect(s.x + 5.5, s.y - 24, 2.5, 15);
+
+  // Crossbar
+  const barGrad = ctx.createLinearGradient(s.x - 8, s.y - 24, s.x - 8, s.y - 21);
+  barGrad.addColorStop(0, '#a07848');
+  barGrad.addColorStop(1, '#7a5830');
+  ctx.fillStyle = barGrad;
+  ctx.fillRect(s.x - 9, s.y - 24, 20, 3);
+  // Crossbar highlight
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x - 9, s.y - 24); ctx.lineTo(s.x + 11, s.y - 24); ctx.stroke();
+
+  // Rope
+  ctx.strokeStyle = '#c8a860';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 1, s.y - 21);
+  ctx.lineTo(s.x + 1, s.y - 13);
+  ctx.stroke();
+  // Rope coil detail
+  ctx.strokeStyle = 'rgba(180,140,80,0.5)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - 21);
+  ctx.lineTo(s.x + 2, s.y - 19);
+  ctx.moveTo(s.x, s.y - 19);
+  ctx.lineTo(s.x + 2, s.y - 17);
+  ctx.stroke();
+
+  // Wooden bucket
+  const bucketGrad = ctx.createLinearGradient(s.x - 2, s.y - 14, s.x + 4, s.y - 14);
+  bucketGrad.addColorStop(0, '#a07040');
+  bucketGrad.addColorStop(1, '#7a5028');
+  ctx.fillStyle = bucketGrad;
+  ctx.fillRect(s.x - 1, s.y - 13, 5, 5);
+  // Bucket hoops
+  ctx.strokeStyle = '#5a3a10';
+  ctx.lineWidth = 0.8;
+  ctx.strokeRect(s.x - 1, s.y - 13, 5, 5);
+  ctx.beginPath(); ctx.moveTo(s.x - 1, s.y - 11); ctx.lineTo(s.x + 4, s.y - 11); ctx.stroke();
+  // Bucket handle
+  ctx.strokeStyle = '#c8a040';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.arc(s.x + 1.5, s.y - 13, 2, Math.PI, 0);
+  ctx.stroke();
 }
 
 function drawTavern(ctx, s) {
@@ -1972,36 +2311,182 @@ function drawRoad(ctx, s) {
 }
 
 function drawTradingPost(ctx, s, b) {
-  // Dock platform
-  ctx.fillStyle = '#8b6a4e';
-  ctx.fillRect(s.x - 14, s.y - 6, 28, 6);
-  ctx.fillStyle = '#6a5040';
-  ctx.fillRect(s.x - 14, s.y - 8, 28, 2);
-  // Pier posts
-  ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(s.x - 12, s.y - 2, 2, 6);
-  ctx.fillRect(s.x + 10, s.y - 2, 2, 6);
-  // Sail/flag
-  ctx.fillStyle = '#d4a030';
-  ctx.fillRect(s.x + 6, s.y - 24, 2, 18);
-  ctx.fillStyle = b.caravanOut ? '#999' : '#e8c060';
+  // === TRADING POST — wooden dock with moored boat, cargo crates, and pennant ===
+
+  // Water underneath the dock
+  const waterGrad = ctx.createLinearGradient(s.x - 16, s.y, s.x + 16, s.y + 4);
+  waterGrad.addColorStop(0, '#2a5878');
+  waterGrad.addColorStop(1, '#1a3a58');
+  ctx.fillStyle = waterGrad;
   ctx.beginPath();
-  ctx.moveTo(s.x + 8, s.y - 22);
-  ctx.lineTo(s.x + 18, s.y - 18);
-  ctx.lineTo(s.x + 8, s.y - 14);
+  ctx.moveTo(s.x, s.y + 2);
+  ctx.lineTo(s.x + 16, s.y - 4);
+  ctx.lineTo(s.x + 16, s.y + 2);
+  ctx.lineTo(s.x, s.y + 8);
+  ctx.lineTo(s.x - 16, s.y + 2);
+  ctx.lineTo(s.x - 16, s.y - 4);
   ctx.closePath();
   ctx.fill();
-  // Crates
-  ctx.fillStyle = '#a3714f';
-  ctx.fillRect(s.x - 8, s.y - 12, 5, 4);
-  ctx.fillStyle = '#8b6a4e';
-  ctx.fillRect(s.x - 3, s.y - 11, 4, 3);
-  // Status indicator
+  // Water ripple lines
+  ctx.strokeStyle = 'rgba(100,170,220,0.25)';
+  ctx.lineWidth = 0.7;
+  for (let wr = -10; wr <= 10; wr += 5) {
+    ctx.beginPath();
+    ctx.moveTo(s.x + wr - 4, s.y + 1);
+    ctx.lineTo(s.x + wr + 4, s.y + 1);
+    ctx.stroke();
+  }
+
+  // Pier support posts below dock level
+  ctx.fillStyle = '#4a2e10';
+  for (const px of [-11, -4, 4, 11]) {
+    ctx.fillRect(s.x + px - 1, s.y - 2, 2, 6);
+  }
+
+  // Dock plank platform
+  const dockGrad = ctx.createLinearGradient(s.x, s.y - 14, s.x, s.y - 2);
+  dockGrad.addColorStop(0, '#a07858');
+  dockGrad.addColorStop(1, '#7a5838');
+  ctx.fillStyle = dockGrad;
+  ctx.fillRect(s.x - 14, s.y - 14, 28, 12);
+  // Top edge highlight
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x - 14, s.y - 14); ctx.lineTo(s.x + 14, s.y - 14); ctx.stroke();
+  // Plank grain lines
+  ctx.strokeStyle = 'rgba(60,35,10,0.22)';
+  ctx.lineWidth = 0.7;
+  for (let pl = s.y - 12; pl < s.y - 2; pl += 3) {
+    ctx.beginPath(); ctx.moveTo(s.x - 14, pl); ctx.lineTo(s.x + 14, pl); ctx.stroke();
+  }
+  // Dock edge fascia board
+  ctx.fillStyle = '#5a3a18';
+  ctx.fillRect(s.x - 14, s.y - 14, 28, 2);
+  ctx.fillRect(s.x - 14, s.y - 2, 28, 1.5);
+
+  // Small boat hull moored at left side
+  const hullGrad = ctx.createLinearGradient(s.x - 14, s.y - 8, s.x - 14, s.y - 2);
+  hullGrad.addColorStop(0, '#8b5a28');
+  hullGrad.addColorStop(1, '#5a3010');
+  ctx.fillStyle = hullGrad;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 14, s.y - 8);
+  ctx.lineTo(s.x - 4, s.y - 8);
+  ctx.lineTo(s.x - 2, s.y - 4);
+  ctx.lineTo(s.x - 14, s.y - 4);
+  ctx.closePath();
+  ctx.fill();
+  // Boat gunwale
+  ctx.strokeStyle = '#c8903a';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 14, s.y - 8);
+  ctx.lineTo(s.x - 4, s.y - 8);
+  ctx.lineTo(s.x - 2, s.y - 4);
+  ctx.stroke();
+  // Boat interior
+  ctx.fillStyle = '#4a2808';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 13, s.y - 7);
+  ctx.lineTo(s.x - 5, s.y - 7);
+  ctx.lineTo(s.x - 3.5, s.y - 5);
+  ctx.lineTo(s.x - 13, s.y - 5);
+  ctx.closePath();
+  ctx.fill();
+  // Mooring rope (dashed)
+  ctx.strokeStyle = '#c8a860';
+  ctx.lineWidth = 0.8;
+  ctx.setLineDash([1.5, 1.5]);
+  ctx.beginPath();
+  ctx.moveTo(s.x - 9, s.y - 8);
+  ctx.lineTo(s.x - 9, s.y - 14);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Cargo crates stacked on dock
+  const crateGrad = ctx.createLinearGradient(s.x + 2, s.y - 22, s.x + 2, s.y - 14);
+  crateGrad.addColorStop(0, '#c09060');
+  crateGrad.addColorStop(1, '#8a6030');
+  ctx.fillStyle = crateGrad;
+  ctx.fillRect(s.x + 2, s.y - 22, 8, 8);
+  // Iso top of crate
+  ctx.fillStyle = '#b08848';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 2, s.y - 22); ctx.lineTo(s.x + 6, s.y - 25);
+  ctx.lineTo(s.x + 10, s.y - 22); ctx.lineTo(s.x + 6, s.y - 19);
+  ctx.closePath(); ctx.fill();
+  // Crate straps
+  ctx.strokeStyle = 'rgba(60,35,10,0.35)';
+  ctx.lineWidth = 0.8;
+  ctx.strokeRect(s.x + 2, s.y - 22, 8, 8);
+  ctx.beginPath(); ctx.moveTo(s.x + 6, s.y - 22); ctx.lineTo(s.x + 6, s.y - 14); ctx.stroke();
+  // Second smaller crate
+  ctx.fillStyle = '#b07848';
+  ctx.fillRect(s.x + 3, s.y - 16, 5, 5);
+  ctx.strokeStyle = 'rgba(60,35,10,0.3)';
+  ctx.lineWidth = 0.7;
+  ctx.strokeRect(s.x + 3, s.y - 16, 5, 5);
+  // Barrel beside crates
+  const barrelGrad = ctx.createLinearGradient(s.x + 9, 0, s.x + 15, 0);
+  barrelGrad.addColorStop(0, '#9a7038');
+  barrelGrad.addColorStop(1, '#6a4818');
+  ctx.fillStyle = barrelGrad;
+  ctx.fillRect(s.x + 9, s.y - 16, 6, 5);
+  ctx.fillStyle = '#8a6030';
+  ctx.beginPath();
+  ctx.ellipse(s.x + 12, s.y - 16, 3, 1.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(s.x + 12, s.y - 11, 3, 1.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Barrel hoop
+  ctx.strokeStyle = '#5a3010';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath(); ctx.moveTo(s.x + 9, s.y - 14); ctx.lineTo(s.x + 15, s.y - 14); ctx.stroke();
+
+  // Mast / flag pole with gradient
+  const mastGrad = ctx.createLinearGradient(s.x + 5, s.y - 14, s.x + 7, s.y - 14);
+  mastGrad.addColorStop(0, '#a07848');
+  mastGrad.addColorStop(1, '#6a4820');
+  ctx.fillStyle = mastGrad;
+  ctx.fillRect(s.x + 5, s.y - 36, 2, 22);
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x + 5, s.y - 36); ctx.lineTo(s.x + 5, s.y - 14); ctx.stroke();
+
+  // Pennant — grayed when caravan is out
+  const pennantLight = b.caravanOut ? '#888888' : '#e8c060';
+  const pennantDark  = b.caravanOut ? '#666666' : '#c8a030';
+  ctx.fillStyle = pennantLight;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 7, s.y - 34);
+  ctx.lineTo(s.x + 20, s.y - 28);
+  ctx.lineTo(s.x + 7, s.y - 22);
+  ctx.closePath();
+  ctx.fill();
+  // Lower half shading
+  ctx.fillStyle = pennantDark;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 7, s.y - 28);
+  ctx.lineTo(s.x + 20, s.y - 28);
+  ctx.lineTo(s.x + 7, s.y - 22);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 7, s.y - 34);
+  ctx.lineTo(s.x + 20, s.y - 28);
+  ctx.lineTo(s.x + 7, s.y - 22);
+  ctx.closePath();
+  ctx.stroke();
+
+  // Status text when caravan is away
   if (b.caravanOut) {
-    ctx.fillStyle = 'rgba(255,200,50,0.5)';
+    ctx.fillStyle = 'rgba(255,200,50,0.55)';
     ctx.font = '8px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('⛵ en route', s.x, s.y - 28);
+    ctx.fillText('⛵ en route', s.x, s.y - 40);
   }
 }
 
@@ -2229,31 +2714,127 @@ function drawCastle(ctx, s) {
 }
 
 function drawGranary(ctx, s) {
-  // Round clay storage building
-  ctx.fillStyle = '#c09060';
+  // === GRANARY — rounded grain silo with dome, barrel hoops, door, grain sacks ===
+
+  // Grain sack props beside the silo (drawn first so silo overlaps)
+  // Sack 1 (left)
+  ctx.fillStyle = '#c8a860';
   ctx.beginPath();
-  ctx.arc(s.x, s.y - 10, 10, Math.PI, 0);
-  ctx.lineTo(s.x + 10, s.y - 2);
-  ctx.lineTo(s.x - 10, s.y - 2);
+  ctx.ellipse(s.x - 13, s.y - 5, 4, 3, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,80,20,0.35)';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.ellipse(s.x - 13, s.y - 5, 4, 3, -0.3, 0, Math.PI * 2);
+  ctx.stroke();
+  // Sack 1 tie
+  ctx.fillStyle = '#8a5820';
+  ctx.fillRect(s.x - 14, s.y - 9, 2, 2);
+  // Sack 2 (leaning against silo)
+  ctx.fillStyle = '#d4b068';
+  ctx.beginPath();
+  ctx.ellipse(s.x - 10, s.y - 7, 3, 4.5, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,80,20,0.3)';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath();
+  ctx.ellipse(s.x - 10, s.y - 7, 3, 4.5, 0.2, 0, Math.PI * 2);
+  ctx.stroke();
+  // Sack 2 tie
+  ctx.fillStyle = '#8a5820';
+  ctx.fillRect(s.x - 11, s.y - 13, 2, 2);
+  // Loose grain pile
+  ctx.fillStyle = '#e8c870';
+  ctx.beginPath();
+  ctx.ellipse(s.x + 12, s.y - 3, 5, 2, 0, 0, Math.PI);
   ctx.closePath();
   ctx.fill();
-  // Dome top
-  ctx.fillStyle = '#a07848';
+  ctx.fillStyle = '#d4a840';
   ctx.beginPath();
-  ctx.arc(s.x, s.y - 10, 10, Math.PI, 0);
+  ctx.ellipse(s.x + 12, s.y - 3, 5, 1, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Silo cylinder body — warm earth gradient
+  const siloGrad = ctx.createLinearGradient(s.x - 11, s.y - 10, s.x + 11, s.y - 10);
+  siloGrad.addColorStop(0, '#c09868');
+  siloGrad.addColorStop(0.35, '#e0c090');
+  siloGrad.addColorStop(0.7, '#c89060');
+  siloGrad.addColorStop(1, '#9a6838');
+  ctx.fillStyle = siloGrad;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 10, 11, Math.PI, 0);
+  ctx.lineTo(s.x + 11, s.y - 2);
+  ctx.lineTo(s.x - 11, s.y - 2);
   ctx.closePath();
   ctx.fill();
-  // Door
-  ctx.fillStyle = '#5a3a1a';
+  // Cylinder top edge highlight
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 0.6;
   ctx.beginPath();
-  ctx.arc(s.x, s.y - 4, 3, Math.PI, 0);
-  ctx.closePath();
-  ctx.fill();
-  // Grain texture dots
-  ctx.fillStyle = '#d4a870';
-  for (let i = -5; i <= 5; i += 3) {
-    ctx.fillRect(s.x + i, s.y - 14 + Math.abs(i) * 0.3, 1.5, 1.5);
+  ctx.arc(s.x, s.y - 10, 11, Math.PI + 0.2, -0.2);
+  ctx.stroke();
+
+  // Wooden barrel hoops around the body
+  ctx.strokeStyle = '#6a4818';
+  ctx.lineWidth = 1.2;
+  for (const hy of [s.y - 5, s.y - 10, s.y - 15]) {
+    // Compute half-width at this height for a believable elliptical hoop
+    const dy = hy - (s.y - 10);
+    const hw = Math.sqrt(Math.max(0, 11 * 11 - dy * dy));
+    ctx.beginPath();
+    ctx.moveTo(s.x - hw, hy);
+    ctx.lineTo(s.x + hw, hy);
+    ctx.stroke();
+    // Hoop nail dots
+    ctx.fillStyle = '#4a2e08';
+    ctx.beginPath(); ctx.arc(s.x - hw + 1.5, hy, 0.9, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x + hw - 1.5, hy, 0.9, 0, Math.PI * 2); ctx.fill();
   }
+
+  // Dome cap — darker warm tone with radial gradient
+  const domeGrad = ctx.createRadialGradient(s.x - 3, s.y - 18, 1, s.x, s.y - 12, 12);
+  domeGrad.addColorStop(0, '#e0c08a');
+  domeGrad.addColorStop(0.5, '#b88848');
+  domeGrad.addColorStop(1, '#8a5c28');
+  ctx.fillStyle = domeGrad;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 10, 11, Math.PI, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Dome highlight arc
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(s.x - 2, s.y - 12, 6, Math.PI + 0.5, Math.PI * 1.8);
+  ctx.stroke();
+  // Dome cap finial (small knob at top)
+  ctx.fillStyle = '#7a4c20';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 21, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Small arched door at base
+  ctx.fillStyle = '#3a2008';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 4, 3.5, Math.PI, 0);
+  ctx.lineTo(s.x + 3.5, s.y - 2);
+  ctx.lineTo(s.x - 3.5, s.y - 2);
+  ctx.closePath();
+  ctx.fill();
+  // Door frame
+  ctx.strokeStyle = '#7a5028';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 4, 3.5, Math.PI, 0);
+  ctx.moveTo(s.x - 3.5, s.y - 4);
+  ctx.lineTo(s.x - 3.5, s.y - 2);
+  ctx.moveTo(s.x + 3.5, s.y - 4);
+  ctx.lineTo(s.x + 3.5, s.y - 2);
+  ctx.stroke();
+  // Door hinge dot
+  ctx.fillStyle = '#c8a040';
+  ctx.beginPath(); ctx.arc(s.x - 2.5, s.y - 4.5, 0.7, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(s.x - 2.5, s.y - 2.5, 0.7, 0, Math.PI * 2); ctx.fill();
 }
 
 function drawChurch(ctx, s) {
@@ -2748,12 +3329,15 @@ function drawWater(ctx, x, y, a, tx, ty) {
 // ── Minimap ─────────────────────────────────────────────────
 const MINI_COLORS = {0:'#1a6aaa',1:'#d4a76a',2:'#4a7c4f',3:'#2d5a30',4:'#6b7280',5:'#4b6fa0',6:'#4a4a5a'};
 const MINI_BUILD = {
-  house:'#e8a060', farm:'#7cb342', lumber:'#a3714f', quarry:'#9ca3af',
-  mine:'#5577aa', market:'#fbbf24', barracks:'#ef4444', tower:'#f87171',
-  wall:'#9ca3af', road:'#6b7280', tradingpost:'#f59e0b', granary:'#d4a76a',
-  church:'#e0e0ff', school:'#93c5fd', castle:'#ffd166', tavern:'#c084fc',
-  well:'#60a5fa',
+  house:'#d4a574', farm:'#7cb342', lumber:'#a3714f',
+  quarry:'#8a8e9a', mine:'#5a85b8', market:'#e8a040',
+  barracks:'#6a7a8a', tower:'#8a8a9a', church:'#e0e0e0',
+  castle:'#ffd166', tavern:'#c07040', wall:'#7a7a7a',
+  road:'#8a7a60', well:'#60a5fa', granary:'#d4a574',
+  tradingpost:'#e8a040', school:'#d4b890',
 };
+// Tile type for road detection (matches TILE.ROAD in state.js)
+const MINI_ROAD_TILE = 5;
 
 function renderMinimap() {
   const mc = minimapCtx;
@@ -2764,15 +3348,42 @@ function renderMinimap() {
   mc.fillStyle = '#08090f';
   mc.fillRect(0, 0, mw, mh);
 
-  // Terrain tiles — explored and unexplored (fog = dark)
+  // Terrain tiles — explored tiles at normal color, unexplored very dark
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
       if (G.fog[y][x]) {
         mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
       } else {
-        mc.fillStyle = '#0d0f1a';
+        // Darker unexplored areas for more visible fog of war
+        mc.fillStyle = '#070810';
       }
       mc.fillRect(x * sx, y * sy, Math.ceil(sx), Math.ceil(sy));
+    }
+  }
+
+  // Roads as tiny brown lines — draw road tiles as connected segments
+  mc.strokeStyle = '#6b5a3e';
+  mc.lineWidth = 1;
+  for (let y = 0; y < MAP_H; y++) {
+    for (let x = 0; x < MAP_W; x++) {
+      if (!G.fog[y][x]) continue;
+      if (G.map[y][x] !== MINI_ROAD_TILE) continue;
+      const cx = (x + 0.5) * sx;
+      const cy = (y + 0.5) * sy;
+      // Connect to right neighbor
+      if (x + 1 < MAP_W && G.fog[y][x+1] && G.map[y][x+1] === MINI_ROAD_TILE) {
+        mc.beginPath();
+        mc.moveTo(cx, cy);
+        mc.lineTo((x + 1.5) * sx, cy);
+        mc.stroke();
+      }
+      // Connect to bottom neighbor
+      if (y + 1 < MAP_H && G.fog[y+1][x] && G.map[y+1][x] === MINI_ROAD_TILE) {
+        mc.beginPath();
+        mc.moveTo(cx, cy);
+        mc.lineTo(cx, (y + 1.5) * sy);
+        mc.stroke();
+      }
     }
   }
 
@@ -2783,20 +3394,28 @@ function renderMinimap() {
     const bx = (b.x + 0.5) * sx;
     const by = (b.y + 0.5) * sy;
     const r = b.type === 'castle' ? 4 : b.type === 'tower' || b.type === 'church' ? 3.5 : 3;
+    // Dark halo
     mc.beginPath();
     mc.arc(bx, by, r + 1.5, 0, Math.PI * 2);
     mc.fillStyle = 'rgba(0,0,0,0.65)';
     mc.fill();
+    // Building dot with actual color
     mc.beginPath();
     mc.arc(bx, by, r, 0, Math.PI * 2);
     mc.fillStyle = MINI_BUILD[b.type] || '#fff';
     mc.fill();
   }
 
-  // Citizens as tiny bright yellow dots
-  mc.fillStyle = '#facc15';
+  // Citizens as bright yellow dots with a slight glow (3px, up from 2px)
   for (const c of G.citizens) {
-    mc.fillRect(Math.round(c.x * sx) - 0.5, Math.round(c.y * sy) - 0.5, 2, 2);
+    const cx = Math.round(c.x * sx);
+    const cy = Math.round(c.y * sy);
+    // Glow halo
+    mc.fillStyle = 'rgba(250,204,21,0.3)';
+    mc.fillRect(cx - 2, cy - 2, 5, 5);
+    // Solid dot
+    mc.fillStyle = '#facc15';
+    mc.fillRect(cx - 1, cy - 1, 3, 3);
   }
 
   // Camera viewport — dark shadow stroke then bright cyan outline for visibility
@@ -2811,10 +3430,15 @@ function renderMinimap() {
   mc.lineWidth = 1.5;
   mc.strokeRect(vx, vy, vw, vh);
 
+  // Thin border around entire minimap for island definition
+  mc.strokeStyle = 'rgba(180,160,120,0.5)';
+  mc.lineWidth = 1;
+  mc.strokeRect(0.5, 0.5, mw - 1, mh - 1);
+
   // Subtle inner vignette for depth
   const vign = mc.createRadialGradient(mw / 2, mh / 2, mw * 0.3, mw / 2, mh / 2, mw * 0.72);
   vign.addColorStop(0, 'rgba(0,0,0,0)');
-  vign.addColorStop(1, 'rgba(0,0,0,0.35)');
+  vign.addColorStop(1, 'rgba(0,0,0,0.45)');
   mc.fillStyle = vign;
   mc.fillRect(0, 0, mw, mh);
 }
