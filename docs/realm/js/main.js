@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, updateSeason, getSeasonData, getDifficulty, DIFFICULTY } from './state.js';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY } from './state.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
@@ -14,7 +14,7 @@ import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPan
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame } from './save.js';
-import { updateAmbient, toggleAmbient, isAmbientEnabled } from './audio.js';
+import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 
@@ -139,7 +139,22 @@ function updateTime() {
     checkRandomEvents();
     if (updateSeason()) {
       const s = getSeasonData();
-      notify(`Season changed: ${s.name}`, 'event');
+      const seasonNum = Math.floor((G.day - 1) / 7) + 1;
+      notify(`${s.name} begins! (Season ${seasonNum})`, 'event');
+      playSound('mission');
+      // Season banner particles
+      const seasonEmojis = { spring:['🌱','🌸','🌿'], summer:['☀️','🌻','🌊'], autumn:['🍂','🍁','🌾'], winter:['❄️','⛄','🌨️'] };
+      const emojis = seasonEmojis[G.season] || ['✨'];
+      for (let i = 0; i < 15; i++) {
+        G.particles.push({
+          tx: MAP_W/2 + (Math.random()-0.5)*8,
+          ty: MAP_H/2 + (Math.random()-0.5)*8,
+          offsetY: -10 - Math.random()*20,
+          text: emojis[Math.floor(Math.random()*emojis.length)],
+          alpha: 1.5, vy: -0.12 - Math.random()*0.15,
+          decay: 0.007, type: 'text',
+        });
+      }
     }
   }
 }

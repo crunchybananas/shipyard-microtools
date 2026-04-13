@@ -20,6 +20,24 @@ function pathTo(c, tx, ty) {
 
 export function updateCitizens() {
   for (const c of G.citizens) {
+    // Hungry emote — show 🍽️ when hunger is high and no food available
+    if (c.hunger > 70 && G.resources.food <= 0) {
+      const emoteInterval = 120; // every 2 seconds at 1x
+      if (!c._hungerEmoteTimer) c._hungerEmoteTimer = Math.floor(Math.random() * emoteInterval);
+      c._hungerEmoteTimer--;
+      if (c._hungerEmoteTimer <= 0) {
+        c._hungerEmoteTimer = emoteInterval + Math.floor(Math.random() * 60);
+        const emote = c.hunger >= 90 ? '❗' : '🍽️';
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -22,
+          text: emote,
+          alpha: 1.4, vy: -0.1, decay: 0.015, type: 'speech',
+        });
+      }
+    } else {
+      c._hungerEmoteTimer = 0;
+    }
+
     // Follow path if we have one
     if (c.path && c.pathIdx < c.path.length) {
       const wp = c.path[c.pathIdx];
@@ -35,6 +53,11 @@ export function updateCitizens() {
           const b = G.buildingGrid[gy]?.[gx];
           if (b && b.type === 'road') spd *= 2;
         }
+        // Hunger speed penalty: up to -40% at hunger 100, kicks in above 60
+        if (c.hunger > 60) {
+          const penalty = Math.min(0.4, (c.hunger - 60) / 100);
+          spd *= (1 - penalty);
+        }
         c.x += (dx/d) * Math.min(spd, d);
         c.y += (dy/d) * Math.min(spd, d);
       }
@@ -46,7 +69,11 @@ export function updateCitizens() {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {
-        const spd = c.speed * G.speed;
+        let spd = c.speed * G.speed;
+        if (c.hunger > 60) {
+          const penalty = Math.min(0.4, (c.hunger - 60) / 100);
+          spd *= (1 - penalty);
+        }
         c.x += (dx/d) * Math.min(spd, d);
         c.y += (dy/d) * Math.min(spd, d);
         continue;
@@ -64,12 +91,12 @@ function runStateMachine(c) {
   switch (c.state) {
     case 'idle':
     case 'find_job':
-      // Hungry? Eat first.
+      // Hungry? Eat first. Citizen eats when hunger > 70 and food is available.
       if (c.hunger > 70 && G.resources.food > 0) {
         G.resources.food--;
-        c.hunger = Math.max(0, c.hunger - 50);
+        c.hunger = Math.max(0, c.hunger - 60);
         c.state = 'eating';
-        c.stateTimer = 30;
+        c.stateTimer = 20;
         c.path = null;
         return;
       }

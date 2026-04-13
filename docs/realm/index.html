@@ -42,9 +42,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .res-warn{animation:resWarn 0.8s ease-in-out infinite}
 .res-warn .val{color:var(--danger)!important}
 @keyframes resWarn{0%,100%{opacity:1}50%{opacity:0.4}}
-.rate{font-size:0.65rem;font-weight:400;margin-left:0.15rem}
+.rate{font-size:0.65rem;font-weight:400;margin-left:0.15rem;cursor:help}
 .rate.pos{color:var(--food)}
 .rate.neg{color:var(--danger)}
+.food-warn-emoji{filter:hue-rotate(180deg) saturate(2);animation:foodWarnEmoji 1s ease-in-out infinite}
+@keyframes foodWarnEmoji{0%,100%{filter:hue-rotate(180deg) saturate(2) brightness(1)}50%{filter:hue-rotate(180deg) saturate(3) brightness(1.4)}}
 #day-display{color:rgba(255,255,255,0.5);font-size:0.72rem}
 .raid-warn{color:var(--danger);font-weight:600}
 .raid-warn-urgent{color:var(--danger);font-weight:700;animation:raidPulse 0.7s ease-in-out infinite}
@@ -146,11 +148,13 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .log-badge{color:var(--gold);font-size:1.2rem;line-height:0;vertical-align:super;margin-left:-0.1rem}
 
 /* Help overlay */
-#help-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:60;backdrop-filter:blur(6px)}
-.help-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;max-width:380px;width:90vw;backdrop-filter:blur(12px)}
+#help-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);z-index:60;backdrop-filter:blur(6px)}
+.help-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.4rem 1.6rem;max-width:560px;width:92vw;backdrop-filter:blur(12px)}
 .help-card h3{margin:0 0 0.6rem;font-size:0.9rem;color:var(--gold)}
+.help-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 1.4rem;margin-bottom:0.4rem}
 .help-grid{display:grid;grid-template-columns:auto 1fr;gap:0.3rem 0.8rem;font-size:0.78rem;margin-bottom:0.4rem}
-.hk{font-family:'SF Mono',Monaco,monospace;background:rgba(255,255,255,0.08);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.72rem;color:var(--accent);text-align:center;font-weight:600}
+.help-section-title{font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.06em;margin:0.7rem 0 0.4rem;grid-column:1/-1}
+.hk{font-family:'SF Mono',Monaco,monospace;background:rgba(255,255,255,0.08);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.72rem;color:var(--accent);text-align:center;font-weight:600;white-space:nowrap}
 .help-close{display:block;margin:1rem auto 0;background:transparent;border:1px solid var(--border);color:var(--text);padding:0.4rem 1.2rem;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.82rem}
 .help-close:hover{background:rgba(255,255,255,0.06)}
 
@@ -170,19 +174,22 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .pop-hunger-bar{height:100%;border-radius:3px;transition:width 0.3s}
 
 /* Victory screen */
-#victory-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:200;backdrop-filter:blur(8px);animation:vicFadeIn 1s ease}
-@keyframes vicFadeIn{from{opacity:0}to{opacity:1}}
-.vic-card{text-align:center;max-width:380px;padding:2.5rem 2rem;background:linear-gradient(180deg,rgba(25,25,50,0.95),rgba(15,15,30,0.98));border:2px solid var(--gold);border-radius:16px;box-shadow:0 0 80px rgba(255,209,102,0.2),0 20px 60px rgba(0,0,0,0.6)}
-.vic-crown{font-size:4rem;margin-bottom:0.5rem;animation:vicBounce 1.5s ease infinite}
-@keyframes vicBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.vic-title{font-size:2.2rem;color:var(--gold);margin:0 0 0.3rem;letter-spacing:0.05em}
-.vic-subtitle{color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0 0 1.5rem}
+#victory-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.88);z-index:200;backdrop-filter:blur(10px);animation:vicFadeIn 1.2s ease}
+#vic-confetti{position:absolute;inset:0;pointer-events:none;z-index:201}
+@keyframes vicFadeIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+.vic-card{position:relative;text-align:center;max-width:400px;padding:2.5rem 2rem;background:linear-gradient(180deg,rgba(30,25,60,0.97),rgba(12,10,30,0.99));border:2px solid var(--gold);border-radius:18px;box-shadow:0 0 120px rgba(255,209,102,0.25),0 0 40px rgba(255,209,102,0.1),0 20px 60px rgba(0,0,0,0.7);animation:vicCardIn 1s 0.3s both ease,vicShimmer 3s 1.3s ease-in-out infinite}
+@keyframes vicCardIn{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes vicShimmer{0%,100%{box-shadow:0 0 120px rgba(255,209,102,0.25),0 0 40px rgba(255,209,102,0.1),0 20px 60px rgba(0,0,0,0.7);border-color:var(--gold)}50%{box-shadow:0 0 160px rgba(255,209,102,0.45),0 0 70px rgba(255,209,102,0.2),0 20px 60px rgba(0,0,0,0.7),inset 0 0 30px rgba(255,209,102,0.06);border-color:#ffe566}}
+.vic-crown{font-size:4.5rem;margin-bottom:0.5rem;animation:vicBounce 1.8s ease infinite;filter:drop-shadow(0 0 16px rgba(255,209,102,0.7))}
+@keyframes vicBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.08)}}
+.vic-title{font-size:2.4rem;color:var(--gold);margin:0 0 0.3rem;letter-spacing:0.07em;text-shadow:0 0 20px rgba(255,209,102,0.6)}
+.vic-subtitle{color:rgba(255,255,255,0.65);font-size:0.92rem;margin:0 0 1.5rem}
 .vic-stats{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem}
-.vic-stat{display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.85rem}
+.vic-stat{display:flex;justify-content:space-between;padding:0.45rem 0.3rem;border-bottom:1px solid rgba(255,255,255,0.07);font-size:0.85rem}
 .vic-label{color:rgba(255,255,255,0.5)}
 .vic-stat span:last-child{font-weight:700;color:var(--gold)}
-.vic-btn{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:0.7rem 2rem;border-radius:8px;font-size:1rem;cursor:pointer;font-family:inherit;font-weight:600;transition:background 0.2s}
-.vic-btn:hover{background:rgba(255,209,102,0.12)}
+.vic-btn{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:0.7rem 2rem;border-radius:8px;font-size:1rem;cursor:pointer;font-family:inherit;font-weight:600;transition:background 0.2s,box-shadow 0.2s}
+.vic-btn:hover{background:rgba(255,209,102,0.12);box-shadow:0 0 20px rgba(255,209,102,0.2)}
 
 /* Achievement toast */
 #achievement-toast{position:fixed;bottom:5rem;right:1rem;display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1rem;background:rgba(15,15,30,0.95);border:1.5px solid var(--gold);border-radius:10px;z-index:100;font-size:0.8rem;pointer-events:none;opacity:0;transition:opacity 0.4s,transform 0.4s;transform:translateX(20px);max-width:300px;backdrop-filter:blur(10px)}
@@ -369,14 +376,16 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 </div>
 
 <div id="victory-screen" style="display:none">
+  <canvas id="vic-confetti"></canvas>
   <div class="vic-card">
     <div class="vic-crown">👑</div>
     <h2 class="vic-title">Victory!</h2>
     <p class="vic-subtitle">Your castle stands tall. The realm is yours.</p>
     <div class="vic-stats">
-      <div class="vic-stat"><span class="vic-label">Time</span><span class="vic-day">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Days Survived</span><span class="vic-day">—</span></div>
       <div class="vic-stat"><span class="vic-label">Population</span><span class="vic-pop">—</span></div>
       <div class="vic-stat"><span class="vic-label">Buildings</span><span class="vic-buildings">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Resources Gathered</span><span class="vic-resources">—</span></div>
       <div class="vic-stat"><span class="vic-label">Research</span><span class="vic-techs">—</span></div>
       <div class="vic-stat"><span class="vic-label">Achievements</span><span class="vic-achievements">—</span></div>
     </div>
@@ -386,22 +395,35 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 <div id="help-overlay" style="display:none" onclick="this.style.display='none'">
   <div class="help-card" onclick="event.stopPropagation()">
-    <h3>⌨️ Keyboard Shortcuts</h3>
-    <div class="help-grid">
-      <span class="hk">1-9</span><span>Select building type</span>
-      <span class="hk">Esc</span><span>Cancel build / deselect</span>
-      <span class="hk">Right-click</span><span>Demolish building (50% refund)</span>
-      <span class="hk">Scroll</span><span>Zoom in / out</span>
-      <span class="hk">Drag</span><span>Pan camera</span>
-      <span class="hk">?</span><span>Toggle this help</span>
-    </div>
-    <h3 style="margin-top:0.8rem">🖱️ HUD Buttons</h3>
-    <div class="help-grid">
-      <span class="hk">🔬</span><span>Research panel — unlock new buildings</span>
-      <span class="hk">😊</span><span>Happiness breakdown</span>
-      <span class="hk">🏆</span><span>Achievements (21 total)</span>
-      <span class="hk">🔊</span><span>Toggle ambient sound</span>
-      <span class="hk">👤</span><span>Population list — click the counter</span>
+    <h3>⌨️ Keyboard &amp; Mouse Controls</h3>
+    <div class="help-cols">
+      <div class="help-grid">
+        <span class="help-section-title">Building</span>
+        <span class="hk">1 – 9</span><span>Select building type</span>
+        <span class="hk">Esc</span><span>Deselect / cancel build</span>
+        <span class="hk">Right-click</span><span>Demolish building (50% refund)</span>
+        <span class="help-section-title">Camera</span>
+        <span class="hk">W A S D</span><span>Pan camera</span>
+        <span class="hk">↑ ↓ ← →</span><span>Pan camera</span>
+        <span class="hk">Scroll</span><span>Zoom in / out</span>
+        <span class="hk">+ / =</span><span>Zoom in</span>
+        <span class="hk">−</span><span>Zoom out</span>
+        <span class="hk">Drag</span><span>Pan camera</span>
+        <span class="hk">H / Home</span><span>Recenter on island</span>
+      </div>
+      <div class="help-grid">
+        <span class="help-section-title">Time</span>
+        <span class="hk">Space</span><span>Cycle speed: pause → 1× → 2× → 4×</span>
+        <span class="hk">P</span><span>Toggle pause</span>
+        <span class="help-section-title">HUD Buttons</span>
+        <span class="hk">🔬</span><span>Research — unlock buildings</span>
+        <span class="hk">😊</span><span>Happiness breakdown</span>
+        <span class="hk">🏆</span><span>Achievements (21 total)</span>
+        <span class="hk">🔊</span><span>Toggle ambient sound</span>
+        <span class="hk">👤</span><span>Population list</span>
+        <span class="help-section-title">Help</span>
+        <span class="hk">?</span><span>Toggle this overlay</span>
+      </div>
     </div>
     <button class="help-close" onclick="this.closest('#help-overlay').style.display='none'">Got it!</button>
   </div>

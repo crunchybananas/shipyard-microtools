@@ -1027,6 +1027,14 @@ export function render() {
     ctx.fillRect(-5000, -600, 10000, 1200);
   }
 
+  // ── Victory golden tint (world-space overlay) ────────────────
+  if (G.won) {
+    const shimmer = 0.05 + 0.04 * Math.sin(G.gameTick * 0.03);
+    ctx.globalAlpha = shimmer;
+    ctx.fillStyle = 'rgba(255,209,102,1)';
+    ctx.fillRect(-5000,-5000,10000,10000);
+  }
+
   ctx.globalAlpha = 1;
   ctx.restore();
 

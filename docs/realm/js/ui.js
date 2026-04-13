@@ -6,12 +6,18 @@ import { G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js';
 import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
+import { notify } from './notifications.js';
 
-function rateStr(val) {
+function _triggerFoodWarning() {
+  notify('⚠️ Food running low! Build more farms!', 'danger');
+}
+
+function rateStr(val, tooltip) {
   if (val === 0) return '';
   const arrow = val > 0 ? '▲' : '▼';
   const abs = Math.abs(val);
-  return ` <span class="rate ${val>0?'pos':'neg'}">${arrow}${abs}</span>`;
+  const tt = tooltip ? ` title="${tooltip}"` : '';
+  return ` <span class="rate ${val>0?'pos':'neg'}"${tt}>${arrow}${abs}/day</span>`;
 }
 
 export function updateUI() {
@@ -35,14 +41,52 @@ export function updateUI() {
     else { el.closest('.res')?.classList.remove('res-warn'); }
   };
   const wEl = $('r-wood'), sEl = $('r-stone'), fEl = $('r-food'), gEl = $('r-gold'), iEl = $('r-iron');
-  wEl.innerHTML = Math.floor(G.resources.wood) + rateStr(G.resourceRates.wood);
+
+  // Food rate tooltip: show consumption vs production context
+  const foodRate = G.resourceRates.food;
+  const foodConsumption = G.population; // ~1 per citizen per day (economy.js: pop * 1.0)
+  const foodTooltip = foodRate < 0
+    ? `Consuming ~${foodConsumption}/day. Build more farms!`
+    : foodRate > 0
+      ? `Net +${foodRate}/day. ${Math.floor(G.resources.food / Math.abs(foodRate || 1))} days of surplus.`
+      : `Food is balanced. Consider more farms for safety.`;
+
+  wEl.innerHTML = Math.floor(G.resources.wood) + rateStr(G.resourceRates.wood, G.resourceRates.wood < 0 ? 'Wood declining — build more lumber mills!' : null);
   sEl.innerHTML = Math.floor(G.resources.stone) + rateStr(G.resourceRates.stone);
-  fEl.innerHTML = Math.floor(G.resources.food) + rateStr(G.resourceRates.food);
+  fEl.innerHTML = Math.floor(G.resources.food) + rateStr(foodRate, foodTooltip);
   gEl.innerHTML = Math.floor(G.resources.gold) + rateStr(G.resourceRates.gold);
   iEl.innerHTML = Math.floor(G.resources.iron) + rateStr(G.resourceRates.iron);
+
+  // Warn thresholds: food warns when below 2x daily consumption or negative rate
+  const foodWarnThreshold = Math.max(20, G.population * 2);
   warn(wEl, G.resources.wood, 5);
-  warn(fEl, G.resources.food, 10);
+  warn(fEl, G.resources.food, foodWarnThreshold);
   warn(gEl, G.resources.gold, 0);
+
+  // Food emoji tint: add red class when food is critically low or rate is negative
+  const foodRes = $('r-food')?.closest('.res');
+  const foodEmoji = foodRes?.querySelector('.res-emoji');
+  if (foodEmoji) {
+    if (G.resources.food < foodWarnThreshold || foodRate < 0) {
+      foodEmoji.classList.add('food-warn-emoji');
+    } else {
+      foodEmoji.classList.remove('food-warn-emoji');
+    }
+  }
+
+  // Persistent food warning toast (throttled: at most once per day-cycle)
+  if (!G._lastFoodWarnDay) G._lastFoodWarnDay = 0;
+  const foodCritical = G.resources.food < foodWarnThreshold && foodRate < 0;
+  if (foodCritical && G.day > G._lastFoodWarnDay) {
+    G._lastFoodWarnDay = G.day;
+    // Import notify lazily via the notifications module pattern — use window or deferred
+    if (typeof notifyFood === 'function') {
+      notifyFood();
+    } else {
+      // We'll handle this via the imported notify in a dedicated exported function
+      _triggerFoodWarning();
+    }
+  }
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
   const season = getSeasonData();
   const diffLabel = DIFFICULTY[G.difficulty]?.label?.split(' ')[0] || '';

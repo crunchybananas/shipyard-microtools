@@ -6,7 +6,7 @@ import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
 import { screenToWorld, toScreen } from './render.js';
 import { placeBuilding, demolishBuilding } from './economy.js';
 import { initAudio, playSound } from './audio.js';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel } from './ui.js';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js';
 import { renderMissions } from './missions.js';
 
 // Standard isometric hit test: screen-space bounding box, depth-sorted (front wins)
@@ -257,6 +257,27 @@ export function setupInput(canvas) {
         G.selectedBuild = G.selectedBuild === keys[idx] ? null : keys[idx];
         renderBuildBar();
       }
+    }
+    if (e.key === '+' || e.key === '=') {
+      G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * 1.2));
+      return;
+    }
+    if (e.key === '-') {
+      G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * 0.9));
+      return;
+    }
+    if (e.key === 'p') {
+      G.speed = G.speed > 0 ? 0 : 1;
+      renderBuildBar(); updateUI();
+      return;
+    }
+    if (e.key === ' ') {
+      e.preventDefault();
+      const speeds = [0, 1, 2, 4];
+      const idx = speeds.indexOf(G.speed);
+      G.speed = speeds[(idx + 1) % speeds.length];
+      setSpeed(G.speed);
+      return;
     }
   });
 

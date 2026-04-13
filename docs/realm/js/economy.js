@@ -66,6 +66,31 @@ export function trySpawnSettlers(count) {
     G.citizens.push(makeCitizen(cx, cy));
     G.population++;
   }
+
+  // Check population milestones
+  const milestones = [
+    { pop: 10, key: '_milestone10', label: '10' },
+    { pop: 25, key: '_milestone25', label: '25' },
+    { pop: 50, key: '_milestone50', label: '50' },
+    { pop: 75, key: '_milestone75', label: '75' },
+  ];
+  for (const m of milestones) {
+    if (G.population >= m.pop && !G[m.key]) {
+      G[m.key] = true;
+      notify(`🎉 Population reached ${m.label}!`, 'event');
+      playSound('mission');
+      for (let i = 0; i < 20; i++) {
+        G.particles.push({
+          tx: MAP_W/2 + (Math.random()-0.5)*6,
+          ty: MAP_H/2 + (Math.random()-0.5)*6,
+          offsetY: -15 - Math.random()*25,
+          text: ['🎉','⭐','✨'][Math.floor(Math.random()*3)],
+          alpha: 1.5, vy: -0.15 - Math.random()*0.2,
+          decay: 0.008, type: 'text',
+        });
+      }
+    }
+  }
 }
 
 export function updateProduction() {
@@ -97,6 +122,7 @@ export function updateProduction() {
       } else {
         for (const [k,v] of Object.entries(adjustedProd)) {
           G.resources[k] = (G.resources[k]||0) + v;
+          G.totalResourcesGathered = (G.totalResourcesGathered || 0) + v;
         }
       }
       // Floating particle — show every 3rd production cycle to keep it subtle
@@ -114,9 +140,10 @@ export function updateProduction() {
     }
   }
 
-  // Hunger (10 times per day)
-  if (G.gameTick % Math.floor(G.dayLength / 10) === 0) {
-    for (const c of G.citizens) c.hunger = Math.min(100, c.hunger + 3);
+  // Hunger rises 5 times per day (+6 each time = +30/day total)
+  // Citizens eat individually when hunger > 70 (in citizens.js state machine)
+  if (G.gameTick % Math.floor(G.dayLength / 5) === 0) {
+    for (const c of G.citizens) c.hunger = Math.min(100, c.hunger + 6);
   }
 
   // Happiness (5 times per day)
@@ -129,9 +156,9 @@ export function updateProduction() {
     G.happiness = Math.min(100, Math.max(10, 50 + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
   }
 
-  // Food consumption (every half-day = dayLength/2)
-  if (G.gameTick % Math.floor(G.dayLength / 2) === 0) {
-    let foodNeeded = Math.ceil(G.population * 0.5 * getDifficulty().foodMult);
+  // Food consumption (once per day)
+  if (G.gameTick % G.dayLength === 0) {
+    let foodNeeded = Math.ceil(G.population * 1.0 * getDifficulty().foodMult);
     // Granaries halve food consumption in winter
     if (G.season === 'winter') {
       const granaries = G.buildings.filter(b => b.type === 'granary').length;
@@ -140,13 +167,32 @@ export function updateProduction() {
     G.resources.food = Math.max(0, G.resources.food - foodNeeded);
     if (G.resources.food <= 0 && G.population > 1) {
       G.happiness = Math.max(0, G.happiness - 10);
-      if (G.happiness < 10 && G.citizens.length > 1) {
-        const c = G.citizens.pop();
-        if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w=>w!==c);
-        G.population--;
-        notify('A settler has left due to starvation!', 'danger');
+      if (G.happiness < 20 && G.citizens.length > 1) {
+        // Pick the hungriest citizen to die from starvation
+        const sorted = [...G.citizens].sort((a, b) => b.hunger - a.hunger);
+        const c = sorted[0];
+        if (c.hunger >= 90) {
+          G.citizens = G.citizens.filter(x => x !== c);
+          if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+          G.population--;
+          // Death particle
+          G.particles.push({
+            tx: c.x, ty: c.y, offsetY: -20,
+            text: '💀 Starved',
+            alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
+          });
+          notify(`${c.name} has died of starvation!`, 'danger');
+        } else {
+          // Citizen flees
+          const c2 = G.citizens.pop();
+          if (c2.jobBuilding) c2.jobBuilding.workers = c2.jobBuilding.workers.filter(w => w !== c2);
+          G.population--;
+          notify('A settler has left — they could not find food!', 'danger');
+        }
       }
     }
+    // Track daily food consumption for rate display
+    G._dailyFoodConsumed = foodNeeded;
   }
 
   // ── Caravans ──────────────────────────────────────────────
@@ -354,9 +400,61 @@ function showVictoryScreen() {
   el.querySelector('.vic-day').textContent = `Day ${G.day}`;
   el.querySelector('.vic-pop').textContent = `${G.population} citizens`;
   el.querySelector('.vic-buildings').textContent = `${G.buildings.length} buildings`;
+  el.querySelector('.vic-resources').textContent = `${G.totalResourcesGathered || 0} total`;
   el.querySelector('.vic-techs').textContent = `${G.researchedTechs.size} technologies`;
   const ach = document.querySelectorAll ? document.querySelectorAll('.ach-item.done').length : 0;
   el.querySelector('.vic-achievements').textContent = `${ach} achievements`;
+  // Spawn canvas confetti
+  spawnVictoryConfetti();
+}
+
+function spawnVictoryConfetti() {
+  const canvas = document.getElementById('vic-confetti');
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#FFD166','#EF476F','#06D6A0','#118AB2','#FFB347','#A8DADC','#FF6B6B','#FFF3B0'];
+  const pieces = [];
+  for (let i = 0; i < 80; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: -10 - Math.random() * canvas.height * 0.5,
+      w: 6 + Math.random() * 8,
+      h: 4 + Math.random() * 5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rot: Math.random() * Math.PI * 2,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 4,
+      vrot: (Math.random() - 0.5) * 0.2,
+      alpha: 1,
+    });
+  }
+  let frame = 0;
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of pieces) {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.07; // gravity
+      p.rot += p.vrot;
+      if (p.y > canvas.height * 0.85) p.alpha -= 0.03;
+    }
+    frame++;
+    if (frame < 240 && pieces.some(p => p.alpha > 0)) {
+      requestAnimationFrame(drawConfetti);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  drawConfetti();
 }
 
 // notify() is now imported from notifications.js
