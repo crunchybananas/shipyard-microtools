@@ -8,7 +8,12 @@ import { missions } from './missions.js';
 
 const SAVE_KEY = 'realm-save-v2';
 
-export function saveGame() {
+export function getSaveSize() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  return raw ? raw.length : 0;
+}
+
+export function saveGame({ silent = false } = {}) {
   try {
     const state = {
       v: 2,
@@ -16,6 +21,7 @@ export function saveGame() {
       fog: G.fog,
       buildings: G.buildings.map(b => ({
         type: b.type, x: b.x, y: b.y, hp: b.hp, prodTimer: b.prodTimer,
+        level: b.level || 1,
         workerIdxs: b.workers.map(w => G.citizens.indexOf(w)),
       })),
       citizens: G.citizens.map(c => ({
@@ -49,7 +55,11 @@ export function saveGame() {
       })),
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    showToast('Game saved.');
+    if (silent) {
+      showSaveIndicator();
+    } else {
+      showToast('Game saved.');
+    }
   } catch (e) {
     console.error('Save failed:', e);
   }
@@ -84,7 +94,8 @@ export function loadGame() {
     // Rebuild buildings with worker refs
     G.buildings = s.buildings.map(b => ({
       type: b.type, x: b.x, y: b.y, hp: b.hp, prodTimer: b.prodTimer,
-      active: true, produced: null,
+      level: b.level || 1,
+      active: true, produced: null, prodShowCount: 0,
       workers: (b.workerIdxs || []).map(i => G.citizens[i]).filter(Boolean),
     }));
 
@@ -111,7 +122,9 @@ export function loadGame() {
 
     // Restore events
     G.activeEvent = s.activeEvent || null;
-    G.eventModifiers = s.eventModifiers || { foodProd: 1, goldProd: 1, happinessOffset: 0 };
+    G.eventModifiers = s.eventModifiers
+      ? { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1, ...s.eventModifiers }
+      : { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1 };
 
     // Restore caravans
     G.caravans = (s.caravans || []).map(c => ({
@@ -131,6 +144,21 @@ export function loadGame() {
 
 export function hasSave() {
   return !!localStorage.getItem(SAVE_KEY);
+}
+
+function showSaveIndicator() {
+  // Remove any existing indicator to reset the animation
+  const existing = document.getElementById('save-indicator');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'save-indicator';
+  el.textContent = '💾 Saved';
+  el.style.cssText = 'position:fixed;top:3.5rem;left:0.8rem;background:rgba(15,15,30,0.9);color:var(--gold);padding:0.3rem 0.6rem;border-radius:6px;font-size:0.7rem;opacity:0;transition:opacity 0.3s;z-index:20;pointer-events:none';
+  document.body.appendChild(el);
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+  setTimeout(() => { el.style.opacity = '0'; }, 1500);
+  setTimeout(() => { el.remove(); }, 2000);
 }
 
 function showToast(msg, danger = false) {

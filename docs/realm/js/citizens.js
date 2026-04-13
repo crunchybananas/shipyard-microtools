@@ -4,6 +4,7 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData } from './state.js';
 import { findPath } from './pathfinding.js';
+import { getCitizenSpeedMult } from './events.js';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -46,7 +47,7 @@ export function updateCitizens() {
       if (d < 0.15) {
         c.pathIdx++;
       } else {
-        let spd = c.speed * G.speed * getSeasonData().speedMult;
+        let spd = c.speed * G.speed * getSeasonData().speedMult * getCitizenSpeedMult();
         // Road speed bonus
         const gx = Math.round(c.x), gy = Math.round(c.y);
         if (gx >= 0 && gx < MAP_W && gy >= 0 && gy < MAP_H) {
@@ -69,7 +70,7 @@ export function updateCitizens() {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {
-        let spd = c.speed * G.speed;
+        let spd = c.speed * G.speed * getCitizenSpeedMult();
         if (c.hunger > 60) {
           const penalty = Math.min(0.4, (c.hunger - 60) / 100);
           spd *= (1 - penalty);

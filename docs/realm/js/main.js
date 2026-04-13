@@ -13,7 +13,7 @@ import { setupInput } from './input.js';
 import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel } from './ui.js';
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
-import { saveGame } from './save.js';
+import { saveGame, getSaveSize } from './save.js';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
@@ -32,11 +32,16 @@ window.addEventListener('resize', resizeCanvas);
 setupSaveButtons();
 loadAchievements();
 
-// Check for existing save to show Continue button
+// Check for existing save to show Continue button with file size
 const hasSaveData = !!localStorage.getItem('realm-save-v2');
 if (hasSaveData) {
   const loadBtn = document.getElementById('title-load');
-  if (loadBtn) loadBtn.style.display = 'inline-block';
+  if (loadBtn) {
+    const bytes = getSaveSize();
+    const kb = (bytes / 1024).toFixed(1);
+    loadBtn.textContent = `📁 Continue (${kb} KB)`;
+    loadBtn.style.display = 'inline-block';
+  }
 }
 
 function beginGame() {
@@ -97,7 +102,7 @@ window.newGame = () => {
   G.researchedTechs = new Set(['agriculture','forestry']);
   G.currentResearch = null;
   G.activeEvent = null;
-  G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0 };
+  G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0, speedMult:1 };
   G.season = 'spring'; G.won = false;
   G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
   G.lastResources = null;
@@ -182,7 +187,7 @@ function simTick() {
     updateTutorialTip();
   }
   if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); }
-  if (G.gameTick % 3600 === 0) saveGame();
+  if (G.gameTick % 3600 === 0 && G.gameTick > 0) saveGame({ silent: true });
 }
 
 function gameLoop() {

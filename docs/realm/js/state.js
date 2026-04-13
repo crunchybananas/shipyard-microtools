@@ -90,7 +90,7 @@ export const G = {
   caravans: [],
   raidFlash: 0,
   activeEvent: null,
-  eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0 },
+  eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1 },
   season: 'spring',
   won: false,
   difficulty: 'normal', // easy, normal, hard

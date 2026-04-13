@@ -159,43 +159,148 @@ export function renderResearchPanel() {
   if (!content) return;
   content.innerHTML = '';
 
-  // Current research progress bar
+  // ── Prominent active-research progress bar ──────────────
   const prog = getResearchProgress();
   if (prog) {
+    const pct = Math.round(prog.fraction * 100);
+    const techData = TECHS[prog.techId];
     const progDiv = document.createElement('div');
-    progDiv.className = 'research-progress';
+    progDiv.className = 'research-progress-hero';
     progDiv.innerHTML = `
-      <div class="rp-label">Researching: <strong>${prog.name}</strong></div>
-      <div class="rp-bar"><div class="rp-fill" style="width:${Math.round(prog.fraction*100)}%"></div></div>
-      <div class="rp-pct">${Math.round(prog.fraction*100)}%</div>`;
+      <div class="rp-hero-label">
+        <span>🔬 Researching</span>
+        <span class="rp-hero-tech">${techData.icon} ${prog.name}</span>
+        <span class="rp-hero-pct">${pct}%</span>
+      </div>
+      <div class="rp-bar"><div class="rp-fill" style="width:${pct}%"></div></div>
+      <div class="rp-sublabel">Schools speed up research by 50% each</div>`;
     content.appendChild(progDiv);
   }
 
-  // Tech list
-  for (const [id, tech] of Object.entries(TECHS)) {
-    const researched = G.researchedTechs.has(id);
-    const available = canResearch(id);
-    const prereqMet = !tech.prereq || G.researchedTechs.has(tech.prereq);
-    const isActive = G.currentResearch?.techId === id;
+  // ── Build a building-icon lookup from BUILDINGS ──────────
+  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
 
-    const div = document.createElement('div');
-    div.className = 'tech-item' + (researched ? ' done' : '') + (isActive ? ' active' : '') + (!prereqMet ? ' locked' : '');
-    const costStr = Object.entries(tech.cost).filter(([,v])=>v>0).map(([k,v])=>`${v} ${k}`).join(', ') || 'Free';
-    div.innerHTML = `
-      <span class="tech-icon">${tech.icon}</span>
-      <div class="tech-info">
-        <div class="tech-name">${tech.name}</div>
-        <div class="tech-desc">${tech.desc}</div>
-        <div class="tech-cost">${researched ? '✓ Researched' : isActive ? '🔬 In progress...' : costStr}${tech.prereq && !prereqMet ? ' · Requires ' + TECHS[tech.prereq].name : ''}</div>
-      </div>`;
-    if (available && !isActive) {
-      const btn = document.createElement('button');
-      btn.className = 'tech-btn';
-      btn.textContent = 'Research';
-      btn.onclick = () => { startResearch(id); renderResearchPanel(); renderBuildBar(); };
-      div.appendChild(btn);
+  // ── Organise techs into tiers by prereq depth ────────────
+  // tier0: no prereq
+  // tier1: prereq is a tier0 tech
+  // tier2: prereq is a tier1 tech
+  const allIds = Object.keys(TECHS);
+  const tierOf = {};
+  // first pass: root nodes
+  for (const id of allIds) {
+    if (!TECHS[id].prereq) tierOf[id] = 0;
+  }
+  // subsequent passes until stable
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const id of allIds) {
+      if (tierOf[id] !== undefined) continue;
+      const prereq = TECHS[id].prereq;
+      if (prereq && tierOf[prereq] !== undefined) {
+        tierOf[id] = tierOf[prereq] + 1;
+        changed = true;
+      }
     }
-    content.appendChild(div);
+  }
+  // fallback: any unresolved go to tier 3
+  for (const id of allIds) {
+    if (tierOf[id] === undefined) tierOf[id] = 3;
+  }
+
+  const maxTier = Math.max(...Object.values(tierOf));
+  const tiers = [];
+  for (let t = 0; t <= maxTier; t++) {
+    tiers.push(allIds.filter(id => tierOf[id] === t));
+  }
+
+  const tierLabels = ['Foundations', 'Advanced', 'Mastery'];
+
+  // ── Render each tier ─────────────────────────────────────
+  for (let t = 0; t < tiers.length; t++) {
+    const tierIds = tiers[t];
+    if (tierIds.length === 0) continue;
+
+    // Connector lines between tiers (not before first)
+    if (t > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'tech-connector';
+      content.appendChild(conn);
+    }
+
+    const tierSection = document.createElement('div');
+    tierSection.className = 'tech-tier';
+
+    const tierLabel = document.createElement('div');
+    tierLabel.className = 'tech-tier-label';
+    tierLabel.textContent = tierLabels[t] || `Tier ${t}`;
+    tierSection.appendChild(tierLabel);
+
+    const row = document.createElement('div');
+    row.className = 'tech-row';
+
+    for (const id of tierIds) {
+      const tech = TECHS[id];
+      const researched = G.researchedTechs.has(id);
+      const available = canResearch(id);
+      const prereqMet = !tech.prereq || G.researchedTechs.has(tech.prereq);
+      const isActive = G.currentResearch?.techId === id;
+
+      // Card state classes
+      let cardClass = 'tech-card';
+      if (researched)    cardClass += ' done';
+      else if (isActive) cardClass += ' active';
+      else if (!prereqMet) cardClass += ' locked';
+      else if (available)  cardClass += ' available';
+
+      // Cost string
+      const costEntries = Object.entries(tech.cost).filter(([,v]) => v > 0);
+      const costStr = costEntries.length
+        ? costEntries.map(([k, v]) => `${resEmoji[k] || k} ${v}`).join('  ')
+        : 'Free';
+      const isFree = costEntries.length === 0;
+
+      // Unlocks row — show building icons + names
+      const unlockItems = tech.unlocks.map(bKey => {
+        const bDef = BUILDINGS[bKey];
+        return bDef ? `<span class="tc-unlock-item">${bDef.icon} ${bDef.name}</span>` : '';
+      }).filter(Boolean).join('');
+
+      const card = document.createElement('div');
+      card.className = cardClass;
+      card.innerHTML = `
+        <div class="tc-top">
+          <span class="tc-icon">${tech.icon}</span>
+          <span class="tc-name">${tech.name}</span>
+          ${researched ? '<span class="tc-check">✓</span>' : ''}
+        </div>
+        <div class="tc-desc">${tech.desc}</div>
+        ${unlockItems ? `<div class="tc-unlocks"><span class="tc-unlock-label">Unlocks:</span>${unlockItems}</div>` : ''}
+        <div class="tc-cost ${isFree ? 'free' : ''}">
+          ${researched
+            ? '<span style="color:#4ade80">✓ Researched</span>'
+            : isActive
+              ? '<span style="color:var(--accent)">🔬 In progress…</span>'
+              : costStr}
+        </div>
+        ${tech.prereq && !prereqMet
+          ? `<div class="tc-prereq-note">⚠ Requires ${TECHS[tech.prereq].icon} ${TECHS[tech.prereq].name}</div>`
+          : ''}`;
+
+      // Research button
+      if (available && !isActive) {
+        const btn = document.createElement('button');
+        btn.className = 'tech-btn';
+        btn.textContent = 'Research';
+        btn.onclick = () => { startResearch(id); renderResearchPanel(); renderBuildBar(); };
+        card.appendChild(btn);
+      }
+
+      row.appendChild(card);
+    }
+
+    tierSection.appendChild(row);
+    content.appendChild(tierSection);
   }
 }
 
