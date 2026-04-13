@@ -7,6 +7,22 @@ import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData } 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
 
+// ── Performance caches ────────────────────────────────────────
+// Vignette gradient — recreated only on resize, not every frame
+let vignetteGradient = null;
+let vignetteW = 0, vignetteH = 0;
+
+// Fog-of-war gradient cache keyed by direction ('N'|'S'|'E'|'W')
+// These are relative gradients that are re-applied via translate, so they
+// can be shared. We store them keyed to a canonical tile position and
+// invalidate when the map scrolls far enough (handled by always re-checking
+// the logical tile position encoded in the key).
+const fogGradCache = {};
+
+// Night glow gradient cache — keyed by "type_glowR" since gradient shape is
+// the same for all buildings of the same type; position is applied via ctx offset
+const nightGlowCache = new Map();
+
 export function initRenderer(canvas, minimap) {
   C = canvas;
   ctx = C.getContext('2d');
@@ -23,6 +39,9 @@ export function resizeCanvas() {
   C.style.width = logicalW + 'px';
   C.style.height = logicalH + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // Invalidate screen-space gradient caches
+  vignetteGradient = null;
+  nightGlowCache.clear();
 }
 
 export function toScreen(tx, ty) {
@@ -124,7 +143,8 @@ export function render() {
       ctx.fill();
 
       // Tile texture — subtle noise pattern for visual richness
-      if (tile !== TILE.WATER) {
+      // Only draw on every other tile (checkerboard) — halves draw calls with no perceptible loss
+      if (tile !== TILE.WATER && (x + y) % 2 === 0) {
         ctx.globalAlpha = daylight * 0.08;
         for (let i = 0; i < 3; i++) {
           const nx = s.x + ((x * 7 + i * 13) % 20) - 10;
@@ -172,6 +192,35 @@ export function render() {
       ctx.closePath();
       ctx.fill();
 
+      // Cliff edge — darker rocky face where land meets water
+      if (tile !== TILE.WATER && showDetails) {
+        const waterRight = x < MAP_W-1 && G.map[y][x+1] === TILE.WATER;
+        const waterDown  = y < MAP_H-1 && G.map[y+1][x] === TILE.WATER;
+        if (waterRight) {
+          ctx.globalAlpha = daylight * 0.45;
+          ctx.fillStyle = '#2a1a0a';
+          ctx.beginPath();
+          ctx.moveTo(s.x + TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x, s.y + TH/2 + tileDepth + 2);
+          ctx.lineTo(s.x + TW/2, s.y + tileDepth + 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+        if (waterDown) {
+          ctx.globalAlpha = daylight * 0.35;
+          ctx.fillStyle = '#2a1a0a';
+          ctx.beginPath();
+          ctx.moveTo(s.x - TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x, s.y + TH/2 + tileDepth + 2);
+          ctx.lineTo(s.x - TW/2, s.y + tileDepth + 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+      }
 
       // Beach edge shimmer on sand tiles adjacent to water
       if (tile === TILE.SAND) {
@@ -191,6 +240,35 @@ export function render() {
           ctx.lineTo(s.x - TW/2, s.y);
           ctx.closePath();
           ctx.fill();
+        }
+      }
+
+      // Beach details — shells and wet sand near water
+      if (tile === TILE.SAND && showDetails) {
+        const adjWater = (x>0 && G.map[y][x-1]===TILE.WATER) || (x<MAP_W-1 && G.map[y][x+1]===TILE.WATER) ||
+                         (y>0 && G.map[y-1][x]===TILE.WATER) || (y<MAP_H-1 && G.map[y+1][x]===TILE.WATER);
+        if (adjWater) {
+          // Wet sand strip
+          ctx.globalAlpha = daylight * 0.2;
+          ctx.fillStyle = '#a08850';
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x + TW/4, s.y + TH/4);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x - TW/4, s.y + TH/4);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+        // Shells/pebbles
+        const sh = ((x * 31 + y * 47) & 0xff);
+        if (sh < 40) {
+          ctx.globalAlpha = daylight * 0.5;
+          ctx.fillStyle = '#f0e0c0';
+          ctx.beginPath();
+          ctx.arc(s.x - 5 + sh%10, s.y + sh%4 - 2, 1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = daylight;
         }
       }
 
@@ -343,7 +421,25 @@ export function render() {
         ctx.fillRect(s.x + 4 - rh%5, s.y - 1, 1.5, 1.5);
       }
       else if (tile === TILE.IRON) drawIronOre(ctx, s.x, s.y-4, daylight);
-      else if (tile === TILE.WATER) drawWater(ctx, s.x, s.y, daylight, x, y);
+      else if (tile === TILE.WATER) {
+        drawWater(ctx, s.x, s.y, daylight, x, y);
+        // Distant ocean mist — fade water tiles near map edges into haze
+        const edgeDist = Math.min(x, MAP_W-1-x, y, MAP_H-1-y);
+        if (edgeDist < 3) {
+          const mistAlpha = (1 - edgeDist / 3) * 0.55;
+          const mistPulse = 0.03 * Math.sin(G.gameTick * 0.015 + x * 0.4 + y * 0.3);
+          ctx.globalAlpha = daylight * (mistAlpha + mistPulse);
+          ctx.fillStyle = '#b8d4f0';
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y - TH/2);
+          ctx.lineTo(s.x + TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x - TW/2, s.y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+      }
       else if (tile === TILE.MOUNTAIN) {
         const mh = ((x * 37 + y * 53) & 0xff);
         const backPeakTop = s.y - 16 - (mh % 6);
@@ -498,6 +594,24 @@ export function render() {
   }
 
   // ── Fog of war soft edges ─────────────────────────────────
+  // Fog gradients only depend on direction (N/S/E/W) — cache 4 objects at the
+  // tile origin (0,0), then use ctx.translate so the same gradient reuses every
+  // edge tile. This replaces O(edge_tiles * 4) gradient allocations per frame
+  // with just 4 cached gradients total.
+  function getFogGrad(dir) {
+    if (fogGradCache[dir]) return fogGradCache[dir];
+    const hw = TW / 2, hh = TH / 2;
+    let g;
+    if (dir === 'N')      g = ctx.createLinearGradient(0, -hh, 0, 0);
+    else if (dir === 'S') g = ctx.createLinearGradient(0, hh, 0, 0);
+    else if (dir === 'W') g = ctx.createLinearGradient(-hw, 0, 0, 0);
+    else                  g = ctx.createLinearGradient(hw, 0, 0, 0);
+    g.addColorStop(0, 'rgba(10,14,26,0.72)');
+    g.addColorStop(1, 'rgba(10,14,26,0)');
+    fogGradCache[dir] = g;
+    return g;
+  }
+
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
       if (G.fog[y]?.[x]) {
@@ -517,35 +631,12 @@ export function render() {
           ctx.lineTo(s.x - hw, s.y);
           ctx.closePath();
           ctx.clip();
-          // Draw a directional gradient toward each unexplored neighbor
-          if (fogN) {
-            const g = ctx.createLinearGradient(s.x, s.y - hh, s.x, s.y);
-            g.addColorStop(0, 'rgba(10,14,26,0.72)');
-            g.addColorStop(1, 'rgba(10,14,26,0)');
-            ctx.fillStyle = g;
-            ctx.fillRect(s.x - hw, s.y - hh, TW, hh);
-          }
-          if (fogS) {
-            const g = ctx.createLinearGradient(s.x, s.y + hh, s.x, s.y);
-            g.addColorStop(0, 'rgba(10,14,26,0.72)');
-            g.addColorStop(1, 'rgba(10,14,26,0)');
-            ctx.fillStyle = g;
-            ctx.fillRect(s.x - hw, s.y, TW, hh);
-          }
-          if (fogW) {
-            const g = ctx.createLinearGradient(s.x - hw, s.y, s.x, s.y);
-            g.addColorStop(0, 'rgba(10,14,26,0.72)');
-            g.addColorStop(1, 'rgba(10,14,26,0)');
-            ctx.fillStyle = g;
-            ctx.fillRect(s.x - hw, s.y - hh, hw, TH);
-          }
-          if (fogE) {
-            const g = ctx.createLinearGradient(s.x + hw, s.y, s.x, s.y);
-            g.addColorStop(0, 'rgba(10,14,26,0.72)');
-            g.addColorStop(1, 'rgba(10,14,26,0)');
-            ctx.fillStyle = g;
-            ctx.fillRect(s.x, s.y - hh, hw, TH);
-          }
+          // Translate so cached origin-relative gradients map onto this tile
+          ctx.translate(s.x, s.y);
+          if (fogN) { ctx.fillStyle = getFogGrad('N'); ctx.fillRect(-hw, -hh, TW, hh); }
+          if (fogS) { ctx.fillStyle = getFogGrad('S'); ctx.fillRect(-hw, 0, TW, hh); }
+          if (fogW) { ctx.fillStyle = getFogGrad('W'); ctx.fillRect(-hw, -hh, hw, TH); }
+          if (fogE) { ctx.fillStyle = getFogGrad('E'); ctx.fillRect(0, -hh, hw, TH); }
           ctx.restore();
         }
       }
@@ -889,6 +980,11 @@ export function render() {
   // ── Particles ─────────────────────────────────────────────
   for (const p of G.particles) {
     const s = toScreen(p.tx, p.ty);
+    // Skip particles whose screen-space position is outside the viewport
+    // (toScreen returns world-space coords; add camera offset to get viewport coords)
+    const psx = (s.x - G.camera.x) * G.camera.zoom + logicalW / 2;
+    const psy = (s.y + (p.offsetY || 0) - G.camera.y) * G.camera.zoom + logicalH / 2;
+    if (psx < -50 || psx > logicalW + 50 || psy < -50 || psy > logicalH + 50) continue;
     ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
 
     if (p.type === 'smoke') {
@@ -1109,12 +1205,17 @@ export function render() {
   }
 
   // ── Screen-space vignette (atmospheric edge fog) ──────────
+  // Cache the gradient — it only changes when the window resizes (resizeCanvas
+  // clears vignetteGradient), so we avoid creating a radial gradient every frame.
   const vw = logicalW, vh = logicalH;
-  const vigSize = Math.min(vw, vh) * 0.4;
-  const vig = ctx.createRadialGradient(vw/2, vh/2, Math.min(vw,vh)*0.3, vw/2, vh/2, Math.max(vw,vh)*0.7);
-  vig.addColorStop(0, 'rgba(10,14,26,0)');
-  vig.addColorStop(1, 'rgba(10,14,26,0.5)');
-  ctx.fillStyle = vig;
+  if (!vignetteGradient || vignetteW !== vw || vignetteH !== vh) {
+    vignetteGradient = ctx.createRadialGradient(vw/2, vh/2, Math.min(vw,vh)*0.3, vw/2, vh/2, Math.max(vw,vh)*0.7);
+    vignetteGradient.addColorStop(0, 'rgba(10,14,26,0)');
+    vignetteGradient.addColorStop(1, 'rgba(10,14,26,0.5)');
+    vignetteW = vw;
+    vignetteH = vh;
+  }
+  ctx.fillStyle = vignetteGradient;
   ctx.fillRect(0, 0, vw, vh);
 
   // ── Minimap ───────────────────────────────────────────────
@@ -1207,16 +1308,26 @@ function drawBuilding(ctx, b, s, daylight) {
     if (daylight < 0.75 && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
       const glowAlpha = (0.75 - daylight) * 2; // brighter as it gets darker
       ctx.globalAlpha = glowAlpha;
-      // Warm point light around the building
+      // Warm point light around the building.
+      // Cache the radial gradient at origin (0,0) keyed by building type; reuse
+      // with ctx.translate so we avoid one createRadialGradient per building per frame.
       const glowR = b.type === 'castle' ? 40 : b.type === 'church' ? 32 : 24;
-      const glowY = b.type === 'tower' ? s.y - 22 : b.type === 'castle' ? s.y - 20 : s.y - 14;
-      const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
-      glow.addColorStop(0, 'rgba(255,220,140,0.55)');
-      glow.addColorStop(1, 'rgba(255,220,140,0)');
+      const glowOffY = b.type === 'tower' ? -22 : b.type === 'castle' ? -20 : -14;
+      const glowCacheKey = `${b.type}_${glowR}`;
+      let glow = nightGlowCache.get(glowCacheKey);
+      if (!glow) {
+        glow = ctx.createRadialGradient(0, glowOffY, 2, 0, glowOffY, glowR);
+        glow.addColorStop(0, 'rgba(255,220,140,0.55)');
+        glow.addColorStop(1, 'rgba(255,220,140,0)');
+        nightGlowCache.set(glowCacheKey, glow);
+      }
+      ctx.save();
+      ctx.translate(s.x, s.y);
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(s.x, glowY, glowR, 0, Math.PI * 2);
+      ctx.arc(0, glowOffY, glowR, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
       // Bright window dots
       ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
       if (b.type === 'house') {

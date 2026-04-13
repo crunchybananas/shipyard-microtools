@@ -517,9 +517,9 @@ export function renderHappinessPanel() {
   const el = document.getElementById('happiness-content');
   if (!el) return;
   const factors = [];
-  factors.push({ label: 'Base happiness', val: 50 });
+  factors.push({ label: '🏡 Base happiness', val: 50, category: 'base' });
 
-  // Building bonuses
+  // Building bonuses — group by type
   const bCounts = {};
   for (const b of G.buildings) {
     const def = BUILDINGS[b.type];
@@ -529,27 +529,66 @@ export function renderHappinessPanel() {
   }
   for (const [type, count] of Object.entries(bCounts)) {
     const def = BUILDINGS[type];
-    factors.push({ label: `${def.icon} ${def.name} ×${count}`, val: def.happiness * count });
+    factors.push({ label: `${def.icon} ${def.name} ×${count}`, val: def.happiness * count, category: 'building' });
   }
 
-  // Overcrowding
+  // Negative modifiers
   const excess = Math.max(0, G.population - G.maxPop);
-  if (excess > 0) factors.push({ label: `Overcrowding (${excess} homeless)`, val: -excess * 5 });
-
-  // Starvation
-  if (G.resources.food <= 0) factors.push({ label: 'Starvation (no food)', val: -10 });
-
-  // Low food warning
+  if (excess > 0) factors.push({ label: `😰 Overcrowding (${excess} homeless)`, val: -excess * 5, category: 'penalty' });
+  if (G.resources.food <= 0) factors.push({ label: '💀 Starvation (no food)', val: -10, category: 'penalty' });
   if (G.resources.food > 0 && G.resources.food < G.population) {
-    factors.push({ label: 'Food shortage', val: -3 });
+    factors.push({ label: '🍎 Food shortage', val: -3, category: 'penalty' });
   }
 
-  const total = Math.min(100, Math.max(0, factors.reduce((s, f) => s + f.val, 0)));
+  // Event modifiers
+  if (G.eventModifiers.happinessOffset && G.eventModifiers.happinessOffset !== 0) {
+    factors.push({ label: '✨ Event modifier', val: G.eventModifiers.happinessOffset, category: 'event' });
+  }
 
-  el.innerHTML = factors.map(f =>
-    `<div class="hp-row"><span class="hp-label">${f.label}</span><span class="hp-val ${f.val >= 0 ? 'pos' : 'neg'}">${f.val >= 0 ? '+' : ''}${f.val}</span></div>`
-  ).join('') +
-    `<div class="hp-row hp-total"><span class="hp-label">Total</span><span class="hp-val">${total}%</span></div>`;
+  const rawTotal = factors.reduce((s, f) => s + f.val, 0);
+  const total = Math.min(100, Math.max(0, rawTotal));
+
+  // Happiness score color
+  const barColor = total >= 70 ? '#4ade80' : total >= 40 ? '#ffd166' : '#f87171';
+  const scoreLabel = total >= 75 ? '😄 Happy' : total >= 50 ? '😐 Content' : total >= 25 ? '😟 Unhappy' : '😡 Miserable';
+
+  // Net change: compare to previous day target
+  const prevHappiness = G.happiness;
+  const netChange = total - prevHappiness;
+  const netStr = netChange > 0.5 ? `▲ +${Math.round(netChange)}/day`
+    : netChange < -0.5 ? `▼ ${Math.round(netChange)}/day`
+    : '— Stable';
+  const netColor = netChange > 0.5 ? '#4ade80' : netChange < -0.5 ? '#f87171' : 'rgba(255,255,255,0.4)';
+
+  // Separate bonuses from penalties
+  const bonuses = factors.filter(f => f.val > 0);
+  const penalties = factors.filter(f => f.val < 0);
+
+  let html = `
+    <div class="hp-score-bar">
+      <div class="hp-score-fill" style="width:${total}%;background:${barColor}"></div>
+    </div>
+    <div class="hp-score-row">
+      <span class="hp-score-label">${scoreLabel}</span>
+      <span class="hp-score-val" style="color:${barColor}">${total}%</span>
+    </div>
+    <div class="hp-net" style="color:${netColor}">${netStr}</div>
+    <div class="hp-section-title">Happiness Sources</div>`;
+
+  html += bonuses.map(f =>
+    `<div class="hp-row"><span class="hp-label">${f.label}</span><span class="hp-val pos">+${f.val}</span></div>`
+  ).join('');
+
+  if (penalties.length > 0) {
+    html += `<div class="hp-section-title hp-section-penalty">Penalties</div>`;
+    html += penalties.map(f =>
+      `<div class="hp-row"><span class="hp-label">${f.label}</span><span class="hp-val neg">${f.val}</span></div>`
+    ).join('');
+  }
+
+  html += `<div class="hp-row hp-total"><span class="hp-label">Net Happiness</span><span class="hp-val">${total}%</span></div>`;
+
+  el.innerHTML = html;
 }
 
 // ── Tutorial system ────────────────────────────────────────
@@ -674,23 +713,65 @@ function renderPopPanel() {
     working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
     foraging:'Foraging', eating:'Eating' };
 
-  // Header
+  // Classify citizens
+  const isHungry = c => c.hunger >= 70;
+  const isWorking = c => c.jobBuilding && !isHungry(c) &&
+    ['working','walk_to_work','walk_to_deliver','deliver'].includes(c.state);
+  const getGroup = c => isHungry(c) ? 2 : isWorking(c) ? 0 : 1;
+
+  // Sort: working first (0), idle (1), hungry (2); within group alphabetically
+  const sorted = [...G.citizens].map((c, i) => ({ c, i })).sort((a, b) => {
+    const ga = getGroup(a.c), gb = getGroup(b.c);
+    return ga !== gb ? ga - gb : a.c.name.localeCompare(b.c.name);
+  });
+
+  // Summary counts
+  const workingCount = G.citizens.filter(isWorking).length;
+  const hungryCount = G.citizens.filter(isHungry).length;
+  const idleCount = G.citizens.length - workingCount - hungryCount;
+
+  // Summary bar
+  const summary = document.createElement('div');
+  summary.className = 'pop-summary';
+  summary.innerHTML = `
+    <span class="pop-sum-item pop-sum-work">🟢 ${workingCount} Working</span>
+    <span class="pop-sum-item pop-sum-idle">🟡 ${idleCount} Idle</span>
+    <span class="pop-sum-item pop-sum-hungry${hungryCount > 0 ? ' pop-sum-warn' : ''}">🔴 ${hungryCount} Hungry</span>`;
+  el.appendChild(summary);
+
+  // Column header
   const hdr = document.createElement('div');
   hdr.className = 'pop-row pop-header';
   hdr.innerHTML = `<span>Name</span><span>Job</span><span>State</span><span>Hunger</span><span></span>`;
   el.appendChild(hdr);
 
-  for (let i = 0; i < G.citizens.length; i++) {
-    const c = G.citizens[i];
-    const job = c.jobBuilding ? BUILDINGS[c.jobBuilding.type]?.name : 'None';
+  let lastGroup = -1;
+  for (const { c, i } of sorted) {
+    const group = getGroup(c);
+
+    // Group divider labels
+    if (group !== lastGroup) {
+      lastGroup = group;
+      const groupNames = ['Working', 'Idle', 'Hungry'];
+      const groupColors = ['var(--food)', 'var(--gold)', 'var(--danger)'];
+      const div = document.createElement('div');
+      div.className = 'pop-group-label';
+      div.style.color = groupColors[group];
+      div.textContent = groupNames[group];
+      el.appendChild(div);
+    }
+
+    const job = c.jobBuilding ? (BUILDINGS[c.jobBuilding.type]?.icon || '') + ' ' + (BUILDINGS[c.jobBuilding.type]?.name || '') : '—';
     const state = stateLabel[c.state] || c.state;
     const hungerBar = Math.round(c.hunger);
+    const stateColor = group === 0 ? 'var(--food)' : group === 2 ? 'var(--danger)' : 'var(--gold)';
     const div = document.createElement('div');
     div.className = 'pop-row';
+    div.style.borderLeft = `3px solid ${stateColor}`;
     div.innerHTML = `
       <span class="pop-name">${c.name}</span>
       <span class="pop-job">${job}</span>
-      <span class="pop-state">${state}</span>
+      <span class="pop-state" style="color:${stateColor}">${state}</span>
       <span class="pop-hunger" title="Hunger ${hungerBar}%">
         <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
       </span>

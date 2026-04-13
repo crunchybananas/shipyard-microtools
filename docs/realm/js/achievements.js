@@ -72,15 +72,86 @@ function showAchievementToast(a) {
   el._timer = setTimeout(() => el.classList.remove('show'), 4000);
 }
 
+// Progress helpers: compute 0–1 progress for partially-checkable achievements
+function getProgress(a) {
+  try {
+    if (unlocked.has(a.id)) return 1;
+    // Population milestones
+    if (a.id === 'pop10') return Math.min(1, G.population / 10);
+    if (a.id === 'pop25') return Math.min(1, G.population / 25);
+    if (a.id === 'pop50') return Math.min(1, G.population / 50);
+    // Day milestones
+    if (a.id === 'day30') return Math.min(1, G.day / 30);
+    if (a.id === 'day100') return Math.min(1, G.day / 100);
+    // Builder milestones
+    if (a.id === 'builder10') return Math.min(1, G.buildings.length / 10);
+    if (a.id === 'builder25') return Math.min(1, G.buildings.length / 25);
+    // Research
+    if (a.id === 'first_research') return Math.min(1, G.researchedTechs.size / 3);
+    if (a.id === 'all_techs') return Math.min(1, G.researchedTechs.size / 8);
+    // Gold
+    if (a.id === 'rich') return Math.min(1, G.resources.gold / 100);
+    // Happiness
+    if (a.id === 'happy90') return Math.min(1, G.happiness / 90);
+    // Fortified
+    if (a.id === 'fortified') {
+      const cnt = G.buildings.filter(b => b.type === 'barracks' || b.type === 'tower' || b.type === 'wall').length;
+      return Math.min(1, cnt / 3);
+    }
+  } catch {}
+  return 0;
+}
+
 export function renderAchievementsPanel() {
   const el = document.getElementById('achievements-content');
   if (!el) return;
   el.innerHTML = '';
-  for (const a of ACHIEVEMENTS) {
+
+  const doneCount = unlocked.size;
+  const totalCount = ACHIEVEMENTS.length;
+
+  // Panel summary
+  const summary = document.createElement('div');
+  summary.className = 'ach-summary';
+  const pct = Math.round((doneCount / totalCount) * 100);
+  summary.innerHTML = `
+    <div class="ach-sum-row">
+      <span class="ach-sum-label">${doneCount} / ${totalCount} Unlocked</span>
+      <span class="ach-sum-pct">${pct}%</span>
+    </div>
+    <div class="ach-sum-bar"><div class="ach-sum-fill" style="width:${pct}%"></div></div>`;
+  el.appendChild(summary);
+
+  // Unlocked first, then locked
+  const sortedAchs = [...ACHIEVEMENTS].sort((a, b) => {
+    const da = unlocked.has(a.id) ? 0 : 1;
+    const db = unlocked.has(b.id) ? 0 : 1;
+    return da - db;
+  });
+
+  for (const a of sortedAchs) {
     const done = unlocked.has(a.id);
+    const progress = getProgress(a);
+    const hasProgress = !done && progress > 0;
+
     const div = document.createElement('div');
     div.className = 'ach-item' + (done ? ' done' : '');
-    div.innerHTML = `<span class="ach-icon">${done ? a.icon : '🔒'}</span><div class="ach-info"><div class="ach-name">${done ? a.name : '???'}</div><div class="ach-desc">${a.desc}</div></div>`;
+    if (done) div.title = a.desc;
+
+    let progressHtml = '';
+    if (hasProgress) {
+      const pctBar = Math.round(progress * 100);
+      progressHtml = `<div class="ach-progress"><div class="ach-progress-fill" style="width:${pctBar}%"></div><span class="ach-progress-label">${pctBar}%</span></div>`;
+    }
+
+    div.innerHTML = `
+      <span class="ach-icon${done ? '' : ' ach-icon-locked'}">${done ? a.icon : '🔒'}</span>
+      <div class="ach-info">
+        <div class="ach-name">${done ? a.name : (hasProgress ? a.name : '???')}</div>
+        <div class="ach-desc">${a.desc}</div>
+        ${progressHtml}
+      </div>
+      ${done ? '<span class="ach-check">✓</span>' : ''}`;
     el.appendChild(div);
   }
 }
