@@ -1454,26 +1454,78 @@ function drawFarm(ctx, s) {
 }
 
 function drawLumber(ctx, s) {
-  ctx.fillStyle = '#8b6a4e';
+  // Front wall — wood-plank gradient (light top, darker bottom)
+  const wallGrad = ctx.createLinearGradient(s.x-10, s.y-18, s.x-10, s.y-4);
+  wallGrad.addColorStop(0, '#b8865c');
+  wallGrad.addColorStop(1, '#7a5535');
+  ctx.fillStyle = wallGrad;
   ctx.fillRect(s.x-10, s.y-18, 20, 14);
-  ctx.fillStyle = '#6a5040';
+  // Horizontal plank lines
+  ctx.strokeStyle = 'rgba(60,35,10,0.35)';
+  ctx.lineWidth = 0.7;
+  for (let py = -14; py <= -6; py += 4) {
+    ctx.beginPath(); ctx.moveTo(s.x-10, s.y+py); ctx.lineTo(s.x+10, s.y+py); ctx.stroke();
+  }
+  // Side face (right)
+  const sideGrad = ctx.createLinearGradient(s.x+10, s.y-18, s.x+14, s.y-4);
+  sideGrad.addColorStop(0, '#8a6040');
+  sideGrad.addColorStop(1, '#5a3820');
+  ctx.fillStyle = sideGrad;
   ctx.beginPath();
   ctx.moveTo(s.x+10, s.y-18); ctx.lineTo(s.x+14, s.y-15);
   ctx.lineTo(s.x+14, s.y-1); ctx.lineTo(s.x+10, s.y-4);
   ctx.closePath();
   ctx.fill();
-  // Roof
-  ctx.fillStyle = '#5a4a3a';
+  // Roof (dark shingles)
+  const roofGrad = ctx.createLinearGradient(s.x, s.y-26, s.x, s.y-18);
+  roofGrad.addColorStop(0, '#4a3828');
+  roofGrad.addColorStop(1, '#6a5040');
+  ctx.fillStyle = roofGrad;
   ctx.beginPath();
   ctx.moveTo(s.x-13, s.y-18); ctx.lineTo(s.x, s.y-26);
   ctx.lineTo(s.x+13, s.y-18); ctx.closePath();
   ctx.fill();
-  // Log pile
-  ctx.fillStyle = '#a3714f';
-  for (let i = 0; i < 3; i++) {
-    ctx.beginPath();
-    ctx.arc(s.x-6+i*4, s.y-1, 2.5, 0, Math.PI*2);
-    ctx.fill();
+  // Roof ridge line
+  ctx.strokeStyle = '#3a2818'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(s.x-13, s.y-18); ctx.lineTo(s.x, s.y-26); ctx.lineTo(s.x+13, s.y-18); ctx.stroke();
+  // Small chimney (sawdust exhaust)
+  ctx.fillStyle = '#5a4030';
+  ctx.fillRect(s.x+2, s.y-31, 4, 7);
+  // Smoke puffs from chimney
+  ctx.fillStyle = 'rgba(200,190,175,0.55)';
+  ctx.beginPath(); ctx.arc(s.x+4, s.y-33, 2.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(200,190,175,0.35)';
+  ctx.beginPath(); ctx.arc(s.x+6, s.y-36, 2, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(200,190,175,0.2)';
+  ctx.beginPath(); ctx.arc(s.x+5, s.y-39, 1.5, 0, Math.PI*2); ctx.fill();
+  // Door
+  ctx.fillStyle = '#3a2510';
+  ctx.fillRect(s.x-2, s.y-12, 4, 6);
+  // Log pile (left side) — stacked cylinders with end-grain rings
+  const logColors = ['#c4844e', '#b07040', '#a06030'];
+  for (let row = 0; row < 2; row++) {
+    for (let col = 0; col < 3; col++) {
+      const lx = s.x-18 + col*5;
+      const ly = s.y - 3 - row*4;
+      ctx.fillStyle = logColors[col % 3];
+      ctx.beginPath(); ctx.ellipse(lx, ly, 3, 2, 0, 0, Math.PI*2); ctx.fill();
+      // End-grain ring
+      ctx.strokeStyle = 'rgba(60,30,10,0.5)'; ctx.lineWidth = 0.7;
+      ctx.beginPath(); ctx.ellipse(lx, ly, 1.5, 1, 0, 0, Math.PI*2); ctx.stroke();
+    }
+  }
+  // Axe prop — handle + blade leaning against wall
+  ctx.strokeStyle = '#6a4a28'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(s.x+13, s.y-4); ctx.lineTo(s.x+16, s.y-14); ctx.stroke();
+  ctx.fillStyle = '#8a9aaa';
+  ctx.beginPath();
+  ctx.moveTo(s.x+16, s.y-14); ctx.lineTo(s.x+19, s.y-17); ctx.lineTo(s.x+19, s.y-12); ctx.closePath();
+  ctx.fill();
+  // Sawdust scatter around base
+  ctx.fillStyle = 'rgba(210,165,90,0.6)';
+  const dustSpots = [[-8,1],[-5,2],[-3,1],[3,2],[6,1],[9,2],[-10,3]];
+  for (const [dx,dy] of dustSpots) {
+    ctx.beginPath(); ctx.arc(s.x+dx, s.y+dy, 1.2, 0, Math.PI*2); ctx.fill();
   }
 }
 
@@ -1495,20 +1547,75 @@ function drawQuarry(ctx, s) {
 }
 
 function drawMine(ctx, s) {
-  ctx.fillStyle = '#5a5a6a';
-  ctx.fillRect(s.x-10, s.y-16, 20, 12);
-  // Entrance arch
-  ctx.fillStyle = '#2a2a34';
+  // Rock face — gradient from light grey top to dark base
+  const rockGrad = ctx.createLinearGradient(s.x-12, s.y-20, s.x-12, s.y-4);
+  rockGrad.addColorStop(0, '#8a8a9a');
+  rockGrad.addColorStop(1, '#4a4a58');
+  ctx.fillStyle = rockGrad;
+  ctx.fillRect(s.x-12, s.y-20, 24, 16);
+  // Side face (right) — darker rock
+  ctx.fillStyle = '#3e3e4e';
   ctx.beginPath();
-  ctx.arc(s.x, s.y-8, 6, Math.PI, 0);
-  ctx.lineTo(s.x+6, s.y-4); ctx.lineTo(s.x-6, s.y-4);
+  ctx.moveTo(s.x+12, s.y-20); ctx.lineTo(s.x+16, s.y-17);
+  ctx.lineTo(s.x+16, s.y-4); ctx.lineTo(s.x+12, s.y-4);
   ctx.closePath();
   ctx.fill();
-  // Support beams
-  ctx.fillStyle = '#8b6a4e';
-  ctx.fillRect(s.x-7, s.y-14, 2, 10);
-  ctx.fillRect(s.x+5, s.y-14, 2, 10);
-  ctx.fillRect(s.x-7, s.y-15, 14, 2);
+  // Rock texture cracks on front face
+  ctx.strokeStyle = 'rgba(30,30,40,0.4)'; ctx.lineWidth = 0.6;
+  ctx.beginPath(); ctx.moveTo(s.x-8, s.y-20); ctx.lineTo(s.x-6, s.y-16); ctx.lineTo(s.x-9, s.y-13); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s.x+5, s.y-19); ctx.lineTo(s.x+8, s.y-15); ctx.stroke();
+  // Dark tunnel interior — radial gradient for depth
+  const tunnelGrad = ctx.createRadialGradient(s.x, s.y-8, 1, s.x, s.y-8, 7);
+  tunnelGrad.addColorStop(0, '#1a1a22');
+  tunnelGrad.addColorStop(1, '#0a0a10');
+  ctx.fillStyle = tunnelGrad;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y-8, 7, Math.PI, 0);
+  ctx.lineTo(s.x+7, s.y-4); ctx.lineTo(s.x-7, s.y-4);
+  ctx.closePath();
+  ctx.fill();
+  // Wooden support beams — frame around entrance
+  ctx.fillStyle = '#7a5530';
+  ctx.fillRect(s.x-8, s.y-16, 2.5, 12);   // left post
+  ctx.fillRect(s.x+5, s.y-16, 2.5, 12);   // right post
+  ctx.fillRect(s.x-8, s.y-17, 15, 2.5);   // lintel
+  // Beam grain lines
+  ctx.strokeStyle = 'rgba(40,20,5,0.4)'; ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-7.5, s.y-15); ctx.lineTo(s.x-7.5, s.y-5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s.x+6.5, s.y-15); ctx.lineTo(s.x+6.5, s.y-5); ctx.stroke();
+  // Lantern — small yellow glow near entrance
+  ctx.fillStyle = '#ffd166';
+  ctx.beginPath(); ctx.arc(s.x-10, s.y-10, 2, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,200,80,0.3)';
+  ctx.beginPath(); ctx.arc(s.x-10, s.y-10, 4, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#8a6030'; ctx.lineWidth = 0.8;
+  ctx.strokeRect(s.x-11, s.y-11, 2, 2);
+  // Mine cart on short track (right of entrance)
+  // Track rails
+  ctx.strokeStyle = '#6a6a7a'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(s.x+8, s.y-3); ctx.lineTo(s.x+20, s.y-3); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s.x+8, s.y-1); ctx.lineTo(s.x+20, s.y-1); ctx.stroke();
+  // Tie crossbars
+  ctx.lineWidth = 0.5;
+  for (let tx = 9; tx < 20; tx += 3) {
+    ctx.beginPath(); ctx.moveTo(s.x+tx, s.y-4); ctx.lineTo(s.x+tx, s.y); ctx.stroke();
+  }
+  // Cart body
+  ctx.fillStyle = '#5a5a6a';
+  ctx.fillRect(s.x+12, s.y-8, 8, 5);
+  ctx.fillStyle = '#3a3a48';
+  ctx.fillRect(s.x+12, s.y-4, 8, 1);
+  // Cart wheels
+  ctx.fillStyle = '#2a2a32';
+  ctx.beginPath(); ctx.arc(s.x+14, s.y-3, 1.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(s.x+18, s.y-3, 1.5, 0, Math.PI*2); ctx.fill();
+  // Ore pile beside entrance (left) — blue-grey stones
+  const oreColors = ['#7a8a9a', '#6a7a8a', '#5a6a7a', '#8a9aaa'];
+  const orePos = [[-20,-2],[-17,-4],[-22,-4],[-19,-6],[-16,-2]];
+  for (let oi = 0; oi < orePos.length; oi++) {
+    ctx.fillStyle = oreColors[oi % oreColors.length];
+    ctx.beginPath(); ctx.ellipse(s.x+orePos[oi][0], s.y+orePos[oi][1], 3, 2, 0.3, 0, Math.PI*2); ctx.fill();
+  }
 }
 
 function drawMarket(ctx, s) {
@@ -1566,29 +1673,119 @@ function drawMarket(ctx, s) {
 }
 
 function drawBarracks(ctx, s) {
-  ctx.fillStyle = '#5a6070';
-  ctx.fillRect(s.x-10, s.y-18, 20, 14);
-  ctx.fillStyle = '#4a5060';
+  // --- Isometric side face (right) ---
+  const sideGrad = ctx.createLinearGradient(s.x+12, s.y-22, s.x+12, s.y-2);
+  sideGrad.addColorStop(0, '#4a5462');
+  sideGrad.addColorStop(1, '#333b47');
+  ctx.fillStyle = sideGrad;
   ctx.beginPath();
-  ctx.moveTo(s.x+10, s.y-18); ctx.lineTo(s.x+14, s.y-15);
-  ctx.lineTo(s.x+14, s.y-1); ctx.lineTo(s.x+10, s.y-4);
+  ctx.moveTo(s.x+12, s.y-22); ctx.lineTo(s.x+17, s.y-18);
+  ctx.lineTo(s.x+17, s.y-1); ctx.lineTo(s.x+12, s.y-5);
   ctx.closePath();
   ctx.fill();
-  // Flat roof with crenellations
-  ctx.fillStyle = '#6a7080';
-  ctx.fillRect(s.x-12, s.y-20, 24, 3);
-  for (let i = -10; i < 12; i += 5) {
-    ctx.fillRect(s.x+i, s.y-24, 3, 4);
+
+  // --- Main front wall — grey stone gradient, wide & low ---
+  const wallGrad = ctx.createLinearGradient(s.x, s.y-26, s.x, s.y-4);
+  wallGrad.addColorStop(0, '#6e7a88');
+  wallGrad.addColorStop(1, '#48525e');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(s.x-13, s.y-24, 25, 20);
+  // Top edge highlight
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath(); ctx.moveTo(s.x-13, s.y-24); ctx.lineTo(s.x+12, s.y-24); ctx.stroke();
+
+  // --- Stone block texture (horizontal mortar lines) ---
+  ctx.strokeStyle = 'rgba(0,0,0,0.14)';
+  ctx.lineWidth = 0.7;
+  for (let py = s.y-21; py < s.y-4; py += 4) {
+    ctx.beginPath(); ctx.moveTo(s.x-13, py); ctx.lineTo(s.x+12, py); ctx.stroke();
   }
-  // Flag
-  ctx.fillStyle = '#e74c3c';
+  // Vertical mortar offsets (staggered courses)
+  ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+  ctx.lineWidth = 0.5;
+  for (let py = s.y-21; py < s.y-4; py += 8) {
+    ctx.beginPath(); ctx.moveTo(s.x-7, py); ctx.lineTo(s.x-7, py+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x+1, py); ctx.lineTo(s.x+1, py+4); ctx.stroke();
+  }
+  for (let py = s.y-25; py < s.y-4; py += 8) {
+    ctx.beginPath(); ctx.moveTo(s.x-10, py); ctx.lineTo(s.x-10, py+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x+5, py); ctx.lineTo(s.x+5, py+4); ctx.stroke();
+  }
+
+  // --- Flat roof parapet ---
+  ctx.fillStyle = '#7a8694';
+  ctx.fillRect(s.x-15, s.y-27, 29, 4);
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x-15, s.y-27); ctx.lineTo(s.x+14, s.y-27); ctx.stroke();
+
+  // --- Crenellations (merlons) along roofline ---
+  ctx.fillStyle = '#828e9c';
+  for (let i = -13; i < 14; i += 5) {
+    ctx.fillRect(s.x+i, s.y-32, 3, 5);
+  }
+
+  // --- Arrow slits (tall thin dark rectangles) ---
+  ctx.fillStyle = '#1e2530';
+  ctx.fillRect(s.x-9,  s.y-21, 2, 6);   // left slit
+  ctx.fillRect(s.x+1,  s.y-21, 2, 6);   // centre slit
+  ctx.fillRect(s.x+8,  s.y-21, 2, 6);   // right slit
+  // horizontal crossbar on each slit
+  ctx.fillStyle = '#2a3240';
+  ctx.fillRect(s.x-10, s.y-18, 4, 1);
+  ctx.fillRect(s.x,    s.y-18, 4, 1);
+  ctx.fillRect(s.x+7,  s.y-18, 4, 1);
+
+  // --- Wooden door with iron bands ---
+  // Door frame
+  ctx.fillStyle = '#2a3240';
+  ctx.fillRect(s.x-4, s.y-14, 8, 10);
+  // Door planks (warm wood)
+  ctx.fillStyle = '#7a5030';
+  ctx.fillRect(s.x-3, s.y-13, 3, 9);
+  ctx.fillStyle = '#6a4428';
+  ctx.fillRect(s.x,   s.y-13, 3, 9);
+  // Iron bands across door
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(s.x-3, s.y-11, 6, 1);
+  ctx.fillRect(s.x-3, s.y-7,  6, 1);
+  // Door handle
+  ctx.fillStyle = '#888';
+  ctx.fillRect(s.x-1, s.y-9, 1, 2);
+
+  // --- Flag pole & red banner ---
+  ctx.fillStyle = '#8a7a5a';
+  ctx.fillRect(s.x+8, s.y-44, 2, 17);
+  ctx.fillStyle = '#c0392b';
   ctx.beginPath();
-  ctx.moveTo(s.x+8, s.y-30); ctx.lineTo(s.x+16, s.y-27);
-  ctx.lineTo(s.x+8, s.y-24);
+  ctx.moveTo(s.x+10, s.y-44); ctx.lineTo(s.x+19, s.y-41);
+  ctx.lineTo(s.x+10, s.y-38);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#7a6a5a';
-  ctx.fillRect(s.x+7, s.y-30, 2, 14);
+  // White stripe on banner
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(s.x+10, s.y-42, 8, 1);
+
+  // --- Training dummy (prop, left side) ---
+  // Post
+  ctx.fillStyle = '#6a5030';
+  ctx.fillRect(s.x-21, s.y-22, 2, 18);
+  // Dummy body (sack)
+  ctx.fillStyle = '#c8a870';
+  ctx.beginPath();
+  ctx.ellipse(s.x-20, s.y-18, 4, 5, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Dummy head
+  ctx.fillStyle = '#d4b888';
+  ctx.beginPath();
+  ctx.arc(s.x-20, s.y-24, 3, 0, Math.PI*2);
+  ctx.fill();
+  // Rope binding on dummy body
+  ctx.strokeStyle = '#8a6030';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(s.x-24, s.y-18); ctx.lineTo(s.x-16, s.y-18); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s.x-24, s.y-15); ctx.lineTo(s.x-16, s.y-15); ctx.stroke();
 }
 
 function drawTower(ctx, s) {
@@ -1809,68 +2006,226 @@ function drawTradingPost(ctx, s, b) {
 }
 
 function drawCastle(ctx, s) {
-  // Grand multi-tower castle
-  // Main keep
-  ctx.fillStyle = '#8a8a9a';
-  ctx.fillRect(s.x-14, s.y-32, 28, 28);
-  ctx.fillStyle = '#7a7a8a';
+  // ===== CASTLE — the largest, most detailed building in the game =====
+
+  // --- LEFT FLANKING TOWER ---
+  const ltGrad = ctx.createLinearGradient(s.x - 22, s.y - 50, s.x - 22, s.y - 4);
+  ltGrad.addColorStop(0, '#9898aa');
+  ltGrad.addColorStop(1, '#5e5e70');
+  ctx.fillStyle = ltGrad;
+  ctx.fillRect(s.x - 28, s.y - 50, 12, 46);
+  // Iso side face
+  ctx.fillStyle = '#707082';
   ctx.beginPath();
-  ctx.moveTo(s.x+14, s.y-32); ctx.lineTo(s.x+18, s.y-28);
-  ctx.lineTo(s.x+18, s.y); ctx.lineTo(s.x+14, s.y-4);
-  ctx.closePath();
-  ctx.fill();
-  // Crenellations on keep
-  ctx.fillStyle = '#9a9aaa';
-  for (let i = -12; i < 14; i += 5) {
-    ctx.fillRect(s.x + i, s.y - 36, 3, 4);
-  }
-  // Left tower
-  ctx.fillStyle = '#8a8a9a';
-  ctx.fillRect(s.x-20, s.y-40, 10, 36);
-  ctx.fillStyle = '#9a9aaa';
-  for (let i = -19; i < -10; i += 4) {
-    ctx.fillRect(s.x + i, s.y - 44, 3, 4);
-  }
-  // Right tower
-  ctx.fillStyle = '#8a8a9a';
-  ctx.fillRect(s.x+10, s.y-40, 10, 36);
-  ctx.fillStyle = '#9a9aaa';
-  for (let i = 11; i < 20; i += 4) {
-    ctx.fillRect(s.x + i, s.y - 44, 3, 4);
-  }
-  // Gate
-  ctx.fillStyle = '#3a3a44';
-  ctx.beginPath();
-  ctx.arc(s.x, s.y - 10, 5, Math.PI, 0);
-  ctx.lineTo(s.x + 5, s.y - 4);
-  ctx.lineTo(s.x - 5, s.y - 4);
-  ctx.closePath();
-  ctx.fill();
-  // Portcullis lines
-  ctx.strokeStyle = '#5a5a64';
-  ctx.lineWidth = 0.8;
-  for (let i = -3; i <= 3; i += 2) {
-    ctx.beginPath();
-    ctx.moveTo(s.x + i, s.y - 14); ctx.lineTo(s.x + i, s.y - 4);
-    ctx.stroke();
-  }
-  // Flags on towers
-  ctx.fillStyle = '#ffd166';
-  ctx.fillRect(s.x - 16, s.y - 50, 2, 10);
-  ctx.fillRect(s.x + 14, s.y - 50, 2, 10);
-  ctx.fillStyle = '#e74c3c';
-  ctx.beginPath();
-  ctx.moveTo(s.x-14, s.y-50); ctx.lineTo(s.x-6, s.y-47); ctx.lineTo(s.x-14, s.y-44);
+  ctx.moveTo(s.x - 16, s.y - 50); ctx.lineTo(s.x - 12, s.y - 47);
+  ctx.lineTo(s.x - 12, s.y - 1);  ctx.lineTo(s.x - 16, s.y - 4);
   ctx.closePath(); ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(s.x+16, s.y-50); ctx.lineTo(s.x+24, s.y-47); ctx.lineTo(s.x+16, s.y-44);
-  ctx.closePath(); ctx.fill();
-  // Windows
+  // Parapet band
+  ctx.fillStyle = '#a4a4b6';
+  ctx.fillRect(s.x - 29, s.y - 54, 14, 5);
+  // Crenellations
+  ctx.fillStyle = '#acacbe';
+  for (let i = -28; i < -15; i += 4) {
+    ctx.fillRect(s.x + i, s.y - 59, 3, 6);
+  }
+  // Gold trim on left tower parapet
+  ctx.strokeStyle = '#c8a020';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(s.x - 29, s.y - 54); ctx.lineTo(s.x - 15, s.y - 54); ctx.stroke();
+  // Stone mortar lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.11)';
+  ctx.lineWidth = 0.6;
+  for (let ly = s.y - 47; ly < s.y - 4; ly += 5) {
+    ctx.beginPath(); ctx.moveTo(s.x - 28, ly); ctx.lineTo(s.x - 16, ly); ctx.stroke();
+  }
+  // Arrow slit left tower
+  ctx.fillStyle = '#1e1e2e';
+  ctx.fillRect(s.x - 23, s.y - 42, 2, 7);
+  ctx.fillStyle = '#2a2a3c';
+  ctx.fillRect(s.x - 24, s.y - 38, 4, 1);
+  // Left tower window
   ctx.fillStyle = '#ffeebb';
-  ctx.fillRect(s.x-6, s.y-26, 3, 4);
-  ctx.fillRect(s.x+3, s.y-26, 3, 4);
-  ctx.fillRect(s.x-6, s.y-18, 3, 4);
-  ctx.fillRect(s.x+3, s.y-18, 3, 4);
+  ctx.fillRect(s.x - 24, s.y - 28, 3, 4);
+
+  // --- RIGHT FLANKING TOWER ---
+  const rtGrad = ctx.createLinearGradient(s.x + 22, s.y - 50, s.x + 22, s.y - 4);
+  rtGrad.addColorStop(0, '#9898aa');
+  rtGrad.addColorStop(1, '#5e5e70');
+  ctx.fillStyle = rtGrad;
+  ctx.fillRect(s.x + 16, s.y - 50, 12, 46);
+  // Iso side
+  ctx.fillStyle = '#606072';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 28, s.y - 50); ctx.lineTo(s.x + 32, s.y - 47);
+  ctx.lineTo(s.x + 32, s.y - 1);  ctx.lineTo(s.x + 28, s.y - 4);
+  ctx.closePath(); ctx.fill();
+  // Parapet band
+  ctx.fillStyle = '#a4a4b6';
+  ctx.fillRect(s.x + 15, s.y - 54, 14, 5);
+  // Crenellations
+  ctx.fillStyle = '#acacbe';
+  for (let i = 16; i < 29; i += 4) {
+    ctx.fillRect(s.x + i, s.y - 59, 3, 6);
+  }
+  // Gold trim on right tower parapet
+  ctx.strokeStyle = '#c8a020';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(s.x + 15, s.y - 54); ctx.lineTo(s.x + 29, s.y - 54); ctx.stroke();
+  // Mortar lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.11)';
+  ctx.lineWidth = 0.6;
+  for (let ly = s.y - 47; ly < s.y - 4; ly += 5) {
+    ctx.beginPath(); ctx.moveTo(s.x + 16, ly); ctx.lineTo(s.x + 28, ly); ctx.stroke();
+  }
+  // Arrow slit right tower
+  ctx.fillStyle = '#1e1e2e';
+  ctx.fillRect(s.x + 21, s.y - 42, 2, 7);
+  ctx.fillStyle = '#2a2a3c';
+  ctx.fillRect(s.x + 20, s.y - 38, 4, 1);
+  // Right tower window
+  ctx.fillStyle = '#ffeebb';
+  ctx.fillRect(s.x + 21, s.y - 28, 3, 4);
+
+  // --- CENTRAL KEEP (tallest, widest) ---
+  const keepTopY = s.y - 66;
+  const keepGrad = ctx.createLinearGradient(s.x, keepTopY, s.x, s.y - 4);
+  keepGrad.addColorStop(0, '#a2a2b6');
+  keepGrad.addColorStop(0.45, '#7e7e92');
+  keepGrad.addColorStop(1, '#545468');
+  ctx.fillStyle = keepGrad;
+  ctx.fillRect(s.x - 14, keepTopY, 28, 62);
+  // Iso side face of keep
+  ctx.fillStyle = '#646476';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 14, keepTopY);
+  ctx.lineTo(s.x + 19, keepTopY + 4);
+  ctx.lineTo(s.x + 19, s.y);
+  ctx.lineTo(s.x + 14, s.y - 4);
+  ctx.closePath();
+  ctx.fill();
+  // Top edge highlight
+  ctx.strokeStyle = 'rgba(255,255,255,0.24)';
+  ctx.lineWidth = 0.9;
+  ctx.beginPath(); ctx.moveTo(s.x - 14, keepTopY); ctx.lineTo(s.x + 14, keepTopY); ctx.stroke();
+  // Keep parapet
+  ctx.fillStyle = '#aeaec2';
+  ctx.fillRect(s.x - 16, keepTopY - 5, 32, 6);
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath(); ctx.moveTo(s.x - 16, keepTopY - 5); ctx.lineTo(s.x + 16, keepTopY - 5); ctx.stroke();
+  // Keep crenellations
+  ctx.fillStyle = '#b8b8cc';
+  for (let i = -14; i < 16; i += 5) {
+    ctx.fillRect(s.x + i, keepTopY - 11, 3, 7);
+  }
+  // Gold trim on keep parapet
+  ctx.strokeStyle = '#c8a020';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(s.x - 16, keepTopY - 5); ctx.lineTo(s.x + 16, keepTopY - 5); ctx.stroke();
+  // Horizontal mortar lines on keep
+  ctx.strokeStyle = 'rgba(0,0,0,0.09)';
+  ctx.lineWidth = 0.7;
+  for (let ly = keepTopY + 5; ly < s.y - 4; ly += 5) {
+    ctx.beginPath(); ctx.moveTo(s.x - 14, ly); ctx.lineTo(s.x + 14, ly); ctx.stroke();
+  }
+  // Staggered vertical joints
+  ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+  ctx.lineWidth = 0.5;
+  for (let ly = keepTopY + 5; ly < s.y - 4; ly += 10) {
+    ctx.beginPath(); ctx.moveTo(s.x - 7, ly); ctx.lineTo(s.x - 7, ly + 5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x + 3, ly); ctx.lineTo(s.x + 3, ly + 5); ctx.stroke();
+  }
+  for (let ly = keepTopY + 10; ly < s.y - 4; ly += 10) {
+    ctx.beginPath(); ctx.moveTo(s.x - 11, ly); ctx.lineTo(s.x - 11, ly + 5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x + 8,  ly); ctx.lineTo(s.x + 8,  ly + 5); ctx.stroke();
+  }
+
+  // --- ARCHED GATE ---
+  ctx.fillStyle = '#3a3a4c';
+  ctx.fillRect(s.x - 8, s.y - 20, 16, 16);
+  // Arch opening
+  ctx.fillStyle = '#14141e';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 10, 6, Math.PI, 0);
+  ctx.lineTo(s.x + 6, s.y - 4);
+  ctx.lineTo(s.x - 6, s.y - 4);
+  ctx.closePath();
+  ctx.fill();
+  // Portcullis vertical bars
+  ctx.strokeStyle = '#505060';
+  ctx.lineWidth = 1.1;
+  for (let bx = s.x - 5; bx <= s.x + 5; bx += 2.5) {
+    ctx.beginPath(); ctx.moveTo(bx, s.y - 15); ctx.lineTo(bx, s.y - 4); ctx.stroke();
+  }
+  // Portcullis horizontal rails
+  ctx.beginPath(); ctx.moveTo(s.x - 6, s.y - 12); ctx.lineTo(s.x + 6, s.y - 12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s.x - 6, s.y -  7); ctx.lineTo(s.x + 6, s.y -  7); ctx.stroke();
+  // Keystone
+  ctx.fillStyle = '#9898b0';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 2.5, s.y - 17); ctx.lineTo(s.x + 2.5, s.y - 17);
+  ctx.lineTo(s.x + 2,   s.y - 11); ctx.lineTo(s.x - 2,   s.y - 11);
+  ctx.closePath(); ctx.fill();
+  // Gate surround rivets
+  ctx.fillStyle = '#5a5a6c';
+  ctx.fillRect(s.x - 8, s.y - 18, 2, 2);
+  ctx.fillRect(s.x + 6, s.y - 18, 2, 2);
+
+  // --- LIT WINDOWS on keep (3 rows) ---
+  ctx.fillStyle = '#ffeebb';
+  ctx.fillRect(s.x - 9, s.y - 54, 3, 5);
+  ctx.fillRect(s.x - 2, s.y - 54, 3, 5);
+  ctx.fillRect(s.x + 5, s.y - 54, 3, 5);
+  ctx.fillRect(s.x - 9, s.y - 42, 3, 5);
+  ctx.fillRect(s.x - 2, s.y - 42, 3, 5);
+  ctx.fillRect(s.x + 5, s.y - 42, 3, 5);
+  ctx.fillRect(s.x - 9, s.y - 30, 3, 5);
+  ctx.fillRect(s.x + 5, s.y - 30, 3, 5);
+  // Warm glow halos
+  ctx.fillStyle = 'rgba(255,240,140,0.15)';
+  const winPositions = [
+    [s.x - 7, s.y - 52], [s.x, s.y - 52], [s.x + 7, s.y - 52],
+    [s.x - 7, s.y - 40], [s.x, s.y - 40], [s.x + 7, s.y - 40],
+    [s.x - 7, s.y - 28], [s.x + 7, s.y - 28],
+  ];
+  for (let wi = 0; wi < winPositions.length; wi++) {
+    ctx.beginPath(); ctx.arc(winPositions[wi][0], winPositions[wi][1], 4.5, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // --- FLAG POLES & BANNERS ---
+  // Left tower pole (gold)
+  ctx.fillStyle = '#c8a020';
+  ctx.fillRect(s.x - 25, s.y - 72, 2, 14);
+  // Right tower pole
+  ctx.fillRect(s.x + 23, s.y - 72, 2, 14);
+  // Central keep pole (tallest)
+  ctx.fillRect(s.x - 1, s.y - 84, 2, 20);
+  // Left banner (red)
+  ctx.fillStyle = '#c0392b';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 23, s.y - 72); ctx.lineTo(s.x - 13, s.y - 69);
+  ctx.lineTo(s.x - 23, s.y - 66);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(s.x - 23, s.y - 71, 9, 1);
+  // Right banner (royal blue)
+  ctx.fillStyle = '#2471a3';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 25, s.y - 72); ctx.lineTo(s.x + 35, s.y - 69);
+  ctx.lineTo(s.x + 25, s.y - 66);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fillRect(s.x + 25, s.y - 71, 9, 1);
+  // Central keep banner (gold royal)
+  ctx.fillStyle = '#d4a017';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 1, s.y - 84); ctx.lineTo(s.x + 12, s.y - 81);
+  ctx.lineTo(s.x + 1, s.y - 78);
+  ctx.closePath(); ctx.fill();
+  // Crown emblem — tiny cross on gold banner
+  ctx.fillStyle = '#fff8e0';
+  ctx.fillRect(s.x + 4, s.y - 83, 1, 4);
+  ctx.fillRect(s.x + 3, s.y - 82, 3, 1);
 }
 
 function drawGranary(ctx, s) {
@@ -1970,36 +2325,112 @@ function drawChurch(ctx, s) {
 }
 
 function drawSchool(ctx, s) {
-  // Main building
-  ctx.fillStyle = '#c4a882';
-  ctx.fillRect(s.x - 12, s.y - 18, 24, 14);
-  ctx.fillStyle = '#a89070';
+  // Main building — tall 3-floor stone/plaster with gradient walls
+  const wallGrad = ctx.createLinearGradient(s.x-13, s.y-32, s.x-13, s.y-4);
+  wallGrad.addColorStop(0, '#d4b890');
+  wallGrad.addColorStop(0.5, '#c4a878');
+  wallGrad.addColorStop(1, '#a88858');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(s.x-13, s.y-32, 26, 28);
+  // Side face (right) — darker plaster
+  const sideGrad = ctx.createLinearGradient(s.x+13, s.y-32, s.x+17, s.y-4);
+  sideGrad.addColorStop(0, '#a89060');
+  sideGrad.addColorStop(1, '#806840');
+  ctx.fillStyle = sideGrad;
   ctx.beginPath();
-  ctx.moveTo(s.x + 12, s.y - 18); ctx.lineTo(s.x + 15, s.y - 15);
-  ctx.lineTo(s.x + 15, s.y - 1); ctx.lineTo(s.x + 12, s.y - 4);
+  ctx.moveTo(s.x+13, s.y-32); ctx.lineTo(s.x+17, s.y-28);
+  ctx.lineTo(s.x+17, s.y-4); ctx.lineTo(s.x+13, s.y-4);
   ctx.closePath();
   ctx.fill();
-  // Flat roof with slight overhang
-  ctx.fillStyle = '#7a6a5a';
-  ctx.fillRect(s.x - 14, s.y - 20, 28, 3);
-  // Windows (multiple, suggesting classrooms)
-  ctx.fillStyle = '#ffeebb';
-  for (let i = -8; i <= 6; i += 5) {
-    ctx.fillRect(s.x + i, s.y - 16, 3, 3);
+  // Stone block texture on front wall
+  ctx.strokeStyle = 'rgba(100,70,30,0.2)'; ctx.lineWidth = 0.5;
+  for (let row = -30; row < -6; row += 6) {
+    ctx.beginPath(); ctx.moveTo(s.x-13, s.y+row); ctx.lineTo(s.x+13, s.y+row); ctx.stroke();
   }
-  // Door
-  ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(s.x - 2, s.y - 8, 5, 4);
-  // Bell tower
-  ctx.fillStyle = '#8a7a6a';
-  ctx.fillRect(s.x + 7, s.y - 28, 4, 10);
+  // Flat roof / cornice with overhang
+  const roofGrad = ctx.createLinearGradient(s.x-15, s.y-34, s.x-15, s.y-31);
+  roofGrad.addColorStop(0, '#7a6a5a');
+  roofGrad.addColorStop(1, '#6a5a4a');
+  ctx.fillStyle = roofGrad;
+  ctx.fillRect(s.x-15, s.y-34, 30, 4);
+  // Cornice highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillRect(s.x-15, s.y-34, 30, 1);
+  // Floor 1 windows — amber warm light
   ctx.fillStyle = '#ffd166';
+  for (let i = -9; i <= 5; i += 7) {
+    ctx.fillRect(s.x+i, s.y-14, 4, 4);
+    // window frame
+    ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 0.7;
+    ctx.strokeRect(s.x+i, s.y-14, 4, 4);
+    // window sill
+    ctx.fillStyle = '#c4a060';
+    ctx.fillRect(s.x+i-0.5, s.y-10, 5, 1);
+    ctx.fillStyle = '#ffd166';
+  }
+  // Floor 2 windows
+  ctx.fillStyle = '#ffe599';
+  for (let i = -9; i <= 5; i += 7) {
+    ctx.fillRect(s.x+i, s.y-22, 4, 4);
+    ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 0.7;
+    ctx.strokeRect(s.x+i, s.y-22, 4, 4);
+    ctx.fillStyle = '#c4a060';
+    ctx.fillRect(s.x+i-0.5, s.y-18, 5, 1);
+    ctx.fillStyle = '#ffe599';
+  }
+  // Floor 3 windows — near roof
+  ctx.fillStyle = '#fff2bb';
+  for (let i = -6; i <= 3; i += 9) {
+    ctx.fillRect(s.x+i, s.y-30, 3, 3);
+    ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 0.5;
+    ctx.strokeRect(s.x+i, s.y-30, 3, 3);
+  }
+  // Door (arched top)
+  ctx.fillStyle = '#4a2a0a';
+  ctx.fillRect(s.x-3, s.y-9, 6, 5);
+  ctx.beginPath(); ctx.arc(s.x, s.y-9, 3, Math.PI, 0); ctx.fill();
+  // Door step
+  ctx.fillStyle = '#a08060';
+  ctx.fillRect(s.x-4, s.y-4, 8, 1.5);
+  // Bell tower / cupola above roof (left side)
+  const towerGrad = ctx.createLinearGradient(s.x-10, s.y-52, s.x-10, s.y-34);
+  towerGrad.addColorStop(0, '#9a8a7a');
+  towerGrad.addColorStop(1, '#7a6a5a');
+  ctx.fillStyle = towerGrad;
+  ctx.fillRect(s.x-11, s.y-52, 10, 18);
+  // Tower side face
+  ctx.fillStyle = '#665a48';
   ctx.beginPath();
-  ctx.arc(s.x + 9, s.y - 25, 1.5, 0, Math.PI * 2);
-  ctx.fill();
-  // Book icon on front
-  ctx.fillStyle = '#4a6080';
-  ctx.fillRect(s.x - 8, s.y - 12, 4, 3);
+  ctx.moveTo(s.x-1, s.y-52); ctx.lineTo(s.x+2, s.y-50);
+  ctx.lineTo(s.x+2, s.y-34); ctx.lineTo(s.x-1, s.y-34);
+  ctx.closePath(); ctx.fill();
+  // Cupola / pointed roof on tower
+  ctx.fillStyle = '#5a4a38';
+  ctx.beginPath();
+  ctx.moveTo(s.x-13, s.y-52); ctx.lineTo(s.x-6, s.y-60); ctx.lineTo(s.x+1, s.y-52);
+  ctx.closePath(); ctx.fill();
+  // Bell opening (arch) in tower
+  ctx.fillStyle = '#2a1a0a';
+  ctx.beginPath(); ctx.arc(s.x-6, s.y-45, 3, Math.PI, 0); ctx.fill();
+  ctx.fillRect(s.x-9, s.y-45, 6, 3);
+  // Bell (gold circle)
+  ctx.fillStyle = '#ffd166';
+  ctx.beginPath(); ctx.arc(s.x-6, s.y-44, 1.5, 0, Math.PI*2); ctx.fill();
+  // Finial / weathervane spike on cupola
+  ctx.fillStyle = '#c8a840';
+  ctx.fillRect(s.x-7, s.y-64, 1.5, 4);
+  // Book/scroll decoration on front wall
+  // Scroll body
+  ctx.fillStyle = '#f5e8c8';
+  ctx.fillRect(s.x+4, s.y-28, 6, 5);
+  // Scroll rolled ends
+  ctx.fillStyle = '#d4c4a0';
+  ctx.beginPath(); ctx.ellipse(s.x+4, s.y-25.5, 1, 2.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(s.x+10, s.y-25.5, 1, 2.5, 0, 0, Math.PI*2); ctx.fill();
+  // Scroll lines
+  ctx.strokeStyle = '#a08060'; ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x+5, s.y-27); ctx.lineTo(s.x+9, s.y-27); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(s.x+5, s.y-25); ctx.lineTo(s.x+9, s.y-25); ctx.stroke();
 }
 
 function drawGeneric(ctx, s, def) {

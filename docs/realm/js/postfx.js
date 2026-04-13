@@ -96,10 +96,27 @@ void main() {
     color.rgb = mix(color.rgb, color.rgb + sunColor * 0.15, dawnDusk * horizonFade * 0.5);
   }
 
+  // ── Directional light simulation ──
+  // Isometric sun from upper-left
+  float sunDir = dot(uv - 0.5, normalize(vec2(-0.6, -0.4)));
+  float sunLight = 1.0 + sunDir * 0.08 * u_daylight; // subtle 8% brightness shift
+  color.rgb *= sunLight;
+
   // ── Vignette ──
   float dist = length(uv - 0.5) * 1.6;
   float vig = 1.0 - smoothstep(0.4, 1.2, dist);
   color.rgb *= mix(0.6, 1.0, vig);
+
+  // ── Subtle chromatic aberration at edges ──
+  float caStr = 0.001 * dist * dist; // dist from vignette calculation
+  vec2 caOffset = (uv - 0.5) * caStr;
+  float r = texture(u_scene, uv + caOffset).r;
+  float b = texture(u_scene, uv - caOffset).b;
+  color.r = mix(color.r, r, 0.4);
+  color.b = mix(color.b, b, 0.4);
+
+  // ── Contrast S-curve ──
+  color.rgb = smoothstep(vec3(0.0), vec3(1.0), color.rgb * 1.05 - 0.025);
 
   // ── Film Grain (subtle) ──
   float grain = fract(sin(dot(uv * u_resolution + u_time * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
