@@ -582,6 +582,16 @@ export function render() {
       ctx.arc(s.x, cy - 6, 6, 0, Math.PI * 2);
       ctx.stroke();
     }
+
+    // Selected citizen highlight — pulsing ring
+    if (c === G.selectedCitizen) {
+      const pulse = 0.5 + 0.4 * Math.sin(G.gameTick * 0.1);
+      ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(s.x, cy - 6, 8, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
 
   // ── Citizen hover tooltip ──────────────────────────────────
@@ -889,10 +899,10 @@ function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   ctx.globalAlpha = daylight;
 
-  // Shadow (scaled)
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  // Shadow — subtle ground contact shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y+9, 20, 8, 0, 0, Math.PI*2);
+  ctx.ellipse(s.x, s.y+6, 14, 5, 0, 0, Math.PI*2);
   ctx.fill();
 
   // Scale up buildings by 1.3x for visual presence

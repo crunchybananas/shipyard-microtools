@@ -41,6 +41,56 @@ function findBuildingAtClick(clientX, clientY) {
   return best;
 }
 
+// Find citizen at screen position — small radius around citizen sprite
+function findCitizenAtClick(clientX, clientY) {
+  const C = document.getElementById('game');
+  const rect = C.getBoundingClientRect();
+  const cpx = (clientX - rect.left) * (C.width / rect.width);
+  const cpy = (clientY - rect.top) * (C.height / rect.height);
+  const wx = (cpx - C.width/2) / G.camera.zoom + G.camera.x;
+  const wy = (cpy - C.height/2) / G.camera.zoom + G.camera.y;
+
+  let best = null, bestDist = Infinity;
+  for (const c of G.citizens) {
+    const cs = toScreen(c.x, c.y);
+    const dx = wx - cs.x;
+    const dy = wy - (cs.y - 8); // citizen visual center is ~8px above tile
+    const dist = dx*dx + dy*dy;
+    if (dist < 15*15 && dist < bestDist) { // 15px radius
+      bestDist = dist;
+      best = c;
+    }
+  }
+  return best;
+}
+
+function showCitizenPanel(c) {
+  const panel = document.getElementById('info-panel');
+  if (!panel) return;
+  const stateLabels = {
+    idle:'Idle', find_job:'Looking for work', walk_to_work:'Walking to work',
+    working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
+    foraging:'Foraging', eating:'Eating',
+  };
+  const state = stateLabels[c.state] || c.state;
+  const job = c.jobBuilding ? BUILDINGS[c.jobBuilding.type]?.name : 'Unemployed';
+  const carrying = c.carrying ? `${c.carryAmount} ${c.carrying}` : 'Nothing';
+
+  panel.innerHTML = `
+    <div class="ip-header">
+      <span class="ip-title">👤 ${c.name}</span>
+      <button class="ip-close" onclick="hideInfoPanel()">✕</button>
+    </div>
+    <div class="ip-desc">${state}</div>
+    <div class="ip-row"><span class="ip-label">Job</span><span class="ip-val">${job}</span></div>
+    <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${carrying}</span></div>
+    <div class="ip-row"><span class="ip-label">Hunger</span><span class="ip-val">${Math.round(c.hunger)}%</span></div>
+    <div class="ip-hint">Citizens auto-assign to buildings that need workers.</div>
+  `;
+  panel.style.display = 'block';
+  requestAnimationFrame(() => panel.classList.add('ip-visible'));
+}
+
 export function setupInput(canvas) {
   const C = canvas;
   let touchDist = 0;
@@ -95,15 +145,25 @@ export function setupInput(canvas) {
       return;
     }
 
-    // Left-click select building
+    // Left-click select citizen or building
     if (e.button === 0 && !G.selectedBuild) {
+      // Check citizens first (they render in front of buildings)
+      const cit = findCitizenAtClick(e.clientX, e.clientY);
+      if (cit) {
+        G.selectedBuilding = null;
+        G.selectedCitizen = cit;
+        showCitizenPanel(cit);
+        return;
+      }
       const b = findBuildingAtClick(e.clientX, e.clientY);
       if (b) {
         G.selectedBuilding = b;
+        G.selectedCitizen = null;
         showInfoPanel(b);
         return;
       } else {
         G.selectedBuilding = null;
+        G.selectedCitizen = null;
         hideInfoPanel();
       }
     }

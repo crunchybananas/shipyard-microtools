@@ -77,6 +77,7 @@ export const G = {
   camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1.3 },
   selectedBuild: null,
   selectedBuilding: null,
+  selectedCitizen: null,
   hoveredTile: null,
   dragging: false,
   dragStart: {x:0,y:0},
