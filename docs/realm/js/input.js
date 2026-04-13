@@ -3,11 +3,36 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
-import { screenToWorld } from './render.js';
+import { screenToWorld, toScreen } from './render.js';
 import { placeBuilding, demolishBuilding } from './economy.js';
 import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel } from './ui.js';
 import { renderMissions } from './missions.js';
+
+// Find building at screen position — accounts for buildings rendering above their tile
+function findBuildingAtClick(clientX, clientY) {
+  // Convert click to world-space screen coords
+  const C = document.getElementById('game');
+  const sx = (clientX - C.width/2) / G.camera.zoom + G.camera.x;
+  const sy = (clientY - C.height/2) / G.camera.zoom + G.camera.y;
+
+  let best = null, bestDist = Infinity;
+  for (const b of G.buildings) {
+    const bs = toScreen(b.x, b.y);
+    // Building visual center is above tile center (roofs extend ~30px up with 1.3x scale)
+    const bx = bs.x;
+    const by = bs.y - 16; // approximate visual center of building sprite
+    const dx = sx - bx;
+    const dy = sy - by;
+    // Elliptical hit area: wider than tall (isometric perspective)
+    const dist = (dx * dx) / (28 * 28) + (dy * dy) / (24 * 24);
+    if (dist < 1 && dist < bestDist) {
+      bestDist = dist;
+      best = b;
+    }
+  }
+  return best;
+}
 
 export function setupInput(canvas) {
   const C = canvas;
@@ -22,8 +47,7 @@ export function setupInput(canvas) {
     // Right-click demolish
     if (e.button === 2) {
       e.preventDefault();
-      const t = screenToWorld(e.clientX, e.clientY);
-      const b = G.buildings.find(b => b.x === t.x && b.y === t.y);
+      const b = findBuildingAtClick(e.clientX, e.clientY);
       if (b) {
         demolishBuilding(b);
         G.selectedBuilding = null;
@@ -66,8 +90,7 @@ export function setupInput(canvas) {
 
     // Left-click select building
     if (e.button === 0 && !G.selectedBuild) {
-      const t = screenToWorld(e.clientX, e.clientY);
-      const b = G.buildings.find(b => b.x === t.x && b.y === t.y);
+      const b = findBuildingAtClick(e.clientX, e.clientY);
       if (b) {
         G.selectedBuilding = b;
         showInfoPanel(b);
