@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight } from './state.js';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
@@ -43,13 +43,29 @@ if (hasSaveData) {
 }
 
 function beginGame() {
-  document.getElementById('title-screen').style.display = 'none';
+  const titleEl = document.getElementById('title-screen');
+  titleEl.style.transition = 'opacity 0.5s';
+  titleEl.style.opacity = '0';
+  setTimeout(() => { titleEl.style.display = 'none'; }, 500);
+
   setupInput(canvas);
   renderBuildBar();
   renderMissions();
   updateUI();
   notify('Welcome to Realm. Build your settlement!');
   gameLoop();
+
+  // Cinematic zoom-in over 1.5 seconds
+  G.camera.zoom = 0.9;
+  const zoomStart = performance.now();
+  function zoomIn() {
+    const elapsed = performance.now() - zoomStart;
+    const t = Math.min(1, elapsed / 1500);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // ease in-out
+    G.camera.zoom = 0.9 + 0.4 * ease;
+    if (t < 1) requestAnimationFrame(zoomIn);
+  }
+  requestAnimationFrame(zoomIn);
 }
 
 window.setDifficulty = (d) => {
@@ -193,12 +209,12 @@ function gameLoop() {
     if (document.visibilityState === 'visible') {
       simTick();
       render();
-      applyPostFX(canvas, G.gameTick, getDaylight());
+      applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
       requestAnimationFrame(gameLoop);
     } else {
       for (let i = 0; i < 60; i++) simTick();
       render();
-      applyPostFX(canvas, G.gameTick, getDaylight());
+      applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
       setTimeout(gameLoop, 16);
     }
   } catch (e) {

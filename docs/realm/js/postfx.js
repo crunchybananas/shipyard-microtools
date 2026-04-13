@@ -24,6 +24,7 @@ out vec4 fragColor;
 uniform sampler2D u_scene;
 uniform float u_time;
 uniform float u_daylight;
+uniform float u_season;
 uniform vec2 u_resolution;
 
 void main() {
@@ -45,6 +46,18 @@ void main() {
       bloomWeight += 1.0;
     }
   }
+  // Extra bloom taps at wider radius
+  for (int x = -2; x <= 2; x += 2) {
+    for (int y = -2; y <= 2; y += 2) {
+      if (x == 0 && y == 0) continue;
+      vec2 offset = vec2(float(x), float(y)) * texel * bloomRadius * 2.0;
+      vec3 s = texture(u_scene, uv + offset).rgb;
+      float bright = dot(s, vec3(0.2126, 0.7152, 0.0722));
+      float mask = smoothstep(0.55, 1.0, bright);
+      bloomSum += s * mask * 0.5; // half weight for outer ring
+      bloomWeight += 0.5;
+    }
+  }
   vec3 bloom = bloomSum / bloomWeight;
   // Bloom stronger at night
   float bloomIntensity = mix(0.15, 0.4, 1.0 - smoothstep(0.55, 1.0, u_daylight));
@@ -55,6 +68,33 @@ void main() {
   float desat = dot(color.rgb, vec3(0.3, 0.5, 0.2));
   vec3 coolGrade = mix(vec3(desat), color.rgb * vec3(0.85, 0.92, 1.18), 0.7);
   color.rgb = mix(coolGrade, warmGrade, smoothstep(0.55, 0.9, u_daylight));
+
+  // Season color adjustments
+  if (u_season < 0.5) {
+    // Spring — fresh green boost
+    color.rgb *= vec3(0.98, 1.04, 0.96);
+  } else if (u_season < 1.5) {
+    // Summer — warm golden
+    color.rgb *= vec3(1.05, 1.02, 0.92);
+  } else if (u_season < 2.5) {
+    // Autumn — amber warmth
+    color.rgb *= vec3(1.08, 0.98, 0.88);
+  } else {
+    // Winter — cool blue, desaturated
+    float lum = dot(color.rgb, vec3(0.3, 0.5, 0.2));
+    color.rgb = mix(vec3(lum), color.rgb * vec3(0.92, 0.95, 1.08), 0.8);
+  }
+
+  // Sunrise/sunset glow
+  float dawnDusk = 0.0;
+  if (u_daylight > 0.55 && u_daylight < 0.75) {
+    dawnDusk = 1.0 - abs(u_daylight - 0.65) / 0.1;
+  }
+  if (dawnDusk > 0.0) {
+    float horizonFade = smoothstep(0.3, 0.7, uv.y); // stronger in bottom half
+    vec3 sunColor = mix(vec3(1.0, 0.4, 0.15), vec3(1.0, 0.7, 0.3), horizonFade);
+    color.rgb = mix(color.rgb, color.rgb + sunColor * 0.15, dawnDusk * horizonFade * 0.5);
+  }
 
   // ── Vignette ──
   float dist = length(uv - 0.5) * 1.6;
@@ -190,7 +230,7 @@ export function resizePostFX() {
   texReady = false; // force texImage2D on next frame
 }
 
-export function applyPostFX(sourceCanvas, gameTick, daylight) {
+export function applyPostFX(sourceCanvas, gameTick, daylight, season = 0) {
   if (!enabled || !gl || !program) return;
 
   gl.useProgram(program);
@@ -211,6 +251,7 @@ export function applyPostFX(sourceCanvas, gameTick, daylight) {
   gl.uniform1i(gl.getUniformLocation(program, 'u_scene'), 0);
   gl.uniform1f(gl.getUniformLocation(program, 'u_time'), gameTick / 60.0);
   gl.uniform1f(gl.getUniformLocation(program, 'u_daylight'), daylight);
+  gl.uniform1f(gl.getUniformLocation(program, 'u_season'), season);
   gl.uniform2f(gl.getUniformLocation(program, 'u_resolution'), postCanvas.width, postCanvas.height);
 
   // Draw

@@ -130,6 +130,8 @@ export const SEASONS = {
   winter: { name:'❄️ Winter', foodMult:0.3, speedMult:0.8, tileShift:[-10,-5,15], label:'Winter' },
 };
 const SEASON_ORDER = ['spring','summer','autumn','winter'];
+export const SEASON_IDX = { spring: 0, summer: 1, autumn: 2, winter: 3 };
+export function getSeasonIndex() { return SEASON_IDX[G.season] ?? 0; }
 
 export function updateSeason() {
   const idx = Math.floor((G.day - 1) / 7) % 4;

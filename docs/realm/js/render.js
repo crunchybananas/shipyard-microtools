@@ -144,18 +144,19 @@ export function render() {
         ctx.globalAlpha = daylight;
       }
 
-      // Terrain blend: if neighbor is different biome, paint a soft spot at the edge
-      if (showDetails && tile >= TILE.SAND && tile <= TILE.FOREST) {
+      // Terrain blend: gradient strip at edges bordering different biomes
+      if (tile >= TILE.SAND && tile <= TILE.FOREST && showDetails) {
         for (const [dx2, dy2] of [[-1,0],[1,0],[0,-1],[0,1]]) {
           const nx = x+dx2, ny = y+dy2;
           if (nx<0||nx>=MAP_W||ny<0||ny>=MAP_H) continue;
           const nTile = G.map[ny][nx];
           if (nTile === tile || nTile === TILE.WATER || nTile === TILE.MOUNTAIN) continue;
           const nColors = TILE_COLORS[nTile];
-          ctx.globalAlpha = daylight * 0.12;
+          // Draw gradient strip - more visible
+          ctx.globalAlpha = daylight * 0.2;
           ctx.fillStyle = nColors[0];
           ctx.beginPath();
-          ctx.arc(s.x + dx2*12, s.y + dy2*6, 8, 0, Math.PI*2);
+          ctx.arc(s.x + dx2*14, s.y + dy2*7, 10, 0, Math.PI*2);
           ctx.fill();
         }
         ctx.globalAlpha = daylight;
@@ -873,6 +874,36 @@ export function render() {
       ctx.arc(s.x, cy - 9, 10, 0, Math.PI * 2);
       ctx.stroke();
     }
+  }
+
+  // ── Selected citizen path visualization ──────────────────
+  if (G.selectedCitizen && G.selectedCitizen.path && G.selectedCitizen.pathIdx < G.selectedCitizen.path.length) {
+    const c = G.selectedCitizen;
+    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = 'rgba(100,200,255,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    const start = toScreen(c.x, c.y);
+    ctx.moveTo(start.x, start.y);
+    for (let i = c.pathIdx; i < c.path.length; i++) {
+      const wp = c.path[i];
+      const ws = toScreen(wp.x, wp.y);
+      ctx.lineTo(ws.x, ws.y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Destination marker
+    if (c.path.length > 0) {
+      const dest = c.path[c.path.length - 1];
+      const ds = toScreen(dest.x, dest.y);
+      ctx.fillStyle = 'rgba(100,200,255,0.5)';
+      ctx.beginPath();
+      ctx.arc(ds.x, ds.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = daylight;
   }
 
   // ── Citizen hover tooltip ──────────────────────────────────
@@ -1712,42 +1743,35 @@ function drawWall(ctx, s, b) {
 }
 
 function drawRoad(ctx, s) {
-  // Dirt/cobblestone path across the tile - isometric strip running NE-SW
+  // Full tile coverage for automatic visual connection
+  const hw = 24, hh = 12; // slightly inset from tile edge
   ctx.fillStyle = '#8a7a60';
   ctx.beginPath();
-  ctx.moveTo(s.x - 20, s.y - 3);
-  ctx.lineTo(s.x - 10, s.y - 8);
-  ctx.lineTo(s.x + 10, s.y - 8);
-  ctx.lineTo(s.x + 20, s.y - 3);
-  ctx.lineTo(s.x + 10, s.y + 2);
-  ctx.lineTo(s.x - 10, s.y + 2);
+  ctx.moveTo(s.x, s.y - hh);
+  ctx.lineTo(s.x + hw, s.y);
+  ctx.lineTo(s.x, s.y + hh);
+  ctx.lineTo(s.x - hw, s.y);
   ctx.closePath();
   ctx.fill();
-
-  // Lighter center stripe
+  // Lighter center
   ctx.fillStyle = '#a09078';
+  const hw2 = 16, hh2 = 8;
   ctx.beginPath();
-  ctx.moveTo(s.x - 14, s.y - 2);
-  ctx.lineTo(s.x - 6, s.y - 6);
-  ctx.lineTo(s.x + 6, s.y - 6);
-  ctx.lineTo(s.x + 14, s.y - 2);
-  ctx.lineTo(s.x + 6, s.y + 1);
-  ctx.lineTo(s.x - 6, s.y + 1);
+  ctx.moveTo(s.x, s.y - hh2);
+  ctx.lineTo(s.x + hw2, s.y);
+  ctx.lineTo(s.x, s.y + hh2);
+  ctx.lineTo(s.x - hw2, s.y);
   ctx.closePath();
   ctx.fill();
-
   // Cobblestone dots
-  ctx.fillStyle = 'rgba(0,0,0,0.1)';
-  for (let i = -8; i <= 8; i += 4) {
-    ctx.beginPath();
-    ctx.arc(s.x + i, s.y - 3 + (i % 3), 1.2, 0, Math.PI * 2);
-    ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  for (let i = -2; i <= 2; i++) {
+    for (let j = -1; j <= 1; j++) {
+      ctx.beginPath();
+      ctx.arc(s.x + i*6, s.y + j*4, 1.2, 0, Math.PI*2);
+      ctx.fill();
+    }
   }
-
-  // Edge shadow
-  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-  ctx.lineWidth = 0.5;
-  ctx.stroke();
 }
 
 function drawTradingPost(ctx, s, b) {

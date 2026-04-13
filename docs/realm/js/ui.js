@@ -650,6 +650,12 @@ let tutorialStep = 0;
 let tutorialDismissed = false;
 
 export function updateTutorialTip() {
+  // Auto-dismiss if player is already past the tutorial
+  if (!tutorialDismissed && G.buildings.length >= 2) {
+    dismissTutorial();
+    return;
+  }
+
   const tipEl = document.getElementById('tutorial-tip');
   if (!tipEl) return;
   if (tutorialDismissed || tutorialStep >= TUTORIAL_STEPS.length) {
