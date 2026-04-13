@@ -692,118 +692,84 @@ export function render() {
 
     // Walking bob when moving — smooth sine, reduced amplitude
     const isMoving = c.path && c.pathIdx < (c.path?.length ?? 0);
-    const bobRaw = isMoving ? Math.sin(G.gameTick * 0.22 + c.x * 3) : 0;
-    const bob = bobRaw * 1.2; // gentler vertical bob
+    // Compact chibi-style citizen — big head, small body, subtle animation
+    const bob = isMoving ? Math.sin(G.gameTick * 0.2 + c.x * 3) * 0.8 : 0;
     const cy = s.y + bob;
 
-    // Leg-swing phase (separate so it's decoupled from bob)
-    const legPhase = G.gameTick * 0.28 + c.x * 3;
-
-    // Shadow — slightly larger to match bigger body
-    ctx.fillStyle = 'rgba(0,0,0,0.18)';
-    ctx.beginPath();
-    ctx.ellipse(s.x, cy + 3, 5, 2.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Legs — stroked lines for better look; stride when walking, stubs when idle
-    ctx.strokeStyle = '#444';
-    ctx.lineWidth = 1.5;
-    ctx.lineCap = 'round';
-    if (isMoving) {
-      const legSwing = Math.sin(legPhase) * 3;
-      ctx.beginPath();
-      ctx.moveTo(s.x - 1.5, cy - 2);
-      ctx.lineTo(s.x - 1.5 - legSwing * 0.3, cy + 5 + legSwing * 0.2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(s.x + 1.5, cy - 2);
-      ctx.lineTo(s.x + 1.5 + legSwing * 0.3, cy + 5 - legSwing * 0.2);
-      ctx.stroke();
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(s.x - 1.5, cy - 2);
-      ctx.lineTo(s.x - 1.5, cy + 5);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(s.x + 1.5, cy - 2);
-      ctx.lineTo(s.x + 1.5, cy + 5);
-      ctx.stroke();
-    }
-
-    // Body — job-colored clothing
-    let bodyColor = '#bbb'; // idle: grey
-    if (c.jobBuilding) {
-      const jt = c.jobBuilding.type;
-      if (jt === 'farm') bodyColor = '#7cb342';
-      else if (jt === 'lumber') bodyColor = '#a3714f';
-      else if (jt === 'quarry' || jt === 'mine') bodyColor = '#6a7a8a';
-      else if (jt === 'market') bodyColor = '#e8a040';
-      else if (jt === 'barracks') bodyColor = '#5a6a7a';
-      else if (jt === 'tavern') bodyColor = '#c07040';
-      else bodyColor = '#8899aa';
-    }
-    if (c.state === 'eating') bodyColor = '#4ade80';
-
-    // Torso — capsule/rounded-rect shape (wider, taller than old circle)
-    const torsoW = 5, torsoH = 7, torsoTop = cy - 12, torsoR = 2.5;
-    ctx.fillStyle = bodyColor;
-    ctx.beginPath();
-    ctx.roundRect(s.x - torsoW, torsoTop, torsoW * 2, torsoH, torsoR);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 0.7;
-    ctx.stroke();
-
-    // Arms — swing when walking, hang at sides when idle
-    const armSwing = isMoving ? Math.sin(legPhase + Math.PI) * 2.5 : 0;
-    ctx.strokeStyle = bodyColor;
-    ctx.lineWidth = 1.8;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(s.x - torsoW, torsoTop + 1.5);
-    ctx.lineTo(s.x - torsoW - 1.5, torsoTop + 4 + armSwing);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(s.x + torsoW, torsoTop + 1.5);
-    ctx.lineTo(s.x + torsoW + 1.5, torsoTop + 4 - armSwing);
-    ctx.stroke();
-
-    // Facing direction — determine from movement or path target
-    let faceX = 0; // -1 = left, 0 = center, 1 = right
+    // Facing direction
+    let faceX = 0;
     if (c.path && c.pathIdx < (c.path?.length ?? 0)) {
       const wp = c.path[c.pathIdx];
-      const fdx = wp.x - c.x;
-      faceX = fdx > 0.1 ? 1 : fdx < -0.1 ? -1 : 0;
+      faceX = (wp.x - c.x) > 0.1 ? 1 : (wp.x - c.x) < -0.1 ? -1 : 0;
     } else if (Math.abs(c.tx - c.x) > 0.1) {
       faceX = c.tx > c.x ? 1 : -1;
     }
 
-    // Head — skin tone, radius 3.5, shifted slightly in facing direction
-    const headX = s.x + faceX * 0.8;
-    ctx.fillStyle = '#ffe0c0';
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.arc(headX, cy - 17, 3.5, 0, Math.PI * 2);
+    ctx.ellipse(s.x, s.y + 2, 4, 1.8, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+
+    // Job color
+    let bodyColor = '#aab0b8';
+    if (c.jobBuilding) {
+      const jt = c.jobBuilding.type;
+      if (jt === 'farm') bodyColor = '#6da835';
+      else if (jt === 'lumber') bodyColor = '#a07040';
+      else if (jt === 'quarry' || jt === 'mine') bodyColor = '#687888';
+      else if (jt === 'market') bodyColor = '#d89530';
+      else if (jt === 'barracks') bodyColor = '#5a6878';
+      else if (jt === 'tavern') bodyColor = '#b06838';
+      else bodyColor = '#7888a0';
+    }
+    if (c.state === 'eating') bodyColor = '#50c870';
+
+    // Feet — small ovals, subtle step offset when walking
+    const step = isMoving ? Math.sin(G.gameTick * 0.25 + c.x * 3) * 1.5 : 0;
+    ctx.fillStyle = '#4a3a2a';
+    ctx.beginPath();
+    ctx.ellipse(s.x - 2 - step * 0.3, cy - 1, 2, 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(s.x + 2 + step * 0.3, cy - 1, 2, 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Body — rounded pill shape
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.ellipse(s.x, cy - 6, 4.5, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
-    // Hair — covers back of head (opposite to facing direction)
+    // Head — large for chibi proportions (oversized head = cute)
+    const headX = s.x + faceX * 0.5;
+    const headY = cy - 14;
+    ctx.fillStyle = '#ffe0c0';
+    ctx.beginPath();
+    ctx.arc(headX, headY, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.lineWidth = 0.4;
+    ctx.stroke();
+
+    // Hair — cap on top of head
     const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
     ctx.fillStyle = ['#3a2a1a','#8a6a3a','#2a2a2a','#c08050'][hairHash];
     ctx.beginPath();
-    const hairCenter = headX - faceX * 0.6;
-    ctx.arc(hairCenter, cy - 17.5, 3.2, Math.PI * 0.65, Math.PI * 2.35);
+    ctx.arc(headX - faceX * 0.4, headY - 1, 4.2, Math.PI * 0.8, Math.PI * 2.2);
     ctx.closePath();
     ctx.fill();
 
-    // Eyes — on the facing side of the head
-    if (G.camera.zoom >= 1.2) {
+    // Face — eyes on facing side
+    if (G.camera.zoom >= 1.0) {
+      const eyeX = headX + faceX * 0.8;
       ctx.fillStyle = '#2a1a0a';
-      const eyeBase = headX + faceX * 0.5;
       ctx.beginPath();
-      ctx.arc(eyeBase - 1.0, cy - 16.8, 0.55, 0, Math.PI * 2);
-      ctx.arc(eyeBase + 1.0, cy - 16.8, 0.55, 0, Math.PI * 2);
+      ctx.arc(eyeX - 1.2, headY + 0.5, 0.6, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.2, headY + 0.5, 0.6, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -811,8 +777,8 @@ export function render() {
       // Tool icon when working
       if (c.state === 'working' && c.jobBuilding) {
         const jt = c.jobBuilding.type;
-        const toolX = s.x + torsoW + 2;
-        const toolY = torsoTop + 2;
+        const toolX = s.x + 6;
+        const toolY = cy - 8;
         ctx.save();
         ctx.lineCap = 'round';
         if (jt === 'mine' || jt === 'quarry') {
@@ -860,17 +826,17 @@ export function render() {
         ctx.globalAlpha = 0.75;
         ctx.font = '8px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(emote, s.x, cy - 23);
+        ctx.fillText(emote, s.x, cy - 20);
         ctx.globalAlpha = daylight;
       }
 
-      // Carrying indicator (resource on shoulder)
+      // Carrying indicator (small colored dot on back)
       if (c.carrying) {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
         ctx.fillStyle = cc;
-        ctx.fillRect(s.x + 3, cy - 12, 3, 3);
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.fillRect(s.x + 3, cy - 12, 3, 1);
+        ctx.beginPath();
+        ctx.arc(s.x - faceX * 3, cy - 8, 2, 0, Math.PI * 2);
+        ctx.fill();
       }
     } // end zoom >= 0.7
 
@@ -879,7 +845,7 @@ export function render() {
       ctx.strokeStyle = 'rgba(255,209,102,0.7)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 9, 8, 0, Math.PI * 2);
+      ctx.arc(s.x, cy - 7, 7, 0, Math.PI * 2);
       ctx.stroke();
     }
 
@@ -889,7 +855,7 @@ export function render() {
       ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 9, 10, 0, Math.PI * 2);
+      ctx.arc(s.x, cy - 7, 9, 0, Math.PI * 2);
       ctx.stroke();
     }
   }
