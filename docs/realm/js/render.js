@@ -2,16 +2,12 @@
 // Renderer — isometric canvas, building sprites, minimap
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData } from './state.js';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
 
 // ── Performance caches ────────────────────────────────────────
-// Vignette gradient — recreated only on resize, not every frame
-let vignetteGradient = null;
-let vignetteW = 0, vignetteH = 0;
-
 // Fog-of-war gradient cache keyed by direction ('N'|'S'|'E'|'W')
 // These are relative gradients that are re-applied via translate, so they
 // can be shared. We store them keyed to a canonical tile position and
@@ -40,7 +36,6 @@ export function resizeCanvas() {
   C.style.height = logicalH + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   // Invalidate screen-space gradient caches
-  vignetteGradient = null;
   nightGlowCache.clear();
 }
 
@@ -78,13 +73,7 @@ function shiftColor(color, shift) {
   return `rgb(${Math.max(0,Math.min(255,r+shift[0]))},${Math.max(0,Math.min(255,g+shift[1]))},${Math.max(0,Math.min(255,b+shift[2]))})`;
 }
 
-function getDaylight() {
-  const t = G.dayPhase / G.dayLength;
-  if (t < 0.1) return 0.55 + (t/0.1)*0.45;  // dawn
-  if (t < 0.6) return 1;                      // day
-  if (t < 0.75) return 1 - ((t-0.6)/0.15)*0.35; // dusk
-  return 0.65 - ((t-0.75)/0.25)*0.1;          // night (floor 0.55)
-}
+// getDaylight is imported from state.js
 
 export function render() {
   ctx.fillStyle = '#0a0e1a';
@@ -1204,19 +1193,7 @@ export function render() {
     ctx.restore();
   }
 
-  // ── Screen-space vignette (atmospheric edge fog) ──────────
-  // Cache the gradient — it only changes when the window resizes (resizeCanvas
-  // clears vignetteGradient), so we avoid creating a radial gradient every frame.
-  const vw = logicalW, vh = logicalH;
-  if (!vignetteGradient || vignetteW !== vw || vignetteH !== vh) {
-    vignetteGradient = ctx.createRadialGradient(vw/2, vh/2, Math.min(vw,vh)*0.3, vw/2, vh/2, Math.max(vw,vh)*0.7);
-    vignetteGradient.addColorStop(0, 'rgba(10,14,26,0)');
-    vignetteGradient.addColorStop(1, 'rgba(10,14,26,0.5)');
-    vignetteW = vw;
-    vignetteH = vh;
-  }
-  ctx.fillStyle = vignetteGradient;
-  ctx.fillRect(0, 0, vw, vh);
+  // Screen-space vignette removed — handled by WebGL post-processing (postfx.js)
 
   // ── Minimap ───────────────────────────────────────────────
   renderMinimap();

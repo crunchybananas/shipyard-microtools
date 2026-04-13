@@ -144,3 +144,11 @@ export function updateSeason() {
 export function getSeasonData() {
   return SEASONS[G.season] || SEASONS.spring;
 }
+
+export function getDaylight() {
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.1) return 0.55 + (t/0.1)*0.45;
+  if (t < 0.6) return 1;
+  if (t < 0.75) return 1 - ((t-0.6)/0.15)*0.35;
+  return 0.65 - ((t-0.75)/0.25)*0.1;
+}

@@ -2,7 +2,8 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY } from './state.js';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight } from './state.js';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
@@ -24,11 +25,8 @@ const minimap = document.getElementById('minimap');
 
 initRenderer(canvas, minimap);
 resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-initRenderer(canvas, minimap);
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+initPostFX(canvas);
+window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); });
 setupSaveButtons();
 loadAchievements();
 
@@ -195,10 +193,12 @@ function gameLoop() {
     if (document.visibilityState === 'visible') {
       simTick();
       render();
+      applyPostFX(canvas, G.gameTick, getDaylight());
       requestAnimationFrame(gameLoop);
     } else {
       for (let i = 0; i < 60; i++) simTick();
       render();
+      applyPostFX(canvas, G.gameTick, getDaylight());
       setTimeout(gameLoop, 16);
     }
   } catch (e) {
