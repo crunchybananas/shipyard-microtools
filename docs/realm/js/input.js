@@ -9,29 +9,33 @@ import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel } from './ui.js';
 import { renderMissions } from './missions.js';
 
-// Find building at screen position — accounts for buildings rendering above their tile
+// Standard isometric hit test: screen-space bounding box, depth-sorted (front wins)
 function findBuildingAtClick(clientX, clientY) {
-  // Convert click to world-space screen coords (account for canvas offset + DPI scaling)
   const C = document.getElementById('game');
   const rect = C.getBoundingClientRect();
-  const cx = (clientX - rect.left) * (C.width / rect.width);
-  const cy = (clientY - rect.top) * (C.height / rect.height);
-  const sx = (cx - C.width/2) / G.camera.zoom + G.camera.x;
-  const sy = (cy - C.height/2) / G.camera.zoom + G.camera.y;
+  // Convert click to canvas pixels, then to world iso-screen coords
+  const cpx = (clientX - rect.left) * (C.width / rect.width);
+  const cpy = (clientY - rect.top) * (C.height / rect.height);
+  const wx = (cpx - C.width/2) / G.camera.zoom + G.camera.x;
+  const wy = (cpy - C.height/2) / G.camera.zoom + G.camera.y;
 
-  let best = null, bestDist = Infinity;
+  // Test all buildings, keep the frontmost (highest screen Y = closest to camera) hit
+  let best = null, bestY = -Infinity;
   for (const b of G.buildings) {
     const bs = toScreen(b.x, b.y);
-    // Building visual center is above tile center (roofs extend ~30px up with 1.3x scale)
-    const bx = bs.x;
-    const by = bs.y - 16; // approximate visual center of building sprite
-    const dx = sx - bx;
-    const dy = sy - by;
-    // Elliptical hit area: wider than tall (isometric perspective)
-    const dist = (dx * dx) / (28 * 28) + (dy * dy) / (24 * 24);
-    if (dist < 1 && dist < bestDist) {
-      bestDist = dist;
-      best = b;
+    // Screen-space bounding box of the building sprite (with 1.3x scale)
+    // Buildings render from ~45px above tile center to ~10px below
+    const hitLeft   = bs.x - 22;
+    const hitRight  = bs.x + 22;
+    const hitTop    = bs.y - 48;
+    const hitBottom = bs.y + 10;
+
+    if (wx >= hitLeft && wx <= hitRight && wy >= hitTop && wy <= hitBottom) {
+      // Depth sort: higher bs.y = rendered later = in front
+      if (bs.y > bestY) {
+        bestY = bs.y;
+        best = b;
+      }
     }
   }
   return best;
