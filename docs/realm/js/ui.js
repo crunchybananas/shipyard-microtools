@@ -333,30 +333,30 @@ const TUTORIAL_STEPS = [
     check: () => G.gameTick > 30,
   },
   {
-    id: 'build_house',
-    text: '🏠 First, build a House for shelter. Click the House button below (or press 1).',
-    action: 'Select House from the build bar ↓',
-    check: () => G.selectedBuild === 'house',
-    highlight: '.build-btn',
-  },
-  {
-    id: 'place_house',
-    text: '🏠 Now click on a green tile to place your house.',
-    action: 'Click a grass tile on the island',
-    check: () => G.buildings.some(b => b.type === 'house'),
-  },
-  {
     id: 'build_farm',
-    text: '🌾 Settlers need food! Build a Farm to produce it. Click Farm (or press 2).',
+    text: '🌾 Your settlers need food! Build a Farm first. Click Farm below (or press 2).',
     action: 'Select Farm from the build bar ↓',
-    check: () => G.selectedBuild === 'farm' || G.buildings.some(b => b.type === 'farm'),
+    check: () => G.selectedBuild === 'farm',
     highlight: '.build-btn',
   },
   {
     id: 'place_farm',
-    text: '🌾 Place the farm on any grass tile. Build 2 farms to keep up with food demand!',
-    action: 'Click grass tiles to place farms',
-    check: () => G.buildings.filter(b => b.type === 'farm').length >= 2,
+    text: '🌾 Click on a green grass tile to place your farm. Workers will auto-assign!',
+    action: 'Click a grass tile on the island',
+    check: () => G.buildings.some(b => b.type === 'farm'),
+  },
+  {
+    id: 'build_lumber',
+    text: '🪓 Now build a Lumber Mill on a forest tile for wood. Click Lumber Mill (or press 3).',
+    action: 'Select Lumber Mill from the build bar ↓',
+    check: () => G.selectedBuild === 'lumber' || G.buildings.some(b => b.type === 'lumber'),
+    highlight: '.build-btn',
+  },
+  {
+    id: 'place_lumber',
+    text: '🪓 Place the Lumber Mill on a dark green forest tile. You need wood to build more!',
+    action: 'Click a forest tile',
+    check: () => G.buildings.some(b => b.type === 'lumber'),
   },
   {
     id: 'speed',
@@ -396,7 +396,7 @@ export function updateTutorialTip() {
   try {
     if (step.check()) {
       // Auto-dismiss after the player places their first building
-      if (step.id === 'place_house') {
+      if (step.id === 'place_farm') {
         dismissTutorial();
         return;
       }

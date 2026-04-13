@@ -38,7 +38,7 @@ export function updateCitizens() {
         c.x += (dx/d) * Math.min(spd, d);
         c.y += (dy/d) * Math.min(spd, d);
       }
-      return; // still moving
+      continue; // still moving — next citizen
     }
 
     // No path or path complete — fallback straight-line for non-pathfound movement
@@ -49,13 +49,13 @@ export function updateCitizens() {
         const spd = c.speed * G.speed;
         c.x += (dx/d) * Math.min(spd, d);
         c.y += (dy/d) * Math.min(spd, d);
-        return;
+        continue;
       }
     }
 
     // Arrived or no movement needed — run state machine
     c.stateTimer -= G.speed;
-    if (c.stateTimer > 0) return;
+    if (c.stateTimer > 0) continue;
     runStateMachine(c);
   }
 }
