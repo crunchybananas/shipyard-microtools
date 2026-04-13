@@ -1121,47 +1121,31 @@ function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   ctx.globalAlpha = daylight;
 
-  // Foundation platform — dark isometric base that connects building to ground
+  // Foundation — darken the tile under the building for grounding
   if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
-    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    const hw = TW/2, hh = TH/2;
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
     ctx.beginPath();
-    ctx.moveTo(s.x, s.y - 4);
-    ctx.lineTo(s.x + 18, s.y + 5);
-    ctx.lineTo(s.x, s.y + 14);
-    ctx.lineTo(s.x - 18, s.y + 5);
-    ctx.closePath();
-    ctx.fill();
-    // Foundation edge — darker bottom
-    ctx.fillStyle = 'rgba(0,0,0,0.18)';
-    ctx.beginPath();
-    ctx.moveTo(s.x - 18, s.y + 5);
-    ctx.lineTo(s.x, s.y + 14);
-    ctx.lineTo(s.x, s.y + 17);
-    ctx.lineTo(s.x - 18, s.y + 8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(s.x + 18, s.y + 5);
-    ctx.lineTo(s.x, s.y + 14);
-    ctx.lineTo(s.x, s.y + 17);
-    ctx.lineTo(s.x + 18, s.y + 8);
+    ctx.moveTo(s.x, s.y - hh);
+    ctx.lineTo(s.x + hw, s.y);
+    ctx.lineTo(s.x, s.y + hh);
+    ctx.lineTo(s.x - hw, s.y);
     ctx.closePath();
     ctx.fill();
   }
 
   // Shadow — soft ground shadow offset to the right
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
   ctx.beginPath();
-  ctx.ellipse(s.x + 4, s.y + 8, 16, 6, 0.2, 0, Math.PI*2);
+  ctx.ellipse(s.x + 3, s.y + 4, 14, 5, 0.15, 0, Math.PI*2);
   ctx.fill();
 
-  // Scale up buildings by 1.3x for visual presence
-  // groundY shifts the anchor down so buildings sit on the tile surface
-  const groundY = s.y + 4;
+  // Scale up buildings by 1.2x for visual presence
+  // Anchor at the building base (s.y) so scaling grows upward, keeping the base pinned to the tile
   ctx.save();
-  ctx.translate(s.x, groundY);
-  ctx.scale(1.3, 1.3);
-  ctx.translate(-s.x, -groundY);
+  ctx.translate(s.x, s.y);
+  ctx.scale(1.2, 1.2);
+  ctx.translate(-s.x, -s.y);
 
   switch (b.type) {
     case 'house': drawHouse(ctx, s); break;
@@ -1190,7 +1174,7 @@ function drawBuilding(ctx, b, s, daylight) {
     if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
       ctx.fillStyle = 'rgba(230,240,255,0.85)';
       // Snow sits on top of the building — approximate roof peak
-      const snowY = b.type === 'tower' ? s.y - 34 : b.type === 'church' ? s.y - 38 : s.y - 24;
+      const snowY = b.type === 'tower' ? s.y - 38 : b.type === 'church' ? s.y - 42 : s.y - 28;
       const snowW = b.type === 'tower' ? 8 : b.type === 'church' ? 10 : 14;
       ctx.beginPath();
       ctx.ellipse(s.x, snowY, snowW, 3, 0, 0, Math.PI * 2);
@@ -1208,7 +1192,7 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.globalAlpha = glowAlpha;
       // Warm point light around the building
       const glowR = b.type === 'castle' ? 40 : b.type === 'church' ? 32 : 24;
-      const glowY = b.type === 'tower' ? s.y - 18 : b.type === 'castle' ? s.y - 16 : s.y - 10;
+      const glowY = b.type === 'tower' ? s.y - 22 : b.type === 'castle' ? s.y - 20 : s.y - 14;
       const glow = ctx.createRadialGradient(s.x, glowY, 2, s.x, glowY, glowR);
       glow.addColorStop(0, 'rgba(255,220,140,0.55)');
       glow.addColorStop(1, 'rgba(255,220,140,0)');
@@ -1247,7 +1231,7 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.font = '8px -apple-system,sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
-      const wy = b.type === 'tower' ? s.y - 44 : b.type === 'church' ? s.y - 46 : b.type === 'castle' ? s.y - 50 : s.y - 34;
+      const wy = b.type === 'tower' ? s.y - 48 : b.type === 'church' ? s.y - 50 : b.type === 'castle' ? s.y - 54 : s.y - 38;
       ctx.fillText(`${have}/${needed}👤`, s.x, wy);
       ctx.globalAlpha = daylight;
     }
