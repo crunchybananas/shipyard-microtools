@@ -11,10 +11,13 @@ import { renderMissions } from './missions.js';
 
 // Find building at screen position — accounts for buildings rendering above their tile
 function findBuildingAtClick(clientX, clientY) {
-  // Convert click to world-space screen coords
+  // Convert click to world-space screen coords (account for canvas offset + DPI scaling)
   const C = document.getElementById('game');
-  const sx = (clientX - C.width/2) / G.camera.zoom + G.camera.x;
-  const sy = (clientY - C.height/2) / G.camera.zoom + G.camera.y;
+  const rect = C.getBoundingClientRect();
+  const cx = (clientX - rect.left) * (C.width / rect.width);
+  const cy = (clientY - rect.top) * (C.height / rect.height);
+  const sx = (cx - C.width/2) / G.camera.zoom + G.camera.x;
+  const sy = (cy - C.height/2) / G.camera.zoom + G.camera.y;
 
   let best = null, bestDist = Infinity;
   for (const b of G.buildings) {

@@ -28,8 +28,11 @@ export function toWorld(sx, sy) {
 }
 
 export function screenToWorld(mx, my) {
-  const sx = (mx - C.width/2)/G.camera.zoom + G.camera.x;
-  const sy = (my - C.height/2)/G.camera.zoom + G.camera.y;
+  const rect = C.getBoundingClientRect();
+  const cx = (mx - rect.left) * (C.width / rect.width);
+  const cy = (my - rect.top) * (C.height / rect.height);
+  const sx = (cx - C.width/2)/G.camera.zoom + G.camera.x;
+  const sy = (cy - C.height/2)/G.camera.zoom + G.camera.y;
   const w = toWorld(sx, sy);
   return { x: Math.floor(w.x), y: Math.floor(w.y) };
 }
