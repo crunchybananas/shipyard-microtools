@@ -111,7 +111,7 @@ export function render() {
       }
 
       ctx.globalAlpha = daylight;
-      const tileDepth = tile === TILE.WATER ? 2 : tile === TILE.SAND ? 3 : tile === TILE.MOUNTAIN ? 8 : 4;
+      const tileDepth = tile === TILE.WATER ? 4 : tile === TILE.SAND ? 3 : tile === TILE.MOUNTAIN ? 8 : 4;
 
       // Top face
       ctx.fillStyle = tileColor;
@@ -153,7 +153,7 @@ export function render() {
       }
 
       // Right side face (darker)
-      ctx.fillStyle = shiftColor(tileColor, [-30, -30, -30]);
+      ctx.fillStyle = tile === TILE.WATER ? 'rgba(5,25,70,0.9)' : shiftColor(tileColor, [-30, -30, -30]);
       ctx.beginPath();
       ctx.moveTo(s.x + TW/2, s.y);
       ctx.lineTo(s.x, s.y + TH/2);
@@ -163,7 +163,7 @@ export function render() {
       ctx.fill();
 
       // Left side face (medium dark)
-      ctx.fillStyle = shiftColor(tileColor, [-18, -18, -18]);
+      ctx.fillStyle = tile === TILE.WATER ? 'rgba(8,35,90,0.85)' : shiftColor(tileColor, [-18, -18, -18]);
       ctx.beginPath();
       ctx.moveTo(s.x - TW/2, s.y);
       ctx.lineTo(s.x, s.y + TH/2);
@@ -322,52 +322,117 @@ export function render() {
       else if (tile === TILE.WATER) drawWater(ctx, s.x, s.y, daylight, x, y);
       else if (tile === TILE.MOUNTAIN) {
         const mh = ((x * 37 + y * 53) & 0xff);
+        const backPeakTop = s.y - 16 - (mh % 6);
+        const frontPeakTop = s.y - 12 - (mh % 4);
+
         // Shadow at base
-        ctx.globalAlpha = daylight * 0.2;
+        ctx.globalAlpha = daylight * 0.28;
         ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.ellipse(s.x, s.y + 2, 12, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(s.x, s.y + 3, 14, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = daylight;
-        // Back peak (taller, farther)
-        ctx.fillStyle = '#6a6a7a';
+
+        // Back peak — gradient from dark slate base to lighter grey peak
+        const backGrad = ctx.createLinearGradient(s.x - 4, backPeakTop, s.x + 2, s.y + 4);
+        backGrad.addColorStop(0, '#9898aa');
+        backGrad.addColorStop(0.5, '#606070');
+        backGrad.addColorStop(1, '#4a4a58');
+        ctx.fillStyle = backGrad;
         ctx.beginPath();
         ctx.moveTo(s.x - 10, s.y + 4);
-        ctx.lineTo(s.x - 4, s.y - 16 - (mh % 6));
+        ctx.lineTo(s.x - 4, backPeakTop);
         ctx.lineTo(s.x + 2, s.y - 10);
         ctx.lineTo(s.x + 6, s.y + 4);
         ctx.closePath();
         ctx.fill();
-        // Front peak (shorter, closer)
-        ctx.fillStyle = '#7a7a8a';
+
+        // Front peak — gradient: darker base, mid-grey body
+        const frontGrad = ctx.createLinearGradient(s.x + 3, frontPeakTop, s.x + 8, s.y + 4);
+        frontGrad.addColorStop(0, '#a0a0b2');
+        frontGrad.addColorStop(0.45, '#727282');
+        frontGrad.addColorStop(1, '#585868');
+        ctx.fillStyle = frontGrad;
         ctx.beginPath();
         ctx.moveTo(s.x - 4, s.y + 4);
-        ctx.lineTo(s.x + 3, s.y - 12 - (mh % 4));
+        ctx.lineTo(s.x + 3, frontPeakTop);
         ctx.lineTo(s.x + 8, s.y - 6);
         ctx.lineTo(s.x + 12, s.y + 4);
         ctx.closePath();
         ctx.fill();
-        // Lit face (sunlight side)
-        ctx.fillStyle = '#8a8a9a';
+
+        // Lit sunlight face — right-side highlight with gradient
+        const litGrad = ctx.createLinearGradient(s.x + 3, frontPeakTop, s.x + 12, s.y + 4);
+        litGrad.addColorStop(0, '#c0c0d0');
+        litGrad.addColorStop(1, '#8888a0');
+        ctx.fillStyle = litGrad;
         ctx.beginPath();
-        ctx.moveTo(s.x + 3, s.y - 12 - (mh % 4));
+        ctx.moveTo(s.x + 3, frontPeakTop);
         ctx.lineTo(s.x + 8, s.y - 6);
         ctx.lineTo(s.x + 12, s.y + 4);
         ctx.lineTo(s.x + 3, s.y + 2);
         ctx.closePath();
         ctx.fill();
-        // Snow cap
-        ctx.fillStyle = 'rgba(230,240,255,0.85)';
+
+        // Rocky texture lines — thin dark strokes on the mountain face
+        ctx.strokeStyle = 'rgba(30,30,45,0.45)';
+        ctx.lineWidth = 0.7;
+        // Back peak texture lines
+        ctx.globalAlpha = daylight * 0.6;
+        const backMid = s.y - 10;
         ctx.beginPath();
-        ctx.moveTo(s.x - 4, s.y - 14 - (mh % 6));
-        ctx.lineTo(s.x - 6, s.y - 10);
-        ctx.lineTo(s.x - 1, s.y - 11);
+        ctx.moveTo(s.x - 8, backMid + 2);  ctx.lineTo(s.x - 5, backMid - 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s.x - 6, backMid + 5);  ctx.lineTo(s.x - 2, backMid + 2);
+        ctx.stroke();
+        // Front peak texture lines
+        ctx.beginPath();
+        ctx.moveTo(s.x + 1, s.y - 4);  ctx.lineTo(s.x + 5, s.y - 8);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s.x - 1, s.y);      ctx.lineTo(s.x + 4, s.y - 4);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s.x + 4, s.y - 9);  ctx.lineTo(s.x + 7, s.y - 6);
+        ctx.stroke();
+        ctx.globalAlpha = daylight;
+
+        // Snow cap on back peak — wider, blue-white tint
+        ctx.fillStyle = 'rgba(210,230,255,0.92)';
+        ctx.beginPath();
+        ctx.moveTo(s.x - 4, backPeakTop);
+        ctx.lineTo(s.x - 7, backPeakTop + 5);
+        ctx.lineTo(s.x - 3, backPeakTop + 6);
+        ctx.lineTo(s.x + 0, backPeakTop + 4);
+        ctx.lineTo(s.x + 2, s.y - 10);
         ctx.closePath();
         ctx.fill();
+        // Highlight on back snow
+        ctx.fillStyle = 'rgba(240,250,255,0.7)';
         ctx.beginPath();
-        ctx.moveTo(s.x + 3, s.y - 10 - (mh % 4));
-        ctx.lineTo(s.x + 1, s.y - 7);
-        ctx.lineTo(s.x + 6, s.y - 6);
+        ctx.moveTo(s.x - 4, backPeakTop);
+        ctx.lineTo(s.x - 5, backPeakTop + 3);
+        ctx.lineTo(s.x - 1, backPeakTop + 2);
+        ctx.closePath();
+        ctx.fill();
+
+        // Snow cap on front peak — blue-white tint, slightly jagged
+        ctx.fillStyle = 'rgba(215,235,255,0.90)';
+        ctx.beginPath();
+        ctx.moveTo(s.x + 3, frontPeakTop);
+        ctx.lineTo(s.x + 1, frontPeakTop + 4);
+        ctx.lineTo(s.x + 4, frontPeakTop + 5);
+        ctx.lineTo(s.x + 7, frontPeakTop + 3);
+        ctx.lineTo(s.x + 8, s.y - 6);
+        ctx.closePath();
+        ctx.fill();
+        // Highlight on front snow
+        ctx.fillStyle = 'rgba(240,250,255,0.65)';
+        ctx.beginPath();
+        ctx.moveTo(s.x + 3, frontPeakTop);
+        ctx.lineTo(s.x + 2, frontPeakTop + 2);
+        ctx.lineTo(s.x + 5, frontPeakTop + 2);
         ctx.closePath();
         ctx.fill();
       }
@@ -515,23 +580,44 @@ export function render() {
     const s = toScreen(c.x, c.y);
     ctx.globalAlpha = daylight;
 
-    // Walking bob when moving
+    // Walking bob when moving — smooth sine, reduced amplitude
     const isMoving = c.path && c.pathIdx < (c.path?.length ?? 0);
-    const bob = isMoving ? Math.sin(G.gameTick * 0.25 + c.x * 3) * 1.5 : 0;
+    const bobRaw = isMoving ? Math.sin(G.gameTick * 0.22 + c.x * 3) : 0;
+    const bob = bobRaw * 1.2; // gentler vertical bob
     const cy = s.y + bob;
 
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    // Leg-swing phase (separate so it's decoupled from bob)
+    const legPhase = G.gameTick * 0.28 + c.x * 3;
+
+    // Shadow — slightly larger to match bigger body
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
     ctx.beginPath();
-    ctx.ellipse(s.x, cy+2, 4, 2, 0, 0, Math.PI*2);
+    ctx.ellipse(s.x, cy + 3, 5, 2.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Legs (when walking)
+    // Legs — stroked lines for better look; stride when walking, stubs when idle
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
     if (isMoving) {
-      const legSwing = Math.sin(G.gameTick * 0.3 + c.x * 3) * 2;
-      ctx.fillStyle = '#555';
-      ctx.fillRect(s.x - 2, cy - 2, 1.5, 3 + legSwing * 0.3);
-      ctx.fillRect(s.x + 0.5, cy - 2, 1.5, 3 - legSwing * 0.3);
+      const legSwing = Math.sin(legPhase) * 3;
+      ctx.beginPath();
+      ctx.moveTo(s.x - 1.5, cy - 2);
+      ctx.lineTo(s.x - 1.5 - legSwing * 0.3, cy + 5 + legSwing * 0.2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(s.x + 1.5, cy - 2);
+      ctx.lineTo(s.x + 1.5 + legSwing * 0.3, cy + 5 - legSwing * 0.2);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(s.x - 1.5, cy - 2);
+      ctx.lineTo(s.x - 1.5, cy + 5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(s.x + 1.5, cy - 2);
+      ctx.lineTo(s.x + 1.5, cy + 5);
+      ctx.stroke();
     }
 
     // Body — job-colored clothing
@@ -548,38 +634,110 @@ export function render() {
     }
     if (c.state === 'eating') bodyColor = '#4ade80';
 
+    // Torso — capsule/rounded-rect shape (wider, taller than old circle)
+    const torsoW = 5, torsoH = 7, torsoTop = cy - 12, torsoR = 2.5;
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
-    ctx.arc(s.x, cy - 7, 4, 0, Math.PI * 2);
+    ctx.roundRect(s.x - torsoW, torsoTop, torsoW * 2, torsoH, torsoR);
     ctx.fill();
-    // Body outline for readability
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 0.6;
+    ctx.lineWidth = 0.7;
     ctx.stroke();
 
-    // Head
+    // Arms — swing when walking, hang at sides when idle
+    const armSwing = isMoving ? Math.sin(legPhase + Math.PI) * 2.5 : 0;
+    ctx.strokeStyle = bodyColor;
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(s.x - torsoW, torsoTop + 1.5);
+    ctx.lineTo(s.x - torsoW - 1.5, torsoTop + 4 + armSwing);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(s.x + torsoW, torsoTop + 1.5);
+    ctx.lineTo(s.x + torsoW + 1.5, torsoTop + 4 - armSwing);
+    ctx.stroke();
+
+    // Head — skin tone, radius 3.5
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
-    ctx.arc(s.x, cy - 14, 3, 0, Math.PI * 2);
+    ctx.arc(s.x, cy - 17, 3.5, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
 
-    // Hair (tiny variation)
+    // Hair — better coverage over top of head
     const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
     ctx.fillStyle = ['#3a2a1a','#8a6a3a','#2a2a2a','#c08050'][hairHash];
     ctx.beginPath();
-    ctx.arc(s.x, cy - 13.5, 2, Math.PI * 0.8, Math.PI * 2.2);
+    ctx.arc(s.x, cy - 17.5, 3.2, Math.PI * 0.65, Math.PI * 2.35);
+    ctx.closePath();
     ctx.fill();
 
+    // Eyes — only when zoomed in enough
+    if (G.camera.zoom >= 1.2) {
+      ctx.fillStyle = '#2a1a0a';
+      ctx.beginPath();
+      ctx.arc(s.x - 1.3, cy - 17, 0.55, 0, Math.PI * 2);
+      ctx.arc(s.x + 1.3, cy - 17, 0.55, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     if (G.camera.zoom >= 0.7) {
-      // Emote bubble above head
+      // Tool icon when working
+      if (c.state === 'working' && c.jobBuilding) {
+        const jt = c.jobBuilding.type;
+        const toolX = s.x + torsoW + 2;
+        const toolY = torsoTop + 2;
+        ctx.save();
+        ctx.lineCap = 'round';
+        if (jt === 'mine' || jt === 'quarry') {
+          // Pickaxe: angled handle + cross-head
+          ctx.translate(toolX, toolY);
+          ctx.rotate(-0.4);
+          ctx.strokeStyle = '#8b5e3c';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 5); ctx.stroke();
+          ctx.strokeStyle = '#aaa';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(-2, 0); ctx.lineTo(2, 0); ctx.stroke();
+        } else if (jt === 'lumber') {
+          // Axe: handle + filled wedge head
+          ctx.translate(toolX, toolY);
+          ctx.rotate(0.3);
+          ctx.strokeStyle = '#8b5e3c';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 5); ctx.stroke();
+          ctx.fillStyle = '#aaa';
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(2.5, -1); ctx.lineTo(1.5, 2); ctx.closePath(); ctx.fill();
+        } else if (jt === 'farm') {
+          // Scythe: handle + curved arc blade
+          ctx.translate(toolX, toolY);
+          ctx.strokeStyle = '#8b5e3c';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -1); ctx.stroke();
+          ctx.strokeStyle = '#ccc';
+          ctx.lineWidth = 1.3;
+          ctx.beginPath(); ctx.arc(-1, -1, 2.5, 0, Math.PI * 0.9); ctx.stroke();
+        } else {
+          // Generic tool dot for other job types
+          ctx.translate(toolX, toolY);
+          ctx.fillStyle = '#ccc';
+          ctx.beginPath(); ctx.arc(0, 0, 1.5, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Emote bubble above head (suppress working emote — tool icon handles it)
       const emote = c.state==='idle' ? '💤' : c.state==='eating' ? '🍎' :
-        c.state==='working' ? '⚒️' : c.state==='foraging' ? '🌿' :
+        c.state==='working' ? null : c.state==='foraging' ? '🌿' :
         (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
       if (emote && G.gameTick % 120 < 80) { // show emote 80 of every 120 ticks (flicker)
-        ctx.globalAlpha = 0.7;
+        ctx.globalAlpha = 0.75;
         ctx.font = '8px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(emote, s.x, cy - 18);
+        ctx.fillText(emote, s.x, cy - 23);
         ctx.globalAlpha = daylight;
       }
 
@@ -587,9 +745,9 @@ export function render() {
       if (c.carrying) {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
         ctx.fillStyle = cc;
-        ctx.fillRect(s.x + 2, cy - 10, 3, 3);
+        ctx.fillRect(s.x + 3, cy - 12, 3, 3);
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.fillRect(s.x + 2, cy - 10, 3, 1);
+        ctx.fillRect(s.x + 3, cy - 12, 3, 1);
       }
     } // end zoom >= 0.7
 
@@ -598,7 +756,7 @@ export function render() {
       ctx.strokeStyle = 'rgba(255,209,102,0.7)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 6, 6, 0, Math.PI * 2);
+      ctx.arc(s.x, cy - 9, 8, 0, Math.PI * 2);
       ctx.stroke();
     }
 
@@ -608,7 +766,7 @@ export function render() {
       ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 6, 8, 0, Math.PI * 2);
+      ctx.arc(s.x, cy - 9, 10, 0, Math.PI * 2);
       ctx.stroke();
     }
   }
@@ -918,10 +1076,38 @@ function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   ctx.globalAlpha = daylight;
 
-  // Shadow — subtle ground contact shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  // Foundation platform — dark isometric base that connects building to ground
+  if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y - 4);
+    ctx.lineTo(s.x + 18, s.y + 5);
+    ctx.lineTo(s.x, s.y + 14);
+    ctx.lineTo(s.x - 18, s.y + 5);
+    ctx.closePath();
+    ctx.fill();
+    // Foundation edge — darker bottom
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.moveTo(s.x - 18, s.y + 5);
+    ctx.lineTo(s.x, s.y + 14);
+    ctx.lineTo(s.x, s.y + 17);
+    ctx.lineTo(s.x - 18, s.y + 8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(s.x + 18, s.y + 5);
+    ctx.lineTo(s.x, s.y + 14);
+    ctx.lineTo(s.x, s.y + 17);
+    ctx.lineTo(s.x + 18, s.y + 8);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Shadow — soft ground shadow offset to the right
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.beginPath();
-  ctx.ellipse(s.x, s.y+6, 14, 5, 0, 0, Math.PI*2);
+  ctx.ellipse(s.x + 4, s.y + 8, 16, 6, 0.2, 0, Math.PI*2);
   ctx.fill();
 
   // Scale up buildings by 1.3x for visual presence
@@ -1704,11 +1890,71 @@ function drawTree(ctx, x, y, a, seasonShift) {
 }
 
 function drawRock(ctx, x, y, a) {
-  ctx.globalAlpha = a*0.9;
-  ctx.fillStyle = '#7a7a88';
-  ctx.beginPath(); ctx.moveTo(x-6,y+2); ctx.lineTo(x-4,y-6); ctx.lineTo(x+3,y-5); ctx.lineTo(x+6,y+2); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#8a8a98';
-  ctx.beginPath(); ctx.moveTo(x+2,y); ctx.lineTo(x+4,y-4); ctx.lineTo(x+8,y-2); ctx.lineTo(x+7,y+1); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = a * 0.9;
+
+  // Main large rock — gradient for 3D rounded look
+  const mainGrad = ctx.createLinearGradient(x - 6, y - 6, x + 6, y + 2);
+  mainGrad.addColorStop(0, '#a0a0b0');
+  mainGrad.addColorStop(0.4, '#808090');
+  mainGrad.addColorStop(1, '#505060');
+  ctx.fillStyle = mainGrad;
+  ctx.beginPath();
+  ctx.moveTo(x - 6, y + 2);
+  ctx.lineTo(x - 4, y - 6);
+  ctx.lineTo(x + 3, y - 5);
+  ctx.lineTo(x + 6, y + 2);
+  ctx.closePath();
+  ctx.fill();
+  // Dark shadow underside on main rock
+  ctx.fillStyle = 'rgba(20,20,35,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(x - 6, y + 2);
+  ctx.lineTo(x + 6, y + 2);
+  ctx.lineTo(x + 3, y - 1);
+  ctx.lineTo(x - 3, y - 1);
+  ctx.closePath();
+  ctx.fill();
+  // Metallic specular highlight — top-left face catch
+  ctx.fillStyle = 'rgba(200,205,220,0.55)';
+  ctx.beginPath();
+  ctx.moveTo(x - 4, y - 6);
+  ctx.lineTo(x - 2, y - 8);
+  ctx.lineTo(x + 1, y - 6);
+  ctx.lineTo(x - 1, y - 4);
+  ctx.closePath();
+  ctx.fill();
+
+  // Secondary rock (right, slightly smaller) — gradient
+  const secGrad = ctx.createLinearGradient(x + 2, y - 4, x + 8, y + 1);
+  secGrad.addColorStop(0, '#9898a8');
+  secGrad.addColorStop(1, '#585868');
+  ctx.fillStyle = secGrad;
+  ctx.beginPath();
+  ctx.moveTo(x + 2, y);
+  ctx.lineTo(x + 4, y - 4);
+  ctx.lineTo(x + 8, y - 2);
+  ctx.lineTo(x + 7, y + 1);
+  ctx.closePath();
+  ctx.fill();
+  // Specular on secondary rock
+  ctx.fillStyle = 'rgba(210,215,230,0.5)';
+  ctx.beginPath();
+  ctx.moveTo(x + 4, y - 4);
+  ctx.lineTo(x + 6, y - 3);
+  ctx.lineTo(x + 5, y - 1);
+  ctx.lineTo(x + 3, y - 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Small pebble cluster — lower left
+  ctx.globalAlpha = a * 0.7;
+  const pebGrad = ctx.createRadialGradient(x - 5, y + 4, 0.5, x - 5, y + 4, 2.5);
+  pebGrad.addColorStop(0, '#b0b0be');
+  pebGrad.addColorStop(1, '#606070');
+  ctx.fillStyle = pebGrad;
+  ctx.beginPath(); ctx.ellipse(x - 5, y + 4, 2.5, 1.5, 0.2, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x - 1, y + 4, 1.8, 1.2, -0.3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x + 3, y + 3, 1.5, 1.0, 0.1, 0, Math.PI * 2); ctx.fill();
 }
 
 function drawIronOre(ctx, x, y, a) {
