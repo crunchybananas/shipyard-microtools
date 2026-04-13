@@ -17,6 +17,14 @@ export function updateParticles() {
       p.tx += (p.vx || 0) * 0.02;
       p.size = (p.size || 2) * 0.995;
     }
+    if (p.type === 'petal') {
+      p.tx += (p.vx || 0) * 0.5 + Math.sin(G.gameTick * 0.015 + p.tx) * 0.003;
+      p.size = (p.size || 2) * 0.999;
+    }
+    if (p.type === 'leaf') {
+      p.tx += (p.vx || 0) * 0.5 + Math.sin(G.gameTick * 0.01 + p.tx * 2) * 0.004;
+      p.rotation = (p.rotation || 0) + 0.03;
+    }
     if (p.alpha <= 0) G.particles.splice(i, 1);
   }
 }
@@ -76,6 +84,43 @@ export function updateSmokeEmitters() {
       decay: 0.002,
       type: 'snow',
       size: 1 + Math.random() * 1.5,
+    });
+  }
+
+  // Spring flower petals floating in the wind
+  if (G.season === 'spring' && G.gameTick % 12 === 0 && G.particles.length < 250) {
+    const cx = G.camera.x / 32, cy = G.camera.y / 16;
+    G.particles.push({
+      tx: cx + (Math.random() - 0.5) * 20,
+      ty: cy + (Math.random() - 0.5) * 15,
+      offsetY: -20 - Math.random() * 30,
+      text: null,
+      alpha: 0.5 + Math.random() * 0.3,
+      vy: 0.08 + Math.random() * 0.06,
+      decay: 0.002,
+      type: 'petal',
+      size: 1.5 + Math.random(),
+      vx: 0.02 + Math.random() * 0.02,
+      color: ['#ffb0c8','#ff90a8','#ffe066','#fff0f0'][Math.floor(Math.random()*4)],
+    });
+  }
+
+  // Autumn falling leaves
+  if (G.season === 'autumn' && G.gameTick % 10 === 0 && G.particles.length < 250) {
+    const cx = G.camera.x / 32, cy = G.camera.y / 16;
+    G.particles.push({
+      tx: cx + (Math.random() - 0.5) * 20,
+      ty: cy + (Math.random() - 0.5) * 15,
+      offsetY: -25 - Math.random() * 25,
+      text: null,
+      alpha: 0.6 + Math.random() * 0.3,
+      vy: 0.1 + Math.random() * 0.08,
+      decay: 0.0015,
+      type: 'leaf',
+      size: 2 + Math.random() * 1.5,
+      vx: (Math.random() - 0.3) * 0.03,
+      color: ['#c85020','#d4a020','#b83018','#e8a830'][Math.floor(Math.random()*4)],
+      rotation: Math.random() * Math.PI * 2,
     });
   }
 }

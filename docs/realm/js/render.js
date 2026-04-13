@@ -194,6 +194,30 @@ export function render() {
         }
       }
 
+      // Ambient occlusion — darken edges where elevation changes
+      if (tile !== TILE.WATER) {
+        const adjWater = (
+          (x>0 && G.map[y][x-1]===TILE.WATER) ||
+          (x<MAP_W-1 && G.map[y][x+1]===TILE.WATER) ||
+          (y>0 && G.map[y-1][x]===TILE.WATER) ||
+          (y<MAP_H-1 && G.map[y+1][x]===TILE.WATER)
+        );
+        if (adjWater) {
+          ctx.globalAlpha = daylight * 0.15;
+          ctx.fillStyle = '#000';
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y + TH/2 - 2);
+          ctx.lineTo(s.x + TW/2, s.y - 2);
+          ctx.lineTo(s.x + TW/2, s.y + 2);
+          ctx.lineTo(s.x, s.y + TH/2 + 2);
+          ctx.lineTo(s.x - TW/2, s.y + 2);
+          ctx.lineTo(s.x - TW/2, s.y - 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+      }
+
       // Winter frost overlay on land tiles
       if (G.season === 'winter' && tile !== TILE.WATER && tile !== TILE.SAND) {
         ctx.fillStyle = 'rgba(200,220,255,0.18)';
@@ -906,6 +930,27 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x + drift, s.y + p.offsetY, sz, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'petal') {
+      ctx.fillStyle = p.color || '#ffb0c8';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + p.offsetY, p.size, p.size * 0.6, G.gameTick * 0.02, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.type === 'leaf') {
+      ctx.save();
+      ctx.translate(s.x, s.y + p.offsetY);
+      ctx.rotate(p.rotation || 0);
+      ctx.fillStyle = p.color || '#c85020';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size, p.size * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Leaf vein
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.lineWidth = 0.3;
+      ctx.beginPath();
+      ctx.moveTo(-p.size, 0);
+      ctx.lineTo(p.size, 0);
+      ctx.stroke();
+      ctx.restore();
     } else {
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 11px -apple-system,sans-serif';
@@ -1129,7 +1174,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'tower': drawTower(ctx, s); break;
     case 'well': drawWell(ctx, s); break;
     case 'tavern': drawTavern(ctx, s); break;
-    case 'wall': drawWall(ctx, s); break;
+    case 'wall': drawWall(ctx, s, b); break;
     case 'road': drawRoad(ctx, s); break;
     case 'tradingpost': drawTradingPost(ctx, s, b); break;
     case 'castle': drawCastle(ctx, s); break;
@@ -1536,28 +1581,84 @@ function drawTavern(ctx, s) {
   ctx.fillRect(s.x-3, s.y-12, 6, 8);
 }
 
-function drawWall(ctx, s) {
-  ctx.fillStyle = '#7a7a8a';
-  ctx.fillRect(s.x-TW/4, s.y-8, TW/2, 8);
-  ctx.fillStyle = '#6a6a7a';
-  ctx.fillRect(s.x-TW/4, s.y-10, TW/2, 2);
-  // Brick lines
-  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-  ctx.lineWidth = 0.5;
-  for (let i = -TW/4+4; i < TW/4; i += 6) {
+function drawWall(ctx, s, b) {
+  // Check which neighbors are also walls
+  const hasN = b && G.buildingGrid[b.y-1]?.[b.x]?.type === 'wall';
+  const hasS = b && G.buildingGrid[b.y+1]?.[b.x]?.type === 'wall';
+  const hasE = b && G.buildingGrid[b.y]?.[b.x+1]?.type === 'wall';
+  const hasW = b && G.buildingGrid[b.y]?.[b.x-1]?.type === 'wall';
+
+  // Main wall post (always drawn)
+  ctx.fillStyle = '#8a8078';
+  ctx.fillRect(s.x - 4, s.y - 14, 8, 14);
+  // Top cap
+  ctx.fillStyle = '#9a9088';
+  ctx.fillRect(s.x - 5, s.y - 16, 10, 3);
+  // Merlon
+  ctx.fillRect(s.x - 2, s.y - 19, 4, 3);
+
+  // Connection segments to neighbors
+  if (hasE || hasS) {
+    // Right connection (toward +x or +y in iso)
+    ctx.fillStyle = '#7a7068';
     ctx.beginPath();
-    ctx.moveTo(s.x+i, s.y-8); ctx.lineTo(s.x+i, s.y);
-    ctx.stroke();
+    ctx.moveTo(s.x + 4, s.y - 12);
+    ctx.lineTo(s.x + TW/2, s.y - 6);
+    ctx.lineTo(s.x + TW/2, s.y);
+    ctx.lineTo(s.x + 4, s.y);
+    ctx.closePath();
+    ctx.fill();
+  }
+  if (hasW || hasN) {
+    // Left connection
+    ctx.fillStyle = '#8a7a70';
+    ctx.beginPath();
+    ctx.moveTo(s.x - 4, s.y - 12);
+    ctx.lineTo(s.x - TW/2, s.y - 6);
+    ctx.lineTo(s.x - TW/2, s.y);
+    ctx.lineTo(s.x - 4, s.y);
+    ctx.closePath();
+    ctx.fill();
   }
 }
 
 function drawRoad(ctx, s) {
-  ctx.fillStyle = '#4a4a40';
+  // Dirt/cobblestone path across the tile - isometric strip running NE-SW
+  ctx.fillStyle = '#8a7a60';
   ctx.beginPath();
-  ctx.moveTo(s.x, s.y-TH/4); ctx.lineTo(s.x+TW/4, s.y);
-  ctx.lineTo(s.x, s.y+TH/4); ctx.lineTo(s.x-TW/4, s.y);
+  ctx.moveTo(s.x - 20, s.y - 3);
+  ctx.lineTo(s.x - 10, s.y - 8);
+  ctx.lineTo(s.x + 10, s.y - 8);
+  ctx.lineTo(s.x + 20, s.y - 3);
+  ctx.lineTo(s.x + 10, s.y + 2);
+  ctx.lineTo(s.x - 10, s.y + 2);
   ctx.closePath();
   ctx.fill();
+
+  // Lighter center stripe
+  ctx.fillStyle = '#a09078';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 14, s.y - 2);
+  ctx.lineTo(s.x - 6, s.y - 6);
+  ctx.lineTo(s.x + 6, s.y - 6);
+  ctx.lineTo(s.x + 14, s.y - 2);
+  ctx.lineTo(s.x + 6, s.y + 1);
+  ctx.lineTo(s.x - 6, s.y + 1);
+  ctx.closePath();
+  ctx.fill();
+
+  // Cobblestone dots
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  for (let i = -8; i <= 8; i += 4) {
+    ctx.beginPath();
+    ctx.arc(s.x + i, s.y - 3 + (i % 3), 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Edge shadow
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
 }
 
 function drawTradingPost(ctx, s, b) {
@@ -1970,109 +2071,134 @@ function drawIronOre(ctx, x, y, a) {
 
 function drawWater(ctx, x, y, a, tx, ty) {
   // tx/ty = tile grid coords for per-tile variation and foam detection
-  const t = G.gameTick * 0.018;
+  const t = G.gameTick * 0.025; // faster tick for visible motion
   // Per-tile phase offset so neighbouring tiles don't animate in lockstep
   const phase = (tx * 2.3 + ty * 1.7) % (Math.PI * 2);
 
-  // ── Layer 1: deep colour gradient across the diamond ────────
-  // Shift between deep navy and rich cobalt with a gentle pulse
-  const depthPulse = 0.12 + 0.06 * Math.sin(t * 0.6 + phase);
-  ctx.globalAlpha = a * (0.55 + depthPulse);
-  ctx.fillStyle = 'rgba(18,100,195,1)';   // deep base
+  // ── Layer 1: deep colour base with oscillating hue shift ────
+  // Visibly shifts between deep navy and rich cobalt each cycle
+  const colorShift = 0.5 + 0.5 * Math.sin(t * 0.7 + phase);
+  const cr = Math.round(18 + colorShift * 20);
+  const cg = Math.round(80 + colorShift * 50);
+  const cb = Math.round(180 + colorShift * 40);
+  ctx.globalAlpha = a * 0.9;
+  ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
   ctx.fill();
 
-  // ── Layer 2: mid-water colour tint (lighter cobalt) ─────────
-  ctx.globalAlpha = a * (0.35 + 0.1 * Math.sin(t * 0.9 + phase + 1));
-  ctx.fillStyle = 'rgba(55,165,245,1)';
+  // ── Layer 2: bright mid-water shimmer overlay ────────────────
+  const shimmer = 0.25 + 0.2 * Math.sin(t * 1.1 + phase + 1.5);
+  ctx.globalAlpha = a * shimmer;
+  ctx.fillStyle = 'rgba(100,200,255,1)';
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
   ctx.fill();
 
-  // ── Layer 3: animated wave crests (sinusoidal stripes) ──────
-  // Three wave bands spaced vertically across the tile
-  ctx.lineWidth = 1;
-  const waveRows = [-8, 0, 8];
+  // ── Layer 3: animated wave crests – denser and larger ───────
+  // Five wave bands for clearly visible ripples
+  ctx.lineWidth = 2;
+  const waveRows = [-10, -5, 0, 5, 10];
   for (let i = 0; i < waveRows.length; i++) {
     const rowY = waveRows[i];
-    // Alternate direction so adjacent rows look natural
     const dir = (i % 2 === 0) ? 1 : -1;
-    const wAlpha = 0.28 + 0.14 * Math.sin(t * 1.4 + phase + i * 1.1);
-    ctx.globalAlpha = a * wAlpha;
-    ctx.strokeStyle = `rgba(200,235,255,1)`;
+    // Strong alpha oscillation makes crests visibly pulse in/out
+    const wAlpha = 0.5 + 0.4 * Math.sin(t * 2.2 + phase + i * 1.3);
+    ctx.globalAlpha = a * Math.max(0.1, wAlpha);
+    ctx.strokeStyle = 'rgba(210,245,255,1)';
     ctx.beginPath();
-    // Clip wave to the diamond by stepping through isometric x-range
-    // The diamond at row offset rowY spans from -halfW to +halfW
-    // where halfW = 32 * (1 - |rowY|/16)
-    const halfW = 32 * (1 - Math.abs(rowY) / 18);
-    const step = 4;
+    const halfW = 32 * (1 - Math.abs(rowY) / 20);
+    const step = 3;
     let started = false;
     for (let dx = -halfW; dx <= halfW; dx += step) {
       const wx = x + dx;
-      // Two overlapping sine waves travelling in opposite directions
-      const wy = y + rowY * 0.5
-        + Math.sin(t * 1.6 * dir + dx * 0.22 + phase + i) * 1.8
-        + Math.sin(t * 0.9 + dx * 0.14 + phase * 0.5) * 1.0;
+      // Two overlapping sine waves with larger amplitude for visibility
+      const wy = y + rowY * 0.6
+        + Math.sin(t * 2.4 * dir + dx * 0.28 + phase + i) * 3.5
+        + Math.sin(t * 1.3 + dx * 0.18 + phase * 0.5) * 1.8;
       if (!started) { ctx.moveTo(wx, wy); started = true; }
       else ctx.lineTo(wx, wy);
     }
     ctx.stroke();
   }
 
-  // ── Layer 4: bright specular glints (2–3 tiny sparkles) ────
-  const numGlints = 2 + ((tx * 3 + ty * 7) & 1); // 2 or 3 per tile
-  for (let g = 0; g < numGlints; g++) {
-    // Deterministic but animated position
-    const gPhase = phase + g * 2.1;
-    const gx = x + Math.sin(t * 0.8 + gPhase) * 14;
-    const gy = y + Math.cos(t * 0.6 + gPhase) * 7;
-    const gSize = 1.5 + 1.0 * Math.sin(t * 2.5 + gPhase);
-    const gAlpha = 0.45 + 0.35 * Math.sin(t * 3.0 + gPhase);
+  // ── Layer 4: bright specular glints – larger and brighter ───
+  const numGlints = 3 + ((tx * 3 + ty * 7) & 1); // 3 or 4 per tile
+  for (let gi = 0; gi < numGlints; gi++) {
+    const gPhase = phase + gi * 1.8;
+    const gx = x + Math.sin(t * 1.1 + gPhase) * 18;
+    const gy = y + Math.cos(t * 0.8 + gPhase) * 9;
+    const gSize = 3.0 + 2.5 * Math.abs(Math.sin(t * 3.5 + gPhase));
+    const gAlpha = 0.6 + 0.4 * Math.sin(t * 4.0 + gPhase);
     ctx.globalAlpha = a * Math.max(0, gAlpha);
-    ctx.fillStyle = 'rgba(240,252,255,1)';
+    // Inner bright white core
+    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.beginPath();
+    ctx.arc(gx, gy, gSize * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Outer soft halo
+    ctx.globalAlpha = a * Math.max(0, gAlpha) * 0.4;
+    ctx.fillStyle = 'rgba(200,240,255,1)';
     ctx.beginPath();
     ctx.arc(gx, gy, gSize, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // ── Layer 5: foam at land-adjacent edges ────────────────────
-  // Check all 4 cardinal neighbours; draw a white arc on each land edge
+  // ── Layer 5: foam/whitecaps at land-adjacent edges ───────────
   const neighbours = [
     { dx:  0, dy: -1, ex: x,      ey: y - 16, ax: x - 32, ay: y,      bx: x + 32, by: y      }, // top
     { dx:  1, dy:  0, ex: x + 32, ey: y,      ax: x,      ay: y - 16, bx: x,      by: y + 16 }, // right
     { dx:  0, dy:  1, ex: x,      ey: y + 16, ax: x - 32, ay: y,      bx: x + 32, by: y      }, // bottom
     { dx: -1, dy:  0, ex: x - 32, ey: y,      ax: x,      ay: y - 16, bx: x,      by: y + 16 }, // left
   ];
-  const foamPulse = 0.55 + 0.2 * Math.sin(t * 1.2 + phase);
-  ctx.lineWidth = 1.5;
+  // Foam pulses visibly between 0.5 and 1.0
+  const foamPulse = 0.7 + 0.3 * Math.sin(t * 2.0 + phase);
   for (const n of neighbours) {
     const nx = tx + n.dx, ny = ty + n.dy;
     const isLand = nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H
       && G.map[ny][nx] !== TILE.WATER;
     if (!isLand) continue;
-    // Draw a short foamy stroke along the shared edge using a midpoint
-    ctx.globalAlpha = a * foamPulse;
-    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-    ctx.beginPath();
-    // Midpoints of the two half-edges that form the shared diamond side
     const m1x = (n.ex + n.ax) / 2, m1y = (n.ey + n.ay) / 2;
     const m2x = (n.ex + n.bx) / 2, m2y = (n.ey + n.by) / 2;
-    ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
-    ctx.stroke();
-    // Secondary softer foam halo
-    ctx.globalAlpha = a * foamPulse * 0.35;
-    ctx.strokeStyle = 'rgba(200,235,255,1)';
+    // Bold primary foam stripe
+    ctx.globalAlpha = a * foamPulse;
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
     ctx.stroke();
-    ctx.lineWidth = 1.5;
+    // Secondary softer foam halo
+    ctx.globalAlpha = a * foamPulse * 0.5;
+    ctx.strokeStyle = 'rgba(200,240,255,1)';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
+    ctx.stroke();
+    // Foam dot clusters along each half of the edge
+    ctx.globalAlpha = a * foamPulse * 0.8;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    for (let fi = 0; fi < 5; fi++) {
+      const frac = (fi + 1) / 6;
+      const fx = m1x + (n.ex - m1x) * frac + Math.sin(t * 3.0 + phase + fi) * 1.5;
+      const fy = m1y + (n.ey - m1y) * frac + Math.cos(t * 2.5 + phase + fi) * 1.0;
+      ctx.beginPath();
+      ctx.arc(fx, fy, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    for (let fi = 0; fi < 5; fi++) {
+      const frac = (fi + 1) / 6;
+      const fx = n.ex + (m2x - n.ex) * frac + Math.sin(t * 3.0 + phase + fi + 5) * 1.5;
+      const fy = n.ey + (m2y - n.ey) * frac + Math.cos(t * 2.5 + phase + fi + 5) * 1.0;
+      ctx.beginPath();
+      ctx.arc(fx, fy, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   ctx.globalAlpha = a; // restore
+  ctx.lineWidth = 1;
 }
 
 // ── Minimap ─────────────────────────────────────────────────
