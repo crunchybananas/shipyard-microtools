@@ -741,6 +741,31 @@ export function render() {
     }
     if (c.state === 'eating') bodyColor = '#50c870';
 
+    if (G.camera.zoom < 0.5) {
+      // Tiny dot for very far zoom
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y - 4, 2, 0, Math.PI*2);
+      ctx.fill();
+      // Still draw selected/hover rings
+      if (c === hoveredCitizen) {
+        ctx.strokeStyle = 'rgba(255,209,102,0.7)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y - 4, 5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      if (c === G.selectedCitizen) {
+        const pulse = 0.5 + 0.4 * Math.sin(G.gameTick * 0.1);
+        ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y - 4, 7, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      continue;
+    }
+
     // Feet — small ovals, subtle step offset when walking
     const step = isMoving ? Math.sin(G.gameTick * 0.25 + c.x * 3) * 1.5 : 0;
     ctx.fillStyle = '#4a3a2a';
@@ -910,6 +935,16 @@ export function render() {
   for (const s of G.soldiers) {
     const ss = toScreen(s.x, s.y);
     ctx.globalAlpha = daylight;
+    if (G.camera.zoom < 0.6) {
+      // Simple dot for far zoom
+      ctx.fillStyle = '#5a6a7a';
+      ctx.beginPath();
+      ctx.arc(ss.x, ss.y - 4, 3, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#c8383f';
+      ctx.fillRect(ss.x - 1, ss.y - 7, 2, 2);
+      continue;
+    }
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
     ctx.beginPath();
@@ -1062,6 +1097,13 @@ export function render() {
   for (const e of G.enemies) {
     const es = toScreen(e.x, e.y);
     ctx.globalAlpha = daylight;
+    if (G.camera.zoom < 0.6) {
+      ctx.fillStyle = '#4a2a2a';
+      ctx.beginPath();
+      ctx.arc(es.x, es.y - 4, 3, 0, Math.PI*2);
+      ctx.fill();
+      continue;
+    }
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
     ctx.beginPath();

@@ -28,6 +28,12 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .diff-btn{padding:0.45rem 1rem;font-size:0.82rem;border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);border-radius:6px;cursor:pointer;font-family:inherit;transition:all 0.15s}
 .diff-btn:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.3)}
 .diff-btn.active{color:#fff;border-color:var(--accent);background:rgba(129,140,248,0.15)}
+.scenario-select{margin-top:0.8rem;text-align:center;animation:titleSlideUp 0.7s ease both;animation-delay:0.65s}
+.title-section-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:0.3rem}
+.scenario-buttons{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap}
+.scen-btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:0.4rem 0.8rem;border-radius:6px;font-family:inherit;font-size:0.75rem;cursor:pointer;transition:all 0.15s}
+.scen-btn:hover{color:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.3)}
+.scen-btn.active{border-color:var(--accent);background:rgba(129,140,248,0.1);color:var(--accent)}
 .title-buttons{display:flex;gap:0.8rem;justify-content:center;margin-bottom:1.5rem;animation:titleSlideUp 0.7s ease both;animation-delay:0.7s}
 .title-btn{padding:0.8rem 2rem;font-size:1rem;font-weight:700;border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
 .title-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.4);transform:translateY(-1px)}
@@ -88,6 +94,9 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .mission.done{opacity:0.4;text-decoration:line-through}
 .mission .check{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem}
 .mission.done .check{background:var(--food);border-color:var(--food);color:#000}
+.scenario-header{padding:0.35rem 0 0.4rem;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:0.3rem}
+.scen-name{font-weight:700;font-size:0.8rem;color:var(--gold);margin-bottom:0.15rem}
+.scen-desc{font-size:0.68rem;color:rgba(255,255,255,0.45);font-style:italic}
 
 /* Toast — type-aware styles */
 #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.90);color:var(--gold);padding:1rem 2rem;border-radius:10px;font-size:1.1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:2px solid rgba(255,209,102,0.35);box-shadow:0 4px 32px rgba(0,0,0,0.6)}
@@ -382,6 +391,14 @@ canvas#game{display:block;position:absolute;top:0;left:0}
       <button class="diff-btn active" data-diff="easy" onclick="setDifficulty('easy')">🟢 Easy</button>
       <button class="diff-btn" data-diff="normal" onclick="setDifficulty('normal')">🟡 Normal</button>
       <button class="diff-btn" data-diff="hard" onclick="setDifficulty('hard')">🔴 Hard</button>
+    </div>
+    <div class="scenario-select">
+      <div class="title-section-label">Scenario</div>
+      <div class="scenario-buttons">
+        <button class="scen-btn active" onclick="setScenario('peaceful_start')">🌾 Peaceful</button>
+        <button class="scen-btn" onclick="setScenario('military_rise')">⚔️ Military</button>
+        <button class="scen-btn" onclick="setScenario('merchant_kingdom')">🪙 Merchant</button>
+      </div>
     </div>
     <div class="title-buttons">
       <button class="title-btn primary" onclick="startNewGame()">⚔️ New Game</button>

@@ -20,6 +20,7 @@ import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound } from './aud
 import { toggleNotificationLog, notify } from './notifications.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
+import { getActiveScenario } from './scenarios.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -77,6 +78,13 @@ window.setDifficulty = (d) => {
   });
 };
 
+window.setScenario = (id) => {
+  G.scenario = id;
+  document.querySelectorAll('.scen-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(id));
+  });
+};
+
 window.startNewGame = () => {
   // Apply difficulty settings to starting resources
   const diff = getDifficulty();
@@ -85,6 +93,12 @@ window.startNewGame = () => {
   G.resources.wood = diff.startWood;
   G.resources.gold = diff.startGold;
   G.nextRaidDay = diff.raidStart;
+  // Apply scenario starting conditions (override difficulty defaults)
+  const scen = getActiveScenario();
+  if (scen) {
+    G.resources = { ...scen.startResources };
+    G.nextRaidDay = scen.raidStart;
+  }
   beginGame();
 };
 

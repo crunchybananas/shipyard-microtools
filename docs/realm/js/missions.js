@@ -4,6 +4,7 @@
 
 import { G } from './state.js';
 import { playSound } from './audio.js';
+import { getActiveScenario } from './scenarios.js';
 
 export const missions = [
   { id:'farm1',   text:'Build a farm',                  check:()=>G.buildings.some(b=>b.type==='farm'),      done:false, reward:{wood:20} },
@@ -52,6 +53,23 @@ export function renderMissions() {
   const list = document.getElementById('mission-list');
   if (!list) return;
   list.innerHTML = '';
+
+  // Prepend scenario objectives at the top
+  const scen = getActiveScenario();
+  if (scen) {
+    const header = document.createElement('div');
+    header.className = 'scenario-header';
+    header.innerHTML = `<div class="scen-name">${scen.name}</div><div class="scen-desc">${scen.desc}</div>`;
+    list.appendChild(header);
+    for (const obj of scen.objectives) {
+      const done = obj.check();
+      const row = document.createElement('div');
+      row.className = 'mission' + (done ? ' done' : '');
+      row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}`;
+      list.appendChild(row);
+    }
+  }
+
   for (const m of missions) {
     const div = document.createElement('div');
     div.className = 'mission' + (m.done ? ' done' : '');

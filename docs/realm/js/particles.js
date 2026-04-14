@@ -65,6 +65,8 @@ export function spawnDust(tx, ty) {
 }
 
 export function updateSmokeEmitters() {
+  // Early exit if too many particles
+  if (G.particles.length > 400) return;
   if (G.gameTick % 8 !== 0) return;
   for (const b of G.buildings) {
     if (b.type === 'house' || b.type === 'tavern' || b.type === 'lumber') {

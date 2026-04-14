@@ -272,12 +272,16 @@ export function checkRaids() {
     notify('⚠️ Scouts report raiders approaching! Raid expected in 2 days.', 'danger');
     playSound('raid');
   }
-  if (daysUntilRaid === 1 && G.dayPhase < 5) {
-    notify('🚨 Raiders will attack tomorrow! Build defenses NOW!', 'danger');
+  // Pre-raid warning (1 day before)
+  if (G.day === G.nextRaidDay - 1 && !G._raidWarningGiven) {
+    G._raidWarningGiven = true;
+    notify('⚠️ Raiders approach from the darkness! Prepare your defenses.', 'danger');
+    playSound('raidWarning');
   }
 
   // Raid happens
   if (G.day >= G.nextRaidDay && G.dayPhase < 5) {
+    G._raidWarningGiven = false;
     const raiders = Math.floor((2 + G.day/5) * getDifficulty().raidMult);
     const totalAttack = raiders * 10;
     const dmg = Math.max(0, totalAttack - G.defense);

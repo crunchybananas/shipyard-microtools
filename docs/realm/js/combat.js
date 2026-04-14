@@ -7,6 +7,20 @@ import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
 export function updateEnemies() {
   for (let i = G.enemies.length - 1; i >= 0; i--) {
     const e = G.enemies[i];
+    // Check if there's a wall in path — enemies must go around walls
+    const nx = Math.round(e.x), ny = Math.round(e.y);
+    const wall = G.buildingGrid[ny]?.[nx];
+    if (wall && wall.type === 'wall' && wall.hp > 0) {
+      // Attack wall instead of passing through
+      wall.hp -= 0.5 * G.speed;
+      if (wall.hp <= 0) {
+        G.buildings = G.buildings.filter(x => x !== wall);
+        G.buildingGrid[wall.y][wall.x] = null;
+        G.stats.buildingsLost = (G.stats.buildingsLost || 0) + 1;
+      }
+      continue; // don't move this tick
+    }
+
     // Move toward target
     const dx = e.tx - e.x, dy = e.ty - e.y;
     const d = Math.sqrt(dx*dx + dy*dy);

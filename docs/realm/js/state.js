@@ -104,6 +104,7 @@ export const G = {
   rallyPoint: null,
   won: false,
   difficulty: 'normal', // easy, normal, hard
+  scenario: 'peaceful_start', // selected scenario id
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
   notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
   lastResources: null, // snapshot for rate calculation
