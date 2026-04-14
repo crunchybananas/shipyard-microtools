@@ -105,4 +105,13 @@ A medieval settlement-builder-meets-light-RTS where the player grows an island k
 - Missions complete with toast
 
 ## Known bugs to fix
-- Citizens don't auto-assign to barracks (need to verify if job-finding includes barracks)
+(none currently — citizen auto-assign to barracks verified working)
+
+## Verified iter 30 state (browser test)
+- Title screen scenario selector works (Peaceful/Military/Merchant)
+- Scenario starts with correct resources + raid timing
+- Citizens auto-assign to barracks (workers added, soldiers trained)
+- Soldiers patrol with correct chibi sprites (grey armor + red plume)
+- HUD shows soldier count, threat indicator, emoji resources
+- Missions panel shows active scenario + objectives
+- All new buildings render correctly
