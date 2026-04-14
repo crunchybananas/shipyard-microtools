@@ -87,6 +87,15 @@ export const TECHS = {
     icon: '🏰',
     prereq: 'military',
   },
+  baking: {
+    name: 'Baking',
+    desc: 'Unlocks windmill and bakery for food processing',
+    cost: { gold: 20, wood: 15 },
+    time: 350,
+    unlocks: ['windmill', 'bakery'],
+    icon: '🍞',
+    prereq: 'agriculture',
+  },
 };
 
 // Which building types require NO tech (always available)

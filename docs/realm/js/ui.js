@@ -101,7 +101,7 @@ export function updateUI() {
 
 const CATEGORIES = [
   { name: 'Housing',        keys: ['house'] },
-  { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine'] },
+  { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine', 'windmill', 'bakery'] },
   { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
   { name: 'Defense',        keys: ['barracks', 'tower', 'wall'] },
   { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },

@@ -54,6 +54,8 @@ export const BUILDINGS = {
   granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
   church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
+  windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, boost:{type:'food',radius:4,multiplier:1.5,target:'farm'}, desc:'Boosts nearby farms by 50%. Works with wind!' },
+  bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, boost:{type:'food',radius:3,multiplier:1.3,target:'farm'}, happiness:5, desc:'Produces bread from nearby farms. Small happiness boost.' },
 };
 
 // ── Mutable game state (single source of truth) ───────────

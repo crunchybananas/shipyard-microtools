@@ -1291,6 +1291,8 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'granary': drawGranary(ctx, s); break;
     case 'church': drawChurch(ctx, s); break;
     case 'school': drawSchool(ctx, s); break;
+    case 'windmill': drawWindmill(ctx, s, b); break;
+    case 'bakery': drawBakery(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
   }
   ctx.restore(); // undo the 1.3x scale
@@ -2991,6 +2993,117 @@ function drawSchool(ctx, s) {
   ctx.strokeStyle = '#a08060'; ctx.lineWidth = 0.5;
   ctx.beginPath(); ctx.moveTo(s.x+5, s.y-27); ctx.lineTo(s.x+9, s.y-27); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(s.x+5, s.y-25); ctx.lineTo(s.x+9, s.y-25); ctx.stroke();
+}
+
+function drawWindmill(ctx, s, b) {
+  // Stone base
+  const baseGrad = ctx.createLinearGradient(s.x-8, s.y-8, s.x+8, s.y-8);
+  baseGrad.addColorStop(0, '#9a8878');
+  baseGrad.addColorStop(1, '#7a6858');
+  ctx.fillStyle = baseGrad;
+  ctx.beginPath();
+  ctx.moveTo(s.x-7, s.y-2);
+  ctx.lineTo(s.x-5, s.y-22);
+  ctx.lineTo(s.x+5, s.y-22);
+  ctx.lineTo(s.x+7, s.y-2);
+  ctx.closePath();
+  ctx.fill();
+  // Stone texture lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < 3; i++) {
+    const yy = s.y - 8 - i * 5;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 6 + i * 0.3, yy);
+    ctx.lineTo(s.x + 6 - i * 0.3, yy);
+    ctx.stroke();
+  }
+  // Wooden cap at top
+  ctx.fillStyle = '#8b5e2a';
+  ctx.fillRect(s.x-6, s.y-28, 12, 7);
+  ctx.fillStyle = '#6b4418';
+  ctx.fillRect(s.x-4, s.y-31, 8, 4);
+  // Small door
+  ctx.fillStyle = '#4a2e10';
+  ctx.fillRect(s.x-2, s.y-8, 4, 6);
+  // Rotating blades
+  const angle = (G.gameTick * 0.03) % (Math.PI * 2);
+  const cx = s.x, cy = s.y - 24;
+  ctx.save();
+  ctx.translate(cx, cy);
+  for (let i = 0; i < 4; i++) {
+    const a = angle + i * Math.PI / 2;
+    ctx.save();
+    ctx.rotate(a);
+    // Blade: elongated rectangle
+    ctx.fillStyle = '#c8a060';
+    ctx.fillRect(-1.5, -12, 3, 12);
+    // Blade tip
+    ctx.fillStyle = '#a07840';
+    ctx.fillRect(-2, -14, 4, 3);
+    ctx.restore();
+  }
+  // Hub
+  ctx.fillStyle = '#5a3a18';
+  ctx.beginPath();
+  ctx.arc(0, 0, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBakery(ctx, s) {
+  // Main building — warm plaster walls
+  const wallGrad = ctx.createLinearGradient(s.x-10, s.y-24, s.x+10, s.y-4);
+  wallGrad.addColorStop(0, '#d4a87a');
+  wallGrad.addColorStop(1, '#b88858');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(s.x-10, s.y-22, 20, 18);
+  // Stone base edge
+  ctx.fillStyle = '#9a7a5a';
+  ctx.fillRect(s.x-10, s.y-6, 20, 4);
+  // Roof — warm terracotta
+  ctx.fillStyle = '#c05020';
+  ctx.beginPath();
+  ctx.moveTo(s.x-12, s.y-22);
+  ctx.lineTo(s.x, s.y-32);
+  ctx.lineTo(s.x+12, s.y-22);
+  ctx.closePath();
+  ctx.fill();
+  // Roof ridge highlight
+  ctx.fillStyle = '#e06030';
+  ctx.beginPath();
+  ctx.moveTo(s.x-3, s.y-28);
+  ctx.lineTo(s.x, s.y-32);
+  ctx.lineTo(s.x+3, s.y-28);
+  ctx.closePath();
+  ctx.fill();
+  // Chimney
+  ctx.fillStyle = '#7a5038';
+  ctx.fillRect(s.x+3, s.y-38, 5, 14);
+  ctx.fillStyle = '#5a3820';
+  ctx.fillRect(s.x+2, s.y-40, 7, 3);
+  // Chimney smoke
+  const smokePhase = (G.gameTick * 0.04) % (Math.PI * 2);
+  for (let i = 0; i < 3; i++) {
+    const sy = s.y - 42 - i * 5;
+    const sx = s.x + 5.5 + Math.sin(smokePhase + i * 1.2) * 2;
+    const alpha = 0.4 - i * 0.12;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#aaa';
+    ctx.beginPath();
+    ctx.arc(sx, sy, 2 + i * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // Door
+  ctx.fillStyle = '#4a2e10';
+  ctx.fillRect(s.x-3, s.y-14, 6, 8);
+  ctx.fillStyle = '#7a5030';
+  ctx.fillRect(s.x-2.5, s.y-13.5, 2.5, 7);
+  // Bread sign
+  ctx.font = '8px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🍞', s.x + 6, s.y - 16);
 }
 
 function drawGeneric(ctx, s, def) {

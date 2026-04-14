@@ -116,6 +116,22 @@ export function updateProduction() {
         if (k === 'food') mult *= season.foodMult;
         adjustedProd[k] = Math.round(v * mult);
       }
+      // Apply windmill/bakery boosts to farms
+      if (b.type === 'farm') {
+        let boost = 1;
+        for (const other of G.buildings) {
+          if (!other.active) continue;
+          const odef = BUILDINGS[other.type];
+          if (!odef.boost || odef.boost.target !== 'farm') continue;
+          const d = Math.abs(other.x - b.x) + Math.abs(other.y - b.y);
+          if (d <= odef.boost.radius) boost *= odef.boost.multiplier;
+        }
+        if (boost > 1) {
+          for (const k of Object.keys(adjustedProd)) {
+            adjustedProd[k] = Math.round(adjustedProd[k] * boost);
+          }
+        }
+      }
       // If a worker is available to carry, set produced flag
       const carrier = b.workers.find(w => w.state === 'working');
       if (carrier) {
