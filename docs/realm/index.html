@@ -302,6 +302,16 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .hp-row.hp-total{border-top:2px solid var(--border);margin-top:0.3rem;padding-top:0.5rem;font-weight:700;font-size:0.85rem}
 .hp-row.hp-total .hp-val{color:var(--gold);font-size:0.95rem}
 
+/* Stats panel */
+#stats-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(340px,88vw);background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden}
+.stats-header{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;border-bottom:1px solid var(--border)}
+.stats-header h3{margin:0;font-size:0.95rem;color:var(--gold)}
+#stats-content{padding:0.7rem 0.9rem;font-size:0.82rem}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.stat-row:last-child{border-bottom:none}
+.stat-row span:first-child{color:rgba(255,255,255,0.7)}
+.stat-row span:last-child{font-weight:700;font-variant-numeric:tabular-nums;color:var(--gold)}
+
 /* Research panel */
 #research-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(600px,94vw);max-height:88vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
 .rp-header{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;border-bottom:1px solid var(--border)}
@@ -402,6 +412,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>
   <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()">🔊</button>
   <button class="hud-btn" onclick="toggleAchievements()">🏆</button>
+  <button class="hud-btn" onclick="toggleStats()">📊</button>
   <button class="hud-btn" onclick="toggleLog()">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
 </div>
 
@@ -436,6 +447,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <div id="happiness-panel" style="display:none">
   <div class="hp-header"><h3>😊 Happiness Breakdown</h3><button class="rp-close" onclick="toggleHappiness()">✕</button></div>
   <div id="happiness-content"></div>
+</div>
+
+<div id="stats-panel" style="display:none">
+  <div class="stats-header"><h3>📊 Kingdom Stats</h3><button class="rp-close" onclick="toggleStats()">✕</button></div>
+  <div id="stats-content"></div>
 </div>
 
 <div id="research-panel" style="display:none">

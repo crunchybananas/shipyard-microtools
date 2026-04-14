@@ -906,6 +906,39 @@ export function render() {
     ctx.globalAlpha = daylight;
   }
 
+  // ── Soldiers ──────────────────────────────────────────────
+  for (const s of G.soldiers) {
+    const ss = toScreen(s.x, s.y);
+    ctx.globalAlpha = daylight;
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(ss.x, ss.y + 2, 4, 2, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Body — armored, darker metallic
+    ctx.fillStyle = '#5a6a7a';
+    ctx.beginPath();
+    ctx.ellipse(ss.x, ss.y - 6, 4.5, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Helmet
+    ctx.fillStyle = '#888';
+    ctx.beginPath();
+    ctx.arc(ss.x, ss.y - 13, 4, 0, Math.PI*2);
+    ctx.fill();
+    // Sword on back
+    ctx.strokeStyle = '#aaa';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(ss.x - 3, ss.y - 14);
+    ctx.lineTo(ss.x + 3, ss.y - 8);
+    ctx.stroke();
+    // Plume on helmet
+    ctx.fillStyle = '#c8383f';
+    ctx.beginPath();
+    ctx.ellipse(ss.x, ss.y - 16, 1.5, 2, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+
   // ── Citizen hover tooltip ──────────────────────────────────
   if (hoveredCitizen) {
     const hs = toScreen(hoveredCitizen.x, hoveredCitizen.y);
@@ -995,6 +1028,61 @@ export function render() {
     ctx.closePath();
     ctx.fill();
     ctx.restore();
+  }
+
+  // ── Enemies ───────────────────────────────────────────────
+  for (const e of G.enemies) {
+    const es = toScreen(e.x, e.y);
+    ctx.globalAlpha = daylight;
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(es.x, es.y + 2, 4, 2, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Dark body
+    ctx.fillStyle = '#4a2a2a';
+    ctx.beginPath();
+    ctx.ellipse(es.x, es.y - 6, 4, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Dark hood/head
+    ctx.fillStyle = '#2a1a1a';
+    ctx.beginPath();
+    ctx.arc(es.x, es.y - 13, 3.5, 0, Math.PI*2);
+    ctx.fill();
+    // Red eye glow
+    ctx.fillStyle = '#ff4040';
+    ctx.beginPath();
+    ctx.arc(es.x - 1, es.y - 13, 0.6, 0, Math.PI*2);
+    ctx.arc(es.x + 1, es.y - 13, 0.6, 0, Math.PI*2);
+    ctx.fill();
+    // HP bar
+    if (e.hp < e.maxHp) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(es.x - 6, es.y - 20, 12, 2);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(es.x - 6, es.y - 20, 12 * (e.hp/e.maxHp), 2);
+    }
+  }
+
+  // ── Projectiles (arrows) ───────────────────────────────────
+  for (const p of G.projectiles) {
+    const ps = toScreen(p.x, p.y);
+    ctx.globalAlpha = daylight;
+    ctx.strokeStyle = '#8a6a3a';
+    ctx.lineWidth = 1.2;
+    const angle = Math.atan2(p.ty - p.y, p.tx - p.x);
+    ctx.beginPath();
+    ctx.moveTo(ps.x - Math.cos(angle) * 4, ps.y - Math.sin(angle) * 2);
+    ctx.lineTo(ps.x + Math.cos(angle) * 4, ps.y + Math.sin(angle) * 2);
+    ctx.stroke();
+    // Arrowhead
+    ctx.fillStyle = '#aaa';
+    ctx.beginPath();
+    ctx.moveTo(ps.x + Math.cos(angle) * 4, ps.y + Math.sin(angle) * 2);
+    ctx.lineTo(ps.x + Math.cos(angle) * 2 - Math.sin(angle), ps.y + Math.sin(angle) * 1 + Math.cos(angle));
+    ctx.lineTo(ps.x + Math.cos(angle) * 2 + Math.sin(angle), ps.y + Math.sin(angle) * 1 - Math.cos(angle));
+    ctx.closePath();
+    ctx.fill();
   }
 
   // ── Particles ─────────────────────────────────────────────

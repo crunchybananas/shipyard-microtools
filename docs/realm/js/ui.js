@@ -871,3 +871,27 @@ export function setupSaveButtons() {
   });
   document.getElementById('btn-newgame')?.addEventListener('click', () => window.newGame?.());
 }
+
+// ── Stats panel ───────────────────────────────────────────
+export function renderStatsPanel() {
+  const c = document.getElementById('stats-content');
+  if (!c) return;
+  const s = G.stats || {};
+  c.innerHTML = `
+    <div class="stat-row"><span>Buildings Built</span><span>${s.buildingsBuilt || 0}</span></div>
+    <div class="stat-row"><span>Buildings Lost</span><span>${s.buildingsLost || 0}</span></div>
+    <div class="stat-row"><span>Citizens Born</span><span>${s.citizensBorn || 0}</span></div>
+    <div class="stat-row"><span>Raids Survived</span><span>${s.raidsSurvived || 0}</span></div>
+    <div class="stat-row"><span>Enemies Defeated</span><span>${s.enemiesKilled || 0}</span></div>
+    <div class="stat-row"><span>Days Lived</span><span>${s.daysLived || 0}</span></div>
+    <div class="stat-row"><span>Gold Earned</span><span>${s.goldEarned || 0}🪙</span></div>
+  `;
+}
+
+export function toggleStatsPanel() {
+  const p = document.getElementById('stats-panel');
+  if (!p) return;
+  const open = p.style.display !== 'none';
+  p.style.display = open ? 'none' : 'block';
+  if (!open) renderStatsPanel();
+}

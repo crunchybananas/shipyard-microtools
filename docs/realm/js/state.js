@@ -67,8 +67,11 @@ export const G = {
   fog: [],
   buildings: [],
   citizens: [],
+  soldiers: [],
   buildingGrid: [],    // MAP_H x MAP_W, null or building ref
   particles: [],
+  enemies: [],
+  projectiles: [],
   resources: { wood:60, stone:30, food:80, gold:25, iron:0 },
   population: 3,
   maxPop: 3,
@@ -102,6 +105,16 @@ export const G = {
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
   notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
   lastResources: null, // snapshot for rate calculation
+  stats: {
+    buildingsBuilt: 0,
+    buildingsLost: 0,
+    citizensBorn: 0,
+    citizensDied: 0,
+    raidsSurvived: 0,
+    enemiesKilled: 0,
+    goldEarned: 0,
+    daysLived: 0,
+  },
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────

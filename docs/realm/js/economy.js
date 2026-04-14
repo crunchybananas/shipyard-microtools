@@ -45,6 +45,7 @@ export function placeBuilding(type, tx, ty) {
   if (def.reveal) revealAround(tx, ty, def.reveal);
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
+  if (G.stats) G.stats.buildingsBuilt++;
   playSound('build');
   spawnDust(tx, ty);
   notifyBuild(type);
@@ -56,7 +57,7 @@ export function placeBuilding(type, tx, ty) {
   return true;
 }
 
-export function demolishBuilding(b) {
+export function demolishBuilding(b, byEnemy = false) {
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
@@ -64,6 +65,7 @@ export function demolishBuilding(b) {
   if (def.defense) G.defense -= def.defense;
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + Math.floor(v/2);
   for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
+  if (byEnemy && G.stats) G.stats.buildingsLost++;
   playSound('build');
 }
 
@@ -75,6 +77,7 @@ export function trySpawnSettlers(count) {
     G.citizens.push(makeCitizen(cx, cy));
     G.population++;
   }
+  if (max > 0 && G.stats) G.stats.citizensBorn += max;
 
   // Check population milestones
   const milestones = [
@@ -104,6 +107,27 @@ export function trySpawnSettlers(count) {
 
 export function updateProduction() {
   for (const b of G.buildings) {
+    // Barracks: train soldiers
+    if (b.type === 'barracks' && b.workers.length >= 1) {
+      b.trainTimer = (b.trainTimer || 0) + 1;
+      const cap = 4; // max 4 soldiers per barracks
+      const current = G.soldiers.filter(s => s.homeBuilding === b).length;
+      if (b.trainTimer >= 600 && current < cap && G.resources.iron >= 1) {
+        b.trainTimer = 0;
+        G.resources.iron--;
+        G.soldiers.push({
+          x: b.x + 0.5, y: b.y + 0.5,
+          tx: b.x, ty: b.y,
+          homeBuilding: b,
+          type: 'swordsman',
+          hp: 50, maxHp: 50,
+          state: 'patrol',
+          stateTimer: 0,
+          target: null,
+        });
+      }
+    }
+
     const def = BUILDINGS[b.type];
     if (!def.prod) continue;
     const needed = def.workers || 0;
@@ -148,6 +172,7 @@ export function updateProduction() {
         for (const [k,v] of Object.entries(adjustedProd)) {
           G.resources[k] = (G.resources[k]||0) + v;
           G.totalResourcesGathered = (G.totalResourcesGathered || 0) + v;
+          if (k === 'gold' && G.stats) G.stats.goldEarned += v;
         }
       }
       // Floating particle — show every 3rd production cycle to keep it subtle
@@ -268,7 +293,7 @@ export function checkRaids() {
         target.hp -= dmg;
         if (target.hp <= 0) {
           report.push(`💥 ${BUILDINGS[target.type].name} was destroyed!`);
-          demolishBuilding(target);
+          demolishBuilding(target, true);
         } else {
           report.push(`🔨 ${BUILDINGS[target.type].name} damaged (${target.hp}% HP remaining)`);
         }
@@ -281,6 +306,23 @@ export function checkRaids() {
     // Show full report
     for (const line of report) {
       notify(line, dmg > 0 ? 'danger' : 'event');
+    }
+
+    // Spawn enemy raiders that visibly approach the settlement
+    const raidSize = 3 + Math.floor(G.day / 10);
+    for (let i = 0; i < raidSize; i++) {
+      const side = Math.floor(Math.random() * 4);
+      let ex, ey;
+      if (side === 0) { ex = Math.random() * MAP_W; ey = 0; }
+      else if (side === 1) { ex = MAP_W - 1; ey = Math.random() * MAP_H; }
+      else if (side === 2) { ex = Math.random() * MAP_W; ey = MAP_H - 1; }
+      else { ex = 0; ey = Math.random() * MAP_H; }
+      G.enemies.push({
+        x: ex, y: ey, tx: MAP_W/2, ty: MAP_H/2,
+        hp: 30, maxHp: 30,
+        type: 'raider',
+        state: 'approach',
+      });
     }
 
     // Raid visual effects — dramatic particles at settlement center
@@ -378,6 +420,7 @@ function updateCaravans() {
       } else {
         // Returned home — deliver gold
         G.resources.gold += c.gold;
+        if (G.stats) G.stats.goldEarned += c.gold;
         G.particles.push({
           tx: c.homeX, ty: c.homeY, offsetY: 0,
           text: `+${c.gold} 🪙 trade`, alpha: 1.8, vy: -0.3, type: 'text',
@@ -490,6 +533,7 @@ export function collectTaxes() {
   const tax = Math.round(effectivePop * 0.3 * happyMod);
   if (tax > 0) {
     G.resources.gold += tax;
+    if (G.stats) G.stats.goldEarned += tax;
     // Floating text showing income
     G.particles.push({
       tx: MAP_W/2, ty: MAP_H/2, offsetY: -20,

@@ -7,17 +7,19 @@ import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
+import { updateSoldiers } from './soldiers.js';
 import { updateProduction, checkRaids, collectTaxes } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel } from './ui.js';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel } from './ui.js';
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame, getSaveSize } from './save.js';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -107,7 +109,7 @@ window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   if (!confirm('Start a new game? Current unsaved progress will be lost.')) return;
   // Reset all state
-  G.buildings = []; G.citizens = []; G.caravans = []; G.particles = [];
+  G.buildings = []; G.citizens = []; G.caravans = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = [];
   G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
   G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
   G.day = 1; G.dayPhase = 0; G.gameTick = 0; G.speed = 1;
@@ -120,11 +122,13 @@ window.newGame = () => {
   G.season = 'spring'; G.won = false;
   G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
   G.lastResources = null;
+  G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0 };
   generateWorld();
   renderBuildBar(); renderMissions(); updateUI();
   notify('New game started!');
 };
 window.togglePopPanel = togglePopPanel;
+window.toggleStats = toggleStatsPanel;
 window.toggleAchievements = () => {
   const p = document.getElementById('achievements-panel');
   if (!p) return;
@@ -154,8 +158,11 @@ function updateTime() {
   if (G.dayPhase >= G.dayLength) {
     G.dayPhase = 0;
     G.day++;
+    if (G.stats) G.stats.daysLived++;
+    const _raidDayBefore = G.nextRaidDay;
     collectTaxes();
     checkRaids();
+    if (G.stats && G.nextRaidDay > _raidDayBefore) G.stats.raidsSurvived++;
     checkRandomEvents();
     if (updateSeason()) {
       const s = getSeasonData();
@@ -186,6 +193,10 @@ function simTick() {
     G.gameTick++;
     updateTime();
     updateCitizens();
+    updateSoldiers();
+    updateEnemies();
+    updateTowers();
+    updateProjectiles();
     updateProduction();
     updateParticles();
     updateSmokeEmitters();
