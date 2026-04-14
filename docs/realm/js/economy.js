@@ -2,7 +2,7 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js';
 import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound } from './audio.js';
@@ -17,6 +17,14 @@ export function canPlace(type, tx, ty) {
   if (G.buildingGrid[ty]?.[tx]) return false;
   const def = BUILDINGS[type];
   if (def.on && !def.on.includes(tile)) return false;
+  if (type === 'fisherman') {
+    const adjacent = [[-1,0],[1,0],[0,-1],[0,1]];
+    const hasWater = adjacent.some(([dx,dy]) => {
+      const nx = tx+dx, ny = ty+dy;
+      return nx>=0 && nx<MAP_W && ny>=0 && ny<MAP_H && G.map[ny][nx] === TILE.WATER;
+    });
+    if (!hasWater) return false;
+  }
   return true;
 }
 
@@ -165,10 +173,18 @@ export function updateProduction() {
 
   // Happiness (5 times per day)
   if (G.gameTick % Math.floor(G.dayLength / 5) === 0) {
+    const houses = G.buildings.filter(b => BUILDINGS[b.type].pop);
+    const totalHouses = houses.length;
     let hBonus = 0;
     for (const b of G.buildings) {
       const def = BUILDINGS[b.type];
-      if (def.happiness) hBonus += def.happiness;
+      if (!def.happiness) continue;
+      if (def.radius && totalHouses > 0) {
+        const covered = houses.filter(h => Math.hypot(h.x - b.x, h.y - b.y) <= def.radius).length;
+        hBonus += def.happiness * (covered / totalHouses);
+      } else {
+        hBonus += def.happiness;
+      }
     }
     G.happiness = Math.min(100, Math.max(10, 50 + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
   }
@@ -215,17 +231,7 @@ export function updateProduction() {
   // ── Caravans ──────────────────────────────────────────────
   updateCaravans();
 
-  // Passive gold income: +1 per 5 population each day cycle
-  if (G.gameTick % G.dayLength === 0 && G.population >= 5) {
-    const goldIncome = Math.floor(G.population / 5);
-    G.resources.gold += goldIncome;
-    if (goldIncome > 0) {
-      G.particles.push({
-        tx: MAP_W / 2, ty: MAP_H / 2, offsetY: 0,
-        text: `+${goldIncome} 🪙 taxes`, alpha: 1.8, vy: -0.3, type: 'text',
-      });
-    }
-  }
+  // Tax collection is handled by collectTaxes(), called from updateTime() on day change.
 
   // Immigration (once per day)
   if (G.gameTick % G.dayLength === 0 && G.happiness > 60 && G.population < G.maxPop) {
@@ -472,6 +478,25 @@ function spawnVictoryConfetti() {
     }
   }
   drawConfetti();
+}
+
+export function collectTaxes() {
+  // Only count housed population (not vagrants)
+  const housed = G.buildings.filter(b => b.type === 'house').length * 3;
+  const effectivePop = Math.min(housed, G.population);
+  // Happiness modifier: happy citizens pay more
+  const happyMod = G.happiness / 100;
+  // Base tax: 0.3 gold per pop per day, scaled by happiness
+  const tax = Math.round(effectivePop * 0.3 * happyMod);
+  if (tax > 0) {
+    G.resources.gold += tax;
+    // Floating text showing income
+    G.particles.push({
+      tx: MAP_W/2, ty: MAP_H/2, offsetY: -20,
+      text: `+${tax}🪙 taxes`,
+      alpha: 1.4, vy: -0.2, decay: 0.01, type: 'text',
+    });
+  }
 }
 
 // notify() is now imported from notifications.js

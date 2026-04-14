@@ -7,7 +7,7 @@ import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
-import { updateProduction, checkRaids } from './economy.js';
+import { updateProduction, checkRaids, collectTaxes } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
@@ -154,6 +154,7 @@ function updateTime() {
   if (G.dayPhase >= G.dayLength) {
     G.dayPhase = 0;
     G.day++;
+    collectTaxes();
     checkRaids();
     checkRandomEvents();
     if (updateSeason()) {

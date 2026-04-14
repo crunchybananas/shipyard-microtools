@@ -101,7 +101,7 @@ export function updateUI() {
 
 const CATEGORIES = [
   { name: 'Housing',        keys: ['house'] },
-  { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine', 'windmill', 'bakery'] },
+  { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine', 'windmill', 'bakery', 'chickencoop', 'cowpen', 'fisherman'] },
   { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
   { name: 'Defense',        keys: ['barracks', 'tower', 'wall'] },
   { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },
@@ -519,17 +519,28 @@ export function renderHappinessPanel() {
   const factors = [];
   factors.push({ label: '🏡 Base happiness', val: 50, category: 'base' });
 
-  // Building bonuses — group by type
-  const bCounts = {};
+  // Building bonuses — service buildings with radius only cover nearby houses
+  const houses = G.buildings.filter(b => BUILDINGS[b.type].pop);
+  const totalHouses = houses.length;
+  const bContribs = {}; // type -> total happiness contribution
   for (const b of G.buildings) {
     const def = BUILDINGS[b.type];
-    if (def.happiness) {
-      bCounts[b.type] = (bCounts[b.type] || 0) + 1;
+    if (!def.happiness) continue;
+    let bonus;
+    if (def.radius && totalHouses > 0) {
+      // Count houses within radius; scale bonus by coverage fraction
+      const covered = houses.filter(h => Math.hypot(h.x - b.x, h.y - b.y) <= def.radius).length;
+      bonus = def.happiness * (covered / totalHouses);
+    } else {
+      bonus = def.happiness;
     }
+    bContribs[b.type] = (bContribs[b.type] || 0) + bonus;
   }
-  for (const [type, count] of Object.entries(bCounts)) {
+  for (const [type, contrib] of Object.entries(bContribs)) {
     const def = BUILDINGS[type];
-    factors.push({ label: `${def.icon} ${def.name} ×${count}`, val: def.happiness * count, category: 'building' });
+    const count = G.buildings.filter(b => b.type === type).length;
+    const rounded = Math.round(contrib * 10) / 10;
+    factors.push({ label: `${def.icon} ${def.name} ×${count}`, val: rounded, category: 'building' });
   }
 
   // Negative modifiers

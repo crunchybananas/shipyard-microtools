@@ -17,7 +17,7 @@ export const TILE_COLORS = {
 };
 
 export const BUILDINGS = {
-  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:3, desc:'Shelters 3 settlers' },
+  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:3, desc:'Shelters 3 settlers. Generates tax income based on happiness.' },
   farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:2}, workers:1, desc:'Produces food each cycle',
     upgrades: [
       { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },
@@ -38,24 +38,27 @@ export const BUILDINGS = {
       { cost:{wood:22,stone:22,iron:3},  prodMult:1.5, name:'Level 2' },
       { cost:{wood:38,stone:38,iron:8},  prodMult:2.0, name:'Level 3' },
     ] },
-  market:    { name:'Market',      icon:'🏪', cost:{wood:20,stone:15}, prod:{gold:2}, workers:1, desc:'Generates gold from trade',
+  market:    { name:'Market',      icon:'🏪', cost:{wood:20,stone:15}, prod:{gold:2}, radius:5, workers:1, desc:'Generates gold from trade',
     upgrades: [
       { cost:{wood:30,stone:22,gold:10}, prodMult:1.5, name:'Level 2' },
       { cost:{wood:50,stone:38,gold:25,iron:5}, prodMult:2.0, name:'Level 3' },
     ] },
   barracks:  { name:'Barracks',    icon:'⚔️', cost:{wood:20,stone:20,iron:5}, defense:10, workers:2, desc:'Trains soldiers for defense' },
   tower:     { name:'Watch Tower', icon:'🗼', cost:{stone:25,iron:5},  defense:15, reveal:4, desc:'Reveals fog and defends' },
-  well:      { name:'Well',        icon:'🪣', cost:{stone:10},         happiness:5, desc:'Provides water, boosts happiness' },
-  tavern:    { name:'Tavern',      icon:'🍺', cost:{wood:20,gold:10},  happiness:10, workers:1, desc:'Entertainment, big happiness boost' },
+  well:      { name:'Well',        icon:'🪣', cost:{stone:10},         happiness:5,  radius:4, desc:'Provides water, boosts happiness' },
+  tavern:    { name:'Tavern',      icon:'🍺', cost:{wood:20,gold:10},  happiness:10, radius:5, workers:1, desc:'Entertainment, big happiness boost' },
   wall:      { name:'Wall',        icon:'🧱', cost:{stone:8},          defense:5, desc:'Fortification segment' },
   road:      { name:'Road',        icon:'🛤️', cost:{stone:3},          speedBonus:true, desc:'Citizens move faster on roads' },
   tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
   castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50}, defense:50, happiness:20, pop:10, desc:'The ultimate structure. Build this to win!' },
   granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
-  church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, desc:'Major happiness boost for your settlement' },
+  church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
   windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, boost:{type:'food',radius:4,multiplier:1.5,target:'farm'}, desc:'Boosts nearby farms by 50%. Works with wind!' },
   bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, boost:{type:'food',radius:3,multiplier:1.3,target:'farm'}, happiness:5, desc:'Produces bread from nearby farms. Small happiness boost.' },
+  chickencoop: { name:'Chicken Coop', icon:'🐔', cost:{wood:15}, prod:{food:1}, workers:1, desc:'Small chicken coop producing eggs and meat' },
+  cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
+  fisherman: { name:"Fisherman's Hut", icon:'🎣', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
 };
 
 // ── Mutable game state (single source of truth) ───────────

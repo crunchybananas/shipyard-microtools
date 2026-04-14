@@ -668,6 +668,22 @@ export function render() {
     ctx.fillStyle = 'rgba(255,209,102,0.15)';
     ctx.fill();
     ctx.globalAlpha = daylight;
+
+    // Coverage radius for service buildings
+    const selDef = BUILDINGS[G.selectedBuilding.type];
+    if (selDef.radius) {
+      const r = selDef.radius;
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = selDef.happiness ? '#ffd166' : '#60a5fa';
+      ctx.beginPath();
+      ctx.ellipse(ss.x, ss.y, r * TW/2, r * TH/2, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = selDef.happiness ? '#ffd166' : '#60a5fa';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = daylight;
+    }
   }
 
   // ── Citizens ──────────────────────────────────────────────
@@ -1293,6 +1309,9 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'school': drawSchool(ctx, s); break;
     case 'windmill': drawWindmill(ctx, s, b); break;
     case 'bakery': drawBakery(ctx, s); break;
+    case 'chickencoop': drawChickenCoop(ctx, s); break;
+    case 'cowpen': drawCowPen(ctx, s); break;
+    case 'fisherman': drawFisherman(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
   }
   ctx.restore(); // undo the 1.3x scale
@@ -3104,6 +3123,230 @@ function drawBakery(ctx, s) {
   ctx.font = '8px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('🍞', s.x + 6, s.y - 16);
+}
+
+function drawChickenCoop(ctx, s) {
+  // Small wooden hut — half height of a house
+  // Base / floor
+  ctx.fillStyle = '#8B5E3C';
+  ctx.fillRect(s.x - 9, s.y - 10, 18, 8);
+  // Wall shading on right
+  ctx.fillStyle = '#6B4422';
+  ctx.fillRect(s.x + 5, s.y - 10, 4, 8);
+  // Pointed roof
+  ctx.fillStyle = '#A0522D';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 11, s.y - 10);
+  ctx.lineTo(s.x, s.y - 20);
+  ctx.lineTo(s.x + 11, s.y - 10);
+  ctx.closePath();
+  ctx.fill();
+  // Roof highlight
+  ctx.fillStyle = '#C07840';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 3, s.y - 17);
+  ctx.lineTo(s.x, s.y - 20);
+  ctx.lineTo(s.x + 3, s.y - 17);
+  ctx.closePath();
+  ctx.fill();
+  // Small door opening (dark arch)
+  ctx.fillStyle = '#2a1a08';
+  ctx.beginPath();
+  ctx.arc(s.x - 2, s.y - 5, 2.5, Math.PI, 0);
+  ctx.fillRect(s.x - 4.5, s.y - 5, 5, 3);
+  ctx.fill();
+  // Perch post on right side
+  ctx.fillStyle = '#5a3a18';
+  ctx.fillRect(s.x + 7, s.y - 18, 2, 16);
+  ctx.fillRect(s.x + 4, s.y - 14, 8, 1.5);
+  // Scattered small birds / chicken emoji in front
+  ctx.font = '7px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🐔', s.x - 6, s.y + 4);
+  ctx.font = '5px sans-serif';
+  ctx.fillText('🐥', s.x + 2, s.y + 5);
+}
+
+function drawCowPen(ctx, s) {
+  // Dirt patch inside the pen
+  ctx.fillStyle = '#c8a870';
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y - 4, 14, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Wooden fence — four sides of a rectangle
+  ctx.strokeStyle = '#7a5530';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.strokeRect(s.x - 14, s.y - 16, 28, 18);
+  // Fence posts at corners and midpoints
+  ctx.fillStyle = '#6a4520';
+  const postXs = [s.x - 14, s.x - 7, s.x, s.x + 7, s.x + 14];
+  for (const px of postXs) {
+    ctx.fillRect(px - 1, s.y - 18, 2, 20);
+  }
+  // Horizontal rails
+  ctx.strokeStyle = '#9a7040';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 14, s.y - 12); ctx.lineTo(s.x + 14, s.y - 12);
+  ctx.moveTo(s.x - 14, s.y - 7);  ctx.lineTo(s.x + 14, s.y - 7);
+  ctx.stroke();
+  // Hay pile in back-left corner
+  ctx.fillStyle = '#e8c040';
+  ctx.beginPath();
+  ctx.ellipse(s.x - 8, s.y - 12, 4, 2.5, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#c8a020';
+  ctx.fillRect(s.x - 11, s.y - 13, 6, 2);
+  // Cow 1 — rounded body with dark spots
+  ctx.fillStyle = '#f0ece0';
+  ctx.beginPath();
+  ctx.ellipse(s.x - 3, s.y - 7, 5, 3, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  // Spots on cow 1
+  ctx.fillStyle = '#5a3a20';
+  ctx.beginPath();
+  ctx.ellipse(s.x - 4, s.y - 8, 1.5, 1, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(s.x - 1, s.y - 6, 1.2, 0.8, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  // Cow 2 — smaller, lighter
+  ctx.fillStyle = '#e8dcc8';
+  ctx.beginPath();
+  ctx.ellipse(s.x + 6, s.y - 5, 4, 2.5, -0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#7a5030';
+  ctx.beginPath();
+  ctx.ellipse(s.x + 7, s.y - 6, 1, 0.7, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  // Small icon label
+  ctx.font = '7px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🐄', s.x, s.y - 20);
+}
+
+function drawFisherman(ctx, s) {
+  // Dock platform — weathered planks over sand
+  ctx.fillStyle = '#8b6a3a';
+  ctx.fillRect(s.x - 14, s.y - 4, 28, 5);
+  // Plank lines
+  ctx.strokeStyle = '#6a4e28';
+  ctx.lineWidth = 0.5;
+  for (let i = -12; i < 14; i += 5) {
+    ctx.beginPath();
+    ctx.moveTo(s.x + i, s.y - 4);
+    ctx.lineTo(s.x + i, s.y + 1);
+    ctx.stroke();
+  }
+  // Stilts into water (two legs)
+  ctx.fillStyle = '#7a5a2a';
+  ctx.fillRect(s.x - 10, s.y, 3, 6);
+  ctx.fillRect(s.x + 7, s.y, 3, 6);
+
+  // Main hut body
+  const wallGrad = ctx.createLinearGradient(s.x - 9, s.y - 22, s.x + 9, s.y - 4);
+  wallGrad.addColorStop(0, '#c8924a');
+  wallGrad.addColorStop(1, '#a07038');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(s.x - 9, s.y - 22, 18, 18);
+  // Hut left-face shade
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(s.x - 9, s.y - 22, 4, 18);
+
+  // Thatched roof
+  ctx.fillStyle = '#b8882a';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 12, s.y - 22);
+  ctx.lineTo(s.x, s.y - 34);
+  ctx.lineTo(s.x + 12, s.y - 22);
+  ctx.closePath();
+  ctx.fill();
+  // Thatch highlights
+  ctx.strokeStyle = '#d4a840';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 4; i++) {
+    const oy = 4 + i * 4;
+    const rx = 12 - oy * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(s.x - rx, s.y - 22 - oy + 4);
+    ctx.lineTo(s.x + rx, s.y - 22 - oy + 4);
+    ctx.stroke();
+  }
+
+  // Fishing pole — tall bamboo pole to the right
+  ctx.strokeStyle = '#8b7040';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 10, s.y - 4);
+  ctx.lineTo(s.x + 12, s.y - 30);
+  ctx.stroke();
+  // Fishing line
+  ctx.strokeStyle = '#c8c8b8';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 12, s.y - 30);
+  ctx.lineTo(s.x + 18, s.y - 6);
+  ctx.stroke();
+  // Bobber
+  ctx.fillStyle = '#e84040';
+  ctx.beginPath();
+  ctx.arc(s.x + 18, s.y - 6, 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#f0f0f0';
+  ctx.beginPath();
+  ctx.arc(s.x + 18, s.y - 7, 2, Math.PI, Math.PI * 2);
+  ctx.fill();
+
+  // Hanging net on left side of hut
+  ctx.strokeStyle = '#c8a868';
+  ctx.lineWidth = 0.7;
+  // Vertical net strings
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.moveTo(s.x - 14 + i * 2, s.y - 20);
+    ctx.lineTo(s.x - 14 + i * 2, s.y - 10);
+    ctx.stroke();
+  }
+  // Horizontal net strings
+  for (let j = 0; j < 3; j++) {
+    ctx.beginPath();
+    ctx.moveTo(s.x - 14, s.y - 20 + j * 4);
+    ctx.lineTo(s.x - 8, s.y - 20 + j * 4);
+    ctx.stroke();
+  }
+
+  // Small boat moored to the left
+  ctx.fillStyle = '#7a5030';
+  ctx.beginPath();
+  ctx.ellipse(s.x - 16, s.y + 2, 6, 2.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#9a6840';
+  ctx.fillRect(s.x - 21, s.y + 0, 10, 2);
+  // Mooring rope
+  ctx.strokeStyle = '#a08060';
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 11, s.y + 1);
+  ctx.lineTo(s.x - 11, s.y - 3);
+  ctx.stroke();
+
+  // Fish bucket on dock
+  ctx.fillStyle = '#888880';
+  ctx.fillRect(s.x - 1, s.y - 8, 5, 4);
+  ctx.fillStyle = '#aaaaaa';
+  ctx.fillRect(s.x - 1, s.y - 9, 5, 1);
+  // Fish in bucket (small orange dot)
+  ctx.fillStyle = '#f07040';
+  ctx.beginPath();
+  ctx.arc(s.x + 1.5, s.y - 6, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Door
+  ctx.fillStyle = '#4a2e10';
+  ctx.fillRect(s.x - 3, s.y - 14, 6, 8);
+  ctx.fillStyle = '#7a5030';
+  ctx.fillRect(s.x - 2.5, s.y - 13.5, 2.5, 7);
 }
 
 function drawGeneric(ctx, s, def) {
