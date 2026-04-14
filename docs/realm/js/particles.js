@@ -70,6 +70,26 @@ export function updateSmokeEmitters() {
     if (b.type === 'house' || b.type === 'tavern' || b.type === 'lumber') {
       if (G.particles.length < 200) spawnSmoke(b.x, b.y);
     }
+    if (b.type === 'blacksmith' && b.workers && b.workers.length > 0) {
+      if (G.particles.length < 250) {
+        // Dark forge smoke
+        spawnSmoke(b.x, b.y);
+        // Orange sparks
+        G.particles.push({
+          tx: b.x + (Math.random() - 0.5) * 0.15,
+          ty: b.y + (Math.random() - 0.5) * 0.15,
+          offsetY: -32 - Math.random() * 8,
+          text: null,
+          alpha: 0.9 + Math.random() * 0.1,
+          vy: -0.25 - Math.random() * 0.2,
+          vx: (Math.random() - 0.5) * 0.3,
+          decay: 0.03 + Math.random() * 0.02,
+          type: 'spark',
+          size: 1 + Math.random() * 1.5,
+          color: Math.random() < 0.5 ? '#ff8c00' : '#ffcc00',
+        });
+      }
+    }
   }
   // Snowflakes in winter
   if (G.season === 'winter' && G.gameTick % 4 === 0 && G.particles.length < 250) {

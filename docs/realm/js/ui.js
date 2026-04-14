@@ -103,7 +103,7 @@ const CATEGORIES = [
   { name: 'Housing',        keys: ['house'] },
   { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine', 'windmill', 'bakery', 'chickencoop', 'cowpen', 'fisherman'] },
   { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
-  { name: 'Defense',        keys: ['barracks', 'tower', 'wall'] },
+  { name: 'Defense',        keys: ['barracks', 'tower', 'wall', 'blacksmith'] },
   { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },
   { name: 'Culture',        keys: ['tavern', 'church'] },
   { name: 'Victory',        keys: ['castle'] },

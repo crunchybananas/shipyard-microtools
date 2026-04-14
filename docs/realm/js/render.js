@@ -937,6 +937,34 @@ export function render() {
     ctx.beginPath();
     ctx.ellipse(ss.x, ss.y - 16, 1.5, 2, 0, 0, Math.PI*2);
     ctx.fill();
+    // HP bar when damaged
+    if (s.hp < s.maxHp) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(ss.x - 5, ss.y - 20, 10, 2);
+      ctx.fillStyle = '#4ade80';
+      ctx.fillRect(ss.x - 5, ss.y - 20, 10 * (s.hp / s.maxHp), 2);
+    }
+  }
+
+  // ── Rally point flag ──────────────────────────────────────
+  if (G.rallyPoint) {
+    const rs = toScreen(G.rallyPoint.x, G.rallyPoint.y);
+    ctx.globalAlpha = 0.9;
+    // Flag pole
+    ctx.strokeStyle = '#5a3a1a';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(rs.x, rs.y);
+    ctx.lineTo(rs.x, rs.y - 14);
+    ctx.stroke();
+    // Flag
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.moveTo(rs.x, rs.y - 14);
+    ctx.lineTo(rs.x + 8, rs.y - 11);
+    ctx.lineTo(rs.x, rs.y - 8);
+    ctx.closePath();
+    ctx.fill();
   }
 
   // ── Citizen hover tooltip ──────────────────────────────────
@@ -1155,6 +1183,13 @@ export function render() {
       ctx.lineTo(p.size, 0);
       ctx.stroke();
       ctx.restore();
+    } else if (p.type === 'spark') {
+      const sz = p.size || 1.5;
+      const drift = (p.vx || 0) * (G.gameTick % 60) * 0.08;
+      ctx.fillStyle = p.color || '#ff8c00';
+      ctx.beginPath();
+      ctx.arc(s.x + drift, s.y + p.offsetY, sz, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 11px -apple-system,sans-serif';
@@ -1400,6 +1435,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'chickencoop': drawChickenCoop(ctx, s); break;
     case 'cowpen': drawCowPen(ctx, s); break;
     case 'fisherman': drawFisherman(ctx, s); break;
+    case 'blacksmith': drawBlacksmith(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
   }
   ctx.restore(); // undo the 1.3x scale
@@ -3435,6 +3471,131 @@ function drawFisherman(ctx, s) {
   ctx.fillRect(s.x - 3, s.y - 14, 6, 8);
   ctx.fillStyle = '#7a5030';
   ctx.fillRect(s.x - 2.5, s.y - 13.5, 2.5, 7);
+}
+
+function drawBlacksmith(ctx, s) {
+  // --- Isometric side face (right) — dark stone ---
+  const sideGrad = ctx.createLinearGradient(s.x + 11, s.y - 22, s.x + 11, s.y - 2);
+  sideGrad.addColorStop(0, '#4a3830');
+  sideGrad.addColorStop(1, '#2e2420');
+  ctx.fillStyle = sideGrad;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 11, s.y - 22); ctx.lineTo(s.x + 16, s.y - 18);
+  ctx.lineTo(s.x + 16, s.y - 2); ctx.lineTo(s.x + 11, s.y - 6);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- Main front wall — dark stone gradient ---
+  const wallGrad = ctx.createLinearGradient(s.x, s.y - 26, s.x, s.y - 4);
+  wallGrad.addColorStop(0, '#6a5a50');
+  wallGrad.addColorStop(1, '#3e2e28');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(s.x - 12, s.y - 24, 23, 20);
+  // Top edge highlight
+  ctx.strokeStyle = 'rgba(255,220,150,0.15)';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath(); ctx.moveTo(s.x - 12, s.y - 24); ctx.lineTo(s.x + 11, s.y - 24); ctx.stroke();
+
+  // --- Stone block texture ---
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+  ctx.lineWidth = 0.7;
+  for (let py = s.y - 21; py < s.y - 4; py += 4) {
+    ctx.beginPath(); ctx.moveTo(s.x - 12, py); ctx.lineTo(s.x + 11, py); ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 0.5;
+  for (let py = s.y - 21; py < s.y - 4; py += 8) {
+    ctx.beginPath(); ctx.moveTo(s.x - 6, py); ctx.lineTo(s.x - 6, py + 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x + 2, py); ctx.lineTo(s.x + 2, py + 4); ctx.stroke();
+  }
+
+  // --- Flat roof parapet ---
+  ctx.fillStyle = '#5a4a42';
+  ctx.fillRect(s.x - 14, s.y - 27, 27, 4);
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(s.x - 14, s.y - 27); ctx.lineTo(s.x + 13, s.y - 27); ctx.stroke();
+
+  // --- Forge window — warm orange glow ---
+  const forgeGlow = ctx.createRadialGradient(s.x - 4, s.y - 14, 1, s.x - 4, s.y - 14, 6);
+  forgeGlow.addColorStop(0, 'rgba(255,180,40,0.9)');
+  forgeGlow.addColorStop(0.5, 'rgba(255,100,10,0.5)');
+  forgeGlow.addColorStop(1, 'rgba(180,40,0,0)');
+  ctx.fillStyle = forgeGlow;
+  ctx.beginPath();
+  ctx.arc(s.x - 4, s.y - 14, 6, 0, Math.PI * 2);
+  ctx.fill();
+  // Window opening (dark arch)
+  ctx.fillStyle = '#1a1008';
+  ctx.beginPath();
+  ctx.arc(s.x - 4, s.y - 15, 3, Math.PI, 0);
+  ctx.lineTo(s.x - 1, s.y - 12); ctx.lineTo(s.x - 7, s.y - 12);
+  ctx.closePath();
+  ctx.fill();
+  // Bright core of fire inside window
+  ctx.fillStyle = 'rgba(255,220,80,0.7)';
+  ctx.beginPath();
+  ctx.arc(s.x - 4, s.y - 15, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // --- Heavy chimney (right side of roof) ---
+  ctx.fillStyle = '#4a3830';
+  ctx.fillRect(s.x + 4, s.y - 38, 6, 14);
+  // Chimney cap
+  ctx.fillStyle = '#3a2820';
+  ctx.fillRect(s.x + 3, s.y - 39, 8, 2);
+  // Stone texture on chimney
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 0.5;
+  for (let cy = s.y - 35; cy < s.y - 26; cy += 3) {
+    ctx.beginPath(); ctx.moveTo(s.x + 4, cy); ctx.lineTo(s.x + 10, cy); ctx.stroke();
+  }
+
+  // --- Door — heavy iron-banded wood ---
+  ctx.fillStyle = '#1e1410';
+  ctx.fillRect(s.x - 2, s.y - 13, 7, 9);
+  ctx.fillStyle = '#5a3818';
+  ctx.fillRect(s.x - 1, s.y - 12, 3, 8);
+  ctx.fillStyle = '#4a2e12';
+  ctx.fillRect(s.x + 2, s.y - 12, 3, 8);
+  // Iron bands
+  ctx.fillStyle = '#333';
+  ctx.fillRect(s.x - 1, s.y - 10, 6, 1);
+  ctx.fillRect(s.x - 1, s.y - 7, 6, 1);
+
+  // --- Anvil silhouette (front prop, lower centre) ---
+  // Anvil base
+  ctx.fillStyle = '#2a2a2e';
+  ctx.fillRect(s.x - 9, s.y - 6, 8, 3);
+  // Anvil body
+  ctx.fillStyle = '#3a3a40';
+  ctx.fillRect(s.x - 8, s.y - 10, 6, 4);
+  // Anvil horn (right taper)
+  ctx.beginPath();
+  ctx.moveTo(s.x - 2, s.y - 9); ctx.lineTo(s.x + 1, s.y - 7); ctx.lineTo(s.x - 2, s.y - 6);
+  ctx.closePath();
+  ctx.fill();
+  // Anvil sheen
+  ctx.fillStyle = 'rgba(180,180,200,0.3)';
+  ctx.fillRect(s.x - 8, s.y - 10, 6, 1);
+
+  // --- Hammer propped against wall ---
+  ctx.strokeStyle = '#7a5a30'; ctx.lineWidth = 1.8;
+  ctx.beginPath(); ctx.moveTo(s.x + 11, s.y - 4); ctx.lineTo(s.x + 13, s.y - 15); ctx.stroke();
+  // Hammer head
+  ctx.fillStyle = '#5a5a68';
+  ctx.fillRect(s.x + 10, s.y - 18, 6, 4);
+  ctx.fillStyle = 'rgba(200,200,220,0.3)';
+  ctx.fillRect(s.x + 10, s.y - 18, 6, 1);
+
+  // --- Warm forge glow ambient (subtle orange on ground) ---
+  const ambientGlow = ctx.createRadialGradient(s.x - 4, s.y - 10, 2, s.x - 4, s.y - 10, 14);
+  ambientGlow.addColorStop(0, 'rgba(255,120,20,0.12)');
+  ambientGlow.addColorStop(1, 'rgba(255,80,0,0)');
+  ctx.fillStyle = ambientGlow;
+  ctx.beginPath();
+  ctx.arc(s.x - 4, s.y - 10, 14, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawGeneric(ctx, s, def) {

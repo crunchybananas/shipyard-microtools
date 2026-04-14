@@ -111,6 +111,24 @@ export function setupInput(canvas) {
     if (e.target !== C) return;
     initAudio();
 
+    // Shift + right-click sets rally point for all soldiers
+    if (e.button === 2 && e.shiftKey) {
+      e.preventDefault();
+      const t = screenToWorld(e.clientX, e.clientY);
+      G.rallyPoint = { x: t.x, y: t.y };
+      // Redirect all soldiers
+      for (const s of G.soldiers) {
+        s.tx = t.x + Math.random() * 2 - 1;
+        s.ty = t.y + Math.random() * 2 - 1;
+      }
+      // Visual feedback particle
+      G.particles.push({
+        tx: t.x, ty: t.y, offsetY: -10,
+        text: '🚩 Rally', alpha: 1.5, vy: -0.15, decay: 0.01, type: 'text',
+      });
+      return;
+    }
+
     // Right-click demolish
     if (e.button === 2) {
       e.preventDefault();

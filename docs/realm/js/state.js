@@ -59,6 +59,7 @@ export const BUILDINGS = {
   chickencoop: { name:'Chicken Coop', icon:'🐔', cost:{wood:15}, prod:{food:1}, workers:1, desc:'Small chicken coop producing eggs and meat' },
   cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
   fisherman: { name:"Fisherman's Hut", icon:'🎣', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
+  blacksmith: { name:'Blacksmith', icon:'🔨', cost:{wood:20,stone:15}, workers:1, desc:'Forges weapons. Boosts soldier damage by 50%.', boost:{type:'soldier',radius:8,multiplier:1.5} },
 };
 
 // ── Mutable game state (single source of truth) ───────────
@@ -100,6 +101,7 @@ export const G = {
   activeEvent: null,
   eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1 },
   season: 'spring',
+  rallyPoint: null,
   won: false,
   difficulty: 'normal', // easy, normal, hard
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },

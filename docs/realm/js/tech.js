@@ -105,6 +105,15 @@ export const TECHS = {
     icon: '🐄',
     prereq: 'agriculture',
   },
+  smithing: {
+    name: 'Smithing',
+    desc: 'Unlocks blacksmith for better weapons',
+    cost: { gold: 25, iron: 5 },
+    time: 400,
+    unlocks: ['blacksmith'],
+    icon: '🔨',
+    prereq: 'metallurgy',
+  },
 };
 
 // Which building types require NO tech (always available)
