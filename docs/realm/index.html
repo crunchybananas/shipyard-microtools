@@ -228,6 +228,16 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .pop-hunger{height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
 .pop-hunger-bar{height:100%;border-radius:3px;transition:width 0.3s}
 
+/* Scenario victory screen */
+#scenario-victory{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:200;backdrop-filter:blur(8px)}
+.sv-card{text-align:center;max-width:400px;padding:2.5rem 2rem;background:linear-gradient(180deg,rgba(25,25,50,0.95),rgba(15,15,30,0.98));border:2px solid var(--gold);border-radius:16px;box-shadow:0 0 80px rgba(255,209,102,0.2),0 20px 60px rgba(0,0,0,0.6)}
+.sv-icon{font-size:3rem;margin-bottom:0.5rem}
+.sv-title{font-size:1.8rem;color:var(--gold);margin-bottom:0.4rem;font-weight:700}
+.sv-name{font-size:1.1rem;color:var(--text);margin-bottom:1rem}
+.sv-stats{text-align:left;padding:0.8rem;background:rgba(0,0,0,0.3);border-radius:8px;margin-bottom:1rem;font-size:0.85rem}
+.sv-btn{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:0.6rem 1.5rem;border-radius:8px;margin:0 0.3rem;cursor:pointer;font-family:inherit;font-weight:600}
+.sv-btn:hover{background:rgba(255,209,102,0.1)}
+
 /* Victory screen */
 #victory-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.88);z-index:200;backdrop-filter:blur(10px);animation:vicFadeIn 1.2s ease}
 #vic-confetti{position:absolute;inset:0;pointer-events:none;z-index:201}
@@ -519,6 +529,19 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <div id="trade-panel" style="display:none">
   <div class="stats-header"><h3>🛒 Trade Partners</h3><button class="rp-close" onclick="toggleTrade()">✕</button></div>
   <div id="trade-content"></div>
+</div>
+
+<div id="scenario-victory" style="display:none">
+  <div class="sv-card">
+    <div class="sv-icon">🏆</div>
+    <div class="sv-title">Scenario Complete!</div>
+    <div class="sv-name" id="sv-name"></div>
+    <div class="sv-stats" id="sv-stats"></div>
+    <div class="sv-buttons">
+      <button class="sv-btn" onclick="continuePlayingScenario()">Continue Playing</button>
+      <button class="sv-btn" onclick="returnToTitle()">Return to Title</button>
+    </div>
+  </div>
 </div>
 
 <div id="victory-screen" style="display:none">

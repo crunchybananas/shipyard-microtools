@@ -107,6 +107,14 @@ A medieval settlement-builder-meets-light-RTS where the player grows an island k
 ## Known bugs to fix
 (none currently — citizen auto-assign to barracks verified working)
 
+## Verified iter 45 state (browser test)
+- Archery Range builds + trains 3 archers
+- Barracks trains 4 swordsmen
+- Both unit types kill enemies successfully
+- Archery Range sprite renders with target + arrow
+- Scenario progress "0/3" indicator shows correctly
+- All 5 scenarios available on title screen
+
 ## Verified iter 30 state (browser test)
 - Title screen scenario selector works (Peaceful/Military/Merchant)
 - Scenario starts with correct resources + raid timing

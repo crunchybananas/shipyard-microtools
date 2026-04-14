@@ -98,9 +98,11 @@ export const G = {
   researchedTechs: new Set(['agriculture', 'forestry']),
   currentResearch: null,
   caravans: [],
+  walkers: [],
   raidFlash: 0,
   activeEvent: null,
   eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1 },
+  weather: 'clear',
   season: 'spring',
   rallyPoint: null,
   won: false,
@@ -119,6 +121,7 @@ export const G = {
     enemiesKilled: 0,
     goldEarned: 0,
     daysLived: 0,
+    scenariosWon: [],
   },
 };
 

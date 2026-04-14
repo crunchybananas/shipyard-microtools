@@ -22,6 +22,7 @@ import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
+import { updateWalkers } from './walkers.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -45,6 +46,19 @@ if (hasSaveData) {
     loadBtn.style.display = 'inline-block';
   }
 }
+
+// Mark completed scenarios on title screen
+try {
+  const save = JSON.parse(localStorage.getItem('realm-save-v2') || '{}');
+  const won = save.G?._scenariosCompleted || [];
+  document.querySelectorAll('.scen-btn').forEach(b => {
+    const onclick = b.getAttribute('onclick') || '';
+    const match = onclick.match(/setScenario\(['"]([^'"]+)['"]\)/);
+    if (match && won.includes(match[1])) {
+      b.innerHTML = '✓ ' + b.innerHTML;
+    }
+  });
+} catch (_e) {}
 
 function beginGame() {
   const titleEl = document.getElementById('title-screen');
@@ -125,7 +139,7 @@ window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   if (!confirm('Start a new game? Current unsaved progress will be lost.')) return;
   // Reset all state
-  G.buildings = []; G.citizens = []; G.caravans = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = [];
+  G.buildings = []; G.citizens = []; G.caravans = []; G.walkers = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = [];
   G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
   G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
   G.day = 1; G.dayPhase = 0; G.gameTick = 0; G.speed = 1;
@@ -225,6 +239,7 @@ function simTick() {
     updateEnemies();
     updateTowers();
     updateProjectiles();
+    updateWalkers();
     updateProduction();
     updateFires();
     updateParticles();
@@ -245,11 +260,9 @@ function simTick() {
   if (G.gameTick % 120 === 0 && !G._scenarioWon) {
     if (checkScenarioComplete()) {
       G._scenarioWon = true;
-      const scen = getActiveScenario();
-      notify(`🎉 Scenario Complete: ${scen.name}!`, 'mission');
       G._scenariosCompleted = G._scenariosCompleted || [];
       if (!G._scenariosCompleted.includes(G.scenario)) G._scenariosCompleted.push(G.scenario);
-      playSound('mission');
+      if (G.stats && !G.stats.scenariosWon.includes(G.scenario)) G.stats.scenariosWon.push(G.scenario);
       // Victory particles
       for (let i = 0; i < 30; i++) {
         G.particles.push({
@@ -260,6 +273,7 @@ function simTick() {
           alpha: 2, vy: -0.15, decay: 0.005, type: 'text',
         });
       }
+      showScenarioVictory();
     }
   }
   if (G.gameTick % 3600 === 0 && G.gameTick > 0) saveGame({ silent: true });
@@ -283,6 +297,31 @@ function gameLoop() {
     setTimeout(gameLoop, 100); // retry after error
   }
 }
+
+// ── Scenario victory ───────────────────────────────────────
+function showScenarioVictory() {
+  const scen = getActiveScenario();
+  const el = document.getElementById('scenario-victory');
+  const nameEl = document.getElementById('sv-name');
+  const statsEl = document.getElementById('sv-stats');
+  if (!el || !nameEl || !statsEl) return;
+  nameEl.textContent = scen.name;
+  statsEl.innerHTML = `
+    <div>Days lived: <strong>${G.stats?.daysLived || G.day}</strong></div>
+    <div>Population: <strong>${G.population}</strong></div>
+    <div>Buildings: <strong>${G.buildings.length}</strong></div>
+    <div>Raids survived: <strong>${G.stats?.raidsSurvived || 0}</strong></div>
+    <div>Gold earned: <strong>${G.stats?.goldEarned || 0}</strong></div>
+  `;
+  el.style.display = 'flex';
+  playSound('mission');
+}
+window.continuePlayingScenario = () => {
+  document.getElementById('scenario-victory').style.display = 'none';
+};
+window.returnToTitle = () => {
+  location.reload();
+};
 
 // Game loop starts when player clicks New Game or Continue from the title screen.
 

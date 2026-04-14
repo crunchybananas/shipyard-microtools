@@ -111,7 +111,8 @@ export function updateUI() {
     const urgent = raidDays <= 2;
     raidWarn = ` · <span class="${urgent ? 'raid-warn-urgent' : 'raid-warn'}">⚔️${raidDays}d</span>`;
   }
-  $('day-display').innerHTML = `Day ${G.day} · ${season.name} · ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
+  const weatherEmoji = G.weather === 'rain' ? ' 🌧️' : G.weather === 'snow' ? ' ❄️' : '';
+  $('day-display').innerHTML = `Day ${G.day} · ${season.name}${weatherEmoji} · ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
 }
 
 const CATEGORIES = [

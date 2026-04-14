@@ -906,6 +906,33 @@ export function render() {
     }
   }
 
+  // ── Service walkers ───────────────────────────────────────
+  for (const w of G.walkers) {
+    const ws = toScreen(w.x, w.y);
+    ctx.globalAlpha = daylight;
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(ws.x, ws.y + 2, 3, 1.5, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Colored robe body
+    ctx.fillStyle = w.color;
+    ctx.beginPath();
+    ctx.ellipse(ws.x, ws.y - 6, 4, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Head
+    ctx.fillStyle = '#ffe0c0';
+    ctx.beginPath();
+    ctx.arc(ws.x, ws.y - 13, 3.5, 0, Math.PI*2);
+    ctx.fill();
+    // Small emoji on chest
+    if (G.camera.zoom >= 1.2) {
+      ctx.font = '6px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(w.emoji, ws.x, ws.y - 5);
+    }
+  }
+
   // ── Selected citizen path visualization ──────────────────
   if (G.selectedCitizen && G.selectedCitizen.path && G.selectedCitizen.pathIdx < G.selectedCitizen.path.length) {
     const c = G.selectedCitizen;
@@ -1347,6 +1374,23 @@ export function render() {
 
   ctx.globalAlpha = 1;
   ctx.restore();
+
+  // ── Rain overlay (screen space) ───────────────────────────────
+  if (G.weather === 'rain' && G.camera.zoom >= 0.6) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = '#8ab4e0';
+    ctx.lineWidth = 0.6;
+    for (let i = 0; i < 80; i++) {
+      const rx = (i * 37 + G.gameTick * 8) % (logicalW + 100) - 50;
+      const ry = (i * 53 + G.gameTick * 12) % (logicalH + 100) - 50;
+      ctx.beginPath();
+      ctx.moveTo(rx, ry);
+      ctx.lineTo(rx - 2, ry + 6);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
 
   // ── Raid flash overlay (screen space) ────────────────────────
   if (G.raidFlash > 0) {
