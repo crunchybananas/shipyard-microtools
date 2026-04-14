@@ -173,6 +173,42 @@ export const EVENT_DEFS = [
     onEnd() {},
     endMsg: '',
   },
+  {
+    id: 'fire',
+    name: '🔥 Fire!',
+    desc: 'A building catches fire! Act fast or it will burn down.',
+    duration: 0,
+    color: '#f97316',
+    positive: false,
+    onStart() {
+      const flammable = G.buildings.filter(b => ['house','tavern','bakery','lumber','windmill'].includes(b.type));
+      if (flammable.length === 0) return;
+      const b = flammable[Math.floor(Math.random() * flammable.length)];
+      b.onFire = true;
+      b._fireTimer = 0;
+    },
+    onEnd() {},
+    endMsg: '',
+  },
+  {
+    id: 'plague',
+    name: '☠️ Plague!',
+    desc: 'A plague sweeps through the settlement! −1–2 citizens, movement slowed for 3 days.',
+    duration: 3,
+    color: '#a855f7',
+    positive: false,
+    onStart() {
+      const losses = Math.min(2, G.citizens.length);
+      for (let i = 0; i < losses; i++) {
+        const c = G.citizens.pop();
+        if (c && c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+      }
+      G.population = Math.max(0, G.population - losses);
+      G.eventModifiers.speedMult = 0.7;
+    },
+    onEnd() { G.eventModifiers.speedMult = 1; },
+    endMsg: '☠️ The plague subsides. Citizens recover.',
+  },
 ];
 
 function showToast(msg, danger = false) {

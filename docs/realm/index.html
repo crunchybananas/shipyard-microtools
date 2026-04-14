@@ -65,6 +65,8 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .raid-warn{color:var(--danger);font-weight:600}
 .raid-warn-urgent{color:var(--danger);font-weight:700;animation:raidPulse 0.7s ease-in-out infinite}
 @keyframes raidPulse{0%,100%{opacity:1;text-shadow:0 0 6px rgba(248,113,113,0.8)}50%{opacity:0.5;text-shadow:none}}
+.threat-display{color:var(--danger);animation:threatPulse 1s ease infinite}
+@keyframes threatPulse{0%,100%{opacity:1}50%{opacity:0.6}}
 
 /* Build bar */
 #build-bar{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:stretch;justify-content:flex-start;gap:0.4rem;padding:0.5rem 0.8rem;background:var(--panel);border-top:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent}
@@ -321,6 +323,16 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .stat-row span:first-child{color:rgba(255,255,255,0.7)}
 .stat-row span:last-child{font-weight:700;font-variant-numeric:tabular-nums;color:var(--gold)}
 
+/* Trade panel */
+#trade-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(360px,90vw);background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden}
+#trade-content{padding:0.7rem 0.9rem;display:flex;flex-direction:column;gap:0.55rem}
+.trade-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:0.65rem 0.8rem;display:flex;align-items:center;gap:0.6rem;justify-content:space-between}
+.trade-name{font-size:0.88rem;font-weight:700;color:var(--gold);min-width:100px}
+.trade-offer{font-size:0.78rem;color:rgba(255,255,255,0.65);flex:1}
+.trade-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0.3rem 0.75rem;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;white-space:nowrap}
+.trade-btn:hover{background:#6366f1}
+.trade-empty{padding:1rem;text-align:center;color:rgba(255,255,255,0.45);font-size:0.82rem}
+
 /* Research panel */
 #research-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(600px,94vw);max-height:88vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column}
 .rp-header{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;border-bottom:1px solid var(--border)}
@@ -424,6 +436,8 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <div class="res"><span class="res-emoji">🪙</span><span class="val" id="r-gold">10</span></div>
   <div class="res"><span class="res-emoji">⚙️</span><span class="val" id="r-iron">0</span></div>
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
+  <div class="res"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
+  <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
   <span id="day-display">Day 1</span>
   <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>
@@ -431,6 +445,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <button class="hud-btn" onclick="toggleAchievements()">🏆</button>
   <button class="hud-btn" onclick="toggleStats()">📊</button>
   <button class="hud-btn" onclick="toggleLog()">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
+  <button class="hud-btn" onclick="toggleTrade()">🛒</button>
 </div>
 
 <div id="tutorial-tip" style="display:none"></div>
@@ -494,6 +509,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <div id="pop-panel" style="display:none">
   <div class="rp-header"><h3>👤 Citizens</h3><button class="rp-close" onclick="togglePopPanel()">✕</button></div>
   <div id="pop-content" class="research-content"></div>
+</div>
+
+<div id="trade-panel" style="display:none">
+  <div class="stats-header"><h3>🛒 Trade Partners</h3><button class="rp-close" onclick="toggleTrade()">✕</button></div>
+  <div id="trade-content"></div>
 </div>
 
 <div id="victory-screen" style="display:none">

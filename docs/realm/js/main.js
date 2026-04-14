@@ -8,16 +8,17 @@ import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
-import { updateProduction, checkRaids, collectTaxes } from './economy.js';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel } from './ui.js';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel } from './ui.js';
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame, getSaveSize } from './save.js';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
+import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 import { getActiveScenario } from './scenarios.js';
@@ -143,6 +144,18 @@ window.newGame = () => {
 };
 window.togglePopPanel = togglePopPanel;
 window.toggleStats = toggleStatsPanel;
+window.toggleTrade = toggleTradePanel;
+window.doTrade = (partnerId, resource, amount) => {
+  const r = executeTrade(partnerId, resource, amount);
+  if (r) {
+    const emojis = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+    notify(`Traded ${r.given} ${emojis[resource] || resource} for ${r.received} ${emojis[r.export] || r.export}`, 'event');
+    renderTradePanel();
+    updateUI();
+  } else {
+    notify('Not enough resources for this trade', 'danger');
+  }
+};
 window.toggleAchievements = () => {
   const p = document.getElementById('achievements-panel');
   if (!p) return;
@@ -212,6 +225,7 @@ function simTick() {
     updateTowers();
     updateProjectiles();
     updateProduction();
+    updateFires();
     updateParticles();
     updateSmokeEmitters();
     updateResearch();

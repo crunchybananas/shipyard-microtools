@@ -7,6 +7,7 @@ import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js';
 import { saveGame, loadGame, hasSave } from './save.js';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
 import { notify } from './notifications.js';
+import { TRADE_PARTNERS, executeTrade } from './trade.js';
 
 function _triggerFoodWarning() {
   notify('⚠️ Food running low! Build more farms!', 'danger');
@@ -88,6 +89,15 @@ export function updateUI() {
     }
   }
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
+  const soldierEl = $('soldier-count');
+  if (soldierEl) soldierEl.textContent = (G.soldiers || []).length;
+  const threatEl = $('threat-display');
+  const enemyEl = $('enemy-count');
+  if (threatEl && enemyEl) {
+    const enemies = (G.enemies || []).length;
+    threatEl.style.display = enemies > 0 ? 'flex' : 'none';
+    enemyEl.textContent = enemies;
+  }
   const season = getSeasonData();
   const diffLabel = DIFFICULTY[G.difficulty]?.label?.split(' ')[0] || '';
   const raidDays = getRaidCountdown();
@@ -894,4 +904,35 @@ export function toggleStatsPanel() {
   const open = p.style.display !== 'none';
   p.style.display = open ? 'none' : 'block';
   if (!open) renderStatsPanel();
+}
+
+// ── Trade panel ───────────────────────────────────────────
+export function renderTradePanel() {
+  const c = document.getElementById('trade-content');
+  if (!c) return;
+  c.innerHTML = '';
+  const hasTP = G.buildings.some(b => b.type === 'tradingpost');
+  if (!hasTP) {
+    c.innerHTML = '<div class="trade-empty">Build a Trading Post to unlock trade partners.</div>';
+    return;
+  }
+  const emojis = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+  for (const p of TRADE_PARTNERS) {
+    const card = document.createElement('div');
+    card.className = 'trade-card';
+    card.innerHTML = `
+      <div class="trade-name">${p.name}</div>
+      <div class="trade-offer">Give 10 ${emojis[p.import]} → Get ${Math.round(10 * p.rate)} ${emojis[p.export]}</div>
+      <button class="trade-btn" onclick="doTrade('${p.id}','${p.import}',10)">Trade</button>
+    `;
+    c.appendChild(card);
+  }
+}
+
+export function toggleTradePanel() {
+  const p = document.getElementById('trade-panel');
+  if (!p) return;
+  const open = p.style.display !== 'none';
+  p.style.display = open ? 'none' : 'block';
+  if (!open) renderTradePanel();
 }

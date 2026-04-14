@@ -1233,13 +1233,18 @@ export function render() {
       ctx.arc(s.x + drift, s.y + p.offsetY, sz, 0, Math.PI * 2);
       ctx.fill();
     } else {
+      const scale = 1 + (1 - (p.alpha / 1.5)) * 0.3;
+      ctx.save();
+      ctx.translate(psx, psy - 20);
+      ctx.scale(scale, scale);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 11px -apple-system,sans-serif';
       ctx.textAlign = 'center';
       ctx.shadowColor = 'rgba(0,0,0,0.5)';
       ctx.shadowBlur = 3;
-      ctx.fillText(p.text, s.x, s.y + p.offsetY - 20);
+      ctx.fillText(p.text, 0, 0);
       ctx.shadowBlur = 0;
+      ctx.restore();
     }
   }
 
@@ -1567,6 +1572,14 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.fillRect(s.x-12, s.y-34, 24, 3);
     ctx.fillStyle = b.hp > 50 ? '#4ade80' : '#f87171';
     ctx.fillRect(s.x-12, s.y-34, 24*(b.hp/100), 3);
+  }
+
+  // Fire overlay
+  if (b.onFire) {
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = `rgba(255,${100 + Math.sin(G.gameTick * 0.2) * 50},0,0.3)`;
+    ctx.fillRect(s.x - 15, s.y - 25, 30, 35);
+    ctx.globalAlpha = daylight;
   }
 }
 

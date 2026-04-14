@@ -2,7 +2,7 @@
 // Missions — goals and progression
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js';
+import { G, MAP_W, MAP_H } from './state.js';
 import { playSound } from './audio.js';
 import { getActiveScenario } from './scenarios.js';
 
@@ -42,6 +42,11 @@ export function checkMissions() {
         for (const [k,v] of Object.entries(m.reward)) {
           G.resources[k] = (G.resources[k]||0) + v;
         }
+        const parts = Object.entries(m.reward).map(([k,v]) => `+${v} ${k}`).join(' ');
+        G.particles.push({
+          tx: MAP_W/2, ty: MAP_H/2, offsetY: -30,
+          text: parts, alpha: 2, vy: -0.2, decay: 0.008, type: 'text',
+        });
       }
       playSound('mission');
       showToast(`✨ Mission complete: ${m.text}`);

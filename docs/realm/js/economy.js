@@ -527,6 +527,51 @@ function spawnVictoryConfetti() {
   drawConfetti();
 }
 
+export function updateFires() {
+  for (const b of [...G.buildings]) {
+    if (!b.onFire) continue;
+    b._fireTimer = (b._fireTimer || 0) + G.speed;
+    b.hp -= 0.5 * G.speed;
+    // Spawn fire particles every 4 ticks
+    if (G.gameTick % 4 === 0) {
+      G.particles.push({
+        tx: b.x + (Math.random()-0.5)*0.5, ty: b.y + (Math.random()-0.5)*0.5,
+        offsetY: -20 - Math.random()*10,
+        text: '🔥', alpha: 1, vy: -0.2, decay: 0.03, type: 'text',
+      });
+    }
+    // Check for wells within radius 4 — auto-douse
+    let doused = false;
+    for (const w of G.buildings) {
+      if (w.type !== 'well') continue;
+      const d = Math.abs(w.x - b.x) + Math.abs(w.y - b.y);
+      if (d <= 4 && Math.random() < 0.02) {
+        b.onFire = false;
+        doused = true;
+        G.particles.push({
+          tx: b.x, ty: b.y, offsetY: -20,
+          text: '💧 Doused!', alpha: 1.5, vy: -0.25, decay: 0.012, type: 'text',
+        });
+        break;
+      }
+    }
+    if (doused) continue;
+    // Burn out over time or randomly
+    if (b._fireTimer > 300 || Math.random() < 0.005) {
+      b.onFire = false;
+      continue;
+    }
+    // Destroy building if HP reaches 0
+    if (b.hp <= 0) {
+      notify(`🔥 ${BUILDINGS[b.type]?.name || b.type} burned down!`, 'danger');
+      G.buildings = G.buildings.filter(x => x !== b);
+      G.buildingGrid[b.y][b.x] = null;
+      if (b.workers) for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
+      G.stats.buildingsLost = (G.stats.buildingsLost || 0) + 1;
+    }
+  }
+}
+
 export function collectTaxes() {
   // Only count housed population (not vagrants)
   const housed = G.buildings.filter(b => b.type === 'house').length * 3;
