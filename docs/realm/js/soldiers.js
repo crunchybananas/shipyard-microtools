@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, MAP_W, MAP_H, rng, rngRange } from './state.js';
+import { playSound } from './audio.js';
 
 function soldierDamage(s) {
   let damage = 5;
@@ -24,7 +25,37 @@ export function updateSoldiers() {
     }
 
     if (nearestEnemy && nearestDist < 12) {
-      // Move toward enemy
+      // Archer AI — ranged unit stays at distance and fires arrows
+      if (s.type === 'archer') {
+        const idealRange = 5;
+        if (nearestDist < idealRange - 1) {
+          // Too close — back up
+          s.x -= (nearestEnemy.x - s.x) * 0.02 * G.speed;
+          s.y -= (nearestEnemy.y - s.y) * 0.02 * G.speed;
+        } else if (nearestDist < idealRange + 2) {
+          // In range — fire arrow
+          s.attackTimer = (s.attackTimer || 0) - G.speed;
+          if (s.attackTimer <= 0) {
+            s.attackTimer = 90;
+            G.projectiles.push({
+              x: s.x, y: s.y,
+              tx: nearestEnemy.x, ty: nearestEnemy.y,
+              target: nearestEnemy,
+              damage: 8, life: 50,
+              type: 'arrow',
+            });
+          }
+        } else {
+          // Close the gap
+          const dx = nearestEnemy.x - s.x, dy = nearestEnemy.y - s.y;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          s.x += (dx/d) * 0.035 * G.speed;
+          s.y += (dy/d) * 0.035 * G.speed;
+        }
+        continue; // skip default melee logic
+      }
+
+      // Melee soldier AI
       const dx = nearestEnemy.x - s.x, dy = nearestEnemy.y - s.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.5) {
@@ -37,6 +68,7 @@ export function updateSoldiers() {
         if (s.attackTimer <= 0) {
           s.attackTimer = 40;
           nearestEnemy.hp -= soldierDamage(s);
+          if (G.gameTick % 20 === 0) playSound('click'); // avoid spam
           // Slash particle
           G.particles.push({
             tx: nearestEnemy.x, ty: nearestEnemy.y, offsetY: -10,

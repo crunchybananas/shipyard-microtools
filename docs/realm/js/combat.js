@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
+import { playSound } from './audio.js';
 
 export function updateEnemies() {
   for (let i = G.enemies.length - 1; i >= 0; i--) {
@@ -47,6 +48,7 @@ export function updateEnemies() {
     if (e.hp <= 0) {
       G.enemies.splice(i, 1);
       if (G.stats) G.stats.enemiesKilled++;
+      playSound('demolish');
       // Death particles
       for (let p = 0; p < 3; p++) {
         G.particles.push({

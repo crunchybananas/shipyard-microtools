@@ -107,6 +107,25 @@ export function trySpawnSettlers(count) {
 
 export function updateProduction() {
   for (const b of G.buildings) {
+    // Archery range: train archers
+    if (b.type === 'archery' && b.workers.length >= 1) {
+      b.trainTimer = (b.trainTimer || 0) + 1;
+      const cap = 3;
+      const current = G.soldiers.filter(s => s.homeBuilding === b).length;
+      if (b.trainTimer >= 800 && current < cap && G.resources.wood >= 2) {
+        b.trainTimer = 0;
+        G.resources.wood -= 2;
+        G.soldiers.push({
+          x: b.x + 0.5, y: b.y + 0.5,
+          tx: b.x, ty: b.y,
+          homeBuilding: b,
+          type: 'archer',
+          hp: 30, maxHp: 30,
+          state: 'patrol', stateTimer: 0, target: null,
+        });
+      }
+    }
+
     // Barracks: train soldiers
     if (b.type === 'barracks' && b.workers.length >= 1) {
       b.trainTimer = (b.trainTimer || 0) + 1;
@@ -297,6 +316,7 @@ export function checkRaids() {
         target.hp -= dmg;
         if (target.hp <= 0) {
           report.push(`💥 ${BUILDINGS[target.type].name} was destroyed!`);
+          G.cameraShake = Math.max(G.cameraShake || 0, 10);
           demolishBuilding(target, true);
         } else {
           report.push(`🔨 ${BUILDINGS[target.type].name} damaged (${target.hp}% HP remaining)`);
@@ -564,6 +584,7 @@ export function updateFires() {
     // Destroy building if HP reaches 0
     if (b.hp <= 0) {
       notify(`🔥 ${BUILDINGS[b.type]?.name || b.type} burned down!`, 'danger');
+      G.cameraShake = Math.max(G.cameraShake || 0, 10);
       G.buildings = G.buildings.filter(x => x !== b);
       G.buildingGrid[b.y][b.x] = null;
       if (b.workers) for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }

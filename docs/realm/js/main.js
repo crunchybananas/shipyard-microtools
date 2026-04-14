@@ -21,7 +21,7 @@ import { toggleNotificationLog, notify } from './notifications.js';
 import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
-import { getActiveScenario } from './scenarios.js';
+import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -100,6 +100,7 @@ window.startNewGame = () => {
     G.resources = { ...scen.startResources };
     G.nextRaidDay = scen.raidStart;
   }
+  G._scenarioWon = false;
   beginGame();
 };
 
@@ -134,7 +135,7 @@ window.newGame = () => {
   G.currentResearch = null;
   G.activeEvent = null;
   G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0, speedMult:1 };
-  G.season = 'spring'; G.won = false;
+  G.season = 'spring'; G.won = false; G._scenarioWon = false;
   G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
   G.lastResources = null;
   G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0 };
@@ -241,6 +242,26 @@ function simTick() {
     updateTutorialTip();
   }
   if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); }
+  if (G.gameTick % 120 === 0 && !G._scenarioWon) {
+    if (checkScenarioComplete()) {
+      G._scenarioWon = true;
+      const scen = getActiveScenario();
+      notify(`🎉 Scenario Complete: ${scen.name}!`, 'mission');
+      G._scenariosCompleted = G._scenariosCompleted || [];
+      if (!G._scenariosCompleted.includes(G.scenario)) G._scenariosCompleted.push(G.scenario);
+      playSound('mission');
+      // Victory particles
+      for (let i = 0; i < 30; i++) {
+        G.particles.push({
+          tx: MAP_W/2 + (Math.random()-0.5)*10,
+          ty: MAP_H/2 + (Math.random()-0.5)*10,
+          offsetY: -20 - Math.random()*40,
+          text: ['🎉','⭐','🏆'][Math.floor(Math.random()*3)],
+          alpha: 2, vy: -0.15, decay: 0.005, type: 'text',
+        });
+      }
+    }
+  }
   if (G.gameTick % 3600 === 0 && G.gameTick > 0) saveGame({ silent: true });
 }
 

@@ -53,6 +53,8 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .res-emoji{font-size:1rem;line-height:1}
 .res .val{font-variant-numeric:tabular-nums}
 #pop-display{color:var(--accent)}
+.pop-full{color:var(--gold);animation:popPulse 1.5s ease infinite}
+@keyframes popPulse{0%,100%{opacity:1}50%{opacity:0.6}}
 .res-warn{animation:resWarn 0.8s ease-in-out infinite}
 .res-warn .val{color:var(--danger)!important}
 @keyframes resWarn{0%,100%{opacity:1}50%{opacity:0.4}}
@@ -99,6 +101,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .scenario-header{padding:0.35rem 0 0.4rem;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:0.3rem}
 .scen-name{font-weight:700;font-size:0.8rem;color:var(--gold);margin-bottom:0.15rem}
 .scen-desc{font-size:0.68rem;color:rgba(255,255,255,0.45);font-style:italic}
+.scen-progress{font-size:0.7rem;color:var(--accent);float:right}
 
 /* Toast — type-aware styles */
 #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.90);color:var(--gold);padding:1rem 2rem;border-radius:10px;font-size:1.1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:2px solid rgba(255,209,102,0.35);box-shadow:0 4px 32px rgba(0,0,0,0.6)}
@@ -410,6 +413,8 @@ canvas#game{display:block;position:absolute;top:0;left:0}
         <button class="scen-btn active" onclick="setScenario('peaceful_start')">🌾 Peaceful</button>
         <button class="scen-btn" onclick="setScenario('military_rise')">⚔️ Military</button>
         <button class="scen-btn" onclick="setScenario('merchant_kingdom')">🪙 Merchant</button>
+        <button class="scen-btn" onclick="setScenario('seafaring')">⛵ Seafaring</button>
+        <button class="scen-btn" onclick="setScenario('industrial')">⚙️ Industrial</button>
       </div>
     </div>
     <div class="title-buttons">

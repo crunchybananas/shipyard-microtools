@@ -85,9 +85,14 @@ export function render() {
   ctx.fillRect(0, 0, logicalW, logicalH);
 
   ctx.save();
-  ctx.translate(logicalW/2, logicalH/2);
+  const shake = G.cameraShake || 0;
+  const shakeX = shake > 0 ? (Math.random() - 0.5) * shake : 0;
+  const shakeY = shake > 0 ? (Math.random() - 0.5) * shake : 0;
+  ctx.translate(logicalW/2 + shakeX, logicalH/2 + shakeY);
   ctx.scale(G.camera.zoom, G.camera.zoom);
   ctx.translate(-G.camera.x, -G.camera.y);
+  // Decay shake
+  if (G.cameraShake > 0) G.cameraShake -= 0.5;
 
   const daylight = getDaylight();
 
@@ -950,28 +955,47 @@ export function render() {
     ctx.beginPath();
     ctx.ellipse(ss.x, ss.y + 2, 4, 2, 0, 0, Math.PI*2);
     ctx.fill();
-    // Body — armored, darker metallic
-    ctx.fillStyle = '#5a6a7a';
-    ctx.beginPath();
-    ctx.ellipse(ss.x, ss.y - 6, 4.5, 5, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Helmet
-    ctx.fillStyle = '#888';
-    ctx.beginPath();
-    ctx.arc(ss.x, ss.y - 13, 4, 0, Math.PI*2);
-    ctx.fill();
-    // Sword on back
-    ctx.strokeStyle = '#aaa';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(ss.x - 3, ss.y - 14);
-    ctx.lineTo(ss.x + 3, ss.y - 8);
-    ctx.stroke();
-    // Plume on helmet
-    ctx.fillStyle = '#c8383f';
-    ctx.beginPath();
-    ctx.ellipse(ss.x, ss.y - 16, 1.5, 2, 0, 0, Math.PI*2);
-    ctx.fill();
+    if (s.type === 'archer') {
+      // Green tunic body
+      ctx.fillStyle = '#4a6a2a';
+      ctx.beginPath();
+      ctx.ellipse(ss.x, ss.y - 6, 4.5, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Leather cap
+      ctx.fillStyle = '#6a4a1a';
+      ctx.beginPath();
+      ctx.arc(ss.x, ss.y - 13, 4, 0, Math.PI*2);
+      ctx.fill();
+      // Bow on back
+      ctx.strokeStyle = '#8a5a2a';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(ss.x - 3, ss.y - 9, 4, -0.5, 0.5);
+      ctx.stroke();
+    } else {
+      // Swordsman — armored, darker metallic
+      ctx.fillStyle = '#5a6a7a';
+      ctx.beginPath();
+      ctx.ellipse(ss.x, ss.y - 6, 4.5, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Helmet
+      ctx.fillStyle = '#888';
+      ctx.beginPath();
+      ctx.arc(ss.x, ss.y - 13, 4, 0, Math.PI*2);
+      ctx.fill();
+      // Sword on back
+      ctx.strokeStyle = '#aaa';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(ss.x - 3, ss.y - 14);
+      ctx.lineTo(ss.x + 3, ss.y - 8);
+      ctx.stroke();
+      // Plume on helmet
+      ctx.fillStyle = '#c8383f';
+      ctx.beginPath();
+      ctx.ellipse(ss.x, ss.y - 16, 1.5, 2, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
     // HP bar when damaged
     if (s.hp < s.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -1467,6 +1491,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'mine': drawMine(ctx, s); break;
     case 'market': drawMarket(ctx, s); break;
     case 'barracks': drawBarracks(ctx, s); break;
+    case 'archery': drawArchery(ctx, s); break;
     case 'tower': drawTower(ctx, s); break;
     case 'well': drawWell(ctx, s); break;
     case 'tavern': drawTavern(ctx, s); break;
@@ -1486,6 +1511,22 @@ function drawBuilding(ctx, b, s, daylight) {
     default: drawGeneric(ctx, s, def); break;
   }
   ctx.restore(); // undo the 1.3x scale
+
+  // Building damage cracks when HP is below 70%
+  if (b.hp !== undefined && b.maxHp !== undefined && b.hp < b.maxHp * 0.7) {
+    const damage = 1 - (b.hp / b.maxHp);
+    ctx.globalAlpha = damage * 0.6;
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    // Deterministic crack pattern based on building position
+    const h = b.x * 37 + b.y * 73;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 5, s.y - 15);
+    ctx.lineTo(s.x + (h % 10) - 5, s.y - 10);
+    ctx.lineTo(s.x + (h % 7), s.y - 3);
+    ctx.stroke();
+    ctx.globalAlpha = daylight;
+  }
 
   if (G.camera.zoom >= 0.5) {
     // Snow cap on roofs in winter
@@ -2196,6 +2237,96 @@ function drawBarracks(ctx, s) {
   ctx.lineWidth = 0.8;
   ctx.beginPath(); ctx.moveTo(s.x-24, s.y-18); ctx.lineTo(s.x-16, s.y-18); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(s.x-24, s.y-15); ctx.lineTo(s.x-16, s.y-15); ctx.stroke();
+}
+
+function drawArchery(ctx, s) {
+  // --- Isometric side face ---
+  ctx.fillStyle = '#5a3a1a';
+  ctx.beginPath();
+  ctx.moveTo(s.x+10, s.y-18); ctx.lineTo(s.x+15, s.y-14);
+  ctx.lineTo(s.x+15, s.y-1); ctx.lineTo(s.x+10, s.y-5);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- Main wooden building front wall ---
+  const woodGrad = ctx.createLinearGradient(s.x, s.y-22, s.x, s.y-2);
+  woodGrad.addColorStop(0, '#a0632a');
+  woodGrad.addColorStop(1, '#7a4a1a');
+  ctx.fillStyle = woodGrad;
+  ctx.fillRect(s.x-12, s.y-20, 22, 16);
+  // Wood plank lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+  ctx.lineWidth = 0.7;
+  for (let py = s.y-20; py < s.y-4; py += 4) {
+    ctx.beginPath(); ctx.moveTo(s.x-12, py); ctx.lineTo(s.x+10, py); ctx.stroke();
+  }
+  // Top edge highlight
+  ctx.strokeStyle = 'rgba(255,220,150,0.2)';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath(); ctx.moveTo(s.x-12, s.y-20); ctx.lineTo(s.x+10, s.y-20); ctx.stroke();
+
+  // --- Open-roof shooting lane fence posts ---
+  ctx.fillStyle = '#6a3a10';
+  ctx.fillRect(s.x-14, s.y-24, 2, 20); // left post
+  ctx.fillRect(s.x+12, s.y-24, 2, 20); // right post
+  // Horizontal fence rail
+  ctx.fillRect(s.x-14, s.y-24, 28, 2);
+  ctx.fillRect(s.x-14, s.y-16, 28, 2);
+
+  // --- Archery targets on hay bales (right side) ---
+  // Hay bale
+  ctx.fillStyle = '#c8a830';
+  ctx.fillRect(s.x+4, s.y-14, 8, 8);
+  ctx.strokeStyle = '#a08020';
+  ctx.lineWidth = 0.8;
+  ctx.strokeRect(s.x+4, s.y-14, 8, 8);
+  // Target rings (concentric circles)
+  ctx.strokeStyle = '#8a0000';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(s.x+8, s.y-10, 3.5, 0, Math.PI*2); ctx.stroke();
+  ctx.strokeStyle = '#cc2222';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(s.x+8, s.y-10, 2, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#ff4444';
+  ctx.beginPath(); ctx.arc(s.x+8, s.y-10, 0.8, 0, Math.PI*2); ctx.fill();
+  // Arrow sticking in target
+  ctx.strokeStyle = '#8a5a2a';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(s.x+5, s.y-13); ctx.lineTo(s.x+8, s.y-10); ctx.stroke();
+  // Arrowhead
+  ctx.fillStyle = '#888';
+  ctx.beginPath();
+  ctx.arc(s.x+8, s.y-10, 1, 0, Math.PI*2);
+  ctx.fill();
+
+  // --- Bow rack on the left side ---
+  ctx.fillStyle = '#6a4010';
+  ctx.fillRect(s.x-20, s.y-20, 2, 14); // rack post
+  ctx.fillRect(s.x-22, s.y-18, 6, 1);  // rack arm top
+  ctx.fillRect(s.x-22, s.y-12, 6, 1);  // rack arm bottom
+  // Bow hanging on rack
+  ctx.strokeStyle = '#7a5020';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(s.x-19, s.y-15, 3.5, -1.2, 1.2);
+  ctx.stroke();
+  // Bow string
+  ctx.strokeStyle = '#c8a870';
+  ctx.lineWidth = 0.6;
+  ctx.beginPath();
+  ctx.moveTo(s.x-19 + 3.5*Math.sin(1.2), s.y-15 - 3.5*Math.cos(1.2));
+  ctx.lineTo(s.x-19 + 3.5*Math.sin(-1.2), s.y-15 - 3.5*Math.cos(-1.2));
+  ctx.stroke();
+
+  // --- Green pennant flag ---
+  ctx.fillStyle = '#5a7a30';
+  ctx.fillRect(s.x-2, s.y-30, 1.5, 12);
+  ctx.beginPath();
+  ctx.moveTo(s.x-0.5, s.y-30);
+  ctx.lineTo(s.x+7, s.y-27);
+  ctx.lineTo(s.x-0.5, s.y-24);
+  ctx.closePath();
+  ctx.fill();
 }
 
 function drawTower(ctx, s) {

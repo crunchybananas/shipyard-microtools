@@ -114,6 +114,15 @@ export const TECHS = {
     icon: '🔨',
     prereq: 'metallurgy',
   },
+  archery: {
+    name: 'Archery',
+    desc: 'Unlocks archery range for ranged units',
+    cost: { gold: 20, wood: 20 },
+    time: 400,
+    unlocks: ['archery'],
+    icon: '🏹',
+    prereq: 'military',
+  },
 };
 
 // Which building types require NO tech (always available)

@@ -64,7 +64,8 @@ export function renderMissions() {
   if (scen) {
     const header = document.createElement('div');
     header.className = 'scenario-header';
-    header.innerHTML = `<div class="scen-name">${scen.name}</div><div class="scen-desc">${scen.desc}</div>`;
+    const progress = scen.objectives.filter(o => o.check()).length;
+    header.innerHTML = `<div class="scen-name">${scen.name} <span class="scen-progress">${progress}/${scen.objectives.length}</span></div><div class="scen-desc">${scen.desc}</div>`;
     list.appendChild(header);
     for (const obj of scen.objectives) {
       const done = obj.check();

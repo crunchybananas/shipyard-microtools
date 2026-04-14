@@ -89,6 +89,11 @@ export function updateUI() {
     }
   }
   $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
+  const popEl = $('pop-display');
+  if (popEl) {
+    if (G.population >= G.maxPop && G.population > 3) popEl.classList.add('pop-full');
+    else popEl.classList.remove('pop-full');
+  }
   const soldierEl = $('soldier-count');
   if (soldierEl) soldierEl.textContent = (G.soldiers || []).length;
   const threatEl = $('threat-display');
@@ -113,7 +118,7 @@ const CATEGORIES = [
   { name: 'Housing',        keys: ['house'] },
   { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine', 'windmill', 'bakery', 'chickencoop', 'cowpen', 'fisherman'] },
   { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
-  { name: 'Defense',        keys: ['barracks', 'tower', 'wall', 'blacksmith'] },
+  { name: 'Defense',        keys: ['barracks', 'archery', 'tower', 'wall', 'blacksmith'] },
   { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },
   { name: 'Culture',        keys: ['tavern', 'church'] },
   { name: 'Victory',        keys: ['castle'] },

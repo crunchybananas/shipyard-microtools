@@ -29,6 +29,8 @@ export const ACHIEVEMENTS = [
   { id:'faithful',        icon:'⛪', name:'Faithful',           desc:'Build a church',                        check:()=>G.buildings.some(b=>b.type==='church') },
   { id:'prepared',        icon:'🏺', name:'Prepared',           desc:'Build a granary before winter',         check:()=>G.buildings.some(b=>b.type==='granary') },
   { id:'victory',         icon:'👑', name:'Realm Complete',     desc:'Build a Castle and claim your realm',   check:()=>G.won },
+  { id:'peaceful_won',    icon:'🌾', name:'Peaceful Victor',    desc:'Complete the Peaceful Valley scenario',  check:()=>G._scenariosCompleted?.includes('peaceful_start') },
+  { id:'military_won',    icon:'⚔️', name:'War Hero',           desc:'Complete the Rise of the Sword scenario', check:()=>G._scenariosCompleted?.includes('military_rise') },
 ];
 
 let unlocked = new Set();
