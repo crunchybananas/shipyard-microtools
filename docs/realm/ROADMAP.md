@@ -77,5 +77,32 @@ A medieval settlement-builder-meets-light-RTS where the player grows an island k
 5. Commit and push each iteration
 6. Update this file's "Completed" section as iterations land
 
-## Completed
-(none yet)
+## Completed (30/100)
+- iter 0: roadmap created
+- iter 1: bread production chain (windmill+bakery boost farms)
+- iter 2: livestock (chicken coop, cow pen)
+- iter 3: service coverage radius system
+- iter 4: tax collection from houses
+- iter 5: fisherman hut (coastal food)
+- iter 6: actual soldier units spawn from barracks
+- iter 7-8: visible enemy raiders + arrow projectiles
+- iter 9-10: game stats tracking + panel
+- iter 11-12: soldier melee combat with enemies
+- iter 13-14: blacksmith building (soldier damage boost)
+- iter 15: rally point (shift+right-click)
+- iter 16-17: raid warning + walls block enemies
+- iter 18-19: 3 scenarios with objectives
+- iter 20: LOD optimizations
+- iter 21-23: trade partners + trade panel
+- iter 24-26: disasters (fire, plague) with spread
+- iter 27-30: HUD soldier/threat count, resource deltas, polish
+
+## Verified in browser
+- Scenarios load correctly
+- Combat (soldiers vs enemies) works
+- All new building sprites render
+- HUD indicators update
+- Missions complete with toast
+
+## Known bugs to fix
+- Citizens don't auto-assign to barracks (need to verify if job-finding includes barracks)
