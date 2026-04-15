@@ -21,6 +21,7 @@
 - Hot air balloons drift across daytime sky (loop 6)
 - Aurora borealis on winter nights (loop 7)
 - Frozen lake ice sheets in winter (loop 8)
+- Wolves prowling at night (loop 9)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -71,3 +72,9 @@
 - Ideas: (1) **frozen lake ice sheets** (2) wolves at night near forest (3) frozen waterfall/icicles on stone tiles
 - Chose: ice sheets (highest-impact winter visual, ties season to water tile)
 - Implemented: extra layer in drawWater (render.js) — pale ice overlay with deterministic crack patterns and snow drifts when G.season === winter. Boats still render on top (slightly silly but fine).
+
+### Loop 9
+- Validator: nights are visually atmospheric but lack threatening creatures; deer/sheep don't react to time of day.
+- Ideas: (1) **wolves prowling near forest at night** (2) ghostly will-o-wisps in marshes (3) glowing mushrooms in dark forests
+- Chose: wolves (adds tension + nocturnal life balancing daytime herbivores)
+- Implemented: enhancements.js updateWolves/renderWolves. Spawn near forest at night, prowl between forest/grass, yellow glowing eyes, occasional howl arc indicators, despawn at sunrise.

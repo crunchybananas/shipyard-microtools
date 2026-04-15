@@ -8,6 +8,111 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 9: Wolves prowling near forest at night ────────────
+export function updateWolves() {
+  if (!G.wolves) G.wolves = [];
+  const t = G.dayPhase / G.dayLength;
+  const isNight = t > 0.72 || t < 0.08;
+  // Spawn 1-2 wolves at dusk near forest
+  if (isNight && G.gameTick % 400 === 0 && G.wolves.length < 2 && Math.random() < 0.5) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.FOREST) {
+        G.wolves.push({
+          x, y, tx: x + (Math.random() - 0.5) * 4, ty: y + (Math.random() - 0.5) * 4,
+          phase: Math.random() * Math.PI * 2,
+          howlTimer: 200 + Math.random() * 400,
+        });
+        break;
+      }
+    }
+  }
+  // Cull at sunrise
+  if (!isNight && G.wolves.length > 0 && G.gameTick % 60 === 0) {
+    G.wolves.shift();
+  }
+  for (const w of G.wolves) {
+    const dx = w.tx - w.x, dy = w.ty - w.y;
+    const d = Math.hypot(dx, dy);
+    if (d < 0.3) {
+      // pick new target near forest tile
+      let tries = 8;
+      while (tries-- > 0) {
+        const nx = Math.max(1, Math.min(MAP_W - 2, w.x + (Math.random() - 0.5) * 6));
+        const ny = Math.max(1, Math.min(MAP_H - 2, w.y + (Math.random() - 0.5) * 6));
+        const tile = G.map[Math.round(ny)] && G.map[Math.round(ny)][Math.round(nx)];
+        if (tile === TILE.FOREST || tile === TILE.GRASS) { w.tx = nx; w.ty = ny; break; }
+      }
+    } else {
+      const spd = 0.018 * G.speed;
+      w.x += (dx / d) * Math.min(spd, d);
+      w.y += (dy / d) * Math.min(spd, d);
+    }
+    w.howlTimer -= G.speed;
+    if (w.howlTimer <= 0) { w.howling = 30; w.howlTimer = 400 + Math.random() * 600; }
+    if (w.howling > 0) w.howling -= G.speed;
+  }
+}
+export function renderWolves(ctx) {
+  if (!G.wolves || !G.wolves.length || G.camera.zoom < 0.5) return;
+  const t = G.dayPhase / G.dayLength;
+  const isNight = t > 0.7 || t < 0.1;
+  if (!isNight) return;
+  for (const w of G.wolves) {
+    const s = toScreen(w.x, w.y);
+    const bob = Math.sin(G.gameTick * 0.18 + w.phase) * 0.6;
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 3, 5, 1.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Body — dark grey
+    ctx.fillStyle = '#3a3a44';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y - 2 + bob, 4.5, 2.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Head with snout
+    ctx.fillStyle = '#444450';
+    ctx.beginPath();
+    ctx.arc(s.x + 3, s.y - 4 + bob, 1.7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(s.x + 4, s.y - 4 + bob, 2, 1);
+    // Ears
+    ctx.fillStyle = '#2a2a30';
+    ctx.beginPath();
+    ctx.moveTo(s.x + 2.3, s.y - 5.2 + bob);
+    ctx.lineTo(s.x + 3, s.y - 6.5 + bob);
+    ctx.lineTo(s.x + 3.5, s.y - 5.2 + bob);
+    ctx.fill();
+    // Eyes (yellow glow)
+    ctx.fillStyle = 'rgba(255, 220, 80, 0.95)';
+    ctx.beginPath();
+    ctx.arc(s.x + 3.5, s.y - 4 + bob, 0.45, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail
+    ctx.strokeStyle = '#2a2a30';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 4, s.y - 2 + bob);
+    ctx.lineTo(s.x - 6, s.y - 3.5 + bob);
+    ctx.stroke();
+    // Howling — small text/wavy lines
+    if (w.howling > 0) {
+      ctx.globalAlpha = w.howling / 30;
+      ctx.strokeStyle = 'rgba(220,220,255,0.7)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.arc(s.x + 8, s.y - 6, 3, -1, 1);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(s.x + 10, s.y - 7, 5, -1, 1);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
 // ── Loop 7: Aurora borealis on winter nights ────────────────
 export function renderAurora(ctx, logicalW, logicalH) {
   if (G.season !== 'winter') return;
