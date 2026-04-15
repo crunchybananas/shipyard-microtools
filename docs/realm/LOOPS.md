@@ -35,6 +35,8 @@
 - Animated sun with lens flare ghosts (loop 20)
 - Spontaneous snowmen near houses in winter (loop 21)
 - Cherry blossom canopies in spring forests (loop 22)
+- Smoking volcano on a mountain peak (loop 23)
+- Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -165,3 +167,5 @@
 - Implemented: enhancements.js updateSnowmen/renderSnowmen. Periodically spawn 3-tier snowman near a random house in winter, with hat/eyes/carrot nose/stick arms; cleared when winter ends.
 
 ### Loop 22 — cherry blossom canopies in spring forest tiles (deterministic per tile, ~25%, pink/white puffs).
+
+### Loop 23 — refactor: registerUpdater/Renderer aggregator added so future loops only edit enhancements.js. First registered feature: smoking volcano on a single mountain peak (orange glowing crater + drifting grey smoke plumes).

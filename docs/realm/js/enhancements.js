@@ -1068,3 +1068,114 @@ export function renderBoats(ctx) {
   }
   ctx.globalAlpha = 1;
 }
+
+// ════════════════════════════════════════════════════════════
+// Aggregator hooks — called once from main.js and render.js,
+// dispatch all enhancement update/render functions in defined order.
+// New loops can append entries to these arrays without touching
+// main.js / render.js.
+// ════════════════════════════════════════════════════════════
+
+const _updaters = [];        // [{ fn, needsScreen?:bool }]
+const _worldRenderers = [];  // [(ctx)=>...]    drawn in world transform
+const _screenRenderers = []; // [(ctx, w, h)=>...]  drawn in screen space
+
+export function registerUpdater(fn, needsScreen=false) { _updaters.push({fn, needsScreen}); }
+export function registerWorldRenderer(fn) { _worldRenderers.push(fn); }
+export function registerScreenRenderer(fn) { _screenRenderers.push(fn); }
+
+export function enhUpdateAll(logicalW, logicalH) {
+  for (const u of _updaters) {
+    if (u.needsScreen) u.fn(logicalW, logicalH);
+    else u.fn();
+  }
+}
+export function enhRenderWorld(ctx) {
+  for (const fn of _worldRenderers) fn(ctx);
+}
+export function enhRenderScreen(ctx, logicalW, logicalH) {
+  for (const fn of _screenRenderers) fn(ctx, logicalW, logicalH);
+}
+
+// Existing loops 4-22 are wired explicitly in main.js / render.js.
+// From loop 23 onward, new features should call register* below — they will
+// then be dispatched by enhUpdateAll / enhRenderWorld / enhRenderScreen,
+// which are invoked once from main.js / render.js, eliminating import edits.
+//
+// Loop boundaries (registration order = render order):
+// (none yet — loop 23+ adds here)
+
+
+// ── Loop 23: Smoking volcano (rare; one mountain peak) ─────
+let _volcanoTile = null;
+function findVolcanoTile() {
+  for (let attempt = 0; attempt < 200; attempt++) {
+    const x = Math.floor(Math.random() * MAP_W);
+    const y = Math.floor(Math.random() * MAP_H);
+    if (G.map[y] && G.map[y][x] === TILE.MOUNTAIN) return { x, y };
+  }
+  return null;
+}
+function getVolcano() {
+  if (_volcanoTile !== null) return _volcanoTile || null;
+  // Only init if mountains exist
+  let hasMountain = false;
+  for (let y = 0; y < MAP_H && !hasMountain; y++)
+    for (let x = 0; x < MAP_W; x++)
+      if (G.map[y] && G.map[y][x] === TILE.MOUNTAIN) { hasMountain = true; break; }
+  if (!hasMountain) { _volcanoTile = false; return null; }
+  _volcanoTile = findVolcanoTile() || false;
+  return _volcanoTile || null;
+}
+function updateVolcano() {
+  const v = getVolcano();
+  if (!v) return;
+  if (!G.volcanoSmoke) G.volcanoSmoke = [];
+  if (G.gameTick % 18 === 0 && G.volcanoSmoke.length < 14) {
+    G.volcanoSmoke.push({
+      ox: (Math.random() - 0.5) * 4,
+      oy: 0,
+      vy: -0.3 - Math.random() * 0.2,
+      vx: (Math.random() - 0.5) * 0.05,
+      size: 4 + Math.random() * 3,
+      alpha: 0.6 + Math.random() * 0.2,
+    });
+  }
+  for (let i = G.volcanoSmoke.length - 1; i >= 0; i--) {
+    const p = G.volcanoSmoke[i];
+    p.oy += p.vy * G.speed;
+    p.ox += p.vx * G.speed;
+    p.size += 0.05 * G.speed;
+    p.alpha -= 0.004 * G.speed;
+    if (p.alpha <= 0) G.volcanoSmoke.splice(i, 1);
+  }
+}
+function renderVolcano(ctx) {
+  const v = getVolcano();
+  if (!v || G.camera.zoom < 0.5) return;
+  const s = toScreen(v.x, v.y);
+  // Glowing crater (orange)
+  ctx.save();
+  const tt = G.gameTick * 0.1;
+  const pulse = 0.7 + 0.3 * Math.sin(tt);
+  ctx.globalCompositeOperation = 'screen';
+  const grad = ctx.createRadialGradient(s.x, s.y - 24, 0, s.x, s.y - 24, 12);
+  grad.addColorStop(0, `rgba(255,180,40,${0.85 * pulse})`);
+  grad.addColorStop(1, 'rgba(255,80,0,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - 24, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  // Smoke plumes
+  for (const p of G.volcanoSmoke) {
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.fillStyle = '#7a6a64';
+    ctx.beginPath();
+    ctx.arc(s.x + p.ox, s.y - 28 + p.oy, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+registerUpdater(updateVolcano);
+registerWorldRenderer(renderVolcano);

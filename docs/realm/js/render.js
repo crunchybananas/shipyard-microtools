@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms } from './enhancements.js';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
@@ -1512,6 +1512,8 @@ export function render() {
   renderSnowmen(ctx);
   // ── Cherry blossoms in spring (loop 22+) ────────────────
   renderBlossoms(ctx);
+  // ── Loop 23+: aggregator dispatch (world space) ─────────
+  enhRenderWorld(ctx);
   // ── Wolves (loop 9+) ─────────────────────────────────────
   renderWolves(ctx);
   // ── Glowing mushrooms (loop 10+) ────────────────────────
@@ -1937,6 +1939,9 @@ export function render() {
       ctx.fill();
     }
   }
+
+  // ── Loop 23+: aggregator dispatch (screen space) ─────────
+  enhRenderScreen(ctx, logicalW, logicalH);
 
   // ── FPS counter ───────────────────────────────────────────
   fpsFrames++;
