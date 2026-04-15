@@ -106,6 +106,7 @@
 - Rare meteor impacts with crater (loop 91)
 - Dragon purple smoke trail (loop 92)
 - Bald eagle circles castle (loop 93)
+- Spring pollen bursts from grass (loop 94)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -379,3 +380,5 @@
 ### Loop 92 — purple smoke trail follows behind the dragon during flyovers.
 
 ### Loop 93 — bald eagle (white head, wider wings) circles slowly above castle when one exists.
+
+### Loop 94 — periodic small pollen bursts erupt from random grass tiles in spring.

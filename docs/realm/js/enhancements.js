@@ -3876,3 +3876,31 @@ function renderEagles(ctx) {
 }
 registerUpdater(updateEagles, true);
 registerScreenRenderer(renderEagles);
+
+// ── Loop 94: Pollen burst on flowers in spring meadows ─────
+function updatePollenBurst() {
+  if (G.season !== 'spring') return;
+  if (!G.particles) G.particles = [];
+  if (G.gameTick % 90 !== 0 || G.particles.length > 320) return;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const x = Math.floor(Math.random() * MAP_W);
+    const y = Math.floor(Math.random() * MAP_H);
+    if (G.map[y] && G.map[y][x] === TILE.GRASS) {
+      for (let k = 0; k < 5; k++) {
+        G.particles.push({
+          tx: x + (Math.random() - 0.5) * 0.5,
+          ty: y + (Math.random() - 0.5) * 0.5,
+          offsetY: -3 - Math.random() * 4,
+          text: null, alpha: 0.7,
+          vy: -0.04 - Math.random() * 0.04,
+          decay: 0.005,
+          type: 'pollen',
+          size: 0.6 + Math.random() * 0.5,
+          vx: (Math.random() - 0.5) * 0.04,
+        });
+      }
+      break;
+    }
+  }
+}
+registerUpdater(updatePollenBurst);
