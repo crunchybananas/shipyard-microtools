@@ -88,6 +88,7 @@
 - Floating resource emoji from producers (loop 73)
 - Chickens orbit chicken coops (loop 74)
 - Pulsing halo under selected building (loop 75)
+- Gravestone markers on citizen death (loop 76)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -325,3 +326,5 @@
 ### Loop 74 — chickens orbit and peck near each chicken coop building.
 
 ### Loop 75 — pulsing golden ellipse halo under any selected building.
+
+### Loop 76 — small temporary gravestone marker spawns at a random house when a citizen dies.

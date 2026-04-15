@@ -3268,3 +3268,48 @@ function renderSelectedHalo(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderSelectedHalo);
+
+// ── Loop 76: Skull markers on tiles where citizens died (transient)
+function spawnDeathMarker(x, y) {
+  if (!G.deathMarkers) G.deathMarkers = [];
+  G.deathMarkers.push({ x, y, life: 800 });
+}
+let _prevCitizens = 0;
+function updateDeathMarkers() {
+  if (!G.deathMarkers) G.deathMarkers = [];
+  // Detect deaths via citizensDied stat increase
+  const dead = G.stats?.citizensDied || 0;
+  if (dead > (G._prevDead || 0)) {
+    const houses = G.buildings.filter(b => b.type === 'house');
+    if (houses.length) {
+      const h = houses[Math.floor(Math.random() * houses.length)];
+      spawnDeathMarker(h.x, h.y);
+    }
+  }
+  G._prevDead = dead;
+  for (let i = G.deathMarkers.length - 1; i >= 0; i--) {
+    G.deathMarkers[i].life -= G.speed;
+    if (G.deathMarkers[i].life <= 0) G.deathMarkers.splice(i, 1);
+  }
+}
+function renderDeathMarkers(ctx) {
+  if (!G.deathMarkers || !G.deathMarkers.length || G.camera.zoom < 0.7) return;
+  for (const m of G.deathMarkers) {
+    const s = toScreen(m.x, m.y);
+    const a = Math.min(1, m.life / 200);
+    ctx.globalAlpha = a * 0.85;
+    // Gravestone shape
+    ctx.fillStyle = '#7a7a82';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 1, 1.8, Math.PI, 0);
+    ctx.fill();
+    ctx.fillRect(s.x - 1.8, s.y - 1, 3.6, 4);
+    ctx.fillStyle = '#3a3a40';
+    ctx.font = 'bold 3px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('+', s.x, s.y + 1.3);
+  }
+  ctx.globalAlpha = 1;
+}
+registerUpdater(updateDeathMarkers);
+registerWorldRenderer(renderDeathMarkers);
