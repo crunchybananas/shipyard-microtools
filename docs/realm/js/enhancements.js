@@ -2027,3 +2027,44 @@ function renderCampfires(ctx) {
   }
 }
 registerWorldRenderer(renderCampfires);
+
+// ── Loop 40: Fluttering banners on watch towers ─────────────
+function renderTowerBanners(ctx) {
+  if (G.camera.zoom < 0.6) return;
+  const tt = G.gameTick * 0.15;
+  for (const b of G.buildings) {
+    if (b.type !== 'tower') continue;
+    const s = toScreen(b.x, b.y);
+    // Pole (extension above existing tower top ~y-38)
+    const px = s.x;
+    const py = s.y - 50;
+    ctx.strokeStyle = '#2a1810';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(px, py + 12);
+    ctx.lineTo(px, py - 6);
+    ctx.stroke();
+    // Banner — wave amplitude based on sin
+    const len = 9, h = 5;
+    ctx.fillStyle = '#c83030';
+    ctx.beginPath();
+    ctx.moveTo(px, py - 6);
+    for (let i = 0; i <= len; i++) {
+      const t = i / len;
+      const wy = py - 6 + Math.sin(tt + t * 4) * 1.2;
+      ctx.lineTo(px + i, wy);
+    }
+    for (let i = len; i >= 0; i--) {
+      const t = i / len;
+      const wy = py - 6 + h + Math.sin(tt + t * 4) * 1.2;
+      ctx.lineTo(px + i, wy);
+    }
+    ctx.closePath();
+    ctx.fill();
+    // Banner cross (white)
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(px + 3, py - 6, 1, 5);
+    ctx.fillRect(px + 1, py - 4, 5, 1);
+  }
+}
+registerWorldRenderer(renderTowerBanners);

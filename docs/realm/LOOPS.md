@@ -52,6 +52,7 @@
 - Spider webs in autumn forests (loop 37)
 - Crabs scuttle on sand (loop 38)
 - Soldier campfires by barracks at night (loop 39)
+- Fluttering banners on watch towers (loop 40)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -217,3 +218,5 @@
 ### Loop 38 — crabs scuttle sideways on sand tiles.
 
 ### Loop 39 — campfires beside each barracks at night, with flickering flame and seated soldier silhouette.
+
+### Loop 40 — fluttering red banners with white cross atop each watch tower.
