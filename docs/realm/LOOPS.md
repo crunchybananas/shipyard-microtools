@@ -30,3 +30,9 @@
 - Ideas: (1) wildlife ecosystem (2) **procedural road wear** (3) dawn reveal cinematic
 - Chose: procedural road wear (addresses "houses float like tokens")
 - Implemented: tileWear grid, citizen+soldier movement increments wear, rendered as progressive dirt tint, save/load support
+
+### Loop 2 — 031919e
+- Validator: snow caps are stickers; buildings feel like catalog of placed objects; water is linoleum
+- Ideas: (1) **living animal herds** (2) spatial ruins layer (3) dynamic fire/torch network
+- Chose: living animal herds (kills "catalog of placed objects")
+- Implemented: animals.js — deer (near forest), sheep (grass), chickens (near houses), graze/walk state machine, rendered with species-specific sprites

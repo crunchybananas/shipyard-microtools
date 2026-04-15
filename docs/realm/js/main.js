@@ -179,6 +179,7 @@ window.newGame = () => {
   G.currentResearch = null;
   G.activeEvent = null;
   G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0, speedMult:1 };
+  G._lightningTimer = null; G._lightningFlash = 0; G.meteors = [];
   G.season = 'spring'; G.won = false; G._scenarioWon = false;
   G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
   G.lastResources = null;

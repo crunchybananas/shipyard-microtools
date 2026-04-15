@@ -1694,11 +1694,11 @@ export function render() {
   let horizonColor = '255,120,60';
   if (dayT < 0.1) {
     // Dawn: fade in then out quickly
-    horizonAlpha = Math.sin((dayT / 0.1) * Math.PI) * 0.55;
+    horizonAlpha = Math.sin((dayT / 0.1) * Math.PI) * 0.8;
     horizonColor = '255,140,60'; // warm orange-gold dawn
   } else if (dayT >= 0.6 && dayT < 0.75) {
     // Dusk: fade in then out
-    horizonAlpha = Math.sin(((dayT - 0.6) / 0.15) * Math.PI) * 0.65;
+    horizonAlpha = Math.sin(((dayT - 0.6) / 0.15) * Math.PI) * 0.8;
     horizonColor = '220,80,30'; // deeper red-orange dusk
   }
   if (horizonAlpha > 0) {
@@ -1761,6 +1761,24 @@ export function render() {
       ctx.stroke();
     }
     ctx.restore();
+  }
+
+  // ── Lightning strike during thunderstorm ─────────────────────
+  if (G.weather === 'rain' || G.weather === 'storm') {
+    if (!G._lightningTimer) G._lightningTimer = 300 + Math.random() * 600;
+    G._lightningTimer--;
+    if (G._lightningTimer <= 0) {
+      G._lightningFlash = 3; // 3 frames of flash
+      G._lightningTimer = 300 + Math.random() * 600;
+    }
+    if (G._lightningFlash > 0) {
+      G._lightningFlash--;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = `rgba(255, 255, 220, ${G._lightningFlash / 3 * 0.8})`;
+      ctx.fillRect(-5000, -5000, 10000, 10000);
+      ctx.restore();
+    }
   }
 
   // ── Raid flash overlay (screen space) ────────────────────────
@@ -1834,6 +1852,51 @@ export function render() {
   }
 
   // Screen-space vignette removed — handled by WebGL post-processing (postfx.js)
+
+  // ── Meteor shower (screen space, night only) ──────────────────
+  if (daylight < 0.65) {
+    if (!G.meteors) G.meteors = [];
+    if (G.gameTick % 150 === 0 && Math.random() < 0.3 && G.meteors.length < 2) {
+      G.meteors.push({
+        x: Math.random() * logicalW,
+        y: Math.random() * logicalH * 0.4,
+        vx: 6 + Math.random() * 4,
+        vy: 2 + Math.random() * 2,
+        life: 60,
+        trail: [],
+      });
+    }
+    for (let i = G.meteors.length - 1; i >= 0; i--) {
+      const m = G.meteors[i];
+      m.trail.push({ x: m.x, y: m.y });
+      if (m.trail.length > 15) m.trail.shift();
+      m.x += m.vx;
+      m.y += m.vy;
+      m.life--;
+      if (m.life <= 0 || m.x > logicalW + 100) {
+        G.meteors.splice(i, 1);
+        continue;
+      }
+      // Draw trail
+      ctx.lineCap = 'round';
+      for (let j = 1; j < m.trail.length; j++) {
+        const alpha = (j / m.trail.length) * 0.8;
+        const thick = (j / m.trail.length) * 3;
+        ctx.strokeStyle = `rgba(255, 240, 200, ${alpha})`;
+        ctx.lineWidth = thick;
+        const p = m.trail[j - 1], c = m.trail[j];
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(c.x, c.y);
+        ctx.stroke();
+      }
+      // Bright head
+      ctx.fillStyle = 'rgba(255, 250, 220, 1)';
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 
   // ── FPS counter ───────────────────────────────────────────
   fpsFrames++;
@@ -1910,8 +1973,14 @@ function drawBuilding(ctx, b, s, daylight) {
   if (b.type !== 'road' && b.type !== 'wall') {
     const buildingH = (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 32 :
                       (b.type === 'house' || b.type === 'tavern' || b.type === 'barracks' || b.type === 'bakery') ? 20 : 12;
-    // Shadow length = building height projected at light angle
-    const shadowLen = buildingH * 0.8;
+    // Shadow length scales with sun angle — dramatically longer at dawn/dusk
+    const sunAngle = Math.abs(daylight - 0.7) * 3; // 0 at midday (~0.7), peaks at dawn/dusk
+    const shadowMultiplier = 1 + sunAngle; // shadows 1x at noon, up to ~3x at sunrise/set
+    const shadowLen = buildingH * 0.8 * shadowMultiplier;
+    // Warm shadow tint during golden hours
+    const dayT = G.dayPhase / G.dayLength;
+    const isGolden = (dayT < 0.15 || (dayT > 0.55 && dayT < 0.75));
+    const shadowBaseColor = isGolden ? '120,60,40' : '0,0,0';
     // Create a slanted quadrilateral shadow shape
     ctx.globalAlpha = daylight * 0.3;
     ctx.fillStyle = '#1a1010';
@@ -1925,9 +1994,9 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.closePath();
     // Use radial gradient for soft fade
     const shadowGrad = ctx.createRadialGradient(s.x, s.y + 2, 5, s.x + shadowLen, s.y + 2 + shadowLen * 0.5, shadowLen);
-    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.45)');
-    shadowGrad.addColorStop(0.6, 'rgba(0,0,0,0.2)');
-    shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    shadowGrad.addColorStop(0, `rgba(${shadowBaseColor},0.45)`);
+    shadowGrad.addColorStop(0.6, `rgba(${shadowBaseColor},0.2)`);
+    shadowGrad.addColorStop(1, `rgba(${shadowBaseColor},0)`);
     ctx.fillStyle = shadowGrad;
     ctx.fill();
     ctx.globalAlpha = 1;
