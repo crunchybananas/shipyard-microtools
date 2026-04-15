@@ -2589,3 +2589,38 @@ function renderTavernToadstools(ctx) {
   }
 }
 registerWorldRenderer(renderTavernToadstools);
+
+// ── Loop 57: Smoke from forest tile fire when raid happens
+// (use raidFlash as trigger; spawn smoke columns over random forest)
+function updateRaidSmoke() {
+  if (!G.raidSmoke) G.raidSmoke = [];
+  if (G.raidFlash > 0.3 && G.gameTick % 12 === 0 && G.raidSmoke.length < 30) {
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && (G.map[y][x] === TILE.FOREST || G.map[y][x] === TILE.GRASS)) {
+        G.raidSmoke.push({ x, y, oy: -2, vy: -0.15, size: 3, alpha: 0.7 });
+        break;
+      }
+    }
+  }
+  for (let i = G.raidSmoke.length - 1; i >= 0; i--) {
+    const p = G.raidSmoke[i];
+    p.oy += p.vy * G.speed; p.size += 0.04 * G.speed; p.alpha -= 0.005 * G.speed;
+    if (p.alpha <= 0) G.raidSmoke.splice(i, 1);
+  }
+}
+function renderRaidSmoke(ctx) {
+  if (!G.raidSmoke || !G.raidSmoke.length) return;
+  for (const p of G.raidSmoke) {
+    const s = toScreen(p.x, p.y);
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.fillStyle = '#5a4030';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 12 + p.oy, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+registerUpdater(updateRaidSmoke);
+registerWorldRenderer(renderRaidSmoke);
