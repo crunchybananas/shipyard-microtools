@@ -67,6 +67,7 @@
 - Mine carts at iron mines (loop 52)
 - Fish jump from water with splash (loop 53)
 - Drying laundry between houses (loop 54)
+- Day-1 sunrise burst (loop 55)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -262,3 +263,5 @@
 ### Loop 53 — occasional fish jumps out of water with arc + splash ripple.
 
 ### Loop 54 — laundry lines between adjacent houses with swaying colored clothes.
+
+### Loop 55 — opening-day sunrise burst (radial god rays) only on day 1.

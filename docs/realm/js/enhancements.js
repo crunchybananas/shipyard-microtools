@@ -2529,3 +2529,35 @@ function renderLaundry(ctx) {
   }
 }
 registerWorldRenderer(renderLaundry);
+
+// ── Loop 55: Day-1 sunrise burst on screen ─────────────────
+function renderSunriseBurst(ctx, logicalW, logicalH) {
+  if (G.day !== 1) return;
+  const t = G.dayPhase / G.dayLength;
+  if (t > 0.18) return;
+  const fade = Math.max(0, 1 - t / 0.18);
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const cx = logicalW * 0.15;
+  const cy = logicalH * 0.65;
+  // Radial sunburst
+  for (let i = 0; i < 18; i++) {
+    const ang = (i / 18) * Math.PI * 2;
+    ctx.strokeStyle = `rgba(255,220,150,${fade * 0.18})`;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(ang) * logicalW, cy + Math.sin(ang) * logicalW);
+    ctx.stroke();
+  }
+  // Bright center
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 200);
+  grad.addColorStop(0, `rgba(255,250,210,${fade * 0.7})`);
+  grad.addColorStop(1, 'rgba(255,200,100,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 200, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+registerScreenRenderer(renderSunriseBurst);
