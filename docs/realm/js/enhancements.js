@@ -8,6 +8,41 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 14: Rainbow after rain stops ──────────────────────
+let _prevWeather = null;
+let _rainbowAge = 0;
+const RAINBOW_DURATION = 1500; // game ticks
+export function updateRainbow() {
+  if (!G.weather) G.weather = 'clear';
+  if (_prevWeather === 'rain' && G.weather !== 'rain') {
+    _rainbowAge = RAINBOW_DURATION;
+  }
+  _prevWeather = G.weather;
+  if (_rainbowAge > 0) _rainbowAge -= G.speed;
+}
+export function renderRainbow(ctx, logicalW, logicalH) {
+  if (_rainbowAge <= 0) return;
+  if (getDaylight() < 0.55) return;
+  const fade = Math.min(1, _rainbowAge / 400) * Math.min(1, (RAINBOW_DURATION - _rainbowAge) / 200 + 0.3);
+  const cx = logicalW * 0.7;
+  const cy = logicalH + 50;
+  const rOuter = Math.min(logicalW, logicalH) * 0.85;
+  const colors = [
+    'rgba(255,80,80,', 'rgba(255,160,60,', 'rgba(255,230,80,',
+    'rgba(80,200,80,', 'rgba(80,160,255,', 'rgba(120,100,220,', 'rgba(200,80,200,',
+  ];
+  ctx.save();
+  ctx.lineWidth = 8;
+  for (let i = 0; i < colors.length; i++) {
+    const r = rOuter - i * 9;
+    ctx.strokeStyle = colors[i] + (0.45 * fade) + ')';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, Math.PI * 1.05, Math.PI * 1.95);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 // ── Loop 13: Wandering merchant carts (visit market) ───────
 export function updateCarts() {
   if (!G.carts) G.carts = [];

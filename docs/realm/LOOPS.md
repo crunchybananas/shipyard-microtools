@@ -26,6 +26,7 @@
 - Dawn ground mist bands (loop 11)
 - Festival lantern strings between houses (loop 12)
 - Merchant carts visit markets (loop 13)
+- Rainbow after rain (loop 14)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -106,3 +107,9 @@
 - Ideas: (1) **wandering merchant carts visit markets** (2) caravan campfire props (3) ghost fishing nets in shallow water
 - Chose: merchant carts (visualize commerce, narrative payoff)
 - Implemented: enhancements.js updateCarts/renderCarts. Spawn at map edge, travel to a market, unload, depart back to edge. Horse + canvas-cover wagon sprite with wheels + bobbing.
+
+### Loop 14
+- Validator: weather changes pass without payoff — rain just stops.
+- Ideas: (1) **rainbow after rain** (2) puddles on ground after rain (3) wet shine on building roofs
+- Chose: rainbow (cheap, iconic, big payoff)
+- Implemented: enhancements.js updateRainbow/renderRainbow. Detect rain→clear transition, draw 7-band screen-space arc rainbow with fade in/out for ~25 sec.

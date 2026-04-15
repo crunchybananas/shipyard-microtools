@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts } from './enhancements.js';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow } from './enhancements.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
@@ -1811,6 +1811,8 @@ export function render() {
   renderAurora(ctx, logicalW, logicalH);
   // ── Ground mist (loop 11+) — dawn/dusk ───────────────────
   renderGroundMist(ctx, logicalW, logicalH);
+  // ── Rainbow after rain (loop 14+) ────────────────────────
+  renderRainbow(ctx, logicalW, logicalH);
 
   // ── Stars & Moon (screen space, drawn during night/dawn/dusk) ─
   const nightStrength = Math.max(0, (0.8 - daylight) / 0.25); // 0→1 as daylight 0.8→0.55
