@@ -313,7 +313,7 @@ function addBuildingMesh(verts, indices, b, groundY) {
   const cz = b.y + 0.5;
   const gy = groundY;
   const type = b.type;
-  const S = 1.8; // global building size multiplier for visibility
+  const S = 3.5; // global building size multiplier for visibility
 
   // Record vertex count before building; we'll scale them at the end
   const vertStart = verts.length;
@@ -504,15 +504,31 @@ export function buildTerrainMesh() {
   for (let row = 0; row < MAP_H; row++) {
     for (let col = 0; col < MAP_W; col++) {
       const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
-      const h = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.5;
-      const color = TILE_COLOR_3D[tileType] || [0.5, 0.5, 0.5];
+      const baseH = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.5;
+      const baseColor = TILE_COLOR_3D[tileType] || [0.5, 0.5, 0.5];
+
+      // Per-tile deterministic noise for variety (breaks up the uniform-square look)
+      const seed = (col * 374761 + row * 668265) >>> 0;
+      const noise1 = ((seed & 0xff) / 255 - 0.5); // -0.5..0.5
+      const noise2 = (((seed >>> 8) & 0xff) / 255 - 0.5);
+
+      // Height variation within a tile type: ±0.08 units
+      const h = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12);
+
+      // Color variation: ±8% tint per tile to break up flat areas
+      const cv = noise2 * 0.15;
+      const color = [
+        Math.max(0, Math.min(1, baseColor[0] * (1 + cv))),
+        Math.max(0, Math.min(1, baseColor[1] * (1 + cv))),
+        Math.max(0, Math.min(1, baseColor[2] * (1 + cv))),
+      ];
 
       const x0 = col;
       const x1 = col + 1;
       const z0 = row;
       const z1 = row + 1;
       const y  = h;    // top face at height h
-      const yb = 0.0;  // bottom (sea level)
+      const yb = -0.5;  // bottom goes below sea so no gaps
 
       // Top face (normal up: 0,1,0)
       pushFace(verts, indices,
@@ -520,6 +536,9 @@ export function buildTerrainMesh() {
         [0, 1, 0],
         color
       );
+
+      // Skip water side faces entirely — water is a flat plane
+      if (tileType === TILE.WATER) continue;
 
       // Only draw side faces if tile is elevated
       if (h > 0.0) {
@@ -605,14 +624,17 @@ export function buildTerrainMesh() {
 // ── Buildings mesh ─────────────────────────────────────────
 export function buildBuildingsMesh() {
   if (!gl || !program) return;
-  if (!G.buildings || G.buildings.length === 0) {
-    buildingsIndexCount = 0;
-    lastBuildingRebuild = performance.now();
-    return;
-  }
 
   const verts   = [];
   const indices = [];
+
+  if (!G.buildings || G.buildings.length === 0) {
+    buildingsIndexCount = 0;
+    lastBuildingRebuild = performance.now();
+    console.log('[gl3d] No buildings to render');
+    return;
+  }
+  console.log(`[gl3d] Building mesh for ${G.buildings.length} buildings`);
 
   for (const b of G.buildings) {
     // Skip non-structural types that have no visual presence worth rendering
@@ -623,7 +645,14 @@ export function buildBuildingsMesh() {
     const tileType = (G.map[row] && G.map[row][col] !== undefined)
       ? G.map[row][col]
       : TILE.GRASS;
-    const groundY = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8;
+    const baseH = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8;
+    const seed = (col * 374761 + row * 668265) >>> 0;
+    const noise1 = ((seed & 0xff) / 255 - 0.5);
+    const groundY = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12) + 0.02;
+
+    // DEBUG: Bright marker - bigger than building, hot pink, high
+    const cx = b.x + 0.5, cz = b.y + 0.5;
+    pushBox(verts, indices, cx-0.5, groundY, cz-0.5, cx+0.5, groundY+6.0, cz+0.5, [1.0, 0.0, 1.0]);
 
     addBuildingMesh(verts, indices, b, groundY);
   }
@@ -636,6 +665,7 @@ export function buildBuildingsMesh() {
 
   buildingsIndexCount = uploadMesh(buildingsVao, buildingsVertexBuf, buildingsIndexBuf, verts, indices);
   lastBuildingRebuild = performance.now();
+  console.log(`[gl3d] Buildings mesh uploaded: ${verts.length/9} verts, ${indices.length} indices`);
 }
 
 // ── Camera / VP matrix ─────────────────────────────────────
