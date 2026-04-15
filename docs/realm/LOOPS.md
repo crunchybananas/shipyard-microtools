@@ -92,6 +92,7 @@
 - Town crier walks across map (loop 77)
 - Dragonflies over summer water (loop 78)
 - Midday golden sparkles around castle (loop 79)
+- Driftwood logs on sand (loop 80)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -337,3 +338,5 @@
 ### Loop 78 — dragonflies hover over water tiles in summer (translucent wings).
 
 ### Loop 79 — golden sparkles orbit castle rooftop at midday peak daylight.
+
+### Loop 80 — driftwood logs scattered on sand tiles (deterministic ~8%).
