@@ -2484,3 +2484,48 @@ function renderFishJumps(ctx) {
 }
 registerUpdater(updateFishJumps);
 registerWorldRenderer(renderFishJumps);
+
+// ── Loop 54: Drying laundry on lines between houses ────────
+function renderLaundry(ctx) {
+  if (G.camera.zoom < 0.95) return;
+  const tt = G.gameTick * 0.04;
+  const houses = G.buildings.filter(b => b.type === 'house');
+  const seen = new Set();
+  for (let i = 0; i < houses.length; i++) {
+    for (let j = i + 1; j < houses.length; j++) {
+      const a = houses[i], b = houses[j];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      if (dx*dx + dy*dy > 4 || dx*dx + dy*dy < 1) continue;
+      // Only for first house pair
+      const key = i + ':' + j;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const sa = toScreen(a.x, a.y);
+      const sb = toScreen(b.x, b.y);
+      const ax = sa.x, ay = sa.y - 14;
+      const bx = sb.x, by = sb.y - 14;
+      const cx = (ax + bx) / 2, cy = (ay + by) / 2 + 4;
+      // Rope
+      ctx.strokeStyle = 'rgba(60,40,20,0.6)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo(cx, cy, bx, by);
+      ctx.stroke();
+      // Clothes (3 items)
+      const colors = ['#4080c8','#c84040','#e0d040'];
+      for (let k = 1; k < 4; k++) {
+        const t = k / 4;
+        const px = (1 - t) * (1 - t) * ax + 2 * (1 - t) * t * cx + t * t * bx;
+        const py = (1 - t) * (1 - t) * ay + 2 * (1 - t) * t * cy + t * t * by;
+        const sway = Math.sin(tt + k + i) * 1.2;
+        ctx.fillStyle = colors[k - 1];
+        ctx.fillRect(px - 1.5 + sway, py + 0.5, 3, 4);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(px - 1 + sway, py + 0.5, 2, 0.5);
+      }
+      break; // only one per house
+    }
+  }
+}
+registerWorldRenderer(renderLaundry);
