@@ -84,6 +84,7 @@
 - Compass signposts at map edges (loop 69)
 - Pumpkin patches at farms in autumn (loop 70)
 - Bats fly across night sky (loop 71)
+- Heart particles on population growth (loop 72)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -313,3 +314,5 @@
 ### Loop 70 — pumpkin patch decorations around farms in autumn.
 
 ### Loop 71 — bats erratically fly across screen at night.
+
+### Loop 72 — heart particles burst from a random house when population grows.

@@ -3184,3 +3184,24 @@ function renderBats(ctx) {
 }
 registerUpdater(updateBats, true);
 registerScreenRenderer(renderBats);
+
+// ── Loop 72: Citizen heart particle when birth happens
+let _prevPop = 0;
+function updateBirthHearts() {
+  if (G.population > _prevPop && _prevPop !== 0) {
+    if (!G.particles) G.particles = [];
+    const houses = G.buildings.filter(b => b.type === 'house');
+    if (houses.length) {
+      const h = houses[Math.floor(Math.random() * houses.length)];
+      for (let i = 0; i < 4; i++) {
+        G.particles.push({
+          tx: h.x, ty: h.y, offsetY: -10 - Math.random() * 5,
+          text: '❤', alpha: 1.5,
+          vy: -0.18 - Math.random() * 0.1, decay: 0.012, type: 'text',
+        });
+      }
+    }
+  }
+  _prevPop = G.population;
+}
+registerUpdater(updateBirthHearts);
