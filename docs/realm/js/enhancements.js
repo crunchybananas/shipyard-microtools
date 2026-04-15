@@ -8,6 +8,59 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 5: Migrating bird flocks in V formation ──────────
+export function updateFlocks(logicalW, logicalH) {
+  if (!G.flocks) G.flocks = [];
+  // Spawn at dawn or dusk only
+  const t = G.dayPhase / G.dayLength;
+  const isDawnDusk = (t > 0.05 && t < 0.18) || (t > 0.62 && t < 0.78);
+  if (isDawnDusk && G.gameTick % 600 === 0 && G.flocks.length < 1 && Math.random() < 0.6) {
+    const goingRight = Math.random() < 0.5;
+    const count = 7 + Math.floor(Math.random() * 6);
+    const baseY = logicalH * (0.08 + Math.random() * 0.18);
+    G.flocks.push({
+      x: goingRight ? -80 : logicalW + 80,
+      y: baseY,
+      vx: (goingRight ? 1 : -1) * (1.2 + Math.random() * 0.5),
+      vy: 0,
+      count,
+      phase: 0,
+    });
+  }
+  for (let i = G.flocks.length - 1; i >= 0; i--) {
+    const f = G.flocks[i];
+    f.x += f.vx; f.y += Math.sin(G.gameTick * 0.01 + f.phase) * 0.15;
+    if (f.x < -200 || f.x > (logicalW || 2000) + 200) G.flocks.splice(i, 1);
+  }
+}
+
+export function renderFlocks(ctx, logicalW, logicalH) {
+  if (!G.flocks || !G.flocks.length) return;
+  const t = G.dayPhase / G.dayLength;
+  const isDawnDusk = (t > 0.05 && t < 0.22) || (t > 0.58 && t < 0.82);
+  ctx.save();
+  for (const f of G.flocks) {
+    // Silhouette dark against sky, slight orange tint at dusk
+    ctx.strokeStyle = isDawnDusk ? 'rgba(40,25,15,0.85)' : 'rgba(30,30,40,0.7)';
+    ctx.lineWidth = 1.3;
+    const dir = f.vx >= 0 ? 1 : -1;
+    for (let k = 0; k < f.count; k++) {
+      // V formation: two rows fanning back
+      const row = k === 0 ? 0 : (k % 2 === 1 ? 1 : -1);
+      const idx = Math.ceil(k / 2);
+      const bx = f.x - dir * idx * 14;
+      const by = f.y + row * idx * 6;
+      const wing = Math.sin(G.gameTick * 0.35 + k * 0.6) * 4;
+      ctx.beginPath();
+      ctx.moveTo(bx - 5 * dir, by + wing);
+      ctx.lineTo(bx, by);
+      ctx.lineTo(bx + 5 * dir, by + wing);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
 // ── Loop 4: Wandering fishing boats on open water ───────────
 function findWaterCluster() {
   // Find a large connected water area; return a spawn coordinate

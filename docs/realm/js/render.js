@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
-import { renderBoats } from './enhancements.js';
+import { renderBoats, renderFlocks } from './enhancements.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
@@ -1749,6 +1749,9 @@ export function render() {
     }
     ctx.restore();
   }
+
+  // ── Migrating flocks (loop 5+) ──────────────────────────────
+  renderFlocks(ctx, logicalW, logicalH);
 
   // ── Rain overlay (screen space) ───────────────────────────────
   if (G.weather === 'rain' && G.camera.zoom >= 0.6) {

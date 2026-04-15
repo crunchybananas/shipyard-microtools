@@ -17,6 +17,7 @@
 - Seasonal weather (rain, snow particles)
 - Citizen directional facing (eyes, mouth, hair)
 - Wandering fishing boats on water (loop 4)
+- Migrating bird flocks at dawn/dusk (loop 5)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -43,3 +44,9 @@
 - Ideas: (1) **wandering fishing boats on open water** (2) seasonal migrating bird flocks across sky (3) shipwreck props sprinkled on coastline
 - Chose: fishing boats (gives water purpose, complements existing animal life on land)
 - Implemented: enhancements.js (new module). Boats spawn in water clusters, wander between water tiles, two kinds (sail + fishing pole with figure), bobbing animation, V-shaped wake. Hooked into main.js sim tick + render.js after animals.
+
+### Loop 5
+- Validator: existing single birds feel scattered; sky has stars/moon at night but feels empty during dawn/dusk transitions.
+- Ideas: (1) **migrating flocks in V-formation** (2) hot air balloons drifting overhead (3) shooting comets visible at twilight
+- Chose: V-formation flocks (timed to dawn/dusk reinforces day/night cycle)
+- Implemented: enhancements.js updateFlocks/renderFlocks. Spawns rare flock of 7-12 birds at dawn or dusk, V-formation, dark silhouettes with flapping wings, drift across screen-space sky.
