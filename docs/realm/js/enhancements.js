@@ -3368,3 +3368,39 @@ function renderCrier(ctx) {
 }
 registerUpdater(updateCrier);
 registerWorldRenderer(renderCrier);
+
+// ── Loop 78: Lily pads gain little frogs and dragonflies in summer
+function renderDragonflies(ctx) {
+  if (G.season !== 'summer' || G.camera.zoom < 1.0) return;
+  const tt = G.gameTick;
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 18 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.WATER) continue;
+      const h = ((tx * 0x9999) ^ (ty * 0xc7c7)) >>> 0;
+      if (h % 100 > 6) continue;
+      const s = toScreen(tx, ty);
+      const dx = Math.sin(tt * 0.05 + h) * 8;
+      const dy = Math.cos(tt * 0.07 + h) * 4;
+      const cxs = s.x + dx, cys = s.y - 6 + dy;
+      // Body
+      ctx.fillStyle = '#3aa0c8';
+      ctx.fillRect(cxs - 0.5, cys - 0.2, 2, 0.4);
+      // Wings (transparent)
+      ctx.fillStyle = 'rgba(220,240,255,0.55)';
+      const wing = Math.sin(tt * 0.5 + h) * 0.3 + 1;
+      ctx.beginPath();
+      ctx.ellipse(cxs - 0.2, cys - 0.5, 1.4, 0.5 * wing, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(cxs + 0.6, cys - 0.5, 1.4, 0.5 * wing, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+registerWorldRenderer(renderDragonflies);
