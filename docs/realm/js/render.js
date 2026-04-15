@@ -1409,6 +1409,98 @@ export function render() {
     ctx.fill();
   }
 
+  // ── Animals ─────────────────────────────────────────────
+  if (G.animals && G.camera.zoom >= 0.6) {
+    for (const a of G.animals) {
+      const as = toScreen(a.x, a.y);
+      ctx.globalAlpha = daylight;
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.beginPath();
+      ctx.ellipse(as.x, as.y + 3, 4, 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Walking bob
+      const isWalking = a.state === 'walk';
+      const bob = isWalking ? Math.sin(G.gameTick * 0.2 + a.phase) * 0.8 : 0;
+
+      if (a.type === 'deer') {
+        // Brown body
+        ctx.fillStyle = '#8a6a40';
+        ctx.beginPath();
+        ctx.ellipse(as.x, as.y - 3 + bob, 4, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Head (small, forward)
+        ctx.fillStyle = '#9a7a50';
+        ctx.beginPath();
+        ctx.arc(as.x + 3, as.y - 5 + bob, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        // Antlers (at high zoom)
+        if (G.camera.zoom >= 1.3) {
+          ctx.strokeStyle = '#5a3a1a';
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(as.x + 3, as.y - 7 + bob);
+          ctx.lineTo(as.x + 4.5, as.y - 9 + bob);
+          ctx.moveTo(as.x + 3, as.y - 7 + bob);
+          ctx.lineTo(as.x + 2, as.y - 9 + bob);
+          ctx.stroke();
+        }
+        // Tiny legs (4 small lines)
+        ctx.strokeStyle = '#5a3a1a';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(as.x - 2, as.y - 1); ctx.lineTo(as.x - 2, as.y + 2);
+        ctx.moveTo(as.x + 2, as.y - 1); ctx.lineTo(as.x + 2, as.y + 2);
+        ctx.stroke();
+      } else if (a.type === 'sheep') {
+        // Fluffy white body
+        ctx.fillStyle = '#f0ece0';
+        ctx.beginPath();
+        ctx.ellipse(as.x, as.y - 2 + bob, 3.5, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Fluff bumps
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.arc(as.x + i * 1.5, as.y - 3.5 + bob, 1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Dark head
+        ctx.fillStyle = '#1a1a1a';
+        ctx.beginPath();
+        ctx.arc(as.x + 3, as.y - 3 + bob, 1.3, 0, Math.PI * 2);
+        ctx.fill();
+        // Legs
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(as.x - 1.5, as.y); ctx.lineTo(as.x - 1.5, as.y + 2);
+        ctx.moveTo(as.x + 1.5, as.y); ctx.lineTo(as.x + 1.5, as.y + 2);
+        ctx.stroke();
+      } else if (a.type === 'chicken') {
+        // White body
+        ctx.fillStyle = '#f4f2e8';
+        ctx.beginPath();
+        ctx.ellipse(as.x, as.y - 2 + bob, 2, 1.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Red comb
+        ctx.fillStyle = '#c02020';
+        ctx.beginPath();
+        ctx.arc(as.x + 1.5, as.y - 3.5 + bob, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        // Beak
+        ctx.fillStyle = '#d4a020';
+        ctx.beginPath();
+        ctx.moveTo(as.x + 2.3, as.y - 3 + bob);
+        ctx.lineTo(as.x + 3.2, as.y - 2.8 + bob);
+        ctx.lineTo(as.x + 2.3, as.y - 2.5 + bob);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+
   // ── Particles ─────────────────────────────────────────────
   for (const p of G.particles) {
     const s = toScreen(p.tx, p.ty);

@@ -72,6 +72,7 @@ export const G = {
   soldiers: [],
   buildingGrid: [],    // MAP_H x MAP_W, null or building ref
   particles: [],
+  animals: [],
   enemies: [],
   projectiles: [],
   resources: { wood:60, stone:30, food:80, gold:25, iron:0 },

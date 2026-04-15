@@ -23,6 +23,7 @@ import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievemen
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
 import { updateWalkers } from './walkers.js';
+import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
 
@@ -168,7 +169,7 @@ window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   if (!confirm('Start a new game? Current unsaved progress will be lost.')) return;
   // Reset all state
-  G.buildings = []; G.citizens = []; G.caravans = []; G.walkers = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = [];
+  G.buildings = []; G.citizens = []; G.caravans = []; G.walkers = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = []; G.animals = [];
   G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
   G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
   G.day = 1; G.dayPhase = 0; G.gameTick = 0; G.speed = 1;
@@ -276,6 +277,7 @@ function simTick() {
     updateTowers();
     updateProjectiles();
     updateWalkers();
+    updateAnimals();
     updateProduction();
     updateFires();
     updateParticles();

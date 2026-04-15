@@ -24,4 +24,9 @@
 - If divergent thinker proposes something already tried, reject and re-ask.
 
 ## Loop log
-(Each loop appends here with: validator findings | ideas proposed | chosen | commit hash)
+
+### Loop 1 — 295fc38
+- Validator: castle doesn't feel elevated; mountains look like wallpaper; houses float like tokens; water is a color zone; assets feel like different games
+- Ideas: (1) wildlife ecosystem (2) **procedural road wear** (3) dawn reveal cinematic
+- Chose: procedural road wear (addresses "houses float like tokens")
+- Implemented: tileWear grid, citizen+soldier movement increments wear, rendered as progressive dirt tint, save/load support
