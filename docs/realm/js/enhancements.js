@@ -8,6 +8,47 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 22: Cherry blossom canopy on forest tiles in spring
+export function renderBlossoms(ctx) {
+  if (G.season !== 'spring' || G.camera.zoom < 0.7) return;
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 28 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.FOREST) continue;
+      const h = ((tx * 2654435761) ^ (ty * 1597463007)) >>> 0;
+      if (h % 100 > 25) continue; // 25% of forest tiles bloom
+      const s = toScreen(tx, ty);
+      // Cluster of 5-7 pink puffs
+      const N = 5 + (h % 3);
+      const isWhite = h & 8;
+      for (let i = 0; i < N; i++) {
+        const off = ((h + i * 911) % 100) / 100;
+        const off2 = ((h + i * 1373) % 100) / 100;
+        const px = s.x + (off - 0.5) * 14;
+        const py = s.y - 8 + (off2 - 0.5) * 6;
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = isWhite ? '#ffeef5' : (i & 1 ? '#ffb0c8' : '#ff8aa8');
+        ctx.beginPath();
+        ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 0.4;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(px - 0.4, py - 0.4, 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
 // ── Loop 21: Spontaneous snowmen near houses in winter ────
 export function updateSnowmen() {
   if (G.season !== 'winter') { if (G.snowmen) G.snowmen.length = 0; return; }
