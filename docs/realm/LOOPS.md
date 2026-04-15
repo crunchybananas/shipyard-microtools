@@ -41,6 +41,7 @@
 - Wind-rippled wheat halos around farms (loop 26)
 - Perched owls in forest at night (loop 27)
 - Large 3-masted trade ships along map edges (loop 28)
+- Sparkles orbiting wells (loop 29)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -184,3 +185,5 @@
 ### Loop 27 — owls perched on forest tiles at night (silhouettes + glowing yellow eyes that blink + occasional 'hoo' text).
 
 ### Loop 28 — large 3-masted trade ships traverse map edge water (entry from left/top, exit on opposite side; flag, big sails).
+
+### Loop 29 — magical blue sparkles orbit each well building.

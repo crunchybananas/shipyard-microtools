@@ -1465,3 +1465,32 @@ function renderTradeShips(ctx) {
 }
 registerUpdater(updateTradeShip);
 registerWorldRenderer(renderTradeShips);
+
+// ── Loop 29: Magical sparkles emanate from well buildings ──
+function renderWellSparkles(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const tt = G.gameTick * 0.08;
+  for (const b of G.buildings) {
+    if (b.type !== 'well') continue;
+    const s = toScreen(b.x, b.y);
+    for (let i = 0; i < 5; i++) {
+      const ang = tt + i * (Math.PI * 2 / 5);
+      const r = 6 + Math.sin(tt * 1.3 + i) * 4;
+      const sx = s.x + Math.cos(ang) * r;
+      const sy = s.y - 14 + Math.sin(ang) * r * 0.5;
+      const a = 0.5 + 0.5 * Math.sin(tt * 2 + i * 1.5);
+      ctx.fillStyle = `rgba(180,230,255,${a * 0.85})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 0.9, 0, Math.PI * 2);
+      ctx.fill();
+      // Cross sparkle
+      ctx.strokeStyle = `rgba(220,250,255,${a * 0.5})`;
+      ctx.lineWidth = 0.4;
+      ctx.beginPath();
+      ctx.moveTo(sx - 1.5, sy); ctx.lineTo(sx + 1.5, sy);
+      ctx.moveTo(sx, sy - 1.5); ctx.lineTo(sx, sy + 1.5);
+      ctx.stroke();
+    }
+  }
+}
+registerWorldRenderer(renderWellSparkles);
