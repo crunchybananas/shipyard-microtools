@@ -8,6 +8,42 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 19: Footprints in snow (winter only) ──────────────
+export function updateFootprints() {
+  if (G.season !== 'winter') { if (G.footprints) G.footprints.length = 0; return; }
+  if (!G.footprints) G.footprints = [];
+  // Each citizen leaves a print every ~20 ticks
+  if (G.gameTick % 20 === 0 && G.citizens) {
+    for (const c of G.citizens) {
+      if (G.footprints.length > 200) break;
+      G.footprints.push({ x: c.x, y: c.y, age: 0, life: 600 });
+    }
+  }
+  for (let i = G.footprints.length - 1; i >= 0; i--) {
+    G.footprints[i].age += G.speed;
+    if (G.footprints[i].age >= G.footprints[i].life) G.footprints.splice(i, 1);
+  }
+}
+export function renderFootprints(ctx) {
+  if (G.season !== 'winter' || !G.footprints || !G.footprints.length || G.camera.zoom < 0.7) return;
+  ctx.save();
+  for (const fp of G.footprints) {
+    const fade = 1 - (fp.age / fp.life);
+    if (fade <= 0) continue;
+    const s = toScreen(fp.x, fp.y);
+    ctx.globalAlpha = fade * 0.45;
+    ctx.fillStyle = '#7088a8';
+    ctx.beginPath();
+    ctx.ellipse(s.x - 1, s.y + 2, 0.9, 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(s.x + 1, s.y + 3, 0.9, 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
 // ── Loop 18: Town bonfire when happiness is high ────────────
 function townCenter() {
   if (!G.buildings.length) return null;

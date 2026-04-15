@@ -31,6 +31,7 @@
 - Constellation line patterns at night (loop 16)
 - Wet ground puddles after rain (loop 17)
 - Town bonfire when happiness high (loop 18)
+- Citizen footprints in snow (loop 19)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -141,3 +142,9 @@
 - Ideas: (1) **town bonfire when happiness > 65** (2) cheering villagers near tavern (3) confetti when scenario won (already kind of done)
 - Chose: bonfire (passive worldspace happiness indicator + nighttime warmth)
 - Implemented: enhancements.js renderBonfire. Above town center, logs + flickering flame layers + warm halo at night, only when happiness ≥ 65.
+
+### Loop 19
+- Validator: snow accumulates only on building roofs; ground stays static, citizens leave no trace.
+- Ideas: (1) **citizen footprints in snow** (2) snowmen built spontaneously (3) icicles dripping
+- Chose: footprints (kinetic, organic trail telling movement story)
+- Implemented: enhancements.js updateFootprints/renderFootprints. Each citizen drops a small dual-print every 20 ticks in winter, fade out over ~10 sec; capped at 200 prints.
