@@ -2982,3 +2982,50 @@ function renderForgeEmbers(ctx) {
   }
 }
 registerWorldRenderer(renderForgeEmbers);
+
+// ── Loop 67: Decorative weather vane on church spire ───────
+function renderChurchVane(ctx) {
+  if (G.camera.zoom < 0.6) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'church') continue;
+    const s = toScreen(b.x, b.y);
+    const cx = s.x, cy = s.y - 50;
+    const ang = G.gameTick * 0.02;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(Math.sin(ang) * 0.4);
+    // Rooster silhouette
+    ctx.fillStyle = '#3a2a14';
+    ctx.beginPath();
+    ctx.moveTo(-4, 0);
+    ctx.lineTo(0, -3);
+    ctx.lineTo(2, -3);
+    ctx.lineTo(4, 0);
+    ctx.lineTo(2, 1);
+    ctx.lineTo(-3, 1);
+    ctx.closePath();
+    ctx.fill();
+    // Comb
+    ctx.fillStyle = '#c83018';
+    ctx.fillRect(0, -4.5, 2.5, 1.2);
+    // Tail
+    ctx.fillStyle = '#3a2a14';
+    ctx.beginPath();
+    ctx.moveTo(-4, 0);
+    ctx.lineTo(-7, -3);
+    ctx.lineTo(-5, 1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    // Cross-axis indicator
+    ctx.strokeStyle = '#3a2a14';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 5, cy + 2);
+    ctx.lineTo(cx + 5, cy + 2);
+    ctx.moveTo(cx, cy - 3);
+    ctx.lineTo(cx, cy + 5);
+    ctx.stroke();
+  }
+}
+registerWorldRenderer(renderChurchVane);
