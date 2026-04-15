@@ -3250,3 +3250,21 @@ function renderCoopChickens(ctx) {
   }
 }
 registerWorldRenderer(renderCoopChickens);
+
+// ── Loop 75: Hovering text labels on selected building ──────
+// Already exists in UI? Add hover info above selected building anyway.
+function renderSelectedHalo(ctx) {
+  if (!G.selectedBuilding) return;
+  const b = G.selectedBuilding;
+  const s = toScreen(b.x, b.y);
+  const tt = G.gameTick * 0.08;
+  const r = 18 + Math.sin(tt) * 2;
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,210,120,${0.6 + 0.3 * Math.sin(tt)})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y + 4, r, r * 0.4, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+registerWorldRenderer(renderSelectedHalo);
