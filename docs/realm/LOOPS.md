@@ -45,6 +45,7 @@
 - Slow comets across deep-night sky (loop 30)
 - Wandering ghost wisp at night (loop 31)
 - Frogs hop on sand near water at night (loop 32)
+- Visible jagged lightning bolts in rain (loop 33)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -196,3 +197,5 @@
 ### Loop 31 — wandering ghost wisp at night (rare, fades in/out, drifts on land tiles).
 
 ### Loop 32 — frogs hop on sand near water at dusk/night, occasional throat-puff croak.
+
+### Loop 33 — visible jagged lightning bolts during rain (multi-segment paths from sky downward + glow halo).

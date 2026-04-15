@@ -1678,3 +1678,53 @@ function renderFrogs(ctx) {
 }
 registerUpdater(updateFrogs);
 registerWorldRenderer(renderFrogs);
+
+// ── Loop 33: Visible jagged lightning bolts during rain ────
+function updateBolts(logicalW, logicalH) {
+  if (!G.bolts) G.bolts = [];
+  if (G.weather === 'rain' && G.gameTick % 200 === 0 && Math.random() < 0.4) {
+    const x = Math.random() * (logicalW || 1500);
+    const segs = [];
+    let cx = x, cy = 0;
+    while (cy < (logicalH || 800) * 0.7) {
+      const nx = cx + (Math.random() - 0.5) * 30;
+      const ny = cy + 30 + Math.random() * 25;
+      segs.push({ x: cx, y: cy, x2: nx, y2: ny });
+      cx = nx; cy = ny;
+    }
+    G.bolts.push({ segs, life: 12 });
+  }
+  for (let i = G.bolts.length - 1; i >= 0; i--) {
+    G.bolts[i].life -= G.speed;
+    if (G.bolts[i].life <= 0) G.bolts.splice(i, 1);
+  }
+}
+function renderBolts(ctx) {
+  if (!G.bolts || !G.bolts.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const b of G.bolts) {
+    const a = Math.min(1, b.life / 6);
+    // Glow halo
+    ctx.strokeStyle = `rgba(180,210,255,${a * 0.4})`;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    for (const seg of b.segs) {
+      ctx.moveTo(seg.x, seg.y);
+      ctx.lineTo(seg.x2, seg.y2);
+    }
+    ctx.stroke();
+    // Core
+    ctx.strokeStyle = `rgba(255,255,255,${a})`;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    for (const seg of b.segs) {
+      ctx.moveTo(seg.x, seg.y);
+      ctx.lineTo(seg.x2, seg.y2);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+registerUpdater(updateBolts, true);
+registerScreenRenderer(renderBolts);
