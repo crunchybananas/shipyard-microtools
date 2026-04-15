@@ -107,6 +107,7 @@
 - Dragon purple smoke trail (loop 92)
 - Bald eagle circles castle (loop 93)
 - Spring pollen bursts from grass (loop 94)
+- Students run circles around schools (loop 95)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -382,3 +383,5 @@
 ### Loop 93 — bald eagle (white head, wider wings) circles slowly above castle when one exists.
 
 ### Loop 94 — periodic small pollen bursts erupt from random grass tiles in spring.
+
+### Loop 95 — small student figures run circles around each school building.

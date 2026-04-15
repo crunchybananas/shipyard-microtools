@@ -3904,3 +3904,33 @@ function updatePollenBurst() {
   }
 }
 registerUpdater(updatePollenBurst);
+
+// ── Loop 95: Bookish kid runs around schools ───────────────
+function updateSchoolKids() {
+  if (!G.schoolKids) G.schoolKids = [];
+  const schools = G.buildings.filter(b => b.type === 'school');
+  if (!schools.length) { G.schoolKids.length = 0; return; }
+  while (G.schoolKids.length < Math.min(schools.length * 2, 6)) {
+    const s = schools[G.schoolKids.length % schools.length];
+    G.schoolKids.push({ school: s, ang: Math.random() * Math.PI * 2, r: 5 + Math.random() * 4, speed: 0.04 + Math.random() * 0.04 });
+  }
+  for (const k of G.schoolKids) k.ang += k.speed * G.speed;
+}
+function renderSchoolKids(ctx) {
+  if (!G.schoolKids || !G.schoolKids.length || G.camera.zoom < 0.9) return;
+  for (const k of G.schoolKids) {
+    if (!k.school) continue;
+    const s = toScreen(k.school.x, k.school.y);
+    const x = s.x + Math.cos(k.ang) * k.r;
+    const y = s.y + 4 + Math.sin(k.ang) * k.r * 0.4;
+    // Tiny figure
+    ctx.fillStyle = '#3a4080';
+    ctx.fillRect(x - 0.6, y - 1.5, 1.2, 2);
+    ctx.fillStyle = '#e8c8a0';
+    ctx.beginPath();
+    ctx.arc(x, y - 2.2, 0.7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+registerUpdater(updateSchoolKids);
+registerWorldRenderer(renderSchoolKids);
