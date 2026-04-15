@@ -62,6 +62,7 @@
 - Pulsating tide foam on coastal sand (loop 47)
 - Snow drift mounds beside buildings (loop 48)
 - Dust devils on summer sand (loop 49)
+- Victory confetti rain (loop 50)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -247,3 +248,5 @@
 ### Loop 48 — snow drift mounds piled on east side of every building in winter.
 
 ### Loop 49 — twisting dust devils on summer sand tiles.
+
+### Loop 50 — continuous confetti rain after winning a scenario or the main game.

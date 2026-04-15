@@ -2353,3 +2353,34 @@ function renderDustDevils(ctx) {
 }
 registerUpdater(updateDustDevils);
 registerWorldRenderer(renderDustDevils);
+
+// ── Loop 50: Continuous victory confetti rain ──────────────
+function renderVictoryConfetti(ctx, logicalW, logicalH) {
+  if (!G.won && !G._scenarioWon) return;
+  if (!G._confetti) G._confetti = [];
+  if (G.gameTick % 4 === 0 && G._confetti.length < 80) {
+    G._confetti.push({
+      x: Math.random() * logicalW,
+      y: -10,
+      vx: (Math.random() - 0.5) * 2,
+      vy: 1 + Math.random() * 1.5,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.3,
+      color: ['#ff5050','#ffd166','#50ff80','#50a0ff','#ff80ff'][Math.floor(Math.random() * 5)],
+      life: 200,
+    });
+  }
+  for (let i = G._confetti.length - 1; i >= 0; i--) {
+    const c = G._confetti[i];
+    c.x += c.vx; c.y += c.vy; c.rot += c.vrot;
+    c.life--;
+    if (c.life <= 0 || c.y > logicalH + 20) { G._confetti.splice(i, 1); continue; }
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-2, -1, 4, 2);
+    ctx.restore();
+  }
+}
+registerScreenRenderer(renderVictoryConfetti);
