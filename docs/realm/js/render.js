@@ -119,6 +119,13 @@ export function render() {
       let tileColor = colors[(x+y)%2];
       const seasonShift = getSeasonData().tileShift;
 
+      // Water uses large-scale smooth noise — no per-tile checkerboard seams
+      if (tile === TILE.WATER) {
+        const n = (Math.sin(x * 0.3 + 0.7) + Math.cos(y * 0.4 + 0.5)) * 0.5 + 0.5;
+        const tint = Math.floor(n * 20) - 10;
+        tileColor = `rgb(${0x18 + tint}, ${0x52 + tint}, ${0xb8 + tint})`;
+      }
+
       // Grass shade variation via position hash + season tint
       if (tile === TILE.GRASS || tile === TILE.SAND) {
         const h = ((x * 374761 + y * 668265) & 0xff) / 255;
@@ -129,7 +136,8 @@ export function render() {
       }
 
       ctx.globalAlpha = daylight;
-      const tileDepth = tile === TILE.WATER ? 4 : tile === TILE.SAND ? 3 : tile === TILE.MOUNTAIN ? 8 : 4;
+      // Water depth = 0 — water is flat at ocean level, no raised side faces
+      const tileDepth = tile === TILE.WATER ? 0 : tile === TILE.SAND ? 3 : tile === TILE.MOUNTAIN ? 8 : 4;
 
       // Top face
       ctx.fillStyle = tileColor;
@@ -154,7 +162,7 @@ export function render() {
         ctx.globalAlpha = daylight;
       }
 
-      // Terrain blend: gradient strip at edges bordering different biomes
+      // Terrain blend: multi-step gradient at edges bordering different biomes
       if (tile >= TILE.SAND && tile <= TILE.FOREST && showDetails) {
         for (const [dx2, dy2] of [[-1,0],[1,0],[0,-1],[0,1]]) {
           const nx = x+dx2, ny = y+dy2;
@@ -162,42 +170,53 @@ export function render() {
           const nTile = G.map[ny][nx];
           if (nTile === tile || nTile === TILE.WATER || nTile === TILE.MOUNTAIN) continue;
           const nColors = TILE_COLORS[nTile];
-          // Draw gradient strip - more visible
-          ctx.globalAlpha = daylight * 0.2;
+          // 3 overlapping circles at different radii, decreasing alpha for soft gradient
+          ctx.globalAlpha = daylight * 0.18;
           ctx.fillStyle = nColors[0];
           ctx.beginPath();
-          ctx.arc(s.x + dx2*14, s.y + dy2*7, 10, 0, Math.PI*2);
+          ctx.arc(s.x + dx2 * 16, s.y + dy2 * 8, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = daylight * 0.10;
+          ctx.beginPath();
+          ctx.arc(s.x + dx2 * 13, s.y + dy2 * 6, 12, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = daylight * 0.06;
+          ctx.beginPath();
+          ctx.arc(s.x + dx2 * 10, s.y + dy2 * 5, 15, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = daylight;
       }
 
-      // Right side face (darker)
-      ctx.fillStyle = tile === TILE.WATER ? 'rgba(5,25,70,0.9)' : shiftColor(tileColor, [-30, -30, -30]);
-      ctx.beginPath();
-      ctx.moveTo(s.x + TW/2, s.y);
-      ctx.lineTo(s.x, s.y + TH/2);
-      ctx.lineTo(s.x, s.y + TH/2 + tileDepth);
-      ctx.lineTo(s.x + TW/2, s.y + tileDepth);
-      ctx.closePath();
-      ctx.fill();
+      // Side faces — only for non-water tiles that have actual depth
+      if (tileDepth > 0) {
+        // Right side face (darker)
+        ctx.fillStyle = shiftColor(tileColor, [-30, -30, -30]);
+        ctx.beginPath();
+        ctx.moveTo(s.x + TW/2, s.y);
+        ctx.lineTo(s.x, s.y + TH/2);
+        ctx.lineTo(s.x, s.y + TH/2 + tileDepth);
+        ctx.lineTo(s.x + TW/2, s.y + tileDepth);
+        ctx.closePath();
+        ctx.fill();
 
-      // Left side face (medium dark)
-      ctx.fillStyle = tile === TILE.WATER ? 'rgba(8,35,90,0.85)' : shiftColor(tileColor, [-18, -18, -18]);
-      ctx.beginPath();
-      ctx.moveTo(s.x - TW/2, s.y);
-      ctx.lineTo(s.x, s.y + TH/2);
-      ctx.lineTo(s.x, s.y + TH/2 + tileDepth);
-      ctx.lineTo(s.x - TW/2, s.y + tileDepth);
-      ctx.closePath();
-      ctx.fill();
+        // Left side face (medium dark)
+        ctx.fillStyle = shiftColor(tileColor, [-18, -18, -18]);
+        ctx.beginPath();
+        ctx.moveTo(s.x - TW/2, s.y);
+        ctx.lineTo(s.x, s.y + TH/2);
+        ctx.lineTo(s.x, s.y + TH/2 + tileDepth);
+        ctx.lineTo(s.x - TW/2, s.y + tileDepth);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       // Cliff edge — darker rocky face where land meets water
       if (tile !== TILE.WATER && showDetails) {
         const waterRight = x < MAP_W-1 && G.map[y][x+1] === TILE.WATER;
         const waterDown  = y < MAP_H-1 && G.map[y+1][x] === TILE.WATER;
         if (waterRight) {
-          ctx.globalAlpha = daylight * 0.45;
+          ctx.globalAlpha = daylight * 0.65;
           ctx.fillStyle = '#2a1a0a';
           ctx.beginPath();
           ctx.moveTo(s.x + TW/2, s.y);
@@ -209,7 +228,7 @@ export function render() {
           ctx.globalAlpha = daylight;
         }
         if (waterDown) {
-          ctx.globalAlpha = daylight * 0.35;
+          ctx.globalAlpha = daylight * 0.55;
           ctx.fillStyle = '#2a1a0a';
           ctx.beginPath();
           ctx.moveTo(s.x - TW/2, s.y);
@@ -460,119 +479,80 @@ export function render() {
       }
       else if (tile === TILE.MOUNTAIN) {
         const mh = ((x * 37 + y * 53) & 0xff);
-        const backPeakTop = s.y - 16 - (mh % 6);
-        const frontPeakTop = s.y - 12 - (mh % 4);
-
-        // Shadow at base
-        ctx.globalAlpha = daylight * 0.28;
+        // Height variation: 28-36px tall
+        const peakH = 28 + (mh % 9);
+        // Base shadow
+        ctx.globalAlpha = daylight * 0.3;
         ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.ellipse(s.x, s.y + 3, 14, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(s.x + 2, s.y + 5, 18, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = daylight;
 
-        // Back peak — gradient from dark slate base to lighter grey peak
-        const backGrad = ctx.createLinearGradient(s.x - 4, backPeakTop, s.x + 2, s.y + 4);
-        backGrad.addColorStop(0, '#9898aa');
-        backGrad.addColorStop(0.5, '#606070');
-        backGrad.addColorStop(1, '#4a4a58');
-        ctx.fillStyle = backGrad;
+        // Back peak (taller, darker)
+        const bx = s.x - 3, byTop = s.y - peakH - (mh % 4);
+        ctx.fillStyle = '#5a5a6a';
         ctx.beginPath();
-        ctx.moveTo(s.x - 10, s.y + 4);
-        ctx.lineTo(s.x - 4, backPeakTop);
-        ctx.lineTo(s.x + 2, s.y - 10);
-        ctx.lineTo(s.x + 6, s.y + 4);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(bx, byTop);
+        ctx.lineTo(bx - 14, s.y + 4);
+        ctx.lineTo(bx + 14, s.y + 2);
+        ctx.closePath(); ctx.fill();
 
-        // Front peak — gradient: darker base, mid-grey body
-        const frontGrad = ctx.createLinearGradient(s.x + 3, frontPeakTop, s.x + 8, s.y + 4);
-        frontGrad.addColorStop(0, '#a0a0b2');
-        frontGrad.addColorStop(0.45, '#727282');
-        frontGrad.addColorStop(1, '#585868');
-        ctx.fillStyle = frontGrad;
+        // Rocky shadow strokes on back peak
+        ctx.strokeStyle = 'rgba(20,20,30,0.35)';
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
-        ctx.moveTo(s.x - 4, s.y + 4);
-        ctx.lineTo(s.x + 3, frontPeakTop);
-        ctx.lineTo(s.x + 8, s.y - 6);
-        ctx.lineTo(s.x + 12, s.y + 4);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(bx - 3, byTop + 5); ctx.lineTo(bx - 8, s.y);
+        ctx.moveTo(bx + 2, byTop + 8); ctx.lineTo(bx + 6, s.y - 2);
+        ctx.stroke();
 
-        // Lit sunlight face — right-side highlight with gradient
-        const litGrad = ctx.createLinearGradient(s.x + 3, frontPeakTop, s.x + 12, s.y + 4);
-        litGrad.addColorStop(0, '#c0c0d0');
-        litGrad.addColorStop(1, '#8888a0');
-        ctx.fillStyle = litGrad;
+        // Snow cap on back peak
+        ctx.fillStyle = 'rgba(240,245,255,0.92)';
         ctx.beginPath();
-        ctx.moveTo(s.x + 3, frontPeakTop);
-        ctx.lineTo(s.x + 8, s.y - 6);
-        ctx.lineTo(s.x + 12, s.y + 4);
-        ctx.lineTo(s.x + 3, s.y + 2);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(bx, byTop);
+        ctx.lineTo(bx - 5, byTop + 9);
+        ctx.lineTo(bx + 4, byTop + 8);
+        ctx.closePath(); ctx.fill();
 
-        // Rocky texture lines — thin dark strokes on the mountain face
-        ctx.strokeStyle = 'rgba(30,30,45,0.45)';
-        ctx.lineWidth = 0.7;
-        // Back peak texture lines
-        ctx.globalAlpha = daylight * 0.6;
-        const backMid = s.y - 10;
+        // Front peak (shorter, lighter — main visible face)
+        const fpeakH = peakH - 6;
+        const fx = s.x + 4, fyTop = s.y - fpeakH - (mh % 3);
+        ctx.fillStyle = '#7a7a88';
         ctx.beginPath();
-        ctx.moveTo(s.x - 8, backMid + 2);  ctx.lineTo(s.x - 5, backMid - 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(s.x - 6, backMid + 5);  ctx.lineTo(s.x - 2, backMid + 2);
-        ctx.stroke();
-        // Front peak texture lines
-        ctx.beginPath();
-        ctx.moveTo(s.x + 1, s.y - 4);  ctx.lineTo(s.x + 5, s.y - 8);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(s.x - 1, s.y);      ctx.lineTo(s.x + 4, s.y - 4);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(s.x + 4, s.y - 9);  ctx.lineTo(s.x + 7, s.y - 6);
-        ctx.stroke();
-        ctx.globalAlpha = daylight;
+        ctx.moveTo(fx, fyTop);
+        ctx.lineTo(fx - 12, s.y + 4);
+        ctx.lineTo(fx + 12, s.y + 4);
+        ctx.closePath(); ctx.fill();
 
-        // Snow cap on back peak — wider, blue-white tint
-        ctx.fillStyle = 'rgba(210,230,255,0.92)';
+        // Rocky strokes on front peak
+        ctx.strokeStyle = 'rgba(40,40,50,0.4)';
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
-        ctx.moveTo(s.x - 4, backPeakTop);
-        ctx.lineTo(s.x - 7, backPeakTop + 5);
-        ctx.lineTo(s.x - 3, backPeakTop + 6);
-        ctx.lineTo(s.x + 0, backPeakTop + 4);
-        ctx.lineTo(s.x + 2, s.y - 10);
-        ctx.closePath();
-        ctx.fill();
-        // Highlight on back snow
-        ctx.fillStyle = 'rgba(240,250,255,0.7)';
-        ctx.beginPath();
-        ctx.moveTo(s.x - 4, backPeakTop);
-        ctx.lineTo(s.x - 5, backPeakTop + 3);
-        ctx.lineTo(s.x - 1, backPeakTop + 2);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(fx - 3, fyTop + 4); ctx.lineTo(fx - 6, s.y);
+        ctx.moveTo(fx + 3, fyTop + 6); ctx.lineTo(fx + 7, s.y);
+        ctx.stroke();
 
-        // Snow cap on front peak — blue-white tint, slightly jagged
-        ctx.fillStyle = 'rgba(215,235,255,0.90)';
+        // Sunlit highlight on left face
+        ctx.fillStyle = 'rgba(180,180,200,0.35)';
         ctx.beginPath();
-        ctx.moveTo(s.x + 3, frontPeakTop);
-        ctx.lineTo(s.x + 1, frontPeakTop + 4);
-        ctx.lineTo(s.x + 4, frontPeakTop + 5);
-        ctx.lineTo(s.x + 7, frontPeakTop + 3);
-        ctx.lineTo(s.x + 8, s.y - 6);
-        ctx.closePath();
-        ctx.fill();
-        // Highlight on front snow
-        ctx.fillStyle = 'rgba(240,250,255,0.65)';
+        ctx.moveTo(fx, fyTop);
+        ctx.lineTo(fx - 12, s.y + 4);
+        ctx.lineTo(fx - 3, s.y + 4);
+        ctx.lineTo(fx, fyTop + 8);
+        ctx.closePath(); ctx.fill();
+
+        // Snow cap on front peak (bigger, brighter)
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
         ctx.beginPath();
-        ctx.moveTo(s.x + 3, frontPeakTop);
-        ctx.lineTo(s.x + 2, frontPeakTop + 2);
-        ctx.lineTo(s.x + 5, frontPeakTop + 2);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(fx, fyTop);
+        ctx.lineTo(fx - 6, fyTop + 10);
+        ctx.lineTo(fx + 5, fyTop + 9);
+        ctx.closePath(); ctx.fill();
+
+        // Snow detail lines dripping down
+        ctx.fillStyle = 'rgba(240,245,255,0.6)';
+        ctx.fillRect(fx - 4, fyTop + 8, 1, 3);
+        ctx.fillRect(fx + 2, fyTop + 7, 1, 4);
       }
       else if (tile === TILE.SAND) {
         // Sand grain dots for beach texture
@@ -1599,6 +1579,14 @@ function drawBuilding(ctx, b, s, daylight) {
     }
   }
 
+  // AO contact ring — always at base, grounds the building visually
+  if (b.type !== 'road' && b.type !== 'wall') {
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 2, 10, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   // Longer directional shadow — darker toward building, faded toward tip
   const shadowGrad = ctx.createRadialGradient(s.x + 2, s.y + 3, 4, s.x + 12, s.y + 8, 25);
   shadowGrad.addColorStop(0, 'rgba(0,0,0,0.35)');
@@ -1818,6 +1806,9 @@ function drawHouse(ctx, s) {
   // Door
   ctx.fillStyle = '#4a2a12';
   ctx.fillRect(s.x-3, s.y-10, 6, 6);
+  // Doorstep — darker stone step
+  ctx.fillStyle = 'rgba(50, 45, 40, 0.6)';
+  ctx.fillRect(s.x - 4, s.y - 4, 8, 2);
   // Window
   ctx.fillStyle = '#ffeebb';
   ctx.fillRect(s.x+4, s.y-18, 3, 3);
@@ -1870,20 +1861,22 @@ function drawFarm(ctx, s) {
     ctx.lineWidth = 1;
     for (let row = -3; row <= 2; row++) {
       const cy = s.y + row * 2.8;
+      const stemIdx = ci * 6 + (row + 3);
+      const sway = Math.sin((G.gameTick || 0) * 0.05 + stemIdx * 0.3) * 0.4;
       ctx.beginPath();
       ctx.moveTo(cx, cy + 1);
-      ctx.lineTo(cx, cy - 3);
+      ctx.lineTo(cx + sway, cy - 3);
       ctx.stroke();
       if (isRipe) {
         ctx.fillStyle = '#d4a017';
-        ctx.fillRect(cx - 1, cy - 5, 2, 2);
+        ctx.fillRect(cx - 1 + sway, cy - 5, 2, 2);
         ctx.fillStyle = '#c8901a';
-        ctx.fillRect(cx - 1, cy - 3, 2, 1);
+        ctx.fillRect(cx - 1 + sway * 0.5, cy - 3, 2, 1);
       } else {
         ctx.fillStyle = '#4db820';
-        ctx.fillRect(cx - 2, cy - 5, 4, 2);
+        ctx.fillRect(cx - 2 + sway, cy - 5, 4, 2);
         ctx.fillStyle = '#3aaa10';
-        ctx.fillRect(cx - 1, cy - 3, 2, 1);
+        ctx.fillRect(cx - 1 + sway * 0.5, cy - 3, 2, 1);
       }
     }
   }
@@ -2651,6 +2644,15 @@ function drawWell(ctx, s) {
   ctx.beginPath();
   ctx.arc(s.x + 1.5, s.y - 13, 2, Math.PI, 0);
   ctx.stroke();
+
+  // Nearby puddles — suggest water splashing from bucket
+  ctx.fillStyle = 'rgba(96, 165, 250, 0.4)';
+  ctx.beginPath();
+  ctx.ellipse(s.x - 12, s.y + 8, 4, 1.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(s.x + 10, s.y + 7, 3, 1.2, 0, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawTavern(ctx, s) {
@@ -2703,6 +2705,9 @@ function drawTavern(ctx, s) {
   // Door
   ctx.fillStyle = '#3a2010';
   ctx.fillRect(s.x-3, s.y-12, 6, 8);
+  // Doorstep — darker stone step
+  ctx.fillStyle = 'rgba(50, 45, 40, 0.6)';
+  ctx.fillRect(s.x - 4, s.y - 4, 8, 2);
 }
 
 function drawWall(ctx, s, b) {
@@ -3371,6 +3376,15 @@ function drawChurch(ctx, s) {
   // Door
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(s.x - 3, s.y - 8, 6, 4);
+  // Doorstep — darker stone step
+  ctx.fillStyle = 'rgba(50, 45, 40, 0.6)';
+  ctx.fillRect(s.x - 4, s.y - 4, 8, 2);
+  // Faint window glow from within (always visible — divine light)
+  const windowGlow = ctx.createRadialGradient(s.x, s.y - 14, 1, s.x, s.y - 14, 6);
+  windowGlow.addColorStop(0, 'rgba(255, 230, 150, 0.4)');
+  windowGlow.addColorStop(1, 'rgba(255, 230, 150, 0)');
+  ctx.fillStyle = windowGlow;
+  ctx.fillRect(s.x - 6, s.y - 20, 12, 12);
 }
 
 function drawSchool(ctx, s) {
@@ -3953,93 +3967,135 @@ function drawGeneric(ctx, s, def) {
 // ── Terrain details ─────────────────────────────────────────
 function drawTree(ctx, x, y, a, seasonShift) {
   ctx.globalAlpha = a;
-  const c1 = seasonShift ? shiftColor('#2e7e35', seasonShift) : '#2e7e35';
-  const c2 = seasonShift ? shiftColor('#3d9e42', seasonShift) : '#3d9e42';
-  const c3 = seasonShift ? shiftColor('#236b28', seasonShift) : '#236b28';
-  const c4 = seasonShift ? shiftColor('#55b55a', seasonShift) : '#55b55a';
 
-  // Pick variant based on position
-  const variant = ((Math.abs(Math.round(x)) * 7 + Math.abs(Math.round(y)) * 13) % 3);
-
-  // Size variation
-  const size = 0.85 + ((Math.abs(Math.round(x)) * 374761 + Math.abs(Math.round(y)) * 668265) & 0xff) / 255 * 0.35;
+  // Pick variant based on position hash
+  const posHash = (Math.abs(Math.round(x)) * 374761 + Math.abs(Math.round(y)) * 668265) >>> 0;
+  const variantPick = posHash % 20;
+  let variant;
+  if (variantPick < 8) variant = 0;       // pine (40%)
+  else if (variantPick < 14) variant = 1;  // oak (30%)
+  else if (variantPick < 18) variant = 2;  // birch (20%)
+  else variant = 3;                         // dead (10%)
 
   // Shadow
   ctx.globalAlpha = a * 0.15;
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.ellipse(x + 3, y + 4, 10*size, 4*size, 0.3, 0, Math.PI * 2);
+  ctx.ellipse(x + 3, y + 4, 10, 4, 0.3, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = a;
 
-  // Trunk
-  ctx.fillStyle = '#5a3a1a';
-  ctx.fillRect(x - 2, y - 2, 4, 10);
-  ctx.fillStyle = '#6a4a2a';
-  ctx.fillRect(x - 1, y, 2, 7);
-
   if (variant === 0) {
-    // Round deciduous tree (original but with gradient)
-    const grad = ctx.createRadialGradient(x-2, y-10, 2, x, y-4, 14*size);
-    grad.addColorStop(0, c4);
-    grad.addColorStop(0.5, c2);
-    grad.addColorStop(1, c3);
-    ctx.fillStyle = grad;
+    // Tall Pine (conifer): slim trunk, stacked triangular layers
+    const size = 0.9 + ((posHash >> 8) & 0xff) / 255 * 0.3;
+    // Trunk
+    ctx.fillStyle = '#4a3018';
+    ctx.fillRect(x - 2, y - 2, 3, 10);
+    // 3 tiers of pine needles — pointed, overlapping
+    const pc1 = seasonShift ? shiftColor('#2a5a20', seasonShift) : '#2a5a20';
+    const pc2 = seasonShift ? shiftColor('#3a7030', seasonShift) : '#3a7030';
+    ctx.fillStyle = pc1;
+    // Bottom tier (widest)
     ctx.beginPath();
-    ctx.arc(x, y - 4, 14*size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = c1;
+    ctx.moveTo(x, y - 2);
+    ctx.lineTo(x - 11*size, y + 3);
+    ctx.lineTo(x + 11*size, y + 3);
+    ctx.closePath(); ctx.fill();
+    // Middle tier
+    ctx.fillStyle = pc2;
     ctx.beginPath();
-    ctx.arc(x - 2, y - 12*size, 9*size, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x - 8*size, y - 2);
+    ctx.lineTo(x + 8*size, y - 2);
+    ctx.closePath(); ctx.fill();
+    // Top tier (pointed)
+    ctx.fillStyle = pc1;
     ctx.beginPath();
-    ctx.arc(x + 2, y - 16*size, 6*size, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(x, y - 16);
+    ctx.lineTo(x - 5*size, y - 8);
+    ctx.lineTo(x + 5*size, y - 8);
+    ctx.closePath(); ctx.fill();
+    // Tiny highlight streak on sunlit side
+    ctx.strokeStyle = 'rgba(180,230,140,0.35)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(x - 4*size, y - 5); ctx.lineTo(x - 2*size, y - 10);
+    ctx.stroke();
   } else if (variant === 1) {
-    // Conical pine/spruce tree
-    ctx.fillStyle = c3;
+    // Oak Tree: thick trunk, wide round canopy with lumps
+    const size = 0.95 + ((posHash >> 8) & 0xff) / 255 * 0.3;
+    // Thick trunk
+    ctx.fillStyle = '#5a3a1a';
+    ctx.fillRect(x - 3, y - 1, 5, 10);
+    ctx.fillStyle = '#6a4a2a';
+    ctx.fillRect(x - 1, y - 1, 2, 8);
+    // Wide round canopy with 3 overlapping bubbles
+    const oc1 = seasonShift ? shiftColor('#3a7a30', seasonShift) : '#3a7a30';
+    const oc2 = seasonShift ? shiftColor('#4a9040', seasonShift) : '#4a9040';
+    const oc3 = seasonShift ? shiftColor('#5aa550', seasonShift) : '#5aa550';
+    ctx.fillStyle = oc1;
     ctx.beginPath();
-    ctx.moveTo(x, y - 22*size);
-    ctx.lineTo(x - 10*size, y - 2);
-    ctx.lineTo(x + 10*size, y - 2);
-    ctx.closePath();
+    ctx.arc(x - 4, y - 6, 8*size, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = c2;
     ctx.beginPath();
-    ctx.moveTo(x, y - 22*size);
-    ctx.lineTo(x - 7*size, y - 8);
-    ctx.lineTo(x + 7*size, y - 8);
-    ctx.closePath();
+    ctx.arc(x + 4, y - 7, 7*size, 0, Math.PI * 2);
     ctx.fill();
-    // Snow tip or light highlight
-    ctx.fillStyle = c4;
-    ctx.globalAlpha = a * 0.5;
+    ctx.fillStyle = oc2;
     ctx.beginPath();
-    ctx.moveTo(x, y - 22*size);
-    ctx.lineTo(x - 3*size, y - 16*size);
-    ctx.lineTo(x + 3*size, y - 16*size);
-    ctx.closePath();
+    ctx.arc(x, y - 10, 7*size, 0, Math.PI * 2);
+    ctx.fill();
+    // Highlight bubbles (top-left)
+    ctx.fillStyle = oc3;
+    ctx.globalAlpha = a * 0.6;
+    ctx.beginPath();
+    ctx.arc(x - 3, y - 11, 3.5*size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 2, y - 12, 2.5*size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = a;
+  } else if (variant === 2) {
+    // Birch / skinny tree: thin white trunk with dark marks, narrow elongated canopy
+    const size = 0.9 + ((posHash >> 8) & 0xff) / 255 * 0.2;
+    // Thin white trunk with black stripes
+    ctx.fillStyle = '#e0dcd4';
+    ctx.fillRect(x - 1.5, y - 3, 3, 14);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(x - 1.5, y - 1, 3, 1);
+    ctx.fillRect(x - 1.5, y + 3, 3, 1);
+    ctx.fillRect(x - 1.5, y + 7, 3, 1);
+    // Narrow tall canopy — lighter green
+    const bc1 = seasonShift ? shiftColor('#4a8a3a', seasonShift) : '#4a8a3a';
+    const bc2 = seasonShift ? shiftColor('#6aaa5a', seasonShift) : '#6aaa5a';
+    ctx.fillStyle = bc1;
+    ctx.beginPath();
+    ctx.ellipse(x, y - 9, 6*size, 10*size, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = bc2;
+    ctx.globalAlpha = a * 0.7;
+    ctx.beginPath();
+    ctx.ellipse(x - 2, y - 11, 3*size, 6*size, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = a;
   } else {
-    // Bushy/wide oak
-    ctx.fillStyle = c1;
+    // Dead tree (rare ~10%): just branches, no leaves — grey-brown
+    const size = 0.85 + ((posHash >> 8) & 0xff) / 255 * 0.25;
+    // Grey-brown trunk
+    ctx.strokeStyle = '#5a4a3a';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.ellipse(x, y - 6, 16*size, 10*size, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = c2;
+    ctx.moveTo(x, y + 8);
+    ctx.lineTo(x, y - 14*size);
+    ctx.stroke();
+    // Branches
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.ellipse(x - 4, y - 10, 10*size, 7*size, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = c4;
-    ctx.globalAlpha = a * 0.4;
-    ctx.beginPath();
-    ctx.arc(x + 5, y - 8, 5*size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x - 6, y - 5, 4*size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = a;
+    ctx.moveTo(x, y - 4); ctx.lineTo(x - 6*size, y - 10*size);
+    ctx.moveTo(x, y - 7); ctx.lineTo(x + 5*size, y - 13*size);
+    ctx.moveTo(x, y - 10); ctx.lineTo(x - 4*size, y - 15*size);
+    ctx.moveTo(x + 3, y - 13); ctx.lineTo(x + 4, y - 17*size);
+    ctx.stroke();
   }
 }
 
@@ -4197,6 +4253,17 @@ function drawWater(ctx, x, y, a, tx, ty) {
     ctx.beginPath();
     ctx.arc(gx, gy, gSize, 0, Math.PI * 2);
     ctx.fill();
+  }
+
+  // ── Layer 4b: shimmering highlight streaks (light reflections) ──
+  ctx.lineWidth = 1;
+  const streakPhase = G.gameTick * 0.008 + tx * 0.1 + ty * 0.07;
+  for (let i = 0; i < 2; i++) {
+    const off = Math.sin(streakPhase + i * 1.5) * 6;
+    const alpha = 0.08 + 0.06 * Math.sin(streakPhase + i * 2);
+    ctx.globalAlpha = a * Math.max(0, alpha);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillRect(x - 10 + off, y - 3 + i * 4, 16, 0.8);
   }
 
   // ── Layer 5: foam/whitecaps at land-adjacent edges ───────────
