@@ -4056,3 +4056,76 @@ function renderSunPillars(ctx, logicalW, logicalH) {
   ctx.restore();
 }
 registerScreenRenderer(renderSunPillars);
+
+// ── Loop 100: Royal procession celebrates loop 100 ──────────
+// A line of figures (king + 4 retinue) walks across the map in a parade
+function updateProcession() {
+  if (!G.procession) {
+    if (G.gameTick % 1800 === 0 && Math.random() < 0.3) {
+      G.procession = {
+        x: 1, y: MAP_H / 2,
+        tx: MAP_W - 2, ty: MAP_H / 2,
+        members: [
+          { off: 0, color: '#ffd166', isKing: true },
+          { off: 1.2, color: '#a02818' },
+          { off: 2.4, color: '#3060c8' },
+          { off: 3.6, color: '#306020' },
+          { off: 4.8, color: '#a02888' },
+        ],
+      };
+    }
+    return;
+  }
+  const p = G.procession;
+  const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
+  if (d < 0.5) { G.procession = null; return; }
+  p.x += (dx / d) * 0.018 * G.speed;
+  p.y += (dy / d) * 0.018 * G.speed;
+}
+function renderProcession(ctx) {
+  if (!G.procession || G.camera.zoom < 0.6) return;
+  const p = G.procession;
+  const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy) || 1;
+  const ux = dx / d, uy = dy / d;
+  for (const m of p.members) {
+    const mx = p.x - ux * m.off;
+    const my = p.y - uy * m.off;
+    const s = toScreen(mx, my);
+    // Body
+    ctx.fillStyle = m.color;
+    ctx.fillRect(s.x - 1.5, s.y - 4, 3, 4);
+    // Head
+    ctx.fillStyle = '#e8c8a0';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 6, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Crown for king
+    if (m.isKing) {
+      ctx.fillStyle = '#ffd166';
+      ctx.beginPath();
+      ctx.moveTo(s.x - 2, s.y - 7.5);
+      ctx.lineTo(s.x - 1, s.y - 9);
+      ctx.lineTo(s.x, s.y - 7.5);
+      ctx.lineTo(s.x + 1, s.y - 9);
+      ctx.lineTo(s.x + 2, s.y - 7.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#a07810';
+      ctx.lineWidth = 0.3;
+      ctx.stroke();
+    }
+  }
+  // Trumpet sparkle ahead
+  const lead = p.members[0];
+  const sx = toScreen(p.x + ux * 1.5, p.y + uy * 1.5);
+  const tt = G.gameTick * 0.1;
+  for (let i = 0; i < 4; i++) {
+    const a = 0.5 + 0.5 * Math.sin(tt + i);
+    ctx.fillStyle = `rgba(255,230,150,${a * 0.7})`;
+    ctx.beginPath();
+    ctx.arc(sx.x + (i - 1.5) * 2, sx.y - 6 - i * 0.5, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+registerUpdater(updateProcession);
+registerWorldRenderer(renderProcession);

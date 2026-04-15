@@ -112,6 +112,7 @@
 - Glowing runes on monoliths at night (loop 97)
 - Rain splash ripples on ground (loop 98)
 - Sun pillars at sunrise/sunset (loop 99)
+- Royal procession across the map (loop 100)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -397,3 +398,5 @@
 ### Loop 98 — small expanding ripple rings on ground tiles during rain (raindrop splashes).
 
 ### Loop 99 — vertical golden sun pillar rising from sun position at sunrise/sunset.
+
+### Loop 100 — royal procession (king with crown + 4 retinue + sparkles) walks across the map periodically.
