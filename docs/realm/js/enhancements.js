@@ -2384,3 +2384,25 @@ function renderVictoryConfetti(ctx, logicalW, logicalH) {
   }
 }
 registerScreenRenderer(renderVictoryConfetti);
+
+// ── Loop 51: Caravan campfire when carts are unloading ─────
+function renderCartCampfire(ctx) {
+  if (!G.carts || !G.carts.length) return;
+  const tt = G.gameTick * 0.18;
+  for (const c of G.carts) {
+    if (c.state !== 'unloading') continue;
+    const s = toScreen(c.x, c.y);
+    const flick = 0.7 + 0.3 * Math.sin(tt + c.x);
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const grad = ctx.createRadialGradient(s.x - 8, s.y + 2, 1, s.x - 8, s.y + 2, 8 * flick);
+    grad.addColorStop(0, `rgba(255,210,120,${0.7 * flick})`);
+    grad.addColorStop(1, 'rgba(255,120,40,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(s.x - 8, s.y + 2, 4 * flick, 6 * flick, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderCartCampfire);

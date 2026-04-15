@@ -63,6 +63,7 @@
 - Snow drift mounds beside buildings (loop 48)
 - Dust devils on summer sand (loop 49)
 - Victory confetti rain (loop 50)
+- Cart campfires while unloading (loop 51)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -250,3 +251,5 @@
 ### Loop 49 — twisting dust devils on summer sand tiles.
 
 ### Loop 50 — continuous confetti rain after winning a scenario or the main game.
+
+### Loop 51 — small campfire next to merchant carts while unloading at market.
