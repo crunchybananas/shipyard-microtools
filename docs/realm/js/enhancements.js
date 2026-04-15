@@ -4035,3 +4035,24 @@ function renderRainSplashes(ctx) {
   ctx.globalAlpha = 1;
 }
 registerWorldRenderer(renderRainSplashes);
+
+// ── Loop 99: Sun pillars (vertical light columns at sunrise/set)
+function renderSunPillars(ctx, logicalW, logicalH) {
+  const t = G.dayPhase / G.dayLength;
+  let strength = 0;
+  if (t > 0.05 && t < 0.18) strength = 1 - Math.abs(t - 0.11) / 0.07;
+  else if (t > 0.62 && t < 0.78) strength = (1 - Math.abs(t - 0.7) / 0.08) * 0.85;
+  if (strength <= 0.05) return;
+  const sunFrac = Math.min(1, Math.max(0, (t - 0.05) / 0.7));
+  const sx = sunFrac * logicalW * 0.85 + logicalW * 0.075;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  // Vertical pillar rising from horizon
+  const grad = ctx.createLinearGradient(sx, logicalH * 0.5, sx, 0);
+  grad.addColorStop(0, `rgba(255,200,140,${strength * 0.45})`);
+  grad.addColorStop(1, 'rgba(255,200,140,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(sx - 12, 0, 24, logicalH * 0.5);
+  ctx.restore();
+}
+registerScreenRenderer(renderSunPillars);

@@ -111,6 +111,7 @@
 - Ancient corner monoliths (loop 96)
 - Glowing runes on monoliths at night (loop 97)
 - Rain splash ripples on ground (loop 98)
+- Sun pillars at sunrise/sunset (loop 99)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -394,3 +395,5 @@
 ### Loop 97 — runes on corner monoliths glow green at night with pulsing halo.
 
 ### Loop 98 — small expanding ripple rings on ground tiles during rain (raindrop splashes).
+
+### Loop 99 — vertical golden sun pillar rising from sun position at sunrise/sunset.
