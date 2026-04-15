@@ -4803,6 +4803,37 @@ function drawWater(ctx, x, y, a, tx, ty) {
     }
   }
 
+  // ── Layer 6 (loop 8+): Winter ice sheet overlay ─────────────
+  if (G.season === 'winter') {
+    // Tile-stable freeze fraction so coastline is patchy slush
+    const freeze = ((tx * 7 + ty * 11) % 17) / 17 * 0.5 + 0.5; // 0.5..1
+    ctx.globalAlpha = a * 0.78 * freeze;
+    // Pale ice fill
+    ctx.fillStyle = 'rgba(220,238,250,1)';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
+    ctx.closePath();
+    ctx.fill();
+    // Cracks (deterministic from tile)
+    ctx.strokeStyle = 'rgba(110,140,170,0.55)';
+    ctx.lineWidth = 0.6;
+    const seedA = ((tx * 13) ^ (ty * 7)) & 7;
+    ctx.beginPath();
+    ctx.moveTo(x - 20 + seedA, y - 6);
+    ctx.lineTo(x - 4, y + 2);
+    ctx.lineTo(x + 6, y - 4 + (seedA & 3));
+    ctx.lineTo(x + 18, y + 6);
+    ctx.stroke();
+    // Snow drifts (white blobs)
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.beginPath();
+    ctx.ellipse(x - 8 + (seedA % 5), y - 2, 5, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(x + 6, y + 4 - (seedA % 3), 4, 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   ctx.globalAlpha = a; // restore
   ctx.lineWidth = 1;
 }

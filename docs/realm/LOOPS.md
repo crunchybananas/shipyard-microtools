@@ -20,6 +20,7 @@
 - Migrating bird flocks at dawn/dusk (loop 5)
 - Hot air balloons drift across daytime sky (loop 6)
 - Aurora borealis on winter nights (loop 7)
+- Frozen lake ice sheets in winter (loop 8)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -64,3 +65,9 @@
 - Ideas: (1) **aurora borealis on winter nights** (2) frozen lake ice sheets (3) dynamic constellations
 - Chose: aurora (high visual payoff, signature winter mood)
 - Implemented: enhancements.js renderAurora. Three undulating colored ribbons (green/cyan/violet), screen-blend mode, only at night during winter season, animated by sine waves.
+
+### Loop 8
+- Validator: winter only changes ground tint and adds snow particles; water remains liquid blue, breaking immersion.
+- Ideas: (1) **frozen lake ice sheets** (2) wolves at night near forest (3) frozen waterfall/icicles on stone tiles
+- Chose: ice sheets (highest-impact winter visual, ties season to water tile)
+- Implemented: extra layer in drawWater (render.js) — pale ice overlay with deterministic crack patterns and snow drifts when G.season === winter. Boats still render on top (slightly silly but fine).
