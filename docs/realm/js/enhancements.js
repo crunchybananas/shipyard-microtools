@@ -8,6 +8,49 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 20: Sun lens flare (animates with day phase) ──────
+export function renderLensFlare(ctx, logicalW, logicalH) {
+  const dayl = getDaylight();
+  if (dayl < 0.6) return;
+  const t = G.dayPhase / G.dayLength;
+  // Sun horizontally moves across upper area — left at dawn, right at dusk
+  const sunFrac = Math.min(1, Math.max(0, (t - 0.05) / 0.7));
+  const sx = sunFrac * logicalW * 0.85 + logicalW * 0.075;
+  const sy = logicalH * 0.18;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  // Main sun glow
+  const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 90);
+  grad.addColorStop(0, `rgba(255,250,210,${dayl * 0.55})`);
+  grad.addColorStop(0.4, `rgba(255,210,140,${dayl * 0.18})`);
+  grad.addColorStop(1, 'rgba(255,210,140,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(sx, sy, 90, 0, Math.PI * 2);
+  ctx.fill();
+  // Lens flare ghosts along axis from sun through screen center
+  const cx = logicalW / 2, cy = logicalH / 2;
+  const dx = cx - sx, dy = cy - sy;
+  const flareSpots = [
+    { t: 0.5, r: 28, color: `rgba(255,170,80,${dayl * 0.15})` },
+    { t: 0.85, r: 18, color: `rgba(160,200,255,${dayl * 0.12})` },
+    { t: 1.2,  r: 38, color: `rgba(255,100,160,${dayl * 0.10})` },
+    { t: 1.55, r: 12, color: `rgba(180,255,180,${dayl * 0.13})` },
+  ];
+  for (const f of flareSpots) {
+    const fx = sx + dx * f.t;
+    const fy = sy + dy * f.t;
+    const fg = ctx.createRadialGradient(fx, fy, 0, fx, fy, f.r);
+    fg.addColorStop(0, f.color);
+    fg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = fg;
+    ctx.beginPath();
+    ctx.arc(fx, fy, f.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ── Loop 19: Footprints in snow (winter only) ──────────────
 export function updateFootprints() {
   if (G.season !== 'winter') { if (G.footprints) G.footprints.length = 0; return; }

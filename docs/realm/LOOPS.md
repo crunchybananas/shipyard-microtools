@@ -32,6 +32,7 @@
 - Wet ground puddles after rain (loop 17)
 - Town bonfire when happiness high (loop 18)
 - Citizen footprints in snow (loop 19)
+- Animated sun with lens flare ghosts (loop 20)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -148,3 +149,9 @@
 - Ideas: (1) **citizen footprints in snow** (2) snowmen built spontaneously (3) icicles dripping
 - Chose: footprints (kinetic, organic trail telling movement story)
 - Implemented: enhancements.js updateFootprints/renderFootprints. Each citizen drops a small dual-print every 20 ticks in winter, fade out over ~10 sec; capped at 200 prints.
+
+### Loop 20
+- Validator: god rays exist but the actual sun is invisible; daytime sky lacks a focal point.
+- Ideas: (1) **animated sun + lens flare** (2) cloud rim-lighting (3) sun reflection on water tiles
+- Chose: lens flare (defines sky direction, animates with time of day)
+- Implemented: enhancements.js renderLensFlare. Sun position interpolates left→right across the day, radial gradient sun + 4 colored ghost spots along the sun→center axis.
