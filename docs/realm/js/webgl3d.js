@@ -15,9 +15,17 @@ let indexBuf = null;
 let indexCount = 0;
 let isWebGL2 = false;
 
+// Buildings mesh state
+let buildingsVao = null;
+let buildingsVertexBuf = null;
+let buildingsIndexBuf = null;
+let buildingsIndexCount = 0;
+let lastBuildingRebuild = 0;
+
 // Uniform locations
 let uViewProjLoc = null;
 let uLightDirLoc = null;
+let uTimeLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -50,14 +58,23 @@ in vec3 aPos;
 in vec3 aNormal;
 in vec3 aColor;
 uniform mat4 uViewProj;
+uniform float uTime;
 out vec3 vNormal;
 out vec3 vColor;
 out vec3 vWorldPos;
 void main() {
-  gl_Position = uViewProj * vec4(aPos, 1.0);
+  vec3 pos = aPos;
+  // Water animation: tiles where color is water blue get wave displacement
+  bool isWater = aColor.b > 0.6 && aColor.r < 0.2;
+  if (isWater && aPos.y < 0.01) {
+    float wave = sin(aPos.x * 0.8 + uTime * 1.5) * 0.08
+               + cos(aPos.z * 0.8 + uTime * 1.2) * 0.06;
+    pos.y += wave;
+  }
+  gl_Position = uViewProj * vec4(pos, 1.0);
   vNormal = aNormal;
   vColor = aColor;
-  vWorldPos = aPos;
+  vWorldPos = pos;
 }`;
 
 const FS_SRC_300 = `#version 300 es
@@ -81,14 +98,22 @@ attribute vec3 aPos;
 attribute vec3 aNormal;
 attribute vec3 aColor;
 uniform mat4 uViewProj;
+uniform float uTime;
 varying vec3 vNormal;
 varying vec3 vColor;
 varying vec3 vWorldPos;
 void main() {
-  gl_Position = uViewProj * vec4(aPos, 1.0);
+  vec3 pos = aPos;
+  bool isWater = aColor.b > 0.6 && aColor.r < 0.2;
+  if (isWater && aPos.y < 0.01) {
+    float wave = sin(aPos.x * 0.8 + uTime * 1.5) * 0.08
+               + cos(aPos.z * 0.8 + uTime * 1.2) * 0.06;
+    pos.y += wave;
+  }
+  gl_Position = uViewProj * vec4(pos, 1.0);
   vNormal = aNormal;
   vColor = aColor;
-  vWorldPos = aPos;
+  vWorldPos = pos;
 }`;
 
 const FS_SRC_100 = `
@@ -217,6 +242,259 @@ function pushFace(verts, indices, positions, normal, color) {
   indices.push(base, base+1, base+2, base, base+2, base+3);
 }
 
+function pushTri(verts, indices, p0, p1, p2, normal, color) {
+  const base = verts.length / 9;
+  for (const p of [p0, p1, p2]) {
+    verts.push(p[0], p[1], p[2], normal[0], normal[1], normal[2], color[0], color[1], color[2]);
+  }
+  indices.push(base, base+1, base+2);
+}
+
+function pushBox(verts, indices, x0, y0, z0, x1, y1, z1, color) {
+  // Top
+  pushFace(verts, indices, [[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]], [0,1,0], color);
+  // Bottom
+  pushFace(verts, indices, [[x0,y0,z0],[x0,y0,z1],[x1,y0,z1],[x1,y0,z0]], [0,-1,0], color);
+  // Front (+Z)
+  pushFace(verts, indices, [[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]], [0,0,1], color);
+  // Back (-Z)
+  pushFace(verts, indices, [[x1,y0,z0],[x0,y0,z0],[x0,y1,z0],[x1,y1,z0]], [0,0,-1], color);
+  // Right (+X)
+  pushFace(verts, indices, [[x1,y0,z1],[x1,y0,z0],[x1,y1,z0],[x1,y1,z1]], [1,0,0], color);
+  // Left (-X)
+  pushFace(verts, indices, [[x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0]], [-1,0,0], color);
+}
+
+// ── Tree geometry ──────────────────────────────────────────
+function addTree(verts, indices, cx, cz, groundY) {
+  const baseY = groundY;
+  // Trunk — a brown box
+  const trunkColor = [0.35, 0.22, 0.10];
+  const trunkH = 0.6;
+  const trunkW = 0.15;
+  pushBox(verts, indices,
+    cx - trunkW, baseY, cz - trunkW,
+    cx + trunkW, baseY + trunkH, cz + trunkW,
+    trunkColor
+  );
+  // Canopy — a pyramid (cone approximation with square base)
+  const canopyColor     = [0.18, 0.52, 0.22];
+  const canopyColorDark = [0.12, 0.40, 0.16];
+  const topY = baseY + trunkH + 1.6;
+  const midY = baseY + trunkH;
+  const cw = 0.6;
+  const apex = [cx, topY, cz];
+  // Front
+  pushTri(verts, indices,
+    [cx-cw, midY, cz+cw], [cx+cw, midY, cz+cw], apex,
+    [0, 0.3, 1], canopyColor
+  );
+  // Right
+  pushTri(verts, indices,
+    [cx+cw, midY, cz+cw], [cx+cw, midY, cz-cw], apex,
+    [1, 0.3, 0], canopyColorDark
+  );
+  // Back
+  pushTri(verts, indices,
+    [cx+cw, midY, cz-cw], [cx-cw, midY, cz-cw], apex,
+    [0, 0.3, -1], canopyColor
+  );
+  // Left
+  pushTri(verts, indices,
+    [cx-cw, midY, cz-cw], [cx-cw, midY, cz+cw], apex,
+    [-1, 0.3, 0], canopyColorDark
+  );
+}
+
+// ── Building geometry helpers ──────────────────────────────
+
+function addBuildingMesh(verts, indices, b, groundY) {
+  const cx = b.x + 0.5;
+  const cz = b.y + 0.5;
+  const gy = groundY;
+  const type = b.type;
+  const S = 1.8; // global building size multiplier for visibility
+
+  // Record vertex count before building; we'll scale them at the end
+  const vertStart = verts.length;
+  if (type === 'house') {
+    // Base box
+    const baseColor = [0.82, 0.62, 0.38];
+    const hw = 0.4;
+    const bh = 0.6;
+    pushBox(verts, indices, cx-hw, gy, cz-hw, cx+hw, gy+bh, cz+hw, baseColor);
+    // Pyramid roof
+    const roofColor = [0.78, 0.22, 0.18];
+    const roofBase = gy + bh;
+    const roofApex = roofBase + 0.5;
+    const rw = 0.42;
+    const apex = [cx, roofApex, cz];
+    pushTri(verts, indices, [cx-rw,roofBase,cz+rw], [cx+rw,roofBase,cz+rw], apex, [0,0.3,1], roofColor);
+    pushTri(verts, indices, [cx+rw,roofBase,cz+rw], [cx+rw,roofBase,cz-rw], apex, [1,0.3,0], roofColor);
+    pushTri(verts, indices, [cx+rw,roofBase,cz-rw], [cx-rw,roofBase,cz-rw], apex, [0,0.3,-1], roofColor);
+    pushTri(verts, indices, [cx-rw,roofBase,cz-rw], [cx-rw,roofBase,cz+rw], apex, [-1,0.3,0], roofColor);
+
+  } else if (type === 'farm') {
+    // Flat wooden platform
+    const platformColor = [0.72, 0.55, 0.30];
+    pushBox(verts, indices, cx-0.48, gy, cz-0.48, cx+0.48, gy+0.05, cz+0.48, platformColor);
+    // 4 crop boxes in 2x2 grid
+    const cropColor = [0.35, 0.22, 0.10];
+    const offsets = [[-0.2,-0.2],[0.2,-0.2],[-0.2,0.2],[0.2,0.2]];
+    for (const [ox, oz] of offsets) {
+      pushBox(verts, indices, cx+ox-0.08, gy+0.05, cz+oz-0.08, cx+ox+0.08, gy+0.18, cz+oz+0.08, cropColor);
+    }
+
+  } else if (type === 'tower') {
+    // Tall thin box
+    const towerColor = [0.55, 0.55, 0.60];
+    pushBox(verts, indices, cx-0.2, gy, cz-0.2, cx+0.2, gy+1.4, cz+0.2, towerColor);
+    // Turret on top
+    const turretColor = [0.40, 0.40, 0.45];
+    pushBox(verts, indices, cx-0.25, gy+1.4, cz-0.25, cx+0.25, gy+1.65, cz+0.25, turretColor);
+
+  } else if (type === 'church') {
+    // Wide base
+    const stoneColor = [0.87, 0.82, 0.74];
+    pushBox(verts, indices, cx-0.45, gy, cz-0.45, cx+0.45, gy+0.7, cz+0.45, stoneColor);
+    // Steeple tower on +X side
+    const steepleColor = [0.80, 0.75, 0.68];
+    pushBox(verts, indices, cx+0.15, gy, cz-0.15, cx+0.45, gy+1.4, cz+0.15, steepleColor);
+    // Steeple apex
+    const apexY = gy + 1.4 + 0.4;
+    const sc = 0.15;
+    const sa = [cx+0.3, apexY, cz];
+    pushTri(verts, indices, [cx+0.15,gy+1.4,cz+sc],[cx+0.45,gy+1.4,cz+sc], sa, [0,0.3,1], steepleColor);
+    pushTri(verts, indices, [cx+0.45,gy+1.4,cz+sc],[cx+0.45,gy+1.4,cz-sc], sa, [1,0.3,0], steepleColor);
+    pushTri(verts, indices, [cx+0.45,gy+1.4,cz-sc],[cx+0.15,gy+1.4,cz-sc], sa, [0,0.3,-1], steepleColor);
+    pushTri(verts, indices, [cx+0.15,gy+1.4,cz-sc],[cx+0.15,gy+1.4,cz+sc], sa, [-1,0.3,0], steepleColor);
+
+  } else if (type === 'barracks') {
+    // Grey stone, wide and lower
+    const barColor = [0.42, 0.45, 0.52];
+    pushBox(verts, indices, cx-0.48, gy, cz-0.38, cx+0.48, gy+0.55, cz+0.38, barColor);
+    // Flag stick (thin dark red box on top)
+    const flagColor = [0.55, 0.10, 0.10];
+    pushBox(verts, indices, cx+0.35, gy+0.55, cz-0.03, cx+0.42, gy+0.9, cz+0.03, flagColor);
+
+  } else if (type === 'market') {
+    // Low open platform
+    const platColor = [0.80, 0.72, 0.55];
+    pushBox(verts, indices, cx-0.48, gy, cz-0.48, cx+0.48, gy+0.2, cz+0.48, platColor);
+    // Red awning
+    const awningColor = [0.85, 0.22, 0.18];
+    pushBox(verts, indices, cx-0.4, gy+0.2, cz-0.4, cx+0.4, gy+0.35, cz+0.4, awningColor);
+
+  } else if (type === 'castle') {
+    // Main keep
+    const castleColor = [0.65, 0.62, 0.60];
+    pushBox(verts, indices, cx-0.35, gy, cz-0.35, cx+0.35, gy+1.3, cz+0.35, castleColor);
+    // Corner towers
+    const towerColor2 = [0.58, 0.55, 0.52];
+    pushBox(verts, indices, cx-0.48, gy, cz-0.48, cx-0.22, gy+1.0, cz-0.22, towerColor2);
+    pushBox(verts, indices, cx+0.22, gy, cz+0.22, cx+0.48, gy+1.0, cz+0.48, towerColor2);
+
+  } else if (type === 'well') {
+    // Stone ring base
+    const wellColor = [0.62, 0.58, 0.55];
+    pushBox(verts, indices, cx-0.22, gy, cz-0.22, cx+0.22, gy+0.25, cz+0.22, wellColor);
+    // Hollow out the top by just leaving a platform (visual approximation)
+    // Wooden crossbar
+    const woodColor = [0.55, 0.38, 0.18];
+    pushBox(verts, indices, cx-0.25, gy+0.25, cz-0.04, cx+0.25, gy+0.32, cz+0.04, woodColor);
+
+  } else if (type === 'tavern') {
+    // Warmer wood color, similar to house
+    const tavColor = [0.72, 0.48, 0.25];
+    pushBox(verts, indices, cx-0.42, gy, cz-0.42, cx+0.42, gy+0.65, cz+0.42, tavColor);
+    // Roof
+    const roofColor = [0.55, 0.30, 0.15];
+    const rb = gy + 0.65;
+    const ra = rb + 0.45;
+    const rw = 0.44;
+    const rapex = [cx, ra, cz];
+    pushTri(verts, indices, [cx-rw,rb,cz+rw],[cx+rw,rb,cz+rw], rapex, [0,0.3,1], roofColor);
+    pushTri(verts, indices, [cx+rw,rb,cz+rw],[cx+rw,rb,cz-rw], rapex, [1,0.3,0], roofColor);
+    pushTri(verts, indices, [cx+rw,rb,cz-rw],[cx-rw,rb,cz-rw], rapex, [0,0.3,-1], roofColor);
+    pushTri(verts, indices, [cx-rw,rb,cz-rw],[cx-rw,rb,cz+rw], rapex, [-1,0.3,0], roofColor);
+    // Chimney
+    const chimneyColor = [0.50, 0.45, 0.42];
+    pushBox(verts, indices, cx+0.2, gy+0.65, cz-0.08, cx+0.30, gy+0.95, cz+0.08, chimneyColor);
+
+  } else if (type === 'blacksmith') {
+    // Dark grey box
+    const smithColor = [0.35, 0.35, 0.40];
+    pushBox(verts, indices, cx-0.38, gy, cz-0.38, cx+0.38, gy+0.6, cz+0.38, smithColor);
+    // Chimney
+    const chimneyColor = [0.28, 0.28, 0.32];
+    pushBox(verts, indices, cx+0.18, gy+0.6, cz-0.08, cx+0.28, gy+0.95, cz+0.08, chimneyColor);
+
+  } else if (type === 'windmill') {
+    // Tall body
+    const wmColor = [0.78, 0.72, 0.62];
+    pushBox(verts, indices, cx-0.2, gy, cz-0.2, cx+0.2, gy+1.1, cz+0.2, wmColor);
+    // Cross blades (2 overlapping flat boxes)
+    const bladeColor = [0.90, 0.85, 0.70];
+    pushBox(verts, indices, cx-0.55, gy+0.85, cz-0.04, cx+0.55, gy+0.96, cz+0.04, bladeColor);
+    pushBox(verts, indices, cx-0.04, gy+0.55, cz-0.04, cx+0.04, gy+1.25, cz+0.04, bladeColor);
+
+  } else {
+    // Generic grey box for all others (quarry, mine, lumber, granary, etc.)
+    const genericColor = [0.55, 0.55, 0.55];
+    pushBox(verts, indices, cx-0.35, gy, cz-0.35, cx+0.35, gy+0.55, cz+0.35, genericColor);
+  }
+
+  // Scale all vertices of this building by S around (cx, gy, cz)
+  // Vertex layout is [x,y,z, nx,ny,nz, r,g,b] — 9 floats per vertex
+  for (let i = vertStart; i < verts.length; i += 9) {
+    verts[i]   = cx + (verts[i]   - cx) * S;
+    verts[i+1] = gy + (verts[i+1] - gy) * S;
+    verts[i+2] = cz + (verts[i+2] - cz) * S;
+  }
+}
+
+// ── Upload a mesh to a VAO/buffer pair ─────────────────────
+function uploadMesh(targetVao, targetVertBuf, targetIdxBuf, verts, indices) {
+  const vertData = new Float32Array(verts);
+  const idxData  = new Uint32Array(indices);
+  const STRIDE   = 9 * 4;
+
+  if (isWebGL2) {
+    gl.bindVertexArray(targetVao);
+  } else if (oeVao) {
+    oeVao.bindVertexArrayOES(targetVao);
+  }
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, targetVertBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, vertData, gl.DYNAMIC_DRAW);
+
+  const aPosLoc    = gl.getAttribLocation(program, 'aPos');
+  const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
+  const aColorLoc  = gl.getAttribLocation(program, 'aColor');
+
+  gl.enableVertexAttribArray(aPosLoc);
+  gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
+
+  gl.enableVertexAttribArray(aNormalLoc);
+  gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
+
+  gl.enableVertexAttribArray(aColorLoc);
+  gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, targetIdxBuf);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idxData, gl.DYNAMIC_DRAW);
+
+  if (isWebGL2) {
+    gl.bindVertexArray(null);
+  } else if (oeVao) {
+    oeVao.bindVertexArrayOES(null);
+  }
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  return idxData.length;
+}
+
 export function buildTerrainMesh() {
   if (!gl) return;
 
@@ -273,6 +551,13 @@ export function buildTerrainMesh() {
           sideColor
         );
       }
+
+      // 3D trees on FOREST tiles
+      if (tileType === TILE.FOREST) {
+        const cx = col + 0.5;
+        const cz = row + 0.5;
+        addTree(verts, indices, cx, cz, h);
+      }
     }
   }
 
@@ -315,6 +600,42 @@ export function buildTerrainMesh() {
   }
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
+}
+
+// ── Buildings mesh ─────────────────────────────────────────
+export function buildBuildingsMesh() {
+  if (!gl || !program) return;
+  if (!G.buildings || G.buildings.length === 0) {
+    buildingsIndexCount = 0;
+    lastBuildingRebuild = performance.now();
+    return;
+  }
+
+  const verts   = [];
+  const indices = [];
+
+  for (const b of G.buildings) {
+    // Skip non-structural types that have no visual presence worth rendering
+    if (b.type === 'road' || b.type === 'wall') continue;
+
+    const row = b.y;
+    const col = b.x;
+    const tileType = (G.map[row] && G.map[row][col] !== undefined)
+      ? G.map[row][col]
+      : TILE.GRASS;
+    const groundY = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8;
+
+    addBuildingMesh(verts, indices, b, groundY);
+  }
+
+  if (indices.length === 0) {
+    buildingsIndexCount = 0;
+    lastBuildingRebuild = performance.now();
+    return;
+  }
+
+  buildingsIndexCount = uploadMesh(buildingsVao, buildingsVertexBuf, buildingsIndexBuf, verts, indices);
+  lastBuildingRebuild = performance.now();
 }
 
 // ── Camera / VP matrix ─────────────────────────────────────
@@ -385,17 +706,29 @@ export function initGL3D(canvas) {
   // Get uniform locations
   uViewProjLoc = gl.getUniformLocation(program, 'uViewProj');
   uLightDirLoc = gl.getUniformLocation(program, 'uLightDir');
+  uTimeLoc     = gl.getUniformLocation(program, 'uTime');
 
-  // Create VAO
+  // Create terrain VAO
   if (isWebGL2) {
     vao = gl.createVertexArray();
   } else if (oeVao) {
     vao = oeVao.createVertexArrayOES();
   }
 
-  // Create GPU buffers
+  // Create terrain GPU buffers
   vertexBuf = gl.createBuffer();
   indexBuf  = gl.createBuffer();
+
+  // Create buildings VAO
+  if (isWebGL2) {
+    buildingsVao = gl.createVertexArray();
+  } else if (oeVao) {
+    buildingsVao = oeVao.createVertexArrayOES();
+  }
+
+  // Create buildings GPU buffers
+  buildingsVertexBuf = gl.createBuffer();
+  buildingsIndexBuf  = gl.createBuffer();
 
   // GL state
   gl.enable(gl.DEPTH_TEST);
@@ -414,6 +747,12 @@ export function initGL3D(canvas) {
 export function render3D() {
   if (!gl || !program || indexCount === 0) return;
 
+  // Throttled buildings mesh rebuild (~500ms)
+  const now = performance.now();
+  if (now - lastBuildingRebuild > 500) {
+    buildBuildingsMesh();
+  }
+
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -424,12 +763,14 @@ export function render3D() {
   gl.uniformMatrix4fv(uViewProjLoc, false, vp);
 
   // Directional light: from upper-left-front (normalized)
-  // In world space: light comes from (+X, +Y, -Z) direction → points toward origin
   const lx = 0.6, ly = 0.8, lz = -0.2;
   const len = Math.sqrt(lx*lx + ly*ly + lz*lz);
   gl.uniform3f(uLightDirLoc, lx/len, ly/len, lz/len);
 
-  // Bind VAO and draw
+  // Time uniform for water animation
+  if (uTimeLoc) gl.uniform1f(uTimeLoc, performance.now() * 0.001);
+
+  // ── Draw terrain (includes trees) ──────────────────────────
   if (isWebGL2) {
     gl.bindVertexArray(vao);
   } else if (oeVao) {
@@ -456,6 +797,36 @@ export function render3D() {
     gl.bindVertexArray(null);
   } else if (oeVao) {
     oeVao.bindVertexArrayOES(null);
+  }
+
+  // ── Draw buildings ──────────────────────────────────────────
+  if (buildingsIndexCount > 0) {
+    if (isWebGL2) {
+      gl.bindVertexArray(buildingsVao);
+    } else if (oeVao) {
+      oeVao.bindVertexArrayOES(buildingsVao);
+    } else {
+      const STRIDE = 9 * 4;
+      gl.bindBuffer(gl.ARRAY_BUFFER, buildingsVertexBuf);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buildingsIndexBuf);
+      const aPosLoc    = gl.getAttribLocation(program, 'aPos');
+      const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
+      const aColorLoc  = gl.getAttribLocation(program, 'aColor');
+      gl.enableVertexAttribArray(aPosLoc);
+      gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
+      gl.enableVertexAttribArray(aNormalLoc);
+      gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
+      gl.enableVertexAttribArray(aColorLoc);
+      gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
+    }
+
+    gl.drawElements(gl.TRIANGLES, buildingsIndexCount, gl.UNSIGNED_INT, 0);
+
+    if (isWebGL2) {
+      gl.bindVertexArray(null);
+    } else if (oeVao) {
+      oeVao.bindVertexArrayOES(null);
+    }
   }
 }
 
