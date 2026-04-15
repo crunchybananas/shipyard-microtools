@@ -8,6 +8,52 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 21: Spontaneous snowmen near houses in winter ────
+export function updateSnowmen() {
+  if (G.season !== 'winter') { if (G.snowmen) G.snowmen.length = 0; return; }
+  if (!G.snowmen) G.snowmen = [];
+  if (G.gameTick % 800 === 0 && G.snowmen.length < 6) {
+    const houses = G.buildings.filter(b => b.type === 'house');
+    if (!houses.length) return;
+    const h = houses[Math.floor(Math.random() * houses.length)];
+    const ox = (Math.random() - 0.5) * 3;
+    const oy = (Math.random() - 0.5) * 3;
+    const x = h.x + ox, y = h.y + oy;
+    const tx = Math.round(x), ty = Math.round(y);
+    if (G.map[ty] && G.map[ty][tx] === TILE.GRASS && !(G.buildingGrid[ty] && G.buildingGrid[ty][tx])) {
+      G.snowmen.push({ x, y, hatColor: ['#c02020','#202060','#206020','#604010'][Math.floor(Math.random()*4)] });
+    }
+  }
+}
+export function renderSnowmen(ctx) {
+  if (G.season !== 'winter' || !G.snowmen || !G.snowmen.length || G.camera.zoom < 0.7) return;
+  for (const sm of G.snowmen) {
+    const s = toScreen(sm.x, sm.y);
+    // Body
+    ctx.fillStyle = '#fcfcff';
+    ctx.beginPath(); ctx.arc(s.x, s.y + 1, 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x, s.y - 3.5, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x, s.y - 7, 1.8, 0, Math.PI * 2); ctx.fill();
+    // Hat
+    ctx.fillStyle = sm.hatColor;
+    ctx.fillRect(s.x - 2, s.y - 9, 4, 1.5);
+    ctx.fillRect(s.x - 2.5, s.y - 7.7, 5, 0.5);
+    // Eyes & carrot
+    ctx.fillStyle = '#000';
+    ctx.fillRect(s.x - 0.8, s.y - 7.3, 0.5, 0.5);
+    ctx.fillRect(s.x + 0.4, s.y - 7.3, 0.5, 0.5);
+    ctx.fillStyle = '#ff8030';
+    ctx.fillRect(s.x - 0.2, s.y - 6.7, 0.6, 0.4);
+    // Arms (stick)
+    ctx.strokeStyle = '#5a3a1a';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 2.3, s.y - 4); ctx.lineTo(s.x - 5, s.y - 6);
+    ctx.moveTo(s.x + 2.3, s.y - 4); ctx.lineTo(s.x + 5, s.y - 6);
+    ctx.stroke();
+  }
+}
+
 // ── Loop 20: Sun lens flare (animates with day phase) ──────
 export function renderLensFlare(ctx, logicalW, logicalH) {
   const dayl = getDaylight();

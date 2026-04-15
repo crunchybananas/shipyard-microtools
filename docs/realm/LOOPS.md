@@ -33,6 +33,7 @@
 - Town bonfire when happiness high (loop 18)
 - Citizen footprints in snow (loop 19)
 - Animated sun with lens flare ghosts (loop 20)
+- Spontaneous snowmen near houses in winter (loop 21)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -155,3 +156,9 @@
 - Ideas: (1) **animated sun + lens flare** (2) cloud rim-lighting (3) sun reflection on water tiles
 - Chose: lens flare (defines sky direction, animates with time of day)
 - Implemented: enhancements.js renderLensFlare. Sun position interpolates left→right across the day, radial gradient sun + 4 colored ghost spots along the sun→center axis.
+
+### Loop 21
+- Validator: winter has new ice/aurora/footprints but no playful winter activity.
+- Ideas: (1) **snowmen built spontaneously** (2) sledding citizens on hillside (3) ice fishing huts on frozen water
+- Chose: snowmen (cheap, charming, persistent across the season)
+- Implemented: enhancements.js updateSnowmen/renderSnowmen. Periodically spawn 3-tier snowman near a random house in winter, with hat/eyes/carrot nose/stick arms; cleared when winter ends.
