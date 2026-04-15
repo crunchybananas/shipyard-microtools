@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Realm 3D Prototype</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #0a0e1a; overflow: hidden; font-family: -apple-system, system-ui, sans-serif; color: #e0e8f0; }
+  canvas { display: block; }
+  #hud {
+    position: fixed; top: 10px; left: 10px;
+    background: rgba(15,15,30,0.8); padding: 8px 12px; border-radius: 6px;
+    font-size: 12px; line-height: 1.5; pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  #hud .k { color: #ffd166; }
+  #fps { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 11px; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="hud">
+  <div><span class="k">Drag</span> to pan · <span class="k">Scroll</span> to zoom · <span class="k">Q/E</span> to rotate</div>
+</div>
+<div id="fps">–– fps</div>
+<script type="module" src="./3d.js?v=5"></script>
+</body>
+</html>
