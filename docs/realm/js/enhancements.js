@@ -2561,3 +2561,31 @@ function renderSunriseBurst(ctx, logicalW, logicalH) {
   ctx.restore();
 }
 registerScreenRenderer(renderSunriseBurst);
+
+// ── Loop 56: Toad-stool (red&white) clusters around tavern
+function renderTavernToadstools(ctx) {
+  if (G.camera.zoom < 0.9) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'tavern') continue;
+    const s = toScreen(b.x, b.y);
+    const seed = (b.x * 31 + b.y * 17) | 0;
+    for (let i = 0; i < 5; i++) {
+      const ang = (i + seed) * 1.3;
+      const r = 14 + (i & 1) * 4;
+      const mx = s.x + Math.cos(ang) * r;
+      const my = s.y + 6 + Math.sin(ang) * r * 0.4;
+      // Stem
+      ctx.fillStyle = '#f0e8d4';
+      ctx.fillRect(mx - 0.5, my - 1.5, 1, 1.5);
+      // Cap red with white spots
+      ctx.fillStyle = '#c84028';
+      ctx.beginPath();
+      ctx.ellipse(mx, my - 2, 1.6, 1, 0, Math.PI, 0);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(mx - 0.6, my - 2.4, 0.4, 0.4);
+      ctx.fillRect(mx + 0.4, my - 2, 0.4, 0.4);
+    }
+  }
+}
+registerWorldRenderer(renderTavernToadstools);

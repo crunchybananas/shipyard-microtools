@@ -68,6 +68,7 @@
 - Fish jump from water with splash (loop 53)
 - Drying laundry between houses (loop 54)
 - Day-1 sunrise burst (loop 55)
+- Toadstools around taverns (loop 56)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -265,3 +266,5 @@
 ### Loop 54 — laundry lines between adjacent houses with swaying colored clothes.
 
 ### Loop 55 — opening-day sunrise burst (radial god rays) only on day 1.
+
+### Loop 56 — red-cap toadstool clusters around taverns.
