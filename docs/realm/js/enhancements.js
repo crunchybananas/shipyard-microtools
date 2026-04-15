@@ -1728,3 +1728,63 @@ function renderBolts(ctx) {
 }
 registerUpdater(updateBolts, true);
 registerScreenRenderer(renderBolts);
+
+// ── Loop 34: Mountain rams clambering on stone tiles ───────
+function updateRams() {
+  if (!G.rams) G.rams = [];
+  if (G.gameTick % 700 === 0 && G.rams.length < 3) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.STONE) {
+        G.rams.push({ x, y, tx: x, ty: y, phase: Math.random() * Math.PI * 2 });
+        break;
+      }
+    }
+  }
+  for (const r of G.rams) {
+    const dx = r.tx - r.x, dy = r.ty - r.y, d = Math.hypot(dx, dy);
+    if (d < 0.2) {
+      r.tx = r.x + (Math.random() - 0.5) * 4;
+      r.ty = r.y + (Math.random() - 0.5) * 4;
+    } else {
+      r.x += (dx / d) * 0.012 * G.speed;
+      r.y += (dy / d) * 0.012 * G.speed;
+    }
+  }
+}
+function renderRams(ctx) {
+  if (!G.rams || !G.rams.length || G.camera.zoom < 0.7) return;
+  for (const r of G.rams) {
+    const s = toScreen(r.x, r.y);
+    const bob = Math.sin(G.gameTick * 0.18 + r.phase) * 0.6;
+    // Body brown
+    ctx.fillStyle = '#8a6a48';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y - 2 + bob, 4, 2.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Head
+    ctx.fillStyle = '#a07854';
+    ctx.beginPath();
+    ctx.arc(s.x + 3, s.y - 4 + bob, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+    // Curling horns
+    ctx.strokeStyle = '#3a2818';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.arc(s.x + 2.3, s.y - 5 + bob, 1.2, Math.PI * 0.2, Math.PI * 1.6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(s.x + 3.7, s.y - 5 + bob, 1.2, Math.PI * 0.2, Math.PI * 1.6);
+    ctx.stroke();
+    // Legs
+    ctx.strokeStyle = '#5a3018';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 2, s.y - 0.5); ctx.lineTo(s.x - 2, s.y + 2.5);
+    ctx.moveTo(s.x + 2, s.y - 0.5); ctx.lineTo(s.x + 2, s.y + 2.5);
+    ctx.stroke();
+  }
+}
+registerUpdater(updateRams);
+registerWorldRenderer(renderRams);
