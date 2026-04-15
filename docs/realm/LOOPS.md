@@ -101,6 +101,7 @@
 - Stained-glass window glow on churches (loop 86)
 - Long sunset shadows from soldiers (loop 87)
 - Soldier dust puffs (loop 88)
+- Balloon ground shadows (loop 89)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -364,3 +365,5 @@
 ### Loop 87 — long elongated shadows extend from soldiers as the sun sets.
 
 ### Loop 88 — soldiers kick up dust puffs as they walk.
+
+### Loop 89 — soft drifting ground shadows under each hot air balloon.

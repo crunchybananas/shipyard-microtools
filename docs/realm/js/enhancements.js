@@ -3711,3 +3711,18 @@ function updateSoldierDust() {
   }
 }
 registerUpdater(updateSoldierDust);
+
+// ── Loop 89: Shooting balloons / hot-air balloon shadows ───
+// (extra: ground shadows underneath balloons that follow them)
+function renderBalloonShadows(ctx) {
+  if (!G.balloons || !G.balloons.length) return;
+  // Convert balloon screen coord to a ground plane shadow (approx)
+  for (const b of G.balloons) {
+    // Project shadow offset (down+right)
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(b.x + 30, b.y + 80, 20, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+registerScreenRenderer(renderBalloonShadows);
