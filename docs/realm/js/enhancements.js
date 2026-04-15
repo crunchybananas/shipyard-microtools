@@ -1989,3 +1989,41 @@ function renderCrabs(ctx) {
 }
 registerUpdater(updateCrabs);
 registerWorldRenderer(renderCrabs);
+
+// ── Loop 39: Campfires next to barracks at night ───────────
+function renderCampfires(ctx) {
+  const dayl = getDaylight();
+  const ns = Math.max(0, Math.min(1, (0.85 - dayl) / 0.4));
+  if (ns < 0.05 || G.camera.zoom < 0.7) return;
+  const tt = G.gameTick * 0.2;
+  for (const b of G.buildings) {
+    if (b.type !== 'barracks') continue;
+    const s = toScreen(b.x, b.y);
+    const fx = s.x + 14, fy = s.y + 4;
+    // Logs
+    ctx.fillStyle = '#3a2410';
+    ctx.fillRect(fx - 3, fy + 1, 6, 1);
+    ctx.fillRect(fx - 2, fy + 2, 4, 0.8);
+    // Flame
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const flick = 0.7 + 0.3 * Math.sin(tt);
+    const grad = ctx.createRadialGradient(fx, fy - 2, 1, fx, fy - 2, 8 * flick);
+    grad.addColorStop(0, `rgba(255,240,140,${0.85 * flick})`);
+    grad.addColorStop(0.5, `rgba(255,140,40,${0.55 * flick})`);
+    grad.addColorStop(1, 'rgba(180,40,10,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(fx, fy - 2, 4 * flick, 6 * flick, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Soldier silhouette beside fire
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = `rgba(40,30,20,${0.9 * ns})`;
+    ctx.beginPath();
+    ctx.arc(fx + 6, fy - 2, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(fx + 5, fy - 1, 2, 3);
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderCampfires);

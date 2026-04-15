@@ -51,6 +51,7 @@
 - Will-o-wisps in forest at night (loop 36)
 - Spider webs in autumn forests (loop 37)
 - Crabs scuttle on sand (loop 38)
+- Soldier campfires by barracks at night (loop 39)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -214,3 +215,5 @@
 ### Loop 37 — spider webs draped on autumn forest tiles (radial+concentric, deterministic ~18%).
 
 ### Loop 38 — crabs scuttle sideways on sand tiles.
+
+### Loop 39 — campfires beside each barracks at night, with flickering flame and seated soldier silhouette.
