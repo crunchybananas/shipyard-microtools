@@ -38,7 +38,7 @@ export function placeBuilding(type, tx, ty) {
   if (!canPlace(type,tx,ty) || !canAfford(type)) return false;
   const def = BUILDINGS[type];
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] -= v;
-  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null, prodShowCount:0, level:1 };
+  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null, prodShowCount:0, level:1, buildProgress: 0 };
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
   if (def.pop) { G.maxPop += def.pop; trySpawnSettlers(def.pop); }
@@ -107,6 +107,11 @@ export function trySpawnSettlers(count) {
 
 export function updateProduction() {
   for (const b of G.buildings) {
+    // Construction animation: grow from 0 to 1 over ~100 ticks
+    if (b.buildProgress !== undefined && b.buildProgress < 1) {
+      b.buildProgress = Math.min(1, b.buildProgress + 0.01 * G.speed);
+    }
+
     // Archery range: train archers
     if (b.type === 'archery' && b.workers.length >= 1) {
       b.trainTimer = (b.trainTimer || 0) + 1;

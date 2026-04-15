@@ -37,6 +37,19 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .title-buttons{display:flex;gap:0.8rem;justify-content:center;margin-bottom:1.5rem;animation:titleSlideUp 0.7s ease both;animation-delay:0.7s}
 .title-btn{padding:0.8rem 2rem;font-size:1rem;font-weight:700;border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
 .title-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.4);transform:translateY(-1px)}
+.kingdom-name-section { margin-top: 0.8rem; text-align: center; }
+#kingdom-name-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  width: 240px;
+  text-align: center;
+}
+#kingdom-name-input:focus { outline: none; border-color: var(--accent); }
 .title-btn.primary{border-color:var(--gold);color:var(--gold)}
 .title-btn.primary:hover{background:rgba(255,209,102,0.12);box-shadow:0 4px 20px rgba(255,209,102,0.2)}
 .title-features{display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin-bottom:1.5rem;animation:titleFadeIn 0.7s ease both;animation-delay:0.85s}
@@ -427,6 +440,9 @@ canvas#game{display:block;position:absolute;top:0;left:0}
         <button class="scen-btn" onclick="setScenario('industrial')">⚙️ Industrial</button>
       </div>
     </div>
+    <div class="kingdom-name-section">
+      <input type="text" id="kingdom-name-input" placeholder="Name your kingdom..." maxlength="20" />
+    </div>
     <div class="title-buttons">
       <button class="title-btn primary" onclick="startNewGame()">⚔️ New Game</button>
       <button class="title-btn" id="title-load" onclick="loadAndStart()" style="display:none">📂 Continue</button>
@@ -435,7 +451,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
       <div class="tf"><span class="tf-icon">🏘️</span>17 Buildings</div>
       <div class="tf"><span class="tf-icon">🔬</span>9 Technologies</div>
       <div class="tf"><span class="tf-icon">🌿</span>4 Seasons</div>
-      <div class="tf"><span class="tf-icon">🏆</span>21 Achievements</div>
+      <div class="tf"><span class="tf-icon">🏆</span>33 Achievements</div>
     </div>
     <p class="title-credit">Made with 🧡 by Cory Loken & Claude · Zero dependencies</p>
   </div>
@@ -453,6 +469,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
   <div class="res"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
   <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
+  <span id="kingdom-display"></span>
   <span id="day-display">Day 1</span>
   <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>

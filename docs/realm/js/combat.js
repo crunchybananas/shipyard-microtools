@@ -49,11 +49,15 @@ export function updateEnemies() {
       G.enemies.splice(i, 1);
       if (G.stats) G.stats.enemiesKilled++;
       playSound('demolish');
-      // Death particles
-      for (let p = 0; p < 3; p++) {
+      // Death particles — dramatic blood splat effect
+      for (let p = 0; p < 8; p++) {
         G.particles.push({
-          tx: e.x, ty: e.y, offsetY: 0,
-          text: '💀', alpha: 1, vy: -0.2, decay: 0.02, type: 'text',
+          tx: e.x + (Math.random()-0.5)*0.3, ty: e.y + (Math.random()-0.5)*0.3,
+          offsetY: -5 - Math.random()*10,
+          text: p < 2 ? '💀' : '•',
+          alpha: 1.5, vy: -0.15 - Math.random()*0.15, decay: 0.03,
+          type: 'text',
+          color: '#8a1a1a',
         });
       }
     }

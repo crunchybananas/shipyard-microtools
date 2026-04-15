@@ -1091,6 +1091,15 @@ export function render() {
 
   // ── Caravans ──────────────────────────────────────────────
   for (const c of G.caravans) {
+    // Dust trail behind caravan
+    if (G.gameTick % 8 === 0) {
+      G.particles.push({
+        tx: c.x, ty: c.y, offsetY: -2,
+        text: null, alpha: 0.4, vy: 0, decay: 0.02,
+        type: 'dust', size: 2, vx: 0,
+      });
+    }
+
     const s = toScreen(c.x, c.y);
     ctx.globalAlpha = daylight;
     const bob = Math.sin(G.gameTick * 0.2 + c.x * 2) * 1;
@@ -1499,7 +1508,8 @@ function canPlaceCheck(type, x, y) {
 // ── Building sprites ────────────────────────────────────────
 function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
-  ctx.globalAlpha = daylight;
+  const buildAlpha = (b.buildProgress !== undefined && b.buildProgress < 1) ? b.buildProgress : 1;
+  ctx.globalAlpha = daylight * buildAlpha;
 
   // Foundation — darken the tile under the building for grounding
   if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
@@ -4230,6 +4240,26 @@ function renderMinimap() {
     // Solid dot
     mc.fillStyle = '#facc15';
     mc.fillRect(cx - 1, cy - 1, 3, 3);
+  }
+
+  // Enemies on minimap
+  for (const e of G.enemies) {
+    const mx = (e.x / MAP_W) * minimapC.width;
+    const my = (e.y / MAP_H) * minimapC.height;
+    mc.fillStyle = '#ef4444';
+    mc.beginPath();
+    mc.arc(mx, my, 2, 0, Math.PI * 2);
+    mc.fill();
+  }
+
+  // Soldiers on minimap (blue/green)
+  for (const s of G.soldiers) {
+    const mx = (s.x / MAP_W) * minimapC.width;
+    const my = (s.y / MAP_H) * minimapC.height;
+    mc.fillStyle = s.type === 'archer' ? '#22c55e' : '#3b82f6';
+    mc.beginPath();
+    mc.arc(mx, my, 1.5, 0, Math.PI * 2);
+    mc.fill();
   }
 
   // Camera viewport — dark shadow stroke then bright cyan outline for visibility

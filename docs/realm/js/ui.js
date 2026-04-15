@@ -94,8 +94,11 @@ export function updateUI() {
     if (G.population >= G.maxPop && G.population > 3) popEl.classList.add('pop-full');
     else popEl.classList.remove('pop-full');
   }
+  const maxSoldiers = G.buildings.filter(b => b.type === 'barracks').length * 4 + G.buildings.filter(b => b.type === 'archery').length * 3;
   const soldierEl = $('soldier-count');
-  if (soldierEl) soldierEl.textContent = (G.soldiers || []).length;
+  if (soldierEl) {
+    soldierEl.textContent = `${(G.soldiers || []).length}/${maxSoldiers}`;
+  }
   const threatEl = $('threat-display');
   const enemyEl = $('enemy-count');
   if (threatEl && enemyEl) {
@@ -112,7 +115,11 @@ export function updateUI() {
     raidWarn = ` · <span class="${urgent ? 'raid-warn-urgent' : 'raid-warn'}">⚔️${raidDays}d</span>`;
   }
   const weatherEmoji = G.weather === 'rain' ? ' 🌧️' : G.weather === 'snow' ? ' ❄️' : '';
-  $('day-display').innerHTML = `Day ${G.day} · ${season.name}${weatherEmoji} · ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
+  const year = Math.floor((G.day - 1) / 28) + 1;
+  const dayInYear = ((G.day - 1) % 28) + 1;
+  $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · ${season.name} ${weatherEmoji}· ☀️${Math.round(G.happiness)}%${raidWarn} ${diffLabel}`;
+  const kd = $('kingdom-display');
+  if (kd) kd.textContent = G.kingdomName ? `👑 ${G.kingdomName}` : '';
 }
 
 const CATEGORIES = [

@@ -23,6 +23,7 @@ import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievemen
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
 import { updateWalkers } from './walkers.js';
+import { checkAdvisor } from './advisor.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -115,6 +116,8 @@ window.startNewGame = () => {
     G.nextRaidDay = scen.raidStart;
   }
   G._scenarioWon = false;
+  const nameInput = document.getElementById('kingdom-name-input');
+  G.kingdomName = (nameInput && nameInput.value.trim()) || 'Realm';
   beginGame();
 };
 
@@ -257,6 +260,7 @@ function simTick() {
     updateTutorialTip();
   }
   if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); }
+  if (G.gameTick % 120 === 0) checkAdvisor();
   if (G.gameTick % 120 === 0 && !G._scenarioWon) {
     if (checkScenarioComplete()) {
       G._scenarioWon = true;

@@ -31,6 +31,19 @@ export const ACHIEVEMENTS = [
   { id:'victory',         icon:'👑', name:'Realm Complete',     desc:'Build a Castle and claim your realm',   check:()=>G.won },
   { id:'peaceful_won',    icon:'🌾', name:'Peaceful Victor',    desc:'Complete the Peaceful Valley scenario',  check:()=>G._scenariosCompleted?.includes('peaceful_start') },
   { id:'military_won',    icon:'⚔️', name:'War Hero',           desc:'Complete the Rise of the Sword scenario', check:()=>G._scenariosCompleted?.includes('military_rise') },
+  { id:'day_50',          icon:'📅', name:'Elder',              desc:'Survive 50 days',                          check:()=>G.day>=50 },
+  { id:'day_100',         icon:'🌟', name:'Century',            desc:'Survive 100 days',                         check:()=>G.day>=100 },
+  { id:'kill_10_enemies', icon:'⚔️', name:'Defender',           desc:'Defeat 10 enemies',                        check:()=>(G.stats?.enemiesKilled||0)>=10 },
+  { id:'kill_50_enemies', icon:'🛡️', name:'War Veteran',        desc:'Defeat 50 enemies',                        check:()=>(G.stats?.enemiesKilled||0)>=50 },
+  { id:'build_all_buildings', icon:'🏗️', name:'Master Architect', desc:'Build every type of building',          check:()=>{
+    const types = ['house','farm','lumber','quarry','mine','market','barracks','tower','well','tavern','church','granary','school','blacksmith','windmill','bakery','chickencoop','cowpen','fisherman','archery'];
+    return types.every(t => G.buildings.some(b => b.type === t));
+  }},
+  { id:'perfect_happiness', icon:'😊', name:'Perfectly Happy',  desc:'Reach 100% happiness',                   check:()=>G.happiness>=100 },
+  { id:'rich_kingdom',    icon:'💰', name:'Wealth',             desc:'Accumulate 1000 gold',                     check:()=>G.resources.gold>=1000 },
+  { id:'grand_army',      icon:'⚔️', name:'Grand Army',         desc:'Command 20 soldiers',                      check:()=>(G.soldiers?.length||0)>=20 },
+  { id:'thriving',        icon:'🎉', name:'Thriving',           desc:'Reach 100 population',                     check:()=>G.population>=100 },
+  { id:'tech_tree',       icon:'🎓', name:'Scholar',            desc:'Research all technologies',                check:()=>G.researchedTechs?.size>=12 },
 ];
 
 let unlocked = new Set();
@@ -99,6 +112,21 @@ function getProgress(a) {
     if (a.id === 'fortified') {
       const cnt = G.buildings.filter(b => b.type === 'barracks' || b.type === 'tower' || b.type === 'wall').length;
       return Math.min(1, cnt / 3);
+    }
+    // New achievements progress
+    if (a.id === 'day_50') return Math.min(1, G.day / 50);
+    if (a.id === 'day_100') return Math.min(1, G.day / 100);
+    if (a.id === 'kill_10_enemies') return Math.min(1, (G.stats?.enemiesKilled || 0) / 10);
+    if (a.id === 'kill_50_enemies') return Math.min(1, (G.stats?.enemiesKilled || 0) / 50);
+    if (a.id === 'perfect_happiness') return Math.min(1, G.happiness / 100);
+    if (a.id === 'rich_kingdom') return Math.min(1, G.resources.gold / 1000);
+    if (a.id === 'grand_army') return Math.min(1, (G.soldiers?.length || 0) / 20);
+    if (a.id === 'thriving') return Math.min(1, G.population / 100);
+    if (a.id === 'tech_tree') return Math.min(1, (G.researchedTechs?.size || 0) / 12);
+    if (a.id === 'build_all_buildings') {
+      const types = ['house','farm','lumber','quarry','mine','market','barracks','tower','well','tavern','church','granary','school','blacksmith','windmill','bakery','chickencoop','cowpen','fisherman','archery'];
+      const built = types.filter(t => G.buildings.some(b => b.type === t)).length;
+      return Math.min(1, built / types.length);
     }
   } catch {}
   return 0;
