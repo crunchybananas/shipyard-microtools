@@ -2,7 +2,7 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange } from './state.js';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js';
 import { playSound } from './audio.js';
 
 function soldierDamage(s) {
@@ -17,6 +17,21 @@ function soldierDamage(s) {
 
 export function updateSoldiers() {
   for (const s of G.soldiers) {
+    // Track tile wear — soldiers patrolling create dirt paths over time
+    const _wx = Math.round(s.x), _wy = Math.round(s.y);
+    if (_wx >= 0 && _wx < MAP_W && _wy >= 0 && _wy < MAP_H) {
+      if (!G.tileWear) {
+        G.tileWear = Array.from({length: MAP_H}, () => new Uint8Array(MAP_W));
+      }
+      const tile = G.map[_wy]?.[_wx];
+      if (tile !== undefined && tile !== TILE.WATER && tile !== TILE.MOUNTAIN) {
+        const cur = G.tileWear[_wy][_wx];
+        if (cur < 200 && G.gameTick % 30 === 0) {
+          G.tileWear[_wy][_wx] = cur + 1;
+        }
+      }
+    }
+
     // Find nearest enemy
     let nearestEnemy = null, nearestDist = Infinity;
     for (const e of G.enemies) {

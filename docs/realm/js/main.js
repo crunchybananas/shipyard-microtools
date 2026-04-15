@@ -181,6 +181,7 @@ window.newGame = () => {
   G.season = 'spring'; G.won = false; G._scenarioWon = false;
   G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
   G.lastResources = null;
+  G.tileWear = null;
   G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0 };
   generateWorld();
   if (gl3dReady) buildTerrainMesh(); // rebuild 3D mesh for new world

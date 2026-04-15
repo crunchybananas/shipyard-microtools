@@ -2,7 +2,7 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData } from './state.js';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js';
 import { findPath } from './pathfinding.js';
 import { getCitizenSpeedMult } from './events.js';
 import { revealAround } from './world.js';
@@ -22,6 +22,21 @@ function pathTo(c, tx, ty) {
 
 export function updateCitizens() {
   for (const c of G.citizens) {
+    // Track tile wear — citizens walking over tiles gradually create dirt paths
+    const _wx = Math.round(c.x), _wy = Math.round(c.y);
+    if (_wx >= 0 && _wx < MAP_W && _wy >= 0 && _wy < MAP_H) {
+      if (!G.tileWear) {
+        G.tileWear = Array.from({length: MAP_H}, () => new Uint8Array(MAP_W));
+      }
+      const tile = G.map[_wy][_wx];
+      if (tile !== TILE.WATER && tile !== TILE.MOUNTAIN) {
+        const cur = G.tileWear[_wy][_wx];
+        if (cur < 200 && G.gameTick % 30 === 0) {
+          G.tileWear[_wy][_wx] = cur + 1;
+        }
+      }
+    }
+
     // Reveal fog around citizen after movement
     const _cx = Math.round(c.x), _cy = Math.round(c.y);
     if (_cx >= 0 && _cx < MAP_W && _cy >= 0 && _cy < MAP_H) {

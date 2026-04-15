@@ -108,6 +108,7 @@ export const G = {
   won: false,
   clouds: null,
   cameraShake: 0,
+  tileWear: null,  // 2D array [MAP_H][MAP_W] of 0-255 wear values, lazy-init
   difficulty: 'normal', // easy, normal, hard
   scenario: 'peaceful_start', // selected scenario id
   kingdomName: 'Realm',

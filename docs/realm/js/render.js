@@ -183,6 +183,24 @@ export function render() {
         }
       }
 
+      // Path wear overlay — tiles citizens walk on gradually darken into worn dirt paths
+      if (G.tileWear && tile !== TILE.WATER && tile !== TILE.MOUNTAIN) {
+        const wear = G.tileWear[y]?.[x] || 0;
+        if (wear > 5) {
+          const wearAlpha = Math.min(0.55, wear / 400);
+          ctx.globalAlpha = daylight * wearAlpha;
+          ctx.fillStyle = '#6a4e2e';
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y - TH/2);
+          ctx.lineTo(s.x + TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x - TW/2, s.y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+      }
+
       // Tile texture — subtle noise pattern for visual richness
       // Only draw on every other tile (checkerboard) — halves draw calls with no perceptible loss
       if (tile !== TILE.WATER && (x + y) % 2 === 0) {
@@ -555,6 +573,16 @@ export function render() {
             ctx.stroke();
           }
         }
+      }
+
+      // Heavily-worn tiles show packed dirt speckles
+      if (G.tileWear && G.tileWear[y]?.[x] > 150 && tile !== TILE.WATER && tile !== TILE.MOUNTAIN) {
+        ctx.globalAlpha = daylight * 0.35;
+        ctx.fillStyle = '#4a3218';
+        const sh = ((x * 13 + y * 29) & 0xff);
+        ctx.fillRect(s.x - 5 + (sh % 10), s.y - 2 + ((sh >> 3) % 4), 1, 1);
+        ctx.fillRect(s.x - 3 + ((sh * 3) % 10), s.y + ((sh * 7) % 4) - 1, 1, 1);
+        ctx.globalAlpha = daylight;
       }
 
       // Lily pads on water (~2%)

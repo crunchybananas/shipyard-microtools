@@ -54,6 +54,9 @@ export function saveGame({ silent = false } = {}) {
         buildingIdx: G.buildings.indexOf(c.building),
       })),
     };
+    if (G.tileWear) {
+      state.tileWear = G.tileWear.map(row => Array.from(row));
+    }
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -131,6 +134,12 @@ export function loadGame() {
       ...c,
       building: c.buildingIdx >= 0 ? G.buildings[c.buildingIdx] : null,
     }));
+
+    if (s.tileWear) {
+      G.tileWear = s.tileWear.map(row => Uint8Array.from(row));
+    } else {
+      G.tileWear = null;
+    }
 
     G.particles = [];
     showToast('Game loaded.');
