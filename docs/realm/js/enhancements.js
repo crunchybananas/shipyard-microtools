@@ -3518,3 +3518,28 @@ function renderSnowflakeOverlay(ctx) {
 }
 registerUpdater(updateSnowflakeOverlay, true);
 registerScreenRenderer(renderSnowflakeOverlay);
+
+// ── Loop 82: Hot-tub style steam from wells in winter ──────
+function renderWellSteam(ctx) {
+  if (G.season !== 'winter' || G.camera.zoom < 0.7) return;
+  const tt = G.gameTick * 0.05;
+  for (const b of G.buildings) {
+    if (b.type !== 'well') continue;
+    const s = toScreen(b.x, b.y);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 4; i++) {
+      const phase = i + (b.x + b.y) * 0.3;
+      const off = ((tt + phase) % 4);
+      const sx = s.x + Math.sin(phase + tt) * 2;
+      const sy = s.y - 16 - off * 4;
+      const a = (1 - off / 4) * 0.5;
+      ctx.fillStyle = `rgba(220,230,240,${a})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 2 + off, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderWellSteam);

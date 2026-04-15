@@ -94,6 +94,7 @@
 - Midday golden sparkles around castle (loop 79)
 - Driftwood logs on sand (loop 80)
 - Large screen-space snowflakes in winter (loop 81)
+- Steam from wells in winter (loop 82)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -343,3 +344,5 @@
 ### Loop 80 — driftwood logs scattered on sand tiles (deterministic ~8%).
 
 ### Loop 81 — large 6-arm snowflake silhouettes drift down the screen in winter.
+
+### Loop 82 — wells emit visible steam plumes in winter (warm water vs cold air).
