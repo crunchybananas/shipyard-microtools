@@ -3404,3 +3404,35 @@ function renderDragonflies(ctx) {
   }
 }
 registerWorldRenderer(renderDragonflies);
+
+// ── Loop 79: Castle dome shimmers gold during midday ───────
+function renderCastleShimmer(ctx) {
+  const dayl = getDaylight();
+  if (dayl < 0.85) return;
+  const castle = G.buildings.find(b => b.type === 'castle');
+  if (!castle) return;
+  const s = toScreen(castle.x, castle.y);
+  const tt = G.gameTick * 0.06;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 6; i++) {
+    const ang = tt + i * (Math.PI * 2 / 6);
+    const r = 22;
+    const sx = s.x + Math.cos(ang) * r;
+    const sy = s.y - 30 + Math.sin(ang) * r * 0.4;
+    const a = 0.5 + 0.5 * Math.sin(tt * 2 + i);
+    ctx.fillStyle = `rgba(255,230,150,${a * 0.45})`;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    // Cross sparkle
+    ctx.strokeStyle = `rgba(255,250,200,${a * 0.6})`;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(sx - 2, sy); ctx.lineTo(sx + 2, sy);
+    ctx.moveTo(sx, sy - 2); ctx.lineTo(sx, sy + 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderCastleShimmer);
