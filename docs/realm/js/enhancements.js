@@ -3471,3 +3471,50 @@ function renderDriftwood(ctx) {
   }
 }
 registerWorldRenderer(renderDriftwood);
+
+// ── Loop 81: Snowflake patterns drifting in winter (large)
+function updateSnowflakeOverlay(logicalW, logicalH) {
+  if (G.season !== 'winter') { if (G.bigSnow) G.bigSnow.length = 0; return; }
+  if (!G.bigSnow) G.bigSnow = [];
+  if (G.gameTick % 6 === 0 && G.bigSnow.length < 25) {
+    G.bigSnow.push({
+      x: Math.random() * (logicalW || 1500),
+      y: -10,
+      vy: 0.6 + Math.random() * 0.5,
+      vx: (Math.random() - 0.5) * 0.4,
+      rot: 0, vrot: (Math.random() - 0.5) * 0.05,
+      size: 4 + Math.random() * 4,
+    });
+  }
+  for (let i = G.bigSnow.length - 1; i >= 0; i--) {
+    const p = G.bigSnow[i];
+    p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+    if (p.y > (logicalH || 800) + 20) G.bigSnow.splice(i, 1);
+  }
+}
+function renderSnowflakeOverlay(ctx) {
+  if (!G.bigSnow || !G.bigSnow.length) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(220,235,255,0.7)';
+  ctx.lineWidth = 0.6;
+  for (const p of G.bigSnow) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    for (let k = 0; k < 6; k++) {
+      ctx.rotate(Math.PI / 3);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, p.size);
+      ctx.moveTo(0, p.size * 0.5);
+      ctx.lineTo(p.size * 0.2, p.size * 0.7);
+      ctx.moveTo(0, p.size * 0.5);
+      ctx.lineTo(-p.size * 0.2, p.size * 0.7);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+registerUpdater(updateSnowflakeOverlay, true);
+registerScreenRenderer(renderSnowflakeOverlay);
