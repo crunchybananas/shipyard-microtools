@@ -3692,3 +3692,22 @@ function renderSoldierShadows(ctx) {
   }
 }
 registerWorldRenderer(renderSoldierShadows);
+
+// ── Loop 88: Dust kicked up when soldier walks ─────────────
+function updateSoldierDust() {
+  if (!G.soldiers || !G.particles) return;
+  if (G.gameTick % 30 !== 0) return;
+  for (const sd of G.soldiers) {
+    if (G.particles.length > 350) break;
+    G.particles.push({
+      tx: sd.x + (Math.random() - 0.5) * 0.2,
+      ty: sd.y + (Math.random() - 0.5) * 0.2,
+      offsetY: -2,
+      text: null, alpha: 0.5,
+      vy: -0.05, decay: 0.018,
+      type: 'dust', size: 1 + Math.random() * 0.5,
+      vx: (Math.random() - 0.5) * 0.08,
+    });
+  }
+}
+registerUpdater(updateSoldierDust);

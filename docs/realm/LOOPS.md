@@ -100,6 +100,7 @@
 - Beggar with coin bowl beside taverns (loop 85)
 - Stained-glass window glow on churches (loop 86)
 - Long sunset shadows from soldiers (loop 87)
+- Soldier dust puffs (loop 88)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -361,3 +362,5 @@
 ### Loop 86 — colored stained-glass window glow on church facades.
 
 ### Loop 87 — long elongated shadows extend from soldiers as the sun sets.
+
+### Loop 88 — soldiers kick up dust puffs as they walk.
