@@ -1610,3 +1610,71 @@ function renderGhost(ctx) {
 }
 registerUpdater(updateGhost);
 registerWorldRenderer(renderGhost);
+
+// ── Loop 32: Frogs hop on water-edge sand at dusk/night ────
+function updateFrogs() {
+  if (!G.frogs) G.frogs = [];
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.55 || (t > 0.1 && t < 0.5)) { /* not allowed */ }
+  if ((t > 0.55 || t < 0.1) && G.gameTick % 600 === 0 && G.frogs.length < 4) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.SAND) {
+        // Adjacent water?
+        let nearWater = false;
+        for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          if (G.map[y+dy] && G.map[y+dy][x+dx] === TILE.WATER) { nearWater = true; break; }
+        }
+        if (nearWater) {
+          G.frogs.push({ x, y, hopTimer: 100 + Math.random() * 100, hop: 0, croak: 0 });
+          break;
+        }
+      }
+    }
+  }
+  for (let i = G.frogs.length - 1; i >= 0; i--) {
+    const f = G.frogs[i];
+    f.hopTimer -= G.speed;
+    if (f.hopTimer <= 0) {
+      f.hop = 12;
+      f.x += (Math.random() - 0.5) * 0.6;
+      f.y += (Math.random() - 0.5) * 0.4;
+      f.hopTimer = 100 + Math.random() * 200;
+    }
+    if (f.hop > 0) f.hop -= G.speed;
+    if (Math.random() < 0.005) f.croak = 25;
+    if (f.croak > 0) f.croak -= G.speed;
+    if (Math.random() < 0.0005) G.frogs.splice(i, 1);
+  }
+}
+function renderFrogs(ctx) {
+  if (!G.frogs || !G.frogs.length || G.camera.zoom < 1.0) return;
+  for (const f of G.frogs) {
+    const s = toScreen(f.x, f.y);
+    const yOff = -Math.sin((Math.max(0,f.hop) / 12) * Math.PI) * 4;
+    // Body green
+    ctx.fillStyle = '#3a8030';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 2 + yOff, 1.8, 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Eyes
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(s.x - 0.8, s.y + 1 + yOff, 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x + 0.8, s.y + 1 + yOff, 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(s.x - 0.8, s.y + 1 + yOff, 0.18, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x + 0.8, s.y + 1 + yOff, 0.18, 0, Math.PI * 2); ctx.fill();
+    if (f.croak > 0) {
+      ctx.globalAlpha = f.croak / 25;
+      // Throat puff (light yellow)
+      ctx.fillStyle = '#f5e890';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y + 3.5 + yOff, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+registerUpdater(updateFrogs);
+registerWorldRenderer(renderFrogs);
