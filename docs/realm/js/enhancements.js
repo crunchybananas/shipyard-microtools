@@ -2670,3 +2670,27 @@ function renderFishingNets(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderFishingNets);
+
+// ── Loop 59: Slow magical aurora over castle when player wins
+function renderVictoryAura(ctx) {
+  if (!G.won && !G._scenarioWon) return;
+  const castle = G.buildings.find(b => b.type === 'castle');
+  if (!castle) return;
+  const s = toScreen(castle.x, castle.y);
+  const tt = G.gameTick * 0.04;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 3; i++) {
+    const r = 40 + i * 12 + Math.sin(tt + i) * 5;
+    const a = 0.18 - i * 0.04;
+    const grad = ctx.createRadialGradient(s.x, s.y - 20, r * 0.4, s.x, s.y - 20, r);
+    grad.addColorStop(0, `rgba(255,220,140,${a})`);
+    grad.addColorStop(1, 'rgba(255,220,140,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 20, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderVictoryAura);
