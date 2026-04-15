@@ -1788,3 +1788,31 @@ function renderRams(ctx) {
 }
 registerUpdater(updateRams);
 registerWorldRenderer(renderRams);
+
+// ── Loop 35: Bee swarms around farms in summer ─────────────
+function renderBeeSwarms(ctx) {
+  if (G.season !== 'summer' || G.camera.zoom < 0.9) return;
+  const tt = G.gameTick * 0.3;
+  for (const b of G.buildings) {
+    if (b.type !== 'farm') continue;
+    const s = toScreen(b.x, b.y);
+    for (let i = 0; i < 6; i++) {
+      const phase = i + (b.x + b.y) * 0.7;
+      const bx = s.x + Math.sin(tt * 0.7 + phase) * 8 + Math.cos(tt * 1.1 + phase * 1.3) * 5;
+      const by = s.y - 8 + Math.cos(tt * 0.9 + phase) * 5 + Math.sin(tt * 1.5 + phase) * 3;
+      // Body striped
+      ctx.fillStyle = '#fdd33b';
+      ctx.beginPath();
+      ctx.arc(bx, by, 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1a1810';
+      ctx.fillRect(bx - 0.7, by - 0.2, 1.4, 0.3);
+      // Wing blur
+      ctx.fillStyle = 'rgba(220,230,255,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(bx, by - 0.6, 1.1, 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+registerWorldRenderer(renderBeeSwarms);

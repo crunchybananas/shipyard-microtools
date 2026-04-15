@@ -47,6 +47,7 @@
 - Frogs hop on sand near water at night (loop 32)
 - Visible jagged lightning bolts in rain (loop 33)
 - Mountain rams on stone tiles (loop 34)
+- Bee swarms around farms in summer (loop 35)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -202,3 +203,5 @@
 ### Loop 33 — visible jagged lightning bolts during rain (multi-segment paths from sky downward + glow halo).
 
 ### Loop 34 — mountain rams clamber on stone tiles (curling horns).
+
+### Loop 35 — bee swarms (yellow striped dots with wing blur) buzz around farms in summer.
