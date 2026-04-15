@@ -1401,3 +1401,67 @@ function renderOwls(ctx) {
 }
 registerUpdater(updateOwls);
 registerWorldRenderer(renderOwls);
+
+// ── Loop 28: Large trade ship sails along edge of map water ─
+function updateTradeShip() {
+  if (!G.tradeShips) G.tradeShips = [];
+  if (G.gameTick % 1500 === 0 && G.tradeShips.length < 1) {
+    // Find a long stretch of water along an edge
+    const tries = 10;
+    for (let i = 0; i < tries; i++) {
+      const edgeY = Math.floor(Math.random() * MAP_H);
+      // Try left edge first
+      if (G.map[edgeY] && G.map[edgeY][1] === TILE.WATER && G.map[edgeY][2] === TILE.WATER) {
+        G.tradeShips.push({ x: -2, y: edgeY, vx: 0.012, vy: 0, bobPhase: Math.random() * Math.PI * 2 });
+        return;
+      }
+      const x = Math.floor(Math.random() * MAP_W);
+      if (G.map[1] && G.map[1][x] === TILE.WATER) {
+        G.tradeShips.push({ x, y: -2, vx: 0, vy: 0.012, bobPhase: Math.random() * Math.PI * 2 });
+        return;
+      }
+    }
+  }
+  for (let i = G.tradeShips.length - 1; i >= 0; i--) {
+    const s = G.tradeShips[i];
+    s.x += s.vx * G.speed; s.y += s.vy * G.speed;
+    if (s.x > MAP_W + 4 || s.y > MAP_H + 4) G.tradeShips.splice(i, 1);
+  }
+}
+function renderTradeShips(ctx) {
+  if (!G.tradeShips || !G.tradeShips.length || G.camera.zoom < 0.4) return;
+  for (const t of G.tradeShips) {
+    const s = toScreen(t.x, t.y);
+    const bob = Math.sin(G.gameTick * 0.05 + t.bobPhase) * 0.8;
+    // Hull (wider than fishing boats)
+    ctx.fillStyle = '#3a2410';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + bob, 14, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#5a3a20';
+    ctx.fillRect(s.x - 14, s.y + bob - 4, 28, 1);
+    // Three masts
+    ctx.strokeStyle = '#3a2a14';
+    ctx.lineWidth = 1;
+    for (const mx of [-8, 0, 8]) {
+      ctx.beginPath();
+      ctx.moveTo(s.x + mx, s.y + bob - 3);
+      ctx.lineTo(s.x + mx, s.y + bob - 22);
+      ctx.stroke();
+    }
+    // Big sails
+    ctx.fillStyle = '#f4ecd0';
+    ctx.fillRect(s.x - 12, s.y + bob - 18, 7, 13);
+    ctx.fillRect(s.x - 4,  s.y + bob - 22, 8, 17);
+    ctx.fillRect(s.x + 5,  s.y + bob - 18, 7, 13);
+    // Sail shadows
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(s.x - 12, s.y + bob - 18, 7, 13);
+    ctx.fillRect(s.x + 5,  s.y + bob - 18, 7, 13);
+    // Flag
+    ctx.fillStyle = '#c83030';
+    ctx.fillRect(s.x, s.y + bob - 25, 4, 2);
+  }
+}
+registerUpdater(updateTradeShip);
+registerWorldRenderer(renderTradeShips);
