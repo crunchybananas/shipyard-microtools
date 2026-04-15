@@ -3611,3 +3611,38 @@ function renderRoofCats(ctx) {
   }
 }
 registerWorldRenderer(renderRoofCats);
+
+// ── Loop 85: Beggar/musician sits next to taverns ──────────
+function renderBeggar(ctx) {
+  if (G.camera.zoom < 0.95) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'tavern') continue;
+    const s = toScreen(b.x, b.y);
+    const px = s.x - 14, py = s.y + 4;
+    // Sitting figure (cloaked)
+    ctx.fillStyle = '#5a4030';
+    ctx.beginPath();
+    ctx.arc(px, py - 4, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(px - 2.5, py + 2);
+    ctx.lineTo(px - 2, py - 3);
+    ctx.lineTo(px + 2, py - 3);
+    ctx.lineTo(px + 2.5, py + 2);
+    ctx.closePath();
+    ctx.fill();
+    // Hat
+    ctx.fillStyle = '#3a2818';
+    ctx.fillRect(px - 1.8, py - 5.5, 3.6, 0.6);
+    // Coin bowl
+    ctx.fillStyle = '#7a6a40';
+    ctx.beginPath();
+    ctx.ellipse(px + 3, py + 1, 1.5, 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Coins
+    ctx.fillStyle = '#ffd166';
+    ctx.fillRect(px + 2.3, py + 0.4, 0.5, 0.5);
+    ctx.fillRect(px + 3.3, py + 0.6, 0.4, 0.4);
+  }
+}
+registerWorldRenderer(renderBeggar);

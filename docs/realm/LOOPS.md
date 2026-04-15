@@ -97,6 +97,7 @@
 - Steam from wells in winter (loop 82)
 - Underwater bubbles rise on water tiles (loop 83)
 - Rooftop cats nap on houses (loop 84)
+- Beggar with coin bowl beside taverns (loop 85)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -352,3 +353,5 @@
 ### Loop 83 — small bubble pairs rise from random water tiles (suggests fish / underwater life).
 
 ### Loop 84 — cats nap on rooftops of ~1/8 houses (orange or black tabby).
+
+### Loop 85 — cloaked beggar with coin bowl sits beside each tavern.
