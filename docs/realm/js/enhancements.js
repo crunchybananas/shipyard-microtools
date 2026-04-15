@@ -1920,3 +1920,72 @@ function renderWebs(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderWebs);
+
+// ── Loop 38: Crabs scuttle on sand near water ──────────────
+function updateCrabs() {
+  if (!G.crabs) G.crabs = [];
+  if (G.gameTick % 350 === 0 && G.crabs.length < 5) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.SAND) {
+        G.crabs.push({ x, y, tx: x, ty: y, dir: Math.random() < 0.5 ? 1 : -1, phase: 0 });
+        break;
+      }
+    }
+  }
+  for (let i = G.crabs.length - 1; i >= 0; i--) {
+    const c = G.crabs[i];
+    c.phase += G.speed;
+    const dx = c.tx - c.x, dy = c.ty - c.y, d = Math.hypot(dx, dy);
+    if (d < 0.2) {
+      // Scuttle sideways
+      const ox = c.dir * 1.5, oy = (Math.random() - 0.5) * 1;
+      const nx = Math.max(1, Math.min(MAP_W - 2, c.x + ox));
+      const ny = Math.max(1, Math.min(MAP_H - 2, c.y + oy));
+      if (G.map[Math.round(ny)] && G.map[Math.round(ny)][Math.round(nx)] === TILE.SAND) {
+        c.tx = nx; c.ty = ny;
+      } else {
+        c.dir *= -1;
+      }
+    } else {
+      c.x += (dx / d) * 0.02 * G.speed;
+      c.y += (dy / d) * 0.02 * G.speed;
+    }
+    if (Math.random() < 0.0005) G.crabs.splice(i, 1);
+  }
+}
+function renderCrabs(ctx) {
+  if (!G.crabs || !G.crabs.length || G.camera.zoom < 1.0) return;
+  for (const c of G.crabs) {
+    const s = toScreen(c.x, c.y);
+    const wig = Math.sin(c.phase * 0.4) * 0.6;
+    // Body
+    ctx.fillStyle = '#d04030';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 2, 1.6, 1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Eyes
+    ctx.fillStyle = '#000';
+    ctx.fillRect(s.x - 0.6, s.y + 1.3, 0.4, 0.4);
+    ctx.fillRect(s.x + 0.2, s.y + 1.3, 0.4, 0.4);
+    // Claws
+    ctx.strokeStyle = '#a02818';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 1.4, s.y + 2);
+    ctx.lineTo(s.x - 2.5, s.y + 1.5 + wig);
+    ctx.moveTo(s.x + 1.4, s.y + 2);
+    ctx.lineTo(s.x + 2.5, s.y + 1.5 - wig);
+    ctx.stroke();
+    // Legs
+    for (let k = -1; k <= 1; k += 2) {
+      ctx.beginPath();
+      ctx.moveTo(s.x + k * 0.8, s.y + 2.5);
+      ctx.lineTo(s.x + k * 1.7, s.y + 3.4 + wig);
+      ctx.stroke();
+    }
+  }
+}
+registerUpdater(updateCrabs);
+registerWorldRenderer(renderCrabs);

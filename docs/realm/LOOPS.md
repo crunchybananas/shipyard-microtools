@@ -50,6 +50,7 @@
 - Bee swarms around farms in summer (loop 35)
 - Will-o-wisps in forest at night (loop 36)
 - Spider webs in autumn forests (loop 37)
+- Crabs scuttle on sand (loop 38)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -211,3 +212,5 @@
 ### Loop 36 — colored will-o-wisps drift in forest at night (cyan/blue/violet).
 
 ### Loop 37 — spider webs draped on autumn forest tiles (radial+concentric, deterministic ~18%).
+
+### Loop 38 — crabs scuttle sideways on sand tiles.
