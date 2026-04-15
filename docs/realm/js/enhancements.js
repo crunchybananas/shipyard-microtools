@@ -8,6 +8,118 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 13: Wandering merchant carts (visit market) ───────
+export function updateCarts() {
+  if (!G.carts) G.carts = [];
+  const markets = G.buildings.filter(b => b.type === 'market');
+  if (markets.length === 0) { G.carts.length = 0; return; }
+  // Spawn one cart per market max; respawn after delivery
+  if (G.gameTick % 600 === 0 && G.carts.length < markets.length && G.carts.length < 3) {
+    // Spawn at map edge, target a random market
+    const m = markets[Math.floor(Math.random() * markets.length)];
+    const edge = Math.floor(Math.random() * 4);
+    let sx, sy;
+    if (edge === 0) { sx = 0; sy = Math.floor(Math.random() * MAP_H); }
+    else if (edge === 1) { sx = MAP_W - 1; sy = Math.floor(Math.random() * MAP_H); }
+    else if (edge === 2) { sx = Math.floor(Math.random() * MAP_W); sy = 0; }
+    else { sx = Math.floor(Math.random() * MAP_W); sy = MAP_H - 1; }
+    G.carts.push({
+      x: sx, y: sy, tx: m.x, ty: m.y,
+      state: 'arriving', stateTimer: 0, market: m,
+      bobPhase: Math.random() * Math.PI * 2,
+    });
+  }
+  for (let i = G.carts.length - 1; i >= 0; i--) {
+    const c = G.carts[i];
+    const dx = c.tx - c.x, dy = c.ty - c.y;
+    const d = Math.hypot(dx, dy);
+    if (c.state === 'arriving') {
+      if (d < 0.6) {
+        c.state = 'unloading';
+        c.stateTimer = 200;
+      } else {
+        const spd = 0.025 * G.speed;
+        // Skip impassable tiles
+        const stepX = (dx / d) * Math.min(spd, d);
+        const stepY = (dy / d) * Math.min(spd, d);
+        c.x += stepX; c.y += stepY;
+      }
+    } else if (c.state === 'unloading') {
+      c.stateTimer -= G.speed;
+      if (c.stateTimer <= 0) {
+        c.state = 'leaving';
+        // pick edge target
+        const edge = Math.floor(Math.random() * 4);
+        if (edge === 0) { c.tx = 0; c.ty = c.y; }
+        else if (edge === 1) { c.tx = MAP_W - 1; c.ty = c.y; }
+        else if (edge === 2) { c.tx = c.x; c.ty = 0; }
+        else { c.tx = c.x; c.ty = MAP_H - 1; }
+      }
+    } else if (c.state === 'leaving') {
+      if (c.x <= 0.3 || c.x >= MAP_W - 1.3 || c.y <= 0.3 || c.y >= MAP_H - 1.3) {
+        G.carts.splice(i, 1);
+        continue;
+      }
+      const spd = 0.025 * G.speed;
+      c.x += (dx / d) * Math.min(spd, d);
+      c.y += (dy / d) * Math.min(spd, d);
+    }
+  }
+}
+export function renderCarts(ctx) {
+  if (!G.carts || !G.carts.length || G.camera.zoom < 0.5) return;
+  const dayl = getDaylight();
+  for (const c of G.carts) {
+    const s = toScreen(c.x, c.y);
+    const bob = Math.sin(G.gameTick * 0.15 + c.bobPhase) * 0.4;
+    ctx.globalAlpha = dayl;
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 4, 10, 2.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Cart bed (brown plank)
+    ctx.fillStyle = '#7a4a20';
+    ctx.fillRect(s.x - 7, s.y - 4 + bob, 14, 4);
+    ctx.fillStyle = '#5a3010';
+    ctx.fillRect(s.x - 7, s.y - 4 + bob, 14, 1);
+    // Canvas cover (arched)
+    ctx.fillStyle = '#e8dcb0';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y - 5 + bob, 7, 4, 0, Math.PI, 0);
+    ctx.fill();
+    ctx.strokeStyle = '#a08858';
+    ctx.lineWidth = 0.5;
+    for (let r = -2; r <= 2; r++) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y - 5 + bob, 7, Math.PI + (r + 2) * 0.5, Math.PI + (r + 2) * 0.5 + 0.01);
+      ctx.stroke();
+    }
+    // Wheels
+    ctx.fillStyle = '#3a2410';
+    ctx.beginPath(); ctx.arc(s.x - 5, s.y + 1, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x + 5, s.y + 1, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#7a5028';
+    ctx.beginPath(); ctx.arc(s.x - 5, s.y + 1, 0.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x + 5, s.y + 1, 0.8, 0, Math.PI * 2); ctx.fill();
+    // Horse pulling (small) — drawn ahead of cart in motion direction
+    if (c.state !== 'unloading') {
+      const mdx = c.tx - c.x, mdy = c.ty - c.y;
+      const md = Math.hypot(mdx, mdy) || 1;
+      const hsx = s.x + (mdx / md) * 9;
+      const hsy = s.y + bob - 2;
+      ctx.fillStyle = '#6a4828';
+      ctx.beginPath();
+      ctx.ellipse(hsx, hsy, 3, 1.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(hsx + (mdx / md) * 2.5, hsy - 1, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
 // ── Loop 12: Festival lanterns strung between adjacent houses
 // When two houses are close (≤ 3 tiles), draw a string of glowing
 // lanterns between them. Active any time, brighter at night.

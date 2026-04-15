@@ -25,6 +25,7 @@
 - Glowing bioluminescent mushrooms in forest at night (loop 10)
 - Dawn ground mist bands (loop 11)
 - Festival lantern strings between houses (loop 12)
+- Merchant carts visit markets (loop 13)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -99,3 +100,9 @@
 - Ideas: (1) **festival lantern strings between close houses** (2) market awnings/stall canopies (3) town square paving
 - Chose: lantern strings (visually striking at night, organically wires the town)
 - Implemented: enhancements.js renderLanterns. For every house/tavern pair within 3 tiles, draw a sagging rope with 4 colored lanterns; bright halos at night via screen blend.
+
+### Loop 13
+- Validator: trade economy is invisible — gold appears with no spatial story; markets sit alone with no traffic.
+- Ideas: (1) **wandering merchant carts visit markets** (2) caravan campfire props (3) ghost fishing nets in shallow water
+- Chose: merchant carts (visualize commerce, narrative payoff)
+- Implemented: enhancements.js updateCarts/renderCarts. Spawn at map edge, travel to a market, unload, depart back to edge. Horse + canvas-cover wagon sprite with wheels + bobbing.
