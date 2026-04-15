@@ -1216,3 +1216,96 @@ function renderStatusBubbles(ctx) {
   }
 }
 registerWorldRenderer(renderStatusBubbles);
+
+// ── Loop 25: Rare dragon flyover (screen space) ────────────
+function updateDragon(logicalW, logicalH) {
+  if (!G.dragon) {
+    if (G.gameTick % 2400 === 0 && Math.random() < 0.15) {
+      const goingRight = Math.random() < 0.5;
+      G.dragon = {
+        x: goingRight ? -120 : (logicalW || 1500) + 120,
+        y: (logicalH || 800) * (0.10 + Math.random() * 0.18),
+        vx: (goingRight ? 1 : -1) * 1.5,
+        wing: 0,
+        scale: 1.0,
+        breath: 0,
+      };
+    }
+    return;
+  }
+  const d = G.dragon;
+  d.x += d.vx * G.speed;
+  d.wing += 0.18 * G.speed;
+  d.breath = Math.max(0, d.breath - G.speed);
+  if (Math.random() < 0.005) d.breath = 25;
+  if (d.x < -200 || d.x > (logicalW || 1500) + 200) G.dragon = null;
+}
+function renderDragon(ctx) {
+  const d = G.dragon;
+  if (!d) return;
+  ctx.save();
+  ctx.translate(d.x, d.y);
+  if (d.vx < 0) ctx.scale(-1, 1);
+  // Body
+  ctx.fillStyle = '#3a2050';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 22, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Tail
+  ctx.beginPath();
+  ctx.moveTo(-22, 0);
+  ctx.lineTo(-40, -3);
+  ctx.lineTo(-46, 0);
+  ctx.lineTo(-40, 3);
+  ctx.closePath();
+  ctx.fill();
+  // Tail spike
+  ctx.beginPath();
+  ctx.moveTo(-46, 0);
+  ctx.lineTo(-50, -4);
+  ctx.lineTo(-50, 4);
+  ctx.closePath();
+  ctx.fill();
+  // Head
+  ctx.beginPath();
+  ctx.ellipse(22, -2, 8, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Horns
+  ctx.fillStyle = '#1a0a30';
+  ctx.beginPath();
+  ctx.moveTo(24, -6); ctx.lineTo(28, -11); ctx.lineTo(26, -5); ctx.closePath();
+  ctx.fill();
+  // Wings (animated)
+  const wingOff = Math.sin(d.wing) * 14;
+  ctx.fillStyle = 'rgba(80,30,120,0.9)';
+  ctx.beginPath();
+  ctx.moveTo(-4, -2);
+  ctx.lineTo(-12, -22 - wingOff);
+  ctx.lineTo(8, -10 - wingOff * 0.4);
+  ctx.lineTo(8, -2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-4, 2);
+  ctx.lineTo(-10, 18 + wingOff * 0.6);
+  ctx.lineTo(8, 8 + wingOff * 0.4);
+  ctx.lineTo(8, 2);
+  ctx.closePath();
+  ctx.fill();
+  // Fire breath
+  if (d.breath > 0) {
+    const a = d.breath / 25;
+    ctx.globalCompositeOperation = 'screen';
+    const grad = ctx.createRadialGradient(38, -1, 0, 38, -1, 22);
+    grad.addColorStop(0, `rgba(255,240,140,${a * 0.95})`);
+    grad.addColorStop(0.5, `rgba(255,120,40,${a * 0.7})`);
+    grad.addColorStop(1, 'rgba(255,40,0,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(40, -1, 22, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateDragon, true);
+registerScreenRenderer(renderDragon);

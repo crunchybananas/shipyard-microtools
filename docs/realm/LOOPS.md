@@ -37,6 +37,7 @@
 - Cherry blossom canopies in spring forests (loop 22)
 - Smoking volcano on a mountain peak (loop 23)
 - Floating status bubbles above buildings (loop 24)
+- Rare dragon flyover (loop 25)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -172,3 +173,5 @@
 ### Loop 23 — refactor: registerUpdater/Renderer aggregator added so future loops only edit enhancements.js. First registered feature: smoking volcano on a single mountain peak (orange glowing crater + drifting grey smoke plumes).
 
 ### Loop 24 — floating status bubbles above buildings ('?' for understaffed, '!' for low food on farms).
+
+### Loop 25 — rare dragon flyover (screen space): purple body, animated wings, occasional fire breath.
