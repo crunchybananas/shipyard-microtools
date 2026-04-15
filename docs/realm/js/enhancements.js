@@ -2942,3 +2942,43 @@ function renderSleepBubbles(ctx) {
   ctx.globalAlpha = 1;
 }
 registerWorldRenderer(renderSleepBubbles);
+
+// ── Loop 66: Glowing forge embers around blacksmiths ───────
+function renderForgeEmbers(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const dayl = getDaylight();
+  const tt = G.gameTick * 0.15;
+  for (const b of G.buildings) {
+    if (b.type !== 'blacksmith') continue;
+    const s = toScreen(b.x, b.y);
+    // Floating embers
+    for (let i = 0; i < 5; i++) {
+      const phase = i + (b.x + b.y) * 0.5;
+      const ex = s.x + Math.sin(tt * 0.7 + phase) * 6;
+      const ey = s.y - 6 + (((G.gameTick * 0.3 + i * 7) % 30) - 15);
+      const a = 1 - Math.abs(((G.gameTick * 0.3 + i * 7) % 30) - 15) / 15;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = `rgba(255,140,40,${a * 0.85})`;
+      ctx.beginPath();
+      ctx.arc(ex, ey, 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    // Forge glow
+    if (dayl < 0.7) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const a = (0.7 - dayl) * 0.8;
+      const grad = ctx.createRadialGradient(s.x + 4, s.y - 2, 1, s.x + 4, s.y - 2, 14);
+      grad.addColorStop(0, `rgba(255,150,40,${a})`);
+      grad.addColorStop(1, 'rgba(255,80,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(s.x + 4, s.y - 2, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+registerWorldRenderer(renderForgeEmbers);

@@ -78,6 +78,7 @@
 - Dense fireflies over summer water edges (loop 63)
 - Bunnies hop on spring grass (loop 64)
 - Sleep z-bubbles above houses at night (loop 65)
+- Forge embers around blacksmiths (loop 66)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -295,3 +296,5 @@
 ### Loop 64 — bunnies hop across grass in spring (white tail).
 
 ### Loop 65 — sleepy 'z' bubbles drift up from each house at night.
+
+### Loop 66 — orange forge glow + rising embers around each blacksmith building.
