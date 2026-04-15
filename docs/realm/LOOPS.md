@@ -43,6 +43,7 @@
 - Large 3-masted trade ships along map edges (loop 28)
 - Sparkles orbiting wells (loop 29)
 - Slow comets across deep-night sky (loop 30)
+- Wandering ghost wisp at night (loop 31)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -190,3 +191,5 @@
 ### Loop 29 — magical blue sparkles orbit each well building.
 
 ### Loop 30 — slow majestic comets across deep-night sky (gradient teardrop tail + glowing head, distinct from existing fast meteors).
+
+### Loop 31 — wandering ghost wisp at night (rare, fades in/out, drifts on land tiles).

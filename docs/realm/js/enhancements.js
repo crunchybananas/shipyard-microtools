@@ -1552,3 +1552,61 @@ function renderComets(ctx) {
 }
 registerUpdater(updateComets, true);
 registerScreenRenderer(renderComets);
+
+// ── Loop 31: Wandering ghost in graveyards (stub: random spot at night)
+function updateGhost() {
+  if (!G.ghosts) G.ghosts = [];
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.78 && t > 0.05) { G.ghosts.length = 0; return; }
+  if (G.gameTick % 500 === 0 && G.ghosts.length < 1 && Math.random() < 0.3) {
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      const tile = G.map[y] && G.map[y][x];
+      if (tile === TILE.GRASS || tile === TILE.FOREST) {
+        G.ghosts.push({ x, y, tx: x, ty: y, life: 800, phase: Math.random() * Math.PI * 2 });
+        break;
+      }
+    }
+  }
+  for (let i = G.ghosts.length - 1; i >= 0; i--) {
+    const g = G.ghosts[i];
+    g.life -= G.speed;
+    if (g.life <= 0) { G.ghosts.splice(i, 1); continue; }
+    const dx = g.tx - g.x, dy = g.ty - g.y, d = Math.hypot(dx, dy);
+    if (d < 0.2) {
+      g.tx = g.x + (Math.random() - 0.5) * 4;
+      g.ty = g.y + (Math.random() - 0.5) * 4;
+    } else {
+      g.x += (dx / d) * 0.008 * G.speed;
+      g.y += (dy / d) * 0.008 * G.speed;
+    }
+  }
+}
+function renderGhost(ctx) {
+  if (!G.ghosts || !G.ghosts.length || G.camera.zoom < 0.7) return;
+  for (const g of G.ghosts) {
+    const s = toScreen(g.x, g.y);
+    const fade = Math.min(1, g.life / 200);
+    const bob = Math.sin(G.gameTick * 0.05 + g.phase) * 1.5;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.55 * fade;
+    // Wispy body
+    const grad = ctx.createRadialGradient(s.x, s.y - 6 + bob, 0, s.x, s.y - 6 + bob, 10);
+    grad.addColorStop(0, 'rgba(220,255,250,0.95)');
+    grad.addColorStop(1, 'rgba(150,220,220,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y - 5 + bob, 4, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Eyes (dark holes)
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = `rgba(20,30,60,${0.7 * fade})`;
+    ctx.beginPath(); ctx.arc(s.x - 1.2, s.y - 7 + bob, 0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x + 1.2, s.y - 7 + bob, 0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+}
+registerUpdater(updateGhost);
+registerWorldRenderer(renderGhost);
