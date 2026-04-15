@@ -29,6 +29,7 @@
 - Rainbow after rain (loop 14)
 - Hawks circle overhead (loop 15)
 - Constellation line patterns at night (loop 16)
+- Wet ground puddles after rain (loop 17)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -127,3 +128,9 @@
 - Ideas: (1) **constellation patterns connecting bright stars** (2) zodiac wheel near horizon (3) crescent moon phases per day
 - Chose: constellations (mythic feel, simple line art)
 - Implemented: enhancements.js renderConstellations. Three named patterns (dragon/cup/archer) at fixed screen-space coords with line-connecting bright stars + cross sparkles.
+
+### Loop 17
+- Validator: rain ends with no trace; ground returns to dry instantly. Need wet-aftermath.
+- Ideas: (1) **puddles after rain** (2) wet-shine roof tint (3) muddy roads
+- Chose: puddles (cheap, distinct, complements rainbow)
+- Implemented: enhancements.js updatePuddles/renderPuddles. After rain ends, deterministic ~22% of grass/sand tiles get blue elliptical puddles with sky glint, fade out over ~30 sec.

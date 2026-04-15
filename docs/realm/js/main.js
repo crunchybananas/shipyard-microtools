@@ -26,7 +26,7 @@ import { updateWalkers } from './walkers.js';
 import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
-import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks } from './enhancements.js';
+import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles } from './enhancements.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -287,6 +287,7 @@ function simTick() {
     updateCarts();
     updateRainbow();
     updateHawks(window.innerWidth, window.innerHeight);
+    updatePuddles();
     updateProduction();
     updateFires();
     updateParticles();

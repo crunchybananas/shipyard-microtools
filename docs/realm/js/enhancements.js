@@ -8,6 +8,56 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 17: Wet ground puddles after rain ─────────────────
+let _puddleAge = 0;
+let _prevWeather2 = null;
+const PUDDLE_DURATION = 2000;
+export function updatePuddles() {
+  if (_prevWeather2 === 'rain' && G.weather !== 'rain') {
+    _puddleAge = PUDDLE_DURATION;
+  }
+  _prevWeather2 = G.weather;
+  if (_puddleAge > 0) _puddleAge -= G.speed;
+}
+export function renderPuddles(ctx) {
+  if (_puddleAge <= 0 || G.camera.zoom < 0.7) return;
+  const fade = Math.min(1, _puddleAge / 400);
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 28 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      const tile = G.map[ty][tx];
+      if (tile !== TILE.GRASS && tile !== TILE.SAND) continue;
+      const h = ((tx * 0x1f1f) ^ (ty * 0x3b3b)) >>> 0;
+      if (h % 100 > 22) continue; // only ~22% of tiles have a puddle
+      const s = toScreen(tx, ty);
+      const ox = ((h % 17) - 8);
+      const oy = ((h >> 4) % 7) - 3;
+      const w = 8 + (h % 5);
+      const hh = 3 + (h % 3);
+      // Reflective base
+      ctx.globalAlpha = 0.55 * fade;
+      ctx.fillStyle = '#7daed8';
+      ctx.beginPath();
+      ctx.ellipse(s.x + ox, s.y + oy, w, hh, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Sky glint
+      ctx.globalAlpha = 0.4 * fade;
+      ctx.fillStyle = '#cfe6ff';
+      ctx.beginPath();
+      ctx.ellipse(s.x + ox - w * 0.3, s.y + oy - hh * 0.3, w * 0.4, hh * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
 // ── Loop 16: Constellation patterns connecting bright stars ─
 // Hand-crafted "constellation" line patterns drawn at fixed
 // screen-space positions, only at deep night.
