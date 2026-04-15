@@ -3063,3 +3063,35 @@ function renderChurchBeams(ctx) {
 }
 registerUpdater(updateChurchBeams);
 registerWorldRenderer(renderChurchBeams);
+
+// ── Loop 69: Chess-piece signposts at map edges (compass markers)
+function renderCompassMarkers(ctx) {
+  if (G.camera.zoom < 0.4) return;
+  const margin = 4;
+  const corners = [
+    { x: margin, y: MAP_H / 2, label: 'W' },
+    { x: MAP_W - margin, y: MAP_H / 2, label: 'E' },
+    { x: MAP_W / 2, y: margin, label: 'N' },
+    { x: MAP_W / 2, y: MAP_H - margin, label: 'S' },
+  ];
+  ctx.save();
+  ctx.fillStyle = 'rgba(40,28,16,0.6)';
+  ctx.font = 'bold 12px serif';
+  ctx.textAlign = 'center';
+  for (const c of corners) {
+    const s = toScreen(c.x, c.y);
+    // Stone post
+    ctx.fillStyle = '#5a5a60';
+    ctx.fillRect(s.x - 2, s.y - 8, 4, 8);
+    ctx.fillStyle = '#3a3a40';
+    ctx.fillRect(s.x - 2, s.y - 9, 4, 1);
+    // Letter plate
+    ctx.fillStyle = '#7a7a82';
+    ctx.fillRect(s.x - 3.5, s.y - 14, 7, 6);
+    ctx.fillStyle = '#1a1a20';
+    ctx.font = 'bold 6px serif';
+    ctx.fillText(c.label, s.x, s.y - 9);
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderCompassMarkers);

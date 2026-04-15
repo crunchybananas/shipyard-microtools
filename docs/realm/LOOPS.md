@@ -81,6 +81,7 @@
 - Forge embers around blacksmiths (loop 66)
 - Rooster weather vanes on churches (loop 67)
 - Sabbath light beams from churches (loop 68)
+- Compass signposts at map edges (loop 69)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -304,3 +305,5 @@
 ### Loop 67 — rooster weather vane on each church spire (oscillates with wind).
 
 ### Loop 68 — golden light beam shines up from churches at the start of every 7th day (sabbath).
+
+### Loop 69 — N/S/E/W stone signposts at map edges (orientation cue).
