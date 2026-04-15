@@ -1,0 +1,14 @@
+{
+  "name": "harbor-chat-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bridge for external agents (Peel, CI/CD, etc.) to post to Harbor Chat",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js",
+    "post": "node cli.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}

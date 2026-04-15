@@ -4,6 +4,7 @@ import { on } from "@ember/modifier";
 import { inject as service } from "@ember/service";
 import type DesignStoreService from "atelier/services/design-store";
 import type AuthService from "atelier/services/auth-service";
+import type TokenRegistryService from "atelier/services/token-registry";
 import type RouterService from "@ember/routing/router-service";
 import {
   IconSparkles,
@@ -18,11 +19,17 @@ const IconSignOut = <template><svg viewBox="0 0 24 24" fill="none" stroke="curre
 const IconShare = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></template>;
 
 
+const IconChat = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></template>;
+const IconImport = <template><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></template>;
+
 export interface TopbarSignature {
   Args: {
     onOpenExport: () => void;
     onOpenAiModal: () => void;
     onOpenShareModal?: () => void;
+    onToggleConversationMode?: () => void;
+    onImportApp?: () => void;
+    conversationMode?: boolean;
   };
 }
 
@@ -30,6 +37,7 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
   @service declare designStore: DesignStoreService;
   @service declare authService: AuthService;
   @service declare router: RouterService;
+  @service declare tokenRegistry: TokenRegistryService;
 
   @tracked showUserDropdown: boolean = false;
 
@@ -122,15 +130,37 @@ export default class AtelierTopbar extends Component<TopbarSignature> {
 
         <div class="topbar-separator"></div>
 
+        {{#if @onImportApp}}
+          <button class="topbar-btn" type="button" {{on "click" @onImportApp}}>
+            <IconImport />
+            Import
+          </button>
+        {{/if}}
+
         <button class="topbar-btn" type="button" {{on "click" @onOpenExport}}>
           <IconExport />
           Export
+          {{#if this.tokenRegistry.hasCustomTokens}}
+            <span class="topbar-token-badge" title="Custom design tokens active">DS</span>
+          {{/if}}
         </button>
 
         <button class="topbar-btn ai-btn" type="button" {{on "click" @onOpenAiModal}}>
           <IconSparkles />
           AI Generate
         </button>
+
+        {{#if @onToggleConversationMode}}
+          <button
+            class="topbar-btn conv-mode-btn {{if @conversationMode 'active'}}"
+            type="button"
+            title="Toggle Conversation Mode"
+            {{on "click" @onToggleConversationMode}}
+          >
+            <IconChat />
+            {{if @conversationMode "Canvas" "Chat"}}
+          </button>
+        {{/if}}
 
         {{#if this.authService.isAuthenticated}}
           <div class="topbar-separator"></div>

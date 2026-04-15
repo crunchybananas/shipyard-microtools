@@ -16,6 +16,7 @@
 - Ground details (boulders, clover, mushrooms, tree stumps, lily pads)
 - Seasonal weather (rain, snow particles)
 - Citizen directional facing (eyes, mouth, hair)
+- Wandering fishing boats on water (loop 4)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -36,3 +37,9 @@
 - Ideas: (1) **living animal herds** (2) spatial ruins layer (3) dynamic fire/torch network
 - Chose: living animal herds (kills "catalog of placed objects")
 - Implemented: animals.js — deer (near forest), sheep (grass), chickens (near houses), graze/walk state machine, rendered with species-specific sprites
+
+### Loop 4
+- Validator: water still feels static and unused — only color/foam, no life on it; nothing happens "out there" in unused parts of the map.
+- Ideas: (1) **wandering fishing boats on open water** (2) seasonal migrating bird flocks across sky (3) shipwreck props sprinkled on coastline
+- Chose: fishing boats (gives water purpose, complements existing animal life on land)
+- Implemented: enhancements.js (new module). Boats spawn in water clusters, wander between water tiles, two kinds (sail + fishing pole with figure), bobbing animation, V-shaped wake. Hooked into main.js sim tick + render.js after animals.

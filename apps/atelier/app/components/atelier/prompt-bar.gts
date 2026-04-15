@@ -5,7 +5,7 @@ import { fn } from "@ember/helper";
 import { inject as service } from "@ember/service";
 import type DesignStoreService from "atelier/services/design-store";
 import type AiServiceService from "atelier/services/ai-service";
-import type { AgentStep } from "atelier/services/ai-service";
+import type { AgentStep, ClaudeModelTier } from "atelier/services/ai-service";
 import type VoiceServiceService from "atelier/services/voice-service";
 import {
   IconFrame,
@@ -46,7 +46,9 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   }
 
   get modelLabel(): string {
-    if (this.aiService.selectedModel === "atelier-pro" && this.aiService.hasApiKey) return "Claude Pro";
+    if (this.aiService.selectedModel === "atelier-pro" && this.aiService.hasApiKey) {
+      return `Claude ${this.aiService.claudeModel.label}`;
+    }
     if (this.aiService.selectedModel === "atelier-pro") return "Atelier Pro";
     return "Atelier v1";
   }
@@ -54,6 +56,37 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   get isProModel(): boolean {
     return this.aiService.selectedModel === "atelier-pro";
   }
+
+  selectModelTier = (tier: ClaudeModelTier) => {
+    this.aiService.setClaudeModelTier(tier);
+  };
+
+  isTierSelected = (tier: ClaudeModelTier): boolean => {
+    return this.aiService.claudeModelTier === tier;
+  };
+
+  get apiKeyStatusClass(): string {
+    if (this.aiService.apiKeyTesting) return "testing";
+    if (this.aiService.apiKeyValid === true) return "valid";
+    if (this.aiService.apiKeyValid === false) return "invalid";
+    return "untested";
+  }
+
+  get apiKeyStatusText(): string {
+    if (this.aiService.apiKeyTesting) return "Testing connection...";
+    if (this.aiService.apiKeyValid === true) return "Connected";
+    if (this.aiService.apiKeyValid === false) return "Invalid key or connection error";
+    return "Key saved — not yet tested";
+  }
+
+  testConnection = async () => {
+    const valid = await this.aiService.testApiKey();
+    if (valid) {
+      this.showToast("Connection successful");
+    } else {
+      this.showToast("Connection failed — check your key");
+    }
+  };
 
   get voiceDisplayText(): string {
     return this.voiceService.displayText;
@@ -69,6 +102,12 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   get promptValue(): string {
     if (this.voiceService.isListening && this.voiceService.displayText) {
       return this.voiceService.displayText;
+    }
+    // Consume pending suggestion from AI chat panel
+    if (this.aiService.pendingSuggestion) {
+      this.aiPrompt = this.aiService.pendingSuggestion;
+      this.aiService.pendingSuggestion = "";
+      return this.aiPrompt;
     }
     return this.aiPrompt;
   }
@@ -137,6 +176,10 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
   };
 
   quickGenerate = async (prompt: string) => {
+    if (prompt === "__extract_components__") {
+      this.aiService.extractComponents();
+      return;
+    }
     this.aiPrompt = prompt;
     await this.aiService.generateFromPrompt(prompt);
   };
@@ -195,9 +238,12 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
       {{#unless @showOnboarding}}
         <div class="ai-prompt-bar">
           <div class="ai-prompt-bar-chips">
-            <button class="ai-prompt-chip" type="button" {{on "click" (fn this.quickGenerate "A modern SaaS landing page with hero, features, and stats")}}>Landing Page</button>
-            <button class="ai-prompt-chip" type="button" {{on "click" (fn this.quickGenerate "A mobile banking app with balance card and transactions")}}>Mobile App</button>
-            <button class="ai-prompt-chip" type="button" {{on "click" (fn this.quickGenerate "An analytics dashboard with charts, stats cards, and data table")}}>Dashboard</button>
+            {{#each this.aiService.smartSuggestions as |suggestion|}}
+              <button class="ai-prompt-chip" type="button" {{on "click" (fn this.quickGenerate suggestion.prompt)}}>
+                <span class="chip-icon">{{suggestion.icon}}</span>
+                {{suggestion.label}}
+              </button>
+            {{/each}}
           </div>
           <div class="ai-prompt-bar-inner {{if this.voiceService.isListening 'voice-active'}}">
             <div class="ai-prompt-model-selector">
@@ -210,11 +256,26 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
                 <div class="model-dropdown">
                   <button class="model-dropdown-item {{if (this.isModelSelected 'atelier-v1') 'active'}}" type="button" {{on "click" (fn this.selectModel "atelier-v1")}}>
                     <span>Atelier v1</span>
+                    <span class="model-desc">Templates — no API key needed</span>
                   </button>
+                  <div class="model-dropdown-divider"></div>
                   <button class="model-dropdown-item {{if (this.isModelSelected 'atelier-pro') 'active'}}" type="button" {{on "click" (fn this.selectModel "atelier-pro")}}>
-                    <span>Atelier Pro</span>
-                    <span class="model-pro-badge">PRO</span>
+                    <span>Claude AI</span>
+                    <span class="model-pro-badge">BYOK</span>
                   </button>
+                  {{#if (this.isModelSelected "atelier-pro")}}
+                    {{#each this.aiService.allModelTiers as |entry|}}
+                      <button
+                        class="model-dropdown-item model-tier-item {{if (this.isTierSelected entry.tier) 'active'}}"
+                        type="button"
+                        {{on "click" (fn this.selectModelTier entry.tier)}}
+                      >
+                        <span class="model-tier-name">{{entry.config.label}}</span>
+                        <span class="model-tier-desc">{{entry.config.description}}</span>
+                        <span class="model-tier-cost">${{entry.config.inputCostPer1M}}/${{entry.config.outputCostPer1M}} per 1M tokens</span>
+                      </button>
+                    {{/each}}
+                  {{/if}}
                 </div>
               {{/if}}
             </div>
@@ -298,9 +359,16 @@ export default class AtelierPromptBar extends Component<PromptBarSignature> {
             value={{this.apiKeyDraft}}
             {{on "input" this.onApiKeyInput}}
           />
+          {{#if this.aiService.hasApiKey}}
+            <div class="api-key-status">
+              <span class="api-key-status-dot {{this.apiKeyStatusClass}}"></span>
+              <span>{{this.apiKeyStatusText}}</span>
+            </div>
+          {{/if}}
           <div class="api-key-actions">
             {{#if this.aiService.hasApiKey}}
               <button class="api-key-btn danger" type="button" {{on "click" this.clearApiKey}}>Remove Key</button>
+              <button class="api-key-btn" type="button" {{on "click" this.testConnection}}>Test Connection</button>
             {{/if}}
             <button class="api-key-btn" type="button" {{on "click" this.closeApiKeyInput}}>Cancel</button>
             <button class="api-key-btn primary" type="button" {{on "click" this.saveApiKey}}>Save & Activate</button>

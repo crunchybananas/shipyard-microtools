@@ -1,0 +1,22 @@
+display_information:
+  name: HessamBot
+  description: A bot that reads and posts messages in channels
+  background_color: "#4A154B"
+features:
+  bot_user:
+    display_name: HessamBot
+    always_online: true
+oauth_config:
+  scopes:
+    bot:
+      - channels:read
+      - channels:join
+      - groups:read
+      - chat:write
+      - im:read
+      - im:write
+      - mpim:read
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

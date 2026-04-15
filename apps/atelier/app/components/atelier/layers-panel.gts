@@ -96,6 +96,82 @@ export default class AtelierLayersPanel extends Component {
     return msg.role === "user";
   };
 
+  get hasElements(): boolean {
+    return this.designStore.elements.length > 0;
+  }
+
+  private static designTips = [
+    "Your canvas is waiting.\nPress R to draw a rectangle,\nor let AI do the heavy lifting.",
+    "Good design is invisible.\nGreat design is unforgettable.\nStart with AI Generate above.",
+    "Every masterpiece starts\nwith a blank canvas.\nWhat will you create today?",
+    "Pro tip: Press Cmd+K\nto access 35+ commands\nwithout touching the mouse.",
+    "Spacing matters more\nthan you think. Let AI\ncritique your layout.",
+  ];
+
+  get designTip(): string {
+    const idx = Math.floor(Date.now() / 60000) % AtelierLayersPanel.designTips.length;
+    return AtelierLayersPanel.designTips[idx]!;
+  }
+
+  @tracked critiqueResults: string[] = [];
+  @tracked showCritique: boolean = false;
+  @tracked layoutResult: string | null = null;
+
+  useSuggestion = (text: string) => {
+    // Handle special actions locally
+    if (text === "Critique this design and suggest improvements") {
+      this.runCritique();
+      return;
+    }
+    if (text === "Improve the spacing and alignment") {
+      this.runAutoLayout();
+      return;
+    }
+    // Otherwise send to prompt bar
+    this.aiService.pendingSuggestion = text;
+    this.aiService.showConversation = true;
+  };
+
+  runCritique = () => {
+    const issues = this.designStore.critiqueDesign();
+    this.critiqueResults = issues;
+    this.showCritique = true;
+    this.layoutResult = null;
+    // Add to conversation
+    this.aiService.conversationHistory = [
+      ...this.aiService.conversationHistory,
+      { role: "user", content: "Critique this design", timestamp: new Date() },
+      { role: "assistant", content: issues.join("\n\n"), timestamp: new Date() },
+    ];
+  };
+
+  runAutoLayout = () => {
+    const result = this.designStore.autoLayout();
+    this.layoutResult = result.description;
+    this.showCritique = false;
+    // Add to conversation
+    this.aiService.conversationHistory = [
+      ...this.aiService.conversationHistory,
+      { role: "user", content: "Make it better — fix spacing and alignment", timestamp: new Date() },
+      { role: "assistant", content: result.changes > 0
+        ? `Made ${result.changes} improvements: ${result.description}`
+        : result.description,
+        timestamp: new Date() },
+    ];
+  };
+
+  dismissCritique = () => {
+    this.showCritique = false;
+  };
+
+  dismissLayout = () => {
+    this.layoutResult = null;
+  };
+
+  isActionType = (type: string): boolean => {
+    return type === "action";
+  };
+
   formatTimestamp = (date: Date): string => {
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   };
@@ -181,7 +257,7 @@ export default class AtelierLayersPanel extends Component {
           {{else}}
             <div class="layers-empty">
               <IconLayers />
-              <span class="layers-empty-text">No layers yet.<br/>Draw something on the canvas<br/>or use AI Generate.</span>
+              <span class="layers-empty-text">{{this.designTip}}</span>
             </div>
           {{/if}}
         </div>
@@ -204,10 +280,62 @@ export default class AtelierLayersPanel extends Component {
                 </div>
               </div>
             {{/each}}
+
+            {{! Smart quick actions at bottom of conversation }}
+            <div class="chat-quick-actions">
+              {{#each this.aiService.smartSuggestions as |suggestion|}}
+                {{#if (this.isActionType suggestion.type)}}
+                  <button
+                    class="chat-quick-btn {{if (this.isActionType suggestion.type) 'chat-quick-fix'}}"
+                    type="button"
+                    {{on "click" (fn this.useSuggestion suggestion.prompt)}}
+                  >
+                    <span class="quick-btn-icon">{{suggestion.icon}}</span> {{suggestion.label}}
+                  </button>
+                {{/if}}
+              {{/each}}
+            </div>
           {{else}}
-            <div class="chat-empty">
-              <IconSparkles />
-              <span class="chat-empty-text">No conversations yet.<br/>Generate a design with AI<br/>to start a conversation.</span>
+            <div class="chat-empty-smart">
+              <div class="chat-ai-orb">
+                <div class="chat-ai-orb-inner">
+                  <IconSparkles />
+                </div>
+                <div class="chat-ai-orb-ring"></div>
+                <div class="chat-ai-orb-ring chat-ai-orb-ring-2"></div>
+              </div>
+              <div class="chat-ai-greeting">
+                <span class="chat-ai-greeting-title">Your AI Design Partner</span>
+                <span class="chat-ai-greeting-sub">I can see your canvas. Tell me what to create, improve, or change.</span>
+              </div>
+
+              <div class="chat-suggestions">
+                <span class="chat-suggestions-label">
+                  {{#if this.hasElements}}
+                    I see your design. Try...
+                  {{else}}
+                    Try asking me to...
+                  {{/if}}
+                </span>
+                {{#each this.aiService.smartSuggestions as |suggestion|}}
+                  <button
+                    class="chat-suggestion-chip {{if (this.isActionType suggestion.type) 'chat-suggestion-action'}}"
+                    type="button"
+                    {{on "click" (fn this.useSuggestion suggestion.prompt)}}
+                  >
+                    <span class="chip-icon">{{suggestion.icon}}</span> {{suggestion.label}}
+                  </button>
+                {{/each}}
+              </div>
+
+              <div class="chat-ai-context">
+                <span class="chat-context-dot"></span>
+                {{#if this.hasElements}}
+                  Seeing {{this.designStore.elements.length}} elements on canvas
+                {{else}}
+                  Canvas is empty — let's create something
+                {{/if}}
+              </div>
             </div>
           {{/if}}
         </div>

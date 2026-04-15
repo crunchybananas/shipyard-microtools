@@ -6,6 +6,7 @@ import { inject as service } from "@ember/service";
 import { modifier } from "ember-modifier";
 import type DesignStoreService from "atelier/services/design-store";
 import type { DesignElement, ToolType, Point } from "atelier/services/design-store";
+import { CanvasRenderer } from "atelier/utils/canvas-renderer";
 import {
   IconRect,
   IconEllipse,
@@ -56,6 +57,78 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
       element.removeEventListener("wheel", handleWheel as EventListener);
     };
   });
+
+  setupCanvas2D = modifier((container: Element) => {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'canvas2d-overlay';
+    container.appendChild(canvas);
+
+    const renderer = new CanvasRenderer(canvas);
+
+    const resizeCanvas = () => {
+      const rect = container.getBoundingClientRect();
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      renderer.resize();
+    };
+    resizeCanvas();
+
+    const resizeObserver = new ResizeObserver(() => resizeCanvas());
+    resizeObserver.observe(container);
+
+    let rafId: number;
+    const renderLoop = () => {
+      if (this.designStore.useCanvas2D) {
+        canvas.style.display = 'block';
+        renderer.render(this.designStore.elements, {
+          zoom: this.designStore.zoom,
+          panX: this.designStore.panX,
+          panY: this.designStore.panY,
+          selectedIds: this.designStore.selectedIds,
+          hoveredId: this.designStore.hoveredElementId,
+          showGrid: this.designStore.showGrid,
+          gridSize: this.designStore.gridSize,
+          marquee: this.marqueeRect,
+          drawingElement: this.drawingPreviewElement,
+        });
+      } else {
+        canvas.style.display = 'none';
+      }
+      rafId = requestAnimationFrame(renderLoop);
+    };
+    rafId = requestAnimationFrame(renderLoop);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+      renderer.destroy();
+      canvas.remove();
+    };
+  });
+
+  get drawingPreviewElement(): Partial<DesignElement> | null {
+    if (!this.drawStart || !this.drawCurrent) return null;
+    const tool = this.designStore.activeTool;
+    if (tool === 'line') {
+      return {
+        type: 'line',
+        x: Math.min(this.drawStart.x, this.drawCurrent.x),
+        y: Math.min(this.drawStart.y, this.drawCurrent.y),
+        width: Math.abs(this.drawCurrent.x - this.drawStart.x),
+        height: Math.abs(this.drawCurrent.y - this.drawStart.y),
+        x1: this.drawStart.x,
+        y1: this.drawStart.y,
+        x2: this.drawCurrent.x,
+        y2: this.drawCurrent.y,
+      };
+    }
+    const preview = this.drawPreview;
+    if (!preview) return null;
+    return {
+      type: tool === 'ellipse' ? 'ellipse' : tool === 'frame' ? 'frame' : 'rectangle',
+      ...preview,
+    } as Partial<DesignElement>;
+  }
 
   // ---- Coordinate conversion ----
 
@@ -519,6 +592,7 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
     let cls = "canvas-area";
     cls += ` tool-${tool}`;
     if (this.isPanning) cls += " panning";
+    if (this.designStore.useCanvas2D) cls += " canvas2d-active";
     return cls;
   }
 
@@ -605,11 +679,34 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
     return this.designStore.selectedIds.includes(id);
   };
 
+  elementClass = (el: DesignElement): string => {
+    const classes = ['design-element'];
+    if (el.locked) classes.push('locked');
+    if (this.designStore.isElementEntering(el.id)) classes.push('element-enter');
+    return classes.join(' ');
+  };
+
   centerX = (el: DesignElement): number => el.x + el.width / 2;
   centerY = (el: DesignElement): number => el.y + el.height / 2;
   halfWidth = (el: DesignElement): number => el.width / 2;
   halfHeight = (el: DesignElement): number => el.height / 2;
   textBaselineY = (el: DesignElement): number => el.y + (el.fontSize || 24);
+
+  textDisplayHeight = (el: DesignElement): number => {
+    // Use element height, but ensure a minimum based on font size for single-line text
+    const fontSize = el.fontSize || 16;
+    return Math.max(el.height, fontSize * 1.6);
+  };
+
+  textDisplayStyle = (el: DesignElement): string => {
+    const fontSize = el.fontSize || 16;
+    const fontWeight = el.fontWeight || "400";
+    const fontFamily = el.fontFamily || "Inter, system-ui, sans-serif";
+    const fill = el.fill || "#e4e4e7";
+    const textAlign = el.textAlign || "left";
+    return `color:${fill};font-size:${fontSize}px;font-weight:${fontWeight};font-family:${fontFamily};text-align:${textAlign};line-height:1.4;overflow:hidden;word-wrap:break-word;overflow-wrap:break-word;opacity:${el.opacity ?? 1};pointer-events:none;margin:0;padding:0;`;
+  };
+
   frameNameY = (el: DesignElement): number => el.y - 6;
   lineX1 = (el: DesignElement): number => el.x1 ?? el.x;
   lineY1 = (el: DesignElement): number => el.y1 ?? el.y;
@@ -661,38 +758,57 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
   };
 
   <template>
-    <div class={{this.canvasClass}}>
+    <div class={{this.canvasClass}} {{this.setupCanvas2D}}>
       {{! Onboarding }}
       {{#if @showOnboarding}}
         <div class="onboarding-overlay">
           <div class="onboarding-card">
-            <div class="onboarding-icon">
-              <IconSparkles />
+            <div class="onboarding-hero">
+              <div class="onboarding-orb">
+                <div class="onboarding-orb-inner">
+                  <IconSparkles />
+                </div>
+                <div class="onboarding-orb-ring"></div>
+                <div class="onboarding-orb-ring onboarding-orb-ring-2"></div>
+                <div class="onboarding-orb-ring onboarding-orb-ring-3"></div>
+              </div>
             </div>
-            <h2 class="onboarding-title">Welcome to Atelier</h2>
+            <h2 class="onboarding-title">Design. Export. Ship.</h2>
             <p class="onboarding-desc">
-              A design studio for crafting beautiful interfaces.
-              Draw shapes, arrange layouts, and let AI generate
-              entire designs from a text prompt.
+              Describe your app — Atelier generates the design and exports a working Ember project.
             </p>
-            <div class="onboarding-actions">
-              <button class="onboarding-btn" type="button" {{on "click" @onDismissOnboarding}}>
-                Start from Scratch
+            <div class="onboarding-prompts">
+              <button class="onboarding-prompt" type="button" {{on "click" @onStartWithAi}}>
+                <span class="onboarding-prompt-icon">⚡</span>
+                <span class="onboarding-prompt-text">"A multi-page SaaS app with Home, Features, and Pricing routes"</span>
               </button>
-              <button class="onboarding-btn primary" type="button" {{on "click" @onStartWithAi}}>
-                <IconSparkles />
-                Generate with AI
+              <button class="onboarding-prompt" type="button" {{on "click" @onStartWithAi}}>
+                <span class="onboarding-prompt-icon">📊</span>
+                <span class="onboarding-prompt-text">"An admin dashboard with sidebar nav, stats, and data table"</span>
               </button>
+              <button class="onboarding-prompt" type="button" {{on "click" @onStartWithAi}}>
+                <span class="onboarding-prompt-icon">🛒</span>
+                <span class="onboarding-prompt-text">"An e-commerce app with Product List, Detail, and Cart routes"</span>
+              </button>
+            </div>
+            <div class="onboarding-divider">
+              <span>or</span>
+            </div>
+            <button class="onboarding-btn-scratch" type="button" {{on "click" @onDismissOnboarding}}>
+              Start with a blank canvas
+            </button>
+            <div class="onboarding-features">
+              <span class="onboarding-feature">.gts components</span>
+              <span class="onboarding-feature">Tailwind CSS</span>
+              <span class="onboarding-feature">One-click Ember app export</span>
+              <span class="onboarding-feature">AI-powered</span>
             </div>
             <div class="onboarding-shortcuts">
-              <span class="shortcut-item"><span class="shortcut-key">V</span> Select</span>
+              <span class="shortcut-item"><span class="shortcut-key">Cmd+J</span> Chat mode</span>
+              <span class="shortcut-item"><span class="shortcut-key">Cmd+K</span> Commands</span>
               <span class="shortcut-item"><span class="shortcut-key">R</span> Rectangle</span>
-              <span class="shortcut-item"><span class="shortcut-key">O</span> Ellipse</span>
               <span class="shortcut-item"><span class="shortcut-key">T</span> Text</span>
-              <span class="shortcut-item"><span class="shortcut-key">L</span> Line</span>
               <span class="shortcut-item"><span class="shortcut-key">F</span> Frame</span>
-              <span class="shortcut-item"><span class="shortcut-key">H</span> Hand/Pan</span>
-              <span class="shortcut-item"><span class="shortcut-key">G</span> Toggle Grid</span>
             </div>
           </div>
         </div>
@@ -735,7 +851,7 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
             {{#if el.visible}}
               {{#if (this.isType el "rectangle")}}
                 <rect
-                  class="design-element {{if el.locked 'locked'}}"
+                  class={{this.elementClass el}}
                   x={{el.x}}
                   y={{el.y}}
                   width={{el.width}}
@@ -749,7 +865,7 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
                 />
               {{else if (this.isType el "frame")}}
                 <rect
-                  class="design-element {{if el.locked 'locked'}}"
+                  class={{this.elementClass el}}
                   x={{el.x}}
                   y={{el.y}}
                   width={{el.width}}
@@ -771,7 +887,7 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
                 >{{el.name}}</text>
               {{else if (this.isType el "ellipse")}}
                 <ellipse
-                  class="design-element {{if el.locked 'locked'}}"
+                  class={{this.elementClass el}}
                   cx={{this.centerX el}}
                   cy={{this.centerY el}}
                   rx={{this.halfWidth el}}
@@ -801,30 +917,32 @@ export default class AtelierCanvas extends Component<CanvasSignature> {
                     />
                   </foreignObject>
                 {{else}}
-                  <text
-                    class="design-element {{if el.locked 'locked'}}"
+                  <foreignObject
+                    class={{this.elementClass el}}
                     x={{el.x}}
-                    y={{this.textBaselineY el}}
-                    font-size={{el.fontSize}}
-                    font-weight={{el.fontWeight}}
-                    font-family={{el.fontFamily}}
-                    fill={{el.fill}}
-                    opacity={{el.opacity}}
+                    y={{el.y}}
+                    width={{el.width}}
+                    height={{this.textDisplayHeight el}}
                     transform={{this.elementTransform el}}
-                  >{{el.text}}</text>
+                  >
+                    <div
+                      xmlns="http://www.w3.org/1999/xhtml"
+                      style={{this.textDisplayStyle el}}
+                    >{{el.text}}</div>
+                  </foreignObject>
                 {{/if}}
                 {{! Invisible hit area for text }}
                 <rect
                   x={{el.x}}
                   y={{el.y}}
                   width={{el.width}}
-                  height={{el.height}}
+                  height={{this.textDisplayHeight el}}
                   fill="transparent"
                   class="design-element"
                 />
               {{else if (this.isType el "line")}}
                 <line
-                  class="design-element {{if el.locked 'locked'}}"
+                  class={{this.elementClass el}}
                   x1={{this.lineX1 el}}
                   y1={{this.lineY1 el}}
                   x2={{this.lineX2 el}}

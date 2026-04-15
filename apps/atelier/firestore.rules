@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Projects — users can CRUD their own, collaborators can read/write
+    match /projects/{projectId} {
+      allow read: if request.auth != null && (
+        resource.data.ownerId == request.auth.uid ||
+        request.auth.token.email in resource.data.collaboratorEmails
+      );
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Organizations — owner manages, members can read
+    match /organizations/{orgId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+
+      match /members/{memberId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerId == request.auth.uid;
+      }
+
+      match /invites/{inviteId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerId == request.auth.uid;
+        allow update: if request.auth != null;
+        allow delete: if request.auth != null && get(/databases/$(database)/documents/organizations/$(orgId)).data.ownerId == request.auth.uid;
+      }
+    }
+
+    // Usage tracking — users can only read their own, Cloud Functions write
+    match /usage/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Only Cloud Functions (admin SDK) can write usage data
+      allow write: if false;
+    }
+  }
+}

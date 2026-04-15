@@ -1,0 +1,17 @@
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Functions build
+functions/lib/
+functions/node_modules/
+
+# Claude
+.claude/

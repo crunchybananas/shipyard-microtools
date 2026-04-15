@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Lockstep — P2P Retro Co-op</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #141821;
+      --panel-2: #1c2130;
+      --ink: #e7ecf3;
+      --ink-dim: #8a93a6;
+      --accent: #7cf3c3;
+      --accent-2: #6aa5ff;
+      --warn: #ffb454;
+      --err: #ff6b6b;
+      --border: #232938;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+    h1 .tag {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .sub {
+      color: var(--ink-dim);
+      font-size: 13px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .stage {
+      position: relative;
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      aspect-ratio: 256 / 240;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #000;
+    }
+    .dropzone {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(11, 13, 18, 0.92);
+      color: var(--ink);
+      text-align: center;
+      padding: 24px;
+      transition: background 120ms ease, border-color 120ms ease;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .dropzone.hover {
+      background: rgba(124, 243, 195, 0.08);
+      border-color: var(--accent);
+    }
+    .dropzone h2 { margin: 0; font-size: 18px; }
+    .dropzone p { margin: 0; color: var(--ink-dim); font-size: 13px; }
+    .dropzone .pill {
+      font-size: 11px;
+      color: var(--ink-dim);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+    .dropzone.hidden { display: none; }
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--ink-dim);
+    }
+    .status .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ink-dim);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .status .dot.ok { background: var(--accent); }
+    .status .dot.warn { background: var(--warn); }
+    .status .dot.err { background: var(--err); }
+    .panel h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ink-dim);
+      margin: 0 0 10px 0;
+    }
+    .keyline {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-dim);
+      padding: 4px 0;
+    }
+    .keyline kbd {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--ink);
+      font-size: 11px;
+    }
+    .row { display: flex; gap: 8px; }
+    .row + .row { margin-top: 8px; }
+    button.btn {
+      background: var(--panel-2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button.btn:hover { border-color: var(--accent); }
+    button.btn.primary {
+      background: var(--accent);
+      color: #0b0d12;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    button.btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .footer {
+      margin-top: 16px;
+      color: var(--ink-dim);
+      font-size: 12px;
+      text-align: center;
+    }
+    .footer code {
+      background: var(--panel-2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+    }
+    input[type="file"] { display: none; }
+
+    /* ---- touch controls (visible on coarse pointers / narrow screens) ---- */
+    .touchpad {
+      display: none;
+      margin-top: 14px;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body.touch .touchpad { display: flex; }
+    @media (pointer: coarse) { .touchpad { display: flex; } }
+    .touchpad .dpad {
+      position: relative;
+      width: 168px;
+      height: 168px;
+      flex-shrink: 0;
+    }
+    .touchpad .dpad button {
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      background: var(--panel-2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+    .touchpad .dpad button.pressed { background: var(--accent); color: #0b0d12; border-color: var(--accent); }
+    .touchpad .dpad button[data-btn="up"]    { left: 56px; top: 0; }
+    .touchpad .dpad button[data-btn="left"]  { left: 0; top: 56px; }
+    .touchpad .dpad button[data-btn="right"] { left: 112px; top: 56px; }
+    .touchpad .dpad button[data-btn="down"]  { left: 56px; top: 112px; }
+
+    .touchpad .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+    .touchpad .meta button {
+      background: var(--panel-2);
+      color: var(--ink-dim);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 12px;
+      letter-spacing: 1.2px;
+      touch-action: none;
+    }
+    .touchpad .meta button.pressed { background: var(--accent); color: #0b0d12; border-color: var(--accent); }
+
+    .touchpad .actions {
+      display: flex;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .touchpad .actions button {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--panel-2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      font-size: 22px;
+      font-weight: 700;
+      touch-action: none;
+    }
+    .touchpad .actions button.pressed {
+      background: var(--accent);
+      color: #0b0d12;
+      border-color: var(--accent);
+      transform: scale(0.95);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 70px;
+      background: var(--panel-2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      resize: vertical;
+    }
+    textarea:focus { outline: none; border-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Lockstep <span class="tag">▸ P2P Retro Co-op</span></h1>
+        <div class="sub">Drag a ROM in. Two browsers, one game, zero servers.</div>
+      </div>
+      <div class="sub" id="headerStatus">No ROM loaded</div>
+    </header>
+
+    <div class="grid">
+      <section>
+        <div class="stage">
+          <canvas id="screen" width="256" height="240"></canvas>
+          <div class="dropzone" id="dropzone">
+            <div style="font-size: 42px">🎮</div>
+            <h2>Drop a ROM to start</h2>
+            <p>Click or drag a <code style="color:var(--accent)">.nes</code> or <code style="color:var(--accent)">.zip</code> file here</p>
+            <span class="pill">NES supported now · SNES / Apple II coming</span>
+            <input type="file" id="fileInput" accept=".nes,.zip" />
+          </div>
+        </div>
+
+        <div class="status">
+          <div><span class="dot" id="coreDot"></span><span id="coreText">Core: idle</span></div>
+          <div><span id="fpsText">— fps</span></div>
+          <div><span class="dot" id="netDot"></span><span id="netText">Net: offline</span></div>
+        </div>
+
+        <div class="touchpad" id="touchpad">
+          <div class="dpad">
+            <button data-btn="up">▲</button>
+            <button data-btn="left">◀</button>
+            <button data-btn="right">▶</button>
+            <button data-btn="down">▼</button>
+          </div>
+          <div class="meta">
+            <button data-btn="select">SELECT</button>
+            <button data-btn="start">START</button>
+          </div>
+          <div class="actions">
+            <button data-btn="b">B</button>
+            <button data-btn="a">A</button>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <div class="panel">
+          <h3>Player 1 Controls</h3>
+          <div class="keyline"><span>D-Pad</span><span><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></span></div>
+          <div class="keyline"><span>A button</span><kbd>Z</kbd></div>
+          <div class="keyline"><span>B button</span><kbd>X</kbd></div>
+          <div class="keyline"><span>Start</span><kbd>Enter</kbd></div>
+          <div class="keyline"><span>Select</span><kbd>Shift</kbd></div>
+        </div>
+        <div class="panel" style="margin-top:12px">
+          <h3>Session</h3>
+          <div class="row">
+            <button class="btn" id="pauseBtn" disabled>Pause</button>
+            <button class="btn" id="resetBtn" disabled>Reset</button>
+            <button class="btn" id="ejectBtn" disabled>Eject</button>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="hostBtn">Host co-op</button>
+            <button class="btn" id="joinBtn">Join</button>
+          </div>
+        </div>
+        <div class="panel" id="p2pPanel" style="margin-top:12px; display:none">
+          <h3 id="p2pTitle">Peer connection</h3>
+          <div id="p2pStep1">
+            <div class="keyline" style="padding-bottom:6px"><span id="p2pLabel1">Offer (send to peer)</span></div>
+            <textarea id="p2pOut" readonly placeholder="generating…"></textarea>
+            <div class="row"><button class="btn" id="p2pCopyBtn">Copy</button></div>
+            <div class="keyline" style="padding:10px 0 6px"><span id="p2pLabel2">Paste peer's answer</span></div>
+            <textarea id="p2pIn" placeholder="paste here…"></textarea>
+            <div class="row">
+              <button class="btn primary" id="p2pSubmitBtn">Connect</button>
+              <button class="btn" id="p2pCancelBtn">Cancel</button>
+            </div>
+          </div>
+          <div class="keyline" style="padding-top:10px"><span id="p2pStatus" style="color:var(--ink-dim)">idle</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer">
+      Lockstep v0 · NES core via <code>jsnes</code> in a Web Worker · single file, no build
+    </div>
+  </div>
+
+  <script>
+    // ---------- tiny signals ----------
+    function signal(initial) {
+      let value = initial;
+      const subs = new Set();
+      return {
+        get() { return value; },
+        set(v) {
+          if (Object.is(v, value)) return;
+          value = v;
+          subs.forEach((fn) => fn(value));
+        },
+        subscribe(fn) { subs.add(fn); fn(value); return () => subs.delete(fn); },
+      };
+    }
+
+    // ---------- state ----------
+    const coreState = signal("idle"); // idle | loading | running | paused | error
+    const romName = signal(null);
+    const fps = signal(0);
+    const netState = signal("offline"); // offline | lan | wan
+
+    // ---------- DOM refs ----------
+    const canvas = document.getElementById("screen");
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.createImageData(256, 240);
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const headerStatus = document.getElementById("headerStatus");
+    const coreText = document.getElementById("coreText");
+    const coreDot = document.getElementById("coreDot");
+    const fpsText = document.getElementById("fpsText");
+    const netText = document.getElementById("netText");
+    const netDot = document.getElementById("netDot");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const ejectBtn = document.getElementById("ejectBtn");
+
+    // initial clear
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 256, 240);
+
+    // ---------- reactive bindings ----------
+    coreState.subscribe((s) => {
+      coreText.textContent = `Core: ${s}`;
+      coreDot.className = "dot " + (s === "running" ? "ok" : s === "error" ? "err" : s === "paused" ? "warn" : "");
+      pauseBtn.disabled = !(s === "running" || s === "paused");
+      resetBtn.disabled = !(s === "running" || s === "paused");
+      ejectBtn.disabled = !(s === "running" || s === "paused" || s === "error");
+      pauseBtn.textContent = s === "paused" ? "Resume" : "Pause";
+    });
+    romName.subscribe((name) => {
+      headerStatus.textContent = name ? `ROM: ${name}` : "No ROM loaded";
+      if (name) dropzone.classList.add("hidden");
+      else dropzone.classList.remove("hidden");
+    });
+    fps.subscribe((v) => { fpsText.textContent = v ? `${v.toFixed(0)} fps` : "— fps"; });
+    netState.subscribe((s) => {
+      netText.textContent = `Net: ${s}`;
+      netDot.className = "dot " + (s === "offline" ? "" : "ok");
+    });
+
+    // ---------- NES worker (classic worker, loads jsnes UMD from CDN) ----------
+    const workerSrc = `
+      importScripts('https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js');
+
+      let nes = null;
+      let sampleRate = 44100;
+      let audioBuf = []; // stereo interleaved samples collected during frame()
+      const framebuffer = new Uint8ClampedArray(256 * 240 * 4);
+
+      function makeNes() {
+        return new jsnes.NES({
+          onFrame(buf) {
+            // jsnes gives a Uint32Array in 0x00BBGGRR
+            for (let i = 0, j = 0; i < buf.length; i++, j += 4) {
+              const p = buf[i];
+              framebuffer[j]     =  p        & 0xff; // R
+              framebuffer[j + 1] = (p >> 8)  & 0xff; // G
+              framebuffer[j + 2] = (p >> 16) & 0xff; // B
+              framebuffer[j + 3] = 0xff;
+            }
+          },
+          onAudioSample(l, r) { audioBuf.push(l, r); },
+          sampleRate: sampleRate,
+        });
+      }
+
+      self.onmessage = (e) => {
+        const msg = e.data;
+        if (msg.type === 'load') {
+          try {
+            if (msg.sampleRate) sampleRate = msg.sampleRate;
+            nes = makeNes();
+            nes.loadROM(msg.rom);
+            self.postMessage({ type: 'loaded' });
+          } catch (err) {
+            self.postMessage({ type: 'error', error: String(err && err.message || err) });
+          }
+          return;
+        }
+        if (msg.type === 'frame') {
+          if (!nes) return;
+          // Apply inputs: msg.p1 and msg.p2 are bitfields of button state
+          applyInputs(1, msg.p1 || 0);
+          applyInputs(2, msg.p2 || 0);
+          audioBuf.length = 0;
+          nes.frame();
+          const out = new Uint8ClampedArray(framebuffer);
+          const samples = new Float32Array(audioBuf);
+          self.postMessage(
+            { type: 'frame', pixels: out.buffer, samples: samples.buffer },
+            [out.buffer, samples.buffer]
+          );
+          return;
+        }
+        if (msg.type === 'reset') {
+          if (nes) nes.reset();
+          return;
+        }
+      };
+
+      // button bit order matches BTN_* below
+      const BTN_ORDER = [
+        jsnes.Controller.BUTTON_A,
+        jsnes.Controller.BUTTON_B,
+        jsnes.Controller.BUTTON_SELECT,
+        jsnes.Controller.BUTTON_START,
+        jsnes.Controller.BUTTON_UP,
+        jsnes.Controller.BUTTON_DOWN,
+        jsnes.Controller.BUTTON_LEFT,
+        jsnes.Controller.BUTTON_RIGHT,
+      ];
+      let lastMask = [0, 0, 0];
+      function applyInputs(player, mask) {
+        const prev = lastMask[player] | 0;
+        for (let bit = 0; bit < BTN_ORDER.length; bit++) {
+          const on = (mask >> bit) & 1;
+          const was = (prev >> bit) & 1;
+          if (on !== was) {
+            if (on) nes.buttonDown(player, BTN_ORDER[bit]);
+            else nes.buttonUp(player, BTN_ORDER[bit]);
+          }
+        }
+        lastMask[player] = mask;
+      }
+    `;
+    const workerUrl = URL.createObjectURL(new Blob([workerSrc], { type: "application/javascript" }));
+    let worker = null;
+
+    // ---------- audio (ScriptProcessorNode + main-thread ring buffer) ----------
+    // We avoid AudioWorklet here because Safari refuses to load worklet
+    // modules from blob: URLs (CORS error). ScriptProcessorNode is deprecated
+    // but works in every browser with no module loading.
+    const RING_CAP = 32768; // stereo interleaved floats (~340ms at 48k)
+    const ringBuf = new Float32Array(RING_CAP);
+    let ringRead = 0;
+    let ringWrite = 0;
+    let ringSize = 0;
+    function pushSamples(s) {
+      const n = s.length;
+      if (ringSize + n > RING_CAP) {
+        const drop = ringSize + n - RING_CAP;
+        ringRead = (ringRead + drop) % RING_CAP;
+        ringSize -= drop;
+      }
+      for (let i = 0; i < n; i++) {
+        ringBuf[ringWrite] = s[i];
+        ringWrite = (ringWrite + 1) % RING_CAP;
+      }
+      ringSize += n;
+    }
+    function pullStereo(left, right) {
+      const n = left.length;
+      for (let i = 0; i < n; i++) {
+        if (ringSize >= 2) {
+          left[i] = ringBuf[ringRead];
+          ringRead = (ringRead + 1) % RING_CAP;
+          right[i] = ringBuf[ringRead];
+          ringRead = (ringRead + 1) % RING_CAP;
+          ringSize -= 2;
+        } else {
+          left[i] = 0;
+          right[i] = 0;
+        }
+      }
+    }
+
+    let audioCtx = null;
+    let audioNode = null; // ScriptProcessorNode
+    let audioReady = null; // promise resolving to sample rate
+    // Must be invoked SYNCHRONOUSLY inside a user-gesture (click/drop) so
+    // Safari/Chrome allow AudioContext creation + resume(). Any awaits before
+    // this point will break autoplay policy.
+    function primeAudio() {
+      if (audioCtx) {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioReady;
+      }
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const resumePromise = audioCtx.resume();
+        // 0 inputs, 2 outputs, 2048 buffer size (~43ms at 48k — tight but fine)
+        audioNode = audioCtx.createScriptProcessor(2048, 0, 2);
+        audioNode.onaudioprocess = (e) => {
+          pullStereo(e.outputBuffer.getChannelData(0), e.outputBuffer.getChannelData(1));
+        };
+        audioNode.connect(audioCtx.destination);
+        audioReady = Promise.resolve(resumePromise).then(() => {
+          console.log("[lockstep] audio ready:", audioCtx.sampleRate, "Hz,", audioCtx.state);
+          return audioCtx.sampleRate;
+        });
+        return audioReady;
+      } catch (err) {
+        console.warn("[lockstep] audio init failed:", err);
+        audioReady = Promise.resolve(44100);
+        return audioReady;
+      }
+    }
+
+    function startWorker() {
+      if (worker) worker.terminate();
+      worker = new Worker(workerUrl);
+      worker.onmessage = (e) => {
+        const msg = e.data;
+        if (msg.type === "loaded") {
+          coreState.set("running");
+          requestAnimationFrame(tick);
+        } else if (msg.type === "frame") {
+          const px = new Uint8ClampedArray(msg.pixels);
+          imageData.data.set(px);
+          ctx.putImageData(imageData, 0, 0);
+          if (msg.samples) {
+            const s = new Float32Array(msg.samples);
+            if (s.length) {
+              if (!loggedFirstSamples) {
+                loggedFirstSamples = true;
+                console.log("[lockstep] first audio frame:", s.length, "samples, ctx state:", audioCtx && audioCtx.state);
+              }
+              pushSamples(s);
+            } else if (!loggedNoSamples) {
+              loggedNoSamples = true;
+              console.warn("[lockstep] worker returned 0 audio samples — jsnes onAudioSample not firing");
+            }
+          }
+          pendingFrame = false;
+        } else if (msg.type === "error") {
+          coreState.set("error");
+          headerStatus.textContent = "Error: " + msg.error;
+        }
+      };
+    }
+
+    // ---------- input ----------
+    // Bit order must match BTN_ORDER in the worker:
+    // 0=A, 1=B, 2=Select, 3=Start, 4=Up, 5=Down, 6=Left, 7=Right
+    const keyMap = {
+      KeyZ: 0, KeyX: 1, ShiftLeft: 2, ShiftRight: 2, Enter: 3,
+      ArrowUp: 4, ArrowDown: 5, ArrowLeft: 6, ArrowRight: 7,
+    };
+    let p1Mask = 0;
+    window.addEventListener("keydown", (e) => {
+      const bit = keyMap[e.code];
+      if (bit === undefined) return;
+      p1Mask |= (1 << bit);
+      e.preventDefault();
+    });
+    window.addEventListener("keyup", (e) => {
+      const bit = keyMap[e.code];
+      if (bit === undefined) return;
+      p1Mask &= ~(1 << bit);
+      e.preventDefault();
+    });
+
+    // ---------- touch controls ----------
+    // Detect touch capability and reveal the on-screen pad
+    if ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0) {
+      document.body.classList.add("touch");
+    }
+    const touchBitMap = { a: 0, b: 1, select: 2, start: 3, up: 4, down: 5, left: 6, right: 7 };
+    const touchpad = document.getElementById("touchpad");
+    // Track which pointer ID is pressing which button so multi-touch works
+    // (diagonal d-pad presses require two simultaneous buttons).
+    const activePointers = new Map(); // pointerId -> btnEl
+    function pressBtn(btn) {
+      const name = btn.dataset.btn;
+      const bit = touchBitMap[name];
+      if (bit === undefined) return;
+      p1Mask |= (1 << bit);
+      btn.classList.add("pressed");
+    }
+    function releaseBtn(btn) {
+      const name = btn.dataset.btn;
+      const bit = touchBitMap[name];
+      if (bit === undefined) return;
+      p1Mask &= ~(1 << bit);
+      btn.classList.remove("pressed");
+    }
+    touchpad.addEventListener("pointerdown", (e) => {
+      const btn = e.target.closest("button[data-btn]");
+      if (!btn) return;
+      e.preventDefault();
+      btn.setPointerCapture(e.pointerId);
+      activePointers.set(e.pointerId, btn);
+      pressBtn(btn);
+    });
+    const endPointer = (e) => {
+      const btn = activePointers.get(e.pointerId);
+      if (!btn) return;
+      activePointers.delete(e.pointerId);
+      releaseBtn(btn);
+    };
+    touchpad.addEventListener("pointerup", endPointer);
+    touchpad.addEventListener("pointercancel", endPointer);
+    // Slide-off-button should release too
+    touchpad.addEventListener("pointerleave", (e) => {
+      // only if not captured (capture keeps events going to the original)
+      if (!activePointers.has(e.pointerId)) return;
+    });
+    // Kill the iOS 300ms click + double-tap zoom on the pad
+    touchpad.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+    touchpad.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    // ---------- frame loop (main thread drives, worker advances) ----------
+    let pendingFrame = false;
+    let lastFpsTime = performance.now();
+    let framesSinceFpsTick = 0;
+    let paused = false;
+    let loggedFirstSamples = false;
+    let loggedNoSamples = false;
+
+    // Lockstep state
+    const INPUT_DELAY = 2;
+    let currentFrame = 0;               // frame number to advance next
+    const localInputs = new Map();      // frame -> mask (local)
+    const remoteInputs = new Map();     // frame -> mask (peer)
+    let peerRole = null;                // "host" | "guest" | null (solo)
+    // In lockstep, *both* peers treat the host's input as controller 1 and
+    // the guest's input as controller 2 so the simulation is identical.
+
+    function resetLockstepState() {
+      currentFrame = 0;
+      localInputs.clear();
+      remoteInputs.clear();
+      // pre-seed INPUT_DELAY frames of neutral input for both sides
+      for (let f = 0; f < INPUT_DELAY; f++) {
+        localInputs.set(f, 0);
+        remoteInputs.set(f, 0);
+      }
+    }
+
+    function tick() {
+      if (coreState.get() !== "running" || paused) return;
+      if (!pendingFrame) {
+        if (peerRole) {
+          // lockstep mode
+          // 1. enqueue local input for frame = currentFrame + INPUT_DELAY and ship it
+          const targetFrame = currentFrame + INPUT_DELAY;
+          if (!localInputs.has(targetFrame)) {
+            localInputs.set(targetFrame, p1Mask);
+            sendInput(targetFrame, p1Mask);
+          }
+          // 2. advance currentFrame only if both sides' inputs are ready
+          if (localInputs.has(currentFrame) && remoteInputs.has(currentFrame)) {
+            const hostMask = peerRole === "host" ? localInputs.get(currentFrame) : remoteInputs.get(currentFrame);
+            const guestMask = peerRole === "host" ? remoteInputs.get(currentFrame) : localInputs.get(currentFrame);
+            pendingFrame = true;
+            worker.postMessage({ type: "frame", p1: hostMask, p2: guestMask });
+            // prune old entries
+            if (currentFrame > INPUT_DELAY) {
+              localInputs.delete(currentFrame - INPUT_DELAY - 1);
+              remoteInputs.delete(currentFrame - INPUT_DELAY - 1);
+            }
+            currentFrame++;
+          }
+        } else {
+          // solo mode
+          pendingFrame = true;
+          worker.postMessage({ type: "frame", p1: p1Mask, p2: 0 });
+        }
+
+        framesSinceFpsTick++;
+        const now = performance.now();
+        if (now - lastFpsTime >= 500) {
+          fps.set((framesSinceFpsTick * 1000) / (now - lastFpsTime));
+          lastFpsTime = now;
+          framesSinceFpsTick = 0;
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ---------- ROM loading ----------
+    let jszipPromise = null;
+    function loadJsZip() {
+      if (jszipPromise) return jszipPromise;
+      jszipPromise = new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = "https://unpkg.com/jszip@3.10.1/dist/jszip.min.js";
+        s.onload = () => resolve(window.JSZip);
+        s.onerror = () => reject(new Error("Failed to load JSZip"));
+        document.head.appendChild(s);
+      });
+      return jszipPromise;
+    }
+
+    async function extractNesFromZip(file) {
+      const JSZip = await loadJsZip();
+      const zip = await JSZip.loadAsync(file);
+      // find first .nes entry (case insensitive, skip mac metadata)
+      let entry = null;
+      let entryName = null;
+      zip.forEach((path, obj) => {
+        if (entry) return;
+        if (obj.dir) return;
+        if (/(^|\/)__MACOSX\//.test(path)) return;
+        if (/\.nes$/i.test(path)) { entry = obj; entryName = path.split("/").pop(); }
+      });
+      if (!entry) throw new Error("No .nes file found inside zip");
+      const buf = await entry.async("arraybuffer");
+      return { buf, name: entryName };
+    }
+
+    async function loadRomFile(file) {
+      if (!file) return;
+      // NOTE: audio must be primed SYNCHRONOUSLY from the gesture handler,
+      // not from here — by the time this runs we may have already awaited.
+      try {
+        let buf, name;
+        if (/\.zip$/i.test(file.name)) {
+          coreState.set("loading");
+          headerStatus.textContent = "Extracting " + file.name + "…";
+          const out = await extractNesFromZip(file);
+          buf = out.buf;
+          name = out.name;
+        } else if (/\.nes$/i.test(file.name)) {
+          coreState.set("loading");
+          buf = await file.arrayBuffer();
+          name = file.name;
+        } else {
+          headerStatus.textContent = "Drop a .nes or .zip file";
+          return;
+        }
+        // jsnes wants a binary string :(
+        const bytes = new Uint8Array(buf);
+        let s = "";
+        for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+        lastRomBytes = bytes;
+        lastRomName = name;
+        romName.set(name);
+        let sr = 44100;
+        try { sr = await (audioReady || Promise.resolve(44100)); } catch (err) { console.warn("audio init failed:", err); }
+        startWorker();
+        worker.postMessage({ type: "load", rom: s, sampleRate: sr });
+      } catch (err) {
+        coreState.set("error");
+        headerStatus.textContent = "Error: " + (err && err.message || err);
+      }
+    }
+
+    // drag/drop — primeAudio() MUST run synchronously from the gesture
+    dropzone.addEventListener("click", () => { primeAudio(); fileInput.click(); });
+    fileInput.addEventListener("change", (e) => { primeAudio(); loadRomFile(e.target.files[0]); });
+    ["dragenter", "dragover"].forEach((ev) =>
+      dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add("hover"); })
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove("hover"); })
+    );
+    dropzone.addEventListener("drop", (e) => {
+      primeAudio();
+      const file = e.dataTransfer.files[0];
+      loadRomFile(file);
+    });
+    // allow dropping anywhere on the stage area
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (coreState.get() === "running" || coreState.get() === "paused") return;
+      primeAudio();
+      const file = e.dataTransfer.files[0];
+      if (file) loadRomFile(file);
+    });
+
+    // ---------- controls ----------
+    pauseBtn.addEventListener("click", async () => {
+      if (coreState.get() === "running") {
+        paused = true;
+        coreState.set("paused");
+        if (audioCtx && audioCtx.state === "running") await audioCtx.suspend();
+      } else if (coreState.get() === "paused") {
+        paused = false;
+        if (audioCtx && audioCtx.state === "suspended") await audioCtx.resume();
+        coreState.set("running");
+        requestAnimationFrame(tick);
+      }
+    });
+    resetBtn.addEventListener("click", () => {
+      if (!worker) return;
+      worker.postMessage({ type: "reset" });
+    });
+    ejectBtn.addEventListener("click", () => {
+      if (worker) { worker.terminate(); worker = null; }
+      paused = false;
+      romName.set(null);
+      coreState.set("idle");
+      fps.set(0);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, 256, 240);
+    });
+
+    // ========== WebRTC peer-to-peer lockstep ==========
+    const RTC_CONFIG = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+    let pc = null;
+    let dc = null;
+
+    const hostBtn = document.getElementById("hostBtn");
+    const joinBtn = document.getElementById("joinBtn");
+    const p2pPanel = document.getElementById("p2pPanel");
+    const p2pTitle = document.getElementById("p2pTitle");
+    const p2pLabel1 = document.getElementById("p2pLabel1");
+    const p2pLabel2 = document.getElementById("p2pLabel2");
+    const p2pOut = document.getElementById("p2pOut");
+    const p2pIn = document.getElementById("p2pIn");
+    const p2pStatus = document.getElementById("p2pStatus");
+    const p2pCopyBtn = document.getElementById("p2pCopyBtn");
+    const p2pSubmitBtn = document.getElementById("p2pSubmitBtn");
+    const p2pCancelBtn = document.getElementById("p2pCancelBtn");
+    const p2pStep1 = document.getElementById("p2pStep1");
+
+    function setP2pStatus(text, kind) {
+      p2pStatus.textContent = text;
+      p2pStatus.style.color = kind === "err" ? "var(--err)" :
+                              kind === "ok"  ? "var(--accent)" :
+                              kind === "warn" ? "var(--warn)" : "var(--ink-dim)";
+    }
+
+    function showP2pPanel(title) {
+      p2pTitle.textContent = title;
+      p2pPanel.style.display = "block";
+      p2pStep1.style.display = "block";
+      p2pOut.value = "";
+      p2pIn.value = "";
+    }
+    function hideP2pPanel() {
+      p2pPanel.style.display = "none";
+    }
+
+    function waitForIceComplete(pc) {
+      return new Promise((resolve) => {
+        if (pc.iceGatheringState === "complete") return resolve();
+        const check = () => {
+          if (pc.iceGatheringState === "complete") {
+            pc.removeEventListener("icegatheringstatechange", check);
+            resolve();
+          }
+        };
+        pc.addEventListener("icegatheringstatechange", check);
+      });
+    }
+
+    function encodeSdp(desc) {
+      return btoa(JSON.stringify({ type: desc.type, sdp: desc.sdp }));
+    }
+    function decodeSdp(str) {
+      const clean = str.trim().replace(/\s+/g, "");
+      return JSON.parse(atob(clean));
+    }
+
+    function teardownPeer() {
+      if (dc) { try { dc.close(); } catch {} dc = null; }
+      if (pc) { try { pc.close(); } catch {} pc = null; }
+      peerRole = null;
+      netState.set("offline");
+    }
+
+    // ---------- Host ----------
+    hostBtn.addEventListener("click", async () => {
+      if (coreState.get() !== "running" && coreState.get() !== "paused") {
+        setP2pStatus("Load a ROM first, then host.", "warn");
+        showP2pPanel("Host co-op");
+        return;
+      }
+      teardownPeer();
+      showP2pPanel("Host co-op");
+      setP2pStatus("gathering ICE candidates…");
+      try {
+        pc = new RTCPeerConnection(RTC_CONFIG);
+        dc = pc.createDataChannel("lockstep", { ordered: true });
+        wireDataChannel(dc, "host");
+        pc.onconnectionstatechange = () => {
+          setP2pStatus("connection: " + pc.connectionState,
+            pc.connectionState === "connected" ? "ok" :
+            pc.connectionState === "failed" ? "err" : null);
+        };
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await waitForIceComplete(pc);
+        p2pOut.value = encodeSdp(pc.localDescription);
+        p2pLabel1.textContent = "1. Send this offer to your peer";
+        p2pLabel2.textContent = "2. Paste their answer below";
+        setP2pStatus("offer ready — send it to your peer");
+      } catch (err) {
+        setP2pStatus("host error: " + (err.message || err), "err");
+      }
+    });
+
+    // ---------- Join ----------
+    joinBtn.addEventListener("click", () => {
+      teardownPeer();
+      showP2pPanel("Join co-op");
+      p2pOut.value = "(answer will appear after you paste the offer)";
+      p2pLabel1.textContent = "2. Send this answer back to the host";
+      p2pLabel2.textContent = "1. Paste the host's offer below";
+      setP2pStatus("waiting for offer…");
+    });
+
+    p2pSubmitBtn.addEventListener("click", async () => {
+      try {
+        const raw = p2pIn.value;
+        if (!raw.trim()) { setP2pStatus("paste something first", "warn"); return; }
+        const desc = decodeSdp(raw);
+
+        if (pc && desc.type === "answer") {
+          // Host applying guest's answer
+          await pc.setRemoteDescription(desc);
+          setP2pStatus("applying answer…", "ok");
+          return;
+        }
+
+        // Guest path: no pc yet, accept the offer
+        pc = new RTCPeerConnection(RTC_CONFIG);
+        pc.onconnectionstatechange = () => {
+          setP2pStatus("connection: " + pc.connectionState,
+            pc.connectionState === "connected" ? "ok" :
+            pc.connectionState === "failed" ? "err" : null);
+        };
+        pc.ondatachannel = (e) => {
+          dc = e.channel;
+          wireDataChannel(dc, "guest");
+        };
+        await pc.setRemoteDescription(desc);
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await waitForIceComplete(pc);
+        p2pOut.value = encodeSdp(pc.localDescription);
+        setP2pStatus("answer ready — send it back to the host");
+      } catch (err) {
+        setP2pStatus("error: " + (err.message || err), "err");
+      }
+    });
+
+    p2pCopyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(p2pOut.value);
+        setP2pStatus("copied to clipboard", "ok");
+      } catch {
+        p2pOut.select();
+        document.execCommand("copy");
+      }
+    });
+
+    p2pCancelBtn.addEventListener("click", () => {
+      teardownPeer();
+      hideP2pPanel();
+    });
+
+    // ---------- Data channel protocol ----------
+    // Messages:
+    //   'i' + u32 frame + u8 mask                    — input for frame
+    //   'r' + 'start' + u32 size + 32 bytes name     — ROM header
+    //   'r' + 'chunk' + u32 offset + bytes           — ROM chunk
+    //   'r' + 'done'                                 — ROM transfer complete
+    //   'g' + 'go'                                   — both sides ready, begin lockstep
+    //
+    // To keep things simple I'm encoding as JSON for control messages and
+    // raw ArrayBuffer for input and ROM chunks.
+
+    const ROM_CHUNK = 16 * 1024;
+    let incomingRom = null; // { name, size, received, bytes }
+
+    function wireDataChannel(channel, role) {
+      channel.binaryType = "arraybuffer";
+      channel.onopen = () => {
+        console.log("[lockstep] data channel open, role:", role);
+        netState.set(role === "host" ? "hosted" : "joined");
+        if (role === "host") {
+          // Host sends the ROM to the guest, then signals go
+          sendRomToPeer();
+        }
+      };
+      channel.onclose = () => {
+        console.log("[lockstep] data channel closed");
+        teardownPeer();
+      };
+      channel.onerror = (e) => console.warn("[lockstep] dc error", e);
+      channel.onmessage = (e) => handleDcMessage(e.data);
+    }
+
+    function sendDc(obj) {
+      if (!dc || dc.readyState !== "open") return;
+      dc.send(JSON.stringify(obj));
+    }
+    function sendDcBinary(buf) {
+      if (!dc || dc.readyState !== "open") return;
+      dc.send(buf);
+    }
+
+    // Input: pack into 5-byte binary for low overhead
+    function sendInput(frame, mask) {
+      if (!dc || dc.readyState !== "open") return;
+      const buf = new ArrayBuffer(6);
+      const dv = new DataView(buf);
+      dv.setUint8(0, 0x49); // 'I'
+      dv.setUint32(1, frame, true);
+      dv.setUint8(5, mask & 0xff);
+      dc.send(buf);
+    }
+
+    function handleDcMessage(data) {
+      if (typeof data === "string") {
+        let msg;
+        try { msg = JSON.parse(data); } catch { return; }
+        if (msg.type === "rom-start") {
+          incomingRom = {
+            name: msg.name,
+            size: msg.size,
+            received: 0,
+            bytes: new Uint8Array(msg.size),
+          };
+          setP2pStatus("receiving ROM…", "ok");
+        } else if (msg.type === "rom-done") {
+          if (!incomingRom) return;
+          loadRomBytesIntoWorker(incomingRom.bytes, incomingRom.name);
+          incomingRom = null;
+        } else if (msg.type === "go") {
+          // host has finished ROM transfer and tells guest to start
+          beginLockstep("guest");
+          sendDc({ type: "ready" });
+        } else if (msg.type === "ready") {
+          // guest confirms; host begins
+          beginLockstep("host");
+        }
+        return;
+      }
+
+      // binary: input or rom chunk
+      const buf = data instanceof ArrayBuffer ? data : data.buffer;
+      const dv = new DataView(buf);
+      const tag = dv.getUint8(0);
+      if (tag === 0x49) { // 'I' input
+        const frame = dv.getUint32(1, true);
+        const mask = dv.getUint8(5);
+        remoteInputs.set(frame, mask);
+      } else if (tag === 0x52) { // 'R' rom chunk
+        const offset = dv.getUint32(1, true);
+        const chunk = new Uint8Array(buf, 5);
+        if (incomingRom) {
+          incomingRom.bytes.set(chunk, offset);
+          incomingRom.received += chunk.length;
+        }
+      }
+    }
+
+    // Host: stream the currently-loaded ROM to the guest.
+    // We keep the raw bytes around when we load on the host side.
+    let lastRomBytes = null;
+    let lastRomName = null;
+
+    async function sendRomToPeer() {
+      if (!lastRomBytes) {
+        setP2pStatus("no ROM loaded on host", "err");
+        return;
+      }
+      setP2pStatus("sending ROM to peer…", "ok");
+      sendDc({ type: "rom-start", name: lastRomName, size: lastRomBytes.length });
+      for (let off = 0; off < lastRomBytes.length; off += ROM_CHUNK) {
+        const end = Math.min(off + ROM_CHUNK, lastRomBytes.length);
+        const chunk = lastRomBytes.subarray(off, end);
+        const packet = new Uint8Array(5 + chunk.length);
+        const dv = new DataView(packet.buffer);
+        dv.setUint8(0, 0x52); // 'R'
+        dv.setUint32(1, off, true);
+        packet.set(chunk, 5);
+        sendDcBinary(packet.buffer);
+        // Yield occasionally so the data channel can flush
+        if ((off / ROM_CHUNK) % 8 === 7) await new Promise(r => setTimeout(r, 0));
+      }
+      sendDc({ type: "rom-done" });
+      sendDc({ type: "go" });
+    }
+
+    function beginLockstep(role) {
+      peerRole = role;
+      resetLockstepState();
+      if (worker) worker.postMessage({ type: "reset" });
+      netState.set(role === "host" ? "hosted" : "joined");
+      setP2pStatus("lockstep active as " + role, "ok");
+      // close the panel automatically once we're live
+      setTimeout(hideP2pPanel, 800);
+      if (coreState.get() === "paused") {
+        paused = false;
+        coreState.set("running");
+        requestAnimationFrame(tick);
+      }
+    }
+
+    // Accept ROM bytes received from the network and load them into the worker
+    async function loadRomBytesIntoWorker(bytes, name) {
+      let sr = 44100;
+      try { sr = await (audioReady || Promise.resolve(44100)); } catch {}
+      let s = "";
+      for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+      lastRomBytes = bytes;
+      lastRomName = name;
+      romName.set(name);
+      startWorker();
+      worker.postMessage({ type: "load", rom: s, sampleRate: sr });
+    }
+  </script>
+</body>
+</html>

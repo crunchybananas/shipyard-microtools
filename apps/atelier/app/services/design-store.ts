@@ -5,6 +5,7 @@ import type AuthService from "atelier/services/auth-service";
 import { generateEmberComponent, generateEmberComponentTailwind } from "atelier/utils/export-ember-component";
 import { generateReactComponent } from "atelier/utils/export-react-component";
 import { generateSwiftUIView } from "atelier/utils/export-swiftui";
+import { generateHTML } from "atelier/utils/export-html";
 import type TokenRegistryService from "atelier/services/token-registry";
 
 export interface Point {
@@ -93,7 +94,7 @@ export default class DesignStoreService extends Service {
   @tracked isResizing: boolean = false;
   @tracked isDrawing: boolean = false;
   @tracked showExportModal: boolean = false;
-  @tracked exportFormat: "svg" | "ember" | "tailwind" | "react" | "swiftui" = "svg";
+  @tracked exportFormat: "svg" | "ember" | "tailwind" | "react" | "swiftui" | "html" | "ember-app" = "svg";
   @tracked showShareModal: boolean = false;
   @tracked fileName: string = "Untitled";
   @tracked showColorPicker: boolean = false;
@@ -101,8 +102,10 @@ export default class DesignStoreService extends Service {
   @tracked colorPickerAnchorY: number = 200;
   @tracked contextMenuPos: Point | null = null;
   @tracked hoveredElementId: string | null = null;
+  @tracked enteringElementIds: string[] = [];
   @tracked dragStartPoint: Point | null = null;
   @tracked showOnboarding: boolean = true;
+  @tracked useCanvas2D: boolean = true;
   @tracked currentProjectId: string | null = null;
 
   private history: HistoryEntry[] = [];
@@ -172,6 +175,20 @@ export default class DesignStoreService extends Service {
 
   get selectedElements(): DesignElement[] {
     return this.elements.filter((el) => this.selectedIds.includes(el.id));
+  }
+
+  isElementEntering(id: string): boolean {
+    return this.enteringElementIds.includes(id);
+  }
+
+  markElementsEntering(ids: string[]): void {
+    this.enteringElementIds = [...this.enteringElementIds, ...ids];
+    // Clear after animation completes (500ms)
+    setTimeout(() => {
+      this.enteringElementIds = this.enteringElementIds.filter(
+        (eid) => !ids.includes(eid)
+      );
+    }, 600);
   }
 
   get hasSelection(): boolean {
@@ -681,6 +698,10 @@ export default class DesignStoreService extends Service {
     return generateSwiftUIView(this.elements, this.fileName);
   }
 
+  exportHTML(): string {
+    return generateHTML(this.elements, this.fileName);
+  }
+
   clearCanvas(): void {
     this.pushHistory();
     this.elements = [];
@@ -710,5 +731,210 @@ export default class DesignStoreService extends Service {
 
     this.selectedIds = [frame.id];
     this.scheduleSave();
+  }
+
+  // --- AI-powered auto-layout ("Make it better") ---
+
+  autoLayout(): { changes: number; description: string } {
+    if (this.elements.length < 2) {
+      return { changes: 0, description: "Need at least 2 elements to optimize layout." };
+    }
+
+    this.pushHistory();
+    let changes = 0;
+    const descriptions: string[] = [];
+
+    // 1. Snap elements to nearest 8px grid
+    const gridSnap = 8;
+    const snappable = this.elements.filter(el => el.type !== "line" && !el.locked);
+    for (const el of snappable) {
+      const newX = Math.round(el.x / gridSnap) * gridSnap;
+      const newY = Math.round(el.y / gridSnap) * gridSnap;
+      if (newX !== el.x || newY !== el.y) {
+        this.elements = this.elements.map(e =>
+          e.id === el.id ? { ...e, x: newX, y: newY } : e
+        );
+        changes++;
+      }
+    }
+    if (changes > 0) descriptions.push(`Snapped ${changes} elements to 8px grid`);
+
+    // 2. Align text elements with similar Y positions (within 8px)
+    let alignCount = 0;
+    const textEls = this.elements.filter(el => el.type === "text" && !el.locked);
+    const yGroups: Map<number, typeof textEls> = new Map();
+    for (const el of textEls) {
+      const roundedY = Math.round(el.y / 12) * 12;
+      if (!yGroups.has(roundedY)) yGroups.set(roundedY, []);
+      yGroups.get(roundedY)!.push(el);
+    }
+    for (const [targetY, group] of yGroups.entries()) {
+      if (group.length > 1) {
+        for (const el of group) {
+          if (el.y !== targetY) {
+            this.elements = this.elements.map(e =>
+              e.id === el.id ? { ...e, y: targetY } : e
+            );
+            alignCount++;
+          }
+        }
+      }
+    }
+    if (alignCount > 0) descriptions.push(`Aligned ${alignCount} text elements`);
+    changes += alignCount;
+
+    // 3. Harmonize spacing between vertically stacked elements
+    let spacingFixes = 0;
+    const rects = this.elements
+      .filter(el => (el.type === "rectangle" || el.type === "frame") && !el.locked)
+      .sort((a, b) => a.y - b.y);
+
+    // Group elements that share similar X positions (likely a vertical stack)
+    const xGroups: Map<number, typeof rects> = new Map();
+    for (const el of rects) {
+      const roundedX = Math.round(el.x / 40) * 40;
+      if (!xGroups.has(roundedX)) xGroups.set(roundedX, []);
+      xGroups.get(roundedX)!.push(el);
+    }
+
+    for (const [, group] of xGroups.entries()) {
+      if (group.length < 3) continue;
+      // Calculate average gap
+      const gaps: number[] = [];
+      for (let i = 1; i < group.length; i++) {
+        const gap = group[i]!.y - (group[i-1]!.y + group[i-1]!.height);
+        if (gap > 0 && gap < 200) gaps.push(gap);
+      }
+      if (gaps.length < 2) continue;
+      const avgGap = Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length / gridSnap) * gridSnap;
+      if (avgGap <= 0) continue;
+
+      // Apply consistent spacing
+      for (let i = 1; i < group.length; i++) {
+        const expectedY = group[i-1]!.y + group[i-1]!.height + avgGap;
+        const el = group[i]!;
+        if (Math.abs(el.y - expectedY) > 4) {
+          this.elements = this.elements.map(e =>
+            e.id === el.id ? { ...e, y: expectedY } : e
+          );
+          spacingFixes++;
+        }
+      }
+    }
+    if (spacingFixes > 0) descriptions.push(`Harmonized ${spacingFixes} element spacings`);
+    changes += spacingFixes;
+
+    // 4. Round corner radii to consistent values
+    let cornerFixes = 0;
+    const standardRadii = [0, 4, 8, 12, 16, 20, 24, 32, 44];
+    for (const el of this.elements) {
+      if (el.cornerRadius && !el.locked) {
+        const closest = standardRadii.reduce((a, b) =>
+          Math.abs(b - el.cornerRadius) < Math.abs(a - el.cornerRadius) ? b : a
+        );
+        if (closest !== el.cornerRadius) {
+          this.elements = this.elements.map(e =>
+            e.id === el.id ? { ...e, cornerRadius: closest } : e
+          );
+          cornerFixes++;
+        }
+      }
+    }
+    if (cornerFixes > 0) descriptions.push(`Standardized ${cornerFixes} corner radii`);
+    changes += cornerFixes;
+
+    this.scheduleSave();
+
+    if (changes === 0) {
+      return { changes: 0, description: "Layout already looks good! No changes needed." };
+    }
+
+    return {
+      changes,
+      description: descriptions.join(". ") + ".",
+    };
+  }
+
+  // --- Design critique ---
+
+  critiqueDesign(): string[] {
+    const issues: string[] = [];
+
+    if (this.elements.length === 0) {
+      return ["Canvas is empty. Try generating a design first!"];
+    }
+
+    // Check for inconsistent text sizes
+    const textEls = this.elements.filter(el => el.type === "text");
+    const fontSizes = [...new Set(textEls.map(el => el.fontSize).filter(Boolean))];
+    if (fontSizes.length > 5) {
+      issues.push(`Too many font sizes (${fontSizes.length}). Good design uses 3-4 sizes for clear hierarchy. Consider consolidating to: heading, subheading, body, and caption.`);
+    }
+
+    // Check for unaligned elements
+    const xPositions = this.elements.filter(el => el.type !== "line").map(el => el.x);
+    const uniqueX = [...new Set(xPositions)];
+    if (uniqueX.length > this.elements.length * 0.7) {
+      issues.push("Many elements have unique X positions. This creates a scattered look. Try aligning elements to a consistent grid or using 'Make it better' to auto-align.");
+    }
+
+    // Check spacing consistency
+    const rects = this.elements
+      .filter(el => el.type === "rectangle" || el.type === "frame")
+      .sort((a, b) => a.y - b.y);
+    if (rects.length > 2) {
+      const gaps: number[] = [];
+      for (let i = 1; i < rects.length; i++) {
+        const gap = rects[i]!.y - (rects[i-1]!.y + rects[i-1]!.height);
+        if (gap > 0 && gap < 200) gaps.push(gap);
+      }
+      if (gaps.length > 1) {
+        const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+        const variance = gaps.reduce((sum, g) => sum + Math.abs(g - avgGap), 0) / gaps.length;
+        if (variance > 10) {
+          issues.push(`Spacing between sections varies (${Math.round(variance)}px avg deviation). Consistent spacing creates visual rhythm. Use 'Make it better' to harmonize.`);
+        }
+      }
+    }
+
+    // Check for elements that might be too close together
+    for (let i = 0; i < this.elements.length; i++) {
+      for (let j = i + 1; j < this.elements.length; j++) {
+        const a = this.elements[i]!;
+        const b = this.elements[j]!;
+        if (a.type === "line" || b.type === "line") continue;
+        const overlapX = a.x < b.x + b.width && a.x + a.width > b.x;
+        const overlapY = a.y < b.y + b.height && a.y + a.height > b.y;
+        if (overlapX && overlapY) {
+          const overlapAmount = Math.min(a.x + a.width - b.x, b.x + b.width - a.x) *
+            Math.min(a.y + a.height - b.y, b.y + b.height - a.y);
+          if (overlapAmount > 0 && overlapAmount < 100 && a.parentId !== b.id && b.parentId !== a.id) {
+            issues.push(`"${a.name}" and "${b.name}" slightly overlap. This usually looks unintentional. Separate them or fully overlap for a layered effect.`);
+            break;
+          }
+        }
+      }
+      if (issues.length > 5) break; // Don't overwhelm with feedback
+    }
+
+    // Check for good practices
+    const hasNavBar = this.elements.some(el =>
+      el.name.toLowerCase().includes("nav") || (el.y < 80 && el.width > 800)
+    );
+    if (!hasNavBar && this.elements.length > 5) {
+      issues.push("No navigation bar detected. Most web UIs benefit from a clear nav at the top.");
+    }
+
+    // Color variety check
+    const fills = [...new Set(this.elements.map(el => el.fill).filter(f => f && f !== "transparent"))];
+    if (fills.length > 8) {
+      issues.push(`Using ${fills.length} different colors. A strong design palette typically uses 3-5 core colors. Consider consolidating.`);
+    }
+
+    if (issues.length === 0) {
+      issues.push("This design looks well-structured! Good alignment, consistent spacing, and clear hierarchy.");
+    }
+
+    return issues;
   }
 }

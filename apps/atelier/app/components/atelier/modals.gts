@@ -1,7 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { on } from "@ember/modifier";
-import { fn } from "@ember/helper";
+import { fn, concat } from "@ember/helper";
 import { inject as service } from "@ember/service";
 import { modifier } from "ember-modifier";
 import type DesignStoreService from "atelier/services/design-store";
@@ -10,6 +10,8 @@ import type CommandPaletteService from "atelier/services/command-palette";
 import type ProjectStoreService from "atelier/services/project-store";
 import type TokenRegistryService from "atelier/services/token-registry";
 import type { DesignElement } from "atelier/services/design-store";
+import { generateEmberApp } from "atelier/utils/export-ember-app";
+import { generateZip } from "atelier/utils/zip";
 import {
   IconSparkles,
   IconX,
@@ -102,6 +104,8 @@ export default class AtelierModals extends Component<ModalsSignature> {
   copySVG = () => {
     const svg = this.designStore.exportSVG();
     navigator.clipboard.writeText(svg);
+    this.copyFeedback = true;
+    setTimeout(() => { this.copyFeedback = false; }, 1500);
     this.args.onShowToast("SVG copied to clipboard");
   };
 
@@ -130,8 +134,16 @@ export default class AtelierModals extends Component<ModalsSignature> {
     return this.designStore.exportFormat === "swiftui";
   }
 
+  get isHtmlExport(): boolean {
+    return this.designStore.exportFormat === "html";
+  }
+
+  get isEmberAppExport(): boolean {
+    return this.designStore.exportFormat === "ember-app";
+  }
+
   get isComponentExport(): boolean {
-    return this.isEmberExport || this.isTailwindExport || this.isReactExport || this.isSwiftUIExport;
+    return this.isEmberExport || this.isTailwindExport || this.isReactExport || this.isSwiftUIExport || this.isHtmlExport;
   }
 
   setExportSvg = () => {
@@ -159,6 +171,63 @@ export default class AtelierModals extends Component<ModalsSignature> {
     this.previewTab = "code";
   };
 
+  setExportHtml = () => {
+    this.designStore.exportFormat = "html";
+    this.previewTab = "preview";
+  };
+
+  setExportEmberApp = () => {
+    this.designStore.exportFormat = "ember-app";
+    this.previewTab = "code";
+  };
+
+  get emberAppFiles(): Record<string, string> {
+    return generateEmberApp(
+      this.designStore.elements,
+      this.designStore.fileName,
+      this.tokenRegistry,
+    );
+  }
+
+  get emberAppFileList(): { path: string; lines: number }[] {
+    const files = this.emberAppFiles;
+    return Object.entries(files).map(([path, content]) => ({
+      path,
+      lines: content.split("\n").length,
+    }));
+  }
+
+  get emberAppPreviewCode(): string {
+    const files = this.emberAppFiles;
+    const sections: string[] = [];
+    for (const [path, content] of Object.entries(files)) {
+      sections.push(`// ── ${path} ${"─".repeat(Math.max(0, 60 - path.length))}\n${content}`);
+    }
+    return sections.join("\n\n");
+  }
+
+  downloadEmberApp = () => {
+    const files = this.emberAppFiles;
+    const projectName = this.designStore.fileName.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "atelier-app";
+
+    // Prefix all paths with project directory
+    const prefixed: Record<string, string> = {};
+    for (const [path, content] of Object.entries(files)) {
+      prefixed[`${projectName}/${path}`] = content;
+    }
+
+    const zipBuffer = generateZip(prefixed);
+    const blob = new Blob([zipBuffer], { type: "application/zip" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${projectName}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.designStore.showExportModal = false;
+    this.args.onShowToast(`Downloaded ${projectName}.zip — run pnpm install && pnpm start`);
+  };
+
   get emberComponentContent(): string {
     return this.designStore.exportEmberComponent();
   }
@@ -175,7 +244,12 @@ export default class AtelierModals extends Component<ModalsSignature> {
     return this.designStore.exportSwiftUIView();
   }
 
+  get htmlContent(): string {
+    return this.designStore.exportHTML();
+  }
+
   get activeComponentContent(): string {
+    if (this.isHtmlExport) return this.htmlContent;
     if (this.isReactExport) return this.reactComponentContent;
     if (this.isSwiftUIExport) return this.swiftuiComponentContent;
     if (this.isTailwindExport) return this.tailwindComponentContent;
@@ -183,6 +257,7 @@ export default class AtelierModals extends Component<ModalsSignature> {
   }
 
   get activeExportLabel(): string {
+    if (this.isHtmlExport) return "HTML";
     if (this.isReactExport) return "React";
     if (this.isSwiftUIExport) return "SwiftUI";
     if (this.isTailwindExport) return "Tailwind";
@@ -190,10 +265,34 @@ export default class AtelierModals extends Component<ModalsSignature> {
   }
 
   get activeFileExtension(): string {
+    if (this.isHtmlExport) return ".html";
     if (this.isSwiftUIExport) return ".swift";
     if (this.isReactExport) return ".tsx";
     return ".gts";
   }
+
+  get activeCode(): string {
+    return this.isComponentExport ? this.activeComponentContent : this.svgContent;
+  }
+
+  get codeLineCount(): number {
+    return this.activeCode.split('\n').length;
+  }
+
+  get lineNumbers(): string {
+    return Array.from({ length: this.codeLineCount }, (_, i) => i + 1).join('\n');
+  }
+
+  @tracked copyFeedback: boolean = false;
+  @tracked showFullPreview: boolean = false;
+
+  openFullPreview = () => {
+    this.showFullPreview = true;
+  };
+
+  closeFullPreview = () => {
+    this.showFullPreview = false;
+  };
 
   @tracked previewTab: "preview" | "code" = "preview";
 
@@ -208,6 +307,11 @@ export default class AtelierModals extends Component<ModalsSignature> {
    * a standalone HTML document with Tailwind CDN for iframe preview.
    */
   get livePreviewSrcdoc(): string {
+    // HTML export is already a full document — use it directly
+    if (this.isHtmlExport) {
+      return this.htmlContent;
+    }
+
     const code = this.activeComponentContent;
     // Extract content between <template> and </template>
     const match = code.match(/<template>\s*([\s\S]*?)\s*<\/template>/);
@@ -266,6 +370,8 @@ export default class AtelierModals extends Component<ModalsSignature> {
   copyComponent = () => {
     const content = this.activeComponentContent;
     navigator.clipboard.writeText(content);
+    this.copyFeedback = true;
+    setTimeout(() => { this.copyFeedback = false; }, 1500);
     this.args.onShowToast(`${this.activeExportLabel} component copied to clipboard`);
   };
 
@@ -671,7 +777,15 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
       <div class="modal-overlay" role="button" {{on "click" this.closeExport}}>
         <div class="export-modal" role="dialog" {{on "click" this.stopPropagation}}>
           <div class="export-modal-header">
-            <div class="export-modal-title">Export Design</div>
+            <div class="export-modal-header-left">
+              <div class="export-modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <div>
+                <div class="export-modal-title">Export Design</div>
+                <div class="export-modal-subtitle">{{this.designStore.fileName}} — {{this.designStore.elements.length}} elements</div>
+              </div>
+            </div>
             <button class="ai-modal-close" type="button" {{on "click" this.closeExport}}>
               <IconX />
             </button>
@@ -683,47 +797,106 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
               type="button"
               {{on "click" this.setExportSvg}}
             >
-              SVG
+              <span class="export-tab-label">SVG</span>
+              <span class="export-tab-ext">.svg</span>
             </button>
             <button
               class="export-tab {{if this.isEmberExport 'active'}}"
               type="button"
               {{on "click" this.setExportEmber}}
             >
-              Ember
+              <span class="export-tab-label">Ember</span>
+              <span class="export-tab-ext">.gts</span>
             </button>
             <button
               class="export-tab {{if this.isTailwindExport 'active'}}"
               type="button"
               {{on "click" this.setExportTailwind}}
             >
-              Tailwind
+              <span class="export-tab-label">Tailwind</span>
+              <span class="export-tab-ext">.gts</span>
             </button>
             <button
               class="export-tab {{if this.isReactExport 'active'}}"
               type="button"
               {{on "click" this.setExportReact}}
             >
-              React
+              <span class="export-tab-label">React</span>
+              <span class="export-tab-ext">.tsx</span>
             </button>
             <button
               class="export-tab {{if this.isSwiftUIExport 'active'}}"
               type="button"
               {{on "click" this.setExportSwiftUI}}
             >
-              SwiftUI
+              <span class="export-tab-label">SwiftUI</span>
+              <span class="export-tab-ext">.swift</span>
+            </button>
+            <button
+              class="export-tab {{if this.isHtmlExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportHtml}}
+            >
+              <span class="export-tab-label">HTML</span>
+              <span class="export-tab-ext">.html</span>
+            </button>
+            <button
+              class="export-tab export-tab-app {{if this.isEmberAppExport 'active'}}"
+              type="button"
+              {{on "click" this.setExportEmberApp}}
+            >
+              <span class="export-tab-label">Ember App</span>
+              <span class="export-tab-ext">.zip</span>
             </button>
           </div>
 
-          {{#if this.isSvgExport}}
-            <div class="export-preview">
-              <pre>{{this.svgContent}}</pre>
+          {{#if this.isEmberAppExport}}
+            <div class="export-app-panel">
+              <div class="export-app-info">
+                <div class="export-app-badge">FULL APP</div>
+                <span class="export-app-desc">Complete Ember 6.10 + Vite project — {{this.emberAppFileList.length}} files</span>
+              </div>
+              <div class="export-app-files">
+                {{#each this.emberAppFileList as |file|}}
+                  <div class="export-app-file">
+                    <span class="export-app-file-path">{{file.path}}</span>
+                    <span class="export-app-file-lines">{{file.lines}} lines</span>
+                  </div>
+                {{/each}}
+              </div>
+              <div class="export-code-container">
+                <div class="export-code-header">
+                  <span class="export-code-filename">All files preview</span>
+                </div>
+                <div class="export-preview export-preview-highlighted">
+                  <pre class="export-highlighted-code">{{this.emberAppPreviewCode}}</pre>
+                </div>
+              </div>
             </div>
             <div class="export-modal-footer">
               <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
-              <button class="export-btn" type="button" {{on "click" this.copySVG}}>Copy SVG</button>
+              <button class="export-btn primary export-btn-app" type="button" {{on "click" this.downloadEmberApp}}>
+                <IconDownload /> Download Ember App (.zip)
+              </button>
+            </div>
+          {{else if this.isSvgExport}}
+            <div class="export-code-container">
+              <div class="export-code-header">
+                <span class="export-code-filename">{{this.designStore.fileName}}.svg</span>
+                <span class="export-code-lines">{{this.codeLineCount}} lines</span>
+              </div>
+              <div class="export-preview export-preview-highlighted">
+                <pre class="export-line-numbers">{{this.lineNumbers}}</pre>
+                <pre class="export-highlighted-code">{{this.activeCode}}</pre>
+              </div>
+            </div>
+            <div class="export-modal-footer">
+              <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
+              <button class="export-btn {{if this.copyFeedback 'copy-success'}}" type="button" {{on "click" this.copySVG}}>
+                {{if this.copyFeedback "Copied!" "Copy SVG"}}
+              </button>
               <button class="export-btn primary" type="button" {{on "click" this.downloadSVG}}>
-                <IconDownload /> Download SVG
+                <IconDownload /> Download .svg
               </button>
             </div>
           {{else}}
@@ -790,21 +963,55 @@ Example: A modern SaaS landing page with hero section, feature cards, and pricin
                   sandbox="allow-scripts"
                   title="Component preview"
                 ></iframe>
+                <button class="export-fullscreen-btn" type="button" {{on "click" this.openFullPreview}} title="Open full-screen preview">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                </button>
               </div>
             {{else}}
-              <div class="export-preview export-preview-code">
-                <pre>{{this.activeComponentContent}}</pre>
+              <div class="export-code-container">
+                <div class="export-code-header">
+                  <span class="export-code-filename">{{this.designStore.fileName}}{{this.activeFileExtension}}</span>
+                  <span class="export-code-lines">{{this.codeLineCount}} lines</span>
+                </div>
+                <div class="export-preview export-preview-highlighted">
+                  <pre class="export-line-numbers">{{this.lineNumbers}}</pre>
+                  <pre class="export-highlighted-code">{{this.activeCode}}</pre>
+                </div>
               </div>
             {{/if}}
             <div class="export-modal-footer">
               <button class="export-btn" type="button" {{on "click" this.closeExport}}>Cancel</button>
-              <button class="export-btn" type="button" {{on "click" this.copyComponent}}>Copy {{this.activeFileExtension}}</button>
+              <button class="export-btn {{if this.copyFeedback 'copy-success'}}" type="button" {{on "click" this.copyComponent}}>
+                {{if this.copyFeedback "Copied!" (concat "Copy " this.activeFileExtension)}}
+              </button>
               <button class="export-btn primary" type="button" {{on "click" this.downloadComponent}}>
                 <IconDownload /> Download {{this.activeFileExtension}}
               </button>
             </div>
           {{/if}}
         </div>
+      </div>
+    {{/if}}
+
+    {{! ---- Full Screen Preview ---- }}
+    {{#if this.showFullPreview}}
+      <div class="fullpreview-overlay" role="button" {{on "click" this.closeFullPreview}}>
+        <div class="fullpreview-header" {{on "click" this.stopPropagation}}>
+          <div class="fullpreview-header-left">
+            <div class="fullpreview-badge">LIVE PREVIEW</div>
+            <span class="fullpreview-filename">{{this.designStore.fileName}} — {{this.activeExportLabel}} + Tailwind CSS</span>
+          </div>
+          <button class="fullpreview-close" type="button" {{on "click" this.closeFullPreview}}>
+            <IconX />
+            <span>Close</span>
+          </button>
+        </div>
+        <iframe
+          class="fullpreview-iframe"
+          srcdoc={{this.livePreviewSrcdoc}}
+          sandbox="allow-scripts"
+          title="Full screen preview"
+        ></iframe>
       </div>
     {{/if}}
 

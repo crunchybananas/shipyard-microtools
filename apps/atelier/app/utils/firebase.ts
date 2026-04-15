@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
   projectId: "atelier-eac0b",
@@ -15,3 +16,9 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app);
+
+// Connect to local emulator in development
+if (window.location.hostname === "localhost") {
+  connectFunctionsEmulator(functions, "localhost", 5001);
+}

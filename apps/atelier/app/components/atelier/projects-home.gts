@@ -600,16 +600,42 @@ export default class ProjectsHome extends Component {
           </div>
         </div>
 
-        {{! Loading state }}
+        {{! Loading state — skeleton cards }}
         {{#if this.projectStore.isInitialLoading}}
-          <div class="ph-syncing-indicator">
-            <div class="ph-syncing-spinner"></div>
-            Loading projects...
+          <div class="ph-skeleton-grid">
+            <div class="ph-skeleton-card">
+              <div class="ph-skeleton-preview"><div class="ph-skeleton-shimmer"></div></div>
+              <div class="ph-skeleton-info">
+                <div class="ph-skeleton-line ph-skeleton-title"></div>
+                <div class="ph-skeleton-line ph-skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="ph-skeleton-card" style="animation-delay: 0.1s">
+              <div class="ph-skeleton-preview"><div class="ph-skeleton-shimmer"></div></div>
+              <div class="ph-skeleton-info">
+                <div class="ph-skeleton-line ph-skeleton-title"></div>
+                <div class="ph-skeleton-line ph-skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="ph-skeleton-card" style="animation-delay: 0.2s">
+              <div class="ph-skeleton-preview"><div class="ph-skeleton-shimmer"></div></div>
+              <div class="ph-skeleton-info">
+                <div class="ph-skeleton-line ph-skeleton-title"></div>
+                <div class="ph-skeleton-line ph-skeleton-meta"></div>
+              </div>
+            </div>
+            <div class="ph-skeleton-card" style="animation-delay: 0.3s">
+              <div class="ph-skeleton-preview"><div class="ph-skeleton-shimmer"></div></div>
+              <div class="ph-skeleton-info">
+                <div class="ph-skeleton-line ph-skeleton-title"></div>
+                <div class="ph-skeleton-line ph-skeleton-meta"></div>
+              </div>
+            </div>
           </div>
         {{else if this.projectStore.isSyncing}}
           <div class="ph-syncing-indicator">
-            <div class="ph-syncing-spinner"></div>
-            Syncing projects...
+            <div class="ph-syncing-dot"></div>
+            <span>Syncing...</span>
           </div>
         {{/if}}
 
@@ -687,11 +713,20 @@ export default class ProjectsHome extends Component {
                 {{on "click" (fn this.openProject project.id)}}
               >
                 <div class="ph-card-preview">
-                  <div class="ph-card-preview-inner">
-                    <div class="ph-card-preview-mock-1"></div>
-                    <div class="ph-card-preview-mock-2"></div>
-                    <div class="ph-card-preview-mock-3"></div>
-                  </div>
+                  {{#if project.elementCount}}
+                    <div class="ph-card-preview-inner ph-card-has-content">
+                      <div class="ph-card-preview-mock-1"></div>
+                      <div class="ph-card-preview-mock-2"></div>
+                      <div class="ph-card-preview-mock-3"></div>
+                    </div>
+                    <div class="ph-card-element-badge">{{project.elementCount}}</div>
+                  {{else}}
+                    <div class="ph-card-preview-inner ph-card-empty-content">
+                      <div class="ph-card-empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                      </div>
+                    </div>
+                  {{/if}}
                 </div>
                 <div class="ph-card-info">
                   <div class="ph-card-name">{{project.name}}</div>

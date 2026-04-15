@@ -17,7 +17,9 @@
     "lint:hbs:fix": "ember-template-lint . --fix",
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
-    "lint:types": "ember-tsc"
+    "lint:types": "ember-tsc",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "devDependencies": {
     "@babel/core": "catalog:",
@@ -36,6 +38,7 @@
     "@glint/ember-tsc": "catalog:glint",
     "@glint/template": "catalog:glint",
     "@glint/tsserver-plugin": "catalog:glint",
+    "@playwright/test": "^1.59.1",
     "@rollup/plugin-babel": "^6.1.0",
     "@types/qunit": "^2.19.13",
     "@typescript-eslint/eslint-plugin": "^8.46.1",

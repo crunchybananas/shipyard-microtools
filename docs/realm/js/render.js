@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
+import { renderBoats } from './enhancements.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
@@ -1500,6 +1501,9 @@ export function render() {
     }
   }
   ctx.globalAlpha = 1;
+
+  // ── Boats (loop 4+) ─────────────────────────────────────
+  renderBoats(ctx);
 
   // ── Particles ─────────────────────────────────────────────
   for (const p of G.particles) {

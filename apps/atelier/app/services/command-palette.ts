@@ -3,6 +3,7 @@ import { inject as service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
 import type RouterService from "@ember/routing/router-service";
 import type DesignStoreService from "./design-store";
+import type AiServiceService from "./ai-service";
 
 export interface Command {
   id: string;
@@ -15,10 +16,12 @@ export interface Command {
 export default class CommandPaletteService extends Service {
   @service declare designStore: DesignStoreService;
   @service declare router: RouterService;
+  @service declare aiService: AiServiceService;
 
   @tracked isOpen: boolean = false;
   @tracked query: string = "";
   @tracked selectedIndex: number = 0;
+  @tracked recentCommandIds: string[] = [];
 
   get commands(): Command[] {
     return [
@@ -52,10 +55,18 @@ export default class CommandPaletteService extends Service {
       { id: "arrange-group", label: "Group Selection", shortcut: "", category: "Arrange", action: () => { this.designStore.groupSelected(); } },
       // AI
       { id: "ai-generate", label: "AI Generate Design", shortcut: "", category: "AI", action: () => { this.designStore.showAiModal = true; } },
+      { id: "ai-landing", label: "AI: Generate Landing Page", shortcut: "", category: "AI", action: () => { this.aiService.generateFromPrompt("Design a multi-page SaaS app with Home, Features, and Pricing routes"); } },
+      { id: "ai-dashboard", label: "AI: Generate Dashboard", shortcut: "", category: "AI", action: () => { this.aiService.generateFromPrompt("Build a dashboard with sidebar nav, stats cards, data table, and chart area"); } },
+      { id: "ai-mobile", label: "AI: Generate Mobile App", shortcut: "", category: "AI", action: () => { this.aiService.generateFromPrompt("Create a mobile app with tab navigation — Home, Search, Profile screens"); } },
+      { id: "ai-extract", label: "Extract Ember Components", shortcut: "Cmd+Shift+E", category: "AI", action: () => { this.aiService.extractComponents(); } },
+      // Export
+      { id: "file-export", label: "Export as SVG", shortcut: "", category: "Export", action: () => { this.designStore.exportFormat = "svg"; this.designStore.showExportModal = true; } },
+      { id: "file-export-ember", label: "Export as Ember Component (.gts)", shortcut: "", category: "Export", action: () => { this.designStore.exportFormat = "ember"; this.designStore.showExportModal = true; } },
+      { id: "file-export-tailwind", label: "Export with Tailwind (.gts)", shortcut: "", category: "Export", action: () => { this.designStore.exportFormat = "tailwind"; this.designStore.showExportModal = true; } },
+      { id: "file-export-html", label: "Export as HTML", shortcut: "", category: "Export", action: () => { this.designStore.exportFormat = "html"; this.designStore.showExportModal = true; } },
+      { id: "file-export-react", label: "Export as React (.tsx)", shortcut: "", category: "Export", action: () => { this.designStore.exportFormat = "react"; this.designStore.showExportModal = true; } },
+      { id: "file-export-app", label: "Download Ember App (.zip)", shortcut: "", category: "Export", action: () => { this.designStore.exportFormat = "ember-app"; this.designStore.showExportModal = true; } },
       // File
-      { id: "file-export", label: "Export Design", shortcut: "", category: "File", action: () => { this.designStore.exportFormat = "svg"; this.designStore.showExportModal = true; } },
-      { id: "file-export-ember", label: "Export as Ember Component", shortcut: "", category: "File", action: () => { this.designStore.exportFormat = "ember"; this.designStore.showExportModal = true; } },
-      { id: "file-export-tailwind", label: "Export with Tailwind CSS", shortcut: "", category: "File", action: () => { this.designStore.exportFormat = "tailwind"; this.designStore.showExportModal = true; } },
       { id: "file-clear", label: "Clear Canvas", shortcut: "", category: "File", action: () => { this.designStore.clearCanvas(); } },
       { id: "file-home", label: "Back to Projects", shortcut: "", category: "File", action: () => { this.router.transitionTo('index'); } },
     ];
@@ -80,7 +91,20 @@ export default class CommandPaletteService extends Service {
 
   get groupedCommands(): { category: string; commands: Command[] }[] {
     const groups: Map<string, Command[]> = new Map();
-    for (const cmd of this.filteredCommands) {
+    const filtered = this.filteredCommands;
+
+    // Show recent commands when no query
+    if (!this.query.trim() && this.recentCommandIds.length > 0) {
+      const recentCmds = this.recentCommandIds
+        .map((id) => this.commands.find((c) => c.id === id))
+        .filter((c): c is Command => c !== undefined)
+        .slice(0, 4);
+      if (recentCmds.length > 0) {
+        groups.set("Recent", recentCmds);
+      }
+    }
+
+    for (const cmd of filtered) {
       if (!groups.has(cmd.category)) {
         groups.set(cmd.category, []);
       }
@@ -116,6 +140,11 @@ export default class CommandPaletteService extends Service {
     const cmd = this.commands.find((c) => c.id === id);
     if (cmd) {
       cmd.action();
+      // Track recent commands
+      this.recentCommandIds = [
+        id,
+        ...this.recentCommandIds.filter((r) => r !== id),
+      ].slice(0, 8);
     }
     this.close();
   }
