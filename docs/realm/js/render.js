@@ -96,6 +96,22 @@ export function render() {
 
   const daylight = getDaylight();
 
+  // God rays from upper-left (sun direction) — only during daytime
+  if (daylight > 0.6) {
+    const rayAlpha = (daylight - 0.6) * 0.15;
+    ctx.globalAlpha = rayAlpha;
+    ctx.fillStyle = 'rgba(255, 245, 210, 0.6)';
+    // Draw 4 long beams radiating from upper-left
+    for (let i = 0; i < 4; i++) {
+      ctx.save();
+      ctx.translate(-500 + i * 200, -400);
+      ctx.rotate(0.7 + i * 0.04);
+      ctx.fillRect(0, 0, 40, 3000);
+      ctx.restore();
+    }
+    ctx.globalAlpha = daylight;
+  }
+
   // ── Tiles ─────────────────────────────────────────────────
   // Viewport culling — isometric needs all 4 screen corners
   const c0 = screenToWorld(0, 0);
@@ -1447,6 +1463,28 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x + Math.sin(G.gameTick * 0.02 + p.tx) * 4, s.y + p.offsetY, p.size, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'firefly') {
+      const pulse = 0.5 + 0.5 * Math.sin(G.gameTick * 0.15 + p.phase);
+      const alpha = p.alpha * pulse;
+      // Outer glow
+      const glow = ctx.createRadialGradient(s.x, s.y + p.offsetY, 0, s.x, s.y + p.offsetY, p.size * 5);
+      glow.addColorStop(0, `rgba(200, 255, 150, ${alpha})`);
+      glow.addColorStop(1, 'rgba(200, 255, 150, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y + p.offsetY, p.size * 5, 0, Math.PI * 2);
+      ctx.fill();
+      // Core dot
+      ctx.fillStyle = `rgba(220, 255, 180, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y + p.offsetY, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.type === 'dustmote') {
+      const twinkle = 0.5 + 0.5 * Math.sin(G.gameTick * 0.1 + p.phase);
+      ctx.fillStyle = `rgba(255, 250, 200, ${ctx.globalAlpha * twinkle})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y + p.offsetY, p.size, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       const scale = 1 + (1 - (p.alpha / 1.5)) * 0.3;
       ctx.save();
@@ -1461,6 +1499,32 @@ export function render() {
       ctx.shadowBlur = 0;
       ctx.restore();
     }
+  }
+
+  // ── Cloud shadows ─────────────────────────────────────────
+  if (!G.clouds) {
+    G.clouds = [
+      { x: 100, y: 100, r: 180, vx: 0.15, alpha: 0.18 },
+      { x: 400, y: 300, r: 220, vx: 0.12, alpha: 0.15 },
+      { x: 700, y: 500, r: 160, vx: 0.18, alpha: 0.22 },
+      { x: 1000, y: 800, r: 200, vx: 0.14, alpha: 0.16 },
+    ];
+  }
+  if (daylight > 0.5) {
+    for (const cloud of G.clouds) {
+      cloud.x += cloud.vx * G.speed;
+      if (cloud.x > 3000) cloud.x = -500;
+      const cloudAlpha = cloud.alpha * daylight;
+      ctx.globalAlpha = cloudAlpha;
+      const grad = ctx.createRadialGradient(cloud.x, cloud.y, cloud.r * 0.3, cloud.x, cloud.y, cloud.r);
+      grad.addColorStop(0, 'rgba(20,30,40,0.6)');
+      grad.addColorStop(1, 'rgba(20,30,40,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cloud.x, cloud.y, cloud.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = daylight;
   }
 
   // ── Build ghost ───────────────────────────────────────────
@@ -1719,14 +1783,32 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.fill();
   }
 
-  // Longer directional shadow — darker toward building, faded toward tip
-  const shadowGrad = ctx.createRadialGradient(s.x + 2, s.y + 3, 4, s.x + 12, s.y + 8, 25);
-  shadowGrad.addColorStop(0, 'rgba(0,0,0,0.35)');
-  shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = shadowGrad;
-  ctx.beginPath();
-  ctx.ellipse(s.x + 7, s.y + 5, 20, 7, 0.25, 0, Math.PI * 2);
-  ctx.fill();
+  // Long directional shadow — proper isometric cast shadow
+  if (b.type !== 'road' && b.type !== 'wall') {
+    const buildingH = (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 32 :
+                      (b.type === 'house' || b.type === 'tavern' || b.type === 'barracks' || b.type === 'bakery') ? 20 : 12;
+    // Shadow length = building height projected at light angle
+    const shadowLen = buildingH * 0.8;
+    // Create a slanted quadrilateral shadow shape
+    ctx.globalAlpha = daylight * 0.3;
+    ctx.fillStyle = '#1a1010';
+    ctx.beginPath();
+    // Base of building (4 corners of foundation)
+    ctx.moveTo(s.x - 10, s.y + 2);
+    ctx.lineTo(s.x + 10, s.y + 2);
+    // Shadow tip (projected to lower-right)
+    ctx.lineTo(s.x + 10 + shadowLen, s.y + 2 + shadowLen * 0.5);
+    ctx.lineTo(s.x - 10 + shadowLen, s.y + 2 + shadowLen * 0.5);
+    ctx.closePath();
+    // Use radial gradient for soft fade
+    const shadowGrad = ctx.createRadialGradient(s.x, s.y + 2, 5, s.x + shadowLen, s.y + 2 + shadowLen * 0.5, shadowLen);
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.45)');
+    shadowGrad.addColorStop(0.6, 'rgba(0,0,0,0.2)');
+    shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shadowGrad;
+    ctx.fill();
+    ctx.globalAlpha = daylight;
+  }
 
   // Ground the sprite: scale from tile-center anchor so buildings grow UP
   // from the ground (not out in all directions), then shift down 4px to
@@ -3108,226 +3190,248 @@ function drawTradingPost(ctx, s, b) {
 }
 
 function drawCastle(ctx, s) {
-  // ===== CASTLE — the largest, most detailed building in the game =====
+  // Stone base (wider than walls)
+  const baseGrad = ctx.createLinearGradient(s.x, s.y - 2, s.x, s.y + 8);
+  baseGrad.addColorStop(0, '#706860');
+  baseGrad.addColorStop(1, '#4a4238');
+  ctx.fillStyle = baseGrad;
+  ctx.fillRect(s.x - 22, s.y - 2, 44, 6);
 
-  // --- LEFT FLANKING TOWER ---
-  const ltGrad = ctx.createLinearGradient(s.x - 22, s.y - 50, s.x - 22, s.y - 4);
-  ltGrad.addColorStop(0, '#9898aa');
-  ltGrad.addColorStop(1, '#5e5e70');
+  // Front wall darker side
+  ctx.fillStyle = '#3a3228';
+  ctx.fillRect(s.x - 22, s.y + 4, 44, 3);
+
+  // LEFT flanking tower
+  const ltGrad = ctx.createLinearGradient(s.x - 18, s.y - 38, s.x - 18, s.y - 2);
+  ltGrad.addColorStop(0, '#b0a89a');
+  ltGrad.addColorStop(0.5, '#807a6e');
+  ltGrad.addColorStop(1, '#5a5448');
   ctx.fillStyle = ltGrad;
-  ctx.fillRect(s.x - 28, s.y - 50, 12, 46);
-  // Iso side face
-  ctx.fillStyle = '#707082';
+  ctx.fillRect(s.x - 22, s.y - 38, 10, 40);
+  // Tower right face (darker)
+  ctx.fillStyle = '#4a4238';
+  ctx.fillRect(s.x - 12, s.y - 36, 2, 38);
+  // Tower top parapet
+  ctx.fillStyle = '#8a8278';
+  ctx.fillRect(s.x - 23, s.y - 42, 12, 4);
+  // Merlons
+  ctx.fillStyle = '#706860';
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(s.x - 22 + i * 4, s.y - 46, 2, 4);
+  }
+  // Conical roof
+  ctx.fillStyle = '#b02020';
   ctx.beginPath();
-  ctx.moveTo(s.x - 16, s.y - 50); ctx.lineTo(s.x - 12, s.y - 47);
-  ctx.lineTo(s.x - 12, s.y - 1);  ctx.lineTo(s.x - 16, s.y - 4);
-  ctx.closePath(); ctx.fill();
-  // Parapet band
-  ctx.fillStyle = '#a4a4b6';
-  ctx.fillRect(s.x - 29, s.y - 54, 14, 5);
-  // Crenellations
-  ctx.fillStyle = '#acacbe';
-  for (let i = -28; i < -15; i += 4) {
-    ctx.fillRect(s.x + i, s.y - 59, 3, 6);
-  }
-  // Gold trim on left tower parapet
-  ctx.strokeStyle = '#c8a020';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(s.x - 29, s.y - 54); ctx.lineTo(s.x - 15, s.y - 54); ctx.stroke();
-  // Stone mortar lines
-  ctx.strokeStyle = 'rgba(0,0,0,0.11)';
+  ctx.moveTo(s.x - 23, s.y - 42);
+  ctx.lineTo(s.x - 17, s.y - 54);
+  ctx.lineTo(s.x - 11, s.y - 42);
+  ctx.closePath();
+  ctx.fill();
+  // Roof darker side
+  ctx.fillStyle = '#7a1818';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 17, s.y - 54);
+  ctx.lineTo(s.x - 11, s.y - 42);
+  ctx.lineTo(s.x - 14, s.y - 48);
+  ctx.closePath();
+  ctx.fill();
+  // Pennant on left tower
+  ctx.strokeStyle = '#333';
   ctx.lineWidth = 0.6;
-  for (let ly = s.y - 47; ly < s.y - 4; ly += 5) {
-    ctx.beginPath(); ctx.moveTo(s.x - 28, ly); ctx.lineTo(s.x - 16, ly); ctx.stroke();
-  }
-  // Arrow slit left tower
-  ctx.fillStyle = '#1e1e2e';
-  ctx.fillRect(s.x - 23, s.y - 42, 2, 7);
-  ctx.fillStyle = '#2a2a3c';
-  ctx.fillRect(s.x - 24, s.y - 38, 4, 1);
-  // Left tower window
-  ctx.fillStyle = '#ffeebb';
-  ctx.fillRect(s.x - 24, s.y - 28, 3, 4);
+  ctx.beginPath();
+  ctx.moveTo(s.x - 17, s.y - 54);
+  ctx.lineTo(s.x - 17, s.y - 62);
+  ctx.stroke();
+  const pennantSway1 = Math.sin(G.gameTick * 0.08) * 1;
+  ctx.fillStyle = '#c02828';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 17, s.y - 62);
+  ctx.lineTo(s.x - 17 + 5 + pennantSway1, s.y - 60);
+  ctx.lineTo(s.x - 17 + 4 + pennantSway1, s.y - 57);
+  ctx.lineTo(s.x - 17, s.y - 58);
+  ctx.closePath();
+  ctx.fill();
 
-  // --- RIGHT FLANKING TOWER ---
-  const rtGrad = ctx.createLinearGradient(s.x + 22, s.y - 50, s.x + 22, s.y - 4);
-  rtGrad.addColorStop(0, '#9898aa');
-  rtGrad.addColorStop(1, '#5e5e70');
+  // RIGHT flanking tower
+  const rtGrad = ctx.createLinearGradient(s.x + 18, s.y - 38, s.x + 18, s.y - 2);
+  rtGrad.addColorStop(0, '#a89e8e');
+  rtGrad.addColorStop(0.5, '#786e60');
+  rtGrad.addColorStop(1, '#524638');
   ctx.fillStyle = rtGrad;
-  ctx.fillRect(s.x + 16, s.y - 50, 12, 46);
-  // Iso side
-  ctx.fillStyle = '#606072';
+  ctx.fillRect(s.x + 12, s.y - 38, 10, 40);
+  ctx.fillStyle = '#403830';
+  ctx.fillRect(s.x + 20, s.y - 36, 2, 38);
+  ctx.fillStyle = '#7a7268';
+  ctx.fillRect(s.x + 11, s.y - 42, 12, 4);
+  ctx.fillStyle = '#605850';
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(s.x + 12 + i * 4, s.y - 46, 2, 4);
+  }
+  ctx.fillStyle = '#b02020';
   ctx.beginPath();
-  ctx.moveTo(s.x + 28, s.y - 50); ctx.lineTo(s.x + 32, s.y - 47);
-  ctx.lineTo(s.x + 32, s.y - 1);  ctx.lineTo(s.x + 28, s.y - 4);
-  ctx.closePath(); ctx.fill();
-  // Parapet band
-  ctx.fillStyle = '#a4a4b6';
-  ctx.fillRect(s.x + 15, s.y - 54, 14, 5);
-  // Crenellations
-  ctx.fillStyle = '#acacbe';
-  for (let i = 16; i < 29; i += 4) {
-    ctx.fillRect(s.x + i, s.y - 59, 3, 6);
-  }
-  // Gold trim on right tower parapet
-  ctx.strokeStyle = '#c8a020';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(s.x + 15, s.y - 54); ctx.lineTo(s.x + 29, s.y - 54); ctx.stroke();
-  // Mortar lines
-  ctx.strokeStyle = 'rgba(0,0,0,0.11)';
-  ctx.lineWidth = 0.6;
-  for (let ly = s.y - 47; ly < s.y - 4; ly += 5) {
-    ctx.beginPath(); ctx.moveTo(s.x + 16, ly); ctx.lineTo(s.x + 28, ly); ctx.stroke();
-  }
-  // Arrow slit right tower
-  ctx.fillStyle = '#1e1e2e';
-  ctx.fillRect(s.x + 21, s.y - 42, 2, 7);
-  ctx.fillStyle = '#2a2a3c';
-  ctx.fillRect(s.x + 20, s.y - 38, 4, 1);
-  // Right tower window
-  ctx.fillStyle = '#ffeebb';
-  ctx.fillRect(s.x + 21, s.y - 28, 3, 4);
+  ctx.moveTo(s.x + 11, s.y - 42);
+  ctx.lineTo(s.x + 17, s.y - 54);
+  ctx.lineTo(s.x + 23, s.y - 42);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#7a1818';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 17, s.y - 54);
+  ctx.lineTo(s.x + 23, s.y - 42);
+  ctx.lineTo(s.x + 20, s.y - 48);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#333';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 17, s.y - 54);
+  ctx.lineTo(s.x + 17, s.y - 62);
+  ctx.stroke();
+  const pennantSway2 = Math.sin(G.gameTick * 0.08 + 1) * 1;
+  ctx.fillStyle = '#2848c0';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 17, s.y - 62);
+  ctx.lineTo(s.x + 17 + 5 + pennantSway2, s.y - 60);
+  ctx.lineTo(s.x + 17 + 4 + pennantSway2, s.y - 57);
+  ctx.lineTo(s.x + 17, s.y - 58);
+  ctx.closePath();
+  ctx.fill();
 
-  // --- CENTRAL KEEP (tallest, widest) ---
-  const keepTopY = s.y - 66;
-  const keepGrad = ctx.createLinearGradient(s.x, keepTopY, s.x, s.y - 4);
-  keepGrad.addColorStop(0, '#a2a2b6');
-  keepGrad.addColorStop(0.45, '#7e7e92');
-  keepGrad.addColorStop(1, '#545468');
+  // CENTRAL KEEP — the main imposing structure
+  const keepGrad = ctx.createLinearGradient(s.x, s.y - 56, s.x, s.y - 2);
+  keepGrad.addColorStop(0, '#c0b8a8');
+  keepGrad.addColorStop(0.4, '#888070');
+  keepGrad.addColorStop(1, '#584f40');
   ctx.fillStyle = keepGrad;
-  ctx.fillRect(s.x - 14, keepTopY, 28, 62);
-  // Iso side face of keep
-  ctx.fillStyle = '#646476';
-  ctx.beginPath();
-  ctx.moveTo(s.x + 14, keepTopY);
-  ctx.lineTo(s.x + 19, keepTopY + 4);
-  ctx.lineTo(s.x + 19, s.y);
-  ctx.lineTo(s.x + 14, s.y - 4);
-  ctx.closePath();
-  ctx.fill();
-  // Top edge highlight
-  ctx.strokeStyle = 'rgba(255,255,255,0.24)';
-  ctx.lineWidth = 0.9;
-  ctx.beginPath(); ctx.moveTo(s.x - 14, keepTopY); ctx.lineTo(s.x + 14, keepTopY); ctx.stroke();
-  // Keep parapet
-  ctx.fillStyle = '#aeaec2';
-  ctx.fillRect(s.x - 16, keepTopY - 5, 32, 6);
-  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-  ctx.lineWidth = 0.6;
-  ctx.beginPath(); ctx.moveTo(s.x - 16, keepTopY - 5); ctx.lineTo(s.x + 16, keepTopY - 5); ctx.stroke();
-  // Keep crenellations
-  ctx.fillStyle = '#b8b8cc';
-  for (let i = -14; i < 16; i += 5) {
-    ctx.fillRect(s.x + i, keepTopY - 11, 3, 7);
-  }
-  // Gold trim on keep parapet
-  ctx.strokeStyle = '#c8a020';
-  ctx.lineWidth = 1.4;
-  ctx.beginPath(); ctx.moveTo(s.x - 16, keepTopY - 5); ctx.lineTo(s.x + 16, keepTopY - 5); ctx.stroke();
-  // Horizontal mortar lines on keep
-  ctx.strokeStyle = 'rgba(0,0,0,0.09)';
-  ctx.lineWidth = 0.7;
-  for (let ly = keepTopY + 5; ly < s.y - 4; ly += 5) {
-    ctx.beginPath(); ctx.moveTo(s.x - 14, ly); ctx.lineTo(s.x + 14, ly); ctx.stroke();
-  }
-  // Staggered vertical joints
-  ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+  ctx.fillRect(s.x - 14, s.y - 56, 28, 54);
+  // Keep right face (shadow side)
+  ctx.fillStyle = '#3a3228';
+  ctx.fillRect(s.x + 12, s.y - 54, 2, 52);
+
+  // Stone block texture — horizontal mortar lines
+  ctx.strokeStyle = 'rgba(20, 15, 10, 0.25)';
   ctx.lineWidth = 0.5;
-  for (let ly = keepTopY + 5; ly < s.y - 4; ly += 10) {
-    ctx.beginPath(); ctx.moveTo(s.x - 7, ly); ctx.lineTo(s.x - 7, ly + 5); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(s.x + 3, ly); ctx.lineTo(s.x + 3, ly + 5); ctx.stroke();
-  }
-  for (let ly = keepTopY + 10; ly < s.y - 4; ly += 10) {
-    ctx.beginPath(); ctx.moveTo(s.x - 11, ly); ctx.lineTo(s.x - 11, ly + 5); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(s.x + 8,  ly); ctx.lineTo(s.x + 8,  ly + 5); ctx.stroke();
+  for (let row = 0; row < 8; row++) {
+    const y = s.y - 52 + row * 7;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 14, y);
+    ctx.lineTo(s.x + 14, y);
+    ctx.stroke();
+    // Staggered vertical joints
+    const offset = (row % 2) * 4;
+    for (let c = -12 + offset; c <= 12; c += 8) {
+      ctx.beginPath();
+      ctx.moveTo(s.x + c, y);
+      ctx.lineTo(s.x + c, y + 7);
+      ctx.stroke();
+    }
   }
 
-  // --- ARCHED GATE ---
-  ctx.fillStyle = '#3a3a4c';
-  ctx.fillRect(s.x - 8, s.y - 20, 16, 16);
-  // Arch opening
-  ctx.fillStyle = '#14141e';
+  // Top edge highlight (sunlit)
+  ctx.strokeStyle = 'rgba(255, 240, 200, 0.35)';
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(s.x, s.y - 10, 6, Math.PI, 0);
-  ctx.lineTo(s.x + 6, s.y - 4);
-  ctx.lineTo(s.x - 6, s.y - 4);
+  ctx.moveTo(s.x - 14, s.y - 56);
+  ctx.lineTo(s.x + 14, s.y - 56);
+  ctx.stroke();
+
+  // Keep top parapet with gold trim
+  ctx.fillStyle = '#7a7268';
+  ctx.fillRect(s.x - 16, s.y - 60, 32, 4);
+  // Gold trim line
+  ctx.fillStyle = '#d4a820';
+  ctx.fillRect(s.x - 16, s.y - 61, 32, 1.2);
+  // Dense crenellations
+  ctx.fillStyle = '#605850';
+  for (let i = 0; i < 7; i++) {
+    ctx.fillRect(s.x - 15 + i * 4.5, s.y - 64, 2.5, 4);
+  }
+
+  // Windows with warm glow (ALWAYS visible — castle is grand)
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 4; col++) {
+      const wx = s.x - 11 + col * 6;
+      const wy = s.y - 48 + row * 12;
+      // Glow halo
+      const wGlow = ctx.createRadialGradient(wx + 1.5, wy + 1.5, 0, wx + 1.5, wy + 1.5, 5);
+      wGlow.addColorStop(0, 'rgba(255, 220, 140, 0.4)');
+      wGlow.addColorStop(1, 'rgba(255, 220, 140, 0)');
+      ctx.fillStyle = wGlow;
+      ctx.fillRect(wx - 4, wy - 4, 11, 11);
+      // Window itself
+      ctx.fillStyle = '#ffe08a';
+      ctx.fillRect(wx, wy, 3, 3);
+    }
+  }
+
+  // Arrow slits on outer keep walls
+  ctx.fillStyle = '#1a1008';
+  for (const ax of [s.x - 13, s.x + 11]) {
+    ctx.fillRect(ax, s.y - 38, 1.5, 5);
+    ctx.fillRect(ax, s.y - 26, 1.5, 5);
+    ctx.fillRect(ax, s.y - 14, 1.5, 5);
+  }
+
+  // GRAND ENTRANCE ARCH
+  // Dark arch opening
+  ctx.fillStyle = '#0a0804';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 5, s.y - 2);
+  ctx.lineTo(s.x - 5, s.y - 11);
+  ctx.quadraticCurveTo(s.x, s.y - 16, s.x + 5, s.y - 11);
+  ctx.lineTo(s.x + 5, s.y - 2);
   ctx.closePath();
   ctx.fill();
-  // Portcullis vertical bars
-  ctx.strokeStyle = '#505060';
-  ctx.lineWidth = 1.1;
-  for (let bx = s.x - 5; bx <= s.x + 5; bx += 2.5) {
-    ctx.beginPath(); ctx.moveTo(bx, s.y - 15); ctx.lineTo(bx, s.y - 4); ctx.stroke();
+  // Stone arch frame
+  ctx.strokeStyle = '#2a2018';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Portcullis bars
+  ctx.strokeStyle = '#302820';
+  ctx.lineWidth = 0.6;
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.moveTo(s.x - 4 + i * 2, s.y - 11);
+    ctx.lineTo(s.x - 4 + i * 2, s.y - 3);
+    ctx.stroke();
   }
-  // Portcullis horizontal rails
-  ctx.beginPath(); ctx.moveTo(s.x - 6, s.y - 12); ctx.lineTo(s.x + 6, s.y - 12); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(s.x - 6, s.y -  7); ctx.lineTo(s.x + 6, s.y -  7); ctx.stroke();
   // Keystone
-  ctx.fillStyle = '#9898b0';
-  ctx.beginPath();
-  ctx.moveTo(s.x - 2.5, s.y - 17); ctx.lineTo(s.x + 2.5, s.y - 17);
-  ctx.lineTo(s.x + 2,   s.y - 11); ctx.lineTo(s.x - 2,   s.y - 11);
-  ctx.closePath(); ctx.fill();
-  // Gate surround rivets
-  ctx.fillStyle = '#5a5a6c';
-  ctx.fillRect(s.x - 8, s.y - 18, 2, 2);
-  ctx.fillRect(s.x + 6, s.y - 18, 2, 2);
+  ctx.fillStyle = '#9a9084';
+  ctx.fillRect(s.x - 1, s.y - 17, 2, 3);
 
-  // --- LIT WINDOWS on keep (3 rows) ---
-  ctx.fillStyle = '#ffeebb';
-  ctx.fillRect(s.x - 9, s.y - 54, 3, 5);
-  ctx.fillRect(s.x - 2, s.y - 54, 3, 5);
-  ctx.fillRect(s.x + 5, s.y - 54, 3, 5);
-  ctx.fillRect(s.x - 9, s.y - 42, 3, 5);
-  ctx.fillRect(s.x - 2, s.y - 42, 3, 5);
-  ctx.fillRect(s.x + 5, s.y - 42, 3, 5);
-  ctx.fillRect(s.x - 9, s.y - 30, 3, 5);
-  ctx.fillRect(s.x + 5, s.y - 30, 3, 5);
-  // Warm glow halos
-  ctx.fillStyle = 'rgba(255,240,140,0.15)';
-  const winPositions = [
-    [s.x - 7, s.y - 52], [s.x, s.y - 52], [s.x + 7, s.y - 52],
-    [s.x - 7, s.y - 40], [s.x, s.y - 40], [s.x + 7, s.y - 40],
-    [s.x - 7, s.y - 28], [s.x + 7, s.y - 28],
-  ];
-  for (let wi = 0; wi < winPositions.length; wi++) {
-    ctx.beginPath(); ctx.arc(winPositions[wi][0], winPositions[wi][1], 4.5, 0, Math.PI * 2); ctx.fill();
-  }
+  // CENTRAL ROOF — pyramidal keep cap
+  ctx.fillStyle = '#8a1818';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 16, s.y - 60);
+  ctx.lineTo(s.x, s.y - 78);
+  ctx.lineTo(s.x + 16, s.y - 60);
+  ctx.closePath();
+  ctx.fill();
+  // Roof shadow side
+  ctx.fillStyle = '#5a1010';
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - 78);
+  ctx.lineTo(s.x + 16, s.y - 60);
+  ctx.lineTo(s.x + 5, s.y - 66);
+  ctx.closePath();
+  ctx.fill();
+  // Gold spire finial
+  ctx.fillStyle = '#d4a820';
+  ctx.fillRect(s.x - 0.5, s.y - 84, 1, 6);
 
-  // --- FLAG POLES & BANNERS ---
-  // Left tower pole (gold)
-  ctx.fillStyle = '#c8a020';
-  ctx.fillRect(s.x - 25, s.y - 72, 2, 14);
-  // Right tower pole
-  ctx.fillRect(s.x + 23, s.y - 72, 2, 14);
-  // Central keep pole (tallest)
-  ctx.fillRect(s.x - 1, s.y - 84, 2, 20);
-  // Left banner (red)
-  ctx.fillStyle = '#c0392b';
+  // GOLD FLAG on top (largest, most prominent)
+  const flagSway = Math.sin(G.gameTick * 0.06) * 1.5;
+  ctx.fillStyle = '#d4a820';
   ctx.beginPath();
-  ctx.moveTo(s.x - 23, s.y - 72); ctx.lineTo(s.x - 13, s.y - 69);
-  ctx.lineTo(s.x - 23, s.y - 66);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.fillRect(s.x - 23, s.y - 71, 9, 1);
-  // Right banner (royal blue)
-  ctx.fillStyle = '#2471a3';
-  ctx.beginPath();
-  ctx.moveTo(s.x + 25, s.y - 72); ctx.lineTo(s.x + 35, s.y - 69);
-  ctx.lineTo(s.x + 25, s.y - 66);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.fillRect(s.x + 25, s.y - 71, 9, 1);
-  // Central keep banner (gold royal)
-  ctx.fillStyle = '#d4a017';
-  ctx.beginPath();
-  ctx.moveTo(s.x + 1, s.y - 84); ctx.lineTo(s.x + 12, s.y - 81);
-  ctx.lineTo(s.x + 1, s.y - 78);
-  ctx.closePath(); ctx.fill();
-  // Crown emblem — tiny cross on gold banner
-  ctx.fillStyle = '#fff8e0';
-  ctx.fillRect(s.x + 4, s.y - 83, 1, 4);
-  ctx.fillRect(s.x + 3, s.y - 82, 3, 1);
+  ctx.moveTo(s.x, s.y - 84);
+  ctx.lineTo(s.x + 8 + flagSway, s.y - 82);
+  ctx.lineTo(s.x + 7 + flagSway, s.y - 78);
+  ctx.lineTo(s.x, s.y - 79);
+  ctx.closePath();
+  ctx.fill();
+  // Cross emblem on flag
+  ctx.fillStyle = '#8a6014';
+  ctx.fillRect(s.x + 3 + flagSway * 0.5, s.y - 82.5, 0.6, 3);
+  ctx.fillRect(s.x + 2 + flagSway * 0.5, s.y - 81, 2.5, 0.6);
 }
 
 function drawGranary(ctx, s) {
@@ -4414,6 +4518,34 @@ function drawWater(ctx, x, y, a, tx, ty) {
     ctx.globalAlpha = a * Math.max(0, alpha);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.fillRect(x - 10 + off, y - 3 + i * 4, 16, 0.8);
+  }
+
+  // ── Layer 4c: occasional strong specular flash (sun glint on water) ──
+  const flashPhase = G.gameTick * 0.03 + (tx * 0.7 + ty * 0.3);
+  const flashIntensity = Math.max(0, Math.sin(flashPhase) - 0.7) * 3; // spikes rarely
+  if (flashIntensity > 0) {
+    ctx.globalAlpha = a * flashIntensity * 0.6;
+    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.beginPath();
+    ctx.ellipse(x + (tx*3)%15-7, y + (ty*3)%5-2, 2, 1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = a;
+  }
+
+  // ── Layer 4d: golden sparkles during daytime (sun reflection) ──
+  const sparkPhase = (G.gameTick * 0.02) + (tx * 1.7 + ty * 0.9);
+  const sparkle = Math.max(0, Math.sin(sparkPhase * 0.3) - 0.85) * 6; // rare bright peak
+  if (sparkle > 0 && a > 0.7) {
+    ctx.globalAlpha = sparkle * a;
+    // Small cross-shaped sparkle
+    ctx.strokeStyle = 'rgba(255, 240, 180, 0.9)';
+    ctx.lineWidth = 1;
+    const sx = x + (tx * 5 % 16) - 8, sy = y + (ty * 3 % 6) - 3;
+    ctx.beginPath();
+    ctx.moveTo(sx - 3, sy); ctx.lineTo(sx + 3, sy);
+    ctx.moveTo(sx, sy - 2); ctx.lineTo(sx, sy + 2);
+    ctx.stroke();
+    ctx.globalAlpha = a;
   }
 
   // ── Layer 5: foam/whitecaps at land-adjacent edges ───────────

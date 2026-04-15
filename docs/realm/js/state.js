@@ -106,6 +106,7 @@ export const G = {
   season: 'spring',
   rallyPoint: null,
   won: false,
+  clouds: null,
   cameraShake: 0,
   difficulty: 'normal', // easy, normal, hard
   scenario: 'peaceful_start', // selected scenario id

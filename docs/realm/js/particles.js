@@ -28,6 +28,16 @@ export function updateParticles() {
     if (p.type === 'pollen') {
       p.tx += (p.vx || 0) + Math.sin(G.gameTick * 0.02 + p.tx * 3) * 0.001;
     }
+    if (p.type === 'firefly') {
+      // Gentle floating with direction changes
+      p.tx += (p.vx || 0);
+      p.offsetY += (p.vy2 || 0);
+      // Random direction tweaks
+      if (Math.random() < 0.02) {
+        p.vx = (Math.random() - 0.5) * 0.06;
+        p.vy2 = (Math.random() - 0.5) * 0.05;
+      }
+    }
     if (p.alpha <= 0) G.particles.splice(i, 1);
   }
 }
@@ -42,11 +52,11 @@ export function spawnSmoke(tx, ty) {
     ty: ty + (Math.random() - 0.5) * 0.1,
     offsetY: -30 - Math.random() * 5,
     text: null,
-    alpha: 0.35 + Math.random() * 0.15,
-    vy: -0.15 - Math.random() * 0.1,
-    decay: 0.003 + Math.random() * 0.002,
+    alpha: 0.45 + Math.random() * 0.15,
+    vy: -0.2 - Math.random() * 0.1,  // faster rise
+    decay: 0.002 + Math.random() * 0.002, // longer lifetime
     type: 'smoke',
-    size: 1.5 + Math.random(),
+    size: 2 + Math.random() * 1.5,  // bigger
   });
 }
 
@@ -144,6 +154,42 @@ export function updateSmokeEmitters() {
       type: 'pollen',
       size: 0.8 + Math.random() * 0.6,
       vx: (Math.random() - 0.5) * 0.03,
+    });
+  }
+
+  // Fireflies at night (magical atmosphere)
+  if (G.dayPhase / G.dayLength > 0.7 && G.gameTick % 30 === 0 && G.particles.length < 180) {
+    const cx = G.camera.x / 32, cy = G.camera.y / 16;
+    G.particles.push({
+      tx: cx + (Math.random() - 0.5) * 18,
+      ty: cy + (Math.random() - 0.5) * 14,
+      offsetY: -2 - Math.random() * 18,
+      text: null,
+      alpha: 0.4 + Math.random() * 0.3,
+      vy: 0,
+      decay: 0.0015,
+      type: 'firefly',
+      size: 0.8 + Math.random() * 0.4,
+      vx: (Math.random() - 0.5) * 0.05,
+      vy2: (Math.random() - 0.5) * 0.04,
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+
+  // Sun dust motes (daytime, rare)
+  if (G.dayPhase / G.dayLength > 0.1 && G.dayPhase / G.dayLength < 0.6 && G.gameTick % 40 === 0 && G.particles.length < 200) {
+    const cx = G.camera.x / 32, cy = G.camera.y / 16;
+    G.particles.push({
+      tx: cx + (Math.random() - 0.5) * 20,
+      ty: cy + (Math.random() - 0.5) * 15,
+      offsetY: -5 - Math.random() * 20,
+      text: null,
+      alpha: 0.3 + Math.random() * 0.3,
+      vy: -0.005,
+      decay: 0.0012,
+      type: 'dustmote',
+      size: 0.5 + Math.random() * 0.4,
+      phase: Math.random() * Math.PI * 2,
     });
   }
 
