@@ -59,6 +59,7 @@
 - Warm window glow on houses at night (loop 44)
 - Rotating windmill blades overlay (loop 45)
 - Acorns drop in autumn (loop 46)
+- Pulsating tide foam on coastal sand (loop 47)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -238,3 +239,5 @@
 ### Loop 45 — visibly rotating 4-blade windmill overlay on each windmill.
 
 ### Loop 46 — acorns drop from autumn forest tiles, settle on the ground.
+
+### Loop 47 — pulsating tide foam on sand tiles bordering water (slow tidal cycle).

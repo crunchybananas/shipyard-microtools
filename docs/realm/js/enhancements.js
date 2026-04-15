@@ -2259,3 +2259,37 @@ function renderAcorns(ctx) {
 }
 registerUpdater(updateAcorns);
 registerWorldRenderer(renderAcorns);
+
+// ── Loop 47: Coastal tide foam shifts with day phase ───────
+function renderTideFoam(ctx) {
+  if (G.camera.zoom < 0.5) return;
+  const tt = G.gameTick * 0.01;
+  const tideOffset = Math.sin(tt * 0.05) * 0.4; // slow tidal cycle
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 24 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  ctx.fillStyle = 'rgba(240,250,255,0.55)';
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.SAND) continue;
+      // adjacent water?
+      let nearWater = false;
+      for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+        if (G.map[ty+dy] && G.map[ty+dy][tx+dx] === TILE.WATER) { nearWater = true; break; }
+      }
+      if (!nearWater) continue;
+      const s = toScreen(tx, ty);
+      const wPhase = ((tx + ty) * 0.6 + tt) % (Math.PI * 2);
+      const len = 8 + Math.sin(wPhase) * 3 + tideOffset * 4;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 4, len, 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderTideFoam);
