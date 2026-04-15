@@ -3671,3 +3671,24 @@ function renderChurchGlow(ctx) {
   }
 }
 registerWorldRenderer(renderChurchGlow);
+
+// ── Loop 87: Long shadows of soldiers extending at sunset ──
+function renderSoldierShadows(ctx) {
+  if (!G.soldiers || G.camera.zoom < 0.7) return;
+  const t = G.dayPhase / G.dayLength;
+  const lowSun = (t > 0.6 && t < 0.78);
+  if (!lowSun) return;
+  const len = (t - 0.6) / 0.18 * 18;
+  ctx.fillStyle = 'rgba(20,15,10,0.45)';
+  for (const sd of G.soldiers) {
+    const s = toScreen(sd.x, sd.y);
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(s.x + len, s.y - 1);
+    ctx.lineTo(s.x + len + 2, s.y + 1);
+    ctx.lineTo(s.x, s.y + 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+registerWorldRenderer(renderSoldierShadows);
