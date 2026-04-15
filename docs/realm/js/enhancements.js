@@ -1309,3 +1309,33 @@ function renderDragon(ctx) {
 }
 registerUpdater(updateDragon, true);
 registerScreenRenderer(renderDragon);
+
+// ── Loop 26: Wind-rippled grass/wheat overlay near farms ───
+function renderWindRipple(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const tt = G.gameTick * 0.04;
+  for (const b of G.buildings) {
+    if (b.type !== 'farm') continue;
+    const s = toScreen(b.x, b.y);
+    // Draw a wave of small wheat strokes around the farm tile
+    for (let i = 0; i < 12; i++) {
+      const ang = (i / 12) * Math.PI * 2;
+      const r = 12 + (i & 1) * 4;
+      const wx = s.x + Math.cos(ang) * r;
+      const wy = s.y + Math.sin(ang) * r * 0.5 + 8;
+      const sway = Math.sin(tt + i * 0.5 + b.x + b.y) * 1.2;
+      ctx.strokeStyle = 'rgba(212,180,80,0.85)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(wx, wy);
+      ctx.lineTo(wx + sway, wy - 3);
+      ctx.stroke();
+      // Head dot
+      ctx.fillStyle = 'rgba(232,210,120,0.95)';
+      ctx.beginPath();
+      ctx.arc(wx + sway, wy - 3.5, 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+registerWorldRenderer(renderWindRipple);

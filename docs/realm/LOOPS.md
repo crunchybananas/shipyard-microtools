@@ -38,6 +38,7 @@
 - Smoking volcano on a mountain peak (loop 23)
 - Floating status bubbles above buildings (loop 24)
 - Rare dragon flyover (loop 25)
+- Wind-rippled wheat halos around farms (loop 26)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -175,3 +176,5 @@
 ### Loop 24 — floating status bubbles above buildings ('?' for understaffed, '!' for low food on farms).
 
 ### Loop 25 — rare dragon flyover (screen space): purple body, animated wings, occasional fire breath.
+
+### Loop 26 — wind-rippled wheat halo around each farm building (animated sway).
