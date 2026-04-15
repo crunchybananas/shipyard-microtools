@@ -83,6 +83,7 @@
 - Sabbath light beams from churches (loop 68)
 - Compass signposts at map edges (loop 69)
 - Pumpkin patches at farms in autumn (loop 70)
+- Bats fly across night sky (loop 71)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -310,3 +311,5 @@
 ### Loop 69 — N/S/E/W stone signposts at map edges (orientation cue).
 
 ### Loop 70 — pumpkin patch decorations around farms in autumn.
+
+### Loop 71 — bats erratically fly across screen at night.

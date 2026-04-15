@@ -3128,3 +3128,59 @@ function renderPumpkins(ctx) {
   }
 }
 registerWorldRenderer(renderPumpkins);
+
+// ── Loop 71: Bats fly around at night above forest ─────────
+function updateBats(logicalW, logicalH) {
+  if (!G.bats) G.bats = [];
+  const t = G.dayPhase / G.dayLength;
+  const isNight = t > 0.7 || t < 0.1;
+  if (!isNight) { G.bats.length = 0; return; }
+  if (G.gameTick % 200 === 0 && G.bats.length < 4) {
+    G.bats.push({
+      x: Math.random() * (logicalW || 1500),
+      y: Math.random() * (logicalH || 800) * 0.5 + 50,
+      vx: (Math.random() - 0.5) * 2.5,
+      vy: (Math.random() - 0.5) * 1,
+      life: 1000, phase: 0,
+    });
+  }
+  for (let i = G.bats.length - 1; i >= 0; i--) {
+    const b = G.bats[i];
+    b.x += b.vx; b.y += b.vy;
+    b.phase += 0.4 * G.speed;
+    if (Math.random() < 0.04) { b.vx += (Math.random() - 0.5) * 1.2; b.vy += (Math.random() - 0.5) * 0.5; }
+    b.vx = Math.max(-3, Math.min(3, b.vx));
+    b.vy = Math.max(-1.5, Math.min(1.5, b.vy));
+    b.life -= G.speed;
+    if (b.life <= 0 || b.x < -50 || b.x > (logicalW || 1500) + 50 || b.y > (logicalH || 800)) G.bats.splice(i, 1);
+  }
+}
+function renderBats(ctx) {
+  if (!G.bats || !G.bats.length) return;
+  ctx.save();
+  ctx.fillStyle = 'rgba(20,15,25,0.85)';
+  for (const b of G.bats) {
+    const dir = b.vx >= 0 ? 1 : -1;
+    const wing = Math.sin(b.phase) * 4;
+    // body
+    ctx.beginPath();
+    ctx.ellipse(b.x, b.y, 1.5, 0.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Wings as triangles flapping
+    ctx.beginPath();
+    ctx.moveTo(b.x - 1, b.y);
+    ctx.lineTo(b.x - 5 * dir, b.y - 2 - wing);
+    ctx.lineTo(b.x - 4 * dir, b.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(b.x + 1, b.y);
+    ctx.lineTo(b.x + 5 * dir, b.y - 2 - wing);
+    ctx.lineTo(b.x + 4 * dir, b.y);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateBats, true);
+registerScreenRenderer(renderBats);
