@@ -3578,3 +3578,36 @@ function renderUnderwaterBubbles(ctx) {
   ctx.globalAlpha = 1;
 }
 registerWorldRenderer(renderUnderwaterBubbles);
+
+// ── Loop 84: Cat naps on roofs of houses ───────────────────
+function renderRoofCats(ctx) {
+  if (G.camera.zoom < 1.0) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'house') continue;
+    const seed = (b.x * 41 + b.y * 23) | 0;
+    if ((seed & 7) !== 0) continue; // ~1 in 8 houses has a cat
+    const s = toScreen(b.x, b.y);
+    const cx = s.x - 4, cy = s.y - 14;
+    // Body curled up
+    ctx.fillStyle = (seed & 8) ? '#5a3018' : '#3a3a3a';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 2.2, 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Head
+    ctx.beginPath();
+    ctx.arc(cx + 2, cy - 0.5, 1, 0, Math.PI * 2);
+    ctx.fill();
+    // Ears
+    ctx.beginPath();
+    ctx.moveTo(cx + 1.4, cy - 1.2); ctx.lineTo(cx + 1.7, cy - 2); ctx.lineTo(cx + 2, cy - 1.2); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx + 2.2, cy - 1.2); ctx.lineTo(cx + 2.5, cy - 2); ctx.lineTo(cx + 2.8, cy - 1.2); ctx.fill();
+    // Tail curled
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.arc(cx - 1.5, cy + 0.5, 1.2, -Math.PI * 0.2, Math.PI);
+    ctx.stroke();
+  }
+}
+registerWorldRenderer(renderRoofCats);

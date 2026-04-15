@@ -96,6 +96,7 @@
 - Large screen-space snowflakes in winter (loop 81)
 - Steam from wells in winter (loop 82)
 - Underwater bubbles rise on water tiles (loop 83)
+- Rooftop cats nap on houses (loop 84)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -349,3 +350,5 @@
 ### Loop 82 — wells emit visible steam plumes in winter (warm water vs cold air).
 
 ### Loop 83 — small bubble pairs rise from random water tiles (suggests fish / underwater life).
+
+### Loop 84 — cats nap on rooftops of ~1/8 houses (orange or black tabby).
