@@ -144,7 +144,7 @@ export function updateProduction() {
           tx: b.x, ty: b.y,
           homeBuilding: b,
           type: 'swordsman',
-          hp: 50, maxHp: 50,
+          hp: 75, maxHp: 75,
           state: 'patrol',
           stateTimer: 0,
           target: null,
@@ -600,7 +600,7 @@ export function updateFires() {
 
 export function collectTaxes() {
   // Only count housed population (not vagrants)
-  const housed = G.buildings.filter(b => b.type === 'house').length * 3;
+  const housed = G.buildings.filter(b => b.type === 'house').length * 4;
   const effectivePop = Math.min(housed, G.population);
   // Happiness modifier: happy citizens pay more
   const happyMod = G.happiness / 100;

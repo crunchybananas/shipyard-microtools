@@ -73,6 +73,7 @@ export function updateProjectiles() {
       // Hit target
       if (p.target && p.target.hp !== undefined) {
         p.target.hp -= p.damage;
+        if (G.gameTick % 10 === 0) playSound('click');
       }
       G.projectiles.splice(i, 1);
     } else {
@@ -90,7 +91,7 @@ export function updateTowers() {
     b.fireTimer = (b.fireTimer || 0) - G.speed;
     if (b.fireTimer > 0) continue;
     // Find nearest enemy
-    const range = b.type === 'tower' ? 8 : 5;
+    const range = b.type === 'tower' ? 10 : 6;
     let target = null, bestD = Infinity;
     for (const e of G.enemies) {
       const d = Math.sqrt((e.x-b.x)**2 + (e.y-b.y)**2);

@@ -424,7 +424,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
     <div class="title-icon">🏰</div>
     <h1 class="title-name">REALM</h1>
     <p class="title-sub">A Settlement Builder</p>
-    <p class="title-desc">Build, research, trade, and survive the seasons.<br>Grow your village into a kingdom.</p>
+    <p class="title-desc">Build, fight, trade, and survive. Grow your island settlement into a medieval kingdom.</p>
     <div class="title-difficulty">
       <button class="diff-btn active" data-diff="easy" onclick="setDifficulty('easy')">🟢 Easy</button>
       <button class="diff-btn" data-diff="normal" onclick="setDifficulty('normal')">🟡 Normal</button>
@@ -455,25 +455,26 @@ canvas#game{display:block;position:absolute;top:0;left:0}
     </div>
     <p class="title-credit">Made with 🧡 by Cory Loken & Claude · Zero dependencies</p>
   </div>
-  <div id="title-version">v0.9</div>
+  <div id="title-version">v1.0</div>
 </div>
 
 <canvas id="game"></canvas>
 
 <div id="hud">
-  <div class="res"><span class="res-emoji">🪵</span><span class="val" id="r-wood">50</span></div>
-  <div class="res"><span class="res-emoji">🪨</span><span class="val" id="r-stone">30</span></div>
-  <div class="res"><span class="res-emoji">🍎</span><span class="val" id="r-food">40</span></div>
-  <div class="res"><span class="res-emoji">🪙</span><span class="val" id="r-gold">10</span></div>
-  <div class="res"><span class="res-emoji">⚙️</span><span class="val" id="r-iron">0</span></div>
+  <div class="res" title="Wood — build most structures"><span class="res-emoji">🪵</span><span class="val" id="r-wood">50</span></div>
+  <div class="res" title="Stone — defensive buildings and upgrades"><span class="res-emoji">🪨</span><span class="val" id="r-stone">30</span></div>
+  <div class="res" title="Food — feeds your population"><span class="res-emoji">🍎</span><span class="val" id="r-food">40</span></div>
+  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji">🪙</span><span class="val" id="r-gold">10</span></div>
+  <div class="res" title="Iron — weapons and advanced buildings"><span class="res-emoji">⚙️</span><span class="val" id="r-iron">0</span></div>
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
-  <div class="res"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
+  <div class="res" title="Soldiers under your command"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
   <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
   <span id="kingdom-display"></span>
   <span id="day-display">Day 1</span>
   <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
   <button class="hud-btn" onclick="toggleHappiness()">😊</button>
   <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()">🔊</button>
+  <button class="hud-btn" id="btn-music" onclick="toggleMusicBtn()">🎵</button>
   <button class="hud-btn" onclick="toggleAchievements()">🏆</button>
   <button class="hud-btn" onclick="toggleStats()">📊</button>
   <button class="hud-btn" onclick="toggleLog()">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>

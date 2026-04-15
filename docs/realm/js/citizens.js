@@ -5,6 +5,7 @@
 import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData } from './state.js';
 import { findPath } from './pathfinding.js';
 import { getCitizenSpeedMult } from './events.js';
+import { revealAround } from './world.js';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -21,6 +22,14 @@ function pathTo(c, tx, ty) {
 
 export function updateCitizens() {
   for (const c of G.citizens) {
+    // Reveal fog around citizen after movement
+    const _cx = Math.round(c.x), _cy = Math.round(c.y);
+    if (_cx >= 0 && _cx < MAP_W && _cy >= 0 && _cy < MAP_H) {
+      if (!G.fog[_cy][_cx]) {
+        revealAround(_cx, _cy, 2);
+      }
+    }
+
     // Hungry emote — show 🍽️ when hunger is high and no food available
     if (c.hunger > 70 && G.resources.food <= 0) {
       const emoteInterval = 120; // every 2 seconds at 1x

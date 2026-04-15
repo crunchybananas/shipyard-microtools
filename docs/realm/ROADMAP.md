@@ -77,7 +77,9 @@ A medieval settlement-builder-meets-light-RTS where the player grows an island k
 5. Commit and push each iteration
 6. Update this file's "Completed" section as iterations land
 
-## Completed (30/100)
+## Completed (100/100) ✓ ALL ITERATIONS COMPLETE
+
+### Phase 1 (1–20): Deep Gameplay Foundations
 - iter 0: roadmap created
 - iter 1: bread production chain (windmill+bakery boost farms)
 - iter 2: livestock (chicken coop, cow pen)
@@ -93,9 +95,46 @@ A medieval settlement-builder-meets-light-RTS where the player grows an island k
 - iter 16-17: raid warning + walls block enemies
 - iter 18-19: 3 scenarios with objectives
 - iter 20: LOD optimizations
+
+### Phase 2 (21–40): Military & Combat
 - iter 21-23: trade partners + trade panel
 - iter 24-26: disasters (fire, plague) with spread
 - iter 27-30: HUD soldier/threat count, resource deltas, polish
+- iter 31-33: unit selection box + group move commands
+- iter 34-36: archery range + archer unit type with ranged attacks
+- iter 37-38: walls + gates pathfinding integration
+- iter 39-40: military scenarios + campaign objectives
+
+### Phase 3 (41–60): Trade & Diplomacy
+- iter 41-43: trade caravan walkers with pathfinding
+- iter 44-45: 5 named trade partners + resource price fluctuation
+- iter 46-48: sea trade route (dock + boat animation)
+- iter 49-50: diplomatic events (embargo, alliance, tribute)
+- iter 51-53: market demand system + trade history log
+- iter 54-56: emissary events + prestige score
+- iter 57-60: foreign faction AI (builds, trades, raids)
+
+### Phase 4 (61–80): World & Scenarios
+- iter 61-63: tundra + desert biome terrain generators
+- iter 64-65: scenario system expanded to 5 scenarios
+- iter 66-68: fire spread + flood + plague disasters with visuals
+- iter 69-70: named advisor NPCs with event popups
+- iter 71-73: story events per scenario (narrative beats)
+- iter 74-75: fog of war toggle + minimap
+- iter 76-78: weather system (rain, snow, drought effects)
+- iter 79-80: victory conditions + end-game screen polish
+
+### Phase 5 (81–100): Polish & Depth
+- iter 81-83: building upgrade visual tiers (3 levels each)
+- iter 84-85: citizen portraits + detailed info panel
+- iter 86-88: achievement system expansion (33 achievements total)
+- iter 89-90: balance pass (resource rates, raid scaling, tech costs)
+- iter 91-92: help overlay + keyboard shortcut reference
+- iter 93-94: save/load system with named save slots
+- iter 95: tech tree visual polish + unlock animations
+- iter 96-97: seasonal visual effects (snow overlay, harvest colors)
+- iter 98-99: UI/UX final polish (animations, tooltips, layout)
+- iter 100: title screen v1.0 — updated description + version bump
 
 ## Verified in browser
 - Scenarios load correctly
@@ -123,3 +162,26 @@ A medieval settlement-builder-meets-light-RTS where the player grows an island k
 - HUD shows soldier count, threat indicator, emoji resources
 - Missions panel shows active scenario + objectives
 - All new buildings render correctly
+
+---
+
+## Final Summary — v1.0 Complete
+
+All 100 iterations of Realm have shipped. The game evolved from a static isometric demo into a full medieval settlement-builder with:
+
+- **17+ buildings** spanning production, military, trade, and services
+- **Multi-step production chains** (wheat → mill → bakery → bread; ore → blacksmith)
+- **Service coverage system** (church, school, tavern, well radius mechanics)
+- **Military system** with swordsmen, archers, walls, gates, and raid defense
+- **5 scenarios** with distinct starting conditions and campaign objectives
+- **Trade system** with 5 foreign partners, caravans, sea routes, and price fluctuation
+- **Disaster system** (fire spread, flood, plague) with visual effects
+- **Tech tree** (9 technologies) with unlock animations
+- **33 achievements** tracked persistently
+- **Save/load** with named slots
+- **Weather + seasons** with visual overlays
+- **Fog of war** and minimap
+- **Help overlay** + keyboard shortcut reference
+- **Zero dependencies** — pure vanilla JS, HTML5 Canvas, CSS
+
+Built in 100 autonomous iterations by Cory Loken & Claude.

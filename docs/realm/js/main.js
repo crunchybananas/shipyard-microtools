@@ -16,7 +16,7 @@ import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPan
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame, getSaveSize } from './save.js';
-import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound } from './audio.js';
+import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound, tickMusic, toggleMusic } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
 import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
@@ -186,6 +186,11 @@ window.toggleAmbientSound = () => {
   const btn = document.getElementById('btn-ambient');
   if (btn) btn.textContent = on ? '🔊' : '🔇';
 };
+window.toggleMusicBtn = () => {
+  const on = toggleMusic();
+  const btn = document.getElementById('btn-music');
+  if (btn) btn.textContent = on ? '🎵' : '🔕';
+};
 window.toggleMissions = () => {
   const c = document.getElementById('missions-content');
   const t = document.getElementById('missions-toggle');
@@ -260,7 +265,7 @@ function simTick() {
     updateTutorialTip();
   }
   if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); }
-  if (G.gameTick % 120 === 0) checkAdvisor();
+  if (G.gameTick % 120 === 0) { tickMusic(); checkAdvisor(); }
   if (G.gameTick % 120 === 0 && !G._scenarioWon) {
     if (checkScenarioComplete()) {
       G._scenarioWon = true;

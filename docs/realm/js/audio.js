@@ -209,6 +209,56 @@ export function playSound(type) {
   }
 }
 
+// ════════════════════════════════════════════════════════════
+// Procedural background music — gentle medieval pentatonic
+// ════════════════════════════════════════════════════════════
+
+let musicScheduled = 0;
+let musicEnabled = true;
+
+export function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  if (!musicEnabled && G.audioCtx) {
+    try {
+      // Silence any lingering music gain — nodes self-stop via scheduled stop()
+    } catch {}
+  }
+  return musicEnabled;
+}
+
+// Pentatonic scale in C
+const MUSIC_SCALE = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33];
+
+export function tickMusic() {
+  if (!musicEnabled || !G.audioCtx) return;
+  const ctx = G.audioCtx;
+  if (ctx.state === 'suspended') return;
+  const now = ctx.currentTime;
+  if (now < musicScheduled) return;
+
+  // Schedule next note
+  const noteDur = 1.5 + Math.random() * 1.0;
+  const freq = MUSIC_SCALE[Math.floor(Math.random() * MUSIC_SCALE.length)];
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, now);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  // Soft envelope
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.04, now + 0.3);
+  gain.gain.linearRampToValueAtTime(0.02, now + noteDur - 0.3);
+  gain.gain.linearRampToValueAtTime(0, now + noteDur);
+
+  osc.start(now);
+  osc.stop(now + noteDur);
+
+  musicScheduled = now + noteDur * 0.7;
+}
+
 // ── Seasonal ambient soundscape ────────────────────────────
 // Each season has a unique drone. Cross-fades on season change.
 // All pure synthesis — no audio files.

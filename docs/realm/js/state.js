@@ -17,8 +17,8 @@ export const TILE_COLORS = {
 };
 
 export const BUILDINGS = {
-  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:3, desc:'Shelters 3 settlers. Generates tax income based on happiness.' },
-  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:2}, workers:1, desc:'Produces food each cycle',
+  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, desc:'Shelters 4 settlers. Generates tax income based on happiness.' },
+  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:3}, workers:1, desc:'Produces food each cycle',
     upgrades: [
       { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },
       { cost:{wood:25,stone:20,iron:5},  prodMult:2.0, name:'Level 3' },
