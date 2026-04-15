@@ -28,6 +28,7 @@
 - Merchant carts visit markets (loop 13)
 - Rainbow after rain (loop 14)
 - Hawks circle overhead (loop 15)
+- Constellation line patterns at night (loop 16)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -120,3 +121,9 @@
 - Ideas: (1) **hawks circling overhead** (2) constellations connecting stars at night (3) shooting stars from horizon
 - Chose: hawks (hovering predator above complements wolves below)
 - Implemented: enhancements.js updateHawks/renderHawks. Rare daytime spawn, circle elliptically around a center point, triangular wings + tail fan silhouette.
+
+### Loop 16
+- Validator: night sky has stars but no structure; eye doesn't latch onto patterns.
+- Ideas: (1) **constellation patterns connecting bright stars** (2) zodiac wheel near horizon (3) crescent moon phases per day
+- Chose: constellations (mythic feel, simple line art)
+- Implemented: enhancements.js renderConstellations. Three named patterns (dragon/cup/archer) at fixed screen-space coords with line-connecting bright stars + cross sparkles.

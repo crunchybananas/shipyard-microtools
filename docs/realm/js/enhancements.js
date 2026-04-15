@@ -8,6 +8,52 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 16: Constellation patterns connecting bright stars ─
+// Hand-crafted "constellation" line patterns drawn at fixed
+// screen-space positions, only at deep night.
+const CONSTELLATIONS = [
+  // each: array of [xFrac, yFrac] points; lines connect sequentially
+  { name: 'dragon',  pts: [[0.12,0.10],[0.16,0.13],[0.21,0.11],[0.26,0.14],[0.30,0.12],[0.34,0.16],[0.32,0.21]] },
+  { name: 'cup',     pts: [[0.50,0.08],[0.54,0.12],[0.58,0.08],[0.54,0.16],[0.54,0.20]] },
+  { name: 'archer',  pts: [[0.74,0.18],[0.77,0.13],[0.80,0.18],[0.83,0.13],[0.81,0.22]] },
+];
+export function renderConstellations(ctx, logicalW, logicalH) {
+  const dayl = getDaylight();
+  const nightStrength = Math.max(0, Math.min(1, (0.7 - dayl) / 0.25));
+  if (nightStrength < 0.1) return;
+  ctx.save();
+  ctx.strokeStyle = `rgba(180,200,255,${nightStrength * 0.18})`;
+  ctx.lineWidth = 0.8;
+  ctx.fillStyle = `rgba(220,235,255,${nightStrength * 0.95})`;
+  for (const c of CONSTELLATIONS) {
+    // Lines
+    ctx.beginPath();
+    for (let i = 0; i < c.pts.length; i++) {
+      const [fx, fy] = c.pts[i];
+      const x = fx * logicalW, y = fy * logicalH;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    // Brighter star at each vertex
+    for (const [fx, fy] of c.pts) {
+      const x = fx * logicalW, y = fy * logicalH;
+      ctx.beginPath();
+      ctx.arc(x, y, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+      // Cross sparkle
+      ctx.strokeStyle = `rgba(220,235,255,${nightStrength * 0.55})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x - 3, y); ctx.lineTo(x + 3, y);
+      ctx.moveTo(x, y - 3); ctx.lineTo(x, y + 3);
+      ctx.stroke();
+      ctx.strokeStyle = `rgba(180,200,255,${nightStrength * 0.18})`;
+      ctx.lineWidth = 0.8;
+    }
+  }
+  ctx.restore();
+}
+
 // ── Loop 15: Hawks circling overhead casting shadows ───────
 export function updateHawks(logicalW, logicalH) {
   if (!G.hawks) G.hawks = [];
