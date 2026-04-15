@@ -8,6 +8,55 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 10: Glowing mushroom clusters in dark forest ──────
+// Deterministically placed (seeded by tile coords) — render only at night
+export function renderGlowMushrooms(ctx) {
+  const t = G.dayPhase / G.dayLength;
+  const nightStrength = Math.max(0, Math.min(1, (0.75 - getDaylight()) / 0.3));
+  if (nightStrength < 0.05 || G.camera.zoom < 0.7) return;
+  // Iterate over visible tiles only via camera bounds
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 28 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2; // approx center tile
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.FOREST) continue;
+      // Stable hash to decide if this tile has a mushroom cluster (~12% of forest tiles)
+      const h = ((tx * 73856093) ^ (ty * 19349663)) >>> 0;
+      if (h % 100 > 12) continue;
+      const s = toScreen(tx, ty);
+      const cluster = 2 + (h % 3);
+      for (let i = 0; i < cluster; i++) {
+        const off = ((h + i * 911) % 100) / 100;
+        const off2 = ((h + i * 1373) % 100) / 100;
+        const mx = s.x + (off - 0.5) * 18;
+        const my = s.y + (off2 - 0.5) * 8 + 2;
+        const pulse = 0.6 + 0.4 * Math.sin(G.gameTick * 0.05 + i + tx + ty);
+        const a = nightStrength * pulse;
+        // Cyan-green glow halo
+        const grad = ctx.createRadialGradient(mx, my, 0, mx, my, 6);
+        grad.addColorStop(0, `rgba(120,255,200,${a * 0.85})`);
+        grad.addColorStop(1, 'rgba(120,255,200,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(mx, my, 6, 0, Math.PI * 2);
+        ctx.fill();
+        // Bright core
+        ctx.fillStyle = `rgba(220,255,230,${a})`;
+        ctx.beginPath();
+        ctx.arc(mx, my, 0.9, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  ctx.restore();
+}
+
 // ── Loop 9: Wolves prowling near forest at night ────────────
 export function updateWolves() {
   if (!G.wolves) G.wolves = [];

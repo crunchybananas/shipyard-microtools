@@ -22,6 +22,7 @@
 - Aurora borealis on winter nights (loop 7)
 - Frozen lake ice sheets in winter (loop 8)
 - Wolves prowling at night (loop 9)
+- Glowing bioluminescent mushrooms in forest at night (loop 10)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -78,3 +79,9 @@
 - Ideas: (1) **wolves prowling near forest at night** (2) ghostly will-o-wisps in marshes (3) glowing mushrooms in dark forests
 - Chose: wolves (adds tension + nocturnal life balancing daytime herbivores)
 - Implemented: enhancements.js updateWolves/renderWolves. Spawn near forest at night, prowl between forest/grass, yellow glowing eyes, occasional howl arc indicators, despawn at sunrise.
+
+### Loop 10
+- Validator: forest tiles look identical at night vs day — only darken; missing magical/dangerous undertone.
+- Ideas: (1) **glowing bioluminescent mushrooms** (2) low ground mist between trees (3) wisp lights between branches
+- Chose: glow mushrooms (cheap render, deterministic placement, adds magic)
+- Implemented: enhancements.js renderGlowMushrooms — deterministic per-tile (~12% of forest tiles), 2-4 cyan-green glow points per cluster, screen-blend, pulse animation, only at night, only on visible viewport.
