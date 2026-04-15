@@ -57,6 +57,7 @@
 - Citizen motion dust trails (loop 42)
 - Swallows dart in spring sky (loop 43)
 - Warm window glow on houses at night (loop 44)
+- Rotating windmill blades overlay (loop 45)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -232,3 +233,5 @@
 ### Loop 43 — swallows dart erratically across spring daytime sky (small forked silhouettes).
 
 ### Loop 44 — warm window glow on houses+taverns at night (flickering candlelight).
+
+### Loop 45 — visibly rotating 4-blade windmill overlay on each windmill.

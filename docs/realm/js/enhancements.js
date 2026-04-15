@@ -2187,3 +2187,39 @@ function renderHouseWindows(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderHouseWindows);
+
+// ── Loop 45: Rotating windmill blade overlay ────────────────
+function renderWindmillSpin(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'windmill') continue;
+    const s = toScreen(b.x, b.y);
+    const cx = s.x, cy = s.y - 22;
+    const ang = G.gameTick * 0.05;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#f0e8d4';
+    ctx.strokeStyle = '#5a3a14';
+    ctx.lineWidth = 0.5;
+    for (let k = 0; k < 4; k++) {
+      ctx.save();
+      ctx.rotate(k * Math.PI / 2);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(7, -1.5);
+      ctx.lineTo(8, 0);
+      ctx.lineTo(7, 1.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.fillStyle = '#3a2410';
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderWindmillSpin);
