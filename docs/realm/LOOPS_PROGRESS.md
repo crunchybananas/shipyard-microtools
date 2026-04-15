@@ -1,36 +1,14 @@
 # Realm — Autonomous Loops Progress
 
-## Through Loop 20 (commit 030ee96)
-
-### Features shipped this batch (loops 4-20)
-- L4: Wandering fishing boats on water tiles
-- L5: Migrating bird flocks (V-formation) at dawn/dusk
-- L6: Hot air balloons drift across daytime sky
-- L7: Aurora borealis on winter nights
-- L8: Frozen lake ice sheets in winter
-- L9: Wolves prowl forest edges at night
-- L10: Glowing bioluminescent mushrooms in forest at night
-- L11: Dawn ground mist bands
-- L12: Festival lantern strings between close houses
-- L13: Wandering merchant carts visit markets
-- L14: Rainbow after rain stops
-- L15: Hawks circling overhead
-- L16: Constellation patterns connecting bright stars
-- L17: Wet ground puddles after rain
-- L18: Town bonfire when happiness is high
-- L19: Citizen footprints in snow
-- L20: Animated sun with lens flare ghosts
+## Through Loop 40 (commit 98866e7)
 
 ### Architecture
-- All features live in new `js/enhancements.js` module — additive, never refactored.
-- `update*` functions hooked from `main.js` simTick, `render*` functions hooked from `render.js`.
-- Inline `toScreen` in enhancements to avoid circular import with render.js.
-- One feature per loop, one commit per loop.
+- All features in `js/enhancements.js`. Loops 4-22 wired explicitly into main.js+render.js. Loop 23 added a register*() aggregator pattern; loops 23+ register update/render fns once and are auto-dispatched. Future loops only edit enhancements.js + LOOPS.md.
 
-### Themes emerging
-- Time-of-day life: dawn mist, hawks at noon, dusk flocks, night wolves/mushrooms/aurora/constellations/bonfire glow.
-- Weather aftermath: rainbow + puddles after rain.
-- Winter signature: ice sheets, footprints, aurora.
-- Town personality: lanterns, bonfire, merchant carts.
+### Features 4-40 shipped
+- L4 fishing boats, L5 V-formation flocks, L6 hot air balloons, L7 aurora (winter night), L8 frozen lake ice sheets, L9 wolves at night, L10 glowing mushrooms, L11 dawn ground mist, L12 lantern strings between houses, L13 merchant carts, L14 rainbow after rain, L15 hawks circling, L16 constellations, L17 puddles after rain, L18 town bonfire (happiness), L19 footprints in snow, L20 sun + lens flare, L21 snowmen, L22 cherry blossoms (spring), L23 smoking volcano + register API, L24 status bubbles on buildings, L25 dragon flyover, L26 wheat sway around farms, L27 owls in forest at night, L28 trade ships at map edges, L29 well sparkles, L30 slow comets, L31 ghost wisps, L32 frogs near water, L33 jagged lightning bolts, L34 mountain rams, L35 bee swarms (summer farms), L36 will-o-wisps, L37 spider webs (autumn), L38 sand crabs, L39 barracks campfires, L40 tower banners.
 
-80 more loops to go.
+### Themes maintained
+- Time-of-day life, seasonal markers, fauna at every biome, weather aftermath, building animation/personality, sky spectacle.
+
+60 loops to go.
