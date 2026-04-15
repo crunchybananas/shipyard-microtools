@@ -3205,3 +3205,21 @@ function updateBirthHearts() {
   _prevPop = G.population;
 }
 registerUpdater(updateBirthHearts);
+
+// ── Loop 73: Resource floats up from production buildings
+function updateResourceFloats() {
+  if (!G.particles) G.particles = [];
+  for (const b of G.buildings) {
+    if (!b.prod) continue;
+    if (Math.random() > 0.0015 * G.speed) continue;
+    const key = Object.keys(b.prod)[0];
+    const emojiMap = { wood: '🪵', stone: '🪨', food: '🍎', gold: '🪙', iron: '⚙️' };
+    G.particles.push({
+      tx: b.x, ty: b.y, offsetY: -20,
+      text: emojiMap[key] || '+',
+      alpha: 1.2,
+      vy: -0.18, decay: 0.012, type: 'text',
+    });
+  }
+}
+registerUpdater(updateResourceFloats);
