@@ -2293,3 +2293,19 @@ function renderTideFoam(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderTideFoam);
+
+// ── Loop 48: Snow drift mounds on east side of buildings ───
+function renderSnowDrifts(ctx) {
+  if (G.season !== 'winter' || G.camera.zoom < 0.7) return;
+  ctx.fillStyle = 'rgba(245,250,255,0.85)';
+  for (const b of G.buildings) {
+    const s = toScreen(b.x, b.y);
+    ctx.beginPath();
+    ctx.ellipse(s.x + 12, s.y + 4, 7, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(s.x + 8, s.y + 5, 4, 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+registerWorldRenderer(renderSnowDrifts);
