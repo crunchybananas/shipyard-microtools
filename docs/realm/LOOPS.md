@@ -54,6 +54,7 @@
 - Soldier campfires by barracks at night (loop 39)
 - Fluttering banners on watch towers (loop 40)
 - Pigeons near markets (loop 41)
+- Citizen motion dust trails (loop 42)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -223,3 +224,5 @@
 ### Loop 40 — fluttering red banners with white cross atop each watch tower.
 
 ### Loop 41 — pigeons walk and peck near markets.
+
+### Loop 42 — subtle dust trails behind moving citizens (high-zoom only).

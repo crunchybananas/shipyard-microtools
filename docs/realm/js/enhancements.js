@@ -2102,3 +2102,26 @@ function renderPigeons(ctx) {
 }
 registerUpdater(updatePigeons);
 registerWorldRenderer(renderPigeons);
+
+// ── Loop 42: Subtle motion trails behind moving citizens ───
+function renderCitizenTrails(ctx) {
+  if (!G.citizens || G.camera.zoom < 1.1) return;
+  for (const c of G.citizens) {
+    if (!c.trail) c.trail = [];
+    if (G.gameTick % 4 === 0) {
+      c.trail.push({ x: c.x, y: c.y, age: 0 });
+      if (c.trail.length > 4) c.trail.shift();
+    }
+    for (const pt of c.trail) pt.age += G.speed;
+    for (const pt of c.trail) {
+      if (pt.age > 30) continue;
+      const s = toScreen(pt.x, pt.y);
+      const a = (1 - pt.age / 30) * 0.18;
+      ctx.fillStyle = `rgba(180,180,200,${a})`;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 4, 1.5, 0.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+registerWorldRenderer(renderCitizenTrails);
