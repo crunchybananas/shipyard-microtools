@@ -3095,3 +3095,36 @@ function renderCompassMarkers(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderCompassMarkers);
+
+// ── Loop 70: Pumpkin patches in autumn farms ───────────────
+function renderPumpkins(ctx) {
+  if (G.season !== 'autumn' || G.camera.zoom < 0.8) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'farm') continue;
+    const s = toScreen(b.x, b.y);
+    const seed = (b.x * 13 + b.y * 7) | 0;
+    for (let i = 0; i < 4; i++) {
+      const ang = (i + seed) * 1.7;
+      const r = 8 + (i & 1) * 3;
+      const px = s.x + Math.cos(ang) * r;
+      const py = s.y + 5 + Math.sin(ang) * r * 0.4;
+      // Pumpkin
+      ctx.fillStyle = '#e87020';
+      ctx.beginPath();
+      ctx.ellipse(px, py, 1.6, 1.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Ribs
+      ctx.strokeStyle = '#a04010';
+      ctx.lineWidth = 0.3;
+      ctx.beginPath();
+      ctx.moveTo(px - 0.7, py - 1.1); ctx.lineTo(px - 0.7, py + 1.1);
+      ctx.moveTo(px, py - 1.3); ctx.lineTo(px, py + 1.3);
+      ctx.moveTo(px + 0.7, py - 1.1); ctx.lineTo(px + 0.7, py + 1.1);
+      ctx.stroke();
+      // Stem
+      ctx.fillStyle = '#3a6020';
+      ctx.fillRect(px - 0.2, py - 1.7, 0.5, 0.6);
+    }
+  }
+}
+registerWorldRenderer(renderPumpkins);
