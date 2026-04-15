@@ -95,6 +95,7 @@
 - Driftwood logs on sand (loop 80)
 - Large screen-space snowflakes in winter (loop 81)
 - Steam from wells in winter (loop 82)
+- Underwater bubbles rise on water tiles (loop 83)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -346,3 +347,5 @@
 ### Loop 81 — large 6-arm snowflake silhouettes drift down the screen in winter.
 
 ### Loop 82 — wells emit visible steam plumes in winter (warm water vs cold air).
+
+### Loop 83 — small bubble pairs rise from random water tiles (suggests fish / underwater life).

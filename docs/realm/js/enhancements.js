@@ -3543,3 +3543,38 @@ function renderWellSteam(ctx) {
   }
 }
 registerWorldRenderer(renderWellSteam);
+
+// ── Loop 83: Floating bubbles rise from underwater (water tiles)
+function renderUnderwaterBubbles(ctx) {
+  if (G.camera.zoom < 0.8 || G.season === 'winter') return;
+  const tt = G.gameTick;
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 22 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.WATER) continue;
+      const h = ((tx * 0xc1c1) ^ (ty * 0xd2d2)) >>> 0;
+      if (h % 100 > 18) continue;
+      const s = toScreen(tx, ty);
+      const phase = (tt * 0.05 + h * 0.07) % 30;
+      const a = 1 - phase / 30;
+      const yOff = -phase * 0.4;
+      ctx.globalAlpha = a * 0.5;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(s.x + ((h % 7) - 3), s.y + yOff, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(s.x + ((h % 5) - 2) + 2, s.y + yOff - 1, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+registerWorldRenderer(renderUnderwaterBubbles);
