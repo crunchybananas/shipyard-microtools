@@ -8,6 +8,43 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 7: Aurora borealis on winter nights ────────────────
+export function renderAurora(ctx, logicalW, logicalH) {
+  if (G.season !== 'winter') return;
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.78 && t > 0.05) return; // night only
+  const nightStrength = Math.min(1, Math.max(0, (0.7 - getDaylight()) / 0.3));
+  if (nightStrength <= 0) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const baseY = logicalH * 0.18;
+  const tt = G.gameTick * 0.005;
+  // Three undulating ribbons of color
+  const ribbons = [
+    { color: '#3effa0', alpha: 0.18 * nightStrength, offset: 0,    h: 60 },
+    { color: '#7af0ff', alpha: 0.13 * nightStrength, offset: 1.1,  h: 80 },
+    { color: '#c060ff', alpha: 0.10 * nightStrength, offset: 2.2,  h: 50 },
+  ];
+  for (const r of ribbons) {
+    ctx.fillStyle = r.color;
+    ctx.globalAlpha = r.alpha;
+    ctx.beginPath();
+    const yTop = baseY + r.offset * 18;
+    ctx.moveTo(0, yTop);
+    for (let x = 0; x <= logicalW; x += 30) {
+      const y = yTop + Math.sin(x * 0.005 + tt + r.offset) * 22 + Math.sin(x * 0.013 + tt * 1.4) * 12;
+      ctx.lineTo(x, y);
+    }
+    for (let x = logicalW; x >= 0; x -= 30) {
+      const y = yTop + r.h + Math.sin(x * 0.005 + tt + r.offset) * 22 + Math.sin(x * 0.013 + tt * 1.4) * 12;
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ── Loop 6: Hot air balloons drifting overhead ─────────────
 const BALLOON_COLORS = [
   ['#d63b3b','#f0c14a'], ['#3b6dd6','#f0e8d4'], ['#3bd66e','#a04ad6'],

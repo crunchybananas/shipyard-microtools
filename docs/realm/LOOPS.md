@@ -19,6 +19,7 @@
 - Wandering fishing boats on water (loop 4)
 - Migrating bird flocks at dawn/dusk (loop 5)
 - Hot air balloons drift across daytime sky (loop 6)
+- Aurora borealis on winter nights (loop 7)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -57,3 +58,9 @@
 - Ideas: (1) **hot air balloons drifting overhead** (2) wind-driven leaves swirling around buildings (3) celestial weather (auroras at night)
 - Chose: hot air balloons (daytime spectacle, 5 random colorways)
 - Implemented: enhancements.js updateBalloons/renderBalloons. Rare daytime spawn, drift across screen-space sky, gradient envelope, vertical stripe pattern, basket with ropes, gentle bobbing.
+
+### Loop 7
+- Validator: winter nights look identical to other nights aside from snow particles; no signature winter atmosphere.
+- Ideas: (1) **aurora borealis on winter nights** (2) frozen lake ice sheets (3) dynamic constellations
+- Chose: aurora (high visual payoff, signature winter mood)
+- Implemented: enhancements.js renderAurora. Three undulating colored ribbons (green/cyan/violet), screen-blend mode, only at night during winter season, animated by sine waves.
