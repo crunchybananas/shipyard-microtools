@@ -3313,3 +3313,58 @@ function renderDeathMarkers(ctx) {
 }
 registerUpdater(updateDeathMarkers);
 registerWorldRenderer(renderDeathMarkers);
+
+// ── Loop 77: Town crier walks roads occasionally ringing bell
+function updateCrier() {
+  if (!G.crier) {
+    if (G.gameTick % 1500 === 0 && Math.random() < 0.3) {
+      // Spawn crier at edge of map
+      const edge = Math.floor(Math.random() * 2);
+      G.crier = {
+        x: edge === 0 ? 1 : MAP_W - 2, y: MAP_H / 2,
+        tx: edge === 0 ? MAP_W - 2 : 1, ty: MAP_H / 2,
+        bellTimer: 0, bellOn: false,
+      };
+    }
+    return;
+  }
+  const c = G.crier;
+  const dx = c.tx - c.x, dy = c.ty - c.y, d = Math.hypot(dx, dy);
+  if (d < 0.5) { G.crier = null; return; }
+  c.x += (dx / d) * 0.025 * G.speed;
+  c.y += (dy / d) * 0.025 * G.speed;
+  c.bellTimer -= G.speed;
+  if (c.bellTimer <= 0) { c.bellOn = !c.bellOn; c.bellTimer = c.bellOn ? 8 : 60; }
+}
+function renderCrier(ctx) {
+  if (!G.crier || G.camera.zoom < 0.6) return;
+  const c = G.crier;
+  const s = toScreen(c.x, c.y);
+  // Body
+  ctx.fillStyle = '#a02818';
+  ctx.fillRect(s.x - 1.5, s.y - 4, 3, 4);
+  ctx.fillStyle = '#3a2410';
+  ctx.fillRect(s.x - 1.5, s.y, 3, 2);
+  // Head
+  ctx.fillStyle = '#e8c8a0';
+  ctx.beginPath(); ctx.arc(s.x, s.y - 6, 1.5, 0, Math.PI * 2); ctx.fill();
+  // Hat (tall)
+  ctx.fillStyle = '#1a1a20';
+  ctx.fillRect(s.x - 1.5, s.y - 9, 3, 2.5);
+  ctx.fillRect(s.x - 2, s.y - 7, 4, 0.6);
+  // Bell
+  if (c.bellOn) {
+    ctx.fillStyle = '#d4a020';
+    ctx.beginPath(); ctx.arc(s.x + 3, s.y - 3, 0.9, 0, Math.PI * 2); ctx.fill();
+    // Sound waves
+    ctx.strokeStyle = 'rgba(220,200,80,0.6)';
+    ctx.lineWidth = 0.5;
+    for (let r = 2; r <= 5; r += 1.5) {
+      ctx.beginPath();
+      ctx.arc(s.x + 3, s.y - 3, r, -0.6, 0.6);
+      ctx.stroke();
+    }
+  }
+}
+registerUpdater(updateCrier);
+registerWorldRenderer(renderCrier);
