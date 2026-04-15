@@ -1530,11 +1530,13 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.ellipse(s.x + 3, s.y + 4, 14, 5, 0.15, 0, Math.PI*2);
   ctx.fill();
 
-  // Shift building sprite down so its base sits at tile center (visual ground
-  // in isometric perspective). Sprites were drawn with base around s.y-4,
-  // so we translate +4 to ground them properly.
+  // Ground the sprite: scale from tile-center anchor so buildings grow UP
+  // from the ground (not out in all directions), then shift down 4px to
+  // place sprite base at visual ground level (tile center in iso).
   ctx.save();
-  ctx.translate(0, 4);
+  ctx.translate(s.x, s.y);
+  ctx.scale(1.1, 1.1);
+  ctx.translate(-s.x, -s.y + 3);
 
   switch (b.type) {
     case 'house': drawHouse(ctx, s); break;
