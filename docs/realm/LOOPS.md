@@ -24,6 +24,7 @@
 - Wolves prowling at night (loop 9)
 - Glowing bioluminescent mushrooms in forest at night (loop 10)
 - Dawn ground mist bands (loop 11)
+- Festival lantern strings between houses (loop 12)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -92,3 +93,9 @@
 - Ideas: (1) **dawn ground mist** (2) chimney smoke columns visible from far (3) sun rays through trees
 - Chose: dawn mist (subtle but powerful mood)
 - Implemented: enhancements.js renderGroundMist — three undulating soft horizontal bands fading in/out around dawn (strong) and dusk (weak).
+
+### Loop 12
+- Validator: dense town areas have no human-warmth markers; just clumps of houses with no decoration linking them.
+- Ideas: (1) **festival lantern strings between close houses** (2) market awnings/stall canopies (3) town square paving
+- Chose: lantern strings (visually striking at night, organically wires the town)
+- Implemented: enhancements.js renderLanterns. For every house/tavern pair within 3 tiles, draw a sagging rope with 4 colored lanterns; bright halos at night via screen blend.

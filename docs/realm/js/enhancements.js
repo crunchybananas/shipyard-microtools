@@ -8,6 +8,80 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 12: Festival lanterns strung between adjacent houses
+// When two houses are close (≤ 3 tiles), draw a string of glowing
+// lanterns between them. Active any time, brighter at night.
+function lanternColor(idx) {
+  return ['#ff8c4a','#ffd166','#ffb0c8','#a4f0ff','#c0ffae'][idx % 5];
+}
+export function renderLanterns(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const houses = G.buildings.filter(b => b.type === 'house' || b.type === 'tavern');
+  if (houses.length < 2) return;
+  const dayl = getDaylight();
+  const nightStrength = Math.max(0, Math.min(1, (0.85 - dayl) / 0.4));
+  ctx.save();
+  // Find pairs of close houses (each pair drawn once, dedupe by sorted id)
+  const seen = new Set();
+  for (let i = 0; i < houses.length; i++) {
+    for (let j = i + 1; j < houses.length; j++) {
+      const a = houses[i], b = houses[j];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > 9) continue; // > 3 tiles
+      const key = i + ':' + j;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const sa = toScreen(a.x, a.y);
+      const sb = toScreen(b.x, b.y);
+      const ax = sa.x, ay = sa.y - 22;
+      const bx = sb.x, by = sb.y - 22;
+      // Sag the string
+      const cx = (ax + bx) / 2;
+      const cy = (ay + by) / 2 + 8;
+      // Draw rope
+      ctx.strokeStyle = 'rgba(40,28,16,0.7)';
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo(cx, cy, bx, by);
+      ctx.stroke();
+      // Lanterns at parameter steps
+      const N = 5;
+      for (let k = 1; k < N; k++) {
+        const t = k / N;
+        const lx = (1 - t) * (1 - t) * ax + 2 * (1 - t) * t * cx + t * t * bx;
+        const ly = (1 - t) * (1 - t) * ay + 2 * (1 - t) * t * cy + t * t * by;
+        const col = lanternColor((i + j + k));
+        // Glow halo (additive at night)
+        if (nightStrength > 0.05) {
+          ctx.globalCompositeOperation = 'screen';
+          ctx.globalAlpha = nightStrength * 0.7;
+          const grad = ctx.createRadialGradient(lx, ly, 0, lx, ly, 8);
+          grad.addColorStop(0, col);
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(lx, ly, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.globalAlpha = 1;
+        }
+        // Lantern body
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.ellipse(lx, ly, 1.6, 2.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Cap & base
+        ctx.fillStyle = '#3a2410';
+        ctx.fillRect(lx - 1.2, ly - 2.6, 2.4, 0.6);
+        ctx.fillRect(lx - 1, ly + 2, 2, 0.5);
+      }
+    }
+  }
+  ctx.restore();
+}
+
 // ── Loop 11: Dawn ground mist drifting over land ───────────
 export function renderGroundMist(ctx, logicalW, logicalH) {
   const t = G.dayPhase / G.dayLength;

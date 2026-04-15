@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist } from './enhancements.js';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns } from './enhancements.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
@@ -1508,6 +1508,8 @@ export function render() {
   renderWolves(ctx);
   // ── Glowing mushrooms (loop 10+) ────────────────────────
   renderGlowMushrooms(ctx);
+  // ── Festival lanterns (loop 12+) ────────────────────────
+  renderLanterns(ctx);
 
   // ── Particles ─────────────────────────────────────────────
   for (const p of G.particles) {
