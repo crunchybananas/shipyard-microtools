@@ -70,6 +70,7 @@
 - Day-1 sunrise burst (loop 55)
 - Toadstools around taverns (loop 56)
 - Smoke columns during raids (loop 57)
+- Fishing nets in shallow water (loop 58)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -271,3 +272,5 @@
 ### Loop 56 — red-cap toadstool clusters around taverns.
 
 ### Loop 57 — dark smoke columns rise from random land tiles during raids.
+
+### Loop 58 — floating fishing nets with buoys in water tiles bordering sand (~12% spawn).

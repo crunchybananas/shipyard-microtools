@@ -2624,3 +2624,49 @@ function renderRaidSmoke(ctx) {
 }
 registerUpdater(updateRaidSmoke);
 registerWorldRenderer(renderRaidSmoke);
+
+// ── Loop 58: Floating fishing nets in shallow water near piers/sand
+function renderFishingNets(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 22 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  ctx.strokeStyle = 'rgba(40,30,20,0.6)';
+  ctx.lineWidth = 0.4;
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.WATER) continue;
+      // adjacent sand?
+      let nearSand = false;
+      for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+        if (G.map[ty+dy] && G.map[ty+dy][tx+dx] === TILE.SAND) { nearSand = true; break; }
+      }
+      if (!nearSand) continue;
+      const h = ((tx * 0x4f4f) ^ (ty * 0x6363)) >>> 0;
+      if (h % 100 > 12) continue;
+      const s = toScreen(tx, ty);
+      // Float buoys
+      ctx.fillStyle = '#f0a830';
+      ctx.beginPath(); ctx.arc(s.x - 6, s.y, 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x + 6, s.y, 0.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y - 4, 0.8, 0, Math.PI * 2); ctx.fill();
+      // Net mesh
+      ctx.beginPath();
+      for (let k = 0; k < 4; k++) {
+        ctx.moveTo(s.x - 6 + k * 4, s.y);
+        ctx.lineTo(s.x - 6 + k * 4, s.y - 4);
+      }
+      for (let k = 0; k < 3; k++) {
+        ctx.moveTo(s.x - 6, s.y - k * 1.3);
+        ctx.lineTo(s.x + 6, s.y - k * 1.3);
+      }
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderFishingNets);
