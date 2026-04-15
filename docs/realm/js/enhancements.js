@@ -1179,3 +1179,40 @@ function renderVolcano(ctx) {
 }
 registerUpdater(updateVolcano);
 registerWorldRenderer(renderVolcano);
+
+// ── Loop 24: Floating status bubbles above buildings ───────
+// Indicates idle workers (?) or low food (!) etc.
+function renderStatusBubbles(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  for (const b of G.buildings) {
+    let icon = null, color = null;
+    if ((b.workersNeeded || 0) > (b.workers ? b.workers.length : 0) && b.type !== 'house' && b.type !== 'wall' && b.type !== 'road' && b.type !== 'tower' && b.type !== 'well') {
+      icon = '?'; color = '#ffd166';
+    } else if (b.type === 'farm' && G.resources && G.resources.food < 15) {
+      icon = '!'; color = '#f97070';
+    }
+    if (!icon) continue;
+    const s = toScreen(b.x, b.y);
+    const bob = Math.sin(G.gameTick * 0.05 + (b.x + b.y) * 0.7) * 1.5;
+    const cx = s.x, cy = s.y - 36 + bob;
+    // Bubble
+    ctx.fillStyle = 'rgba(20,20,30,0.85)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(cx - 2, cy + 4);
+    ctx.lineTo(cx, cy + 8);
+    ctx.lineTo(cx + 2, cy + 4);
+    ctx.closePath();
+    ctx.fill();
+    // Icon
+    ctx.fillStyle = color;
+    ctx.font = 'bold 7px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(icon, cx, cy + 0.5);
+  }
+}
+registerWorldRenderer(renderStatusBubbles);
