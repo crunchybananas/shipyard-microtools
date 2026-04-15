@@ -3934,3 +3934,38 @@ function renderSchoolKids(ctx) {
 }
 registerUpdater(updateSchoolKids);
 registerWorldRenderer(renderSchoolKids);
+
+// ── Loop 96: Stone monoliths placed at compass points (deco)
+function renderMonoliths(ctx) {
+  if (G.camera.zoom < 0.5) return;
+  const spots = [
+    { x: 8, y: 8 }, { x: MAP_W - 8, y: 8 },
+    { x: 8, y: MAP_H - 8 }, { x: MAP_W - 8, y: MAP_H - 8 },
+  ];
+  ctx.save();
+  for (const p of spots) {
+    if (!G.map[p.y] || G.map[p.y][p.x] !== TILE.GRASS) continue;
+    const s = toScreen(p.x, p.y);
+    // Tall stone slab
+    ctx.fillStyle = '#5a5a64';
+    ctx.beginPath();
+    ctx.moveTo(s.x - 2, s.y - 12);
+    ctx.lineTo(s.x + 2, s.y - 12);
+    ctx.lineTo(s.x + 2.5, s.y);
+    ctx.lineTo(s.x - 2.5, s.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#3a3a44';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    // Cap
+    ctx.fillStyle = '#404048';
+    ctx.fillRect(s.x - 2.5, s.y - 12, 5, 1.2);
+    // Rune (subtle)
+    ctx.fillStyle = '#7a7a82';
+    ctx.fillRect(s.x - 0.6, s.y - 8, 1.2, 0.4);
+    ctx.fillRect(s.x - 0.6, s.y - 6, 1.2, 0.4);
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderMonoliths);
