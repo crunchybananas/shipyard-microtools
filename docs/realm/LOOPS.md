@@ -55,6 +55,7 @@
 - Fluttering banners on watch towers (loop 40)
 - Pigeons near markets (loop 41)
 - Citizen motion dust trails (loop 42)
+- Swallows dart in spring sky (loop 43)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -226,3 +227,5 @@
 ### Loop 41 — pigeons walk and peck near markets.
 
 ### Loop 42 — subtle dust trails behind moving citizens (high-zoom only).
+
+### Loop 43 — swallows dart erratically across spring daytime sky (small forked silhouettes).

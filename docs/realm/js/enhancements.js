@@ -2125,3 +2125,42 @@ function renderCitizenTrails(ctx) {
   }
 }
 registerWorldRenderer(renderCitizenTrails);
+
+// ── Loop 43: Swallows dart in spring sky ───────────────────
+function updateSwallows(logicalW, logicalH) {
+  if (G.season !== 'spring') { if (G.swallows) G.swallows.length = 0; return; }
+  if (!G.swallows) G.swallows = [];
+  if (G.gameTick % 200 === 0 && G.swallows.length < 5 && getDaylight() > 0.6) {
+    G.swallows.push({
+      x: Math.random() * (logicalW || 1500),
+      y: Math.random() * (logicalH || 800) * 0.5 + 60,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 1,
+      life: 800,
+    });
+  }
+  for (let i = G.swallows.length - 1; i >= 0; i--) {
+    const s = G.swallows[i];
+    s.x += s.vx; s.y += s.vy;
+    if (Math.random() < 0.04) { s.vx += (Math.random() - 0.5) * 1.5; s.vy += (Math.random() - 0.5) * 0.6; }
+    s.vx = Math.max(-5, Math.min(5, s.vx));
+    s.vy = Math.max(-1.5, Math.min(1.5, s.vy));
+    s.life -= G.speed;
+    if (s.life <= 0 || s.x < -50 || s.x > (logicalW || 1500) + 50 || s.y < -50 || s.y > (logicalH || 800) * 0.7) G.swallows.splice(i, 1);
+  }
+}
+function renderSwallows(ctx) {
+  if (!G.swallows || !G.swallows.length) return;
+  ctx.strokeStyle = 'rgba(20,20,30,0.7)';
+  ctx.lineWidth = 1;
+  for (const s of G.swallows) {
+    const dir = s.vx >= 0 ? 1 : -1;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 3 * dir, s.y);
+    ctx.lineTo(s.x, s.y - 1);
+    ctx.lineTo(s.x + 2 * dir, s.y + 1);
+    ctx.stroke();
+  }
+}
+registerUpdater(updateSwallows, true);
+registerScreenRenderer(renderSwallows);
