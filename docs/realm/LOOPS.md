@@ -102,6 +102,7 @@
 - Long sunset shadows from soldiers (loop 87)
 - Soldier dust puffs (loop 88)
 - Balloon ground shadows (loop 89)
+- Floating books over schools (loop 90)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -367,3 +368,5 @@
 ### Loop 88 — soldiers kick up dust puffs as they walk.
 
 ### Loop 89 — soft drifting ground shadows under each hot air balloon.
+
+### Loop 90 — three small colored books float in slow orbit above each school.

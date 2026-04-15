@@ -3726,3 +3726,24 @@ function renderBalloonShadows(ctx) {
   }
 }
 registerScreenRenderer(renderBalloonShadows);
+
+// ── Loop 90: School books float around schools ─────────────
+function renderSchoolBooks(ctx) {
+  if (G.camera.zoom < 0.9) return;
+  const tt = G.gameTick * 0.04;
+  for (const b of G.buildings) {
+    if (b.type !== 'school') continue;
+    const s = toScreen(b.x, b.y);
+    for (let i = 0; i < 3; i++) {
+      const phase = i * 2.1 + (b.x + b.y);
+      const ox = Math.sin(tt + phase) * 8;
+      const oy = Math.cos(tt + phase * 0.7) * 4;
+      const bx = s.x + ox, by = s.y - 18 + oy;
+      ctx.fillStyle = ['#a02818','#205080','#608030'][i % 3];
+      ctx.fillRect(bx - 1.4, by - 1, 2.8, 2);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(bx - 1.4, by - 1, 0.4, 2);
+    }
+  }
+}
+registerWorldRenderer(renderSchoolBooks);
