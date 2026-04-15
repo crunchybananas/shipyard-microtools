@@ -3828,3 +3828,51 @@ function renderDragonTrail(ctx) {
 }
 registerUpdater(updateDragonTrail);
 registerScreenRenderer(renderDragonTrail);
+
+// ── Loop 93: Hovering eagles (separate from hawks) over castle
+function updateEagles(logicalW, logicalH) {
+  if (!G.eagles) G.eagles = [];
+  const castle = G.buildings.find(b => b.type === 'castle');
+  if (!castle) { G.eagles.length = 0; return; }
+  if (G.gameTick % 1200 === 0 && G.eagles.length < 1 && getDaylight() > 0.7) {
+    G.eagles.push({
+      cx: (logicalW || 1500) * 0.45,
+      cy: (logicalH || 800) * 0.25,
+      r: 110, ang: Math.random() * Math.PI * 2,
+      angVel: 0.005,
+    });
+  }
+  for (const e of G.eagles) e.ang += e.angVel * G.speed;
+}
+function renderEagles(ctx) {
+  if (!G.eagles || !G.eagles.length) return;
+  for (const e of G.eagles) {
+    const x = e.cx + Math.cos(e.ang) * e.r;
+    const y = e.cy + Math.sin(e.ang) * e.r * 0.3;
+    const wing = Math.sin(G.gameTick * 0.1) * 6;
+    ctx.fillStyle = 'rgba(50,30,15,0.92)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, 3, 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Wider wing span than hawks
+    ctx.beginPath();
+    ctx.moveTo(x - 14, y + wing * 0.3);
+    ctx.lineTo(x - 2, y);
+    ctx.lineTo(x - 8, y + wing);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 14, y + wing * 0.3);
+    ctx.lineTo(x + 2, y);
+    ctx.lineTo(x + 8, y + wing);
+    ctx.closePath();
+    ctx.fill();
+    // White head
+    ctx.fillStyle = 'rgba(240,240,240,0.95)';
+    ctx.beginPath();
+    ctx.arc(x + 2, y - 0.5, 0.9, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+registerUpdater(updateEagles, true);
+registerScreenRenderer(renderEagles);

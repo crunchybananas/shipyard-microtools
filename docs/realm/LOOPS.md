@@ -105,6 +105,7 @@
 - Floating books over schools (loop 90)
 - Rare meteor impacts with crater (loop 91)
 - Dragon purple smoke trail (loop 92)
+- Bald eagle circles castle (loop 93)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -376,3 +377,5 @@
 ### Loop 91 — rare meteor impact explosion (camera shake + bright fireball + dark crater rim).
 
 ### Loop 92 — purple smoke trail follows behind the dragon during flyovers.
+
+### Loop 93 — bald eagle (white head, wider wings) circles slowly above castle when one exists.
