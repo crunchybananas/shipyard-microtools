@@ -1879,3 +1879,44 @@ function renderWisps(ctx) {
 }
 registerUpdater(updateWisps);
 registerWorldRenderer(renderWisps);
+
+// ── Loop 37: Spider webs draped in forest tiles in autumn ──
+function renderWebs(ctx) {
+  if (G.season !== 'autumn' || G.camera.zoom < 0.9) return;
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 24 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  ctx.save();
+  ctx.strokeStyle = 'rgba(220,220,230,0.55)';
+  ctx.lineWidth = 0.4;
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.FOREST) continue;
+      const h = ((tx * 0x3a3a) ^ (ty * 0x5959)) >>> 0;
+      if (h % 100 > 18) continue;
+      const s = toScreen(tx, ty);
+      const ox = ((h % 11) - 5);
+      const oy = ((h >> 4) % 5) - 3;
+      const cxs = s.x + ox, cys = s.y - 4 + oy;
+      // Radial spokes
+      for (let i = 0; i < 6; i++) {
+        const ang = (i / 6) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cxs, cys);
+        ctx.lineTo(cxs + Math.cos(ang) * 5, cys + Math.sin(ang) * 5);
+        ctx.stroke();
+      }
+      // Concentric strands
+      for (const rr of [1.5, 3, 4.5]) {
+        ctx.beginPath();
+        ctx.arc(cxs, cys, rr, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderWebs);
