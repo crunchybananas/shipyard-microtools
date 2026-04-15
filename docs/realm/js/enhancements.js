@@ -3223,3 +3223,30 @@ function updateResourceFloats() {
   }
 }
 registerUpdater(updateResourceFloats);
+
+// ── Loop 74: Chickens scratch and wander near coops ────────
+function renderCoopChickens(ctx) {
+  if (G.camera.zoom < 0.9) return;
+  const tt = G.gameTick;
+  for (const b of G.buildings) {
+    if (b.type !== 'chickencoop') continue;
+    const s = toScreen(b.x, b.y);
+    const seed = (b.x * 53 + b.y * 19) | 0;
+    for (let i = 0; i < 3; i++) {
+      const phase = (tt * 0.04 + i * 2 + seed) % (Math.PI * 2);
+      const cx = s.x + Math.cos(phase) * 7;
+      const cy = s.y + 4 + Math.sin(phase) * 3;
+      const peck = Math.sin(tt * 0.2 + i) * 0.5;
+      // Body white
+      ctx.fillStyle = '#f4f2e8';
+      ctx.beginPath(); ctx.ellipse(cx, cy, 1.5, 1.1, 0, 0, Math.PI * 2); ctx.fill();
+      // Comb red
+      ctx.fillStyle = '#c02020';
+      ctx.beginPath(); ctx.arc(cx + 1, cy - 1.4, 0.5, 0, Math.PI * 2); ctx.fill();
+      // Beak
+      ctx.fillStyle = '#d4a020';
+      ctx.fillRect(cx + 1.4, cy - 0.6 + peck, 0.5, 0.3);
+    }
+  }
+}
+registerWorldRenderer(renderCoopChickens);

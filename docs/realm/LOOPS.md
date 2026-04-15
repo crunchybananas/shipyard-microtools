@@ -86,6 +86,7 @@
 - Bats fly across night sky (loop 71)
 - Heart particles on population growth (loop 72)
 - Floating resource emoji from producers (loop 73)
+- Chickens orbit chicken coops (loop 74)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -319,3 +320,5 @@
 ### Loop 72 — heart particles burst from a random house when population grows.
 
 ### Loop 73 — small chance per tick that production buildings float a resource emoji upward.
+
+### Loop 74 — chickens orbit and peck near each chicken coop building.
