@@ -8,6 +8,62 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 15: Hawks circling overhead casting shadows ───────
+export function updateHawks(logicalW, logicalH) {
+  if (!G.hawks) G.hawks = [];
+  if (G.gameTick % 800 === 0 && G.hawks.length < 1 && getDaylight() > 0.7 && Math.random() < 0.5) {
+    G.hawks.push({
+      cx: Math.random() * logicalW,
+      cy: Math.random() * logicalH * 0.55 + 80,
+      radius: 60 + Math.random() * 40,
+      angle: Math.random() * Math.PI * 2,
+      angVel: 0.012 + Math.random() * 0.008,
+      life: 1500 + Math.random() * 500,
+    });
+  }
+  for (let i = G.hawks.length - 1; i >= 0; i--) {
+    const h = G.hawks[i];
+    h.angle += h.angVel * G.speed;
+    h.life -= G.speed;
+    if (h.life <= 0) G.hawks.splice(i, 1);
+  }
+}
+export function renderHawks(ctx) {
+  if (!G.hawks || !G.hawks.length) return;
+  ctx.save();
+  for (const h of G.hawks) {
+    const x = h.cx + Math.cos(h.angle) * h.radius;
+    const y = h.cy + Math.sin(h.angle) * h.radius * 0.5;
+    const wing = Math.sin(G.gameTick * 0.12) * 6;
+    // Hawk silhouette — wider than birds
+    ctx.fillStyle = 'rgba(40,30,25,0.85)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, 2.5, 1.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Wings as triangles
+    ctx.beginPath();
+    ctx.moveTo(x - 9, y + wing * 0.3);
+    ctx.lineTo(x - 1, y);
+    ctx.lineTo(x - 6, y + wing);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 9, y + wing * 0.3);
+    ctx.lineTo(x + 1, y);
+    ctx.lineTo(x + 6, y + wing);
+    ctx.closePath();
+    ctx.fill();
+    // Tail fan
+    ctx.beginPath();
+    ctx.moveTo(x - 1, y);
+    ctx.lineTo(x + 1, y);
+    ctx.lineTo(x, y + 4);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ── Loop 14: Rainbow after rain stops ──────────────────────
 let _prevWeather = null;
 let _rainbowAge = 0;

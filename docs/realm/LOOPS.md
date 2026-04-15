@@ -27,6 +27,7 @@
 - Festival lantern strings between houses (loop 12)
 - Merchant carts visit markets (loop 13)
 - Rainbow after rain (loop 14)
+- Hawks circle overhead (loop 15)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -113,3 +114,9 @@
 - Ideas: (1) **rainbow after rain** (2) puddles on ground after rain (3) wet shine on building roofs
 - Chose: rainbow (cheap, iconic, big payoff)
 - Implemented: enhancements.js updateRainbow/renderRainbow. Detect rain→clear transition, draw 7-band screen-space arc rainbow with fade in/out for ~25 sec.
+
+### Loop 15
+- Validator: sky has flocks/balloons/birds but they all travel linearly; nothing hovers/observes the world.
+- Ideas: (1) **hawks circling overhead** (2) constellations connecting stars at night (3) shooting stars from horizon
+- Chose: hawks (hovering predator above complements wolves below)
+- Implemented: enhancements.js updateHawks/renderHawks. Rare daytime spawn, circle elliptically around a center point, triangular wings + tail fan silhouette.
