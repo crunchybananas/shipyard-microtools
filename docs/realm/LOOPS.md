@@ -103,6 +103,7 @@
 - Soldier dust puffs (loop 88)
 - Balloon ground shadows (loop 89)
 - Floating books over schools (loop 90)
+- Rare meteor impacts with crater (loop 91)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -370,3 +371,5 @@
 ### Loop 89 — soft drifting ground shadows under each hot air balloon.
 
 ### Loop 90 — three small colored books float in slow orbit above each school.
+
+### Loop 91 — rare meteor impact explosion (camera shake + bright fireball + dark crater rim).

@@ -3747,3 +3747,52 @@ function renderSchoolBooks(ctx) {
   }
 }
 registerWorldRenderer(renderSchoolBooks);
+
+// ── Loop 91: Comet impact crash explosion (rare, decorative)
+function updateMeteorImpact(logicalW, logicalH) {
+  if (!G.meteorImpacts) G.meteorImpacts = [];
+  if (!G.particles) G.particles = [];
+  if (G.gameTick % 3000 === 0 && Math.random() < 0.2) {
+    // pick random map tile
+    const tx = Math.floor(Math.random() * MAP_W);
+    const ty = Math.floor(Math.random() * MAP_H);
+    G.meteorImpacts.push({ tx, ty, t: 0 });
+    // shake camera
+    G.cameraShake = (G.cameraShake || 0) + 6;
+  }
+  for (let i = G.meteorImpacts.length - 1; i >= 0; i--) {
+    const m = G.meteorImpacts[i];
+    m.t += G.speed;
+    if (m.t >= 90) G.meteorImpacts.splice(i, 1);
+  }
+}
+function renderMeteorImpact(ctx) {
+  if (!G.meteorImpacts || !G.meteorImpacts.length) return;
+  for (const m of G.meteorImpacts) {
+    const s = toScreen(m.tx, m.ty);
+    const p = m.t / 90;
+    const r = 4 + p * 30;
+    const a = (1 - p) * 0.85;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
+    grad.addColorStop(0, `rgba(255,240,180,${a})`);
+    grad.addColorStop(0.5, `rgba(255,140,40,${a * 0.6})`);
+    grad.addColorStop(1, 'rgba(120,40,0,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // Crater rim
+    if (p > 0.4) {
+      ctx.strokeStyle = `rgba(40,30,20,${(1 - p) * 0.6})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 2, r * 0.5, r * 0.18, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+registerUpdater(updateMeteorImpact, true);
+registerWorldRenderer(renderMeteorImpact);
