@@ -8,6 +8,75 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 6: Hot air balloons drifting overhead ─────────────
+const BALLOON_COLORS = [
+  ['#d63b3b','#f0c14a'], ['#3b6dd6','#f0e8d4'], ['#3bd66e','#a04ad6'],
+  ['#d6973b','#3b3bd6'], ['#d63bb6','#f5dc70'],
+];
+export function updateBalloons(logicalW, logicalH) {
+  if (!G.balloons) G.balloons = [];
+  const t = G.dayPhase / G.dayLength;
+  const isDay = t > 0.15 && t < 0.65;
+  if (isDay && G.gameTick % 1200 === 0 && G.balloons.length < 1 && Math.random() < 0.5) {
+    const goingRight = Math.random() < 0.5;
+    G.balloons.push({
+      x: goingRight ? -60 : (logicalW || 1500) + 60,
+      y: (logicalH || 800) * (0.18 + Math.random() * 0.25),
+      vx: (goingRight ? 1 : -1) * (0.25 + Math.random() * 0.2),
+      bobPhase: Math.random() * Math.PI * 2,
+      colorIdx: Math.floor(Math.random() * BALLOON_COLORS.length),
+      size: 22 + Math.random() * 8,
+    });
+  }
+  for (let i = G.balloons.length - 1; i >= 0; i--) {
+    const b = G.balloons[i];
+    b.x += b.vx;
+    if (b.x < -120 || b.x > (logicalW || 1500) + 120) G.balloons.splice(i, 1);
+  }
+}
+export function renderBalloons(ctx) {
+  if (!G.balloons || !G.balloons.length) return;
+  for (const b of G.balloons) {
+    const bob = Math.sin(G.gameTick * 0.02 + b.bobPhase) * 2.5;
+    const cy = b.y + bob;
+    const [c1, c2] = BALLOON_COLORS[b.colorIdx];
+    ctx.save();
+    // Balloon envelope (teardrop)
+    const grad = ctx.createRadialGradient(b.x - b.size * 0.3, cy - b.size * 0.3, b.size * 0.2, b.x, cy, b.size);
+    grad.addColorStop(0, c2);
+    grad.addColorStop(0.5, c1);
+    grad.addColorStop(1, '#3a1818');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(b.x, cy, b.size * 0.85, b.size, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Vertical stripes
+    ctx.strokeStyle = c2;
+    ctx.lineWidth = 1.2;
+    for (let s = -2; s <= 2; s++) {
+      ctx.beginPath();
+      ctx.moveTo(b.x + s * b.size * 0.18, cy - b.size * 0.7);
+      ctx.quadraticCurveTo(b.x + s * b.size * 0.22, cy, b.x + s * b.size * 0.18, cy + b.size * 0.6);
+      ctx.stroke();
+    }
+    // Ropes
+    ctx.strokeStyle = '#3a2a14';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(b.x - b.size * 0.5, cy + b.size * 0.6);
+    ctx.lineTo(b.x - b.size * 0.3, cy + b.size * 1.3);
+    ctx.moveTo(b.x + b.size * 0.5, cy + b.size * 0.6);
+    ctx.lineTo(b.x + b.size * 0.3, cy + b.size * 1.3);
+    ctx.stroke();
+    // Basket
+    ctx.fillStyle = '#7a4a20';
+    ctx.fillRect(b.x - b.size * 0.35, cy + b.size * 1.25, b.size * 0.7, b.size * 0.35);
+    ctx.fillStyle = '#5a3010';
+    ctx.fillRect(b.x - b.size * 0.35, cy + b.size * 1.55, b.size * 0.7, 1.5);
+    ctx.restore();
+  }
+}
+
 // ── Loop 5: Migrating bird flocks in V formation ──────────
 export function updateFlocks(logicalW, logicalH) {
   if (!G.flocks) G.flocks = [];

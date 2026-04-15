@@ -18,6 +18,7 @@
 - Citizen directional facing (eyes, mouth, hair)
 - Wandering fishing boats on water (loop 4)
 - Migrating bird flocks at dawn/dusk (loop 5)
+- Hot air balloons drift across daytime sky (loop 6)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -50,3 +51,9 @@
 - Ideas: (1) **migrating flocks in V-formation** (2) hot air balloons drifting overhead (3) shooting comets visible at twilight
 - Chose: V-formation flocks (timed to dawn/dusk reinforces day/night cycle)
 - Implemented: enhancements.js updateFlocks/renderFlocks. Spawns rare flock of 7-12 birds at dawn or dusk, V-formation, dark silhouettes with flapping wings, drift across screen-space sky.
+
+### Loop 6
+- Validator: skies have stars, moon, occasional flocks, but daytime sky lacks any spectacle objects above buildings.
+- Ideas: (1) **hot air balloons drifting overhead** (2) wind-driven leaves swirling around buildings (3) celestial weather (auroras at night)
+- Chose: hot air balloons (daytime spectacle, 5 random colorways)
+- Implemented: enhancements.js updateBalloons/renderBalloons. Rare daytime spawn, drift across screen-space sky, gradient envelope, vertical stripe pattern, basket with ropes, gentle bobbing.
