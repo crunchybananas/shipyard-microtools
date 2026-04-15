@@ -53,6 +53,7 @@
 - Crabs scuttle on sand (loop 38)
 - Soldier campfires by barracks at night (loop 39)
 - Fluttering banners on watch towers (loop 40)
+- Pigeons near markets (loop 41)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -220,3 +221,5 @@
 ### Loop 39 — campfires beside each barracks at night, with flickering flame and seated soldier silhouette.
 
 ### Loop 40 — fluttering red banners with white cross atop each watch tower.
+
+### Loop 41 — pigeons walk and peck near markets.

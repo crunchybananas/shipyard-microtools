@@ -2068,3 +2068,37 @@ function renderTowerBanners(ctx) {
   }
 }
 registerWorldRenderer(renderTowerBanners);
+
+// ── Loop 41: Pigeons walk near markets ─────────────────────
+function updatePigeons() {
+  if (!G.pigeons) G.pigeons = [];
+  if (G.gameTick % 250 === 0 && G.pigeons.length < 6) {
+    const markets = G.buildings.filter(b => b.type === 'market');
+    if (!markets.length) return;
+    const m = markets[Math.floor(Math.random() * markets.length)];
+    G.pigeons.push({ x: m.x + (Math.random() - 0.5) * 2, y: m.y + (Math.random() - 0.5) * 2, tx: m.x, ty: m.y, pickPhase: Math.random() * 100 });
+  }
+  for (let i = G.pigeons.length - 1; i >= 0; i--) {
+    const p = G.pigeons[i];
+    p.pickPhase += G.speed;
+    const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
+    if (d < 0.2) { p.tx = p.x + (Math.random() - 0.5) * 2.5; p.ty = p.y + (Math.random() - 0.5) * 2.5; }
+    else { p.x += (dx / d) * 0.015 * G.speed; p.y += (dy / d) * 0.015 * G.speed; }
+    if (Math.random() < 0.0005) G.pigeons.splice(i, 1);
+  }
+}
+function renderPigeons(ctx) {
+  if (!G.pigeons || !G.pigeons.length || G.camera.zoom < 0.9) return;
+  for (const p of G.pigeons) {
+    const s = toScreen(p.x, p.y);
+    const peck = Math.sin(p.pickPhase * 0.2) * 0.6;
+    ctx.fillStyle = '#8a8a90';
+    ctx.beginPath(); ctx.ellipse(s.x, s.y, 1.6, 1.1, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#6a6a72';
+    ctx.beginPath(); ctx.arc(s.x + 1.2, s.y - 1 + peck, 0.7, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d4b040';
+    ctx.fillRect(s.x + 1.8, s.y - 0.8 + peck, 0.5, 0.3);
+  }
+}
+registerUpdater(updatePigeons);
+registerWorldRenderer(renderPigeons);
