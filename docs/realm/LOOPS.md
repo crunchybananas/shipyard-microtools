@@ -39,6 +39,7 @@
 - Floating status bubbles above buildings (loop 24)
 - Rare dragon flyover (loop 25)
 - Wind-rippled wheat halos around farms (loop 26)
+- Perched owls in forest at night (loop 27)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -178,3 +179,5 @@
 ### Loop 25 — rare dragon flyover (screen space): purple body, animated wings, occasional fire breath.
 
 ### Loop 26 — wind-rippled wheat halo around each farm building (animated sway).
+
+### Loop 27 — owls perched on forest tiles at night (silhouettes + glowing yellow eyes that blink + occasional 'hoo' text).

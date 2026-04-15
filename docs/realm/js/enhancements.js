@@ -1339,3 +1339,65 @@ function renderWindRipple(ctx) {
   }
 }
 registerWorldRenderer(renderWindRipple);
+
+// ── Loop 27: Owls perched on trees at night ────────────────
+function updateOwls() {
+  if (!G.owls) G.owls = [];
+  const t = G.dayPhase / G.dayLength;
+  const isNight = t > 0.7 || t < 0.1;
+  if (!isNight) { G.owls.length = 0; return; }
+  if (G.gameTick % 300 === 0 && G.owls.length < 4) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.FOREST) {
+        G.owls.push({ x, y, blinkPhase: Math.random() * 100, hoot: 0 });
+        break;
+      }
+    }
+  }
+  for (const o of G.owls) {
+    o.blinkPhase += G.speed;
+    if (Math.random() < 0.005) o.hoot = 30;
+    if (o.hoot > 0) o.hoot -= G.speed;
+  }
+}
+function renderOwls(ctx) {
+  if (!G.owls || !G.owls.length || G.camera.zoom < 0.9) return;
+  for (const o of G.owls) {
+    const s = toScreen(o.x, o.y);
+    const cx = s.x + 4, cy = s.y - 14;
+    // Body silhouette
+    ctx.fillStyle = '#3a3024';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 2, 2.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Ear tufts
+    ctx.beginPath();
+    ctx.moveTo(cx - 1.6, cy - 2.2);
+    ctx.lineTo(cx - 2.2, cy - 3.2);
+    ctx.lineTo(cx - 1, cy - 2.5);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx + 1.6, cy - 2.2);
+    ctx.lineTo(cx + 2.2, cy - 3.2);
+    ctx.lineTo(cx + 1, cy - 2.5);
+    ctx.fill();
+    // Glowing eyes (blink)
+    const blink = (o.blinkPhase % 80) > 4 ? 1 : 0;
+    if (blink) {
+      ctx.fillStyle = 'rgba(255,210,100,0.95)';
+      ctx.beginPath(); ctx.arc(cx - 0.7, cy - 0.8, 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + 0.7, cy - 0.8, 0.5, 0, Math.PI * 2); ctx.fill();
+    }
+    if (o.hoot > 0) {
+      ctx.globalAlpha = o.hoot / 30;
+      ctx.fillStyle = '#aabbe0';
+      ctx.font = 'italic 6px serif';
+      ctx.fillText('hoo', cx + 4, cy);
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+registerUpdater(updateOwls);
+registerWorldRenderer(renderOwls);
