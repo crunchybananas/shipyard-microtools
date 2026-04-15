@@ -77,6 +77,7 @@
 - Research-complete sparkle burst from school (loop 62)
 - Dense fireflies over summer water edges (loop 63)
 - Bunnies hop on spring grass (loop 64)
+- Sleep z-bubbles above houses at night (loop 65)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -292,3 +293,5 @@
 ### Loop 63 — extra dense firefly clouds over water-edge tiles in summer nights.
 
 ### Loop 64 — bunnies hop across grass in spring (white tail).
+
+### Loop 65 — sleepy 'z' bubbles drift up from each house at night.

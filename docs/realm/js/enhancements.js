@@ -2921,3 +2921,24 @@ function renderBunnies(ctx) {
 }
 registerUpdater(updateBunnies);
 registerWorldRenderer(renderBunnies);
+
+// ── Loop 65: Citizen sleeps Z bubbles when at home at night
+function renderSleepBubbles(ctx) {
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.78 && t > 0.05) return;
+  if (G.camera.zoom < 0.9) return;
+  const houses = G.buildings.filter(b => b.type === 'house');
+  ctx.fillStyle = 'rgba(220,235,255,0.7)';
+  ctx.font = 'bold 6px monospace';
+  ctx.textAlign = 'center';
+  for (const h of houses) {
+    const s = toScreen(h.x, h.y);
+    const phase = (G.gameTick * 0.04 + h.x + h.y) % 6;
+    const yOff = -phase * 2;
+    const a = (1 - phase / 6) * 0.85;
+    ctx.globalAlpha = a;
+    ctx.fillText('z', s.x + 4, s.y - 18 + yOff);
+  }
+  ctx.globalAlpha = 1;
+}
+registerWorldRenderer(renderSleepBubbles);
