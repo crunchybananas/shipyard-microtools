@@ -64,6 +64,7 @@
 - Dust devils on summer sand (loop 49)
 - Victory confetti rain (loop 50)
 - Cart campfires while unloading (loop 51)
+- Mine carts at iron mines (loop 52)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -253,3 +254,5 @@
 ### Loop 50 — continuous confetti rain after winning a scenario or the main game.
 
 ### Loop 51 — small campfire next to merchant carts while unloading at market.
+
+### Loop 52 — small mine cart slides back-and-forth on track at iron mines.

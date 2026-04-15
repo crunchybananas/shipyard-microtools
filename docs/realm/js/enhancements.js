@@ -2406,3 +2406,31 @@ function renderCartCampfire(ctx) {
   }
 }
 registerWorldRenderer(renderCartCampfire);
+
+// ── Loop 52: Mine carts on iron mines (small running sprite)
+function renderMineCarts(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const tt = G.gameTick;
+  for (const b of G.buildings) {
+    if (b.type !== 'mine') continue;
+    const s = toScreen(b.x, b.y);
+    const t = ((tt + b.x * 47) % 200) / 200;
+    const dx = (t - 0.5) * 30;
+    const cx = s.x + dx, cy = s.y + 6 + Math.abs(t - 0.5) * 2;
+    // Body
+    ctx.fillStyle = '#5a3a18';
+    ctx.fillRect(cx - 3, cy - 2, 6, 2.5);
+    ctx.fillStyle = '#3a2410';
+    ctx.fillRect(cx - 3, cy - 2.4, 6, 0.4);
+    // Wheels
+    ctx.fillStyle = '#1a1410';
+    ctx.beginPath(); ctx.arc(cx - 2, cy + 0.5, 0.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + 2, cy + 0.5, 0.8, 0, Math.PI * 2); ctx.fill();
+    // Iron ore inside (pile)
+    ctx.fillStyle = '#7a8090';
+    ctx.beginPath();
+    ctx.arc(cx, cy - 2, 1.2, Math.PI, 0);
+    ctx.fill();
+  }
+}
+registerWorldRenderer(renderMineCarts);
