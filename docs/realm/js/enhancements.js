@@ -3969,3 +3969,35 @@ function renderMonoliths(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderMonoliths);
+
+// ── Loop 97: Glowing runes pulse on monoliths at night ─────
+function renderMonolithRunes(ctx) {
+  const dayl = getDaylight();
+  const ns = Math.max(0, Math.min(1, (0.65 - dayl) / 0.3));
+  if (ns < 0.05 || G.camera.zoom < 0.6) return;
+  const spots = [
+    { x: 8, y: 8 }, { x: MAP_W - 8, y: 8 },
+    { x: 8, y: MAP_H - 8 }, { x: MAP_W - 8, y: MAP_H - 8 },
+  ];
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const tt = G.gameTick * 0.07;
+  for (const p of spots) {
+    if (!G.map[p.y] || G.map[p.y][p.x] !== TILE.GRASS) continue;
+    const s = toScreen(p.x, p.y);
+    const pulse = 0.6 + 0.4 * Math.sin(tt + p.x);
+    ctx.fillStyle = `rgba(120,255,180,${ns * pulse * 0.75})`;
+    ctx.fillRect(s.x - 0.6, s.y - 8, 1.2, 0.4);
+    ctx.fillRect(s.x - 0.6, s.y - 6, 1.2, 0.4);
+    // Halo around top
+    const grad = ctx.createRadialGradient(s.x, s.y - 12, 0, s.x, s.y - 12, 14);
+    grad.addColorStop(0, `rgba(120,255,180,${ns * pulse * 0.4})`);
+    grad.addColorStop(1, 'rgba(120,255,180,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 12, 14, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderMonolithRunes);

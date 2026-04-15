@@ -109,6 +109,7 @@
 - Spring pollen bursts from grass (loop 94)
 - Students run circles around schools (loop 95)
 - Ancient corner monoliths (loop 96)
+- Glowing runes on monoliths at night (loop 97)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -388,3 +389,5 @@
 ### Loop 95 — small student figures run circles around each school building.
 
 ### Loop 96 — ancient stone monoliths at four corner regions of the map (placed only on grass).
+
+### Loop 97 — runes on corner monoliths glow green at night with pulsing halo.
