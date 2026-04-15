@@ -24,7 +24,7 @@ import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
 import { updateWalkers } from './walkers.js';
 import { checkAdvisor } from './advisor.js';
-import { initGL3D, buildTerrainMesh, render3D, resize3D } from './webgl3d.js';
+import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -313,6 +313,16 @@ function simTick() {
     }
   }
   if (G.gameTick % 3600 === 0 && G.gameTick > 0) saveGame({ silent: true });
+  // Bird spawning — screen-space birds fly across sky during daytime
+  if (!G.birds) G.birds = [];
+  if (G.gameTick % 400 === 0 && G.birds.length < 3 && getDaylight() > 0.6) {
+    G.birds.push({
+      x: -50 + Math.random() * 200,
+      y: 50 + Math.random() * 100,
+      vx: 0.5 + Math.random() * 0.5,
+      vy: 0,
+    });
+  }
 }
 
 function gameLoop() {

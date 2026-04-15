@@ -10,8 +10,8 @@ export function updateParticles() {
     p.offsetY += p.vy;
     p.alpha -= p.decay || 0.012;
     if (p.type === 'smoke') {
-      p.tx += (Math.sin(G.gameTick * 0.01 + p.tx) * 0.002);
-      p.size = (p.size || 2) + 0.015;
+      p.tx += (Math.sin(G.gameTick * 0.015 + p.tx * 0.5) * 0.003);
+      p.size = (p.size || 2) + 0.02;  // grow as it rises
     }
     if (p.type === 'dust') {
       p.tx += (p.vx || 0) * 0.02;

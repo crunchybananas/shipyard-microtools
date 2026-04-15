@@ -240,6 +240,18 @@ export function render() {
           ctx.lineTo(s.x - TW/2, s.y);
           ctx.closePath();
           ctx.fill();
+          // Foam bubble animation at shoreline
+          const foamPhase = (G.gameTick * 0.05 + x * 0.3 + y * 0.7) % (Math.PI * 2);
+          const foamAlpha = 0.3 + 0.4 * Math.sin(foamPhase);
+          ctx.globalAlpha = daylight * foamAlpha;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.beginPath();
+          ctx.arc(s.x - 8, s.y + 4, 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(s.x + 6, s.y + 2, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = daylight;
         }
       }
 
@@ -324,23 +336,29 @@ export function render() {
       if (tile === TILE.GRASS && G.season !== 'winter') {
         const gh = ((x * 271 + y * 619) & 0xff);
         const sway = Math.sin(G.gameTick * 0.02 + x * 0.5 + y * 0.3) * 1.5;
-        ctx.globalAlpha = daylight * 0.6;
-        if (gh < 80) {
+        ctx.globalAlpha = daylight * 0.7;
+        if (gh < 140) {
           ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
           const gx = s.x - 8 + (gh % 16) + sway, gy = s.y - 4 + ((gh >> 4) % 6);
           ctx.beginPath();
-          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1 + sway * 0.5, gy - 3); ctx.lineTo(gx + 1, gy - 2);
+          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1 + sway * 0.5, gy - 4); ctx.lineTo(gx + 1.5, gy - 3);
           ctx.fill();
           ctx.beginPath();
-          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3 + sway * 0.5, gy - 4); ctx.lineTo(gx + 4, gy - 1);
+          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3 + sway * 0.5, gy - 5); ctx.lineTo(gx + 5, gy - 1.5);
           ctx.fill();
+          // Third blade for denser tufts
+          if (gh < 80) {
+            ctx.beginPath();
+            ctx.moveTo(gx + 5, gy); ctx.lineTo(gx + 6 + sway * 0.3, gy - 4); ctx.lineTo(gx + 7.5, gy - 2);
+            ctx.fill();
+          }
         }
-        if (gh > 220 && G.season === 'spring') {
+        if (G.season === 'spring' && gh > 192) {
           ctx.fillStyle = ['#f0a0c0','#ffe066','#a0c0f0'][gh % 3];
-          ctx.globalAlpha = daylight * 0.7;
+          ctx.globalAlpha = daylight * 0.8;
           const fx = s.x - 6 + (gh % 12) + sway * 0.5, fy = s.y - 2 + ((gh >> 3) % 5);
           ctx.beginPath();
-          ctx.arc(fx, fy, 1.2, 0, Math.PI * 2);
+          ctx.arc(fx, fy, 1.8, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = daylight;
@@ -717,14 +735,19 @@ export function render() {
     const bob = isMoving ? Math.sin(G.gameTick * 0.2 + c.x * 3) * 0.8 : 0;
     const cy = s.y + bob;
 
-    // Facing direction
-    let faceX = 0;
+    // Facing direction (x = left/right, z = depth/forward-back in iso)
+    let faceX = 0, faceZ = 0;
     if (c.path && c.pathIdx < (c.path?.length ?? 0)) {
       const wp = c.path[c.pathIdx];
-      faceX = (wp.x - c.x) > 0.1 ? 1 : (wp.x - c.x) < -0.1 ? -1 : 0;
+      const fdx = wp.x - c.x;
+      const fdy = wp.y - c.y;
+      faceX = fdx > 0.1 ? 1 : fdx < -0.1 ? -1 : 0;
+      faceZ = fdy > 0.1 ? 1 : fdy < -0.1 ? -1 : 0;
     } else if (Math.abs(c.tx - c.x) > 0.1) {
       faceX = c.tx > c.x ? 1 : -1;
     }
+    // In iso: camera looks from upper-left, facing away = moving up-right (+X, -Y)
+    const facingAway = faceX > 0 && faceZ < 0;
 
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
@@ -781,13 +804,20 @@ export function render() {
     ctx.ellipse(s.x + 2 + step * 0.3, cy - 1, 2, 1.2, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body — rounded pill shape
+    // Body — rounded pill shape with shadow side
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
     ctx.ellipse(s.x, cy - 6, 4.5, 5, 0, 0, Math.PI * 2);
     ctx.fill();
+    // Shadow side (lower-right crescent for depth)
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(s.x + 1.5, cy - 5, 3.5, 4, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.ellipse(s.x, cy - 6, 4.5, 5, 0, 0, Math.PI * 2);
     ctx.stroke();
 
     // Head — large for chibi proportions (oversized head = cute)
@@ -809,14 +839,24 @@ export function render() {
     ctx.closePath();
     ctx.fill();
 
-    // Face — eyes on facing side
-    if (G.camera.zoom >= 1.0) {
+    // Face — eyes and mouth on facing side, hidden when facing away
+    if (!facingAway && G.camera.zoom >= 1.0) {
       const eyeX = headX + faceX * 0.8;
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
       ctx.arc(eyeX - 1.2, headY + 0.5, 0.6, 0, Math.PI * 2);
       ctx.arc(eyeX + 1.2, headY + 0.5, 0.6, 0, Math.PI * 2);
       ctx.fill();
+    }
+    // Mouth — tiny line, only at closer zoom
+    if (!facingAway && G.camera.zoom >= 1.5) {
+      ctx.strokeStyle = 'rgba(80,50,30,0.7)';
+      ctx.lineWidth = 0.5;
+      const mouthX = headX + faceX * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(mouthX - 0.8, headY + 1.5);
+      ctx.lineTo(mouthX + 0.8, headY + 1.5);
+      ctx.stroke();
     }
 
     if (G.camera.zoom >= 0.7) {
@@ -876,13 +916,16 @@ export function render() {
         ctx.globalAlpha = daylight;
       }
 
-      // Carrying indicator (small colored dot on back)
+      // Carrying indicator (small colored dot on back, opposite from facing direction)
       if (c.carrying) {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
         ctx.fillStyle = cc;
         ctx.beginPath();
-        ctx.arc(s.x - faceX * 3, cy - 8, 2, 0, Math.PI * 2);
+        ctx.arc(s.x - faceX * 2.5, cy - 7, 2.2, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
       }
     } // end zoom >= 0.7
 
@@ -1384,6 +1427,27 @@ export function render() {
   ctx.globalAlpha = 1;
   ctx.restore();
 
+  // ── Birds (screen space, fly across sky during day) ──────────
+  if (G.birds && G.birds.length > 0) {
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1.5;
+    for (let i = G.birds.length - 1; i >= 0; i--) {
+      const b = G.birds[i];
+      b.x += b.vx;
+      if (b.x > logicalW + 50) { G.birds.splice(i, 1); continue; }
+      // V-shape bird silhouette with flapping wings
+      const wing = Math.sin(G.gameTick * 0.3 + b.x * 0.01) * 3;
+      ctx.beginPath();
+      ctx.moveTo(b.x - 4, b.y + wing);
+      ctx.lineTo(b.x, b.y);
+      ctx.lineTo(b.x + 4, b.y + wing);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   // ── Rain overlay (screen space) ───────────────────────────────
   if (G.weather === 'rain' && G.camera.zoom >= 0.6) {
     ctx.save();
@@ -1522,12 +1586,26 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.lineTo(s.x - hw, s.y);
     ctx.closePath();
     ctx.fill();
+    // Worn grass ring — subtle brown tint under buildings at normal+ zoom
+    if (b.type !== 'fisherman' && G.camera && G.camera.zoom >= 1.0) {
+      ctx.fillStyle = 'rgba(80, 60, 40, 0.12)';
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y - TH/2 + 1);
+      ctx.lineTo(s.x + TW/2 - 1, s.y);
+      ctx.lineTo(s.x, s.y + TH/2 - 1);
+      ctx.lineTo(s.x - TW/2 + 1, s.y);
+      ctx.closePath();
+      ctx.fill();
+    }
   }
 
-  // Shadow — soft ground shadow offset to the right
-  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  // Longer directional shadow — darker toward building, faded toward tip
+  const shadowGrad = ctx.createRadialGradient(s.x + 2, s.y + 3, 4, s.x + 12, s.y + 8, 25);
+  shadowGrad.addColorStop(0, 'rgba(0,0,0,0.35)');
+  shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = shadowGrad;
   ctx.beginPath();
-  ctx.ellipse(s.x + 3, s.y + 4, 14, 5, 0.15, 0, Math.PI*2);
+  ctx.ellipse(s.x + 7, s.y + 5, 20, 7, 0.25, 0, Math.PI * 2);
   ctx.fill();
 
   // Ground the sprite: scale from tile-center anchor so buildings grow UP
@@ -1646,6 +1724,17 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.globalAlpha = daylight;
     }
 
+    // Dawn/dusk warm window glow (when daylight is between 0.5-0.85)
+    if (daylight > 0.5 && daylight < 0.85 && G.camera.zoom >= 0.5) {
+      const dawnAlpha = Math.min((0.85 - daylight) * 3, (daylight - 0.5) * 3) * 0.4;
+      if (dawnAlpha > 0 && (b.type === 'house' || b.type === 'tavern' || b.type === 'church')) {
+        ctx.fillStyle = `rgba(255, 200, 120, ${dawnAlpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x + 4, s.y - 12, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // Worker count indicator for buildings that need workers
     const needed = def.workers || 0;
     if (needed > 0) {
@@ -1668,6 +1757,20 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.fillRect(s.x-12, s.y-34, 24, 3);
     ctx.fillStyle = b.hp > 50 ? '#4ade80' : '#f87171';
     ctx.fillRect(s.x-12, s.y-34, 24*(b.hp/100), 3);
+  }
+
+  // Building status glow — pulsing red outline for damaged buildings
+  if (G.camera.zoom >= 1.0 && b.hp < b.maxHp) {
+    const hpRatio = b.hp / b.maxHp;
+    if (hpRatio < 0.5) {
+      // Damaged: pulsing red outline
+      const pulse = 0.3 + 0.2 * Math.sin(G.gameTick * 0.15);
+      ctx.strokeStyle = `rgba(239, 68, 68, ${pulse})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 2, 16, 6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
 
   // Fire overlay
