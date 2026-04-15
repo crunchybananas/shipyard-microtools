@@ -48,6 +48,7 @@
 - Visible jagged lightning bolts in rain (loop 33)
 - Mountain rams on stone tiles (loop 34)
 - Bee swarms around farms in summer (loop 35)
+- Will-o-wisps in forest at night (loop 36)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -205,3 +206,5 @@
 ### Loop 34 — mountain rams clamber on stone tiles (curling horns).
 
 ### Loop 35 — bee swarms (yellow striped dots with wing blur) buzz around farms in summer.
+
+### Loop 36 — colored will-o-wisps drift in forest at night (cyan/blue/violet).

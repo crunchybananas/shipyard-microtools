@@ -1816,3 +1816,66 @@ function renderBeeSwarms(ctx) {
   }
 }
 registerWorldRenderer(renderBeeSwarms);
+
+// ── Loop 36: Will-o-wisps drift near forest at night ───────
+function updateWisps() {
+  if (!G.wisps) G.wisps = [];
+  const t = G.dayPhase / G.dayLength;
+  if (t > 0.05 && t < 0.7) { G.wisps.length = 0; return; }
+  if (G.gameTick % 250 === 0 && G.wisps.length < 4) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.FOREST) {
+        G.wisps.push({
+          x, y,
+          tx: x + (Math.random() - 0.5) * 3, ty: y + (Math.random() - 0.5) * 3,
+          life: 600 + Math.random() * 400,
+          color: ['#80ffe0','#a0f0ff','#c8a0ff'][Math.floor(Math.random() * 3)],
+        });
+        break;
+      }
+    }
+  }
+  for (let i = G.wisps.length - 1; i >= 0; i--) {
+    const w = G.wisps[i];
+    w.life -= G.speed;
+    if (w.life <= 0) { G.wisps.splice(i, 1); continue; }
+    const dx = w.tx - w.x, dy = w.ty - w.y, d = Math.hypot(dx, dy);
+    if (d < 0.2) {
+      w.tx = w.x + (Math.random() - 0.5) * 4;
+      w.ty = w.y + (Math.random() - 0.5) * 4;
+    } else {
+      w.x += (dx / d) * 0.01 * G.speed;
+      w.y += (dy / d) * 0.01 * G.speed;
+    }
+  }
+}
+function renderWisps(ctx) {
+  if (!G.wisps || !G.wisps.length || G.camera.zoom < 0.6) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const w of G.wisps) {
+    const s = toScreen(w.x, w.y);
+    const fade = Math.min(1, w.life / 200);
+    const pulse = 0.7 + 0.3 * Math.sin(G.gameTick * 0.08 + w.x);
+    const cy = s.y - 8 + Math.sin(G.gameTick * 0.04 + w.y) * 2;
+    const grad = ctx.createRadialGradient(s.x, cy, 0, s.x, cy, 9);
+    grad.addColorStop(0, w.color + 'ff'.replace('ff', Math.floor(pulse * 255).toString(16).padStart(2,'0')));
+    grad.addColorStop(1, w.color.replace(')', ',0)').replace('rgb', 'rgba'));
+    // Simpler: use opacity
+    ctx.globalAlpha = fade * pulse * 0.85;
+    ctx.fillStyle = w.color;
+    ctx.beginPath();
+    ctx.arc(s.x, cy, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = fade * pulse * 0.35;
+    ctx.beginPath();
+    ctx.arc(s.x, cy, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+registerUpdater(updateWisps);
+registerWorldRenderer(renderWisps);
