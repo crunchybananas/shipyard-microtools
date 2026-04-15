@@ -2864,3 +2864,60 @@ function updateExtraFireflies() {
   }
 }
 registerUpdater(updateExtraFireflies);
+
+// ── Loop 64: Bunnies hop on grass tiles in spring ──────────
+function updateBunnies() {
+  if (G.season !== 'spring') { if (G.bunnies) G.bunnies.length = 0; return; }
+  if (!G.bunnies) G.bunnies = [];
+  if (G.gameTick % 300 === 0 && G.bunnies.length < 5) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.GRASS) {
+        G.bunnies.push({ x, y, tx: x, ty: y, hop: 0, hopTimer: 60 + Math.random() * 80 });
+        break;
+      }
+    }
+  }
+  for (let i = G.bunnies.length - 1; i >= 0; i--) {
+    const b = G.bunnies[i];
+    b.hopTimer -= G.speed;
+    if (b.hopTimer <= 0) {
+      b.hop = 14;
+      b.x += (Math.random() - 0.5) * 1.2;
+      b.y += (Math.random() - 0.5) * 0.8;
+      b.x = Math.max(1, Math.min(MAP_W - 2, b.x));
+      b.y = Math.max(1, Math.min(MAP_H - 2, b.y));
+      b.hopTimer = 80 + Math.random() * 120;
+    }
+    if (b.hop > 0) b.hop -= G.speed;
+    if (Math.random() < 0.0006) G.bunnies.splice(i, 1);
+  }
+}
+function renderBunnies(ctx) {
+  if (!G.bunnies || !G.bunnies.length || G.camera.zoom < 0.9) return;
+  for (const b of G.bunnies) {
+    const s = toScreen(b.x, b.y);
+    const yOff = -Math.sin((Math.max(0, b.hop) / 14) * Math.PI) * 5;
+    // Body
+    ctx.fillStyle = '#d8c0a0';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y - 1 + yOff, 2, 1.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Head
+    ctx.beginPath();
+    ctx.arc(s.x + 1.5, s.y - 2.5 + yOff, 1.1, 0, Math.PI * 2);
+    ctx.fill();
+    // Ears
+    ctx.fillStyle = '#c8b090';
+    ctx.fillRect(s.x + 1, s.y - 5 + yOff, 0.5, 2);
+    ctx.fillRect(s.x + 2, s.y - 5 + yOff, 0.5, 2);
+    // Tail
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s.x - 2, s.y - 1 + yOff, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+registerUpdater(updateBunnies);
+registerWorldRenderer(renderBunnies);

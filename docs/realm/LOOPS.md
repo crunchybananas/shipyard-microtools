@@ -76,6 +76,7 @@
 - Spiders hanging on threads (loop 61)
 - Research-complete sparkle burst from school (loop 62)
 - Dense fireflies over summer water edges (loop 63)
+- Bunnies hop on spring grass (loop 64)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -289,3 +290,5 @@
 ### Loop 62 — magical sparkle burst from school when research completes.
 
 ### Loop 63 — extra dense firefly clouds over water-edge tiles in summer nights.
+
+### Loop 64 — bunnies hop across grass in spring (white tail).
