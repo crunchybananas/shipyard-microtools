@@ -2223,3 +2223,39 @@ function renderWindmillSpin(ctx) {
   }
 }
 registerWorldRenderer(renderWindmillSpin);
+
+// ── Loop 46: Acorns drop from forest tiles in autumn ───────
+function updateAcorns() {
+  if (G.season !== 'autumn') { if (G.acorns) G.acorns.length = 0; return; }
+  if (!G.acorns) G.acorns = [];
+  if (G.gameTick % 30 === 0 && G.acorns.length < 30) {
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.FOREST) {
+        G.acorns.push({ x: x + (Math.random() - 0.5) * 0.5, y: y + (Math.random() - 0.5) * 0.5, oy: -16, vy: 0.25, life: 80 });
+        break;
+      }
+    }
+  }
+  for (let i = G.acorns.length - 1; i >= 0; i--) {
+    const a = G.acorns[i];
+    a.oy += a.vy * G.speed;
+    if (a.oy >= 0) a.life -= G.speed;
+    if (a.life <= 0) G.acorns.splice(i, 1);
+  }
+}
+function renderAcorns(ctx) {
+  if (!G.acorns || !G.acorns.length || G.camera.zoom < 0.8) return;
+  for (const a of G.acorns) {
+    const s = toScreen(a.x, a.y);
+    ctx.fillStyle = '#7a4a18';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + a.oy, 0.7, 0.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#3a1c08';
+    ctx.fillRect(s.x - 0.6, s.y + a.oy - 0.9, 1.2, 0.4);
+  }
+}
+registerUpdater(updateAcorns);
+registerWorldRenderer(renderAcorns);

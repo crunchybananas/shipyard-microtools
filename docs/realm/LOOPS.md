@@ -58,6 +58,7 @@
 - Swallows dart in spring sky (loop 43)
 - Warm window glow on houses at night (loop 44)
 - Rotating windmill blades overlay (loop 45)
+- Acorns drop in autumn (loop 46)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -235,3 +236,5 @@
 ### Loop 44 — warm window glow on houses+taverns at night (flickering candlelight).
 
 ### Loop 45 — visibly rotating 4-blade windmill overlay on each windmill.
+
+### Loop 46 — acorns drop from autumn forest tiles, settle on the ground.
