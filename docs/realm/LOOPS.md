@@ -61,6 +61,7 @@
 - Acorns drop in autumn (loop 46)
 - Pulsating tide foam on coastal sand (loop 47)
 - Snow drift mounds beside buildings (loop 48)
+- Dust devils on summer sand (loop 49)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -244,3 +245,5 @@
 ### Loop 47 — pulsating tide foam on sand tiles bordering water (slow tidal cycle).
 
 ### Loop 48 — snow drift mounds piled on east side of every building in winter.
+
+### Loop 49 — twisting dust devils on summer sand tiles.

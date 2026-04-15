@@ -2309,3 +2309,47 @@ function renderSnowDrifts(ctx) {
   }
 }
 registerWorldRenderer(renderSnowDrifts);
+
+// ── Loop 49: Dust devils swirl on sand in summer ───────────
+function updateDustDevils() {
+  if (G.season !== 'summer') { if (G.dustDevils) G.dustDevils.length = 0; return; }
+  if (!G.dustDevils) G.dustDevils = [];
+  if (G.gameTick % 600 === 0 && G.dustDevils.length < 1) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.SAND) {
+        G.dustDevils.push({ x, y, vx: (Math.random() - 0.5) * 0.05, vy: (Math.random() - 0.5) * 0.05, life: 400 });
+        break;
+      }
+    }
+  }
+  for (let i = G.dustDevils.length - 1; i >= 0; i--) {
+    const d = G.dustDevils[i];
+    d.x += d.vx * G.speed; d.y += d.vy * G.speed;
+    d.life -= G.speed;
+    if (d.life <= 0) G.dustDevils.splice(i, 1);
+  }
+}
+function renderDustDevils(ctx) {
+  if (!G.dustDevils || !G.dustDevils.length || G.camera.zoom < 0.6) return;
+  const tt = G.gameTick * 0.2;
+  for (const d of G.dustDevils) {
+    const s = toScreen(d.x, d.y);
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.5, d.life / 400) * 0.8;
+    for (let k = 0; k < 6; k++) {
+      const ang = tt + k * 1.0;
+      const r = 2 + k * 1.5;
+      const dx = Math.cos(ang) * r;
+      const dy = Math.sin(ang) * r * 0.5;
+      ctx.fillStyle = '#d4b88a';
+      ctx.beginPath();
+      ctx.arc(s.x + dx, s.y - k * 2 + dy, 1.2 - k * 0.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+registerUpdater(updateDustDevils);
+registerWorldRenderer(renderDustDevils);
