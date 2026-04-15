@@ -23,6 +23,7 @@
 - Frozen lake ice sheets in winter (loop 8)
 - Wolves prowling at night (loop 9)
 - Glowing bioluminescent mushrooms in forest at night (loop 10)
+- Dawn ground mist bands (loop 11)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -85,3 +86,9 @@
 - Ideas: (1) **glowing bioluminescent mushrooms** (2) low ground mist between trees (3) wisp lights between branches
 - Chose: glow mushrooms (cheap render, deterministic placement, adds magic)
 - Implemented: enhancements.js renderGlowMushrooms — deterministic per-tile (~12% of forest tiles), 2-4 cyan-green glow points per cluster, screen-blend, pulse animation, only at night, only on visible viewport.
+
+### Loop 11
+- Validator: dawn transitions are flat — color shifts but no atmospheric depth at horizon.
+- Ideas: (1) **dawn ground mist** (2) chimney smoke columns visible from far (3) sun rays through trees
+- Chose: dawn mist (subtle but powerful mood)
+- Implemented: enhancements.js renderGroundMist — three undulating soft horizontal bands fading in/out around dawn (strong) and dusk (weak).

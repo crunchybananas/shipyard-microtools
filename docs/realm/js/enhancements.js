@@ -8,6 +8,39 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 11: Dawn ground mist drifting over land ───────────
+export function renderGroundMist(ctx, logicalW, logicalH) {
+  const t = G.dayPhase / G.dayLength;
+  // Strongest at early dawn (t 0.05..0.18), fade out
+  let strength = 0;
+  if (t > 0.02 && t < 0.22) {
+    strength = 1 - Math.abs(t - 0.1) / 0.1;
+  } else if (t > 0.62 && t < 0.78) {
+    strength = (1 - Math.abs(t - 0.7) / 0.08) * 0.6; // weaker dusk mist
+  }
+  if (strength <= 0.05) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over';
+  // Three soft horizontal bands of mist
+  const tt = G.gameTick * 0.003;
+  for (let band = 0; band < 3; band++) {
+    const yBase = logicalH * (0.55 + band * 0.12);
+    ctx.globalAlpha = strength * (0.18 - band * 0.04);
+    ctx.fillStyle = '#e8eef5';
+    ctx.beginPath();
+    ctx.moveTo(0, yBase);
+    for (let x = 0; x <= logicalW; x += 30) {
+      const y = yBase + Math.sin(x * 0.004 + tt + band) * 14 + Math.sin(x * 0.012 + tt * 1.5 + band) * 5;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(logicalW, yBase + 70);
+    ctx.lineTo(0, yBase + 70);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ── Loop 10: Glowing mushroom clusters in dark forest ──────
 // Deterministically placed (seeded by tile coords) — render only at night
 export function renderGlowMushrooms(ctx) {
