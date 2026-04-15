@@ -3029,3 +3029,37 @@ function renderChurchVane(ctx) {
   }
 }
 registerWorldRenderer(renderChurchVane);
+
+// ── Loop 68: Chime light beams from church when day changes (Sunday)
+let _prevDay = 0;
+function updateChurchBeams() {
+  if (G.day !== _prevDay && G.day % 7 === 0) {
+    G._churchBeam = 100;
+  }
+  _prevDay = G.day;
+  if (G._churchBeam > 0) G._churchBeam -= G.speed;
+}
+function renderChurchBeams(ctx) {
+  if (!G._churchBeam || G._churchBeam <= 0) return;
+  const a = G._churchBeam / 100;
+  const churches = G.buildings.filter(b => b.type === 'church');
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const c of churches) {
+    const s = toScreen(c.x, c.y);
+    const grad = ctx.createLinearGradient(s.x, s.y - 60, s.x, s.y - 200);
+    grad.addColorStop(0, `rgba(255,240,180,${a * 0.9})`);
+    grad.addColorStop(1, 'rgba(255,240,180,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 8, s.y - 60);
+    ctx.lineTo(s.x + 8, s.y - 60);
+    ctx.lineTo(s.x + 35, s.y - 250);
+    ctx.lineTo(s.x - 35, s.y - 250);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateChurchBeams);
+registerWorldRenderer(renderChurchBeams);

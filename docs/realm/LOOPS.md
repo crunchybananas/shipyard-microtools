@@ -80,6 +80,7 @@
 - Sleep z-bubbles above houses at night (loop 65)
 - Forge embers around blacksmiths (loop 66)
 - Rooster weather vanes on churches (loop 67)
+- Sabbath light beams from churches (loop 68)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -301,3 +302,5 @@
 ### Loop 66 — orange forge glow + rising embers around each blacksmith building.
 
 ### Loop 67 — rooster weather vane on each church spire (oscillates with wind).
+
+### Loop 68 — golden light beam shines up from churches at the start of every 7th day (sabbath).
