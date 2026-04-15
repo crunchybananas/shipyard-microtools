@@ -1494,3 +1494,61 @@ function renderWellSparkles(ctx) {
   }
 }
 registerWorldRenderer(renderWellSparkles);
+
+// ── Loop 30: Slow comets at deep night (different from meteors)
+// Meteors are fast, screen-only streaks. Comets are slow, large,
+// have long teardrop tails, and travel arcs across the upper sky.
+function updateComets(logicalW, logicalH) {
+  if (!G.comets) G.comets = [];
+  if (G.gameTick % 1800 === 0 && G.comets.length < 1 && getDaylight() < 0.4 && Math.random() < 0.4) {
+    const goingRight = Math.random() < 0.5;
+    G.comets.push({
+      x: goingRight ? -50 : (logicalW || 1500) + 50,
+      y: (logicalH || 800) * (0.05 + Math.random() * 0.2),
+      vx: (goingRight ? 1 : -1) * 0.45,
+      vy: 0.05,
+      life: 2000,
+    });
+  }
+  for (let i = G.comets.length - 1; i >= 0; i--) {
+    const c = G.comets[i];
+    c.x += c.vx * G.speed; c.y += c.vy * G.speed; c.life -= G.speed;
+    if (c.life <= 0 || c.x < -200 || c.x > (logicalW || 1500) + 200) G.comets.splice(i, 1);
+  }
+}
+function renderComets(ctx) {
+  if (!G.comets || !G.comets.length) return;
+  const dayl = getDaylight();
+  const ns = Math.max(0, Math.min(1, (0.6 - dayl) / 0.3));
+  if (ns < 0.05) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const c of G.comets) {
+    const dir = c.vx >= 0 ? 1 : -1;
+    // Tail (gradient)
+    const tailLen = 80 * dir;
+    const grad = ctx.createLinearGradient(c.x, c.y, c.x - tailLen, c.y - 6);
+    grad.addColorStop(0, `rgba(220,235,255,${0.85 * ns})`);
+    grad.addColorStop(0.4, `rgba(180,210,255,${0.45 * ns})`);
+    grad.addColorStop(1, 'rgba(120,160,230,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y - 4);
+    ctx.lineTo(c.x - tailLen, c.y - 1);
+    ctx.lineTo(c.x - tailLen, c.y + 1);
+    ctx.lineTo(c.x, c.y + 4);
+    ctx.closePath();
+    ctx.fill();
+    // Head
+    const hg = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 8);
+    hg.addColorStop(0, `rgba(255,255,255,${ns})`);
+    hg.addColorStop(1, 'rgba(180,210,255,0)');
+    ctx.fillStyle = hg;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateComets, true);
+registerScreenRenderer(renderComets);
