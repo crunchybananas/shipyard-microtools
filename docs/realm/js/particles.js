@@ -25,6 +25,9 @@ export function updateParticles() {
       p.tx += (p.vx || 0) * 0.5 + Math.sin(G.gameTick * 0.01 + p.tx * 2) * 0.004;
       p.rotation = (p.rotation || 0) + 0.03;
     }
+    if (p.type === 'pollen') {
+      p.tx += (p.vx || 0) + Math.sin(G.gameTick * 0.02 + p.tx * 3) * 0.001;
+    }
     if (p.alpha <= 0) G.particles.splice(i, 1);
   }
 }
@@ -124,6 +127,23 @@ export function updateSmokeEmitters() {
       size: 1.5 + Math.random(),
       vx: 0.02 + Math.random() * 0.02,
       color: ['#ffb0c8','#ff90a8','#ffe066','#fff0f0'][Math.floor(Math.random()*4)],
+    });
+  }
+
+  // Spring pollen/motes — tiny golden dust drifting in warm daytime air
+  if (G.season === 'spring' && G.gameTick % 50 === 0 && G.particles.length < 180) {
+    const cx = G.camera.x / 32, cy = G.camera.y / 16;
+    G.particles.push({
+      tx: cx + (Math.random() - 0.5) * 18,
+      ty: cy + (Math.random() - 0.5) * 14,
+      offsetY: -5 - Math.random() * 25,
+      text: null,
+      alpha: 0.3 + Math.random() * 0.2,
+      vy: 0.02 + Math.random() * 0.04,
+      decay: 0.003,
+      type: 'pollen',
+      size: 0.8 + Math.random() * 0.6,
+      vx: (Math.random() - 0.5) * 0.03,
     });
   }
 

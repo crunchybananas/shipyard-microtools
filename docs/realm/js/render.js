@@ -149,6 +149,24 @@ export function render() {
       ctx.closePath();
       ctx.fill();
 
+      // Atmospheric haze — outer edge tiles fade to pale blue-grey
+      if (tile !== TILE.WATER) {
+        const centerDist = Math.sqrt(Math.pow(x - MAP_W/2, 2) + Math.pow(y - MAP_H/2, 2)) / (MAP_W/2);
+        const haze = Math.max(0, centerDist - 0.6) * 0.4;
+        if (haze > 0) {
+          ctx.globalAlpha = daylight * haze;
+          ctx.fillStyle = 'rgb(200,215,230)';
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y - TH/2);
+          ctx.lineTo(s.x + TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x - TW/2, s.y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = daylight;
+        }
+      }
+
       // Tile texture — subtle noise pattern for visual richness
       // Only draw on every other tile (checkerboard) — halves draw calls with no perceptible loss
       if (tile !== TILE.WATER && (x + y) % 2 === 0) {
@@ -383,6 +401,43 @@ export function render() {
         ctx.globalAlpha = daylight;
       }
 
+      // Scattered small boulders on grass tiles (~5%)
+      if (tile === TILE.GRASS && showDetails) {
+        const rh = ((x * 149 + y * 211) & 0xff);
+        if (rh < 13) {
+          const bx = s.x + (rh % 8) - 4;
+          const by = s.y + ((rh >> 3) % 5) - 2;
+          ctx.fillStyle = '#6a6560';
+          ctx.beginPath();
+          ctx.ellipse(bx, by, 2.5, 1.8, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#8a8580';
+          ctx.beginPath();
+          ctx.ellipse(bx - 0.5, by - 0.5, 1.2, 0.8, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Rare clover patches on grass (~5%, not in winter)
+      if (tile === TILE.GRASS && showDetails && G.season !== 'winter') {
+        const ch = ((x * 89 + y * 131) & 0xff);
+        if (ch < 12) {
+          const cx = s.x + (ch % 16) - 8;
+          const cy = s.y + ((ch >> 3) % 8) - 4;
+          ctx.globalAlpha = daylight * 0.8;
+          ctx.fillStyle = '#7ab85a';
+          for (let i = 0; i < 3; i++) {
+            const ang = i * Math.PI * 2 / 3;
+            const lx = cx + Math.cos(ang) * 1.2;
+            const ly = cy + Math.sin(ang) * 0.8;
+            ctx.beginPath();
+            ctx.arc(lx, ly, 0.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = daylight;
+        }
+      }
+
       // Pebbles on stone tiles
       if (tile === TILE.STONE) {
         const ph = ((x * 193 + y * 457) & 0xff);
@@ -430,6 +485,78 @@ export function render() {
             ctx.ellipse(mx - 1, my - 5, 1.5, 1, -0.3, 0, Math.PI * 2);
             ctx.fill();
             ctx.globalAlpha = daylight;
+          }
+        }
+      }
+
+      // Small mushroom clusters on forest tiles (~10%)
+      if (tile === TILE.FOREST && showDetails) {
+        const mh = ((x * 71 + y * 97) & 0xff);
+        if (mh < 25) {
+          const mx = s.x + (mh % 14) - 7;
+          const my = s.y + ((mh >> 3) % 6) - 1;
+          // Red cap with white spots
+          ctx.fillStyle = '#c83232';
+          ctx.beginPath();
+          ctx.ellipse(mx, my, 1.5, 1, 0, Math.PI, 0);
+          ctx.fill();
+          // White stem
+          ctx.fillStyle = '#f0e8d8';
+          ctx.fillRect(mx - 0.5, my, 1, 1.5);
+          // Spot on cap
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(mx - 0.3, my - 0.5, 0.6, 0.5);
+        }
+      }
+
+      // Old tree stumps on grass near forest edges (~6%)
+      if (tile === TILE.GRASS && showDetails) {
+        const nearForest =
+          (x > 0 && G.map[y][x-1] === TILE.FOREST) ||
+          (x < MAP_W - 1 && G.map[y][x+1] === TILE.FOREST) ||
+          (y > 0 && G.map[y-1][x] === TILE.FOREST) ||
+          (y < MAP_H - 1 && G.map[y+1][x] === TILE.FOREST);
+        if (nearForest) {
+          const sh = ((x * 13 + y * 29) & 0xff);
+          if (sh < 15) {
+            const stx = s.x + (sh % 10) - 5;
+            const sty = s.y + ((sh >> 2) % 6) - 3;
+            // Stump base
+            ctx.fillStyle = '#6a4a2a';
+            ctx.beginPath();
+            ctx.ellipse(stx, sty, 3, 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Top ring (sawn surface)
+            ctx.fillStyle = '#b89468';
+            ctx.beginPath();
+            ctx.ellipse(stx, sty - 0.5, 2.5, 1.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Growth rings
+            ctx.strokeStyle = '#8a6a4a';
+            ctx.lineWidth = 0.3;
+            ctx.beginPath();
+            ctx.ellipse(stx, sty - 0.5, 1.2, 0.7, 0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Lily pads on water (~2%)
+      if (tile === TILE.WATER && showDetails) {
+        const lh = ((x * 43 + y * 67) & 0xff);
+        if (lh < 5) {
+          const lpx = s.x + (lh % 10) - 5;
+          const lpy = s.y + ((lh >> 2) % 6) - 3;
+          ctx.fillStyle = 'rgba(50, 120, 50, 0.7)';
+          ctx.beginPath();
+          ctx.ellipse(lpx, lpy, 3, 2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Pink flower sometimes
+          if (lh < 2) {
+            ctx.fillStyle = '#ff9aae';
+            ctx.beginPath();
+            ctx.arc(lpx, lpy - 0.5, 0.8, 0, Math.PI * 2);
+            ctx.fill();
           }
         }
       }
@@ -794,8 +921,8 @@ export function render() {
     ctx.beginPath();
     ctx.ellipse(s.x + 1.5, cy - 5, 3.5, 4, 0, -Math.PI / 2, Math.PI / 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = 'rgba(20,10,0,0.4)';
+    ctx.lineWidth = 0.6;
     ctx.beginPath();
     ctx.ellipse(s.x, cy - 6, 4.5, 5, 0, 0, Math.PI * 2);
     ctx.stroke();
@@ -807,8 +934,8 @@ export function render() {
     ctx.beginPath();
     ctx.arc(headX, headY, 4.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-    ctx.lineWidth = 0.4;
+    ctx.strokeStyle = 'rgba(20,10,0,0.35)';
+    ctx.lineWidth = 0.6;
     ctx.stroke();
 
     // Hair — cap on top of head
@@ -1315,6 +1442,11 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x + drift, s.y + p.offsetY, sz, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'pollen') {
+      ctx.fillStyle = `rgba(255, 240, 180, ${ctx.globalAlpha})`;
+      ctx.beginPath();
+      ctx.arc(s.x + Math.sin(G.gameTick * 0.02 + p.tx) * 4, s.y + p.offsetY, p.size, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       const scale = 1 + (1 - (p.alpha / 1.5)) * 0.3;
       ctx.save();
@@ -1803,6 +1935,12 @@ function drawHouse(ctx, s) {
   ctx.lineTo(s.x+5, s.y-29); ctx.lineTo(s.x+16, s.y-17);
   ctx.closePath();
   ctx.fill();
+  // Subtle warm glow on lower wall (interior light leaking out)
+  const warmGlow = ctx.createLinearGradient(s.x, s.y - 8, s.x, s.y - 4);
+  warmGlow.addColorStop(0, 'rgba(255, 220, 150, 0)');
+  warmGlow.addColorStop(1, 'rgba(255, 200, 120, 0.15)');
+  ctx.fillStyle = warmGlow;
+  ctx.fillRect(s.x - 9, s.y - 8, 18, 4);
   // Door
   ctx.fillStyle = '#4a2a12';
   ctx.fillRect(s.x-3, s.y-10, 6, 6);
@@ -2702,6 +2840,12 @@ function drawTavern(ctx, s) {
   tavernGlow.addColorStop(1, 'rgba(255,150,30,0)');
   ctx.fillStyle = tavernGlow;
   ctx.fillRect(s.x-8, s.y-13, 16, 11);
+  // Subtle warm glow on lower wall (interior light leaking out)
+  const tavernWarmGlow = ctx.createLinearGradient(s.x, s.y - 8, s.x, s.y - 4);
+  tavernWarmGlow.addColorStop(0, 'rgba(255, 220, 150, 0)');
+  tavernWarmGlow.addColorStop(1, 'rgba(255, 200, 120, 0.15)');
+  ctx.fillStyle = tavernWarmGlow;
+  ctx.fillRect(s.x - 10, s.y - 8, 20, 4);
   // Door
   ctx.fillStyle = '#3a2010';
   ctx.fillRect(s.x-3, s.y-12, 6, 8);
@@ -3373,6 +3517,12 @@ function drawChurch(ctx, s) {
   ctx.fill();
   ctx.fillStyle = '#a08020';
   ctx.fillRect(s.x - 0.5, s.y - 35, 1, 2);
+  // Subtle warm glow on lower wall (interior light leaking out)
+  const churchWarmGlow = ctx.createLinearGradient(s.x, s.y - 8, s.x, s.y - 4);
+  churchWarmGlow.addColorStop(0, 'rgba(255, 220, 150, 0)');
+  churchWarmGlow.addColorStop(1, 'rgba(255, 200, 120, 0.15)');
+  ctx.fillStyle = churchWarmGlow;
+  ctx.fillRect(s.x - 10, s.y - 8, 20, 4);
   // Door
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(s.x - 3, s.y - 8, 6, 4);
