@@ -56,6 +56,7 @@
 - Pigeons near markets (loop 41)
 - Citizen motion dust trails (loop 42)
 - Swallows dart in spring sky (loop 43)
+- Warm window glow on houses at night (loop 44)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -229,3 +230,5 @@
 ### Loop 42 — subtle dust trails behind moving citizens (high-zoom only).
 
 ### Loop 43 — swallows dart erratically across spring daytime sky (small forked silhouettes).
+
+### Loop 44 — warm window glow on houses+taverns at night (flickering candlelight).

@@ -2164,3 +2164,26 @@ function renderSwallows(ctx) {
 }
 registerUpdater(updateSwallows, true);
 registerScreenRenderer(renderSwallows);
+
+// ── Loop 44: Glowing windows on houses at night ────────────
+function renderHouseWindows(ctx) {
+  const dayl = getDaylight();
+  const ns = Math.max(0, Math.min(1, (0.7 - dayl) / 0.3));
+  if (ns < 0.05 || G.camera.zoom < 0.7) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const b of G.buildings) {
+    if (b.type !== 'house' && b.type !== 'tavern') continue;
+    const s = toScreen(b.x, b.y);
+    const flick = 0.85 + 0.15 * Math.sin(G.gameTick * 0.07 + b.x + b.y);
+    const grad = ctx.createRadialGradient(s.x, s.y - 8, 1, s.x, s.y - 8, 14);
+    grad.addColorStop(0, `rgba(255,210,140,${0.55 * ns * flick})`);
+    grad.addColorStop(1, 'rgba(255,210,140,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 8, 14, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerWorldRenderer(renderHouseWindows);
