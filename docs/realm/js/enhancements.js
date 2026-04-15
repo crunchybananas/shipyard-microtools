@@ -3796,3 +3796,35 @@ function renderMeteorImpact(ctx) {
 }
 registerUpdater(updateMeteorImpact, true);
 registerWorldRenderer(renderMeteorImpact);
+
+// ── Loop 92: Smoke trail under flying dragon ───────────────
+function updateDragonTrail() {
+  if (!G.dragon) return;
+  if (!G.dragonTrail) G.dragonTrail = [];
+  if (G.gameTick % 4 === 0) {
+    G.dragonTrail.push({ x: G.dragon.x, y: G.dragon.y, life: 60 });
+    if (G.dragonTrail.length > 30) G.dragonTrail.shift();
+  }
+  for (let i = G.dragonTrail.length - 1; i >= 0; i--) {
+    G.dragonTrail[i].life -= G.speed;
+    if (G.dragonTrail[i].life <= 0) G.dragonTrail.splice(i, 1);
+  }
+}
+function renderDragonTrail(ctx) {
+  if (!G.dragonTrail || !G.dragonTrail.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const p of G.dragonTrail) {
+    const a = p.life / 60;
+    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 18);
+    grad.addColorStop(0, `rgba(180,80,160,${a * 0.45})`);
+    grad.addColorStop(1, 'rgba(60,30,80,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateDragonTrail);
+registerScreenRenderer(renderDragonTrail);
