@@ -2782,3 +2782,49 @@ function renderSpider(ctx) {
   }
 }
 registerWorldRenderer(renderSpider);
+
+// ── Loop 62: Magic spell sparkles when research completes
+function triggerResearchSparkle() {
+  if (!G.researchSparkles) G.researchSparkles = [];
+  const school = G.buildings.find(b => b.type === 'school');
+  if (!school) return;
+  for (let i = 0; i < 12; i++) {
+    G.researchSparkles.push({
+      x: school.x, y: school.y,
+      vx: (Math.random() - 0.5) * 0.05,
+      vy: -0.05 - Math.random() * 0.05,
+      life: 80, size: 1 + Math.random() * 1.5,
+      color: ['#80c0ff','#a0a0ff','#ffd0ff','#80ffe0'][Math.floor(Math.random() * 4)],
+    });
+  }
+}
+let _prevResearch = null;
+function updateResearchSparkles() {
+  // Detect research completion: currentResearch transitioned to null while researched count grew
+  const cur = G.currentResearch ? G.currentResearch.id : null;
+  if (_prevResearch && cur === null) triggerResearchSparkle();
+  _prevResearch = cur;
+  if (!G.researchSparkles) G.researchSparkles = [];
+  for (let i = G.researchSparkles.length - 1; i >= 0; i--) {
+    const p = G.researchSparkles[i];
+    p.x += p.vx * G.speed; p.y += p.vy * G.speed; p.life -= G.speed;
+    if (p.life <= 0) G.researchSparkles.splice(i, 1);
+  }
+}
+function renderResearchSparkles(ctx) {
+  if (!G.researchSparkles || !G.researchSparkles.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const p of G.researchSparkles) {
+    const s = toScreen(p.x, p.y);
+    const a = Math.min(1, p.life / 30);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 8, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateResearchSparkles);
+registerWorldRenderer(renderResearchSparkles);

@@ -74,6 +74,7 @@
 - Golden aura over castle on victory (loop 59)
 - Fluffy sheep clouds drifting (loop 60)
 - Spiders hanging on threads (loop 61)
+- Research-complete sparkle burst from school (loop 62)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -283,3 +284,5 @@
 ### Loop 60 — fluffy 'sheep clouds' drift across daytime sky with soft shadows.
 
 ### Loop 61 — small spider hangs from web thread in autumn forest tiles (rare).
+
+### Loop 62 — magical sparkle burst from school when research completes.
