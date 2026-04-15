@@ -2434,3 +2434,53 @@ function renderMineCarts(ctx) {
   }
 }
 registerWorldRenderer(renderMineCarts);
+
+// ── Loop 53: Fish jump out of water occasionally ───────────
+function updateFishJumps() {
+  if (!G.fishJumps) G.fishJumps = [];
+  if (G.gameTick % 100 === 0 && G.fishJumps.length < 3 && G.season !== 'winter') {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.WATER) {
+        G.fishJumps.push({ x, y, t: 0, dur: 25 });
+        break;
+      }
+    }
+  }
+  for (let i = G.fishJumps.length - 1; i >= 0; i--) {
+    G.fishJumps[i].t += G.speed;
+    if (G.fishJumps[i].t >= G.fishJumps[i].dur) G.fishJumps.splice(i, 1);
+  }
+}
+function renderFishJumps(ctx) {
+  if (!G.fishJumps || !G.fishJumps.length || G.camera.zoom < 0.6) return;
+  for (const f of G.fishJumps) {
+    const s = toScreen(f.x, f.y);
+    const p = f.t / f.dur;
+    const yOff = -Math.sin(p * Math.PI) * 8;
+    // Fish body silhouette
+    ctx.fillStyle = '#5a4030';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + yOff, 1.4, 0.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(s.x - 1.3, s.y + yOff);
+    ctx.lineTo(s.x - 2.5, s.y - 0.6 + yOff);
+    ctx.lineTo(s.x - 2.5, s.y + 0.6 + yOff);
+    ctx.closePath();
+    ctx.fill();
+    // Splash ripples at landing point (when t > dur*0.5 going down)
+    if (p > 0.85) {
+      const a = (1 - (p - 0.85) / 0.15) * 0.55;
+      ctx.strokeStyle = `rgba(220,240,255,${a})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 1, 4 * (p - 0.85) / 0.15 + 1, 1.5 * (p - 0.85) / 0.15 + 0.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+registerUpdater(updateFishJumps);
+registerWorldRenderer(renderFishJumps);

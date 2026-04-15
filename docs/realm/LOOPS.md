@@ -65,6 +65,7 @@
 - Victory confetti rain (loop 50)
 - Cart campfires while unloading (loop 51)
 - Mine carts at iron mines (loop 52)
+- Fish jump from water with splash (loop 53)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -256,3 +257,5 @@
 ### Loop 51 — small campfire next to merchant carts while unloading at market.
 
 ### Loop 52 — small mine cart slides back-and-forth on track at iron mines.
+
+### Loop 53 — occasional fish jumps out of water with arc + splash ripple.
