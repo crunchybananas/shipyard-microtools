@@ -1553,17 +1553,19 @@ export function render() {
     ctx.globalAlpha = daylight;
   }
 
-  // Night overlay — gradient instead of flat fill
-  if (daylight < 0.8) {
-    const overlayAlpha = (1-daylight) * 0.7;
-    ctx.globalAlpha = overlayAlpha;
-    // Radial gradient: deeper blue at edges, slightly lighter center
-    const nightGrad = ctx.createRadialGradient(0, -2000, 500, 0, 0, 7000);
-    nightGrad.addColorStop(0, 'rgba(8,10,30,0.6)');
-    nightGrad.addColorStop(0.5, 'rgba(5,8,25,0.85)');
-    nightGrad.addColorStop(1, 'rgba(2,4,18,1)');
-    ctx.fillStyle = nightGrad;
-    ctx.fillRect(-5000,-5000,10000,10000);
+  // Night overlay — multiply-blend so it darkens without washing out color
+  if (daylight < 0.95) {
+    const darkness = (1 - daylight);
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    // Blue-tinted dark multiply overlay
+    const tintR = Math.round(255 - darkness * 180);
+    const tintG = Math.round(255 - darkness * 170);
+    const tintB = Math.round(255 - darkness * 110);
+    ctx.fillStyle = `rgb(${tintR},${tintG},${tintB})`;
+    ctx.fillRect(-5000, -5000, 10000, 10000);
+    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   // Sunset/sunrise horizon glow (dawn: t<0.1, dusk: t 0.6–0.75)
@@ -1749,7 +1751,8 @@ function canPlaceCheck(type, x, y) {
 function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   const buildAlpha = (b.buildProgress !== undefined && b.buildProgress < 1) ? b.buildProgress : 1;
-  ctx.globalAlpha = daylight * buildAlpha;
+  // Keep buildings fully opaque — night overlay darkens them later
+  ctx.globalAlpha = buildAlpha;
 
   // Foundation — darken the tile under the building for grounding
   if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
@@ -1807,7 +1810,7 @@ function drawBuilding(ctx, b, s, daylight) {
     shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = shadowGrad;
     ctx.fill();
-    ctx.globalAlpha = daylight;
+    ctx.globalAlpha = 1;
   }
 
   // Ground the sprite: scale from tile-center anchor so buildings grow UP
@@ -1860,7 +1863,7 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.lineTo(s.x + (h % 10) - 5, s.y - 10);
     ctx.lineTo(s.x + (h % 7), s.y - 3);
     ctx.stroke();
-    ctx.globalAlpha = daylight;
+    ctx.globalAlpha = 1;
   }
 
   if (G.camera.zoom >= 0.5) {
@@ -1923,7 +1926,7 @@ function drawBuilding(ctx, b, s, daylight) {
       } else if (b.type === 'barracks') {
         ctx.fillRect(s.x-4, s.y-11, 4, 5);
       }
-      ctx.globalAlpha = daylight;
+      ctx.globalAlpha = 1;
     }
 
     // Dawn/dusk warm window glow (when daylight is between 0.5-0.85)
@@ -1948,7 +1951,7 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
       const wy = b.type === 'tower' ? s.y - 48 : b.type === 'church' ? s.y - 50 : b.type === 'castle' ? s.y - 54 : s.y - 38;
       ctx.fillText(`${have}/${needed}👤`, s.x, wy);
-      ctx.globalAlpha = daylight;
+      ctx.globalAlpha = 1;
     }
   } // end zoom >= 0.5
 
@@ -1980,7 +1983,7 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = `rgba(255,${100 + Math.sin(G.gameTick * 0.2) * 50},0,0.3)`;
     ctx.fillRect(s.x - 15, s.y - 25, 30, 35);
-    ctx.globalAlpha = daylight;
+    ctx.globalAlpha = 1;
   }
 }
 
