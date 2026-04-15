@@ -110,6 +110,7 @@
 - Students run circles around schools (loop 95)
 - Ancient corner monoliths (loop 96)
 - Glowing runes on monoliths at night (loop 97)
+- Rain splash ripples on ground (loop 98)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -391,3 +392,5 @@
 ### Loop 96 — ancient stone monoliths at four corner regions of the map (placed only on grass).
 
 ### Loop 97 — runes on corner monoliths glow green at night with pulsing halo.
+
+### Loop 98 — small expanding ripple rings on ground tiles during rain (raindrop splashes).
