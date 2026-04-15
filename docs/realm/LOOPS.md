@@ -72,6 +72,7 @@
 - Smoke columns during raids (loop 57)
 - Fishing nets in shallow water (loop 58)
 - Golden aura over castle on victory (loop 59)
+- Fluffy sheep clouds drifting (loop 60)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -277,3 +278,5 @@
 ### Loop 58 — floating fishing nets with buoys in water tiles bordering sand (~12% spawn).
 
 ### Loop 59 — pulsing golden aura over castle after victory.
+
+### Loop 60 — fluffy 'sheep clouds' drift across daytime sky with soft shadows.

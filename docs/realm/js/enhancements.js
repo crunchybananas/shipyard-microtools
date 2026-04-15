@@ -2694,3 +2694,45 @@ function renderVictoryAura(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderVictoryAura);
+
+// ── Loop 60: Sheep clouds — fluffy little wandering clouds in screen sky
+function updateSheepClouds(logicalW, logicalH) {
+  if (!G.sheepClouds) G.sheepClouds = [];
+  if (G.gameTick % 250 === 0 && G.sheepClouds.length < 4 && getDaylight() > 0.65) {
+    G.sheepClouds.push({
+      x: -50,
+      y: Math.random() * (logicalH || 800) * 0.35 + 30,
+      vx: 0.15 + Math.random() * 0.1,
+      size: 10 + Math.random() * 8,
+      puffSeed: Math.random() * 100,
+    });
+  }
+  for (let i = G.sheepClouds.length - 1; i >= 0; i--) {
+    const c = G.sheepClouds[i];
+    c.x += c.vx;
+    if (c.x > (logicalW || 1500) + 80) G.sheepClouds.splice(i, 1);
+  }
+}
+function renderSheepClouds(ctx) {
+  if (!G.sheepClouds || !G.sheepClouds.length) return;
+  ctx.save();
+  for (const c of G.sheepClouds) {
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    for (let i = 0; i < 5; i++) {
+      const off = (c.puffSeed + i * 1.7) % 5;
+      const px = c.x + (i - 2) * c.size * 0.6;
+      const py = c.y + Math.sin(off) * 2;
+      ctx.beginPath();
+      ctx.arc(px, py, c.size * (0.6 + (i & 1) * 0.3), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Soft shadow
+    ctx.fillStyle = 'rgba(140,160,180,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(c.x, c.y + c.size * 0.4, c.size * 1.5, c.size * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+registerUpdater(updateSheepClouds, true);
+registerScreenRenderer(renderSheepClouds);
