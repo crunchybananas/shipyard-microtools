@@ -98,6 +98,7 @@
 - Underwater bubbles rise on water tiles (loop 83)
 - Rooftop cats nap on houses (loop 84)
 - Beggar with coin bowl beside taverns (loop 85)
+- Stained-glass window glow on churches (loop 86)
 - Aggregator hooks for future loops (loop 23 refactor)
 
 ## Rules
@@ -355,3 +356,5 @@
 ### Loop 84 — cats nap on rooftops of ~1/8 houses (orange or black tabby).
 
 ### Loop 85 — cloaked beggar with coin bowl sits beside each tavern.
+
+### Loop 86 — colored stained-glass window glow on church facades.

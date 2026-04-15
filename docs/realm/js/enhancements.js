@@ -3646,3 +3646,28 @@ function renderBeggar(ctx) {
   }
 }
 registerWorldRenderer(renderBeggar);
+
+// ── Loop 86: Stained glass glow from churches at any time ──
+function renderChurchGlow(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  for (const b of G.buildings) {
+    if (b.type !== 'church') continue;
+    const s = toScreen(b.x, b.y);
+    const tt = G.gameTick * 0.05;
+    const colors = ['#c83030','#3060c8','#30c860','#c8c030'];
+    for (let i = 0; i < colors.length; i++) {
+      const x = s.x - 6 + i * 4;
+      const y = s.y - 18;
+      const a = 0.55 + 0.25 * Math.sin(tt + i);
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = colors[i];
+      ctx.globalAlpha = a;
+      ctx.beginPath();
+      ctx.ellipse(x, y, 1.5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+registerWorldRenderer(renderChurchGlow);
