@@ -24,15 +24,39 @@ import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
 import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
 import { updateWalkers } from './walkers.js';
 import { checkAdvisor } from './advisor.js';
+import { initGL3D, buildTerrainMesh, render3D, resize3D } from './webgl3d.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
 const minimap = document.getElementById('minimap');
 
+// ── WebGL 3D canvas setup ──────────────────────────────────
+let canvas3d = document.getElementById('game3d');
+if (!canvas3d) {
+  canvas3d = document.createElement('canvas');
+  canvas3d.id = 'game3d';
+  canvas3d.style.cssText = 'display:none;position:absolute;top:0;left:0;z-index:5;';
+  document.body.appendChild(canvas3d);
+}
+const gl3dReady = initGL3D(canvas3d);
+
+let _3dVisible = false;
+window.toggle3D = () => {
+  _3dVisible = !_3dVisible;
+  canvas3d.style.display = _3dVisible ? 'block' : 'none';
+  canvas.style.display = _3dVisible ? 'none' : 'block';
+  const miniEl = document.getElementById('minimap');
+  if (miniEl) miniEl.style.display = _3dVisible ? 'none' : 'block';
+  if (_3dVisible && gl3dReady) {
+    buildTerrainMesh();
+    render3D();
+  }
+};
+
 initRenderer(canvas, minimap);
 resizeCanvas();
 initPostFX(canvas);
-window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); });
+window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); if (gl3dReady) resize3D(); });
 setupSaveButtons();
 loadAchievements();
 
@@ -105,6 +129,7 @@ window.startNewGame = () => {
   // Apply difficulty settings to starting resources
   const diff = getDifficulty();
   generateWorld();
+  if (gl3dReady) buildTerrainMesh(); // pre-build 3D mesh after world gen
   G.resources.food = diff.startFood;
   G.resources.wood = diff.startWood;
   G.resources.gold = diff.startGold;
@@ -123,6 +148,7 @@ window.startNewGame = () => {
 
 window.loadAndStart = () => {
   generateWorld();
+  if (gl3dReady) buildTerrainMesh(); // pre-build 3D mesh after world gen
   if (loadGame()) {
     renderBuildBar();
     updateUI();
@@ -157,6 +183,7 @@ window.newGame = () => {
   G.lastResources = null;
   G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0 };
   generateWorld();
+  if (gl3dReady) buildTerrainMesh(); // rebuild 3D mesh for new world
   renderBuildBar(); renderMissions(); updateUI();
   notify('New game started!');
 };
@@ -292,8 +319,12 @@ function gameLoop() {
   try {
     if (document.visibilityState === 'visible') {
       simTick();
-      render();
-      applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
+      if (_3dVisible && gl3dReady) {
+        render3D();
+      } else {
+        render();
+        applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
+      }
       requestAnimationFrame(gameLoop);
     } else {
       for (let i = 0; i < 60; i++) simTick();
