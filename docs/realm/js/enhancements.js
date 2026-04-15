@@ -2736,3 +2736,49 @@ function renderSheepClouds(ctx) {
 }
 registerUpdater(updateSheepClouds, true);
 registerScreenRenderer(renderSheepClouds);
+
+// ── Loop 61: Spider hangs from web in autumn forest ────────
+function renderSpider(ctx) {
+  if (G.season !== 'autumn' || G.camera.zoom < 1.0) return;
+  const cx = G.camera.x, cy = G.camera.y;
+  const range = 18 / G.camera.zoom;
+  const tcx = (cx / 32 + cy / 16) / 2;
+  const tcy = (cy / 16 - cx / 32) / 2;
+  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
+  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (G.map[ty][tx] !== TILE.FOREST) continue;
+      const h = ((tx * 0x7373) ^ (ty * 0x9999)) >>> 0;
+      if (h % 100 > 4) continue;
+      const s = toScreen(tx, ty);
+      const sway = Math.sin(G.gameTick * 0.04 + h) * 1.2;
+      const cxs = s.x + ((h % 8) - 4);
+      const cys = s.y - 6 + ((h >> 4) % 4);
+      // Web thread
+      ctx.strokeStyle = 'rgba(220,220,230,0.5)';
+      ctx.lineWidth = 0.4;
+      ctx.beginPath();
+      ctx.moveTo(cxs, cys - 8);
+      ctx.lineTo(cxs + sway, cys);
+      ctx.stroke();
+      // Spider body
+      ctx.fillStyle = '#1a1a1a';
+      ctx.beginPath();
+      ctx.arc(cxs + sway, cys, 1, 0, Math.PI * 2);
+      ctx.fill();
+      // Legs
+      ctx.lineWidth = 0.3;
+      ctx.strokeStyle = '#1a1a1a';
+      for (let k = -1; k <= 1; k += 1) {
+        ctx.beginPath();
+        ctx.moveTo(cxs + sway, cys);
+        ctx.lineTo(cxs + sway - 1.5 + k * 0.5, cys + 1);
+        ctx.moveTo(cxs + sway, cys);
+        ctx.lineTo(cxs + sway + 1.5 + k * 0.5, cys + 1);
+        ctx.stroke();
+      }
+    }
+  }
+}
+registerWorldRenderer(renderSpider);
