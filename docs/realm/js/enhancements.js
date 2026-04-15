@@ -2828,3 +2828,39 @@ function renderResearchSparkles(ctx) {
 }
 registerUpdater(updateResearchSparkles);
 registerWorldRenderer(renderResearchSparkles);
+
+// ── Loop 63: Fireflies extra dense around water at summer night
+function updateExtraFireflies() {
+  if (G.season !== 'summer') return;
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.7 && t > 0.05) return;
+  if (!G.particles) G.particles = [];
+  if (G.gameTick % 12 === 0 && G.particles.length < 350) {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const x = Math.floor(Math.random() * MAP_W);
+      const y = Math.floor(Math.random() * MAP_H);
+      if (G.map[y] && G.map[y][x] === TILE.WATER) {
+        // adjacent grass?
+        let nearGrass = false;
+        for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          if (G.map[y+dy] && (G.map[y+dy][x+dx] === TILE.GRASS || G.map[y+dy][x+dx] === TILE.SAND)) { nearGrass = true; break; }
+        }
+        if (nearGrass) {
+          G.particles.push({
+            tx: x + (Math.random() - 0.5) * 2,
+            ty: y + (Math.random() - 0.5) * 2,
+            offsetY: -3 - Math.random() * 12,
+            text: null, alpha: 0.5 + Math.random() * 0.3,
+            vy: 0, decay: 0.0012,
+            type: 'firefly', size: 0.9 + Math.random() * 0.5,
+            vx: (Math.random() - 0.5) * 0.04,
+            vy2: (Math.random() - 0.5) * 0.04,
+            phase: Math.random() * Math.PI * 2,
+          });
+          break;
+        }
+      }
+    }
+  }
+}
+registerUpdater(updateExtraFireflies);
