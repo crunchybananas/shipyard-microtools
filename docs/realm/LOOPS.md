@@ -30,6 +30,7 @@
 - Hawks circle overhead (loop 15)
 - Constellation line patterns at night (loop 16)
 - Wet ground puddles after rain (loop 17)
+- Town bonfire when happiness high (loop 18)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -134,3 +135,9 @@
 - Ideas: (1) **puddles after rain** (2) wet-shine roof tint (3) muddy roads
 - Chose: puddles (cheap, distinct, complements rainbow)
 - Implemented: enhancements.js updatePuddles/renderPuddles. After rain ends, deterministic ~22% of grass/sand tiles get blue elliptical puddles with sky glint, fade out over ~30 sec.
+
+### Loop 18
+- Validator: happiness is just a UI bar; nothing in the world reflects mood.
+- Ideas: (1) **town bonfire when happiness > 65** (2) cheering villagers near tavern (3) confetti when scenario won (already kind of done)
+- Chose: bonfire (passive worldspace happiness indicator + nighttime warmth)
+- Implemented: enhancements.js renderBonfire. Above town center, logs + flickering flame layers + warm halo at night, only when happiness ≥ 65.

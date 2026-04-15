@@ -8,6 +8,52 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+// ── Loop 18: Town bonfire when happiness is high ────────────
+function townCenter() {
+  if (!G.buildings.length) return null;
+  let sx = 0, sy = 0;
+  for (const b of G.buildings) { sx += b.x; sy += b.y; }
+  return { x: sx / G.buildings.length, y: sy / G.buildings.length };
+}
+export function renderBonfire(ctx) {
+  if ((G.happiness || 0) < 65) return;
+  const tc = townCenter();
+  if (!tc) return;
+  const s = toScreen(tc.x, tc.y);
+  const dayl = getDaylight();
+  const nightStrength = Math.max(0, Math.min(1, (0.85 - dayl) / 0.4));
+  ctx.save();
+  // Logs
+  ctx.fillStyle = '#3a2410';
+  ctx.fillRect(s.x - 5, s.y + 1, 10, 1.5);
+  ctx.fillRect(s.x - 4, s.y + 2.5, 8, 1.2);
+  // Flame (additive when night)
+  if (nightStrength > 0.05) ctx.globalCompositeOperation = 'screen';
+  const tt = G.gameTick * 0.18;
+  for (let i = 0; i < 3; i++) {
+    const flick = 0.7 + 0.3 * Math.sin(tt + i * 1.7);
+    const grad = ctx.createRadialGradient(s.x, s.y - 4, 1, s.x, s.y - 4, 14 * flick);
+    grad.addColorStop(0, `rgba(255,240,140,${0.9 * flick})`);
+    grad.addColorStop(0.5, `rgba(255,140,40,${0.6 * flick})`);
+    grad.addColorStop(1, 'rgba(180,40,10,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(s.x + Math.sin(tt * 0.7 + i) * 1.2, s.y - 4 - i * 1.2, 6 * flick, 10 * flick, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Halo light at night
+  if (nightStrength > 0.1) {
+    const hgrad = ctx.createRadialGradient(s.x, s.y - 4, 5, s.x, s.y - 4, 60);
+    hgrad.addColorStop(0, `rgba(255,180,80,${nightStrength * 0.35})`);
+    hgrad.addColorStop(1, 'rgba(255,180,80,0)');
+    ctx.fillStyle = hgrad;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 4, 60, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ── Loop 17: Wet ground puddles after rain ─────────────────
 let _puddleAge = 0;
 let _prevWeather2 = null;
