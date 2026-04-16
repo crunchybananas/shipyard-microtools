@@ -132,6 +132,7 @@ function runStateMachine(c) {
         let bestDist = Infinity, bestB = null;
         for (const b of G.buildings) {
           const def = BUILDINGS[b.type];
+          if (!def) continue; // guard against unknown building types (corrupt save, etc.)
           if (!def.prod && !def.workers) continue;
           const needed = def.workers || 0;
           if (b.workers.length >= needed) continue;

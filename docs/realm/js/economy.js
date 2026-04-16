@@ -197,6 +197,7 @@ export function updateProduction() {
     }
 
     const def = BUILDINGS[b.type];
+    if (!def) continue; // guard against unknown building types
     if (!def.prod) continue;
     const needed = def.workers || 0;
     if (b.workers.length < needed) continue;
