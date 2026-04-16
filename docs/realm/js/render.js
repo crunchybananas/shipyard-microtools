@@ -737,6 +737,25 @@ export function render() {
         }
       }
 
+      // Valid-tile highlight: when a building is selected, highlight all viewport
+      // tiles where placement is valid with a gentle pulsing green tint.
+      if (G.selectedBuild && !(G.hoveredTile && G.hoveredTile.x===x && G.hoveredTile.y===y)) {
+        if (canPlaceCheck(G.selectedBuild, x, y)) {
+          const pulse = 0.18 + 0.12 * Math.sin(G.gameTick * 0.08 + (x+y)*0.3);
+          ctx.save();
+          ctx.globalAlpha = pulse;
+          ctx.fillStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y - TH/2);
+          ctx.lineTo(s.x + TW/2, s.y);
+          ctx.lineTo(s.x, s.y + TH/2);
+          ctx.lineTo(s.x - TW/2, s.y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
       // Hover
       if (G.hoveredTile && G.hoveredTile.x===x && G.hoveredTile.y===y) {
         const valid = G.selectedBuild ? canPlaceCheck(G.selectedBuild, x, y) : true;
