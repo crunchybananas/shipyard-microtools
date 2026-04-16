@@ -97,7 +97,11 @@ function beginGame() {
   setupInput(canvas);
   initChronicle();
   if (G.chronicle.length === 0) {
-    chronicle(`The realm of ${G.kingdomName} is founded. Three settlers arrive seeking a home.`, 'milestone');
+    // Avoid "The realm of Realm" collision when the player keeps the default kingdom name
+    const foundingText = G.kingdomName && G.kingdomName !== 'Realm'
+      ? `The realm of ${G.kingdomName} is founded. Three weary settlers arrive at the shore, carrying all they own in wicker packs.`
+      : `A new realm is founded on this quiet island. Three weary settlers arrive at the shore, carrying all they own in wicker packs.`;
+    chronicle(foundingText, 'milestone');
   }
   renderBuildBar();
   renderMissions();
