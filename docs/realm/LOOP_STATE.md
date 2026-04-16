@@ -21,6 +21,17 @@ Every ~15 minutes, the main agent wakes up and runs one cycle:
 - ALWAYS check console errors after changes — 60fps error loops cause lockups
 - If an enhancement references a symbol not imported in its file, the function must be disabled or the import added
 
+## Deep-Play Cycles
+Every 5th cycle (51, 56, 61, ...), run a DEEP PLAY session instead of just screenshotting Day 1:
+1. Navigate, new game, skip tutorial
+2. Place 1 House + 1 Farm + 1 Lumber Mill via canvas clicks on the build bar then on tiles
+3. Click ▶▶▶ fast-forward, let 3-5 days pass
+4. Screenshot mid-play — check: workers assigned? food producing? citizens walking with purpose?
+5. Continue until first raid (or 10 days max) — screenshot during combat
+6. Open chronicle/stats panel, screenshot
+7. Validator gets these screenshots — NOT just title screen
+Deep-play cycles surface real quirks (combat flow, post-raid state, food/hunger loop, building worker assignment) that Day 1 screenshots miss.
+
 ## Current Focus Area
 VISUAL_CLEANUP
 <!-- Rotate through: VISUAL_CLEANUP → UX_FLOW → GAMEPLAY_DEPTH → STORY → AUDIO → repeat -->
@@ -37,10 +48,17 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 50 (milestone)
-- **What**: Fresh-eyes validator flagged grass-tile tufts as "pervasive clutter — //hash glyphs on nearly every tile, make map look dirty". render.js:428 was `gh < 140` (~55% of grass tiles got tufts), with a denser 3-blade variant at `gh < 80` (~31%). Halved both: 140→70 (~27%) and 80→35 (~14%). Central plains now read as grass, not as a noisy scatter of debug marks. Chrome-verified with cache-bust ?_cb=51.
-- **Commit**: 057cc9e
-- **Verified**: node --check clean. Chrome-reloaded, no console errors, visible cleanup on central plain in zoom comparison.
+- **Number**: 51 (first deep-play cycle)
+- **What**: User asked for meaningful gameplay to surface quirks. Added Deep-Play Cycles rule (every 5th cycle: place buildings, fast-forward several days, play into combat). Ran cycle 51 as first deep-play: placed Farm + Lumber Mill via canvas clicks, pressed ▶▶▶, played 11 in-game days. Observations:
+  - Cycle 50 grass-tuft fix VERY visible — central plains now read as clean grass, not noise
+  - Spring→Autumn transition at Day 17 is dramatic + pretty (warm tile tints, brown water edges)
+  - Worker auto-assignment works for Farm (1/1) but Lumber Mill placed after building showed 0/1 briefly — may just be a tick of delay, bears watching
+  - Hot air balloon ambient visitor looks good
+  - Wood rate jumps from +18 to +38/day after mill — producing correctly
+  - 7 citizens cluster near farm when assigned — reasonable, not broken
+  - No console errors through 20+ seconds of fast-forward
+- **Commit**: (this cycle is process-only — the grass-tuft code change was cycle 50's 057cc9e)
+- **Verified**: Deep-play through Day 17. No console errors. All systems exercised.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -63,12 +81,14 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 ## Backlog (prioritized)
 1. [HIGH] USER-REPORTED (partial): After a raid wipes everything, can't place new buildings — cycle 31 fixed worker/maxPop cleanup but may need to verify canPlace after destruction
 2. [HIGH] USER-REPORTED: Some ambient floating things look weird — audit remaining screen-space renderers (what's still rendering off-map or in odd spots)
-4. [HIGH] Citizens feel like static decoration — need idle animation, movement, or visible agency
-5. [HIGH] Minimap is vestigial — no citizen/building dots, no viewport indicator
-6. [MED] "Found!" citizen bark fires on Day 1 with no context
-7. [MED] Sleep "Z" indicator needs context/legend
-8. [LOW] Night is very dark — hard to see anything
-9. [LOW] Pollen/dust particles could be toned down further
+3. [MED] DEEP-PLAY OBSERVATION: newly-placed building briefly shows "0/1" workers until next assignment tick — either auto-assign on place, or render "(assigning...)" until settled
+4. [MED] DEEP-PLAY OBSERVATION: citizens cluster/stand near farm once assigned — walking-to-work looks like standing-still unless you watch closely. Consider a more visible "in transit" marker.
+5. [HIGH] Citizens feel like static decoration — need idle animation, movement, or visible agency (partially addressed cycle 38)
+6. [HIGH] Minimap is vestigial — RESOLVED (dots + viewport visible as of recent cycles)
+7. [MED] "Found!" citizen bark fires on Day 1 with no context (RESOLVED cycle 36)
+8. [MED] Sleep "Z" indicator needs context/legend
+9. [LOW] Night is very dark — hard to see anything (addressed cycle 37, may revisit)
+10. [LOW] Pollen/dust particles could be toned down further
 
 ## Stuck (needs investigation)
 (empty — vignette resolved the void clutter issue)
@@ -129,6 +149,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 48: demolishBuilding — no refund when byEnemy, clamp maxPop/defense to 0
 - Cycle 49: Citizens killed by enemies now actually die — pop decrements, citizensDied stat fires, death particle/chronicle (cycle 46 had damage but no death handler)
 - Cycle 50 (milestone): Halved grass tuft density (55%→27%, dense variant 31%→14%) — central plains were reading as noisy clutter per fresh-eyes validator
+- Cycle 51 (first deep-play): Added Deep-Play rule (every 5th cycle plays through multiple days). First run: confirmed cycle 50 grass-tuft fix visibly works, observed Spring→Autumn transition, logged 2 new deep-play observations to backlog (worker assignment delay, citizen transit visibility). No code change — process cycle.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
