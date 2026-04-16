@@ -281,16 +281,8 @@ function pushBox(verts, indices, x0, y0, z0, x1, y1, z1, color) {
 function addTree(verts, indices, cx, cz, groundY) {
   const baseY = groundY;
   const S = 2.8; // scale up trees so they're clearly visible 3D landmarks
-  // Trunk — a brown box
-  const trunkColor = [0.52, 0.32, 0.12];
-  const trunkH = 0.6 * S;
-  const trunkW = 0.15 * S;
-  pushBox(verts, indices,
-    cx - trunkW, baseY, cz - trunkW,
-    cx + trunkW, baseY + trunkH, cz + trunkW,
-    trunkColor
-  );
-  // Canopy — vivid lime/emerald to contrast with dark forest floor
+  // Canopy only — no trunk box, keeps forest floor readable
+  const trunkH = 0.3 * S;  // canopy base height above ground
   const canopyColor     = [0.22, 0.82, 0.28];
   const canopyColorDark = [0.14, 0.55, 0.18];
   const topY = baseY + trunkH + 1.6 * S;
