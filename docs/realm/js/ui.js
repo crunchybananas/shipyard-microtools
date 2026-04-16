@@ -1031,7 +1031,15 @@ export function renderTradePanel() {
   c.innerHTML = '';
   const hasTP = G.buildings.some(b => b.type === 'tradingpost');
   if (!hasTP) {
-    c.innerHTML = '<div class="trade-empty">Build a Trading Post to unlock trade partners.</div>';
+    const hasCommerce = G.researchedTechs && G.researchedTechs.has('commerce');
+    const nextStep = hasCommerce
+      ? 'Build a <strong>Trading Post</strong> to unlock trade partners.'
+      : 'Research <strong>Commerce</strong>, then build a Trading Post to unlock trade partners.';
+    c.innerHTML = `<div class="trade-empty">
+      <div class="trade-empty-title">🛒 Merchant Caravans</div>
+      <div class="trade-empty-pitch">Trade wood, stone, food, or iron for gold — and gold for any resource you lack. Essential for building an economy that isn't bottlenecked on raw materials.</div>
+      <div class="trade-empty-step">${nextStep}</div>
+    </div>`;
     return;
   }
   const emojis = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
