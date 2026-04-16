@@ -425,7 +425,8 @@ export function render() {
         const gh = ((x * 271 + y * 619) & 0xff);
         const sway = Math.sin(G.gameTick * 0.02 + x * 0.5 + y * 0.3) * 1.5;
         ctx.globalAlpha = daylight * 0.7;
-        if (gh < 140) {
+        // Reduced from gh<140 (~55%) to gh<70 (~27%) — was too busy, read as noise/artifacts
+        if (gh < 70) {
           ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
           const gx = s.x - 8 + (gh % 16) + sway, gy = s.y - 4 + ((gh >> 4) % 6);
           ctx.beginPath();
@@ -434,8 +435,8 @@ export function render() {
           ctx.beginPath();
           ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3 + sway * 0.5, gy - 5); ctx.lineTo(gx + 5, gy - 1.5);
           ctx.fill();
-          // Third blade for denser tufts
-          if (gh < 80) {
+          // Third blade for denser tufts — also halved from gh<80 to gh<35
+          if (gh < 35) {
             ctx.beginPath();
             ctx.moveTo(gx + 5, gy); ctx.lineTo(gx + 6 + sway * 0.3, gy - 4); ctx.lineTo(gx + 7.5, gy - 2);
             ctx.fill();
