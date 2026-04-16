@@ -89,9 +89,12 @@ export function demolishBuilding(b, byEnemy = false) {
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
-  if (def.pop) G.maxPop -= def.pop;
-  if (def.defense) G.defense -= def.defense;
-  for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + Math.floor(v/2);
+  if (def.pop) G.maxPop = Math.max(0, G.maxPop - def.pop);
+  if (def.defense) G.defense = Math.max(0, G.defense - def.defense);
+  // Refund half the cost only on voluntary demolish — enemies don't give back materials!
+  if (!byEnemy) {
+    for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + Math.floor(v/2);
+  }
   for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
   if (byEnemy && G.stats) G.stats.buildingsLost++;
   playSound('demolish');
