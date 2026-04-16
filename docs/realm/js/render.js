@@ -1981,6 +1981,7 @@ function canPlaceCheck(type, x, y) {
 // ── Building sprites ────────────────────────────────────────
 function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
+  if (!def) return; // guard against unknown building types
   const buildAlpha = (b.buildProgress !== undefined && b.buildProgress < 1) ? b.buildProgress : 1;
   // Keep buildings fully opaque — night overlay darkens them later
   ctx.globalAlpha = buildAlpha;

@@ -5,6 +5,7 @@ export function updateWalkers() {
   if (G.gameTick % 200 === 0) {
     for (const b of G.buildings) {
       const def = BUILDINGS[b.type];
+      if (!def) continue; // guard against unknown building types
       if (!def.radius || !def.happiness) continue;
       // Don't spawn if we already have a walker from this building
       if (G.walkers.some(w => w.home === b)) continue;
