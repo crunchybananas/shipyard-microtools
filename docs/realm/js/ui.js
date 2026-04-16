@@ -375,6 +375,36 @@ export function showInfoPanel(b) {
   if (def.desc) {
     html += `<div class="ip-desc">${def.desc}</div>`;
   }
+  // Lore tooltip (flavor text)
+  const LORE = {
+    house: '"Four walls and a fire make a world of difference to the weary traveler."',
+    farm: '"Tend the land and it will tend you. Forget it, and the winter is unforgiving."',
+    lumber: '"Every great realm was first built from timber."',
+    quarry: '"Stone remembers. Each block carries the mountain\'s patience."',
+    mine: '"Iron is the backbone of empire — and the bane of those who delve too deep."',
+    market: '"Where coin flows, people follow. Where people gather, history happens."',
+    barracks: '"The peace of the realm is kept by those who practice for war."',
+    tower: '"From here, the watchmen see what others cannot: the future."',
+    well: '"Sweet water is worth more than gold to parched lips."',
+    tavern: '"More treaties are signed in taverns than in throne rooms."',
+    wall: '"A wall is not just stone. It is the line between our world and theirs."',
+    road: '"All roads lead somewhere worth going, or we wouldn\'t have built them."',
+    tradingpost: '"The sea remembers every ship, and rewards the bold."',
+    castle: '"When the castle stands, the realm is eternal."',
+    granary: '"A full granary is the difference between a bad season and a dead one."',
+    church: '"The bells call to something older than any kingdom."',
+    school: '"Knowledge doubles every generation — if we bother to teach it."',
+    windmill: '"It catches the invisible and turns it into bread."',
+    bakery: '"The smell of fresh bread has ended more arguments than any sword."',
+    chickencoop: '"Humble creatures, but their eggs have fed kings."',
+    cowpen: '"Patient beasts who turn grass into sustenance."',
+    fisherman: '"The sea gives freely to those patient enough to ask."',
+    blacksmith: '"Every sword begins as a lump of ore and a question: who will wield it?"',
+    archery: '"The arrow knows no rank. It finds the careless and the brave alike."',
+  };
+  if (LORE[b.type]) {
+    html += `<div class="ip-lore">${LORE[b.type]}</div>`;
+  }
 
   // HP bar
   html += `
