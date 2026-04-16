@@ -1101,7 +1101,8 @@ export function render() {
       }
 
       // Emote bubble above head (suppress working emote — tool icon handles it)
-      const emote = c.state==='idle' ? '💤' : c.state==='eating' ? '🍎' :
+      // Idle is handled by the '?' indicator after 3s; showing 💤 for all idle citizens makes Day 1 look dead
+      const emote = c.state==='eating' ? '🍎' :
         c.state==='working' ? null : c.state==='foraging' ? '🌿' :
         (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
       if (emote && G.gameTick % 120 < 80) { // show emote 80 of every 120 ticks (flicker)
