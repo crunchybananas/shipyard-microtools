@@ -49,6 +49,22 @@ export function toScreen(tx, ty) {
   return { x: (tx-ty)*TW/2, y: (tx+ty)*TH/2 };
 }
 
+// Smooth pan camera to tile (tx,ty) over ~1s. Used by event cinematic hooks.
+export function panCameraTo(tx, ty, durMs = 900) {
+  const target = toScreen(tx, ty);
+  const startX = G.camera.x, startY = G.camera.y;
+  const dx = target.x - startX, dy = target.y - startY;
+  const t0 = performance.now();
+  function step() {
+    const t = Math.min(1, (performance.now() - t0) / durMs);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    G.camera.x = startX + dx * ease;
+    G.camera.y = startY + dy * ease;
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 export function toWorld(sx, sy) {
   const wx = sx/(TW/2), wy = sy/(TH/2);
   return { x: (wx+wy)/2, y: (wy-wx)/2 };

@@ -7,6 +7,7 @@ import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
+import { panCameraTo } from './render.js';
 import { notify, notifyBuild } from './notifications.js';
 
 export function canPlace(type, tx, ty) {
@@ -318,6 +319,8 @@ export function checkRaids() {
       const damageable = G.buildings.filter(b => b.type !== 'road' && b.type !== 'wall');
       if (damageable.length > 0) {
         const target = damageable[rngInt(0, damageable.length-1)];
+        // Cinematic: pan camera to the attacked building
+        try { panCameraTo(target.x, target.y, 800); } catch (_e) {}
         target.hp -= dmg;
         if (target.hp <= 0) {
           report.push(`💥 ${BUILDINGS[target.type].name} was destroyed!`);
