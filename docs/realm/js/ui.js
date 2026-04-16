@@ -143,7 +143,9 @@ export function updateUI() {
   const year = Math.floor((G.day - 1) / 28) + 1;
   const dayInYear = ((G.day - 1) % 28) + 1;
   const happyPct = Math.round(G.happiness);
-  const happyEmoji = happyPct >= 75 ? '😊' : happyPct >= 50 ? '🙂' : happyPct >= 25 ? '😐' : '😟';
+  // Thresholds slightly below the display boundaries so a displayed "50%" shows
+  // the 🙂 face (G.happiness often sits at 49.x but rounds to 50% — felt inconsistent)
+  const happyEmoji = happyPct >= 70 ? '😊' : happyPct >= 45 ? '🙂' : happyPct >= 20 ? '😐' : '😟';
   $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · ${season.name} ${weatherEmoji}· <span title="Settler happiness — affects tax income and population growth">${happyEmoji} ${happyPct}%</span>${raidWarn} ${diffLabel}`;
   const kd = $('kingdom-display');
   if (kd) kd.textContent = G.kingdomName ? `👑 ${G.kingdomName}` : '';
