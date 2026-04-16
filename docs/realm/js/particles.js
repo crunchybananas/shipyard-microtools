@@ -122,8 +122,12 @@ export function updateSmokeEmitters() {
     });
   }
 
-  // Spring flower petals floating in the wind
-  if (G.season === 'spring' && G.gameTick % 12 === 0 && G.particles.length < 250) {
+  // Spring flower petals floating in the wind — DISABLED.
+  // User reported these as "little squares with circles that come down the
+  // center from time to time...seem out of place." They were pink/salmon/yellow
+  // ellipses drifting through the play area at a high spawn rate (every 12 ticks
+  // across 20x15 tile range).
+  if (false && G.season === 'spring' && G.gameTick % 12 === 0 && G.particles.length < 250) {
     const cx = G.camera.x / 32, cy = G.camera.y / 16;
     G.particles.push({
       tx: cx + (Math.random() - 0.5) * 20,
