@@ -13,6 +13,8 @@ let vao = null;          // WebGL2 VAO (or null for WebGL1)
 let vertexBuf = null;
 let indexBuf = null;
 let indexCount = 0;
+let terrainIndexCount = 0;
+let treeIndexCount = 0;
 let isWebGL2 = false;
 
 // Buildings mesh state
@@ -278,21 +280,22 @@ function pushBox(verts, indices, x0, y0, z0, x1, y1, z1, color) {
 // ── Tree geometry ──────────────────────────────────────────
 function addTree(verts, indices, cx, cz, groundY) {
   const baseY = groundY;
+  const S = 2.8; // scale up trees so they're clearly visible 3D landmarks
   // Trunk — a brown box
-  const trunkColor = [0.35, 0.22, 0.10];
-  const trunkH = 0.6;
-  const trunkW = 0.15;
+  const trunkColor = [0.52, 0.32, 0.12];
+  const trunkH = 0.6 * S;
+  const trunkW = 0.15 * S;
   pushBox(verts, indices,
     cx - trunkW, baseY, cz - trunkW,
     cx + trunkW, baseY + trunkH, cz + trunkW,
     trunkColor
   );
-  // Canopy — a pyramid (cone approximation with square base)
-  const canopyColor     = [0.18, 0.52, 0.22];
-  const canopyColorDark = [0.12, 0.40, 0.16];
-  const topY = baseY + trunkH + 1.6;
+  // Canopy — vivid lime/emerald to contrast with dark forest floor
+  const canopyColor     = [0.22, 0.82, 0.28];
+  const canopyColorDark = [0.14, 0.55, 0.18];
+  const topY = baseY + trunkH + 1.6 * S;
   const midY = baseY + trunkH;
-  const cw = 0.6;
+  const cw = 0.6 * S;
   const apex = [cx, topY, cz];
   // Front
   pushTri(verts, indices,
@@ -508,10 +511,19 @@ function uploadMesh(targetVao, targetVertBuf, targetIdxBuf, verts, indices) {
 export function buildTerrainMesh() {
   if (!gl) return;
 
-  const verts = [];   // will become Float32Array
-  const indices = []; // will become Uint32Array
+  const verts = [];
+  const indices = [];
+  const treeTiles = []; // collected during terrain loop, drawn after terrain
 
-  // Pre-compute tile heights for per-vertex normal computation
+  // Base height of a tile — used for side-face culling (only draw when neighbor is lower)
+  const tileBaseH = (r, c) => {
+    const tr = Math.max(0, Math.min(MAP_H - 1, r));
+    const tc = Math.max(0, Math.min(MAP_W - 1, c));
+    const tt = (G.map[tr] && G.map[tr][tc] !== undefined) ? G.map[tr][tc] : TILE.GRASS;
+    return TILE_HEIGHT[tt] !== undefined ? TILE_HEIGHT[tt] : 0.5;
+  };
+
+  // Noisy height for slope-normal computation only (not for geometry)
   const tileH = (r, c) => {
     const tr = Math.max(0, Math.min(MAP_H - 1, r));
     const tc = Math.max(0, Math.min(MAP_W - 1, c));
@@ -542,9 +554,9 @@ export function buildTerrainMesh() {
       const noise1 = ((seed & 0xff) / 255 - 0.5); // -0.5..0.5
       const noise2 = (((seed >>> 8) & 0xff) / 255 - 0.5);
 
-      // Small height variation: ±0.06 units — enough for slope normals within a biome
-      // without creating ledges large enough to read as a noisy triangle grid
-      const h = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.06);
+      // Flat geometry within each biome — eliminates tile-edge ledges and triangle grid.
+      // tileH() still uses noise for slope normal computation (subtle shading variation).
+      const h = baseH;
 
       // No per-tile color variation — solid biome colors let slope normals read cleanly
       const cv = 0;
@@ -561,12 +573,17 @@ export function buildTerrainMesh() {
       const y  = h;    // top face at height h
       const yb = -0.5;  // bottom goes below sea so no gaps
 
-      // Top face: single per-tile slope normal (avoids intra-tile triangle artifact from per-vertex normal interpolation)
-      const dx3 = (tileH(row, col + 1) - tileH(row, col - 1)) * 0.4;
-      const dz3 = (tileH(row + 1, col) - tileH(row - 1, col)) * 0.4;
-      const tnx = -dx3, tny = 1.0, tnz = -dz3;
-      const tlen = Math.sqrt(tnx * tnx + tny * tny + tnz * tnz);
-      const tileNormal = [tnx / tlen, tny / tlen, tnz / tlen];
+      // Top face normal: flat for water (no grid), slope-based for land
+      let tileNormal;
+      if (tileType === TILE.WATER) {
+        tileNormal = [0, 1, 0];
+      } else {
+        const dx3 = (tileH(row, col + 1) - tileH(row, col - 1)) * 0.4;
+        const dz3 = (tileH(row + 1, col) - tileH(row - 1, col)) * 0.4;
+        const tnx = -dx3, tny = 1.0, tnz = -dz3;
+        const tlen = Math.sqrt(tnx * tnx + tny * tny + tnz * tnz);
+        tileNormal = [tnx / tlen, tny / tlen, tnz / tlen];
+      }
       pushFace(verts, indices,
         [ [x0,y,z0], [x1,y,z0], [x1,y,z1], [x0,y,z1] ],
         tileNormal,
@@ -576,45 +593,49 @@ export function buildTerrainMesh() {
       // Skip water side faces entirely — water is a flat plane
       if (tileType === TILE.WATER) continue;
 
-      // Only draw side faces if tile is elevated
+      // Only draw a side face when the neighbor on that side is lower — avoids
+      // same-height tile walls that create the triangle grid within flat biomes
       if (h > 0.0) {
-        // Side faces use same base color — shader lighting differentiates them
         const sideColor = color;
-
-        // Front face  (+Z, normal 0,0,1)
-        pushFace(verts, indices,
-          [ [x0,yb,z1], [x1,yb,z1], [x1,y,z1], [x0,y,z1] ],
-          [0, 0, 1],
-          sideColor
-        );
-        // Back face   (-Z, normal 0,0,-1)
-        pushFace(verts, indices,
-          [ [x1,yb,z0], [x0,yb,z0], [x0,y,z0], [x1,y,z0] ],
-          [0, 0, -1],
-          sideColor
-        );
-        // Right face  (+X, normal 1,0,0)
-        pushFace(verts, indices,
-          [ [x1,yb,z1], [x1,yb,z0], [x1,y,z0], [x1,y,z1] ],
-          [1, 0, 0],
-          sideColor
-        );
-        // Left face   (-X, normal -1,0,0)
-        pushFace(verts, indices,
-          [ [x0,yb,z0], [x0,yb,z1], [x0,y,z1], [x0,y,z0] ],
-          [-1, 0, 0],
-          sideColor
-        );
+        if (tileBaseH(row + 1, col) < h) {
+          pushFace(verts, indices,
+            [ [x0,yb,z1], [x1,yb,z1], [x1,y,z1], [x0,y,z1] ],
+            [0, 0, 1], sideColor
+          );
+        }
+        if (tileBaseH(row - 1, col) < h) {
+          pushFace(verts, indices,
+            [ [x1,yb,z0], [x0,yb,z0], [x0,y,z0], [x1,y,z0] ],
+            [0, 0, -1], sideColor
+          );
+        }
+        if (tileBaseH(row, col + 1) < h) {
+          pushFace(verts, indices,
+            [ [x1,yb,z1], [x1,yb,z0], [x1,y,z0], [x1,y,z1] ],
+            [1, 0, 0], sideColor
+          );
+        }
+        if (tileBaseH(row, col - 1) < h) {
+          pushFace(verts, indices,
+            [ [x0,yb,z0], [x0,yb,z1], [x0,y,z1], [x0,y,z0] ],
+            [-1, 0, 0], sideColor
+          );
+        }
       }
 
-      // 3D trees on FOREST tiles
+      // Collect forest tile positions — trees are drawn in a separate pass after terrain
       if (tileType === TILE.FOREST) {
-        const cx = col + 0.5;
-        const cz = row + 0.5;
-        addTree(verts, indices, cx, cz, h);
+        treeTiles.push([col + 0.5, row + 0.5, h]);
       }
     }
   }
+
+  // Record terrain-only index count, then append tree geometry
+  terrainIndexCount = indices.length;
+  for (const [cx, cz, groundY] of treeTiles) {
+    addTree(verts, indices, cx, cz, groundY);
+  }
+  treeIndexCount = indices.length - terrainIndexCount;
 
   const vertData = new Float32Array(verts);
   const idxData  = new Uint32Array(indices);
@@ -853,12 +874,42 @@ export function render3D() {
     gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
   }
 
-  gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_INT, 0);
+  gl.drawElements(gl.TRIANGLES, terrainIndexCount, gl.UNSIGNED_INT, 0);
 
   if (isWebGL2) {
     gl.bindVertexArray(null);
   } else if (oeVao) {
     oeVao.bindVertexArrayOES(null);
+  }
+
+  // ── Draw trees — after terrain, depth ALWAYS so they appear above their tiles ──
+  if (treeIndexCount > 0) {
+    if (isWebGL2) {
+      gl.bindVertexArray(vao);
+    } else if (oeVao) {
+      oeVao.bindVertexArrayOES(vao);
+    } else {
+      const STRIDE = 9 * 4;
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuf);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuf);
+      const aPosLoc2    = gl.getAttribLocation(program, 'aPos');
+      const aNormalLoc2 = gl.getAttribLocation(program, 'aNormal');
+      const aColorLoc2  = gl.getAttribLocation(program, 'aColor');
+      gl.enableVertexAttribArray(aPosLoc2);
+      gl.vertexAttribPointer(aPosLoc2,    3, gl.FLOAT, false, STRIDE, 0);
+      gl.enableVertexAttribArray(aNormalLoc2);
+      gl.vertexAttribPointer(aNormalLoc2, 3, gl.FLOAT, false, STRIDE, 3*4);
+      gl.enableVertexAttribArray(aColorLoc2);
+      gl.vertexAttribPointer(aColorLoc2,  3, gl.FLOAT, false, STRIDE, 6*4);
+    }
+    gl.depthFunc(gl.ALWAYS);
+    gl.drawElements(gl.TRIANGLES, treeIndexCount, gl.UNSIGNED_INT, terrainIndexCount * 4);
+    gl.depthFunc(gl.LEQUAL);
+    if (isWebGL2) {
+      gl.bindVertexArray(null);
+    } else if (oeVao) {
+      oeVao.bindVertexArrayOES(null);
+    }
   }
 
   // ── Draw buildings ──────────────────────────────────────────
@@ -882,7 +933,9 @@ export function render3D() {
       gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
     }
 
+    gl.depthFunc(gl.ALWAYS);
     gl.drawElements(gl.TRIANGLES, buildingsIndexCount, gl.UNSIGNED_INT, 0);
+    gl.depthFunc(gl.LEQUAL);
 
     if (isWebGL2) {
       gl.bindVertexArray(null);
