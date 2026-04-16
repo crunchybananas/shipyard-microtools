@@ -16,6 +16,11 @@ const TIPS = [
 const lastShown = {};
 
 export function checkAdvisor() {
+  // Stay quiet while the tutorial is driving onboarding — two centered banners
+  // with different asks (tutorial "Build a Farm first" + advisor "Build a
+  // House!") hijack attention and contradict the step the player is on.
+  const tut = document.getElementById('tutorial-tip');
+  if (tut && tut.style.display !== 'none') return;
   for (const tip of TIPS) {
     if ((lastShown[tip.id] || 0) + tip.cooldown > G.gameTick) continue;
     if (tip.check()) {
