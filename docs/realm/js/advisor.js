@@ -10,7 +10,7 @@ const TIPS = [
   { id: 'noirongame', check: () => G.day > 15 && !G.buildings.some(b=>b.type==='mine'), text: "Iron mines are crucial for advanced buildings. Find iron tiles!", cooldown: 1200 },
   { id: 'raid_coming', check: () => G.day >= G.nextRaidDay - 2 && G.buildings.filter(b=>b.type==='tower'||b.type==='barracks').length === 0, text: "A raid approaches — build defenses now!", cooldown: 400, danger: true },
   { id: 'stockpile_food', check: () => G.season === 'autumn' && G.resources.food < 100, text: "Winter is coming. Stock up on food before production drops.", cooldown: 800 },
-  { id: 'tech_idle', check: () => G.gameTick > 300 && !G.currentResearch && G.researchedTechs.size < 12, text: "Your scholars are idle. Visit Research to unlock new buildings.", cooldown: 1500 },
+  { id: 'tech_idle', check: () => G.day > 5 && G.buildings.some(b => b.type === 'library' || b.type === 'school') && !G.currentResearch && G.researchedTechs.size < 12, text: "Your scholars are idle. Visit Research to unlock new buildings.", cooldown: 1500 },
 ];
 
 const lastShown = {};
