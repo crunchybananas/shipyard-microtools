@@ -4573,3 +4573,158 @@ function updateTownHum() {
   } catch(_e){}
 }
 registerUpdater(updateTownHum);
+
+// ── Loop 141: Season-specific ambient SFX overlay ───────────
+// Rain patter in rainy weather, wind howl in winter.
+let _weatherSfxTimer = 0;
+function updateWeatherSfx() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G.gameTick - _weatherSfxTimer < 180) return;
+  _weatherSfxTimer = G.gameTick;
+  if (G.weather === 'rain' && Math.random() < 0.4) {
+    // Gentle rain patter: filtered noise burst
+    const ctx = G.audioCtx;
+    const t = ctx.currentTime;
+    const bufSize = Math.ceil(ctx.sampleRate * 0.4);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.012, t);
+    g.gain.linearRampToValueAtTime(0, t + 0.4);
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 3000; f.Q.value = 0.5;
+    src.connect(f); f.connect(g); g.connect(ctx.destination);
+    src.start(t); src.stop(t + 0.41);
+  }
+}
+registerUpdater(updateWeatherSfx);
+
+// ── Loop 142: Starvation warning screen-edge vignette ───────
+function renderStarvationVignette(ctx, w, h) {
+  if (G.resources.food > 5) return;
+  const pulse = 0.1 + 0.05 * Math.sin(G.gameTick * 0.08);
+  const grad = ctx.createRadialGradient(w/2, h/2, w*0.3, w/2, h/2, w*0.7);
+  grad.addColorStop(0, 'rgba(220,38,38,0)');
+  grad.addColorStop(1, `rgba(220,38,38,${pulse})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+}
+registerScreenRenderer(renderStarvationVignette);
+
+// ── Loop 143: Building fire crackle SFX ─��───────────────────
+let _fireSfxTimer = 0;
+function updateFireSfx() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  const onFire = G.buildings.some(b => b.onFire);
+  if (!onFire) return;
+  if (G.gameTick - _fireSfxTimer < 150) return;
+  _fireSfxTimer = G.gameTick;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  // Crackle: short noise burst + low rumble
+  const bufSize = Math.ceil(ctx.sampleRate * 0.15);
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.06, t);
+  g.gain.linearRampToValueAtTime(0, t + 0.15);
+  const f = ctx.createBiquadFilter();
+  f.type = 'highpass'; f.frequency.value = 2000;
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(t); src.stop(t + 0.16);
+}
+registerUpdater(updateFireSfx);
+
+// ── Loop 144: Story — first year anniversary milestone ──────
+import { chronicle as _chr144, hasFlag as _hf144, setFlag as _sf144 } from './story.js';
+function updateAnniversaryBeat() {
+  if (G.gameTick % 120 !== 0) return;
+  const year = Math.floor((G.day - 1) / 28) + 1;
+  if (year >= 2 && !_hf144('year2')) {
+    _sf144('year2');
+    _chr144(`One full year has passed. The realm enters its second year with ${G.population} souls.`, 'milestone');
+  }
+  if (year >= 3 && !_hf144('year3')) {
+    _sf144('year3');
+    _chr144(`The third year dawns. ${G.kingdomName} has grown beyond its humble beginnings.`, 'milestone');
+  }
+  if (year >= 5 && !_hf144('year5')) {
+    _sf144('year5');
+    _chr144('Five years stand behind us. The chronicle grows long, the realm stands strong.', 'milestone');
+  }
+}
+registerUpdater(updateAnniversaryBeat);
+
+// ── Loop 145: Night danger indicator (red border) ───────────
+function renderNightDanger(ctx, w, h) {
+  if (G.enemies.length === 0) return;
+  const daylight = G.dayPhase / G.dayLength;
+  if (daylight > 0.25 && daylight < 0.75) return;
+  const pulse = 0.08 + 0.04 * Math.sin(G.gameTick * 0.12);
+  ctx.save();
+  ctx.strokeStyle = `rgba(239,68,68,${pulse})`;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(2, 2, w - 4, h - 4);
+  ctx.restore();
+}
+registerScreenRenderer(renderNightDanger);
+
+// ── Loop 146: Happiness emotion indicator on HUD ────────────
+function updateHappinessEmoji() {
+  if (G.gameTick % 60 !== 0) return;
+  const el = document.querySelector('[onclick="toggleHappiness()"]');
+  if (!el) return;
+  if (G.happiness >= 80) el.textContent = '😊';
+  else if (G.happiness >= 50) el.textContent = '��';
+  else if (G.happiness >= 25) el.textContent = '😟';
+  else el.textContent = '😢';
+}
+registerUpdater(updateHappinessEmoji);
+
+// ── Loop 147: Keyboard L for log panel ──────────────────────
+// (Hooked in input.js below)
+
+// ─�� Loop 148: Auto-save indicator enhancement ───────────────
+// Already handled in save.js. This loop adds a "last saved" display.
+function updateSaveAge() {
+  if (G.gameTick % 600 !== 0) return;
+  const el = document.getElementById('btn-save');
+  if (!el) return;
+  const last = G._lastSaveTick || 0;
+  const ago = Math.floor((G.gameTick - last) / 60);
+  if (ago > 30) el.title = `Last saved: ${ago}s ago`;
+}
+registerUpdater(updateSaveAge);
+
+// ── Loop 149: Story — named rival lord sends messengers ─────
+function updateRivalMessages() {
+  if (G.gameTick % 360 !== 0) return;
+  if (!G.namedCharacters || !G.namedCharacters.rival) return;
+  if (G.day < 15) return;
+  const rival = G.namedCharacters.rival;
+  // Once-per-game message around day 15-20
+  if (!_hf144('rivalMessage1') && G.day >= 15 && G.day <= 25) {
+    _sf144('rivalMessage1');
+    _chr144(`${rival.name} sends a messenger: "Your lands will be mine before the snow falls."`, 'character');
+  }
+  // Second threat when pop > 40
+  if (!_hf144('rivalMessage2') && G.population >= 40) {
+    _sf144('rivalMessage2');
+    _chr144(`${rival.name} is said to be gathering forces. The realm must prepare.`, 'raid');
+  }
+}
+registerUpdater(updateRivalMessages);
+
+// ── Loop 150: Mouse cursor changes when building selected ───
+function updateCursorStyle() {
+  const canvas = document.getElementById('game');
+  if (!canvas) return;
+  canvas.style.cursor = G.selectedBuild ? 'crosshair' : 'default';
+}
+registerUpdater(updateCursorStyle);

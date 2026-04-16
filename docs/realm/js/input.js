@@ -289,6 +289,10 @@ export function setupInput(canvas) {
       G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * 0.9));
       return;
     }
+    if (e.key === 'l' && !e.ctrlKey && !e.metaKey) {
+      if (window.toggleLog) window.toggleLog();
+      return;
+    }
     if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
       const rp = document.getElementById('research-panel');
       if (rp) rp.style.display = rp.style.display === 'none' ? 'block' : 'none';
