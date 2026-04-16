@@ -976,10 +976,9 @@ export class GameEngine {
     this.onStateChange?.();
   }
 
-  // Wall collision - check if position is inside any valid corridor
-  private isValidPosition(x: number, z: number): boolean {
-    const PLAYER_RADIUS = 0.5;
-    const HALF_WIDTH = CORRIDOR_WIDTH / 2 - PLAYER_RADIUS;
+  // Wall collision - check if position is inside any valid corridor and not inside a pillar
+  private isValidPosition(x: number, z: number, radius = 0.5): boolean {
+    const HALF_WIDTH = CORRIDOR_WIDTH / 2 - radius;
 
     // Define corridor bounds (matching generateCorridors)
     const corridors = [
@@ -995,14 +994,29 @@ export class GameEngine {
       { minX: -20 - HALF_WIDTH, maxX: -20 + HALF_WIDTH, minZ: -25, maxZ: 25 },
     ];
 
-    // Check if position is inside any corridor
+    let inCorridor = false;
     for (const c of corridors) {
       if (x >= c.minX && x <= c.maxX && z >= c.minZ && z <= c.maxZ) {
-        return true;
+        inCorridor = true;
+        break;
+      }
+    }
+    if (!inCorridor) return false;
+
+    // Carve out pillar footprints (matching generateCorridors pillarPositions)
+    const PILLAR_HALF = 0.75 + radius; // half of 1.5 box + body radius
+    const pillars = [
+      { x: 10, z: 10 }, { x: -10, z: 10 },
+      { x: 10, z: -10 }, { x: -10, z: -10 },
+      { x: 0, z: 25 }, { x: 0, z: -25 },
+    ];
+    for (const p of pillars) {
+      if (Math.abs(x - p.x) < PILLAR_HALF && Math.abs(z - p.z) < PILLAR_HALF) {
+        return false;
       }
     }
 
-    return false;
+    return true;
   }
 
   private updateEnemies(delta: number): void {
@@ -1024,8 +1038,16 @@ export class GameEngine {
         enemy.rotation = angle;
 
         if (distToPlayer > 3) {
-          enemy.position.x += Math.sin(angle) * enemy.speed * delta;
-          enemy.position.z += Math.cos(angle) * enemy.speed * delta;
+          const newEX = enemy.position.x + Math.sin(angle) * enemy.speed * delta;
+          const newEZ = enemy.position.z + Math.cos(angle) * enemy.speed * delta;
+          if (this.isValidPosition(newEX, newEZ, 0.5)) {
+            enemy.position.x = newEX;
+            enemy.position.z = newEZ;
+          } else if (this.isValidPosition(newEX, enemy.position.z, 0.5)) {
+            enemy.position.x = newEX;
+          } else if (this.isValidPosition(enemy.position.x, newEZ, 0.5)) {
+            enemy.position.z = newEZ;
+          }
         } else {
           // Attack
           const now = Date.now();
@@ -1054,10 +1076,20 @@ export class GameEngine {
         if (pDist > 1) {
           const pAngle = Math.atan2(pdx, pdz);
           enemy.rotation = pAngle;
-          enemy.position.x +=
-            Math.sin(pAngle) * enemy.speed * 0.3 * delta;
-          enemy.position.z +=
-            Math.cos(pAngle) * enemy.speed * 0.3 * delta;
+          const newEX = enemy.position.x + Math.sin(pAngle) * enemy.speed * 0.3 * delta;
+          const newEZ = enemy.position.z + Math.cos(pAngle) * enemy.speed * 0.3 * delta;
+          if (this.isValidPosition(newEX, newEZ, 0.5)) {
+            enemy.position.x = newEX;
+            enemy.position.z = newEZ;
+            enemy.rotation = pAngle;
+          } else if (this.isValidPosition(newEX, enemy.position.z, 0.5)) {
+            enemy.position.x = newEX;
+          } else if (this.isValidPosition(enemy.position.x, newEZ, 0.5)) {
+            enemy.position.z = newEZ;
+          } else {
+            // Stuck — pick a new patrol target next frame
+            enemy.patrolTarget = null;
+          }
         }
       }
 
@@ -1146,6 +1178,23 @@ export class GameEngine {
         this.player.position.x = newX;
       } else if (this.isValidPosition(this.player.position.x, newZ)) {
         this.player.position.z = newZ;
+      }
+    }
+
+    // Player-enemy body separation — prevent walking through drones
+    for (const enemy of this.enemies) {
+      const edx = this.player.position.x - enemy.position.x;
+      const edz = this.player.position.z - enemy.position.z;
+      const edist = Math.sqrt(edx * edx + edz * edz);
+      const minSep = 1.1; // player radius 0.5 + enemy radius ~0.6
+      if (edist < minSep && edist > 0.001) {
+        const push = (minSep - edist) / edist;
+        const px = this.player.position.x + edx * push;
+        const pz = this.player.position.z + edz * push;
+        if (this.isValidPosition(px, pz)) {
+          this.player.position.x = px;
+          this.player.position.z = pz;
+        }
       }
     }
 
