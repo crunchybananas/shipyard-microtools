@@ -61,6 +61,7 @@ export function renderMissions() {
 
   // Prepend scenario objectives at the top
   const scen = getActiveScenario();
+  let firstActiveAssigned = false;
   if (scen) {
     const header = document.createElement('div');
     header.className = 'scenario-header';
@@ -70,7 +71,10 @@ export function renderMissions() {
     for (const obj of scen.objectives) {
       const done = obj.check();
       const row = document.createElement('div');
-      row.className = 'mission' + (done ? ' done' : '');
+      let cls = 'mission' + (done ? ' done' : '');
+      if (!done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
+      else if (!done) cls += ' mission-later';
+      row.className = cls;
       row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}`;
       list.appendChild(row);
     }
@@ -78,7 +82,10 @@ export function renderMissions() {
 
   for (const m of missions) {
     const div = document.createElement('div');
-    div.className = 'mission' + (m.done ? ' done' : '');
+    let cls = 'mission' + (m.done ? ' done' : '');
+    if (!m.done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
+    else if (!m.done) cls += ' mission-later';
+    div.className = cls;
     div.innerHTML = `<span class="check">${m.done?'✓':''}</span><span>${m.text}</span>`;
     list.appendChild(div);
   }
