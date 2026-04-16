@@ -4129,3 +4129,32 @@ function renderProcession(ctx) {
 }
 registerUpdater(updateProcession);
 registerWorldRenderer(renderProcession);
+
+// ── Loop 105: Idle citizen indicators ──────────────────────
+// Citizens sitting idle for >3s show a floating '?' bubble so the player
+// can see who has no work and find them easily.
+function renderIdleIndicators(ctx) {
+  if (G.camera.zoom < 0.7) return;
+  const tt = G.gameTick * 0.08;
+  for (const c of G.citizens) {
+    if (c.state !== 'idle') { c._idleAge = 0; continue; }
+    c._idleAge = (c._idleAge || 0) + 1;
+    if (c._idleAge < 180) continue; // ~3s at 60 ticks/s
+    const s = toScreen(c.x, c.y);
+    const bob = Math.sin(tt + c.x * 3) * 1.5;
+    const y = s.y - 18 + bob;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = '#ffd166';
+    ctx.beginPath();
+    ctx.arc(s.x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1a1428';
+    ctx.font = 'bold 7px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('?', s.x, y + 0.5);
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderIdleIndicators);
