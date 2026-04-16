@@ -149,7 +149,8 @@ export function renderAchievementsPanel() {
       <span class="ach-sum-label">${doneCount} / ${totalCount} Unlocked</span>
       <span class="ach-sum-pct">${pct}%</span>
     </div>
-    <div class="ach-sum-bar"><div class="ach-sum-fill" style="width:${pct}%"></div></div>`;
+    <div class="ach-sum-bar"><div class="ach-sum-fill" style="width:${pct}%"></div></div>
+    <div class="ach-sum-note">Lifetime progress across all playthroughs</div>`;
   el.appendChild(summary);
 
   // Unlocked first, then locked
