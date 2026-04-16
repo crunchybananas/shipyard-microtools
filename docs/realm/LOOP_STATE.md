@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 57 (regular)
-- **What**: Tutorial was actively misdirecting new players. On the `build_farm` / `build_lumber` / `build_house` steps, the instruction text correctly said "Click Farm" (etc.) but the pulsing tut-highlight class was landing on the HOUSE card every time. Root cause: `highlight: '.build-btn'` with `document.querySelector('.build-btn')` returns the first match — always House, since it's card #1. Fix: target the specific card via `[data-build-key="farm"]` / `="lumber"` / `="house"`. ui.js only.
-- **Verified**: Chrome ?_cb=62 — forced gameTick=50 to advance past welcome step. `.tut-highlight` now lands on the Farm button (buildKey "farm") with its purple pulse, matching "Select Farm below" instruction. Screenshot confirms Farm card is the one glowing. No console errors.
-- **Validator notes (cycle 57, deferred)**: Top-bar icons (speaker, music, trophy, etc.) are unlabeled at rest (they DO have tooltips per cycle 9, just not visible in static screenshot). Build-bar category labels HOUSING/PRODUCTION/INFRASTRUCTURE are rotated 90° and dark-on-dark. Tutorial modal obscures upper-right map region with no dim overlay.
+- **Number**: 58 (regular)
+- **What**: Pause overlay looked broken. Validator reported "PAUSED text is clipped by a villager sprite" — actually a transparency problem, not z-order: backdrop at 25% alpha + white text at 50% alpha let citizen sprites bleed *through* the letters. Fix in enhancements.js renderPauseOverlay: backdrop 0.25→0.42, white fill 0.5→0.95, added 5px dark stroke (lineJoin:round) so PAUSED is readable over any terrain/sprite. Single file.
+- **Verified**: Chrome ?_cb=64 — paused state, zoom confirms "⏸ PAUSED" crisp white with solid dark outline; villager to the right of the word no longer appears "in front of" the E. Scene darkens noticeably, pause reads as decisive. No console errors.
+- **Validator notes (cycle 58, deferred)**: Minimap viewport indicator rendered as a degenerate thin cyan line (zero height) — worth a later cycle. HUD category labels (HOUSING/PRODUCTION/INFRASTRUCTURE) still rotated low-contrast. Top-bar first icon (◆◆) reads as "??" placeholder to fresh eyes.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -149,6 +149,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 55: Difficulty dot (🟡/🟢/🔴) was wrapping to an orphan second line under the day-display text. Added white-space:nowrap to #day-display in index.html — full "Year 1, Day 1 · 🌱Spring · 😐50% 🟡" now stays on one row.
 - Cycle 56 (deep-play): CRITICAL — simTick's `% N === 0` checks silently miss when speed doesn't divide N (e.g., speed=4 + odd gameTick → updateUI, checkMissions, tickMusic ALL stop firing; HUD freezes mid-game). Replaced all 5 occurrences with a `crossed(N)` helper that fires on crossing a multiple of N, robust to any speed ≥ 1.
 - Cycle 57: Tutorial highlight bug — `.build-btn` selector always resolved to HOUSE (first build button), so "Click Farm" / "Click Lumber Mill" / "Click House" steps all pulsed the same wrong card. Changed highlight selectors to `[data-build-key="<type>"]` for each step. Farm now glows when the tutorial says to select Farm.
+- Cycle 58: Pause overlay transparency — backdrop 0.25α + text 0.5α let citizen sprites bleed through the letters so "PAUSED" looked clipped by villagers. Bumped backdrop to 0.42, text to 0.95, added dark stroke. Scene darkens when paused; text is readable over any background.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:

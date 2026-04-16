@@ -4921,12 +4921,21 @@ registerScreenRenderer(renderSpeedIndicator);
 function renderPauseOverlay(ctx, w, h) {
   if (G.speed !== 0) return;
   ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  // Stronger scene-darken so the paused state reads as "world is frozen,"
+  // and so the label has real contrast against bright terrain.
+  ctx.fillStyle = 'rgba(0,0,0,0.42)';
   ctx.fillRect(0, 0, w, h);
   ctx.font = 'bold 28px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  // Dark stroke behind fully-opaque white fill. At 0.5 alpha the old fill
+  // let citizen sprites bleed through the letterforms so the "E" looked
+  // z-clipped by a villager — this makes PAUSED legible over anything.
+  ctx.lineWidth = 5;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+  ctx.strokeText('⏸ PAUSED', w/2, h/2);
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
   ctx.fillText('⏸ PAUSED', w/2, h/2);
   ctx.restore();
 }
