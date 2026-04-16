@@ -132,6 +132,27 @@ export function playBuildingSound(buildingType) {
   playSound('build');
 }
 
+// Short citizen "voice" bark — randomized pitch sine warble
+export function playVoiceBark(kind='happy') {
+  if (!G.audioCtx) return;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  const dest = ctx.destination;
+  const pitchMap = { happy: 560, sad: 320, work: 460, hungry: 380, cheer: 700, alarm: 640 };
+  const base = pitchMap[kind] || 500;
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(base, t);
+  osc.frequency.linearRampToValueAtTime(base * (kind === 'sad' ? 0.7 : 1.3), t + 0.12);
+  osc.frequency.linearRampToValueAtTime(base * 0.9, t + 0.22);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.035, t + 0.02);
+  g.gain.linearRampToValueAtTime(0, t + 0.25);
+  osc.connect(g); g.connect(dest);
+  osc.start(t); osc.stop(t + 0.26);
+}
+
 export function playSound(type) {
   if (!G.audioCtx) return;
   const ctx = G.audioCtx;

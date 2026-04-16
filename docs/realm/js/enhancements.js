@@ -4158,3 +4158,26 @@ function renderIdleIndicators(ctx) {
   }
 }
 registerWorldRenderer(renderIdleIndicators);
+
+// ── Loop 107: Occasional citizen voice barks ───────────────
+import { playVoiceBark as _playBark } from './audio.js';
+let _lastBarkTick = 0;
+function updateBarks() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G.citizens.length === 0) return;
+  // At most one bark every ~4 seconds (240 ticks)
+  if (G.gameTick - _lastBarkTick < 240) return;
+  if (Math.random() < 0.25) {
+    const c = G.citizens[Math.floor(Math.random() * G.citizens.length)];
+    if (!c) return;
+    let kind = 'work';
+    if (c.hunger > 80) kind = 'hungry';
+    else if (c.state === 'eating') kind = 'happy';
+    else if (c.state === 'idle') kind = 'sad';
+    else if (c.state === 'working') kind = 'work';
+    else if (G.happiness > 80) kind = 'cheer';
+    _playBark(kind);
+    _lastBarkTick = G.gameTick;
+  }
+}
+registerUpdater(updateBarks);
