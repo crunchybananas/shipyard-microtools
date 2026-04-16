@@ -779,7 +779,11 @@ const TUTORIAL_STEPS = [
     text: '🌾 Your settlers need food! Build a Farm first. Click Farm below (or press 2).',
     action: 'Select Farm from the build bar ↓',
     check: () => G.selectedBuild === 'farm',
-    highlight: '.build-btn',
+    // Target the specific building by data-build-key — `.build-btn` alone matches
+    // all build buttons and querySelector returns the first (House), so the
+    // pulsing tutorial highlight was landing on the wrong card and actively
+    // misdirecting new players ("select Farm" with the House button glowing).
+    highlight: '[data-build-key="farm"]',
   },
   {
     id: 'place_farm',
@@ -792,7 +796,7 @@ const TUTORIAL_STEPS = [
     text: '🪓 Now build a Lumber Mill on a forest tile for wood. Click Lumber Mill (or press 3).',
     action: 'Select Lumber Mill from the build bar ↓',
     check: () => G.selectedBuild === 'lumber' || G.buildings.some(b => b.type === 'lumber'),
-    highlight: '.build-btn',
+    highlight: '[data-build-key="lumber"]',
   },
   {
     id: 'place_lumber',
@@ -818,7 +822,7 @@ const TUTORIAL_STEPS = [
     text: '🏠 Build a House to grow your population! More citizens = more workers for buildings.',
     action: 'Select House and place on grass',
     check: () => G.buildings.some(b => b.type === 'house'),
-    highlight: '.build-btn',
+    highlight: '[data-build-key="house"]',
   },
   {
     id: 'tip_hotkeys',

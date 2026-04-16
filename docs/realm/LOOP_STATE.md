@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 56 (deep-play)
-- **What**: Deep-play uncovered a SERIOUS latent bug: `if (G.gameTick % N === 0)` in main.js simTick silently misses when G.speed doesn't divide N. Specifically, speed=4 combined with an odd-parity gameTick means gameTick increments 4-at-a-time through only the odd residues mod 30 — never lands on 0, so updateUI / checkMissions / updateAmbient / tickMusic ALL stop firing. HUD freezes mid-session until player pauses (resetting to speed 0). Observed in-game: HUD stuck displaying "Year 1, Day 2" while internal G.day was 40, then 68. Fix: added `crossed(N)` helper in simTick (Math.floor(tick/N) > Math.floor((tick-speed)/N)) that fires when a multiple of N is *crossed* regardless of alignment. Replaced all 5 `% N === 0` checks (30, 60×3, 120×2) in simTick with `crossed(N)` calls.
-- **Verified**: Chrome ?_cb=60 — with speed=4 and gameTick=1001 (odd, the exact broken scenario), day-display got 16 writes in 2s (was 0 pre-fix). Day advanced Day 1→Day 8, season ticked Spring→Summer. No console errors.
-- **Deep-play observations captured to backlog**: Festival event double-notification (toast + big banner), citizen HP/death flow readable, raid of 8 enemies → full wipe of population/buildings feels unforgiving.
+- **Number**: 57 (regular)
+- **What**: Tutorial was actively misdirecting new players. On the `build_farm` / `build_lumber` / `build_house` steps, the instruction text correctly said "Click Farm" (etc.) but the pulsing tut-highlight class was landing on the HOUSE card every time. Root cause: `highlight: '.build-btn'` with `document.querySelector('.build-btn')` returns the first match — always House, since it's card #1. Fix: target the specific card via `[data-build-key="farm"]` / `="lumber"` / `="house"`. ui.js only.
+- **Verified**: Chrome ?_cb=62 — forced gameTick=50 to advance past welcome step. `.tut-highlight` now lands on the Farm button (buildKey "farm") with its purple pulse, matching "Select Farm below" instruction. Screenshot confirms Farm card is the one glowing. No console errors.
+- **Validator notes (cycle 57, deferred)**: Top-bar icons (speaker, music, trophy, etc.) are unlabeled at rest (they DO have tooltips per cycle 9, just not visible in static screenshot). Build-bar category labels HOUSING/PRODUCTION/INFRASTRUCTURE are rotated 90° and dark-on-dark. Tutorial modal obscures upper-right map region with no dim overlay.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -148,6 +148,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 54: USER BUG FIXED — build-bar two-click bug. Removed renderBuildBar() from 30-tick periodic path in main.js; it was wiping bar.innerHTML every 500ms and racing real mouse clicks between mousedown and click. updateBuildBarAffordability() inside updateUI() already handles in-place cost/lock updates.
 - Cycle 55: Difficulty dot (🟡/🟢/🔴) was wrapping to an orphan second line under the day-display text. Added white-space:nowrap to #day-display in index.html — full "Year 1, Day 1 · 🌱Spring · 😐50% 🟡" now stays on one row.
 - Cycle 56 (deep-play): CRITICAL — simTick's `% N === 0` checks silently miss when speed doesn't divide N (e.g., speed=4 + odd gameTick → updateUI, checkMissions, tickMusic ALL stop firing; HUD freezes mid-game). Replaced all 5 occurrences with a `crossed(N)` helper that fires on crossing a multiple of N, robust to any speed ≥ 1.
+- Cycle 57: Tutorial highlight bug — `.build-btn` selector always resolved to HOUSE (first build button), so "Click Farm" / "Click Lumber Mill" / "Click House" steps all pulsed the same wrong card. Changed highlight selectors to `[data-build-key="<type>"]` for each step. Farm now glows when the tutorial says to select Farm.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
