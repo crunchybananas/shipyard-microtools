@@ -258,11 +258,8 @@ function runStateMachine(c) {
           text: `+${amount} ${resEmoji(res)}`,
           alpha: 1.2, vy: -0.3, type: 'text',
         });
-        G.particles.push({
-          tx: c.x, ty: c.y, offsetY: -25,
-          text: 'Found!',
-          alpha: 0.9, vy: -0.1, decay: 0.02, type: 'speech',
-        });
+        // "Found!" bubble removed — the +resource text already communicates the event.
+        // Adding a separate speech bubble was redundant and confusing at a distance.
         c.carrying = res;
         c.carryAmount = 0;
       }
