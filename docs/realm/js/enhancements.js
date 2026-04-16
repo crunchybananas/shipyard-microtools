@@ -2701,6 +2701,7 @@ registerWorldRenderer(renderVictoryAura);
 
 // ── Loop 60: Sheep clouds — fluffy little wandering clouds in screen sky
 function updateSheepClouds(logicalW, logicalH) {
+  return;
   if (!G.sheepClouds) G.sheepClouds = [];
   if (G.gameTick % 250 === 0 && G.sheepClouds.length < 4 && getDaylight() > 0.65) {
     G.sheepClouds.push({
@@ -2718,6 +2719,7 @@ function updateSheepClouds(logicalW, logicalH) {
   }
 }
 function renderSheepClouds(ctx) {
+  return;
   if (!G.sheepClouds || !G.sheepClouds.length) return;
   ctx.save();
   for (const c of G.sheepClouds) {
@@ -5336,11 +5338,11 @@ registerUpdater(update100Buildings);
 function renderMapVignette(ctx, w, h) {
   const cx = w * 0.45;              // slightly left of center — map is offset
   const cy = h * 0.5;
-  const innerR = Math.min(w, h) * 0.35;   // full-brightness zone
-  const outerR = Math.max(w, h) * 0.75;   // fully opaque at this radius
+  const innerR = Math.min(w, h) * 0.28;   // full-brightness zone
+  const outerR = Math.max(w, h) * 0.55;   // fully opaque at this radius
   const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
   grad.addColorStop(0,   'rgba(10,14,26,0)');
-  grad.addColorStop(0.7, 'rgba(10,14,26,0.5)');
+  grad.addColorStop(0.6, 'rgba(10,14,26,0.75)');
   grad.addColorStop(1,   'rgba(10,14,26,1)');
   ctx.save();
   ctx.fillStyle = grad;
