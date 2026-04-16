@@ -27,7 +27,7 @@ import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
-import { initChronicle, chronicle, toggleChroniclePanel } from './story.js';
+import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats } from './story.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -313,7 +313,7 @@ function simTick() {
     renderBuildBar();
     updateTutorialTip();
   }
-  if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); }
+  if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); checkStoryBeats(); }
   if (G.gameTick % 120 === 0) { tickMusic(); checkAdvisor(); }
   if (G.gameTick % 120 === 0 && !G._scenarioWon) {
     if (checkScenarioComplete()) {

@@ -61,6 +61,108 @@ export function renderChroniclePanel() {
   c.innerHTML = html;
 }
 
+// ════════════════════════════════════════════════════════════
+// Story beats — triggered by milestones. Each beat fires once.
+// ════════════════════════════════════════════════════════════
+
+const MAYOR_FIRST = ['Aldwin','Brynne','Cedric','Dahlia','Eadric','Ferra','Garrick','Hestia','Ivor','Juna','Kerrin','Liana','Malcolm','Nerys','Osric','Petra','Quillan','Rowen','Sibyl','Thane'];
+const MAYOR_LAST  = ['the Steady','the Bold','Ironheart','of the Vale','Fairwind','Oakmoot','Stormward','the Patient','Brightblade','the Just','Silverthorn','Greyhelm'];
+const BARD_FIRST  = ['Lilian','Merek','Oriel','Piper','Roderic','Seraphine','Tomas','Wren'];
+const RIVAL_NAMES = ['Lord Vorgan of the Ashlands','Baroness Sable of Crowhold','The Iron Earl Draven','Duchess Morrigan of Nightshade'];
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+export function ensureMayor() {
+  initChronicle();
+  if (G.namedCharacters.mayor) return G.namedCharacters.mayor;
+  const name = `${pick(MAYOR_FIRST)} ${pick(MAYOR_LAST)}`;
+  G.namedCharacters.mayor = { name, appointedDay: G.day };
+  chronicle(`${name} is appointed mayor. "I shall serve ${G.kingdomName} with all that I am."`, 'character');
+  return G.namedCharacters.mayor;
+}
+
+export function ensureBard() {
+  initChronicle();
+  if (G.namedCharacters.bard) return G.namedCharacters.bard;
+  const name = pick(BARD_FIRST);
+  G.namedCharacters.bard = { name, arrivedDay: G.day };
+  chronicle(`A wandering bard, ${name}, arrives to play at the tavern. Songs of the realm begin.`, 'character');
+  return G.namedCharacters.bard;
+}
+
+export function ensureRival() {
+  initChronicle();
+  if (G.namedCharacters.rival) return G.namedCharacters.rival;
+  const name = pick(RIVAL_NAMES);
+  G.namedCharacters.rival = { name, noticedDay: G.day };
+  chronicle(`${name} takes notice of ${G.kingdomName}. Their banners have been seen at the borders.`, 'character');
+  return G.namedCharacters.rival;
+}
+
+// Run each tick/day to detect milestones and fire beats once.
+export function checkStoryBeats() {
+  initChronicle();
+
+  // First house
+  if (!hasFlag('firstHouse') && G.buildings.some(b => b.type === 'house')) {
+    setFlag('firstHouse');
+    chronicle('The first house is raised. Smoke rises from a new hearth tonight.', 'milestone');
+  }
+  // First farm
+  if (!hasFlag('firstFarm') && G.buildings.some(b => b.type === 'farm')) {
+    setFlag('firstFarm');
+    chronicle('A farm is established. The earth will feed us now.', 'milestone');
+  }
+  // First tavern → mayor appears, bard soon after
+  if (!hasFlag('firstTavern') && G.buildings.some(b => b.type === 'tavern')) {
+    setFlag('firstTavern');
+    chronicle('The tavern opens its doors. Laughter carries into the night.', 'milestone');
+    ensureMayor();
+  }
+  // First market
+  if (!hasFlag('firstMarket') && G.buildings.some(b => b.type === 'market')) {
+    setFlag('firstMarket');
+    chronicle('Merchants unpack their wares at the new market. Trade has come to the realm.', 'milestone');
+  }
+  // First barracks → rival noticed
+  if (!hasFlag('firstBarracks') && G.buildings.some(b => b.type === 'barracks')) {
+    setFlag('firstBarracks');
+    chronicle('The barracks is built. Recruits drill at dawn.', 'milestone');
+    ensureRival();
+  }
+  // First church
+  if (!hasFlag('firstChurch') && G.buildings.some(b => b.type === 'church')) {
+    setFlag('firstChurch');
+    chronicle('Bells toll from the new church. The faithful gather.', 'milestone');
+    ensureBard();
+  }
+  // Population thresholds
+  const popCheck = [
+    [10, 'pop10', 'Ten souls now call this land home.'],
+    [25, 'pop25', 'Twenty-five citizens — a true town takes shape.'],
+    [50, 'pop50', 'Fifty strong! Travelers on the road whisper of the rising realm.'],
+    [75, 'pop75', 'Seventy-five subjects. Other lords now watch with envy.'],
+    [100, 'pop100', 'One hundred souls. A city is born.'],
+  ];
+  for (const [thr, flag, text] of popCheck) {
+    if (!hasFlag(flag) && G.population >= thr) {
+      setFlag(flag);
+      chronicle(text, 'milestone');
+    }
+  }
+  // Castle = end-of-act
+  if (!hasFlag('castleBuilt') && G.buildings.some(b => b.type === 'castle')) {
+    setFlag('castleBuilt');
+    const m = G.namedCharacters.mayor;
+    chronicle(`The castle stands complete. ${m ? m.name + ' proclaims,' : 'The heralds proclaim,'} "${G.kingdomName} shall endure a thousand years!"`, 'victory');
+  }
+  // First raid survived
+  if (!hasFlag('firstRaidSurvived') && G.stats && G.stats.raidsSurvived >= 1) {
+    setFlag('firstRaidSurvived');
+    chronicle('The first raid is turned back. The dead are buried; the living drink to the fallen.', 'raid');
+  }
+}
+
 export function toggleChroniclePanel() {
   const p = document.getElementById('chronicle-panel');
   if (!p) return;
