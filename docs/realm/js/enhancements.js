@@ -5338,12 +5338,13 @@ registerUpdater(update100Buildings);
 function renderMapVignette(ctx, w, h) {
   const cx = w * 0.45;              // slightly left of center — map is offset
   const cy = h * 0.5;
-  const innerR = Math.min(w, h) * 0.28;   // full-brightness zone
-  const outerR = Math.max(w, h) * 0.55;   // fully opaque at this radius
+  const innerR = Math.min(w, h) * 0.4;    // bigger bright zone — less "spotlight"
+  const outerR = Math.max(w, h) * 0.7;    // softer, longer fade
   const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
-  grad.addColorStop(0,   'rgba(10,14,26,0)');
-  grad.addColorStop(0.6, 'rgba(10,14,26,0.75)');
-  grad.addColorStop(1,   'rgba(10,14,26,1)');
+  grad.addColorStop(0,    'rgba(10,14,26,0)');
+  grad.addColorStop(0.55, 'rgba(10,14,26,0.35)');
+  grad.addColorStop(0.85, 'rgba(10,14,26,0.85)');
+  grad.addColorStop(1,    'rgba(10,14,26,1)');
   ctx.save();
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
