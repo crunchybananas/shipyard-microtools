@@ -148,9 +148,45 @@ export function updateUI() {
   const kd = $('kingdom-display');
   if (kd) kd.textContent = G.kingdomName ? `👑 ${G.kingdomName}` : '';
 
-  // Refresh build bar periodically so affordability reflects current resources
-  // (without this, cost colors only update on click/keypress)
-  if (G.gameTick % 30 === 0) renderBuildBar();
+  // Update affordability classes in place — avoids re-rendering the whole
+  // bar every 30 ticks (which was destroying hover tooltips, tearing down
+  // the lifted selected-state CSS, and feeling flaky to click)
+  if (G.gameTick % 30 === 0) updateBuildBarAffordability();
+}
+
+// In-place update: toggles .disabled class + .cost-short spans without
+// rebuilding DOM, so hover/selected state stays intact.
+function updateBuildBarAffordability() {
+  const bar = document.getElementById('build-bar');
+  if (!bar) return;
+  bar.querySelectorAll('.build-btn').forEach(btn => {
+    const key = btn.dataset.buildKey;
+    if (!key) return;
+    const def = BUILDINGS[key];
+    if (!def) return;
+    const affordable = canAfford(key);
+    btn.classList.toggle('disabled', !affordable);
+    // Update each cost span's short class without rewriting the button text
+    const spans = btn.querySelectorAll('.cost > span');
+    let i = 0;
+    for (const [k, v] of Object.entries(def.cost)) {
+      const span = spans[i++];
+      if (!span) continue;
+      const have = G.resources[k] || 0;
+      span.classList.toggle('cost-short', have < v);
+    }
+    // Toggle lock badge visibility
+    const lock = btn.querySelector('.build-lock');
+    if (!affordable && !lock) {
+      const lockEl = document.createElement('span');
+      lockEl.className = 'build-lock';
+      lockEl.setAttribute('aria-label', 'Cannot afford');
+      lockEl.textContent = '🔒';
+      btn.insertBefore(lockEl, btn.firstChild);
+    } else if (affordable && lock) {
+      lock.remove();
+    }
+  });
 }
 
 const CATEGORIES = [
@@ -185,6 +221,7 @@ export function renderBuildBar() {
       const affordable = canAfford(key);
       const btn = document.createElement('button');
       btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
+      btn.dataset.buildKey = key;
       // Highlight individual resource costs the player can't afford — direct "why can't I build this" feedback
       const costStr = Object.entries(def.cost).map(([k,v]) => {
         const have = G.resources[k] || 0;
