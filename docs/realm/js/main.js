@@ -337,8 +337,13 @@ function simTick() {
     }
   }
   if (G.gameTick % 30 === 0) {
+    // updateUI() already calls updateBuildBarAffordability() for in-place cost/lock
+    // updates. Calling renderBuildBar() here would wipe bar.innerHTML every 500ms
+    // — if that fires between a user's mousedown and click, the button element is
+    // replaced before the click lands, so the first click is lost (reported as
+    // "selecting a building requires two clicks"). Full rebuilds happen on the
+    // events that change bar structure: placement, research, undo, Escape, etc.
     updateUI();
-    renderBuildBar();
     updateTutorialTip();
   }
   if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); checkStoryBeats(); }

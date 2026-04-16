@@ -48,10 +48,9 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 53
-- **What**: Validator: top-right HUD toolbar had stylistic inconsistency — trophy 🏆 rendered as saturated gold while siblings (🔊🎵📊📜🛒📖) read as muted gray. Trophy "shouted" ~3x the weight. Added filter:saturate(0.7) to .hud-btn, with hover restoring saturate(1). Unifies the toolbar row without removing color cues entirely. Zoom comparison confirms trophy is now comparable weight to neighbors.
-- **Commit**: 530d371
-- **Verified**: Chrome-reloaded with ?_cb=55, zoom of HUD toolbar shows all 7 icons at similar visual weight. No console errors.
+- **Number**: 54 (USER-REPORTED BUG FIX — out-of-band, jumped cycle 54 slot)
+- **What**: User: "selecting the building requires two clicks for it to become the tool." Root cause: main.js:341 called renderBuildBar() every 30 ticks alongside updateUI(). That wiped bar.innerHTML every ~500ms; when it fired between a real mousedown and click, the button element was swapped out and the click landed on nothing. Cycle 33's updateBuildBarAffordability() already handles in-place cost/lock updates inside updateUI() — the periodic full rebuild was redundant AND destructive. Removed it from main.js:341. Full rebuilds still run on every event that actually changes bar structure (placement, research unlock, Escape, undo, selection, new/load game).
+- **Verified**: Chrome ?_cb=56 — button DOM identity persists across 62 ticks (sameElement:true). Synthetic click sets selectedBuild:"house" and active:true on a single click. No console errors.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
