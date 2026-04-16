@@ -486,15 +486,15 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
   <span id="kingdom-display"></span>
   <span id="day-display">Day 1</span>
-  <button class="hud-btn" onclick="toggleResearch()">🔬 Research</button>
-  <button class="hud-btn" onclick="toggleHappiness()">😊</button>
-  <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()">🔊</button>
-  <button class="hud-btn" id="btn-music" onclick="toggleMusicBtn()">🎵</button>
-  <button class="hud-btn" onclick="toggleAchievements()">🏆</button>
-  <button class="hud-btn" onclick="toggleStats()">📊</button>
-  <button class="hud-btn" onclick="toggleLog()">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
-  <button class="hud-btn" onclick="toggleTrade()">🛒</button>
-  <button class="hud-btn" onclick="toggleChronicle()" title="Chronicle of the Realm">📖</button>
+  <button class="hud-btn" onclick="toggleResearch()" title="Research — unlock new buildings and upgrades (R)">🔬 Research</button>
+  <button class="hud-btn" onclick="toggleHappiness()" title="Happiness — view settler mood breakdown">😊</button>
+  <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()" title="Ambient sound on/off">🔊</button>
+  <button class="hud-btn" id="btn-music" onclick="toggleMusicBtn()" title="Music on/off (M)">🎵</button>
+  <button class="hud-btn" onclick="toggleAchievements()" title="Achievements">🏆</button>
+  <button class="hud-btn" onclick="toggleStats()" title="Statistics — resources, production, population history">📊</button>
+  <button class="hud-btn" onclick="toggleLog()" title="Notifications log (L)">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
+  <button class="hud-btn" onclick="toggleTrade()" title="Trade with merchant partners (T)">🛒</button>
+  <button class="hud-btn" onclick="toggleChronicle()" title="Chronicle — recorded history of your realm">📖</button>
 </div>
 
 <div id="chronicle-panel" style="display:none">
