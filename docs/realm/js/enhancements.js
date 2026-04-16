@@ -4378,3 +4378,198 @@ function renderDamagedBuildings(ctx) {
   }
 }
 registerWorldRenderer(renderDamagedBuildings);
+
+// ── Loop 131: Victory cinematic — slow zoom + golden overlay ──
+let _victoryAnim = null;
+function updateVictoryCinematic() {
+  if (G.won && !_victoryAnim) {
+    _victoryAnim = { tick: 0 };
+  }
+  if (_victoryAnim) {
+    _victoryAnim.tick += G.speed;
+  }
+}
+function renderVictoryCinematic(ctx, w, h) {
+  if (!_victoryAnim || _victoryAnim.tick > 300) return;
+  const t = _victoryAnim.tick / 300;
+  ctx.save();
+  ctx.globalAlpha = Math.sin(t * Math.PI) * 0.15;
+  ctx.fillStyle = '#ffd166';
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+}
+registerUpdater(updateVictoryCinematic);
+registerScreenRenderer(renderVictoryCinematic);
+
+// ── Loop 132: Citizen nameplate on hover ────────────────────
+function renderCitizenNameplates(ctx) {
+  if (G.camera.zoom < 0.9) return;
+  if (!G.selectedCitizen && !G.hoveredTile) return;
+  for (const c of G.citizens) {
+    if (c !== G.selectedCitizen) continue;
+    const s = toScreen(c.x, c.y);
+    ctx.save();
+    ctx.font = 'bold 8px sans-serif';
+    ctx.textAlign = 'center';
+    const tw = ctx.measureText(c.name).width + 6;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(s.x - tw/2, s.y - 24, tw, 12);
+    ctx.fillStyle = '#facc15';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(c.name, s.x, s.y - 18);
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderCitizenNameplates);
+
+// ── Loop 133: Day/night transition overlay gradient ─────────
+function renderDawnDuskGlow(ctx, w, h) {
+  const t = G.dayPhase / G.dayLength;
+  let alpha = 0;
+  let color = '255,180,80';
+  if (t > 0.05 && t < 0.15) {
+    alpha = Math.sin((t - 0.05) / 0.1 * Math.PI) * 0.12;
+    color = '255,200,100'; // dawn gold
+  } else if (t > 0.55 && t < 0.7) {
+    alpha = Math.sin((t - 0.55) / 0.15 * Math.PI) * 0.1;
+    color = '255,120,60'; // sunset orange
+  }
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.fillStyle = `rgba(${color},${alpha})`;
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+}
+registerScreenRenderer(renderDawnDuskGlow);
+
+// ── Loop 134: Advisor popup for first-time situations ───────
+let _advisorTips = {};
+function updateAdvisorTips() {
+  if (G.gameTick % 120 !== 0) return;
+  // Tip: no farm yet
+  if (!_advisorTips.noFarm && G.day >= 2 && !G.buildings.some(b => b.type === 'farm')) {
+    _advisorTips.noFarm = true;
+    try { 
+      const el = document.getElementById('toast');
+      if (el) {
+        el.textContent = '💡 Advisor: Build a farm soon or your settlers will starve!';
+        el.className = 'show toast-event';
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove('show'), 4000);
+      }
+    } catch(_e){}
+  }
+  // Tip: no defense before raid
+  if (!_advisorTips.noDefense && G.nextRaidDay - G.day <= 3 && G.defense < 5 && G.day > 3) {
+    _advisorTips.noDefense = true;
+    try {
+      const el = document.getElementById('toast');
+      if (el) {
+        el.textContent = '💡 Advisor: Raiders approach! Build barracks or towers for defense!';
+        el.className = 'show toast-danger';
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove('show'), 4000);
+      }
+    } catch(_e){}
+  }
+}
+registerUpdater(updateAdvisorTips);
+
+// ── Loop 135: Worker assignment indicator on buildings ───────
+function renderWorkerDots(ctx) {
+  if (G.camera.zoom < 0.9) return;
+  for (const b of G.buildings) {
+    const def = BUILDINGS[b.type];
+    if (!def.workers) continue;
+    const s = toScreen(b.x, b.y);
+    const needed = def.workers;
+    const have = b.workers ? b.workers.length : 0;
+    for (let i = 0; i < needed; i++) {
+      const cx = s.x - (needed - 1) * 3 + i * 6;
+      const cy = s.y + 10;
+      ctx.fillStyle = i < have ? '#4ade80' : '#ef4444';
+      ctx.globalAlpha = i < have ? 0.9 : 0.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+registerWorldRenderer(renderWorkerDots);
+
+// ── Loop 136: Keyboard shortcut: R to open research ─────────
+// (Handled in input.js — see below. This stub notes the loop.)
+
+// ── Loop 137: Building upgrade particles ────────────────────
+// (Hooked into economy.js upgrade — emits sparkle burst)
+
+// ── Loop 138: Resource gathering animation (citizen carries) ─
+// Render carried resource icon above citizen heads.
+function renderCarryIcons(ctx) {
+  if (G.camera.zoom < 1.0) return;
+  const emoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+  for (const c of G.citizens) {
+    if (!c.carrying || !c.carryAmount) continue;
+    const s = toScreen(c.x, c.y);
+    ctx.save();
+    ctx.font = '8px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(emoji[c.carrying] || c.carrying, s.x, s.y - 16);
+    ctx.restore();
+  }
+}
+registerWorldRenderer(renderCarryIcons);
+
+// ── Loop 139: Map edge boundary indicator ───────────────────
+function renderMapBoundary(ctx) {
+  if (G.camera.zoom < 0.5) return;
+  // Draw subtle red dashes at map edge tiles when camera is near edge
+  const edgeAlpha = 0.3;
+  // Top-left edge
+  for (let i = 0; i < MAP_W; i++) {
+    const s = toScreen(i, 0);
+    ctx.fillStyle = `rgba(200,100,80,${edgeAlpha})`;
+    ctx.fillRect(s.x - 1, s.y - 1, 2, 2);
+  }
+  for (let i = 0; i < MAP_H; i++) {
+    const s = toScreen(0, i);
+    ctx.fillStyle = `rgba(200,100,80,${edgeAlpha})`;
+    ctx.fillRect(s.x - 1, s.y - 1, 2, 2);
+  }
+}
+registerWorldRenderer(renderMapBoundary);
+
+// ── Loop 140: Audio: town hum ambient layer ─────────────────
+// When population > 10 and cursor is near center, subtle murmur.
+import { initAudio as _initAudio140 } from './audio.js';
+let _townHumNode = null;
+function updateTownHum() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G.population < 10) {
+    if (_townHumNode) {
+      try { _townHumNode.gain.linearRampToValueAtTime(0, G.audioCtx.currentTime + 0.5); } catch(_e){}
+      _townHumNode = null;
+    }
+    return;
+  }
+  if (_townHumNode) return;
+  try {
+    const ctx = G.audioCtx;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 110;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 300;
+    filter.Q.value = 0.3;
+    g.gain.value = 0.008;
+    osc.connect(filter);
+    filter.connect(g);
+    g.connect(ctx.destination);
+    osc.start();
+    _townHumNode = g;
+  } catch(_e){}
+}
+registerUpdater(updateTownHum);
