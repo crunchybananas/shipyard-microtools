@@ -295,6 +295,20 @@ export function playSound(type) {
       break;
     }
 
+    // ── Bell toll: day transitions (church exists) ────────────
+    case 'bellToll': {
+      const hasChurch = G.buildings && G.buildings.some(b => b.type === 'church');
+      if (!hasChurch) break;
+      // Rich bell with 3 partials + slow decay
+      makeOsc(ctx, dest, 'sine', 330, 0.14, 0.005, 1.5, t);
+      makeOsc(ctx, dest, 'sine', 660, 0.08, 0.005, 1.2, t);
+      makeOsc(ctx, dest, 'sine', 990, 0.04, 0.005, 1.0, t);
+      // Second hit
+      makeOsc(ctx, dest, 'sine', 330, 0.11, 0.005, 1.4, t + 0.8);
+      makeOsc(ctx, dest, 'sine', 660, 0.06, 0.005, 1.1, t + 0.8);
+      break;
+    }
+
     // ── Season change: gentle wind-chime cascade ─────────────
     case 'season': {
       // Pentatonic-ish chime sequence

@@ -246,6 +246,8 @@ function updateTime() {
     G.dayPhase = 0;
     G.day++;
     if (G.stats) G.stats.daysLived++;
+    // Bell toll at dawn if church exists
+    playSound('bellToll');
     const _raidDayBefore = G.nextRaidDay;
     collectTaxes();
     checkRaids();
