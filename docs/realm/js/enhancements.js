@@ -4937,18 +4937,23 @@ function renderPauseOverlay(ctx, w, h) {
   // and so the label has real contrast against bright terrain.
   ctx.fillStyle = 'rgba(0,0,0,0.42)';
   ctx.fillRect(0, 0, w, h);
-  ctx.font = 'bold 28px sans-serif';
+  // Label lives at top-center below the HUD instead of dead-center. On Day 1
+  // the starting citizens spawn mid-map and the old h/2 label landed right on
+  // top of them, obscuring the exact area a new player is looking at. Moving
+  // to y=56 keeps the "world is frozen" signal (the scrim still darkens
+  // everything) while leaving the play area unobstructed.
+  ctx.font = 'bold 22px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   // Dark stroke behind fully-opaque white fill. At 0.5 alpha the old fill
   // let citizen sprites bleed through the letterforms so the "E" looked
   // z-clipped by a villager — this makes PAUSED legible over anything.
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 4;
   ctx.lineJoin = 'round';
   ctx.strokeStyle = 'rgba(0,0,0,0.75)';
-  ctx.strokeText('⏸ PAUSED', w/2, h/2);
+  ctx.strokeText('⏸ PAUSED', w/2, 56);
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fillText('⏸ PAUSED', w/2, h/2);
+  ctx.fillText('⏸ PAUSED', w/2, 56);
   ctx.restore();
 }
 registerScreenRenderer(renderPauseOverlay);
