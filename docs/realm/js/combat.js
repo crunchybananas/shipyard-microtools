@@ -44,6 +44,28 @@ export function updateEnemies() {
           // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
           demolishBuilding(target.b, true);
         }
+      } else if (e.retreating) {
+        // Reached the retreat edge — leave the map
+        G.enemies.splice(i, 1);
+        continue;
+      } else {
+        // No buildings left to attack — retreat toward the nearest map edge
+        // and despawn on arrival. Without this, raids that wipe the settlement
+        // leave every surviving enemy spinning on the town-center tile forever;
+        // later raid days pile more enemies on top (observed in deep-play:
+        // 108-159 raiders stacked on tile (40,40) by Year 3 after pop hit 0,
+        // HUD skull counter climbing unbounded while the map sat frozen).
+        e.retreating = true;
+        // Pick whichever axis (x or y) is closer to its nearer edge
+        const distX = Math.min(e.x, MAP_W - 1 - e.x);
+        const distY = Math.min(e.y, MAP_H - 1 - e.y);
+        if (distX < distY) {
+          e.tx = e.x < MAP_W / 2 ? 0 : MAP_W - 1;
+          e.ty = e.y;
+        } else {
+          e.tx = e.x;
+          e.ty = e.y < MAP_H / 2 ? 0 : MAP_H - 1;
+        }
       }
     }
     // Enemies harm nearby citizens — citizens flee and can die if caught

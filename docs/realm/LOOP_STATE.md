@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 60 (regular)
-- **What**: Missions panel conflated scenario objectives with the 15 global side-missions — the scenario header said "Peaceful Valley 0/3" but the panel listed everything in one continuous column with no visual separator, making fresh-eyes readers assume all ~18 rows should count against /3 (and conclude the tracker was broken). Added a "SIDE GOALS" divider (top-border + uppercase label, muted color) between the 3 scenario objectives and the appended global list in missions.js. Also stopped the first side-goal from stealing the "mission-next" gold-highlighted styling — the scenario's current objective is the real active step. missions.js only.
-- **Verified**: Chrome ?_cb=68 — zoom on mission panel confirms divider renders between the 3 scenario rows and the side-goal list. "Reach 10 population" (scenario) keeps its gold active highlight; "Build a farm" (first side goal) renders as mission-later. No console errors.
-- **Validator notes (cycle 60, deferred)**: Top-bar `◆◆` first icon still reads as missing-glyph "tofu" to fresh eyes. Minimap viewport indicator still a squashed thin line (pre-existing). Rotated HOUSING/PRODUCTION/INFRASTRUCTURE labels still low-contrast.
+- **Number**: 61 (DEEP-PLAY)
+- **What**: Deep-play observation (Year 3, pop 0, 0 buildings) surfaced a simulation bug: after a raid wipes the settlement, surviving enemies sit at the target tile forever because `updateEnemies` only attacks when a building is found — null target meant no-op. Later raid days piled more enemies on the same tile; HUD skull counter climbed unbounded (observed 108 at Y3D13, 159 at Y3D27, all stacked at (40,40)). Fixed in combat.js: when an enemy arrives at target with no buildings to attack, it sets `retreating=true` and picks the nearer map-edge (X or Y axis). On subsequent ticks the existing move-toward-target code carries them to the edge; when they arrive at the edge still with no buildings, they despawn. combat.js only.
+- **Verified**: Chrome ?_cb=70 — injected 3 enemies at (40,40) with empty buildings array. First tick: all flagged retreating, targets set to (79, y) or (x, 79). Sampled every 500ms at speed 4: x went 49.82 → 59.42 → 69.02 → 78.62 → despawned (count 0). No console errors.
+- **Validator notes (cycle 61, deferred)**: No game-over screen when pop=0 & buildings=0 — game keeps ticking Y3+ in a zombie state, mission "Reach 10 population" sits at 0/10 with no way to recover. Happiness frozen at 50% in wiped state.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -152,6 +152,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 58: Pause overlay transparency — backdrop 0.25α + text 0.5α let citizen sprites bleed through the letters so "PAUSED" looked clipped by villagers. Bumped backdrop to 0.42, text to 0.95, added dark stroke. Scene darkens when paused; text is readable over any background.
 - Cycle 59: HUD difficulty dot was a bare emoji (🟡) with no label — read as a stray artifact after the happiness percent. Wrapped in a `<span>` with `title`/`aria-label` ("Difficulty: Normal"), keeping the compact single-glyph HUD but revealing meaning on hover + for screen readers.
 - Cycle 60: Missions panel had no divider between the 3 scenario objectives and the 15 appended global side-missions — fresh-eyes readers thought every row should count toward "0/3". Added a "SIDE GOALS" subheader divider; side goals no longer steal the scenario's active-mission gold highlight.
+- Cycle 61 (deep-play): Enemy pile-up bug — after settlement wipe, `updateEnemies` found null target and no-op'd, leaving every surviving raider spinning on the town-center tile. Later raid days stacked more on top (108→159 enemies on one tile, HUD skull counter climbing unbounded). Fixed by routing idle-no-target enemies to the nearest map edge via a `retreating` flag; they despawn on edge arrival. Verified injected 3 enemies retreat from x=40 to x=79 then despawn.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
