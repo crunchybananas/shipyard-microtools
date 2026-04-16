@@ -700,6 +700,20 @@ export function renderHappinessPanel() {
 
   html += `<div class="hp-row hp-total"><span class="hp-label">Net Happiness</span><span class="hp-val">${total}%</span></div>`;
 
+  // Roadmap: show buildings with happiness bonuses that the player hasn't built yet
+  // Gives the player a concrete path from 50% → 80%
+  const builtTypes = new Set(G.buildings.map(b => b.type));
+  const happinessBuildings = Object.entries(BUILDINGS)
+    .filter(([k, def]) => def.happiness && def.happiness > 0 && !builtTypes.has(k))
+    .sort((a, b) => b[1].happiness - a[1].happiness)
+    .slice(0, 5);
+  if (happinessBuildings.length > 0) {
+    html += `<div class="hp-section-title hp-section-roadmap">Ways to Raise Happiness</div>`;
+    html += happinessBuildings.map(([k, def]) =>
+      `<div class="hp-row hp-row-muted"><span class="hp-label">${def.icon} Build a ${def.name}</span><span class="hp-val pot">+${def.happiness}</span></div>`
+    ).join('');
+  }
+
   el.innerHTML = html;
 }
 
