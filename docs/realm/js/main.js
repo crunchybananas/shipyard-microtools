@@ -63,14 +63,28 @@ window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); if (gl
 setupSaveButtons();
 loadAchievements();
 
-// Check for existing save to show Continue button with file size
+// Check for existing save to show Continue button with friendly summary
 const hasSaveData = !!localStorage.getItem('realm-save-v2');
 if (hasSaveData) {
   const loadBtn = document.getElementById('title-load');
   if (loadBtn) {
-    const bytes = getSaveSize();
-    const kb = (bytes / 1024).toFixed(1);
-    loadBtn.textContent = `📁 Continue (${kb} KB)`;
+    // Parse save for kingdom name + day instead of raw byte size
+    let label = '📁 Continue';
+    try {
+      const raw = localStorage.getItem('realm-save-v2');
+      if (raw) {
+        const save = JSON.parse(raw);
+        const kName = save.kingdomName && save.kingdomName !== 'Realm' ? save.kingdomName : null;
+        const day = save.day || 1;
+        const pop = Array.isArray(save.citizens) ? save.citizens.length : 0;
+        const year = Math.floor((day - 1) / 28) + 1;
+        const dayInYear = ((day - 1) % 28) + 1;
+        label = kName
+          ? `📁 Continue ${kName} · Year ${year} Day ${dayInYear} · 👤${pop}`
+          : `📁 Continue · Year ${year} Day ${dayInYear} · 👤${pop}`;
+      }
+    } catch (e) { /* fall back to plain label */ }
+    loadBtn.textContent = label;
     loadBtn.style.display = 'inline-block';
   }
 }
