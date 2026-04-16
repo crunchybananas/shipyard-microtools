@@ -173,7 +173,10 @@ function updateBuildBarAffordability() {
       const span = spans[i++];
       if (!span) continue;
       const have = G.resources[k] || 0;
-      span.classList.toggle('cost-short', have < v);
+      const short = have < v;
+      const close = short && have >= v * 0.6;
+      span.classList.toggle('cost-short', short && !close);
+      span.classList.toggle('cost-close', close);
     }
     // Toggle lock badge visibility
     const lock = btn.querySelector('.build-lock');
@@ -222,11 +225,14 @@ export function renderBuildBar() {
       const btn = document.createElement('button');
       btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
       btn.dataset.buildKey = key;
-      // Highlight individual resource costs the player can't afford — direct "why can't I build this" feedback
+      // Affordance gradient: red when short, amber when close (have >= 60% of cost
+      // but below), normal when flush. Gives the player at-a-glance "close to
+      // affording" tension rather than a binary can/can't.
       const costStr = Object.entries(def.cost).map(([k,v]) => {
         const have = G.resources[k] || 0;
-        const short = have < v;
-        return `<span class="${short ? 'cost-short' : ''}">${v}${k[0].toUpperCase()}</span>`;
+        let cls = '';
+        if (have < v) cls = have >= v * 0.6 ? 'cost-close' : 'cost-short';
+        return `<span class="${cls}">${v}${k[0].toUpperCase()}</span>`;
       }).join(' ');
       // Show terrain requirement if applicable
       const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
