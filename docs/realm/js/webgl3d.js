@@ -242,6 +242,16 @@ function pushFace(verts, indices, positions, normal, color) {
   indices.push(base, base+1, base+2, base, base+2, base+3);
 }
 
+// Per-vertex normals variant — for height-field top faces
+function pushFaceNormals(verts, indices, positions, normals, color) {
+  const base = verts.length / 9;
+  for (let i = 0; i < 4; i++) {
+    const p = positions[i], n = normals[i];
+    verts.push(p[0], p[1], p[2], n[0], n[1], n[2], color[0], color[1], color[2]);
+  }
+  indices.push(base, base+1, base+2, base, base+2, base+3);
+}
+
 function pushTri(verts, indices, p0, p1, p2, normal, color) {
   const base = verts.length / 9;
   for (const p of [p0, p1, p2]) {
@@ -501,6 +511,26 @@ export function buildTerrainMesh() {
   const verts = [];   // will become Float32Array
   const indices = []; // will become Uint32Array
 
+  // Pre-compute tile heights for per-vertex normal computation
+  const tileH = (r, c) => {
+    const tr = Math.max(0, Math.min(MAP_H - 1, r));
+    const tc = Math.max(0, Math.min(MAP_W - 1, c));
+    const tt = (G.map[tr] && G.map[tr][tc] !== undefined) ? G.map[tr][tc] : TILE.GRASS;
+    const bh = TILE_HEIGHT[tt] !== undefined ? TILE_HEIGHT[tt] : 0.5;
+    if (tt === TILE.WATER) return bh;
+    const s = (tc * 374761 + tr * 668265) >>> 0;
+    return bh + ((s & 0xff) / 255 - 0.5) * 0.12;
+  };
+
+  // Compute smooth normal for a top-face vertex at (row, col) using Sobel-filter on heights
+  const vertNormal = (r, c) => {
+    const dx = (tileH(r, c + 1) - tileH(r, c - 1)) * 0.4; // moderate slope factor
+    const dz = (tileH(r + 1, c) - tileH(r - 1, c)) * 0.4;
+    const nx = -dx, ny = 1.0, nz = -dz;
+    const len = Math.sqrt(nx * nx + ny * ny + nz * nz);
+    return [nx / len, ny / len, nz / len];
+  };
+
   for (let row = 0; row < MAP_H; row++) {
     for (let col = 0; col < MAP_W; col++) {
       const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
@@ -512,7 +542,7 @@ export function buildTerrainMesh() {
       const noise1 = ((seed & 0xff) / 255 - 0.5); // -0.5..0.5
       const noise2 = (((seed >>> 8) & 0xff) / 255 - 0.5);
 
-      // Height variation within a tile type: ±0.08 units
+      // Height variation within a tile type: ±0.12 units
       const h = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12);
 
       // Color variation: ±15% tint per tile to break up flat areas (skip for water — noise creates triangle-grid artifact)
@@ -530,10 +560,10 @@ export function buildTerrainMesh() {
       const y  = h;    // top face at height h
       const yb = -0.5;  // bottom goes below sea so no gaps
 
-      // Top face (normal up: 0,1,0)
-      pushFace(verts, indices,
+      // Top face: per-vertex normals from height-field gradient for elevation relief
+      pushFaceNormals(verts, indices,
         [ [x0,y,z0], [x1,y,z0], [x1,y,z1], [x0,y,z1] ],
-        [0, 1, 0],
+        [ vertNormal(row, col), vertNormal(row, col+1), vertNormal(row+1, col+1), vertNormal(row+1, col) ],
         color
       );
 
