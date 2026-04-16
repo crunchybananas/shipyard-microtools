@@ -64,6 +64,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .res{display:flex;align-items:center;gap:0.35rem;font-weight:600}
 .res-icon{width:16px;height:16px;border-radius:3px;display:inline-block}
 .res-emoji{font-size:1rem;line-height:1}
+.res-emoji.gold-coin{color:#f5c94a;font-size:1.15rem;font-weight:900;text-shadow:0 0 3px rgba(245,201,74,0.5)}
 .res .val{font-variant-numeric:tabular-nums}
 #pop-display{color:var(--accent)}
 .pop-full{color:var(--gold);animation:popPulse 1.5s ease infinite}
@@ -478,7 +479,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <div class="res" title="Wood — build most structures"><span class="res-emoji">🪵</span><span class="val" id="r-wood">50</span></div>
   <div class="res" title="Stone — defensive buildings and upgrades"><span class="res-emoji">🪨</span><span class="val" id="r-stone">30</span></div>
   <div class="res" title="Food — feeds your population"><span class="res-emoji">🍎</span><span class="val" id="r-food">40</span></div>
-  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji">🪙</span><span class="val" id="r-gold">10</span></div>
+  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji gold-coin" aria-hidden="true">◉</span><span class="val" id="r-gold">10</span></div>
   <div class="res" title="Iron — weapons and advanced buildings"><span class="res-emoji">⚙️</span><span class="val" id="r-iron">0</span></div>
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
   <div class="res" title="Soldiers under your command"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
