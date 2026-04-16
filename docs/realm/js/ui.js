@@ -713,8 +713,21 @@ const TUTORIAL_STEPS = [
     highlight: '.hud-btn',
   },
   {
+    id: 'build_house',
+    text: '🏠 Build a House to grow your population! More citizens = more workers for buildings.',
+    action: 'Select House and place on grass',
+    check: () => G.buildings.some(b => b.type === 'house'),
+    highlight: '.build-btn',
+  },
+  {
+    id: 'tip_hotkeys',
+    text: '⌨️ Tip: Press 1-9 to quick-select buildings. Ctrl+Z to undo. Space to cycle speed. ? for all hotkeys.',
+    action: '',
+    check: () => G.day >= 2,
+  },
+  {
     id: 'done',
-    text: '🎉 You\'re on your own now! Build, research, trade, and survive the seasons. Watch out for raiders!',
+    text: '🎉 You\'re on your own now! Build, research, trade, and survive. Raids come on Day 8. Open the 📖 Chronicle to read your story!',
     action: '',
     check: () => G.gameTick > 99999, // stays until dismissed
   },
@@ -725,7 +738,7 @@ let tutorialDismissed = false;
 
 export function updateTutorialTip() {
   // Auto-dismiss if player is already past the tutorial
-  if (!tutorialDismissed && G.buildings.length >= 2) {
+  if (!tutorialDismissed && G.buildings.length >= 4) {
     dismissTutorial();
     return;
   }
@@ -742,8 +755,8 @@ export function updateTutorialTip() {
   // Auto-advance if check passes
   try {
     if (step.check()) {
-      // Auto-dismiss after the player places their first building
-      if (step.id === 'place_farm') {
+      // Auto-dismiss after the done step
+      if (step.id === 'done') {
         dismissTutorial();
         return;
       }
