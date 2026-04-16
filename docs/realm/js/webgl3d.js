@@ -840,8 +840,9 @@ export function render3D() {
   const vp = buildViewProjection();
   gl.uniformMatrix4fv(uViewProjLoc, false, vp);
 
-  // Directional light: from upper-left-front (normalized)
-  const lx = 0.6, ly = 0.8, lz = -0.2;
+  // Directional light: upper-right-front — illuminates both visible isometric faces
+  // (+X right face and +Z front face both lit, right face slightly brighter)
+  const lx = 0.6, ly = 0.8, lz = 0.5;
   const len = Math.sqrt(lx*lx + ly*ly + lz*lz);
   gl.uniform3f(uLightDirLoc, lx/len, ly/len, lz/len);
 
