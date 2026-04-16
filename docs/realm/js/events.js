@@ -5,6 +5,7 @@
 import { G, rng, rngInt } from './state.js';
 import { trySpawnSettlers } from './economy.js';
 import { playSound } from './audio.js';
+import { chronicle, initChronicle } from './story.js';
 
 // positive:true → green banner + 'season' sound
 // positive:false → red banner + 'raidWarning' sound
@@ -266,6 +267,59 @@ export const EVENT_DEFS = [
     },
     onEnd() { G.eventModifiers.speedMult = 1; },
     endMsg: '☠️ The plague subsides. Citizens recover.',
+  },
+  {
+    id: 'stranger_trade',
+    name: '🤝 A Stranger Arrives',
+    desc: 'A cloaked traveler offers a trade: 20 food for 15 iron. You accept.',
+    duration: 0,
+    color: '#c084fc',
+    positive: true,
+    onStart() {
+      if (G.resources.food >= 20) {
+        G.resources.food -= 20;
+        G.resources.iron += 15;
+        try { chronicle('A cloaked stranger arrived at dawn, trading iron for food. They vanished by nightfall.', 'event'); } catch(_e){}
+      } else {
+        G.resources.iron += 5;
+        try { chronicle('A cloaked stranger visited but we had little to offer. They left a small gift of iron.', 'event'); } catch(_e){}
+      }
+    },
+    onEnd() {},
+    endMsg: '',
+  },
+  {
+    id: 'bard_song',
+    name: '🎵 The Bard Plays',
+    desc: 'A wandering bard lifts spirits with song! +15 happiness for 2 days.',
+    duration: 2,
+    color: '#c084fc',
+    positive: true,
+    onStart() {
+      G.eventModifiers.happinessOffset = 15;
+      try { chronicle('A bard arrived and sang tales of heroism. The realm rejoiced.', 'character'); } catch(_e){}
+    },
+    onEnd() { G.eventModifiers.happinessOffset = 0; },
+    endMsg: '🎵 The bard departs, promising to return.',
+  },
+  {
+    id: 'rival_demand',
+    name: '🏴 Rival Lord\'s Demand',
+    desc: 'A rival lord demands tribute: −20 gold or face a raid sooner.',
+    duration: 0,
+    color: '#ef4444',
+    positive: false,
+    onStart() {
+      if (G.resources.gold >= 20) {
+        G.resources.gold -= 20;
+        try { chronicle('A rival lord sent emissaries demanding gold. We paid to keep the peace.', 'event'); } catch(_e){}
+      } else {
+        G.nextRaidDay = Math.min(G.nextRaidDay, G.day + 2);
+        try { chronicle('A rival lord demanded tribute we could not pay. War looms closer.', 'raid'); } catch(_e){}
+      }
+    },
+    onEnd() {},
+    endMsg: '',
   },
 ];
 
