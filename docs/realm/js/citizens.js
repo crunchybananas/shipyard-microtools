@@ -11,6 +11,18 @@ function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
 }
 
+// Find nearest building of a given type (or any type if typeOrNull is null).
+// Used to route delivering citizens to a real drop-off instead of the map center.
+function nearestBuilding(c, typeOrNull) {
+  let best = null, bestD = Infinity;
+  for (const b of G.buildings) {
+    if (typeOrNull && b.type !== typeOrNull) continue;
+    const d = dist2(c.x, c.y, b.x, b.y);
+    if (d < bestD) { bestD = d; best = b; }
+  }
+  return best;
+}
+
 function pathTo(c, tx, ty) {
   c.path = findPath(Math.round(c.x), Math.round(c.y), tx, ty);
   c.pathIdx = 0;
@@ -205,8 +217,26 @@ function runStateMachine(c) {
             c.carryAmount = amount;
             c.jobBuilding.produced = null;
             c.state = 'walk_to_deliver';
-            // Deliver to town center
-            pathTo(c, Math.round(MAP_W/2), Math.round(MAP_H/2));
+            // User-reported: citizens were walking to map midpoint (MAP_W/2, MAP_H/2)
+            // because "town center" was an imaginary coordinate, not a building.
+            // Pick a real drop-off: resource-specific storage if present (granary
+            // for food, market for gold), else nearest house (settlement hearth),
+            // else any building. Only fall back to map center if the world is
+            // literally empty of buildings (shouldn't happen — citizen has a job).
+            let dropoff = null;
+            if (resKey === 'food') {
+              dropoff = nearestBuilding(c, 'granary') || nearestBuilding(c, 'house');
+            } else if (resKey === 'gold') {
+              dropoff = nearestBuilding(c, 'market') || nearestBuilding(c, 'house');
+            } else {
+              dropoff = nearestBuilding(c, 'house');
+            }
+            if (!dropoff) dropoff = nearestBuilding(c, null);
+            if (dropoff) {
+              pathTo(c, dropoff.x, dropoff.y);
+            } else {
+              pathTo(c, Math.round(MAP_W/2), Math.round(MAP_H/2));
+            }
             return;
           }
         }
