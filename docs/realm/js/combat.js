@@ -73,7 +73,7 @@ export function updateProjectiles() {
       // Hit target
       if (p.target && p.target.hp !== undefined) {
         p.target.hp -= p.damage;
-        if (G.gameTick % 10 === 0) playSound('click');
+        if (G.gameTick % 10 === 0) playSound('combat');
       }
       G.projectiles.splice(i, 1);
     } else {

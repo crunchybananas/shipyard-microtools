@@ -309,6 +309,14 @@ export function playSound(type) {
       break;
     }
 
+    // ── Combat clang: sword/shield impact ──────────────────
+    case 'combat': {
+      makeOsc(ctx, dest, 'square', 1600, 0.1, 0.001, 0.04, t);
+      makeNoiseBurst(ctx, dest, 0.12, 0.08, t + 0.01, 6000);
+      makeOsc(ctx, dest, 'triangle', 280, 0.08, 0.003, 0.12, t + 0.02);
+      break;
+    }
+
     // ── Season change: gentle wind-chime cascade ─────────────
     case 'season': {
       // Pentatonic-ish chime sequence
