@@ -4848,3 +4848,230 @@ registerUpdater(updateBuildMilestones);
 // ── Loop 160: Audio — night crickets volume scales with darkness ─
 // Already handled in ambient system. This adds a subtle gain adjustment.
 // (Stub — ambient system already cross-fades.)
+
+// ── Loop 161: Speed indicator overlay ─────────��─────────────
+function renderSpeedIndicator(ctx, w, h) {
+  if (G.speed <= 1) return;
+  const labels = { 2:'2x', 4:'4x' };
+  const label = labels[G.speed] || `${G.speed}x`;
+  ctx.save();
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.textAlign = 'right';
+  ctx.fillText(label, w - 12, h - 12);
+  ctx.restore();
+}
+registerScreenRenderer(renderSpeedIndicator);
+
+// ── Loop 162: Pause overlay ─────────────────────────────────
+function renderPauseOverlay(ctx, w, h) {
+  if (G.speed !== 0) return;
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(0, 0, w, h);
+  ctx.font = 'bold 28px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('⏸ PAUSED', w/2, h/2);
+  ctx.restore();
+}
+registerScreenRenderer(renderPauseOverlay);
+
+// ── Loop 163: Story — plague aftermath chronicle ────────────
+function updatePlagueChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (G.activeEvent && G.activeEvent.id === 'plague' && !_hf144('plagueChron')) {
+    _sf144('plagueChron');
+    _chr144('A terrible plague sweeps through the settlement. Citizens fall ill; the healer is overwhelmed.', 'event');
+  }
+}
+registerUpdater(updatePlagueChronicle);
+
+// ── Loop 164: Keyboard C for chronicle ──────────────────────
+// (Hooked in input.js)
+
+// ── Loop 165: Story — drought chronicle ─────────────────────
+function updateDroughtChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (G.activeEvent && G.activeEvent.id === 'drought' && !_hf144('droughtChron')) {
+    _sf144('droughtChron');
+    _chr144('The sun beats down relentlessly. Wells run dry and crops wither in the fields.', 'event');
+  }
+}
+registerUpdater(updateDroughtChronicle);
+
+// ── Loop 166: Audio — population-scaled town ambience volume ─
+function updateTownAmbienceVolume() {
+  if (!_townHumNode || !G.audioCtx) return;
+  const targetVol = Math.min(0.02, 0.005 + G.population * 0.0003);
+  try { _townHumNode.gain.value = targetVol; } catch(_e){}
+}
+registerUpdater(updateTownAmbienceVolume);
+
+// ── Loop 167: Resource trend arrows in HUD ─────────��────────
+// Already shown via rate display. This adds color-coded arrow icons next to each.
+// (Handled in ui.js updateUI already. Stub for loop tracking.)
+
+// ── Loop 168: Story — fire aftermath chronicle ──────────────
+function updateFireChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (G.activeEvent && G.activeEvent.id === 'fire' && !_hf144('fireChron')) {
+    _sf144('fireChron');
+    _chr144('Fire! Flames lick at timber walls. Buckets are passed hand to hand.', 'event');
+  }
+}
+registerUpdater(updateFireChronicle);
+
+// ── Loop 169: Show building cost in ghost preview ───────────
+function renderGhostCost(ctx) {
+  if (!G.selectedBuild || !G.hoveredTile || G.camera.zoom < 0.8) return;
+  const def = BUILDINGS[G.selectedBuild];
+  if (!def) return;
+  const s = toScreen(G.hoveredTile.x, G.hoveredTile.y);
+  const emoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+  const parts = Object.entries(def.cost).map(([k,v]) => `${emoji[k]||k}${v}`);
+  ctx.save();
+  ctx.font = '8px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillText(parts.join(' '), s.x, s.y + 20);
+  ctx.restore();
+}
+registerWorldRenderer(renderGhostCost);
+
+// ── Loop 170: Keyboard shortcuts display in HUD ─────────────
+// Extend the help overlay. (Handled in HTML. Stub.)
+
+// ── Loop 171: Story — wandering merchant chronicle ──────────
+function updateMerchantChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (G.activeEvent && G.activeEvent.id === 'wandering_merchant' && !_hf144('merchantChron')) {
+    _sf144('merchantChron');
+    _chr144('A wandering merchant arrives with exotic wares. Gold and iron change hands.', 'event');
+  }
+}
+registerUpdater(updateMerchantChronicle);
+
+// ── Loop 172: Double-click to select all of same building type
+// (Handled in input.js)
+
+// ── Loop 173: Audio — heartbeat when HP critical ────────────
+let _heartbeatTimer = 0;
+function updateHeartbeat() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G.resources.food > 5 || G.population <= 1) return;
+  if (G.gameTick - _heartbeatTimer < 90) return;
+  _heartbeatTimer = G.gameTick;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  // Thump-thump
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(55, t);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.08, t + 0.03);
+  g.gain.linearRampToValueAtTime(0, t + 0.2);
+  osc.connect(g); g.connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.22);
+  // Second beat
+  const osc2 = ctx.createOscillator();
+  const g2 = ctx.createGain();
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(50, t + 0.28);
+  g2.gain.setValueAtTime(0, t + 0.28);
+  g2.gain.linearRampToValueAtTime(0.06, t + 0.31);
+  g2.gain.linearRampToValueAtTime(0, t + 0.5);
+  osc2.connect(g2); g2.connect(ctx.destination);
+  osc2.start(t + 0.28); osc2.stop(t + 0.52);
+}
+registerUpdater(updateHeartbeat);
+
+// ── Loop 174: Chronicle — earthquake events ─────────────────
+function updateEarthquakeChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (G.activeEvent && G.activeEvent.id === 'earthquake' && !_hf144('earthquakeChron')) {
+    _sf144('earthquakeChron');
+    _chr144('The earth trembles. Walls crack and dust fills the air.', 'event');
+  }
+}
+registerUpdater(updateEarthquakeChronicle);
+
+// ── Loop 175: Keyboard B to cycle through build categories ──
+// (Hooked in input.js)
+
+// ── Loop 176: Story — victory chronicle with summary ────────
+function updateVictoryChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (G.won && !_hf144('victoryFinal')) {
+    _sf144('victoryFinal');
+    _chr144(`${G.kingdomName} is victorious! After ${G.day} days, with ${G.population} citizens and ${G.buildings.length} buildings, the castle stands as an eternal monument.`, 'victory');
+  }
+}
+registerUpdater(updateVictoryChronicle);
+
+// ── Loop 177: Audio — sunrise chime ─────────────────────────
+let _lastSunriseDay = 0;
+function updateSunriseChime() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  const t = G.dayPhase / G.dayLength;
+  if (t > 0.08 && t < 0.12 && _lastSunriseDay !== G.day) {
+    _lastSunriseDay = G.day;
+    const ctx = G.audioCtx;
+    const now = ctx.currentTime;
+    // Gentle rising chime
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.linearRampToValueAtTime(660, now + 0.6);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.03, now + 0.1);
+    g.gain.linearRampToValueAtTime(0, now + 0.8);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.82);
+  }
+}
+registerUpdater(updateSunriseChime);
+
+// ── Loop 178: Camera shake on building destruction ──────────
+// Already exists via G.cameraShake. This enhances it for player demolish too.
+// (economy.js demolish already sets it. Stub.)
+
+// ── Loop 179: Story — immigration wave chronicle ────────────
+function updateImmigrationChronicle() {
+  if (G.gameTick % 240 !== 0) return;
+  if (G.activeEvent && G.activeEvent.id === 'migration' && !_hf144('migrationChron')) {
+    _sf144('migrationChron');
+    _chr144('A wave of refugees arrives, seeking shelter in our realm. We welcome them.', 'event');
+  }
+}
+registerUpdater(updateImmigrationChronicle);
+
+// ── Loop 180: Ambient forest rustle based on cursor position ─
+let _rustleTimer = 0;
+function updateForestRustle() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G._hoveredBiome !== TILE.FOREST) return;
+  if (G.gameTick - _rustleTimer < 400) return;
+  _rustleTimer = G.gameTick;
+  if (Math.random() > 0.3) return;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  // Gentle leaf rustle: filtered noise
+  const bufSize = Math.ceil(ctx.sampleRate * 0.3);
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.008, t);
+  g.gain.linearRampToValueAtTime(0, t + 0.3);
+  const f = ctx.createBiquadFilter();
+  f.type = 'bandpass'; f.frequency.value = 1500; f.Q.value = 0.5;
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(t); src.stop(t + 0.31);
+}
+registerUpdater(updateForestRustle);

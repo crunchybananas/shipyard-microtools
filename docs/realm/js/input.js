@@ -289,6 +289,22 @@ export function setupInput(canvas) {
       G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * 0.9));
       return;
     }
+    if (e.key === 'c' && !e.ctrlKey && !e.metaKey) {
+      if (window.toggleChronicle) window.toggleChronicle();
+      return;
+    }
+    if (e.key === 'b' && !e.ctrlKey && !e.metaKey) {
+      // Cycle through building types
+      const keys = Object.keys(BUILDINGS);
+      if (!G.selectedBuild) {
+        G.selectedBuild = keys[0];
+      } else {
+        const idx = keys.indexOf(G.selectedBuild);
+        G.selectedBuild = keys[(idx + 1) % keys.length];
+      }
+      renderBuildBar();
+      return;
+    }
     if (e.key === 'm' && !e.ctrlKey && !e.metaKey) {
       const mm = document.getElementById('minimap');
       if (mm) mm.style.display = mm.style.display === 'none' ? 'block' : 'none';
