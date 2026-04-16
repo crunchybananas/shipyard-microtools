@@ -140,12 +140,16 @@ export function updateSmokeEmitters() {
     });
   }
 
-  // Spring pollen/motes — tiny golden dust drifting in warm daytime air
+  // Spring pollen/motes — tiny golden dust drifting in warm daytime air.
+  // Constrained to on-map interior tiles so pollen doesn't drift into the vignette void.
   if (G.season === 'spring' && G.gameTick % 50 === 0 && G.particles.length < 180) {
     const cx = G.camera.x / 32, cy = G.camera.y / 16;
-    G.particles.push({
-      tx: cx + (Math.random() - 0.5) * 18,
-      ty: cy + (Math.random() - 0.5) * 14,
+    const rtx = cx + (Math.random() - 0.5) * 18;
+    const rty = cy + (Math.random() - 0.5) * 14;
+    // Only spawn if within map interior (skip edge band that projects into vignette)
+    if (rtx >= 4 && rtx <= 76 && rty >= 4 && rty <= 76) G.particles.push({
+      tx: rtx,
+      ty: rty,
       offsetY: -5 - Math.random() * 25,
       text: null,
       alpha: 0.3 + Math.random() * 0.2,
