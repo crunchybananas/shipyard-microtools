@@ -4906,18 +4906,22 @@ function renderMinimap() {
   mc.fillStyle = '#08090f';
   mc.fillRect(0, 0, mw, mh);
 
-  // Terrain tiles — explored tiles at normal color, unexplored very dark
+  // Terrain tiles — explored tiles at normal color, unexplored as dimmed silhouette
+  // (was '#070810' which matched the #08090f background — island was invisible on Day 1)
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
       if (G.fog[y][x]) {
+        mc.globalAlpha = 1;
         mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
       } else {
-        // Darker unexplored areas for more visible fog of war
-        mc.fillStyle = '#070810';
+        // Show island shape at low alpha so player can see the map from turn 1
+        mc.globalAlpha = 0.28;
+        mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
       }
       mc.fillRect(x * sx, y * sy, Math.ceil(sx), Math.ceil(sy));
     }
   }
+  mc.globalAlpha = 1;
 
   // Roads as tiny brown lines — draw road tiles as connected segments
   mc.strokeStyle = '#6b5a3e';
