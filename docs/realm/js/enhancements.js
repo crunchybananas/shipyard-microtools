@@ -4939,9 +4939,11 @@ function renderPauseOverlay(ctx, w, h) {
   ctx.fillRect(0, 0, w, h);
   // Label lives at top-center below the HUD instead of dead-center. On Day 1
   // the starting citizens spawn mid-map and the old h/2 label landed right on
-  // top of them, obscuring the exact area a new player is looking at. Moving
-  // to y=56 keeps the "world is frozen" signal (the scrim still darkens
-  // everything) while leaving the play area unobstructed.
+  // top of them, obscuring the exact area a new player is looking at. y=56
+  // originally sat inside the HUD band and got clipped by the opaque HTML
+  // panel layered above the canvas — moved to y=92 so the label sits cleanly
+  // in the empty strip between the HUD and the play area, clear of the
+  // Save/Load/New buttons which hug the left edge.
   ctx.font = 'bold 22px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -4951,9 +4953,9 @@ function renderPauseOverlay(ctx, w, h) {
   ctx.lineWidth = 4;
   ctx.lineJoin = 'round';
   ctx.strokeStyle = 'rgba(0,0,0,0.75)';
-  ctx.strokeText('⏸ PAUSED', w/2, 56);
+  ctx.strokeText('⏸ PAUSED', w/2, 92);
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fillText('⏸ PAUSED', w/2, 56);
+  ctx.fillText('⏸ PAUSED', w/2, 92);
   ctx.restore();
 }
 registerScreenRenderer(renderPauseOverlay);
