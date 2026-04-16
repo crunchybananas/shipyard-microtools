@@ -352,45 +352,27 @@ export function checkRaids() {
     playSound('raidWarning');
   }
 
-  // Raid happens
+  // Raid happens — spawn enemies that will walk in and fight soldiers/towers.
+  // No more instant-damage abstract calc: let the battle play out visibly.
   if (G.day >= G.nextRaidDay && G.dayPhase < 5) {
     G._raidWarningGiven = false;
     const raiders = Math.floor((2 + G.day/5) * getDifficulty().raidMult);
-    const totalAttack = raiders * 10;
-    const dmg = Math.max(0, totalAttack - G.defense);
     playSound('raid');
 
-    // Detailed raid report
-    const report = [`⚔️ RAID: ${raiders} raiders (attack: ${totalAttack}, your defense: ${G.defense})`];
+    const report = [`⚔️ RAID: ${raiders} raiders approach!`];
+    report.push(G.defense > 0 || (G.soldiers && G.soldiers.length > 0)
+      ? 'Your defenders move to intercept.'
+      : '⚠️ No defenders! Build walls, barracks, or towers.');
+    for (const line of report) notify(line, 'danger');
 
-    if (dmg > 0) {
-      const damageable = G.buildings.filter(b => b.type !== 'road' && b.type !== 'wall');
-      if (damageable.length > 0) {
-        const target = damageable[rngInt(0, damageable.length-1)];
-        // Cinematic: pan camera to the attacked building
-        try { panCameraTo(target.x, target.y, 800); } catch (_e) {}
-        target.hp -= dmg;
-        if (target.hp <= 0) {
-          report.push(`💥 ${BUILDINGS[target.type].name} was destroyed!`);
-          G.cameraShake = Math.max(G.cameraShake || 0, 10);
-          demolishBuilding(target, true);
-        } else {
-          report.push(`🔨 ${BUILDINGS[target.type].name} damaged (${target.hp}% HP remaining)`);
-        }
-      }
-      report.push(G.defense > 0 ? 'Defenses absorbed some damage.' : '⚠️ No defenses! Build walls, barracks, or towers.');
-    } else {
-      report.push('✅ Your defenses held! No damage taken.');
-    }
-
-    // Show full report
-    for (const line of report) {
-      notify(line, dmg > 0 ? 'danger' : 'event');
+    // Pan camera to an attacked-area preview
+    const firstBuilding = G.buildings.find(b => b.type !== 'road' && b.type !== 'wall');
+    if (firstBuilding) {
+      try { panCameraTo(firstBuilding.x, firstBuilding.y, 800); } catch (_e) {}
     }
 
     // Spawn enemy raiders that visibly approach the settlement
-    const raidSize = 3 + Math.floor(G.day / 10);
-    for (let i = 0; i < raidSize; i++) {
+    for (let i = 0; i < raiders; i++) {
       const side = Math.floor(Math.random() * 4);
       let ex, ey;
       if (side === 0) { ex = Math.random() * MAP_W; ey = 0; }
