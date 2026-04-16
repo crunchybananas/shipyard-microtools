@@ -4181,3 +4181,24 @@ function updateBarks() {
   }
 }
 registerUpdater(updateBarks);
+
+// ── Loop 108: Resource shortage warnings ───────────────────
+// Flashing resource icon in HUD when critically low + screen-space warning text.
+let _lastShortageWarnTick = 0;
+function updateResourceWarnings() {
+  // Check every 120 ticks (~2 sec)
+  if ((G.gameTick - _lastShortageWarnTick) < 120) return;
+  _lastShortageWarnTick = G.gameTick;
+  const thresholds = { food: 10, wood: 8, stone: 5, gold: 3, iron: 0 };
+  for (const [res, minVal] of Object.entries(thresholds)) {
+    if (minVal <= 0) continue;
+    const el = document.getElementById('r-' + res);
+    if (!el) continue;
+    if (G.resources[res] <= minVal) {
+      el.parentElement.classList.add('res-critical');
+    } else {
+      el.parentElement.classList.remove('res-critical');
+    }
+  }
+}
+registerUpdater(updateResourceWarnings);

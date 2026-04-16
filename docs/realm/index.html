@@ -69,6 +69,9 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .pop-full{color:var(--gold);animation:popPulse 1.5s ease infinite}
 @keyframes popPulse{0%,100%{opacity:1}50%{opacity:0.6}}
 .res-warn{animation:resWarn 0.8s ease-in-out infinite}
+.res-critical{animation:resCritical 0.5s ease-in-out infinite;padding:0.1rem 0.25rem;border-radius:4px;background:rgba(239,68,68,0.12)}
+.res-critical .val{color:var(--danger)!important}
+@keyframes resCritical{0%,100%{background:rgba(239,68,68,0.12);transform:scale(1)}50%{background:rgba(239,68,68,0.28);transform:scale(1.05)}}
 .res-warn .val{color:var(--danger)!important}
 @keyframes resWarn{0%,100%{opacity:1}50%{opacity:0.4}}
 .rate{font-size:0.65rem;font-weight:400;margin-left:0.15rem;cursor:help}
