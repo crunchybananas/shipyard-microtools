@@ -37,10 +37,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 49
-- **What**: Cycle 46 added combat damage to citizens (c.hp -= 0.3/frame near enemies) but I never wrote death handling — citizens took damage to negative hp forever, never removed from G.citizens, G.population unaffected, G.stats.citizensDied never incremented. Added cleanup pass in updateEnemies: splice dead citizens, free job workers, decrement pop, bump stat, spawn death particle, notify + chronicle. Feeds the death-marker enhancement that was watching citizensDied stat.
-- **Commit**: 81e3c03
-- **Verified**: node --check clean. Chrome MCP disconnected at start.
+- **Number**: 50 (milestone)
+- **What**: Fresh-eyes validator flagged grass-tile tufts as "pervasive clutter — //hash glyphs on nearly every tile, make map look dirty". render.js:428 was `gh < 140` (~55% of grass tiles got tufts), with a denser 3-blade variant at `gh < 80` (~31%). Halved both: 140→70 (~27%) and 80→35 (~14%). Central plains now read as grass, not as a noisy scatter of debug marks. Chrome-verified with cache-bust ?_cb=51.
+- **Commit**: 057cc9e
+- **Verified**: node --check clean. Chrome-reloaded, no console errors, visible cleanup on central plain in zoom comparison.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -128,6 +128,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 47: Extended mission progress counts to Merchant/Seafaring/Industrial scenarios
 - Cycle 48: demolishBuilding — no refund when byEnemy, clamp maxPop/defense to 0
 - Cycle 49: Citizens killed by enemies now actually die — pop decrements, citizensDied stat fires, death particle/chronicle (cycle 46 had damage but no death handler)
+- Cycle 50 (milestone): Halved grass tuft density (55%→27%, dense variant 31%→14%) — central plains were reading as noisy clutter per fresh-eyes validator
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
