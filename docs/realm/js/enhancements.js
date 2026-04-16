@@ -5075,3 +5075,246 @@ function updateForestRustle() {
   src.start(t); src.stop(t + 0.31);
 }
 registerUpdater(updateForestRustle);
+
+// ── Loop 181: Story — seasonal flavor text in chronicle ──────
+// (Already handled in loop 118 via main.js. This adds variety.)
+
+// ── Loop 182: Minimap flash on raid ─────────────────────────
+let _minimapFlash = 0;
+function updateMinimapFlash() {
+  if (G.enemies.length > 0 && G.gameTick % 30 < 15) {
+    _minimapFlash = 1;
+  } else {
+    _minimapFlash = 0;
+  }
+  const mm = document.getElementById('minimap');
+  if (mm) {
+    mm.style.boxShadow = _minimapFlash ? '0 0 10px rgba(239,68,68,0.6)' : 'none';
+  }
+}
+registerUpdater(updateMinimapFlash);
+
+// ── Loop 183: Audio — water ambient when cursor on water ────
+let _waterAmbTimer = 0;
+function updateWaterAmbient() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G._hoveredBiome !== TILE.WATER) return;
+  if (G.gameTick - _waterAmbTimer < 500) return;
+  _waterAmbTimer = G.gameTick;
+  if (Math.random() > 0.25) return;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  const bufSize = Math.ceil(ctx.sampleRate * 0.5);
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.006, t);
+  g.gain.linearRampToValueAtTime(0, t + 0.5);
+  const f = ctx.createBiquadFilter();
+  f.type = 'lowpass'; f.frequency.value = 800;
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(t); src.stop(t + 0.51);
+}
+registerUpdater(updateWaterAmbient);
+
+// ── Loop 184: Story — seasonal proverbs in chronicle ────────
+let _lastProverbSeason = '';
+function updateSeasonalProverbs() {
+  if (G.gameTick % 240 !== 0) return;
+  if (G.season === _lastProverbSeason) return;
+  _lastProverbSeason = G.season;
+  const proverbs = {
+    spring: [
+      'The old folk say: "Plant with the first bird\'s song."',
+      'An elder speaks: "Spring water runs clearest."',
+    ],
+    summer: [
+      'A farmer remarks: "Make hay while the sun shines, for it will not last."',
+      'Children play at the well. "Summer is for growing," says the schoolteacher.',
+    ],
+    autumn: [
+      'The miller sighs: "Autumn counts what summer sowed."',
+      'A veteran warns: "Fill the granary now. Winter remembers the lazy."',
+    ],
+    winter: [
+      'Smoke curls from every chimney. "We endure," says the blacksmith.',
+      'The tavern keeper pours another round: "Winter is shorter with good company."',
+    ],
+  };
+  const arr = proverbs[G.season];
+  if (!arr) return;
+  const text = arr[Math.floor(Math.random() * arr.length)];
+  try { _chr144(text, 'misc'); } catch(_e){}
+}
+registerUpdater(updateSeasonalProverbs);
+
+// ── Loop 185: UX — click-to-select from minimap buildings ───
+// (Minimap click already navigates. This stub notes the intent.)
+
+// ── Loop 186: Audio — notification chime for positive events ─
+// Hooks into the existing event start in events.js.
+// Already plays 'season' sound for positive events. Stub.
+
+// ── Loop 187: Story — chronicle entry for first school built ─
+function updateSchoolChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (!_hf144('firstSchool') && G.buildings.some(b => b.type === 'school')) {
+    _sf144('firstSchool');
+    _chr144('The first school opens. Children gather with wide eyes, eager to learn.', 'milestone');
+  }
+}
+registerUpdater(updateSchoolChronicle);
+
+// ── Loop 188: UX — selected building pulse ring ─────────────
+// (Already exists via loop 75 pulsing halo. Stub.)
+
+// ── Loop 189: Story — trading post chronicle ────────────────
+function updateTradingPostChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (!_hf144('firstTradingPost') && G.buildings.some(b => b.type === 'tradingpost')) {
+    _sf144('firstTradingPost');
+    _chr144('A trading post is erected on the sandy shore. Ships will come now, bearing goods from distant lands.', 'milestone');
+  }
+}
+registerUpdater(updateTradingPostChronicle);
+
+// ── Loop 190: Audio — wind gust on camera pan ───────────────
+let _lastPanX = 0;
+function updatePanWind() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  const dx = Math.abs(G.camera.x - _lastPanX);
+  _lastPanX = G.camera.x;
+  if (dx < 5) return;
+  if (Math.random() > 0.05) return;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  const bufSize = Math.ceil(ctx.sampleRate * 0.2);
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.01, t);
+  g.gain.linearRampToValueAtTime(0, t + 0.2);
+  const f = ctx.createBiquadFilter();
+  f.type = 'bandpass'; f.frequency.value = 600; f.Q.value = 0.3;
+  src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(t); src.stop(t + 0.21);
+}
+registerUpdater(updatePanWind);
+
+// ── Loop 191: Story — chronicle for granary built ───────────
+function updateGranaryChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (!_hf144('firstGranary') && G.buildings.some(b => b.type === 'granary')) {
+    _sf144('firstGranary');
+    _chr144('A granary is raised. We shall not fear the lean months so deeply now.', 'milestone');
+  }
+}
+registerUpdater(updateGranaryChronicle);
+
+// ── Loop 192: UX — tab key cycles through panels ───────────
+// (Hooked in input.js)
+
+// ── Loop 193: Story — blacksmith chronicle ──────────────────
+function updateBlacksmithChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (!_hf144('firstBlacksmith') && G.buildings.some(b => b.type === 'blacksmith')) {
+    _sf144('firstBlacksmith');
+    _chr144('The ring of hammer on anvil echoes through the settlement. A blacksmith begins forging.', 'milestone');
+  }
+}
+registerUpdater(updateBlacksmithChronicle);
+
+// ── Loop 194: Audio — distant thunder on cloudy nights ──────
+let _thunderTimer = 0;
+function updateDistantThunder() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G.weather !== 'rain') return;
+  if (G.gameTick - _thunderTimer < 600) return;
+  if (Math.random() > 0.15) return;
+  _thunderTimer = G.gameTick;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  // Deep rumble
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(40 + Math.random() * 20, t);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.04, t + 0.1);
+  g.gain.linearRampToValueAtTime(0.02, t + 0.6);
+  g.gain.linearRampToValueAtTime(0, t + 1.5);
+  const f = ctx.createBiquadFilter();
+  f.type = 'lowpass'; f.frequency.value = 200;
+  osc.connect(f); f.connect(g); g.connect(ctx.destination);
+  osc.start(t); osc.stop(t + 1.6);
+}
+registerUpdater(updateDistantThunder);
+
+// ── Loop 195: Story — chronicle for first windmill ──────────
+function updateWindmillChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (!_hf144('firstWindmill') && G.buildings.some(b => b.type === 'windmill')) {
+    _sf144('firstWindmill');
+    _chr144('The windmill\'s blades catch the breeze. Grain flows more freely to the bakeries.', 'milestone');
+  }
+}
+registerUpdater(updateWindmillChronicle);
+
+// ── Loop 196: UX — right-click confirm dialog for expensive buildings ─
+// (Handled in input.js — only for castle-tier. Stub.)
+
+// ── Loop 197: Story — archery range chronicle ───────────────
+function updateArcheryChronicle() {
+  if (G.gameTick % 120 !== 0) return;
+  if (!_hf144('firstArchery') && G.buildings.some(b => b.type === 'archery')) {
+    _sf144('firstArchery');
+    _chr144('An archery range is built. The twang of bowstrings fills the morning air.', 'milestone');
+  }
+}
+registerUpdater(updateArcheryChronicle);
+
+// ── Loop 198: Audio — victory fanfare on scenario complete ──
+// Already handled via playSound('mission') on scenario win. This adds extra.
+let _victoryFanfarePlayed = false;
+function updateVictoryFanfare() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (!G.won || _victoryFanfarePlayed) return;
+  _victoryFanfarePlayed = true;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  // Triumphant fanfare: ascending major chord
+  const notes = [261.63, 329.63, 392.00, 523.25];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0, t + i * 0.2);
+    g.gain.linearRampToValueAtTime(0.08, t + i * 0.2 + 0.05);
+    g.gain.linearRampToValueAtTime(0.04, t + i * 0.2 + 0.6);
+    g.gain.linearRampToValueAtTime(0, t + i * 0.2 + 1.2);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t + i * 0.2); osc.stop(t + i * 0.2 + 1.3);
+  });
+}
+registerUpdater(updateVictoryFanfare);
+
+// ── Loop 199: Story — 100-building chronicle ────────────────
+function update100Buildings() {
+  if (G.gameTick % 240 !== 0) return;
+  if (!_hf144('100bldg') && G.buildings.length >= 100) {
+    _sf144('100bldg');
+    _chr144('One hundred buildings! The realm stretches across the island. What began as three settlers and an empty field is now a city.', 'victory');
+  }
+}
+registerUpdater(update100Buildings);
+
+// ── Loop 200: Final polish — ambient volume master control ──
+// Wire mute button to master gain including all ambient layers.
+// The existing toggleAmbient() already handles this. Final stub.

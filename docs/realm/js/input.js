@@ -289,6 +289,18 @@ export function setupInput(canvas) {
       G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * 0.9));
       return;
     }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const panels = ['research-panel','stats-panel','achievements-panel','chronicle-panel','trade-panel'];
+      const open = panels.find(id => { const el = document.getElementById(id); return el && el.style.display !== 'none'; });
+      if (open) {
+        document.getElementById(open).style.display = 'none';
+        const idx = panels.indexOf(open);
+        const next = panels[(idx + 1) % panels.length];
+        document.getElementById(next).style.display = 'block';
+      }
+      return;
+    }
     if (e.key === 'c' && !e.ctrlKey && !e.metaKey) {
       if (window.toggleChronicle) window.toggleChronicle();
       return;
