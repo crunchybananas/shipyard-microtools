@@ -23,12 +23,13 @@ function findBuildingAtClick(clientX, clientY) {
   let best = null, bestY = -Infinity;
   for (const b of G.buildings) {
     const bs = toScreen(b.x, b.y);
-    // Screen-space bounding box of the building sprite (with 1.3x scale)
-    // Buildings render from ~45px above tile center to ~10px below
-    const hitLeft   = bs.x - 22;
-    const hitRight  = bs.x + 22;
-    const hitTop    = bs.y - 48;
-    const hitBottom = bs.y + 10;
+    // Screen-space bounding box of the building sprite. Buildings render with
+    // a 1.3x scale around (bs.x, bs.y); box widened to cover the visible sprite
+    // so clicks near the roof or base don't fall through to the grass tile.
+    const hitLeft   = bs.x - 28;
+    const hitRight  = bs.x + 28;
+    const hitTop    = bs.y - 56;
+    const hitBottom = bs.y + 16;
 
     if (wx >= hitLeft && wx <= hitRight && wy >= hitTop && wy <= hitBottom) {
       // Depth sort: higher bs.y = rendered later = in front
