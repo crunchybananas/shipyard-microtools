@@ -113,6 +113,41 @@ export function checkStoryBeats() {
     setFlag('firstFarm');
     chronicle('A farm is established. The earth will feed us now.', 'milestone');
   }
+  // First lumber mill — Day 1 build-bar building; without a beat, placing it
+  // on Day 1 alongside House + Farm produced only 2 chronicle entries, making
+  // the log read as if the lumber mill wasn't "real".
+  if (!hasFlag('firstLumber') && G.buildings.some(b => b.type === 'lumber')) {
+    setFlag('firstLumber');
+    chronicle('The lumber mill hums to life. Timber stacks grow at its side.', 'milestone');
+  }
+  // First fisherman's hut — on the Day 1 build bar, also missing acknowledgment.
+  if (!hasFlag('firstFisherman') && G.buildings.some(b => b.type === 'fisherman')) {
+    setFlag('firstFisherman');
+    chronicle("A fisherman's hut rises on the sand. Nets hang out to dry in the sea breeze.", 'milestone');
+  }
+  // First granary — fills out the Day 1 build bar with a beat.
+  if (!hasFlag('firstGranary') && G.buildings.some(b => b.type === 'granary')) {
+    setFlag('firstGranary');
+    chronicle('The granary is sealed against the weather. Winter will find us ready.', 'milestone');
+  }
+  // First mine / first quarry — common Day 2–3 placements; without beats the
+  // mid-game chronicle goes silent for 4+ days between Day 1 founding and the
+  // next seasonal turn.
+  if (!hasFlag('firstMine') && G.buildings.some(b => b.type === 'mine')) {
+    setFlag('firstMine');
+    chronicle('Picks ring in the iron mine. Ore carts clatter up from the dark.', 'milestone');
+  }
+  if (!hasFlag('firstQuarry') && G.buildings.some(b => b.type === 'quarry')) {
+    setFlag('firstQuarry');
+    chronicle('The quarry is opened. Dust hangs in the air as the first blocks are cut.', 'milestone');
+  }
+  // First citizen born — deep-play showed citizensBorn=4 by Day 12 with zero
+  // chronicle entries about a single birth. The settlement grew from 3 to 7
+  // and the log never mentioned any of the new arrivals.
+  if (!hasFlag('firstBirth') && G.stats && (G.stats.citizensBorn || 0) >= 1) {
+    setFlag('firstBirth');
+    chronicle('A child is born in the realm. The first new life to call this land home.', 'birth');
+  }
   // First tavern → mayor appears, bard soon after
   if (!hasFlag('firstTavern') && G.buildings.some(b => b.type === 'tavern')) {
     setFlag('firstTavern');
