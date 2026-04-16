@@ -280,6 +280,7 @@ const CONSTELLATIONS = [
   { name: 'archer',  pts: [[0.74,0.18],[0.77,0.13],[0.80,0.18],[0.83,0.13],[0.81,0.22]] },
 ];
 export function renderConstellations(ctx, logicalW, logicalH) {
+  return; // disabled — space effects removed
   const dayl = getDaylight();
   const nightStrength = Math.max(0, Math.min(1, (0.7 - dayl) / 0.25));
   if (nightStrength < 0.1) return;
@@ -1219,6 +1220,7 @@ registerWorldRenderer(renderStatusBubbles);
 
 // ── Loop 25: Rare dragon flyover (screen space) ────────────
 function updateDragon(logicalW, logicalH) {
+  return; // disabled — flying dragon feels out of place
   if (!G.dragon) {
     if (G.gameTick % 2400 === 0 && Math.random() < 0.15) {
       const goingRight = Math.random() < 0.5;
@@ -1499,6 +1501,7 @@ registerWorldRenderer(renderWellSparkles);
 // Meteors are fast, screen-only streaks. Comets are slow, large,
 // have long teardrop tails, and travel arcs across the upper sky.
 function updateComets(logicalW, logicalH) {
+  return; // disabled — space effects removed
   if (!G.comets) G.comets = [];
   if (G.gameTick % 1800 === 0 && G.comets.length < 1 && getDaylight() < 0.4 && Math.random() < 0.4) {
     const goingRight = Math.random() < 0.5;
@@ -3750,6 +3753,7 @@ registerWorldRenderer(renderSchoolBooks);
 
 // ── Loop 91: Comet impact crash explosion (rare, decorative)
 function updateMeteorImpact(logicalW, logicalH) {
+  return; // disabled — space effects removed
   if (!G.meteorImpacts) G.meteorImpacts = [];
   if (!G.particles) G.particles = [];
   if (G.gameTick % 3000 === 0 && Math.random() < 0.2) {
@@ -3799,6 +3803,7 @@ registerWorldRenderer(renderMeteorImpact);
 
 // ── Loop 92: Smoke trail under flying dragon ───────────────
 function updateDragonTrail() {
+  return; // disabled — space effects removed
   if (!G.dragon) return;
   if (!G.dragonTrail) G.dragonTrail = [];
   if (G.gameTick % 4 === 0) {
@@ -4038,6 +4043,7 @@ registerWorldRenderer(renderRainSplashes);
 
 // ── Loop 99: Sun pillars (vertical light columns at sunrise/set)
 function renderSunPillars(ctx, logicalW, logicalH) {
+  return; // disabled — space effects removed
   const t = G.dayPhase / G.dayLength;
   let strength = 0;
   if (t > 0.05 && t < 0.18) strength = 1 - Math.abs(t - 0.11) / 0.07;

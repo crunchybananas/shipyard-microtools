@@ -1930,50 +1930,7 @@ export function render() {
 
   // Screen-space vignette removed — handled by WebGL post-processing (postfx.js)
 
-  // ── Meteor shower (screen space, night only) ──────────────────
-  if (daylight < 0.65) {
-    if (!G.meteors) G.meteors = [];
-    if (G.gameTick % 150 === 0 && Math.random() < 0.3 && G.meteors.length < 2) {
-      G.meteors.push({
-        x: Math.random() * logicalW,
-        y: Math.random() * logicalH * 0.4,
-        vx: 6 + Math.random() * 4,
-        vy: 2 + Math.random() * 2,
-        life: 60,
-        trail: [],
-      });
-    }
-    for (let i = G.meteors.length - 1; i >= 0; i--) {
-      const m = G.meteors[i];
-      m.trail.push({ x: m.x, y: m.y });
-      if (m.trail.length > 15) m.trail.shift();
-      m.x += m.vx;
-      m.y += m.vy;
-      m.life--;
-      if (m.life <= 0 || m.x > logicalW + 100) {
-        G.meteors.splice(i, 1);
-        continue;
-      }
-      // Draw trail
-      ctx.lineCap = 'round';
-      for (let j = 1; j < m.trail.length; j++) {
-        const alpha = (j / m.trail.length) * 0.8;
-        const thick = (j / m.trail.length) * 3;
-        ctx.strokeStyle = `rgba(255, 240, 200, ${alpha})`;
-        ctx.lineWidth = thick;
-        const p = m.trail[j - 1], c = m.trail[j];
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(c.x, c.y);
-        ctx.stroke();
-      }
-      // Bright head
-      ctx.fillStyle = 'rgba(255, 250, 220, 1)';
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
+  // ── Meteor shower removed (too space-y, out of place) ──
 
   // ── Loop 23+: aggregator dispatch (screen space) ─────────
   enhRenderScreen(ctx, logicalW, logicalH);
