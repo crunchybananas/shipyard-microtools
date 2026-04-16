@@ -5,6 +5,8 @@
 import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
 import { playSound } from './audio.js';
 import { demolishBuilding } from './economy.js';
+import { notify } from './notifications.js';
+import { chronicle } from './story.js';
 
 export function updateEnemies() {
   for (let i = G.enemies.length - 1; i >= 0; i--) {
@@ -79,6 +81,26 @@ export function updateEnemies() {
         });
       }
     }
+  }
+
+  // Remove citizens that were killed by enemies (hp <= 0 from combat damage)
+  // Without this, citizens take damage forever and never actually die.
+  for (let i = G.citizens.length - 1; i >= 0; i--) {
+    const c = G.citizens[i];
+    if (c.hp === undefined || c.hp > 0) continue;
+    G.citizens.splice(i, 1);
+    if (c.jobBuilding) c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
+    G.population = Math.max(0, G.population - 1);
+    if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
+    playSound('demolish');
+    G.particles.push({
+      tx: c.x, ty: c.y, offsetY: -20,
+      text: `💀 ${c.name || 'Settler'}`,
+      alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
+      color: '#8a1a1a',
+    });
+    try { notify(`${c.name || 'A settler'} was slain by raiders!`, 'danger'); } catch(_e){}
+    try { chronicle(`${c.name || 'A settler'} fell to raiders. Their name joins the stone.`, 'death'); } catch(_e){}
   }
 }
 
