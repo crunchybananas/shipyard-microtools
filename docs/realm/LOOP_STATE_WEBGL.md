@@ -213,7 +213,8 @@ Every building renders a **6-unit tall hot-pink pillar** as a debug marker. Must
 
 ## Next Cycle Plan
 
-**Cycle 7:** Brighten the scene — grass is too dark/olive. Two changes:
-1. Increase ambient from `0.15` to `0.25` in fragment shader
-2. Increase GRASS color brightness: `[0.30, 0.66, 0.33]` → `[0.40, 0.78, 0.42]`
-This should make the island pop vs the dark navy background and bring it closer to the 2D mode's bright green palette.
+**Cycle 7:** Brighten grass + raise ambient. **Cycle 8:** Tree density 40% hash. **Cycle 9:** lz -0.2→0.5, both faces lit.
+
+**Visual result (cycles 7-9):** Bright lime-green grass, readable sparse forest, lit terrain faces, buildings visible with 3D depth.
+
+**Cycle 10:** Make buildings more visually distinct — currently all read as grey boxes at zoom-out. Boost building scale multiplier from S=3.5 to S=4.5, and give house a warmer tan (`[0.92, 0.72, 0.48]`), church off-white (`[0.96, 0.92, 0.84]`), castle/tower a cooler blue-grey (`[0.52, 0.54, 0.62]`) to break up the monochrome grey blob.
