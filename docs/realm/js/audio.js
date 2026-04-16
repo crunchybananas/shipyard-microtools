@@ -340,8 +340,17 @@ export function toggleMusic() {
   return musicEnabled;
 }
 
-// Pentatonic scale in C
-const MUSIC_SCALE = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33];
+// Season-specific scales for procedural music
+const SEASON_SCALES = {
+  // C major pentatonic — bright, hopeful
+  spring: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33],
+  // G mixolydian pentatonic — warm, full
+  summer: [196.00, 220.00, 246.94, 293.66, 329.63, 392.00, 440.00],
+  // D minor pentatonic — melancholy, reflective
+  autumn: [293.66, 349.23, 392.00, 440.00, 523.25, 587.33, 698.46],
+  // A natural minor — cold, sparse
+  winter: [220.00, 246.94, 261.63, 329.63, 349.23, 440.00, 493.88],
+};
 
 export function tickMusic() {
   if (!musicEnabled || !G.audioCtx) return;
@@ -350,13 +359,18 @@ export function tickMusic() {
   const now = ctx.currentTime;
   if (now < musicScheduled) return;
 
-  // Schedule next note
-  const noteDur = 1.5 + Math.random() * 1.0;
-  const freq = MUSIC_SCALE[Math.floor(Math.random() * MUSIC_SCALE.length)];
+  // Pick season-specific scale
+  const scale = SEASON_SCALES[G.season] || SEASON_SCALES.spring;
+  const freq = scale[Math.floor(Math.random() * scale.length)];
+
+  // Tempo varies by season: winter slower, summer faster
+  const tempoMult = { spring: 1.0, summer: 0.8, autumn: 1.1, winter: 1.4 }[G.season] || 1;
+  const noteDur = (1.5 + Math.random() * 1.0) * tempoMult;
 
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = 'sine';
+  // Winter uses triangle for colder timbre; summer uses sine
+  osc.type = G.season === 'winter' ? 'triangle' : 'sine';
   osc.frequency.setValueAtTime(freq, now);
   osc.connect(gain);
   gain.connect(ctx.destination);
