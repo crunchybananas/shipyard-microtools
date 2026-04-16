@@ -2,6 +2,20 @@
 // Enhancements — incremental ambient features added across
 // the autonomous improvement loops. Each block is self-contained
 // and additive; do not remove prior blocks.
+//
+// DISABLING A FEATURE: add `return;` as the first statement inside
+// the update/render function (NOT the registerXxx call). The register
+// call stays so the ordering of later features isn't perturbed.
+// Examples: search for `return; // disabled` to see the pattern.
+//
+// CURRENT DISABLED FEATURES (12, as of cycle 41):
+//   - Space effects: meteors, comets, constellations, sun pillars,
+//     dragon, dragon trail, meteor impacts — too "out of place"
+//   - Sunrise burst — too visually dominant
+//   - Swallows — screen-space V-strokes drifted into vignette
+//   - Map boundary dots — appeared as void artifacts
+//   - renderWorkerDots/renderRadiusPreview/renderGhostCost —
+//     referenced undefined BUILDINGS, caused 60fps crash loop
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
