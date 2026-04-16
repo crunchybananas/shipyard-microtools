@@ -936,25 +936,34 @@ export function render() {
     // In iso: camera looks from upper-left, facing away = moving up-right (+X, -Y)
     const facingAway = faceX > 0 && faceZ < 0;
 
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 2, 4, 1.8, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Job color
-    let bodyColor = '#aab0b8';
+    // Job color — vibrant saturated palette so citizens stand out
+    let bodyColor = '#8899bb';
     if (c.jobBuilding) {
       const jt = c.jobBuilding.type;
-      if (jt === 'farm') bodyColor = '#6da835';
-      else if (jt === 'lumber') bodyColor = '#a07040';
-      else if (jt === 'quarry' || jt === 'mine') bodyColor = '#687888';
-      else if (jt === 'market') bodyColor = '#d89530';
-      else if (jt === 'barracks') bodyColor = '#5a6878';
-      else if (jt === 'tavern') bodyColor = '#b06838';
-      else bodyColor = '#7888a0';
+      if (jt === 'farm') bodyColor = '#4ec820';
+      else if (jt === 'lumber') bodyColor = '#c07820';
+      else if (jt === 'quarry' || jt === 'mine') bodyColor = '#5080a8';
+      else if (jt === 'market') bodyColor = '#f0a800';
+      else if (jt === 'barracks') bodyColor = '#3858a0';
+      else if (jt === 'tavern') bodyColor = '#c83820';
+      else bodyColor = '#5080c8';
     }
-    if (c.state === 'eating') bodyColor = '#50c870';
+    if (c.state === 'eating') bodyColor = '#20d860';
+
+    // Colored ground circle — makes citizens pop against any terrain
+    const cr = parseInt(bodyColor.slice(1,3),16);
+    const cg = parseInt(bodyColor.slice(3,5),16);
+    const cb = parseInt(bodyColor.slice(5,7),16);
+    ctx.fillStyle = `rgba(${cr},${cg},${cb},0.45)`;
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 1, 8, 3.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Drop shadow on top of the colored circle
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 2, 5.5, 2.5, 0, 0, Math.PI * 2);
+    ctx.fill();
 
     if (G.camera.zoom < 0.5) {
       // Tiny dot for very far zoom
@@ -981,68 +990,68 @@ export function render() {
       continue;
     }
 
-    // Feet — small ovals, subtle step offset when walking
+    // Feet — small ovals, subtle step offset when walking (scaled ~1.4x)
     const step = isMoving ? Math.sin(G.gameTick * 0.25 + c.x * 3) * 1.5 : 0;
     ctx.fillStyle = '#4a3a2a';
     ctx.beginPath();
-    ctx.ellipse(s.x - 2 - step * 0.3, cy - 1, 2, 1.2, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x - 2.8 - step * 0.3, cy - 1, 2.8, 1.7, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(s.x + 2 + step * 0.3, cy - 1, 2, 1.2, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x + 2.8 + step * 0.3, cy - 1, 2.8, 1.7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body — rounded pill shape with shadow side
+    // Body — rounded pill shape with shadow side (scaled ~1.4x)
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
-    ctx.ellipse(s.x, cy - 6, 4.5, 5, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x, cy - 8, 6.3, 7, 0, 0, Math.PI * 2);
     ctx.fill();
     // Shadow side (lower-right crescent for depth)
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.ellipse(s.x + 1.5, cy - 5, 3.5, 4, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.ellipse(s.x + 2, cy - 7, 4.9, 5.6, 0, -Math.PI / 2, Math.PI / 2);
     ctx.fill();
     ctx.strokeStyle = 'rgba(20,10,0,0.4)';
-    ctx.lineWidth = 0.6;
+    ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.ellipse(s.x, cy - 6, 4.5, 5, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x, cy - 8, 6.3, 7, 0, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Head — large for chibi proportions (oversized head = cute)
-    const headX = s.x + faceX * 0.5;
-    const headY = cy - 14;
+    // Head — large for chibi proportions (oversized head = cute, scaled ~1.4x)
+    const headX = s.x + faceX * 0.7;
+    const headY = cy - 20;
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
-    ctx.arc(headX, headY, 4.5, 0, Math.PI * 2);
+    ctx.arc(headX, headY, 6.3, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = 'rgba(20,10,0,0.35)';
-    ctx.lineWidth = 0.6;
+    ctx.lineWidth = 0.8;
     ctx.stroke();
 
-    // Hair — cap on top of head
+    // Hair — vibrant colors, cap on top of head (scaled ~1.4x)
     const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
-    ctx.fillStyle = ['#3a2a1a','#8a6a3a','#2a2a2a','#c08050'][hairHash];
+    ctx.fillStyle = ['#5c3a18','#c08020','#1a1a2e','#e8704a'][hairHash];
     ctx.beginPath();
-    ctx.arc(headX - faceX * 0.4, headY - 1, 4.2, Math.PI * 0.8, Math.PI * 2.2);
+    ctx.arc(headX - faceX * 0.6, headY - 1.4, 5.9, Math.PI * 0.8, Math.PI * 2.2);
     ctx.closePath();
     ctx.fill();
 
     // Face — eyes and mouth on facing side, hidden when facing away
     if (!facingAway && G.camera.zoom >= 1.0) {
-      const eyeX = headX + faceX * 0.8;
+      const eyeX = headX + faceX * 1.1;
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.2, headY + 0.5, 0.6, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.2, headY + 0.5, 0.6, 0, Math.PI * 2);
+      ctx.arc(eyeX - 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
       ctx.fill();
     }
     // Mouth — tiny line, only at closer zoom
     if (!facingAway && G.camera.zoom >= 1.5) {
       ctx.strokeStyle = 'rgba(80,50,30,0.7)';
-      ctx.lineWidth = 0.5;
-      const mouthX = headX + faceX * 0.5;
+      ctx.lineWidth = 0.7;
+      const mouthX = headX + faceX * 0.7;
       ctx.beginPath();
-      ctx.moveTo(mouthX - 0.8, headY + 1.5);
-      ctx.lineTo(mouthX + 0.8, headY + 1.5);
+      ctx.moveTo(mouthX - 1.1, headY + 2.1);
+      ctx.lineTo(mouthX + 1.1, headY + 2.1);
       ctx.stroke();
     }
 
@@ -1050,8 +1059,8 @@ export function render() {
       // Tool icon when working
       if (c.state === 'working' && c.jobBuilding) {
         const jt = c.jobBuilding.type;
-        const toolX = s.x + 6;
-        const toolY = cy - 8;
+        const toolX = s.x + 8;
+        const toolY = cy - 11;
         ctx.save();
         ctx.lineCap = 'round';
         if (jt === 'mine' || jt === 'quarry') {
@@ -1097,9 +1106,9 @@ export function render() {
         (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
       if (emote && G.gameTick % 120 < 80) { // show emote 80 of every 120 ticks (flicker)
         ctx.globalAlpha = 0.75;
-        ctx.font = '8px sans-serif';
+        ctx.font = '9px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(emote, s.x, cy - 20);
+        ctx.fillText(emote, s.x, cy - 28);
         ctx.globalAlpha = daylight;
       }
 
@@ -1108,10 +1117,10 @@ export function render() {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
         ctx.fillStyle = cc;
         ctx.beginPath();
-        ctx.arc(s.x - faceX * 2.5, cy - 7, 2.2, 0, Math.PI * 2);
+        ctx.arc(s.x - faceX * 3.5, cy - 10, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = 0.7;
         ctx.stroke();
       }
     } // end zoom >= 0.7
@@ -1121,7 +1130,7 @@ export function render() {
       ctx.strokeStyle = 'rgba(255,209,102,0.7)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 7, 7, 0, Math.PI * 2);
+      ctx.arc(s.x, cy - 10, 10, 0, Math.PI * 2);
       ctx.stroke();
     }
 
@@ -1131,7 +1140,7 @@ export function render() {
       ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 7, 9, 0, Math.PI * 2);
+      ctx.arc(s.x, cy - 10, 13, 0, Math.PI * 2);
       ctx.stroke();
     }
   }
@@ -1449,6 +1458,7 @@ export function render() {
   if (G.animals && G.camera.zoom >= 0.6) {
     for (const a of G.animals) {
       const as = toScreen(a.x, a.y);
+      if (as.x < -20 || as.x > logicalW + 20 || as.y < -20 || as.y > logicalH + 20) continue;
       ctx.globalAlpha = daylight;
       // Shadow
       ctx.fillStyle = 'rgba(0,0,0,0.2)';
