@@ -61,9 +61,10 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 /* HUD */
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
-.res{display:flex;align-items:center;gap:0.35rem;font-weight:600}
+.res{display:flex;align-items:center;gap:0.3rem;font-weight:600}
 .res-icon{width:16px;height:16px;border-radius:3px;display:inline-block}
 .res-emoji{font-size:1rem;line-height:1}
+.res-lbl{font-size:0.62rem;font-weight:500;color:rgba(255,255,255,0.5);letter-spacing:0.03em;text-transform:uppercase;margin-right:-0.05rem}
 .res-emoji.gold-coin, .gold-coin{color:#ffd24a;font-weight:900;text-shadow:0 0 5px rgba(255,210,74,0.8),0 0 2px rgba(255,230,100,1)}
 .res-emoji.gold-coin{font-size:1.15rem}
 .res .val{font-variant-numeric:tabular-nums}
@@ -495,11 +496,11 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 <canvas id="game"></canvas>
 
 <div id="hud">
-  <div class="res" title="Wood — build most structures"><span class="res-emoji">🪵</span><span class="val" id="r-wood">50</span></div>
-  <div class="res" title="Stone — defensive buildings and upgrades"><span class="res-emoji">🪨</span><span class="val" id="r-stone">30</span></div>
-  <div class="res" title="Food — feeds your population"><span class="res-emoji">🍎</span><span class="val" id="r-food">40</span></div>
-  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji gold-coin" aria-hidden="true">◉</span><span class="val" id="r-gold">10</span></div>
-  <div class="res" title="Iron — weapons and advanced buildings"><span class="res-emoji">⚙️</span><span class="val" id="r-iron">0</span></div>
+  <div class="res" title="Wood — build most structures"><span class="res-emoji">🪵</span><span class="res-lbl">Wood</span><span class="val" id="r-wood">50</span></div>
+  <div class="res" title="Stone — defensive buildings and upgrades"><span class="res-emoji">🪨</span><span class="res-lbl">Stone</span><span class="val" id="r-stone">30</span></div>
+  <div class="res" title="Food — feeds your population"><span class="res-emoji">🍎</span><span class="res-lbl">Food</span><span class="val" id="r-food">40</span></div>
+  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji gold-coin" aria-hidden="true">◉</span><span class="res-lbl">Gold</span><span class="val" id="r-gold">10</span></div>
+  <div class="res" title="Iron — weapons and advanced buildings"><span class="res-emoji">⚙️</span><span class="res-lbl">Iron</span><span class="val" id="r-iron">0</span></div>
   <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
   <div class="res" title="Soldiers under your command"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
   <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
