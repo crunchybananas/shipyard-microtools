@@ -116,6 +116,7 @@ export const G = {
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
   notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
   lastResources: null, // snapshot for rate calculation
+  buildQueue: [],   // [{type, x, y}] — queued builds awaiting resources
   stats: {
     buildingsBuilt: 0,
     buildingsLost: 0,

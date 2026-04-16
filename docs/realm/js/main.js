@@ -8,7 +8,7 @@ import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js';
+import { updateProduction, checkRaids, collectTaxes, updateFires, processQueue } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
@@ -308,6 +308,7 @@ function simTick() {
     enhUpdateAll(window.innerWidth, window.innerHeight);
     updateProduction();
     updateFires();
+    if (G.gameTick % 60 === 0) processQueue();
     updateParticles();
     updateSmokeEmitters();
     updateResearch();

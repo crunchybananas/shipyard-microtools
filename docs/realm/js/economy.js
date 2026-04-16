@@ -35,6 +35,25 @@ export function canAfford(type) {
   return true;
 }
 
+export function queueBuilding(type, tx, ty) {
+  if (!canPlace(type,tx,ty)) return false;
+  if (!G.buildQueue) G.buildQueue = [];
+  if (G.buildQueue.length >= 5) return false; // cap
+  G.buildQueue.push({ type, x: tx, y: ty });
+  return true;
+}
+
+export function processQueue() {
+  if (!G.buildQueue || G.buildQueue.length === 0) return;
+  for (let i = G.buildQueue.length - 1; i >= 0; i--) {
+    const q = G.buildQueue[i];
+    if (canAfford(q.type) && canPlace(q.type, q.x, q.y)) {
+      G.buildQueue.splice(i, 1);
+      placeBuilding(q.type, q.x, q.y);
+    }
+  }
+}
+
 export function placeBuilding(type, tx, ty) {
   if (!canPlace(type,tx,ty) || !canAfford(type)) return false;
   const def = BUILDINGS[type];
