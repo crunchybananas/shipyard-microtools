@@ -4,6 +4,7 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
 import { playSound } from './audio.js';
+import { demolishBuilding } from './economy.js';
 
 export function updateEnemies() {
   for (let i = G.enemies.length - 1; i >= 0; i--) {
@@ -15,9 +16,8 @@ export function updateEnemies() {
       // Attack wall instead of passing through
       wall.hp -= 0.5 * G.speed;
       if (wall.hp <= 0) {
-        G.buildings = G.buildings.filter(x => x !== wall);
-        G.buildingGrid[wall.y][wall.x] = null;
-        G.stats.buildingsLost = (G.stats.buildingsLost || 0) + 1;
+        // Use demolishBuilding so defense/maxPop/workers are all cleaned up properly
+        demolishBuilding(wall, true);
       }
       continue; // don't move this tick
     }
@@ -39,8 +39,8 @@ export function updateEnemies() {
       if (target) {
         target.b.hp -= 1;
         if (target.b.hp <= 0) {
-          G.buildings = G.buildings.filter(x => x !== target.b);
-          G.buildingGrid[target.b.y][target.b.x] = null;
+          // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
+          demolishBuilding(target.b, true);
         }
       }
     }
