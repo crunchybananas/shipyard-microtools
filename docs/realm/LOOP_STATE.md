@@ -48,9 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 55
-- **What**: Validator spotted that top HUD day-display line had the difficulty dot (🟡 Normal / 🟢 Easy / 🔴 Hard) wrapping onto a SECOND line beneath the text — orphan emoji that read like a stray coin or debug glyph. Root cause: "Year 1, Day 1 · 🌱Spring · 😐50% 🟡" overflowed the inline span at this viewport, breaking between the `%` and the diffLabel. Fix: added `white-space:nowrap` to `#day-display` in index.html:84. Full line stays on one row; no sibling layout shift (Research button + HUD icons already had ample gap).
-- **Verified**: Chrome ?_cb=58 — zoom of top HUD shows "…😐50% 🟡" flush on one line. No console errors. No regression in HUD icons.
+- **Number**: 56 (deep-play)
+- **What**: Deep-play uncovered a SERIOUS latent bug: `if (G.gameTick % N === 0)` in main.js simTick silently misses when G.speed doesn't divide N. Specifically, speed=4 combined with an odd-parity gameTick means gameTick increments 4-at-a-time through only the odd residues mod 30 — never lands on 0, so updateUI / checkMissions / updateAmbient / tickMusic ALL stop firing. HUD freezes mid-session until player pauses (resetting to speed 0). Observed in-game: HUD stuck displaying "Year 1, Day 2" while internal G.day was 40, then 68. Fix: added `crossed(N)` helper in simTick (Math.floor(tick/N) > Math.floor((tick-speed)/N)) that fires when a multiple of N is *crossed* regardless of alignment. Replaced all 5 `% N === 0` checks (30, 60×3, 120×2) in simTick with `crossed(N)` calls.
+- **Verified**: Chrome ?_cb=60 — with speed=4 and gameTick=1001 (odd, the exact broken scenario), day-display got 16 writes in 2s (was 0 pre-fix). Day advanced Day 1→Day 8, season ticked Spring→Summer. No console errors.
+- **Deep-play observations captured to backlog**: Festival event double-notification (toast + big banner), citizen HP/death flow readable, raid of 8 enemies → full wipe of population/buildings feels unforgiving.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -146,6 +147,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 53: Desaturated HUD toolbar icons (filter:saturate(0.7)) so trophy 🏆 no longer dominates siblings. Hover restores full saturation.
 - Cycle 54: USER BUG FIXED — build-bar two-click bug. Removed renderBuildBar() from 30-tick periodic path in main.js; it was wiping bar.innerHTML every 500ms and racing real mouse clicks between mousedown and click. updateBuildBarAffordability() inside updateUI() already handles in-place cost/lock updates.
 - Cycle 55: Difficulty dot (🟡/🟢/🔴) was wrapping to an orphan second line under the day-display text. Added white-space:nowrap to #day-display in index.html — full "Year 1, Day 1 · 🌱Spring · 😐50% 🟡" now stays on one row.
+- Cycle 56 (deep-play): CRITICAL — simTick's `% N === 0` checks silently miss when speed doesn't divide N (e.g., speed=4 + odd gameTick → updateUI, checkMissions, tickMusic ALL stop firing; HUD freezes mid-game). Replaced all 5 occurrences with a `crossed(N)` helper that fires on crossing a multiple of N, robust to any speed ≥ 1.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:

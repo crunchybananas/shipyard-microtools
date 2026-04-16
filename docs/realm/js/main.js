@@ -303,6 +303,11 @@ function updateTime() {
 // ── Game Loop ──────────────────────────────────────────────
 function simTick() {
   if (G.speed <= 0) return;
+  // Crossing check: true iff this simTick advanced gameTick across a multiple
+  // of N. Replaces bare `G.gameTick % N === 0`, which silently misses when
+  // G.speed doesn't divide N (e.g., speed=4 with an odd-parity gameTick never
+  // lands on any multiple of 30 → HUD freezes mid-game until you pause).
+  const crossed = (N) => Math.floor(G.gameTick / N) > Math.floor((G.gameTick - G.speed) / N);
   for (let i = 0; i < G.speed; i++) {
     G.gameTick++;
     updateTime();
@@ -326,17 +331,22 @@ function simTick() {
     enhUpdateAll(window.innerWidth, window.innerHeight);
     updateProduction();
     updateFires();
-    if (G.gameTick % 60 === 0) processQueue();
+    // `crossed(N)` fires when gameTick just crossed a multiple of N in this
+    // simTick. Plain `% N === 0` MISSES ENTIRELY when G.speed and G.gameTick
+    // don't align (e.g., speed=4 with an odd gameTick never lands on any
+    // multiple of 30) — which caused the HUD to freeze mid-game until you
+    // paused and resumed. This is robust to any speed ≥ 1.
+    if (crossed(60)) processQueue();
     updateParticles();
     updateSmokeEmitters();
     updateResearch();
-    if (G.gameTick % 60 === 0) {
+    if (crossed(60)) {
       checkMissions();
       renderMissions();
       renderResearchPanel();
     }
   }
-  if (G.gameTick % 30 === 0) {
+  if (crossed(30)) {
     // updateUI() already calls updateBuildBarAffordability() for in-place cost/lock
     // updates. Calling renderBuildBar() here would wipe bar.innerHTML every 500ms
     // — if that fires between a user's mousedown and click, the button element is
@@ -346,9 +356,9 @@ function simTick() {
     updateUI();
     updateTutorialTip();
   }
-  if (G.gameTick % 60 === 0) { updateAmbient(); checkAchievements(); checkStoryBeats(); }
-  if (G.gameTick % 120 === 0) { tickMusic(); checkAdvisor(); }
-  if (G.gameTick % 120 === 0 && !G._scenarioWon) {
+  if (crossed(60)) { updateAmbient(); checkAchievements(); checkStoryBeats(); }
+  if (crossed(120)) { tickMusic(); checkAdvisor(); }
+  if (crossed(120) && !G._scenarioWon) {
     if (checkScenarioComplete()) {
       G._scenarioWon = true;
       G._scenariosCompleted = G._scenariosCompleted || [];
