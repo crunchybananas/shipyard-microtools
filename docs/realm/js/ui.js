@@ -460,6 +460,13 @@ function showTooltip(anchor, key, def) {
 
   const lines = [];
 
+  // Keyboard shortcut
+  const allKeys = Object.keys(BUILDINGS);
+  const shortcutIdx = allKeys.indexOf(key) + 1;
+  if (shortcutIdx >= 1 && shortcutIdx <= 9) {
+    lines.push(`<span class="tt-row tt-shortcut"><span class="tt-lbl">Hotkey</span> <kbd>${shortcutIdx}</kbd></span>`);
+  }
+
   // Description
   if (def.desc) lines.push(`<span class="tt-desc">${def.desc}</span>`);
 
