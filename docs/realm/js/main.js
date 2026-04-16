@@ -255,7 +255,7 @@ window.toggleMissions = () => {
   if (t) t.textContent = open ? '▶' : '▼';
 };
 
-notify('Welcome to Realm. Build your settlement!', 'info');
+// (Welcome notification is fired from beginGame() — avoid duplicate at module load)
 
 // ── Day/Night ──────────────────────────────────────────────
 function updateTime() {
