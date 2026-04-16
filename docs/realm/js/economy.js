@@ -8,6 +8,7 @@ import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
 import { panCameraTo } from './render.js';
+import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 
 export function canPlace(type, tx, ty) {
@@ -304,6 +305,7 @@ export function updateProduction() {
             alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
           });
           notify(`${c.name} has died of starvation!`, 'danger');
+          try { chronicle(`${c.name} perished from hunger. The realm mourns.`, 'death'); } catch(_e){}
         } else {
           // Citizen flees
           const c2 = G.citizens.pop();
@@ -325,7 +327,10 @@ export function updateProduction() {
   // Immigration (once per day)
   if (G.gameTick % G.dayLength === 0 && G.happiness > 60 && G.population < G.maxPop) {
     trySpawnSettlers(1);
-    if (G.population > 3) notify('A new settler arrives!');
+    if (G.population > 3) {
+      notify('A new settler arrives!');
+      try { chronicle(`A new settler joins the realm. Population: ${G.population}.`, 'birth'); } catch(_e){}
+    }
   }
 }
 
