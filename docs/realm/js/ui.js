@@ -58,6 +58,12 @@ export function updateUI() {
   gEl.innerHTML = Math.floor(G.resources.gold) + rateStr(G.resourceRates.gold);
   iEl.innerHTML = Math.floor(G.resources.iron) + rateStr(G.resourceRates.iron);
 
+  // Hide empty categories that would otherwise show "0" with no meaning on Day 1
+  const ironRes = iEl.closest('.res');
+  if (ironRes) ironRes.style.display = (G.resources.iron > 0 || (G.resourceRates.iron || 0) !== 0) ? '' : 'none';
+  const goldRes = gEl.closest('.res');
+  if (goldRes) goldRes.style.display = (G.resources.gold > 0 || (G.resourceRates.gold || 0) !== 0) ? '' : 'none';
+
   // Warn thresholds: food warns when below 2x daily consumption or negative rate
   const foodWarnThreshold = Math.max(20, G.population * 2);
   warn(wEl, G.resources.wood, 5);
@@ -98,6 +104,9 @@ export function updateUI() {
   const soldierEl = $('soldier-count');
   if (soldierEl) {
     soldierEl.textContent = `${(G.soldiers || []).length}/${maxSoldiers}`;
+    // Hide soldier counter when no barracks exist and no soldiers — dead UI weight on Day 1
+    const soldierRes = soldierEl.closest('.res');
+    if (soldierRes) soldierRes.style.display = (maxSoldiers > 0 || (G.soldiers || []).length > 0) ? '' : 'none';
   }
   const threatEl = $('threat-display');
   const enemyEl = $('enemy-count');
