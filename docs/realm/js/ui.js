@@ -474,7 +474,9 @@ export function toggleResearchPanel() {
   const panel = document.getElementById('research-panel');
   if (!panel) return;
   const isOpen = panel.style.display !== 'none';
-  panel.style.display = isOpen ? 'none' : 'block';
+  // 'flex' preserves the CSS display:flex column so .research-content's
+  // flex:1 + min-height:0 can actually constrain and scroll the list.
+  panel.style.display = isOpen ? 'none' : 'flex';
   if (!isOpen) renderResearchPanel();
 }
 

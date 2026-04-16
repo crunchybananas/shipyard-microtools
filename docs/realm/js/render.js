@@ -3198,13 +3198,46 @@ function drawTavern(ctx, s) {
 }
 
 function drawWall(ctx, s, b) {
-  // Check which neighbors are also walls
+  // Check which neighbors are also walls. In this iso:
+  //   E = (x+1,y) → screen +TW/2, +TH/2  (down-right)
+  //   S = (x,y+1) → screen -TW/2, +TH/2  (down-left)
+  //   W = (x-1,y) → screen -TW/2, -TH/2  (up-left)
+  //   N = (x,y-1) → screen +TW/2, -TH/2  (up-right)
   const hasN = b && G.buildingGrid[b.y-1]?.[b.x]?.type === 'wall';
   const hasS = b && G.buildingGrid[b.y+1]?.[b.x]?.type === 'wall';
   const hasE = b && G.buildingGrid[b.y]?.[b.x+1]?.type === 'wall';
   const hasW = b && G.buildingGrid[b.y]?.[b.x-1]?.type === 'wall';
 
-  // Main wall post (always drawn)
+  // Connectors first so the post draws over the junction.
+  // Each connector is a diagonal band running from this post's top
+  // to the neighbor's post top (neighbor center.y - 14, same as own post).
+  const topY = -13;   // near post top (post top = -14)
+  const botY = -3;    // ribbon thickness
+  ctx.fillStyle = '#7a7068';
+  const band = (dx, dy) => {
+    ctx.beginPath();
+    ctx.moveTo(s.x + 3, s.y + topY);
+    ctx.lineTo(s.x + dx, s.y + dy + topY);
+    ctx.lineTo(s.x + dx, s.y + dy + botY);
+    ctx.lineTo(s.x + 3, s.y + botY);
+    ctx.closePath();
+    ctx.fill();
+  };
+  const bandLeft = (dx, dy) => {
+    ctx.beginPath();
+    ctx.moveTo(s.x - 3, s.y + topY);
+    ctx.lineTo(s.x + dx, s.y + dy + topY);
+    ctx.lineTo(s.x + dx, s.y + dy + botY);
+    ctx.lineTo(s.x - 3, s.y + botY);
+    ctx.closePath();
+    ctx.fill();
+  };
+  if (hasE) band(TW/2, TH/2);    // down-right
+  if (hasN) band(TW/2, -TH/2);   // up-right
+  if (hasS) bandLeft(-TW/2, TH/2);   // down-left
+  if (hasW) bandLeft(-TW/2, -TH/2);  // up-left
+
+  // Main wall post
   ctx.fillStyle = '#8a8078';
   ctx.fillRect(s.x - 4, s.y - 14, 8, 14);
   // Top cap
@@ -3212,30 +3245,6 @@ function drawWall(ctx, s, b) {
   ctx.fillRect(s.x - 5, s.y - 16, 10, 3);
   // Merlon
   ctx.fillRect(s.x - 2, s.y - 19, 4, 3);
-
-  // Connection segments to neighbors
-  if (hasE || hasS) {
-    // Right connection (toward +x or +y in iso)
-    ctx.fillStyle = '#7a7068';
-    ctx.beginPath();
-    ctx.moveTo(s.x + 4, s.y - 12);
-    ctx.lineTo(s.x + TW/2, s.y - 6);
-    ctx.lineTo(s.x + TW/2, s.y);
-    ctx.lineTo(s.x + 4, s.y);
-    ctx.closePath();
-    ctx.fill();
-  }
-  if (hasW || hasN) {
-    // Left connection
-    ctx.fillStyle = '#8a7a70';
-    ctx.beginPath();
-    ctx.moveTo(s.x - 4, s.y - 12);
-    ctx.lineTo(s.x - TW/2, s.y - 6);
-    ctx.lineTo(s.x - TW/2, s.y);
-    ctx.lineTo(s.x - 4, s.y);
-    ctx.closePath();
-    ctx.fill();
-  }
 }
 
 function drawRoad(ctx, s) {

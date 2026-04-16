@@ -337,13 +337,26 @@ export function playSound(type) {
 
 let musicScheduled = 0;
 let musicEnabled = true;
+let musicMasterGain = null;
+
+function getMusicMaster() {
+  if (!G.audioCtx) return null;
+  if (!musicMasterGain || musicMasterGain.context !== G.audioCtx) {
+    musicMasterGain = G.audioCtx.createGain();
+    musicMasterGain.gain.setValueAtTime(musicEnabled ? 1 : 0, G.audioCtx.currentTime);
+    musicMasterGain.connect(G.audioCtx.destination);
+  }
+  return musicMasterGain;
+}
 
 export function toggleMusic() {
   musicEnabled = !musicEnabled;
-  if (!musicEnabled && G.audioCtx) {
-    try {
-      // Silence any lingering music gain — nodes self-stop via scheduled stop()
-    } catch {}
+  const m = getMusicMaster();
+  if (m && G.audioCtx) {
+    const t = G.audioCtx.currentTime;
+    m.gain.cancelScheduledValues(t);
+    // 80ms ramp avoids click artifact while still feeling instant
+    m.gain.linearRampToValueAtTime(musicEnabled ? 1 : 0, t + 0.08);
   }
   return musicEnabled;
 }
@@ -381,7 +394,7 @@ export function tickMusic() {
   osc.type = G.season === 'winter' ? 'triangle' : 'sine';
   osc.frequency.setValueAtTime(freq, now);
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getMusicMaster() || ctx.destination);
 
   // Soft envelope
   gain.gain.setValueAtTime(0, now);

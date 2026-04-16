@@ -356,7 +356,7 @@ export function setupInput(canvas) {
     }
     if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
       const rp = document.getElementById('research-panel');
-      if (rp) rp.style.display = rp.style.display === 'none' ? 'block' : 'none';
+      if (rp) rp.style.display = rp.style.display === 'none' ? 'flex' : 'none';
       return;
     }
     if (e.key === 'p') {
