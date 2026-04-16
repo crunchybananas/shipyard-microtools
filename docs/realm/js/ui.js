@@ -213,11 +213,19 @@ const CATEGORIES = [
   { name: 'Victory',        keys: ['castle'] },
 ];
 
+// Tracks the 1-indexed order of buttons the player actually sees in the build
+// bar (category-grouped, unlocked-filtered). Rebuilt on each renderBuildBar.
+// Used both to stamp the "N" shortcut badge and by the keydown handler below
+// so pressing "4" selects the 4th visible button — not BUILDINGS[3], which on
+// Day 1 is `quarry` (locked, not on the bar). Keeping this in module scope
+// lets one source of truth drive both the badge and the hotkey.
+let _visibleBuildKeys = [];
+
 export function renderBuildBar() {
   const bar = document.getElementById('build-bar');
   if (!bar) return;
   bar.innerHTML = '';
-  const allKeys = Object.keys(BUILDINGS);
+  _visibleBuildKeys = [];
   const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
 
   for (const cat of CATEGORIES) {
@@ -248,8 +256,12 @@ export function renderBuildBar() {
       // Show terrain requirement if applicable
       const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
       const terrainTag = terrainReq ? `<span class="cost terrain">⬡ ${terrainReq}</span>` : '';
-      // Keyboard shortcut number (1-based index in BUILDINGS declaration order)
-      const shortcutNum = allKeys.indexOf(key) + 1;
+      // Keyboard shortcut number = position in the visible build bar, not the
+      // BUILDINGS declaration index. Previously badges used declaration order,
+      // which left Fisherman's Hut (index 21) and Granary (index 14) with no
+      // badge at all on Day 1, and made pressing "4" select `quarry` (locked).
+      _visibleBuildKeys.push(key);
+      const shortcutNum = _visibleBuildKeys.length;
       const shortcutBadge = shortcutNum <= 9 ? `<span class="build-btn-shortcut">${shortcutNum}</span>` : '';
       // Count of existing buildings of this type
       const count = G.buildings.filter(b => b.type === key).length;
@@ -272,6 +284,29 @@ export function renderBuildBar() {
       bar.appendChild(btn);
     }
   }
+}
+
+// Capture-phase hotkey handler for number keys 1-9 — preempts input.js's
+// declaration-order handler so digits map to the buttons the player actually
+// sees. input.js still handles every other key; we only intercept 1-9 and
+// stopPropagation so the declaration-order fallback doesn't also fire.
+// Attach once at module load.
+if (typeof window !== 'undefined' && !window._buildBarHotkeyBound) {
+  window._buildBarHotkeyBound = true;
+  window.addEventListener('keydown', (e) => {
+    if (e.key < '1' || e.key > '9') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // Ignore when the user is typing in a text field (kingdom name input etc.)
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    const idx = parseInt(e.key, 10) - 1;
+    if (idx >= _visibleBuildKeys.length) return;
+    e.stopPropagation();
+    const pick = _visibleBuildKeys[idx];
+    G.selectedBuild = G.selectedBuild === pick ? null : pick;
+    G.selectedBuilding = null;
+    renderBuildBar();
+  }, { capture: true });
 }
 
 export function renderResearchPanel() {
