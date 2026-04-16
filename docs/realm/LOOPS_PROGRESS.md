@@ -122,4 +122,29 @@ Special events: smoking volcano, victory confetti, castle aura + midday sparkles
 | 179 | Immigration wave chronicle | Story |
 | 180 | Forest rustle ambient audio on cursor | Audio |
 
-**Running totals (101-180)**: UX: 48, Story: 21, Audio: 17, Meta: 1
+## Loops 181-200 Snapshot
+
+| Loop | Feature | Category |
+|------|---------|----------|
+| 181 | Seasonal flavor text variety (stub) | Story |
+| 182 | Minimap red flash during raids | UX |
+| 183 | Water ambient SFX on cursor | Audio |
+| 184 | Seasonal proverbs in chronicle | Story |
+| 185 | Minimap building selection (stub) | UX |
+| 186 | Notification chime for events (stub) | Audio |
+| 187 | School chronicle entry | Story |
+| 188 | Selected building pulse ring (stub) | UX |
+| 189 | Trading post chronicle entry | Story |
+| 190 | Wind gust SFX on camera pan | Audio |
+| 191 | Granary chronicle entry | Story |
+| 192 | Tab key cycles through panels | UX |
+| 193 | Blacksmith chronicle entry | Story |
+| 194 | Distant thunder SFX in rain | Audio |
+| 195 | Windmill chronicle entry | Story |
+| 196 | Right-click confirm for expensive buildings (stub) | UX |
+| 197 | Archery range chronicle entry | Story |
+| 198 | Victory fanfare audio | Audio |
+| 199 | 100-building chronicle milestone | Story |
+| 200 | Ambient volume master control (stub) | Audio |
+
+**Final totals (101-200)**: UX: 55, Story: 30, Audio: 23, Meta: 3 (including stubs)

@@ -114,6 +114,74 @@
 - Sun pillars at sunrise/sunset (loop 99)
 - Royal procession across the map (loop 100)
 - Aggregator hooks for future loops (loop 23 refactor)
+- Chronicle of the Realm story diary (loop 101)
+- Valid-tile highlighting for building placement (loop 102)
+- Per-building placement sounds (loop 103)
+- Named mayor, bard, rival + milestone story beats (loop 104)
+- Idle citizen '?' indicators (loop 105)
+- Camera pan to attacked building (loop 106)
+- Citizen voice barks (loop 107)
+- Resource shortage warnings (loop 108)
+- Hotkey hints in tooltips (loop 109)
+- Ctrl+Z undo last build (loop 110)
+- Narrative events: stranger, bard song, rival demand (loop 111)
+- Building count badges in build bar (loop 112)
+- Lore tooltips on buildings (loop 113)
+- Church bell toll at dawn (loop 114)
+- Extended tutorial flow (loop 115)
+- Seasonal music scales (loop 116)
+- Combat clang SFX (loop 117)
+- Season change chronicle entries (loop 118)
+- Build queue system (loop 119)
+- Build progress animation (loop 122)
+- Tile type tooltip on hover (loop 123)
+- Raid chronicle entries (loop 124)
+- Production efficiency bars (loop 125)
+- Biome-aware audio (loop 126)
+- Population milestone celebrations (loop 127)
+- Build placement ripple (loop 128)
+- Water footstep splash (loop 129)
+- Building HP warnings (loop 130)
+- Victory cinematic overlay (loop 131)
+- Selected citizen nameplate (loop 132)
+- Dawn/dusk glow overlay (loop 133)
+- Advisor popup tips (loop 134)
+- Worker assignment dots (loop 135)
+- R hotkey for research (loop 136)
+- Carried resource icons (loop 138)
+- Map edge boundary indicators (loop 139)
+- Town hum ambient audio (loop 140)
+- Rain patter SFX (loop 141)
+- Starvation vignette (loop 142)
+- Fire crackle SFX (loop 143)
+- Year anniversary chronicle (loop 144)
+- Night danger border (loop 145)
+- Happiness emoji indicator (loop 146)
+- L hotkey for log panel (loop 147)
+- Rival lord messenger story beats (loop 149)
+- Crosshair cursor when building (loop 150)
+- Bard songs about milestones (loop 153)
+- Drag-to-build highlight (loop 154)
+- Mayor decrees at milestones (loop 156)
+- Building radius preview circle (loop 157)
+- M hotkey for minimap (loop 158)
+- Building count chronicle milestones (loop 159)
+- Speed indicator overlay (loop 161)
+- Pause overlay (loop 162)
+- B hotkey to cycle builds (loop 175)
+- C hotkey for chronicle (loop 164)
+- Ghost preview cost display (loop 169)
+- Heartbeat SFX when starving (loop 173)
+- Sunrise chime audio (loop 177)
+- Forest rustle ambient on cursor (loop 180)
+- Minimap flash during raids (loop 182)
+- Water ambient SFX on cursor (loop 183)
+- Seasonal proverbs in chronicle (loop 184)
+- Distant thunder SFX in rain (loop 194)
+- Victory fanfare audio (loop 198)
+- 100-building chronicle milestone (loop 199)
+- Tab key cycles panels (loop 192)
+- Multiple building-type chronicle entries (loops 187-197)
 
 ## Rules
 - Divergent thinker gets sparse context (NOT the full project history). Just: screenshots + "things tried" + "propose 3 non-incremental ideas"
@@ -400,3 +468,55 @@
 ### Loop 99 — vertical golden sun pillar rising from sun position at sunrise/sunset.
 
 ### Loop 100 — royal procession (king with crown + 4 retinue + sparkles) walks across the map periodically.
+
+### Loop 101 — chronicle of the realm (story diary with tag system, HUD button, save/load, CSS).
+
+### Loop 102 — highlight all valid placement tiles when building selected (green pulsing tint).
+
+### Loop 103 — per-building placement sounds: each building type has unique SFX (axe, bell, coins, horn, fanfare).
+
+### Loop 104 — named mayor, bard, rival lord + milestone story beats (first house, farm, pop thresholds, castle).
+
+### Loop 105 — idle citizen '?' indicators (floating gold bubble after 3s idle).
+
+### Loop 106 — camera pans to attacked building during raids.
+
+### Loop 107 — citizen voice barks (procedural sine warbles: happy, sad, work, hungry).
+
+### Loop 108 — resource shortage warnings (flashing red HUD when critically low).
+
+### Loop 109 — hotkey hints (kbd element) in building tooltips.
+
+### Loop 110 — Ctrl+Z undo last build with full refund (10-item stack).
+
+### Loop 111 — narrative events: stranger trade, bard song, rival demand + chronicle integration.
+
+### Loop 112 — building count badges in build bar.
+
+### Loop 113 — lore tooltips (flavor quotes) on all building types.
+
+### Loop 114 — church bell toll at dawn (rich 3-partial bell + second hit).
+
+### Loop 115 — extended tutorial with house build step and hotkey tips.
+
+### Loop 116 — seasonal music scales (pentatonic spring, mixolydian summer, minor autumn/winter).
+
+### Loop 117 — combat clang SFX on projectile hits.
+
+### Loop 118 — season change chronicle entries with descriptive prose.
+
+### Loop 119 — build queue system: queue up to 5 buildings, auto-placed when affordable.
+
+### Loops 122-125 — build progress animation, tile tooltip, raid chronicle, production efficiency bars.
+
+### Loops 126-130 — biome-aware audio data, population milestones, build ripples, water splash, HP warnings.
+
+### Loops 131-140 — victory cinematic, citizen nameplates, dawn glow, advisor tips, worker dots, R hotkey, carry icons, boundary, town hum.
+
+### Loops 141-150 — weather SFX, starvation vignette, fire crackle, anniversary beats, night danger, happiness emoji, L hotkey, rival messages, crosshair cursor.
+
+### Loops 151-160 — bard songs, mayor decrees, radius preview, drag trail, building milestones, M hotkey, seasonal audio stubs.
+
+### Loops 161-180 — speed/pause overlay, plague/drought/fire/earthquake chronicles, heartbeat SFX, sunrise chime, forest rustle, ghost cost display, C/B hotkeys.
+
+### Loops 181-200 — minimap flash, water ambient, seasonal proverbs, school/trading/granary/blacksmith/windmill/archery chronicles, distant thunder, victory fanfare, Tab panel cycle, 100-building milestone.
