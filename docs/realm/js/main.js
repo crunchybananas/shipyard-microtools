@@ -258,6 +258,13 @@ function updateTime() {
       const seasonNum = Math.floor((G.day - 1) / 7) + 1;
       notify(`${s.name} begins! (Season ${seasonNum})`, 'event');
       playSound('mission');
+      const seasonTexts = {
+        spring: 'The snows melt. Green shoots push through the thawing earth.',
+        summer: 'Long days and warm winds. The fields grow golden.',
+        autumn: 'Leaves turn amber and crimson. The harvest is upon us.',
+        winter: 'Frost grips the land. Fires burn low in every hearth.',
+      };
+      chronicle(seasonTexts[G.season] || `${s.name} begins.`, 'season');
       // Season banner particles
       const seasonEmojis = { spring:['🌱','🌸','🌿'], summer:['☀️','🌻','🌊'], autumn:['🍂','🍁','🌾'], winter:['❄️','⛄','🌨️'] };
       const emojis = seasonEmojis[G.season] || ['✨'];
