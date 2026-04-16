@@ -161,7 +161,10 @@ export function renderBuildBar() {
       // Keyboard shortcut number (1-based index in BUILDINGS declaration order)
       const shortcutNum = allKeys.indexOf(key) + 1;
       const shortcutBadge = shortcutNum <= 9 ? `<span class="build-btn-shortcut">${shortcutNum}</span>` : '';
-      btn.innerHTML = `${shortcutBadge}<span class="icon">${def.icon}</span><span>${def.name}</span><span class="cost">${costStr}</span>${terrainTag}`;
+      // Count of existing buildings of this type
+      const count = G.buildings.filter(b => b.type === key).length;
+      const countBadge = count > 0 ? `<span class="build-count">${count}</span>` : '';
+      btn.innerHTML = `${shortcutBadge}<span class="icon">${def.icon}</span><span>${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
       btn.onclick = () => {
         G.selectedBuild = G.selectedBuild === key ? null : key;
         G.selectedBuilding = null;
