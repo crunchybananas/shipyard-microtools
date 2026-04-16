@@ -10,9 +10,9 @@ export const SCENARIOS = [
     name: '🌾 Peaceful Valley',
     desc: 'A quiet island. Build your first settlement.',
     objectives: [
-      { text: 'Reach 10 population', check: () => G.population >= 10 },
+      { text: 'Reach 10 population', check: () => G.population >= 10, progress: () => [G.population, 10] },
       { text: 'Research stonework, then build a Church', check: () => G.buildings.some(b => b.type === 'church') },
-      { text: 'Reach 80% happiness', check: () => G.happiness >= 80 },
+      { text: 'Reach 80% happiness', check: () => G.happiness >= 80, progress: () => [Math.floor(G.happiness), 80] },
     ],
     startResources: { wood: 100, stone: 50, food: 100, gold: 30, iron: 0 },
     raidStart: 30,
@@ -23,8 +23,8 @@ export const SCENARIOS = [
     name: '⚔️ Rise of the Sword',
     desc: 'Hostile neighbors approach. Build an army.',
     objectives: [
-      { text: 'Train 10 soldiers', check: () => G.soldiers && G.soldiers.length >= 10 },
-      { text: 'Survive 5 raids', check: () => G.stats?.raidsSurvived >= 5 },
+      { text: 'Train 10 soldiers', check: () => G.soldiers && G.soldiers.length >= 10, progress: () => [(G.soldiers||[]).length, 10] },
+      { text: 'Survive 5 raids', check: () => G.stats?.raidsSurvived >= 5, progress: () => [G.stats?.raidsSurvived || 0, 5] },
       { text: 'Build a Castle', check: () => G.buildings.some(b => b.type === 'castle') },
     ],
     startResources: { wood: 60, stone: 80, food: 80, gold: 50, iron: 20 },

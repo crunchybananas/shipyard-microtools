@@ -75,7 +75,17 @@ export function renderMissions() {
       if (!done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
       else if (!done) cls += ' mission-later';
       row.className = cls;
-      row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}`;
+      // Show progress like "3/10" when the objective has a numeric target and isn't done yet
+      let progressText = '';
+      if (!done && typeof obj.progress === 'function') {
+        try {
+          const [cur, target] = obj.progress();
+          if (typeof cur === 'number' && typeof target === 'number') {
+            progressText = ` <span class="mission-progress">(${cur}/${target})</span>`;
+          }
+        } catch (_e) { /* progress is optional; ignore errors */ }
+      }
+      row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}${progressText}`;
       list.appendChild(row);
     }
   }
