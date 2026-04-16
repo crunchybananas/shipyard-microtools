@@ -200,7 +200,9 @@ export function renderBuildBar() {
       // Count of existing buildings of this type
       const count = G.buildings.filter(b => b.type === key).length;
       const countBadge = count > 0 ? `<span class="build-count">${count}</span>` : '';
-      btn.innerHTML = `${shortcutBadge}<span class="icon">${def.icon}</span><span>${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
+      // Lock badge on unaffordable buildings — secondary signal for colorblind players
+      const lockBadge = !affordable ? `<span class="build-lock" aria-label="Cannot afford">🔒</span>` : '';
+      btn.innerHTML = `${shortcutBadge}${lockBadge}<span class="icon">${def.icon}</span><span>${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
       btn.onclick = () => {
         G.selectedBuild = G.selectedBuild === key ? null : key;
         G.selectedBuilding = null;
