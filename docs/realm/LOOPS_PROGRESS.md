@@ -47,4 +47,29 @@ Special events: smoking volcano, victory confetti, castle aura + midday sparkles
 | 119 | Build queue system | UX |
 | 120 | Progress snapshot | Meta |
 
-**Breakdown**: UX: 9, Story: 5, Audio: 5, Meta: 1
+## Loops 121-140 Snapshot
+
+| Loop | Feature | Category |
+|------|---------|----------|
+| 121 | Citizen death/birth chronicle entries | Story |
+| 122 | Build progress animation | UX |
+| 123 | Tile type tooltip on hover | UX |
+| 124 | Raid chronicle entries | Story |
+| 125 | Production efficiency bars under buildings | UX |
+| 126 | Biome-aware audio data (hoveredBiome) | Audio |
+| 127 | Population milestone celebration particles | UX |
+| 128 | Build placement ripple effect | UX |
+| 129 | Water footstep splash sounds | Audio |
+| 130 | Building HP warning (red tint) | UX |
+| 131 | Victory cinematic golden overlay | Story |
+| 132 | Selected citizen nameplate | UX |
+| 133 | Dawn/dusk glow overlay | UX |
+| 134 | Advisor popup tips | UX |
+| 135 | Worker assignment dots on buildings | UX |
+| 136 | R hotkey for research panel | UX |
+| 137 | Building upgrade particles (stub) | UX |
+| 138 | Carried resource icons above citizens | UX |
+| 139 | Map edge boundary indicators | UX |
+| 140 | Town hum ambient audio layer | Audio |
+
+**Running totals (101-140)**: UX: 22, Story: 9, Audio: 8, Meta: 1
