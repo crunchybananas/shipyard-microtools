@@ -1116,15 +1116,26 @@ export function render() {
         ctx.globalAlpha = daylight;
       }
 
-      // Carrying indicator (small colored dot on back, opposite from facing direction)
+      // Carrying indicator — tiny pack peeking over the shoulder blade, on the
+      // side opposite from facing. The old r=3 dot at chest-height read as a
+      // debug pip stamped on the body; shrinking + lifting it to the shoulder
+      // edge and adding a thin strap makes it scan as a bindle being carried.
       if (c.carrying) {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
+        const px = s.x - faceX * 5;
+        const py = cy - 14;
+        ctx.strokeStyle = 'rgba(20,10,0,0.55)';
+        ctx.lineWidth = 0.7;
+        // Strap from shoulder down across body
+        ctx.beginPath();
+        ctx.moveTo(px + faceX * 1.5, py + 1);
+        ctx.lineTo(s.x + faceX * 1.5, cy - 5);
+        ctx.stroke();
+        // Pack body
         ctx.fillStyle = cc;
         ctx.beginPath();
-        ctx.arc(s.x - faceX * 3.5, cy - 10, 3, 0, Math.PI * 2);
+        ctx.arc(px, py, 1.9, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-        ctx.lineWidth = 0.7;
         ctx.stroke();
       }
     } // end zoom >= 0.7
