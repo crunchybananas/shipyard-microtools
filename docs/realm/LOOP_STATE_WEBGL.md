@@ -115,7 +115,18 @@ Every building renders a **6-unit tall hot-pink pillar** as a debug marker. Must
 - Spawned VALIDATOR subagent for baseline critique
 
 ### Validator Baseline Critique (Cycle 0)
-*(See validator output below — populated after subagent returns)*
+
+**2D wins clearly. 3D problems ranked by impact:**
+
+1. **Trees/sprites completely missing (highest impact)** — 2D has charming conifer sprites, settler characters, visible buildings. In 3D all sprites vanish. Map looks empty and dead. The 3D tree geometry exists (trunk+pyramid canopy) but renders too small to see at 80×80 zoom (~3–5px).
+2. **Terrain reads as undifferentiated noise** — Every tile renders as two triangles forming diamond/pyramid faces. Dense uniform zigzag texture; cannot distinguish grass from forest from beach. Caused by per-tile color noise (±15%) + isometric tile boundaries creating visible zigzag lines.
+3. **Interior water nearly invisible** — In 2D, inland water is a striking blue landmark. In 3D, shrinks to tiny jagged blue patch.
+4. **Ocean water looks wrong** — Flat solid baby-blue fill with subtle repeating triangle texture. Reads as plastic tray. The triangle pattern comes from per-vertex color noise on water tiles creating slight color differences between adjacent tiles.
+5. **Island has ragged staircase edges** — Blocky isometric extrusion creates harsh stair-step perimeter instead of smooth soft outline.
+6. **Color palette goes muddy** — 3D shading darkens everything; grass→dark olive, sand→dark khaki, contrast between zones collapses.
+
+**Validator's top recommendation:** Render the 2D sprite layer on top of 3D terrain. (Multi-cycle effort.)  
+**Most actionable quick win per validator:** Fix #4 (water) and #6 (lighting/color) for immediate visual improvement.
 
 ---
 
