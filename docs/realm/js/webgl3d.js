@@ -87,8 +87,8 @@ uniform vec3 uLightDir;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.20;
-  vec3 diffuse = vColor * NdotL * 0.8;
+  vec3 ambient = vColor * 0.15;
+  vec3 diffuse = vColor * NdotL * 1.1;
   fragColor = vec4(ambient + diffuse, 1.0);
 }`;
 
@@ -125,8 +125,8 @@ uniform vec3 uLightDir;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.20;
-  vec3 diffuse = vColor * NdotL * 0.8;
+  vec3 ambient = vColor * 0.15;
+  vec3 diffuse = vColor * NdotL * 1.1;
   gl_FragColor = vec4(ambient + diffuse, 1.0);
 }`;
 
@@ -542,11 +542,12 @@ export function buildTerrainMesh() {
       const noise1 = ((seed & 0xff) / 255 - 0.5); // -0.5..0.5
       const noise2 = (((seed >>> 8) & 0xff) / 255 - 0.5);
 
-      // Height variation within a tile type: ±0.12 units
-      const h = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12);
+      // Small height variation: ±0.06 units — enough for slope normals within a biome
+      // without creating ledges large enough to read as a noisy triangle grid
+      const h = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.06);
 
-      // Color variation: ±15% tint per tile to break up flat areas (skip for water — noise creates triangle-grid artifact)
-      const cv = (tileType === TILE.WATER) ? 0 : noise2 * 0.15;
+      // No per-tile color variation — solid biome colors let slope normals read cleanly
+      const cv = 0;
       const color = [
         Math.max(0, Math.min(1, baseColor[0] * (1 + cv))),
         Math.max(0, Math.min(1, baseColor[1] * (1 + cv))),
@@ -560,10 +561,15 @@ export function buildTerrainMesh() {
       const y  = h;    // top face at height h
       const yb = -0.5;  // bottom goes below sea so no gaps
 
-      // Top face: per-vertex normals from height-field gradient for elevation relief
-      pushFaceNormals(verts, indices,
+      // Top face: single per-tile slope normal (avoids intra-tile triangle artifact from per-vertex normal interpolation)
+      const dx3 = (tileH(row, col + 1) - tileH(row, col - 1)) * 0.4;
+      const dz3 = (tileH(row + 1, col) - tileH(row - 1, col)) * 0.4;
+      const tnx = -dx3, tny = 1.0, tnz = -dz3;
+      const tlen = Math.sqrt(tnx * tnx + tny * tny + tnz * tnz);
+      const tileNormal = [tnx / tlen, tny / tlen, tnz / tlen];
+      pushFace(verts, indices,
         [ [x0,y,z0], [x1,y,z0], [x1,y,z1], [x0,y,z1] ],
-        [ vertNormal(row, col), vertNormal(row, col+1), vertNormal(row+1, col+1), vertNormal(row+1, col) ],
+        tileNormal,
         color
       );
 
@@ -697,7 +703,7 @@ export function buildBuildingsMesh() {
 // ── Camera / VP matrix ─────────────────────────────────────
 function buildViewProjection() {
   const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.3;
-  const orthoSize = 18 / zoom;
+  const orthoSize = 26 / zoom;
 
   const aspect = (gl.drawingBufferWidth || 800) / (gl.drawingBufferHeight || 600);
   const hw = orthoSize * aspect;
