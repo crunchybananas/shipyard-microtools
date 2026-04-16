@@ -1748,10 +1748,13 @@ export function render() {
     const darkness = (1 - daylight);
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    // Blue-tinted dark multiply overlay
-    const tintR = Math.round(255 - darkness * 180);
-    const tintG = Math.round(255 - darkness * 170);
-    const tintB = Math.round(255 - darkness * 110);
+    // Blue-tinted dark multiply overlay. Cap darkness at 0.7 so night
+    // stays playable — was going nearly black at daylight=0, making
+    // citizens and buildings impossible to see.
+    const cappedDarkness = Math.min(darkness, 0.7);
+    const tintR = Math.round(255 - cappedDarkness * 160);
+    const tintG = Math.round(255 - cappedDarkness * 150);
+    const tintB = Math.round(255 - cappedDarkness * 100);
     ctx.fillStyle = `rgb(${tintR},${tintG},${tintB})`;
     ctx.fillRect(-5000, -5000, 10000, 10000);
     ctx.restore();
