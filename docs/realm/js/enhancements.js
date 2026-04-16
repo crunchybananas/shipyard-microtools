@@ -4159,6 +4159,18 @@ registerWorldRenderer(renderProcession);
 // can see who has no work and find them easily.
 function renderIdleIndicators(ctx) {
   if (G.camera.zoom < 0.7) return;
+  // Only surface the yellow "?" when there's actually a job the citizen
+  // could be taking. On Day 1 (3 villagers, 0 buildings) every citizen is
+  // idle by definition, so this used to paint "?" over every sprite and
+  // fresh-eyes readers interpret the whole group as "broken / missing
+  // state". Mirror the understaffed-job check used by the building status
+  // bubbles so the "?" becomes a meaningful "would-work-if-you-built-it"
+  // cue after the settlement has a workplace with an open slot.
+  const hasOpenJob = G.buildings.some(b =>
+    (b.workersNeeded || 0) > (b.workers ? b.workers.length : 0)
+    && b.type !== 'house' && b.type !== 'wall' && b.type !== 'road' && b.type !== 'tower' && b.type !== 'well'
+  );
+  if (!hasOpenJob) return;
   const tt = G.gameTick * 0.08;
   for (const c of G.citizens) {
     if (c.state !== 'idle') { c._idleAge = 0; continue; }
