@@ -615,9 +615,12 @@ export function buildTerrainMesh() {
         }
       }
 
-      // Collect forest tile positions — trees are drawn in a separate pass after terrain
+      // ~40% of FOREST tiles get a tree — lets forest floor show through
       if (tileType === TILE.FOREST) {
-        treeTiles.push([col + 0.5, row + 0.5, h]);
+        const treeSeed = (col * 4517 + row * 2971) >>> 0;
+        if ((treeSeed % 10) < 4) {
+          treeTiles.push([col + 0.5, row + 0.5, h]);
+        }
       }
     }
   }
