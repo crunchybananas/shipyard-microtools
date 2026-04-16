@@ -4229,18 +4229,47 @@ registerUpdater(renderBuildProgress);
 function renderTileTooltip(ctx, logicalW, logicalH) {
   if (!G.hoveredTile || G.selectedBuild) return;
   const names = ['Water','Sand','Grass','Forest','Stone','Iron Ore','Mountain'];
+  // Per-terrain hint about what builds there
+  const hints = [
+    'Boats only — no building',            // Water
+    'Good for Fisherman\'s Huts',         // Sand
+    'Most buildings go here',              // Grass
+    'Good for Lumber Mills',               // Forest
+    'Good for Quarries',                   // Stone
+    'Good for Iron Mines',                 // Iron Ore
+    'Impassable terrain',                  // Mountain
+  ];
   const tile = G.map[G.hoveredTile.y]?.[G.hoveredTile.x];
   if (tile === undefined) return;
   const label = names[tile] || '?';
+  const hint = hints[tile] || '';
+  // Position near cursor (use mouse pos if available)
+  const mx = (G.mouseX || logicalW / 2) + 14;
+  const my = (G.mouseY || logicalH / 2) + 14;
   ctx.save();
-  ctx.font = '11px sans-serif';
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  const tw = ctx.measureText(label).width + 10;
-  const mx = logicalW - tw - 10;
-  ctx.fillRect(mx, logicalH - 28, tw, 20);
-  ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(label, mx + 5, logicalH - 18);
+  ctx.font = 'bold 12px sans-serif';
+  const labelW = ctx.measureText(label).width;
+  ctx.font = '10px sans-serif';
+  const hintW = ctx.measureText(hint).width;
+  const boxW = Math.max(labelW, hintW) + 14;
+  const boxH = hint ? 34 : 20;
+  // Keep tooltip on-screen
+  const x = Math.min(mx, logicalW - boxW - 8);
+  const y = Math.min(my, logicalH - boxH - 8);
+  ctx.fillStyle = 'rgba(15,17,35,0.92)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.fillRect(x, y, boxW, boxH);
+  ctx.strokeRect(x, y, boxW, boxH);
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#f5c94a';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillText(label, x + 7, y + 4);
+  if (hint) {
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.font = '10px sans-serif';
+    ctx.fillText(hint, x + 7, y + 20);
+  }
   ctx.restore();
 }
 registerScreenRenderer(renderTileTooltip);

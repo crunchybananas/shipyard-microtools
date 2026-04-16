@@ -195,6 +195,7 @@ export function setupInput(canvas) {
       G.camera.y = G.camStart.y - (e.clientY - G.dragStart.y) / G.camera.zoom;
     }
     G.hoveredTile = screenToWorld(e.clientX, e.clientY);
+    G.mouseX = e.clientX; G.mouseY = e.clientY;
   });
 
   C.addEventListener('mouseup', () => { G.dragging = false; });
