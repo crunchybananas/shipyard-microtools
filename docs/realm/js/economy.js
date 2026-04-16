@@ -47,6 +47,10 @@ export function placeBuilding(type, tx, ty) {
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
   if (G.stats) G.stats.buildingsBuilt++;
+  // Record for undo
+  G._undoStack = G._undoStack || [];
+  G._undoStack.push(b);
+  if (G._undoStack.length > 10) G._undoStack.shift();
   playBuildingSound(type);
   spawnDust(tx, ty);
   notifyBuild(type);
@@ -68,6 +72,22 @@ export function demolishBuilding(b, byEnemy = false) {
   for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
   if (byEnemy && G.stats) G.stats.buildingsLost++;
   playSound('demolish');
+}
+
+export function undoLastBuild() {
+  if (!G._undoStack || G._undoStack.length === 0) return false;
+  const b = G._undoStack.pop();
+  if (!G.buildings.includes(b)) return false;
+  const def = BUILDINGS[b.type];
+  G.buildings = G.buildings.filter(x => x !== b);
+  G.buildingGrid[b.y][b.x] = null;
+  if (def.pop) G.maxPop -= def.pop;
+  if (def.defense) G.defense -= def.defense;
+  // Full refund on undo
+  for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + v;
+  for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
+  playSound('click');
+  return true;
 }
 
 export function trySpawnSettlers(count) {

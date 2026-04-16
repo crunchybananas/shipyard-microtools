@@ -4,7 +4,7 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
 import { screenToWorld, toScreen, toggleFPS } from './render.js';
-import { placeBuilding, demolishBuilding } from './economy.js';
+import { placeBuilding, demolishBuilding, undoLastBuild } from './economy.js';
 import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js';
 import { renderMissions } from './missions.js';
@@ -255,6 +255,11 @@ export function setupInput(canvas) {
   // Keyboard
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { G.selectedBuild = null; G.selectedBuilding = null; hideInfoPanel(); renderBuildBar(); }
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      if (undoLastBuild()) { renderBuildBar(); updateUI(); }
+      return;
+    }
     if (e.key === 'Home' || e.key === 'h') {
       // Recenter camera on island center
       const cx = MAP_W / 2, cy = MAP_H / 2;
