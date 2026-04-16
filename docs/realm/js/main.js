@@ -363,13 +363,15 @@ function simTick() {
     }
   }
   if (G.gameTick % 3600 === 0 && G.gameTick > 0) saveGame({ silent: true });
-  // Bird spawning — screen-space birds fly across sky during daytime
+  // Bird spawning — screen-space birds fly across sky during daytime.
+  // Spawn fully offscreen-left so they don't appear inside the vignette void;
+  // let them fly across the visible map and exit right.
   if (!G.birds) G.birds = [];
   if (G.gameTick % 400 === 0 && G.birds.length < 3 && getDaylight() > 0.6) {
     G.birds.push({
-      x: -50 + Math.random() * 200,
-      y: 50 + Math.random() * 100,
-      vx: 0.5 + Math.random() * 0.5,
+      x: -80 - Math.random() * 60,
+      y: 80 + Math.random() * 120,
+      vx: 0.8 + Math.random() * 0.5,
       vy: 0,
     });
   }

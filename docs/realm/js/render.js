@@ -1805,6 +1805,9 @@ export function render() {
       const b = G.birds[i];
       b.x += b.vx;
       if (b.x > logicalW + 50) { G.birds.splice(i, 1); continue; }
+      // Skip rendering while still inside the vignette's opaque zone (left ~12% of screen)
+      // so birds don't appear to "float in void" at the map edge.
+      if (b.x < logicalW * 0.12) continue;
       // V-shape bird silhouette with flapping wings
       const wing = Math.sin(G.gameTick * 0.3 + b.x * 0.01) * 3;
       ctx.beginPath();
