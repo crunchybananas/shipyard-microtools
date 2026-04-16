@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 64 (regular)
-- **What**: HUD pop-display reads "👤 3/3" on Day 1 — fresh-eyes validator parsed this as "at cap, can't grow," and it clashed with the scenario mission "Reach 10 population (3/10)" — two denominators for the same number. Added a live-updated `title` tooltip in `updateUI` that explains the denominator ("N settlers · M housing slots (room for X more)") and, at cap, prompts the next step ("build a House (+4) to grow"). The static `title="Click to view citizens"` on the index.html span is overwritten each updateUI tick. ui.js only.
-- **Verified**: Chrome ?_cb=76 — pop-display at Day 1 (3/3): title = "3 settlers filling all 3 housing slots — build a House (+4) to grow. Click to view citizens." Simulated at-cap (7/7): tooltip updates correctly. Simulated non-cap (3/7): "3 settlers · 7 housing slots (room for 4 more). Click to view citizens." No console errors.
-- **Validator notes (cycle 64, deferred)**: Speaker (🔊) and music (🎵) icons in top-right show conflicting mute states with no tooltip/label — player can't tell SFX from music. Build-card cost shorthand "15W 5S" uses letters while HUD uses icons; tooltip reveals icons but shorthand is never defined anywhere. Both deferred.
+- **Number**: 65 (regular)
+- **What**: Fisherman's Hut build-card icon was 🎣 (fishing rod + dangling fish). At the ~40px render size on the dark card background, the rod silhouette + perpendicular fish really did read as a vacuum cleaner — a cycle 62 validator flagged this and I mistakenly rejected it as hallucination after only verifying the emoji codepoint in DOM (not its rendered appearance). Cycle 65 validator raised the same issue; this time I zoomed in on the screenshot and confirmed the misread. Changed state.js line 61 icon from 🎣 → 🐟, matching the animal-producer pattern that the neighboring cards already use (chickencoop=🐔, cowpen=🐄). Fisherman's Hut now silhouettes cleanly as a fish, instantly readable. state.js only.
+- **Verified**: Chrome ?_cb=78 — DOM shows `<span class="icon">🐟</span>`, zoomed screenshot shows a clean blue fish on the card. No console errors. Process lesson: when a validator claims a rendered-icon issue, zoom on the actual pixels — not just the Unicode codepoint.
+- **Validator notes (cycle 65, deferred)**: none new — reusing cycle 64 deferred list (speaker/music mute ambiguity, build-card cost letter shorthand).
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -156,6 +156,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 62: Build-bar hotkey badges + handler used BUILDINGS declaration order — Fisherman's Hut (idx 21) and Granary (idx 14) had no "4"/"5" badge and pressing 4/5 selected locked `quarry`/`mine`. Tracked a visible-order array in ui.js; badges now read 1-5 for the 5 visible Day 1 buttons, and a capture-phase keydown handler uses the same list (preempting input.js) so 4→fisherman and 5→granary as shown.
 - Cycle 63: `renderIdleIndicators` drew "?" over every citizen idle >3s — on Day 1 (0 buildings, nothing to do), all three starting villagers sprouted "?" and read as broken state. Gated the renderer behind an "open job exists" predicate (non-housing/wall/road/tower/well building with a worker slot short), so "?" becomes a meaningful "this citizen could work here" cue instead of Day 1 noise.
 - Cycle 64: HUD "👤 3/3" read as "at cap" to fresh eyes and clashed with the scenario mission "Reach 10 population (3/10)". Added live `title` on pop-display that spells out the denominator ("N settlers · M housing slots (room for X more)") and, at cap, prompts "build a House (+4) to grow". Static HTML title retained no information about what the "/" means; tooltip now teaches it.
+- Cycle 65: Fisherman's Hut icon 🎣 (fishing rod + dangling fish) silhouetted as a vacuum cleaner at card scale on dark bg — cycle 62 validator called this out and I wrongly rejected it as a hallucination. Cycle 65 validator repeated the call; this time I zoomed on the actual pixels and confirmed the misread. Swapped to 🐟, matching chickencoop 🐔 / cowpen 🐄 animal-producer pattern. Lesson: verify rendered pixels, not just Unicode codepoints.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:

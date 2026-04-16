@@ -58,7 +58,7 @@ export const BUILDINGS = {
   bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, boost:{type:'food',radius:3,multiplier:1.3,target:'farm'}, happiness:5, desc:'Produces bread from nearby farms. Small happiness boost.' },
   chickencoop: { name:'Chicken Coop', icon:'🐔', cost:{wood:15}, prod:{food:1}, workers:1, desc:'Small chicken coop producing eggs and meat' },
   cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
-  fisherman: { name:"Fisherman's Hut", icon:'🎣', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
+  fisherman: { name:"Fisherman's Hut", icon:'🐟', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
   blacksmith: { name:'Blacksmith', icon:'🔨', cost:{wood:20,stone:15}, workers:1, desc:'Forges weapons. Boosts soldier damage by 50%.', boost:{type:'soldier',radius:8,multiplier:1.5} },
   archery:   { name:'Archery Range', icon:'🏹', cost:{wood:30,stone:10}, workers:1, defense:5, desc:'Trains archer units. Archers have longer range but less HP.' },
 };
