@@ -11,7 +11,7 @@ export const SCENARIOS = [
     desc: 'A quiet island. Build your first settlement.',
     objectives: [
       { text: 'Reach 10 population', check: () => G.population >= 10 },
-      { text: 'Build a Church', check: () => G.buildings.some(b => b.type === 'church') },
+      { text: 'Research stonework, then build a Church', check: () => G.buildings.some(b => b.type === 'church') },
       { text: 'Reach 80% happiness', check: () => G.happiness >= 80 },
     ],
     startResources: { wood: 100, stone: 50, food: 100, gold: 30, iron: 0 },
