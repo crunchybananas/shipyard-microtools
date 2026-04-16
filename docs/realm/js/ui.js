@@ -64,6 +64,22 @@ export function updateUI() {
   const goldRes = gEl.closest('.res');
   if (goldRes) goldRes.style.display = (G.resources.gold > 0 || (G.resourceRates.gold || 0) !== 0) ? '' : 'none';
 
+  // Dynamic tooltips: show context, not just "what is this resource"
+  const foodResEl = fEl.closest('.res');
+  if (foodResEl) {
+    const daysLeft = G.population > 0 ? Math.floor(G.resources.food / G.population) : 999;
+    foodResEl.title = `Food: ${Math.floor(G.resources.food)} — feeds ${G.population} settlers for ~${daysLeft} days`;
+  }
+  const woodResEl = wEl.closest('.res');
+  if (woodResEl) {
+    const houses = Math.floor(G.resources.wood / 15);
+    woodResEl.title = `Wood: ${Math.floor(G.resources.wood)} — enough for ~${houses} house${houses!==1?'s':''} (15W each)`;
+  }
+  const stoneResEl = sEl.closest('.res');
+  if (stoneResEl) {
+    stoneResEl.title = `Stone: ${Math.floor(G.resources.stone)} — unlocks defensive buildings (wall, tower, quarry)`;
+  }
+
   // Warn thresholds: food warns when below 2x daily consumption or negative rate
   const foodWarnThreshold = Math.max(20, G.population * 2);
   warn(wEl, G.resources.wood, 5);
