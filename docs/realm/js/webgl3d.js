@@ -87,7 +87,7 @@ uniform vec3 uLightDir;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.35;
+  vec3 ambient = vColor * 0.20;
   vec3 diffuse = vColor * NdotL * 0.8;
   fragColor = vec4(ambient + diffuse, 1.0);
 }`;
@@ -125,7 +125,7 @@ uniform vec3 uLightDir;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.35;
+  vec3 ambient = vColor * 0.20;
   vec3 diffuse = vColor * NdotL * 0.8;
   gl_FragColor = vec4(ambient + diffuse, 1.0);
 }`;
@@ -515,8 +515,8 @@ export function buildTerrainMesh() {
       // Height variation within a tile type: ±0.08 units
       const h = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12);
 
-      // Color variation: ±8% tint per tile to break up flat areas
-      const cv = noise2 * 0.15;
+      // Color variation: ±15% tint per tile to break up flat areas (skip for water — noise creates triangle-grid artifact)
+      const cv = (tileType === TILE.WATER) ? 0 : noise2 * 0.15;
       const color = [
         Math.max(0, Math.min(1, baseColor[0] * (1 + cv))),
         Math.max(0, Math.min(1, baseColor[1] * (1 + cv))),
@@ -649,10 +649,6 @@ export function buildBuildingsMesh() {
     const seed = (col * 374761 + row * 668265) >>> 0;
     const noise1 = ((seed & 0xff) / 255 - 0.5);
     const groundY = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12) + 0.02;
-
-    // DEBUG: Bright marker - bigger than building, hot pink, high
-    const cx = b.x + 0.5, cz = b.y + 0.5;
-    pushBox(verts, indices, cx-0.5, groundY, cz-0.5, cx+0.5, groundY+6.0, cz+0.5, [1.0, 0.0, 1.0]);
 
     addBuildingMesh(verts, indices, b, groundY);
   }
