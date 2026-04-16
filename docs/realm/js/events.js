@@ -257,10 +257,25 @@ export const EVENT_DEFS = [
     color: '#a855f7',
     positive: false,
     onStart() {
-      const losses = Math.min(2, G.citizens.length);
+      // Deep-play (cycle 71) caught: old code always took 2 (contradicting the
+      // "−1–2" description) AND deaths were silent — population quietly dropped
+      // 2 while G.stats.citizensDied stayed at 0 and the chronicle never named
+      // the fallen. Cycle 49 fixed the same class of bug for combat deaths;
+      // this brings plague to parity.
+      const intent = 1 + Math.floor(Math.random() * 2); // 1 or 2
+      const losses = Math.min(intent, G.citizens.length);
       for (let i = 0; i < losses; i++) {
         const c = G.citizens.pop();
-        if (c && c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+        if (!c) continue;
+        if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+        if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -20,
+          text: `🪦 ${c.name || 'Settler'}`,
+          alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
+          color: '#a855f7',
+        });
+        try { chronicle(`${c.name || 'A settler'} succumbed to the plague. The healer could do nothing.`, 'death'); } catch(_e){}
       }
       G.population = Math.max(0, G.population - losses);
       G.eventModifiers.speedMult = 0.7;
