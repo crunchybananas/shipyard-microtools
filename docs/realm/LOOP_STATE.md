@@ -48,17 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 51 (first deep-play cycle)
-- **What**: User asked for meaningful gameplay to surface quirks. Added Deep-Play Cycles rule (every 5th cycle: place buildings, fast-forward several days, play into combat). Ran cycle 51 as first deep-play: placed Farm + Lumber Mill via canvas clicks, pressed ▶▶▶, played 11 in-game days. Observations:
-  - Cycle 50 grass-tuft fix VERY visible — central plains now read as clean grass, not noise
-  - Spring→Autumn transition at Day 17 is dramatic + pretty (warm tile tints, brown water edges)
-  - Worker auto-assignment works for Farm (1/1) but Lumber Mill placed after building showed 0/1 briefly — may just be a tick of delay, bears watching
-  - Hot air balloon ambient visitor looks good
-  - Wood rate jumps from +18 to +38/day after mill — producing correctly
-  - 7 citizens cluster near farm when assigned — reasonable, not broken
-  - No console errors through 20+ seconds of fast-forward
-- **Commit**: (this cycle is process-only — the grass-tuft code change was cycle 50's 057cc9e)
-- **Verified**: Deep-play through Day 17. No console errors. All systems exercised.
+- **Number**: 52
+- **What**: Validator flagged minimap as "lost in oversized empty panel — reads as a UI bug". Root cause: render.js:4916 drew unexplored (fog) tiles as #070810, which is almost identical to the #08090f background fill. On Day 1 with fog covering 99% of the map, the island was invisible. Changed unexplored branch to render tile's actual MINI_COLOR at globalAlpha 0.28 — full island silhouette now visible from turn 1, explored area still clearly brighter.
+- **Commit**: ba61953
+- **Verified**: Chrome-reloaded with ?_cb=53, zoom of minimap region shows full island shape at low alpha + brighter explored center disc. No console errors.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -150,6 +143,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 49: Citizens killed by enemies now actually die — pop decrements, citizensDied stat fires, death particle/chronicle (cycle 46 had damage but no death handler)
 - Cycle 50 (milestone): Halved grass tuft density (55%→27%, dense variant 31%→14%) — central plains were reading as noisy clutter per fresh-eyes validator
 - Cycle 51 (first deep-play): Added Deep-Play rule (every 5th cycle plays through multiple days). First run: confirmed cycle 50 grass-tuft fix visibly works, observed Spring→Autumn transition, logged 2 new deep-play observations to backlog (worker assignment delay, citizen transit visibility). No code change — process cycle.
+- Cycle 52: Minimap unexplored tiles rendered as #070810 ≈ background, making island invisible on Day 1. Now render at globalAlpha 0.28 with actual tile color — full silhouette always visible.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
