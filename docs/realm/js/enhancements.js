@@ -2131,6 +2131,7 @@ registerWorldRenderer(renderCitizenTrails);
 
 // ── Loop 43: Swallows dart in spring sky ───────────────────
 function updateSwallows(logicalW, logicalH) {
+  return; // disabled — renders V-strokes in random screen positions, drifts into vignette void
   if (G.season !== 'spring') { if (G.swallows) G.swallows.length = 0; return; }
   if (!G.swallows) G.swallows = [];
   if (G.gameTick % 200 === 0 && G.swallows.length < 5 && getDaylight() > 0.6) {
