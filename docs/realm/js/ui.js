@@ -876,6 +876,12 @@ function renderPopPanel() {
   hdr.innerHTML = `<span>Name</span><span>Job</span><span>State</span><span>Hunger</span><span></span>`;
   el.appendChild(hdr);
 
+  // Compute understaffed buildings up-front so rows can conditionally hide the assign dropdown
+  const hasUnderstaffed = G.buildings.some(b => {
+    const def = BUILDINGS[b.type];
+    return def && def.workers && b.workers.length < def.workers;
+  });
+
   let lastGroup = -1;
   for (const { c, i } of sorted) {
     const group = getGroup(c);
@@ -907,7 +913,7 @@ function renderPopPanel() {
         <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
       </span>
       <button class="pop-unassign" title="Unassign from job" data-idx="${i}">✕</button>
-      ${!c.jobBuilding ? `<select class="pop-assign" data-idx="${i}"><option value="">Assign to...</option></select>` : ''}`;
+      ${!c.jobBuilding && hasUnderstaffed ? `<select class="pop-assign" data-idx="${i}"><option value="">Assign to...</option></select>` : ''}`;
     el.appendChild(div);
   }
 
