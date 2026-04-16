@@ -147,6 +147,10 @@ export function updateUI() {
   $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · ${season.name} ${weatherEmoji}· <span title="Settler happiness — affects tax income and population growth">${happyEmoji} ${happyPct}%</span>${raidWarn} ${diffLabel}`;
   const kd = $('kingdom-display');
   if (kd) kd.textContent = G.kingdomName ? `👑 ${G.kingdomName}` : '';
+
+  // Refresh build bar periodically so affordability reflects current resources
+  // (without this, cost colors only update on click/keypress)
+  if (G.gameTick % 30 === 0) renderBuildBar();
 }
 
 const CATEGORIES = [
@@ -181,7 +185,12 @@ export function renderBuildBar() {
       const affordable = canAfford(key);
       const btn = document.createElement('button');
       btn.className = 'build-btn' + (G.selectedBuild === key ? ' active' : '') + (!affordable ? ' disabled' : '');
-      const costStr = Object.entries(def.cost).map(([k,v]) => `${v}${k[0].toUpperCase()}`).join(' ');
+      // Highlight individual resource costs the player can't afford — direct "why can't I build this" feedback
+      const costStr = Object.entries(def.cost).map(([k,v]) => {
+        const have = G.resources[k] || 0;
+        const short = have < v;
+        return `<span class="${short ? 'cost-short' : ''}">${v}${k[0].toUpperCase()}</span>`;
+      }).join(' ');
       // Show terrain requirement if applicable
       const terrainReq = def.on ? def.on.map(t => terrainNames[t] || '?').join('/') : null;
       const terrainTag = terrainReq ? `<span class="cost terrain">⬡ ${terrainReq}</span>` : '';
