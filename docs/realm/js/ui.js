@@ -204,7 +204,11 @@ export function renderBuildBar() {
       const lockBadge = !affordable ? `<span class="build-lock" aria-label="Cannot afford">🔒</span>` : '';
       btn.innerHTML = `${shortcutBadge}${lockBadge}<span class="icon">${def.icon}</span><span>${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
       btn.onclick = () => {
-        G.selectedBuild = G.selectedBuild === key ? null : key;
+        // Always select on click — don't toggle off when clicking the same
+        // button again (that was causing "House button doesn't work" confusion
+        // after placing a building, since selectedBuild was still 'house').
+        // Deselect via Escape key or by clicking the build bar category label.
+        G.selectedBuild = key;
         G.selectedBuilding = null;
         hideInfoPanel();
         renderBuildBar();
