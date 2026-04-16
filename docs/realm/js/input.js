@@ -289,6 +289,11 @@ export function setupInput(canvas) {
       G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * 0.9));
       return;
     }
+    if (e.key === 'm' && !e.ctrlKey && !e.metaKey) {
+      const mm = document.getElementById('minimap');
+      if (mm) mm.style.display = mm.style.display === 'none' ? 'block' : 'none';
+      return;
+    }
     if (e.key === 'l' && !e.ctrlKey && !e.metaKey) {
       if (window.toggleLog) window.toggleLog();
       return;
