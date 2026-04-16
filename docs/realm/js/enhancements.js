@@ -5326,3 +5326,25 @@ registerUpdater(update100Buildings);
 // ── Loop 200: Final polish — ambient volume master control ──
 // Wire mute button to master gain including all ambient layers.
 // The existing toggleAmbient() already handles this. Final stub.
+
+// ── Map vignette mask — hides void clutter and softens hard tile edge ──
+// Renders a radial gradient that fades the outer screen to the body
+// background color (#0a0e1a), masking the black void beyond the isometric
+// map edge and any screen-space particles (clouds, scissors) that stray
+// into that region.  Registered as a SCREEN renderer so it sits above
+// world renderers but below HUD elements.
+function renderMapVignette(ctx, w, h) {
+  const cx = w * 0.45;              // slightly left of center — map is offset
+  const cy = h * 0.5;
+  const innerR = Math.min(w, h) * 0.35;   // full-brightness zone
+  const outerR = Math.max(w, h) * 0.75;   // fully opaque at this radius
+  const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
+  grad.addColorStop(0,   'rgba(10,14,26,0)');
+  grad.addColorStop(0.7, 'rgba(10,14,26,0.5)');
+  grad.addColorStop(1,   'rgba(10,14,26,1)');
+  ctx.save();
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+}
+registerScreenRenderer(renderMapVignette);
