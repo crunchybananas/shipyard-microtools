@@ -4,7 +4,8 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
 import { screenToWorld, toScreen, toggleFPS } from './render.js';
-import { placeBuilding, demolishBuilding, undoLastBuild } from './economy.js';
+import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js';
+import { notify } from './notifications.js';
 import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js';
 import { renderMissions } from './missions.js';
@@ -98,6 +99,31 @@ function tryPlaceAt(tx, ty) {
     renderMissions();
     updateUI();
     return true;
+  }
+  // Placement failed — surface the reason (throttled so we don't spam)
+  const now = Date.now();
+  if (!G._lastPlaceFailMsg || now - G._lastPlaceFailMsg > 1500) {
+    G._lastPlaceFailMsg = now;
+    const type = G.selectedBuild;
+    const def = BUILDINGS[type];
+    let reason = 'Cannot build here.';
+    if (!def) reason = 'Unknown building type.';
+    else if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) reason = 'Out of map bounds.';
+    else if (!G.fog[ty][tx]) reason = 'Tile not yet explored.';
+    else if (G.map[ty][tx] === 0) reason = 'Cannot build on water.';
+    else if (G.map[ty][tx] === 6) reason = 'Cannot build on mountain.';
+    else if (G.buildingGrid[ty]?.[tx]) reason = 'Tile already occupied.';
+    else if (def.on && !def.on.includes(G.map[ty][tx])) {
+      const terrain = ['water','sand','grass','forest','stone','road','mountain'];
+      const need = def.on.map(t => terrain[t]).join(' or ');
+      reason = `${def.name} must be built on ${need}.`;
+    }
+    else if (type === 'fisherman') reason = 'Fisherman\'s Hut must be adjacent to water.';
+    else if (!canAfford(type)) {
+      const short = Object.entries(def.cost).filter(([k,v]) => (G.resources[k]||0) < v).map(([k]) => k);
+      reason = `Not enough ${short.join(', ')}.`;
+    }
+    notify(`⚠️ ${reason}`, 'danger');
   }
   return false;
 }

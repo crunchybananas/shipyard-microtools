@@ -44,6 +44,24 @@ export function updateEnemies() {
         }
       }
     }
+    // Enemies harm nearby citizens — citizens flee and can die if caught
+    for (const c of G.citizens) {
+      const dx = c.x - e.x, dy = c.y - e.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 2.5) continue;
+      // Citizen takes 0.3 dmg/frame when within 2.5 tiles of an enemy
+      c.hp = (c.hp !== undefined ? c.hp : 100) - 0.3 * G.speed;
+      // Flee behavior: set target away from enemy toward map center
+      if (!c._fleeing || G.gameTick % 20 === 0) {
+        c._fleeing = true;
+        const flx = Math.max(1, Math.min(MAP_W-2, c.x + (dx / (d||1)) * 5));
+        const fly = Math.max(1, Math.min(MAP_H-2, c.y + (dy / (d||1)) * 5));
+        c.tx = flx; c.ty = fly;
+        c.state = 'idle';
+        c.path = null;
+      }
+    }
+
     // Die if hp drops to 0
     if (e.hp <= 0) {
       G.enemies.splice(i, 1);
