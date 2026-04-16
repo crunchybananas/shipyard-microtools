@@ -5,7 +5,7 @@
 import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js';
 import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
-import { playSound } from './audio.js';
+import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
 import { notify, notifyBuild } from './notifications.js';
 
@@ -46,7 +46,7 @@ export function placeBuilding(type, tx, ty) {
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
   if (G.stats) G.stats.buildingsBuilt++;
-  playSound('build');
+  playBuildingSound(type);
   spawnDust(tx, ty);
   notifyBuild(type);
   // Victory check
@@ -66,7 +66,7 @@ export function demolishBuilding(b, byEnemy = false) {
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + Math.floor(v/2);
   for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
   if (byEnemy && G.stats) G.stats.buildingsLost++;
-  playSound('build');
+  playSound('demolish');
 }
 
 export function trySpawnSettlers(count) {

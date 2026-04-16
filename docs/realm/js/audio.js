@@ -53,6 +53,85 @@ function makeNoiseBurst(ctx, dest, gainPeak, durationSec, startTime, filterFreq)
   return src;
 }
 
+// ── Diegetic SFX for specific buildings ──────────────────
+// Each building type gets a small sonic signature on placement.
+export function playBuildingSound(buildingType) {
+  if (!G.audioCtx) return;
+  const ctx = G.audioCtx;
+  const t = ctx.currentTime;
+  const dest = ctx.destination;
+  switch (buildingType) {
+    case 'farm':
+    case 'chickencoop':
+    case 'cowpen':
+      // Rustling leaves + gentle chime
+      makeNoiseBurst(ctx, dest, 0.08, 0.2, t, 2500);
+      makeOsc(ctx, dest, 'sine', 660, 0.06, 0.005, 0.22, t + 0.05);
+      break;
+    case 'lumber':
+      // Axe chop
+      makeNoiseBurst(ctx, dest, 0.14, 0.1, t, 1500);
+      makeOsc(ctx, dest, 'triangle', 220, 0.18, 0.003, 0.15, t);
+      break;
+    case 'quarry':
+    case 'mine':
+      // Chisel on stone
+      makeNoiseBurst(ctx, dest, 0.16, 0.08, t, 3500);
+      makeOsc(ctx, dest, 'square', 180, 0.1, 0.002, 0.1, t + 0.02);
+      break;
+    case 'blacksmith':
+      // Anvil clang
+      makeOsc(ctx, dest, 'square', 880, 0.14, 0.002, 0.25, t);
+      makeOsc(ctx, dest, 'triangle', 1320, 0.08, 0.002, 0.2, t);
+      break;
+    case 'tavern':
+      // Cheer (two up-notes)
+      makeOsc(ctx, dest, 'triangle', 523, 0.1, 0.005, 0.18, t);
+      makeOsc(ctx, dest, 'triangle', 784, 0.1, 0.005, 0.2, t + 0.12);
+      break;
+    case 'church':
+      // Bell
+      makeOsc(ctx, dest, 'sine', 440, 0.18, 0.003, 0.9, t);
+      makeOsc(ctx, dest, 'sine', 880, 0.1, 0.003, 0.7, t);
+      makeOsc(ctx, dest, 'sine', 1320, 0.05, 0.003, 0.6, t);
+      break;
+    case 'market':
+      // Coin jingle
+      makeOsc(ctx, dest, 'triangle', 1760, 0.08, 0.003, 0.12, t);
+      makeOsc(ctx, dest, 'triangle', 2349, 0.06, 0.003, 0.15, t + 0.07);
+      makeOsc(ctx, dest, 'triangle', 1976, 0.05, 0.003, 0.12, t + 0.14);
+      break;
+    case 'barracks':
+    case 'tower':
+    case 'archery':
+      // Horn
+      makeOsc(ctx, dest, 'sawtooth', 220, 0.15, 0.02, 0.35, t);
+      makeOsc(ctx, dest, 'sawtooth', 165, 0.1, 0.02, 0.35, t);
+      break;
+    case 'well':
+      // Water drop + splash
+      makeOsc(ctx, dest, 'sine', 1200, 0.08, 0.002, 0.06, t);
+      makeNoiseBurst(ctx, dest, 0.05, 0.18, t + 0.05, 1200);
+      break;
+    case 'windmill':
+      // Whoosh
+      makeNoiseBurst(ctx, dest, 0.12, 0.5, t, 800);
+      break;
+    case 'castle':
+      // Triumphant fanfare
+      makeOsc(ctx, dest, 'sawtooth', 392, 0.14, 0.02, 0.28, t);
+      makeOsc(ctx, dest, 'sawtooth', 523, 0.14, 0.02, 0.28, t + 0.18);
+      makeOsc(ctx, dest, 'sawtooth', 659, 0.16, 0.02, 0.5, t + 0.36);
+      makeOsc(ctx, dest, 'sawtooth', 784, 0.14, 0.02, 0.7, t + 0.54);
+      break;
+    default:
+      playSound('build');
+      return;
+  }
+  // Always add the base thunk for tactile body
+  playSound('build');
+}
+
 export function playSound(type) {
   if (!G.audioCtx) return;
   const ctx = G.audioCtx;
