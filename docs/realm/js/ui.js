@@ -997,14 +997,22 @@ export function renderStatsPanel() {
   const c = document.getElementById('stats-content');
   if (!c) return;
   const s = G.stats || {};
+  // Days Lived should reflect the current in-game day, not a separately tracked counter that starts at 0
+  const daysLived = Math.max(s.daysLived || 0, G.day || 1);
+  const pop = G.population || 0;
+  const buildingsStanding = G.buildings?.length || 0;
   c.innerHTML = `
+    <div class="stat-group-label">Current</div>
+    <div class="stat-row"><span>Day</span><span>${daysLived}</span></div>
+    <div class="stat-row"><span>Population</span><span>${pop}</span></div>
+    <div class="stat-row"><span>Buildings Standing</span><span>${buildingsStanding}</span></div>
+    <div class="stat-group-label">Totals</div>
     <div class="stat-row"><span>Buildings Built</span><span>${s.buildingsBuilt || 0}</span></div>
     <div class="stat-row"><span>Buildings Lost</span><span>${s.buildingsLost || 0}</span></div>
     <div class="stat-row"><span>Citizens Born</span><span>${s.citizensBorn || 0}</span></div>
     <div class="stat-row"><span>Raids Survived</span><span>${s.raidsSurvived || 0}</span></div>
     <div class="stat-row"><span>Enemies Defeated</span><span>${s.enemiesKilled || 0}</span></div>
-    <div class="stat-row"><span>Days Lived</span><span>${s.daysLived || 0}</span></div>
-    <div class="stat-row"><span>Gold Earned</span><span>${s.goldEarned || 0}🪙</span></div>
+    <div class="stat-row"><span>Gold Earned</span><span>${s.goldEarned || 0} <span class="gold-coin" aria-hidden="true">◉</span></span></div>
   `;
 }
 
