@@ -4529,6 +4529,7 @@ registerWorldRenderer(renderCarryIcons);
 
 // ── Loop 139: Map edge boundary indicator ───────────────────
 function renderMapBoundary(ctx) {
+  return; // disabled: dots appeared as void artifacts outside the visible map area
   if (G.camera.zoom < 0.5) return;
   // Draw subtle red dashes at map edge tiles when camera is near edge
   const edgeAlpha = 0.3;

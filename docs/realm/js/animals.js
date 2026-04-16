@@ -100,6 +100,9 @@ export function updateAnimals() {
         a.x += (dx / d) * Math.min(spd, d);
         a.y += (dy / d) * Math.min(spd, d);
       }
+      // Clamp position so animals never render in the void outside the map
+      a.x = Math.max(1, Math.min(MAP_W - 2, a.x));
+      a.y = Math.max(1, Math.min(MAP_H - 2, a.y));
     }
   }
 }
