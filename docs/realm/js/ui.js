@@ -132,7 +132,16 @@ export function updateUI() {
     enemyEl.textContent = enemies;
   }
   const season = getSeasonData();
-  const diffLabel = DIFFICULTY[G.difficulty]?.label?.split(' ')[0] || '';
+  // DIFFICULTY labels are "🟢 Easy" / "🟡 Normal" / "🔴 Hard" — only the colored
+  // dot is shown in the HUD to save space. Wrap it in a title tooltip so a
+  // fresh player hovering the orphan dot sees what it actually means; without
+  // this it reads as a stray icon dangling after the happiness percent.
+  const diffDef = DIFFICULTY[G.difficulty];
+  const diffDot = diffDef?.label?.split(' ')[0] || '';
+  const diffName = diffDef?.label?.split(' ').slice(1).join(' ') || '';
+  const diffLabel = diffDot
+    ? `<span title="Difficulty: ${diffName}" aria-label="Difficulty: ${diffName}">${diffDot}</span>`
+    : '';
   const raidDays = getRaidCountdown();
   let raidWarn = '';
   if (raidDays) {

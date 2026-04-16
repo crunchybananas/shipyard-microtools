@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 58 (regular)
-- **What**: Pause overlay looked broken. Validator reported "PAUSED text is clipped by a villager sprite" — actually a transparency problem, not z-order: backdrop at 25% alpha + white text at 50% alpha let citizen sprites bleed *through* the letters. Fix in enhancements.js renderPauseOverlay: backdrop 0.25→0.42, white fill 0.5→0.95, added 5px dark stroke (lineJoin:round) so PAUSED is readable over any terrain/sprite. Single file.
-- **Verified**: Chrome ?_cb=64 — paused state, zoom confirms "⏸ PAUSED" crisp white with solid dark outline; villager to the right of the word no longer appears "in front of" the E. Scene darkens noticeably, pause reads as decisive. No console errors.
-- **Validator notes (cycle 58, deferred)**: Minimap viewport indicator rendered as a degenerate thin cyan line (zero height) — worth a later cycle. HUD category labels (HOUSING/PRODUCTION/INFRASTRUCTURE) still rotated low-contrast. Top-bar first icon (◆◆) reads as "??" placeholder to fresh eyes.
+- **Number**: 59 (regular)
+- **What**: The difficulty indicator in the top HUD rendered as a bare colored dot with no label — `DIFFICULTY[id].label.split(' ')[0]` intentionally kept only the emoji to save horizontal space, but the dot then dangled after the happiness percent with zero context (fresh-eyes validator called it a "stray yellow circle"). Wrapped the dot in a `<span title="Difficulty: Normal" aria-label="Difficulty: Normal">` so hover reveals meaning and screen readers announce it. Compact HUD footprint unchanged. ui.js only.
+- **Verified**: Chrome ?_cb=66 — day-display innerHTML now includes `<span title="Difficulty: Normal" aria-label="Difficulty: Normal">🟡</span>`. No console errors.
+- **Validator notes (cycle 59, deferred)**: Fisherman's Hut 🎣 and Granary 🏺 emojis render ambiguously on macOS (read as "vacuum cleaner" and "ASSIST-branded amphora" to fresh eyes) — platform-specific Apple emoji rendering, changing icons is low-value. Mission progress counters use three different accent colors (purple 0/3, bright gold 3/10, dim gold 50/80) but the hierarchy is intentional (overall/active/locked).
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -150,6 +150,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 56 (deep-play): CRITICAL — simTick's `% N === 0` checks silently miss when speed doesn't divide N (e.g., speed=4 + odd gameTick → updateUI, checkMissions, tickMusic ALL stop firing; HUD freezes mid-game). Replaced all 5 occurrences with a `crossed(N)` helper that fires on crossing a multiple of N, robust to any speed ≥ 1.
 - Cycle 57: Tutorial highlight bug — `.build-btn` selector always resolved to HOUSE (first build button), so "Click Farm" / "Click Lumber Mill" / "Click House" steps all pulsed the same wrong card. Changed highlight selectors to `[data-build-key="<type>"]` for each step. Farm now glows when the tutorial says to select Farm.
 - Cycle 58: Pause overlay transparency — backdrop 0.25α + text 0.5α let citizen sprites bleed through the letters so "PAUSED" looked clipped by villagers. Bumped backdrop to 0.42, text to 0.95, added dark stroke. Scene darkens when paused; text is readable over any background.
+- Cycle 59: HUD difficulty dot was a bare emoji (🟡) with no label — read as a stray artifact after the happiness percent. Wrapped in a `<span>` with `title`/`aria-label` ("Difficulty: Normal"), keeping the compact single-glyph HUD but revealing meaning on hover + for screen readers.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
