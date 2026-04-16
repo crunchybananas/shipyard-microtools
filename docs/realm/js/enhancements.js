@@ -4202,3 +4202,72 @@ function updateResourceWarnings() {
   }
 }
 registerUpdater(updateResourceWarnings);
+
+// ── Loop 122: Build progress animation ─────────────────────
+// Buildings "grow" visually during their first few seconds.
+function renderBuildProgress(ctx) {
+  if (G.camera.zoom < 0.5) return;
+  for (const b of G.buildings) {
+    if (b.buildProgress === undefined) b.buildProgress = 0;
+    if (b.buildProgress < 1) {
+      b.buildProgress = Math.min(1, b.buildProgress + 0.015 * G.speed);
+    }
+  }
+}
+registerUpdater(renderBuildProgress);
+
+// ── Loop 123: Hover tooltip showing tile type ──────────────
+function renderTileTooltip(ctx, logicalW, logicalH) {
+  if (!G.hoveredTile || G.selectedBuild) return;
+  const names = ['Water','Sand','Grass','Forest','Stone','Iron Ore','Mountain'];
+  const tile = G.map[G.hoveredTile.y]?.[G.hoveredTile.x];
+  if (tile === undefined) return;
+  const label = names[tile] || '?';
+  ctx.save();
+  ctx.font = '11px sans-serif';
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  const tw = ctx.measureText(label).width + 10;
+  const mx = logicalW - tw - 10;
+  ctx.fillRect(mx, logicalH - 28, tw, 20);
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, mx + 5, logicalH - 18);
+  ctx.restore();
+}
+registerScreenRenderer(renderTileTooltip);
+
+// ── Loop 124: Raid chronicle entry ─────────────────────────
+// (Handled in economy.js already, but adding raid survival chronicle)
+import { chronicle as _chronicle124 } from './story.js';
+let _lastRaidDay = 0;
+function updateRaidChronicle() {
+  if (!G.stats) return;
+  if (G.enemies.length > 0 && _lastRaidDay !== G.day) {
+    _lastRaidDay = G.day;
+  }
+  if (G.enemies.length === 0 && _lastRaidDay > 0 && G.stats.raidsSurvived > 0) {
+    if (_lastRaidDay === G.day - 1 || _lastRaidDay === G.day) {
+      try { _chronicle124(`Raid on day ${_lastRaidDay} repelled. ${G.stats.enemiesKilled} foes slain in total.`, 'raid'); } catch(_e){}
+    }
+    _lastRaidDay = 0;
+  }
+}
+registerUpdater(updateRaidChronicle);
+
+// ── Loop 125: Production building efficiency indicator ──────
+// Shows a small fill bar under production buildings.
+function renderEfficiencyBars(ctx) {
+  if (G.camera.zoom < 0.8) return;
+  for (const b of G.buildings) {
+    if (!b.prodTimer) continue;
+    const s = toScreen(b.x, b.y);
+    const pct = Math.min(1, (b.prodTimer || 0) / 120);
+    if (pct <= 0) continue;
+    const w = 18, h = 2;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(s.x - w/2, s.y + 5, w, h);
+    ctx.fillStyle = '#4ade80';
+    ctx.fillRect(s.x - w/2, s.y + 5, w * pct, h);
+  }
+}
+registerWorldRenderer(renderEfficiencyBars);
