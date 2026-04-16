@@ -15,7 +15,7 @@ import { setupInput } from './input.js';
 import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel } from './ui.js';
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
-import { saveGame, getSaveSize } from './save.js';
+import { saveGame, loadGame, getSaveSize } from './save.js';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound, tickMusic, toggleMusic } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
 import { executeTrade } from './trade.js';
