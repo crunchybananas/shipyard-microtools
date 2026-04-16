@@ -173,7 +173,7 @@ window.dismissTutorial = dismissTutorial;
 window.hideInfoPanel = hideInfoPanel;
 window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
-  if (!confirm('Start a new game? Current unsaved progress will be lost.')) return;
+  // No confirm dialog — it blocks browser automation and interrupts flow
   // Reset all state
   G.buildings = []; G.citizens = []; G.caravans = []; G.walkers = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = []; G.animals = [];
   G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };

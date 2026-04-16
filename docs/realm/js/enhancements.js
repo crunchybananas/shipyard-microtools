@@ -2535,6 +2535,7 @@ registerWorldRenderer(renderLaundry);
 
 // ── Loop 55: Day-1 sunrise burst on screen ─────────────────
 function renderSunriseBurst(ctx, logicalW, logicalH) {
+  return; // disabled — too visually dominant, obscures gameplay
   if (G.day !== 1) return;
   const t = G.dayPhase / G.dayLength;
   if (t > 0.18) return;
