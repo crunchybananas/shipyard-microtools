@@ -47,7 +47,7 @@ const TILE_HEIGHT = {
 const TILE_COLOR_3D = {
   [TILE.WATER]:    [0.10, 0.40, 0.75],
   [TILE.SAND]:     [0.91, 0.78, 0.49],
-  [TILE.GRASS]:    [0.30, 0.66, 0.33],
+  [TILE.GRASS]:    [0.40, 0.78, 0.42],
   [TILE.FOREST]:   [0.18, 0.48, 0.21],
   [TILE.STONE]:    [0.60, 0.58, 0.56],
   [TILE.IRON]:     [0.35, 0.52, 0.72],
@@ -89,7 +89,7 @@ uniform vec3 uLightDir;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.15;
+  vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   fragColor = vec4(ambient + diffuse, 1.0);
 }`;
@@ -127,7 +127,7 @@ uniform vec3 uLightDir;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.15;
+  vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   gl_FragColor = vec4(ambient + diffuse, 1.0);
 }`;
