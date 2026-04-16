@@ -423,29 +423,34 @@ export function render() {
       // Grass tufts and tiny flowers on grass tiles
       if (tile === TILE.GRASS && G.season !== 'winter') {
         const gh = ((x * 271 + y * 619) & 0xff);
-        const sway = Math.sin(G.gameTick * 0.02 + x * 0.5 + y * 0.3) * 1.5;
+        // Tufts are STATIC. The prior per-frame `Math.sin(G.gameTick * 0.02)`
+        // sway made every tuft on every grass tile wobble in a different
+        // phase — combined effect was a constant low-amplitude shimmer across
+        // the whole map that user-reported as "tiles pulsing" and made the
+        // tiny 3-blade tuft shapes impossible to identify as grass. Fixed
+        // positions let the eye lock onto them as static texture.
         ctx.globalAlpha = daylight * 0.7;
         // Reduced from gh<140 (~55%) to gh<70 (~27%) — was too busy, read as noise/artifacts
         if (gh < 70) {
           ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
-          const gx = s.x - 8 + (gh % 16) + sway, gy = s.y - 4 + ((gh >> 4) % 6);
+          const gx = s.x - 8 + (gh % 16), gy = s.y - 4 + ((gh >> 4) % 6);
           ctx.beginPath();
-          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1 + sway * 0.5, gy - 4); ctx.lineTo(gx + 1.5, gy - 3);
+          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1, gy - 4); ctx.lineTo(gx + 1.5, gy - 3);
           ctx.fill();
           ctx.beginPath();
-          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3 + sway * 0.5, gy - 5); ctx.lineTo(gx + 5, gy - 1.5);
+          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3, gy - 5); ctx.lineTo(gx + 5, gy - 1.5);
           ctx.fill();
           // Third blade for denser tufts — also halved from gh<80 to gh<35
           if (gh < 35) {
             ctx.beginPath();
-            ctx.moveTo(gx + 5, gy); ctx.lineTo(gx + 6 + sway * 0.3, gy - 4); ctx.lineTo(gx + 7.5, gy - 2);
+            ctx.moveTo(gx + 5, gy); ctx.lineTo(gx + 6, gy - 4); ctx.lineTo(gx + 7.5, gy - 2);
             ctx.fill();
           }
         }
         if (G.season === 'spring' && gh > 192) {
           ctx.fillStyle = ['#f0a0c0','#ffe066','#a0c0f0'][gh % 3];
           ctx.globalAlpha = daylight * 0.8;
-          const fx = s.x - 6 + (gh % 12) + sway * 0.5, fy = s.y - 2 + ((gh >> 3) % 5);
+          const fx = s.x - 6 + (gh % 12), fy = s.y - 2 + ((gh >> 3) % 5);
           ctx.beginPath();
           ctx.arc(fx, fy, 1.8, 0, Math.PI * 2);
           ctx.fill();
