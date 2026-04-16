@@ -413,7 +413,8 @@ export function render() {
         const lh = ((x*17 + y*31) & 0xff);
         if (lh < 40) {
           ctx.fillStyle = ['#c06020','#d4a030','#a05020'][lh % 3];
-          ctx.globalAlpha = daylight * 0.5;
+          // User feedback: "less transparencies" — bump 0.5→0.85 so autumn leaves read as distinct specks
+          ctx.globalAlpha = daylight * 0.85;
           ctx.fillRect(s.x - 4 + (lh%8), s.y - 2 + ((lh>>3)%5), 2, 1.5);
           ctx.globalAlpha = daylight;
         }
@@ -429,7 +430,8 @@ export function render() {
         // the whole map that user-reported as "tiles pulsing" and made the
         // tiny 3-blade tuft shapes impossible to identify as grass. Fixed
         // positions let the eye lock onto them as static texture.
-        ctx.globalAlpha = daylight * 0.7;
+        // User feedback: "less transparencies" — bump 0.7→1.0 so tufts read as clear grass blades, not ghosts
+        ctx.globalAlpha = daylight;
         // Reduced from gh<140 (~55%) to gh<70 (~27%) — was too busy, read as noise/artifacts
         if (gh < 70) {
           ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
@@ -449,7 +451,8 @@ export function render() {
         }
         if (G.season === 'spring' && gh > 192) {
           ctx.fillStyle = ['#f0a0c0','#ffe066','#a0c0f0'][gh % 3];
-          ctx.globalAlpha = daylight * 0.8;
+          // User feedback: "less transparencies" — bump 0.8→1.0 for crisp spring flower dots
+          ctx.globalAlpha = daylight;
           const fx = s.x - 6 + (gh % 12), fy = s.y - 2 + ((gh >> 3) % 5);
           ctx.beginPath();
           ctx.arc(fx, fy, 1.8, 0, Math.PI * 2);
@@ -481,7 +484,8 @@ export function render() {
         if (ch < 12) {
           const cx = s.x + (ch % 16) - 8;
           const cy = s.y + ((ch >> 3) % 8) - 4;
-          ctx.globalAlpha = daylight * 0.8;
+          // User feedback: "less transparencies" — bump 0.8→1.0 for distinct clover trefoils
+          ctx.globalAlpha = daylight;
           ctx.fillStyle = '#7ab85a';
           for (let i = 0; i < 3; i++) {
             const ang = i * Math.PI * 2 / 3;
@@ -499,7 +503,8 @@ export function render() {
       if (tile === TILE.STONE) {
         const ph = ((x * 193 + y * 457) & 0xff);
         if (ph < 90) {
-          ctx.globalAlpha = daylight * 0.45;
+          // User feedback: "less transparencies" — bump 0.45→0.85 so pebbles read as solid stones, not smudges
+          ctx.globalAlpha = daylight * 0.85;
           ctx.fillStyle = ph < 45 ? '#c0bdb8' : '#a8a5a0';
           const px1 = s.x - 10 + (ph % 20), py1 = s.y - 1 + ((ph >> 4) % 5);
           ctx.beginPath();
@@ -527,7 +532,8 @@ export function render() {
           );
           if (hasGrass) {
             const mx = s.x - 10 + (fh % 20), my = s.y - 1 + ((fh >> 4) % 5);
-            ctx.globalAlpha = daylight * 0.85;
+            // User feedback: "less transparencies" — bump 0.85→1.0 for fully-readable mushroom caps
+            ctx.globalAlpha = daylight;
             // Stem
             ctx.fillStyle = '#e8d8b0';
             ctx.fillRect(mx - 1, my - 4, 2, 4);
