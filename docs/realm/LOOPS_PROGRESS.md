@@ -72,4 +72,29 @@ Special events: smoking volcano, victory confetti, castle aura + midday sparkles
 | 139 | Map edge boundary indicators | UX |
 | 140 | Town hum ambient audio layer | Audio |
 
-**Running totals (101-140)**: UX: 22, Story: 9, Audio: 8, Meta: 1
+## Loops 141-160 Snapshot
+
+| Loop | Feature | Category |
+|------|---------|----------|
+| 141 | Rain patter weather SFX | Audio |
+| 142 | Starvation vignette (red screen edge) | UX |
+| 143 | Fire crackle SFX | Audio |
+| 144 | Year anniversary chronicle milestones | Story |
+| 145 | Night danger red border during raids | UX |
+| 146 | Happiness emoji indicator | UX |
+| 147 | L hotkey for log panel | UX |
+| 148 | Auto-save age display | UX |
+| 149 | Rival lord messenger story beats | Story |
+| 150 | Crosshair cursor when building | UX |
+| 151 | Notification sound type differentiation (stub) | Audio |
+| 152 | Seasonal tree tint (stub) | UX |
+| 153 | Bard composes songs about milestones | Story |
+| 154 | Drag-to-build highlight indicator | UX |
+| 155 | Upgrade sparkle SFX (stub) | Audio |
+| 156 | Mayor decrees at happiness/population milestones | Story |
+| 157 | Building radius preview circle | UX |
+| 158 | M hotkey for minimap toggle | UX |
+| 159 | Building count chronicle milestones | Story |
+| 160 | Night crickets volume scaling (stub) | Audio |
+
+**Running totals (101-160)**: UX: 35, Story: 14, Audio: 13, Meta: 1 (+ stubs: 4)
