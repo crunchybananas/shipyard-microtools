@@ -84,6 +84,65 @@ export function updateProjectiles() {
   }
 }
 
+// Soldiers find nearest enemy and close to attack. Each soldier has its own
+// cooldown so a group can attack together. If no enemies exist they patrol
+// around their home barracks.
+export function updateSoldiers() {
+  if (!G.soldiers || G.soldiers.length === 0) return;
+  for (const s of G.soldiers) {
+    // Find nearest enemy
+    let target = null, bestD = Infinity;
+    for (const e of G.enemies) {
+      if (e.hp <= 0) continue;
+      const d = Math.hypot(e.x - s.x, e.y - s.y);
+      if (d < bestD) { bestD = d; target = e; }
+    }
+
+    if (target) {
+      s.state = 'combat';
+      // Move toward enemy
+      const dx = target.x - s.x, dy = target.y - s.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 0.6) {
+        const spd = 0.035 * G.speed;
+        s.x += (dx / d) * Math.min(spd, d);
+        s.y += (dy / d) * Math.min(spd, d);
+      } else {
+        // In melee range — strike on cooldown
+        s.attackCd = (s.attackCd || 0) - G.speed;
+        if (s.attackCd <= 0) {
+          s.attackCd = 45; // ~0.75s between strikes
+          target.hp -= 8;
+          if (G.gameTick % 5 === 0) playSound('combat');
+          // Enemy also hits back
+          if (target.hp > 0) {
+            s.hp = (s.hp !== undefined ? s.hp : 100) - 3;
+          }
+        }
+      }
+    } else {
+      // Patrol near home barracks
+      s.state = 'patrol';
+      if (s.homeBuilding) {
+        const hx = s.homeBuilding.x, hy = s.homeBuilding.y;
+        const dx = hx - s.x, dy = hy - s.y;
+        const d = Math.hypot(dx, dy);
+        if (d > 2.5) {
+          const spd = 0.02 * G.speed;
+          s.x += (dx / d) * Math.min(spd, d);
+          s.y += (dy / d) * Math.min(spd, d);
+        }
+      }
+    }
+  }
+  // Remove fallen soldiers
+  for (let i = G.soldiers.length - 1; i >= 0; i--) {
+    if (G.soldiers[i].hp !== undefined && G.soldiers[i].hp <= 0) {
+      G.soldiers.splice(i, 1);
+    }
+  }
+}
+
 export function updateTowers() {
   // Towers fire at nearby enemies
   for (const b of G.buildings) {

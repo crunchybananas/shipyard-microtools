@@ -20,7 +20,7 @@ import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound, tickMusic, t
 import { toggleNotificationLog, notify } from './notifications.js';
 import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
+import { updateEnemies, updateProjectiles, updateTowers, updateSoldiers } from './combat.js';
 import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
 import { updateWalkers } from './walkers.js';
 import { updateAnimals } from './animals.js';
@@ -309,6 +309,7 @@ function simTick() {
     updateCitizens();
     updateSoldiers();
     updateEnemies();
+    updateSoldiers();
     updateTowers();
     updateProjectiles();
     updateWalkers();
