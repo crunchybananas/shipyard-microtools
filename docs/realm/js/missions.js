@@ -90,6 +90,23 @@ export function renderMissions() {
     }
   }
 
+  // Divider so the global "Side Goals" list is visibly separate from the
+  // scenario's tracked objectives. Without this, the 15 global missions get
+  // appended in the same list with no break and make the scenario counter
+  // ("0/3") look wrong — fresh-eyes reviewers read the full panel as one
+  // mission group and wonder why only 3 count.
+  if (scen && missions.length > 0) {
+    const divider = document.createElement('div');
+    divider.className = 'mission-side-divider';
+    divider.style.cssText = 'margin-top:0.9rem;padding:0.4rem 0 0.25rem;border-top:1px solid rgba(255,255,255,0.08);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.38);font-weight:600';
+    divider.textContent = 'Side Goals';
+    list.appendChild(divider);
+    // After the divider, don't treat the first incomplete global mission as
+    // the "next" pulsing/gold row — the scenario's active objective is the
+    // real next step; keeping them all 'mission-later' preserves hierarchy.
+    firstActiveAssigned = true;
+  }
+
   for (const m of missions) {
     const div = document.createElement('div');
     let cls = 'mission' + (m.done ? ' done' : '');

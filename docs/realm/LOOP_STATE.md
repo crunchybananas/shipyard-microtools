@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 59 (regular)
-- **What**: The difficulty indicator in the top HUD rendered as a bare colored dot with no label — `DIFFICULTY[id].label.split(' ')[0]` intentionally kept only the emoji to save horizontal space, but the dot then dangled after the happiness percent with zero context (fresh-eyes validator called it a "stray yellow circle"). Wrapped the dot in a `<span title="Difficulty: Normal" aria-label="Difficulty: Normal">` so hover reveals meaning and screen readers announce it. Compact HUD footprint unchanged. ui.js only.
-- **Verified**: Chrome ?_cb=66 — day-display innerHTML now includes `<span title="Difficulty: Normal" aria-label="Difficulty: Normal">🟡</span>`. No console errors.
-- **Validator notes (cycle 59, deferred)**: Fisherman's Hut 🎣 and Granary 🏺 emojis render ambiguously on macOS (read as "vacuum cleaner" and "ASSIST-branded amphora" to fresh eyes) — platform-specific Apple emoji rendering, changing icons is low-value. Mission progress counters use three different accent colors (purple 0/3, bright gold 3/10, dim gold 50/80) but the hierarchy is intentional (overall/active/locked).
+- **Number**: 60 (regular)
+- **What**: Missions panel conflated scenario objectives with the 15 global side-missions — the scenario header said "Peaceful Valley 0/3" but the panel listed everything in one continuous column with no visual separator, making fresh-eyes readers assume all ~18 rows should count against /3 (and conclude the tracker was broken). Added a "SIDE GOALS" divider (top-border + uppercase label, muted color) between the 3 scenario objectives and the appended global list in missions.js. Also stopped the first side-goal from stealing the "mission-next" gold-highlighted styling — the scenario's current objective is the real active step. missions.js only.
+- **Verified**: Chrome ?_cb=68 — zoom on mission panel confirms divider renders between the 3 scenario rows and the side-goal list. "Reach 10 population" (scenario) keeps its gold active highlight; "Build a farm" (first side goal) renders as mission-later. No console errors.
+- **Validator notes (cycle 60, deferred)**: Top-bar `◆◆` first icon still reads as missing-glyph "tofu" to fresh eyes. Minimap viewport indicator still a squashed thin line (pre-existing). Rotated HOUSING/PRODUCTION/INFRASTRUCTURE labels still low-contrast.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -151,6 +151,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 57: Tutorial highlight bug — `.build-btn` selector always resolved to HOUSE (first build button), so "Click Farm" / "Click Lumber Mill" / "Click House" steps all pulsed the same wrong card. Changed highlight selectors to `[data-build-key="<type>"]` for each step. Farm now glows when the tutorial says to select Farm.
 - Cycle 58: Pause overlay transparency — backdrop 0.25α + text 0.5α let citizen sprites bleed through the letters so "PAUSED" looked clipped by villagers. Bumped backdrop to 0.42, text to 0.95, added dark stroke. Scene darkens when paused; text is readable over any background.
 - Cycle 59: HUD difficulty dot was a bare emoji (🟡) with no label — read as a stray artifact after the happiness percent. Wrapped in a `<span>` with `title`/`aria-label` ("Difficulty: Normal"), keeping the compact single-glyph HUD but revealing meaning on hover + for screen readers.
+- Cycle 60: Missions panel had no divider between the 3 scenario objectives and the 15 appended global side-missions — fresh-eyes readers thought every row should count toward "0/3". Added a "SIDE GOALS" subheader divider; side goals no longer steal the scenario's active-mission gold highlight.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
