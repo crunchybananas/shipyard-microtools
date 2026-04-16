@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, resourceEmoji } from './state.js';
+import { chronicle } from './story.js';
 
 let toastTimer = null;
 let toastShakeTimer = null;
@@ -54,6 +55,14 @@ export function notify(text, type = 'info', meta = {}) {
   const entry = { text, type, day: G.day, ts: Date.now(), meta };
   G.notificationLog.push(entry);
   if (G.notificationLog.length > 50) G.notificationLog.shift();
+
+  // ── Chronicle (story log) — only notable event/danger/mission ──
+  try {
+    if (type === 'event' || type === 'danger' || type === 'mission') {
+      const tagMap = { event:'event', danger:'raid', mission:'milestone' };
+      chronicle(text, tagMap[type] || 'misc');
+    }
+  } catch (_e) {}
 
   // Update badge
   updateLogBadge();

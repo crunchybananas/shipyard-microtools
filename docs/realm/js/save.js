@@ -57,6 +57,12 @@ export function saveGame({ silent = false } = {}) {
     if (G.tileWear) {
       state.tileWear = G.tileWear.map(row => Array.from(row));
     }
+    state.chronicle = G.chronicle || [];
+    state.storyFlags = G.storyFlags || {};
+    state.namedCharacters = G.namedCharacters || {};
+    state.kingdomName = G.kingdomName;
+    state.scenario = G.scenario;
+    state.difficulty = G.difficulty;
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -142,6 +148,12 @@ export function loadGame() {
     }
 
     G.particles = [];
+    G.chronicle = Array.isArray(s.chronicle) ? s.chronicle : [];
+    G.storyFlags = s.storyFlags || {};
+    G.namedCharacters = s.namedCharacters || {};
+    if (s.kingdomName) G.kingdomName = s.kingdomName;
+    if (s.scenario) G.scenario = s.scenario;
+    if (s.difficulty) G.difficulty = s.difficulty;
     showToast('Game loaded.');
     return true;
   } catch (e) {

@@ -27,6 +27,7 @@ import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
+import { initChronicle, chronicle, toggleChroniclePanel } from './story.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -94,6 +95,10 @@ function beginGame() {
   setTimeout(() => { titleEl.style.display = 'none'; }, 500);
 
   setupInput(canvas);
+  initChronicle();
+  if (G.chronicle.length === 0) {
+    chronicle(`The realm of ${G.kingdomName} is founded. Three settlers arrive seeking a home.`, 'milestone');
+  }
   renderBuildBar();
   renderMissions();
   updateUI();
@@ -222,6 +227,7 @@ window.toggleMusicBtn = () => {
   const btn = document.getElementById('btn-music');
   if (btn) btn.textContent = on ? '🎵' : '🔕';
 };
+window.toggleChronicle = toggleChroniclePanel;
 window.toggleMissions = () => {
   const c = document.getElementById('missions-content');
   const t = document.getElementById('missions-toggle');

@@ -184,6 +184,14 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 /* Notification log */
 #log-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(430px,90vw);max-height:72vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+#chronicle-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(520px,92vw);max-height:78vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'Georgia',serif}
+#chronicle-content{padding:0.5rem 0.8rem;overflow-y:auto}
+.chron-day{margin:0.6rem 0 0.8rem;padding-bottom:0.4rem;border-bottom:1px dashed rgba(255,255,255,0.07)}
+.chron-day-h{font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.75);letter-spacing:0.05em;margin-bottom:0.35rem}
+.chron-row{display:flex;gap:0.5rem;padding:0.2rem 0.1rem;font-size:0.8rem;color:rgba(255,255,255,0.8);line-height:1.45}
+.chron-tag{flex-shrink:0;width:1.2rem;text-align:center}
+.chron-text{flex:1;font-style:italic}
+.chron-empty{padding:2rem 1rem;color:rgba(255,255,255,0.45);text-align:center;font-style:italic}
 /* Filter bar */
 .log-filter-bar{display:flex;gap:0.3rem;padding:0.55rem 0.8rem 0.45rem;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;flex-wrap:wrap}
 .log-filter-btn{padding:0.22rem 0.65rem;font-size:0.65rem;font-family:inherit;font-weight:600;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.45);border-radius:20px;cursor:pointer;transition:all 0.15s;letter-spacing:0.03em}
@@ -479,6 +487,12 @@ canvas#game{display:block;position:absolute;top:0;left:0}
   <button class="hud-btn" onclick="toggleStats()">📊</button>
   <button class="hud-btn" onclick="toggleLog()">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
   <button class="hud-btn" onclick="toggleTrade()">🛒</button>
+  <button class="hud-btn" onclick="toggleChronicle()" title="Chronicle of the Realm">📖</button>
+</div>
+
+<div id="chronicle-panel" style="display:none">
+  <div class="rp-header"><h3>📖 Chronicle of the Realm</h3><button class="rp-close" onclick="toggleChronicle()">✕</button></div>
+  <div id="chronicle-content" class="research-content"></div>
 </div>
 
 <div id="tutorial-tip" style="display:none"></div>
