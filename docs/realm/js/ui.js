@@ -242,7 +242,7 @@ export function renderResearchPanel() {
   }
 
   // ── Build a building-icon lookup from BUILDINGS ──────────
-  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'<span class="gold-coin" aria-label="gold">◉</span>', iron:'⚙️' };
 
   // ── Organise techs into tiers by prereq depth ────────────
   // tier0: no prereq
@@ -542,7 +542,7 @@ function showTooltip(anchor, key, def) {
   if (def.desc) lines.push(`<span class="tt-desc">${def.desc}</span>`);
 
   // Cost breakdown with emoji icons
-  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
+  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'<span class="gold-coin" aria-label="gold">◉</span>', iron:'⚙️' };
   const costParts = Object.entries(def.cost).map(([k,v]) => `${resEmoji[k]||k} ${v}`).join('  ');
   lines.push(`<span class="tt-row"><span class="tt-lbl">Cost</span> ${costParts}</span>`);
 
