@@ -48,10 +48,10 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 52
-- **What**: Validator flagged minimap as "lost in oversized empty panel — reads as a UI bug". Root cause: render.js:4916 drew unexplored (fog) tiles as #070810, which is almost identical to the #08090f background fill. On Day 1 with fog covering 99% of the map, the island was invisible. Changed unexplored branch to render tile's actual MINI_COLOR at globalAlpha 0.28 — full island silhouette now visible from turn 1, explored area still clearly brighter.
-- **Commit**: ba61953
-- **Verified**: Chrome-reloaded with ?_cb=53, zoom of minimap region shows full island shape at low alpha + brighter explored center disc. No console errors.
+- **Number**: 53
+- **What**: Validator: top-right HUD toolbar had stylistic inconsistency — trophy 🏆 rendered as saturated gold while siblings (🔊🎵📊📜🛒📖) read as muted gray. Trophy "shouted" ~3x the weight. Added filter:saturate(0.7) to .hud-btn, with hover restoring saturate(1). Unifies the toolbar row without removing color cues entirely. Zoom comparison confirms trophy is now comparable weight to neighbors.
+- **Commit**: 530d371
+- **Verified**: Chrome-reloaded with ?_cb=55, zoom of HUD toolbar shows all 7 icons at similar visual weight. No console errors.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -144,6 +144,7 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 50 (milestone): Halved grass tuft density (55%→27%, dense variant 31%→14%) — central plains were reading as noisy clutter per fresh-eyes validator
 - Cycle 51 (first deep-play): Added Deep-Play rule (every 5th cycle plays through multiple days). First run: confirmed cycle 50 grass-tuft fix visibly works, observed Spring→Autumn transition, logged 2 new deep-play observations to backlog (worker assignment delay, citizen transit visibility). No code change — process cycle.
 - Cycle 52: Minimap unexplored tiles rendered as #070810 ≈ background, making island invisible on Day 1. Now render at globalAlpha 0.28 with actual tile color — full silhouette always visible.
+- Cycle 53: Desaturated HUD toolbar icons (filter:saturate(0.7)) so trophy 🏆 no longer dominates siblings. Hover restores full saturation.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:
