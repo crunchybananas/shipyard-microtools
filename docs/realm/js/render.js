@@ -916,10 +916,12 @@ export function render() {
     const s = toScreen(c.x, c.y);
     ctx.globalAlpha = daylight;
 
-    // Walking bob when moving — smooth sine, reduced amplitude
+    // Walking bob when moving — smooth sine, reduced amplitude.
+    // Idle citizens still get a small breathing bob so they don't look frozen.
     const isMoving = c.path && c.pathIdx < (c.path?.length ?? 0);
-    // Compact chibi-style citizen — big head, small body, subtle animation
-    const bob = isMoving ? Math.sin(G.gameTick * 0.2 + c.x * 3) * 0.8 : 0;
+    const bob = isMoving
+      ? Math.sin(G.gameTick * 0.2 + c.x * 3) * 0.8
+      : Math.sin(G.gameTick * 0.05 + c.x * 7) * 0.35;  // slow shallow idle breathing
     const cy = s.y + bob;
 
     // Facing direction (x = left/right, z = depth/forward-back in iso)
