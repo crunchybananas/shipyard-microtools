@@ -534,10 +534,10 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 <div id="controls">
   <div id="speed">
-    <button onclick="setSpeed(0)">⏸</button>
-    <button class="active" onclick="setSpeed(1)">▶</button>
-    <button onclick="setSpeed(2)">▶▶</button>
-    <button onclick="setSpeed(4)">▶▶▶</button>
+    <button onclick="setSpeed(0)" title="Pause — tap Space to cycle speeds" aria-label="Pause">⏸</button>
+    <button class="active" onclick="setSpeed(1)" title="Normal speed (1×)" aria-label="Normal speed, 1 times">▶</button>
+    <button onclick="setSpeed(2)" title="Fast forward (2×)" aria-label="Fast forward, 2 times">▶▶</button>
+    <button onclick="setSpeed(4)" title="Very fast (4×)" aria-label="Very fast, 4 times">▶▶▶</button>
   </div>
   <div id="save-controls">
     <button id="btn-save">💾 Save</button>
