@@ -542,8 +542,8 @@ export function buildTerrainMesh() {
 
       // Only draw side faces if tile is elevated
       if (h > 0.0) {
-        // Slightly darker sides to distinguish faces under flat lighting
-        const sideColor = [color[0]*0.75, color[1]*0.75, color[2]*0.75];
+        // Side faces use same base color — shader lighting differentiates them
+        const sideColor = color;
 
         // Front face  (+Z, normal 0,0,1)
         pushFace(verts, indices,
@@ -667,7 +667,7 @@ export function buildBuildingsMesh() {
 // ── Camera / VP matrix ─────────────────────────────────────
 function buildViewProjection() {
   const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.3;
-  const orthoSize = 40 / zoom;
+  const orthoSize = 18 / zoom;
 
   const aspect = (gl.drawingBufferWidth || 800) / (gl.drawingBufferHeight || 600);
   const hw = orthoSize * aspect;
