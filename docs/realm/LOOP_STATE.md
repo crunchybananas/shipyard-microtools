@@ -48,9 +48,9 @@ VISUAL_CLEANUP
 <!-- Reset to 0 when focus area changes. At 3, rotate to next focus area. -->
 
 ## Last Cycle
-- **Number**: 54 (USER-REPORTED BUG FIX — out-of-band, jumped cycle 54 slot)
-- **What**: User: "selecting the building requires two clicks for it to become the tool." Root cause: main.js:341 called renderBuildBar() every 30 ticks alongside updateUI(). That wiped bar.innerHTML every ~500ms; when it fired between a real mousedown and click, the button element was swapped out and the click landed on nothing. Cycle 33's updateBuildBarAffordability() already handles in-place cost/lock updates inside updateUI() — the periodic full rebuild was redundant AND destructive. Removed it from main.js:341. Full rebuilds still run on every event that actually changes bar structure (placement, research unlock, Escape, undo, selection, new/load game).
-- **Verified**: Chrome ?_cb=56 — button DOM identity persists across 62 ticks (sameElement:true). Synthetic click sets selectedBuild:"house" and active:true on a single click. No console errors.
+- **Number**: 55
+- **What**: Validator spotted that top HUD day-display line had the difficulty dot (🟡 Normal / 🟢 Easy / 🔴 Hard) wrapping onto a SECOND line beneath the text — orphan emoji that read like a stray coin or debug glyph. Root cause: "Year 1, Day 1 · 🌱Spring · 😐50% 🟡" overflowed the inline span at this viewport, breaking between the `%` and the diffLabel. Fix: added `white-space:nowrap` to `#day-display` in index.html:84. Full line stays on one row; no sibling layout shift (Research button + HUD icons already had ample gap).
+- **Verified**: Chrome ?_cb=58 — zoom of top HUD shows "…😐50% 🟡" flush on one line. No console errors. No regression in HUD icons.
 
 ## 40-Cycle Milestone Summary (addendum)
 Bugs caught via Chrome verification that blind agents had shipped:
@@ -144,6 +144,8 @@ Pattern held: Chrome-verified loop + rotating validator focus (research/chronicl
 - Cycle 51 (first deep-play): Added Deep-Play rule (every 5th cycle plays through multiple days). First run: confirmed cycle 50 grass-tuft fix visibly works, observed Spring→Autumn transition, logged 2 new deep-play observations to backlog (worker assignment delay, citizen transit visibility). No code change — process cycle.
 - Cycle 52: Minimap unexplored tiles rendered as #070810 ≈ background, making island invisible on Day 1. Now render at globalAlpha 0.28 with actual tile color — full silhouette always visible.
 - Cycle 53: Desaturated HUD toolbar icons (filter:saturate(0.7)) so trophy 🏆 no longer dominates siblings. Hover restores full saturation.
+- Cycle 54: USER BUG FIXED — build-bar two-click bug. Removed renderBuildBar() from 30-tick periodic path in main.js; it was wiping bar.innerHTML every 500ms and racing real mouse clicks between mousedown and click. updateBuildBarAffordability() inside updateUI() already handles in-place cost/lock updates.
+- Cycle 55: Difficulty dot (🟡/🟢/🔴) was wrapping to an orphan second line under the day-display text. Added white-space:nowrap to #day-display in index.html — full "Year 1, Day 1 · 🌱Spring · 😐50% 🟡" now stays on one row.
 
 ## 30-Cycle Milestone Summary
 Over 30 Chrome-verified cycles the loop pattern caught and fixed:

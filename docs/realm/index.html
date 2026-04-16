@@ -81,7 +81,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .rate.neg{color:var(--danger)}
 .food-warn-emoji{filter:hue-rotate(180deg) saturate(2);animation:foodWarnEmoji 1s ease-in-out infinite}
 @keyframes foodWarnEmoji{0%,100%{filter:hue-rotate(180deg) saturate(2) brightness(1)}50%{filter:hue-rotate(180deg) saturate(3) brightness(1.4)}}
-#day-display{color:rgba(255,255,255,0.5);font-size:0.72rem}
+#day-display{color:rgba(255,255,255,0.5);font-size:0.72rem;white-space:nowrap}
 .raid-warn{color:var(--danger);font-weight:600}
 .raid-warn-urgent{color:var(--danger);font-weight:700;animation:raidPulse 0.7s ease-in-out infinite}
 @keyframes raidPulse{0%,100%{opacity:1;text-shadow:0 0 6px rgba(248,113,113,0.8)}50%{opacity:0.5;text-shadow:none}}
