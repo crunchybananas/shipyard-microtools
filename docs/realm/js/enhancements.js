@@ -4484,7 +4484,7 @@ registerUpdater(updateAdvisorTips);
 
 // ── Loop 135: Worker assignment indicator on buildings ───────
 function renderWorkerDots(ctx) {
-  if (G.camera.zoom < 0.9) return;
+  return; // disabled — BUILDINGS not imported, caused 60fps error spam and game lockup
   for (const b of G.buildings) {
     const def = BUILDINGS[b.type];
     if (!def.workers) continue;
@@ -4813,7 +4813,7 @@ registerUpdater(updateMayorDecrees);
 // When hovering a building to place that has a radius (well, tavern, etc),
 // show a translucent circle indicating the effect radius.
 function renderRadiusPreview(ctx) {
-  if (!G.selectedBuild || !G.hoveredTile) return;
+  return; // disabled — BUILDINGS not imported, caused 60fps error spam and game lockup
   const def = BUILDINGS[G.selectedBuild];
   const radius = def.radius || (def.boost && def.boost.radius);
   if (!radius) return;
@@ -4933,7 +4933,7 @@ registerUpdater(updateFireChronicle);
 
 // ── Loop 169: Show building cost in ghost preview ───────────
 function renderGhostCost(ctx) {
-  if (!G.selectedBuild || !G.hoveredTile || G.camera.zoom < 0.8) return;
+  return; // disabled — BUILDINGS not imported, caused error spam
   const def = BUILDINGS[G.selectedBuild];
   if (!def) return;
   const s = toScreen(G.hoveredTile.x, G.hoveredTile.y);
