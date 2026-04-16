@@ -4747,7 +4747,7 @@ function updateHappinessEmoji() {
   const el = document.querySelector('[onclick="toggleHappiness()"]');
   if (!el) return;
   if (G.happiness >= 80) el.textContent = '😊';
-  else if (G.happiness >= 50) el.textContent = '��';
+  else if (G.happiness >= 50) el.textContent = '🙂';
   else if (G.happiness >= 25) el.textContent = '😟';
   else el.textContent = '😢';
 }
