@@ -115,6 +115,15 @@ export function updateUI() {
   if (popEl) {
     if (G.population >= G.maxPop && G.population > 3) popEl.classList.add('pop-full');
     else popEl.classList.remove('pop-full');
+    // Explain the denominator. Fresh-eyes readers parse "3/3" as "at cap",
+    // which collides with the scenario mission "Reach 10 population (3/10)"
+    // — two denominators for the same number. Spell it out live so hover
+    // reveals that 3/3 means "3 settlers filling all 3 housing slots",
+    // and at cap the tooltip prompts the next step.
+    const atCap = G.population >= G.maxPop;
+    popEl.title = atCap
+      ? `${G.population} settlers filling all ${G.maxPop} housing slots — build a House (+4) to grow. Click to view citizens.`
+      : `${G.population} settlers · ${G.maxPop} housing slot${G.maxPop === 1 ? '' : 's'} (room for ${G.maxPop - G.population} more). Click to view citizens.`;
   }
   const maxSoldiers = G.buildings.filter(b => b.type === 'barracks').length * 4 + G.buildings.filter(b => b.type === 'archery').length * 3;
   const soldierEl = $('soldier-count');
