@@ -97,4 +97,29 @@ Special events: smoking volcano, victory confetti, castle aura + midday sparkles
 | 159 | Building count chronicle milestones | Story |
 | 160 | Night crickets volume scaling (stub) | Audio |
 
-**Running totals (101-160)**: UX: 35, Story: 14, Audio: 13, Meta: 1 (+ stubs: 4)
+## Loops 161-180 Snapshot
+
+| Loop | Feature | Category |
+|------|---------|----------|
+| 161 | Speed indicator overlay | UX |
+| 162 | Pause overlay | UX |
+| 163 | Plague chronicle entry | Story |
+| 164 | C hotkey for chronicle | UX |
+| 165 | Drought chronicle entry | Story |
+| 166 | Population-scaled town ambience volume | Audio |
+| 167 | Resource trend arrows (stub) | UX |
+| 168 | Fire chronicle entry | Story |
+| 169 | Ghost preview cost display | UX |
+| 170 | Keyboard shortcuts in help overlay (stub) | UX |
+| 171 | Wandering merchant chronicle | Story |
+| 172 | Double-click building selection (stub) | UX |
+| 173 | Heartbeat SFX when starving | Audio |
+| 174 | Earthquake chronicle entry | Story |
+| 175 | B hotkey to cycle build types | UX |
+| 176 | Victory chronicle with summary | Story |
+| 177 | Sunrise chime audio | Audio |
+| 178 | Camera shake on demolish (stub) | UX |
+| 179 | Immigration wave chronicle | Story |
+| 180 | Forest rustle ambient audio on cursor | Audio |
+
+**Running totals (101-180)**: UX: 48, Story: 21, Audio: 17, Meta: 1
