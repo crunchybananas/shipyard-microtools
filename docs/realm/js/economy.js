@@ -74,6 +74,9 @@ export function placeBuilding(type, tx, ty) {
   playBuildingSound(type);
   spawnDust(tx, ty);
   notifyBuild(type);
+  // Build ripple effect
+  if (!G._buildRipples) G._buildRipples = [];
+  G._buildRipples.push({ x: tx, y: ty, radius: 3, alpha: 0.8 });
   // Victory check
   if (type === 'castle' && !G.won) {
     G.won = true;

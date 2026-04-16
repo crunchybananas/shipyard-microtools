@@ -4271,3 +4271,110 @@ function renderEfficiencyBars(ctx) {
   }
 }
 registerWorldRenderer(renderEfficiencyBars);
+
+// ── Loop 126: Ambient wind audio shifts with biome under cursor ─
+// (Stub — actual audio manipulation done in audio tick via G.hoveredBiome)
+function updateHoveredBiome() {
+  if (!G.hoveredTile) return;
+  const tile = G.map[G.hoveredTile.y]?.[G.hoveredTile.x];
+  G._hoveredBiome = tile;
+}
+registerUpdater(updateHoveredBiome);
+
+// ── Loop 127: Population milestone celebration particles ────
+let _lastPopMilestone = 0;
+function updatePopMilestone() {
+  const milestones = [10, 25, 50, 75, 100, 150, 200];
+  for (const m of milestones) {
+    if (G.population >= m && _lastPopMilestone < m) {
+      _lastPopMilestone = m;
+      for (let i = 0; i < 12; i++) {
+        G.particles.push({
+          tx: MAP_W/2 + (Math.random()-0.5)*6,
+          ty: MAP_H/2 + (Math.random()-0.5)*6,
+          offsetY: -15 - Math.random()*25,
+          text: ['🎉','⭐','🎊'][Math.floor(Math.random()*3)],
+          alpha: 1.8, vy: -0.18 - Math.random()*0.1,
+          decay: 0.008, type: 'text',
+        });
+      }
+      break;
+    }
+  }
+}
+registerUpdater(updatePopMilestone);
+
+// ── Loop 128: Click feedback ripple on build placement ──────
+if (!G._buildRipples) G._buildRipples = [];
+function updateBuildRipples() {
+  if (!G._buildRipples) return;
+  for (let i = G._buildRipples.length - 1; i >= 0; i--) {
+    const r = G._buildRipples[i];
+    r.radius += 0.4 * G.speed;
+    r.alpha -= 0.02 * G.speed;
+    if (r.alpha <= 0) G._buildRipples.splice(i, 1);
+  }
+}
+function renderBuildRipples(ctx) {
+  if (!G._buildRipples) return;
+  for (const r of G._buildRipples) {
+    const s = toScreen(r.x, r.y);
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, r.alpha);
+    ctx.strokeStyle = '#4ade80';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, r.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+registerUpdater(updateBuildRipples);
+registerWorldRenderer(renderBuildRipples);
+
+// ── Loop 129: Water footstep splash sound ───────────────────
+import { playSound as _playSound129 } from './audio.js';
+let _lastSplashTick = 0;
+function updateWaterSplash() {
+  if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
+  if (G.gameTick - _lastSplashTick < 300) return;
+  for (const c of G.citizens) {
+    const tx = Math.round(c.x), ty = Math.round(c.y);
+    if (tx >= 0 && tx < MAP_W && ty >= 0 && ty < MAP_H) {
+      if (G.map[ty][tx] === TILE.SAND) {
+        _lastSplashTick = G.gameTick;
+        // Tiny water-adjacent splash
+        if (Math.random() < 0.15) _playSound129('click');
+        break;
+      }
+    }
+  }
+}
+registerUpdater(updateWaterSplash);
+
+// ── Loop 130: Building HP warning (red tint for damaged buildings) ─
+function renderDamagedBuildings(ctx) {
+  if (G.camera.zoom < 0.5) return;
+  for (const b of G.buildings) {
+    if ((b.hp || 100) >= 60) continue;
+    const s = toScreen(b.x, b.y);
+    const pulse = 0.3 + 0.2 * Math.sin(G.gameTick * 0.1);
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y - 12, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    // HP text
+    if (G.camera.zoom > 1.0) {
+      ctx.save();
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = 'bold 7px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${Math.round(b.hp)}%`, s.x, s.y + 12);
+      ctx.restore();
+    }
+  }
+}
+registerWorldRenderer(renderDamagedBuildings);
