@@ -5,6 +5,10 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, MAP_W, MAP_H } from './state.js';
+import { loadGLBGeometry } from './glb-loader.js';
+
+// ── GLB tree geometry (loaded async, used in buildTerrainMesh) ─
+let glbTreeVariants = null; // array of {positions, normals, indices} once loaded
 
 // ── Module-level GL state ──────────────────────────────────
 let gl = null;
@@ -316,6 +320,27 @@ function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
     [cx-cw, midY, cz-cw], [cx-cw, midY, cz+cw], apex,
     [-1, 0.3, 0], canopyColorDark
   );
+}
+
+// ── Inline a GLB geometry at (cx, groundY, cz) with uniform scale ──
+function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color) {
+  const { positions, normals } = geom;
+  const vertBase = verts.length / 9; // 9 floats per vertex: pos(3)+normal(3)+color(3)
+  const vCount = positions.length / 3;
+
+  // Find Y extents to bottom-align the tree to groundY
+  let minY = Infinity;
+  for (let i = 1; i < positions.length; i += 3) minY = Math.min(minY, positions[i]);
+
+  for (let i = 0; i < vCount; i++) {
+    const px = positions[i*3+0] * scale + cx;
+    const py = (positions[i*3+1] - minY) * scale + groundY;
+    const pz = positions[i*3+2] * scale + cz;
+    verts.push(px, py, pz,
+      normals[i*3+0], normals[i*3+1], normals[i*3+2],
+      color[0], color[1], color[2]);
+  }
+  for (const idx of geom.indices) indices.push(idx + vertBase);
 }
 
 // ── Building geometry helpers ──────────────────────────────
@@ -634,7 +659,7 @@ export function buildTerrainMesh() {
         if ((treeSeed % 25) < 7) {
           // Vary tree height 1.4–2.6 — smaller canopy radius reduces overlap
           const treeScale = 1.4 + ((treeSeed >>> 8) & 0xff) / 255 * 1.2;
-          treeTiles.push([col + 0.5, row + 0.5, h, treeScale]);
+          treeTiles.push([col + 0.5, row + 0.5, h, treeScale, treeSeed]);
         }
       }
     }
@@ -642,8 +667,16 @@ export function buildTerrainMesh() {
 
   // Record terrain-only index count, then append tree geometry
   terrainIndexCount = indices.length;
-  for (const [cx, cz, groundY, scale] of treeTiles) {
-    addTree(verts, indices, cx, cz, groundY, scale);
+  for (const [cx, cz, groundY, scale, treeSeed] of treeTiles) {
+    if (glbTreeVariants && glbTreeVariants.length > 0) {
+      // Pick a variant deterministically — mix sizes by cycling through variants
+      const variant = glbTreeVariants[treeSeed % glbTreeVariants.length];
+      const glbScale = scale * 0.38; // Kenney trees are ~3 units tall; our tiles ~1 unit
+      const canopyColor = [0.18, 0.60, 0.22];
+      inlineGLBTree(verts, indices, variant, cx, groundY, cz, glbScale, canopyColor);
+    } else {
+      addTree(verts, indices, cx, cz, groundY, scale);
+    }
   }
   treeIndexCount = indices.length - terrainIndexCount;
 
@@ -698,7 +731,6 @@ export function buildBuildingsMesh() {
   if (!G.buildings || G.buildings.length === 0) {
     buildingsIndexCount = 0;
     lastBuildingRebuild = performance.now();
-    console.log('[gl3d] No buildings to render');
     return;
   }
   console.log(`[gl3d] Building mesh for ${G.buildings.length} buildings`);
@@ -832,6 +864,17 @@ export function initGL3D(canvas) {
 
   // Size canvas to match display
   resize3D();
+
+  // Load Kenney tree GLBs asynchronously — terrain rebuilds when ready
+  Promise.all([
+    loadGLBGeometry('./assets/meshes/tree_pineDefaultA.glb'),
+    loadGLBGeometry('./assets/meshes/tree_pineTallA.glb'),
+    loadGLBGeometry('./assets/meshes/tree_pineSmallC.glb'),
+  ]).then(variants => {
+    glbTreeVariants = variants;
+    buildTerrainMesh(); // rebuild to swap pyramids → real trees
+    console.log('GLB tree meshes loaded, terrain rebuilt');
+  }).catch(e => console.warn('GLB load failed, using pyramid trees:', e));
 
   console.log(`WebGL3D initialized (WebGL${isWebGL2 ? '2' : '1'})`);
   return true;
