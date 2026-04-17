@@ -31,6 +31,10 @@ export function updateEnemies() {
       const spd = 0.02 * G.speed;
       e.x += (dx/d) * Math.min(spd, d);
       e.y += (dy/d) * Math.min(spd, d);
+    } else if (e.retreating) {
+      // Reached the retreat edge — leave the map regardless of buildings
+      G.enemies.splice(i, 1);
+      continue;
     } else {
       // Arrived at town center — attack nearest building
       const target = G.buildings.reduce((best, b) => {
@@ -44,10 +48,6 @@ export function updateEnemies() {
           // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
           demolishBuilding(target.b, true);
         }
-      } else if (e.retreating) {
-        // Reached the retreat edge — leave the map
-        G.enemies.splice(i, 1);
-        continue;
       } else {
         // No buildings left to attack — retreat toward the nearest map edge
         // and despawn on arrival. Without this, raids that wipe the settlement

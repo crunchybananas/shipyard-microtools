@@ -72,8 +72,8 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #pop-display{color:var(--accent)}
 .pop-full{color:var(--gold);animation:popPulse 1.5s ease infinite}
 @keyframes popPulse{0%,100%{opacity:1}50%{opacity:0.6}}
-.res-warn{animation:resWarn 0.8s ease-in-out infinite}
-.res-critical{animation:resCritical 0.5s ease-in-out infinite;padding:0.1rem 0.25rem;border-radius:4px;background:rgba(239,68,68,0.12)}
+.res-warn{animation:resWarn 1.6s ease-in-out infinite}
+.res-critical{animation:resCritical 1.2s ease-in-out infinite;padding:0.1rem 0.25rem;border-radius:4px;background:rgba(239,68,68,0.12)}
 .res-critical .val{color:var(--danger)!important}
 @keyframes resCritical{0%,100%{background:rgba(239,68,68,0.12);transform:scale(1)}50%{background:rgba(239,68,68,0.28);transform:scale(1.05)}}
 .res-warn .val{color:var(--danger)!important}
@@ -87,7 +87,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #kingdom-display:empty{display:none}
 #day-display{color:rgba(255,255,255,0.5);font-size:0.72rem;white-space:nowrap}
 .raid-warn{color:var(--danger);font-weight:600}
-.raid-warn-urgent{color:var(--danger);font-weight:700;animation:raidPulse 0.7s ease-in-out infinite}
+.raid-warn-urgent{color:var(--danger);font-weight:700;animation:raidPulse 1.4s ease-in-out infinite}
 @keyframes raidPulse{0%,100%{opacity:1;text-shadow:0 0 6px rgba(248,113,113,0.8)}50%{opacity:0.5;text-shadow:none}}
 .threat-display{color:var(--danger);animation:threatPulse 1s ease infinite}
 @keyframes threatPulse{0%,100%{opacity:1}50%{opacity:0.6}}
@@ -340,7 +340,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
    markers, reads distinct from selection blue), wider halo (up to 12px spread),
    and a gentle scale breath so the eye locks onto it even across the map-wide gap
    between the left-gutter tip and the bottom build bar. */
-.tut-highlight{animation:tutHighlight 1.1s ease-in-out infinite!important;position:relative;z-index:20}
+.tut-highlight{animation:tutHighlight 2.2s ease-in-out infinite!important;position:relative;z-index:20}
 @keyframes tutHighlight{
   0%,100%{box-shadow:0 0 0 2px rgba(255,209,102,0.55),0 0 12px 2px rgba(255,209,102,0.25);transform:scale(1)}
   50%{box-shadow:0 0 0 4px rgba(255,209,102,1),0 0 24px 6px rgba(255,209,102,0.55);transform:scale(1.04)}
