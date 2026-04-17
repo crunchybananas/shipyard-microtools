@@ -814,7 +814,7 @@ export function initGL3D(canvas) {
   gl.depthFunc(gl.LEQUAL);
   gl.enable(gl.CULL_FACE);
   gl.cullFace(gl.BACK);
-  gl.clearColor(0.08, 0.10, 0.18, 1.0);
+  gl.clearColor(0.45, 0.68, 0.88, 1.0);
 
   // Size canvas to match display
   resize3D();
