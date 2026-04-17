@@ -138,6 +138,14 @@ void main() {
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  // Grass micro-variation: per-tile hash breaks up uniform green carpet
+  if (isGrass && N.y > 0.5) {
+    vec2 tileId = floor(vWorldPos.xz);
+    float h = fract(sin(dot(tileId, vec2(23.7, 57.3))) * 31241.9);
+    float brightVar = 0.88 + h * 0.22;
+    float hueShift = h * 0.08 - 0.04; // subtle yellow↔cool shift
+    litColor *= vec3(brightVar + hueShift, brightVar, brightVar - hueShift * 0.5);
+  }
   // Sand ripple: noise-based shading on warm sandy tiles (beach/desert)
   bool isSand = vColor.r > 0.80 && vColor.g > 0.68 && vColor.g < 0.85 && vColor.b < 0.60;
   if (isSand && N.y > 0.5) {
@@ -301,6 +309,13 @@ void main() {
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  if (isGrass && N.y > 0.5) {
+    vec2 tileId = floor(vWorldPos.xz);
+    float h = fract(sin(dot(tileId, vec2(23.7, 57.3))) * 31241.9);
+    float brightVar = 0.88 + h * 0.22;
+    float hueShift = h * 0.08 - 0.04;
+    litColor *= vec3(brightVar + hueShift, brightVar, brightVar - hueShift * 0.5);
+  }
   bool isSand = vColor.r > 0.80 && vColor.g > 0.68 && vColor.g < 0.85 && vColor.b < 0.60;
   if (isSand && N.y > 0.5) {
     vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
