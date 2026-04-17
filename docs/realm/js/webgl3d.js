@@ -344,16 +344,29 @@ function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
 }
 
 // ── Inline a GLB geometry at (cx, groundY, cz) with uniform scale ──
-function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color) {
+// baseColor: optional color for the lower 38% of model height (hex base layer)
+// If omitted, the entire model uses `color`.
+// clipBase: if true, skip all triangles whose verts are in the bottom 36% of the model height.
+// Used for buildings to remove the Kenney hex tile base platform.
+function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clipBase) {
   const { positions, normals } = geom;
-  const vertBase = verts.length / 9; // 9 floats per vertex: pos(3)+normal(3)+color(3)
   const vCount = positions.length / 3;
 
-  // Find Y extents to bottom-align the tree to groundY
-  let minY = Infinity;
-  for (let i = 1; i < positions.length; i += 3) minY = Math.min(minY, positions[i]);
+  let minY = Infinity, maxY = -Infinity;
+  for (let i = 1; i < positions.length; i += 3) {
+    if (positions[i] < minY) minY = positions[i];
+    if (positions[i] > maxY) maxY = positions[i];
+  }
+  const baseThreshold = minY + (maxY - minY) * 0.36;
+
+  // Map original vert index → new packed index (-1 = skipped)
+  const vertMap = new Int32Array(vCount).fill(-1);
+  const vertBase = verts.length / 9;
+  let newIdx = 0;
 
   for (let i = 0; i < vCount; i++) {
+    if (clipBase && positions[i*3+1] < baseThreshold) continue;
+    vertMap[i] = vertBase + newIdx++;
     const px = positions[i*3+0] * scale + cx;
     const py = (positions[i*3+1] - minY) * scale + groundY;
     const pz = positions[i*3+2] * scale + cz;
@@ -361,7 +374,14 @@ function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color) {
       normals[i*3+0], normals[i*3+1], normals[i*3+2],
       color[0], color[1], color[2]);
   }
-  for (const idx of geom.indices) indices.push(idx + vertBase);
+
+  // Only emit triangles where all 3 verts survived clipping
+  const idxArr = geom.indices;
+  for (let t = 0; t < idxArr.length; t += 3) {
+    const a = vertMap[idxArr[t]], b = vertMap[idxArr[t+1]], c = vertMap[idxArr[t+2]];
+    if (a < 0 || b < 0 || c < 0) continue;
+    indices.push(a, b, c);
+  }
 }
 
 // ── Building geometry helpers ──────────────────────────────
@@ -792,8 +812,8 @@ export function buildBuildingsMesh() {
         windmill:   [0.88, 0.82, 0.65],
       };
       const color = GLB_COLORS[b.type] || [0.80, 0.78, 0.72];
-      // Sink so hex base is buried — only the building structure shows above ground
-      inlineGLBTree(verts, indices, glbGeom, cx, groundY - 0.42, cz, bldScale, color);
+      // Clip bottom 36% of model (Kenney hex base platform) — building structure only
+      inlineGLBTree(verts, indices, glbGeom, cx, groundY - 0.30, cz, bldScale, color, true);
     } else {
       addBuildingMesh(verts, indices, b, groundY);
     }
