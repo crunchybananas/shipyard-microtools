@@ -1075,11 +1075,13 @@ export function render() {
     // When facing away, hair sits on the camera-visible (back) side of the head.
     // When facing camera, hair sits on the back/opposite side from the face.
     const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
-    ctx.fillStyle = ['#5c3a18','#c08020','#1a1a2e','#e8704a'][hairHash];
+    // Dark color changed from near-black navy (#1a1a2e) to raven-plum so it
+    // doesn't render as a featureless black blob over any skin tone.
+    ctx.fillStyle = ['#5c3a18','#c08020','#3a1a3a','#e8704a'][hairHash];
     const hairOffX = facingAway ? faceX * 0.5 : -faceX * 0.6;
-    // When facing away, widen the arc slightly so the hair cap covers the back of the head
-    const hairStart = facingAway ? Math.PI * 0.6 : Math.PI * 0.8;
-    const hairEnd   = facingAway ? Math.PI * 2.4 : Math.PI * 2.2;
+    // Reduced arc coverage by ~18° so forehead/chin always show skin color.
+    const hairStart = facingAway ? Math.PI * 0.65 : Math.PI * 0.85;
+    const hairEnd   = facingAway ? Math.PI * 2.35 : Math.PI * 2.15;
     ctx.beginPath();
     ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
     ctx.closePath();
