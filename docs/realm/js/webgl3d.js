@@ -351,7 +351,7 @@ function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
 // If omitted, the entire model uses `color`.
 // clipBase: if true, skip all triangles whose verts are in the bottom 36% of the model height.
 // Used for buildings to remove the Kenney hex tile base platform.
-function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clipBase) {
+function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clipBase, trunkColor) {
   const { positions, normals } = geom;
   const vCount = positions.length / 3;
 
@@ -360,7 +360,9 @@ function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clip
     if (positions[i] < minY) minY = positions[i];
     if (positions[i] > maxY) maxY = positions[i];
   }
-  const baseThreshold = minY + (maxY - minY) * 0.36;
+  const range = maxY - minY;
+  const baseThreshold = minY + range * 0.36;
+  const trunkThreshold = minY + range * 0.28; // lower 28% = trunk
 
   // Map original vert index → new packed index (-1 = skipped)
   const vertMap = new Int32Array(vCount).fill(-1);
@@ -373,9 +375,10 @@ function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clip
     const px = positions[i*3+0] * scale + cx;
     const py = (positions[i*3+1] - minY) * scale + groundY;
     const pz = positions[i*3+2] * scale + cz;
+    const c = (trunkColor && positions[i*3+1] < trunkThreshold) ? trunkColor : color;
     verts.push(px, py, pz,
       normals[i*3+0], normals[i*3+1], normals[i*3+2],
-      color[0], color[1], color[2]);
+      c[0], c[1], c[2]);
   }
 
   // Only emit triangles where all 3 verts survived clipping
@@ -723,8 +726,9 @@ export function buildTerrainMesh() {
         [0.22, 0.64, 0.26], // small — lighter young pine
       ];
       const canopyColor = treeColors[variantIdx];
+      const trunkColor = [0.42, 0.28, 0.14]; // warm brown bark
       // Raise tree 0.08 above ground so base geometry doesn't clip terrain
-      inlineGLBTree(verts, indices, variant, cx, groundY + 0.08, cz, glbScale, canopyColor);
+      inlineGLBTree(verts, indices, variant, cx, groundY + 0.08, cz, glbScale, canopyColor, false, trunkColor);
     } else {
       addTree(verts, indices, cx, cz, groundY, scale);
     }
