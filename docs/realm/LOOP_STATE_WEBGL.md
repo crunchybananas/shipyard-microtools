@@ -318,8 +318,24 @@ Best free CC0 GLTF sources for this project:
 
 ## Next Cycle Plan
 
-**Cycle 16:** Begin GLTF mesh pipeline.
-1. Download KayKit Medieval Hexagon pack from kaylousberg.itch.io/kaykit-medieval-hexagon (CC0, GLTF)
-2. Write ~100-line `loadGLB(url, gl)` in a new `js/glb-loader.js` — parse 12-byte header, JSON chunk, binary chunk, extract POSITION+NORMAL+indices into a VAO
-3. Test with a single conifer tree GLB — render one at map center alongside existing geometry
-4. If successful, replace pyramid trees with the real conifer mesh in cycle 17
+### Cycle 16 — 2026-04-16
+**New files:**
+- `js/glb-loader.js` — 80-line vanilla GLB parser (header → JSON chunk → BIN chunk → POSITION+NORMAL+indices)
+- `assets/meshes/tree_pineDefaultA.glb` (17KB), `tree_pineTallA.glb` (7KB), `tree_pineSmallC.glb` (5.3KB) — Kenney Nature Kit CC0
+
+**Changes (js/webgl3d.js):**
+- Imports `loadGLBGeometry` from `./glb-loader.js`
+- GLBs load async on `initGL3D()`, trigger `buildTerrainMesh()` rebuild when ready
+- `inlineGLBTree()` transforms GLB geometry into terrain VAO at each tree position (scale 0.38× of tile scale)
+- Falls back to pyramid if GLB not yet loaded
+- Removed noisy per-frame "No buildings to render" log
+
+**Visual result:** Real multi-tiered Kenney pine conifers render in place of flat pyramids. Trees have proper normals and directional shading. Recognizable as forest.
+
+**Remaining issue:** Trees somewhat small at scale 0.38. Some tree variants may show z-fighting or clipping at ground level.
+
+---
+
+## Next Cycle Plan
+
+**Cycle 17:** Tune tree scale (try 0.55×) and download KayKit Medieval Hexagon building meshes. Replace box-geometry for at least `house` and `tower` building types with real GLBs. Apply same inlining approach as trees.
