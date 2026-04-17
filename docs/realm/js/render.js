@@ -1086,6 +1086,12 @@ export function render() {
     ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
     ctx.closePath();
     ctx.fill();
+    // Hair sheen — thin lighter arc on upper-front for depth/dimensionality
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.arc(headX + hairOffX - 0.5, headY - 2.2, 4.8, hairStart, hairStart + Math.PI * 0.6);
+    ctx.stroke();
 
     // Face — eyes and mouth on facing side, hidden when facing away
     if (!facingAway && G.camera.zoom >= 1.0) {
@@ -1101,6 +1107,12 @@ export function render() {
       ctx.beginPath();
       ctx.arc(eyeX - 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
       ctx.arc(eyeX + 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
+      ctx.fill();
+      // Pupil glint — tiny white highlight dot for liveliness
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.beginPath();
+      ctx.arc(eyeX - 1.7 - 0.3, headY + 0.7 - 0.35, 0.38, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.7 - 0.3, headY + 0.7 - 0.35, 0.38, 0, Math.PI * 2);
       ctx.fill();
     }
     // Mouth — tiny line, only at closer zoom
