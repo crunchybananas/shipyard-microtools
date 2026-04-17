@@ -1094,25 +1094,25 @@ export function render() {
     ctx.stroke();
 
     // Face — eyes and mouth on facing side, hidden when facing away
-    if (!facingAway && G.camera.zoom >= 1.0) {
+    if (!facingAway && G.camera.zoom >= 0.8) {
       const eyeX = headX + faceScreenX * 0.8;
-      // Eye whites for expressiveness
+      // Eye whites — slightly larger so they read at default zoom
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7, headY + 0.7, 1.3, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.7, headY + 0.7, 1.3, 0, Math.PI * 2);
+      ctx.arc(eyeX - 1.7, headY + 0.7, 1.6, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.7, headY + 0.7, 1.6, 0, Math.PI * 2);
       ctx.fill();
       // Pupils
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
+      ctx.arc(eyeX - 1.7, headY + 0.7, 1.1, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.7, headY + 0.7, 1.1, 0, Math.PI * 2);
       ctx.fill();
       // Pupil glint — tiny white highlight dot for liveliness
       ctx.fillStyle = 'rgba(255,255,255,0.75)';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7 - 0.3, headY + 0.7 - 0.35, 0.38, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.7 - 0.3, headY + 0.7 - 0.35, 0.38, 0, Math.PI * 2);
+      ctx.arc(eyeX - 1.7 - 0.3, headY + 0.7 - 0.4, 0.45, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.7 - 0.3, headY + 0.7 - 0.4, 0.45, 0, Math.PI * 2);
       ctx.fill();
     }
     // Mouth — gentle smile curve, only at closer zoom
