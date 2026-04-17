@@ -329,8 +329,8 @@ export function render() {
           ctx.closePath();
           ctx.fill();
           // Foam bubble animation at shoreline
-          const foamPhase = (G.gameTick * 0.05 + x * 0.3 + y * 0.7) % (Math.PI * 2);
-          const foamAlpha = 0.3 + 0.4 * Math.sin(foamPhase);
+          const foamPhase = (G.gameTick * 0.02 + x * 0.3 + y * 0.7) % (Math.PI * 2);
+          const foamAlpha = 0.25 + 0.2 * Math.sin(foamPhase);
           ctx.globalAlpha = daylight * foamAlpha;
           ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
           ctx.beginPath();
@@ -947,8 +947,10 @@ export function render() {
     } else if (Math.abs(c.tx - c.x) > 0.1) {
       faceX = c.tx > c.x ? 1 : -1;
     }
-    // In iso: camera looks from upper-left, facing away = moving up-right (+X, -Y)
-    const facingAway = faceX > 0 && faceZ < 0;
+    // In iso: screen Y = (worldX + worldY)*TH/2, so moving away from camera
+    // (up on screen) = faceX + faceZ < 0. Prior "faceX>0 && faceZ<0" only caught
+    // one diagonal; this catches all rearward-facing directions.
+    const facingAway = faceX + faceZ < 0;
 
     // Job color — vibrant saturated palette so citizens stand out
     let bodyColor = '#8899bb';
@@ -1422,40 +1424,80 @@ export function render() {
   for (const e of G.enemies) {
     const es = toScreen(e.x, e.y);
     ctx.globalAlpha = daylight;
+    // Per-enemy visual variety from fixed spawn variant
+    const eVariant = e.variant ?? 0; // 0=swordsman, 1=spearman, 2=berserker
+    const eHash = eVariant * 2.1; // stable phase offset for eye pulse
     if (G.camera.zoom < 0.6) {
-      ctx.fillStyle = '#4a2a2a';
+      ctx.fillStyle = ['#5a1a1a','#3a2a3a','#6a1818'][eVariant];
       ctx.beginPath();
       ctx.arc(es.x, es.y - 4, 3, 0, Math.PI*2);
       ctx.fill();
       continue;
     }
     // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
     ctx.beginPath();
-    ctx.ellipse(es.x, es.y + 2, 4, 2, 0, 0, Math.PI*2);
+    ctx.ellipse(es.x, es.y + 2, 5, 2, 0, 0, Math.PI*2);
     ctx.fill();
-    // Dark body
-    ctx.fillStyle = '#4a2a2a';
+    // Walking bob
+    const eMoving = Math.hypot(e.tx - e.x, e.ty - e.y) > 0.3;
+    const eBob = eMoving ? Math.sin(G.gameTick * 0.22 + (eHash & 0xff) * 0.04) * 0.7 : 0;
+    // Body — wider than before (5px wide), with armour colour variant
+    const bodyColors = ['#3a2030', '#2a2a3a', '#3a1818'];
+    ctx.fillStyle = bodyColors[eVariant];
     ctx.beginPath();
-    ctx.ellipse(es.x, es.y - 6, 4, 5, 0, 0, Math.PI*2);
+    ctx.ellipse(es.x, es.y - 6 + eBob, 5, 6, 0, 0, Math.PI*2);
     ctx.fill();
-    // Dark hood/head
+    // Armour trim
+    ctx.fillStyle = ['#6a3a48','#3a4060','#6a2828'][eVariant];
+    ctx.fillRect(es.x - 4, es.y - 8 + eBob, 8, 1.5);
+    // Head — helmet shape (flattened top)
     ctx.fillStyle = '#2a1a1a';
     ctx.beginPath();
-    ctx.arc(es.x, es.y - 13, 3.5, 0, Math.PI*2);
+    ctx.arc(es.x, es.y - 14 + eBob, 3.8, 0, Math.PI*2);
     ctx.fill();
+    // Helmet brim
+    ctx.fillStyle = ['#5a3a40','#3a3a50','#5a2a2a'][eVariant];
+    ctx.fillRect(es.x - 4.5, es.y - 12.5 + eBob, 9, 1.2);
     // Red eye glow
     ctx.fillStyle = '#ff4040';
+    ctx.globalAlpha = daylight * (0.7 + 0.3 * Math.sin(G.gameTick * 0.12 + eHash));
     ctx.beginPath();
-    ctx.arc(es.x - 1, es.y - 13, 0.6, 0, Math.PI*2);
-    ctx.arc(es.x + 1, es.y - 13, 0.6, 0, Math.PI*2);
+    ctx.arc(es.x - 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
+    ctx.arc(es.x + 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
     ctx.fill();
+    ctx.globalAlpha = daylight;
+    // Weapon — axe, spear, or club depending on variant
+    if (G.camera.zoom >= 0.7) {
+      ctx.strokeStyle = '#5a3a1a';
+      ctx.lineWidth = 1;
+      ctx.save();
+      ctx.translate(es.x + 5, es.y - 8 + eBob);
+      if (eVariant === 0) {
+        // Axe: handle + wedge head
+        ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -5); ctx.stroke();
+        ctx.fillStyle = '#8a8890';
+        ctx.beginPath(); ctx.moveTo(0, -5); ctx.lineTo(4, -3); ctx.lineTo(1, 0); ctx.closePath(); ctx.fill();
+      } else if (eVariant === 1) {
+        // Spear: long handle + tip
+        ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(0, -7); ctx.stroke();
+        ctx.fillStyle = '#a0a0b0';
+        ctx.beginPath(); ctx.moveTo(-1, -5); ctx.lineTo(1, -5); ctx.lineTo(0, -9); ctx.closePath(); ctx.fill();
+      } else {
+        // Club: thick handle + knob
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -4); ctx.stroke();
+        ctx.fillStyle = '#5a3a10';
+        ctx.beginPath(); ctx.arc(0, -5, 2, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    }
     // HP bar
     if (e.hp < e.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(es.x - 6, es.y - 20, 12, 2);
+      ctx.fillRect(es.x - 7, es.y - 22, 14, 2);
       ctx.fillStyle = '#ef4444';
-      ctx.fillRect(es.x - 6, es.y - 20, 12 * (e.hp/e.maxHp), 2);
+      ctx.fillRect(es.x - 7, es.y - 22, 14 * (e.hp/e.maxHp), 2);
     }
   }
 
@@ -4716,16 +4758,15 @@ function drawIronOre(ctx, x, y, a) {
 
 function drawWater(ctx, x, y, a, tx, ty) {
   // tx/ty = tile grid coords for per-tile variation and foam detection
-  const t = G.gameTick * 0.025; // faster tick for visible motion
+  const t = G.gameTick * 0.015; // slower base rate — reduces per-tile flicker
   // Per-tile phase offset so neighbouring tiles don't animate in lockstep
   const phase = (tx * 2.3 + ty * 1.7) % (Math.PI * 2);
 
-  // ── Layer 1: deep colour base with oscillating hue shift ────
-  // Visibly shifts between deep navy and rich cobalt each cycle
-  const colorShift = 0.5 + 0.5 * Math.sin(t * 0.7 + phase);
-  const cr = Math.round(18 + colorShift * 20);
-  const cg = Math.round(80 + colorShift * 50);
-  const cb = Math.round(180 + colorShift * 40);
+  // ── Layer 1: deep colour base with slow hue shift ────────────
+  const colorShift = 0.5 + 0.5 * Math.sin(t * 0.6 + phase);
+  const cr = Math.round(18 + colorShift * 16);
+  const cg = Math.round(78 + colorShift * 38);
+  const cb = Math.round(178 + colorShift * 30);
   ctx.globalAlpha = a * 0.9;
   ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
   ctx.beginPath();
@@ -4733,8 +4774,8 @@ function drawWater(ctx, x, y, a, tx, ty) {
   ctx.closePath();
   ctx.fill();
 
-  // ── Layer 2: bright mid-water shimmer overlay ────────────────
-  const shimmer = 0.25 + 0.2 * Math.sin(t * 1.1 + phase + 1.5);
+  // ── Layer 2: gentle shimmer overlay ─────────────────────────
+  const shimmer = 0.18 + 0.12 * Math.sin(t * 0.9 + phase + 1.5);
   ctx.globalAlpha = a * shimmer;
   ctx.fillStyle = 'rgba(100,200,255,1)';
   ctx.beginPath();
@@ -4742,49 +4783,45 @@ function drawWater(ctx, x, y, a, tx, ty) {
   ctx.closePath();
   ctx.fill();
 
-  // ── Layer 3: animated wave crests – denser and larger ───────
-  // Five wave bands for clearly visible ripples
-  ctx.lineWidth = 2;
-  const waveRows = [-10, -5, 0, 5, 10];
+  // ── Layer 3: animated wave crests ────────────────────────────
+  ctx.lineWidth = 1.5;
+  const waveRows = [-8, -3, 2, 7];
   for (let i = 0; i < waveRows.length; i++) {
     const rowY = waveRows[i];
     const dir = (i % 2 === 0) ? 1 : -1;
-    // Strong alpha oscillation makes crests visibly pulse in/out
-    const wAlpha = 0.5 + 0.4 * Math.sin(t * 2.2 + phase + i * 1.3);
-    ctx.globalAlpha = a * Math.max(0.1, wAlpha);
+    // Softer alpha oscillation — avoids rapid per-tile flicker
+    const wAlpha = 0.3 + 0.2 * Math.sin(t * 1.4 + phase + i * 1.3);
+    ctx.globalAlpha = a * Math.max(0.08, wAlpha);
     ctx.strokeStyle = 'rgba(210,245,255,1)';
     ctx.beginPath();
     const halfW = 32 * (1 - Math.abs(rowY) / 20);
-    const step = 3;
+    const step = 4;
     let started = false;
     for (let dx = -halfW; dx <= halfW; dx += step) {
       const wx = x + dx;
-      // Two overlapping sine waves with larger amplitude for visibility
       const wy = y + rowY * 0.6
-        + Math.sin(t * 2.4 * dir + dx * 0.28 + phase + i) * 3.5
-        + Math.sin(t * 1.3 + dx * 0.18 + phase * 0.5) * 1.8;
+        + Math.sin(t * 1.6 * dir + dx * 0.28 + phase + i) * 3.0
+        + Math.sin(t * 0.9 + dx * 0.18 + phase * 0.5) * 1.4;
       if (!started) { ctx.moveTo(wx, wy); started = true; }
       else ctx.lineTo(wx, wy);
     }
     ctx.stroke();
   }
 
-  // ── Layer 4: bright specular glints – larger and brighter ───
-  const numGlints = 3 + ((tx * 3 + ty * 7) & 1); // 3 or 4 per tile
+  // ── Layer 4: specular glints (2 per tile, slow-moving) ───────
+  const numGlints = 2;
   for (let gi = 0; gi < numGlints; gi++) {
-    const gPhase = phase + gi * 1.8;
-    const gx = x + Math.sin(t * 1.1 + gPhase) * 18;
-    const gy = y + Math.cos(t * 0.8 + gPhase) * 9;
-    const gSize = 3.0 + 2.5 * Math.abs(Math.sin(t * 3.5 + gPhase));
-    const gAlpha = 0.6 + 0.4 * Math.sin(t * 4.0 + gPhase);
+    const gPhase = phase + gi * 2.1;
+    const gx = x + Math.sin(t * 0.8 + gPhase) * 14;
+    const gy = y + Math.cos(t * 0.6 + gPhase) * 7;
+    const gSize = 2.0 + 1.2 * Math.abs(Math.sin(t * 1.8 + gPhase));
+    const gAlpha = 0.35 + 0.25 * Math.sin(t * 2.0 + gPhase); // gentle, ~3s cycle
     ctx.globalAlpha = a * Math.max(0, gAlpha);
-    // Inner bright white core
     ctx.fillStyle = 'rgba(255,255,255,1)';
     ctx.beginPath();
     ctx.arc(gx, gy, gSize * 0.5, 0, Math.PI * 2);
     ctx.fill();
-    // Outer soft halo
-    ctx.globalAlpha = a * Math.max(0, gAlpha) * 0.4;
+    ctx.globalAlpha = a * Math.max(0, gAlpha) * 0.35;
     ctx.fillStyle = 'rgba(200,240,255,1)';
     ctx.beginPath();
     ctx.arc(gx, gy, gSize, 0, Math.PI * 2);

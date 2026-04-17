@@ -387,6 +387,7 @@ export function checkRaids() {
         hp: 30, maxHp: 30,
         type: 'raider',
         state: 'approach',
+        variant: Math.floor(Math.random() * 3), // 0=swordsman 1=spearman 2=berserker
       });
     }
 
