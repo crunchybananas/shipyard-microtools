@@ -952,6 +952,13 @@ export function render() {
     // one diagonal; this catches all rearward-facing directions.
     const facingAway = faceX + faceZ < 0;
 
+    // Derived per-citizen constants used across head, neck, eyes, cheeks
+    const skinHash = (c.name.charCodeAt(0) * 53 + (c.name.charCodeAt(1) || 29) * 17) % 4;
+    // Tones chosen to stay clearly distinct from all job body colors (no warm-orange clashes)
+    const skinColor = ['#ffe0c0', '#f5c99a', '#d0845a', '#9e5c38'][skinHash];
+    const headX = s.x + (faceX - faceZ) * 0.5;
+    const headY = cy - 20;
+
     // Job color — vibrant saturated palette so citizens stand out
     let bodyColor = '#8899bb';
     if (c.jobBuilding) {
@@ -1032,16 +1039,19 @@ export function render() {
     ctx.ellipse(s.x, cy - 8, 6.3, 7, 0, 0, Math.PI * 2);
     ctx.stroke();
 
+    // Neck stub — skin-colored oval; drawn before head so head overlaps top edge naturally
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.ellipse(headX, cy - 15.5, 2.2, 2.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
     // Head — large for chibi proportions (oversized head = cute, scaled ~1.4x)
-    // Screen-X shift = (worldX - worldY) * TW/2, so offset by both faceX and faceZ
-    const headX = s.x + (faceX - faceZ) * 0.5;
-    const headY = cy - 20;
-    ctx.fillStyle = '#ffe0c0';
+    ctx.fillStyle = skinColor;
     ctx.beginPath();
     ctx.arc(headX, headY, 6.3, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(20,10,0,0.35)';
-    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = 'rgba(10,5,0,0.55)';
+    ctx.lineWidth = 1.0;
     ctx.stroke();
 
     // Hair — vibrant colors, cap shifts based on facing direction
@@ -1062,6 +1072,13 @@ export function render() {
     if (!facingAway && G.camera.zoom >= 1.0) {
       const faceScreenX = faceX - faceZ;
       const eyeX = headX + faceScreenX * 0.8;
+      // Eye whites for expressiveness
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath();
+      ctx.arc(eyeX - 1.7, headY + 0.7, 1.3, 0, Math.PI * 2);
+      ctx.arc(eyeX + 1.7, headY + 0.7, 1.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Pupils
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
       ctx.arc(eyeX - 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
@@ -1078,6 +1095,13 @@ export function render() {
       ctx.moveTo(mouthX - 1.1, headY + 2.1);
       ctx.lineTo(mouthX + 1.1, headY + 2.1);
       ctx.stroke();
+      // Rosy cheeks — soft blush at close zoom
+      const faceScreenX2 = faceX - faceZ;
+      ctx.fillStyle = 'rgba(240,100,80,0.22)';
+      ctx.beginPath();
+      ctx.ellipse(headX + faceScreenX2 * 0.4 - 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(headX + faceScreenX2 * 0.4 + 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     if (G.camera.zoom >= 0.7) {
