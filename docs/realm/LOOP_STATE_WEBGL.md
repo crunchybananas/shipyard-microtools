@@ -262,4 +262,15 @@ Every building renders a **6-unit tall hot-pink pillar** as a debug marker. Must
 
 ## Next Cycle Plan
 
-**Cycle 13:** The water color `[0.10, 0.40, 0.75]` is darker than the sky `(0.45, 0.68, 0.88)`. Brightening water to match sky hue — e.g. `[0.35, 0.62, 0.85]` — would create smooth ocean-to-sky continuity. Also consider adding a subtle fog: in the fragment shader, blend fragments toward sky color based on distance from map center, giving atmospheric depth near the edges.
+### Cycle 13 — 2026-04-16
+**Changes (js/webgl3d.js):**
+- Water color `[0.10,0.40,0.75]` → `[0.38,0.65,0.87]` — now matches sky hue
+- Fragment shaders (WebGL2 + WebGL1): `smoothstep(30.0, 46.0, fogDist)` fog blends geometry toward sky `(0.45,0.68,0.88)` at 80% weight near map edges
+
+**Visual result:** Ocean and sky now read as one coherent blue environment. Hard ocean cutoff eliminated. Island sits naturally in sky-water world. Forest pyramid density still dominates — most prominent remaining issue.
+
+---
+
+## Next Cycle Plan
+
+**Cycle 14:** Forest is too dense — nearly every forest tile renders a tree, making the island look like a solid green spiky carpet with no terrain visible underneath. Thin tree density to ~55% of forest tiles using the existing tile hash. Also consider darkening tree canopy slightly (`[0.22, 0.62, 0.28]` → `[0.18, 0.52, 0.24]`) so they read as forest rather than neon lime patches.
