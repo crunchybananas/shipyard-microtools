@@ -4,7 +4,7 @@
 // geometry with directional lighting.
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js';
+import { G, TILE, MAP_W, MAP_H, TW, TH } from './state.js';
 import { loadGLBGeometry } from './glb-loader.js';
 
 // ── GLB tree geometry (loaded async, used in buildTerrainMesh) ─
@@ -913,11 +913,14 @@ function buildViewProjection() {
   const rx = mat4RotateX(pitchRad);
   const ry = mat4RotateY(yawRad);
 
-  // Camera target: center of map at ground level
-  const cx = MAP_W / 2;
-  const cy = 0;
-  const cz = MAP_H / 2;
-  const tr = mat4Translate(-cx, -cy, -cz);
+  // Convert 2D isometric screen-pixel camera to 3D tile coordinates
+  // G.camera.x/y are isometric screen offsets; toWorld formula: wx=camX/(TW/2), wy=camY/(TH/2)
+  const halfTW = TW / 2, halfTH = TH / 2;
+  const wx = (G.camera?.x ?? 0) / halfTW;
+  const wy = (G.camera?.y ?? (MAP_H * halfTH)) / halfTH;
+  const cx = (wx + wy) / 2;   // 3D world X = tile col
+  const cz = (wy - wx) / 2;   // 3D world Z = tile row
+  const tr = mat4Translate(-cx, 0, -cz);
 
   // VP = ortho * rotateX * rotateY * translate
   const vp = mat4Multiply(ortho, mat4Multiply(rx, mat4Multiply(ry, tr)));
