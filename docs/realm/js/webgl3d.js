@@ -290,8 +290,8 @@ function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
   const baseY = groundY;
   // Canopy only — no trunk box, keeps forest floor readable
   const trunkH = 0.3 * S;  // canopy base height above ground
-  const canopyColor     = [0.22, 0.82, 0.28];
-  const canopyColorDark = [0.14, 0.55, 0.18];
+  const canopyColor     = [0.18, 0.60, 0.22];
+  const canopyColorDark = [0.11, 0.40, 0.14];
   const topY = baseY + trunkH + 1.6 * S;
   const midY = baseY + trunkH;
   const cw = 0.6 * S;
@@ -622,12 +622,12 @@ export function buildTerrainMesh() {
         }
       }
 
-      // ~40% of FOREST tiles get a tree — lets forest floor show through
+      // ~28% of FOREST tiles get a tree — keeps canopy readable without solid carpet
       if (tileType === TILE.FOREST) {
         const treeSeed = (col * 4517 + row * 2971) >>> 0;
-        if ((treeSeed % 10) < 4) {
-          // Vary tree height 1.8–3.4 for organic mixed-forest look
-          const treeScale = 1.8 + ((treeSeed >>> 8) & 0xff) / 255 * 1.6;
+        if ((treeSeed % 25) < 7) {
+          // Vary tree height 1.4–2.6 — smaller canopy radius reduces overlap
+          const treeScale = 1.4 + ((treeSeed >>> 8) & 0xff) / 255 * 1.2;
           treeTiles.push([col + 0.5, row + 0.5, h, treeScale]);
         }
       }
