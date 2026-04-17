@@ -57,6 +57,7 @@ let uSeasonTintLoc = null;
 let uCameraCenterLoc = null;
 let uSnowAmountLoc = null;
 let uAutumnAmountLoc = null;
+let uDayPhaseLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -120,6 +121,7 @@ uniform float uTime;
 uniform vec2 uCameraCenter;
 uniform float uSnowAmount;
 uniform float uAutumnAmount;
+uniform float uDayPhase;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -155,7 +157,15 @@ void main() {
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
-  vec3 skyCol = vec3(0.45, 0.68, 0.88);
+  // Sky/fog color shifts with time of day: dawn amber → noon blue → dusk purple
+  float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
+  float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
+  vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
+  vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
+  vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
+  vec3 skyCol = mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk);
+  // Warm sunrise/sunset tint bleeds into lit surfaces
+  litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
   fragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
 }`;
 
@@ -194,6 +204,7 @@ uniform float uTime;
 uniform vec2 uCameraCenter;
 uniform float uSnowAmount;
 uniform float uAutumnAmount;
+uniform float uDayPhase;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -225,7 +236,13 @@ void main() {
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
-  vec3 skyCol = vec3(0.45, 0.68, 0.88);
+  float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
+  float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
+  vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
+  vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
+  vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
+  vec3 skyCol = mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk);
+  litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
   gl_FragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
 }`;
 
@@ -1032,6 +1049,7 @@ export function initGL3D(canvas) {
   uCameraCenterLoc  = gl.getUniformLocation(program, 'uCameraCenter');
   uSnowAmountLoc    = gl.getUniformLocation(program, 'uSnowAmount');
   uAutumnAmountLoc  = gl.getUniformLocation(program, 'uAutumnAmount');
+  uDayPhaseLoc      = gl.getUniformLocation(program, 'uDayPhase');
 
   // Create terrain VAO
   if (isWebGL2) {
@@ -1110,6 +1128,17 @@ export function render3D() {
   }
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  // Dynamic clear color tracks day phase so background matches fog sky
+  {
+    const t = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
+    const dawn = Math.max(0, 1 - Math.abs(t - 0.15) * 6);
+    const dusk = Math.max(0, 1 - Math.abs(t - 0.85) * 6);
+    const lerp = (a, b, f) => a + (b - a) * f;
+    const r = lerp(lerp(0.45, 0.96, dawn), 0.70, dusk);
+    const g = lerp(lerp(0.68, 0.65, dawn), 0.45, dusk);
+    const b = lerp(lerp(0.88, 0.38, dawn), 0.72, dusk);
+    gl.clearColor(r, g, b, 1.0);
+  }
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   gl.useProgram(program);
@@ -1145,6 +1174,10 @@ export function render3D() {
   // Autumn foliage: shift green grass/trees to amber-orange
   if (uAutumnAmountLoc) {
     gl.uniform1f(uAutumnAmountLoc, G.season === 'autumn' ? 1.0 : 0.0);
+  }
+  // Day phase: 0=midnight, 0.15=dawn, 0.5=noon, 0.85=dusk, 1=midnight
+  if (uDayPhaseLoc) {
+    gl.uniform1f(uDayPhaseLoc, (G.dayPhase ?? 0) / (G.dayLength ?? 3600));
   }
 
   // Fog center: follow camera tile position so fog fades from view center
