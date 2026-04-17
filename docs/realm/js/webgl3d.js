@@ -132,13 +132,14 @@ void main() {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
     litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
   }
-  // Winter snow: bleach green tiles white
-  if (isGrass && uSnowAmount > 0.0) {
+  // Winter snow: height-scaled — mountain tops fully white, lowlands dusty
+  bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
+  if (!isWater && uSnowAmount > 0.0) {
+    float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
-    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
+    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * heightFactor);
   }
   // Animated water sparkle + specular sun glint
-  bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
@@ -204,11 +205,12 @@ void main() {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
     litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
   }
-  if (isGrass && uSnowAmount > 0.0) {
-    vec3 snowCol = vec3(0.90, 0.93, 0.98);
-    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
-  }
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
+  if (!isWater && uSnowAmount > 0.0) {
+    float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
+    vec3 snowCol = vec3(0.90, 0.93, 0.98);
+    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * heightFactor);
+  }
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
