@@ -317,18 +317,18 @@ function addBuildingMesh(verts, indices, b, groundY) {
   const cz = b.y + 0.5;
   const gy = groundY;
   const type = b.type;
-  const S = 3.5; // global building size multiplier for visibility
+  const S = 4.0; // global building size multiplier for visibility
 
   // Record vertex count before building; we'll scale them at the end
   const vertStart = verts.length;
   if (type === 'house') {
     // Base box
-    const baseColor = [0.82, 0.62, 0.38];
+    const baseColor = [0.94, 0.88, 0.72];
     const hw = 0.4;
     const bh = 0.6;
     pushBox(verts, indices, cx-hw, gy, cz-hw, cx+hw, gy+bh, cz+hw, baseColor);
     // Pyramid roof
-    const roofColor = [0.78, 0.22, 0.18];
+    const roofColor = [0.88, 0.18, 0.12];
     const roofBase = gy + bh;
     const roofApex = roofBase + 0.5;
     const rw = 0.42;
