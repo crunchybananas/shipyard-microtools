@@ -152,6 +152,9 @@ void main() {
     vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
     float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
     litColor *= 0.90 + ripple * 0.18;
+    float wetness = 1.0 - smoothstep(0.0, 0.85, vWorldPos.y);
+    vec3 wetSandCol = vec3(0.58, 0.46, 0.26);
+    litColor = mix(litColor, wetSandCol * (0.38 + NdotL * 0.75), wetness * 0.60);
   }
   // Stone mottling: mineral veins and rock surface texture variation
   bool isStone = vColor.r > 0.38 && vColor.r < 0.72 && abs(vColor.r - vColor.g) < 0.10 && abs(vColor.g - vColor.b) < 0.10;
@@ -330,6 +333,10 @@ void main() {
     vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
     float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
     litColor *= 0.90 + ripple * 0.18;
+    // Wet sand near waterline: darker, cooler, more saturated toward y=0
+    float wetness = 1.0 - smoothstep(0.0, 0.85, vWorldPos.y);
+    vec3 wetSandCol = vec3(0.58, 0.46, 0.26);
+    litColor = mix(litColor, wetSandCol * (0.38 + NdotL * 0.75), wetness * 0.60);
   }
   bool isStone = vColor.r > 0.38 && vColor.r < 0.72 && abs(vColor.r - vColor.g) < 0.10 && abs(vColor.g - vColor.b) < 0.10;
   if (isStone) {
