@@ -55,6 +55,7 @@ let uLightDirLoc = null;
 let uTimeLoc = null;
 let uSeasonTintLoc = null;
 let uCameraCenterLoc = null;
+let uSnowAmountLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -116,13 +117,20 @@ uniform vec3 uLightDir;
 uniform vec3 uSeasonTint;
 uniform float uTime;
 uniform vec2 uCameraCenter;
+uniform float uSnowAmount;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
-  // Animated water sparkle: time-based shimmer on water tiles
+  // Snow: bleach grass/forest tiles toward white in winter
+  bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  if (isGrass && uSnowAmount > 0.0) {
+    vec3 snowCol = vec3(0.90, 0.93, 0.98);
+    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
+  }
+  // Animated water sparkle
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
@@ -168,12 +176,18 @@ uniform vec3 uLightDir;
 uniform vec3 uSeasonTint;
 uniform float uTime;
 uniform vec2 uCameraCenter;
+uniform float uSnowAmount;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
+  bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  if (isGrass && uSnowAmount > 0.0) {
+    vec3 snowCol = vec3(0.90, 0.93, 0.98);
+    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
+  }
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
@@ -987,6 +1001,7 @@ export function initGL3D(canvas) {
   uTimeLoc          = gl.getUniformLocation(program, 'uTime');
   uSeasonTintLoc    = gl.getUniformLocation(program, 'uSeasonTint');
   uCameraCenterLoc  = gl.getUniformLocation(program, 'uCameraCenter');
+  uSnowAmountLoc    = gl.getUniformLocation(program, 'uSnowAmount');
 
   // Create terrain VAO
   if (isWebGL2) {
@@ -1091,6 +1106,11 @@ export function render3D() {
       winter: [0.85, 0.90, 1.10],
     }[G.season] || [1, 1, 1];
     gl.uniform3f(uSeasonTintLoc, ST[0], ST[1], ST[2]);
+  }
+
+  // Snow cover: full white blanket in winter, none otherwise
+  if (uSnowAmountLoc) {
+    gl.uniform1f(uSnowAmountLoc, G.season === 'winter' ? 1.0 : 0.0);
   }
 
   // Fog center: follow camera tile position so fog fades from view center
