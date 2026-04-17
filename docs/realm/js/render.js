@@ -1039,6 +1039,18 @@ export function render() {
     ctx.ellipse(s.x, cy - 8, 6.3, 7, 0, 0, Math.PI * 2);
     ctx.stroke();
 
+    // Arm stubs — small ovals on body sides, counter-swing to feet when walking
+    const armSwing = isMoving ? step * 0.45 : 0;
+    ctx.fillStyle = bodyColor;
+    ctx.strokeStyle = 'rgba(20,10,0,0.35)';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.ellipse(s.x - 7.0, cy - 9 + armSwing, 2.6, 1.9, Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(s.x + 7.0, cy - 9 - armSwing, 2.6, 1.9, -Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
     // Neck stub — skin-colored oval; drawn before head so head overlaps top edge naturally
     ctx.fillStyle = skinColor;
     ctx.beginPath();
