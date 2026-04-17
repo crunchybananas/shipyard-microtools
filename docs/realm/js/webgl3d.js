@@ -292,7 +292,11 @@ void main() {
     float star = step(0.965, h) * twinkle * nightAmt * fog;
     finalCol += vec3(0.88, 0.92, 1.0) * star * 1.4;
   }
-  fragColor = vec4(finalCol, 1.0);
+  // Final grade: gentle saturation boost + soft contrast lift
+  float finalLum = dot(finalCol, vec3(0.299, 0.587, 0.114));
+  finalCol = mix(vec3(finalLum), finalCol, 1.18);
+  finalCol = finalCol * 1.04 - 0.02;
+  fragColor = vec4(clamp(finalCol, 0.0, 1.0), 1.0);
 }`;
 
 // WebGL1 fallback shaders
@@ -478,7 +482,10 @@ void main() {
     float star = step(0.965, h) * twinkle * nightAmt * fog;
     finalCol += vec3(0.88, 0.92, 1.0) * star * 1.4;
   }
-  gl_FragColor = vec4(finalCol, 1.0);
+  float finalLum = dot(finalCol, vec3(0.299, 0.587, 0.114));
+  finalCol = mix(vec3(finalLum), finalCol, 1.18);
+  finalCol = finalCol * 1.04 - 0.02;
+  gl_FragColor = vec4(clamp(finalCol, 0.0, 1.0), 1.0);
 }`;
 
 // ── Matrix math ────────────────────────────────────────────
