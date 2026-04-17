@@ -43,6 +43,12 @@ let buildingsIndexBuf = null;
 let buildingsIndexCount = 0;
 let lastBuildingRebuild = 0;
 
+// Citizens mesh state (rebuilt every frame for smooth movement)
+let citizensVao = null;
+let citizensVertexBuf = null;
+let citizensIndexBuf = null;
+let citizensIndexCount = 0;
+
 // Uniform locations
 let uViewProjLoc = null;
 let uLightDirLoc = null;
@@ -803,6 +809,41 @@ export function buildBuildingsMesh() {
   lastBuildingRebuild = performance.now();
 }
 
+// ── Citizens mesh (rebuilt every frame) ────────────────────
+const CITIZEN_COLORS = [
+  [0.85, 0.25, 0.20], // red
+  [0.25, 0.45, 0.85], // blue
+  [0.20, 0.70, 0.25], // green
+  [0.85, 0.72, 0.18], // yellow
+  [0.70, 0.25, 0.75], // purple
+  [0.20, 0.72, 0.72], // teal
+];
+const SKIN = [0.92, 0.75, 0.55];
+
+function buildCitizensMesh() {
+  if (!gl || !program || !G.citizens || G.citizens.length === 0) {
+    citizensIndexCount = 0;
+    return;
+  }
+  const verts = [], indices = [];
+  for (let i = 0; i < G.citizens.length; i++) {
+    const c = G.citizens[i];
+    const col = Math.floor(c.x), row = Math.floor(c.y);
+    const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
+    const baseH = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8;
+    const groundY = baseH + 0.02;
+    const cx = c.x, cz = c.y;
+    const bodyColor = CITIZEN_COLORS[i % CITIZEN_COLORS.length];
+    const S = 0.10;
+    // Body
+    pushBox(verts, indices, cx-S, groundY, cz-S, cx+S, groundY+S*3.5, cz+S, bodyColor);
+    // Head
+    pushBox(verts, indices, cx-S*0.85, groundY+S*3.5, cz-S*0.85, cx+S*0.85, groundY+S*5.5, cz+S*0.85, SKIN);
+  }
+  if (indices.length === 0) { citizensIndexCount = 0; return; }
+  citizensIndexCount = uploadMesh(citizensVao, citizensVertexBuf, citizensIndexBuf, verts, indices);
+}
+
 // ── Camera / VP matrix ─────────────────────────────────────
 function buildViewProjection() {
   const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.7;
@@ -894,6 +935,15 @@ export function initGL3D(canvas) {
   // Create buildings GPU buffers
   buildingsVertexBuf = gl.createBuffer();
   buildingsIndexBuf  = gl.createBuffer();
+
+  // Create citizens VAO + buffers
+  if (isWebGL2) {
+    citizensVao = gl.createVertexArray();
+  } else if (oeVao) {
+    citizensVao = oeVao.createVertexArrayOES();
+  }
+  citizensVertexBuf = gl.createBuffer();
+  citizensIndexBuf  = gl.createBuffer();
 
   // GL state
   gl.enable(gl.DEPTH_TEST);
@@ -1042,6 +1092,37 @@ export function render3D() {
     gl.drawElements(gl.TRIANGLES, buildingsIndexCount, gl.UNSIGNED_INT, 0);
     gl.depthFunc(gl.LEQUAL);
 
+    if (isWebGL2) {
+      gl.bindVertexArray(null);
+    } else if (oeVao) {
+      oeVao.bindVertexArrayOES(null);
+    }
+  }
+
+  // ── Draw citizens (rebuilt every frame for smooth movement) ──
+  buildCitizensMesh();
+  if (citizensIndexCount > 0) {
+    if (isWebGL2) {
+      gl.bindVertexArray(citizensVao);
+    } else if (oeVao) {
+      oeVao.bindVertexArrayOES(citizensVao);
+    } else {
+      const STRIDE = 9 * 4;
+      gl.bindBuffer(gl.ARRAY_BUFFER, citizensVertexBuf);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, citizensIndexBuf);
+      const aPosLoc    = gl.getAttribLocation(program, 'aPos');
+      const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
+      const aColorLoc  = gl.getAttribLocation(program, 'aColor');
+      gl.enableVertexAttribArray(aPosLoc);
+      gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
+      gl.enableVertexAttribArray(aNormalLoc);
+      gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
+      gl.enableVertexAttribArray(aColorLoc);
+      gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
+    }
+    gl.depthFunc(gl.ALWAYS);
+    gl.drawElements(gl.TRIANGLES, citizensIndexCount, gl.UNSIGNED_INT, 0);
+    gl.depthFunc(gl.LEQUAL);
     if (isWebGL2) {
       gl.bindVertexArray(null);
     } else if (oeVao) {
