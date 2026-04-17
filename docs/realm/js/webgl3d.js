@@ -157,15 +157,21 @@ void main() {
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
-  // Sky/fog color shifts with time of day: dawn amber → noon blue → dusk purple
+  // Sky/fog color shifts with time of day: dawn amber → noon blue → dusk purple → night navy
   float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
   float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
+  float nightPhase = abs(uDayPhase - 0.5); // 0=noon, 0.5=midnight
+  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
   vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
   vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
   vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
-  vec3 skyCol = mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk);
+  vec3 skyNight = vec3(0.04, 0.07, 0.18);
+  vec3 skyCol = mix(mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk), skyNight, nightAmt);
   // Warm sunrise/sunset tint bleeds into lit surfaces
   litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
+  // Night: dim scene to moonlit blue-silver
+  vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
+  litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
   fragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
 }`;
 
@@ -238,11 +244,16 @@ void main() {
   float fog = smoothstep(30.0, 46.0, fogDist);
   float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
   float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
+  float nightPhase = abs(uDayPhase - 0.5);
+  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
   vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
   vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
   vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
-  vec3 skyCol = mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk);
+  vec3 skyNight = vec3(0.04, 0.07, 0.18);
+  vec3 skyCol = mix(mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk), skyNight, nightAmt);
   litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
+  vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
+  litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
   gl_FragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
 }`;
 
@@ -1128,15 +1139,18 @@ export function render3D() {
   }
 
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-  // Dynamic clear color tracks day phase so background matches fog sky
+  // Dynamic clear color tracks day/night phase so background matches fog sky
   {
     const t = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
     const dawn = Math.max(0, 1 - Math.abs(t - 0.15) * 6);
     const dusk = Math.max(0, 1 - Math.abs(t - 0.85) * 6);
+    const nightPhase = Math.abs(t - 0.5);
+    const night = Math.max(0, Math.min(1, (nightPhase - 0.30) / 0.17));
     const lerp = (a, b, f) => a + (b - a) * f;
-    const r = lerp(lerp(0.45, 0.96, dawn), 0.70, dusk);
-    const g = lerp(lerp(0.68, 0.65, dawn), 0.45, dusk);
-    const b = lerp(lerp(0.88, 0.38, dawn), 0.72, dusk);
+    let r = lerp(lerp(0.45, 0.96, dawn), 0.70, dusk);
+    let g = lerp(lerp(0.68, 0.65, dawn), 0.45, dusk);
+    let b = lerp(lerp(0.88, 0.38, dawn), 0.72, dusk);
+    r = lerp(r, 0.04, night); g = lerp(g, 0.07, night); b = lerp(b, 0.18, night);
     gl.clearColor(r, g, b, 1.0);
   }
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
