@@ -846,20 +846,26 @@ function buildCitizensMesh() {
     return;
   }
   const verts = [], indices = [];
-  for (let i = 0; i < G.citizens.length; i++) {
-    const c = G.citizens[i];
-    const col = Math.floor(c.x), row = Math.floor(c.y);
+
+  function addPerson(cx, cz, bodyColor, S) {
+    const col = Math.floor(cx), row = Math.floor(cz);
     const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
-    const baseH = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8;
-    const groundY = baseH + 0.02;
-    const cx = c.x, cz = c.y;
-    const bodyColor = CITIZEN_COLORS[i % CITIZEN_COLORS.length];
-    const S = 0.10;
-    // Body
-    pushBox(verts, indices, cx-S, groundY, cz-S, cx+S, groundY+S*3.5, cz+S, bodyColor);
-    // Head
+    const groundY = (TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8) + 0.02;
+    pushBox(verts, indices, cx-S, groundY,       cz-S, cx+S,      groundY+S*3.5, cz+S,      bodyColor);
     pushBox(verts, indices, cx-S*0.85, groundY+S*3.5, cz-S*0.85, cx+S*0.85, groundY+S*5.5, cz+S*0.85, SKIN);
   }
+
+  for (let i = 0; i < G.citizens.length; i++) {
+    const c = G.citizens[i];
+    addPerson(c.x, c.y, CITIZEN_COLORS[i % CITIZEN_COLORS.length], 0.10);
+  }
+
+  // Enemies render as slightly larger dark-red figures
+  const ENEMY_COLOR = [0.72, 0.08, 0.08];
+  for (const e of (G.enemies || [])) {
+    addPerson(e.x, e.y, ENEMY_COLOR, 0.13);
+  }
+
   if (indices.length === 0) { citizensIndexCount = 0; return; }
   citizensIndexCount = uploadMesh(citizensVao, citizensVertexBuf, citizensIndexBuf, verts, indices);
 }
