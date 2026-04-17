@@ -137,6 +137,12 @@ void main() {
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
+  // Forest rim light: sky-fill on side faces of tree/forest geometry makes canopy feel 3D
+  bool isForest = vColor.g > 0.38 && vColor.g > vColor.r * 1.05 && vColor.b < 0.45 && vColor.g < 0.72;
+  if (isForest && N.y < 0.35) {
+    float skyFill = max(0.0, -dot(N, vec3(0.0, -1.0, 0.0)) + 0.5);
+    litColor += vec3(0.18, 0.32, 0.42) * skyFill * 0.28;
+  }
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
   // Grass micro-variation: per-tile hash breaks up uniform green carpet
   if (isGrass && N.y > 0.5) {
@@ -348,6 +354,11 @@ void main() {
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
+  bool isForest = vColor.g > 0.38 && vColor.g > vColor.r * 1.05 && vColor.b < 0.45 && vColor.g < 0.72;
+  if (isForest && N.y < 0.35) {
+    float skyFill = max(0.0, -dot(N, vec3(0.0, -1.0, 0.0)) + 0.5);
+    litColor += vec3(0.18, 0.32, 0.42) * skyFill * 0.28;
+  }
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
   if (isGrass && N.y > 0.5) {
     vec2 tileId = floor(vWorldPos.xz);
