@@ -351,7 +351,8 @@ function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
 // If omitted, the entire model uses `color`.
 // clipBase: if true, skip all triangles whose verts are in the bottom 36% of the model height.
 // Used for buildings to remove the Kenney hex tile base platform.
-function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clipBase, trunkColor) {
+// color = mid/wall color, trunkColor = lower 28%, roofColor = upper 32%
+function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clipBase, trunkColor, roofColor) {
   const { positions, normals } = geom;
   const vCount = positions.length / 3;
 
@@ -362,7 +363,8 @@ function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clip
   }
   const range = maxY - minY;
   const baseThreshold = minY + range * 0.36;
-  const trunkThreshold = minY + range * 0.28; // lower 28% = trunk
+  const trunkThreshold = minY + range * 0.28; // lower 28% = trunk/base
+  const roofThreshold  = minY + range * 0.68; // upper 32% = roof/top
 
   // Map original vert index → new packed index (-1 = skipped)
   const vertMap = new Int32Array(vCount).fill(-1);
@@ -375,7 +377,9 @@ function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clip
     const px = positions[i*3+0] * scale + cx;
     const py = (positions[i*3+1] - minY) * scale + groundY;
     const pz = positions[i*3+2] * scale + cz;
-    const c = (trunkColor && positions[i*3+1] < trunkThreshold) ? trunkColor : color;
+    let c = color;
+    if (trunkColor && positions[i*3+1] < trunkThreshold) c = trunkColor;
+    else if (roofColor && positions[i*3+1] > roofThreshold)  c = roofColor;
     verts.push(px, py, pz,
       normals[i*3+0], normals[i*3+1], normals[i*3+2],
       c[0], c[1], c[2]);
@@ -818,9 +822,23 @@ export function buildBuildingsMesh() {
         blacksmith: [0.32, 0.32, 0.38],
         windmill:   [0.88, 0.82, 0.65],
       };
-      const color = GLB_COLORS[b.type] || [0.80, 0.78, 0.72];
+      // Contrasting roof/top color per building type for visual identity
+      const GLB_ROOF = {
+        house:      [0.70, 0.22, 0.18], // red tile roof
+        farm:       [0.55, 0.40, 0.18], // brown thatch
+        tower:      [0.38, 0.42, 0.48], // dark slate cap
+        church:     [0.48, 0.46, 0.44], // stone spire
+        barracks:   [0.50, 0.20, 0.16], // dark red roof
+        market:     [0.82, 0.24, 0.14], // bright red awning
+        castle:     [0.42, 0.40, 0.38], // dark stone merlon
+        tavern:     [0.55, 0.35, 0.16], // brown thatch
+        blacksmith: [0.22, 0.22, 0.26], // dark iron roof
+        windmill:   [0.72, 0.28, 0.18], // red cap
+      };
+      const color    = GLB_COLORS[b.type] || [0.80, 0.78, 0.72];
+      const roofColor = GLB_ROOF[b.type] || null;
       // Clip bottom 36% of model (Kenney hex base platform) — building structure only
-      inlineGLBTree(verts, indices, glbGeom, cx, groundY - 0.30, cz, bldScale, color, true);
+      inlineGLBTree(verts, indices, glbGeom, cx, groundY - 0.30, cz, bldScale, color, true, null, roofColor);
     } else {
       addBuildingMesh(verts, indices, b, groundY);
     }
