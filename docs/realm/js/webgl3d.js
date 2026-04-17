@@ -153,6 +153,14 @@ void main() {
   // Compute night amount early — needed for water and sky sections
   float nightPhase = abs(uDayPhase - 0.5); // 0=noon, 0.5=midnight
   float nightAmt = smoothstep(0.30, 0.47, nightPhase);
+  // Cloud shadows: drifting dark patches on top-facing terrain during daytime
+  if (N.y > 0.5 && nightAmt < 0.8 && uRainAmount < 0.5) {
+    vec2 cUV = vWorldPos.xz * 0.07 + vec2(uTime * 0.018, uTime * 0.011);
+    float c1 = sin(cUV.x * 3.1 + sin(cUV.y * 2.3)) * 0.5 + 0.5;
+    float c2 = sin(cUV.x * 1.7 + cUV.y * 2.9 + 1.4) * 0.5 + 0.5;
+    float cloud = smoothstep(0.55, 0.75, c1 * c2);
+    litColor *= 1.0 - cloud * 0.22 * (1.0 - nightAmt);
+  }
   // Winter snow: height-scaled gradient + crisp alpine snowline above y=2.5
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (!isWater && uSnowAmount > 0.0) {
@@ -288,6 +296,13 @@ void main() {
   }
   float nightPhase = abs(uDayPhase - 0.5);
   float nightAmt = smoothstep(0.30, 0.47, nightPhase);
+  if (N.y > 0.5 && nightAmt < 0.8 && uRainAmount < 0.5) {
+    vec2 cUV = vWorldPos.xz * 0.07 + vec2(uTime * 0.018, uTime * 0.011);
+    float c1 = sin(cUV.x * 3.1 + sin(cUV.y * 2.3)) * 0.5 + 0.5;
+    float c2 = sin(cUV.x * 1.7 + cUV.y * 2.9 + 1.4) * 0.5 + 0.5;
+    float cloud = smoothstep(0.55, 0.75, c1 * c2);
+    litColor *= 1.0 - cloud * 0.22 * (1.0 - nightAmt);
+  }
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (!isWater && uSnowAmount > 0.0) {
     float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
