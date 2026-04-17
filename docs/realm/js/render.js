@@ -228,7 +228,7 @@ export function render() {
           ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
           ctx.fillRect(nx, ny, 1.5, 1);
         }
-        ctx.globalAlpha = daylight;
+        ctx.globalAlpha = 1;
       }
 
       // Terrain blend: multi-step gradient at edges bordering different biomes
@@ -254,7 +254,7 @@ export function render() {
           ctx.arc(s.x + dx2 * 10, s.y + dy2 * 5, 15, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.globalAlpha = daylight;
+        ctx.globalAlpha = 1;
       }
 
       // Side faces — only for non-water tiles that have actual depth
