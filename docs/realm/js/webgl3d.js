@@ -137,12 +137,20 @@ void main() {
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
     litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
   }
-  // Animated water sparkle
+  // Animated water sparkle + specular sun glint
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
     litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
+    // Animate per-fragment wave normals for sun glint hotspots
+    float wnx = sin(vWorldPos.x * 4.1 + uTime * 1.8) * 0.28;
+    float wnz = cos(vWorldPos.z * 3.7 + uTime * 2.1) * 0.28;
+    vec3 waveN = normalize(vec3(-wnx, 1.0, -wnz));
+    vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
+    vec3 halfVec = normalize(uLightDir + viewDir);
+    float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
+    litColor += vec3(1.0, 0.97, 0.88) * spec * 0.5;
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
@@ -205,6 +213,13 @@ void main() {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
     litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
+    float wnx = sin(vWorldPos.x * 4.1 + uTime * 1.8) * 0.28;
+    float wnz = cos(vWorldPos.z * 3.7 + uTime * 2.1) * 0.28;
+    vec3 waveN = normalize(vec3(-wnx, 1.0, -wnz));
+    vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
+    vec3 halfVec = normalize(uLightDir + viewDir);
+    float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
+    litColor += vec3(1.0, 0.97, 0.88) * spec * 0.5;
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
