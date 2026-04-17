@@ -45,7 +45,7 @@ const TILE_HEIGHT = {
 
 // ── Tile colors (RGB 0–1 matching existing palette) ────────
 const TILE_COLOR_3D = {
-  [TILE.WATER]:    [0.10, 0.40, 0.75],
+  [TILE.WATER]:    [0.38, 0.65, 0.87],
   [TILE.SAND]:     [0.91, 0.78, 0.49],
   [TILE.GRASS]:    [0.40, 0.78, 0.42],
   [TILE.FOREST]:   [0.18, 0.48, 0.21],
@@ -91,7 +91,11 @@ void main() {
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
-  fragColor = vec4(ambient + diffuse, 1.0);
+  vec3 litColor = ambient + diffuse;
+  float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
+  float fog = smoothstep(30.0, 46.0, fogDist);
+  vec3 skyCol = vec3(0.45, 0.68, 0.88);
+  fragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
 }`;
 
 // WebGL1 fallback shaders
@@ -129,7 +133,11 @@ void main() {
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
-  gl_FragColor = vec4(ambient + diffuse, 1.0);
+  vec3 litColor = ambient + diffuse;
+  float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
+  float fog = smoothstep(30.0, 46.0, fogDist);
+  vec3 skyCol = vec3(0.45, 0.68, 0.88);
+  gl_FragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
 }`;
 
 // ── Matrix math ────────────────────────────────────────────
