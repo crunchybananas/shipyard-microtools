@@ -166,6 +166,9 @@ void main() {
     // Day: warm sun glint. Night: bright silver moonpath (boosted intensity)
     litColor += mix(vec3(1.0, 0.97, 0.88) * spec * 0.5,
                     vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
+    // Whitecap foam: wave crests bleach to white-blue
+    float crest = smoothstep(0.05, 0.10, vWorldPos.y);
+    litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
@@ -268,6 +271,8 @@ void main() {
     float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
     litColor += mix(vec3(1.0, 0.97, 0.88) * spec * 0.5,
                     vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
+    float crest = smoothstep(0.05, 0.10, vWorldPos.y);
+    litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
