@@ -249,3 +249,17 @@ Every building renders a **6-unit tall hot-pink pillar** as a debug marker. Must
 ## Next Cycle Plan
 
 **Cycle 12:** Replace flat dark navy background with a sky gradient. Currently `gl.clearColor(0.05, 0.05, 0.12, 1.0)` paints a solid dark void. Change to a light blue sky gradient rendered as a fullscreen quad before the terrain pass — this would make the ocean water blend into a horizon rather than cutting off at a hard dark boundary. Alternatively, just brightening the clear color to a lighter horizon blue `(0.55, 0.75, 0.90)` would immediately improve the "floating island" feel.
+
+### Cycle 12 — 2026-04-16
+**Changes (js/webgl3d.js):**
+- `gl.clearColor` changed from dark navy `(0.08, 0.10, 0.18)` → sky blue `(0.45, 0.68, 0.88)`
+
+**Visual result:** Major transformation. Island now sits in a coherent sky/water world instead of floating in space. Ocean water blends naturally into sky background. Buildings clearly visible (church steeple, tower, castle corner towers, brown house/tavern). The scene feels like a proper game.
+
+**Key learning:** ES module cache — must Cmd+Shift+R (hard refresh) after every code change, not just ?_cb= bump.
+
+---
+
+## Next Cycle Plan
+
+**Cycle 13:** The water color `[0.10, 0.40, 0.75]` is darker than the sky `(0.45, 0.68, 0.88)`. Brightening water to match sky hue — e.g. `[0.35, 0.62, 0.85]` — would create smooth ocean-to-sky continuity. Also consider adding a subtle fog: in the fragment shader, blend fragments toward sky color based on distance from map center, giving atmospheric depth near the edges.
