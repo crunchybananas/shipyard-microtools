@@ -169,6 +169,13 @@ void main() {
     float snowBlend = mix(heightFactor, 1.0, snowLine);
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
     litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * snowBlend);
+    // Snow specular: sun glint on snowfields and alpine peaks
+    if (N.y > 0.4) {
+      vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
+      vec3 halfVec = normalize(uLightDir + viewDir);
+      float snowSpec = pow(max(0.0, dot(N, halfVec)), 28.0);
+      litColor += vec3(0.95, 0.97, 1.0) * snowSpec * uSnowAmount * snowBlend * 0.6;
+    }
   }
   // Animated water sparkle + specular — sun glint by day, moonpath by night
   if (isWater) {
@@ -310,6 +317,12 @@ void main() {
     float snowBlend = mix(heightFactor, 1.0, snowLine);
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
     litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * snowBlend);
+    if (N.y > 0.4) {
+      vec3 viewDir2 = normalize(vec3(0.57, 1.0, 0.57));
+      vec3 halfVec2 = normalize(uLightDir + viewDir2);
+      float snowSpec = pow(max(0.0, dot(N, halfVec2)), 28.0);
+      litColor += vec3(0.95, 0.97, 1.0) * snowSpec * uSnowAmount * snowBlend * 0.6;
+    }
   }
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
