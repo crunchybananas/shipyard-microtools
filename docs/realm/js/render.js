@@ -1115,20 +1115,22 @@ export function render() {
       ctx.arc(eyeX + 1.7 - 0.3, headY + 0.7 - 0.35, 0.38, 0, Math.PI * 2);
       ctx.fill();
     }
-    // Mouth — tiny line, only at closer zoom
+    // Mouth — gentle smile curve, only at closer zoom
     if (!facingAway && G.camera.zoom >= 1.5) {
-      ctx.strokeStyle = 'rgba(80,50,30,0.7)';
-      ctx.lineWidth = 0.7;
+      ctx.strokeStyle = 'rgba(80,50,30,0.75)';
+      ctx.lineWidth = 0.9;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
       const mouthX = headX + faceScreenX * 0.5;
       ctx.beginPath();
-      ctx.moveTo(mouthX - 1.1, headY + 2.1);
-      ctx.lineTo(mouthX + 1.1, headY + 2.1);
+      ctx.moveTo(mouthX - 1.2, headY + 1.8);
+      ctx.quadraticCurveTo(mouthX, headY + 3.1, mouthX + 1.2, headY + 1.8);
       ctx.stroke();
       // Rosy cheeks — soft blush at close zoom
       ctx.fillStyle = 'rgba(240,100,80,0.22)';
       ctx.beginPath();
-      ctx.ellipse(headX + faceScreenX * 0.4 - 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
-      ctx.ellipse(headX + faceScreenX * 0.4 + 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(headX + faceScreenX * 0.4 - 2.8, headY + 2.2, 2.2, 1.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(headX + faceScreenX * 0.4 + 2.8, headY + 2.2, 2.2, 1.5, 0, 0, Math.PI * 2);
       ctx.fill();
     }
 
