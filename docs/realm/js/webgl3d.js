@@ -134,6 +134,9 @@ void main() {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
     litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
   }
+  // Compute night amount early — needed for water and sky sections
+  float nightPhase = abs(uDayPhase - 0.5); // 0=noon, 0.5=midnight
+  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
   // Winter snow: height-scaled — mountain tops fully white, lowlands dusty
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (!isWater && uSnowAmount > 0.0) {
@@ -141,27 +144,27 @@ void main() {
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
     litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * heightFactor);
   }
-  // Animated water sparkle + specular sun glint
+  // Animated water sparkle + specular — sun glint by day, moonpath by night
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
-    litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
-    // Animate per-fragment wave normals for sun glint hotspots
+    litColor += mix(vec3(sparkle * 0.7, sparkle * 0.85, sparkle),
+                    vec3(sparkle * 0.55, sparkle * 0.65, sparkle), nightAmt);
     float wnx = sin(vWorldPos.x * 4.1 + uTime * 1.8) * 0.28;
     float wnz = cos(vWorldPos.z * 3.7 + uTime * 2.1) * 0.28;
     vec3 waveN = normalize(vec3(-wnx, 1.0, -wnz));
     vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
     vec3 halfVec = normalize(uLightDir + viewDir);
     float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
-    litColor += vec3(1.0, 0.97, 0.88) * spec * 0.5;
+    // Day: warm sun glint. Night: bright silver moonpath (boosted intensity)
+    litColor += mix(vec3(1.0, 0.97, 0.88) * spec * 0.5,
+                    vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
   // Sky/fog color shifts with time of day: dawn amber → noon blue → dusk purple → night navy
   float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
   float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
-  float nightPhase = abs(uDayPhase - 0.5); // 0=noon, 0.5=midnight
-  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
   vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
   vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
   vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
@@ -231,6 +234,8 @@ void main() {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
     litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
   }
+  float nightPhase = abs(uDayPhase - 0.5);
+  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (!isWater && uSnowAmount > 0.0) {
     float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
@@ -240,21 +245,21 @@ void main() {
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
-    litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
+    litColor += mix(vec3(sparkle * 0.7, sparkle * 0.85, sparkle),
+                    vec3(sparkle * 0.55, sparkle * 0.65, sparkle), nightAmt);
     float wnx = sin(vWorldPos.x * 4.1 + uTime * 1.8) * 0.28;
     float wnz = cos(vWorldPos.z * 3.7 + uTime * 2.1) * 0.28;
     vec3 waveN = normalize(vec3(-wnx, 1.0, -wnz));
     vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
     vec3 halfVec = normalize(uLightDir + viewDir);
     float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
-    litColor += vec3(1.0, 0.97, 0.88) * spec * 0.5;
+    litColor += mix(vec3(1.0, 0.97, 0.88) * spec * 0.5,
+                    vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
   float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
   float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
-  float nightPhase = abs(uDayPhase - 0.5);
-  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
   vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
   vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
   vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
