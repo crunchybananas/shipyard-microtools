@@ -669,11 +669,18 @@ export function buildTerrainMesh() {
   terrainIndexCount = indices.length;
   for (const [cx, cz, groundY, scale, treeSeed] of treeTiles) {
     if (glbTreeVariants && glbTreeVariants.length > 0) {
-      // Pick a variant deterministically — mix sizes by cycling through variants
-      const variant = glbTreeVariants[treeSeed % glbTreeVariants.length];
-      const glbScale = scale * 0.38; // Kenney trees are ~3 units tall; our tiles ~1 unit
-      const canopyColor = [0.18, 0.60, 0.22];
-      inlineGLBTree(verts, indices, variant, cx, groundY, cz, glbScale, canopyColor);
+      const variantIdx = treeSeed % glbTreeVariants.length;
+      const variant = glbTreeVariants[variantIdx];
+      const glbScale = scale * 0.55;
+      // Slight color variation per variant so forest isn't uniform
+      const treeColors = [
+        [0.18, 0.60, 0.22], // default — medium forest green
+        [0.14, 0.50, 0.18], // tall — darker spruce
+        [0.22, 0.64, 0.26], // small — lighter young pine
+      ];
+      const canopyColor = treeColors[variantIdx];
+      // Raise tree 0.08 above ground so base geometry doesn't clip terrain
+      inlineGLBTree(verts, indices, variant, cx, groundY + 0.08, cz, glbScale, canopyColor);
     } else {
       addTree(verts, indices, cx, cz, groundY, scale);
     }
