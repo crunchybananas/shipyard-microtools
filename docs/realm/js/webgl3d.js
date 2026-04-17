@@ -58,6 +58,7 @@ let uCameraCenterLoc = null;
 let uSnowAmountLoc = null;
 let uAutumnAmountLoc = null;
 let uDayPhaseLoc = null;
+let uRainAmountLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -129,6 +130,7 @@ uniform vec2 uCameraCenter;
 uniform float uSnowAmount;
 uniform float uAutumnAmount;
 uniform float uDayPhase;
+uniform float uRainAmount;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -178,6 +180,15 @@ void main() {
     // Whitecap foam: wave crests bleach to white-blue
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
+  }
+  // Rain: overcast darkening + diagonal streaks on terrain tops
+  if (uRainAmount > 0.0) {
+    litColor *= mix(1.0, 0.70, uRainAmount);
+    if (N.y > 0.5) {
+      float streak = fract((vWorldPos.x - vWorldPos.z * 0.5) * 5.0 + uTime * 9.0);
+      float drop = step(0.93, streak) * 0.4;
+      litColor += vec3(0.55, 0.65, 0.80) * drop * uRainAmount;
+    }
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
@@ -248,6 +259,7 @@ uniform vec2 uCameraCenter;
 uniform float uSnowAmount;
 uniform float uAutumnAmount;
 uniform float uDayPhase;
+uniform float uRainAmount;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -290,6 +302,14 @@ void main() {
                     vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
+  }
+  if (uRainAmount > 0.0) {
+    litColor *= mix(1.0, 0.70, uRainAmount);
+    if (N.y > 0.5) {
+      float streak = fract((vWorldPos.x - vWorldPos.z * 0.5) * 5.0 + uTime * 9.0);
+      float drop = step(0.93, streak) * 0.4;
+      litColor += vec3(0.55, 0.65, 0.80) * drop * uRainAmount;
+    }
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
@@ -1118,6 +1138,7 @@ export function initGL3D(canvas) {
   uSnowAmountLoc    = gl.getUniformLocation(program, 'uSnowAmount');
   uAutumnAmountLoc  = gl.getUniformLocation(program, 'uAutumnAmount');
   uDayPhaseLoc      = gl.getUniformLocation(program, 'uDayPhase');
+  uRainAmountLoc    = gl.getUniformLocation(program, 'uRainAmount');
 
   // Create terrain VAO
   if (isWebGL2) {
@@ -1249,6 +1270,9 @@ export function render3D() {
   // Day phase: 0=midnight, 0.15=dawn, 0.5=noon, 0.85=dusk, 1=midnight
   if (uDayPhaseLoc) {
     gl.uniform1f(uDayPhaseLoc, (G.dayPhase ?? 0) / (G.dayLength ?? 3600));
+  }
+  if (uRainAmountLoc) {
+    gl.uniform1f(uRainAmountLoc, G.weather === 'rain' || G.weather === 'storm' ? 1.0 : 0.0);
   }
 
   // Fog center: follow camera tile position so fog fades from view center
