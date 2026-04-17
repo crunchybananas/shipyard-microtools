@@ -583,10 +583,16 @@ export function buildTerrainMesh() {
         const tlen = Math.sqrt(tnx * tnx + tny * tny + tnz * tnz);
         tileNormal = [tnx / tlen, tny / tlen, tnz / tlen];
       }
+      // Rock/mountain top faces get a lighter cap; grey sides stay dark
+      const topColor = tileType === TILE.MOUNTAIN
+        ? [0.88, 0.88, 0.92]   // snow cap
+        : tileType === TILE.STONE
+        ? [0.74, 0.70, 0.66]   // warm pale rock top
+        : color;
       pushFace(verts, indices,
         [ [x0,y,z0], [x1,y,z0], [x1,y,z1], [x0,y,z1] ],
         tileNormal,
-        color
+        topColor
       );
 
       // Skip water side faces entirely — water is a flat plane
