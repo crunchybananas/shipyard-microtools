@@ -4,11 +4,22 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
 import { screenToWorld, toScreen, toggleFPS } from './render.js';
+import { screenToTile3D } from './webgl3d.js';
 import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js';
 import { notify } from './notifications.js';
 import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js';
 import { renderMissions } from './missions.js';
+
+function is3DActive() {
+  const c3 = document.getElementById('game3d');
+  return c3 && c3.style.display !== 'none';
+}
+
+function pickTile(clientX, clientY) {
+  if (is3DActive()) return screenToTile3D(clientX, clientY);
+  return screenToWorld(clientX, clientY);
+}
 
 // Standard isometric hit test: screen-space bounding box, depth-sorted (front wins)
 function findBuildingAtClick(clientX, clientY) {
@@ -128,14 +139,15 @@ function tryPlaceAt(tx, ty) {
   return false;
 }
 
-export function setupInput(canvas) {
+export function setupInput(canvas, canvas3d) {
   const C = canvas;
   let touchDist = 0;
 
   C.addEventListener('contextmenu', e => e.preventDefault());
+  if (canvas3d) canvas3d.addEventListener('contextmenu', e => e.preventDefault());
 
-  C.addEventListener('mousedown', e => {
-    if (e.target !== C) return;
+  function onMouseDown(e) {
+    if (e.target !== C && e.target !== canvas3d) return;
     initAudio();
 
     // Shift + right-click sets rally point for all soldiers
@@ -171,7 +183,8 @@ export function setupInput(canvas) {
 
     // Left-click build
     if (e.button === 0 && G.selectedBuild) {
-      const t = screenToWorld(e.clientX, e.clientY);
+      const t = pickTile(e.clientX, e.clientY);
+      if (!t) return;
       tryPlaceAt(t.x, t.y);
       G._lastPaintTile = { x: t.x, y: t.y };
       return;
@@ -204,11 +217,13 @@ export function setupInput(canvas) {
     G.dragging = true;
     G.dragStart = { x: e.clientX, y: e.clientY };
     G.camStart = { x: G.camera.x, y: G.camera.y };
-  });
+  }
+  C.addEventListener('mousedown', onMouseDown);
+  if (canvas3d) canvas3d.addEventListener('mousedown', onMouseDown);
 
-  C.addEventListener('mousemove', e => {
+  function onMouseMove(e) {
     // Drag-to-paint: hold mouse and drag to place roads/walls continuously
-    if (G.selectedBuild && e.buttons === 1 && (G.selectedBuild === 'road' || G.selectedBuild === 'wall')) {
+    if (G.selectedBuild && e.buttons === 1 && !is3DActive() && (G.selectedBuild === 'road' || G.selectedBuild === 'wall')) {
       const t = screenToWorld(e.clientX, e.clientY);
       if (!G._lastPaintTile || t.x !== G._lastPaintTile.x || t.y !== G._lastPaintTile.y) {
         tryPlaceAt(t.x, t.y);
@@ -221,19 +236,26 @@ export function setupInput(canvas) {
       G.camera.x = G.camStart.x - (e.clientX - G.dragStart.x) / G.camera.zoom;
       G.camera.y = G.camStart.y - (e.clientY - G.dragStart.y) / G.camera.zoom;
     }
-    G.hoveredTile = screenToWorld(e.clientX, e.clientY);
+    G.hoveredTile = pickTile(e.clientX, e.clientY);
     G.mouseX = e.clientX; G.mouseY = e.clientY;
-  });
+  }
+  C.addEventListener('mousemove', onMouseMove);
+  if (canvas3d) canvas3d.addEventListener('mousemove', onMouseMove);
 
-  C.addEventListener('mouseup', () => { G.dragging = false; });
-  C.addEventListener('mouseleave', () => { G.dragging = false; });
-  window.addEventListener('mouseup', () => { G.dragging = false; });
+  const stopDrag = () => { G.dragging = false; };
+  C.addEventListener('mouseup', stopDrag);
+  C.addEventListener('mouseleave', stopDrag);
+  if (canvas3d) canvas3d.addEventListener('mouseup', stopDrag);
+  if (canvas3d) canvas3d.addEventListener('mouseleave', stopDrag);
+  window.addEventListener('mouseup', stopDrag);
 
-  C.addEventListener('wheel', e => {
+  const onWheel = e => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * delta));
-  }, { passive: false });
+  };
+  C.addEventListener('wheel', onWheel, { passive: false });
+  if (canvas3d) canvas3d.addEventListener('wheel', onWheel, { passive: false });
 
   // Touch
   C.addEventListener('touchstart', e => {
@@ -242,8 +264,8 @@ export function setupInput(canvas) {
     if (e.touches.length === 1) {
       const t = e.touches[0];
       if (G.selectedBuild) {
-        const tile = screenToWorld(t.clientX, t.clientY);
-        if (placeBuilding(G.selectedBuild, tile.x, tile.y)) {
+        const tile = pickTile(t.clientX, t.clientY);
+        if (tile && placeBuilding(G.selectedBuild, tile.x, tile.y)) {
           renderBuildBar(); renderMissions(); updateUI();
         }
         return;
@@ -266,7 +288,7 @@ export function setupInput(canvas) {
       const t = e.touches[0];
       G.camera.x = G.camStart.x - (t.clientX - G.dragStart.x) / G.camera.zoom;
       G.camera.y = G.camStart.y - (t.clientY - G.dragStart.y) / G.camera.zoom;
-      G.hoveredTile = screenToWorld(t.clientX, t.clientY);
+      G.hoveredTile = pickTile(t.clientX, t.clientY);
     }
     if (e.touches.length === 2) {
       const d = Math.hypot(

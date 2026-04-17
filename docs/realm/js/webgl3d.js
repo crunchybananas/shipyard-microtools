@@ -49,6 +49,12 @@ let citizensVertexBuf = null;
 let citizensIndexBuf = null;
 let citizensIndexCount = 0;
 
+// Hover tile highlight mesh (rebuilt every frame)
+let hoverVao = null;
+let hoverVertexBuf = null;
+let hoverIndexBuf = null;
+let hoverIndexCount = 0;
+
 // Uniform locations
 let uViewProjLoc = null;
 let uLightDirLoc = null;
@@ -1226,6 +1232,29 @@ function buildCitizensMesh() {
   citizensIndexCount = uploadMesh(citizensVao, citizensVertexBuf, citizensIndexBuf, verts, indices);
 }
 
+// ── Hover tile highlight ────────────────────────────────────
+function buildHoverMesh() {
+  hoverIndexCount = 0;
+  const ht = G.hoveredTile;
+  if (!gl || !ht) return;
+  const col = ht.x, row = ht.y;
+  if (col < 0 || col >= MAP_W || row < 0 || row >= MAP_H) return;
+  const tileType = (G.map[row]?.[col] !== undefined) ? G.map[row][col] : TILE.GRASS;
+  const h = (TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8) + 0.06;
+  const inset = 0.06;
+  const x0 = col + inset, x1 = col + 1 - inset;
+  const z0 = row + inset, z1 = row + 1 - inset;
+  const r = 1.0, g = 0.92, b = 0.1; // bright yellow
+  const verts = [
+    x0, h, z0,  0,1,0,  r,g,b,
+    x1, h, z0,  0,1,0,  r,g,b,
+    x1, h, z1,  0,1,0,  r,g,b,
+    x0, h, z1,  0,1,0,  r,g,b,
+  ];
+  const indices = [0,1,2, 0,2,3];
+  hoverIndexCount = uploadMesh(hoverVao, hoverVertexBuf, hoverIndexBuf, verts, indices);
+}
+
 // ── Camera / VP matrix ─────────────────────────────────────
 function buildViewProjection() {
   const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.7;
@@ -1256,6 +1285,33 @@ function buildViewProjection() {
   // VP = ortho * rotateX * rotateY * translate
   const vp = mat4Multiply(ortho, mat4Multiply(rx, mat4Multiply(ry, tr)));
   return vp;
+}
+
+// ── Tile picking (inverse VP projection) ───────────────────
+export function screenToTile3D(mx, my) {
+  if (!gl) return null;
+  const canvas = gl.canvas;
+  const rect = canvas.getBoundingClientRect();
+  const px = (mx - rect.left) * (canvas.width / rect.width);
+  const py = (my - rect.top)  * (canvas.height / rect.height);
+  const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.7;
+  const aspect = canvas.width / canvas.height;
+  const hh = 26 / zoom;
+  const hw = hh * aspect;
+  const ndcX =  2 * px / canvas.width  - 1;
+  const ndcY =  1 - 2 * py / canvas.height;
+  const vx = ndcX * hw;
+  const vy = ndcY * hh;
+  // Inverse of rotateX(pitch) * rotateY(-45°) * translate
+  // pitch = -atan(1/sqrt(2)), cos(pitch) = sqrt(2/3), sin(pitch) = -1/sqrt(3)
+  // After undoing the ortho projection we get view-space coords.
+  // Solving for tile (col, row) with y=tileHeight assumed flat:
+  const halfTW = TW / 2, halfTH = TH / 2;
+  const wx = (G.camera?.x ?? 0) / halfTW;
+  const wy = (G.camera?.y ?? 0) / halfTH;
+  const sum  = wy + 2 * vy / Math.sqrt(6);
+  const diff = wx + Math.sqrt(2) * vx;
+  return { x: Math.round((sum + diff) / 2), y: Math.round((sum - diff) / 2) };
 }
 
 // ── Public API ─────────────────────────────────────────────
@@ -1335,6 +1391,15 @@ export function initGL3D(canvas) {
   }
   citizensVertexBuf = gl.createBuffer();
   citizensIndexBuf  = gl.createBuffer();
+
+  // Create hover tile VAO + buffers
+  if (isWebGL2) {
+    hoverVao = gl.createVertexArray();
+  } else if (oeVao) {
+    hoverVao = oeVao.createVertexArrayOES();
+  }
+  hoverVertexBuf = gl.createBuffer();
+  hoverIndexBuf  = gl.createBuffer();
 
   // GL state
   gl.enable(gl.DEPTH_TEST);
@@ -1567,6 +1632,39 @@ export function render3D() {
       gl.bindVertexArray(null);
     } else if (oeVao) {
       oeVao.bindVertexArrayOES(null);
+    }
+  }
+
+  // ── Draw hover tile highlight ──────────────────────────────
+  if (G.selectedBuild) {
+    buildHoverMesh();
+    if (hoverIndexCount > 0) {
+      if (isWebGL2) {
+        gl.bindVertexArray(hoverVao);
+      } else if (oeVao) {
+        oeVao.bindVertexArrayOES(hoverVao);
+      } else {
+        const STRIDE = 9 * 4;
+        gl.bindBuffer(gl.ARRAY_BUFFER, hoverVertexBuf);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, hoverIndexBuf);
+        const aPosLoc    = gl.getAttribLocation(program, 'aPos');
+        const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
+        const aColorLoc  = gl.getAttribLocation(program, 'aColor');
+        gl.enableVertexAttribArray(aPosLoc);
+        gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
+        gl.enableVertexAttribArray(aNormalLoc);
+        gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
+        gl.enableVertexAttribArray(aColorLoc);
+        gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
+      }
+      gl.depthFunc(gl.ALWAYS);
+      gl.drawElements(gl.TRIANGLES, hoverIndexCount, gl.UNSIGNED_INT, 0);
+      gl.depthFunc(gl.LEQUAL);
+      if (isWebGL2) {
+        gl.bindVertexArray(null);
+      } else if (oeVao) {
+        oeVao.bindVertexArrayOES(null);
+      }
     }
   }
 }

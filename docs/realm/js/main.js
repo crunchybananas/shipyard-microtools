@@ -108,7 +108,7 @@ function beginGame() {
   titleEl.style.opacity = '0';
   setTimeout(() => { titleEl.style.display = 'none'; }, 500);
 
-  setupInput(canvas);
+  setupInput(canvas, canvas3d);
   initChronicle();
   if (G.chronicle.length === 0) {
     // Avoid "The realm of Realm" collision when the player keeps the default kingdom name
