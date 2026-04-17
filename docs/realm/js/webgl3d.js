@@ -54,6 +54,7 @@ let uViewProjLoc = null;
 let uLightDirLoc = null;
 let uTimeLoc = null;
 let uSeasonTintLoc = null;
+let uCameraCenterLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -114,6 +115,7 @@ out vec4 fragColor;
 uniform vec3 uLightDir;
 uniform vec3 uSeasonTint;
 uniform float uTime;
+uniform vec2 uCameraCenter;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -127,7 +129,7 @@ void main() {
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
     litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
   }
-  float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
+  float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
   vec3 skyCol = vec3(0.45, 0.68, 0.88);
   fragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
@@ -165,6 +167,7 @@ varying vec3 vWorldPos;
 uniform vec3 uLightDir;
 uniform vec3 uSeasonTint;
 uniform float uTime;
+uniform vec2 uCameraCenter;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -177,7 +180,7 @@ void main() {
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
     litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
   }
-  float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
+  float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
   vec3 skyCol = vec3(0.45, 0.68, 0.88);
   gl_FragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
@@ -979,10 +982,11 @@ export function initGL3D(canvas) {
   }
 
   // Get uniform locations
-  uViewProjLoc    = gl.getUniformLocation(program, 'uViewProj');
-  uLightDirLoc    = gl.getUniformLocation(program, 'uLightDir');
-  uTimeLoc        = gl.getUniformLocation(program, 'uTime');
-  uSeasonTintLoc  = gl.getUniformLocation(program, 'uSeasonTint');
+  uViewProjLoc      = gl.getUniformLocation(program, 'uViewProj');
+  uLightDirLoc      = gl.getUniformLocation(program, 'uLightDir');
+  uTimeLoc          = gl.getUniformLocation(program, 'uTime');
+  uSeasonTintLoc    = gl.getUniformLocation(program, 'uSeasonTint');
+  uCameraCenterLoc  = gl.getUniformLocation(program, 'uCameraCenter');
 
   // Create terrain VAO
   if (isWebGL2) {
@@ -1087,6 +1091,14 @@ export function render3D() {
       winter: [0.85, 0.90, 1.10],
     }[G.season] || [1, 1, 1];
     gl.uniform3f(uSeasonTintLoc, ST[0], ST[1], ST[2]);
+  }
+
+  // Fog center: follow camera tile position so fog fades from view center
+  if (uCameraCenterLoc) {
+    const halfTW2 = TW / 2, halfTH2 = TH / 2;
+    const wx2 = (G.camera?.x ?? 0) / halfTW2;
+    const wy2 = (G.camera?.y ?? (MAP_H * halfTH2)) / halfTH2;
+    gl.uniform2f(uCameraCenterLoc, (wx2 + wy2) / 2, (wy2 - wx2) / 2);
   }
 
   // ── Draw terrain (includes trees) ──────────────────────────
