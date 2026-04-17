@@ -273,4 +273,38 @@ Every building renders a **6-unit tall hot-pink pillar** as a debug marker. Must
 
 ## Next Cycle Plan
 
-**Cycle 14:** Forest is too dense — nearly every forest tile renders a tree, making the island look like a solid green spiky carpet with no terrain visible underneath. Thin tree density to ~55% of forest tiles using the existing tile hash. Also consider darkening tree canopy slightly (`[0.22, 0.62, 0.28]` → `[0.18, 0.52, 0.24]`) so they read as forest rather than neon lime patches.
+### Cycle 14 — 2026-04-16
+**Changes (js/webgl3d.js):**
+- Tree density: `(treeSeed % 10) < 4` → `(treeSeed % 25) < 7` (~28% of FOREST tiles)
+- Scale range: 1.8–3.4 → 1.4–2.6 (smaller canopy radius, less overlap)
+- Canopy color: `[0.22,0.82,0.28]` → `[0.18,0.60,0.22]` (forest green, not neon lime)
+- Dark face: `[0.14,0.55,0.18]` → `[0.11,0.40,0.14]`
+
+**Visual result:** Terrain floor visible between trees, island biomes readable. Forest reads as forest glade not solid carpet. Mountains much more visible in center.
+
+**Validator (subagent) consensus:** Tree density was #1 issue. Next: mountains look like grey concrete rubble (#2). Life/animation (#3 — addressed by GLTF mesh effort below).
+
+---
+
+## Open Source Mesh Research (subagent, 2026-04-16)
+
+Best free CC0 GLTF sources for this project:
+
+| Pack | Source | License | Coverage |
+|------|--------|---------|----------|
+| **KayKit Medieval Hexagon** | kaylousberg.itch.io/kaykit-medieval-hexagon | CC0 | 9/11 building types (church, tavern, blacksmith, windmill, barracks, well, market, house) + trees + rocks |
+| **Kenney Nature Kit** | kenney.nl/assets/nature-kit | CC0 | Trees, rocks, foliage in GLB |
+| **Kenney Fantasy Town Kit** | kenney.nl/assets/fantasy-town-kit | CC0 | 160 medieval building GLBs |
+| **Quaternius Medieval Village MegaKit** | quaternius.itch.io/medieval-village-megakit | CC0 | 300+ modular pieces, GLTF |
+
+**Technical path:** Write ~100-line `loadGLB(url, gl)` vanilla JS parser. GLB = 12-byte header + JSON chunk + binary buffer chunk. For static diffuse meshes, only need POSITION/NORMAL/indices. Fits cleanly into existing webgl3d.js VAO pattern.
+
+**Recommended:** Download KayKit Medieval Hexagon (covers most buildings + nature), write minimal GLB loader, replace pyramid trees and box buildings over 3–4 cycles.
+
+---
+
+## Next Cycle Plan
+
+**Cycle 15:** Fix mountain appearance — grey flat `[0.42,0.42,0.48]` with no highlight reads as concrete rubble. Add a lighter snow/rock cap: top face of MOUNTAIN tiles gets `[0.88,0.88,0.92]` (near-white) while side faces keep the grey base. This is a single color lookup change in `buildTerrainMesh()`.
+
+**Cycles 16–18:** GLTF mesh loading — download KayKit assets, write `loadGLB()`, replace pyramid trees with real conifer meshes, then replace box buildings.
