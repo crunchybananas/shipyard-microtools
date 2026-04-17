@@ -113,12 +113,20 @@ in vec3 vWorldPos;
 out vec4 fragColor;
 uniform vec3 uLightDir;
 uniform vec3 uSeasonTint;
+uniform float uTime;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
+  // Animated water sparkle: time-based shimmer on water tiles
+  bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
+  if (isWater) {
+    float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
+    float sparkle = pow(max(0.0, s), 6.0) * 0.35;
+    litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
+  }
   float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
   float fog = smoothstep(30.0, 46.0, fogDist);
   vec3 skyCol = vec3(0.45, 0.68, 0.88);
@@ -156,12 +164,19 @@ varying vec3 vColor;
 varying vec3 vWorldPos;
 uniform vec3 uLightDir;
 uniform vec3 uSeasonTint;
+uniform float uTime;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
+  bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
+  if (isWater) {
+    float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
+    float sparkle = pow(max(0.0, s), 6.0) * 0.35;
+    litColor += vec3(sparkle * 0.7, sparkle * 0.85, sparkle);
+  }
   float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
   float fog = smoothstep(30.0, 46.0, fogDist);
   vec3 skyCol = vec3(0.45, 0.68, 0.88);
