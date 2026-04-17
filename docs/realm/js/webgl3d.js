@@ -53,6 +53,7 @@ let citizensIndexCount = 0;
 let uViewProjLoc = null;
 let uLightDirLoc = null;
 let uTimeLoc = null;
+let uSeasonTintLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -111,12 +112,13 @@ in vec3 vColor;
 in vec3 vWorldPos;
 out vec4 fragColor;
 uniform vec3 uLightDir;
+uniform vec3 uSeasonTint;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
-  vec3 litColor = ambient + diffuse;
+  vec3 litColor = (ambient + diffuse) * uSeasonTint;
   float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
   float fog = smoothstep(30.0, 46.0, fogDist);
   vec3 skyCol = vec3(0.45, 0.68, 0.88);
@@ -153,12 +155,13 @@ varying vec3 vNormal;
 varying vec3 vColor;
 varying vec3 vWorldPos;
 uniform vec3 uLightDir;
+uniform vec3 uSeasonTint;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
-  vec3 litColor = ambient + diffuse;
+  vec3 litColor = (ambient + diffuse) * uSeasonTint;
   float fogDist = length(vec2(vWorldPos.x - 40.0, vWorldPos.z - 40.0));
   float fog = smoothstep(30.0, 46.0, fogDist);
   vec3 skyCol = vec3(0.45, 0.68, 0.88);
@@ -623,8 +626,8 @@ export function buildTerrainMesh() {
       // tileH() still uses noise for slope normal computation (subtle shading variation).
       const h = baseH;
 
-      // No per-tile color variation — solid biome colors let slope normals read cleanly
-      const cv = 0;
+      // Subtle per-tile brightness jitter (±10%) breaks up the uniform-square look
+      const cv = 0.20 * noise1;
       const color = [
         Math.max(0, Math.min(1, baseColor[0] * (1 + cv))),
         Math.max(0, Math.min(1, baseColor[1] * (1 + cv))),
@@ -936,9 +939,10 @@ export function initGL3D(canvas) {
   }
 
   // Get uniform locations
-  uViewProjLoc = gl.getUniformLocation(program, 'uViewProj');
-  uLightDirLoc = gl.getUniformLocation(program, 'uLightDir');
-  uTimeLoc     = gl.getUniformLocation(program, 'uTime');
+  uViewProjLoc    = gl.getUniformLocation(program, 'uViewProj');
+  uLightDirLoc    = gl.getUniformLocation(program, 'uLightDir');
+  uTimeLoc        = gl.getUniformLocation(program, 'uTime');
+  uSeasonTintLoc  = gl.getUniformLocation(program, 'uSeasonTint');
 
   // Create terrain VAO
   if (isWebGL2) {
@@ -1033,6 +1037,17 @@ export function render3D() {
 
   // Time uniform for water animation
   if (uTimeLoc) gl.uniform1f(uTimeLoc, performance.now() * 0.001);
+
+  // Season tint: shifts entire scene color to match current season
+  if (uSeasonTintLoc) {
+    const ST = {
+      spring: [1.00, 1.00, 1.00],
+      summer: [1.06, 1.02, 0.93],
+      autumn: [1.14, 0.90, 0.80],
+      winter: [0.85, 0.90, 1.10],
+    }[G.season] || [1, 1, 1];
+    gl.uniform3f(uSeasonTintLoc, ST[0], ST[1], ST[2]);
+  }
 
   // ── Draw terrain (includes trees) ──────────────────────────
   if (isWebGL2) {
