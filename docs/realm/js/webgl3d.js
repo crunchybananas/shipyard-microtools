@@ -181,6 +181,15 @@ void main() {
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
   }
+  // Night window glow: warm amber patches on building walls simulate lit windows
+  bool isBuildingWall = N.y < 0.3 && vWorldPos.y > 0.5 && vColor.r > 0.55 && vColor.r > vColor.b * 1.3;
+  if (isBuildingWall && nightAmt > 0.1) {
+    vec2 winHash = floor(vWorldPos.xz * 3.0 + vec2(vWorldPos.y * 1.7, 0.0));
+    float h = fract(sin(dot(winHash, vec2(17.3, 41.7))) * 8273.5);
+    float flicker = 0.85 + 0.15 * sin(uTime * (3.0 + h * 5.0) + h * 6.28);
+    float windowGlow = step(0.55, h) * nightAmt * 0.55 * flicker;
+    litColor += vec3(1.0, 0.72, 0.20) * windowGlow;
+  }
   // Rain: overcast darkening + diagonal streaks on terrain tops
   if (uRainAmount > 0.0) {
     litColor *= mix(1.0, 0.70, uRainAmount);
@@ -302,6 +311,14 @@ void main() {
                     vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
+  }
+  bool isBuildingWall = N.y < 0.3 && vWorldPos.y > 0.5 && vColor.r > 0.55 && vColor.r > vColor.b * 1.3;
+  if (isBuildingWall && nightAmt > 0.1) {
+    vec2 winHash = floor(vWorldPos.xz * 3.0 + vec2(vWorldPos.y * 1.7, 0.0));
+    float h = fract(sin(dot(winHash, vec2(17.3, 41.7))) * 8273.5);
+    float flicker = 0.85 + 0.15 * sin(uTime * (3.0 + h * 5.0) + h * 6.28);
+    float windowGlow = step(0.55, h) * nightAmt * 0.55 * flicker;
+    litColor += vec3(1.0, 0.72, 0.20) * windowGlow;
   }
   if (uRainAmount > 0.0) {
     litColor *= mix(1.0, 0.70, uRainAmount);
