@@ -305,6 +305,21 @@ Best free CC0 GLTF sources for this project:
 
 ## Next Cycle Plan
 
-**Cycle 15:** Fix mountain appearance — grey flat `[0.42,0.42,0.48]` with no highlight reads as concrete rubble. Add a lighter snow/rock cap: top face of MOUNTAIN tiles gets `[0.88,0.88,0.92]` (near-white) while side faces keep the grey base. This is a single color lookup change in `buildTerrainMesh()`.
+### Cycle 15 — 2026-04-16
+**Changes (js/webgl3d.js):**
+- STONE top face: `[0.74,0.70,0.66]` (warm pale rock) vs dark grey `[0.60,0.58,0.56]` sides
+- MOUNTAIN top face: `[0.88,0.88,0.92]` (snow cap) vs grey `[0.42,0.42,0.48]` sides
+- Note: MOUNTAIN is only 12 tiles on a typical map; STONE (109 tiles) was the visible fix
+- Side note: IRON tiles `[0.35,0.52,0.72]` produce a blue hue — could be toned down later
 
-**Cycles 16–18:** GLTF mesh loading — download KayKit assets, write `loadGLB()`, replace pyramid trees with real conifer meshes, then replace box buildings.
+**Visual result:** Rocky terrain reads as carved stone with clear depth. Stone outcroppings have proper top-side contrast. Not concrete anymore.
+
+---
+
+## Next Cycle Plan
+
+**Cycle 16:** Begin GLTF mesh pipeline.
+1. Download KayKit Medieval Hexagon pack from kaylousberg.itch.io/kaykit-medieval-hexagon (CC0, GLTF)
+2. Write ~100-line `loadGLB(url, gl)` in a new `js/glb-loader.js` — parse 12-byte header, JSON chunk, binary chunk, extract POSITION+NORMAL+indices into a VAO
+3. Test with a single conifer tree GLB — render one at map center alongside existing geometry
+4. If successful, replace pyramid trees with the real conifer mesh in cycle 17
