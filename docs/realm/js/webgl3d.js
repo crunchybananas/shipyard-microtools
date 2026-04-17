@@ -222,6 +222,14 @@ void main() {
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
   }
+  // Rooftop sun specular: bright spot on building tops from direct sunlight
+  bool isRooftop = N.y > 0.7 && vWorldPos.y > 1.0 && !isGrass && !isWater && !isSand;
+  if (isRooftop && nightAmt < 0.7) {
+    vec3 roofView = normalize(vec3(0.57, 1.0, 0.57));
+    vec3 roofHalf = normalize(uLightDir + roofView);
+    float roofSpec = pow(max(0.0, dot(N, roofHalf)), 18.0) * (1.0 - nightAmt);
+    litColor += vec3(1.0, 0.96, 0.88) * roofSpec * 0.45;
+  }
   // Night window glow: warm amber patches on building walls simulate lit windows
   bool isBuildingWall = N.y < 0.3 && vWorldPos.y > 0.5 && vColor.r > 0.55 && vColor.r > vColor.b * 1.3;
   if (isBuildingWall && nightAmt > 0.1) {
@@ -393,6 +401,13 @@ void main() {
                     vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
+  }
+  bool isRooftop = N.y > 0.7 && vWorldPos.y > 1.0 && !isGrass && !isWater && !isSand;
+  if (isRooftop && nightAmt < 0.7) {
+    vec3 roofView = normalize(vec3(0.57, 1.0, 0.57));
+    vec3 roofHalf = normalize(uLightDir + roofView);
+    float roofSpec = pow(max(0.0, dot(N, roofHalf)), 18.0) * (1.0 - nightAmt);
+    litColor += vec3(1.0, 0.96, 0.88) * roofSpec * 0.45;
   }
   bool isBuildingWall = N.y < 0.3 && vWorldPos.y > 0.5 && vColor.r > 0.55 && vColor.r > vColor.b * 1.3;
   if (isBuildingWall && nightAmt > 0.1) {
