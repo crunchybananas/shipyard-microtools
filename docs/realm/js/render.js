@@ -1033,7 +1033,8 @@ export function render() {
     ctx.stroke();
 
     // Head — large for chibi proportions (oversized head = cute, scaled ~1.4x)
-    const headX = s.x + faceX * 0.7;
+    // Screen-X shift = (worldX - worldY) * TW/2, so offset by both faceX and faceZ
+    const headX = s.x + (faceX - faceZ) * 0.5;
     const headY = cy - 20;
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
@@ -1043,17 +1044,24 @@ export function render() {
     ctx.lineWidth = 0.8;
     ctx.stroke();
 
-    // Hair — vibrant colors, cap on top of head (scaled ~1.4x)
+    // Hair — vibrant colors, cap shifts based on facing direction
+    // When facing away, hair sits on the camera-visible (back) side of the head.
+    // When facing camera, hair sits on the back/opposite side from the face.
     const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
     ctx.fillStyle = ['#5c3a18','#c08020','#1a1a2e','#e8704a'][hairHash];
+    const hairOffX = facingAway ? faceX * 0.5 : -faceX * 0.6;
+    // When facing away, widen the arc slightly so the hair cap covers the back of the head
+    const hairStart = facingAway ? Math.PI * 0.6 : Math.PI * 0.8;
+    const hairEnd   = facingAway ? Math.PI * 2.4 : Math.PI * 2.2;
     ctx.beginPath();
-    ctx.arc(headX - faceX * 0.6, headY - 1.4, 5.9, Math.PI * 0.8, Math.PI * 2.2);
+    ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
     ctx.closePath();
     ctx.fill();
 
     // Face — eyes and mouth on facing side, hidden when facing away
     if (!facingAway && G.camera.zoom >= 1.0) {
-      const eyeX = headX + faceX * 1.1;
+      const faceScreenX = faceX - faceZ;
+      const eyeX = headX + faceScreenX * 0.8;
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
       ctx.arc(eyeX - 1.7, headY + 0.7, 0.9, 0, Math.PI * 2);
@@ -1062,9 +1070,10 @@ export function render() {
     }
     // Mouth — tiny line, only at closer zoom
     if (!facingAway && G.camera.zoom >= 1.5) {
+      const faceScreenX = faceX - faceZ;
       ctx.strokeStyle = 'rgba(80,50,30,0.7)';
       ctx.lineWidth = 0.7;
-      const mouthX = headX + faceX * 0.7;
+      const mouthX = headX + faceScreenX * 0.5;
       ctx.beginPath();
       ctx.moveTo(mouthX - 1.1, headY + 2.1);
       ctx.lineTo(mouthX + 1.1, headY + 2.1);
@@ -1135,14 +1144,15 @@ export function render() {
       // edge and adding a thin strap makes it scan as a bindle being carried.
       if (c.carrying) {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
-        const px = s.x - faceX * 5;
+        const faceScreenX = faceX - faceZ; // screen-X direction of movement
+        const px = s.x - faceScreenX * 4;
         const py = cy - 14;
         ctx.strokeStyle = 'rgba(20,10,0,0.55)';
         ctx.lineWidth = 0.7;
         // Strap from shoulder down across body
         ctx.beginPath();
-        ctx.moveTo(px + faceX * 1.5, py + 1);
-        ctx.lineTo(s.x + faceX * 1.5, cy - 5);
+        ctx.moveTo(px + faceScreenX * 1.2, py + 1);
+        ctx.lineTo(s.x + faceScreenX * 1.2, cy - 5);
         ctx.stroke();
         // Pack body
         ctx.fillStyle = cc;
