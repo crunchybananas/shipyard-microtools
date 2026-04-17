@@ -126,8 +126,8 @@ export function render() {
       ctx.fillRect(0, 0, 40, 3000);
       ctx.restore();
     }
-    ctx.globalAlpha = daylight;
   }
+  ctx.globalAlpha = 1;
 
   // ── Tiles ─────────────────────────────────────────────────
   // Viewport culling — isometric needs all 4 screen corners
@@ -1715,6 +1715,7 @@ export function render() {
       ctx.restore();
     }
   }
+  ctx.globalAlpha = 1;
 
   // ── Cloud shadows ─────────────────────────────────────────
   if (!G.clouds) {

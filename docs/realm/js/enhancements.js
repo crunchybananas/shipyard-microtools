@@ -237,7 +237,7 @@ export function renderBonfire(ctx) {
 // ── Loop 17: Wet ground puddles after rain ─────────────────
 let _puddleAge = 0;
 let _prevWeather2 = null;
-const PUDDLE_DURATION = 2000;
+const PUDDLE_DURATION = 800;
 export function updatePuddles() {
   if (_prevWeather2 === 'rain' && G.weather !== 'rain') {
     _puddleAge = PUDDLE_DURATION;
@@ -267,13 +267,13 @@ export function renderPuddles(ctx) {
       const w = 8 + (h % 5);
       const hh = 3 + (h % 3);
       // Reflective base
-      ctx.globalAlpha = 0.55 * fade;
+      ctx.globalAlpha = 0.28 * fade;
       ctx.fillStyle = '#7daed8';
       ctx.beginPath();
       ctx.ellipse(s.x + ox, s.y + oy, w, hh, 0, 0, Math.PI * 2);
       ctx.fill();
       // Sky glint
-      ctx.globalAlpha = 0.4 * fade;
+      ctx.globalAlpha = 0.18 * fade;
       ctx.fillStyle = '#cfe6ff';
       ctx.beginPath();
       ctx.ellipse(s.x + ox - w * 0.3, s.y + oy - hh * 0.3, w * 0.4, hh * 0.4, 0, 0, Math.PI * 2);
@@ -1592,8 +1592,8 @@ function updateGhost() {
     if (g.life <= 0) { G.ghosts.splice(i, 1); continue; }
     const dx = g.tx - g.x, dy = g.ty - g.y, d = Math.hypot(dx, dy);
     if (d < 0.2) {
-      g.tx = g.x + (Math.random() - 0.5) * 4;
-      g.ty = g.y + (Math.random() - 0.5) * 4;
+      g.tx = Math.max(1, Math.min(MAP_W - 2, g.x + (Math.random() - 0.5) * 4));
+      g.ty = Math.max(1, Math.min(MAP_H - 2, g.y + (Math.random() - 0.5) * 4));
     } else {
       g.x += (dx / d) * 0.008 * G.speed;
       g.y += (dy / d) * 0.008 * G.speed;
@@ -1762,8 +1762,8 @@ function updateRams() {
   for (const r of G.rams) {
     const dx = r.tx - r.x, dy = r.ty - r.y, d = Math.hypot(dx, dy);
     if (d < 0.2) {
-      r.tx = r.x + (Math.random() - 0.5) * 4;
-      r.ty = r.y + (Math.random() - 0.5) * 4;
+      r.tx = Math.max(1, Math.min(MAP_W - 2, r.x + (Math.random() - 0.5) * 4));
+      r.ty = Math.max(1, Math.min(MAP_H - 2, r.y + (Math.random() - 0.5) * 4));
     } else {
       r.x += (dx / d) * 0.012 * G.speed;
       r.y += (dy / d) * 0.012 * G.speed;
@@ -1860,8 +1860,8 @@ function updateWisps() {
     if (w.life <= 0) { G.wisps.splice(i, 1); continue; }
     const dx = w.tx - w.x, dy = w.ty - w.y, d = Math.hypot(dx, dy);
     if (d < 0.2) {
-      w.tx = w.x + (Math.random() - 0.5) * 4;
-      w.ty = w.y + (Math.random() - 0.5) * 4;
+      w.tx = Math.max(1, Math.min(MAP_W - 2, w.x + (Math.random() - 0.5) * 4));
+      w.ty = Math.max(1, Math.min(MAP_H - 2, w.y + (Math.random() - 0.5) * 4));
     } else {
       w.x += (dx / d) * 0.01 * G.speed;
       w.y += (dy / d) * 0.01 * G.speed;
