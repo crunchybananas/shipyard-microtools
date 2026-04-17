@@ -1302,16 +1302,29 @@ export function screenToTile3D(mx, my) {
   const ndcY =  1 - 2 * py / canvas.height;
   const vx = ndcX * hw;
   const vy = ndcY * hh;
-  // Inverse of rotateX(pitch) * rotateY(-45°) * translate
-  // pitch = -atan(1/sqrt(2)), cos(pitch) = sqrt(2/3), sin(pitch) = -1/sqrt(3)
-  // After undoing the ortho projection we get view-space coords.
-  // Solving for tile (col, row) with y=tileHeight assumed flat:
+  // Inverse isometric VP: vy = (X'+Z')/√6 + h·√(2/3), vx = (X'-Z')/√2
+  // Solving: X'+Z' = √6·vy − 2h, X'-Z' = √2·vx
+  // col = (X'+Z' + X'-Z')/2 + cx,  row = (X'+Z' - X'-Z')/2 + cz
   const halfTW = TW / 2, halfTH = TH / 2;
   const wx = (G.camera?.x ?? 0) / halfTW;
   const wy = (G.camera?.y ?? 0) / halfTH;
-  const sum  = wy + 2 * vy / Math.sqrt(6);
-  const diff = wx + Math.sqrt(2) * vx;
-  return { x: Math.round((sum + diff) / 2), y: Math.round((sum - diff) / 2) };
+  const SQ2 = Math.sqrt(2), SQ6 = Math.sqrt(6);
+  const diff = wx + SQ2 * vx;
+
+  function pickWithH(h) {
+    const sum = wy + SQ6 * vy - 2 * h;
+    return { x: Math.round((sum + diff) / 2), y: Math.round((sum - diff) / 2) };
+  }
+
+  // Pass 1: guess with average grass height
+  const rough = pickWithH(0.8);
+  // Pass 2: look up actual tile height and refine
+  const row = Math.max(0, Math.min(MAP_H - 1, rough.y));
+  const col = Math.max(0, Math.min(MAP_W - 1, rough.x));
+  const tileType = G.map?.[row]?.[col];
+  const h = (tileType !== undefined && TILE_HEIGHT[tileType] !== undefined)
+    ? TILE_HEIGHT[tileType] : 0.8;
+  return pickWithH(h);
 }
 
 // ── Public API ─────────────────────────────────────────────
