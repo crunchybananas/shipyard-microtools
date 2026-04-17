@@ -1481,37 +1481,60 @@ export function render() {
       ctx.fill();
       continue;
     }
+    // Danger ground ring — red-tinted so raiders read as threat, not citizens
+    ctx.fillStyle = 'rgba(200,0,0,0.28)';
+    ctx.beginPath();
+    ctx.ellipse(es.x, es.y + 1, 8, 3.5, 0, 0, Math.PI*2);
+    ctx.fill();
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.22)';
     ctx.beginPath();
     ctx.ellipse(es.x, es.y + 2, 5, 2, 0, 0, Math.PI*2);
     ctx.fill();
-    // Walking bob
+    // Walking bob and movement direction
     const eMoving = Math.hypot(e.tx - e.x, e.ty - e.y) > 0.3;
     const eBob = eMoving ? Math.sin(G.gameTick * 0.22 + (eHash & 0xff) * 0.04) * 0.7 : 0;
-    // Body — wider than before (5px wide), with armour colour variant
+    const edx = e.tx - e.x, edy = e.ty - e.y;
+    const eDist = Math.hypot(edx, edy) || 1;
+    const eFaceX = edx / eDist > 0.1 ? 1 : edx / eDist < -0.1 ? -1 : 0;
+    const eFaceZ = edy / eDist > 0.1 ? 1 : edy / eDist < -0.1 ? -1 : 0;
+    const eFaceScreenX = eFaceX - eFaceZ;
+    const eLean = eMoving ? eFaceScreenX * 0.9 : 0;
+    const eBodyX = es.x + eLean * 0.35;
+    const eBodyTilt = eLean * 0.055;
+    // Body — armour colour variant, leans in walk direction
     const bodyColors = ['#3a2030', '#2a2a3a', '#3a1818'];
     ctx.fillStyle = bodyColors[eVariant];
     ctx.beginPath();
-    ctx.ellipse(es.x, es.y - 6 + eBob, 5, 6, 0, 0, Math.PI*2);
+    ctx.ellipse(eBodyX, es.y - 6 + eBob, 5, 6, eBodyTilt, 0, Math.PI*2);
+    ctx.fill();
+    // Arm stubs — armored, angled slightly differently than citizens
+    const eArmSwing = eMoving ? Math.sin(G.gameTick * 0.25 + eHash) * 1.5 * 0.45 : 0;
+    ctx.fillStyle = ['#4a2a3a','#2a2a4a','#4a1a1a'][eVariant];
+    ctx.beginPath();
+    ctx.ellipse(eBodyX - 6.5, es.y - 7 + eBob + eArmSwing, 2.4, 1.7, Math.PI * 0.2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(eBodyX + 6.5, es.y - 7 + eBob - eArmSwing, 2.4, 1.7, -Math.PI * 0.2, 0, Math.PI*2);
     ctx.fill();
     // Armour trim
     ctx.fillStyle = ['#6a3a48','#3a4060','#6a2828'][eVariant];
-    ctx.fillRect(es.x - 4, es.y - 8 + eBob, 8, 1.5);
-    // Head — helmet shape (flattened top)
+    ctx.fillRect(eBodyX - 4, es.y - 8 + eBob, 8, 1.5);
+    // Head — helmet shape (flattened top), leans with body
+    const eHeadX = eBodyX + eFaceScreenX * 0.4;
     ctx.fillStyle = '#2a1a1a';
     ctx.beginPath();
-    ctx.arc(es.x, es.y - 14 + eBob, 3.8, 0, Math.PI*2);
+    ctx.arc(eHeadX, es.y - 14 + eBob, 3.8, 0, Math.PI*2);
     ctx.fill();
     // Helmet brim
     ctx.fillStyle = ['#5a3a40','#3a3a50','#5a2a2a'][eVariant];
-    ctx.fillRect(es.x - 4.5, es.y - 12.5 + eBob, 9, 1.2);
+    ctx.fillRect(eHeadX - 4.5, es.y - 12.5 + eBob, 9, 1.2);
     // Red eye glow
     ctx.fillStyle = '#ff4040';
     ctx.globalAlpha = daylight * (0.7 + 0.3 * Math.sin(G.gameTick * 0.12 + eHash));
     ctx.beginPath();
-    ctx.arc(es.x - 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
-    ctx.arc(es.x + 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
+    ctx.arc(eHeadX - 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
+    ctx.arc(eHeadX + 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
     ctx.fill();
     ctx.globalAlpha = daylight;
     // Weapon — axe, spear, or club depending on variant
@@ -1519,7 +1542,7 @@ export function render() {
       ctx.strokeStyle = '#5a3a1a';
       ctx.lineWidth = 1;
       ctx.save();
-      ctx.translate(es.x + 5, es.y - 8 + eBob);
+      ctx.translate(eBodyX + 5, es.y - 8 + eBob);
       if (eVariant === 0) {
         // Axe: handle + wedge head
         ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -5); ctx.stroke();
