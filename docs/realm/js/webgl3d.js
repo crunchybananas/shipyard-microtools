@@ -172,7 +172,16 @@ void main() {
   // Night: dim scene to moonlit blue-silver
   vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
   litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
-  fragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
+  vec3 finalCol = mix(litColor, skyCol, fog * 0.8);
+  // Stars: random bright points in the dark fogged sky
+  if (nightAmt > 0.2 && fog > 0.55) {
+    vec2 sGrid = floor(vWorldPos.xz * 1.8);
+    float h = fract(sin(dot(sGrid, vec2(127.1, 311.7))) * 43758.5453);
+    float twinkle = 0.5 + 0.5 * sin(uTime * (2.0 + h * 4.0) + h * 31.4);
+    float star = step(0.965, h) * twinkle * nightAmt * fog;
+    finalCol += vec3(0.88, 0.92, 1.0) * star * 1.4;
+  }
+  fragColor = vec4(finalCol, 1.0);
 }`;
 
 // WebGL1 fallback shaders
@@ -254,7 +263,15 @@ void main() {
   litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
   vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
   litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
-  gl_FragColor = vec4(mix(litColor, skyCol, fog * 0.8), 1.0);
+  vec3 finalCol = mix(litColor, skyCol, fog * 0.8);
+  if (nightAmt > 0.2 && fog > 0.55) {
+    vec2 sGrid = floor(vWorldPos.xz * 1.8);
+    float h = fract(sin(dot(sGrid, vec2(127.1, 311.7))) * 43758.5453);
+    float twinkle = 0.5 + 0.5 * sin(uTime * (2.0 + h * 4.0) + h * 31.4);
+    float star = step(0.965, h) * twinkle * nightAmt * fog;
+    finalCol += vec3(0.88, 0.92, 1.0) * star * 1.4;
+  }
+  gl_FragColor = vec4(finalCol, 1.0);
 }`;
 
 // ── Matrix math ────────────────────────────────────────────
