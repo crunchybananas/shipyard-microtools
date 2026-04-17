@@ -956,7 +956,10 @@ export function render() {
     const skinHash = (c.name.charCodeAt(0) * 53 + (c.name.charCodeAt(1) || 29) * 17) % 4;
     // Tones chosen to stay clearly distinct from all job body colors (no warm-orange clashes)
     const skinColor = ['#ffe0c0', '#f5c99a', '#d0845a', '#9e5c38'][skinHash];
-    const headX = s.x + (faceX - faceZ) * 0.5;
+    const faceScreenX = faceX - faceZ; // screen-X component of movement direction
+    // Lean into walk direction — body + head shift slightly forward
+    const walkLean = isMoving ? faceScreenX * 0.9 : 0;
+    const headX = s.x + faceScreenX * 0.5 + walkLean * 0.4;
     const headY = cy - 20;
 
     // Job color — vibrant saturated palette so citizens stand out
@@ -1023,20 +1026,22 @@ export function render() {
     ctx.ellipse(s.x + 2.8 + step * 0.3, cy - 1, 2.8, 1.7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body — rounded pill shape with shadow side (scaled ~1.4x)
+    // Body — rounded pill shape with walk lean and shadow side (scaled ~1.4x)
+    const bodyX = s.x + walkLean * 0.35;
+    const bodyTilt = walkLean * 0.055; // slight tilt in walk direction
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
-    ctx.ellipse(s.x, cy - 8, 6.3, 7, 0, 0, Math.PI * 2);
+    ctx.ellipse(bodyX, cy - 8, 6.3, 7, bodyTilt, 0, Math.PI * 2);
     ctx.fill();
     // Shadow side (lower-right crescent for depth)
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.ellipse(s.x + 2, cy - 7, 4.9, 5.6, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.ellipse(bodyX + 2, cy - 7, 4.9, 5.6, bodyTilt, -Math.PI / 2, Math.PI / 2);
     ctx.fill();
     ctx.strokeStyle = 'rgba(20,10,0,0.4)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.ellipse(s.x, cy - 8, 6.3, 7, 0, 0, Math.PI * 2);
+    ctx.ellipse(bodyX, cy - 8, 6.3, 7, bodyTilt, 0, Math.PI * 2);
     ctx.stroke();
 
     // Arm stubs — small ovals on body sides, counter-swing to feet when walking
@@ -1045,16 +1050,16 @@ export function render() {
     ctx.strokeStyle = 'rgba(20,10,0,0.35)';
     ctx.lineWidth = 0.7;
     ctx.beginPath();
-    ctx.ellipse(s.x - 7.0, cy - 9 + armSwing, 2.6, 1.9, Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.ellipse(bodyX - 7.0, cy - 9 + armSwing, 2.6, 1.9, Math.PI * 0.15, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     ctx.beginPath();
-    ctx.ellipse(s.x + 7.0, cy - 9 - armSwing, 2.6, 1.9, -Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.ellipse(bodyX + 7.0, cy - 9 - armSwing, 2.6, 1.9, -Math.PI * 0.15, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
 
-    // Neck stub — skin-colored oval; drawn before head so head overlaps top edge naturally
+    // Neck stub — bridging body to head, X averaged between body and head positions
     ctx.fillStyle = skinColor;
     ctx.beginPath();
-    ctx.ellipse(headX, cy - 15.5, 2.2, 2.6, 0, 0, Math.PI * 2);
+    ctx.ellipse((bodyX + headX) * 0.5, cy - 15.5, 2.2, 2.6, bodyTilt, 0, Math.PI * 2);
     ctx.fill();
 
     // Head — large for chibi proportions (oversized head = cute, scaled ~1.4x)
@@ -1082,7 +1087,6 @@ export function render() {
 
     // Face — eyes and mouth on facing side, hidden when facing away
     if (!facingAway && G.camera.zoom >= 1.0) {
-      const faceScreenX = faceX - faceZ;
       const eyeX = headX + faceScreenX * 0.8;
       // Eye whites for expressiveness
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -1099,7 +1103,6 @@ export function render() {
     }
     // Mouth — tiny line, only at closer zoom
     if (!facingAway && G.camera.zoom >= 1.5) {
-      const faceScreenX = faceX - faceZ;
       ctx.strokeStyle = 'rgba(80,50,30,0.7)';
       ctx.lineWidth = 0.7;
       const mouthX = headX + faceScreenX * 0.5;
@@ -1108,11 +1111,10 @@ export function render() {
       ctx.lineTo(mouthX + 1.1, headY + 2.1);
       ctx.stroke();
       // Rosy cheeks — soft blush at close zoom
-      const faceScreenX2 = faceX - faceZ;
       ctx.fillStyle = 'rgba(240,100,80,0.22)';
       ctx.beginPath();
-      ctx.ellipse(headX + faceScreenX2 * 0.4 - 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
-      ctx.ellipse(headX + faceScreenX2 * 0.4 + 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(headX + faceScreenX * 0.4 - 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(headX + faceScreenX * 0.4 + 2.8, headY + 2.0, 2.2, 1.5, 0, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -1180,7 +1182,6 @@ export function render() {
       // edge and adding a thin strap makes it scan as a bindle being carried.
       if (c.carrying) {
         const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
-        const faceScreenX = faceX - faceZ; // screen-X direction of movement
         const px = s.x - faceScreenX * 4;
         const py = cy - 14;
         ctx.strokeStyle = 'rgba(20,10,0,0.55)';
