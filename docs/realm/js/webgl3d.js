@@ -153,6 +153,15 @@ void main() {
     float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
     litColor *= 0.90 + ripple * 0.18;
   }
+  // Stone mottling: mineral veins and rock surface texture variation
+  bool isStone = vColor.r > 0.38 && vColor.r < 0.72 && abs(vColor.r - vColor.g) < 0.10 && abs(vColor.g - vColor.b) < 0.10;
+  if (isStone) {
+    float sv1 = sin(vWorldPos.x * 3.7 + vWorldPos.y * 2.1 + vWorldPos.z * 4.3);
+    float sv2 = cos(vWorldPos.x * 2.9 + vWorldPos.z * 3.1 + vWorldPos.y * 1.7);
+    float mottle = sv1 * sv2 * 0.5 + 0.5;
+    float vein = smoothstep(0.68, 0.74, mottle) * 0.18;
+    litColor = mix(litColor * (0.88 + mottle * 0.18), litColor + vec3(0.08, 0.07, 0.05) * vein, 0.8);
+  }
   // Autumn: shift green foliage/grass to orange-amber
   if (isGrass && uAutumnAmount > 0.0) {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
@@ -321,6 +330,14 @@ void main() {
     vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
     float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
     litColor *= 0.90 + ripple * 0.18;
+  }
+  bool isStone = vColor.r > 0.38 && vColor.r < 0.72 && abs(vColor.r - vColor.g) < 0.10 && abs(vColor.g - vColor.b) < 0.10;
+  if (isStone) {
+    float sv1 = sin(vWorldPos.x * 3.7 + vWorldPos.y * 2.1 + vWorldPos.z * 4.3);
+    float sv2 = cos(vWorldPos.x * 2.9 + vWorldPos.z * 3.1 + vWorldPos.y * 1.7);
+    float mottle = sv1 * sv2 * 0.5 + 0.5;
+    float vein = smoothstep(0.68, 0.74, mottle) * 0.18;
+    litColor = mix(litColor * (0.88 + mottle * 0.18), litColor + vec3(0.08, 0.07, 0.05) * vein, 0.8);
   }
   if (isGrass && uAutumnAmount > 0.0) {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
