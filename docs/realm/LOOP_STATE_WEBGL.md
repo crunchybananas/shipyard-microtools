@@ -357,9 +357,24 @@ Best free CC0 GLTF sources for this project:
 
 ---
 
+### Cycle 20 — 2026-04-16
+- Building scale: 0.65→0.80 for better visibility
+- Hex base burial: sink buildings 0.42 units so dark hex platform is mostly underground
+- Default zoom: 1.3→1.7 so island fills viewport
+
+### Cycle 21 — 2026-04-16
+- Added `citizensVao` rebuilt every render frame
+- Citizens render as colored body+head box pairs (6 colors: red, blue, green, yellow, purple, teal)
+- Skin-tone head cap on each citizen
+- **World now feels alive** — settlers move smoothly in 3D
+
+**Visual result (confirmed via screenshot):** Citizens clearly visible as small colored figures against green terrain. Red and blue settlers standing next to buildings. Massive life improvement.
+
+---
+
 ## Next Cycle Plan
 
-**Cycle 20:** Visual subagent critique of current 3D vs 2D state. Focus: are building shapes recognizable? Is the overall scene readable at default zoom? Candidates:
-- Adjust GLB building scale per-type (church/castle at 0.55, house at 0.70)
-- Add ambient occlusion approximation (darken tiles under buildings)
-- Or source Kenney Fantasy Town Kit buildings which look more medieval and less hex-grid
+**Cycle 22:** Make buildings MORE recognizable at default zoom. Options:
+1. Source Kenney Fantasy Town Kit GLBs — more medieval silhouettes (peaked roofs, towers, arches)
+2. Increase base color brightness in shader (ambient 0.20 → 0.25) so buildings read better at distance
+3. Add enemy/raid rendering with red color so combat is visible in 3D
