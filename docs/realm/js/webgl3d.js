@@ -222,6 +222,10 @@ void main() {
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
+  // Atmospheric perspective: distant tiles desaturate before fog takes over
+  float atmDist = smoothstep(18.0, 30.0, fogDist);
+  float lum = dot(litColor, vec3(0.299, 0.587, 0.114));
+  litColor = mix(litColor, vec3(lum) * 0.9 + vec3(0.06, 0.09, 0.14) * 0.1, atmDist * 0.45);
   // Sky/fog color shifts with time of day: dawn amber → noon blue → dusk purple → night navy
   float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
   float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
@@ -369,6 +373,9 @@ void main() {
   }
   float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
   float fog = smoothstep(30.0, 46.0, fogDist);
+  float atmDist = smoothstep(18.0, 30.0, fogDist);
+  float lum = dot(litColor, vec3(0.299, 0.587, 0.114));
+  litColor = mix(litColor, vec3(lum) * 0.9 + vec3(0.06, 0.09, 0.14) * 0.1, atmDist * 0.45);
   float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
   float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
   vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
