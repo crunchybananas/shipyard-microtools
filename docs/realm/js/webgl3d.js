@@ -179,6 +179,12 @@ void main() {
   }
   // Animated water sparkle + specular — sun glint by day, moonpath by night
   if (isWater) {
+    // Depth variation: shallow coastal water is turquoise, deep open water is navy
+    float depthNoise = sin(vWorldPos.x * 0.22 + 1.3) * cos(vWorldPos.z * 0.19 + 0.7) * 0.5 + 0.5;
+    vec3 shallowCol = vec3(0.28, 0.68, 0.75); // turquoise-teal
+    vec3 deepCol    = vec3(0.08, 0.18, 0.42); // deep navy
+    vec3 waterBase  = mix(deepCol, shallowCol, depthNoise * 0.65);
+    litColor = mix(waterBase * (0.3 + NdotL * 0.5), litColor, 0.35);
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
     litColor += mix(vec3(sparkle * 0.7, sparkle * 0.85, sparkle),
@@ -325,6 +331,11 @@ void main() {
     }
   }
   if (isWater) {
+    float depthNoise = sin(vWorldPos.x * 0.22 + 1.3) * cos(vWorldPos.z * 0.19 + 0.7) * 0.5 + 0.5;
+    vec3 shallowCol = vec3(0.28, 0.68, 0.75);
+    vec3 deepCol    = vec3(0.08, 0.18, 0.42);
+    vec3 waterBase  = mix(deepCol, shallowCol, depthNoise * 0.65);
+    litColor = mix(waterBase * (0.3 + NdotL * 0.5), litColor, 0.35);
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
     float sparkle = pow(max(0.0, s), 6.0) * 0.35;
     litColor += mix(vec3(sparkle * 0.7, sparkle * 0.85, sparkle),
