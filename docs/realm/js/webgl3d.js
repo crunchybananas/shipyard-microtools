@@ -136,6 +136,13 @@ void main() {
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  // Sand ripple: noise-based shading on warm sandy tiles (beach/desert)
+  bool isSand = vColor.r > 0.80 && vColor.g > 0.68 && vColor.g < 0.85 && vColor.b < 0.60;
+  if (isSand && N.y > 0.5) {
+    vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
+    float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
+    litColor *= 0.90 + ripple * 0.18;
+  }
   // Autumn: shift green foliage/grass to orange-amber
   if (isGrass && uAutumnAmount > 0.0) {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
@@ -248,6 +255,12 @@ void main() {
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  bool isSand = vColor.r > 0.80 && vColor.g > 0.68 && vColor.g < 0.85 && vColor.b < 0.60;
+  if (isSand && N.y > 0.5) {
+    vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
+    float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
+    litColor *= 0.90 + ripple * 0.18;
+  }
   if (isGrass && uAutumnAmount > 0.0) {
     vec3 autumnCol = vec3(0.88, 0.50, 0.06);
     litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
