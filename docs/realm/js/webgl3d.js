@@ -144,12 +144,14 @@ void main() {
   // Compute night amount early — needed for water and sky sections
   float nightPhase = abs(uDayPhase - 0.5); // 0=noon, 0.5=midnight
   float nightAmt = smoothstep(0.30, 0.47, nightPhase);
-  // Winter snow: height-scaled — mountain tops fully white, lowlands dusty
+  // Winter snow: height-scaled gradient + crisp alpine snowline above y=2.5
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (!isWater && uSnowAmount > 0.0) {
     float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
+    float snowLine = smoothstep(2.3, 2.65, vWorldPos.y); // sharp alpine line
+    float snowBlend = mix(heightFactor, 1.0, snowLine);
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
-    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * heightFactor);
+    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * snowBlend);
   }
   // Animated water sparkle + specular — sun glint by day, moonpath by night
   if (isWater) {
@@ -255,8 +257,10 @@ void main() {
   bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
   if (!isWater && uSnowAmount > 0.0) {
     float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
+    float snowLine = smoothstep(2.3, 2.65, vWorldPos.y);
+    float snowBlend = mix(heightFactor, 1.0, snowLine);
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
-    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * heightFactor);
+    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * snowBlend);
   }
   if (isWater) {
     float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
