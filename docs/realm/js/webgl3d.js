@@ -264,6 +264,15 @@ void main() {
   vec3 skyCol = mix(mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk), skyNight, nightAmt);
   // Warm sunrise/sunset tint bleeds into lit surfaces
   litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
+  // God rays: diagonal light shafts sweep terrain at dawn/dusk
+  float goldenHour = max(dawn, dusk * 0.8);
+  if (goldenHour > 0.05 && N.y > 0.4) {
+    float rayDir = dawn > dusk ? 1.0 : -1.0;
+    float shaftCoord = (vWorldPos.x * 0.6 + vWorldPos.z * 0.4) * 0.18 + uTime * 0.04 * rayDir;
+    float shaft = pow(max(0.0, sin(shaftCoord * 6.28318) * 0.5 + 0.5), 6.0);
+    vec3 rayCol = mix(vec3(1.0, 0.80, 0.45), vec3(0.90, 0.55, 0.70), dusk);
+    litColor += rayCol * shaft * goldenHour * 0.22;
+  }
   // Night: dim scene to moonlit blue-silver
   vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
   litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
@@ -438,6 +447,14 @@ void main() {
   vec3 skyNight = vec3(0.04, 0.07, 0.18);
   vec3 skyCol = mix(mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk), skyNight, nightAmt);
   litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
+  float goldenHour = max(dawn, dusk * 0.8);
+  if (goldenHour > 0.05 && N.y > 0.4) {
+    float rayDir = dawn > dusk ? 1.0 : -1.0;
+    float shaftCoord = (vWorldPos.x * 0.6 + vWorldPos.z * 0.4) * 0.18 + uTime * 0.04 * rayDir;
+    float shaft = pow(max(0.0, sin(shaftCoord * 6.28318) * 0.5 + 0.5), 6.0);
+    vec3 rayCol = mix(vec3(1.0, 0.80, 0.45), vec3(0.90, 0.55, 0.70), dusk);
+    litColor += rayCol * shaft * goldenHour * 0.22;
+  }
   vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
   litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
   vec3 finalCol = mix(litColor, skyCol, fog * 0.8);
