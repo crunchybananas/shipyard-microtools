@@ -10,6 +10,21 @@ import { loadGLBGeometry } from './glb-loader.js';
 // ── GLB tree geometry (loaded async, used in buildTerrainMesh) ─
 let glbTreeVariants = null; // array of {positions, normals, indices} once loaded
 
+// ── GLB building geometry (loaded async, keyed by building type) ─
+const glbBuildings = {}; // { house, tower, church, farm, … } → {positions,normals,indices}
+const BUILDING_GLB_MAP = {
+  house:      './assets/meshes/buildings/building_house.glb',
+  farm:       './assets/meshes/buildings/building_farm.glb',
+  tower:      './assets/meshes/buildings/building_tower.glb',
+  church:     './assets/meshes/buildings/building_church.glb',
+  barracks:   './assets/meshes/buildings/building_barracks.glb',
+  market:     './assets/meshes/buildings/building_market.glb',
+  castle:     './assets/meshes/buildings/building_castle.glb',
+  tavern:     './assets/meshes/buildings/building_tavern.glb',
+  blacksmith: './assets/meshes/buildings/building_blacksmith.glb',
+  windmill:   './assets/meshes/buildings/building_windmill.glb',
+};
+
 // ── Module-level GL state ──────────────────────────────────
 let gl = null;
 let program = null;
@@ -740,8 +755,6 @@ export function buildBuildingsMesh() {
     lastBuildingRebuild = performance.now();
     return;
   }
-  console.log(`[gl3d] Building mesh for ${G.buildings.length} buildings`);
-
   for (const b of G.buildings) {
     // Skip non-structural types that have no visual presence worth rendering
     if (b.type === 'road' || b.type === 'wall') continue;
@@ -756,7 +769,27 @@ export function buildBuildingsMesh() {
     const noise1 = ((seed & 0xff) / 255 - 0.5);
     const groundY = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12) + 0.02;
 
-    addBuildingMesh(verts, indices, b, groundY);
+    const glbGeom = glbBuildings[b.type];
+    if (glbGeom) {
+      const cx = col + 0.5, cz = row + 0.5;
+      const bldScale = 0.65;
+      const GLB_COLORS = {
+        house:      [0.95, 0.82, 0.60],
+        farm:       [0.68, 0.52, 0.28],
+        tower:      [0.62, 0.65, 0.70],
+        church:     [0.95, 0.90, 0.80],
+        barracks:   [0.48, 0.52, 0.58],
+        market:     [0.92, 0.72, 0.28],
+        castle:     [0.58, 0.55, 0.52],
+        tavern:     [0.78, 0.50, 0.25],
+        blacksmith: [0.32, 0.32, 0.38],
+        windmill:   [0.88, 0.82, 0.65],
+      };
+      const color = GLB_COLORS[b.type] || [0.80, 0.78, 0.72];
+      inlineGLBTree(verts, indices, glbGeom, cx, groundY, cz, bldScale, color);
+    } else {
+      addBuildingMesh(verts, indices, b, groundY);
+    }
   }
 
   if (indices.length === 0) {
@@ -767,7 +800,6 @@ export function buildBuildingsMesh() {
 
   buildingsIndexCount = uploadMesh(buildingsVao, buildingsVertexBuf, buildingsIndexBuf, verts, indices);
   lastBuildingRebuild = performance.now();
-  console.log(`[gl3d] Buildings mesh uploaded: ${verts.length/9} verts, ${indices.length} indices`);
 }
 
 // ── Camera / VP matrix ─────────────────────────────────────
@@ -879,9 +911,20 @@ export function initGL3D(canvas) {
     loadGLBGeometry('./assets/meshes/tree_pineSmallC.glb'),
   ]).then(variants => {
     glbTreeVariants = variants;
-    buildTerrainMesh(); // rebuild to swap pyramids → real trees
-    console.log('GLB tree meshes loaded, terrain rebuilt');
-  }).catch(e => console.warn('GLB load failed, using pyramid trees:', e));
+    buildTerrainMesh();
+    console.log('GLB tree meshes loaded');
+  }).catch(e => console.warn('GLB tree load failed, using pyramids:', e));
+
+  // Load building GLBs — buildings mesh rebuilds when ready
+  Promise.all(
+    Object.entries(BUILDING_GLB_MAP).map(([type, url]) =>
+      loadGLBGeometry(url).then(geom => { glbBuildings[type] = geom; })
+        .catch(e => console.warn(`GLB building ${type} failed:`, e))
+    )
+  ).then(() => {
+    lastBuildingRebuild = 0; // force rebuild on next render tick
+    console.log('GLB building meshes loaded');
+  });
 
   console.log(`WebGL3D initialized (WebGL${isWebGL2 ? '2' : '1'})`);
   return true;

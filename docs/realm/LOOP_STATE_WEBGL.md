@@ -336,6 +336,30 @@ Best free CC0 GLTF sources for this project:
 
 ---
 
+### Cycles 17–19 — 2026-04-16
+
+**Cycle 17:** Tree scale tuned to 0.55× (from 0.38×). 3 Kenney Nature Kit pine GLBs load as `glbTreeVariants`. Trees now properly sized, recognizable as conifers. Trees raised `groundY + 0.08` to prevent clipping into terrain.
+
+**Cycle 18:** Added `js/glb-loader.js` invocation for 10 Kenney Hexagon Kit building GLBs in `assets/meshes/buildings/`. `initGL3D()` loads all 10 async; `buildBuildingsMesh()` uses `inlineGLBTree()` to render GLB geometry per type.
+
+**Cycle 19 (2026-04-16):**
+- Building scale: 0.30 → 0.65 (buildings were invisible at 0.30, now fill ~1 tile each)
+- Per-type colors added via `GLB_COLORS` map in `buildBuildingsMesh()`:
+  - house=tan, farm=earthy, tower=blue-grey, church=cream, barracks=slate, market=gold, castle=dark stone, tavern=warm wood, blacksmith=dark metal, windmill=cream
+- Removed noisy rebuild logs from `buildBuildingsMesh()`
+
+**Visual result:** Buildings clearly visible as Kenney hexagon-style structures with their characteristic hex base platforms. Distinct colors per type make settlement readable. 10 building types covered.
+
+**Remaining issues:**
+1. Kenney hex base tiles visible below buildings (dark hexagons) — by design, but may look odd in square-tile context
+2. Buildings render as single-color flat-lit — no material variation within one model
+3. Types with no GLB mapping (lumber_mill, granary, fisherman_hut) fall back to procedural geometry
+
+---
+
 ## Next Cycle Plan
 
-**Cycle 17:** Tune tree scale (try 0.55×) and download KayKit Medieval Hexagon building meshes. Replace box-geometry for at least `house` and `tower` building types with real GLBs. Apply same inlining approach as trees.
+**Cycle 20:** Visual subagent critique of current 3D vs 2D state. Focus: are building shapes recognizable? Is the overall scene readable at default zoom? Candidates:
+- Adjust GLB building scale per-type (church/castle at 0.55, house at 0.70)
+- Add ambient occlusion approximation (darken tiles under buildings)
+- Or source Kenney Fantasy Town Kit buildings which look more medieval and less hex-grid
