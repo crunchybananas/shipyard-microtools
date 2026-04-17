@@ -103,6 +103,13 @@ void main() {
                + cos(aPos.z * 0.8 + uTime * 1.2) * 0.06;
     pos.y += wave;
   }
+  // Grass wind sway: gentle ripple on top faces of green tiles
+  bool isGrassV = aColor.g > aColor.r * 1.1 && aColor.g > aColor.b && aColor.b < 0.55;
+  if (isGrassV && aNormal.y > 0.5) {
+    float sway = sin(aPos.x * 1.3 + aPos.z * 0.9 + uTime * 1.1) * 0.025
+               + cos(aPos.x * 0.8 + aPos.z * 1.4 + uTime * 0.8) * 0.018;
+    pos.y += sway;
+  }
   gl_Position = uViewProj * vec4(pos, 1.0);
   vNormal = aNormal;
   vColor = aColor;
@@ -204,6 +211,12 @@ void main() {
     float wave = sin(aPos.x * 0.8 + uTime * 1.5) * 0.08
                + cos(aPos.z * 0.8 + uTime * 1.2) * 0.06;
     pos.y += wave;
+  }
+  bool isGrassV = aColor.g > aColor.r * 1.1 && aColor.g > aColor.b && aColor.b < 0.55;
+  if (isGrassV && aNormal.y > 0.5) {
+    float sway = sin(aPos.x * 1.3 + aPos.z * 0.9 + uTime * 1.1) * 0.025
+               + cos(aPos.x * 0.8 + aPos.z * 1.4 + uTime * 0.8) * 0.018;
+    pos.y += sway;
   }
   gl_Position = uViewProj * vec4(pos, 1.0);
   vNormal = aNormal;
