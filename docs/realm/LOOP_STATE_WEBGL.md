@@ -218,3 +218,34 @@ Every building renders a **6-unit tall hot-pink pillar** as a debug marker. Must
 **Visual result (cycles 7-9):** Bright lime-green grass, readable sparse forest, lit terrain faces, buildings visible with 3D depth.
 
 **Cycle 10:** Make buildings more visually distinct — currently all read as grey boxes at zoom-out. Boost building scale multiplier from S=3.5 to S=4.5, and give house a warmer tan (`[0.92, 0.72, 0.48]`), church off-white (`[0.96, 0.92, 0.84]`), castle/tower a cooler blue-grey (`[0.52, 0.54, 0.62]`) to break up the monochrome grey blob.
+
+### Cycle 10 — 2026-04-16
+**Changes (js/webgl3d.js):**
+- `addTree()` now accepts variable `S` scale parameter (default 2.8)
+- Tree scale randomized 1.8–3.4 via deterministic tile hash (`treeSeed >>> 8`)
+- `treeTiles[]` stores `[cx, cz, groundY, scale]` tuples
+
+**Visual result:** Forest reads as natural mixed-height canopy instead of uniform carpet. Organic silhouette. Buildings visible in clearing but still small.
+
+---
+
+### Cycle 11 — 2026-04-16
+**Changes (js/webgl3d.js):**
+- Building scale S: 3.5 → 4.0 (tried 5.5, too dominant, settled on 4.0)
+- House walls brightened: `[0.82,0.62,0.38]` → `[0.94,0.88,0.72]` (cream)
+- House roof more vivid: `[0.78,0.22,0.18]` → `[0.88,0.18,0.12]` (vivid red)
+
+**Key finding:** Chrome ES module cache must be busted with Cmd+Shift+R (hard refresh), not just ?_cb= URL bump. Module at cached line 673 ≠ current line 684 = stale execution. Also: injected test buildings need full schema `{hp:100, workers:[], active:true, prodTimer:0, level:1, buildProgress:1}` — missing `workers` crashes economy.js.
+
+**Visual result:** Buildings clearly visible with distinct shapes — church steeple, tower, castle corner towers, windmill blades all readable. Cream house walls + vivid red roof landmark visible against green canopy.
+
+**Validator recommendation (cycle 11):**
+1. Buildings grey — fix colors/roof → DONE (partially: house now cream+red; other types still grey-ish)
+2. Dark navy void background — "floating island in space" breaks immersion
+3. Blocky shoreline staircase edges
+
+---
+
+## Next Cycle Plan
+
+**Cycle 12:** Replace flat dark navy background with a sky gradient. Currently `gl.clearColor(0.05, 0.05, 0.12, 1.0)` paints a solid dark void. Change to a light blue sky gradient rendered as a fullscreen quad before the terrain pass — this would make the ocean water blend into a horizon rather than cutting off at a hard dark boundary. Alternatively, just brightening the clear color to a lighter horizon blue `(0.55, 0.75, 0.90)` would immediately improve the "floating island" feel.
