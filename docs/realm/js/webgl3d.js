@@ -278,9 +278,8 @@ function pushBox(verts, indices, x0, y0, z0, x1, y1, z1, color) {
 }
 
 // ── Tree geometry ──────────────────────────────────────────
-function addTree(verts, indices, cx, cz, groundY) {
+function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
   const baseY = groundY;
-  const S = 2.8; // scale up trees so they're clearly visible 3D landmarks
   // Canopy only — no trunk box, keeps forest floor readable
   const trunkH = 0.3 * S;  // canopy base height above ground
   const canopyColor     = [0.22, 0.82, 0.28];
@@ -619,7 +618,9 @@ export function buildTerrainMesh() {
       if (tileType === TILE.FOREST) {
         const treeSeed = (col * 4517 + row * 2971) >>> 0;
         if ((treeSeed % 10) < 4) {
-          treeTiles.push([col + 0.5, row + 0.5, h]);
+          // Vary tree height 1.8–3.4 for organic mixed-forest look
+          const treeScale = 1.8 + ((treeSeed >>> 8) & 0xff) / 255 * 1.6;
+          treeTiles.push([col + 0.5, row + 0.5, h, treeScale]);
         }
       }
     }
@@ -627,8 +628,8 @@ export function buildTerrainMesh() {
 
   // Record terrain-only index count, then append tree geometry
   terrainIndexCount = indices.length;
-  for (const [cx, cz, groundY] of treeTiles) {
-    addTree(verts, indices, cx, cz, groundY);
+  for (const [cx, cz, groundY, scale] of treeTiles) {
+    addTree(verts, indices, cx, cz, groundY, scale);
   }
   treeIndexCount = indices.length - terrainIndexCount;
 
