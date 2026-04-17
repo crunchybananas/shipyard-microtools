@@ -221,6 +221,13 @@ void main() {
     // Whitecap foam: wave crests bleach to white-blue
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
+    // Moon reflection path: bright silver band runs diagonally across night water
+    if (nightAmt > 0.3) {
+      float moonPath = vWorldPos.x * 0.6 - vWorldPos.z * 0.8;
+      float moonBand = exp(-abs(moonPath - 8.0) * 0.18) + exp(-abs(moonPath + 4.0) * 0.28);
+      float moonRipple = 0.6 + 0.4 * sin(vWorldPos.x * 5.2 + uTime * 2.8) * cos(vWorldPos.z * 4.7 + uTime * 1.9);
+      litColor += vec3(0.82, 0.90, 1.0) * moonBand * moonRipple * nightAmt * 0.45;
+    }
   }
   // Rooftop sun specular: bright spot on building tops from direct sunlight
   bool isRooftop = N.y > 0.7 && vWorldPos.y > 1.0 && !isGrass && !isWater && !isSand;
@@ -410,6 +417,12 @@ void main() {
                     vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
     float crest = smoothstep(0.05, 0.10, vWorldPos.y);
     litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
+    if (nightAmt > 0.3) {
+      float moonPath = vWorldPos.x * 0.6 - vWorldPos.z * 0.8;
+      float moonBand = exp(-abs(moonPath - 8.0) * 0.18) + exp(-abs(moonPath + 4.0) * 0.28);
+      float moonRipple = 0.6 + 0.4 * sin(vWorldPos.x * 5.2 + uTime * 2.8) * cos(vWorldPos.z * 4.7 + uTime * 1.9);
+      litColor += vec3(0.82, 0.90, 1.0) * moonBand * moonRipple * nightAmt * 0.45;
+    }
   }
   bool isRooftop = N.y > 0.7 && vWorldPos.y > 1.0 && !isGrass && !isWater && !isSand;
   if (isRooftop && nightAmt < 0.7) {
