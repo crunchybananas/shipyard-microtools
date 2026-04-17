@@ -772,7 +772,7 @@ export function buildBuildingsMesh() {
     const glbGeom = glbBuildings[b.type];
     if (glbGeom) {
       const cx = col + 0.5, cz = row + 0.5;
-      const bldScale = 0.65;
+      const bldScale = 0.80;
       const GLB_COLORS = {
         house:      [0.95, 0.82, 0.60],
         farm:       [0.68, 0.52, 0.28],
@@ -786,7 +786,8 @@ export function buildBuildingsMesh() {
         windmill:   [0.88, 0.82, 0.65],
       };
       const color = GLB_COLORS[b.type] || [0.80, 0.78, 0.72];
-      inlineGLBTree(verts, indices, glbGeom, cx, groundY, cz, bldScale, color);
+      // Sink so hex base is buried — only the building structure shows above ground
+      inlineGLBTree(verts, indices, glbGeom, cx, groundY - 0.42, cz, bldScale, color);
     } else {
       addBuildingMesh(verts, indices, b, groundY);
     }
@@ -804,7 +805,7 @@ export function buildBuildingsMesh() {
 
 // ── Camera / VP matrix ─────────────────────────────────────
 function buildViewProjection() {
-  const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.3;
+  const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.7;
   const orthoSize = 26 / zoom;
 
   const aspect = (gl.drawingBufferWidth || 800) / (gl.drawingBufferHeight || 600);
