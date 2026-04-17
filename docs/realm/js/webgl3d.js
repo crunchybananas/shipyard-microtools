@@ -56,6 +56,7 @@ let uTimeLoc = null;
 let uSeasonTintLoc = null;
 let uCameraCenterLoc = null;
 let uSnowAmountLoc = null;
+let uAutumnAmountLoc = null;
 
 // Extension for VAO in WebGL1
 let oeVao = null;
@@ -118,14 +119,20 @@ uniform vec3 uSeasonTint;
 uniform float uTime;
 uniform vec2 uCameraCenter;
 uniform float uSnowAmount;
+uniform float uAutumnAmount;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
   vec3 ambient = vColor * 0.25;
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
-  // Snow: bleach grass/forest tiles toward white in winter
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  // Autumn: shift green foliage/grass to orange-amber
+  if (isGrass && uAutumnAmount > 0.0) {
+    vec3 autumnCol = vec3(0.88, 0.50, 0.06);
+    litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
+  }
+  // Winter snow: bleach green tiles white
   if (isGrass && uSnowAmount > 0.0) {
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
     litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
@@ -177,6 +184,7 @@ uniform vec3 uSeasonTint;
 uniform float uTime;
 uniform vec2 uCameraCenter;
 uniform float uSnowAmount;
+uniform float uAutumnAmount;
 void main() {
   vec3 N = normalize(vNormal);
   float NdotL = max(0.0, dot(N, uLightDir));
@@ -184,6 +192,10 @@ void main() {
   vec3 diffuse = vColor * NdotL * 1.1;
   vec3 litColor = (ambient + diffuse) * uSeasonTint;
   bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
+  if (isGrass && uAutumnAmount > 0.0) {
+    vec3 autumnCol = vec3(0.88, 0.50, 0.06);
+    litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
+  }
   if (isGrass && uSnowAmount > 0.0) {
     vec3 snowCol = vec3(0.90, 0.93, 0.98);
     litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount);
@@ -1002,6 +1014,7 @@ export function initGL3D(canvas) {
   uSeasonTintLoc    = gl.getUniformLocation(program, 'uSeasonTint');
   uCameraCenterLoc  = gl.getUniformLocation(program, 'uCameraCenter');
   uSnowAmountLoc    = gl.getUniformLocation(program, 'uSnowAmount');
+  uAutumnAmountLoc  = gl.getUniformLocation(program, 'uAutumnAmount');
 
   // Create terrain VAO
   if (isWebGL2) {
@@ -1111,6 +1124,10 @@ export function render3D() {
   // Snow cover: full white blanket in winter, none otherwise
   if (uSnowAmountLoc) {
     gl.uniform1f(uSnowAmountLoc, G.season === 'winter' ? 1.0 : 0.0);
+  }
+  // Autumn foliage: shift green grass/trees to amber-orange
+  if (uAutumnAmountLoc) {
+    gl.uniform1f(uAutumnAmountLoc, G.season === 'autumn' ? 1.0 : 0.0);
   }
 
   // Fog center: follow camera tile position so fog fades from view center
