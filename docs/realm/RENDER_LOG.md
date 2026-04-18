@@ -148,6 +148,11 @@ Ranked by impact:
 | 58 | Hover ring same treatment — gold iso-ellipse at feet (7×3). Unified visual language with selection. | — | — | KEEP. |
 | 59 | Night windows for 7 more building types (lumber/granary/bakery/fisherman/blacksmith/market/windmill). Previously only homes and large monuments lit up after dark. | — | — | KEEP. Night settlement now reads as fully inhabited, not just houses. |
 | 60 | **DEEP PLAY** — forced 3 raiders + dusk lighting. Confirmed new raider silhouette renders correctly alongside new citizen silhouette. Raiders visible as spike-helmed armored brutes distinct from villagers. | — | realm_s4_loop60_raid.jpg | KEEP. Combined polish chain stable. |
+| 61 | Soldier silhouette rebuild. Prior was pre-L41 torso-pill + helmet-dot. Now full chibi: legs (trousers/greaves), boots, tapered torso, shoulder-to-waist, long arms with gauntlet tips, proper helm with brim + face shadow, plume (BLUE for swordsman vs raider red), weapons on back. Archers get green feather, leather glove hands. | — | — | KEEP. |
+| 62 | Building ground-contact shadow matching citizen style (3-layer stacked ellipse, per-type footprint width 10-14). Buildings no longer look like they're floating above the tile at noon. | — | — | KEEP. |
+| 63 | — (skipped / consolidated into L62) | | | |
+| 64 | Ambient walker upgrade — merchants/students/criers/beggars get the same chibi treatment (legs+boots+robe+dot-eyes). Prior torso-pill looked out of place next to refined citizens. Keeps role emoji on chest. | — | — | KEEP. |
+| 65 | **DEEP PLAY** — forced 3 soldiers (swordsman/archer/swordsman) + 3 raiders at a citizen. Confirmed ally vs enemy silhouettes are distinct at a glance: blue plumes vs red helm spikes. | — | realm_s4_loop65_battle.jpg | KEEP. |
 
 
 
