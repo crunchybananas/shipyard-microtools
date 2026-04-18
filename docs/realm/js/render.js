@@ -2353,7 +2353,7 @@ function drawBuilding(ctx, b, s, daylight) {
   switch (b.type) {
     case 'house': drawHouse(ctx, s, b); break;
     case 'farm': drawFarm(ctx, s, b); break;
-    case 'lumber': drawLumber(ctx, s); break;
+    case 'lumber': drawLumber(ctx, s, b); break;
     case 'quarry': drawQuarry(ctx, s); break;
     case 'mine': drawMine(ctx, s); break;
     case 'market': drawMarket(ctx, s); break;
@@ -2761,7 +2761,7 @@ function drawFarm(ctx, s, b) {
   ctx.fillRect(scx - 1.5, scy - 14, 3, 3);
 }
 
-function drawLumber(ctx, s) {
+function drawLumber(ctx, s, b) {
   // Front wall — wood-plank gradient (light top, darker bottom)
   const wallGrad = ctx.createLinearGradient(s.x-10, s.y-18, s.x-10, s.y-4);
   wallGrad.addColorStop(0, '#b8865c');
@@ -2809,29 +2809,77 @@ function drawLumber(ctx, s) {
   // Door
   ctx.fillStyle = '#3a2510';
   ctx.fillRect(s.x-2, s.y-12, 4, 6);
-  // Log pile (left side) — stacked cylinders with end-grain rings
+  // Loop 21 (render S3): per-building hash variance. Log pile size, axe/saw
+  // tool choice, sawdust density vary per mill. Taller pile = active camp;
+  // smaller pile = recently shipped out.
+  const h = b ? (((b.x * 73 + b.y * 41) & 0xff)) : 0;
+  const pileHeight = 1 + (h & 0x3);  // 1-4 rows of logs
+  const pileWide = (h >> 2) & 0x1;    // extra column
+  const toolVariant = (h >> 3) & 0x3; // 0 axe, 1 two-hand saw, 2 both, 3 just stump
+  const sawdustHeavy = (h >> 5) & 0x1;
+
+  // Log pile
   const logColors = ['#c4844e', '#b07040', '#a06030'];
-  for (let row = 0; row < 2; row++) {
-    for (let col = 0; col < 3; col++) {
+  const cols = pileWide ? 4 : 3;
+  for (let row = 0; row < pileHeight; row++) {
+    for (let col = 0; col < cols; col++) {
       const lx = s.x-18 + col*5;
       const ly = s.y - 3 - row*4;
       ctx.fillStyle = logColors[col % 3];
       ctx.beginPath(); ctx.ellipse(lx, ly, 3, 2, 0, 0, Math.PI*2); ctx.fill();
-      // End-grain ring
       ctx.strokeStyle = 'rgba(60,30,10,0.5)'; ctx.lineWidth = 0.7;
       ctx.beginPath(); ctx.ellipse(lx, ly, 1.5, 1, 0, 0, Math.PI*2); ctx.stroke();
     }
   }
-  // Axe prop — handle + blade leaning against wall
-  ctx.strokeStyle = '#6a4a28'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(s.x+13, s.y-4); ctx.lineTo(s.x+16, s.y-14); ctx.stroke();
-  ctx.fillStyle = '#8a9aaa';
-  ctx.beginPath();
-  ctx.moveTo(s.x+16, s.y-14); ctx.lineTo(s.x+19, s.y-17); ctx.lineTo(s.x+19, s.y-12); ctx.closePath();
-  ctx.fill();
-  // Sawdust scatter around base
+
+  // Tools: axe / two-hand saw / both / stump only
+  if (toolVariant === 0 || toolVariant === 2) {
+    // Axe — handle + blade leaning against wall
+    ctx.strokeStyle = '#6a4a28'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(s.x+13, s.y-4); ctx.lineTo(s.x+16, s.y-14); ctx.stroke();
+    ctx.fillStyle = '#8a9aaa';
+    ctx.beginPath();
+    ctx.moveTo(s.x+16, s.y-14); ctx.lineTo(s.x+19, s.y-17); ctx.lineTo(s.x+19, s.y-12); ctx.closePath();
+    ctx.fill();
+  }
+  if (toolVariant === 1 || toolVariant === 2) {
+    // Two-hand saw on a sawhorse
+    ctx.strokeStyle = '#5a3a18'; ctx.lineWidth = 1.1;
+    // Sawhorse
+    ctx.beginPath(); ctx.moveTo(s.x+10, s.y+0); ctx.lineTo(s.x+13, s.y-4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x+17, s.y+0); ctx.lineTo(s.x+14, s.y-4); ctx.stroke();
+    ctx.strokeStyle = '#7a5a38'; ctx.lineWidth = 1.0;
+    ctx.beginPath(); ctx.moveTo(s.x+10, s.y-4); ctx.lineTo(s.x+18, s.y-4); ctx.stroke();
+    // Saw blade flat on top
+    ctx.fillStyle = '#b4bec8';
+    ctx.fillRect(s.x+11, s.y-6, 6, 1.2);
+    // Teeth
+    ctx.strokeStyle = '#707880'; ctx.lineWidth = 0.5;
+    for (let tx = s.x+11; tx <= s.x+17; tx += 0.7) {
+      ctx.beginPath(); ctx.moveTo(tx, s.y-4.8); ctx.lineTo(tx+0.3, s.y-4.2); ctx.stroke();
+    }
+  }
+  if (toolVariant === 3) {
+    // Chopping stump with axe stuck in it
+    ctx.fillStyle = '#7a5030';
+    ctx.beginPath(); ctx.ellipse(s.x+14, s.y-2, 4, 2, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = 'rgba(40,20,5,0.6)'; ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.ellipse(s.x+14, s.y-2, 2, 1, 0, 0, Math.PI*2); ctx.stroke();
+    // Axe handle sticking up
+    ctx.strokeStyle = '#5a3a18'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(s.x+14, s.y-3); ctx.lineTo(s.x+14, s.y-10); ctx.stroke();
+    // Axe blade at top
+    ctx.fillStyle = '#a0a8b4';
+    ctx.beginPath();
+    ctx.moveTo(s.x+14, s.y-10); ctx.lineTo(s.x+17, s.y-12); ctx.lineTo(s.x+14, s.y-13);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // Sawdust density
   ctx.fillStyle = 'rgba(210,165,90,0.6)';
-  const dustSpots = [[-8,1],[-5,2],[-3,1],[3,2],[6,1],[9,2],[-10,3]];
+  const dustSpots = sawdustHeavy
+    ? [[-8,1],[-5,2],[-3,1],[3,2],[6,1],[9,2],[-10,3],[2,3],[-6,4],[8,3]]
+    : [[-8,1],[-5,2],[-3,1],[3,2],[6,1]];
   for (const [dx,dy] of dustSpots) {
     ctx.beginPath(); ctx.arc(s.x+dx, s.y+dy, 1.2, 0, Math.PI*2); ctx.fill();
   }
