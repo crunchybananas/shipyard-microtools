@@ -2161,17 +2161,25 @@ export function render() {
   renderBalloons(ctx);
 
   // ── Rain overlay (screen space) ───────────────────────────────
-  if (G.weather === 'rain' && G.camera.zoom >= 0.6) {
+  // Loop 32 (render S3): denser rain during storm, varied droplet lengths,
+  // wind shear so drops slant harder in storm weather.
+  if ((G.weather === 'rain' || G.weather === 'storm') && G.camera.zoom >= 0.6) {
     ctx.save();
-    ctx.globalAlpha = 0.4;
-    ctx.strokeStyle = '#8ab4e0';
+    const isStorm = G.weather === 'storm';
+    ctx.globalAlpha = isStorm ? 0.55 : 0.4;
+    ctx.strokeStyle = isStorm ? '#7ea4d0' : '#8ab4e0';
     ctx.lineWidth = 0.6;
-    for (let i = 0; i < 80; i++) {
-      const rx = (i * 37 + G.gameTick * 8) % (logicalW + 100) - 50;
-      const ry = (i * 53 + G.gameTick * 12) % (logicalH + 100) - 50;
+    const dropCount = isStorm ? 140 : 80;
+    const shearX = isStorm ? -5 : -2;
+    const shearY = isStorm ? 10 : 6;
+    for (let i = 0; i < dropCount; i++) {
+      const rx = (i * 37 + G.gameTick * (isStorm ? 14 : 8)) % (logicalW + 100) - 50;
+      const ry = (i * 53 + G.gameTick * (isStorm ? 20 : 12)) % (logicalH + 100) - 50;
+      // Vary droplet length by hash so some are long streaks, some short
+      const len = 0.7 + ((i * 11) % 10) / 20;
       ctx.beginPath();
       ctx.moveTo(rx, ry);
-      ctx.lineTo(rx - 2, ry + 6);
+      ctx.lineTo(rx + shearX * len, ry + shearY * len);
       ctx.stroke();
     }
     ctx.restore();
