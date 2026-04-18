@@ -4302,17 +4302,39 @@ function renderTileTooltip(ctx, logicalW, logicalH) {
 registerScreenRenderer(renderTileTooltip);
 
 // ── Loop 124: Raid chronicle entry ─────────────────────────
-// (Handled in economy.js already, but adding raid survival chronicle)
+// Loop 10 (render S3): rewrote to report this-raid kills/losses instead
+// of lifetime counters, and to tell the truth when the village was razed.
+// Prior code said "Raid repelled. 0 foes slain in total." even when every
+// citizen was dead — a chronicle lie that made the narrative untrustworthy.
 import { chronicle as _chronicle124 } from './story.js';
 let _lastRaidDay = 0;
+let _raidKillsStart = 0;
+let _raidDiedStart = 0;
 function updateRaidChronicle() {
   if (!G.stats) return;
   if (G.enemies.length > 0 && _lastRaidDay !== G.day) {
     _lastRaidDay = G.day;
+    _raidKillsStart = G.stats.enemiesKilled || 0;
+    _raidDiedStart = G.stats.citizensDied || 0;
   }
   if (G.enemies.length === 0 && _lastRaidDay > 0 && G.stats.raidsSurvived > 0) {
     if (_lastRaidDay === G.day - 1 || _lastRaidDay === G.day) {
-      try { _chronicle124(`Raid on day ${_lastRaidDay} repelled. ${G.stats.enemiesKilled} foes slain in total.`, 'raid'); } catch(_e){}
+      const kills = (G.stats.enemiesKilled || 0) - _raidKillsStart;
+      const losses = (G.stats.citizensDied || 0) - _raidDiedStart;
+      const popAlive = G.citizens.length;
+      let msg;
+      if (popAlive === 0) {
+        msg = `Raid on day ${_lastRaidDay}: the village was razed. None remain to tell it.`;
+      } else if (losses > 0 && kills === 0) {
+        msg = `Raid on day ${_lastRaidDay}: ${losses} fell, no foe answered. The survivors bury their own.`;
+      } else if (losses > 0 && kills > 0) {
+        msg = `Raid on day ${_lastRaidDay} turned back at a cost: ${losses} lost, ${kills} foes slain.`;
+      } else if (kills > 0) {
+        msg = `Raid on day ${_lastRaidDay} repelled — ${kills} foes slain, none of ours lost.`;
+      } else {
+        msg = `Raid on day ${_lastRaidDay}: the raiders withdrew before either side struck a blow.`;
+      }
+      try { _chronicle124(msg, 'raid'); } catch(_e){}
     }
     _lastRaidDay = 0;
   }
