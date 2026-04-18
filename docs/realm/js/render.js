@@ -2361,7 +2361,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'archery': drawArchery(ctx, s); break;
     case 'tower': drawTower(ctx, s); break;
     case 'well': drawWell(ctx, s); break;
-    case 'tavern': drawTavern(ctx, s); break;
+    case 'tavern': drawTavern(ctx, s, b); break;
     case 'wall': drawWall(ctx, s, b); break;
     case 'road': drawRoad(ctx, s); break;
     case 'tradingpost': drawTradingPost(ctx, s, b); break;
@@ -3542,7 +3542,7 @@ function drawWell(ctx, s) {
   ctx.fill();
 }
 
-function drawTavern(ctx, s) {
+function drawTavern(ctx, s, b) {
   // Walls — warm wood gradient, lighter at top
   const woodGrad = ctx.createLinearGradient(s.x, s.y-22, s.x, s.y-4);
   woodGrad.addColorStop(0, '#b88a50');
@@ -3571,14 +3571,54 @@ function drawTavern(ctx, s) {
   for (let py = s.y-18; py < s.y-4; py += 3) {
     ctx.beginPath(); ctx.moveTo(s.x-10, py); ctx.lineTo(s.x+10, py); ctx.stroke();
   }
-  // Sign bracket + hanging sign board
+  // Loop 27 (render S3): per-tavern sign board + sign-emblem variance.
+  // Every tavern had the same gold-banded sign. Now the board color and its
+  // emblem (mug / boar / crown / anchor) vary per-building.
+  const tavHash = b ? (((b.x * 59 + b.y * 31) & 0xff)) : 0;
+  const signColors = [
+    { board: '#c8922a', accent: '#ffd166' },  // classic gold (original)
+    { board: '#8e3f2a', accent: '#e08260' },  // burgundy
+    { board: '#3a5a84', accent: '#8fb8d4' },  // navy blue
+    { board: '#4e6a30', accent: '#a0c070' },  // mossy green
+  ][tavHash & 0x3];
+  const emblemType = (tavHash >> 2) & 0x3;
+  // Sign bracket
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(s.x-12, s.y-16, 2, 8);
   ctx.fillRect(s.x-16, s.y-16, 7, 1);
-  ctx.fillStyle = '#c8922a';
+  // Board
+  ctx.fillStyle = signColors.board;
   ctx.fillRect(s.x-17, s.y-15, 8, 5);
-  ctx.fillStyle = '#ffd166';
+  // Top accent band
+  ctx.fillStyle = signColors.accent;
   ctx.fillRect(s.x-16, s.y-14, 6, 1);
+  // Emblem — tiny symbol in the middle of the board
+  ctx.fillStyle = signColors.accent;
+  if (emblemType === 0) {
+    // Mug — rect + handle
+    ctx.fillRect(s.x-14, s.y-13, 2, 2);
+    ctx.strokeStyle = signColors.accent;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.arc(s.x-11.5, s.y-12, 0.8, -Math.PI/2, Math.PI/2); ctx.stroke();
+  } else if (emblemType === 1) {
+    // Boar head — triangle ear + blob
+    ctx.fillRect(s.x-14, s.y-12, 2.5, 1.5);
+    ctx.beginPath();
+    ctx.moveTo(s.x-13, s.y-13); ctx.lineTo(s.x-14, s.y-13); ctx.lineTo(s.x-13, s.y-11.5);
+    ctx.closePath(); ctx.fill();
+  } else if (emblemType === 2) {
+    // Crown — three bumps
+    for (let i = 0; i < 3; i++) {
+      ctx.fillRect(s.x-14 + i*1.2, s.y-12.5 + (i === 1 ? -0.5 : 0), 0.8, 1);
+    }
+    ctx.fillRect(s.x-14, s.y-11.5, 3.2, 0.6);
+  } else {
+    // Anchor — vertical + crossbar
+    ctx.fillRect(s.x-13, s.y-13, 0.6, 3);
+    ctx.fillRect(s.x-14, s.y-12, 2.4, 0.6);
+    ctx.beginPath();
+    ctx.arc(s.x-12.7, s.y-10.5, 1, 0, Math.PI); ctx.fill();
+  }
   // Windows (warm glow)
   ctx.fillStyle = '#ffe088';
   ctx.fillRect(s.x-5, s.y-18, 4, 3);
