@@ -133,24 +133,81 @@ export function playBuildingSound(buildingType) {
 }
 
 // Short citizen "voice" bark — randomized pitch sine warble
-export function playVoiceBark(kind='happy') {
+// Loop 23 (render S3): voice barks now have per-kind pitch contours and an
+// optional voice-seed shift so not every settler sounds identical. Prior
+// code was one frequency-sweep shape for all kinds; only the base pitch
+// varied. Now happy/sad/work/hungry/cheer/alarm each have their own shape.
+export function playVoiceBark(kind = 'happy', voiceSeed = 0) {
   if (!G.audioCtx) return;
   const ctx = G.audioCtx;
   const t = ctx.currentTime;
   const dest = ctx.destination;
   const pitchMap = { happy: 560, sad: 320, work: 460, hungry: 380, cheer: 700, alarm: 640 };
-  const base = pitchMap[kind] || 500;
-  const osc = ctx.createOscillator();
-  const g = ctx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(base, t);
-  osc.frequency.linearRampToValueAtTime(base * (kind === 'sad' ? 0.7 : 1.3), t + 0.12);
-  osc.frequency.linearRampToValueAtTime(base * 0.9, t + 0.22);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.035, t + 0.02);
-  g.gain.linearRampToValueAtTime(0, t + 0.25);
-  osc.connect(g); g.connect(dest);
-  osc.start(t); osc.stop(t + 0.26);
+  // Per-citizen detune: ±12% from seed (0..255 hash). Voices keep their ratio
+  // but each settler sounds a bit different.
+  const detune = 1 + (((voiceSeed & 0xff) / 255) - 0.5) * 0.24;
+  const base = (pitchMap[kind] || 500) * detune;
+
+  // Shared helper
+  const playShape = (type, points, peak) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.connect(g); g.connect(dest);
+    for (const [dt, f] of points) {
+      osc.frequency.linearRampToValueAtTime(f, t + dt);
+    }
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.02);
+    g.gain.linearRampToValueAtTime(peak * 0.6, t + points[points.length - 1][0] - 0.05);
+    g.gain.linearRampToValueAtTime(0, t + points[points.length - 1][0]);
+    osc.start(t);
+    osc.stop(t + points[points.length - 1][0] + 0.01);
+  };
+  // Set starting freq on the oscillator (first point with dt=0)
+  const makeOscAt = (type, f) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(f, t);
+    return {osc, g};
+  };
+  const emit = (type, seq, peak) => {
+    const {osc, g} = makeOscAt(type, seq[0][1]);
+    osc.connect(g); g.connect(dest);
+    for (let i = 1; i < seq.length; i++) {
+      osc.frequency.linearRampToValueAtTime(seq[i][1], t + seq[i][0]);
+    }
+    const end = seq[seq.length - 1][0];
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.02);
+    g.gain.linearRampToValueAtTime(peak * 0.6, t + end - 0.05);
+    g.gain.linearRampToValueAtTime(0, t + end);
+    osc.start(t); osc.stop(t + end + 0.01);
+  };
+
+  if (kind === 'happy') {
+    // Two-note up lilt: hop + softer settle
+    emit('sine', [[0, base], [0.08, base * 1.2], [0.18, base * 1.1]], 0.035);
+  } else if (kind === 'sad') {
+    // Slow downward sigh
+    emit('sine', [[0, base], [0.22, base * 0.72], [0.38, base * 0.62]], 0.028);
+  } else if (kind === 'work') {
+    // Two-syllable grunt "uh-huh"
+    emit('triangle', [[0, base], [0.05, base * 0.85], [0.09, base * 0.85], [0.14, base]], 0.035);
+  } else if (kind === 'hungry') {
+    // Whiny wobble
+    emit('sine', [[0, base], [0.08, base * 1.1], [0.16, base * 0.95], [0.24, base * 1.05], [0.32, base * 0.9]], 0.03);
+  } else if (kind === 'cheer') {
+    // Bright three-note ascending arpeggio
+    emit('sine', [[0, base], [0.06, base * 1.18], [0.12, base * 1.4], [0.22, base * 1.35]], 0.04);
+  } else if (kind === 'alarm') {
+    // Sharp up-down
+    emit('square', [[0, base], [0.04, base * 1.35], [0.12, base * 0.85]], 0.028);
+  } else {
+    // Fallback — original shape
+    emit('sine', [[0, base], [0.12, base * 1.3], [0.22, base * 0.9]], 0.035);
+  }
 }
 
 export function playSound(type) {
