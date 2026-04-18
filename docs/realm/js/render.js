@@ -1447,23 +1447,43 @@ export function render() {
       // side opposite from facing. The old r=3 dot at chest-height read as a
       // debug pip stamped on the body; shrinking + lifting it to the shoulder
       // edge and adding a thin strap makes it scan as a bindle being carried.
+      // Loop 54 (render S4): carrying indicator polish.
+      // - Food color shifted from bright #4ade80 (interface green) to a
+      //   warmer apple #d96060 so it reads as "fruits in a sack", not
+      //   a UI status light.
+      // - Pack drawn as a rounded bindle (ellipse, slightly taller than
+      //   wide) with a darker knot at the top for the strap tie-off.
+      // - Strap rendered brown instead of near-black outline so it
+      //   reads as a leather/rope strap rather than a stroke artifact.
       if (c.carrying) {
-        const cc = {wood:'#a3714f',stone:'#9ca3af',food:'#4ade80',gold:'#ffd166',iron:'#60a5fa'}[c.carrying] || '#fff';
+        const cc = {
+          wood:'#a3714f', stone:'#9ca3af', food:'#d96060',
+          gold:'#ffd166', iron:'#60a5fa',
+        }[c.carrying] || '#ddd';
         const px = s.x - faceScreenX * 4;
         const py = cy - 14;
-        ctx.strokeStyle = 'rgba(20,10,0,0.55)';
-        ctx.lineWidth = 0.7;
-        // Strap from shoulder down across body
+        // Rope/leather strap from shoulder
+        ctx.strokeStyle = 'rgba(90,60,30,0.75)';
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
-        ctx.moveTo(px + faceScreenX * 1.2, py + 1);
-        ctx.lineTo(s.x + faceScreenX * 1.2, cy - 5);
+        ctx.moveTo(px + faceScreenX * 1.3, py + 1);
+        ctx.lineTo(s.x + faceScreenX * 1.3, cy - 5);
         ctx.stroke();
-        // Pack body
+        // Bindle — vertical oval for a bulky pack
         ctx.fillStyle = cc;
         ctx.beginPath();
-        ctx.arc(px, py, 1.9, 0, Math.PI * 2);
+        ctx.ellipse(px, py + 0.2, 1.7, 2.2, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
+        // Darker tie-knot at top of pack
+        ctx.fillStyle = 'rgba(60,35,15,0.85)';
+        ctx.beginPath();
+        ctx.ellipse(px, py - 1.6, 1.3, 0.7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Subtle highlight on sunlit side of pack
+        ctx.fillStyle = 'rgba(255,255,255,0.18)';
+        ctx.beginPath();
+        ctx.ellipse(px - 0.6, py - 0.3, 0.7, 1.1, 0, 0, Math.PI * 2);
+        ctx.fill();
       }
     } // end zoom >= 0.7
 
