@@ -1582,69 +1582,123 @@ export function render() {
   // ── Soldiers ──────────────────────────────────────────────
   for (const s of G.soldiers) {
     const ss = toScreen(s.x, s.y);
-    ctx.globalAlpha = daylight;
+    // Loop 61 (render S4): soldier silhouette rebuild — proper legs, drop
+    // shadow, and body-with-shoulders. Prior shape was the pre-L41 body
+    // pill — no legs, toy-looking. Now matches the citizen/raider chibi
+    // vocabulary with an ALLIED accent: blue plume (not red like raiders),
+    // steel helm, longer arms, chainmail torso.
+    ctx.globalAlpha = Math.max(0.85, daylight);
     if (G.camera.zoom < 0.6) {
-      // Simple dot for far zoom
       ctx.fillStyle = '#5a6a7a';
       ctx.beginPath();
-      ctx.arc(ss.x, ss.y - 4, 3, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle = '#c8383f';
+      ctx.arc(ss.x, ss.y - 4, 3, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#3a7acc';
       ctx.fillRect(ss.x - 1, ss.y - 7, 2, 2);
       continue;
     }
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-    ctx.beginPath();
-    ctx.ellipse(ss.x, ss.y + 2, 4, 2, 0, 0, Math.PI*2);
-    ctx.fill();
-    if (s.type === 'archer') {
-      // Green tunic body
-      ctx.fillStyle = '#4a6a2a';
+    // Stacked drop shadow (matches citizens)
+    ctx.fillStyle = 'rgba(0,0,0,0.10)';
+    ctx.beginPath(); ctx.ellipse(ss.x, ss.y + 2, 7.5, 3.2, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath(); ctx.ellipse(ss.x, ss.y + 2, 5.5, 2.3, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.beginPath(); ctx.ellipse(ss.x, ss.y + 2, 3.2, 1.4, 0, 0, Math.PI*2); ctx.fill();
+
+    const isArcher = s.type === 'archer';
+    const bodyColor = isArcher ? '#4a6a2a' : '#5a6a7a';
+    const darkerBody = isArcher ? '#3a5020' : '#44525e';
+    const helmColor = isArcher ? '#6a4a1a' : '#9aa0a8';
+    const plumeColor = isArcher ? '#2a6a30' : '#3a7acc'; // green feather / blue plume
+
+    // Legs — dark brown trousers / metal greaves
+    const legColor = isArcher ? '#3a2818' : '#2a2a2e';
+    ctx.fillStyle = legColor;
+    const legLx = ss.x - 2.0, legRx = ss.x + 2.0;
+    ctx.fillRect(legLx - 1.2, ss.y - 1 - 5, 2.4, 5);
+    ctx.fillRect(legRx - 1.2, ss.y - 1 - 5, 2.4, 5);
+    // Leg highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(legLx - 1.2, ss.y - 1 - 5, 0.6, 5);
+    ctx.fillRect(legRx - 1.2, ss.y - 1 - 5, 0.6, 5);
+    // Boots
+    ctx.fillStyle = '#1e1510';
+    ctx.beginPath(); ctx.ellipse(legLx, ss.y + 0.5, 2.6, 1.6, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(legRx, ss.y + 0.5, 2.6, 1.6, 0, 0, Math.PI*2); ctx.fill();
+
+    // Body — tapered two-ellipse torso
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath(); ctx.ellipse(ss.x, ss.y - 7, 4.6, 4.5, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ss.x, ss.y - 11, 5.4, 4.2, 0, 0, Math.PI*2); ctx.fill();
+    // Chest band trim (armor belt)
+    ctx.fillStyle = darkerBody;
+    ctx.fillRect(ss.x - 4.2, ss.y - 8.5, 8.4, 1.2);
+
+    // Arms — long ovals with hand dots at tips
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath(); ctx.ellipse(ss.x - 5.8, ss.y - 8, 1.6, 3.8, Math.PI * 0.08, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ss.x + 5.8, ss.y - 8, 1.6, 3.8, -Math.PI * 0.08, 0, Math.PI*2); ctx.fill();
+    // Gauntlets / leather gloves at arm tips
+    ctx.fillStyle = isArcher ? '#4a3018' : '#3a3a42';
+    ctx.beginPath(); ctx.arc(ss.x - 5.8, ss.y - 4.5, 1.1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ss.x + 5.8, ss.y - 4.5, 1.1, 0, Math.PI*2); ctx.fill();
+
+    // Head / helm
+    ctx.fillStyle = helmColor;
+    ctx.beginPath(); ctx.arc(ss.x, ss.y - 15, 4.0, 0, Math.PI*2); ctx.fill();
+    // Face shadow (visible chin under helm)
+    ctx.fillStyle = '#d0a888';
+    ctx.beginPath(); ctx.arc(ss.x, ss.y - 13.5, 2.6, 0.1, Math.PI - 0.1); ctx.fill();
+    // Helmet brim
+    ctx.fillStyle = isArcher ? '#5a3a0a' : '#7a8088';
+    ctx.fillRect(ss.x - 4.8, ss.y - 13.5, 9.6, 1.3);
+
+    // Plume / feather
+    ctx.fillStyle = plumeColor;
+    if (isArcher) {
+      // Green feather sideways
       ctx.beginPath();
-      ctx.ellipse(ss.x, ss.y - 6, 4.5, 5, 0, 0, Math.PI*2);
+      ctx.ellipse(ss.x + 3, ss.y - 17, 1.0, 2.5, Math.PI * 0.25, 0, Math.PI * 2);
       ctx.fill();
-      // Leather cap
-      ctx.fillStyle = '#6a4a1a';
-      ctx.beginPath();
-      ctx.arc(ss.x, ss.y - 13, 4, 0, Math.PI*2);
-      ctx.fill();
-      // Bow on back
-      ctx.strokeStyle = '#8a5a2a';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(ss.x - 3, ss.y - 9, 4, -0.5, 0.5);
-      ctx.stroke();
     } else {
-      // Swordsman — armored, darker metallic
-      ctx.fillStyle = '#5a6a7a';
+      // Vertical red→blue plume
       ctx.beginPath();
-      ctx.ellipse(ss.x, ss.y - 6, 4.5, 5, 0, 0, Math.PI*2);
-      ctx.fill();
-      // Helmet
-      ctx.fillStyle = '#888';
-      ctx.beginPath();
-      ctx.arc(ss.x, ss.y - 13, 4, 0, Math.PI*2);
-      ctx.fill();
-      // Sword on back
-      ctx.strokeStyle = '#aaa';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(ss.x - 3, ss.y - 14);
-      ctx.lineTo(ss.x + 3, ss.y - 8);
-      ctx.stroke();
-      // Plume on helmet
-      ctx.fillStyle = '#c8383f';
-      ctx.beginPath();
-      ctx.ellipse(ss.x, ss.y - 16, 1.5, 2, 0, 0, Math.PI*2);
+      ctx.ellipse(ss.x, ss.y - 18, 1.3, 2.5, 0, 0, Math.PI * 2);
       ctx.fill();
     }
+
+    // Weapon — sword or bow on back
+    if (isArcher) {
+      ctx.strokeStyle = '#8a5a2a';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.arc(ss.x - 4, ss.y - 10, 4.5, -0.5, 0.5);
+      ctx.stroke();
+      // Bowstring
+      ctx.strokeStyle = 'rgba(240,230,200,0.7)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(ss.x - 6.5, ss.y - 7.8); ctx.lineTo(ss.x - 6.5, ss.y - 12.2);
+      ctx.stroke();
+    } else {
+      // Sword on back — diagonal across torso
+      ctx.strokeStyle = '#aaa';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.moveTo(ss.x - 3, ss.y - 14.5); ctx.lineTo(ss.x + 3.5, ss.y - 7.5);
+      ctx.stroke();
+      // Sword handle cross-guard
+      ctx.strokeStyle = '#6a5a30';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(ss.x - 4, ss.y - 16); ctx.lineTo(ss.x - 2.5, ss.y - 13); ctx.stroke();
+    }
+
     // HP bar when damaged
     if (s.hp < s.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(ss.x - 5, ss.y - 20, 10, 2);
+      ctx.fillRect(ss.x - 5, ss.y - 22, 10, 2);
       ctx.fillStyle = '#4ade80';
-      ctx.fillRect(ss.x - 5, ss.y - 20, 10 * (s.hp / s.maxHp), 2);
+      ctx.fillRect(ss.x - 5, ss.y - 22, 10 * (s.hp / s.maxHp), 2);
     }
   }
 
