@@ -138,6 +138,11 @@ Ranked by impact:
 | 48 | Real walk cycle: foot swing-phase lift (1.6px Y + 1.1px X forward) from half-rectified cos(walkPhase), leg shortens when foot lifts. Prior sine-slide now reads as actual walking arc. | — | realm_s4_loop48_walking.jpg | KEEP. Movement finally looks like walking not gliding. |
 | 49 | Tutorial auto-dismiss smarter: added day≥6 AND buildings≥2 trigger, plus citizens≥8 trigger. Prior single threshold (buildings>=4) left "Select Farm from build bar" showing with 11 citizens and a barracks. | — | — | KEEP. |
 | 50 | **DEEP PLAY** — fresh game, placed farm/farm/house/house/granary/lumber. Day 2, 7 pop, 4 buildings. Verified tutorial auto-dismissed (L49 working). Eye dots, drop shadows, walk cycle all rendering without issues. | — | realm_s4_loop50_live.jpg — active settlement with pier/water/water | KEEP — polish chain is stable. |
+| 51 | Tool-while-walking: citizens now carry their work tool during walk_to_work + walk_to_deliver states, smaller scale (0.85×) and shouldered pose vs swung pose. Added new tool sprites for fisherman (rod + line) and blacksmith (hammer) — were generic dots. | — | — | KEEP. |
+| 52 | Citizens readable at night: alpha floor 0.85 instead of fading with daylight. Scene still reads as night via tile dimming + warm windows, villagers stay visible. | — | — | KEEP. |
+| 53 | Tool carried on OFF-face side when walking. Was always right-offset → blocked the face when citizens walked leftward. Now flips to leading side so face stays readable. | — | — | KEEP. |
+| 54 | Carrying bindle polish. Prior tiny colored dot read as UI status indicator; the bright green food color was worst. Now: shift food to warm apple red, reshape to vertical ellipse bindle with darker tie-knot + small highlight. Strap rendered in leather brown instead of near-black. | — | — | KEEP. |
+| 55 | **DEEP PLAY** — Day 3, 7 pop, 4 buildings (farm×2, house×2), 4 walking. Verified walking tools + bindles render correctly. | — | realm_s4_loop55_cumulative.jpg (zoom 5 close-up) | KEEP. |
 
 
 
