@@ -159,13 +159,28 @@ export function render() {
         tileColor = `rgb(${0x18 + tint}, ${0x52 + tint}, ${0xb8 + tint})`;
       }
 
-      // Grass shade variation via position hash + season tint
+      // Grass/sand shade variation via position hash + season tint.
+      // Loop 13 (render S3): prior code used 4 discrete color buckets for grass,
+      // which left ~13pt jumps between adjacent tiles — the seam was visible as a
+      // diamond lattice over every field (fresh-eyes critique #5). Now we draw
+      // from a shared base with small continuous offsets, so tile-to-tile deltas
+      // are ~3pt max and the grid reads as natural meadow variation instead of
+      // a bisected checkerboard.
       if (tile === TILE.GRASS || tile === TILE.SAND) {
-        const h = ((x * 374761 + y * 668265) & 0xff) / 255;
-        const shade = tile === TILE.GRASS
-          ? (h < 0.25 ? '#3d8f45' : h < 0.5 ? '#4da854' : h < 0.75 ? '#45a04a' : '#55b558')
-          : (h < 0.5 ? '#e8c07a' : '#ddb46e');
-        tileColor = shiftColor(shade, seasonShift);
+        const h = ((x * 374761 + y * 668265) & 0xff);
+        const n1 = ((h & 0xf) / 15) - 0.5;  // -0.5 .. 0.5
+        const n2 = (((h >> 4) & 0xf) / 15) - 0.5;
+        if (tile === TILE.GRASS) {
+          const r = 74 + Math.round(n1 * 6);
+          const g = 168 + Math.round(n2 * 10);
+          const b = 80 + Math.round(n1 * 4);
+          tileColor = shiftColor(`rgb(${r},${g},${b})`, seasonShift);
+        } else {
+          const r = 228 + Math.round(n1 * 8);
+          const g = 186 + Math.round(n2 * 6);
+          const b = 116 + Math.round(n1 * 6);
+          tileColor = shiftColor(`rgb(${r},${g},${b})`, seasonShift);
+        }
       }
 
       ctx.globalAlpha = daylight;
