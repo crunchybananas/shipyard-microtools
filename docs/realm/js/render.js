@@ -1496,13 +1496,25 @@ export function render() {
       ctx.stroke();
     }
 
-    // Selected citizen highlight — pulsing ring
+    // Selected citizen — elliptical ring at feet + faint arc overhead.
+    // Loop 57 (render S4): prior was a big circle centered at chest. Looked
+    // like a targeting reticle from above. Now anchored at the feet (where
+    // the drop shadow is) using iso-flattened ellipse + a subtle overhead
+    // crescent so the selection reads across zoom levels without fighting
+    // the new shadow system.
     if (c === G.selectedCitizen) {
-      const pulse = 0.5 + 0.4 * Math.sin(G.gameTick * 0.1);
-      ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
-      ctx.lineWidth = 2;
+      const pulse = 0.55 + 0.35 * Math.sin(G.gameTick * 0.1);
+      // Feet ring — iso-flat ellipse
+      ctx.strokeStyle = `rgba(120,210,255,${pulse})`;
+      ctx.lineWidth = 1.4;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 10, 13, 0, Math.PI * 2);
+      ctx.ellipse(s.x, s.y + 2, 8, 3.4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      // Overhead crescent — light arc above head for easy finding in a crowd
+      ctx.strokeStyle = `rgba(120,210,255,${pulse * 0.75})`;
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.arc(s.x, cy - 28, 4.5, Math.PI * 1.15, Math.PI * 1.85);
       ctx.stroke();
     }
   }
