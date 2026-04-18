@@ -2037,24 +2037,61 @@ export function render() {
   }
 
   // ── Projectiles (arrows) ───────────────────────────────────
+  // Loop 66 (render S4): arrows now have proper length, motion streak,
+  // and white fletching at the tail. Prior was an 8px line with a
+  // triangular head — read as a dash, no motion feel.
   for (const p of G.projectiles) {
     const ps = toScreen(p.x, p.y);
-    ctx.globalAlpha = daylight;
-    ctx.strokeStyle = '#8a6a3a';
-    ctx.lineWidth = 1.2;
-    const angle = Math.atan2(p.ty - p.y, p.tx - p.x);
+    ctx.globalAlpha = Math.max(0.85, daylight);
+    const dxp = p.tx - p.x, dyp = p.ty - p.y;
+    const len = Math.hypot(dxp, dyp) || 1;
+    // In screen space, isometric angles need the iso aspect. Use a simple
+    // atan2 on world delta — close enough for the visual.
+    const angle = Math.atan2(dyp, dxp);
+    const ca = Math.cos(angle), sa = Math.sin(angle);
+    // Motion trail — fading line behind the arrowhead (6px fade)
+    const grad = ctx.createLinearGradient(
+      ps.x - ca * 9, ps.y - sa * 5,
+      ps.x + ca * 5, ps.y + sa * 3
+    );
+    grad.addColorStop(0, 'rgba(255,240,200,0)');
+    grad.addColorStop(0.6, 'rgba(255,240,200,0.35)');
+    grad.addColorStop(1, 'rgba(255,240,200,0.75)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 0.9;
     ctx.beginPath();
-    ctx.moveTo(ps.x - Math.cos(angle) * 4, ps.y - Math.sin(angle) * 2);
-    ctx.lineTo(ps.x + Math.cos(angle) * 4, ps.y + Math.sin(angle) * 2);
+    ctx.moveTo(ps.x - ca * 9, ps.y - sa * 5);
+    ctx.lineTo(ps.x + ca * 5, ps.y + sa * 3);
     ctx.stroke();
-    // Arrowhead
-    ctx.fillStyle = '#aaa';
+    // Shaft — solid brown
+    ctx.strokeStyle = '#8a6a3a';
+    ctx.lineWidth = 1.1;
     ctx.beginPath();
-    ctx.moveTo(ps.x + Math.cos(angle) * 4, ps.y + Math.sin(angle) * 2);
-    ctx.lineTo(ps.x + Math.cos(angle) * 2 - Math.sin(angle), ps.y + Math.sin(angle) * 1 + Math.cos(angle));
-    ctx.lineTo(ps.x + Math.cos(angle) * 2 + Math.sin(angle), ps.y + Math.sin(angle) * 1 - Math.cos(angle));
+    ctx.moveTo(ps.x - ca * 4, ps.y - sa * 2);
+    ctx.lineTo(ps.x + ca * 5, ps.y + sa * 3);
+    ctx.stroke();
+    // Arrowhead — steel triangle at leading tip
+    ctx.fillStyle = '#c8c8d0';
+    const tipX = ps.x + ca * 5.5, tipY = ps.y + sa * 3.3;
+    ctx.beginPath();
+    ctx.moveTo(tipX + ca * 2.5, tipY + sa * 1.5);
+    ctx.lineTo(tipX - sa * 1.3, tipY + ca * 1.3);
+    ctx.lineTo(tipX + sa * 1.3, tipY - ca * 1.3);
     ctx.closePath();
     ctx.fill();
+    // Fletching — V-shaped white feathers at the tail
+    const tailX = ps.x - ca * 4, tailY = ps.y - sa * 2;
+    ctx.fillStyle = 'rgba(240,240,230,0.85)';
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(tailX - ca * 2 - sa * 1.3, tailY - sa * 1 + ca * 1.3);
+    ctx.lineTo(tailX - ca * 1.3, tailY - sa * 0.8);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(tailX - ca * 2 + sa * 1.3, tailY - sa * 1 - ca * 1.3);
+    ctx.lineTo(tailX - ca * 1.3, tailY - sa * 0.8);
+    ctx.closePath(); ctx.fill();
   }
 
   // ── Animals ─────────────────────────────────────────────
