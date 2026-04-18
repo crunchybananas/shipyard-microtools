@@ -3290,47 +3290,98 @@ function renderSelectedHalo(ctx) {
 }
 registerWorldRenderer(renderSelectedHalo);
 
-// ── Loop 76: Skull markers on tiles where citizens died (transient)
-function spawnDeathMarker(x, y) {
-  if (!G.deathMarkers) G.deathMarkers = [];
-  G.deathMarkers.push({ x, y, life: 800 });
-}
-let _prevCitizens = 0;
+// ── Loop 77 (render S4): persistent carved gravestones at real death tiles.
+//
+// Previous system (L76) polled G.stats.citizensDied and dropped a 3.6×4 px
+// placeholder at a RANDOM house for 800 ticks. Three issues: (1) location
+// was fake — a citizen slain at the north tower line got a marker on a
+// random south-side home, (2) they vanished after ~13s and carried no
+// narrative weight, (3) the shape was a flat grey lozenge with a tiny
+// "+" — unrecognisable as a gravestone at default zoom.
+//
+// New: death sites in combat.js/events.js/soldiers.js push {x,y,name,day,cause}
+// directly. Graves are persistent — they outlive individual deaths and form
+// a visible history of the settlement's losses. Capped at 40 (FIFO) so a
+// long campaign doesn't tile the map with stones. Visual: arched sandstone
+// slab with gradient shading, carved cross, moss patch, grass tuft,
+// ground shadow. At z≥0.7 reads instantly as a tombstone.
+const GRAVE_MAX = 40;
 function updateDeathMarkers() {
   if (!G.deathMarkers) G.deathMarkers = [];
-  // Detect deaths via citizensDied stat increase
-  const dead = G.stats?.citizensDied || 0;
-  if (dead > (G._prevDead || 0)) {
-    const houses = G.buildings.filter(b => b.type === 'house');
-    if (houses.length) {
-      const h = houses[Math.floor(Math.random() * houses.length)];
-      spawnDeathMarker(h.x, h.y);
-    }
-  }
-  G._prevDead = dead;
-  for (let i = G.deathMarkers.length - 1; i >= 0; i--) {
-    G.deathMarkers[i].life -= G.speed;
-    if (G.deathMarkers[i].life <= 0) G.deathMarkers.splice(i, 1);
-  }
+  // FIFO cap — oldest graves fade out of memory when we exceed the max
+  while (G.deathMarkers.length > GRAVE_MAX) G.deathMarkers.shift();
 }
 function renderDeathMarkers(ctx) {
-  if (!G.deathMarkers || !G.deathMarkers.length || G.camera.zoom < 0.7) return;
+  if (!G.deathMarkers || !G.deathMarkers.length || G.camera.zoom < 0.55) return;
   for (const m of G.deathMarkers) {
     const s = toScreen(m.x, m.y);
-    const a = Math.min(1, m.life / 200);
-    ctx.globalAlpha = a * 0.85;
-    // Gravestone shape
-    ctx.fillStyle = '#7a7a82';
+    const cx = s.x;
+    const W = 6.2;             // stone width (world px)
+    const H = 9.5;              // stone height
+    const bottomY = s.y + 1.5;  // planted slightly into ground
+    const topY = bottomY - H;
+    const archCY = topY + W / 2;
+
+    // Soft ground shadow — grounds the stone, reads as weight
+    ctx.fillStyle = 'rgba(0,0,0,0.32)';
     ctx.beginPath();
-    ctx.arc(s.x, s.y - 1, 1.8, Math.PI, 0);
+    ctx.ellipse(cx, bottomY + 0.6, W * 0.85, 1.4, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillRect(s.x - 1.8, s.y - 1, 3.6, 4);
-    ctx.fillStyle = '#3a3a40';
-    ctx.font = 'bold 3px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('+', s.x, s.y + 1.3);
+
+    // Grass tufts at base — age/weathering
+    ctx.fillStyle = '#3e8645';
+    ctx.beginPath();
+    ctx.ellipse(cx - W / 2 - 0.4, bottomY - 0.1, 1.3, 0.7, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx + W / 2 + 0.4, bottomY - 0.1, 1.3, 0.7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Stone silhouette path (arched top, flat bottom)
+    ctx.beginPath();
+    ctx.moveTo(cx - W / 2, bottomY);
+    ctx.lineTo(cx - W / 2, archCY);
+    ctx.arc(cx, archCY, W / 2, Math.PI, 0);
+    ctx.lineTo(cx + W / 2, bottomY);
+    ctx.closePath();
+
+    // Gradient fill — sandstone, lit from top-left
+    const grad = ctx.createLinearGradient(cx - W / 2, 0, cx + W / 2, 0);
+    grad.addColorStop(0, '#b3aca3');
+    grad.addColorStop(0.55, '#8d8680');
+    grad.addColorStop(1, '#6b655f');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Carved cross — recessed dark etching with lighter under-edge for depth
+    // Vertical bar
+    ctx.fillStyle = '#3a352f';
+    ctx.fillRect(cx - 0.45, topY + 2.0, 0.9, 4.3);
+    // Horizontal bar
+    ctx.fillRect(cx - 1.7, topY + 3.3, 3.4, 0.85);
+    // Faint under-highlight on the cross (light catching bottom lip of etch)
+    ctx.fillStyle = 'rgba(255,245,225,0.18)';
+    ctx.fillRect(cx - 0.45, topY + 6.1, 0.9, 0.2);
+    ctx.fillRect(cx - 1.7, topY + 4.05, 3.4, 0.15);
+
+    // Moss patch — lower-right, signals age
+    ctx.fillStyle = 'rgba(72, 128, 62, 0.5)';
+    ctx.beginPath();
+    ctx.ellipse(cx + W / 2 - 1.1, bottomY - 1.2, 1.1, 0.7, 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    // Smaller moss speck
+    ctx.beginPath();
+    ctx.ellipse(cx - W / 2 + 0.7, topY + 2.2, 0.5, 0.35, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Thin outline to pop the stone from the grass
+    ctx.strokeStyle = 'rgba(40,35,30,0.55)';
+    ctx.lineWidth = 0.35;
+    ctx.beginPath();
+    ctx.moveTo(cx - W / 2, bottomY);
+    ctx.lineTo(cx - W / 2, archCY);
+    ctx.arc(cx, archCY, W / 2, Math.PI, 0);
+    ctx.lineTo(cx + W / 2, bottomY);
+    ctx.stroke();
   }
-  ctx.globalAlpha = 1;
 }
 registerUpdater(updateDeathMarkers);
 registerWorldRenderer(renderDeathMarkers);

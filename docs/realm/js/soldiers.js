@@ -140,9 +140,13 @@ export function updateSoldiers() {
   // Remove dead soldiers
   for (let i = G.soldiers.length - 1; i >= 0; i--) {
     if (G.soldiers[i].hp <= 0) {
+      const s = G.soldiers[i];
       G.soldiers.splice(i, 1);
       G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
       playSound('death');
+      // Loop 77: gravestone marker at soldier's actual falling spot
+      if (!G.deathMarkers) G.deathMarkers = [];
+      G.deathMarkers.push({ x: s.x, y: s.y, name: s.name || 'Soldier', day: G.day, cause: 'battle' });
     }
   }
 }

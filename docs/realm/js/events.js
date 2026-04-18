@@ -275,6 +275,9 @@ export const EVENT_DEFS = [
           alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
           color: '#a855f7',
         });
+        // Loop 77: persistent gravestone at actual death tile for plague victims too
+        if (!G.deathMarkers) G.deathMarkers = [];
+        G.deathMarkers.push({ x: c.x, y: c.y, name: c.name || 'Settler', day: G.day, cause: 'plague' });
         try { chronicle(`${c.name || 'A settler'} succumbed to the plague. The healer could do nothing.`, 'death'); } catch(_e){}
         playSound('death');
       }

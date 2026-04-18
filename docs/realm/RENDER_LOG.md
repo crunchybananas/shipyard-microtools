@@ -163,6 +163,8 @@ Ranked by impact:
 | 73 | Construction scaffolding — prior construction was just alpha fade-in. Now 4 wooden posts at corners, horizontal plank, diagonal brace, red fluttering builder's flag on the peak, and progress % text at zoom ≥1.2. Building silhouette still fades in through the scaffold. | — | — | KEEP. |
 | 74 | Low-HP blood droplet — pulsing red teardrop above head when hp < 40. Complements L71 damage flash (moment of impact) and L28 hungry frown (state). Three-tier distress feedback. | — | — | KEEP. |
 | 75 | **DEEP PLAY** — combat + under-construction buildings + forced low-HP citizen. Verified new effects render together without issues. | — | realm_s4_loop75_everything.jpg | KEEP. |
+| 76 | Sky gradient — vertical linear gradient behind the iso world that blends through four phases (night / dawn / day / dusk) driven by `getDaylight()` + dayPhase. Top and bottom colors lerp separately so dawn reads as warm-bottom cool-top glow. Prior background was a flat navy slab. | — | — | KEEP. |
+| 77 | Gravestone persistence + art pass. Previous L-cycle system polled `G.stats.citizensDied` and dropped a 3.6×4px placeholder at a **random house** for 800 ticks. Rewritten: death sites in combat.js/events.js/soldiers.js push `{x,y,name,day,cause}` at the actual fall location. Graves persist (FIFO cap 40) and survive save/load. Visual: arched sandstone slab with left-to-right light gradient, carved cross with under-edge highlight, ground shadow, grass tufts at base, moss patch. Reads as a tombstone at zoom ≥ 0.55. | — | — | KEEP. |
 
 
 

@@ -73,6 +73,11 @@ export function saveGame({ silent = false } = {}) {
     state.notificationLog = Array.isArray(G.notificationLog)
       ? G.notificationLog.slice(-30) // cap saved log to recent 30
       : [];
+    // Loop 77 (render S4): persist gravestones so the settlement's
+    // dead carry across save/load. Cap matches the in-memory FIFO (40).
+    state.deathMarkers = Array.isArray(G.deathMarkers)
+      ? G.deathMarkers.slice(-40)
+      : [];
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -169,6 +174,7 @@ export function loadGame() {
     if (s.weather) G.weather = s.weather;
     if (s.stats) G.stats = { ...G.stats, ...s.stats };
     if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
+    G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');
     return true;
   } catch (e) {

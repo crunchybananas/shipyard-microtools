@@ -125,6 +125,11 @@ export function updateEnemies() {
       alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
       color: '#8a1a1a',
     });
+    // Loop 77 (render S4): persistent gravestone at actual death tile
+    // (replaces earlier random-house spawn). Name + day recorded so
+    // hovering a grave can eventually surface who fell where.
+    if (!G.deathMarkers) G.deathMarkers = [];
+    G.deathMarkers.push({ x: c.x, y: c.y, name: c.name || 'Settler', day: G.day, cause: 'raid' });
     try { notify(`${c.name || 'A settler'} was slain by raiders!`, 'danger'); } catch(_e){}
     try { chronicle(`${c.name || 'A settler'} fell to raiders. Their name joins the stone.`, 'death'); } catch(_e){}
   }
