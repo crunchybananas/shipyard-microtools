@@ -4940,9 +4940,12 @@ function drawWater(ctx, x, y, a, tx, ty) {
   ctx.fill();
 
   // ── Layer 2: gentle shimmer overlay ─────────────────────────
-  const shimmer = 0.18 + 0.12 * Math.sin(t * 0.9 + phase + 1.5);
+  // Loop 6 (render S3): shimmer halved (0.18+0.12 → 0.08+0.06) and hue darkened
+  // toward the base so cyan doesn't crust tile edges. Fresh-eyes critique
+  // #2 saw the tiles as "disconnected blue diamonds with hard white borders".
+  const shimmer = 0.08 + 0.06 * Math.sin(t * 0.9 + phase + 1.5);
   ctx.globalAlpha = a * shimmer;
-  ctx.fillStyle = 'rgba(100,200,255,1)';
+  ctx.fillStyle = 'rgba(70,150,210,1)';
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
@@ -4955,9 +4958,12 @@ function drawWater(ctx, x, y, a, tx, ty) {
     const rowY = waveRows[i];
     const dir = (i % 2 === 0) ? 1 : -1;
     // Softer alpha oscillation — avoids rapid per-tile flicker
-    const wAlpha = 0.3 + 0.2 * Math.sin(t * 1.4 + phase + i * 1.3);
-    ctx.globalAlpha = a * Math.max(0.08, wAlpha);
-    ctx.strokeStyle = 'rgba(210,245,255,1)';
+    // Loop 6 (render S3): wave crest alpha reduced (0.3+0.2 → 0.18+0.12)
+    // and color shifted from near-white to a muted blue-white so waves
+    // look like water movement, not painted lines on puzzle pieces.
+    const wAlpha = 0.18 + 0.12 * Math.sin(t * 1.4 + phase + i * 1.3);
+    ctx.globalAlpha = a * Math.max(0.05, wAlpha);
+    ctx.strokeStyle = 'rgba(180,215,235,1)';
     ctx.beginPath();
     const halfW = 32 * (1 - Math.abs(rowY) / 20);
     const step = 4;
