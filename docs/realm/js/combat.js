@@ -136,6 +136,19 @@ export function updateProjectiles() {
       if (p.target && p.target.hp !== undefined) {
         p.target.hp -= p.damage;
         if (G.gameTick % 10 === 0) playSound('combat');
+        // Loop 67 (render S4): dedicated impact burst on projectile hit.
+        // 5 small white sparks radiating from the impact point, fade fast.
+        const hx = p.target.x, hy = p.target.y;
+        for (let k = 0; k < 5; k++) {
+          const ang = (k / 5) * Math.PI * 2 + Math.random() * 0.4;
+          G.particles.push({
+            tx: hx, ty: hy, offsetY: -8,
+            text: null, alpha: 1.0,
+            vx: Math.cos(ang) * 0.25, vy: Math.sin(ang) * 0.25 - 0.1,
+            decay: 0.06, type: 'spark',
+            size: 1.2, color: '#ffffff',
+          });
+        }
       }
       G.projectiles.splice(i, 1);
     } else {

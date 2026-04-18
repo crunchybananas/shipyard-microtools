@@ -84,11 +84,23 @@ export function updateSoldiers() {
           s.attackTimer = 40;
           nearestEnemy.hp -= soldierDamage(s);
           if (G.gameTick % 20 === 0) playSound('click'); // avoid spam
-          // Slash particle
+          // Loop 67 (render S4): emoji ⚔️ was readable but cartoonish; now
+          // also emit a radial spark burst at the impact point so the clash
+          // feels physical.
           G.particles.push({
             tx: nearestEnemy.x, ty: nearestEnemy.y, offsetY: -10,
-            text: '⚔️', alpha: 1.2, vy: -0.2, decay: 0.04, type: 'text',
+            text: '⚔️', alpha: 1.1, vy: -0.2, decay: 0.05, type: 'text',
           });
+          for (let k = 0; k < 4; k++) {
+            const ang = (k / 4) * Math.PI * 2 + Math.random() * 0.5;
+            G.particles.push({
+              tx: nearestEnemy.x, ty: nearestEnemy.y, offsetY: -8,
+              text: null, alpha: 1.0,
+              vx: Math.cos(ang) * 0.22, vy: Math.sin(ang) * 0.22 - 0.08,
+              decay: 0.08, type: 'spark',
+              size: 1.1, color: k === 0 ? '#ffcc00' : '#ffffff',
+            });
+          }
         }
       }
       // If soldier takes damage back
