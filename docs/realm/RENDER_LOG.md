@@ -62,6 +62,8 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 32 | Rain scales with storm severity. Prior rain was 80 uniform streaks regardless of weather. Now storm gets 140 drops, harder slant (shear doubles), faster fall, slightly cooler blue, per-drop length variance. Rain (non-storm) keeps the lighter look. | — | (visible during weather events) | KEEP. |
 | 33 | Fisherman's hut catch variants. 4 types keyed to b.x/b.y: fish bucket (original), woven crab pot, fish drying rack with 3 hanging fish, lobster trap stack with visible red antenna. Stable per-tile. | — | (placing fisherman's huts shows variety) | KEEP. |
 | 34 | Church variants: 4 stained-glass palettes (blue/rose/amber/monastic green) × 3 steeple ornaments (bell/weathervane-with-rooster/saint statue). 12 combos. | — | (placing churches shows variety) | KEEP. |
+| 35 | **DEEP PLAY** (5th-loop). Placed a small village at night: house, farm, tavern. Confirmed all variants render without crashes. Only 3 of 9 planned placements landed (many tried for water/forest tiles). Build placement validation working as designed. | — | realm_s3_loop35_village.jpg | KEEP — game stable with all L18-L34 variant changes landed. |
+
 
 
 
