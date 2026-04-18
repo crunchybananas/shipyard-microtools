@@ -51,6 +51,8 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 21 | drawLumber per-building variance: pile height 1-4 rows, ~50% get a 4th column, tools switch between axe/two-hand saw/both/chopping-stump, sawdust density doubles on some mills. | — | realm_s3_loop21_lumber.jpg (4 mills placed across forest tiles) | KEEP. Mills now look like they're in different stages of work. |
 | 22 | Tutorial skip-ahead. `updateTutorialTip` advanced one step per tick; `selectedBuild === 'farm'` is a transient state that missed tick boundaries when a player used the hotkey + canvas click fast sequence → tutorial stalled on "Select Farm" despite a visible farm. Now walks forward while subsequent steps' checks are already satisfied. | — | (UX fix not easily screenshotable) | KEEP. Tutorial no longer strands fast players. |
 | 23 | Voice-bark per-kind contours + per-citizen detune. Prior playVoiceBark was one up-down sweep with base-pitch swap. Now happy=lilt / sad=sigh / work=grunt / hungry=wobble / cheer=arpeggio / alarm=sharp blip, and a `voiceSeed` detunes ±12% so settlers sound like individuals. | — | (audio-only) | KEEP. |
+| 24 | drawRoad detail. Was a uniform diamond with a 5×3 grid of identical cobblestone dots — read as printed texture. Now has 2 wheel ruts along the iso long-axis + 8 cobblestones with varied radii/alpha and lighter top-left highlights. | — | (will be visible when a player places roads) | KEEP. Roads read as trodden paths. |
+
 
 
 
