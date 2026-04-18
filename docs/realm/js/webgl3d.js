@@ -1192,6 +1192,10 @@ export function buildBuildingsMesh() {
 }
 
 // ── Citizens mesh (rebuilt every frame) ────────────────────
+// Loop 14 (render S3): upgraded voxel citizens from 2-box (torso+head)
+// to 6-box chibi (legs+torso+head+hair+arms). Hair color varies per-citizen
+// via name hash to match the 2D renderer's variety. Enemies get a darker
+// palette + spear/helmet accent box.
 const CITIZEN_COLORS = [
   [0.85, 0.25, 0.20], // red
   [0.25, 0.45, 0.85], // blue
@@ -1200,7 +1204,25 @@ const CITIZEN_COLORS = [
   [0.70, 0.25, 0.75], // purple
   [0.20, 0.72, 0.72], // teal
 ];
-const SKIN = [0.92, 0.75, 0.55];
+const SKIN_TONES = [
+  [0.98, 0.85, 0.71],
+  [0.92, 0.75, 0.55],
+  [0.78, 0.55, 0.35],
+  [0.55, 0.38, 0.22],
+];
+const HAIR_COLORS = [
+  [0.30, 0.20, 0.12],  // dark brown
+  [0.68, 0.48, 0.18],  // blonde
+  [0.22, 0.12, 0.22],  // raven-plum
+  [0.82, 0.42, 0.22],  // auburn
+];
+const LEG_COLOR = [0.28, 0.20, 0.12];
+
+function nameHash(s, mod) {
+  const a = s?.charCodeAt(0) || 0;
+  const b = s?.charCodeAt(1) || 0;
+  return (a * 53 + b * 17) % mod;
+}
 
 function buildCitizensMesh() {
   if (!gl || !program || !G.citizens || G.citizens.length === 0) {
@@ -1209,23 +1231,56 @@ function buildCitizensMesh() {
   }
   const verts = [], indices = [];
 
-  function addPerson(cx, cz, bodyColor, S) {
+  function addPerson(cx, cz, bodyColor, S, opts) {
     const col = Math.floor(cx), row = Math.floor(cz);
     const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
     const groundY = (TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8) + 0.02;
-    pushBox(verts, indices, cx-S, groundY,       cz-S, cx+S,      groundY+S*3.5, cz+S,      bodyColor);
-    pushBox(verts, indices, cx-S*0.85, groundY+S*3.5, cz-S*0.85, cx+S*0.85, groundY+S*5.5, cz+S*0.85, SKIN);
+    const skin = (opts && opts.skin) || SKIN_TONES[1];
+    const hair = (opts && opts.hair) || HAIR_COLORS[0];
+    // Legs: two thin boxes from ground to S (shin height), split L/R
+    pushBox(verts, indices, cx-S*0.85, groundY, cz-S*0.35, cx-S*0.15, groundY+S*1.0, cz+S*0.35, LEG_COLOR);
+    pushBox(verts, indices, cx+S*0.15, groundY, cz-S*0.35, cx+S*0.85, groundY+S*1.0, cz+S*0.35, LEG_COLOR);
+    // Torso (body color): S*1 to S*3.5
+    pushBox(verts, indices, cx-S, groundY+S*1.0, cz-S*0.7, cx+S, groundY+S*3.5, cz+S*0.7, bodyColor);
+    // Arms — thin boxes on sides of torso (same color, slightly darker)
+    const armCol = [bodyColor[0]*0.85, bodyColor[1]*0.85, bodyColor[2]*0.85];
+    pushBox(verts, indices, cx-S*1.25, groundY+S*1.4, cz-S*0.35, cx-S*0.95, groundY+S*3.2, cz+S*0.35, armCol);
+    pushBox(verts, indices, cx+S*0.95, groundY+S*1.4, cz-S*0.35, cx+S*1.25, groundY+S*3.2, cz+S*0.35, armCol);
+    // Head (skin): S*3.5 to S*5.2 — wider than torso for chibi proportion
+    pushBox(verts, indices, cx-S*1.1, groundY+S*3.5, cz-S*0.9, cx+S*1.1, groundY+S*5.2, cz+S*0.9, skin);
+    // Hair cap on top of head
+    pushBox(verts, indices, cx-S*1.15, groundY+S*4.8, cz-S*0.95, cx+S*1.15, groundY+S*5.35, cz+S*0.95, hair);
   }
 
   for (let i = 0; i < G.citizens.length; i++) {
     const c = G.citizens[i];
-    addPerson(c.x, c.y, CITIZEN_COLORS[i % CITIZEN_COLORS.length], 0.10);
+    const nm = c.name || '';
+    const skin = SKIN_TONES[nameHash(nm, 4)];
+    const hair = HAIR_COLORS[(nameHash(nm, 4) + 1) % 4];
+    // Job-based body color when assigned, else a hash-picked default palette entry
+    let body;
+    if (c.jobBuilding) {
+      const jt = c.jobBuilding.type;
+      if (jt === 'farm') body = [0.31, 0.78, 0.13];
+      else if (jt === 'lumber') body = [0.75, 0.47, 0.13];
+      else if (jt === 'quarry' || jt === 'mine') body = [0.31, 0.50, 0.66];
+      else if (jt === 'market') body = [0.94, 0.66, 0.02];
+      else if (jt === 'barracks') body = [0.22, 0.35, 0.63];
+      else if (jt === 'tavern') body = [0.78, 0.22, 0.13];
+      else body = [0.31, 0.50, 0.78];
+    } else {
+      body = CITIZEN_COLORS[nameHash(nm, CITIZEN_COLORS.length)];
+    }
+    if (c.state === 'eating') body = [0.13, 0.85, 0.38];
+    addPerson(c.x, c.y, body, 0.10, {skin, hair});
   }
 
-  // Enemies render as slightly larger dark-red figures
-  const ENEMY_COLOR = [0.72, 0.08, 0.08];
+  // Enemies: darker palette, helmet-like accent box
+  const ENEMY_BODY = [0.42, 0.10, 0.10];
+  const ENEMY_HELM = [0.18, 0.18, 0.20];
+  const ENEMY_SKIN = [0.62, 0.52, 0.42];
   for (const e of (G.enemies || [])) {
-    addPerson(e.x, e.y, ENEMY_COLOR, 0.13);
+    addPerson(e.x, e.y, ENEMY_BODY, 0.12, {skin: ENEMY_SKIN, hair: ENEMY_HELM});
   }
 
   if (indices.length === 0) { citizensIndexCount = 0; return; }
