@@ -2430,7 +2430,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'chickencoop': drawChickenCoop(ctx, s); break;
     case 'cowpen': drawCowPen(ctx, s); break;
     case 'fisherman': drawFisherman(ctx, s, b); break;
-    case 'blacksmith': drawBlacksmith(ctx, s); break;
+    case 'blacksmith': drawBlacksmith(ctx, s, b); break;
     default: drawGeneric(ctx, s, def); break;
   }
   ctx.restore(); // undo the 1.3x scale
@@ -4964,7 +4964,7 @@ function drawFisherman(ctx, s, b) {
   ctx.fillRect(s.x - 2.5, s.y - 13.5, 2.5, 7);
 }
 
-function drawBlacksmith(ctx, s) {
+function drawBlacksmith(ctx, s, b) {
   // --- Isometric side face (right) — dark stone ---
   const sideGrad = ctx.createLinearGradient(s.x + 11, s.y - 22, s.x + 11, s.y - 2);
   sideGrad.addColorStop(0, '#4a3830');
@@ -5007,11 +5007,24 @@ function drawBlacksmith(ctx, s) {
   ctx.lineWidth = 0.5;
   ctx.beginPath(); ctx.moveTo(s.x - 14, s.y - 27); ctx.lineTo(s.x + 13, s.y - 27); ctx.stroke();
 
-  // --- Forge window — warm orange glow ---
+  // --- Forge window — warm glow. Loop 37 (render S3): fire color varies
+  // per-smithy. Most forges are the classic orange-amber, but some are
+  // cooler-burning blue/purple (elemental), green (alchemical), or
+  // white-hot (master smith). Bright core pulses slightly with gameTick.
+  const bsHash = b ? (((b.x * 89 + b.y * 41) & 0xff)) : 0;
+  const firePalette = [
+    { outer: '255,180,40', mid: '255,100,10', core: '255,220,80' },  // classic amber (most common)
+    { outer: '255,180,40', mid: '255,100,10', core: '255,220,80' },  // (repeat — 2 of 6 slots)
+    { outer: '160,100,255', mid: '100,40,200', core: '220,180,255' }, // purple-magical
+    { outer: '90,220,180', mid: '40,160,120', core: '200,255,220' },  // alchemical green
+    { outer: '255,240,200', mid: '230,210,160', core: '255,255,255' },// white-hot
+    { outer: '80,160,230', mid: '40,100,200', core: '180,220,255' },  // blue
+  ][bsHash % 6];
+  const pulse = 0.9 + 0.1 * Math.sin((G.gameTick || 0) * 0.12 + bsHash);
   const forgeGlow = ctx.createRadialGradient(s.x - 4, s.y - 14, 1, s.x - 4, s.y - 14, 6);
-  forgeGlow.addColorStop(0, 'rgba(255,180,40,0.9)');
-  forgeGlow.addColorStop(0.5, 'rgba(255,100,10,0.5)');
-  forgeGlow.addColorStop(1, 'rgba(180,40,0,0)');
+  forgeGlow.addColorStop(0, `rgba(${firePalette.outer},${0.9 * pulse})`);
+  forgeGlow.addColorStop(0.5, `rgba(${firePalette.mid},0.5)`);
+  forgeGlow.addColorStop(1, `rgba(${firePalette.mid},0)`);
   ctx.fillStyle = forgeGlow;
   ctx.beginPath();
   ctx.arc(s.x - 4, s.y - 14, 6, 0, Math.PI * 2);
@@ -5024,7 +5037,7 @@ function drawBlacksmith(ctx, s) {
   ctx.closePath();
   ctx.fill();
   // Bright core of fire inside window
-  ctx.fillStyle = 'rgba(255,220,80,0.7)';
+  ctx.fillStyle = `rgba(${firePalette.core},${0.7 * pulse})`;
   ctx.beginPath();
   ctx.arc(s.x - 4, s.y - 15, 1.5, 0, Math.PI * 2);
   ctx.fill();
