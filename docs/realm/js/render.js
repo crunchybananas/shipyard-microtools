@@ -1367,8 +1367,12 @@ export function render() {
       if (showTool) {
         const jt = c.jobBuilding.type;
         const isWalking = c.state !== 'working';
-        // Carry position: over shoulder when walking, in front when working
-        const toolX = s.x + (isWalking ? 6 : 8);
+        // Loop 53 (render S4): tool carried on the LEADING side when walking
+        // (opposite the face direction so it doesn't block the face).
+        // Before: tool was always +right-offset — blocked the eyes when a
+        // citizen walked leftward.
+        const toolSide = isWalking && faceScreenX !== 0 ? -faceScreenX : 1;
+        const toolX = s.x + (isWalking ? 6 : 8) * toolSide;
         const toolY = cy - (isWalking ? 12 : 11);
         const toolScale = isWalking ? 0.85 : 1.0;
         ctx.save();
