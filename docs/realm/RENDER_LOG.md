@@ -52,8 +52,48 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 
 ## Future Research / Big Bets (user-requested)
 
-- **Hex tiles or denser pathfinding** — explore switching the projection from iso-rhombus (TW=64, TH=32 diamond) to axial hex coordinates, OR keep the iso but increase subdivision so citizens can step in 8 directions at half-tile granularity. Hex = fundamental engine rewrite: `toScreen`, `toWorld`, `screenToWorld`, `findPath`, every tile shader, minimap, placement. Denser iso pathfinding = isolated to pathfinding.js + movement step size.
-- **Citizens respect environment elements** — currently they walk through the *image* of trees/bushes on walkable tiles. A denser graph + per-decoration occupancy would let citizens weave between trees rather than stamp over them.
+- **Citizens respect environment elements** — currently they walk through the *image* of trees/bushes on walkable tiles. A denser graph + per-decoration occupancy would let citizens weave between trees rather than stamp over them. (See hex/sub-tile research below.)
+
+### Hex tiles vs. denser iso pathfinding — feasibility study (Loop 5)
+
+**Current projection.** `render.js:48` — `toScreen(tx, ty) = { x:(tx-ty)*TW/2, y:(tx+ty)*TH/2 }` with `TW=64, TH=32` (iso diamond, 2:1 aspect). Tiles are integer-indexed `G.map[y][x]`. Pathfinding is 8-direction A* over the same grid (`pathfinding.js`).
+
+**Option A — true hex tiles.**
+| Area | Change |
+|---|---|
+| Projection | `toScreen` → axial `(q,r)`: `x = size * sqrt(3) * (q + r/2)`, `y = size * 3/2 * r`. Diamond fills → hex fills (6-point `beginPath/closePath`). |
+| Storage | `G.map[y][x]` → `G.map[r][q]` (names only), but neighbor math diverges. Cliff/water edge code in render.js:284 and every `G.map[y][x+1]` check needs rewriting with hex adjacency. |
+| Neighbors | 8-way → 6-way, with axial offsets `[[+1,0],[-1,0],[0,+1],[0,-1],[+1,-1],[-1,+1]]`. Uniform (no offset-row parity). |
+| Pathfinding | A* still works; replace `DIRS` array + `heuristic` with hex distance (`(|dq|+|dr|+|dq+dr|)/2`). Step cost uniform (no SQRT2 diagonal). |
+| Building placement | Each building currently claims `x,y` footprint. Castle (2×2) and walls assume orthogonal neighbors — would need rewrite or hex-aware shapes. |
+| Minimap | Minor — still pixel-per-tile, slightly different aspect. |
+| Other | `screenToWorld`, `toWorld`, god rays, vignette, fog edge blending, viewport culling all take coords — all need audit. |
+| **Scope** | **~1200-1800 lines touched across ≥12 files. Multi-day rewrite.** |
+| **ROI** | Aesthetic: organic shapes, 6-neighbor feel. Functional gain: modest (8-dir A* already feels natural). |
+| **Risk** | High — regression surface is enormous. Existing 83 LOOP_STATE cycles' worth of visual polish tuning would need re-validation. |
+
+**Option B — sub-tile granularity (keep iso).**
+Citizens move on a grid at **half-tile or quarter-tile** resolution while `G.map` stays at whole tiles. Decorations (trees, rocks, individual tree dabs) register as sub-tile obstacles. Pathfinding operates on the denser graph.
+
+| Area | Change |
+|---|---|
+| Projection | No change. `toScreen` still projects floats — sub-tile coords naturally interpolate. |
+| Storage | New `G.subGrid[sy][sx]` at 2× (or 4×) resolution, derived from `G.map` + registered decorations. |
+| Neighbors | Still 8-way; DIRS unchanged. |
+| Pathfinding | `findPath` takes `MAP_W*2 × MAP_H*2` (i.e., 160×160) grid. Bump `maxIter` 2000 → 6000 to cover 4× search space. |
+| Building placement | Unchanged. Buildings stay on whole tiles; sub-grid marks building footprint as blocked. |
+| Citizens | Movement step size stays the same (continuous coords). The difference is the *path* has more, finer waypoints. |
+| Decorations | New step: at world-gen (or lazily on first render), enumerate tree/rock positions on each forest/rock tile → mark their sub-cells as blocked. Trees currently drawn in `drawTree(ctx, x, y, a, seasonShift)` from tile-hash — positions are deterministic and recoverable. |
+| **Scope** | **~250-450 lines. Mostly in `pathfinding.js`, a new `world.js:registerDecorations()`, and `citizens.pathTo()`. 1-2 dev days.** |
+| **ROI** | High — directly enables "citizens weave between trees" behavior the user described. |
+| **Risk** | Medium — 4× pathfinding grid = 4× memory for the search sets and ~4× worst-case iterations. At 80×80 → 160×160 = 25,600 cells, still fine for 2000+ iter A*. |
+
+**Recommendation.** **Option B (sub-tile iso)** is the right next bet. Same visual language, targeted at the user's "respect environment elements" request, ~4× cheaper than hex, and doesn't risk regressing 83 cycles of visual polish. Hex can come later if aesthetics warrant.
+
+**Prerequisite for either: a world-gen pass that persists decoration positions.** Currently trees/rocks are drawn from position hash every frame but never stored in state. The first implementation step is `G.decorations[y][x] = [{type:'tree', ox: 0.2, oy: -0.1}, …]` populated at `generateWorld()`. This alone is a useful refactor because (a) it lets pathfinding see them, (b) it lets citizens slow/dodge near them, and (c) it fixes the bug where decoration positions can drift if the hash seed changes.
+
+**Not to touch next loop** (implementation would be Loop 6+), but documented here so the shape of the change is clear.
+
 
 ## Rejected / Reverted Approaches
 
