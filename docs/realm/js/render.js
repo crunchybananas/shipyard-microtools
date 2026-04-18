@@ -2429,7 +2429,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'bakery': drawBakery(ctx, s); break;
     case 'chickencoop': drawChickenCoop(ctx, s); break;
     case 'cowpen': drawCowPen(ctx, s); break;
-    case 'fisherman': drawFisherman(ctx, s); break;
+    case 'fisherman': drawFisherman(ctx, s, b); break;
     case 'blacksmith': drawBlacksmith(ctx, s); break;
     default: drawGeneric(ctx, s, def); break;
   }
@@ -4759,7 +4759,7 @@ function drawCowPen(ctx, s) {
   ctx.fillText('🐄', s.x, s.y - 20);
 }
 
-function drawFisherman(ctx, s) {
+function drawFisherman(ctx, s, b) {
   // Dock platform — weathered planks over sand
   ctx.fillStyle = '#8b6a3a';
   ctx.fillRect(s.x - 14, s.y - 4, 28, 5);
@@ -4864,16 +4864,69 @@ function drawFisherman(ctx, s) {
   ctx.lineTo(s.x - 11, s.y - 3);
   ctx.stroke();
 
-  // Fish bucket on dock
-  ctx.fillStyle = '#888880';
-  ctx.fillRect(s.x - 1, s.y - 8, 5, 4);
-  ctx.fillStyle = '#aaaaaa';
-  ctx.fillRect(s.x - 1, s.y - 9, 5, 1);
-  // Fish in bucket (small orange dot)
-  ctx.fillStyle = '#f07040';
-  ctx.beginPath();
-  ctx.arc(s.x + 1.5, s.y - 6, 1.2, 0, Math.PI * 2);
-  ctx.fill();
+  // Loop 33 (render S3): per-hut catch variants. Some huts have a bucket
+  // of cod (orange), some have crab pots, some have hanging fish drying.
+  const fhash = b ? (((b.x * 53 + b.y * 31) & 0xff)) : 0;
+  const catchVar = fhash & 0x3;
+  if (catchVar === 0) {
+    // Classic bucket of fish
+    ctx.fillStyle = '#888880';
+    ctx.fillRect(s.x - 1, s.y - 8, 5, 4);
+    ctx.fillStyle = '#aaaaaa';
+    ctx.fillRect(s.x - 1, s.y - 9, 5, 1);
+    ctx.fillStyle = '#f07040';
+    ctx.beginPath(); ctx.arc(s.x + 1.5, s.y - 6, 1.2, 0, Math.PI * 2); ctx.fill();
+  } else if (catchVar === 1) {
+    // Crab pot (cylindrical mesh with lid)
+    ctx.fillStyle = '#a08050';
+    ctx.beginPath(); ctx.ellipse(s.x + 2, s.y - 5, 3, 1.6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#6a5030';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.ellipse(s.x + 2, s.y - 5 - i * 1.2, 3 - i * 0.2, 1.3 - i * 0.3, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#7a5a30';
+    ctx.fillRect(s.x + 0.5, s.y - 8.5, 3, 0.6);
+  } else if (catchVar === 2) {
+    // Fish drying rack (3 fish hanging from a crossbar)
+    ctx.strokeStyle = '#8a6a30';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 2, s.y - 9); ctx.lineTo(s.x + 6, s.y - 9); ctx.stroke();
+    for (let i = 0; i < 3; i++) {
+      const fx = s.x - 1 + i * 2.5;
+      ctx.strokeStyle = 'rgba(180,160,120,0.8)';
+      ctx.lineWidth = 0.4;
+      ctx.beginPath(); ctx.moveTo(fx, s.y - 9); ctx.lineTo(fx, s.y - 6); ctx.stroke();
+      // Fish body
+      ctx.fillStyle = '#c4a070';
+      ctx.beginPath();
+      ctx.ellipse(fx, s.y - 5, 0.9, 1.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Fish tail
+      ctx.fillStyle = '#a88450';
+      ctx.beginPath();
+      ctx.moveTo(fx, s.y - 3.5); ctx.lineTo(fx - 0.8, s.y - 2.5); ctx.lineTo(fx + 0.8, s.y - 2.5);
+      ctx.closePath(); ctx.fill();
+    }
+  } else {
+    // Lobster trap stack (2 wooden boxes)
+    ctx.fillStyle = '#6a4a28';
+    ctx.fillRect(s.x, s.y - 9, 5, 3);
+    ctx.fillRect(s.x + 1, s.y - 12, 4, 3);
+    ctx.strokeStyle = '#8a6a48';
+    ctx.lineWidth = 0.4;
+    // Lattice lines
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath(); ctx.moveTo(s.x + i * 1.5, s.y - 9); ctx.lineTo(s.x + i * 1.5, s.y - 6); ctx.stroke();
+    }
+    // Visible red lobster antenna
+    ctx.strokeStyle = '#c02020';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(s.x + 4.5, s.y - 6); ctx.lineTo(s.x + 5.5, s.y - 7); ctx.stroke();
+  }
 
   // Door
   ctx.fillStyle = '#4a2e10';
