@@ -1525,27 +1525,49 @@ export function render() {
   // ── Service walkers ───────────────────────────────────────
   for (const w of G.walkers) {
     const ws = toScreen(w.x, w.y);
-    ctx.globalAlpha = daylight;
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.beginPath();
-    ctx.ellipse(ws.x, ws.y + 2, 3, 1.5, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Colored robe body
+    ctx.globalAlpha = Math.max(0.85, daylight);
+    // Loop 64 (render S4): ambient walkers (merchant, student, crier, etc.)
+    // upgraded to match citizen silhouette vocabulary — legs + boots under
+    // robe, stacked drop shadow, smaller head. Prior shape was the old
+    // torso-pill + head-dot which stood out against the new chibi citizens.
+    // Stacked shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.10)';
+    ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 3.5, 1.6, 0, 0, Math.PI*2); ctx.fill();
+    // Legs / under-robe
+    ctx.fillStyle = '#3a2618';
+    ctx.fillRect(ws.x - 2.2, ws.y - 2, 1.8, 3);
+    ctx.fillRect(ws.x + 0.4, ws.y - 2, 1.8, 3);
+    // Boots
+    ctx.fillStyle = '#1e1510';
+    ctx.beginPath(); ctx.ellipse(ws.x - 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ws.x + 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
+    // Colored robe body — taller than before to extend past the legs
     ctx.fillStyle = w.color;
     ctx.beginPath();
-    ctx.ellipse(ws.x, ws.y - 6, 4, 5, 0, 0, Math.PI*2);
+    ctx.ellipse(ws.x, ws.y - 7, 4.2, 5.2, 0, 0, Math.PI*2);
     ctx.fill();
+    // Robe trim (lighter stripe)
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(ws.x - 3.5, ws.y - 8, 7, 1);
     // Head
     ctx.fillStyle = '#ffe0c0';
     ctx.beginPath();
-    ctx.arc(ws.x, ws.y - 13, 3.5, 0, Math.PI*2);
+    ctx.arc(ws.x, ws.y - 14, 3.4, 0, Math.PI*2);
     ctx.fill();
-    // Small emoji on chest
+    // Tiny dot eyes
+    ctx.fillStyle = '#2a1a0a';
+    ctx.beginPath();
+    ctx.arc(ws.x - 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
+    ctx.arc(ws.x + 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
+    ctx.fill();
+    // Small emoji on chest (trade/role indicator)
     if (G.camera.zoom >= 1.2) {
       ctx.font = '6px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(w.emoji, ws.x, ws.y - 5);
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.fillText(w.emoji, ws.x, ws.y - 6);
     }
   }
 
