@@ -1053,19 +1053,22 @@ export function render() {
     }
     if (c.state === 'eating') bodyColor = '#20d860';
 
-    // Colored ground circle — makes citizens pop against any terrain
-    const cr = parseInt(bodyColor.slice(1,3),16);
-    const cg = parseInt(bodyColor.slice(3,5),16);
-    const cb = parseInt(bodyColor.slice(5,7),16);
-    ctx.fillStyle = `rgba(${cr},${cg},${cb},0.45)`;
+    // Loop 43 (render S4): killed the job-colored ground ring. Fresh-eyes
+    // critique: "colored rings read as UI selection indicators stacked on
+    // every unit — visually noisy and removes weight." Now just a proper
+    // soft elliptical drop-shadow with feathered edge via stacked alphas.
+    // Reserve any colored ring for SELECTED citizen only (handled later).
+    ctx.fillStyle = 'rgba(0,0,0,0.10)';
     ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 1, 8, 3.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x, s.y + 2, 7.5, 3.2, 0, 0, Math.PI * 2);
     ctx.fill();
-
-    // Drop shadow on top of the colored circle
     ctx.fillStyle = 'rgba(0,0,0,0.18)';
     ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 2, 5.5, 2.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x, s.y + 2, 5.5, 2.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 2, 3.2, 1.4, 0, 0, Math.PI * 2);
     ctx.fill();
 
     if (G.camera.zoom < 0.5) {

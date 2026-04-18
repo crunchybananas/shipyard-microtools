@@ -111,6 +111,28 @@ Total commits on main: 80+. RENDER_LOG.md tracks every loop with challenge/evide
 |------|-------------|-----------|----------|---------|
 | 41 | **People graphics rebuild** per user feedback ("I think you can do better"). Close inspection showed body bottom and feet touched — citizens were floating torsos with glued-on shoes, no legs. Arm stubs (2.3×2.0) read as shoulder bumps. Rebuild: added 2 vertical pants-leg rectangles (counter-phase stride), moved feet down 1.5px, replaced arm-stubs with elongated 1.6×3.8 hanging ovals + skin-tone hand dots at arm ends, split body into two overlapping ellipses for shoulder-waist taper. | Looked at zoom 4-5 critically: what's actually wrong? Answer: no legs, tiny arms, head-body height ratio was 1:1 | realm_s3_loop41_people_v2.jpg — citizens at zoom 5, 5+ visible with clear pants/arms/hands/torso silhouette | KEEP. Citizens now read as people, not bobbleheads. |
 
+## Session 4 — "do another 40 with the same goal"
+
+User: last pass was a great improvement, do that more. Critical-inspection bias.
+
+### Fresh-eyes critique (L42)
+Ranked by impact:
+1. Citizens float — colored rings read as UI selection indicators, no grounding shadow
+2. Particles bleed onto island (pollen/sparkles over grass+torsos)
+3. Tile-grid pulse — checker moiré + 1px edge highlight reads as wireframe
+4. Water tiles "square axis-aligned" (agent may be misreading inset wave pattern — verify)
+5. Citizen outline inconsistency across zooms — mix of crisp/soft
+6. UI panels fight each other (PAUSED + tooltip + grass-tip stack)
+**Keep:** night color grade — warm amber rim against cool green interior sells the "lit settlement" mood
+
+### Loops
+
+| Loop | Improvement | Challenge | Evidence | Verdict |
+|------|-------------|-----------|----------|---------|
+| 42 | Critique capture (no code) — three zoom-level screenshots + subagent ranked list | — | realm_s4_loop42_z1/z2/z4.jpg | Drives L43+. |
+| 43 | Killed job-colored ground ring (agent #1). Replaced with 3-layer stacked drop-shadow (0.10 outer / 0.18 mid / 0.22 core) — proper feathered contact shadow. Citizens are no longer visually perched on a UI poker chip. | — | realm_s4_loop43_shadow.jpg — citizens grounded with soft shadows, no colored halos | KEEP. Immediate visual win. |
+
+
 
 
 
