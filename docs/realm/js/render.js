@@ -5516,13 +5516,18 @@ function drawWater(ctx, x, y, a, tx, ty) {
 
 // ── Minimap ─────────────────────────────────────────────────
 const MINI_COLORS = {0:'#1a6aaa',1:'#d4a76a',2:'#4a7c4f',3:'#2d5a30',4:'#6b7280',5:'#4b6fa0',6:'#4a4a5a'};
+// Loop 36 (render S3): expanded to cover fisherman/archery/blacksmith/
+// bakery/windmill/chickencoop/cowpen (previously rendered as white fallback)
 const MINI_BUILD = {
   house:'#d4a574', farm:'#7cb342', lumber:'#a3714f',
   quarry:'#8a8e9a', mine:'#5a85b8', market:'#e8a040',
   barracks:'#6a7a8a', tower:'#8a8a9a', church:'#e0e0e0',
   castle:'#ffd166', tavern:'#c07040', wall:'#7a7a7a',
-  road:'#8a7a60', well:'#60a5fa', granary:'#d4a574',
+  road:'#8a7a60', well:'#60a5fa', granary:'#c7a060',
   tradingpost:'#e8a040', school:'#d4b890',
+  fisherman:'#4a90c8', archery:'#8a4a3a', blacksmith:'#aa5a30',
+  bakery:'#dca858', windmill:'#e0d0a0', chickencoop:'#e8d060',
+  cowpen:'#a88050',
 };
 // Tile type for road detection (matches TILE.ROAD in state.js)
 const MINI_ROAD_TILE = 5;
