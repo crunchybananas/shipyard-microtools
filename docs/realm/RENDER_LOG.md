@@ -158,6 +158,11 @@ Ranked by impact:
 | 68 | Smoke volumetric puffs — 3-layer stacked core+halo instead of flat disc. | — | — | KEEP. |
 | 69 | Spark embers — 3-layer hot core + halo (outer p.color at 28%, mid p.color 60%, white core 100%). Previously flat dots. Now reads as hot glowing embers. | — | — | KEEP. |
 | 70 | **DEEP PLAY** — spawned 2 soldiers + 2 raiders + arrow mid-flight. Verified sparks, smoke, arrow visuals render together correctly. | — | realm_s4_loop70_combat.jpg | KEEP. |
+| 71 | Damage flash — red radial overlay on citizen body + head when hurtTimer > 0. Timer set to 12 on combat damage (citizens/soldiers/enemies), decrements each tick. ~200ms flash @ 1× speed. | — | — | KEEP. |
+| 72 | Production progress arc — replaced flat green fill bar with an iso-flat arc ring around building base. Dark gutter + green fill sweeping clockwise from 12 o'clock + bright tip dot at current progress. Reads as a cooldown meter. | — | — | KEEP. |
+| 73 | Construction scaffolding — prior construction was just alpha fade-in. Now 4 wooden posts at corners, horizontal plank, diagonal brace, red fluttering builder's flag on the peak, and progress % text at zoom ≥1.2. Building silhouette still fades in through the scaffold. | — | — | KEEP. |
+| 74 | Low-HP blood droplet — pulsing red teardrop above head when hp < 40. Complements L71 damage flash (moment of impact) and L28 hungry frown (state). Three-tier distress feedback. | — | — | KEEP. |
+| 75 | **DEEP PLAY** — combat + under-construction buildings + forced low-HP citizen. Verified new effects render together without issues. | — | realm_s4_loop75_everything.jpg | KEEP. |
 
 
 
