@@ -359,7 +359,14 @@ export function checkRaids() {
   // No more instant-damage abstract calc: let the battle play out visibly.
   if (G.day >= G.nextRaidDay && G.dayPhase < 5) {
     G._raidWarningGiven = false;
-    const raiders = Math.floor((2 + G.day/5) * getDifficulty().raidMult);
+    // Loop 16 (render S3): first raid is always a gentle probe (2 raiders on
+    // easy, scaling by difficulty) so Day-1 players without research-gated
+    // defenses don't sudden-death at day 30. Subsequent raids use the prior
+    // scaling formula (2 + day/5). This gives a new player one "learn that
+    // raids exist" event before the economy-crushing wave.
+    const isFirstRaid = !G.stats?.raidsSurvived;
+    const baseCount = isFirstRaid ? 2 : (2 + G.day/5);
+    const raiders = Math.max(2, Math.floor(baseCount * getDifficulty().raidMult));
     playSound('raid');
 
     const report = [`⚔️ RAID: ${raiders} raiders approach!`];
