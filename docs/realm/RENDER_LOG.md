@@ -143,6 +143,11 @@ Ranked by impact:
 | 53 | Tool carried on OFF-face side when walking. Was always right-offset → blocked the face when citizens walked leftward. Now flips to leading side so face stays readable. | — | — | KEEP. |
 | 54 | Carrying bindle polish. Prior tiny colored dot read as UI status indicator; the bright green food color was worst. Now: shift food to warm apple red, reshape to vertical ellipse bindle with darker tie-knot + small highlight. Strap rendered in leather brown instead of near-black. | — | — | KEEP. |
 | 55 | **DEEP PLAY** — Day 3, 7 pop, 4 buildings (farm×2, house×2), 4 walking. Verified walking tools + bindles render correctly. | — | realm_s4_loop55_cumulative.jpg (zoom 5 close-up) | KEEP. |
+| 56 | Raider silhouette rebuild — added armored greaves (legs), heavy boots, hulking shoulders (6.0 vs citizen 5.4), shoulder pauldrons (dark knobs), longer arms with gauntlet ends, helmet spike for unmistakable hostile read. Walk cycle mirrors citizens (half-rectified cosine). Alpha floor 0.85 too. | — | realm_s4_loop60_raid.jpg (via next loop) | KEEP. Raiders are now a proper threat silhouette, not floating helmets. |
+| 57 | Selected-citizen indicator unified to feet-anchored iso-ellipse + overhead crescent (cyan). Prior was a chest-height circle that looked like a targeting reticle and fought the new drop shadow. | — | — | KEEP. |
+| 58 | Hover ring same treatment — gold iso-ellipse at feet (7×3). Unified visual language with selection. | — | — | KEEP. |
+| 59 | Night windows for 7 more building types (lumber/granary/bakery/fisherman/blacksmith/market/windmill). Previously only homes and large monuments lit up after dark. | — | — | KEEP. Night settlement now reads as fully inhabited, not just houses. |
+| 60 | **DEEP PLAY** — forced 3 raiders + dusk lighting. Confirmed new raider silhouette renders correctly alongside new citizen silhouette. Raiders visible as spike-helmed armored brutes distinct from villagers. | — | realm_s4_loop60_raid.jpg | KEEP. Combined polish chain stable. |
 
 
 
