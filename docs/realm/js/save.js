@@ -63,6 +63,16 @@ export function saveGame({ silent = false } = {}) {
     state.kingdomName = G.kingdomName;
     state.scenario = G.scenario;
     state.difficulty = G.difficulty;
+    // Loop 31 (render S3): persist run-state fields that weren't being saved.
+    // Without G.stats the first-raid probe logic (L16) mistakenly fires on
+    // every save reload. Without season/weather, continuing looks weird
+    // (always spring). Without notificationLog, recent toasts lost.
+    state.season = G.season;
+    state.weather = G.weather;
+    state.stats = G.stats ? { ...G.stats } : null;
+    state.notificationLog = Array.isArray(G.notificationLog)
+      ? G.notificationLog.slice(-30) // cap saved log to recent 30
+      : [];
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -154,6 +164,11 @@ export function loadGame() {
     if (s.kingdomName) G.kingdomName = s.kingdomName;
     if (s.scenario) G.scenario = s.scenario;
     if (s.difficulty) G.difficulty = s.difficulty;
+    // Loop 31 restore additions
+    if (s.season) G.season = s.season;
+    if (s.weather) G.weather = s.weather;
+    if (s.stats) G.stats = { ...G.stats, ...s.stats };
+    if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
     showToast('Game loaded.');
     return true;
   } catch (e) {
