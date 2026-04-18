@@ -2351,7 +2351,7 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.translate(-s.x, -s.y + 3);
 
   switch (b.type) {
-    case 'house': drawHouse(ctx, s); break;
+    case 'house': drawHouse(ctx, s, b); break;
     case 'farm': drawFarm(ctx, s); break;
     case 'lumber': drawLumber(ctx, s); break;
     case 'quarry': drawQuarry(ctx, s); break;
@@ -2516,7 +2516,16 @@ function drawBuilding(ctx, b, s, daylight) {
   }
 }
 
-function drawHouse(ctx, s) {
+function drawHouse(ctx, s, b) {
+  // Loop 18 (render S3): per-building hash variance. Every house was
+  // identical (same red roof, same chimney position, same window). Now
+  // 4 roof variants × 2 chimney positions × double-window chance.
+  // Stable: hash from b.x/b.y so the same house keeps the same look.
+  const h = b ? (((b.x * 37 + b.y * 53) & 0xff)) : 0;
+  const roofVar = h & 0x3;
+  const chimneyRight = (h >> 4) & 0x1;
+  const extraWindow = (h >> 5) & 0x1;
+
   // Walls — gradient for depth
   const wallGrad = ctx.createLinearGradient(s.x, s.y-20, s.x, s.y-4);
   wallGrad.addColorStop(0, '#d4a068');
@@ -2527,29 +2536,51 @@ function drawHouse(ctx, s) {
   ctx.strokeStyle = 'rgba(255,255,255,0.15)';
   ctx.lineWidth = 0.5;
   ctx.beginPath(); ctx.moveTo(s.x-9, s.y-20); ctx.lineTo(s.x+9, s.y-20); ctx.stroke();
-  // Side wall (iso depth — keep flat, it's in shadow)
+  // Side wall (iso depth)
   ctx.fillStyle = '#a87c4e';
   ctx.beginPath();
   ctx.moveTo(s.x+9, s.y-20); ctx.lineTo(s.x+14, s.y-17);
   ctx.lineTo(s.x+14, s.y-1); ctx.lineTo(s.x+9, s.y-4);
   ctx.closePath();
   ctx.fill();
-  // Roof — gradient for shininess
-  const roofGrad = ctx.createLinearGradient(s.x, s.y-32, s.x, s.y-20);
-  roofGrad.addColorStop(0, '#d44030');
-  roofGrad.addColorStop(1, '#a02820');
+
+  // Roof variants — color + peak height depend on hash
+  const roofCfg = [
+    { top: '#d44030', bottom: '#a02820', side: '#a02e23', peakY: 32 },  // classic red tile (steep)
+    { top: '#8a9aae', bottom: '#5a6a80', side: '#4e5e72', peakY: 28 },  // slate blue-grey (low-pitch)
+    { top: '#c2a04e', bottom: '#8e6e26', side: '#886020', peakY: 34 },  // golden thatch (tall straw)
+    { top: '#6a9a54', bottom: '#48703a', side: '#3c5e2e', peakY: 30 },  // moss green
+  ][roofVar];
+
+  const roofGrad = ctx.createLinearGradient(s.x, s.y - roofCfg.peakY, s.x, s.y-20);
+  roofGrad.addColorStop(0, roofCfg.top);
+  roofGrad.addColorStop(1, roofCfg.bottom);
   ctx.fillStyle = roofGrad;
   ctx.beginPath();
-  ctx.moveTo(s.x-12, s.y-20); ctx.lineTo(s.x, s.y-32);
+  ctx.moveTo(s.x-12, s.y-20); ctx.lineTo(s.x, s.y - roofCfg.peakY);
   ctx.lineTo(s.x+12, s.y-20); ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#a02e23';
+  ctx.fillStyle = roofCfg.side;
   ctx.beginPath();
-  ctx.moveTo(s.x+12, s.y-20); ctx.lineTo(s.x, s.y-32);
-  ctx.lineTo(s.x+5, s.y-29); ctx.lineTo(s.x+16, s.y-17);
+  ctx.moveTo(s.x+12, s.y-20); ctx.lineTo(s.x, s.y - roofCfg.peakY);
+  ctx.lineTo(s.x+5, s.y - roofCfg.peakY + 3); ctx.lineTo(s.x+16, s.y-17);
   ctx.closePath();
   ctx.fill();
-  // Subtle warm glow on lower wall (interior light leaking out)
+
+  // Thatch variant gets horizontal strand detail
+  if (roofVar === 2) {
+    ctx.strokeStyle = 'rgba(40,28,8,0.35)';
+    ctx.lineWidth = 0.5;
+    for (let yy = s.y - 28; yy <= s.y - 20; yy += 2) {
+      ctx.beginPath();
+      const halfW = ((s.y - 20 - yy) / (roofCfg.peakY - 20)) * 12;
+      ctx.moveTo(s.x - halfW, yy);
+      ctx.lineTo(s.x + halfW, yy);
+      ctx.stroke();
+    }
+  }
+
+  // Subtle warm glow on lower wall
   const warmGlow = ctx.createLinearGradient(s.x, s.y - 8, s.x, s.y - 4);
   warmGlow.addColorStop(0, 'rgba(255, 220, 150, 0)');
   warmGlow.addColorStop(1, 'rgba(255, 200, 120, 0.15)');
@@ -2558,15 +2589,21 @@ function drawHouse(ctx, s) {
   // Door
   ctx.fillStyle = '#4a2a12';
   ctx.fillRect(s.x-3, s.y-10, 6, 6);
-  // Doorstep — darker stone step
+  // Doorstep
   ctx.fillStyle = 'rgba(50, 45, 40, 0.6)';
   ctx.fillRect(s.x - 4, s.y - 4, 8, 2);
-  // Window
+  // Window(s)
   ctx.fillStyle = '#ffeebb';
   ctx.fillRect(s.x+4, s.y-18, 3, 3);
-  // Chimney
-  ctx.fillStyle = '#7a6a5a';
-  ctx.fillRect(s.x+5, s.y-35, 4, 8);
+  if (extraWindow) ctx.fillRect(s.x-7, s.y-18, 3, 3);
+  // Chimney — position varies + matches roof side accent for shingle variants
+  const chimneyX = chimneyRight ? s.x + 5 : s.x - 9;
+  const chimneyColor = roofVar === 1 ? '#5a6a70' : '#7a6a5a';
+  ctx.fillStyle = chimneyColor;
+  ctx.fillRect(chimneyX, s.y-35, 4, 8);
+  // Chimney cap
+  ctx.fillStyle = roofVar === 1 ? '#40505a' : '#5a4a3a';
+  ctx.fillRect(chimneyX - 1, s.y - 36, 6, 2);
 }
 
 function drawFarm(ctx, s) {
