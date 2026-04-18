@@ -359,17 +359,22 @@ export function checkRaids() {
   // No more instant-damage abstract calc: let the battle play out visibly.
   if (G.day >= G.nextRaidDay && G.dayPhase < 5) {
     G._raidWarningGiven = false;
-    // Loop 16 + 20 (render S3): first raid is a gentle probe, and raid
-    // scaling is capped until the player has had time to research defenses.
-    // L20 deep-play showed population wiped by D80 under old scaling even
-    // with the L16 probe. Cap at 3 raiders before day 20 (player has time
-    // to research Masonry + build walls). After day 20 use the old formula
-    // but cap at 12 raiders lifetime so late-game raids don't overwhelm
-    // raid mechanics that may not scale well to 20+ simultaneous enemies.
+    // Loop 16 + 20 + 26 (render S3): raid scaling adapts to the player's
+    // defensive posture. Without walls/barracks/towers the game can't
+    // realistically scale up wave size — each raid is a wipe.
+    // - First raid: 2 raiders (tutorial event)
+    // - Defenseless (0 defensive buildings): cap at 3 lifetime. Players
+    //   who never research defense get a quiet island, not nightly massacres.
+    // - Before day 20 with defense: cap at 5 (ramp)
+    // - Day 20+: 2 + day/5 capped at 12
     const isFirstRaid = !G.stats?.raidsSurvived;
+    const hasDefense = G.buildings.some(b =>
+      b.type === 'wall' || b.type === 'barracks' || b.type === 'tower' || b.type === 'archery' || b.type === 'castle'
+    );
     let baseCount;
     if (isFirstRaid) baseCount = 2;
-    else if (G.day < 20) baseCount = Math.min(3, 2 + G.day/10);
+    else if (!hasDefense) baseCount = 3;
+    else if (G.day < 20) baseCount = Math.min(5, 3 + G.day/8);
     else baseCount = Math.min(12, 2 + G.day/5);
     const raiders = Math.max(2, Math.floor(baseCount * getDifficulty().raidMult));
     playSound('raid');
