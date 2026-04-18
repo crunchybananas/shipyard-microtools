@@ -678,24 +678,38 @@ export function render() {
         }
       }
       else if (tile === TILE.MOUNTAIN) {
+        // Loop 2 (render S3): per-tile silhouette variance. Before this, every
+        // mountain shared identical base widths, peak positions, and snow shape
+        // even though `mh` was being computed — only height varied. Fresh-eyes
+        // critique called them "identical grey traffic cones stamped in rows".
+        // Now width, lean, snow shape, twin-peak vary per tile-hash.
         const mh = ((x * 37 + y * 53) & 0xff);
-        // Height variation: 28-36px tall
         const peakH = 28 + (mh % 9);
-        // Base shadow
+        // Base half-width: 10-17px (was fixed 14)
+        const baseHW = 10 + ((mh >> 1) & 0x7);
+        // Horizontal lean: ±3px asymmetry between left/right base
+        const lean = ((mh >> 4) & 0x7) - 3;
+        // Snow cap asymmetry: picks which side drips lower
+        const snowTilt = ((mh >> 2) & 0x3) - 1;
+        // Twin peak modifier: ~1 in 4 mountains gets a secondary sub-peak
+        const twin = (mh & 0x3) === 0;
+        const snowless = (mh & 0x1f) === 0; // ~1 in 32 = bare rocky outcrop
+
+        // Base shadow — scaled with baseHW so wider mountains have bigger shadow
         ctx.globalAlpha = daylight * 0.3;
         ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.ellipse(s.x + 2, s.y + 5, 18, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(s.x + 2, s.y + 5, baseHW + 4, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = daylight;
 
-        // Back peak (taller, darker)
-        const bx = s.x - 3, byTop = s.y - peakH - (mh % 4);
+        // Back peak (taller, darker) — apex shifts with lean
+        const bx = s.x - 3 + lean, byTop = s.y - peakH - (mh % 4);
         ctx.fillStyle = '#5a5a6a';
         ctx.beginPath();
         ctx.moveTo(bx, byTop);
-        ctx.lineTo(bx - 14, s.y + 4);
-        ctx.lineTo(bx + 14, s.y + 2);
+        ctx.lineTo(bx - baseHW, s.y + 4);
+        ctx.lineTo(bx + baseHW - 2, s.y + 2);
         ctx.closePath(); ctx.fill();
 
         // Rocky shadow strokes on back peak
@@ -706,22 +720,26 @@ export function render() {
         ctx.moveTo(bx + 2, byTop + 8); ctx.lineTo(bx + 6, s.y - 2);
         ctx.stroke();
 
-        // Snow cap on back peak
-        ctx.fillStyle = 'rgba(240,245,255,0.92)';
-        ctx.beginPath();
-        ctx.moveTo(bx, byTop);
-        ctx.lineTo(bx - 5, byTop + 9);
-        ctx.lineTo(bx + 4, byTop + 8);
-        ctx.closePath(); ctx.fill();
+        // Snow cap on back peak — asymmetric drip
+        if (!snowless) {
+          ctx.fillStyle = 'rgba(240,245,255,0.92)';
+          ctx.beginPath();
+          ctx.moveTo(bx, byTop);
+          ctx.lineTo(bx - 5 + snowTilt, byTop + 9);
+          ctx.lineTo(bx + 4 - snowTilt, byTop + 8);
+          ctx.closePath(); ctx.fill();
+        }
 
         // Front peak (shorter, lighter — main visible face)
         const fpeakH = peakH - 6;
-        const fx = s.x + 4, fyTop = s.y - fpeakH - (mh % 3);
+        // Narrower front base — also scaled with baseHW
+        const fBaseHW = Math.max(8, baseHW - 2);
+        const fx = s.x + 4 - lean, fyTop = s.y - fpeakH - (mh % 3);
         ctx.fillStyle = '#7a7a88';
         ctx.beginPath();
         ctx.moveTo(fx, fyTop);
-        ctx.lineTo(fx - 12, s.y + 4);
-        ctx.lineTo(fx + 12, s.y + 4);
+        ctx.lineTo(fx - fBaseHW, s.y + 4);
+        ctx.lineTo(fx + fBaseHW, s.y + 4);
         ctx.closePath(); ctx.fill();
 
         // Rocky strokes on front peak
@@ -736,23 +754,44 @@ export function render() {
         ctx.fillStyle = 'rgba(180,180,200,0.35)';
         ctx.beginPath();
         ctx.moveTo(fx, fyTop);
-        ctx.lineTo(fx - 12, s.y + 4);
+        ctx.lineTo(fx - fBaseHW, s.y + 4);
         ctx.lineTo(fx - 3, s.y + 4);
         ctx.lineTo(fx, fyTop + 8);
         ctx.closePath(); ctx.fill();
 
-        // Snow cap on front peak (bigger, brighter)
-        ctx.fillStyle = 'rgba(255,255,255,0.95)';
-        ctx.beginPath();
-        ctx.moveTo(fx, fyTop);
-        ctx.lineTo(fx - 6, fyTop + 10);
-        ctx.lineTo(fx + 5, fyTop + 9);
-        ctx.closePath(); ctx.fill();
+        // Twin sub-peak: a shorter secondary ridge rising from the right slope
+        if (twin) {
+          const tx = fx + 6, tyTop = fyTop + 7 + (mh & 0x3);
+          ctx.fillStyle = '#6a6a78';
+          ctx.beginPath();
+          ctx.moveTo(tx, tyTop);
+          ctx.lineTo(tx - 4, s.y + 4);
+          ctx.lineTo(tx + 5, s.y + 4);
+          ctx.closePath(); ctx.fill();
+          // Its own tiny snow dab
+          if (!snowless) {
+            ctx.fillStyle = 'rgba(240,245,255,0.9)';
+            ctx.beginPath();
+            ctx.moveTo(tx, tyTop);
+            ctx.lineTo(tx - 2, tyTop + 3);
+            ctx.lineTo(tx + 2, tyTop + 3);
+            ctx.closePath(); ctx.fill();
+          }
+        }
 
-        // Snow detail lines dripping down
-        ctx.fillStyle = 'rgba(240,245,255,0.6)';
-        ctx.fillRect(fx - 4, fyTop + 8, 1, 3);
-        ctx.fillRect(fx + 2, fyTop + 7, 1, 4);
+        // Snow cap on front peak — asymmetric
+        if (!snowless) {
+          ctx.fillStyle = 'rgba(255,255,255,0.95)';
+          ctx.beginPath();
+          ctx.moveTo(fx, fyTop);
+          ctx.lineTo(fx - 6 + snowTilt, fyTop + 10);
+          ctx.lineTo(fx + 5 - snowTilt, fyTop + 9);
+          ctx.closePath(); ctx.fill();
+
+          ctx.fillStyle = 'rgba(240,245,255,0.6)';
+          ctx.fillRect(fx - 4, fyTop + 8, 1, 3);
+          ctx.fillRect(fx + 2, fyTop + 7, 1, 4);
+        }
       }
       else if (tile === TILE.SAND) {
         // Sand grain dots for beach texture
@@ -1031,29 +1070,30 @@ export function render() {
     const bodyTilt = walkLean * 0.055; // slight tilt in walk direction
     ctx.fillStyle = bodyColor;
     ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 8, 6.3, 7, bodyTilt, 0, Math.PI * 2);
+    ctx.ellipse(bodyX, cy - 8, 5.4, 7.4, bodyTilt, 0, Math.PI * 2);
     ctx.fill();
     // Shadow side (lower-right crescent for depth)
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.ellipse(bodyX + 2, cy - 7, 4.9, 5.6, bodyTilt, -Math.PI / 2, Math.PI / 2);
+    ctx.ellipse(bodyX + 1.5, cy - 7, 4.2, 5.9, bodyTilt, -Math.PI / 2, Math.PI / 2);
     ctx.fill();
     ctx.strokeStyle = 'rgba(20,10,0,0.4)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 8, 6.3, 7, bodyTilt, 0, Math.PI * 2);
+    ctx.ellipse(bodyX, cy - 8, 5.4, 7.4, bodyTilt, 0, Math.PI * 2);
     ctx.stroke();
 
     // Arm stubs — small ovals on body sides, counter-swing to feet when walking
+    // Loop 2: moved inward 7.0 → 6.0 (body is narrower now) and tilted vertical-ish
     const armSwing = isMoving ? step * 0.45 : 0;
     ctx.fillStyle = bodyColor;
     ctx.strokeStyle = 'rgba(20,10,0,0.35)';
     ctx.lineWidth = 0.7;
     ctx.beginPath();
-    ctx.ellipse(bodyX - 7.0, cy - 9 + armSwing, 2.6, 1.9, Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.ellipse(bodyX - 6.0, cy - 9 + armSwing, 2.3, 2.0, Math.PI * 0.15, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     ctx.beginPath();
-    ctx.ellipse(bodyX + 7.0, cy - 9 - armSwing, 2.6, 1.9, -Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.ellipse(bodyX + 6.0, cy - 9 - armSwing, 2.3, 2.0, -Math.PI * 0.15, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
 
     // Neck stub — bridging body to head, X averaged between body and head positions

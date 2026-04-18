@@ -29,13 +29,14 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | Loop | Improvement | Challenge | Evidence | Verdict |
 |------|-------------|-----------|----------|---------|
 | 1 | Head-neck join: killed head outline stroke, widened neck 2.2×2.6 → 3.0×3.0, dropped head y cy-20 → cy-19 | Eye spacing ±1.7 was too close (whites touched at centerline = "goggles" read) | Before: s3_loop00_zoom2.jpg. After: s3_loop01_zoom3.jpg — heads no longer severed; eyes at ±2.0 with 1.3 whites = clear 0.7px gap between whites | KEEP both. Agent critique #1 ("heads read as severed") visually resolved; eyes now read as a face, not goggles. |
+| 2 | Mountain variance: per-tile hash now drives base half-width (10-17px), lean (±3px), snow asymmetry, ~1/4 twin-peak, ~1/32 snowless rocky | Body 6.3×7 too blobby → tried 5.4×7.4 (narrower, taller) with arm-stubs pulled in 7.0 → 6.0 | realm_s3_loop02_mountains.jpg shows cluster of ~5 mountains, all different. realm_s3_loop02_body.jpg shows narrower bodies — head-to-body ratio now reads more clearly chibi | KEEP both. Mountains no longer "stamped traffic cones". Bodies less ball-like. |
 
 
 ## Open Challenges (things to question each loop)
 
 - ~~**Eye spacing ±1.7**: on cheek-dense close-up (zoom 2.0) whites touch. Try ±2.0 with smaller whites.~~ RESOLVED Loop 1 → ±2.0, whites 1.3.
 - **Ground ring job-colored (alpha 0.45, size 8×3.5)**: at zoom 1.0 forms a distracting colored halo under every villager. Noisy vs. helpful?
-- **Body shape 6.3×7 (near-circular)**: too blobby — most chibi references have a clearer torso/shoulder taper.
+- ~~**Body shape 6.3×7 (near-circular)**: too blobby — most chibi references have a clearer torso/shoulder taper.~~ RESOLVED Loop 2 → 5.4×7.4 with arm stubs 6.0 offset.
 - **Hair arc sheen (cycle 8)**: does the 0.18-alpha 1.3-width stroke actually read at zoom 1.0? Likely sub-pixel.
 - **Mouth zoom threshold 1.5**: most players play at zoom 1.0-1.5; the smile is invisible to them.
 - **Cheek threshold 1.5**: same.
