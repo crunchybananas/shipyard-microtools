@@ -4352,8 +4352,12 @@ function updateRaidChronicle() {
 }
 registerUpdater(updateRaidChronicle);
 
-// ── Loop 125: Production building efficiency indicator ──────
-// Shows a small fill bar under production buildings.
+// ── Loop 125 + S4 L72: Production efficiency arc ──────────
+// Flat fill bar under building was fine but read like a UI element.
+// Replaced with a subtle arc ring drawn around the building base —
+// fills clockwise as the building gets closer to producing. Reads
+// as a cooldown meter (RPG / RTS convention) and doesn't fight the
+// building silhouette.
 function renderEfficiencyBars(ctx) {
   if (G.camera.zoom < 0.8) return;
   for (const b of G.buildings) {
@@ -4361,11 +4365,28 @@ function renderEfficiencyBars(ctx) {
     const s = toScreen(b.x, b.y);
     const pct = Math.min(1, (b.prodTimer || 0) / 120);
     if (pct <= 0) continue;
-    const w = 18, h = 2;
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.fillRect(s.x - w/2, s.y + 5, w, h);
-    ctx.fillStyle = '#4ade80';
-    ctx.fillRect(s.x - w/2, s.y + 5, w * pct, h);
+    // Base arc — dark gutter
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 4, 11, 4.2, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // Filled arc — green, starts at 12 o'clock, sweeps clockwise
+    ctx.strokeStyle = '#4ade80';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 4, 11, 4.2, 0,
+                -Math.PI / 2,
+                -Math.PI / 2 + pct * Math.PI * 2);
+    ctx.stroke();
+    // Tiny tip dot at the current progress position for clarity
+    const ang = -Math.PI / 2 + pct * Math.PI * 2;
+    const tx = s.x + Math.cos(ang) * 11;
+    const ty = s.y + 4 + Math.sin(ang) * 4.2;
+    ctx.fillStyle = '#86efac';
+    ctx.beginPath();
+    ctx.arc(tx, ty, 1.2, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 registerWorldRenderer(renderEfficiencyBars);
