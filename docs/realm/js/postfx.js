@@ -32,8 +32,13 @@ void main() {
   vec4 color = texture(u_scene, uv);
 
   // ── Bloom: 9-tap soft glow on bright pixels ──
+  // Loop 8 (render S3): threshold raised 0.55 → 0.78 so only actually-bright
+  // emissive pixels bloom (torches, lit windows, specular highlights), not
+  // ordinary lit grass/foliage. Radius reduced 3.0 → 2.0 so halos don't
+  // frost entire shapes. Fresh-eyes critique #4 flagged "soft green halo
+  // larger than the tree itself" — this removes it.
   vec2 texel = 1.0 / u_resolution;
-  float bloomRadius = 3.0;
+  float bloomRadius = 2.0;
   vec3 bloomSum = vec3(0.0);
   float bloomWeight = 0.0;
   for (int x = -1; x <= 1; x++) {
@@ -41,26 +46,26 @@ void main() {
       vec2 offset = vec2(float(x), float(y)) * texel * bloomRadius;
       vec3 s = texture(u_scene, uv + offset).rgb;
       float bright = dot(s, vec3(0.2126, 0.7152, 0.0722));
-      float mask = smoothstep(0.55, 1.0, bright);
+      float mask = smoothstep(0.78, 1.0, bright);
       bloomSum += s * mask;
       bloomWeight += 1.0;
     }
   }
-  // Extra bloom taps at wider radius
+  // Extra bloom taps at wider radius (tighter now)
   for (int x = -2; x <= 2; x += 2) {
     for (int y = -2; y <= 2; y += 2) {
       if (x == 0 && y == 0) continue;
-      vec2 offset = vec2(float(x), float(y)) * texel * bloomRadius * 2.0;
+      vec2 offset = vec2(float(x), float(y)) * texel * bloomRadius * 1.6;
       vec3 s = texture(u_scene, uv + offset).rgb;
       float bright = dot(s, vec3(0.2126, 0.7152, 0.0722));
-      float mask = smoothstep(0.55, 1.0, bright);
-      bloomSum += s * mask * 0.5; // half weight for outer ring
-      bloomWeight += 0.5;
+      float mask = smoothstep(0.78, 1.0, bright);
+      bloomSum += s * mask * 0.4;
+      bloomWeight += 0.4;
     }
   }
   vec3 bloom = bloomSum / bloomWeight;
-  // Bloom stronger at night
-  float bloomIntensity = mix(0.15, 0.4, 1.0 - smoothstep(0.55, 1.0, u_daylight));
+  // Bloom stronger at night (so torches/windows still pop)
+  float bloomIntensity = mix(0.12, 0.35, 1.0 - smoothstep(0.55, 1.0, u_daylight));
   color.rgb += bloom * bloomIntensity;
 
   // ── Color Grading: warm day / cool night ──
