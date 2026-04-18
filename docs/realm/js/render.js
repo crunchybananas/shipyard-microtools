@@ -98,8 +98,49 @@ function shiftColor(color, shift) {
 // getDaylight is imported from state.js
 
 export function render() {
-  ctx.fillStyle = '#0a0e1a';
-  ctx.fillRect(0, 0, logicalW, logicalH);
+  // Loop 76 (render S4): sky gradient varies with day phase. Before, the
+  // off-island area was a flat near-black void at all times. Now: warm
+  // orange/amber at dawn and dusk, pale blue midday, deep navy at night.
+  // Top-to-bottom gradient so horizon warmth reads against the cooler
+  // upper sky.
+  {
+    const t = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
+    // t: 0=midnight, 0.25=dawn, 0.5=noon, 0.75=dusk, 1=midnight
+    const dawn = Math.max(0, 1 - Math.abs(t - 0.22) * 8);  // peaks at t=0.22
+    const dusk = Math.max(0, 1 - Math.abs(t - 0.78) * 8);  // peaks at t=0.78
+    const day  = Math.max(0, Math.min(1, (t - 0.18) * 10)) * Math.max(0, Math.min(1, (0.82 - t) * 10));
+    // Choose top/bottom sky colors by phase
+    const mix = (a, b, f) => {
+      const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab2 = a & 255;
+      const br = (b >> 16) & 255, bg = (b >> 8) & 255, bb2 = b & 255;
+      return `rgb(${Math.round(ar + (br - ar) * f)},${Math.round(ag + (bg - ag) * f)},${Math.round(ab2 + (bb2 - ab2) * f)})`;
+    };
+    const nightTop = 0x06080f, nightBot = 0x121628;
+    const dawnTop = 0x2e2a50, dawnBot = 0xc6703a;
+    const dayTop = 0x8fb4de, dayBot = 0xd0dbe8;
+    const duskTop = 0x3a2a58, duskBot = 0xd06044;
+    const lerp2 = (a, b, f) => a * (1 - f) + b * f;
+    // Blend: night is default; dawn/dusk/day override by phase amount.
+    let topR = ((nightTop >> 16) & 255), topG = ((nightTop >> 8) & 255), topB = nightTop & 255;
+    let botR = ((nightBot >> 16) & 255), botG = ((nightBot >> 8) & 255), botB = nightBot & 255;
+    const apply = (color, f) => {
+      const cr = (color >> 16) & 255, cg = (color >> 8) & 255, cb = color & 255;
+      topR = lerp2(topR, cr, f); topG = lerp2(topG, cg, f); topB = lerp2(topB, cb, f);
+    };
+    const applyBot = (color, f) => {
+      const cr = (color >> 16) & 255, cg = (color >> 8) & 255, cb = color & 255;
+      botR = lerp2(botR, cr, f); botG = lerp2(botG, cg, f); botB = lerp2(botB, cb, f);
+    };
+    apply(dawnTop, dawn); applyBot(dawnBot, dawn);
+    apply(dayTop, day); applyBot(dayBot, day);
+    apply(duskTop, dusk); applyBot(duskBot, dusk);
+    const grad = ctx.createLinearGradient(0, 0, 0, logicalH);
+    grad.addColorStop(0, `rgb(${Math.round(topR)},${Math.round(topG)},${Math.round(topB)})`);
+    grad.addColorStop(1, `rgb(${Math.round(botR)},${Math.round(botG)},${Math.round(botB)})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, logicalW, logicalH);
+    void mix; void nightTop; void dawnTop; void dayTop; void duskTop;
+  }
 
   ctx.save();
   const shake = G.cameraShake || 0;
