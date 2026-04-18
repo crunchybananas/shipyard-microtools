@@ -193,7 +193,12 @@ window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
   // No confirm dialog — it blocks browser automation and interrupts flow
   // Reset all state
+  // Loop 25 (render S3): also reset chronicle + storyFlags so new games
+  // start with a blank history. Was leaving old raid entries from previous
+  // runs contaminating the new chronicle panel.
   G.buildings = []; G.citizens = []; G.caravans = []; G.walkers = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = []; G.animals = [];
+  G.chronicle = []; G.storyFlags = {};
+  G.notificationLog = [];
   G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
   G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
   G.day = 1; G.dayPhase = 0; G.gameTick = 0; G.speed = 1;
