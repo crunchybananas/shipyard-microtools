@@ -1500,6 +1500,28 @@ export function render() {
       ctx.fill();
     }
 
+    // Loop 74 (render S4): low-HP indicator. When citizen HP drops below
+    // 40 (out of ~100), show a small red droplet + HP text at close zoom.
+    // Citizens rarely have HP tracked unless combat has happened, so this
+    // doubles as a "this citizen was injured recently" cue.
+    if (c.hp !== undefined && c.hp < 40 && c.hp > 0 && G.camera.zoom >= 0.8) {
+      // Blood droplet floating above head
+      const droplet = 0.5 + 0.5 * Math.sin(G.gameTick * 0.1 + phaseOffset);
+      ctx.globalAlpha = Math.max(0.85, daylight) * (0.6 + 0.4 * droplet);
+      ctx.fillStyle = '#c8201c';
+      ctx.beginPath();
+      ctx.moveTo(s.x, cy - 28);
+      ctx.bezierCurveTo(s.x - 1.5, cy - 26, s.x - 1.5, cy - 23, s.x, cy - 22);
+      ctx.bezierCurveTo(s.x + 1.5, cy - 23, s.x + 1.5, cy - 26, s.x, cy - 28);
+      ctx.fill();
+      // Tiny highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.beginPath();
+      ctx.arc(s.x - 0.5, cy - 26, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = Math.max(0.85, daylight);
+    }
+
     // Hover ring — iso-flat ellipse at feet, gold.
     // Loop 58 (render S4): was a 10px circle at chest height. Matched the
     // old selected-citizen style which I just redid in L57. Unified: hover
