@@ -2412,7 +2412,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'lumber': drawLumber(ctx, s, b); break;
     case 'quarry': drawQuarry(ctx, s); break;
     case 'mine': drawMine(ctx, s); break;
-    case 'market': drawMarket(ctx, s); break;
+    case 'market': drawMarket(ctx, s, b); break;
     case 'barracks': drawBarracks(ctx, s); break;
     case 'archery': drawArchery(ctx, s); break;
     case 'tower': drawTower(ctx, s); break;
@@ -3163,14 +3163,26 @@ function drawMine(ctx, s) {
   }
 }
 
-function drawMarket(ctx, s) {
+function drawMarket(ctx, s, b) {
+  // Loop 38 (render S3): awning color + displayed goods vary per market.
+  // Before: every market was a red-striped awning with 1 gold + 1 green
+  // good. Now 4 awning colors × 3 goods-display variants.
+  const mkHash = b ? (((b.x * 79 + b.y * 37) & 0xff)) : 0;
+  const awningPalette = [
+    { top: '#f05545', bottom: '#c0302090' },  // red (classic)
+    { top: '#5a8ad0', bottom: '#304a9090' },  // blue
+    { top: '#6ab040', bottom: '#407020A0' },  // green
+    { top: '#c8a040', bottom: '#906010A0' },  // gold
+  ][mkHash & 0x3];
+  const goodsVar = (mkHash >> 2) & 0x3;
+
   // Counter
   ctx.fillStyle = '#c89460';
   ctx.fillRect(s.x-12, s.y-8, 24, 6);
   // Awning — subtle top-to-bottom gradient
   const awningGrad = ctx.createLinearGradient(s.x, s.y-20, s.x, s.y-8);
-  awningGrad.addColorStop(0, '#f05545');
-  awningGrad.addColorStop(1, '#c0302090');
+  awningGrad.addColorStop(0, awningPalette.top);
+  awningGrad.addColorStop(1, awningPalette.bottom);
   ctx.fillStyle = awningGrad;
   ctx.beginPath();
   ctx.moveTo(s.x-14, s.y-20); ctx.lineTo(s.x+14, s.y-20);
@@ -3193,13 +3205,39 @@ function drawMarket(ctx, s) {
   // Counter shelf edge highlight
   ctx.fillStyle = '#a07040';
   ctx.fillRect(s.x-12, s.y-9, 24, 1);
-  // Goods on counter
-  ctx.fillStyle = '#ffd166';
-  ctx.fillRect(s.x-6, s.y-12, 4, 3);
-  ctx.fillStyle = '#4ade80';
-  ctx.fillRect(s.x+2, s.y-12, 4, 3);
-  // Extra awning stripe detail (thin red border along bottom edge)
-  ctx.fillStyle = '#c0392b';
+  // Goods on counter — variant picks different commodity pairs
+  if (goodsVar === 0) {
+    // Gold bread + green apples (original)
+    ctx.fillStyle = '#ffd166'; ctx.fillRect(s.x-6, s.y-12, 4, 3);
+    ctx.fillStyle = '#4ade80'; ctx.fillRect(s.x+2, s.y-12, 4, 3);
+  } else if (goodsVar === 1) {
+    // Cloth bolts — red + blue
+    ctx.fillStyle = '#c04040'; ctx.fillRect(s.x-7, s.y-13, 5, 4);
+    ctx.fillStyle = '#4060b0'; ctx.fillRect(s.x+2, s.y-13, 5, 4);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 0.4;
+    ctx.beginPath(); ctx.moveTo(s.x-7, s.y-12); ctx.lineTo(s.x-2, s.y-12); ctx.stroke();
+  } else if (goodsVar === 2) {
+    // Spices — small amber + orange cones
+    ctx.fillStyle = '#e0a030';
+    ctx.beginPath();
+    ctx.moveTo(s.x-5, s.y-12); ctx.lineTo(s.x-3, s.y-9); ctx.lineTo(s.x-7, s.y-9); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#c85020';
+    ctx.beginPath();
+    ctx.moveTo(s.x+3, s.y-12); ctx.lineTo(s.x+5, s.y-9); ctx.lineTo(s.x+1, s.y-9); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#6a3018';
+    ctx.beginPath();
+    ctx.moveTo(s.x-1, s.y-12); ctx.lineTo(s.x+1, s.y-10); ctx.lineTo(s.x-3, s.y-10); ctx.closePath(); ctx.fill();
+  } else {
+    // Pottery — urn + bowl silhouettes
+    ctx.fillStyle = '#b87040';
+    ctx.beginPath(); ctx.ellipse(s.x-4, s.y-10, 2, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d89060';
+    ctx.beginPath(); ctx.ellipse(s.x-4, s.y-11.5, 1.4, 0.8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#906040';
+    ctx.beginPath(); ctx.ellipse(s.x+3, s.y-10, 3, 1.2, 0, 0, Math.PI); ctx.fill();
+  }
+  // Thin bottom edge stripe matches awning top
+  ctx.fillStyle = awningPalette.top;
   ctx.fillRect(s.x-16, s.y-9, 32, 1);
   // Barrel prop beside stall (left side)
   ctx.fillStyle = '#8b6a4e';
