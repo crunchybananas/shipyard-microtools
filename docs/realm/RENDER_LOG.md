@@ -60,6 +60,8 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 30 | **DEEP PLAY** (5th-loop). Verified L26 defense-cap works: played defenseless settlement for 253 days, observed 48 raids ALL spawning exactly 3 raiders each. Prior wipe-at-D97 now survives to D253 (pop eventually dropped from attrition, not raid wipe). | Test: does "no defense → cap at 3" hold? YES, 41 raid chronicle entries all show "RAID: 3 raiders approach!" | (position deltas not capturable; evidence is in chronicle text) | KEEP L26 balance. Defenseless sandbox play is now viable. |
 | 31 | Save.js audit → added G.stats, G.season, G.weather, G.notificationLog to save/load. Before: reloading a save mistakenly re-triggered the L16 first-raid probe (because stats.raidsSurvived was reset). Season/weather always looked like spring on reload. | — | (state persistence fix) | KEEP. |
 | 32 | Rain scales with storm severity. Prior rain was 80 uniform streaks regardless of weather. Now storm gets 140 drops, harder slant (shear doubles), faster fall, slightly cooler blue, per-drop length variance. Rain (non-storm) keeps the lighter look. | — | (visible during weather events) | KEEP. |
+| 33 | Fisherman's hut catch variants. 4 types keyed to b.x/b.y: fish bucket (original), woven crab pot, fish drying rack with 3 hanging fish, lobster trap stack with visible red antenna. Stable per-tile. | — | (placing fisherman's huts shows variety) | KEEP. |
+
 
 
 
