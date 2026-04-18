@@ -153,6 +153,11 @@ Ranked by impact:
 | 63 | — (skipped / consolidated into L62) | | | |
 | 64 | Ambient walker upgrade — merchants/students/criers/beggars get the same chibi treatment (legs+boots+robe+dot-eyes). Prior torso-pill looked out of place next to refined citizens. Keeps role emoji on chest. | — | — | KEEP. |
 | 65 | **DEEP PLAY** — forced 3 soldiers (swordsman/archer/swordsman) + 3 raiders at a citizen. Confirmed ally vs enemy silhouettes are distinct at a glance: blue plumes vs red helm spikes. | — | realm_s4_loop65_battle.jpg | KEEP. |
+| 66 | Arrow projectile proper shape: motion streak (fading cream gradient trail), brown shaft, steel tip, V-fletching feathers at tail. Prior was an 8px line + head. Feels like actual flying arrow now. | — | — | KEEP. |
+| 67 | Combat impact sparks — 5-spark radial burst on projectile hit, 4-spark + ⚔️ emoji on melee clash. Prior hits had only combat SFX + no visual. | — | — | KEEP. |
+| 68 | Smoke volumetric puffs — 3-layer stacked core+halo instead of flat disc. | — | — | KEEP. |
+| 69 | Spark embers — 3-layer hot core + halo (outer p.color at 28%, mid p.color 60%, white core 100%). Previously flat dots. Now reads as hot glowing embers. | — | — | KEEP. |
+| 70 | **DEEP PLAY** — spawned 2 soldiers + 2 raiders + arrow mid-flight. Verified sparks, smoke, arrow visuals render together correctly. | — | realm_s4_loop70_combat.jpg | KEEP. |
 
 
 
