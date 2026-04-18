@@ -137,6 +137,7 @@ Ranked by impact:
 | 47 | Dot-eyes instead of white-eyes. Prior whites r=1.3 + pupils r=0.9 left ~0.4px white ring reading as spectacles at zoom 5. Now solid dark dots r=1.2 with single bright glint r=0.35 upper-left. Peanuts-style. | — | — | KEEP. |
 | 48 | Real walk cycle: foot swing-phase lift (1.6px Y + 1.1px X forward) from half-rectified cos(walkPhase), leg shortens when foot lifts. Prior sine-slide now reads as actual walking arc. | — | realm_s4_loop48_walking.jpg | KEEP. Movement finally looks like walking not gliding. |
 | 49 | Tutorial auto-dismiss smarter: added day≥6 AND buildings≥2 trigger, plus citizens≥8 trigger. Prior single threshold (buildings>=4) left "Select Farm from build bar" showing with 11 citizens and a barracks. | — | — | KEEP. |
+| 50 | **DEEP PLAY** — fresh game, placed farm/farm/house/house/granary/lumber. Day 2, 7 pop, 4 buildings. Verified tutorial auto-dismissed (L49 working). Eye dots, drop shadows, walk cycle all rendering without issues. | — | realm_s4_loop50_live.jpg — active settlement with pier/water/water | KEEP — polish chain is stable. |
 
 
 
