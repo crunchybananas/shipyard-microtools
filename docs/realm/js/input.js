@@ -134,7 +134,7 @@ function tryPlaceAt(tx, ty) {
       const short = Object.entries(def.cost).filter(([k,v]) => (G.resources[k]||0) < v).map(([k]) => k);
       reason = `Not enough ${short.join(', ')}.`;
     }
-    notify(`⚠️ ${reason}`, 'danger');
+    notify(`⚠️ ${reason}`, 'danger', { chronicle: false });
   }
   return false;
 }

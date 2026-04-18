@@ -57,8 +57,13 @@ export function notify(text, type = 'info', meta = {}) {
   if (G.notificationLog.length > 50) G.notificationLog.shift();
 
   // ── Chronicle (story log) — only notable event/danger/mission ──
+  // Loop 15 (render S3): deep-play found "Tile already occupied" showing up
+  // in the chronicle as a "raid" entry because the type=='danger' → tag='raid'
+  // map was too coarse. UI warnings (placement failures, etc.) shouldn't
+  // pollute story history. Callers can now pass `meta.chronicle = false` to
+  // keep a message in the notification log / toast without chronicling it.
   try {
-    if (type === 'event' || type === 'danger' || type === 'mission') {
+    if (meta.chronicle !== false && (type === 'event' || type === 'danger' || type === 'mission')) {
       const tagMap = { event:'event', danger:'raid', mission:'milestone' };
       chronicle(text, tagMap[type] || 'misc');
     }
