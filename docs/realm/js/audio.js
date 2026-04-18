@@ -394,6 +394,14 @@ const SEASON_SCALES = {
   winter: [220.00, 246.94, 261.63, 329.63, 349.23, 440.00, 493.88],
 };
 
+// Loop 17 (render S3): music state — track position in scale + phrase to
+// drive harmony decisions. Prior code picked random notes with no musical
+// coherence; now we bias toward melodic steps, occasionally add a fifth
+// below, and punctuate every ~8 notes with a root tonic — giving the
+// ambient synth texture a phrase-like shape.
+let _musicPhraseIdx = 0;
+let _musicLastScaleIdx = 0;
+
 export function tickMusic() {
   if (!musicEnabled || !G.audioCtx) return;
   const ctx = G.audioCtx;
@@ -401,30 +409,53 @@ export function tickMusic() {
   const now = ctx.currentTime;
   if (now < musicScheduled) return;
 
-  // Pick season-specific scale
   const scale = SEASON_SCALES[G.season] || SEASON_SCALES.spring;
-  const freq = scale[Math.floor(Math.random() * scale.length)];
+  // Melodic motion: step within ±2 of the previous note 70% of the time,
+  // free jump 30%. Tonic (index 0) every 8 notes to close a phrase.
+  let scaleIdx;
+  if (_musicPhraseIdx % 8 === 0) {
+    scaleIdx = 0;
+  } else if (Math.random() < 0.7) {
+    const step = Math.floor(Math.random() * 5) - 2; // -2..+2
+    scaleIdx = Math.max(0, Math.min(scale.length - 1, _musicLastScaleIdx + step));
+  } else {
+    scaleIdx = Math.floor(Math.random() * scale.length);
+  }
+  _musicLastScaleIdx = scaleIdx;
+  _musicPhraseIdx++;
+  const freq = scale[scaleIdx];
 
-  // Tempo varies by season: winter slower, summer faster
   const tempoMult = { spring: 1.0, summer: 0.8, autumn: 1.1, winter: 1.4 }[G.season] || 1;
   const noteDur = (1.5 + Math.random() * 1.0) * tempoMult;
+  const master = getMusicMaster() || ctx.destination;
 
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  // Winter uses triangle for colder timbre; summer uses sine
-  osc.type = G.season === 'winter' ? 'triangle' : 'sine';
-  osc.frequency.setValueAtTime(freq, now);
-  osc.connect(gain);
-  gain.connect(getMusicMaster() || ctx.destination);
+  const playTone = (f, type, peak, dur) => {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f, now);
+    o.connect(g); g.connect(master);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(peak, now + 0.3);
+    g.gain.linearRampToValueAtTime(peak * 0.5, now + dur - 0.3);
+    g.gain.linearRampToValueAtTime(0, now + dur);
+    o.start(now);
+    o.stop(now + dur);
+  };
 
-  // Soft envelope
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(0.04, now + 0.3);
-  gain.gain.linearRampToValueAtTime(0.02, now + noteDur - 0.3);
-  gain.gain.linearRampToValueAtTime(0, now + noteDur);
+  // Lead note
+  playTone(freq, G.season === 'winter' ? 'triangle' : 'sine', 0.04, noteDur);
 
-  osc.start(now);
-  osc.stop(now + noteDur);
+  // Harmony: perfect fifth below on ~30% of notes, slightly softer and
+  // triangle-toned. Adds harmonic depth without doubling the loudness.
+  if (Math.random() < 0.3 && freq > 200) {
+    playTone(freq * (2 / 3), 'triangle', 0.022, noteDur * 0.9);
+  }
+
+  // Phrase-closing tonic gets an octave-up shimmer (summer only — warmer)
+  if (_musicPhraseIdx % 8 === 1 && G.season === 'summer') {
+    playTone(freq * 2, 'sine', 0.018, noteDur * 0.6);
+  }
 
   musicScheduled = now + noteDur * 0.7;
 }
