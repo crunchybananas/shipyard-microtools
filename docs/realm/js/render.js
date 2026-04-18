@@ -2423,7 +2423,7 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'tradingpost': drawTradingPost(ctx, s, b); break;
     case 'castle': drawCastle(ctx, s); break;
     case 'granary': drawGranary(ctx, s); break;
-    case 'church': drawChurch(ctx, s); break;
+    case 'church': drawChurch(ctx, s, b); break;
     case 'school': drawSchool(ctx, s); break;
     case 'windmill': drawWindmill(ctx, s, b); break;
     case 'bakery': drawBakery(ctx, s); break;
@@ -4355,7 +4355,7 @@ function drawGranary(ctx, s) {
   ctx.beginPath(); ctx.arc(s.x - 2.5, s.y - 2.5, 0.7, 0, Math.PI * 2); ctx.fill();
 }
 
-function drawChurch(ctx, s) {
+function drawChurch(ctx, s, b) {
   // Main body — stone wall gradient
   const stoneGrad = ctx.createLinearGradient(s.x, s.y-26, s.x, s.y-4);
   stoneGrad.addColorStop(0, '#e8e0d8');
@@ -4391,33 +4391,62 @@ function drawChurch(ctx, s) {
   for (let sy = s.y-20; sy < s.y-4; sy += 4) {
     ctx.beginPath(); ctx.moveTo(s.x-10, sy); ctx.lineTo(s.x+10, sy); ctx.stroke();
   }
-  // Detailed stained glass window (multi-color arched)
-  ctx.fillStyle = '#4488cc';
+  // Loop 34 (render S3): stained-glass palette varies per building.
+  // Blue dominant / rose dominant / amber dominant / deep-green monastic.
+  const churchHash = b ? (((b.x * 67 + b.y * 43) & 0xff)) : 0;
+  const glassPalette = [
+    { base: '#4488cc', left: '#cc4444', right: '#ddaa22' }, // classic (original)
+    { base: '#a24a6a', left: '#f0b0c0', right: '#8a3a52' }, // rose
+    { base: '#d09030', left: '#f0c050', right: '#a06010' }, // amber
+    { base: '#3a6a52', left: '#5aa07a', right: '#1a4030' }, // monastic green
+  ][churchHash & 0x3];
+  ctx.fillStyle = glassPalette.base;
   ctx.beginPath();
   ctx.arc(s.x, s.y - 14, 3, Math.PI, 0);
   ctx.lineTo(s.x + 3, s.y - 9);
   ctx.lineTo(s.x - 3, s.y - 9);
   ctx.closePath();
   ctx.fill();
-  // Red pane left, gold pane right
-  ctx.fillStyle = '#cc4444';
+  ctx.fillStyle = glassPalette.left;
   ctx.beginPath();
   ctx.arc(s.x - 1, s.y - 14, 1.5, Math.PI, 0);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#ddaa22';
+  ctx.fillStyle = glassPalette.right;
   ctx.beginPath();
   ctx.arc(s.x + 1, s.y - 14, 1.5, Math.PI, 0);
   ctx.closePath();
   ctx.fill();
-  // Small bell inside steeple opening
-  ctx.fillStyle = '#c8a030';
-  ctx.beginPath();
-  ctx.arc(s.x, s.y - 36, 2, 0, Math.PI);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#a08020';
-  ctx.fillRect(s.x - 0.5, s.y - 35, 1, 2);
+  // Steeple top ornament — bell (most common), weathervane, or small statue.
+  const topOrnament = (churchHash >> 2) & 0x3;
+  if (topOrnament === 0 || topOrnament === 1) {
+    // Bell (two of the four slots — most common)
+    ctx.fillStyle = '#c8a030';
+    ctx.beginPath(); ctx.arc(s.x, s.y - 36, 2, 0, Math.PI); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#a08020';
+    ctx.fillRect(s.x - 0.5, s.y - 35, 1, 2);
+  } else if (topOrnament === 2) {
+    // Weathervane — rooster silhouette on a horizontal arrow
+    ctx.strokeStyle = '#6a4820'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(s.x - 2, s.y - 36); ctx.lineTo(s.x + 2, s.y - 36); ctx.stroke();
+    ctx.fillStyle = '#6a4820';
+    ctx.beginPath();
+    ctx.moveTo(s.x + 2, s.y - 36); ctx.lineTo(s.x + 3.5, s.y - 37); ctx.lineTo(s.x + 3.5, s.y - 35);
+    ctx.closePath(); ctx.fill();
+    // Tiny rooster blob
+    ctx.beginPath();
+    ctx.ellipse(s.x - 0.5, s.y - 37.5, 1.2, 0.9, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(s.x - 1, s.y - 38.5, 0.5, 1);
+  } else {
+    // Small saint statue — rectangular body + round head
+    ctx.fillStyle = '#b0a898';
+    ctx.fillRect(s.x - 1, s.y - 37, 2, 3);
+    ctx.beginPath(); ctx.arc(s.x, s.y - 38, 1.1, 0, Math.PI * 2); ctx.fill();
+    // Raised arms
+    ctx.strokeStyle = '#b0a898'; ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(s.x - 1, s.y - 36); ctx.lineTo(s.x - 2, s.y - 37.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(s.x + 1, s.y - 36); ctx.lineTo(s.x + 2, s.y - 37.5); ctx.stroke();
+  }
   // Subtle warm glow on lower wall (interior light leaking out)
   const churchWarmGlow = ctx.createLinearGradient(s.x, s.y - 8, s.x, s.y - 4);
   churchWarmGlow.addColorStop(0, 'rgba(255, 220, 150, 0)');
