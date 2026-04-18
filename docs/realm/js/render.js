@@ -960,7 +960,7 @@ export function render() {
     // Lean into walk direction — body + head shift slightly forward
     const walkLean = isMoving ? faceScreenX * 0.9 : 0;
     const headX = s.x + faceScreenX * 0.5 + walkLean * 0.4;
-    const headY = cy - 20;
+    const headY = cy - 19;  // Loop 1 (render S3): dropped 1px so jaw overlaps body top, kills the "severed head" read
 
     // Job color — vibrant saturated palette so citizens stand out
     let bodyColor = '#8899bb';
@@ -1057,19 +1057,21 @@ export function render() {
     ctx.fill(); ctx.stroke();
 
     // Neck stub — bridging body to head, X averaged between body and head positions
+    // Loop 1 (render S3): widened 2.2×2.6 → 3.0×3.0 so neck is 45% of head width
+    // (was 35%) — less "ball on a bottle"; and top extends past head bottom to overlap
     ctx.fillStyle = skinColor;
     ctx.beginPath();
-    ctx.ellipse((bodyX + headX) * 0.5, cy - 15.5, 2.2, 2.6, bodyTilt, 0, Math.PI * 2);
+    ctx.ellipse((bodyX + headX) * 0.5, cy - 15, 3.0, 3.0, bodyTilt, 0, Math.PI * 2);
     ctx.fill();
 
     // Head — large for chibi proportions (oversized head = cute, scaled ~1.4x)
+    // Loop 1 (render S3): dropped the dark head outline. The full-circumference
+    // rgba(10,5,0,0.55) stroke at the jawline read as a literal gap between head
+    // and neck (the "severed" look). Silhouette holds from skin-vs-body contrast.
     ctx.fillStyle = skinColor;
     ctx.beginPath();
     ctx.arc(headX, headY, 6.3, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(10,5,0,0.55)';
-    ctx.lineWidth = 1.0;
-    ctx.stroke();
 
     // Hair — vibrant colors, cap shifts based on facing direction
     // When facing away, hair sits on the camera-visible (back) side of the head.
@@ -1094,35 +1096,39 @@ export function render() {
     ctx.stroke();
 
     // Face — eyes and mouth on facing side, hidden when facing away
+    // Loop 1 (render S3): widened eye spacing ±1.7 → ±2.0 and shrank whites 1.6 → 1.3;
+    // prior config had inner edges at ±0.1 so the whites touched at centerline, making
+    // the face read as "goggles" at zoom ≥2. Now inner edges sit ~0.7px apart.
     if (!facingAway && G.camera.zoom >= 0.8) {
       const eyeX = headX + faceScreenX * 0.8;
-      // Eye whites — slightly larger so they read at default zoom
+      const eyeDX = 2.0;
+      // Eye whites
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7, headY + 0.7, 1.6, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.7, headY + 0.7, 1.6, 0, Math.PI * 2);
+      ctx.arc(eyeX - eyeDX, headY + 0.7, 1.3, 0, Math.PI * 2);
+      ctx.arc(eyeX + eyeDX, headY + 0.7, 1.3, 0, Math.PI * 2);
       ctx.fill();
       // Pupils
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7, headY + 0.7, 1.1, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.7, headY + 0.7, 1.1, 0, Math.PI * 2);
+      ctx.arc(eyeX - eyeDX, headY + 0.7, 0.9, 0, Math.PI * 2);
+      ctx.arc(eyeX + eyeDX, headY + 0.7, 0.9, 0, Math.PI * 2);
       ctx.fill();
       // Pupil glint — tiny white highlight dot for liveliness
       ctx.fillStyle = 'rgba(255,255,255,0.75)';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7 - 0.3, headY + 0.7 - 0.4, 0.45, 0, Math.PI * 2);
-      ctx.arc(eyeX + 1.7 - 0.3, headY + 0.7 - 0.4, 0.45, 0, Math.PI * 2);
+      ctx.arc(eyeX - eyeDX - 0.25, headY + 0.7 - 0.35, 0.4, 0, Math.PI * 2);
+      ctx.arc(eyeX + eyeDX - 0.25, headY + 0.7 - 0.35, 0.4, 0, Math.PI * 2);
       ctx.fill();
       // Eyebrows — thin arcs above each eye, give expression even at small size
       ctx.strokeStyle = 'rgba(55,28,8,0.75)';
       ctx.lineWidth = 0.85;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.arc(eyeX - 1.7, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.arc(eyeX - eyeDX, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
       ctx.stroke();
       ctx.beginPath();
-      ctx.arc(eyeX + 1.7, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.arc(eyeX + eyeDX, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
       ctx.stroke();
     }
     // Mouth — gentle smile curve, only at closer zoom
