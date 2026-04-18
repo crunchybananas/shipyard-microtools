@@ -980,7 +980,12 @@ export function render() {
 
   for (const c of G.citizens) {
     const s = toScreen(c.x, c.y);
-    ctx.globalAlpha = daylight;
+    // Loop 52 (render S4): citizens stay readable at night. Prior alpha was
+    // plain `daylight`, so at night (daylight ~0.5) they dimmed to half —
+    // players couldn't see their villagers moving around after dark.
+    // Floor citizen alpha at 0.85 so they remain legible; the scene still
+    // reads as night via dim tiles/buildings and the warm-window glow.
+    ctx.globalAlpha = Math.max(0.85, daylight);
 
     // Walking bob when moving — smooth sine, reduced amplitude.
     // Idle citizens still get a small breathing bob so they don't look frozen.
