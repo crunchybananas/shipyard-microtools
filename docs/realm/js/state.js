@@ -6,14 +6,18 @@ export const TILE = { WATER:0, SAND:1, GRASS:2, FOREST:3, STONE:4, IRON:5, MOUNT
 export const TW = 64, TH = 32;
 export const MAP_W = 80, MAP_H = 80;
 
+// Loop 45 (render S4): tightened the per-tile two-color alternation so
+// the checkerboard pulse is less visible. Deltas were 8-16pt which read
+// as a visible iso-diamond grid overlaid on every field. Now ≤4pt —
+// same base tone with a subtle darker cousin.
 export const TILE_COLORS = {
-  [TILE.WATER]:   ['#1872b8','#1260a8'],
-  [TILE.SAND]:    ['#e8c87a','#ddb870'],
-  [TILE.GRASS]:   ['#4da854','#459a4a'],
-  [TILE.FOREST]:  ['#2d7a35','#256e2d'],
-  [TILE.STONE]:   ['#9a9490','#8a8480'],
-  [TILE.IRON]:    ['#5a85b8','#4e78aa'],
-  [TILE.MOUNTAIN]:['#6a6a7a','#5e5e6e'],
+  [TILE.WATER]:   ['#1872b8','#1668b0'],
+  [TILE.SAND]:    ['#e4c478','#dec074'],
+  [TILE.GRASS]:   ['#4aa352','#479d4e'],
+  [TILE.FOREST]:  ['#2d7a35','#2a7432'],
+  [TILE.STONE]:   ['#9a9490','#948e8a'],
+  [TILE.IRON]:    ['#5a85b8','#547fb2'],
+  [TILE.MOUNTAIN]:['#6a6a7a','#656575'],
 };
 
 export const BUILDINGS = {
