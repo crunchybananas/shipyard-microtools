@@ -932,22 +932,63 @@ export function renderFlocks(ctx, logicalW, logicalH) {
   const t = G.dayPhase / G.dayLength;
   const isDawnDusk = (t > 0.05 && t < 0.22) || (t > 0.58 && t < 0.82);
   ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   for (const f of G.flocks) {
-    // Silhouette dark against sky, slight orange tint at dusk
-    ctx.strokeStyle = isDawnDusk ? 'rgba(40,25,15,0.85)' : 'rgba(30,30,40,0.7)';
-    ctx.lineWidth = 1.3;
+    // Loop 79 (render S4): proper V-formation bird silhouettes.
+    // Prior pass drew each bird as a flat 10px checkmark with all birds
+    // flapping in a k*0.6 phase wave — read as "notches in the sky" not
+    // birds. Changes:
+    //   (1) Tighter V geometry: 15px rank step × 7px vertical spread
+    //       → 50° total V angle (geese are 45–60°).
+    //   (2) Bird anatomy: small body line + curved wings via
+    //       quadraticCurveTo so up-stroke bends at the shoulder (was a
+    //       straight moveTo→lineTo→lineTo kink).
+    //   (3) Rank-based flap phase — flock ripple travels from leader
+    //       back through the V rather than all birds beating in a
+    //       k-offset wave. Looks like a real squadron.
+    //   (4) Leader 1.3× larger, slight brighter stroke — eye picks up
+    //       the point of the V first.
+    //   (5) Wing tips lag behind shoulder on up-stroke via a second
+    //       curve control — cheap but reads as air resistance.
+    const baseColor = isDawnDusk ? 'rgba(40,25,15,0.88)' : 'rgba(30,30,40,0.72)';
+    const leaderColor = isDawnDusk ? 'rgba(30,18,10,0.95)' : 'rgba(22,22,32,0.88)';
     const dir = f.vx >= 0 ? 1 : -1;
+    const rankStep = 15;
+    const rankSpread = 7;
     for (let k = 0; k < f.count; k++) {
-      // V formation: two rows fanning back
-      const row = k === 0 ? 0 : (k % 2 === 1 ? 1 : -1);
-      const idx = Math.ceil(k / 2);
-      const bx = f.x - dir * idx * 14;
-      const by = f.y + row * idx * 6;
-      const wing = Math.sin(G.gameTick * 0.35 + k * 0.6) * 4;
+      const rank = Math.ceil(k / 2);
+      const side = k === 0 ? 0 : (k % 2 === 1 ? 1 : -1);
+      const bx = f.x - dir * rank * rankStep;
+      const by = f.y + side * rank * rankSpread;
+      // Rank-based phase — flap wave travels from leader backward
+      const flap = Math.sin(G.gameTick * 0.32 - rank * 0.55) * 4;
+      // Wing tips lag on up-stroke — derivative of flap, soft cap
+      const lag = Math.cos(G.gameTick * 0.32 - rank * 0.55) * -1.2;
+      const size = k === 0 ? 1.3 : 1.0;
+      const wingSpan = 6 * size;
+      const bodyLen = 2.4 * size;
+      ctx.strokeStyle = k === 0 ? leaderColor : baseColor;
+      // Body — short oriented line
+      ctx.lineWidth = 1.5 * size;
       ctx.beginPath();
-      ctx.moveTo(bx - 5 * dir, by + wing);
-      ctx.lineTo(bx, by);
-      ctx.lineTo(bx + 5 * dir, by + wing);
+      ctx.moveTo(bx - bodyLen * dir * 0.7, by);
+      ctx.lineTo(bx + bodyLen * dir * 0.7, by);
+      ctx.stroke();
+      // Wings — curved silhouette, tips drop on down-stroke
+      ctx.lineWidth = 1.25 * size;
+      ctx.beginPath();
+      // Left wing
+      ctx.moveTo(bx - wingSpan * dir, by + flap);
+      ctx.quadraticCurveTo(
+        bx - wingSpan * 0.5 * dir, by - 1.5 + lag,
+        bx, by - 0.3
+      );
+      // Right wing
+      ctx.quadraticCurveTo(
+        bx + wingSpan * 0.5 * dir, by - 1.5 + lag,
+        bx + wingSpan * dir, by + flap
+      );
       ctx.stroke();
     }
   }
