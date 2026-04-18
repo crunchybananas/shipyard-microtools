@@ -32,11 +32,16 @@ function pathTo(c, tx, ty) {
   }
 }
 
-// Loop 3 (render S3): citizens respect each other. Per-frame soft separation
-// force — pairs within PERSONAL_SPACE tiles push apart a small amount so
-// they don't stack on the same target tile. Skips tiles that aren't walkable
-// (water, mountain) so separation can't eject a citizen into the void.
-const PERSONAL_SPACE = 0.75;
+// Loop 3 → Loop 7 (render S3): citizens respect each other, but don't get
+// stuck. User-reported bug after L3: citizens could freeze in place because
+// separation fought their movement. Now:
+//   - Both-moving pairs: no separation (they'll walk past each other on paths).
+//   - Mixed pairs (one moving, one idle): 40% strength on the moving citizen,
+//     full on the idle one.
+//   - Both-idle pairs: full strength.
+// Also shrank PERSONAL_SPACE 0.75 → 0.55 — 0.75 was knocking pathing citizens
+// off their waypoints even before the stuck bug manifested.
+const PERSONAL_SPACE = 0.55;
 const SEP_STRENGTH = 0.22;
 
 function tileWalkable(x, y) {
@@ -46,20 +51,27 @@ function tileWalkable(x, y) {
   return t !== TILE.WATER && t !== TILE.MOUNTAIN;
 }
 
+function isActivelyMoving(c) {
+  return c.path && c.pathIdx < c.path.length;
+}
+
 function applyCitizenSeparation() {
   const cs = G.citizens;
   const r2 = PERSONAL_SPACE * PERSONAL_SPACE;
   for (let i = 0; i < cs.length; i++) {
     const a = cs[i];
+    const aMoving = isActivelyMoving(a);
     for (let j = i + 1; j < cs.length; j++) {
       const b = cs[j];
+      const bMoving = isActivelyMoving(b);
+      // Both moving: skip — path following handles de-stacking naturally and
+      // separation would knock them off waypoints (the stuck-citizens bug).
+      if (aMoving && bMoving) continue;
       const dx = a.x - b.x, dy = a.y - b.y;
       const d2 = dx * dx + dy * dy;
       if (d2 >= r2) continue;
       let nx, ny, d;
       if (d2 < 0.0004) {
-        // Perfectly stacked — pick a deterministic but distinct break direction
-        // so pairs peel off radially instead of jittering in place.
         const angle = (i * 37 + j * 53) % 360 * Math.PI / 180;
         nx = Math.cos(angle);
         ny = Math.sin(angle);
@@ -69,14 +81,14 @@ function applyCitizenSeparation() {
         nx = dx / d;
         ny = dy / d;
       }
-      // Linear falloff scaled by strength — stronger push than before so
-      // multi-citizen pile-ups (raid survivors, pub-quitting crowds) actually
-      // spread instead of stabilizing in a tight huddle.
-      const push = ((PERSONAL_SPACE - d) / PERSONAL_SPACE) * SEP_STRENGTH;
-      const ax = a.x + nx * push * 0.5;
-      const ay = a.y + ny * push * 0.5;
-      const bx = b.x - nx * push * 0.5;
-      const by = b.y - ny * push * 0.5;
+      const baseP = ((PERSONAL_SPACE - d) / PERSONAL_SPACE) * SEP_STRENGTH;
+      // Moving citizen gets less push so their path isn't derailed.
+      const aWeight = aMoving ? 0.4 : 1.0;
+      const bWeight = bMoving ? 0.4 : 1.0;
+      const ax = a.x + nx * baseP * 0.5 * aWeight;
+      const ay = a.y + ny * baseP * 0.5 * aWeight;
+      const bx = b.x - nx * baseP * 0.5 * bWeight;
+      const by = b.y - ny * baseP * 0.5 * bWeight;
       if (tileWalkable(ax, ay)) { a.x = ax; a.y = ay; }
       if (tileWalkable(bx, by)) { b.x = bx; b.y = by; }
     }
