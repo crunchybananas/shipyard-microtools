@@ -1257,28 +1257,27 @@ export function render() {
     // Loop 1 (render S3): widened eye spacing ±1.7 → ±2.0 and shrank whites 1.6 → 1.3;
     // prior config had inner edges at ±0.1 so the whites touched at centerline, making
     // the face read as "goggles" at zoom ≥2. Now inner edges sit ~0.7px apart.
+    // Loop 47 (render S4): dot-eyes instead of white-eyes. Prior whites
+    // radius 1.3 with pupils 0.9 left a ~0.4px white ring around each
+    // pupil that read as spectacles, especially at zoom 5+. Now: dark
+    // dots directly on skin with a tiny single-pixel white glint.
+    // Classic cute-character eye treatment (Peanuts/Sanrio).
     if (!facingAway && G.camera.zoom >= 0.8) {
       const eyeX = headX + faceScreenX * 0.8;
       const eyeDX = 2.0;
-      // Eye whites
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.beginPath();
-      ctx.arc(eyeX - eyeDX, headY + 0.7, 1.3, 0, Math.PI * 2);
-      ctx.arc(eyeX + eyeDX, headY + 0.7, 1.3, 0, Math.PI * 2);
-      ctx.fill();
-      // Pupils
+      // Solid dark eye dots
       ctx.fillStyle = '#2a1a0a';
       ctx.beginPath();
-      ctx.arc(eyeX - eyeDX, headY + 0.7, 0.9, 0, Math.PI * 2);
-      ctx.arc(eyeX + eyeDX, headY + 0.7, 0.9, 0, Math.PI * 2);
+      ctx.arc(eyeX - eyeDX, headY + 0.7, 1.2, 0, Math.PI * 2);
+      ctx.arc(eyeX + eyeDX, headY + 0.7, 1.2, 0, Math.PI * 2);
       ctx.fill();
-      // Pupil glint — tiny white highlight dot for liveliness
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      // Single bright glint upper-left of each eye (lively highlight)
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.beginPath();
-      ctx.arc(eyeX - eyeDX - 0.25, headY + 0.7 - 0.35, 0.4, 0, Math.PI * 2);
-      ctx.arc(eyeX + eyeDX - 0.25, headY + 0.7 - 0.35, 0.4, 0, Math.PI * 2);
+      ctx.arc(eyeX - eyeDX - 0.4, headY + 0.7 - 0.4, 0.35, 0, Math.PI * 2);
+      ctx.arc(eyeX + eyeDX - 0.4, headY + 0.7 - 0.4, 0.35, 0, Math.PI * 2);
       ctx.fill();
-      // Eyebrows — thin arcs above each eye, give expression even at small size
+      // Eyebrows — thin arcs above each eye
       ctx.strokeStyle = 'rgba(55,28,8,0.75)';
       ctx.lineWidth = 0.85;
       ctx.lineCap = 'round';
