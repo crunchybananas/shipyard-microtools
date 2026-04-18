@@ -1114,6 +1114,16 @@ export function render() {
       ctx.arc(eyeX - 1.7 - 0.3, headY + 0.7 - 0.4, 0.45, 0, Math.PI * 2);
       ctx.arc(eyeX + 1.7 - 0.3, headY + 0.7 - 0.4, 0.45, 0, Math.PI * 2);
       ctx.fill();
+      // Eyebrows — thin arcs above each eye, give expression even at small size
+      ctx.strokeStyle = 'rgba(55,28,8,0.75)';
+      ctx.lineWidth = 0.85;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(eyeX - 1.7, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(eyeX + 1.7, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
     }
     // Mouth — gentle smile curve, only at closer zoom
     if (!facingAway && G.camera.zoom >= 1.5) {
