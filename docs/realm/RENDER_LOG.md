@@ -105,6 +105,13 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 
 Total commits on main: 80+. RENDER_LOG.md tracks every loop with challenge/evidence/verdict.
 
+## Post-S3 continued iteration
+
+| Loop | Improvement | Challenge | Evidence | Verdict |
+|------|-------------|-----------|----------|---------|
+| 41 | **People graphics rebuild** per user feedback ("I think you can do better"). Close inspection showed body bottom and feet touched — citizens were floating torsos with glued-on shoes, no legs. Arm stubs (2.3×2.0) read as shoulder bumps. Rebuild: added 2 vertical pants-leg rectangles (counter-phase stride), moved feet down 1.5px, replaced arm-stubs with elongated 1.6×3.8 hanging ovals + skin-tone hand dots at arm ends, split body into two overlapping ellipses for shoulder-waist taper. | Looked at zoom 4-5 critically: what's actually wrong? Answer: no legs, tiny arms, head-body height ratio was 1:1 | realm_s3_loop41_people_v2.jpg — citizens at zoom 5, 5+ visible with clear pants/arms/hands/torso silhouette | KEEP. Citizens now read as people, not bobbleheads. |
+
+
 
 
 

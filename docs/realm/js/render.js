@@ -1093,46 +1093,92 @@ export function render() {
       continue;
     }
 
-    // Feet — small ovals, subtle step offset when walking (scaled ~1.4x)
-    const step = isMoving ? Math.sin(G.gameTick * 0.25 + c.x * 3) * 1.5 : 0;
-    ctx.fillStyle = '#4a3a2a';
+    // Loop 41 (render S3 revisited): rebuilt the citizen silhouette so
+    // they have actual LEGS between body and feet, and proper arms instead
+    // of shoulder stubs. Prior layout had body-bottom (cy-0.6) and feet
+    // (cy-1) touching, so citizens read as floating torsos.
+    //
+    // New stack, bottom-up:
+    //   Feet: cy+1 (below old position to clear room)
+    //   Legs: 2 thin vertical rectangles from cy+1 to cy-4 (pants color)
+    //   Body: ellipse centered at cy-9 (moved up 1px), 5.2×6.6
+    //   Arms: elongated ovals from cy-10 to cy-5, slight outward angle
+    //   Head: unchanged (cy-19, r=6.3)
+    const step = isMoving ? Math.sin(G.gameTick * 0.25 + phaseOffset) * 1.5 : 0;
+    const pantsColor = '#3a2618';  // dark brown trousers
+
+    // Legs — 2 thin rectangles with step offset for walk animation
+    ctx.fillStyle = pantsColor;
+    const legL_x = s.x - 2.0 - step * 0.2;
+    const legR_x = s.x + 2.0 + step * 0.2;
+    // Slight walk-cycle bend — legs shorten/lengthen in counter-phase
+    const legL_len = 5 + (isMoving ? step * 0.3 : 0);
+    const legR_len = 5 - (isMoving ? step * 0.3 : 0);
+    ctx.fillRect(legL_x - 1.2, cy - 1 - legL_len, 2.4, legL_len);
+    ctx.fillRect(legR_x - 1.2, cy - 1 - legR_len, 2.4, legR_len);
+    // Leg highlight (left edge catch-light)
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(legL_x - 1.2, cy - 1 - legL_len, 0.6, legL_len);
+    ctx.fillRect(legR_x - 1.2, cy - 1 - legR_len, 0.6, legR_len);
+
+    // Feet — shoes, shifted down by 1px so they sit below legs
+    ctx.fillStyle = '#2a1a10';
     ctx.beginPath();
-    ctx.ellipse(s.x - 2.8 - step * 0.3, cy - 1, 2.8, 1.7, 0, 0, Math.PI * 2);
+    ctx.ellipse(legL_x, cy + 0.5, 2.6, 1.6, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(s.x + 2.8 + step * 0.3, cy - 1, 2.8, 1.7, 0, 0, Math.PI * 2);
+    ctx.ellipse(legR_x, cy + 0.5, 2.6, 1.6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body — rounded pill shape with walk lean and shadow side (scaled ~1.4x)
+    // Body — torso ellipse, slightly tapered (shoulders wider than waist).
+    // Draw as two overlapping ellipses for subtle taper without bespoke
+    // path code.
     const bodyX = s.x + walkLean * 0.35;
-    const bodyTilt = walkLean * 0.055; // slight tilt in walk direction
+    const bodyTilt = walkLean * 0.055;
     ctx.fillStyle = bodyColor;
+    // Lower body (narrower waist)
     ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 8, 5.4, 7.4, bodyTilt, 0, Math.PI * 2);
+    ctx.ellipse(bodyX, cy - 7, 4.6, 4.5, bodyTilt, 0, Math.PI * 2);
     ctx.fill();
-    // Shadow side (lower-right crescent for depth)
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    // Upper body (broader shoulders)
     ctx.beginPath();
-    ctx.ellipse(bodyX + 1.5, cy - 7, 4.2, 5.9, bodyTilt, -Math.PI / 2, Math.PI / 2);
+    ctx.ellipse(bodyX, cy - 11, 5.4, 4.2, bodyTilt, 0, Math.PI * 2);
+    ctx.fill();
+    // Shadow side
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    ctx.beginPath();
+    ctx.ellipse(bodyX + 1.6, cy - 8.5, 4.2, 5.3, bodyTilt, -Math.PI / 2, Math.PI / 2);
     ctx.fill();
     ctx.strokeStyle = 'rgba(20,10,0,0.4)';
-    ctx.lineWidth = 0.8;
+    ctx.lineWidth = 0.7;
     ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 8, 5.4, 7.4, bodyTilt, 0, Math.PI * 2);
+    ctx.ellipse(bodyX, cy - 7, 4.6, 4.5, bodyTilt, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(bodyX, cy - 11, 5.4, 4.2, bodyTilt, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Arm stubs — small ovals on body sides, counter-swing to feet when walking
-    // Loop 2: moved inward 7.0 → 6.0 (body is narrower now) and tilted vertical-ish
-    const armSwing = isMoving ? step * 0.45 : 0;
+    // Arms — elongated ovals, one slightly in front of body.
+    // Much more arm-like than the old stubs.
+    const armSwing = isMoving ? step * 0.6 : 0;
     ctx.fillStyle = bodyColor;
     ctx.strokeStyle = 'rgba(20,10,0,0.35)';
     ctx.lineWidth = 0.7;
+    // Left arm (hangs down and out, full shoulder-to-hand length)
     ctx.beginPath();
-    ctx.ellipse(bodyX - 6.0, cy - 9 + armSwing, 2.3, 2.0, Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.ellipse(bodyX - 5.8, cy - 8 + armSwing, 1.6, 3.8, Math.PI * 0.08, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
+    // Right arm
     ctx.beginPath();
-    ctx.ellipse(bodyX + 6.0, cy - 9 - armSwing, 2.3, 2.0, -Math.PI * 0.15, 0, Math.PI * 2);
+    ctx.ellipse(bodyX + 5.8, cy - 8 - armSwing, 1.6, 3.8, -Math.PI * 0.08, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
+    // Hands — small skin-tone dots at the arm bottoms so the eye reads
+    // where the arm ends. Huge silhouette improvement at any zoom.
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.arc(bodyX - 5.8, cy - 4.5 + armSwing, 1.1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bodyX + 5.8, cy - 4.5 - armSwing, 1.1, 0, Math.PI * 2); ctx.fill();
 
     // Neck stub — bridging body to head, X averaged between body and head positions
     // Loop 1 (render S3): widened 2.2×2.6 → 3.0×3.0 so neck is 45% of head width
