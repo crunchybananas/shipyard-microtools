@@ -3654,8 +3654,11 @@ function drawWall(ctx, s, b) {
 }
 
 function drawRoad(ctx, s) {
-  // Full tile coverage for automatic visual connection
-  const hw = 24, hh = 12; // slightly inset from tile edge
+  // Loop 24 (render S3): added wheel ruts (two parallel darker grooves),
+  // lightened cobble density, and mixed cobble sizes/colors so roads read
+  // as trodden paths rather than a uniform stamped texture.
+  const hw = 24, hh = 12;
+  // Base road fill
   ctx.fillStyle = '#8a7a60';
   ctx.beginPath();
   ctx.moveTo(s.x, s.y - hh);
@@ -3664,7 +3667,7 @@ function drawRoad(ctx, s) {
   ctx.lineTo(s.x - hw, s.y);
   ctx.closePath();
   ctx.fill();
-  // Lighter center
+  // Lighter center panel (sun-baked center)
   ctx.fillStyle = '#a09078';
   const hw2 = 16, hh2 = 8;
   ctx.beginPath();
@@ -3674,14 +3677,36 @@ function drawRoad(ctx, s) {
   ctx.lineTo(s.x - hw2, s.y);
   ctx.closePath();
   ctx.fill();
-  // Cobblestone dots
-  ctx.fillStyle = 'rgba(0,0,0,0.08)';
-  for (let i = -2; i <= 2; i++) {
-    for (let j = -1; j <= 1; j++) {
-      ctx.beginPath();
-      ctx.arc(s.x + i*6, s.y + j*4, 1.2, 0, Math.PI*2);
-      ctx.fill();
-    }
+  // Wheel ruts — two faint grooves running diagonally along the iso axes
+  ctx.strokeStyle = 'rgba(60,45,25,0.22)';
+  ctx.lineWidth = 1.2;
+  for (const off of [-3, 3]) {
+    ctx.beginPath();
+    ctx.moveTo(s.x - hw2 + 1, s.y + off * 0.5);
+    ctx.lineTo(s.x + hw2 - 1, s.y + off * 0.5);
+    ctx.stroke();
+  }
+  // Cobblestones — mixed sizes + tones
+  const cobbles = [
+    {dx: -12, dy: 0, r: 1.6, a: 0.14},
+    {dx: -6, dy: -2, r: 1.1, a: 0.10},
+    {dx: -4, dy: 3, r: 1.4, a: 0.12},
+    {dx: 2, dy: -3, r: 1.2, a: 0.11},
+    {dx: 4, dy: 2, r: 1.5, a: 0.13},
+    {dx: 9, dy: -1, r: 1.0, a: 0.09},
+    {dx: 12, dy: 2, r: 1.3, a: 0.11},
+    {dx: 0, dy: 4, r: 0.9, a: 0.09},
+  ];
+  for (const c of cobbles) {
+    ctx.fillStyle = `rgba(0,0,0,${c.a})`;
+    ctx.beginPath();
+    ctx.arc(s.x + c.dx, s.y + c.dy, c.r, 0, Math.PI * 2);
+    ctx.fill();
+    // Small lighter edge on top-left of each for relief
+    ctx.fillStyle = `rgba(255,255,255,${c.a * 0.45})`;
+    ctx.beginPath();
+    ctx.arc(s.x + c.dx - 0.4, s.y + c.dy - 0.4, c.r * 0.45, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
