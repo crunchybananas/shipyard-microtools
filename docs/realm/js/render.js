@@ -980,12 +980,12 @@ export function render() {
 
   for (const c of G.citizens) {
     const s = toScreen(c.x, c.y);
-    // Loop 52 (render S4): citizens stay readable at night. Prior alpha was
-    // plain `daylight`, so at night (daylight ~0.5) they dimmed to half —
-    // players couldn't see their villagers moving around after dark.
-    // Floor citizen alpha at 0.85 so they remain legible; the scene still
-    // reads as night via dim tiles/buildings and the warm-window glow.
     ctx.globalAlpha = Math.max(0.85, daylight);
+    // Loop 71 (render S4): damage flash. When c.hurtTimer > 0 (set by
+    // combat code when a citizen takes damage), render a brief red tint
+    // over the full body region via a radial gradient. Timer ticks down
+    // in citizens.js so it fades over ~200ms at 1x speed.
+    const hurtAlpha = c.hurtTimer > 0 ? Math.min(0.6, c.hurtTimer / 12 * 0.6) : 0;
 
     // Walking bob when moving — smooth sine, reduced amplitude.
     // Idle citizens still get a small breathing bob so they don't look frozen.
@@ -1486,6 +1486,19 @@ export function render() {
         ctx.fill();
       }
     } // end zoom >= 0.7
+
+    // Loop 71 (render S4): damage flash overlay — red radial gradient on
+    // body + head when hurtTimer > 0. Drawn after body so it tints, fades
+    // with the timer. Used for combat hits.
+    if (hurtAlpha > 0) {
+      const hurtGrad = ctx.createRadialGradient(s.x, cy - 10, 2, s.x, cy - 10, 12);
+      hurtGrad.addColorStop(0, `rgba(255, 60, 60, ${hurtAlpha})`);
+      hurtGrad.addColorStop(1, `rgba(255, 60, 60, 0)`);
+      ctx.fillStyle = hurtGrad;
+      ctx.beginPath();
+      ctx.arc(s.x, cy - 10, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     // Hover ring — iso-flat ellipse at feet, gold.
     // Loop 58 (render S4): was a 10px circle at chest height. Matched the

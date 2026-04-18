@@ -75,6 +75,10 @@ export function updateEnemies() {
       if (d > 2.5) continue;
       // Citizen takes 0.3 dmg/frame when within 2.5 tiles of an enemy
       c.hp = (c.hp !== undefined ? c.hp : 100) - 0.3 * G.speed;
+      // Loop 71 (render S4): set a hurt timer so the renderer can flash the
+      // citizen red briefly. Refresh on each damage tick so continuous harm
+      // reads as a sustained flash rather than stuttering.
+      c.hurtTimer = 12;
       // Flee behavior: set target away from enemy toward map center
       if (!c._fleeing || G.gameTick % 20 === 0) {
         c._fleeing = true;
@@ -135,6 +139,7 @@ export function updateProjectiles() {
       // Hit target
       if (p.target && p.target.hp !== undefined) {
         p.target.hp -= p.damage;
+        p.target.hurtTimer = 12;
         if (G.gameTick % 10 === 0) playSound('combat');
         // Loop 67 (render S4): dedicated impact burst on projectile hit.
         // 5 small white sparks radiating from the impact point, fade fast.

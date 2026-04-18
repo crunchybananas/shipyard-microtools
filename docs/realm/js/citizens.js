@@ -96,6 +96,10 @@ function applyCitizenSeparation() {
 }
 
 export function updateCitizens() {
+  // Loop 71 (render S4): decrement hurtTimer each sim tick so the flash fades.
+  for (const c of G.citizens) {
+    if (c.hurtTimer > 0) c.hurtTimer -= G.speed;
+  }
   for (const c of G.citizens) {
     // Track tile wear — citizens walking over tiles gradually create dirt paths
     const _wx = Math.round(c.x), _wy = Math.round(c.y);

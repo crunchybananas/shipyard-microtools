@@ -108,7 +108,10 @@ export function updateSoldiers() {
       if (enemyAttackTimer <= 0 && d < 1.0) {
         nearestEnemy.attackTimer = 50;
         s.hp -= 3;
+        s.hurtTimer = 12;
       }
+      // Also flash enemy when soldier damaged them above
+      if (s.attackTimer === 40) nearestEnemy.hurtTimer = 12;
       continue;
     }
 
