@@ -2352,7 +2352,7 @@ function drawBuilding(ctx, b, s, daylight) {
 
   switch (b.type) {
     case 'house': drawHouse(ctx, s, b); break;
-    case 'farm': drawFarm(ctx, s); break;
+    case 'farm': drawFarm(ctx, s, b); break;
     case 'lumber': drawLumber(ctx, s); break;
     case 'quarry': drawQuarry(ctx, s); break;
     case 'mine': drawMine(ctx, s); break;
@@ -2606,7 +2606,7 @@ function drawHouse(ctx, s, b) {
   ctx.fillRect(chimneyX - 1, s.y - 36, 6, 2);
 }
 
-function drawFarm(ctx, s) {
+function drawFarm(ctx, s, b) {
   // --- Ground base — flat tilled earth diamond ---
   ctx.fillStyle = '#3d2408';
   ctx.beginPath();
@@ -2641,31 +2641,81 @@ function drawFarm(ctx, s) {
   ctx.lineTo(s.x + 13, s.y - 1);
   ctx.stroke();
 
-  // --- Crops: alternate green (growing) and golden (ripe) columns ---
+  // --- Crops: alternate columns. Loop 19 (render S3): crop TYPE varies per
+  // farm via position hash so different farms show different crops. Types:
+  // 0 wheat (green stems + golden heads, current), 1 pumpkins (orange
+  // ground fruit), 2 corn (tall yellow-green stalks with tassels), 3 flax
+  // (thin blue-flower stems).
   const cropCols = [-10, -5, 0, 5];
+  const farmHash = b ? (((b.x * 37 + b.y * 53) & 0xff)) : 0;
+  const cropType = farmHash & 0x3;
   for (let ci = 0; ci < cropCols.length; ci++) {
     const cx = s.x + cropCols[ci];
     const isRipe = ci % 2 === 1;
-    ctx.strokeStyle = isRipe ? '#8b7020' : '#3a7a10';
-    ctx.lineWidth = 1;
-    for (let row = -3; row <= 2; row++) {
-      const cy = s.y + row * 2.8;
-      const stemIdx = ci * 6 + (row + 3);
-      const sway = Math.sin((G.gameTick || 0) * 0.05 + stemIdx * 0.3) * 0.4;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy + 1);
-      ctx.lineTo(cx + sway, cy - 3);
-      ctx.stroke();
-      if (isRipe) {
-        ctx.fillStyle = '#d4a017';
-        ctx.fillRect(cx - 1 + sway, cy - 5, 2, 2);
-        ctx.fillStyle = '#c8901a';
+    if (cropType === 0) {
+      // Wheat — original
+      ctx.strokeStyle = isRipe ? '#8b7020' : '#3a7a10';
+      ctx.lineWidth = 1;
+      for (let row = -3; row <= 2; row++) {
+        const cy = s.y + row * 2.8;
+        const stemIdx = ci * 6 + (row + 3);
+        const sway = Math.sin((G.gameTick || 0) * 0.05 + stemIdx * 0.3) * 0.4;
+        ctx.beginPath(); ctx.moveTo(cx, cy + 1); ctx.lineTo(cx + sway, cy - 3); ctx.stroke();
+        ctx.fillStyle = isRipe ? '#d4a017' : '#4db820';
+        ctx.fillRect(cx - (isRipe ? 1 : 2) + sway, cy - 5, isRipe ? 2 : 4, 2);
+        ctx.fillStyle = isRipe ? '#c8901a' : '#3aaa10';
         ctx.fillRect(cx - 1 + sway * 0.5, cy - 3, 2, 1);
-      } else {
-        ctx.fillStyle = '#4db820';
-        ctx.fillRect(cx - 2 + sway, cy - 5, 4, 2);
-        ctx.fillStyle = '#3aaa10';
-        ctx.fillRect(cx - 1 + sway * 0.5, cy - 3, 2, 1);
+      }
+    } else if (cropType === 1) {
+      // Pumpkins — round orange fruit on ground, low vines
+      for (let row = -3; row <= 2; row++) {
+        const cy = s.y + row * 2.8;
+        const stemIdx = ci * 6 + (row + 3);
+        // Small green vine
+        ctx.strokeStyle = '#2a6a10';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath(); ctx.moveTo(cx - 1, cy); ctx.lineTo(cx + 1, cy - 1); ctx.stroke();
+        // Pumpkin ~every 3rd row
+        if ((row + stemIdx) % 3 === 0) {
+          ctx.fillStyle = '#d76b1a';
+          ctx.beginPath(); ctx.ellipse(cx, cy - 1, 2, 1.6, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#3a6a1a';
+          ctx.beginPath(); ctx.moveTo(cx, cy - 2.5); ctx.lineTo(cx + 0.7, cy - 3.5); ctx.stroke();
+        }
+      }
+    } else if (cropType === 2) {
+      // Corn — tall stalks with yellow tassels
+      for (let row = -3; row <= 2; row++) {
+        const cy = s.y + row * 2.8;
+        const stemIdx = ci * 6 + (row + 3);
+        const sway = Math.sin((G.gameTick || 0) * 0.05 + stemIdx * 0.3) * 0.3;
+        // Stalk
+        ctx.strokeStyle = '#6aa224';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx, cy + 1); ctx.lineTo(cx + sway, cy - 6); ctx.stroke();
+        // Leaves
+        ctx.strokeStyle = '#7abb2a';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(cx, cy - 2); ctx.lineTo(cx - 2, cy - 1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + sway, cy - 4); ctx.lineTo(cx + 2, cy - 3); ctx.stroke();
+        // Tassel at top when ripe
+        if (isRipe) {
+          ctx.fillStyle = '#e8d650';
+          ctx.fillRect(cx - 0.6 + sway, cy - 7, 1.4, 1.2);
+        }
+      }
+    } else {
+      // Flax — thin stems with small blue flowers
+      ctx.strokeStyle = '#5a7a3a';
+      ctx.lineWidth = 0.7;
+      for (let row = -3; row <= 2; row++) {
+        const cy = s.y + row * 2.8;
+        const stemIdx = ci * 6 + (row + 3);
+        const sway = Math.sin((G.gameTick || 0) * 0.05 + stemIdx * 0.3) * 0.5;
+        ctx.beginPath(); ctx.moveTo(cx, cy + 1); ctx.lineTo(cx + sway, cy - 4); ctx.stroke();
+        // Little blue flower on top
+        ctx.fillStyle = isRipe ? '#b0c8e8' : '#6a82b8';
+        ctx.fillRect(cx - 0.6 + sway, cy - 5, 1.2, 1.2);
       }
     }
   }
