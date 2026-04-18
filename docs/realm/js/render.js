@@ -2707,7 +2707,11 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.arc(0, glowOffY, glowR, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
-      // Bright window dots
+      // Bright window dots.
+      // Loop 59 (render S4): added night windows for the remaining
+      // inhabitable buildings. Before: only house/tavern/castle/school/
+      // church/barracks lit at night — lumber mill, granary, bakery,
+      // fisherman's hut, blacksmith, market, windmill stayed dark holes.
       ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.9})`;
       if (b.type === 'house') {
         ctx.fillRect(s.x+3, s.y-15, 5, 5);
@@ -2725,6 +2729,29 @@ function drawBuilding(ctx, b, s, daylight) {
         ctx.fill();
       } else if (b.type === 'barracks') {
         ctx.fillRect(s.x-4, s.y-11, 4, 5);
+      } else if (b.type === 'lumber') {
+        ctx.fillRect(s.x-5, s.y-14, 4, 4);
+      } else if (b.type === 'granary') {
+        ctx.fillRect(s.x-3, s.y-13, 6, 4);
+      } else if (b.type === 'bakery') {
+        // Oven + window — warmer orange for oven
+        ctx.fillStyle = `rgba(255,170,70,${glowAlpha * 0.95})`;
+        ctx.fillRect(s.x-4, s.y-10, 4, 4);
+        ctx.fillStyle = `rgba(255,230,150,${glowAlpha * 0.8})`;
+        ctx.fillRect(s.x+3, s.y-14, 4, 4);
+      } else if (b.type === 'fisherman') {
+        ctx.fillRect(s.x-4, s.y-14, 4, 4);
+      } else if (b.type === 'blacksmith') {
+        // Forge already glows — add a small window too
+        ctx.fillRect(s.x+3, s.y-16, 4, 4);
+      } else if (b.type === 'market') {
+        // Lantern at stall — not a window
+        ctx.fillStyle = `rgba(255,190,100,${glowAlpha * 0.9})`;
+        ctx.beginPath();
+        ctx.arc(s.x - 12, s.y - 16, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (b.type === 'windmill') {
+        ctx.fillRect(s.x-2, s.y-18, 4, 4);
       }
       ctx.globalAlpha = 1;
     }
