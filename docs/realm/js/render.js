@@ -2221,10 +2221,21 @@ export function render() {
     ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
 
     if (p.type === 'smoke') {
+      // Loop 68 (render S4): smoke puffs now have an inner core + outer soft
+      // halo for a more volumetric look. Prior was a flat disc.
       const sz = p.size || 2;
-      ctx.fillStyle = `rgba(180,180,200,${ctx.globalAlpha * 0.6})`;
+      const ay = s.y + p.offsetY - 20;
+      ctx.fillStyle = `rgba(200,200,210,${ctx.globalAlpha * 0.25})`;
       ctx.beginPath();
-      ctx.arc(s.x, s.y + p.offsetY - 20, sz, 0, Math.PI * 2);
+      ctx.arc(s.x, ay, sz * 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(180,180,200,${ctx.globalAlpha * 0.5})`;
+      ctx.beginPath();
+      ctx.arc(s.x, ay, sz * 1.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(150,150,170,${ctx.globalAlpha * 0.65})`;
+      ctx.beginPath();
+      ctx.arc(s.x, ay, sz * 0.7, 0, Math.PI * 2);
       ctx.fill();
     } else if (p.type === 'speech') {
       ctx.font = 'bold 8px -apple-system,sans-serif';
