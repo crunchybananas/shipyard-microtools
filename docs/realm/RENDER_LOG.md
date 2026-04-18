@@ -67,6 +67,44 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 37 | Blacksmith forge-fire variants. 6 palette slots: classic amber × 2 (most common), purple-magical, alchemical green, white-hot master, cool blue. Core color pulses per gameTick. Lets late-game settlements feel like they have specialty smiths. | — | — | KEEP. |
 | 38 | Market variants. 4 awning colors (red/blue/green/gold) × 4 goods displays (bread+apples/cloth-bolts/spice-cones/pottery). Bottom stripe matches awning. Each market reads as a different merchant. | — | — | KEEP. |
 | 39 | Richer citizen hover tooltip: optional line 3 (carrying-cargo with emoji OR hungry warning), plus a color-coded hunger bar at the bottom (green→amber→red). | — | (visible when hovering citizens) | KEEP. |
+| 40 | **SESSION 3 FINALE** — 40 loops shipped. Final deep play: force-placed 12 buildings (houses/farms/markets/tavern/church/blacksmith/barracks), pop reached 11/11, 2 soldiers trained, all variant systems rendering simultaneously. | — | realm_s3_loop40_finale.jpg (active village with citizens, soldiers, barracks flag, water shores) | KEEP. Session 3 complete. |
+
+## Session 3 Summary (Loops 1-40)
+
+**Visual polish (2D render):**
+- Fresh-eyes critique resolved: severed heads (L1), water rims (L6), mountain stamps (L2), tree bloom (L8), tile-seam lattice (L13), one-haircut chibi (L9).
+- Citizen polish: head-neck join, eye spacing, body taper, walk bob desync (L1/L2/L4), 4 hair silhouette variants × 4 colors × 4 skin tones, state-driven mouth expressions (L28), richer hover tooltip (L39).
+- Building variants: house roofs (L18), farm crops (L19), lumber tools (L21), tavern signs (L27), fisherman catch (L33), church glass/ornament (L34), blacksmith forge fire (L37), market awning/goods (L38). Stable per-building hashes.
+- Terrain: mountain variance (L2), grass/sand continuous color (L13), road detail with ruts + mixed cobbles (L24), softer water (L6).
+- Weather/atmosphere: dialed WebGL bloom back (L8), storm-aware rain density/angle (L32).
+- Minimap building-color coverage (L36).
+
+**Citizen AI / gameplay:**
+- Personal-space separation (L3), fixed stuck regression (L7), social facing (L4), desynced bob per citizen (L4), no-defense raid cap (L26), first-raid probe (L16), raid-count tuning (L20).
+- Chronicle truth-telling (L10) + newGame resets chronicle (L25).
+- Save.js persists stats/season/weather/notificationLog (L31).
+- Tutorial skip-ahead for fast players (L22).
+
+**Audio:**
+- Dedicated death SFX (L12), music phrasing + harmony fifth (L17), voice-bark per-kind shapes + detune (L23).
+
+**WebGL / 3D:**
+- Exposed 3D via 🧊 HUD button (L11). Voxel citizens upgraded from 2-box to 6-box chibi with hash variety (L14).
+
+**Research / analysis:**
+- Hex vs sub-tile pathfinding feasibility study (L5) — recommended Option B.
+
+**Bugs fixed (surfaced via deep-play):**
+- L7 stuck citizens (separation vs path)
+- L10 chronicle lie ("0 foes slain" when razed)
+- L15 UI warnings polluting chronicle
+- L25 newGame not resetting chronicle
+- L31 save missing stats/season/weather
+
+**Deep play cycles:** L6, L10, L15, L20, L25, L30, L35, L40 (every 5th).
+
+Total commits on main: 80+. RENDER_LOG.md tracks every loop with challenge/evidence/verdict.
+
 
 
 
