@@ -56,6 +56,8 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 26 | Raids adapt to player defense. Before: even at 12-raider cap, a defenseless 7-citizen settlement wipes. Now: players with zero defensive buildings (wall/barracks/tower/archery/castle) get capped at 3 raiders forever. Players who research defense get proper scaling (min(5, 3+day/8) before D20, min(12, 2+day/5) after). Sandbox players get peace; challenge players get challenge. | Addresses the L25 observation directly — "defenseless settlements can't survive" | — | KEEP. |
 | 27 | Tavern sign variants. 4 board colors (gold / burgundy / navy / mossy green) × 4 emblem shapes (mug / boar / crown / anchor) = 16 stable combos via b.x/b.y hash. Each tavern now reads as a distinct establishment. | — | (placing a tavern shows the variants) | KEEP. |
 | 28 | State-driven citizen expressions. Mouth was always a smile only at zoom ≥1.5. Now visible from zoom ≥1.2 and varies: eating=O, hungry(>70)=frown, working=neutral line, else=smile. Cheeks still at ≥1.5. | — | (visible during play at normal zoom) | KEEP. Hungry citizens now show it on their faces. |
+| 29 | Resource floater color + drift. `+N 🪵` floaters were all flat white. Now auto-colored by resource emoji (wood=tan, stone=slate, food=coral, gold=amber, iron=pale-blue) with x-drift seeded per-particle so multi-floaters fan out instead of stacking. Losses (`-`) red, gains (`+`) green by default. | — | (visible during play when citizens deliver goods) | KEEP. |
+
 
 
 
