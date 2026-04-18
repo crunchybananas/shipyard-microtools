@@ -2292,12 +2292,27 @@ export function render() {
       ctx.stroke();
       ctx.restore();
     } else if (p.type === 'spark') {
+      // Loop 69 (render S4): sparks now have a bright core + soft halo
+      // and fade with alpha. Prior was a flat solid dot — read as a dot,
+      // not a hot glowing ember.
       const sz = p.size || 1.5;
       const drift = (p.vx || 0) * (G.gameTick % 60) * 0.08;
-      ctx.fillStyle = p.color || '#ff8c00';
-      ctx.beginPath();
-      ctx.arc(s.x + drift, s.y + p.offsetY, sz, 0, Math.PI * 2);
-      ctx.fill();
+      const baseColor = p.color || '#ff8c00';
+      const sx = s.x + drift;
+      const sy = s.y + p.offsetY;
+      // Outer halo (additive-look via rgba)
+      ctx.fillStyle = baseColor + (ctx.globalAlpha < 1 ? '' : '');
+      ctx.globalAlpha *= 0.28;
+      ctx.beginPath(); ctx.arc(sx, sy, sz * 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha /= 0.28;
+      // Mid glow
+      ctx.globalAlpha *= 0.6;
+      ctx.fillStyle = baseColor;
+      ctx.beginPath(); ctx.arc(sx, sy, sz * 1.3, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha /= 0.6;
+      // Hot bright core (nearly white)
+      ctx.fillStyle = '#fff8dc';
+      ctx.beginPath(); ctx.arc(sx, sy, sz * 0.55, 0, Math.PI * 2); ctx.fill();
     } else if (p.type === 'pollen') {
       ctx.fillStyle = `rgba(255, 240, 180, ${ctx.globalAlpha})`;
       ctx.beginPath();
