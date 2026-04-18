@@ -66,6 +66,8 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 36 | Minimap MINI_BUILD map: 7 missing building types (fisherman, archery, blacksmith, bakery, windmill, chickencoop, cowpen) were rendering as white fallback dots. Added distinct colors. Granary nudged to a slightly different tan than house so the two are distinguishable. | — | — | KEEP. |
 | 37 | Blacksmith forge-fire variants. 6 palette slots: classic amber × 2 (most common), purple-magical, alchemical green, white-hot master, cool blue. Core color pulses per gameTick. Lets late-game settlements feel like they have specialty smiths. | — | — | KEEP. |
 | 38 | Market variants. 4 awning colors (red/blue/green/gold) × 4 goods displays (bread+apples/cloth-bolts/spice-cones/pottery). Bottom stripe matches awning. Each market reads as a different merchant. | — | — | KEEP. |
+| 39 | Richer citizen hover tooltip: optional line 3 (carrying-cargo with emoji OR hungry warning), plus a color-coded hunger bar at the bottom (green→amber→red). | — | (visible when hovering citizens) | KEEP. |
+
 
 
 
