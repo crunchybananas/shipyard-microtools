@@ -1107,30 +1107,44 @@ export function render() {
     //   Body: ellipse centered at cy-9 (moved up 1px), 5.2×6.6
     //   Arms: elongated ovals from cy-10 to cy-5, slight outward angle
     //   Head: unchanged (cy-19, r=6.3)
-    const step = isMoving ? Math.sin(G.gameTick * 0.25 + phaseOffset) * 1.5 : 0;
-    const pantsColor = '#3a2618';  // dark brown trousers
+    // Loop 48 (render S4): real walk cycle. Prior code had feet sliding
+    // left/right via sine — looked slidey. Now each foot follows a proper
+    // up+forward swing phase then a planted stance phase, mirrored L/R.
+    // stepL is positive during left-foot swing, negative during right.
+    const walkPhase = G.gameTick * 0.22 + phaseOffset;
+    const stepSin = Math.sin(walkPhase);
+    const step = isMoving ? stepSin * 1.5 : 0;
+    const pantsColor = '#3a2618';
+    // Per-foot lift: the foot is UP when it's swinging forward (cos>0),
+    // PLANTED when cos<0. Use half-rectified cosines so only the swing
+    // half has lift. Foot L swings on cos>0, foot R on cos<0.
+    const cosP = Math.cos(walkPhase);
+    const liftL = isMoving ? Math.max(0, cosP) * 1.6 : 0;
+    const liftR = isMoving ? Math.max(0, -cosP) * 1.6 : 0;
+    // Forward shift also comes from the same phase — foot ahead when lifted
+    const shiftL = isMoving ? Math.max(0, cosP) * 1.1 : 0;
+    const shiftR = isMoving ? Math.max(0, -cosP) * 1.1 : 0;
 
-    // Legs — 2 thin rectangles with step offset for walk animation
+    // Legs
     ctx.fillStyle = pantsColor;
-    const legL_x = s.x - 2.0 - step * 0.2;
-    const legR_x = s.x + 2.0 + step * 0.2;
-    // Slight walk-cycle bend — legs shorten/lengthen in counter-phase
-    const legL_len = 5 + (isMoving ? step * 0.3 : 0);
-    const legR_len = 5 - (isMoving ? step * 0.3 : 0);
-    ctx.fillRect(legL_x - 1.2, cy - 1 - legL_len, 2.4, legL_len);
-    ctx.fillRect(legR_x - 1.2, cy - 1 - legR_len, 2.4, legR_len);
-    // Leg highlight (left edge catch-light)
+    const legL_x = s.x - 2.0 + shiftL * 0.6 - step * 0.15;
+    const legR_x = s.x + 2.0 - shiftR * 0.6 + step * 0.15;
+    const legL_len = 5 - liftL * 0.6;  // leg shortens when foot lifts
+    const legR_len = 5 - liftR * 0.6;
+    ctx.fillRect(legL_x - 1.2, cy - 1 - liftL - legL_len, 2.4, legL_len);
+    ctx.fillRect(legR_x - 1.2, cy - 1 - liftR - legR_len, 2.4, legR_len);
+    // Leg highlight
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(legL_x - 1.2, cy - 1 - legL_len, 0.6, legL_len);
-    ctx.fillRect(legR_x - 1.2, cy - 1 - legR_len, 0.6, legR_len);
+    ctx.fillRect(legL_x - 1.2, cy - 1 - liftL - legL_len, 0.6, legL_len);
+    ctx.fillRect(legR_x - 1.2, cy - 1 - liftR - legR_len, 0.6, legR_len);
 
-    // Feet — shoes, shifted down by 1px so they sit below legs
+    // Feet — lifted by liftL/liftR for the swing arc
     ctx.fillStyle = '#2a1a10';
     ctx.beginPath();
-    ctx.ellipse(legL_x, cy + 0.5, 2.6, 1.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(legL_x, cy + 0.5 - liftL, 2.6, 1.6, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(legR_x, cy + 0.5, 2.6, 1.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(legR_x, cy + 0.5 - liftR, 2.6, 1.6, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Body — torso ellipse, slightly tapered (shoulders wider than waist).
