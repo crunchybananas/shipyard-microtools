@@ -910,19 +910,19 @@ export function updateTutorialTip() {
     return;
   }
 
-  const step = TUTORIAL_STEPS[tutorialStep];
-
-  // Auto-advance if check passes
+  // Loop 22 (render S3): skip-ahead logic. The prior check advanced exactly
+  // one step per tick, so if a player built a farm via hotkey faster than the
+  // check could observe selectedBuild='farm', the tutorial would stall on
+  // "Select Farm" even though a farm was visibly placed. Now walk forward
+  // while any later step's check is already satisfied.
   try {
-    if (step.check()) {
-      // Auto-dismiss after the done step
-      if (step.id === 'done') {
-        dismissTutorial();
-        return;
-      }
+    while (tutorialStep < TUTORIAL_STEPS.length) {
+      const s = TUTORIAL_STEPS[tutorialStep];
+      if (!s.check()) break;
+      if (s.id === 'done') { dismissTutorial(); return; }
       tutorialStep++;
-      if (tutorialStep >= TUTORIAL_STEPS.length) { tipEl.style.display = 'none'; return; }
     }
+    if (tutorialStep >= TUTORIAL_STEPS.length) { tipEl.style.display = 'none'; return; }
   } catch {}
 
   const current = TUTORIAL_STEPS[Math.min(tutorialStep, TUTORIAL_STEPS.length - 1)];
