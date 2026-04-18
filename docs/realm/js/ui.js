@@ -897,10 +897,15 @@ let tutorialStep = 0;
 let tutorialDismissed = false;
 
 export function updateTutorialTip() {
-  // Auto-dismiss if player is already past the tutorial
-  if (!tutorialDismissed && G.buildings.length >= 4) {
-    dismissTutorial();
-    return;
+  // Auto-dismiss if player is already past the tutorial.
+  // Loop 49 (render S4): added day and population thresholds. Earlier
+  // dismissal was ONLY buildings>=4, so a player with 11 citizens,
+  // a barracks, and a house on Day 7 still saw "Select Farm from the
+  // build bar ↓" — absurd.
+  if (!tutorialDismissed) {
+    if (G.buildings.length >= 4) { dismissTutorial(); return; }
+    if (G.day >= 6 && G.buildings.length >= 2) { dismissTutorial(); return; }
+    if (G.citizens.length >= 8) { dismissTutorial(); return; }
   }
 
   const tipEl = document.getElementById('tutorial-tip');
