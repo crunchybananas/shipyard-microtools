@@ -1803,9 +1803,17 @@ export function render() {
     ctx.beginPath();
     ctx.ellipse(es.x, es.y + 2, 5, 2, 0, 0, Math.PI*2);
     ctx.fill();
-    // Walking bob and movement direction
+    // Loop 56 (render S4): raider silhouette rebuild — added legs/greaves,
+    // real arms, hulking shoulders for a menacing stance. Prior raiders
+    // were the pre-L41 citizen shape (floating torso + helmet). Now they
+    // have full chibi proportions but with brutal details (heavier build,
+    // spiked helm, armored greaves instead of cloth legs).
     const eMoving = Math.hypot(e.tx - e.x, e.ty - e.y) > 0.3;
-    const eBob = eMoving ? Math.sin(G.gameTick * 0.22 + (eHash & 0xff) * 0.04) * 0.7 : 0;
+    const ePhase = G.gameTick * 0.24 + (eHash & 0xff) * 0.04;
+    const eBob = eMoving ? Math.sin(ePhase) * 0.7 : 0;
+    const eStepSin = Math.sin(ePhase);
+    const eStep = eMoving ? eStepSin * 1.5 : 0;
+    const eCosP = Math.cos(ePhase);
     const edx = e.tx - e.x, edy = e.ty - e.y;
     const eDist = Math.hypot(edx, edy) || 1;
     const eFaceX = edx / eDist > 0.1 ? 1 : edx / eDist < -0.1 ? -1 : 0;
@@ -1814,41 +1822,95 @@ export function render() {
     const eLean = eMoving ? eFaceScreenX * 0.9 : 0;
     const eBodyX = es.x + eLean * 0.35;
     const eBodyTilt = eLean * 0.055;
-    // Body — armour colour variant, leans in walk direction
+    const eCY = es.y + eBob;
+
+    // Greaves (metal leg plates) — bit heavier than citizen pants
+    const greaveColor = '#22222a';
+    const eLiftL = eMoving ? Math.max(0, eCosP) * 1.4 : 0;
+    const eLiftR = eMoving ? Math.max(0, -eCosP) * 1.4 : 0;
+    const eShiftL = eMoving ? Math.max(0, eCosP) * 1.0 : 0;
+    const eShiftR = eMoving ? Math.max(0, -eCosP) * 1.0 : 0;
+    const eLegLx = es.x - 2.2 + eShiftL * 0.5 - eStep * 0.15;
+    const eLegRx = es.x + 2.2 - eShiftR * 0.5 + eStep * 0.15;
+    const eLegLen = 5;
+    ctx.fillStyle = greaveColor;
+    ctx.fillRect(eLegLx - 1.4, es.y - 1 - eLiftL - (eLegLen - eLiftL * 0.4), 2.8, eLegLen - eLiftL * 0.4);
+    ctx.fillRect(eLegRx - 1.4, es.y - 1 - eLiftR - (eLegLen - eLiftR * 0.4), 2.8, eLegLen - eLiftR * 0.4);
+    // Metal highlight on greaves (sheen)
+    ctx.fillStyle = 'rgba(140,140,160,0.3)';
+    ctx.fillRect(eLegLx - 1.4, es.y - 1 - eLiftL - (eLegLen - eLiftL * 0.4), 0.6, eLegLen - eLiftL * 0.4);
+    ctx.fillRect(eLegRx - 1.4, es.y - 1 - eLiftR - (eLegLen - eLiftR * 0.4), 0.6, eLegLen - eLiftR * 0.4);
+    // Heavy boots
+    ctx.fillStyle = '#18181f';
+    ctx.beginPath();
+    ctx.ellipse(eLegLx, es.y + 0.5 - eLiftL, 2.8, 1.7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(eLegRx, es.y + 0.5 - eLiftR, 2.8, 1.7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Body — hulking shoulders + waist. Armor plate colors
     const bodyColors = ['#3a2030', '#2a2a3a', '#3a1818'];
     ctx.fillStyle = bodyColors[eVariant];
+    // Lower torso (armor skirt/waist)
     ctx.beginPath();
-    ctx.ellipse(eBodyX, es.y - 6 + eBob, 5, 6, eBodyTilt, 0, Math.PI*2);
+    ctx.ellipse(eBodyX, eCY - 7, 4.8, 4.6, eBodyTilt, 0, Math.PI * 2);
     ctx.fill();
-    // Arm stubs — armored, angled slightly differently than citizens
-    const eArmSwing = eMoving ? Math.sin(G.gameTick * 0.25 + eHash) * 1.5 * 0.45 : 0;
+    // Upper torso — wider than citizens for brute look
+    ctx.beginPath();
+    ctx.ellipse(eBodyX, eCY - 11, 6.0, 4.5, eBodyTilt, 0, Math.PI * 2);
+    ctx.fill();
+    // Shoulder pauldrons — dark metal knobs at each shoulder
+    ctx.fillStyle = '#1a1a20';
+    ctx.beginPath();
+    ctx.ellipse(eBodyX - 5.5, eCY - 12, 2.0, 1.8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(eBodyX + 5.5, eCY - 12, 2.0, 1.8, 0, 0, Math.PI * 2); ctx.fill();
+    // Armour trim (chest band)
+    ctx.fillStyle = ['#6a3a48','#3a4060','#6a2828'][eVariant];
+    ctx.fillRect(eBodyX - 4.2, eCY - 8.5, 8.4, 1.3);
+
+    // Arms — longer hanging ovals with spiked shoulders
+    const eArmSwing = eMoving ? eStepSin * 0.6 : 0;
     ctx.fillStyle = ['#4a2a3a','#2a2a4a','#4a1a1a'][eVariant];
     ctx.beginPath();
-    ctx.ellipse(eBodyX - 6.5, es.y - 7 + eBob + eArmSwing, 2.4, 1.7, Math.PI * 0.2, 0, Math.PI*2);
+    ctx.ellipse(eBodyX - 6.2, eCY - 8 + eArmSwing, 1.7, 3.6, Math.PI * 0.08, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(eBodyX + 6.5, es.y - 7 + eBob - eArmSwing, 2.4, 1.7, -Math.PI * 0.2, 0, Math.PI*2);
+    ctx.ellipse(eBodyX + 6.2, eCY - 8 - eArmSwing, 1.7, 3.6, -Math.PI * 0.08, 0, Math.PI * 2);
     ctx.fill();
-    // Armour trim
-    ctx.fillStyle = ['#6a3a48','#3a4060','#6a2828'][eVariant];
-    ctx.fillRect(eBodyX - 4, es.y - 8 + eBob, 8, 1.5);
-    // Head — helmet shape (flattened top), leans with body
+    // Gauntlets (metal hand covers) at arm ends
+    ctx.fillStyle = '#3a3a42';
+    ctx.beginPath();
+    ctx.arc(eBodyX - 6.2, eCY - 4.5 + eArmSwing, 1.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(eBodyX + 6.2, eCY - 4.5 - eArmSwing, 1.2, 0, Math.PI * 2); ctx.fill();
+
+    // Head — helmet (slightly smaller than citizen head — visor visible)
     const eHeadX = eBodyX + eFaceScreenX * 0.4;
-    ctx.fillStyle = '#2a1a1a';
+    ctx.fillStyle = '#1a1010';
     ctx.beginPath();
-    ctx.arc(eHeadX, es.y - 14 + eBob, 3.8, 0, Math.PI*2);
+    ctx.arc(eHeadX, eCY - 15, 4.0, 0, Math.PI * 2);
     ctx.fill();
-    // Helmet brim
+    // Helmet brim (horizontal bar)
     ctx.fillStyle = ['#5a3a40','#3a3a50','#5a2a2a'][eVariant];
-    ctx.fillRect(eHeadX - 4.5, es.y - 12.5 + eBob, 9, 1.2);
-    // Red eye glow
-    ctx.fillStyle = '#ff4040';
-    ctx.globalAlpha = daylight * (0.7 + 0.3 * Math.sin(G.gameTick * 0.12 + eHash));
+    ctx.fillRect(eHeadX - 4.8, eCY - 13.5, 9.6, 1.3);
+    // Spike on top of helmet (new — makes silhouette unmistakably hostile)
+    ctx.fillStyle = '#4a3a30';
     ctx.beginPath();
-    ctx.arc(eHeadX - 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
-    ctx.arc(eHeadX + 1.2, es.y - 14 + eBob, 0.7, 0, Math.PI*2);
+    ctx.moveTo(eHeadX, eCY - 19);
+    ctx.lineTo(eHeadX - 1, eCY - 16.5);
+    ctx.lineTo(eHeadX + 1, eCY - 16.5);
+    ctx.closePath();
     ctx.fill();
-    ctx.globalAlpha = daylight;
+    // Red eye glow — pulsing
+    ctx.fillStyle = '#ff4040';
+    ctx.globalAlpha = Math.max(0.85, daylight) * (0.7 + 0.3 * Math.sin(G.gameTick * 0.12 + eHash));
+    ctx.beginPath();
+    ctx.arc(eHeadX - 1.3, eCY - 15, 0.75, 0, Math.PI * 2);
+    ctx.arc(eHeadX + 1.3, eCY - 15, 0.75, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = Math.max(0.85, daylight);
     // Weapon — axe, spear, or club depending on variant
     if (G.camera.zoom >= 0.7) {
       ctx.strokeStyle = '#5a3a1a';
