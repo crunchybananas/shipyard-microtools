@@ -1487,12 +1487,15 @@ export function render() {
       }
     } // end zoom >= 0.7
 
-    // Hover highlight ring
+    // Hover ring — iso-flat ellipse at feet, gold.
+    // Loop 58 (render S4): was a 10px circle at chest height. Matched the
+    // old selected-citizen style which I just redid in L57. Unified: hover
+    // is a gold version of the foot ring.
     if (c === hoveredCitizen) {
-      ctx.strokeStyle = 'rgba(255,209,102,0.7)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(255,209,102,0.8)';
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.arc(s.x, cy - 10, 10, 0, Math.PI * 2);
+      ctx.ellipse(s.x, s.y + 2, 7, 3.0, 0, 0, Math.PI * 2);
       ctx.stroke();
     }
 
