@@ -276,6 +276,7 @@ export const EVENT_DEFS = [
           color: '#a855f7',
         });
         try { chronicle(`${c.name || 'A settler'} succumbed to the plague. The healer could do nothing.`, 'death'); } catch(_e){}
+        playSound('death');
       }
       G.population = Math.max(0, G.population - losses);
       G.eventModifiers.speedMult = 0.7;

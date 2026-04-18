@@ -276,6 +276,27 @@ export function playSound(type) {
     }
 
     // ── Demolish: crash noise + low thud ─────────────────────
+    // ── Citizen death: somber descending sigh ──────────────
+    // Loop 12 (render S3): dedicated death sound. Was reusing 'demolish'
+    // (a building-collapse crash) which read as "a wall fell" instead of
+    // "a person died". This is a soft downward triangle sigh + faint
+    // subharmonic tail, so raid losses feel mournful rather than brash.
+    case 'death': {
+      const sigh = ctx.createOscillator();
+      const sighG = ctx.createGain();
+      sigh.type = 'triangle';
+      sigh.frequency.setValueAtTime(440, t);
+      sigh.frequency.exponentialRampToValueAtTime(146, t + 0.9);
+      sighG.gain.setValueAtTime(0, t);
+      sighG.gain.linearRampToValueAtTime(0.08, t + 0.05);
+      sighG.gain.exponentialRampToValueAtTime(0.001, t + 0.95);
+      sigh.connect(sighG); sighG.connect(dest);
+      sigh.start(t); sigh.stop(t + 1.0);
+      // Sub tail
+      makeOsc(ctx, dest, 'sine', 110, 0.05, 0.02, 1.2, t + 0.15);
+      break;
+    }
+
     case 'demolish': {
       // Broadband crash
       makeNoiseBurst(ctx, dest, 0.18, 0.35, t, 8000);

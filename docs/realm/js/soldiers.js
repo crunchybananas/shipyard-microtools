@@ -127,6 +127,7 @@ export function updateSoldiers() {
     if (G.soldiers[i].hp <= 0) {
       G.soldiers.splice(i, 1);
       G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
+      playSound('death');
     }
   }
 }
