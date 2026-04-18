@@ -1246,17 +1246,44 @@ export function render() {
       ctx.arc(eyeX + eyeDX, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
       ctx.stroke();
     }
-    // Mouth — gentle smile curve, only at closer zoom
-    if (!facingAway && G.camera.zoom >= 1.5) {
+    // Mouth — state-driven expression. Loop 28 (render S3): was always a
+    // smile at zoom ≥1.5; now also shows at zoom ≥1.2 (less close) and
+    // varies by c.state (eating = O, working = neutral line, hungry = frown,
+    // default = smile). Cheeks stay at zoom ≥1.5 threshold.
+    if (!facingAway && G.camera.zoom >= 1.2) {
       ctx.strokeStyle = 'rgba(80,50,30,0.75)';
+      ctx.fillStyle = 'rgba(80,50,30,0.8)';
       ctx.lineWidth = 0.9;
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
       const mouthX = headX + faceScreenX * 0.5;
-      ctx.beginPath();
-      ctx.moveTo(mouthX - 1.2, headY + 1.8);
-      ctx.quadraticCurveTo(mouthX, headY + 3.1, mouthX + 1.2, headY + 1.8);
-      ctx.stroke();
+      const mouthY = headY + 2.2;
+      if (c.state === 'eating') {
+        // Small O for eating
+        ctx.beginPath();
+        ctx.arc(mouthX, mouthY, 0.9, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (c.hunger > 70) {
+        // Frown — inverted smile curve
+        ctx.beginPath();
+        ctx.moveTo(mouthX - 1.2, mouthY + 0.3);
+        ctx.quadraticCurveTo(mouthX, mouthY - 0.9, mouthX + 1.2, mouthY + 0.3);
+        ctx.stroke();
+      } else if (c.state === 'working') {
+        // Neutral concentration line
+        ctx.beginPath();
+        ctx.moveTo(mouthX - 1.0, mouthY - 0.2);
+        ctx.lineTo(mouthX + 1.0, mouthY - 0.2);
+        ctx.stroke();
+      } else {
+        // Default smile
+        ctx.beginPath();
+        ctx.moveTo(mouthX - 1.2, mouthY - 0.4);
+        ctx.quadraticCurveTo(mouthX, mouthY + 0.9, mouthX + 1.2, mouthY - 0.4);
+        ctx.stroke();
+      }
+    }
+    if (!facingAway && G.camera.zoom >= 1.5) {
       // Rosy cheeks — soft blush at close zoom
       ctx.fillStyle = 'rgba(240,100,80,0.22)';
       ctx.beginPath();
