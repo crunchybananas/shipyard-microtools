@@ -1349,17 +1349,30 @@ export function render() {
     }
 
     if (G.camera.zoom >= 0.7) {
-      // Tool icon when working
-      if (c.state === 'working' && c.jobBuilding) {
+      // Loop 51 (render S4): carry tool while WALKING to/from job too, not
+      // just at work. Citizens now visibly wield their trade tool during
+      // walk_to_work (heading out) and walk_to_deliver (heading back).
+      // Slightly smaller + more upright when walking so it reads as
+      // "carried" vs "in use".
+      const showTool = c.jobBuilding && (
+        c.state === 'working' ||
+        c.state === 'walk_to_work' ||
+        c.state === 'walk_to_deliver'
+      );
+      if (showTool) {
         const jt = c.jobBuilding.type;
-        const toolX = s.x + 8;
-        const toolY = cy - 11;
+        const isWalking = c.state !== 'working';
+        // Carry position: over shoulder when walking, in front when working
+        const toolX = s.x + (isWalking ? 6 : 8);
+        const toolY = cy - (isWalking ? 12 : 11);
+        const toolScale = isWalking ? 0.85 : 1.0;
         ctx.save();
         ctx.lineCap = 'round';
+        ctx.translate(toolX, toolY);
+        ctx.scale(toolScale, toolScale);
         if (jt === 'mine' || jt === 'quarry') {
-          // Pickaxe: angled handle + cross-head
-          ctx.translate(toolX, toolY);
-          ctx.rotate(-0.4);
+          // Pickaxe — when walking, shouldered at steeper angle
+          ctx.rotate(isWalking ? -0.8 : -0.4);
           ctx.strokeStyle = '#8b5e3c';
           ctx.lineWidth = 1.2;
           ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 5); ctx.stroke();
@@ -1367,26 +1380,41 @@ export function render() {
           ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.moveTo(-2, 0); ctx.lineTo(2, 0); ctx.stroke();
         } else if (jt === 'lumber') {
-          // Axe: handle + filled wedge head
-          ctx.translate(toolX, toolY);
-          ctx.rotate(0.3);
+          // Axe — shouldered when walking (vertical) vs swung when working (tilted)
+          ctx.rotate(isWalking ? 0.0 : 0.3);
           ctx.strokeStyle = '#8b5e3c';
           ctx.lineWidth = 1.2;
           ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 5); ctx.stroke();
           ctx.fillStyle = '#aaa';
           ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(2.5, -1); ctx.lineTo(1.5, 2); ctx.closePath(); ctx.fill();
         } else if (jt === 'farm') {
-          // Scythe: handle + curved arc blade
-          ctx.translate(toolX, toolY);
+          // Scythe — long handle, curved blade. Carry vertical when walking.
+          ctx.rotate(isWalking ? 0.15 : 0);
           ctx.strokeStyle = '#8b5e3c';
           ctx.lineWidth = 1.2;
           ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -1); ctx.stroke();
           ctx.strokeStyle = '#ccc';
           ctx.lineWidth = 1.3;
           ctx.beginPath(); ctx.arc(-1, -1, 2.5, 0, Math.PI * 0.9); ctx.stroke();
+        } else if (jt === 'fisherman') {
+          // Fishing rod — long thin rod with line
+          ctx.rotate(isWalking ? -0.2 : 0.1);
+          ctx.strokeStyle = '#8b5e3c';
+          ctx.lineWidth = 1.0;
+          ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(1, -5); ctx.stroke();
+          // Line
+          ctx.strokeStyle = 'rgba(220,220,220,0.7)';
+          ctx.lineWidth = 0.4;
+          ctx.beginPath(); ctx.moveTo(1, -5); ctx.lineTo(2.5, 2); ctx.stroke();
+        } else if (jt === 'blacksmith') {
+          // Hammer — short handle with rect head
+          ctx.rotate(isWalking ? 0.2 : 0.6);
+          ctx.strokeStyle = '#8b5e3c';
+          ctx.lineWidth = 1.1;
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 4); ctx.stroke();
+          ctx.fillStyle = '#666';
+          ctx.fillRect(-1.5, -1, 3, 2);
         } else {
-          // Generic tool dot for other job types
-          ctx.translate(toolX, toolY);
           ctx.fillStyle = '#ccc';
           ctx.beginPath(); ctx.arc(0, 0, 1.5, 0, Math.PI * 2); ctx.fill();
         }
