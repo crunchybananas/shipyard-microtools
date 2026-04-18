@@ -2642,6 +2642,30 @@ function drawBuilding(ctx, b, s, daylight) {
     const sunAngle = Math.abs(daylight - 0.7) * 3; // 0 at midday (~0.7), peaks at dawn/dusk
     const shadowMultiplier = 1 + sunAngle; // shadows 1x at noon, up to ~3x at sunrise/set
     const shadowLen = buildingH * 0.8 * shadowMultiplier;
+
+    // Loop 62 (render S4): ground-contact shadow to match citizen style.
+    // Prior code only drew the long directional cast shadow — at noon or
+    // when the sun was nearly overhead, the building had NO contact shadow
+    // so it looked like it was floating a tile above the ground. Now there's
+    // always a soft ground-contact ellipse beneath the base, same stacked
+    // style as citizens, which anchors the building visually.
+    const footprintW = (b.type === 'castle') ? 14 : (b.type === 'church' || b.type === 'tower') ? 11 : (b.type === 'wall' || b.type === 'road') ? 0 : 10;
+    if (footprintW > 0) {
+      ctx.globalAlpha = daylight * 0.5;
+      ctx.fillStyle = 'rgba(0,0,0,0.10)';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 3, footprintW + 3, (footprintW + 3) * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 3, footprintW, footprintW * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 3, footprintW - 3, (footprintW - 3) * 0.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
     // Warm shadow tint during golden hours
     const dayT = G.dayPhase / G.dayLength;
     const isGolden = (dayT < 0.15 || (dayT > 0.55 && dayT < 0.75));
