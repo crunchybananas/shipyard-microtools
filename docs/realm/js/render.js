@@ -1987,14 +1987,35 @@ export function render() {
       ctx.arc(s.x, s.y + p.offsetY, p.size, 0, Math.PI * 2);
       ctx.fill();
     } else {
+      // Loop 29 (render S3): text floaters now pick a color based on content.
+      // "+N 🪵" = wood brown, "+N 🍎" = food red, etc. Boring flat-white
+      // before. Also adds a gentle x-drift per-particle so multiple floaters
+      // at the same tile fan out instead of stacking.
       const scale = 1 + (1 - (p.alpha / 1.5)) * 0.3;
       ctx.save();
-      ctx.translate(psx, psy - 20);
+      // Per-particle horizontal drift — seeded by text+alpha for determinism
+      if (p._driftX === undefined) {
+        const seed = (p.text ? p.text.charCodeAt(0) : 0) * 13 + Math.floor((p.alpha || 0) * 100);
+        p._driftX = ((seed % 10) - 5) * 0.18;
+      }
+      const driftX = p._driftX * (1.5 - (p.alpha || 0));
+      ctx.translate(psx + driftX, psy - 20);
       ctx.scale(scale, scale);
-      ctx.fillStyle = '#fff';
+      // Pick color by resource emoji in text
+      let fill = '#ffffff';
+      if (p.text) {
+        if (p.text.includes('🪵')) fill = '#d4a270';
+        else if (p.text.includes('🪨')) fill = '#c8cad0';
+        else if (p.text.includes('🍎')) fill = '#f08260';
+        else if (p.text.includes('🪙')) fill = '#ffd166';
+        else if (p.text.includes('⚙️')) fill = '#a8c8f0';
+        else if (p.text.startsWith('-')) fill = '#f87171';  // loss
+        else if (p.text.startsWith('+')) fill = '#86efac';  // gain, default
+      }
+      ctx.fillStyle = p.color || fill;
       ctx.font = 'bold 11px -apple-system,sans-serif';
       ctx.textAlign = 'center';
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowColor = 'rgba(0,0,0,0.55)';
       ctx.shadowBlur = 3;
       ctx.fillText(p.text, 0, 0);
       ctx.shadowBlur = 0;
