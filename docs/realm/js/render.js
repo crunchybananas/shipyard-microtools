@@ -1139,23 +1139,60 @@ export function render() {
     // Hair — vibrant colors, cap shifts based on facing direction
     // When facing away, hair sits on the camera-visible (back) side of the head.
     // When facing camera, hair sits on the back/opposite side from the face.
-    const hairHash = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
-    // Dark color changed from near-black navy (#1a1a2e) to raven-plum so it
-    // doesn't render as a featureless black blob over any skin tone.
-    ctx.fillStyle = ['#5c3a18','#c08020','#3a1a3a','#e8704a'][hairHash];
+    // Loop 9 (render S3): hair silhouette variants. Prior code used a single
+    // arc shape — 4 colors × 1 silhouette × 4 skins = "four villagers, one
+    // haircut" per fresh-eyes critique #1b. Now 4 colors × 4 silhouettes ×
+    // 4 skins = real crowd variety. Shape is keyed to (name_hash >> 3) so
+    // two citizens sharing a hair COLOR can still differ in shape.
+    const hairColorIdx = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
+    const hairShapeIdx = ((c.name.charCodeAt(0) * 13 + (c.name.charCodeAt(1) || 17) * 7) >> 1) % 4;
+    ctx.fillStyle = ['#5c3a18','#c08020','#3a1a3a','#e8704a'][hairColorIdx];
     const hairOffX = facingAway ? faceX * 0.5 : -faceX * 0.6;
-    // Reduced arc coverage by ~18° so forehead/chin always show skin color.
     const hairStart = facingAway ? Math.PI * 0.65 : Math.PI * 0.85;
     const hairEnd   = facingAway ? Math.PI * 2.35 : Math.PI * 2.15;
-    ctx.beginPath();
-    ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
-    ctx.closePath();
-    ctx.fill();
-    // Hair sheen — thin lighter arc on upper-front for depth/dimensionality
+
+    if (hairShapeIdx === 0) {
+      // Variant 0: classic cap (the original silhouette)
+      ctx.beginPath();
+      ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
+      ctx.closePath();
+      ctx.fill();
+    } else if (hairShapeIdx === 1) {
+      // Variant 1: tall tuft — cap + cowlick/spike on top
+      ctx.beginPath();
+      ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
+      ctx.closePath();
+      ctx.fill();
+      // Small tuft blob above the crown
+      ctx.beginPath();
+      ctx.ellipse(headX + hairOffX - faceX * 1.2, headY - 5.8, 2.4, 2.2, -0.2 * faceX, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (hairShapeIdx === 2) {
+      // Variant 2: asymmetric side-parting — wider on one side
+      ctx.beginPath();
+      ctx.arc(headX + hairOffX + 0.8 * (facingAway ? -faceX : faceX), headY - 1.1, 6.0, hairStart - 0.25, hairEnd + 0.15);
+      ctx.closePath();
+      ctx.fill();
+      // Bang falling forward over the "short" side
+      if (!facingAway) {
+        ctx.beginPath();
+        ctx.ellipse(headX - faceX * 2.8, headY - 1.8, 1.6, 1.1, 0.3 * faceX, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else {
+      // Variant 3: buzzed / close-cropped — much smaller radius
+      ctx.beginPath();
+      ctx.arc(headX + hairOffX, headY - 1.9, 4.6, hairStart + 0.15, hairEnd - 0.15);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Hair sheen — shape-aware upper-front highlight
     ctx.strokeStyle = 'rgba(255,255,255,0.18)';
     ctx.lineWidth = 1.3;
+    const sheenR = hairShapeIdx === 3 ? 3.9 : 4.8;
     ctx.beginPath();
-    ctx.arc(headX + hairOffX - 0.5, headY - 2.2, 4.8, hairStart, hairStart + Math.PI * 0.6);
+    ctx.arc(headX + hairOffX - 0.5, headY - 2.2, sheenR, hairStart, hairStart + Math.PI * 0.6);
     ctx.stroke();
 
     // Face — eyes and mouth on facing side, hidden when facing away
