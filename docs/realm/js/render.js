@@ -969,10 +969,15 @@ export function render() {
 
     // Walking bob when moving — smooth sine, reduced amplitude.
     // Idle citizens still get a small breathing bob so they don't look frozen.
+    // Loop 4 (render S3): phase derived from name-hash instead of c.x so
+    // neighbors don't bob in stadium-wave lockstep. Prior (c.x * N) meant
+    // two citizens on adjacent tiles had near-identical phase.
     const isMoving = c.path && c.pathIdx < (c.path?.length ?? 0);
+    const phaseHash = (c.name.charCodeAt(0) * 91 + (c.name.charCodeAt(1) || 11) * 41) % 360;
+    const phaseOffset = phaseHash * Math.PI / 180;
     const bob = isMoving
-      ? Math.sin(G.gameTick * 0.2 + c.x * 3) * 0.8
-      : Math.sin(G.gameTick * 0.05 + c.x * 7) * 0.35;  // slow shallow idle breathing
+      ? Math.sin(G.gameTick * 0.2 + phaseOffset) * 0.8
+      : Math.sin(G.gameTick * 0.05 + phaseOffset) * 0.35;
     const cy = s.y + bob;
 
     // Facing direction (x = left/right, z = depth/forward-back in iso)
@@ -985,6 +990,24 @@ export function render() {
       faceZ = fdy > 0.1 ? 1 : fdy < -0.1 ? -1 : 0;
     } else if (Math.abs(c.tx - c.x) > 0.1) {
       faceX = c.tx > c.x ? 1 : -1;
+    }
+    // Loop 4 (render S3): social orientation — idle citizens face the
+    // nearest neighbor within 1.4 tiles. Makes clusters read as a
+    // conversation, not strangers standing back-to-back. Only fires
+    // when no movement direction is set.
+    if (faceX === 0 && faceZ === 0) {
+      let nearest = null, ndMin = 1.4;
+      for (const other of G.citizens) {
+        if (other === c) continue;
+        const odx = other.x - c.x, ody = other.y - c.y;
+        const nd = Math.sqrt(odx * odx + ody * ody);
+        if (nd < ndMin) { ndMin = nd; nearest = other; }
+      }
+      if (nearest) {
+        const sdx = nearest.x - c.x, sdy = nearest.y - c.y;
+        faceX = sdx > 0.1 ? 1 : sdx < -0.1 ? -1 : 0;
+        faceZ = sdy > 0.1 ? 1 : sdy < -0.1 ? -1 : 0;
+      }
     }
     // In iso: screen Y = (worldX + worldY)*TH/2, so moving away from camera
     // (up on screen) = faceX + faceZ < 0. Prior "faceX>0 && faceZ<0" only caught
