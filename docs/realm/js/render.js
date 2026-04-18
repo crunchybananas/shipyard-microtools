@@ -1543,6 +1543,8 @@ export function render() {
 
   // ── Citizen hover tooltip ──────────────────────────────────
   if (hoveredCitizen) {
+    // Loop 39 (render S3): tooltip now also shows hunger status with a
+    // small bar, and includes carrying-cargo info if applicable.
     const hs = toScreen(hoveredCitizen.x, hoveredCitizen.y);
     const name = hoveredCitizen.name;
     const stateLabel = {
@@ -1552,12 +1554,22 @@ export function render() {
     }[hoveredCitizen.state] || hoveredCitizen.state;
     const jobLabel = hoveredCitizen.jobBuilding ? BUILDINGS[hoveredCitizen.jobBuilding.type]?.name : null;
     const line2 = jobLabel ? `${stateLabel} · ${jobLabel}` : stateLabel;
+    // Line 3: carrying info or hunger warning
+    let line3 = '';
+    if (hoveredCitizen.carrying && hoveredCitizen.carryAmount > 0) {
+      const emoji = {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️'}[hoveredCitizen.carrying] || '•';
+      line3 = `Carrying: ${hoveredCitizen.carryAmount} ${emoji}`;
+    } else if (hoveredCitizen.hunger > 70) {
+      line3 = `⚠️ Hungry (${Math.round(hoveredCitizen.hunger)})`;
+    }
 
     ctx.globalAlpha = 0.92;
     ctx.font = 'bold 10px -apple-system,sans-serif';
-    const tw = Math.max(ctx.measureText(name).width, ctx.measureText(line2).width) + 12;
-    const th = 28;
-    const tx = hs.x - tw/2, ty = hs.y - 40;
+    const widths = [ctx.measureText(name).width, ctx.measureText(line2).width];
+    if (line3) widths.push(ctx.measureText(line3).width);
+    const tw = Math.max(...widths) + 14;
+    const th = line3 ? 42 : 32;
+    const tx = hs.x - tw/2, ty = hs.y - (th + 16);
     // Background
     ctx.fillStyle = 'rgba(10,14,26,0.88)';
     ctx.beginPath();
@@ -1569,11 +1581,24 @@ export function render() {
     // Name
     ctx.fillStyle = '#ffd166';
     ctx.textAlign = 'center';
-    ctx.fillText(name, hs.x, ty + 11);
+    ctx.fillText(name, hs.x, ty + 12);
     // State
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
     ctx.font = '9px -apple-system,sans-serif';
-    ctx.fillText(line2, hs.x, ty + 23);
+    ctx.fillText(line2, hs.x, ty + 24);
+    // Line 3 (carrying or hunger warning)
+    if (line3) {
+      ctx.fillStyle = line3.startsWith('⚠') ? 'rgba(251,191,36,0.9)' : 'rgba(134,239,172,0.85)';
+      ctx.fillText(line3, hs.x, ty + 36);
+    }
+    // Hunger bar at the bottom — quick glance indicator
+    const hungerPct = Math.min(1, Math.max(0, hoveredCitizen.hunger / 100));
+    const barY = ty + th - 3;
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = '#1a1a20';
+    ctx.fillRect(tx + 4, barY, tw - 8, 1.5);
+    ctx.fillStyle = hungerPct > 0.7 ? '#f87171' : hungerPct > 0.4 ? '#fbbf24' : '#4ade80';
+    ctx.fillRect(tx + 4, barY, (tw - 8) * (1 - hungerPct), 1.5);
     ctx.globalAlpha = 1;
   }
 
