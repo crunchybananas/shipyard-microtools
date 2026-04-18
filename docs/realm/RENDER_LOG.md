@@ -58,6 +58,8 @@ Focused on the **visual fidelity of render.js**, independent of the LOOP_STATE.m
 | 28 | State-driven citizen expressions. Mouth was always a smile only at zoom ≥1.5. Now visible from zoom ≥1.2 and varies: eating=O, hungry(>70)=frown, working=neutral line, else=smile. Cheeks still at ≥1.5. | — | (visible during play at normal zoom) | KEEP. Hungry citizens now show it on their faces. |
 | 29 | Resource floater color + drift. `+N 🪵` floaters were all flat white. Now auto-colored by resource emoji (wood=tan, stone=slate, food=coral, gold=amber, iron=pale-blue) with x-drift seeded per-particle so multi-floaters fan out instead of stacking. Losses (`-`) red, gains (`+`) green by default. | — | (visible during play when citizens deliver goods) | KEEP. |
 | 30 | **DEEP PLAY** (5th-loop). Verified L26 defense-cap works: played defenseless settlement for 253 days, observed 48 raids ALL spawning exactly 3 raiders each. Prior wipe-at-D97 now survives to D253 (pop eventually dropped from attrition, not raid wipe). | Test: does "no defense → cap at 3" hold? YES, 41 raid chronicle entries all show "RAID: 3 raiders approach!" | (position deltas not capturable; evidence is in chronicle text) | KEEP L26 balance. Defenseless sandbox play is now viable. |
+| 31 | Save.js audit → added G.stats, G.season, G.weather, G.notificationLog to save/load. Before: reloading a save mistakenly re-triggered the L16 first-raid probe (because stats.raidsSurvived was reset). Season/weather always looked like spring on reload. | — | (state persistence fix) | KEEP. |
+
 
 
 
