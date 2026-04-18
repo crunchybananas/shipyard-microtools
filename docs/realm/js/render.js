@@ -1152,29 +1152,23 @@ export function render() {
     ctx.beginPath();
     ctx.ellipse(bodyX + 1.6, cy - 8.5, 4.2, 5.3, bodyTilt, -Math.PI / 2, Math.PI / 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(20,10,0,0.4)';
-    ctx.lineWidth = 0.7;
-    ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 7, 4.6, 4.5, bodyTilt, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 11, 5.4, 4.2, bodyTilt, 0, Math.PI * 2);
-    ctx.stroke();
+    // Loop 46 (render S4): removed the body and arm strokes. Agent #5:
+    // "mix of crisp outlines and soft halos — likely upscaled low-res
+    // art + vector at different render paths." Was from stroked body
+    // ellipses + unstroked head/legs/hands. Unified by dropping all
+    // outlines — silhouette now reads from shape + shadow contrast.
 
     // Arms — elongated ovals, one slightly in front of body.
-    // Much more arm-like than the old stubs.
     const armSwing = isMoving ? step * 0.6 : 0;
     ctx.fillStyle = bodyColor;
-    ctx.strokeStyle = 'rgba(20,10,0,0.35)';
-    ctx.lineWidth = 0.7;
     // Left arm (hangs down and out, full shoulder-to-hand length)
     ctx.beginPath();
     ctx.ellipse(bodyX - 5.8, cy - 8 + armSwing, 1.6, 3.8, Math.PI * 0.08, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
+    ctx.fill();
     // Right arm
     ctx.beginPath();
     ctx.ellipse(bodyX + 5.8, cy - 8 - armSwing, 1.6, 3.8, -Math.PI * 0.08, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
+    ctx.fill();
     // Hands — small skin-tone dots at the arm bottoms so the eye reads
     // where the arm ends. Huge silhouette improvement at any zoom.
     ctx.fillStyle = skinColor;
