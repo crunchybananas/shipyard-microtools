@@ -131,6 +131,12 @@ Ranked by impact:
 |------|-------------|-----------|----------|---------|
 | 42 | Critique capture (no code) — three zoom-level screenshots + subagent ranked list | — | realm_s4_loop42_z1/z2/z4.jpg | Drives L43+. |
 | 43 | Killed job-colored ground ring (agent #1). Replaced with 3-layer stacked drop-shadow (0.10 outer / 0.18 mid / 0.22 core) — proper feathered contact shadow. Citizens are no longer visually perched on a UI poker chip. | — | realm_s4_loop43_shadow.jpg — citizens grounded with soft shadows, no colored halos | KEEP. Immediate visual win. |
+| 44 | Pollen density halved + occupancy check (agent #2). Interval 90→180 ticks, 5→2 particles per burst, skip tiles with citizens within 0.9. Pollen no longer puffs through citizens' faces. | — | — | KEEP. |
+| 45 | Tile-checker variance tightened from 8-16pt deltas to ≤4pt across all tile types in state.js (agent #3). Stone was worst at 16pt → 6pt. Diamond grid no longer reads as a wireframe overlay. | — | — | KEEP. |
+| 46 | Removed body + arm stroke outlines from citizens (agent #5). Prior had some parts stroked (body ellipses) and others not (head/legs/hands). Unified on zero-stroke — silhouette via shape + shadow. | — | realm_s4_loop46_close.jpg | KEEP. Consistent illustration look. |
+| 47 | Dot-eyes instead of white-eyes. Prior whites r=1.3 + pupils r=0.9 left ~0.4px white ring reading as spectacles at zoom 5. Now solid dark dots r=1.2 with single bright glint r=0.35 upper-left. Peanuts-style. | — | — | KEEP. |
+| 48 | Real walk cycle: foot swing-phase lift (1.6px Y + 1.1px X forward) from half-rectified cos(walkPhase), leg shortens when foot lifts. Prior sine-slide now reads as actual walking arc. | — | realm_s4_loop48_walking.jpg | KEEP. Movement finally looks like walking not gliding. |
+| 49 | Tutorial auto-dismiss smarter: added day≥6 AND buildings≥2 trigger, plus citizens≥8 trigger. Prior single threshold (buildings>=4) left "Select Farm from build bar" showing with 11 citizens and a barracks. | — | — | KEEP. |
 
 
 
