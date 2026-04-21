@@ -236,6 +236,152 @@ export function checkStoryBeats() {
     setFlag('firstRaidSurvived');
     chronicle('The first raid is turned back. The dead are buried; the living drink to the fallen.', 'raid');
   }
+
+  // Loop 039 (the-dream, surprise challenge): collective dreams.
+  // Every 14 days at dawn, the realm wakes to a shared dream composed
+  // deterministically from the kingdom name + day + what's present in
+  // the realm. Content is seeded (same kingdom + day → same dream) and
+  // uses named characters when they exist. Three threads are chosen
+  // from the pool; each thread contributes one image. Feels like
+  // someone unseen is writing the realm's subconscious.
+  checkDreamBeat();
+}
+
+// ── Loop 039: the-dream — collective dreams ─────────────────
+// Pure deterministic string hash; no crypto needed.
+function _dreamHash(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+// Thread = a seed of images. Triggered by realm state. Each image is a
+// fragment the dreamer "saw." The prose joins them with "; then " so
+// the chronicle reads as a sequence of visions.
+const _DREAM_THREADS = {
+  founding: {
+    always: true,
+    images: [
+      'a boat of pale wood arriving at a shore that was not there yesterday',
+      'nets of starlight pulled in empty',
+      'a drowned crown resting on sea-washed stones',
+      'three settlers at a fire that will not go out',
+      'footprints in sand that the tide refuses',
+    ],
+  },
+  forge: {
+    requires: () => !!G.namedCharacters?.smith,
+    images: (G) => [
+      `${G.namedCharacters.smith.name}'s anvil singing without a hammer`,
+      'steel poured like water, cooling into names no one remembers',
+      'a sword that weeps when no one holds it',
+      'the forge lit by a fire the smith did not kindle',
+    ],
+  },
+  harvest: {
+    requires: () => G.buildings.some(b => b.type === 'farm'),
+    images: [
+      'wheat fields stretching into the sky, harvested by hands from above',
+      'grain that speaks the old tongues when threshed',
+      'bread baked by a mother no one remembers',
+      'the first loaf each citizen ever tasted, warm again in their hands',
+      'ears of corn with the kingdom\'s name hidden in their rows',
+    ],
+  },
+  market: {
+    requires: () => !!G.namedCharacters?.merchant,
+    images: (G) => [
+      `coins bearing ${G.namedCharacters.merchant.name}'s face on both sides`,
+      'a scale weighing mercy against regret, tipping slowly',
+      'a merchant who trades only questions, all of them the same',
+      'caravans arriving from the edge of the map',
+    ],
+  },
+  warning: {
+    requires: () => G.day > 20 || (G.enemies && G.enemies.length > 0),
+    images: [
+      'a wolf at the borders speaking the kingdom\'s founding words',
+      'a banner torn by no wind',
+      'a child who knows the ending',
+      'shadows on the walls that move against the torchlight',
+      'the year\'s end seen from both sides',
+    ],
+  },
+  hearth: {
+    requires: () => G.buildings.some(b => b.type === 'house'),
+    images: [
+      'every house lit at once, though no one struck a light',
+      'the first hearth-smoke of the realm, visible again in the air',
+      'a door that opens on a room the owner has never entered',
+      'a window looking out on the realm as it will be in a hundred years',
+    ],
+  },
+  water: {
+    requires: () => G.buildings.some(b => b.type === 'well' || b.type === 'fisherman'),
+    images: [
+      'the well filled with stars instead of water',
+      'fish that swim upstream into the sky',
+      'a tide that returns what it took',
+      'rain falling upward from the lake',
+    ],
+  },
+  learning: {
+    requires: () => !!G.namedCharacters?.teacher,
+    images: (G) => [
+      `${G.namedCharacters.teacher.name} teaching a lesson in a language the children already know`,
+      'a library of books that rewrite themselves when closed',
+      'a schoolhouse where the walls listen',
+      'the alphabet of a tongue no one has yet spoken',
+    ],
+  },
+};
+
+export function checkDreamBeat() {
+  // Require some history; don't dream on day 1-13
+  if (G.day < 14) return;
+  if (G.day % 14 !== 0) return;
+  // Only at dawn (dayPhase < 120 ≈ first ~3% of the day)
+  if (G.dayPhase > 120) return;
+  const flag = `dream_${G.day}`;
+  if (hasFlag(flag)) return;
+  setFlag(flag);
+
+  // Build available thread list
+  const avail = [];
+  for (const [name, t] of Object.entries(_DREAM_THREADS)) {
+    if (t.always || (t.requires && t.requires())) avail.push(name);
+  }
+  if (avail.length === 0) return;
+
+  // Seed base from kingdom + day — same kingdom + day → same dream
+  const kname = G.kingdomName || 'Realm';
+  const baseKey = `${kname}_${G.day}`;
+
+  // Pick 3 threads. Each thread-pick uses its own hash so two kingdoms
+  // whose base seeds happen to collide mod avail.length still diverge.
+  const picked = [];
+  for (let i = 0; i < 3; i++) {
+    const idx = _dreamHash(`${baseKey}_thread_${i}`) % avail.length;
+    picked.push(avail[idx]);
+  }
+
+  // One image per pick, derived from a per-image hash so the entropy
+  // scales with pool.length regardless of pick ordering. Dedup by
+  // image text (not thread) — early-game realms with only 1 thread
+  // still get distinct images from that thread's pool.
+  const rawImages = picked.map((threadName, i) => {
+    const t = _DREAM_THREADS[threadName];
+    const pool = typeof t.images === 'function' ? t.images(G) : t.images;
+    const idx = _dreamHash(`${baseKey}_img_${threadName}_${i}`) % pool.length;
+    return pool[idx];
+  });
+  const images = [];
+  for (const img of rawImages) if (!images.includes(img)) images.push(img);
+
+  const dreamText = `At dawn the realm wakes to shared dreams: ${images.join('; then ')}. No one speaks of them, but everyone remembers.`;
+  chronicle(dreamText, 'dream');
 }
 
 export function toggleChroniclePanel() {

@@ -161,6 +161,44 @@ code-detective, silent-module still un-picked).
 
 Play for information; build for progress.
 
+## Evolution mandate (updated after tick 038)
+
+User directive: **the loop should evolve realm into something
+unexpected**. Queue-draining is not the goal. The 47+ open
+ideas create gravity; resist it.
+
+Rules:
+
+- **Not every tick needs to close an ideas.md entry.** A tick
+  that ADDS something new — a feature, scenario, mechanic,
+  or system nobody filed — is equally legitimate, often more
+  valuable.
+- **At least one in five ticks should pick from the "surprise"
+  category** (`unnamed-thing`, `a-scene-that-happens-once`,
+  `time-aware`, `the-dream`) OR propose something not in
+  ideas.md. None of the four surprise challenges had been
+  picked in 38 ticks before this section was added — that's
+  the gap this mandate closes.
+- **Risk is permitted.** Ship bold things; document honestly
+  when they don't land. A half-broken experiment with clear
+  reasoning is more valuable than a fifth trivial fix.
+- **Cross-reference over silo.** New features should touch
+  existing named characters / chronicle / scenarios where
+  it makes sense, deepening the realm's web instead of
+  bolting on unconnected mechanics.
+- **Preserve the surprise.** Don't pre-announce the novel
+  beat in ScheduleWakeup prompts — ship it; user finds out
+  from the journal. The ScheduleWakeup prompt can hint at
+  *kind* ("a surprise tick") without spoiling the *thing*.
+
+If a tick genuinely can't think of something surprising, it
+may fall back to a fixer tick — but own that choice in the
+journal, don't default to it.
+
+The goal: over a day of loop-time, realm should feel as if
+someone unseen has been working on it — not merely *fixing*
+it. Weirdness is welcome.
+
 ## Meta
 
 - **START**: 2026-04-20 (iteration 001 is this scaffolding)
