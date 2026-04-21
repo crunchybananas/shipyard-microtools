@@ -171,6 +171,32 @@ export function checkStoryBeats() {
     chronicle('Bells toll from the new church. The faithful gather.', 'milestone');
     ensureBard();
   }
+  // Loop 022 (the-fixer, closing 021 audit): 5 previously-silent buildings
+  // that mark meaningful mid-game pivots. 021 found that 12 of 24 building
+  // types had no first-build chronicle beat; these are the narratively
+  // weighty ones. Wall/road/well/tradingpost/chickencoop/cowpen/tower are
+  // deliberately not added here — they're either cosmetic (wall, road) or
+  // smaller side-steps; can be added in a later tick if desired.
+  if (!hasFlag('firstBlacksmith') && G.buildings.some(b => b.type === 'blacksmith')) {
+    setFlag('firstBlacksmith');
+    chronicle('Hammer rings on anvil. The first blade is quenched — sparks, steam, and a promise.', 'milestone');
+  }
+  if (!hasFlag('firstSchool') && G.buildings.some(b => b.type === 'school')) {
+    setFlag('firstSchool');
+    chronicle("The schoolhouse opens. Children's voices rise from the yard; letters are learned.", 'milestone');
+  }
+  if (!hasFlag('firstWindmill') && G.buildings.some(b => b.type === 'windmill')) {
+    setFlag('firstWindmill');
+    chronicle("Sails turn above the fields. Grain will become flour now, without the miller's back.", 'milestone');
+  }
+  if (!hasFlag('firstBakery') && G.buildings.some(b => b.type === 'bakery')) {
+    setFlag('firstBakery');
+    chronicle("The first loaves cool on the baker's rack. The realm smells like home tonight.", 'milestone');
+  }
+  if (!hasFlag('firstArchery') && G.buildings.some(b => b.type === 'archery')) {
+    setFlag('firstArchery');
+    chronicle('The butts are set, the strings drawn. Arrows find their mark — or fly far into the heather.', 'milestone');
+  }
   // Population thresholds
   const popCheck = [
     [10, 'pop10', 'Ten souls now call this land home.'],
