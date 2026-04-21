@@ -426,6 +426,12 @@ export function checkRaids() {
 
     G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
     G.raidInterval = Math.max(4, G.raidInterval - 1);
+    // Loop 014 (the-fixer): only count the raid toward "Survive N raids"
+    // if the player had actual defenses when it spawned. Previously this
+    // incremented unconditionally in main.js, so 5/5 was achievable by
+    // standing still through five raids with zero military buildings.
+    // hasDefense is computed above (line ~371) for raid-scaling; reuse.
+    if (G.stats && hasDefense) G.stats.raidsSurvived++;
   }
 }
 

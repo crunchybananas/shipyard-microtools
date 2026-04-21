@@ -278,10 +278,12 @@ function updateTime() {
     if (G.stats) G.stats.daysLived++;
     // Bell toll at dawn if church exists
     playSound('bellToll');
-    const _raidDayBefore = G.nextRaidDay;
     collectTaxes();
     checkRaids();
-    if (G.stats && G.nextRaidDay > _raidDayBefore) G.stats.raidsSurvived++;
+    // Note: raidsSurvived now increments inside checkRaids() only when the
+    // player had defenses at the moment of raid-spawn. Loop 014 fix: the
+    // old unconditional increment here counted raids as "survived" even
+    // against a settlement with zero military buildings.
     checkRandomEvents();
     if (updateSeason()) {
       const s = getSeasonData();
