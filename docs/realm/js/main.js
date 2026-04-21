@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex } from './state.js';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
@@ -183,6 +183,8 @@ window.loadAndStart = () => {
 
 // Expose for inline onclick handlers and console debugging
 window.G = G;
+G.debug = G.debug || {};
+G.debug.lightCurve = lightCurve;
 window.forceRender = render;
 window.setSpeed = setSpeed;
 window.toggleResearch = toggleResearchPanel;

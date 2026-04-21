@@ -189,3 +189,40 @@ export function getDaylight() {
   if (t < 0.75) return 1 - ((t-0.6)/0.15)*0.35;
   return 0.65 - ((t-0.75)/0.25)*0.1;
 }
+
+// Instrumentation for loop 004 (the-profiler): sample the lighting
+// pipeline across a day without changing gameplay. The multiply-blend
+// night overlay in render.js kicks in when daylight < 0.95; its
+// darkness is capped at 0.7. Effective luminance below is a rough
+// proxy for what hits mid-grey pixels after the overlay multiply.
+export function lightCurve({ samples = 24, season = null } = {}) {
+  const savedPhase = G.dayPhase;
+  const savedSeason = G.season;
+  if (season) G.season = season;
+  const rows = [];
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    G.dayPhase = t * G.dayLength;
+    const dl = getDaylight();
+    const row = {
+      t: +t.toFixed(3),
+      dayPhase: Math.round(G.dayPhase),
+      hour: +(t * 24).toFixed(1),
+      daylight: +dl.toFixed(3),
+    };
+    if (dl < 0.95) {
+      const darkness = Math.min(1 - dl, 0.7);
+      row.overlayR = Math.round(255 - darkness * 160);
+      row.overlayG = Math.round(255 - darkness * 150);
+      row.overlayB = Math.round(255 - darkness * 100);
+      row.effLum = +((row.overlayR + row.overlayG + row.overlayB) / 765).toFixed(3);
+    } else {
+      row.overlayR = 255; row.overlayG = 255; row.overlayB = 255;
+      row.effLum = 1;
+    }
+    rows.push(row);
+  }
+  G.dayPhase = savedPhase;
+  G.season = savedSeason;
+  return rows;
+}
