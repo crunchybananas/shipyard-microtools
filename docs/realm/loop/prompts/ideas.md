@@ -53,6 +53,11 @@ and note the promotion here.
 - 063 [review] — long-run echo audit after 063 fix: how often does echo cite `event`/`season` vs other tags? Inform future weighting. [story.js]
 - 063 [code] — weighted echo-source selection: prefer once-per-realm tags (nightmare, stone, victory) 2× over more-abundant tags (milestone, dream, event, season). Makes lifetime-unique beats more likely to resurface. [story.js]
 - 060 [code] **HIGH** — add `event` and `season` to `_ECHO_SOURCE_TAGS` in story.js:648. 060 audit found these 2 tags excluded but they're legitimate origin-class beats (cloaked-stranger, season-transitions). Trivial 1-line expansion. [story.js] **DONE → 063**
+- 066 [code] **HIGH** — extract 012/017 night-tint multiply into exportable `applyNightTint(ctx, dayPhase, dayLength)` so both render() and renderBuildingIsolated use the same tint code. Without this, all color-eye audits via the helper silently miss tint effects. ~15 lines refactor. [render.js]
+- 066 [code] — quick-fix alt: apply night-tint inside renderBuildingIsolated by duplicating the render.js:2515-2549 block. Works but duplicates math. [render.js]
+- 066 [review] — re-run per-building color-eye audit AFTER the tint fix lands. Current 066 data is incomplete for dusk/night palettes.
+- 066 [code] — tighter bounding-box for low-profile buildings (well/farm/chickencoop/cowpen) in renderBuildingIsolated — crop to non-bg pixels rather than fixed 100×140. Makes palette counts more meaningful. [render.js]
+- 066 [code] — `renderElementIsolated(name, opts)` sibling helper that knows about module-local _stoneDraw / _wandererDraw entries so silhouette/palette audits can cover non-building elements. [enhancements.js or helper file]
 - 065 [code] — "all techs researched" milestone beat. If G.researchedTechs.size === Object.keys(TECHS).length, fire a single milestone beat. ~8 lines. [tech.js]
 - 065 [code] — tech-prereq unlock beats (subtle hint when prereq completion opens new research option). [tech.js]
 - 065 [review] — tone audit: read the 11 new research beats alongside BUILDING_FIRST_BEATS. Confirm no drift. [story.js + tech.js]
