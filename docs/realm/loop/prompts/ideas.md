@@ -28,6 +28,12 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 053 [code] **HIGH** — add 4 missing first-build beats to `BUILDING_FIRST_BEATS` in story.js: tower, well, chickencoop, cowpen. 021 found 12 missing, 022 fixed 5, 053's programmatic completionist play found these 4 still genuinely absent. Drafts in 053 journal. ~8-12 lines. Closes a 3-tick-old gap. [story.js]
+- 053 [code] — season-transition chronicle beats ("Summer arrives; the fields turn gold" / "First frost settles" / etc). Parallel to first-build-beats but triggered on G.season change. ~20 lines. Fills the mid-game chronicle void 053 surfaced. [story.js]
+- 053 [code] — expand `_DREAM_THREADS` pool. 053's 11-dream run showed repetition by the 5th-6th fire. Adding 2-3 threads (e.g. `weather`, `children`, `dead`) brings pool above repeat threshold. [story.js]
+- 053 [code] — `G.debug.t048()` getter that returns `_t048` state (or null). Unblocks verification of 048's element without naming it in code body. [enhancements.js]
+- 053 [surprise / code] — end-of-realm beats: chronicle is origin-heavy, death-silent. "Last citizen dies" / "castle falls" / "realm forgotten" would bookend narrative. [story.js]
+- 053 [code] — happiness/state-reactive dreams. When happiness < 30 or population falling, dreams bias toward `warning` thread. Gate + boost logic like 044's. [story.js]
 - 052 [review] — full the-silhouette-test / the-color-eye re-run via `G.debug.renderBuildingIsolated` on all 20 buildings. With the helper live, this is a 5-min tick not a 30-min one. Likely to ground-truth 046's findings (052 already caught one correction: bakery was NOT in the house/tavern blur cluster, its peakY=43 is 21px above house's 64).
 - 052 [code] — extend helper: `renderBuildingsGrid(types[], cols, opts)` returns one canvas with N buildings tiled for side-by-side audits. `renderBuildingAnimated(type, frames, opts)` returns array of canvases at different G.gameTick values for windmill/048/animated sprites. [render.js]
 - 052 [code] — `renderBuildingIsolated` option `{ overlayOnMain: true }` to blit the result onto the main canvas at a fixed debug position, so visual confirmation is one keystroke from the console. [render.js]
