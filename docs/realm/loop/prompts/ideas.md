@@ -29,7 +29,7 @@ and note the promotion here.
 (new ideas go here — newest on top)
 
 - 002 [code] — population-growth hint on "Reach 10 population" mission card; novice has no signal that housing grows pop. [ui.js / missions.js]
-- 002 [play] — HUD tooltip audit: hover every top-bar icon and report which have tooltips vs which are bare. Pair with `the-novice` persona. [index.html / ui.js]
+- 002 [play] — HUD tooltip audit: hover every top-bar icon and report which have tooltips vs which are bare. Pair with `the-novice` persona. [index.html / ui.js] **DONE → 027** (the-kid DOM-enumerated the 11 top-right HUD icons; all have `title` attrs with descriptive text. 007's "no labels" claim was from non-hovering observation — see 027 for correction. Touch-device follow-up filed as a new idea.)
 - 002 [code] — tighten welcome-banner fade: currently overlaps starting citizens at T+0–3. Either move it out of the citizen zone or fade it faster. [main.js? enhancements.js?] **DONE → 006** (repositioned `#toast` to top:5rem in index.html; affects all centered toasts, welcome no longer covers map center)
 - 002 [play] — verify or refute: is there a placement ghost-preview after selecting a building? 30-seconds tick missed it; needs a focused second look. [input.js + render.js] **DONE → 006** (confirmed by incidental observation during 006 fix: selecting Farm overlays a translucent grid on buildable tiles — 30-seconds tick's screenshot timing missed it)
 - 003 [code] — day-lighting curve audit: log current luminance multiplier across dayPhase 0–3600 for each season; expose on `G.debug.lightCurve`. Measure before changing. [render.js] **DONE → 004** (in state.js+main.js)
