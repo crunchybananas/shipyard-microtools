@@ -245,6 +245,9 @@ export function checkStoryBeats() {
   // from the pool; each thread contributes one image. Feels like
   // someone unseen is writing the realm's subconscious.
   checkDreamBeat();
+  // Loop 043 (a-scene-that-happens-once, surprise challenge):
+  // at most one NIGHTMARE per realm, ever. See checkNightmareBeat.
+  checkNightmareBeat();
 }
 
 // ── Loop 039: the-dream — collective dreams ─────────────────
@@ -383,6 +386,93 @@ export function checkDreamBeat() {
   const dreamText = `At dawn the realm wakes to shared dreams: ${images.join('; then ')}. No one speaks of them, but everyone remembers.`;
   chronicle(dreamText, 'dream');
 }
+
+// ── Loop 043: a-scene-that-happens-once — the NIGHTMARE ─────────
+//
+// Each realm dreams ONE nightmare in its entire lifetime, and only
+// one. The day it fires is seeded from the kingdom name, landing
+// somewhere in the mid-game (day 50–250). It supersedes the regular
+// dream for that one day. Different framing. Darker imagery. A
+// permanent flag ensures it never re-fires within a save, even
+// across reloads.
+//
+// Unlike the collective dreams (039), the nightmare ALSO fires a
+// toast — this is the rarest chronicle beat in realm and deserves
+// to be noticed in the moment. Players can read the full prose in
+// the chronicle afterward.
+//
+// Cross-refs the named-character system (034): the mayor / smith /
+// merchant / teacher appear in a few images if present.
+
+const _NIGHTMARE_IMAGES_STATIC = [
+  'a bell that tolls itself, counting losses not yet suffered',
+  'every candle in the realm blown out at once, then relit by hands no one owns',
+  'a child\'s drawing of the castle, on fire',
+  'the sea receding past where the fishermen have ever gone',
+  'a door locked from the outside, with the key on the inside',
+  'every dog in the realm barking at the same star',
+  'wheat fields harvested by hands no one recognizes',
+  'a winter come early, glimpsed through a window that looks out on summer',
+  'a mirror that shows the realm as it will be after everyone has left',
+  'the founders standing at the walls, weeping',
+  'a road leading away from the kingdom that was not there yesterday',
+];
+
+function _nightmareImagesForState(G) {
+  // Base pool + character-conditional fragments. No more than 3 are
+  // picked for any single nightmare.
+  const pool = [..._NIGHTMARE_IMAGES_STATIC];
+  if (G.namedCharacters?.mayor) {
+    pool.push(`${G.namedCharacters.mayor.name}'s voice heard from an empty room`);
+  }
+  if (G.namedCharacters?.smith) {
+    pool.push(`${G.namedCharacters.smith.name}'s forge cold for the first time in memory`);
+  }
+  if (G.namedCharacters?.bard) {
+    pool.push(`${G.namedCharacters.bard.name} singing a song no one in the realm has taught`);
+  }
+  if (G.namedCharacters?.teacher) {
+    pool.push(`${G.namedCharacters.teacher.name} writing the same word on every wall`);
+  }
+  return pool;
+}
+
+export function checkNightmareBeat() {
+  if (hasFlag('nightmare_fired')) return;
+  // Nightmare day seeded from kingdom name; fires in [50, 250]
+  const kname = G.kingdomName || 'Realm';
+  const targetDay = _dreamHash(`${kname}_nightmare_day`) % 200 + 50;
+  if (G.day !== targetDay) return;
+  // Only at dawn — same gate as the regular dream so they don't stomp each other
+  if (G.dayPhase > 120) return;
+  setFlag('nightmare_fired');
+
+  const pool = _nightmareImagesForState(G);
+  const seed = _dreamHash(`${kname}_nightmare_content`);
+  // Pick 3 distinct images by per-slot hash
+  const rawImages = [];
+  for (let i = 0; i < 3; i++) {
+    const idx = _dreamHash(`${kname}_nightmare_img_${i}`) % pool.length;
+    rawImages.push(pool[idx]);
+  }
+  const images = [];
+  for (const img of rawImages) if (!images.includes(img)) images.push(img);
+
+  const prose = `The realm does not wake — it is woken. ${images.join('; and behind it, ')}. The day begins with the feel of something ended.`;
+  chronicle(prose, 'nightmare');
+
+  // Toast the beat so it doesn't pass unnoticed. Chronicle already
+  // written above, so chronicle:false suppresses re-chronicling in notify.
+  try {
+    const notif = _NIGHTMARE_NOTIFY;
+    if (notif) notif(`🌑 The realm did not wake well.`, 'danger', { chronicle: false });
+  } catch (_e) {}
+}
+
+// Late-bound notify import to avoid load-order coupling with story.js's
+// position in the module graph. Set on module-load below.
+let _NIGHTMARE_NOTIFY = null;
+import('./notifications.js').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
 
 export function toggleChroniclePanel() {
   const p = document.getElementById('chronicle-panel');
