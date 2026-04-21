@@ -861,20 +861,26 @@ export function render() {
       }
 
       // Valid-tile highlight: when a building is selected, highlight all viewport
-      // tiles where placement is valid with a gentle pulsing green tint.
+      // tiles where placement is valid. Loop 009 (the-fixer, 007 finding #6):
+      // bumped pulse range + added a pale-green edge stroke so the grid reads
+      // against grass tiles rather than blending into them.
       if (G.selectedBuild && !(G.hoveredTile && G.hoveredTile.x===x && G.hoveredTile.y===y)) {
         if (canPlaceCheck(G.selectedBuild, x, y)) {
-          const pulse = 0.18 + 0.12 * Math.sin(G.gameTick * 0.08 + (x+y)*0.3);
+          const pulse = 0.28 + 0.14 * Math.sin(G.gameTick * 0.08 + (x+y)*0.3);
           ctx.save();
-          ctx.globalAlpha = pulse;
-          ctx.fillStyle = '#22c55e';
           ctx.beginPath();
           ctx.moveTo(s.x, s.y - TH/2);
           ctx.lineTo(s.x + TW/2, s.y);
           ctx.lineTo(s.x, s.y + TH/2);
           ctx.lineTo(s.x - TW/2, s.y);
           ctx.closePath();
+          ctx.globalAlpha = pulse;
+          ctx.fillStyle = '#4ade80';
           ctx.fill();
+          ctx.globalAlpha = Math.min(1, pulse * 2);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#bbf7d0';
+          ctx.stroke();
           ctx.restore();
         }
       }
