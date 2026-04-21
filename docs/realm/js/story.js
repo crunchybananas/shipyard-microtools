@@ -99,48 +99,46 @@ export function ensureRival() {
   return G.namedCharacters.rival;
 }
 
+// Loop 026 (refactor-only): 13 first-build beats data-driven into one
+// table + loop. Before this, each beat was a 4-line hand-written block
+// and the 12 existing + 5 added-by-022 lived in one ever-growing wall of
+// near-identical code. Extracting to data makes adding a new beat (or
+// editing one) a single-line change, and makes the "the chronicle knows
+// about these N buildings" fact visible at a glance.
+//
+// Side-effect beats (tavern → ensureMayor, barracks → ensureRival,
+// church → ensureBard) stay inline below — they aren't repetitive text;
+// they're distinct moments that do extra work. Special-shape beats
+// (firstBirth, castleBuilt, firstRaidSurvived) also stay inline — they
+// key on stats/gameState, not `buildings.some(b => b.type === X)`.
+const BUILDING_FIRST_BEATS = [
+  { type: 'house',      flag: 'firstHouse',      text: 'The first house is raised. Smoke rises from a new hearth tonight.' },
+  { type: 'farm',       flag: 'firstFarm',       text: 'A farm is established. The earth will feed us now.' },
+  { type: 'lumber',     flag: 'firstLumber',     text: 'The lumber mill hums to life. Timber stacks grow at its side.' },
+  { type: 'fisherman',  flag: 'firstFisherman',  text: "A fisherman's hut rises on the sand. Nets hang out to dry in the sea breeze." },
+  { type: 'granary',    flag: 'firstGranary',    text: 'The granary is sealed against the weather. Winter will find us ready.' },
+  { type: 'mine',       flag: 'firstMine',       text: 'Picks ring in the iron mine. Ore carts clatter up from the dark.' },
+  { type: 'quarry',     flag: 'firstQuarry',     text: 'The quarry is opened. Dust hangs in the air as the first blocks are cut.' },
+  { type: 'market',     flag: 'firstMarket',     text: 'Merchants unpack their wares at the new market. Trade has come to the realm.' },
+  { type: 'blacksmith', flag: 'firstBlacksmith', text: 'Hammer rings on anvil. The first blade is quenched — sparks, steam, and a promise.' },
+  { type: 'school',     flag: 'firstSchool',     text: "The schoolhouse opens. Children's voices rise from the yard; letters are learned." },
+  { type: 'windmill',   flag: 'firstWindmill',   text: "Sails turn above the fields. Grain will become flour now, without the miller's back." },
+  { type: 'bakery',     flag: 'firstBakery',     text: "The first loaves cool on the baker's rack. The realm smells like home tonight." },
+  { type: 'archery',    flag: 'firstArchery',    text: 'The butts are set, the strings drawn. Arrows find their mark — or fly far into the heather.' },
+];
+
 // Run each tick/day to detect milestones and fire beats once.
 export function checkStoryBeats() {
   initChronicle();
 
-  // First house
-  if (!hasFlag('firstHouse') && G.buildings.some(b => b.type === 'house')) {
-    setFlag('firstHouse');
-    chronicle('The first house is raised. Smoke rises from a new hearth tonight.', 'milestone');
+  // Simple first-build beats — one pattern, one table. See BUILDING_FIRST_BEATS.
+  for (const beat of BUILDING_FIRST_BEATS) {
+    if (!hasFlag(beat.flag) && G.buildings.some(b => b.type === beat.type)) {
+      setFlag(beat.flag);
+      chronicle(beat.text, 'milestone');
+    }
   }
-  // First farm
-  if (!hasFlag('firstFarm') && G.buildings.some(b => b.type === 'farm')) {
-    setFlag('firstFarm');
-    chronicle('A farm is established. The earth will feed us now.', 'milestone');
-  }
-  // First lumber mill — Day 1 build-bar building; without a beat, placing it
-  // on Day 1 alongside House + Farm produced only 2 chronicle entries, making
-  // the log read as if the lumber mill wasn't "real".
-  if (!hasFlag('firstLumber') && G.buildings.some(b => b.type === 'lumber')) {
-    setFlag('firstLumber');
-    chronicle('The lumber mill hums to life. Timber stacks grow at its side.', 'milestone');
-  }
-  // First fisherman's hut — on the Day 1 build bar, also missing acknowledgment.
-  if (!hasFlag('firstFisherman') && G.buildings.some(b => b.type === 'fisherman')) {
-    setFlag('firstFisherman');
-    chronicle("A fisherman's hut rises on the sand. Nets hang out to dry in the sea breeze.", 'milestone');
-  }
-  // First granary — fills out the Day 1 build bar with a beat.
-  if (!hasFlag('firstGranary') && G.buildings.some(b => b.type === 'granary')) {
-    setFlag('firstGranary');
-    chronicle('The granary is sealed against the weather. Winter will find us ready.', 'milestone');
-  }
-  // First mine / first quarry — common Day 2–3 placements; without beats the
-  // mid-game chronicle goes silent for 4+ days between Day 1 founding and the
-  // next seasonal turn.
-  if (!hasFlag('firstMine') && G.buildings.some(b => b.type === 'mine')) {
-    setFlag('firstMine');
-    chronicle('Picks ring in the iron mine. Ore carts clatter up from the dark.', 'milestone');
-  }
-  if (!hasFlag('firstQuarry') && G.buildings.some(b => b.type === 'quarry')) {
-    setFlag('firstQuarry');
-    chronicle('The quarry is opened. Dust hangs in the air as the first blocks are cut.', 'milestone');
-  }
+
   // First citizen born — deep-play showed citizensBorn=4 by Day 12 with zero
   // chronicle entries about a single birth. The settlement grew from 3 to 7
   // and the log never mentioned any of the new arrivals.
@@ -154,11 +152,6 @@ export function checkStoryBeats() {
     chronicle('The tavern opens its doors. Laughter carries into the night.', 'milestone');
     ensureMayor();
   }
-  // First market
-  if (!hasFlag('firstMarket') && G.buildings.some(b => b.type === 'market')) {
-    setFlag('firstMarket');
-    chronicle('Merchants unpack their wares at the new market. Trade has come to the realm.', 'milestone');
-  }
   // First barracks → rival noticed
   if (!hasFlag('firstBarracks') && G.buildings.some(b => b.type === 'barracks')) {
     setFlag('firstBarracks');
@@ -170,32 +163,6 @@ export function checkStoryBeats() {
     setFlag('firstChurch');
     chronicle('Bells toll from the new church. The faithful gather.', 'milestone');
     ensureBard();
-  }
-  // Loop 022 (the-fixer, closing 021 audit): 5 previously-silent buildings
-  // that mark meaningful mid-game pivots. 021 found that 12 of 24 building
-  // types had no first-build chronicle beat; these are the narratively
-  // weighty ones. Wall/road/well/tradingpost/chickencoop/cowpen/tower are
-  // deliberately not added here — they're either cosmetic (wall, road) or
-  // smaller side-steps; can be added in a later tick if desired.
-  if (!hasFlag('firstBlacksmith') && G.buildings.some(b => b.type === 'blacksmith')) {
-    setFlag('firstBlacksmith');
-    chronicle('Hammer rings on anvil. The first blade is quenched — sparks, steam, and a promise.', 'milestone');
-  }
-  if (!hasFlag('firstSchool') && G.buildings.some(b => b.type === 'school')) {
-    setFlag('firstSchool');
-    chronicle("The schoolhouse opens. Children's voices rise from the yard; letters are learned.", 'milestone');
-  }
-  if (!hasFlag('firstWindmill') && G.buildings.some(b => b.type === 'windmill')) {
-    setFlag('firstWindmill');
-    chronicle("Sails turn above the fields. Grain will become flour now, without the miller's back.", 'milestone');
-  }
-  if (!hasFlag('firstBakery') && G.buildings.some(b => b.type === 'bakery')) {
-    setFlag('firstBakery');
-    chronicle("The first loaves cool on the baker's rack. The realm smells like home tonight.", 'milestone');
-  }
-  if (!hasFlag('firstArchery') && G.buildings.some(b => b.type === 'archery')) {
-    setFlag('firstArchery');
-    chronicle('The butts are set, the strings drawn. Arrows find their mark — or fly far into the heather.', 'milestone');
   }
   // Population thresholds
   const popCheck = [
