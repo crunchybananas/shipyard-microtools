@@ -30,6 +30,10 @@ and note the promotion here.
 
 - 053 [code] **HIGH** — add 4 missing first-build beats to `BUILDING_FIRST_BEATS` in story.js: tower, well, chickencoop, cowpen. 021 found 12 missing, 022 fixed 5, 053's programmatic completionist play found these 4 still genuinely absent. Drafts in 053 journal. ~8-12 lines. Closes a 3-tick-old gap. [story.js]
 - 053 [code] — season-transition chronicle beats ("Summer arrives; the fields turn gold" / "First frost settles" / etc). Parallel to first-build-beats but triggered on G.season change. ~20 lines. Fills the mid-game chronicle void 053 surfaced. [story.js]
+- 056 [code] — render 056's standing stone at its seeded grass tile (persistent dark vertical + small base ellipse). Needs stone_x/stone_y stored in storyFlags. Pairs with 052's renderBuildingIsolated helper availability. [enhancements.js + story.js]
+- 056 [code] — expand 056's _STONE_PHRASES pool from 4 → 6-8 variants. Verification showed 3 of 8 kingdoms used the same "barely-legible" phrase. ~4 lines. [story.js]
+- 056 [surprise] — chronicle-echo system: low-rate (1% per new write) chance that an old tag:stone / tag:nightmare / tag:dream entry resurfaces as "An elder murmurs about..." — weaves old beats back into ongoing voice. [story.js]
+- 056 [code] — tune 043 nightmare window [50,250] vs 056 stone window [30,200] so they don't cluster. Filed; decide after more play data. [story.js]
 - 055 [code] — if cadence=10 feels too frequent in real play, try cadence=12 as middle ground (5 dreams per 60 days vs 4 at 14-day). Single-line revert/tweak. [story.js]
 - 055 [code] — staggered cadence: dreams every 10 days up to day 80, then every 20 days after. Late-game fewer fires → less repetition + preserves "rare ambient" feel. May be the real design shape. [story.js]
 - 055 [review] — thread-surfacing audit: which of the 10 threads actually surface for a typical realm? Which never do? Data-drives future pool-expansion. Pairs with 053's filed G.debug.dreamCoverage helper. [story.js]

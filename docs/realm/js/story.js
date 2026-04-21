@@ -248,6 +248,10 @@ export function checkStoryBeats() {
   // Loop 043 (a-scene-that-happens-once, surprise challenge):
   // at most one NIGHTMARE per realm, ever. See checkNightmareBeat.
   checkNightmareBeat();
+  // Loop 056 (a-scene-that-happens-once, second take): a standing
+  // stone found at dawn, inscribed with the kingdom's own name.
+  // Exactly one per realm, seeded day [30, 200]. See checkStoneBeat.
+  checkStoneBeat();
 }
 
 // ── Loop 039: the-dream — collective dreams ─────────────────
@@ -555,6 +559,49 @@ export function checkNightmareBeat() {
 // position in the module graph. Set on module-load below.
 let _NIGHTMARE_NOTIFY = null;
 import('./notifications.js').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
+
+// ── Loop 056: a-scene-that-happens-once (second take) ────────
+//
+// Sibling to 043's NIGHTMARE. Once per realm, on a seeded day in
+// [30, 200], a standing stone is discovered at dawn. The stone
+// bears the kingdom's own name — every realm gets one, always
+// inscribed with itself. No one remembers raising it.
+//
+// Where the nightmare is dark and rare-late-game (day 50-250),
+// the stone is earlier (30-200) and quieter — just one chronicle
+// line with tag 'stone'. No toast. Filed-then-forgotten-then-
+// rediscovered in an old chronicle. Not every player will
+// notice; future archivist ticks can surface it as a callback.
+//
+// Designed so the two once-per-realm beats don't overshadow each
+// other: nightmare is a disturbance (danger toast, rare tag,
+// character-conditional images), stone is a discovery (no toast,
+// persistent tag, kingdom-name only).
+
+const _STONE_DIRECTIONS = ['northern', 'southern', 'eastern', 'western'];
+const _STONE_PHRASES = [
+  (kname) => `carved into its face is a single word: ${kname}`,
+  (kname) => `the kingdom's name is cut shallow into it: ${kname}`,
+  (kname) => `a name is pressed into the stone, barely legible — ${kname}`,
+  (kname) => `the wind has worn ${kname} into the stone's lean`,
+];
+
+export function checkStoneBeat() {
+  if (hasFlag('stone_found')) return;
+  const kname = G.kingdomName || 'Realm';
+  const targetDay = _dreamHash(`${kname}_stone_day`) % 170 + 30;
+  if (G.day !== targetDay) return;
+  if (G.dayPhase > 120) return;  // dawn-only, same gate as the other beats
+  setFlag('stone_found');
+
+  const dir = _STONE_DIRECTIONS[_dreamHash(`${kname}_stone_dir`) % _STONE_DIRECTIONS.length];
+  const phrase = _STONE_PHRASES[_dreamHash(`${kname}_stone_phrase`) % _STONE_PHRASES.length](kname);
+
+  chronicle(
+    `A standing stone is found at dawn on the ${dir} edge of the fields — ${phrase}. No one remembers raising it.`,
+    'stone'
+  );
+}
 
 export function toggleChroniclePanel() {
   const p = document.getElementById('chronicle-panel');
