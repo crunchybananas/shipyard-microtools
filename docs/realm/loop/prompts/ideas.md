@@ -37,6 +37,9 @@ and note the promotion here.
 - 048 [review] — player-playthrough test: does the _t048 element actually get noticed? Would benefit from a `G.debug.forceT048()` helper to reliably trigger for testing.
 - 048 [code] — the _t048 pattern (module-local state + registerUpdater + registerWorldRenderer) is a reusable template for ambient content without polluting G. Extract into a helper? `silent-module` follow-up. [enhancements.js]
 - 048 [code] — subtle audio cue for _t048 (footstep ticks while walking). Tempting but this tick was deliberately pure-visual. Needs audio module cooperation. [enhancements.js + audio.js]
+- 050 [review] — full audit of ideas.md at tick 075 or 100 to cull DONE-and-no-longer-relevant items. Current: 30 DONE, 3 DROPPED in 90+ filed. Cleanup not urgent.
+- 050 [code] — give one named character (mayor, merchant, smith, teacher, bard, rival) a behavior that isn't just chronicle-beat framing. E.g., merchant's name influences trade prices; teacher gates a small research bonus. Graduates named-character system from decoration to mechanic. [state.js + (economy.js or tech.js)]
+- 050 [play] — Industrial / Seafaring / Merchant end-to-end playthrough, minimum 15 real minutes, journal mid-game findings. Never been done in the 001-050 window. Fresh class of findings guaranteed. [gameplay]
 - 049 [code] — broaden the hostname gate in index.html's SW-register block to include private-network IP ranges (192.168.x.x, 10.x.x.x) in case someone runs realm from a LAN IP. One-line change; defer until it's actually an issue. [index.html]
 - 049 [review] — remove old `?t=` cache-busters scattered across earlier verification paths. The SW makes them redundant. Low priority. [multiple]
 - 049 [code] — add a `Cache-Control: no-store` header shim via the SW for HTML too, so index.html edits also reflect on reload. Currently browsers may cache HTML per normal behavior. Only matters if a future tick touches index.html frequently. [sw.js]
