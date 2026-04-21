@@ -260,6 +260,10 @@ export function checkStoryBeats() {
   // stone found at dawn, inscribed with the kingdom's own name.
   // Exactly one per realm, seeded day [30, 200]. See checkStoneBeat.
   checkStoneBeat();
+  // Loop 059 (surprise, chronicle-echo): at dawn, small chance to
+  // resurface a prior memorable beat as a memory-fragment. See
+  // checkEchoBeat.
+  checkEchoBeat();
 }
 
 // ── Loop 039: the-dream — collective dreams ─────────────────
@@ -624,6 +628,67 @@ export function checkStoneBeat() {
     `A standing stone is found at dawn on the ${dir} edge of the fields — ${phrase}. No one remembers raising it.`,
     'stone'
   );
+}
+
+// ── Loop 059: chronicle-echo — old beats resurface as memory ─
+//
+// The realm was origin-heavy (first-build cluster + cycling
+// dreams + two once-per-realm beats), but ONCE a chronicle beat
+// fires it never resurfaces. 059 adds a loop-back: at dawn, a
+// small chance (~2%) to lift a prior memorable beat and wrap it
+// in a memory-frame so someone in the realm is "heard" recalling
+// it. Tagged 'echo' so UI/future filtering can treat them
+// distinctly. The effect is that the realm feels like it has a
+// memory of itself — travelers mention the nightmare weeks after
+// it was dreamed, bards still sing of the first bell.
+//
+// Selection rules:
+// - dawn only (dayPhase < 120), same gate as the rest
+// - G.day >= 30 (need some history)
+// - at least 3 memorable entries must exist
+// - deterministic per (kingdom, day) so two loads of the same
+//   save on the same day always see the same echo (or lack)
+// - never echoes misc/'echo'/'season' — only origin-class tags
+
+const _ECHO_SOURCE_TAGS = new Set([
+  'milestone', 'victory', 'character', 'birth',
+  'dream', 'nightmare', 'stone', 'raid',
+]);
+
+const _ECHO_FRAMES = [
+  (text) => `An elder is heard telling a child: "${text}"`,
+  (text) => `Travelers at the market repeat an old tale — "${text}"`,
+  (text) => `The bards still sing of that day: "${text}"`,
+  (text) => `Old folk remember. "${text}" they say.`,
+];
+
+export function checkEchoBeat() {
+  if (G.dayPhase > 120) return;       // dawn only
+  if (G.day < 30) return;             // require some history
+  if (!G.chronicle || G.chronicle.length < 3) return;
+
+  // Dedupe per day: one echo max per dawn
+  if (hasFlag(`echo_${G.day}`)) return;
+
+  const kname = G.kingdomName || 'Realm';
+  const roll = _dreamHash(`${kname}_echo_${G.day}`) % 100;
+  if (roll >= 2) return;  // ~2% chance
+
+  // Build candidate pool. Source beats should be memorable AND at
+  // least ~14 days old so the echo feels like distance, not repetition.
+  const candidates = G.chronicle.filter(c =>
+    _ECHO_SOURCE_TAGS.has(c.tag) && c.day <= G.day - 14
+  );
+  if (candidates.length < 1) return;
+
+  setFlag(`echo_${G.day}`);
+
+  const idx = _dreamHash(`${kname}_echo_pick_${G.day}`) % candidates.length;
+  const src = candidates[idx];
+  // Trim trailing newlines; keep the source prose intact in the quote.
+  const quoted = src.text.trim();
+  const frameIdx = _dreamHash(`${kname}_echo_frame_${G.day}`) % _ECHO_FRAMES.length;
+  chronicle(_ECHO_FRAMES[frameIdx](quoted), 'echo');
 }
 
 export function toggleChroniclePanel() {

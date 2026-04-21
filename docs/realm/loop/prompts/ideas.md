@@ -39,7 +39,11 @@ and note the promotion here.
 - 058 [review / play] — visual check of the stone on canvas with a persona (the-photographer / the-screenshot-critic). Pixel verification confirms render; persona check would confirm it reads right.
 - 056 [code] — render 056's standing stone at its seeded grass tile (persistent dark vertical + small base ellipse). Needs stone_x/stone_y stored in storyFlags. Pairs with 052's renderBuildingIsolated helper availability. [enhancements.js + story.js] **DONE → 058**
 - 056 [code] — expand 056's _STONE_PHRASES pool from 4 → 6-8 variants. Verification showed 3 of 8 kingdoms used the same "barely-legible" phrase. ~4 lines. [story.js]
-- 056 [surprise] — chronicle-echo system: low-rate (1% per new write) chance that an old tag:stone / tag:nightmare / tag:dream entry resurfaces as "An elder murmurs about..." — weaves old beats back into ongoing voice. [story.js]
+- 059 [code] — character-aware echo frames: when the source beat has a named character, use that character's name in the frame ("Rowen the Just was heard speaking of…"). 4 additional frame variants. Cross-refs 034. [story.js]
+- 059 [code] — echo-tier visual in chronicle UI: render 'echo' entries in a faded italic style so they read as recollection. [ui.js + index.html]
+- 059 [review] — echo-coverage audit: run 500 days, count what fraction of origin-class beats ever get echoed. If < 10%, consider doubling the rate or broadening the age gate. [story.js + G.debug helper]
+- 059 [code] — dynamic frame pool tied to source tag (nightmare echoes → "the day the realm didn't wake well"). More targeted than generic frames. [story.js]
+- 056 [surprise] — chronicle-echo system: low-rate (1% per new write) chance that an old tag:stone / tag:nightmare / tag:dream entry resurfaces as "An elder murmurs about..." — weaves old beats back into ongoing voice. [story.js] **DONE → 059**
 - 056 [code] — tune 043 nightmare window [50,250] vs 056 stone window [30,200] so they don't cluster. Filed; decide after more play data. [story.js]
 - 055 [code] — if cadence=10 feels too frequent in real play, try cadence=12 as middle ground (5 dreams per 60 days vs 4 at 14-day). Single-line revert/tweak. [story.js]
 - 055 [code] — staggered cadence: dreams every 10 days up to day 80, then every 20 days after. Late-game fewer fires → less repetition + preserves "rare ambient" feel. May be the real design shape. [story.js]
