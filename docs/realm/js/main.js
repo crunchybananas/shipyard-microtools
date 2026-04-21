@@ -27,7 +27,7 @@ import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
-import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens } from './story.js';
+import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -269,6 +269,7 @@ window.toggleMusicBtn = () => {
   if (btn) btn.textContent = on ? '🎵' : '🔕';
 };
 window.toggleChronicle = toggleChroniclePanel;
+window.setChronicleFilter = setChronicleFilter;  // 078: chip-click handler
 window.toggleMissions = () => {
   const c = document.getElementById('missions-content');
   const t = document.getElementById('missions-toggle');

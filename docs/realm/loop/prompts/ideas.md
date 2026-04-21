@@ -102,7 +102,11 @@ and note the promotion here.
 - 060 [code] — happiness-threshold beats. When happiness crosses 80 up (peak) or 20 down (crisis), fire one beat with cooldown. Emotional-state signal currently missing. ~10 lines. [story.js] **DONE → 071**
 - 060 [code] — sustained-state beats: "The realm has known peace for fifty days" / "Hunger grips the realm". Flag-gated to not spam. [story.js]
 - 060 [review] — surface-map doc: clean diagram of all 16 chronicle sites + 13 tags + 9 systems (060 mapped these). Would prevent future 053-style mis-diagnoses of already-shipped work. [loop/docs/]
-- 060 [code] — chronicle-panel tag filter UI: allow players to filter by tag. 13 tags ready to drive this. [ui.js + index.html]
+- 078 [code] — persist chronicle filter preference to localStorage so it survives page reload. ~5 lines. [story.js]
+- 078 [review] — emoji tone pass on the 14 TAG_ICONS. Does 🔁 for echo feel right vs 🕰️? Small review. [story.js]
+- 078 [code] — keyboard shortcuts 1-9 to pick the first 9 chip tags. [input.js + story.js]
+- 078 [code] — tag-group meta-chips ("narrative" = dream+echo+nightmare+stone, "economy" = event+research+milestone). [story.js]
+- 060 [code] — chronicle-panel tag filter UI: allow players to filter by tag. 13 tags ready to drive this. [ui.js + index.html] **DONE → 078**
 - 059 [code] — character-aware echo frames: when the source beat has a named character, use that character's name in the frame ("Rowen the Just was heard speaking of…"). 4 additional frame variants. Cross-refs 034. [story.js]
 - 059 [code] — echo-tier visual in chronicle UI: render 'echo' entries in a faded italic style so they read as recollection. [ui.js + index.html]
 - 059 [review] — echo-coverage audit: run 500 days, count what fraction of origin-class beats ever get echoed. If < 10%, consider doubling the rate or broadening the age gate. [story.js + G.debug helper]

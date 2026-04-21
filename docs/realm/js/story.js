@@ -30,6 +30,26 @@ export function hasFlag(key) { initChronicle(); return !!G.storyFlags[key]; }
 export function setFlag(key, val=true) { initChronicle(); G.storyFlags[key] = val; }
 
 // ── Render chronicle panel ─────────────────────────────────
+// Loop 078: chronicle tag-filter UI. Uses the 14-tag taxonomy 075
+// documented in loop/docs/narrative-surfaces.md. Chips above the
+// entry list toggle per-tag filtering: click once to show only
+// matching entries, click the same chip again (or click the All
+// chip) to clear. Active chip gets accent border.
+const TAG_ICONS = {
+  milestone:'🏛️', event:'✨', character:'👤', raid:'⚔️',
+  season:'🍃', death:'🪦', birth:'👶', victory:'🏆', misc:'📜',
+  dream:'🌙', nightmare:'🌑', stone:'🗿', echo:'🔁', research:'📚',
+};
+
+// Module-local filter state (not persisted to save — this is a
+// viewing preference, not realm state).
+let _chronicleFilter = null;
+
+export function setChronicleFilter(tag) {
+  _chronicleFilter = (tag === _chronicleFilter || tag == null) ? null : tag;
+  renderChroniclePanel();
+}
+
 export function renderChroniclePanel() {
   initChronicle();
   const c = document.getElementById('chronicle-content');
@@ -38,23 +58,46 @@ export function renderChroniclePanel() {
     c.innerHTML = '<div class="chron-empty">Your chronicle is blank. Shape the realm and it will record your deeds.</div>';
     return;
   }
-  const tagIcons = {
-    milestone:'🏛️', event:'✨', character:'👤', raid:'⚔️',
-    season:'🍃', death:'🪦', birth:'👶', victory:'🏆', misc:'📜',
-  };
   const seasonIcons = { spring:'🌱', summer:'☀️', autumn:'🍂', winter:'❄️' };
+
+  // Figure out which tags actually appear in this realm's chronicle —
+  // only show chips for present tags, so empty categories don't
+  // clutter the filter row.
+  const presentTags = new Set(G.chronicle.map(e => e.tag));
+
+  // Build filter chip row: "All" + one chip per present tag
+  let filterRow = '<div class="chron-filters">';
+  filterRow += `<span class="chron-chip${_chronicleFilter == null ? ' active' : ''}" onclick="window.setChronicleFilter(null)">All · ${G.chronicle.length}</span>`;
+  for (const [tag, icon] of Object.entries(TAG_ICONS)) {
+    if (!presentTags.has(tag)) continue;
+    const count = G.chronicle.filter(e => e.tag === tag).length;
+    const active = _chronicleFilter === tag;
+    filterRow += `<span class="chron-chip${active ? ' active' : ''}" onclick="window.setChronicleFilter('${tag}')">${icon} ${count}</span>`;
+  }
+  filterRow += '</div>';
+
+  // Apply filter to entries
+  const entries = _chronicleFilter == null
+    ? G.chronicle
+    : G.chronicle.filter(e => e.tag === _chronicleFilter);
+
+  if (entries.length === 0) {
+    c.innerHTML = filterRow + '<div class="chron-empty">No entries match this filter.</div>';
+    return;
+  }
+
   const byDay = {};
-  for (const e of G.chronicle) {
+  for (const e of entries) {
     if (!byDay[e.day]) byDay[e.day] = [];
     byDay[e.day].push(e);
   }
   const days = Object.keys(byDay).map(Number).sort((a,b)=>b-a);
-  let html = '';
+  let html = filterRow;
   for (const d of days) {
     const seas = byDay[d][0].season;
     html += `<div class="chron-day"><div class="chron-day-h">${seasonIcons[seas]||''} Day ${d}</div>`;
     for (const e of byDay[d]) {
-      html += `<div class="chron-row"><span class="chron-tag">${tagIcons[e.tag]||'📜'}</span><span class="chron-text">${e.text}</span></div>`;
+      html += `<div class="chron-row"><span class="chron-tag">${TAG_ICONS[e.tag]||'📜'}</span><span class="chron-text">${e.text}</span></div>`;
     }
     html += '</div>';
   }
