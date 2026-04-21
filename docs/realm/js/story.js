@@ -339,6 +339,32 @@ const _DREAM_THREADS = {
       'the alphabet of a tongue no one has yet spoken',
     ],
   },
+  // Loop 054 (the-fixer, 053 HIGH): pool expansion. 053's 155-day
+  // programmatic play showed dreams started repeating by the 5th-6th
+  // fire — the pre-054 pool was 8 threads × ~4 images, and `requires()`
+  // gates narrow the surfaced set to 3-4 threads for most mid-game
+  // realms. Adding `weather` (always-available) and `children` (pop >=
+  // 10 gate) brings the pool above the repeat threshold.
+  weather: {
+    always: true,
+    images: [
+      'a rain that falls only inside the houses, warm and remembered',
+      'snow arriving on the wrong side of the year, unmelted by morning',
+      'a fog that knows every name and refuses to say them',
+      'the wind carrying voices from a storm three hundred years past',
+      'a single cloud shaped exactly like the realm\'s coastline',
+    ],
+  },
+  children: {
+    requires: () => (G.population ?? 0) >= 10,
+    images: [
+      'children laughing at a game the adults have forgotten how to play',
+      'a lullaby sung by a mother whose own mother taught it, and so on',
+      'small footprints leading up the wall and onto the ceiling',
+      'a toy boat floating on a puddle that reflects a different sky',
+      'the first word each child in the realm will speak, all in unison',
+    ],
+  },
 };
 
 // ── Loop 044: time-aware — real-world seasoning ──────────────

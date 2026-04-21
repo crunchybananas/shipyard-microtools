@@ -30,7 +30,10 @@ and note the promotion here.
 
 - 053 [code] **HIGH** — add 4 missing first-build beats to `BUILDING_FIRST_BEATS` in story.js: tower, well, chickencoop, cowpen. 021 found 12 missing, 022 fixed 5, 053's programmatic completionist play found these 4 still genuinely absent. Drafts in 053 journal. ~8-12 lines. Closes a 3-tick-old gap. [story.js]
 - 053 [code] — season-transition chronicle beats ("Summer arrives; the fields turn gold" / "First frost settles" / etc). Parallel to first-build-beats but triggered on G.season change. ~20 lines. Fills the mid-game chronicle void 053 surfaced. [story.js]
-- 053 [code] — expand `_DREAM_THREADS` pool. 053's 11-dream run showed repetition by the 5th-6th fire. Adding 2-3 threads (e.g. `weather`, `children`, `dead`) brings pool above repeat threshold. [story.js]
+- 054 [code] — connect `weather` dream thread to `G.weather` state. When active weather is rain/storm, boost weather-thread weight via 044's `_realWorldDreamLens` mechanism. Pattern-match with seasonal boost. [story.js]
+- 054 [code] — `dead` thread (filed 053 + 054 de-prioritized). If it ships, adjust 043's nightmare image pool to avoid overlap. [story.js]
+- 054 [code] — thread-coverage audit helper `G.debug.dreamCoverage(n)` that runs N dream fires for a kingdom and reports surface frequency by thread. Would make future pool-expansion ticks data-driven. [story.js]
+- 053 [code] — expand `_DREAM_THREADS` pool. 053's 11-dream run showed repetition by the 5th-6th fire. Adding 2-3 threads (e.g. `weather`, `children`, `dead`) brings pool above repeat threshold. [story.js] **DONE → 054** (shipped 2 of 3: weather + children; dead skipped for tonal reasons)
 - 053 [code] — `G.debug.t048()` getter that returns `_t048` state (or null). Unblocks verification of 048's element without naming it in code body. [enhancements.js]
 - 053 [surprise / code] — end-of-realm beats: chronicle is origin-heavy, death-silent. "Last citizen dies" / "castle falls" / "realm forgotten" would bookend narrative. [story.js]
 - 053 [code] — happiness/state-reactive dreams. When happiness < 30 or population falling, dreams bias toward `warning` thread. Gate + boost logic like 044's. [story.js]
