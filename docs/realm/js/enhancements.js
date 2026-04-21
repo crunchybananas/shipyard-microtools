@@ -4488,7 +4488,14 @@ function updateRaidChronicle() {
     _raidKillsStart = G.stats.enemiesKilled || 0;
     _raidDiedStart = G.stats.citizensDied || 0;
   }
-  if (G.enemies.length === 0 && _lastRaidDay > 0 && G.stats.raidsSurvived > 0) {
+  // Loop 038 (the-fixer): dropped the `raidsSurvived > 0` gate. Post-014
+  // that counter only increments when hasDefense is true at spawn-time, so
+  // a defenseless raid that kills citizens and leaves used to have no
+  // summary at all — worst-case outcome with least feedback. The message-
+  // picker below already handles all four outcome shapes (razed / losses-
+  // only / mixed / victory / bloodless-withdraw); _lastRaidDay > 0 is
+  // enough to confirm a raid actually occurred.
+  if (G.enemies.length === 0 && _lastRaidDay > 0) {
     if (_lastRaidDay === G.day - 1 || _lastRaidDay === G.day) {
       const kills = (G.stats.enemiesKilled || 0) - _raidKillsStart;
       const losses = (G.stats.citizensDied || 0) - _raidDiedStart;
