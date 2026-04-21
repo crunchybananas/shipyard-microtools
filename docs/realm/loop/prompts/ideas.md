@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 045 [code] **HIGH** — add `SEASONS.<season>.skyShift` triples and apply via `shiftColor` to dayTop/dayBot at render.js:118-121 during the `day` blend coefficient only (not dawn/dusk). 045 pixel-sampled 4 seasons at midday and all 4 sky averages landed within ±1 per channel. Calibration in 045 journal. Closes the root cause 013's "weakest frame" flag pointed at. Magnitude ≤ 15/channel. [state.js + render.js]
+- 045 [code] — bump `horizonAlpha` at dawn/dusk OR widen the warm-bottom gradient band so horizon warmth isn't clipped by typical camera angles. Needs a screenshot-critic follow-up to tune. [render.js ~118-139 and ~2555]
+- 045 [review] — after skyShift lands, re-run color-eye across 16 frames (4 seasons × 4 times-of-day) to verify no regression in 012/017/018 hue-variation. Pairs with light screenshot-critic re-shoot.
 - 044 [code] — extend `_realWorldDreamLens` into `checkNightmareBeat`: a Halloween-day nightmare fires with an even darker intro override. Tiny (~5 lines). Risk: nightmare+Halloween collision reads on-the-nose. But: Halloween rare × nightmare once-per-realm = low realized-collision rate. [story.js]
 - 044 [code] — `nextDreamSeason()` helper that peeks at what season will bias the *next* fire. Could power a chronicle ticker hint e.g. "The dreams ahead feel like winter." [story.js]
 - 044 [surprise] — locale-aware special dates keyed off `navigator.language` (Dia de los Muertos, Samhain closer variants). Fragile; document the localization risk before picking. [story.js]
