@@ -119,6 +119,20 @@ export function render() {
     const dawnTop = 0x2e2a50, dawnBot = 0xc6703a;
     const dayTop = 0x8fb4de, dayBot = 0xd0dbe8;
     const duskTop = 0x3a2a58, duskBot = 0xd06044;
+    // Loop 047 (the-fixer, 045 HIGH finding): midday sky was season-
+    // blind. Shift dayTop/dayBot by the season's skyShift so midday
+    // reads autumn-amber / winter-cool / etc. Only the `day` blend
+    // pulls toward dayTopS — dawn/dusk keep nightTop/dawnTop/duskTop
+    // unchanged so 012's hue-variation thread is untouched.
+    const seasonSkyShift = (getSeasonData().skyShift) || [0,0,0];
+    const shiftHex = (hex, sh) => {
+      const r = Math.max(0, Math.min(255, ((hex >> 16) & 255) + sh[0]));
+      const g = Math.max(0, Math.min(255, ((hex >> 8)  & 255) + sh[1]));
+      const b = Math.max(0, Math.min(255, (hex & 255)         + sh[2]));
+      return (r << 16) | (g << 8) | b;
+    };
+    const dayTopS = shiftHex(dayTop, seasonSkyShift);
+    const dayBotS = shiftHex(dayBot, seasonSkyShift);
     const lerp2 = (a, b, f) => a * (1 - f) + b * f;
     // Blend: night is default; dawn/dusk/day override by phase amount.
     let topR = ((nightTop >> 16) & 255), topG = ((nightTop >> 8) & 255), topB = nightTop & 255;
@@ -132,7 +146,7 @@ export function render() {
       botR = lerp2(botR, cr, f); botG = lerp2(botG, cg, f); botB = lerp2(botB, cb, f);
     };
     apply(dawnTop, dawn); applyBot(dawnBot, dawn);
-    apply(dayTop, day); applyBot(dayBot, day);
+    apply(dayTopS, day); applyBot(dayBotS, day);
     apply(duskTop, dusk); applyBot(duskBot, dusk);
     const grad = ctx.createLinearGradient(0, 0, 0, logicalH);
     grad.addColorStop(0, `rgb(${Math.round(topR)},${Math.round(topG)},${Math.round(topB)})`);
