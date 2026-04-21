@@ -412,6 +412,48 @@ export function _realWorldDreamLens(now = new Date()) {
   return { boost, special };
 }
 
+// ── Loop 064: the approach — pre-event dream bias ────────────
+//
+// Looks up the kingdom's seeded nightmare-day and stone-day
+// (same hashes 043/056 use), and if the current day is within a
+// 10-day approach window of either beat AND the beat hasn't
+// fired, returns a list of thread names to boost. Mirrors 044's
+// `boost` shape so callers can extend avail[] identically.
+//
+// The window is exactly one dream-cadence cycle (055 set cadence
+// to 10 days). Nightmare day 150 → dream on day 140 is the one
+// fire inside the window; it gets the boost. Stone day 176 →
+// dream on day 170 gets the boost. This targets the last dream
+// before each lifetime event, so the player sees ONE biased dream
+// heralding what's coming.
+//
+// Nightmare approach → 'warning' (cold foreboding in dreams).
+// Stone approach → 'founding' + 'hearth' (settlement-memory
+// imagery, so the stone feels like something the realm has been
+// building toward even though no one raised it).
+//
+// Once the beat fires, its flag kills the boost — post-event
+// dreams revert to normal cadence.
+export function _approachingEventBoost() {
+  const kname = G.kingdomName || 'Realm';
+  const boost = [];
+
+  if (!hasFlag('nightmare_fired')) {
+    const nDay = _dreamHash(`${kname}_nightmare_day`) % 200 + 50;
+    if (G.day >= nDay - 10 && G.day < nDay) boost.push('warning');
+  }
+
+  if (!hasFlag('stone_found')) {
+    const sDay = _dreamHash(`${kname}_stone_day`) % 170 + 30;
+    if (G.day >= sDay - 10 && G.day < sDay) {
+      boost.push('founding');
+      boost.push('hearth');
+    }
+  }
+
+  return boost;
+}
+
 export function checkDreamBeat() {
   // Loop 055 (constant-shift): dream cadence 14 → 10 days. 053's
   // completionist play flagged mid-game chronicle-density as low:
@@ -441,6 +483,17 @@ export function checkDreamBeat() {
   // boosted — we don't invent threads that don't apply.
   const lens = _realWorldDreamLens();
   for (const name of lens.boost) {
+    if (avail.includes(name)) avail.push(name);
+  }
+
+  // Loop 064 (the approach, surprise): in the 5 days before a
+  // once-per-realm beat fires, bias the dream pool toward thematic
+  // pre-echoes. A nightmare approaches → warning imagery creeps in.
+  // A stone is about to be found → dreams of founding/hearth surface.
+  // The bias is subtle (one extra copy in the pool); the effect over
+  // 3-5 dream fires is a noticeable lean. Attentive players feel
+  // "something's coming" without any chronicle announcement.
+  for (const name of _approachingEventBoost()) {
     if (avail.includes(name)) avail.push(name);
   }
 

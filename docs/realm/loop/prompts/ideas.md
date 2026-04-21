@@ -45,6 +45,10 @@ and note the promotion here.
 - 061 [code] — optional chronicle beat on wanderer spawn (`character` or new `visitor` tag). Breaks 048's "silent" rule; only ship if we decide wanderer should be announced. [enhancements.js + story.js]
 - 061 [code] — soft interaction: clicking near the wanderer shows a one-line tooltip once per realm ("A figure passes. They do not pause."). Preserves mystery. [input.js + enhancements.js]
 - 061 [code] — pilgrim sibling variant — religious-coded, stops at the church if one exists. Lets wanderer keep its rootless meaning, introduces a second element with its own role. [enhancements.js]
+- 064 [code] — approach-aware echoes: in the 10-day nightmare-approach window, `checkEchoBeat` prefers sources tagged 'warning'/'raid'/'death'. Thematic pre-echo alongside dream bias. ~8 lines. [story.js]
+- 064 [code] — visual approach cue: ambient signal in world (raven appears, dusk dims 2-3% extra) during nightmare approach window. Pairs with 048/058 ambient philosophy. [enhancements.js + render.js]
+- 064 [review / play] — long-run play through both approach windows; is 064's ×2 boost detectable in real play? If subtle, bump to ×3. If obvious, keep ×2.
+- 064 [code] — silent music cue (single low note) on nightmare-approach days. Adds audio layer to a currently-silent narrative axis. [audio.js + story.js]
 - 063 [code] — consider adding `death` to `_ECHO_SOURCE_TAGS`. 059 excluded it ("don't joke about deaths") but "the bards still sing of the plague year" could land. [story.js]
 - 063 [review] — long-run echo audit after 063 fix: how often does echo cite `event`/`season` vs other tags? Inform future weighting. [story.js]
 - 063 [code] — weighted echo-source selection: prefer once-per-realm tags (nightmare, stone, victory) 2× over more-abundant tags (milestone, dream, event, season). Makes lifetime-unique beats more likely to resurface. [story.js]
