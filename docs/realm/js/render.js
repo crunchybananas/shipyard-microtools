@@ -2971,6 +2971,26 @@ function drawBuilding(ctx, b, s, daylight) {
         ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
       }
     }
+    // Loop 087 (the-fixer, 086 filed): farm + quarry were excluded
+    // from snow-caps above because they don't have roofs to cap.
+    // Winter farm == summer farm was a real seasonal-signal gap.
+    // 087 adds a ground-level dusting over the tile footprint for
+    // these two building types. Semi-transparent so the tile
+    // beneath still reads.
+    if (G.season === 'winter' && (b.type === 'farm' || b.type === 'quarry')) {
+      ctx.fillStyle = 'rgba(230,240,255,0.35)';
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y - TH/2 + 2);
+      ctx.lineTo(s.x + TW/2 - 2, s.y);
+      ctx.lineTo(s.x, s.y + TH/2 - 2);
+      ctx.lineTo(s.x - TW/2 + 2, s.y);
+      ctx.closePath();
+      ctx.fill();
+      // Two frost highlights
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillRect(s.x - 6, s.y - 3, 3, 1);
+      ctx.fillRect(s.x + 2, s.y + 1, 4, 1);
+    }
 
     // Night window glow — warm light from inhabited buildings at night
     if (daylight < 0.75 && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
