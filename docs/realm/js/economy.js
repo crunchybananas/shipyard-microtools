@@ -10,6 +10,7 @@ import { spawnDust } from './particles.js';
 import { panCameraTo } from './render.js';
 import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
+import { isBuildingUnlocked } from './tech.js';
 
 export function canPlace(type, tx, ty) {
   if (tx<0||tx>=MAP_W||ty<0||ty>=MAP_H) return false;
@@ -380,9 +381,28 @@ export function checkRaids() {
     playSound('raid');
 
     const report = [`⚔️ RAID: ${raiders} raiders approach!`];
-    report.push(G.defense > 0 || (G.soldiers && G.soldiers.length > 0)
-      ? 'Your defenders move to intercept.'
-      : '⚠️ No defenders! Build walls, barracks, or towers.');
+    if (G.defense > 0 || (G.soldiers && G.soldiers.length > 0)) {
+      report.push('Your defenders move to intercept.');
+    } else {
+      // Loop 015 (the-fixer, closing 010 #1): the "No defenders!" toast
+      // used to name walls/barracks/towers regardless of whether they
+      // were actually available to the player. On Military scenario with
+      // zero techs, the toast pointed at buildings the player couldn't
+      // see in the build bar. Now we rephrase by what's actually unlocked.
+      const wallOK = isBuildingUnlocked('wall');
+      const barrackOK = isBuildingUnlocked('barracks'); // towers share the same tech
+      let hint;
+      if (!wallOK && !barrackOK) {
+        hint = '⚠️ No defenders! Research Masonry to unlock walls.';
+      } else if (wallOK && !barrackOK) {
+        hint = '⚠️ No defenders! Build walls. Research Military for barracks/towers.';
+      } else if (!wallOK && barrackOK) {
+        hint = '⚠️ No defenders! Build barracks or towers.';
+      } else {
+        hint = '⚠️ No defenders! Build walls, barracks, or towers.';
+      }
+      report.push(hint);
+    }
     for (const line of report) notify(line, 'danger');
 
     // Pan camera to an attacked-area preview
