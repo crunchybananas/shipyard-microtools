@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080. Maintained by
+**Status:** Written in tick 075. Updated 080, 084. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -8,7 +8,12 @@ more systems, 074 removed 5 duplicates, 075 wrote this. 076 audit
 found 10 more duplicate-toast sites, 077 closed 8 of them (3 HIGH
 + 5 MEDIUM). 078 shipped the tag-filter UI using the taxonomy
 below. 079 added a cross-system compound beat (offering-at-stone,
-reuses `stone` tag). 080 updated this doc.
+reuses `stone` tag). 080 first maintenance update. 081 shipped
+`G.debug.fastForward` infra. 082 ran completionist through
+fastForward + found 2 HIGHs (raid pollution, "dawn gate skip").
+083 closed BOTH with one 3-line fix — the "dawn gate skip"
+hypothesis was wrong; real mechanism was cap eviction by raid
+noise. 084 (this update) captures the 082/083 lesson.
 
 ## why this exists
 
@@ -219,11 +224,23 @@ should respect:
   the toast from duplicating the direct write.
 - **Chronicle cap 300 entries** (story.js:26). Enforce via
   `G.chronicle.splice(0, excess)` — oldest drops first.
+- **Noise evicts signal at the cap.** 082/083 discovered: if any
+  single system writes many entries per game-day, rare one-shot
+  beats (nightmare, stone, founder-naming, offering) can be
+  pushed out of the 300-entry window before a player reads them.
+  Before adding a chronicle writer, estimate its steady-state
+  rate per 200-day realm. Anything above ~1 entry/day is a
+  candidate for `{chronicle: false}` unless the entries are
+  truly memorable. See 083's raid-toast cleanup for the template
+  fix.
+- **Filed as future protection** (083 idea): once-per-realm tag
+  writes (nightmare/stone/victory) could be marked
+  eviction-immune when the cap kicks in. Not implemented yet.
 - **Chronicle entries have `{day, season, tick, text, tag}`
   shape.** Writers should use the existing `chronicle(text, tag)`
   helper; don't push directly.
 
-## known gaps (as of 080)
+## known gaps (as of 084)
 
 - **Sustained-state beats** (060 filed) — no beat for "realm has
   known peace for 50 days." Filed as 060 idea.
@@ -239,34 +256,63 @@ should respect:
 - **LOW design-choice sites** (076 LOW): main.js:247 trade-success
   and economy.js:589 upgrade-success chronicle every action.
   Noisy for long economies; worth a design review.
+- **Once-per-realm beats aren't eviction-immune** (083 filed).
+  If a future noise regression happens, the rare beats could get
+  cap-evicted again. ~5-line fix in story.js:26 chronicle()
+  would pin lifetime tags. Filed; defensive.
+- **Year-milestone has grammar bug** (082): "enters second year
+  with 1 souls" — should be `soul` when N=1. Also year boundary
+  computation at day 29 is unusual.
+
+## retired hypotheses (record for future ticks)
+
+- **"fastForward skips dawn-gated beats"** (082 HIGH #2 →
+  retired by 083). Original 082 symptom was dream/stone/echo =
+  0 in a 200-day fastForward. Hypothesis: rAF-free loop with
+  G.speed=60 + `crossed(60)` sampling missed the dayPhase 0-120
+  window. Reality: beats FIRED but got cap-evicted by 197 raid-
+  noise entries. fastForward is trustworthy for dawn-gated beats.
+  Don't re-investigate this unless there's new evidence.
 
 ## cadence summary
 
-Per a 200-day realm with a normal build pace (updated at 080
-after 077 cleanup + 079 addition):
+Per a 200-day realm with a normal build pace (updated at 084
+after 077/083 cleanups + 079 addition). 082 measured 299 entries
+pre-083 (hit 300 cap, evicting dream/stone/echo). 083 cleaned
+raid-toast pollution (-162). Re-measured 083: **156 entries**.
 
 ```
-~20-25 first-build/milestone beats (day 1-30 cluster)
-~1 founder beat (day 3-6, one-shot — 3 names in one entry)
-~6 character intro beats (34's ensures, day 2-15)
-20 dreams (every 10 days from day 10)
-~2-4 echoes (2% per-dawn)
-1 nightmare (seeded [50,250])
-1 stone (seeded [30,200])
+25  first-build/milestone beats (day 1-30 cluster)
+1   founder beat (day 3-6, one-shot — 3 names in one entry)
+10  character intro + events (034 ensures + bard arrivals)
+20  dreams (every 10 days from day 10)
+2-4 echoes (2% per-dawn)
+0-1 nightmare (seeded [50,250])
+0-1 stone (seeded [30,200])
 0-1 offering-at-stone (079 — cross-gated on peak+stone, rare)
-~4 season transitions (every 7 days, ~28 per 200 days)
-~10-30 seasonal proverbs (one per season change)
+28  season transitions (every 7 days × 4-ish cycles)
+29  seasonal proverbs (one per season change + elder saying)
 0-3 research beats (depends on player pace)
-0-5 disaster event beats (RNG)
+2-5 disaster event beats (RNG; plague/drought/fire/earthquake)
 0-4 happiness-threshold beats (depends on trajectory)
-0-3 year milestones (year 2/3/5)
+3   year milestones (year 2/3/5 if realm lives long enough)
+15-35 raid-resolution beats (one per raid cycle, 083 clean-up;
+      PRE-083 was 150-200 due to UI-toast pollution)
 ```
 
-Total per 200-day realm: **~80-120 chronicle entries in normal
-play, well under the 300 cap.** 077 removed ~10-20 duplicate/
-miscategorized entries that used to inflate this count; the
-range is intact but the *quality* of each entry is higher (less
-tag-pollution, cleaner filterable streams).
+Total per 200-day realm: **~130-170 chronicle entries** in 083-
+clean play. Under 300 cap with comfortable headroom. 075's
+original ~80-120 prediction was slightly low — didn't anticipate
+that season (28) + seasonal proverbs (29) each contribute at the
+high end of a season cycle; those are fixed-cadence recurring
+beats that sum near 57 by themselves.
+
+**Cadence health trend:**
+- 082 (pre-083): 299 (cap-hit, signal evicted)
+- 083 (post-fix): 156 (quality signal, no eviction)
+- 075's target: 80-120 (too low — underestimated seasons)
+- **084's revised target: ~130-170** (realistic with current
+  surfaces, assumes no future noise regressions)
 
 ## how to update this doc
 
@@ -292,5 +338,13 @@ shipping, touch this file too.
 - **077** — fixed 8 of 10 (3 HIGH + 5 MEDIUM)
 - **078** — tag-filter UI using taxonomy above
 - **079** — added cross-system offering beat (reuses `stone` tag)
-- **080** — this update (adds #14 system, cadence updated,
-  invariants expanded with tag-reuse + cross-system gate rules)
+- **080** — first maintenance update (adds #14 system, tag-reuse +
+  cross-system gate invariants)
+- **081** — `G.debug.fastForward` helper; main.js
+- **082** — fastForward-driven completionist; found 2 HIGHs
+- **083** — closed BOTH 082 HIGHs with one 3-line fix. Raid-toast
+  cleanup + surprise lesson: the "dawn-gate skip" was actually
+  cap-eviction by noise, not a fastForward bug.
+- **084** — this maintenance update. Captures noise-evicts-signal
+  as an invariant; revises cadence target to 130-170 post-083;
+  corrects 082's HIGH #2 hypothesis.

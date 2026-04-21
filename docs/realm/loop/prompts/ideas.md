@@ -78,7 +78,10 @@ and note the promotion here.
 - 069 [review] — audit other toast+chronicle double-fires besides season. Raid events? Research completion (does showToast route to chronicle?). [notifications.js]
 - 081 [code] — `{ noParticles: true }` option for fastForward — skip particle/smoke updates for tighter benchmarking. Small speedup. [main.js]
 - 081 [code] — `G.debug.snapshot()` helper returning full-state snapshot for before/after comparisons. Pairs with fastForward. [main.js]
-- 083 [doc] — update narrative-surfaces.md: post-083 cadence (156 per 200-day realm, much closer to 075's ~80-120 target), close 082 HIGH #2 false hypothesis (fastForward IS trustworthy for dawn-gates; the issue was cap eviction by noise), document the "noise-evicts-signal" failure mode. [loop/docs/]
+- 084 [review] — after tick 100, re-measure cadence via fastForward. Confirm ~156/200-day realm is stable. If crept up from new systems, budget a noise-control pass.
+- 084 [code] — inline chronicle-rate warning: if any single tag exceeds ~100 entries in 200-day window, log warn in debug mode. Catches noise regressions before they evict signal. [story.js]
+- 084 [doc] — "how to audit a chronicle regression" playbook: fastForward(200) + tag-count + look for outliers. Operational recipe. [loop/docs/]
+- 083 [doc] — update narrative-surfaces.md: post-083 cadence (156 per 200-day realm, much closer to 075's ~80-120 target), close 082 HIGH #2 false hypothesis (fastForward IS trustworthy for dawn-gates; the issue was cap eviction by noise), document the "noise-evicts-signal" failure mode. [loop/docs/] **DONE → 084**
 - 083 [review] — scan for other chronicle noise sources at tick 100. Event tag only had 4 entries in 083 run — any others polluted? Not urgent. [events.js + story.js]
 - 083 [code] — protect once-per-realm beats (nightmare/stone/victory) from chronicle cap eviction. ~5 lines in story.js:26. [story.js]
 - 082 [code] **HIGH** — add `{chronicle: false}` to 4 raid-warning notify calls (economy.js:371 scouts-report, :377 raiders-approach, raid-spawn notify, no-defenders warning). Reduces raid-tag chronicle pollution by ~180 entries per 200-day realm. Same 070/077 pattern. 076 classified as LOW; 082 volume data promotes to HIGH. [economy.js] **DONE → 083**
