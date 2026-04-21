@@ -605,6 +605,21 @@ export function checkStoneBeat() {
   const dir = _STONE_DIRECTIONS[_dreamHash(`${kname}_stone_dir`) % _STONE_DIRECTIONS.length];
   const phrase = _STONE_PHRASES[_dreamHash(`${kname}_stone_phrase`) % _STONE_PHRASES.length](kname);
 
+  // Loop 058: store seeded tile coords so a renderer can draw the
+  // stone at the location implied by the direction. Kept in
+  // storyFlags (persists with the save) as plain numbers. Renderer
+  // lives in enhancements.js and reads stone_x / stone_y on every
+  // frame. Range [22, 58] keeps the tile comfortably inside the
+  // 80×80 map's grassy interior without touching the shore.
+  const offset = _dreamHash(`${kname}_stone_offset`) % 36 + 22;
+  let sx, sy;
+  if (dir === 'northern')      { sx = offset; sy = 22; }
+  else if (dir === 'southern') { sx = offset; sy = 58; }
+  else if (dir === 'eastern')  { sx = 58; sy = offset; }
+  else                         { sx = 22; sy = offset; }
+  setFlag('stone_x', sx);
+  setFlag('stone_y', sy);
+
   chronicle(
     `A standing stone is found at dawn on the ${dir} edge of the fields — ${phrase}. No one remembers raising it.`,
     'stone'

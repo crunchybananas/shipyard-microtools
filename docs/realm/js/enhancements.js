@@ -1239,6 +1239,48 @@ function _t048_draw(ctx) {
 registerUpdater(_t048_tick);
 registerWorldRenderer(_t048_draw);
 
+// ── Loop 058 — render 056's standing stone ───────────────────
+// Paired with story.js:checkStoneBeat (loop 056). Reads the seeded
+// tile coords that fire saved into `G.storyFlags.stone_x/stone_y`
+// and draws a small standing stone there — once the beat has
+// fired, the stone is persistent for the realm's life. Hidden at
+// tiny zoom so it doesn't register as a dot on distant views.
+function _stoneDraw(ctx) {
+  if (!G.storyFlags?.stone_found) return;
+  const tx = G.storyFlags.stone_x;
+  const ty = G.storyFlags.stone_y;
+  if (tx == null || ty == null) return;
+  if (G.camera && G.camera.zoom < 0.6) return;
+  const p = toScreen(tx, ty);
+  ctx.save();
+  // Ground shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y + 2, 4, 1.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Stone body — gradient dark-grey, slightly narrower at top
+  const grad = ctx.createLinearGradient(p.x, p.y - 12, p.x, p.y);
+  grad.addColorStop(0, '#4e4844');
+  grad.addColorStop(1, '#2e2826');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(p.x - 2.8, p.y);
+  ctx.lineTo(p.x - 1.8, p.y - 12);
+  ctx.lineTo(p.x + 2.0, p.y - 12);
+  ctx.lineTo(p.x + 3.0, p.y);
+  ctx.closePath();
+  ctx.fill();
+  // Left-edge highlight (sun from upper-right by convention)
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(p.x - 1.8, p.y - 12);
+  ctx.lineTo(p.x - 2.8, p.y);
+  ctx.stroke();
+  ctx.restore();
+}
+registerWorldRenderer(_stoneDraw);
+
 
 // ── Loop 23: Smoking volcano (rare; one mountain peak) ─────
 let _volcanoTile = null;
