@@ -61,7 +61,15 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #title-version{position:absolute;bottom:1rem;right:1.2rem;font-size:0.65rem;color:rgba(255,255,255,0.2);font-variant-numeric:tabular-nums;letter-spacing:0.05em}
 
 /* HUD */
-#hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
+/* Loop 041 (the-fixer, closing 040 HIGH): gap 1.5rem→1rem saves ~152px of
+   flex-gap budget (19 gaps × 8px) — reclaiming more than the 123px overflow
+   040 measured at 1280 viewport under stress. Also added max-width+ellipsis
+   on #kingdom-display below so unusually long names can't re-introduce the
+   overflow. justify-content stays center; min-width:0 on shrinkable children
+   lets the long items (kingdom/date) shrink rather than push neighbors off. */
+#hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
+#kingdom-display{max-width:10rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#day-display{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Loop 035: photo mode — hide all HUD chrome so the canvas shows a clean frame. Toggled by H key via window.togglePhotoMode. */
 body.photo-mode #hud,body.photo-mode #build-bar,body.photo-mode #missions,body.photo-mode #controls,body.photo-mode #minimap,body.photo-mode #info-panel,body.photo-mode #tutorial-tip,body.photo-mode #toast,body.photo-mode #activity-feed,body.photo-mode #event-banner,body.photo-mode #raid-banner,body.photo-mode #chronicle-panel,body.photo-mode #happiness-panel,body.photo-mode #research-panel,body.photo-mode #stats-panel,body.photo-mode #achievements-panel,body.photo-mode #notification-log,body.photo-mode #trade-panel,body.photo-mode #pop-panel{display:none !important}
 /* Loop 036: sticky raid banner — prominent but non-modal. Sits below the HUD, center-anchored. Red-tinted so it reads "urgent" without a modal feel. */
