@@ -276,6 +276,9 @@ export function checkStoryBeats() {
   // resurface a prior memorable beat as a memory-fragment. See
   // checkEchoBeat.
   checkEchoBeat();
+  // Loop 072 (surprise): once per realm, the three founding settlers
+  // are named. See checkFounderBeat.
+  checkFounderBeat();
 }
 
 // ── Loop 039: the-dream — collective dreams ─────────────────
@@ -762,6 +765,56 @@ export function checkEchoBeat() {
   const quoted = src.text.trim();
   const frameIdx = _dreamHash(`${kname}_echo_frame_${G.day}`) % _ECHO_FRAMES.length;
   chronicle(_ECHO_FRAMES[frameIdx](quoted), 'echo');
+}
+
+// ── Loop 072: the founders named (surprise) ──────────────────
+//
+// The day-1 founding beat describes "three weary settlers" but
+// the settlers themselves stay nameless forever. 072 fills that
+// gap: on a kingdom-seeded day in [3, 6] at dawn, a chronicle
+// entry names the three founders. Names persist as story flags
+// (founder1/founder2/founder3) so future echoes or lore-hunter
+// ticks can reference them.
+//
+// Different from the 034 named-character system (mayor/bard/
+// rival/smith/merchant/teacher) — those are building-rooted
+// characters who appear ONCE a specific building exists. The
+// founders pre-date any building; they're a fixed cast of the
+// realm's beginning.
+//
+// Tag 'character' — auto-echo-eligible (059/063 pool).
+
+const _FOUNDER_NAMES_POOL = [
+  'Edda', 'Maren', 'Silas', 'Linna', 'Bram', 'Ivy', 'Torrin',
+  'Hesper', 'Osric', 'Rhea', 'Corvin', 'Maia', 'Orin', 'Juno',
+  'Wren', 'Thaddeus', 'Lira', 'Aldo', 'Bree', 'Finn',
+];
+
+export function checkFounderBeat() {
+  if (hasFlag('founders_named')) return;
+  if (G.day < 3) return;
+  const kname = G.kingdomName || 'Realm';
+  const targetDay = _dreamHash(`${kname}_founders_day`) % 4 + 3;  // [3, 6]
+  if (G.day !== targetDay) return;
+  if (G.dayPhase > 120) return;  // dawn-only, same gate as other beats
+  setFlag('founders_named');
+
+  // Pick 3 distinct names by per-slot hash, without replacement
+  const pool = [..._FOUNDER_NAMES_POOL];
+  const names = [];
+  for (let i = 0; i < 3; i++) {
+    const idx = _dreamHash(`${kname}_founder_${i}`) % pool.length;
+    names.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  setFlag('founder1', names[0]);
+  setFlag('founder2', names[1]);
+  setFlag('founder3', names[2]);
+
+  chronicle(
+    `The three founders at last know each other's names: ${names[0]}, ${names[1]}, and ${names[2]}. The wicker packs are unpacked; the fire does not go out.`,
+    'character'
+  );
 }
 
 export function toggleChroniclePanel() {

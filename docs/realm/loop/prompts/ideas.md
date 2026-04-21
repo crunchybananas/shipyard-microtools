@@ -75,6 +75,10 @@ and note the promotion here.
 - 065 [code] — tech-prereq unlock beats (subtle hint when prereq completion opens new research option). [tech.js]
 - 065 [review] — tone audit: read the 11 new research beats alongside BUILDING_FIRST_BEATS. Confirm no drift. [story.js + tech.js]
 - 060 [code] — research-completion beats. `tag:research` when a tech finishes. "The realm has mastered Masonry" etc. A whole progression axis is currently silent in the chronicle. ~15 lines. [tech.js or story.js] **DONE → 065**
+- 072 [code] — add founder-name fragments to 043's `_nightmareImagesForState` pool. `founders_named` flag gate + 3 conditionals (`${founder1}'s footprints...` etc). Deep-game narrative compound. [story.js]
+- 072 [code] — 039 dream thread `founding` could have founder-name-conditional image variants once founders_named flag is set. [story.js]
+- 072 [review] — lore-hunter read of the 20-name founder pool for unintended connotations (too-modern / too-tropey). Quick tone pass. [story.js]
+- 072 [code] — founder death tracking: if a starter citizen dies, name them specifically in a chronicle beat. Requires citizen-ID → founder-slot mapping. [combat.js + story.js]
 - 071 [code] — variant texts for happiness peak/crisis beats (3-4 variations each via _dreamHash pick, like 056's stone). Makes repeat cycles less literal. [story.js]
 - 071 [code] — extend 064 approach system: when happiness trends DOWN toward crisis, bias dreams toward `warning`. State-slope trigger, same boost mechanism. [story.js]
 - 071 [review] — happy-peak + nightmare/stone day collision check: does a kingdom whose nightmare lands near a peak/crisis day feel off? Low priority.
