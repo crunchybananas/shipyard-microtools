@@ -31,6 +31,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .scenario-select{margin-top:0.8rem;text-align:center;animation:titleSlideUp 0.7s ease both;animation-delay:0.65s}
 .title-section-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);margin-bottom:0.3rem}
 .scenario-buttons{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap}
+#scenario-desc{margin-top:0.5rem;font-size:0.75rem;color:rgba(255,255,255,0.55);font-style:italic;min-height:1em;transition:color 0.2s}
 .scen-btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:0.4rem 0.8rem;border-radius:6px;font-family:inherit;font-size:0.75rem;cursor:pointer;transition:all 0.15s}
 .scen-btn:hover{color:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.3)}
 .scen-btn.active{border-color:var(--accent);background:rgba(129,140,248,0.1);color:var(--accent)}
@@ -505,6 +506,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
         <button class="scen-btn" onclick="setScenario('seafaring')">⛵ Seafaring</button>
         <button class="scen-btn" onclick="setScenario('industrial')">⚙️ Industrial</button>
       </div>
+      <div id="scenario-desc">A quiet island. Build your first settlement.</div>
     </div>
     <div class="kingdom-name-section">
       <input type="text" id="kingdom-name-input" placeholder="Name your kingdom..." maxlength="20" />

@@ -46,7 +46,7 @@ and note the promotion here.
 - 005 [code] — split `getDaylight` into `getDaylight` (clamp [0,1], gameplay-safe) + `getWarmth` (free-range color bias). Pre-req for any curve re-shape. [state.js]
 - 005 [code] — align ground luminance peaks with sky-gradient peaks at t=0.22 and t=0.78 (they're currently mis-aligned — sky peaks warm when ground is ramping or already descending). [state.js + render.js:118]
 - 005 [code] — `getSkyWarmth(t)` sampler on `G.debug.skyCurve`; enables sky/ground alignment verification before shipping a change. [render.js + state.js]
-- 007 [code] — scenario descriptions on landing page: one line per scenario (Peaceful/Military/Merchant/Seafaring/Industrial), hover or always-visible. Novice can't tell them apart. [index.html landing]
+- 007 [code] — scenario descriptions on landing page: one line per scenario (Peaceful/Military/Merchant/Seafaring/Industrial), hover or always-visible. Novice can't tell them apart. [index.html landing] **DONE → 008** (desc element under `.scenario-buttons`, driven by `SCENARIOS[id].desc` via `setScenario`)
 - 007 [code] — tutorial progress label: change `2/10` to `Step 2 of 10` or similar explicit label. Currently ambiguous with resource counts. [ui.js tutorial tip]
 - 007 [code] — cancel building-selection on tutorial-step advance (or flash the new target). Current behavior: tutorial says "click Lumber Mill" but previous Farm selection stays active, causing accidental double-farm placement. [input.js / ui.js]
 - 007 [code] — tooltip coverage on tile-decoration dots (berries, herbs, ore, etc.). Current: no hover reveal. Novice can't identify them. [input.js hover handler + ui.js]

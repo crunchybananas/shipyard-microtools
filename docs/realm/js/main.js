@@ -21,7 +21,7 @@ import { toggleNotificationLog, notify } from './notifications.js';
 import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js';
-import { getActiveScenario, checkScenarioComplete } from './scenarios.js';
+import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js';
 import { updateWalkers } from './walkers.js';
 import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
@@ -148,6 +148,11 @@ window.setScenario = (id) => {
   document.querySelectorAll('.scen-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick').includes(id));
   });
+  const descEl = document.getElementById('scenario-desc');
+  if (descEl) {
+    const scen = SCENARIOS.find(s => s.id === id);
+    descEl.textContent = scen ? scen.desc : '';
+  }
 };
 
 window.startNewGame = () => {
