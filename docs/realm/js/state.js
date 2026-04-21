@@ -162,7 +162,15 @@ export const SEASONS = {
   spring: { name:'🌱 Spring', foodMult:1.2, speedMult:1.0, tileShift:[0,12,0],   label:'Spring' },
   summer: { name:'☀️ Summer', foodMult:1.5, speedMult:1.1, tileShift:[8,5,-5],   label:'Summer' },
   autumn: { name:'🍂 Autumn', foodMult:0.8, speedMult:1.0, tileShift:[15,-5,-10], label:'Autumn' },
-  winter: { name:'❄️ Winter', foodMult:0.3, speedMult:0.8, tileShift:[-10,-5,15], label:'Winter' },
+  // Loop 017 (the-fixer, 013 finding): winter tileShift tuned from
+  // [-10,-5,+15] to [-5,-3,+8]. The previous values produced a uniformly
+  // blue-washed drained winter-midday (the multiply overlay is off at
+  // daylight=1.0 so the tileShift was unopposed for ~42% of each winter
+  // day). Half-magnitude preserves the cool winter cue without reading
+  // as under-exposed. Dusk/night hue-variation (012) still supplies the
+  // warm/cool contrast; winter midday no longer has to carry a cold feel
+  // on its own.
+  winter: { name:'❄️ Winter', foodMult:0.3, speedMult:0.8, tileShift:[-5,-3,8], label:'Winter' },
 };
 const SEASON_ORDER = ['spring','summer','autumn','winter'];
 export const SEASON_IDX = { spring: 0, summer: 1, autumn: 2, winter: 3 };
