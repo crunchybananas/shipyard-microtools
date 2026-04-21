@@ -61,7 +61,11 @@ and note the promotion here.
 - 074 [review] — verify removed loop numbers (187/191/193/195/197) aren't referenced in any cross-reference journals. If so, note the retirement.
 - 073 [code] **HIGH** — remove 5 duplicate first-build blocks in enhancements.js (firstSchool/firstGranary/firstBlacksmith/firstWindmill/firstArchery). BUILDING_FIRST_BEATS runs first so the enhancements.js prose is dead code. ~30 LoC. [enhancements.js] **DONE → 074**
 - 073 [code] — promote year-milestone beats (year 2/3/5) from enhancements.js:5086-5097 into a NARRATIVE_BEATS generalization when 062 lands. [enhancements.js → story.js]
-- 073 [review] — write a loop-docs narrative-surface map with all 20 systems (073 corrected 060's 9-system count). Future ticks save hours. [loop/docs/]
+- 075 [code] — automated doc-check CI/script that counts `chronicle(` callsites and compares to doc's claimed count. Fails on mismatch. Prevents silent doc rot. [scripts/ or ci]
+- 075 [review] — re-audit narrative-surfaces.md at tick 100 (or every 25 ticks). Update claimed system count against reality.
+- 075 [doc] — ASCII flow diagram section showing chronicle-writer → tag → echo-eligible → echo-frames relationships. [loop/docs/narrative-surfaces.md]
+- 075 [code] — `G.debug.chronicleSources()` helper: returns live tag→count histogram for current save. Lets future ticks verify doc vs reality in seconds. [main.js]
+- 073 [review] — write a loop-docs narrative-surface map with all 20 systems (073 corrected 060's 9-system count). Future ticks save hours. [loop/docs/] **DONE → 075** (final count: ~25 systems, not 20 — audit drift noted in doc)
 - 073 [code] — move disaster beats (plague/drought/fire/earthquake) from enhancements.js to events.js where related event-firing lives. De-duplicate with events.js's existing event content. [events.js + enhancements.js]
 - 073 [review] — the-minimalist on enhancements.js (~6000 lines). What's disabled/orphaned? Pruning pass. [enhancements.js]
 - 069 [code] — trace the misc-tagged elder-saying source at season change ("Children play at the well. 'Summer is for growing'"). Likely advisor.js. Needs adding to 060's surface map. [advisor.js + audit] **DONE → 073** (source: enhancements.js:5579 seasonal proverbs, NOT advisor.js)
