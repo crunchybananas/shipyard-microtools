@@ -239,3 +239,54 @@ export function lightCurve({ samples = 24, season = null } = {}) {
   G.season = savedSeason;
   return rows;
 }
+
+// Instrumentation for loop 037 (silent-module): sample the tint overlay
+// coefficients across a day. Mirrors render.js:2515-2530 as a pure
+// function — no game-state mutation beyond the save/restore dayPhase
+// bracket. Useful for any future tick that needs to numerically diff
+// 012's hue-variation (e.g., before shipping a further tint change).
+//
+// NOTE: lightCurve (004) reports `overlayR/G/B` using the PRE-012
+// static coefficients (160/150/100). Those values are now stale. Prefer
+// tintCurve for current tint math; lightCurve remains correct for the
+// daylight-curve shape (`t`, `daylight`, `effLum`).
+export function tintCurve({ samples = 24 } = {}) {
+  const savedPhase = G.dayPhase;
+  const rows = [];
+  for (let i = 0; i <= samples; i++) {
+    const dayT = i / samples;
+    G.dayPhase = dayT * G.dayLength;
+    const dl = getDaylight();
+    const row = {
+      t: +dayT.toFixed(3),
+      hour: +(dayT * 24).toFixed(1),
+      daylight: +dl.toFixed(3),
+    };
+    if (dl < 0.95) {
+      const darkness = Math.min(1 - dl, 0.7);
+      let kR, kG, kB;
+      if (dayT < 0.10) {
+        // Dawn — soft rose (render.js:2524-2528).
+        kR = 80; kG = 140; kB = 160;
+      } else {
+        // Dusk (t=0.70) → night (t=1.0) lerp.
+        const nightBlend = Math.max(0, Math.min(1, (dayT - 0.70) / 0.30));
+        kR = 80  + (180 - 80)  * nightBlend;
+        kG = 120 + (140 - 120) * nightBlend;
+        kB = 180 + (100 - 180) * nightBlend;
+      }
+      row.kR = Math.round(kR);
+      row.kG = Math.round(kG);
+      row.kB = Math.round(kB);
+      row.tintR = Math.round(255 - darkness * kR);
+      row.tintG = Math.round(255 - darkness * kG);
+      row.tintB = Math.round(255 - darkness * kB);
+    } else {
+      row.kR = 0; row.kG = 0; row.kB = 0;
+      row.tintR = 255; row.tintG = 255; row.tintB = 255;
+    }
+    rows.push(row);
+  }
+  G.dayPhase = savedPhase;
+  return rows;
+}

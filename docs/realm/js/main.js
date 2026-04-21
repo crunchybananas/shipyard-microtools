@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve } from './state.js';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render } from './render.js';
@@ -190,6 +190,7 @@ window.loadAndStart = () => {
 window.G = G;
 G.debug = G.debug || {};
 G.debug.lightCurve = lightCurve;
+G.debug.tintCurve = tintCurve;
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /
