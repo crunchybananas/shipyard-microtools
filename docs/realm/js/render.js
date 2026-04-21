@@ -97,6 +97,47 @@ function shiftColor(color, shift) {
 
 // getDaylight is imported from state.js
 
+// ── Loop 067 (the-fixer, 066 HIGH) ────────────────────────────
+// Shared night-tint overlay. Applies a multiply-blend tint on top
+// of the current ctx, using 012's dawn-rose / dusk-amber /
+// indigo-night hue-lerp profile. Called from render() for the
+// world pass AND from renderBuildingIsolated() so isolated-
+// building audits see the same tint the live render shows.
+//
+// Arguments are explicit (not read from G) so callers in
+// offscreen contexts don't need to swap G state.
+//
+// The fillRect is drawn well beyond any reasonable canvas edge
+// so the tint covers both the iso world view (world-transformed
+// ctx) and the isolated canvas (identity transform).
+export function applyNightTint(ctx, daylight, dayPhase, dayLength) {
+  if (daylight >= 0.95) return;
+  const darkness = (1 - daylight);
+  ctx.save();
+  ctx.globalCompositeOperation = 'multiply';
+  const cappedDarkness = Math.min(darkness, 0.7);
+  const dayTNow = (dayPhase ?? 0) / (dayLength ?? 3600);
+  let kR, kG, kB;
+  if (dayTNow < 0.10) {
+    // Dawn — soft rose: R drops least, G medium, B more
+    kR = 80; kG = 140; kB = 160;
+  } else {
+    // Dusk→night: lerp from amber (t=0.70) to indigo (t=1.0).
+    // amber:  R 80, G 120, B 180 → keeps warm light, cools distance
+    // indigo: R 180, G 140, B 100 → the classic night blue-cast
+    const nightBlend = Math.max(0, Math.min(1, (dayTNow - 0.70) / 0.30));
+    kR = 80  + (180 - 80)  * nightBlend;
+    kG = 120 + (140 - 120) * nightBlend;
+    kB = 180 + (100 - 180) * nightBlend;
+  }
+  const tintR = Math.round(255 - cappedDarkness * kR);
+  const tintG = Math.round(255 - cappedDarkness * kG);
+  const tintB = Math.round(255 - cappedDarkness * kB);
+  ctx.fillStyle = `rgb(${tintR},${tintG},${tintB})`;
+  ctx.fillRect(-5000, -5000, 10000, 10000);
+  ctx.restore();
+}
+
 export function render() {
   // Loop 76 (render S4): sky gradient varies with day phase. Before, the
   // off-island area was a flat near-black void at all times. Now: warm
@@ -2526,41 +2567,12 @@ export function render() {
     ctx.globalAlpha = daylight;
   }
 
-  // Night overlay — multiply-blend so it darkens without washing out color
-  if (daylight < 0.95) {
-    const darkness = (1 - daylight);
-    ctx.save();
-    ctx.globalCompositeOperation = 'multiply';
-    // Loop 012 (the-fixer, closing 011's recommendation): the tint hue
-    // now varies with dayPhase instead of being a uniform blue cast at
-    // every non-plateau moment. Dawn = rose, dusk = amber, deep night
-    // = indigo. Magnitude (cappedDarkness) unchanged; only the per-
-    // channel coefficient profile moves. This lets the ~19% luminance
-    // delta between peak-plateau and dusk read against *different*
-    // colored tints instead of the same blue one.
-    const cappedDarkness = Math.min(darkness, 0.7);
-    const dayTNow = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
-    let kR, kG, kB;
-    if (dayTNow < 0.10) {
-      // Dawn — soft rose: R drops least, G medium, B more
-      kR = 80; kG = 140; kB = 160;
-    } else {
-      // Dusk→night: lerp from amber (t=0.70) to indigo (t=1.0).
-      // amber:  R 80, G 120, B 180 → keeps warm light, cools distance
-      // indigo: R 180, G 140, B 100 → the classic night blue-cast
-      const nightBlend = Math.max(0, Math.min(1, (dayTNow - 0.70) / 0.30));
-      kR = 80  + (180 - 80)  * nightBlend;
-      kG = 120 + (140 - 120) * nightBlend;
-      kB = 180 + (100 - 180) * nightBlend;
-    }
-    const tintR = Math.round(255 - cappedDarkness * kR);
-    const tintG = Math.round(255 - cappedDarkness * kG);
-    const tintB = Math.round(255 - cappedDarkness * kB);
-    ctx.fillStyle = `rgb(${tintR},${tintG},${tintB})`;
-    ctx.fillRect(-5000, -5000, 10000, 10000);
-    ctx.restore();
-    ctx.globalAlpha = 1;
-  }
+  // Night overlay — multiply-blend so it darkens without washing out color.
+  // Loop 067 (the-fixer, 066 HIGH): extracted to `applyNightTint` so
+  // `renderBuildingIsolated` can re-use the same tint math. Shared
+  // function, single source of truth.
+  applyNightTint(ctx, daylight, G.dayPhase, G.dayLength);
+  ctx.globalAlpha = 1;
 
   // Sunset/sunrise horizon glow (dawn: t<0.1, dusk: t 0.6–0.75)
   const dayT = G.dayPhase / G.dayLength;
@@ -6275,6 +6287,11 @@ export function renderBuildingIsolated(type, opts = {}) {
   const daylight = opts.daylight !== undefined ? opts.daylight : 1.0;
   const bgColor = opts.bgColor || '#4fb04f';  // grass green
   const season = opts.season || 'spring';
+  // Loop 067: dayPhase defaults to midday if caller didn't set one.
+  // Audits that want a dusk/night tint pass explicit phases like
+  // 0.78 * dayLength (dusk peak) or 0.05 * dayLength (deep night).
+  const dayLengthVal = G.dayLength || 3600;
+  const dayPhase = opts.dayPhase !== undefined ? opts.dayPhase : dayLengthVal * 0.5;
 
   const off = document.createElement('canvas');
   off.width = width;
@@ -6298,11 +6315,16 @@ export function renderBuildingIsolated(type, opts = {}) {
   const origDayPhase = G.dayPhase;
   const origSeason = G.season;
   G.camera = { x: 0, y: 0, zoom: 1.5 };  // zoom >= 1 enables full-detail branches
-  G.dayPhase = (G.dayLength || 3600) * 0.5;  // midday — no night tint
+  G.dayPhase = dayPhase;  // 067: allow caller-set phase for tint audits
   G.season = season;
 
   try {
     drawBuilding(octx, mockBuilding, s, daylight);
+    // Loop 067: apply the shared night-tint overlay so dusk/night
+    // renders through the helper show the same tint the live game
+    // shows. Explicit dayPhase + dayLength args — no G swap needed
+    // for applyNightTint itself.
+    applyNightTint(octx, daylight, dayPhase, dayLengthVal);
   } finally {
     G.camera = origCamera;
     G.dayPhase = origDayPhase;
