@@ -94,6 +94,9 @@ and note the promotion here.
 - 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play] **DONE → 082**
 - 081 [code] — `G._fastForwarding` flag so music/particles/rendering can skip expensive work during batch advance. [main.js]
 - 069 [code] — `G.debug.fastForward(days)` helper that directly advances the main-loop for N days without rAF throttling. Would make future idle-player chrome-mcp ticks hit mid-game in seconds. [main.js] **DONE → 081**
+- 088 [code] — subsequent-winter beats (second/third/fifth winters with shifting tone). ~12 lines. [story.js]
+- 088 [code] — first-storm / first-rain / first-drought analogs to first-snow. [story.js + weather]
+- 088 [review] — visual check: does 088's "stands in the fields" phrasing read OK against 087's ground-dusting? On-screen moment. [play]
 - 087 [code] — wall snow cap (winter stones look frosted). Currently roads + walls stay vanilla. 3-4 lines. [render.js]
 - 087 [review] — 086's per-season audit data now slightly stale — farm no longer season-invariant. Minor update if future silhouette-test uses 086 as baseline. [loop/docs/]
 - 087 [code] — snow accumulation over time (thin → thicker by mid-winter → melt). Dynamic rather than static. ~15 lines. [render.js + state.js]

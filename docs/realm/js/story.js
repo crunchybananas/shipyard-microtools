@@ -305,6 +305,19 @@ export function checkStoryBeats() {
     chronicle('The first raid is turned back. The dead are buried; the living drink to the fallen.', 'raid');
   }
 
+  // Loop 088 (surprise): first-snow beat. Fires once, the first
+  // time the realm sees winter past day 10. References a founder
+  // by name if 072 has named them; otherwise generic. Cross-refs
+  // 072 founders + 087 winter visuals + season-change.
+  if (!hasFlag('first_snow_seen') && G.season === 'winter' && G.day >= 10) {
+    setFlag('first_snow_seen');
+    const founder = G.storyFlags.founder1;
+    const text = founder
+      ? `The first snow falls on the realm. ${founder} stands in the fields a long time before going indoors.`
+      : `The first snow falls on the realm. The settlers stand in the fields a long time before going indoors.`;
+    chronicle(text, 'milestone');
+  }
+
   // Loop 071: happiness-threshold beats. 060 audit found no narrative
   // surface when happiness crosses critical thresholds. Fires once on
   // crossing 80 up (peak) or 20 down (crisis), with a cooldown flag
