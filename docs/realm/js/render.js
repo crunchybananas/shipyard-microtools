@@ -2517,13 +2517,31 @@ export function render() {
     const darkness = (1 - daylight);
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    // Blue-tinted dark multiply overlay. Cap darkness at 0.7 so night
-    // stays playable — was going nearly black at daylight=0, making
-    // citizens and buildings impossible to see.
+    // Loop 012 (the-fixer, closing 011's recommendation): the tint hue
+    // now varies with dayPhase instead of being a uniform blue cast at
+    // every non-plateau moment. Dawn = rose, dusk = amber, deep night
+    // = indigo. Magnitude (cappedDarkness) unchanged; only the per-
+    // channel coefficient profile moves. This lets the ~19% luminance
+    // delta between peak-plateau and dusk read against *different*
+    // colored tints instead of the same blue one.
     const cappedDarkness = Math.min(darkness, 0.7);
-    const tintR = Math.round(255 - cappedDarkness * 160);
-    const tintG = Math.round(255 - cappedDarkness * 150);
-    const tintB = Math.round(255 - cappedDarkness * 100);
+    const dayTNow = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
+    let kR, kG, kB;
+    if (dayTNow < 0.10) {
+      // Dawn — soft rose: R drops least, G medium, B more
+      kR = 80; kG = 140; kB = 160;
+    } else {
+      // Dusk→night: lerp from amber (t=0.70) to indigo (t=1.0).
+      // amber:  R 80, G 120, B 180 → keeps warm light, cools distance
+      // indigo: R 180, G 140, B 100 → the classic night blue-cast
+      const nightBlend = Math.max(0, Math.min(1, (dayTNow - 0.70) / 0.30));
+      kR = 80  + (180 - 80)  * nightBlend;
+      kG = 120 + (140 - 120) * nightBlend;
+      kB = 180 + (100 - 180) * nightBlend;
+    }
+    const tintR = Math.round(255 - cappedDarkness * kR);
+    const tintG = Math.round(255 - cappedDarkness * kG);
+    const tintB = Math.round(255 - cappedDarkness * kB);
     ctx.fillStyle = `rgb(${tintR},${tintG},${tintB})`;
     ctx.fillRect(-5000, -5000, 10000, 10000);
     ctx.restore();
