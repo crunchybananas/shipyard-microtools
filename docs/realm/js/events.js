@@ -61,7 +61,14 @@ export const EVENT_DEFS = [
       if (count > 0) trySpawnSettlers(count);
     },
     onEnd() {},
-    endMsg: '',
+    // Loop 033 (the-fixer, closing 021 audit): migration previously had
+    // an empty endMsg, so an event that DID do something (+5 settlers)
+    // ended silently. Closing beat matches the tone of the duration>0
+    // events (drought/plague/festival etc.) which all narrate their
+    // endings. Other duration:0 events still have empty endMsg — that's
+    // a broader pattern question deferred to a future tick (see 033
+    // journal).
+    endMsg: '🚶 The newcomers have settled in. Their foreign accents are fading already.',
   },
   {
     id: 'bountiful',
