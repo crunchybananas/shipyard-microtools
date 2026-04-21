@@ -53,7 +53,10 @@ and note the promotion here.
 - 063 [review] — long-run echo audit after 063 fix: how often does echo cite `event`/`season` vs other tags? Inform future weighting. [story.js]
 - 063 [code] — weighted echo-source selection: prefer once-per-realm tags (nightmare, stone, victory) 2× over more-abundant tags (milestone, dream, event, season). Makes lifetime-unique beats more likely to resurface. [story.js]
 - 060 [code] **HIGH** — add `event` and `season` to `_ECHO_SOURCE_TAGS` in story.js:648. 060 audit found these 2 tags excluded but they're legitimate origin-class beats (cloaked-stranger, season-transitions). Trivial 1-line expansion. [story.js] **DONE → 063**
-- 060 [code] — research-completion beats. `tag:research` when a tech finishes. "The realm has mastered Masonry" etc. A whole progression axis is currently silent in the chronicle. ~15 lines. [tech.js or story.js]
+- 065 [code] — "all techs researched" milestone beat. If G.researchedTechs.size === Object.keys(TECHS).length, fire a single milestone beat. ~8 lines. [tech.js]
+- 065 [code] — tech-prereq unlock beats (subtle hint when prereq completion opens new research option). [tech.js]
+- 065 [review] — tone audit: read the 11 new research beats alongside BUILDING_FIRST_BEATS. Confirm no drift. [story.js + tech.js]
+- 060 [code] — research-completion beats. `tag:research` when a tech finishes. "The realm has mastered Masonry" etc. A whole progression axis is currently silent in the chronicle. ~15 lines. [tech.js or story.js] **DONE → 065**
 - 060 [code] — happiness-threshold beats. When happiness crosses 80 up (peak) or 20 down (crisis), fire one beat with cooldown. Emotional-state signal currently missing. ~10 lines. [story.js]
 - 060 [code] — sustained-state beats: "The realm has known peace for fifty days" / "Hunger grips the realm". Flag-gated to not spam. [story.js]
 - 060 [review] — surface-map doc: clean diagram of all 16 chronicle sites + 13 tags + 9 systems (060 mapped these). Would prevent future 053-style mis-diagnoses of already-shipped work. [loop/docs/]

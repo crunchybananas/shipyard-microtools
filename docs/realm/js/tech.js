@@ -4,6 +4,7 @@
 
 import { G } from './state.js';
 import { playSound } from './audio.js';
+import { chronicle } from './story.js';
 
 export const TECHS = {
   agriculture: {
@@ -161,6 +162,27 @@ export function startResearch(techId) {
   return true;
 }
 
+// Loop 065 (the-fixer, 060 HIGH): chronicle beats for research
+// completion. 060's audit found research was the widest uncovered
+// narrative axis — techs finished silently, without the realm
+// acknowledging mastery. Each tech gets an imagistic one-liner in
+// the voice of BUILDING_FIRST_BEATS. Missing entries fall through
+// to a generic "<tech> is mastered" beat so new techs always get
+// at least a default chronicle.
+const RESEARCH_BEATS = {
+  masonry:      'The realm masters masonry. Stone now speaks in lines and courses.',
+  engineering:  'Engineering is grasped. Water runs where it is told; the roads remember where they lead.',
+  metallurgy:   'Ore yields to fire at last. The realm learns to fetch the buried heat.',
+  commerce:     'Commerce is taught. Coins begin to remember which hands they have passed through.',
+  military:     'The art of arms is set down in lore. Recruits study what they once only endured.',
+  brewing:      'Brewing is learned. What cold spring water could not cheer, malted barley will.',
+  architecture: 'Architecture is learned. Thresholds now know where walls begin and where they end.',
+  baking:       "Baking is mastered. Bread cools on a shelf the village knows the shape of.",
+  husbandry:    'Husbandry is grasped. Hoof and horn are counted, named, remembered.',
+  smithing:     'Smithing is learned. Hammers now strike with purpose beyond force.',
+  archery:      "The fletcher's trade is mastered. Arrows fly true to measure, not to hope.",
+};
+
 export function updateResearch() {
   if (!G.currentResearch) return;
   // Schools boost research speed by 50% each (multiplicative)
@@ -174,6 +196,9 @@ export function updateResearch() {
     playSound('mission');
     const tech = TECHS[techId];
     showToast(`Research complete: ${tech.name}`);
+    // Loop 065: chronicle beat. Fallback for any future tech.
+    const text = RESEARCH_BEATS[techId] || `${tech.name} is mastered. The realm bends a new skill into its lore.`;
+    try { chronicle(text, 'research'); } catch (_e) {}
   }
 }
 

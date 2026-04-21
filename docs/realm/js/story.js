@@ -703,6 +703,7 @@ const _ECHO_SOURCE_TAGS = new Set([
   'milestone', 'victory', 'character', 'birth',
   'dream', 'nightmare', 'stone', 'raid',
   'event', 'season',
+  'research',  // added 065 alongside the new tag
 ]);
 
 const _ECHO_FRAMES = [
