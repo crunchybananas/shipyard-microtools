@@ -382,6 +382,13 @@ export function setupInput(canvas, canvas3d) {
       if (window.toggleLog) window.toggleLog();
       return;
     }
+    // Loop 035 (the-fixer): H = photo mode (hide all HUD chrome). Pairs
+    // with CSS rules on body.photo-mode in index.html + the G.photoMode
+    // check in enhancements.js:renderPauseOverlay.
+    if (e.key === 'h' && !e.ctrlKey && !e.metaKey) {
+      if (window.togglePhotoMode) window.togglePhotoMode();
+      return;
+    }
     if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
       const rp = document.getElementById('research-panel');
       if (rp) rp.style.display = rp.style.display === 'none' ? 'flex' : 'none';

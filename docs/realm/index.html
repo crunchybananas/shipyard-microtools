@@ -62,6 +62,10 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 /* HUD */
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
+/* Loop 035: photo mode — hide all HUD chrome so the canvas shows a clean frame. Toggled by H key via window.togglePhotoMode. */
+body.photo-mode #hud,body.photo-mode #build-bar,body.photo-mode #missions,body.photo-mode #controls,body.photo-mode #minimap,body.photo-mode #info-panel,body.photo-mode #tutorial-tip,body.photo-mode #toast,body.photo-mode #activity-feed,body.photo-mode #event-banner,body.photo-mode #chronicle-panel,body.photo-mode #happiness-panel,body.photo-mode #research-panel,body.photo-mode #stats-panel,body.photo-mode #achievements-panel,body.photo-mode #notification-log,body.photo-mode #trade-panel,body.photo-mode #pop-panel{display:none !important}
+body.photo-mode #photo-mode-badge{display:block}
+#photo-mode-badge{display:none;position:fixed;bottom:0.8rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:rgba(255,255,255,0.85);padding:0.35rem 0.8rem;border-radius:6px;font-size:0.7rem;letter-spacing:0.05em;z-index:40;pointer-events:none;font-family:inherit}
 .res{display:flex;align-items:center;gap:0.3rem;font-weight:600}
 .res-icon{width:16px;height:16px;border-radius:3px;display:inline-block}
 .res-emoji{font-size:1rem;line-height:1}
@@ -694,6 +698,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 
 <div id="toast"></div>
 <div id="activity-feed"></div>
+<div id="photo-mode-badge">📷 Photo Mode — press H to exit</div>
 <div id="tooltip"><div class="tt-title"></div><div class="tt-body"></div></div>
 
 <script type="module" src="js/main.js"></script>

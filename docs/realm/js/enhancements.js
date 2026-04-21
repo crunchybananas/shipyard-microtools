@@ -5143,6 +5143,9 @@ registerScreenRenderer(renderSpeedIndicator);
 // ── Loop 162: Pause overlay ─────────────────────────────────
 function renderPauseOverlay(ctx, w, h) {
   if (G.speed !== 0) return;
+  // Loop 035 (the-fixer): photo-mode hides the PAUSED label so you can
+  // compose a screenshot while paused without the dim overlay or label.
+  if (G.photoMode) return;
   ctx.save();
   // Stronger scene-darken so the paused state reads as "world is frozen,"
   // and so the label has real contrast against bright terrain.

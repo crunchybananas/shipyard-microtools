@@ -192,6 +192,14 @@ G.debug = G.debug || {};
 G.debug.lightCurve = lightCurve;
 window.forceRender = render;
 window.setSpeed = setSpeed;
+// Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /
+// mission panel / minimap / controls / pause overlay so the player can
+// screenshot a clean frame. Triggered from the H key (input.js) or
+// directly from the console.
+window.togglePhotoMode = () => {
+  G.photoMode = !G.photoMode;
+  document.body.classList.toggle('photo-mode', G.photoMode);
+};
 window.toggleResearch = toggleResearchPanel;
 window.toggleHappiness = toggleHappinessPanel;
 window.dismissTutorial = dismissTutorial;
