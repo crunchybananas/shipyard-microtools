@@ -45,7 +45,10 @@ and note the promotion here.
 - 061 [code] — optional chronicle beat on wanderer spawn (`character` or new `visitor` tag). Breaks 048's "silent" rule; only ship if we decide wanderer should be announced. [enhancements.js + story.js]
 - 061 [code] — soft interaction: clicking near the wanderer shows a one-line tooltip once per realm ("A figure passes. They do not pause."). Preserves mystery. [input.js + enhancements.js]
 - 061 [code] — pilgrim sibling variant — religious-coded, stops at the church if one exists. Lets wanderer keep its rootless meaning, introduces a second element with its own role. [enhancements.js]
-- 060 [code] **HIGH** — add `event` and `season` to `_ECHO_SOURCE_TAGS` in story.js:648. 060 audit found these 2 tags excluded but they're legitimate origin-class beats (cloaked-stranger, season-transitions). Trivial 1-line expansion. [story.js]
+- 063 [code] — consider adding `death` to `_ECHO_SOURCE_TAGS`. 059 excluded it ("don't joke about deaths") but "the bards still sing of the plague year" could land. [story.js]
+- 063 [review] — long-run echo audit after 063 fix: how often does echo cite `event`/`season` vs other tags? Inform future weighting. [story.js]
+- 063 [code] — weighted echo-source selection: prefer once-per-realm tags (nightmare, stone, victory) 2× over more-abundant tags (milestone, dream, event, season). Makes lifetime-unique beats more likely to resurface. [story.js]
+- 060 [code] **HIGH** — add `event` and `season` to `_ECHO_SOURCE_TAGS` in story.js:648. 060 audit found these 2 tags excluded but they're legitimate origin-class beats (cloaked-stranger, season-transitions). Trivial 1-line expansion. [story.js] **DONE → 063**
 - 060 [code] — research-completion beats. `tag:research` when a tech finishes. "The realm has mastered Masonry" etc. A whole progression axis is currently silent in the chronicle. ~15 lines. [tech.js or story.js]
 - 060 [code] — happiness-threshold beats. When happiness crosses 80 up (peak) or 20 down (crisis), fire one beat with cooldown. Emotional-state signal currently missing. ~10 lines. [story.js]
 - 060 [code] — sustained-state beats: "The realm has known peace for fifty days" / "Hunger grips the realm". Flag-gated to not spam. [story.js]

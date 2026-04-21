@@ -638,11 +638,18 @@ export function checkStoneBeat() {
 // - at least 3 memorable entries must exist
 // - deterministic per (kingdom, day) so two loads of the same
 //   save on the same day always see the same echo (or lack)
-// - never echoes misc/'echo'/'season' — only origin-class tags
+// - never echoes misc or other 'echo' entries — only origin-class tags
+//
+// Loop 063 (the-fixer, closes 060 HIGH): added 'event' + 'season'
+// to the pool. 060's audit found 059's original set missed these
+// two tags even though both are legitimate origin-class beats —
+// cloaked-stranger / plague (events.js) and season-transitions
+// (main.js:310) never got echoed. 1-line correctness win.
 
 const _ECHO_SOURCE_TAGS = new Set([
   'milestone', 'victory', 'character', 'birth',
   'dream', 'nightmare', 'stone', 'raid',
+  'event', 'season',
 ]);
 
 const _ECHO_FRAMES = [
