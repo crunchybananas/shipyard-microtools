@@ -133,6 +133,34 @@ The current tick may override with judgment — document the override
 in the journal ("wake in 600s instead of 300s because ..."). Don't
 pick a number you can't justify in one line.
 
+## Tick-type mix (updated after tick 033)
+
+User steering: **favor builder work over persona plays.** Plays are
+valuable but surface-level; code ticks that ship graphics, mechanics,
+or systems move realm forward. After ~34 ticks, the observed mix was
+11 play / 13 code / 4 review (33% / 39% / 12%). The new target:
+
+- **~60%+ builder ticks** (code — `the-fixer`, `refactor-only`,
+  `the-profiler`, `the-name-giver`, `the-dead-code-detective`,
+  `constant-shift`, `silent-module`, `cut-as-you-add`, surprise
+  `[code]` entries).
+- **~15–20% plays**, spaced out. Persona plays are for diagnostic
+  surveys, not every-third-tick check-ins. Prefer fresh-persona
+  plays that surface a class of findings no other persona can (the
+  31-persona survey axis from 020 still applies — but once per
+  area is usually enough).
+- **~15–20% reviews**. Keep the-contrarian / the-archivist / the-
+  minimalist / the-skeptic / the-art-director available for when
+  the loop needs to step back.
+
+The 40% the-fixer monoculture warning from 020 still stands for
+variety **among code ticks** — if half the builder work is
+the-fixer closing ideas, the other half should be exploratory
+code challenges (refactor-only tried in 026; name-giver, dead-
+code-detective, silent-module still un-picked).
+
+Play for information; build for progress.
+
 ## Meta
 
 - **START**: 2026-04-20 (iteration 001 is this scaffolding)

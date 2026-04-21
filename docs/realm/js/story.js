@@ -99,6 +99,44 @@ export function ensureRival() {
   return G.namedCharacters.rival;
 }
 
+// Loop 034 (the-fixer, closing 021 audit): three more NPCs tied to
+// first-build beats. The pattern mirrors mayor/bard/rival — a name-pool
+// pick, a `namedCharacters.X` entry, and a chronicle line in the
+// 'character' category. 021 observed that blacksmith/market/school were
+// meaningful buildings without named inhabitants; these ensure the
+// realm *feels* inhabited by specific people, not just anonymous
+// workers.
+const SMITH_NAMES    = ['Harald Ironhand','Mira the Forger','Gunnar Blackanvil','Yara Sparkwright','Tobias Hammerfell','Vela Coalwright','Bren Sootmark'];
+const MERCHANT_NAMES = ['Osric the Coin','Dame Lisbet Saltwater','Yusuf of the Three Ports','Marlene Goldvein','Pietro Silkwake','Ada Longroad'];
+const TEACHER_NAMES  = ['Master Kellan','Dame Ysolt the Wise','Brother Orlan','Sister Tannis','Scribe Devin','Reader Mira'];
+
+export function ensureSmith() {
+  initChronicle();
+  if (G.namedCharacters.smith) return G.namedCharacters.smith;
+  const name = pick(SMITH_NAMES);
+  G.namedCharacters.smith = { name, arrivedDay: G.day };
+  chronicle(`${name} takes up the hammer at the new forge. "Steel remembers every strike," they say.`, 'character');
+  return G.namedCharacters.smith;
+}
+
+export function ensureMerchant() {
+  initChronicle();
+  if (G.namedCharacters.merchant) return G.namedCharacters.merchant;
+  const name = pick(MERCHANT_NAMES);
+  G.namedCharacters.merchant = { name, arrivedDay: G.day };
+  chronicle(`${name} sets up stall at the market. Their caravans travel as far as the coast.`, 'character');
+  return G.namedCharacters.merchant;
+}
+
+export function ensureTeacher() {
+  initChronicle();
+  if (G.namedCharacters.teacher) return G.namedCharacters.teacher;
+  const name = pick(TEACHER_NAMES);
+  G.namedCharacters.teacher = { name, arrivedDay: G.day };
+  chronicle(`${name} opens the schoolhouse doors. The first lesson: "Know thy realm."`, 'character');
+  return G.namedCharacters.teacher;
+}
+
 // Loop 026 (refactor-only): 13 first-build beats data-driven into one
 // table + loop. Before this, each beat was a 4-line hand-written block
 // and the 12 existing + 5 added-by-022 lived in one ever-growing wall of
@@ -111,6 +149,12 @@ export function ensureRival() {
 // they're distinct moments that do extra work. Special-shape beats
 // (firstBirth, castleBuilt, firstRaidSurvived) also stay inline — they
 // key on stats/gameState, not `buildings.some(b => b.type === X)`.
+// Loop 034: added optional `after` field. When a beat fires, after()
+// runs once right after the chronicle line — used to introduce a named
+// character tied to the building (smith/merchant/teacher). The `fragile`
+// concern from 026 (mixing function refs into data) is real, but for
+// pure character-setup side-effects it's the lighter option vs. moving
+// these 3 beats back inline.
 const BUILDING_FIRST_BEATS = [
   { type: 'house',      flag: 'firstHouse',      text: 'The first house is raised. Smoke rises from a new hearth tonight.' },
   { type: 'farm',       flag: 'firstFarm',       text: 'A farm is established. The earth will feed us now.' },
@@ -119,9 +163,9 @@ const BUILDING_FIRST_BEATS = [
   { type: 'granary',    flag: 'firstGranary',    text: 'The granary is sealed against the weather. Winter will find us ready.' },
   { type: 'mine',       flag: 'firstMine',       text: 'Picks ring in the iron mine. Ore carts clatter up from the dark.' },
   { type: 'quarry',     flag: 'firstQuarry',     text: 'The quarry is opened. Dust hangs in the air as the first blocks are cut.' },
-  { type: 'market',     flag: 'firstMarket',     text: 'Merchants unpack their wares at the new market. Trade has come to the realm.' },
-  { type: 'blacksmith', flag: 'firstBlacksmith', text: 'Hammer rings on anvil. The first blade is quenched — sparks, steam, and a promise.' },
-  { type: 'school',     flag: 'firstSchool',     text: "The schoolhouse opens. Children's voices rise from the yard; letters are learned." },
+  { type: 'market',     flag: 'firstMarket',     text: 'Merchants unpack their wares at the new market. Trade has come to the realm.',            after: ensureMerchant },
+  { type: 'blacksmith', flag: 'firstBlacksmith', text: 'Hammer rings on anvil. The first blade is quenched — sparks, steam, and a promise.',       after: ensureSmith },
+  { type: 'school',     flag: 'firstSchool',     text: "The schoolhouse opens. Children's voices rise from the yard; letters are learned.",        after: ensureTeacher },
   { type: 'windmill',   flag: 'firstWindmill',   text: "Sails turn above the fields. Grain will become flour now, without the miller's back." },
   { type: 'bakery',     flag: 'firstBakery',     text: "The first loaves cool on the baker's rack. The realm smells like home tonight." },
   { type: 'archery',    flag: 'firstArchery',    text: 'The butts are set, the strings drawn. Arrows find their mark — or fly far into the heather.' },
@@ -132,10 +176,13 @@ export function checkStoryBeats() {
   initChronicle();
 
   // Simple first-build beats — one pattern, one table. See BUILDING_FIRST_BEATS.
+  // The optional `after` field runs once when a beat fires; used to introduce
+  // a named character tied to the building (added in 034).
   for (const beat of BUILDING_FIRST_BEATS) {
     if (!hasFlag(beat.flag) && G.buildings.some(b => b.type === beat.type)) {
       setFlag(beat.flag);
       chronicle(beat.text, 'milestone');
+      if (beat.after) beat.after();
     }
   }
 
