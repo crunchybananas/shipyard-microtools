@@ -169,6 +169,14 @@ const BUILDING_FIRST_BEATS = [
   { type: 'windmill',   flag: 'firstWindmill',   text: "Sails turn above the fields. Grain will become flour now, without the miller's back." },
   { type: 'bakery',     flag: 'firstBakery',     text: "The first loaves cool on the baker's rack. The realm smells like home tonight." },
   { type: 'archery',    flag: 'firstArchery',    text: 'The butts are set, the strings drawn. Arrows find their mark — or fly far into the heather.' },
+  // Loop 057 (the-fixer, 053 HIGH): 4 beats 053's completionist play found
+  // still missing. 021 identified 12 missing, 022 closed 5, 057 closes the
+  // last 4 that deserve a beat (road and wall excluded — placed dozens of
+  // times, shouldn't each fire).
+  { type: 'tower',       flag: 'firstTower',       text: 'A watchtower rises above the treeline. Eyes now reach the horizon in every direction.' },
+  { type: 'well',        flag: 'firstWell',        text: 'A new well is dug. Cold sweet water meets the light for the first time in ages.' },
+  { type: 'chickencoop', flag: 'firstChickencoop', text: 'Chickens settle into their coop. The realm wakes to a new kind of dawn chorus.' },
+  { type: 'cowpen',      flag: 'firstCowpen',      text: 'A cow pen is raised. Milk and hide will flow from patient beasts now.' },
 ];
 
 // Run each tick/day to detect milestones and fire beats once.

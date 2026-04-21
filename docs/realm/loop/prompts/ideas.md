@@ -28,7 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 053 [code] **HIGH** — add 4 missing first-build beats to `BUILDING_FIRST_BEATS` in story.js: tower, well, chickencoop, cowpen. 021 found 12 missing, 022 fixed 5, 053's programmatic completionist play found these 4 still genuinely absent. Drafts in 053 journal. ~8-12 lines. Closes a 3-tick-old gap. [story.js]
+- 057 [code] — introduce a shepherd character tied to cowpen (or chickencoop) via an `after` trigger like 034's pattern. Would bring named-character count 6 → 7. [story.js]
+- 057 [review] — audit BUILDING_FIRST_BEATS for tone drift now that 057 added 4 at once. The 22 table was consistent; 057 may have drifted slightly. Quick read-through pass. [story.js]
+- 057 [code] — `firstRoad`/`firstWall` intentionally skipped; "road network connects first two buildings" or "wall encircles realm" beat could fill that gap with a different trigger shape. [story.js]
+- 053 [code] **HIGH** — add 4 missing first-build beats to `BUILDING_FIRST_BEATS` in story.js: tower, well, chickencoop, cowpen. 021 found 12 missing, 022 fixed 5, 053's programmatic completionist play found these 4 still genuinely absent. Drafts in 053 journal. ~8-12 lines. Closes a 3-tick-old gap. [story.js] **DONE → 057**
 - 053 [code] — season-transition chronicle beats ("Summer arrives; the fields turn gold" / "First frost settles" / etc). Parallel to first-build-beats but triggered on G.season change. ~20 lines. Fills the mid-game chronicle void 053 surfaced. [story.js]
 - 056 [code] — render 056's standing stone at its seeded grass tile (persistent dark vertical + small base ellipse). Needs stone_x/stone_y stored in storyFlags. Pairs with 052's renderBuildingIsolated helper availability. [enhancements.js + story.js]
 - 056 [code] — expand 056's _STONE_PHRASES pool from 4 → 6-8 variants. Verification showed 3 of 8 kingdoms used the same "barely-legible" phrase. ~4 lines. [story.js]
