@@ -299,7 +299,14 @@ function updateTime() {
     if (updateSeason()) {
       const s = getSeasonData();
       const seasonNum = Math.floor((G.day - 1) / 7) + 1;
-      notify(`${s.name} begins! (Season ${seasonNum})`, 'event');
+      // Loop 070 (the-fixer, 069 HIGH): pass `chronicle: false` so the
+      // notify-toast doesn't ALSO write to chronicle. 069's live play
+      // saw day 8 fire THREE back-to-back chronicle entries at summer
+      // (event from toast-route + season from the direct write below
+      // + misc from advisor). The toast is ephemeral UX; the direct
+      // `chronicle(..., 'season')` below IS the narrative memory. One
+      // chronicle row per event is the right shape.
+      notify(`${s.name} begins! (Season ${seasonNum})`, 'event', { chronicle: false });
       playSound('mission');
       const seasonTexts = {
         spring: 'The snows melt. Green shoots push through the thawing earth.',
