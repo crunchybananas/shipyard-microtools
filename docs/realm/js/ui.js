@@ -477,7 +477,33 @@ export function toggleResearchPanel() {
   // 'flex' preserves the CSS display:flex column so .research-content's
   // flex:1 + min-height:0 can actually constrain and scroll the list.
   panel.style.display = isOpen ? 'none' : 'flex';
-  if (!isOpen) renderResearchPanel();
+  if (!isOpen) {
+    renderResearchPanel();
+    // Loop 042 (the-fixer, closing 040 HIGH): wire the scroll-cue so a
+    // late-game player with 13 researched techs sees a "more below"
+    // gradient at the bottom of the panel. Without this, 5 of 13 techs
+    // clip off-screen at 1280×627 with no indicator.
+    _wireScrollCue(panel);
+  }
+}
+
+// Loop 042: toggles body.has-more-below class on a panel element based
+// on the scroll state of its inner .research-content child. Re-runs on
+// scroll (to clear when user reaches bottom) and on initial open.
+function _wireScrollCue(panel) {
+  const c = panel.querySelector('.research-content');
+  if (!c) return;
+  const update = () => {
+    const atBottom = c.scrollTop + c.clientHeight >= c.scrollHeight - 4;
+    const canScroll = c.scrollHeight > c.clientHeight;
+    panel.classList.toggle('has-more-below', canScroll && !atBottom);
+  };
+  if (!c._scrollCueWired) {
+    c.addEventListener('scroll', update, { passive: true });
+    c._scrollCueWired = true;
+  }
+  // Initial check — use rAF so layout has settled after renderResearchPanel.
+  requestAnimationFrame(update);
 }
 
 export function showInfoPanel(b) {
