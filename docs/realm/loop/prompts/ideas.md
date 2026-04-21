@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 044 [code] — extend `_realWorldDreamLens` into `checkNightmareBeat`: a Halloween-day nightmare fires with an even darker intro override. Tiny (~5 lines). Risk: nightmare+Halloween collision reads on-the-nose. But: Halloween rare × nightmare once-per-realm = low realized-collision rate. [story.js]
+- 044 [code] — `nextDreamSeason()` helper that peeks at what season will bias the *next* fire. Could power a chronicle ticker hint e.g. "The dreams ahead feel like winter." [story.js]
+- 044 [surprise] — locale-aware special dates keyed off `navigator.language` (Dia de los Muertos, Samhain closer variants). Fragile; document the localization risk before picking. [story.js]
+- 044 [surprise] — persist "this realm first dreamed in <real-month>" fact; surface centuries later in game-time as: "the realm remembers it was born in a spring dream." Tiny quiet real-world callback that writes the seed. [story.js + state.js]
 - 043 [code] — second-nightmare callback: for realms that survive past day 500, fire a softer "the dream returns" beat that quotes one image from the original nightmare. Requires storing the original 3 images on fire (e.g. `G.storyFlags.nightmare_images`). ~20 lines. Payoff: players who stick with a realm past a year get a ripple. [story.js]
 - 043 [code] — chronicle renders `nightmare`-tagged entries in a muted color (distinct from regular beats). One CSS rule + one render touch-up. Makes the beat visually distinct on re-read. [ui.js + index.html]
 - 043 [surprise] — `every-10-dawns` quiet recurrence beat: someone in the realm counts days aloud on every 10th dawn, chronicled simply. Much lower drama than the nightmare — gives rhythm without demanding attention. [story.js]

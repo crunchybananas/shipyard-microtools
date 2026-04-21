@@ -27,7 +27,7 @@ import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
-import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats } from './story.js';
+import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens } from './story.js';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -191,6 +191,7 @@ window.G = G;
 G.debug = G.debug || {};
 G.debug.lightCurve = lightCurve;
 G.debug.tintCurve = tintCurve;
+G.debug.dreamLens = _realWorldDreamLens;
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /

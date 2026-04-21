@@ -341,6 +341,45 @@ const _DREAM_THREADS = {
   },
 };
 
+// ── Loop 044: time-aware — real-world seasoning ──────────────
+// A lens over the dream system: the real-world calendar biases
+// which threads are more likely to surface, and a few special
+// dates override the dream intro entirely. Same realm, same day,
+// different month → different flavor. The game listens to the
+// clock on the wall behind the player.
+//
+// `now` is injectable to keep the function testable.
+export function _realWorldDreamLens(now = new Date()) {
+  const month = now.getMonth(); // 0-11
+  const date = now.getDate();   // 1-31
+  const hour = now.getHours();  // 0-23
+
+  // Seasonal weighting. Threads in `boost` are added to the avail
+  // pool a second time, doubling their selection weight.
+  let boost = [];
+  if (month === 11 || month === 0 || month === 1) boost = ['hearth', 'warning'];          // winter
+  else if (month >= 2 && month <= 4)              boost = ['harvest', 'water'];           // spring
+  else if (month >= 5 && month <= 7)              boost = ['water', 'market'];            // summer
+  else                                            boost = ['warning', 'forge'];           // autumn
+
+  // Special-date overrides: intro line + tag tweak. Checked in
+  // order; first match wins.
+  let special = null;
+  if (month === 9 && date === 31) {
+    special = { intro: 'On the thinnest night of the year the realm wakes to dreams:', closer: 'Tomorrow the veil thickens again.' };
+  } else if (month === 11 && date >= 20 && date <= 22) {
+    special = { intro: 'On the longest night the realm wakes to dreams:', closer: 'The dark will turn now.' };
+  } else if (month === 5 && date >= 20 && date <= 22) {
+    special = { intro: 'On the shortest night the realm wakes to dreams:', closer: 'The light will turn now.' };
+  } else if (month === 2 && date >= 19 && date <= 21) {
+    special = { intro: 'On the balanced night the realm wakes to dreams:', closer: 'The seasons change hands.' };
+  } else if (hour === 0) {
+    special = { intro: 'At the witching hour the realm wakes to dreams:', closer: 'No one speaks of them, but everyone remembers.' };
+  }
+
+  return { boost, special };
+}
+
 export function checkDreamBeat() {
   // Require some history; don't dream on day 1-13
   if (G.day < 14) return;
@@ -357,6 +396,14 @@ export function checkDreamBeat() {
     if (t.always || (t.requires && t.requires())) avail.push(name);
   }
   if (avail.length === 0) return;
+
+  // 044: the real-world calendar doubles-weight certain threads.
+  // Only threads that are actually available in this realm get
+  // boosted — we don't invent threads that don't apply.
+  const lens = _realWorldDreamLens();
+  for (const name of lens.boost) {
+    if (avail.includes(name)) avail.push(name);
+  }
 
   // Seed base from kingdom + day — same kingdom + day → same dream
   const kname = G.kingdomName || 'Realm';
@@ -383,7 +430,9 @@ export function checkDreamBeat() {
   const images = [];
   for (const img of rawImages) if (!images.includes(img)) images.push(img);
 
-  const dreamText = `At dawn the realm wakes to shared dreams: ${images.join('; then ')}. No one speaks of them, but everyone remembers.`;
+  const intro = lens.special?.intro || 'At dawn the realm wakes to shared dreams:';
+  const closer = lens.special?.closer || 'No one speaks of them, but everyone remembers.';
+  const dreamText = `${intro} ${images.join('; then ')}. ${closer}`;
   chronicle(dreamText, 'dream');
 }
 
