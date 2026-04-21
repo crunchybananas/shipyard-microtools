@@ -102,6 +102,11 @@ and note the promotion here.
 - 060 [code] — happiness-threshold beats. When happiness crosses 80 up (peak) or 20 down (crisis), fire one beat with cooldown. Emotional-state signal currently missing. ~10 lines. [story.js] **DONE → 071**
 - 060 [code] — sustained-state beats: "The realm has known peace for fifty days" / "Hunger grips the realm". Flag-gated to not spam. [story.js]
 - 060 [review] — surface-map doc: clean diagram of all 16 chronicle sites + 13 tags + 9 systems (060 mapped these). Would prevent future 053-style mis-diagnoses of already-shipped work. [loop/docs/]
+- 079 [code] — optional resource-cost mode for offering: when offering fires, decrement small amount of food/gold. Flag-gated. [story.js]
+- 079 [code] — render tiny offering sprite at stone tile for N days after offering fires, then fades. [enhancements.js]
+- 079 [code] — founder-name cross-reference in offering item pool ("{founder2} was seen nearby at dusk…"). Compounds 072+079. [story.js]
+- 079 [code] — second-offering on later happy-peak cycles (currently once-per-realm). [story.js]
+- 079 [doc] — add system #26 (offering) to loop/docs/narrative-surfaces.md. Same tag, new trigger. [loop/docs/]
 - 078 [code] — persist chronicle filter preference to localStorage so it survives page reload. ~5 lines. [story.js]
 - 078 [review] — emoji tone pass on the 14 TAG_ICONS. Does 🔁 for echo feel right vs 🕰️? Small review. [story.js]
 - 078 [code] — keyboard shortcuts 1-9 to pick the first 9 chip tags. [input.js + story.js]

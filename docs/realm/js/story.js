@@ -322,6 +322,10 @@ export function checkStoryBeats() {
   // Loop 072 (surprise): once per realm, the three founding settlers
   // are named. See checkFounderBeat.
   checkFounderBeat();
+  // Loop 079 (surprise): offering at the stone. Cross-system beat
+  // firing on happy-peak dawns once the 056 stone is placed.
+  // See checkOfferingBeat.
+  checkOfferingBeat();
 }
 
 // ── Loop 039: the-dream — collective dreams ─────────────────
@@ -857,6 +861,57 @@ export function checkFounderBeat() {
   chronicle(
     `The three founders at last know each other's names: ${names[0]}, ${names[1]}, and ${names[2]}. The wicker packs are unpacked; the fire does not go out.`,
     'character'
+  );
+}
+
+// ── Loop 079: offering at the stone (surprise) ───────────────
+//
+// Cross-system beat that can ONLY fire when three prior systems
+// have all landed in the same realm:
+//   - 056 stone is placed  (hasFlag('stone_found'))
+//   - 071 happiness is at peak  (hasFlag('happyPeakActive'))
+//   - 079 offering hasn't fired yet this realm
+//
+// Once per realm, on a qualifying dawn, ~15% probability fires a
+// chronicle beat describing an anonymous offering at the stone.
+// Narrative only — no resource cost, no visible sprite, no UI cue.
+// Tag 'stone' (reuse, per 075 anti-tag-proliferation): keeps all
+// stone-related beats together for filter/echo purposes.
+//
+// Feels like an interstitial moment that only a realm which has
+// *become* happy and *has* the stone can experience. Players
+// running an unhappy or sub-day-50 realm never see it.
+
+const _OFFERING_ITEMS = [
+  'a basket of new bread',
+  'a rush of summer wildflowers',
+  'a string of carved beads',
+  'a small blue stone the rivers have not seen',
+  'a child\'s drawing of the kingdom\'s gate',
+  'a folded linen cloth the wind does not take',
+];
+
+export function checkOfferingBeat() {
+  if (hasFlag('offering_made')) return;
+  if (!hasFlag('stone_found')) return;
+  if (!hasFlag('happyPeakActive')) return;
+  if (G.dayPhase > 120) return;  // dawn gate
+  if (G.day < 30) return;  // compounds require mid-game
+
+  // ~15% per qualifying dawn, deterministic per (kingdom, day)
+  const kname = G.kingdomName || 'Realm';
+  const roll = _dreamHash(`${kname}_offering_${G.day}`) % 100;
+  if (roll >= 15) return;
+
+  setFlag('offering_made');
+
+  // Pick item from the pool
+  const idx = _dreamHash(`${kname}_offering_item`) % _OFFERING_ITEMS.length;
+  const item = _OFFERING_ITEMS[idx];
+
+  chronicle(
+    `At dawn, ${item} was found at the standing stone. No one admits to placing it there.`,
+    'stone'
   );
 }
 
