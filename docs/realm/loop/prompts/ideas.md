@@ -83,7 +83,10 @@ and note the promotion here.
 - 084 [doc] — "how to audit a chronicle regression" playbook: fastForward(200) + tag-count + look for outliers. Operational recipe. [loop/docs/]
 - 083 [doc] — update narrative-surfaces.md: post-083 cadence (156 per 200-day realm, much closer to 075's ~80-120 target), close 082 HIGH #2 false hypothesis (fastForward IS trustworthy for dawn-gates; the issue was cap eviction by noise), document the "noise-evicts-signal" failure mode. [loop/docs/] **DONE → 084**
 - 083 [review] — scan for other chronicle noise sources at tick 100. Event tag only had 4 entries in 083 run — any others polluted? Not urgent. [events.js + story.js]
-- 083 [code] — protect once-per-realm beats (nightmare/stone/victory) from chronicle cap eviction. ~5 lines in story.js:26. [story.js]
+- 085 [doc] — update narrative-surfaces.md to mark eviction-immune protection as IMPLEMENTED (not just "filed"). 1-line correction. [loop/docs/]
+- 085 [code] — soft-overflow warning log if chronicle grows past 310 (signals noise regression hitting immune tags). ~3 lines. [story.js]
+- 085 [code] — flag-based per-entry immunity (`protect: true` on the entry). More flexible than tag-based. Defer unless needed. [story.js]
+- 083 [code] — protect once-per-realm beats (nightmare/stone/victory) from chronicle cap eviction. ~5 lines in story.js:26. [story.js] **DONE → 085**
 - 082 [code] **HIGH** — add `{chronicle: false}` to 4 raid-warning notify calls (economy.js:371 scouts-report, :377 raiders-approach, raid-spawn notify, no-defenders warning). Reduces raid-tag chronicle pollution by ~180 entries per 200-day realm. Same 070/077 pattern. 076 classified as LOW; 082 volume data promotes to HIGH. [economy.js] **DONE → 083**
 - 082 [code] **HIGH** — investigate fastForward skipping dawn-gated beats. Options: (a) run simTick with G.speed=1 for first+last tick of each day, (b) force extra checkStoryBeats call at known dawn tick, (c) widen dawn gate tolerance. Makes future fastForward audits trustworthy. [main.js + story.js] **DONE (INCIDENTALLY) → 083** (real cause was cap-eviction by raid noise, not dawn-gate skipping)
 - 082 [code] — year-milestone grammar fix: `${n} soul${n===1?'':'s'}` and verify year boundary in enhancements.js:5086. Currently fires "1 souls" and at odd day boundaries. [enhancements.js]

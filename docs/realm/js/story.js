@@ -14,6 +14,17 @@ export function initChronicle() {
   if (!G.namedCharacters) G.namedCharacters = {};
 }
 
+// Loop 085 (the-fixer, 083 filed): once-per-realm beats are
+// eviction-immune at the chronicle cap. 082/083 discovered the
+// "noise evicts signal" failure mode — a high-rate chronicle
+// writer could push rare lifetime beats (nightmare, stone,
+// victory) out of the 300-entry window before the player read
+// them. 084 codified this as an invariant in narrative-surfaces.md.
+// 085 enforces it in code: when the cap kicks in, oldest
+// NON-IMMUNE entries drop first; immune entries are preserved
+// even if that means the buffer sits slightly over 300.
+const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory']);
+
 export function chronicle(text, tag='misc') {
   initChronicle();
   G.chronicle.push({
@@ -22,8 +33,24 @@ export function chronicle(text, tag='misc') {
     tick: G.gameTick,
     text, tag,
   });
-  // Cap to last 300 entries
-  if (G.chronicle.length > 300) G.chronicle.splice(0, G.chronicle.length - 300);
+  // Cap to last 300 entries, preserving eviction-immune tags
+  if (G.chronicle.length > 300) {
+    const excess = G.chronicle.length - 300;
+    const toRemove = [];
+    // Collect oldest-first indices of non-immune entries, up to
+    // `excess`. If all entries are immune, none are removed and the
+    // buffer soft-overflows — acceptable because immune entries are
+    // the point of the protection.
+    for (let i = 0; i < G.chronicle.length && toRemove.length < excess; i++) {
+      if (!_EVICTION_IMMUNE_TAGS.has(G.chronicle[i].tag)) {
+        toRemove.push(i);
+      }
+    }
+    // Remove in reverse so earlier indices stay valid
+    for (let j = toRemove.length - 1; j >= 0; j--) {
+      G.chronicle.splice(toRemove[j], 1);
+    }
+  }
 }
 
 export function hasFlag(key) { initChronicle(); return !!G.storyFlags[key]; }
