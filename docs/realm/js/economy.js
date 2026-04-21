@@ -371,15 +371,21 @@ export function updateProduction() {
 
 export function checkRaids() {
   // Warning: 2 days before raid
+  // Loop 083 (the-fixer, 082 HIGH): {chronicle:false} on all pre-
+  // raid and raid-spawn notifies. 082's fastForward audit found
+  // each raid cycle produces 5 tag:raid chronicle entries — 4 of
+  // them are these UI warnings. Real raid MEMORY lives in the
+  // enhancements.js:4632-4640 resolution beats. The toast + sound
+  // are the live UX; chronicle is the retrospective.
   const daysUntilRaid = G.nextRaidDay - G.day;
   if (daysUntilRaid === 2 && G.dayPhase < 5) {
-    notify('⚠️ Scouts report raiders approaching! Raid expected in 2 days.', 'danger');
+    notify('⚠️ Scouts report raiders approaching! Raid expected in 2 days.', 'danger', { chronicle: false });
     playSound('raid');
   }
   // Pre-raid warning (1 day before)
   if (G.day === G.nextRaidDay - 1 && !G._raidWarningGiven) {
     G._raidWarningGiven = true;
-    notify('⚠️ Raiders approach from the darkness! Prepare your defenses.', 'danger');
+    notify('⚠️ Raiders approach from the darkness! Prepare your defenses.', 'danger', { chronicle: false });
     playSound('raidWarning');
   }
 
@@ -430,7 +436,9 @@ export function checkRaids() {
       }
       report.push(hint);
     }
-    for (const line of report) notify(line, 'danger');
+    // Loop 083: {chronicle:false} on the per-raid report toasts
+    // (spawn + intercept + no-defenders hint). See 082 HIGH.
+    for (const line of report) notify(line, 'danger', { chronicle: false });
 
     // Pan camera to an attacked-area preview
     const firstBuilding = G.buildings.find(b => b.type !== 'road' && b.type !== 'wall');
