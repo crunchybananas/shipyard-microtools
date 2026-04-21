@@ -39,6 +39,9 @@ and note the promotion here.
 - 058 [review / play] — visual check of the stone on canvas with a persona (the-photographer / the-screenshot-critic). Pixel verification confirms render; persona check would confirm it reads right.
 - 056 [code] — render 056's standing stone at its seeded grass tile (persistent dark vertical + small base ellipse). Needs stone_x/stone_y stored in storyFlags. Pairs with 052's renderBuildingIsolated helper availability. [enhancements.js + story.js] **DONE → 058**
 - 056 [code] — expand 056's _STONE_PHRASES pool from 4 → 6-8 variants. Verification showed 3 of 8 kingdoms used the same "barely-legible" phrase. ~4 lines. [story.js]
+- 061 [code] — optional chronicle beat on wanderer spawn (`character` or new `visitor` tag). Breaks 048's "silent" rule; only ship if we decide wanderer should be announced. [enhancements.js + story.js]
+- 061 [code] — soft interaction: clicking near the wanderer shows a one-line tooltip once per realm ("A figure passes. They do not pause."). Preserves mystery. [input.js + enhancements.js]
+- 061 [code] — pilgrim sibling variant — religious-coded, stops at the church if one exists. Lets wanderer keep its rootless meaning, introduces a second element with its own role. [enhancements.js]
 - 060 [code] **HIGH** — add `event` and `season` to `_ECHO_SOURCE_TAGS` in story.js:648. 060 audit found these 2 tags excluded but they're legitimate origin-class beats (cloaked-stranger, season-transitions). Trivial 1-line expansion. [story.js]
 - 060 [code] — research-completion beats. `tag:research` when a tech finishes. "The realm has mastered Masonry" etc. A whole progression axis is currently silent in the chronicle. ~15 lines. [tech.js or story.js]
 - 060 [code] — happiness-threshold beats. When happiness crosses 80 up (peak) or 20 down (crisis), fire one beat with cooldown. Emotional-state signal currently missing. ~10 lines. [story.js]

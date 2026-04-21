@@ -1161,7 +1161,7 @@ export function enhRenderScreen(ctx, logicalW, logicalH) {
 // Loop boundaries (registration order = render order):
 // (none yet — loop 23+ adds here)
 
-// ── Loop 048 ─────────────────────────────────────────────────
+// ── Loop 048 / 061 — the wanderer ────────────────────────────
 // An element that arrives, crosses, and leaves. Once per season,
 // at some dawn, starting from a random map edge and traversing
 // to the opposite one at a pace slower than any citizen. Nothing
@@ -1169,25 +1169,32 @@ export function enhRenderScreen(ctx, logicalW, logicalH) {
 // any named-character surface. No chance to click it. No tooltip
 // if you do.
 //
-// Deliberately un-identified. A later iteration can choose what
-// this is.
+// 048 shipped this deliberately un-identified (internal name
+// `_t048`) with an invitation for a later iteration to name it.
+// 061 (the-name-giver) names it `_wanderer`: silent enough to
+// match the element's behavior, specific enough to stop reading
+// as a loop-number token. Behavior is unchanged — name-only
+// refactor. The player-facing element remains nameless (no
+// chronicle beat, no toast, no tooltip).
 
-let _t048 = null;
-let _t048_season = null;
+let _wanderer = null;
+let _wandererSeason = null;
 
-function _t048_tick() {
+function _wandererTick() {
   // New season → roll whether one appears this season
-  if (_t048_season !== G.season) {
-    _t048_season = G.season;
+  if (_wandererSeason !== G.season) {
+    _wandererSeason = G.season;
     // Skip winter — impassable feeling for the element
-    if (G.season === 'winter') { _t048 = null; return; }
-    // ~55% chance per season; deterministic from kingdom + season
+    if (G.season === 'winter') { _wanderer = null; return; }
+    // ~55% chance per season; deterministic from kingdom + season.
+    // Seed key retains the "048" token so existing realms get the
+    // same spawn decisions as before the rename.
     const kname = G.kingdomName || 'Realm';
     let h = 0;
     const s = `${kname}_048_${G.season}_${Math.floor(G.day / 15)}`;
     for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
     const fire = Math.abs(h) % 100 < 55;
-    if (!fire) { _t048 = null; return; }
+    if (!fire) { _wanderer = null; return; }
     // Pick one of 4 edges; target the opposite
     const edge = Math.abs(h >> 7) % 4;
     const half = MAP_W / 2;
@@ -1197,25 +1204,25 @@ function _t048_tick() {
     else if (edge === 1) { sx = MAP_W-1; sy = perp;    tx = 0;       ty = MAP_H-1 - perp; }
     else if (edge === 2) { sx = perp;    sy = 0;       tx = MAP_W-1 - perp; ty = MAP_H-1; }
     else                 { sx = perp;    sy = MAP_H-1; tx = MAP_W-1 - perp; ty = 0; }
-    _t048 = { x: sx, y: sy, tx, ty, speed: 0.012 };
+    _wanderer = { x: sx, y: sy, tx, ty, speed: 0.012 };
     void half;
   }
-  if (!_t048) return;
+  if (!_wanderer) return;
   // Only moves during dawn/day to keep the silhouette readable
   const daylight = getDaylight();
   if (daylight < 0.35) return;
-  const dx = _t048.tx - _t048.x, dy = _t048.ty - _t048.y;
+  const dx = _wanderer.tx - _wanderer.x, dy = _wanderer.ty - _wanderer.y;
   const d = Math.sqrt(dx*dx + dy*dy);
-  if (d < 0.5) { _t048 = null; return; }
-  const spd = _t048.speed * (G.speed || 1);
-  _t048.x += (dx / d) * spd;
-  _t048.y += (dy / d) * spd;
+  if (d < 0.5) { _wanderer = null; return; }
+  const spd = _wanderer.speed * (G.speed || 1);
+  _wanderer.x += (dx / d) * spd;
+  _wanderer.y += (dy / d) * spd;
 }
 
-function _t048_draw(ctx) {
-  if (!_t048) return;
+function _wandererDraw(ctx) {
+  if (!_wanderer) return;
   if (G.camera && G.camera.zoom < 0.55) return; // don't render at tiny zoom
-  const s = toScreen(_t048.x, _t048.y);
+  const s = toScreen(_wanderer.x, _wanderer.y);
   const daylight = getDaylight();
   // Fade with daylight so it melts into dusk
   const a = Math.max(0, Math.min(1, (daylight - 0.2) * 1.5)) * 0.72;
@@ -1236,8 +1243,8 @@ function _t048_draw(ctx) {
   ctx.restore();
 }
 
-registerUpdater(_t048_tick);
-registerWorldRenderer(_t048_draw);
+registerUpdater(_wandererTick);
+registerWorldRenderer(_wandererDraw);
 
 // ── Loop 058 — render 056's standing stone ───────────────────
 // Paired with story.js:checkStoneBeat (loop 056). Reads the seeded
