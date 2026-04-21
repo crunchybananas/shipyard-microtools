@@ -1161,6 +1161,84 @@ export function enhRenderScreen(ctx, logicalW, logicalH) {
 // Loop boundaries (registration order = render order):
 // (none yet — loop 23+ adds here)
 
+// ── Loop 048 ─────────────────────────────────────────────────
+// An element that arrives, crosses, and leaves. Once per season,
+// at some dawn, starting from a random map edge and traversing
+// to the opposite one at a pace slower than any citizen. Nothing
+// about it touches G, the chronicle, the notification feed, or
+// any named-character surface. No chance to click it. No tooltip
+// if you do.
+//
+// Deliberately un-identified. A later iteration can choose what
+// this is.
+
+let _t048 = null;
+let _t048_season = null;
+
+function _t048_tick() {
+  // New season → roll whether one appears this season
+  if (_t048_season !== G.season) {
+    _t048_season = G.season;
+    // Skip winter — impassable feeling for the element
+    if (G.season === 'winter') { _t048 = null; return; }
+    // ~55% chance per season; deterministic from kingdom + season
+    const kname = G.kingdomName || 'Realm';
+    let h = 0;
+    const s = `${kname}_048_${G.season}_${Math.floor(G.day / 15)}`;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    const fire = Math.abs(h) % 100 < 55;
+    if (!fire) { _t048 = null; return; }
+    // Pick one of 4 edges; target the opposite
+    const edge = Math.abs(h >> 7) % 4;
+    const half = MAP_W / 2;
+    const perp = (Math.abs(h >> 11) % MAP_W);
+    let sx, sy, tx, ty;
+    if (edge === 0)      { sx = 0;       sy = perp;    tx = MAP_W-1; ty = MAP_H-1 - perp; }
+    else if (edge === 1) { sx = MAP_W-1; sy = perp;    tx = 0;       ty = MAP_H-1 - perp; }
+    else if (edge === 2) { sx = perp;    sy = 0;       tx = MAP_W-1 - perp; ty = MAP_H-1; }
+    else                 { sx = perp;    sy = MAP_H-1; tx = MAP_W-1 - perp; ty = 0; }
+    _t048 = { x: sx, y: sy, tx, ty, speed: 0.012 };
+    void half;
+  }
+  if (!_t048) return;
+  // Only moves during dawn/day to keep the silhouette readable
+  const daylight = getDaylight();
+  if (daylight < 0.35) return;
+  const dx = _t048.tx - _t048.x, dy = _t048.ty - _t048.y;
+  const d = Math.sqrt(dx*dx + dy*dy);
+  if (d < 0.5) { _t048 = null; return; }
+  const spd = _t048.speed * (G.speed || 1);
+  _t048.x += (dx / d) * spd;
+  _t048.y += (dy / d) * spd;
+}
+
+function _t048_draw(ctx) {
+  if (!_t048) return;
+  if (G.camera && G.camera.zoom < 0.55) return; // don't render at tiny zoom
+  const s = toScreen(_t048.x, _t048.y);
+  const daylight = getDaylight();
+  // Fade with daylight so it melts into dusk
+  const a = Math.max(0, Math.min(1, (daylight - 0.2) * 1.5)) * 0.72;
+  ctx.save();
+  ctx.globalAlpha = a;
+  // Soft ground shadow (matches citizen grounding style)
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y + 2, 3.2, 1.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Figure — single dark silhouette, slightly taller than a citizen.
+  // No face, no color detail. Two-tone: slightly warmer at top, cooler below,
+  // so it reads against both sky and ground bands without matching either.
+  ctx.fillStyle = '#2a2420';
+  ctx.fillRect(s.x - 1.2, s.y - 9, 2.4, 6);  // body/robe
+  ctx.fillStyle = '#1a1612';
+  ctx.fillRect(s.x - 1, s.y - 12, 2, 3.5);   // head/hood
+  ctx.restore();
+}
+
+registerUpdater(_t048_tick);
+registerWorldRenderer(_t048_draw);
+
 
 // ── Loop 23: Smoking volcano (rare; one mountain peak) ─────
 let _volcanoTile = null;
