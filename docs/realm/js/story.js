@@ -407,9 +407,16 @@ export function _realWorldDreamLens(now = new Date()) {
 }
 
 export function checkDreamBeat() {
-  // Require some history; don't dream on day 1-13
-  if (G.day < 14) return;
-  if (G.day % 14 !== 0) return;
+  // Loop 055 (constant-shift): dream cadence 14 → 10 days. 053's
+  // completionist play flagged mid-game chronicle-density as low:
+  // only 1 beat every 14 days after day 2's build-beat cluster.
+  // 054 expanded the thread pool to 10 threads × ~4-5 images, so
+  // faster cadence won't immediately re-trigger the repetition
+  // 054 just reduced. Expected result: ~50% more dreams in any
+  // given mid-game window, still below the pool's repeat ceiling.
+  // First 9 days still silent (protects the founding beat window).
+  if (G.day < 10) return;
+  if (G.day % 10 !== 0) return;
   // Only at dawn (dayPhase < 120 ≈ first ~3% of the day)
   if (G.dayPhase > 120) return;
   const flag = `dream_${G.day}`;

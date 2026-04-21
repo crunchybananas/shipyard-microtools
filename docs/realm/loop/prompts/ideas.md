@@ -30,6 +30,9 @@ and note the promotion here.
 
 - 053 [code] **HIGH** — add 4 missing first-build beats to `BUILDING_FIRST_BEATS` in story.js: tower, well, chickencoop, cowpen. 021 found 12 missing, 022 fixed 5, 053's programmatic completionist play found these 4 still genuinely absent. Drafts in 053 journal. ~8-12 lines. Closes a 3-tick-old gap. [story.js]
 - 053 [code] — season-transition chronicle beats ("Summer arrives; the fields turn gold" / "First frost settles" / etc). Parallel to first-build-beats but triggered on G.season change. ~20 lines. Fills the mid-game chronicle void 053 surfaced. [story.js]
+- 055 [code] — if cadence=10 feels too frequent in real play, try cadence=12 as middle ground (5 dreams per 60 days vs 4 at 14-day). Single-line revert/tweak. [story.js]
+- 055 [code] — staggered cadence: dreams every 10 days up to day 80, then every 20 days after. Late-game fewer fires → less repetition + preserves "rare ambient" feel. May be the real design shape. [story.js]
+- 055 [review] — thread-surfacing audit: which of the 10 threads actually surface for a typical realm? Which never do? Data-drives future pool-expansion. Pairs with 053's filed G.debug.dreamCoverage helper. [story.js]
 - 054 [code] — connect `weather` dream thread to `G.weather` state. When active weather is rain/storm, boost weather-thread weight via 044's `_realWorldDreamLens` mechanism. Pattern-match with seasonal boost. [story.js]
 - 054 [code] — `dead` thread (filed 053 + 054 de-prioritized). If it ships, adjust 043's nightmare image pool to avoid overlap. [story.js]
 - 054 [code] — thread-coverage audit helper `G.debug.dreamCoverage(n)` that runs N dream fires for a kingdom and reports surface frequency by thread. Would make future pool-expansion ticks data-driven. [story.js]
