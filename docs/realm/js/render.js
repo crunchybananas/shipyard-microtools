@@ -6246,3 +6246,67 @@ function renderMinimap() {
   mc.fillStyle = vign;
   mc.fillRect(0, 0, mw, mh);
 }
+
+// ════════════════════════════════════════════════════════════
+// Loop 052 (silent-module): isolated building renderer.
+//
+// Renders one building onto an offscreen canvas against a known
+// background. Unblocks graphics audits that need to see a single
+// building's silhouette/palette without the whole world in the way.
+// Filed in 046 and 051 after both ticks hit the same ~15-min camera-
+// wrangling tax trying to pixel-verify a single sprite. Now every
+// future silhouette/palette/color-eye audit is a 1-line debug call.
+//
+// Usage (console):
+//   const c = G.debug.renderBuildingIsolated('tavern');
+//   document.body.appendChild(c);  // visual check
+//
+// Usage (programmatic):
+//   const c = G.debug.renderBuildingIsolated('tavern', { daylight: 0.5 });
+//   const ctx = c.getContext('2d');
+//   const p = ctx.getImageData(...).data;  // pixel-level checks
+// ════════════════════════════════════════════════════════════
+export function renderBuildingIsolated(type, opts = {}) {
+  const def = BUILDINGS[type];
+  if (!def) throw new Error(`renderBuildingIsolated: unknown building type "${type}"`);
+
+  const width = opts.width || 100;
+  const height = opts.height || 140;
+  const daylight = opts.daylight !== undefined ? opts.daylight : 1.0;
+  const bgColor = opts.bgColor || '#4fb04f';  // grass green
+  const season = opts.season || 'spring';
+
+  const off = document.createElement('canvas');
+  off.width = width;
+  off.height = height;
+  const octx = off.getContext('2d');
+  octx.fillStyle = bgColor;
+  octx.fillRect(0, 0, width, height);
+
+  // Mock building sprite position — centered horizontally, 75% down so
+  // the building grows up from a visible "ground" line
+  const mockBuilding = {
+    type, x: 0, y: 0, level: 1, hp: 100, maxHp: 100,
+    workers: [], buildProgress: 1, productionTimer: 0, lastProduced: 0,
+  };
+  const s = { x: width / 2, y: Math.round(height * 0.72) };
+
+  // Swap in neutral G state so drawBuilding doesn't consult real
+  // camera/season/dayPhase. Restore afterward so the main canvas
+  // isn't disturbed.
+  const origCamera = G.camera;
+  const origDayPhase = G.dayPhase;
+  const origSeason = G.season;
+  G.camera = { x: 0, y: 0, zoom: 1.5 };  // zoom >= 1 enables full-detail branches
+  G.dayPhase = (G.dayLength || 3600) * 0.5;  // midday — no night tint
+  G.season = season;
+
+  try {
+    drawBuilding(octx, mockBuilding, s, daylight);
+  } finally {
+    G.camera = origCamera;
+    G.dayPhase = origDayPhase;
+    G.season = origSeason;
+  }
+  return off;
+}

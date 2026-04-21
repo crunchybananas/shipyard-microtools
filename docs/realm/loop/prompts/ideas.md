@@ -28,7 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 051 [code] **HIGH** — `G.debug.renderBuildingIsolated(type)` helper: draws a single building onto an offscreen canvas against a known background. Was filed in 046 as `[code]`; 051 hit the same tooling gap trying to pixel-verify the tavern flag. Without it, every silhouette/palette audit has a ~15-min camera-wrangling tax. Pays rent on every future graphics tick. [render.js + main.js]
+- 052 [review] — full the-silhouette-test / the-color-eye re-run via `G.debug.renderBuildingIsolated` on all 20 buildings. With the helper live, this is a 5-min tick not a 30-min one. Likely to ground-truth 046's findings (052 already caught one correction: bakery was NOT in the house/tavern blur cluster, its peakY=43 is 21px above house's 64).
+- 052 [code] — extend helper: `renderBuildingsGrid(types[], cols, opts)` returns one canvas with N buildings tiled for side-by-side audits. `renderBuildingAnimated(type, frames, opts)` returns array of canvases at different G.gameTick values for windmill/048/animated sprites. [render.js]
+- 052 [code] — `renderBuildingIsolated` option `{ overlayOnMain: true }` to blit the result onto the main canvas at a fixed debug position, so visual confirmation is one keystroke from the console. [render.js]
+- 051 [code] **HIGH** — `G.debug.renderBuildingIsolated(type)` helper: draws a single building onto an offscreen canvas against a known background. Was filed in 046 as `[code]`; 051 hit the same tooling gap trying to pixel-verify the tavern flag. Without it, every silhouette/palette audit has a ~15-min camera-wrangling tax. Pays rent on every future graphics tick. [render.js + main.js] **DONE → 052**
 - 051 [review] — the-silhouette-test re-run once `renderBuildingIsolated` exists. Should be a 5-min tick instead of 046's 30-min.
 - 051 [code] — flag-wave animation on tavern peak-flag (once renderBuildingIsolated lets us see it). `Math.sin(G.gameTick * 0.05)` skew on flag's right edge. 3-4 lines. Defer until visual verification is fast. [render.js]
 - 046 [code] — project tavern sign ABOVE the roof line (~6 lines in `drawTavern`, render.js:4144). Breaks the house≈tavern≈bakery silhouette cluster for the smallest effort of any option. Calibration + fix shape in 046 journal. [render.js] **DONE → 051**
