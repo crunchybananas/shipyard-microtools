@@ -69,7 +69,13 @@ function findCitizenAtClick(clientX, clientY) {
     const dx = wx - cs.x;
     const dy = wy - (cs.y - 8); // citizen visual center is ~8px above tile
     const dist = dx*dx + dy*dy;
-    if (dist < 15*15 && dist < bestDist) { // 15px radius
+    // Loop 031 (the-fixer, closing 027 finding): bumped hit radius from
+    // 15px to 22px. The sprite visual extent at 1.3× zoom is roughly
+    // 22px tall by 14px wide; the old 15px hit-box missed many clicks
+    // that visually landed on the citizen's head/shoulders. 22px gives
+    // a generous circle that matches the visual footprint without
+    // overlapping neighboring citizens at typical spacing.
+    if (dist < 22*22 && dist < bestDist) { // 22px radius
       bestDist = dist;
       best = c;
     }
