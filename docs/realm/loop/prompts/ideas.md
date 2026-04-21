@@ -39,6 +39,9 @@ and note the promotion here.
 - 058 [review / play] — visual check of the stone on canvas with a persona (the-photographer / the-screenshot-critic). Pixel verification confirms render; persona check would confirm it reads right.
 - 056 [code] — render 056's standing stone at its seeded grass tile (persistent dark vertical + small base ellipse). Needs stone_x/stone_y stored in storyFlags. Pairs with 052's renderBuildingIsolated helper availability. [enhancements.js + story.js] **DONE → 058**
 - 056 [code] — expand 056's _STONE_PHRASES pool from 4 → 6-8 variants. Verification showed 3 of 8 kingdoms used the same "barely-legible" phrase. ~4 lines. [story.js]
+- 062 [code] — generalize BUILDING_FIRST_BEATS to NARRATIVE_BEATS with a `trigger: (G) => bool` field. Would let firstBirth, castleBuilt, population thresholds, and raid beat all live in one table. ~25 lines. Pairs with 060's surface-map doc. [story.js]
+- 062 [code] — allow `text:` to be a function `(G) => string` for dynamic prose (castleBuilt uses kingdom + mayor name). ~5 lines. [story.js]
+- 062 [review] — tone-consistency audit of BUILDING_FIRST_BEATS now that 062 added 3 formerly-inline entries. Their voice may differ from the 13 that were always in the table. [story.js]
 - 061 [code] — optional chronicle beat on wanderer spawn (`character` or new `visitor` tag). Breaks 048's "silent" rule; only ship if we decide wanderer should be announced. [enhancements.js + story.js]
 - 061 [code] — soft interaction: clicking near the wanderer shows a one-line tooltip once per realm ("A figure passes. They do not pause."). Preserves mystery. [input.js + enhancements.js]
 - 061 [code] — pilgrim sibling variant — religious-coded, stops at the church if one exists. Lets wanderer keep its rootless meaning, introduces a second element with its own role. [enhancements.js]

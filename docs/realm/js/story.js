@@ -177,6 +177,14 @@ const BUILDING_FIRST_BEATS = [
   { type: 'well',        flag: 'firstWell',        text: 'A new well is dug. Cold sweet water meets the light for the first time in ages.' },
   { type: 'chickencoop', flag: 'firstChickencoop', text: 'Chickens settle into their coop. The realm wakes to a new kind of dawn chorus.' },
   { type: 'cowpen',      flag: 'firstCowpen',      text: 'A cow pen is raised. Milk and hide will flow from patient beasts now.' },
+  // Loop 062 (cut-as-you-add): consolidated the inline tavern/barracks/
+  // church first-build blocks into the table. Previous code duplicated
+  // the table pattern as three 4-line if-blocks below checkStoryBeats;
+  // merging here preserves exact beat text + tag and uses the existing
+  // `after:` hook for the ensure* named-character triggers.
+  { type: 'tavern',      flag: 'firstTavern',      text: 'The tavern opens its doors. Laughter carries into the night.', after: ensureMayor },
+  { type: 'barracks',    flag: 'firstBarracks',    text: 'The barracks is built. Recruits drill at dawn.',               after: ensureRival },
+  { type: 'church',      flag: 'firstChurch',      text: 'Bells toll from the new church. The faithful gather.',         after: ensureBard },
 ];
 
 // Run each tick/day to detect milestones and fire beats once.
@@ -200,24 +208,6 @@ export function checkStoryBeats() {
   if (!hasFlag('firstBirth') && G.stats && (G.stats.citizensBorn || 0) >= 1) {
     setFlag('firstBirth');
     chronicle('A child is born in the realm. The first new life to call this land home.', 'birth');
-  }
-  // First tavern → mayor appears, bard soon after
-  if (!hasFlag('firstTavern') && G.buildings.some(b => b.type === 'tavern')) {
-    setFlag('firstTavern');
-    chronicle('The tavern opens its doors. Laughter carries into the night.', 'milestone');
-    ensureMayor();
-  }
-  // First barracks → rival noticed
-  if (!hasFlag('firstBarracks') && G.buildings.some(b => b.type === 'barracks')) {
-    setFlag('firstBarracks');
-    chronicle('The barracks is built. Recruits drill at dawn.', 'milestone');
-    ensureRival();
-  }
-  // First church
-  if (!hasFlag('firstChurch') && G.buildings.some(b => b.type === 'church')) {
-    setFlag('firstChurch');
-    chronicle('Bells toll from the new church. The faithful gather.', 'milestone');
-    ensureBard();
   }
   // Population thresholds
   const popCheck = [
