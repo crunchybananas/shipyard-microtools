@@ -68,9 +68,19 @@ export function placeBuilding(type, tx, ty) {
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
   if (G.stats) G.stats.buildingsBuilt++;
-  // Record for undo
+  // Record for undo. Loop 025 (the-fixer, closing 024 pessimist bug):
+  // snapshot storyFlags and chronicle length at push-time. Without this,
+  // pressing undo on a first-build leaves the chronicle entry AND the
+  // `firstX` flag in place — the chronicle narrates an event that didn't
+  // persistently happen, and a later rebuild gets no new beat (flag blocks
+  // re-fire). Shallow clone of storyFlags is sufficient; it's a flat
+  // object keyed by flag name. Chronicle length is truncated on undo.
   G._undoStack = G._undoStack || [];
-  G._undoStack.push(b);
+  G._undoStack.push({
+    b,
+    flagsSnapshot: { ...(G.storyFlags || {}) },
+    chronicleLen: (G.chronicle || []).length,
+  });
   if (G._undoStack.length > 10) G._undoStack.shift();
   playBuildingSound(type);
   spawnDust(tx, ty);
@@ -103,7 +113,12 @@ export function demolishBuilding(b, byEnemy = false) {
 
 export function undoLastBuild() {
   if (!G._undoStack || G._undoStack.length === 0) return false;
-  const b = G._undoStack.pop();
+  const entry = G._undoStack.pop();
+  // Loop 025 (the-fixer, closing 024): entries are now `{b, flagsSnapshot,
+  // chronicleLen}` wrappers. Raw-building entries are not expected in the
+  // current codebase (undo stack is in-memory only) but a defensive unwrap
+  // keeps older shapes from crashing this path.
+  const b = entry && entry.b ? entry.b : entry;
   if (!G.buildings.includes(b)) return false;
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
@@ -113,6 +128,13 @@ export function undoLastBuild() {
   // Full refund on undo
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + v;
   for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
+  // Restore storyFlags + truncate chronicle to pre-place state so a
+  // first-build beat that already fired is reverted. A later rebuild will
+  // now correctly re-narrate.
+  if (entry && entry.flagsSnapshot) G.storyFlags = entry.flagsSnapshot;
+  if (entry && typeof entry.chronicleLen === 'number' && G.chronicle) {
+    G.chronicle.length = entry.chronicleLen;
+  }
   playSound('click');
   return true;
 }
