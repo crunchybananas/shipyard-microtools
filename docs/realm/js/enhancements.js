@@ -5615,14 +5615,10 @@ registerUpdater(updateSeasonalProverbs);
 // Already plays 'season' sound for positive events. Stub.
 
 // ── Loop 187: Story — chronicle entry for first school built ─
-function updateSchoolChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (!_hf144('firstSchool') && G.buildings.some(b => b.type === 'school')) {
-    _sf144('firstSchool');
-    _chr144('The first school opens. Children gather with wide eyes, eager to learn.', 'milestone');
-  }
-}
-registerUpdater(updateSchoolChronicle);
+// (Removed in loop 074 — duplicate of BUILDING_FIRST_BEATS entry in
+// story.js. The table version wins execution order so this was dead
+// code since the 022/057 refactor. Prose retired: "The first school
+// opens. Children gather with wide eyes, eager to learn.")
 
 // ── Loop 188: UX — selected building pulse ring ─────────────
 // (Already exists via loop 75 pulsing halo. Stub.)
@@ -5664,27 +5660,17 @@ function updatePanWind() {
 registerUpdater(updatePanWind);
 
 // ── Loop 191: Story — chronicle for granary built ───────────
-function updateGranaryChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (!_hf144('firstGranary') && G.buildings.some(b => b.type === 'granary')) {
-    _sf144('firstGranary');
-    _chr144('A granary is raised. We shall not fear the lean months so deeply now.', 'milestone');
-  }
-}
-registerUpdater(updateGranaryChronicle);
+// (Removed in loop 074 — duplicate of BUILDING_FIRST_BEATS entry.
+// Prose retired: "A granary is raised. We shall not fear the lean
+// months so deeply now.")
 
 // ── Loop 192: UX — tab key cycles through panels ───────────
 // (Hooked in input.js)
 
 // ── Loop 193: Story — blacksmith chronicle ──────────────────
-function updateBlacksmithChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (!_hf144('firstBlacksmith') && G.buildings.some(b => b.type === 'blacksmith')) {
-    _sf144('firstBlacksmith');
-    _chr144('The ring of hammer on anvil echoes through the settlement. A blacksmith begins forging.', 'milestone');
-  }
-}
-registerUpdater(updateBlacksmithChronicle);
+// (Removed in loop 074 — duplicate of BUILDING_FIRST_BEATS entry.
+// Prose retired: "The ring of hammer on anvil echoes through the
+// settlement. A blacksmith begins forging.")
 
 // ── Loop 194: Audio — distant thunder on cloudy nights ──────
 let _thunderTimer = 0;
@@ -5713,27 +5699,17 @@ function updateDistantThunder() {
 registerUpdater(updateDistantThunder);
 
 // ── Loop 195: Story — chronicle for first windmill ──────────
-function updateWindmillChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (!_hf144('firstWindmill') && G.buildings.some(b => b.type === 'windmill')) {
-    _sf144('firstWindmill');
-    _chr144('The windmill\'s blades catch the breeze. Grain flows more freely to the bakeries.', 'milestone');
-  }
-}
-registerUpdater(updateWindmillChronicle);
+// (Removed in loop 074 — duplicate of BUILDING_FIRST_BEATS entry.
+// Prose retired: "The windmill's blades catch the breeze. Grain
+// flows more freely to the bakeries.")
 
 // ── Loop 196: UX — right-click confirm dialog for expensive buildings ─
 // (Handled in input.js — only for castle-tier. Stub.)
 
 // ── Loop 197: Story — archery range chronicle ───────────────
-function updateArcheryChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (!_hf144('firstArchery') && G.buildings.some(b => b.type === 'archery')) {
-    _sf144('firstArchery');
-    _chr144('An archery range is built. The twang of bowstrings fills the morning air.', 'milestone');
-  }
-}
-registerUpdater(updateArcheryChronicle);
+// (Removed in loop 074 — duplicate of BUILDING_FIRST_BEATS entry.
+// Prose retired: "An archery range is built. The twang of bowstrings
+// fills the morning air.")
 
 // ── Loop 198: Audio — victory fanfare on scenario complete ──
 // Already handled via playSound('mission') on scenario win. This adds extra.
