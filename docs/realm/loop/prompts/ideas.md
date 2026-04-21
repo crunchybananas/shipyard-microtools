@@ -18,7 +18,7 @@ and note the promotion here.
 
 ## seeds (from archive/LOOP_STATE.md Known Issues, 2026-04-15)
 
-- 001 [code] — minimap click broken: async `import()` in `input.js` doesn't resolve. [input.js]
+- 001 [code] — minimap click broken: async `import()` in `input.js` doesn't resolve. [input.js] **DROPPED → 006** (verified in chrome-mcp: no async imports remain; handler works; seed was outdated)
 - 001 [play] — long-session verify: 30+ day play with missions/raids/research after rAF fallback fix. [the-idle-player pairs well]
 - 001 [code] — workers should be visible at buildings: citizens assigned to farms standing visibly near the farm. [citizens.js + render.js]
 - 001 [play] — sound-on-production verify: SFX fires for each production tick across all building types. [the-lore-hunter]
@@ -30,8 +30,8 @@ and note the promotion here.
 
 - 002 [code] — population-growth hint on "Reach 10 population" mission card; novice has no signal that housing grows pop. [ui.js / missions.js]
 - 002 [play] — HUD tooltip audit: hover every top-bar icon and report which have tooltips vs which are bare. Pair with `the-novice` persona. [index.html / ui.js]
-- 002 [code] — tighten welcome-banner fade: currently overlaps starting citizens at T+0–3. Either move it out of the citizen zone or fade it faster. [main.js? enhancements.js?]
-- 002 [play] — verify or refute: is there a placement ghost-preview after selecting a building? 30-seconds tick missed it; needs a focused second look. [input.js + render.js]
+- 002 [code] — tighten welcome-banner fade: currently overlaps starting citizens at T+0–3. Either move it out of the citizen zone or fade it faster. [main.js? enhancements.js?] **DONE → 006** (repositioned `#toast` to top:5rem in index.html; affects all centered toasts, welcome no longer covers map center)
+- 002 [play] — verify or refute: is there a placement ghost-preview after selecting a building? 30-seconds tick missed it; needs a focused second look. [input.js + render.js] **DONE → 006** (confirmed by incidental observation during 006 fix: selecting Farm overlays a translucent grid on buildable tiles — 30-seconds tick's screenshot timing missed it)
 - 003 [code] — day-lighting curve audit: log current luminance multiplier across dayPhase 0–3600 for each season; expose on `G.debug.lightCurve`. Measure before changing. [render.js] **DONE → 004** (in state.js+main.js)
 - 003 [code] — photo mode (`H` toggle): hide HUD, mission panel, minimap, build bar, pause label. Useful for marketing and for future `the-photographer` ticks. [index.html / ui.js]
 - 003 [code] — winter palette warm-highlight pass: lit windows, fire glow, sun-on-snow specular so winter doesn't read as "underexposed." [render.js / enhancements.js]

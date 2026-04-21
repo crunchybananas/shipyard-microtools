@@ -150,13 +150,13 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .scen-progress{font-size:0.7rem;color:var(--accent);float:right}
 
 /* Toast — type-aware styles */
-#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.90);color:var(--gold);padding:1rem 2rem;border-radius:10px;font-size:1.1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:2px solid rgba(255,209,102,0.35);box-shadow:0 4px 32px rgba(0,0,0,0.6)}
+#toast{position:fixed;top:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.90);color:var(--gold);padding:1rem 2rem;border-radius:10px;font-size:1.1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:2px solid rgba(255,209,102,0.35);box-shadow:0 4px 32px rgba(0,0,0,0.6)}
 #toast.show{opacity:1}
 #toast.toast-info{color:#93c5fd;border-color:rgba(147,197,253,0.45);box-shadow:0 4px 32px rgba(96,165,250,0.25)}
 #toast.toast-danger{color:var(--danger);border-color:rgba(248,113,113,0.55);box-shadow:0 4px 32px rgba(248,113,113,0.3)}
 #toast.toast-event{color:var(--gold);border-color:rgba(255,209,102,0.5);box-shadow:0 4px 32px rgba(255,209,102,0.25)}
 #toast.toast-mission{color:#4ade80;border-color:rgba(74,222,128,0.5);box-shadow:0 4px 32px rgba(74,222,128,0.25)}
-@keyframes toastShake{0%,100%{transform:translate(-50%,-50%)}15%{transform:translate(calc(-50% - 6px),-50%)}30%{transform:translate(calc(-50% + 6px),-50%)}45%{transform:translate(calc(-50% - 4px),-50%)}60%{transform:translate(calc(-50% + 4px),-50%)}75%{transform:translate(calc(-50% - 2px),-50%)}90%{transform:translate(calc(-50% + 2px),-50%)}}
+@keyframes toastShake{0%,100%{transform:translateX(-50%)}15%{transform:translateX(calc(-50% - 6px))}30%{transform:translateX(calc(-50% + 6px))}45%{transform:translateX(calc(-50% - 4px))}60%{transform:translateX(calc(-50% + 4px))}75%{transform:translateX(calc(-50% - 2px))}90%{transform:translateX(calc(-50% + 2px))}}
 #toast.toast-shake{animation:toastShake 0.55s ease}
 
 /* Activity feed */
