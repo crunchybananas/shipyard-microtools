@@ -130,7 +130,11 @@ export function updateEnemies() {
     // hovering a grave can eventually surface who fell where.
     if (!G.deathMarkers) G.deathMarkers = [];
     G.deathMarkers.push({ x: c.x, y: c.y, name: c.name || 'Settler', day: G.day, cause: 'raid' });
-    try { notify(`${c.name || 'A settler'} was slain by raiders!`, 'danger'); } catch(_e){}
+    // Loop 077 (the-fixer, 076 HIGH): {chronicle:false} on the
+    // notify so the direct chronicle('death') below is the sole
+    // chronicle row for a raider-kill. 076 audit caught this
+    // duplicate (notify→tag:raid + direct→tag:death).
+    try { notify(`${c.name || 'A settler'} was slain by raiders!`, 'danger', { chronicle: false }); } catch(_e){}
     try { chronicle(`${c.name || 'A settler'} fell to raiders. Their name joins the stone.`, 'death'); } catch(_e){}
   }
 }

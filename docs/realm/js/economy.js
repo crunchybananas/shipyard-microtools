@@ -159,7 +159,10 @@ export function trySpawnSettlers(count) {
   for (const m of milestones) {
     if (G.population >= m.pop && !G[m.key]) {
       G[m.key] = true;
-      notify(`🎉 Population reached ${m.label}!`, 'event');
+      // Loop 077: {chronicle:false} — story.js popCheck already writes
+      // the canonical 'milestone' entry ("Ten souls now call this land
+      // home." etc). 076 HIGH: duplicate at pop 10/25/50/75.
+      notify(`🎉 Population reached ${m.label}!`, 'event', { chronicle: false });
       playSound('mission');
       for (let i = 0; i < 20; i++) {
         G.particles.push({
@@ -334,14 +337,16 @@ export function updateProduction() {
             text: '💀 Starved',
             alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
           });
-          notify(`${c.name} has died of starvation!`, 'danger');
+          // Loop 077: {chronicle:false} so direct 'death' write is canonical (076 HIGH)
+          notify(`${c.name} has died of starvation!`, 'danger', { chronicle: false });
           try { chronicle(`${c.name} perished from hunger. The realm mourns.`, 'death'); } catch(_e){}
         } else {
           // Citizen flees
           const c2 = G.citizens.pop();
           if (c2.jobBuilding) c2.jobBuilding.workers = c2.jobBuilding.workers.filter(w => w !== c2);
           G.population--;
-          notify('A settler has left — they could not find food!', 'danger');
+          // Loop 077: {chronicle:false} (076 MEDIUM) — UI warning, not a raid event
+          notify('A settler has left — they could not find food!', 'danger', { chronicle: false });
         }
       }
     }
@@ -574,7 +579,8 @@ export function upgradeBuilding(b) {
   for (const [k, v] of Object.entries(nextUpgrade.cost)) {
     if ((G.resources[k] || 0) < v) {
       const costStr = Object.entries(nextUpgrade.cost).map(([k,v]) => `${v} ${resourceEmoji(k)}`).join(', ');
-      notify(`Not enough resources to upgrade! Need: ${costStr}`, 'danger');
+      // Loop 077: {chronicle:false} (076 MEDIUM) — UI-only failure message
+      notify(`Not enough resources to upgrade! Need: ${costStr}`, 'danger', { chronicle: false });
       return false;
     }
   }
@@ -690,7 +696,8 @@ export function updateFires() {
     }
     // Destroy building if HP reaches 0
     if (b.hp <= 0) {
-      notify(`🔥 ${BUILDINGS[b.type]?.name || b.type} burned down!`, 'danger');
+      // Loop 077: {chronicle:false} (076 MEDIUM) — was writing tag:raid, wrong tag for fire
+      notify(`🔥 ${BUILDINGS[b.type]?.name || b.type} burned down!`, 'danger', { chronicle: false });
       G.cameraShake = Math.max(G.cameraShake || 0, 10);
       G.buildings = G.buildings.filter(x => x !== b);
       G.buildingGrid[b.y][b.x] = null;

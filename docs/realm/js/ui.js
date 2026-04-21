@@ -10,7 +10,8 @@ import { notify } from './notifications.js';
 import { TRADE_PARTNERS, executeTrade } from './trade.js';
 
 function _triggerFoodWarning() {
-  notify('⚠️ Food running low! Build more farms!', 'danger');
+  // Loop 077: {chronicle:false} (076 MEDIUM) — live UI prompt, not realm memory
+  notify('⚠️ Food running low! Build more farms!', 'danger', { chronicle: false });
 }
 
 function rateStr(val, tooltip) {

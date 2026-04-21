@@ -248,7 +248,7 @@ window.doTrade = (partnerId, resource, amount) => {
     renderTradePanel();
     updateUI();
   } else {
-    notify('Not enough resources for this trade', 'danger');
+    notify('Not enough resources for this trade', 'danger', { chronicle: false });  // 077/076 MEDIUM: UI failure, not a raid
   }
 };
 window.toggleAchievements = () => {
