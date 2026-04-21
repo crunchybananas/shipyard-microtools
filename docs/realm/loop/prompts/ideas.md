@@ -78,7 +78,11 @@ and note the promotion here.
 - 069 [review] — audit other toast+chronicle double-fires besides season. Raid events? Research completion (does showToast route to chronicle?). [notifications.js]
 - 081 [code] — `{ noParticles: true }` option for fastForward — skip particle/smoke updates for tighter benchmarking. Small speedup. [main.js]
 - 081 [code] — `G.debug.snapshot()` helper returning full-state snapshot for before/after comparisons. Pairs with fastForward. [main.js]
-- 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play]
+- 082 [code] **HIGH** — add `{chronicle: false}` to 4 raid-warning notify calls (economy.js:371 scouts-report, :377 raiders-approach, raid-spawn notify, no-defenders warning). Reduces raid-tag chronicle pollution by ~180 entries per 200-day realm. Same 070/077 pattern. 076 classified as LOW; 082 volume data promotes to HIGH. [economy.js]
+- 082 [code] **HIGH** — investigate fastForward skipping dawn-gated beats. Options: (a) run simTick with G.speed=1 for first+last tick of each day, (b) force extra checkStoryBeats call at known dawn tick, (c) widen dawn gate tolerance. Makes future fastForward audits trustworthy. [main.js + story.js]
+- 082 [code] — year-milestone grammar fix: `${n} soul${n===1?'':'s'}` and verify year boundary in enhancements.js:5086. Currently fires "1 souls" and at odd day boundaries. [enhancements.js]
+- 082 [doc] — update narrative-surfaces.md: note the raid-pollution finding and fastForward dawn-gate limitation. [loop/docs/]
+- 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play] **DONE → 082**
 - 081 [code] — `G._fastForwarding` flag so music/particles/rendering can skip expensive work during batch advance. [main.js]
 - 069 [code] — `G.debug.fastForward(days)` helper that directly advances the main-loop for N days without rAF throttling. Would make future idle-player chrome-mcp ticks hit mid-game in seconds. [main.js] **DONE → 081**
 - 068 [review] — night-specific silhouette-test: via helper, look at non-bg pixels at night phase to see which buildings silhouette distinctively under tint. Shape beats color at night. Pairs with 068's residential-blur finding.
