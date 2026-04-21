@@ -235,6 +235,28 @@ export function checkStoryBeats() {
     chronicle('The first raid is turned back. The dead are buried; the living drink to the fallen.', 'raid');
   }
 
+  // Loop 071: happiness-threshold beats. 060 audit found no narrative
+  // surface when happiness crosses critical thresholds. Fires once on
+  // crossing 80 up (peak) or 20 down (crisis), with a cooldown flag
+  // that clears when happiness crosses back to mid-range [35, 65] so
+  // the same realm can experience cycles of glory and crisis.
+  // Population >= 5 required so early-game fluctuations don't spam.
+  if (G.population >= 5) {
+    if (G.happiness >= 80 && !hasFlag('happyPeakActive')) {
+      setFlag('happyPeakActive');
+      setFlag('happyCrisisActive', false);  // reset opposite flag
+      chronicle('The realm is glad. Doors stand open; songs carry further than they should.', 'milestone');
+    } else if (G.happiness <= 20 && !hasFlag('happyCrisisActive')) {
+      setFlag('happyCrisisActive');
+      setFlag('happyPeakActive', false);
+      chronicle('A grey mood settles over the realm. Doors close earlier; the bards hold their tongues.', 'milestone');
+    } else if (G.happiness >= 35 && G.happiness <= 65) {
+      // Mid-range — clear both flags so next crossing can re-fire
+      if (hasFlag('happyPeakActive')) setFlag('happyPeakActive', false);
+      if (hasFlag('happyCrisisActive')) setFlag('happyCrisisActive', false);
+    }
+  }
+
   // Loop 039 (the-dream, surprise challenge): collective dreams.
   // Every 14 days at dawn, the realm wakes to a shared dream composed
   // deterministically from the kingdom name + day + what's present in
