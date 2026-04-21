@@ -102,3 +102,10 @@ and note the promotion here.
 - 039 [code] — named-NPC personal dreams + character-journal panel: let Mira / Osric / Tannis / etc. have their own dream fragments stored per-character and viewable in a new UI panel. Different system from collective dreams. [story.js + ui.js]
 - 039 [code] — sound chord on dream-fire: a quiet one-note chime when the dream beat triggers. Requires audio.js hook. [audio.js + story.js]
 - 039 [code] — time-aware dream seasoning: on real-world calendar days (Oct 31, Dec 21, etc.) bias dream threads toward thematic imagery. Uses `time-aware` surprise challenge. [story.js checkDreamBeat]
+
+## ⚠️ user-flagged priorities (2026-04-21)
+
+The user flagged two specific UX concerns worth a dedicated audit tick. Top of queue:
+
+- **USER-PRIORITY 040 [play]** — heavy-research UX audit: load a game, research ALL 9 techs (via `G.researchedTechs.add(...)` shortcut to skip the 5-minute research wait from 032), open the research panel, screenshot. Verify: does the research panel overflow? Do items overlap visually? Is the scroll behavior OK? What's the read-experience for a player at late-game? Report specific overlaps + file [code] ideas for each. [ui.js research panel]
+- **USER-PRIORITY 040 [play]** — header (HUD bar) overlap audit: the top HUD has ~11 buttons + kingdom name + date + 5 resources + population/soldier/threat counters. At narrower viewports or after certain state changes (long kingdom name, running research label, etc.), does anything overlap or wrap badly? Screenshot at 1280, 1440, 1568, and 1920 widths. Report specific overlaps. [index.html #hud + ui.js]
