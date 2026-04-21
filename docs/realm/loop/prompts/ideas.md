@@ -28,6 +28,11 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 046 [code] — project tavern sign ABOVE the roof line (~6 lines in `drawTavern`, render.js:4144). Breaks the house≈tavern≈bakery silhouette cluster for the smallest effort of any option. Calibration + fix shape in 046 journal. [render.js]
+- 046 [code] — dome bakery's oven as a bulge protruding from one wall (`drawBakery`, render.js:5178) so its silhouette gains a distinctive curve. ~10 lines. Secondary to tavern sign. [render.js]
+- 046 [code] — add central doorway arch or small rooftop structure in `drawBarracks` (render.js:3763) to break silhouette parity with blacksmith. Lower priority since they're rarely adjacent. [render.js]
+- 046 [code] — expose `G.debug.renderBuildingIsolated(type)` that draws a single building onto an offscreen canvas against a known background. Would make silhouette audits automatable and pairs with future screenshot-critic ticks. Unblocks 046-style reviews. [render.js + main.js]
+- 046 [review] — after any silhouette fix lands, re-run `the-silhouette-test` via `renderBuildingIsolated` on all 20 buildings; overlay at low alpha for a visual cluster check.
 - 045 [code] **HIGH** — add `SEASONS.<season>.skyShift` triples and apply via `shiftColor` to dayTop/dayBot at render.js:118-121 during the `day` blend coefficient only (not dawn/dusk). 045 pixel-sampled 4 seasons at midday and all 4 sky averages landed within ±1 per channel. Calibration in 045 journal. Closes the root cause 013's "weakest frame" flag pointed at. Magnitude ≤ 15/channel. [state.js + render.js]
 - 045 [code] — bump `horizonAlpha` at dawn/dusk OR widen the warm-bottom gradient band so horizon warmth isn't clipped by typical camera angles. Needs a screenshot-critic follow-up to tune. [render.js ~118-139 and ~2555]
 - 045 [review] — after skyShift lands, re-run color-eye across 16 frames (4 seasons × 4 times-of-day) to verify no regression in 012/017/018 hue-variation. Pairs with light screenshot-critic re-shoot.
