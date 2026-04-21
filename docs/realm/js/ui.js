@@ -934,7 +934,7 @@ export function updateTutorialTip() {
   tipEl.innerHTML = `
     <div class="tut-text">${current.text}</div>
     ${current.action ? `<div class="tut-action">${current.action}</div>` : ''}
-    <div class="tut-progress">${tutorialStep + 1} / ${TUTORIAL_STEPS.length}</div>
+    <div class="tut-progress">Step ${tutorialStep + 1} of ${TUTORIAL_STEPS.length}</div>
     <button class="tut-skip" onclick="dismissTutorial()">Skip tutorial</button>
   `;
   tipEl.style.display = 'block';
