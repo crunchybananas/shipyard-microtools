@@ -721,6 +721,19 @@ body.photo-mode #photo-mode-badge{display:block}
 <div id="photo-mode-badge">📷 Photo Mode — press H to exit</div>
 <div id="tooltip"><div class="tt-title"></div><div class="tt-body"></div></div>
 
+<script>
+/* Loop 049 (silent-module): dev cache-buster. On localhost only,
+   register sw.js which forces no-store on /js/*.js fetches. First
+   install reloads once so the SW can intercept module imports that
+   already happened. Production deploys (non-localhost host) see
+   normal browser caching. See loop/journal/049.md for context. */
+if ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(() => {
+    if (!navigator.serviceWorker.controller) location.reload();
+  }).catch(() => {});
+}
+</script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>
