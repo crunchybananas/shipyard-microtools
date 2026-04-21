@@ -28,7 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 046 [code] — project tavern sign ABOVE the roof line (~6 lines in `drawTavern`, render.js:4144). Breaks the house≈tavern≈bakery silhouette cluster for the smallest effort of any option. Calibration + fix shape in 046 journal. [render.js]
+- 051 [code] **HIGH** — `G.debug.renderBuildingIsolated(type)` helper: draws a single building onto an offscreen canvas against a known background. Was filed in 046 as `[code]`; 051 hit the same tooling gap trying to pixel-verify the tavern flag. Without it, every silhouette/palette audit has a ~15-min camera-wrangling tax. Pays rent on every future graphics tick. [render.js + main.js]
+- 051 [review] — the-silhouette-test re-run once `renderBuildingIsolated` exists. Should be a 5-min tick instead of 046's 30-min.
+- 051 [code] — flag-wave animation on tavern peak-flag (once renderBuildingIsolated lets us see it). `Math.sin(G.gameTick * 0.05)` skew on flag's right edge. 3-4 lines. Defer until visual verification is fast. [render.js]
+- 046 [code] — project tavern sign ABOVE the roof line (~6 lines in `drawTavern`, render.js:4144). Breaks the house≈tavern≈bakery silhouette cluster for the smallest effort of any option. Calibration + fix shape in 046 journal. [render.js] **DONE → 051**
 - 046 [code] — dome bakery's oven as a bulge protruding from one wall (`drawBakery`, render.js:5178) so its silhouette gains a distinctive curve. ~10 lines. Secondary to tavern sign. [render.js]
 - 046 [code] — add central doorway arch or small rooftop structure in `drawBarracks` (render.js:3763) to break silhouette parity with blacksmith. Lower priority since they're rarely adjacent. [render.js]
 - 046 [code] — expose `G.debug.renderBuildingIsolated(type)` that draws a single building onto an offscreen canvas against a known background. Would make silhouette audits automatable and pairs with future screenshot-critic ticks. Unblocks 046-style reviews. [render.js + main.js]

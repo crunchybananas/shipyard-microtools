@@ -4195,6 +4195,23 @@ function drawTavern(ctx, s, b) {
     { board: '#4e6a30', accent: '#a0c070' },  // mossy green
   ][tavHash & 0x3];
   const emblemType = (tavHash >> 2) & 0x3;
+  // Loop 051 (the-fixer, closes 046 HIGH): small flag projecting
+  // ABOVE the roof peak (y-30). 046's silhouette-test found house
+  // ≈ tavern ≈ bakery blur at default zoom because all three share
+  // peaked-roof + chimney shape, and 27's side-sign sits below the
+  // roof line — invisible in a pure black silhouette. A 6-px pole
+  // + 5×2 flag above the peak adds a distinct horizontal bar to
+  // the tavern silhouette, breaking the residential cluster. Uses
+  // the per-tavern signColors so visual identity carries upward.
+  ctx.fillStyle = '#3a2818';
+  ctx.fillRect(s.x - 0.4, s.y - 36, 0.8, 6);     // pole (roof → sky)
+  ctx.fillStyle = signColors.board;
+  ctx.fillRect(s.x + 0.4, s.y - 36, 5, 2.5);     // flag
+  ctx.fillStyle = signColors.accent;
+  ctx.fillRect(s.x + 0.4, s.y - 36, 5, 0.5);     // top band
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+  ctx.lineWidth = 0.4;
+  ctx.strokeRect(s.x + 0.4, s.y - 36, 5, 2.5);   // outline for edge definition
   // Sign bracket
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(s.x-12, s.y-16, 2, 8);
