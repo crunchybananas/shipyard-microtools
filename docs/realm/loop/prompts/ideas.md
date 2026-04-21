@@ -94,6 +94,11 @@ and note the promotion here.
 - 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play] **DONE → 082**
 - 081 [code] — `G._fastForwarding` flag so music/particles/rendering can skip expensive work during batch advance. [main.js]
 - 069 [code] — `G.debug.fastForward(days)` helper that directly advances the main-loop for N days without rAF throttling. Would make future idle-player chrome-mcp ticks hit mid-game in seconds. [main.js] **DONE → 081**
+- 086 [code] — add snow-cap / snow-dust to farm in winter (render.js:2934 exclusion — remove farm or add ground-level snow). Gives winter farms a seasonal visual tell. ~3-5 lines. [render.js]
+- 086 [code] — per-building snow-cap variation: more distinct caps for residential cluster (house/tavern/bakery/lumber/windmill/market/granary) so 046's winter blur disambiguates. Tower already has smaller cap; extend pattern. [render.js]
+- 086 [code] — quarry snow: same pattern as farm. Ensure excluded tiles get SOME winter signal (ground-level dust). [render.js]
+- 086 [review] — after variation added, re-run silhouette-test at winter to confirm 046 blur is broken.
+- 086 [review] — investigate if well+granary winter peakY convergence (both → 70) causes visual confusion at normal zoom. Measure.
 - 068 [review] — night-specific silhouette-test: via helper, look at non-bg pixels at night phase to see which buildings silhouette distinctively under tint. Shape beats color at night. Pairs with 068's residential-blur finding.
 - 068 [code] — `renderBuildingIsolated` background-only mode: return tinted-grass sample alone (no building) so audits can subtract baseline per phase. Cleaner pixel-delta analyses. [render.js]
 - 068 [code] — night-specific distinguishing feature for residential buildings: per-building glow color (tavern gold, house warm-white, lumber no glow). Already in render.js:~2950 night-window code — 066 didn't sample it because glow requires daylight<0.75 which helper's default midday skips. Investigate existing variation first. [render.js]
