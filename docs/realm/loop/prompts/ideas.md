@@ -42,4 +42,7 @@ and note the promotion here.
 - 004 [code] — canvas pixel-luminance sampler on `G.debug.sampleLum()`: snapshot N pixels, compute mean luminance. More rigorous than the effLum proxy in lightCurve. [main.js / render.js]
 - 004 [code] — configurable night floor: expose `G.debug.nightFloor` knob so designers can test 0.3 / 0.4 / 0.55 / 0.7 without re-deploy. [state.js]
 - 004 [code] — night-progression curve: let effLum dip past 0.76 mid-night and recover near dawn so the back half of a day *feels* like a night. [state.js getDaylight]
-- 004 [review] — argue for/against re-shaping the lightCurve given 004 numbers; pair `the-skeptic` with `the-art-director`. [journal only]
+- 004 [review] — argue for/against re-shaping the lightCurve given 004 numbers; pair `the-skeptic` with `the-art-director`. [journal only] **PARTIALLY DONE → 005** (art-director side argued; contrarian/skeptic still open)
+- 005 [code] — split `getDaylight` into `getDaylight` (clamp [0,1], gameplay-safe) + `getWarmth` (free-range color bias). Pre-req for any curve re-shape. [state.js]
+- 005 [code] — align ground luminance peaks with sky-gradient peaks at t=0.22 and t=0.78 (they're currently mis-aligned — sky peaks warm when ground is ramping or already descending). [state.js + render.js:118]
+- 005 [code] — `getSkyWarmth(t)` sampler on `G.debug.skyCurve`; enables sky/ground alignment verification before shipping a change. [render.js + state.js]
