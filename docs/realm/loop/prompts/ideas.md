@@ -54,7 +54,7 @@ and note the promotion here.
 - 063 [code] — weighted echo-source selection: prefer once-per-realm tags (nightmare, stone, victory) 2× over more-abundant tags (milestone, dream, event, season). Makes lifetime-unique beats more likely to resurface. [story.js]
 - 060 [code] **HIGH** — add `event` and `season` to `_ECHO_SOURCE_TAGS` in story.js:648. 060 audit found these 2 tags excluded but they're legitimate origin-class beats (cloaked-stranger, season-transitions). Trivial 1-line expansion. [story.js] **DONE → 063**
 - 067 [code] — DAY_PHASES convenience presets (`{ dawn: 0.22, midday: 0.5, dusk: 0.78, night: 0.05 }`) so helper callers can reference named phases instead of magic numbers. ~3 lines. [render.js]
-- 077 [doc] — update loop/docs/narrative-surfaces.md cadence-summary to reflect the ~10-20 chronicle entries per realm no longer being written post-077. [loop/docs/]
+- 077 [doc] — update loop/docs/narrative-surfaces.md cadence-summary to reflect the ~10-20 chronicle entries per realm no longer being written post-077. [loop/docs/] **DONE → 080**
 - 076 [code] **HIGH** — ship 3 duplicate-chronicle fixes: combat.js:133 (raider-kill), economy.js:337 (starvation), economy.js:162 (pop milestones at 10/25/50/75). Add `{chronicle: false}` per 070 pattern. ~3 lines each. [combat.js + economy.js] **DONE → 077**
 - 076 [code] — ship 5 MEDIUM wrong-tag fixes: ui.js:13 / economy.js:344/577/693 / main.js:251 all write chronicle tag='raid' for non-raid events. Add `{chronicle: false}` (these are UI warnings, shouldn't chronicle at all). [ui.js + economy.js + main.js] **DONE → 077**
 - 076 [review] — design-decision: should every trade-success + upgrade-success write to chronicle? Long economy-heavy realms produce 50+ noise beats. the-minimalist could argue for opt-out. [main.js + economy.js]
@@ -106,7 +106,9 @@ and note the promotion here.
 - 079 [code] — render tiny offering sprite at stone tile for N days after offering fires, then fades. [enhancements.js]
 - 079 [code] — founder-name cross-reference in offering item pool ("{founder2} was seen nearby at dusk…"). Compounds 072+079. [story.js]
 - 079 [code] — second-offering on later happy-peak cycles (currently once-per-realm). [story.js]
-- 079 [doc] — add system #26 (offering) to loop/docs/narrative-surfaces.md. Same tag, new trigger. [loop/docs/]
+- 080 [review] — programmatic doc-check script (previously 075 filed): node script that grep's known patterns and compares to doc claims. Fails CI on drift. [scripts/ or ci]
+- 080 [review] — doc-version check: _DOC_VERSION constant in story.js the doc references; future ticks touching narrative must bump version + update doc or CI flags. [story.js + doc]
+- 079 [doc] — add system #26 (offering) to loop/docs/narrative-surfaces.md. Same tag, new trigger. [loop/docs/] **DONE → 080**
 - 078 [code] — persist chronicle filter preference to localStorage so it survives page reload. ~5 lines. [story.js]
 - 078 [review] — emoji tone pass on the 14 TAG_ICONS. Does 🔁 for echo feel right vs 🕰️? Small review. [story.js]
 - 078 [code] — keyboard shortcuts 1-9 to pick the first 9 chip tags. [input.js + story.js]

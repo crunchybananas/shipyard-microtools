@@ -1,9 +1,14 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Maintained by subsequent loops.
+**Status:** Written in tick 075. Updated 080. Maintained by
+subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
-more systems, 074 removed 5 duplicates, 075 writes this down.
+more systems, 074 removed 5 duplicates, 075 wrote this. 076 audit
+found 10 more duplicate-toast sites, 077 closed 8 of them (3 HIGH
++ 5 MEDIUM). 078 shipped the tag-filter UI using the taxonomy
+below. 079 added a cross-system compound beat (offering-at-stone,
+reuses `stone` tag). 080 updated this doc.
 
 ## why this exists
 
@@ -74,9 +79,14 @@ Numbered in rough order of file:
     via 058 at stored `stone_x`/`stone_y`.
 13. **checkEchoBeat** (059/063, ~2% per-dawn, `echo`) — cites
     prior `_ECHO_SOURCE_TAGS` with one of 4 memory frames.
+14. **checkOfferingBeat** (079, cross-system gated, `stone` tag
+    reuse) — fires once per realm on a dawn when `stone_found`
+    AND `happyPeakActive` AND `!offering_made` (+ day ≥ 30) at
+    ~15% probability. First chronicle beat requiring the
+    intersection of 3 system flags. 6 item variants.
 
-Wait — that's 13 items in story.js counting founding. Let me
-collapse: founding is logically main.js's; story.js owns 12.
+Wait — that's 14 items in story.js counting founding. Let me
+collapse: founding is logically main.js's; story.js owns 13.
 
 ### main.js (2 systems)
 
@@ -161,6 +171,7 @@ Main-loop per-tick order (from main.js, simplified):
    - checkStoneBeat (056)
    - checkEchoBeat (059/063)
    - checkFounderBeat (072)
+   - checkOfferingBeat (079) — cross-gated by stone+happyPeak
 8. enhUpdateAll() → enhancements.js registered updaters
    - year milestones
    - rival / bard / mayor beats
@@ -188,11 +199,19 @@ should respect:
   Currently excluded: death (debatable), misc, echo.
 - **Dawn-only gating for scheduled beats.** `checkDreamBeat`,
   `checkNightmareBeat`, `checkStoneBeat`, `checkEchoBeat`,
-  `checkFounderBeat` all guard `G.dayPhase > 120`.
+  `checkFounderBeat`, `checkOfferingBeat` all guard
+  `G.dayPhase > 120`.
 - **Once-per-realm beats use `hasFlag` + `setFlag` to prevent
   re-fire.** `nightmare_fired`, `stone_found`, `founders_named`,
-  `year2`/`year3`/`year5`, `firstXxx`, `pop10`/etc., `castleBuilt`,
-  `firstRaidSurvived`.
+  `offering_made`, `year2`/`year3`/`year5`, `firstXxx`, `pop10`/etc.,
+  `castleBuilt`, `firstRaidSurvived`.
+- **Tags are REUSED across related beats, not proliferated per
+  feature.** 075 established and 079 respected: the offering beat
+  reuses `stone` rather than adding tag #15 `offering`. Rule of
+  thumb — if the new beat's subject is already a tag, reuse.
+- **Cross-system beats gate on multiple flags.** 079 requires all
+  of `stone_found + happyPeakActive + !offering_made`. Treat
+  multi-flag gates like a sentence: AND the prerequisites.
 - **Hysteresis-gated beats use pairs of flags.** See
   `happyPeakActive` / `happyCrisisActive` (071).
 - **notify() calls that already chronicle directly at the same
@@ -204,12 +223,12 @@ should respect:
   shape.** Writers should use the existing `chronicle(text, tag)`
   helper; don't push directly.
 
-## known gaps (as of 075)
+## known gaps (as of 080)
 
 - **Sustained-state beats** (060 filed) — no beat for "realm has
   known peace for 50 days." Filed as 060 idea.
 - **Founder→nightmare/dream cross-reference** (072 filed) — 072
-  names the 3 founders; 043/039 pools don't reference them.
+  names the 3 founders; 043/039/079 pools don't reference them.
 - **Victory v2 in enhancements.js may duplicate `castleBuilt`** —
   needs a follow-up audit.
 - **Disaster events live in enhancements.js, not events.js** —
@@ -217,20 +236,25 @@ should respect:
 - **Seasonal-proverb duplicates the misc-tag space with advisor.js**
   — actually 069/073 showed advisor.js doesn't write chronicle at
   all. Proverbs are the only misc-tag recurring system.
+- **LOW design-choice sites** (076 LOW): main.js:247 trade-success
+  and economy.js:589 upgrade-success chronicle every action.
+  Noisy for long economies; worth a design review.
 
 ## cadence summary
 
-Per a 200-day realm with a normal build pace:
+Per a 200-day realm with a normal build pace (updated at 080
+after 077 cleanup + 079 addition):
 
 ```
 ~20-25 first-build/milestone beats (day 1-30 cluster)
+~1 founder beat (day 3-6, one-shot — 3 names in one entry)
 ~6 character intro beats (34's ensures, day 2-15)
-~3 founder beats (day 3-6, one-shot)
 20 dreams (every 10 days from day 10)
 ~2-4 echoes (2% per-dawn)
 1 nightmare (seeded [50,250])
 1 stone (seeded [30,200])
-~4 season transitions (every 7 days, so ~28 per 200 days)
+0-1 offering-at-stone (079 — cross-gated on peak+stone, rare)
+~4 season transitions (every 7 days, ~28 per 200 days)
 ~10-30 seasonal proverbs (one per season change)
 0-3 research beats (depends on player pace)
 0-5 disaster event beats (RNG)
@@ -238,8 +262,11 @@ Per a 200-day realm with a normal build pace:
 0-3 year milestones (year 2/3/5)
 ```
 
-Total per 200-day realm: ~80-120 chronicle entries in normal
-play, well under the 300 cap.
+Total per 200-day realm: **~80-120 chronicle entries in normal
+play, well under the 300 cap.** 077 removed ~10-20 duplicate/
+miscategorized entries that used to inflate this count; the
+range is intact but the *quality* of each entry is higher (less
+tag-pollution, cleaner filterable streams).
 
 ## how to update this doc
 
@@ -260,4 +287,10 @@ shipping, touch this file too.
 - **070** — fixed season triplicate
 - **073** — found 25 enhancements.js callsites + 5 duplicates
 - **074** — removed 5 dead duplicates
-- **075** — this doc
+- **075** — wrote this doc
+- **076** — audit found 10 notify-duplicate sites
+- **077** — fixed 8 of 10 (3 HIGH + 5 MEDIUM)
+- **078** — tag-filter UI using taxonomy above
+- **079** — added cross-system offering beat (reuses `stone` tag)
+- **080** — this update (adds #14 system, cadence updated,
+  invariants expanded with tag-reuse + cross-system gate rules)
