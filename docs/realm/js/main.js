@@ -193,6 +193,7 @@ G.debug.lightCurve = lightCurve;
 G.debug.tintCurve = tintCurve;
 G.debug.dreamLens = _realWorldDreamLens;
 G.debug.renderBuildingIsolated = renderBuildingIsolated;
+G.debug.fastForward = fastForward;  // 081: synchronous N-day advance
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /
@@ -423,6 +424,49 @@ function simTick() {
       vy: 0,
     });
   }
+}
+
+// ── Loop 081 (the-fixer, 069 filed 12 ticks ago) ─────────────
+// Synchronously advance the simulation N game-days by calling
+// simTick() in a tight loop with temporarily-boosted G.speed.
+// Bypasses rAF throttling — a 200-day advance completes in ~50ms
+// instead of ~48 seconds of background setTimeout accumulation.
+//
+// Intended for loop ticks that want to verify mid/late-game state
+// (069's the-idle-player couldn't reach day 50+ in chrome-mcp;
+// fastForward(50) gets there instantly).
+//
+// Trade-offs:
+// - Particles + smoke still tick, may accumulate. Call
+//   `G.particles.length = 0` before/after if clean state matters.
+// - Rendering is NOT called. If the caller wants a frame after,
+//   call window.forceRender().
+// - Caps at a safety margin (days × dayLength × 2 iterations) so
+//   a bug can't wedge the browser.
+function fastForward(days) {
+  if (!G || typeof G.dayLength !== 'number') return { error: 'game not initialized' };
+  if (!Number.isFinite(days) || days <= 0) return { error: 'days must be positive number' };
+  const startDay = G.day;
+  const targetDay = startDay + Math.floor(days);
+  const origSpeed = G.speed;
+  G.speed = 60;  // each simTick advances 60 game-ticks
+  const maxIters = Math.ceil((days * G.dayLength) / G.speed) + 100;
+  let iters = 0;
+  while (G.day < targetDay && iters < maxIters) {
+    simTick();
+    iters++;
+  }
+  G.speed = origSpeed;
+  return {
+    advancedDays: G.day - startDay,
+    gameTick: G.gameTick,
+    iters,
+    day: G.day,
+    season: G.season,
+    happiness: G.happiness,
+    population: G.population,
+    chronicleLen: G.chronicle?.length,
+  };
 }
 
 function gameLoop() {

@@ -76,7 +76,11 @@ and note the promotion here.
 - 073 [review] — the-minimalist on enhancements.js (~6000 lines). What's disabled/orphaned? Pruning pass. [enhancements.js]
 - 069 [code] — trace the misc-tagged elder-saying source at season change ("Children play at the well. 'Summer is for growing'"). Likely advisor.js. Needs adding to 060's surface map. [advisor.js + audit] **DONE → 073** (source: enhancements.js:5579 seasonal proverbs, NOT advisor.js)
 - 069 [review] — audit other toast+chronicle double-fires besides season. Raid events? Research completion (does showToast route to chronicle?). [notifications.js]
-- 069 [code] — `G.debug.fastForward(days)` helper that directly advances the main-loop for N days without rAF throttling. Would make future idle-player chrome-mcp ticks hit mid-game in seconds. [main.js]
+- 081 [code] — `{ noParticles: true }` option for fastForward — skip particle/smoke updates for tighter benchmarking. Small speedup. [main.js]
+- 081 [code] — `G.debug.snapshot()` helper returning full-state snapshot for before/after comparisons. Pairs with fastForward. [main.js]
+- 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play]
+- 081 [code] — `G._fastForwarding` flag so music/particles/rendering can skip expensive work during batch advance. [main.js]
+- 069 [code] — `G.debug.fastForward(days)` helper that directly advances the main-loop for N days without rAF throttling. Would make future idle-player chrome-mcp ticks hit mid-game in seconds. [main.js] **DONE → 081**
 - 068 [review] — night-specific silhouette-test: via helper, look at non-bg pixels at night phase to see which buildings silhouette distinctively under tint. Shape beats color at night. Pairs with 068's residential-blur finding.
 - 068 [code] — `renderBuildingIsolated` background-only mode: return tinted-grass sample alone (no building) so audits can subtract baseline per phase. Cleaner pixel-delta analyses. [render.js]
 - 068 [code] — night-specific distinguishing feature for residential buildings: per-building glow color (tavern gold, house warm-white, lumber no glow). Already in render.js:~2950 night-window code — 066 didn't sample it because glow requires daylight<0.75 which helper's default midday skips. Investigate existing variation first. [render.js]
