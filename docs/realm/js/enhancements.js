@@ -4475,6 +4475,9 @@ registerScreenRenderer(renderTileTooltip);
 // Prior code said "Raid repelled. 0 foes slain in total." even when every
 // citizen was dead — a chronicle lie that made the narrative untrustworthy.
 import { chronicle as _chronicle124 } from './story.js';
+// Loop 036 (the-fixer): also surface the raid summary as a toast so the
+// player sees it without opening the chronicle panel.
+import { notify as _notify036 } from './notifications.js';
 let _lastRaidDay = 0;
 let _raidKillsStart = 0;
 let _raidDiedStart = 0;
@@ -4503,11 +4506,34 @@ function updateRaidChronicle() {
         msg = `Raid on day ${_lastRaidDay}: the raiders withdrew before either side struck a blow.`;
       }
       try { _chronicle124(msg, 'raid'); } catch(_e){}
+      // Loop 036: also fire a danger toast with the same summary.
+      // `chronicle: false` suppresses re-chronicling in notify since
+      // the chronicle entry was just written above.
+      try { _notify036(msg, popAlive === 0 ? 'danger' : 'event', { chronicle: false }); } catch(_e){}
     }
     _lastRaidDay = 0;
   }
 }
 registerUpdater(updateRaidChronicle);
+
+// ── Loop 036: sticky raid banner — shows while enemies are active ───
+// 010's biggest finding was "raids happen off-screen without ceremony."
+// A HUD-anchored banner during active raids turns ambient combat into
+// a visible emergency the player can't scroll past. Body-count summary
+// already exists in updateRaidChronicle above; this banner is the
+// during-raid counterpart.
+function updateRaidBanner() {
+  const el = document.getElementById('raid-banner');
+  if (!el) return;
+  const n = G.enemies.length;
+  if (n > 0) {
+    el.style.display = 'block';
+    el.textContent = `⚔ Raid in progress — ${n} raider${n === 1 ? '' : 's'}`;
+  } else if (el.style.display !== 'none') {
+    el.style.display = 'none';
+  }
+}
+registerUpdater(updateRaidBanner);
 
 // ── Loop 125 + S4 L72: Production efficiency arc ──────────
 // Flat fill bar under building was fine but read like a UI element.

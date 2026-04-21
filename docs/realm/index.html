@@ -63,7 +63,9 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 /* HUD */
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1.5rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:0.82rem}
 /* Loop 035: photo mode — hide all HUD chrome so the canvas shows a clean frame. Toggled by H key via window.togglePhotoMode. */
-body.photo-mode #hud,body.photo-mode #build-bar,body.photo-mode #missions,body.photo-mode #controls,body.photo-mode #minimap,body.photo-mode #info-panel,body.photo-mode #tutorial-tip,body.photo-mode #toast,body.photo-mode #activity-feed,body.photo-mode #event-banner,body.photo-mode #chronicle-panel,body.photo-mode #happiness-panel,body.photo-mode #research-panel,body.photo-mode #stats-panel,body.photo-mode #achievements-panel,body.photo-mode #notification-log,body.photo-mode #trade-panel,body.photo-mode #pop-panel{display:none !important}
+body.photo-mode #hud,body.photo-mode #build-bar,body.photo-mode #missions,body.photo-mode #controls,body.photo-mode #minimap,body.photo-mode #info-panel,body.photo-mode #tutorial-tip,body.photo-mode #toast,body.photo-mode #activity-feed,body.photo-mode #event-banner,body.photo-mode #raid-banner,body.photo-mode #chronicle-panel,body.photo-mode #happiness-panel,body.photo-mode #research-panel,body.photo-mode #stats-panel,body.photo-mode #achievements-panel,body.photo-mode #notification-log,body.photo-mode #trade-panel,body.photo-mode #pop-panel{display:none !important}
+/* Loop 036: sticky raid banner — prominent but non-modal. Sits below the HUD, center-anchored. Red-tinted so it reads "urgent" without a modal feel. */
+#raid-banner{position:fixed;top:3.3rem;left:50%;transform:translateX(-50%);background:rgba(135,20,20,0.88);color:#fee;padding:0.45rem 1.1rem;border-radius:8px;font-size:0.85rem;font-weight:700;z-index:25;border:1px solid rgba(248,113,113,0.6);box-shadow:0 2px 12px rgba(239,68,68,0.35);pointer-events:none;letter-spacing:0.02em}
 body.photo-mode #photo-mode-badge{display:block}
 #photo-mode-badge{display:none;position:fixed;bottom:0.8rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:rgba(255,255,255,0.85);padding:0.35rem 0.8rem;border-radius:6px;font-size:0.7rem;letter-spacing:0.05em;z-index:40;pointer-events:none;font-family:inherit}
 .res{display:flex;align-items:center;gap:0.3rem;font-weight:600}
@@ -562,6 +564,7 @@ body.photo-mode #photo-mode-badge{display:block}
 
 <div id="tutorial-tip" style="display:none"></div>
 <div id="event-banner" style="display:none"></div>
+<div id="raid-banner" style="display:none"></div>
 <div id="build-bar"></div>
 
 <div id="missions">
