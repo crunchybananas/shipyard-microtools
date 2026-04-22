@@ -902,6 +902,12 @@ export function checkStoneBeat() {
     `A standing stone is found at dawn on the ${dir} edge of the fields — ${phrase}. No one remembers raising it.`,
     'stone'
   );
+
+  // Loop 113 (the-fixer, 106-filed): stone chime. 3rd audio cue; Pattern
+  // 1 per audio-surfaces.md (dedicated check-function). Ascending fifth
+  // (E5 → B5) — brighter, consonant, "a thing was found." Reuses 106's
+  // late-bound _PLAY_SOUND import.
+  try { if (_PLAY_SOUND) _PLAY_SOUND('stone'); } catch (_e) {}
 }
 
 // ── Loop 059: chronicle-echo — old beats resurface as memory ─

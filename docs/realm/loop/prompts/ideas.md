@@ -44,7 +44,10 @@ and note the promotion here.
 - 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js] **PARTIAL → 111** (requiem bell-toll shipped; stone/founders/offering/first-snow still open)
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
-- 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js]
+- 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)
+- 113 [code] — visual "glint" on the stone tile when 113 chime plays. 2-3 frames of bright white pixel burst at stone_x/stone_y. Audio+visual compound. ~8 lines. [enhancements.js]
+- 113 [code] — apply per-kingdom pitch variation (111-filed) to BOTH requiem AND stone cues via shared helper. ~10 lines. [audio.js + story.js]
+- 113 [review] — live-audition of stone chime + 106 nightmare + 111 requiem all together. Closes 106/111 filed reviews. [play]
 - 111 [doc] — audio-surfaces.md in loop/docs/ now that 2 cues exist (nightmare, requiem). ~30 lines. [loop/docs/] **DONE → 112** (~140 lines; 5 principles + 2-cue catalog + 8-axis contrast table + 2 patterns + 7 invariants + 7 open ideas)
 - 112 [doc] — move pre-001 SFX inventory (build, voice, music SFX from loops 81-150-era) into audio-surfaces.md OR a separate audio-sfx-inventory.md. Preserves institutional knowledge when old 3-agent journal is archived. [loop/docs/]
 - 112 [review] — when 3rd audio cue (stone chime) lands, re-read audio-surfaces.md and verify each invariant still holds. [loop/docs/]

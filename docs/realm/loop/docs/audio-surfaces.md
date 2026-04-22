@@ -1,12 +1,15 @@
 # audio-surfaces.md
 
-**Status:** Written in tick 112. Sibling to `narrative-
-surfaces.md` (075). Maintained by subsequent audio ticks.
+**Status:** Written in tick 112. Updated 113. Sibling to
+`narrative-surfaces.md` (075). Maintained by subsequent
+audio ticks.
 **Sources:** 106 opened the axis (nightmare sound cue in
 new loop protocol); 111 added requiem bell-toll and
 established the NARRATIVE_BEATS dispatch-loop pattern for
-tag-specific sound fires. 112 (this doc) captures the
-design philosophy + current catalog + open ideas.
+tag-specific sound fires. 112 captured the design
+philosophy + 2-cue catalog. 113 shipped stone chime (3rd
+cue) — brings Pattern 1 count to 2, keeps Pattern 2 at 1,
+so no `onFire` refactor pressure yet per 112's threshold.
 
 ## why this exists
 
@@ -50,7 +53,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (2 cues)
+## current catalog (3 cues)
 
 ### `nightmare` — loop 106
 
@@ -89,22 +92,42 @@ sequence — the realm is over, not mid-story.
 inline branch in `story.js:checkStoryBeats` using the
 111-added `if (beat.tag === 'requiem')` check.
 
+### `stone` — loop 113
+
+**Trigger:** `checkStoneBeat` at story.js fires; the
+`stone_found` flag transitions false→true exactly once
+per realm (seeded day [30, 200], dawn-only gate).
+
+**Sound design:** ascending perfect fifth — 659 Hz (E5)
++ 988 Hz (B5, at +80ms) + 1976 Hz (B6 shimmer overtone,
+at +120ms). All pure sine waves. Short attack 0.01s
+(chime struck). Mid decay 1.3-1.5s. Gain 0.07 peak.
+
+**Affect:** bright, consonant, discovery-coded. "A thing
+was found that was not placed." Contrasts both prior
+cues: warmer than nightmare's dissonance, higher than
+requiem's low bell.
+
+**Code:** `js/audio.js` switch case, Pattern 1 fire at
+the end of `story.js:checkStoneBeat` (dedicated check-
+function).
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) |
-| --- | --- | --- |
-| Wave | triangle | sine |
-| Root | 64 Hz (C2) | 196 Hz (G3) |
-| Interval | minor-2nd dissonant | harmonic consonant |
-| Beating | 4 Hz tremolo | none |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) |
-| Decay | 2.2s | 5.0s |
-| Character | unstable, buzzy | clean, mournful |
-| Gain peak | 0.10 | 0.08 |
+| Axis | nightmare (106) | requiem (111) | stone (113) |
+| --- | --- | --- | --- |
+| Wave | triangle | sine | sine |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending |
+| Beating | 4 Hz tremolo | none | none |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) |
+| Decay | 2.2s | 5.0s | 1.3s |
+| Character | unstable, buzzy | clean, mournful | bright, discovery |
+| Gain peak | 0.10 | 0.08 | 0.07 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -194,10 +217,9 @@ audio ticks should respect them:
 
 ## open ideas (as of 112)
 
-- **Stone chime** (106 + 111 filed): ascending fifth,
-  short attack, mid decay. "A thing was found."
-  `checkStoneBeat` trigger (056). Pattern 1 (dedicated
-  function).
+- ~~**Stone chime**~~ (106 + 111 filed) — **DONE → 113**:
+  ascending fifth E5→B5 + B6 shimmer overtone, short
+  attack, mid decay. Pattern 1 via `checkStoneBeat`.
 - **Founders-named phrase** (106 filed): three-note
   sequence matching founder1/2/3 names' syllable-count
   hash. `checkFounderBeat` trigger (072). Pattern 1.
@@ -226,7 +248,11 @@ audio ticks should respect them:
 - **111** — requiem bell-toll. Established Pattern 2
   (dispatch-loop tag branch). Defined acoustic-contrast
   invariant.
-- **112** — this doc.
+- **112** — this doc's first version.
+- **113** — stone chime. 3rd cue; 2nd Pattern 1 usage
+  (alongside nightmare). Pattern 2 count stays at 1, so
+  no `onFire` callback refactor pressure per 112's
+  threshold. Contrast table extended to 3 columns.
 
 ## how to update this doc
 

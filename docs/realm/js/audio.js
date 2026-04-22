@@ -438,6 +438,20 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine',     588, 0.015, 0.02, 3.5, t);
       break;
     }
+
+    // ── Stone: Loop 113 (the-fixer, 106-filed). Ascending perfect-
+    //    fifth chime — E5 (659 Hz) then B5 (988 Hz) at +80ms. Short
+    //    attack (chime struck), mid decay. Bright, consonant, discovery-
+    //    coded. Contrasts 106 (dissonant low triangle) and 111 (mournful
+    //    low bell) — audio-surfaces.md's 8-axis contrast table gets a
+    //    3rd row. Plays once per realm when 056 checkStoneBeat fires.
+    case 'stone': {
+      makeOsc(ctx, dest, 'sine', 659, 0.07,  0.01, 1.3, t);
+      makeOsc(ctx, dest, 'sine', 988, 0.055, 0.01, 1.5, t + 0.08);
+      // High shimmer overtone — faint, sparkly.
+      makeOsc(ctx, dest, 'sine', 1976, 0.015, 0.01, 0.9, t + 0.12);
+      break;
+    }
   }
 }
 
