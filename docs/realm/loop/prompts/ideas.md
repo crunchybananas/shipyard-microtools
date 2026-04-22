@@ -32,9 +32,11 @@ and note the promotion here.
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
-- 098 [code] **MEDIUM** — raise farm/quarry winter-dust alpha from 0.35 → 0.55-0.65 at render.js:2981 so summer-green crops don't show through the winter dust overlay. 098's gallery found this seasonal-consistency bug. [render.js]
+- 098 [code] **MEDIUM** — raise farm/quarry winter-dust alpha from 0.35 → 0.55-0.65 at render.js:2981 so summer-green crops don't show through the winter dust overlay. 098's gallery found this seasonal-consistency bug. [render.js] **DONE → 099** (shipped at 0.55; verified cover-art frame now reads snowy)
 - 098 [code] — winter-variant farm/quarry sprite with dormant brown crops. Larger scope than alpha fix but "correct" answer. [render.js drawFarm/drawQuarry]
-- 098 [code] — hide per-building worker "0/1" labels in photo-mode. Wrap render block in `if (!G.photoMode)`. ~2 lines. [render.js or ui.js]
+- 098 [code] — hide per-building worker "0/1" labels in photo-mode. Wrap render block in `if (!G.photoMode)`. ~2 lines. [render.js or ui.js] **DONE → 099** (1-char change `if (needed > 0 && !G.photoMode)` at render.js:3120)
+- 099 [review] — cover-art recipes doc in loop/docs/ capturing the winning frames (winter-dusk 0.78, etc) to prevent future regressions. Un-filed before 099; now surfaced. [loop/docs/]
+- 099 [code] — CSS audit for photo-mode: are HP bars, damage cracks, production indicators also canvas-drawn and unhidden? Quick sweep of render.js for all UI-overlay blocks that should be gated. [render.js]
 - 098 [code] — "photo-mode preset" dropdown with cover-art recipes: winter-dusk (0.78 winter), summer-dusk (0.70 summer), winter-dawn (0.22 winter). 018 originally filed this. [ui.js + main.js]
 - 098 [surprise] — "gallery scenario" preset starting with a mature settlement for photographers/screenshot-critics. Pairs with photo-mode for first-party marketing frames. [scenarios.js]
 - 098 [review] — document winter-dusk cover-art recipe in a high-visibility place (narrative-surfaces-adjacent or new cover-art-recipes.md) so future graphics ticks don't regress it. Frame 2 of 098 is the winning combo. [loop/docs/]

@@ -3016,7 +3016,13 @@ function drawBuilding(ctx, b, s, daylight) {
     // these two building types. Semi-transparent so the tile
     // beneath still reads.
     if (G.season === 'winter' && (b.type === 'farm' || b.type === 'quarry')) {
-      ctx.fillStyle = 'rgba(230,240,255,0.35)';
+      // Loop 099 (the-fixer, 098 MEDIUM): alpha raised 0.35 → 0.55
+      // because 098's photographer tick found that summer-green crops
+      // showed through the 087 dusting, breaking seasonal consistency.
+      // Higher alpha lets the underlying sprite read less vividly but
+      // still show (0.55 preserves some sprite detail while making
+      // "this is snowy, not green" the dominant perceptual signal).
+      ctx.fillStyle = 'rgba(230,240,255,0.55)';
       ctx.beginPath();
       ctx.moveTo(s.x, s.y - TH/2 + 2);
       ctx.lineTo(s.x + TW/2 - 2, s.y);
@@ -3025,7 +3031,7 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.closePath();
       ctx.fill();
       // Two frost highlights
-      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
       ctx.fillRect(s.x - 6, s.y - 3, 3, 1);
       ctx.fillRect(s.x + 2, s.y + 1, 4, 1);
     }
@@ -3115,8 +3121,12 @@ function drawBuilding(ctx, b, s, daylight) {
     }
 
     // Worker count indicator for buildings that need workers
+    // Loop 099 (the-fixer, 098 filed): gate on !G.photoMode so cover-art
+    // frames don't show "0/1" UI labels floating above each building.
+    // 035's photo-mode hid ~15 HUD elements via CSS but this label is
+    // canvas-drawn, invisible to CSS rules.
     const needed = def.workers || 0;
-    if (needed > 0) {
+    if (needed > 0 && !G.photoMode) {
       const have = b.workers.length;
       const full = have >= needed;
       ctx.globalAlpha = 0.85;
