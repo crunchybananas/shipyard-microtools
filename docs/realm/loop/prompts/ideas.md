@@ -45,7 +45,9 @@ and note the promotion here.
 - 106 [review] — live-play verification of the nightmare sound: does it read "dissonant" or "intrusive"? Gain may need real-world adjustment. [play]
 - 106 [doc] — new `audio-surfaces.md` in loop/docs/ if 3+ audio ticks accumulate. Mirrors narrative-surfaces but for sound cues. [loop/docs/]
 - 106 [code] — 064's approach-window audio can share the `playSound('nightmare-approach')` pattern — a softer, less-decayed version of 106's chord. [audio.js + story.js]
-- 107 [code] **HIGH** — drop `|| e.key === 'h'` from input.js:319 so photo-mode H hotkey works. Dead since 035 (~72 ticks). Badge says "press H to exit" which has been a broken instruction that entire time. 2-token fix. [input.js]
+- 107 [code] **HIGH** — drop `|| e.key === 'h'` from input.js:319 so photo-mode H hotkey works. Dead since 035 (~72 ticks). Badge says "press H to exit" which has been a broken instruction that entire time. 2-token fix. [input.js] **DONE → 108** (shipped; static code-read verified; live-keystroke verify pending extension reconnect — filed as 108 [review])
+- 108 [review] — live-keystroke verify photo-mode H toggle after 108 fix. Extension was disconnected during 108. [play]
+- 108 [code] — help overlay (`?`) should list all 18 keyboard shortcuts 107 mapped. Unclear if current content matches reality. [index.html]
 - 107 [code] MEDIUM — aria-label on all HUD icon buttons (only 4/39 currently). ~10 lines. [ui.js or index.html]
 - 107 [code] MEDIUM — visible highlight on current B-cycled build-bar card. ~3-5 lines. [ui.js or render.js]
 - 107 [code] MEDIUM — keyboard building-placement path: arrow keys move cursor, Enter places. Core gameplay is currently mouse-required. ~30-50 lines. [input.js + render.js]

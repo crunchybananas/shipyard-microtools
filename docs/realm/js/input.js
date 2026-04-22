@@ -316,8 +316,12 @@ export function setupInput(canvas, canvas3d) {
       if (undoLastBuild()) { renderBuildBar(); updateUI(); }
       return;
     }
-    if (e.key === 'Home' || e.key === 'h') {
-      // Recenter camera on island center
+    if (e.key === 'Home') {
+      // Recenter camera on island center. Loop 108 (the-fixer, 107
+      // HIGH): dropped `|| e.key === 'h'` — it shadowed the photo-
+      // mode handler below, which had been dead since 035 (~72 ticks).
+      // Badge said "press H to exit" but H was recentering the camera
+      // every time. Home-only keeps the standard OS convention.
       const cx = MAP_W / 2, cy = MAP_H / 2;
       G.camera.x = (cx - cy) * TW / 2;
       G.camera.y = (cx + cy) * TH / 2;
