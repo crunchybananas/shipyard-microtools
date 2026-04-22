@@ -32,6 +32,13 @@ and note the promotion here.
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
+- 098 [code] **MEDIUM** — raise farm/quarry winter-dust alpha from 0.35 → 0.55-0.65 at render.js:2981 so summer-green crops don't show through the winter dust overlay. 098's gallery found this seasonal-consistency bug. [render.js]
+- 098 [code] — winter-variant farm/quarry sprite with dormant brown crops. Larger scope than alpha fix but "correct" answer. [render.js drawFarm/drawQuarry]
+- 098 [code] — hide per-building worker "0/1" labels in photo-mode. Wrap render block in `if (!G.photoMode)`. ~2 lines. [render.js or ui.js]
+- 098 [code] — "photo-mode preset" dropdown with cover-art recipes: winter-dusk (0.78 winter), summer-dusk (0.70 summer), winter-dawn (0.22 winter). 018 originally filed this. [ui.js + main.js]
+- 098 [surprise] — "gallery scenario" preset starting with a mature settlement for photographers/screenshot-critics. Pairs with photo-mode for first-party marketing frames. [scenarios.js]
+- 098 [review] — document winter-dusk cover-art recipe in a high-visibility place (narrative-surfaces-adjacent or new cover-art-recipes.md) so future graphics ticks don't regress it. Frame 2 of 098 is the winning combo. [loop/docs/]
+
 - 097 [code] — winter boost for founder1 via 044's seasonal lens; spring boost for founder3. Narratively: fire-keeper most visible in cold, harvest-counter in spring. ~5 lines. [story.js]
 - 097 [code] — founder-named variants for forge/water threads (cross-referencing via already-named smith/fisherman). Deeper compound beyond 097's 3-thread scope. [story.js]
 - 097 [review] — long-play read of a 200-day realm with founders_named: does the founder-variant weight feel right? Pairs with 054-filed G.debug.dreamCoverage helper. [play]
