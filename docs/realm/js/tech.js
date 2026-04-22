@@ -187,7 +187,13 @@ export function updateResearch() {
   if (!G.currentResearch) return;
   // Schools boost research speed by 50% each (multiplicative)
   const schools = G.buildings.filter(b => b.type === 'school' && b.workers.length > 0).length;
-  const speedMult = 1 + schools * 0.5;
+  // Loop 101 (the-fixer, 050 filed 50+ ticks): named teacher adds a
+  // flat +10% speed bonus. Graduates the named-character system from
+  // "chronicle decoration" (034) to "game mechanic" — 050 and 100
+  // both asked for this shape. Additive alongside school bonus; no
+  // chronicle beat (034's character-intro already announced teacher).
+  const teacherBonus = G.namedCharacters?.teacher ? 0.1 : 0;
+  const speedMult = 1 + schools * 0.5 + teacherBonus;
   G.currentResearch.progress += G.speed * speedMult;
   if (G.currentResearch.progress >= G.currentResearch.total) {
     const techId = G.currentResearch.techId;

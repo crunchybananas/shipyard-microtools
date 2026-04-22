@@ -32,6 +32,12 @@ and note the promotion here.
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
+- 101 [code] — merchant → trade price modifier. Named merchant: +5% trade return. Mirror of 101's teacher pattern. ~3 lines. [economy.js]
+- 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js]
+- 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick]
+- 101 [code] — mayor → unlocks a civic building (town hall, court). Bigger scope. [buildings.js + state.js]
+- 101 [review] — play tick after all character-mechanics land: cumulative balance check (6 compounding bonuses may be too much). [play]
+
 - 098 [code] **MEDIUM** — raise farm/quarry winter-dust alpha from 0.35 → 0.55-0.65 at render.js:2981 so summer-green crops don't show through the winter dust overlay. 098's gallery found this seasonal-consistency bug. [render.js] **DONE → 099** (shipped at 0.55; verified cover-art frame now reads snowy)
 - 098 [code] — winter-variant farm/quarry sprite with dormant brown crops. Larger scope than alpha fix but "correct" answer. [render.js drawFarm/drawQuarry]
 - 098 [code] — hide per-building worker "0/1" labels in photo-mode. Wrap render block in `if (!G.photoMode)`. ~2 lines. [render.js or ui.js] **DONE → 099** (1-char change `if (needed > 0 && !G.photoMode)` at render.js:3120)
@@ -223,7 +229,7 @@ and note the promotion here.
 - 048 [code] — the _t048 pattern (module-local state + registerUpdater + registerWorldRenderer) is a reusable template for ambient content without polluting G. Extract into a helper? `silent-module` follow-up. [enhancements.js]
 - 048 [code] — subtle audio cue for _t048 (footstep ticks while walking). Tempting but this tick was deliberately pure-visual. Needs audio module cooperation. [enhancements.js + audio.js]
 - 050 [review] — full audit of ideas.md at tick 075 or 100 to cull DONE-and-no-longer-relevant items. Current: 30 DONE, 3 DROPPED in 90+ filed. Cleanup not urgent.
-- 050 [code] — give one named character (mayor, merchant, smith, teacher, bard, rival) a behavior that isn't just chronicle-beat framing. E.g., merchant's name influences trade prices; teacher gates a small research bonus. Graduates named-character system from decoration to mechanic. [state.js + (economy.js or tech.js)]
+- 050 [code] — give one named character (mayor, merchant, smith, teacher, bard, rival) a behavior that isn't just chronicle-beat framing. E.g., merchant's name influences trade prices; teacher gates a small research bonus. Graduates named-character system from decoration to mechanic. [state.js + (economy.js or tech.js)] **DONE → 101** (teacher: +10% research speed additive; 4-case matrix verified; named-character graduation pattern established)
 - 050 [play] — Industrial / Seafaring / Merchant end-to-end playthrough, minimum 15 real minutes, journal mid-game findings. Never been done in the 001-050 window. Fresh class of findings guaranteed. [gameplay]
 - 049 [code] — broaden the hostname gate in index.html's SW-register block to include private-network IP ranges (192.168.x.x, 10.x.x.x) in case someone runs realm from a LAN IP. One-line change; defer until it's actually an issue. [index.html]
 - 049 [review] — remove old `?t=` cache-busters scattered across earlier verification paths. The SW makes them redundant. Low priority. [multiple]
