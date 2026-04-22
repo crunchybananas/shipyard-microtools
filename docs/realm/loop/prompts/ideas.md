@@ -28,6 +28,11 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 095 [code] **HIGH** — 3-line `_WINTER_CAPS` fix: windmill y=-32→-28, granary y=-26→-22, lumber y=-29→-28. Closes 095's perceptual "floating cap" finding on 3 building-types without losing width-based pixel-diff distinctness. [render.js]
+- 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
+- 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
+- 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play]
+
 - 094 [code] — dome-shape rendering for bakery/granary winter caps (rounded/domed top instead of ellipse). Requires shape field in _WINTER_CAPS + discrimination in draw code. [render.js]
 - 094 [code] — tavern cap as small peaked cone (matches 051 flag's vertical projection style). Stacks two disambiguation signals. [render.js]
 - 094 [review] — 046-style silhouette re-audit in winter using 052 helper, confirms pixel-diff distinctness translates to perceptual readability at typical zoom. [play/render]
