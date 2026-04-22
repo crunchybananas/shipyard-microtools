@@ -45,6 +45,12 @@ and note the promotion here.
 - 106 [review] — live-play verification of the nightmare sound: does it read "dissonant" or "intrusive"? Gain may need real-world adjustment. [play]
 - 106 [doc] — new `audio-surfaces.md` in loop/docs/ if 3+ audio ticks accumulate. Mirrors narrative-surfaces but for sound cues. [loop/docs/]
 - 106 [code] — 064's approach-window audio can share the `playSound('nightmare-approach')` pattern — a softer, less-decayed version of 106's chord. [audio.js + story.js]
+- 107 [code] **HIGH** — drop `|| e.key === 'h'` from input.js:319 so photo-mode H hotkey works. Dead since 035 (~72 ticks). Badge says "press H to exit" which has been a broken instruction that entire time. 2-token fix. [input.js]
+- 107 [code] MEDIUM — aria-label on all HUD icon buttons (only 4/39 currently). ~10 lines. [ui.js or index.html]
+- 107 [code] MEDIUM — visible highlight on current B-cycled build-bar card. ~3-5 lines. [ui.js or render.js]
+- 107 [code] MEDIUM — keyboard building-placement path: arrow keys move cursor, Enter places. Core gameplay is currently mouse-required. ~30-50 lines. [input.js + render.js]
+- 107 [code] LOW — resolve M-key conflict (music title claims `(M)` but M toggles minimap). [ui.js + input.js]
+- 107 [code] LOW — keyboard shortcuts cheat-sheet in help overlay (`?`). [index.html]
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js] **DONE → 105** (2 lines in combat.js:updateTowers; +5% projectile damage; 2-case matrix verified)
 - 105 [code] — rival → raid difficulty +10% when named (adversarial character; might include +reward for successful defense). [events.js or combat.js]
 - 105 [review] — post-4-mechanic cumulative-balance check after bard lands. Play full scenario with all 4 named, measure pacing impact. Pairs with 101 filed balance review. [play]
