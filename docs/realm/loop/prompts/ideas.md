@@ -28,6 +28,11 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 093 [code] — 4th winter beat as a "quiet" interlude between 3rd and 5th. Optional; arc works without it. [story.js]
+- 093 [code] — 10th/20th/50th winter beats for long-lived realms. Pair with 092-filed year10/20/50. [story.js]
+- 093 [code] — founder-death integration: if a founder citizen dies (when mapped), subsequent-winter beats should de-reference them. Requires citizen-ID → founder-slot mapping (also 072 filed). [story.js + combat.js]
+- 093 [review] — long-play read of the 088 + 093×3 winter arc. Does the founder-aging feel earned or forced? [play]
+
 - 092 [code] — export `addNarrativeBeat(entry)` helper from story.js so future cross-file contributions don't need to edit the table directly. Lets enhancements.js / tech.js / events.js push their own entries at module-load. [story.js]
 - 092 [code] — year10, year20, year50 beats. Realms that survive that long deserve markers. ~3 lines per entry in NARRATIVE_BEATS. [story.js]
 - 092 [doc] — update narrative-surfaces.md: system #16 (year milestones) moved from enhancements.js to story.js. Enhancements.js system count 10 → 9; story.js count unchanged (already catalogued under NARRATIVE_BEATS table entry #5). Breadcrumb-stub added at enhancements.js:5082. [loop/docs/]
@@ -111,7 +116,7 @@ and note the promotion here.
 - 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play] **DONE → 082**
 - 081 [code] — `G._fastForwarding` flag so music/particles/rendering can skip expensive work during batch advance. [main.js]
 - 069 [code] — `G.debug.fastForward(days)` helper that directly advances the main-loop for N days without rAF throttling. Would make future idle-player chrome-mcp ticks hit mid-game in seconds. [main.js] **DONE → 081**
-- 088 [code] — subsequent-winter beats (second/third/fifth winters with shifting tone). ~12 lines. [story.js]
+- 088 [code] — subsequent-winter beats (second/third/fifth winters with shifting tone). ~12 lines. [story.js] **DONE → 093** (3 NARRATIVE_BEATS entries; founder1 ages across the arc: "knows what to store" → "counts like elders" → "remembers the first, speaks of it less often"; graceful fallback; 7 gate tests pass)
 - 088 [code] — first-storm / first-rain / first-drought analogs to first-snow. [story.js + weather]
 - 088 [review] — visual check: does 088's "stands in the fields" phrasing read OK against 087's ground-dusting? On-screen moment. [play]
 - 087 [code] — wall snow cap (winter stones look frosted). Currently roads + walls stay vanilla. 3-4 lines. [render.js]

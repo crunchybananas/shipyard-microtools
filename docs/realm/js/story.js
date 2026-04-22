@@ -284,6 +284,39 @@ const NARRATIVE_BEATS = [
     text: G => `The third year dawns. ${G.kingdomName} has grown beyond its humble beginnings.` },
   { flag: 'year5', tag: 'milestone', trigger: G => G.day >= 113,
     text: 'Five years stand behind us. The chronicle grows long, the realm stands strong.' },
+  // Loop 093 (surprise, 088-filed + un-filed founder-aging layer):
+  // subsequent-winter beats. 088 captured the FIRST winter; 093 captures
+  // the 2nd, 3rd, and 5th winters with tonal progression as the realm
+  // (and its founder1) ages. Each gracefully degrades to a generic
+  // settlers-narrative if 072 hasn't named founders yet.
+  // Day thresholds: seasons are 7 days, year is 28. Winter boundaries:
+  // year-1 day 22, year-2 day 50, year-3 day 78, year-5 day 134. Each
+  // beat gates on winter season + sufficient day for that winter to be
+  // reachable, so fired-once prevents re-fire across subsequent winters.
+  { flag: 'second_winter_seen', tag: 'milestone',
+    trigger: G => G.season === 'winter' && G.day >= 50,
+    text: G => {
+      const f = G.storyFlags.founder1;
+      return f
+        ? `The second winter comes as no surprise. ${f} knows what to store, and what to wait out.`
+        : 'The second winter comes as no surprise. The realm knows what to store, and what to wait out.';
+    } },
+  { flag: 'third_winter_seen', tag: 'milestone',
+    trigger: G => G.season === 'winter' && G.day >= 78,
+    text: G => {
+      const f = G.storyFlags.founder1;
+      return f
+        ? `The third winter. ${f} counts them now, the way elders count — pressing each one into memory.`
+        : 'The third winter. The realm counts its own now.';
+    } },
+  { flag: 'fifth_winter_seen', tag: 'milestone',
+    trigger: G => G.season === 'winter' && G.day >= 134,
+    text: G => {
+      const f = G.storyFlags.founder1;
+      return f
+        ? `Five winters behind us. ${f} remembers the first, and speaks of it less often now.`
+        : 'Five winters behind us. The oldest in the realm remember the first, and speak of it less often now.';
+    } },
 ];
 
 // Run each tick/day to detect milestones and fire beats once.
