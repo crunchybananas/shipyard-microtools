@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -13,7 +13,14 @@ reuses `stone` tag). 080 first maintenance update. 081 shipped
 fastForward + found 2 HIGHs (raid pollution, "dawn gate skip").
 083 closed BOTH with one 3-line fix — the "dawn gate skip"
 hypothesis was wrong; real mechanism was cap eviction by raid
-noise. 084 (this update) captures the 082/083 lesson.
+noise. 084 captured the 082/083 lesson. 085 shipped eviction-
+immune protection for nightmare/stone/victory tags. 088 added
+first-snow cross-system compound beat. 089 added founder-
+conditional fragments to the nightmare pool (closed 072's
+founder→nightmare gap). 090 consolidated 8 inline one-shot
+beats into the shared NARRATIVE_BEATS table (closed 062, the
+longest-open idea at 28 ticks). 091 (this update) catches the
+doc up to 085-090.
 
 ## why this exists
 
@@ -69,87 +76,104 @@ Numbered in rough order of file:
    rival/smith/merchant/teacher. Triggered by building-first hooks.
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
-5. **First citizen born** (one-shot, `birth`) — `G.stats.citizensBorn >= 1`.
-6. **Population thresholds** (10/25/50/75/100, one-shot, `milestone`).
-7. **Castle built** (`castleBuilt` flag, `victory`) — kingdom +
-   mayor name in prose.
-8. **First raid survived** (one-shot, `raid`).
-9. **Happiness-threshold beats** (071, recurring with hysteresis,
+5. **NARRATIVE_BEATS table** (090, table-driven, closes 062) —
+   consolidates 8 one-shot state-triggered beats that used to be
+   inline if-blocks: firstBirth (`birth`), pop10/25/50/75/100
+   (`milestone`), castleBuilt (`victory`, dynamic text with mayor+
+   kingdom), firstRaidSurvived (`raid`). Each entry:
+   `{ flag, tag, trigger(G)→bool, text: string|(G)→string }`.
+   Mirrors BUILDING_FIRST_BEATS; sibling table, single dispatch
+   loop.
+6. **Happiness-threshold beats** (071, recurring with hysteresis,
    `milestone`) — peak ≥80 / crisis ≤20, mid-range 35-65 resets
-   flags so cycling works.
-10. **checkDreamBeat** (039/054/055, 10-day cadence, `dream`) —
+   flags so cycling works. Kept inline in 090 refactor (re-fire
+   semantics don't fit one-shot NARRATIVE_BEATS shape).
+7. **First-snow beat** (088, cross-system compound, `milestone`) —
+   fires once the first time the realm enters winter past day
+   10. References `storyFlags.founder1` by name if 072 has fired
+   ("…${founder} stands in the fields…"); otherwise generic.
+   Kept inline (story-specific compound; NARRATIVE_BEATS trigger
+   would work but adds nothing at N=1).
+8. **checkDreamBeat** (039/054/055, 10-day cadence, `dream`) —
     10-thread pool, 044 seasonal lens, 064 approach boost.
-11. **checkNightmareBeat** (043, once-per-realm seeded, `nightmare`).
-12. **checkStoneBeat** (056, once-per-realm seeded, `stone`) — renders
+9. **checkNightmareBeat** (043, once-per-realm seeded, `nightmare`).
+    089 added 3 founder-conditional fragments to the image pool,
+    gated on `founders_named`. Pool base 11 → 14 (+ up to 4 named-
+    character conditionals = 18 max). Pool growth preserves
+    hash-seed determinism per kingdom.
+10. **checkStoneBeat** (056, once-per-realm seeded, `stone`) — renders
     via 058 at stored `stone_x`/`stone_y`.
-13. **checkEchoBeat** (059/063, ~2% per-dawn, `echo`) — cites
+11. **checkEchoBeat** (059/063, ~2% per-dawn, `echo`) — cites
     prior `_ECHO_SOURCE_TAGS` with one of 4 memory frames.
-14. **checkOfferingBeat** (079, cross-system gated, `stone` tag
+12. **checkOfferingBeat** (079, cross-system gated, `stone` tag
     reuse) — fires once per realm on a dawn when `stone_found`
     AND `happyPeakActive` AND `!offering_made` (+ day ≥ 30) at
     ~15% probability. First chronicle beat requiring the
     intersection of 3 system flags. 6 item variants.
 
-Wait — that's 14 items in story.js counting founding. Let me
-collapse: founding is logically main.js's; story.js owns 13.
+(12 items in story.js. 090 compressed systems 5-8 of the pre-090
+numbering into a single NARRATIVE_BEATS table; the underlying
+beats still fire — firstBirth + 5 pops + castleBuilt + firstRaid
+— they just share dispatch now.)
 
 ### main.js (2 systems)
 
-14. **Founding beat** (day 1, `milestone`).
-15. **Season transitions** (4×/year, `season`) — prose in
+13. **Founding beat** (day 1, `milestone`).
+14. **Season transitions** (4×/year, `season`) — prose in
     `seasonTexts` object. After 070, toast does NOT double-chronicle
     (passes `{chronicle: false}`).
 
 ### tech.js (1 system, shipped in 065)
 
-16. **Research completion** (per-tech completion, `research`) —
+15. **Research completion** (per-tech completion, `research`) —
     RESEARCH_BEATS table, 11 entries + fallback.
 
-### enhancements.js (6 systems)
+### enhancements.js (10 systems)
 
-17. **Year milestones** (year 2/3/5, `milestone`).
-18. **Rival messenger** (day-scheduled via 034 `rival`, `character`
+16. **Year milestones** (year 2/3/5, `milestone`). 082 grammar
+    bug ("1 souls") still open.
+17. **Rival messenger** (day-scheduled via 034 `rival`, `character`
     and `raid`).
-19. **Bard compositions** (raid-triggered via 034 `bard`, `character`).
-20. **Mayor declarations** (happiness-triggered via 034 `mayor`,
+18. **Bard compositions** (raid-triggered via 034 `bard`, `character`).
+19. **Mayor declarations** (happiness-triggered via 034 `mayor`,
     `character`).
-21. **Building-count milestones** (10/25/50/etc., `milestone`).
-22. **Disaster events** (plague/drought/fire/earthquake/merchant/
+20. **Building-count milestones** (10/25/50/etc., `milestone`).
+21. **Disaster events** (plague/drought/fire/earthquake/merchant/
     refugees, `event`).
-23. **Seasonal proverbs** (season-change `misc`) — was 069's
+22. **Seasonal proverbs** (season-change `misc`) — was 069's
     "Children play at the well..." mystery.
-24. **Victory v2** (`victory`) — may overlap with castleBuilt; audit
+23. **Victory v2** (`victory`) — may overlap with castleBuilt; audit
     needed.
-25. **100-building milestone** (`victory`).
-26. **Trading post first-build** (`firstTradingPost` flag,
+24. **100-building milestone** (`victory`).
+25. **Trading post first-build** (`firstTradingPost` flag,
     `milestone`) — only source; NOT in BUILDING_FIRST_BEATS.
 
-That's 10 systems in enhancements.js, not 6. Let me correct — I
-mis-collapsed them.
+### combat.js + economy.js + events.js + notifications.js (6 systems)
 
-### combat.js + economy.js + events.js + notifications.js (4 systems)
-
-27. **Combat death** (combat.js:134, `death`) — raider kills.
-28. **Starvation death** (economy.js:338, `death`).
-29. **Population birth** (economy.js:362, `birth`).
-30. **Plague death** (events.js:288, `death`).
-31. **Random events** (events.js:308+, `event`, `character`, `raid`)
+26. **Combat death** (combat.js:134, `death`) — raider kills.
+27. **Starvation death** (economy.js:338, `death`).
+28. **Population birth** (economy.js:362, `birth`).
+29. **Plague death** (events.js:288, `death`).
+30. **Random events** (events.js:308+, `event`, `character`, `raid`)
     — cloaked stranger, bard arrives, rival tribute.
-32. **notify-passthrough** (notifications.js:68) — when callers
+31. **notify-passthrough** (notifications.js:68) — when callers
     pass type='event'/'danger'/'mission', the toast is also
     chronicled. Can be suppressed with `meta.chronicle=false`
     (loops 15 + 070 pattern).
 
 ### final count
 
-story.js: 12 systems
+story.js: 12 systems (post-090 table consolidation; underlying
+  beat count unchanged)
 main.js: 2 systems
 tech.js: 1 system
 enhancements.js: 10 systems
-combat.js + economy.js + events.js: 6 systems
+combat.js + economy.js + events.js: 5 systems
 notifications.js: 1 shared passthrough
 
-**≈ 25 narrative systems producing chronicle entries.**
+**≈ 31 narrative entry-points, producing ~25 distinct beat-
+flavors.** The 090 refactor means story.js has fewer
+dispatching SITES but the same underlying beat SURFACES.
 
 The 060 audit said 9; 073 revised to ~20; a careful recount in
 075 lands at 25. Each time the loop re-audits, the count grows.
@@ -169,10 +193,12 @@ Main-loop per-tick order (from main.js, simplified):
 7. checkStoryBeats() → everything in story.js
    - BUILDING_FIRST_BEATS table
    - 034 ensure* hooks (via `after:` field)
-   - firstBirth / pop thresholds / castle / firstRaid
-   - happiness-threshold (071)
+   - NARRATIVE_BEATS table (090 — firstBirth / pop thresholds /
+     castleBuilt / firstRaidSurvived in one dispatch loop)
+   - first-snow (088) — winter + day ≥ 10 + founder1 if named
+   - happiness-threshold (071) — peak/crisis with hysteresis
    - checkDreamBeat (039/054/055)
-   - checkNightmareBeat (043)
+   - checkNightmareBeat (043 + 089 founder fragments)
    - checkStoneBeat (056)
    - checkEchoBeat (059/063)
    - checkFounderBeat (072)
@@ -198,6 +224,13 @@ should respect:
 - **`BUILDING_FIRST_BEATS` is the single source of truth for
   building-first beats.** No duplicate `updateXxxChronicle` in
   enhancements.js. (Enforced: 074 removed the duplicates.)
+- **`NARRATIVE_BEATS` is the single source for state-triggered
+  one-shot beats** (090, sibling to BUILDING_FIRST_BEATS). New
+  beats that fit the shape `{flag, trigger(G), text, tag}` and
+  fire at most once per realm SHOULD be added to this table
+  rather than written inline. Re-fire semantics (hysteresis,
+  cycles) stay inline until/unless the table grows a
+  `resetOn:` extension (090 filed).
 - **`_ECHO_SOURCE_TAGS` governs which tags are echo-eligible.**
   Currently: milestone, victory, character, birth, dream,
   nightmare, stone, raid, event, season, research.
@@ -233,19 +266,26 @@ should respect:
   candidate for `{chronicle: false}` unless the entries are
   truly memorable. See 083's raid-toast cleanup for the template
   fix.
-- **Filed as future protection** (083 idea): once-per-realm tag
-  writes (nightmare/stone/victory) could be marked
-  eviction-immune when the cap kicks in. Not implemented yet.
+- **Once-per-realm tag writes are eviction-immune** (085,
+  implemented — closes the 083-filed defensive protection).
+  `_EVICTION_IMMUNE_TAGS = { nightmare, stone, victory }` at
+  story.js:17. When the 300-entry cap triggers, non-immune
+  entries drop oldest-first and immune entries survive even
+  if the buffer soft-overflows. Protects lifetime-unique beats
+  from future noise regressions.
 - **Chronicle entries have `{day, season, tick, text, tag}`
   shape.** Writers should use the existing `chronicle(text, tag)`
   helper; don't push directly.
 
-## known gaps (as of 084)
+## known gaps (as of 091)
 
 - **Sustained-state beats** (060 filed) — no beat for "realm has
   known peace for 50 days." Filed as 060 idea.
-- **Founder→nightmare/dream cross-reference** (072 filed) — 072
-  names the 3 founders; 043/039/079 pools don't reference them.
+- **Founder→dream cross-reference** (072 filed, partially closed
+  by 089). 089 wired founders into the nightmare pool; the dream
+  pool (039) and offering pool (079) still don't reference
+  founder names. 089-filed idea: weave founder-named images
+  into `founding`/`hearth`/`harvest` dream threads.
 - **Victory v2 in enhancements.js may duplicate `castleBuilt`** —
   needs a follow-up audit.
 - **Disaster events live in enhancements.js, not events.js** —
@@ -256,13 +296,16 @@ should respect:
 - **LOW design-choice sites** (076 LOW): main.js:247 trade-success
   and economy.js:589 upgrade-success chronicle every action.
   Noisy for long economies; worth a design review.
-- **Once-per-realm beats aren't eviction-immune** (083 filed).
-  If a future noise regression happens, the rare beats could get
-  cap-evicted again. ~5-line fix in story.js:26 chronicle()
-  would pin lifetime tags. Filed; defensive.
-- **Year-milestone has grammar bug** (082): "enters second year
-  with 1 souls" — should be `soul` when N=1. Also year boundary
-  computation at day 29 is unusual.
+- **Year-milestone has grammar bug** (082, still open): "enters
+  second year with 1 souls" — should be `soul` when N=1. Also
+  year boundary computation at day 29 is unusual.
+- **Happiness beats not in NARRATIVE_BEATS** (090 filed) — their
+  hysteresis-reset semantics don't fit the one-shot trigger
+  model. Could be migrated with a `resetOn:` extension field.
+- **First-snow beat (088) not in NARRATIVE_BEATS** (090 filed) —
+  trivial to migrate; left inline as minimum-risk path on 090.
+- **Year milestones not in NARRATIVE_BEATS** (090/073 filed) —
+  enhancements.js:5086; would need cross-file table export.
 
 ## retired hypotheses (record for future ticks)
 
@@ -284,10 +327,11 @@ raid-toast pollution (-162). Re-measured 083: **156 entries**.
 ```
 25  first-build/milestone beats (day 1-30 cluster)
 1   founder beat (day 3-6, one-shot — 3 names in one entry)
+1   first-snow beat (088 — first winter past day 10, one-shot)
 10  character intro + events (034 ensures + bard arrivals)
 20  dreams (every 10 days from day 10)
 2-4 echoes (2% per-dawn)
-0-1 nightmare (seeded [50,250])
+0-1 nightmare (seeded [50,250]; 089 may include founder images)
 0-1 stone (seeded [30,200])
 0-1 offering-at-stone (079 — cross-gated on peak+stone, rare)
 28  season transitions (every 7 days × 4-ish cycles)
@@ -305,14 +349,19 @@ clean play. Under 300 cap with comfortable headroom. 075's
 original ~80-120 prediction was slightly low — didn't anticipate
 that season (28) + seasonal proverbs (29) each contribute at the
 high end of a season cycle; those are fixed-cadence recurring
-beats that sum near 57 by themselves.
+beats that sum near 57 by themselves. 088's first-snow adds
++1 to the per-realm total; negligible impact on the range.
 
 **Cadence health trend:**
 - 082 (pre-083): 299 (cap-hit, signal evicted)
 - 083 (post-fix): 156 (quality signal, no eviction)
 - 075's target: 80-120 (too low — underestimated seasons)
-- **084's revised target: ~130-170** (realistic with current
-  surfaces, assumes no future noise regressions)
+- 084's revised target: ~130-170
+- **091 (this update): target unchanged at ~130-170.** 088
+  added +1 beat; 089/090 added no new chronicle writers (089
+  expands nightmare pool; 090 is pure refactor). 085's
+  eviction-immune protection means the target is also now
+  floor-robust against future noise regressions.
 
 ## how to update this doc
 
@@ -345,6 +394,21 @@ shipping, touch this file too.
 - **083** — closed BOTH 082 HIGHs with one 3-line fix. Raid-toast
   cleanup + surprise lesson: the "dawn-gate skip" was actually
   cap-eviction by noise, not a fastForward bug.
-- **084** — this maintenance update. Captures noise-evicts-signal
-  as an invariant; revises cadence target to 130-170 post-083;
-  corrects 082's HIGH #2 hypothesis.
+- **084** — maintenance update. Captured noise-evicts-signal
+  as an invariant; revised cadence target to 130-170 post-083;
+  corrected 082's HIGH #2 hypothesis.
+- **085** — implemented eviction-immune protection for
+  nightmare/stone/victory tags (083's filed defensive work).
+- **088** — added cross-system first-snow compound beat
+  (winter + day ≥ 10 + founder1 if named). +1 to cadence.
+- **089** — closed 072's founder→nightmare gap: 3 founder-
+  conditional image fragments in `_nightmareImagesForState`
+  pool, gated on `founders_named`. Pool 11 → 14 base.
+- **090** — NARRATIVE_BEATS refactor (closes 062, 28 ticks open).
+  Consolidated 8 inline state-triggered one-shot beats into a
+  shared table. Net LoC −2; bit-for-bit behavior preservation
+  verified via 9 chrome-mcp tests.
+- **091** — this maintenance update. Captures 085/088/089/090
+  in the invariants + system enumeration. Renumbers story.js
+  systems post-090 consolidation (14 → 12 dispatching sites,
+  same underlying beat surfaces).

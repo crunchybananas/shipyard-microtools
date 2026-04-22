@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 091 [review] — quarterly audit of narrative-surfaces.md for stale line-number references (e.g. "story.js:17"). Spot-check sample; update any drifted due to file edits. Prevents slow rot. [loop/docs/]
+- 091 [code] — automated line-number verifier: node script parses doc for `file.js:N` refs, checks referenced line still matches expected pattern. Fails on drift. Unlocks the 075-filed CI doc-check. [scripts/ or ci]
+- 091 [doc] — consider splitting narrative-surfaces.md into 3 sibling docs (taxonomy / enumeration / cadence-budget). 414 lines is getting large. Each could be maintained independently. [loop/docs/]
+
 - 090 [code] — migrate happiness peak/crisis into NARRATIVE_BEATS with hysteresis-reset extension (`resetOn: G => bool` or `otherFlags: [...]` field). Would remove the last bespoke one-shot beat block. Requires careful re-test of hysteresis cycles. [story.js]
 - 090 [code] — migrate 088's first-snow beat into NARRATIVE_BEATS. Trivial once pattern exists. Could use `text: (G) => G.storyFlags.founder1 ? ... : ...`. ~3 lines. [story.js]
 - 090 [code] — promote 073's filed year-milestone beats (enhancements.js:5086) into NARRATIVE_BEATS. Cross-file; needs table export or module restructure. [story.js + enhancements.js]
