@@ -687,6 +687,17 @@ function _nightmareImagesForState(G) {
   if (G.namedCharacters?.teacher) {
     pool.push(`${G.namedCharacters.teacher.name} writing the same word on every wall`);
   }
+  // Loop 089: founder-conditional fragments, gated on 072's founders_named flag.
+  // Founders fire at day [3,6]; nightmare at [50,250] — so the flag will be set
+  // by the time nightmare fires, unless the player somehow skipped 072's window.
+  if (hasFlag('founders_named')) {
+    const f1 = G.storyFlags.founder1;
+    const f2 = G.storyFlags.founder2;
+    const f3 = G.storyFlags.founder3;
+    if (f1) pool.push(`${f1}'s footprints in fresh soil, leading only away from the realm`);
+    if (f2) pool.push(`${f2} at the gate after sunset, not looking up`);
+    if (f3) pool.push(`${f3}'s face on a stone that no hand in the realm carved`);
+  }
   return pool;
 }
 

@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 089 [code] — echo frames that preserve character names: when nightmare echoes via 059's `checkEchoBeat`, render "The old folk remember Maia's face on a stone…" instead of wrapping around a character-less frame. Pairs with 059's filed character-aware echo. [story.js]
+- 089 [code] — founders in 039 dream threads: weave founder-named image variants into `founding` / `hearth` / `harvest` threads when `founders_named` is set. Parallel to 089's nightmare work but for the peaceful dreams. ~15 lines. [story.js]
+- 089 [review] — lore-hunter pass on the 3 new founder fragments (footprints/gate/stone): do they compose well with the 11 base images at long-play read? Any tonal clashes? [story.js]
+
 - 057 [code] — introduce a shepherd character tied to cowpen (or chickencoop) via an `after` trigger like 034's pattern. Would bring named-character count 6 → 7. [story.js]
 - 057 [review] — audit BUILDING_FIRST_BEATS for tone drift now that 057 added 4 at once. The 22 table was consistent; 057 may have drifted slightly. Quick read-through pass. [story.js]
 - 057 [code] — `firstRoad`/`firstWall` intentionally skipped; "road network connects first two buildings" or "wall encircles realm" beat could fill that gap with a different trigger shape. [story.js]
@@ -120,7 +124,7 @@ and note the promotion here.
 - 065 [code] — tech-prereq unlock beats (subtle hint when prereq completion opens new research option). [tech.js]
 - 065 [review] — tone audit: read the 11 new research beats alongside BUILDING_FIRST_BEATS. Confirm no drift. [story.js + tech.js]
 - 060 [code] — research-completion beats. `tag:research` when a tech finishes. "The realm has mastered Masonry" etc. A whole progression axis is currently silent in the chronicle. ~15 lines. [tech.js or story.js] **DONE → 065**
-- 072 [code] — add founder-name fragments to 043's `_nightmareImagesForState` pool. `founders_named` flag gate + 3 conditionals (`${founder1}'s footprints...` etc). Deep-game narrative compound. [story.js]
+- 072 [code] — add founder-name fragments to 043's `_nightmareImagesForState` pool. `founders_named` flag gate + 3 conditionals (`${founder1}'s footprints...` etc). Deep-game narrative compound. [story.js] **DONE → 089** (3 fragments added gated on `founders_named`: footprints-leading-away, gate-after-sunset, face-on-stone-no-hand-carved. Pool 11→14 base. 5 gate tests pass; sample fire surfaces 2/3 founders)
 - 072 [code] — 039 dream thread `founding` could have founder-name-conditional image variants once founders_named flag is set. [story.js]
 - 072 [review] — lore-hunter read of the 20-name founder pool for unintended connotations (too-modern / too-tropey). Quick tone pass. [story.js]
 - 072 [code] — founder death tracking: if a starter citizen dies, name them specifically in a chronicle beat. Requires citizen-ID → founder-slot mapping. [combat.js + story.js]
