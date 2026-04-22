@@ -5078,25 +5078,12 @@ function updateFireSfx() {
 }
 registerUpdater(updateFireSfx);
 
-// ── Loop 144: Story — first year anniversary milestone ──────
-import { chronicle as _chr144, hasFlag as _hf144, setFlag as _sf144 } from './story.js';
-function updateAnniversaryBeat() {
-  if (G.gameTick % 120 !== 0) return;
-  const year = Math.floor((G.day - 1) / 28) + 1;
-  if (year >= 2 && !_hf144('year2')) {
-    _sf144('year2');
-    _chr144(`One full year has passed. The realm enters its second year with ${G.population} souls.`, 'milestone');
-  }
-  if (year >= 3 && !_hf144('year3')) {
-    _sf144('year3');
-    _chr144(`The third year dawns. ${G.kingdomName} has grown beyond its humble beginnings.`, 'milestone');
-  }
-  if (year >= 5 && !_hf144('year5')) {
-    _sf144('year5');
-    _chr144('Five years stand behind us. The chronicle grows long, the realm stands strong.', 'milestone');
-  }
-}
-registerUpdater(updateAnniversaryBeat);
+// ── Loop 144: year-milestone beats — moved to story.js NARRATIVE_BEATS in 092.
+// Loop 092 (the-fixer + 090 cross-file migration) relocated year2/year3/year5
+// from this updater into the shared NARRATIVE_BEATS table at story.js:275 and
+// fixed 082's grammar bug ("1 souls" → "1 soul") via text-as-function.
+// The trigger changed shape (G.day >= 29/57/113 vs year-calc) but behavior is
+// equivalent: same firing boundaries, same flags, same prose (minus grammar).
 
 // ── Loop 145: Night danger indicator (red border) ───────────
 function renderNightDanger(ctx, w, h) {

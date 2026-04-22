@@ -272,6 +272,18 @@ const NARRATIVE_BEATS = [
   { flag: 'castleBuilt',       tag: 'victory',   trigger: G => G.buildings.some(b => b.type === 'castle'),
     text: G => { const m = G.namedCharacters.mayor; return `The castle stands complete. ${m ? m.name + ' proclaims,' : 'The heralds proclaim,'} "${G.kingdomName} shall endure a thousand years!"`; } },
   { flag: 'firstRaidSurvived', tag: 'raid',      trigger: G => G.stats && G.stats.raidsSurvived >= 1, text: 'The first raid is turned back. The dead are buried; the living drink to the fallen.' },
+  // Loop 092: year-milestones migrated from enhancements.js:5082
+  // (first cross-file use of NARRATIVE_BEATS). 082 filed the grammar
+  // bug: year2 text rendered "1 souls" when population=1. Fixed here
+  // via text-as-function + conditional pluralization. Year N starts
+  // at day (N-1)*28 + 1 in realm calendar; trigger uses G.day directly
+  // so no year-math needed in the predicate.
+  { flag: 'year2', tag: 'milestone', trigger: G => G.day >= 29,
+    text: G => `One full year has passed. The realm enters its second year with ${G.population} soul${G.population === 1 ? '' : 's'}.` },
+  { flag: 'year3', tag: 'milestone', trigger: G => G.day >= 57,
+    text: G => `The third year dawns. ${G.kingdomName} has grown beyond its humble beginnings.` },
+  { flag: 'year5', tag: 'milestone', trigger: G => G.day >= 113,
+    text: 'Five years stand behind us. The chronicle grows long, the realm stands strong.' },
 ];
 
 // Run each tick/day to detect milestones and fire beats once.

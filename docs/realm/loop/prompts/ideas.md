@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 092 [code] — export `addNarrativeBeat(entry)` helper from story.js so future cross-file contributions don't need to edit the table directly. Lets enhancements.js / tech.js / events.js push their own entries at module-load. [story.js]
+- 092 [code] — year10, year20, year50 beats. Realms that survive that long deserve markers. ~3 lines per entry in NARRATIVE_BEATS. [story.js]
+- 092 [doc] — update narrative-surfaces.md: system #16 (year milestones) moved from enhancements.js to story.js. Enhancements.js system count 10 → 9; story.js count unchanged (already catalogued under NARRATIVE_BEATS table entry #5). Breadcrumb-stub added at enhancements.js:5082. [loop/docs/]
+
 - 091 [review] — quarterly audit of narrative-surfaces.md for stale line-number references (e.g. "story.js:17"). Spot-check sample; update any drifted due to file edits. Prevents slow rot. [loop/docs/]
 - 091 [code] — automated line-number verifier: node script parses doc for `file.js:N` refs, checks referenced line still matches expected pattern. Fails on drift. Unlocks the 075-filed CI doc-check. [scripts/ or ci]
 - 091 [doc] — consider splitting narrative-surfaces.md into 3 sibling docs (taxonomy / enumeration / cadence-budget). 414 lines is getting large. Each could be maintained independently. [loop/docs/]
@@ -79,7 +83,7 @@ and note the promotion here.
 - 074 [code] — orphan-code audit: grep each `_hf144('firstX')` in enhancements.js against BUILDING_FIRST_BEATS flags. Should be zero now; keep watch for future orphans. [enhancements.js]
 - 074 [review] — verify removed loop numbers (187/191/193/195/197) aren't referenced in any cross-reference journals. If so, note the retirement.
 - 073 [code] **HIGH** — remove 5 duplicate first-build blocks in enhancements.js (firstSchool/firstGranary/firstBlacksmith/firstWindmill/firstArchery). BUILDING_FIRST_BEATS runs first so the enhancements.js prose is dead code. ~30 LoC. [enhancements.js] **DONE → 074**
-- 073 [code] — promote year-milestone beats (year 2/3/5) from enhancements.js:5086-5097 into a NARRATIVE_BEATS generalization when 062 lands. [enhancements.js → story.js]
+- 073 [code] — promote year-milestone beats (year 2/3/5) from enhancements.js:5086-5097 into a NARRATIVE_BEATS generalization when 062 lands. [enhancements.js → story.js] **DONE → 092** (same tick as 082 grammar fix)
 - 075 [code] — automated doc-check CI/script that counts `chronicle(` callsites and compares to doc's claimed count. Fails on mismatch. Prevents silent doc rot. [scripts/ or ci]
 - 075 [review] — re-audit narrative-surfaces.md at tick 100 (or every 25 ticks). Update claimed system count against reality.
 - 075 [doc] — ASCII flow diagram section showing chronicle-writer → tag → echo-eligible → echo-frames relationships. [loop/docs/narrative-surfaces.md]
@@ -102,7 +106,7 @@ and note the promotion here.
 - 083 [code] — protect once-per-realm beats (nightmare/stone/victory) from chronicle cap eviction. ~5 lines in story.js:26. [story.js] **DONE → 085**
 - 082 [code] **HIGH** — add `{chronicle: false}` to 4 raid-warning notify calls (economy.js:371 scouts-report, :377 raiders-approach, raid-spawn notify, no-defenders warning). Reduces raid-tag chronicle pollution by ~180 entries per 200-day realm. Same 070/077 pattern. 076 classified as LOW; 082 volume data promotes to HIGH. [economy.js] **DONE → 083**
 - 082 [code] **HIGH** — investigate fastForward skipping dawn-gated beats. Options: (a) run simTick with G.speed=1 for first+last tick of each day, (b) force extra checkStoryBeats call at known dawn tick, (c) widen dawn gate tolerance. Makes future fastForward audits trustworthy. [main.js + story.js] **DONE (INCIDENTALLY) → 083** (real cause was cap-eviction by raid noise, not dawn-gate skipping)
-- 082 [code] — year-milestone grammar fix: `${n} soul${n===1?'':'s'}` and verify year boundary in enhancements.js:5086. Currently fires "1 souls" and at odd day boundaries. [enhancements.js]
+- 082 [code] — year-milestone grammar fix: `${n} soul${n===1?'':'s'}` and verify year boundary in enhancements.js:5086. Currently fires "1 souls" and at odd day boundaries. [enhancements.js] **DONE → 092** (migrated year2/year3/year5 into NARRATIVE_BEATS at story.js, fixed grammar via text-as-function with conditional pluralization; 6 gate tests pass)
 - 082 [doc] — update narrative-surfaces.md: note the raid-pollution finding and fastForward dawn-gate limitation. [loop/docs/]
 - 081 [review] — use fastForward to re-run 053-style completionist play but through REAL main-loop (not just checkStoryBeats). Would capture systems 053 missed. [play] **DONE → 082**
 - 081 [code] — `G._fastForwarding` flag so music/particles/rendering can skip expensive work during batch advance. [main.js]
