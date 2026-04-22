@@ -25,6 +25,31 @@ const fogGradCache = {};
 // the same for all buildings of the same type; position is applied via ctx offset
 const nightGlowCache = new Map();
 
+// Loop 094 (the-fixer, 086 filed): per-building winter cap geometry.
+// Each entry: { w: halfWidth, h: height, y: yOffset-relative-to-s.y }.
+// Broke 046's residential-blur cluster by giving each building-type a
+// distinct cap silhouette at typical zoom. Buildings not in the table
+// use `_default` (the pre-094 baseline). Road/wall/farm/quarry are
+// gated out before this map is read.
+const _WINTER_CAPS = {
+  _default:   { w: 14, h: 3, y: -28 },
+  // Tall outliers (pre-094 already distinct)
+  tower:      { w: 8,  h: 3, y: -38 },
+  church:     { w: 10, h: 3, y: -42 },
+  // Residential cluster — 086 found these bit-for-bit identical in
+  // winter silhouette. 094 disambiguates via w × h × y variation.
+  house:      { w: 13, h: 3, y: -28 },  // baseline residential
+  tavern:     { w: 16, h: 3, y: -27 },  // widest + 051 flag already above
+  bakery:     { w: 14, h: 4, y: -25 },  // thicker + lower (bread/dome)
+  lumber:     { w: 11, h: 3, y: -29 },  // narrower + higher (tall beams)
+  market:     { w: 17, h: 2, y: -24 },  // widest + flattest (awning)
+  windmill:   { w: 9,  h: 3, y: -32 },  // narrow + highest (tall body)
+  granary:    { w: 15, h: 4, y: -26 },  // thick dome
+  // Other non-residentials — left at default or small tweaks where distinct
+  blacksmith: { w: 14, h: 3, y: -28 },  // baseline (046: blur with barracks)
+  barracks:   { w: 13, h: 3, y: -29 },  // slightly narrower + higher
+};
+
 export function initRenderer(canvas, minimap) {
   C = canvas;
   ctx = C.getContext('2d');
@@ -2956,14 +2981,20 @@ function drawBuilding(ctx, b, s, daylight) {
   }
 
   if (G.camera.zoom >= 0.5) {
-    // Snow cap on roofs in winter
+    // Snow cap on roofs in winter. Loop 094 (the-fixer, 086 filed):
+    // per-building cap variation breaks 046's residential-blur cluster
+    // in winter. Before 094 the residential types (house/tavern/bakery/
+    // lumber/market/windmill/granary) all shared w=14 h=3 y=-28, so
+    // winter silhouettes were identical. 094's table gives each its
+    // own width × height × yOffset geometry. Building-types not in the
+    // table use the defaults (14/3/-28).
     if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
       ctx.fillStyle = 'rgba(230,240,255,0.85)';
-      // Snow sits on top of the building — approximate roof peak
-      const snowY = b.type === 'tower' ? s.y - 38 : b.type === 'church' ? s.y - 42 : s.y - 28;
-      const snowW = b.type === 'tower' ? 8 : b.type === 'church' ? 10 : 14;
+      const cap = _WINTER_CAPS[b.type] || _WINTER_CAPS._default;
+      const snowY = s.y + cap.y;
+      const snowW = cap.w;
       ctx.beginPath();
-      ctx.ellipse(s.x, snowY, snowW, 3, 0, 0, Math.PI * 2);
+      ctx.ellipse(s.x, snowY, snowW, cap.h, 0, 0, Math.PI * 2);
       ctx.fill();
       // Icicles
       ctx.fillStyle = 'rgba(200,220,255,0.6)';

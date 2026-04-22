@@ -28,6 +28,12 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 094 [code] — dome-shape rendering for bakery/granary winter caps (rounded/domed top instead of ellipse). Requires shape field in _WINTER_CAPS + discrimination in draw code. [render.js]
+- 094 [code] — tavern cap as small peaked cone (matches 051 flag's vertical projection style). Stacks two disambiguation signals. [render.js]
+- 094 [review] — 046-style silhouette re-audit in winter using 052 helper, confirms pixel-diff distinctness translates to perceptual readability at typical zoom. [play/render]
+- 094 [code] — per-building icicle tint (warm-glow for tavern/bakery). Subtle lived-in variation. [render.js]
+- 094 [play] — the-screenshot-critic on winter scene with all 9 residentials visible. Visual check that 094's geometric diff reads as perceptually distinct. [play]
+
 - 093 [code] — 4th winter beat as a "quiet" interlude between 3rd and 5th. Optional; arc works without it. [story.js]
 - 093 [code] — 10th/20th/50th winter beats for long-lived realms. Pair with 092-filed year10/20/50. [story.js]
 - 093 [code] — founder-death integration: if a founder citizen dies (when mapped), subsequent-winter beats should de-reference them. Requires citizen-ID → founder-slot mapping (also 072 filed). [story.js + combat.js]
@@ -123,7 +129,7 @@ and note the promotion here.
 - 087 [review] — 086's per-season audit data now slightly stale — farm no longer season-invariant. Minor update if future silhouette-test uses 086 as baseline. [loop/docs/]
 - 087 [code] — snow accumulation over time (thin → thicker by mid-winter → melt). Dynamic rather than static. ~15 lines. [render.js + state.js]
 - 086 [code] — add snow-cap / snow-dust to farm in winter (render.js:2934 exclusion — remove farm or add ground-level snow). Gives winter farms a seasonal visual tell. ~3-5 lines. [render.js] **DONE → 087**
-- 086 [code] — per-building snow-cap variation: more distinct caps for residential cluster (house/tavern/bakery/lumber/windmill/market/granary) so 046's winter blur disambiguates. Tower already has smaller cap; extend pattern. [render.js]
+- 086 [code] — per-building snow-cap variation: more distinct caps for residential cluster (house/tavern/bakery/lumber/windmill/market/granary) so 046's winter blur disambiguates. Tower already has smaller cap; extend pattern. [render.js] **DONE → 094** (`_WINTER_CAPS` table; 11 building-types verified distinct via 052-helper pixel-diff; widths 18-34px, minY 66-75)
 - 086 [code] — quarry snow: same pattern as farm. Ensure excluded tiles get SOME winter signal (ground-level dust). [render.js] **DONE → 087**
 - 086 [review] — after variation added, re-run silhouette-test at winter to confirm 046 blur is broken.
 - 086 [review] — investigate if well+granary winter peakY convergence (both → 70) causes visual confusion at normal zoom. Measure.
