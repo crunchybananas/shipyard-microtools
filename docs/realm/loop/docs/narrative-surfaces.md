@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -19,8 +19,15 @@ first-snow cross-system compound beat. 089 added founder-
 conditional fragments to the nightmare pool (closed 072's
 founder→nightmare gap). 090 consolidated 8 inline one-shot
 beats into the shared NARRATIVE_BEATS table (closed 062, the
-longest-open idea at 28 ticks). 091 (this update) catches the
-doc up to 085-090.
+longest-open idea at 28 ticks). 091 captured 085-090 in the doc.
+092 migrated year-milestones cross-file into NARRATIVE_BEATS
+(closed 082 "1 souls" grammar bug). 093 added subsequent-winter
+beats × 3 as a founder-aging arc. 097 added founder-conditional
+image variants to 3 dream threads. 101 + 102 graduated the
+named-character system from decoration to mechanic (teacher +10%
+research, merchant +5% trade). 103 (surprise) added an end-of-
+realm `requiem` beat — new 15th tag, Lira arc closes across 7
+narrative surfaces. 104 (this update) catches the doc up to 092-103.
 
 ## why this exists
 
@@ -41,7 +48,7 @@ This doc is the single place to look when you want to know:
 
 Keep it accurate or retire it — a lying doc is worse than none.
 
-## tag inventory (14 tags)
+## tag inventory (15 tags)
 
 | Tag          | Writer file(s)                      | Cadence             |
 | ------------ | ----------------------------------- | ------------------- |
@@ -59,6 +66,7 @@ Keep it accurate or retire it — a lying doc is worse than none.
 | `echo`       | story.js                            | recurring            |
 | `research`   | tech.js                             | recurring            |
 | `misc`       | story.js + enhancements.js + notifications.js | rare+recurring |
+| `requiem`    | story.js                            | once-per-realm (103)|
 
 ## 20 chronicle-writing systems (as of tick 075)
 
@@ -76,14 +84,22 @@ Numbered in rough order of file:
    rival/smith/merchant/teacher. Triggered by building-first hooks.
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
-5. **NARRATIVE_BEATS table** (090, table-driven, closes 062) —
-   consolidates 8 one-shot state-triggered beats that used to be
-   inline if-blocks: firstBirth (`birth`), pop10/25/50/75/100
-   (`milestone`), castleBuilt (`victory`, dynamic text with mayor+
-   kingdom), firstRaidSurvived (`raid`). Each entry:
+5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103 extended) —
+   consolidates state-triggered one-shot beats. Each entry:
    `{ flag, tag, trigger(G)→bool, text: string|(G)→string }`.
    Mirrors BUILDING_FIRST_BEATS; sibling table, single dispatch
-   loop.
+   loop. Current 15 entries:
+   - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
+     firstRaidSurvived
+   - 3 year milestones (092, migrated from enhancements.js): year2,
+     year3, year5 (year2 uses `${n} soul${n===1?'':'s'}` for
+     correct pluralization — closes 082 grammar bug)
+   - 3 subsequent-winter beats (093, founder-aging arc):
+     second_winter_seen, third_winter_seen, fifth_winter_seen —
+     each references founder1 by name ("Lira knows what to store"
+     / "Lira counts like elders" / "Lira remembers the first")
+   - 1 realm-end beat (103): realm_fell — requiem tag, references
+     founder1 when present ("${f}'s name is the last spoken")
 6. **Happiness-threshold beats** (071, recurring with hysteresis,
    `milestone`) — peak ≥80 / crisis ≤20, mid-range 35-65 resets
    flags so cycling works. Kept inline in 090 refactor (re-fire
@@ -94,8 +110,13 @@ Numbered in rough order of file:
    ("…${founder} stands in the fields…"); otherwise generic.
    Kept inline (story-specific compound; NARRATIVE_BEATS trigger
    would work but adds nothing at N=1).
-8. **checkDreamBeat** (039/054/055, 10-day cadence, `dream`) —
-    10-thread pool, 044 seasonal lens, 064 approach boost.
+8. **checkDreamBeat** (039/054/055/097, 10-day cadence, `dream`) —
+    10-thread pool, 044 seasonal lens, 064 approach boost. 097
+    added founder-conditional image variants to 3 threads
+    (founding:founder1, hearth:founder2, harvest:founder3) —
+    function-form `images: (G) => [...]` pattern established by
+    forge/market/learning threads. Graceful fallback when 072
+    hasn't named founders.
 9. **checkNightmareBeat** (043, once-per-realm seeded, `nightmare`).
     089 added 3 founder-conditional fragments to the image pool,
     gated on `founders_named`. Pool base 11 → 14 (+ up to 4 named-
@@ -267,17 +288,31 @@ should respect:
   truly memorable. See 083's raid-toast cleanup for the template
   fix.
 - **Once-per-realm tag writes are eviction-immune** (085,
-  implemented — closes the 083-filed defensive protection).
-  `_EVICTION_IMMUNE_TAGS = { nightmare, stone, victory }` at
-  story.js:17. When the 300-entry cap triggers, non-immune
-  entries drop oldest-first and immune entries survive even
-  if the buffer soft-overflows. Protects lifetime-unique beats
-  from future noise regressions.
+  implemented — closes the 083-filed defensive protection;
+  103 added `requiem`). `_EVICTION_IMMUNE_TAGS = { nightmare,
+  stone, victory, requiem }` at story.js:26. When the 300-entry
+  cap triggers, non-immune entries drop oldest-first and immune
+  entries survive even if the buffer soft-overflows. Protects
+  lifetime-unique beats from future noise regressions — especially
+  critical for 103's realm-end beat, which could otherwise be
+  cap-evicted by a flood of death entries as population drops to 0.
 - **Chronicle entries have `{day, season, tick, text, tag}`
   shape.** Writers should use the existing `chronicle(text, tag)`
   helper; don't push directly.
+- **Named characters can carry game mechanics** (101 + 102,
+  closing 050's filed ask). Pattern:
+  `const <char>Mult = G.namedCharacters?.<char> ? 1.N : 1;`
+  applied inside existing multiplier chains. Currently shipped:
+  teacher → +10% research (tech.js), merchant → +5% trade
+  (trade.js). Silent mechanic (no UI, no chronicle beat —
+  034's character-intro already narrates arrival). Remaining
+  character slots (smith/bard/mayor/rival) are filed follow-ups.
+- **End-of-realm beats are first-class** (103, closing 053's
+  filed ask). `realm_fell` NARRATIVE_BEATS entry fires when
+  `G.population === 0 && G.day > 1`. Tag: `requiem`.
+  Eviction-immune. No echo-eligible (no more dawns post-fall).
 
-## known gaps (as of 091)
+## known gaps (as of 104)
 
 - **Sustained-state beats** (060 filed) — no beat for "realm has
   known peace for 50 days." Filed as 060 idea.
@@ -296,9 +331,23 @@ should respect:
 - **LOW design-choice sites** (076 LOW): main.js:247 trade-success
   and economy.js:589 upgrade-success chronicle every action.
   Noisy for long economies; worth a design review.
-- **Year-milestone has grammar bug** (082, still open): "enters
-  second year with 1 souls" — should be `soul` when N=1. Also
-  year boundary computation at day 29 is unusual.
+- **~~Year-milestone has grammar bug~~** (082 → 092). Closed:
+  year-milestones migrated into NARRATIVE_BEATS with
+  `${n} soul${n===1?'':'s'}` conditional pluralization. Year
+  boundary computation simplified from year-math to
+  `G.day >= 29/57/113` direct thresholds.
+- **~~End-of-realm beats missing~~** (053 → 103). Closed:
+  `realm_fell` beat with `requiem` tag (new 15th tag). Castle-
+  falls and realm-forgotten variants still filed as follow-ups.
+- **Named-character mechanics partially landed** (050 → 101/102).
+  Teacher + merchant shipped. Smith/bard/mayor/rival still
+  decoration. Pattern established; remaining 4 are ~3-line ticks
+  each.
+- **Founder-weaving arc is now 7 surfaces deep** (088 + 089 +
+  093×3 + 097 + 103). Lira canonical across the realm's
+  lifetime. Concern: adding more founder1-named beats could
+  feel heavy-handed. Future founder-related ticks should favor
+  founder2/3 for cast variety.
 - **Happiness beats not in NARRATIVE_BEATS** (090 filed) — their
   hysteresis-reset semantics don't fit the one-shot trigger
   model. Could be migrated with a `resetOn:` extension field.
@@ -328,8 +377,9 @@ raid-toast pollution (-162). Re-measured 083: **156 entries**.
 25  first-build/milestone beats (day 1-30 cluster)
 1   founder beat (day 3-6, one-shot — 3 names in one entry)
 1   first-snow beat (088 — first winter past day 10, one-shot)
+0-3 subsequent-winter beats (093 — 2nd/3rd/5th, founder-aging)
 10  character intro + events (034 ensures + bard arrivals)
-20  dreams (every 10 days from day 10)
+20  dreams (every 10 days from day 10; 097 folds founder names in)
 2-4 echoes (2% per-dawn)
 0-1 nightmare (seeded [50,250]; 089 may include founder images)
 0-1 stone (seeded [30,200])
@@ -340,6 +390,7 @@ raid-toast pollution (-162). Re-measured 083: **156 entries**.
 2-5 disaster event beats (RNG; plague/drought/fire/earthquake)
 0-4 happiness-threshold beats (depends on trajectory)
 3   year milestones (year 2/3/5 if realm lives long enough)
+0-1 requiem beat (103 — fires iff population drops to 0)
 15-35 raid-resolution beats (one per raid cycle, 083 clean-up;
       PRE-083 was 150-200 due to UI-toast pollution)
 ```
@@ -362,6 +413,13 @@ beats that sum near 57 by themselves. 088's first-snow adds
   expands nightmare pool; 090 is pure refactor). 085's
   eviction-immune protection means the target is also now
   floor-robust against future noise regressions.
+- **104 (this update): target unchanged at ~130-170.** 092 is
+  pure migration (no new beats). 093 adds 0-3 subsequent-winter
+  beats (depends on realm lifespan; most realms see 2nd+3rd
+  but not 5th). 097 adds no NEW beats (extends existing dream
+  threads). 103 adds exactly 1 terminal beat. Effective impact:
+  realms reaching year 5 produce +4 beats over 091's target.
+  Still well under the 300-entry cap.
 
 ## how to update this doc
 
@@ -408,7 +466,25 @@ shipping, touch this file too.
   Consolidated 8 inline state-triggered one-shot beats into a
   shared table. Net LoC −2; bit-for-bit behavior preservation
   verified via 9 chrome-mcp tests.
-- **091** — this maintenance update. Captures 085/088/089/090
-  in the invariants + system enumeration. Renumbers story.js
-  systems post-090 consolidation (14 → 12 dispatching sites,
-  same underlying beat surfaces).
+- **091** — maintenance update. Captured 085/088/089/090 in
+  the invariants + system enumeration. Renumbered story.js
+  systems post-090 consolidation.
+- **092** — year-milestones migrated cross-file into
+  NARRATIVE_BEATS. Closed 082 "1 souls" grammar via
+  conditional pluralization + function-form text. First
+  cross-file use of the 090 table pattern.
+- **093** — subsequent-winter beats × 3 (founder-aging arc).
+  Third generation of NARRATIVE_BEATS use (090 landed,
+  092 cross-file, 093 native).
+- **097** — founders→dream. Added founder-conditional image
+  variants to founding/hearth/harvest threads. Each founder
+  owns one thread. Closes 089's filed idea.
+- **101** — teacher research-bonus. First named-character
+  mechanic. Closes 050's 50-tick-old ask.
+- **102** — merchant price-bonus. Second character mechanic;
+  pattern proven portable.
+- **103** — end-of-realm requiem beat. Closes 053's 50-tick-
+  old ask. New 15th tag. Lira arc closes at 7 surfaces.
+- **104** — this maintenance update. Captures 092-103 in the
+  invariants + tag inventory + system enumeration + cadence
+  summary. Per 075 invariant.

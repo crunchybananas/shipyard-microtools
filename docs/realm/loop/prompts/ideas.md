@@ -37,7 +37,10 @@ and note the promotion here.
 - 103 [code] — castle-falls requiem: if castle destroyed (raid or future mechanic), fire requiem beat. Tag:requiem reuse. [story.js + events.js]
 - 103 [code] — `G.realmEnded` flag: set when requiem fires. Enables post-end rendering (fog return, desaturation, silence). Future mood tick. [state.js + story.js]
 - 103 [review] — does the 7-surface Lira arc feel EARNED or forced at realm-end? Long-play read. [play]
-- 103 [doc] — update narrative-surfaces.md: new `requiem` tag (15 tags now), new eviction-immune entry, new NARRATIVE_BEATS entry. Per 075 invariant. [loop/docs/]
+- 103 [doc] — update narrative-surfaces.md: new `requiem` tag (15 tags now), new eviction-immune entry, new NARRATIVE_BEATS entry. Per 075 invariant. [loop/docs/] **DONE → 104** (maintenance tick; also caught up 092/093/097/101/102)
+- 104 [code] — enhancements.js system count should be 9 (not 10) in narrative-surfaces.md. 092 removed anniversary updater; doc's enumeration wasn't shifted. [loop/docs/]
+- 104 [review] — re-measure 130-170 cadence target via fastForward with year-5 realms. Does 093/103 +4 materialize as predicted? [play]
+- 104 [doc] — cover-art recipes doc (098 filed, still open). Pair with narrative-surfaces in loop/docs/. [loop/docs/]
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js]
 - 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick]
 - 101 [code] — mayor → unlocks a civic building (town hall, court). Bigger scope. [buildings.js + state.js]
