@@ -41,6 +41,10 @@ and note the promotion here.
 - 104 [code] — enhancements.js system count should be 9 (not 10) in narrative-surfaces.md. 092 removed anniversary updater; doc's enumeration wasn't shifted. [loop/docs/]
 - 104 [review] — re-measure 130-170 cadence target via fastForward with year-5 realms. Does 093/103 +4 materialize as predicted? [play]
 - 104 [doc] — cover-art recipes doc (098 filed, still open). Pair with narrative-surfaces in loop/docs/. [loop/docs/]
+- 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js]
+- 106 [review] — live-play verification of the nightmare sound: does it read "dissonant" or "intrusive"? Gain may need real-world adjustment. [play]
+- 106 [doc] — new `audio-surfaces.md` in loop/docs/ if 3+ audio ticks accumulate. Mirrors narrative-surfaces but for sound cues. [loop/docs/]
+- 106 [code] — 064's approach-window audio can share the `playSound('nightmare-approach')` pattern — a softer, less-decayed version of 106's chord. [audio.js + story.js]
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js] **DONE → 105** (2 lines in combat.js:updateTowers; +5% projectile damage; 2-case matrix verified)
 - 105 [code] — rival → raid difficulty +10% when named (adversarial character; might include +reward for successful defense). [events.js or combat.js]
 - 105 [review] — post-4-mechanic cumulative-balance check after bard lands. Play full scenario with all 4 named, measure pacing impact. Pairs with 101 filed balance review. [play]

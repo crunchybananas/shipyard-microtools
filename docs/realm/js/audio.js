@@ -406,6 +406,22 @@ export function playSound(type) {
       });
       break;
     }
+
+    // ── Nightmare: Loop 106 (surprise, un-filed). A single low chord
+    //    with a dissonant overtone that wavers. Long attack + long
+    //    decay so it SNEAKS IN instead of startling. Plays exactly
+    //    once per realm (043 nightmare is once-per-realm). Gain is
+    //    low — a player absorbed in the UI might miss it, which fits
+    //    the "rarest moment" philosophy. 64Hz is C2; 68Hz is a flat
+    //    C#2, ~11 cents minor-second above → beating creates unease.
+    case 'nightmare': {
+      makeOsc(ctx, dest, 'triangle', 64, 0.10, 0.5, 2.2, t);
+      makeOsc(ctx, dest, 'triangle', 68, 0.07, 0.5, 2.4, t);
+      // High ghost overtone — barely audible, feels like a distant
+      // bell no one remembered ringing.
+      makeOsc(ctx, dest, 'sine',     384, 0.015, 0.3, 1.8, t + 0.15);
+      break;
+    }
   }
 }
 

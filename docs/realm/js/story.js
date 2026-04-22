@@ -821,12 +821,24 @@ export function checkNightmareBeat() {
     const notif = _NIGHTMARE_NOTIFY;
     if (notif) notif(`🌑 The realm did not wake well.`, 'danger', { chronicle: false });
   } catch (_e) {}
+
+  // Loop 106 (surprise, un-filed): audio cue. A subtle low-chord
+  // plays the one time the nightmare fires per realm. 064 filed a
+  // "silent music cue on nightmare-APPROACH" idea; 106 ships the
+  // fire-moment counterpart. Quiet enough to miss if the player
+  // isn't listening — which fits the "rarest moment" philosophy.
+  try {
+    const ps = _PLAY_SOUND;
+    if (ps) ps('nightmare');
+  } catch (_e) {}
 }
 
-// Late-bound notify import to avoid load-order coupling with story.js's
+// Late-bound imports to avoid load-order coupling with story.js's
 // position in the module graph. Set on module-load below.
 let _NIGHTMARE_NOTIFY = null;
+let _PLAY_SOUND = null;
 import('./notifications.js').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
+import('./audio.js').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
 
 // ── Loop 056: a-scene-that-happens-once (second take) ────────
 //
