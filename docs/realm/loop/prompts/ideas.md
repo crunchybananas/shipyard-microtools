@@ -32,6 +32,11 @@ and note the promotion here.
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
+- 097 [code] — winter boost for founder1 via 044's seasonal lens; spring boost for founder3. Narratively: fire-keeper most visible in cold, harvest-counter in spring. ~5 lines. [story.js]
+- 097 [code] — founder-named variants for forge/water threads (cross-referencing via already-named smith/fisherman). Deeper compound beyond 097's 3-thread scope. [story.js]
+- 097 [review] — long-play read of a 200-day realm with founders_named: does the founder-variant weight feel right? Pairs with 054-filed G.debug.dreamCoverage helper. [play]
+- 097 [code] — character-aware echo frame specifically for founder-named dreams: "Lira's first fire still burns in the dreams of the elders" instead of generic frame. Un-filed extension. [story.js]
+
 - 096 [review] — after 088/093 winter-beat play + 094/095/096 winter-graphics, is winter "done" as a seasonal axis? Or are there still gaps? A photographer or silhouette-test could audit. [play]
 - 096 [code] — consider a "screenshot capture" helper alongside renderBuildingIsolated for perceptual-diff audits. Would formalize the 094/095/096 workflow. [render.js + loop/docs/]
 
@@ -60,7 +65,7 @@ and note the promotion here.
 - 090 [review] — now that NARRATIVE_BEATS exists, re-audit `checkStoryBeats` for other hidden one-shot triggers (first-famine / first-winter-death / first-technology-mastered?). [story.js]
 
 - 089 [code] — echo frames that preserve character names: when nightmare echoes via 059's `checkEchoBeat`, render "The old folk remember Maia's face on a stone…" instead of wrapping around a character-less frame. Pairs with 059's filed character-aware echo. [story.js]
-- 089 [code] — founders in 039 dream threads: weave founder-named image variants into `founding` / `hearth` / `harvest` threads when `founders_named` is set. Parallel to 089's nightmare work but for the peaceful dreams. ~15 lines. [story.js]
+- 089 [code] — founders in 039 dream threads: weave founder-named image variants into `founding` / `hearth` / `harvest` threads when `founders_named` is set. Parallel to 089's nightmare work but for the peaceful dreams. ~15 lines. [story.js] **DONE → 097** (each founder owns one thread — f1:founding/fire, f2:hearth/door, f3:harvest/grain; 3 tests pass; graceful fallback)
 - 089 [review] — lore-hunter pass on the 3 new founder fragments (footprints/gate/stone): do they compose well with the 11 base images at long-play read? Any tonal clashes? [story.js]
 
 - 057 [code] — introduce a shepherd character tied to cowpen (or chickencoop) via an `after` trigger like 034's pattern. Would bring named-character count 6 → 7. [story.js]

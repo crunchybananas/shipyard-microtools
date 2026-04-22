@@ -427,13 +427,24 @@ function _dreamHash(s) {
 const _DREAM_THREADS = {
   founding: {
     always: true,
-    images: [
-      'a boat of pale wood arriving at a shore that was not there yesterday',
-      'nets of starlight pulled in empty',
-      'a drowned crown resting on sea-washed stones',
-      'three settlers at a fire that will not go out',
-      'footprints in sand that the tide refuses',
-    ],
+    // Loop 097 (surprise, 089 filed): founders→dream. Converted from
+    // array to function-form images so the founder1-conditional variant
+    // can weave in when 072 has named the founders. Cross-refs the
+    // 088/093 winter arc where founder1 is "the one who stands/counts/
+    // remembers." Here the dream shows founder1 at the first fire.
+    images: (G) => {
+      const base = [
+        'a boat of pale wood arriving at a shore that was not there yesterday',
+        'nets of starlight pulled in empty',
+        'a drowned crown resting on sea-washed stones',
+        'three settlers at a fire that will not go out',
+        'footprints in sand that the tide refuses',
+      ];
+      if (G.storyFlags.founders_named && G.storyFlags.founder1) {
+        base.push(`${G.storyFlags.founder1} keeping the first fire alive, without effort or speech`);
+      }
+      return base;
+    },
   },
   forge: {
     requires: () => !!G.namedCharacters?.smith,
@@ -446,13 +457,22 @@ const _DREAM_THREADS = {
   },
   harvest: {
     requires: () => G.buildings.some(b => b.type === 'farm'),
-    images: [
-      'wheat fields stretching into the sky, harvested by hands from above',
-      'grain that speaks the old tongues when threshed',
-      'bread baked by a mother no one remembers',
-      'the first loaf each citizen ever tasted, warm again in their hands',
-      'ears of corn with the kingdom\'s name hidden in their rows',
-    ],
+    // Loop 097: founder3-conditional variant. Harvest is the founders'
+    // labor made visible across generations — founder3 takes the role
+    // of the one who remembers the old counting rituals.
+    images: (G) => {
+      const base = [
+        'wheat fields stretching into the sky, harvested by hands from above',
+        'grain that speaks the old tongues when threshed',
+        'bread baked by a mother no one remembers',
+        'the first loaf each citizen ever tasted, warm again in their hands',
+        'ears of corn with the kingdom\'s name hidden in their rows',
+      ];
+      if (G.storyFlags.founders_named && G.storyFlags.founder3) {
+        base.push(`${G.storyFlags.founder3} counting grain by the handful, unable to remember how many handfuls`);
+      }
+      return base;
+    },
   },
   market: {
     requires: () => !!G.namedCharacters?.merchant,
@@ -475,12 +495,22 @@ const _DREAM_THREADS = {
   },
   hearth: {
     requires: () => G.buildings.some(b => b.type === 'house'),
-    images: [
-      'every house lit at once, though no one struck a light',
-      'the first hearth-smoke of the realm, visible again in the air',
-      'a door that opens on a room the owner has never entered',
-      'a window looking out on the realm as it will be in a hundred years',
-    ],
+    // Loop 097: founder2-conditional variant. Hearth is domestic
+    // memory — founder2 standing at a door that opens on a room they
+    // don't recognize. Complements the window-looking-forward image
+    // already in the pool.
+    images: (G) => {
+      const base = [
+        'every house lit at once, though no one struck a light',
+        'the first hearth-smoke of the realm, visible again in the air',
+        'a door that opens on a room the owner has never entered',
+        'a window looking out on the realm as it will be in a hundred years',
+      ];
+      if (G.storyFlags.founders_named && G.storyFlags.founder2) {
+        base.push(`${G.storyFlags.founder2} standing at a door that opens on a room they do not recognize`);
+      }
+      return base;
+    },
   },
   water: {
     requires: () => G.buildings.some(b => b.type === 'well' || b.type === 'fisherman'),
