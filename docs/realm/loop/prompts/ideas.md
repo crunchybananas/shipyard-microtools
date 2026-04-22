@@ -28,10 +28,12 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 095 [code] **HIGH** — 3-line `_WINTER_CAPS` fix: windmill y=-32→-28, granary y=-26→-22, lumber y=-29→-28. Closes 095's perceptual "floating cap" finding on 3 building-types without losing width-based pixel-diff distinctness. [render.js]
+- 095 [code] **HIGH** — 3-line `_WINTER_CAPS` fix: windmill y=-32→-28, granary y=-26→-22, lumber y=-29→-28. Closes 095's perceptual "floating cap" finding on 3 building-types without losing width-based pixel-diff distinctness. [render.js] **DONE → 096** (3 y-offsets + granary h=4→3; width axis preserved 18/22/26/30; 9/9 caps now read natural on :8891)
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
-- 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play]
+- 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
+- 096 [review] — after 088/093 winter-beat play + 094/095/096 winter-graphics, is winter "done" as a seasonal axis? Or are there still gaps? A photographer or silhouette-test could audit. [play]
+- 096 [code] — consider a "screenshot capture" helper alongside renderBuildingIsolated for perceptual-diff audits. Would formalize the 094/095/096 workflow. [render.js + loop/docs/]
 
 - 094 [code] — dome-shape rendering for bakery/granary winter caps (rounded/domed top instead of ellipse). Requires shape field in _WINTER_CAPS + discrimination in draw code. [render.js]
 - 094 [code] — tavern cap as small peaked cone (matches 051 flag's vertical projection style). Stacks two disambiguation signals. [render.js]

@@ -38,13 +38,20 @@ const _WINTER_CAPS = {
   church:     { w: 10, h: 3, y: -42 },
   // Residential cluster — 086 found these bit-for-bit identical in
   // winter silhouette. 094 disambiguates via w × h × y variation.
+  // Loop 096 (the-fixer, 095 HIGH): 095 screenshot-critic found
+  // windmill/granary/lumber had floating caps (visible gap between
+  // sprite and ellipse) because 094's y-spread pushed caps above
+  // the actual roof geometry. 096 reverts those three y-offsets
+  // toward the -28 baseline while PRESERVING width variation — the
+  // pixel-diff audit distinctness still holds (width axis), the
+  // perceptual roof-conformance returns.
   house:      { w: 13, h: 3, y: -28 },  // baseline residential
   tavern:     { w: 16, h: 3, y: -27 },  // widest + 051 flag already above
   bakery:     { w: 14, h: 4, y: -25 },  // thicker + lower (bread/dome)
-  lumber:     { w: 11, h: 3, y: -29 },  // narrower + higher (tall beams)
+  lumber:     { w: 11, h: 3, y: -28 },  // 096: was -29 (floated above chimney)
   market:     { w: 17, h: 2, y: -24 },  // widest + flattest (awning)
-  windmill:   { w: 9,  h: 3, y: -32 },  // narrow + highest (tall body)
-  granary:    { w: 15, h: 4, y: -26 },  // thick dome
+  windmill:   { w: 9,  h: 3, y: -28 },  // 096: was -32 (floated above sails)
+  granary:    { w: 15, h: 3, y: -22 },  // 096: was -26, h=4 (stacked-dome look)
   // Other non-residentials — left at default or small tweaks where distinct
   blacksmith: { w: 14, h: 3, y: -28 },  // baseline (046: blur with barracks)
   barracks:   { w: 13, h: 3, y: -29 },  // slightly narrower + higher
