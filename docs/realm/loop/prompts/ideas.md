@@ -48,7 +48,7 @@ and note the promotion here.
 - 107 [code] **HIGH** — drop `|| e.key === 'h'` from input.js:319 so photo-mode H hotkey works. Dead since 035 (~72 ticks). Badge says "press H to exit" which has been a broken instruction that entire time. 2-token fix. [input.js] **DONE → 108** (shipped; static code-read verified; live-keystroke verify pending extension reconnect — filed as 108 [review])
 - 108 [review] — live-keystroke verify photo-mode H toggle after 108 fix. Extension was disconnected during 108. [play]
 - 108 [code] — help overlay (`?`) should list all 18 keyboard shortcuts 107 mapped. Unclear if current content matches reality. [index.html]
-- 109 [code] **HIGH** — viewport meta: replace `user-scalable=no` with `maximum-scale=5`. Restores a11y pinch-zoom (WCAG violation currently). 1-line. [index.html]
+- 109 [code] **HIGH** — viewport meta: replace `user-scalable=no` with `maximum-scale=5`. Restores a11y pinch-zoom (WCAG violation currently). 1-line. [index.html] **DONE → 110** (shipped exactly as filed; net LoC 0; mechanical edit)
 - 109 [code] MEDIUM — hide minimap on <500px viewport OR make it collapsible. Currently dominates 38% of 390px viewport width. ~3-5 lines. [index.html]
 - 109 [code] MEDIUM — build-bar scroll-cue (042-style gradient) when content x-overflows. Reuse _wireScrollCue. ~5 lines. [ui.js]
 - 109 [code] MEDIUM — long-press tooltip overlay for touch users. 14/39 HUD button titles invisible without mouse hover. ~20 lines. [input.js + ui.js]
