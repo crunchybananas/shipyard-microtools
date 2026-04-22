@@ -33,6 +33,11 @@ and note the promotion here.
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
 - 101 [code] — merchant → trade price modifier. Named merchant: +5% trade return. Mirror of 101's teacher pattern. ~3 lines. [economy.js] **DONE → 102** (2 lines in trade.js; 6-case matrix verified; pattern portable)
+- 103 [code] — "realm forgotten" follow-up requiem: fires some days after realm_fell via direct chain (since no more dawns post-pop=0). Pairs with current requiem. [story.js]
+- 103 [code] — castle-falls requiem: if castle destroyed (raid or future mechanic), fire requiem beat. Tag:requiem reuse. [story.js + events.js]
+- 103 [code] — `G.realmEnded` flag: set when requiem fires. Enables post-end rendering (fog return, desaturation, silence). Future mood tick. [state.js + story.js]
+- 103 [review] — does the 7-surface Lira arc feel EARNED or forced at realm-end? Long-play read. [play]
+- 103 [doc] — update narrative-surfaces.md: new `requiem` tag (15 tags now), new eviction-immune entry, new NARRATIVE_BEATS entry. Per 075 invariant. [loop/docs/]
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js]
 - 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick]
 - 101 [code] — mayor → unlocks a civic building (town hall, court). Bigger scope. [buildings.js + state.js]
@@ -211,7 +216,7 @@ and note the promotion here.
 - 054 [code] — thread-coverage audit helper `G.debug.dreamCoverage(n)` that runs N dream fires for a kingdom and reports surface frequency by thread. Would make future pool-expansion ticks data-driven. [story.js]
 - 053 [code] — expand `_DREAM_THREADS` pool. 053's 11-dream run showed repetition by the 5th-6th fire. Adding 2-3 threads (e.g. `weather`, `children`, `dead`) brings pool above repeat threshold. [story.js] **DONE → 054** (shipped 2 of 3: weather + children; dead skipped for tonal reasons)
 - 053 [code] — `G.debug.t048()` getter that returns `_t048` state (or null). Unblocks verification of 048's element without naming it in code body. [enhancements.js]
-- 053 [surprise / code] — end-of-realm beats: chronicle is origin-heavy, death-silent. "Last citizen dies" / "castle falls" / "realm forgotten" would bookend narrative. [story.js]
+- 053 [surprise / code] — end-of-realm beats: chronicle is origin-heavy, death-silent. "Last citizen dies" / "castle falls" / "realm forgotten" would bookend narrative. [story.js] **DONE → 103** (shipped "last citizen dies" variant via new requiem tag + `realm_fell` in NARRATIVE_BEATS; Lira arc closes; 6 tests pass. Castle-falls + realm-forgotten variants filed as follow-ups)
 - 053 [code] — happiness/state-reactive dreams. When happiness < 30 or population falling, dreams bias toward `warning` thread. Gate + boost logic like 044's. [story.js]
 - 052 [review] — full the-silhouette-test / the-color-eye re-run via `G.debug.renderBuildingIsolated` on all 20 buildings. With the helper live, this is a 5-min tick not a 30-min one. Likely to ground-truth 046's findings (052 already caught one correction: bakery was NOT in the house/tavern blur cluster, its peakY=43 is 21px above house's 64).
 - 052 [code] — extend helper: `renderBuildingsGrid(types[], cols, opts)` returns one canvas with N buildings tiled for side-by-side audits. `renderBuildingAnimated(type, frames, opts)` returns array of canvases at different G.gameTick values for windmill/048/animated sprites. [render.js]

@@ -23,7 +23,7 @@ export function initChronicle() {
 // 085 enforces it in code: when the cap kicks in, oldest
 // NON-IMMUNE entries drop first; immune entries are preserved
 // even if that means the buffer sits slightly over 300.
-const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory']);
+const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem']);
 
 export function chronicle(text, tag='misc') {
   initChronicle();
@@ -66,6 +66,7 @@ const TAG_ICONS = {
   milestone:'🏛️', event:'✨', character:'👤', raid:'⚔️',
   season:'🍃', death:'🪦', birth:'👶', victory:'🏆', misc:'📜',
   dream:'🌙', nightmare:'🌑', stone:'🗿', echo:'🔁', research:'📚',
+  requiem:'🕯️',  // Loop 103: realm-end beat. 1 tag, 1 beat (so far).
 };
 
 // Module-local filter state (not persisted to save — this is a
@@ -316,6 +317,22 @@ const NARRATIVE_BEATS = [
       return f
         ? `Five winters behind us. ${f} remembers the first, and speaks of it less often now.`
         : 'Five winters behind us. The oldest in the realm remember the first, and speak of it less often now.';
+    } },
+  // Loop 103 (surprise, 053 filed 50+ ticks): end-of-realm beat. Closes
+  // the structural narrative gap 020/050/100 all flagged — the chronicle
+  // is origin-heavy, death-silent. When population drops to 0 the realm
+  // has fallen; this beat marks the moment. References founder1 by name
+  // if 072 has fired (compounds with the 088/093/097 founder-arc).
+  // New tag 'requiem' (justified per 075: no existing tag fits "realm
+  // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
+  // starvation/combat deaths doesn't cap-evict this last beat.
+  { flag: 'realm_fell', tag: 'requiem',
+    trigger: G => G.day > 1 && G.population === 0,
+    text: G => {
+      const f = G.storyFlags.founder1;
+      return f
+        ? `The last fire in the realm goes out. ${f}'s name is the last spoken, and then there is no one to speak it.`
+        : 'The last fire in the realm goes out. There is no one left to tend it, and no one left to remember.';
     } },
 ];
 
