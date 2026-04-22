@@ -17,7 +17,12 @@ export function executeTrade(partnerId, resourceKey, amount) {
   if (resourceKey !== p.import) return false;
   if ((G.resources[resourceKey] || 0) < amount) return false;
   G.resources[resourceKey] -= amount;
-  const received = Math.round(amount * p.rate);
+  // Loop 102 (the-fixer, 101 sibling): named merchant gives +5% trade
+  // return. Mirrors 101's teacher research-bonus pattern. Graduates
+  // 034's merchant intro from decoration to mechanic. No UI indicator —
+  // player will notice larger haul across many trades if they track it.
+  const merchantMult = G.namedCharacters?.merchant ? 1.05 : 1;
+  const received = Math.round(amount * p.rate * merchantMult);
   G.resources[p.export] = (G.resources[p.export] || 0) + received;
   return { given: amount, received, export: p.export };
 }

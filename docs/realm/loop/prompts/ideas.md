@@ -32,7 +32,7 @@ and note the promotion here.
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
-- 101 [code] — merchant → trade price modifier. Named merchant: +5% trade return. Mirror of 101's teacher pattern. ~3 lines. [economy.js]
+- 101 [code] — merchant → trade price modifier. Named merchant: +5% trade return. Mirror of 101's teacher pattern. ~3 lines. [economy.js] **DONE → 102** (2 lines in trade.js; 6-case matrix verified; pattern portable)
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js]
 - 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick]
 - 101 [code] — mayor → unlocks a civic building (town hall, court). Bigger scope. [buildings.js + state.js]
