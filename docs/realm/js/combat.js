@@ -188,9 +188,14 @@ export function updateTowers() {
     }
     if (target) {
       b.fireTimer = 60; // 1 sec cooldown
+      // Loop 105 (the-fixer, 101/102 sibling): named smith adds +5%
+      // projectile damage. Same pattern as teacher (101 research) and
+      // merchant (102 trade). Third named-character → mechanic
+      // graduation. Silent effect — no UI, no chronicle beat.
+      const smithMult = G.namedCharacters?.smith ? 1.05 : 1;
       G.projectiles.push({
         x: b.x, y: b.y, tx: target.x, ty: target.y,
-        target, damage: 10, life: 40,
+        target, damage: 10 * smithMult, life: 40,
         type: 'arrow',
       });
     }
