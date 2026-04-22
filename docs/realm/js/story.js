@@ -362,6 +362,12 @@ export function checkStoryBeats() {
       setFlag(beat.flag);
       const text = typeof beat.text === 'function' ? beat.text(G) : beat.text;
       chronicle(text, beat.tag);
+      // Loop 111 (surprise, 106-filed): requiem beat gets a single bell-
+      // toll sound cue. Inverse of 106's nightmare dissonance. Mirrors
+      // the late-bound import pattern from checkNightmareBeat.
+      if (beat.tag === 'requiem') {
+        try { if (_PLAY_SOUND) _PLAY_SOUND('requiem'); } catch (_e) {}
+      }
     }
   }
 

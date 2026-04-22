@@ -422,6 +422,22 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine',     384, 0.015, 0.3, 1.8, t + 0.15);
       break;
     }
+
+    // ── Requiem: Loop 111 (surprise, 106-filed). Inverse of nightmare:
+    //    a single church-bell toll when the realm falls (103 realm_fell
+    //    beat). Clean sine + matched harmonic overtones (stack of 2, 3x
+    //    fundamental) produce a bell-like partial profile — inharmonic
+    //    but consonant. 196 Hz (G3) low, mournful. Long decay (5s) so it
+    //    RINGS AWAY instead of starting and stopping. Low gain — this
+    //    is a distant bell, not a dinner bell. Plays once per realm
+    //    iff requiem beat fires. One toll, not a sequence; the realm
+    //    is over, not mid-story.
+    case 'requiem': {
+      makeOsc(ctx, dest, 'sine',     196, 0.08,  0.02, 5.0, t);
+      makeOsc(ctx, dest, 'sine',     392, 0.035, 0.02, 4.5, t);
+      makeOsc(ctx, dest, 'sine',     588, 0.015, 0.02, 3.5, t);
+      break;
+    }
   }
 }
 

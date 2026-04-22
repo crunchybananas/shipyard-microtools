@@ -41,7 +41,11 @@ and note the promotion here.
 - 104 [code] — enhancements.js system count should be 9 (not 10) in narrative-surfaces.md. 092 removed anniversary updater; doc's enumeration wasn't shifted. [loop/docs/]
 - 104 [review] — re-measure 130-170 cadence target via fastForward with year-5 realms. Does 093/103 +4 materialize as predicted? [play]
 - 104 [doc] — cover-art recipes doc (098 filed, still open). Pair with narrative-surfaces in loop/docs/. [loop/docs/]
-- 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js]
+- 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js] **PARTIAL → 111** (requiem bell-toll shipped; stone/founders/offering/first-snow still open)
+- 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
+- 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
+- 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js]
+- 111 [doc] — audio-surfaces.md in loop/docs/ now that 2 cues exist (nightmare, requiem). ~30 lines. [loop/docs/]
 - 106 [review] — live-play verification of the nightmare sound: does it read "dissonant" or "intrusive"? Gain may need real-world adjustment. [play]
 - 106 [doc] — new `audio-surfaces.md` in loop/docs/ if 3+ audio ticks accumulate. Mirrors narrative-surfaces but for sound cues. [loop/docs/]
 - 106 [code] — 064's approach-window audio can share the `playSound('nightmare-approach')` pattern — a softer, less-decayed version of 106's chord. [audio.js + story.js]
