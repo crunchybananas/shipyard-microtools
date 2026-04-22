@@ -257,6 +257,23 @@ const BUILDING_FIRST_BEATS = [
   { type: 'church',      flag: 'firstChurch',      text: 'Bells toll from the new church. The faithful gather.',         after: ensureBard },
 ];
 
+// Loop 090 (refactor-only, closes 062 filed 28 ticks): state-triggered
+// one-shot beats. Each entry: { flag, trigger(G)→bool, text(string or
+// (G)→string), tag }. Fires once per realm when trigger first returns
+// true. Text may be a function for dynamic prose (castle references
+// mayor name + kingdom name). Checked in checkStoryBeats.
+const NARRATIVE_BEATS = [
+  { flag: 'firstBirth',        tag: 'birth',     trigger: G => G.stats && (G.stats.citizensBorn || 0) >= 1, text: 'A child is born in the realm. The first new life to call this land home.' },
+  { flag: 'pop10',             tag: 'milestone', trigger: G => G.population >= 10,  text: 'Ten souls now call this land home.' },
+  { flag: 'pop25',             tag: 'milestone', trigger: G => G.population >= 25,  text: 'Twenty-five citizens — a true town takes shape.' },
+  { flag: 'pop50',             tag: 'milestone', trigger: G => G.population >= 50,  text: 'Fifty strong! Travelers on the road whisper of the rising realm.' },
+  { flag: 'pop75',             tag: 'milestone', trigger: G => G.population >= 75,  text: 'Seventy-five subjects. Other lords now watch with envy.' },
+  { flag: 'pop100',            tag: 'milestone', trigger: G => G.population >= 100, text: 'One hundred souls. A city is born.' },
+  { flag: 'castleBuilt',       tag: 'victory',   trigger: G => G.buildings.some(b => b.type === 'castle'),
+    text: G => { const m = G.namedCharacters.mayor; return `The castle stands complete. ${m ? m.name + ' proclaims,' : 'The heralds proclaim,'} "${G.kingdomName} shall endure a thousand years!"`; } },
+  { flag: 'firstRaidSurvived', tag: 'raid',      trigger: G => G.stats && G.stats.raidsSurvived >= 1, text: 'The first raid is turned back. The dead are buried; the living drink to the fallen.' },
+];
+
 // Run each tick/day to detect milestones and fire beats once.
 export function checkStoryBeats() {
   initChronicle();
@@ -272,37 +289,18 @@ export function checkStoryBeats() {
     }
   }
 
-  // First citizen born — deep-play showed citizensBorn=4 by Day 12 with zero
-  // chronicle entries about a single birth. The settlement grew from 3 to 7
-  // and the log never mentioned any of the new arrivals.
-  if (!hasFlag('firstBirth') && G.stats && (G.stats.citizensBorn || 0) >= 1) {
-    setFlag('firstBirth');
-    chronicle('A child is born in the realm. The first new life to call this land home.', 'birth');
-  }
-  // Population thresholds
-  const popCheck = [
-    [10, 'pop10', 'Ten souls now call this land home.'],
-    [25, 'pop25', 'Twenty-five citizens — a true town takes shape.'],
-    [50, 'pop50', 'Fifty strong! Travelers on the road whisper of the rising realm.'],
-    [75, 'pop75', 'Seventy-five subjects. Other lords now watch with envy.'],
-    [100, 'pop100', 'One hundred souls. A city is born.'],
-  ];
-  for (const [thr, flag, text] of popCheck) {
-    if (!hasFlag(flag) && G.population >= thr) {
-      setFlag(flag);
-      chronicle(text, 'milestone');
+  // Loop 090 (refactor-only, closes 062 filed 28 ticks): once-fire
+  // trigger-based beats share a shape (flag + trigger(G) + text + tag).
+  // Consolidating 8 previously-inline beats (firstBirth + 5 pop + castle
+  // + firstRaid) into NARRATIVE_BEATS mirrors the BUILDING_FIRST_BEATS
+  // pattern. Happiness beats stay inline — they have re-fire semantics
+  // (hysteresis reset) that don't fit a simple one-shot trigger.
+  for (const beat of NARRATIVE_BEATS) {
+    if (!hasFlag(beat.flag) && beat.trigger(G)) {
+      setFlag(beat.flag);
+      const text = typeof beat.text === 'function' ? beat.text(G) : beat.text;
+      chronicle(text, beat.tag);
     }
-  }
-  // Castle = end-of-act
-  if (!hasFlag('castleBuilt') && G.buildings.some(b => b.type === 'castle')) {
-    setFlag('castleBuilt');
-    const m = G.namedCharacters.mayor;
-    chronicle(`The castle stands complete. ${m ? m.name + ' proclaims,' : 'The heralds proclaim,'} "${G.kingdomName} shall endure a thousand years!"`, 'victory');
-  }
-  // First raid survived
-  if (!hasFlag('firstRaidSurvived') && G.stats && G.stats.raidsSurvived >= 1) {
-    setFlag('firstRaidSurvived');
-    chronicle('The first raid is turned back. The dead are buried; the living drink to the fallen.', 'raid');
   }
 
   // Loop 088 (surprise): first-snow beat. Fires once, the first

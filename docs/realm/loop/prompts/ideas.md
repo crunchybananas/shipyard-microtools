@@ -28,6 +28,11 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 090 [code] — migrate happiness peak/crisis into NARRATIVE_BEATS with hysteresis-reset extension (`resetOn: G => bool` or `otherFlags: [...]` field). Would remove the last bespoke one-shot beat block. Requires careful re-test of hysteresis cycles. [story.js]
+- 090 [code] — migrate 088's first-snow beat into NARRATIVE_BEATS. Trivial once pattern exists. Could use `text: (G) => G.storyFlags.founder1 ? ... : ...`. ~3 lines. [story.js]
+- 090 [code] — promote 073's filed year-milestone beats (enhancements.js:5086) into NARRATIVE_BEATS. Cross-file; needs table export or module restructure. [story.js + enhancements.js]
+- 090 [review] — now that NARRATIVE_BEATS exists, re-audit `checkStoryBeats` for other hidden one-shot triggers (first-famine / first-winter-death / first-technology-mastered?). [story.js]
+
 - 089 [code] — echo frames that preserve character names: when nightmare echoes via 059's `checkEchoBeat`, render "The old folk remember Maia's face on a stone…" instead of wrapping around a character-less frame. Pairs with 059's filed character-aware echo. [story.js]
 - 089 [code] — founders in 039 dream threads: weave founder-named image variants into `founding` / `hearth` / `harvest` threads when `founders_named` is set. Parallel to 089's nightmare work but for the peaceful dreams. ~15 lines. [story.js]
 - 089 [review] — lore-hunter pass on the 3 new founder fragments (footprints/gate/stone): do they compose well with the 11 base images at long-play read? Any tonal clashes? [story.js]
@@ -43,7 +48,7 @@ and note the promotion here.
 - 058 [review / play] — visual check of the stone on canvas with a persona (the-photographer / the-screenshot-critic). Pixel verification confirms render; persona check would confirm it reads right.
 - 056 [code] — render 056's standing stone at its seeded grass tile (persistent dark vertical + small base ellipse). Needs stone_x/stone_y stored in storyFlags. Pairs with 052's renderBuildingIsolated helper availability. [enhancements.js + story.js] **DONE → 058**
 - 056 [code] — expand 056's _STONE_PHRASES pool from 4 → 6-8 variants. Verification showed 3 of 8 kingdoms used the same "barely-legible" phrase. ~4 lines. [story.js]
-- 062 [code] — generalize BUILDING_FIRST_BEATS to NARRATIVE_BEATS with a `trigger: (G) => bool` field. Would let firstBirth, castleBuilt, population thresholds, and raid beat all live in one table. ~25 lines. Pairs with 060's surface-map doc. [story.js]
+- 062 [code] — generalize BUILDING_FIRST_BEATS to NARRATIVE_BEATS with a `trigger: (G) => bool` field. Would let firstBirth, castleBuilt, population thresholds, and raid beat all live in one table. ~25 lines. Pairs with 060's surface-map doc. [story.js] **DONE → 090** (8 beats consolidated: firstBirth + 5 pop + castleBuilt + firstRaid; net LoC −2; 9 chrome-mcp tests pass; happiness peak/crisis and first-snow kept inline due to re-fire semantics / story-specificity)
 - 062 [code] — allow `text:` to be a function `(G) => string` for dynamic prose (castleBuilt uses kingdom + mayor name). ~5 lines. [story.js]
 - 062 [review] — tone-consistency audit of BUILDING_FIRST_BEATS now that 062 added 3 formerly-inline entries. Their voice may differ from the 13 that were always in the table. [story.js]
 - 061 [code] — optional chronicle beat on wanderer spawn (`character` or new `visitor` tag). Breaks 048's "silent" rule; only ship if we decide wanderer should be announced. [enhancements.js + story.js]
