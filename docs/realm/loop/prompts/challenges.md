@@ -158,6 +158,56 @@ person*, then journal what they saw.
   generated from a seed (today's date + save id). Same seed →
   same content. No persisted state.
 
+### expansion (added tick 114; loop-native patterns)
+
+The 34-challenge pool above was the original MANIFEST set.
+By tick 114 it had been 100% picked and the loop had
+developed new axes (audio cues 106/111/113, named-character
+mechanics 101/102/105, founder-weaving arc 088/089/093/097/103,
+NARRATIVE_BEATS table 090/092/093/103). These 8 new
+challenges pull on axes the original pool didn't anticipate:
+
+- **`the-composer`** `[code]` — design a new sound cue for
+  an existing once-per-realm beat that doesn't have one
+  yet (founders-named, offering, first-snow, etc). Must
+  respect audio-surfaces.md's 5 principles (silent-by-
+  default, miss-able, once-per-realm, distinct
+  fingerprint, no UI). Update the acoustic-contrast table.
+- **`the-balancer`** `[play]` — play a full scenario with
+  all graduated named-character mechanics active
+  (teacher/merchant/smith/whoever). Measure pacing. Is
+  the cumulative bonus too generous? Not enough? Pair
+  with 101-filed balance review.
+- **`the-cartographer`** `[play|review]` — spend a tick on
+  the map itself. Tile decorations, biome distribution,
+  map-seed reproducibility, how big the island feels.
+  An underused axis — graphics ticks have been building-
+  focused.
+- **`the-migrant`** `[play]` — play a fresh scenario as
+  if you've forgotten everything about the game (no
+  memory of prior ticks' findings). Where do you stall?
+  What do you rediscover? Sibling to `the-novice` but
+  for returning-player psychology.
+- **`the-typographer`** `[review]` — audit typography,
+  font sizes, reading hierarchy, contrast. The chronicle
+  and beat prose have grown substantially; UI text may
+  not have kept pace. Pairs with 041/042's HUD-overflow
+  thread.
+- **`the-interrupter`** `[play]` — play with simulated
+  interruption: focus, get distracted, come back 2
+  minutes later, continue. What did the game tell you
+  while you were gone? What's lost? Sibling to `the-
+  idle-player` but for re-engagement.
+- **`the-critic`** `[review]` — read every chronicle-
+  producing prose source side-by-side. Is the voice
+  consistent? Where does tone drift? Which beat feels
+  the most earned, which feels forced?
+- **`the-re-shipper`** `[code]` — take one old
+  journal-filed idea that's been open for 20+ ticks and
+  ship or drop it. Not `the-fixer` (which drains the
+  backlog); `the-re-shipper` explicitly picks LONG-
+  OPEN ideas as a quality pass.
+
 ## picking well
 
 Good picks:

@@ -64,7 +64,9 @@ and note the promotion here.
 - 109 [code] LOW — @media(max-width:480px) for title-screen stacking. ~8 lines. [index.html]
 - 109 [code] LOW — `navigator.vibrate(10)` on successful placement. 1 line. [input.js]
 - 109 [review] — live-device test (actual iPhone OR Chrome devtools mobile emulator) to verify 109's code-read findings. [play]
-- 109 [meta] — challenge-pool expansion: 34/34 picked; a meta-tick that adds 5-10 new challenges would refresh the loop's option space. [prompts/challenges.md]
+- 109 [meta] — challenge-pool expansion: 34/34 picked; a meta-tick that adds 5-10 new challenges would refresh the loop's option space. [prompts/challenges.md] **DONE → 114** (8 added: composer, balancer, cartographer, migrant, typographer, interrupter, critic, re-shipper; pool now 42)
+- 114 [review] — at tick 150 or 175, audit the 8 new challenges. Which got picked? Which didn't? Dropped challenges are as informative as picked ones. [loop/]
+- 114 [code] — grep helper showing challenge-usage distribution (never-picked / picked 5+). Pairs with archivist ticks. [scripts/ or loop/docs/]
 - 107 [code] MEDIUM — aria-label on all HUD icon buttons (only 4/39 currently). ~10 lines. [ui.js or index.html]
 - 107 [code] MEDIUM — visible highlight on current B-cycled build-bar card. ~3-5 lines. [ui.js or render.js]
 - 107 [code] MEDIUM — keyboard building-placement path: arrow keys move cursor, Enter places. Core gameplay is currently mouse-required. ~30-50 lines. [input.js + render.js]
