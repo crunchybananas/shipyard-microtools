@@ -54,6 +54,10 @@ and note the promotion here.
 - 116 [code] — audio cue for constellation naming (high ethereal tones, very quiet). Slot for the-composer next. [audio.js + story.js]
 - 116 [code] — echo frame specific to constellation: "Old folk still call them ${shape}." Pairs with 059. [story.js]
 - 116 [review] — long-play read: do the 20 constellation names feel distinctive or interchangeable? Tune pool. [play]
+- 122 [code] — visual weathering on 058's stone render: when `stone_weathered` is set, tilt sprite or overlay mossy texture. ~8 lines. [enhancements.js]
+- 122 [code] — optional 4th stone beat at day ≥ 300: "The stone has been here longer than the oldest citizen." Extends arc to century+ realms. [story.js]
+- 122 [review] — after multiple realms verify the 4 weathering variants feel distinct (vs 056's original "barely legible" problem). [play]
+- 122 [doc] — narrative-surfaces.md entry count drifted; says NARRATIVE_BEATS has 15 entries (last updated 104) but post-116/121/122 it's 18. Small doc update. [loop/docs/]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
 - 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)

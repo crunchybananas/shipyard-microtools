@@ -333,6 +333,25 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 122 (surprise, un-filed): the stone weathers. A second beat
+  // on 056's standing stone, fires once day ≥150 past first discovery.
+  // Extends the stone's narrative arc: 056 discovery → 079 offering
+  // → 122 weathering. Three beats about the same physical object over
+  // ~150+ days. Tag: stone (reuses per 075 invariant; 085 makes it
+  // eviction-immune). 4 prose variants picked by kingdom-hash —
+  // different kingdoms see different kinds of weathering.
+  { flag: 'stone_weathered', tag: 'stone',
+    trigger: G => G.storyFlags.stone_found && G.day >= 150,
+    text: G => {
+      const kname = G.kingdomName || 'Realm';
+      const variants = [
+        `Moss has begun to fill the name ${kname} on the standing stone.`,
+        `The stone leans a little more than it did. The name ${kname} remains.`,
+        `Weather has written lines on the stone beside the name ${kname} — marks only time reads.`,
+        `A bird has nested in the lee of the stone. ${kname}, it continues to say.`,
+      ];
+      return variants[_dreamHash(`${kname}_weather`) % variants.length];
+    } },
   // Loop 121 (the-re-shipper, 090 filed 31 ticks): first-snow beat
   // migrated from inline block (088) into NARRATIVE_BEATS. Honors 112
   // audio-surfaces.md invariant ("migrate inline beats to table before
