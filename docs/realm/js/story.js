@@ -1027,6 +1027,11 @@ export function checkFounderBeat() {
     `The three founders at last know each other's names: ${names[0]}, ${names[1]}, and ${names[2]}. The wicker packs are unpacked; the fire does not go out.`,
     'character'
   );
+
+  // Loop 115 (the-composer, 106/111-filed founders-named cue; first use
+  // of the tick-114 expanded challenge pool). Three-note minor triad,
+  // one note per founder. Pattern 1 via this dedicated function.
+  try { if (_PLAY_SOUND) _PLAY_SOUND('founders'); } catch (_e) {}
 }
 
 // ── Loop 079: offering at the stone (surprise) ───────────────

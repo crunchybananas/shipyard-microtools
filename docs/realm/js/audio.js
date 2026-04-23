@@ -452,6 +452,20 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine', 1976, 0.015, 0.01, 0.9, t + 0.12);
       break;
     }
+
+    // ── Founders: Loop 115 (the-composer, 106/111-filed; first use
+    //    of the tick-114 expanded challenge pool). Three ascending
+    //    minor-triad notes, one per founder slot. Slower pacing
+    //    (~0.25s between notes) than stone's quick chime — reads as
+    //    ceremonial rather than incidental. C5-Eb5-G5 = a minor triad;
+    //    ceremonial but not heavy.
+    case 'founders': {
+      // C5, E♭5, G5 — rising minor triad
+      makeOsc(ctx, dest, 'sine', 523, 0.06, 0.05, 0.9, t);
+      makeOsc(ctx, dest, 'sine', 622, 0.06, 0.05, 0.9, t + 0.25);
+      makeOsc(ctx, dest, 'sine', 784, 0.06, 0.05, 1.1, t + 0.50);
+      break;
+    }
   }
 }
 

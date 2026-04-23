@@ -1,15 +1,18 @@
 # audio-surfaces.md
 
-**Status:** Written in tick 112. Updated 113. Sibling to
-`narrative-surfaces.md` (075). Maintained by subsequent
+**Status:** Written in tick 112. Updated 113, 115. Sibling
+to `narrative-surfaces.md` (075). Maintained by subsequent
 audio ticks.
 **Sources:** 106 opened the axis (nightmare sound cue in
 new loop protocol); 111 added requiem bell-toll and
 established the NARRATIVE_BEATS dispatch-loop pattern for
 tag-specific sound fires. 112 captured the design
 philosophy + 2-cue catalog. 113 shipped stone chime (3rd
-cue) — brings Pattern 1 count to 2, keeps Pattern 2 at 1,
-so no `onFire` refactor pressure yet per 112's threshold.
+cue). 115 shipped founders three-note minor-triad —
+**first use of the-composer challenge added by tick 114's
+expansion**. Pattern 1 count now 3 (nightmare, stone,
+founders); Pattern 2 count still 1 (requiem). No `onFire`
+refactor pressure yet — Pattern 1 scales naturally.
 
 ## why this exists
 
@@ -53,7 +56,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (3 cues)
+## current catalog (4 cues)
 
 ### `nightmare` — loop 106
 
@@ -112,22 +115,44 @@ requiem's low bell.
 the end of `story.js:checkStoneBeat` (dedicated check-
 function).
 
+### `founders` — loop 115
+
+**Trigger:** `checkFounderBeat` at story.js fires; the
+`founders_named` flag transitions false→true exactly once
+per realm (seeded day [3,6], dawn-only).
+
+**Sound design:** three ascending sine notes forming a
+C minor triad — C5 (523 Hz), E♭5 (622 Hz), G5 (784 Hz) —
+spaced 0.25s apart for ~0.75s total phrase. Each note
+has a soft attack (0.05s) and ~0.9-1.1s decay. Gain 0.06.
+
+**Affect:** ceremonial, slow, three-beat structure. One
+note per founder slot. The minor-third + perfect-fifth
+interval set is solemn but not mournful — a "three
+settlers arrive, name each other" moment.
+
+**Code:** `js/audio.js` switch case, Pattern 1 fire at
+the end of `story.js:checkFounderBeat`. First cue added
+under the `the-composer` challenge slot (tick-114
+expansion).
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) | stone (113) |
-| --- | --- | --- | --- |
-| Wave | triangle | sine | sine |
-| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) |
-| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending |
-| Beating | 4 Hz tremolo | none | none |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) |
-| Decay | 2.2s | 5.0s | 1.3s |
-| Character | unstable, buzzy | clean, mournful | bright, discovery |
-| Gain peak | 0.10 | 0.08 | 0.07 |
+| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) |
+| --- | --- | --- | --- | --- |
+| Wave | triangle | sine | sine | sine |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending |
+| Structure | sustained chord | single toll | quick chime | 3-note sequence |
+| Beating | 4 Hz tremolo | none | none | none |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft |
+| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note |
+| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn |
+| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -220,9 +245,10 @@ audio ticks should respect them:
 - ~~**Stone chime**~~ (106 + 111 filed) — **DONE → 113**:
   ascending fifth E5→B5 + B6 shimmer overtone, short
   attack, mid decay. Pattern 1 via `checkStoneBeat`.
-- **Founders-named phrase** (106 filed): three-note
-  sequence matching founder1/2/3 names' syllable-count
-  hash. `checkFounderBeat` trigger (072). Pattern 1.
+- ~~**Founders-named phrase**~~ (106 filed) — **DONE → 115**:
+  3-note C-minor-triad ascending (523/622/784 Hz), 0.25s
+  pacing. Pattern 1 via `checkFounderBeat`. Syllable-count-
+  hash variant not shipped; kept constant phrase.
 - **Offering chord** (106 filed): sweeter sibling to
   nightmare's dissonance. `checkOfferingBeat` trigger
   (079). Pattern 1.
@@ -253,6 +279,11 @@ audio ticks should respect them:
   (alongside nightmare). Pattern 2 count stays at 1, so
   no `onFire` callback refactor pressure per 112's
   threshold. Contrast table extended to 3 columns.
+- **115** — founders minor-triad phrase. 4th cue; 3rd
+  Pattern 1 usage. **First cue shipped under the tick-
+  114 expanded challenge pool (`the-composer`).**
+  Contrast table extended to 4 columns; added
+  `Structure` row (first multi-note cue).
 
 ## how to update this doc
 

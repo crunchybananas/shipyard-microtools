@@ -41,7 +41,10 @@ and note the promotion here.
 - 104 [code] — enhancements.js system count should be 9 (not 10) in narrative-surfaces.md. 092 removed anniversary updater; doc's enumeration wasn't shifted. [loop/docs/]
 - 104 [review] — re-measure 130-170 cadence target via fastForward with year-5 realms. Does 093/103 +4 materialize as predicted? [play]
 - 104 [doc] — cover-art recipes doc (098 filed, still open). Pair with narrative-surfaces in loop/docs/. [loop/docs/]
-- 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js] **PARTIAL → 111** (requiem bell-toll shipped; stone/founders/offering/first-snow still open)
+- 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js] **PARTIAL → 111/113/115** (requiem 111, stone 113, founders 115 shipped; offering + first-snow still open)
+- 115 [code] — offering audio cue: sweeter chord, minor-to-major resolution. Sibling to nightmare's dissonance. [audio.js + story.js]
+- 115 [code] — first-snow audio cue: soft high-freq noise burst, shimmer-heavy. "The sound of snow that isn't quite sound." [audio.js + story.js]
+- 115 [review] — the-balancer first use: character-mechanic cumulative-balance check (3/6 mechanics shipped). Pairs with 101 filed review. Uses tick-114 expanded pool. [play]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
 - 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)
