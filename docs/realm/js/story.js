@@ -333,6 +333,18 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 121 (the-re-shipper, 090 filed 31 ticks): first-snow beat
+  // migrated from inline block (088) into NARRATIVE_BEATS. Honors 112
+  // audio-surfaces.md invariant ("migrate inline beats to table before
+  // adding audio"). Same trigger + text as the inline version.
+  { flag: 'first_snow_seen', tag: 'milestone',
+    trigger: G => G.season === 'winter' && G.day >= 10,
+    text: G => {
+      const f = G.storyFlags.founder1;
+      return f
+        ? `The first snow falls on the realm. ${f} stands in the fields a long time before going indoors.`
+        : 'The first snow falls on the realm. The settlers stand in the fields a long time before going indoors.';
+    } },
   // Loop 116 (surprise, un-filed): the realm names a constellation.
   // Every kingdom has a distinct star-pattern it remembers — the shape
   // it sees overhead when first autumn falls. Deterministic per
@@ -406,18 +418,9 @@ export function checkStoryBeats() {
     }
   }
 
-  // Loop 088 (surprise): first-snow beat. Fires once, the first
-  // time the realm sees winter past day 10. References a founder
-  // by name if 072 has named them; otherwise generic. Cross-refs
-  // 072 founders + 087 winter visuals + season-change.
-  if (!hasFlag('first_snow_seen') && G.season === 'winter' && G.day >= 10) {
-    setFlag('first_snow_seen');
-    const founder = G.storyFlags.founder1;
-    const text = founder
-      ? `The first snow falls on the realm. ${founder} stands in the fields a long time before going indoors.`
-      : `The first snow falls on the realm. The settlers stand in the fields a long time before going indoors.`;
-    chronicle(text, 'milestone');
-  }
+  // Loop 088 (surprise): first-snow beat migrated to NARRATIVE_BEATS
+  // in 121. Kept here as a sourcing breadcrumb — the beat now dispatches
+  // through the table loop above with flag first_snow_seen.
 
   // Loop 071: happiness-threshold beats. 060 audit found no narrative
   // surface when happiness crosses critical thresholds. Fires once on

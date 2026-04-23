@@ -128,7 +128,10 @@ and note the promotion here.
 - 091 [doc] — consider splitting narrative-surfaces.md into 3 sibling docs (taxonomy / enumeration / cadence-budget). 414 lines is getting large. Each could be maintained independently. [loop/docs/]
 
 - 090 [code] — migrate happiness peak/crisis into NARRATIVE_BEATS with hysteresis-reset extension (`resetOn: G => bool` or `otherFlags: [...]` field). Would remove the last bespoke one-shot beat block. Requires careful re-test of hysteresis cycles. [story.js]
-- 090 [code] — migrate 088's first-snow beat into NARRATIVE_BEATS. Trivial once pattern exists. Could use `text: (G) => G.storyFlags.founder1 ? ... : ...`. ~3 lines. [story.js]
+- 090 [code] — migrate 088's first-snow beat into NARRATIVE_BEATS. Trivial once pattern exists. Could use `text: (G) => G.storyFlags.founder1 ? ... : ...`. ~3 lines. [story.js] **DONE → 121** (the-re-shipper, 31 ticks old at ship; table grew 16→17; honors 112 audio-surfaces invariant)
+- 121 [doc] — update audio-surfaces.md invariant "(happiness, first-snow) deliberately have no audio yet" — post-121 only happiness remains inline. [loop/docs/]
+- 121 [code] — first-snow audio cue requires Pattern 2 to distinguish by FLAG not just TAG (since 'milestone' is used by many). Either refine Pattern 2 or promote to `onFire` callback. Required before 115-filed first-snow audio can ship. [audio.js + story.js]
+- 121 [code] — migrate happiness peak/crisis into NARRATIVE_BEATS with `resetOn: G => bool` callback field. Completes table-based dispatch of all one-shot + hysteresis beats. ~15 lines. [story.js]
 - 090 [code] — promote 073's filed year-milestone beats (enhancements.js:5086) into NARRATIVE_BEATS. Cross-file; needs table export or module restructure. [story.js + enhancements.js]
 - 090 [review] — now that NARRATIVE_BEATS exists, re-audit `checkStoryBeats` for other hidden one-shot triggers (first-famine / first-winter-death / first-technology-mastered?). [story.js]
 
