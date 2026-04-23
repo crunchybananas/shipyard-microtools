@@ -893,11 +893,21 @@ import('./audio.js').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
 // persistent tag, kingdom-name only).
 
 const _STONE_DIRECTIONS = ['northern', 'southern', 'eastern', 'western'];
+// Loop 117 (the-re-shipper, 056 filed 61 ticks): expanded from 4 → 8
+// phrase variants. 056's verification noted 3-of-8 kingdoms shared the
+// same "barely-legible" phrase; doubling the pool halves that
+// collision rate. New phrases keep the one-inscription-per-stone
+// philosophy (the kingdom's own name is always the text), vary the
+// descriptive framing.
 const _STONE_PHRASES = [
   (kname) => `carved into its face is a single word: ${kname}`,
   (kname) => `the kingdom's name is cut shallow into it: ${kname}`,
   (kname) => `a name is pressed into the stone, barely legible — ${kname}`,
   (kname) => `the wind has worn ${kname} into the stone's lean`,
+  (kname) => `moss has filled every letter of ${kname} but one`,
+  (kname) => `the letters spelling ${kname} are deeper than any hand would carve them`,
+  (kname) => `${kname} appears where rain has lightened the stone`,
+  (kname) => `${kname}, cut as if the stone remembers being named`,
 ];
 
 export function checkStoneBeat() {
