@@ -45,6 +45,10 @@ and note the promotion here.
 - 115 [code] — offering audio cue: sweeter chord, minor-to-major resolution. Sibling to nightmare's dissonance. [audio.js + story.js]
 - 115 [code] — first-snow audio cue: soft high-freq noise burst, shimmer-heavy. "The sound of snow that isn't quite sound." [audio.js + story.js]
 - 115 [review] — the-balancer first use: character-mechanic cumulative-balance check (3/6 mechanics shipped). Pairs with 101 filed review. Uses tick-114 expanded pool. [play]
+- 116 [code] — visual constellation render on autumn nights: draw stored shape in sky overlay using small star-sprite clusters. Per-shape position table. ~20 lines. [render.js + story.js]
+- 116 [code] — audio cue for constellation naming (high ethereal tones, very quiet). Slot for the-composer next. [audio.js + story.js]
+- 116 [code] — echo frame specific to constellation: "Old folk still call them ${shape}." Pairs with 059. [story.js]
+- 116 [review] — long-play read: do the 20 constellation names feel distinctive or interchangeable? Tune pool. [play]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
 - 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)

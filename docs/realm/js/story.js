@@ -326,6 +326,34 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 116 (surprise, un-filed): the realm names a constellation.
+  // Every kingdom has a distinct star-pattern it remembers — the shape
+  // it sees overhead when first autumn falls. Deterministic per
+  // kingdom-name. Fires at dawn of first autumn-day past day 15
+  // (autumn window is days 15-21 in year 1, 43-49 in year 2, etc; the
+  // ≥15 gate just ensures realm has had a life before it names the
+  // sky). Tag: milestone (reuse per 075). Text references founder2
+  // when named — the 072 arc gives each founder a narrative lane;
+  // 088/093/097/103 gave founder1 seasonality; 089 uses 1+2+3; 115
+  // uses all three. 116 gives founder2 their own canonical role:
+  // the one who looks up. First use of founder2 as sole focus.
+  { flag: 'constellation_named', tag: 'milestone',
+    trigger: G => G.season === 'autumn' && G.day >= 15,
+    text: G => {
+      const kname = G.kingdomName || 'Realm';
+      const shapes = [
+        'the Hare', 'the Ash-Tree', 'the Broken Wheel', 'the Three Sisters',
+        'the Lantern', 'the Old Wolf', 'the Shieldmaiden', 'the Seven Sisters',
+        'the Midwife', 'the Plough', 'the Harp', 'the Empty Hand',
+        'the Crown', 'the Fisherman', 'the Smith', 'the Open Door',
+        'the Warning', 'the Traveler', 'the Black Bird', 'the Sheaf',
+      ];
+      const shape = shapes[_dreamHash(`${kname}_constellation`) % shapes.length];
+      const f = G.storyFlags.founder2;
+      return f
+        ? `The first autumn stars stand clear above the eastern ridge. ${f}, looking up, names them ${shape}. The realm takes the name.`
+        : `The first autumn stars stand clear above the eastern ridge. The elders name the pattern ${shape}. The realm takes the name.`;
+    } },
   { flag: 'realm_fell', tag: 'requiem',
     trigger: G => G.day > 1 && G.population === 0,
     text: G => {
