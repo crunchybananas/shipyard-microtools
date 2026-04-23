@@ -466,6 +466,21 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine', 784, 0.06, 0.05, 1.1, t + 0.50);
       break;
     }
+
+    // ── First-snow: Loop 124 (the-composer, 115-filed; validates 123
+    //    onFire refactor). Soft high-frequency noise burst at 8kHz cut
+    //    — reads as "snow landing." Two overlapping bursts staggered by
+    //    150ms create a subtle shimmer. Very quiet (0.04 peak) — the
+    //    sound is less heard than felt, matching 106/111/113/115's
+    //    "miss-able" philosophy. High-freq noise is distinct from every
+    //    prior cue (all tonal); breaks pure-sine pattern deliberately.
+    case 'first-snow': {
+      makeNoiseBurst(ctx, dest, 0.04, 0.9, t, 8000);
+      makeNoiseBurst(ctx, dest, 0.025, 0.7, t + 0.15, 6000);
+      // Single high sine — like a distant bell at the frost threshold.
+      makeOsc(ctx, dest, 'sine', 1568, 0.02, 0.02, 1.2, t + 0.05);
+      break;
+    }
   }
 }
 

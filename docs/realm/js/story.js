@@ -356,7 +356,7 @@ const NARRATIVE_BEATS = [
   // migrated from inline block (088) into NARRATIVE_BEATS. Honors 112
   // audio-surfaces.md invariant ("migrate inline beats to table before
   // adding audio"). Same trigger + text as the inline version.
-  { flag: 'first_snow_seen', tag: 'milestone',
+  { flag: 'first_snow_seen', tag: 'milestone', onFire: 'first-snow',
     trigger: G => G.season === 'winter' && G.day >= 10,
     text: G => {
       const f = G.storyFlags.founder1;

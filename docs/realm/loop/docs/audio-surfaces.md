@@ -62,7 +62,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (4 cues)
+## current catalog (5 cues)
 
 ### `nightmare` — loop 106
 
@@ -142,23 +142,47 @@ the end of `story.js:checkFounderBeat`. First cue added
 under the `the-composer` challenge slot (tick-114
 expansion).
 
+### `first-snow` — loop 124
+
+**Trigger:** `first_snow_seen` NARRATIVE_BEATS entry
+(table-dispatched, post-121 migration). Tag: milestone.
+Fires once per realm when `G.season === 'winter' &&
+G.day >= 10`.
+
+**Sound design:** two overlapping high-frequency noise
+bursts (8 kHz + 6 kHz cut), staggered 150ms apart; plus
+a single high sine at 1568 Hz (G6) for a distant-bell
+overtone. Duration ~0.9s primary + 0.7s secondary burst.
+Gain 0.04 peak — quietest cue yet. Noise-based texture
+(vs all prior tonal cues) reads as "snow landing."
+
+**Affect:** whispering, nearly-subliminal. The sound is
+"felt more than heard" — fits the "miss-able" invariant
+strongly. Distinct from every prior cue: first noise-
+based entry breaks the pure-sine pattern deliberately.
+
+**Code:** `js/audio.js` switch case, Pattern 2 via
+`onFire: 'first-snow'` field on the NARRATIVE_BEATS
+entry (first new cue shipped under the 123 refactor —
+validates `onFire` in practice).
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) |
-| --- | --- | --- | --- | --- |
-| Wave | triangle | sine | sine | sine |
-| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) |
-| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending |
-| Structure | sustained chord | single toll | quick chime | 3-note sequence |
-| Beating | 4 Hz tremolo | none | none | none |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft |
-| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note |
-| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn |
-| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 |
+| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) |
+| --- | --- | --- | --- | --- | --- |
+| Wave | triangle | sine | sine | sine | **noise + sine** |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture |
+| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts |
+| Beating | 4 Hz tremolo | none | none | none | none |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) |
+| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s |
+| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard |
+| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -261,9 +285,11 @@ audio ticks should respect them:
 - **Offering chord** (106 filed): sweeter sibling to
   nightmare's dissonance. `checkOfferingBeat` trigger
   (079). Pattern 1.
-- **First-snow shimmer** (106 filed): soft high-freq
-  noise burst. first_snow_seen NARRATIVE_BEATS trigger
-  (088). Pattern 2 — add tag branch.
+- ~~**First-snow shimmer**~~ (106 filed) — **DONE → 124**:
+  8 kHz + 6 kHz noise bursts + 1568 Hz sine overtone.
+  Pattern 2 via `onFire: 'first-snow'` on the 121-
+  migrated entry. First audio cue to use 123's onFire
+  refactor.
 - **Per-kingdom bell-pitch variation** (111 filed): hash
   kingdom name to pick requiem fundamental from a minor-
   scale set (A2, D3, G3, B♭3, …). 5 lines in the
@@ -304,6 +330,13 @@ audio ticks should respect them:
   NARRATIVE_BEATS audio cues just add `onFire`;
   unblocks first-snow/constellation/stone-weathers.
   Refactor-only — zero user-visible change.
+- **124** — first-snow shimmer. 5th cue; **first audio
+  to ship under 123's `onFire` refactor**. First non-
+  tonal cue (noise-based) — breaks pure-sine pattern.
+  Acoustic-contrast table gets a 5th column; adds
+  "noise + sine" wave type, non-tonal texture,
+  whispering character. Validates the refactor in
+  practice.
 
 ## how to update this doc
 

@@ -43,7 +43,7 @@ and note the promotion here.
 - 104 [doc] — cover-art recipes doc (098 filed, still open). Pair with narrative-surfaces in loop/docs/. [loop/docs/]
 - 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js] **PARTIAL → 111/113/115** (requiem 111, stone 113, founders 115 shipped; offering + first-snow still open)
 - 115 [code] — offering audio cue: sweeter chord, minor-to-major resolution. Sibling to nightmare's dissonance. [audio.js + story.js]
-- 115 [code] — first-snow audio cue: soft high-freq noise burst, shimmer-heavy. "The sound of snow that isn't quite sound." [audio.js + story.js]
+- 115 [code] — first-snow audio cue: soft high-freq noise burst, shimmer-heavy. "The sound of snow that isn't quite sound." [audio.js + story.js] **DONE → 124** (8 kHz + 6 kHz noise + 1568 Hz sine overtone; gain 0.04; first non-tonal cue in catalog; `onFire: 'first-snow'` validates 123 refactor)
 - 115 [review] — the-balancer first use: character-mechanic cumulative-balance check (3/6 mechanics shipped). Pairs with 101 filed review. Uses tick-114 expanded pool. [play] **DONE → 120** (math-analysis; 75s cumulative speedup across 200-day realm; 5 findings filed)
 - 120 [code] MEDIUM — smith mechanic impact marginal (integer HP rounding). Consider +10% (teacher parity) OR fire-rate axis (`b.fireTimer = 55` with named smith). [combat.js]
 - 120 [code] LOW — teacher bonus diminishes with school count (+10% abs → +4% rel at 3 schools). Optional: make scalable `0.1 + 0.05 * schools`. Design choice. [tech.js]
@@ -135,7 +135,9 @@ and note the promotion here.
 - 090 [code] — migrate 088's first-snow beat into NARRATIVE_BEATS. Trivial once pattern exists. Could use `text: (G) => G.storyFlags.founder1 ? ... : ...`. ~3 lines. [story.js] **DONE → 121** (the-re-shipper, 31 ticks old at ship; table grew 16→17; honors 112 audio-surfaces invariant)
 - 121 [doc] — update audio-surfaces.md invariant "(happiness, first-snow) deliberately have no audio yet" — post-121 only happiness remains inline. [loop/docs/]
 - 121 [code] — first-snow audio cue requires Pattern 2 to distinguish by FLAG not just TAG (since 'milestone' is used by many). Either refine Pattern 2 or promote to `onFire` callback. Required before 115-filed first-snow audio can ship. [audio.js + story.js] **DONE → 123** (shipped `onFire` field refactor; string-form; unblocks 3+ audio cues)
-- 123 [code] — first-snow audio cue via `onFire: 'first-snow'` on entry + new playSound case. ~10 lines. [audio.js + story.js]
+- 123 [code] — first-snow audio cue via `onFire: 'first-snow'` on entry + new playSound case. ~10 lines. [audio.js + story.js] **DONE → 124**
+- 124 [code] — offering audio cue: sweeter chord resolving major — sibling to nightmare dissonance. Closes LAST 106-list audio cue. Pattern 1 via checkOfferingBeat. ~15 lines. [audio.js + story.js]
+- 124 [review] — live-audition of all 5 cues on real speakers (106 nightmare + 111 requiem + 113 stone + 115 founders + 124 first-snow). Each distinct? Gain levels balanced? [play]
 - 123 [code] — constellation audio cue via `onFire: 'constellation'`. Ethereal high tones. [audio.js + story.js]
 - 123 [code] — stone-weathering audio via `onFire: 'stone-weather'`. Could be 113's stone chime pitched lower — "same object, time later." [audio.js + story.js]
 - 123 [review] — live-verify requiem still fires audio in post-123 refactor path when extension reconnects. [play]
