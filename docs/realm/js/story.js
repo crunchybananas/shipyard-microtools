@@ -392,7 +392,7 @@ const NARRATIVE_BEATS = [
         ? `The first autumn stars stand clear above the eastern ridge. ${f}, looking up, names them ${shape}. The realm takes the name.`
         : `The first autumn stars stand clear above the eastern ridge. The elders name the pattern ${shape}. The realm takes the name.`;
     } },
-  { flag: 'realm_fell', tag: 'requiem',
+  { flag: 'realm_fell', tag: 'requiem', onFire: 'requiem',
     trigger: G => G.day > 1 && G.population === 0,
     text: G => {
       const f = G.storyFlags.founder1;
@@ -401,6 +401,18 @@ const NARRATIVE_BEATS = [
         : 'The last fire in the realm goes out. There is no one left to tend it, and no one left to remember.';
     } },
 ];
+// Loop 123 (refactor-only): added optional `onFire` field to
+// NARRATIVE_BEATS entries. Replaces 111's inline `beat.tag ===
+// 'requiem'` audio branch with a per-entry declaration. Per 112 audio-
+// surfaces.md "2-is-coincidence, 3-is-a-pattern" rule: requiem was
+// Pattern 2 alone; with first-snow/constellation/stone-weathers all
+// wanting audio via the table (all tag:milestone or tag:stone that
+// can't be distinguished by tag alone), the pattern needs
+// generalization. onFire is that generalization.
+//
+// Usage: add `onFire: 'nameString'` to any NARRATIVE_BEATS entry; the
+// dispatch loop calls `_PLAY_SOUND(beat.onFire)` after chronicle().
+// Backward-compatible: entries without onFire fire silently, unchanged.
 
 // Run each tick/day to detect milestones and fire beats once.
 export function checkStoryBeats() {
@@ -428,11 +440,12 @@ export function checkStoryBeats() {
       setFlag(beat.flag);
       const text = typeof beat.text === 'function' ? beat.text(G) : beat.text;
       chronicle(text, beat.tag);
-      // Loop 111 (surprise, 106-filed): requiem beat gets a single bell-
-      // toll sound cue. Inverse of 106's nightmare dissonance. Mirrors
-      // the late-bound import pattern from checkNightmareBeat.
-      if (beat.tag === 'requiem') {
-        try { if (_PLAY_SOUND) _PLAY_SOUND('requiem'); } catch (_e) {}
+      // Loop 123 (refactor-only, generalizes 111's inline requiem audio
+      // branch): per-entry `onFire` field. Any NARRATIVE_BEATS entry
+      // with `onFire: 'soundName'` fires that sound after chronicle
+      // writes. Backward-compatible (entries without onFire fire silently).
+      if (beat.onFire) {
+        try { if (_PLAY_SOUND) _PLAY_SOUND(beat.onFire); } catch (_e) {}
       }
     }
   }

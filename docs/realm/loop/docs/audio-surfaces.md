@@ -1,8 +1,8 @@
 # audio-surfaces.md
 
-**Status:** Written in tick 112. Updated 113, 115. Sibling
-to `narrative-surfaces.md` (075). Maintained by subsequent
-audio ticks.
+**Status:** Written in tick 112. Updated 113, 115, 123.
+Sibling to `narrative-surfaces.md` (075). Maintained by
+subsequent audio ticks.
 **Sources:** 106 opened the axis (nightmare sound cue in
 new loop protocol); 111 added requiem bell-toll and
 established the NARRATIVE_BEATS dispatch-loop pattern for
@@ -10,9 +10,15 @@ tag-specific sound fires. 112 captured the design
 philosophy + 2-cue catalog. 113 shipped stone chime (3rd
 cue). 115 shipped founders three-note minor-triad —
 **first use of the-composer challenge added by tick 114's
-expansion**. Pattern 1 count now 3 (nightmare, stone,
-founders); Pattern 2 count still 1 (requiem). No `onFire`
-refactor pressure yet — Pattern 1 scales naturally.
+expansion**. 121 migrated first-snow into NARRATIVE_BEATS
+and surfaced a flag-vs-tag problem in Pattern 2's tag-
+specific branch. **123 refactored Pattern 2 to a per-entry
+`onFire` string field** — tag-branch no longer needed; any
+NARRATIVE_BEATS entry with `onFire: 'soundName'` plays
+that sound on fire. Pattern 1 count: 3 (nightmare, stone,
+founders); Pattern 2 count: 1 (requiem); first-snow/
+constellation/stone-weathers now unblocked for Pattern 2
+audio since tags are no longer distinguishing.
 
 ## why this exists
 
@@ -178,39 +184,42 @@ try {
 Use when: the beat already has a dedicated function (043
 nightmare, 056 stone, 072 founders, 079 offering).
 
-### Pattern 2: dispatch-loop inline branch (requiem)
+### Pattern 2: NARRATIVE_BEATS `onFire` field (requiem, 111 + 123)
 
-111 used this for NARRATIVE_BEATS entries:
+111 shipped this as an inline `beat.tag === 'requiem'`
+branch. 123 generalized to a per-entry `onFire` string field
+when first-snow + constellation + stone-weathers all needed
+audio but shared the `milestone`/`stone` tags with other
+beats. The tag-based branch couldn't distinguish.
+
+Current shape (post-123):
 
 ```js
+{ flag: 'realm_fell', tag: 'requiem', onFire: 'requiem',
+  trigger: ..., text: ... },
+
+// Dispatch loop:
 for (const beat of NARRATIVE_BEATS) {
   if (!hasFlag(beat.flag) && beat.trigger(G)) {
     setFlag(beat.flag);
     chronicle(text, beat.tag);
-    if (beat.tag === 'requiem') {
-      try { if (_PLAY_SOUND) _PLAY_SOUND('requiem'); } catch (_e) {}
+    if (beat.onFire) {
+      try { if (_PLAY_SOUND) _PLAY_SOUND(beat.onFire); } catch (_e) {}
     }
   }
 }
 ```
 
-Use when: the beat lives in NARRATIVE_BEATS (a table
-entry, no bespoke function). Each audio-eligible tag
-gets a tiny branch in the dispatch loop.
+Use when: the beat lives in NARRATIVE_BEATS. Entry gets a
+1-word-string `onFire` field; entries without it fire silently
+(backward compatible).
 
-### When to refactor to an `onFire` callback
+### Historical: "When to refactor to onFire" — triggered at 123
 
-The tag-specific branches scale until ~3-4. Beyond that,
-add an `onFire: (G) => void` field to NARRATIVE_BEATS
-entries:
-
-```js
-{ flag: 'realm_fell', tag: 'requiem', trigger: ..., text: ...,
-  onFire: (G) => { if (_PLAY_SOUND) _PLAY_SOUND('requiem'); } },
-```
-
-Don't generalize until the 3rd tag-specific branch
-lands. 2 is coincidence; 3 is a pattern.
+Earlier versions of this doc said "wait until the 3rd tag-
+branch lands." 123 is when that landed. Pattern 2 is now
+the `onFire` field shape (no longer inline-branch). Future
+audio cues for NARRATIVE_BEATS entries just add an `onFire`.
 
 ## invariants
 
@@ -284,6 +293,17 @@ audio ticks should respect them:
   114 expanded challenge pool (`the-composer`).**
   Contrast table extended to 4 columns; added
   `Structure` row (first multi-note cue).
+- **121** — first-snow migrated to NARRATIVE_BEATS.
+  Surfaced Pattern 2 flag-vs-tag distinguishability
+  problem — blocked further audio cues for table-
+  dispatched beats.
+- **123** — Pattern 2 refactored to `onFire: 'name'`
+  field. Inline `beat.tag === 'requiem'` branch
+  replaced; requiem entry gains `onFire: 'requiem'`
+  field. Pattern 1 usage stays at 3. Future
+  NARRATIVE_BEATS audio cues just add `onFire`;
+  unblocks first-snow/constellation/stone-weathers.
+  Refactor-only — zero user-visible change.
 
 ## how to update this doc
 
