@@ -267,11 +267,18 @@ const NARRATIVE_BEATS = [
   { flag: 'firstBirth',        tag: 'birth',     trigger: G => G.stats && (G.stats.citizensBorn || 0) >= 1, text: 'A child is born in the realm. The first new life to call this land home.' },
   { flag: 'pop10',             tag: 'milestone', trigger: G => G.population >= 10,  text: 'Ten souls now call this land home.' },
   { flag: 'pop25',             tag: 'milestone', trigger: G => G.population >= 25,  text: 'Twenty-five citizens — a true town takes shape.' },
-  { flag: 'pop50',             tag: 'milestone', trigger: G => G.population >= 50,  text: 'Fifty strong! Travelers on the road whisper of the rising realm.' },
+  { flag: 'pop50',             tag: 'milestone', trigger: G => G.population >= 50,  text: 'Fifty strong. Travelers on the road whisper of the rising realm.' },
   { flag: 'pop75',             tag: 'milestone', trigger: G => G.population >= 75,  text: 'Seventy-five subjects. Other lords now watch with envy.' },
   { flag: 'pop100',            tag: 'milestone', trigger: G => G.population >= 100, text: 'One hundred souls. A city is born.' },
+  // Loop 119 (the-fixer, closes 118 HIGH): rewrote castleBuilt to drop
+  // quoted direct speech + exclamation — 118 found this was the ONLY
+  // beat with dialogue and only beat with "!" inside prose. Replaced
+  // with "names it to endure a thousand years; the realm takes the
+  // name" — the trailing clause is a deliberate callback to 116's
+  // constellation beat ("The realm takes the name"), threading the
+  // naming-ceremony voice across castle + constellation surfaces.
   { flag: 'castleBuilt',       tag: 'victory',   trigger: G => G.buildings.some(b => b.type === 'castle'),
-    text: G => { const m = G.namedCharacters.mayor; return `The castle stands complete. ${m ? m.name + ' proclaims,' : 'The heralds proclaim,'} "${G.kingdomName} shall endure a thousand years!"`; } },
+    text: G => { const m = G.namedCharacters.mayor; return `The castle stands complete. ${m ? m.name : 'The heralds'} name it to endure a thousand years; the realm takes the name.`; } },
   { flag: 'firstRaidSurvived', tag: 'raid',      trigger: G => G.stats && G.stats.raidsSurvived >= 1, text: 'The first raid is turned back. The dead are buried; the living drink to the fallen.' },
   // Loop 092: year-milestones migrated from enhancements.js:5082
   // (first cross-file use of NARRATIVE_BEATS). 082 filed the grammar
