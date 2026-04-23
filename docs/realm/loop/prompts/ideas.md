@@ -44,7 +44,12 @@ and note the promotion here.
 - 106 [code] — sound cues for other once-per-realm beats: stone (discovery chime), founders-named (three-note phrase), offering (sweeter chord), first-snow (soft shimmer), requiem (final bell toll OR deliberate silence). Each ~10 lines. [audio.js + story.js] **PARTIAL → 111/113/115** (requiem 111, stone 113, founders 115 shipped; offering + first-snow still open)
 - 115 [code] — offering audio cue: sweeter chord, minor-to-major resolution. Sibling to nightmare's dissonance. [audio.js + story.js]
 - 115 [code] — first-snow audio cue: soft high-freq noise burst, shimmer-heavy. "The sound of snow that isn't quite sound." [audio.js + story.js]
-- 115 [review] — the-balancer first use: character-mechanic cumulative-balance check (3/6 mechanics shipped). Pairs with 101 filed review. Uses tick-114 expanded pool. [play]
+- 115 [review] — the-balancer first use: character-mechanic cumulative-balance check (3/6 mechanics shipped). Pairs with 101 filed review. Uses tick-114 expanded pool. [play] **DONE → 120** (math-analysis; 75s cumulative speedup across 200-day realm; 5 findings filed)
+- 120 [code] MEDIUM — smith mechanic impact marginal (integer HP rounding). Consider +10% (teacher parity) OR fire-rate axis (`b.fireTimer = 55` with named smith). [combat.js]
+- 120 [code] LOW — teacher bonus diminishes with school count (+10% abs → +4% rel at 3 schools). Optional: make scalable `0.1 + 0.05 * schools`. Design choice. [tech.js]
+- 120 [review] — document mechanic-stacking rules BEFORE bard/mayor/rival land. How do future mechanics compose with teacher/merchant/smith? [loop/docs/ or MANIFEST]
+- 120 [review] — live-play balancer verification when extension reconnects. Walk peaceful scenario end-to-end with all 3 mechanics named, measure wall-clock. [play]
+- 120 [code] — verify difficulty-multiplier interaction with the 3 bonuses (Easy/Normal/Hard). Disproportionate impact at tier edges? [tech.js + combat.js + trade.js]
 - 116 [code] — visual constellation render on autumn nights: draw stored shape in sky overlay using small star-sprite clusters. Per-shape position table. ~20 lines. [render.js + story.js]
 - 116 [code] — audio cue for constellation naming (high ethereal tones, very quiet). Slot for the-composer next. [audio.js + story.js]
 - 116 [code] — echo frame specific to constellation: "Old folk still call them ${shape}." Pairs with 059. [story.js]
