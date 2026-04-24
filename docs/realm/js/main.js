@@ -252,7 +252,23 @@ window.loadAndStart = () => {
       const ch = G.chronicle;
       if (ch && ch.length > 0) {
         const last = ch[ch.length - 1];
-        notify(`Where we left off (day ${last.day}): ${last.text}`, 'info', { chronicle: false });
+        // Loop 139 (the-fixer, 133 MEDIUM): real-world wait prefix when
+        // savedAt is available. Thresholds: >= 24h → "Your realm has
+        // been waiting N days." >= 1h → "...a few hours." Below 1h
+        // doesn't warrant a mention — resume feels immediate.
+        let prefix = '';
+        const savedAt = G._savedAt;
+        if (savedAt) {
+          const waitMs = Date.now() - savedAt;
+          const waitDays = Math.floor(waitMs / (24 * 60 * 60 * 1000));
+          if (waitDays >= 1) {
+            prefix = `Your realm has been waiting ${waitDays} day${waitDays === 1 ? '' : 's'}. `;
+          } else if (waitMs >= 60 * 60 * 1000) {
+            prefix = 'Your realm has been waiting a few hours. ';
+          }
+        }
+        notify(`${prefix}Where we left off (day ${last.day}): ${last.text}`, 'info', { chronicle: false });
+        delete G._savedAt;  // one-shot — don't persist after welcome-back
       }
     } catch (_e) {}
   }

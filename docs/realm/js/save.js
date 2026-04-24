@@ -78,6 +78,11 @@ export function saveGame({ silent = false } = {}) {
     state.deathMarkers = Array.isArray(G.deathMarkers)
       ? G.deathMarkers.slice(-40)
       : [];
+    // Loop 139 (the-fixer, 133 MEDIUM): record wall-clock time of save
+    // so loadAndStart can compute real-world wait and surface it in
+    // 135's welcome-back notify. Legacy saves without this field
+    // fall back to "no wait info available" on resume.
+    state.savedAt = Date.now();
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -108,6 +113,9 @@ export function loadGame() {
     G.gameTick = s.gameTick;
     G.nextRaidDay = s.nextRaidDay;
     G.raidInterval = s.raidInterval;
+    // Loop 139: expose savedAt on G so loadAndStart can compute the
+    // real-world wait. Legacy saves without this field: stays undefined.
+    G._savedAt = s.savedAt;
     setSeed(s.seed);
 
     // Rebuild citizens (without jobBuilding refs yet)

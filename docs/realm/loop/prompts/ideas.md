@@ -75,7 +75,9 @@ and note the promotion here.
 - 135 [code] — extend 135 to show last 3 significant beats (filter non-season/misc) instead of just last entry. ~5 lines. [main.js]
 - 135 [code] — if save is older than 24 real-world hours (needs 133 MEDIUM savedAt), prefix with "Your realm has been waiting." Emotional cue. [main.js + save.js]
 - 135 [review] — live-verify full absence trilogy (5s / 2min / cross-session). Each scale should feel right. [play]
-- 133 [code] MEDIUM — record `savedAt: Date.now()` in save.js; compute delta in loadAndStart; surface "your realm has been waiting X days" if > 1 day of real-world absence. [save.js + main.js]
+- 133 [code] MEDIUM — record `savedAt: Date.now()` in save.js; compute delta in loadAndStart; surface "your realm has been waiting X days" if > 1 day of real-world absence. [save.js + main.js] **DONE → 139** (3-tier prefix: <1h silent / 1-24h "a few hours" / ≥1d "N days"; singular-plural grammar; one-shot via delete G._savedAt; legacy saves degrade gracefully)
+- 139 [code] — "a long time" tier for ≥ 30 days real-world wait. Timeless register matches 103 requiem's voice. 1 branch in the if-chain. [main.js]
+- 139 [review] — live-verify each wait-tier prefix variant via localStorage.setItem trick to simulate durations. [play]
 - 133 [code] LOW — persist chronicle filter state (078's `_chronicleFilter`) in G.storyFlags so it survives save/load. 2-3 lines. [story.js]
 - 133 [review] — at tick 150 or 175, audit 114-expansion usage trends. Inform whether pool needs another expansion. [loop/]
 - 134 [code] — extend namesake to actual citizen-name override: pick a recent G.citizens entry and rename to ${f}. Makes the namesake a REAL character in the realm, not just a chronicle beat. ~8 lines. [story.js + state.js]
