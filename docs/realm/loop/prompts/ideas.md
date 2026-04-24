@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 150 [code] — phase 3 exact-match font-size migrations: `.help-close` 0.82→fs-base, `.trade-btn` 0.75→fs-sm, `.tech-name` 0.82→fs-base, `.rp-label` 0.75→fs-sm, `#stats-content` 0.82→fs-base, `.hp-score-label` 0.82→fs-base, `.upgrade-btn` 0.75→fs-sm, `.tt-shortcut kbd` 0.65→fs-xs, `.log-filter-btn` 0.65→fs-xs, `.log-entry` 0.75→fs-sm, etc. ~10-15 more exact-match candidates. Refactor-only, zero-shift. [index.html]
+- 150 [code] — design-shift tick: near-exact migrations are within perceptual threshold individually but cumulatively a design choice. `#missions h3` 0.8→0.82, `.scen-name` 0.8→0.82, `.mission-progress` 0.72→0.75 (+4.2%), `#tooltip` 0.72→0.75, `.sv-stats` 0.85→0.82, `#hud` media query 0.7→0.75. One deliberate tick. [index.html]
+- 150 [review] — live-verify cold-start visual diff after 150's 8 exact-match migrations. Should read as identical (0% shift). [play]
 - 149 [review] — live-audition of all 9 cues together (nightmare / requiem / stone / founders / first-snow / offering / namesake / shepherds / great-storm). Specifically: does great-storm read as "distant past" or just "bass rumble"? Needs real speakers — laptop speakers won't render 72 Hz faithfully. [play]
 - 149 [code] — onFire callback payload form for per-variant audio. Currently `onFire: 'name'` fires the same sound regardless of text variant. For great-storm's 5 variants (wind-through / rain-overflows / east-storm / bronze-sky / lightning-struck-nothing), subtle variation could deepen. File only if 2nd caller wants it — don't generalize preemptively. [audio.js + story.js]
 - 149 [code] — per-kingdom storm-pitch variation. Hash kingdom name to pick D2/D#2/C#2 root. ~4 lines in great-storm case. Matches 111-filed per-kingdom-bell-pitch variation pattern. [audio.js]
