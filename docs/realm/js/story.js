@@ -333,6 +333,35 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 142 (surprise, un-filed): a letter from the other realm.
+  // Opens up the WORLD beyond the island — the realm receives news
+  // from a distant kingdom. Both the distant name and the news are
+  // deterministic per kingdom (different hash seeds than founder/
+  // constellation/stone pools). Cross-realm: same "Avalon" hears
+  // from the same distant kingdom every time. Tag: event (reuse per
+  // 075; 063 added event to _ECHO_SOURCE_TAGS so this can resurface
+  // via 059 echo). Gate: firstMarket (a merchant network to carry
+  // letters) + day ≥ 60 (realm has had time to establish trade).
+  { flag: 'distant_letter_received', tag: 'event',
+    trigger: G => G.storyFlags.firstMarket && G.day >= 60,
+    text: G => {
+      const kname = G.kingdomName || 'Realm';
+      const distantNames = [
+        'Norrith', 'Velar', 'Ashen Fields', 'the Three Bays',
+        'Oldspine', 'Maran', 'Drift-lee', 'Blackwell', 'Sylvain', 'Holm',
+      ];
+      const news = [
+        'grain there is red, and their bells ring at dusk',
+        'the wolves have been hunted clean; a winter-ghost walks their ridge',
+        'their mayor has given their sword to a woman who would not take it',
+        'their river runs backward one morning, then right again by noon',
+        'a new star burns above their mountain, and they have named it',
+        'a child has been born who speaks only in rhymes',
+      ];
+      const dIdx = _dreamHash(`${kname}_distant_name`) % distantNames.length;
+      const nIdx = _dreamHash(`${kname}_distant_news`) % news.length;
+      return `A traveler brings word from ${distantNames[dIdx]}: ${news[nIdx]}.`;
+    } },
   // Loop 138 (surprise, un-filed): the shepherd's song. Once-per-
   // realm ambient beat: after founders are named AND cowpen is built
   // AND the season is cold (autumn/winter) AND the realm has
