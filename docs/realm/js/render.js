@@ -51,7 +51,8 @@ const _WINTER_CAPS = {
   lumber:     { w: 11, h: 3, y: -28 },  // 096: was -29 (floated above chimney)
   market:     { w: 17, h: 2, y: -24 },  // widest + flattest (awning)
   windmill:   { w: 9,  h: 3, y: -28 },  // 096: was -32 (floated above sails)
-  granary:    { w: 15, h: 3, y: -22 },  // 096: was -26, h=4 (stacked-dome look)
+  // granary: entry removed in 158 — dome-conforming render replaces
+  // the ellipse cap for granary specifically (see render block below).
   // Other non-residentials — left at default or small tweaks where distinct
   blacksmith: { w: 14, h: 3, y: -28 },  // baseline (046: blur with barracks)
   barracks:   { w: 13, h: 3, y: -29 },  // slightly narrower + higher
@@ -2997,16 +2998,37 @@ function drawBuilding(ctx, b, s, daylight) {
     // table use the defaults (14/3/-28).
     if (G.season === 'winter' && b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm' && b.type !== 'quarry') {
       ctx.fillStyle = 'rgba(230,240,255,0.85)';
-      const cap = _WINTER_CAPS[b.type] || _WINTER_CAPS._default;
-      const snowY = s.y + cap.y;
-      const snowW = cap.w;
-      ctx.beginPath();
-      ctx.ellipse(s.x, snowY, snowW, cap.h, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Icicles
-      ctx.fillStyle = 'rgba(200,220,255,0.6)';
-      for (let i = -snowW + 3; i < snowW; i += 4) {
-        ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
+      if (b.type === 'granary') {
+        // Loop 158 (the-fixer, closes 095 filed ~63 ticks ago):
+        // granary snow CONFORMS to the dome rather than floating as an
+        // ellipse above it. drawGranary draws an 11-radius dome
+        // centered at y-10; 094's flat ellipse cap (w=15, h=3, y=-26)
+        // read as a stacked second dome, and 096's y=-22 adjustment
+        // narrowed the gap without fixing the shape mismatch. 158
+        // traces the top ~100° of the dome as an arc and fills it as
+        // a cap — matches how snow sits on a rounded silo.
+        ctx.beginPath();
+        ctx.arc(s.x, s.y - 10, 11, Math.PI + 0.55, -0.55);
+        ctx.closePath();
+        ctx.fill();
+        // Icicles drip from the dome surface where snow rests
+        ctx.fillStyle = 'rgba(200,220,255,0.6)';
+        for (let i = -8; i <= 8; i += 4) {
+          const icY = -Math.sqrt(Math.max(0, 121 - i * i)) + (s.y - 10);
+          ctx.fillRect(s.x + i, icY + 1, 1, 2 + Math.abs(i % 3));
+        }
+      } else {
+        const cap = _WINTER_CAPS[b.type] || _WINTER_CAPS._default;
+        const snowY = s.y + cap.y;
+        const snowW = cap.w;
+        ctx.beginPath();
+        ctx.ellipse(s.x, snowY, snowW, cap.h, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Icicles
+        ctx.fillStyle = 'rgba(200,220,255,0.6)';
+        for (let i = -snowW + 3; i < snowW; i += 4) {
+          ctx.fillRect(s.x + i, snowY + 1, 1, 2 + Math.abs(i % 3));
+        }
       }
     }
     // Loop 087 (the-fixer, 086 filed): farm + quarry were excluded

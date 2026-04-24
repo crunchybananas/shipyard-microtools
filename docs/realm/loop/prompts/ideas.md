@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 158 [review] — live-play verify granary dome-conforming cap: build granary on winter map, zoom to 095 screenshot's scale, confirm "sits on dome" not "stacks above." Check day/night. [play]
+- 158 [code] — windmill winter cap could similarly CONFORM to sail geometry: small caps on 4 sail-tips instead of one ellipse above hub. ~15 LoC new windmill branch. [render.js]
+- 158 [code] — dome-conforming snow for church bell-tower spire if rounded cap exists there. Low priority; church reads well already. [render.js]
 - 157 [review] **PRIORITY** — live-play a long-lived realm (day ≥ 60, firstBirth present) to verify 148 wanderer + 152 night-shape fire as intended. Read chronicle; confirm prose lands as ambient, not forced. [play]
 - 157 [review] **PRIORITY** — live-play read of founder-arc saturation. Does chronicle feel founder-heavy or balanced? Without this, 146's compositional hypothesis stays unproven. [play]
 - 157 [code] — first ambient-entity acknowledgment OUTSIDE moratorium (owls or frogs candidate). Signals grammar is PERMANENT, not moratorium-contingent. Deliberately paced (not within 2-3 ticks of 157). [story.js]
@@ -60,7 +63,7 @@ and note the promotion here.
 - 149 [code] — per-kingdom storm-pitch variation. Hash kingdom name to pick D2/D#2/C#2 root. ~4 lines in great-storm case. Matches 111-filed per-kingdom-bell-pitch variation pattern. [audio.js]
 
 - 095 [code] **HIGH** — 3-line `_WINTER_CAPS` fix: windmill y=-32→-28, granary y=-26→-22, lumber y=-29→-28. Closes 095's perceptual "floating cap" finding on 3 building-types without losing width-based pixel-diff distinctness. [render.js] **DONE → 096** (3 y-offsets + granary h=4→3; width axis preserved 18/22/26/30; 9/9 caps now read natural on :8891)
-- 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
+- 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js] **DONE → 158** (arc(s.x, s.y-10, 11, π+0.55, -0.55) matching dome geometry; on-dome icicles at 5 evenly-spaced offsets; `_WINTER_CAPS.granary` entry removed; +22 LoC)
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
 - 095 [review] — re-run this screenshot check after the 3-line 095-HIGH fix lands. Verify residential row reads natural. [play] **DONE → 096** (re-verified in same tick; 9/9 pass)
 - 101 [code] — merchant → trade price modifier. Named merchant: +5% trade return. Mirror of 101's teacher pattern. ~3 lines. [economy.js] **DONE → 102** (2 lines in trade.js; 6-case matrix verified; pattern portable)
