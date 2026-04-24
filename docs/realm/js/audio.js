@@ -514,6 +514,21 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine', 440, 0.050, 0.06, 1.2, t + 0.28);
       break;
     }
+
+    // ── Shepherd's song: Loop 145 (the-composer, 138-filed). Two
+    //    close pitches (G4 = 392 Hz, detuned partner at 395 Hz)
+    //    create ~3 Hz beating that reads as a sustained human voice
+    //    with slight natural wobble — similar trick to 106's
+    //    dissonance but much quieter and slower. Adds a low G3
+    //    drone (196 Hz) at +0.2s for pastoral warmth. Slow attack
+    //    (0.15s) so the voice fades IN rather than announces.
+    //    Heard-from-across-fields register.
+    case 'shepherds-song': {
+      makeOsc(ctx, dest, 'sine', 392, 0.045, 0.15, 2.5, t);
+      makeOsc(ctx, dest, 'sine', 395, 0.030, 0.20, 2.3, t);
+      makeOsc(ctx, dest, 'sine', 196, 0.025, 0.20, 2.2, t + 0.2);
+      break;
+    }
   }
 }
 

@@ -92,8 +92,10 @@ and note the promotion here.
 - 134 [code] — audio cue for namesake via `onFire: 'namesake'`. Soft 3-note child-growth phrase. [audio.js + story.js] **DONE → 137** (shipped as 2-note F4→A4 ascending major 3rd; spoken-name intonation; 7th cue)
 - 137 [code] — per-founder pitch variation for namesake cue: hash `namesake_who` decision also picks the root pitch. ~3 lines. [audio.js]
 - 137 [review] — after more composer ticks, re-audit audio-surfaces.md design philosophy. Is "silent by default, miss-able" still right as catalog grows 7+? [loop/docs/]
-- 138 [code] — audio cue for shepherd's song via `onFire: 'shepherds-song'`. Soft sustained note with small vibrato, or 2-note descent. [audio.js + story.js]
+- 138 [code] — audio cue for shepherd's song via `onFire: 'shepherds-song'`. Soft sustained note with small vibrato, or 2-note descent. [audio.js + story.js] **DONE → 145** (detune-pair 392+395 Hz voice emulation + G3 drone; first voice-emulation cue; 8th catalog entry)
 - 142 [code] — audio cue for distant-letter via `onFire: 'distant-letter'`. Distant-wind or soft horn; could reuse first-snow noise-burst at lower volume. [audio.js + story.js]
+- 145 [code] — shepherd's-song seasonal pitch variation: autumn = G4, winter = F#4 (semitone lower). ~4 lines. [audio.js + story.js]
+- 145 [review] — live-audition of all 8 cues together. Gain balance, emotional-coverage sanity, "pastoral presence" landing correctly. [play]
 - 142 [code] — second-distant-letter at year 3+ (different news fragment, same OR new distant kingdom). [story.js]
 - 142 [code] — "the realm sends word" companion beat (mirror: outbound news). Requires player milestone (e.g., castle built, tech mastered). [story.js]
 - 142 [review] — read all 60 possible distant-letter compositions and verify each reads coherent. Each news fragment should work with any distant name. [loop/]

@@ -62,7 +62,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (7 cues)
+## current catalog (8 cues)
 
 ### `nightmare` — loop 106
 
@@ -213,23 +213,46 @@ quieter — a quiet private moment, not a ceremony.
 `onFire: 'namesake'` field on the NARRATIVE_BEATS
 entry. 4th composer-tick cue.
 
+### `shepherds-song` — loop 145
+
+**Trigger:** 138's `shepherds_song_heard` NARRATIVE_
+BEATS entry. Once-per-realm when founders_named +
+firstCowpen + day ≥ 30 + cold season. Tag: character.
+
+**Sound design:** two close sine pitches (G4 = 392 Hz
++ detuned partner at 395 Hz) produce ~3 Hz beating
+that reads as a sustained voice with natural wobble —
+similar trick to 106's dissonance but much quieter
+and slower. Low G3 drone (196 Hz) at +0.2s adds
+pastoral warmth. Slow attack (0.15-0.20s) so the
+voice fades IN rather than announces. Duration
+~2.5s. Gain 0.045 peak.
+
+**Affect:** heard-from-across-fields, sustained-
+voice register. A person singing to themselves at
+a distance. Contrasts all prior cues (none used
+detuned-pair voice emulation before).
+
+**Code:** `js/audio.js` switch case, Pattern 2 via
+`onFire: 'shepherds-song'`. 5th composer-tick cue.
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) | namesake (137) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Wave | triangle | sine | sine | sine | **noise + sine** | sine | sine |
-| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) | 349 Hz (F4) |
-| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** | ascending major 3rd |
-| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph | 2-note spoken-name |
-| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift | overlap mid-phrase |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s | 0.05-0.06s |
-| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s | 0.4s + 1.2s |
-| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving | intimate, spoken |
-| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 | 0.050 |
+| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) | namesake (137) | shepherds (145) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Wave | triangle | sine | sine | sine | **noise + sine** | sine | sine | sine + detuned |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) | 349 Hz (F4) | 392 Hz (G4) |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** | ascending major 3rd | **3 Hz detune beat** |
+| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph | 2-note spoken-name | sustained voice + drone |
+| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift | overlap mid-phrase | 3 Hz natural wobble |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s | 0.05-0.06s | 0.15-0.20s |
+| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s | 0.4s + 1.2s | 2.2-2.5s |
+| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving | intimate, spoken | heard-from-fields |
+| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 | 0.050 | 0.045 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -401,6 +424,12 @@ audio ticks should respect them:
   of a spoken name. Fires on 134's `namesake_born`
   entry. Extends audio catalog into the
   intergenerational-continuity surface.
+- **145** — shepherd's song. 8th cue; 5th composer
+  use; 4th Pattern-2. Detuned-pair sine (392 + 395
+  Hz) produces ~3 Hz beating that reads as
+  sustained voice. Low G3 drone for warmth. First
+  cue to emulate a human voice via detune trick.
+  Fires on 138's shepherd's-song beat.
 
 ## how to update this doc
 

@@ -370,7 +370,7 @@ const NARRATIVE_BEATS = [
   // door + namesake-candidate + audio-cue participation + shepherd-
   // singer). Compound extends 072 founders + 057 cowpen with a
   // gentle character moment. Tag: character (reuse per 075).
-  { flag: 'shepherds_song_heard', tag: 'character',
+  { flag: 'shepherds_song_heard', tag: 'character', onFire: 'shepherds-song',
     trigger: G => {
       if (!G.storyFlags.founders_named) return false;
       if (!G.storyFlags.firstCowpen) return false;
