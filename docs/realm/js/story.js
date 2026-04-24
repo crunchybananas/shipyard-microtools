@@ -333,6 +333,28 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
+  // a great storm remembered. Location/weather-focal, NO founder
+  // reference. Fires autumn of year 2+ (realm has lived long enough
+  // to REMEMBER something). 5 storm-memory variants picked per-
+  // kingdom hash; "the children born after do not believe it" gives
+  // an intergenerational nod without naming anyone. Tag: event
+  // (reuse per 075 invariant; 063 added event to echo-sources so
+  // this can resurface).
+  { flag: 'great_storm_remembered', tag: 'event',
+    trigger: G => G.storyFlags.year2 && G.season === 'autumn',
+    text: G => {
+      const kname = G.kingdomName || 'Realm';
+      const storms = [
+        `the wind ran through ${kname} for a day and a night and stopped`,
+        'rain fell hard and sideways until the wells overflowed',
+        'a storm came from the east and bent the tallest trees',
+        'the sky went the color of old bronze; no one spoke for an hour',
+        'lightning struck nothing, but was seen for miles',
+      ];
+      const idx = _dreamHash(`${kname}_great_storm`) % storms.length;
+      return `Some of the realm remember a great storm: ${storms[idx]}. The children born after do not believe it.`;
+    } },
   // Loop 142 (surprise, un-filed): a letter from the other realm.
   // Opens up the WORLD beyond the island — the realm receives news
   // from a distant kingdom. Both the distant name and the news are
