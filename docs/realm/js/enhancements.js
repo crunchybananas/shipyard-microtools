@@ -1179,6 +1179,83 @@ export function enhRenderScreen(ctx, logicalW, logicalH) {
 // Loop boundaries (registration order = render order):
 // (none yet — loop 23+ adds here)
 
+// ── Loop 159 — Shooting star crossing the named sky ──────────
+// Un-filed surprise. First post-moratorium graphics evolution.
+// Once per realm, at deep night, AFTER 116's constellation_named
+// beat has fired, a single shooting star streaks across the sky.
+// Silent event — no chronicle, no toast, no UI. The player might
+// catch it if looking; they might miss it entirely.
+//
+// This extends the 116/151 night-sky arc to a third moment:
+// 116 names the realm's constellation; 151 draws it; 159 moves
+// a single star through the sky the realm has named. Three ticks
+// building one coherent night-sky vignette.
+//
+// Respects 016's "space effects too out of place" concern via
+// gating: not generic sky-junk, but a unique moment tied to the
+// realm's naming ceremony. Exactly one occurrence per realm
+// (persistent `G.storyFlags.shooting_star_fired`). Most realms
+// will pass deep nights without seeing it — ~0.3% spawn chance
+// per tick per eligible frame — but long-lived realms past
+// first autumn + day 15 will eventually catch one.
+let _shootingStar = null;
+function _shootingStarTick(logicalW, logicalH) {
+  if (!G.storyFlags) return;
+  if (G.storyFlags.shooting_star_fired) { _shootingStar = null; return; }
+  if (!G.storyFlags.constellation_named) return;
+  const dayl = getDaylight();
+  if (dayl > 0.35) { _shootingStar = null; return; }
+  if (!_shootingStar) {
+    if (Math.random() < 0.003) {
+      const w = logicalW || 1500;
+      const h = logicalH || 800;
+      _shootingStar = {
+        x: 30 + Math.random() * (w * 0.4),
+        y: 20 + Math.random() * (h * 0.15),
+        vx: 12 + Math.random() * 6,
+        vy: 3 + Math.random() * 2,
+        life: 28,
+      };
+    }
+    return;
+  }
+  _shootingStar.x += _shootingStar.vx;
+  _shootingStar.y += _shootingStar.vy;
+  _shootingStar.life -= 1;
+  if (_shootingStar.life <= 0) {
+    _shootingStar = null;
+    G.storyFlags.shooting_star_fired = true;
+  }
+}
+function renderShootingStar(ctx) {
+  if (!_shootingStar) return;
+  const dayl = getDaylight();
+  const ns = Math.max(0, Math.min(1, (0.45 - dayl) / 0.2));
+  if (ns < 0.1) return;
+  const fade = Math.min(1, _shootingStar.life / 10);
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const tx = _shootingStar.x - _shootingStar.vx * 2.5;
+  const ty = _shootingStar.y - _shootingStar.vy * 2.5;
+  const grad = ctx.createLinearGradient(_shootingStar.x, _shootingStar.y, tx, ty);
+  grad.addColorStop(0, `rgba(255,255,240,${ns * fade * 0.95})`);
+  grad.addColorStop(0.5, `rgba(220,235,255,${ns * fade * 0.45})`);
+  grad.addColorStop(1, 'rgba(200,220,255,0)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(_shootingStar.x, _shootingStar.y);
+  ctx.lineTo(tx, ty);
+  ctx.stroke();
+  ctx.fillStyle = `rgba(255,255,255,${ns * fade})`;
+  ctx.beginPath();
+  ctx.arc(_shootingStar.x, _shootingStar.y, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+registerUpdater(_shootingStarTick, true);
+registerScreenRenderer(renderShootingStar);
+
 // ── Loop 048 / 061 — the wanderer ────────────────────────────
 // An element that arrives, crosses, and leaves. Once per season,
 // at some dawn, starting from a random map edge and traversing

@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 159 [review] — live-verify shooting star: fresh Avalon past first autumn, fast-forward deep nights, confirm (a) visible when spawned, (b) sets flag on completion, (c) doesn't fire again post-reload. [play]
+- 159 [code] — second shooting star per realm at much later gate (day ≥ 150 && stone_found && shooting_star_fired): "a second light passes years later." Pairs with 122 stone-weathering as realm-has-aged marker. [enhancements.js]
+- 159 [code] — if a future tick adds a falling-star narrative beat, hook via `after` callback on 116 constellation entry to chronicle the event once. [story.js + enhancements.js]
+- 159 [code] — kingdom-hashed color for the shooting star (warm gold / pale silver / greenish). 3 options in table, ~3 LoC. [enhancements.js]
 - 158 [review] — live-play verify granary dome-conforming cap: build granary on winter map, zoom to 095 screenshot's scale, confirm "sits on dome" not "stacks above." Check day/night. [play]
 - 158 [code] — windmill winter cap could similarly CONFORM to sail geometry: small caps on 4 sail-tips instead of one ellipse above hub. ~15 LoC new windmill branch. [render.js]
 - 158 [code] — dome-conforming snow for church bell-tower spire if rounded cap exists there. Low priority; church reads well already. [render.js]
