@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -38,8 +38,14 @@ NARRATIVE_BEATS entries (see audio-surfaces.md). 124 shipped
 first-snow cue via onFire. 125 shipped offering cue — **closes
 original 106-filed audio list entirely** (6 cues shipped). 128
 (un-filed surprise) added longest_night_seen — founder3 as
-night-watcher, continuing 116's founder-rebalancing. 129 (this
-update) catches the doc up to 116-128.
+night-watcher, continuing 116's founder-rebalancing. 129 caught
+the doc up to 116-128. 134 (un-filed surprise) added
+namesake_born — intergenerational continuity beat (child takes
+a founder's name, kingdom-hashed pick). 137 shipped the
+namesake audio cue (F4→A4 spoken-name intonation). 138 (un-
+filed surprise) added shepherd's song — founder2 at cowpen on
+cold evening; **founder arc fully balanced at 7/5/4**. 141
+(this update) catches the doc up to 134-138.
 
 ## why this exists
 
@@ -97,12 +103,12 @@ Numbered in rough order of file:
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
 5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103, 116,
-   121, 122, 128 extended) — consolidates state-triggered one-
-   shot beats. Each entry: `{ flag, tag, trigger(G)→bool, text:
-   string|(G)→string, onFire?: string }`. Mirrors
+   121, 122, 128, 134, 138 extended) — consolidates state-
+   triggered one-shot beats. Each entry: `{ flag, tag, trigger(G)
+   →bool, text: string|(G)→string, onFire?: string }`. Mirrors
    BUILDING_FIRST_BEATS; sibling table, single dispatch loop.
    123 added the optional `onFire: 'soundName'` string field
-   for audio (see audio-surfaces.md Pattern 2). **Current 19 entries:**
+   for audio (see audio-surfaces.md Pattern 2). **Current 21 entries:**
    - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
      firstRaidSurvived
    - 3 year milestones (092, migrated from enhancements.js): year2,
@@ -129,6 +135,15 @@ Numbered in rough order of file:
      night of first winter (day ≥22 AND dayPhase > 0.85 ×
      dayLength); **founder3 as night-watcher** (4th canonical
      role for founder3)
+   - 1 namesake beat (134, un-filed surprise): once-per-realm
+     when `founders_named && citizensBorn >= 5`; child is born
+     bearing a founder's name (deterministic per kingdom via
+     `_dreamHash(${kname}_namesake_who) % 3`); **`onFire:
+     'namesake'`** (137 — F4→A4 two-note spoken-name intonation)
+   - 1 shepherd's-song beat (138, un-filed surprise): once-per-
+     realm when `founders_named && firstCowpen && day ≥ 30 &&
+     (autumn || winter)`; **founder2 as shepherd-singer** —
+     completes the founder arc rebalance to 7/5/4
 6. **Happiness-threshold beats** (071, recurring with hysteresis,
    `milestone`) — peak ≥80 / crisis ≤20, mid-range 35-65 resets
    flags so cycling works. Kept inline in 090 refactor (re-fire
@@ -410,6 +425,8 @@ raid-toast pollution (-162). Re-measured 083: **156 entries**.
 0-1 constellation beat (116 — first autumn past day 15)
 0-1 longest-night beat (128 — first winter deep night)
 0-1 stone-weathering beat (122 — day ≥150 after stone_found)
+0-1 namesake beat (134 — founders_named + 5 births)
+0-1 shepherd's-song beat (138 — founders_named + cowpen + cold season + day ≥ 30)
 10  character intro + events (034 ensures + bard arrivals)
 20  dreams (every 10 days from day 10; 097 folds founder names in)
 2-4 echoes (2% per-dawn)
@@ -460,6 +477,13 @@ beats that sum near 57 by themselves. 088's first-snow adds
   new beats per long-lived realm: +3 over 104's budget. Still
   well under cap. Audio cues (124/125) don't add chronicle
   entries — they're playback side-effects.
+- **141 (this update): target revised to ~137-178.** 134 adds
+  +1 namesake (founders + 5 births gate). 138 adds +1
+  shepherd's song (founders + cowpen + cold season). Both
+  cross-system conditional — realms that build cowpens before
+  cold season see the shepherd's song; those that don't never
+  do. Peak cadence is still well under 300 cap. 137/139/140
+  (audio, savedAt, tokens) don't add chronicle entries.
 
 ## how to update this doc
 
@@ -547,6 +571,18 @@ shipping, touch this file too.
   filed 97 ticks ago.
 - **128** — longest_night_seen surprise. Founder3 as night-
   watcher; continues 116's rebalancing (cast now 7/4/4).
-- **129** — this maintenance update. Captures 116-128 in the
+- **129** — maintenance update. Captured 116-128 in the
   invariants + NARRATIVE_BEATS entry list (15→19) + cadence
   summary + related-loops.
+- **134** — namesake_born surprise. Intergenerational
+  continuity via kingdom-hashed founder pick.
+- **137** — namesake audio cue via `onFire: 'namesake'`. 7th
+  catalog entry.
+- **138** — shepherd's song surprise. Founder2 gets 5th
+  surface; arc fully balanced at 7/5/4.
+- **139** — savedAt + real-world wait prefix. Re-engagement
+  quintet across 5 absence-magnitudes.
+- **140** — type-scale CSS variables phase 1 (silent-module).
+- **141** — this maintenance update. Captures 134-140 in the
+  NARRATIVE_BEATS entry list (19→21) + cadence summary +
+  related-loops.
