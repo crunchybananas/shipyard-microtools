@@ -333,6 +333,25 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 138 (surprise, un-filed): the shepherd's song. Once-per-
+  // realm ambient beat: after founders are named AND cowpen is built
+  // AND the season is cold (autumn/winter) AND the realm has
+  // settled past day 30, founder2 is heard singing at the cowpen.
+  // Gives founder2 a 5th canonical surface (sky-watcher + hearth-
+  // door + namesake-candidate + audio-cue participation + shepherd-
+  // singer). Compound extends 072 founders + 057 cowpen with a
+  // gentle character moment. Tag: character (reuse per 075).
+  { flag: 'shepherds_song_heard', tag: 'character',
+    trigger: G => {
+      if (!G.storyFlags.founders_named) return false;
+      if (!G.storyFlags.firstCowpen) return false;
+      if (G.day < 30) return false;
+      return G.season === 'autumn' || G.season === 'winter';
+    },
+    text: G => {
+      const f = G.storyFlags.founder2 || 'one of the founders';
+      return `${f} is heard singing at the cowpen one cold evening. The cattle stop moving, briefly, to listen.`;
+    } },
   // Loop 134 (surprise, un-filed): a namesake. Once per realm, if
   // founders have been named (072) AND the realm has had ≥5 births,
   // a child is given one of the founders' names. Which founder is

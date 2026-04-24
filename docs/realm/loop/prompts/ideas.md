@@ -82,6 +82,8 @@ and note the promotion here.
 - 134 [code] — audio cue for namesake via `onFire: 'namesake'`. Soft 3-note child-growth phrase. [audio.js + story.js] **DONE → 137** (shipped as 2-note F4→A4 ascending major 3rd; spoken-name intonation; 7th cue)
 - 137 [code] — per-founder pitch variation for namesake cue: hash `namesake_who` decision also picks the root pitch. ~3 lines. [audio.js]
 - 137 [review] — after more composer ticks, re-audit audio-surfaces.md design philosophy. Is "silent by default, miss-able" still right as catalog grows 7+? [loop/docs/]
+- 138 [code] — audio cue for shepherd's song via `onFire: 'shepherds-song'`. Soft sustained note with small vibrato, or 2-note descent. [audio.js + story.js]
+- 138 [code] — morning-crowing parallel for chickencoop + founder3 (night-watcher → morning-witness). Ambient sibling to shepherd's song. [story.js]
 - 134 [code] — multi-generation beats: "a grandchild of ${f} is born" day 150+ after namesake. [story.js]
 - 134 [review] — after plays, does namesake text read well with various founder names (short/long syllable counts)? [play]
 - 131 [code] MEDIUM — biome variants (temperate/arid/boreal) with biome-conditional TILE_COLORS + optional prose flavor. 50+ lines. Larger design scope. [state.js + world.js + render.js]
