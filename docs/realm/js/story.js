@@ -333,6 +333,20 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 148 (surprise, un-filed, moratorium tick 2): wanderer
+  // acknowledgment. 048 introduced the silent walker; 061 renamed it
+  // `_wanderer` internally but kept it player-anonymous. 87 ticks
+  // after 061, the wanderer still has ZERO narrative surface. 148
+  // gives it ONE — a chronicle beat that acknowledges without
+  // naming. Honors 048's original intent ("see if a later iteration
+  // names it") by explicitly NOT naming. Tag: misc (reuse per 075;
+  // aligns with elder-sayings' edge-of-voice register). Fires day
+  // ≥ 50 (realm has lived long enough to have seen the figure at
+  // least once — wanderer spawn is 55% per non-winter season, so
+  // by year 2 the ~80%+ of realms have witnessed).
+  { flag: 'wanderer_acknowledged', tag: 'misc',
+    trigger: G => G.day >= 50,
+    text: 'There is a figure that crosses the realm from one edge to the other, some seasons. No one knows where they go. No one calls them anything.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder
   // reference. Fires autumn of year 2+ (realm has lived long enough

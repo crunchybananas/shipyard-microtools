@@ -99,7 +99,9 @@ and note the promotion here.
 - 146 [review] **founder-moratorium check-in** — at tick 157, audit whether the 147-156 window stayed non-founder in narrative surfaces. Metrics: ≥ 3 non-founder surprises, ≥ 2 new focal points, founder-surface increase ≤ 1. [loop/]
 - 147 [code] — audio cue `onFire: 'great-storm'` — distant-wind + rain texture. [audio.js + story.js]
 - 147 [code] — location-focal beat ("the northern cliff feels empty this autumn"). Map direction as focal, no characters. [story.js]
-- 147 [code] — wanderer-acknowledgment beat (048/061 _wanderer still has no narrative surface). Moratorium-compliant. [story.js + enhancements.js]
+- 147 [code] — wanderer-acknowledgment beat (048/061 _wanderer still has no narrative surface). Moratorium-compliant. [story.js + enhancements.js] **DONE → 148** (static string; tag:misc; day ≥ 50 gate; "No one calls them anything" preserves 048's anonymous intent)
+- 148 [code] — wanderer continuous audio (footstep ambient when _wanderer is visible on-screen). Needs visibility hook from enhancements.js. [audio.js + enhancements.js]
+- 148 [review] — does the "No one calls them anything" prose land as mysterious or incomplete across multiple realms? [loop/]
 - 142 [code] — second-distant-letter at year 3+ (different news fragment, same OR new distant kingdom). [story.js]
 - 142 [code] — "the realm sends word" companion beat (mirror: outbound news). Requires player milestone (e.g., castle built, tech mastered). [story.js]
 - 142 [review] — read all 60 possible distant-letter compositions and verify each reads coherent. Each news fragment should work with any distant name. [loop/]
