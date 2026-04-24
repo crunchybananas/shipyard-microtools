@@ -86,8 +86,15 @@ export function generateWorld(){
     }
   }
 
-  // River — carve from near center toward coast
-  let rx = sx + 4, ry = sy;
+  // River — carve from near center toward coast. Loop 136 (the-fixer,
+  // 131 MEDIUM): river direction is now per-kingdom (4-way) via the
+  // 132-seeded RNG. Pre-136 every realm's river flowed east; now each
+  // kingdom gets its own. Cross-realm memory: a player will remember
+  // "Avalon's river flowed south" as distinct from "Kestrel's flowed west".
+  const dir = Math.floor(rng() * 4);  // 0=E, 1=S, 2=W, 3=N
+  const [dxDir, dyDir] = [[1,0], [0,1], [-1,0], [0,-1]][dir];
+  let rx = sx + 4 * dxDir;
+  let ry = sy + 4 * dyDir;
   for (let step = 0; step < 35; step++) {
     if (rx < 1 || rx >= MAP_W-1 || ry < 1 || ry >= MAP_H-1) break;
     if (G.map[ry][rx] === TILE.WATER) break;
@@ -100,9 +107,11 @@ export function generateWorld(){
         if (G.map[by][bx] !== TILE.SAND) G.map[by][bx] = TILE.SAND;
       }
     }
-    // Flow generally toward the nearest edge with some meandering
-    rx += 1;
-    ry += Math.round(rng() * 2 - 1);
+    // Flow in primary direction with perpendicular meander
+    rx += dxDir;
+    ry += dyDir;
+    if (dxDir !== 0) ry += Math.round(rng() * 2 - 1);  // horizontal flow → vertical meander
+    else             rx += Math.round(rng() * 2 - 1);  // vertical flow → horizontal meander
   }
 
   revealAround(sx, sy, 9);

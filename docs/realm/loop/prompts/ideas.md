@@ -83,7 +83,10 @@ and note the promotion here.
 - 134 [code] — multi-generation beats: "a grandchild of ${f} is born" day 150+ after namesake. [story.js]
 - 134 [review] — after plays, does namesake text read well with various founder names (short/long syllable counts)? [play]
 - 131 [code] MEDIUM — biome variants (temperate/arid/boreal) with biome-conditional TILE_COLORS + optional prose flavor. 50+ lines. Larger design scope. [state.js + world.js + render.js]
-- 131 [code] MEDIUM — river direction per-kingdom (currently always flows east). With 131 HIGH landed: 4-way direction hashed from kingdom. ~5 lines. [world.js]
+- 131 [code] MEDIUM — river direction per-kingdom (currently always flows east). With 131 HIGH landed: 4-way direction hashed from kingdom. ~5 lines. [world.js] **DONE → 136** (4-way via rng() post 132 kingdom-seed; meander swaps axis perpendicular to flow)
+- 136 [code] — quiet river-direction chronicle beat at day 1: "The river runs ${dir} through the fields." Adds early topological flavor. ~5 lines. [story.js]
+- 136 [review] — resource-cluster layout comparison across river directions. Does river direction affect scenario balance feel? [play + world.js]
+- 136 [code] — branching rivers (T-junction at center). Major scope. [world.js]
 - 131 [code] LOW — resource-cluster count per scenario/difficulty. Peaceful=15, Industrial=25. ~3 lines. [world.js]
 - 131 [review] — actual tile-decoration audit via live play (when extension reconnects). 73+ registerWorldRenderer matches in enhancements.js; content unknown. [play]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
