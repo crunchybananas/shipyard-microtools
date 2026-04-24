@@ -187,15 +187,22 @@ export function updateTowers() {
       if (d < range && d < bestD) { target = e; bestD = d; }
     }
     if (target) {
-      b.fireTimer = 60; // 1 sec cooldown
       // Loop 105 (the-fixer, 101/102 sibling): named smith adds +5%
       // projectile damage. Same pattern as teacher (101 research) and
       // merchant (102 trade). Third named-character → mechanic
       // graduation. Silent effect — no UI, no chronicle beat.
-      const smithMult = G.namedCharacters?.smith ? 1.05 : 1;
+      //
+      // Loop 153 (the-fixer, closes 120 MEDIUM): swapped from +5%
+      // damage to +5% fire-rate. 120's balance audit found the damage
+      // axis ran into integer HP-rounding at common raider HPs
+      // (10→10.5 damage rarely changed kill counts). Fire-rate is
+      // continuous — affects every shot at every HP. Same ~5% DPS
+      // magnitude but now perceivable in every engagement.
+      const smithBonus = G.namedCharacters?.smith ? 1.05 : 1;
+      b.fireTimer = 60 / smithBonus; // 60 ticks base; ~57.1 with smith
       G.projectiles.push({
         x: b.x, y: b.y, tx: target.x, ty: target.y,
-        target, damage: 10 * smithMult, life: 40,
+        target, damage: 10, life: 40,
         type: 'arrow',
       });
     }

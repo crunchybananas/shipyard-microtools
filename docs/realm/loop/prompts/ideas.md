@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 153 [review] — live-verify smith fire-rate: fresh realm w/ smith named vs w/o (use G hack); measure kill times against 10 raiders; confirm perceptual ~5% faster. [play]
+- 153 [code] — remaining named-character mechanics (bard/mayor/rival). 120 audit flagged bard (happiness), mayor (civic), rival (negative modifier). 3 of 6 graduated post-153. Each ~5 LoC. [?]
+- 153 [code] — fire-rate as per-tower upgrade (2nd tier: higher cost, faster fire). Separate axis from smith. [combat.js + buildings.js]
 - 152 [code] — additional ambient-entity acknowledgment beats. Each 1-beat per entity, acknowledge-without-naming pattern: **owls** ("at night there are calls that no one answers"), **frogs** ("after rain the water-edges speak in two voices"), **rams** ("the ridge-sheep find their own paths"), **trade ships** ("sails pass through the mouth of the river that never stop"). Each ~15 LoC, misc/event tag, different gates. Could stretch into a small arc across ticks without crowding founder arc. [story.js]
 - 152 [code] — audio cue for night-shape: very soft shimmery texture, 0.2s spike then gone. Tie via `onFire: 'night-shape'`. Would be 10th audio cue. [audio.js + story.js]
 - 152 [review] — live-verify: fresh realm, fast-forward day 60 with citizens; verify beat fires; also verify doesn't fire pre-firstBirth. [play]
@@ -59,7 +62,7 @@ and note the promotion here.
 - 115 [code] — offering audio cue: sweeter chord, minor-to-major resolution. Sibling to nightmare's dissonance. [audio.js + story.js]
 - 115 [code] — first-snow audio cue: soft high-freq noise burst, shimmer-heavy. "The sound of snow that isn't quite sound." [audio.js + story.js] **DONE → 124** (8 kHz + 6 kHz noise + 1568 Hz sine overtone; gain 0.04; first non-tonal cue in catalog; `onFire: 'first-snow'` validates 123 refactor)
 - 115 [review] — the-balancer first use: character-mechanic cumulative-balance check (3/6 mechanics shipped). Pairs with 101 filed review. Uses tick-114 expanded pool. [play] **DONE → 120** (math-analysis; 75s cumulative speedup across 200-day realm; 5 findings filed)
-- 120 [code] MEDIUM — smith mechanic impact marginal (integer HP rounding). Consider +10% (teacher parity) OR fire-rate axis (`b.fireTimer = 55` with named smith). [combat.js]
+- 120 [code] MEDIUM — smith mechanic impact marginal (integer HP rounding). Consider +10% (teacher parity) OR fire-rate axis (`b.fireTimer = 55` with named smith). [combat.js] **DONE → 153** (shipped as fire-rate: `b.fireTimer = 60 / smithBonus` → 57.14; same ~5% DPS magnitude, continuous across all HPs; damage reverted to clean 10; teacher/merchant/smith all at +5% parity)
 - 120 [code] LOW — teacher bonus diminishes with school count (+10% abs → +4% rel at 3 schools). Optional: make scalable `0.1 + 0.05 * schools`. Design choice. [tech.js]
 - 120 [review] — document mechanic-stacking rules BEFORE bard/mayor/rival land. How do future mechanics compose with teacher/merchant/smith? [loop/docs/ or MANIFEST]
 - 120 [review] — live-play balancer verification when extension reconnects. Walk peaceful scenario end-to-end with all 3 mechanics named, measure wall-clock. [play]
