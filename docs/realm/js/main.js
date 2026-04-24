@@ -2,7 +2,7 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve } from './state.js';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render, renderBuildingIsolated } from './render.js';
@@ -208,6 +208,18 @@ window.setScenario = (id) => {
 window.startNewGame = () => {
   // Apply difficulty settings to starting resources
   const diff = getDifficulty();
+  // Loop 132 (the-fixer, 131 HIGH): seed map RNG from kingdom name so
+  // topology is reproducible per kingdom. Before 132, `_seed` was
+  // `Date.now() % 100000` — two realms named the same thing at
+  // different times got different islands. 132 reads the name first,
+  // then seeds the RNG, then generates. Same kingdom → same island.
+  const nameInput = document.getElementById('kingdom-name-input');
+  G.kingdomName = (nameInput && nameInput.value.trim()) || 'Realm';
+  let kh = 0;
+  for (let i = 0; i < G.kingdomName.length; i++) {
+    kh = ((kh << 5) - kh + G.kingdomName.charCodeAt(i)) | 0;
+  }
+  setSeed(Math.abs(kh) || 1);
   generateWorld();
   if (gl3dReady) buildTerrainMesh(); // pre-build 3D mesh after world gen
   G.resources.food = diff.startFood;
@@ -221,8 +233,6 @@ window.startNewGame = () => {
     G.nextRaidDay = scen.raidStart;
   }
   G._scenarioWon = false;
-  const nameInput = document.getElementById('kingdom-name-input');
-  G.kingdomName = (nameInput && nameInput.value.trim()) || 'Realm';
   beginGame();
 };
 
