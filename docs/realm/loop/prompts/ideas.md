@@ -64,6 +64,9 @@ and note the promotion here.
 - 128 [doc] — narrative-surfaces.md catch-up: NARRATIVE_BEATS now 19 entries post-116/121/122/128. Doc says 15. Archivist tick to sync. [loop/docs/] **DONE → 129** (+62 net LoC; doc updated through 128; cadence budget revised 130-170→135-175)
 - 129 [doc] — formalize "catch-up every ~15-20 ticks" as acceptable protocol in MANIFEST or narrative-surfaces.md. 075 invariant is aspirational; reality pattern is catch-up-driven (075 → 080 → 084 → 091 → 104 → 129 every ~20 ticks). [MANIFEST or loop/docs/]
 - 129 [code] — programmatic drift check: count `chronicle(` callsites, NARRATIVE_BEATS entries, TAG_ICONS keys; fail CI on drift vs doc. 075 filed; still open. Would eliminate catch-up friction. [scripts/]
+- 130 [code] **HIGH** — define `--fs-xs` through `--fs-2xl` CSS variables in `:root`; migrate ~100 font-size declarations across index.html to use them. Consolidates 26 unique sizes → 6-8 tier scale. Refactor-only or the-re-shipper shape. [index.html]
+- 130 [code] MEDIUM — raise low-opacity body-text colors from rgba(255,255,255,0.4-0.5) to 0.6-0.65 for WCAG AA compliance. ~10-15 selectors. [index.html]
+- 130 [review] — after 130 HIGH var-migration lands, re-audit font-size usage: only 6-8 tiers remain? no new orphan values introduced? [index.html]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
 - 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)
