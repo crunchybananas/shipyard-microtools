@@ -284,49 +284,67 @@ export function renderPuddles(ctx) {
   ctx.globalAlpha = 1;
 }
 
-// ── Loop 16: Constellation patterns connecting bright stars ─
-// Hand-crafted "constellation" line patterns drawn at fixed
-// screen-space positions, only at deep night.
-const CONSTELLATIONS = [
-  // each: array of [xFrac, yFrac] points; lines connect sequentially
-  { name: 'dragon',  pts: [[0.12,0.10],[0.16,0.13],[0.21,0.11],[0.26,0.14],[0.30,0.12],[0.34,0.16],[0.32,0.21]] },
-  { name: 'cup',     pts: [[0.50,0.08],[0.54,0.12],[0.58,0.08],[0.54,0.16],[0.54,0.20]] },
-  { name: 'archer',  pts: [[0.74,0.18],[0.77,0.13],[0.80,0.18],[0.83,0.13],[0.81,0.22]] },
-];
+// ── Loop 16 / 151 — Kingdom constellation ───────────────────
+// 016 shipped hand-crafted 3-constellation patterns but the
+// path was disabled with a "space effects removed" early return.
+// 151 (the-fixer, closes 116 filed 35 ticks) reactivates the
+// path with kingdom-specific content: the constellation named
+// by 116's `constellation_named` narrative beat now actually
+// appears in the night sky.
+//
+// Shape is seeded from the kingdom name (same hash family as
+// story.js:_dreamHash) so each realm has its OWN asterism.
+// 5-7 points, confined to upper ~22% of screen. Drawn only
+// after the 116 beat has fired (the realm has to *name* it
+// before it appears) — this keeps the sky unmarked in young
+// realms and gives the 116 beat a quiet visual payoff later.
+let _constShapeCache = null;
+let _constShapeKey = null;
+function _kingdomConstellationPts() {
+  const kname = (G.kingdomName || 'Realm');
+  if (_constShapeKey === kname && _constShapeCache) return _constShapeCache;
+  let h = 0;
+  const s = `${kname}_constellation_pts`;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  const nPts = 5 + (Math.abs(h) % 3); // 5, 6, or 7 points per asterism
+  const pts = [];
+  let cursor = h;
+  for (let i = 0; i < nPts; i++) {
+    cursor = ((cursor << 5) - cursor + i * 2654435761) | 0;
+    const fx = 0.15 + ((Math.abs(cursor) % 1000) / 1000) * 0.70;
+    cursor = ((cursor << 5) - cursor + 7919) | 0;
+    const fy = 0.05 + ((Math.abs(cursor) % 1000) / 1000) * 0.17;
+    pts.push([fx, fy]);
+  }
+  _constShapeCache = pts;
+  _constShapeKey = kname;
+  return pts;
+}
 export function renderConstellations(ctx, logicalW, logicalH) {
-  return; // disabled — space effects removed
+  if (!G.storyFlags?.constellation_named) return;
   const dayl = getDaylight();
   const nightStrength = Math.max(0, Math.min(1, (0.7 - dayl) / 0.25));
   if (nightStrength < 0.1) return;
+  const pts = _kingdomConstellationPts();
   ctx.save();
-  ctx.strokeStyle = `rgba(180,200,255,${nightStrength * 0.18})`;
+  // Connecting lines — very faint; the asterism is read from the
+  // stars themselves, the lines are a hint, not a banner.
+  ctx.strokeStyle = `rgba(180,200,255,${nightStrength * 0.15})`;
   ctx.lineWidth = 0.8;
-  ctx.fillStyle = `rgba(220,235,255,${nightStrength * 0.95})`;
-  for (const c of CONSTELLATIONS) {
-    // Lines
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const x = pts[i][0] * logicalW, y = pts[i][1] * logicalH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  // Brighter vertex stars — slightly larger than the 180-star field
+  // so they catch the eye without overwhelming it.
+  ctx.fillStyle = `rgba(235,240,255,${nightStrength * 0.9})`;
+  for (const [fx, fy] of pts) {
+    const x = fx * logicalW, y = fy * logicalH;
     ctx.beginPath();
-    for (let i = 0; i < c.pts.length; i++) {
-      const [fx, fy] = c.pts[i];
-      const x = fx * logicalW, y = fy * logicalH;
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    // Brighter star at each vertex
-    for (const [fx, fy] of c.pts) {
-      const x = fx * logicalW, y = fy * logicalH;
-      ctx.beginPath();
-      ctx.arc(x, y, 1.6, 0, Math.PI * 2);
-      ctx.fill();
-      // Cross sparkle
-      ctx.strokeStyle = `rgba(220,235,255,${nightStrength * 0.55})`;
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(x - 3, y); ctx.lineTo(x + 3, y);
-      ctx.moveTo(x, y - 3); ctx.lineTo(x, y + 3);
-      ctx.stroke();
-      ctx.strokeStyle = `rgba(180,200,255,${nightStrength * 0.18})`;
-      ctx.lineWidth = 0.8;
-    }
+    ctx.arc(x, y, 1.7, 0, Math.PI * 2);
+    ctx.fill();
   }
   ctx.restore();
 }

@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 151 [code] — constellation audio cue via `onFire: 'constellation'` on 116 entry. Bright twinkling chime; pairs with 113 stone (discovery-coded) but higher register and shorter. 10th audio cue. [audio.js + story.js]
+- 151 [code] — per-shape curated asterisms. Hand-design point arrays for all 20 shapes in 116's pool so "the Plough" actually looks like a plough, etc. ~200 LoC of data; its own graphics tick. [enhancements.js]
+- 151 [code] — subtle twinkle on constellation vertices (sine-based, matches 180-star field). ~3 lines. [enhancements.js]
+- 151 [review] — live-play: fresh Avalon vs fresh Kestrel — do constellations look visually distinct? Pre-day-15 sky blank vs post-autumn-beat asterism visible? [play]
 - 150 [code] — phase 3 exact-match font-size migrations: `.help-close` 0.82→fs-base, `.trade-btn` 0.75→fs-sm, `.tech-name` 0.82→fs-base, `.rp-label` 0.75→fs-sm, `#stats-content` 0.82→fs-base, `.hp-score-label` 0.82→fs-base, `.upgrade-btn` 0.75→fs-sm, `.tt-shortcut kbd` 0.65→fs-xs, `.log-filter-btn` 0.65→fs-xs, `.log-entry` 0.75→fs-sm, etc. ~10-15 more exact-match candidates. Refactor-only, zero-shift. [index.html]
 - 150 [code] — design-shift tick: near-exact migrations are within perceptual threshold individually but cumulatively a design choice. `#missions h3` 0.8→0.82, `.scen-name` 0.8→0.82, `.mission-progress` 0.72→0.75 (+4.2%), `#tooltip` 0.72→0.75, `.sv-stats` 0.85→0.82, `#hud` media query 0.7→0.75. One deliberate tick. [index.html]
 - 150 [review] — live-verify cold-start visual diff after 150's 8 exact-match migrations. Should read as identical (0% shift). [play]
@@ -57,7 +61,7 @@ and note the promotion here.
 - 120 [review] — document mechanic-stacking rules BEFORE bard/mayor/rival land. How do future mechanics compose with teacher/merchant/smith? [loop/docs/ or MANIFEST]
 - 120 [review] — live-play balancer verification when extension reconnects. Walk peaceful scenario end-to-end with all 3 mechanics named, measure wall-clock. [play]
 - 120 [code] — verify difficulty-multiplier interaction with the 3 bonuses (Easy/Normal/Hard). Disproportionate impact at tier edges? [tech.js + combat.js + trade.js]
-- 116 [code] — visual constellation render on autumn nights: draw stored shape in sky overlay using small star-sprite clusters. Per-shape position table. ~20 lines. [render.js + story.js]
+- 116 [code] — visual constellation render on autumn nights: draw stored shape in sky overlay using small star-sprite clusters. Per-shape position table. ~20 lines. [render.js + story.js] **DONE → 151** (reactivated 016 disabled `renderConstellations`; procedural kingdom-hashed asterism 5-7 points upper 17%/70%; gated on `constellation_named`; cached per kingdom; +18 LoC net)
 - 116 [code] — audio cue for constellation naming (high ethereal tones, very quiet). Slot for the-composer next. [audio.js + story.js]
 - 116 [code] — echo frame specific to constellation: "Old folk still call them ${shape}." Pairs with 059. [story.js]
 - 116 [review] — long-play read: do the 20 constellation names feel distinctive or interchangeable? Tune pool. [play]
