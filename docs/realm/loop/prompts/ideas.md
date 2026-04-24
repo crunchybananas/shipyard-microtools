@@ -67,6 +67,11 @@ and note the promotion here.
 - 130 [code] **HIGH** — define `--fs-xs` through `--fs-2xl` CSS variables in `:root`; migrate ~100 font-size declarations across index.html to use them. Consolidates 26 unique sizes → 6-8 tier scale. Refactor-only or the-re-shipper shape. [index.html]
 - 130 [code] MEDIUM — raise low-opacity body-text colors from rgba(255,255,255,0.4-0.5) to 0.6-0.65 for WCAG AA compliance. ~10-15 selectors. [index.html]
 - 130 [review] — after 130 HIGH var-migration lands, re-audit font-size usage: only 6-8 tiers remain? no new orphan values introduced? [index.html]
+- 131 [code] **HIGH** — seed the map from kingdom name in startNewGame (currently seeded from `Date.now() % 100000`). Makes topology reproducible per kingdom. 1-2 lines. [state.js + world.js + main.js]
+- 131 [code] MEDIUM — biome variants (temperate/arid/boreal) with biome-conditional TILE_COLORS + optional prose flavor. 50+ lines. Larger design scope. [state.js + world.js + render.js]
+- 131 [code] MEDIUM — river direction per-kingdom (currently always flows east). With 131 HIGH landed: 4-way direction hashed from kingdom. ~5 lines. [world.js]
+- 131 [code] LOW — resource-cluster count per scenario/difficulty. Peaceful=15, Industrial=25. ~3 lines. [world.js]
+- 131 [review] — actual tile-decoration audit via live play (when extension reconnects). 73+ registerWorldRenderer matches in enhancements.js; content unknown. [play]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
 - 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)
