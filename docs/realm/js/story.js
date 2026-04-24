@@ -399,6 +399,20 @@ const NARRATIVE_BEATS = [
       const key = ['founder1', 'founder2', 'founder3'][idx];
       const f = G.storyFlags[key] || 'the founder';
       return `A child is born in the realm and takes the name ${f}. The news carries from house to house — no one gathers, but no one stays still.`;
+    },
+    // Loop 144 (the-fixer, 134 filed): actually rename the newest
+    // citizen so the namesake is a real character in the realm, not
+    // just a chronicle beat. Recomputes the same founder pick.
+    after: G => {
+      if (!G.citizens || G.citizens.length === 0) return;
+      const kname = G.kingdomName || 'Realm';
+      const idx = _dreamHash(`${kname}_namesake_who`) % 3;
+      const key = ['founder1', 'founder2', 'founder3'][idx];
+      const f = G.storyFlags[key];
+      if (!f) return;
+      // Newest citizen (most recently born/added).
+      const c = G.citizens[G.citizens.length - 1];
+      if (c && c.name !== f) c.name = f;
     } },
   // Loop 128 (surprise, un-filed): the longest night. Once per realm,
   // fires deep in a winter night (first winter is days 22-28;
@@ -527,6 +541,14 @@ export function checkStoryBeats() {
       // writes. Backward-compatible (entries without onFire fire silently).
       if (beat.onFire) {
         try { if (_PLAY_SOUND) _PLAY_SOUND(beat.onFire); } catch (_e) {}
+      }
+      // Loop 144 (the-fixer, 134 filed): `after(G)` callback for
+      // arbitrary side effects. Mirrors BUILDING_FIRST_BEATS' after:
+      // field used for ensureCharacter hooks. Runs AFTER chronicle
+      // and onFire audio — chronicle is the contract; side effects
+      // are garnish.
+      if (typeof beat.after === 'function') {
+        try { beat.after(G); } catch (_e) {}
       }
     }
   }
