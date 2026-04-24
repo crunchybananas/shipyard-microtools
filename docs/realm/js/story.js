@@ -347,6 +347,21 @@ const NARRATIVE_BEATS = [
   { flag: 'wanderer_acknowledged', tag: 'misc',
     trigger: G => G.day >= 50,
     text: 'There is a figure that crosses the realm from one edge to the other, some seasons. No one knows where they go. No one calls them anything.' },
+  // Loop 152 (surprise, un-filed, tick-146 founder-moratorium tick 6):
+  // sibling to 148 — an ambient entity that has visual presence (enh.js
+  // Loop 31 'ghosts' — wispy wraith spawning on grass/forest late at
+  // night, ~30% per 500 ticks, zoom ≥ 0.7 only) but zero narrative
+  // surface after 121 ticks. 148 gave the wanderer its first; 152
+  // gives the ghost its first. Different focal: wanderer is a figure
+  // that crosses edge-to-edge by day; the 152 surface is something
+  // seen at night, by children, not confirmed by elders. Acknowledges
+  // without naming (no "ghost" word in prose — 142 uses "winter-
+  // ghost" for a DISTANT realm's news, keeping our ambiguity intact).
+  // Tag: misc (reuse per 075 invariant; elder-saying register like
+  // 148). Gate: day ≥ 60 + firstBirth (need children to have seen it).
+  { flag: 'night_shape_seen', tag: 'misc',
+    trigger: G => G.day >= 60 && G.storyFlags.firstBirth,
+    text: 'There are nights when the youngest in the realm speak of a bright shape in the fields. No one asks them to describe it.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder
   // reference. Fires autumn of year 2+ (realm has lived long enough

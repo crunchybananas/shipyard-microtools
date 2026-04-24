@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 152 [code] — additional ambient-entity acknowledgment beats. Each 1-beat per entity, acknowledge-without-naming pattern: **owls** ("at night there are calls that no one answers"), **frogs** ("after rain the water-edges speak in two voices"), **rams** ("the ridge-sheep find their own paths"), **trade ships** ("sails pass through the mouth of the river that never stop"). Each ~15 LoC, misc/event tag, different gates. Could stretch into a small arc across ticks without crowding founder arc. [story.js]
+- 152 [code] — audio cue for night-shape: very soft shimmery texture, 0.2s spike then gone. Tie via `onFire: 'night-shape'`. Would be 10th audio cue. [audio.js + story.js]
+- 152 [review] — live-verify: fresh realm, fast-forward day 60 with citizens; verify beat fires; also verify doesn't fire pre-firstBirth. [play]
 - 151 [code] — constellation audio cue via `onFire: 'constellation'` on 116 entry. Bright twinkling chime; pairs with 113 stone (discovery-coded) but higher register and shorter. 10th audio cue. [audio.js + story.js]
 - 151 [code] — per-shape curated asterisms. Hand-design point arrays for all 20 shapes in 116's pool so "the Plough" actually looks like a plough, etc. ~200 LoC of data; its own graphics tick. [enhancements.js]
 - 151 [code] — subtle twinkle on constellation vertices (sine-based, matches 180-star field). ~3 lines. [enhancements.js]
