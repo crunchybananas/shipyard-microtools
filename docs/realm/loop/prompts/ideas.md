@@ -28,6 +28,11 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 157 [review] **PRIORITY** — live-play a long-lived realm (day ≥ 60, firstBirth present) to verify 148 wanderer + 152 night-shape fire as intended. Read chronicle; confirm prose lands as ambient, not forced. [play]
+- 157 [review] **PRIORITY** — live-play read of founder-arc saturation. Does chronicle feel founder-heavy or balanced? Without this, 146's compositional hypothesis stays unproven. [play]
+- 157 [code] — first ambient-entity acknowledgment OUTSIDE moratorium (owls or frogs candidate). Signals grammar is PERMANENT, not moratorium-contingent. Deliberately paced (not within 2-3 ticks of 157). [story.js]
+- 157 [review] — next the-contrarian candidates: named-character chain (3/6), type-scale series, dream pool expansion. Each could benefit from a pattern-check. [journal]
+- 157 [meta] — document the milestone-check-in protocol as a loop-level practice in MANIFEST (like 114 did for expansion challenges). "Propose multi-tick constraints with pre-scheduled check-in ticks." [MANIFEST or loop/docs/]
 - 155 [review] — audit audio-surfaces.md cadence: is it due for a 112-archivist-style catch-up separate from same-commit-per-cue maintenance? [loop/docs/]
 - 155 [code] — extract ambient-entity acknowledgment grammar to a micro-helper or template comment at top of NARRATIVE_BEATS in story.js so next ambient tick doesn't re-derive. ~8 LoC. [story.js] **DONE → 156** (29-line template comment block with 6 rules + candidate entity list + queue-drain warning; points at narrative-surfaces.md as canonical spec)
 - 155 [code] — consider grouping ambient-entity entries into their own subsection in NARRATIVE_BEATS (dispatch unchanged; grouping aids reading). Refactor-only. [story.js] **PARTIAL → 156** (header comment added; entry reordering deliberately NOT done — would shift git blame for 148/152 entries without behavior benefit)
