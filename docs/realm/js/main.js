@@ -242,6 +242,19 @@ window.loadAndStart = () => {
   if (loadGame()) {
     renderBuildBar();
     updateUI();
+    // Loop 135 (the-fixer, 133 HIGH): cross-session welcome-back.
+    // 127 handles within-session absence (tab blur/focus) but NOT
+    // full-session resume. 135 fires a notify showing the last
+    // chronicle entry on Continue so the returning player
+    // reconnects to the realm's voice. `chronicle:false` because
+    // we're just replaying existing history, not adding a new beat.
+    try {
+      const ch = G.chronicle;
+      if (ch && ch.length > 0) {
+        const last = ch[ch.length - 1];
+        notify(`Where we left off (day ${last.day}): ${last.text}`, 'info', { chronicle: false });
+      }
+    } catch (_e) {}
   }
   beginGame();
 };

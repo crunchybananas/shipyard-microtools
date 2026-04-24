@@ -71,7 +71,10 @@ and note the promotion here.
 - 132 [review] — live-verify: two fresh "Avalon" games 30s apart should produce identical G.map pixel-by-pixel. [play]
 - 132 [code] — extract `_dreamHash`-style helper to state.js as `hashString(s)` if a 3rd consumer needs it. Low priority. [state.js]
 - 132 [review] — kingdom-gallery tick: known kingdoms → their island shapes, reproducibility + aesthetic audit. [play]
-- 133 [code] **HIGH** — cross-session welcome-back on `loadAndStart`: fire a notify with the last chronicle entry text + its day. "Where we left off (day X): ..." 10 lines. [main.js]
+- 133 [code] **HIGH** — cross-session welcome-back on `loadAndStart`: fire a notify with the last chronicle entry text + its day. "Where we left off (day X): ..." 10 lines. [main.js] **DONE → 135** (13 lines; same-day after audit; absence-trilogy complete)
+- 135 [code] — extend 135 to show last 3 significant beats (filter non-season/misc) instead of just last entry. ~5 lines. [main.js]
+- 135 [code] — if save is older than 24 real-world hours (needs 133 MEDIUM savedAt), prefix with "Your realm has been waiting." Emotional cue. [main.js + save.js]
+- 135 [review] — live-verify full absence trilogy (5s / 2min / cross-session). Each scale should feel right. [play]
 - 133 [code] MEDIUM — record `savedAt: Date.now()` in save.js; compute delta in loadAndStart; surface "your realm has been waiting X days" if > 1 day of real-world absence. [save.js + main.js]
 - 133 [code] LOW — persist chronicle filter state (078's `_chronicleFilter`) in G.storyFlags so it survives save/load. 2-3 lines. [story.js]
 - 133 [review] — at tick 150 or 175, audit 114-expansion usage trends. Inform whether pool needs another expansion. [loop/]
