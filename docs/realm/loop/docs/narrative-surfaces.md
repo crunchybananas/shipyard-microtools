@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -45,7 +45,32 @@ a founder's name, kingdom-hashed pick). 137 shipped the
 namesake audio cue (F4→A4 spoken-name intonation). 138 (un-
 filed surprise) added shepherd's song — founder2 at cowpen on
 cold evening; **founder arc fully balanced at 7/5/4**. 141
-(this update) catches the doc up to 134-138.
+caught the doc up to 134-138. 142 (un-filed surprise) added
+`distant_letter_received` — first beat referencing the world
+OUTSIDE the island (10 distant-kingdom names × 6 news fragments
+= 60 pairs per kingdom-hash pool, kingdom-deterministic). 144
+(the-fixer) extended the NARRATIVE_BEATS schema with
+`after: (G) => void` callback for arbitrary side effects
+(mirrors BUILDING_FIRST_BEATS `after:`); 134's namesake entry
+gained the hook to rename the newest citizen to the hashed
+founder's name. **146 (the-contrarian) flagged founder-arc
+overreach at 16 surfaces (7/5/4); proposed a 10-tick
+founder-moratorium for ticks 147-156.** 147 (moratorium
+tick 1, surprise) added `great_storm_remembered` — weather/
+memory focal, no founder reference, 5 kingdom-hashed storm
+variants. 148 (moratorium tick 2, surprise) gave 048's
+silent walker its first narrative surface
+(`wanderer_acknowledged`, misc tag, elder-saying register,
+"no one calls them anything"). 151 (the-fixer) reactivated
+016's disabled `renderConstellations` path for a kingdom-
+hashed procedural asterism that actually appears in the
+night sky after 116's beat fires. 152 (moratorium tick 6,
+surprise) mirrored 148's pattern for 031's ghost entity
+(`night_shape_seen`, seen by children at night) —
+**moratorium scorecard HITS target** (3/≥3 non-founder
+surprises). 148+152 form a paired grammar for ambient-
+entity acknowledgment without founder bookkeeping. 155
+(this update) catches the doc up to 142-152.
 
 ## why this exists
 
@@ -103,12 +128,16 @@ Numbered in rough order of file:
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
 5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103, 116,
-   121, 122, 128, 134, 138 extended) — consolidates state-
-   triggered one-shot beats. Each entry: `{ flag, tag, trigger(G)
-   →bool, text: string|(G)→string, onFire?: string }`. Mirrors
+   121, 122, 128, 134, 138, 142, 147, 148, 152 extended) —
+   consolidates state-triggered one-shot beats. Each entry:
+   `{ flag, tag, trigger(G)→bool, text: string|(G)→string,
+   onFire?: string, after?: (G)=>void }`. Mirrors
    BUILDING_FIRST_BEATS; sibling table, single dispatch loop.
    123 added the optional `onFire: 'soundName'` string field
-   for audio (see audio-surfaces.md Pattern 2). **Current 21 entries:**
+   for audio (see audio-surfaces.md Pattern 2); **144 added
+   the optional `after: (G) => void` callback for arbitrary
+   side effects** (mirrors BUILDING_FIRST_BEATS `after:` used
+   since 034). **Current 25 entries:**
    - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
      firstRaidSurvived
    - 3 year milestones (092, migrated from enhancements.js): year2,
@@ -144,6 +173,47 @@ Numbered in rough order of file:
      realm when `founders_named && firstCowpen && day ≥ 30 &&
      (autumn || winter)`; **founder2 as shepherd-singer** —
      completes the founder arc rebalance to 7/5/4
+   - 1 namesake `after:` hook (144, the-fixer): 134's entry
+     gained an `after: G => ...` hook that renames the newest
+     citizen to the kingdom-hashed founder's name. First use of
+     the new schema field. Citizens persist names across save/
+     load (save.js:29 confirms); what was theatrical at 134
+     now reifies a real in-game citizen carrying the founder's
+     name (visible in tooltips)
+   - 1 distant-letter beat (142, un-filed surprise): once-per-
+     realm when `firstMarket && day ≥ 60`; **first beat to
+     reference the world OUTSIDE the island** — a traveler
+     brings word from one of 10 distant kingdoms (Norrith /
+     Velar / Ashen Fields / etc) about one of 6 news fragments
+     (grain red + bells at dusk / rivers backward / winter-
+     ghost / …). 60 pairs total, both dimensions kingdom-
+     hashed (separate seeds: `_distant_name`, `_distant_news`).
+     Tag: event (reuse); echo-eligible via 063
+   - 1 great-storm beat (147, moratorium tick 1, un-filed
+     surprise): once-per-realm when `year2 && autumn`;
+     **weather/memory focal, NO founder reference** — 5
+     kingdom-hashed storm-memory variants. Intergenerational
+     nod via "children born after do not believe it" without
+     named founders. Tag: event (reuse). `onFire:
+     'great-storm'` (149 audio — low-band noise + D2 rumble
+     + D3 overtone, slow attack signals memory-forms)
+   - 1 wanderer-acknowledgment beat (148, moratorium tick 2,
+     un-filed surprise): once-per-realm when `day ≥ 50`;
+     **gives 048's silent walker its first narrative surface
+     after 87 ticks**. Static string, no variants (048's
+     design asserts ONE wanderer per realm). Tag: misc (reuse;
+     elder-saying register). "No one calls them anything" —
+     acknowledges without naming, honoring 048's original
+     intent (the wanderer remains un-identified)
+   - 1 night-shape-acknowledgment beat (152, moratorium tick 6,
+     un-filed surprise): once-per-realm when `day ≥ 60 &&
+     firstBirth`; **gives 031's ghost entity its first
+     narrative surface after ~121 ticks**. Static string;
+     no "ghost" word in prose (142 uses "winter-ghost" but
+     only for a DISTANT realm's news — our own realm's
+     ambiguity preserved). Tag: misc (reuse; mirrors 148).
+     "The youngest in the realm speak of a bright shape in
+     the fields. No one asks them to describe it."
 6. **Happiness-threshold beats** (071, recurring with hysteresis,
    `milestone`) — peak ≥80 / crisis ≤20, mid-range 35-65 resets
    flags so cycling works. Kept inline in 090 refactor (re-fire
@@ -236,9 +306,12 @@ enhancements.js: 10 systems
 combat.js + economy.js + events.js: 5 systems
 notifications.js: 1 shared passthrough
 
-**≈ 31 narrative entry-points, producing ~25 distinct beat-
-flavors.** The 090 refactor means story.js has fewer
-dispatching SITES but the same underlying beat SURFACES.
+**≈ 31 narrative entry-points, producing ~29 distinct beat-
+flavors post-155.** The 090 refactor means story.js has fewer
+dispatching SITES but the same underlying beat SURFACES. Post-
+155 NARRATIVE_BEATS holds 25 entries; total distinct flavors
+factors in other system outputs (dreams, seasons, research,
+disasters, etc).
 
 The 060 audit said 9; 073 revised to ~20; a careful recount in
 075 lands at 25. Each time the loop re-audits, the count grows.
@@ -355,6 +428,30 @@ should respect:
   filed ask). `realm_fell` NARRATIVE_BEATS entry fires when
   `G.population === 0 && G.day > 1`. Tag: `requiem`.
   Eviction-immune. No echo-eligible (no more dawns post-fall).
+- **Ambient-entity acknowledgment is a paired grammar** (148 +
+  152). Ambient entities with existing visual presence but no
+  narrative surface (wanderer: 048/061; ghost: 031; others
+  pending — owls/frogs/rams/trade-ships/hawks) may get a
+  1-beat acknowledgment each. Pattern: misc-tag, static string,
+  no variants (entity singularity), no "name" word that would
+  collapse ambiguity. Elder-silence register ("no one calls
+  them anything" / "no one asks them to describe it"). Gate
+  on timing or prerequisite that makes the sighting plausible
+  (wanderer: day ≥ 50; night-shape: day ≥ 60 + firstBirth).
+  Does NOT contribute to founder arc bookkeeping — useful
+  during/after the 146 founder-moratorium to diversify focal
+  points. Rule: if the entity already has a kingdom name or a
+  player interaction, use a different pattern (it's no longer
+  ambient).
+- **144 schema: `after: (G) => void` for NARRATIVE_BEATS
+  entries.** Mirrors BUILDING_FIRST_BEATS `after:` (used since
+  034 for named-character intros). Dispatch loop runs
+  `beat.after(G)` after chronicle + onFire, in a try/catch
+  wrapper. First use: 134 namesake's citizen-rename. Rule per
+  123/144 pattern-emergence: new schema fields are added when
+  3+ entries would need them (`onFire` had 3+ audio needs at
+  123; `after` had 1 at 144 — justified because 144's need was
+  a legitimate side effect, not a post-hoc generalization).
 
 ## known gaps (as of 104)
 
@@ -383,15 +480,31 @@ should respect:
 - **~~End-of-realm beats missing~~** (053 → 103). Closed:
   `realm_fell` beat with `requiem` tag (new 15th tag). Castle-
   falls and realm-forgotten variants still filed as follow-ups.
-- **Named-character mechanics partially landed** (050 → 101/102).
-  Teacher + merchant shipped. Smith/bard/mayor/rival still
-  decoration. Pattern established; remaining 4 are ~3-line ticks
-  each.
-- **Founder-weaving arc is now 7 surfaces deep** (088 + 089 +
-  093×3 + 097 + 103). Lira canonical across the realm's
-  lifetime. Concern: adding more founder1-named beats could
-  feel heavy-handed. Future founder-related ticks should favor
-  founder2/3 for cast variety.
+- **~~Named-character mechanics partially landed~~** (050 →
+  101/102/105/153). Closed: 3 of 6 graduated. Teacher +10%
+  research (101), merchant +5% trade (102), smith +5% fire-
+  rate (105 shipped as damage, 153 swapped to fire-rate per
+  120 audit finding that integer HP-rounding made the damage
+  axis marginal). Bard/mayor/rival still decoration. 154
+  the-skeptic flagged pursuing all 6 may exceed 120's 25%
+  cumulative-speedup budget; remaining 3 await deliberate
+  decision (pair each with a distinct game system to avoid
+  multiplicative stacking).
+- **Founder-weaving arc is 16 surfaces deep at 7/5/4 (fully
+  balanced)** (088 + 089 + 093×3 + 097 + 103 = founder1 7;
+  116 + 128 + 134 + 137 + 138 = founder2 5 via named-role
+  or spoken-name; 128 + 134 + 138 = founder3 4). **146 the-
+  contrarian argued the arc had become the loop's default
+  crutch** (75% of surprises 116-138 leaned founder-focal);
+  proposed 10-tick moratorium 147-156 on NEW founder
+  surfaces. Scorecard at 152 HITS target (3/≥3 non-founder
+  surprises: 147 great-storm / 148 wanderer / 152 night-
+  shape; ≥2 new focal points introduced; 0 founder-surface
+  increase). **157 check-in tick will close the moratorium.**
+  Going forward: new narrative ticks should continue
+  diversifying focal points (ambient-entity grammar, object-
+  focal beats, location-focal beats, weather) rather than
+  adding founder mentions.
 - **Happiness beats not in NARRATIVE_BEATS** (090 filed) — their
   hysteresis-reset semantics don't fit the one-shot trigger
   model. Could be migrated with a `resetOn:` extension field.
@@ -484,6 +597,23 @@ beats that sum near 57 by themselves. 088's first-snow adds
   cold season see the shepherd's song; those that don't never
   do. Peak cadence is still well under 300 cap. 137/139/140
   (audio, savedAt, tokens) don't add chronicle entries.
+- **155 (this update): target revised to ~141-182.** +4
+  conditional beats since 141:
+  - 142 distant-letter (firstMarket + day ≥ 60): +1 per
+    realm that builds a market before day 60 (most do).
+  - 147 great-storm (year2 + autumn): +1 per realm surviving
+    into year 2, which reaches autumn (most long-lived).
+  - 148 wanderer (day ≥ 50): +1 per realm surviving to day 50
+    (essentially universal for any non-failed realm).
+  - 152 night-shape (day ≥ 60 + firstBirth): +1 per realm
+    with any birth by day 60 (essentially universal in
+    normal play — births start day 10-30).
+  Expected +3-4 new beats per long-lived realm, peak cadence
+  still well under 300 cap. 144 (after callback) adds no new
+  chronicle entries — it renames a citizen, which doesn't
+  write. 151 (constellation visual) adds no chronicle. 149/150/
+  153/154 (audio, type-scale, fire-rate swap, review) don't
+  add chronicle entries.
 
 ## how to update this doc
 
@@ -583,6 +713,52 @@ shipping, touch this file too.
 - **139** — savedAt + real-world wait prefix. Re-engagement
   quintet across 5 absence-magnitudes.
 - **140** — type-scale CSS variables phase 1 (silent-module).
-- **141** — this maintenance update. Captures 134-140 in the
+- **141** — maintenance update. Captured 134-140 in the
   NARRATIVE_BEATS entry list (19→21) + cadence summary +
+  related-loops.
+- **142** — distant-letter surprise. First beat to reference
+  the world OUTSIDE the island; 60 kingdom/news pairs via
+  two separate deterministic hashes.
+- **144** — the-fixer. Extended NARRATIVE_BEATS schema with
+  `after: (G) => void` callback for arbitrary side effects
+  (mirrors BUILDING_FIRST_BEATS `after:`). 134 namesake
+  gained the hook (renames newest citizen to the kingdom-
+  hashed founder's name — reifies a chronicle reference).
+  Schema now `{ flag, tag, trigger, text, onFire?, after? }`.
+- **146** — the-contrarian. Flagged founder-arc overreach
+  (16 surfaces at 7/5/4, 75% of recent surprises founder-
+  focal). Proposed 10-tick founder-moratorium ticks
+  147-156; scorecard targets (≥3 non-founder surprises,
+  ≥2 new focal points, ≤1 founder-surface increase).
+- **147** — great-storm-remembered surprise (moratorium
+  tick 1). Weather/memory focal, no founder reference;
+  5 kingdom-hashed variants. Tag: event (reuse).
+- **148** — wanderer-acknowledgment surprise (moratorium
+  tick 2). Gives 048's silent walker its first narrative
+  surface after 87 ticks. Static string, misc tag, elder-
+  saying register. Opens the paired ambient-entity
+  acknowledgment grammar.
+- **151** — the-fixer. Reactivated 016's disabled
+  `renderConstellations` path for 116's kingdom-hashed
+  asterism. Narrative surface unchanged (116 beat still
+  fires prose); visual payoff now manifests in actual
+  night-sky rendering after the beat fires.
+- **152** — night-shape-acknowledgment surprise (moratorium
+  tick 6). Sibling to 148 for 031's ghost entity. Different
+  focal (night vs day, children-observed vs edge-traveller).
+  **Moratorium scorecard HITS target** (3/≥3 non-founder
+  surprises). Closes the ambient-entity acknowledgment
+  grammar's first pair.
+- **153** — the-fixer. Smith mechanic damage→fire-rate
+  swap (closes 120 MEDIUM). Named-character chain now
+  3/6 graduated (teacher/merchant/smith).
+- **154** — the-skeptic. Flagged audio-axis growth without
+  verification (9 cues, 0 auditions). No code change;
+  recommends halting new audio cues until 149's audition
+  ships.
+- **155** — this maintenance update. Captures 142-152 in
+  the NARRATIVE_BEATS entry list (21→25) + schema
+  evolution (added `after` field per 144) + cadence
+  summary (~137-178 → ~141-182) + ambient-entity
+  grammar invariant + founder-arc moratorium status +
   related-loops.

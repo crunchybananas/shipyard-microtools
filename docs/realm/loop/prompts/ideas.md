@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 155 [review] — audit audio-surfaces.md cadence: is it due for a 112-archivist-style catch-up separate from same-commit-per-cue maintenance? [loop/docs/]
+- 155 [code] — extract ambient-entity acknowledgment grammar to a micro-helper or template comment at top of NARRATIVE_BEATS in story.js so next ambient tick doesn't re-derive. ~8 LoC. [story.js]
+- 155 [code] — consider grouping ambient-entity entries into their own subsection in NARRATIVE_BEATS (dispatch unchanged; grouping aids reading). Refactor-only. [story.js]
+- 155 [review] — moratorium 157 check-in tick: milestone-style review comparing 146's predictions to 147-156 outcomes. Moratorium success/failure is the deliverable. [journal]
 - 154 [review] **PRIORITY — blocks new audio work** — audio live-audition (escalated from 3+ prior filings). When chrome-mcp is up: ship a single play tick that hears all 9 cues in random order, records "what did you hear?" per cue with blind labels, then compares to code-labels. If 3+ conflate: reductive composer tick to merge. [play]
 - 154 [code] — if audition (154 review) finds conflation, candidate merges: stone+namesake (both mid-register sine, discovery-coded), founders+offering (both sine chord, D/C root). Requiem+great-storm distinct (different register). Pre-stage for reductive composer tick. [audio.js + story.js]
 - 154 [review] — apply the-skeptic to OTHER potentially over-invested axes: NARRATIVE_BEATS table (25 entries, is cadence 137-178 right?); named-character mechanics (3/6 graduated — skip bard/mayor/rival?); type-scale series (3 ticks so far 140/143/150). [journal]
