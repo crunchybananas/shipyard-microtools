@@ -339,7 +339,7 @@ const NARRATIVE_BEATS = [
   // deterministic per kingdom (hash-picked). Tag: character (034
   // aligned). Compound that extends 072 founders + firstBirth into
   // a continuing-generations surface.
-  { flag: 'namesake_born', tag: 'character',
+  { flag: 'namesake_born', tag: 'character', onFire: 'namesake',
     trigger: G => {
       if (!G.storyFlags.founders_named) return false;
       const births = G.stats && (G.stats.citizensBorn || 0);

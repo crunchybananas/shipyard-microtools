@@ -500,6 +500,20 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine', 440, 0.035, 0.05, 1.5, t + 0.30);
       break;
     }
+
+    // ── Namesake: Loop 137 (the-composer, 134 surprise). Two-note
+    //    intonation mimicking the spoken rhythm of calling a name —
+    //    first syllable softly, then the rise of the second. F4 → A4
+    //    is a major third (bright, hopeful), but the softer lead-in
+    //    and gentle sustain keep it intimate, not ceremonial. Quietest
+    //    non-first-snow cue at gain 0.045.
+    case 'namesake': {
+      // F4 — first syllable
+      makeOsc(ctx, dest, 'sine', 349, 0.045, 0.05, 0.4, t);
+      // A4 — rising second syllable; starts as F4 fades
+      makeOsc(ctx, dest, 'sine', 440, 0.050, 0.06, 1.2, t + 0.28);
+      break;
+    }
   }
 }
 

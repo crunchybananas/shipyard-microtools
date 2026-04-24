@@ -62,7 +62,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (6 cues — closes original 106 list)
+## current catalog (7 cues)
 
 ### `nightmare` — loop 106
 
@@ -192,23 +192,44 @@ check-function). **Closes the original 106-filed audio
 cue list** — all 6 cues (nightmare/requiem/stone/
 founders/first-snow/offering) now shipped.
 
+### `namesake` — loop 137
+
+**Trigger:** 134's `namesake_born` NARRATIVE_BEATS
+entry. Once-per-realm when founders are named AND
+citizensBorn ≥ 5. Tag: character.
+
+**Sound design:** two-note F4 → A4 intonation.
+F4 (349 Hz) at t, sustained 0.4s; A4 (440 Hz) at
+t+0.28s, sustained 1.2s. Overlaps briefly mid-phrase.
+Major 3rd interval — bright but soft (0.045 gain on
+F4, 0.050 on A4). Duration ~1.5s total.
+
+**Affect:** intimate, spoken-name-like. The two
+syllables mimic the rhythm of calling a name (like
+"Li-ra" or "Seph-i"). Brighter than offering but
+quieter — a quiet private moment, not a ceremony.
+
+**Code:** `js/audio.js` switch case, Pattern 2 via
+`onFire: 'namesake'` field on the NARRATIVE_BEATS
+entry. 4th composer-tick cue.
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) |
-| --- | --- | --- | --- | --- | --- | --- |
-| Wave | triangle | sine | sine | sine | **noise + sine** | sine |
-| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) |
-| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** |
-| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph |
-| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s |
-| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s |
-| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving |
-| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 |
+| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) | namesake (137) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Wave | triangle | sine | sine | sine | **noise + sine** | sine | sine |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) | 349 Hz (F4) |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** | ascending major 3rd |
+| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph | 2-note spoken-name |
+| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift | overlap mid-phrase |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s | 0.05-0.06s |
+| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s | 0.4s + 1.2s |
+| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving | intimate, spoken |
+| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 | 0.050 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -373,6 +394,13 @@ audio ticks should respect them:
   nightmare / requiem / stone / founders / first-snow /
   offering — spanning sub-bass dissonance to mid-
   register resolution.
+- **137** — namesake 2-note intonation. 7th cue; 4th
+  `the-composer` use; 3rd Pattern-2 (onFire-based)
+  cue after requiem (111/123) and first-snow (124).
+  F4 → A4 ascending major 3rd, mimicking the rhythm
+  of a spoken name. Fires on 134's `namesake_born`
+  entry. Extends audio catalog into the
+  intergenerational-continuity surface.
 
 ## how to update this doc
 

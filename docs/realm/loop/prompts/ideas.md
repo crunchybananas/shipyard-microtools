@@ -79,7 +79,9 @@ and note the promotion here.
 - 133 [code] LOW — persist chronicle filter state (078's `_chronicleFilter`) in G.storyFlags so it survives save/load. 2-3 lines. [story.js]
 - 133 [review] — at tick 150 or 175, audit 114-expansion usage trends. Inform whether pool needs another expansion. [loop/]
 - 134 [code] — extend namesake to actual citizen-name override: pick a recent G.citizens entry and rename to ${f}. Makes the namesake a REAL character in the realm, not just a chronicle beat. ~8 lines. [story.js + state.js]
-- 134 [code] — audio cue for namesake via `onFire: 'namesake'`. Soft 3-note child-growth phrase. [audio.js + story.js]
+- 134 [code] — audio cue for namesake via `onFire: 'namesake'`. Soft 3-note child-growth phrase. [audio.js + story.js] **DONE → 137** (shipped as 2-note F4→A4 ascending major 3rd; spoken-name intonation; 7th cue)
+- 137 [code] — per-founder pitch variation for namesake cue: hash `namesake_who` decision also picks the root pitch. ~3 lines. [audio.js]
+- 137 [review] — after more composer ticks, re-audit audio-surfaces.md design philosophy. Is "silent by default, miss-able" still right as catalog grows 7+? [loop/docs/]
 - 134 [code] — multi-generation beats: "a grandchild of ${f} is born" day 150+ after namesake. [story.js]
 - 134 [review] — after plays, does namesake text read well with various founder names (short/long syllable counts)? [play]
 - 131 [code] MEDIUM — biome variants (temperate/arid/boreal) with biome-conditional TILE_COLORS + optional prose flavor. 50+ lines. Larger design scope. [state.js + world.js + render.js]
