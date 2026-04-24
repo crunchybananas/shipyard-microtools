@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 154 [review] **PRIORITY — blocks new audio work** — audio live-audition (escalated from 3+ prior filings). When chrome-mcp is up: ship a single play tick that hears all 9 cues in random order, records "what did you hear?" per cue with blind labels, then compares to code-labels. If 3+ conflate: reductive composer tick to merge. [play]
+- 154 [code] — if audition (154 review) finds conflation, candidate merges: stone+namesake (both mid-register sine, discovery-coded), founders+offering (both sine chord, D/C root). Requiem+great-storm distinct (different register). Pre-stage for reductive composer tick. [audio.js + story.js]
+- 154 [review] — apply the-skeptic to OTHER potentially over-invested axes: NARRATIVE_BEATS table (25 entries, is cadence 137-178 right?); named-character mechanics (3/6 graduated — skip bard/mayor/rival?); type-scale series (3 ticks so far 140/143/150). [journal]
 - 153 [review] — live-verify smith fire-rate: fresh realm w/ smith named vs w/o (use G hack); measure kill times against 10 raiders; confirm perceptual ~5% faster. [play]
 - 153 [code] — remaining named-character mechanics (bard/mayor/rival). 120 audit flagged bard (happiness), mayor (civic), rival (negative modifier). 3 of 6 graduated post-153. Each ~5 LoC. [?]
 - 153 [code] — fire-rate as per-tower upgrade (2nd tier: higher cost, faster fire). Separate axis from smith. [combat.js + buildings.js]
