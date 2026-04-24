@@ -96,6 +96,7 @@ and note the promotion here.
 - 142 [code] — audio cue for distant-letter via `onFire: 'distant-letter'`. Distant-wind or soft horn; could reuse first-snow noise-burst at lower volume. [audio.js + story.js]
 - 145 [code] — shepherd's-song seasonal pitch variation: autumn = G4, winter = F#4 (semitone lower). ~4 lines. [audio.js + story.js]
 - 145 [review] — live-audition of all 8 cues together. Gain balance, emotional-coverage sanity, "pastoral presence" landing correctly. [play]
+- 146 [review] **founder-moratorium check-in** — at tick 157, audit whether the 147-156 window stayed non-founder in narrative surfaces. Metrics: ≥ 3 non-founder surprises, ≥ 2 new focal points, founder-surface increase ≤ 1. [loop/]
 - 142 [code] — second-distant-letter at year 3+ (different news fragment, same OR new distant kingdom). [story.js]
 - 142 [code] — "the realm sends word" companion beat (mirror: outbound news). Requires player milestone (e.g., castle built, tech mastered). [story.js]
 - 142 [review] — read all 60 possible distant-letter compositions and verify each reads coherent. Each news fragment should work with any distant name. [loop/]
