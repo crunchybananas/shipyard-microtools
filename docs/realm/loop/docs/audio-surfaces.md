@@ -62,7 +62,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (5 cues)
+## current catalog (6 cues — closes original 106 list)
 
 ### `nightmare` — loop 106
 
@@ -166,23 +166,49 @@ based entry breaks the pure-sine pattern deliberately.
 entry (first new cue shipped under the 123 refactor —
 validates `onFire` in practice).
 
+### `offering` — loop 125
+
+**Trigger:** `checkOfferingBeat` at story.js fires;
+`offering_made` flag once-per-realm when stone + happy-
+peak + 15% probability intersect (079 original design).
+Tag: stone.
+
+**Sound design:** minor→major resolution chord. D4 (293
+Hz) sustained throughout. F4 (minor 3rd, 349 Hz) fires
+briefly at t, decaying as F#4 (major 3rd, 370 Hz) and
+A4 (perfect 5th, 440 Hz) arrive at t+0.3s. The ear
+perceives "minor → major lift" within 0.3s. Pure sines;
+gain 0.05 (between stone's 0.07 and first-snow's 0.04).
+Duration ~1.8s total.
+
+**Affect:** lifting, resolving. Sibling to 106
+nightmare's dissonance — same minor-interval opening,
+but resolves to major instead of beating into unease.
+"A quiet offering received; the weight lifts."
+
+**Code:** `js/audio.js` switch case, Pattern 1 fire at
+the end of `story.js:checkOfferingBeat` (dedicated
+check-function). **Closes the original 106-filed audio
+cue list** — all 6 cues (nightmare/requiem/stone/
+founders/first-snow/offering) now shipped.
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) |
-| --- | --- | --- | --- | --- | --- |
-| Wave | triangle | sine | sine | sine | **noise + sine** |
-| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine |
-| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture |
-| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts |
-| Beating | 4 Hz tremolo | none | none | none | none |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) |
-| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s |
-| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard |
-| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 |
+| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Wave | triangle | sine | sine | sine | **noise + sine** | sine |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** |
+| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph |
+| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s |
+| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s |
+| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving |
+| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -282,9 +308,11 @@ audio ticks should respect them:
   3-note C-minor-triad ascending (523/622/784 Hz), 0.25s
   pacing. Pattern 1 via `checkFounderBeat`. Syllable-count-
   hash variant not shipped; kept constant phrase.
-- **Offering chord** (106 filed): sweeter sibling to
-  nightmare's dissonance. `checkOfferingBeat` trigger
-  (079). Pattern 1.
+- ~~**Offering chord**~~ (106 filed) — **DONE → 125**:
+  minor→major resolution chord on D root; sibling to
+  106 nightmare dissonance but resolves instead of
+  beating. Pattern 1 via `checkOfferingBeat`. Closes
+  original 106-filed cue list.
 - ~~**First-snow shimmer**~~ (106 filed) — **DONE → 124**:
   8 kHz + 6 kHz noise bursts + 1568 Hz sine overtone.
   Pattern 2 via `onFire: 'first-snow'` on the 121-
@@ -337,6 +365,14 @@ audio ticks should respect them:
   "noise + sine" wave type, non-tonal texture,
   whispering character. Validates the refactor in
   practice.
+- **125** — offering resolution chord. 6th cue;
+  **closes the original 106-filed audio cue list
+  entirely**. Sibling to nightmare (same D-root minor
+  opening) but resolves to major within 0.3s. Pattern
+  1 via checkOfferingBeat. All 6 original cues shipped:
+  nightmare / requiem / stone / founders / first-snow /
+  offering — spanning sub-bass dissonance to mid-
+  register resolution.
 
 ## how to update this doc
 

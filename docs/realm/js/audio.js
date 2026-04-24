@@ -481,6 +481,25 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine', 1568, 0.02, 0.02, 1.2, t + 0.05);
       break;
     }
+
+    // ── Offering: Loop 125 (the-composer, 106-filed — CLOSES
+    //    ORIGINAL 106 CUE LIST). Sibling to 106 nightmare: same D-root
+    //    minor interval at t, but lifts to major within 0.3s. The
+    //    minor F4 decays while F#4 arrives — audible "resolution"
+    //    felt more than parsed. Pure sines; gain 0.05 (between stone's
+    //    0.07 and first-snow's 0.04). Short-ish decay — offering is a
+    //    quiet moment, not ceremonial.
+    case 'offering': {
+      // D4 fundamental held throughout
+      makeOsc(ctx, dest, 'sine', 293, 0.05, 0.03, 1.8, t);
+      // F4 (minor 3rd) — short, decays as F#4 arrives
+      makeOsc(ctx, dest, 'sine', 349, 0.04, 0.03, 0.35, t);
+      // F#4 (major 3rd) — arrives at +0.3s as the resolution
+      makeOsc(ctx, dest, 'sine', 370, 0.045, 0.05, 1.5, t + 0.30);
+      // A4 (perfect 5th) — also at +0.3s, completes major triad
+      makeOsc(ctx, dest, 'sine', 440, 0.035, 0.05, 1.5, t + 0.30);
+      break;
+    }
   }
 }
 

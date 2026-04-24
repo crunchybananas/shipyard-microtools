@@ -1163,6 +1163,12 @@ export function checkOfferingBeat() {
     `At dawn, ${item} was found at the standing stone. No one admits to placing it there.`,
     'stone'
   );
+
+  // Loop 125 (the-composer, 106-filed, closes ORIGINAL 106 audio
+  // list): offering gets a minor→major resolution chord. Sibling to
+  // 106 nightmare's dissonance — same minor-interval opening, but
+  // lifts to major within 0.3s. Pattern 1 (dedicated check-function).
+  try { if (_PLAY_SOUND) _PLAY_SOUND('offering'); } catch (_e) {}
 }
 
 export function toggleChroniclePanel() {
