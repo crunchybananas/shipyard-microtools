@@ -60,6 +60,56 @@ initRenderer(canvas, minimap);
 resizeCanvas();
 initPostFX(canvas);
 window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); if (gl3dReady) resize3D(); });
+
+// Loop 127 (the-fixer, 030 filed 96 ticks + 126 HIGH): welcome-back
+// summary. On tab blur, snapshot G state. On focus, diff and render a
+// brief "during your absence: X" toast so the returning player can
+// orient. Accept-the-loss design preserved — game doesn't pause; the
+// summary is passive information, not a prompt.
+let _blurSnapshot = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    // Only snapshot if the game has started and isn't already snapshotted
+    if (G && G.day && !_blurSnapshot) {
+      _blurSnapshot = {
+        day: G.day, season: G.season,
+        population: G.population,
+        food: G.resources?.food ?? 0,
+        wood: G.resources?.wood ?? 0,
+        gold: G.resources?.gold ?? 0,
+        citizensBorn: G.stats?.citizensBorn ?? 0,
+        citizensDied: G.stats?.citizensDied ?? 0,
+        raidsSurvived: G.stats?.raidsSurvived ?? 0,
+        wallTime: Date.now(),
+      };
+    }
+  } else if (document.visibilityState === 'visible' && _blurSnapshot) {
+    const snap = _blurSnapshot;
+    _blurSnapshot = null;
+    // Only summarize if enough time OR game-state changed to matter
+    const daysPassed = G.day - snap.day;
+    const wallMs = Date.now() - snap.wallTime;
+    if (daysPassed < 1 && wallMs < 30_000) return;  // too brief to summarize
+    // Build deltas
+    const popDelta = G.population - snap.population;
+    const bornDelta = (G.stats?.citizensBorn ?? 0) - snap.citizensBorn;
+    const diedDelta = (G.stats?.citizensDied ?? 0) - snap.citizensDied;
+    const raidDelta = (G.stats?.raidsSurvived ?? 0) - snap.raidsSurvived;
+    const seasonChanged = G.season !== snap.season;
+    // Compose brief summary
+    const parts = [`${daysPassed} day${daysPassed === 1 ? '' : 's'}`];
+    if (seasonChanged) parts.push(`→ ${G.season}`);
+    if (bornDelta > 0) parts.push(`+${bornDelta} born`);
+    if (diedDelta > 0) parts.push(`−${diedDelta} lost`);
+    if (raidDelta > 0) parts.push(`${raidDelta} raid${raidDelta === 1 ? '' : 's'} survived`);
+    if (popDelta !== 0 && bornDelta === 0 && diedDelta === 0) {
+      parts.push(`pop ${popDelta > 0 ? '+' : ''}${popDelta}`);
+    }
+    const text = `While you were away: ${parts.join(', ')}.`;
+    notify(text, 'info', { chronicle: false });
+  }
+});
+
 setupSaveButtons();
 loadAchievements();
 
