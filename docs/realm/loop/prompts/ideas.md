@@ -65,7 +65,9 @@ and note the promotion here.
 - 129 [doc] — formalize "catch-up every ~15-20 ticks" as acceptable protocol in MANIFEST or narrative-surfaces.md. 075 invariant is aspirational; reality pattern is catch-up-driven (075 → 080 → 084 → 091 → 104 → 129 every ~20 ticks). [MANIFEST or loop/docs/]
 - 129 [code] — programmatic drift check: count `chronicle(` callsites, NARRATIVE_BEATS entries, TAG_ICONS keys; fail CI on drift vs doc. 075 filed; still open. Would eliminate catch-up friction. [scripts/]
 - 130 [code] **HIGH** — define `--fs-xs` through `--fs-2xl` CSS variables in `:root`; migrate ~100 font-size declarations across index.html to use them. Consolidates 26 unique sizes → 6-8 tier scale. Refactor-only or the-re-shipper shape. [index.html] **PARTIAL → 140** (phase 1: 7 tokens defined in :root, zero migrations yet; future ticks can migrate piecemeal). Phase 2 still open.
-- 140 [code] — first migration tick: pick a panel (chronicle or missions) and migrate font-sizes to `var(--fs-*)`. Proves pattern + starts chipping the 100-line migration. ~10-15 lines. [index.html]
+- 140 [code] — first migration tick: pick a panel (chronicle or missions) and migrate font-sizes to `var(--fs-*)`. Proves pattern + starts chipping the 100-line migration. ~10-15 lines. [index.html] **DONE → 143** (chronicle panel; 2 migrations; 2 of ~150 declarations consolidated; refactor-only envelope held)
+- 143 [code] — missions-panel migration (next natural refactor target). ~5 font-sizes to map. [index.html]
+- 143 [review] — after 3-4 migration ticks, re-grep font-size counts vs 130's 26-unique baseline. [index.html]
 - 140 [code] — line-height tokens (`--lh-tight: 1.25; --lh-base: 1.45; --lh-relaxed: 1.7`). Sibling to fs-tokens. ~3 lines. [index.html]
 - 140 [review] — after 2-3 migration ticks, re-audit font-size counts. Expect drop from 26 unique toward 7-tokens + un-migrated remainder. [index.html]
 - 130 [code] MEDIUM — raise low-opacity body-text colors from rgba(255,255,255,0.4-0.5) to 0.6-0.65 for WCAG AA compliance. ~10-15 selectors. [index.html]
