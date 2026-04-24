@@ -333,6 +333,35 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // ── AMBIENT-ENTITY ACKNOWLEDGMENT (misc tag) ─────────────────
+  // A paired-grammar set (148 + 152) for giving ambient entities
+  // that have VISUAL presence but no narrative surface their first
+  // chronicle beat. Formalized as an invariant in loop/docs/
+  // narrative-surfaces.md per 155.
+  //
+  //   Rules for future acknowledgments:
+  //   1. Tag: misc (75's reuse invariant).
+  //   2. Static string, no variants — entity is SINGULAR by nature;
+  //      variants would imply plurality or collapse the ambiguity.
+  //   3. No "name" word that would collapse the entity's intended
+  //      anonymity. "No one calls them anything" / "No one asks
+  //      them to describe it" / etc. — elder-silence register.
+  //   4. Gate on timing or prerequisite that makes sighting
+  //      plausible (wanderer: day ≥ 50; night-shape: day ≥ 60 +
+  //      firstBirth).
+  //   5. Does NOT contribute to founder arc bookkeeping. Useful
+  //      during/after 146's founder-moratorium to diversify focal
+  //      points.
+  //   6. If the entity already has a kingdom name or a player
+  //      interaction, use a different pattern — it's no longer
+  //      ambient.
+  //
+  //   Candidates for future ticks: owls (enh.js 1587), frogs
+  //   (enh.js 1865), rams (enh.js 1975), trade-ships (enh.js 1651),
+  //   hawks. Each ~15 LoC. Space them out — 3-4 in rapid
+  //   succession would start to feel like queue-drain per the
+  //   155-filed pattern-grouping concern.
+  //
   // Loop 148 (surprise, un-filed, moratorium tick 2): wanderer
   // acknowledgment. 048 introduced the silent walker; 061 renamed it
   // `_wanderer` internally but kept it player-anonymous. 87 ticks

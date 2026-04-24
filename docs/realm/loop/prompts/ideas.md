@@ -29,8 +29,10 @@ and note the promotion here.
 (new ideas go here — newest on top)
 
 - 155 [review] — audit audio-surfaces.md cadence: is it due for a 112-archivist-style catch-up separate from same-commit-per-cue maintenance? [loop/docs/]
-- 155 [code] — extract ambient-entity acknowledgment grammar to a micro-helper or template comment at top of NARRATIVE_BEATS in story.js so next ambient tick doesn't re-derive. ~8 LoC. [story.js]
-- 155 [code] — consider grouping ambient-entity entries into their own subsection in NARRATIVE_BEATS (dispatch unchanged; grouping aids reading). Refactor-only. [story.js]
+- 155 [code] — extract ambient-entity acknowledgment grammar to a micro-helper or template comment at top of NARRATIVE_BEATS in story.js so next ambient tick doesn't re-derive. ~8 LoC. [story.js] **DONE → 156** (29-line template comment block with 6 rules + candidate entity list + queue-drain warning; points at narrative-surfaces.md as canonical spec)
+- 155 [code] — consider grouping ambient-entity entries into their own subsection in NARRATIVE_BEATS (dispatch unchanged; grouping aids reading). Refactor-only. [story.js] **PARTIAL → 156** (header comment added; entry reordering deliberately NOT done — would shift git blame for 148/152 entries without behavior benefit)
+- 156 [code] — first ambient acknowledgment beat OUTSIDE moratorium window (post-157) to test whether grammar survives non-moratorium context. Owls or frogs candidate. Deliberately delayed to signal permanence of the pattern, not moratorium-contingency. [story.js]
+- 156 [review] — 157 check-in should also audit: did "no founder surface increase" trade off against realm feeling less "peopled"? Needs live-play to verify. [journal]
 - 155 [review] — moratorium 157 check-in tick: milestone-style review comparing 146's predictions to 147-156 outcomes. Moratorium success/failure is the deliverable. [journal]
 - 154 [review] **PRIORITY — blocks new audio work** — audio live-audition (escalated from 3+ prior filings). When chrome-mcp is up: ship a single play tick that hears all 9 cues in random order, records "what did you hear?" per cue with blind labels, then compares to code-labels. If 3+ conflate: reductive composer tick to merge. [play]
 - 154 [code] — if audition (154 review) finds conflation, candidate merges: stone+namesake (both mid-register sine, discovery-coded), founders+offering (both sine chord, D/C root). Requiem+great-storm distinct (different register). Pre-stage for reductive composer tick. [audio.js + story.js]
