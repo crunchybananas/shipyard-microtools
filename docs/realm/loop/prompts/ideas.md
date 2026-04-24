@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 160 [code] — phase 4 exact-match font-size migrations: `.tt-shortcut kbd` 0.65→fs-xs, `.tech-name` 0.82→fs-base (bundled-line precise match), `.tech-cost` 0.65→fs-xs (same bundled line). ~3-5 more exact-matches. [index.html]
+- 160 [code] — design-shift tick (deferred again): group near-exacts (0.72→0.75, 0.8→0.82, 0.78→0.82, 0.7→0.75, 0.85→0.82) into one deliberate migration pass. [index.html]
+- 160 [doc] — once phases 4-5 complete, close 130 HIGH entirely and capture the migration arc briefly in loop/docs/. [loop/docs/]
 - 159 [review] — live-verify shooting star: fresh Avalon past first autumn, fast-forward deep nights, confirm (a) visible when spawned, (b) sets flag on completion, (c) doesn't fire again post-reload. [play]
 - 159 [code] — second shooting star per realm at much later gate (day ≥ 150 && stone_found && shooting_star_fired): "a second light passes years later." Pairs with 122 stone-weathering as realm-has-aged marker. [enhancements.js]
 - 159 [code] — if a future tick adds a falling-star narrative beat, hook via `after` callback on 116 constellation entry to chronicle the event once. [story.js + enhancements.js]
