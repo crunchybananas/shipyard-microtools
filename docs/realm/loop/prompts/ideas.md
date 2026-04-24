@@ -61,7 +61,9 @@ and note the promotion here.
 - 128 [code] — audio cue for longest-night via `onFire: 'longest-night'`. Low sustained hum or distant animal sound. New emotional corner: NOCTURNAL VIGIL. [audio.js + story.js]
 - 128 [code] — visual effect on the longest night: subtle screen-darkening overlay OR stars brighter for that specific in-game night. [render.js + enhancements.js]
 - 128 [code] — multi-year longest-night variants ("the second longest night", "the fifth longest night") mirroring 093's subsequent-winter arc. ~12 lines. [story.js]
-- 128 [doc] — narrative-surfaces.md catch-up: NARRATIVE_BEATS now 19 entries post-116/121/122/128. Doc says 15. Archivist tick to sync. [loop/docs/]
+- 128 [doc] — narrative-surfaces.md catch-up: NARRATIVE_BEATS now 19 entries post-116/121/122/128. Doc says 15. Archivist tick to sync. [loop/docs/] **DONE → 129** (+62 net LoC; doc updated through 128; cadence budget revised 130-170→135-175)
+- 129 [doc] — formalize "catch-up every ~15-20 ticks" as acceptable protocol in MANIFEST or narrative-surfaces.md. 075 invariant is aspirational; reality pattern is catch-up-driven (075 → 080 → 084 → 091 → 104 → 129 every ~20 ticks). [MANIFEST or loop/docs/]
+- 129 [code] — programmatic drift check: count `chronicle(` callsites, NARRATIVE_BEATS entries, TAG_ICONS keys; fail CI on drift vs doc. 075 filed; still open. Would eliminate catch-up friction. [scripts/]
 - 111 [code] — per-kingdom bell-pitch variation: hash kingdom name to pick requiem bell's fundamental from a minor-scale set. Subtle fingerprint. ~5 lines. [audio.js + story.js]
 - 111 [review] — live-audition of requiem bell + nightmare chord on speakers. Adjust gain/overtones from real-world listening. [play]
 - 111 [code] — stone chime: bright ascending fifth, short attack, mid decay — "a thing was found." Next audio cue to ship (106 + 111 established the `beat.tag === '<tag>'` pattern). [audio.js + story.js] **DONE → 113** (Pattern 1 via checkStoneBeat; 659 E5 + 988 B5 + 1976 B6 shimmer; audio-surfaces.md updated same-commit per 112 invariant)

@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -27,7 +27,19 @@ image variants to 3 dream threads. 101 + 102 graduated the
 named-character system from decoration to mechanic (teacher +10%
 research, merchant +5% trade). 103 (surprise) added an end-of-
 realm `requiem` beat — new 15th tag, Lira arc closes across 7
-narrative surfaces. 104 (this update) catches the doc up to 092-103.
+narrative surfaces. 104 caught the doc up to 092-103. 116 added
+constellation_named (first beat where founder2 is sole focal;
+began rebalancing the founder arc from founder1-oversaturation).
+121 migrated 088's inline first-snow into NARRATIVE_BEATS. 122
+(un-filed surprise) added stone_weathered — 3rd beat on 056's
+stone arc (discovery→offering→weathering). 123 refactored
+Pattern-2 audio dispatch to `onFire: 'soundName'` field on
+NARRATIVE_BEATS entries (see audio-surfaces.md). 124 shipped
+first-snow cue via onFire. 125 shipped offering cue — **closes
+original 106-filed audio list entirely** (6 cues shipped). 128
+(un-filed surprise) added longest_night_seen — founder3 as
+night-watcher, continuing 116's founder-rebalancing. 129 (this
+update) catches the doc up to 116-128.
 
 ## why this exists
 
@@ -84,11 +96,13 @@ Numbered in rough order of file:
    rival/smith/merchant/teacher. Triggered by building-first hooks.
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
-5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103 extended) —
-   consolidates state-triggered one-shot beats. Each entry:
-   `{ flag, tag, trigger(G)→bool, text: string|(G)→string }`.
-   Mirrors BUILDING_FIRST_BEATS; sibling table, single dispatch
-   loop. Current 15 entries:
+5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103, 116,
+   121, 122, 128 extended) — consolidates state-triggered one-
+   shot beats. Each entry: `{ flag, tag, trigger(G)→bool, text:
+   string|(G)→string, onFire?: string }`. Mirrors
+   BUILDING_FIRST_BEATS; sibling table, single dispatch loop.
+   123 added the optional `onFire: 'soundName'` string field
+   for audio (see audio-surfaces.md Pattern 2). **Current 19 entries:**
    - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
      firstRaidSurvived
    - 3 year milestones (092, migrated from enhancements.js): year2,
@@ -99,17 +113,32 @@ Numbered in rough order of file:
      each references founder1 by name ("Lira knows what to store"
      / "Lira counts like elders" / "Lira remembers the first")
    - 1 realm-end beat (103): realm_fell — requiem tag, references
-     founder1 when present ("${f}'s name is the last spoken")
+     founder1 when present ("${f}'s name is the last spoken");
+     **`onFire: 'requiem'`** (123 — audio via single bell toll)
+   - 1 constellation beat (116): constellation_named — fires first
+     autumn past day 15; deterministic 20-shape pool per kingdom
+     hash; **first beat where founder2 is SOLE focal** (sky-
+     watcher role) — began rebalancing the founder arc
+   - 1 first-snow beat (121, migrated from 088 inline; founder1
+     canonical field-stander); **`onFire: 'first-snow'`** (124 —
+     audio via noise bursts + high sine)
+   - 1 stone-weathering beat (122, un-filed surprise): fires day
+     ≥150 AND stone_found; tag:stone (reuse); 4 kingdom-hashed
+     variants
+   - 1 longest-night beat (128, un-filed surprise): fires in deep
+     night of first winter (day ≥22 AND dayPhase > 0.85 ×
+     dayLength); **founder3 as night-watcher** (4th canonical
+     role for founder3)
 6. **Happiness-threshold beats** (071, recurring with hysteresis,
    `milestone`) — peak ≥80 / crisis ≤20, mid-range 35-65 resets
    flags so cycling works. Kept inline in 090 refactor (re-fire
    semantics don't fit one-shot NARRATIVE_BEATS shape).
-7. **First-snow beat** (088, cross-system compound, `milestone`) —
-   fires once the first time the realm enters winter past day
-   10. References `storyFlags.founder1` by name if 072 has fired
-   ("…${founder} stands in the fields…"); otherwise generic.
-   Kept inline (story-specific compound; NARRATIVE_BEATS trigger
-   would work but adds nothing at N=1).
+7. **First-snow beat** (088 inline, 121 migrated into
+   NARRATIVE_BEATS) — fires once the first time the realm enters
+   winter past day 10. References `storyFlags.founder1` by name
+   if 072 has fired ("…${founder} stands in the fields…");
+   otherwise generic. Now table-dispatched (see system #5 above)
+   with `onFire: 'first-snow'` audio cue (124).
 8. **checkDreamBeat** (039/054/055/097, 10-day cadence, `dream`) —
     10-thread pool, 044 seasonal lens, 064 approach boost. 097
     added founder-conditional image variants to 3 threads
@@ -378,6 +407,9 @@ raid-toast pollution (-162). Re-measured 083: **156 entries**.
 1   founder beat (day 3-6, one-shot — 3 names in one entry)
 1   first-snow beat (088 — first winter past day 10, one-shot)
 0-3 subsequent-winter beats (093 — 2nd/3rd/5th, founder-aging)
+0-1 constellation beat (116 — first autumn past day 15)
+0-1 longest-night beat (128 — first winter deep night)
+0-1 stone-weathering beat (122 — day ≥150 after stone_found)
 10  character intro + events (034 ensures + bard arrivals)
 20  dreams (every 10 days from day 10; 097 folds founder names in)
 2-4 echoes (2% per-dawn)
@@ -420,6 +452,14 @@ beats that sum near 57 by themselves. 088's first-snow adds
   threads). 103 adds exactly 1 terminal beat. Effective impact:
   realms reaching year 5 produce +4 beats over 091's target.
   Still well under the 300-entry cap.
+- **129 (this update): target revised to ~135-175.** 116 adds
+  +1 constellation beat (0-1 per realm depending on survival).
+  121 is pure migration (first-snow). 122 adds +1 stone-
+  weathering (conditional on stone_found + day ≥150). 128 adds
+  +1 longest-night (conditional on first winter night). Total
+  new beats per long-lived realm: +3 over 104's budget. Still
+  well under cap. Audio cues (124/125) don't add chronicle
+  entries — they're playback side-effects.
 
 ## how to update this doc
 
@@ -485,6 +525,28 @@ shipping, touch this file too.
   pattern proven portable.
 - **103** — end-of-realm requiem beat. Closes 053's 50-tick-
   old ask. New 15th tag. Lira arc closes at 7 surfaces.
-- **104** — this maintenance update. Captures 092-103 in the
+- **104** — maintenance update. Captured 092-103 in the
   invariants + tag inventory + system enumeration + cadence
-  summary. Per 075 invariant.
+  summary.
+- **116** — constellation_named surprise. First beat where
+  founder2 is sole focal — began rebalancing the founder arc
+  from founder1-oversaturation.
+- **121** — the-re-shipper migrated 088's first-snow into
+  NARRATIVE_BEATS. Honored 112 audio-surfaces invariant
+  ("migrate inline beats to table BEFORE adding audio"). 090
+  closed 31 ticks after filing.
+- **122** — stone_weathered surprise. 3rd beat on 056's stone
+  arc (discovery→offering→weathering).
+- **123** — refactor-only `onFire` field on NARRATIVE_BEATS
+  entries. Unblocks Pattern-2 audio for entries sharing tags.
+- **124** — first-snow audio cue via `onFire: 'first-snow'`.
+  First audio to ship under the 123 refactor.
+- **125** — offering audio cue. Closes the original 106-filed
+  audio cue list entirely.
+- **127** — welcome-back summary on tab refocus. Closes 030
+  filed 97 ticks ago.
+- **128** — longest_night_seen surprise. Founder3 as night-
+  watcher; continues 116's rebalancing (cast now 7/4/4).
+- **129** — this maintenance update. Captures 116-128 in the
+  invariants + NARRATIVE_BEATS entry list (15→19) + cadence
+  summary + related-loops.
