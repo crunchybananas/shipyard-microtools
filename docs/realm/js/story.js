@@ -333,6 +333,25 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 134 (surprise, un-filed): a namesake. Once per realm, if
+  // founders have been named (072) AND the realm has had ≥5 births,
+  // a child is given one of the founders' names. Which founder is
+  // deterministic per kingdom (hash-picked). Tag: character (034
+  // aligned). Compound that extends 072 founders + firstBirth into
+  // a continuing-generations surface.
+  { flag: 'namesake_born', tag: 'character',
+    trigger: G => {
+      if (!G.storyFlags.founders_named) return false;
+      const births = G.stats && (G.stats.citizensBorn || 0);
+      return births >= 5;
+    },
+    text: G => {
+      const kname = G.kingdomName || 'Realm';
+      const idx = _dreamHash(`${kname}_namesake_who`) % 3;
+      const key = ['founder1', 'founder2', 'founder3'][idx];
+      const f = G.storyFlags[key] || 'the founder';
+      return `A child is born in the realm and takes the name ${f}. The news carries from house to house — no one gathers, but no one stays still.`;
+    } },
   // Loop 128 (surprise, un-filed): the longest night. Once per realm,
   // fires deep in a winter night (first winter is days 22-28;
   // dayPhase > 0.85 of dayLength = late-night). Gives founder3 a 4th
