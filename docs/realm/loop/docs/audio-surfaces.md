@@ -62,7 +62,7 @@ future audio-ticks don't re-derive the shape.
    play a sound," the sound becomes an expectation.
    Undiscovered beats keep their surprise.
 
-## current catalog (8 cues)
+## current catalog (9 cues)
 
 ### `nightmare` — loop 106
 
@@ -236,23 +236,47 @@ detuned-pair voice emulation before).
 **Code:** `js/audio.js` switch case, Pattern 2 via
 `onFire: 'shepherds-song'`. 5th composer-tick cue.
 
+### `great-storm` — loop 149
+
+**Trigger:** 147's `great_storm_remembered` entry.
+Fires in autumn of year 2+. Tag: event (first event-
+tag audio cue; prior 7 onFire cues covered milestone/
+character/requiem/stone tags).
+
+**Sound design:** low-frequency noise burst (400 Hz
+cut, 2.0s, 0.03 gain) + D2 sine rumble (72 Hz, 0.4s
+attack, 2.5s decay, 0.05 gain) + D3 octave overtone
+(144 Hz, 0.5s attack, 2.2s decay). Slow attack on
+the rumble — it RISES like a memory forming. No
+high-frequency content at all; sound is muffled,
+distant.
+
+**Affect:** distant-past storm surfacing into memory.
+Not a storm LIVE; a storm REMEMBERED. The lack of
+high-frequency crispness signals temporal distance
+(sound-waves-over-time lose highs). Matches 147's
+"some of the realm remember" framing.
+
+**Code:** `js/audio.js` switch case, Pattern 2 via
+`onFire: 'great-storm'`. 6th composer-tick cue.
+
 ## acoustic contrast
 
 Nightmare and requiem are deliberately opposite on every
 axis — the realm's two "rarest" beats should sound as
 different as possible:
 
-| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) | namesake (137) | shepherds (145) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Wave | triangle | sine | sine | sine | **noise + sine** | sine | sine | sine + detuned |
-| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) | 349 Hz (F4) | 392 Hz (G4) |
-| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** | ascending major 3rd | **3 Hz detune beat** |
-| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph | 2-note spoken-name | sustained voice + drone |
-| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift | overlap mid-phrase | 3 Hz natural wobble |
-| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s | 0.05-0.06s | 0.15-0.20s |
-| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s | 0.4s + 1.2s | 2.2-2.5s |
-| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving | intimate, spoken | heard-from-fields |
-| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 | 0.050 | 0.045 |
+| Axis | nightmare (106) | requiem (111) | stone (113) | founders (115) | first-snow (124) | offering (125) | namesake (137) | shepherds (145) | great-storm (149) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Wave | triangle | sine | sine | sine | **noise + sine** | sine | sine | sine + detuned | **low noise + sine** |
+| Root | 64 Hz (C2) | 196 Hz (G3) | 659 Hz (E5) | 523 Hz (C5) | 8 kHz cut + 1568 Hz sine | 293 Hz (D4) | 349 Hz (F4) | 392 Hz (G4) | 72 Hz (D2) |
+| Interval | minor-2nd dissonant | harmonic consonant | perfect-5th ascending | minor triad ascending | non-tonal texture | **minor→major resolution** | ascending major 3rd | **3 Hz detune beat** | octave (72+144) |
+| Structure | sustained chord | single toll | quick chime | 3-note sequence | overlapping bursts | chord morph | 2-note spoken-name | sustained voice + drone | rising rumble + muffled wind |
+| Beating | 4 Hz tremolo | none | none | none | none | brief clash then lift | overlap mid-phrase | 3 Hz natural wobble | none |
+| Attack | 0.5s (sneaks in) | 0.02s (bell strike) | 0.01s (chime struck) | 0.05s soft | 0s (noise-gate) | 0.03s | 0.05-0.06s | 0.15-0.20s | 0.4-0.5s (memory-forms) |
+| Decay | 2.2s | 5.0s | 1.3s | 0.9-1.1s per note | 0.9s | 1.5-1.8s | 0.4s + 1.2s | 2.2-2.5s | 2.0-2.5s |
+| Character | unstable, buzzy | clean, mournful | bright, discovery | ceremonial, solemn | whispering, barely-heard | lifting, resolving | intimate, spoken | heard-from-fields | distant past, muffled |
+| Gain peak | 0.10 | 0.08 | 0.07 | 0.06 | 0.04 | 0.05 | 0.050 | 0.045 | 0.05 |
 
 If future cues land, document their coordinates on this
 grid so each stays perceptually distinct.
@@ -430,6 +454,15 @@ audio ticks should respect them:
   sustained voice. Low G3 drone for warmth. First
   cue to emulate a human voice via detune trick.
   Fires on 138's shepherd's-song beat.
+- **149** — great-storm memory. 9th cue; 6th composer
+  use; 5th Pattern-2. Low-band noise (400 Hz cut) +
+  D2 rumble (72 Hz) + D3 overtone (144 Hz) with
+  slow attacks — a storm REMEMBERED, not live.
+  First cue to occupy the sub-bass rumble register
+  (below 100 Hz root); first to signal temporal
+  distance through muffled frequency content. Fires
+  on 147's `great_storm_remembered` beat. First
+  event-tag audio cue.
 
 ## how to update this doc
 

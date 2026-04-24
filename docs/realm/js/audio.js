@@ -529,6 +529,22 @@ export function playSound(type) {
       makeOsc(ctx, dest, 'sine', 196, 0.025, 0.20, 2.2, t + 0.2);
       break;
     }
+
+    // ── Great storm: Loop 149 (the-composer, 147-filed). The beat is
+    //    MEMORY of a storm, not the storm arriving. Audio signals
+    //    distance: low-frequency noise at 400 Hz cut (muffled wind,
+    //    no high-frequency crispness), low D2 sine (72 Hz) rumble
+    //    with slow attack (0.4s) — rises like a memory forming —
+    //    then falls over 2.5s. Octave overtone at D3 for depth.
+    //    Quietest non-first-snow cue at gain 0.05 peak. Reads as
+    //    "the sound of something that happened long ago and far
+    //    away."
+    case 'great-storm': {
+      makeNoiseBurst(ctx, dest, 0.03, 2.0, t, 400);
+      makeOsc(ctx, dest, 'sine', 72, 0.05, 0.4, 2.5, t);
+      makeOsc(ctx, dest, 'sine', 144, 0.025, 0.5, 2.2, t + 0.3);
+      break;
+    }
   }
 }
 

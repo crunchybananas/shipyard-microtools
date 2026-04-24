@@ -355,7 +355,7 @@ const NARRATIVE_BEATS = [
   // an intergenerational nod without naming anyone. Tag: event
   // (reuse per 075 invariant; 063 added event to echo-sources so
   // this can resurface).
-  { flag: 'great_storm_remembered', tag: 'event',
+  { flag: 'great_storm_remembered', tag: 'event', onFire: 'great-storm',
     trigger: G => G.storyFlags.year2 && G.season === 'autumn',
     text: G => {
       const kname = G.kingdomName || 'Realm';

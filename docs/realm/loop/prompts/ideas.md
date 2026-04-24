@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 149 [review] — live-audition of all 9 cues together (nightmare / requiem / stone / founders / first-snow / offering / namesake / shepherds / great-storm). Specifically: does great-storm read as "distant past" or just "bass rumble"? Needs real speakers — laptop speakers won't render 72 Hz faithfully. [play]
+- 149 [code] — onFire callback payload form for per-variant audio. Currently `onFire: 'name'` fires the same sound regardless of text variant. For great-storm's 5 variants (wind-through / rain-overflows / east-storm / bronze-sky / lightning-struck-nothing), subtle variation could deepen. File only if 2nd caller wants it — don't generalize preemptively. [audio.js + story.js]
+- 149 [code] — per-kingdom storm-pitch variation. Hash kingdom name to pick D2/D#2/C#2 root. ~4 lines in great-storm case. Matches 111-filed per-kingdom-bell-pitch variation pattern. [audio.js]
+
 - 095 [code] **HIGH** — 3-line `_WINTER_CAPS` fix: windmill y=-32→-28, granary y=-26→-22, lumber y=-29→-28. Closes 095's perceptual "floating cap" finding on 3 building-types without losing width-based pixel-diff distinctness. [render.js] **DONE → 096** (3 y-offsets + granary h=4→3; width axis preserved 18/22/26/30; 9/9 caps now read natural on :8891)
 - 095 [code] — dome-shape rendering specifically for granary (cap CONFORMS to dome curve, not ellipse above). Pairs with 086/094 dome idea but specifically motivated by 095 "double-dome" visual. [render.js]
 - 095 [code] — sail-tip snow accumulation on windmill: instead of a cap above the sails, settle snow on the ends of the 4 sail arms. Ties snow to sprite shape. ~10 lines. [render.js]
@@ -97,7 +101,7 @@ and note the promotion here.
 - 145 [code] — shepherd's-song seasonal pitch variation: autumn = G4, winter = F#4 (semitone lower). ~4 lines. [audio.js + story.js]
 - 145 [review] — live-audition of all 8 cues together. Gain balance, emotional-coverage sanity, "pastoral presence" landing correctly. [play]
 - 146 [review] **founder-moratorium check-in** — at tick 157, audit whether the 147-156 window stayed non-founder in narrative surfaces. Metrics: ≥ 3 non-founder surprises, ≥ 2 new focal points, founder-surface increase ≤ 1. [loop/]
-- 147 [code] — audio cue `onFire: 'great-storm'` — distant-wind + rain texture. [audio.js + story.js]
+- 147 [code] — audio cue `onFire: 'great-storm'` — distant-wind + rain texture. [audio.js + story.js] **DONE → 149** (low-band noise burst 400 Hz cut + D2 sine rumble 72 Hz slow attack + D3 overtone; muffled = distant past; 9th cue; first sub-bass sine; first event-tag audio; Pattern 2)
 - 147 [code] — location-focal beat ("the northern cliff feels empty this autumn"). Map direction as focal, no characters. [story.js]
 - 147 [code] — wanderer-acknowledgment beat (048/061 _wanderer still has no narrative surface). Moratorium-compliant. [story.js + enhancements.js] **DONE → 148** (static string; tag:misc; day ≥ 50 gate; "No one calls them anything" preserves 048's anonymous intent)
 - 148 [code] — wanderer continuous audio (footstep ambient when _wanderer is visible on-screen). Needs visibility hook from enhancements.js. [audio.js + enhancements.js]
