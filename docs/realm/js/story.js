@@ -333,6 +333,20 @@ const NARRATIVE_BEATS = [
   // New tag 'requiem' (justified per 075: no existing tag fits "realm
   // itself ends"). Added to _EVICTION_IMMUNE_TAGS so a flood of final
   // starvation/combat deaths doesn't cap-evict this last beat.
+  // Loop 128 (surprise, un-filed): the longest night. Once per realm,
+  // fires deep in a winter night (first winter is days 22-28;
+  // dayPhase > 0.85 of dayLength = late-night). Gives founder3 a 4th
+  // canonical surface (after 089 nightmare pool, 097 dream harvest
+  // thread, 115 founders audio). Cast now: founder1=7, founder2=4,
+  // founder3=4. 116's founder3-rebalancing continues.
+  { flag: 'longest_night_seen', tag: 'milestone',
+    trigger: G => G.season === 'winter' && G.day >= 22 && G.dayPhase > (G.dayLength || 3600) * 0.85,
+    text: G => {
+      const f = G.storyFlags.founder3;
+      return f
+        ? `The night is longer than any the oldest will admit to remembering. ${f} keeps watch at the fires.`
+        : 'The night is longer than any the oldest will admit to remembering. The watchers at the fires do not speak.';
+    } },
   // Loop 122 (surprise, un-filed): the stone weathers. A second beat
   // on 056's standing stone, fires once day ≥150 past first discovery.
   // Extends the stone's narrative arc: 056 discovery → 079 offering
