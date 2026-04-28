@@ -87,7 +87,7 @@ Keep it accurate or retire it.
   granary); lower per-building visual fidelity than canvas/SVG; no
   textures yet (per-vertex color only)
 - **Currently shipped:** castle, house, tower, church, barn,
-  granary (post-163) — 6 of 11+ types
+  granary (post-163), windmill (post-167) — 7 of 11+ types
 
 ### asset/meshes/
 
@@ -132,8 +132,8 @@ tick 165:
 | house        |   ✓    |     —      |    ✓      |
 | tower        |   ✓    |     —      |    ✓      |
 | barn         |   —    |     —      |    ✓      |
+| windmill     |   ✓    |     —      |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
-| windmill     |   ✓    |     —      |     —     |
 | tavern       |   ✓    |     —      |     —     |
 | blacksmith   |   ✓    |     —      |     —     |
 | market       |   ✓    |     —      |     —     |
@@ -246,10 +246,16 @@ pipeline, these will need solving:
 - **163** — 3D engine first touch; granary mesh + pushCylinder +
   debug-pillar cleanup; granary now in all three layers
 - **164** — church.svg; 3rd sprite milestone reached
-- **165 (this update)** — render-layers.md captures the canvas/
-  SVG/3D landscape; coverage map; cross-axis triangle invariant;
-  authoring-cost data; integration-concern checklist for future
-  integration tick
+- **165** — render-layers.md captures the canvas/SVG/3D landscape;
+  coverage map; cross-axis triangle invariant; authoring-cost
+  data; integration-concern checklist for future integration
+  tick.
+- **166** — frog-voices acknowledgment (3rd ambient-entity beat;
+  148/152 grammar). Non-graphics tick; doesn't change render
+  layers but documents the variety cadence around graphics work.
+- **167** — 3D windmill mesh added; coverage map updated. Builds
+  toward windmill cross-axis triangle (158 canvas anchor; SVG
+  sibling pending). 3D layer coverage now 7 of 11 buildings.
 
 ## how to update this doc
 

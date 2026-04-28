@@ -91,6 +91,7 @@ function placeSampleBuildings(map) {
     ['church', -4, 0],
     ['barn', 0, 3],
     ['granary', 4, 2],  // Loop 163 — paired with 158 canvas + 161 SVG siblings
+    ['windmill', -2, -3], // Loop 167 — pairs with 158 canvas; SVG sibling pending
   ];
   for (const [type, dx, dy] of positions) {
     const x = cx + dx, y = cy + dy;
@@ -374,6 +375,37 @@ function buildBuildingsMesh(buildings, map) {
         [cx + 0.5, gy + 0.55, cz - 0.35],
         [cx + 0.5, roofTopY, cz],
         [1, 0, 0], [0.55, 0.25, 0.18]);
+    }
+    else if (b.type === 'windmill') {
+      // Loop 167 — windmill 3D mesh. Sibling to 158 canvas
+      // drawWindmill (dome-conforming concerns + the conforming-cap
+      // thread); pending sibling SVG sprite to complete the
+      // windmill cross-axis triangle (granary established the
+      // pattern at 158/161/163). Static blades — the 3D prototype
+      // doesn't animate per-frame meshes, and a fixed-cross blade
+      // pose reads as a windmill at iso angle.
+      const stone = [0.62, 0.58, 0.52];
+      const wood = [0.55, 0.40, 0.22];
+      const blade = [0.78, 0.62, 0.38];
+      const hubColor = [0.36, 0.24, 0.10];
+      // Octagonal stone base (single-radius — tapered base would
+      // need a frustum primitive; defer for visual fine-tuning)
+      mesh.pushCylinder(cx, cz, gy, gy + 0.85, 0.32, 8, stone);
+      // Wooden cap atop base
+      mesh.pushBox(cx - 0.22, gy + 0.85, cz - 0.22, cx + 0.22, gy + 1.00, cz + 0.22, wood);
+      // Hub: dark cube projecting forward (+z)
+      const hubY = gy + 1.05;
+      mesh.pushBox(cx - 0.06, hubY - 0.06, cz + 0.18, cx + 0.06, hubY + 0.06, cz + 0.30, hubColor);
+      // 4 blades in cross pattern, plane facing +z
+      const bL = 0.50, bW = 0.04, bT = 0.04;
+      mesh.pushBox(cx - bW, hubY + 0.06, cz + 0.20,
+                   cx + bW, hubY + 0.06 + bL, cz + 0.20 + bT, blade);
+      mesh.pushBox(cx - bW, hubY - 0.06 - bL, cz + 0.20,
+                   cx + bW, hubY - 0.06, cz + 0.20 + bT, blade);
+      mesh.pushBox(cx + 0.06, hubY - bW, cz + 0.20,
+                   cx + 0.06 + bL, hubY + bW, cz + 0.20 + bT, blade);
+      mesh.pushBox(cx - 0.06 - bL, hubY - bW, cz + 0.20,
+                   cx - 0.06, hubY + bW, cz + 0.20 + bT, blade);
     }
     else if (b.type === 'granary') {
       // Loop 163 — first 3D engine touch. Sibling to 158 canvas

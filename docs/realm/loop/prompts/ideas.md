@@ -44,7 +44,11 @@ and note the promotion here.
 - 161 [code] **AXIS** — render-pipeline integration: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with SVG image draw. Must compose with hover halo, day-night tint, winter cap (158), fog modulation, photo-mode zoom. ~1 deliberate tick after 3+ sprites exist. [render.js]
 - 161 [review] — performance audit: SVG sprite cost per building at 60fps with 100+ buildings on screen. Compare to canvas baseline. Decides whether SVG ships in live game or stays as sprite reference. [play]
 - 161 [code] **AXIS** — open the 3D engine axis: ship a small improvement to `docs/realm/3d/3d.js` (add a building, fix a control, polish a shader). Forces familiarity. [3d/3d.js] **DONE → 163** (cleaned up 3 debug pillars; added `pushCylinder` mesh primitive; shipped granary mesh — granary now expressed across canvas/SVG/3D layers; +38 LoC net)
-- 163 [code] — windmill 3D mesh: cylinder base + box wooden cap + 4 thin-prism rotating blades around hub axis. Pairs with 158 (canvas conforming-cap). [3d/3d.js]
+- 163 [code] — windmill 3D mesh: cylinder base + box wooden cap + 4 thin-prism rotating blades around hub axis. Pairs with 158 (canvas conforming-cap). [3d/3d.js] **DONE → 167** (octagonal cylinder base + cap box + cross-pattern static blades + dark hub cube; rotation deferred — filed; pushCylinder reused; +32 LoC)
+- 167 [code] — animate windmill blades via per-vertex blade-marker attribute + uniform `uWindmillAngle` driven by `uTime`. ~15-20 LoC in vertex shader + Mesh class. [3d/3d.js]
+- 167 [code] — `pushFrustum(cx, cz, baseY, topY, baseR, topR, sides, c)` Mesh primitive for tapered cylinders (windmill base, tower spire transition, etc). ~25 LoC. [3d/3d.js]
+- 167 [code] — windmill SVG sprite (4th SVG sprite) — completes windmill cross-axis triangle (canvas 158 + 3D 167 + SVG). [assets/sprites/]
+- 167 [review] — visual diff: 3D windmill vs canvas drawWindmill at iso angle. Do static blades read as windmill, or does lack of rotation make it look broken? [play]
 - 163 [review] — live-verify granary appears correctly in 3D scene at offset (4, 2). Confirm cylinder + dome + finial + door render with proper lighting. [play]
 - 163 [code] — re-enable backface culling and audit winding-order. If holes appear, fix in `pushQuad`/`pushBox`/etc rather than leaving culling off. Performance + correctness. [3d/3d.js]
 - 163 [code] — day/night sun rotation: animate `uLightDir` over 60s loop. Adds atmosphere. ~10 LoC. [3d/3d.js]
