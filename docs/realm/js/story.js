@@ -636,6 +636,12 @@ const NARRATIVE_BEATS = [
   { flag: 'constellation_forgotten', tag: 'milestone',
     trigger: G => G.storyFlags.year3 && G.day >= 85 && G.storyFlags.constellation_named && G.stats && G.stats.citizensBorn >= 10,
     text: 'Years pass, and the constellation the realm named goes back to being just stars. No one corrects the youngest when they call them by other names, or by no name at all.' },
+  // Loop 192 (the-fixer, closes 103 filed): `G.realmEnded` flag added
+  // via `after:` callback (144 schema). Sets when realm_fell beat
+  // fires. Silent-module: future rendering ticks can read this to
+  // desaturate / fog / silence post-end. No immediate visual change.
+  // Mirrors the way 144 namesake's `after:` reifies a chronicle
+  // reference into game state.
   { flag: 'realm_fell', tag: 'requiem', onFire: 'requiem',
     trigger: G => G.day > 1 && G.population === 0,
     text: G => {
@@ -643,7 +649,8 @@ const NARRATIVE_BEATS = [
       return f
         ? `The last fire in the realm goes out. ${f}'s name is the last spoken, and then there is no one to speak it.`
         : 'The last fire in the realm goes out. There is no one left to tend it, and no one left to remember.';
-    } },
+    },
+    after: G => { G.realmEnded = true; } },
 ];
 // Loop 123 (refactor-only): added optional `onFire` field to
 // NARRATIVE_BEATS entries. Replaces 111's inline `beat.tag ===

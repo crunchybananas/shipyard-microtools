@@ -183,7 +183,12 @@ and note the promotion here.
 - 101 [code] — merchant → trade price modifier. Named merchant: +5% trade return. Mirror of 101's teacher pattern. ~3 lines. [economy.js] **DONE → 102** (2 lines in trade.js; 6-case matrix verified; pattern portable)
 - 103 [code] — "realm forgotten" follow-up requiem: fires some days after realm_fell via direct chain (since no more dawns post-pop=0). Pairs with current requiem. [story.js]
 - 103 [code] — castle-falls requiem: if castle destroyed (raid or future mechanic), fire requiem beat. Tag:requiem reuse. [story.js + events.js]
-- 103 [code] — `G.realmEnded` flag: set when requiem fires. Enables post-end rendering (fog return, desaturation, silence). Future mood tick. [state.js + story.js]
+- 103 [code] — `G.realmEnded` flag: set when requiem fires. Enables post-end rendering (fog return, desaturation, silence). Future mood tick. [state.js + story.js] **DONE → 192** (after: callback on realm_fell NARRATIVE_BEATS entry; silent-module — ships flag-setter, consumers filed)
+- 192 [code] — first consumer of G.realmEnded: render-pipeline desaturation post-end (multiply-blend grey overlay when G.realmEnded). ~10 LoC. [render.js]
+- 192 [code] — second consumer: audio silence / fade-out (G.audioCtx mute or master gain to 0). [audio.js]
+- 192 [code] — UI toast suppression post-end (notify() filter on G.realmEnded). [notifications.js]
+- 192 [code] — save.js persistence for G.realmEnded (2 lines). Re-derives from storyFlags.realm_fell otherwise. [save.js]
+- 192 [doc] — when a consumer ships, document the post-end-mode pattern in loop/docs/ as a reusable runtime-state hook (sibling to NARRATIVE_BEATS but for G runtime properties). [loop/docs/]
 - 103 [review] — does the 7-surface Lira arc feel EARNED or forced at realm-end? Long-play read. [play]
 - 103 [doc] — update narrative-surfaces.md: new `requiem` tag (15 tags now), new eviction-immune entry, new NARRATIVE_BEATS entry. Per 075 invariant. [loop/docs/] **DONE → 104** (maintenance tick; also caught up 092/093/097/101/102)
 - 104 [code] — enhancements.js system count should be 9 (not 10) in narrative-surfaces.md. 092 removed anniversary updater; doc's enumeration wasn't shifted. [loop/docs/]
