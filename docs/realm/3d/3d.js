@@ -93,6 +93,7 @@ function placeSampleBuildings(map) {
     ['granary', 4, 2],  // Loop 163 — paired with 158 canvas + 161 SVG siblings
     ['windmill', -2, -3], // Loop 167 — pairs with 158 canvas; SVG sibling pending
     ['barracks', 2, 3],   // Loop 183 — pairs with 182 SVG; 6/11 cross-axis triangles
+    ['tavern', -3, 2],    // Loop 185 — pairs with 175 SVG; cross-axis triangle complete
   ];
   for (const [type, dx, dy] of positions) {
     const x = cx + dx, y = cy + dy;
@@ -376,6 +377,30 @@ function buildBuildingsMesh(buildings, map) {
         [cx + 0.5, gy + 0.55, cz - 0.35],
         [cx + 0.5, roofTopY, cz],
         [1, 0, 0], [0.55, 0.25, 0.18]);
+    }
+    else if (b.type === 'tavern') {
+      // Loop 185 — tavern 3D mesh. Sibling to 175 SVG sprite + canvas
+      // drawTavern. Pairs the most narrative-weight building across
+      // all three render layers. Warm-wood family palette (matches
+      // house 173 + bakery 180 SVG family per 181 milestone-review).
+      const wood = [0.62, 0.42, 0.20];
+      const amberRoof = [0.66, 0.45, 0.16];
+      const sign = [0.86, 0.66, 0.18];
+      const flag = [0.78, 0.58, 0.16];
+      // Main warm-wood walls
+      mesh.pushBox(cx - 0.5, gy, cz - 0.4, cx + 0.5, gy + 0.85, cz + 0.4, wood);
+      // Pitched amber roof (square pyramid)
+      mesh.pushPyramid(cx, cz, gy + 0.85, gy + 1.40, 0.55, amberRoof);
+      // Roof-top flag pole (051 silhouette-fix sibling)
+      mesh.pushBox(cx - 0.025, gy + 1.40, cz - 0.025, cx + 0.025, gy + 1.75, cz + 0.025, [0.30, 0.20, 0.10]);
+      // Roof-top flag (small extending box)
+      mesh.pushBox(cx + 0.025, gy + 1.55, cz - 0.025, cx + 0.30, gy + 1.70, cz + 0.025, flag);
+      // Side sign board (left face, gold)
+      mesh.pushBox(cx - 0.55, gy + 0.45, cz - 0.10, cx - 0.45, gy + 0.65, cz + 0.10, sign);
+      // Sign bracket arm
+      mesh.pushBox(cx - 0.50, gy + 0.55, cz - 0.02, cx - 0.45, gy + 0.55, cz + 0.02, [0.30, 0.20, 0.10]);
+      // Door (small dark box, front face)
+      mesh.pushBox(cx - 0.10, gy, cz + 0.38, cx + 0.10, gy + 0.45, cz + 0.45, [0.22, 0.12, 0.06]);
     }
     else if (b.type === 'barracks') {
       // Loop 183 — barracks 3D mesh. Sibling to 182 SVG sprite +

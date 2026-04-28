@@ -93,8 +93,8 @@ Keep it accurate or retire it.
   granary); lower per-building visual fidelity than canvas/SVG; no
   textures yet (per-vertex color only)
 - **Currently shipped:** castle, house, tower, church, barn,
-  granary (post-163), windmill (post-167), barracks (post-183)
-  — 8 of 11+ types
+  granary (post-163), windmill (post-167), barracks (post-183),
+  tavern (post-185) — 9 of 11+ types
 
 ### asset/meshes/ — LOOP DOES NOT TOUCH
 
@@ -129,6 +129,7 @@ is treated as an external system.
 | windmill | 094/096/158 (~70 LoC) | 168 (213 LoC) | 167 (~25 LoC) | canvas → 3D → SVG |
 | tower    | pre-loop (~42 LoC) | 170 (188 LoC) | pre-loop (~15 LoC) | canvas + 3D pre-loop → SVG |
 | barracks | pre-loop (~115 LoC) | 182 (242 LoC) | 183 (~25 LoC) | canvas pre-loop → SVG → 3D |
+| tavern   | pre-loop (~120 LoC) | 175 (239 LoC) | 185 (~25 LoC) | canvas pre-loop → SVG → 3D |
 
 158 (canvas) shipped a dome-conforming snow cap closing 095's
 filed idea. 161 (SVG) demonstrated the same building authored
@@ -160,7 +161,7 @@ tick 172:
 | barn         |   —    |     —      |    ✓      |
 | windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
-| tavern       |   ✓    |    ✓ (175) |     —     |
+| tavern       |   ✓    |    ✓ (175) |    ✓ (185)|
 | blacksmith   |   ✓    |    ✓ (176) |     —     |
 | market       |   ✓    |    ✓ (179) |     —     |
 | bakery       |   ✓    |    ✓ (180) |     —     |
@@ -532,11 +533,20 @@ pipeline, these will need solving:
   castle/church/house (canvas + SVG + 3D pre-loop +
   loop-shipped SVG), granary (158/161/163),
   tower (170 + pre-loop 3D), windmill (094/096/158/167/168),
-  barracks (canvas pre-loop / 182 / 183). **3 buildings
-  still need 3D meshes**: tavern / blacksmith / market —
-  these have canvas + SVG but no 3D yet. (Plus barn is 3D-
-  only with no canvas/SVG; farm is canvas-only with no
-  SVG/3D.)
+  barracks (canvas pre-loop / 182 / 183).
+- **184** — surprise (chrome-offline interleave). Stone
+  arc closes with `stone_forgotten` beat — fourth beat on
+  056/079/122 standing-stone arc. Chrome-independent,
+  narrative-only.
+- **185** — Phase B still blocked on chrome; fallback queue
+  continues with **3D tavern mesh**. Sibling to 175 SVG.
+  Form: warm-wood walls box + amber pyramid roof + roof-
+  top flag pole + flag + side sign board with bracket arm
+  + small dark door. Per 181 milestone-review's family-
+  palette correspondence (warm-wood family with house +
+  bakery). 3D layer **9 of 11**; **8 of 11 cross-axis
+  triangles complete**. 2 buildings still need 3D meshes:
+  blacksmith / market.
 
 ## how to update this doc
 

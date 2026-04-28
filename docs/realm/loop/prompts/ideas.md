@@ -44,7 +44,8 @@ and note the promotion here.
 - 181 [code] **PHASE A 11/11** — barracks SVG sprite at 182. Military: stone walls + parapet (canvas drawBarracks at line 3879). [assets/sprites/] **DONE → 182** (242 lines; cruciform arrow slits + crenellations + flag banner + training dummy with target marks + weapons rack with shield/cross emblem; ROSTER COMPLETE 11/11)
 - 182 [review] **PRIORITY** — visual-debt catch-up when chrome returns: verify all 11 sprites at 4 zoom levels in sandbox; compare each to canvas-equivalent at matching scales; multi-instance paint cost stress test; photo-mode 5× zoom crispness check. Documented in render-layers.md visual-debt log. [play]
 - 182 [code] — 3D barracks mesh: walls box + flat parapet + crenellation cubes + small flag pole. ~25 LoC. [3d/3d.js] **DONE → 183** (27 LoC; Phase B chrome-offline pivot; defensive-industrial palette; cross-axis triangle complete; 3D layer 8/11)
-- 183 [code] — 3D tavern mesh: walls box + pitched roof pyramid + sign-board cube. ~25 LoC. [3d/3d.js]
+- 183 [code] — 3D tavern mesh: walls box + pitched roof pyramid + sign-board cube. ~25 LoC. [3d/3d.js] **DONE → 185** (25 LoC; warm-wood family palette; flag pole + bracket arm + door; tavern triangle complete; 3D layer 9/11)
+- 185 [code] — `pushFrustum(cx, cz, baseY, topY, baseHalfW, topHalfW, c)` Mesh primitive for tapered forms (windmill base taper, market awning trapezoid, etc). ~25 LoC. Silent-module work; chrome-independent. [3d/3d.js]
 - 183 [code] — 3D blacksmith mesh: dark walls + flat roof + chimney box + anvil. ~25 LoC. [3d/3d.js]
 - 183 [code] — 3D market mesh: counter + 2 posts + awning prism + barrel/crate cubes. ~30 LoC. [3d/3d.js]
 - 183 [process] — chrome-offline fallback queue: 3D meshes drain over 3 ticks (tavern/blacksmith/market). Then non-graphics interleaves. Phase B unblocks when chrome returns. [process]
