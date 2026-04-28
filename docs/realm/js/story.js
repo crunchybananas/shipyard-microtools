@@ -430,6 +430,21 @@ const NARRATIVE_BEATS = [
       const idx = _dreamHash(`${kname}_great_storm`) % storms.length;
       return `Some of the realm remember a great storm: ${storms[idx]}. The children born after do not believe it.`;
     } },
+  // Loop 174 (surprise, un-filed, post-moratorium): first frost. Sibling
+  // to 147 great-storm in seasonal placement (both year-2+ autumn) but
+  // PRESENT-tense observation rather than past-tense memory. Fires on
+  // day ≥ 45 (mid-late year-2 autumn) so 147 has a 2-day head start
+  // and the two beats land on different chronicle mornings.
+  // Year-2-aware: the realm has lived through one full cycle and now
+  // RECOGNIZES the seasonal change rather than just experiencing it.
+  // Tag: misc (sibling cluster register; observational, communal).
+  // Static string — autumn frost is a singular event (no kingdom-
+  // hashed variants; the FIRST frost is one moment per realm-year).
+  // Diversifies the surprise palette: 148/152/166 = ambient-entity
+  // grammar, 174 = seasonal/weather-recognition. Different family.
+  { flag: 'first_frost_marked', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && G.season === 'autumn' && G.day >= 45,
+    text: 'There is a morning when frost finds the fields and does not leave by noon. The realm marks the year by it now.' },
   // Loop 142 (surprise, un-filed): a letter from the other realm.
   // Opens up the WORLD beyond the island — the realm receives news
   // from a distant kingdom. Both the distant name and the news are
