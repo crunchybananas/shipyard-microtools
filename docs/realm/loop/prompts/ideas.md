@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 198 [code] — third use of `after:` schema would promote it to a formal invariant per pattern-emergence rule. Currently 2 uses (134 namesake citizen-rename + 192 realm-fell flag-setter). Candidate: a beat that needs to set a flag AND modify game state simultaneously. No specific candidate yet; filed as watch-pattern. [story.js]
+- 198 [code] — third source-specific echo branch would promote checkEchoBeat pattern to invariant + registry refactor. Currently 1 use (194 constellation shape). Candidates: stone (056) "they say a stone there bears our own name still" / great-storm (147) / wanderer (148). Per 194 filing. [story.js]
+- 198 [doc] — when 3+ source-specific echo branches exist, refactor to a registry table (`_ECHO_SPECIAL_FRAMES` keyed by source-prose-fingerprint). Until then conditional branches are fine. [story.js + loop/docs/]
 - 161 [code] **AXIS** — convert remaining buildings to SVG sprites. Suggested order (visual complexity descending): ~~castle~~ (162) → church → tower → tavern → blacksmith → market → windmill → bakery → barracks → house → farm. **2 of 11 shipped (granary 161, castle 162)**. [assets/sprites/]
 - 162 [code] — animated pennants + flag sway via `<animate>` or CSS keyframes on castle.svg. Optional polish; only if integration picks SVG. [castle.svg]
 - 162 [code] — 3rd SVG sprite: church (spire/steeple language pairs with castle, smaller proportion). Establishes 3-sprite arc as real. [assets/sprites/church.svg] **DONE → 164** (~165 lines SVG with gothic stained-glass rose window using true elliptical-arc paths, lead tracery, block-pattern stone courses, gold cross finial, classic blue glass + bell variant; 3-sprite milestone reached)
@@ -62,7 +65,7 @@ and note the promotion here.
 - 193 [code] — landmark visual: pick a random tile near the realm cluster, mark on minimap with small symbol. Pairs prose to spatial feature. ~20 LoC. [render.js]
 - 193 [code] — landmark forgetting beat at year 5+ (closes the realm-environment naming triplet's 3rd member). Pair with 184/190 forgettings; ~tick 200+ window per spacing. [story.js]
 - 193 [code] — second landmark beat at year 4+ from a different pool (the realm names ~3 places over its life). [story.js]
-- 193 [doc] — narrative-surfaces.md archivist tick due ~198-203 (188 last; +10-15 tick rhythm; 190+193 added beats). [loop/docs/]
+- 193 [doc] — narrative-surfaces.md archivist tick due ~198-203 (188 last; +10-15 tick rhythm; 190+193 added beats). [loop/docs/] **DONE → 198** (NARRATIVE_BEATS 28→31 with 190/193/196 + 192 after-callback + 194 echo branch; cadence ~145-186 → ~147-188; +139 LoC; pattern-emergence rule tracked at 2 uses for both `after:` schema and source-specific echo)
 - 188 [process] — chrome-offline ticks 178-188 = 11 ticks static-only verification; visual-debt batch ~21 items. Pattern: when chrome drops 10+ ticks, surface re-prompting more directly. [process]
 - 184 [doc] — narrative-surfaces.md archivist tick due (177 was last; +7 ticks; 178/184 added beats). [loop/docs/]
 - 182 [code] — animate barracks banner flutter via `<animate transform>`. Phase C. [barracks.svg]

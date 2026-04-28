@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -102,9 +102,44 @@ weathering is per-kingdom). Tag: stone (reuse;
 eviction-immune per 085). Gate: `year3 && stone_found &&
 citizensBorn ≥ 10`. 185-187 shipped 3D-mesh fallback ticks
 (tavern/blacksmith/market) — chrome-independent
-graphics work; no chronicle additions. **188 (this update)**
-catches the doc up to 184 + adds the OBJECT-ARC CLOSURE
-template invariant (filed at 184 for cross-application).
+graphics work; no chronicle additions. 188 caught
+the doc up to 184 + added the OBJECT-ARC CLOSURE
+template invariant (filed at 184 for cross-
+application). 189/191 shipped type-scale phase 5
++ 6 (CSS hygiene; **130 HIGH closes** after 6
+phases / 42 migrations / 61 ticks; non-narrative).
+**190 (surprise, post-moratorium)** added
+`constellation_forgotten` — **second use** of the
+object-arc closure template (188 invariant).
+2-beat cycle (116 named → 190 forgotten) vs
+stone's 4-beat; template tolerates either. **192
+(the-fixer)** closed 103-filed `G.realmEnded`
+flag via the **second use** of the 144 `after:`
+schema (after 134 namesake's citizen-rename) —
+realm_fell beat sets a runtime flag for future
+post-end consumers. **193 (surprise)** added
+`landmark_named` — opens the **realm-environment
+naming triplet** (sky 116 / object 056 / place
+193). NARRATIVE_BEATS reaches 30 entries. **194
+(the-fixer)** closed 116-filed constellation
+echo frame: special branch in checkEchoBeat
+detects 116 source via unique phrase + extracts
+shape via regex; surfaces "Old folk still call
+them ${shape}" frame. Constellation arc now 5
+touchpoints (116/151/159/190/194). **195 (the-
+skeptic)** flagged year-3+ beats may be
+invisible to median play; recommended early-
+game bias for next 5-10 narrative ticks. **196
+(surprise)** directly responded with
+`first_long_evening` — year-1 summer day ≤ 14;
+**anti-anxious mood** ("things are okay");
+fills the THIN year-1 summer narrative gap.
+NARRATIVE_BEATS 31 entries. **197 (the-fixer)**
+shipped G.realmEnded save persistence (closes
+192-filed; 2-path defensive load). 198 (this
+update) catches the doc up to 190/193/196 +
+documents the 194 checkEchoBeat source-specific
+echo branch in system #11.
 
 ## why this exists
 
@@ -162,16 +197,19 @@ Numbered in rough order of file:
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
 5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103, 116,
-   121, 122, 128, 134, 138, 142, 147, 148, 152, 166, 174, 184
-   extended) — consolidates state-triggered one-shot beats.
-   Each entry: `{ flag, tag, trigger(G)→bool, text:
-   string|(G)→string, onFire?: string, after?: (G)=>void }`.
+   121, 122, 128, 134, 138, 142, 147, 148, 152, 166, 174, 184,
+   190, 192, 193, 196 extended) — consolidates state-triggered
+   one-shot beats. Each entry: `{ flag, tag, trigger(G)→bool,
+   text: string|(G)→string, onFire?: string, after?: (G)=>void }`.
    Mirrors BUILDING_FIRST_BEATS; sibling table, single dispatch
    loop. 123 added the optional `onFire: 'soundName'` string
    field for audio (see audio-surfaces.md Pattern 2); **144
    added the optional `after: (G) => void` callback for
    arbitrary side effects** (mirrors BUILDING_FIRST_BEATS
-   `after:` used since 034). **Current 28 entries:**
+   `after:` used since 034). 192 added a **SECOND use of the
+   `after:` schema** (after 134 namesake): `realm_fell` entry
+   gains `after: G => { G.realmEnded = true; }` for post-end
+   runtime mode. **Current 31 entries:**
    - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
      firstRaidSurvived
    - 3 year milestones (092, migrated from enhancements.js): year2,
@@ -208,6 +246,45 @@ Numbered in rough order of file:
      instead of a WEATHER MEMORY. Static (no kingdom-hashed
      variants) because forgetting is universal even when
      weathering is per-kingdom.
+   - 1 constellation-forgetting beat (190, un-filed surprise):
+     once-per-realm when `year3 && day ≥ 85 &&
+     constellation_named && citizensBorn ≥ 10`. **SECOND USE of
+     188 object-arc closure template** (stone was first at 184).
+     **Closes the constellation arc as a 2-beat cycle** (116
+     named → 190 forgotten) vs stone's 4-beat — template
+     tolerates either; only requires the object earned its
+     closure. Tag: milestone (matches 116's anchor). Static
+     prose: "Years pass, and the constellation the realm named
+     goes back to being just stars. No one corrects the
+     youngest when they call them by other names, or by no
+     name at all."
+   - 1 landmark-named beat (193, un-filed surprise): once-per-
+     realm when `year2 && day ≥ 50`. **OPENING beat** (mood
+     contrast vs forgetting cluster). Third member of the
+     realm-environment naming triplet (sky 116 / object 056 /
+     place 193). 8 kingdom-hashed rural-vernacular names ("the
+     bent ash" / "the cold spring" / "the long hill" / "the
+     path between" / "the high meadow" / "the southern ridge" /
+     "the stone wall" / "the old well"). "No one decided this;
+     it simply is" emergent-naming idiom. Tag: milestone.
+   - 1 first-long-evening beat (196, un-filed surprise; **post-
+     195 skeptic-flag response**): once-per-realm when
+     `season === 'summer' && day ≤ 14`. **YEAR-1 ONLY** —
+     fires in the THIN year-1 mid-summer narrative gap (days
+     8-14, between founders day 3-6 and autumn beats day ≥ 15).
+     **Anti-anxious mood**: "things are okay right now" —
+     almost no other realm beat permits rest. Static text:
+     "There is a summer evening early in the realm when nothing
+     is asked of anyone. The work is done. The fields hold heat
+     into the dusk, and the fire is allowed to burn low." Tag:
+     misc (joins observational cluster — 9 misc-tag beats now).
+   - 1 realm-fell `after:` hook (192, the-fixer): closes 103
+     filed 89 ticks ago. `realm_fell` entry gains `after: G =>
+     { G.realmEnded = true; }` for post-end runtime mode. Second
+     use of the after callback after 134 namesake. Silent-
+     module: ships the flag-setter; consumers (render desat /
+     audio fade / UI suppression) pending. 197 added save
+     persistence (defensive 2-path load).
    - 1 longest-night beat (128, un-filed surprise): fires in deep
      night of first winter (day ≥22 AND dayPhase > 0.85 ×
      dayLength); **founder3 as night-watcher** (4th canonical
@@ -310,8 +387,16 @@ Numbered in rough order of file:
     hash-seed determinism per kingdom.
 10. **checkStoneBeat** (056, once-per-realm seeded, `stone`) — renders
     via 058 at stored `stone_x`/`stone_y`.
-11. **checkEchoBeat** (059/063, ~2% per-dawn, `echo`) — cites
-    prior `_ECHO_SOURCE_TAGS` with one of 4 memory frames.
+11. **checkEchoBeat** (059/063/194, ~2% per-dawn, `echo`) —
+    cites prior `_ECHO_SOURCE_TAGS` with one of 4 memory
+    frames. **194 added a SOURCE-SPECIFIC FAST-PATH** before
+    the default 4-frame dispatch: when source is the 116
+    constellation_named beat (detected by unique "first
+    autumn stars stand clear above the eastern ridge"
+    phrase), extract kingdom-hashed shape via regex and
+    surface "Old folk still call them ${shape}." Specialized
+    echo for the constellation arc; default frames untouched
+    for all other 12 milestone-tagged beats.
 12. **checkOfferingBeat** (079, cross-system gated, `stone` tag
     reuse) — fires once per realm on a dawn when `stone_found`
     AND `happyPeakActive` AND `!offering_made` (+ day ≥ 30) at
@@ -701,12 +786,25 @@ beats that sum near 57 by themselves. 088's first-snow adds
 - **178: cadence target REVISED to ~144-185 post-fix.**
   166's gate lowered from `day ≥ 70` to `day ≥ 35`. Most
   long-lived realms now see frog-voices.
-- **188 (this update): cadence target ~145-186 with
-  stone_forgotten.** +1 conditional beat: 184 stone-forgetting
-  (year3 + stone_found + citizensBorn ≥ 10) — long-lived
-  realms reaching year 3 with their stone and 10+ births.
-  Most realms reaching year 3 satisfy the gate. Cadence still
-  well under 300 cap.
+- **188: cadence target ~145-186 with stone_forgotten.** +1
+  conditional beat. Most realms reaching year 3 see this.
+- **198 (this update): cadence target ~147-188** with the
+  3 new beats (190/193/196). +3 conditional beats since 188:
+  - **190 constellation-forgotten** (year3 + day ≥ 85 +
+    constellation_named + citizensBorn ≥ 10): year-3+ realms
+    with their constellation named — most long-lived realms.
+  - **193 landmark-named** (year2 + day ≥ 50): year-2+ realms
+    past day 50 — visible to most realms reaching year 2's
+    second half.
+  - **196 first-long-evening** (year-1 summer day ≤ 14):
+    fires in year-1 summer ONLY (year-2+ summers excluded
+    by day-gate). **Most players reaching day 8 see this.**
+    195 skeptic-flag-response beat.
+  Cadence still well under 300 cap. **195 skeptic flag
+  partially addressed**: 196 ships an early-game beat
+  counterbalancing the late-arc bias; one more early-game
+  beat filed (196 [code] "first cold morning") for future
+  ticks.
 
 ## how to update this doc
 
@@ -915,13 +1013,54 @@ shipping, touch this file too.
   queue (tavern / blacksmith / market). Chrome-
   independent graphics work; no chronicle additions.
   3D layer reaches ROSTER COMPLETE 11/11.
-- **188 (this update)** — the-archivist. Catches
-  the doc up to 184 + adds the **object-arc closure
-  template invariant**: long-lived focal objects
-  can support a 4-beat NARRATIVE arc shape
-  (discovery → use → weathering → forgetting); the
-  stone arc is the canonical example; constellation
-  / wanderer / great-storm filed as candidates for
-  forgetting beats at year 4-5+. Cadence summary
-  revised ~144-185 → ~145-186 (+1 conditional beat
-  per long-lived realm from 184).
+- **189-191** — type-scale phase 5+6 CSS hygiene; **130
+  HIGH closes** (42 migrations / 6 phases / 61 ticks).
+  Non-narrative.
+- **190** — surprise. **constellation_forgotten** —
+  SECOND USE of object-arc closure template (188
+  invariant). 2-beat cycle (116 named → 190 forgotten)
+  vs stone's 4-beat. Tag: milestone (matches 116).
+- **192** — the-fixer. Closes 103 filed (89 ticks):
+  `realm_fell` entry gains `after: G => { G.realmEnded
+  = true; }`. **Second use of after: schema** (134
+  namesake first). Silent-module post-end-mode flag.
+- **193** — surprise. **landmark_named** — opens
+  realm-environment naming triplet (sky 116 / object
+  056 / place 193). 8 kingdom-hashed rural-vernacular
+  names. NARRATIVE_BEATS reaches 30.
+- **194** — the-fixer. Closes 116-filed echo frame
+  (78 ticks): `checkEchoBeat` gains source-specific
+  branch detecting constellation prose + extracting
+  shape via regex; surfaces "Old folk still call them
+  ${shape}." Constellation arc now 5 touchpoints.
+- **195** — the-skeptic. Year-3+ beats may be
+  invisible to median play; ~7 shipped + 3 filed
+  long-arc beats. **Recommend bias to early-game**
+  for next 5-10 narrative ticks. Filed playtime
+  audit (chrome-required).
+- **196** — surprise. **first_long_evening** —
+  direct response to 195 flag. Year-1 summer day
+  ≤ 14 (most players reach day 8). **Anti-anxious
+  mood**: "things are okay right now." NARRATIVE_BEATS
+  reaches 31.
+- **197** — the-fixer. Closes 192-filed save
+  persistence (5 ticks): `state.realmEnded =
+  !!G.realmEnded` save + 2-path defensive load
+  (explicit field OR fallback derive from
+  storyFlags.realm_fell). Backward-compatible.
+- **188** — the-archivist. Caught the doc up to 184
+  + added the **object-arc closure template
+  invariant**: long-lived focal objects can support
+  a 4-beat NARRATIVE arc shape (discovery → use →
+  weathering → forgetting); the stone arc is the
+  canonical example; constellation/wanderer/great-
+  storm filed as candidates for forgetting beats at
+  year 4-5+.
+- **198 (this update)** — the-archivist. Catches
+  the doc up to 190/193/196 + 192's after-callback
+  + 194's source-specific echo branch in
+  checkEchoBeat. NARRATIVE_BEATS 28 → 31. Cadence
+  ~145-186 → ~147-188 (+3 conditional beats from
+  190/193/196). Notes 195 skeptic flag was
+  partially addressed by 196 (year-1 summer beat);
+  one more early-game beat filed for future tick.
