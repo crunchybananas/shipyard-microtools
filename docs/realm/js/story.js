@@ -401,12 +401,17 @@ const NARRATIVE_BEATS = [
   // lapping; or as something stranger — preserves the ambiguity.
   // Static string; no "frog" word. Tag: misc (148/152 precedent).
   // Gate: spring/summer (frogs are vocal in warm seasons) + day ≥
-  // 70 (realm settled mid-year-1). 14-tick gap from 152 honors
-  // 156's "space them out" warning against ambient-grammar queue-
-  // drain. Continues 156's filed candidate list (owls/frogs/rams/
-  // trade-ships/hawks).
+  // 35 (settling-year window: year 2 spring 29-35; original 166's
+  // ≥ 70 was a math mistake — ≥ 70 with spring/summer fires year
+  // 3+ in practice (year 1 spring 1-7, summer 8-14; year 2 spring
+  // 29-35, summer 36-42; year 3 spring 57-63, summer 64-70 → only
+  // day 70 qualified, and most realms missed it). 178 lowered the
+  // gate to 35 per 177 archivist's finding so spring of year 2 is
+  // the natural fire window. 14-tick gap from 152 ambient-grammar
+  // sibling honored. Continues 156's filed candidate list
+  // (owls/frogs/rams/trade-ships/hawks).
   { flag: 'frog_voices_heard', tag: 'misc',
-    trigger: G => G.day >= 70 && (G.season === 'spring' || G.season === 'summer'),
+    trigger: G => G.day >= 35 && (G.season === 'spring' || G.season === 'summer'),
     text: 'There are evenings after rain when the water-edges speak in two voices. The realm does not name the things speaking.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder

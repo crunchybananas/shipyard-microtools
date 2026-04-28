@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -85,8 +85,12 @@ spacing from 152 honors 156's queue-drain warning). 174
 `first_frost_marked` — sibling to 147 great-storm in
 seasonal placement (year-2+ autumn) but PRESENT-tense
 observation rather than past-tense memory; pairs the
-autumn-of-year-2+ signature. 177 (this update) catches the
-doc up to 166 and 174.
+autumn-of-year-2+ signature. 177 caught the
+doc up to 166 and 174. 178 (the-fixer, 1-line) lowered 166's
+day-gate from 70 to 35 — original `≥ 70` was a math mistake by
+166's author given the 28-day-year structure (year 1: days 1-28;
+year 2 spring/summer ends at day 42 — `≥ 70` only fired year 3
+day 70 onward). Doc cadence revised ~144-185 post-fix.
 
 ## why this exists
 
@@ -230,14 +234,17 @@ Numbered in rough order of file:
      ambiguity preserved). Tag: misc (reuse; mirrors 148).
      "The youngest in the realm speak of a bright shape in
      the fields. No one asks them to describe it."
-   - 1 frog-voices beat (166, post-moratorium surprise): once-
-     per-realm when `day ≥ 70 && (spring || summer)`. Third
-     ambient-entity acknowledgment (148/152/166 grammar);
-     **water-edge sound focal** (no other beat covers water-
-     edge or sound-based). Tag: misc. Static string: "There
-     are evenings after rain when the water-edges speak in two
-     voices. The realm does not name the things speaking."
-     14-tick gap from 152 honors 156's queue-drain warning.
+   - 1 frog-voices beat (166, post-moratorium surprise; gate
+     fixed at 178): once-per-realm when `day ≥ 35 && (spring
+     || summer)`. Third ambient-entity acknowledgment
+     (148/152/166 grammar); **water-edge sound focal** (no
+     other beat covers water-edge or sound-based). Tag: misc.
+     Static string: "There are evenings after rain when the
+     water-edges speak in two voices. The realm does not name
+     the things speaking." 14-tick gap from 152 honors 156's
+     queue-drain warning. **178 fixed**: 166 originally shipped
+     with `day ≥ 70` (math mistake — fired year-3+ only); 178
+     lowered to 35 so year-2 spring is the natural fire window.
    - 1 first-frost beat (174, post-moratorium surprise): once-
      per-realm when `year2 && autumn && day ≥ 45`. **Sibling
      to 147 great-storm in seasonal placement** (both year-2+
@@ -638,24 +645,22 @@ beats that sum near 57 by themselves. 088's first-snow adds
   since 141: 142 distant-letter / 147 great-storm / 148
   wanderer / 152 night-shape. Expected +3-4 new beats per
   long-lived realm, still well under 300 cap.
-- **177 (this update): target revised to ~143-184.** +2
-  conditional beats since 155:
-  - 166 frog-voices (day ≥ 70 + spring/summer): +1 per realm
-    surviving into year 1's spring or summer past day 70.
-    Year 1 covers days 1-28; year 2 covers 29-56 (spring 29-
-    35, summer 36-42); first year-2 spring already past day
-    70 won't fit (year-2 summer ends at day 42). So this
-    actually fires year 3+ spring/summer (day 71-77 or 78-84
-    in year 3+). **Most realms reach year 3** — fires for
-    long-lived realms only.
-  - 174 first-frost (year2 + autumn + day ≥ 45): +1 per
-    realm reaching year 2 autumn day 45+ (essentially day
-    45-49 in year 2's autumn, then year 3+ autumn). **Most
-    long-lived realms** see this.
-  Expected +1-2 new beats per realm reaching year 2-3+,
-  cadence still under 300 cap. 156-176 ticks added no other
-  chronicle writers (Phase A SVG sprites, 3D meshes, audio
-  axis halt, refactors all chronicle-silent).
+- **177: target revised to ~143-184** (initial estimate
+  before 178 gate fix). +2 conditional beats since 155: 166
+  frog-voices + 174 first-frost. Documented 166 firing
+  year-3+ in practice given the original ≥ 70 day-gate.
+- **178 (this update): cadence target REVISED to ~144-185
+  post-fix.** 166's gate lowered from `day ≥ 70` to
+  `day ≥ 35`:
+  - 166 frog-voices now fires year-2 spring (days 29-35;
+    day 35 qualifies as the last day of year-2 spring) OR
+    year-2 summer (36-42) OR year-3+ spring/summer. **Most
+    long-lived realms** see this — was year-3+-only,
+    becomes year-2+. +0.5-1 expected beat per realm
+    increase from the fix.
+  - 174 first-frost still fires year-2+ autumn day ≥ 45
+    (mid-late autumn).
+  Cadence still well under 300 cap.
 
 ## how to update this doc
 
@@ -839,12 +844,19 @@ shipping, touch this file too.
   PRESENT-tense observation rather than past-tense
   memory. Day ≥ 45 gate gives 147 a 2-day head
   start.
-- **177 (this update)** — maintenance update.
-  Captures 156-176 in the doc. NARRATIVE_BEATS
-  entry list 25→27 (frog 166 + frost 174).
-  Cadence summary ~141-182 → ~143-184 (+2
-  conditional beats, year-3+ realms see frog;
-  year-2+ autumn realms see frost). Sources
-  paragraph extended through 177. Filed: fixer
-  to lower 166's day-gate from 70 to ~30-40 so
-  more realms see it.
+- **177** — maintenance update. Captures 156-176 in
+  the doc. NARRATIVE_BEATS entry list 25→27 (frog
+  166 + frost 174). Cadence summary ~141-182 →
+  ~143-184 (+2 conditional beats). Sources
+  paragraph extended through 177. Filed: fixer to
+  lower 166's day-gate.
+- **178 (this update)** — the-fixer. 1-line gate
+  fix on 166 frog-voices: `day ≥ 70` → `day ≥ 35`.
+  Doc analysis at 177 had revealed the ≥ 70 gate
+  fired year-3+ only in practice (math mistake by
+  166's author, given 28-day-year structure).
+  Lowered to 35 so year-2 spring/summer is the
+  natural fire window. Most long-lived realms now
+  see the beat. Cadence revised ~143-184 → ~144-185
+  (+0.5-1 expected beat per realm from the gate
+  expansion).
