@@ -67,9 +67,11 @@ Keep it accurate or retire it.
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
   LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
   (170, 188 LoC), house (173, 194 LoC), tavern (175, 239 LoC),
-  blacksmith (176, 223 LoC), market (179, 234 LoC) — 9 of 11
-  (Phase A: 4/5; **PHASE B INTEGRATION SPRINT THRESHOLD: 9/11
-  CRITICAL MASS REACHED**)
+  blacksmith (176, 223 LoC), market (179, 234 LoC), bakery
+  (180, 230 LoC) — 10 of 11 (**PHASE A COMPLETE**: shipped 5
+  Phase A sprites in 8 ticks, 173-180 with 174/177/178 as
+  variety/maintenance interleaves; only barracks remains
+  un-SVG'd of the live-game roster)
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -160,7 +162,7 @@ tick 172:
 | tavern       |   ✓    |    ✓ (175) |     —     |
 | blacksmith   |   ✓    |    ✓ (176) |     —     |
 | market       |   ✓    |    ✓ (179) |     —     |
-| bakery       |   ✓    |     —      |     —     |
+| bakery       |   ✓    |    ✓ (180) |     —     |
 | barracks     |   ✓    |     —      |     —     |
 | school       |   ✓    |     —      |     —     |
 
@@ -442,6 +444,27 @@ pipeline, these will need solving:
   4 goods); SVG ships canonical red + bread+apples. SVG
   layer 8 → 9 of 11 (Phase A: 4 of 5). **9/11 = PHASE B
   CRITICAL MASS THRESHOLD REACHED per 171 strategic plan.**
+- **180** — **PHASE A 5/5 — COMPLETES PHASE A.** SVG bakery
+  sprite ships (230 lines: warm plaster walls + half-timber
+  posts + plaster texture + stone base + sunlit edge + lower-
+  wall warm spill (oven heat through wall) + terracotta
+  pitched roof with sunlit ridge highlight + 4 tile rows +
+  chimney with 4 dough-light smoke wisps (white-grey, gentler
+  than blacksmith's coal-smoke) + brick courses + cap +
+  arched oven-warmth window with bright cream core + warm
+  yellow halo + **drawn hanging bread-loaf sign** (replaces
+  canvas's emoji 🍞 with proper SVG bread + score lines +
+  bracket + chain links) + iron-banded wooden door with
+  strap hinges + ring handle + warm light spilling under
+  the door + **bread paddle leaning against wall** (NEW)
+  + flour dust on doorstep area (NEW) + warmth flecks near
+  oven). Domestic warmth complement to blacksmith's
+  industrial forge — same "fire inside" structural
+  language but warm domestic palette. SVG layer 9 → 10 of
+  11 (Phase A: 5/5 COMPLETE). **Only barracks remains
+  un-SVG'd of the live-game roster.** Per 171 strategic
+  plan, **Phase B integration sprint becomes appropriate
+  next**.
 
 ## how to update this doc
 

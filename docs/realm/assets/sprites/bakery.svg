@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Bakery sprite — Loop 180 (SVG axis, 10th sprite).
+  PHASE A 5/5 — COMPLETES PHASE A per 171 strategic plan.
+  Sibling to render.js drawBakery canvas implementation.
+
+  ViewBox 0 0 128 128. Bakery centered at x=64; ground at y=104.
+  Light: upper-left.
+
+  Canvas drawBakery uses an emoji (🍞) for the sign — SVG ships
+  a drawn hanging bread-loaf sign in the same slot. Single
+  variant (canvas drawBakery is itself static — no per-bakery
+  hash variants like tavern/blacksmith).
+
+  Form: warm plaster walls + half-timber accents + stone base
+  edge + terracotta peaked roof + ridge highlight + chimney with
+  dough-smoke (gentle white) + oven-warmth window glow + wooden
+  door with iron handle + drawn hanging bread sign + bread
+  paddle leaning against wall + flour dusted on doorstep.
+
+  Domestic warmth complement to blacksmith's industrial forge:
+  same "fire inside" structural concept (chimney + glowing
+  window) but warm domestic palette (terracotta + plaster +
+  bread-yellow vs blacksmith's dark stone + iron).
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Plaster walls: warm cream-tan -->
+    <linearGradient id="bakeryWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcb088"/>
+      <stop offset="0.5" stop-color="#bc8858"/>
+      <stop offset="1" stop-color="#8a6038"/>
+    </linearGradient>
+
+    <!-- Stone base -->
+    <linearGradient id="bakeryStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a87a5a"/>
+      <stop offset="1" stop-color="#5a3a18"/>
+    </linearGradient>
+
+    <!-- Terracotta roof -->
+    <linearGradient id="terracottaRoof" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#e06430"/>
+      <stop offset="0.6" stop-color="#a83818"/>
+      <stop offset="1" stop-color="#6a1810"/>
+    </linearGradient>
+
+    <linearGradient id="terracottaShadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a83818"/>
+      <stop offset="1" stop-color="#5a1010"/>
+    </linearGradient>
+
+    <!-- Oven warmth glow (yellow-warm, gentler than blacksmith's amber) -->
+    <radialGradient id="ovenGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,224,140,0.85)"/>
+      <stop offset="0.5" stop-color="rgba(255,180,80,0.45)"/>
+      <stop offset="1" stop-color="rgba(255,180,80,0)"/>
+    </radialGradient>
+
+    <!-- Bread sign loaf (hanging) -->
+    <radialGradient id="signLoaf" cx="0.4" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#fce080"/>
+      <stop offset="0.7" stop-color="#d4a050"/>
+      <stop offset="1" stop-color="#7a4818"/>
+    </radialGradient>
+
+    <!-- Smoke (dough-light, white-grey, lighter than blacksmith's coal) -->
+    <radialGradient id="bakerySmoke" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(220,210,200,0.55)"/>
+      <stop offset="1" stop-color="rgba(220,210,200,0)"/>
+    </radialGradient>
+
+    <!-- Plaster texture -->
+    <pattern id="plasterTex" width="6" height="3" patternUnits="userSpaceOnUse">
+      <rect width="6" height="3" fill="transparent"/>
+      <line x1="0" y1="2" x2="6" y2="2" stroke="rgba(60,40,20,0.1)" stroke-width="0.3"/>
+    </pattern>
+
+    <!-- Lower-wall warm spill (oven heat through wall) -->
+    <linearGradient id="bakeryWarmSpill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,200,120,0)"/>
+      <stop offset="1" stop-color="rgba(255,180,100,0.22)"/>
+    </linearGradient>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="bakeryShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.4)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="68" cy="106" rx="22" ry="4" fill="url(#bakeryShadow)"/>
+
+  <!-- Flour dust on doorstep area (NEW DETAIL) -->
+  <g fill="rgba(245,235,210,0.45)">
+    <ellipse cx="64" cy="103" rx="6" ry="0.7"/>
+    <ellipse cx="62" cy="102.5" rx="2" ry="0.4"/>
+    <ellipse cx="66" cy="102.6" rx="2" ry="0.4"/>
+  </g>
+
+  <!-- ─── Stone base edge ──────────────────────────────────────── -->
+  <rect x="54" y="98" width="20" height="4" fill="url(#bakeryStone)"/>
+  <line x1="54" y1="98" x2="74" y2="98" stroke="rgba(255,240,210,0.3)" stroke-width="0.4"/>
+
+  <!-- ─── Main plaster walls ───────────────────────────────────── -->
+  <rect x="54" y="82" width="20" height="16" fill="url(#bakeryWall)"/>
+  <rect x="54" y="82" width="20" height="16" fill="url(#plasterTex)" opacity="0.8"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="54" y1="82" x2="74" y2="82" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+
+  <!-- Half-timber vertical posts (matches house/tavern family) -->
+  <g fill="rgba(80,50,20,0.32)">
+    <rect x="54.4" y="82" width="0.6" height="16"/>
+    <rect x="63.7" y="82" width="0.6" height="16"/>
+    <rect x="73.0" y="82" width="0.6" height="16"/>
+  </g>
+
+  <!-- Lower-wall warm spill (oven heat) -->
+  <rect x="54" y="92" width="20" height="6" fill="url(#bakeryWarmSpill)"/>
+
+  <!-- ─── Terracotta peaked roof ────────────────────────────────── -->
+  <path d="M 52 82 L 64 72 L 76 82 Z" fill="url(#terracottaRoof)"/>
+  <!-- Roof shadow side -->
+  <path d="M 64 72 L 76 82 L 80 79 L 68 69 Z" fill="url(#terracottaShadow)"/>
+  <!-- Roof ridge highlight (sunlit ridge) -->
+  <path d="M 60 76 L 64 72 L 68 76 Z" fill="rgba(255,140,80,0.65)"/>
+  <!-- Roof tile rows -->
+  <line x1="54" y1="80" x2="74" y2="80" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="56" y1="78" x2="72" y2="78" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="58" y1="76" x2="70" y2="76" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="60" y1="74" x2="68" y2="74" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <!-- Sunlit roof edge -->
+  <line x1="52" y1="82" x2="64" y2="72" stroke="rgba(255,200,160,0.45)" stroke-width="0.5"/>
+
+  <!-- ─── Chimney (right side of roof) ─────────────────────────── -->
+  <g>
+    <!-- Smoke wisps (gentle, white-grey, dough-like) -->
+    <ellipse cx="69" cy="60" rx="2.5" ry="1.6" fill="url(#bakerySmoke)"/>
+    <ellipse cx="67" cy="55" rx="3" ry="1.8" fill="url(#bakerySmoke)"/>
+    <ellipse cx="64" cy="50" rx="3.4" ry="2" fill="url(#bakerySmoke)"/>
+    <ellipse cx="61" cy="45" rx="3.6" ry="2.2" fill="url(#bakerySmoke)"/>
+
+    <!-- Chimney body -->
+    <rect x="68" y="64" width="5" height="14" fill="#7a5038"/>
+    <!-- Chimney brick courses -->
+    <line x1="68" y1="68" x2="73" y2="68" stroke="rgba(0,0,0,0.3)" stroke-width="0.3"/>
+    <line x1="68" y1="72" x2="73" y2="72" stroke="rgba(0,0,0,0.3)" stroke-width="0.3"/>
+    <!-- Chimney cap (slightly wider) -->
+    <rect x="67" y="62" width="7" height="2" fill="#5a3820"/>
+    <!-- Chimney sunlit edge -->
+    <line x1="68" y1="64" x2="68" y2="78" stroke="rgba(255,210,150,0.3)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Oven-warmth window (drawn first so glow extends behind) ─ -->
+  <g>
+    <!-- Outer warm glow halo -->
+    <ellipse cx="59" cy="89" rx="5" ry="4" fill="url(#ovenGlow)"/>
+    <!-- Window arch frame -->
+    <path d="M 56 91 L 56 87 A 3 3 0 0 1 62 87 L 62 91 Z" fill="#3a2010"/>
+    <!-- Bright warmth inside window -->
+    <ellipse cx="59" cy="89.5" rx="2.2" ry="1.6" fill="#ffe098"/>
+    <!-- Inner brightest core -->
+    <ellipse cx="59" cy="89.3" rx="1.2" ry="0.8" fill="#fff4d0"/>
+    <!-- Arch frame outline -->
+    <path d="M 56 91 L 56 87 A 3 3 0 0 1 62 87 L 62 91"
+          stroke="#5a3010" stroke-width="0.5" fill="none"/>
+  </g>
+
+  <!-- ─── Hanging bread-loaf sign (replaces emoji from canvas) ──── -->
+  <g>
+    <!-- Bracket arm extending from wall -->
+    <rect x="74" y="84" width="2" height="0.6" fill="#5a3a18"/>
+    <rect x="75.5" y="84" width="0.6" height="3" fill="#5a3a18"/>
+    <!-- Hanging chain (small ovals) -->
+    <ellipse cx="75.8" cy="87.4" rx="0.3" ry="0.25" fill="none" stroke="#3a2818" stroke-width="0.25"/>
+    <ellipse cx="75.8" cy="88.0" rx="0.3" ry="0.25" fill="none" stroke="#3a2818" stroke-width="0.25"/>
+    <!-- Bread loaf as the sign -->
+    <ellipse cx="75.8" cy="89.5" rx="2.2" ry="1.4" fill="url(#signLoaf)"/>
+    <!-- Score lines on loaf -->
+    <line x1="74.3" y1="88.7" x2="75.3" y2="89.4" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <line x1="75.4" y1="88.5" x2="76.4" y2="89.2" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <line x1="76.5" y1="88.7" x2="77.3" y2="89.4" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <!-- Sign outline -->
+    <ellipse cx="75.8" cy="89.5" rx="2.2" ry="1.4" fill="none" stroke="rgba(60,30,8,0.4)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Wooden door ──────────────────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <rect x="65" y="92" width="6" height="8" fill="#1a0e04"/>
+    <!-- Door planks -->
+    <rect x="65.3" y="92.3" width="2.8" height="7.4" fill="#5a3a18"/>
+    <rect x="68.2" y="92.3" width="2.8" height="7.4" fill="#4a2810"/>
+    <line x1="68" y1="92.3" x2="68" y2="99.7" stroke="rgba(0,0,0,0.4)" stroke-width="0.3"/>
+    <!-- Door frame -->
+    <rect x="65" y="92" width="6" height="8" fill="none" stroke="#7a4a18" stroke-width="0.5"/>
+    <!-- Iron strap hinges -->
+    <rect x="65.3" y="93.5" width="5.4" height="0.5" fill="#1a0e04"/>
+    <rect x="65.3" y="98" width="5.4" height="0.5" fill="#1a0e04"/>
+    <!-- Door handle -->
+    <circle cx="69.5" cy="96" r="0.5" fill="#7a6048"/>
+    <circle cx="69.5" cy="96" r="0.25" fill="#1a0e04"/>
+    <!-- Warm light spilling under the door -->
+    <line x1="65.3" y1="99.7" x2="70.7" y2="99.7" stroke="rgba(255,200,120,0.5)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Bread paddle leaning against wall (NEW DETAIL) ────────── -->
+  <g>
+    <!-- Long handle -->
+    <line x1="56" y1="100" x2="58" y2="86" stroke="#7a5028" stroke-width="0.7"/>
+    <!-- Paddle blade (broad flat at top) -->
+    <ellipse cx="58" cy="84.5" rx="2.2" ry="1" fill="#a07840"/>
+    <line x1="56" y1="84.5" x2="60" y2="84.5" stroke="rgba(60,30,8,0.4)" stroke-width="0.3"/>
+  </g>
+
+  <!-- Doorstep -->
+  <rect x="63" y="100" width="10" height="1.5" fill="rgba(50,42,34,0.55)"/>
+
+  <!-- ─── Subtle dust + warmth flecks ───────────────────────────── -->
+  <g>
+    <!-- Warmth flecks near oven window -->
+    <circle cx="55" cy="86" r="0.4" fill="rgba(255,220,160,0.55)"/>
+    <circle cx="63" cy="84" r="0.3" fill="rgba(255,220,160,0.55)"/>
+    <!-- Cool dust away from oven -->
+    <circle cx="48" cy="76" r="0.4" fill="rgba(255,240,200,0.3)"/>
+    <circle cx="84" cy="78" r="0.4" fill="rgba(255,240,200,0.3)"/>
+  </g>
+</svg>
