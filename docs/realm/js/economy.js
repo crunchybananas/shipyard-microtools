@@ -309,7 +309,20 @@ export function updateProduction() {
         hBonus += def.happiness;
       }
     }
-    G.happiness = Math.min(100, Math.max(10, 50 + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
+    // Loop 201 (the-fixer, 101 filed 100 ticks): named bard adds a
+    // flat +5 happiness baseline. Fourth named-character mechanic
+    // (101 teacher / 102 merchant / 105+153 smith / 201 bard).
+    // Additive (not multiplicative) — bards raise spirits, they don't
+    // amplify existing systems. Stacks before the min-100 / max-10
+    // clamp; visible in mid-range realms (10 < base < 95) where it
+    // moves the needle without saturating. No chronicle beat (034
+    // bard-arrival already announces the character). Pattern: when
+    // the bonus is a flat baseline, prefer additive `+= N` over
+    // multiplicative `*= 1.N`. 5 of 6 named-cast now have mechanics;
+    // mayor (civic-unlock filed 101) + rival (raid-difficulty filed
+    // 105) remain. Closes 101 filed bard idea.
+    const bardBonus = G.namedCharacters?.bard ? 5 : 0;
+    G.happiness = Math.min(100, Math.max(10, 50 + bardBonus + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
   }
 
   // Food consumption (once per day)

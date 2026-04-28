@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 201 [doc] — pattern: **additive baseline vs multiplicative bonus** for named-character mechanics. Multiplicative when the character amplifies an existing system (101 teacher×school speed, 102 merchant×trade margin, 105+153 smith×tower fire-rate); additive when the character contributes baseline character (201 bard happiness +5 flat). Document in narrative-surfaces.md or a new patterns doc when 3+ additive cases ever accrete. Currently 1 use (bard). [loop/docs/]
+- 201 [code] — rival → raid difficulty multiplier `+10% raider count` or `+5% raider HP` when named. Adversarial inverse of cooperative pattern. Could include +reward modifier for successful defense (per 105 filing). ~5 LoC. [combat.js or events.js]
+- 201 [code] — mayor → civic unlock (town hall building). Larger scope: new building def in BUILDINGS table + adjacency effects + research gate. ~30-50 LoC. Last structural-shape mechanic. Defer to a slow tick. [buildings.js + state.js + index.html]
+- 201 [review] — chrome-required full-scenario play: build all 6 named characters (tavern → mayor + bard, blacksmith → smith, market → merchant, school → teacher, ...rival via adversarial trigger), measure cumulative happiness/pacing impact. Pairs with 101+105 cumulative balance review (now 4 mechanics, soon 6). [play]
 - 199 [code] — third early-game beat: "the fields know the realm" — year-1 spring or summer beat about the realm becoming familiar with its land. Per 196 filing, deferred from 199 (one early-game ship per 5-10 ticks per alternation discipline). Earliest ~tick 205+. ~12 LoC. [story.js]
 - 199 [code] — fourth early-game candidate: citizen "first sigh" — quiet moment of individual personhood in the early realm. Year-1 spring/summer. Per 196 filing. ~12 LoC. [story.js]
 - 199 [doc] — early-game beat sub-pattern within misc-tag observational register (196/199 + 2 filed). When cluster reaches 4 entries, narrative-surfaces.md should document the early-game discipline: hopeful-not-anxious mood, "goes on" continuity register, year-1-only via flag-once-fire, bracket year-1 mid-game. Promote to invariant at cluster size 4. [loop/docs/]
@@ -323,7 +327,7 @@ and note the promotion here.
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js] **DONE → 105** (2 lines in combat.js:updateTowers; +5% projectile damage; 2-case matrix verified)
 - 105 [code] — rival → raid difficulty +10% when named (adversarial character; might include +reward for successful defense). [events.js or combat.js]
 - 105 [review] — post-4-mechanic cumulative-balance check after bard lands. Play full scenario with all 4 named, measure pacing impact. Pairs with 101 filed balance review. [play]
-- 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick]
+- 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick] **DONE → 201** (single-line addition to economy.js happiness formula at line ~312; additive baseline pattern as sibling to multiplicative `*Mult`; clamped invisibly at extremes; 5 of 6 named-cast now have mechanics)
 - 101 [code] — mayor → unlocks a civic building (town hall, court). Bigger scope. [buildings.js + state.js]
 - 101 [review] — play tick after all character-mechanics land: cumulative balance check (6 compounding bonuses may be too much). [play]
 
