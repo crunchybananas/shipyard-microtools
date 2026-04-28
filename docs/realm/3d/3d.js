@@ -92,6 +92,7 @@ function placeSampleBuildings(map) {
     ['barn', 0, 3],
     ['granary', 4, 2],  // Loop 163 — paired with 158 canvas + 161 SVG siblings
     ['windmill', -2, -3], // Loop 167 — pairs with 158 canvas; SVG sibling pending
+    ['barracks', 2, 3],   // Loop 183 — pairs with 182 SVG; 6/11 cross-axis triangles
   ];
   for (const [type, dx, dy] of positions) {
     const x = cx + dx, y = cy + dy;
@@ -375,6 +376,32 @@ function buildBuildingsMesh(buildings, map) {
         [cx + 0.5, gy + 0.55, cz - 0.35],
         [cx + 0.5, roofTopY, cz],
         [1, 0, 0], [0.55, 0.25, 0.18]);
+    }
+    else if (b.type === 'barracks') {
+      // Loop 183 — barracks 3D mesh. Sibling to 182 SVG sprite +
+      // canvas drawBarracks. Cross-axis triangle progress: 6 of
+      // 11 buildings now expressed across all 3 layers.
+      // Defensive-industrial palette per 181 milestone-review.
+      const stone = [0.46, 0.51, 0.58];
+      const stoneDark = [0.32, 0.36, 0.42];
+      const wood = [0.48, 0.32, 0.16];
+      const banner = [0.82, 0.20, 0.18];
+      const iron = [0.40, 0.44, 0.50];
+      // Main wall block (wide and low — fortress shape)
+      mesh.pushBox(cx - 0.65, gy, cz - 0.45, cx + 0.65, gy + 0.85, cz + 0.45, stone);
+      // Flat parapet roof (slightly wider than walls)
+      mesh.pushBox(cx - 0.72, gy + 0.85, cz - 0.50, cx + 0.72, gy + 1.00, cz + 0.50, stoneDark);
+      // Crenellation cubes (5 along front edge for iso visibility)
+      for (let i = 0; i < 5; i++) {
+        const mx = cx - 0.55 + i * 0.275;
+        mesh.pushBox(mx - 0.06, gy + 1.00, cz + 0.42, mx + 0.06, gy + 1.20, cz + 0.50, stone);
+      }
+      // Iron-banded door (small dark box on front face)
+      mesh.pushBox(cx - 0.10, gy, cz + 0.43, cx + 0.10, gy + 0.45, cz + 0.50, wood);
+      // Flag pole (thin tall box on right side of parapet)
+      mesh.pushBox(cx + 0.55, gy + 1.00, cz + 0.45, cx + 0.60, gy + 1.85, cz + 0.50, iron);
+      // Red banner (thin flat box, extends right from pole)
+      mesh.pushBox(cx + 0.60, gy + 1.55, cz + 0.45, cx + 1.05, gy + 1.85, cz + 0.50, banner);
     }
     else if (b.type === 'windmill') {
       // Loop 167 — windmill 3D mesh. Sibling to 158 canvas

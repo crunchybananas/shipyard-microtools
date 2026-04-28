@@ -43,7 +43,11 @@ and note the promotion here.
 - 180 [meta] **PHASE A MILESTONE REVIEW** — at 181, ship a milestone-style review tick (sibling to 100/157/171) on Phase A completion BEFORE Phase B sprint. Captures: total LoC, authoring patterns, integration-concern checklist refresh, decision on 11/11 (barracks) timing. [journal] **DONE → 181** (3 emergent patterns documented; per-instance variation HEAVIER than 171 estimated; animation MEDIUM not LOW; decision: barracks at 182 before Phase B; revised timeline ~+5 ticks)
 - 181 [code] **PHASE A 11/11** — barracks SVG sprite at 182. Military: stone walls + parapet (canvas drawBarracks at line 3879). [assets/sprites/] **DONE → 182** (242 lines; cruciform arrow slits + crenellations + flag banner + training dummy with target marks + weapons rack with shield/cross emblem; ROSTER COMPLETE 11/11)
 - 182 [review] **PRIORITY** — visual-debt catch-up when chrome returns: verify all 11 sprites at 4 zoom levels in sandbox; compare each to canvas-equivalent at matching scales; multi-instance paint cost stress test; photo-mode 5× zoom crispness check. Documented in render-layers.md visual-debt log. [play]
-- 182 [code] — 3D barracks mesh: walls box + flat parapet + crenellation cubes + small flag pole. ~25 LoC. [3d/3d.js]
+- 182 [code] — 3D barracks mesh: walls box + flat parapet + crenellation cubes + small flag pole. ~25 LoC. [3d/3d.js] **DONE → 183** (27 LoC; Phase B chrome-offline pivot; defensive-industrial palette; cross-axis triangle complete; 3D layer 8/11)
+- 183 [code] — 3D tavern mesh: walls box + pitched roof pyramid + sign-board cube. ~25 LoC. [3d/3d.js]
+- 183 [code] — 3D blacksmith mesh: dark walls + flat roof + chimney box + anvil. ~25 LoC. [3d/3d.js]
+- 183 [code] — 3D market mesh: counter + 2 posts + awning prism + barrel/crate cubes. ~30 LoC. [3d/3d.js]
+- 183 [process] — chrome-offline fallback queue: 3D meshes drain over 3 ticks (tavern/blacksmith/market). Then non-graphics interleaves. Phase B unblocks when chrome returns. [process]
 - 182 [code] — animate barracks banner flutter via `<animate transform>`. Phase C. [barracks.svg]
 - 182 [process] — Phase B scaffolding tick (183) **CANNOT SHIP without chrome verification** per visual-verification memory. If chrome offline, defer 183 to next online tick or pivot to a chrome-independent tick (3D / refactor / surprise). [process]
 - 181 [code] **PHASE B step 1** — at 183: scaffolding tick. `_USE_SVG_SPRITES` feature flag + sprite-loader (decide: `<img>` lazy-load OR inline fetch + innerHTML). ~30-50 LoC. [render.js]

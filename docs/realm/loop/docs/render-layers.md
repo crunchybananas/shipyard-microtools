@@ -93,7 +93,8 @@ Keep it accurate or retire it.
   granary); lower per-building visual fidelity than canvas/SVG; no
   textures yet (per-vertex color only)
 - **Currently shipped:** castle, house, tower, church, barn,
-  granary (post-163), windmill (post-167) — 7 of 11+ types
+  granary (post-163), windmill (post-167), barracks (post-183)
+  — 8 of 11+ types
 
 ### asset/meshes/ — LOOP DOES NOT TOUCH
 
@@ -127,6 +128,7 @@ is treated as an external system.
 | granary  | 158 (~75 LoC) | 161 (172 LoC) | 163 (~15 LoC) | canvas → SVG → 3D |
 | windmill | 094/096/158 (~70 LoC) | 168 (213 LoC) | 167 (~25 LoC) | canvas → 3D → SVG |
 | tower    | pre-loop (~42 LoC) | 170 (188 LoC) | pre-loop (~15 LoC) | canvas + 3D pre-loop → SVG |
+| barracks | pre-loop (~115 LoC) | 182 (242 LoC) | 183 (~25 LoC) | canvas pre-loop → SVG → 3D |
 
 158 (canvas) shipped a dome-conforming snow cap closing 095's
 filed idea. 161 (SVG) demonstrated the same building authored
@@ -162,7 +164,7 @@ tick 172:
 | blacksmith   |   ✓    |    ✓ (176) |     —     |
 | market       |   ✓    |    ✓ (179) |     —     |
 | bakery       |   ✓    |    ✓ (180) |     —     |
-| barracks     |   ✓    |    ✓ (182) |     —     |
+| barracks     |   ✓    |    ✓ (182) |    ✓ (183)|
 | school       |   ✓    |     —      |     —     |
 
 (Plus the canvas-only specialized buildings: archery, chickencoop,
@@ -518,6 +520,23 @@ pipeline, these will need solving:
   SVG layer **11 of 11 ROSTER COMPLETE** (~2401 lines total).
   **Visual-debt log added to this doc** capturing the 11-
   sprite catch-up batch needed when chrome-mcp returns.
+- **183** — Phase B was scheduled here per 181 plan but
+  REQUIRES chrome-mcp for visual verification of composition
+  (no static-only equivalent for "did the day/night tint
+  composite correctly under the SVG sprite"). Chrome offline
+  → 183 pivots to **3D barracks mesh** (chrome-independent;
+  3D prototype is its own page and renders standalone).
+  Cross-axis triangle for barracks now complete (canvas
+  pre-loop + 182 SVG + 183 3D). 3D layer 7 → **8 of 11**.
+  **Cross-axis triangles complete: 7 of 11** —
+  castle/church/house (canvas + SVG + 3D pre-loop +
+  loop-shipped SVG), granary (158/161/163),
+  tower (170 + pre-loop 3D), windmill (094/096/158/167/168),
+  barracks (canvas pre-loop / 182 / 183). **3 buildings
+  still need 3D meshes**: tavern / blacksmith / market —
+  these have canvas + SVG but no 3D yet. (Plus barn is 3D-
+  only with no canvas/SVG; farm is canvas-only with no
+  SVG/3D.)
 
 ## how to update this doc
 
