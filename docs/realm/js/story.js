@@ -618,6 +618,34 @@ const NARRATIVE_BEATS = [
         ? `The first autumn stars stand clear above the eastern ridge. ${f}, looking up, names them ${shape}. The realm takes the name.`
         : `The first autumn stars stand clear above the eastern ridge. The elders name the pattern ${shape}. The realm takes the name.`;
     } },
+  // Loop 193 (surprise, post-moratorium): a place gets a name. Sibling
+  // to 116 constellation (sky-naming) and 056 stone (object-finding) on
+  // the realm-naming-its-environment axis. Different mood from forgetting
+  // beats (184/190): something coming-into-existence rather than fading.
+  // 8 kingdom-hashed feature names (bent ash / cold spring / long hill /
+  // etc) — rural-vernacular shape (places named for distinguishing
+  // features, not founders). "No one decided this; it simply is" frames
+  // the naming as emergent rather than imposed.
+  // Gate: year2 (day ≥ 29) + day ≥ 50 (deep year-2 — realm has lived
+  // long enough that places ACQUIRE names by use). Tag: milestone
+  // (matches 116 naming-axis anchor).
+  { flag: 'landmark_named', tag: 'milestone',
+    trigger: G => G.storyFlags.year2 && G.day >= 50,
+    text: G => {
+      const kname = G.kingdomName || 'Realm';
+      const names = [
+        'the bent ash',
+        'the cold spring',
+        'the long hill',
+        'the path between',
+        'the high meadow',
+        'the southern ridge',
+        'the stone wall',
+        'the old well',
+      ];
+      const idx = _dreamHash(`${kname}_landmark`) % names.length;
+      return `There is now a place called ${names[idx]}. No one decided this; it simply is.`;
+    } },
   // Loop 190 (surprise, post-moratorium): the constellation is
   // forgotten. SECOND use of the object-arc closure template (188
   // invariant): 116 constellation_named → 190 constellation_forgotten.
