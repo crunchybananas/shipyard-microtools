@@ -94,6 +94,7 @@ function placeSampleBuildings(map) {
     ['windmill', -2, -3], // Loop 167 — pairs with 158 canvas; SVG sibling pending
     ['barracks', 2, 3],   // Loop 183 — pairs with 182 SVG; 6/11 cross-axis triangles
     ['tavern', -3, 2],    // Loop 185 — pairs with 175 SVG; cross-axis triangle complete
+    ['blacksmith', 3, -2],// Loop 186 — pairs with 176 SVG; defensive-industrial family
   ];
   for (const [type, dx, dy] of positions) {
     const x = cx + dx, y = cy + dy;
@@ -377,6 +378,35 @@ function buildBuildingsMesh(buildings, map) {
         [cx + 0.5, gy + 0.55, cz - 0.35],
         [cx + 0.5, roofTopY, cz],
         [1, 0, 0], [0.55, 0.25, 0.18]);
+    }
+    else if (b.type === 'blacksmith') {
+      // Loop 186 — blacksmith 3D mesh. Sibling to 176 SVG sprite +
+      // canvas drawBlacksmith. Defensive-industrial family palette
+      // per 181 milestone-review (matches tower / barracks dark
+      // stone tone but warmer toward iron-grey). Bright forge fire
+      // box: per-vertex flat color is the prototype's only color
+      // mechanism, so the forge appears as a small saturated-amber
+      // cube reading as "glowing window" against the dark walls.
+      const stone = [0.36, 0.32, 0.30];
+      const stoneDark = [0.22, 0.20, 0.18];
+      const fire = [0.98, 0.65, 0.18];
+      const iron = [0.30, 0.28, 0.30];
+      const wood = [0.42, 0.28, 0.14];
+      // Main dark stone walls (industrial — slightly taller than tavern)
+      mesh.pushBox(cx - 0.55, gy, cz - 0.45, cx + 0.55, gy + 1.00, cz + 0.45, stone);
+      // Flat parapet roof
+      mesh.pushBox(cx - 0.62, gy + 1.00, cz - 0.50, cx + 0.62, gy + 1.12, cz + 0.50, stoneDark);
+      // Heavy chimney (right side, projects above parapet)
+      mesh.pushBox(cx + 0.30, gy + 1.12, cz + 0.10, cx + 0.50, gy + 1.85, cz + 0.30, stoneDark);
+      // Forge fire window (small saturated cube on front face — reads as glowing arch)
+      mesh.pushBox(cx - 0.20, gy + 0.40, cz + 0.40, cx - 0.05, gy + 0.55, cz + 0.50, fire);
+      // Iron-banded door (dark wood)
+      mesh.pushBox(cx + 0.10, gy, cz + 0.40, cx + 0.30, gy + 0.50, cz + 0.50, wood);
+      // Anvil prop (front-center, small dark stack)
+      mesh.pushBox(cx - 0.18, gy, cz + 0.55, cx - 0.05, gy + 0.05, cz + 0.65, [0.16, 0.16, 0.20]);
+      mesh.pushBox(cx - 0.16, gy + 0.05, cz + 0.56, cx - 0.07, gy + 0.20, cz + 0.64, iron);
+      // Anvil horn (small extending box)
+      mesh.pushBox(cx - 0.07, gy + 0.10, cz + 0.58, cx + 0.02, gy + 0.18, cz + 0.62, iron);
     }
     else if (b.type === 'tavern') {
       // Loop 185 — tavern 3D mesh. Sibling to 175 SVG sprite + canvas

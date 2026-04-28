@@ -94,7 +94,8 @@ Keep it accurate or retire it.
   textures yet (per-vertex color only)
 - **Currently shipped:** castle, house, tower, church, barn,
   granary (post-163), windmill (post-167), barracks (post-183),
-  tavern (post-185) — 9 of 11+ types
+  tavern (post-185), blacksmith (post-186) — 10 of 11+ types
+  (only market remains unmeshed of the user-buildable roster)
 
 ### asset/meshes/ — LOOP DOES NOT TOUCH
 
@@ -130,6 +131,7 @@ is treated as an external system.
 | tower    | pre-loop (~42 LoC) | 170 (188 LoC) | pre-loop (~15 LoC) | canvas + 3D pre-loop → SVG |
 | barracks | pre-loop (~115 LoC) | 182 (242 LoC) | 183 (~25 LoC) | canvas pre-loop → SVG → 3D |
 | tavern   | pre-loop (~120 LoC) | 175 (239 LoC) | 185 (~25 LoC) | canvas pre-loop → SVG → 3D |
+| blacksmith | pre-loop (~140 LoC) | 176 (223 LoC) | 186 (~30 LoC) | canvas pre-loop → SVG → 3D |
 
 158 (canvas) shipped a dome-conforming snow cap closing 095's
 filed idea. 161 (SVG) demonstrated the same building authored
@@ -162,7 +164,7 @@ tick 172:
 | windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
 | tavern       |   ✓    |    ✓ (175) |    ✓ (185)|
-| blacksmith   |   ✓    |    ✓ (176) |     —     |
+| blacksmith   |   ✓    |    ✓ (176) |    ✓ (186)|
 | market       |   ✓    |    ✓ (179) |     —     |
 | bakery       |   ✓    |    ✓ (180) |     —     |
 | barracks     |   ✓    |    ✓ (182) |    ✓ (183)|
@@ -547,6 +549,22 @@ pipeline, these will need solving:
   bakery). 3D layer **9 of 11**; **8 of 11 cross-axis
   triangles complete**. 2 buildings still need 3D meshes:
   blacksmith / market.
+- **186** — Phase B still blocked; fallback queue 3/3 with
+  **3D blacksmith mesh**. Sibling to 176 SVG. Form:
+  defensive-industrial family palette (matches tower /
+  barracks dark stone tone, slightly warmer toward iron-
+  grey); walls box (taller than tavern — fortified
+  industrial framing) + flat parapet (no pyramid) + heavy
+  chimney projecting above parapet + **bright saturated-
+  amber forge-fire box** on front face (per-vertex flat
+  color is the 3D prototype's only color mechanism, so
+  the forge appears as a small glowing cube against dark
+  walls — acceptable affordance even without emissive
+  shading) + iron-banded door + 3-box anvil prop with
+  horn extending forward. 3D layer **10 of 11**; **9 of
+  11 cross-axis triangles complete**. **Only market
+  remains unmeshed** — its trapezoidal awning would
+  benefit from the filed `pushFrustum` primitive.
 
 ## how to update this doc
 
