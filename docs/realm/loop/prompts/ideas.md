@@ -30,7 +30,11 @@ and note the promotion here.
 
 - 161 [code] **AXIS** — convert remaining buildings to SVG sprites. Suggested order (visual complexity descending): ~~castle~~ (162) → church → tower → tavern → blacksmith → market → windmill → bakery → barracks → house → farm. **2 of 11 shipped (granary 161, castle 162)**. [assets/sprites/]
 - 162 [code] — animated pennants + flag sway via `<animate>` or CSS keyframes on castle.svg. Optional polish; only if integration picks SVG. [castle.svg]
-- 162 [code] — 3rd SVG sprite: church (spire/steeple language pairs with castle, smaller proportion). Establishes 3-sprite arc as real. [assets/sprites/church.svg]
+- 162 [code] — 3rd SVG sprite: church (spire/steeple language pairs with castle, smaller proportion). Establishes 3-sprite arc as real. [assets/sprites/church.svg] **DONE → 164** (~165 lines SVG with gothic stained-glass rose window using true elliptical-arc paths, lead tracery, block-pattern stone courses, gold cross finial, classic blue glass + bell variant; 3-sprite milestone reached)
+- 164 [code] — 4th SVG sprite: tower (smaller cousin of castle's flanking towers; standalone defensive structure). Established cadence ~2 ticks per sprite. [assets/sprites/]
+- 164 [doc] **PRIORITY UNBLOCKED** — `loop/docs/render-layers.md` doc tick now unblocked (3+ sprites exist). Capture canvas/SVG/3D triangle, cross-axis pattern (granary in all three), authoring-cost comparisons with concrete LoC, integration tradeoffs, when to pick each layer. [loop/docs/]
+- 164 [code] — SVG variant-parameterization prototype: church.svg glass-palette via CSS custom properties (`--glass-base`, `--glass-left`, `--glass-right`). Future integration could swap per kingdom. [church.svg]
+- 164 [review] — visual diff canvas drawChurch vs church.svg in Chrome; audit the rose window where canvas approximates via arc() vs SVG's elliptical-arc paths. [play]
 - 162 [review] — direct comparison: canvas drawCastle vs castle.svg side-by-side at matching scales in Chrome. Decide perceptual winner per detail. [play]
 - 162 [doc] — once 3 sprites exist, open `loop/docs/render-layers.md` with concrete SVG-vs-canvas tradeoffs. [loop/docs/]
 - 161 [code] **AXIS** — render-pipeline integration: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with SVG image draw. Must compose with hover halo, day-night tint, winter cap (158), fog modulation, photo-mode zoom. ~1 deliberate tick after 3+ sprites exist. [render.js]

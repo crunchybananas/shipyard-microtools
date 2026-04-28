@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Church sprite — Loop 164 (SVG axis, 3rd sprite).
+  Sibling to render.js drawChurch canvas implementation.
+  ViewBox 0 0 128 128. Church centered at x=64; ground at y=104.
+  Light: upper-left (matches granary/castle convention).
+
+  Form: stone nave + side-wall depth + peaked roof + central steeple
+  with bell + 3-arched stained-glass rose window + arched wooden door
+  + buttresses + warm interior glow + golden cross finial.
+
+  3rd sprite completes the SVG-axis arc; pairs visually with castle
+  (162) for spire/steeple language. Together with granary (161) +
+  castle (162) + church (164), opens the loop/docs/render-layers.md
+  doc tick.
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Stone wall: light upper, darker lower -->
+    <linearGradient id="churchStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ece4d8"/>
+      <stop offset="0.5" stop-color="#d4ccc0"/>
+      <stop offset="1" stop-color="#b0a898"/>
+    </linearGradient>
+
+    <!-- Side wall (shadow side): cooler/darker -->
+    <linearGradient id="churchStoneSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bcb4a8"/>
+      <stop offset="1" stop-color="#807868"/>
+    </linearGradient>
+
+    <!-- Peaked roof: weathered slate -->
+    <linearGradient id="slateRoof" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#7a6a5a"/>
+      <stop offset="0.7" stop-color="#5a4a3a"/>
+      <stop offset="1" stop-color="#3a2e22"/>
+    </linearGradient>
+
+    <!-- Stained-glass center rose: blue dominant -->
+    <radialGradient id="glassCenter" cx="0.5" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#a8d0ff"/>
+      <stop offset="0.5" stop-color="#4488cc"/>
+      <stop offset="1" stop-color="#1a3866"/>
+    </radialGradient>
+
+    <!-- Window halo: warm glow (interior light leaking out) -->
+    <radialGradient id="churchWindowGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,220,150,0.5)"/>
+      <stop offset="1" stop-color="rgba(255,220,150,0)"/>
+    </radialGradient>
+
+    <!-- Warm wall glow (lower band, interior light spill) -->
+    <linearGradient id="warmSpill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,210,130,0)"/>
+      <stop offset="1" stop-color="rgba(255,200,120,0.18)"/>
+    </linearGradient>
+
+    <!-- Gold cross finial -->
+    <linearGradient id="crossGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fce080"/>
+      <stop offset="0.5" stop-color="#ffd166"/>
+      <stop offset="1" stop-color="#a07820"/>
+    </linearGradient>
+
+    <!-- Stone-block pattern (horizontal courses) -->
+    <pattern id="churchBlocks" width="10" height="4" patternUnits="userSpaceOnUse">
+      <rect width="10" height="4" fill="transparent"/>
+      <line x1="0" y1="0" x2="10" y2="0" stroke="rgba(40,30,20,0.18)" stroke-width="0.4"/>
+      <line x1="0" y1="2" x2="0" y2="4" stroke="rgba(40,30,20,0.16)" stroke-width="0.4"/>
+      <line x1="5" y1="0" x2="5" y2="2" stroke="rgba(40,30,20,0.16)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="churchShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.4)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="68" cy="106" rx="22" ry="4.5" fill="url(#churchShadow)"/>
+
+  <!-- ─── Side wall (right side, drawn first as background depth) ── -->
+  <path d="M 74 82 L 78 85 L 78 100 L 74 100 Z" fill="url(#churchStoneSide)"/>
+  <!-- Side wall buttress -->
+  <rect x="76" y="86" width="2" height="14" fill="rgba(60,50,40,0.35)"/>
+
+  <!-- ─── Main nave body ───────────────────────────────────────── -->
+  <rect x="54" y="82" width="20" height="18" fill="url(#churchStone)"/>
+  <rect x="54" y="82" width="20" height="18" fill="url(#churchBlocks)" opacity="0.85"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="54" y1="82" x2="74" y2="82" stroke="rgba(255,255,255,0.35)" stroke-width="0.6"/>
+
+  <!-- Buttresses (left + middle reinforcement columns) -->
+  <rect x="54" y="84" width="2" height="16" fill="rgba(0,0,0,0.18)"/>
+  <rect x="56" y="84" width="0.6" height="16" fill="rgba(255,255,255,0.18)"/>
+
+  <!-- Lower-wall warm spill (interior light through stone) -->
+  <rect x="54" y="92" width="20" height="8" fill="url(#warmSpill)"/>
+
+  <!-- ─── Peaked roof over the nave ────────────────────────────── -->
+  <path d="M 52 82 L 64 72 L 76 82 Z" fill="url(#slateRoof)"/>
+  <!-- Slate-tile rows (subtle horizontal lines on the roof) -->
+  <line x1="54" y1="80.5" x2="74" y2="80.5" stroke="rgba(0,0,0,0.18)" stroke-width="0.35"/>
+  <line x1="56" y1="78" x2="72" y2="78" stroke="rgba(0,0,0,0.18)" stroke-width="0.35"/>
+  <line x1="58" y1="76" x2="70" y2="76" stroke="rgba(0,0,0,0.18)" stroke-width="0.35"/>
+  <line x1="60" y1="74" x2="68" y2="74" stroke="rgba(0,0,0,0.18)" stroke-width="0.35"/>
+  <!-- Roof ridge highlight -->
+  <line x1="52" y1="82" x2="64" y2="72" stroke="rgba(255,230,200,0.25)" stroke-width="0.5"/>
+
+  <!-- ─── Stained-glass rose window (3-arch composition) ────────── -->
+  <g>
+    <!-- Halo glow behind window (interior light leaking) -->
+    <ellipse cx="64" cy="90" rx="7" ry="6" fill="url(#churchWindowGlow)"/>
+
+    <!-- Center rose window: 3-arched gothic -->
+    <!-- Outer arched frame -->
+    <path d="M 61 95 L 61 90 A 3 3 0 0 1 67 90 L 67 95 Z" fill="#3a2e1a"/>
+    <!-- Center light pane -->
+    <path d="M 61.6 94.5 L 61.6 90.3 A 2.4 2.4 0 0 1 66.4 90.3 L 66.4 94.5 Z" fill="url(#glassCenter)"/>
+    <!-- Lead tracery: vertical mullion + horizontal transom -->
+    <line x1="64" y1="90" x2="64" y2="95" stroke="rgba(40,30,20,0.6)" stroke-width="0.4"/>
+    <line x1="61.6" y1="92.5" x2="66.4" y2="92.5" stroke="rgba(40,30,20,0.6)" stroke-width="0.4"/>
+
+    <!-- Side panes: small arched windows flanking the rose -->
+    <!-- Left -->
+    <path d="M 56.5 95 L 56.5 91.5 A 1.2 1.2 0 0 1 58.9 91.5 L 58.9 95 Z" fill="#cc4444"/>
+    <path d="M 56.7 94.8 L 56.7 91.6 A 1.0 1.0 0 0 1 58.7 91.6 L 58.7 94.8" stroke="rgba(40,30,20,0.5)" stroke-width="0.3" fill="none"/>
+    <!-- Right -->
+    <path d="M 69.1 95 L 69.1 91.5 A 1.2 1.2 0 0 1 71.5 91.5 L 71.5 95 Z" fill="#ddaa22"/>
+    <path d="M 69.3 94.8 L 69.3 91.6 A 1.0 1.0 0 0 1 71.3 91.6 L 71.3 94.8" stroke="rgba(40,30,20,0.5)" stroke-width="0.3" fill="none"/>
+  </g>
+
+  <!-- ─── Steeple (above the roof apex, central tower) ──────────── -->
+  <g>
+    <!-- Steeple body -->
+    <rect x="62" y="60" width="4" height="12" fill="url(#churchStone)"/>
+    <rect x="62" y="60" width="4" height="12" fill="url(#churchBlocks)" opacity="0.85"/>
+    <!-- Steeple shadow side -->
+    <rect x="65" y="60" width="1" height="12" fill="rgba(40,30,20,0.4)"/>
+    <!-- Steeple top edge sunlit -->
+    <line x1="62" y1="60" x2="66" y2="60" stroke="rgba(255,240,200,0.4)" stroke-width="0.5"/>
+    <!-- Bell opening (arched) -->
+    <path d="M 62.5 70 L 62.5 65.5 A 1.5 1.5 0 0 1 65.5 65.5 L 65.5 70 Z" fill="#1a1208"/>
+    <!-- Bell -->
+    <ellipse cx="64" cy="67.5" rx="1.2" ry="0.8" fill="#c8a030"/>
+    <rect x="63.6" y="67.7" width="0.8" height="1.4" fill="#a08020"/>
+    <!-- Bell highlight -->
+    <ellipse cx="63.6" cy="67.2" rx="0.4" ry="0.25" fill="rgba(255,240,180,0.7)"/>
+    <!-- Bell rope (faint line dropping to roof) -->
+    <line x1="64" y1="69" x2="64" y2="71.5" stroke="rgba(60,40,20,0.5)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Gold Cross finial atop the steeple ────────────────────── -->
+  <g>
+    <!-- Vertical shaft -->
+    <rect x="63.5" y="54" width="1" height="6" fill="url(#crossGold)"/>
+    <!-- Horizontal arm -->
+    <rect x="61.8" y="56" width="4.4" height="1" fill="url(#crossGold)"/>
+    <!-- Top point sharpening -->
+    <polygon points="63.5,54 64.5,54 64,53" fill="#fce080"/>
+    <!-- Cross shadow on stone behind -->
+    <rect x="63.5" y="60" width="1" height="0.6" fill="rgba(0,0,0,0.3)"/>
+  </g>
+
+  <!-- ─── Arched front door ─────────────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <path d="M 60 100 L 60 95 A 4 3.5 0 0 1 68 95 L 68 100 Z" fill="#2a1a0a"/>
+    <!-- Door planks -->
+    <path d="M 60.5 99.5 L 60.5 95.5 A 3.5 3 0 0 1 67.5 95.5 L 67.5 99.5 Z" fill="#5a3a1a"/>
+    <!-- Plank seam -->
+    <line x1="64" y1="95" x2="64" y2="99.5" stroke="rgba(0,0,0,0.4)" stroke-width="0.4"/>
+    <!-- Door arch frame stone -->
+    <path d="M 60 100 L 60 95 A 4 3.5 0 0 1 68 95 L 68 100"
+          stroke="#7a6a58" stroke-width="0.7" fill="none"/>
+    <!-- Iron hinges -->
+    <rect x="60.7" y="96" width="2" height="0.6" fill="#3a2e1e"/>
+    <rect x="60.7" y="98" width="2" height="0.6" fill="#3a2e1e"/>
+    <!-- Door ring handle -->
+    <circle cx="66.3" cy="97.5" r="0.5" fill="#8a7028"/>
+    <circle cx="66.3" cy="97.5" r="0.25" fill="#3a2e1e"/>
+  </g>
+
+  <!-- Doorstep -->
+  <rect x="58" y="100" width="12" height="1.5" fill="rgba(50,42,34,0.55)"/>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(255,240,200,0.35)">
+    <circle cx="48" cy="78" r="0.5"/>
+    <circle cx="84" cy="74" r="0.5"/>
+    <circle cx="58" cy="64" r="0.4"/>
+    <circle cx="72" cy="60" r="0.4"/>
+  </g>
+</svg>
