@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Barracks sprite — Loop 182 (SVG axis, 11th sprite).
+  PHASE A 11/11 — COMPLETES SVG ROSTER.
+  Sibling to render.js drawBarracks canvas implementation.
+
+  ViewBox 0 0 128 128. Barracks centered at x=64; ground at y=104.
+  Light: upper-left.
+
+  Form: cool grey-blue stone walls (military, defensive-industrial
+  family) + side-wall depth + flat parapet roof + crenellations +
+  cross-shaped arrow slits (cruciform, matching tower 170) + iron-
+  banded wooden door + tall red banner with white stripe on flag
+  pole + training dummy on left (post + sack body + head + rope
+  bindings) + weapons rack on right (spears + shield) NEW DETAIL +
+  cobblestone path to door + dust flecks.
+
+  Defensive-industrial family palette (matches tower 170 +
+  blacksmith 176 in the 181 milestone-review's family
+  correspondences): cool greys + iron + military insignia red.
+
+  **VISUAL-DEBT NOTE (per 178+memory):** Chrome extension is
+  offline this tick. Sandbox at /svg-test/ can't be loaded for
+  visual verification. This sprite (and the 10 prior Phase A
+  sprites) ship with static-only verification. Filed for catch-up
+  visual audit when chrome reconnects.
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Barracks stone: cool grey-blue (matches tower family) -->
+    <linearGradient id="barracksStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8e9aa8"/>
+      <stop offset="0.5" stop-color="#6e7a88"/>
+      <stop offset="1" stop-color="#4a5260"/>
+    </linearGradient>
+
+    <!-- Side wall (deeper shadow) -->
+    <linearGradient id="barracksStoneSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#586272"/>
+      <stop offset="1" stop-color="#2a3240"/>
+    </linearGradient>
+
+    <!-- Parapet -->
+    <linearGradient id="barracksParapet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9aa6b4"/>
+      <stop offset="1" stop-color="#6a7280"/>
+    </linearGradient>
+
+    <!-- Banner red with depth -->
+    <linearGradient id="banner" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#e04030"/>
+      <stop offset="0.6" stop-color="#a82820"/>
+      <stop offset="1" stop-color="#7a1810"/>
+    </linearGradient>
+
+    <!-- Stone-block pattern (matches tower / blacksmith) -->
+    <pattern id="barracksBlocks" width="8" height="4" patternUnits="userSpaceOnUse">
+      <rect width="8" height="4" fill="transparent"/>
+      <line x1="0" y1="0" x2="8" y2="0" stroke="rgba(0,0,0,0.28)" stroke-width="0.4"/>
+      <line x1="0" y1="2" x2="0" y2="4" stroke="rgba(0,0,0,0.22)" stroke-width="0.4"/>
+      <line x1="4" y1="0" x2="4" y2="2" stroke="rgba(0,0,0,0.22)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Iron tool / weapon gradient -->
+    <linearGradient id="barracksIron" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a8090"/>
+      <stop offset="1" stop-color="#3a4050"/>
+    </linearGradient>
+
+    <!-- Wooden post / shield wood -->
+    <linearGradient id="barracksWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9a7050"/>
+      <stop offset="1" stop-color="#5a3818"/>
+    </linearGradient>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="barracksShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.45)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="68" cy="106" rx="32" ry="5" fill="url(#barracksShadow)"/>
+
+  <!-- Cobblestone path leading to door -->
+  <g>
+    <ellipse cx="64" cy="103" rx="1.2" ry="0.55" fill="#8a8a98"/>
+    <ellipse cx="61" cy="105" rx="1" ry="0.5" fill="#7a7a88"/>
+    <ellipse cx="67" cy="105" rx="1.1" ry="0.55" fill="#9aa0aa"/>
+    <ellipse cx="59" cy="107" rx="0.9" ry="0.45" fill="#7a7a88"/>
+    <ellipse cx="69" cy="107" rx="0.9" ry="0.45" fill="#8a8a98"/>
+  </g>
+
+  <!-- ─── Side wall (right depth strip) ─────────────────────────── -->
+  <path d="M 76 80 L 81 84 L 81 102 L 76 102 Z" fill="url(#barracksStoneSide)"/>
+
+  <!-- ─── Main front walls ──────────────────────────────────────── -->
+  <rect x="51" y="80" width="25" height="22" fill="url(#barracksStone)"/>
+  <rect x="51" y="80" width="25" height="22" fill="url(#barracksBlocks)" opacity="0.9"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="51" y1="80" x2="76" y2="80" stroke="rgba(255,255,255,0.28)" stroke-width="0.6"/>
+
+  <!-- ─── Flat roof parapet ─────────────────────────────────────── -->
+  <rect x="49" y="76" width="29" height="4" fill="url(#barracksParapet)"/>
+  <line x1="49" y1="76" x2="78" y2="76" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+  <!-- Parapet shadow stripe -->
+  <rect x="76" y="77" width="2" height="3" fill="rgba(20,20,32,0.4)"/>
+
+  <!-- ─── Crenellations (6 merlons along roofline) ─────────────── -->
+  <g fill="#6e7a88">
+    <rect x="50" y="71" width="3" height="5"/>
+    <rect x="55" y="71" width="3" height="5"/>
+    <rect x="60" y="71" width="3" height="5"/>
+    <rect x="65" y="71" width="3" height="5"/>
+    <rect x="70" y="71" width="3" height="5"/>
+    <rect x="75" y="71" width="3" height="5"/>
+  </g>
+  <!-- Merlon top sunlit highlights -->
+  <g stroke="rgba(255,255,255,0.22)" stroke-width="0.3">
+    <line x1="50" y1="71.2" x2="53" y2="71.2"/>
+    <line x1="55" y1="71.2" x2="58" y2="71.2"/>
+    <line x1="60" y1="71.2" x2="63" y2="71.2"/>
+    <line x1="65" y1="71.2" x2="68" y2="71.2"/>
+    <line x1="70" y1="71.2" x2="73" y2="71.2"/>
+    <line x1="75" y1="71.2" x2="78" y2="71.2"/>
+  </g>
+
+  <!-- ─── Cross-shaped arrow slits (3 across, cruciform) ────────── -->
+  <g fill="#1a1e2a">
+    <!-- Left slit -->
+    <rect x="55.4" y="83" width="1.2" height="6"/>
+    <rect x="54.4" y="85" width="3.2" height="0.8"/>
+    <!-- Center slit -->
+    <rect x="63.4" y="83" width="1.2" height="6"/>
+    <rect x="62.4" y="85" width="3.2" height="0.8"/>
+    <!-- Right slit -->
+    <rect x="71.4" y="83" width="1.2" height="6"/>
+    <rect x="70.4" y="85" width="3.2" height="0.8"/>
+  </g>
+
+  <!-- ─── Iron-banded wooden door ───────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <rect x="61" y="92" width="8" height="10" fill="#0a0e14"/>
+    <!-- Door planks (warm wood) -->
+    <rect x="61.4" y="92.4" width="3.6" height="9.2" fill="#7a5030"/>
+    <rect x="65" y="92.4" width="3.6" height="9.2" fill="#5a3818"/>
+    <line x1="65" y1="92.4" x2="65" y2="101.6" stroke="rgba(0,0,0,0.4)" stroke-width="0.3"/>
+    <!-- Door frame -->
+    <rect x="61" y="92" width="8" height="10" fill="none" stroke="#2a3240" stroke-width="0.5"/>
+    <!-- Iron bands (3 horizontal) -->
+    <rect x="61" y="94" width="8" height="0.7" fill="#1a1a1e"/>
+    <rect x="61" y="97" width="8" height="0.7" fill="#1a1a1e"/>
+    <rect x="61" y="100" width="8" height="0.7" fill="#1a1a1e"/>
+    <!-- Iron studs at band ends -->
+    <circle cx="61.6" cy="94.4" r="0.3" fill="#5a5a68"/>
+    <circle cx="68.4" cy="94.4" r="0.3" fill="#5a5a68"/>
+    <circle cx="61.6" cy="97.4" r="0.3" fill="#5a5a68"/>
+    <circle cx="68.4" cy="97.4" r="0.3" fill="#5a5a68"/>
+    <circle cx="61.6" cy="100.4" r="0.3" fill="#5a5a68"/>
+    <circle cx="68.4" cy="100.4" r="0.3" fill="#5a5a68"/>
+    <!-- Door ring handle -->
+    <circle cx="67" cy="98.5" r="0.6" fill="#7a8090"/>
+    <circle cx="67" cy="98.5" r="0.3" fill="#0a0e14"/>
+  </g>
+
+  <!-- Doorstep -->
+  <rect x="59" y="102" width="12" height="1.5" fill="rgba(20,25,40,0.6)"/>
+
+  <!-- ─── Tall flag pole + red banner with white stripe ─────────── -->
+  <g>
+    <!-- Pole -->
+    <rect x="73" y="60" width="1.4" height="17" fill="#8a7a5a"/>
+    <!-- Pole tip -->
+    <circle cx="73.7" cy="60" r="0.6" fill="#c8a040"/>
+    <!-- Banner triangle (extends to right) -->
+    <path d="M 74.4 61 L 84 64 L 74.4 67 Z" fill="url(#banner)"/>
+    <!-- White stripe across banner -->
+    <rect x="74.4" y="63.5" width="9" height="0.7" fill="rgba(255,255,255,0.5)"/>
+    <!-- Banner shadow side fold -->
+    <line x1="78" y1="62.2" x2="78" y2="65.8" stroke="rgba(0,0,0,0.25)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Training dummy (left of barracks) ─────────────────────── -->
+  <g>
+    <!-- Wooden post -->
+    <rect x="40" y="84" width="2" height="18" fill="url(#barracksWood)"/>
+    <!-- Post horizontal arm -->
+    <rect x="36" y="86" width="10" height="1.2" fill="url(#barracksWood)"/>
+    <!-- Dummy body (sack) -->
+    <ellipse cx="41" cy="92" rx="3.5" ry="4.5" fill="#c8a870"/>
+    <!-- Sack texture -->
+    <line x1="38" y1="89" x2="44" y2="95" stroke="rgba(110,80,40,0.4)" stroke-width="0.3"/>
+    <line x1="38" y1="92" x2="44" y2="92" stroke="rgba(110,80,40,0.4)" stroke-width="0.3"/>
+    <!-- Dummy head -->
+    <circle cx="41" cy="85.5" r="2.3" fill="#d4b888"/>
+    <!-- Painted target marks on head (eyes / nose mark) -->
+    <circle cx="40.2" cy="85.2" r="0.3" fill="#3a2810"/>
+    <circle cx="41.8" cy="85.2" r="0.3" fill="#3a2810"/>
+    <line x1="40.5" y1="86.5" x2="41.5" y2="86.5" stroke="#3a2810" stroke-width="0.4"/>
+    <!-- Rope bindings (horizontal across body) -->
+    <line x1="37" y1="89" x2="45" y2="89" stroke="#7a5028" stroke-width="0.6"/>
+    <line x1="37" y1="93" x2="45" y2="93" stroke="#7a5028" stroke-width="0.6"/>
+    <line x1="37" y1="96" x2="45" y2="96" stroke="#7a5028" stroke-width="0.6"/>
+    <!-- Worn/struck marks on dummy (small dark spots) -->
+    <circle cx="40" cy="91" r="0.3" fill="#7a5028" opacity="0.6"/>
+    <circle cx="42" cy="93.5" r="0.3" fill="#7a5028" opacity="0.6"/>
+    <circle cx="41" cy="96" r="0.3" fill="#7a5028" opacity="0.6"/>
+  </g>
+
+  <!-- ─── Weapons rack (right of barracks, behind banner) ────────── -->
+  <g>
+    <!-- Rack horizontal beam (low to ground) -->
+    <rect x="83" y="98" width="10" height="1.2" fill="url(#barracksWood)"/>
+    <rect x="83" y="98" width="10" height="0.4" fill="rgba(255,210,150,0.3)"/>
+    <!-- 3 spears leaning, point up -->
+    <line x1="84" y1="99" x2="83" y2="86" stroke="url(#barracksWood)" stroke-width="0.7"/>
+    <polygon points="82.5,86 83.5,86 83,84" fill="url(#barracksIron)"/>
+    <line x1="87" y1="99" x2="86.5" y2="83" stroke="url(#barracksWood)" stroke-width="0.7"/>
+    <polygon points="86,83 87,83 86.5,81" fill="url(#barracksIron)"/>
+    <line x1="90" y1="99" x2="90" y2="84" stroke="url(#barracksWood)" stroke-width="0.7"/>
+    <polygon points="89.5,84 90.5,84 90,82" fill="url(#barracksIron)"/>
+    <!-- Round shield leaning at right end -->
+    <circle cx="92" cy="95" r="3" fill="url(#barracksWood)"/>
+    <circle cx="92" cy="95" r="3" fill="none" stroke="#3a2810" stroke-width="0.4"/>
+    <!-- Shield boss (center metal stud) -->
+    <circle cx="92" cy="95" r="0.8" fill="url(#barracksIron)"/>
+    <circle cx="92" cy="95" r="0.4" fill="#1a1e2a"/>
+    <!-- Shield emblem (small red cross) -->
+    <rect x="91.7" y="93.5" width="0.6" height="3" fill="#a82820"/>
+    <rect x="90.5" y="94.7" width="3" height="0.6" fill="#a82820"/>
+  </g>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(220,220,255,0.3)">
+    <circle cx="34" cy="76" r="0.4"/>
+    <circle cx="48" cy="68" r="0.3"/>
+    <circle cx="80" cy="74" r="0.4"/>
+  </g>
+</svg>

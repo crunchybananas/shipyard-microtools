@@ -68,10 +68,9 @@ Keep it accurate or retire it.
   LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
   (170, 188 LoC), house (173, 194 LoC), tavern (175, 239 LoC),
   blacksmith (176, 223 LoC), market (179, 234 LoC), bakery
-  (180, 230 LoC) — 10 of 11 (**PHASE A COMPLETE**: shipped 5
-  Phase A sprites in 8 ticks, 173-180 with 174/177/178 as
-  variety/maintenance interleaves; only barracks remains
-  un-SVG'd of the live-game roster)
+  (180, 230 LoC), barracks (182, 242 LoC) — **11 of 11 — FULL
+  SVG ROSTER COMPLETE** (Phase A formally closed at 182).
+  Total: ~2401 lines across 11 sprites.
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -163,7 +162,7 @@ tick 172:
 | blacksmith   |   ✓    |    ✓ (176) |     —     |
 | market       |   ✓    |    ✓ (179) |     —     |
 | bakery       |   ✓    |    ✓ (180) |     —     |
-| barracks     |   ✓    |     —      |     —     |
+| barracks     |   ✓    |    ✓ (182) |     —     |
 | school       |   ✓    |     —      |     —     |
 
 (Plus the canvas-only specialized buildings: archery, chickencoop,
@@ -287,6 +286,40 @@ animation path doesn't compose with the integration approach.
 The phase-tick numbers are pace estimates, not commitments.
 User steering can accelerate or decelerate. The PHASE STRUCTURE
 is the durable artifact, not the tick numbers.
+
+## visual-debt log (post-182)
+
+User flagged 2026-04-28: chrome-mcp fell out of habit during the SVG
+sprite arc. All 11 SVG sprites shipped with **static-only verification**
+(`node --check` of touched JS, XML parse of SVG, git diff). No browser
+ever loaded the sandbox at `/svg-test/`. Visual quality is the WHOLE
+POINT of this axis; this is a real gap.
+
+**Catch-up batch (when chrome-mcp comes back):**
+
+1. Open `http://localhost:8889/svg-test/` (after `python3 -m http.server
+   --directory docs/realm 8889`). Verify each of the 11 sprites at the
+   four zoom levels (48/96/192/384px) renders correctly: no broken
+   gradients, no clipped shapes, no collapsed paths.
+2. Compare each SVG to its canvas-equivalent at matching scales (run
+   the live game in another tab; place each building at the same iso
+   tile). Note where SVG looks better, worse, or off-spec relative to
+   canvas.
+3. Stress test: render multiple instances of each sprite on the sandbox
+   page to estimate paint cost (will inform Phase B integration
+   approach — `<img>` lazy-load vs inline fetch vs sprite atlas).
+4. Photo-mode-zoom verification: view each at 384px equivalent (5×
+   in-game zoom). Confirm vector-crispness claims hold (especially gold
+   spire on castle, cross emblem on flag, cruciform arrow slits on
+   tower/barracks).
+
+**Discipline going forward (per
+`feedback_realm_loop_visual_verification.md`):** every visual-shipping
+tick MUST attempt `mcp__claude-in-chrome__tabs_context_mcp` first. Only
+file `live-verify` after the connection actually fails. Phase B
+integration ticks (post-183) cannot ship without chrome — there's no
+static-only equivalent of "did the day/night tint actually composite
+correctly under the SVG sprite."
 
 ## integration concerns (NOT yet solved)
 
@@ -444,7 +477,7 @@ pipeline, these will need solving:
   4 goods); SVG ships canonical red + bread+apples. SVG
   layer 8 → 9 of 11 (Phase A: 4 of 5). **9/11 = PHASE B
   CRITICAL MASS THRESHOLD REACHED per 171 strategic plan.**
-- **180** — **PHASE A 5/5 — COMPLETES PHASE A.** SVG bakery
+- **180** — **PHASE A 5/5 (sprint).** SVG bakery
   sprite ships (230 lines: warm plaster walls + half-timber
   posts + plaster texture + stone base + sunlit edge + lower-
   wall warm spill (oven heat through wall) + terracotta
@@ -465,6 +498,26 @@ pipeline, these will need solving:
   un-SVG'd of the live-game roster.** Per 171 strategic
   plan, **Phase B integration sprint becomes appropriate
   next**.
+- **181** — meta. Phase A milestone review (sibling to 100/
+  157/171). 3 emergent patterns documented (interior-OPEN
+  idiom, tools-propped idiom, family-palette correspondences).
+  Per-instance variation finding: 5 of 10 sprites have canvas
+  hash variants (70+ configurations) that SVG ships single-
+  variant — Phase B step 5 is HEAVIER than 171 estimated.
+  Animation finding: 4 of 10 sprites have canvas animations
+  — Phase C MEDIUM not LOW. Decision: barracks at 182 before
+  Phase B. Revised timeline ~+5 ticks.
+- **182** — **PHASE A 11/11 — FULL ROSTER COMPLETE.** SVG
+  barracks ships (242 lines: cool grey-blue stone + cruciform
+  arrow slits (matching tower 170) + crenellations + iron-
+  banded door + tall flag pole + red banner with white stripe
+  + training dummy on left (post + sack body + rope bindings
+  + painted target head + worn struck spots) + **weapons rack
+  on right** (NEW: 3 spears + round shield with red-cross
+  emblem) + cobble path. Defensive-industrial family palette.
+  SVG layer **11 of 11 ROSTER COMPLETE** (~2401 lines total).
+  **Visual-debt log added to this doc** capturing the 11-
+  sprite catch-up batch needed when chrome-mcp returns.
 
 ## how to update this doc
 
