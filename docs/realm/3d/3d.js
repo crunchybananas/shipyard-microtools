@@ -90,6 +90,7 @@ function placeSampleBuildings(map) {
     ['tower', 4, 0],
     ['church', -4, 0],
     ['barn', 0, 3],
+    ['granary', 4, 2],  // Loop 163 — paired with 158 canvas + 161 SVG siblings
   ];
   for (const [type, dx, dy] of positions) {
     const x = cx + dx, y = cy + dy;
@@ -198,6 +199,37 @@ class Mesh {
     this.pushTri(p[1], p[2], apex, [1, 0.4, 0], darkSide);
     this.pushTri(p[2], p[3], apex, [0, 0.4, -1], c);
     this.pushTri(p[3], p[0], apex, [-1, 0.4, 0], darkSide);
+  }
+  // Loop 163 — Faceted cylinder for round forms (silos, columns).
+  // `sides` controls smoothness; 8 reads as round at iso scale.
+  pushCylinder(cx, cz, baseY, topY, radius, sides, c) {
+    // Side facets — radial outward normal per facet midpoint
+    for (let i = 0; i < sides; i++) {
+      const a0 = (i / sides) * Math.PI * 2;
+      const a1 = ((i + 1) / sides) * Math.PI * 2;
+      const cos0 = Math.cos(a0), sin0 = Math.sin(a0);
+      const cos1 = Math.cos(a1), sin1 = Math.sin(a1);
+      const x0 = cx + cos0 * radius, z0 = cz + sin0 * radius;
+      const x1 = cx + cos1 * radius, z1 = cz + sin1 * radius;
+      const mx = (cos0 + cos1) * 0.5, mz = (sin0 + sin1) * 0.5;
+      const ml = Math.sqrt(mx * mx + mz * mz) || 1;
+      this.pushQuad(
+        [x0, baseY, z0],
+        [x1, baseY, z1],
+        [x1, topY, z1],
+        [x0, topY, z0],
+        [mx / ml, 0, mz / ml], c);
+    }
+    // Top cap — fan of tris from center, normal up
+    for (let i = 0; i < sides; i++) {
+      const a0 = (i / sides) * Math.PI * 2;
+      const a1 = ((i + 1) / sides) * Math.PI * 2;
+      this.pushTri(
+        [cx, topY, cz],
+        [cx + Math.cos(a0) * radius, topY, cz + Math.sin(a0) * radius],
+        [cx + Math.cos(a1) * radius, topY, cz + Math.sin(a1) * radius],
+        [0, 1, 0], c);
+    }
   }
 }
 
@@ -342,6 +374,25 @@ function buildBuildingsMesh(buildings, map) {
         [cx + 0.5, gy + 0.55, cz - 0.35],
         [cx + 0.5, roofTopY, cz],
         [1, 0, 0], [0.55, 0.25, 0.18]);
+    }
+    else if (b.type === 'granary') {
+      // Loop 163 — first 3D engine touch. Sibling to 158 canvas
+      // drawGranary (dome-conforming snow cap) and 161 granary.svg.
+      // Same building expressed across all three render layers.
+      const silo = [0.78, 0.62, 0.40];
+      const dome = [0.65, 0.45, 0.22];
+      const dark = [0.30, 0.20, 0.10];
+      // Octagonal silo cylinder body
+      mesh.pushCylinder(cx, cz, gy, gy + 0.85, 0.45, 8, silo);
+      // Domed cap via 3-tier shrinking pyramid stack — matches the
+      // multi-pyramid pine-canopy technique for organic curve approx.
+      mesh.pushPyramid(cx, cz, gy + 0.85, gy + 1.05, 0.42, dome);
+      mesh.pushPyramid(cx, cz, gy + 1.00, gy + 1.15, 0.32, dome);
+      mesh.pushPyramid(cx, cz, gy + 1.10, gy + 1.20, 0.20, dome);
+      // Tiny finial knob at apex
+      mesh.pushBox(cx - 0.05, gy + 1.20, cz - 0.05, cx + 0.05, gy + 1.32, cz + 0.05, dark);
+      // Arched door at front (+z face)
+      mesh.pushBox(cx - 0.08, gy, cz + 0.43, cx + 0.08, gy + 0.35, cz + 0.48, dark);
     }
     else if (b.type === 'church') {
       const stone = [0.88, 0.85, 0.78];
@@ -500,9 +551,6 @@ function uploadMesh(mesh) {
 const map = generateMap();
 const buildings = placeSampleBuildings(map);
 const terrainMesh = buildTerrainMesh(map);
-// DEBUG: add hot pink pillar directly to terrain mesh
-terrainMesh.pushBox(19.5, 0, 19.5, 20.5, 8, 20.5, [1, 0, 1]);
-console.log('Pink pillar added to terrain mesh');
 const decorMesh = buildDecorMesh(map);
 const buildingsMesh = buildBuildingsMesh(buildings, map);
 
@@ -513,14 +561,8 @@ console.log(`Buildings: ${buildingsMesh.verts.length / 9} verts (${buildings.len
 const terrainGpu = uploadMesh(terrainMesh);
 const decorGpu = uploadMesh(decorMesh);
 const buildingsGpu = uploadMesh(buildingsMesh);
-
-// Debug: 4 tall pink pillars at known coords to verify rendering pipeline
-const debugMesh = new Mesh();
-debugMesh.pushBox(19.5, 0, 19.5, 20.5, 6, 20.5, [1, 0.2, 0.8]);  // center
-debugMesh.pushBox(14.5, 0, 14.5, 15.5, 6, 15.5, [1, 1, 0]);  // yellow NW
-debugMesh.pushBox(24.5, 0, 24.5, 25.5, 6, 25.5, [0, 1, 1]);  // cyan SE
-console.log(`Debug mesh: ${debugMesh.verts.length / 9} verts`);
-const debugGpu = uploadMesh(debugMesh);
+// Loop 163 — removed debug pink/yellow/cyan verification pillars (had
+// served their purpose during initial pipeline diagnosis).
 
 // ── Camera state ───────────────────────────────────────────
 const camera = {
@@ -629,10 +671,6 @@ function frame(now) {
   // Draw buildings
   gl.bindVertexArray(buildingsGpu.vao);
   gl.drawElements(gl.TRIANGLES, buildingsGpu.indexCount, gl.UNSIGNED_INT, 0);
-
-  // Draw debug marker
-  gl.bindVertexArray(debugGpu.vao);
-  gl.drawElements(gl.TRIANGLES, debugGpu.indexCount, gl.UNSIGNED_INT, 0);
 
   gl.bindVertexArray(null);
   requestAnimationFrame(frame);

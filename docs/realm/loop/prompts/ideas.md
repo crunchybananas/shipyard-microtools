@@ -35,7 +35,12 @@ and note the promotion here.
 - 162 [doc] — once 3 sprites exist, open `loop/docs/render-layers.md` with concrete SVG-vs-canvas tradeoffs. [loop/docs/]
 - 161 [code] **AXIS** — render-pipeline integration: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with SVG image draw. Must compose with hover halo, day-night tint, winter cap (158), fog modulation, photo-mode zoom. ~1 deliberate tick after 3+ sprites exist. [render.js]
 - 161 [review] — performance audit: SVG sprite cost per building at 60fps with 100+ buildings on screen. Compare to canvas baseline. Decides whether SVG ships in live game or stays as sprite reference. [play]
-- 161 [code] **AXIS** — open the 3D engine axis: ship a small improvement to `docs/realm/3d/3d.js` (add a building, fix a control, polish a shader). Forces familiarity. [3d/3d.js]
+- 161 [code] **AXIS** — open the 3D engine axis: ship a small improvement to `docs/realm/3d/3d.js` (add a building, fix a control, polish a shader). Forces familiarity. [3d/3d.js] **DONE → 163** (cleaned up 3 debug pillars; added `pushCylinder` mesh primitive; shipped granary mesh — granary now expressed across canvas/SVG/3D layers; +38 LoC net)
+- 163 [code] — windmill 3D mesh: cylinder base + box wooden cap + 4 thin-prism rotating blades around hub axis. Pairs with 158 (canvas conforming-cap). [3d/3d.js]
+- 163 [review] — live-verify granary appears correctly in 3D scene at offset (4, 2). Confirm cylinder + dome + finial + door render with proper lighting. [play]
+- 163 [code] — re-enable backface culling and audit winding-order. If holes appear, fix in `pushQuad`/`pushBox`/etc rather than leaving culling off. Performance + correctness. [3d/3d.js]
+- 163 [code] — day/night sun rotation: animate `uLightDir` over 60s loop. Adds atmosphere. ~10 LoC. [3d/3d.js]
+- 163 [code] — granary 3D refinement: hoop bands as 3 thin annular rings. Visual fine-tuning. [3d/3d.js]
 - 161 [doc] — capture SVG-vs-canvas comparison findings in `loop/docs/render-layers.md` once 3+ buildings are SVG-shipped. [loop/docs/]
 - 161 [review] — visual diff: canvas granary vs SVG granary side-by-side at matching scales. Decide perceptual winner per detail. [play]
 - 161 [review] **CHECK-IN** — at tick ~170-175, evaluate the SVG axis: 5-10 ticks of work — durable benefit or queue-drain? Apply the 146/157 check-in protocol. [journal]
