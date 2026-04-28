@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5">
+<title>Realm SVG Sprite Sandbox</title>
+<style>
+  :root { --bg: #1a1a2e; --panel: #0f0f1e; --gold: #ffd166; --text: #e0e8f0; --border: rgba(255,255,255,0.1); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 1.5rem;
+  }
+  h1 { color: var(--gold); margin: 0 0 0.5rem; font-size: 1.4rem; letter-spacing: 0.05em; }
+  .lede { color: rgba(255,255,255,0.6); margin: 0 0 1.5rem; font-size: 0.9rem; max-width: 620px; line-height: 1.5; }
+  .lede a { color: var(--gold); }
+  .row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.2rem; min-width: 180px;
+  }
+  .card h2 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.5); margin: 0 0 0.6rem; }
+  .stage {
+    display: flex; align-items: end; justify-content: center;
+    background: linear-gradient(180deg, #2a3a52 0%, #4a6840 60%, #3a5430 100%);
+    border-radius: 8px; padding: 1.2rem 0.6rem 0.6rem;
+  }
+  .scales { display: flex; align-items: end; gap: 1rem; }
+  .scales > div { display: flex; flex-direction: column; align-items: center; }
+  .scales label { font-size: 0.62rem; color: rgba(255,255,255,0.7);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.4rem; }
+  /* Render granary at multiple sizes to test legibility at game zooms */
+  .px48  { width: 48px; height: 48px; }
+  .px96  { width: 96px; height: 96px; }
+  .px192 { width: 192px; height: 192px; }
+  .px384 { width: 384px; height: 384px; }
+  .meta { font-size: 0.78rem; line-height: 1.55; color: rgba(255,255,255,0.7);
+    max-width: 620px; }
+  .meta code { background: rgba(255,255,255,0.06); padding: 0.05rem 0.3rem;
+    border-radius: 3px; font-size: 0.85em; color: var(--gold); }
+  .meta strong { color: var(--text); }
+  .footer { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 1rem; }
+</style>
+</head>
+<body>
+  <h1>Realm SVG Sprite Sandbox</h1>
+  <p class="lede">
+    Loop 161 experiment. Sibling to <code>render.js drawGranary</code>
+    (canvas implementation). The same building rendered as inline SVG with
+    richer detail than the canvas primitives can produce, viewed at four
+    sizes representing zoom levels in-game (48px ≈ default zoom; 384px ≈
+    photo-mode zoom).
+  </p>
+
+  <div class="row">
+    <div class="card">
+      <h2>Stage</h2>
+      <div class="stage">
+        <div class="scales">
+          <div>
+            <img class="px48"  src="../assets/sprites/granary.svg" alt="granary 48px"/>
+            <label>48px</label>
+          </div>
+          <div>
+            <img class="px96"  src="../assets/sprites/granary.svg" alt="granary 96px"/>
+            <label>96px</label>
+          </div>
+          <div>
+            <img class="px192" src="../assets/sprites/granary.svg" alt="granary 192px"/>
+            <label>192px</label>
+          </div>
+          <div>
+            <img class="px384" src="../assets/sprites/granary.svg" alt="granary 384px"/>
+            <label>384px</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="meta">
+    <p><strong>What's in the SVG that the canvas version can't easily do:</strong></p>
+    <ul>
+      <li><code>linearGradient</code> + <code>radialGradient</code> for the
+      silo body and dome face — cleaner light falloff than canvas
+      <code>createLinearGradient</code> chains, and they scale crisp at
+      photo-mode zoom.</li>
+      <li><code>pattern</code> for wood-grain on the dome —
+      tileable, vector-clean.</li>
+      <li>Per-shape highlight + shadow strokes that don't pixel-stair.</li>
+      <li>Decorative grain specks, hinges, latch, finial detail —
+      affordable to author at this fidelity in markup; expensive to
+      maintain inside a procedural canvas function.</li>
+    </ul>
+    <p><strong>Open questions for future ticks:</strong></p>
+    <ul>
+      <li>Performance vs canvas at 100+ buildings on screen?</li>
+      <li>Replace <code>drawGranary</code> entirely or run side-by-side
+      via a feature flag?</li>
+      <li>How does the SVG composite with the existing day/night tint and
+      winter snow cap (158 dome-conforming arc)?</li>
+      <li>Should sprites be inlined into the bundle or fetched per-type?</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    Loop 161 · 2026-04-28 · realm/svg-test/
+  </div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Granary sprite — Loop 161 SVG generation experiment.
+  Sibling to render.js drawGranary canvas implementation.
+  Designed for crisp display at the in-game default zoom (≈48×48 px on screen,
+  scaled from this 128×128 viewBox).
+
+  Light source: upper-left (matches canvas pipeline's implicit sun direction).
+  Forms: silo cylinder + wooden dome + barrel hoops + arched door + grain
+  sacks + spilled grain pile + ground shadow.
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Silo body: warm earth gradient from upper-left highlight to lower-right shadow -->
+    <linearGradient id="siloBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8c898"/>
+      <stop offset="0.35" stop-color="#d8a878"/>
+      <stop offset="0.7" stop-color="#b88040"/>
+      <stop offset="1" stop-color="#8a5820"/>
+    </linearGradient>
+
+    <!-- Dome: radial highlight with darker rim -->
+    <radialGradient id="domeFace" cx="0.35" cy="0.3" r="0.85">
+      <stop offset="0" stop-color="#f0d4a0"/>
+      <stop offset="0.4" stop-color="#c89858"/>
+      <stop offset="0.85" stop-color="#8a5820"/>
+      <stop offset="1" stop-color="#4a2e08"/>
+    </radialGradient>
+
+    <!-- Sack body: warm tan with subtle weave -->
+    <linearGradient id="sackBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0c280"/>
+      <stop offset="1" stop-color="#a07840"/>
+    </linearGradient>
+
+    <!-- Grain pile: golden gradient -->
+    <radialGradient id="grainPile" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#f4d480"/>
+      <stop offset="0.7" stop-color="#d4a840"/>
+      <stop offset="1" stop-color="#9a7020"/>
+    </radialGradient>
+
+    <!-- Wood grain pattern for dome -->
+    <pattern id="woodGrain" width="6" height="2" patternUnits="userSpaceOnUse">
+      <rect width="6" height="2" fill="transparent"/>
+      <path d="M0 1 Q 3 0.5 6 1" stroke="rgba(74,46,8,0.18)" stroke-width="0.4" fill="none"/>
+    </pattern>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="groundShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.45)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow (cast slightly to right of silo, soft ellipse) -->
+  <ellipse cx="68" cy="106" rx="34" ry="6" fill="url(#groundShadow)"/>
+
+  <!-- ─── Grain sacks (drawn first; silo overlaps them) ─────────────── -->
+  <!-- Sack 1: leans against silo, lower-left -->
+  <g transform="translate(36 92)">
+    <ellipse cx="0" cy="0" rx="9" ry="6.5" fill="url(#sackBody)" transform="rotate(-12)"/>
+    <path d="M-7 -2 Q 0 -7 7 -2" stroke="rgba(120,80,20,0.35)" stroke-width="0.6" fill="none"/>
+    <!-- tie at top -->
+    <rect x="-2" y="-9" width="4" height="3" fill="#7a4818"/>
+    <ellipse cx="0" cy="-8" rx="3" ry="1.2" fill="#e0c080"/>
+  </g>
+  <!-- Sack 2: smaller, behind sack 1 -->
+  <g transform="translate(28 96)">
+    <ellipse cx="0" cy="0" rx="7" ry="5" fill="url(#sackBody)" transform="rotate(8)" opacity="0.92"/>
+    <rect x="-1.5" y="-6" width="3" height="2" fill="#7a4818"/>
+  </g>
+
+  <!-- ─── Silo cylinder body ──────────────────────────────────────── -->
+  <!-- Main cylinder: top is a half-ellipse (perspective), bottom flat -->
+  <path d="M 42 96 L 42 60 A 22 6 0 0 1 86 60 L 86 96 Z" fill="url(#siloBody)"/>
+
+  <!-- Top rim shadow (a subtle inner curve at the cylinder top opening) -->
+  <ellipse cx="64" cy="60" rx="22" ry="6" fill="rgba(0,0,0,0.25)"/>
+
+  <!-- Subtle vertical staves (clay/wood plank seams) -->
+  <g stroke="rgba(74,46,8,0.18)" stroke-width="0.6" fill="none">
+    <line x1="50" y1="64" x2="50" y2="94"/>
+    <line x1="58" y1="62" x2="58" y2="94"/>
+    <line x1="64" y1="61" x2="64" y2="94"/>
+    <line x1="70" y1="62" x2="70" y2="94"/>
+    <line x1="78" y1="64" x2="78" y2="94"/>
+  </g>
+
+  <!-- Barrel hoops (3 horizontal bands wrapped around cylinder) -->
+  <g stroke="#5a3e10" stroke-width="1.6" fill="none" stroke-linecap="round">
+    <!-- top hoop, near rim -->
+    <ellipse cx="64" cy="68" rx="22" ry="5.5" stroke-dasharray="0" />
+    <!-- middle hoop -->
+    <ellipse cx="64" cy="80" rx="22" ry="6"/>
+    <!-- bottom hoop -->
+    <ellipse cx="64" cy="92" rx="22" ry="5.5"/>
+  </g>
+  <!-- Hoop highlights (top edge, suggesting metal/wood) -->
+  <g stroke="rgba(255,235,180,0.4)" stroke-width="0.5" fill="none">
+    <path d="M 44 67 Q 64 64.5 84 67"/>
+    <path d="M 44 79 Q 64 76.5 84 79"/>
+    <path d="M 44 91 Q 64 88.5 84 91"/>
+  </g>
+  <!-- Hoop nail studs -->
+  <g fill="#3a2008">
+    <circle cx="44" cy="68" r="1"/>
+    <circle cx="84" cy="68" r="1"/>
+    <circle cx="44" cy="80" r="1"/>
+    <circle cx="84" cy="80" r="1"/>
+    <circle cx="44" cy="92" r="1"/>
+    <circle cx="84" cy="92" r="1"/>
+  </g>
+
+  <!-- ─── Wooden dome cap ──────────────────────────────────────────── -->
+  <!-- Dome: a half-sphere shape sitting on the silo top -->
+  <path d="M 42 60 A 22 22 0 0 1 86 60 Z" fill="url(#domeFace)"/>
+  <!-- Wood-grain overlay on dome -->
+  <path d="M 42 60 A 22 22 0 0 1 86 60 Z" fill="url(#woodGrain)" opacity="0.6"/>
+  <!-- Dome highlight crescent (upper-left) -->
+  <path d="M 48 58 Q 54 44 70 42"
+        stroke="rgba(255,240,210,0.45)"
+        stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- Dome rim shadow -->
+  <path d="M 42 60 A 22 22 0 0 1 86 60"
+        stroke="rgba(40,20,4,0.3)" stroke-width="1" fill="none"/>
+
+  <!-- Finial: small carved knob at apex of dome -->
+  <g>
+    <ellipse cx="64" cy="38" rx="2.4" ry="1.2" fill="#3a2008"/>
+    <rect x="63.4" y="34" width="1.2" height="4" fill="#5a3a18"/>
+    <circle cx="64" cy="33.5" r="1.6" fill="#7a5028"/>
+    <circle cx="63.4" cy="33" r="0.6" fill="rgba(255,230,180,0.7)"/>
+  </g>
+
+  <!-- ─── Arched door ───────────────────────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <path d="M 58 96 L 58 86 A 6 5 0 0 1 70 86 L 70 96 Z" fill="#1a0e02"/>
+    <!-- Door planks -->
+    <path d="M 59 95 L 59 87 A 5 4 0 0 1 69 87 L 69 95 Z" fill="#3a2008"/>
+    <line x1="64" y1="87" x2="64" y2="95" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>
+    <!-- Door frame -->
+    <path d="M 58 96 L 58 86 A 6 5 0 0 1 70 86 L 70 96"
+          stroke="#7a5028" stroke-width="0.8" fill="none"/>
+    <!-- Hinges -->
+    <circle cx="60" cy="89" r="0.7" fill="#c8a040"/>
+    <circle cx="60" cy="93" r="0.7" fill="#c8a040"/>
+    <!-- Latch -->
+    <rect x="67" y="91" width="1.5" height="1.5" fill="#c8a040"/>
+  </g>
+
+  <!-- ─── Spilled grain pile ────────────────────────────────────────── -->
+  <g transform="translate(96 99)">
+    <ellipse cx="0" cy="0" rx="10" ry="3.5" fill="url(#grainPile)"/>
+    <ellipse cx="0" cy="-1.5" rx="7" ry="2" fill="#e8c870"/>
+    <!-- individual grain specks -->
+    <circle cx="-5" cy="-1" r="0.5" fill="#a07820"/>
+    <circle cx="-2" cy="-2" r="0.5" fill="#c89030"/>
+    <circle cx="2" cy="-1.5" r="0.5" fill="#a07820"/>
+    <circle cx="5" cy="0" r="0.4" fill="#c89030"/>
+    <circle cx="6" cy="-0.5" r="0.4" fill="#a07820"/>
+    <circle cx="-7" cy="0.5" r="0.4" fill="#a07820"/>
+  </g>
+
+  <!-- ─── Subtle dust/light flecks around the dome ─────────────────── -->
+  <g fill="rgba(255,240,200,0.4)">
+    <circle cx="50" cy="48" r="0.6"/>
+    <circle cx="78" cy="50" r="0.5"/>
+    <circle cx="55" cy="40" r="0.4"/>
+  </g>
+</svg>

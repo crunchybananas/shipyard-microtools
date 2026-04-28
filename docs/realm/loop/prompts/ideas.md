@@ -28,6 +28,13 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 161 [code] **AXIS** — convert remaining buildings to SVG sprites. Suggested order (visual complexity descending): castle → church → tower → tavern → blacksmith → market → windmill → bakery → barracks → house → farm. ~1 building per tick = 10 ticks span. [assets/sprites/]
+- 161 [code] **AXIS** — render-pipeline integration: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with SVG image draw. Must compose with hover halo, day-night tint, winter cap (158), fog modulation, photo-mode zoom. ~1 deliberate tick after 3+ sprites exist. [render.js]
+- 161 [review] — performance audit: SVG sprite cost per building at 60fps with 100+ buildings on screen. Compare to canvas baseline. Decides whether SVG ships in live game or stays as sprite reference. [play]
+- 161 [code] **AXIS** — open the 3D engine axis: ship a small improvement to `docs/realm/3d/3d.js` (add a building, fix a control, polish a shader). Forces familiarity. [3d/3d.js]
+- 161 [doc] — capture SVG-vs-canvas comparison findings in `loop/docs/render-layers.md` once 3+ buildings are SVG-shipped. [loop/docs/]
+- 161 [review] — visual diff: canvas granary vs SVG granary side-by-side at matching scales. Decide perceptual winner per detail. [play]
+- 161 [review] **CHECK-IN** — at tick ~170-175, evaluate the SVG axis: 5-10 ticks of work — durable benefit or queue-drain? Apply the 146/157 check-in protocol. [journal]
 - 160 [code] — phase 4 exact-match font-size migrations: `.tt-shortcut kbd` 0.65→fs-xs, `.tech-name` 0.82→fs-base (bundled-line precise match), `.tech-cost` 0.65→fs-xs (same bundled line). ~3-5 more exact-matches. [index.html]
 - 160 [code] — design-shift tick (deferred again): group near-exacts (0.72→0.75, 0.8→0.82, 0.78→0.82, 0.7→0.75, 0.85→0.82) into one deliberate migration pass. [index.html]
 - 160 [doc] — once phases 4-5 complete, close 130 HIGH entirely and capture the migration arc briefly in loop/docs/. [loop/docs/]
