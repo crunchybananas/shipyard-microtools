@@ -60,7 +60,10 @@ and note the promotion here.
 - 161 [doc] — capture SVG-vs-canvas comparison findings in `loop/docs/render-layers.md` once 3+ buildings are SVG-shipped. [loop/docs/]
 - 161 [review] — visual diff: canvas granary vs SVG granary side-by-side at matching scales. Decide perceptual winner per detail. [play]
 - 161 [review] **CHECK-IN** — at tick ~170-175, evaluate the SVG axis: 5-10 ticks of work — durable benefit or queue-drain? Apply the 146/157 check-in protocol. [journal]
-- 160 [code] — phase 4 exact-match font-size migrations: `.tt-shortcut kbd` 0.65→fs-xs, `.tech-name` 0.82→fs-base (bundled-line precise match), `.tech-cost` 0.65→fs-xs (same bundled line). ~3-5 more exact-matches. [index.html]
+- 160 [code] — phase 4 exact-match font-size migrations: `.tt-shortcut kbd` 0.65→fs-xs, `.tech-name` 0.82→fs-base (bundled-line precise match), `.tech-cost` 0.65→fs-xs (same bundled line). ~3-5 more exact-matches. [index.html] **PARTIAL → 169** (8 exact-match migrations: #hud, .feed-item + .feed-icon, #tooltip .tt-lbl, .tt-shortcut kbd, .tut-action, #event-banner, .eb-days; bundled-line .tech-name/cost deferred for phase 6 surgical tick)
+- 169 [code] — phase 5 exact-match migrations: .diff-btn 0.82→fs-base, .rate 0.65→fs-xs, .at-title 0.65→fs-xs, .ach-sum-row 0.75→fs-sm, .ach-sum-note 0.65→fs-xs, .ach-item 0.75→fs-sm, .tut-skip 0.65→fs-xs, .trade-empty 0.82→fs-base, .rp-sublabel 0.65→fs-xs, .tc-desc 0.65→fs-xs, .rp-pct 0.65→fs-xs. ~11 more exact-matches. [index.html]
+- 169 [code] — phase 6 bundled-line surgery: line 520 .tech-name 0.82, .tech-cost 0.65 (line has 5 selectors; use anchored regex or full-line replace with care). [index.html]
+- 169 [doc] — once phase 5+6 close, document the migration arc total LoC + invariants + deferred design-shift list. [loop/docs/]
 - 160 [code] — design-shift tick (deferred again): group near-exacts (0.72→0.75, 0.8→0.82, 0.78→0.82, 0.7→0.75, 0.85→0.82) into one deliberate migration pass. [index.html]
 - 160 [doc] — once phases 4-5 complete, close 130 HIGH entirely and capture the migration arc briefly in loop/docs/. [loop/docs/]
 - 159 [review] — live-verify shooting star: fresh Avalon past first autumn, fast-forward deep nights, confirm (a) visible when spawned, (b) sets flag on completion, (c) doesn't fire again post-reload. [play]
