@@ -83,6 +83,13 @@ export function saveGame({ silent = false } = {}) {
     // 135's welcome-back notify. Legacy saves without this field
     // fall back to "no wait info available" on resume.
     state.savedAt = Date.now();
+    // Loop 197 (the-fixer, closes 192 filed): persist G.realmEnded so
+    // a fallen-realm save preserves post-end mode across reloads.
+    // Without this, future consumers of G.realmEnded (render desat /
+    // audio fade / UI suppression) would re-derive from
+    // storyFlags.realm_fell on load — workable but indirect. Explicit
+    // is cleaner.
+    state.realmEnded = !!G.realmEnded;
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -174,6 +181,9 @@ export function loadGame() {
     G.chronicle = Array.isArray(s.chronicle) ? s.chronicle : [];
     G.storyFlags = s.storyFlags || {};
     G.namedCharacters = s.namedCharacters || {};
+    // Loop 197: restore G.realmEnded (192-filed silent-module flag).
+    // Falls back to deriving from storyFlags.realm_fell for legacy saves.
+    G.realmEnded = !!s.realmEnded || !!(s.storyFlags && s.storyFlags.realm_fell);
     if (s.kingdomName) G.kingdomName = s.kingdomName;
     if (s.scenario) G.scenario = s.scenario;
     if (s.difficulty) G.difficulty = s.difficulty;

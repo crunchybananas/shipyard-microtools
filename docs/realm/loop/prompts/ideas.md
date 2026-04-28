@@ -191,7 +191,7 @@ and note the promotion here.
 - 192 [code] — first consumer of G.realmEnded: render-pipeline desaturation post-end (multiply-blend grey overlay when G.realmEnded). ~10 LoC. [render.js]
 - 192 [code] — second consumer: audio silence / fade-out (G.audioCtx mute or master gain to 0). [audio.js]
 - 192 [code] — UI toast suppression post-end (notify() filter on G.realmEnded). [notifications.js]
-- 192 [code] — save.js persistence for G.realmEnded (2 lines). Re-derives from storyFlags.realm_fell otherwise. [save.js]
+- 192 [code] — save.js persistence for G.realmEnded (2 lines). Re-derives from storyFlags.realm_fell otherwise. [save.js] **DONE → 197** (10 LoC including comments; defensive 2-path load; backward-compatible; durable post-end-mode pattern: setter 192 + persistence 197 + consumers pending)
 - 192 [doc] — when a consumer ships, document the post-end-mode pattern in loop/docs/ as a reusable runtime-state hook (sibling to NARRATIVE_BEATS but for G runtime properties). [loop/docs/]
 - 103 [review] — does the 7-surface Lira arc feel EARNED or forced at realm-end? Long-play read. [play]
 - 103 [doc] — update narrative-surfaces.md: new `requiem` tag (15 tags now), new eviction-immune entry, new NARRATIVE_BEATS entry. Per 075 invariant. [loop/docs/] **DONE → 104** (maintenance tick; also caught up 092/093/097/101/102)
