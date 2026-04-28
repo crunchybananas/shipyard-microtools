@@ -601,6 +601,22 @@ const NARRATIVE_BEATS = [
         ? `The first snow falls on the realm. ${f} stands in the fields a long time before going indoors.`
         : 'The first snow falls on the realm. The settlers stand in the fields a long time before going indoors.';
     } },
+  // Loop 199 (surprise, 196 filed): SECOND early-game beat per 195
+  // skeptic alternation discipline. Sibling to 196 first_long_evening
+  // (summer-evening / anti-anxious) but DIFFERENT MOOD: morning beat
+  // marking the seasonal turn from summer into autumn. Fires the same
+  // day-window as 116 constellation_named (autumn day ≥ 15) but BEFORE
+  // it in table order — so the chronicle reads morning-cold then
+  // evening-stars on the seam day. Static prose; observational-elder
+  // register matching the 148/152/166/174/184/190/193/196 cluster.
+  // Hopeful-not-anxious: "goes on" closes with continuity rather than
+  // alarm. Pairs first_long_evening (8 of 196 filed early-game pool)
+  // → first_cold_morning (this) as morning/evening sibling beats
+  // bracketing year-1's mid-game. Two more candidates remain filed
+  // ("fields know the realm" / citizen first sigh).
+  { flag: 'first_cold_morning', tag: 'misc',
+    trigger: G => G.season === 'autumn' && G.day >= 15,
+    text: 'There is a morning when the air has changed. Dew holds late on the grass; breath shows on a back step for the first time. The realm pulls a cloak closer and goes on.' },
   // Loop 116 (surprise, un-filed): the realm names a constellation.
   // Every kingdom has a distinct star-pattern it remembers — the shape
   // it sees overhead when first autumn falls. Deterministic per

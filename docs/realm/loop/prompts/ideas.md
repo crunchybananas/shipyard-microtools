@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 199 [code] — third early-game beat: "the fields know the realm" — year-1 spring or summer beat about the realm becoming familiar with its land. Per 196 filing, deferred from 199 (one early-game ship per 5-10 ticks per alternation discipline). Earliest ~tick 205+. ~12 LoC. [story.js]
+- 199 [code] — fourth early-game candidate: citizen "first sigh" — quiet moment of individual personhood in the early realm. Year-1 spring/summer. Per 196 filing. ~12 LoC. [story.js]
+- 199 [doc] — early-game beat sub-pattern within misc-tag observational register (196/199 + 2 filed). When cluster reaches 4 entries, narrative-surfaces.md should document the early-game discipline: hopeful-not-anxious mood, "goes on" continuity register, year-1-only via flag-once-fire, bracket year-1 mid-game. Promote to invariant at cluster size 4. [loop/docs/]
+- 199 [code] — same-day beat-pair pattern: 116 constellation_named + 199 first_cold_morning both fire autumn day 15. First deliberate pairing in NARRATIVE_BEATS. If 2+ more same-day pairings emerge, promote to **same-day beat-pair invariant** (table-order = chronicle-order; morning/evening register-pair). Currently 1 use. [story.js + loop/docs/]
 - 198 [code] — third use of `after:` schema would promote it to a formal invariant per pattern-emergence rule. Currently 2 uses (134 namesake citizen-rename + 192 realm-fell flag-setter). Candidate: a beat that needs to set a flag AND modify game state simultaneously. No specific candidate yet; filed as watch-pattern. [story.js]
 - 198 [code] — third source-specific echo branch would promote checkEchoBeat pattern to invariant + registry refactor. Currently 1 use (194 constellation shape). Candidates: stone (056) "they say a stone there bears our own name still" / great-storm (147) / wanderer (148). Per 194 filing. [story.js]
 - 198 [doc] — when 3+ source-specific echo branches exist, refactor to a registry table (`_ECHO_SPECIAL_FRAMES` keyed by source-prose-fingerprint). Until then conditional branches are fine. [story.js + loop/docs/]
@@ -218,7 +222,7 @@ and note the promotion here.
 - 194 [doc] — narrative-surfaces.md mention source-specific echo pattern in invariants when 3+ instances accrete. [loop/docs/]
 - 195 [review] **PRIORITY** — chrome-required playtime audit when chrome reconnects: fresh realm, track in-game-days per real-time-minute at 5/10/15/30 min marks. Calibrates gate-window choices. [play]
 - 195 [code] — early-game narrative beat to counterbalance forgetting cluster. Year 1 day 5-15 zone is THIN. Candidates: "first cold morning" / "first frost-on-fields" (different from 174 year-2-frame) / citizen "first sigh." [story.js] **DONE → 196** (first-long-evening; year-1 summer day ≤ 14; anti-anxious "things are okay" mood; static prose; misc tag)
-- 196 [code] — second early-game beat: "first cold morning" (year-1 autumn day 15+, before constellation_named fires). Sibling to 196 but different mood. ~12 LoC. [story.js]
+- 196 [code] — second early-game beat: "first cold morning" (year-1 autumn day 15+, before constellation_named fires). Sibling to 196 but different mood. ~12 LoC. [story.js] **DONE → 199** (placed BEFORE constellation_named in table order so chronicle reads cold-morning → star-evening on day 15; misc tag; "goes on" continuity mood; novel same-day beat-pair pattern filed as candidate invariant)
 - 196 [code] — third early-game beat: "the fields know the realm" — year-1 spring or summer about land becoming familiar. ~12 LoC. [story.js]
 - 196 [process] — alternation tracker in suggestion-for-next: count recent surprises by gate-window (year1/year2/year3+) and recommend the underrepresented bucket. [process]
 - 195 [code] — gate-down candidate: 184 stone-forgotten from year3 to year2 + 5 births. Trade arc-feels-too-fast vs visible-to-more-players. [story.js]
