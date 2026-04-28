@@ -1342,6 +1342,22 @@ export function checkEchoBeat() {
   const src = candidates[idx];
   // Trim trailing newlines; keep the source prose intact in the quote.
   const quoted = src.text.trim();
+
+  // Loop 194 (the-fixer, closes 116 filed): constellation-specific
+  // echo frame. When the echoed source is the 116 constellation_named
+  // beat (detected via the unique "first autumn stars" phrase), surface
+  // a tighter quote — "Old folk still call them ${shape}" — pulling the
+  // kingdom-hashed shape name out of the source text. Replaces the
+  // generic 4-frame wrap which would echo the whole "${f}, looking up..."
+  // prose. Reads as the constellation NAME persisting through time, not
+  // the act of naming being repeated.
+  if (src.tag === 'milestone' && /first autumn stars stand clear above the eastern ridge/.test(quoted)) {
+    const shapeMatch = quoted.match(/(?:names? them|name the pattern) (.+?)\. The realm takes the name/);
+    const shape = (shapeMatch && shapeMatch[1]) ? shapeMatch[1] : 'them';
+    chronicle(`Old folk still call them ${shape}.`, 'echo');
+    return;
+  }
+
   const frameIdx = _dreamHash(`${kname}_echo_frame_${G.day}`) % _ECHO_FRAMES.length;
   chronicle(_ECHO_FRAMES[frameIdx](quoted), 'echo');
 }

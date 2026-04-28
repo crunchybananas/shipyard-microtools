@@ -209,7 +209,10 @@ and note the promotion here.
 - 120 [code] — verify difficulty-multiplier interaction with the 3 bonuses (Easy/Normal/Hard). Disproportionate impact at tier edges? [tech.js + combat.js + trade.js]
 - 116 [code] — visual constellation render on autumn nights: draw stored shape in sky overlay using small star-sprite clusters. Per-shape position table. ~20 lines. [render.js + story.js] **DONE → 151** (reactivated 016 disabled `renderConstellations`; procedural kingdom-hashed asterism 5-7 points upper 17%/70%; gated on `constellation_named`; cached per kingdom; +18 LoC net)
 - 116 [code] — audio cue for constellation naming (high ethereal tones, very quiet). Slot for the-composer next. [audio.js + story.js]
-- 116 [code] — echo frame specific to constellation: "Old folk still call them ${shape}." Pairs with 059. [story.js]
+- 116 [code] — echo frame specific to constellation: "Old folk still call them ${shape}." Pairs with 059. [story.js] **DONE → 194** (conditional branch in checkEchoBeat detects 116 source by unique phrase, extracts shape via regex; default 4-frame pool unchanged; constellation arc now 5 touchpoints incl echo-persistence)
+- 194 [code] — special echo frames for other long-arc beats: stone (056) "they say a stone there bears our own name still" / great-storm (147) / wanderer (148) / namesake (134). Each tightens echo to focus on PERSISTENCE vs REPETITION. ~10 LoC each. [story.js]
+- 194 [code] — refactor `_ECHO_FRAMES` to `_ECHO_SPECIAL_FRAMES` (Map<predicate, frame-fn>) when 3+ source-specific echoes exist. Right now 1; not worth abstraction yet. [story.js]
+- 194 [doc] — narrative-surfaces.md mention source-specific echo pattern in invariants when 3+ instances accrete. [loop/docs/]
 - 116 [review] — long-play read: do the 20 constellation names feel distinctive or interchangeable? Tune pool. [play]
 - 122 [code] — visual weathering on 058's stone render: when `stone_weathered` is set, tilt sprite or overlay mossy texture. ~8 lines. [enhancements.js]
 - 122 [code] — optional 4th stone beat at day ≥ 300: "The stone has been here longer than the oldest citizen." Extends arc to century+ realms. [story.js]
