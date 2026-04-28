@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Castle sprite — Loop 162 (SVG axis, 2nd sprite).
+  Sibling to render.js drawCastle canvas implementation.
+  ViewBox 0 0 128 128. Castle centered at x=64; ground at y≈104.
+  Light: upper-left.
+
+  Form: stone foundation + 2 flanking towers (red conical roofs +
+  pennants) + central keep (stone-block texture, gold-trimmed parapet,
+  crenellations, 12-window grid with warm glow, arrow slits, arched
+  portcullis, pyramidal red roof, gold spire, gold cross-emblem flag).
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Foundation: dark cool stone -->
+    <linearGradient id="castleBase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#807870"/>
+      <stop offset="1" stop-color="#3a322a"/>
+    </linearGradient>
+
+    <!-- Flanking tower body: light face → shadow -->
+    <linearGradient id="towerLeft" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#c4bca8"/>
+      <stop offset="0.5" stop-color="#88806e"/>
+      <stop offset="1" stop-color="#5a5448"/>
+    </linearGradient>
+    <linearGradient id="towerRight" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#b8b09e"/>
+      <stop offset="0.5" stop-color="#807868"/>
+      <stop offset="1" stop-color="#524638"/>
+    </linearGradient>
+
+    <!-- Keep body: pale upper, dark lower -->
+    <linearGradient id="keepBody" x1="0" y1="0" x2="0.06" y2="1">
+      <stop offset="0" stop-color="#d0c8b6"/>
+      <stop offset="0.4" stop-color="#888070"/>
+      <stop offset="1" stop-color="#584f40"/>
+    </linearGradient>
+
+    <!-- Window glow: warm radial -->
+    <radialGradient id="windowGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,220,140,0.55)"/>
+      <stop offset="1" stop-color="rgba(255,220,140,0)"/>
+    </radialGradient>
+
+    <!-- Red roof gradient -->
+    <linearGradient id="redRoof" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#d03030"/>
+      <stop offset="0.5" stop-color="#a82020"/>
+      <stop offset="1" stop-color="#6a1010"/>
+    </linearGradient>
+
+    <!-- Stone-block pattern: horizontal mortar + staggered vertical joints -->
+    <pattern id="stoneBlocks" width="8" height="7" patternUnits="userSpaceOnUse">
+      <rect width="8" height="7" fill="transparent"/>
+      <line x1="0" y1="0" x2="8" y2="0" stroke="rgba(20,15,10,0.28)" stroke-width="0.4"/>
+      <line x1="0" y1="3.5" x2="0" y2="7" stroke="rgba(20,15,10,0.28)" stroke-width="0.4"/>
+      <line x1="4" y1="0" x2="4" y2="3.5" stroke="rgba(20,15,10,0.28)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Gold gradient for spire/flag -->
+    <linearGradient id="goldShine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fce080"/>
+      <stop offset="0.5" stop-color="#d4a820"/>
+      <stop offset="1" stop-color="#8a6014"/>
+    </linearGradient>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="castleShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.5)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="68" cy="108" rx="38" ry="6" fill="url(#castleShadow)"/>
+
+  <!-- ─── Stone foundation (back layer) ─────────────────────────── -->
+  <rect x="42" y="100" width="44" height="6" fill="url(#castleBase)"/>
+  <rect x="42" y="106" width="44" height="3" fill="#2a221a"/>
+  <line x1="42" y1="100" x2="86" y2="100" stroke="rgba(255,240,200,0.18)" stroke-width="0.5"/>
+
+  <!-- ─── LEFT flanking tower ───────────────────────────────────── -->
+  <g>
+    <!-- Tower body -->
+    <rect x="42" y="64" width="10" height="40" fill="url(#towerLeft)"/>
+    <!-- Right face shadow -->
+    <rect x="50" y="66" width="2" height="38" fill="#3a3228"/>
+    <!-- Stone-block texture overlay (subtle) -->
+    <rect x="42" y="64" width="10" height="40" fill="url(#stoneBlocks)" opacity="0.7"/>
+    <!-- Parapet (slightly wider than tower) -->
+    <rect x="41" y="60" width="12" height="4" fill="#8a8278"/>
+    <!-- Merlons (3) -->
+    <rect x="42" y="56" width="2" height="4" fill="#706860"/>
+    <rect x="46" y="56" width="2" height="4" fill="#706860"/>
+    <rect x="50" y="56" width="2" height="4" fill="#706860"/>
+    <!-- Highlight on parapet top edge -->
+    <line x1="41" y1="60" x2="53" y2="60" stroke="rgba(255,240,200,0.35)" stroke-width="0.5"/>
+    <!-- Conical roof (red) -->
+    <path d="M 41 60 L 47 48 L 53 60 Z" fill="url(#redRoof)"/>
+    <!-- Roof shadow side -->
+    <path d="M 47 48 L 53 60 L 50 54 Z" fill="rgba(60,8,8,0.5)"/>
+    <!-- Roof tiles (subtle horizontal lines) -->
+    <line x1="42" y1="58" x2="52" y2="58" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+    <line x1="44" y1="55" x2="50" y2="55" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+    <line x1="46" y1="52" x2="48" y2="52" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+    <!-- Pennant pole -->
+    <line x1="47" y1="48" x2="47" y2="40" stroke="#3a3228" stroke-width="0.7"/>
+    <!-- Red pennant -->
+    <path d="M 47 40 L 53 42 L 52 45 L 47 44 Z" fill="#c02828"/>
+    <line x1="47" y1="40" x2="47" y2="44.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.4"/>
+    <!-- Tower window slit -->
+    <rect x="46" y="80" width="1.2" height="3.5" fill="#1a1008"/>
+    <rect x="46" y="88" width="1.2" height="3.5" fill="#1a1008"/>
+  </g>
+
+  <!-- ─── RIGHT flanking tower ──────────────────────────────────── -->
+  <g>
+    <rect x="76" y="64" width="10" height="40" fill="url(#towerRight)"/>
+    <rect x="84" y="66" width="2" height="38" fill="#332b22"/>
+    <rect x="76" y="64" width="10" height="40" fill="url(#stoneBlocks)" opacity="0.7"/>
+    <rect x="75" y="60" width="12" height="4" fill="#7a7268"/>
+    <rect x="76" y="56" width="2" height="4" fill="#605850"/>
+    <rect x="80" y="56" width="2" height="4" fill="#605850"/>
+    <rect x="84" y="56" width="2" height="4" fill="#605850"/>
+    <line x1="75" y1="60" x2="87" y2="60" stroke="rgba(255,240,200,0.3)" stroke-width="0.5"/>
+    <path d="M 75 60 L 81 48 L 87 60 Z" fill="url(#redRoof)"/>
+    <path d="M 81 48 L 87 60 L 84 54 Z" fill="rgba(60,8,8,0.55)"/>
+    <line x1="76" y1="58" x2="86" y2="58" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+    <line x1="78" y1="55" x2="84" y2="55" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+    <line x1="80" y1="52" x2="82" y2="52" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+    <line x1="81" y1="48" x2="81" y2="40" stroke="#3a3228" stroke-width="0.7"/>
+    <!-- Blue pennant on right tower -->
+    <path d="M 81 40 L 87 42 L 86 45 L 81 44 Z" fill="#2848c0"/>
+    <line x1="81" y1="40" x2="81" y2="44.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.4"/>
+    <rect x="80" y="80" width="1.2" height="3.5" fill="#1a1008"/>
+    <rect x="80" y="88" width="1.2" height="3.5" fill="#1a1008"/>
+  </g>
+
+  <!-- ─── CENTRAL KEEP (the imposing core) ──────────────────────── -->
+  <g>
+    <!-- Keep body -->
+    <rect x="50" y="46" width="28" height="54" fill="url(#keepBody)"/>
+    <!-- Right face shadow stripe -->
+    <rect x="76" y="48" width="2" height="52" fill="#3a3228"/>
+    <!-- Stone-block texture overlay -->
+    <rect x="50" y="46" width="28" height="54" fill="url(#stoneBlocks)" opacity="0.85"/>
+    <!-- Top edge sunlit highlight -->
+    <line x1="50" y1="46" x2="78" y2="46" stroke="rgba(255,240,200,0.4)" stroke-width="0.8"/>
+
+    <!-- Parapet -->
+    <rect x="48" y="42" width="32" height="4" fill="#7a7268"/>
+    <!-- Gold trim line -->
+    <rect x="48" y="41" width="32" height="1.2" fill="url(#goldShine)"/>
+    <!-- Dense crenellations (7) -->
+    <g fill="#605850">
+      <rect x="49"   y="38" width="2.5" height="4"/>
+      <rect x="53.5" y="38" width="2.5" height="4"/>
+      <rect x="58"   y="38" width="2.5" height="4"/>
+      <rect x="62.5" y="38" width="2.5" height="4"/>
+      <rect x="67"   y="38" width="2.5" height="4"/>
+      <rect x="71.5" y="38" width="2.5" height="4"/>
+      <rect x="76"   y="38" width="2.5" height="4"/>
+    </g>
+
+    <!-- Windows with warm glow (3 rows × 4 cols = 12) -->
+    <g>
+      <!-- row 1 (top) -->
+      <circle cx="54.5" cy="55.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="60.5" cy="55.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="66.5" cy="55.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="72.5" cy="55.5" r="3.5" fill="url(#windowGlow)"/>
+      <rect x="53" y="54" width="3" height="3" fill="#ffe08a"/>
+      <rect x="59" y="54" width="3" height="3" fill="#ffe08a"/>
+      <rect x="65" y="54" width="3" height="3" fill="#ffe08a"/>
+      <rect x="71" y="54" width="3" height="3" fill="#ffe08a"/>
+      <!-- row 2 -->
+      <circle cx="54.5" cy="67.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="60.5" cy="67.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="66.5" cy="67.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="72.5" cy="67.5" r="3.5" fill="url(#windowGlow)"/>
+      <rect x="53" y="66" width="3" height="3" fill="#ffe08a"/>
+      <rect x="59" y="66" width="3" height="3" fill="#ffe08a"/>
+      <rect x="65" y="66" width="3" height="3" fill="#ffe08a"/>
+      <rect x="71" y="66" width="3" height="3" fill="#ffe08a"/>
+      <!-- row 3 (bottom) -->
+      <circle cx="54.5" cy="79.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="60.5" cy="79.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="66.5" cy="79.5" r="3.5" fill="url(#windowGlow)"/>
+      <circle cx="72.5" cy="79.5" r="3.5" fill="url(#windowGlow)"/>
+      <rect x="53" y="78" width="3" height="3" fill="#ffe08a"/>
+      <rect x="59" y="78" width="3" height="3" fill="#ffe08a"/>
+      <rect x="65" y="78" width="3" height="3" fill="#ffe08a"/>
+      <rect x="71" y="78" width="3" height="3" fill="#ffe08a"/>
+    </g>
+
+    <!-- Arrow slits on outer keep walls -->
+    <g fill="#1a1008">
+      <rect x="51" y="64"  width="1.5" height="5"/>
+      <rect x="51" y="76"  width="1.5" height="5"/>
+      <rect x="51" y="88"  width="1.5" height="5"/>
+      <rect x="75" y="64"  width="1.5" height="5"/>
+      <rect x="75" y="76"  width="1.5" height="5"/>
+      <rect x="75" y="88"  width="1.5" height="5"/>
+    </g>
+
+    <!-- GRAND ARCHED ENTRANCE -->
+    <g>
+      <!-- Dark arch opening -->
+      <path d="M 59 100 L 59 91 Q 64 86 69 91 L 69 100 Z" fill="#0a0804"/>
+      <!-- Stone arch frame -->
+      <path d="M 59 100 L 59 91 Q 64 86 69 91 L 69 100"
+            stroke="#2a2018" stroke-width="1.2" fill="none"/>
+      <!-- Portcullis bars (vertical iron grates) -->
+      <line x1="60" y1="91" x2="60" y2="99" stroke="#302820" stroke-width="0.5"/>
+      <line x1="62" y1="91" x2="62" y2="99" stroke="#302820" stroke-width="0.5"/>
+      <line x1="64" y1="89.5" x2="64" y2="99" stroke="#302820" stroke-width="0.5"/>
+      <line x1="66" y1="91" x2="66" y2="99" stroke="#302820" stroke-width="0.5"/>
+      <line x1="68" y1="91" x2="68" y2="99" stroke="#302820" stroke-width="0.5"/>
+      <!-- Portcullis horizontal bars -->
+      <line x1="60" y1="93" x2="68" y2="93" stroke="#302820" stroke-width="0.5"/>
+      <line x1="60" y1="96" x2="68" y2="96" stroke="#302820" stroke-width="0.5"/>
+      <!-- Keystone -->
+      <rect x="63" y="85" width="2" height="3" fill="#a89c88"/>
+      <rect x="63.2" y="85" width="1.6" height="0.4" fill="rgba(255,240,200,0.6)"/>
+    </g>
+  </g>
+
+  <!-- ─── CENTRAL PYRAMIDAL ROOF ────────────────────────────────── -->
+  <g>
+    <path d="M 48 42 L 64 24 L 80 42 Z" fill="url(#redRoof)"/>
+    <!-- Shadow side -->
+    <path d="M 64 24 L 80 42 L 69 36 Z" fill="rgba(60,8,8,0.55)"/>
+    <!-- Roof tile lines -->
+    <line x1="50" y1="40" x2="78" y2="40" stroke="rgba(0,0,0,0.18)" stroke-width="0.4"/>
+    <line x1="53" y1="36" x2="75" y2="36" stroke="rgba(0,0,0,0.18)" stroke-width="0.4"/>
+    <line x1="56" y1="32" x2="72" y2="32" stroke="rgba(0,0,0,0.18)" stroke-width="0.4"/>
+    <line x1="59" y1="28" x2="69" y2="28" stroke="rgba(0,0,0,0.18)" stroke-width="0.4"/>
+    <!-- Highlight crease (sunlit ridge) -->
+    <line x1="48" y1="42" x2="64" y2="24" stroke="rgba(255,200,180,0.28)" stroke-width="0.6"/>
+  </g>
+
+  <!-- ─── GOLD SPIRE FINIAL + FLAG ──────────────────────────────── -->
+  <g>
+    <!-- Spire base bulb -->
+    <ellipse cx="64" cy="22" rx="1.6" ry="0.9" fill="#8a6014"/>
+    <!-- Spire shaft -->
+    <rect x="63.4" y="16" width="1.2" height="6" fill="url(#goldShine)"/>
+    <!-- Spire top tip -->
+    <polygon points="63.4,16 64.6,16 64,14" fill="#fce080"/>
+
+    <!-- Flag pole at very top -->
+    <line x1="64" y1="14" x2="64" y2="11" stroke="#3a2a08" stroke-width="0.5"/>
+    <!-- GOLD flag with cross emblem -->
+    <path d="M 64 11 L 75 13 L 74 18 L 64 16 Z" fill="url(#goldShine)"/>
+    <!-- Cross emblem -->
+    <rect x="68" y="12.5" width="0.6" height="4" fill="#8a6014"/>
+    <rect x="66.7" y="14" width="2.5" height="0.6" fill="#8a6014"/>
+    <!-- Flag highlight -->
+    <line x1="64" y1="11.5" x2="74" y2="13.5" stroke="rgba(255,240,180,0.55)" stroke-width="0.4"/>
+  </g>
+
+  <!-- ─── Subtle dust flecks around the towers ──────────────────── -->
+  <g fill="rgba(255,240,200,0.35)">
+    <circle cx="38" cy="55" r="0.5"/>
+    <circle cx="92" cy="58" r="0.5"/>
+    <circle cx="44" cy="34" r="0.4"/>
+    <circle cx="84" cy="36" r="0.4"/>
+  </g>
+</svg>

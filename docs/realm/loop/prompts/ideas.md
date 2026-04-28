@@ -28,7 +28,11 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 161 [code] **AXIS** — convert remaining buildings to SVG sprites. Suggested order (visual complexity descending): castle → church → tower → tavern → blacksmith → market → windmill → bakery → barracks → house → farm. ~1 building per tick = 10 ticks span. [assets/sprites/]
+- 161 [code] **AXIS** — convert remaining buildings to SVG sprites. Suggested order (visual complexity descending): ~~castle~~ (162) → church → tower → tavern → blacksmith → market → windmill → bakery → barracks → house → farm. **2 of 11 shipped (granary 161, castle 162)**. [assets/sprites/]
+- 162 [code] — animated pennants + flag sway via `<animate>` or CSS keyframes on castle.svg. Optional polish; only if integration picks SVG. [castle.svg]
+- 162 [code] — 3rd SVG sprite: church (spire/steeple language pairs with castle, smaller proportion). Establishes 3-sprite arc as real. [assets/sprites/church.svg]
+- 162 [review] — direct comparison: canvas drawCastle vs castle.svg side-by-side at matching scales in Chrome. Decide perceptual winner per detail. [play]
+- 162 [doc] — once 3 sprites exist, open `loop/docs/render-layers.md` with concrete SVG-vs-canvas tradeoffs. [loop/docs/]
 - 161 [code] **AXIS** — render-pipeline integration: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with SVG image draw. Must compose with hover halo, day-night tint, winter cap (158), fog modulation, photo-mode zoom. ~1 deliberate tick after 3+ sprites exist. [render.js]
 - 161 [review] — performance audit: SVG sprite cost per building at 60fps with 100+ buildings on screen. Compare to canvas baseline. Decides whether SVG ships in live game or stays as sprite reference. [play]
 - 161 [code] **AXIS** — open the 3D engine axis: ship a small improvement to `docs/realm/3d/3d.js` (add a building, fix a control, polish a shader). Forces familiarity. [3d/3d.js]

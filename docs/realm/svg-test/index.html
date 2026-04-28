@@ -47,16 +47,16 @@
 <body>
   <h1>Realm SVG Sprite Sandbox</h1>
   <p class="lede">
-    Loop 161 experiment. Sibling to <code>render.js drawGranary</code>
-    (canvas implementation). The same building rendered as inline SVG with
-    richer detail than the canvas primitives can produce, viewed at four
-    sizes representing zoom levels in-game (48px ≈ default zoom; 384px ≈
-    photo-mode zoom).
+    Loops 161-162 experiment. Sibling to the canvas <code>drawGranary</code>
+    / <code>drawCastle</code> implementations. The same buildings rendered
+    as inline SVG with richer detail than canvas primitives can produce,
+    viewed at four sizes representing zoom levels in-game (48px ≈ default
+    zoom; 384px ≈ photo-mode zoom).
   </p>
 
   <div class="row">
     <div class="card">
-      <h2>Stage</h2>
+      <h2>Granary (loop 161)</h2>
       <div class="stage">
         <div class="scales">
           <div>
@@ -73,6 +73,29 @@
           </div>
           <div>
             <img class="px384" src="../assets/sprites/granary.svg" alt="granary 384px"/>
+            <label>384px</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Castle (loop 162)</h2>
+      <div class="stage">
+        <div class="scales">
+          <div>
+            <img class="px48"  src="../assets/sprites/castle.svg" alt="castle 48px"/>
+            <label>48px</label>
+          </div>
+          <div>
+            <img class="px96"  src="../assets/sprites/castle.svg" alt="castle 96px"/>
+            <label>96px</label>
+          </div>
+          <div>
+            <img class="px192" src="../assets/sprites/castle.svg" alt="castle 192px"/>
+            <label>192px</label>
+          </div>
+          <div>
+            <img class="px384" src="../assets/sprites/castle.svg" alt="castle 384px"/>
             <label>384px</label>
           </div>
         </div>
@@ -106,7 +129,7 @@
   </div>
 
   <div class="footer">
-    Loop 161 · 2026-04-28 · realm/svg-test/
+    Loops 161-162 · 2026-04-28 · realm/svg-test/
   </div>
 </body>
 </html>
