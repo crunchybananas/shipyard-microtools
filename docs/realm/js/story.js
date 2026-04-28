@@ -618,6 +618,24 @@ const NARRATIVE_BEATS = [
         ? `The first autumn stars stand clear above the eastern ridge. ${f}, looking up, names them ${shape}. The realm takes the name.`
         : `The first autumn stars stand clear above the eastern ridge. The elders name the pattern ${shape}. The realm takes the name.`;
     } },
+  // Loop 190 (surprise, post-moratorium): the constellation is
+  // forgotten. SECOND use of the object-arc closure template (188
+  // invariant): 116 constellation_named → 190 constellation_forgotten.
+  // Constellation has narrative anchor (116) + visual support (151
+  // SVG-rendered asterism + 159 shooting-star-once) — the closure
+  // beat acknowledges that named patterns fade across generations.
+  // Different cycle shape from stone (4 beats) — constellation has
+  // 1 narrative anchor, so this is a 2-beat closure (named + un-
+  // named). Template doesn't require all 4 beats; only that the
+  // object has earned its closure.
+  // Gate: year3 (day ≥ 57) + day ≥ 85 (deep year 3 / year 4) +
+  // constellation_named (the realm must have NAMED it before it can
+  // forget) + citizensBorn ≥ 10 (intergenerational turnover, matches
+  // 184 stone). Tag: milestone (matches 116 constellation_named's
+  // anchor). Static prose (forgetting is universal).
+  { flag: 'constellation_forgotten', tag: 'milestone',
+    trigger: G => G.storyFlags.year3 && G.day >= 85 && G.storyFlags.constellation_named && G.stats && G.stats.citizensBorn >= 10,
+    text: 'Years pass, and the constellation the realm named goes back to being just stars. No one corrects the youngest when they call them by other names, or by no name at all.' },
   { flag: 'realm_fell', tag: 'requiem', onFire: 'requiem',
     trigger: G => G.day > 1 && G.population === 0,
     text: G => {
