@@ -214,7 +214,10 @@ and note the promotion here.
 - 194 [code] — refactor `_ECHO_FRAMES` to `_ECHO_SPECIAL_FRAMES` (Map<predicate, frame-fn>) when 3+ source-specific echoes exist. Right now 1; not worth abstraction yet. [story.js]
 - 194 [doc] — narrative-surfaces.md mention source-specific echo pattern in invariants when 3+ instances accrete. [loop/docs/]
 - 195 [review] **PRIORITY** — chrome-required playtime audit when chrome reconnects: fresh realm, track in-game-days per real-time-minute at 5/10/15/30 min marks. Calibrates gate-window choices. [play]
-- 195 [code] — early-game narrative beat to counterbalance forgetting cluster. Year 1 day 5-15 zone is THIN. Candidates: "first cold morning" / "first frost-on-fields" (different from 174 year-2-frame) / citizen "first sigh." [story.js]
+- 195 [code] — early-game narrative beat to counterbalance forgetting cluster. Year 1 day 5-15 zone is THIN. Candidates: "first cold morning" / "first frost-on-fields" (different from 174 year-2-frame) / citizen "first sigh." [story.js] **DONE → 196** (first-long-evening; year-1 summer day ≤ 14; anti-anxious "things are okay" mood; static prose; misc tag)
+- 196 [code] — second early-game beat: "first cold morning" (year-1 autumn day 15+, before constellation_named fires). Sibling to 196 but different mood. ~12 LoC. [story.js]
+- 196 [code] — third early-game beat: "the fields know the realm" — year-1 spring or summer about land becoming familiar. ~12 LoC. [story.js]
+- 196 [process] — alternation tracker in suggestion-for-next: count recent surprises by gate-window (year1/year2/year3+) and recommend the underrepresented bucket. [process]
 - 195 [code] — gate-down candidate: 184 stone-forgotten from year3 to year2 + 5 births. Trade arc-feels-too-fast vs visible-to-more-players. [story.js]
 - 195 [doc] — narrative-surfaces.md "playtime visibility" section documenting gate-window tradeoffs. Or `loop/docs/playtime-visibility.md`. Ship when chrome data exists. [loop/docs/]
 - 195 [meta] — discipline: alternate early-game (year1-2) and late-game (year3+) surprises. Currently late-biased; needs rebalance. Track in suggestion-for-next sections. [process]

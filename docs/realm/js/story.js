@@ -413,6 +413,17 @@ const NARRATIVE_BEATS = [
   { flag: 'frog_voices_heard', tag: 'misc',
     trigger: G => G.day >= 35 && (G.season === 'spring' || G.season === 'summer'),
     text: 'There are evenings after rain when the water-edges speak in two voices. The realm does not name the things speaking.' },
+  // Loop 196 (surprise, un-filed, post-195 skeptic-flag): EARLY-GAME
+  // beat to counterbalance the late-arc bias 195 flagged. Fires only
+  // in year-1 summer (days 8-14) — fills the THIN zone between founders
+  // (days 3-6) and autumn beats (constellation day ≥ 15). Anti-anxious
+  // tone: most early-realm prose has a settling/striving register; this
+  // beat gives the realm one moment of "things are okay." Non-founder
+  // (per 157 soft-cap), non-forgetting (per 195 saturation flag),
+  // observational-elder register (sibling to 148/152/166).
+  { flag: 'first_long_evening', tag: 'misc',
+    trigger: G => G.season === 'summer' && G.day <= 14,
+    text: 'There is a summer evening early in the realm when nothing is asked of anyone. The work is done. The fields hold heat into the dusk, and the fire is allowed to burn low.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder
   // reference. Fires autumn of year 2+ (realm has lived long enough
