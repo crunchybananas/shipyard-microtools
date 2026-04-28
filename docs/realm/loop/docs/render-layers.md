@@ -66,7 +66,7 @@ Keep it accurate or retire it.
   un-shipped
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
   LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
-  (170, 188 LoC) — 5 of 11
+  (170, 188 LoC), house (173, 194 LoC) — 6 of 11 (Phase A: 1/5)
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -149,7 +149,7 @@ tick 172:
 | castle       |   ✓    |    ✓ (162) |    ✓      |
 | church       |   ✓    |    ✓ (164) |    ✓      |
 | granary      |   ✓    |    ✓ (161) |    ✓ (163)|
-| house        |   ✓    |     —      |    ✓      |
+| house        |   ✓    |    ✓ (173) |    ✓      |
 | tower        |   ✓    |    ✓ (170) |    ✓      |
 | barn         |   —    |     —      |    ✓      |
 | windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
@@ -375,13 +375,23 @@ pipeline, these will need solving:
   Phase C (animation polish ~2-3 ticks). 3D engine declared
   standalone (canvas-replacement architectural cost exceeds
   gain). .glb meshes declared "loop does not touch."
-- **172 (this update)** — captures 171's strategic plan as a
-  durable doc artifact (new "strategic plan (post-171)"
-  section). Status line + coverage map header dated through
-  172. .glb-meshes section gains explicit BOUNDARY language
-  (loop does not modify, regenerate, load, or reconcile).
-  Future fresh-context ticks now inherit the integration plan
-  by reading this doc.
+- **172** — captures 171's strategic plan as a durable doc
+  artifact (new "strategic plan (post-171)" section). Status
+  line + coverage map header dated through 172. .glb-meshes
+  section gains explicit BOUNDARY language (loop does not
+  modify, regenerate, load, or reconcile). Future fresh-
+  context ticks now inherit the integration plan by reading
+  this doc.
+- **173** — Phase A start. SVG house sprite ships (194 lines:
+  half-timber wall accents + red-tile pitched roof with ridge
+  highlight + brick chimney with smoke wisps + glowing window
+  with 4-pane mullions + flowerbox with red/yellow/white
+  flowers + plank wooden door with iron studs and ring handle).
+  Canvas drawHouse picks 1 of 4 roof variants × 2 chimney
+  positions × extra-window via per-house hash; SVG ships the
+  CANONICAL variant (red tile + right chimney + single window).
+  Per-instance variation deferred to Phase B integration step
+  5. SVG layer coverage 5 → 6 of 11 (Phase A: 1 of 5).
 
 ## how to update this doc
 

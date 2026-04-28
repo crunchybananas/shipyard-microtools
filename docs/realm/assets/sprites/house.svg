@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  House sprite — Loop 173 (SVG axis, 6th sprite).
+  Phase A start (per 171 strategic plan / 172 doc anchor).
+  Sibling to render.js drawHouse canvas + 3D house mesh.
+
+  ViewBox 0 0 128 128. House centered at x=64; ground at y=104.
+  Light: upper-left.
+
+  CANONICAL VARIANT: red-tile roof + right-side chimney + single
+  window. Canvas drawHouse picks 1 of 4 roof variants (red/slate/
+  thatch/moss) × 2 chimney positions × extra-window chance via
+  per-house hash. SVG ships the most-common configuration; per-
+  instance variation deferred to Phase B integration step 5
+  (CSS custom properties or variant files).
+
+  Form: stone-tan walls + side-wall depth + red-tile pitched roof
+  + ridge tiles + brick chimney with smoke wisp + wooden plank
+  door + glowing window with mullions + small flowerbox + warm
+  interior glow on lower wall + doorstep.
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Wall plaster: warm tan gradient -->
+    <linearGradient id="houseWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dca878"/>
+      <stop offset="0.5" stop-color="#c08a52"/>
+      <stop offset="1" stop-color="#a07038"/>
+    </linearGradient>
+
+    <!-- Side wall (depth shadow) -->
+    <linearGradient id="houseWallSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8784a"/>
+      <stop offset="1" stop-color="#704a20"/>
+    </linearGradient>
+
+    <!-- Red-tile roof -->
+    <linearGradient id="roofTile" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#e44838"/>
+      <stop offset="0.6" stop-color="#b02820"/>
+      <stop offset="1" stop-color="#7a1812"/>
+    </linearGradient>
+
+    <!-- Roof shadow side -->
+    <linearGradient id="roofTileSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a02820"/>
+      <stop offset="1" stop-color="#601410"/>
+    </linearGradient>
+
+    <!-- Brick chimney -->
+    <linearGradient id="chimney" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9a8474"/>
+      <stop offset="1" stop-color="#5a4838"/>
+    </linearGradient>
+
+    <!-- Window glow -->
+    <radialGradient id="windowGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,228,160,0.65)"/>
+      <stop offset="1" stop-color="rgba(255,228,160,0)"/>
+    </radialGradient>
+
+    <!-- Warm wall spill (interior light leaking out lower wall) -->
+    <linearGradient id="warmSpill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,210,130,0)"/>
+      <stop offset="1" stop-color="rgba(255,200,120,0.18)"/>
+    </linearGradient>
+
+    <!-- Wall plaster texture (subtle horizontal weather lines) -->
+    <pattern id="plasterTex" width="6" height="3" patternUnits="userSpaceOnUse">
+      <rect width="6" height="3" fill="transparent"/>
+      <line x1="0" y1="2" x2="6" y2="2" stroke="rgba(60,40,20,0.1)" stroke-width="0.3"/>
+    </pattern>
+
+    <!-- Smoke wisp (subtle, from chimney) -->
+    <radialGradient id="smokeWisp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(180,180,180,0.4)"/>
+      <stop offset="1" stop-color="rgba(180,180,180,0)"/>
+    </radialGradient>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="houseShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.4)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="68" cy="106" rx="22" ry="4" fill="url(#houseShadow)"/>
+
+  <!-- ─── Side wall (right depth strip) ─────────────────────────── -->
+  <path d="M 73 84 L 78 87 L 78 100 L 73 100 Z" fill="url(#houseWallSide)"/>
+
+  <!-- ─── Main walls ────────────────────────────────────────────── -->
+  <rect x="55" y="84" width="18" height="16" fill="url(#houseWall)"/>
+  <rect x="55" y="84" width="18" height="16" fill="url(#plasterTex)" opacity="0.85"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="55" y1="84" x2="73" y2="84" stroke="rgba(255,255,255,0.35)" stroke-width="0.5"/>
+
+  <!-- Lower-wall warm spill -->
+  <rect x="55" y="93" width="18" height="7" fill="url(#warmSpill)"/>
+
+  <!-- ─── Half-timber accents (vertical timber posts) ───────────── -->
+  <g fill="rgba(80,50,20,0.38)">
+    <rect x="55.5" y="84" width="0.7" height="16"/>
+    <rect x="64.65" y="84" width="0.7" height="16"/>
+    <rect x="72.3" y="84" width="0.7" height="16"/>
+  </g>
+  <!-- Diagonal cross-brace on left wall section -->
+  <line x1="56" y1="100" x2="64" y2="84" stroke="rgba(80,50,20,0.32)" stroke-width="0.5"/>
+
+  <!-- ─── Pitched red-tile roof ─────────────────────────────────── -->
+  <path d="M 52 84 L 64 72 L 76 84 Z" fill="url(#roofTile)"/>
+  <!-- Shadow side (right slope visible at iso angle) -->
+  <path d="M 64 72 L 76 84 L 81 81 L 69 69 Z" fill="url(#roofTileSide)"/>
+  <!-- Roof tile rows (horizontal lines suggesting overlap of clay tiles) -->
+  <line x1="54" y1="82" x2="74" y2="82" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="56" y1="80" x2="72" y2="80" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="58" y1="78" x2="70" y2="78" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="60" y1="76" x2="68" y2="76" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <line x1="62" y1="74" x2="66" y2="74" stroke="rgba(60,8,8,0.35)" stroke-width="0.3"/>
+  <!-- Roof ridge sunlit highlight -->
+  <line x1="52" y1="84" x2="64" y2="72" stroke="rgba(255,200,180,0.4)" stroke-width="0.6"/>
+  <!-- Ridge tile (small bump along apex) -->
+  <line x1="52" y1="84" x2="64" y2="72" stroke="#5a1010" stroke-width="0.6"/>
+
+  <!-- ─── Chimney (right side of house) ─────────────────────────── -->
+  <g>
+    <rect x="69" y="65" width="4" height="8" fill="url(#chimney)"/>
+    <!-- Chimney cap (slightly wider) -->
+    <rect x="68" y="64" width="6" height="2" fill="#3a2c20"/>
+    <!-- Brick courses -->
+    <line x1="69" y1="68" x2="73" y2="68" stroke="rgba(0,0,0,0.3)" stroke-width="0.3"/>
+    <line x1="69" y1="71" x2="73" y2="71" stroke="rgba(0,0,0,0.3)" stroke-width="0.3"/>
+    <!-- Chimney sunlit edge -->
+    <line x1="69" y1="65" x2="69" y2="73" stroke="rgba(255,210,150,0.3)" stroke-width="0.3"/>
+    <!-- Smoke wisps (subtle, drift up-and-left toward sun) -->
+    <ellipse cx="70" cy="60" rx="2.2" ry="1.5" fill="url(#smokeWisp)"/>
+    <ellipse cx="68" cy="56" rx="1.8" ry="1.2" fill="url(#smokeWisp)"/>
+    <ellipse cx="66" cy="53" rx="1.4" ry="1" fill="url(#smokeWisp)"/>
+  </g>
+
+  <!-- ─── Glowing window with mullions ──────────────────────────── -->
+  <g>
+    <!-- Halo glow behind window -->
+    <ellipse cx="61.5" cy="89.5" rx="3.5" ry="3" fill="url(#windowGlow)"/>
+    <!-- Window frame -->
+    <rect x="59" y="87.5" width="5" height="4" fill="#3a2810"/>
+    <!-- Window light pane -->
+    <rect x="59.4" y="87.9" width="4.2" height="3.2" fill="#ffe4a0"/>
+    <!-- Mullions (cross dividing into 4 panes) -->
+    <line x1="61.5" y1="87.5" x2="61.5" y2="91.5" stroke="rgba(60,40,20,0.7)" stroke-width="0.4"/>
+    <line x1="59" y1="89.5" x2="64" y2="89.5" stroke="rgba(60,40,20,0.7)" stroke-width="0.4"/>
+    <!-- Highlight reflection on glass -->
+    <line x1="59.7" y1="88.2" x2="60.5" y2="88.2" stroke="rgba(255,255,220,0.7)" stroke-width="0.3"/>
+
+    <!-- Small flowerbox under window -->
+    <rect x="58.5" y="91.5" width="6" height="1.4" fill="#5a3818"/>
+    <line x1="58.5" y1="92.0" x2="64.5" y2="92.0" stroke="rgba(0,0,0,0.4)" stroke-width="0.3"/>
+    <!-- Flowers (3 small dots — red, yellow, white) -->
+    <circle cx="59.7" cy="91.4" r="0.4" fill="#d44040"/>
+    <circle cx="61.5" cy="91.3" r="0.4" fill="#fce080"/>
+    <circle cx="63.2" cy="91.4" r="0.4" fill="#f0e8d8"/>
+  </g>
+
+  <!-- ─── Wooden plank door ─────────────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <rect x="65" y="94" width="6" height="6" fill="#1a1208"/>
+    <!-- Door planks (4 vertical) -->
+    <rect x="65.3" y="94.3" width="5.4" height="5.4" fill="#4a2a10"/>
+    <line x1="66.6" y1="94.3" x2="66.6" y2="99.7" stroke="rgba(0,0,0,0.45)" stroke-width="0.25"/>
+    <line x1="68" y1="94.3" x2="68" y2="99.7" stroke="rgba(0,0,0,0.45)" stroke-width="0.25"/>
+    <line x1="69.4" y1="94.3" x2="69.4" y2="99.7" stroke="rgba(0,0,0,0.45)" stroke-width="0.25"/>
+    <!-- Door frame -->
+    <rect x="65" y="94" width="6" height="6" stroke="#7a4a18" stroke-width="0.5" fill="none"/>
+    <!-- Iron handle -->
+    <circle cx="69.5" cy="97" r="0.5" fill="#7a6048"/>
+    <circle cx="69.5" cy="97" r="0.25" fill="#1a1208"/>
+    <!-- Iron studs -->
+    <circle cx="65.7" cy="95" r="0.3" fill="#3a2810"/>
+    <circle cx="65.7" cy="98.7" r="0.3" fill="#3a2810"/>
+  </g>
+
+  <!-- Doorstep -->
+  <rect x="63.5" y="100" width="9" height="1.5" fill="rgba(50,42,34,0.55)"/>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(255,240,200,0.3)">
+    <circle cx="50" cy="76" r="0.4"/>
+    <circle cx="86" cy="80" r="0.4"/>
+    <circle cx="56" cy="88" r="0.3"/>
+  </g>
+</svg>
