@@ -47,7 +47,10 @@ and note the promotion here.
 - 183 [code] — 3D tavern mesh: walls box + pitched roof pyramid + sign-board cube. ~25 LoC. [3d/3d.js] **DONE → 185** (25 LoC; warm-wood family palette; flag pole + bracket arm + door; tavern triangle complete; 3D layer 9/11)
 - 185 [code] — `pushFrustum(cx, cz, baseY, topY, baseHalfW, topHalfW, c)` Mesh primitive for tapered forms (windmill base taper, market awning trapezoid, etc). ~25 LoC. Silent-module work; chrome-independent. [3d/3d.js]
 - 183 [code] — 3D blacksmith mesh: dark walls + flat roof + chimney box + anvil. ~25 LoC. [3d/3d.js] **DONE → 186** (30 LoC; defensive-industrial family; bright forge-fire box reads as glowing window without emissive shading; cross-axis triangle complete; 3D layer 10/11)
-- 186 [code] — 3D market mesh (final unmeshed building): counter box + 2 post boxes + awning (could ship with 4-quad trapezoid composition OR via `pushFrustum`). ~30 LoC. Closes 3D roster at 11/11. [3d/3d.js]
+- 186 [code] — 3D market mesh (final unmeshed building): counter box + 2 post boxes + awning (could ship with 4-quad trapezoid composition OR via `pushFrustum`). ~30 LoC. Closes 3D roster at 11/11. [3d/3d.js] **DONE → 187** (23 LoC; counter + 2 posts + awning box + ridge highlight + barrel; pushFrustum deferred; **3D LAYER ROSTER COMPLETE 11/11**)
+- 187 [process] — chrome-offline SVG/3D queue EXHAUSTED. Next chrome-offline ticks (188+) MUST be non-graphics. Rotation: archivist (177 last + 10) / surprise / refactor / fixer. [process]
+- 187 [code] — 3D scene all-buildings walkthrough screenshot when chrome returns. 12 unique meshes (11 buildings + barn). [play]
+- 187 [review] — 3D scene wall-edge consistency audit: some buildings taller than others; iso-camera produces stair-stepped silhouette across cluster. [3d/3d.js]
 - 183 [code] — 3D market mesh: counter + 2 posts + awning prism + barrel/crate cubes. ~30 LoC. [3d/3d.js]
 - 183 [process] — chrome-offline fallback queue: 3D meshes drain over 3 ticks (tavern/blacksmith/market). Then non-graphics interleaves. Phase B unblocks when chrome returns. [process]
 - 184 [code] — sibling forgetting beats for other long-lived objects: 116 constellation ("the realm stops naming the stars" at year 4+); 048/148 wanderer ("the wanderer is no longer remarked upon" at year 5+). Each ~15 LoC; pattern from stone arc closure. [story.js]

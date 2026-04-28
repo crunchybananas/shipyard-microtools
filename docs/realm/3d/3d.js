@@ -95,6 +95,7 @@ function placeSampleBuildings(map) {
     ['barracks', 2, 3],   // Loop 183 — pairs with 182 SVG; 6/11 cross-axis triangles
     ['tavern', -3, 2],    // Loop 185 — pairs with 175 SVG; cross-axis triangle complete
     ['blacksmith', 3, -2],// Loop 186 — pairs with 176 SVG; defensive-industrial family
+    ['market', 0, -3],    // Loop 187 — pairs with 179 SVG; CLOSES 3D ROSTER 11/11
   ];
   for (const [type, dx, dy] of positions) {
     const x = cx + dx, y = cy + dy;
@@ -378,6 +379,28 @@ function buildBuildingsMesh(buildings, map) {
         [cx + 0.5, gy + 0.55, cz - 0.35],
         [cx + 0.5, roofTopY, cz],
         [1, 0, 0], [0.55, 0.25, 0.18]);
+    }
+    else if (b.type === 'market') {
+      // Loop 187 — market 3D mesh. Sibling to 179 SVG sprite + canvas
+      // drawMarket. Open-air stall — most distinct silhouette in
+      // the roster (no walls, no roof above counter; just an
+      // awning supported by posts). Reused all-pushBox primitives;
+      // pushFrustum filed for future tapered-form refinement.
+      // Closes the 3D roster at 11/11.
+      const counter = [0.78, 0.58, 0.30];
+      const post = [0.42, 0.28, 0.14];
+      const awning = [0.84, 0.30, 0.22];
+      // Counter (wide low box)
+      mesh.pushBox(cx - 0.5, gy, cz - 0.25, cx + 0.5, gy + 0.25, cz + 0.25, counter);
+      // 2 support posts (left + right)
+      mesh.pushBox(cx - 0.55, gy + 0.25, cz - 0.20, cx - 0.50, gy + 0.65, cz - 0.15, post);
+      mesh.pushBox(cx + 0.50, gy + 0.25, cz - 0.20, cx + 0.55, gy + 0.65, cz - 0.15, post);
+      // Awning (slightly wider than counter, sits atop posts)
+      mesh.pushBox(cx - 0.60, gy + 0.65, cz - 0.30, cx + 0.60, gy + 0.85, cz + 0.05, awning);
+      // Awning ridge highlight (small thin top strip)
+      mesh.pushBox(cx - 0.45, gy + 0.85, cz - 0.20, cx + 0.45, gy + 0.88, cz - 0.05, [0.95, 0.45, 0.30]);
+      // Barrel prop (left of stall — small box)
+      mesh.pushBox(cx - 0.65, gy, cz + 0.10, cx - 0.50, gy + 0.20, cz + 0.25, [0.55, 0.35, 0.18]);
     }
     else if (b.type === 'blacksmith') {
       // Loop 186 — blacksmith 3D mesh. Sibling to 176 SVG sprite +

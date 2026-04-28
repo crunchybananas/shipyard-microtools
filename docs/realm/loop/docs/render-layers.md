@@ -94,8 +94,10 @@ Keep it accurate or retire it.
   textures yet (per-vertex color only)
 - **Currently shipped:** castle, house, tower, church, barn,
   granary (post-163), windmill (post-167), barracks (post-183),
-  tavern (post-185), blacksmith (post-186) — 10 of 11+ types
-  (only market remains unmeshed of the user-buildable roster)
+  tavern (post-185), blacksmith (post-186), market (post-187)
+  — **11 of 11 user-buildable roster — 3D LAYER COMPLETE**.
+  (Plus barn from pre-loop has no canvas/SVG sibling — 3D-only;
+  farm has no SVG/3D — canvas-only.)
 
 ### asset/meshes/ — LOOP DOES NOT TOUCH
 
@@ -132,6 +134,7 @@ is treated as an external system.
 | barracks | pre-loop (~115 LoC) | 182 (242 LoC) | 183 (~25 LoC) | canvas pre-loop → SVG → 3D |
 | tavern   | pre-loop (~120 LoC) | 175 (239 LoC) | 185 (~25 LoC) | canvas pre-loop → SVG → 3D |
 | blacksmith | pre-loop (~140 LoC) | 176 (223 LoC) | 186 (~30 LoC) | canvas pre-loop → SVG → 3D |
+| market   | pre-loop (~90 LoC)  | 179 (234 LoC) | 187 (~23 LoC) | canvas pre-loop → SVG → 3D |
 
 158 (canvas) shipped a dome-conforming snow cap closing 095's
 filed idea. 161 (SVG) demonstrated the same building authored
@@ -165,7 +168,7 @@ tick 172:
 | farm         |   ✓    |     —      |     —     |
 | tavern       |   ✓    |    ✓ (175) |    ✓ (185)|
 | blacksmith   |   ✓    |    ✓ (176) |    ✓ (186)|
-| market       |   ✓    |    ✓ (179) |     —     |
+| market       |   ✓    |    ✓ (179) |    ✓ (187)|
 | bakery       |   ✓    |    ✓ (180) |     —     |
 | barracks     |   ✓    |    ✓ (182) |    ✓ (183)|
 | school       |   ✓    |     —      |     —     |
@@ -565,6 +568,23 @@ pipeline, these will need solving:
   11 cross-axis triangles complete**. **Only market
   remains unmeshed** — its trapezoidal awning would
   benefit from the filed `pushFrustum` primitive.
+- **187** — Phase B still blocked; **3D market mesh —
+  CLOSES 3D ROSTER 11/11**. Open-air stall: counter wide-
+  low-box + 2 wooden support posts + awning (slightly-
+  wider box; pushFrustum filed but not shipped — box
+  silhouette reads acceptably as trapezoid awning at iso
+  scale) + awning ridge highlight thin top strip + barrel
+  prop. Reused all-pushBox primitives. **Cross-axis
+  triangle for market complete** (canvas pre-loop / 179
+  SVG / 187 3D). **3D layer 11/11 ROSTER COMPLETE.**
+  **All 11 user-buildable buildings now have full cross-
+  axis triangles (canvas + SVG + 3D).** Only edge cases:
+  barn is 3D-only with no canvas/SVG sibling; farm is
+  canvas-only with no SVG/3D sibling. Visual-debt batch
+  grows to 21 items (11 SVG sprites + 10 3D meshes).
+  After 187, the loop has no chrome-independent SVG/3D
+  ship work remaining — must pivot to non-graphics
+  ticks until chrome returns.
 
 ## how to update this doc
 
