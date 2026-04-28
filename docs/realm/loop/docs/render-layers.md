@@ -1,7 +1,8 @@
 # render-layers.md
 
-**Status:** Written in tick 165. Maintained by subsequent loops as
-new sprites/meshes land or the integration story changes.
+**Status:** Written in tick 165. Updated 167, 168, 170, 172.
+Maintained by subsequent loops as new sprites/meshes land or the
+integration story changes.
 **Sources:** 161 opened the SVG axis (granary.svg + sandbox); 162
 shipped castle.svg; 163 opened the 3D engine axis with granary mesh
 + pushCylinder + debug-pillar cleanup; 164 shipped church.svg
@@ -90,14 +91,27 @@ Keep it accurate or retire it.
 - **Currently shipped:** castle, house, tower, church, barn,
   granary (post-163), windmill (post-167) — 7 of 11+ types
 
-### asset/meshes/
+### asset/meshes/ — LOOP DOES NOT TOUCH
 
-`docs/realm/assets/meshes/buildings/*.glb` exists but is **NOT
-loaded** by the 3D prototype. The .glb meshes change outside the
-loop's awareness (e.g., from a separate Blender pipeline). The 3D
-prototype generates its own procedural meshes in JS. Reconciling
-the two is a **future tick** — could be: a glb-loader pass that
-swaps procedural meshes for higher-fidelity .glb when available.
+`docs/realm/assets/meshes/buildings/*.glb` (10 buildings) +
+`assets/meshes/tree_*.glb` (3 trees) exist but are **NOT loaded**
+by the 3D prototype. The .glb files change outside the loop's
+awareness (showed up in `git status` repeatedly across many
+ticks; presumably from a separate Blender / asset pipeline). The
+3D prototype generates its own procedural meshes in JS via the
+`Mesh` class.
+
+**Boundary (set 172, post-171 strategic decision):**
+- Loop ticks DO NOT modify, regenerate, or load the .glb files.
+- Loop ticks DO NOT attempt to reconcile procedural 3D meshes
+  with .glb files.
+- If a future tick wants to bridge them, that's a deliberate
+  scope expansion requiring user steering — not an emergent
+  loop decision.
+
+This boundary prevents future ticks from spending effort on
+reconciliation that the user hasn't requested. The .glb pipeline
+is treated as an external system.
 
 ## the cross-axis triangle
 
@@ -128,7 +142,7 @@ fixed (granary went canvas → SVG → 3D; windmill went canvas → 3D
 ## coverage map
 
 11 building types in the live game. Coverage across layers as of
-tick 165:
+tick 172:
 
 | Building     | Canvas | SVG (161+) | 3D (163+) |
 | ------------ | :----: | :--------: | :-------: |
@@ -195,6 +209,79 @@ camera-control experiments. The prototype is genuinely separate
 from the live game — what ships there doesn't affect players.
 Useful for atmospheric exploration that the canvas can't easily
 express.
+
+## strategic plan (post-171)
+
+171 (meta) made the strategic call after 5 SVG sprites + 3 cross-
+axis triangles. The decision: **target live integration**, not
+sandbox-only — but staged in three phases so neither risk nor
+investment outpaces evidence.
+
+### Phase A — complete the sprite roster (~5 ticks)
+
+Continue current cadence to ship sprites for the remaining 6
+buildings: house, tavern, blacksmith, market, bakery, barracks
+(possibly farm). House first (simplest); tavern has most
+narrative weight; the rest in roughly visual-complexity order.
+
+Variety ticks (surprise / refactor / fixer) interleave at
+~30-40% rate. At one sprite per ~2-3 ticks, Phase A ends near
+tick ~180-185.
+
+**Don't integrate at 5/11** — half-roster integration creates
+two visual styles in the live game (some SVG, some canvas)
+which is worse than either end-state. 9-11/11 is the critical-
+mass threshold.
+
+### Phase B — integration sprint (~3-5 ticks)
+
+Once 9-11 sprites exist, ship integration in this order, each
+step rollback-able by toggling a single feature flag:
+
+1. **Scaffolding tick.** `_USE_SVG_SPRITES` boolean flag
+   (default off) + sprite-loader path in render.js. ~30 LoC.
+   No visible change; just the rails.
+2. **Day/night tint composition.** SVG sprites composite under
+   the existing canvas multiply-blend. Test on granary alone.
+3. **Winter cap composition.** 158's dome arc applies on top
+   of SVG granary in winter. Tests the layer-composition
+   approach for all "after-sprite" canvas overlays.
+4. **Hover halo + fog.** Final composition concerns.
+5. **Per-instance variation.** Church glass palette as CSS
+   custom property; kingdom hash sets the property at building
+   instantiation. Or per-variant SVG files.
+6. **Live-game enable.** Flip `_USE_SVG_SPRITES` to true; all
+   buildings ship as SVG.
+
+Each step has a rollback (set flag back to false). Risk-bounded.
+
+### Phase C — animation polish (~2-3 ticks)
+
+After integration, ship animation:
+- Animated windmill sails (rotation around hub axis)
+- Castle pennants + flag sway
+- Tower lantern flicker + banner sway
+
+Use `<animate>` or CSS keyframes for SVG-internal animation;
+fall back to canvas-pipeline timer-driven re-render if the SVG
+animation path doesn't compose with the integration approach.
+
+### What's deferred
+
+- **3D engine canvas-replacement.** Architectural cost of
+  switching the live game to WebGL2 exceeds the visual gain.
+  3D stays standalone exploration.
+- **.glb mesh reconciliation.** External pipeline; loop boundary
+  set above.
+- **Tower / market / specialized building canvas redraws.** The
+  canvas drawX functions can be improved INDEPENDENTLY of SVG
+  integration. Both axes survive.
+
+### Dates are estimates
+
+The phase-tick numbers are pace estimates, not commitments.
+User steering can accelerate or decelerate. The PHASE STRUCTURE
+is the durable artifact, not the tick numbers.
 
 ## integration concerns (NOT yet solved)
 
@@ -281,6 +368,20 @@ pipeline, these will need solving:
   + 3D (pre-loop) + 170 SVG. Tower's triangle closed via SVG
   shipping last (different order than granary or windmill). SVG
   layer coverage now 5 of 11; ~half the building roster has SVG.
+- **171** — strategic-decision check-in (meta, 165-filed).
+  Adopted **3-phase plan toward live integration**: Phase A
+  (complete sprite roster ~5 ticks) → Phase B (integration
+  sprint ~3-5 ticks via `_USE_SVG_SPRITES` feature flag) →
+  Phase C (animation polish ~2-3 ticks). 3D engine declared
+  standalone (canvas-replacement architectural cost exceeds
+  gain). .glb meshes declared "loop does not touch."
+- **172 (this update)** — captures 171's strategic plan as a
+  durable doc artifact (new "strategic plan (post-171)"
+  section). Status line + coverage map header dated through
+  172. .glb-meshes section gains explicit BOUNDARY language
+  (loop does not modify, regenerate, load, or reconcile).
+  Future fresh-context ticks now inherit the integration plan
+  by reading this doc.
 
 ## how to update this doc
 

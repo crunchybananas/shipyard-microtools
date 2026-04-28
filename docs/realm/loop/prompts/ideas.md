@@ -39,7 +39,9 @@ and note the promotion here.
 - 171 [code] **PHASE B** — integration scaffolding tick (only after sprite roster ~9/11). `_USE_SVG_SPRITES` feature flag + sprite-loader path in render.js. ~30 LoC. [render.js]
 - 171 [code] **PHASE B** — per-building integration ticks (after scaffolding): (1) day/night tint composition, (2) winter cap composition (158's dome arc), (3) hover halo + fog modulation, (4) per-instance variation (church glass palette as CSS custom property; kingdom-hash sets at building-level), (5) live-game enable (flip flag to true). 5 ticks; rollback per step. [render.js]
 - 171 [code] **PHASE C** — animation polish tick: windmill sails + castle pennants + flag + tower lantern flicker + banner sway. After integration ships. [SVG files +/- render.js]
-- 171 [doc] — update render-layers.md with the 3-phase plan + .glb-meshes "loop does not touch" boundary marker. [loop/docs/]
+- 171 [doc] — update render-layers.md with the 3-phase plan + .glb-meshes "loop does not touch" boundary marker. [loop/docs/] **DONE → 172** (new `## strategic plan (post-171)` section with Phase A/B/C details; .glb section heading "LOOP DOES NOT TOUCH" + explicit boundary list; status + coverage map dates updated; +101 LoC)
+- 172 [doc] — extend render-layers.md authoring-cost table to include windmill (168) + tower (170) rows when next integration-relevant tick lands. [loop/docs/]
+- 172 [doc] — when Phase B integration scaffolding ships, render-layers.md grows new `## integration` section documenting runtime layer-composition strategy. [loop/docs/]
 - 165 [code] — reconcile `assets/meshes/*.glb` with 3D prototype: glb-loader pass in 3d.js that swaps procedural meshes for authored .glb when file exists. [3d/3d.js]
 - 165 [doc] — when integration ships, grow render-layers.md with section on runtime layer-composition strategy (filter/buffer/canvas-pass). [loop/docs/]
 - 164 [code] — SVG variant-parameterization prototype: church.svg glass-palette via CSS custom properties (`--glass-base`, `--glass-left`, `--glass-right`). Future integration could swap per kingdom. [church.svg]
