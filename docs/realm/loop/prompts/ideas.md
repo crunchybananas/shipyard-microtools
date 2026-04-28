@@ -37,7 +37,12 @@ and note the promotion here.
 - 165 [meta] — strategic decision tick: SHOULD SVG sprites replace canvas drawX in live game, or coexist as fallback/photo-mode-only layer? Pair with 154-style skepticism + render-layers.md data. [journal] **DONE → 171** (3-phase plan: Phase A complete roster ~5 ticks → Phase B integration sprint ~3-5 ticks → Phase C animation polish ~2-3 ticks; 3D stays standalone)
 - 171 [code] **PHASE A** — 6th SVG sprite. Suggested order: house (simplest) / tavern / blacksmith / market / bakery / barracks. ~5 more ticks to reach 9-11/11 critical mass. [assets/sprites/] **PHASE A 1/5 → 173** (house, 194 lines, canonical red-tile/right-chimney/single-window variant; half-timber accents + smoke wisps + flowerbox + mullion window + iron studs)
 - 173 [code] **PHASE A 2/5** — 7th SVG sprite. Tavern next (most narrative weight, mayor character lives there). Or blacksmith / market / bakery / barracks. [assets/sprites/] **PHASE A 2/5 → 175** (tavern, 239 lines, canonical gold sign + mug emblem; chain-suspended swinging board + cobble path + harvest bundle + hearth glow + slightly-ajar warm door)
-- 175 [code] **PHASE A 3/5** — 8th SVG sprite. Blacksmith (industrial contrast vs tavern warmth) or market / bakery / barracks. [assets/sprites/]
+- 175 [code] **PHASE A 3/5** — 8th SVG sprite. Blacksmith (industrial contrast vs tavern warmth) or market / bakery / barracks. [assets/sprites/] **PHASE A 3/5 → 176** (blacksmith, 223 lines, canonical amber forge; ash pile + tongs + hammer-on-anvil + 3 sparks + 4 coal-smoke wisps; iron-banded door with 3 bands)
+- 176 [code] **PHASE A 4/5** — 9th SVG sprite. Market (most distinct covered-stalls silhouette) or bakery (oven-warmth sibling to forge) or barracks (military). [assets/sprites/]
+- 176 [code] — animate forge fire flicker + spark drift via `<animate>`. Phase C. [blacksmith.svg]
+- 176 [code] — variant fire-palette CSS custom properties (`--fire-core`, `--fire-mid`, `--fire-outer`). Phase B step 5. [blacksmith.svg]
+- 176 [code] — 3D blacksmith mesh: walls box + flat-roof box + chimney box + small anvil. ~25 LoC. [3d/3d.js]
+- 176 [doc] — narrative-surfaces.md archivist tick OVERDUE (155 last; +21 ticks). 174 frost undocumented. [loop/docs/]
 - 175 [code] — variant tavern (CSS custom properties for sign palette + emblem swap, OR separate variant SVG files). Phase B step 5. [tavern.svg]
 - 175 [code] — animate sign board swing via `<animate transform>` rotation around bracket attachment. Phase C. [tavern.svg]
 - 175 [code] — 3D tavern mesh: walls box + roof pyramid + small box for sign + flag. Pairs with 173 house in cross-axis triangle. [3d/3d.js]

@@ -66,8 +66,8 @@ Keep it accurate or retire it.
   un-shipped
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
   LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
-  (170, 188 LoC), house (173, 194 LoC), tavern (175, 239 LoC) —
-  7 of 11 (Phase A: 2/5)
+  (170, 188 LoC), house (173, 194 LoC), tavern (175, 239 LoC),
+  blacksmith (176, 223 LoC) — 8 of 11 (Phase A: 3/5)
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -156,7 +156,7 @@ tick 172:
 | windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
 | tavern       |   ✓    |    ✓ (175) |     —     |
-| blacksmith   |   ✓    |     —      |     —     |
+| blacksmith   |   ✓    |    ✓ (176) |     —     |
 | market       |   ✓    |     —      |     —     |
 | bakery       |   ✓    |     —      |     —     |
 | barracks     |   ✓    |     —      |     —     |
@@ -408,6 +408,19 @@ pipeline, these will need solving:
   Canvas drawTavern picks 1 of 4 sign-color palettes × 4
   emblems = 16 variants; SVG ships canonical gold + mug.
   SVG layer 6 → 7 of 11 (Phase A: 2 of 5).
+- **176** — Phase A 3/5. SVG blacksmith sprite ships (223
+  lines: dark stone walls (industrial contrast vs tavern) +
+  side-wall depth + flat parapet roof + arched forge window
+  with bright amber fire core + ash pile under window with
+  embers + 4 rising smoke wisps from chimney (industrial coal
+  smoke, darker than house's) + 3 spark dots above forge +
+  iron tongs hanging on wall + iron-banded wooden door (3
+  bands, iron studs, ring handle) + anvil prop with horn +
+  hammer mid-strike on anvil + propped hammer against wall +
+  ambient orange ground glow near forge). Canvas drawBlacksmith
+  picks 1 of 6 fire palettes (amber/purple/green/white/blue);
+  SVG ships canonical amber. SVG layer 7 → 8 of 11 (Phase A:
+  3 of 5).
 
 ## how to update this doc
 
