@@ -47,7 +47,11 @@ and note the promotion here.
 - 163 [code] — windmill 3D mesh: cylinder base + box wooden cap + 4 thin-prism rotating blades around hub axis. Pairs with 158 (canvas conforming-cap). [3d/3d.js] **DONE → 167** (octagonal cylinder base + cap box + cross-pattern static blades + dark hub cube; rotation deferred — filed; pushCylinder reused; +32 LoC)
 - 167 [code] — animate windmill blades via per-vertex blade-marker attribute + uniform `uWindmillAngle` driven by `uTime`. ~15-20 LoC in vertex shader + Mesh class. [3d/3d.js]
 - 167 [code] — `pushFrustum(cx, cz, baseY, topY, baseR, topR, sides, c)` Mesh primitive for tapered cylinders (windmill base, tower spire transition, etc). ~25 LoC. [3d/3d.js]
-- 167 [code] — windmill SVG sprite (4th SVG sprite) — completes windmill cross-axis triangle (canvas 158 + 3D 167 + SVG). [assets/sprites/]
+- 167 [code] — windmill SVG sprite (4th SVG sprite) — completes windmill cross-axis triangle (canvas 158 + 3D 167 + SVG). [assets/sprites/] **DONE → 168** (213 lines; cloth-paneled sails with wooden cross-frames; iron hub with bolts; second cross-axis triangle complete)
+- 168 [code] — 5th SVG sprite (tower or tavern). Tower: smaller cousin of castle's flanking towers. Tavern: residential hospitality, simpler form. [assets/sprites/]
+- 168 [code] — animation pass tick: `<animate>` for windmill sails + castle pennants + flag. Single tick covering SVG animation needs at once. ~30 LoC. Pre-condition: 165-filed strategic decision on live-game SVG integration. [SVG files]
+- 168 [code] — render-pipeline integration prototype: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with `<img>`. Address day/night tint, winter cap, hover halo composability. Filed at 161+162; unblocks live-game ship. [render.js]
+- 168 [review] — visual diff: canvas drawWindmill rotating blades vs static windmill.svg. Does static SVG read as windmill, or does lack of rotation feel broken? Pairs with 167 review. [play]
 - 167 [review] — visual diff: 3D windmill vs canvas drawWindmill at iso angle. Do static blades read as windmill, or does lack of rotation make it look broken? [play]
 - 163 [review] — live-verify granary appears correctly in 3D scene at offset (4, 2). Confirm cylinder + dome + finial + door render with proper lighting. [play]
 - 163 [code] — re-enable backface culling and audit winding-order. If holes appear, fix in `pushQuad`/`pushBox`/etc rather than leaving culling off. Performance + correctness. [3d/3d.js]

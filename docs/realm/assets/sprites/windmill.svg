@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Windmill sprite — Loop 168 (SVG axis, 4th sprite).
+  Sibling to render.js drawWindmill canvas + 167 3D mesh.
+  ViewBox 0 0 128 128. Windmill centered at x=64; ground at y=104.
+  Light: upper-left (matches granary/castle/church convention).
+
+  COMPLETES THE SECOND CROSS-AXIS TRIANGLE: 158 canvas (winter
+  conforming-cap thread) + 167 3D (octagonal base + cross-pattern
+  static blades) + 168 SVG (this file). Granary at 158/161/163 was
+  the first triangle; windmill at 158/167/168 is the second.
+
+  Form: tapered stone base (block-pattern overlay) + wooden cap
+  with planks + smaller cupola + 4 sails in canonical cross pose
+  with wooden frame + cloth panels + iron hub + arched door + dust.
+
+  Static blades match the 3D sibling (167 doesn't animate; this
+  doesn't either — animation deferred for a future <animate> tick).
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Tapered stone base — light upper, darker lower -->
+    <linearGradient id="windmillStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b0a89c"/>
+      <stop offset="0.5" stop-color="#8a8276"/>
+      <stop offset="1" stop-color="#5a5448"/>
+    </linearGradient>
+
+    <!-- Wooden cap: warm wood with grain-implied gradient -->
+    <linearGradient id="windmillWood" x1="0" y1="0" x2="0.05" y2="1">
+      <stop offset="0" stop-color="#a07840"/>
+      <stop offset="0.6" stop-color="#7a5028"/>
+      <stop offset="1" stop-color="#4a2e10"/>
+    </linearGradient>
+
+    <!-- Cloth sail: warm cream with subtle weathered tint -->
+    <linearGradient id="sailCloth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0e0b8"/>
+      <stop offset="1" stop-color="#c4b080"/>
+    </linearGradient>
+
+    <!-- Hub: iron + dark center -->
+    <radialGradient id="hubIron" cx="0.35" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#80706a"/>
+      <stop offset="0.5" stop-color="#3a2e26"/>
+      <stop offset="1" stop-color="#1a1208"/>
+    </radialGradient>
+
+    <!-- Stone-block pattern (vertical staves common on windmill bases) -->
+    <pattern id="windmillBlocks" width="6" height="5" patternUnits="userSpaceOnUse">
+      <rect width="6" height="5" fill="transparent"/>
+      <line x1="0" y1="0" x2="6" y2="0" stroke="rgba(20,15,10,0.22)" stroke-width="0.4"/>
+      <line x1="0" y1="2.5" x2="0" y2="5" stroke="rgba(20,15,10,0.18)" stroke-width="0.4"/>
+      <line x1="3" y1="0" x2="3" y2="2.5" stroke="rgba(20,15,10,0.18)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Wood grain pattern for cap -->
+    <pattern id="windmillWoodGrain" width="3" height="2" patternUnits="userSpaceOnUse">
+      <rect width="3" height="2" fill="transparent"/>
+      <path d="M0 1 Q 1.5 0.6 3 1" stroke="rgba(30,18,4,0.22)" stroke-width="0.3" fill="none"/>
+    </pattern>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="windmillShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.45)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow (wider than base — sails cast a longer footprint) -->
+  <ellipse cx="68" cy="106" rx="32" ry="5" fill="url(#windmillShadow)"/>
+
+  <!-- ─── Tapered stone base ──────────────────────────────────── -->
+  <!-- Trapezoid: wider at bottom (x=50→78), narrower at top (x=54→74) -->
+  <path d="M 50 102 L 78 102 L 74 80 L 54 80 Z" fill="url(#windmillStone)"/>
+  <!-- Stone-block pattern overlay -->
+  <path d="M 50 102 L 78 102 L 74 80 L 54 80 Z" fill="url(#windmillBlocks)" opacity="0.85"/>
+  <!-- Top edge sunlit highlight -->
+  <line x1="54" y1="80" x2="74" y2="80" stroke="rgba(255,240,210,0.4)" stroke-width="0.6"/>
+  <!-- Bottom shadow band -->
+  <rect x="50" y="100" width="28" height="2" fill="rgba(0,0,0,0.25)"/>
+
+  <!-- Stone-block accent lines (horizontal courses every ~5 px) -->
+  <g stroke="rgba(30,20,10,0.18)" stroke-width="0.4">
+    <line x1="51" y1="92" x2="77" y2="92"/>
+    <line x1="52" y1="86" x2="76" y2="86"/>
+  </g>
+
+  <!-- ─── Arched front door at base ─────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <path d="M 60 102 L 60 96 A 4 3 0 0 1 68 96 L 68 102 Z" fill="#1a1208"/>
+    <!-- Door planks -->
+    <path d="M 60.5 101.5 L 60.5 96.5 A 3.5 2.7 0 0 1 67.5 96.5 L 67.5 101.5 Z" fill="#3a2008"/>
+    <line x1="64" y1="96" x2="64" y2="101.5" stroke="rgba(0,0,0,0.4)" stroke-width="0.4"/>
+    <!-- Door frame -->
+    <path d="M 60 102 L 60 96 A 4 3 0 0 1 68 96 L 68 102"
+          stroke="#5a3a18" stroke-width="0.6" fill="none"/>
+    <!-- Hinges -->
+    <rect x="60.6" y="97" width="1.6" height="0.5" fill="#1a1208"/>
+    <rect x="60.6" y="100" width="1.6" height="0.5" fill="#1a1208"/>
+  </g>
+
+  <!-- ─── Wooden cap at top of stone base ───────────────────────── -->
+  <!-- Main cap: slightly wider than the stone top -->
+  <rect x="52" y="74" width="24" height="6" fill="url(#windmillWood)"/>
+  <rect x="52" y="74" width="24" height="6" fill="url(#windmillWoodGrain)" opacity="0.7"/>
+  <!-- Cap shadow side (bottom-right strip) -->
+  <rect x="74" y="76" width="2" height="4" fill="rgba(20,12,4,0.35)"/>
+  <!-- Cap top edge sunlit -->
+  <line x1="52" y1="74" x2="76" y2="74" stroke="rgba(255,210,160,0.4)" stroke-width="0.5"/>
+  <!-- Plank seams -->
+  <line x1="58" y1="74" x2="58" y2="80" stroke="rgba(20,12,4,0.35)" stroke-width="0.3"/>
+  <line x1="64" y1="74" x2="64" y2="80" stroke="rgba(20,12,4,0.35)" stroke-width="0.3"/>
+  <line x1="70" y1="74" x2="70" y2="80" stroke="rgba(20,12,4,0.35)" stroke-width="0.3"/>
+
+  <!-- Smaller cupola on top -->
+  <rect x="56" y="68" width="16" height="6" fill="url(#windmillWood)"/>
+  <rect x="56" y="68" width="16" height="6" fill="url(#windmillWoodGrain)" opacity="0.7"/>
+  <rect x="70" y="69" width="2" height="5" fill="rgba(20,12,4,0.4)"/>
+  <line x1="56" y1="68" x2="72" y2="68" stroke="rgba(255,210,160,0.4)" stroke-width="0.5"/>
+  <!-- Decorative roof crest line -->
+  <line x1="60" y1="68" x2="68" y2="68" stroke="rgba(255,220,170,0.35)" stroke-width="0.3"/>
+
+  <!-- ─── 4 SAILS in canonical cross pose ────────────────────────── -->
+  <!-- Sails are at the front of the cap. Hub center: (64, 71). -->
+  <!-- Each sail = wooden cross-frame + cloth panels in 4 quadrants -->
+
+  <!-- UP sail -->
+  <g>
+    <!-- Wooden frame: vertical spar + 2 cross-arms -->
+    <rect x="63.4" y="44" width="1.2" height="26" fill="#5a3a18"/>
+    <line x1="60" y1="50" x2="68" y2="50" stroke="#5a3a18" stroke-width="0.7"/>
+    <line x1="60" y1="58" x2="68" y2="58" stroke="#5a3a18" stroke-width="0.7"/>
+    <!-- Cloth panels (left + right of vertical spar; 3 horizontal sections) -->
+    <rect x="60.3" y="44.3" width="3" height="5.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="64.7" y="44.3" width="3" height="5.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="60.3" y="50.3" width="3" height="7.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="64.7" y="50.3" width="3" height="7.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="60.3" y="58.3" width="3" height="11.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="64.7" y="58.3" width="3" height="11.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <!-- Subtle cloth seam -->
+    <line x1="61.8" y1="44.3" x2="61.8" y2="69.7" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+    <line x1="66.2" y1="44.3" x2="66.2" y2="69.7" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+  </g>
+
+  <!-- DOWN sail (mirror — extends from hub down past cap, behind door area) -->
+  <g>
+    <rect x="63.4" y="72" width="1.2" height="26" fill="#5a3a18"/>
+    <line x1="60" y1="78" x2="68" y2="78" stroke="#5a3a18" stroke-width="0.7"/>
+    <line x1="60" y1="86" x2="68" y2="86" stroke="#5a3a18" stroke-width="0.7"/>
+    <!-- Note: down sail clipped by the wooden cap; only the parts BELOW the cap show -->
+    <!-- Actually the cap is at y=68-80; hub at y=71; sail starts y=72 just below hub.
+         Visual: sail blade going down from hub through the front of the cap (z-overlap) -->
+    <rect x="60.3" y="72" width="3" height="5.7" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="64.7" y="72" width="3" height="5.7" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="60.3" y="78.3" width="3" height="7.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="64.7" y="78.3" width="3" height="7.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="60.3" y="86.3" width="3" height="11.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="64.7" y="86.3" width="3" height="11.4" fill="url(#sailCloth)" opacity="0.92"/>
+    <line x1="61.8" y1="72.3" x2="61.8" y2="97.7" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+    <line x1="66.2" y1="72.3" x2="66.2" y2="97.7" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+  </g>
+
+  <!-- RIGHT sail -->
+  <g>
+    <rect x="66" y="70.4" width="26" height="1.2" fill="#5a3a18"/>
+    <line x1="72" y1="68" x2="72" y2="74" stroke="#5a3a18" stroke-width="0.7"/>
+    <line x1="80" y1="68" x2="80" y2="74" stroke="#5a3a18" stroke-width="0.7"/>
+    <rect x="66" y="67.3" width="5.7" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="66" y="71.7" width="5.7" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="72.3" y="67.3" width="7.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="72.3" y="71.7" width="7.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="80.3" y="67.3" width="11.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="80.3" y="71.7" width="11.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <line x1="66.3" y1="68.8" x2="91.7" y2="68.8" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+    <line x1="66.3" y1="73.2" x2="91.7" y2="73.2" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+  </g>
+
+  <!-- LEFT sail -->
+  <g>
+    <rect x="36" y="70.4" width="26" height="1.2" fill="#5a3a18"/>
+    <line x1="48" y1="68" x2="48" y2="74" stroke="#5a3a18" stroke-width="0.7"/>
+    <line x1="56" y1="68" x2="56" y2="74" stroke="#5a3a18" stroke-width="0.7"/>
+    <rect x="56.3" y="67.3" width="5.7" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="56.3" y="71.7" width="5.7" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="48.3" y="67.3" width="7.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="48.3" y="71.7" width="7.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="36.3" y="67.3" width="11.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <rect x="36.3" y="71.7" width="11.4" height="3" fill="url(#sailCloth)" opacity="0.92"/>
+    <line x1="36.3" y1="68.8" x2="61.7" y2="68.8" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+    <line x1="36.3" y1="73.2" x2="61.7" y2="73.2" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
+  </g>
+
+  <!-- ─── Iron hub (drawn last so it sits over sail intersection) ─ -->
+  <circle cx="64" cy="71" r="3" fill="url(#hubIron)"/>
+  <circle cx="64" cy="71" r="1.4" fill="#1a1208"/>
+  <!-- Hub bolts -->
+  <circle cx="64" cy="68.5" r="0.4" fill="#a09080"/>
+  <circle cx="64" cy="73.5" r="0.4" fill="#a09080"/>
+  <circle cx="61.5" cy="71" r="0.4" fill="#a09080"/>
+  <circle cx="66.5" cy="71" r="0.4" fill="#a09080"/>
+  <!-- Hub highlight -->
+  <ellipse cx="62.7" cy="69.8" rx="0.7" ry="0.4" fill="rgba(255,240,200,0.6)"/>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(255,240,200,0.32)">
+    <circle cx="32" cy="70" r="0.5"/>
+    <circle cx="96" cy="73" r="0.5"/>
+    <circle cx="46" cy="56" r="0.4"/>
+    <circle cx="80" cy="58" r="0.4"/>
+  </g>
+</svg>

@@ -64,7 +64,7 @@ Keep it accurate or retire it.
   cap composition (158's dome arc); 8 of 11 buildings still
   un-shipped
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
-  LoC), church (164, 196 LoC) — 3 of 11
+  LoC), church (164, 196 LoC), windmill (168, 213 LoC) — 4 of 11
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -100,24 +100,28 @@ swaps procedural meshes for higher-fidelity .glb when available.
 
 ## the cross-axis triangle
 
-**Granary is the first building expressed in all three layers:**
+**Granary is the first building expressed in all three layers**;
+**windmill is the second** (post-168):
 
-| Layer  | Tick | File:LineRange                          | LoC |
-| ------ | ---- | --------------------------------------- | --- |
-| Canvas | 158  | `js/render.js` `drawGranary` + 158 cap  | ~75 |
-| SVG    | 161  | `assets/sprites/granary.svg`            | 172 |
-| 3D     | 163  | `3d/3d.js` `b.type === 'granary'` branch | ~15 |
+| Building | Canvas | SVG | 3D  | Pattern |
+| -------- | -----: | --: | --: | ------- |
+| granary  | 158 (~75 LoC) | 161 (172 LoC) | 163 (~15 LoC) | canvas → SVG → 3D |
+| windmill | 094/096/158 (~70 LoC) | 168 (213 LoC) | 167 (~25 LoC) | canvas → 3D → SVG |
 
 158 (canvas) shipped a dome-conforming snow cap closing 095's
 filed idea. 161 (SVG) demonstrated the same building authored
 declaratively. 163 (3D) added the granary mesh + a new
 `pushCylinder` primitive.
 
+094/096/158 anchored windmill in canvas (per-building winter cap
++ sail-tip alignment). 167 added the 3D mesh (reusing 163's
+`pushCylinder`). 168 shipped the SVG sprite — 4 sails in canonical
+cross pose with cloth panels + wooden cross-frames + iron hub.
+
 The pattern: **when a building gets meaningful work in one layer,
-a sibling tick in another layer pairs the work**. Granary
-established the precedent; future buildings can follow the
-triangle (next candidate: windmill, since 158-filed sail-tip
-caps work pairs with potential SVG + 3D windmill).
+a sibling tick in another layer pairs the work**. Order isn't
+fixed (granary went canvas → SVG → 3D; windmill went canvas → 3D
+→ SVG); what matters is closing the triangle.
 
 ## coverage map
 
@@ -132,7 +136,7 @@ tick 165:
 | house        |   ✓    |     —      |    ✓      |
 | tower        |   ✓    |     —      |    ✓      |
 | barn         |   —    |     —      |    ✓      |
-| windmill     |   ✓    |     —      |    ✓ (167)|
+| windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
 | tavern       |   ✓    |     —      |     —     |
 | blacksmith   |   ✓    |     —      |     —     |
@@ -256,6 +260,14 @@ pipeline, these will need solving:
 - **167** — 3D windmill mesh added; coverage map updated. Builds
   toward windmill cross-axis triangle (158 canvas anchor; SVG
   sibling pending). 3D layer coverage now 7 of 11 buildings.
+- **168** — windmill SVG sprite ships (213 lines: tapered stone
+  base + wooden cap + smaller cupola + 4 sails in canonical cross
+  pose with wooden cross-frames + 3-section cloth panels per blade
+  + iron hub with bolts + arched door). **SECOND CROSS-AXIS
+  TRIANGLE COMPLETE**: windmill canvas (094/096/158 conforming-
+  cap thread) + 167 3D mesh + 168 SVG. Granary at 158/161/163
+  was the first triangle; windmill is the second. SVG layer
+  coverage now 4 of 11.
 
 ## how to update this doc
 
