@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -91,6 +91,20 @@ day-gate from 70 to 35 — original `≥ 70` was a math mistake by
 166's author given the 28-day-year structure (year 1: days 1-28;
 year 2 spring/summer ends at day 42 — `≥ 70` only fired year 3
 day 70 onward). Doc cadence revised ~144-185 post-fix.
+**184 (surprise, post-moratorium)** added `stone_forgotten` —
+**FOURTH beat on the standing-stone arc**, closing the cycle:
+056 discovery → 079 offering → 122 weathering → 184 forgetting.
+Realm's longest object-centered narrative gets its closing
+chord. Generational-gap framing parallels 147 great-storm's
+"children born after do not believe it." Static prose; no
+kingdom-hashed variants (forgetting is universal whereas
+weathering is per-kingdom). Tag: stone (reuse;
+eviction-immune per 085). Gate: `year3 && stone_found &&
+citizensBorn ≥ 10`. 185-187 shipped 3D-mesh fallback ticks
+(tavern/blacksmith/market) — chrome-independent
+graphics work; no chronicle additions. **188 (this update)**
+catches the doc up to 184 + adds the OBJECT-ARC CLOSURE
+template invariant (filed at 184 for cross-application).
 
 ## why this exists
 
@@ -148,7 +162,7 @@ Numbered in rough order of file:
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
 5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103, 116,
-   121, 122, 128, 134, 138, 142, 147, 148, 152, 166, 174
+   121, 122, 128, 134, 138, 142, 147, 148, 152, 166, 174, 184
    extended) — consolidates state-triggered one-shot beats.
    Each entry: `{ flag, tag, trigger(G)→bool, text:
    string|(G)→string, onFire?: string, after?: (G)=>void }`.
@@ -157,7 +171,7 @@ Numbered in rough order of file:
    field for audio (see audio-surfaces.md Pattern 2); **144
    added the optional `after: (G) => void` callback for
    arbitrary side effects** (mirrors BUILDING_FIRST_BEATS
-   `after:` used since 034). **Current 27 entries:**
+   `after:` used since 034). **Current 28 entries:**
    - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
      firstRaidSurvived
    - 3 year milestones (092, migrated from enhancements.js): year2,
@@ -180,6 +194,20 @@ Numbered in rough order of file:
    - 1 stone-weathering beat (122, un-filed surprise): fires day
      ≥150 AND stone_found; tag:stone (reuse); 4 kingdom-hashed
      variants
+   - 1 stone-forgetting beat (184, un-filed surprise): once-per-
+     realm when `year3 && stone_found && citizensBorn ≥ 10`;
+     **CLOSES THE STONE ARC** as a 4-beat cycle (056 discovery
+     → 079 offering → 122 weathering → 184 forgetting) — realm's
+     longest object-centered narrative. Tag: stone (reuse;
+     eviction-immune per 085). Static text: "Years pass, and the
+     standing stone goes unmentioned for whole seasons. The
+     youngest in the realm have never heard the story of who
+     found it." Generational-gap framing parallels 147
+     great-storm's "children born after do not believe it" —
+     same past-event-not-witnessed structure for an OBJECT
+     instead of a WEATHER MEMORY. Static (no kingdom-hashed
+     variants) because forgetting is universal even when
+     weathering is per-kingdom.
    - 1 longest-night beat (128, un-filed surprise): fires in deep
      night of first winter (day ≥22 AND dayPhase > 0.85 ×
      dayLength); **founder3 as night-watcher** (4th canonical
@@ -496,6 +524,27 @@ should respect:
   3+ entries would need them (`onFire` had 3+ audio needs at
   123; `after` had 1 at 144 — justified because 144's need was
   a legitimate side effect, not a post-hoc generalization).
+- **Object-arc closure template (184).** Long-lived focal
+  objects (the stone, the constellation, the wanderer, the
+  great-storm-memory) can support a 4-beat NARRATIVE arc
+  shape: **discovery → use → weathering/aging → forgetting**.
+  The standing-stone is the canonical example:
+  - 056 discovery (a-scene-that-happens-once)
+  - 079 use (cross-system gated ritual)
+  - 122 weathering (per-kingdom variants of erosion/aging)
+  - 184 forgetting (universal generational-gap closure)
+  Future long-lived object arcs may follow the template but
+  shouldn't force it — only when the object has earned its
+  fourth beat (i.e., the realm has lived long enough that
+  forgetting is plausible). Year-3+ gating is appropriate;
+  citizensBorn ≥ 10 ensures intergenerational turnover. The
+  forgetting-beat tags `misc` or the focal-object's existing
+  tag (stone/event/etc); reuses 075 invariant. Static prose
+  is preferred for closure (forgetting is universal); per-
+  kingdom variants reserved for the WEATHERING beat where
+  variation reads as different conditions of the same object.
+  **Filed**: constellation 116 + wanderer 048/148 + great-
+  storm 147 are candidates for forgetting beats at year 4-5+.
 
 ## known gaps (as of 104)
 
@@ -649,18 +698,15 @@ beats that sum near 57 by themselves. 088's first-snow adds
   before 178 gate fix). +2 conditional beats since 155: 166
   frog-voices + 174 first-frost. Documented 166 firing
   year-3+ in practice given the original ≥ 70 day-gate.
-- **178 (this update): cadence target REVISED to ~144-185
-  post-fix.** 166's gate lowered from `day ≥ 70` to
-  `day ≥ 35`:
-  - 166 frog-voices now fires year-2 spring (days 29-35;
-    day 35 qualifies as the last day of year-2 spring) OR
-    year-2 summer (36-42) OR year-3+ spring/summer. **Most
-    long-lived realms** see this — was year-3+-only,
-    becomes year-2+. +0.5-1 expected beat per realm
-    increase from the fix.
-  - 174 first-frost still fires year-2+ autumn day ≥ 45
-    (mid-late autumn).
-  Cadence still well under 300 cap.
+- **178: cadence target REVISED to ~144-185 post-fix.**
+  166's gate lowered from `day ≥ 70` to `day ≥ 35`. Most
+  long-lived realms now see frog-voices.
+- **188 (this update): cadence target ~145-186 with
+  stone_forgotten.** +1 conditional beat: 184 stone-forgetting
+  (year3 + stone_found + citizensBorn ≥ 10) — long-lived
+  realms reaching year 3 with their stone and 10+ births.
+  Most realms reaching year 3 satisfy the gate. Cadence still
+  well under 300 cap.
 
 ## how to update this doc
 
@@ -850,13 +896,32 @@ shipping, touch this file too.
   ~143-184 (+2 conditional beats). Sources
   paragraph extended through 177. Filed: fixer to
   lower 166's day-gate.
-- **178 (this update)** — the-fixer. 1-line gate
-  fix on 166 frog-voices: `day ≥ 70` → `day ≥ 35`.
-  Doc analysis at 177 had revealed the ≥ 70 gate
-  fired year-3+ only in practice (math mistake by
-  166's author, given 28-day-year structure).
-  Lowered to 35 so year-2 spring/summer is the
-  natural fire window. Most long-lived realms now
-  see the beat. Cadence revised ~143-184 → ~144-185
-  (+0.5-1 expected beat per realm from the gate
-  expansion).
+- **178** — the-fixer. 1-line gate fix on 166 frog-
+  voices: `day ≥ 70` → `day ≥ 35`. Doc analysis at
+  177 had revealed the ≥ 70 gate fired year-3+ only
+  in practice (math mistake by 166's author given
+  the 28-day-year structure). Most long-lived realms
+  now see the beat.
+- **184** — surprise. **stone_forgotten** beat
+  closes the standing-stone arc as a 4-beat cycle
+  (056 discovery → 079 offering → 122 weathering →
+  184 forgetting). Realm's longest object-centered
+  narrative gets its closing chord. Generational-gap
+  framing parallels 147 great-storm. Static prose
+  (forgetting is universal). Tag: stone (eviction-
+  immune per 085). Year-3+ + stone_found + 10+
+  births gate.
+- **185-187** — chrome-offline 3D-mesh fallback
+  queue (tavern / blacksmith / market). Chrome-
+  independent graphics work; no chronicle additions.
+  3D layer reaches ROSTER COMPLETE 11/11.
+- **188 (this update)** — the-archivist. Catches
+  the doc up to 184 + adds the **object-arc closure
+  template invariant**: long-lived focal objects
+  can support a 4-beat NARRATIVE arc shape
+  (discovery → use → weathering → forgetting); the
+  stone arc is the canonical example; constellation
+  / wanderer / great-storm filed as candidates for
+  forgetting beats at year 4-5+. Cadence summary
+  revised ~144-185 → ~145-186 (+1 conditional beat
+  per long-lived realm from 184).
