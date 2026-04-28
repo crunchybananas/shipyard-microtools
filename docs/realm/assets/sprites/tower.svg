@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tower sprite — Loop 170 (SVG axis, 5th sprite).
+  Sibling to render.js drawTower canvas implementation + the tower
+  3D mesh in 3d.js (existed pre-loop). Establishes the THIRD
+  cross-axis triangle: tower in canvas + 3D + SVG.
+
+  ViewBox 0 0 128 128. Tower centered at x=64; ground at y=104.
+  Light: upper-left (matches granary/castle/church/windmill).
+
+  Form: tall stone body (cool blue-grey) + side-wall depth strip +
+  battlemented top with 4 merlons + arched arrow slits + arched
+  doorway with wooden door + iron lantern bracket + stone-block
+  pattern overlay + subtle moss at base + small banner pennant.
+
+  Canvas drawTower is ~42 lines and feels spartan; SVG ships it at
+  ~190 lines with meaningful additional detail (lantern bracket,
+  moss, banner, richer arrow slits, refined door).
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Tower stone: cool blue-grey gradient -->
+    <linearGradient id="towerStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a4a4b6"/>
+      <stop offset="0.5" stop-color="#7a7a90"/>
+      <stop offset="1" stop-color="#52525e"/>
+    </linearGradient>
+
+    <!-- Side wall (shadow side): cooler/darker -->
+    <linearGradient id="towerStoneSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a7a8e"/>
+      <stop offset="1" stop-color="#3a3a48"/>
+    </linearGradient>
+
+    <!-- Crenellation parapet: slightly different tone -->
+    <linearGradient id="towerParapet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8a8b8"/>
+      <stop offset="1" stop-color="#7a7a8a"/>
+    </linearGradient>
+
+    <!-- Stone-block pattern (matches castle/church family) -->
+    <pattern id="towerBlocks" width="6" height="5" patternUnits="userSpaceOnUse">
+      <rect width="6" height="5" fill="transparent"/>
+      <line x1="0" y1="0" x2="6" y2="0" stroke="rgba(20,15,30,0.22)" stroke-width="0.4"/>
+      <line x1="0" y1="2.5" x2="0" y2="5" stroke="rgba(20,15,30,0.18)" stroke-width="0.4"/>
+      <line x1="3" y1="0" x2="3" y2="2.5" stroke="rgba(20,15,30,0.18)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Iron lantern: warm glow inside dark cage -->
+    <radialGradient id="lanternGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,210,140,0.85)"/>
+      <stop offset="0.6" stop-color="rgba(255,180,100,0.4)"/>
+      <stop offset="1" stop-color="rgba(255,160,80,0)"/>
+    </radialGradient>
+
+    <!-- Banner: rich red -->
+    <linearGradient id="bannerRed" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#d82828"/>
+      <stop offset="1" stop-color="#7a1010"/>
+    </linearGradient>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="towerShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.45)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="68" cy="106" rx="20" ry="4" fill="url(#towerShadow)"/>
+
+  <!-- ─── Side wall (right depth strip) ─────────────────────────── -->
+  <path d="M 70 70 L 73 73 L 73 100 L 70 100 Z" fill="url(#towerStoneSide)"/>
+
+  <!-- ─── Main tower body ───────────────────────────────────────── -->
+  <rect x="58" y="70" width="12" height="30" fill="url(#towerStone)"/>
+  <rect x="58" y="70" width="12" height="30" fill="url(#towerBlocks)" opacity="0.85"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="58" y1="70" x2="70" y2="70" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+
+  <!-- Stone courses (subtle horizontal accents) -->
+  <g stroke="rgba(20,15,30,0.18)" stroke-width="0.35">
+    <line x1="59" y1="76" x2="69" y2="76"/>
+    <line x1="59" y1="82" x2="69" y2="82"/>
+    <line x1="59" y1="88" x2="69" y2="88"/>
+    <line x1="59" y1="94" x2="69" y2="94"/>
+  </g>
+
+  <!-- ─── Battlemented parapet ──────────────────────────────────── -->
+  <!-- Parapet base (slightly wider than body) -->
+  <rect x="57" y="66" width="14" height="4" fill="url(#towerParapet)"/>
+  <line x1="57" y1="66" x2="71" y2="66" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+  <!-- Parapet shadow stripe -->
+  <rect x="69" y="67" width="2" height="3" fill="rgba(20,15,30,0.4)"/>
+
+  <!-- Crenellations: 4 merlons with notches between -->
+  <g fill="#7a7a8a">
+    <rect x="57" y="62" width="3" height="4"/>
+    <rect x="61" y="62" width="3" height="4"/>
+    <rect x="65" y="62" width="3" height="4"/>
+    <rect x="69" y="62" width="2" height="4"/>
+  </g>
+  <!-- Merlon highlights -->
+  <g stroke="rgba(255,255,255,0.25)" stroke-width="0.3">
+    <line x1="57" y1="62.2" x2="60" y2="62.2"/>
+    <line x1="61" y1="62.2" x2="64" y2="62.2"/>
+    <line x1="65" y1="62.2" x2="68" y2="62.2"/>
+  </g>
+
+  <!-- ─── Arrow slits ───────────────────────────────────────────── -->
+  <!-- Cross-shaped slits (vertical with small horizontal arms) -->
+  <g fill="#1a1a2a">
+    <!-- Upper slit -->
+    <rect x="63.4" y="74" width="1.2" height="5"/>
+    <rect x="62.4" y="76" width="3.2" height="0.8"/>
+    <!-- Middle slit -->
+    <rect x="63.4" y="83" width="1.2" height="5"/>
+    <rect x="62.4" y="85" width="3.2" height="0.8"/>
+  </g>
+
+  <!-- ─── Iron lantern bracket on side wall ─────────────────────── -->
+  <g>
+    <!-- Bracket arm extending outward -->
+    <rect x="70.5" y="83" width="3" height="0.6" fill="#3a2e26"/>
+    <rect x="73" y="82.5" width="0.6" height="2" fill="#3a2e26"/>
+    <!-- Lantern cage (rectangle) -->
+    <rect x="71.8" y="84.5" width="3.4" height="3.5" fill="#1a1a26"/>
+    <!-- Lantern glow -->
+    <rect x="72.2" y="84.9" width="2.6" height="2.7" fill="url(#lanternGlow)"/>
+    <!-- Cage bars -->
+    <line x1="73.5" y1="84.5" x2="73.5" y2="88" stroke="#1a1a26" stroke-width="0.3"/>
+    <line x1="71.8" y1="86.2" x2="75.2" y2="86.2" stroke="#1a1a26" stroke-width="0.3"/>
+    <!-- Bracket bottom hook -->
+    <rect x="73" y="87.7" width="0.6" height="1.3" fill="#3a2e26"/>
+  </g>
+
+  <!-- ─── Arched doorway at base ────────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <path d="M 60 100 L 60 95 A 4 3 0 0 1 68 95 L 68 100 Z" fill="#1a1a26"/>
+    <!-- Wooden door planks -->
+    <path d="M 60.5 99.5 L 60.5 95.5 A 3.5 2.7 0 0 1 67.5 95.5 L 67.5 99.5 Z" fill="#3a2810"/>
+    <line x1="64" y1="95" x2="64" y2="99.5" stroke="rgba(0,0,0,0.4)" stroke-width="0.4"/>
+    <!-- Door frame -->
+    <path d="M 60 100 L 60 95 A 4 3 0 0 1 68 95 L 68 100"
+          stroke="#5a5060" stroke-width="0.7" fill="none"/>
+    <!-- Iron hinges -->
+    <rect x="60.7" y="96" width="2" height="0.5" fill="#1a1a26"/>
+    <rect x="60.7" y="98.5" width="2" height="0.5" fill="#1a1a26"/>
+    <!-- Iron studs -->
+    <circle cx="61.5" cy="97.3" r="0.3" fill="#5a5060"/>
+    <circle cx="62.3" cy="98.0" r="0.3" fill="#5a5060"/>
+    <!-- Door ring handle -->
+    <circle cx="66.5" cy="97.3" r="0.5" fill="#7a6048"/>
+    <circle cx="66.5" cy="97.3" r="0.25" fill="#1a1a26"/>
+  </g>
+
+  <!-- Doorstep shadow -->
+  <rect x="58" y="100" width="12" height="1.5" fill="rgba(30,25,40,0.55)"/>
+
+  <!-- ─── Subtle moss at base (organic decay) ───────────────────── -->
+  <g fill="rgba(60,90,40,0.55)">
+    <ellipse cx="59.5" cy="99.5" rx="1.2" ry="0.5"/>
+    <ellipse cx="69.5" cy="99.5" rx="1" ry="0.4"/>
+    <circle cx="58.5" cy="98" r="0.4"/>
+    <circle cx="69.8" cy="97.5" r="0.4"/>
+  </g>
+
+  <!-- ─── Small banner pennant on flag pole ─────────────────────── -->
+  <g>
+    <!-- Flag pole -->
+    <line x1="64" y1="62" x2="64" y2="56" stroke="#3a2e22" stroke-width="0.6"/>
+    <!-- Pole tip -->
+    <circle cx="64" cy="56" r="0.5" fill="#a08040"/>
+    <!-- Banner triangle -->
+    <path d="M 64 56.5 L 70 57.5 L 69 60 L 64 59.5 Z" fill="url(#bannerRed)"/>
+    <!-- Banner highlight -->
+    <line x1="64" y1="57" x2="69" y2="57.8" stroke="rgba(255,180,160,0.45)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(220,220,255,0.3)">
+    <circle cx="50" cy="74" r="0.4"/>
+    <circle cx="82" cy="78" r="0.4"/>
+    <circle cx="54" cy="60" r="0.3"/>
+  </g>
+</svg>

@@ -48,7 +48,11 @@ and note the promotion here.
 - 167 [code] — animate windmill blades via per-vertex blade-marker attribute + uniform `uWindmillAngle` driven by `uTime`. ~15-20 LoC in vertex shader + Mesh class. [3d/3d.js]
 - 167 [code] — `pushFrustum(cx, cz, baseY, topY, baseR, topR, sides, c)` Mesh primitive for tapered cylinders (windmill base, tower spire transition, etc). ~25 LoC. [3d/3d.js]
 - 167 [code] — windmill SVG sprite (4th SVG sprite) — completes windmill cross-axis triangle (canvas 158 + 3D 167 + SVG). [assets/sprites/] **DONE → 168** (213 lines; cloth-paneled sails with wooden cross-frames; iron hub with bolts; second cross-axis triangle complete)
-- 168 [code] — 5th SVG sprite (tower or tavern). Tower: smaller cousin of castle's flanking towers. Tavern: residential hospitality, simpler form. [assets/sprites/]
+- 168 [code] — 5th SVG sprite (tower or tavern). Tower: smaller cousin of castle's flanking towers. Tavern: residential hospitality, simpler form. [assets/sprites/] **DONE → 170** (tower; 188 lines; cruciform arrow slits + iron lantern bracket + red banner + moss; third cross-axis triangle complete; tavern stays filed)
+- 170 [code] — 6th SVG sprite. Tavern, blacksmith, market, house, or farm. House is simplest. [assets/sprites/]
+- 170 [code] — animation pass tick: windmill sails + castle pennants + flag + tower lantern flicker + tower banner sway in single tick. ~50 LoC across SVG files. Pre-condition: 165-filed strategic decision. [SVG files]
+- 170 [code] — 3D tower could match SVG's added detail (lantern, banner). [3d/3d.js]
+- 170 [doc] — when SVG hits 6/11, reconsider cadence: sustain or slow for integration? 165-filed strategic decision becomes ripe. [journal]
 - 168 [code] — animation pass tick: `<animate>` for windmill sails + castle pennants + flag. Single tick covering SVG animation needs at once. ~30 LoC. Pre-condition: 165-filed strategic decision on live-game SVG integration. [SVG files]
 - 168 [code] — render-pipeline integration prototype: lazy-load SVG sprites; replace `case 'granary': drawGranary(...)` with `<img>`. Address day/night tint, winter cap, hover halo composability. Filed at 161+162; unblocks live-game ship. [render.js]
 - 168 [review] — visual diff: canvas drawWindmill rotating blades vs static windmill.svg. Does static SVG read as windmill, or does lack of rotation feel broken? Pairs with 167 review. [play]

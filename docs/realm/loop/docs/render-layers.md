@@ -64,7 +64,8 @@ Keep it accurate or retire it.
   cap composition (158's dome arc); 8 of 11 buildings still
   un-shipped
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
-  LoC), church (164, 196 LoC), windmill (168, 213 LoC) — 4 of 11
+  LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
+  (170, 188 LoC) — 5 of 11
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -107,6 +108,7 @@ swaps procedural meshes for higher-fidelity .glb when available.
 | -------- | -----: | --: | --: | ------- |
 | granary  | 158 (~75 LoC) | 161 (172 LoC) | 163 (~15 LoC) | canvas → SVG → 3D |
 | windmill | 094/096/158 (~70 LoC) | 168 (213 LoC) | 167 (~25 LoC) | canvas → 3D → SVG |
+| tower    | pre-loop (~42 LoC) | 170 (188 LoC) | pre-loop (~15 LoC) | canvas + 3D pre-loop → SVG |
 
 158 (canvas) shipped a dome-conforming snow cap closing 095's
 filed idea. 161 (SVG) demonstrated the same building authored
@@ -134,7 +136,7 @@ tick 165:
 | church       |   ✓    |    ✓ (164) |    ✓      |
 | granary      |   ✓    |    ✓ (161) |    ✓ (163)|
 | house        |   ✓    |     —      |    ✓      |
-| tower        |   ✓    |     —      |    ✓      |
+| tower        |   ✓    |    ✓ (170) |    ✓      |
 | barn         |   —    |     —      |    ✓      |
 | windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
@@ -268,6 +270,17 @@ pipeline, these will need solving:
   cap thread) + 167 3D mesh + 168 SVG. Granary at 158/161/163
   was the first triangle; windmill is the second. SVG layer
   coverage now 4 of 11.
+- **169** — type-scale phase 4 (8 exact-match font-size
+  migrations); non-graphics variety after the SVG/3D run; doesn't
+  change render layers but fits the "in some loops" cadence.
+- **170** — tower SVG sprite ships (188 lines: stone body with
+  block pattern + side-wall depth + 4 crenellations + cross-shape
+  arrow slits + iron lantern bracket with warm glow + arched
+  doorway + ring handle + moss at base + small red banner).
+  **THIRD CROSS-AXIS TRIANGLE COMPLETE**: tower canvas (pre-loop)
+  + 3D (pre-loop) + 170 SVG. Tower's triangle closed via SVG
+  shipping last (different order than granary or windmill). SVG
+  layer coverage now 5 of 11; ~half the building roster has SVG.
 
 ## how to update this doc
 
