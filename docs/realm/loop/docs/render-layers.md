@@ -67,7 +67,9 @@ Keep it accurate or retire it.
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
   LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
   (170, 188 LoC), house (173, 194 LoC), tavern (175, 239 LoC),
-  blacksmith (176, 223 LoC) — 8 of 11 (Phase A: 3/5)
+  blacksmith (176, 223 LoC), market (179, 234 LoC) — 9 of 11
+  (Phase A: 4/5; **PHASE B INTEGRATION SPRINT THRESHOLD: 9/11
+  CRITICAL MASS REACHED**)
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -157,7 +159,7 @@ tick 172:
 | farm         |   ✓    |     —      |     —     |
 | tavern       |   ✓    |    ✓ (175) |     —     |
 | blacksmith   |   ✓    |    ✓ (176) |     —     |
-| market       |   ✓    |     —      |     —     |
+| market       |   ✓    |    ✓ (179) |     —     |
 | bakery       |   ✓    |     —      |     —     |
 | barracks     |   ✓    |     —      |     —     |
 | school       |   ✓    |     —      |     —     |
@@ -421,6 +423,25 @@ pipeline, these will need solving:
   picks 1 of 6 fire palettes (amber/purple/green/white/blue);
   SVG ships canonical amber. SVG layer 7 → 8 of 11 (Phase A:
   3 of 5).
+- **177** — narrative-surfaces.md catch-up; documents 166
+  frog + 174 frost. Caught math mistake in 166's day-gate.
+- **178** — fixer for 177-found bug: 166 frog day-gate
+  70 → 35.
+- **179** — Phase A 4/5. SVG market sprite ships (234 lines:
+  open-air covered stall (most distinct silhouette in
+  roster — only no-walls building) + 2 wooden support posts
+  with caps + striped trapezoidal red awning with white
+  vertical stripes + scalloped awning fringe + hanging
+  price-tag bunting (yellow triangular pennants) + wooden
+  counter with grain pattern + sunlit shelf edge + bread
+  loaves with score lines + apples with stem and leaf and
+  highlights + coin pile / tip jar between goods + barrel
+  prop on left with 3 hoops + crate prop on right with
+  stacked smaller crate + scattered cobblestones underfoot).
+  Canvas drawMarket picks 16 variants (4 awning palettes ×
+  4 goods); SVG ships canonical red + bread+apples. SVG
+  layer 8 → 9 of 11 (Phase A: 4 of 5). **9/11 = PHASE B
+  CRITICAL MASS THRESHOLD REACHED per 171 strategic plan.**
 
 ## how to update this doc
 

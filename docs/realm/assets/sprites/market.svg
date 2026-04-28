@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Market sprite — Loop 179 (SVG axis, 9th sprite).
+  Phase A 4/5 per 171 strategic plan.
+  Sibling to render.js drawMarket canvas implementation.
+
+  ViewBox 0 0 128 128. Market centered at x=64; ground at y=104.
+  Light: upper-left.
+
+  CANONICAL VARIANT: classic red-striped awning + bread + apples.
+  Canvas drawMarket picks 1 of 4 awning palettes (red/blue/green/
+  gold) × 4 goods variants (bread+apples / cloth bolts / spices /
+  pottery) = 16 variants. SVG ships canonical config; per-instance
+  variation deferred to Phase B step 5.
+
+  Form: open-air market stall — wooden counter + striped trapezoidal
+  awning + scalloped awning fringe + 2 support posts + counter
+  goods (bread loaves + apples + price-tag bunting) + barrel prop
+  on left + crate stack on right + scattered cobblestones below.
+  MOST DISTINCT silhouette in the roster (no walls, no roof above
+  the awning — purely open-air).
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Counter wood: warm wood gradient -->
+    <linearGradient id="marketCounter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4a070"/>
+      <stop offset="1" stop-color="#8a5a30"/>
+    </linearGradient>
+
+    <!-- Awning red: classic variant -->
+    <linearGradient id="awningRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f05545"/>
+      <stop offset="0.7" stop-color="#c03020"/>
+      <stop offset="1" stop-color="#7a1810"/>
+    </linearGradient>
+
+    <!-- Wood post gradient -->
+    <linearGradient id="awningPost" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7a5028"/>
+      <stop offset="0.5" stop-color="#5a3818"/>
+      <stop offset="1" stop-color="#3a2410"/>
+    </linearGradient>
+
+    <!-- Bread (loaf) gradient -->
+    <radialGradient id="breadLoaf" cx="0.4" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#fce080"/>
+      <stop offset="0.7" stop-color="#d4a050"/>
+      <stop offset="1" stop-color="#7a4818"/>
+    </radialGradient>
+
+    <!-- Apple gradient -->
+    <radialGradient id="apple" cx="0.35" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#7ae060"/>
+      <stop offset="0.6" stop-color="#3aa030"/>
+      <stop offset="1" stop-color="#1a5018"/>
+    </radialGradient>
+
+    <!-- Barrel: warm wood -->
+    <linearGradient id="barrelWood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a87858"/>
+      <stop offset="0.5" stop-color="#8b6a4e"/>
+      <stop offset="1" stop-color="#5a3818"/>
+    </linearGradient>
+
+    <!-- Crate -->
+    <linearGradient id="crateWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b3815f"/>
+      <stop offset="1" stop-color="#7a5028"/>
+    </linearGradient>
+
+    <!-- Wood grain pattern for counter -->
+    <pattern id="counterGrain" width="4" height="2" patternUnits="userSpaceOnUse">
+      <rect width="4" height="2" fill="transparent"/>
+      <path d="M0 1 Q 2 0.6 4 1" stroke="rgba(60,40,16,0.22)" stroke-width="0.3" fill="none"/>
+    </pattern>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="marketShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.4)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow (wide — open-air stall casts a broader shadow) -->
+  <ellipse cx="68" cy="106" rx="32" ry="4" fill="url(#marketShadow)"/>
+
+  <!-- Scattered cobblestones beneath stall (market square texture) -->
+  <g>
+    <ellipse cx="56" cy="103" rx="1" ry="0.5" fill="#9a9088"/>
+    <ellipse cx="59" cy="105" rx="1.1" ry="0.55" fill="#807870"/>
+    <ellipse cx="62" cy="103.5" rx="0.9" ry="0.45" fill="#9a9088"/>
+    <ellipse cx="65" cy="105" rx="1" ry="0.5" fill="#807870"/>
+    <ellipse cx="68" cy="103" rx="1.1" ry="0.55" fill="#9a9088"/>
+    <ellipse cx="71" cy="105" rx="1" ry="0.5" fill="#807870"/>
+    <ellipse cx="74" cy="103.5" rx="0.9" ry="0.45" fill="#9a9088"/>
+  </g>
+
+  <!-- ─── Awning support posts (2 wooden posts on either side) ─── -->
+  <g>
+    <rect x="48" y="85" width="1.4" height="11" fill="url(#awningPost)"/>
+    <rect x="78.6" y="85" width="1.4" height="11" fill="url(#awningPost)"/>
+    <!-- Post tops (caps) -->
+    <rect x="47.5" y="84.5" width="2.4" height="0.8" fill="#3a2410"/>
+    <rect x="78.1" y="84.5" width="2.4" height="0.8" fill="#3a2410"/>
+  </g>
+
+  <!-- ─── Awning (trapezoid) ────────────────────────────────────── -->
+  <!-- Awning body: trapezoid (wider at bottom) -->
+  <path d="M 50 84 L 78 84 L 80 96 L 48 96 Z" fill="url(#awningRed)"/>
+
+  <!-- White stripes (5 vertical-trapezoidal slices) -->
+  <g fill="rgba(255,255,255,0.92)">
+    <path d="M 53 84 L 56 84 L 57 96 L 53.5 96 Z"/>
+    <path d="M 59.5 84 L 62.5 84 L 63 96 L 59 96 Z"/>
+    <path d="M 66 84 L 69 84 L 69.5 96 L 65.5 96 Z"/>
+    <path d="M 72 84 L 75 84 L 76 96 L 72 96 Z"/>
+  </g>
+
+  <!-- Awning top sunlit highlight -->
+  <line x1="50" y1="84" x2="78" y2="84" stroke="rgba(255,240,210,0.55)" stroke-width="0.6"/>
+
+  <!-- ─── Scalloped awning fringe (bottom edge) ─────────────────── -->
+  <g fill="url(#awningRed)">
+    <path d="M 48 96 L 52 96 A 2 1.4 0 0 1 56 96 A 2 1.4 0 0 1 60 96 A 2 1.4 0 0 1 64 96 A 2 1.4 0 0 1 68 96 A 2 1.4 0 0 1 72 96 A 2 1.4 0 0 1 76 96 L 80 96 L 80 96.5 L 48 96.5 Z"/>
+    <!-- Individual scallop drops -->
+    <path d="M 52 96 A 2 1.4 0 0 1 56 96 A 2 1.4 0 0 1 56 97.4 L 52 97.4 Z"/>
+    <path d="M 60 96 A 2 1.4 0 0 1 64 96 A 2 1.4 0 0 1 64 97.4 L 60 97.4 Z"/>
+    <path d="M 68 96 A 2 1.4 0 0 1 72 96 A 2 1.4 0 0 1 72 97.4 L 68 97.4 Z"/>
+    <path d="M 76 96 A 2 1.4 0 0 1 80 96 A 2 1.4 0 0 1 80 97.4 L 76 97.4 Z"/>
+  </g>
+
+  <!-- ─── Hanging price-tag bunting (small triangular pennants) ── -->
+  <g>
+    <line x1="50" y1="97.5" x2="78" y2="97.5" stroke="rgba(60,40,16,0.5)" stroke-width="0.25"/>
+    <path d="M 56 97.5 L 58 97.5 L 57 99 Z" fill="#fce080"/>
+    <path d="M 62 97.5 L 64 97.5 L 63 99 Z" fill="#fce080"/>
+    <path d="M 68 97.5 L 70 97.5 L 69 99 Z" fill="#fce080"/>
+    <path d="M 74 97.5 L 76 97.5 L 75 99 Z" fill="#fce080"/>
+  </g>
+
+  <!-- ─── Counter ──────────────────────────────────────────────── -->
+  <g>
+    <!-- Counter top -->
+    <rect x="52" y="96" width="24" height="6" fill="url(#marketCounter)"/>
+    <rect x="52" y="96" width="24" height="6" fill="url(#counterGrain)" opacity="0.85"/>
+    <!-- Counter shelf edge highlight (sunlit) -->
+    <line x1="52" y1="96" x2="76" y2="96" stroke="rgba(255,230,180,0.5)" stroke-width="0.4"/>
+    <!-- Counter front shadow -->
+    <rect x="52" y="100" width="24" height="2" fill="rgba(60,30,8,0.4)"/>
+    <!-- Counter side post stripe -->
+    <rect x="76" y="96" width="0.5" height="6" fill="rgba(0,0,0,0.4)"/>
+  </g>
+
+  <!-- ─── Bread loaves on counter (left side) ─────────────────── -->
+  <g>
+    <!-- Bread 1 (rounder) -->
+    <ellipse cx="58" cy="93.5" rx="2.5" ry="1.6" fill="url(#breadLoaf)"/>
+    <!-- Bread 1 score lines (slashes on top) -->
+    <line x1="56.5" y1="92.8" x2="57.5" y2="93.4" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <line x1="58" y1="92.6" x2="59" y2="93.2" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <line x1="59.5" y1="92.8" x2="60.5" y2="93.4" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <!-- Bread 2 (smaller, slightly behind) -->
+    <ellipse cx="62" cy="93" rx="2" ry="1.3" fill="url(#breadLoaf)" opacity="0.95"/>
+    <line x1="60.8" y1="92.4" x2="61.6" y2="92.9" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+    <line x1="62.4" y1="92.4" x2="63.2" y2="92.9" stroke="rgba(80,50,16,0.55)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Apples on counter (right side) ──────────────────────── -->
+  <g>
+    <!-- Apple 1 -->
+    <circle cx="68" cy="93.5" r="1.6" fill="url(#apple)"/>
+    <!-- Apple 1 stem -->
+    <rect x="67.85" y="91.6" width="0.3" height="0.8" fill="#5a3818"/>
+    <!-- Apple 1 leaf -->
+    <ellipse cx="68.5" cy="91.7" rx="0.5" ry="0.3" fill="#5aa030" transform="rotate(30 68.5 91.7)"/>
+    <!-- Apple 1 highlight -->
+    <ellipse cx="67.4" cy="92.8" rx="0.4" ry="0.25" fill="rgba(255,255,200,0.7)"/>
+
+    <!-- Apple 2 -->
+    <circle cx="71" cy="93.7" r="1.4" fill="url(#apple)" opacity="0.95"/>
+    <rect x="70.85" y="92" width="0.3" height="0.7" fill="#5a3818"/>
+    <ellipse cx="70.5" cy="93.1" rx="0.3" ry="0.2" fill="rgba(255,255,200,0.7)"/>
+
+    <!-- Apple 3 (smaller, in front) -->
+    <circle cx="69.5" cy="94.5" r="1.1" fill="url(#apple)"/>
+    <ellipse cx="69.2" cy="94.0" rx="0.25" ry="0.2" fill="rgba(255,255,200,0.7)"/>
+  </g>
+
+  <!-- ─── Coin pile / tip jar (between bread and apples) ────────── -->
+  <g>
+    <ellipse cx="64" cy="94.5" rx="1.5" ry="0.5" fill="#3a2810"/>
+    <circle cx="63" cy="93.8" r="0.5" fill="#fce080"/>
+    <circle cx="64" cy="93.6" r="0.5" fill="#d4a830"/>
+    <circle cx="65" cy="93.8" r="0.5" fill="#fce080"/>
+  </g>
+
+  <!-- ─── Barrel prop (left side of stall) ──────────────────────── -->
+  <g>
+    <!-- Barrel body (rounded) -->
+    <ellipse cx="46" cy="100" rx="3.5" ry="3.5" fill="url(#barrelWood)"/>
+    <!-- Barrel hoops (3 horizontal) -->
+    <line x1="42.7" y1="98" x2="49.3" y2="98" stroke="#3a2410" stroke-width="0.6"/>
+    <line x1="42.5" y1="100" x2="49.5" y2="100" stroke="#3a2410" stroke-width="0.6"/>
+    <line x1="42.7" y1="102" x2="49.3" y2="102" stroke="#3a2410" stroke-width="0.6"/>
+    <!-- Barrel top -->
+    <ellipse cx="46" cy="96.7" rx="3.4" ry="0.8" fill="#5a3818"/>
+    <!-- Barrel highlight -->
+    <ellipse cx="44.5" cy="98.5" rx="0.7" ry="2" fill="rgba(255,220,160,0.3)"/>
+  </g>
+
+  <!-- ─── Crate prop (right side of stall) ──────────────────────── -->
+  <g>
+    <!-- Crate body -->
+    <rect x="83" y="96" width="6" height="5" fill="url(#crateWood)"/>
+    <!-- Crate planks (vertical) -->
+    <line x1="85" y1="96" x2="85" y2="101" stroke="rgba(60,40,16,0.5)" stroke-width="0.3"/>
+    <line x1="87" y1="96" x2="87" y2="101" stroke="rgba(60,40,16,0.5)" stroke-width="0.3"/>
+    <!-- Crate top -->
+    <rect x="83" y="96" width="6" height="0.6" fill="#5a3818"/>
+    <!-- Crate frame (border accent) -->
+    <rect x="83" y="96" width="6" height="5" fill="none" stroke="#5a3818" stroke-width="0.4"/>
+    <!-- Stacked crate (smaller, on top) -->
+    <rect x="84" y="93.5" width="4" height="2.5" fill="url(#crateWood)" opacity="0.92"/>
+    <rect x="84" y="93.5" width="4" height="2.5" fill="none" stroke="#5a3818" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(255,240,200,0.32)">
+    <circle cx="40" cy="80" r="0.4"/>
+    <circle cx="88" cy="82" r="0.4"/>
+    <circle cx="64" cy="78" r="0.3"/>
+  </g>
+</svg>
