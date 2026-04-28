@@ -42,7 +42,9 @@ and note the promotion here.
 - 176 [code] — animate forge fire flicker + spark drift via `<animate>`. Phase C. [blacksmith.svg]
 - 176 [code] — variant fire-palette CSS custom properties (`--fire-core`, `--fire-mid`, `--fire-outer`). Phase B step 5. [blacksmith.svg]
 - 176 [code] — 3D blacksmith mesh: walls box + flat-roof box + chimney box + small anvil. ~25 LoC. [3d/3d.js]
-- 176 [doc] — narrative-surfaces.md archivist tick OVERDUE (155 last; +21 ticks). 174 frost undocumented. [loop/docs/]
+- 176 [doc] — narrative-surfaces.md archivist tick OVERDUE (155 last; +21 ticks). 174 frost undocumented. [loop/docs/] **DONE → 177** (NARRATIVE_BEATS 25→27 with 166 frog + 174 frost; cadence ~143-184; SVG arc batched as cluster note; +86 LoC)
+- 177 [code] — fixer: lower 166 frog-voices `day >= 70` gate to `day >= 30` so most year-1+ summer realms see it. Currently year-3+ in practice, narrow window. ~1-line change. [story.js]
+- 177 [doc] — when Phase A wraps (~10-11/11 sprites), narrative-surfaces.md may want brief `## render-axis cross-reference` pointer to render-layers.md so future fresh-context ticks see the connection. [loop/docs/]
 - 175 [code] — variant tavern (CSS custom properties for sign palette + emblem swap, OR separate variant SVG files). Phase B step 5. [tavern.svg]
 - 175 [code] — animate sign board swing via `<animate transform>` rotation around bracket attachment. Phase C. [tavern.svg]
 - 175 [code] — 3D tavern mesh: walls box + roof pyramid + small box for sign + flag. Pairs with 173 house in cross-axis triangle. [3d/3d.js]

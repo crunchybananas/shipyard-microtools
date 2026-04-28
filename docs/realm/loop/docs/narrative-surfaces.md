@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -70,7 +70,23 @@ surprise) mirrored 148's pattern for 031's ghost entity
 **moratorium scorecard HITS target** (3/≥3 non-founder
 surprises). 148+152 form a paired grammar for ambient-
 entity acknowledgment without founder bookkeeping. 155
-(this update) catches the doc up to 142-152.
+caught the doc up to 142-152. **157 (meta) closed the 146
+moratorium check-in** with all targets HIT; soft-cap policy
+replaces hard rule; founder arc unchanged at 7/5/4. 158-170
+shipped 5 SVG sprites + 2 3D mesh ticks (167/163), opening
+the SVG/3D render axes per user steering 2026-04-28; 171/172
+captured the strategic plan + .glb-meshes "loop does not
+touch" boundary in `loop/docs/render-layers.md` (sibling doc
+to this one). 166 (post-moratorium surprise) added
+`frog_voices_heard` — 3rd ambient-entity acknowledgment beat
+(water-edge sound focal, spring/summer evenings, 14-tick
+spacing from 152 honors 156's queue-drain warning). 174
+(post-moratorium surprise, between Phase A sprites) added
+`first_frost_marked` — sibling to 147 great-storm in
+seasonal placement (year-2+ autumn) but PRESENT-tense
+observation rather than past-tense memory; pairs the
+autumn-of-year-2+ signature. 177 (this update) catches the
+doc up to 166 and 174.
 
 ## why this exists
 
@@ -128,16 +144,16 @@ Numbered in rough order of file:
 4. **072 founders named** (seeded day [3,6], `character`) — 3 names
    from a 20-name pool, stored as `storyFlags.founder1/2/3`.
 5. **NARRATIVE_BEATS table** (090 landed; 092, 093, 103, 116,
-   121, 122, 128, 134, 138, 142, 147, 148, 152 extended) —
-   consolidates state-triggered one-shot beats. Each entry:
-   `{ flag, tag, trigger(G)→bool, text: string|(G)→string,
-   onFire?: string, after?: (G)=>void }`. Mirrors
-   BUILDING_FIRST_BEATS; sibling table, single dispatch loop.
-   123 added the optional `onFire: 'soundName'` string field
-   for audio (see audio-surfaces.md Pattern 2); **144 added
-   the optional `after: (G) => void` callback for arbitrary
-   side effects** (mirrors BUILDING_FIRST_BEATS `after:` used
-   since 034). **Current 25 entries:**
+   121, 122, 128, 134, 138, 142, 147, 148, 152, 166, 174
+   extended) — consolidates state-triggered one-shot beats.
+   Each entry: `{ flag, tag, trigger(G)→bool, text:
+   string|(G)→string, onFire?: string, after?: (G)=>void }`.
+   Mirrors BUILDING_FIRST_BEATS; sibling table, single dispatch
+   loop. 123 added the optional `onFire: 'soundName'` string
+   field for audio (see audio-surfaces.md Pattern 2); **144
+   added the optional `after: (G) => void` callback for
+   arbitrary side effects** (mirrors BUILDING_FIRST_BEATS
+   `after:` used since 034). **Current 27 entries:**
    - 8 original (090): firstBirth, pop10/25/50/75/100, castleBuilt,
      firstRaidSurvived
    - 3 year milestones (092, migrated from enhancements.js): year2,
@@ -214,6 +230,27 @@ Numbered in rough order of file:
      ambiguity preserved). Tag: misc (reuse; mirrors 148).
      "The youngest in the realm speak of a bright shape in
      the fields. No one asks them to describe it."
+   - 1 frog-voices beat (166, post-moratorium surprise): once-
+     per-realm when `day ≥ 70 && (spring || summer)`. Third
+     ambient-entity acknowledgment (148/152/166 grammar);
+     **water-edge sound focal** (no other beat covers water-
+     edge or sound-based). Tag: misc. Static string: "There
+     are evenings after rain when the water-edges speak in two
+     voices. The realm does not name the things speaking."
+     14-tick gap from 152 honors 156's queue-drain warning.
+   - 1 first-frost beat (174, post-moratorium surprise): once-
+     per-realm when `year2 && autumn && day ≥ 45`. **Sibling
+     to 147 great-storm in seasonal placement** (both year-2+
+     autumn) but PRESENT-tense observation rather than past-
+     tense memory; 174's `day ≥ 45` gate gives 147 a 2-day
+     head start so beats land on different chronicle mornings
+     within the same season. Year-2-aware: realm has lived
+     through one full cycle and now RECOGNIZES the seasonal
+     change. Tag: misc. Static string: "There is a morning
+     when frost finds the fields and does not leave by noon.
+     The realm marks the year by it now." Different family
+     from ambient-entity grammar — seasonal/weather
+     recognition.
 6. **Happiness-threshold beats** (071, recurring with hysteresis,
    `milestone`) — peak ≥80 / crisis ≤20, mid-range 35-65 resets
    flags so cycling works. Kept inline in 090 refactor (re-fire
@@ -597,23 +634,28 @@ beats that sum near 57 by themselves. 088's first-snow adds
   cold season see the shepherd's song; those that don't never
   do. Peak cadence is still well under 300 cap. 137/139/140
   (audio, savedAt, tokens) don't add chronicle entries.
-- **155 (this update): target revised to ~141-182.** +4
-  conditional beats since 141:
-  - 142 distant-letter (firstMarket + day ≥ 60): +1 per
-    realm that builds a market before day 60 (most do).
-  - 147 great-storm (year2 + autumn): +1 per realm surviving
-    into year 2, which reaches autumn (most long-lived).
-  - 148 wanderer (day ≥ 50): +1 per realm surviving to day 50
-    (essentially universal for any non-failed realm).
-  - 152 night-shape (day ≥ 60 + firstBirth): +1 per realm
-    with any birth by day 60 (essentially universal in
-    normal play — births start day 10-30).
-  Expected +3-4 new beats per long-lived realm, peak cadence
-  still well under 300 cap. 144 (after callback) adds no new
-  chronicle entries — it renames a citizen, which doesn't
-  write. 151 (constellation visual) adds no chronicle. 149/150/
-  153/154 (audio, type-scale, fire-rate swap, review) don't
-  add chronicle entries.
+- **155: target revised to ~141-182.** +4 conditional beats
+  since 141: 142 distant-letter / 147 great-storm / 148
+  wanderer / 152 night-shape. Expected +3-4 new beats per
+  long-lived realm, still well under 300 cap.
+- **177 (this update): target revised to ~143-184.** +2
+  conditional beats since 155:
+  - 166 frog-voices (day ≥ 70 + spring/summer): +1 per realm
+    surviving into year 1's spring or summer past day 70.
+    Year 1 covers days 1-28; year 2 covers 29-56 (spring 29-
+    35, summer 36-42); first year-2 spring already past day
+    70 won't fit (year-2 summer ends at day 42). So this
+    actually fires year 3+ spring/summer (day 71-77 or 78-84
+    in year 3+). **Most realms reach year 3** — fires for
+    long-lived realms only.
+  - 174 first-frost (year2 + autumn + day ≥ 45): +1 per
+    realm reaching year 2 autumn day 45+ (essentially day
+    45-49 in year 2's autumn, then year 3+ autumn). **Most
+    long-lived realms** see this.
+  Expected +1-2 new beats per realm reaching year 2-3+,
+  cadence still under 300 cap. 156-176 ticks added no other
+  chronicle writers (Phase A SVG sprites, 3D meshes, audio
+  axis halt, refactors all chronicle-silent).
 
 ## how to update this doc
 
@@ -756,9 +798,53 @@ shipping, touch this file too.
   verification (9 cues, 0 auditions). No code change;
   recommends halting new audio cues until 149's audition
   ships.
-- **155** — this maintenance update. Captures 142-152 in
+- **155** — maintenance update. Captures 142-152 in
   the NARRATIVE_BEATS entry list (21→25) + schema
   evolution (added `after` field per 144) + cadence
   summary (~137-178 → ~141-182) + ambient-entity
   grammar invariant + founder-arc moratorium status +
   related-loops.
+- **156** — refactor-only. Ambient-entity grammar
+  template comment in story.js anchors the 148/152
+  pattern at the authoring site (sibling to 155's
+  invariant in this doc). FINAL moratorium tick.
+- **157** — meta. Moratorium check-in: scorecard 3/≥3
+  HIT. Soft-cap policy replaces hard rule: new founder
+  surfaces must close a long-open idea or resolve a
+  structural gap, not just "add flavor."
+- **161-170** — SVG / 3D render axis opens per user
+  steering 2026-04-28. 5 SVG sprites (granary 161,
+  castle 162, church 164, windmill 168, tower 170)
+  + 2 3D meshes (granary 163, windmill 167) + render-
+  layers.md doc (165). No new chronicle beats.
+- **166** — surprise (post-moratorium): 3rd ambient-
+  entity acknowledgment beat (`frog_voices_heard`).
+  Water-edge sound focal; spring/summer evenings.
+  14-tick spacing from 152 honors 156's queue-drain
+  warning. **Note: gate `day ≥ 70 && spring/summer`
+  fires year 3+ in practice** — narrow window, may
+  warrant a fixer to lower the day-gate.
+- **171/172** — strategic decision + render-layers.md
+  doc anchor (3-phase plan: Phase A complete sprite
+  roster → Phase B integration sprint → Phase C
+  animation). 3D engine declared standalone; .glb
+  meshes "loop does not touch."
+- **173-176** — Phase A continues: house (173),
+  tavern (175), blacksmith (176). 3 of 5 Phase A
+  sprites shipped. Non-graphics interleave: 174
+  surprise (this beat).
+- **174** — surprise (Phase A interleave):
+  `first_frost_marked`. Sibling to 147 great-storm
+  in seasonal placement (year-2+ autumn) but
+  PRESENT-tense observation rather than past-tense
+  memory. Day ≥ 45 gate gives 147 a 2-day head
+  start.
+- **177 (this update)** — maintenance update.
+  Captures 156-176 in the doc. NARRATIVE_BEATS
+  entry list 25→27 (frog 166 + frost 174).
+  Cadence summary ~141-182 → ~143-184 (+2
+  conditional beats, year-3+ realms see frog;
+  year-2+ autumn realms see frost). Sources
+  paragraph extended through 177. Filed: fixer
+  to lower 166's day-gate from 70 to ~30-40 so
+  more realms see it.
