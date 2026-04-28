@@ -564,6 +564,20 @@ const NARRATIVE_BEATS = [
       ];
       return variants[_dreamHash(`${kname}_weather`) % variants.length];
     } },
+  // Loop 184 (surprise, un-filed): the stone is forgotten. FOURTH beat
+  // on 056's standing stone arc, closing the cycle: 056 discovery →
+  // 079 offering → 122 weathering → 184 forgetting. The realm has lived
+  // long enough for an entire generation to grow up never having
+  // witnessed the discovery. Frame parallels 147 great-storm's
+  // "children born after do not believe it" — generational gap as
+  // narrative texture, not founder bookkeeping.
+  // Gate: year3 (day ≥ 57) + stone_found + citizensBorn ≥ 10 (enough
+  // generational turnover that 'youngest never heard the story' lands).
+  // Tag: stone (reuse; eviction-immune per 085). Static text — the
+  // forgetting is uniform, regardless of kingdom.
+  { flag: 'stone_forgotten', tag: 'stone',
+    trigger: G => G.storyFlags.year3 && G.storyFlags.stone_found && G.stats && G.stats.citizensBorn >= 10,
+    text: 'Years pass, and the standing stone goes unmentioned for whole seasons. The youngest in the realm have never heard the story of who found it.' },
   // Loop 121 (the-re-shipper, 090 filed 31 ticks): first-snow beat
   // migrated from inline block (088) into NARRATIVE_BEATS. Honors 112
   // audio-surfaces.md invariant ("migrate inline beats to table before
