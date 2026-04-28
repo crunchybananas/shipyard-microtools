@@ -391,6 +391,23 @@ const NARRATIVE_BEATS = [
   { flag: 'night_shape_seen', tag: 'misc',
     trigger: G => G.day >= 60 && G.storyFlags.firstBirth,
     text: 'There are nights when the youngest in the realm speak of a bright shape in the fields. No one asks them to describe it.' },
+  // Loop 166 (surprise, un-filed, post-moratorium): 3rd ambient-
+  // entity acknowledgment. enh.js Loop 32 frogs (visible at dusk/
+  // night at sand-tiles adjacent to water; croak stochastically;
+  // ~zero player-noticed because zoom ≥ 1.0 to render) get their
+  // first narrative surface. Different focal axis from 148 (day
+  // figure crossing) and 152 (night sight at fields): water-edge
+  // SOUND, paired with rain. "Two voices" reads as croaking + water
+  // lapping; or as something stranger — preserves the ambiguity.
+  // Static string; no "frog" word. Tag: misc (148/152 precedent).
+  // Gate: spring/summer (frogs are vocal in warm seasons) + day ≥
+  // 70 (realm settled mid-year-1). 14-tick gap from 152 honors
+  // 156's "space them out" warning against ambient-grammar queue-
+  // drain. Continues 156's filed candidate list (owls/frogs/rams/
+  // trade-ships/hawks).
+  { flag: 'frog_voices_heard', tag: 'misc',
+    trigger: G => G.day >= 70 && (G.season === 'spring' || G.season === 'summer'),
+    text: 'There are evenings after rain when the water-edges speak in two voices. The realm does not name the things speaking.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder
   // reference. Fires autumn of year 2+ (realm has lived long enough
