@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tavern sprite — Loop 175 (SVG axis, 7th sprite).
+  Phase A 2/5 per 171 strategic plan.
+  Sibling to render.js drawTavern canvas implementation.
+
+  ViewBox 0 0 128 128. Tavern centered at x=64; ground at y=104.
+  Light: upper-left.
+
+  CANONICAL VARIANT: classic gold sign board + mug emblem + warm
+  amber window glow. Canvas drawTavern picks 1 of 4 sign-color
+  palettes (gold/burgundy/navy/moss) × 4 emblems (mug/boar/crown/
+  anchor) via per-tavern hash — 16 variants. SVG ships the most-
+  common config; per-instance variation deferred to Phase B step 5.
+
+  Form: warm wood walls + side-wall depth + warm-amber pitched
+  roof + horizontal plank texture + projecting roof-top flag (051
+  silhouette-distinguishability fix) + side sign board with
+  bracket + chain + mug emblem + 2 glowing windows + warm hearth
+  glow leaking out the door + cobblestone path + hanging harvest
+  bundle by door + doorstep.
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Warm wood wall: amber upper, darker lower -->
+    <linearGradient id="tavernWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c89858"/>
+      <stop offset="0.5" stop-color="#9a6a30"/>
+      <stop offset="1" stop-color="#684820"/>
+    </linearGradient>
+
+    <!-- Side wall (depth shadow) -->
+    <linearGradient id="tavernWallSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a07848"/>
+      <stop offset="1" stop-color="#5a3818"/>
+    </linearGradient>
+
+    <!-- Amber-gold roof -->
+    <linearGradient id="tavernRoof" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#e4b440"/>
+      <stop offset="0.6" stop-color="#a87820"/>
+      <stop offset="1" stop-color="#704c10"/>
+    </linearGradient>
+
+    <linearGradient id="tavernRoofShadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a87820"/>
+      <stop offset="1" stop-color="#5a3a08"/>
+    </linearGradient>
+
+    <!-- Sign board: classic gold variant -->
+    <linearGradient id="signBoard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dca830"/>
+      <stop offset="1" stop-color="#9a7018"/>
+    </linearGradient>
+
+    <!-- Window glow: warm amber -->
+    <radialGradient id="tavernWindow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,224,136,0.85)"/>
+      <stop offset="1" stop-color="rgba(255,224,136,0)"/>
+    </radialGradient>
+
+    <!-- Door hearth glow: warm orange -->
+    <radialGradient id="hearthGlow" cx="0.5" cy="0.6" r="0.5">
+      <stop offset="0" stop-color="rgba(255,150,30,0.55)"/>
+      <stop offset="0.6" stop-color="rgba(255,150,30,0.18)"/>
+      <stop offset="1" stop-color="rgba(255,150,30,0)"/>
+    </radialGradient>
+
+    <!-- Lower-wall warm spill -->
+    <linearGradient id="tavernSpill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,210,130,0)"/>
+      <stop offset="1" stop-color="rgba(255,200,120,0.22)"/>
+    </linearGradient>
+
+    <!-- Wood plank pattern -->
+    <pattern id="tavernPlanks" width="6" height="3" patternUnits="userSpaceOnUse">
+      <rect width="6" height="3" fill="transparent"/>
+      <line x1="0" y1="2.5" x2="6" y2="2.5" stroke="rgba(50,30,8,0.32)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="tavernShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.45)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow (extends slightly toward path) -->
+  <ellipse cx="68" cy="106" rx="26" ry="4.5" fill="url(#tavernShadow)"/>
+
+  <!-- ─── Cobblestone path leading to door ──────────────────────── -->
+  <g>
+    <ellipse cx="64" cy="103" rx="1.2" ry="0.6" fill="#8a8278"/>
+    <ellipse cx="61" cy="105" rx="1.0" ry="0.5" fill="#9a9088"/>
+    <ellipse cx="67" cy="105" rx="1.1" ry="0.55" fill="#807870"/>
+    <ellipse cx="59" cy="107" rx="0.9" ry="0.45" fill="#9a9088"/>
+    <ellipse cx="69" cy="107" rx="0.9" ry="0.45" fill="#8a8278"/>
+  </g>
+
+  <!-- ─── Side wall (right depth strip) ─────────────────────────── -->
+  <path d="M 74 84 L 78 87 L 78 100 L 74 100 Z" fill="url(#tavernWallSide)"/>
+
+  <!-- ─── Main walls ────────────────────────────────────────────── -->
+  <rect x="54" y="84" width="20" height="16" fill="url(#tavernWall)"/>
+  <rect x="54" y="84" width="20" height="16" fill="url(#tavernPlanks)" opacity="0.9"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="54" y1="84" x2="74" y2="84" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+
+  <!-- Half-timber vertical posts (3 across the front) -->
+  <g fill="rgba(50,30,8,0.45)">
+    <rect x="54.4" y="84" width="0.7" height="16"/>
+    <rect x="63.65" y="84" width="0.7" height="16"/>
+    <rect x="73.0" y="84" width="0.7" height="16"/>
+  </g>
+
+  <!-- Lower-wall warm spill -->
+  <rect x="54" y="92" width="20" height="8" fill="url(#tavernSpill)"/>
+
+  <!-- ─── Pitched amber roof ────────────────────────────────────── -->
+  <path d="M 51 84 L 64 74 L 77 84 Z" fill="url(#tavernRoof)"/>
+  <!-- Shadow side of roof -->
+  <path d="M 64 74 L 77 84 L 81 81 L 68 71 Z" fill="url(#tavernRoofShadow)"/>
+  <!-- Roof tile rows -->
+  <line x1="53" y1="82" x2="75" y2="82" stroke="rgba(50,30,8,0.3)" stroke-width="0.3"/>
+  <line x1="55" y1="80" x2="73" y2="80" stroke="rgba(50,30,8,0.3)" stroke-width="0.3"/>
+  <line x1="57" y1="78" x2="71" y2="78" stroke="rgba(50,30,8,0.3)" stroke-width="0.3"/>
+  <line x1="60" y1="76" x2="68" y2="76" stroke="rgba(50,30,8,0.3)" stroke-width="0.3"/>
+  <!-- Sunlit roof ridge -->
+  <line x1="51" y1="84" x2="64" y2="74" stroke="rgba(255,210,160,0.38)" stroke-width="0.6"/>
+
+  <!-- ─── Roof-top flag (051 silhouette-distinguishability) ─────── -->
+  <g>
+    <!-- Pole -->
+    <rect x="63.6" y="68" width="0.8" height="6" fill="#3a2818"/>
+    <!-- Flag -->
+    <rect x="64.4" y="68" width="5" height="2.5" fill="url(#signBoard)"/>
+    <!-- Top band accent -->
+    <rect x="64.4" y="68" width="5" height="0.5" fill="#fce080"/>
+    <!-- Outline -->
+    <rect x="64.4" y="68" width="5" height="2.5" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="0.3"/>
+  </g>
+
+  <!-- ─── Side sign board with bracket and chain ───────────────── -->
+  <g>
+    <!-- Bracket arm extending from wall -->
+    <rect x="52" y="88" width="2" height="6" fill="#5a3a18"/>
+    <!-- Horizontal bracket beam -->
+    <rect x="48" y="88" width="6" height="0.8" fill="#5a3a18"/>
+    <!-- Bracket flourish (small triangle) -->
+    <path d="M 48 88 L 49 86 L 50 88 Z" fill="#5a3a18"/>
+
+    <!-- Chain links between bracket beam and board (2 small ovals) -->
+    <ellipse cx="49.5" cy="89.5" rx="0.4" ry="0.3" fill="none" stroke="#3a2818" stroke-width="0.3"/>
+    <ellipse cx="49.5" cy="90.4" rx="0.4" ry="0.3" fill="none" stroke="#3a2818" stroke-width="0.3"/>
+
+    <!-- Sign board (gold) -->
+    <rect x="46" y="91" width="8" height="5" fill="url(#signBoard)"/>
+    <!-- Top accent band -->
+    <rect x="46.5" y="91.5" width="7" height="1" fill="#fce080"/>
+    <!-- Board outline -->
+    <rect x="46" y="91" width="8" height="5" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="0.3"/>
+    <!-- Mug emblem (canonical) -->
+    <g fill="#fce080">
+      <!-- Mug body -->
+      <rect x="48" y="93" width="2" height="2.3" />
+      <!-- Mug handle (open ring on right) -->
+      <path d="M 50 93.4 Q 51.2 93.7 51.2 94.2 Q 51.2 94.7 50 95.0"
+            fill="none" stroke="#fce080" stroke-width="0.6"/>
+      <!-- Foam top -->
+      <ellipse cx="49" cy="92.8" rx="1.1" ry="0.4" />
+    </g>
+  </g>
+
+  <!-- ─── Two glowing windows ───────────────────────────────────── -->
+  <g>
+    <!-- Left window halo + pane + mullion -->
+    <ellipse cx="59.5" cy="89.5" rx="3.5" ry="3" fill="url(#tavernWindow)"/>
+    <rect x="57.5" y="87.5" width="4" height="3" fill="#3a2810"/>
+    <rect x="57.8" y="87.8" width="3.4" height="2.4" fill="#ffe088"/>
+    <line x1="59.5" y1="87.5" x2="59.5" y2="90.5" stroke="rgba(60,40,20,0.6)" stroke-width="0.35"/>
+    <line x1="57.5" y1="89" x2="61.5" y2="89" stroke="rgba(60,40,20,0.6)" stroke-width="0.35"/>
+
+    <!-- Right window halo + pane + mullion -->
+    <ellipse cx="68.5" cy="89.5" rx="3.5" ry="3" fill="url(#tavernWindow)"/>
+    <rect x="66.5" y="87.5" width="4" height="3" fill="#3a2810"/>
+    <rect x="66.8" y="87.8" width="3.4" height="2.4" fill="#ffe088"/>
+    <line x1="68.5" y1="87.5" x2="68.5" y2="90.5" stroke="rgba(60,40,20,0.6)" stroke-width="0.35"/>
+    <line x1="66.5" y1="89" x2="70.5" y2="89" stroke="rgba(60,40,20,0.6)" stroke-width="0.35"/>
+  </g>
+
+  <!-- ─── Warm hearth glow leaking out the door area ───────────── -->
+  <ellipse cx="64" cy="98" rx="9" ry="5" fill="url(#hearthGlow)"/>
+
+  <!-- ─── Wooden tavern door ────────────────────────────────────── -->
+  <g>
+    <!-- Door inset shadow -->
+    <rect x="61" y="92" width="6" height="8" fill="#1a0e04"/>
+    <!-- Door planks -->
+    <rect x="61.3" y="92.3" width="5.4" height="7.4" fill="#3a2010"/>
+    <line x1="62.7" y1="92.3" x2="62.7" y2="99.7" stroke="rgba(0,0,0,0.4)" stroke-width="0.25"/>
+    <line x1="64" y1="92.3" x2="64" y2="99.7" stroke="rgba(0,0,0,0.4)" stroke-width="0.25"/>
+    <line x1="65.3" y1="92.3" x2="65.3" y2="99.7" stroke="rgba(0,0,0,0.4)" stroke-width="0.25"/>
+    <!-- Door frame -->
+    <rect x="61" y="92" width="6" height="8" fill="none" stroke="#7a4818" stroke-width="0.5"/>
+    <!-- Iron strap hinges (horizontal across door) -->
+    <rect x="61.3" y="93.5" width="5.4" height="0.5" fill="#1a0e04"/>
+    <rect x="61.3" y="98" width="5.4" height="0.5" fill="#1a0e04"/>
+    <!-- Door ring handle -->
+    <circle cx="65.3" cy="96" r="0.6" fill="#a07818"/>
+    <circle cx="65.3" cy="96" r="0.3" fill="#1a0e04"/>
+    <!-- Warm crack of light at door edges (door slightly ajar feel) -->
+    <line x1="61" y1="93" x2="61" y2="99" stroke="rgba(255,170,80,0.4)" stroke-width="0.25"/>
+  </g>
+
+  <!-- ─── Hanging harvest bundle (decoration by door) ───────────── -->
+  <g>
+    <!-- Hook + string from wall -->
+    <line x1="69" y1="92" x2="69" y2="93.5" stroke="#3a2818" stroke-width="0.3"/>
+    <!-- Bundle (sheaf shape) -->
+    <ellipse cx="69" cy="94.5" rx="1.4" ry="1.8" fill="#c89048"/>
+    <!-- Bundle texture (vertical strands) -->
+    <line x1="68.3" y1="93.2" x2="68.3" y2="96" stroke="rgba(80,50,16,0.5)" stroke-width="0.25"/>
+    <line x1="69" y1="93.0" x2="69" y2="96.2" stroke="rgba(80,50,16,0.5)" stroke-width="0.25"/>
+    <line x1="69.7" y1="93.2" x2="69.7" y2="96" stroke="rgba(80,50,16,0.5)" stroke-width="0.25"/>
+    <!-- Twine band -->
+    <line x1="68" y1="94.5" x2="70" y2="94.5" stroke="#7a5028" stroke-width="0.4"/>
+  </g>
+
+  <!-- Doorstep (wider stone slab) -->
+  <rect x="59" y="100" width="10" height="1.6" fill="rgba(50,42,34,0.6)"/>
+
+  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <g fill="rgba(255,240,200,0.32)">
+    <circle cx="42" cy="80" r="0.4"/>
+    <circle cx="86" cy="76" r="0.4"/>
+    <circle cx="58" cy="70" r="0.3"/>
+  </g>
+</svg>

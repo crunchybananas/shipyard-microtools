@@ -66,7 +66,8 @@ Keep it accurate or retire it.
   un-shipped
 - **Currently shipped:** granary (161, 172 LoC), castle (162, 270
   LoC), church (164, 196 LoC), windmill (168, 213 LoC), tower
-  (170, 188 LoC), house (173, 194 LoC) — 6 of 11 (Phase A: 1/5)
+  (170, 188 LoC), house (173, 194 LoC), tavern (175, 239 LoC) —
+  7 of 11 (Phase A: 2/5)
 
 ### Layer 3: 3D WebGL2 prototype (parallel)
 
@@ -154,7 +155,7 @@ tick 172:
 | barn         |   —    |     —      |    ✓      |
 | windmill     |   ✓    |    ✓ (168) |    ✓ (167)|
 | farm         |   ✓    |     —      |     —     |
-| tavern       |   ✓    |     —      |     —     |
+| tavern       |   ✓    |    ✓ (175) |     —     |
 | blacksmith   |   ✓    |     —      |     —     |
 | market       |   ✓    |     —      |     —     |
 | bakery       |   ✓    |     —      |     —     |
@@ -392,6 +393,21 @@ pipeline, these will need solving:
   CANONICAL variant (red tile + right chimney + single window).
   Per-instance variation deferred to Phase B integration step
   5. SVG layer coverage 5 → 6 of 11 (Phase A: 1 of 5).
+- **174** — first-frost beat (surprise; non-graphics variety
+  break in Phase A). Year-2+ autumn day ≥ 45; sibling to 147
+  great-storm pairs past-tense memory + present-tense
+  observation in same season.
+- **175** — Phase A 2/5. SVG tavern sprite ships (239 lines:
+  warm wood walls + half-timber posts + plank pattern + amber
+  pitched roof with ridge highlight + roof-top flag (051
+  silhouette-distinguishability fix) + side sign board with
+  bracket and chain + mug emblem + 2 glowing windows with
+  mullions + warm hearth glow leaking out door + cobblestone
+  path + hanging harvest bundle + iron strap hinges + door
+  ring handle + door slightly-ajar warm crack of light).
+  Canvas drawTavern picks 1 of 4 sign-color palettes × 4
+  emblems = 16 variants; SVG ships canonical gold + mug.
+  SVG layer 6 → 7 of 11 (Phase A: 2 of 5).
 
 ## how to update this doc
 

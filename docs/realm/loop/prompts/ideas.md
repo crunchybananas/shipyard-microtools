@@ -36,7 +36,11 @@ and note the promotion here.
 - 165 [code] — windmill across all three layers as next cross-axis triangle: 158-filed sail-tip caps in canvas + sibling SVG + sibling 3D mesh. Three ticks. [render.js + assets/sprites/ + 3d/3d.js]
 - 165 [meta] — strategic decision tick: SHOULD SVG sprites replace canvas drawX in live game, or coexist as fallback/photo-mode-only layer? Pair with 154-style skepticism + render-layers.md data. [journal] **DONE → 171** (3-phase plan: Phase A complete roster ~5 ticks → Phase B integration sprint ~3-5 ticks → Phase C animation polish ~2-3 ticks; 3D stays standalone)
 - 171 [code] **PHASE A** — 6th SVG sprite. Suggested order: house (simplest) / tavern / blacksmith / market / bakery / barracks. ~5 more ticks to reach 9-11/11 critical mass. [assets/sprites/] **PHASE A 1/5 → 173** (house, 194 lines, canonical red-tile/right-chimney/single-window variant; half-timber accents + smoke wisps + flowerbox + mullion window + iron studs)
-- 173 [code] **PHASE A 2/5** — 7th SVG sprite. Tavern next (most narrative weight, mayor character lives there). Or blacksmith / market / bakery / barracks. [assets/sprites/]
+- 173 [code] **PHASE A 2/5** — 7th SVG sprite. Tavern next (most narrative weight, mayor character lives there). Or blacksmith / market / bakery / barracks. [assets/sprites/] **PHASE A 2/5 → 175** (tavern, 239 lines, canonical gold sign + mug emblem; chain-suspended swinging board + cobble path + harvest bundle + hearth glow + slightly-ajar warm door)
+- 175 [code] **PHASE A 3/5** — 8th SVG sprite. Blacksmith (industrial contrast vs tavern warmth) or market / bakery / barracks. [assets/sprites/]
+- 175 [code] — variant tavern (CSS custom properties for sign palette + emblem swap, OR separate variant SVG files). Phase B step 5. [tavern.svg]
+- 175 [code] — animate sign board swing via `<animate transform>` rotation around bracket attachment. Phase C. [tavern.svg]
+- 175 [code] — 3D tavern mesh: walls box + roof pyramid + small box for sign + flag. Pairs with 173 house in cross-axis triangle. [3d/3d.js]
 - 174 [code] — frost-overlay rendering on farm/grass tiles when first_frost_marked + autumn day ≥ 45 + dawn phase. Subtle white pixel-dust on tile edges. ~15 LoC. [render.js]
 - 174 [code] — calendrical hook: `first_frost_marked` enables future "days since first frost" computation as realm-age signal. No mechanic effect yet; opens the option. [story.js]
 - 174 [code] — sibling first-thaw beat (spring of year 3+, present-tense). Inverse of first-frost; closes year-cycle awareness with both ends. ~15 LoC. [story.js]
