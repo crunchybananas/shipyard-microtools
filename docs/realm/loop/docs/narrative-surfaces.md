@@ -918,6 +918,13 @@ should respect:
     The "you" addresses the reader as if they were the
     realm's citizen. Distinct from imperative because the
     "you" is a SUBJECT, not the recipient of a command.
+  - *DIALOG-opening* (312 tacit_norms_known) — "'Don't
+    ask the well that.' A grandmother stops a child mid-
+    question." The opening is overheard quoted speech
+    voiced FROM WITHIN the realm — distinct from
+    imperative (which addresses an outside listener) and
+    second-person (which addresses the reader). Dialog
+    implies the narrator is one of many citizens nearby.
 
   **Why this is an invariant not just an observation:** the
   rule is now PRESCRIPTIVE. Prior practice would have framed
@@ -929,18 +936,22 @@ should respect:
   declarative form remain valid (most beats), but STRUCTURE-
   varied beats are explicitly called out.
 
-  **STRUCTURE-ANGLE coupling (prediction filed at 307):** all
-  3 confirming uses (301/305/307) ALSO surprise on ANGLE —
+  **STRUCTURE-ANGLE coupling (prediction filed at 307;
+  CONFIRMED at 4 of 4 uses by 312):** all 4 confirming uses
+  (301/305/307/312) ALSO surprise on ANGLE —
   301 + RITUAL-PERSISTENCE-WITHOUT-ORIGIN (forgetting shape
   4); 305 + EMERGENT-TRADITION (forgetting shape 5); 307 +
-  ANTICIPATORY-AGENCY (land-as-agent shape 6). Hypothesis:
-  non-declarative openings DEMAND fresh content because
-  stale angles collapse the prose (asking "why does X
-  happen" about a familiar angle reads as rhetorical filler).
-  Falsifiable: if a 4th structural surprise lands cleanly
-  with a STALE angle, the coupling is rejected. Until
-  falsified, STRUCTURE-vector ships should pair with fresh
-  ANGLE.
+  ANTICIPATORY-AGENCY (land-as-agent shape 6); 312 +
+  SOCIAL-NORMS (habituation-recognition shape 4).
+  Hypothesis: non-declarative openings DEMAND fresh content
+  because stale angles collapse the prose (asking "why does
+  X happen" about a familiar angle reads as rhetorical
+  filler). Falsifiable: if a 5th structural surprise lands
+  cleanly with a STALE angle, the coupling is rejected.
+  At 4 of 4 confirming uses the prediction is robust;
+  promote-to-rule could happen at 5+ uses or after explicit
+  falsification attempt. Until then: STRUCTURE-vector ships
+  pair with fresh ANGLE.
 
   **Authoring decision tree (combined with 276 + 298):**
   1. Does the prose surprise (203)?
@@ -1294,11 +1305,11 @@ prescriptive AND consistently applied.
       in a row") — awareness mediated through
       routine disruption.
     Per 276 invariant.
-  - *Habituation-recognition* (254/280/285):
+  - *Habituation-recognition* (254/280/285/312):
     the realm recognizes its own habits and
     rhythms (vs sustained-state-recognition's
-    EXTERNAL conditions). **3 shapes** spanning
-    3 domains:
+    EXTERNAL conditions). **4 shapes** spanning
+    4 domains:
     - 254 AUTOMATICITY ("the fire is set
       without thinking now") — action domain.
     - 280 RHYTHM-AWARENESS ("no one has named
@@ -1306,7 +1317,20 @@ prescriptive AND consistently applied.
       time domain.
     - 285 LANGUAGE-DRIFT ("would not know how
       to use it now") — linguistic domain.
-    Per 276 invariant.
+    - 312 SOCIAL-NORMS ("'Don't ask the well
+      that.' A grandmother stops a child
+      mid-question. The realm has rules no
+      one ever wrote down") — intergenerational
+      tacit-rule transmission. **4th
+      structural surprise**: DIALOG-OPENING
+      (after 301 question / 305 imperative /
+      307 second-person). The "shush" CARRIES
+      the rule WITHOUT articulating it; rule
+      exists, transmitted, never crystallized
+      into writing. **CONFIRMS 308 STRUCTURE-
+      ANGLE coupling** at 4 of 4 uses.
+    Per 308 STRUCTURAL-surprise invariant +
+    276 shape-axis invariant.
 
   **Beats explicitly OUTSIDE the cluster
   (different register, listed for awareness):**

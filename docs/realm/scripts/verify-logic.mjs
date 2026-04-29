@@ -405,6 +405,18 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 312 tacit_norms_known — SOCIAL-NORMS habituation-recognition (4th shape; 4th structural-DIALOG-opening)
+const tacitNormsFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  delete window.G.storyFlags.tacit_norms_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.tacit_norms_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('"Don\'t ask the well'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('312: tacit_norms_known fires year3', tacitNormsFire.fired, `text="${tacitNormsFire.text}…" tag=${tacitNormsFire.tag}`);
+
 // Test: 307 path_knows_routine_known — anticipatory-agency (6th land-as-agent; 3rd structural-second-person)
 const pathKnowsFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

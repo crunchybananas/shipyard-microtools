@@ -881,6 +881,33 @@ const NARRATIVE_BEATS = [
   { flag: 'path_knows_routine_known', tag: 'misc',
     trigger: G => G.storyFlags.year3,
     text: 'You walk down the path you have walked many times. The path knows where you are going before you do. The realm has no need to ask where.' },
+  // Loop 312 (surprise, un-filed, alternation after 311 fixer): SOCIAL-
+  // NORMS-DOMAIN extension of habituation-recognition sub-type per 276
+  // invariant + 4th STRUCTURAL surprise per 308 invariant 4-vector
+  // framework. 4th shape of habituation-recognition (sibling to 254
+  // AUTOMATICITY action / 280 RHYTHM-AWARENESS time / 285 LANGUAGE-
+  // DRIFT linguistic). NEW DOMAIN: SOCIAL-NORMS — habituation operating
+  // on intergenerational rule-transmission. The grandmother's shush
+  // CARRIES the rule WITHOUT articulating it; the realm has learned
+  // that some things are not asked. STRUCTURAL surprise: 4th beat to
+  // open with non-declarative form: DIALOG-OPENING (after 301 question /
+  // 305 imperative / 307 second-person). The opening quoted speech is
+  // VOICED FROM WITHIN THE REALM — distinct from imperative ("listen")
+  // which addresses an outside listener, and from second-person ("you")
+  // which addresses the reader. Dialog is OVERHEARD; it implies the
+  // narrator is one of many citizens who happen to be near. **TESTS the
+  // 308 STRUCTURE-ANGLE coupling prediction**: 4 of 4 STRUCTURAL
+  // surprises now ship WITH fresh ANGLE. Coupling CONFIRMED at 4 uses
+  // (next falsification opportunity is 5th structural). Lift line "no
+  // one ever wrote down" captures TACIT-COLLECTIVE-AUTHORSHIP: rules
+  // exist, are transmitted, but never crystallized into writing.
+  // Distinct from 305 EMERGENT-TRADITION (no decision was ever made);
+  // here decisions WERE made implicitly, just never recorded. Gate:
+  // year3 (need long-enough for "no one ever" to land + intergenerational
+  // scene needs older citizens). Once-per-realm; tag misc.
+  { flag: 'tacit_norms_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3,
+    text: '"Don\'t ask the well that." A grandmother stops a child mid-question. The realm has rules no one ever wrote down.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
