@@ -580,8 +580,21 @@ function fastForward(days) {
   const startDay = G.day;
   const targetDay = startDay + Math.floor(days);
   const origSpeed = G.speed;
-  G.speed = 60;  // each simTick advances 60 game-ticks
-  const maxIters = Math.ceil((days * G.dayLength) / G.speed) + 100;
+  // Loop 291 (the-fixer, 289 [code] filing): reduced fastForward G.speed
+  // from 60 to 12 so dayPhase windows are SAMPLED during the run.
+  // Root cause discovered at 291: simTick's inner for-loop calls
+  // updateTime() G.speed times, each adding G.speed to dayPhase. At
+  // G.speed=60 that's 60*60=3600 dayPhase per simTick = a full day per
+  // simTick. checkStoryBeats fires at end-of-simTick with dayPhase=0
+  // (just rolled over). dayPhase-window beats (266 summer-night > 0.75,
+  // 280 late-day > 0.6) silently never fired. With G.speed=12, dayPhase
+  // advances 12*12=144 per simTick (~25 simTicks per game-day);
+  // checkStoryBeats fires at fractions 0.2/0.4/0.6/0.8/1.0 each day,
+  // covering both 266's > 0.75 and 280's > 0.6 gates. ~25× more simTicks
+  // than 60-speed path but still ~25 simTicks/day = fast enough for
+  // verify/play scripts.
+  G.speed = 12;
+  const maxIters = Math.ceil(days * G.dayLength / (G.speed * G.speed)) * 2 + 100;
   let iters = 0;
   while (G.day < targetDay && iters < maxIters) {
     simTick();
