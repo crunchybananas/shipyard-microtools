@@ -236,6 +236,26 @@ const townhallMaxCount = await page.evaluate(async () => {
 });
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
+// Test: 264 — variant raid prose pools (260 [play] follow-on)
+const raidProse = await page.evaluate(async () => {
+  const enh = await import('./js/enhancements.js');
+  // Same outcome shape (victory: kills>0, no losses), different days → different prose
+  const day1 = enh._pickRaidProse(10, 5, 0, 12);
+  const day2 = enh._pickRaidProse(11, 5, 0, 12);
+  const day3 = enh._pickRaidProse(12, 5, 0, 12);
+  const day4 = enh._pickRaidProse(13, 5, 0, 12);
+  const distinct = new Set([day1, day2, day3, day4]).size;
+  // Razed: popAlive=0 always selects razed pool; spread across 4 days
+  const razed1 = enh._pickRaidProse(50, 0, 5, 0);
+  const razed2 = enh._pickRaidProse(51, 0, 5, 0);
+  const razedDistinct = razed1 !== razed2;
+  // Determinism: same inputs → same output
+  const det1 = enh._pickRaidProse(10, 5, 0, 12);
+  const deterministic = det1 === day1;
+  return { distinct, razedDistinct, deterministic, sample: day1.slice(0, 70) };
+});
+rec('264: raid prose pools — 4 days span ≥3 distinct prose for same outcome', raidProse.distinct >= 3, `distinct=${raidProse.distinct}/4 razedSpread=${raidProse.razedDistinct} deterministic=${raidProse.deterministic}`);
+
 // Test: 263 chronicle_self_known — meta-self-aware (chronicle.length ≥ 100)
 const chronicleSelfFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

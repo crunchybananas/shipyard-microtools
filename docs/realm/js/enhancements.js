@@ -4703,6 +4703,61 @@ import { notify as _notify036 } from './notifications.js';
 let _lastRaidDay = 0;
 let _raidKillsStart = 0;
 let _raidDiedStart = 0;
+
+// Loop 264 (the-fixer, 260 [play] follow-on): variant raid prose pools.
+// 260's [play] tick observed 60+ identical "village was razed" entries
+// in a long-lived realm — most monotonous chronicle prose in the corpus.
+// 260's chronicle-gate fixed the post-end repetition, but PRE-END realms
+// with many raids of the same OUTCOME SHAPE (e.g. 30 successful defenses)
+// still see one prose template. This expands each of the 5 outcome shapes
+// (razed / losses-only / mixed / victory / bloodless-withdraw) to 4
+// variants, picked deterministically by `day % pool.length` so saves
+// remain reproducible. First variant in each pool is the original prose
+// (preserves backward-compat for any test/save that relied on exact text).
+const _RAID_PROSE_POOLS = {
+  razed: [
+    (day) => `Raid on day ${day}: the village was razed. None remain to tell it.`,
+    (day) => `Raid on day ${day}: the realm fell silent. The fires went out one by one.`,
+    (day) => `Raid on day ${day}: the realm did not survive the night. There is no one left to bury the dead.`,
+    (day) => `Raid on day ${day}: the raiders left only smoke and stone.`,
+  ],
+  lossesOnly: [
+    (day, _k, l) => `Raid on day ${day}: ${l} fell, no foe answered. The survivors bury their own.`,
+    (day, _k, l) => `Raid on day ${day}: ${l} lost; no raider met their end. The realm grieves without retort.`,
+    (day, _k, l) => `Raid on day ${day}: the raiders took ${l} and left without a scratch. The graves are dug at dusk.`,
+    (day, _k, l) => `Raid on day ${day}: ${l} dead. The raiders escaped clean into the trees.`,
+  ],
+  mixed: [
+    (day, k, l) => `Raid on day ${day} turned back at a cost: ${l} lost, ${k} foes slain.`,
+    (day, k, l) => `Raid on day ${day}: ${l} fell, but ${k} raiders did not return home.`,
+    (day, k, l) => `Raid on day ${day}: bought back at the price of ${l} — ${k} raiders on the field.`,
+    (day, k, l) => `Raid on day ${day}: ${l} of ours, ${k} of theirs. The cost was counted at dawn.`,
+  ],
+  victory: [
+    (day, k) => `Raid on day ${day} repelled — ${k} foes slain, none of ours lost.`,
+    (day, k) => `Raid on day ${day}: ${k} raiders cut down at the gate. The village slept untroubled.`,
+    (day, k) => `Raid on day ${day}: the raiders broke at first light. ${k} of them never made it home.`,
+    (day, k) => `Raid on day ${day}: ${k} foes ran into the realm's sword and stayed. We took no losses.`,
+  ],
+  bloodless: [
+    (day) => `Raid on day ${day}: the raiders withdrew before either side struck a blow.`,
+    (day) => `Raid on day ${day}: the raiders thought better of it and slipped back into the trees.`,
+    (day) => `Raid on day ${day}: a raid that found nothing. The watch held its breath all night.`,
+    (day) => `Raid on day ${day}: the raiders came and the raiders went. Not a blade was drawn.`,
+  ],
+};
+// Pure function (testable): given outcome state, return the chosen variant.
+export function _pickRaidProse(day, kills, losses, popAlive) {
+  let pool;
+  if (popAlive === 0) pool = _RAID_PROSE_POOLS.razed;
+  else if (losses > 0 && kills === 0) pool = _RAID_PROSE_POOLS.lossesOnly;
+  else if (losses > 0 && kills > 0) pool = _RAID_PROSE_POOLS.mixed;
+  else if (kills > 0) pool = _RAID_PROSE_POOLS.victory;
+  else pool = _RAID_PROSE_POOLS.bloodless;
+  const idx = ((day % pool.length) + pool.length) % pool.length;  // safe modulo
+  return pool[idx](day, kills, losses);
+}
+
 function updateRaidChronicle() {
   if (!G.stats) return;
   if (G.enemies.length > 0 && _lastRaidDay !== G.day) {
@@ -4722,18 +4777,7 @@ function updateRaidChronicle() {
       const kills = (G.stats.enemiesKilled || 0) - _raidKillsStart;
       const losses = (G.stats.citizensDied || 0) - _raidDiedStart;
       const popAlive = G.citizens.length;
-      let msg;
-      if (popAlive === 0) {
-        msg = `Raid on day ${_lastRaidDay}: the village was razed. None remain to tell it.`;
-      } else if (losses > 0 && kills === 0) {
-        msg = `Raid on day ${_lastRaidDay}: ${losses} fell, no foe answered. The survivors bury their own.`;
-      } else if (losses > 0 && kills > 0) {
-        msg = `Raid on day ${_lastRaidDay} turned back at a cost: ${losses} lost, ${kills} foes slain.`;
-      } else if (kills > 0) {
-        msg = `Raid on day ${_lastRaidDay} repelled — ${kills} foes slain, none of ours lost.`;
-      } else {
-        msg = `Raid on day ${_lastRaidDay}: the raiders withdrew before either side struck a blow.`;
-      }
+      const msg = _pickRaidProse(_lastRaidDay, kills, losses, popAlive);
       try { _chronicle124(msg, 'raid'); } catch(_e){}
       // Loop 036: also fire a danger toast with the same summary.
       // `chronicle: false` suppresses re-chronicling in notify since
