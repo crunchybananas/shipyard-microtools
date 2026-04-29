@@ -321,7 +321,11 @@ window.newGame = () => {
   G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
   G.lastResources = null;
   G.tileWear = null;
-  G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0 };
+  // Loop 302 (the-fixer, 271 [code] follow-on audit): added scenariosWon
+  // to G.stats reset. Pre-302, newGame omitted scenariosWon → main.js:531
+  // would TypeError on `G.stats.scenariosWon.includes(...)` if a player
+  // restarted mid-scenario. Mirrors state.js initial G.stats schema (155).
+  G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0, scenariosWon:[] };
   // Loop 269 (the-fixer, 268 HIGH+MEDIUM): reset realm-end flag and
   // sustained-state trackers. Without these, a player whose realm fell
   // and clicked "New Game" inherited realmEnded=true (chronicle gated +
@@ -339,6 +343,14 @@ window.newGame = () => {
   // hook + ensureMayor()), and same for the other 5 ensure-character
   // hooks tied to building first-builds.
   G.namedCharacters = {};
+  // Loop 302 (the-fixer, 271 [code] follow-on audit): reset other leaky
+  // _underscore-prefixed fields that were missed in 269/271 sweep.
+  // _undoStack / _buildRipples / birds / _raidWarningGiven are all
+  // realm-scoped runtime state that should NOT carry across newGame().
+  G._undoStack = [];
+  G._buildRipples = [];
+  G.birds = [];
+  G._raidWarningGiven = false;
   generateWorld();
   if (gl3dReady) buildTerrainMesh(); // rebuild 3D mesh for new world
   renderBuildBar(); renderMissions(); updateUI();

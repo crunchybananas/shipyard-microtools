@@ -194,6 +194,12 @@ const newGameReset = await page.evaluate(async () => {
   window.G.lastDeathDay = 50;
   window.G.lastUnderpopDay = 40;
   window.G.namedCharacters = { mayor: { name: 'Stale Mayor' }, bard: { name: 'Stale Bard' } };
+  // 302: seed fields that 271 [code] follow-on audit found leaky
+  window.G._undoStack = [{ b: 'stale' }];
+  window.G._buildRipples = [{ x: 1, y: 1 }];
+  window.G.birds = [{ x: 1, y: 1 }];
+  window.G._raidWarningGiven = true;
+  window.G.stats = { ...window.G.stats, scenariosWon: undefined };
   if (typeof window.newGame !== 'function') return { ok: false, reason: 'no window.newGame' };
   window.newGame();
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -205,6 +211,11 @@ const newGameReset = await page.evaluate(async () => {
     lastUnderpopDay: window.G.lastUnderpopDay,
     namedCharCount: Object.keys(window.G.namedCharacters || {}).length,
     filter: document.getElementById('game').style.filter || '',
+    undoStackLen: (window.G._undoStack || []).length,
+    buildRipplesLen: (window.G._buildRipples || []).length,
+    birdsLen: (window.G.birds || []).length,
+    raidWarningGiven: window.G._raidWarningGiven,
+    scenariosWonIsArray: Array.isArray(window.G.stats?.scenariosWon),
   };
 });
 const reset = newGameReset.realmEnded === false &&
@@ -212,8 +223,13 @@ const reset = newGameReset.realmEnded === false &&
               newGameReset.lastDeathDay === undefined &&
               newGameReset.lastUnderpopDay === undefined &&
               newGameReset.namedCharCount === 0 &&
-              newGameReset.filter === '';
-rec('269+271: newGame() resets realmEnded + trackers + namedCharacters + clears filter', reset, JSON.stringify(newGameReset));
+              newGameReset.filter === '' &&
+              newGameReset.undoStackLen === 0 &&
+              newGameReset.buildRipplesLen === 0 &&
+              newGameReset.birdsLen === 0 &&
+              newGameReset.raidWarningGiven === false &&
+              newGameReset.scenariosWonIsArray === true;
+rec('269+271+302: newGame() resets all leaky fields (realmEnded + trackers + namedCharacters + filter + _undoStack + _buildRipples + birds + _raidWarningGiven + scenariosWon)', reset, JSON.stringify(newGameReset));
 
 // Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
 const realmEndFilter = await page.evaluate(async () => {
