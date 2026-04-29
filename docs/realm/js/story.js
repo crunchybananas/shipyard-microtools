@@ -829,6 +829,28 @@ const NARRATIVE_BEATS = [
   { flag: 'wagon_track_known', tag: 'misc',
     trigger: G => G.storyFlags.year3,
     text: 'There is a wagon-track on the eastern road that no one has ever bothered to fill in, even though everyone curses it. The cursing is part of going down that road. Filling it would be missed.' },
+  // Loop 305 (surprise, un-filed, alternation after 304 review):
+  // EMERGENT-TRADITION shape-extension per 276 invariant + 2nd
+  // STRUCTURAL surprise per 301 4-vector framework. 5th shape of
+  // forgetting sub-type (sibling to 184/190/292/301). NEW ANGLE:
+  // TRADITION-ORIGIN-NEVER-DECIDED — distinct from 301
+  // RITUAL-PERSISTENCE-WITHOUT-ORIGIN ("first ringing forgotten")
+  // because here the origin NEVER EXISTED as a decision; the practice
+  // emerged COLLECTIVELY, with no first-instance to forget. STRUCTURAL
+  // surprise: 2nd beat to open with non-declarative prose form
+  // (imperative "Listen..." vs 301's question-opening). Per 301
+  // [process] 4-vector framework: REGISTER (cluster) / ANGLE
+  // (5th forgetting shape) / TAG (misc) / STRUCTURE (imperative
+  // opening) — 305 varies on STRUCTURE as primary surprise. The lift
+  // line "the realm always knows" captures EMERGENT-COLLECTIVE-
+  // KNOWLEDGE: no one decided, but somehow everyone agrees. This is
+  // how culture forms in the absence of authority. Forgetting sub-
+  // type now at 5 shapes — ties land-as-agent (5) as joint-leading
+  // sub-type. Gate: church + year3 (need both bell-host + long-enough
+  // for "always knows" to land). Once-per-realm; tag misc.
+  { flag: 'silent_morning_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    text: 'Listen for the bell on the day the bell does not ring. Once a year the church keeps a silent morning. No one has ever decided which morning; the realm always knows.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

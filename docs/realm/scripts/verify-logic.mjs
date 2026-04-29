@@ -401,6 +401,22 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 305 silent_morning_known — emergent-tradition (5th forgetting shape; 2nd structural-imperative)
+const silentMorningFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'church')) {
+    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  }
+  delete window.G.storyFlags.silent_morning_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.silent_morning_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('Listen for the bell'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('305: silent_morning_known fires year3 + church', silentMorningFire.fired, `text="${silentMorningFire.text}…" tag=${silentMorningFire.tag}`);
+
 // Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
 const wagonTrackFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

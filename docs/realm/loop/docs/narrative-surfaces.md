@@ -1098,30 +1098,32 @@ prescriptive AND consistently applied.
     weather NOT arriving. Lift "is given the
     night intact" acknowledges passive grace.
     Per 276 invariant.
-  - *Forgetting* (184/190/292/301): closure
-    of a long-lived object's or practice's
-    KNOWLEDGE. **4 shapes** spanning loss
-    vs persistence:
-    - 184 stone_forgotten — OBJECT WEATHERED
-      (stone fades; name lost with thing).
+  - *Forgetting* (184/190/292/301/305):
+    closure of a long-lived object's or
+    practice's KNOWLEDGE. **5 shapes**
+    spanning loss / persistence /
+    emergence:
+    - 184 stone_forgotten — OBJECT WEATHERED.
     - 190 constellation_forgotten — PATTERN
-      UNNAMED (current generation doesn't
-      know what elders did).
+      UNNAMED.
     - 292 bakery_door_carving_known —
-      ARTIFACT-PRESERVED-MEANING-LOST
-      (object persists, meaning gone, no
-      one removes it).
+      ARTIFACT-PRESERVED-MEANING-LOST.
     - 301 noon_bell_origin_known — RITUAL-
-      PERSISTENCE-WITHOUT-ORIGIN ("Why is
-      the church bell rung at noon and not
-      at any other hour?... The first
-      ringing was forgotten before the
-      second was held"). PRACTICE preserved,
-      origin lost, custom continued without
-      remembering why. **First beat in the
-      corpus to open with a QUESTION** —
-      structural prose surprise.
-    Per 276 invariant.
+      PERSISTENCE-WITHOUT-ORIGIN. First
+      QUESTION-opening beat.
+    - 305 silent_morning_known — EMERGENT-
+      TRADITION ("Listen for the bell on
+      the day the bell does not ring...
+      No one has ever decided which morning;
+      the realm always knows"). Practice
+      emerged COLLECTIVELY with no first-
+      instance to forget; ORIGIN NEVER
+      EXISTED as a decision. **2nd structural
+      surprise**: imperative-opening (vs
+      301 question-opening). Per 301
+      [process] 4-vector framework.
+    5 shapes — joint-leading sub-type with
+    land-as-agent. Per 276 invariant.
   - *Naming-place* (193): the realm gives a
     place a colloquial name. Third member of
     the realm-environment naming triplet
