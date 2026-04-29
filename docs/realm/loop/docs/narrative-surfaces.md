@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -860,11 +860,16 @@ prescriptive AND consistently applied.
   for fortified realms. Introduces **sustained-state-recognition**
   as 7th sub-type of the observational-elder cluster (1 use;
   promote at 3+).
-- **Founder→dream cross-reference** (072 filed, partially closed
-  by 089). 089 wired founders into the nightmare pool; the dream
-  pool (039) and offering pool (079) still don't reference
-  founder names. 089-filed idea: weave founder-named images
-  into `founding`/`hearth`/`harvest` dream threads.
+- **~~Founder→dream cross-reference~~** (072 → 089 → 097 → 214).
+  Closed: 089 wired founders into the nightmare pool. 097 wove
+  founder1/2/3 conditional images into the founding/hearth/harvest
+  dream threads (closed 089's specific filing). 214 added a founder1-
+  conditional item to the offering pool (`a small piece of wood with
+  ${founder1}'s name carved into the grain`) — closes the broader
+  cross-reference scope (dream + offering pools both now reference
+  founders; nightmare pool already did via 089). All three founder-
+  hashed pools (dream / nightmare / offering) now cross-reference
+  the founder arc.
 - **Victory v2 in enhancements.js may duplicate `castleBuilt`** —
   needs a follow-up audit.
 - **Disaster events live in enhancements.js, not events.js** —

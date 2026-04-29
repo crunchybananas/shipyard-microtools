@@ -1540,9 +1540,27 @@ export function checkOfferingBeat() {
 
   setFlag('offering_made');
 
-  // Pick item from the pool
-  const idx = _dreamHash(`${kname}_offering_item`) % _OFFERING_ITEMS.length;
-  const item = _OFFERING_ITEMS[idx];
+  // Loop 214 (surprise, 089-broader filed): founder-conditional
+  // offering item. 097 wove founders into 3 dream threads
+  // (founding/hearth/harvest); offering pool stayed founder-blind.
+  // 213 skeptic flagged cluster monoculture in recent narrative
+  // ships (5 in 17 ticks all misc-tag observational-elder); 214
+  // diversifies by EXTENDING an existing non-cluster beat rather
+  // than adding a new cluster member. Tag stone (reuse per 075);
+  // anonymity preserved (founder1's name on the item, not as
+  // placer — "no one admits to placing it" still reads).
+  // Founder1 chosen for continuity with 097 (founder1 = fire-
+  // keeper / first ritualist); the offering at the stone is a
+  // continuation of ritual life. Once-per-realm — additive only,
+  // doesn't change existing realms' deterministic offerings if
+  // they fired pre-214.
+  const items = [..._OFFERING_ITEMS];
+  if (G.storyFlags.founders_named && G.storyFlags.founder1) {
+    items.push(`a small piece of wood with ${G.storyFlags.founder1}'s name carved into the grain, smooth from being held`);
+  }
+  // Pick item from the pool (now possibly 7-deep with founder variant)
+  const idx = _dreamHash(`${kname}_offering_item`) % items.length;
+  const item = items[idx];
 
   chronicle(
     `At dawn, ${item} was found at the standing stone. No one admits to placing it there.`,

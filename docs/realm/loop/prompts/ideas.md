@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 214 [code] — third use of "extend pool with conditional founder image" shape would promote to observed-pattern candidate. Currently 2 uses (097 dream-pool 3 threads + 214 offering pool). Future: weave founder reference into a third pool (distant-letter 142 / great-storm 147 / landmark-name 193). If 3+ accrete, document. [story.js / loop/docs/]
+- 214 [code] — additional founder-conditional offering items: founder2 or founder3 variants. Intentionally NOT shipped at 214 to avoid founder-count over-saturation. Earliest ~tick 220+ if cumulative founder counts remain balanced. [story.js]
+- 214 [process] — observation: 213 skeptic→214 fixer/surprise pairing is 4th such pair (154→155+156 / 195→196 / 213→214). Promote to observed-pattern at 5+. [process]
 - 213 [process] **HIGH** — narrative diversification queue: next 5-10 surprise ticks should sample non-misc tags (event/milestone/stone/dream/character) and non-observational-elder registers per 213 cluster-monoculture finding. Possible candidates: founder-conditional dream-pool fragment per 089 unfinished filing (tag: dream, pool-style not one-shot); year-2/3 transition tag:event beat; tag:character moment for smith/teacher/merchant (201/206/209 introduced silent mechanics — could give one literary moment). Lean 214 toward dream-pool. [story.js]
 - 213 [process] — verify-queue tracking: create `loop/docs/verify-queue.md` listing every chrome-unverified ship since ~180 (estimated 13+ code paths + ~22 visual artifacts as of 213). Update as ships land; work-list when chrome returns. Counters the silent-debt-compounding pattern. [loop/docs/]
 - 213 [doc] — when individual-interiority sub-type next ships (212 + 2 more for promotion), the META-frame "the realm does not see" should NOT repeat per 213 finding 2. Document as NEGATIVE authoring rule for the sub-type — keep citizen-focal angle WITHOUT chronicle-self-awareness. [loop/docs/]
