@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 327 new_road_known — single-axis surprise (3rd naming-place shape; CONTRADICTORY-NAMING-AS-INSIDER-DIRECTION)
+const newRoadFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 98;
+  delete window.G.storyFlags.new_road_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.new_road_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The new road is the oldest road'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('327: new_road_known fires year3 + d>=95', newRoadFire.fired, `text="${newRoadFire.text}…" tag=${newRoadFire.tag}`);
+
 // Test: 325 cold_corner_known — single-axis surprise (2nd naming-place shape; NAME-AS-MEASUREMENT angle)
 const coldCornerFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

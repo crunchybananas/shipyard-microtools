@@ -1102,6 +1102,35 @@ const NARRATIVE_BEATS = [
   { flag: 'cold_corner_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 90,
     text: 'There is a corner of the realm called the cold corner. Citizens say it of all weather. No one has ever measured it; the name has.' },
+  // Loop 327 (surprise, 325 [code] filing): SINGLE-AXIS surprise — 3rd
+  // naming-place shape per 276 invariant. Naming-place sub-type goes
+  // 2→3 shapes. NEW ANGLE: CONTRADICTORY-NAMING-AS-INSIDER-DIRECTION.
+  // The realm gives a place a name that becomes factually inverted
+  // over time (e.g. "the new road" is actually the oldest); the realm
+  // does NOT update the name; outsiders take the name at face value
+  // and walk the wrong way; insiders know the contradiction and
+  // navigate by it. The contradiction itself becomes a marker of
+  // insider knowledge.
+  // Distinct from prior naming-place shapes:
+  //  - 193 EMERGENT-NAMING — place gains name from nothing; no
+  //    decision; "it simply is"
+  //  - 325 NAME-AS-MEASUREMENT — name does the work of measurement
+  //    citizens skipped
+  //  - 327 NAMING-CONTRADICTION-AS-INSIDER-MARKER — name is
+  //    factually wrong + realm doesn't update it + the wrongness
+  //    itself functions as cultural-insider/outsider distinction.
+  // Distinct from 285 LANGUAGE-DRIFT (phrase mishearing) and
+  // 312 SOCIAL-NORMS (tacit rule-transmission) and 294 RESHAPED-
+  // BY-USE (church step worn — wear-as-insider-knowledge); 327 is
+  // about the linguistic contradiction itself functioning as
+  // cultural marker, not the wear/usage carrying knowledge.
+  // **Single-axis ship** (ANGLE-only); per 325 [process] axis-
+  // flexibility — multi-axial DEFAULTS but NOT REQUIRED. Gate:
+  // year3 + day>=95 (next-available year-only slot post-325 at
+  // d>=90, per 321 authoring guideline). Once-per-realm; tag misc.
+  { flag: 'new_road_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 95,
+    text: 'The new road is the oldest road in the realm. No one has ever proposed renaming it. Insiders know what is meant; outsiders point the wrong way.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

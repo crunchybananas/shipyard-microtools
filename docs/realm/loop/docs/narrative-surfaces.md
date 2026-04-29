@@ -1308,11 +1308,11 @@ prescriptive AND consistently applied.
     5 shapes — second-leading sub-type after
     307 promoted land-as-agent to 6. Per 276
     invariant.
-  - *Naming-place* (193/325): the realm gives
-    a place a colloquial name. Third member of
-    the realm-environment naming triplet
-    (sky 116 / object 056 / place 193).
-    **2 shapes** (post-saturation extension):
+  - *Naming-place* (193/325/327): the realm
+    gives a place a colloquial name. Third
+    member of the realm-environment naming
+    triplet (sky 116 / object 056 / place 193).
+    **3 shapes** (post-saturation extension):
     - 193 EMERGENT-NAMING ("There is now a
       place called X. No one decided this; it
       simply is.") — name appears without
@@ -1324,9 +1324,21 @@ prescriptive AND consistently applied.
       does the work of measurement; linguistic
       artifact carries verification citizens
       skipped.
-    Per 276 invariant. Single-axis surprise
-    ship at 325 — multi-axial DEFAULTS but
+    - 327 CONTRADICTORY-NAMING-AS-INSIDER-MARKER
+      ("The new road is the oldest road in
+      the realm... Insiders know what is
+      meant; outsiders point the wrong way.")
+      — name becomes factually inverted; the
+      realm doesn't update it; the wrongness
+      itself functions as insider/outsider
+      cultural marker.
+    Per 276 invariant. Single-axis surprises
+    at 325 + 327 — multi-axial DEFAULTS but
     NOT REQUIRED per 257 + 312-322 pattern.
+    Naming-place was the most-under-extended
+    sub-type at 1 shape since 193; ships
+    1→2→3 shapes in 2 ticks (325 + 327)
+    after 130-tick dormancy.
   - *Early-game-mood* (196/199/207/212): year-1
     moments of arrival, change, or familiarity.
     Anti-anxious continuity register
