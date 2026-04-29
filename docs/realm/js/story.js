@@ -1131,6 +1131,44 @@ const NARRATIVE_BEATS = [
   { flag: 'new_road_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 95,
     text: 'The new road is the oldest road in the realm. No one has ever proposed renaming it. Insiders know what is meant; outsiders point the wrong way.' },
+  // Loop 329 (surprise, un-filed): SINGLE-AXIS surprise — 4th
+  // individual-interiority shape per 276 invariant. Sub-type goes
+  // 3→4 shapes. NEW ANGLE: PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION.
+  // An anonymous citizen has expertise the realm has neither asked
+  // for nor been told about; the knowledge persists silently as a
+  // private morning practice. The knowing-without-display contrasts
+  // with the realm's typical externalization patterns.
+  // Distinct from prior individual-interiority shapes:
+  //  - 212 MID-ACTION ("settler breathes out. No one sees.") —
+  //    brief inner moment within action.
+  //  - 275 TOTALIZING ("the world ends at the eastern ridge as
+  //    far as they are concerned") — whole frame-of-reference.
+  //  - 277 INFERENCE-BY-ABSENCE ("their seat at the inn is
+  //    empty for the third evening in a row") — awareness
+  //    mediated through routine disruption.
+  //  - 329 PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION — hidden
+  //    expertise that nobody knows the citizen has, exercised
+  //    privately and recurrently. The naming-of-birds is not a
+  //    secret kept; it is a competence never offered.
+  // Distinct from 312 SOCIAL-NORMS (tacit-rule-transmission;
+  // collective + transmitted) because 329 is INDIVIDUAL +
+  // UNTRANSMITTED — the knowledge is real but never enters the
+  // realm's collective awareness. Distinct from 322 RECURRENCE
+  // (collective-self-recognition) because 329 is private, not
+  // collective. Distinct from 285 LANGUAGE-DRIFT (linguistic
+  // collective drift) because 329 is competence, not language.
+  // **Single-axis ship** (ANGLE-only); per 325/327 axis-flexibility.
+  // The lift "in the quiet before breakfast" anchors the privacy
+  // in a daily moment of ordinary stillness — captures recurrent
+  // unrecognized expertise as a daily fact of the realm.
+  // Individual-interiority sub-type 3→4 shapes; ALL 9 INSIDE
+  // sub-types now at 3+ shapes (cluster minimum still 3 — no
+  // change to floor). Gate: year3 + day>=100 per 321 authoring
+  // guideline (next-available year-only slot post-327 at d>=95).
+  // Once-per-realm; tag misc.
+  { flag: 'bird_namer_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 100,
+    text: 'There is a citizen who knows every bird in the realm by sound. No one has asked, and no one has been told. The knowing happens every morning, in the quiet before breakfast.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

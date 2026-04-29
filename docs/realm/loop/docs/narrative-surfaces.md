@@ -1385,10 +1385,9 @@ prescriptive AND consistently applied.
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
-  - *Individual-interiority* (212/275/277):
+  - *Individual-interiority* (212/275/277/329):
     focal is a single anonymous citizen rather
-    than the realm collective. **3 shapes**
-    (first sub-type to grow beyond binary):
+    than the realm collective. **4 shapes**:
     - 212 MID-ACTION ("settler... breathes
       out. No one sees.") — brief inner moment.
     - 275 TOTALIZING ("the world ends at the
@@ -1398,6 +1397,12 @@ prescriptive AND consistently applied.
       the inn is empty for the third evening
       in a row") — awareness mediated through
       routine disruption.
+    - 329 PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION
+      ("There is a citizen who knows every bird
+      in the realm by sound. No one has asked,
+      and no one has been told...") — hidden
+      expertise exercised privately and
+      recurrently; competence never offered.
     Per 276 invariant.
   - *Habituation-recognition* (254/280/285/312):
     the realm recognizes its own habits and

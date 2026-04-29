@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 329 bird_namer_known — single-axis surprise (4th individual-interiority shape; PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION)
+const birdNamerFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 105;
+  delete window.G.storyFlags.bird_namer_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.bird_namer_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a citizen who knows every bird'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('329: bird_namer_known fires year3 + d>=100', birdNamerFire.fired, `text="${birdNamerFire.text}…" tag=${birdNamerFire.tag}`);
+
 // Test: 327 new_road_known — single-axis surprise (3rd naming-place shape; CONTRADICTORY-NAMING-AS-INSIDER-DIRECTION)
 const newRoadFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
