@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -607,20 +607,24 @@ should respect:
   `G.population === 0 && G.day > 1`. Tag: `requiem`.
   Eviction-immune. No echo-eligible (no more dawns post-fall).
 - **Ambient-entity acknowledgment is a paired grammar** (148 +
-  152). Ambient entities with existing visual presence but no
-  narrative surface (wanderer: 048/061; ghost: 031; others
-  pending — owls/frogs/rams/trade-ships/hawks) may get a
-  1-beat acknowledgment each. Pattern: misc-tag, static string,
-  no variants (entity singularity), no "name" word that would
-  collapse ambiguity. Elder-silence register ("no one calls
-  them anything" / "no one asks them to describe it"). Gate
-  on timing or prerequisite that makes the sighting plausible
-  (wanderer: day ≥ 50; night-shape: day ≥ 60 + firstBirth).
-  Does NOT contribute to founder arc bookkeeping — useful
-  during/after the 146 founder-moratorium to diversify focal
-  points. Rule: if the entity already has a kingdom name or a
-  player interaction, use a different pattern (it's no longer
-  ambient).
+  152 + 166; 3 uses meets promotion threshold). Ambient
+  entities with existing visual presence but no narrative
+  surface (wanderer: 048/061 → 148; ghost/night-shape: 031 →
+  152; frogs: → 166) may get a 1-beat acknowledgment each.
+  Pattern: misc-tag, static string, no variants (entity
+  singularity), no "name" word that would collapse ambiguity.
+  Elder-silence register ("no one calls them anything" / "no
+  one asks them to describe it"). Gate on timing or
+  prerequisite that makes the sighting plausible (wanderer:
+  day ≥ 50; night-shape: day ≥ 60 + firstBirth; frog: day ≥
+  35 + spring/summer). Does NOT contribute to founder arc
+  bookkeeping — useful during/after the 146 founder-
+  moratorium to diversify focal points. Rule: if the entity
+  already has a kingdom name or a player interaction, use a
+  different pattern (it's no longer ambient). Filed
+  candidates for additional uses: owls / rams / trade-ships /
+  hawks. Now also a sub-type of the broader observational-
+  elder register cluster (see `## observed patterns`).
 - **144 schema: `after: (G) => void` for NARRATIVE_BEATS
   entries.** Mirrors BUILDING_FIRST_BEATS `after:` (used since
   034 for named-character intros). Dispatch loop runs
@@ -855,37 +859,46 @@ prescriptive AND consistently applied.
   `realm_fell` beat with `requiem` tag (new 15th tag). Castle-
   falls and realm-forgotten variants still filed as follow-ups.
 - **~~Named-character mechanics partially landed~~** (050 →
-  101/102/105/153). Closed: 3 of 6 graduated. Teacher +10%
-  research (101), merchant +5% trade (102), smith +5% fire-
-  rate (105 shipped as damage, 153 swapped to fire-rate per
-  120 audit finding that integer HP-rounding made the damage
-  axis marginal). Bard/mayor/rival still decoration. 154
-  the-skeptic flagged pursuing all 6 may exceed 120's 25%
-  cumulative-speedup budget; remaining 3 await deliberate
-  decision (pair each with a distinct game system to avoid
-  multiplicative stacking).
-- **Founder-weaving arc is 16 surfaces deep at 7/5/4 (fully
-  balanced)** (088 + 089 + 093×3 + 097 + 103 = founder1 7;
-  116 + 128 + 134 + 137 + 138 = founder2 5 via named-role
-  or spoken-name; 128 + 134 + 138 = founder3 4). **146 the-
-  contrarian argued the arc had become the loop's default
-  crutch** (75% of surprises 116-138 leaned founder-focal);
-  proposed 10-tick moratorium 147-156 on NEW founder
-  surfaces. Scorecard at 152 HITS target (3/≥3 non-founder
+  101/102/105/153/201/206/209). Closed: 5 of 6 graduated as
+  of 209. Teacher +10% research (101), merchant +5% trade
+  (102), smith +5% fire-rate (105 shipped as damage, 153
+  swapped to fire-rate per 120 audit finding that integer
+  HP-rounding made the damage axis marginal), bard +5
+  happiness baseline (201), rival +10% raid count (206) +
+  +5 gold per raider slain (209). Three mechanic shapes now
+  in the wild: multiplicative ×4 / additive baseline ×1 /
+  event-trigger reward ×1 (see `## observed patterns`
+  additive-baseline entry). 154's cumulative-speedup concern
+  was partially mitigated by 153's smith re-tune AND by
+  diversifying mechanic axes (research / trade / combat /
+  happiness / raid / gold), avoiding multiplicative stacking
+  within a single system. Mayor structural-unlock remains
+  filed as the 6th and last (~30-50 LoC larger scope).
+- **~~Founder-weaving arc + 146 founder-moratorium~~** (146 →
+  157). Closed: 16 surfaces deep at 7/5/4 (fully balanced)
+  pre-moratorium. 146 the-contrarian argued the arc had
+  become the loop's default crutch (75% of surprises 116-138
+  leaned founder-focal); proposed 10-tick moratorium 147-156.
+  Scorecard at 157 HIT all targets (3/≥3 non-founder
   surprises: 147 great-storm / 148 wanderer / 152 night-
   shape; ≥2 new focal points introduced; 0 founder-surface
-  increase). **157 check-in tick will close the moratorium.**
-  Going forward: new narrative ticks should continue
-  diversifying focal points (ambient-entity grammar, object-
-  focal beats, location-focal beats, weather) rather than
-  adding founder mentions.
+  increase). 157 check-in tick formally closed the moratorium.
+  POST-moratorium discipline (158-209) sustained: 174
+  frost / 184 stone-forgotten / 190 constellation-forgotten /
+  193 landmark-named / 196 long-evening / 199 cold-morning /
+  207 fields-know-realm — 7 non-founder surprises in 50+
+  ticks. 200 milestone confirmed Lira (founder1) saturation
+  fear from 100 letter did not materialize.
 - **Happiness beats not in NARRATIVE_BEATS** (090 filed) — their
   hysteresis-reset semantics don't fit the one-shot trigger
   model. Could be migrated with a `resetOn:` extension field.
-- **First-snow beat (088) not in NARRATIVE_BEATS** (090 filed) —
-  trivial to migrate; left inline as minimum-risk path on 090.
-- **Year milestones not in NARRATIVE_BEATS** (090/073 filed) —
-  enhancements.js:5086; would need cross-file table export.
+- **~~First-snow beat (088) not in NARRATIVE_BEATS~~** (090 →
+  121). Closed: first_snow_seen migrated to NARRATIVE_BEATS
+  table at story.js:615 as part of 121's audio-onFire arc.
+- **~~Year milestones not in NARRATIVE_BEATS~~** (090/073 →
+  092). Closed: year2/year3/year5 milestones migrated to
+  NARRATIVE_BEATS at story.js:289-293 with conditional
+  pluralization grammar fix.
 
 ## retired hypotheses (record for future ticks)
 
@@ -1336,17 +1349,30 @@ shipping, touch this file too.
   199 filed this; cluster size threshold met.
   Multiplicative-bonus count in additive-baseline entry
   updated 1+3 → 1+4 (caught up for 206 rival).
-- **209 (this update)** — the-fixer. Closes 206 filed
-  (3 ticks): rival's symmetric +reward arm — +5 gold per
-  raider slain when rival named (combat.js raider-death
-  handler at line 94+). Pairs with 206's difficulty bump
-  as **adversarial-AND-rewarding** symmetric design.
-  Rival is now the first character with TWO mechanic
-  sites (raid-spawn 206 + raider-death 209). Doc
-  invariant updated SAME tick per 204 [process]; rival
-  entry expanded to "+10% raid count + +5 gold per
-  raider slain". Observed-patterns additive-vs-
-  multiplicative entry now identifies a THIRD shape:
-  **event-trigger reward** (1 use, threshold 3+).
-  Three shapes now: 4 multiplicative + 1 additive +
-  1 event-trigger.
+- **209** — the-fixer. Closes 206 filed (3 ticks):
+  rival's symmetric +reward arm — +5 gold per raider slain
+  when rival named (combat.js raider-death handler at line
+  94+). Pairs with 206's difficulty bump as
+  **adversarial-AND-rewarding** symmetric design. Rival is
+  now the first character with TWO mechanic sites
+  (raid-spawn 206 + raider-death 209). Three mechanic shapes
+  now: 4 multiplicative + 1 additive + 1 event-trigger.
+- **210 (this update)** — the-archivist. 12-tick rhythm
+  sweep (198 last). Closes filings 202 [process] (promotion-
+  threshold audit) + 204 [process] (code-state drift audit) +
+  205 [doc] (known-gaps closure sweep). **Findings/fixes:**
+  (1) Ambient-entity paired-grammar invariant updated from
+  2-uses claim (148+152) to **3 uses (148+152+166)** —
+  meets 3+ threshold consistently; doc was lagging the 166
+  ship. Filed candidates list refined. (2) Known-gaps:
+  closed first-snow gap (090 → 121, story.js:615), closed
+  year-milestones gap (090/073 → 092, story.js:289-293),
+  closed founder-moratorium gap (146 → 157), updated named-
+  character mechanics gap from "3 of 6" to **5 of 6** with
+  three-shape taxonomy summary. (3) No other invariants
+  found at sub-threshold; the 144 `after:` schema is
+  infrastructure (not a literary pattern; 3+ rule doesn't
+  apply); end-of-realm-beats invariant is class-level (1
+  beat, but the property generalizes). 188 demotion at 203
+  remains the only active demotion. Status line adds 210.
+  Chronology stays through 210.
