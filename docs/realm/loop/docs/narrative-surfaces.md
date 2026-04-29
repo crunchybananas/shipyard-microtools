@@ -1084,6 +1084,134 @@ contrarian.
 Promote to invariants only when the rule is
 prescriptive AND consistently applied.
 
+- **Framework state at 330 (synthesis observation).**
+  At tick 330 the loop is at a documented saturation
+  moment. This entry consolidates the saturation
+  observations filed across 322-329 [process] for
+  reference at the 350 milestone-letter (20 ticks
+  away).
+
+  **NARRATIVE_BEATS inventory at 330**: 73 entries.
+
+  **INSIDE cluster** (9 sub-types, **33 shapes total**,
+  avg 3.7 shapes/sub-type, **all sub-types at 3+
+  shapes** since 327):
+  - Land-as-agent: 6 shapes (sole-leader since 307)
+  - Forgetting: 5 shapes
+  - Habituation-recognition: 4 shapes
+  - Weather-recognition: 4 shapes
+  - Ambient-entity-grammar: 4 shapes
+  - Early-game-mood: 4 shapes
+  - Individual-interiority: 4 shapes (post-329)
+  - Sustained-state-recognition: 3 shapes (most-
+    under-extended; next single-axis-extension
+    target)
+  - Naming-place: 3 shapes (recovered from 130-tick
+    dormancy at 1 shape via 325 + 327)
+
+  **OUTSIDE cluster** (7 registers, **emotional-tone
+  field saturated** on 2D valence × intensity plane,
+  per 322 [process]):
+  - META 263 (paradoxical)
+  - JOYFUL 296 (positive-active)
+  - WONDER 297 (curious-without-resolving)
+  - IRRITATION 303 (negative-domesticated)
+  - TERROR 314 (negative-acute)
+  - GRIEF 318 (negative-sustained)
+  - CONTENTMENT 322 (positive-passive)
+
+  **STRUCTURAL forms** (7 non-declarative openings;
+  315 sub-rule held at 7/7 confirming uses; CRAFT
+  FACT framing):
+  - QUESTION 301 / IMPERATIVE 305 / SECOND-PERSON 307
+  - DIALOG 312 / NEGATION 314 / FRAGMENT 318
+  - REPETITION 322
+
+  **Active doctrine** (8 invariants + 1 sub-rule;
+  doctrine in STABILITY phase since 315):
+  - 075 chronicle ordering
+  - 144 named-character mech
+  - 203 surprise primary driver
+  - 231 conservative-promotion
+  - 257 anti-completionism
+  - 276 shape-axis (INSIDE)
+  - 284 variant-pool
+  - 287 combination-rule
+  - 298 OUTSIDE-cluster
+  - 308 STRUCTURAL-surprise + 315 STRUCTURE-ANGLE
+    coupling sub-rule
+
+  **Doctrine-cadence phases** (per 323 [process]):
+  - Drought (pre-276 / 80 ticks no promotion)
+  - Expansion (276-298 / 4 invariants in 22 ticks
+    adding new axes)
+  - Deepening (308-315 / 1 invariant + 1 sub-rule
+    in 17 ticks refining STRUCTURE)
+  - **Stability (315-330 / 15 ticks no new
+    invariants)**
+
+  **Audit-yield trajectory** (per 309/316/323/328
+  [process]):
+  - [play] yield: 260 CRITICAL → 310 2× MEDIUM →
+    320 1 LOW → 326 0 (clean)
+  - Pessimist yield: 309 LOW (cluster) → 316 LOW
+    (legacy-load) → 323 LOW (rebuild-mutex) → 328
+    LOW (deferred-item)
+  - Both audit types trend toward zero actionable
+    yield as framework saturates.
+
+  **Authoring patterns at 330** (empirical, not
+  prescriptive):
+  - Multi-axial ships (314/318/322 triple-axis +
+    301/305/307/312 dual-axis) ARE the post-308
+    default when prose supports.
+  - Single-axis ships (325/327/329) are EQUALLY
+    valid when prose surprises on a single axis;
+    framework imposes no quota (per 257 + 325/327
+    axis-flexibility observations).
+  - 4-vector framework permits any combination;
+    the choice is per-prose, not per-tick.
+  - Day-offset gate-spreading (per 313 + 321) +
+    bidirectional mutex (per 319 + 324) +
+    everHadBuilding flag (per 311 + 317 + 319)
+    are mature ecosystem patterns.
+
+  **Verify-rig at 330**: 63 logic + 66 variants =
+  129 assertions. Mutex-validation pattern with 4
+  tests across 2 beat pairs. Test #50 (placeBuilding
+  flag-set) + #53 (loadGame backfill) +
+  #55/#59/#60 (mutex variants) form the
+  everHadBuilding ecosystem coverage.
+
+  **300 hopes scoreboard at 330** (50 ticks past 300):
+  - #1 5th invariant promotion: DONE at 308 (42
+    ticks early)
+  - #2 Audio halt lifts: STILL OPEN (170 ticks)
+  - #3 Phase F sprite: DONE at 306 (44 ticks early)
+  - #4 Shape-axis saturation gracefully: DONE
+    (cluster-uniformity at 3+ shapes per 327)
+  - #5 7th OUTSIDE register: DONE at 322 (28
+    ticks early)
+  - **4 of 5 hopes closed before 350**;
+    0 of 5 fears materialized.
+
+  **Why this synthesis matters**: the 350 milestone-
+  letter (20 ticks away) will score 300 hopes/fears,
+  identify surprises 300 couldn't predict, and state
+  hopes for 400. This synthesis front-runs the
+  inventory work so the 350 letter can focus on
+  scoring + retrospective + new-hope-formulation
+  rather than re-cataloging the realm's current
+  state.
+
+  **What this observation does NOT do**: introduce
+  any new invariant. Per 315 prediction "0-2 more
+  sub-rule refinements through 350" — at 330 the
+  count is 0 of 2; this archivist tick preserves
+  the prediction. Filed as observation; promotion
+  candidates remain in their existing [process]
+  filings for 350 letter evaluation.
+
 - **Object-arc closure (observation, not template).**
   Some long-lived focal objects have closed via a
   forgetting beat. These closures take **different
