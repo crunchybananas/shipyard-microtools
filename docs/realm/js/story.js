@@ -687,8 +687,11 @@ const NARRATIVE_BEATS = [
   // alive but its ORIGIN has become foreign. Year3+ gate ensures
   // enough accumulated culture for drift to be plausible. Once-
   // per-realm; tag misc; static universal prose.
+  // 313 (the-fixer, 309 [process] gate-spreading): added `G.day >= 60`
+  // — 3 days after year3 (d57) — to spread year3-only beats across
+  // d60-d75 instead of all firing same checkStoryBeats call at d57.
   { flag: 'phrase_misheard_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3,
+    trigger: G => G.storyFlags.year3 && G.day >= 60,
     text: 'There is a phrase the realm uses that began as a mishearing of something else. The mishearing has lasted longer than the original. The realm does not remember the original; it would not know how to use it now.' },
   // Loop 290 (surprise, un-filed, alternation after 289 [play]): SEA-BELL
   // beat. 4th use of land-as-agent sub-type (sibling to 207 broad-land /
@@ -784,8 +787,12 @@ const NARRATIVE_BEATS = [
   // multiple OUTSIDE beats coexist as separate observations. Gate:
   // year2 (settled enough for attention drift). Once-per-realm; tag
   // misc.
+  // 313 (the-fixer, 309 [process] gate-spreading): added `G.day >= 32`
+  // — 3 days after year2 (d29) — to break this beat from the year2
+  // transition cluster. Sole year2-ONLY beat, so a single offset is
+  // sufficient.
   { flag: 'unplaceable_sound_known', tag: 'misc',
-    trigger: G => G.storyFlags.year2,
+    trigger: G => G.storyFlags.year2 && G.day >= 32,
     text: 'There is sometimes a sound the realm cannot place — a creak, a far-off bell, a piece of song from across the water. The realm pretends not to listen, then listens anyway.' },
   // Loop 301 (surprise, un-filed, post-300 milestone): RITUAL-
   // PERSISTENCE-WITHOUT-ORIGIN shape-extension per 276 invariant.
@@ -826,8 +833,9 @@ const NARRATIVE_BEATS = [
   // standalone outside cluster with own register annotation. Gate:
   // year3 (need long-enough establishment for "no one has ever
   // bothered" to land). Once-per-realm; tag misc.
+  // 313 gate-spread: G.day >= 65 (8 days after year3 d57).
   { flag: 'wagon_track_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3,
+    trigger: G => G.storyFlags.year3 && G.day >= 65,
     text: 'There is a wagon-track on the eastern road that no one has ever bothered to fill in, even though everyone curses it. The cursing is part of going down that road. Filling it would be missed.' },
   // Loop 305 (surprise, un-filed, alternation after 304 review):
   // EMERGENT-TRADITION shape-extension per 276 invariant + 2nd
@@ -878,8 +886,9 @@ const NARRATIVE_BEATS = [
   // their paths already know. Land-as-agent now at 6 shapes —
   // sole leader (forgetting at 5). Gate: year3 (need long-enough
   // for "many times" to land). Once-per-realm; tag misc.
+  // 313 gate-spread: G.day >= 70 (13 days after year3 d57).
   { flag: 'path_knows_routine_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3,
+    trigger: G => G.storyFlags.year3 && G.day >= 70,
     text: 'You walk down the path you have walked many times. The path knows where you are going before you do. The realm has no need to ask where.' },
   // Loop 312 (surprise, un-filed, alternation after 311 fixer): SOCIAL-
   // NORMS-DOMAIN extension of habituation-recognition sub-type per 276
@@ -905,8 +914,10 @@ const NARRATIVE_BEATS = [
   // here decisions WERE made implicitly, just never recorded. Gate:
   // year3 (need long-enough for "no one ever" to land + intergenerational
   // scene needs older citizens). Once-per-realm; tag misc.
+  // 313 gate-spread: G.day >= 75 (18 days after year3 d57). Latest of
+  // the 4 year3-only beats; ships near the end of the y3 spread window.
   { flag: 'tacit_norms_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3,
+    trigger: G => G.storyFlags.year3 && G.day >= 75,
     text: '"Don\'t ask the well that." A grandmother stops a child mid-question. The realm has rules no one ever wrote down.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is

@@ -406,28 +406,32 @@ const chronicleSelfFire = await page.evaluate(async () => {
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
 // Test: 312 tacit_norms_known — SOCIAL-NORMS habituation-recognition (4th shape; 4th structural-DIALOG-opening)
+// 313: gate-spread requires G.day >= 75 (18 days after y3 d57).
 const tacitNormsFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 80;
   delete window.G.storyFlags.tacit_norms_known;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.tacit_norms_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('"Don\'t ask the well'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('312: tacit_norms_known fires year3', tacitNormsFire.fired, `text="${tacitNormsFire.text}…" tag=${tacitNormsFire.tag}`);
+rec('312: tacit_norms_known fires year3 + d>=75', tacitNormsFire.fired, `text="${tacitNormsFire.text}…" tag=${tacitNormsFire.tag}`);
 
 // Test: 307 path_knows_routine_known — anticipatory-agency (6th land-as-agent; 3rd structural-second-person)
+// 313: gate-spread requires G.day >= 70.
 const pathKnowsFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 75;
   delete window.G.storyFlags.path_knows_routine_known;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.path_knows_routine_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('You walk down the path'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('307: path_knows_routine_known fires year3', pathKnowsFire.fired, `text="${pathKnowsFire.text}…" tag=${pathKnowsFire.tag}`);
+rec('307: path_knows_routine_known fires year3 + d>=70', pathKnowsFire.fired, `text="${pathKnowsFire.text}…" tag=${pathKnowsFire.tag}`);
 
 // Test: 305 silent_morning_known — emergent-tradition (5th forgetting shape; 2nd structural-imperative)
 // 311: gate updated to `G.stats.everHadBuilding?.church` per 310 [code]; tests both
@@ -447,16 +451,18 @@ const silentMorningFire = await page.evaluate(async () => {
 rec('305+311: silent_morning_known fires year3 + everHadBuilding.church (church-destroyed realm)', silentMorningFire.fired, `text="${silentMorningFire.text}…" tag=${silentMorningFire.tag}`);
 
 // Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
+// 313: gate-spread requires G.day >= 65.
 const wagonTrackFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 70;
   delete window.G.storyFlags.wagon_track_known;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.wagon_track_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a wagon-track on the eastern road'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('303: wagon_track_known fires year3', wagonTrackFire.fired, `text="${wagonTrackFire.text}…" tag=${wagonTrackFire.tag}`);
+rec('303: wagon_track_known fires year3 + d>=65', wagonTrackFire.fired, `text="${wagonTrackFire.text}…" tag=${wagonTrackFire.tag}`);
 
 // Test: 301 noon_bell_origin_known — ritual-persistence-without-origin (4th forgetting shape)
 const noonBellFire = await page.evaluate(async () => {
@@ -548,16 +554,18 @@ const seaBellFire = await page.evaluate(async () => {
 rec('290: sea_bell_known fires year3 + church', seaBellFire.fired, `text="${seaBellFire.text}…" tag=${seaBellFire.tag}`);
 
 // Test: 285 phrase_misheard_known — language-drift (3rd habituation-recognition shape)
+// 313: gate-spread requires G.day >= 60.
 const phraseFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 65;
   delete window.G.storyFlags.phrase_misheard_known;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.phrase_misheard_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a phrase the realm uses'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('285: phrase_misheard_known fires year3', phraseFire.fired, `text="${phraseFire.text}…" tag=${phraseFire.tag}`);
+rec('285: phrase_misheard_known fires year3 + d>=60', phraseFire.fired, `text="${phraseFire.text}…" tag=${phraseFire.tag}`);
 
 // Test: 280 liminal_moment_known — rhythm-awareness (2nd habituation-recognition shape)
 const liminalFire = await page.evaluate(async () => {
