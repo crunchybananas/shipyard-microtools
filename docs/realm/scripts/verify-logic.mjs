@@ -385,6 +385,22 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 290 sea_bell_known — inheritance-vs-craft (4th land-as-agent shape)
+const seaBellFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'church')) {
+    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  }
+  delete window.G.storyFlags.sea_bell_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.sea_bell_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a bell at the church'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('290: sea_bell_known fires year3 + church', seaBellFire.fired, `text="${seaBellFire.text}…" tag=${seaBellFire.tag}`);
+
 // Test: 285 phrase_misheard_known — language-drift (3rd habituation-recognition shape)
 const phraseFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

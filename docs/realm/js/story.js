@@ -690,6 +690,27 @@ const NARRATIVE_BEATS = [
   { flag: 'phrase_misheard_known', tag: 'misc',
     trigger: G => G.storyFlags.year3,
     text: 'There is a phrase the realm uses that began as a mishearing of something else. The mishearing has lasted longer than the original. The realm does not remember the original; it would not know how to use it now.' },
+  // Loop 290 (surprise, un-filed, alternation after 289 [play]): SEA-BELL
+  // beat. 4th use of land-as-agent sub-type (sibling to 207 broad-land /
+  // 227 specific-object well / 229 relational hearth) — but shipped per
+  // 276 invariant because PROSE INTRODUCES NEW ANGLE: INHERITANCE-VS-CRAFT.
+  // Existing land-as-agent uses observe land/objects MADE BY OR
+  // BELONGING TO the realm. 290 introduces an OBJECT FROM ELSEWHERE
+  // (the bell pulled from the sea) that the realm INHERITED rather than
+  // made. The lift line "rings clearer than any bell the realm has cast"
+  // captures the comparison: the realm acknowledges its FOUND OBJECTS
+  // outshine its MADE OBJECTS. Cultural humility about craft. Distinct
+  // from 184 stone-forgotten (forgetting an object) and 116 constellation
+  // (naming a celestial); here the object's STORY is alive, the object
+  // is in active use, and the comparison is acknowledged. Land-as-agent
+  // sub-type now has 4 uses (3 made/own + 1 inherited). Per 276 +
+  // 257: ships because new INHERITANCE-VS-CRAFT angle, not because
+  // count needed advancing. Gate: church built + year3 (need both the
+  // bell-host building + temporal distance for "no one alive remembers
+  // the storm" to land). Once-per-realm; tag misc.
+  { flag: 'sea_bell_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    text: 'There is a bell at the church that is said to have been pulled from the sea. No one alive remembers the storm; everyone tells the story. The bell still rings clearer than any bell the realm has cast.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

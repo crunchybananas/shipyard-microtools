@@ -686,6 +686,10 @@ should respect:
     sub-type to grow 3 shapes** (after individual-
     interiority); the 3 shapes span 3 distinct DOMAINS
     of habituation (action / time / language).
+  - *Land-as-agent* (207/227/229/290): made/own → +
+    INHERITED-FROM-OUTSIDE. 290 introduces objects
+    the realm DID NOT MAKE but uses; cultural
+    humility about craft.
 
   **Why this is an invariant not just an observation:** the
   pattern is now PRESCRIPTIVE — it tells future authors that
@@ -1046,29 +1050,23 @@ prescriptive AND consistently applied.
     Anti-anxious continuity register
     counterbalancing the late-arc bias 195
     flagged.
-  - *Land-as-agent* (207/227/229): land/object/
-    relational-keeper has subjective voice.
-    Three agency-shapes shipped:
+  - *Land-as-agent* (207/227/229/290):
+    land/object/relational-keeper has subjective
+    voice. **4 shapes** (per 276 invariant):
     - 207 broad LAND collective — "the land
       has agreed to be lived in"
     - 227 specific OBJECT interiority — "water
-      felt every bucket lowered to it, and
-      remembers each one a long while"
+      felt every bucket lowered to it"
     - 229 RELATIONAL keeper — "the hearth
-      seems to know which names belong to
-      it... the fire keeps them the same way
-      it keeps wood"
-    **3 uses meets 3+ threshold; INTENTIONALLY
-    NOT PROMOTED** to standalone observed-pattern.
-    Per 231 contrarian: sub-types within a
-    cluster are variations of the unifying
-    register, not separate authorship templates.
-    Hoisting would duplicate the cluster
-    framing and fragment the doc's
-    single-place-to-look affordance. Per 213
-    skeptic finding 2: all three avoid
-    META-frame ("realm doesn't see"); pure
-    object/place interiority.
+      seems to know which names belong to it"
+    - 290 INHERITED OBJECT — "a bell at the
+      church... pulled from the sea... rings
+      clearer than any bell the realm has cast"
+    290 introduces INHERITANCE-VS-CRAFT shape:
+    object came from outside the realm,
+    predates it, and the realm acknowledges its
+    found-object outshines its made-objects.
+    Per 276 invariant.
   - *Sustained-state-recognition* (211/228/230):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.
