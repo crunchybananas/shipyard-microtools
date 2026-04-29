@@ -2581,7 +2581,12 @@ export function render() {
     const s = toScreen(p.tx, p.ty);
     // Skip particles whose screen-space position is outside the viewport
     // (toScreen returns world-space coords; add camera offset to get viewport coords)
-    const psx = (s.x - G.camera.x) * G.camera.zoom + logicalW / 2;
+    // Loop 274 (the-fixer, 273 [code]): include p.offsetX in the cull check.
+    // Particles like 267 shootingstar + 273 lightning use offsetX to position
+    // their visible rendered point off the base tile; without offsetX in the
+    // psx calculation, large-offsetX particles could be culled even when
+    // visible (or render off-screen even though cull thinks they're inside).
+    const psx = (s.x + (p.offsetX || 0) - G.camera.x) * G.camera.zoom + logicalW / 2;
     const psy = (s.y + (p.offsetY || 0) - G.camera.y) * G.camera.zoom + logicalH / 2;
     if (psx < -50 || psx > logicalW + 50 || psy < -50 || psy > logicalH + 50) continue;
     ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
