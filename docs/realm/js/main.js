@@ -622,9 +622,24 @@ function fastForward(days) {
 // path. Tracked variable avoids every-frame DOM writes (only flips on
 // state transition: live realm_fell OR save load with realmEnded=true).
 let _lastRealmEndedApplied = null;
+let _realmEndTransitionInstalled = false;
 function _applyRealmEndFilter() {
   if (G.realmEnded === _lastRealmEndedApplied) return;
   _lastRealmEndedApplied = G.realmEnded;
+  // Loop 299 (the-fixer, 261 [code] + 260 long-filed): install CSS
+  // transition once so the realm-end filter FADES rather than snaps.
+  // 1.5s ease — long enough for the realm-fall moment to feel
+  // ceremonial, short enough not to delay the player's visible
+  // acknowledgment that the realm has ended. Installed lazily on
+  // first flip so the postfx canvas (created by initPostFX) is
+  // available. Idempotent — installs only once even if the helper
+  // runs on every frame.
+  if (!_realmEndTransitionInstalled) {
+    _realmEndTransitionInstalled = true;
+    canvas.style.transition = 'filter 1.5s ease';
+    const post = document.getElementById('postfx');
+    if (post) post.style.transition = 'filter 1.5s ease';
+  }
   const filterStr = G.realmEnded ? 'grayscale(0.85) brightness(0.85)' : '';
   canvas.style.filter = filterStr;
   const post = document.getElementById('postfx');
