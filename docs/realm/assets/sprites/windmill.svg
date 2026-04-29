@@ -219,11 +219,26 @@
   <!-- Hub highlight -->
   <ellipse cx="62.7" cy="69.8" rx="0.7" ry="0.4" fill="rgba(255,240,200,0.6)"/>
 
-  <!-- ─── Subtle dust flecks ────────────────────────────────────── -->
+  <!-- ─── Subtle dust flecks — Loop 234 (Phase D): drifting motes
+       around the spinning sails. Each fleck has slight independent
+       drift via translate + opacity pulse. Staggered begin times so
+       the 4 flecks don't pulse together. -->
   <g fill="rgba(255,240,200,0.32)">
-    <circle cx="32" cy="70" r="0.5"/>
-    <circle cx="96" cy="73" r="0.5"/>
-    <circle cx="46" cy="56" r="0.4"/>
-    <circle cx="80" cy="58" r="0.4"/>
+    <circle cx="32" cy="70" r="0.5">
+      <animate attributeName="opacity" values="0.32; 0.55; 0.32" dur="3.4s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 1 -1; 0 0" dur="3.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="96" cy="73" r="0.5">
+      <animate attributeName="opacity" values="0.32; 0.55; 0.32" dur="3.8s" begin="-1s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; -1 -1; 0 0" dur="3.8s" begin="-1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="46" cy="56" r="0.4">
+      <animate attributeName="opacity" values="0.32; 0.55; 0.32" dur="3.0s" begin="-2s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 1.5 0.5; 0 0" dur="3.0s" begin="-2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="80" cy="58" r="0.4">
+      <animate attributeName="opacity" values="0.32; 0.55; 0.32" dur="3.6s" begin="-1.5s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; -1.5 0.5; 0 0" dur="3.6s" begin="-1.5s" repeatCount="indefinite"/>
+    </circle>
   </g>
 </svg>

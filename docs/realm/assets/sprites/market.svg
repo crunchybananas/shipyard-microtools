@@ -105,30 +105,38 @@
     <rect x="78.1" y="84.5" width="2.4" height="0.8" fill="#3a2410"/>
   </g>
 
-  <!-- ─── Awning (trapezoid) ────────────────────────────────────── -->
-  <!-- Awning body: trapezoid (wider at bottom) -->
-  <path d="M 50 84 L 78 84 L 80 96 L 48 96 Z" fill="url(#awningRed)"/>
+  <!-- ─── Awning (trapezoid) — Loop 234 (Phase D): wind sway.
+       Group wraps the awning body + stripes + fringe; rotates ±2°
+       around the top edge center (64, 84). 4.5s cycle, asymmetric
+       range (-2° to +1.5°) reads as wind from one direction.
+       Highlight stays outside (anchored to actual top edge). -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate"
+      values="-2 64 84; 1.5 64 84; -2 64 84" dur="4.5s" repeatCount="indefinite"/>
+    <!-- Awning body: trapezoid (wider at bottom) -->
+    <path d="M 50 84 L 78 84 L 80 96 L 48 96 Z" fill="url(#awningRed)"/>
 
-  <!-- White stripes (5 vertical-trapezoidal slices) -->
-  <g fill="rgba(255,255,255,0.92)">
-    <path d="M 53 84 L 56 84 L 57 96 L 53.5 96 Z"/>
-    <path d="M 59.5 84 L 62.5 84 L 63 96 L 59 96 Z"/>
-    <path d="M 66 84 L 69 84 L 69.5 96 L 65.5 96 Z"/>
-    <path d="M 72 84 L 75 84 L 76 96 L 72 96 Z"/>
+    <!-- White stripes (5 vertical-trapezoidal slices) -->
+    <g fill="rgba(255,255,255,0.92)">
+      <path d="M 53 84 L 56 84 L 57 96 L 53.5 96 Z"/>
+      <path d="M 59.5 84 L 62.5 84 L 63 96 L 59 96 Z"/>
+      <path d="M 66 84 L 69 84 L 69.5 96 L 65.5 96 Z"/>
+      <path d="M 72 84 L 75 84 L 76 96 L 72 96 Z"/>
+    </g>
+
+    <!-- ─── Scalloped awning fringe (bottom edge) ─────────────────── -->
+    <g fill="url(#awningRed)">
+      <path d="M 48 96 L 52 96 A 2 1.4 0 0 1 56 96 A 2 1.4 0 0 1 60 96 A 2 1.4 0 0 1 64 96 A 2 1.4 0 0 1 68 96 A 2 1.4 0 0 1 72 96 A 2 1.4 0 0 1 76 96 L 80 96 L 80 96.5 L 48 96.5 Z"/>
+      <!-- Individual scallop drops -->
+      <path d="M 52 96 A 2 1.4 0 0 1 56 96 A 2 1.4 0 0 1 56 97.4 L 52 97.4 Z"/>
+      <path d="M 60 96 A 2 1.4 0 0 1 64 96 A 2 1.4 0 0 1 64 97.4 L 60 97.4 Z"/>
+      <path d="M 68 96 A 2 1.4 0 0 1 72 96 A 2 1.4 0 0 1 72 97.4 L 68 97.4 Z"/>
+      <path d="M 76 96 A 2 1.4 0 0 1 80 96 A 2 1.4 0 0 1 80 97.4 L 76 97.4 Z"/>
+    </g>
   </g>
 
-  <!-- Awning top sunlit highlight -->
+  <!-- Awning top sunlit highlight (outside sway group; anchored to top) -->
   <line x1="50" y1="84" x2="78" y2="84" stroke="rgba(255,240,210,0.55)" stroke-width="0.6"/>
-
-  <!-- ─── Scalloped awning fringe (bottom edge) ─────────────────── -->
-  <g fill="url(#awningRed)">
-    <path d="M 48 96 L 52 96 A 2 1.4 0 0 1 56 96 A 2 1.4 0 0 1 60 96 A 2 1.4 0 0 1 64 96 A 2 1.4 0 0 1 68 96 A 2 1.4 0 0 1 72 96 A 2 1.4 0 0 1 76 96 L 80 96 L 80 96.5 L 48 96.5 Z"/>
-    <!-- Individual scallop drops -->
-    <path d="M 52 96 A 2 1.4 0 0 1 56 96 A 2 1.4 0 0 1 56 97.4 L 52 97.4 Z"/>
-    <path d="M 60 96 A 2 1.4 0 0 1 64 96 A 2 1.4 0 0 1 64 97.4 L 60 97.4 Z"/>
-    <path d="M 68 96 A 2 1.4 0 0 1 72 96 A 2 1.4 0 0 1 72 97.4 L 68 97.4 Z"/>
-    <path d="M 76 96 A 2 1.4 0 0 1 80 96 A 2 1.4 0 0 1 80 97.4 L 76 97.4 Z"/>
-  </g>
 
   <!-- ─── Hanging price-tag bunting (small triangular pennants) ── -->
   <g>

@@ -26,11 +26,13 @@ await page.waitForTimeout(1000);
 
 // Sprites to verify: each must show a frame-diff after the wait.
 const SPRITES = [
-  { name: 'windmill', file: 'windmill.svg', wait: 4000 },  // sails 180° in 4s
-  { name: 'castle',   file: 'castle.svg',   wait: 2000 },  // pennants ±5°
-  { name: 'tower',    file: 'tower.svg',    wait: 1500 },  // banner sway + lantern flicker (1.4s)
-  { name: 'house',    file: 'house.svg',    wait: 2400 },  // smoke drift (4.8s/2)
-  { name: 'bakery',   file: 'bakery.svg',   wait: 3000 },  // smoke drift (6s/2)
+  { name: 'windmill',   file: 'windmill.svg',   wait: 4000 },  // sails 180° in 4s + dust pulse
+  { name: 'castle',     file: 'castle.svg',     wait: 2000 },  // pennants ±5°
+  { name: 'tower',      file: 'tower.svg',      wait: 1500 },  // banner + lantern flicker
+  { name: 'house',      file: 'house.svg',      wait: 2400 },  // smoke drift
+  { name: 'bakery',     file: 'bakery.svg',     wait: 3000 },  // smoke drift
+  { name: 'market',     file: 'market.svg',     wait: 2300 },  // awning sway 4.5s/2
+  { name: 'blacksmith', file: 'blacksmith.svg', wait: 1700 },  // forge fire pulse 1.6s
 ];
 
 let allPass = true;

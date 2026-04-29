@@ -121,15 +121,34 @@
     <line x1="68" y1="64" x2="68" y2="78" stroke="rgba(255,210,150,0.25)" stroke-width="0.3"/>
   </g>
 
-  <!-- ─── Forge window (arched, glowing amber fire) ────────────── -->
+  <!-- ─── Forge window — Loop 234 (Phase D): pulse the amber fire
+       like a working forge. Outer glow breathes in opacity (0.7→1.0
+       over 1.6s); fire core scales subtly (rx 2→2.3); both share
+       the same dur so highlight + glow read as ONE pulsing flame.
+       Random-feeling key-times keep it from feeling metronomic. -->
   <g>
     <!-- Outer warm glow -->
-    <ellipse cx="60" cy="89" rx="7" ry="6" fill="url(#forgeGlow)"/>
+    <ellipse cx="60" cy="89" rx="7" ry="6" fill="url(#forgeGlow)">
+      <animate attributeName="opacity"
+        values="0.85; 1; 0.78; 1; 0.9; 0.85"
+        keyTimes="0; 0.22; 0.5; 0.7; 0.88; 1"
+        dur="1.6s" repeatCount="indefinite"/>
+    </ellipse>
     <!-- Window opening (dark arch) -->
     <path d="M 57 92 L 57 88 A 3 3 0 0 1 63 88 L 63 92 Z" fill="#1a0a04"/>
-    <!-- Bright fire core inside -->
-    <ellipse cx="60" cy="90" rx="2" ry="1.6" fill="#ffe080"/>
-    <ellipse cx="60" cy="90" rx="1.2" ry="0.9" fill="#fff8e0"/>
+    <!-- Bright fire core inside (scales with the pulse) -->
+    <ellipse cx="60" cy="90" rx="2" ry="1.6" fill="#ffe080">
+      <animate attributeName="rx"
+        values="2; 2.3; 1.9; 2.2; 2; 2"
+        keyTimes="0; 0.22; 0.5; 0.7; 0.88; 1"
+        dur="1.6s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="60" cy="90" rx="1.2" ry="0.9" fill="#fff8e0">
+      <animate attributeName="opacity"
+        values="1; 0.95; 0.85; 1; 0.92; 1"
+        keyTimes="0; 0.22; 0.5; 0.7; 0.88; 1"
+        dur="1.6s" repeatCount="indefinite"/>
+    </ellipse>
     <!-- Arch frame -->
     <path d="M 57 92 L 57 88 A 3 3 0 0 1 63 88 L 63 92"
           stroke="#5a3818" stroke-width="0.6" fill="none"/>

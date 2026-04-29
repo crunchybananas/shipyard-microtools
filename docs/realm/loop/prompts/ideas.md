@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 234 [code] — Phase D batch 2: tavern sign-swing (175) + bakery flour-dust doorstep (180) + barracks training-dummy idle sway. ~20 LoC total. [SVG files]
+- 234 [code] — Phase D batch 3: church bell occasional swing (long pause + brief ring; 30s+ cycle) + granary grain-pile dust (small drift). ~15 LoC total. [SVG files]
+- 234 [code] — per-realm forge-pulse speed variation: kingdom-hashed dur (1.2s/1.6s/2.0s). ~5 LoC. Pairs with 220 variant pipeline. [render.js + blacksmith.svg]
 - 233 [code] — full-pop streak indicator (👥 Nd) — defer until threshold tuning validates against actual play (population oscillation patterns; could flicker). [ui.js]
 - 233 [doc] — evocative tooltips for streak indicators: "the bell has hung silent for N evenings" (peace ☮️), "no funeral cortege for N days" (life 🕯️). Pairs with 211/228 prose registers. [ui.js]
 - 233 [code] — animate streak icons at notable thresholds (50/100/200d): pulse, brighten, or emoji-shift. ~10 LoC CSS keyframes. [ui.js + index.html]
