@@ -460,6 +460,23 @@ const NARRATIVE_BEATS = [
   { flag: 'well_remembers', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.buildings && G.buildings.some(b => b.type === 'well'),
     text: 'The well has been there since the realm\'s first thirsty summer. The water in the dark below has felt every bucket lowered to it, and remembers each one a long while.' },
+  // Loop 229 (surprise, 227 filed): THIRD use of land-as-agent
+  // sub-type. Diversifies agency-shape: 207 broad-LAND collective
+  // ("agreed to be lived in"), 227 specific-OBJECT interiority
+  // (water remembers buckets), 229 RELATIONAL-keeper (hearth holds
+  // names of the dead). Year-3+ gate + earned-state requirement
+  // (citizensDied >= 1) ensures the hearth has names to hold.
+  // The "fire keeps them the same way it keeps wood" double-meaning
+  // — fire keeps wood by burning it; suggests fire keeps memory by
+  // consuming it — is the surprising image per 203 positive rule.
+  // Avoids META-frame per 213 finding 2.
+  // Tag: misc. Sub-type: land-as-agent reaches 3 uses (207/227/229)
+  // — meets 3+ threshold for sub-type-to-invariant promotion
+  // candidate. Whether to actually promote is a separate
+  // contrarian-eligible decision per 188 demotion precedent.
+  { flag: 'hearth_holds_names', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.stats && G.stats.citizensDied >= 1,
+    text: 'In the long evenings the hearth seems to know which names belong to it — the ones who built it, who tended it, who died too young for it to learn well. The fire keeps them the same way it keeps wood.' },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 229 [doc] — land-as-agent reached 3+ use threshold; decision pending whether to hoist to standalone observed-pattern OR keep as cluster sub-type. Pros of hoist: authoring-shape distinction load-bearing. Cons: cluster IS unifying register. Defer to next archivist or contrarian tick. [loop/docs/]
+- 229 [code] — fourth land-as-agent candidate to push past threshold: "the path remembers" (year-3+ + buildings density; emergent-collective agency-shape — paths form from many footsteps, not authored). Different from broad-LAND/object-interiority/relational-keeper. ~12 LoC. [story.js]
+- 229 [process] — discipline observation: when a sub-type meets promotion threshold, the loop should NOT auto-promote. Contrarian/skeptic exists precisely to challenge promotion claims. Thresholds TRIGGER review, not promotion. Document. [process]
 - 228 [code] — third sustained-state candidate to promote sub-type to invariant: "peak happiness 30 days" (G.lastHappyDipDay tracker; happiness < 80 resets) OR "full population 60 days" (G.lastUnderpopDay tracker; pop < maxPop resets). Each ~10 LoC mirror of 211/228 infrastructure pattern. [story.js + state-tracker]
 - 228 [process] — pessimist audit: are there OTHER citizen-death code paths beyond combat.js:131 + economy.js:347? events.js disasters may also kill citizens — if so, those sites should also set G.lastDeathDay. ~5 min audit. [process]
 - 227 [code] — third land-as-agent candidate to promote sub-type to invariant: "the hearth holds names" (year-3+ + at least one citizen has died — hearth as memorial-keeper) OR "the path remembers" (year-3+ + buildings density threshold — paths emerge from use). Each ~15 LoC. [story.js]

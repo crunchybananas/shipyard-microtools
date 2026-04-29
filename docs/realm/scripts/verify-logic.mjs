@@ -162,6 +162,19 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 12: 229 hearth_holds_names — year3 + citizensDied≥1
+const hearthFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.stats = window.G.stats || {};
+  window.G.stats.citizensDied = 1;
+  delete window.G.storyFlags.hearth_holds_names;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.hearth_holds_names === true;
+  return { fired };
+});
+rec('229: hearth_holds_names fires year3 + citizensDied=1', hearthFire.fired);
+
 // Test 11: 228 no_death_known — citizensDied≥1 + lastDeathDay+100 days
 const noDeathFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

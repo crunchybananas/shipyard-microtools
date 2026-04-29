@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -755,7 +755,7 @@ prescriptive AND consistently applied.
   by source-prose-fingerprint) and promote.
 
 - **Observational-elder register cluster
-  (observation, ~15 uses across 4 tags).** A
+  (observation, ~16 uses across 4 tags).** A
   REGISTER-based authoring shape distinct from
   any single tag. Beats in this cluster share:
   declarative present-tense voice, "the realm"
@@ -771,11 +771,11 @@ prescriptive AND consistently applied.
   differently.
 
   **Cluster members (cross-tag):**
-  - *misc tag* (11): 148 wanderer / 152 night-shape /
+  - *misc tag* (12): 148 wanderer / 152 night-shape /
     166 frog-voices / 174 first-frost / 196 long-
     evening / 199 cold-morning / 207 fields-know-realm /
     211 sustained-peace / 212 first-sigh / 227 well-remembers /
-    228 no-death-known
+    228 no-death-known / 229 hearth-holds-names
   - *milestone tag* (2): 190 constellation-forgotten /
     193 landmark-named
   - *stone tag* (1): 184 stone-forgotten
@@ -802,18 +802,31 @@ prescriptive AND consistently applied.
     Anti-anxious continuity register
     counterbalancing the late-arc bias 195
     flagged.
-  - *Land-as-agent* (207/227): land/object has
-    subjective voice. 207 gave broad land
-    agency ("agreed to be lived in"); 227
-    gave a SPECIFIC OBJECT — the well —
-    interiority ("water felt every bucket
-    lowered to it, and remembers each one a
-    long while"). Both 1+ scope still 2 uses;
-    threshold 3+ for promotion. Per 213
-    skeptic finding 2: 227 avoids the META-
-    frame ("realm doesn't see") that 212 used;
-    pure object-interiority without chronicle-
-    self-awareness.
+  - *Land-as-agent* (207/227/229): land/object/
+    relational-keeper has subjective voice.
+    Three agency-shapes shipped:
+    - 207 broad LAND collective — "the land
+      has agreed to be lived in"
+    - 227 specific OBJECT interiority — "water
+      felt every bucket lowered to it, and
+      remembers each one a long while"
+    - 229 RELATIONAL keeper — "the hearth
+      seems to know which names belong to
+      it... the fire keeps them the same way
+      it keeps wood"
+    **3 uses meets 3+ threshold** for
+    sub-type-to-standalone-invariant promotion
+    candidate. Promotion not automatic per 188
+    demotion precedent (promotion is
+    conservative; contrarian-eligible
+    decision). Currently lives within the
+    observational-elder cluster as a sub-type;
+    could hoist to its own observation if a
+    future tick judges the agency-shape
+    distinction load-bearing for new authors.
+    Per 213 skeptic finding 2: all three
+    avoid META-frame ("realm doesn't see");
+    pure object/place interiority.
   - *Sustained-state-recognition* (211/228):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.
