@@ -136,11 +136,38 @@
 
   <!-- ─── Chimney (right side of roof) ─────────────────────────── -->
   <g>
-    <!-- Smoke wisps (gentle, white-grey, dough-like) -->
-    <ellipse cx="69" cy="60" rx="2.5" ry="1.6" fill="url(#bakerySmoke)"/>
-    <ellipse cx="67" cy="55" rx="3" ry="1.8" fill="url(#bakerySmoke)"/>
-    <ellipse cx="64" cy="50" rx="3.4" ry="2" fill="url(#bakerySmoke)"/>
-    <ellipse cx="61" cy="45" rx="3.6" ry="2.2" fill="url(#bakerySmoke)"/>
+    <!-- Smoke wisps — Loop 225 (Phase C step 3): bigger plume than
+         house.svg (4 wisps vs 3, larger radii) reflects bakery oven's
+         constant work. 6s cycle, slightly slower than house. Staggered
+         begin times spread the plume continuously. -->
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; -3 -12" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0; 0.85; 0.6; 0"
+        keyTimes="0; 0.15; 0.7; 1" dur="6s" repeatCount="indefinite"/>
+      <ellipse cx="69" cy="60" rx="2.5" ry="1.6" fill="url(#bakerySmoke)"/>
+    </g>
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; -3 -12" dur="6s" begin="-1.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0; 0.85; 0.6; 0"
+        keyTimes="0; 0.15; 0.7; 1" dur="6s" begin="-1.5s" repeatCount="indefinite"/>
+      <ellipse cx="67" cy="55" rx="3" ry="1.8" fill="url(#bakerySmoke)"/>
+    </g>
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; -3 -12" dur="6s" begin="-3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0; 0.85; 0.6; 0"
+        keyTimes="0; 0.15; 0.7; 1" dur="6s" begin="-3s" repeatCount="indefinite"/>
+      <ellipse cx="64" cy="50" rx="3.4" ry="2" fill="url(#bakerySmoke)"/>
+    </g>
+    <g>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; -3 -12" dur="6s" begin="-4.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0; 0.85; 0.6; 0"
+        keyTimes="0; 0.15; 0.7; 1" dur="6s" begin="-4.5s" repeatCount="indefinite"/>
+      <ellipse cx="61" cy="45" rx="3.6" ry="2.2" fill="url(#bakerySmoke)"/>
+    </g>
 
     <!-- Chimney body -->
     <rect x="68" y="64" width="5" height="14" fill="#7a5038"/>

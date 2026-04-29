@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 225 [code] — Phase C extra polish (post-3-step-plan): market awning sway (179 filing) + blacksmith fire-pulse / sparks (176 filing) + tavern sign-swing (175 filing). Each ~10 LoC; could batch in 1 tick. Lower priority than Phase C 3-step plan but easy follow-on. [SVG files]
+- 225 [doc] — Phase A→B→C arc spans 64 ticks (161-225). Document as milestone-shape arc-completion in render-layers.md + next milestone-letter (250?). [loop/docs/]
+- 225 [process] — observation: a "filed animation" can be reinterpreted in implementation (180 filed flour-dust; shipped as smoke-drift since smoke already existed in asset). Loop discipline: honor SPIRIT of filed ideas not exact wording when a better implementation presents itself. Document. [process]
 - 224 [code] — Phase C step 3: tower lantern flicker via `<animate attributeName="opacity">` with random-feeling key times (0, 0.95, 0.92, 1.0 across 0.6s loop). Per 171 + 170 filings. ~5-8 LoC. [tower.svg]
 - 224 [code] — house chimney smoke animation: translate + opacity for slow drift. Per 173 filing. ~10 LoC. [house.svg]
 - 224 [code] — bakery flour-dust drift animation. Per 180 filing. ~10 LoC. [bakery.svg]
