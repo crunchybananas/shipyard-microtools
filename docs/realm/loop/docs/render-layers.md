@@ -289,6 +289,53 @@ animation path doesn't compose with the integration approach.
   canvas drawX functions can be improved INDEPENDENTLY of SVG
   integration. Both axes survive.
 
+### Loop 215 update — 3D axis explicitly RETIRED for the loop
+
+User flagged at tick 215: "the 3d version still seems like a
+dead end as I see no progress." Honest accounting:
+
+- **11 meshes shipped 163-187** (granary / castle / church /
+  windmill / tower / house / tavern / blacksmith / market /
+  barracks / + scaffolding) live in `docs/realm/3d/3d.js` as a
+  STANDALONE prototype.
+- **They are not integrated into the live game** and no path
+  to integration was planned. 171's strategic plan correctly
+  deferred 3D-canvas-replacement; the loop kept shipping
+  meshes anyway as chrome-offline fallback work.
+- **The "cross-axis triangle" framing oversold the value.**
+  Triangle = canvas + SVG + 3D for each building. In practice
+  only canvas reaches the player today. SVG awaits Phase B.
+  3D awaits an integration architecture that doesn't exist.
+
+**Effective immediately**, the 3D axis is RETIRED as a loop
+priority:
+- No further 3D mesh ships until chrome returns AND a concrete
+  integration plan exists (rendering 3D into the live game,
+  not sandbox).
+- The 11 existing meshes stay as reference artifact in
+  `docs/realm/3d/`. Don't delete; don't extend.
+- 161's user steering ("really focus on the svg generation /
+  rethink them or think about the 3d engine version") is
+  re-interpreted: SVG is the live-game path (Phase B). 3D
+  was exploration; exploration concluded.
+- The "cross-axis triangle invariant" in narrative-surfaces.md
+  / observed-patterns context is renamed/demoted: it was
+  describing breadth-of-prototype, not breadth-of-live-game.
+
+**What replaces it as priority while chrome is offline:** narrative
+ships that reach the player (chronicle prose runs in chrome-
+present and chrome-offline equally; players see beats on
+reload). Mechanic ships that don't require visual verification
+to be correct (math-checkable). Doc/discipline ticks that
+maintain the loop's coherence. NOT graphics-axis exploration
+that doesn't reach the player.
+
+**When chrome returns:** Phase B remains the priority — it has
+been blocked 35+ ticks. After Phase B ships, the loop can
+re-evaluate whether 3D integration is worth a fresh attempt.
+Until then, treating 3D as "ongoing axis" is dishonest about
+where the loop's work lands.
+
 ### Dates are estimates
 
 The phase-tick numbers are pace estimates, not commitments.
