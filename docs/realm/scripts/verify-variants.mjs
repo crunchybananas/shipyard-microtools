@@ -163,6 +163,16 @@ const SPECS = [
     ],
     labels: ['cream', 'sun-bleached', 'mossy-green', 'red-painted'],
   },
+  {
+    type: 'tower', group: 'banner',
+    palettes: [
+      ['#d82828', '#7a1010'],
+      ['#2840d8', '#101a7a'],
+      ['#28a828', '#106a10'],
+      ['#a828a8', '#600060'],
+    ],
+    labels: ['red', 'blue', 'green', 'purple'],
+  },
 ];
 
 const assertResults = [];

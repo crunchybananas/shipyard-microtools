@@ -157,6 +157,23 @@ const _VARIANT_PALETTES = {
       ['#f0c898', '#c89060'],  // 3 red-painted — dyed/sun-warm cloth
     ],
   },
+  // Loop 283 (the-fixer, FINAL 220 filing item): tower banner-pennant
+  // variants. Source #d82828/#7a1010 (lines 58-59 of tower.svg
+  // bannerRed gradient) is the bright-red banner — small but visually
+  // loud. Color families mirror 279 castle.roof for thematic consistency:
+  // red/blue/green/purple. Note hash-keys differ ('castle_roof' vs
+  // 'tower_banner'), so a realm that picks red-roof may pick blue-banner;
+  // future tick could synchronize castle+tower heraldry per kingdom if
+  // appetite. **CLOSES 220 FILING COMPLETELY** — 5 of 5
+  // (church/townhall/castle/granary/windmill/tower).
+  tower: {
+    banner: [
+      ['#d82828', '#7a1010'],  // 0 red (default)
+      ['#2840d8', '#101a7a'],  // 1 blue — naval realm
+      ['#28a828', '#106a10'],  // 2 green — moss/forest realm
+      ['#a828a8', '#600060'],  // 3 purple — twilight/court realm
+    ],
+  },
 };
 // Tiny string-hash for kingdom-name → variant index. Mirrors the
 // _dreamHash style used in story.js without an import (avoids circular
