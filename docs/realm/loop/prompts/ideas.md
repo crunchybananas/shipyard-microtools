@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 206 [code] — rival's symmetric reward arm: +5 gold per raider slain when rival named (or +X reputation if reputation system ships). Pairs with 206 difficulty bump as "adversarial AND rewarding when present." Per 105 filing's "might include" clause. ~5-8 LoC. [combat.js raid resolution or economy.js]
+- 206 [review] — chrome-required full scenario play with all named characters (mayor still pending) to measure cumulative pacing impact. Now 5 mechanics (4 cooperative + 1 adversarial) — uncharted balance space. Filed at 105/201/206. [play]
+- 206 [process] — observation: 6-tick streak of doc-edit-only OR doc+code-pair ticks (203/205/206). Self-check before next tick: are we still authoring prose or just reorganizing? [process]
 - 205 [process] — observation: contrarian/pessimist → fixer pairing pattern at 5 pairs (011→012 / 154→155+156 / 195→196 / 202→203 / 204→205). Recent two pairs landed in IMMEDIATELY NEXT tick (1-tick gap); earlier pairs had 1-3 tick gaps. Threshold met (5+); promote to invariant candidate. Document as "review→fix in next tick" discipline in loop/docs/ when next archivist runs. [loop/docs/]
 - 205 [doc] — when next archivist tick lands (~210), the full invariant sweep should also check the `## known gaps` section for closures. 104 last updated; multiple gaps shipped since. [loop/docs/]
 - 205 [doc] — observed pattern: doc edits with sub-list formatting work well when an invariant has multiple variants. Other invariants might benefit (e.g., misc-tag observational cluster sub-types per 199 filing). [loop/docs/]
@@ -339,7 +342,7 @@ and note the promotion here.
 - 107 [code] LOW — resolve M-key conflict (music title claims `(M)` but M toggles minimap). [ui.js + input.js]
 - 107 [code] LOW — keyboard shortcuts cheat-sheet in help overlay (`?`). [index.html]
 - 101 [code] — smith → combat bonus (soldier attack or weapon-production). ~3 lines. [combat.js] **DONE → 105** (2 lines in combat.js:updateTowers; +5% projectile damage; 2-case matrix verified)
-- 105 [code] — rival → raid difficulty +10% when named (adversarial character; might include +reward for successful defense). [events.js or combat.js]
+- 105 [code] — rival → raid difficulty +10% when named (adversarial character; might include +reward for successful defense). [events.js or combat.js] **DONE → 206** (single-line addition to economy.js raid-spawn at line ~426; multiplicative `rivalMult ? 1.1 : 1` injected into raider count; floor-rounding produces soft difficulty curve — early raids unchanged, deep-realm raids meaner; doc invariant updated same tick per 204 [process]; +reward arm filed separately)
 - 105 [review] — post-4-mechanic cumulative-balance check after bard lands. Play full scenario with all 4 named, measure pacing impact. Pairs with 101 filed balance review. [play]
 - 101 [code] — bard → +5 happiness baseline when named. ~3 lines. [economy.js or happiness tick] **DONE → 201** (single-line addition to economy.js happiness formula at line ~312; additive baseline pattern as sibling to multiplicative `*Mult`; clamped invisibly at extremes; 5 of 6 named-cast now have mechanics)
 - 101 [code] — mayor → unlocks a civic building (town hall, court). Bigger scope. [buildings.js + state.js]

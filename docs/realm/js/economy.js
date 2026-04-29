@@ -423,7 +423,18 @@ export function checkRaids() {
     else if (!hasDefense) baseCount = 3;
     else if (G.day < 20) baseCount = Math.min(5, 3 + G.day/8);
     else baseCount = Math.min(12, 2 + G.day/5);
-    const raiders = Math.max(2, Math.floor(baseCount * getDifficulty().raidMult));
+    // Loop 206 (the-fixer, 105 filed 101 ticks): named rival adds +10%
+    // raider count when present. Adversarial inverse of the cooperative
+    // named-character mechanic pattern (101 teacher / 102 merchant /
+    // 105+153 smith / 201 bard). Sixth shipped mechanic; only mayor
+    // structural-unlock now remains (101 filed). The realm becomes
+    // aware of an external rival when barracks is built (story.js:257
+    // → ensureRival); that rival sending more raiders makes narrative
+    // sense. Floor() rounding means the +10% only adds whole raiders
+    // at baseCount ≥ ~10 — soft difficulty curve that rises with
+    // realm age (early raids unaffected; deep-realm raids meaner).
+    const rivalMult = G.namedCharacters?.rival ? 1.1 : 1;
+    const raiders = Math.max(2, Math.floor(baseCount * getDifficulty().raidMult * rivalMult));
     playSound('raid');
 
     const report = [`⚔️ RAID: ${raiders} raiders approach!`];

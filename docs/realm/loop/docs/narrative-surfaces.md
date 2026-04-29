@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -591,14 +591,16 @@ should respect:
     `const <char>Bonus = G.namedCharacters?.<char> ? N : 0;`
     added to a baseline expression.
 
-  Currently shipped (4 of 6): teacher → +10% research
+  Currently shipped (5 of 6): teacher → +10% research
   (tech.js, 101), merchant → +5% trade (trade.js, 102),
   smith → +5% tower fire-rate (combat.js, 105 → re-tuned
   at 153 from damage to fire-rate), bard → +5 happiness
-  baseline (economy.js, 201). Silent mechanic (no UI, no
-  chronicle beat — 034's character-intro already narrates
-  arrival). Remaining: mayor (civic-unlock; structural,
-  larger scope) + rival (adversarial-modifier).
+  baseline (economy.js, 201), rival → +10% raid count
+  (economy.js raid spawn, 206; floor-rounding means low-
+  count raids unchanged, deep-realm raids meaner). Silent
+  mechanic (no UI, no chronicle beat — 034's character-
+  intro already narrates arrival). Remaining: mayor
+  (civic-unlock; structural, larger scope only).
 - **End-of-realm beats are first-class** (103, closing 053's
   filed ask). `realm_fell` NARRATIVE_BEATS entry fires when
   `G.population === 0 && G.day > 1`. Tag: `requiem`.
