@@ -332,6 +332,13 @@ window.newGame = () => {
   G.lastRaidDay = undefined;
   G.lastDeathDay = undefined;
   G.lastUnderpopDay = undefined;
+  // Loop 271 (the-fixer, 269 [code] filing): also reset namedCharacters
+  // so the new realm doesn't inherit the previous realm's mayor/bard/
+  // smith/teacher/merchant/rival. Without this, the new realm's first
+  // tavern build silently re-uses the previous realm's mayor (per 034
+  // hook + ensureMayor()), and same for the other 5 ensure-character
+  // hooks tied to building first-builds.
+  G.namedCharacters = {};
   generateWorld();
   if (gl3dReady) buildTerrainMesh(); // rebuild 3D mesh for new world
   renderBuildBar(); renderMissions(); updateUI();

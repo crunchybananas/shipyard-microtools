@@ -181,17 +181,16 @@ const mayorFire = await page.evaluate(async () => {
 });
 rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
 
-// Test: 269 — newGame() resets G.realmEnded + sustained-state trackers (268 HIGH+MEDIUM)
+// Test: 269+271 — newGame() resets realmEnded + sustained-state trackers + namedCharacters
 const newGameReset = await page.evaluate(async () => {
-  // Set the realm into the post-fall state with stale trackers
+  // Set the realm into the post-fall state with stale trackers + cast
   window.G.realmEnded = true;
   window.G.lastRaidDay = 30;
   window.G.lastDeathDay = 50;
   window.G.lastUnderpopDay = 40;
-  // Trigger the in-game restart helper
+  window.G.namedCharacters = { mayor: { name: 'Stale Mayor' }, bard: { name: 'Stale Bard' } };
   if (typeof window.newGame !== 'function') return { ok: false, reason: 'no window.newGame' };
   window.newGame();
-  // Allow a frame for _applyRealmEndFilter to react
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   return {
     ok: true,
@@ -199,6 +198,7 @@ const newGameReset = await page.evaluate(async () => {
     lastRaidDay: window.G.lastRaidDay,
     lastDeathDay: window.G.lastDeathDay,
     lastUnderpopDay: window.G.lastUnderpopDay,
+    namedCharCount: Object.keys(window.G.namedCharacters || {}).length,
     filter: document.getElementById('game').style.filter || '',
   };
 });
@@ -206,8 +206,9 @@ const reset = newGameReset.realmEnded === false &&
               newGameReset.lastRaidDay === undefined &&
               newGameReset.lastDeathDay === undefined &&
               newGameReset.lastUnderpopDay === undefined &&
+              newGameReset.namedCharCount === 0 &&
               newGameReset.filter === '';
-rec('269: newGame() resets realmEnded + sustained-state trackers + clears filter', reset, JSON.stringify(newGameReset));
+rec('269+271: newGame() resets realmEnded + trackers + namedCharacters + clears filter', reset, JSON.stringify(newGameReset));
 
 // Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
 const realmEndFilter = await page.evaluate(async () => {
