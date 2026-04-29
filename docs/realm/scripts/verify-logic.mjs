@@ -134,20 +134,25 @@ const peaceFire = await page.evaluate(async () => {
 rec('211: sustained_peace_known fires d65 with raidsSurvived=1, lastRaidDay=10', peaceFire.fired, `text="${peaceFire.lastText}…"`);
 
 // Test 7: 192 realm_fell after-callback — G.realmEnded set when beat fires
+// Test 7b: 278 — terminal "chronicle closes" entry pushed by after-callback
 const realmFell = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.realmEnded = false;
   window.G.population = 0;
   window.G.day = 50;
   delete window.G.storyFlags.realm_fell;
+  const beforeLen = (window.G.chronicle || []).length;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.realm_fell === true;
   const flagSet = window.G.realmEnded === true;
+  const afterLen = window.G.chronicle.length;
+  const terminal = window.G.chronicle.find(e => e.text?.includes('chronicle ends here'));
   // 260: reset so the new checkStoryBeats gate doesn't block downstream tests
   window.G.realmEnded = false;
-  return { fired, flagSet };
+  return { fired, flagSet, beforeLen, afterLen, terminalWritten: !!terminal, terminalTag: terminal?.tag };
 });
 rec('192: realm_fell after-callback sets G.realmEnded', realmFell.fired && realmFell.flagSet, `fired=${realmFell.fired} flag=${realmFell.flagSet}`);
+rec('278: terminal "chronicle closes" entry written + tagged requiem', realmFell.terminalWritten && realmFell.terminalTag === 'requiem', `written=${realmFell.terminalWritten} tag=${realmFell.terminalTag} chronGrew=${realmFell.afterLen - realmFell.beforeLen}`);
 
 // Test 8: 201 bard happiness +5 — set rival false, force ensureBard, check formula
 const bardEffect = await page.evaluate(async () => {

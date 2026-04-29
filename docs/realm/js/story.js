@@ -1195,7 +1195,25 @@ const NARRATIVE_BEATS = [
         ? `The last fire in the realm goes out. ${f}'s name is the last spoken, and then there is no one to speak it.`
         : 'The last fire in the realm goes out. There is no one left to tend it, and no one left to remember.';
     },
-    after: G => { G.realmEnded = true; } },
+    // Loop 278 (the-fixer, 260 [code] filing): write the terminal "chronicle
+    // closes" entry directly via G.chronicle.push, bypassing the chronicle()
+    // gate which is about to activate when realmEnded flips below. Pairs
+    // with 260's chronicle-gate to give the chronicle a clean typographic
+    // close — like the last page of a book. Tag 'requiem' is eviction-
+    // immune (story.js:26 _EVICTION_IMMUNE_TAGS), so this terminal entry
+    // survives any future cap-eviction pressure. Two consecutive requiem
+    // entries (the realm_fell text + this terminal) is intentional: both
+    // deserve the realm's last-page treatment.
+    after: G => {
+      if (G.chronicle) {
+        G.chronicle.push({
+          day: G.day, season: G.season, tick: G.gameTick,
+          text: 'The chronicle ends here. There is no one left to begin a new page.',
+          tag: 'requiem',
+        });
+      }
+      G.realmEnded = true;
+    } },
 ];
 // Loop 123 (refactor-only): added optional `onFire` field to
 // NARRATIVE_BEATS entries. Replaces 111's inline `beat.tag ===
