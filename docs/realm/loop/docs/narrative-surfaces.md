@@ -1,6 +1,22 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251, 252, 253. Maintained by
+**Table of contents** (288 doc-hygiene addition; doc growth past 2000
+lines unblocked by this navigability + per-section anchors):
+
+- `## why this exists` — purpose and steering
+- `## tag inventory` — 15 tags taxonomy
+- `## 20 chronicle-writing systems` — 075's audit + updates
+- `## execution order` — system-call order at startup/tick
+- `## invariants` — prescriptive rules (~7 active: 075/144/named-char-
+  mech/etc + 276 shape-axis + 284 variant-pool + 287 combination-rule)
+- `## observed patterns` — descriptive observations <3 uses
+- `## known gaps` — 104-tick filing of unresolved seams
+- `## retired hypotheses` — patterns falsified or demoted
+- `## cadence summary` — per-tick chronicle entry budget
+- `## how to update this doc` — maintenance protocol
+- `## related loop references` — adjacent loop docs
+
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251, 252, 253, 288. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -1001,36 +1017,22 @@ prescriptive AND consistently applied.
     1-beat acknowledgment of an entity present
     but unnamed. Codified separately as the
     silent-walker grammar invariant. **266
-    summer_falling_star** extends the sub-type
-    by introducing a TRANSIENT presence (other
-    members are sustained: wanderer/night-
-    shape/frog-voices). 266 also introduces
-    a NEW philosophical angle —
-    witness-without-confirmation ("the star
-    is gone before anyone can ask if anyone
-    else saw it"). 4 uses; per 257 anti-
-    completionist: this 4th use ships because
-    PROSE SURPRISES with new angle, not
-    because the count needed advancing.
+    summer_falling_star** adds TRANSIENT-
+    WITNESS shape — others are sustained
+    (wanderer/night-shape/frog-voices); 266 is
+    instant + unsharable ("the star is gone
+    before anyone can ask if anyone else saw
+    it"). Per 276 invariant.
   - *Weather-recognition* (147/174/246/272):
     the realm notices or remembers weather as
     a marker of the year. 174 first-frost +
-    246 first-thaw form a YEAR-CYCLE PAIR
-    at year-2+ seasonal endpoints — both
-    once-per-realm beats marking the realm's
-    memory of one full winter cycle. **272
-    storm_passed_seen** introduces a NEW
-    ANGLE within the sub-type — NEGATIVE-
-    SPACE weather (the storm that doesn't
-    arrive). Other 3 are about weather
-    ARRIVING; 272 about weather NOT
-    arriving. Lift line "is given the night
-    intact" — passive voice acknowledges
-    grace; the realm receives a gift it did
-    not earn. 4 uses; per 257 anti-
-    completionist: this 4th use ships because
-    NEW ANGLE (what-didn't-happen axis), not
-    count-advancement.
+    246 first-thaw form a YEAR-CYCLE PAIR at
+    year-2+ seasonal endpoints. **272 storm_
+    passed_seen** adds NEGATIVE-SPACE shape —
+    other 3 are weather ARRIVING; 272 is
+    weather NOT arriving. Lift "is given the
+    night intact" acknowledges passive grace.
+    Per 276 invariant.
   - *Forgetting* (184/190): generational-gap
     closure of a long-lived object. See the
     object-arc closure observation above for
@@ -1090,76 +1092,33 @@ prescriptive AND consistently applied.
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
-  - *Individual-interiority* (212/275/277): focal
-    is a single anonymous citizen rather than
-    the realm collective. **3 shapes within
-    the sub-type — first sub-type to grow
-    3 shapes (per 276 invariant: shape-axis
-    can extend beyond binary):**
-    - 212 first_sigh_seen — MID-ACTION
-      interiority ("a settler sets down a
-      bucket... breathes out. No one sees.")
-      A brief inner moment.
-    - 275 child_no_elsewhere_known — TOTALIZING
-      interiority ("a child... has heard their
-      elders speak of other places but never
-      seen one. The world ends at the eastern
-      ridge as far as they are concerned.")
-      A whole frame-of-reference rather than
-      an instant.
-    - 277 absent_citizen_seat_known —
-      INFERENCE-BY-ABSENCE interiority ("a
-      citizen no one has seen in many days...
-      their seat at the inn is empty for the
-      third evening in a row.") The realm's
-      awareness mediated through ROUTINE
-      DISRUPTION; the realm doesn't see the
-      citizen, it sees the SHAPE of their
-      absence.
-    Per 276 invariant: each shape ships because
-    PROSE INTRODUCES NEW ANGLE not as count-
-    advancement. The 3-shape grown sub-type
-    demonstrates that shape-axes can extend
-    beyond binary (270 character-interiority +
-    272 weather-recognition + 275 individual-
-    interiority's first shape-extension all
-    introduced 2nd shapes; 277 introduces the
-    first 3rd shape). Future authors: 3+ shapes
-    within one sub-type is permitted IFF each
-    shape introduces a genuinely fresh angle
-    per 203 + 257 + 276 disciplines.
+  - *Individual-interiority* (212/275/277):
+    focal is a single anonymous citizen rather
+    than the realm collective. **3 shapes**
+    (first sub-type to grow beyond binary):
+    - 212 MID-ACTION ("settler... breathes
+      out. No one sees.") — brief inner moment.
+    - 275 TOTALIZING ("the world ends at the
+      eastern ridge as far as they are
+      concerned") — whole frame-of-reference.
+    - 277 INFERENCE-BY-ABSENCE ("their seat at
+      the inn is empty for the third evening
+      in a row") — awareness mediated through
+      routine disruption.
+    Per 276 invariant.
   - *Habituation-recognition* (254/280/285):
     the realm recognizes its own habits and
-    rhythms — second-order observation that
-    distinguishes this sub-type from the
-    EXTERNAL conditions of sustained-state-
-    recognition. **3 shapes within the sub-type
-    — second sub-type to grow 3 shapes after
-    individual-interiority (per 276 invariant):**
-    - 254 nights_blur_known — AUTOMATICITY
-      ("the realm has lived enough nights...
-      the fire is set without thinking now.")
-      Action-domain habituation: doing
-      without thinking.
-    - 280 liminal_moment_known — RHYTHM-
-      AWARENESS ("there is a moment most
-      evenings when the realm is between
-      things... no one has named this moment
-      but everyone knows it.") Time-domain
-      habituation: noticing the unactioned
-      pauses that recur.
-    - 285 phrase_misheard_known — LANGUAGE-
-      DRIFT ("there is a phrase the realm
-      uses that began as a mishearing of
-      something else... it would not know how
-      to use it now.") Linguistic-domain
-      habituation: origin become foreign
-      through accumulated drift.
-    Per 276 invariant: shape-extensions ship
-    because PROSE INTRODUCES NEW ANGLE not as
-    count-advancement. 3 shapes across 3
-    distinct DOMAINS of habituation (action,
-    time, language).
+    rhythms (vs sustained-state-recognition's
+    EXTERNAL conditions). **3 shapes** spanning
+    3 domains:
+    - 254 AUTOMATICITY ("the fire is set
+      without thinking now") — action domain.
+    - 280 RHYTHM-AWARENESS ("no one has named
+      this moment but everyone knows it") —
+      time domain.
+    - 285 LANGUAGE-DRIFT ("would not know how
+      to use it now") — linguistic domain.
+    Per 276 invariant.
 
   **Beats explicitly OUTSIDE the cluster
   (different register, listed for awareness):**
