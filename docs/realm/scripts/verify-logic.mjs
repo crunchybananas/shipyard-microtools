@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 11: 228 no_death_known — citizensDied≥1 + lastDeathDay+100 days
+const noDeathFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.stats = window.G.stats || {};
+  window.G.stats.citizensDied = 1;
+  window.G.lastDeathDay = 10;
+  window.G.day = 115;  // 105 days past last death
+  delete window.G.storyFlags.no_death_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.no_death_known === true;
+  return { fired };
+});
+rec('228: no_death_known fires d115 with citizensDied=1, lastDeathDay=10', noDeathFire.fired);
+
 // Test 10: 227 well_remembers — year2 + well exists
 const wellFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

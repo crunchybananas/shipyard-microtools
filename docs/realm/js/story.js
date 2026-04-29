@@ -533,6 +533,20 @@ const NARRATIVE_BEATS = [
   { flag: 'sustained_peace_known', tag: 'misc',
     trigger: G => G.stats && G.stats.raidsSurvived >= 1 && G.lastRaidDay !== undefined && (G.day - G.lastRaidDay) >= 50,
     text: 'There comes a stretch of days when the watch still climbs the walls each evening, but their hands rest where weapons would have been. The alarm has not sounded in fifty days. The realm carries the quiet differently than it carried the war.' },
+  // Loop 228 (surprise, 211 filed): SUSTAINED-STATE #2 — promotes
+  // the sub-type from 1 use (211) to 2 toward 3+ threshold. Mirror
+  // shape: G.lastDeathDay tracker (set at combat.js:131 and
+  // economy.js:347 starvation site) + save.js persistence + this
+  // gate. Earned-state requirement: stats.citizensDied >= 1
+  // ensures the realm has FACED death, not just lived in lucky
+  // absence. Realistic firing window: year-2+ for realms that
+  // survived early hardship and stabilized. 100-day threshold (vs
+  // 211's 50-day for peace) reflects that death is rarer baseline
+  // than raids — needs a longer absence to read as remarkable.
+  // Sub-type sustained-state-recognition; tag misc; static prose.
+  { flag: 'no_death_known', tag: 'misc',
+    trigger: G => G.stats && G.stats.citizensDied >= 1 && G.lastDeathDay !== undefined && (G.day - G.lastDeathDay) >= 100,
+    text: 'A hundred days have passed without burial. The grave field is older than the last grave; weeds soften the marker stones. The realm sleeps with a different weight in its chest now.' },
   // Loop 142 (surprise, un-filed): a letter from the other realm.
   // Opens up the WORLD beyond the island — the realm receives news
   // from a distant kingdom. Both the distant name and the news are

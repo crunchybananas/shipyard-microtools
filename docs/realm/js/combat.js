@@ -132,6 +132,7 @@ export function updateEnemies() {
     if (c.jobBuilding) c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
     G.population = Math.max(0, G.population - 1);
     if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
+    G.lastDeathDay = G.day;  // Loop 228 (sustained-state #2 infrastructure)
     playSound('death');
     G.particles.push({
       tx: c.x, ty: c.y, offsetY: -20,
