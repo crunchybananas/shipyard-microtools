@@ -181,6 +181,34 @@ const mayorFire = await page.evaluate(async () => {
 });
 rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
 
+// Test: 269 — newGame() resets G.realmEnded + sustained-state trackers (268 HIGH+MEDIUM)
+const newGameReset = await page.evaluate(async () => {
+  // Set the realm into the post-fall state with stale trackers
+  window.G.realmEnded = true;
+  window.G.lastRaidDay = 30;
+  window.G.lastDeathDay = 50;
+  window.G.lastUnderpopDay = 40;
+  // Trigger the in-game restart helper
+  if (typeof window.newGame !== 'function') return { ok: false, reason: 'no window.newGame' };
+  window.newGame();
+  // Allow a frame for _applyRealmEndFilter to react
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return {
+    ok: true,
+    realmEnded: window.G.realmEnded,
+    lastRaidDay: window.G.lastRaidDay,
+    lastDeathDay: window.G.lastDeathDay,
+    lastUnderpopDay: window.G.lastUnderpopDay,
+    filter: document.getElementById('game').style.filter || '',
+  };
+});
+const reset = newGameReset.realmEnded === false &&
+              newGameReset.lastRaidDay === undefined &&
+              newGameReset.lastDeathDay === undefined &&
+              newGameReset.lastUnderpopDay === undefined &&
+              newGameReset.filter === '';
+rec('269: newGame() resets realmEnded + sustained-state trackers + clears filter', reset, JSON.stringify(newGameReset));
+
 // Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
 const realmEndFilter = await page.evaluate(async () => {
   // Reset

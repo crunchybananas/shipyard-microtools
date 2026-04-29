@@ -322,6 +322,16 @@ window.newGame = () => {
   G.lastResources = null;
   G.tileWear = null;
   G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0 };
+  // Loop 269 (the-fixer, 268 HIGH+MEDIUM): reset realm-end flag and
+  // sustained-state trackers. Without these, a player whose realm fell
+  // and clicked "New Game" inherited realmEnded=true (chronicle gated +
+  // visuals desaturated + all NARRATIVE_BEATS gated → new realm born
+  // already-dead) AND stale lastXDay values that caused 211/228/230 beats
+  // to fire at off-by-N-day offsets in the new realm.
+  G.realmEnded = false;
+  G.lastRaidDay = undefined;
+  G.lastDeathDay = undefined;
+  G.lastUnderpopDay = undefined;
   generateWorld();
   if (gl3dReady) buildTerrainMesh(); // rebuild 3D mesh for new world
   renderBuildBar(); renderMissions(); updateUI();

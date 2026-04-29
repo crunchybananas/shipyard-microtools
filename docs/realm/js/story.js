@@ -691,6 +691,12 @@ const NARRATIVE_BEATS = [
     // and render in render.js shootingstar branch (~30 LoC together).
     after: G => {
       if (!G.particles || !G.camera) return;
+      // Loop 269 (the-fixer, 268 LOW): respect the 400-particle cap that
+      // neighboring spawn sites in particles.js (lines 87/91/94/115/etc)
+      // gate on. Single-instance can't overflow on its own (once-per-realm
+      // flag), but the convention matters for future synchronized-surprise
+      // applications per 267 [process] template.
+      if (G.particles.length >= 400) return;
       const cx = G.camera.x / 32, cy = G.camera.y / 16;
       G.particles.push({
         tx: cx, ty: cy,
