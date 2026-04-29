@@ -92,11 +92,22 @@
   <!-- Ground shadow -->
   <ellipse cx="68" cy="106" rx="22" ry="4" fill="url(#bakeryShadow)"/>
 
-  <!-- Flour dust on doorstep area (NEW DETAIL) -->
+  <!-- Flour dust on doorstep — Loop 235 (Phase D batch 2): the
+       dust gently shifts as if disturbed by foot-traffic + a draft
+       from the oven. Each ellipse opacity-pulses with a slight
+       horizontal drift; staggered begin times so the patches
+       move asynchronously. The base ellipse (the layer ON the
+       doorstep) holds steady; only the smaller patches drift. -->
   <g fill="rgba(245,235,210,0.45)">
     <ellipse cx="64" cy="103" rx="6" ry="0.7"/>
-    <ellipse cx="62" cy="102.5" rx="2" ry="0.4"/>
-    <ellipse cx="66" cy="102.6" rx="2" ry="0.4"/>
+    <ellipse cx="62" cy="102.5" rx="2" ry="0.4">
+      <animate attributeName="opacity" values="0.45; 0.7; 0.35; 0.45" keyTimes="0; 0.3; 0.7; 1" dur="5s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; -0.5 0.1; 0 0" dur="5s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="66" cy="102.6" rx="2" ry="0.4">
+      <animate attributeName="opacity" values="0.45; 0.7; 0.35; 0.45" keyTimes="0; 0.3; 0.7; 1" dur="5.4s" begin="-2s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 0.5 0.1; 0 0" dur="5.4s" begin="-2s" repeatCount="indefinite"/>
+    </ellipse>
   </g>
 
   <!-- ─── Stone base edge ──────────────────────────────────────── -->

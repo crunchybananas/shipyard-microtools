@@ -185,29 +185,39 @@
 
   <!-- ─── Training dummy (left of barracks) ─────────────────────── -->
   <g>
-    <!-- Wooden post -->
+    <!-- Wooden post (stays fixed) -->
     <rect x="40" y="84" width="2" height="18" fill="url(#barracksWood)"/>
-    <!-- Post horizontal arm -->
+    <!-- Post horizontal arm (stays fixed) -->
     <rect x="36" y="86" width="10" height="1.2" fill="url(#barracksWood)"/>
-    <!-- Dummy body (sack) -->
-    <ellipse cx="41" cy="92" rx="3.5" ry="4.5" fill="#c8a870"/>
-    <!-- Sack texture -->
-    <line x1="38" y1="89" x2="44" y2="95" stroke="rgba(110,80,40,0.4)" stroke-width="0.3"/>
-    <line x1="38" y1="92" x2="44" y2="92" stroke="rgba(110,80,40,0.4)" stroke-width="0.3"/>
-    <!-- Dummy head -->
-    <circle cx="41" cy="85.5" r="2.3" fill="#d4b888"/>
-    <!-- Painted target marks on head (eyes / nose mark) -->
-    <circle cx="40.2" cy="85.2" r="0.3" fill="#3a2810"/>
-    <circle cx="41.8" cy="85.2" r="0.3" fill="#3a2810"/>
-    <line x1="40.5" y1="86.5" x2="41.5" y2="86.5" stroke="#3a2810" stroke-width="0.4"/>
-    <!-- Rope bindings (horizontal across body) -->
-    <line x1="37" y1="89" x2="45" y2="89" stroke="#7a5028" stroke-width="0.6"/>
-    <line x1="37" y1="93" x2="45" y2="93" stroke="#7a5028" stroke-width="0.6"/>
-    <line x1="37" y1="96" x2="45" y2="96" stroke="#7a5028" stroke-width="0.6"/>
-    <!-- Worn/struck marks on dummy (small dark spots) -->
-    <circle cx="40" cy="91" r="0.3" fill="#7a5028" opacity="0.6"/>
-    <circle cx="42" cy="93.5" r="0.3" fill="#7a5028" opacity="0.6"/>
-    <circle cx="41" cy="96" r="0.3" fill="#7a5028" opacity="0.6"/>
+    <!-- Loop 235 (Phase D batch 2): dummy idle sway. Hangs from
+         the horizontal arm at y=87; pivot near top of dummy at
+         (41, 87). Slow ±2.5° asymmetric (5.5s cycle) reads as
+         passive hanging-from-rope, not active swing. Different
+         cycle from castle pennants / tower banner / tavern sign
+         so neighbouring military buildings don't sync. -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-2.5 41 87; 2 41 87; -2.5 41 87" dur="5.5s" repeatCount="indefinite"/>
+      <!-- Dummy body (sack) -->
+      <ellipse cx="41" cy="92" rx="3.5" ry="4.5" fill="#c8a870"/>
+      <!-- Sack texture -->
+      <line x1="38" y1="89" x2="44" y2="95" stroke="rgba(110,80,40,0.4)" stroke-width="0.3"/>
+      <line x1="38" y1="92" x2="44" y2="92" stroke="rgba(110,80,40,0.4)" stroke-width="0.3"/>
+      <!-- Dummy head -->
+      <circle cx="41" cy="85.5" r="2.3" fill="#d4b888"/>
+      <!-- Painted target marks on head (eyes / nose mark) -->
+      <circle cx="40.2" cy="85.2" r="0.3" fill="#3a2810"/>
+      <circle cx="41.8" cy="85.2" r="0.3" fill="#3a2810"/>
+      <line x1="40.5" y1="86.5" x2="41.5" y2="86.5" stroke="#3a2810" stroke-width="0.4"/>
+      <!-- Rope bindings (horizontal across body) -->
+      <line x1="37" y1="89" x2="45" y2="89" stroke="#7a5028" stroke-width="0.6"/>
+      <line x1="37" y1="93" x2="45" y2="93" stroke="#7a5028" stroke-width="0.6"/>
+      <line x1="37" y1="96" x2="45" y2="96" stroke="#7a5028" stroke-width="0.6"/>
+      <!-- Worn/struck marks on dummy (small dark spots) -->
+      <circle cx="40" cy="91" r="0.3" fill="#7a5028" opacity="0.6"/>
+      <circle cx="42" cy="93.5" r="0.3" fill="#7a5028" opacity="0.6"/>
+      <circle cx="41" cy="96" r="0.3" fill="#7a5028" opacity="0.6"/>
+    </g>
   </g>
 
   <!-- ─── Weapons rack (right of barracks, behind banner) ────────── -->

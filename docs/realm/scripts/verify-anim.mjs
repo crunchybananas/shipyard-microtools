@@ -33,6 +33,8 @@ const SPRITES = [
   { name: 'bakery',     file: 'bakery.svg',     wait: 3000 },  // smoke drift
   { name: 'market',     file: 'market.svg',     wait: 2300 },  // awning sway 4.5s/2
   { name: 'blacksmith', file: 'blacksmith.svg', wait: 1700 },  // forge fire pulse 1.6s
+  { name: 'tavern',     file: 'tavern.svg',     wait: 1900 },  // sign-swing 3.6s/2
+  { name: 'barracks',   file: 'barracks.svg',   wait: 2900 },  // dummy idle 5.5s/2
 ];
 
 let allPass = true;

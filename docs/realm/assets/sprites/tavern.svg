@@ -150,26 +150,36 @@
     <!-- Bracket flourish (small triangle) -->
     <path d="M 48 88 L 49 86 L 50 88 Z" fill="#5a3a18"/>
 
-    <!-- Chain links between bracket beam and board (2 small ovals) -->
-    <ellipse cx="49.5" cy="89.5" rx="0.4" ry="0.3" fill="none" stroke="#3a2818" stroke-width="0.3"/>
-    <ellipse cx="49.5" cy="90.4" rx="0.4" ry="0.3" fill="none" stroke="#3a2818" stroke-width="0.3"/>
+    <!-- Loop 235 (Phase D batch 2): sign-swing animation. Chains
+         + board + mug emblem rotate as one unit around the chain-
+         top attachment (50, 89). 3.6s asymmetric cycle -3°→+2.5°
+         reads as gentle pub-door breeze. Different cycle from castle
+         pennants (3.0/3.4/4.0s) and tower banner (3.2s) so adjacent
+         buildings don't sync. -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-3 50 89; 2.5 50 89; -3 50 89" dur="3.6s" repeatCount="indefinite"/>
+      <!-- Chain links between bracket beam and board (2 small ovals) -->
+      <ellipse cx="49.5" cy="89.5" rx="0.4" ry="0.3" fill="none" stroke="#3a2818" stroke-width="0.3"/>
+      <ellipse cx="49.5" cy="90.4" rx="0.4" ry="0.3" fill="none" stroke="#3a2818" stroke-width="0.3"/>
 
-    <!-- Sign board (gold) -->
-    <rect x="46" y="91" width="8" height="5" fill="url(#signBoard)"/>
-    <!-- Top accent band -->
-    <rect x="46.5" y="91.5" width="7" height="1" fill="#fce080"/>
-    <!-- Board outline -->
-    <rect x="46" y="91" width="8" height="5" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="0.3"/>
-    <!-- Mug emblem (canonical) -->
-    <g fill="#fce080">
-      <!-- Mug body -->
-      <rect x="48" y="93" width="2" height="2.3" />
-      <!-- Mug handle (open ring on right) -->
-      <path d="M 50 93.4 Q 51.2 93.7 51.2 94.2 Q 51.2 94.7 50 95.0"
-            fill="none" stroke="#fce080" stroke-width="0.6"/>
-      <!-- Foam top -->
-      <ellipse cx="49" cy="92.8" rx="1.1" ry="0.4" />
-    </g>
+      <!-- Sign board (gold) -->
+      <rect x="46" y="91" width="8" height="5" fill="url(#signBoard)"/>
+      <!-- Top accent band -->
+      <rect x="46.5" y="91.5" width="7" height="1" fill="#fce080"/>
+      <!-- Board outline -->
+      <rect x="46" y="91" width="8" height="5" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="0.3"/>
+      <!-- Mug emblem (canonical) -->
+      <g fill="#fce080">
+        <!-- Mug body -->
+        <rect x="48" y="93" width="2" height="2.3" />
+        <!-- Mug handle (open ring on right) -->
+        <path d="M 50 93.4 Q 51.2 93.7 51.2 94.2 Q 51.2 94.7 50 95.0"
+              fill="none" stroke="#fce080" stroke-width="0.6"/>
+        <!-- Foam top -->
+        <ellipse cx="49" cy="92.8" rx="1.1" ry="0.4" />
+      </g>
+    </g><!-- /sign-swing wrapper (235) -->
   </g>
 
   <!-- ─── Two glowing windows ───────────────────────────────────── -->
