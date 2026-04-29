@@ -265,6 +265,22 @@ const townhallMaxCount = await page.evaluate(async () => {
 });
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
+// Test: 277 absent_citizen_seat_known — inference-by-absence (3rd individual-interiority shape)
+const absentCitizenFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.day = 35;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'tavern')) {
+    window.G.buildings.push({ type: 'tavern', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  }
+  delete window.G.storyFlags.absent_citizen_seat_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.absent_citizen_seat_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a citizen no one has seen'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('277: absent_citizen_seat_known fires d≥30 + tavern', absentCitizenFire.fired, `text="${absentCitizenFire.text}…" tag=${absentCitizenFire.tag}`);
+
 // Test: 275 child_no_elsewhere_known — POV-inversion (2nd individual-interiority shape)
 const childPOVFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

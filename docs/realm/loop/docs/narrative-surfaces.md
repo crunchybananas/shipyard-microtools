@@ -660,8 +660,10 @@ should respect:
   - *Weather-recognition* (147/174/246 arriving; 272
     not-arriving): WEATHER-ARRIVING → +NEGATIVE-SPACE.
   - *Individual-interiority* (212 mid-action; 275
-    totalizing): MID-ACTION-INTERIORITY → +TOTALIZING-
-    WORLDVIEW.
+    totalizing; 277 inference-by-absence): MID-ACTION-
+    INTERIORITY → +TOTALIZING-WORLDVIEW → +INFERENCE-BY-
+    ABSENCE. **First sub-type to grow 3 shapes**;
+    demonstrates shape-axes can extend beyond binary.
 
   **Why this is an invariant not just an observation:** the
   pattern is now PRESCRIPTIVE — it tells future authors that
@@ -980,10 +982,12 @@ prescriptive AND consistently applied.
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
-  - *Individual-interiority* (212/275): focal
+  - *Individual-interiority* (212/275/277): focal
     is a single anonymous citizen rather than
-    the realm collective. **2 shapes within
-    the sub-type:**
+    the realm collective. **3 shapes within
+    the sub-type — first sub-type to grow
+    3 shapes (per 276 invariant: shape-axis
+    can extend beyond binary):**
     - 212 first_sigh_seen — MID-ACTION
       interiority ("a settler sets down a
       bucket... breathes out. No one sees.")
@@ -995,16 +999,27 @@ prescriptive AND consistently applied.
       ridge as far as they are concerned.")
       A whole frame-of-reference rather than
       an instant.
-    2 uses; per 257 anti-completionist + 270/
-    272 shape-axis precedent: 275 ships because
-    POV-INVERSION angle (citizen's world ENDS
-    at realm boundary) the corpus has never
-    touched, not as count-advancement. The
-    sub-type now has 2 shapes orthogonal to
-    use-count, mirroring 270 character-
-    interiority (solitary + confluence) and
-    272 weather-recognition (arriving + not-
-    arriving) shape-axis pattern.
+    - 277 absent_citizen_seat_known —
+      INFERENCE-BY-ABSENCE interiority ("a
+      citizen no one has seen in many days...
+      their seat at the inn is empty for the
+      third evening in a row.") The realm's
+      awareness mediated through ROUTINE
+      DISRUPTION; the realm doesn't see the
+      citizen, it sees the SHAPE of their
+      absence.
+    Per 276 invariant: each shape ships because
+    PROSE INTRODUCES NEW ANGLE not as count-
+    advancement. The 3-shape grown sub-type
+    demonstrates that shape-axes can extend
+    beyond binary (270 character-interiority +
+    272 weather-recognition + 275 individual-
+    interiority's first shape-extension all
+    introduced 2nd shapes; 277 introduces the
+    first 3rd shape). Future authors: 3+ shapes
+    within one sub-type is permitted IFF each
+    shape introduces a genuinely fresh angle
+    per 203 + 257 + 276 disciplines.
   - *Habituation-recognition* (254): the realm
     recognizes its own *threshold of accumulated
     experience* — second-order observation that

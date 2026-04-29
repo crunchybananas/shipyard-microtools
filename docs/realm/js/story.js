@@ -784,6 +784,28 @@ const NARRATIVE_BEATS = [
   { flag: 'child_no_elsewhere_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && (G.stats?.citizensBorn || 0) >= 1,
     text: 'There is a child in the realm who has lived nowhere else. They have heard their elders speak of other places but have never seen one. The world ends at the eastern ridge as far as they are concerned.' },
+  // Loop 277 (surprise, un-filed, alternation after 276 archivist):
+  // INFERENCE-BY-ABSENCE shape-extension per 276 invariant.
+  // 3rd shape of individual-interiority sub-type (after 212 mid-action +
+  // 275 totalizing). NEW ANGLE: the realm's awareness of a citizen
+  // mediated through a SHARED ROUTINE'S DISRUPTION rather than direct
+  // observation. The realm doesn't see the citizen; it sees the
+  // empty-seat-shaped HOLE in daily life. "Empty for the third evening
+  // in a row" — the detail of "third" is load-bearing: not first
+  // (could be coincidence), not every (too definitive), but third-in-
+  // a-row (when habit-breakage becomes notable). The implicit story
+  // of the absent citizen (sick? dead? gone?) is left unsaid; the
+  // realm only registers the SHAPE of their absence. Per 276 invariant:
+  // shape-extension ships because INFERENCE-BY-ABSENCE angle the
+  // corpus has never touched, not as count-advancement. Individual-
+  // interiority sub-type now has 3 shapes (212 mid-action / 275
+  // totalizing / 277 inference-by-absence) — first sub-type to grow
+  // 3 shapes; documents that shape-axes can extend beyond binary.
+  // Gate: tavern built + day ≥ 30 (long enough for daily inn-routine
+  // to exist as a reference pattern). Once-per-realm; tag misc.
+  { flag: 'absent_citizen_seat_known', tag: 'misc',
+    trigger: G => G.day >= 30 && G.buildings && G.buildings.some(b => b.type === 'tavern'),
+    text: 'There is a citizen no one has seen in many days. The realm only notices when their seat at the inn is empty for the third evening in a row.' },
   { flag: 'storm_passed_seen', tag: 'misc',
     trigger: G => G.season === 'summer' && G.day >= 30,
     text: 'There is a summer evening when a storm builds over the eastern sea but does not come ashore. The realm watches the lightning a long way off and is given the night intact.',
