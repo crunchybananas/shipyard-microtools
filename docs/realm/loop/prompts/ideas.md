@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 245 [code] — remaining character interiority moments per 240 filing: teacher (slate-board with child's name still chalked, year-2+); merchant (counts same coins three times by lamp, year-1+ autumn); rival (banner sighted on distant ridge at dusk, year-3+ autumn/winter). Each ~15-20 LoC; ship 1 per 5-10 ticks. [story.js]
+- 245 [doc] — micro-instance pattern: one cluster sub-type's image NESTLED inside a different sub-type's beat (245 fire-as-agent inside character beat). Adds texture without fragmenting cluster. Document as observed-pattern at 3+ accretion. Currently 1 use. [loop/docs/]
 - 244 [code] — second-townhall beat candidate: year-3+ "townhall has held long sessions" referencing accumulated procedural memory. Sustained-state-recognition variant bonded to the new building. ~10 LoC. [story.js]
 - 244 [process] — "co-shipped infrastructure" pattern observed at 242 + 244: when a filed beat encounters dispatch limitations, fix the dispatch in the same tick as the beat ships, if ≤10 LoC + backward-compatible. Document at next archivist. [process]
 - 244 [doc] — narrative-surfaces.md should document BUILDING_FIRST_BEATS function-text support alongside existing pattern docs. ~3-5 LoC. [loop/docs/]

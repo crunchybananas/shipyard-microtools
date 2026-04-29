@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 17: 245 smith_walks_river — smith named + day≥30 + summer/autumn
+const smithFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureSmith();
+  window.G.day = 35;
+  window.G.season = 'summer';
+  delete window.G.storyFlags.smith_walks_river;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.smith_walks_river === true;
+  const entry = window.G.chronicle.find(e => e.text?.includes("anvil falls silent"));
+  return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
+});
+rec('245: smith_walks_river fires smith + d35 + summer', smithFire.fired, `text="${smithFire.text}…" tag=${smithFire.tag}`);
+
 // Test 16: 244 first-townhall chronicle beat (function-text + mayor reference)
 const townhallBeat = await page.evaluate(async () => {
   const story = await import('./js/story.js');

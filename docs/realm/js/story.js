@@ -511,6 +511,22 @@ const NARRATIVE_BEATS = [
       const b = G.namedCharacters.bard;
       return `There is an evening when ${b.name} composes a song no one will hear sung — they hum it to themselves walking back from the river, and by morning have already half-forgotten the second verse. Some songs the realm has had were never sung aloud.`;
     } },
+  // Loop 245 (the-fixer, 240 filed): SMITH interiority moment.
+  // Mirrors 240 bard's quiet-personhood shape: named-character does
+  // something off-task. Bard composed a song; smith walks the river.
+  // Closing image gives the fire (an inanimate forge element) quiet
+  // agency — "and waits" — small land-as-agent shape WITHIN a tag:
+  // character beat. Per 213 skeptic finding 2 NO META-frame.
+  // Gate: smith named (blacksmith built per 034 hook → ensureSmith)
+  // + day ≥ 30 + summer/autumn (work-weather; smith feels right
+  // walking the river when the fire could be cooling). Once per
+  // realm.
+  { flag: 'smith_walks_river', tag: 'character',
+    trigger: G => G.namedCharacters?.smith && G.day >= 30 && (G.season === 'summer' || G.season === 'autumn'),
+    text: G => {
+      const s = G.namedCharacters.smith;
+      return `There is an afternoon when ${s.name}'s anvil falls silent for an hour past noon. The smith has gone walking to the river, alone, for reasons even ${s.name} does not name. The fire cools by a degree, and waits.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
