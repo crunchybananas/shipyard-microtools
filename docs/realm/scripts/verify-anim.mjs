@@ -35,6 +35,9 @@ const SPRITES = [
   { name: 'blacksmith', file: 'blacksmith.svg', wait: 1700 },  // forge fire pulse 1.6s
   { name: 'tavern',     file: 'tavern.svg',     wait: 1900 },  // sign-swing 3.6s/2
   { name: 'barracks',   file: 'barracks.svg',   wait: 2900 },  // dummy idle 5.5s/2
+  { name: 'granary',    file: 'granary.svg',    wait: 2400 },  // dome dust drift 4.4-5s
+  // Note: church bell is occasional (32s cycle, 85% rest); skip in routine verify
+  // because waiting 30s+ per run is too slow. Manual verify if needed.
 ];
 
 let allPass = true;

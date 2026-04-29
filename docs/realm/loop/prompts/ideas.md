@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 236 [code] — slow-animation verify: separate `verify-anim-slow.mjs` OR `--slow` flag in verify-anim that waits 35s+ to capture church bell occasional-ring + any future long-cycle animations. ~10 LoC. [scripts/]
+- 236 [doc] — render-layers.md should document Phase D completion in strategic-plan section (mirror of how Phase B+C were documented at 221+226). Plan currently ends at Phase C; Phase D was emergent follow-on. ~15-20 LoC. Next archivist or fixer. [loop/docs/]
+- 236 [process] — 75-tick arc from 161 user-steering to fully-animated live game (236). Worth retrospective at next milestone-letter (250). Phases: User direction → Authoring → Bridge unblock → Integration → Animation primary → Animation polish — each closed cleanly. Case study of long-arc execution discipline. [journal]
 - 235 [code] — Phase D batch 3: church bell occasional swing (long-pause + brief ring sequence; 30s+ cycle so it reads as PUNCTUATION not constant motion) + granary grain-pile dust (small drift). Closes Phase D entirely. ~10 LoC. [SVG files]
 - 235 [code] — verify-anim min-delta threshold: tavern (7B) + barracks (4B) animations pass byte-diff but are very small. Could add minimum delta (e.g., 20B) to catch "animation present but invisible" cases. ~5 LoC. [scripts/]
 - 234 [code] — Phase D batch 2: tavern sign-swing (175) + bakery flour-dust doorstep (180) + barracks training-dummy idle sway. ~20 LoC total. [SVG files]

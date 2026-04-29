@@ -163,10 +163,23 @@
     <circle cx="-7" cy="0.5" r="0.4" fill="#a07820"/>
   </g>
 
-  <!-- ─── Subtle dust/light flecks around the dome ─────────────────── -->
+  <!-- ─── Subtle dust/light flecks around the dome — Loop 236
+       (Phase D batch 3): grain-pile dust drift. 3 flecks gain
+       opacity pulse + small horizontal drift; staggered begin
+       times (0/-1.5s/-3s) + varied dur (4.4/5.0/4.7s) so flecks
+       don't pulse together. ────────────────────────────────── -->
   <g fill="rgba(255,240,200,0.4)">
-    <circle cx="50" cy="48" r="0.6"/>
-    <circle cx="78" cy="50" r="0.5"/>
-    <circle cx="55" cy="40" r="0.4"/>
+    <circle cx="50" cy="48" r="0.6">
+      <animate attributeName="opacity" values="0.4; 0.65; 0.4" dur="4.4s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 1 -0.5; 0 0" dur="4.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="78" cy="50" r="0.5">
+      <animate attributeName="opacity" values="0.4; 0.65; 0.4" dur="5.0s" begin="-1.5s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; -1 -0.5; 0 0" dur="5.0s" begin="-1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="55" cy="40" r="0.4">
+      <animate attributeName="opacity" values="0.4; 0.65; 0.4" dur="4.7s" begin="-3s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 0.5 -1; 0 0" dur="4.7s" begin="-3s" repeatCount="indefinite"/>
+    </circle>
   </g>
 </svg>
