@@ -94,6 +94,20 @@ export function updateEnemies() {
     if (e.hp <= 0) {
       G.enemies.splice(i, 1);
       if (G.stats) G.stats.enemiesKilled++;
+      // Loop 209 (the-fixer, 206 filed): rival's symmetric +reward arm.
+      // 206 shipped the difficulty bump (rivalMult ×1.10 raider count);
+      // 209 ships the cooperative-arm pair: +5 gold per raider slain
+      // when rival is named. Per 105 filing's "might include +reward
+      // for successful defense" clause. Adversarial-AND-rewarding shape:
+      // the rival sends more raiders AND each one is worth more when
+      // killed. Net balance: realm faces ~+10% raider count for ~+50
+      // gold per typical late-game raid (10 raiders × 5 gold). Silent
+      // — no toast/chronicle (matches 034 named-character invariant
+      // + 206 silent-mechanic discipline). 6 named-cast mechanics now
+      // shipped fully; only mayor structural-unlock remains.
+      if (G.namedCharacters?.rival) {
+        G.resources.gold += 5;
+      }
       playSound('demolish');
       // Death particles — dramatic blood splat effect
       for (let p = 0; p < 8; p++) {

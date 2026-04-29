@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -595,12 +595,13 @@ should respect:
   (tech.js, 101), merchant → +5% trade (trade.js, 102),
   smith → +5% tower fire-rate (combat.js, 105 → re-tuned
   at 153 from damage to fire-rate), bard → +5 happiness
-  baseline (economy.js, 201), rival → +10% raid count
-  (economy.js raid spawn, 206; floor-rounding means low-
-  count raids unchanged, deep-realm raids meaner). Silent
-  mechanic (no UI, no chronicle beat — 034's character-
-  intro already narrates arrival). Remaining: mayor
-  (civic-unlock; structural, larger scope only).
+  baseline (economy.js, 201), rival → +10% raid count +
+  +5 gold per raider slain (economy.js raid spawn 206 +
+  combat.js raider death 209; adversarial-AND-rewarding
+  symmetric pair). Silent mechanic (no UI, no chronicle
+  beat — 034's character-intro already narrates arrival).
+  Remaining: mayor (civic-unlock; structural, larger
+  scope only).
 - **End-of-realm beats are first-class** (103, closing 053's
   filed ask). `realm_fell` NARRATIVE_BEATS entry fires when
   `G.population === 0 && G.day > 1`. Tag: `requiem`.
@@ -703,22 +704,39 @@ prescriptive AND consistently applied.
   to invariant.
 
 - **Additive-baseline vs multiplicative-bonus
-  for named-character mechanics (observation,
-  1+4 uses).** Multiplicative when the character
-  amplifies an existing system (101 teacher ×
-  research speed, 102 merchant × trade margin,
-  105+153 smith × tower fire-rate, 206 rival ×
-  raid count). Additive when the character
-  contributes baseline character (201 bard +5
-  happiness — flat, independent of buildings).
-  Filed at 201 with promotion threshold 3+ for
-  the additive variant; currently 1 use. If
-  2+ more additive cases emerge (a hypothetical
-  poet wisdom, a diplomat reputation), promote.
-  The multiplicative variant has 4 uses and is
-  effectively the default; the invariant in
-  `## invariants` documents it as the primary
-  pattern.
+  vs event-trigger-reward for named-character
+  mechanics (observation, 4+1+1 uses).** Three
+  shapes now in the wild:
+  - **Multiplicative** when the character
+    amplifies an existing system (4 uses):
+    101 teacher × research speed, 102 merchant
+    × trade margin, 105+153 smith × tower fire-
+    rate, 206 rival × raid count. Effectively
+    the default; the invariant in `## invariants`
+    documents it as the primary pattern.
+  - **Additive baseline** when the character
+    contributes flat baseline character
+    independent of buildings (1 use): 201 bard
+    +5 happiness baseline. Filed at 201 with
+    promotion threshold 3+; currently 1 use.
+  - **Event-trigger reward** when the character
+    grants a per-event bonus on a discrete game
+    event (1 use): 209 rival +5 gold per raider
+    slain (combat.js raider-death handler).
+    Filed at 209 with promotion threshold 3+.
+    Different shape from multiplicative (no
+    multiplier chain) and additive (not a
+    baseline) — it's a CONDITIONAL GRANT inside
+    an event handler.
+  
+  Rival is the first character with TWO mechanic
+  sites (raid-spawn multiplier 206 + raider-kill
+  reward 209). The pair is symmetric: harder
+  raids AND more reward for surviving them.
+  Future characters may follow the same dual-
+  shape design (e.g., a hypothetical bandit-king
+  rival might dual-ship raid difficulty AND
+  per-bandit-corpse loot).
 
 - **Source-specific echo branch (observation,
   1 use).** 194 added a conditional fast-path
@@ -1303,7 +1321,7 @@ shipping, touch this file too.
   Per 203 positive authoring rule earns landing through
   fresh axis, not pattern-completion. NARRATIVE_BEATS
   reaches 33; year-1 progression now 5 beats over 12 days.
-- **208 (this update)** — refactor. Adds
+- **208** — refactor. Adds
   **observational-elder register cluster** as 5th
   observed-pattern: ~11 beats across 4 tags share
   declarative-present-tense voice + "realm" as collective
@@ -1318,3 +1336,17 @@ shipping, touch this file too.
   199 filed this; cluster size threshold met.
   Multiplicative-bonus count in additive-baseline entry
   updated 1+3 → 1+4 (caught up for 206 rival).
+- **209 (this update)** — the-fixer. Closes 206 filed
+  (3 ticks): rival's symmetric +reward arm — +5 gold per
+  raider slain when rival named (combat.js raider-death
+  handler at line 94+). Pairs with 206's difficulty bump
+  as **adversarial-AND-rewarding** symmetric design.
+  Rival is now the first character with TWO mechanic
+  sites (raid-spawn 206 + raider-death 209). Doc
+  invariant updated SAME tick per 204 [process]; rival
+  entry expanded to "+10% raid count + +5 gold per
+  raider slain". Observed-patterns additive-vs-
+  multiplicative entry now identifies a THIRD shape:
+  **event-trigger reward** (1 use, threshold 3+).
+  Three shapes now: 4 multiplicative + 1 additive +
+  1 event-trigger.
