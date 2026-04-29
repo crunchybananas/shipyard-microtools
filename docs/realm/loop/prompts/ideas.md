@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 238 [code] **HIGH** — `_SPRITE_SIZES` bump by ~20% across all 11 entries (specific values in 238 journal). Confirms 217 filing after empirical audit. Verify visual parity with canvas baseline via verify-phaseb at default zoom. ~10 LoC. [render.js]
+- 238 [code] — multi-zoom systematic sizing audit: zoom 0.5/0.75/1.0/1.25/1.5/2.0/2.5. Decide single sweet-spot vs zoom-aware scaling. ~30 LoC scripts/. [scripts/]
+- 238 [code] — animation-quality review via multi-frame GIF capture OR HEADED Playwright session. Single screenshots can't evaluate motion. ~20-30 LoC. [scripts/]
+- 238 [doc] — observation: screenshot-critic could re-run periodically (~every 30 ticks) to track visual-debt accumulation. Document as observed rhythm. [process]
 - 237 [doc] — observation: render-layers.md status-header arc-summary now captures full Phase A→D cleanly. When next major arc starts, status header stays single-place-to-look; per-phase detail lives in strategic-plan. [process]
 - 237 [doc] — punctuation-pattern animation discipline is first entry beyond Phase C's "SVG-internal = zero render.js cost" invariant. If 2+ more SVG-animation invariants emerge, form dedicated `## svg animation invariants` section. [loop/docs/]
 - 236 [code] — slow-animation verify: separate `verify-anim-slow.mjs` OR `--slow` flag in verify-anim that waits 35s+ to capture church bell occasional-ring + any future long-cycle animations. ~10 LoC. [scripts/]
