@@ -143,6 +143,16 @@ const SPECS = [
     ],
     labels: ['red', 'blue', 'green', 'purple'],
   },
+  {
+    type: 'granary', group: 'silo',
+    palettes: [
+      ['#e8c898', '#d8a878', '#b88040', '#8a5820'],
+      ['#d8d4d0', '#b0a8a0', '#807870', '#504840'],
+      ['#e8b098', '#c88068', '#985040', '#682820'],
+      ['#c8d8a8', '#a0b888', '#6a8048', '#3a4818'],
+    ],
+    labels: ['warm-tan', 'cool-grey', 'brick-red', 'mossy-green'],
+  },
 ];
 
 const assertResults = [];

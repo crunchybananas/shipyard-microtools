@@ -128,6 +128,20 @@ const _VARIANT_PALETTES = {
       ['#a830a8', '#702070', '#400040'],  // 3 purple — twilight/court realm
     ],
   },
+  // Loop 281 (the-fixer, 220 filing follow-on after 279 castle): granary
+  // silo-body variants. Source #e8c898/#d8a878/#b88040/#8a5820 (lines 16-
+  // 19 of granary.svg) is the warm-tan silo gradient — the most visually
+  // prominent element. 3 alternates suggest different stone/clay
+  // traditions per realm. Dome / sacks / grain colors stay constant so
+  // the granary's grain-storage identity remains universally recognizable.
+  granary: {
+    silo: [
+      ['#e8c898', '#d8a878', '#b88040', '#8a5820'],  // 0 warm-tan (default)
+      ['#d8d4d0', '#b0a8a0', '#807870', '#504840'],  // 1 cool-grey — northern stone
+      ['#e8b098', '#c88068', '#985040', '#682820'],  // 2 brick-red — clay-fire palette
+      ['#c8d8a8', '#a0b888', '#6a8048', '#3a4818'],  // 3 mossy-green — forest realm
+    ],
+  },
 };
 // Tiny string-hash for kingdom-name → variant index. Mirrors the
 // _dreamHash style used in story.js without an import (avoids circular
