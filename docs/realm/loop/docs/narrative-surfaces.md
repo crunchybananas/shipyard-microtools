@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -580,13 +580,25 @@ should respect:
   shape.** Writers should use the existing `chronicle(text, tag)`
   helper; don't push directly.
 - **Named characters can carry game mechanics** (101 + 102,
-  closing 050's filed ask). Pattern:
-  `const <char>Mult = G.namedCharacters?.<char> ? 1.N : 1;`
-  applied inside existing multiplier chains. Currently shipped:
-  teacher → +10% research (tech.js), merchant → +5% trade
-  (trade.js). Silent mechanic (no UI, no chronicle beat —
-  034's character-intro already narrates arrival). Remaining
-  character slots (smith/bard/mayor/rival) are filed follow-ups.
+  closing 050's filed ask). Two patterns now shipped:
+  - **Multiplicative variant** — used when the character
+    amplifies an existing system:
+    `const <char>Mult = G.namedCharacters?.<char> ? 1.N : 1;`
+    applied inside existing multiplier chains.
+  - **Additive baseline variant** — used when the character
+    contributes flat baseline character independent of
+    buildings (filed at 1 use; see `## observed patterns`):
+    `const <char>Bonus = G.namedCharacters?.<char> ? N : 0;`
+    added to a baseline expression.
+
+  Currently shipped (4 of 6): teacher → +10% research
+  (tech.js, 101), merchant → +5% trade (trade.js, 102),
+  smith → +5% tower fire-rate (combat.js, 105 → re-tuned
+  at 153 from damage to fire-rate), bard → +5 happiness
+  baseline (economy.js, 201). Silent mechanic (no UI, no
+  chronicle beat — 034's character-intro already narrates
+  arrival). Remaining: mayor (civic-unlock; structural,
+  larger scope) + rival (adversarial-modifier).
 - **End-of-realm beats are first-class** (103, closing 053's
   filed ask). `realm_fell` NARRATIVE_BEATS entry fires when
   `G.population === 0 && G.day > 1`. Tag: `requiem`.
@@ -1167,15 +1179,31 @@ shipping, touch this file too.
   unfalsifiable; doctrine silent about un-closed
   objects; closure-pressure not authorship-discipline).
   Recommendation: demote to observed-pattern.
-- **203 (this update)** — the-fixer. Ships 202's
-  mutation: 188 invariant moved out of `## invariants`
-  into new `## observed patterns` section; reframed as
-  descriptive not prescriptive; "earned closure"
-  replaced with positive authoring rule "*closure beats
-  should surprise the realm, not satisfy a pattern.*"
-  Same-day beat-pair (199), additive-baseline (201),
-  and source-specific echo (194) added to the new
-  section as 1-use observations (consistent 3+
-  promotion threshold). All references to "188
-  invariant" / "second use of template" updated through
-  the doc.
+- **203** — the-fixer. Ships 202's mutation: 188
+  invariant moved out of `## invariants` into new
+  `## observed patterns` section; reframed as
+  descriptive not prescriptive; "earned closure" replaced
+  with positive authoring rule "*closure beats should
+  surprise the realm, not satisfy a pattern.*" Same-day
+  beat-pair (199), additive-baseline (201), and source-
+  specific echo (194) added to the new section as 1-use
+  observations (consistent 3+ promotion threshold). All
+  references to "188 invariant" / "second use of template"
+  updated through the doc.
+- **204** — the-pessimist. Adversarial bug-hunt across
+  192/194/196/197/199/201/203. 3 findings: HIGH (named-
+  character invariant 4 ticks stale; claims teacher+merchant
+  shipped when 4 are); MEDIUM (same invariant claims
+  multiplicative-only pattern contradicting 201 additive);
+  LOW (201 journal verification path has wrong character
+  trigger). 6 ships otherwise clean. Doc-lag is the
+  dominant failure mode.
+- **205 (this update)** — the-fixer. Ships 204 HIGH +
+  MEDIUM: named-character invariant updated to reflect
+  4 of 6 mechanics shipped (teacher 101 / merchant 102 /
+  smith 105+153 / bard 201) + dual-pattern shape
+  (multiplicative + additive variants documented;
+  cross-references `## observed patterns`). LOW finding
+  (201 journal verification path) deliberately not
+  edited per "don't rewrite history" discipline; chrome
+  verification will discover empirically.
