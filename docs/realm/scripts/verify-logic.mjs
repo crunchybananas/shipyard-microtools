@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 18: 246 first_thaw_known — year2 + spring + day≥31
+const thawFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.season = 'spring';
+  window.G.day = 32;
+  delete window.G.storyFlags.first_thaw_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.first_thaw_known === true;
+  const entry = window.G.chronicle.find(e => e.text?.includes("first warm day"));
+  return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
+});
+rec('246: first_thaw_known fires year2 + spring d32', thawFire.fired, `text="${thawFire.text}…" tag=${thawFire.tag}`);
+
 // Test 17: 245 smith_walks_river — smith named + day≥30 + summer/autumn
 const smithFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

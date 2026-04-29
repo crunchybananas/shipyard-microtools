@@ -583,6 +583,20 @@ const NARRATIVE_BEATS = [
   { flag: 'first_frost_marked', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.season === 'autumn' && G.day >= 45,
     text: 'There is a morning when frost finds the fields and does not leave by noon. The realm marks the year by it now.' },
+  // Loop 246 (surprise, un-filed): FIRST-THAW year-2+ spring beat.
+  // Sibling to 174 first-frost (year-2 autumn) but OPPOSITE seasonal
+  // boundary — the realm now has memory of one full winter and
+  // experiences the thaw differently than the unfamiliar first time.
+  // Per 213 diversification: tag:event matches 147 great-storm
+  // weather-memory pattern, NOT misc-tag (8 ticks of misc surprises
+  // since 207). "Colder than memory expected; somehow this is
+  // reassuring" — small psychological observation that weather memory
+  // is unreliable + that's OK. Closing line lifts beyond literal
+  // moment per 184/199/240 craft. No META-frame per 213 finding 2.
+  // Static prose; year-2+ once-fire.
+  { flag: 'first_thaw_known', tag: 'event',
+    trigger: G => G.storyFlags.year2 && G.season === 'spring' && G.day >= 31,
+    text: 'The first warm day of the second year arrives. The realm goes barefoot to the river. The water is colder than memory expected; somehow this is reassuring.' },
   // Loop 211 (surprise, closes 060 filed ~150 ticks): SUSTAINED-STATE
   // beat. New shape — fires when a temporal threshold is crossed
   // (50+ days since last raid) rather than a single state-condition.
