@@ -1288,6 +1288,73 @@ beats that sum near 57 by themselves. 088's first-snow adds
   beat filed (196 [code] "first cold morning") for future
   ticks.
 
+- **262 (this update — archivist sweep, ~64 ticks since
+  198): cadence target REVISED to ~165-210.**
+
+  +17 conditional beats since 198 across 5 axes:
+
+  *early-game-mood cluster (4 beats):* 199 first-cold-
+  morning / 207 fields-know-realm / 212 first-sigh-seen
+  (year-1 summer/autumn). Most year-1 realms see all 4.
+
+  *sustained-state-recognition (3 beats, year-2+):* 211
+  sustained-peace-known / 228 no-death-known / 230
+  full-pop-known. Conditional on raidsSurvived≥1 and
+  lastRaidDay≥50 / citizensDied≥1 and lastDeathDay≥100 /
+  pop=maxPop and lastUnderpopDay≥60. Most peaceful
+  fortified realms see all three.
+
+  *land-as-agent (2 beats):* 227 well-remembers / 229
+  hearth-holds-names. Conditional on building presence +
+  year-2+ and stats. Most year-2+ realms see well; year-3+
+  with citizensDied see hearth.
+
+  *character-interiority cast (6 beats):* 240 bard-unsung-
+  song / 245 smith-walks-river / 247 teacher-pauses-slate
+  / 249 merchant-counts-thrice / 252 rival-banner-distant /
+  253 mayor-first-in-hall. Each gated on character-named +
+  era + season. Most long-lived realms with full named cast
+  see 4-6 of these.
+
+  *misc (2 beats):* 246 first-thaw-known (year-2+ spring,
+  YEAR-CYCLE PAIR with 174 first-frost) / 254 nights-blur-
+  known (year-2+ autumn/winter — habituation-recognition).
+
+  *event tag:* 214 added a founder-conditional offering item
+  (NOT a new beat — extends 097's offering pool).
+
+  *milestone tag:* 244 firstTownHall building-first beat
+  (BUILDING_FIRST_BEATS, gated on townhall + mayor).
+
+  *Per-realm impact:* well-played long-lived realms with
+  named cast + radio-active mayor see most of these.
+  Realistic +12-18 new chronicle entries per such realm.
+
+  **260's chronicle-gate side effect:** ungated pre-260
+  cadence on FALLEN realms could write 200+ post-end beats
+  to the 300 cap (raids/seasons/dreams firing into a dead
+  realm — see 260 [play] tick). Post-260, fallen realms
+  freeze the chronicle at requiem; only LIVE realms reach
+  the upper bound of this cadence target. This is a TIGHTER
+  target than pre-260 in practice, even though authored
+  beat count grew.
+
+  **Cadence health:** still well under 300 cap. NARRATIVE_BEATS
+  has 47 entries (story.js:trigger count); BUILDING_FIRST_BEATS
+  + season + dreams + nightmares + echoes + raids contribute
+  the rest. Per the 075 invariant: "the chronicle is the
+  narrative memory; one entry per event is the right shape" —
+  no current eviction-pressure observed in long-lived realms.
+
+  **No invariant promotions** this archivist sweep. Per 231
+  contrarian + 251 conservative-promotion: cluster sub-types
+  (9 now) stay observed-pattern; named-character-mechanic
+  observation stays at 4 shapes; same-day pairing stays at
+  1 use; source-specific echo branch stays at 1 use. The
+  authoring discipline shipped at 257 (HIGH categorization
+  note + cluster anti-completionist warning) reinforces the
+  conservative stance.
+
 ## how to update this doc
 
 Future ticks that add or remove a chronicle-producing system MUST
