@@ -5714,6 +5714,13 @@ function updateWaterAmbient() {
 registerUpdater(updateWaterAmbient);
 
 // ── Loop 184: Story — seasonal proverbs in chronicle ────────
+// Loop 265 (the-fixer, 264 variant-pool axis 2nd use): expanded each
+// season's pool from 2→4 entries + replaced Math.random() with day-based
+// deterministic selection (saves remain reproducible). 264 [process]
+// observation about templated generators dominating chronicle monotony
+// applies here — long-lived realm with N years saw each proverb
+// repeated ~N/2 times under RNG; now N/4 times under day-based hash.
+// First two entries per season preserve original prose (backward compat).
 let _lastProverbSeason = '';
 function updateSeasonalProverbs() {
   if (G.gameTick % 240 !== 0) return;
@@ -5723,24 +5730,32 @@ function updateSeasonalProverbs() {
     spring: [
       'The old folk say: "Plant with the first bird\'s song."',
       'An elder speaks: "Spring water runs clearest."',
+      'A farmer murmurs: "Wet soil holds the seed; dry soil holds the weed."',
+      'The schoolteacher tells the children: "Count the buds before you count the fruit."',
     ],
     summer: [
       'A farmer remarks: "Make hay while the sun shines, for it will not last."',
       'Children play at the well. "Summer is for growing," says the schoolteacher.',
+      'An old shepherd nods: "Long days are short to those who waste them."',
+      'A miller stretches: "The wheel turns easier when the wind is steady."',
     ],
     autumn: [
       'The miller sighs: "Autumn counts what summer sowed."',
       'A veteran warns: "Fill the granary now. Winter remembers the lazy."',
+      'A baker mutters: "The flour bin is the realm\'s true clock."',
+      'An elder rests on a bench: "Frost is honest. Frost makes everyone hurry."',
     ],
     winter: [
       'Smoke curls from every chimney. "We endure," says the blacksmith.',
       'The tavern keeper pours another round: "Winter is shorter with good company."',
+      'A child asks the snow a question. The snow does not answer.',
+      'An elder by the fire: "Cold teaches what summer never could."',
     ],
   };
   const arr = proverbs[G.season];
   if (!arr) return;
-  const text = arr[Math.floor(Math.random() * arr.length)];
-  try { _chr144(text, 'misc'); } catch(_e){}
+  const idx = ((G.day % arr.length) + arr.length) % arr.length;
+  try { _chr144(arr[idx], 'misc'); } catch(_e){}
 }
 registerUpdater(updateSeasonalProverbs);
 

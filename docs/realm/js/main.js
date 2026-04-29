@@ -399,13 +399,38 @@ function updateTime() {
       // chronicle row per event is the right shape.
       notify(`${s.name} begins! (Season ${seasonNum})`, 'event', { chronicle: false });
       playSound('mission');
-      const seasonTexts = {
-        spring: 'The snows melt. Green shoots push through the thawing earth.',
-        summer: 'Long days and warm winds. The fields grow golden.',
-        autumn: 'Leaves turn amber and crimson. The harvest is upon us.',
-        winter: 'Frost grips the land. Fires burn low in every hearth.',
+      // Loop 265 (the-fixer, 264 variant-pool axis 2nd use): season prose
+      // pools. Pre-265 each season fired ONE fixed string every 7 days for
+      // the realm's lifetime — long-lived realm saw "The fields grow golden"
+      // 8+ times. Now each season has 3 variants picked by G.day %
+      // pool.length, so consecutive seasons see different prose. First
+      // variant per pool preserves original prose (backward compat).
+      // Two-sentence rhythm preserved across all variants.
+      const seasonTextPools = {
+        spring: [
+          'The snows melt. Green shoots push through the thawing earth.',
+          'The first warm rain comes. The earth breathes again.',
+          'Spring arrives. The realm wakes to birdsong.',
+        ],
+        summer: [
+          'Long days and warm winds. The fields grow golden.',
+          'The shadows lean long. The noonday sun holds the realm in amber.',
+          'Summer is fully arrived. Bees move thick between the blossoms.',
+        ],
+        autumn: [
+          'Leaves turn amber and crimson. The harvest is upon us.',
+          'The wind sharpens. Smoke from harvest fires drifts low across the fields.',
+          'Autumn comes. The realm gathers what summer made.',
+        ],
+        winter: [
+          'Frost grips the land. Fires burn low in every hearth.',
+          'The first deep cold settles. The realm pulls inward.',
+          'Winter holds the realm. Snow muffles every footfall.',
+        ],
       };
-      chronicle(seasonTexts[G.season] || `${s.name} begins.`, 'season');
+      const pool = seasonTextPools[G.season];
+      const seasonText = pool ? pool[((G.day % pool.length) + pool.length) % pool.length] : `${s.name} begins.`;
+      chronicle(seasonText, 'season');
       // Season banner particles
       const seasonEmojis = { spring:['🌱','🌸','🌿'], summer:['☀️','🌻','🌊'], autumn:['🍂','🍁','🌾'], winter:['❄️','⛄','🌨️'] };
       const emojis = seasonEmojis[G.season] || ['✨'];
