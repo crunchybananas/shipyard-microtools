@@ -856,13 +856,25 @@ prescriptive AND consistently applied.
     completionist: this 4th use ships because
     PROSE SURPRISES with new angle, not
     because the count needed advancing.
-  - *Weather-recognition* (147/174/246): the
-    realm notices or remembers weather as a
-    marker of the year. 174 first-frost +
+  - *Weather-recognition* (147/174/246/272):
+    the realm notices or remembers weather as
+    a marker of the year. 174 first-frost +
     246 first-thaw form a YEAR-CYCLE PAIR
     at year-2+ seasonal endpoints — both
     once-per-realm beats marking the realm's
-    memory of one full winter cycle.
+    memory of one full winter cycle. **272
+    storm_passed_seen** introduces a NEW
+    ANGLE within the sub-type — NEGATIVE-
+    SPACE weather (the storm that doesn't
+    arrive). Other 3 are about weather
+    ARRIVING; 272 about weather NOT
+    arriving. Lift line "is given the night
+    intact" — passive voice acknowledges
+    grace; the realm receives a gift it did
+    not earn. 4 uses; per 257 anti-
+    completionist: this 4th use ships because
+    NEW ANGLE (what-didn't-happen axis), not
+    count-advancement.
   - *Forgetting* (184/190): generational-gap
     closure of a long-lived object. See the
     object-arc closure observation above for

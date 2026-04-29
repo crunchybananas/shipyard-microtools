@@ -734,6 +734,26 @@ const NARRATIVE_BEATS = [
       const s = G.namedCharacters.smith.name;
       return `There comes an evening when ${m}, ${b}, and ${s} all happen to be at the inn at the same time. None of them planned it. The realm has grown into the kind of place where this is possible.`;
     } },
+  // Loop 272 (surprise, un-filed, alternation after 5 fixer/review ticks
+  // since 263 META): NEGATIVE-SPACE WEATHER beat. 4th use of weather-
+  // recognition sub-type (sibling to 147 great-storm-remembered / 174
+  // first-frost-marked / 246 first-thaw-known) — but shipped because
+  // PROSE INTRODUCES NEW ANGLE, NOT to advance the count (per 257 anti-
+  // completionist + 266 precedent). All 3 existing weather-recognition
+  // beats are about weather ARRIVING. 272 is about weather NOT
+  // ARRIVING — a storm builds offshore, lightning a long way off, but
+  // the rain falls on the next ridge. The realm receives the night
+  // intact as a GIFT it did not earn. Negative-space observation:
+  // good fortune via absence rather than presence. Lift line "is given
+  // the night intact" — passive voice acknowledges grace. No other
+  // weather beat captures the WHAT-DIDN'T-HAPPEN axis. Gate: summer
+  // + day ≥ 30 (mid-summer, weather-sensitive). Once-per-realm; tag
+  // misc; static universal prose. Per 203 positive rule: ships
+  // because new angle (negative-space) the corpus has never touched,
+  // not because weather-recognition count needed advancing.
+  { flag: 'storm_passed_seen', tag: 'misc',
+    trigger: G => G.season === 'summer' && G.day >= 30,
+    text: 'There is a summer evening when a storm builds over the eastern sea but does not come ashore. The realm watches the lightning a long way off and is given the night intact.' },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
