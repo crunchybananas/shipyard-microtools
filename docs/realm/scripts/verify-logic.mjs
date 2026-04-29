@@ -236,6 +236,19 @@ const townhallMaxCount = await page.evaluate(async () => {
 });
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
+// Test: 266 summer_falling_star — ambient-entity-grammar 4th use
+const fallingStarFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.season = 'summer';
+  window.G.dayPhase = (window.G.dayLength || 3600) * 0.85;  // deep night
+  delete window.G.storyFlags.summer_falling_star;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.summer_falling_star === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a night in summer when a star falls'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('266: summer_falling_star fires summer + deep night', fallingStarFire.fired, `text="${fallingStarFire.text}…" tag=${fallingStarFire.tag}`);
+
 // Test: 264 — variant raid prose pools (260 [play] follow-on)
 const raidProse = await page.evaluate(async () => {
   const enh = await import('./js/enhancements.js');

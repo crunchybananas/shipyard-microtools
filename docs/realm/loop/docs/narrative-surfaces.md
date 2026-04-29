@@ -841,10 +841,21 @@ prescriptive AND consistently applied.
     YEAR-CYCLE PAIR at seasonal endpoints)
 
   **Sub-types within the cluster:**
-  - *Ambient-entity-grammar* (148/152/166):
+  - *Ambient-entity-grammar* (148/152/166/266):
     1-beat acknowledgment of an entity present
     but unnamed. Codified separately as the
-    silent-walker grammar invariant.
+    silent-walker grammar invariant. **266
+    summer_falling_star** extends the sub-type
+    by introducing a TRANSIENT presence (other
+    members are sustained: wanderer/night-
+    shape/frog-voices). 266 also introduces
+    a NEW philosophical angle —
+    witness-without-confirmation ("the star
+    is gone before anyone can ask if anyone
+    else saw it"). 4 uses; per 257 anti-
+    completionist: this 4th use ships because
+    PROSE SURPRISES with new angle, not
+    because the count needed advancing.
   - *Weather-recognition* (147/174/246): the
     realm notices or remembers weather as a
     marker of the year. 174 first-frost +

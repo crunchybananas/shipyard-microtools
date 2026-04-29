@@ -664,6 +664,27 @@ const NARRATIVE_BEATS = [
   { flag: 'chronicle_self_known', tag: 'misc',
     trigger: G => G.chronicle && G.chronicle.length >= 100,
     text: 'The chronicle has grown longer than any citizen\'s memory. Some of its days are stories the realm has forgotten how to tell.' },
+  // Loop 266 (surprise, un-filed, alternation after 264+265 fixer pair):
+  // SHOOTING-STAR beat. 4th use of ambient-entity-grammar sub-type
+  // (sibling to 148 wanderer / 152 night-shape / 166 frog-voices) — but
+  // shipped because PROSE SURPRISES on its own merits, NOT to advance
+  // the cluster counter (per 257 anti-completionist warning). The
+  // existing ambient-entity beats acknowledge SUSTAINED presences (a
+  // wanderer who returns, a night-shape that recurs, frog voices in
+  // the rain). 266 introduces TRANSIENT presence — the star falls in
+  // an instant — and a NEW philosophical angle: the SOCIAL
+  // IMPOSSIBILITY of shared witness ("the star is gone before anyone
+  // can ask if anyone else saw it"). Other cluster beats let entities
+  // BE; 266 lets an entity GO before anyone can confirm it. Distinct
+  // angle: witness-without-confirmation. Gate: summer + deep night
+  // (G.dayPhase > 0.75 of dayLength — mirrors 128 longest-night
+  // 0.85 threshold but slightly looser since summer nights are short).
+  // Once-per-realm; tag misc; static universal prose. Per 203 positive
+  // rule: ships because prose introduces fresh angle, not because
+  // ambient-entity-grammar count needed advancing.
+  { flag: 'summer_falling_star', tag: 'misc',
+    trigger: G => G.season === 'summer' && G.dayPhase > (G.dayLength || 3600) * 0.75,
+    text: 'There is a night in summer when a star falls across the sky from north to south. The realm watches without naming it; the star is gone before anyone can ask if anyone else saw it.' },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
