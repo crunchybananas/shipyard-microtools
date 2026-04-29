@@ -385,6 +385,18 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 285 phrase_misheard_known — language-drift (3rd habituation-recognition shape)
+const phraseFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  delete window.G.storyFlags.phrase_misheard_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.phrase_misheard_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a phrase the realm uses'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('285: phrase_misheard_known fires year3', phraseFire.fired, `text="${phraseFire.text}…" tag=${phraseFire.tag}`);
+
 // Test: 280 liminal_moment_known — rhythm-awareness (2nd habituation-recognition shape)
 const liminalFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

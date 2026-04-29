@@ -665,9 +665,11 @@ should respect:
     ABSENCE. **First sub-type to grow 3 shapes**;
     demonstrates shape-axes can extend beyond binary.
   - *Habituation-recognition* (254 automaticity; 280
-    rhythm-awareness): AUTOMATICITY → +RHYTHM-AWARENESS.
-    254 captures doing-without-thinking; 280 captures
-    noticing-the-unactioned-moment.
+    rhythm-awareness; 285 language-drift): AUTOMATICITY
+    → +RHYTHM-AWARENESS → +LANGUAGE-DRIFT. **Second
+    sub-type to grow 3 shapes** (after individual-
+    interiority); the 3 shapes span 3 distinct DOMAINS
+    of habituation (action / time / language).
 
   **Why this is an invariant not just an observation:** the
   pattern is now PRESCRIPTIVE — it tells future authors that
@@ -1080,32 +1082,38 @@ prescriptive AND consistently applied.
     within one sub-type is permitted IFF each
     shape introduces a genuinely fresh angle
     per 203 + 257 + 276 disciplines.
-  - *Habituation-recognition* (254/280): the
-    realm recognizes its own habits and rhythms
-    — second-order observation that distinguishes
-    this sub-type from the EXTERNAL conditions
-    of sustained-state-recognition. **2 shapes
-    within the sub-type per 276 invariant:**
+  - *Habituation-recognition* (254/280/285):
+    the realm recognizes its own habits and
+    rhythms — second-order observation that
+    distinguishes this sub-type from the
+    EXTERNAL conditions of sustained-state-
+    recognition. **3 shapes within the sub-type
+    — second sub-type to grow 3 shapes after
+    individual-interiority (per 276 invariant):**
     - 254 nights_blur_known — AUTOMATICITY
-      ("the realm has lived enough nights
-      that some are remembered separately and
-      the rest blur into one long evening.
-      The fire is set without thinking now.")
-      The realm's actions becoming unconscious
-      through repetition.
+      ("the realm has lived enough nights...
+      the fire is set without thinking now.")
+      Action-domain habituation: doing
+      without thinking.
     - 280 liminal_moment_known — RHYTHM-
       AWARENESS ("there is a moment most
       evenings when the realm is between
-      things... the realm holds its breath
-      and lets it out. No one has named this
-      moment but everyone knows it.") The
-      realm's recognition of the GAPS
-      between actions — the unactioned
-      pauses that recur in daily rhythm.
-    Per 276 invariant: shape-extension ships
+      things... no one has named this moment
+      but everyone knows it.") Time-domain
+      habituation: noticing the unactioned
+      pauses that recur.
+    - 285 phrase_misheard_known — LANGUAGE-
+      DRIFT ("there is a phrase the realm
+      uses that began as a mishearing of
+      something else... it would not know how
+      to use it now.") Linguistic-domain
+      habituation: origin become foreign
+      through accumulated drift.
+    Per 276 invariant: shape-extensions ship
     because PROSE INTRODUCES NEW ANGLE not as
-    count-advancement. 2 shapes: doing-without-
-    thinking + noticing-the-unactioned-moment.
+    count-advancement. 3 shapes across 3
+    distinct DOMAINS of habituation (action,
+    time, language).
 
   **Beats explicitly OUTSIDE the cluster
   (different register, listed for awareness):**

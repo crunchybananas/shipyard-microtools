@@ -667,6 +667,29 @@ const NARRATIVE_BEATS = [
   { flag: 'liminal_moment_known', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.dayPhase > (G.dayLength || 3600) * 0.6,
     text: 'There is a moment most evenings when the realm is between things — the shutters not yet closed, the dishes not yet cleared, the children not yet called in. The realm holds its breath and lets it out. No one has named this moment but everyone knows it.' },
+  // Loop 285 (surprise, un-filed, alternation after 281-283-284
+  // fixer/archivist run): LANGUAGE-DRIFT shape-extension per 276
+  // invariant. 3rd shape of habituation-recognition sub-type
+  // (sibling to 254 AUTOMATICITY + 280 RHYTHM-AWARENESS). Per
+  // 276 decision tree: prose surprises (mishearing-as-origin is
+  // a genuinely fresh angle); new angle (254 captures unconscious
+  // action, 280 captures rhythm/gaps, 285 captures linguistic
+  // drift — three different DOMAINS of habituation); register
+  // matches (declarative present-tense "There is a phrase"
+  // parallels "There is a season"). Habituation-recognition
+  // becomes the SECOND sub-type to grow 3 shapes after
+  // individual-interiority (212/275/277). The lift line "would
+  // not know how to use it now" captures the realm's recognition
+  // that origin itself has become FOREIGN through accumulated
+  // drift — different from forgetting (184/190 = no longer
+  // remember WHO/WHAT) where the THING is preserved but the
+  // KNOWLEDGE OF IT lapses; here the THING (a phrase) is fully
+  // alive but its ORIGIN has become foreign. Year3+ gate ensures
+  // enough accumulated culture for drift to be plausible. Once-
+  // per-realm; tag misc; static universal prose.
+  { flag: 'phrase_misheard_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3,
+    text: 'There is a phrase the realm uses that began as a mishearing of something else. The mishearing has lasted longer than the original. The realm does not remember the original; it would not know how to use it now.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
