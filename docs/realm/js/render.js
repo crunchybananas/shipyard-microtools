@@ -38,20 +38,85 @@ const _SPRITE_TYPES = new Set([
   'granary', 'castle', 'church', 'windmill', 'tower',
   'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
 ]);
-const _spriteCache = new Map(); // type → HTMLImageElement (or 'loading')
-function _loadSprite(type) {
+const _spriteCache = new Map(); // `${type}__${kname}` → HTMLImageElement (or 'loading' / null)
+function _loadSprite(type, kname) {
   if (!_SPRITE_TYPES.has(type)) return null;
-  const existing = _spriteCache.get(type);
-  if (existing && existing !== 'loading') return existing;
+  const key = `${type}__${kname || ''}`;
+  const existing = _spriteCache.get(key);
+  if (existing && existing !== 'loading') return existing;  // ready img or null (failed)
   if (existing === 'loading') return null;
-  _spriteCache.set(type, 'loading');
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => _spriteCache.set(type, img);
-  img.onerror = () => _spriteCache.set(type, null);  // give up; fall back to canvas
-  img.src = `assets/sprites/${type}.svg`;
+  _spriteCache.set(key, 'loading');
+  // Phase B step 5 (220): if the type has variants OR kname is set,
+  // fetch the SVG text and apply per-kingdom token replacement; else
+  // fast-path direct img.src for unvaried types.
+  if (_VARIANT_PALETTES[type] && kname) {
+    fetch(`assets/sprites/${type}.svg`)
+      .then(r => r.ok ? r.text() : Promise.reject(new Error('http ' + r.status)))
+      .then(text => {
+        const variantText = _applyVariants(text, type, kname);
+        const blob = new Blob([variantText], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.decoding = 'async';
+        img.onload = () => _spriteCache.set(key, img);
+        img.onerror = () => _spriteCache.set(key, null);
+        img.src = url;
+      })
+      .catch(() => _spriteCache.set(key, null));
+  } else {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => _spriteCache.set(key, img);
+    img.onerror = () => _spriteCache.set(key, null);
+    img.src = `assets/sprites/${type}.svg`;
+  }
   return null;
 }
+// Phase B step 5 (220): per-realm sprite variants. SVGs are fetched
+// as text, color-token strings are replaced per kingdom-hash, and the
+// modified text is loaded as an Image via Blob URL. Cache key includes
+// kingdom name so different realms see different palettes.
+//
+// Adding a new variant: define a row in `_VARIANT_PALETTES[type]` with
+// N parallel entries. Index 0 is the source palette (must match the
+// SVG file exactly). Indices 1+ are the variant target palettes.
+// Kingdom hash mod N picks which entry replaces the source colors.
+const _VARIANT_PALETTES = {
+  church: {
+    // Stained-glass center rose (lines 41-43 of church.svg).
+    // Source #a8d0ff/#4488cc/#1a3866 = light/mid/dark blue.
+    glass: [
+      ['#a8d0ff', '#4488cc', '#1a3866'],  // 0 blue (default)
+      ['#ffb0a8', '#cc4444', '#661a1a'],  // 1 red — clay-fire palette
+      ['#fff0a8', '#cc8844', '#664422'],  // 2 amber — sunset palette
+      ['#a8ffd0', '#44cc88', '#1a6638'],  // 3 green — moss palette
+    ],
+  },
+};
+// Tiny string-hash for kingdom-name → variant index. Mirrors the
+// _dreamHash style used in story.js without an import (avoids circular
+// dependency risk through story.js → render.js path).
+function _kHash(s) {
+  let h = 0; const str = s || '';
+  for (let i = 0; i < str.length; i++) h = (Math.imul(h, 31) + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function _applyVariants(text, type, kname) {
+  const palette = _VARIANT_PALETTES[type];
+  if (!palette || !kname) return text;
+  for (const [groupKey, palettes] of Object.entries(palette)) {
+    if (palettes.length < 2) continue;
+    const idx = _kHash(`${kname}_${type}_${groupKey}`) % palettes.length;
+    if (idx === 0) continue;  // realm picked the source palette; no replacement
+    const source = palettes[0];
+    const target = palettes[idx];
+    for (let i = 0; i < source.length; i++) {
+      text = text.replaceAll(source[i], target[i]);
+    }
+  }
+  return text;
+}
+
 // Per-building sprite size table — Phase B step 2 (217). Matches
 // each canvas drawX's effective footprint at zoom 1.0. Tuned by
 // inspection: tall structures (castle/church/tower) get +height;
@@ -81,7 +146,8 @@ const _SPRITE_SIZES = {
 function drawSpriteIfReady(ctx, b, s) {
   if (!_USE_SVG_SPRITES) return false;
   if (!_SPRITE_TYPES.has(b.type)) return false;
-  const img = _loadSprite(b.type);
+  // Phase B step 5: pass kingdom name to enable per-realm variants.
+  const img = _loadSprite(b.type, G.kingdomName);
   if (!img) return false;  // still loading or failed; fall through
   const size = _SPRITE_SIZES[b.type] || { w: 36, h: 42 };
   // Bottom-anchored at (s.x, s.y); building "stands on" the tile.
@@ -93,8 +159,9 @@ if (typeof window !== 'undefined') {
   window.__realm = window.__realm || {};
   window.__realm.toggleSVG = (on) => {
     _USE_SVG_SPRITES = on === undefined ? !_USE_SVG_SPRITES : !!on;
-    // Eagerly preload all sprite types when enabled.
-    if (_USE_SVG_SPRITES) for (const t of _SPRITE_TYPES) _loadSprite(t);
+    // Eagerly preload all sprite types when enabled. Pass current
+    // G.kingdomName so step 5's per-realm variants load eagerly too.
+    if (_USE_SVG_SPRITES) for (const t of _SPRITE_TYPES) _loadSprite(t, G.kingdomName);
     console.log(`[realm] _USE_SVG_SPRITES = ${_USE_SVG_SPRITES}`);
     return _USE_SVG_SPRITES;
   };

@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 220 [code] — variant entries for remaining sprite-bearing types: tavern (175 filing — sign palette + emblem swap), blacksmith (176 — forge fire palette `--fire-core`/`--fire-mid`/`--fire-outer`), market (179 — 4 awning palettes), house (173 — tile color red/slate/moss). Each ~5-10 LoC: define palette in `_VARIANT_PALETTES`, ensure SVG source colors match exactly. [render.js + sprite SVGs]
+- 220 [code] — hash distribution audit: generate 100 random kingdom names, run through `_applyVariants`, verify each palette gets ~25% with 4 entries. If uneven, switch hash mixer. [scripts/]
+- 220 [code] — per-instance per-building variation: HOUSE in same realm could have different roof colors per build location via kingdom + tile-coords hash. Adds visual interest in dense residential clusters. ~10 LoC; modify cache key to include `b.x_b.y`. [render.js]
 - 218 [code] — `_WINTER_CAPS` per-path tuning: cap geometry (w/h/y) was tuned for canvas drawX. SVG sprite proportions differ per `_SPRITE_SIZES` table. Per-path cap table could be added if visual review flags 1-2px misalignment. ~10 LoC. [render.js]
 - 218 [code] — granary 158 dome-conforming arc targets canvas-specific dome geometry. On SVG granary the arc may not align perfectly with the rendered dome top. ~5 LoC tune. [render.js]
 - 217 [code] — sprite size at higher zoom: `_SPRITE_SIZES` table tuned for zoom 1.0; at zoom 1.5+ SVG sprites may look small relative to canvas drawings. Could scale with G.camera.zoom OR ship larger source SVGs. Filed for step 5 considerations. [render.js]
