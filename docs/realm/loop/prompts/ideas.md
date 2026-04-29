@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 232 [doc] — chronology section (`## related loop references`) hasn't updated since 226. 7 ticks since (227-232). Worth catch-up at next archivist (~236 per 12-tick rhythm). [loop/docs/]
+- 232 [process] — contrarian→fixer pattern now at 6+ pairs (011→012 / 154→155+156 / 195→196 / 202→203 / 204→205 / 213→214 / 231→232). Filed at 205 with 5-pair threshold for promotion; now exceeded. Promote to observed-pattern or discipline invariant. [loop/docs/]
 - 231 [doc] **PRIORITY** — narrative-surfaces.md edits per 231 contrarian: (1) add note to observational-elder cluster entry that sub-types stay sub-types despite 3+ threshold met; (2) update land-as-agent + sustained-state-recognition sub-type entries to mark "threshold met, intentionally not promoted"; (3) clarify 3+ rule articulation that thresholds TRIGGER REVIEW not automatic promotion. ~10-15 LoC. Ship as 232 fixer mirror of 202→203. [loop/docs/]
 - 231 [process] — observation: two cluster sub-types reaching threshold simultaneously is a STRESS TEST for the doctrine. Contrarian's no-promotion ruling shows rule is robust against parallel-arc promotion pressure. Document as discipline. [process]
 - 231 [code] — fourth uses of either sub-type still filed (path-remembers / peak-happiness-30-days). Ship if prose surprises per 203 positive rule, NOT for promotion math. [story.js]

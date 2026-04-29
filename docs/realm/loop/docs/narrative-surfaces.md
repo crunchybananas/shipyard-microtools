@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -641,6 +641,22 @@ what the realm has done; invariants prescribe
 what the realm must do. Patterns in this section
 have NOT yet been promoted (typically: <3
 canonical uses or unresolved structural questions).
+
+**The 3+ rule (per 202 contrarian, refined at
+231):** thresholds TRIGGER REVIEW, not automatic
+promotion. 3 uses signals "this is worth a
+loop-level decision"; the actual promotion is
+contrarian-eligible. 188 was promoted at 1 use
+and demoted; the lesson is conservatism. Sub-
+types within an existing cluster register
+typically should NOT be promoted — they're
+variations of a unifying invariant, not
+separate authorship rules. See land-as-agent
+(207/227/229) and sustained-state-recognition
+(211/228/230) below: both meet 3+ but
+intentionally stay as sub-types per 231
+contrarian.
+
 Promote to invariants only when the rule is
 prescriptive AND consistently applied.
 
@@ -814,19 +830,17 @@ prescriptive AND consistently applied.
       seems to know which names belong to
       it... the fire keeps them the same way
       it keeps wood"
-    **3 uses meets 3+ threshold** for
-    sub-type-to-standalone-invariant promotion
-    candidate. Promotion not automatic per 188
-    demotion precedent (promotion is
-    conservative; contrarian-eligible
-    decision). Currently lives within the
-    observational-elder cluster as a sub-type;
-    could hoist to its own observation if a
-    future tick judges the agency-shape
-    distinction load-bearing for new authors.
-    Per 213 skeptic finding 2: all three
-    avoid META-frame ("realm doesn't see");
-    pure object/place interiority.
+    **3 uses meets 3+ threshold; INTENTIONALLY
+    NOT PROMOTED** to standalone observed-pattern.
+    Per 231 contrarian: sub-types within a
+    cluster are variations of the unifying
+    register, not separate authorship templates.
+    Hoisting would duplicate the cluster
+    framing and fragment the doc's
+    single-place-to-look affordance. Per 213
+    skeptic finding 2: all three avoid
+    META-frame ("realm doesn't see"); pure
+    object/place interiority.
   - *Sustained-state-recognition* (211/228/230):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.
@@ -842,10 +856,14 @@ prescriptive AND consistently applied.
     All three follow the same infrastructure
     pattern: G.lastXDay tracker + save.js
     persistence + earned-state gate. **3 uses
-    meets 3+ threshold** — same conservative-
-    promotion stance as land-as-agent at 229
-    (per 188 precedent: thresholds trigger
-    review not promotion).
+    meets 3+ threshold; INTENTIONALLY NOT
+    PROMOTED** per 231 contrarian — same
+    cluster-sub-type reasoning as land-as-agent
+    above. Future literary-uses welcome (peak
+    happiness 30d filed at 211; full-pop +
+    no-death + peace already shipped); ship
+    if prose surprises per 203 positive rule,
+    not for promotion math.
   - *Individual-interiority* (212): focal is a
     single anonymous settler rather than the
     realm collective ("a settler sets down a
