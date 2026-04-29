@@ -265,6 +265,20 @@ const townhallMaxCount = await page.evaluate(async () => {
 });
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
+// Test: 275 child_no_elsewhere_known — POV-inversion (2nd individual-interiority shape)
+const childPOVFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.stats = window.G.stats || {};
+  window.G.stats.citizensBorn = 1;
+  delete window.G.storyFlags.child_no_elsewhere_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.child_no_elsewhere_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a child in the realm'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('275: child_no_elsewhere_known fires year3 + citizensBorn≥1', childPOVFire.fired, `text="${childPOVFire.text}…" tag=${childPOVFire.tag}`);
+
 // Test: 272 storm_passed_seen — negative-space weather (4th weather-recognition use)
 // Test: 273 — beat's after: callback spawns a 'lightning' particle
 const stormPassedFire = await page.evaluate(async () => {

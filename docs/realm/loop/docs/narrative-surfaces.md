@@ -934,14 +934,31 @@ prescriptive AND consistently applied.
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
-  - *Individual-interiority* (212): focal is a
-    single anonymous settler rather than the
-    realm collective ("a settler sets down a
-    bucket... breathes out. No one sees. The
-    realm goes on without seeing.") The
-    chronicle witnesses what the realm-as-
-    collective doesn't. 1 use; filed for
-    promotion at 3+.
+  - *Individual-interiority* (212/275): focal
+    is a single anonymous citizen rather than
+    the realm collective. **2 shapes within
+    the sub-type:**
+    - 212 first_sigh_seen — MID-ACTION
+      interiority ("a settler sets down a
+      bucket... breathes out. No one sees.")
+      A brief inner moment.
+    - 275 child_no_elsewhere_known — TOTALIZING
+      interiority ("a child... has heard their
+      elders speak of other places but never
+      seen one. The world ends at the eastern
+      ridge as far as they are concerned.")
+      A whole frame-of-reference rather than
+      an instant.
+    2 uses; per 257 anti-completionist + 270/
+    272 shape-axis precedent: 275 ships because
+    POV-INVERSION angle (citizen's world ENDS
+    at realm boundary) the corpus has never
+    touched, not as count-advancement. The
+    sub-type now has 2 shapes orthogonal to
+    use-count, mirroring 270 character-
+    interiority (solitary + confluence) and
+    272 weather-recognition (arriving + not-
+    arriving) shape-axis pattern.
   - *Habituation-recognition* (254): the realm
     recognizes its own *threshold of accumulated
     experience* — second-order observation that

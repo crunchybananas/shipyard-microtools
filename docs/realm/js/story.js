@@ -759,6 +759,31 @@ const NARRATIVE_BEATS = [
   // misc; static universal prose. Per 203 positive rule: ships
   // because new angle (negative-space) the corpus has never touched,
   // not because weather-recognition count needed advancing.
+  // Loop 275 (surprise, un-filed, alternation after 273-274 fixer pair):
+  // CHILD POV-INVERSION beat. 2nd use of individual-interiority sub-type
+  // (sibling to 212 first_sigh_seen) — but shipped because PROSE
+  // INTRODUCES NEW ANGLE within the sub-type, NOT to advance count
+  // (per 257 anti-completionist + 266+272 precedents). 212's interiority
+  // is MID-ACTION (a settler sets down a bucket and breathes out — a
+  // brief inner moment); 275's interiority is TOTALIZING (a child's
+  // entire worldview — they have only ever known this realm). Different
+  // shape: 212 captures the realm's witness of an UNNOTICED INTERIOR
+  // INSTANT; 275 captures a CITIZEN'S WHOLE FRAME OF REFERENCE. The
+  // realm's wider world (cities, other coasts) is HEARSAY to a young
+  // citizen; the EASTERN RIDGE is the world's edge. Lift line "the world
+  // ends at the eastern ridge as far as they are concerned" — POV
+  // inversion + the universal child-experience of small-town totality.
+  // Gate: year3 + at least one citizen born (a child must exist).
+  // Once-per-realm; tag misc; static universal prose. Per 203 positive
+  // rule: ships because POV-inversion angle the corpus has never
+  // touched, not because individual-interiority count needed advancing.
+  // Individual-interiority sub-type now has 2 shapes: MID-ACTION
+  // (212) + TOTALIZING (275). Same pattern as 270 confluence + 272
+  // negative-space — observations developing SHAPE-axes orthogonal to
+  // use-counts.
+  { flag: 'child_no_elsewhere_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && (G.stats?.citizensBorn || 0) >= 1,
+    text: 'There is a child in the realm who has lived nowhere else. They have heard their elders speak of other places but have never seen one. The world ends at the eastern ridge as far as they are concerned.' },
   { flag: 'storm_passed_seen', tag: 'misc',
     trigger: G => G.season === 'summer' && G.day >= 30,
     text: 'There is a summer evening when a storm builds over the eastern sea but does not come ashore. The realm watches the lightning a long way off and is given the night intact.',
