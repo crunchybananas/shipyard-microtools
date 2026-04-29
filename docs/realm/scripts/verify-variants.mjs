@@ -25,7 +25,17 @@ const HEADLESS = process.env.HEADED !== '1';
 const browser = await chromium.launch({ headless: HEADLESS });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 
-const KINGDOMS = ['Avalon', 'Norrith', 'Velar', 'Ashfall'];
+// Loop 293 (the-fixer, 286 LOW closure): added 'Lenwood' as 5th canonical
+// test kingdom. Pre-293 the 4-realm test set had Norrith hitting idx-0
+// (default-no-swap) for 50% of 6 sprites — 2× statistical expectation
+// of 25%. Lenwood probed via kHash distribution: 0% idx-0 hits, 3
+// distinct palettes (1/2/3) across 6 sprites. Adding Lenwood balances
+// the test cohort: across 5 knames × 6 sprites, idx-0 share drops to
+// ~23% (close to expected 25%) without removing any pre-existing
+// realm. Hardens the variant-pipeline test against future variant
+// additions where coincident hash clustering at common kname chars
+// could cause false-clean assertions.
+const KINGDOMS = ['Avalon', 'Norrith', 'Velar', 'Ashfall', 'Lenwood'];
 const errs = [];
 const results = [];
 
