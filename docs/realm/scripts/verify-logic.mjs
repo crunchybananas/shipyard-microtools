@@ -8,10 +8,12 @@
 import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REALM_ROOT = join(__dirname, '..');
-const ORIGIN = process.env.REALM_ORIGIN || 'http://127.0.0.1:4711';
+const server = await ensureServer();
+const ORIGIN = server.origin;
 const GAME_PATH = `${ORIGIN}/index.html`;
 
 const results = [];
@@ -21,7 +23,9 @@ function rec(name, ok, detail) {
   console.log(`  ${tag} ${name}${detail ? ' — ' + detail : ''}`);
 }
 
-const browser = await chromium.launch({ headless: false });
+// Default headless. HEADED=1 to see the window.
+const HEADLESS = process.env.HEADED !== '1';
+const browser = await chromium.launch({ headless: HEADLESS });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 const page = await ctx.newPage();
 const errs = [];
@@ -186,4 +190,5 @@ const passed = results.filter(r => r.ok).length;
 console.log(`\n[verify-logic] ${passed}/${results.length} passed`);
 
 await browser.close();
+await server.stop();
 process.exit(passed === results.length ? 0 : 1);

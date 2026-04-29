@@ -13,16 +13,17 @@
 import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REALM_ROOT = join(__dirname, '..');
-// HTTP origin needed because the live game uses ES modules; file://
-// origins fail CORS for cross-script imports in modern Chrome. Start
-// `python3 -m http.server 4711` in docs/realm/ before running.
-const ORIGIN = process.env.REALM_ORIGIN || 'http://127.0.0.1:4711';
+const SCREENSHOT_DIR = join(REALM_ROOT, 'scripts/screenshots');
+
+const server = await ensureServer();
+console.log(`[verify] http origin ${server.origin} (started=${server.started})`);
+const ORIGIN = server.origin;
 const GAME_PATH = `${ORIGIN}/index.html`;
 const SANDBOX_PATH = `${ORIGIN}/svg-test/index.html`;
-const SCREENSHOT_DIR = join(REALM_ROOT, 'scripts/screenshots');
 
 const args = process.argv.slice(2);
 const flags = {
@@ -32,8 +33,11 @@ const flags = {
   hold: args.includes('--hold'),  // keep browser open at end
 };
 
-console.log('[verify] launching chromium (non-headless)…');
-const browser = await chromium.launch({ headless: false });
+// Default headless for overnight autonomy. Set HEADED=1 to see the
+// browser window for debug.
+const HEADLESS = process.env.HEADED !== '1';
+console.log(`[verify] launching chromium (headless=${HEADLESS})…`);
+const browser = await chromium.launch({ headless: HEADLESS });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 
 // ─── 1. live game smoke test ─────────────────────────────────
@@ -162,5 +166,6 @@ if (flags.hold) {
   await new Promise(() => {});
 } else {
   await browser.close();
+  await server.stop();
   console.log('\n[verify] done. Browser closed.');
 }
