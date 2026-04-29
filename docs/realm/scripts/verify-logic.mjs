@@ -385,6 +385,22 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 301 noon_bell_origin_known — ritual-persistence-without-origin (4th forgetting shape)
+const noonBellFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'church')) {
+    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  }
+  delete window.G.storyFlags.noon_bell_origin_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.noon_bell_origin_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('Why is the church bell'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('301: noon_bell_origin_known fires year2 + church', noonBellFire.fired, `text="${noonBellFire.text}…" tag=${noonBellFire.tag}`);
+
 // Test: 297 unplaceable_sound_known — WONDER (3rd OUTSIDE-cluster register)
 const wonderFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

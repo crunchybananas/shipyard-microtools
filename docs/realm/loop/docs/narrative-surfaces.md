@@ -691,9 +691,11 @@ should respect:
     290 = objects realm DID NOT MAKE; 294 = objects
     the realm has WORN through use. 5 shapes total —
     most of any sub-type.
-  - *Forgetting* (184/190/292): LOSS → +PRESERVATION-
-    WITHOUT-MEMORY. 292 introduces artifacts kept by
-    inertia after meaning has lapsed.
+  - *Forgetting* (184/190/292/301): LOSS → +ARTIFACT-
+    PRESERVED-MEANING-LOST → +RITUAL-PERSISTENCE-
+    WITHOUT-ORIGIN. 292 = object kept by inertia;
+    301 = practice continued without remembering why
+    (first QUESTION-OPENING beat in the corpus).
 
   **Why this is an invariant not just an observation:** the
   pattern is now PRESCRIPTIVE — it tells future authors that
@@ -1096,24 +1098,30 @@ prescriptive AND consistently applied.
     weather NOT arriving. Lift "is given the
     night intact" acknowledges passive grace.
     Per 276 invariant.
-  - *Forgetting* (184/190/292): closure of
-    a long-lived object's KNOWLEDGE. **3
-    shapes** spanning loss vs persistence:
+  - *Forgetting* (184/190/292/301): closure
+    of a long-lived object's or practice's
+    KNOWLEDGE. **4 shapes** spanning loss
+    vs persistence:
     - 184 stone_forgotten — OBJECT WEATHERED
       (stone fades; name lost with thing).
     - 190 constellation_forgotten — PATTERN
       UNNAMED (current generation doesn't
-      know what their elders did).
+      know what elders did).
     - 292 bakery_door_carving_known —
-      PRESERVATION-WITHOUT-MEMORY ("a name
-      carved into the door of the bakery
-      that no one alive remembers... the
-      new bakers leave it where it is").
-      Artifact persists; meaning is lost;
-      no one removes it.
-    See the object-arc closure observation
-    above for the 4-beat-vs-2-beat shape
-    distinction. Per 276 invariant.
+      ARTIFACT-PRESERVED-MEANING-LOST
+      (object persists, meaning gone, no
+      one removes it).
+    - 301 noon_bell_origin_known — RITUAL-
+      PERSISTENCE-WITHOUT-ORIGIN ("Why is
+      the church bell rung at noon and not
+      at any other hour?... The first
+      ringing was forgotten before the
+      second was held"). PRACTICE preserved,
+      origin lost, custom continued without
+      remembering why. **First beat in the
+      corpus to open with a QUESTION** —
+      structural prose surprise.
+    Per 276 invariant.
   - *Naming-place* (193): the realm gives a
     place a colloquial name. Third member of
     the realm-environment naming triplet

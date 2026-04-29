@@ -787,6 +787,27 @@ const NARRATIVE_BEATS = [
   { flag: 'unplaceable_sound_known', tag: 'misc',
     trigger: G => G.storyFlags.year2,
     text: 'There is sometimes a sound the realm cannot place — a creak, a far-off bell, a piece of song from across the water. The realm pretends not to listen, then listens anyway.' },
+  // Loop 301 (surprise, un-filed, post-300 milestone): RITUAL-
+  // PERSISTENCE-WITHOUT-ORIGIN shape-extension per 276 invariant.
+  // 4th shape of forgetting sub-type (sibling to 184 stone-weathered /
+  // 190 constellation-unnamed / 292 artifact-preserved-meaning-lost).
+  // Existing forgetting uses: 184/190 = LOSS (thing AND meaning fade);
+  // 292 = ARTIFACT preserved + meaning lost (the THING is an object).
+  // 301 introduces RITUAL/ACTION preserved + ORIGIN lost (the THING is
+  // a PRACTICE the realm performs without remembering why). Per 276 +
+  // 257: ships because (a) fresh angle distinct from 292's artifact-
+  // focus, (b) STRUCTURAL surprise — first beat to OPEN with a
+  // QUESTION rather than declarative "There is X." The question-
+  // answer-reflection rhythm is a corpus-novel prose structure. Lift
+  // line "the first ringing was forgotten before the second was held"
+  // captures origin-loss at the very moment of practice-establishment.
+  // Forgetting sub-type now has 4 shapes; joins land-as-agent (5
+  // shapes) as 2nd most-extended sub-type. Gate: church + year2
+  // (need bell-host building + long-enough establishment for "always
+  // has been"). Once-per-realm; tag misc.
+  { flag: 'noon_bell_origin_known', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    text: 'Why is the church bell rung at noon and not at any other hour? Because it always has been, in this realm. The first ringing was forgotten before the second was held.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
