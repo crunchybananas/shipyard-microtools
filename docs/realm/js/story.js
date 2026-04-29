@@ -564,6 +564,22 @@ const NARRATIVE_BEATS = [
   { flag: 'no_death_known', tag: 'misc',
     trigger: G => G.stats && G.stats.citizensDied >= 1 && G.lastDeathDay !== undefined && (G.day - G.lastDeathDay) >= 100,
     text: 'A hundred days have passed without burial. The grave field is older than the last grave; weeds soften the marker stones. The realm sleeps with a different weight in its chest now.' },
+  // Loop 230 (surprise, 228 filed): SUSTAINED-STATE #3. Promotes the
+  // sub-type 2 → 3 uses (mirror of 229's land-as-agent promotion).
+  // 60-day threshold (vs 211's 50-day peace and 228's 100-day death-
+  // free) reflects that full population is more recoverable than peace
+  // (you can lose a citizen and gain another quickly) but rarer than
+  // simple absence-of-event. Earned gate: pop >= 10 ensures the realm
+  // is large enough that "fully populated" is meaningful + lastUnderpop
+  // !== undefined ensures the realm has FACED at least one underpop
+  // moment. "For now" closing acknowledges this is a transient state,
+  // not permanence — typical realm-resilience register.
+  // Sub-type sustained-state-recognition reaches 3 uses (211/228/230)
+  // — meets 3+ promotion threshold but per 188 precedent promotion
+  // remains conservative.
+  { flag: 'full_pop_known', tag: 'misc',
+    trigger: G => G.population >= 10 && G.lastUnderpopDay !== undefined && (G.day - G.lastUnderpopDay) >= 60,
+    text: 'For sixty days the houses have all stood full. No empty bed, no vacant chair, no spare loaf. The realm is the size it knows how to be, for now.' },
   // Loop 142 (surprise, un-filed): a letter from the other realm.
   // Opens up the WORLD beyond the island — the realm receives news
   // from a distant kingdom. Both the distant name and the news are

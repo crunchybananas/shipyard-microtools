@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 230 [process] — TWO cluster sub-types at 3+ threshold simultaneously (land-as-agent + sustained-state-recognition). Natural moment for doctrine-pruning at 231: contrarian (argue against premature promotion per 188 precedent) / archivist (hoist both + document) / fixer (defer until 4th use ships of either). Lean contrarian. [process]
+- 230 [code] — "peak happiness 30 days" remains open as 4th sustained-state candidate. Could ship as further literary moment separate from promotion concerns. ~10 LoC. [story.js]
 - 229 [doc] — land-as-agent reached 3+ use threshold; decision pending whether to hoist to standalone observed-pattern OR keep as cluster sub-type. Pros of hoist: authoring-shape distinction load-bearing. Cons: cluster IS unifying register. Defer to next archivist or contrarian tick. [loop/docs/]
 - 229 [code] — fourth land-as-agent candidate to push past threshold: "the path remembers" (year-3+ + buildings density; emergent-collective agency-shape — paths form from many footsteps, not authored). Different from broad-LAND/object-interiority/relational-keeper. ~12 LoC. [story.js]
 - 229 [process] — discipline observation: when a sub-type meets promotion threshold, the loop should NOT auto-promote. Contrarian/skeptic exists precisely to challenge promotion claims. Thresholds TRIGGER review, not promotion. Document. [process]

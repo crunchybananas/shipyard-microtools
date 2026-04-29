@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 13: 230 full_pop_known — pop≥10 + lastUnderpopDay+60 days
+const fullPopFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.population = 12;
+  window.G.maxPop = 12;
+  window.G.lastUnderpopDay = 50;
+  window.G.day = 115;
+  delete window.G.storyFlags.full_pop_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.full_pop_known === true;
+  return { fired };
+});
+rec('230: full_pop_known fires d115 with pop=12, lastUnderpopDay=50', fullPopFire.fired);
+
 // Test 12: 229 hearth_holds_names — year3 + citizensDied≥1
 const hearthFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

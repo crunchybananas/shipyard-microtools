@@ -327,6 +327,10 @@ export function updateProduction() {
 
   // Food consumption (once per day)
   if (G.gameTick % G.dayLength === 0) {
+    // Loop 230 (sustained-state #3 infrastructure): track whenever the
+    // realm is below its maximum population. The next full-pop beat
+    // (`full_pop_known`) gates on G.day - G.lastUnderpopDay >= 60.
+    if (G.population < G.maxPop) G.lastUnderpopDay = G.day;
     let foodNeeded = Math.ceil(G.population * 1.0 * getDifficulty().foodMult);
     // Granaries halve food consumption in winter
     if (G.season === 'winter') {
