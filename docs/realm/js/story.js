@@ -711,8 +711,13 @@ const NARRATIVE_BEATS = [
   // count needed advancing. Gate: church built + year3 (need both the
   // bell-host building + temporal distance for "no one alive remembers
   // the storm" to land). Once-per-realm; tag misc.
+  // 324 (the-fixer, 323 [code]): added !storyFlags.sea_bell_lost_known
+  // for bidirectional mutex with 319-A fallback. Without this, a realm
+  // that loses the church pre-y3, fires sea_bell_lost, then rebuilds
+  // the church would ALSO fire sea_bell_known — chronicle inconsistency.
+  // Now both directions of "first-fired wins" hold.
   { flag: 'sea_bell_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church') && !G.storyFlags.sea_bell_lost_known,
     text: 'There is a bell at the church that is said to have been pulled from the sea. No one alive remembers the storm; everyone tells the story. The bell still rings clearer than any bell the realm has cast.' },
   // Loop 292 (surprise, un-filed, alternation after 286-291 forward-
   // motion arc): PRESERVATION-WITHOUT-MEMORY shape-extension per 276
@@ -748,8 +753,9 @@ const NARRATIVE_BEATS = [
   // RESHAPED-BY-USE angle the corpus has never touched, not as count-
   // advancement. Gate: church + year3 (need long-use temporal distance
   // for "many years" to land). Once-per-realm; tag misc.
+  // 324 bidirectional mutex with 319-B fallback (per 323 [code]).
   { flag: 'church_step_worn_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church') && !G.storyFlags.church_step_worn_lost_known,
     text: 'There is a step at the church door that has been worn to a curve by feet over many years. New visitors trip on it; regulars step over the dip without looking.' },
   // Loop 296 (surprise, un-filed, alternation after 295 review):
   // COLLECTIVE-EASE beat — first JOYFUL register in the corpus. Per 263

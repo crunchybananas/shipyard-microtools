@@ -450,6 +450,38 @@ const seaBellMutexCheck = await page.evaluate(async () => {
 });
 rec('319-A: sea_bell_lost_known does NOT fire when sea_bell_known already set (mutual exclusion)', !seaBellMutexCheck.fired);
 
+// Test: 324 bidirectional mutex — sea_bell_known should NOT fire after sea_bell_lost_known
+// Scenario: church destroyed pre-y3, lost fires at y3+d>=62, then church rebuilt. The
+// original gate must reject because !sea_bell_lost_known is false.
+const seaBellRebuildMutex = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 88;
+  window.G.stats = window.G.stats || {};
+  window.G.stats.everHadBuilding = { church: true };
+  window.G.storyFlags.sea_bell_lost_known = true; // lost already fired
+  window.G.buildings = [{ type: 'church', x: 30, y: 30, hp: 100, workers: [] }]; // rebuilt
+  delete window.G.storyFlags.sea_bell_known;
+  story.checkStoryBeats();
+  return { fired: window.G.storyFlags.sea_bell_known === true };
+});
+rec('324: sea_bell_known does NOT fire after sea_bell_lost_known (bidirectional mutex; rebuild scenario)', !seaBellRebuildMutex.fired);
+
+// Test: 324 bidirectional mutex — church_step_worn_known should NOT fire after church_step_worn_lost_known
+const stepRebuildMutex = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 88;
+  window.G.stats = window.G.stats || {};
+  window.G.stats.everHadBuilding = { church: true };
+  window.G.storyFlags.church_step_worn_lost_known = true;
+  window.G.buildings = [{ type: 'church', x: 30, y: 30, hp: 100, workers: [] }];
+  delete window.G.storyFlags.church_step_worn_known;
+  story.checkStoryBeats();
+  return { fired: window.G.storyFlags.church_step_worn_known === true };
+});
+rec('324: church_step_worn_known does NOT fire after church_step_worn_lost_known (bidirectional mutex)', !stepRebuildMutex.fired);
+
 // Test: 319-B church_step_worn_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
 // 321: gate-spread requires G.day >= 68.
 const stepLostFire = await page.evaluate(async () => {
@@ -609,6 +641,7 @@ const stepWornFire = await page.evaluate(async () => {
     window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
   }
   delete window.G.storyFlags.church_step_worn_known;
+  delete window.G.storyFlags.church_step_worn_lost_known; // 324: clear mutex set by earlier tests
   story.checkStoryBeats();
   const fired = window.G.storyFlags.church_step_worn_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a step at the church'));
@@ -641,6 +674,7 @@ const seaBellFire = await page.evaluate(async () => {
     window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
   }
   delete window.G.storyFlags.sea_bell_known;
+  delete window.G.storyFlags.sea_bell_lost_known; // 324: clear mutex set by earlier tests
   story.checkStoryBeats();
   const fired = window.G.storyFlags.sea_bell_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a bell at the church'));
