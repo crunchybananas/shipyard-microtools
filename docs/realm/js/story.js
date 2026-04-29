@@ -544,6 +544,24 @@ const NARRATIVE_BEATS = [
       const t = G.namedCharacters.teacher;
       return `There is a morning when ${t.name} arrives at the schoolhouse and finds a child's name still chalked on the slate from yesterday. The child wrote their own name, slowly, three times, before being called home. ${t.name} does not wipe it clean for another hour.`;
     } },
+  // Loop 249 (the-fixer, 240+245+247 filed): MERCHANT interiority
+  // moment. 4th character interiority beat (240 bard / 245 smith /
+  // 247 teacher / 249 merchant); 1 remains (rival). Reaching 4 uses
+  // triggers the 248 [process] hoist-vs-stay decision review for
+  // the named-character-interiority observed-pattern. Mood: small
+  // obsessive-yet-meditative behaviour — counting as ritual not
+  // verification. Closing line "counting is its own reason" —
+  // gentle observation that some habits don't have purposes, they
+  // have textures. Per 213 finding 2 NO META-frame.
+  // Tag:character. Gate: merchant named (market built per 034 hook
+  // → ensureMerchant) + autumn + day ≥ 40 (year-2+ autumn; markets
+  // typically build mid-game so year-1 autumn would be too soon).
+  { flag: 'merchant_counts_thrice', tag: 'character',
+    trigger: G => G.namedCharacters?.merchant && G.season === 'autumn' && G.day >= 40,
+    text: G => {
+      const m = G.namedCharacters.merchant;
+      return `There is an evening when ${m.name} closes the market early and counts the day's coins by lamplight. They count them three times. Each count is the same number; ${m.name} counts again anyway, because the lamp is warm and the night is cold, and counting is its own reason.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

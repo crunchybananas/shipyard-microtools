@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 20: 249 merchant_counts_thrice — merchant + autumn + day≥40
+const merchantFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureMerchant();
+  window.G.season = 'autumn';
+  window.G.day = 45;
+  delete window.G.storyFlags.merchant_counts_thrice;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.merchant_counts_thrice === true;
+  const entry = window.G.chronicle.find(e => e.text?.includes("counts the day's coins"));
+  return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
+});
+rec('249: merchant_counts_thrice fires merchant + autumn d45', merchantFire.fired, `text="${merchantFire.text}…" tag=${merchantFire.tag}`);
+
 // Test 19: 247 teacher_pauses_slate — teacher named + year2
 const teacherFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

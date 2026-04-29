@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 249 [doc] **PRIORITY** — at next archivist (~250-261), execute hoist-vs-stay decision for named-character-interiority observed-pattern. 4 uses meets review threshold per 231; lean HOIST per 249's 4-use review (distinct authoring guidance + 4 distinct emotional registers + reusable template). ~15 LoC doc reorganization. [loop/docs/]
+- 249 [code] — rival interiority moment (5th-by-addition; 4-of-4 originally filed at 240 already shipped): banner sighted on distant ridge at dusk (year-3+ autumn/winter). ~15 LoC. Lighter priority. [story.js]
+- 249 [doc] — observation: 6 named characters now have BOTH mechanics (101/102/105+153/201/206/209/243 = 6/6 cast) AND literary surfaces beyond 034 silent intros (240/245/247/249 + rival pending = 5 character-interiorities). Document as completed-arc in 250 (if early) or 300 milestone-letter. [journal]
 - 248 [doc] — narrative-surfaces.md 228 entry's tracker-site list mentions 2 sites (combat.js + economy.js); now 4 sites post-242 (combat / economy / events / soldiers). Single-line clarification at next fixer tick. ~3 LoC. [loop/docs/]
 - 248 [doc] — BUILDING_FIRST_BEATS function-text dispatch support (244 upgrade) deserves brief mention in narrative-surfaces.md invariants. Currently invisible to readers. ~5 LoC. [loop/docs/]
 - 248 [process] — when 4th character-interiority beat ships (merchant or rival per 240/245/247 filings), re-evaluate hoist-vs-stay decision for the named-character-interiority observed-pattern. Decision criteria: does the pattern have enough distinct authoring guidance separate from observational-elder cluster? [process]
