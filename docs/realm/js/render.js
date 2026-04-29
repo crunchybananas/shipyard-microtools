@@ -28,12 +28,19 @@ export function toggleFPS() { showFPS = !showFPS; }
 // enable). Each step rolls back via `_USE_SVG_SPRITES = false`.
 //
 // Loader uses `<img>` elements with `decoding="async"` so SVG
-// parsing happens off the render thread. Cache keyed by building
-// type. First draw of a type kicks off load (returns false from
-// `drawSpriteIfReady`); subsequent draws hit cache and dispatch
-// to ctx.drawImage. While not loaded, dispatch falls through to
-// the existing canvas drawX.
-let _USE_SVG_SPRITES = false;
+// parsing happens off the render thread. Cache keyed by
+// `${type}__${kingdom}` so per-realm variants (220) live alongside
+// canonical sprites. First draw of a (type, kingdom) pair kicks off
+// load (returns false from `drawSpriteIfReady`); subsequent draws
+// hit cache and dispatch to ctx.drawImage. While not loaded, the
+// dispatch falls through to the existing canvas drawX.
+//
+// Loop 221 (Phase B step 6 — final): default flipped to TRUE.
+// Live game now ships SVG sprites with per-realm variants. Canvas
+// drawX functions remain as fallback for unloaded sprites + non-
+// sprite types (farm/lumber/well/etc). Toggle via console:
+// `window.__realm.toggleSVG(false)` reverts to canvas if needed.
+let _USE_SVG_SPRITES = true;
 const _SPRITE_TYPES = new Set([
   'granary', 'castle', 'church', 'windmill', 'tower',
   'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
@@ -154,6 +161,19 @@ function drawSpriteIfReady(ctx, b, s) {
   ctx.drawImage(img, s.x - size.w / 2, s.y - size.h, size.w, size.h);
   return true;
 }
+// Phase B step 6 (221): preload all sprites at module init so the
+// first frame after game-start dispatches to SVG immediately rather
+// than canvas-fallback for ~200ms while loads complete. Kingdom name
+// isn't yet known at module init (G.kingdomName is set per-game), so
+// preload the unvariant default; per-kingdom variants populate
+// lazily on first dispatch (one-frame canvas fallback per type per
+// realm is acceptable).
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    for (const t of _SPRITE_TYPES) _loadSprite(t, '');
+  }, 0);
+}
+
 // Debug helpers — flip via console: `window.__realm.toggleSVG()`.
 if (typeof window !== 'undefined') {
   window.__realm = window.__realm || {};

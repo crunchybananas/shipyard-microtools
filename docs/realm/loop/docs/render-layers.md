@@ -245,27 +245,49 @@ two visual styles in the live game (some SVG, some canvas)
 which is worse than either end-state. 9-11/11 is the critical-
 mass threshold.
 
-### Phase B — integration sprint (~3-5 ticks)
+### Phase B — integration sprint (~~3-5 ticks~~ shipped 216-221, 6 ticks)
 
-Once 9-11 sprites exist, ship integration in this order, each
-step rollback-able by toggling a single feature flag:
+**COMPLETE as of tick 221.** All 6 steps shipped. Live game now
+ships SVG sprites with per-realm variants by default. Canvas drawX
+remains as fallback for unloaded sprites + non-sprite types
+(farm/lumber/well/etc).
 
-1. **Scaffolding tick.** `_USE_SVG_SPRITES` boolean flag
-   (default off) + sprite-loader path in render.js. ~30 LoC.
-   No visible change; just the rails.
-2. **Day/night tint composition.** SVG sprites composite under
-   the existing canvas multiply-blend. Test on granary alone.
-3. **Winter cap composition.** 158's dome arc applies on top
-   of SVG granary in winter. Tests the layer-composition
-   approach for all "after-sprite" canvas overlays.
-4. **Hover halo + fog.** Final composition concerns.
-5. **Per-instance variation.** Church glass palette as CSS
-   custom property; kingdom hash sets the property at building
-   instantiation. Or per-variant SVG files.
-6. **Live-game enable.** Flip `_USE_SVG_SPRITES` to true; all
-   buildings ship as SVG.
+1. **216 — Scaffolding.** `_USE_SVG_SPRITES` flag (default false)
+   + lazy loader + `drawSpriteIfReady` dispatch hook + console
+   toggle `window.__realm.toggleSVG()`.
+2. **217 — Anchor + sizing.** Per-building `_SPRITE_SIZES` table.
+   SVG path moved INSIDE the scale/translate envelope so damage
+   cracks + winter cap compose correctly on either path. (216
+   originally had an early-return bug skipping composition.)
+3. **218 — Winter cap.** Free win from 217's structural fix.
+   `_WINTER_CAPS` overlay composes on SVG sprites identically
+   to canvas. Verified via 2 winter screenshots.
+4. **219 — Hover halo + fog.** Free win — both layers render
+   OUTSIDE drawBuilding (halo at line ~1150 after building loop;
+   fog at line ~1111 before, only on unfogged tiles where
+   buildings live). Z-order independent of dispatch path.
+5. **220 — Per-realm variants.** First real-code step. Fetch +
+   string-replace + Blob URL pipeline. `_VARIANT_PALETTES` table
+   with church glass shipped as proof (4 palettes blue/red/
+   amber/green; kingdom-hash picks per realm). Loader signature
+   `_loadSprite(type, kname)`; cache key `${type}__${kname}`.
+   Closes 164 filed (76 ticks). Verified 4 kingdoms → 3 distinct
+   palettes.
+6. **221 — Live-game enable.** Flag default flipped to TRUE.
+   Module-init eager preload populates default cache so first
+   frame dispatches to SVG immediately. Per-kingdom variants
+   load lazily on first dispatch (one-frame canvas fallback per
+   type per realm — acceptable). Console toggle preserved as
+   rollback path: `window.__realm.toggleSVG(false)` reverts to
+   canvas if needed.
 
-Each step has a rollback (set flag back to false). Risk-bounded.
+Rollback: set flag false via console. Per-step verify scripts
+in `docs/realm/scripts/` provide regression tests:
+- `verify.mjs` — smoke (game + sandbox + logic)
+- `verify-logic.mjs` — targeted state tests (10 items)
+- `verify-phaseb.mjs` — toggle + winter + halo
+- `verify-variants.mjs` — per-realm palette distribution
+- `verify-default-svg.mjs` — default-flag-true sanity
 
 ### Phase C — animation polish (~2-3 ticks)
 

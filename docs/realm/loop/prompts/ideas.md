@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 221 [code] — Phase C animation polish per 171 plan: `<animate>` or CSS keyframes in SVG sprites for windmill sails (rotation around hub), castle/tower banners (sway), tower lantern flicker. SVG sprites are now in the live game so any animation reaches the player immediately. ~3-5 ticks total. [SVG files]
+- 221 [process] — Phase B completion milestone-review tick at ~225 (sibling to 100/157/171/200). Audit: did 3-5-tick estimate hold? (No — 6.) Did visual quality match Phase A sandbox? (Mostly yes; zoom-tuning open.) Canvas drawX retire vs keep as fallback? (Keep for now.) [journal]
+- 221 [code] — 215 3D retirement could potentially be REVISITED now that Phase B sprint pattern + Playwright verify rig are proven. 3D integration may now be tractable. Not urgent; filed for whenever there's appetite. [process / 3d/]
 - 220 [code] — variant entries for remaining sprite-bearing types: tavern (175 filing — sign palette + emblem swap), blacksmith (176 — forge fire palette `--fire-core`/`--fire-mid`/`--fire-outer`), market (179 — 4 awning palettes), house (173 — tile color red/slate/moss). Each ~5-10 LoC: define palette in `_VARIANT_PALETTES`, ensure SVG source colors match exactly. [render.js + sprite SVGs]
 - 220 [code] — hash distribution audit: generate 100 random kingdom names, run through `_applyVariants`, verify each palette gets ~25% with 4 entries. If uneven, switch hash mixer. [scripts/]
 - 220 [code] — per-instance per-building variation: HOUSE in same realm could have different roof colors per build location via kingdom + tile-coords hash. Adds visual interest in dense residential clusters. ~10 LoC; modify cache key to include `b.x_b.y`. [render.js]
