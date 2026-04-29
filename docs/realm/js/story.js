@@ -1078,6 +1078,30 @@ const NARRATIVE_BEATS = [
   { flag: 'recurrence_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 85,
     text: 'The same bread rising. The same lamps lit. The same children asleep. The realm finds itself in an evening it has had many times before, and it does not mind.' },
+  // Loop 325 (surprise, un-filed): SINGLE-AXIS surprise — 2nd naming-
+  // place shape per 276 invariant. Naming-place sub-type was at 1
+  // shape (193 EMERGENT-NAMING) — most-under-extended sub-type post-
+  // saturation observations at 322. NEW ANGLE: NAME-AS-MEASUREMENT-
+  // WITHOUT-VERIFICATION. The realm names a corner "the cold corner";
+  // citizens use the name about ALL weather; no one has measured the
+  // claim. The name does the work that measurement would. Lift "the
+  // name has" reverses agency: the citizens haven't measured it but
+  // the NAME has — the linguistic artifact carries the verification
+  // that the people skipped. Distinct from 193 (place gains name
+  // without ceremony) because 325 is about NAME-FUNCTIONING-AS-DATA
+  // — naming substitutes for measurement.
+  // **Single-axis ship**: STRUCTURE declarative (corpus default);
+  // REGISTER INSIDE cluster naming-place; TAG misc. Per 257
+  // anti-completionism + 312-322 multi-axial DEFAULTS but NOT
+  // REQUIRED — single-axis surprise is valid when prose surprises
+  // on its own merits. Naming-place sub-type promoted 1→2 shapes
+  // (still 2nd-most-under-extended after eventual 8th land-as-agent
+  // or 6th forgetting). Gate: year3 + day>=90 per 321 authoring
+  // guideline (next-available slot post-322 at d>=85). Once-per-
+  // realm; tag misc.
+  { flag: 'cold_corner_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 90,
+    text: 'There is a corner of the realm called the cold corner. Citizens say it of all weather. No one has ever measured it; the name has.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

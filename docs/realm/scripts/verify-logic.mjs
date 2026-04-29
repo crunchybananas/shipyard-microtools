@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 325 cold_corner_known — single-axis surprise (2nd naming-place shape; NAME-AS-MEASUREMENT angle)
+const coldCornerFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 92;
+  delete window.G.storyFlags.cold_corner_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.cold_corner_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a corner of the realm called the cold corner'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('325: cold_corner_known fires year3 + d>=90', coldCornerFire.fired, `text="${coldCornerFire.text}…" tag=${coldCornerFire.tag}`);
+
 // Test: 322 recurrence_known — TRIPLE-AXIS (7th OUTSIDE CONTENTMENT + 7th STRUCTURAL REPETITION + RECURRENCE-AS-SELF-RECOGNITION angle)
 const recurrenceFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

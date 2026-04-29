@@ -1308,10 +1308,25 @@ prescriptive AND consistently applied.
     5 shapes — second-leading sub-type after
     307 promoted land-as-agent to 6. Per 276
     invariant.
-  - *Naming-place* (193): the realm gives a
-    place a colloquial name. Third member of
+  - *Naming-place* (193/325): the realm gives
+    a place a colloquial name. Third member of
     the realm-environment naming triplet
     (sky 116 / object 056 / place 193).
+    **2 shapes** (post-saturation extension):
+    - 193 EMERGENT-NAMING ("There is now a
+      place called X. No one decided this; it
+      simply is.") — name appears without
+      ceremony.
+    - 325 NAME-AS-MEASUREMENT-WITHOUT-VERIFICATION
+      ("There is a corner of the realm called
+      the cold corner... no one has ever
+      measured it; the name has.") — the name
+      does the work of measurement; linguistic
+      artifact carries verification citizens
+      skipped.
+    Per 276 invariant. Single-axis surprise
+    ship at 325 — multi-axial DEFAULTS but
+    NOT REQUIRED per 257 + 312-322 pattern.
   - *Early-game-mood* (196/199/207/212): year-1
     moments of arrival, change, or familiarity.
     Anti-anxious continuity register
