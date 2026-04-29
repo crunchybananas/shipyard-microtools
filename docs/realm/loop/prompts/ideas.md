@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 241 [code] **HIGH** — fix `G.lastDeathDay` tracking at events.js:278 (plague) + soldiers.js:145 (combat). 2-line patch. Ship at 242. Both sites increment `stats.citizensDied` but skip the partner tracker, producing wrong 228 + 233 output for realms with plague/combat deaths. [events.js + soldiers.js]
+- 241 [process] — discipline: when shipping a `G.lastXDay`-style tracker, grep ALL increment sites of partner stat to ensure parity. Pattern observed at 211/228 (lastRaidDay/lastDeathDay). Document as "co-located state-write parity check" invariant. Prevents future 216/241-class bugs. [process]
+- 241 [doc] — observation: pessimist ticks at 204/222/241 have all found ≥1 issue. Pattern: every ~20-30 code-shipping ticks accumulates enough surface for adversarial sweep to find something. Document as observed cadence. [process]
+- 241 [code] — `G.recordDeath(cause)` helper that sets `stats.citizensDied++` + `lastDeathDay = G.day` atomically. Single call site replaces 4 places. Refactoring for invariant enforcement. ~10 LoC. [state.js]
 - 240 [code] — analogous interiority moments for other named characters: teacher slate-board, merchant counting coins, smith anvil falling silent + walking the river, rival's banner on a distant ridge at dusk. Each ~15-20 LoC tag:character. Ship 1 per 5-10 ticks per alternation. [story.js]
 - 240 [process] — tag-diversification rhythm: every 5-8 misc-tag beats deliberately ship a non-misc tag beat. Pattern observed at 240 working as intended. Document as authoring rhythm. [process]
 - 240 [doc] — closing-line craft is emergent across 184/199/240+ beats. "Some X have Y" generalizing structure. Could codify as observed-pattern cluster sub-type "elder-saying closer" at 5+ examples. Currently 3-4. [loop/docs/]
