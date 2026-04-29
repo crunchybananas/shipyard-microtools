@@ -89,6 +89,18 @@ await page.waitForTimeout(500);
 await page.screenshot({ path: join(SHOTS, 'phaseb-flag-back-off.png') });
 console.log('[phaseb] saved phaseb-flag-back-off.png (toggled back; canvas again)');
 
+// Winter mode test — verify _WINTER_CAPS compose on SVG path (218 step 3).
+// Force G.season=winter on both paths and screenshot.
+await page.evaluate(() => { window.G.season = 'winter'; });
+await page.waitForTimeout(300);
+await page.screenshot({ path: join(SHOTS, 'phaseb-winter-canvas.png') });
+console.log('[phaseb] saved phaseb-winter-canvas.png (winter + canvas)');
+
+await page.evaluate(() => window.__realm.toggleSVG(true));
+await page.waitForTimeout(800);
+await page.screenshot({ path: join(SHOTS, 'phaseb-winter-svg.png') });
+console.log('[phaseb] saved phaseb-winter-svg.png (winter + SVG; caps should compose on top)');
+
 // Page errors
 console.log('\n[phaseb] === PAGE ERRORS ===');
 const realErrs = errs.filter(e => !/favicon/i.test(e));

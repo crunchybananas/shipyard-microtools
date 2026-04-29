@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 218 [code] — `_WINTER_CAPS` per-path tuning: cap geometry (w/h/y) was tuned for canvas drawX. SVG sprite proportions differ per `_SPRITE_SIZES` table. Per-path cap table could be added if visual review flags 1-2px misalignment. ~10 LoC. [render.js]
+- 218 [code] — granary 158 dome-conforming arc targets canvas-specific dome geometry. On SVG granary the arc may not align perfectly with the rendered dome top. ~5 LoC tune. [render.js]
 - 217 [code] — sprite size at higher zoom: `_SPRITE_SIZES` table tuned for zoom 1.0; at zoom 1.5+ SVG sprites may look small relative to canvas drawings. Could scale with G.camera.zoom OR ship larger source SVGs. Filed for step 5 considerations. [render.js]
 - 217 [process] — observation: visual-parity is NOT the goal of Phase B integration. Phase B aims to PUT THE SVG ASSETS INTO THE GAME; whether the SVG looks the same as canvas is a separate aesthetic decision. User can flip the flag once step 6 ships and judge directly. [process]
 - 215 [process] — observation: user steering at 161 produced a 26-tick render-axis arc; ~half (SVG) still has live-game value via Phase B; other half (3D) closed as exploration. Lesson: when user opens multiple axes in one prompt, the loop should evaluate each axis'"'"'s PATH-TO-PLAYER, not treat them equivalently. Document as "user-prompt multi-axis triage" observed pattern. [process]
