@@ -2706,6 +2706,36 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x, s.y + p.offsetY, p.size, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'lightning') {
+      // Loop 273 (the-fixer, 272 follow-on): visual sync with storm_passed_
+      // _seen beat. DISTANT lightning flash — a soft diffuse glow at the
+      // far east edge of viewable sky area when the chronicle entry writes.
+      // Intentionally faint to match the prose's "long way off" register.
+      // Two-phase brightness: initial flash (alpha 0.65→0.4), then dim
+      // secondary flicker (alpha 0.2-0.4 with a 0.5x reduction) — mirrors
+      // real distant lightning's primary-then-secondary flash.
+      const baseX = s.x + (p.offsetX || 0);
+      const baseY = s.y + p.offsetY;
+      const flicker = (p.alpha < 0.4 && p.alpha > 0.2) ? 0.5 : 1.0;
+      // Big soft halo — warm white-blue (so it contrasts against the
+      // night-tinted blue sky). Lightning IS bright; real distant flashes
+      // illuminate clouds in pale-yellow-white, not pale-blue (which the
+      // sky already is).
+      ctx.globalAlpha = p.alpha * flicker;
+      const halo = ctx.createRadialGradient(baseX, baseY, 0, baseX, baseY, 70);
+      halo.addColorStop(0, 'rgba(255, 250, 220, 1.0)');
+      halo.addColorStop(0.4, 'rgba(255, 240, 180, 0.5)');
+      halo.addColorStop(1, 'rgba(200, 180, 120, 0)');
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(baseX, baseY, 70, 0, Math.PI * 2);
+      ctx.fill();
+      // Small bright core (the actual visible lightning silhouette)
+      ctx.globalAlpha = p.alpha * flicker;
+      ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
+      ctx.beginPath();
+      ctx.arc(baseX, baseY, 5, 0, Math.PI * 2);
+      ctx.fill();
     } else if (p.type === 'shootingstar') {
       // Loop 267 (the-fixer, 266 follow-on): visual sync with summer_falling_
       // _star beat. Bright head + 10-segment fading trail in screen space.

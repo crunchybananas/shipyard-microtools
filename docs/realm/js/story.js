@@ -697,9 +697,17 @@ const NARRATIVE_BEATS = [
       // flag), but the convention matters for future synchronized-surprise
       // applications per 267 [process] template.
       if (G.particles.length >= 400) return;
-      const cx = G.camera.x / 32, cy = G.camera.y / 16;
+      // Loop 273 (the-fixer): use proper inverse iso projection for the
+      // spawn tile. Earlier 267 used `camera.x/32, camera.y/16` which only
+      // approximates a tile coord when camera.x ≈ 0. The correct math:
+      //   tx = (camera.y/16 - camera.x/32) / 2
+      //   ty = (camera.y/16 + camera.x/32) / 2
+      // Now the streak reliably appears in the visible sky regardless of
+      // where the player has panned.
+      const tx = (G.camera.y / 16 - G.camera.x / 32) / 2;
+      const ty = (G.camera.y / 16 + G.camera.x / 32) / 2;
       G.particles.push({
-        tx: cx, ty: cy,
+        tx, ty,
         offsetX: 0, offsetY: -200,
         vxScreen: -3, vy: 0.5,
         alpha: 1.2, decay: 0.012,
@@ -753,7 +761,32 @@ const NARRATIVE_BEATS = [
   // not because weather-recognition count needed advancing.
   { flag: 'storm_passed_seen', tag: 'misc',
     trigger: G => G.season === 'summer' && G.day >= 30,
-    text: 'There is a summer evening when a storm builds over the eastern sea but does not come ashore. The realm watches the lightning a long way off and is given the night intact.' },
+    text: 'There is a summer evening when a storm builds over the eastern sea but does not come ashore. The realm watches the lightning a long way off and is given the night intact.',
+    // Loop 273 (the-fixer, 272 follow-on): synchronized visual+textual
+    // pattern's 2nd application (1st was 267 shooting-star). Spawns a
+    // distant faint lightning flash at the eastern edge of viewable sky.
+    // Particle render in render.js lightning branch — soft pale-blue
+    // halo + tiny bright core, fades over ~40 frames (~0.7s real time)
+    // with a flicker phase mid-decay matching real distant lightning's
+    // primary-then-secondary brightness pattern.
+    after: G => {
+      if (!G.particles || !G.camera) return;
+      if (G.particles.length >= 400) return;
+      // Inverse iso projection: camera.x = (tx-ty)*32, camera.y = (tx+ty)*16
+      // → tx = (camera.y/16 - camera.x/32) / 2, ty = (camera.y/16 + camera.x/32) / 2
+      // Spawning at the actual camera-tile keeps the flash visible regardless
+      // of camera position. (267 used the simpler camera.x/32 approximation
+      // which only works when camera.x ≈ 0; this corrected math is robust.)
+      const tx = (G.camera.y / 16 - G.camera.x / 32) / 2;
+      const ty = (G.camera.y / 16 + G.camera.x / 32) / 2;
+      G.particles.push({
+        tx, ty,
+        offsetX: 120, offsetY: -150,  // slight east + sky
+        vy: 0,
+        alpha: 0.85, decay: 0.015,    // ~55 frames ≈ 0.9s lifetime
+        type: 'lightning',
+      });
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

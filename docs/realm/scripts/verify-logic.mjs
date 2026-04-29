@@ -266,17 +266,22 @@ const townhallMaxCount = await page.evaluate(async () => {
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
 // Test: 272 storm_passed_seen — negative-space weather (4th weather-recognition use)
+// Test: 273 — beat's after: callback spawns a 'lightning' particle
 const stormPassedFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.season = 'summer';
   window.G.day = 35;
   delete window.G.storyFlags.storm_passed_seen;
+  // Clear pre-existing lightning particles to isolate the spawn
+  window.G.particles = (window.G.particles || []).filter(p => p.type !== 'lightning');
   story.checkStoryBeats();
   const fired = window.G.storyFlags.storm_passed_seen === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a summer evening when a storm builds'));
-  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+  const flash = window.G.particles.find(p => p.type === 'lightning');
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag, particleSpawned: !!flash, particleAlpha: flash?.alpha };
 });
 rec('272: storm_passed_seen fires summer + d≥30', stormPassedFire.fired, `text="${stormPassedFire.text}…" tag=${stormPassedFire.tag}`);
+rec('273: lightning particle spawned by beat after: callback', stormPassedFire.particleSpawned, `alpha=${stormPassedFire.particleAlpha}`);
 
 // Test: 270 inn_confluence_seen — first multi-character beat in corpus
 const confluenceFire = await page.evaluate(async () => {
