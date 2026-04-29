@@ -443,6 +443,23 @@ const NARRATIVE_BEATS = [
   { flag: 'fields_know_realm', tag: 'misc',
     trigger: G => G.season === 'summer' && G.day >= 10,
     text: 'There comes a season when the fields are no longer strange. The grass under bare feet is the realm\'s own; the path between buildings goes the right way without thought. The land has agreed to be lived in.' },
+  // Loop 227 (surprise, post-Phase-C return to narrative): SECOND
+  // USE of land-as-agent sub-type (207 was first). The WELL has
+  // subjective agency — the water "felt" and "remembers" buckets.
+  // Distinct from 207: that beat gave the LAND broad agency
+  // (collective ground/path/grass); 227 gives a SPECIFIC OBJECT
+  // (the well) subjective interiority. Different shape within the
+  // same sub-type — promotes the pattern toward 3+ threshold.
+  // Per 213 skeptic FINDING 2: this beat AVOIDS the META-frame
+  // ("the realm doesn't see") that 212 used. The well-and-water
+  // exist with their own awareness; the realm's awareness is not
+  // commented on. Pure object-interiority.
+  // Tag: misc (cluster sub-type land-as-agent now 2 uses).
+  // Gate: year2 + well exists. The well must have stood through
+  // at least one full cycle for the prose to land.
+  { flag: 'well_remembers', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && G.buildings && G.buildings.some(b => b.type === 'well'),
+    text: 'The well has been there since the realm\'s first thirsty summer. The water in the dark below has felt every bucket lowered to it, and remembers each one a long while.' },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

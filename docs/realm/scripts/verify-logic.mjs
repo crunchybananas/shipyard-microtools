@@ -162,6 +162,22 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 10: 227 well_remembers — year2 + well exists
+const wellFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'well')) {
+    window.G.buildings.push({ type: 'well', x: 30, y: 30, hp: 100, maxHp: 100, workers: [] });
+  }
+  delete window.G.storyFlags.well_remembers;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.well_remembers === true;
+  const lastEntry = window.G.chronicle.at(-1);
+  return { fired, text: lastEntry?.text?.slice(0, 60), tag: lastEntry?.tag };
+});
+rec('227: well_remembers fires year2 + well exists', wellFire.fired, `text="${wellFire.text}…"`);
+
 // Test 9: 214 founder-conditional offering — verify pool size grows when founder1 named
 const offeringPool = await page.evaluate(async () => {
   // Probe by simulating the offering selection logic without firing the beat.

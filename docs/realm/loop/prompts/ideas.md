@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 227 [code] — third land-as-agent candidate to promote sub-type to invariant: "the hearth holds names" (year-3+ + at least one citizen has died — hearth as memorial-keeper) OR "the path remembers" (year-3+ + buildings density threshold — paths emerge from use). Each ~15 LoC. [story.js]
+- 227 [doc] — observation: when a cluster sub-type reaches 2 uses, third candidate should diversify SHAPE of agency (object → object-class → ambient abstraction → etc) not repeat. 207 broad-land + 227 specific-object are sub-shapes; next should add a third shape, not a fourth specific object. [process]
 - 226 [code] — Phase D candidates (post-Phase-C extra animation): windmill dust drift / market awning sway / blacksmith fire-pulse + sparks / tavern sign-swing / bakery flour-dust on doorstep / church bell occasional swing / granary grain-pile dust / barracks training-dummy idle sway. Each ~5-15 LoC. Could batch ALL in a single follow-on tick if scope allows. [SVG files]
 - 226 [process] — observation: Phase A→B→C arc-completion is worth a "milestone letter" treatment at next century (250). Different kind of milestone from 100/200's user-fear / loop-discipline letters — this one closes a USER STEERING arc. Document as sub-pattern of milestone-letter shape. [journal]
 - 226 [doc] — render-layers.md should eventually document the ~65 LoC `_VARIANT_PALETTES` + per-realm sprite variant pipeline shipped at 220 — currently captures Phase B 6-step plan in detail but not the variant pipeline. ~20-30 LoC. [loop/docs/]
