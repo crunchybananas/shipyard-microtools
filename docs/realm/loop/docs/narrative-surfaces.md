@@ -9,7 +9,8 @@ lines unblocked by this navigability + per-section anchors):
 - `## execution order` — system-call order at startup/tick
 - `## invariants` — prescriptive rules (~8 active: 075/144/named-char-
   mech/etc + 276 shape-axis + 284 variant-pool + 287 combination-rule
-  + 298 OUTSIDE-cluster + 308 STRUCTURAL-surprise)
+  + 298 OUTSIDE-cluster + 308 STRUCTURAL-surprise [+ 315 STRUCTURE-
+  ANGLE coupling sub-rule within 308])
 - `## observed patterns` — descriptive observations <3 uses
 - `## known gaps` — 104-tick filing of unresolved seams
 - `## retired hypotheses` — patterns falsified or demoted
@@ -943,28 +944,55 @@ should respect:
   declarative form remain valid (most beats), but STRUCTURE-
   varied beats are explicitly called out.
 
-  **STRUCTURE-ANGLE coupling (prediction filed at 307;
-  CONFIRMED at 5 of 5 uses by 314):** all 5 confirming uses
-  (301/305/307/312/314) ALSO surprise on ANGLE —
-  301 + RITUAL-PERSISTENCE-WITHOUT-ORIGIN (forgetting shape
-  4); 305 + EMERGENT-TRADITION (forgetting shape 5); 307 +
-  ANTICIPATORY-AGENCY (land-as-agent shape 6); 312 +
-  SOCIAL-NORMS (habituation-recognition shape 4); 314 +
-  DREAD-WITHOUT-CAUSE (5th OUTSIDE register, TERROR).
-  Hypothesis: non-declarative openings DEMAND fresh content
-  because stale angles collapse the prose (asking "why does
-  X happen" about a familiar angle reads as rhetorical
-  filler). At 5 of 5 confirming uses the prediction has
-  reached **PROMOTION-ELIGIBLE** threshold. Filed for next
-  archivist: promote STRUCTURE-ANGLE coupling from
-  prediction-WITHIN-308 to its own sub-rule. Falsification
-  attempt remains an option (ship 6th structural with
-  stale angle) but at this density the coupling appears
-  robust — non-declarative authoring naturally summons
-  fresh angles, possibly because writing in a non-default
-  voice triggers fresh thinking. Until promoted or
-  falsified: STRUCTURE-vector ships pair with fresh
-  ANGLE.
+  **STRUCTURE-ANGLE coupling SUB-RULE** (promoted at 315 from
+  307 prediction; reached 5 of 5 confirming uses by 314):
+  **non-declarative STRUCTURE openings (question / imperative /
+  second-person / dialog / negation / future forms) MUST pair
+  with a fresh ANGLE.** Declarative openings remain free to
+  reuse an angle (per 257); the rule applies ONLY to
+  STRUCTURE-vector ships.
+
+  **Confirmed uses establishing the rule (5):**
+  - 301 QUESTION + RITUAL-PERSISTENCE-WITHOUT-ORIGIN
+    (forgetting shape 4)
+  - 305 IMPERATIVE + EMERGENT-TRADITION (forgetting shape 5)
+  - 307 SECOND-PERSON + ANTICIPATORY-AGENCY (land-as-agent
+    shape 6)
+  - 312 DIALOG + SOCIAL-NORMS (habituation-recognition
+    shape 4)
+  - 314 NEGATION + DREAD-WITHOUT-CAUSE (5th OUTSIDE
+    register, TERROR)
+
+  **Why this is a rule and not just a recurrence:** 5 of 5
+  ships across both INSIDE cluster sub-types AND OUTSIDE
+  register. The rule operates across REGISTER boundaries —
+  it's not register-bound. Per 314 [process] **CRAFT FACT
+  hypothesis**: non-declarative voice RESISTS stale content
+  because writing in a non-default voice triggers fresh
+  thinking. The coupling appears to be a property of the
+  writing act, not a contingent observation about this
+  particular corpus. Falsification remains theoretically
+  possible (ship 6th non-declarative with stale angle and
+  see if prose holds), but constructed-stale-angle test
+  prose by definition would not surprise (per 203/257),
+  so the test is effectively unrunnable. The rule stands
+  until either disproved by a real ship that surprises
+  with a stale angle and non-declarative form
+  simultaneously, or refined by future authors discovering
+  a sixth non-declarative form whose prose somehow
+  decouples from angle.
+
+  **What this sub-rule does NOT prescribe:**
+  - Adding STRUCTURE to declarative beats — declarative
+    remains the corpus default; the rule only fires when
+    the author chooses non-declarative.
+  - "Fresh angle" = entirely new sub-type. Angles can be
+    extensions WITHIN existing sub-types per 276 shape-
+    axis. Only the specific angle-INSTANCE must not
+    duplicate an existing beat.
+  - A specific COUNT requirement (e.g. "must add 1
+    structural surprise per N ticks"). The rule only
+    constrains; it does not mandate.
 
   **Authoring decision tree (combined with 276 + 298):**
   1. Does the prose surprise (203)?
