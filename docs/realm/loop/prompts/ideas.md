@@ -28,7 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 238 [code] **HIGH** — `_SPRITE_SIZES` bump by ~20% across all 11 entries (specific values in 238 journal). Confirms 217 filing after empirical audit. Verify visual parity with canvas baseline via verify-phaseb at default zoom. ~10 LoC. [render.js]
+- 239 [code] — `_WINTER_CAPS` cap-geometry tuning to match new sprite sizes. Caps tuned for old 36-44px sprite era; at 42-54px (post-239) caps may sit slightly off height/width. Visual review next critic tick will flag if needed. ~5-10 LoC. [render.js]
+- 239 [process] — critic→fixer pair now at 7+ in loop history (011→012 / 154→155+156 / 195→196 / 202→203 / 204→205 / 213→214 / 231→232 / 238→239). Pattern deeply established. Could promote to invariant. [process]
+- 239 [code] — re-run verify-critic at ~tick 270 per 238 filing's "every ~30 ticks" cadence. Track visual-debt accumulation post-size-bump. [scripts/]
+- 238 [code] **HIGH** — `_SPRITE_SIZES` bump by ~20% across all 11 entries (specific values in 238 journal). Confirms 217 filing after empirical audit. Verify visual parity with canvas baseline via verify-phaseb at default zoom. ~10 LoC. [render.js] **DONE → 239** (per-building +17-24% bump preserving silhouette character; towers favor height; verify-critic 22/22 + verify-phaseb clean both directions)
 - 238 [code] — multi-zoom systematic sizing audit: zoom 0.5/0.75/1.0/1.25/1.5/2.0/2.5. Decide single sweet-spot vs zoom-aware scaling. ~30 LoC scripts/. [scripts/]
 - 238 [code] — animation-quality review via multi-frame GIF capture OR HEADED Playwright session. Single screenshots can't evaluate motion. ~20-30 LoC. [scripts/]
 - 238 [doc] — observation: screenshot-critic could re-run periodically (~every 30 ticks) to track visual-debt accumulation. Document as observed rhythm. [process]

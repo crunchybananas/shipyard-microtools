@@ -124,23 +124,25 @@ function _applyVariants(text, type, kname) {
   return text;
 }
 
-// Per-building sprite size table — Phase B step 2 (217). Matches
-// each canvas drawX's effective footprint at zoom 1.0. Tuned by
-// inspection: tall structures (castle/church/tower) get +height;
-// market is wide-but-short; standard residentials sit mid-range.
-// The 1.1× scale of the parent envelope multiplies these.
+// Per-building sprite size table — Phase B step 2 (217), bumped at
+// 239 per 238 critic HIGH finding. Original table sized by inspection
+// against canvas drawX at zoom 1.0; empirical audit at zoom 1.3
+// (default) showed sprites read ~20% undersized vs canvas
+// equivalents. Bump applied per-building (some get more height than
+// width to preserve characteristic silhouettes). The 1.1× scale of
+// the parent envelope still multiplies these.
 const _SPRITE_SIZES = {
-  granary:    { w: 36, h: 42 },
-  castle:     { w: 44, h: 56 },
-  church:     { w: 40, h: 56 },
-  windmill:   { w: 38, h: 52 },
-  tower:      { w: 32, h: 52 },
-  house:      { w: 36, h: 40 },
-  tavern:     { w: 38, h: 44 },
-  blacksmith: { w: 38, h: 42 },
-  market:     { w: 42, h: 38 },
-  bakery:     { w: 36, h: 42 },
-  barracks:   { w: 40, h: 46 },
+  granary:    { w: 42, h: 50 },  // +17% / +19%
+  castle:     { w: 54, h: 68 },  // +23% / +21%
+  church:     { w: 48, h: 68 },  // +20% / +21%
+  windmill:   { w: 44, h: 64 },  // +16% / +23%
+  tower:      { w: 38, h: 64 },  // +19% / +23%
+  house:      { w: 42, h: 48 },  // +17% / +20%
+  tavern:     { w: 46, h: 54 },  // +21% / +23%
+  blacksmith: { w: 46, h: 52 },  // +21% / +24%
+  market:     { w: 50, h: 46 },  // +19% / +21%
+  bakery:     { w: 42, h: 50 },  // +17% / +19%
+  barracks:   { w: 48, h: 56 },  // +20% / +22%
 };
 // drawSpriteIfReady: returns true if it drew the sprite, false if
 // the caller should fall through to the canvas dispatch. CALLED
