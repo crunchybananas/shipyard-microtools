@@ -162,6 +162,21 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 21: 252 rival_banner_distant — rival + year3 + autumn/winter
+const rivalFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureRival();
+  window.G.storyFlags.year3 = true;
+  window.G.season = 'winter';
+  window.G.day = 75;
+  delete window.G.storyFlags.rival_banner_distant;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.rival_banner_distant === true;
+  const entry = window.G.chronicle.find(e => e.text?.includes("banner is sighted on a far ridge"));
+  return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
+});
+rec('252: rival_banner_distant fires rival + year3 + winter', rivalFire.fired, `text="${rivalFire.text}…" tag=${rivalFire.tag}`);
+
 // Test 20: 249 merchant_counts_thrice — merchant + autumn + day≥40
 const merchantFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251, 252. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -926,10 +926,12 @@ prescriptive AND consistently applied.
   207's filing).
 
 - **Named-character interiority beats
-  (observation, 4 uses).** Distinct from the
+  (observation, 5 uses).** Distinct from the
   observational-elder cluster — uses an
   INDIVIDUAL named character as subject, not
-  the realm collective. Four beats shipped:
+  the realm collective. Five beats shipped
+  (5 of 6 named cast; mayor remains
+  unfilmed — see end note):
   - 240 bard_unsung_song — bard composes a
     song no one will hear; "some songs the
     realm has had were never sung aloud"
@@ -946,6 +948,13 @@ prescriptive AND consistently applied.
     counts the day's coins three times by
     lamplight; "counting is its own reason"
     (register: *meditative ritual*)
+  - 252 rival_banner_distant — rival's
+    banner sighted on a far ridge; "in the
+    way far-off neighbors are"
+    (register: *distant observation*) —
+    **PREDICTION FROM 251 HELD**: rival's
+    canonical adversarial-vigilance role
+    matched the predicted shape.
 
   All tag:character. All gate on the named
   character + a once-per-realm season/year
@@ -954,9 +963,11 @@ prescriptive AND consistently applied.
   184/199/240 craft pattern).
 
   **CANONICAL-ROLE-MATCHED REGISTER** is the
-  emergent authoring rule: each character's
-  interiority shape matches their canonical
-  role from the realm's existing surfaces:
+  emergent authoring rule (validated at 252
+  via prediction-confirmation): each
+  character's interiority shape matches
+  their canonical role from the realm's
+  existing surfaces:
   - Bard's role: art/composition →
     interiority of HIDDEN ART
   - Smith's role: industrial labour →
@@ -968,12 +979,19 @@ prescriptive AND consistently applied.
   - Merchant's role: counting/exchange →
     interiority of MEDITATIVE RITUAL
     (counting as refuge)
+  - Rival's role: adversarial vigilance →
+    interiority of DISTANT OBSERVATION
+    (banner on a far ridge; far-off-
+    neighbor awareness)
 
-  When the 5th candidate (rival) ships, the
-  shape should match the rival's canonical
-  role — adversarial vigilance — likely
-  expressed as DISTANT OBSERVATION (banner
-  on a far ridge per 240 filing).
+  Mayor remains as the 6th-of-6 character
+  WITHOUT an interiority beat. Mayor's
+  canonical role is civic governance →
+  predicted interiority shape: PROCEDURAL
+  WITNESSING (e.g., signing a small
+  document no one else sees, or watching
+  the dawn from the town hall window).
+  Filed for future tick.
 
   **Hoist-vs-stay review (251 per 249
   PRIORITY filing): STAY at observed-pattern.**

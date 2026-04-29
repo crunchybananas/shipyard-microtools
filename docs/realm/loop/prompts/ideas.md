@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 252 [code] — mayor interiority moment (6th-of-6, predicted shape: PROCEDURAL WITNESSING). "Signs a small document no one else sees" OR "watches the dawn from the town hall window before the realm is awake." Year-3+ + townhall built. ~15 LoC. Not urgent — 5/6 already validates the pattern. [story.js]
+- 252 [process] — PREDICTION-DRIVEN ship validates emergent pattern's predictive power. Future hoist-vs-stay reviews (per 251 template) should INCLUDE a prediction step IF pattern has clear authoring rule. Prediction validated/violated by next ship is stronger doctrine signal than use counts alone. Add to hoist-template. [process]
+- 252 [doc] — 5-of-6 character interiority validates cluster pattern. Could document predictive-test pattern explicitly: "when observed-pattern produces correct predictions, descriptive value is higher than use-count alone implies." [loop/docs/]
 - 251 [doc] — chronology section catch-up at next periodic archivist (~261-263 by 12-tick rhythm). 249/250/251 + previous ticks need entries. ~5-10 LoC. [loop/docs/]
 - 251 [process] — hoist-vs-stay review TEMPLATE: when sub-type/pattern reaches threshold, review tick documents (1) use count + new uses; (2) emergent authoring rule if any; (3) prediction of next use's shape; (4) STAY-or-HOIST decision per discipline; (5) reasoning citing 231 contrarian. Reusable for future threshold reviews. [process]
 - 251 [code] — when rival interiority ships, verify whether 251 prediction (DISTANT OBSERVATION shape) holds OR prose surprises by violating expectation. Either outcome valuable; prediction is GUIDANCE not LAW. [story.js]

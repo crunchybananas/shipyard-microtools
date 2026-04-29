@@ -562,6 +562,29 @@ const NARRATIVE_BEATS = [
       const m = G.namedCharacters.merchant;
       return `There is an evening when ${m.name} closes the market early and counts the day's coins by lamplight. They count them three times. Each count is the same number; ${m.name} counts again anyway, because the lamp is warm and the night is cold, and counting is its own reason.`;
     } },
+  // Loop 252 (the-fixer, 240+245+247+249 filed; 251 predicted):
+  // RIVAL interiority moment. 5th-by-addition character interiority
+  // beat (originally 4 filed at 240; 4 shipped; rival was 5th
+  // candidate per 240 filing). 251 archivist predicted rival's
+  // interiority shape would be DISTANT OBSERVATION matching the
+  // canonical-role-matched register rule: rival's adversarial-
+  // vigilance role → interiority of being-seen-from-afar.
+  // PREDICTION HELD: this beat is the banner-on-far-ridge shape
+  // 240 filing drafted, expressing the realm and rival as
+  // far-off-neighbors aware of each other without active
+  // engagement.
+  // Closing line "in the way far-off neighbors are" humanizes
+  // the adversarial relationship without resolving it.
+  // Tag:character. Gate: rival named (barracks build per 034 hook
+  // → ensureRival) + year3+ + autumn/winter (late-late-game feel).
+  // Closes 5-of-5 character interiority arc; cluster sub-type
+  // (per 251 STAY verdict) now at 5 uses.
+  { flag: 'rival_banner_distant', tag: 'character',
+    trigger: G => G.namedCharacters?.rival && G.storyFlags.year3 && (G.season === 'autumn' || G.season === 'winter'),
+    text: G => {
+      const r = G.namedCharacters.rival;
+      return `There is an evening late in the year when ${r.name}'s banner is sighted on a far ridge — visible briefly between two crests, then gone. No challenge is sounded; no preparation is made. The realm and ${r.name} are aware of each other, in the way far-off neighbors are.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
