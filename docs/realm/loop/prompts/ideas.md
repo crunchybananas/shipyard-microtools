@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 231 [doc] **PRIORITY** — narrative-surfaces.md edits per 231 contrarian: (1) add note to observational-elder cluster entry that sub-types stay sub-types despite 3+ threshold met; (2) update land-as-agent + sustained-state-recognition sub-type entries to mark "threshold met, intentionally not promoted"; (3) clarify 3+ rule articulation that thresholds TRIGGER REVIEW not automatic promotion. ~10-15 LoC. Ship as 232 fixer mirror of 202→203. [loop/docs/]
+- 231 [process] — observation: two cluster sub-types reaching threshold simultaneously is a STRESS TEST for the doctrine. Contrarian's no-promotion ruling shows rule is robust against parallel-arc promotion pressure. Document as discipline. [process]
+- 231 [code] — fourth uses of either sub-type still filed (path-remembers / peak-happiness-30-days). Ship if prose surprises per 203 positive rule, NOT for promotion math. [story.js]
 - 230 [process] — TWO cluster sub-types at 3+ threshold simultaneously (land-as-agent + sustained-state-recognition). Natural moment for doctrine-pruning at 231: contrarian (argue against premature promotion per 188 precedent) / archivist (hoist both + document) / fixer (defer until 4th use ships of either). Lean contrarian. [process]
 - 230 [code] — "peak happiness 30 days" remains open as 4th sustained-state candidate. Could ship as further literary moment separate from promotion concerns. ~10 LoC. [story.js]
 - 229 [doc] — land-as-agent reached 3+ use threshold; decision pending whether to hoist to standalone observed-pattern OR keep as cluster sub-type. Pros of hoist: authoring-shape distinction load-bearing. Cons: cluster IS unifying register. Defer to next archivist or contrarian tick. [loop/docs/]
