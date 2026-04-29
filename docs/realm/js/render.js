@@ -45,6 +45,7 @@ const _SPRITE_TYPES = new Set([
   'granary', 'castle', 'church', 'windmill', 'tower',
   'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
   'townhall',  // 255 — 12th + last user-buildable structure to gain SVG.
+  'well',      // 306 — Phase F first; supporting structure with strong narrative anchor (227 well_remembers).
 ]);
 const _spriteCache = new Map(); // `${type}__${kname}` → HTMLImageElement (or 'loading' / null)
 function _loadSprite(type, kname) {
@@ -220,6 +221,8 @@ const _SPRITE_SIZES = {
   barracks:   { w: 48, h: 56 },  // +20% / +22%
   townhall:   { w: 54, h: 56 },  // 255: civic-formal — wider than tall;
                                  //   slightly bigger than market for civic presence.
+  well:       { w: 36, h: 44 },  // 306: smaller than user-buildable structures
+                                 //   (well is supporting; small footprint).
 };
 // drawSpriteIfReady: returns true if it drew the sprite, false if
 // the caller should fall through to the canvas dispatch. CALLED
