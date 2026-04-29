@@ -52,20 +52,40 @@ function _loadSprite(type) {
   img.src = `assets/sprites/${type}.svg`;
   return null;
 }
+// Per-building sprite size table — Phase B step 2 (217). Matches
+// each canvas drawX's effective footprint at zoom 1.0. Tuned by
+// inspection: tall structures (castle/church/tower) get +height;
+// market is wide-but-short; standard residentials sit mid-range.
+// The 1.1× scale of the parent envelope multiplies these.
+const _SPRITE_SIZES = {
+  granary:    { w: 36, h: 42 },
+  castle:     { w: 44, h: 56 },
+  church:     { w: 40, h: 56 },
+  windmill:   { w: 38, h: 52 },
+  tower:      { w: 32, h: 52 },
+  house:      { w: 36, h: 40 },
+  tavern:     { w: 38, h: 44 },
+  blacksmith: { w: 38, h: 42 },
+  market:     { w: 42, h: 38 },
+  bakery:     { w: 36, h: 42 },
+  barracks:   { w: 40, h: 46 },
+};
 // drawSpriteIfReady: returns true if it drew the sprite, false if
-// the caller should fall through to the canvas dispatch. Step 1
-// wires the function but it returns false unconditionally because
-// `_USE_SVG_SPRITES` defaults to false. Step 2 will flip that and
-// add composition logic.
+// the caller should fall through to the canvas dispatch. CALLED
+// FROM INSIDE the parent translate/scale envelope in drawBuilding,
+// so damage cracks and winter cap compose on top regardless of
+// path. Step 2 (217): sized per-building + bottom-anchored at s.
+// Day/night tint is NOT applied here; the screen-space
+// `applyNightTint` after the world pass tints the entire frame
+// uniformly so per-sprite tinting would double-apply.
 function drawSpriteIfReady(ctx, b, s) {
   if (!_USE_SVG_SPRITES) return false;
   if (!_SPRITE_TYPES.has(b.type)) return false;
   const img = _loadSprite(b.type);
   if (!img) return false;  // still loading or failed; fall through
-  // Step 2 will add composition (day/night tint, winter cap, etc).
-  // Step 1 ships the bare draw at sprite native size centered on s.
-  const w = 32, h = 32;
-  ctx.drawImage(img, s.x - w/2, s.y - h, w, h);
+  const size = _SPRITE_SIZES[b.type] || { w: 36, h: 42 };
+  // Bottom-anchored at (s.x, s.y); building "stands on" the tile.
+  ctx.drawImage(img, s.x - size.w / 2, s.y - size.h, size.w, size.h);
   return true;
 }
 // Debug helpers — flip via console: `window.__realm.toggleSVG()`.
@@ -3005,14 +3025,6 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.globalAlpha = 1;
   }
 
-  // Loop 216 (PHASE B step 1): SVG sprite path early-return. When
-  // `_USE_SVG_SPRITES` is true AND the building's sprite is loaded,
-  // draw it and skip the canvas dispatch. Default flag is false
-  // (rails only this tick); console toggle via window.__realm.toggleSVG().
-  if (drawSpriteIfReady(ctx, b, s)) {
-    return;  // Step 2 will compose tint/cap/halo on top of the SVG.
-  }
-
   // Ground the sprite: scale from tile-center anchor so buildings grow UP
   // from the ground (not out in all directions), then shift down 4px to
   // place sprite base at visual ground level (tile center in iso).
@@ -3021,7 +3033,13 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.scale(1.1, 1.1);
   ctx.translate(-s.x, -s.y + 3);
 
-  switch (b.type) {
+  // Loop 217 (PHASE B step 2): SVG path runs INSIDE the same
+  // scale/translate envelope as canvas drawX so damage cracks +
+  // winter cap (drawn after `restore`) compose on top of either.
+  // Returns false → fall through to canvas; true → SVG drew already.
+  if (drawSpriteIfReady(ctx, b, s)) {
+    ctx.restore();
+  } else { switch (b.type) {
     case 'house': drawHouse(ctx, s, b); break;
     case 'farm': drawFarm(ctx, s, b); break;
     case 'lumber': drawLumber(ctx, s, b); break;
@@ -3047,8 +3065,9 @@ function drawBuilding(ctx, b, s, daylight) {
     case 'fisherman': drawFisherman(ctx, s, b); break;
     case 'blacksmith': drawBlacksmith(ctx, s, b); break;
     default: drawGeneric(ctx, s, def); break;
+    }
+    ctx.restore(); // undo the 1.1x scale (canvas path)
   }
-  ctx.restore(); // undo the 1.3x scale
 
   // Building damage cracks when HP is below 70%
   if (b.hp !== undefined && b.maxHp !== undefined && b.hp < b.maxHp * 0.7) {

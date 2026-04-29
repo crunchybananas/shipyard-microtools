@@ -33,22 +33,35 @@ const newGame = await page.$('button:has-text("New Game"), #start-game-btn');
 if (newGame) await newGame.click();
 await page.waitForTimeout(1500);
 
-// Build a granary so there's a sprite-eligible structure on screen.
-// We'll force-place via game internals.
+// Build a row of sprite-eligible structures across the screen + center
+// camera on them so we can visually compare flag-on vs flag-off.
 const placed = await page.evaluate(async () => {
   if (typeof window.G === 'undefined') return { ok: false };
-  // Place a granary mid-map.
   window.G.buildings = window.G.buildings || [];
-  window.G.buildings.push({
-    type: 'granary',
-    x: 40, y: 40,
-    hp: 100, maxHp: 100,
-    workers: [], assigned: [],
-  });
+  const types = ['granary', 'castle', 'church', 'windmill', 'tower', 'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks'];
+  let cx = 35, cy = 35;
+  for (const t of types) {
+    window.G.buildings.push({
+      type: t, x: cx, y: cy,
+      hp: 100, maxHp: 100,
+      workers: [], assigned: [],
+      buildProgress: 1,
+    });
+    cx += 3;
+    if (cx > 50) { cx = 35; cy += 3; }
+  }
+  // Center camera on tile (40, 38) using iso projection.
+  // screenX = (cx - cy) * TW/2 = (40-38) * 32 = 64
+  // screenY = (cx + cy) * TH/2 = (40+38) * 16 = 1248
+  if (window.G.camera) {
+    window.G.camera.x = 64;
+    window.G.camera.y = 1248;
+    window.G.camera.zoom = 1.6;
+  }
   return { ok: true, count: window.G.buildings.length };
 });
-console.log(`[phaseb] placed test granary (${placed.count} buildings total)`);
-await page.waitForTimeout(500);
+console.log(`[phaseb] placed ${placed.count} buildings, centered camera`);
+await page.waitForTimeout(800);
 
 await page.screenshot({ path: join(SHOTS, 'phaseb-flag-off.png') });
 console.log('[phaseb] saved phaseb-flag-off.png (flag default = false; canvas drawGranary)');
