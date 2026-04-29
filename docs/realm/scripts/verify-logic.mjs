@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 14: 240 bard_unsung_song — bard named + day≥25 + spring/summer
+const bardSongFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureBard();
+  window.G.day = 30;
+  window.G.season = 'summer';
+  delete window.G.storyFlags.bard_unsung_song;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.bard_unsung_song === true;
+  const lastEntry = window.G.chronicle.at(-1);
+  return { fired, text: lastEntry?.text?.slice(0, 50), tag: lastEntry?.tag };
+});
+rec('240: bard_unsung_song fires bard + d30 + summer', bardSongFire.fired, `text="${bardSongFire.text}…" tag=${bardSongFire.tag}`);
+
 // Test 13: 230 full_pop_known — pop≥10 + lastUnderpopDay+60 days
 const fullPopFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

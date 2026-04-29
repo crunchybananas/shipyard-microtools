@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 240 [code] — analogous interiority moments for other named characters: teacher slate-board, merchant counting coins, smith anvil falling silent + walking the river, rival's banner on a distant ridge at dusk. Each ~15-20 LoC tag:character. Ship 1 per 5-10 ticks per alternation. [story.js]
+- 240 [process] — tag-diversification rhythm: every 5-8 misc-tag beats deliberately ship a non-misc tag beat. Pattern observed at 240 working as intended. Document as authoring rhythm. [process]
+- 240 [doc] — closing-line craft is emergent across 184/199/240+ beats. "Some X have Y" generalizing structure. Could codify as observed-pattern cluster sub-type "elder-saying closer" at 5+ examples. Currently 3-4. [loop/docs/]
 - 239 [code] — `_WINTER_CAPS` cap-geometry tuning to match new sprite sizes. Caps tuned for old 36-44px sprite era; at 42-54px (post-239) caps may sit slightly off height/width. Visual review next critic tick will flag if needed. ~5-10 LoC. [render.js]
 - 239 [process] — critic→fixer pair now at 7+ in loop history (011→012 / 154→155+156 / 195→196 / 202→203 / 204→205 / 213→214 / 231→232 / 238→239). Pattern deeply established. Could promote to invariant. [process]
 - 239 [code] — re-run verify-critic at ~tick 270 per 238 filing's "every ~30 ticks" cadence. Track visual-debt accumulation post-size-bump. [scripts/]

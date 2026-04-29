@@ -477,6 +477,26 @@ const NARRATIVE_BEATS = [
   { flag: 'hearth_holds_names', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.stats && G.stats.citizensDied >= 1,
     text: 'In the long evenings the hearth seems to know which names belong to it — the ones who built it, who tended it, who died too young for it to learn well. The fire keeps them the same way it keeps wood.' },
+  // Loop 240 (surprise, un-filed): TAG:CHARACTER moment for the
+  // bard. Per 213 cluster-monoculture flag: diversify away from
+  // misc tag (8 ticks of misc-tag narrative since 207); this beat
+  // uses tag:character which is echo-eligible per 075/063. Not
+  // founder, not mechanic-introduction (034 already announces);
+  // a quiet INTERIORITY moment for the named bard. Closes with
+  // a generalizing line "some songs the realm has had were never
+  // sung aloud" — captures realm-has-unwitnessed-moments theme
+  // WITHOUT breaking META-frame (per 213 finding 2; doesn't
+  // commentate on the chronicle's omniscience).
+  // Gate: bard named (church built per 034 hook) + day≥25 (bard
+  // has been around ~19+ days for "composing a song" to land) +
+  // spring/summer (creative-walking-by-river weather). Once per
+  // realm.
+  { flag: 'bard_unsung_song', tag: 'character',
+    trigger: G => G.namedCharacters?.bard && G.day >= 25 && (G.season === 'spring' || G.season === 'summer'),
+    text: G => {
+      const b = G.namedCharacters.bard;
+      return `There is an evening when ${b.name} composes a song no one will hear sung — they hum it to themselves walking back from the river, and by morning have already half-forgotten the second verse. Some songs the realm has had were never sung aloud.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
