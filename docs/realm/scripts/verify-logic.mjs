@@ -820,6 +820,40 @@ const everHadCheck = await page.evaluate(async () => {
 });
 rec('311: placeBuilding sets G.stats.everHadBuilding[type] (310 [code])', everHadCheck.everHadWell, `keys=[${everHadCheck.everHadKeys.join(',')}] placed=${JSON.stringify(everHadCheck.placedAt)}`);
 
+// Test: 317 loadGame backfills G.stats.everHadBuilding from G.buildings (316 LOW closure).
+// Simulates a pre-311 save: saveGame() current state, strip everHadBuilding from
+// the persisted blob, then loadGame() — backfill should rehydrate from G.buildings.
+const legacyLoadCheck = await page.evaluate(async () => {
+  const save = await import('./js/save.js');
+  // Place a couple test buildings via direct push so they exist at save-time
+  // (placeBuilding would set the flag we're trying to test the absence of).
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'church')) {
+    window.G.buildings.push({ type: 'church', x: 28, y: 28, hp: 100, prodTimer: 0, level: 1, workers: [] });
+  }
+  if (!window.G.buildings.some(b => b.type === 'bakery')) {
+    window.G.buildings.push({ type: 'bakery', x: 29, y: 28, hp: 100, prodTimer: 0, level: 1, workers: [] });
+  }
+  save.saveGame({ silent: true });
+  // Strip everHadBuilding from the persisted blob to simulate a pre-311 save.
+  const raw = localStorage.getItem('realm-save-v2');
+  const blob = JSON.parse(raw);
+  if (blob.stats) delete blob.stats.everHadBuilding;
+  localStorage.setItem('realm-save-v2', JSON.stringify(blob));
+  // Wipe runtime everHadBuilding so we're testing post-load state, not pre.
+  window.G.stats.everHadBuilding = {};
+  const loaded = save.loadGame();
+  return {
+    loaded,
+    persistedHadField: 'everHadBuilding' in (blob.stats || {}),
+    everHadChurch: window.G.stats.everHadBuilding?.church === true,
+    everHadBakery: window.G.stats.everHadBuilding?.bakery === true,
+    everHadKeys: Object.keys(window.G.stats.everHadBuilding || {}),
+  };
+});
+const backfillOk = legacyLoadCheck.loaded && !legacyLoadCheck.persistedHadField && legacyLoadCheck.everHadChurch && legacyLoadCheck.everHadBakery;
+rec('317: loadGame backfills everHadBuilding from G.buildings (316 [code] closure)', backfillOk, `loaded=${legacyLoadCheck.loaded} stripField=${!legacyLoadCheck.persistedHadField} keys=[${legacyLoadCheck.everHadKeys.join(',')}]`);
+
 // Page errors check
 console.log('\n[verify-logic] === PAGE ERRORS ===');
 if (errs.length === 0) {

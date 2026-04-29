@@ -205,6 +205,14 @@ export function loadGame() {
     if (s.season) G.season = s.season;
     if (s.weather) G.weather = s.weather;
     if (s.stats) G.stats = { ...G.stats, ...s.stats };
+    // Loop 317 (the-fixer, 316 [code] filing): backfill everHadBuilding
+    // from currently-loaded G.buildings. Pre-311 saves do not have this
+    // field; spreading s.stats over G.stats leaves the empty {} from
+    // initial state, and silent_morning_known (year3 + everHadBuilding.
+    // church) would never fire even with church present. Backfill ensures
+    // legacy-saved realms can still experience the beat.
+    G.stats.everHadBuilding = G.stats.everHadBuilding || {};
+    for (const b of G.buildings || []) G.stats.everHadBuilding[b.type] = true;
     if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
     G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');
