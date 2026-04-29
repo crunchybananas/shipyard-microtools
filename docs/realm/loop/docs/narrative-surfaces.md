@@ -638,6 +638,52 @@ should respect:
   3+ entries would need them (`onFire` had 3+ audio needs at
   123; `after` had 1 at 144 — justified because 144's need was
   a legitimate side effect, not a post-hoc generalization).
+- **Shape-axis pattern: observations and sub-types can be
+  extended via SHAPES — orthogonal to use counts. Shape
+  additions DO NOT advance the sub-type counter; they widen
+  the authoring space.** (276, promoted from observed-pattern
+  with 4 confirming uses + margin: 266 + 270 + 272 + 275.)
+  Per 257 anti-completionist: shape-extensions ship if prose
+  introduces NEW ANGLE on its own merits, not to fill the
+  shape ledger. Each shape-extension MUST document the new
+  angle explicitly with a `// Loop NNN ... NEW ANGLE within
+  existing sub-type, NOT count-advancement` comment in
+  story.js + matching annotation in this doc.
+
+  **Confirmed shape-axes (descriptive ledger, not
+  prescriptive checklist):**
+  - *Ambient-entity-grammar* (148/152/166 sustained;
+    266 transient): SUSTAINED-PRESENCE → +TRANSIENT-WITNESS.
+  - *Character-interiority* (240/245/247/249/252/253
+    solitary; 270 confluence): SOLITARY-INTERIORITY → +
+    MULTI-CHARACTER-CONFLUENCE.
+  - *Weather-recognition* (147/174/246 arriving; 272
+    not-arriving): WEATHER-ARRIVING → +NEGATIVE-SPACE.
+  - *Individual-interiority* (212 mid-action; 275
+    totalizing): MID-ACTION-INTERIORITY → +TOTALIZING-
+    WORLDVIEW.
+
+  **Why this is an invariant not just an observation:** the
+  pattern is now PRESCRIPTIVE — it tells future authors that
+  a beat fitting an existing register but introducing a fresh
+  philosophical angle should be SHIPPED via shape-extension
+  framing rather than (a) creating a new sub-type [forbidden
+  by 257 if motivated by count] or (b) framing as OUTSIDE the
+  cluster [wrong when register matches]. The shape-axis
+  framing is the third path 257's discipline opened up; 4 uses
+  prove it's the operational default.
+
+  **Authoring craft:** when shipping a beat that fits an
+  existing sub-type, ask:
+  1. Does the prose surprise on its own merits (per 203)?
+  2. Does it introduce a NEW ANGLE the existing uses don't
+     touch?
+  3. Does the register match (declarative present-tense /
+     observational-elder / etc.)?
+  If all three: ship as shape-extension with explicit angle
+  documentation. If (3) is no: consider OUTSIDE-cluster (per
+  263 META precedent). If (2) is no: don't ship — per 257.
+
 ## observed patterns
 
 Distinct from invariants. Observations describe
