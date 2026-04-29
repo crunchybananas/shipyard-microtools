@@ -558,6 +558,24 @@ function fastForward(days) {
   };
 }
 
+// Loop 261 (the-fixer, 192 also-filed + 260 sibling): render desaturation
+// when G.realmEnded. The 192 commit added G.realmEnded and named two
+// consumers: "chronicle stop" (closed at 260) + "render desat" (closed
+// here). Together they complete the realm-end visual+textual story —
+// chronicle stops writing AND world goes desaturated/dim. CSS filter on
+// both the game canvas + postfx overlay covers the WebGL post-process
+// path. Tracked variable avoids every-frame DOM writes (only flips on
+// state transition: live realm_fell OR save load with realmEnded=true).
+let _lastRealmEndedApplied = null;
+function _applyRealmEndFilter() {
+  if (G.realmEnded === _lastRealmEndedApplied) return;
+  _lastRealmEndedApplied = G.realmEnded;
+  const filterStr = G.realmEnded ? 'grayscale(0.85) brightness(0.85)' : '';
+  canvas.style.filter = filterStr;
+  const post = document.getElementById('postfx');
+  if (post) post.style.filter = filterStr;
+}
+
 function gameLoop() {
   try {
     if (document.visibilityState === 'visible') {
@@ -568,11 +586,13 @@ function gameLoop() {
         render();
         applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
       }
+      _applyRealmEndFilter();
       requestAnimationFrame(gameLoop);
     } else {
       for (let i = 0; i < 60; i++) simTick();
       render();
       applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
+      _applyRealmEndFilter();
       setTimeout(gameLoop, 16);
     }
   } catch (e) {

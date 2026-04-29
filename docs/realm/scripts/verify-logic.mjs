@@ -181,6 +181,25 @@ const mayorFire = await page.evaluate(async () => {
 });
 rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
 
+// Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
+const realmEndFilter = await page.evaluate(async () => {
+  // Reset
+  window.G.realmEnded = false;
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const preFilter = document.getElementById('game').style.filter || '';
+  // Trigger
+  window.G.realmEnded = true;
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const postFilter = document.getElementById('game').style.filter || '';
+  // Restore
+  window.G.realmEnded = false;
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const restoreFilter = document.getElementById('game').style.filter || '';
+  return { preFilter, postFilter, restoreFilter };
+});
+const filterApplies = realmEndFilter.preFilter === '' && realmEndFilter.postFilter.includes('grayscale') && realmEndFilter.restoreFilter === '';
+rec('261: realm-end CSS filter applies on G.realmEnded transition', filterApplies, `pre='${realmEndFilter.preFilter}' post='${realmEndFilter.postFilter}' restore='${realmEndFilter.restoreFilter}'`);
+
 // Test: 260 — chronicle() gates on G.realmEnded (the-player [play] finding)
 const chronicleGate = await page.evaluate(async () => {
   const story = await import('./js/story.js');
