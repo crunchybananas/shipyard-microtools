@@ -2706,6 +2706,43 @@ export function render() {
       ctx.beginPath();
       ctx.arc(s.x, s.y + p.offsetY, p.size, 0, Math.PI * 2);
       ctx.fill();
+    } else if (p.type === 'shootingstar') {
+      // Loop 267 (the-fixer, 266 follow-on): visual sync with summer_falling_
+      // _star beat. Bright head + 10-segment fading trail in screen space.
+      // The beat's `after:` callback (story.js) spawns this particle when the
+      // chronicle entry writes — a player watching the night sky in summer
+      // sees the streak AT the moment the prose lands.
+      const baseX = s.x + (p.offsetX || 0);
+      const baseY = s.y + p.offsetY;
+      // Trail (drawn first so head sits on top). Step length 6px keeps the
+      // streak coherent at the typical zoom 1.3; trail spans ~50px back.
+      for (let i = 1; i < 11; i++) {
+        const t = i / 11;
+        const tx = baseX - (p.vxScreen || 0) * 6 * i;
+        const ty = baseY - (p.vy || 0) * 6 * i;
+        ctx.globalAlpha = p.alpha * (1 - t) * 0.6;
+        ctx.fillStyle = '#fff8dc';
+        ctx.beginPath();
+        ctx.arc(tx, ty, 2.4 * (1 - t * 0.7), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Outer halo (large soft glow)
+      ctx.globalAlpha = p.alpha * 0.35;
+      ctx.fillStyle = '#fff8dc';
+      ctx.beginPath();
+      ctx.arc(baseX, baseY, 9, 0, Math.PI * 2);
+      ctx.fill();
+      // Inner halo
+      ctx.globalAlpha = p.alpha * 0.6;
+      ctx.beginPath();
+      ctx.arc(baseX, baseY, 5, 0, Math.PI * 2);
+      ctx.fill();
+      // Bright core (white-hot)
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(baseX, baseY, 2.6, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       // Loop 29 (render S3): text floaters now pick a color based on content.
       // "+N 🪵" = wood brown, "+N 🍎" = food red, etc. Boring flat-white

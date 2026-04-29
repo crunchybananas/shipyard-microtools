@@ -684,7 +684,22 @@ const NARRATIVE_BEATS = [
   // ambient-entity-grammar count needed advancing.
   { flag: 'summer_falling_star', tag: 'misc',
     trigger: G => G.season === 'summer' && G.dayPhase > (G.dayLength || 3600) * 0.75,
-    text: 'There is a night in summer when a star falls across the sky from north to south. The realm watches without naming it; the star is gone before anyone can ask if anyone else saw it.' },
+    text: 'There is a night in summer when a star falls across the sky from north to south. The realm watches without naming it; the star is gone before anyone can ask if anyone else saw it.',
+    // Loop 267 (the-fixer, 266 follow-on): visual+textual sync. Spawns a
+    // bright streak with fading trail in screen space above the camera
+    // center. Particle motion lives in particles.js shootingstar branch
+    // and render in render.js shootingstar branch (~30 LoC together).
+    after: G => {
+      if (!G.particles || !G.camera) return;
+      const cx = G.camera.x / 32, cy = G.camera.y / 16;
+      G.particles.push({
+        tx: cx, ty: cy,
+        offsetX: 0, offsetY: -200,
+        vxScreen: -3, vy: 0.5,
+        alpha: 1.2, decay: 0.012,
+        type: 'shootingstar',
+      });
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

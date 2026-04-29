@@ -38,6 +38,11 @@ export function updateParticles() {
         p.vy2 = (Math.random() - 0.5) * 0.05;
       }
     }
+    if (p.type === 'shootingstar') {
+      // Loop 267 (the-fixer, 266 follow-on): screen-space accumulator so
+      // the streak sweeps across the sky regardless of camera motion.
+      p.offsetX = (p.offsetX || 0) + (p.vxScreen || 0);
+    }
     if (p.alpha <= 0) G.particles.splice(i, 1);
   }
 }
