@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 224 [code] — Phase C step 3: tower lantern flicker via `<animate attributeName="opacity">` with random-feeling key times (0, 0.95, 0.92, 1.0 across 0.6s loop). Per 171 + 170 filings. ~5-8 LoC. [tower.svg]
+- 224 [code] — house chimney smoke animation: translate + opacity for slow drift. Per 173 filing. ~10 LoC. [house.svg]
+- 224 [code] — bakery flour-dust drift animation. Per 180 filing. ~10 LoC. [bakery.svg]
+- 224 [doc] — observation: Phase C authoring per-sprite is fast (~10 LoC each); limiting factor is which props exist in each SVG, not animation technique. Could batch animate ALL remaining flag-bearing sprites + smoke + flicker in a single tick if scope allows. [process]
 - 223 [code] — castle pennant + tower banner sway animation. `<animateTransform>` rotation with small angle oscillation (e.g., -8° to +8° at 3s cycle). Per 171 filing. ~10 LoC each. [castle.svg + tower.svg]
 - 223 [code] — tower lantern flicker via `<animate attributeName="opacity">` with random-feeling key times (0, 0.95, 0.92, 1.0 across 0.6s loop). Per 171 + 170 filings. ~5 LoC. [tower.svg]
 - 223 [code] — per-realm rotation speed variation: kingdom-hashed dur (5s/8s/12s) for slow/medium/fast wind feel. Pairs with 220 per-realm variant pattern. ~3 LoC. [render.js + windmill.svg]

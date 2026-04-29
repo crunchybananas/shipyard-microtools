@@ -106,9 +106,15 @@
     <line x1="46" y1="52" x2="48" y2="52" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
     <!-- Pennant pole -->
     <line x1="47" y1="48" x2="47" y2="40" stroke="#3a3228" stroke-width="0.7"/>
-    <!-- Red pennant -->
-    <path d="M 47 40 L 53 42 L 52 45 L 47 44 Z" fill="#c02828"/>
-    <line x1="47" y1="40" x2="47" y2="44.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.4"/>
+    <!-- Red pennant — Loop 224 (Phase C step 2): sway via animateTransform
+         around pole-tip pivot at (47, 40). 3s cycle, asymmetric range so
+         wind reads as gusty rather than perfectly oscillating. -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-7 47 40; 5 47 40; -7 47 40" dur="3s" repeatCount="indefinite"/>
+      <path d="M 47 40 L 53 42 L 52 45 L 47 44 Z" fill="#c02828"/>
+      <line x1="47" y1="40" x2="47" y2="44.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.4"/>
+    </g>
     <!-- Tower window slit -->
     <rect x="46" y="80" width="1.2" height="3.5" fill="#1a1008"/>
     <rect x="46" y="88" width="1.2" height="3.5" fill="#1a1008"/>
@@ -130,9 +136,14 @@
     <line x1="78" y1="55" x2="84" y2="55" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
     <line x1="80" y1="52" x2="82" y2="52" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
     <line x1="81" y1="48" x2="81" y2="40" stroke="#3a3228" stroke-width="0.7"/>
-    <!-- Blue pennant on right tower -->
-    <path d="M 81 40 L 87 42 L 86 45 L 81 44 Z" fill="#2848c0"/>
-    <line x1="81" y1="40" x2="81" y2="44.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.4"/>
+    <!-- Blue pennant on right tower — Loop 224: sway 3.4s (slightly out
+         of sync with the red pennant so the pair looks gusty). -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-7 81 40; 5 81 40; -7 81 40" dur="3.4s" repeatCount="indefinite"/>
+      <path d="M 81 40 L 87 42 L 86 45 L 81 44 Z" fill="#2848c0"/>
+      <line x1="81" y1="40" x2="81" y2="44.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.4"/>
+    </g>
     <rect x="80" y="80" width="1.2" height="3.5" fill="#1a1008"/>
     <rect x="80" y="88" width="1.2" height="3.5" fill="#1a1008"/>
   </g>
@@ -251,13 +262,18 @@
 
     <!-- Flag pole at very top -->
     <line x1="64" y1="14" x2="64" y2="11" stroke="#3a2a08" stroke-width="0.5"/>
-    <!-- GOLD flag with cross emblem -->
-    <path d="M 64 11 L 75 13 L 74 18 L 64 16 Z" fill="url(#goldShine)"/>
-    <!-- Cross emblem -->
-    <rect x="68" y="12.5" width="0.6" height="4" fill="#8a6014"/>
-    <rect x="66.7" y="14" width="2.5" height="0.6" fill="#8a6014"/>
-    <!-- Flag highlight -->
-    <line x1="64" y1="11.5" x2="74" y2="13.5" stroke="rgba(255,240,180,0.55)" stroke-width="0.4"/>
+    <!-- GOLD flag — Loop 224: bigger flag, slower 4s sway, narrower
+         range (heavier cloth resists wind more than smaller pennants). -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="-5 64 11; 4 64 11; -5 64 11" dur="4s" repeatCount="indefinite"/>
+      <path d="M 64 11 L 75 13 L 74 18 L 64 16 Z" fill="url(#goldShine)"/>
+      <!-- Cross emblem -->
+      <rect x="68" y="12.5" width="0.6" height="4" fill="#8a6014"/>
+      <rect x="66.7" y="14" width="2.5" height="0.6" fill="#8a6014"/>
+      <!-- Flag highlight -->
+      <line x1="64" y1="11.5" x2="74" y2="13.5" stroke="rgba(255,240,180,0.55)" stroke-width="0.4"/>
+    </g>
   </g>
 
   <!-- ─── Subtle dust flecks around the towers ──────────────────── -->

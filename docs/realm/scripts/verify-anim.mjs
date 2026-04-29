@@ -24,47 +24,44 @@ await page.goto(`${ORIGIN}/svg-test/index.html`);
 await page.waitForLoadState('domcontentloaded');
 await page.waitForTimeout(1000);
 
-// Scroll the largest windmill img into view, then capture viewport bbox.
-const box = await page.evaluate(() => {
-  const imgs = Array.from(document.querySelectorAll('img'));
-  const wm = imgs.filter(i => i.src.includes('windmill.svg')).sort((a,b) => b.width - a.width)[0];
-  if (!wm) return null;
-  wm.scrollIntoView({ block: 'center' });
-  const r = wm.getBoundingClientRect();
-  return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) };
-});
-if (!box) { console.log('[anim] windmill.svg not found in sandbox'); process.exit(1); }
-await page.waitForTimeout(300);  // let scroll settle
-console.log(`[anim] windmill bbox: ${JSON.stringify(box)}`);
+// Sprites to verify: each must show a frame-diff after the wait.
+const SPRITES = [
+  { name: 'windmill', file: 'windmill.svg', wait: 4000, threshold: 100 },  // sails 180° in 4s
+  { name: 'castle',   file: 'castle.svg',   wait: 2000, threshold: 30 },   // pennants ±5°
+  { name: 'tower',    file: 'tower.svg',    wait: 1800, threshold: 30 },   // banner ±7°
+];
 
-const shot1 = join(SHOTS, 'anim-windmill-t0.png');
-const shot2 = join(SHOTS, 'anim-windmill-t4s.png');
+let allPass = true;
+for (const sp of SPRITES) {
+  const box = await page.evaluate((file) => {
+    const imgs = Array.from(document.querySelectorAll('img'));
+    const target = imgs.filter(i => i.src.includes(file)).sort((a,b) => b.width - a.width)[0];
+    if (!target) return null;
+    target.scrollIntoView({ block: 'center' });
+    const r = target.getBoundingClientRect();
+    return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) };
+  }, sp.file);
+  if (!box) { console.log(`[anim] ${sp.name}: not found`); allPass = false; continue; }
+  await page.waitForTimeout(300);  // let scroll settle
 
-await page.screenshot({ path: shot1, clip: box });
-console.log(`[anim] saved t=0 screenshot`);
+  const shot1 = join(SHOTS, `anim-${sp.name}-t0.png`);
+  const shot2 = join(SHOTS, `anim-${sp.name}-tN.png`);
+  await page.screenshot({ path: shot1, clip: box });
+  await page.waitForTimeout(sp.wait);
+  await page.screenshot({ path: shot2, clip: box });
 
-// 4 seconds at 8s rotation = 180°, sails should be visibly different.
-await page.waitForTimeout(4000);
-await page.screenshot({ path: shot2, clip: box });
-console.log(`[anim] saved t=4s screenshot`);
-
-// Compare file sizes (PNG compression is content-sensitive; identical
-// frames produce nearly-identical sizes).
-const s1 = statSync(shot1).size;
-const s2 = statSync(shot2).size;
-const buf1 = readFileSync(shot1);
-const buf2 = readFileSync(shot2);
-const identical = buf1.length === buf2.length && buf1.equals(buf2);
-console.log(`[anim] t0 size=${s1}B, t4s size=${s2}B, byte-identical=${identical}`);
-
-if (identical) {
-  console.log('[anim] ✗ FAIL — frames are byte-identical; animation not running');
-  await browser.close();
-  await server.stop();
-  process.exit(1);
+  const buf1 = readFileSync(shot1);
+  const buf2 = readFileSync(shot2);
+  const identical = buf1.length === buf2.length && buf1.equals(buf2);
+  const sizeDiff = Math.abs(buf1.length - buf2.length);
+  if (identical) {
+    console.log(`[anim] ✗ ${sp.name}: byte-identical after ${sp.wait}ms — animation not running`);
+    allPass = false;
+  } else {
+    console.log(`[anim] ✓ ${sp.name}: frames differ (size delta ${sizeDiff}B) — animation active`);
+  }
 }
-console.log('[anim] ✓ PASS — frames differ; sail animation active');
 
 await browser.close();
 await server.stop();
-process.exit(0);
+process.exit(allPass ? 0 : 1);
