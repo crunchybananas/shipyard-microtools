@@ -1,0 +1,85 @@
+// Phase B step 1 verifier — confirms the scaffolding loads cleanly,
+// that the toggle works, and that flipping the flag doesn't crash.
+
+import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REALM_ROOT = join(__dirname, '..');
+const ORIGIN = process.env.REALM_ORIGIN || 'http://127.0.0.1:4711';
+const GAME_PATH = `${ORIGIN}/index.html`;
+const SHOTS = join(REALM_ROOT, 'scripts/screenshots');
+
+const browser = await chromium.launch({ headless: false });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+const page = await ctx.newPage();
+const errs = [];
+page.on('pageerror', e => errs.push(e.message));
+page.on('console', m => { if (m.type() === 'error') errs.push(`[console] ${m.text()}`); });
+
+console.log('[phaseb] loading game…');
+await page.goto(GAME_PATH);
+await page.waitForLoadState('domcontentloaded');
+await page.waitForTimeout(1500);
+
+// Enter the game
+const easy = await page.$('.diff-btn'); if (easy) await easy.click();
+const newGame = await page.$('button:has-text("New Game"), #start-game-btn');
+if (newGame) await newGame.click();
+await page.waitForTimeout(1500);
+
+// Build a granary so there's a sprite-eligible structure on screen.
+// We'll force-place via game internals.
+const placed = await page.evaluate(async () => {
+  if (typeof window.G === 'undefined') return { ok: false };
+  // Place a granary mid-map.
+  window.G.buildings = window.G.buildings || [];
+  window.G.buildings.push({
+    type: 'granary',
+    x: 40, y: 40,
+    hp: 100, maxHp: 100,
+    workers: [], assigned: [],
+  });
+  return { ok: true, count: window.G.buildings.length };
+});
+console.log(`[phaseb] placed test granary (${placed.count} buildings total)`);
+await page.waitForTimeout(500);
+
+await page.screenshot({ path: join(SHOTS, 'phaseb-flag-off.png') });
+console.log('[phaseb] saved phaseb-flag-off.png (flag default = false; canvas drawGranary)');
+
+// Flip the SVG flag and reload caches.
+const flipped = await page.evaluate(() => {
+  if (!window.__realm || !window.__realm.toggleSVG) return { ok: false, reason: 'no __realm.toggleSVG' };
+  const result = window.__realm.toggleSVG(true);
+  return { ok: true, flagState: result };
+});
+console.log(`[phaseb] toggleSVG(true) → ${JSON.stringify(flipped)}`);
+
+// Wait for sprites to preload + render
+await page.waitForTimeout(2500);
+
+const cache = await page.evaluate(() => window.__realm.spriteCache());
+console.log(`[phaseb] sprite cache after toggle:`, cache);
+
+await page.screenshot({ path: join(SHOTS, 'phaseb-flag-on.png') });
+console.log('[phaseb] saved phaseb-flag-on.png (flag = true; SVG path active)');
+
+// Toggle back off and verify
+await page.evaluate(() => window.__realm.toggleSVG(false));
+await page.waitForTimeout(500);
+await page.screenshot({ path: join(SHOTS, 'phaseb-flag-back-off.png') });
+console.log('[phaseb] saved phaseb-flag-back-off.png (toggled back; canvas again)');
+
+// Page errors
+console.log('\n[phaseb] === PAGE ERRORS ===');
+const realErrs = errs.filter(e => !/favicon/i.test(e));
+if (realErrs.length === 0) {
+  console.log('  (none)');
+} else {
+  realErrs.slice(-10).forEach(e => console.log('  ', e));
+}
+
+await browser.close();
+process.exit(realErrs.length === 0 ? 0 : 1);

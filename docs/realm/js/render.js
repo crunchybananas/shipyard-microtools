@@ -13,6 +13,76 @@ let fpsFrames = 0, fpsTime = 0, fpsDisplay = 0;
 export let showFPS = false;
 export function toggleFPS() { showFPS = !showFPS; }
 
+// ── Loop 216 (PHASE B step 1): SVG sprite scaffolding ────────
+//
+// 161-182 shipped 11 SVG sprites in `assets/sprites/` covering all
+// user-buildable structures. Sandbox at `svg-test/index.html`
+// renders them at 4 zoom levels — visually verified at 216 via
+// Playwright. They've never reached the live game; canvas drawX
+// functions still own the dispatch.
+//
+// Phase B per 171 strategic plan ships in 6 steps; THIS is step 1
+// — scaffolding only. No visible change while `_USE_SVG_SPRITES`
+// is false (default). Steps 2-6 add composition (day/night tint /
+// winter cap / hover halo+fog / per-instance variation / live-
+// enable). Each step rolls back via `_USE_SVG_SPRITES = false`.
+//
+// Loader uses `<img>` elements with `decoding="async"` so SVG
+// parsing happens off the render thread. Cache keyed by building
+// type. First draw of a type kicks off load (returns false from
+// `drawSpriteIfReady`); subsequent draws hit cache and dispatch
+// to ctx.drawImage. While not loaded, dispatch falls through to
+// the existing canvas drawX.
+let _USE_SVG_SPRITES = false;
+const _SPRITE_TYPES = new Set([
+  'granary', 'castle', 'church', 'windmill', 'tower',
+  'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
+]);
+const _spriteCache = new Map(); // type → HTMLImageElement (or 'loading')
+function _loadSprite(type) {
+  if (!_SPRITE_TYPES.has(type)) return null;
+  const existing = _spriteCache.get(type);
+  if (existing && existing !== 'loading') return existing;
+  if (existing === 'loading') return null;
+  _spriteCache.set(type, 'loading');
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => _spriteCache.set(type, img);
+  img.onerror = () => _spriteCache.set(type, null);  // give up; fall back to canvas
+  img.src = `assets/sprites/${type}.svg`;
+  return null;
+}
+// drawSpriteIfReady: returns true if it drew the sprite, false if
+// the caller should fall through to the canvas dispatch. Step 1
+// wires the function but it returns false unconditionally because
+// `_USE_SVG_SPRITES` defaults to false. Step 2 will flip that and
+// add composition logic.
+function drawSpriteIfReady(ctx, b, s) {
+  if (!_USE_SVG_SPRITES) return false;
+  if (!_SPRITE_TYPES.has(b.type)) return false;
+  const img = _loadSprite(b.type);
+  if (!img) return false;  // still loading or failed; fall through
+  // Step 2 will add composition (day/night tint, winter cap, etc).
+  // Step 1 ships the bare draw at sprite native size centered on s.
+  const w = 32, h = 32;
+  ctx.drawImage(img, s.x - w/2, s.y - h, w, h);
+  return true;
+}
+// Debug helpers — flip via console: `window.__realm.toggleSVG()`.
+if (typeof window !== 'undefined') {
+  window.__realm = window.__realm || {};
+  window.__realm.toggleSVG = (on) => {
+    _USE_SVG_SPRITES = on === undefined ? !_USE_SVG_SPRITES : !!on;
+    // Eagerly preload all sprite types when enabled.
+    if (_USE_SVG_SPRITES) for (const t of _SPRITE_TYPES) _loadSprite(t);
+    console.log(`[realm] _USE_SVG_SPRITES = ${_USE_SVG_SPRITES}`);
+    return _USE_SVG_SPRITES;
+  };
+  window.__realm.spriteCache = () => Array.from(_spriteCache.keys()).map(k => ({
+    type: k, state: _spriteCache.get(k) === 'loading' ? 'loading' : (_spriteCache.get(k) ? 'ready' : 'failed'),
+  }));
+}
+
 // ── Performance caches ────────────────────────────────────────
 // Fog-of-war gradient cache keyed by direction ('N'|'S'|'E'|'W')
 // These are relative gradients that are re-applied via translate, so they
@@ -2933,6 +3003,14 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.fillStyle = shadowGrad;
     ctx.fill();
     ctx.globalAlpha = 1;
+  }
+
+  // Loop 216 (PHASE B step 1): SVG sprite path early-return. When
+  // `_USE_SVG_SPRITES` is true AND the building's sprite is loaded,
+  // draw it and skip the canvas dispatch. Default flag is false
+  // (rails only this tick); console toggle via window.__realm.toggleSVG().
+  if (drawSpriteIfReady(ctx, b, s)) {
+    return;  // Step 2 will compose tint/cap/halo on top of the SVG.
   }
 
   // Ground the sprite: scale from tile-center anchor so buildings grow UP

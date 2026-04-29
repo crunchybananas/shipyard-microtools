@@ -5221,6 +5221,17 @@ function updateSaveAge() {
 }
 registerUpdater(updateSaveAge);
 
+// Loop 216 (the-fixer, latent bug found during Phase B verify):
+// 47 references to `_hf144` / `_sf144` / `_chr144` across the
+// post-144 cluster (rival-messages 149 / bard-songs 151 / mayor
+// effects 152 / trading-post chronicle 189) had never been
+// defined or imported, throwing `ReferenceError` continuously
+// in the game loop. The intended pattern (per 4699's
+// `chronicle as _chronicle124` import) was to alias the same
+// helpers under a 144-suffix prefix; the import line was lost.
+// Adding it once here covers all 47 call sites that follow.
+import { hasFlag as _hf144, setFlag as _sf144, chronicle as _chr144 } from './story.js';
+
 // ── Loop 149: Story — named rival lord sends messengers ─────
 function updateRivalMessages() {
   if (G.gameTick % 360 !== 0) return;
