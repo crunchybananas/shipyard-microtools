@@ -861,8 +861,11 @@ const NARRATIVE_BEATS = [
   // silent morning. Distinct from 290/294 (sea_bell / church_step_worn)
   // which describe specific objects requiring current presence.
   // Once-per-realm; tag misc.
+  // 321 (the-fixer, 320 [code]): added `day>=58` per 320 [process] —
+  // extends 313 gate-spread to condition-only year3 beats. Single day
+  // post-y3 transition; spreads silent_morning out of the d57 cluster.
   { flag: 'silent_morning_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && G.stats?.everHadBuilding?.church,
+    trigger: G => G.storyFlags.year3 && G.day >= 58 && G.stats?.everHadBuilding?.church,
     text: 'Listen for the bell on the day the bell does not ring. Once a year the church keeps a silent morning. No one has ever decided which morning; the realm always knows.' },
   // Loop 307 (surprise, un-filed, alternation after 306 fixer): PATH-
   // KNOWS-ROUTINE shape-extension per 276 invariant + 3rd STRUCTURAL
@@ -990,8 +993,9 @@ const NARRATIVE_BEATS = [
   // citizensDied >= 2 (need real losses for "fewer plates" to land
   // — single death is too thin to register as collective adjustment).
   // Once-per-realm; tag misc.
+  // 321 gate-spread: day>=72 per 320 [process].
   { flag: 'empty_seat_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && (G.stats?.citizensDied || 0) >= 2,
+    trigger: G => G.storyFlags.year3 && G.day >= 72 && (G.stats?.citizensDied || 0) >= 2,
     text: 'An empty seat. The realm sets fewer plates now. No one names what changed.' },
   // Loop 319 (the-fixer, 311 [code] filing): fallback beats for raid-
   // destroyed realms that ONCE had a church or bakery but lost it
@@ -1015,8 +1019,9 @@ const NARRATIVE_BEATS = [
   // from 290's INHERITED-FROM-OUTSIDE because 290 treats the bell as
   // present-and-ringing; 319-A treats the bell-tone as a cultural
   // measurement that endures even when no bell hangs in the realm.
+  // 321 gate-spread: day>=62.
   { flag: 'sea_bell_lost_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.sea_bell_known,
+    trigger: G => G.storyFlags.year3 && G.day >= 62 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.sea_bell_known,
     text: 'The realm remembers a bell that was pulled from the sea. The church that held it is gone. The bell\'s tone is still the realm\'s reference for what a bell ought to sound like — a measurement that outlived its instrument.' },
   // 319-B: church_step_worn_lost — RESHAPED-BY-USE-AS-BODILY-MEMORY.
   // The step is gone with the church; the gait it shaped is not.
@@ -1026,8 +1031,9 @@ const NARRATIVE_BEATS = [
   // because 294's lift line was about insider-knowledge-built-into-
   // stone; 319-B's lift line is about insider-knowledge-built-into-
   // gait — the body remembering what stone no longer can.
+  // 321 gate-spread: day>=68.
   { flag: 'church_step_worn_lost_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.church_step_worn_known,
+    trigger: G => G.storyFlags.year3 && G.day >= 68 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.church_step_worn_known,
     text: 'The church is gone. The step that was worn to a curve by feet of three generations is gone with it. The regulars who knew the dip still step a little high when they walk past the empty patch of ground — the wear migrated from stone into bodies.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is

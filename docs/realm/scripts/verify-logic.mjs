@@ -405,10 +405,12 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
-// Test: 319-A sea_bell_lost_known — fallback for raid-destroyed church (311 [code] closure partial)
+// Test: 319-A sea_bell_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
+// 321: gate-spread requires G.day >= 62.
 const seaBellLostFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 65;
   window.G.buildings = []; // church NOT present
   window.G.stats = window.G.stats || {};
   window.G.stats.everHadBuilding = { church: true }; // realm once had one
@@ -419,12 +421,13 @@ const seaBellLostFire = await page.evaluate(async () => {
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The realm remembers a bell'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('319-A: sea_bell_lost_known fires year3 + everHadBuilding.church + !church present + !sea_bell_known', seaBellLostFire.fired, `text="${seaBellLostFire.text}…" tag=${seaBellLostFire.tag}`);
+rec('319-A+321: sea_bell_lost_known fires year3 + d>=62 + everHadBuilding.church + !church present + !sea_bell_known', seaBellLostFire.fired, `text="${seaBellLostFire.text}…" tag=${seaBellLostFire.tag}`);
 
 // Test: 319-A mutual exclusion — sea_bell_lost should NOT fire if original sea_bell_known already set
 const seaBellMutexCheck = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 65;
   window.G.buildings = []; // church absent
   window.G.stats.everHadBuilding = { church: true };
   window.G.storyFlags.sea_bell_known = true; // original already fired
@@ -434,10 +437,12 @@ const seaBellMutexCheck = await page.evaluate(async () => {
 });
 rec('319-A: sea_bell_lost_known does NOT fire when sea_bell_known already set (mutual exclusion)', !seaBellMutexCheck.fired);
 
-// Test: 319-B church_step_worn_lost_known — fallback for raid-destroyed church (311 [code] closure partial)
+// Test: 319-B church_step_worn_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
+// 321: gate-spread requires G.day >= 68.
 const stepLostFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 70;
   window.G.buildings = [];
   window.G.stats.everHadBuilding = { church: true };
   delete window.G.storyFlags.church_step_worn_lost_known;
@@ -449,12 +454,14 @@ const stepLostFire = await page.evaluate(async () => {
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The church is gone. The step'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('319-B: church_step_worn_lost_known fires year3 + everHadBuilding.church + !church present + !church_step_worn_known', stepLostFire.fired, `text="${stepLostFire.text}…" tag=${stepLostFire.tag}`);
+rec('319-B+321: church_step_worn_lost_known fires year3 + d>=68 + everHadBuilding.church + !church present + !church_step_worn_known', stepLostFire.fired, `text="${stepLostFire.text}…" tag=${stepLostFire.tag}`);
 
 // Test: 318 empty_seat_known — TRIPLE-AXIS (6th OUTSIDE GRIEF + 6th STRUCTURAL FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS angle)
+// 321: gate-spread requires G.day >= 72.
 const emptySeatFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 75;
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensDied = 2;
   delete window.G.storyFlags.empty_seat_known;
@@ -463,7 +470,7 @@ const emptySeatFire = await page.evaluate(async () => {
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('An empty seat'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('318: empty_seat_known fires year3 + citizensDied>=2', emptySeatFire.fired, `text="${emptySeatFire.text}…" tag=${emptySeatFire.tag}`);
+rec('318+321: empty_seat_known fires year3 + d>=72 + citizensDied>=2', emptySeatFire.fired, `text="${emptySeatFire.text}…" tag=${emptySeatFire.tag}`);
 
 // Test: 314 morning_dread_known — TRIPLE-AXIS (5th OUTSIDE TERROR + 5th STRUCTURAL NEGATION + DREAD-WITHOUT-CAUSE angle)
 const dreadFire = await page.evaluate(async () => {
@@ -509,9 +516,11 @@ rec('307: path_knows_routine_known fires year3 + d>=70', pathKnowsFire.fired, `t
 // Test: 305 silent_morning_known — emergent-tradition (5th forgetting shape; 2nd structural-imperative)
 // 311: gate updated to `G.stats.everHadBuilding?.church` per 310 [code]; tests both
 // CURRENT building absent + everHadBuilding flag set → fires (raid-survived realm).
+// 321: gate-spread requires G.day >= 58.
 const silentMorningFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
+  window.G.day = 60;
   window.G.buildings = []; // 311: church NOT currently present
   window.G.stats = window.G.stats || {};
   window.G.stats.everHadBuilding = { church: true }; // but realm once had one
@@ -521,7 +530,7 @@ const silentMorningFire = await page.evaluate(async () => {
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('Listen for the bell'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('305+311: silent_morning_known fires year3 + everHadBuilding.church (church-destroyed realm)', silentMorningFire.fired, `text="${silentMorningFire.text}…" tag=${silentMorningFire.tag}`);
+rec('305+311+321: silent_morning_known fires year3 + d>=58 + everHadBuilding.church (church-destroyed realm)', silentMorningFire.fired, `text="${silentMorningFire.text}…" tag=${silentMorningFire.tag}`);
 
 // Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
 // 313: gate-spread requires G.day >= 65.
