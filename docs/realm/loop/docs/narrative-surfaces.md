@@ -972,7 +972,7 @@ should respect:
   STRUCTURE-vector ships.
 
   **Confirmed uses establishing the rule (5 at promotion;
-  7 in production after 322):**
+  8 in production after 332):**
   - 301 QUESTION + RITUAL-PERSISTENCE-WITHOUT-ORIGIN
     (forgetting shape 4)
   - 305 IMPERATIVE + EMERGENT-TRADITION (forgetting shape 5)
@@ -988,6 +988,11 @@ should respect:
   - 322 REPETITION + RECURRENCE-AS-SELF-RECOGNITION
     (7th OUTSIDE register, CONTENTMENT) — second post-
     promotion confirming use; rule continues to hold.
+  - 332 REPETITION (re-use; 2nd) + NAMED-AFTER-WHO-IS-GONE
+    (4th naming-place shape) — first re-use of an existing
+    STRUCTURAL form post-promotion. Rule holds for
+    re-uses: structural form repetition is fine;
+    angle must remain fresh.
 
   **Why this is a rule and not just a recurrence:** 5 of 5
   ships across both INSIDE cluster sub-types AND OUTSIDE
@@ -1437,11 +1442,11 @@ prescriptive AND consistently applied.
     5 shapes — second-leading sub-type after
     307 promoted land-as-agent to 6. Per 276
     invariant.
-  - *Naming-place* (193/325/327): the realm
+  - *Naming-place* (193/325/327/332): the realm
     gives a place a colloquial name. Third
     member of the realm-environment naming
     triplet (sky 116 / object 056 / place 193).
-    **3 shapes** (post-saturation extension):
+    **4 shapes** (post-saturation extension):
     - 193 EMERGENT-NAMING ("There is now a
       place called X. No one decided this; it
       simply is.") — name appears without
@@ -1461,13 +1466,25 @@ prescriptive AND consistently applied.
       realm doesn't update it; the wrongness
       itself functions as insider/outsider
       cultural marker.
-    Per 276 invariant. Single-axis surprises
-    at 325 + 327 — multi-axial DEFAULTS but
-    NOT REQUIRED per 257 + 312-322 pattern.
-    Naming-place was the most-under-extended
-    sub-type at 1 shape since 193; ships
-    1→2→3 shapes in 2 ticks (325 + 327)
-    after 130-tick dormancy.
+    - 332 NAMED-AFTER-WHO-IS-GONE ("Hilda's
+      bridge. Hilda's well. Hilda's path.
+      There has not been a Hilda in years;
+      the realm carries her by accident.")
+      — place name preserves person past
+      their life; geographic preservation
+      mechanism for absent referents.
+      **Multi-axial ship**: REPETITION
+      (anaphora; 2nd use of structural form
+      after 322) + ANGLE; 8th confirming
+      use of 315 sub-rule.
+    Per 276 invariant. Naming-place was the
+    most-under-extended sub-type at 1 shape
+    since 193; shipped 1→4 shapes in 7 ticks
+    (325 + 327 + 332) after 130-tick
+    dormancy. Single-axis at 325 + 327;
+    multi-axial at 332 — sub-type
+    demonstrates both axis-modes per 325/
+    327/331 axis-flexibility framing.
   - *Early-game-mood* (196/199/207/212): year-1
     moments of arrival, change, or familiarity.
     Anti-anxious continuity register

@@ -1204,6 +1204,47 @@ const NARRATIVE_BEATS = [
   { flag: 'winter_normalized_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.season === 'winter',
     text: 'By the third winter the realm has stopped counting. The third frost feels neither earlier nor later than the second. Winter has become weather.' },
+  // Loop 332 (surprise, 327 [code] filing): MULTI-AXIAL surprise — 4th
+  // naming-place shape per 276 invariant + 2nd use of REPETITION
+  // STRUCTURAL form per 308 invariant. Breaks 4-tick single-axis
+  // streak (325/327/329/331); intentional return to multi-axial when
+  // prose supports.
+  // (1) ANGLE: NAMED-AFTER-WHO-IS-GONE — place name persists past
+  //     the person it referenced. Distinct from prior 3 naming-place
+  //     shapes:
+  //      - 193 EMERGENT-NAMING (place gains name from nothing)
+  //      - 325 NAME-AS-MEASUREMENT (name does verification work)
+  //      - 327 CONTRADICTORY-NAMING (name is factually inverted; cultural marker)
+  //      - 332 NAMED-AFTER-WHO-IS-GONE (name preserves person past their life)
+  //     Distinct from 229 hearth_holds_names (hearth as keeper of
+  //     names; INTERIOR/communal preservation) because 332 is
+  //     EXTERIOR/geographic preservation — places carry names
+  //     attached to absent referents.
+  // (2) STRUCTURE: REPETITION via anaphora ("Hilda's bridge. Hilda's
+  //     well. Hilda's path.") — 2nd use of REPETITION form (1st was
+  //     322 recurrence "The same X. The same X. The same X."). Same
+  //     structural form, fresh angle. Per 315 sub-rule: STRUCTURE
+  //     ship MUST pair fresh ANGLE — 332 complies (NAMED-AFTER-WHO-
+  //     IS-GONE is fresh angle distinct from 322 RECURRENCE-AS-SELF-
+  //     RECOGNITION). 8th confirming use of 315 sub-rule (was 7 at
+  //     322).
+  // (3) Multi-axial: ANGLE + STRUCTURE (declarative resolution makes
+  //     register INSIDE cluster; no fresh REGISTER axis). The
+  //     anaphora makes the reader EXPERIENCE the name's repetition
+  //     across the geography directly, then the resolution reveals
+  //     the absent referent. The form enacts the realm's preservation
+  //     mechanism: each "Hilda's" repeats the absence into existence.
+  // **Multi-axial ship #4** (after 314/318/322 triple-axis multi-
+  // axials); 332 is dual-axis (REGISTER stays default INSIDE-cluster).
+  // Naming-place sub-type 3→4 shapes; only naming-place was at 3
+  // post-331; now naming-place at 4 + sustained-state at 4 + 7
+  // others at 4+; **CLUSTER MINIMUM AT 4 SHAPES** as next milestone
+  // candidate. Gate: year3 + day>=105 (next-available year-only slot
+  // post-329 at d>=100; 331 used seasonal gate so d=105 still open).
+  // Once-per-realm; tag misc.
+  { flag: 'lingering_name_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 105,
+    text: 'Hilda\'s bridge. Hilda\'s well. Hilda\'s path. There has not been a Hilda in years; the realm carries her by accident.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 332 lingering_name_known — multi-axial (4th naming-place shape NAMED-AFTER-WHO-IS-GONE + REPETITION re-use; 2nd use of STRUCTURAL form)
+const lingeringNameFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 110;
+  delete window.G.storyFlags.lingering_name_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.lingering_name_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith("Hilda's bridge"));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('332: lingering_name_known fires year3 + d>=105', lingeringNameFire.fired, `text="${lingeringNameFire.text}…" tag=${lingeringNameFire.tag}`);
+
 // Test: 331 winter_normalized_known — single-axis surprise (4th sustained-state-recognition shape; NORMALIZATION-THROUGH-ACCUMULATION)
 const winterNormalFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
