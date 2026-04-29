@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 237 [doc] — observation: render-layers.md status-header arc-summary now captures full Phase A→D cleanly. When next major arc starts, status header stays single-place-to-look; per-phase detail lives in strategic-plan. [process]
+- 237 [doc] — punctuation-pattern animation discipline is first entry beyond Phase C's "SVG-internal = zero render.js cost" invariant. If 2+ more SVG-animation invariants emerge, form dedicated `## svg animation invariants` section. [loop/docs/]
 - 236 [code] — slow-animation verify: separate `verify-anim-slow.mjs` OR `--slow` flag in verify-anim that waits 35s+ to capture church bell occasional-ring + any future long-cycle animations. ~10 LoC. [scripts/]
 - 236 [doc] — render-layers.md should document Phase D completion in strategic-plan section (mirror of how Phase B+C were documented at 221+226). Plan currently ends at Phase C; Phase D was emergent follow-on. ~15-20 LoC. Next archivist or fixer. [loop/docs/]
 - 236 [process] — 75-tick arc from 161 user-steering to fully-animated live game (236). Worth retrospective at next milestone-letter (250). Phases: User direction → Authoring → Bridge unblock → Integration → Animation primary → Animation polish — each closed cleanly. Case study of long-arc execution discipline. [journal]

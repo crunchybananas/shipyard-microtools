@@ -1,15 +1,16 @@
 # render-layers.md
 
-**Status:** Written in tick 165. Updated 167, 168, 170, 172, 215, 226.
+**Status:** Written in tick 165. Updated 167, 168, 170, 172, 215, 226, 237.
 Maintained by subsequent loops as new sprites/meshes land or the
 integration story changes.
 
-**Arc complete (226):** Phase A (161-182, 22 ticks: 11 SVG sprites) →
-Phase B (216-221, 6 ticks: live-game integration) → Phase C
-(223-225, 3 ticks: animation polish). **Total 64 ticks (161-225).**
-The user steering at 161 ("really focus on the svg generation")
-fully landed: the 11 SVG sprites are now live, animated, and
-deterministically variant per realm. 3D axis retired at 215.
+**Arc complete (237 catch-up):** Phase A (161-182, 22 ticks: 11 SVG
+sprites) → Phase B (216-221, 6 ticks: live-game integration) →
+Phase C (223-225, 3 ticks: primary animations) → Phase D (234-236,
+3 ticks: polish animations on remaining sprites + secondary motion).
+**Total 75 ticks (161-236).** All 11 user-buildable sprites are now
+live, animated, and deterministically variant per realm. 3D axis
+retired at 215.
 **Sources:** 161 opened the SVG axis (granary.svg + sandbox); 162
 shipped castle.svg; 163 opened the 3D engine axis with granary mesh
 + pushCylinder + debug-pillar cleanup; 164 shipped church.svg
@@ -325,9 +326,52 @@ render.js cost. Phase B integration was the hard work; Phase C
 ships as SVG editing. `verify-anim.mjs` (multi-sprite) confirms
 animations active via t=0/t=N PNG-byte-diff check.
 
-**Filed for follow-on (post-Phase-C polish):** market awning
-sway (179) + blacksmith fire-pulse / sparks (176) + tavern
-sign-swing (175). Lower priority; ~10 LoC each; could batch.
+### Phase D — animation polish on remaining sprites (3 ticks, 234-236)
+
+**COMPLETE as of tick 236.** Phase C handled the 3 most prominent
+animations (windmill sails / castle+tower banners / lantern+smoke).
+Phase D extended polish to the remaining sprite-bearing buildings
++ added secondary motion to already-animated ones:
+
+- **234 batch 1** (3 ships): windmill dust flecks (4 circles
+  with staggered opacity-pulse + small drift); market awning
+  sway (`±2°` rotate around top-edge in 4.5s asymmetric);
+  blacksmith forge-window pulse (3 paired animates breathe as
+  one flame in 1.6s).
+- **235 batch 2** (3 ships): tavern sign-swing (chains + board +
+  emblem rotate ±3° around chain-top in 3.6s); bakery flour-dust
+  drift (2 patches opacity-pulse + horizontal drift staggered);
+  barracks training-dummy idle sway (slow ±2.5° in 5.5s).
+- **236 batch 3** (2 ships): church bell occasional swing
+  using **punctuation-pattern keyTimes** — 85% of cycle still,
+  then 4-swing decreasing-amplitude ring over 4.8s in 32s total
+  (reads as PUNCTUATION not constant motion); granary dome dust
+  drift (mirror of 234 windmill pattern).
+
+**Total: 8 of 8 226-filed candidates shipped across 3 ticks.**
+verify-anim.mjs covers 10 routine sprites (church bell skipped
+because 32s cycle would push the run from 30s to 60s+).
+
+**Punctuation-pattern animation discipline (236):** when an
+animation should read as RARE rather than CONSTANT, use
+`keyTimes` to hold the rest position for >80% of the cycle and
+compress the active motion into the remaining tail. Long
+periods of stillness make occasional motion feel intentional;
+short cycles make it feel mechanical.
+
+### Phase A→B→C→D arc summary
+
+The complete SVG sprite arc spans **75 ticks (161-236)**:
+- **Phase A (22 ticks, 161-182):** authoring 11 SVG sprites
+- **Phase B (6 ticks, 216-221):** live-game integration
+- **Phase C (3 ticks, 223-225):** primary animations
+- **Phase D (3 ticks, 234-236):** polish animations
+
+Plus: Bridge unblock (215+216 chrome→Playwright pivot),
+variant pipeline (220), verify rig (216-220 + verify-anim
+parameterization), cross-axis triangle invariant (165+).
+The user steering at tick 161 ("really focus on SVG
+generation") has fully landed in the live game.
 
 ### What's deferred
 
