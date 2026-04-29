@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 314 morning_dread_known — TRIPLE-AXIS (5th OUTSIDE TERROR + 5th STRUCTURAL NEGATION + DREAD-WITHOUT-CAUSE angle)
+const dreadFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 85;
+  delete window.G.storyFlags.morning_dread_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.morning_dread_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('No bell rang'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('314: morning_dread_known fires year3 + d>=80', dreadFire.fired, `text="${dreadFire.text}…" tag=${dreadFire.tag}`);
+
 // Test: 312 tacit_norms_known — SOCIAL-NORMS habituation-recognition (4th shape; 4th structural-DIALOG-opening)
 // 313: gate-spread requires G.day >= 75 (18 days after y3 d57).
 const tacitNormsFire = await page.evaluate(async () => {

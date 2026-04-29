@@ -925,6 +925,13 @@ should respect:
     imperative (which addresses an outside listener) and
     second-person (which addresses the reader). Dialog
     implies the narrator is one of many citizens nearby.
+  - *NEGATION-opening* (314 morning_dread_known) — "No
+    bell rang that morning. The realm waited..." Opens
+    by foregrounding ABSENCE as the agent of attention.
+    A non-event becomes the unsettling thing. Distinct
+    from question/imperative/second-person/dialog because
+    NEGATION makes the reader notice what ISN'T (vs all
+    prior forms which make the reader notice what IS).
 
   **Why this is an invariant not just an observation:** the
   rule is now PRESCRIPTIVE. Prior practice would have framed
@@ -937,21 +944,27 @@ should respect:
   varied beats are explicitly called out.
 
   **STRUCTURE-ANGLE coupling (prediction filed at 307;
-  CONFIRMED at 4 of 4 uses by 312):** all 4 confirming uses
-  (301/305/307/312) ALSO surprise on ANGLE —
+  CONFIRMED at 5 of 5 uses by 314):** all 5 confirming uses
+  (301/305/307/312/314) ALSO surprise on ANGLE —
   301 + RITUAL-PERSISTENCE-WITHOUT-ORIGIN (forgetting shape
   4); 305 + EMERGENT-TRADITION (forgetting shape 5); 307 +
   ANTICIPATORY-AGENCY (land-as-agent shape 6); 312 +
-  SOCIAL-NORMS (habituation-recognition shape 4).
+  SOCIAL-NORMS (habituation-recognition shape 4); 314 +
+  DREAD-WITHOUT-CAUSE (5th OUTSIDE register, TERROR).
   Hypothesis: non-declarative openings DEMAND fresh content
   because stale angles collapse the prose (asking "why does
   X happen" about a familiar angle reads as rhetorical
-  filler). Falsifiable: if a 5th structural surprise lands
-  cleanly with a STALE angle, the coupling is rejected.
-  At 4 of 4 confirming uses the prediction is robust;
-  promote-to-rule could happen at 5+ uses or after explicit
-  falsification attempt. Until then: STRUCTURE-vector ships
-  pair with fresh ANGLE.
+  filler). At 5 of 5 confirming uses the prediction has
+  reached **PROMOTION-ELIGIBLE** threshold. Filed for next
+  archivist: promote STRUCTURE-ANGLE coupling from
+  prediction-WITHIN-308 to its own sub-rule. Falsification
+  attempt remains an option (ship 6th structural with
+  stale angle) but at this density the coupling appears
+  robust — non-declarative authoring naturally summons
+  fresh angles, possibly because writing in a non-default
+  voice triggers fresh thinking. Until promoted or
+  falsified: STRUCTURE-vector ships pair with fresh
+  ANGLE.
 
   **Authoring decision tree (combined with 276 + 298):**
   1. Does the prose surprise (203)?
@@ -1366,15 +1379,39 @@ prescriptive AND consistently applied.
     problem. Gate: year3. **4th OUTSIDE
     register** — first NEGATIVE emotional
     register in OUTSIDE ledger.
+  - *Terror* (314): ACUTE-FEAR register —
+    dread without object. "No bell rang
+    that morning. The realm waited, then
+    waited longer, then went on with the
+    day. Some mornings ask to be feared
+    without showing why." Gate: year3 +
+    day>=80. **5th OUTSIDE register**
+    and second NEGATIVE-tone register
+    (distinct from IRRITATION-DOMESTICATED's
+    cultural-of-imperfection because TERROR
+    is acute, ungrounded, and does not
+    resolve). **TRIPLE-AXIS surprise**:
+    REGISTER (5th OUTSIDE) + STRUCTURE
+    (5th non-declarative; NEGATION-opening)
+    + ANGLE (DREAD-WITHOUT-CAUSE — fear
+    without external referent). Most
+    surprise-axes-fresh single beat in the
+    corpus.
 
-  **4 OUTSIDE beats now**. 298 PROMOTED the
-  pattern to invariant; 303 confirms the path
-  remains operational. The 4 registers cover:
-  paradoxical (META) / positive (JOYFUL) /
-  curious (WONDER) / negative-domesticated
-  (IRRITATION). 350 milestone-letter could
-  reflect on the OUTSIDE register inventory's
-  emotional-tone diversity.
+  **5 OUTSIDE beats now**. 298 PROMOTED the
+  pattern to invariant; 303 + 314 confirm the
+  path remains operational and emotionally
+  diverse. The 5 registers cover: paradoxical
+  (META) / positive (JOYFUL) / curious
+  (WONDER) / negative-domesticated
+  (IRRITATION) / acute-fear (TERROR). 350
+  milestone-letter could reflect on
+  emotional-tone diversity reaching saturation
+  at 5+ — most everyday emotional registers
+  now have an OUTSIDE beat. 300 hopes #5 ("7th
+  OUTSIDE register by 350") on pace at ~2
+  OUTSIDE per 50 ticks (314 ships 11 ticks
+  after 303).
 
   **Authoring guidance (when adding to cluster):**
 

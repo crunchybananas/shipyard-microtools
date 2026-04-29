@@ -919,6 +919,39 @@ const NARRATIVE_BEATS = [
   { flag: 'tacit_norms_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 75,
     text: '"Don\'t ask the well that." A grandmother stops a child mid-question. The realm has rules no one ever wrote down.' },
+  // Loop 314 (surprise, 303 [code] filing): 5th OUTSIDE-cluster register
+  // — TERROR, per 298 OUTSIDE-cluster invariant. Multi-axial surprise:
+  // (1) REGISTER: OUTSIDE TERROR, distinct from the 4 prior OUTSIDE
+  //     registers (META 263 paradoxical / JOYFUL 296 collective-ease /
+  //     WONDER 297 curious-without-resolving / IRRITATION 303 negative-
+  //     domesticated). TERROR is acute fear without object — distinct
+  //     from IRRITATION's cultural-of-imperfection because TERROR is
+  //     instantaneous + ungroundable. The realm experiences dread
+  //     without being able to name what triggered it; the dread does
+  //     not resolve.
+  // (2) ANGLE: DREAD-WITHOUT-CAUSE — fear-as-experience without
+  //     external referent. Distinct from raid mechanic (raid creates
+  //     justified fear of imminent destruction); this beat captures
+  //     UNFOUNDED collective-foreboding. The non-event ("no bell rang")
+  //     is itself the unsettling thing. Lift: "Some mornings ask to
+  //     be feared without showing why."
+  // (3) STRUCTURE: 5th non-declarative opening — NEGATION-opening
+  //     (after 301 question / 305 imperative / 307 second-person /
+  //     312 dialog). NEGATION foregrounds ABSENCE as the agent of
+  //     attention. Per 308 STRUCTURAL-surprise invariant: STRUCTURE-
+  //     ANGLE coupling now at **5 of 5 confirming uses** — promotion-
+  //     eligible threshold reached for promoting the coupling itself
+  //     to a sub-rule. Filed for next archivist.
+  // **TRIPLE-AXIS SURPRISE**: REGISTER + STRUCTURE + ANGLE all fresh
+  // simultaneously. Most surprise-axes-fresh single beat in the corpus.
+  // 4-vector framework production-default-mode (per 312 [process])
+  // operating at peak — every fresh axis can be activated at once when
+  // prose supports it. Gate: year3 + day >= 80 per 313 authoring
+  // guideline (next available year3-only day-offset slot after 312
+  // tacit_norms at 75). Once-per-realm; tag misc; static prose.
+  { flag: 'morning_dread_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 80,
+    text: 'No bell rang that morning. The realm waited, then waited longer, then went on with the day. Some mornings ask to be feared without showing why.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
