@@ -162,6 +162,19 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 19: 247 teacher_pauses_slate — teacher named + year2
+const teacherFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureTeacher();
+  window.G.storyFlags.year2 = true;
+  delete window.G.storyFlags.teacher_pauses_slate;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.teacher_pauses_slate === true;
+  const entry = window.G.chronicle.find(e => e.text?.includes("schoolhouse and finds a child's name"));
+  return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
+});
+rec('247: teacher_pauses_slate fires teacher + year2', teacherFire.fired, `text="${teacherFire.text}…" tag=${teacherFire.tag}`);
+
 // Test 18: 246 first_thaw_known — year2 + spring + day≥31
 const thawFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

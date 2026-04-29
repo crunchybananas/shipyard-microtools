@@ -527,6 +527,23 @@ const NARRATIVE_BEATS = [
       const s = G.namedCharacters.smith;
       return `There is an afternoon when ${s.name}'s anvil falls silent for an hour past noon. The smith has gone walking to the river, alone, for reasons even ${s.name} does not name. The fire cools by a degree, and waits.`;
     } },
+  // Loop 247 (the-fixer, 240+245 filed): TEACHER interiority moment.
+  // 3rd character interiority beat (240 bard / 245 smith / 247
+  // teacher); 2 remain (merchant / rival). Per 240 filing draft:
+  // "the slate-board with a child's name still chalked on it."
+  // Mood: a small artifact of childhood persistence noticed by the
+  // teacher who chooses not to immediately erase it. The teacher's
+  // small preservation IS the lift line — the realm doesn't act,
+  // the teacher does, but quietly.
+  // Tag:character. Gate: teacher named (school built per 034 hook
+  // → ensureTeacher) + year2 (school has had time to accumulate
+  // student-trace; year-1 school is brand-new). Once per realm.
+  { flag: 'teacher_pauses_slate', tag: 'character',
+    trigger: G => G.namedCharacters?.teacher && G.storyFlags.year2,
+    text: G => {
+      const t = G.namedCharacters.teacher;
+      return `There is a morning when ${t.name} arrives at the schoolhouse and finds a child's name still chalked on the slate from yesterday. The child wrote their own name, slowly, three times, before being called home. ${t.name} does not wipe it clean for another hour.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
