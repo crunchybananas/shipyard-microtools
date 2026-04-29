@@ -706,6 +706,34 @@ const NARRATIVE_BEATS = [
         type: 'shootingstar',
       });
     } },
+  // Loop 270 (surprise, un-filed, alternation after 267-268-269 fixer-
+  // class triple): SOCIAL CONFLUENCE beat — FIRST multi-character beat
+  // in the corpus. All previous character-interiority beats
+  // (240/245/247/249/252/253) feature ONE named character alone in a
+  // moment of solitary interiority (bard hidden art / smith unexplained
+  // departure / teacher small preservation / etc). 270 inverts the
+  // shape: three named characters CO-PRESENT in the same scene by
+  // chance. The lift line "the realm has grown into the kind of place
+  // where this is possible" captures the social-density transition —
+  // the realm has crossed a threshold where ordinary co-presence
+  // becomes a notable event. NEW shape (confluence) within the broader
+  // character-interiority observation; NOT a sub-type of observational-
+  // elder cluster. Gate: mayor + bard + smith all named (the canonical
+  // 3 most-likely to all be present in a year-3 realm with tavern +
+  // barracks + townhall built) AND year3. Once-per-realm; tag
+  // character. Per 203 positive rule: ships because prose introduces
+  // fresh axis (multi-character co-presence) the corpus has never
+  // touched. Per 257 anti-completionist: NOT framed as cluster sub-
+  // type completion — distinct shape recognized as +1 observation
+  // entry, not a 10th cluster sub-type.
+  { flag: 'inn_confluence_seen', tag: 'character',
+    trigger: G => G.storyFlags.year3 && G.namedCharacters?.mayor && G.namedCharacters?.bard && G.namedCharacters?.smith,
+    text: G => {
+      const m = G.namedCharacters.mayor.name;
+      const b = G.namedCharacters.bard.name;
+      const s = G.namedCharacters.smith.name;
+      return `There comes an evening when ${m}, ${b}, and ${s} all happen to be at the inn at the same time. None of them planned it. The realm has grown into the kind of place where this is possible.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

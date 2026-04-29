@@ -1092,6 +1092,31 @@ prescriptive AND consistently applied.
   of 243's mechanic-cast 6/6 closure at
   ~10-tick lag.
 
+  **Loop 270 (NEW SHAPE — confluence,
+  multi-character):** 270 inn_confluence_seen
+  introduces a SECOND shape within the
+  character-interiority observation —
+  multi-character co-presence rather than
+  solitary interiority. All 240-253 beats
+  feature ONE named character alone in a
+  moment of inner life; 270 features THREE
+  named characters (mayor, bard, smith)
+  co-present at the inn. Lift line "the
+  realm has grown into the kind of place
+  where this is possible" captures the
+  social-density transition. NEW shape
+  (1 use, threshold 3+); per 257 anti-
+  completionist + 266 precedent: shipped
+  because PROSE INTRODUCES FRESH AXIS
+  (multi-character co-presence corpus has
+  never touched), NOT to advance any sub-
+  type counter. Future confluence beats
+  COULD ship if prose surprises (e.g.
+  rival + mayor at the same town hall;
+  merchant + teacher at the school);
+  document each here as own observation
+  entries, NOT as a sub-type to fill.
+
   **Canonical-role-matched register rule
   validated 6-for-6** with NO violations.
   This is unusually strong evidence for an

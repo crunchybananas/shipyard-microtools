@@ -264,6 +264,21 @@ const townhallMaxCount = await page.evaluate(async () => {
 });
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
+// Test: 270 inn_confluence_seen — first multi-character beat in corpus
+const confluenceFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureMayor('Mayor Test');
+  story.ensureBard('Bard Test');
+  story.ensureSmith('Smith Test');
+  window.G.storyFlags.year3 = true;
+  delete window.G.storyFlags.inn_confluence_seen;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.inn_confluence_seen === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.includes('all happen to be at the inn'));
+  return { fired, text: lastEntry?.text?.slice(0, 80), tag: lastEntry?.tag };
+});
+rec('270: inn_confluence_seen fires year3 + mayor + bard + smith named', confluenceFire.fired, `text="${confluenceFire.text}…" tag=${confluenceFire.tag}`);
+
 // Test: 266 summer_falling_star — ambient-entity-grammar 4th use
 // Test: 267 — beat's after: callback spawns a 'shootingstar' particle
 const fallingStarFire = await page.evaluate(async () => {
