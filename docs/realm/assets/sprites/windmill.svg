@@ -125,6 +125,21 @@
   <!-- ─── 4 SAILS in canonical cross pose ────────────────────────── -->
   <!-- Sails are at the front of the cap. Hub center: (64, 71). -->
   <!-- Each sail = wooden cross-frame + cloth panels in 4 quadrants -->
+  <!--
+    Loop 223 (PHASE C step 1, 168 + 171 filings): sail rotation.
+    All 4 sail <g> blocks are wrapped in this parent group with an
+    <animateTransform> rotating around the hub center (64, 71).
+    8s per full rotation = ~7.5 RPM, slightly faster than realistic
+    (real windmills run 10-20 RPM in moderate wind) but reads as
+    "definitely turning" without becoming distracting at iso scale.
+    Linear easing so the rotation is steady, not pulsing. Animation
+    runs in the SVG document's own loop — no JS / no render.js
+    change. Only visible when _USE_SVG_SPRITES is enabled (default
+    true at 221).
+  -->
+  <g class="windmill-sails">
+    <animateTransform attributeName="transform" type="rotate"
+      from="0 64 71" to="360 64 71" dur="8s" repeatCount="indefinite"/>
 
   <!-- UP sail -->
   <g>
@@ -191,6 +206,7 @@
     <line x1="36.3" y1="68.8" x2="61.7" y2="68.8" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
     <line x1="36.3" y1="73.2" x2="61.7" y2="73.2" stroke="rgba(150,120,80,0.3)" stroke-width="0.2"/>
   </g>
+  </g><!-- /windmill-sails (animation wrapper from 223) -->
 
   <!-- ─── Iron hub (drawn last so it sits over sail intersection) ─ -->
   <circle cx="64" cy="71" r="3" fill="url(#hubIron)"/>

@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 223 [code] — castle pennant + tower banner sway animation. `<animateTransform>` rotation with small angle oscillation (e.g., -8° to +8° at 3s cycle). Per 171 filing. ~10 LoC each. [castle.svg + tower.svg]
+- 223 [code] — tower lantern flicker via `<animate attributeName="opacity">` with random-feeling key times (0, 0.95, 0.92, 1.0 across 0.6s loop). Per 171 + 170 filings. ~5 LoC. [tower.svg]
+- 223 [code] — per-realm rotation speed variation: kingdom-hashed dur (5s/8s/12s) for slow/medium/fast wind feel. Pairs with 220 per-realm variant pattern. ~3 LoC. [render.js + windmill.svg]
+- 223 [doc] — observation: SVG-internal animation is ZERO render.js cost. Phase B integration was the hard work; once shipped, animation is just SVG editing. Document as Phase C invariant. [render-layers.md]
 - 222 [process] — `verify-imports.sh` reusable bash script: enumerate prefix-numbered identifiers across all JS files, check definitions, filter strings/comments, flag undefined usages. ~20 LoC. Lets future pessimist ticks run the hunt routinely. [scripts/]
 - 222 [doc] — soft-invariant on prefix-import discipline: late-arc clusters used prefix-numbered helper imports (e.g., `chronicle as _chr144`) to avoid namespace conflicts; pattern works but can leak when usages are copied without imports (216 bug). Document in narrative-surfaces.md or coding-discipline doc. [loop/docs/]
 - 221 [code] — Phase C animation polish per 171 plan: `<animate>` or CSS keyframes in SVG sprites for windmill sails (rotation around hub), castle/tower banners (sway), tower lantern flicker. SVG sprites are now in the live game so any animation reaches the player immediately. ~3-5 ticks total. [SVG files]
