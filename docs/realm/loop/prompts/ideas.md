@@ -28,6 +28,8 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 222 [process] — `verify-imports.sh` reusable bash script: enumerate prefix-numbered identifiers across all JS files, check definitions, filter strings/comments, flag undefined usages. ~20 LoC. Lets future pessimist ticks run the hunt routinely. [scripts/]
+- 222 [doc] — soft-invariant on prefix-import discipline: late-arc clusters used prefix-numbered helper imports (e.g., `chronicle as _chr144`) to avoid namespace conflicts; pattern works but can leak when usages are copied without imports (216 bug). Document in narrative-surfaces.md or coding-discipline doc. [loop/docs/]
 - 221 [code] — Phase C animation polish per 171 plan: `<animate>` or CSS keyframes in SVG sprites for windmill sails (rotation around hub), castle/tower banners (sway), tower lantern flicker. SVG sprites are now in the live game so any animation reaches the player immediately. ~3-5 ticks total. [SVG files]
 - 221 [process] — Phase B completion milestone-review tick at ~225 (sibling to 100/157/171/200). Audit: did 3-5-tick estimate hold? (No — 6.) Did visual quality match Phase A sandbox? (Mostly yes; zoom-tuning open.) Canvas drawX retire vs keep as fallback? (Keep for now.) [journal]
 - 221 [code] — 215 3D retirement could potentially be REVISITED now that Phase B sprint pattern + Playwright verify rig are proven. 3D integration may now be tractable. Not urgent; filed for whenever there's appetite. [process / 3d/]
