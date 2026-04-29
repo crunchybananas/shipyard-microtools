@@ -142,6 +142,21 @@ const _VARIANT_PALETTES = {
       ['#c8d8a8', '#a0b888', '#6a8048', '#3a4818'],  // 3 mossy-green — forest realm
     ],
   },
+  // Loop 282 (the-fixer, 220 filing follow-on after 281 granary): windmill
+  // sail-cloth variants. Source #f0e0b8/#c4b080 (lines 38-39 of
+  // windmill.svg sailCloth gradient) is the warm-cream sail color — only
+  // 2 colors per palette since sail-cloth is a simple gradient. 3
+  // alternates suggest different cloth treatments per realm. Stone tower /
+  // wooden cap / sail cross-frames stay constant so the windmill's
+  // grain-mill identity is universally recognizable.
+  windmill: {
+    sail: [
+      ['#f0e0b8', '#c4b080'],  // 0 warm-cream (default)
+      ['#fff8e8', '#e8d8b0'],  // 1 sun-bleached — almost-white linen
+      ['#d8e0a8', '#a0a868'],  // 2 mossy-green-stained — wet-cloth tint
+      ['#f0c898', '#c89060'],  // 3 red-painted — dyed/sun-warm cloth
+    ],
+  },
 };
 // Tiny string-hash for kingdom-name → variant index. Mirrors the
 // _dreamHash style used in story.js without an import (avoids circular

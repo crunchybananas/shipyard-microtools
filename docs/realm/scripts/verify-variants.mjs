@@ -153,6 +153,16 @@ const SPECS = [
     ],
     labels: ['warm-tan', 'cool-grey', 'brick-red', 'mossy-green'],
   },
+  {
+    type: 'windmill', group: 'sail',
+    palettes: [
+      ['#f0e0b8', '#c4b080'],
+      ['#fff8e8', '#e8d8b0'],
+      ['#d8e0a8', '#a0a868'],
+      ['#f0c898', '#c89060'],
+    ],
+    labels: ['cream', 'sun-bleached', 'mossy-green', 'red-painted'],
+  },
 ];
 
 const assertResults = [];
