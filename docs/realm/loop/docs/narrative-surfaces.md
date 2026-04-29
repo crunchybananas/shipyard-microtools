@@ -748,6 +748,52 @@ should respect:
     hashes; future tick could synchronize via shared key.
   - Variant count beyond the 2-4 default.
 
+- **Pessimist→fixer combination rule: when pessimist findings
+  share a single doc/file target AND each is ≤15 LoC,
+  combine into one fixer tick. When they span multiple files
+  OR any exceeds ~30 LoC, split.** (287, promoted from
+  observed-pattern with 3 confirming uses: 256→257-259 arc /
+  192→260+261 arc / 268→269 arc.)
+
+  **Combining uses observed:**
+  - 257 closed 2 of 4 256 findings (HIGH categorization +
+    MEDIUM cluster anti-completionist) — same target
+    narrative-surfaces.md, ≤16 LoC each.
+  - 259 closed 1 of 4 256 findings (LOW variant pipeline) +
+    255 filing (townhall variant entry) — both touched
+    `_VARIANT_PALETTES` in render.js.
+  - 269 closed all 3 268 findings (HIGH realmEnded reset +
+    MEDIUM sustained-state-tracker reset + LOW particle-cap
+    guard) — first two same target main.js newGame(); third
+    a small story.js sibling.
+  - 192→260+261 multi-tick arc: 260 chronicle gate + 261
+    render desat both consumed G.realmEnded; sibling fixes
+    where one tick's discovery unlocked the next.
+
+  **Net savings**: each pessimist→fixer arc closed N
+  findings in N or N-1 ticks rather than 1+N ticks. Across
+  3 arcs, ~3 ticks saved.
+
+  **Why this is an invariant not just an observation:** the
+  rule is now PRESCRIPTIVE for any future pessimist→fixer
+  arc. Prior practice was N findings → N fixer ticks
+  (default-split). The combination rule reverses the default:
+  combine first, split only when scope-or-target diverges.
+  Promotion formalizes the new default.
+
+  **What this invariant DOES NOT prescribe:**
+  - Combining unrelated fixer ticks (only same-arc findings).
+  - Combining surprises with fixers (different scope/intent).
+  - Combining when the LoC budget would balloon ≥30 per
+    finding — split for review-clarity.
+  - Combining via cross-file shared filings unless ≤15 LoC
+    each.
+
+  **Mature fixer-arc shape (per 268-269 cleanest example):**
+  pessimist tick → 1 audit producing N findings → 1 fixer
+  tick combining all eligible findings → arc closed in 2
+  ticks vs 1+N split.
+
 ## observed patterns
 
 Distinct from invariants. Observations describe
