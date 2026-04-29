@@ -385,6 +385,22 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 292 bakery_door_carving_known — preservation-without-memory (3rd forgetting shape)
+const carvingFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'bakery')) {
+    window.G.buildings.push({ type: 'bakery', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  }
+  delete window.G.storyFlags.bakery_door_carving_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.bakery_door_carving_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a name carved into the door'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('292: bakery_door_carving_known fires year3 + bakery', carvingFire.fired, `text="${carvingFire.text}…" tag=${carvingFire.tag}`);
+
 // Test: 290 sea_bell_known — inheritance-vs-craft (4th land-as-agent shape)
 const seaBellFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

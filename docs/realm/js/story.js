@@ -711,6 +711,24 @@ const NARRATIVE_BEATS = [
   { flag: 'sea_bell_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
     text: 'There is a bell at the church that is said to have been pulled from the sea. No one alive remembers the storm; everyone tells the story. The bell still rings clearer than any bell the realm has cast.' },
+  // Loop 292 (surprise, un-filed, alternation after 286-291 forward-
+  // motion arc): PRESERVATION-WITHOUT-MEMORY shape-extension per 276
+  // invariant. 3rd shape of forgetting sub-type (sibling to 184
+  // stone_forgotten + 190 constellation_forgotten). Existing forgetting
+  // uses are about LOSS — the thing fades, weathers, becomes unnamed.
+  // 292 introduces PERSISTENCE through INERTIA — the artifact survives
+  // intact, but its meaning is gone, and yet new owners DO NOT remove
+  // it. Inertia-as-memorial. The carving stays not because anyone
+  // reveres it but because no one decides to remove it. Per 276 +
+  // 257: ships because NEW ANGLE (artifact-preserved-but-meaning-lost,
+  // distinct from artifact-and-meaning-both-lost), not as count-
+  // advancement. Forgetting sub-type 2 → 3 uses, joining individual-
+  // interiority + habituation-recognition as 3-shape sub-types.
+  // Gate: bakery built + year3. Once-per-realm; tag misc; static
+  // universal prose.
+  { flag: 'bakery_door_carving_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'bakery'),
+    text: 'There is a name carved into the door of the bakery that no one alive remembers. The baker who carved it never said why. The new bakers leave it where it is.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

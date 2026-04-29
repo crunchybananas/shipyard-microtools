@@ -690,6 +690,9 @@ should respect:
     INHERITED-FROM-OUTSIDE. 290 introduces objects
     the realm DID NOT MAKE but uses; cultural
     humility about craft.
+  - *Forgetting* (184/190/292): LOSS → +PRESERVATION-
+    WITHOUT-MEMORY. 292 introduces artifacts kept by
+    inertia after meaning has lapsed.
 
   **Why this is an invariant not just an observation:** the
   pattern is now PRESCRIPTIVE — it tells future authors that
@@ -1037,10 +1040,24 @@ prescriptive AND consistently applied.
     weather NOT arriving. Lift "is given the
     night intact" acknowledges passive grace.
     Per 276 invariant.
-  - *Forgetting* (184/190): generational-gap
-    closure of a long-lived object. See the
-    object-arc closure observation above for
-    the 4-beat-vs-2-beat shape distinction.
+  - *Forgetting* (184/190/292): closure of
+    a long-lived object's KNOWLEDGE. **3
+    shapes** spanning loss vs persistence:
+    - 184 stone_forgotten — OBJECT WEATHERED
+      (stone fades; name lost with thing).
+    - 190 constellation_forgotten — PATTERN
+      UNNAMED (current generation doesn't
+      know what their elders did).
+    - 292 bakery_door_carving_known —
+      PRESERVATION-WITHOUT-MEMORY ("a name
+      carved into the door of the bakery
+      that no one alive remembers... the
+      new bakers leave it where it is").
+      Artifact persists; meaning is lost;
+      no one removes it.
+    See the object-arc closure observation
+    above for the 4-beat-vs-2-beat shape
+    distinction. Per 276 invariant.
   - *Naming-place* (193): the realm gives a
     place a colloquial name. Third member of
     the realm-environment naming triplet
