@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -926,31 +926,72 @@ prescriptive AND consistently applied.
   207's filing).
 
 - **Named-character interiority beats
-  (observation, 3 uses).** Distinct from the
+  (observation, 4 uses).** Distinct from the
   observational-elder cluster — uses an
   INDIVIDUAL named character as subject, not
-  the realm collective. Three beats shipped:
+  the realm collective. Four beats shipped:
   - 240 bard_unsung_song — bard composes a
     song no one will hear; "some songs the
     realm has had were never sung aloud"
+    (register: *hidden art*)
   - 245 smith_walks_river — smith's anvil
     falls silent for an hour; "the fire
     cools by a degree, and waits"
+    (register: *unexplained departure*)
   - 247 teacher_pauses_slate — teacher
     finds child's name still chalked from
     yesterday; doesn't wipe it for an hour
+    (register: *small preservation*)
+  - 249 merchant_counts_thrice — merchant
+    counts the day's coins three times by
+    lamplight; "counting is its own reason"
+    (register: *meditative ritual*)
+
   All tag:character. All gate on the named
   character + a once-per-realm season/year
   condition. Each closes with a small lift
   line beyond the literal moment (per
-  184/199/240 craft pattern). 3 uses MEETS
-  3+ threshold but per 231 contrarian:
-  thresholds trigger review, not promotion.
-  Two more candidates filed (merchant /
-  rival per 240/245 filings). When 4+ ship,
-  re-evaluate whether to hoist this from
-  observation-with-3-uses to standalone
-  invariant. **Filed at 240 + 247.**
+  184/199/240 craft pattern).
+
+  **CANONICAL-ROLE-MATCHED REGISTER** is the
+  emergent authoring rule: each character's
+  interiority shape matches their canonical
+  role from the realm's existing surfaces:
+  - Bard's role: art/composition →
+    interiority of HIDDEN ART
+  - Smith's role: industrial labour →
+    interiority of UNEXPLAINED DEPARTURE
+    (rare absence from the forge)
+  - Teacher's role: instruction/preservation
+    of knowledge → interiority of SMALL
+    PRESERVATION
+  - Merchant's role: counting/exchange →
+    interiority of MEDITATIVE RITUAL
+    (counting as refuge)
+
+  When the 5th candidate (rival) ships, the
+  shape should match the rival's canonical
+  role — adversarial vigilance — likely
+  expressed as DISTANT OBSERVATION (banner
+  on a far ridge per 240 filing).
+
+  **Hoist-vs-stay review (251 per 249
+  PRIORITY filing): STAY at observed-pattern.**
+  4 uses meets 3+ threshold but per 231
+  contrarian discipline: thresholds trigger
+  review, not auto-promotion. The pattern
+  is descriptive (this is what the realm has
+  done) not prescriptive (you must do this).
+  Promotion to standalone invariant would
+  imply the rule MUST be followed for new
+  character beats; the current shape is
+  guidance, not law. Future authors COULD
+  break the canonical-role-matched register
+  rule deliberately if a character's
+  interiority moment surprises by violating
+  expectation. Discipline preserved.
+
+  **Filed at 240 + 247.** Reviewed at 251.
 
 ## known gaps (as of 104)
 
