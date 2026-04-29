@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -704,17 +704,21 @@ prescriptive AND consistently applied.
 
 - **Additive-baseline vs multiplicative-bonus
   for named-character mechanics (observation,
-  1+3 uses).** Multiplicative when the character
+  1+4 uses).** Multiplicative when the character
   amplifies an existing system (101 teacher ×
   research speed, 102 merchant × trade margin,
-  105+153 smith × tower fire-rate). Additive
-  when the character contributes baseline
-  character (201 bard +5 happiness — flat,
-  independent of buildings). Filed at 201 with
-  promotion threshold 3+ for the additive
-  variant; currently 1 use. If 2+ more additive
-  cases emerge (a hypothetical poet wisdom, a
-  diplomat reputation), promote.
+  105+153 smith × tower fire-rate, 206 rival ×
+  raid count). Additive when the character
+  contributes baseline character (201 bard +5
+  happiness — flat, independent of buildings).
+  Filed at 201 with promotion threshold 3+ for
+  the additive variant; currently 1 use. If
+  2+ more additive cases emerge (a hypothetical
+  poet wisdom, a diplomat reputation), promote.
+  The multiplicative variant has 4 uses and is
+  effectively the default; the invariant in
+  `## invariants` documents it as the primary
+  pattern.
 
 - **Source-specific echo branch (observation,
   1 use).** 194 added a conditional fast-path
@@ -727,6 +731,83 @@ prescriptive AND consistently applied.
   1 use. When 3+ accrete, refactor to a
   registry table (`_ECHO_SPECIAL_FRAMES` keyed
   by source-prose-fingerprint) and promote.
+
+- **Observational-elder register cluster
+  (observation, ~11 uses across 4 tags).** A
+  REGISTER-based authoring shape distinct from
+  any single tag. Beats in this cluster share:
+  declarative present-tense voice, "the realm"
+  as collective subject (or implicit), no
+  founder reference, no named-character agency,
+  hopeful-not-anxious-or-resigned mood ("goes
+  on" / "is allowed" / "agreed" / "no one calls
+  them anything"). **Register guides voice and
+  mood; tag guides eviction and echo. They are
+  orthogonal.** A misc-tag beat and a milestone-
+  tag beat can share register; a milestone-tag
+  beat outside this register would read
+  differently.
+
+  **Cluster members (cross-tag):**
+  - *misc tag* (7): 148 wanderer / 152 night-shape /
+    166 frog-voices / 174 first-frost / 196 long-
+    evening / 199 cold-morning / 207 fields-know-realm
+  - *milestone tag* (2): 190 constellation-forgotten /
+    193 landmark-named
+  - *stone tag* (1): 184 stone-forgotten
+  - *event tag* (1): 147 great-storm-remembered
+
+  **Sub-types within the cluster:**
+  - *Ambient-entity-grammar* (148/152/166):
+    1-beat acknowledgment of an entity present
+    but unnamed. Codified separately as the
+    silent-walker grammar invariant.
+  - *Weather-recognition* (147/174): the realm
+    notices or remembers weather as a marker
+    of the year.
+  - *Forgetting* (184/190): generational-gap
+    closure of a long-lived object. See the
+    object-arc closure observation above for
+    the 4-beat-vs-2-beat shape distinction.
+  - *Naming-place* (193): the realm gives a
+    place a colloquial name. Third member of
+    the realm-environment naming triplet
+    (sky 116 / object 056 / place 193).
+  - *Early-game-mood* (196/199/207): year-1
+    moments of arrival, change, or familiarity.
+    Anti-anxious continuity register
+    counterbalancing the late-arc bias 195
+    flagged.
+  - *Land-as-agent* (207): the LAND has
+    subjective voice ("agreed to be lived in").
+    1 use; filed for promotion at 3+.
+
+  **Authoring guidance (when adding to cluster):**
+  - Pick a sub-type that reads as fresh angle,
+    not sub-type-completion (per 203 positive
+    rule).
+  - Match the sibling beats' register
+    (declarative, present-tense,
+    hopeful-or-resigned).
+  - Choose tag by anchor (075 invariant: reuse
+    the closest existing tag; new tags require
+    3+ uses).
+  - Static prose by default; kingdom-hashed
+    variants only for sub-types with per-realm
+    legitimate variation (147 great-storm picks
+    from 5 storm types; 193 landmark picks from
+    8 place names; most cluster beats are
+    universal).
+  - Some beats span multiple sub-types (207 is
+    early-game-mood + land-as-agent; 193 is
+    naming-place + observational closer to
+    elder-saying than to stone-discovery).
+    That's fine — sub-types are descriptive,
+    not exclusive.
+
+  **Filed at 199 + 207** (cluster size 4+
+  threshold met; documented at 208 per
+  207's filing).
 
 ## known gaps (as of 104)
 
@@ -1200,12 +1281,40 @@ shipping, touch this file too.
   LOW (201 journal verification path has wrong character
   trigger). 6 ships otherwise clean. Doc-lag is the
   dominant failure mode.
-- **205 (this update)** — the-fixer. Ships 204 HIGH +
-  MEDIUM: named-character invariant updated to reflect
-  4 of 6 mechanics shipped (teacher 101 / merchant 102 /
-  smith 105+153 / bard 201) + dual-pattern shape
+- **205** — the-fixer. Ships 204 HIGH + MEDIUM:
+  named-character invariant updated to reflect 4 of 6
+  mechanics shipped (teacher 101 / merchant 102 / smith
+  105+153 / bard 201) + dual-pattern shape
   (multiplicative + additive variants documented;
   cross-references `## observed patterns`). LOW finding
   (201 journal verification path) deliberately not
-  edited per "don't rewrite history" discipline; chrome
-  verification will discover empirically.
+  edited per "don't rewrite history" discipline.
+- **206** — the-fixer. Closes 105 filed (101 ticks):
+  rival → +10% raid count. Sixth named-character
+  mechanic; only mayor structural-unlock remains.
+  Multiplicative variant; floor-rounding produces soft
+  difficulty curve. Doc invariant updated SAME tick per
+  204 [process] discipline (5 of 6 mechanics enumerated).
+- **207** — surprise. **fields_know_realm** — third
+  early-game beat (closes 196/199 filings). Year-1
+  summer day 10+ between long-evening day 8 and autumn
+  pair day 15. Mutual-recognition mood: land-as-agent
+  ("agreed to be lived in") inverts realm-observes-world.
+  Per 203 positive authoring rule earns landing through
+  fresh axis, not pattern-completion. NARRATIVE_BEATS
+  reaches 33; year-1 progression now 5 beats over 12 days.
+- **208 (this update)** — refactor. Adds
+  **observational-elder register cluster** as 5th
+  observed-pattern: ~11 beats across 4 tags share
+  declarative-present-tense voice + "realm" as collective
+  subject + no founder/character agency + hopeful-or-
+  resigned mood. Sub-types catalogued: ambient-entity-
+  grammar (148/152/166) / weather-recognition (147/174) /
+  forgetting (184/190) / naming-place (193) / early-game-
+  mood (196/199/207) / land-as-agent (207, 1 use).
+  **Register and tag are orthogonal**: register guides
+  voice/mood; tag guides eviction/echo. Authoring
+  guidance for new cluster members included. 207 and
+  199 filed this; cluster size threshold met.
+  Multiplicative-bonus count in additive-baseline entry
+  updated 1+3 → 1+4 (caught up for 206 rival).
