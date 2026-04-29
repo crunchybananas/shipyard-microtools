@@ -90,6 +90,10 @@ export function saveGame({ silent = false } = {}) {
     // storyFlags.realm_fell on load — workable but indirect. Explicit
     // is cleaner.
     state.realmEnded = !!G.realmEnded;
+    // Loop 211 (surprise, closes 060 filed): persist lastRaidDay for
+    // sustained-peace beat (story.js sustained_peace_known) which
+    // gates on G.day - G.lastRaidDay ≥ 50.
+    state.lastRaidDay = G.lastRaidDay;
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -184,6 +188,11 @@ export function loadGame() {
     // Loop 197: restore G.realmEnded (192-filed silent-module flag).
     // Falls back to deriving from storyFlags.realm_fell for legacy saves.
     G.realmEnded = !!s.realmEnded || !!(s.storyFlags && s.storyFlags.realm_fell);
+    // Loop 211 restore: lastRaidDay (sustained-peace beat infrastructure).
+    // Legacy saves without the field default to undefined; the
+    // sustained_peace_known beat gate handles this defensively
+    // (defaults to G.day so peace-counter starts fresh on legacy load).
+    if (s.lastRaidDay !== undefined) G.lastRaidDay = s.lastRaidDay;
     if (s.kingdomName) G.kingdomName = s.kingdomName;
     if (s.scenario) G.scenario = s.scenario;
     if (s.difficulty) G.difficulty = s.difficulty;

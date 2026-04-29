@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 211 [code] — sustained-state-recognition promotion candidates: realm at PEAK happiness for 30 days; realm has NOT lost a citizen for 100 days; full population for 60 days; no failed harvest for 2 years. Each needs runtime infrastructure (lastXDay tracker) + a beat. ~10 LoC each. If 2+ ship, promote sub-type to invariant. [story.js + state.js]
+- 211 [code] — `G.lastRaidDay` HUD display: "X days since last raid" alongside raid-countdown counter. Chrome-required for visual verification. ~5 LoC. [ui.js]
+- 211 [process] — observation: closing the longest-aged filing (060 at 151 ticks) is itself a milestone. Loop could add a "stale-filing audit" tick at rhythmic interval to triage filings older than 100 ticks. 028 archivist did this once; could be recurring. [process]
+- 211 [doc] — sustained-state pattern is worth its own observation in `## observed patterns` once 2+ uses ship. Different shape from snapshot-trigger beats; deserves pattern documentation. [loop/docs/]
 - 210 [doc] — observation: per-tick same-tick discipline (204 [process]) catches NEW drift but cannot fix EXISTING drift. 210 sweep found 1 ambient-entity drift the per-tick discipline didn't catch. **Periodic archivist sweeps remain necessary at the 10-15 tick rhythm** alongside per-tick discipline. Document the dual-discipline (per-tick + periodic sweep) as observed practice. [process]
 - 210 [doc] — observation: distinguishing **literary-pattern invariants from infrastructure invariants** matters for the 3+ rule application. Lit-patterns: 3+ uses required (188 demoted, observed-patterns wait). Infrastructure: ride on dispatch support, not use count (144 `after:` kept at 2 uses; chronicle cap at universal). Document this dual-axis in narrative-surfaces.md — possibly hoist to its own observation or note in invariants intro. [loop/docs/]
 - 210 [process] — at 220 (next archivist rhythm), check whether 209 event-trigger reward shape has accumulated additional uses (filed candidates: merchant market-day +X, teacher graduation +happy, mayor festival +happy). If 3+ accrete, promote from observed-patterns to invariant. [loop/docs/]
@@ -527,7 +531,7 @@ and note the promotion here.
 - 071 [code] — extend 064 approach system: when happiness trends DOWN toward crisis, bias dreams toward `warning`. State-slope trigger, same boost mechanism. [story.js]
 - 071 [review] — happy-peak + nightmare/stone day collision check: does a kingdom whose nightmare lands near a peak/crisis day feel off? Low priority.
 - 060 [code] — happiness-threshold beats. When happiness crosses 80 up (peak) or 20 down (crisis), fire one beat with cooldown. Emotional-state signal currently missing. ~10 lines. [story.js] **DONE → 071**
-- 060 [code] — sustained-state beats: "The realm has known peace for fifty days" / "Hunger grips the realm". Flag-gated to not spam. [story.js]
+- 060 [code] — sustained-state beats: "The realm has known peace for fifty days" / "Hunger grips the realm". Flag-gated to not spam. [story.js] **DONE → 211** (sustained_peace_known shipped; longest-aged filing 151 ticks; introduces sustained-state beat shape with G.lastRaidDay tracker + save.js persistence; misc tag observational-elder cluster; 7th sub-type sustained-state-recognition; NARRATIVE_BEATS 33 → 34; "Hunger grips the realm" variant filed below as 211 [code])
 - 060 [review] — surface-map doc: clean diagram of all 16 chronicle sites + 13 tags + 9 systems (060 mapped these). Would prevent future 053-style mis-diagnoses of already-shipped work. [loop/docs/]
 - 079 [code] — optional resource-cost mode for offering: when offering fires, decrement small amount of food/gold. Flag-gated. [story.js]
 - 079 [code] — render tiny offering sprite at stone tile for N days after offering fires, then fades. [enhancements.js]

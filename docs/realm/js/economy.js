@@ -505,6 +505,13 @@ export function checkRaids() {
 
     G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
     G.raidInterval = Math.max(4, G.raidInterval - 1);
+    // Loop 211 (surprise, closes 060 filed ~150 ticks): track the day
+    // each raid happened. Enables the sustained-peace beat (story.js
+    // sustained_peace_known) which fires when raidsSurvived ≥ 1 AND
+    // G.day - G.lastRaidDay ≥ 50. Persisted via save.js for cross-
+    // reload integrity. ~1 LoC infrastructure for an entirely new
+    // beat shape (sustained-state).
+    G.lastRaidDay = G.day;
     // Loop 014 (the-fixer): only count the raid toward "Survive N raids"
     // if the player had actual defenses when it spawned. Previously this
     // incremented unconditionally in main.js, so 5/5 was achievable by

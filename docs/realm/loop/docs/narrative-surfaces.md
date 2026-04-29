@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -755,7 +755,7 @@ prescriptive AND consistently applied.
   by source-prose-fingerprint) and promote.
 
 - **Observational-elder register cluster
-  (observation, ~11 uses across 4 tags).** A
+  (observation, ~12 uses across 4 tags).** A
   REGISTER-based authoring shape distinct from
   any single tag. Beats in this cluster share:
   declarative present-tense voice, "the realm"
@@ -771,9 +771,10 @@ prescriptive AND consistently applied.
   differently.
 
   **Cluster members (cross-tag):**
-  - *misc tag* (7): 148 wanderer / 152 night-shape /
+  - *misc tag* (8): 148 wanderer / 152 night-shape /
     166 frog-voices / 174 first-frost / 196 long-
-    evening / 199 cold-morning / 207 fields-know-realm
+    evening / 199 cold-morning / 207 fields-know-realm /
+    211 sustained-peace
   - *milestone tag* (2): 190 constellation-forgotten /
     193 landmark-named
   - *stone tag* (1): 184 stone-forgotten
@@ -803,6 +804,14 @@ prescriptive AND consistently applied.
   - *Land-as-agent* (207): the LAND has
     subjective voice ("agreed to be lived in").
     1 use; filed for promotion at 3+.
+  - *Sustained-state-recognition* (211): the
+    realm crosses a temporal threshold and
+    notices the change in collective behavior
+    ("the watch still climbs the walls but
+    their hands rest where weapons would have
+    been"). Requires runtime infrastructure
+    (state field tracking the duration). 1
+    use; filed for promotion at 3+.
 
   **Authoring guidance (when adding to cluster):**
   - Pick a sub-type that reads as fresh angle,
@@ -833,8 +842,16 @@ prescriptive AND consistently applied.
 
 ## known gaps (as of 104)
 
-- **Sustained-state beats** (060 filed) — no beat for "realm has
-  known peace for 50 days." Filed as 060 idea.
+- **~~Sustained-state beats~~** (060 → 211). Closed:
+  211 shipped `sustained_peace_known` (misc tag,
+  observational-elder register cluster). Trigger:
+  `G.stats?.raidsSurvived ≥ 1 && G.lastRaidDay !== undefined
+  && (G.day - G.lastRaidDay) ≥ 50`. New infrastructure: 1-LoC
+  `G.lastRaidDay = G.day` set at raid-spawn site (economy.js
+  ~506) + save.js persistence. Realistic firing window: year-2+
+  for fortified realms. Introduces **sustained-state-recognition**
+  as 7th sub-type of the observational-elder cluster (1 use;
+  promote at 3+).
 - **Founder→dream cross-reference** (072 filed, partially closed
   by 089). 089 wired founders into the nightmare pool; the dream
   pool (039) and offering pool (079) still don't reference

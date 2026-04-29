@@ -480,6 +480,23 @@ const NARRATIVE_BEATS = [
   { flag: 'first_frost_marked', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.season === 'autumn' && G.day >= 45,
     text: 'There is a morning when frost finds the fields and does not leave by noon. The realm marks the year by it now.' },
+  // Loop 211 (surprise, closes 060 filed ~150 ticks): SUSTAINED-STATE
+  // beat. New shape — fires when a temporal threshold is crossed
+  // (50+ days since last raid) rather than a single state-condition.
+  // Gate requires raidsSurvived ≥ 1 (peace must be EARNED, not just
+  // never-threatened) AND lastRaidDay set (defensive against legacy
+  // saves) AND G.day - lastRaidDay ≥ 50. The infrastructure (211
+  // economy.js + save.js) tracks lastRaidDay; this trigger checks the
+  // delta. Realistic firing window: year-2+ for fortified realms
+  // that successfully repel raids and accumulate peace. Joins the
+  // observational-elder register cluster as a new sub-type:
+  // sustained-state-recognition (1 use; promote at 3+). Per 203
+  // positive rule: the prose surprises ("the realm carries the
+  // quiet differently than it carried the war") rather than just
+  // checking a peace-box. Tag: misc.
+  { flag: 'sustained_peace_known', tag: 'misc',
+    trigger: G => G.stats && G.stats.raidsSurvived >= 1 && G.lastRaidDay !== undefined && (G.day - G.lastRaidDay) >= 50,
+    text: 'There comes a stretch of days when the watch still climbs the walls each evening, but their hands rest where weapons would have been. The alarm has not sounded in fifty days. The realm carries the quiet differently than it carried the war.' },
   // Loop 142 (surprise, un-filed): a letter from the other realm.
   // Opens up the WORLD beyond the island — the realm receives news
   // from a distant kingdom. Both the distant name and the news are
