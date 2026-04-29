@@ -101,6 +101,25 @@ await page.waitForTimeout(800);
 await page.screenshot({ path: join(SHOTS, 'phaseb-winter-svg.png') });
 console.log('[phaseb] saved phaseb-winter-svg.png (winter + SVG; caps should compose on top)');
 
+// Step 4 (219): hover halo + fog. Halo renders OUTSIDE drawBuilding;
+// composes via z-order regardless of path. Verify by selecting one
+// of the test buildings (sets G.selectedBuilding) and screenshotting.
+await page.evaluate(() => {
+  window.G.season = 'spring';  // back to default for halo visibility
+  // Pick the first castle from our placed row.
+  const target = window.G.buildings.find(b => b.type === 'castle');
+  if (target) window.G.selectedBuilding = target;
+});
+await page.waitForTimeout(500);
+await page.screenshot({ path: join(SHOTS, 'phaseb-halo-svg.png') });
+console.log('[phaseb] saved phaseb-halo-svg.png (selected castle + SVG path; gold halo should render on top)');
+
+// Toggle SVG off, halo should still render same.
+await page.evaluate(() => window.__realm.toggleSVG(false));
+await page.waitForTimeout(500);
+await page.screenshot({ path: join(SHOTS, 'phaseb-halo-canvas.png') });
+console.log('[phaseb] saved phaseb-halo-canvas.png (selected castle + canvas; halo z-order independent)');
+
 // Page errors
 console.log('\n[phaseb] === PAGE ERRORS ===');
 const realErrs = errs.filter(e => !/favicon/i.test(e));
