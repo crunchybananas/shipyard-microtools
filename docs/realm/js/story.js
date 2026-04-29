@@ -443,6 +443,25 @@ const NARRATIVE_BEATS = [
   { flag: 'fields_know_realm', tag: 'misc',
     trigger: G => G.season === 'summer' && G.day >= 10,
     text: 'There comes a season when the fields are no longer strange. The grass under bare feet is the realm\'s own; the path between buildings goes the right way without thought. The land has agreed to be lived in.' },
+  // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
+  // summer day 12+ — late summer, between fields_know (day 10) and
+  // autumn pair (day 15). **Individual-interiority register** — first
+  // beat in the cluster where focal is a single anonymous settler
+  // rather than "the realm" collective. Per 207 filing: shifts focal
+  // from realm-collective to individual citizen. Per 203 positive
+  // authoring rule: meta-recognition that the chronicle witnesses
+  // moments the realm-as-collective never sees ("No one sees. The
+  // realm goes on without seeing.") — earns the landing through
+  // fresh META-angle, not pattern-completion. Sub-type:
+  // individual-interiority (1 use, threshold 3+; new 8th sub-type
+  // of observational-elder cluster). Static prose. Misc tag. Year-1
+  // progression now 6 beats over 12 days (founders 3-6 / long-evening
+  // 8 / fields-know 10 / first-sigh 12 / cold-morning + constellation
+  // 15). Density 6 beats / ~3 minutes at speed 4× = 2 beats/min;
+  // tight but coherent.
+  { flag: 'first_sigh_seen', tag: 'misc',
+    trigger: G => G.season === 'summer' && G.day >= 12,
+    text: 'There is an afternoon when a settler sets down a bucket halfway between the well and the houses, leans against a stone, and breathes out. No one sees. The realm goes on without seeing.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder
   // reference. Fires autumn of year 2+ (realm has lived long enough

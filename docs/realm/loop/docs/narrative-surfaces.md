@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -755,7 +755,7 @@ prescriptive AND consistently applied.
   by source-prose-fingerprint) and promote.
 
 - **Observational-elder register cluster
-  (observation, ~12 uses across 4 tags).** A
+  (observation, ~13 uses across 4 tags).** A
   REGISTER-based authoring shape distinct from
   any single tag. Beats in this cluster share:
   declarative present-tense voice, "the realm"
@@ -771,10 +771,10 @@ prescriptive AND consistently applied.
   differently.
 
   **Cluster members (cross-tag):**
-  - *misc tag* (8): 148 wanderer / 152 night-shape /
+  - *misc tag* (9): 148 wanderer / 152 night-shape /
     166 frog-voices / 174 first-frost / 196 long-
     evening / 199 cold-morning / 207 fields-know-realm /
-    211 sustained-peace
+    211 sustained-peace / 212 first-sigh
   - *milestone tag* (2): 190 constellation-forgotten /
     193 landmark-named
   - *stone tag* (1): 184 stone-forgotten
@@ -796,7 +796,7 @@ prescriptive AND consistently applied.
     place a colloquial name. Third member of
     the realm-environment naming triplet
     (sky 116 / object 056 / place 193).
-  - *Early-game-mood* (196/199/207): year-1
+  - *Early-game-mood* (196/199/207/212): year-1
     moments of arrival, change, or familiarity.
     Anti-anxious continuity register
     counterbalancing the late-arc bias 195
@@ -812,6 +812,14 @@ prescriptive AND consistently applied.
     been"). Requires runtime infrastructure
     (state field tracking the duration). 1
     use; filed for promotion at 3+.
+  - *Individual-interiority* (212): focal is a
+    single anonymous settler rather than the
+    realm collective ("a settler sets down a
+    bucket... breathes out. No one sees. The
+    realm goes on without seeing.") The
+    chronicle witnesses what the realm-as-
+    collective doesn't. 1 use; filed for
+    promotion at 3+.
 
   **Authoring guidance (when adding to cluster):**
   - Pick a sub-type that reads as fresh angle,
