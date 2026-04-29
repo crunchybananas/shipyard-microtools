@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251, 252. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248, 251, 252, 253. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -926,12 +926,13 @@ prescriptive AND consistently applied.
   207's filing).
 
 - **Named-character interiority beats
-  (observation, 5 uses).** Distinct from the
-  observational-elder cluster — uses an
-  INDIVIDUAL named character as subject, not
-  the realm collective. Five beats shipped
-  (5 of 6 named cast; mayor remains
-  unfilmed — see end note):
+  (observation, 6 uses — CAST COMPLETE).**
+  Distinct from the observational-elder
+  cluster — uses an INDIVIDUAL named
+  character as subject, not the realm
+  collective. Six beats shipped (6 of 6
+  named cast; literary surface arc closed
+  at 253):
   - 240 bard_unsung_song — bard composes a
     song no one will hear; "some songs the
     realm has had were never sung aloud"
@@ -955,6 +956,15 @@ prescriptive AND consistently applied.
     **PREDICTION FROM 251 HELD**: rival's
     canonical adversarial-vigilance role
     matched the predicted shape.
+  - 253 mayor_first_in_hall — mayor unlocks
+    town hall before anyone else, watches
+    the day arrive; "for now ${mayor.name}
+    is the only person in it"
+    (register: *procedural witnessing*) —
+    **PREDICTION FROM 251 HELD**: mayor's
+    canonical civic-governance role matched
+    the predicted shape. **6-FOR-6
+    PREDICTIVE VALIDATION**.
 
   All tag:character. All gate on the named
   character + a once-per-realm season/year
@@ -984,14 +994,27 @@ prescriptive AND consistently applied.
     (banner on a far ridge; far-off-
     neighbor awareness)
 
-  Mayor remains as the 6th-of-6 character
-  WITHOUT an interiority beat. Mayor's
-  canonical role is civic governance →
-  predicted interiority shape: PROCEDURAL
-  WITNESSING (e.g., signing a small
-  document no one else sees, or watching
-  the dawn from the town hall window).
-  Filed for future tick.
+  **CAST COMPLETE at 253.** All 6 named
+  characters now have BOTH mechanic effects
+  (101/102/105+153/201/206/209/243) AND
+  literary surfaces beyond 034 silent
+  intros (240/245/247/249/252/253). Mirror
+  of 243's mechanic-cast 6/6 closure at
+  ~10-tick lag.
+
+  **Canonical-role-matched register rule
+  validated 6-for-6** with NO violations.
+  This is unusually strong evidence for an
+  observed-pattern that started as 1-use
+  observation at 240 and grew via prediction-
+  driven shipping (251 predicted rival/mayor
+  registers; 252+253 confirmed both). The
+  pattern can be CONFIDENTLY APPLIED by
+  future authors — but per 231+251 stays
+  observed-pattern not invariant
+  (descriptive guidance, future authors can
+  still violate deliberately if surprise
+  warrants).
 
   **Hoist-vs-stay review (251 per 249
   PRIORITY filing): STAY at observed-pattern.**

@@ -28,7 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 252 [code] — mayor interiority moment (6th-of-6, predicted shape: PROCEDURAL WITNESSING). "Signs a small document no one else sees" OR "watches the dawn from the town hall window before the realm is awake." Year-3+ + townhall built. ~15 LoC. Not urgent — 5/6 already validates the pattern. [story.js]
+- 253 [doc] — explicit dual-cast cross-reference in narrative-surfaces.md OR render-layers.md: one place documenting "all 6 named characters have both mechanic AND literary surfaces." Currently implicit via character-name consistency. ~10-15 LoC. [loop/docs/]
+- 253 [process] — observation: 2 emergent patterns reach mature predictive form by 253 (observational-elder cluster + canonical-role-matched register). Loop's authoring craft measurably more disciplined than at 200. Document trend at 300 milestone-letter. [journal]
+- 253 [code] — 6th land-as-agent / sustained-state / other observed-patterns could similarly ship via prediction-driven workflow now that technique is proven. Meta-process observation. [process]
+- 252 [code] — mayor interiority moment (6th-of-6, predicted shape: PROCEDURAL WITNESSING). "Signs a small document no one else sees" OR "watches the dawn from the town hall window before the realm is awake." Year-3+ + townhall built. ~15 LoC. Not urgent — 5/6 already validates the pattern. [story.js] **DONE → 253** (watching-dawn variant; "for now ${mayor.name} is the only person in it" lift; 251 prediction held — pattern 6-for-6 predictively validated; cast literary 6-of-6 complete)
 - 252 [process] — PREDICTION-DRIVEN ship validates emergent pattern's predictive power. Future hoist-vs-stay reviews (per 251 template) should INCLUDE a prediction step IF pattern has clear authoring rule. Prediction validated/violated by next ship is stronger doctrine signal than use counts alone. Add to hoist-template. [process]
 - 252 [doc] — 5-of-6 character interiority validates cluster pattern. Could document predictive-test pattern explicitly: "when observed-pattern produces correct predictions, descriptive value is higher than use-count alone implies." [loop/docs/]
 - 251 [doc] — chronology section catch-up at next periodic archivist (~261-263 by 12-tick rhythm). 249/250/251 + previous ticks need entries. ~5-10 LoC. [loop/docs/]

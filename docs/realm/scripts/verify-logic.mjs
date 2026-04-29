@@ -162,6 +162,23 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 22: 253 mayor_first_in_hall — mayor + year3 + townhall built
+const mayorFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureMayor();
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'townhall')) {
+    window.G.buildings.push({ type: 'townhall', x: 25, y: 25, hp: 100, maxHp: 100, workers: [] });
+  }
+  delete window.G.storyFlags.mayor_first_in_hall;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.mayor_first_in_hall === true;
+  const entry = window.G.chronicle.find(e => e.text?.includes("unlocks the town hall before the realm is awake"));
+  return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
+});
+rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
+
 // Test 21: 252 rival_banner_distant — rival + year3 + autumn/winter
 const rivalFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

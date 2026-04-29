@@ -585,6 +585,31 @@ const NARRATIVE_BEATS = [
       const r = G.namedCharacters.rival;
       return `There is an evening late in the year when ${r.name}'s banner is sighted on a far ridge — visible briefly between two crests, then gone. No challenge is sounded; no preparation is made. The realm and ${r.name} are aware of each other, in the way far-off neighbors are.`;
     } },
+  // Loop 253 (the-fixer, 252 filed): MAYOR interiority moment.
+  // 6-of-6 character literary cast closure. 251 predicted
+  // PROCEDURAL WITNESSING for mayor's canonical civic-governance
+  // role; 253 ships exactly that — mayor unlocks the town hall
+  // before anyone else, watches the day arrive from the long
+  // window, is alone in the realm for a moment. "Procedural
+  // witnessing" reads as both routine governance AND lonely
+  // stewardship.
+  // Closing line "for now ${mayor.name} is the only person in it"
+  // is the lift — the mayor's privileged position as first-up
+  // doubles as a small private possession of the realm itself.
+  // 6-FOR-6 PREDICTIVELY VALIDATED canonical-role-matched
+  // register rule (after 252's 5-for-5).
+  // Gate: mayor named (tavern build → ensureMayor) + year3 +
+  // townhall exists (243 building required for the prose to land).
+  // Once per realm; season-agnostic (mayor's morning routine is
+  // year-round).
+  // **6-OF-6 CHARACTER LITERARY CAST COMPLETE** at 253. Mirror
+  // of 243 mechanic cast 6/6 closure at 140-tick lag.
+  { flag: 'mayor_first_in_hall', tag: 'character',
+    trigger: G => G.namedCharacters?.mayor && G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'townhall'),
+    text: G => {
+      const m = G.namedCharacters.mayor;
+      return `There is a morning when ${m.name} unlocks the town hall before the realm is awake and stands at the long window watching the day arrive. The first carts are not yet on the road. The first chimneys are not yet smoking. The realm will be busy soon; for now ${m.name} is the only person in it.`;
+    } },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first
