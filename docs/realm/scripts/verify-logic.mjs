@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 322 recurrence_known — TRIPLE-AXIS (7th OUTSIDE CONTENTMENT + 7th STRUCTURAL REPETITION + RECURRENCE-AS-SELF-RECOGNITION angle)
+const recurrenceFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 88;
+  delete window.G.storyFlags.recurrence_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.recurrence_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The same bread rising'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('322: recurrence_known fires year3 + d>=85', recurrenceFire.fired, `text="${recurrenceFire.text}…" tag=${recurrenceFire.tag}`);
+
 // Test: 319-A sea_bell_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
 // 321: gate-spread requires G.day >= 62.
 const seaBellLostFire = await page.evaluate(async () => {

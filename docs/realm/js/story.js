@@ -1035,6 +1035,43 @@ const NARRATIVE_BEATS = [
   { flag: 'church_step_worn_lost_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 68 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.church_step_worn_known,
     text: 'The church is gone. The step that was worn to a curve by feet of three generations is gone with it. The regulars who knew the dip still step a little high when they walk past the empty patch of ground — the wear migrated from stone into bodies.' },
+  // Loop 322 (surprise, 318 [code] filing): TRIPLE-AXIS surprise — 7th
+  // OUTSIDE register (CONTENTMENT / settled-in-recurrence) + 7th
+  // STRUCTURAL opening (REPETITION via anaphora) + RECURRENCE-AS-SELF-
+  // RECOGNITION angle. **Closes 300 hopes #5** ("7th OUTSIDE register
+  // by 350") at 7 of 7 done, 28 ticks ahead of milestone.
+  // (1) REGISTER: OUTSIDE CONTENTMENT — passive-settled-in-recurrence.
+  //     Distinct from prior 6 OUTSIDE registers: META (paradox) /
+  //     JOYFUL (positive ease — ACTIVE laughter) / WONDER (curious-
+  //     without-resolving) / IRRITATION (negative-domesticated) /
+  //     TERROR (acute-fear) / GRIEF (sustained-loss). CONTENTMENT is
+  //     the SECOND POSITIVE-tone register (after JOYFUL) but
+  //     qualitatively different: JOYFUL is ACTIVE LAUGHTER at no
+  //     particular trigger; CONTENTMENT is PASSIVE FITTING in a
+  //     repeated pattern. The realm "does not mind" the recurrence —
+  //     captures non-anxious acceptance.
+  // (2) STRUCTURE: 7th non-declarative opening — REPETITION via
+  //     anaphora ("The same X." "The same X." "The same X.").
+  //     Distinct from prior 6 (Q/I/2P/D/N/F) because REPETITION
+  //     foregrounds RHYTHMIC RECURRENCE rather than introducing a
+  //     fresh form. The repeated structure IS the meaning — the
+  //     prose's rhythm enacts the realm's recurrence.
+  // (3) ANGLE: RECURRENCE-AS-SELF-RECOGNITION-AS-CONTENTMENT — the
+  //     realm finds ITSELF in the repeated pattern (vs 312 SOCIAL-
+  //     NORMS which is about TACIT TRANSMISSION; vs 285 LANGUAGE-
+  //     DRIFT which is about UNCONSCIOUS HABITUATION). 322's angle:
+  //     the realm RECOGNIZES itself as continuous through repetition,
+  //     and FEELS GOOD about it.
+  // **TRIPLE-AXIS surprise** (REGISTER + STRUCTURE + ANGLE all fresh):
+  // third triple-axis ship after 314 + 318. Triple-axis pattern
+  // continues stabilizing; 3 of last 5 surprise ticks ship triple-
+  // axially. Per 315 sub-rule: STRUCTURE+fresh-ANGLE held at 7/7
+  // confirming uses. Gate: year3 + day>=85 (next-available year-only
+  // day-offset slot per 321 [code] authoring guideline). Once-per-
+  // realm; tag misc.
+  { flag: 'recurrence_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 85,
+    text: 'The same bread rising. The same lamps lit. The same children asleep. The realm finds itself in an evening it has had many times before, and it does not mind.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

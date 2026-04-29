@@ -942,6 +942,16 @@ should respect:
     The remaining sentences in the beat resume
     declarative form once the FRAGMENT's attention has
     been claimed.
+  - *REPETITION-opening* (322 recurrence_known) —
+    "The same bread rising. The same lamps lit. The
+    same children asleep." Anaphora: three parallel
+    fragments with identical opening phrase. Distinct
+    from FRAGMENT (single incomplete sentence) and
+    LIST because REPETITION's parallel structure IS
+    the meaning — the prose's rhythm enacts the
+    realm's recurrence. The repeated form makes the
+    reader experience the recurrence directly rather
+    than only being told about it.
 
   **Why this is an invariant not just an observation:** the
   rule is now PRESCRIPTIVE. Prior practice would have framed
@@ -962,7 +972,7 @@ should respect:
   STRUCTURE-vector ships.
 
   **Confirmed uses establishing the rule (5 at promotion;
-  6 in production after 318):**
+  7 in production after 322):**
   - 301 QUESTION + RITUAL-PERSISTENCE-WITHOUT-ORIGIN
     (forgetting shape 4)
   - 305 IMPERATIVE + EMERGENT-TRADITION (forgetting shape 5)
@@ -975,6 +985,9 @@ should respect:
   - 318 FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS
     (6th OUTSIDE register, GRIEF) — first post-promotion
     confirming use; rule held in production.
+  - 322 REPETITION + RECURRENCE-AS-SELF-RECOGNITION
+    (7th OUTSIDE register, CONTENTMENT) — second post-
+    promotion confirming use; rule continues to hold.
 
   **Why this is a rule and not just a recurrence:** 5 of 5
   ships across both INSIDE cluster sub-types AND OUTSIDE
@@ -1455,24 +1468,45 @@ prescriptive AND consistently applied.
     without articulating the change).
     Establishes triple-axis as
     not-one-off pattern (after 314).
+  - *Contentment* (322): SETTLED-IN-
+    RECURRENCE register — passive
+    fitting in repeated pattern. "The
+    same bread rising. The same lamps
+    lit. The same children asleep. The
+    realm finds itself in an evening
+    it has had many times before, and
+    it does not mind." Gate: year3 +
+    day>=85. **7th OUTSIDE register**
+    and second POSITIVE-tone register
+    (distinct from JOYFUL active-
+    laughter: CONTENTMENT is passive,
+    settled, and oriented around
+    recurrence rather than ease). 300
+    hopes #5 closure ("7th OUTSIDE
+    register by 350") at 7 of 7 done.
+    **TRIPLE-AXIS surprise**: REGISTER
+    (7th OUTSIDE) + STRUCTURE (7th non-
+    declarative; REPETITION via
+    anaphora) + ANGLE (RECURRENCE-AS-
+    SELF-RECOGNITION-AS-CONTENTMENT).
+    Third triple-axis ship after
+    314/318 — pattern stabilizing.
 
-  **6 OUTSIDE beats now**. 298 PROMOTED the
-  pattern to invariant; 303/314/318 confirm the
-  path remains operational and emotionally
-  diverse. The 6 registers cover: paradoxical
-  (META) / positive (JOYFUL) / curious
-  (WONDER) / negative-domesticated
-  (IRRITATION) / acute-fear (TERROR) /
-  sustained-loss (GRIEF). 3 negative-tone
-  registers now — IRRITATION cultural,
-  TERROR acute, GRIEF sustained — span the
-  emotional spectrum from minor-annoyance
-  through immediate-fear through
-  long-integration. 300 hopes #5 ("7th
-  OUTSIDE register by 350") on pace at
-  6 of 7 done; 318 ships 4 ticks after
-  314 (faster than the prior 11-tick gap
-  between 303 IRRITATION and 314 TERROR).
+  **7 OUTSIDE beats now**. 298 PROMOTED the
+  pattern to invariant; 303/314/318/322
+  confirm the path remains operational. The
+  7 registers cover: paradoxical (META) /
+  positive-active (JOYFUL) / curious (WONDER)
+  / negative-domesticated (IRRITATION) /
+  acute-fear (TERROR) / sustained-loss
+  (GRIEF) / positive-settled (CONTENTMENT).
+  3 NEGATIVE-tone (IRRITATION/TERROR/GRIEF)
+  span minor-cultural / acute / sustained;
+  2 POSITIVE-tone (JOYFUL/CONTENTMENT) span
+  active-laughter / passive-settled;
+  META + WONDER fill paradoxical + curious.
+  **300 hopes #5 CLOSED 28 ticks ahead of
+  350.**
 
   **Authoring guidance (when adding to cluster):**
 
