@@ -728,7 +728,22 @@ prescriptive AND consistently applied.
   to invariant.
 
 - **Named-character mechanic shapes (observation,
-  4+1+1+1 uses).** Four shapes now in the wild:
+  4+1+1+1 uses).** Four shapes now in the wild.
+  **NOTE (256 pessimist HIGH finding):** the
+  6-of-6 cast framing groups HETEROGENEOUS
+  shapes. 5 of the 6 mechanics deliver
+  CONTINUOUS NUMERIC EFFECTS every tick
+  (multiplicative ×4 + additive ×1) plus an
+  event-trigger reward. The 6th — mayor
+  structural-unlock (tech.js:141) — is a
+  BOOLEAN GATE; once townhall is built, the
+  mayor has no ongoing mechanic effect. Future
+  7th-character authors should NOT copy the
+  cast-completion frame as if all six shapes
+  are interchangeable. Decide which shape
+  category fits the new character's canonical
+  role before reaching for "shape that
+  hasn't been used yet" symmetry.
   - **Multiplicative** when the character
     amplifies an existing system (4 uses):
     101 teacher × research speed, 102 merchant
@@ -756,6 +771,13 @@ prescriptive AND consistently applied.
     boolean rather than numeric, gates content
     rather than tuning math. `isBuildingUnlocked`
     in tech.js owns the gate logic.
+    **CATEGORICALLY DIFFERENT from continuous-
+    bonus shapes:** structural-unlock is a
+    one-time gate that delegates ongoing
+    mechanical impact to the unlocked building
+    (state.js:77 townhall happiness:8 + pop:5).
+    The character's continuous mechanical
+    presence is ZERO once the gate has fired.
   
   Rival is the first character with TWO mechanic
   sites (raid-spawn multiplier 206 + raider-kill
@@ -915,6 +937,25 @@ prescriptive AND consistently applied.
     promotion at 3+.
 
   **Authoring guidance (when adding to cluster):**
+
+  **Sub-type-completion is NOT a positive
+  authoring driver (256 pessimist MEDIUM).**
+  The 9-sub-type ledger above is DESCRIPTIVE,
+  not PRESCRIPTIVE. Filed sub-type uses (e.g.
+  "second habituation-recognition use") are
+  hints worth considering, not assignments to
+  fulfill. Four of the nine sub-types sit at
+  1 use each with "filed for promotion at 3+";
+  the temptation is to ship 2nd/3rd uses to
+  advance the counter. **Resist it.** Per 203
+  positive rule: ship a sub-type's next use
+  ONLY if the prose surprises on its own
+  merits. Counter-pressure is intentional —
+  the cluster's discipline depends on
+  preferring fresh angles over completionism.
+  When in doubt, choose a NEW axis or skip the
+  cluster entirely for that tick.
+
   - Pick a sub-type that reads as fresh angle,
     not sub-type-completion (per 203 positive
     rule).
