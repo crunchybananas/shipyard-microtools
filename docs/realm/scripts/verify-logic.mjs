@@ -405,6 +405,52 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 319-A sea_bell_lost_known — fallback for raid-destroyed church (311 [code] closure partial)
+const seaBellLostFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = []; // church NOT present
+  window.G.stats = window.G.stats || {};
+  window.G.stats.everHadBuilding = { church: true }; // realm once had one
+  delete window.G.storyFlags.sea_bell_lost_known;
+  delete window.G.storyFlags.sea_bell_known; // ensure original didn't fire (mutual exclusion)
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.sea_bell_lost_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The realm remembers a bell'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('319-A: sea_bell_lost_known fires year3 + everHadBuilding.church + !church present + !sea_bell_known', seaBellLostFire.fired, `text="${seaBellLostFire.text}…" tag=${seaBellLostFire.tag}`);
+
+// Test: 319-A mutual exclusion — sea_bell_lost should NOT fire if original sea_bell_known already set
+const seaBellMutexCheck = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = []; // church absent
+  window.G.stats.everHadBuilding = { church: true };
+  window.G.storyFlags.sea_bell_known = true; // original already fired
+  delete window.G.storyFlags.sea_bell_lost_known;
+  story.checkStoryBeats();
+  return { fired: window.G.storyFlags.sea_bell_lost_known === true };
+});
+rec('319-A: sea_bell_lost_known does NOT fire when sea_bell_known already set (mutual exclusion)', !seaBellMutexCheck.fired);
+
+// Test: 319-B church_step_worn_lost_known — fallback for raid-destroyed church (311 [code] closure partial)
+const stepLostFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = [];
+  window.G.stats.everHadBuilding = { church: true };
+  delete window.G.storyFlags.church_step_worn_lost_known;
+  delete window.G.storyFlags.church_step_worn_known;
+  delete window.G.storyFlags.sea_bell_known;
+  delete window.G.storyFlags.sea_bell_lost_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.church_step_worn_lost_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The church is gone. The step'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('319-B: church_step_worn_lost_known fires year3 + everHadBuilding.church + !church present + !church_step_worn_known', stepLostFire.fired, `text="${stepLostFire.text}…" tag=${stepLostFire.tag}`);
+
 // Test: 318 empty_seat_known — TRIPLE-AXIS (6th OUTSIDE GRIEF + 6th STRUCTURAL FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS angle)
 const emptySeatFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

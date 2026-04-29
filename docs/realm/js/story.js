@@ -993,6 +993,42 @@ const NARRATIVE_BEATS = [
   { flag: 'empty_seat_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && (G.stats?.citizensDied || 0) >= 2,
     text: 'An empty seat. The realm sets fewer plates now. No one names what changed.' },
+  // Loop 319 (the-fixer, 311 [code] filing): fallback beats for raid-
+  // destroyed realms that ONCE had a church or bakery but lost it
+  // before reaching the year3 gate. Closes 310 [process] coverage gap
+  // partially (sea_bell + church_step; bakery_door defers — its prose
+  // requires a more substantive fresh angle to surprise post-loss).
+  // Mutually-exclusive gates: each fallback fires only if (1)
+  // everHadBuilding flag set (per 311/317 infrastructure) AND (2)
+  // building NOT currently present AND (3) the corresponding ORIGINAL
+  // beat's flag is NOT yet set. This prevents double-firing for
+  // realms that experienced the original beat then lost the building.
+  // Per 257 anti-completionism: each fallback ships its OWN fresh
+  // angle distinct from the original — the original's prose described
+  // the building's specific object/feature; the fallback describes
+  // the BODILY-MEMORY or CULTURAL-STANDARD that survives the
+  // building's loss.
+  // 319-A: sea_bell_lost — INHERITED-FROM-OUTSIDE-PERSISTS-AS-STANDARD.
+  // The bell was pulled from the sea; the church is gone. The bell's
+  // tone became the realm's reference point for what a bell sounds
+  // like — the cultural standard outlived the substrate. Distinct
+  // from 290's INHERITED-FROM-OUTSIDE because 290 treats the bell as
+  // present-and-ringing; 319-A treats the bell-tone as a cultural
+  // measurement that endures even when no bell hangs in the realm.
+  { flag: 'sea_bell_lost_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.sea_bell_known,
+    text: 'The realm remembers a bell that was pulled from the sea. The church that held it is gone. The bell\'s tone is still the realm\'s reference for what a bell ought to sound like — a measurement that outlived its instrument.' },
+  // 319-B: church_step_worn_lost — RESHAPED-BY-USE-AS-BODILY-MEMORY.
+  // The step is gone with the church; the gait it shaped is not.
+  // The regulars who walked the dip still step a little high when
+  // they pass the empty patch of ground — the wear has migrated
+  // from stone into bodies. Distinct from 294 RESHAPED-BY-USE
+  // because 294's lift line was about insider-knowledge-built-into-
+  // stone; 319-B's lift line is about insider-knowledge-built-into-
+  // gait — the body remembering what stone no longer can.
+  { flag: 'church_step_worn_lost_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.stats?.everHadBuilding?.church && !G.buildings?.some(b => b.type === 'church') && !G.storyFlags.church_step_worn_known,
+    text: 'The church is gone. The step that was worn to a curve by feet of three generations is gone with it. The regulars who knew the dip still step a little high when they walk past the empty patch of ground — the wear migrated from stone into bodies.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
