@@ -7,8 +7,9 @@ lines unblocked by this navigability + per-section anchors):
 - `## tag inventory` — 15 tags taxonomy
 - `## 20 chronicle-writing systems` — 075's audit + updates
 - `## execution order` — system-call order at startup/tick
-- `## invariants` — prescriptive rules (~7 active: 075/144/named-char-
-  mech/etc + 276 shape-axis + 284 variant-pool + 287 combination-rule)
+- `## invariants` — prescriptive rules (~8 active: 075/144/named-char-
+  mech/etc + 276 shape-axis + 284 variant-pool + 287 combination-rule
+  + 298 OUTSIDE-cluster + 308 STRUCTURAL-surprise)
 - `## observed patterns` — descriptive observations <3 uses
 - `## known gaps` — 104-tick filing of unresolved seams
 - `## retired hypotheses` — patterns falsified or demoted
@@ -878,6 +879,107 @@ should respect:
   - Promotion of any OUTSIDE register to its own sub-type
     if it accumulates 3+ uses — separate decision.
 
+- **STRUCTURAL surprise (4-vector framework): every surprise
+  beat occupies a position on at least one of four orthogonal
+  axes — REGISTER / ANGLE / TAG / STRUCTURE. STRUCTURE is the
+  PROSE-OPENING form: declarative (corpus default) /
+  question / imperative / second-person / and successors.
+  When a beat opens with a non-declarative form, document
+  the structural surprise as a formal vector axis distinct
+  from REGISTER (cluster vs OUTSIDE) and ANGLE (shape-extension
+  within sub-type).** (308, promoted from observed-pattern
+  with 3 confirming uses: 301 question / 305 imperative /
+  307 second-person.)
+
+  **The 4 vectors (orthogonal axes a surprise can vary on):**
+  - *REGISTER* — INSIDE the observational-elder cluster
+    (declarative-present-tense voice) vs OUTSIDE the cluster
+    (META/JOYFUL/WONDER/IRRITATION-DOMESTICATED — see 298).
+  - *ANGLE* — shape-extension within an existing sub-type
+    (see 276). 13+ uses since promotion.
+  - *TAG* — 15-tag taxonomy chosen for eviction / echo
+    (misc / milestone / character / event / etc).
+  - *STRUCTURE* — prose-OPENING form. Declarative is the
+    corpus default (~61 of 64 beats). Non-declarative
+    openings are surprises in their own right.
+
+  **Confirmed STRUCTURAL surprises:**
+  - *QUESTION-opening* (301 noon_bell_origin_known) — "Why
+    is the church bell rung at noon and not at any other
+    hour?" Question-answer-reflection rhythm: Q (why is X?)
+    → A (because it always has been) → Reflection (origin
+    lost AT THE MOMENT of practice-establishment).
+  - *IMPERATIVE-opening* (305 silent_morning_known) —
+    "Listen for the bell on the day the bell does not ring."
+    Direct address to an unspecified listener. The prose
+    instructs the realm (or the reader) to attend.
+  - *SECOND-PERSON address* (307 path_knows_routine_known) —
+    "You walk down the path you have walked many times."
+    The "you" addresses the reader as if they were the
+    realm's citizen. Distinct from imperative because the
+    "you" is a SUBJECT, not the recipient of a command.
+
+  **Why this is an invariant not just an observation:** the
+  rule is now PRESCRIPTIVE. Prior practice would have framed
+  these as "oddly-opened beats" or attributed the surprise
+  to the angle alone; the 4-vector framework names STRUCTURE
+  as a first-class authoring axis. Future structural openings
+  (FRAGMENT / DIALOG / NEGATION / etc.) are recognized as
+  surprises BEFORE they accumulate; ANGLE-only surprises with
+  declarative form remain valid (most beats), but STRUCTURE-
+  varied beats are explicitly called out.
+
+  **STRUCTURE-ANGLE coupling (prediction filed at 307):** all
+  3 confirming uses (301/305/307) ALSO surprise on ANGLE —
+  301 + RITUAL-PERSISTENCE-WITHOUT-ORIGIN (forgetting shape
+  4); 305 + EMERGENT-TRADITION (forgetting shape 5); 307 +
+  ANTICIPATORY-AGENCY (land-as-agent shape 6). Hypothesis:
+  non-declarative openings DEMAND fresh content because
+  stale angles collapse the prose (asking "why does X
+  happen" about a familiar angle reads as rhetorical filler).
+  Falsifiable: if a 4th structural surprise lands cleanly
+  with a STALE angle, the coupling is rejected. Until
+  falsified, STRUCTURE-vector ships should pair with fresh
+  ANGLE.
+
+  **Authoring decision tree (combined with 276 + 298):**
+  1. Does the prose surprise (203)?
+  2. What register family?
+     - DECLARATIVE-PRESENT-TENSE observational →
+       INSIDE cluster:
+       - New angle within existing sub-type → 276
+         shape-extension
+       - Reuse of existing angle → don't ship per 257
+     - DIFFERENT register (META/JOYFUL/WONDER/etc) →
+       OUTSIDE cluster per 298 invariant.
+  3. What opening form?
+     - DECLARATIVE (default; ~95% of corpus) → ship
+       on REGISTER/ANGLE/TAG vectors as above.
+     - NON-DECLARATIVE (question / imperative / second-
+       person / successors) → STRUCTURE vector
+       per 308 invariant; pair with fresh ANGLE
+       (per coupling prediction).
+  4. Document with explicit annotation in narrative-
+     surfaces.md (cluster sub-type for INSIDE shape;
+     OUTSIDE register entry; STRUCTURAL-surprise entry
+     for non-declarative form).
+
+  **What this invariant DOES NOT prescribe:**
+  - The set of structural openings — these emerge organically
+    as prose introduces them. FRAGMENT / DIALOG / NEGATION /
+    REPETITION are filed as candidates per 307 [code]; not
+    yet shipped.
+  - Consolidation: structural-surprise beats remain in
+    their cluster annotations (NOT a separate "structural
+    cluster"); STRUCTURE is annotation, not sub-type.
+  - Promotion of a specific structural form to its own
+    invariant if it accumulates 3+ uses — separate decision
+    (e.g. "all imperative beats must do X" would be a
+    further refinement, not entailed).
+  - Mandate: declarative remains the corpus default. The
+    invariant gives non-declarative ships a recognized path,
+    NOT a quota. Most beats will always be declarative.
+
 ## observed patterns
 
 Distinct from invariants. Observations describe
@@ -1123,8 +1225,8 @@ prescriptive AND consistently applied.
       instance to forget; ORIGIN NEVER
       EXISTED as a decision. **2nd structural
       surprise**: imperative-opening (vs
-      301 question-opening). Per 301
-      [process] 4-vector framework.
+      301 question-opening). Per 308
+      STRUCTURAL-surprise invariant.
     5 shapes — second-leading sub-type after
     307 promoted land-as-agent to 6. Per 276
     invariant.
@@ -1152,10 +1254,8 @@ prescriptive AND consistently applied.
       anticipation as agency. **3rd
       structural surprise**: SECOND-PERSON
       address (after 301 question / 305
-      imperative). Per 301 [process] 4-
-      vector framework — STRUCTURAL pattern
-      now at 3 confirming uses (231 promotion
-      threshold MET).
+      imperative). Per 308 STRUCTURAL-
+      surprise invariant.
     Per 276 invariant.
   - *Sustained-state-recognition* (211/228/230):
     the realm crosses a temporal threshold and
