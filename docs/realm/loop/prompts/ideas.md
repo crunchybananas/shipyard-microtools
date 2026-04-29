@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 244 [code] — second-townhall beat candidate: year-3+ "townhall has held long sessions" referencing accumulated procedural memory. Sustained-state-recognition variant bonded to the new building. ~10 LoC. [story.js]
+- 244 [process] — "co-shipped infrastructure" pattern observed at 242 + 244: when a filed beat encounters dispatch limitations, fix the dispatch in the same tick as the beat ships, if ≤10 LoC + backward-compatible. Document at next archivist. [process]
+- 244 [doc] — narrative-surfaces.md should document BUILDING_FIRST_BEATS function-text support alongside existing pattern docs. ~3-5 LoC. [loop/docs/]
 - 243 [code] — townhall.svg sprite + canvas drawTownHall for visual polish. Phase A authored 11 sprites; townhall would be the 12th. ~2 ticks (sprite + dispatch hook). Optional Phase E. [assets/sprites/ + render.js]
 - 243 [code] — first-townhall chronicle beat: extend BUILDING_FIRST_BEATS table to fire a beat when townhall is first built. ~5 LoC; civic-formal register. [story.js]
 - 243 [process] — 6-character cast arc spans ~190 ticks (050 filed → 243 closed). One of the longest closed arcs. Worth noting in 250 milestone-letter as multi-arc-closure case study. [journal]

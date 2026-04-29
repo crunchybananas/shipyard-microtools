@@ -162,6 +162,23 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 16: 244 first-townhall chronicle beat (function-text + mayor reference)
+const townhallBeat = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  story.ensureMayor();
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'townhall')) {
+    window.G.buildings.push({ type: 'townhall', x: 30, y: 30, hp: 100, maxHp: 100, workers: [] });
+  }
+  delete window.G.storyFlags.firstTownHall;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.firstTownHall === true;
+  // Find the townhall beat in chronicle
+  const entry = window.G.chronicle.find(e => e.text?.startsWith('The town hall opens'));
+  return { fired, text: entry?.text?.slice(0, 80), tag: entry?.tag };
+});
+rec('244: firstTownHall fires + uses function-text + mayor reference', townhallBeat.fired && /[A-Z]\w+ sits at the long table/.test(townhallBeat.text || ''), `text="${townhallBeat.text?.slice(0, 60)}…" tag=${townhallBeat.tag}`);
+
 // Test 15: 243 townhall mayor-gated unlock
 const townhallGate = await page.evaluate(async () => {
   const tech = await import('./js/tech.js');

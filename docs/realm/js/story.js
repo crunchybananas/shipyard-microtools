@@ -256,6 +256,20 @@ const BUILDING_FIRST_BEATS = [
   { type: 'tavern',      flag: 'firstTavern',      text: 'The tavern opens its doors. Laughter carries into the night.', after: ensureMayor },
   { type: 'barracks',    flag: 'firstBarracks',    text: 'The barracks is built. Recruits drill at dawn.',               after: ensureRival },
   { type: 'church',      flag: 'firstChurch',      text: 'Bells toll from the new church. The faithful gather.',         after: ensureBard },
+  // Loop 244 (the-fixer, 243 filed): first-townhall beat. Civic-formal
+  // register, contrasts with tavern's "laughter" / church's "bells" /
+  // barracks' "drill at dawn" — the realm's earlier institutional beats
+  // are sensory; townhall's is procedural ("door is locked at dusk for
+  // the first time"). Mayor is already named when townhall can be
+  // built (per 243 isBuildingUnlocked gate); refer to mayor by name to
+  // close the loop between the structural-unlock and the chronicle.
+  { type: 'townhall',    flag: 'firstTownHall',
+    text: G => {
+      const m = G.namedCharacters?.mayor;
+      return m
+        ? `The town hall opens. ${m.name} sits at the long table for the first time; the door is locked at dusk for the first time. The realm has minutes that will outlast it.`
+        : 'The town hall opens. The door is locked at dusk for the first time. The realm has minutes that will outlast it.';
+    } },
 ];
 
 // Loop 090 (refactor-only, closes 062 filed 28 ticks): state-triggered
@@ -869,7 +883,12 @@ export function checkStoryBeats() {
   for (const beat of BUILDING_FIRST_BEATS) {
     if (!hasFlag(beat.flag) && G.buildings.some(b => b.type === beat.type)) {
       setFlag(beat.flag);
-      chronicle(beat.text, 'milestone');
+      // Loop 244: text may be a string OR a function (G)→string,
+      // mirroring NARRATIVE_BEATS dispatch (story.js:910). Lets
+      // first-build beats reference dynamic state like the named
+      // mayor at townhall (see 244 entry).
+      const text = typeof beat.text === 'function' ? beat.text(G) : beat.text;
+      chronicle(text, 'milestone');
       if (beat.after) beat.after();
     }
   }
