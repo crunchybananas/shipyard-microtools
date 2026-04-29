@@ -179,6 +179,24 @@ const mayorFire = await page.evaluate(async () => {
 });
 rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
 
+// Test: 258 — townhall maxCount:1 enforced via isBuildingUnlocked
+const townhallMaxCount = await page.evaluate(async () => {
+  const tech = await import('./js/tech.js');
+  const story = await import('./js/story.js');
+  // Ensure mayor exists so the gate's primary check passes
+  story.ensureMayor('Auditor');
+  // Reset any townhalls
+  window.G.buildings = (window.G.buildings || []).filter(b => b.type !== 'townhall');
+  const unlockedNoCount = tech.isBuildingUnlocked('townhall');
+  // Place one townhall; gate should now refuse a second
+  window.G.buildings.push({ type: 'townhall', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  const unlockedAtCap = tech.isBuildingUnlocked('townhall');
+  // Clean up so the 243 mayor-gate test that runs later sees clean state
+  window.G.buildings = window.G.buildings.filter(b => b.type !== 'townhall');
+  return { unlockedNoCount, unlockedAtCap };
+});
+rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
+
 // Test: 254 nights_blur_known — habituation-recognition (year2 + autumn|winter)
 const nightsBlurFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
@@ -283,6 +301,8 @@ rec('244: firstTownHall fires + uses function-text + mayor reference', townhallB
 const townhallGate = await page.evaluate(async () => {
   const tech = await import('./js/tech.js');
   const story = await import('./js/story.js');
+  // 258: ensure no townhall exists so maxCount:1 doesn't shadow the mayor-gate semantics
+  window.G.buildings = (window.G.buildings || []).filter(b => b.type !== 'townhall');
   // Without mayor: locked
   delete window.G.namedCharacters?.mayor;
   const lockedNoMayor = !tech.isBuildingUnlocked('townhall');

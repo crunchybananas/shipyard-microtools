@@ -2,7 +2,7 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js';
+import { G, BUILDINGS } from './state.js';
 import { playSound } from './audio.js';
 import { chronicle } from './story.js';
 
@@ -135,6 +135,15 @@ export function isTechResearched(techId) {
 
 export function isBuildingUnlocked(buildingType) {
   if (FREE_BUILDINGS.includes(buildingType)) return true;
+  // Loop 258 (the-fixer, 256 MEDIUM finding): maxCount enforcement.
+  // When BUILDINGS[type].maxCount is set, the build option hides once the
+  // realm reaches the cap. First use: townhall maxCount:1 (state.js:77).
+  // Generic check so future capped buildings work the same way.
+  const def = BUILDINGS[buildingType];
+  if (def && def.maxCount != null) {
+    const built = G.buildings ? G.buildings.filter(b => b.type === buildingType).length : 0;
+    if (built >= def.maxCount) return false;
+  }
   // Loop 243: townhall is gated on a NAMED MAYOR (set by tavern-build per
   // 034 hook), not a tech. Mayor-as-prerequisite is the 6th and last
   // named-character mechanic per 101 filing.

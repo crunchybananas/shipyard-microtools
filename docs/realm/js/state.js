@@ -72,9 +72,15 @@ export const BUILDINGS = {
   // radius 6 + pop +5 — civic governance brings stability + housing
   // capacity. Cost mirrors mid-tier civic buildings (church 30 stone +
   // 15 gold; townhall is stone-heavier as governance is durable).
-  // Rendered via drawGeneric fallback (no canvas drawX or SVG sprite yet
-  // — could ship in a future Phase E if appetite).
-  townhall:  { name:'Town Hall',   icon:'🏛️', cost:{stone:40,wood:30,gold:20}, happiness:8, radius:6, pop:5, desc:'Civic governance — boosts realm happiness + housing. Requires a named mayor.' },
+  // Loop 255: SVG sprite shipped (Phase E — 12-of-12 roster).
+  // Loop 258 (the-fixer, 256 MEDIUM finding): maxCount:1 — townhall is a
+  // ONE-SHOT structural unlock per realm. Narrative-coherence rationale:
+  // 244 BUILDING_FIRST_BEATS + 253 mayor_first_in_hall both presume a
+  // SINGULAR town hall ("the long window," "the long table"); multiple
+  // townhalls break the named-character-gate framing. Real-world towns
+  // also have one civic seat. First use of the maxCount schema field;
+  // tech.js isBuildingUnlocked enforces it generically.
+  townhall:  { name:'Town Hall',   icon:'🏛️', cost:{stone:40,wood:30,gold:20}, happiness:8, radius:6, pop:5, maxCount:1, desc:'Civic governance — boosts realm happiness + housing. Requires a named mayor. One per realm.' },
 };
 
 // ── Mutable game state (single source of truth) ───────────
