@@ -610,6 +610,28 @@ const NARRATIVE_BEATS = [
       const m = G.namedCharacters.mayor;
       return `There is a morning when ${m.name} unlocks the town hall before the realm is awake and stands at the long window watching the day arrive. The first carts are not yet on the road. The first chimneys are not yet smoking. The realm will be busy soon; for now ${m.name} is the only person in it.`;
     } },
+  // Loop 254 (surprise, un-filed, alternation after 7-tick narrative
+  // streak): NEW SUB-TYPE habituation-recognition — the realm
+  // recognizing its own habits as a second-order observation.
+  // Distinct from sustained-state-recognition (which observes a
+  // continuous external condition like peace/no-deaths/full-pop)
+  // and from land-as-agent (which gives objects/land subjective
+  // agency). Habituation-recognition is the realm noticing its own
+  // *threshold of accumulated experience* — it has lived enough
+  // nights for them to form a textured memory where some are
+  // remembered separately and the rest blur. The lift line "the
+  // fire is set without thinking now" — automaticity is the proof
+  // of habituation. 9th sub-type of the observational-elder cluster
+  // (1 use, threshold 3+; per 231 contrarian stays observed-pattern,
+  // not invariant). Year-2 + autumn/winter gate (the realm needs to
+  // have lived enough nights for the prose to land — autumn/winter
+  // is when the night-falling-differently observation triggers).
+  // Universal static prose — every realm experiences this. Tag misc.
+  // Per 203 positive authoring rule: surprises by introducing a NEW
+  // sub-type rather than reusing existing ones.
+  { flag: 'nights_blur_known', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && (G.season === 'autumn' || G.season === 'winter'),
+    text: 'There is a season when night falls differently — not later or earlier, but with more weight. The realm has lived enough nights that some are remembered separately and the rest blur into one long evening. The fire is set without thinking now.' },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

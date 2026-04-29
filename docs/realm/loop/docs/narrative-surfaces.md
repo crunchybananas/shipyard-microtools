@@ -897,6 +897,22 @@ prescriptive AND consistently applied.
     chronicle witnesses what the realm-as-
     collective doesn't. 1 use; filed for
     promotion at 3+.
+  - *Habituation-recognition* (254): the realm
+    recognizes its own *threshold of accumulated
+    experience* — second-order observation that
+    enough nights/seasons/repetitions have
+    accumulated to form textured memory.
+    Distinct from sustained-state-recognition
+    (which observes a continuous external
+    condition crossing a temporal gate);
+    habituation-recognition observes the realm's
+    own automaticity as proof of having lived
+    through enough. 254 nights_blur_known: "the
+    realm has lived enough nights that some are
+    remembered separately and the rest blur
+    into one long evening. The fire is set
+    without thinking now." 1 use; filed for
+    promotion at 3+.
 
   **Authoring guidance (when adding to cluster):**
   - Pick a sub-type that reads as fresh angle,

@@ -179,6 +179,19 @@ const mayorFire = await page.evaluate(async () => {
 });
 rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
 
+// Test: 254 nights_blur_known — habituation-recognition (year2 + autumn|winter)
+const nightsBlurFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.season = 'autumn';
+  delete window.G.storyFlags.nights_blur_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.nights_blur_known === true;
+  const lastEntry = window.G.chronicle.at(-1);
+  return { fired, text: lastEntry?.text?.slice(0, 60), tag: lastEntry?.tag };
+});
+rec('254: nights_blur_known fires year2 + autumn', nightsBlurFire.fired, `text="${nightsBlurFire.text}…" tag=${nightsBlurFire.tag}`);
+
 // Test 21: 252 rival_banner_distant — rival + year3 + autumn/winter
 const rivalFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
