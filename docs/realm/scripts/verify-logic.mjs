@@ -385,6 +385,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 296 realm_laughs_known — collective-ease (2nd OUTSIDE-cluster register)
+const realmLaughsFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.happiness = 80;
+  delete window.G.storyFlags.realm_laughs_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.realm_laughs_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There comes an evening when the realm laughs'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('296: realm_laughs_known fires year2 + happiness > 65', realmLaughsFire.fired, `text="${realmLaughsFire.text}…" tag=${realmLaughsFire.tag}`);
+
 // Test: 294 church_step_worn_known — reshaped-by-use (5th land-as-agent shape)
 const stepWornFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

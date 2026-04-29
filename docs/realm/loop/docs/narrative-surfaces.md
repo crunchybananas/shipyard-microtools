@@ -1146,18 +1146,24 @@ prescriptive AND consistently applied.
     elder; this register is META, paradoxical,
     self-referential. 263 chronicle_self_known:
     "The chronicle has grown longer than any
-    citizen's memory. Some of its days are
-    stories the realm has forgotten how to
-    tell." Gate: chronicle.length ≥ 100 (long-
-    lived realms only). **NOT a 10th cluster
-    sub-type** — explicitly recorded outside
-    the cluster per 257 anti-completionist
-    discipline. First self-reference in the
-    corpus; the chronicle has never before
-    been a subject of a beat. If a 2nd use of
-    this register ships, document it here AS
-    ITS OWN observation, not as a cluster
-    sub-type.
+    citizen's memory." Gate: chronicle.length ≥
+    100. NOT a cluster sub-type per 257
+    discipline.
+  - *Collective-ease* (296): a beat in
+    DYNAMIC-JOYFUL register — the realm laughs,
+    not observes. Different from 263's META and
+    different from cluster's contemplative
+    declarative-present-tense. 296 realm_laughs_
+    known: "There comes an evening when the
+    realm laughs. Not at anything in particular
+    — just laughs, here and there, the way a
+    settled place laughs when it doesn't have
+    to pay attention to itself." Gate: year2 +
+    happiness > 65 (sustained contentment).
+    First JOYFUL register beat in the corpus.
+    Each OUTSIDE beat documents its own
+    register; future OUTSIDE beats add their
+    own without becoming sub-types.
 
   **Authoring guidance (when adding to cluster):**
 

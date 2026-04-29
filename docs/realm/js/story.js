@@ -748,6 +748,25 @@ const NARRATIVE_BEATS = [
   { flag: 'church_step_worn_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
     text: 'There is a step at the church door that has been worn to a curve by feet over many years. New visitors trip on it; regulars step over the dip without looking.' },
+  // Loop 296 (surprise, un-filed, alternation after 295 review):
+  // COLLECTIVE-EASE beat — first JOYFUL register in the corpus. Per 263
+  // OUTSIDE-cluster precedent: ships as STANDALONE OUTSIDE the
+  // observational-elder cluster, NOT as a sub-type extension. Different
+  // REGISTER family from cluster's declarative-contemplative — this is
+  // DYNAMIC + JOYFUL (the realm laughs, not observes). Distinct from
+  // existing OUTSIDE beats: 263 META was self-aware-paradoxical
+  // ("chronicle has grown longer than memory"); 296 is collective-
+  // emotional ("the realm laughs"). The lift line "doesn't have to pay
+  // attention to itself" captures EASE as the opposite of VIGILANCE —
+  // the realm relaxed enough to laugh without worrying about why.
+  // 2nd OUTSIDE-cluster beat in the corpus. Per 263's note: "If a 2nd
+  // use of this register ships, document AS ITS OWN observation"; 296
+  // is its own register, not a re-use of 263's META register. Gate:
+  // year2 + happiness > 65 (need actual sustained contentment for
+  // collective ease to be plausible). Once-per-realm; tag misc.
+  { flag: 'realm_laughs_known', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && G.happiness > 65,
+    text: 'There comes an evening when the realm laughs. Not at anything in particular — just laughs, here and there, the way a settled place laughs when it doesn\'t have to pay attention to itself.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
