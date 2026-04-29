@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -109,10 +109,13 @@ application). 189/191 shipped type-scale phase 5
 + 6 (CSS hygiene; **130 HIGH closes** after 6
 phases / 42 migrations / 61 ticks; non-narrative).
 **190 (surprise, post-moratorium)** added
-`constellation_forgotten` — **second use** of the
-object-arc closure template (188 invariant).
-2-beat cycle (116 named → 190 forgotten) vs
-stone's 4-beat; template tolerates either. **192
+`constellation_forgotten` — a 2-beat closure (116
+named → 190 forgotten). 188 originally framed
+this as "second use of object-arc closure
+template"; **202 contrarian** rejected the
+template framing (stone's 4-beat and constellation's
+2-beat are different shapes); **203** demoted to
+observed pattern (see `## observed patterns`). **192
 (the-fixer)** closed 103-filed `G.realmEnded`
 flag via the **second use** of the 144 `after:`
 schema (after 134 namesake's citizen-rename) —
@@ -248,12 +251,15 @@ Numbered in rough order of file:
      weathering is per-kingdom.
    - 1 constellation-forgetting beat (190, un-filed surprise):
      once-per-realm when `year3 && day ≥ 85 &&
-     constellation_named && citizensBorn ≥ 10`. **SECOND USE of
-     188 object-arc closure template** (stone was first at 184).
+     constellation_named && citizensBorn ≥ 10`.
      **Closes the constellation arc as a 2-beat cycle** (116
-     named → 190 forgotten) vs stone's 4-beat — template
-     tolerates either; only requires the object earned its
-     closure. Tag: milestone (matches 116's anchor). Static
+     named → 190 forgotten). Originally framed at 190 as
+     "second use of 188 object-arc closure template"; 202
+     contrarian rejected that framing — stone's 4-beat and
+     constellation's 2-beat are different shapes — and 203
+     demoted the template to observed-pattern (see
+     `## observed patterns`). Tag: milestone (matches 116's
+     anchor). Static
      prose: "Years pass, and the constellation the realm named
      goes back to being just stars. No one corrects the
      youngest when they call them by other names, or by no
@@ -609,27 +615,104 @@ should respect:
   3+ entries would need them (`onFire` had 3+ audio needs at
   123; `after` had 1 at 144 — justified because 144's need was
   a legitimate side effect, not a post-hoc generalization).
-- **Object-arc closure template (184).** Long-lived focal
-  objects (the stone, the constellation, the wanderer, the
-  great-storm-memory) can support a 4-beat NARRATIVE arc
-  shape: **discovery → use → weathering/aging → forgetting**.
-  The standing-stone is the canonical example:
-  - 056 discovery (a-scene-that-happens-once)
-  - 079 use (cross-system gated ritual)
-  - 122 weathering (per-kingdom variants of erosion/aging)
-  - 184 forgetting (universal generational-gap closure)
-  Future long-lived object arcs may follow the template but
-  shouldn't force it — only when the object has earned its
-  fourth beat (i.e., the realm has lived long enough that
-  forgetting is plausible). Year-3+ gating is appropriate;
-  citizensBorn ≥ 10 ensures intergenerational turnover. The
-  forgetting-beat tags `misc` or the focal-object's existing
-  tag (stone/event/etc); reuses 075 invariant. Static prose
-  is preferred for closure (forgetting is universal); per-
-  kingdom variants reserved for the WEATHERING beat where
-  variation reads as different conditions of the same object.
-  **Filed**: constellation 116 + wanderer 048/148 + great-
-  storm 147 are candidates for forgetting beats at year 4-5+.
+## observed patterns
+
+Distinct from invariants. Observations describe
+what the realm has done; invariants prescribe
+what the realm must do. Patterns in this section
+have NOT yet been promoted (typically: <3
+canonical uses or unresolved structural questions).
+Promote to invariants only when the rule is
+prescriptive AND consistently applied.
+
+- **Object-arc closure (observation, not template).**
+  Some long-lived focal objects have closed via a
+  forgetting beat. These closures take **different
+  shapes** depending on the object's earlier
+  presence:
+  - **Stone — 4 beats** (056 discovery / 079 use
+    / 122 weathering / 184 forgetting). Each
+    middle beat does load-bearing work: 079 makes
+    the stone ritual; 122 makes the stone aged.
+  - **Constellation — 2 beats** (116 named / 190
+    forgotten). No use-beat or weathering-beat;
+    the closure compresses straight from naming
+    to forgetting.
+  Calling these the same shape obscures the
+  difference. Stone's middle beats give its
+  closure weight the constellation's doesn't have.
+  This passage previously claimed (188 invariant)
+  these were "uses of the same template"; **202
+  contrarian** rejected that framing. Demoted
+  here as an OBSERVATION about what the realm has
+  done — not a prescription for future arcs.
+
+  **Authoring rule (positive):** *closure beats
+  should surprise the realm, not satisfy a
+  pattern.* If a forgetting beat reads as
+  template-completion, reject it. Long-lived
+  objects (wanderer 048/148, great-storm 147,
+  night-shape 152, frost 174, long-evening 196,
+  cold-morning 199) are NOT obligated to close.
+  They may stay open as 1- or 2-beat observations
+  indefinitely. Closure should land because the
+  prose deserves to land.
+
+  **Year-3+ gating + citizensBorn ≥ 10** remain
+  appropriate WHEN closure is being authored:
+  the realm needs to have lived long enough that
+  forgetting is plausible. Static prose is
+  preferred for closure (forgetting is universal);
+  kingdom-hashed variants reserve for weathering
+  beats where variation reads as different
+  conditions of the same object. These remain
+  good guidance, not enforcement.
+
+  **History note:** the 184 stone-forgotten beat
+  was authored without 188-template foresight.
+  188 codified the shape post-hoc and promoted
+  to "invariant" at 1 use; 202 contrarian flagged
+  the inconsistent threshold (other patterns —
+  `after:` schema, source-specific echo, same-day
+  beat-pair, additive-baseline mechanics — are
+  filed at 3+ promotion threshold). 203 demoted
+  to this section.
+
+- **Same-day beat-pair pattern (observation, 1 use).**
+  Two NARRATIVE_BEATS entries gated to the same
+  day (199 first_cold_morning + 116
+  constellation_named both at `autumn && day ≥
+  15`). Table-iteration order = chronicle order;
+  morning-beat fires first, evening-beat second.
+  Filed at 199 with promotion threshold 3+;
+  currently 1 use. If 2+ more emerge, promote
+  to invariant.
+
+- **Additive-baseline vs multiplicative-bonus
+  for named-character mechanics (observation,
+  1+3 uses).** Multiplicative when the character
+  amplifies an existing system (101 teacher ×
+  research speed, 102 merchant × trade margin,
+  105+153 smith × tower fire-rate). Additive
+  when the character contributes baseline
+  character (201 bard +5 happiness — flat,
+  independent of buildings). Filed at 201 with
+  promotion threshold 3+ for the additive
+  variant; currently 1 use. If 2+ more additive
+  cases emerge (a hypothetical poet wisdom, a
+  diplomat reputation), promote.
+
+- **Source-specific echo branch (observation,
+  1 use).** 194 added a conditional fast-path
+  in `checkEchoBeat` for the 116 constellation
+  source (regex extracts kingdom-hashed shape;
+  surfaces tighter "Old folk still call them
+  ${shape}" frame). Default 4-frame pool
+  unchanged for 12 other milestone-tagged
+  beats. Filed for promotion at 3+; currently
+  1 use. When 3+ accrete, refactor to a
+  registry table (`_ECHO_SPECIAL_FRAMES` keyed
+  by source-prose-fingerprint) and promote.
 
 ## known gaps (as of 104)
 
@@ -1017,9 +1100,13 @@ shipping, touch this file too.
   HIGH closes** (42 migrations / 6 phases / 61 ticks).
   Non-narrative.
 - **190** — surprise. **constellation_forgotten** —
-  SECOND USE of object-arc closure template (188
-  invariant). 2-beat cycle (116 named → 190 forgotten)
-  vs stone's 4-beat. Tag: milestone (matches 116).
+  2-beat closure (116 named → 190 forgotten) for the
+  constellation arc. Originally framed as "second use
+  of 188 object-arc closure template"; 202 contrarian
+  rejected that framing (stone's 4-beat and
+  constellation's 2-beat are different shapes); 203
+  demoted to observed-pattern. Tag: milestone (matches
+  116).
 - **192** — the-fixer. Closes 103 filed (89 ticks):
   `realm_fell` entry gains `after: G => { G.realmEnded
   = true; }`. **Second use of after: schema** (134
@@ -1049,18 +1136,46 @@ shipping, touch this file too.
   (explicit field OR fallback derive from
   storyFlags.realm_fell). Backward-compatible.
 - **188** — the-archivist. Caught the doc up to 184
-  + added the **object-arc closure template
-  invariant**: long-lived focal objects can support
-  a 4-beat NARRATIVE arc shape (discovery → use →
-  weathering → forgetting); the stone arc is the
-  canonical example; constellation/wanderer/great-
-  storm filed as candidates for forgetting beats at
-  year 4-5+.
-- **198 (this update)** — the-archivist. Catches
-  the doc up to 190/193/196 + 192's after-callback
-  + 194's source-specific echo branch in
-  checkEchoBeat. NARRATIVE_BEATS 28 → 31. Cadence
-  ~145-186 → ~147-188 (+3 conditional beats from
-  190/193/196). Notes 195 skeptic flag was
-  partially addressed by 196 (year-1 summer beat);
-  one more early-game beat filed for future tick.
+  + added the object-arc closure passage (originally
+  promoted to "invariant"; 203 demoted to observed-
+  pattern per 202 contrarian).
+- **198** — the-archivist. Catches the doc up to
+  190/193/196 + 192's after-callback + 194's source-
+  specific echo branch in checkEchoBeat.
+  NARRATIVE_BEATS 28 → 31. Cadence ~145-186 → ~147-188.
+  195 skeptic flag partially addressed by 196.
+- **199** — surprise. **first_cold_morning** —
+  second early-game beat per 196 filed. Year-1 autumn
+  day ≥ 15; placed BEFORE constellation_named in
+  table order (chronicle reads cold-morning →
+  star-evening on the seam day). Novel **same-day
+  beat-pair** filed as candidate observed-pattern (1
+  use; promote at 3+). NARRATIVE_BEATS 32.
+- **200** — the-future-you. Century-mark milestone
+  letter (4th: 020 → 050 → 100 → 200). Scored 100's
+  hopes/fears; named 5 surprises 100 couldn't predict;
+  hopes for 250+. Pure journal.
+- **201** — the-fixer. Closes 101 filed (100 ticks):
+  bard +5 happiness baseline. **Additive baseline
+  pattern** as sibling to multiplicative `*Mult`
+  (filed as observed-pattern; 1 use; promote at 3+).
+  5 of 6 named-cast now have mechanics.
+- **202** — the-contrarian. 6-point case against 188
+  object-arc closure invariant (4→2 beat compression
+  is doctrine collapse; retroactive pattern recognition;
+  inconsistent 3+ promotion threshold; "earned closure"
+  unfalsifiable; doctrine silent about un-closed
+  objects; closure-pressure not authorship-discipline).
+  Recommendation: demote to observed-pattern.
+- **203 (this update)** — the-fixer. Ships 202's
+  mutation: 188 invariant moved out of `## invariants`
+  into new `## observed patterns` section; reframed as
+  descriptive not prescriptive; "earned closure"
+  replaced with positive authoring rule "*closure beats
+  should surprise the realm, not satisfy a pattern.*"
+  Same-day beat-pair (199), additive-baseline (201),
+  and source-specific echo (194) added to the new
+  section as 1-use observations (consistent 3+
+  promotion threshold). All references to "188
+  invariant" / "second use of template" updated through
+  the doc.
