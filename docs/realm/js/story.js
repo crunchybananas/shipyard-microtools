@@ -767,6 +767,26 @@ const NARRATIVE_BEATS = [
   { flag: 'realm_laughs_known', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.happiness > 65,
     text: 'There comes an evening when the realm laughs. Not at anything in particular — just laughs, here and there, the way a settled place laughs when it doesn\'t have to pay attention to itself.' },
+  // Loop 297 (surprise, un-filed, 3 ticks pre-300): WONDER beat. 3rd
+  // OUTSIDE-cluster beat after 263 META + 296 COLLECTIVE-EASE. Per 296
+  // [code] filing + 296 OUTSIDE-cluster pattern: ships OUTSIDE with own
+  // register. NEW REGISTER: CURIOUS-WITHOUT-RESOLVING — the realm
+  // acknowledges mystery and chooses to remain in it. Different from
+  // 263 META (chronicle as self-aware object) and 296 JOYFUL (collective
+  // ease/laughter); WONDER is attention-without-conclusion. The lift
+  // line "pretends not to listen, then listens anyway" captures social
+  // fiction (realm has cultural rules about what to acknowledge) +
+  // helpless curiosity (yet listens despite the rule). Self-deception
+  // as cultural form. **3 OUTSIDE-cluster beats now** (263/296/297) —
+  // 231 invariant-promotion threshold MET; OUTSIDE-cluster pattern
+  // could be promoted at 300 milestone-letter or next archivist.
+  // Pattern statement: each OUTSIDE beat documents its own register;
+  // multiple OUTSIDE beats coexist as separate observations. Gate:
+  // year2 (settled enough for attention drift). Once-per-realm; tag
+  // misc.
+  { flag: 'unplaceable_sound_known', tag: 'misc',
+    trigger: G => G.storyFlags.year2,
+    text: 'There is sometimes a sound the realm cannot place — a creak, a far-off bell, a piece of song from across the water. The realm pretends not to listen, then listens anyway.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

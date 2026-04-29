@@ -1149,21 +1149,36 @@ prescriptive AND consistently applied.
     citizen's memory." Gate: chronicle.length ≥
     100. NOT a cluster sub-type per 257
     discipline.
-  - *Collective-ease* (296): a beat in
-    DYNAMIC-JOYFUL register — the realm laughs,
-    not observes. Different from 263's META and
-    different from cluster's contemplative
-    declarative-present-tense. 296 realm_laughs_
-    known: "There comes an evening when the
-    realm laughs. Not at anything in particular
-    — just laughs, here and there, the way a
-    settled place laughs when it doesn't have
-    to pay attention to itself." Gate: year2 +
-    happiness > 65 (sustained contentment).
-    First JOYFUL register beat in the corpus.
-    Each OUTSIDE beat documents its own
-    register; future OUTSIDE beats add their
-    own without becoming sub-types.
+  - *Collective-ease* (296): DYNAMIC-JOYFUL
+    register — the realm laughs, not observes.
+    "the way a settled place laughs when it
+    doesn't have to pay attention to itself."
+    Gate: year2 + happiness > 65. First JOYFUL
+    register.
+  - *Wonder* (297): CURIOUS-WITHOUT-RESOLVING
+    register — the realm acknowledges mystery
+    and chooses to remain in it. "There is
+    sometimes a sound the realm cannot place...
+    the realm pretends not to listen, then
+    listens anyway." Self-deception as
+    cultural form. Gate: year2.
+
+  **3 OUTSIDE beats now (263/296/297) meets
+  231 threshold**. Each documents its own
+  register; multiple OUTSIDE beats coexist
+  as separate observations rather than as a
+  combined sub-type. Pattern is RIPE for
+  invariant-promotion review at 300 milestone-
+  letter or next archivist:
+
+    "When a beat's prose surprises with a
+    register family the cluster does NOT
+    accommodate (META / JOYFUL / WONDER /
+    etc.), ship OUTSIDE the cluster with its
+    own register annotation. Each OUTSIDE
+    register is documented as its own
+    observation; OUTSIDE beats DO NOT
+    consolidate into a 'meta-cluster.'"
 
   **Authoring guidance (when adding to cluster):**
 
