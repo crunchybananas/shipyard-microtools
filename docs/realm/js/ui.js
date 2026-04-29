@@ -158,6 +158,21 @@ export function updateUI() {
     const urgent = raidDays <= 2;
     raidWarn = ` · <span class="${urgent ? 'raid-warn-urgent' : 'raid-warn'}">⚔️${raidDays}d</span>`;
   }
+  // Loop 233 (HUD sustained-state display per 211/228/230 filings):
+  // when no raid is imminent and the realm has earned a peaceful
+  // streak, show ☮️ Nd. Threshold 20 days avoids flicker. Same shape
+  // for ‍🕯️ days-since-last-death (threshold 30) — earned via at
+  // least one prior raid/death so brand-new realms don't trigger
+  // either indicator. Hidden in photo-mode via existing #hud rule.
+  let streakHTML = '';
+  if (!raidDays && G.stats?.raidsSurvived >= 1 && G.lastRaidDay !== undefined) {
+    const peaceD = G.day - G.lastRaidDay;
+    if (peaceD >= 20) streakHTML += ` · <span title="Days since last raid" style="color:#9bcfa9">☮️${peaceD}d</span>`;
+  }
+  if (G.stats?.citizensDied >= 1 && G.lastDeathDay !== undefined) {
+    const lifeD = G.day - G.lastDeathDay;
+    if (lifeD >= 30) streakHTML += ` · <span title="Days since last death" style="color:#bdb09a">🕯️${lifeD}d</span>`;
+  }
   const weatherEmoji = G.weather === 'rain' ? ' 🌧️' : G.weather === 'snow' ? ' ❄️' : '';
   const year = Math.floor((G.day - 1) / 28) + 1;
   const dayInYear = ((G.day - 1) % 28) + 1;
@@ -165,7 +180,7 @@ export function updateUI() {
   // Thresholds slightly below the display boundaries so a displayed "50%" shows
   // the 🙂 face (G.happiness often sits at 49.x but rounds to 50% — felt inconsistent)
   const happyEmoji = happyPct >= 70 ? '😊' : happyPct >= 45 ? '🙂' : happyPct >= 20 ? '😐' : '😟';
-  $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · ${season.name} ${weatherEmoji}· <span title="Settler happiness — affects tax income and population growth">${happyEmoji} ${happyPct}%</span>${raidWarn} ${diffLabel}`;
+  $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · ${season.name} ${weatherEmoji}· <span title="Settler happiness — affects tax income and population growth">${happyEmoji} ${happyPct}%</span>${raidWarn}${streakHTML} ${diffLabel}`;
   const kd = $('kingdom-display');
   if (kd) kd.textContent = G.kingdomName ? `👑 ${G.kingdomName}` : '';
 

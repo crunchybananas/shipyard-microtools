@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 233 [code] — full-pop streak indicator (👥 Nd) — defer until threshold tuning validates against actual play (population oscillation patterns; could flicker). [ui.js]
+- 233 [doc] — evocative tooltips for streak indicators: "the bell has hung silent for N evenings" (peace ☮️), "no funeral cortege for N days" (life 🕯️). Pairs with 211/228 prose registers. [ui.js]
+- 233 [code] — animate streak icons at notable thresholds (50/100/200d): pulse, brighten, or emoji-shift. ~10 LoC CSS keyframes. [ui.js + index.html]
 - 232 [doc] — chronology section (`## related loop references`) hasn't updated since 226. 7 ticks since (227-232). Worth catch-up at next archivist (~236 per 12-tick rhythm). [loop/docs/]
 - 232 [process] — contrarian→fixer pattern now at 6+ pairs (011→012 / 154→155+156 / 195→196 / 202→203 / 204→205 / 213→214 / 231→232). Filed at 205 with 5-pair threshold for promotion; now exceeded. Promote to observed-pattern or discipline invariant. [loop/docs/]
 - 231 [doc] **PRIORITY** — narrative-surfaces.md edits per 231 contrarian: (1) add note to observational-elder cluster entry that sub-types stay sub-types despite 3+ threshold met; (2) update land-as-agent + sustained-state-recognition sub-type entries to mark "threshold met, intentionally not promoted"; (3) clarify 3+ rule articulation that thresholds TRIGGER REVIEW not automatic promotion. ~10-15 LoC. Ship as 232 fixer mirror of 202→203. [loop/docs/]
