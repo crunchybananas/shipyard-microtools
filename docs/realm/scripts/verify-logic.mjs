@@ -405,6 +405,20 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 318 empty_seat_known — TRIPLE-AXIS (6th OUTSIDE GRIEF + 6th STRUCTURAL FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS angle)
+const emptySeatFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.stats = window.G.stats || {};
+  window.G.stats.citizensDied = 2;
+  delete window.G.storyFlags.empty_seat_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.empty_seat_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('An empty seat'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('318: empty_seat_known fires year3 + citizensDied>=2', emptySeatFire.fired, `text="${emptySeatFire.text}…" tag=${emptySeatFire.tag}`);
+
 // Test: 314 morning_dread_known — TRIPLE-AXIS (5th OUTSIDE TERROR + 5th STRUCTURAL NEGATION + DREAD-WITHOUT-CAUSE angle)
 const dreadFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

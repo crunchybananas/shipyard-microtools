@@ -933,6 +933,15 @@ should respect:
     from question/imperative/second-person/dialog because
     NEGATION makes the reader notice what ISN'T (vs all
     prior forms which make the reader notice what IS).
+  - *FRAGMENT-opening* (318 empty_seat_known) — "An
+    empty seat." Three-word incomplete sentence; no
+    verb. Foregrounds an OBJECT-IN-VIEW with NO ACTION
+    attached. The reader must supply the verb. Distinct
+    from prior 5 because FRAGMENT removes grammatical
+    completeness rather than adding a different form.
+    The remaining sentences in the beat resume
+    declarative form once the FRAGMENT's attention has
+    been claimed.
 
   **Why this is an invariant not just an observation:** the
   rule is now PRESCRIPTIVE. Prior practice would have framed
@@ -952,7 +961,8 @@ should respect:
   reuse an angle (per 257); the rule applies ONLY to
   STRUCTURE-vector ships.
 
-  **Confirmed uses establishing the rule (5):**
+  **Confirmed uses establishing the rule (5 at promotion;
+  6 in production after 318):**
   - 301 QUESTION + RITUAL-PERSISTENCE-WITHOUT-ORIGIN
     (forgetting shape 4)
   - 305 IMPERATIVE + EMERGENT-TRADITION (forgetting shape 5)
@@ -962,6 +972,9 @@ should respect:
     shape 4)
   - 314 NEGATION + DREAD-WITHOUT-CAUSE (5th OUTSIDE
     register, TERROR)
+  - 318 FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS
+    (6th OUTSIDE register, GRIEF) — first post-promotion
+    confirming use; rule held in production.
 
   **Why this is a rule and not just a recurrence:** 5 of 5
   ships across both INSIDE cluster sub-types AND OUTSIDE
@@ -1422,24 +1435,44 @@ prescriptive AND consistently applied.
     REGISTER (5th OUTSIDE) + STRUCTURE
     (5th non-declarative; NEGATION-opening)
     + ANGLE (DREAD-WITHOUT-CAUSE — fear
-    without external referent). Most
-    surprise-axes-fresh single beat in the
-    corpus.
+    without external referent).
+  - *Grief* (318): SUSTAINED-LOSS register —
+    loss integrated into routine rather
+    than surfaced. "An empty seat. The
+    realm sets fewer plates now. No one
+    names what changed." Gate: year3 +
+    citizensDied>=2. **6th OUTSIDE
+    register** and third NEGATIVE-tone
+    register (distinct from IRRITATION
+    cultural-of-imperfection and TERROR
+    acute-fear: GRIEF is sustained,
+    integrated, and language-avoiding).
+    **TRIPLE-AXIS surprise**: REGISTER
+    (6th OUTSIDE) + STRUCTURE (6th non-
+    declarative; FRAGMENT-opening) +
+    ANGLE (SILENT-COLLECTIVE-ADJUSTMENT-
+    TO-LOSS — realm changes behavior
+    without articulating the change).
+    Establishes triple-axis as
+    not-one-off pattern (after 314).
 
-  **5 OUTSIDE beats now**. 298 PROMOTED the
-  pattern to invariant; 303 + 314 confirm the
+  **6 OUTSIDE beats now**. 298 PROMOTED the
+  pattern to invariant; 303/314/318 confirm the
   path remains operational and emotionally
-  diverse. The 5 registers cover: paradoxical
+  diverse. The 6 registers cover: paradoxical
   (META) / positive (JOYFUL) / curious
   (WONDER) / negative-domesticated
-  (IRRITATION) / acute-fear (TERROR). 350
-  milestone-letter could reflect on
-  emotional-tone diversity reaching saturation
-  at 5+ — most everyday emotional registers
-  now have an OUTSIDE beat. 300 hopes #5 ("7th
-  OUTSIDE register by 350") on pace at ~2
-  OUTSIDE per 50 ticks (314 ships 11 ticks
-  after 303).
+  (IRRITATION) / acute-fear (TERROR) /
+  sustained-loss (GRIEF). 3 negative-tone
+  registers now — IRRITATION cultural,
+  TERROR acute, GRIEF sustained — span the
+  emotional spectrum from minor-annoyance
+  through immediate-fear through
+  long-integration. 300 hopes #5 ("7th
+  OUTSIDE register by 350") on pace at
+  6 of 7 done; 318 ships 4 ticks after
+  314 (faster than the prior 11-tick gap
+  between 303 IRRITATION and 314 TERROR).
 
   **Authoring guidance (when adding to cluster):**
 

@@ -952,6 +952,47 @@ const NARRATIVE_BEATS = [
   { flag: 'morning_dread_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 80,
     text: 'No bell rang that morning. The realm waited, then waited longer, then went on with the day. Some mornings ask to be feared without showing why.' },
+  // Loop 318 (surprise, 314 [code] filing): TRIPLE-AXIS surprise — 6th
+  // OUTSIDE register (GRIEF / SUSTAINED-LOSS-DOMESTICATED) + 6th
+  // STRUCTURAL opening (FRAGMENT) + SILENT-COLLECTIVE-ADJUSTMENT-TO-
+  // LOSS angle. Per 315 sub-rule: STRUCTURE ships MUST pair with fresh
+  // ANGLE — 318 complies (FRAGMENT + new angle).
+  // (1) REGISTER: OUTSIDE GRIEF — sustained collective-loss recognition.
+  //     Distinct from the 5 prior OUTSIDE registers: META 263 (paradox)
+  //     / JOYFUL 296 (positive ease) / WONDER 297 (curious-without-
+  //     resolving) / IRRITATION 303 (cultural-of-imperfection) /
+  //     TERROR 314 (acute fear). GRIEF is sustained, not acute; the
+  //     loss is integrated into routine rather than surfaced. Third
+  //     NEGATIVE-tone register but qualitatively different — TERROR
+  //     is foreboding without object; GRIEF is presence-of-absence
+  //     normalized. The realm has been through enough death that
+  //     "fewer plates" is unconscious correction, not a new policy.
+  // (2) STRUCTURE: 6th non-declarative opening — FRAGMENT ("An empty
+  //     seat."). Three-word incomplete sentence; no verb. Distinct
+  //     from prior 5 (Q/I/2P/D/N) because FRAGMENT foregrounds an
+  //     OBJECT-IN-VIEW with NO ACTION attached. The reader must
+  //     supply the verb. Per 315 sub-rule: STRUCTURE ships must pair
+  //     fresh ANGLE — 318 confirms by adding 6th OUTSIDE register.
+  // (3) ANGLE: SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS — the realm
+  //     CHANGES ITS BEHAVIOR ("sets fewer plates now") without
+  //     articulating the loss ("No one names what changed").
+  //     Distinct from 229 hearth_holds_names (names KEPT through
+  //     loss) — here the names are SPECIFICALLY UNSPOKEN. Distinct
+  //     from 184/190/292/301/305 forgetting (loss-of-knowledge) —
+  //     here the loss IS known but not articulated. The
+  //     LANGUAGE-AVOIDANCE around grief is itself the cultural
+  //     adaptation.
+  // **TRIPLE-AXIS surprise** (REGISTER + STRUCTURE + ANGLE all
+  // fresh): second beat in the corpus to ship triple-axially after
+  // 314. Establishes that triple-axis is not a one-off but an
+  // emerging mature surprise pattern. STRUCTURE-ANGLE coupling
+  // sub-rule (315) holds at 6/6 in production. Gate: year3 +
+  // citizensDied >= 2 (need real losses for "fewer plates" to land
+  // — single death is too thin to register as collective adjustment).
+  // Once-per-realm; tag misc.
+  { flag: 'empty_seat_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && (G.stats?.citizensDied || 0) >= 2,
+    text: 'An empty seat. The realm sets fewer plates now. No one names what changed.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
