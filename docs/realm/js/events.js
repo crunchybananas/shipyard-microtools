@@ -276,6 +276,7 @@ export const EVENT_DEFS = [
         if (!c) continue;
         if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
         if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
+        G.lastDeathDay = G.day;  // Loop 242 (241 pessimist HIGH fix): plague is a death site too
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -20,
           text: `🪦 ${c.name || 'Settler'}`,

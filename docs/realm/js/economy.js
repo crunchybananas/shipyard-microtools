@@ -348,6 +348,7 @@ export function updateProduction() {
           G.citizens = G.citizens.filter(x => x !== c);
           if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
           G.population--;
+          if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;  // Loop 242 (241 parity-check discipline applied): starvation was missing the partner stat that lastDeathDay tracks against
           G.lastDeathDay = G.day;  // Loop 228 (sustained-state #2 infrastructure)
           // Death particle
           G.particles.push({

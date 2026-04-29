@@ -28,7 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
-- 241 [code] **HIGH** — fix `G.lastDeathDay` tracking at events.js:278 (plague) + soldiers.js:145 (combat). 2-line patch. Ship at 242. Both sites increment `stats.citizensDied` but skip the partner tracker, producing wrong 228 + 233 output for realms with plague/combat deaths. [events.js + soldiers.js]
+- 242 [code] — `G.recordDeath(cause)` helper to enforce the partner-statement invariant programmatically. Ship if 5th death site appears OR if a future pessimist finds another misalignment. ~10 LoC. [state.js]
+- 242 [process] — parity-check discipline (241) caught a SECOND bug in the very tick meant to ship the first. Strong signal the discipline is real. Promote to invariant at next archivist. [loop/docs/]
+- 242 [doc] — narrative-surfaces.md 228 entry text mentions only 2 death sites (combat.js + economy.js). Now 4 sites. Update at next archivist. [loop/docs/]
+- 241 [code] **HIGH** — fix `G.lastDeathDay` tracking at events.js:278 (plague) + soldiers.js:145 (combat). 2-line patch. Ship at 242. Both sites increment `stats.citizensDied` but skip the partner tracker, producing wrong 228 + 233 output for realms with plague/combat deaths. [events.js + soldiers.js] **DONE → 242** (3 single-line patches across events/soldiers/economy; 4-site parity table reads identically; second bug at economy.js starvation caught by parity-check discipline)
 - 241 [process] — discipline: when shipping a `G.lastXDay`-style tracker, grep ALL increment sites of partner stat to ensure parity. Pattern observed at 211/228 (lastRaidDay/lastDeathDay). Document as "co-located state-write parity check" invariant. Prevents future 216/241-class bugs. [process]
 - 241 [doc] — observation: pessimist ticks at 204/222/241 have all found ≥1 issue. Pattern: every ~20-30 code-shipping ticks accumulates enough surface for adversarial sweep to find something. Document as observed cadence. [process]
 - 241 [code] — `G.recordDeath(cause)` helper that sets `stats.citizensDied++` + `lastDeathDay = G.day` atomically. Single call site replaces 4 places. Refactoring for invariant enforcement. ~10 LoC. [state.js]

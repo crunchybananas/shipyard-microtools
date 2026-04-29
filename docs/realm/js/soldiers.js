@@ -143,6 +143,7 @@ export function updateSoldiers() {
       const s = G.soldiers[i];
       G.soldiers.splice(i, 1);
       G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
+      G.lastDeathDay = G.day;  // Loop 242 (241 pessimist HIGH fix): soldier death is a death site too
       playSound('death');
       // Loop 77: gravestone marker at soldier's actual falling spot
       if (!G.deathMarkers) G.deathMarkers = [];
