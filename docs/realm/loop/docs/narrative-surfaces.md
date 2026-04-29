@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243, 248. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -789,7 +789,7 @@ prescriptive AND consistently applied.
   by source-prose-fingerprint) and promote.
 
 - **Observational-elder register cluster
-  (observation, ~17 uses across 4 tags).** A
+  (observation, ~18 uses across 4 tags).** A
   REGISTER-based authoring shape distinct from
   any single tag. Beats in this cluster share:
   declarative present-tense voice, "the realm"
@@ -813,16 +813,23 @@ prescriptive AND consistently applied.
   - *milestone tag* (2): 190 constellation-forgotten /
     193 landmark-named
   - *stone tag* (1): 184 stone-forgotten
-  - *event tag* (1): 147 great-storm-remembered
+  - *event tag* (2): 147 great-storm-remembered /
+    246 first-thaw-known (year-2+ spring sibling to
+    174 first-frost autumn — together form a
+    YEAR-CYCLE PAIR at seasonal endpoints)
 
   **Sub-types within the cluster:**
   - *Ambient-entity-grammar* (148/152/166):
     1-beat acknowledgment of an entity present
     but unnamed. Codified separately as the
     silent-walker grammar invariant.
-  - *Weather-recognition* (147/174): the realm
-    notices or remembers weather as a marker
-    of the year.
+  - *Weather-recognition* (147/174/246): the
+    realm notices or remembers weather as a
+    marker of the year. 174 first-frost +
+    246 first-thaw form a YEAR-CYCLE PAIR
+    at year-2+ seasonal endpoints — both
+    once-per-realm beats marking the realm's
+    memory of one full winter cycle.
   - *Forgetting* (184/190): generational-gap
     closure of a long-lived object. See the
     object-arc closure observation above for
@@ -917,6 +924,33 @@ prescriptive AND consistently applied.
   **Filed at 199 + 207** (cluster size 4+
   threshold met; documented at 208 per
   207's filing).
+
+- **Named-character interiority beats
+  (observation, 3 uses).** Distinct from the
+  observational-elder cluster — uses an
+  INDIVIDUAL named character as subject, not
+  the realm collective. Three beats shipped:
+  - 240 bard_unsung_song — bard composes a
+    song no one will hear; "some songs the
+    realm has had were never sung aloud"
+  - 245 smith_walks_river — smith's anvil
+    falls silent for an hour; "the fire
+    cools by a degree, and waits"
+  - 247 teacher_pauses_slate — teacher
+    finds child's name still chalked from
+    yesterday; doesn't wipe it for an hour
+  All tag:character. All gate on the named
+  character + a once-per-realm season/year
+  condition. Each closes with a small lift
+  line beyond the literal moment (per
+  184/199/240 craft pattern). 3 uses MEETS
+  3+ threshold but per 231 contrarian:
+  thresholds trigger review, not promotion.
+  Two more candidates filed (merchant /
+  rival per 240/245 filings). When 4+ ship,
+  re-evaluate whether to hoist this from
+  observation-with-3-uses to standalone
+  invariant. **Filed at 240 + 247.**
 
 ## known gaps (as of 104)
 

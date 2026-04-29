@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 248 [doc] — narrative-surfaces.md 228 entry's tracker-site list mentions 2 sites (combat.js + economy.js); now 4 sites post-242 (combat / economy / events / soldiers). Single-line clarification at next fixer tick. ~3 LoC. [loop/docs/]
+- 248 [doc] — BUILDING_FIRST_BEATS function-text dispatch support (244 upgrade) deserves brief mention in narrative-surfaces.md invariants. Currently invisible to readers. ~5 LoC. [loop/docs/]
+- 248 [process] — when 4th character-interiority beat ships (merchant or rival per 240/245/247 filings), re-evaluate hoist-vs-stay decision for the named-character-interiority observed-pattern. Decision criteria: does the pattern have enough distinct authoring guidance separate from observational-elder cluster? [process]
 - 246 [code] — year-3+ "second cycle" weather memory: realm with 2+ winters in memory experiences each differently. Different shape from first-thaw/first-frost (which mark the FIRST). Could pair with observational-elder cluster's forgetting sub-type. ~12-15 LoC. [story.js]
 - 246 [doc] — 174 + 246 form a YEAR-CYCLE PAIR (frost + thaw at year-2+ seasonal boundaries). If 3rd cycle-pair emerges (year-2 shadow + light at equinoxes?) promote to observed-pattern. [loop/docs/]
 - 245 [code] — remaining character interiority moments per 240 filing: teacher (slate-board with child's name still chalked, year-2+); merchant (counts same coins three times by lamp, year-1+ autumn); rival (banner sighted on distant ridge at dusk, year-3+ autumn/winter). Each ~15-20 LoC; ship 1 per 5-10 ticks. [story.js]
