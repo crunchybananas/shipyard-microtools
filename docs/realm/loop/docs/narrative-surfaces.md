@@ -690,6 +690,62 @@ should respect:
   documentation. If (3) is no: consider OUTSIDE-cluster (per
   263 META precedent). If (2) is no: don't ship — per 257.
 
+- **Sprite-variant pool: sprite types with culturally-
+  variable visual elements gain variant pools of 2-4 palette
+  alternates picked by kingdom-hashed selection. Source
+  palette = variant index 0 preserves backward-compat. Each
+  variant differentiates HERALDIC or PALETTE choice without
+  changing silhouette.** (284, promoted from observed-
+  pattern with 6 confirming uses spanning ~70 ticks: 218
+  church.glass / 259 townhall.stone / 279 castle.roof / 281
+  granary.silo / 282 windmill.sail / 283 tower.banner.)
+
+  **Implementation pattern (mature copy-paste, ~25 LoC per
+  sprite type):**
+  - Add palette table to `_VARIANT_PALETTES[type][group]` in
+    render.js. Source = index 0 (must match SVG exact);
+    indexes 1+ are alternates.
+  - Add SPECS entry to `verify-variants.mjs` mirroring the
+    same palette structure.
+  - Visual A/B at zoom 5-6 across 4 representative kingdom
+    names (Norrith/Avalon/Velar/Ashfall is the canonical
+    test set). Optional once pattern reaches copy-paste
+    maturity (skipped at 282/283 — text-level assertions
+    sufficient).
+
+  **Authoring craft when picking the variant element:**
+  - Pick the sprite's MOST PROMINENT swappable element
+    (castle keep-roof, not banner; granary silo-body, not
+    door; windmill sail-cloth, not stone-tower).
+  - Vary ONE axis only — preserve silhouette so the
+    building remains universally recognizable. Multi-axis
+    variation risks fragmenting building identity across
+    realms.
+  - 4 palettes is the default for visually-prominent
+    elements; 2-3 is fine for small or simple gradients
+    (windmill 2-color sail, townhall 3-color stone).
+  - Faction-flavor names (naval / moss-forest / twilight /
+    etc.) in palette comments give future authors hooks
+    for narrative beats that align with visual identity.
+
+  **Why this is an invariant not just an observation:** the
+  pattern is now PRESCRIPTIVE for any future sprite that
+  reaches authoring attention. The 220 filing exhausted at
+  283 demonstrates the pattern can RUN END-TO-END through
+  a roster — the FIRST single-thread filing-arc to do so in
+  the corpus (050 named characters / 192 realmEnded
+  consumers also closed, but those were multi-thread).
+  Promotion formalizes the variant-pool as the default
+  authoring move when adding sprite identity.
+
+  **What this invariant DOES NOT prescribe:**
+  - Whether a sprite SHOULD have variants (decision is per-
+    sprite, based on cultural-variability appetite).
+  - Cross-sprite synchronization (e.g. matching castle-roof
+    + tower-banner colors per realm). Currently independent
+    hashes; future tick could synchronize via shared key.
+  - Variant count beyond the 2-4 default.
+
 ## observed patterns
 
 Distinct from invariants. Observations describe
