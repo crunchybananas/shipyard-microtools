@@ -152,6 +152,13 @@ export const G = {
     goldEarned: 0,
     daysLived: 0,
     scenariosWon: [],
+    // Loop 311 (310 [code] filing): track whether each building type
+    // was EVER placed in this realm. Used by narrative gates that should
+    // fire if the realm has experience of a structure even after it is
+    // destroyed (silent_morning_known carries practice independent of
+    // current church). Distinct from G.buildings.some() check which
+    // requires the building to currently exist.
+    everHadBuilding: {},
   },
 };
 

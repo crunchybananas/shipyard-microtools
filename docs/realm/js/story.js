@@ -845,11 +845,16 @@ const NARRATIVE_BEATS = [
   // line "the realm always knows" captures EMERGENT-COLLECTIVE-
   // KNOWLEDGE: no one decided, but somehow everyone agrees. This is
   // how culture forms in the absence of authority. Forgetting sub-
-  // type now at 5 shapes — ties land-as-agent (5) as joint-leading
-  // sub-type. Gate: church + year3 (need both bell-host + long-enough
-  // for "always knows" to land). Once-per-realm; tag misc.
+  // type now at 5 shapes (was joint-leading; 307 promoted land-as-agent
+  // to 6 sole-leader). Gate: year3 + EVER-HAD-CHURCH (per 311 fixer
+  // closing 310 [code] partially). The prose lift line "the realm
+  // always knows" captures practice INDEPENDENT of current substrate;
+  // a realm that once had a church and lost it can still keep the
+  // silent morning. Distinct from 290/294 (sea_bell / church_step_worn)
+  // which describe specific objects requiring current presence.
+  // Once-per-realm; tag misc.
   { flag: 'silent_morning_known', tag: 'misc',
-    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    trigger: G => G.storyFlags.year3 && G.stats?.everHadBuilding?.church,
     text: 'Listen for the bell on the day the bell does not ring. Once a year the church keeps a silent morning. No one has ever decided which morning; the realm always knows.' },
   // Loop 307 (surprise, un-filed, alternation after 306 fixer): PATH-
   // KNOWS-ROUTINE shape-extension per 276 invariant + 3rd STRUCTURAL

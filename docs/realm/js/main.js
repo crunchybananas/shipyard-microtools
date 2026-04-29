@@ -325,7 +325,10 @@ window.newGame = () => {
   // to G.stats reset. Pre-302, newGame omitted scenariosWon → main.js:531
   // would TypeError on `G.stats.scenariosWon.includes(...)` if a player
   // restarted mid-scenario. Mirrors state.js initial G.stats schema (155).
-  G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0, scenariosWon:[] };
+  // Loop 311 (310 [code]): added everHadBuilding tracking. New realm
+  // starts with empty experience; placeBuilding (economy.js:69) sets
+  // each type true.
+  G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0, scenariosWon:[], everHadBuilding:{} };
   // Loop 269 (the-fixer, 268 HIGH+MEDIUM): reset realm-end flag and
   // sustained-state trackers. Without these, a player whose realm fell
   // and clicked "New Game" inherited realmEnded=true (chronicle gated +

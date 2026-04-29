@@ -68,6 +68,10 @@ export function placeBuilding(type, tx, ty) {
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
   if (G.stats) G.stats.buildingsBuilt++;
+  if (G.stats) {
+    G.stats.everHadBuilding = G.stats.everHadBuilding || {};
+    G.stats.everHadBuilding[type] = true;
+  }
   // Record for undo. Loop 025 (the-fixer, closing 024 pessimist bug):
   // snapshot storyFlags and chronicle length at push-time. Without this,
   // pressing undo on a first-build leaves the chronicle entry AND the

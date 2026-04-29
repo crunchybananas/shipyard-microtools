@@ -200,6 +200,8 @@ const newGameReset = await page.evaluate(async () => {
   window.G.birds = [{ x: 1, y: 1 }];
   window.G._raidWarningGiven = true;
   window.G.stats = { ...window.G.stats, scenariosWon: undefined };
+  // 311: seed everHadBuilding with stale entries
+  window.G.stats.everHadBuilding = { church: true, well: true };
   if (typeof window.newGame !== 'function') return { ok: false, reason: 'no window.newGame' };
   window.newGame();
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -216,6 +218,7 @@ const newGameReset = await page.evaluate(async () => {
     birdsLen: (window.G.birds || []).length,
     raidWarningGiven: window.G._raidWarningGiven,
     scenariosWonIsArray: Array.isArray(window.G.stats?.scenariosWon),
+    everHadBuildingEmpty: Object.keys(window.G.stats?.everHadBuilding || {}).length === 0,
   };
 });
 const reset = newGameReset.realmEnded === false &&
@@ -228,8 +231,9 @@ const reset = newGameReset.realmEnded === false &&
               newGameReset.buildRipplesLen === 0 &&
               newGameReset.birdsLen === 0 &&
               newGameReset.raidWarningGiven === false &&
-              newGameReset.scenariosWonIsArray === true;
-rec('269+271+302: newGame() resets all leaky fields (realmEnded + trackers + namedCharacters + filter + _undoStack + _buildRipples + birds + _raidWarningGiven + scenariosWon)', reset, JSON.stringify(newGameReset));
+              newGameReset.scenariosWonIsArray === true &&
+              newGameReset.everHadBuildingEmpty === true;
+rec('269+271+302+311: newGame() resets all leaky fields (realmEnded + trackers + namedCharacters + filter + _undoStack + _buildRipples + birds + _raidWarningGiven + scenariosWon + everHadBuilding)', reset, JSON.stringify(newGameReset));
 
 // Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
 const realmEndFilter = await page.evaluate(async () => {
@@ -414,20 +418,21 @@ const pathKnowsFire = await page.evaluate(async () => {
 rec('307: path_knows_routine_known fires year3', pathKnowsFire.fired, `text="${pathKnowsFire.text}…" tag=${pathKnowsFire.tag}`);
 
 // Test: 305 silent_morning_known — emergent-tradition (5th forgetting shape; 2nd structural-imperative)
+// 311: gate updated to `G.stats.everHadBuilding?.church` per 310 [code]; tests both
+// CURRENT building absent + everHadBuilding flag set → fires (raid-survived realm).
 const silentMorningFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
   window.G.storyFlags.year3 = true;
-  window.G.buildings = window.G.buildings || [];
-  if (!window.G.buildings.some(b => b.type === 'church')) {
-    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
-  }
+  window.G.buildings = []; // 311: church NOT currently present
+  window.G.stats = window.G.stats || {};
+  window.G.stats.everHadBuilding = { church: true }; // but realm once had one
   delete window.G.storyFlags.silent_morning_known;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.silent_morning_known === true;
   const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('Listen for the bell'));
   return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
 });
-rec('305: silent_morning_known fires year3 + church', silentMorningFire.fired, `text="${silentMorningFire.text}…" tag=${silentMorningFire.tag}`);
+rec('305+311: silent_morning_known fires year3 + everHadBuilding.church (church-destroyed realm)', silentMorningFire.fired, `text="${silentMorningFire.text}…" tag=${silentMorningFire.tag}`);
 
 // Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
 const wagonTrackFire = await page.evaluate(async () => {
@@ -756,6 +761,31 @@ const offeringPool = await page.evaluate(async () => {
   return { foundersSet: true, founder1: window.G.storyFlags.founder1 };
 });
 rec('214: founder-conditional offering pre-conditions settable', offeringPool.foundersSet, `founder1=${offeringPool.founder1}`);
+
+// Test: 311 placeBuilding sets G.stats.everHadBuilding[type] (310 [code] closure).
+// Find a buildable tile (revealed grass, not occupied) and call placeBuilding.
+const everHadCheck = await page.evaluate(async () => {
+  const econ = await import('./js/economy.js');
+  window.G.stats = window.G.stats || {};
+  window.G.stats.everHadBuilding = {}; // clean slate
+  window.G.resources = { wood: 999, stone: 999, food: 999, gold: 999, iron: 999 };
+  // Find a placeable tile by canPlace probe.
+  let placedAt = null;
+  for (let r = 0; r < window.G.map.length && !placedAt; r++) {
+    for (let c = 0; c < window.G.map[r].length; c++) {
+      if (econ.canPlace('well', c, r)) {
+        const ok = econ.placeBuilding('well', c, r);
+        if (ok) { placedAt = { c, r }; break; }
+      }
+    }
+  }
+  return {
+    everHadWell: window.G.stats.everHadBuilding?.well === true,
+    everHadKeys: Object.keys(window.G.stats.everHadBuilding || {}),
+    placedAt,
+  };
+});
+rec('311: placeBuilding sets G.stats.everHadBuilding[type] (310 [code])', everHadCheck.everHadWell, `keys=[${everHadCheck.everHadKeys.join(',')}] placed=${JSON.stringify(everHadCheck.placedAt)}`);
 
 // Page errors check
 console.log('\n[verify-logic] === PAGE ERRORS ===');
