@@ -401,6 +401,18 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
+const wagonTrackFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  delete window.G.storyFlags.wagon_track_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.wagon_track_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a wagon-track on the eastern road'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('303: wagon_track_known fires year3', wagonTrackFire.fired, `text="${wagonTrackFire.text}…" tag=${wagonTrackFire.tag}`);
+
 // Test: 301 noon_bell_origin_known — ritual-persistence-without-origin (4th forgetting shape)
 const noonBellFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

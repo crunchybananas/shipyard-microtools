@@ -1223,25 +1223,26 @@ prescriptive AND consistently applied.
     and chooses to remain in it. "There is
     sometimes a sound the realm cannot place...
     the realm pretends not to listen, then
-    listens anyway." Self-deception as
-    cultural form. Gate: year2.
+    listens anyway." Gate: year2.
+  - *Irritation-domesticated* (303): NEGATIVE
+    emotion the realm has accommodated and
+    even VALUES through its cultural use. "a
+    wagon-track on the eastern road... everyone
+    curses it... Filling it would be missed."
+    Cultural value of imperfection; cursing the
+    annoyance is PART of the experience, not a
+    problem. Gate: year3. **4th OUTSIDE
+    register** — first NEGATIVE emotional
+    register in OUTSIDE ledger.
 
-  **3 OUTSIDE beats now (263/296/297) meets
-  231 threshold**. Each documents its own
-  register; multiple OUTSIDE beats coexist
-  as separate observations rather than as a
-  combined sub-type. Pattern is RIPE for
-  invariant-promotion review at 300 milestone-
-  letter or next archivist:
-
-    "When a beat's prose surprises with a
-    register family the cluster does NOT
-    accommodate (META / JOYFUL / WONDER /
-    etc.), ship OUTSIDE the cluster with its
-    own register annotation. Each OUTSIDE
-    register is documented as its own
-    observation; OUTSIDE beats DO NOT
-    consolidate into a 'meta-cluster.'"
+  **4 OUTSIDE beats now**. 298 PROMOTED the
+  pattern to invariant; 303 confirms the path
+  remains operational. The 4 registers cover:
+  paradoxical (META) / positive (JOYFUL) /
+  curious (WONDER) / negative-domesticated
+  (IRRITATION). 350 milestone-letter could
+  reflect on the OUTSIDE register inventory's
+  emotional-tone diversity.
 
   **Authoring guidance (when adding to cluster):**
 

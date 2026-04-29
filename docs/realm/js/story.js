@@ -808,6 +808,27 @@ const NARRATIVE_BEATS = [
   { flag: 'noon_bell_origin_known', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.buildings && G.buildings.some(b => b.type === 'church'),
     text: 'Why is the church bell rung at noon and not at any other hour? Because it always has been, in this realm. The first ringing was forgotten before the second was held.' },
+  // Loop 303 (surprise, un-filed, alternation after 301 surprise + 302
+  // fixer): IRRITATION-DOMESTICATED beat. 4th OUTSIDE-cluster register
+  // per 298 invariant. Confirmed OUTSIDE registers ledger (pre-303):
+  // 263 META / 296 JOYFUL / 297 WONDER. 303 introduces IRRITATION-
+  // DOMESTICATED — a small daily annoyance the realm has accommodated
+  // and even VALUES through its cultural use. Distinct from:
+  // - 296 JOYFUL (positive emotion, celebration)
+  // - 297 WONDER (curiosity-without-resolution, mystery)
+  // - 263 META (paradoxical self-reference)
+  // IRRITATION is NEGATIVE emotion the realm has DOMESTICATED; cursing
+  // the wagon-track has become PART of going down the road, not a
+  // problem to solve. The lift line "Filling it would be missed"
+  // captures CULTURAL VALUE OF IMPERFECTION — fixing the annoyance
+  // would erase the cultural fact of cursing-the-road. Self-aware
+  // about own irritation. Per 298 OUTSIDE-cluster invariant: ships
+  // standalone outside cluster with own register annotation. Gate:
+  // year3 (need long-enough establishment for "no one has ever
+  // bothered" to land). Once-per-realm; tag misc.
+  { flag: 'wagon_track_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3,
+    text: 'There is a wagon-track on the eastern road that no one has ever bothered to fill in, even though everyone curses it. The cursing is part of going down that road. Filling it would be missed.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
