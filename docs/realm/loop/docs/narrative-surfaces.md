@@ -664,6 +664,10 @@ should respect:
     INTERIORITY → +TOTALIZING-WORLDVIEW → +INFERENCE-BY-
     ABSENCE. **First sub-type to grow 3 shapes**;
     demonstrates shape-axes can extend beyond binary.
+  - *Habituation-recognition* (254 automaticity; 280
+    rhythm-awareness): AUTOMATICITY → +RHYTHM-AWARENESS.
+    254 captures doing-without-thinking; 280 captures
+    noticing-the-unactioned-moment.
 
   **Why this is an invariant not just an observation:** the
   pattern is now PRESCRIPTIVE — it tells future authors that
@@ -1020,22 +1024,32 @@ prescriptive AND consistently applied.
     within one sub-type is permitted IFF each
     shape introduces a genuinely fresh angle
     per 203 + 257 + 276 disciplines.
-  - *Habituation-recognition* (254): the realm
-    recognizes its own *threshold of accumulated
-    experience* — second-order observation that
-    enough nights/seasons/repetitions have
-    accumulated to form textured memory.
-    Distinct from sustained-state-recognition
-    (which observes a continuous external
-    condition crossing a temporal gate);
-    habituation-recognition observes the realm's
-    own automaticity as proof of having lived
-    through enough. 254 nights_blur_known: "the
-    realm has lived enough nights that some are
-    remembered separately and the rest blur
-    into one long evening. The fire is set
-    without thinking now." 1 use; filed for
-    promotion at 3+.
+  - *Habituation-recognition* (254/280): the
+    realm recognizes its own habits and rhythms
+    — second-order observation that distinguishes
+    this sub-type from the EXTERNAL conditions
+    of sustained-state-recognition. **2 shapes
+    within the sub-type per 276 invariant:**
+    - 254 nights_blur_known — AUTOMATICITY
+      ("the realm has lived enough nights
+      that some are remembered separately and
+      the rest blur into one long evening.
+      The fire is set without thinking now.")
+      The realm's actions becoming unconscious
+      through repetition.
+    - 280 liminal_moment_known — RHYTHM-
+      AWARENESS ("there is a moment most
+      evenings when the realm is between
+      things... the realm holds its breath
+      and lets it out. No one has named this
+      moment but everyone knows it.") The
+      realm's recognition of the GAPS
+      between actions — the unactioned
+      pauses that recur in daily rhythm.
+    Per 276 invariant: shape-extension ships
+    because PROSE INTRODUCES NEW ANGLE not as
+    count-advancement. 2 shapes: doing-without-
+    thinking + noticing-the-unactioned-moment.
 
   **Beats explicitly OUTSIDE the cluster
   (different register, listed for awareness):**

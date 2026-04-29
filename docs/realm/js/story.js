@@ -643,6 +643,30 @@ const NARRATIVE_BEATS = [
   { flag: 'nights_blur_known', tag: 'misc',
     trigger: G => G.storyFlags.year2 && (G.season === 'autumn' || G.season === 'winter'),
     text: 'There is a season when night falls differently — not later or earlier, but with more weight. The realm has lived enough nights that some are remembered separately and the rest blur into one long evening. The fire is set without thinking now.' },
+  // Loop 280 (surprise, un-filed, alternation after 277/278/279):
+  // LIMINAL-MOMENT-AWARENESS shape-extension per 276 invariant.
+  // 2nd shape of habituation-recognition sub-type (sibling to 254
+  // nights_blur_known). NEW ANGLE: where 254 captures AUTOMATICITY
+  // (the realm's actions becoming unconscious through repetition),
+  // 280 captures RHYTHM-AWARENESS (the realm's recognition of the
+  // GAPS between actions — the liminal pause between work and rest
+  // that recurs every evening). Different facet of habituation:
+  // 254 is "doing without thinking"; 280 is "noticing the
+  // unactioned moment." The lift line "no one has named this
+  // moment but everyone knows it" captures universal silent
+  // recognition — the realm shares awareness of moments it has
+  // not given language to. Per 276 invariant: shape-extension
+  // ships because LIMINAL-MOMENT angle the corpus has never
+  // touched (existing habituation-recognition uses a single
+  // angle: accumulated experience), not as count-advancement.
+  // Habituation-recognition sub-type now has 2 shapes
+  // (automaticity + rhythm-awareness). Gate: year2 (enough
+  // evenings to recognize the rhythm) + late-day dayPhase >
+  // 0.6 (the prose specifies "evenings"). Once-per-realm; tag
+  // misc; static universal prose.
+  { flag: 'liminal_moment_known', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && G.dayPhase > (G.dayLength || 3600) * 0.6,
+    text: 'There is a moment most evenings when the realm is between things — the shutters not yet closed, the dishes not yet cleared, the children not yet called in. The realm holds its breath and lets it out. No one has named this moment but everyone knows it.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

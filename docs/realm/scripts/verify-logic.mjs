@@ -385,6 +385,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 280 liminal_moment_known — rhythm-awareness (2nd habituation-recognition shape)
+const liminalFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.dayPhase = (window.G.dayLength || 3600) * 0.7;
+  delete window.G.storyFlags.liminal_moment_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.liminal_moment_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a moment most evenings'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('280: liminal_moment_known fires year2 + dayPhase>0.6', liminalFire.fired, `text="${liminalFire.text}…" tag=${liminalFire.tag}`);
+
 // Test: 254 nights_blur_known — habituation-recognition (year2 + autumn|winter)
 const nightsBlurFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
