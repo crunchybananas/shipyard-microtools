@@ -424,6 +424,25 @@ const NARRATIVE_BEATS = [
   { flag: 'first_long_evening', tag: 'misc',
     trigger: G => G.season === 'summer' && G.day <= 14,
     text: 'There is a summer evening early in the realm when nothing is asked of anyone. The work is done. The fields hold heat into the dusk, and the fire is allowed to burn low.' },
+  // Loop 207 (surprise, 196 + 199 filed): THIRD early-game beat. Fires
+  // year-1 summer day 10+ — between 196 first_long_evening (day 8) and
+  // the autumn day-15 pair (199 first_cold_morning + 116 constellation).
+  // Inverts the typical realm-observes-world mood — instead of the realm
+  // noticing/naming/finding things in its land, this beat gives the LAND
+  // agency: "the land has agreed to be lived in." Mutual-recognition
+  // register, distinct from 148/152/166's elder-silence and from
+  // 184/190's forgetting. Per 203 positive authoring rule (closure
+  // beats should surprise, not satisfy a pattern) this beat earns its
+  // landing not by completing the early-game cluster but by introducing
+  // a fresh axis (land-as-agent). Tag: misc (joins observational
+  // cluster — 11 misc-tag beats now). Static prose (universal — every
+  // realm reaches familiarity with its land regardless of kingdom name).
+  // Year 1 progression now: founders day 3-6 → 196 long-evening day 8
+  // → 207 fields-know-realm day 10 → 199 cold-morning + 116 constellation
+  // day 15.
+  { flag: 'fields_know_realm', tag: 'misc',
+    trigger: G => G.season === 'summer' && G.day >= 10,
+    text: 'There comes a season when the fields are no longer strange. The grass under bare feet is the realm\'s own; the path between buildings goes the right way without thought. The land has agreed to be lived in.' },
   // Loop 147 (surprise, un-filed, tick-146 founder-moratorium tick 1):
   // a great storm remembered. Location/weather-focal, NO founder
   // reference. Fires autumn of year 2+ (realm has lived long enough
