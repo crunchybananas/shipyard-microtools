@@ -65,6 +65,16 @@ export const BUILDINGS = {
   fisherman: { name:"Fisherman's Hut", icon:'🐟', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
   blacksmith: { name:'Blacksmith', icon:'🔨', cost:{wood:20,stone:15}, workers:1, desc:'Forges weapons. Boosts soldier damage by 50%.', boost:{type:'soldier',radius:8,multiplier:1.5} },
   archery:   { name:'Archery Range', icon:'🏹', cost:{wood:30,stone:10}, workers:1, defense:5, desc:'Trains archer units. Archers have longer range but less HP.' },
+  // Loop 243 (the-fixer, 101 filed ~140 ticks): mayor structural-unlock.
+  // Town Hall — civic governance building gated on a named mayor (set by
+  // tavern-build per 034 hook). Closes the named-character cast filing arc
+  // (101/102/105+153/201/206/209/243). Effect: realm-wide happiness +8
+  // radius 6 + pop +5 — civic governance brings stability + housing
+  // capacity. Cost mirrors mid-tier civic buildings (church 30 stone +
+  // 15 gold; townhall is stone-heavier as governance is durable).
+  // Rendered via drawGeneric fallback (no canvas drawX or SVG sprite yet
+  // — could ship in a future Phase E if appetite).
+  townhall:  { name:'Town Hall',   icon:'🏛️', cost:{stone:40,wood:30,gold:20}, happiness:8, radius:6, pop:5, desc:'Civic governance — boosts realm happiness + housing. Requires a named mayor.' },
 };
 
 // ── Mutable game state (single source of truth) ───────────

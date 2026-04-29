@@ -135,6 +135,10 @@ export function isTechResearched(techId) {
 
 export function isBuildingUnlocked(buildingType) {
   if (FREE_BUILDINGS.includes(buildingType)) return true;
+  // Loop 243: townhall is gated on a NAMED MAYOR (set by tavern-build per
+  // 034 hook), not a tech. Mayor-as-prerequisite is the 6th and last
+  // named-character mechanic per 101 filing.
+  if (buildingType === 'townhall') return !!G.namedCharacters?.mayor;
   for (const [techId, tech] of Object.entries(TECHS)) {
     if (tech.unlocks.includes(buildingType) && G.researchedTechs.has(techId)) return true;
   }

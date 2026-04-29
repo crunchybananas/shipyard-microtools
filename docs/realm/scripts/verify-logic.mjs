@@ -162,6 +162,20 @@ const bardEffect = await page.evaluate(async () => {
 });
 rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `name=${bardEffect.bardName}`);
 
+// Test 15: 243 townhall mayor-gated unlock
+const townhallGate = await page.evaluate(async () => {
+  const tech = await import('./js/tech.js');
+  const story = await import('./js/story.js');
+  // Without mayor: locked
+  delete window.G.namedCharacters?.mayor;
+  const lockedNoMayor = !tech.isBuildingUnlocked('townhall');
+  // After ensureMayor: unlocked
+  story.ensureMayor();
+  const unlockedWithMayor = tech.isBuildingUnlocked('townhall');
+  return { lockedNoMayor, unlockedWithMayor, mayorName: window.G.namedCharacters?.mayor?.name };
+});
+rec('243: townhall locked without mayor + unlocked with mayor', townhallGate.lockedNoMayor && townhallGate.unlockedWithMayor, `mayor=${townhallGate.mayorName}`);
+
 // Test 14: 240 bard_unsung_song — bard named + day≥25 + spring/summer
 const bardSongFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

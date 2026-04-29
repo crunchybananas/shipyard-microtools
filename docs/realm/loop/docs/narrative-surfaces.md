@@ -1,6 +1,6 @@
 # narrative-surfaces.md
 
-**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232. Maintained by
+**Status:** Written in tick 075. Updated 080, 084, 091, 104, 129, 141, 155, 177, 178, 188, 198, 203, 205, 206, 208, 209, 210, 211, 212, 214, 227, 228, 229, 230, 232, 243. Maintained by
 subsequent loops.
 **Sources:** 059 built echo, 060 mapped 9 systems, 069 saw real-time
 triplicate, 070 fixed it, 073 audited enhancements.js and found 11
@@ -591,17 +591,21 @@ should respect:
     `const <char>Bonus = G.namedCharacters?.<char> ? N : 0;`
     added to a baseline expression.
 
-  Currently shipped (5 of 6): teacher → +10% research
-  (tech.js, 101), merchant → +5% trade (trade.js, 102),
-  smith → +5% tower fire-rate (combat.js, 105 → re-tuned
-  at 153 from damage to fire-rate), bard → +5 happiness
-  baseline (economy.js, 201), rival → +10% raid count +
-  +5 gold per raider slain (economy.js raid spawn 206 +
+  Currently shipped (**6 of 6 — CAST COMPLETE**):
+  teacher → +10% research (tech.js, 101), merchant →
+  +5% trade (trade.js, 102), smith → +5% tower
+  fire-rate (combat.js, 105 → re-tuned at 153 from
+  damage to fire-rate), bard → +5 happiness baseline
+  (economy.js, 201), rival → +10% raid count + +5
+  gold per raider slain (economy.js raid spawn 206 +
   combat.js raider death 209; adversarial-AND-rewarding
-  symmetric pair). Silent mechanic (no UI, no chronicle
-  beat — 034's character-intro already narrates arrival).
-  Remaining: mayor (civic-unlock; structural, larger
-  scope only).
+  symmetric pair), mayor → unlocks townhall building
+  (state.js BUILDINGS + tech.js isBuildingUnlocked +
+  ui.js Culture category, 243; structural-unlock
+  pattern). Silent mechanic (no UI, no chronicle beat
+  — 034's character-intro already narrates arrival).
+  **All 6 named-character mechanics now have effects;
+  the cast is functionally complete.**
 - **End-of-realm beats are first-class** (103, closing 053's
   filed ask). `realm_fell` NARRATIVE_BEATS entry fires when
   `G.population === 0 && G.day > 1`. Tag: `requiem`.
@@ -723,10 +727,8 @@ prescriptive AND consistently applied.
   currently 1 use. If 2+ more emerge, promote
   to invariant.
 
-- **Additive-baseline vs multiplicative-bonus
-  vs event-trigger-reward for named-character
-  mechanics (observation, 4+1+1 uses).** Three
-  shapes now in the wild:
+- **Named-character mechanic shapes (observation,
+  4+1+1+1 uses).** Four shapes now in the wild:
   - **Multiplicative** when the character
     amplifies an existing system (4 uses):
     101 teacher × research speed, 102 merchant
@@ -743,11 +745,17 @@ prescriptive AND consistently applied.
     grants a per-event bonus on a discrete game
     event (1 use): 209 rival +5 gold per raider
     slain (combat.js raider-death handler).
-    Filed at 209 with promotion threshold 3+.
     Different shape from multiplicative (no
     multiplier chain) and additive (not a
     baseline) — it's a CONDITIONAL GRANT inside
     an event handler.
+  - **Structural-unlock** when the character's
+    presence gates a NEW BUILDING or capability
+    (1 use): 243 mayor unlocks townhall.
+    Different shape from the other three —
+    boolean rather than numeric, gates content
+    rather than tuning math. `isBuildingUnlocked`
+    in tech.js owns the gate logic.
   
   Rival is the first character with TWO mechanic
   sites (raid-spawn multiplier 206 + raider-kill
@@ -757,6 +765,16 @@ prescriptive AND consistently applied.
   shape design (e.g., a hypothetical bandit-king
   rival might dual-ship raid difficulty AND
   per-bandit-corpse loot).
+
+  **Cast complete (243):** all 6 named slots
+  (teacher / merchant / smith / bard / rival /
+  mayor) now have mechanic effects. Future
+  filings should generally reach for additional
+  uses of EXISTING shapes (e.g., a 3rd
+  multiplicative or 2nd structural-unlock)
+  rather than inventing new shape categories,
+  unless a genuine 5th shape emerges that
+  none of the existing four cover.
 
 - **Source-specific echo branch (observation,
   1 use).** 194 added a conditional fast-path

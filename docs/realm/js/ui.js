@@ -234,7 +234,7 @@ const CATEGORIES = [
   { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
   { name: 'Defense',        keys: ['barracks', 'archery', 'tower', 'wall', 'blacksmith'] },
   { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },
-  { name: 'Culture',        keys: ['tavern', 'church'] },
+  { name: 'Culture',        keys: ['tavern', 'church', 'townhall'] },  // 243: townhall in Culture; gated by mayor presence in isBuildingUnlocked
   { name: 'Victory',        keys: ['castle'] },
 ];
 

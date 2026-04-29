@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 243 [code] — townhall.svg sprite + canvas drawTownHall for visual polish. Phase A authored 11 sprites; townhall would be the 12th. ~2 ticks (sprite + dispatch hook). Optional Phase E. [assets/sprites/ + render.js]
+- 243 [code] — first-townhall chronicle beat: extend BUILDING_FIRST_BEATS table to fire a beat when townhall is first built. ~5 LoC; civic-formal register. [story.js]
+- 243 [process] — 6-character cast arc spans ~190 ticks (050 filed → 243 closed). One of the longest closed arcs. Worth noting in 250 milestone-letter as multi-arc-closure case study. [journal]
+- 243 [code] — second structural-unlock candidate: hypothetical "smith → unlocks weaponsmith workshop" or similar. Tests whether inline hardcoded-gate scales OR needs pluggable approach. Defer until appetite. [state.js + tech.js]
 - 242 [code] — `G.recordDeath(cause)` helper to enforce the partner-statement invariant programmatically. Ship if 5th death site appears OR if a future pessimist finds another misalignment. ~10 LoC. [state.js]
 - 242 [process] — parity-check discipline (241) caught a SECOND bug in the very tick meant to ship the first. Strong signal the discipline is real. Promote to invariant at next archivist. [loop/docs/]
 - 242 [doc] — narrative-surfaces.md 228 entry text mentions only 2 death sites (combat.js + economy.js). Now 4 sites. Update at next archivist. [loop/docs/]
