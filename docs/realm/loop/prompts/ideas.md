@@ -28,6 +28,10 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 204 [doc] **HIGH** — narrative-surfaces.md named-character invariant fix (line 582-589). Update "Currently shipped" list to include smith (105/153 fire-rate) and bard (201 happiness +5). Update "Remaining" to mayor + rival only. Currently 4 ticks stale per 075 rule "lying doc is worse than none." Pair with 204 [doc] MEDIUM in single edit. ~6-8 LoC. [loop/docs/]
+- 204 [doc] **MEDIUM** — same invariant: update pattern claim to acknowledge both multiplicative (`<char>Mult`) and additive (`<char>Bonus`) variants. Cross-reference the new `## observed patterns` section. ~4-6 LoC. [loop/docs/]
+- 204 [process] — when next archivist sweep runs (per 202 [process] threshold-audit), ALSO audit ALL invariants in narrative-surfaces.md for code-state drift, not just promotion-threshold consistency. Doc-lag is a separate failure mode. [loop/docs/]
+- 204 [process] — discipline: every tick that ships invariant-governed code should update the invariant in the SAME tick. Currently invariant has lagged 4 ticks (105/153/201) without update. [process]
 - 203 [doc] — when next archivist tick lands (~210 per 12-15-tick rhythm), sweep all current invariants against the 3+ promotion threshold. 202 contrarian flagged 188 as the visible miss; others may exist (silent-walker grammar at 148+152 = 2 uses; named-character mechanic multiplicative pattern at 3 uses — meets threshold; etc). [loop/docs/]
 - 203 [process] — when a forgetting beat is next proposed (wanderer / great-storm / landmark closure), reviewer applies the positive authoring rule explicitly: "does the prose surprise the realm, or satisfy a pattern?" If only justification is "the template called for closure," reject. [process]
 - 203 [doc] — observation: contrarian→fixer pairs are a healthy doctrine-pruning pattern (011→012 / 154→155+156 / 195→196 / 202→203 = 4 pairs). Document as observed-pattern in loop/docs/ when 5+ pairs accrete. Currently filed at 4. [loop/docs/]
