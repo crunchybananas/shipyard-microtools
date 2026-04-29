@@ -818,6 +818,61 @@ should respect:
   tick combining all eligible findings → arc closed in 2
   ticks vs 1+N split.
 
+- **OUTSIDE-cluster register: when a beat's prose surprises
+  with a register family the cluster does NOT accommodate
+  (META / JOYFUL / WONDER / etc.), ship OUTSIDE the
+  observational-elder cluster with its own register
+  annotation. Each OUTSIDE register is documented as its own
+  observation; OUTSIDE beats DO NOT consolidate into a 'meta-
+  cluster.'** (298, promoted from observed-pattern with 3
+  confirming uses: 263 META / 296 JOYFUL / 297 WONDER.)
+
+  **Confirmed OUTSIDE registers:**
+  - *META-paradoxical* (263 chronicle_self_known) — chronicle
+    referenced AS A THING IN THE WORLD; paradoxical self-
+    reference. "The chronicle has grown longer than any
+    citizen's memory."
+  - *DYNAMIC-JOYFUL* (296 realm_laughs_known) — collective
+    ease, action-not-observation. "the way a settled place
+    laughs when it doesn't have to pay attention to itself."
+  - *CURIOUS-WITHOUT-RESOLVING* / WONDER (297 unplaceable_
+    sound_known) — attention without conclusion; self-
+    deception as cultural form. "The realm pretends not to
+    listen, then listens anyway."
+
+  **Why this is an invariant not just an observation:** the
+  rule is now PRESCRIPTIVE for any future beat whose prose
+  doesn't fit the cluster's declarative-present-tense
+  observational register. Prior practice was to either
+  awkwardly fit a beat into a sub-type OR ship without
+  classification. The OUTSIDE-cluster invariant gives a
+  third path: ship cleanly with explicit register
+  annotation. Complements 276 shape-axis invariant (which
+  governs INSIDE-cluster extension) by formalizing the
+  OUTSIDE path.
+
+  **Authoring decision tree (combined with 276):**
+  1. Does the prose surprise (203)?
+  2. What register family?
+     - DECLARATIVE-PRESENT-TENSE observational →
+       INSIDE cluster:
+       - New angle within existing sub-type → 276
+         shape-extension
+       - Reuse of existing angle → don't ship per 257
+     - DIFFERENT register (META/JOYFUL/WONDER/etc) →
+       OUTSIDE cluster per 298 invariant.
+  3. Document with explicit register annotation in
+     narrative-surfaces.md (cluster sub-type for
+     INSIDE; OUTSIDE register entry for OUTSIDE).
+
+  **What this invariant DOES NOT prescribe:**
+  - The set of OUTSIDE registers — these emerge organically
+    as prose introduces them.
+  - Consolidation: OUTSIDE beats remain separate
+    observations (no meta-cluster).
+  - Promotion of any OUTSIDE register to its own sub-type
+    if it accumulates 3+ uses — separate decision.
+
 ## observed patterns
 
 Distinct from invariants. Observations describe
