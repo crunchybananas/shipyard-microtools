@@ -236,6 +236,19 @@ const townhallMaxCount = await page.evaluate(async () => {
 });
 rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.unlockedNoCount && !townhallMaxCount.unlockedAtCap, `noCount=${townhallMaxCount.unlockedNoCount} atCap=${townhallMaxCount.unlockedAtCap}`);
 
+// Test: 263 chronicle_self_known — meta-self-aware (chronicle.length ≥ 100)
+const chronicleSelfFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  // Pad chronicle to 100 entries
+  while ((window.G.chronicle || []).length < 100) story.chronicle('padding entry', 'misc');
+  delete window.G.storyFlags.chronicle_self_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.chronicle_self_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The chronicle has grown longer'));
+  return { fired, text: lastEntry?.text?.slice(0, 60), tag: lastEntry?.tag };
+});
+rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
+
 // Test: 254 nights_blur_known — habituation-recognition (year2 + autumn|winter)
 const nightsBlurFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

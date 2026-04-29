@@ -643,6 +643,27 @@ const NARRATIVE_BEATS = [
   { flag: 'nights_blur_known', tag: 'misc',
     trigger: G => G.storyFlags.year2 && (G.season === 'autumn' || G.season === 'winter'),
     text: 'There is a season when night falls differently — not later or earlier, but with more weight. The realm has lived enough nights that some are remembered separately and the rest blur into one long evening. The fire is set without thinking now.' },
+  // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
+  // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
+  // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
+  // realm becomes aware that it has been chronicled long enough that
+  // the chronicle now exceeds individual recollection. **OUTSIDE the
+  // observational-elder cluster** — different REGISTER (meta-self-
+  // aware vs declarative-present-tense observational); not a new sub-
+  // type. Per 257 anti-completionist warning: this beat is a
+  // standalone, NOT a 10th cluster sub-type to "fill in." The lift
+  // line "stories the realm has forgotten how to tell" — paradox
+  // landing: the chronicle preserves what the realm itself has lost.
+  // Gate: chronicle.length ≥ 100 — long-lived realms only (typical
+  // 200-day realm produces ~165-210 entries per 262 cadence target,
+  // so threshold 100 fires roughly mid-life of long-lived realms).
+  // Once-per-realm; tag misc; static universal prose.
+  // Per 203 positive authoring rule: surprises by introducing a NEW
+  // axis (META-self-aware) without sub-type-completion within an
+  // existing cluster. First self-reference in the corpus.
+  { flag: 'chronicle_self_known', tag: 'misc',
+    trigger: G => G.chronicle && G.chronicle.length >= 100,
+    text: 'The chronicle has grown longer than any citizen\'s memory. Some of its days are stories the realm has forgotten how to tell.' },
   // Loop 212 (the-fixer, 207 filed): FOURTH early-game beat. Year-1
   // summer day 12+ — late summer, between fields_know (day 10) and
   // autumn pair (day 15). **Individual-interiority register** — first

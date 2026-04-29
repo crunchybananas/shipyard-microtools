@@ -936,6 +936,28 @@ prescriptive AND consistently applied.
     without thinking now." 1 use; filed for
     promotion at 3+.
 
+  **Beats explicitly OUTSIDE the cluster
+  (different register, listed for awareness):**
+  - *Meta-self-aware* (263): a beat where the
+    chronicle itself is referenced AS A THING
+    IN THE WORLD. Different REGISTER from the
+    declarative-present-tense observational-
+    elder; this register is META, paradoxical,
+    self-referential. 263 chronicle_self_known:
+    "The chronicle has grown longer than any
+    citizen's memory. Some of its days are
+    stories the realm has forgotten how to
+    tell." Gate: chronicle.length ≥ 100 (long-
+    lived realms only). **NOT a 10th cluster
+    sub-type** — explicitly recorded outside
+    the cluster per 257 anti-completionist
+    discipline. First self-reference in the
+    corpus; the chronicle has never before
+    been a subject of a beat. If a 2nd use of
+    this register ships, document it here AS
+    ITS OWN observation, not as a cluster
+    sub-type.
+
   **Authoring guidance (when adding to cluster):**
 
   **Sub-type-completion is NOT a positive
