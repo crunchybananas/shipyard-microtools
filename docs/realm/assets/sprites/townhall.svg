@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Town Hall sprite — Loop 255 (render axis, 12th sprite).
+  Sibling to drawGeneric canvas fallback (no drawTownHall exists;
+  switch in render.js:3131 falls to default → drawGeneric).
+  ViewBox 0 0 128 128. Town hall centered at x=64; ground at y=104.
+  Light: upper-left (matches granary/castle/church convention).
+
+  Form: wide stone façade + symmetric pediment + central tall
+  window ("the long window" — narrative callback to 253 mayor's
+  first-in-hall prose) + colonnade entrance with steps + small
+  central cupola with rare-ring bell.
+
+  Distinct from sibling stone buildings:
+  - Castle (tall central keep + pennants/flag): scale + military.
+  - Church (asymmetric spire + cross): vertical worship axis.
+  - Tower (very tall narrow + banner): defensive watch.
+  Townhall is HORIZONTAL formal civic — wider than tall, symmetric,
+  pediment-bearing.
+
+  Animation: cupola bell rings on 95%-rest punctuation pattern
+  (vs church's 85%-rest at 164/236) — townhall bell sounds for
+  rare civic moments, not regular service. 4 swings of decreasing
+  amplitude over the same 4.8s burst, but burst comes once per
+  72s (vs church 32s). Mirror of 236 keyTimes/values structure
+  with the rest band stretched.
+
+  243 unlocked townhall as 6th-of-6 named-character mechanic
+  (mayor required); 253 closed character literary cast 6/6 with
+  mayor_first_in_hall referencing this very window. Sprite
+  closes the visual surface for the 12th + last user-buildable
+  structure that didn't yet have an SVG sibling.
+-->
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Stone façade: light upper, darker lower (formal civic stone) -->
+    <linearGradient id="thStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8e0d0"/>
+      <stop offset="0.5" stop-color="#d0c8b8"/>
+      <stop offset="1" stop-color="#a89f8e"/>
+    </linearGradient>
+
+    <!-- Side wall (shadow side) -->
+    <linearGradient id="thStoneSide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b0a0"/>
+      <stop offset="1" stop-color="#787060"/>
+    </linearGradient>
+
+    <!-- Pediment (triangular gable above colonnade) — slightly warmer -->
+    <linearGradient id="thPediment" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#ddd0b8"/>
+      <stop offset="1" stop-color="#a89880"/>
+    </linearGradient>
+
+    <!-- Tile roof (low-pitched slate, civic dignified) -->
+    <linearGradient id="thRoof" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#6a5a4a"/>
+      <stop offset="0.7" stop-color="#4a3e30"/>
+      <stop offset="1" stop-color="#2e2418"/>
+    </linearGradient>
+
+    <!-- Long window — warm interior glow visible through tall glass -->
+    <linearGradient id="thLongWindow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff0c8"/>
+      <stop offset="0.5" stop-color="#ffd890"/>
+      <stop offset="1" stop-color="#a87038"/>
+    </linearGradient>
+
+    <!-- Window halo: soft warm spill -->
+    <radialGradient id="thWindowGlow" cx="0.5" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="rgba(255,220,150,0.45)"/>
+      <stop offset="1" stop-color="rgba(255,220,150,0)"/>
+    </radialGradient>
+
+    <!-- Cupola roof -->
+    <linearGradient id="thCupola" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#5a4a3a"/>
+      <stop offset="1" stop-color="#2a2010"/>
+    </linearGradient>
+
+    <!-- Stone-block courses pattern -->
+    <pattern id="thBlocks" width="10" height="4" patternUnits="userSpaceOnUse">
+      <rect width="10" height="4" fill="transparent"/>
+      <line x1="0" y1="0" x2="10" y2="0" stroke="rgba(40,32,22,0.16)" stroke-width="0.4"/>
+      <line x1="0" y1="2" x2="0" y2="4" stroke="rgba(40,32,22,0.14)" stroke-width="0.4"/>
+      <line x1="5" y1="0" x2="5" y2="2" stroke="rgba(40,32,22,0.14)" stroke-width="0.4"/>
+    </pattern>
+
+    <!-- Soft ground shadow -->
+    <radialGradient id="thShadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(0,0,0,0.4)"/>
+      <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow (wider than tall — horizontal building) -->
+  <ellipse cx="68" cy="106" rx="28" ry="5" fill="url(#thShadow)"/>
+
+  <!-- ─── Side wall depth (right side, drawn first) ─────────────── -->
+  <path d="M 84 80 L 90 84 L 90 100 L 84 100 Z" fill="url(#thStoneSide)"/>
+  <!-- Side wall corner pilaster -->
+  <rect x="88" y="86" width="2" height="14" fill="rgba(50,42,32,0.4)"/>
+
+  <!-- ─── Main façade body (wide horizontal) ────────────────────── -->
+  <rect x="44" y="80" width="40" height="20" fill="url(#thStone)"/>
+  <rect x="44" y="80" width="40" height="20" fill="url(#thBlocks)" opacity="0.85"/>
+
+  <!-- Top edge sunlit highlight -->
+  <line x1="44" y1="80" x2="84" y2="80" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+
+  <!-- Corner pilasters (left + right + center pair flanking entrance) -->
+  <rect x="44" y="82" width="2" height="18" fill="rgba(0,0,0,0.18)"/>
+  <rect x="46" y="82" width="0.6" height="18" fill="rgba(255,255,255,0.18)"/>
+  <rect x="82" y="82" width="2" height="18" fill="rgba(0,0,0,0.16)"/>
+
+  <!-- ─── Pediment (triangular gable above central entrance) ────── -->
+  <!-- Pediment field -->
+  <path d="M 54 80 L 64 70 L 74 80 Z" fill="url(#thPediment)"/>
+  <!-- Pediment underside shadow (cornice line) -->
+  <line x1="54" y1="80" x2="74" y2="80" stroke="rgba(40,32,22,0.4)" stroke-width="0.5"/>
+  <!-- Pediment ridge highlight -->
+  <line x1="54" y1="80" x2="64" y2="70" stroke="rgba(255,240,210,0.35)" stroke-width="0.5"/>
+  <!-- Pediment dentils (small civic decorative teeth along underside) -->
+  <g fill="rgba(40,32,22,0.35)">
+    <rect x="55" y="79.6" width="1" height="0.7"/>
+    <rect x="57" y="79.6" width="1" height="0.7"/>
+    <rect x="59" y="79.6" width="1" height="0.7"/>
+    <rect x="61" y="79.6" width="1" height="0.7"/>
+    <rect x="63" y="79.6" width="1" height="0.7"/>
+    <rect x="65" y="79.6" width="1" height="0.7"/>
+    <rect x="67" y="79.6" width="1" height="0.7"/>
+    <rect x="69" y="79.6" width="1" height="0.7"/>
+    <rect x="71" y="79.6" width="1" height="0.7"/>
+    <rect x="73" y="79.6" width="1" height="0.7"/>
+  </g>
+
+  <!-- ─── Low-pitched roof flanking the pediment ────────────────── -->
+  <!-- Left wing roof -->
+  <path d="M 44 80 L 54 76 L 54 80 Z" fill="url(#thRoof)"/>
+  <!-- Right wing roof -->
+  <path d="M 74 80 L 84 80 L 84 76 Z" fill="url(#thRoof)"/>
+  <!-- Roof tile rows (subtle horizontal lines) -->
+  <line x1="46" y1="78.8" x2="53" y2="78.8" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+  <line x1="75" y1="78.8" x2="82" y2="78.8" stroke="rgba(0,0,0,0.18)" stroke-width="0.3"/>
+
+  <!-- ─── The Long Window (centered, behind/above the entrance) ─── -->
+  <!-- 253 narrative callback: mayor stands at "the long window watching the day arrive" -->
+  <g>
+    <!-- Halo behind window (interior light leaking) -->
+    <ellipse cx="64" cy="86" rx="5" ry="6" fill="url(#thWindowGlow)"/>
+    <!-- Window frame inset (stone) -->
+    <rect x="61" y="82" width="6" height="11" fill="#3a2e1c"/>
+    <!-- Window glass with warm interior light -->
+    <rect x="61.5" y="82.4" width="5" height="10.2" fill="url(#thLongWindow)"/>
+    <!-- Vertical mullion (3 panes) -->
+    <line x1="63" y1="82.4" x2="63" y2="92.6" stroke="rgba(40,30,20,0.55)" stroke-width="0.35"/>
+    <line x1="65" y1="82.4" x2="65" y2="92.6" stroke="rgba(40,30,20,0.55)" stroke-width="0.35"/>
+    <!-- Horizontal transoms -->
+    <line x1="61.5" y1="85" x2="66.5" y2="85" stroke="rgba(40,30,20,0.55)" stroke-width="0.3"/>
+    <line x1="61.5" y1="89" x2="66.5" y2="89" stroke="rgba(40,30,20,0.55)" stroke-width="0.3"/>
+    <line x1="61.5" y1="92" x2="66.5" y2="92" stroke="rgba(40,30,20,0.5)" stroke-width="0.3"/>
+    <!-- Top arch finial above window -->
+    <path d="M 61 82 L 64 80 L 67 82 Z" fill="rgba(50,40,28,0.45)"/>
+    <!-- Sill -->
+    <rect x="60.5" y="92.8" width="7" height="0.8" fill="rgba(70,58,42,0.6)"/>
+  </g>
+
+  <!-- ─── Side windows (smaller, flanking the long window) ──────── -->
+  <g>
+    <!-- Left side window -->
+    <rect x="49" y="86" width="3" height="5" fill="#3a2e1c"/>
+    <rect x="49.3" y="86.3" width="2.4" height="4.4" fill="url(#thLongWindow)" opacity="0.85"/>
+    <line x1="50.5" y1="86.3" x2="50.5" y2="90.7" stroke="rgba(40,30,20,0.5)" stroke-width="0.25"/>
+    <!-- Right side window -->
+    <rect x="76" y="86" width="3" height="5" fill="#3a2e1c"/>
+    <rect x="76.3" y="86.3" width="2.4" height="4.4" fill="url(#thLongWindow)" opacity="0.85"/>
+    <line x1="77.5" y1="86.3" x2="77.5" y2="90.7" stroke="rgba(40,30,20,0.5)" stroke-width="0.25"/>
+  </g>
+
+  <!-- ─── Cupola with bell (centered atop the pediment) ─────────── -->
+  <g>
+    <!-- Cupola base (small square) -->
+    <rect x="62" y="64" width="4" height="4" fill="url(#thStone)"/>
+    <rect x="62" y="64" width="4" height="4" fill="url(#thBlocks)" opacity="0.7"/>
+    <line x1="62" y1="64" x2="66" y2="64" stroke="rgba(255,240,200,0.4)" stroke-width="0.4"/>
+    <!-- Cupola arch opening (where bell hangs) -->
+    <path d="M 62.5 68 L 62.5 65.5 A 1.5 1.5 0 0 1 65.5 65.5 L 65.5 68 Z" fill="#1a1208"/>
+    <!-- Cupola dome roof above -->
+    <path d="M 62 64 L 64 60 L 66 64 Z" fill="url(#thCupola)"/>
+    <line x1="62" y1="64" x2="64" y2="60" stroke="rgba(255,230,200,0.3)" stroke-width="0.4"/>
+
+    <!-- Cupola finial (small spike) -->
+    <rect x="63.7" y="58" width="0.6" height="2" fill="#7a6028"/>
+    <circle cx="64" cy="57.6" r="0.5" fill="#a07820"/>
+
+    <!-- Bell — Loop 255 sibling to church 236 punctuation animation,
+         but rest band stretched to 95% (vs church 85%) — townhall
+         bell rings for rare civic moments, not regular service.
+         Cycle: 72s (vs church 32s); ring burst still 4 swings of
+         decreasing amplitude (-7°/+5°/-4°/+2°) over ~3.6s before
+         returning to rest. Pivot (64, 65.5) at top of bell-opening
+         arch. Bell + clapper + highlight rotate together; cupola
+         body + arch + roof stay fixed. -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        keyTimes="0; 0.95; 0.96; 0.97; 0.98; 0.99; 1"
+        values="0 64 65.5; 0 64 65.5; -7 64 65.5; 5 64 65.5; -4 64 65.5; 2 64 65.5; 0 64 65.5"
+        dur="72s" repeatCount="indefinite"/>
+      <ellipse cx="64" cy="67" rx="1" ry="0.7" fill="#c8a030"/>
+      <rect x="63.7" y="67.2" width="0.6" height="1.1" fill="#a08020"/>
+      <ellipse cx="63.7" cy="66.8" rx="0.3" ry="0.2" fill="rgba(255,240,180,0.7)"/>
+    </g>
+  </g>
+
+  <!-- ─── Wide steps leading to entrance ────────────────────────── -->
+  <g>
+    <!-- Bottom step (widest) -->
+    <rect x="56" y="100" width="16" height="1.6" fill="rgba(60,52,42,0.6)"/>
+    <line x1="56" y1="100" x2="72" y2="100" stroke="rgba(255,240,210,0.25)" stroke-width="0.4"/>
+    <!-- Middle step -->
+    <rect x="58" y="98.6" width="12" height="1.4" fill="rgba(70,60,48,0.55)"/>
+    <line x1="58" y1="98.6" x2="70" y2="98.6" stroke="rgba(255,240,210,0.22)" stroke-width="0.35"/>
+    <!-- Top step (under door) -->
+    <rect x="60" y="97.4" width="8" height="1.2" fill="rgba(80,68,54,0.5)"/>
+  </g>
+
+  <!-- ─── Central double doors (the doors mayor unlocks at dawn) ── -->
+  <g>
+    <!-- Door inset shadow -->
+    <path d="M 60 97.4 L 60 92.5 A 4 3 0 0 1 68 92.5 L 68 97.4 Z" fill="#221408"/>
+    <!-- Door planks (warm wood) -->
+    <path d="M 60.5 97 L 60.5 92.8 A 3.5 2.7 0 0 1 67.5 92.8 L 67.5 97 Z" fill="#5a3818"/>
+    <!-- Plank seam (double-door split) -->
+    <line x1="64" y1="92.5" x2="64" y2="97" stroke="rgba(0,0,0,0.5)" stroke-width="0.4"/>
+    <!-- Door arch frame -->
+    <path d="M 60 97.4 L 60 92.5 A 4 3 0 0 1 68 92.5 L 68 97.4"
+          stroke="#7a6a58" stroke-width="0.6" fill="none"/>
+    <!-- Iron strap hinges (left + right doors) -->
+    <rect x="60.7" y="93.5" width="2.5" height="0.5" fill="#3a2e1e"/>
+    <rect x="60.7" y="95.5" width="2.5" height="0.5" fill="#3a2e1e"/>
+    <rect x="64.8" y="93.5" width="2.5" height="0.5" fill="#3a2e1e"/>
+    <rect x="64.8" y="95.5" width="2.5" height="0.5" fill="#3a2e1e"/>
+    <!-- Door rings (2 — civic double doors) -->
+    <circle cx="63.2" cy="95" r="0.45" fill="#8a7028"/>
+    <circle cx="63.2" cy="95" r="0.22" fill="#3a2e1e"/>
+    <circle cx="64.8" cy="95" r="0.45" fill="#8a7028"/>
+    <circle cx="64.8" cy="95" r="0.22" fill="#3a2e1e"/>
+  </g>
+
+  <!-- ─── Subtle dust flecks (matches sibling sprite convention) ─ -->
+  <g fill="rgba(255,240,200,0.32)">
+    <circle cx="42" cy="78" r="0.5"/>
+    <circle cx="86" cy="76" r="0.5"/>
+    <circle cx="50" cy="68" r="0.4"/>
+    <circle cx="78" cy="72" r="0.4"/>
+  </g>
+</svg>

@@ -42,7 +42,7 @@ console.log('[default-svg] sprite cache after init:', probe);
 // Place all 11 sprite-bearing types on screen
 await page.evaluate(() => {
   window.G.buildings = window.G.buildings || [];
-  const types = ['granary', 'castle', 'church', 'windmill', 'tower', 'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks'];
+  const types = ['granary', 'castle', 'church', 'windmill', 'tower', 'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks', 'townhall'];
   let cx = 35, cy = 35;
   for (const t of types) {
     window.G.buildings.push({

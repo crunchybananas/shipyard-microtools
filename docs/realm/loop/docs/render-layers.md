@@ -1,6 +1,6 @@
 # render-layers.md
 
-**Status:** Written in tick 165. Updated 167, 168, 170, 172, 215, 226, 237.
+**Status:** Written in tick 165. Updated 167, 168, 170, 172, 215, 226, 237, 255.
 Maintained by subsequent loops as new sprites/meshes land or the
 integration story changes.
 
@@ -11,6 +11,17 @@ Phase C (223-225, 3 ticks: primary animations) → Phase D (234-236,
 **Total 75 ticks (161-236).** All 11 user-buildable sprites are now
 live, animated, and deterministically variant per realm. 3D axis
 retired at 215.
+
+**Phase E (255 — 1 tick, +1 sprite):** townhall.svg ships as the
+12th sprite, closing the user-buildable roster after 243 added
+townhall as the 6th-of-6 named-character mechanic. Cupola bell
+animates on a 95%-rest punctuation cycle (vs church's 85% at 236),
+72s period — townhall bell rings for rare civic moments. Central
+"long window" is a deliberate narrative callback to 253's mayor
+prose. The sprite uses the existing drawSpriteIfReady path; canvas
+fallback is drawGeneric (no townhall-specific drawX exists). With
+townhall, **12 of 12 user-buildable structures** now have SVG
+sprites in the live game.
 **Sources:** 161 opened the SVG axis (granary.svg + sandbox); 162
 shipped castle.svg; 163 opened the 3D engine axis with granary mesh
 + pushCylinder + debug-pillar cleanup; 164 shipped church.svg
