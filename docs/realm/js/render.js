@@ -100,6 +100,20 @@ const _VARIANT_PALETTES = {
       ['#a8ffd0', '#44cc88', '#1a6638'],  // 3 green — moss palette
     ],
   },
+  // Loop 259 (the-fixer, 255 filing): townhall civic-stone variants.
+  // Source #e8e0d0/#d0c8b8/#a89f8e (lines 38-40 of townhall.svg) is the
+  // warm-stone gradient; 3 alternates differentiate the civic façade
+  // per kingdom. Other townhall colors (side-wall / pediment / windows
+  // / cupola) stay constant — only the main façade swaps to keep the
+  // building recognizable as a townhall across all variants.
+  townhall: {
+    stone: [
+      ['#e8e0d0', '#d0c8b8', '#a89f8e'],  // 0 warm-stone (default)
+      ['#e0e4e8', '#c0c4c8', '#888c90'],  // 1 cool-grey — northern stone
+      ['#e8d0c0', '#c89888', '#885044'],  // 2 red-brick — clay civic palette
+      ['#f4f0e8', '#e0dcd0', '#a8a496'],  // 3 pale-marble — formal civic
+    ],
+  },
 };
 // Tiny string-hash for kingdom-name → variant index. Mirrors the
 // _dreamHash style used in story.js without an import (avoids circular

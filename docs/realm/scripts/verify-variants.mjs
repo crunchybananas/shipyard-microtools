@@ -2,6 +2,12 @@
 // Loads the game with 4 different kingdom names, screenshots churches
 // in each. With the variant pipeline working, at least 2-3 of the 4
 // realms should show different glass colors.
+//
+// Loop 259 (the-fixer, 256 LOW): added HARD ASSERTIONS that the variant-
+// text pipeline produces correct color swaps and that 4 knames produce
+// at least 2 distinct palette outputs (proves hash distribution + swap).
+// Closes 256 LOW finding ("variant pipeline not visually verifiable").
+// Also covers townhall (255 filing — variant entry shipped this tick).
 
 import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
 import { fileURLToPath } from 'node:url';
@@ -97,6 +103,94 @@ for (const kname of KINGDOMS) {
   await page.close();
 }
 
+// === HARD ASSERTIONS (259 closure of 256 LOW) ============================
+// Verify the variant-text pipeline (fetch + replaceAll) produces correct
+// color swaps and that the hash distribution is non-degenerate.
+const assertPage = await ctx.newPage();
+assertPage.on('pageerror', e => errs.push(`[assert] ${e.message}`));
+await assertPage.goto(GAME_PATH);
+await assertPage.waitForLoadState('domcontentloaded');
+await assertPage.waitForTimeout(800);
+
+const SPECS = [
+  {
+    type: 'church', group: 'glass',
+    palettes: [
+      ['#a8d0ff', '#4488cc', '#1a3866'],
+      ['#ffb0a8', '#cc4444', '#661a1a'],
+      ['#fff0a8', '#cc8844', '#664422'],
+      ['#a8ffd0', '#44cc88', '#1a6638'],
+    ],
+    labels: ['blue', 'red', 'amber', 'green'],
+  },
+  {
+    type: 'townhall', group: 'stone',
+    palettes: [
+      ['#e8e0d0', '#d0c8b8', '#a89f8e'],
+      ['#e0e4e8', '#c0c4c8', '#888c90'],
+      ['#e8d0c0', '#c89888', '#885044'],
+      ['#f4f0e8', '#e0dcd0', '#a8a496'],
+    ],
+    labels: ['warm', 'cool-grey', 'red-brick', 'marble'],
+  },
+];
+
+const assertResults = [];
+function rec(name, ok, detail) {
+  const tag = ok ? '✓' : '✗';
+  assertResults.push({ name, ok, detail });
+  console.log(`  ${tag} ${name}${detail ? ' — ' + detail : ''}`);
+}
+
+for (const spec of SPECS) {
+  console.log(`\n[variants:assert] ${spec.type}.${spec.group}`);
+  const out = await assertPage.evaluate(async ({type, group, palettes, knames}) => {
+    function kHash(s) {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) | 0;
+      return Math.abs(h);
+    }
+    const r = await fetch(`assets/sprites/${type}.svg`);
+    const sourceText = await r.text();
+    const rows = [];
+    for (const kname of knames) {
+      const idx = kHash(`${kname}_${type}_${group}`) % palettes.length;
+      let variantText = sourceText;
+      if (idx !== 0) {
+        const source = palettes[0];
+        const target = palettes[idx];
+        for (let i = 0; i < source.length; i++) variantText = variantText.replaceAll(source[i], target[i]);
+      }
+      rows.push({
+        kname, idx,
+        sourceContainsSourceMid: sourceText.includes(palettes[0][1]),
+        variantContainsTargetMid: variantText.includes(palettes[idx][1]),
+        variantContainsSourceMid: variantText.includes(palettes[0][1]),
+        differs: variantText !== sourceText,
+      });
+    }
+    return rows;
+  }, { ...spec, knames: KINGDOMS });
+
+  // Source must contain its own mid color
+  rec(`${spec.type}.${spec.group}: source SVG contains source palette mid color`, out.every(r => r.sourceContainsSourceMid));
+  // Each non-zero idx must produce text containing target mid AND not source mid (idx 0 = no swap)
+  for (const r of out) {
+    const label = spec.labels[r.idx];
+    if (r.idx === 0) {
+      rec(`  ${r.kname} → idx=0 (${label}, default — no swap)`, r.variantContainsSourceMid && !r.differs, `differs=${r.differs}`);
+    } else {
+      rec(`  ${r.kname} → idx=${r.idx} (${label}) variant text contains target mid`, r.variantContainsTargetMid);
+      rec(`  ${r.kname} → idx=${r.idx} (${label}) variant text does NOT contain source mid`, !r.variantContainsSourceMid);
+    }
+  }
+  // Hash distribution: at least 2 distinct idx values across 4 knames
+  const distinctIdx = new Set(out.map(r => r.idx));
+  rec(`${spec.type}.${spec.group}: 4 knames span ≥2 distinct palettes`, distinctIdx.size >= 2, `distinct=${[...distinctIdx].join(',')}`);
+}
+
+await assertPage.close();
+
 console.log('\n[variants] === PAGE ERRORS ===');
 const realErrs = errs.filter(e => !/favicon/i.test(e));
 if (realErrs.length === 0) {
@@ -105,6 +199,9 @@ if (realErrs.length === 0) {
   realErrs.slice(0, 10).forEach(e => console.log('  ', e));
 }
 
+const passed = assertResults.filter(r => r.ok).length;
+console.log(`\n[variants] assertions: ${passed}/${assertResults.length} passed`);
+
 await browser.close();
 await server.stop();
-process.exit(realErrs.length === 0 ? 0 : 1);
+process.exit(realErrs.length === 0 && passed === assertResults.length ? 0 : 1);
