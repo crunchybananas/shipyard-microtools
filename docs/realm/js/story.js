@@ -851,6 +851,31 @@ const NARRATIVE_BEATS = [
   { flag: 'silent_morning_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
     text: 'Listen for the bell on the day the bell does not ring. Once a year the church keeps a silent morning. No one has ever decided which morning; the realm always knows.' },
+  // Loop 307 (surprise, un-filed, alternation after 306 fixer): PATH-
+  // KNOWS-ROUTINE shape-extension per 276 invariant + 3rd STRUCTURAL
+  // surprise per 301 [process] 4-vector framework. 6th shape of
+  // land-as-agent sub-type (sibling to 207/227/229/290/294). NEW
+  // ANGLE: ANTICIPATORY-AGENCY — the path KNOWS where the citizen
+  // is going BEFORE the citizen does. Distinct from prior 5 shapes:
+  // 207 (land foreign→home), 227 (object holds bucket-memory), 229
+  // (object holds names), 290 (object came from outside), 294
+  // (object reshaped by use). 307 captures objects that KNOW IN
+  // ADVANCE — anticipation as agency. STRUCTURAL surprise: 3rd
+  // beat to open with non-declarative form (after 301 question +
+  // 305 imperative): SECOND-PERSON address. The "you" addresses
+  // the reader as if they were the realm's citizen — different
+  // from imperative ("listen") + question ("why"). 3 STRUCTURAL
+  // SURPRISES NOW (301 question / 305 imperative / 307 second-
+  // person) — 231 invariant-promotion threshold MET; ready for
+  // archivist review per 305 [process] filing. Lift line "the
+  // realm has no need to ask where" captures privacy-WITHOUT-
+  // surveillance: realm doesn't need to track citizens because
+  // their paths already know. Land-as-agent now at 6 shapes —
+  // sole leader (forgetting at 5). Gate: year3 (need long-enough
+  // for "many times" to land). Once-per-realm; tag misc.
+  { flag: 'path_knows_routine_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3,
+    text: 'You walk down the path you have walked many times. The path knows where you are going before you do. The realm has no need to ask where.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

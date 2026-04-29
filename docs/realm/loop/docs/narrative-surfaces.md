@@ -686,11 +686,14 @@ should respect:
     sub-type to grow 3 shapes** (after individual-
     interiority); the 3 shapes span 3 distinct DOMAINS
     of habituation (action / time / language).
-  - *Land-as-agent* (207/227/229/290/294): made/own
-    → +INHERITED-FROM-OUTSIDE → +RESHAPED-BY-USE.
-    290 = objects realm DID NOT MAKE; 294 = objects
-    the realm has WORN through use. 5 shapes total —
-    most of any sub-type.
+  - *Land-as-agent* (207/227/229/290/294/307): made/own
+    → +INHERITED-FROM-OUTSIDE → +RESHAPED-BY-USE →
+    +ANTICIPATORY-AGENCY. 290 = objects realm DID NOT
+    MAKE; 294 = objects the realm has WORN; 307 = path
+    KNOWS where citizen is going BEFORE citizen does
+    (anticipation as agency; lift line "the realm has
+    no need to ask where" — privacy-WITHOUT-surveillance).
+    **6 shapes total — sole-leading sub-type.**
   - *Forgetting* (184/190/292/301): LOSS → +ARTIFACT-
     PRESERVED-MEANING-LOST → +RITUAL-PERSISTENCE-
     WITHOUT-ORIGIN. 292 = object kept by inertia;
@@ -1122,8 +1125,9 @@ prescriptive AND consistently applied.
       surprise**: imperative-opening (vs
       301 question-opening). Per 301
       [process] 4-vector framework.
-    5 shapes — joint-leading sub-type with
-    land-as-agent. Per 276 invariant.
+    5 shapes — second-leading sub-type after
+    307 promoted land-as-agent to 6. Per 276
+    invariant.
   - *Naming-place* (193): the realm gives a
     place a colloquial name. Third member of
     the realm-environment naming triplet
@@ -1133,23 +1137,25 @@ prescriptive AND consistently applied.
     Anti-anxious continuity register
     counterbalancing the late-arc bias 195
     flagged.
-  - *Land-as-agent* (207/227/229/290/294):
+  - *Land-as-agent* (207/227/229/290/294/307):
     land/object/relational-keeper has subjective
-    voice. **5 shapes** (most of any sub-type):
-    - 207 broad LAND collective ("the land has
-      agreed to be lived in")
-    - 227 OBJECT-HOLDS-MEMORY ("water felt
-      every bucket lowered to it")
-    - 229 OBJECT-HOLDS-NAMES ("the hearth seems
-      to know which names belong to it")
-    - 290 INHERITED-FROM-OUTSIDE ("a bell...
-      pulled from the sea... rings clearer than
-      any bell the realm has cast")
-    - 294 RESHAPED-BY-USE ("a step at the
-      church door... worn to a curve... regulars
-      step over the dip without looking") —
-      physical deformation through generations
-      of use creates insider/outsider knowledge.
+    voice. **6 shapes** (sole-leading sub-type):
+    - 207 broad LAND collective
+    - 227 OBJECT-HOLDS-MEMORY (well water)
+    - 229 OBJECT-HOLDS-NAMES (hearth)
+    - 290 INHERITED-FROM-OUTSIDE (sea-bell)
+    - 294 RESHAPED-BY-USE (worn step)
+    - 307 ANTICIPATORY-AGENCY ("the path
+      knows where you are going before you
+      do. The realm has no need to ask
+      where") — object KNOWS in advance;
+      anticipation as agency. **3rd
+      structural surprise**: SECOND-PERSON
+      address (after 301 question / 305
+      imperative). Per 301 [process] 4-
+      vector framework — STRUCTURAL pattern
+      now at 3 confirming uses (231 promotion
+      threshold MET).
     Per 276 invariant.
   - *Sustained-state-recognition* (211/228/230):
     the realm crosses a temporal threshold and

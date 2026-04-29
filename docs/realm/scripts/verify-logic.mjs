@@ -401,6 +401,18 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 307 path_knows_routine_known — anticipatory-agency (6th land-as-agent; 3rd structural-second-person)
+const pathKnowsFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  delete window.G.storyFlags.path_knows_routine_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.path_knows_routine_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('You walk down the path'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('307: path_knows_routine_known fires year3', pathKnowsFire.fired, `text="${pathKnowsFire.text}…" tag=${pathKnowsFire.tag}`);
+
 // Test: 305 silent_morning_known — emergent-tradition (5th forgetting shape; 2nd structural-imperative)
 const silentMorningFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
