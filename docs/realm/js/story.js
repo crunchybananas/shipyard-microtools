@@ -27,6 +27,17 @@ const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem
 
 export function chronicle(text, tag='misc') {
   initChronicle();
+  // Loop 260 (the-player [play]): once the realm has fallen, no more
+  // beats. The 192 commit added G.realmEnded but never wired the
+  // consumer ("chronicle stop" was filed at 192, never shipped). 260's
+  // play tick observed 248 beats writing AFTER realm_fell at day 52
+  // through day 720 — raids on a village with no population, echoes
+  // referencing a kingdom no one remembers. Gate at the chronicle()
+  // write itself so ALL call sites (NARRATIVE_BEATS / season-changes /
+  // dreams / nightmares / echoes / raids / events) benefit from a
+  // single check. The realm_fell beat itself still writes its requiem
+  // because `after: G => { G.realmEnded = true; }` runs AFTER chronicle.
+  if (G.realmEnded) return;
   G.chronicle.push({
     day: G.day,
     season: G.season,
@@ -1011,6 +1022,11 @@ const NARRATIVE_BEATS = [
 // Run each tick/day to detect milestones and fire beats once.
 export function checkStoryBeats() {
   initChronicle();
+  // Loop 260 (the-player): also gate the iteration itself so flags
+  // don't get set for beats whose chronicle write would no-op anyway.
+  // Belt-and-suspenders alongside the chronicle() gate above — the
+  // chronicle() gate is the seatbelt; this is the speed-limit.
+  if (G.realmEnded) return;
 
   // Simple first-build beats — one pattern, one table. See BUILDING_FIRST_BEATS.
   // The optional `after` field runs once when a beat fires; used to introduce

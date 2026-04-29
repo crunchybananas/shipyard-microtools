@@ -143,6 +143,8 @@ const realmFell = await page.evaluate(async () => {
   story.checkStoryBeats();
   const fired = window.G.storyFlags.realm_fell === true;
   const flagSet = window.G.realmEnded === true;
+  // 260: reset so the new checkStoryBeats gate doesn't block downstream tests
+  window.G.realmEnded = false;
   return { fired, flagSet };
 });
 rec('192: realm_fell after-callback sets G.realmEnded', realmFell.fired && realmFell.flagSet, `fired=${realmFell.fired} flag=${realmFell.flagSet}`);
@@ -178,6 +180,24 @@ const mayorFire = await page.evaluate(async () => {
   return { fired, text: entry?.text?.slice(0, 60), tag: entry?.tag };
 });
 rec('253: mayor_first_in_hall fires mayor + year3 + townhall', mayorFire.fired, `text="${mayorFire.text}…" tag=${mayorFire.tag}`);
+
+// Test: 260 — chronicle() gates on G.realmEnded (the-player [play] finding)
+const chronicleGate = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  // Establish baseline length, ensure realm not ended
+  window.G.realmEnded = false;
+  story.chronicle('test entry pre-end', 'misc');
+  const lenBeforeEnd = window.G.chronicle.length;
+  // Set realmEnded; further writes must be no-ops
+  window.G.realmEnded = true;
+  story.chronicle('attempted write post-end', 'misc');
+  story.chronicle('another attempt', 'misc');
+  const lenAfterEnd = window.G.chronicle.length;
+  // Reset for downstream tests
+  window.G.realmEnded = false;
+  return { lenBeforeEnd, lenAfterEnd, gateHeld: lenBeforeEnd === lenAfterEnd };
+});
+rec('260: chronicle() gates on G.realmEnded', chronicleGate.gateHeld, `before=${chronicleGate.lenBeforeEnd} after=${chronicleGate.lenAfterEnd}`);
 
 // Test: 258 — townhall maxCount:1 enforced via isBuildingUnlocked
 const townhallMaxCount = await page.evaluate(async () => {
