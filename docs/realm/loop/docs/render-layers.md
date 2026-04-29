@@ -1,8 +1,15 @@
 # render-layers.md
 
-**Status:** Written in tick 165. Updated 167, 168, 170, 172.
+**Status:** Written in tick 165. Updated 167, 168, 170, 172, 215, 226.
 Maintained by subsequent loops as new sprites/meshes land or the
 integration story changes.
+
+**Arc complete (226):** Phase A (161-182, 22 ticks: 11 SVG sprites) →
+Phase B (216-221, 6 ticks: live-game integration) → Phase C
+(223-225, 3 ticks: animation polish). **Total 64 ticks (161-225).**
+The user steering at 161 ("really focus on the svg generation")
+fully landed: the 11 SVG sprites are now live, animated, and
+deterministically variant per realm. 3D axis retired at 215.
 **Sources:** 161 opened the SVG axis (granary.svg + sandbox); 162
 shipped castle.svg; 163 opened the 3D engine axis with granary mesh
 + pushCylinder + debug-pillar cleanup; 164 shipped church.svg
@@ -289,16 +296,38 @@ in `docs/realm/scripts/` provide regression tests:
 - `verify-variants.mjs` — per-realm palette distribution
 - `verify-default-svg.mjs` — default-flag-true sanity
 
-### Phase C — animation polish (~2-3 ticks)
+### Phase C — animation polish (~~2-3 ticks~~ shipped 223-225, 3 ticks)
 
-After integration, ship animation:
-- Animated windmill sails (rotation around hub axis)
-- Castle pennants + flag sway
-- Tower lantern flicker + banner sway
+**COMPLETE as of tick 225.** All 3 filed animation steps shipped
++ extras. 5 sprites animate in the live game:
 
-Use `<animate>` or CSS keyframes for SVG-internal animation;
-fall back to canvas-pipeline timer-driven re-render if the SVG
-animation path doesn't compose with the integration approach.
+1. **223 — Windmill sails.** `<animateTransform type="rotate">`
+   wraps the 4 sail `<g>` blocks. 8s per full rotation around hub
+   center (64, 71). Hub + bolts + highlight stay fixed. Closes
+   168 filing (~55 ticks; originally filed for 3D animation,
+   shipped via SVG since 3D retired at 215).
+2. **224 — Castle pennants + tower banner sway.** Four
+   `<animateTransform type="rotate">` oscillations around
+   pole-tip pivots. Castle red 3.0s + blue 3.4s + gold 4.0s;
+   tower red 3.2s. Asymmetric ranges (e.g., -7° to +5°) +
+   distinct durations = gusty wind, not metronomic pulse.
+   Heavier flags get slower + narrower swings.
+3. **225 — Lantern flicker + smoke drift.** Tower lantern
+   `<animate opacity>` 1.4s with 7-keyframe values (`1; 0.92;
+   0.96; 1; 0.88; 0.95; 1`) reads as candle/oil-lamp not
+   sine-pulse. House chimney 3-wisp smoke plume + bakery 4-wisp
+   bigger plume, both `<animateTransform translate>` +
+   `<animate opacity>` paired with staggered begin times for
+   continuous-plume effect (4.8s / 6s cycles).
+
+**Implementation invariant:** SVG-internal animation = ZERO
+render.js cost. Phase B integration was the hard work; Phase C
+ships as SVG editing. `verify-anim.mjs` (multi-sprite) confirms
+animations active via t=0/t=N PNG-byte-diff check.
+
+**Filed for follow-on (post-Phase-C polish):** market awning
+sway (179) + blacksmith fire-pulse / sparks (176) + tavern
+sign-swing (175). Lower priority; ~10 LoC each; could batch.
 
 ### What's deferred
 

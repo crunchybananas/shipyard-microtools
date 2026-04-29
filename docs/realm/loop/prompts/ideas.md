@@ -28,6 +28,9 @@ and note the promotion here.
 
 (new ideas go here — newest on top)
 
+- 226 [code] — Phase D candidates (post-Phase-C extra animation): windmill dust drift / market awning sway / blacksmith fire-pulse + sparks / tavern sign-swing / bakery flour-dust on doorstep / church bell occasional swing / granary grain-pile dust / barracks training-dummy idle sway. Each ~5-15 LoC. Could batch ALL in a single follow-on tick if scope allows. [SVG files]
+- 226 [process] — observation: Phase A→B→C arc-completion is worth a "milestone letter" treatment at next century (250). Different kind of milestone from 100/200's user-fear / loop-discipline letters — this one closes a USER STEERING arc. Document as sub-pattern of milestone-letter shape. [journal]
+- 226 [doc] — render-layers.md should eventually document the ~65 LoC `_VARIANT_PALETTES` + per-realm sprite variant pipeline shipped at 220 — currently captures Phase B 6-step plan in detail but not the variant pipeline. ~20-30 LoC. [loop/docs/]
 - 225 [code] — Phase C extra polish (post-3-step-plan): market awning sway (179 filing) + blacksmith fire-pulse / sparks (176 filing) + tavern sign-swing (175 filing). Each ~10 LoC; could batch in 1 tick. Lower priority than Phase C 3-step plan but easy follow-on. [SVG files]
 - 225 [doc] — Phase A→B→C arc spans 64 ticks (161-225). Document as milestone-shape arc-completion in render-layers.md + next milestone-letter (250?). [loop/docs/]
 - 225 [process] — observation: a "filed animation" can be reinterpreted in implementation (180 filed flour-dust; shipped as smoke-drift since smoke already existed in asset). Loop discipline: honor SPIRIT of filed ideas not exact wording when a better implementation presents itself. Document. [process]
