@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 331 winter_normalized_known — single-axis surprise (4th sustained-state-recognition shape; NORMALIZATION-THROUGH-ACCUMULATION)
+const winterNormalFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.season = 'winter';
+  delete window.G.storyFlags.winter_normalized_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.winter_normalized_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('By the third winter'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('331: winter_normalized_known fires year3 + season=winter', winterNormalFire.fired, `text="${winterNormalFire.text}…" tag=${winterNormalFire.tag}`);
+
 // Test: 329 bird_namer_known — single-axis surprise (4th individual-interiority shape; PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION)
 const birdNamerFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

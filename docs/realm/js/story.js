@@ -1169,6 +1169,41 @@ const NARRATIVE_BEATS = [
   { flag: 'bird_namer_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 100,
     text: 'There is a citizen who knows every bird in the realm by sound. No one has asked, and no one has been told. The knowing happens every morning, in the quiet before breakfast.' },
+  // Loop 331 (surprise, 329 [code] filing): SINGLE-AXIS surprise — 5th
+  // sustained-state-recognition shape per 276 invariant. Sub-type was
+  // most-under-extended at 3 shapes (most-under-extended target per
+  // 329 [process]); 331 promotes 3→4. NEW ANGLE: NORMALIZATION-
+  // THROUGH-ACCUMULATION. The realm crosses a SEASONAL-CYCLE
+  // threshold: the third winter feels indistinguishable from the
+  // second; winter has shifted from EVENT to BACKGROUND. Threshold
+  // is not a count crossed but a TRANSFORMATION (event → weather).
+  // Distinct from prior sustained-state shapes:
+  //  - 211 sustained-peace 50d — count threshold (50 days no raid)
+  //  - 228 no-death 100d — count threshold (days since last death)
+  //  - 230 full-pop — ratio threshold (current/max = 1)
+  //  - 331 winter-normalized — TRANSFORMATION threshold (recurring
+  //    cycle becoming background). All prior 3 are MOMENTARY-
+  //    crossings; 331 is CHARACTER-OF-EXPERIENCE crossing.
+  // Distinct from 254 AUTOMATICITY (action without thinking; subject
+  // is action, not season) and 246 first_thaw (year2+spring; subject
+  // is the moment of seasonal arrival, not seasonal ROUTINIZATION).
+  // 331's lift "Winter has become weather" reframes winter from
+  // notable-event to ordinary-condition — captures the moment when
+  // accumulated experience erases anticipation.
+  // **Single-axis ship** (ANGLE-only); 4th consecutive single-axis
+  // surprise (after 325/327/329) — pattern continues as production
+  // default for ANGLE-only ships. Sustained-state-recognition sub-
+  // type 3→4 shapes; **8 of 9 INSIDE sub-types now at 4+ shapes**
+  // (only naming-place at 3 remaining). Gate: year3 + winter — uses
+  // SEASONAL gate rather than day-offset because year3-winter
+  // naturally distributes across the realm's seasonal cycle (per
+  // 254 nights_blur precedent: year2 + autumn/winter; per 246
+  // first_thaw: year2 + spring d>=32). The seasonal condition
+  // provides natural spread without explicit day-offset. Once-per-
+  // realm; tag misc.
+  { flag: 'winter_normalized_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.season === 'winter',
+    text: 'By the third winter the realm has stopped counting. The third frost feels neither earlier nor later than the second. Winter has become weather.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

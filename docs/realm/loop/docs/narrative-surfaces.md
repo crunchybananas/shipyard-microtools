@@ -1103,9 +1103,10 @@ prescriptive AND consistently applied.
   - Ambient-entity-grammar: 4 shapes
   - Early-game-mood: 4 shapes
   - Individual-interiority: 4 shapes (post-329)
-  - Sustained-state-recognition: 3 shapes (most-
-    under-extended; next single-axis-extension
-    target)
+  - Sustained-state-recognition: 3 shapes at
+    330 (4 post-331; was most-under-extended;
+    naming-place becomes new most-under-extended
+    target post-331)
   - Naming-place: 3 shapes (recovered from 130-tick
     dormancy at 1 shape via 325 + 327)
 
@@ -1490,26 +1491,41 @@ prescriptive AND consistently applied.
       imperative). Per 308 STRUCTURAL-
       surprise invariant.
     Per 276 invariant.
-  - *Sustained-state-recognition* (211/228/230):
+  - *Sustained-state-recognition* (211/228/230/331):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.
-    Three durations shipped:
+    **4 shapes** post-331:
     - 211 sustained-peace 50d ("watch still
-      climbs the walls but hands rest")
+      climbs the walls but hands rest") — count
+      threshold (no raid days).
     - 228 no-death 100d ("hundred days without
       burial; grave field is older than the
-      last grave")
+      last grave") — count threshold (days
+      since last death).
     - 230 full-pop 60d ("for sixty days the
       houses have all stood full... the realm
       is the size it knows how to be, for now")
-    All three follow the same infrastructure
-    pattern: G.lastXDay tracker + save.js
-    persistence + earned-state gate. **3 uses
-    meets 3+ threshold; INTENTIONALLY NOT
-    PROMOTED** per 231 contrarian — same
-    cluster-sub-type reasoning as land-as-agent
-    above. Future literary-uses welcome (peak
-    happiness 30d filed at 211; full-pop +
+      — ratio threshold (current/max = 1).
+    - 331 winter-normalized ("By the third
+      winter the realm has stopped counting...
+      Winter has become weather") —
+      TRANSFORMATION threshold (recurring cycle
+      becoming background); seasonal-cycle
+      threshold rather than count or ratio.
+      First sustained-state shape to track
+      CHARACTER-OF-EXPERIENCE crossing rather
+      than MOMENTARY count crossing.
+    Prior 3 (211/228/230) follow the same
+    infrastructure pattern: G.lastXDay tracker
+    + save.js persistence + earned-state gate.
+    **331 uses a different infrastructure**:
+    G.season + year3 flag (no per-realm tracker
+    needed; the cycle-count is implicit in
+    year3 = "third year" = "third cycle of all
+    seasons"). Single-axis ship #4 in a row
+    (after 325/327/329); axis-flexibility
+    pattern empirically continued.
+    Future literary-uses welcome (peak
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
