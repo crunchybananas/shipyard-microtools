@@ -686,10 +686,11 @@ should respect:
     sub-type to grow 3 shapes** (after individual-
     interiority); the 3 shapes span 3 distinct DOMAINS
     of habituation (action / time / language).
-  - *Land-as-agent* (207/227/229/290): made/own → +
-    INHERITED-FROM-OUTSIDE. 290 introduces objects
-    the realm DID NOT MAKE but uses; cultural
-    humility about craft.
+  - *Land-as-agent* (207/227/229/290/294): made/own
+    → +INHERITED-FROM-OUTSIDE → +RESHAPED-BY-USE.
+    290 = objects realm DID NOT MAKE; 294 = objects
+    the realm has WORN through use. 5 shapes total —
+    most of any sub-type.
   - *Forgetting* (184/190/292): LOSS → +PRESERVATION-
     WITHOUT-MEMORY. 292 introduces artifacts kept by
     inertia after meaning has lapsed.
@@ -1067,22 +1068,23 @@ prescriptive AND consistently applied.
     Anti-anxious continuity register
     counterbalancing the late-arc bias 195
     flagged.
-  - *Land-as-agent* (207/227/229/290):
+  - *Land-as-agent* (207/227/229/290/294):
     land/object/relational-keeper has subjective
-    voice. **4 shapes** (per 276 invariant):
-    - 207 broad LAND collective — "the land
-      has agreed to be lived in"
-    - 227 specific OBJECT interiority — "water
-      felt every bucket lowered to it"
-    - 229 RELATIONAL keeper — "the hearth
-      seems to know which names belong to it"
-    - 290 INHERITED OBJECT — "a bell at the
-      church... pulled from the sea... rings
-      clearer than any bell the realm has cast"
-    290 introduces INHERITANCE-VS-CRAFT shape:
-    object came from outside the realm,
-    predates it, and the realm acknowledges its
-    found-object outshines its made-objects.
+    voice. **5 shapes** (most of any sub-type):
+    - 207 broad LAND collective ("the land has
+      agreed to be lived in")
+    - 227 OBJECT-HOLDS-MEMORY ("water felt
+      every bucket lowered to it")
+    - 229 OBJECT-HOLDS-NAMES ("the hearth seems
+      to know which names belong to it")
+    - 290 INHERITED-FROM-OUTSIDE ("a bell...
+      pulled from the sea... rings clearer than
+      any bell the realm has cast")
+    - 294 RESHAPED-BY-USE ("a step at the
+      church door... worn to a curve... regulars
+      step over the dip without looking") —
+      physical deformation through generations
+      of use creates insider/outsider knowledge.
     Per 276 invariant.
   - *Sustained-state-recognition* (211/228/230):
     the realm crosses a temporal threshold and

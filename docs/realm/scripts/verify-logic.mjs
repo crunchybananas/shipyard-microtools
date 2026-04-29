@@ -385,6 +385,22 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 294 church_step_worn_known — reshaped-by-use (5th land-as-agent shape)
+const stepWornFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.buildings = window.G.buildings || [];
+  if (!window.G.buildings.some(b => b.type === 'church')) {
+    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  }
+  delete window.G.storyFlags.church_step_worn_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.church_step_worn_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a step at the church'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('294: church_step_worn_known fires year3 + church', stepWornFire.fired, `text="${stepWornFire.text}…" tag=${stepWornFire.tag}`);
+
 // Test: 292 bakery_door_carving_known — preservation-without-memory (3rd forgetting shape)
 const carvingFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

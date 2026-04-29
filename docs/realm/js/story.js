@@ -729,6 +729,25 @@ const NARRATIVE_BEATS = [
   { flag: 'bakery_door_carving_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'bakery'),
     text: 'There is a name carved into the door of the bakery that no one alive remembers. The baker who carved it never said why. The new bakers leave it where it is.' },
+  // Loop 294 (surprise, un-filed, alternation; pre-300 narrative
+  // material): RESHAPED-BY-USE shape-extension per 276 invariant.
+  // 5th shape of land-as-agent sub-type (sibling to 207 broad-land /
+  // 227 specific-object well / 229 relational hearth / 290 inherited
+  // bell). NEW ANGLE: physical deformation of an artifact through
+  // generations of use, creating insider/outsider knowledge. The
+  // step's worn dip looks broken to newcomers, invisible to regulars.
+  // Distinct from 207 (land BECOMING familiar — broader transition);
+  // 227 (water HOLDING memory of buckets); 229 (hearth HOLDING names);
+  // 290 (object INHERITED from outside). 294 is RESHAPED-BY-USE: the
+  // realm's own activity has worn the artifact into its current form;
+  // the deformation IS the history. Land-as-agent sub-type now has
+  // 5 shapes — the most of any sub-type. Per 276 + 257: ships because
+  // RESHAPED-BY-USE angle the corpus has never touched, not as count-
+  // advancement. Gate: church + year3 (need long-use temporal distance
+  // for "many years" to land). Once-per-realm; tag misc.
+  { flag: 'church_step_worn_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.buildings && G.buildings.some(b => b.type === 'church'),
+    text: 'There is a step at the church door that has been worn to a curve by feet over many years. New visitors trip on it; regulars step over the dip without looking.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
