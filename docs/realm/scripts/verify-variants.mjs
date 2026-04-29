@@ -133,6 +133,16 @@ const SPECS = [
     ],
     labels: ['warm', 'cool-grey', 'red-brick', 'marble'],
   },
+  {
+    type: 'castle', group: 'roof',
+    palettes: [
+      ['#d03030', '#a82020', '#6a1010'],
+      ['#3060d0', '#2050a8', '#10306a'],
+      ['#30a830', '#208820', '#106a10'],
+      ['#a830a8', '#702070', '#400040'],
+    ],
+    labels: ['red', 'blue', 'green', 'purple'],
+  },
 ];
 
 const assertResults = [];

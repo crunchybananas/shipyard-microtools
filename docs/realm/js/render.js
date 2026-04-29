@@ -114,6 +114,20 @@ const _VARIANT_PALETTES = {
       ['#f4f0e8', '#e0dcd0', '#a8a496'],  // 3 pale-marble — formal civic
     ],
   },
+  // Loop 279 (the-fixer, 220+259 filings): castle roof variants. Source
+  // #d03030/#a82020/#6a1010 (lines 48-50 of castle.svg) is the red-roof
+  // gradient — visually prominent on the keep. 3 alternates differentiate
+  // realm faction-feel per kingdom. Stone walls stay constant so the
+  // castle silhouette is universally recognizable; only the roof color
+  // varies as a HERALDIC marker.
+  castle: {
+    roof: [
+      ['#d03030', '#a82020', '#6a1010'],  // 0 red (default)
+      ['#3060d0', '#2050a8', '#10306a'],  // 1 blue — naval realm
+      ['#30a830', '#208820', '#106a10'],  // 2 green — moss/forest realm
+      ['#a830a8', '#702070', '#400040'],  // 3 purple — twilight/court realm
+    ],
+  },
 };
 // Tiny string-hash for kingdom-name → variant index. Mirrors the
 // _dreamHash style used in story.js without an import (avoids circular
