@@ -283,6 +283,7 @@ G.debug.tintCurve = tintCurve;
 G.debug.dreamLens = _realWorldDreamLens;
 G.debug.renderBuildingIsolated = renderBuildingIsolated;
 G.debug.fastForward = fastForward;  // 081: synchronous N-day advance
+G.debug.disableEvents = false;       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /

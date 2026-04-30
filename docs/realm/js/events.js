@@ -363,6 +363,13 @@ function showToast(msg, danger = false) {
 export function checkRandomEvents() {
   // Only fire at day transitions, skip early game
   if (G.day < 4) return;
+  // Loop 356 (the-fixer, 355 [code] filing): skip random-event rolls
+  // when probe-harness has set G.debug.disableEvents = true. Lets
+  // active events still expire normally (caller below). Analog to
+  // nextRaidDay=9999 (raid-suppress); closes 355 pessimist finding
+  // where 240-day fastForward + raid-suppress STILL hit realm_fell
+  // via drought/plague before reaching long-day beat gates.
+  if (G.debug?.disableEvents && !G.activeEvent) return;
   if (G.activeEvent) {
     // Check if active event expired
     if (G.activeEvent.endDay <= G.day) {

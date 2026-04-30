@@ -445,6 +445,35 @@ const afternoonQuietFire = await page.evaluate(async () => {
 });
 rec('354: afternoon_quiet_known fires year2 + d>=80', afternoonQuietFire.fired, `text="${afternoonQuietFire.text}…" tag=${afternoonQuietFire.tag}`);
 
+// Test: 356 G.debug.disableEvents knob suppresses random-event rolls (closes 355 pessimist finding)
+const disableEventsTest = await page.evaluate(async () => {
+  const events = await import('./js/events.js');
+  // Bypass the day<4 guard
+  window.G.day = 100;
+  window.G.activeEvent = null;
+  window.G.debug.disableEvents = true;
+  // Run 100 checkRandomEvents calls; with knob set, no event should ever activate
+  for (let i = 0; i < 100; i++) {
+    events.checkRandomEvents();
+  }
+  const noEventDuringSuppress = window.G.activeEvent === null;
+  // Now disable the knob; should be able to roll an event eventually
+  window.G.debug.disableEvents = false;
+  let rolledOnce = false;
+  for (let i = 0; i < 200 && !rolledOnce; i++) {
+    events.checkRandomEvents();
+    if (window.G.activeEvent) rolledOnce = true;
+  }
+  // Cleanup so subsequent tests aren't perturbed
+  if (window.G.activeEvent) {
+    const def = events.EVENT_DEFS.find(e => e.id === window.G.activeEvent.id);
+    def?.onEnd?.();
+    window.G.activeEvent = null;
+  }
+  return { noEventDuringSuppress, rolledAfterDisable: rolledOnce };
+});
+rec('356: G.debug.disableEvents suppresses event-rolls (closes 355 pessimist)', disableEventsTest.noEventDuringSuppress && disableEventsTest.rolledAfterDisable, `noEventDuringSuppress=${disableEventsTest.noEventDuringSuppress} rolledAfterDisable=${disableEventsTest.rolledAfterDisable}`);
+
 // Test: 347 avoided_corner_known — single-axis (6th individual-interiority; AVOIDANCE-UNEXPLAINED; INTERIOR-MANIFESTATION-MODE axis articulated; 7/9 axes)
 const avoidedCornerFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
