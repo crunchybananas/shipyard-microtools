@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 348 present_forgetting_known — single-axis (7th forgetting; PRESENT-FORGETTING-AS-EMERGING-GAP; sole-leader at 7; first sub-type at 7)
+const presentForgettingFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 165;
+  delete window.G.storyFlags.present_forgetting_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.present_forgetting_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The realm is forgetting something at this moment'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('348: present_forgetting_known fires year3 + d>=160', presentForgettingFire.fired, `text="${presentForgettingFire.text}…" tag=${presentForgettingFire.tag}`);
+
 // Test: 347 avoided_corner_known — single-axis (6th individual-interiority; AVOIDANCE-UNEXPLAINED; INTERIOR-MANIFESTATION-MODE axis articulated; 7/9 axes)
 const avoidedCornerFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

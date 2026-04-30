@@ -1623,11 +1623,12 @@ prescriptive AND consistently applied.
     weather-recognition).
     Per 276 invariant + 308 STRUCTURAL-surprise
     invariant.
-  - *Forgetting* (184/190/292/301/305/336):
+  - *Forgetting* (184/190/292/301/305/336/348):
     closure of a long-lived object's or
-    practice's KNOWLEDGE. **6 shapes**
-    spanning loss / persistence /
-    emergence / active-pedagogy:
+    practice's KNOWLEDGE. **7 shapes** post-
+    348 — sole-leader (LA/Am/II at 6).
+    Spanning loss / persistence / emergence /
+    active-pedagogy / present-loss:
     - 184 stone_forgotten — OBJECT WEATHERED.
     - 190 constellation_forgotten — PATTERN
       UNNAMED.
@@ -1658,12 +1659,19 @@ prescriptive AND consistently applied.
       First FUTURE-ORIENTED shape (prior 5
       are PAST-ORIENTED: things lost or
       origin obscured).
-    **6 shapes — joins land-as-agent (6) at
-    sole-leader level**; 2 sub-types now
-    tied at 6. Forgetting now has TWO
-    temporal orientations: PAST-ORIENTED
-    (184/190/292/301/305) + FUTURE-ORIENTED
-    (336). Per 276 invariant.
+    - 348 PRESENT-FORGETTING-AS-EMERGING-GAP
+      ("The realm is forgetting something at
+      this moment. No one knows what... the
+      something will be the gap.") —
+      temporally PRESENT (not past, not
+      future); meta-aware mid-process
+      forgetting; INVOLUNTARY.
+    **7 shapes — SOLE-LEADER post-348**
+    (LA/Am/II at 6). Forgetting temporal
+    axis advances 2-position → **3-position**
+    (PAST/PRESENT/FUTURE): PAST 184/190/292/
+    301/305 + PRESENT 348 + FUTURE 336. Per
+    276 invariant.
   - *Naming-place* (193/325/327/332/342): the
     realm gives a place a colloquial name. Third
     member of the realm-environment naming

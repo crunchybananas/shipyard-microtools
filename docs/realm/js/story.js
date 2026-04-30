@@ -1699,6 +1699,52 @@ const NARRATIVE_BEATS = [
   { flag: 'avoided_corner_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 155,
     text: 'There is a citizen who has never sat in the south corner of the inn. They could not say why. The realm has never asked, and the south corner remains theirs not to sit in.' },
+  // Loop 348 (surprise, un-filed): SINGLE-AXIS surprise — 7th
+  // forgetting shape per 276 invariant. Sub-type 6→7 shapes;
+  // becomes SOLE-LEADER again (LA/Am/II remain at 6). NEW ANGLE:
+  // PRESENT-FORGETTING-AS-EMERGING-GAP — forgetting happening
+  // RIGHT NOW; meta-aware mid-process.
+  // Distinct from prior 6 forgetting shapes:
+  //  - 184 stone-forgotten (PAST-OBJECT-WEATHERED)
+  //  - 190 constellation-forgotten (PAST-PATTERN-UNNAMED)
+  //  - 292 bakery-door-carving (PAST-ARTIFACT-PRESERVED-MEANING-LOST)
+  //  - 301 noon-bell-origin (PAST-RITUAL-PERSISTS-WITHOUT-ORIGIN)
+  //  - 305 silent-morning (PAST-EMERGENT-TRADITION; origin never
+  //    existed)
+  //  - 336 unteach (FUTURE-ACTIVE-FORGETTING-AS-PEDAGOGY)
+  //  - 348 PRESENT-FORGETTING-AS-EMERGING-GAP — temporally
+  //    PRESENT (not past, not future); forgetting is happening
+  //    RIGHT NOW; the realm KNOWS it's forgetting but doesn't
+  //    know WHAT.
+  // Per 336 [process] forgetting temporal axis: was 2-position
+  // (PAST + FUTURE); 348 ADVANCES to 3-position (PAST + PRESENT +
+  // FUTURE). Sub-type-internal-axes meta-pattern: forgetting's
+  // axis count was 1 (PAST/FUTURE 2-pos); now richer (PAST/
+  // PRESENT/FUTURE 3-pos) — same axis, more positions.
+  // Distinct from related angles:
+  //  - 263 META-self-aware (chronicle-as-thing-in-world; OUTSIDE
+  //    register): 348 is INSIDE; doesn't reference chronicle
+  //  - 322 RECURRENCE (settled-place repetition): 348 is mid-
+  //    process loss
+  //  - 336 ACTIVE-FORGETTING (deliberate non-teaching; future-
+  //    oriented): 348 is INVOLUNTARY mid-process; not deliberate
+  //  - 305 EMERGENT-TRADITION (no decision; practice formed):
+  //    348 is no decision; thing being lost; the negative
+  //    counterpart
+  // Lift "the something will be the gap" captures forgetting-as-
+  // emerging-absence. The most striking framing: the realm
+  // KNOWS something is being lost without being able to NAME
+  // what; by the time the loss is articulated, the gap will
+  // already be the only thing remaining.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Forgetting now SOLE-LEADER at 7 shapes
+  // (LA/Am/II at 6). Cluster top advances; **first sub-type to
+  // reach 7 shapes**. Total INSIDE shapes: 50. Gate: year3 +
+  // day>=160 per 321 authoring guideline. Once-per-realm; tag
+  // misc.
+  { flag: 'present_forgetting_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 160,
+    text: 'The realm is forgetting something at this moment. No one knows what. By the time someone says "we used to," the something will be the gap.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
