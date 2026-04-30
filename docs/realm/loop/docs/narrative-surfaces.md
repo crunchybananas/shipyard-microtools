@@ -738,7 +738,8 @@ should respect:
   - 336 forgetting: 1D temporal (PAST/FUTURE; later expanded
     to PAST/PRESENT/FUTURE at 348)
   - 337 habituation-recognition: 1D 5-domains (action / time /
-    language / rule-transmission / gesture-enforcement)
+    language / rule-transmission / gesture-enforcement);
+    extended to 6 domains at 354 with rhythmic-collective-moment
   - 339 sustained-state-recognition: 1D 4-threshold-classes
     (count / ratio / transformation / script)
   - 341 weather-recognition: 1D 4-WEATHER-PHASE positions
@@ -1963,11 +1964,11 @@ prescriptive AND consistently applied.
     forgetting (6) and ambient-entity-grammar
     (6) at sole-leader level — 4 sub-types
     tied at 6.
-  - *Habituation-recognition* (254/280/285/312/337):
+  - *Habituation-recognition* (254/280/285/312/337/354):
     the realm recognizes its own habits and
     rhythms (vs sustained-state-recognition's
-    EXTERNAL conditions). **5 shapes** spanning
-    5 domains:
+    EXTERNAL conditions). **6 shapes** spanning
+    6 domains (post-354):
     - 254 AUTOMATICITY ("the fire is set
       without thinking now") — action domain.
     - 280 RHYTHM-AWARENESS ("no one has named
@@ -1995,11 +1996,29 @@ prescriptive AND consistently applied.
       327 (linguistic marker with directional
       correction): 337 is gestural marker
       + non-correction.
+    - 354 RHYTHMIC-COLLECTIVE-MOMENT ("There
+      is a moment in the late afternoon when
+      the realm goes quiet for the length of
+      one breath. No one calls it. No one
+      remembers when it started. The realm
+      has stopped distinguishing the silence
+      from the time.") — synchronized non-
+      conducted moment recurring within a
+      day. Distinct from 280 RHYTHM-AWARENESS
+      (named-time-not-on-clock vs 354 sub-
+      second collective synchronization);
+      distinct from 311 silent_morning
+      (forgetting EMERGENT-TRADITION; daily
+      community-scale practice vs 354 sub-
+      second collective rhythm); distinct
+      from 322 CONTENTMENT (citizen-aware
+      recurrence vs 354 unaware-collective-
+      habit).
     Per 308 STRUCTURAL-surprise invariant +
     276 shape-axis invariant. Sub-type now
-    spans 5 distinct domains: action / time /
+    spans 6 distinct domains: action / time /
     language / rule-transmission / gesture-
-    enforcement.
+    enforcement / rhythmic-collective-moment.
 
   **Beats explicitly OUTSIDE the cluster
   (different register, listed for awareness):**

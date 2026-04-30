@@ -1792,6 +1792,58 @@ const NARRATIVE_BEATS = [
   { flag: 'hill_gathers_fog_known', tag: 'misc',
     trigger: G => G.season === 'autumn' && G.storyFlags.year2 && G.day >= 50,
     text: 'There is a hill on the south coast that gathers fog every autumn morning. The fog finds the hill before the sun finds the realm. The hill does not need a name for what it does.' },
+  // Loop 354 (surprise, un-filed; the-optimist per 353 plan): SINGLE-AXIS
+  // surprise — 6th HABITUATION-RECOGNITION shape per 276 invariant. Sub-
+  // type 5→6 shapes; advances cluster-uniform sweep (5@5→4@5+1@6 post-
+  // 354; HB joins Am/II at 6). NEW DOMAIN: RHYTHMIC-COLLECTIVE-MOMENT
+  // (synchronized non-conducted moments).
+  // Distinct from prior 5 HB domains:
+  //  - 254 ACTION (the way the realm does things)
+  //  - 280 TIME (when meals/work shift unconsciously)
+  //  - 285 LANGUAGE (the realm says X without knowing it adopted X)
+  //  - 312 RULE-TRANSMISSION (tacit norms; shush)
+  //  - 337 GESTURE-ENFORCEMENT (cup-holding; non-correction pedagogy)
+  //  - 354 RHYTHMIC-COLLECTIVE-MOMENT — synchronized collective behavior
+  //    no one coordinated. Distinct from 337 because 337 is single
+  //    citizen acting + collective non-correction; 354 is collective
+  //    synchronization without conducting (everyone goes quiet at the
+  //    same moment without anyone calling for it). Distinct from 311
+  //    silent_morning because 311 is DAILY-SCALE pattern start (Sunday-
+  //    morning quiet AS COMMUNITY-PRACTICE); 354 is SHORTER-SCALE
+  //    moment recurring within a day (one-breath quiet in the late
+  //    afternoon every day).
+  // Distinct from related sub-types:
+  //  - 322 recurrence_known (CONTENTMENT register; settled-place
+  //    repetition): 322 is citizen-AWARENESS of recurrence (mood);
+  //    354 is collective UNAWARE habit (the citizens do it without
+  //    knowing they're doing it together)
+  //  - 343 collective_waking_known (ambient 2D PERSISTENCE×COLLECTIVITY):
+  //    343 is TRANSIENT-COLLECTIVE-WITNESS (a single moment of shared
+  //    seeing); 354 is RECURRING-COLLECTIVE-PERFORMANCE (a habit
+  //    performed every late afternoon)
+  //  - 305 silent_morning_known (forgetting EMERGENT-TRADITION): 305
+  //    is community-scale practice with no origin-decision; 354 is
+  //    collective-rhythm with no origin-decision; difference is 305
+  //    is once-weekly community gathering, 354 is daily sub-second
+  //    synchronization. Both share "no one decided" but at different
+  //    scales of observable behavior.
+  // Lift "The realm has stopped distinguishing the silence from the
+  // time" captures habit-completion: the silence has migrated FROM
+  // citizens INTO the temporal frame; it no longer exists as a
+  // distinct thing the realm DOES, only as a property of the
+  // afternoon itself.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Sub-type 5→6 shapes; HB joins Am/II at 6.
+  // INSIDE cluster post-354: 2@7 (forgetting + LA) / 3@6 (Am, II,
+  // HB) / 4@5 (SS, WE, NP, EM). 52 total INSIDE shapes (was 51).
+  // **Cluster-uniform sweep advance**: 4 sub-types remain at 5; 4
+  // more shapes needed for cluster-uniform-6. Gate: year2 + day>=80
+  // per 321 authoring guideline (year2 ensures realm has accumulated
+  // enough tenure for "as long as anyone can remember"). Once-per-
+  // realm; tag misc.
+  { flag: 'afternoon_quiet_known', tag: 'misc',
+    trigger: G => G.storyFlags.year2 && G.day >= 80,
+    text: 'There is a moment in the late afternoon when the realm goes quiet for the length of one breath. No one calls it. No one remembers when it started. The realm has stopped distinguishing the silence from the time.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

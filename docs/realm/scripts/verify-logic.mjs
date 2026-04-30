@@ -432,6 +432,19 @@ const hillGathersFogFire = await page.evaluate(async () => {
 });
 rec('352: hill_gathers_fog_known fires autumn + year2 + d>=50', hillGathersFogFire.fired, `text="${hillGathersFogFire.text}…" tag=${hillGathersFogFire.tag}`);
 
+// Test: 354 afternoon_quiet_known — single-axis (6th habituation-recognition; RHYTHMIC-COLLECTIVE-MOMENT; HB→6; cluster-uniform sweep)
+const afternoonQuietFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year2 = true;
+  window.G.day = 85;
+  delete window.G.storyFlags.afternoon_quiet_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.afternoon_quiet_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a moment in the late afternoon'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('354: afternoon_quiet_known fires year2 + d>=80', afternoonQuietFire.fired, `text="${afternoonQuietFire.text}…" tag=${afternoonQuietFire.tag}`);
+
 // Test: 347 avoided_corner_known — single-axis (6th individual-interiority; AVOIDANCE-UNEXPLAINED; INTERIOR-MANIFESTATION-MODE axis articulated; 7/9 axes)
 const avoidedCornerFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
