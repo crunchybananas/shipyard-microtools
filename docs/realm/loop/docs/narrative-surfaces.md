@@ -1692,11 +1692,35 @@ prescriptive AND consistently applied.
     axial at 332 — sub-type demonstrates
     both axis-modes per 325/327/331
     axis-flexibility framing.
-  - *Early-game-mood* (196/199/207/212): year-1
-    moments of arrival, change, or familiarity.
-    Anti-anxious continuity register
-    counterbalancing the late-arc bias 195
-    flagged.
+  - *Early-game-mood* (196/199/207/212/344):
+    year-1 moments of arrival, change, or
+    familiarity. Anti-anxious continuity
+    register counterbalancing the late-arc
+    bias 195 flagged. **5 shapes** post-344:
+    - 196 long-evening (mood-of-evening)
+    - 199 cold-morning (mood-of-morning)
+    - 207 fields-know-realm (cross-listed
+      in land-as-agent; LAND-KNOWING-REALM)
+    - 212 first-sigh (cross-listed in
+      individual-interiority; CITIZEN-MOOD-
+      MID-ACTION)
+    - 344 realm-begun-known — REALM-AS-
+      CONTINUITY-UNNOTICED ("There is an
+      evening in the first year when the
+      realm goes to sleep without thinking
+      of itself as a realm trying to be
+      one. The realm has begun.") —
+      retrospective beat: first moment
+      realm-as-continuous-entity registers
+      as ABSENCE of self-doubt rather
+      than presence of confidence.
+    EM does not articulate a clean
+    internal axis (mood-of-time + cross-
+    listed registry); per 343 [process]
+    meta-pattern is OPPORTUNISTIC not
+    MANDATORY — sub-type-internal-axes
+    remains at 6/9 post-344. Per 276
+    invariant.
   - *Land-as-agent* (207/227/229/290/294/307):
     land/object/relational-keeper has subjective
     voice. **6 shapes** (sole-leading sub-type):

@@ -1539,6 +1539,59 @@ const NARRATIVE_BEATS = [
   { flag: 'collective_waking_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.season === 'winter' && G.day >= 140,
     text: 'There is a winter night when every citizen wakes at the same hour. No one tells anyone in the morning. The realm carries the memory of being all awake at once, without naming it.' },
+  // Loop 344 (surprise, un-filed): SINGLE-AXIS surprise — 5th early-
+  // game-mood shape per 276 invariant. Sub-type 4→5 shapes; **CLUSTER-
+  // UNIFORM-5 MILESTONE REACHED** — all 9 INSIDE sub-types now at
+  // 5+ shapes. NEW ANGLE: REALM-AS-CONTINUITY-UNNOTICED. The first
+  // moment when the realm STOPS performing being-a-realm and just IS
+  // one. Retrospective frame from year3+ looking back at year-1.
+  // Distinct from prior 4 early-game-mood shapes:
+  //  - 196 long-evening (mood-of-evening; year-1 weather-mood)
+  //  - 199 cold-morning (mood-of-morning)
+  //  - 207 fields-know-realm (cross-listed in land-as-agent;
+  //    LAND-knowing-realm)
+  //  - 212 first-sigh (cross-listed in individual-interiority;
+  //    citizen mood mid-action)
+  //  - 344 REALM-AS-CONTINUITY-UNNOTICED — the FIRST moment
+  //    realm-as-continuous-entity registers; the realm has been
+  //    PERFORMING being-a-realm and now stops noticing.
+  // Distinct from related angles:
+  //  - 322 RECURRENCE (CONTENTMENT in repetition; OUTSIDE register;
+  //    settled-place laughs at recurrence): 344 = first moment the
+  //    realm DOESN'T NOTICE itself recurring; transitional
+  //  - 254 AUTOMATICITY (action without thinking; habituation):
+  //    254 is about specific actions; 344 is about REALM-AS-WHOLE
+  //    not noticing itself
+  //  - 207 fields_know_realm (LAND knowing realm): 344 = REALM
+  //    KNOWING ITSELF
+  //  - 212 first_sigh (individual citizen mid-action): 344 =
+  //    collective realm-mood
+  // Per 343 [process] sub-type-internal-axes pattern: early-game-mood
+  // 4 prior shapes don't articulate a clean internal axis (mood-of-
+  // time + cross-listed registry). 344 doesn't force axis-
+  // articulation — meta-pattern is OPPORTUNISTIC, not mandatory.
+  // Sub-type-internal-axes meta-pattern remains at 6/9 (343-baseline)
+  // post-344 — 7th potential candidate is naming-place's TIME-
+  // RELATIONSHIP axis OR forgetting's PAST/FUTURE temporal axis;
+  // EM declined.
+  // Lift "The realm has begun" captures the moment of self-
+  // recognition WITHOUT noticing — the realm's continuity registers
+  // as an absence of self-doubt rather than a presence of confidence.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Retrospective frame: gate year3 + day>=145
+  // (next-available year-only slot post-342 at d>=135; 343 used
+  // winter+140; 145 open). The prose looks back at year-1 from
+  // year-3+ retrospective. Once-per-realm; tag misc.
+  // **CLUSTER-UNIFORM-5 MILESTONE REACHED**: all 9 INSIDE sub-types
+  // now at 5+ shapes (cluster minimum 5). Trajectory: pre-325 min 1
+  // → 325 min 2 → 327 min 3 → 332 min 4 → **344 min 5**.
+  // Each milestone advance preceded by 1-12 ticks of focused
+  // extension; 332→344 = 12 ticks for floor 4→5. Total INSIDE
+  // shapes post-344: 47 across 9 sub-types (avg 5.2/sub-type fully-
+  // counted; cluster avg trajectory continues linear).
+  { flag: 'realm_begun_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 145,
+    text: 'There is an evening in the first year when the realm goes to sleep without thinking of itself as a realm trying to be one. The realm has begun.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

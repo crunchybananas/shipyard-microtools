@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 344 realm_begun_known — single-axis (5th early-game-mood shape; REALM-AS-CONTINUITY-UNNOTICED; CLUSTER-UNIFORM-5 milestone)
+const realmBegunFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 150;
+  delete window.G.storyFlags.realm_begun_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.realm_begun_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is an evening in the first year'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('344: realm_begun_known fires year3 + d>=145', realmBegunFire.fired, `text="${realmBegunFire.text}…" tag=${realmBegunFire.tag}`);
+
 // Test: 343 collective_waking_known — single-axis (5th ambient-entity-grammar shape; TRANSIENT-COLLECTIVE-WITNESS)
 const collectiveWakingFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
