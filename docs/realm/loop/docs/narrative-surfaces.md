@@ -1527,10 +1527,10 @@ prescriptive AND consistently applied.
       imperative). Per 308 STRUCTURAL-
       surprise invariant.
     Per 276 invariant.
-  - *Sustained-state-recognition* (211/228/230/331):
+  - *Sustained-state-recognition* (211/228/230/331/339):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.
-    **4 shapes** post-331:
+    **5 shapes** post-339:
     - 211 sustained-peace 50d ("watch still
       climbs the walls but hands rest") — count
       threshold (no raid days).
@@ -1561,6 +1561,21 @@ prescriptive AND consistently applied.
     seasons"). Single-axis ship #4 in a row
     (after 325/327/329); axis-flexibility
     pattern empirically continued.
+    **339 raid_routine_known — THREAT-
+    NORMALIZATION**: 5th shape; G.stats.
+    raidsSurvived counter + script-internalization
+    angle. "By the third raid the realm has a
+    routine for it... The realm has learned to
+    be afraid the same way each time." Distinct
+    from 211 (THREAT-ABSENCE; peace days);
+    339 = THREAT-PRESENCE-METABOLIZED. Distinct
+    from 314 morning_dread (acute fear, OUTSIDE
+    TERROR); 339 is INSIDE-CHRONIC-SCRIPTED-FEAR.
+    Sub-type now spans 4 threshold CLASSES:
+    COUNT (211/228) / RATIO (230) /
+    TRANSFORMATION (331) / SCRIPT (339) — adds
+    sub-type-internal-axis per 337 [process]
+    meta-pattern.
     Future literary-uses welcome (peak
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,

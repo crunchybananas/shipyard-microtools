@@ -405,6 +405,21 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 339 raid_routine_known — single-axis (5th sustained-state-recognition shape; THREAT-NORMALIZATION)
+const raidRoutineFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 130;
+  window.G.stats = window.G.stats || {};
+  window.G.stats.raidsSurvived = 3;
+  delete window.G.storyFlags.raid_routine_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.raid_routine_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('By the third raid'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('339: raid_routine_known fires year3 + d>=125 + raidsSurvived>=3', raidRoutineFire.fired, `text="${raidRoutineFire.text}…" tag=${raidRoutineFire.tag}`);
+
 // Test: 337 cup_holding_known — single-axis (5th habituation-recognition shape; NON-CORRECTION-AS-CULTURAL-ENFORCEMENT)
 const cupHoldingFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

@@ -1373,6 +1373,40 @@ const NARRATIVE_BEATS = [
   { flag: 'cup_holding_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 120,
     text: 'The realm has a way of holding the cup. No one taught it. Strangers visit and hold the cup wrong, and no one corrects them; the realm waits for them to leave.' },
+  // Loop 339 (surprise, 329 [code] filing): SINGLE-AXIS surprise — 5th
+  // sustained-state-recognition shape per 276 invariant. Sub-type 4→5
+  // shapes; joins forgetting (6) / individual-interiority (5) /
+  // habituation (5) / land-as-agent (6) at 5+. NEW ANGLE: THREAT-
+  // NORMALIZATION. The realm has experienced enough raids to have a
+  // ROUTINE for them; the routine becomes a threshold of its own.
+  // Distinct from prior 4 sustained-state shapes:
+  //  - 211 sustained-peace 50d (count threshold — NO raid days)
+  //  - 228 no-death 100d (count — days since last death)
+  //  - 230 full-pop 60d (ratio — pop/maxpop=1)
+  //  - 331 winter-normalized (transformation — cycle becomes background)
+  //  - 339 THREAT-NORMALIZATION (count + script — N raids endured +
+  //    realm has internalized response). Distinct from 211 because
+  //    211 is THREAT-ABSENCE (peace days); 339 is THREAT-PRESENCE-
+  //    METABOLIZED (raids endured become routine).
+  // Distinct from 314 morning_dread (DREAD-WITHOUT-CAUSE; OUTSIDE
+  // TERROR; acute fear) because 339 is INSIDE sustained-state +
+  // CHRONIC-SCRIPTED-FEAR. The fear has a SCRIPT — shutters before
+  // bells, children to known places. The realm knows HOW to be afraid.
+  // Lift "The realm has learned to be afraid the same way each time"
+  // captures fear-as-collective-routine — the most striking framing
+  // of normalized threat: not the threat itself but the SHAPED
+  // RESPONSE TO IT becoming background. Sustained-state-recognition
+  // now has 5 threshold classes: COUNT (211/228) / RATIO (230) /
+  // TRANSFORMATION (331) / SCRIPT (339). Per 337 [process] sub-types
+  // developing INTERNAL DOMAIN-AXES: SS sub-type now spans threshold-
+  // CLASS axis with 4 distinct classes across 5 shapes.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster. Gate: year3 + day>=125 + raidsSurvived>=3 (multi-condition
+  // for fitting prose: realm needs experience of multiple raids for
+  // "same way each time" to land). Once-per-realm; tag misc.
+  { flag: 'raid_routine_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 125 && (G.stats?.raidsSurvived || 0) >= 3,
+    text: 'By the third raid the realm has a routine for it. The shutters go up before the bells. The children know where to go. The realm has learned to be afraid the same way each time.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
