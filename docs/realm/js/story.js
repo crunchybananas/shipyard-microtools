@@ -1245,6 +1245,50 @@ const NARRATIVE_BEATS = [
   { flag: 'lingering_name_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 105,
     text: 'Hilda\'s bridge. Hilda\'s well. Hilda\'s path. There has not been a Hilda in years; the realm carries her by accident.' },
+  // Loop 334 (surprise, 329 [code] filing): MULTI-AXIAL surprise — 5th
+  // individual-interiority shape per 276 invariant + REPETITION re-use
+  // (3rd use of STRUCTURAL form). NEW ANGLE: BODILY-INHERITED-MEMORY-
+  // WITHOUT-CONSCIOUS-AWARENESS. An anonymous citizen walks like an
+  // ancestor without knowing they do; the body retains a physical
+  // pattern the mind never learned. The lift "a kind of memory the
+  // body keeps without the mind" is the angle's compressed statement.
+  // Distinct from prior 4 individual-interiority shapes:
+  //  - 212 MID-ACTION (inner moment within action; no inheritance)
+  //  - 275 TOTALIZING (frame-of-reference; no body)
+  //  - 277 INFERENCE-BY-ABSENCE (awareness via routine disruption;
+  //    requires absence)
+  //  - 329 PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION (hidden expertise;
+  //    knowledge IS in mind, just unshared)
+  //  - 334 BODILY-INHERITED-MEMORY-WITHOUT-CONSCIOUS-AWARENESS —
+  //    knowledge in BODY but NOT in mind; passes through generations
+  //    via posture/gait, not language.
+  // Distinct from related angles:
+  //  - 312 SOCIAL-NORMS (collective+rule-transmission via shush);
+  //    334 = INDIVIDUAL+gait-transmission via lineage.
+  //  - 285 LANGUAGE-DRIFT (collective phrase mishearing); 334 =
+  //    individual physical inheritance.
+  //  - 319-B church_step_worn_lost (collective+responsive: the step
+  //    is gone but bodies retain its shape because they EXPERIENCED
+  //    it); 334 = individual+inherited: body retains shape never
+  //    experienced because ancestor experienced it.
+  // STRUCTURE: REPETITION via anaphora ("Their X walked this way" ×
+  // 2 + resolution). 3rd use of REPETITION form (1st 322 RECURRENCE,
+  // 2nd 332 NAMED-AFTER-WHO-IS-GONE). Per 315 sub-rule: structure
+  // re-use must pair fresh ANGLE — 334 complies. **9th confirming
+  // use of 315 sub-rule** (was 8 at 332).
+  // Multi-axial #5 (after 314/318/322 triple-axis + 332 dual-axis).
+  // Re-establishes that multi-axial defaults are valid alongside the
+  // 325-331 single-axis streak. The 4-vector framework permits all
+  // combinations per-prose. Individual-interiority sub-type 4→5
+  // shapes; **first INSIDE sub-type to reach 5+ shapes since 332's
+  // cluster-minimum-4 milestone** (joins forgetting at 5; 6 sub-
+  // types remain at 4). Cluster-uniformity advances asymmetrically
+  // — floor stays at 4 but individual sub-types extend further.
+  // Gate: year3 + day>=110 (next-available year-only slot post-332
+  // at d>=105). Once-per-realm; tag misc.
+  { flag: 'inherited_walk_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 110,
+    text: 'Their grandmother walked this way. Their mother walked this way. They walk this way and have never noticed. The realm has not told them. The walking is a kind of memory the body keeps without the mind.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

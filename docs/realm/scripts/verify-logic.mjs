@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 334 inherited_walk_known — multi-axial (5th individual-interiority BODILY-INHERITED-MEMORY + REPETITION re-use; 3rd structural form use)
+const inheritedWalkFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 115;
+  delete window.G.storyFlags.inherited_walk_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.inherited_walk_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('Their grandmother walked this way'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('334: inherited_walk_known fires year3 + d>=110', inheritedWalkFire.fired, `text="${inheritedWalkFire.text}…" tag=${inheritedWalkFire.tag}`);
+
 // Test: 332 lingering_name_known — multi-axial (4th naming-place shape NAMED-AFTER-WHO-IS-GONE + REPETITION re-use; 2nd use of STRUCTURAL form)
 const lingeringNameFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

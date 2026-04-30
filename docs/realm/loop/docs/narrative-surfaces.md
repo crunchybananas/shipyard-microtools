@@ -972,7 +972,7 @@ should respect:
   STRUCTURE-vector ships.
 
   **Confirmed uses establishing the rule (5 at promotion;
-  8 in production after 332):**
+  9 in production after 334):**
   - 301 QUESTION + RITUAL-PERSISTENCE-WITHOUT-ORIGIN
     (forgetting shape 4)
   - 305 IMPERATIVE + EMERGENT-TRADITION (forgetting shape 5)
@@ -993,6 +993,11 @@ should respect:
     STRUCTURAL form post-promotion. Rule holds for
     re-uses: structural form repetition is fine;
     angle must remain fresh.
+  - 334 REPETITION (re-use; 3rd) + BODILY-INHERITED-MEMORY-
+    WITHOUT-CONSCIOUS-AWARENESS (5th individual-interiority
+    shape) — second re-use of REPETITION; rule continues
+    to generalize across structural-form re-uses with
+    fresh angles. 9th confirming use overall.
 
   **Why this is a rule and not just a recurrence:** 5 of 5
   ships across both INSIDE cluster sub-types AND OUTSIDE
@@ -1546,9 +1551,9 @@ prescriptive AND consistently applied.
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
-  - *Individual-interiority* (212/275/277/329):
+  - *Individual-interiority* (212/275/277/329/334):
     focal is a single anonymous citizen rather
-    than the realm collective. **4 shapes**:
+    than the realm collective. **5 shapes**:
     - 212 MID-ACTION ("settler... breathes
       out. No one sees.") — brief inner moment.
     - 275 TOTALIZING ("the world ends at the
@@ -1564,7 +1569,20 @@ prescriptive AND consistently applied.
       and no one has been told...") — hidden
       expertise exercised privately and
       recurrently; competence never offered.
-    Per 276 invariant.
+    - 334 BODILY-INHERITED-MEMORY-WITHOUT-
+      CONSCIOUS-AWARENESS ("Their grandmother
+      walked this way. Their mother walked
+      this way. They walk this way and have
+      never noticed... a kind of memory the
+      body keeps without the mind.") — physical
+      pattern transmitted through generations
+      via gait, not language; knowledge in
+      body but not in mind. **Multi-axial**:
+      ANGLE + STRUCTURE (REPETITION 3rd use;
+      9th confirming use of 315 sub-rule).
+    Per 276 invariant. Sub-type now joins
+    forgetting at 5 shapes — second-leading
+    sub-type after land-as-agent (6).
   - *Habituation-recognition* (254/280/285/312):
     the realm recognizes its own habits and
     rhythms (vs sustained-state-recognition's
