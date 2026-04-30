@@ -1566,16 +1566,36 @@ prescriptive AND consistently applied.
     instant + unsharable ("the star is gone
     before anyone can ask if anyone else saw
     it"). Per 276 invariant.
-  - *Weather-recognition* (147/174/246/272):
+  - *Weather-recognition* (147/174/246/272/341):
     the realm notices or remembers weather as
-    a marker of the year. 174 first-frost +
-    246 first-thaw form a YEAR-CYCLE PAIR at
-    year-2+ seasonal endpoints. **272 storm_
-    passed_seen** adds NEGATIVE-SPACE shape —
-    other 3 are weather ARRIVING; 272 is
-    weather NOT arriving. Lift "is given the
-    night intact" acknowledges passive grace.
-    Per 276 invariant.
+    a marker of the year. **5 shapes** spanning
+    a WEATHER-PHASE temporal axis:
+    - 147 great_storm_remembered — STORM-AS-
+      MEMORY-EVENT (REMEMBRANCE phase)
+    - 174 first_frost — FROST-AS-SEASONAL-
+      ARRIVAL (ARRIVAL/EVENT phase)
+    - 246 first_thaw — THAW-AS-SEASONAL-RETURN
+      (ARRIVAL/EVENT phase; year-cycle pair
+      with 174)
+    - 272 storm_passed_seen — STORM-NOT-
+      ARRIVING (NON-EVENT/NEGATIVE-SPACE phase)
+    - 341 first_frost_wait_known — ANTICIPATION-
+      AS-SEASON ("There is a week before the
+      first frost when the realm holds its
+      breath... The waiting is itself the
+      season.") — PRE-EVENT phase; the WAITING
+      becomes the seasonal experience itself.
+    Per 339 [process] axis-articulation-as-
+    extension-pattern: weather-recognition now
+    spans 4 distinct phases on the WEATHER-
+    PHASE temporal axis (REMEMBRANCE / ARRIVAL
+    / NON-EVENT / ANTICIPATION). Sub-type-
+    internal-axes meta-pattern now formalized
+    for 4 of 9 sub-types (336 forgetting / 337
+    habituation / 339 sustained-state / 341
+    weather-recognition).
+    Per 276 invariant + 308 STRUCTURAL-surprise
+    invariant.
   - *Forgetting* (184/190/292/301/305/336):
     closure of a long-lived object's or
     practice's KNOWLEDGE. **6 shapes**

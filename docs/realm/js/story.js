@@ -1407,6 +1407,49 @@ const NARRATIVE_BEATS = [
   { flag: 'raid_routine_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 125 && (G.stats?.raidsSurvived || 0) >= 3,
     text: 'By the third raid the realm has a routine for it. The shutters go up before the bells. The children know where to go. The realm has learned to be afraid the same way each time.' },
+  // Loop 341 (surprise, un-filed): SINGLE-AXIS surprise — 5th weather-
+  // recognition shape per 276 invariant. Sub-type 4→5 shapes; joins
+  // forgetting (6) / land-as-agent (6) / individual-interiority (5)
+  // / habituation (5) / sustained-state (5) at 5+ shapes. NEW ANGLE:
+  // ANTICIPATION-AS-SEASON. The realm WAITS for the first frost; the
+  // waiting itself becomes the season. Pre-event becomes its own
+  // experience.
+  // Distinct from prior 4 weather-recognition shapes:
+  //  - 147 great_storm_remembered — STORM-AS-MEMORY-EVENT (past;
+  //    remembrance)
+  //  - 174 first_frost — FROST-AS-SEASONAL-ARRIVAL (event)
+  //  - 246 first_thaw — THAW-AS-SEASONAL-RETURN (event)
+  //  - 272 storm_passed — STORM-NOT-ARRIVING-AS-NEGATIVE-SPACE
+  //    (non-event)
+  //  - 341 ANTICIPATION-AS-SEASON (PRE-EVENT becomes the seasonal
+  //    experience). The realm doesn't notice the frost arriving; it
+  //    notices the WAITING for it.
+  // Per 339 [process] axis-articulation-as-extension-pattern: weather-
+  // recognition now spans WEATHER-PHASE temporal axis with 5 phases:
+  //  - REMEMBRANCE (147)
+  //  - ARRIVAL/EVENT (174 + 246)
+  //  - NON-EVENT/NEGATIVE-SPACE (272)
+  //  - ANTICIPATION/PRE-EVENT (341)
+  // Sub-type-internal-axis pattern now formalized for 4 of 9 sub-
+  // types (336 forgetting / 337 habituation / 339 sustained-state /
+  // 341 weather-recognition).
+  // Distinct from 280 LIMINAL-MOMENT (rhythm-awareness; DAILY-liminal
+  // — between things in evening); 341 = SEASONAL-liminal — a week
+  // of waiting becomes the season. Different temporal scale.
+  // Distinct from 322 RECURRENCE (CONTENTMENT in repetition; OUTSIDE
+  // register); 341 is INSIDE weather + ACTIVE WAITING (not passive
+  // recurrence).
+  // Lift "The waiting is itself the season" captures pre-event-as-
+  // event. The most striking framing: the realm's anticipation BEFORE
+  // the seasonal marker IS the marker; the frost arrival merely ends
+  // the waiting.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Gate: year3 + season=autumn + day>=130
+  // (multi-condition: year3 + autumn for fitting prose + day-offset
+  // per 321 authoring guideline). Once-per-realm; tag misc.
+  { flag: 'first_frost_wait_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.season === 'autumn' && G.day >= 130,
+    text: 'There is a week before the first frost when the realm holds its breath. Citizens pretend they are not waiting. The waiting is itself the season.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
