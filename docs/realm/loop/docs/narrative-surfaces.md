@@ -1799,9 +1799,11 @@ prescriptive AND consistently applied.
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,
     not for promotion math.
-  - *Individual-interiority* (212/275/277/329/334):
+  - *Individual-interiority* (212/275/277/329/334/347):
     focal is a single anonymous citizen rather
-    than the realm collective. **5 shapes**:
+    than the realm collective. **6 shapes**
+    spanning INTERIOR-MANIFESTATION-MODE axis
+    (1D, 6 positions) — articulated at 347:
     - 212 MID-ACTION ("settler... breathes
       out. No one sees.") — brief inner moment.
     - 275 TOTALIZING ("the world ends at the
@@ -1828,9 +1830,29 @@ prescriptive AND consistently applied.
       body but not in mind. **Multi-axial**:
       ANGLE + STRUCTURE (REPETITION 3rd use;
       9th confirming use of 315 sub-rule).
-    Per 276 invariant. Sub-type now joins
-    forgetting at 5 shapes — second-leading
-    sub-type after land-as-agent (6).
+    - 347 AVOIDANCE-UNEXPLAINED ("There is a
+      citizen who has never sat in the south
+      corner of the inn... the south corner
+      remains theirs not to sit in.") —
+      citizen has daily exclusion without
+      explanation; realm sustains pattern via
+      non-inquiry; avoidance-as-property in
+      negative space.
+    **INTERIOR-MANIFESTATION-MODE axis** (1D,
+    6 positions): DURING-ACTION (212) /
+    AS-WORLDFRAME (275) / AS-ABSENCE (277) /
+    AS-PRIVATE-COMPETENCE (329) /
+    AS-INHERITED-PATTERN (334) /
+    AS-UNEXPLAINED-AVOIDANCE (347). Each
+    shape captures HOW a citizen's interior
+    life manifests as exterior pattern.
+    Sub-type-internal-axes meta-pattern
+    advances 6/9 → 7/9 post-347.
+    Per 276 invariant + 347 axis articulation.
+    Sub-type now joins land-as-agent (6) and
+    forgetting (6) and ambient-entity-grammar
+    (6) at sole-leader level — 4 sub-types
+    tied at 6.
   - *Habituation-recognition* (254/280/285/312/337):
     the realm recognizes its own habits and
     rhythms (vs sustained-state-recognition's

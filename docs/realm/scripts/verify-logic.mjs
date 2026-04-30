@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 347 avoided_corner_known — single-axis (6th individual-interiority; AVOIDANCE-UNEXPLAINED; INTERIOR-MANIFESTATION-MODE axis articulated; 7/9 axes)
+const avoidedCornerFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 160;
+  delete window.G.storyFlags.avoided_corner_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.avoided_corner_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a citizen who has never sat'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('347: avoided_corner_known fires year3 + d>=155', avoidedCornerFire.fired, `text="${avoidedCornerFire.text}…" tag=${avoidedCornerFire.tag}`);
+
 // Test: 346 autumn_sound_known — single-axis (6th ambient-entity-grammar; SUSTAINED-COLLECTIVE-AWARENESS-WITHOUT-NAMING; completes 2D axis)
 const autumnSoundFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

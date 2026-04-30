@@ -1639,6 +1639,66 @@ const NARRATIVE_BEATS = [
   { flag: 'autumn_sound_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.season === 'autumn' && G.day >= 150,
     text: 'There is a sound the realm hears in autumn evenings, never the same week, never the same hour. Citizens know to listen for it. No one alive has named it; everyone alive expects it.' },
+  // Loop 347 (surprise, un-filed): SINGLE-AXIS surprise — 6th
+  // individual-interiority shape per 276 invariant. Sub-type 5→6
+  // shapes; **4 sub-types now tied at 6 shapes** (LA/FG/Am/II).
+  // NEW ANGLE: AVOIDANCE-UNEXPLAINED — a citizen has a daily
+  // exclusion (never sits in south corner) without any explanation.
+  // The pattern is preserved by the realm's NON-INQUIRY: the realm
+  // has never asked.
+  // Distinct from prior 5 individual-interiority shapes:
+  //  - 212 MID-ACTION (interior moment within action)
+  //  - 275 TOTALIZING (whole frame-of-reference)
+  //  - 277 INFERENCE-BY-ABSENCE (citizen empty seat noticed)
+  //  - 329 PRIVATE-KNOWLEDGE (hidden expertise unshared)
+  //  - 334 BODILY-INHERITED-MEMORY (citizen inherits posture
+  //    without awareness)
+  //  - 347 AVOIDANCE-UNEXPLAINED (citizen abstains from a
+  //    place/action without conscious reason; realm sustains
+  //    the avoidance through non-inquiry)
+  // Per 339/341/342/343/346 axis-articulation pattern: 347
+  // ARTICULATES individual-interiority's INTERIOR-MANIFESTATION-MODE
+  // axis with 6 positions (one per shape). The axis describes HOW a
+  // citizen's interior life MANIFESTS as exterior pattern:
+  //  - 212 DURING-ACTION (manifests in the moment of doing)
+  //  - 275 AS-WORLDFRAME (manifests in the whole frame of
+  //    perception)
+  //  - 277 AS-ABSENCE (manifests in not-being-there, inferred)
+  //  - 329 AS-PRIVATE-COMPETENCE (manifests in unrequested
+  //    expertise)
+  //  - 334 AS-INHERITED-PATTERN (manifests in body without mind)
+  //  - 347 AS-UNEXPLAINED-AVOIDANCE (manifests in negative space
+  //    of action; refusing without saying why)
+  // Sub-type-internal-axes meta-pattern advances **6/9 → 7/9**:
+  //  - 336 forgetting (PAST/FUTURE temporal; 1D)
+  //  - 337 habituation (5 domains; 1D)
+  //  - 339 sustained-state (4 threshold-classes; 1D)
+  //  - 341 weather (4 WEATHER-PHASE positions; 1D)
+  //  - 342 naming-place (5 TIME-RELATIONSHIP positions; 1D)
+  //  - 343 ambient-entity-grammar (PERSISTENCE × COLLECTIVITY; 2D)
+  //  - **347 individual-interiority** (6 INTERIOR-MANIFESTATION-
+  //    MODE positions; 1D)
+  // Distinct from related angles:
+  //  - 312 SOCIAL-NORMS (rule TRANSMITTED via shush; collective):
+  //    347 = individual + UN-INQUIRED
+  //  - 322 RECURRENCE (settled-place repetition; OUTSIDE register):
+  //    347 = individual + INSIDE register
+  //  - 277 INFERENCE-BY-ABSENCE: 277 = inferred-absence;
+  //    347 = active-avoidance preserved by non-inquiry (different
+  //    causal mechanism — 277's absence is what's noticed; 347's
+  //    avoidance is what's NOT noticed)
+  //  - 305 EMERGENT-TRADITION ("no one decided"): 305 is
+  //    collective-practice; 347 is individual-pattern
+  // Lift "the south corner remains theirs not to sit in" captures
+  // avoidance-as-property: the not-sitting-there is a possession of
+  // the citizen, sustained by collective non-inquiry. The negative
+  // space is owned.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Gate: year3 + day>=155 per 321 authoring
+  // guideline. Once-per-realm; tag misc.
+  { flag: 'avoided_corner_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 155,
+    text: 'There is a citizen who has never sat in the south corner of the inn. They could not say why. The realm has never asked, and the south corner remains theirs not to sit in.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
