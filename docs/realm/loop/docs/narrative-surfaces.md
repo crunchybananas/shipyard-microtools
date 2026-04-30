@@ -1597,11 +1597,11 @@ prescriptive AND consistently applied.
     Per 276 invariant. Sub-type now joins
     forgetting at 5 shapes — second-leading
     sub-type after land-as-agent (6).
-  - *Habituation-recognition* (254/280/285/312):
+  - *Habituation-recognition* (254/280/285/312/337):
     the realm recognizes its own habits and
     rhythms (vs sustained-state-recognition's
-    EXTERNAL conditions). **4 shapes** spanning
-    4 domains:
+    EXTERNAL conditions). **5 shapes** spanning
+    5 domains:
     - 254 AUTOMATICITY ("the fire is set
       without thinking now") — action domain.
     - 280 RHYTHM-AWARENESS ("no one has named
@@ -1613,16 +1613,27 @@ prescriptive AND consistently applied.
       that.' A grandmother stops a child
       mid-question. The realm has rules no
       one ever wrote down") — intergenerational
-      tacit-rule transmission. **4th
-      structural surprise**: DIALOG-OPENING
-      (after 301 question / 305 imperative /
-      307 second-person). The "shush" CARRIES
-      the rule WITHOUT articulating it; rule
-      exists, transmitted, never crystallized
-      into writing. **CONFIRMS 308 STRUCTURE-
+      tacit-rule transmission via ACTIVE
+      correction. **4th structural surprise**:
+      DIALOG-OPENING. **CONFIRMS 308 STRUCTURE-
       ANGLE coupling** at 4 of 4 uses.
+    - 337 NON-CORRECTION-AS-CULTURAL-
+      ENFORCEMENT ("The realm has a way of
+      holding the cup. No one taught it.
+      Strangers visit and hold the cup wrong,
+      and no one corrects them; the realm
+      waits for them to leave.") — gestural
+      cultural marker enforced by PASSIVE
+      EXCLUSION rather than active correction.
+      Distinct from 312 (active shush) +
+      327 (linguistic marker with directional
+      correction): 337 is gestural marker
+      + non-correction.
     Per 308 STRUCTURAL-surprise invariant +
-    276 shape-axis invariant.
+    276 shape-axis invariant. Sub-type now
+    spans 5 distinct domains: action / time /
+    language / rule-transmission / gesture-
+    enforcement.
 
   **Beats explicitly OUTSIDE the cluster
   (different register, listed for awareness):**

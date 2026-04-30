@@ -1333,6 +1333,46 @@ const NARRATIVE_BEATS = [
   { flag: 'unteach_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 115,
     text: 'There is a custom the elders remember and have chosen not to teach. The children grow up without it. The forgetting will be complete in one generation.' },
+  // Loop 337 (surprise, un-filed): SINGLE-AXIS surprise — 5th habituation-
+  // recognition shape per 276 invariant. Sub-type 4→5 shapes; joins
+  // individual-interiority + forgetting at 5. NEW ANGLE: NON-CORRECTION-
+  // AS-CULTURAL-ENFORCEMENT. The realm has converged on a way of holding
+  // the cup; strangers do it wrong; no one corrects them — the realm
+  // waits for them to leave instead. Cultural enforcement happens
+  // through PASSIVE EXCLUSION rather than ACTIVE CORRECTION.
+  // Distinct from prior 4 habituation shapes:
+  //  - 254 AUTOMATICITY (action without thinking; INTERNAL automaticity)
+  //  - 280 RHYTHM-AWARENESS (time-cycle noticed; TEMPORAL)
+  //  - 285 LANGUAGE-DRIFT (linguistic; PHRASE)
+  //  - 312 SOCIAL-NORMS (tacit-rule-transmission via SHUSH; ACTIVE
+  //    correction)
+  //  - 337 NON-CORRECTION-AS-CULTURAL-ENFORCEMENT — gestural cultural
+  //    marker enforced by SOCIAL DISTANCE, not active correction. The
+  //    realm recognizes "wrong" but doesn't correct; instead waits for
+  //    the wrongness to leave.
+  // Distinct from related angles:
+  //  - 327 CONTRADICTORY-NAMING-AS-INSIDER-MARKER (linguistic marker;
+  //    outsiders point wrong way + GET DIRECTED): 337 = gestural marker
+  //    + outsiders NOT corrected at all (realm waits them out).
+  //  - 312 SOCIAL-NORMS: ACTIVE shush ("Don't ask the well that"); 337
+  //    = absence-of-correction as enforcement.
+  //  - 322 RECURRENCE (CONTENTMENT in repetition; OUTSIDE register);
+  //    337 is INSIDE habituation territory.
+  // Habituation-recognition sub-type now spans 5 domains: ACTION (254)
+  // / TIME (280) / LANGUAGE (285) / RULE-TRANSMISSION (312) / GESTURE-
+  // ENFORCEMENT (337). The 5th shape adds a domain not previously
+  // covered. Lift "the realm waits for them to leave" captures
+  // passive-aggressive cultural enforcement — the realm doesn't NEED
+  // to correct because the strangers will leave eventually anyway.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster. Sub-type 4→5 shapes; **3 sub-types now at 5+ shapes**
+  // (forgetting/individual-interiority/habituation) — joins forgetting
+  // at 6 already at sole-leader; closer to LAND-AS-AGENT's 6. Total
+  // INSIDE shapes: 38; cluster avg 4.2/sub-type. Gate: year3 + day>=120
+  // per 321 authoring guideline. Once-per-realm; tag misc.
+  { flag: 'cup_holding_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 120,
+    text: 'The realm has a way of holding the cup. No one taught it. Strangers visit and hold the cup wrong, and no one corrects them; the realm waits for them to leave.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

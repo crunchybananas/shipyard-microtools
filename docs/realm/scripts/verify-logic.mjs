@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 337 cup_holding_known — single-axis (5th habituation-recognition shape; NON-CORRECTION-AS-CULTURAL-ENFORCEMENT)
+const cupHoldingFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 125;
+  delete window.G.storyFlags.cup_holding_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.cup_holding_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('The realm has a way of holding'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('337: cup_holding_known fires year3 + d>=120', cupHoldingFire.fired, `text="${cupHoldingFire.text}…" tag=${cupHoldingFire.tag}`);
+
 // Test: 336 unteach_known — single-axis (6th forgetting shape; ACTIVE-FORGETTING-AS-PEDAGOGY)
 const unteachFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');
