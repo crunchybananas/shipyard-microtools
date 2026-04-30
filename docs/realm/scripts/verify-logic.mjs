@@ -405,6 +405,20 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 343 collective_waking_known — single-axis (5th ambient-entity-grammar shape; TRANSIENT-COLLECTIVE-WITNESS)
+const collectiveWakingFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.season = 'winter';
+  window.G.day = 145;
+  delete window.G.storyFlags.collective_waking_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.collective_waking_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a winter night when every citizen'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('343: collective_waking_known fires year3 + winter + d>=140', collectiveWakingFire.fired, `text="${collectiveWakingFire.text}…" tag=${collectiveWakingFire.tag}`);
+
 // Test: 342 qualifier_dropped_known — single-axis (5th naming-place shape; COLLECTIVE-RENAMING-VIA-QUALIFIER-DROP)
 const qualifierDroppedFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

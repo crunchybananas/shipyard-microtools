@@ -1490,6 +1490,55 @@ const NARRATIVE_BEATS = [
   { flag: 'qualifier_dropped_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 135,
     text: 'There is a path the realm called "the new path" for two years. Now it is just "the path." No one announced the change. The realm dropped the qualifier when the qualifier stopped meaning anything.' },
+  // Loop 343 (surprise, un-filed): SINGLE-AXIS surprise — 5th ambient-
+  // entity-grammar shape per 276 invariant. Sub-type 4→5 shapes; only
+  // Early-game-mood remains at 4 — cluster ONE TICK from UNIFORM-5.
+  // NEW ANGLE: TRANSIENT-COLLECTIVE-WITNESS. A simultaneous one-instant
+  // experience shared by every citizen but never spoken about. The
+  // realm carries the memory of the simultaneity even though no
+  // individual reports it.
+  // Distinct from prior 4 ambient-entity-grammar shapes:
+  //  - 148 wanderer (SUSTAINED-INDIVIDUAL-WITNESS — entity persists
+  //    over time; each citizen aware separately)
+  //  - 152 night-shape (SUSTAINED-INDIVIDUAL-WITNESS)
+  //  - 166 frog-voices (SUSTAINED-INDIVIDUAL-WITNESS)
+  //  - 266 falling_star (TRANSIENT-INDIVIDUAL-WITNESS — single-
+  //    instant unsharable; "the star is gone before anyone can ask
+  //    if anyone else saw it")
+  //  - 343 collective_waking — TRANSIENT-COLLECTIVE-WITNESS
+  //    (single-instant SHARED but UNSPOKEN; the realm KNOWS it was
+  //    simultaneous despite no one saying so)
+  // Per 339/341/342 axis-articulation pattern: ambient-entity-grammar
+  // now spans **2D AXIS** (PERSISTENCE × COLLECTIVITY):
+  //  - SUSTAINED × INDIVIDUAL: 148/152/166
+  //  - TRANSIENT × INDIVIDUAL: 266
+  //  - TRANSIENT × COLLECTIVE: 343
+  //  - SUSTAINED × COLLECTIVE: empty cell — possible 6th shape
+  // First sub-type with explicit 2D axis (prior 4 sub-types with
+  // formalized axes had 1D axes). Sub-type-internal-axes meta-pattern
+  // now formalized for **6 of 9 sub-types** (336 forgetting / 337
+  // habituation / 339 sustained-state / 341 weather / 342 naming-
+  // place / 343 ambient-entity-grammar). 67% formalization rate.
+  // Distinct from related angles:
+  //  - 322 RECURRENCE (CONTENTMENT in repetition; OUTSIDE register;
+  //    passive collective-recognition): 343 = ACTIVE simultaneous
+  //    awakening
+  //  - 312 SOCIAL-NORMS (rule TRANSMITTED via shush): 343 = NOT
+  //    transmitted; the experience stays in each citizen
+  //  - 263 chronicle_self (META; chronicle as object): 343 is in-
+  //    cluster INSIDE register
+  // Lift "carries the memory of being all awake at once, without
+  // naming it" captures collective-experience-without-articulation.
+  // The realm KNOWS it shared the moment despite no individual
+  // reporting it — knowing-without-saying.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Gate: year3 + season=winter + day>=140 (per
+  // 321 authoring guideline + season fitting prose; will fire in
+  // year4+ winter when year3 flag persists past d=140 + winter
+  // returns). Once-per-realm; tag misc.
+  { flag: 'collective_waking_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.season === 'winter' && G.day >= 140,
+    text: 'There is a winter night when every citizen wakes at the same hour. No one tells anyone in the morning. The realm carries the memory of being all awake at once, without naming it.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
