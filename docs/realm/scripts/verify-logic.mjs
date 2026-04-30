@@ -405,6 +405,19 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 342 qualifier_dropped_known — single-axis (5th naming-place shape; COLLECTIVE-RENAMING-VIA-QUALIFIER-DROP)
+const qualifierDroppedFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 140;
+  delete window.G.storyFlags.qualifier_dropped_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.qualifier_dropped_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a path the realm called'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('342: qualifier_dropped_known fires year3 + d>=135', qualifierDroppedFire.fired, `text="${qualifierDroppedFire.text}…" tag=${qualifierDroppedFire.tag}`);
+
 // Test: 341 first_frost_wait_known — single-axis (5th weather-recognition shape; ANTICIPATION-AS-SEASON)
 const frostWaitFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

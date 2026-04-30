@@ -1450,6 +1450,46 @@ const NARRATIVE_BEATS = [
   { flag: 'first_frost_wait_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.season === 'autumn' && G.day >= 130,
     text: 'There is a week before the first frost when the realm holds its breath. Citizens pretend they are not waiting. The waiting is itself the season.' },
+  // Loop 342 (surprise, 332 [code] filing): SINGLE-AXIS surprise — 5th
+  // naming-place shape per 276 invariant. Sub-type 4→5 shapes; joins
+  // 5 other sub-types at 5+ shapes. NEW ANGLE: COLLECTIVE-RENAMING-
+  // VIA-QUALIFIER-DROP. The realm called a path "the new path" for
+  // two years; the qualifier stopped carrying information; the realm
+  // dropped it organically without ceremony.
+  // Distinct from prior 4 naming-place shapes:
+  //  - 193 EMERGENT-NAMING (place gains name from nothing)
+  //  - 325 NAME-AS-MEASUREMENT (name does verification work)
+  //  - 327 CONTRADICTORY-NAMING (name is factually inverted; insider
+  //    marker)
+  //  - 332 NAMED-AFTER-WHO-IS-GONE (name preserves person past their
+  //    life)
+  //  - 342 COLLECTIVE-RENAMING-VIA-QUALIFIER-DROP — name CHANGES
+  //    organically when its modifier no longer carries information.
+  //    Distinct from 285 LANGUAGE-DRIFT (mistransmission of phrase)
+  //    because 285 is mishearing-error; 342 is information-pruning.
+  // Per 339/341 axis-articulation pattern: naming-place now spans
+  // a TIME-RELATIONSHIP axis (NAME-vs-REFERENT relationship over
+  // time) with 5 positions:
+  //  - 193 EMERGENCE (name attached when place came into being)
+  //  - 325 FUNCTIONAL-SUBSTITUTE (name does work in present)
+  //  - 327 CONTRADICTORY (name no longer matches state)
+  //  - 332 POSTHUMOUS (referent gone; name persists)
+  //  - 342 SHIFTING (name updates when context changes)
+  // Sub-type-internal-axes meta-pattern now formalized for **5 of 9
+  // sub-types** (336 forgetting / 337 habituation / 339 sustained-
+  // state / 341 weather / 342 naming-place). Past majority threshold
+  // (5/9 = 56%); 350 letter promotion-review strengthens.
+  // Lift "The realm dropped the qualifier when the qualifier stopped
+  // meaning anything" captures organic name-update mechanism — no
+  // decision, no ceremony, just collective convergence on a shorter
+  // name.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Gate: year3 + day>=135 (next-available year-
+  // only slot post-339 at d>=125; 341 used seasonal gate so d=135
+  // open). Once-per-realm; tag misc.
+  { flag: 'qualifier_dropped_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 135,
+    text: 'There is a path the realm called "the new path" for two years. Now it is just "the path." No one announced the change. The realm dropped the qualifier when the qualifier stopped meaning anything.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

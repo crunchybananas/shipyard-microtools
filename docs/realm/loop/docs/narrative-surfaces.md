@@ -1637,49 +1637,41 @@ prescriptive AND consistently applied.
     temporal orientations: PAST-ORIENTED
     (184/190/292/301/305) + FUTURE-ORIENTED
     (336). Per 276 invariant.
-  - *Naming-place* (193/325/327/332): the realm
-    gives a place a colloquial name. Third
+  - *Naming-place* (193/325/327/332/342): the
+    realm gives a place a colloquial name. Third
     member of the realm-environment naming
     triplet (sky 116 / object 056 / place 193).
-    **4 shapes** (post-saturation extension):
-    - 193 EMERGENT-NAMING ("There is now a
-      place called X. No one decided this; it
-      simply is.") — name appears without
-      ceremony.
-    - 325 NAME-AS-MEASUREMENT-WITHOUT-VERIFICATION
-      ("There is a corner of the realm called
-      the cold corner... no one has ever
-      measured it; the name has.") — the name
-      does the work of measurement; linguistic
-      artifact carries verification citizens
-      skipped.
-    - 327 CONTRADICTORY-NAMING-AS-INSIDER-MARKER
-      ("The new road is the oldest road in
-      the realm... Insiders know what is
-      meant; outsiders point the wrong way.")
-      — name becomes factually inverted; the
-      realm doesn't update it; the wrongness
-      itself functions as insider/outsider
-      cultural marker.
-    - 332 NAMED-AFTER-WHO-IS-GONE ("Hilda's
-      bridge. Hilda's well. Hilda's path.
-      There has not been a Hilda in years;
-      the realm carries her by accident.")
-      — place name preserves person past
-      their life; geographic preservation
-      mechanism for absent referents.
-      **Multi-axial ship**: REPETITION
-      (anaphora; 2nd use of structural form
-      after 322) + ANGLE; 8th confirming
-      use of 315 sub-rule.
-    Per 276 invariant. Naming-place was the
-    most-under-extended sub-type at 1 shape
-    since 193; shipped 1→4 shapes in 7 ticks
-    (325 + 327 + 332) after 130-tick
-    dormancy. Single-axis at 325 + 327;
-    multi-axial at 332 — sub-type
-    demonstrates both axis-modes per 325/
-    327/331 axis-flexibility framing.
+    **5 shapes** (post-saturation extension)
+    spanning TIME-RELATIONSHIP axis (NAME-vs-
+    REFERENT over time):
+    - 193 EMERGENCE — name attached at place
+      creation (no decision)
+    - 325 FUNCTIONAL-SUBSTITUTE — name does
+      verification work in present
+    - 327 CONTRADICTORY — name no longer
+      matches state
+    - 332 POSTHUMOUS — referent gone; name
+      persists
+    - 342 SHIFTING — name updates organically
+      when modifier stops carrying information
+      ("the new path" → "the path"; qualifier
+      dropped when no longer meaningful)
+    Per 276 invariant + 339/341/342
+    axis-articulation pattern. Sub-type-
+    internal-axes pattern at 5/9 sub-types
+    formalized post-342 (336 forgetting /
+    337 habituation / 339 sustained-state /
+    341 weather / 342 naming-place); past
+    majority threshold (56%).
+    Naming-place was the most-under-extended
+    sub-type at 1 shape since 193; shipped
+    1→4 shapes in 7 ticks (325 + 327 + 332)
+    after 130-tick dormancy; 5th at 342
+    completes the TIME-RELATIONSHIP axis.
+    Single-axis at 325 + 327 + 342; multi-
+    axial at 332 — sub-type demonstrates
+    both axis-modes per 325/327/331
+    axis-flexibility framing.
   - *Early-game-mood* (196/199/207/212): year-1
     moments of arrival, change, or familiarity.
     Anti-anxious continuity register
