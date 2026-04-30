@@ -34,15 +34,15 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #title-screen{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 40%,rgba(30,50,80,0.6) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(20,40,60,0.4) 0%,transparent 50%),linear-gradient(180deg,#0a0e1a 0%,#1a1a2e 50%,#0a0e1a 100%);background-size:200% 200%;animation:titleBg 15s ease infinite}
 @keyframes titleBg{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
 .title-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(26,42,74,0.5) 0%,transparent 70%)}
-.title-content{position:relative;text-align:center;max-width:480px;padding:2rem}
-.title-icon{font-size:5rem;margin-bottom:0.5rem;filter:drop-shadow(0 4px 20px rgba(255,209,102,0.3));animation:titleFloat 3s ease-in-out infinite,titleIconIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both}
+.title-content{position:relative;text-align:center;max-width:500px;padding:1rem 1.2rem}
+.title-icon{width:122px;height:96px;margin:0 auto 0.15rem;background:url('assets/sprites/castle.svg') center bottom/contain no-repeat;filter:drop-shadow(0 12px 24px rgba(0,0,0,0.45)) drop-shadow(0 0 22px rgba(255,209,102,0.18));animation:titleFloat 3s ease-in-out infinite,titleIconIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both}
 @keyframes titleIconIn{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
 @keyframes titleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.title-name{font-size:3.5rem;font-weight:800;letter-spacing:0.15em;color:#ffd166;margin:0;text-shadow:0 0 40px rgba(255,209,102,0.4),0 2px 0 rgba(0,0,0,0.5);animation:titleNameIn 0.7s ease both;animation-delay:0.2s}
+.title-name{font-size:3.15rem;font-weight:800;letter-spacing:0.15em;color:#ffd166;margin:0;text-shadow:0 0 40px rgba(255,209,102,0.4),0 2px 0 rgba(0,0,0,0.5);animation:titleNameIn 0.7s ease both;animation-delay:0.2s}
 @keyframes titleNameIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .title-sub{font-size:1.1rem;color:rgba(255,255,255,0.5);margin:0.3rem 0 1.2rem;letter-spacing:0.08em;animation:titleFadeIn 0.7s ease both;animation-delay:0.4s}
 @keyframes titleFadeIn{from{opacity:0}to{opacity:1}}
-.title-desc{font-size:0.9rem;color:rgba(255,255,255,0.6);line-height:1.7;margin:0 0 1.8rem;animation:titleFadeIn 0.7s ease both;animation-delay:0.5s}
+.title-desc{font-size:0.9rem;color:rgba(255,255,255,0.6);line-height:1.55;margin:0 0 1.1rem;animation:titleFadeIn 0.7s ease both;animation-delay:0.5s}
 .title-difficulty{display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem;animation:titleSlideUp 0.7s ease both;animation-delay:0.6s}
 @keyframes titleSlideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .diff-btn{padding:0.45rem 1rem;font-size:var(--fs-base);border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);border-radius:6px;cursor:pointer;font-family:inherit;transition:all 0.15s}
@@ -55,7 +55,7 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 .scen-btn{background:transparent;border:1px solid var(--border);color:var(--text);padding:0.4rem 0.8rem;border-radius:6px;font-family:inherit;font-size:var(--fs-sm);cursor:pointer;transition:all 0.15s}
 .scen-btn:hover{color:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.3)}
 .scen-btn.active{border-color:var(--accent);background:rgba(129,140,248,0.1);color:var(--accent)}
-.title-buttons{display:flex;gap:0.8rem;justify-content:center;margin-bottom:1.5rem;animation:titleSlideUp 0.7s ease both;animation-delay:0.7s}
+.title-buttons{display:flex;gap:0.8rem;justify-content:center;margin-bottom:0.95rem;animation:titleSlideUp 0.7s ease both;animation-delay:0.7s}
 .title-btn{padding:0.8rem 2rem;font-size:1rem;font-weight:700;border:2px solid rgba(255,255,255,0.2);background:transparent;color:var(--text);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
 .title-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.4);transform:translateY(-1px)}
 .kingdom-name-section { margin-top: 0.8rem; text-align: center; }
@@ -73,12 +73,24 @@ canvas#game{display:block;position:absolute;top:0;left:0}
 #kingdom-name-input:focus { outline: none; border-color: var(--accent); }
 .title-btn.primary{border-color:var(--gold);color:var(--gold)}
 .title-btn.primary:hover{background:rgba(255,209,102,0.12);box-shadow:0 4px 20px rgba(255,209,102,0.2)}
-.title-features{display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin-bottom:1.5rem;animation:titleFadeIn 0.7s ease both;animation-delay:0.85s}
+.title-features{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-bottom:0.9rem;animation:titleFadeIn 0.7s ease both;animation-delay:0.85s}
 .tf{display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.5rem 0.8rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:0.72rem;color:rgba(255,255,255,0.55);line-height:1.4;min-width:72px;transition:all 0.15s}
 .tf:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.8)}
 .tf .tf-icon{font-size:1.3rem;line-height:1}
 .title-credit{font-size:0.7rem;color:rgba(255,255,255,0.2);animation:titleFadeIn 0.7s ease both;animation-delay:1s}
 #title-version{position:absolute;bottom:1rem;right:1.2rem;font-size:var(--fs-xs);color:rgba(255,255,255,0.2);font-variant-numeric:tabular-nums;letter-spacing:0.05em}
+@media (max-height:720px){
+  .title-icon{width:132px;height:104px;margin-bottom:0.05rem}
+  .title-name{font-size:2.75rem}
+  .title-sub{margin:0.15rem 0 0.65rem}
+  .title-desc{line-height:1.35;margin-bottom:0.65rem}
+  .title-difficulty{margin-bottom:0.45rem}
+  .scenario-select{margin-top:0.45rem}
+  .kingdom-name-section{margin-top:0.45rem}
+  .title-buttons{margin-bottom:0.55rem}
+  .title-features{display:none}
+  .title-credit{display:none}
+}
 
 /* HUD */
 /* Loop 041 (the-fixer, closing 040 HIGH): gap 1.5rem→1rem saves ~152px of
@@ -99,6 +111,14 @@ body.photo-mode #photo-mode-badge{display:block}
 .res{display:flex;align-items:center;gap:0.3rem;font-weight:600}
 .res-icon{width:16px;height:16px;border-radius:3px;display:inline-block}
 .res-emoji{font-size:1rem;line-height:1}
+.res-img{width:20px;height:20px;display:inline-block;background-image:url('assets/sprites/ui-icons.png');background-size:140px 20px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.45));flex:0 0 20px}
+.res-wood{background-position:0 0}
+.res-stone{background-position:-20px 0}
+.res-food{background-position:-40px 0}
+.res-gold{background-position:-60px 0}
+.res-iron{background-position:-80px 0}
+.res-pop{background-position:-100px 0;vertical-align:-5px;margin-right:0.2rem}
+.res-soldier{background-position:-120px 0}
 .res-lbl{font-size:0.62rem;font-weight:500;color:rgba(255,255,255,0.5);letter-spacing:0.03em;text-transform:uppercase;margin-right:-0.05rem}
 @media (max-width:1400px){.res-lbl{display:none}}
 .res-emoji.gold-coin, .gold-coin{color:#ffd24a;font-weight:900;text-shadow:0 0 5px rgba(255,210,74,0.8),0 0 2px rgba(255,230,100,1)}
@@ -133,14 +153,17 @@ body.photo-mode #photo-mode-badge{display:block}
 #build-bar::-webkit-scrollbar-track{background:transparent}
 #build-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}
 #build-bar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.3)}
-.build-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.5rem 0.7rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:0.7rem;font-family:inherit;min-width:64px;transition:background 0.15s,border-color 0.15s}
+.build-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.42rem 0.62rem;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.11);border-radius:8px;color:var(--text);cursor:pointer;font-size:0.68rem;font-family:inherit;min-width:72px;transition:background 0.15s,border-color 0.15s,transform 0.15s;overflow:hidden}
 .build-btn-shortcut{position:absolute;top:3px;left:4px;font-size:0.55rem;font-family:'SF Mono',Monaco,monospace;font-weight:700;color:rgba(255,255,255,0.35);line-height:1;pointer-events:none;letter-spacing:0}
 .build-btn:hover .build-btn-shortcut,.build-btn.active .build-btn-shortcut{color:rgba(255,255,255,0.6)}
 .build-count{font-size:0.55rem;background:rgba(129,140,248,0.25);color:var(--accent);padding:0.05rem 0.3rem;border-radius:6px;font-weight:700;margin-left:auto;flex-shrink:0}
-.build-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25)}
+.build-btn:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.24)}
 .build-btn.active{background:rgba(129,140,248,0.35);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 12px rgba(129,140,248,0.5);transform:translateY(-3px)}
 .build-btn.disabled{opacity:0.35;pointer-events:none}
 .build-btn .icon{font-size:1.4rem;line-height:1}
+.build-sprite{width:46px;height:36px;object-fit:contain;object-position:center bottom;display:block;margin:-0.15rem 0 -0.05rem;filter:drop-shadow(0 4px 4px rgba(0,0,0,0.35))}
+.build-emoji{font-size:1.35rem;line-height:36px;height:36px;display:block}
+.build-name{display:block;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .build-btn .cost{font-size:0.6rem;color:rgba(255,255,255,0.5)}
 .build-btn .cost .cost-short{color:#ef4444;font-weight:700}
 .build-btn .cost .cost-close{color:#f5c94a;font-weight:600}
@@ -521,8 +544,9 @@ body.photo-mode #photo-mode-badge{display:block}
 
 @media(max-width:600px){
   #hud{gap:0.6rem;font-size:0.7rem;padding:0.4rem 0.5rem}
-  .build-btn{min-width:52px;padding:0.35rem 0.45rem;font-size:0.62rem}
+  .build-btn{min-width:56px;padding:0.35rem 0.45rem;font-size:0.62rem}
   .build-btn .icon{font-size:1.1rem}
+  .build-sprite{width:36px;height:30px}
   #missions{width:170px;font-size:0.68rem;top:2.5rem;right:0.4rem}
   #minimap{width:150px;height:150px;bottom:3.5rem}
 }
@@ -533,7 +557,7 @@ body.photo-mode #photo-mode-badge{display:block}
 <div id="title-screen">
   <div class="title-bg"></div>
   <div class="title-content">
-    <div class="title-icon">🏰</div>
+    <div class="title-icon" aria-hidden="true"></div>
     <h1 class="title-name">REALM</h1>
     <p class="title-sub">A Settlement Builder</p>
     <p class="title-desc">Build, fight, trade, and survive. Grow your island settlement into a medieval kingdom.</p>
@@ -574,13 +598,13 @@ body.photo-mode #photo-mode-badge{display:block}
 <canvas id="game"></canvas>
 
 <div id="hud">
-  <div class="res" title="Wood — build most structures"><span class="res-emoji">🪵</span><span class="res-lbl">Wood</span><span class="val" id="r-wood">50</span></div>
-  <div class="res" title="Stone — defensive buildings and upgrades"><span class="res-emoji">🪨</span><span class="res-lbl">Stone</span><span class="val" id="r-stone">30</span></div>
-  <div class="res" title="Food — feeds your population"><span class="res-emoji">🍎</span><span class="res-lbl">Food</span><span class="val" id="r-food">40</span></div>
-  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji gold-coin" aria-hidden="true">◉</span><span class="res-lbl">Gold</span><span class="val" id="r-gold">10</span></div>
-  <div class="res" title="Iron — weapons and advanced buildings"><span class="res-emoji">⚙️</span><span class="res-lbl">Iron</span><span class="val" id="r-iron">0</span></div>
-  <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens">👤 3</span>
-  <div class="res" title="Soldiers under your command"><span class="res-emoji">⚔️</span><span class="val" id="soldier-count">0</span></div>
+  <div class="res" title="Wood — build most structures"><span class="res-emoji res-img res-wood" aria-label="Wood"></span><span class="res-lbl">Wood</span><span class="val" id="r-wood">50</span></div>
+  <div class="res" title="Stone — defensive buildings and upgrades"><span class="res-emoji res-img res-stone" aria-label="Stone"></span><span class="res-lbl">Stone</span><span class="val" id="r-stone">30</span></div>
+  <div class="res" title="Food — feeds your population"><span class="res-emoji res-img res-food" aria-label="Food"></span><span class="res-lbl">Food</span><span class="val" id="r-food">40</span></div>
+  <div class="res" title="Gold — currency for market and trade"><span class="res-emoji res-img res-gold" aria-label="Gold"></span><span class="res-lbl">Gold</span><span class="val" id="r-gold">10</span></div>
+  <div class="res" title="Iron — weapons and advanced buildings"><span class="res-emoji res-img res-iron" aria-label="Iron"></span><span class="res-lbl">Iron</span><span class="val" id="r-iron">0</span></div>
+  <span id="pop-display" onclick="togglePopPanel()" style="cursor:pointer" title="Click to view citizens"><span class="res-img res-pop" aria-label="Population"></span>3</span>
+  <div class="res" title="Soldiers under your command"><span class="res-emoji res-img res-soldier" aria-label="Soldiers"></span><span class="val" id="soldier-count">0</span></div>
   <div class="res threat-display" id="threat-display" style="display:none"><span class="res-emoji">💀</span><span class="val" id="enemy-count">0</span></div>
   <span id="kingdom-display"></span>
   <span id="day-display">Day 1</span>

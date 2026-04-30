@@ -11,13 +11,13 @@ export const MAP_W = 80, MAP_H = 80;
 // as a visible iso-diamond grid overlaid on every field. Now ≤4pt —
 // same base tone with a subtle darker cousin.
 export const TILE_COLORS = {
-  [TILE.WATER]:   ['#1872b8','#1668b0'],
-  [TILE.SAND]:    ['#e4c478','#dec074'],
-  [TILE.GRASS]:   ['#4aa352','#479d4e'],
-  [TILE.FOREST]:  ['#2d7a35','#2a7432'],
-  [TILE.STONE]:   ['#9a9490','#948e8a'],
-  [TILE.IRON]:    ['#5a85b8','#547fb2'],
-  [TILE.MOUNTAIN]:['#6a6a7a','#656575'],
+  [TILE.WATER]:   ['#1d5f96','#1a5688'],
+  [TILE.SAND]:    ['#c6a466','#b99758'],
+  [TILE.GRASS]:   ['#408042','#3b7840'],
+  [TILE.FOREST]:  ['#285a34','#244f2f'],
+  [TILE.STONE]:   ['#85817c','#79756f'],
+  [TILE.IRON]:    ['#496f8f','#41657f'],
+  [TILE.MOUNTAIN]:['#5f6068','#565760'],
 };
 
 export const BUILDINGS = {

@@ -21,11 +21,9 @@ export function toggleFPS() { showFPS = !showFPS; }
 // Playwright. They've never reached the live game; canvas drawX
 // functions still own the dispatch.
 //
-// Phase B per 171 strategic plan ships in 6 steps; THIS is step 1
-// — scaffolding only. No visible change while `_USE_SVG_SPRITES`
-// is false (default). Steps 2-6 add composition (day/night tint /
-// winter cap / hover halo+fog / per-instance variation / live-
-// enable). Each step rolls back via `_USE_SVG_SPRITES = false`.
+// Phase B per 171 strategic plan shipped in 6 steps: sprite loader,
+// composition, winter cap / hover halo+fog, per-instance variation,
+// and live enable. That work now sits behind `_SPRITE_MODE`.
 //
 // Loader uses `<img>` elements with `decoding="async"` so SVG
 // parsing happens off the render thread. Cache keyed by
@@ -35,18 +33,243 @@ export function toggleFPS() { showFPS = !showFPS; }
 // hit cache and dispatch to ctx.drawImage. While not loaded, the
 // dispatch falls through to the existing canvas drawX.
 //
-// Loop 221 (Phase B step 6 — final): default flipped to TRUE.
-// Live game now ships SVG sprites with per-realm variants. Canvas
-// drawX functions remain as fallback for unloaded sprites + non-
-// sprite types (farm/lumber/well/etc). Toggle via console:
-// `window.__realm.toggleSVG(false)` reverts to canvas if needed.
-let _USE_SVG_SPRITES = true;
+// Loop 221 (Phase B step 6 — final): default flipped to sprite art.
+// Loop 357: raster atlas mode became the first draw path.
+// Live game now ships sprite art through a layered fallback chain:
+// raster atlas -> SVG sprites -> canvas drawX functions. The atlas is
+// the first bridge toward real bitmap/game-art sprites while keeping the
+// mature SVG and canvas paths one console toggle away.
+let _SPRITE_MODE = 'raster'; // 'raster' | 'svg' | 'canvas'
 const _SPRITE_TYPES = new Set([
   'granary', 'castle', 'church', 'windmill', 'tower',
   'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
   'townhall',  // 255 — 12th + last user-buildable structure to gain SVG.
   'well',      // 306 — Phase F first; supporting structure with strong narrative anchor (227 well_remembers).
+  'farm', 'lumber', 'quarry', 'mine', 'fisherman', 'tradingpost',
+  'school', 'archery', 'wall', 'road', 'chickencoop', 'cowpen',
 ]);
+
+const _RASTER_ATLAS_URL = 'assets/sprites/buildings-atlas-painted.png';
+const _RASTER_ATLAS_CELL = 128;
+const _RASTER_ATLAS_COLS = 4;
+const _RASTER_ATLAS_TYPES = [
+  'granary', 'castle', 'church', 'windmill',
+  'tower', 'house', 'tavern', 'blacksmith',
+  'market', 'bakery', 'barracks', 'townhall',
+  'well',
+];
+const _RASTER_ATLAS_FRAMES = Object.fromEntries(_RASTER_ATLAS_TYPES.map((type, idx) => [
+  type,
+  {
+    x: (idx % _RASTER_ATLAS_COLS) * _RASTER_ATLAS_CELL,
+    y: Math.floor(idx / _RASTER_ATLAS_COLS) * _RASTER_ATLAS_CELL,
+    w: _RASTER_ATLAS_CELL,
+    h: _RASTER_ATLAS_CELL,
+  },
+]));
+const _RASTER_ATLAS_TRIMS = {
+  granary:    { x: 17, y:  8, w: 100, h: 120 },
+  castle:     { x:  3, y:  9, w: 125, h: 114 },
+  church:     { x:  0, y:  7, w: 109, h: 118 },
+  windmill:   { x:  6, y:  8, w:  97, h: 118 },
+  tower:      { x: 19, y:  1, w:  86, h: 123 },
+  house:      { x:  2, y: 13, w: 110, h: 106 },
+  tavern:     { x:  2, y: 10, w: 113, h: 112 },
+  blacksmith: { x:  1, y:  6, w: 112, h: 118 },
+  market:     { x:  8, y: 21, w: 105, h:  97 },
+  bakery:     { x:  1, y:  9, w: 118, h: 110 },
+  barracks:   { x:  0, y:  9, w: 128, h: 109 },
+  townhall:   { x:  0, y:  0, w: 112, h: 121 },
+  well:       { x: 12, y:  6, w:  94, h: 112 },
+};
+function _usesRasterSprite(type) {
+  return _SPRITE_MODE === 'raster' && _SPRITE_TYPES.has(type);
+}
+
+const _SUPPORT_ATLAS_URL = 'assets/sprites/support-atlas.png';
+const _SUPPORT_ATLAS_CELL = 128;
+const _SUPPORT_ATLAS_COLS = 4;
+const _SUPPORT_ATLAS_TYPES = [
+  'farm', 'lumber', 'quarry', 'mine',
+  'fisherman', 'tradingpost', 'school', 'archery',
+  'wall', 'road', 'chickencoop', 'cowpen',
+  'palisade', 'campfire', 'orchard', 'hay',
+];
+const _SUPPORT_ATLAS_FRAMES = Object.fromEntries(_SUPPORT_ATLAS_TYPES.map((type, idx) => [
+  type,
+  {
+    x: (idx % _SUPPORT_ATLAS_COLS) * _SUPPORT_ATLAS_CELL,
+    y: Math.floor(idx / _SUPPORT_ATLAS_COLS) * _SUPPORT_ATLAS_CELL,
+    w: _SUPPORT_ATLAS_CELL,
+    h: _SUPPORT_ATLAS_CELL,
+  },
+]));
+const _SUPPORT_ATLAS_TRIMS = {
+  farm:        { x:  4, y: 37, w: 124, h:  86 },
+  lumber:      { x:  0, y: 23, w: 127, h: 100 },
+  quarry:      { x:  5, y: 24, w: 117, h:  99 },
+  mine:        { x:  1, y: 23, w: 122, h:  99 },
+  fisherman:   { x:  4, y:  9, w: 121, h: 102 },
+  tradingpost: { x:  5, y:  6, w: 118, h: 108 },
+  school:      { x:  6, y:  2, w: 114, h: 126 },
+  archery:     { x:  0, y: 12, w: 124, h: 116 },
+  wall:        { x: 11, y:  7, w: 117, h: 121 },
+  road:        { x:  0, y:  8, w: 123, h: 120 },
+  chickencoop: { x:  3, y:  0, w: 125, h: 128 },
+  cowpen:      { x:  0, y:  0, w: 123, h: 128 },
+  palisade:    { x:  3, y:  0, w: 119, h:  92 },
+  campfire:    { x:  1, y:  0, w: 123, h:  90 },
+  orchard:     { x:  0, y:  0, w: 128, h:  94 },
+  hay:         { x:  0, y:  0, w: 122, h:  90 },
+};
+let _supportAtlas = null;
+let _supportAtlasState = 'idle';
+function _loadSupportAtlas() {
+  if (_supportAtlasState === 'ready') return _supportAtlas;
+  if (_supportAtlasState === 'loading' || _supportAtlasState === 'failed') return null;
+  _supportAtlasState = 'loading';
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    _supportAtlas = img;
+    _supportAtlasState = 'ready';
+  };
+  img.onerror = () => {
+    _supportAtlas = null;
+    _supportAtlasState = 'failed';
+  };
+  img.src = _SUPPORT_ATLAS_URL;
+  return null;
+}
+
+const _NATURE_ATLAS_URL = 'assets/sprites/nature-atlas.png';
+const _NATURE_ATLAS_CELL = 128;
+const _NATURE_ATLAS_COLS = 4;
+const _NATURE_ATLAS_FRAMES = {
+  pine:     { x:   0, y:   0, trim: { x: 25, y:  3, w:  81, h: 120 } },
+  oak:      { x: 128, y:   0, trim: { x: 12, y: 10, w: 104, h: 110 } },
+  birch:    { x: 256, y:   0, trim: { x: 20, y:  3, w:  75, h: 123 } },
+  dead:     { x: 384, y:   0, trim: { x: 25, y:  7, w:  76, h: 117 } },
+  stone:    { x:   0, y: 128, trim: { x: 13, y: 21, w: 102, h:  85 } },
+  iron:     { x: 128, y: 128, trim: { x: 11, y: 19, w:  98, h:  86 } },
+  mountain: { x: 256, y: 128, trim: { x:  7, y:  8, w: 104, h: 104 } },
+  flowers:  { x: 384, y: 128, trim: { x: 11, y: 24, w:  96, h:  85 } },
+};
+let _natureAtlas = null;
+let _natureAtlasState = 'idle';
+function _loadNatureAtlas() {
+  if (_natureAtlasState === 'ready') return _natureAtlas;
+  if (_natureAtlasState === 'loading' || _natureAtlasState === 'failed') return null;
+  _natureAtlasState = 'loading';
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    _natureAtlas = img;
+    _natureAtlasState = 'ready';
+  };
+  img.onerror = () => {
+    _natureAtlas = null;
+    _natureAtlasState = 'failed';
+  };
+  img.src = _NATURE_ATLAS_URL;
+  return null;
+}
+function drawNatureSprite(ctx, type, x, baseY, targetH, alpha = 1) {
+  const atlas = _loadNatureAtlas();
+  const frame = _NATURE_ATLAS_FRAMES[type];
+  if (!atlas || !frame) return false;
+  const trim = frame.trim;
+  const targetW = targetH * (trim.w / trim.h);
+  const oldAlpha = ctx.globalAlpha;
+  ctx.globalAlpha = oldAlpha * alpha;
+  ctx.drawImage(
+    atlas,
+    frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
+    x - targetW / 2, baseY - targetH, targetW, targetH
+  );
+  ctx.globalAlpha = oldAlpha;
+  return true;
+}
+
+const _TERRAIN_ATLAS_URL = 'assets/sprites/terrain-atlas.png';
+const _TERRAIN_ATLAS_CELL = 128;
+const _TERRAIN_ATLAS_FRAMES = {
+  grass:    { x:   0, y:   0, trim: { x: 12, y: 32, w: 116, h: 84 } },
+  forest:   { x: 128, y:   0, trim: { x:  0, y: 31, w: 125, h: 85 } },
+  sand:     { x: 256, y:   0, trim: { x:  0, y: 31, w: 128, h: 85 } },
+  water:    { x: 384, y:   0, trim: { x:  0, y: 31, w: 114, h: 86 } },
+  stone:    { x:   0, y: 128, trim: { x: 12, y:  6, w: 116, h: 86 } },
+  iron:     { x: 128, y: 128, trim: { x:  0, y:  6, w: 128, h: 86 } },
+  mountain: { x: 256, y: 128, trim: { x:  0, y:  3, w: 128, h: 91 } },
+  road:     { x: 384, y: 128, trim: { x:  0, y:  6, w: 114, h: 88 } },
+};
+let _terrainAtlas = null;
+let _terrainAtlasState = 'idle';
+function _loadTerrainAtlas() {
+  if (_terrainAtlasState === 'ready') return _terrainAtlas;
+  if (_terrainAtlasState === 'loading' || _terrainAtlasState === 'failed') return null;
+  _terrainAtlasState = 'loading';
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    _terrainAtlas = img;
+    _terrainAtlasState = 'ready';
+  };
+  img.onerror = () => {
+    _terrainAtlas = null;
+    _terrainAtlasState = 'failed';
+  };
+  img.src = _TERRAIN_ATLAS_URL;
+  return null;
+}
+function terrainSpriteKey(tile) {
+  if (tile === TILE.WATER) return 'water';
+  if (tile === TILE.SAND) return 'sand';
+  if (tile === TILE.GRASS) return 'grass';
+  if (tile === TILE.FOREST) return 'forest';
+  if (tile === TILE.STONE) return 'stone';
+  if (tile === TILE.IRON) return 'iron';
+  if (tile === TILE.MOUNTAIN) return 'mountain';
+  return null;
+}
+function drawTerrainSprite(ctx, tile, s, alpha = 1) {
+  const key = terrainSpriteKey(tile);
+  const atlas = key ? _loadTerrainAtlas() : null;
+  const frame = key ? _TERRAIN_ATLAS_FRAMES[key] : null;
+  if (!atlas || !frame) return false;
+  const trim = frame.trim;
+  const targetW = TW * 1.18;
+  const targetH = targetW * (trim.h / trim.w);
+  const oldAlpha = ctx.globalAlpha;
+  ctx.globalAlpha = oldAlpha * alpha;
+  ctx.drawImage(
+    atlas,
+    frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
+    s.x - targetW / 2, s.y - TH / 2 - 4, targetW, targetH
+  );
+  ctx.globalAlpha = oldAlpha;
+  return true;
+}
+let _rasterAtlas = null;
+let _rasterAtlasState = 'idle';
+function _loadRasterAtlas() {
+  if (_rasterAtlasState === 'ready') return _rasterAtlas;
+  if (_rasterAtlasState === 'loading' || _rasterAtlasState === 'failed') return null;
+  _rasterAtlasState = 'loading';
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    _rasterAtlas = img;
+    _rasterAtlasState = 'ready';
+  };
+  img.onerror = () => {
+    _rasterAtlas = null;
+    _rasterAtlasState = 'failed';
+  };
+  img.src = _RASTER_ATLAS_URL;
+  return null;
+}
+
 const _spriteCache = new Map(); // `${type}__${kname}` → HTMLImageElement (or 'loading' / null)
 function _loadSprite(type, kname) {
   if (!_SPRITE_TYPES.has(type)) return null;
@@ -223,6 +446,18 @@ const _SPRITE_SIZES = {
                                  //   slightly bigger than market for civic presence.
   well:       { w: 36, h: 44 },  // 306: smaller than user-buildable structures
                                  //   (well is supporting; small footprint).
+  farm:        { w: 58, h: 38 },
+  lumber:      { w: 52, h: 48 },
+  quarry:      { w: 50, h: 42 },
+  mine:        { w: 50, h: 46 },
+  fisherman:   { w: 56, h: 50 },
+  tradingpost: { w: 56, h: 50 },
+  school:      { w: 48, h: 54 },
+  archery:     { w: 52, h: 42 },
+  wall:        { w: 44, h: 32 },
+  road:        { w: 58, h: 28 },
+  chickencoop: { w: 46, h: 40 },
+  cowpen:      { w: 50, h: 40 },
 };
 // drawSpriteIfReady: returns true if it drew the sprite, false if
 // the caller should fall through to the canvas dispatch. CALLED
@@ -233,8 +468,30 @@ const _SPRITE_SIZES = {
 // `applyNightTint` after the world pass tints the entire frame
 // uniformly so per-sprite tinting would double-apply.
 function drawSpriteIfReady(ctx, b, s) {
-  if (!_USE_SVG_SPRITES) return false;
+  if (_SPRITE_MODE === 'canvas') return false;
   if (!_SPRITE_TYPES.has(b.type)) return false;
+
+  if (_SPRITE_MODE === 'raster') {
+    const supportFrame = _SUPPORT_ATLAS_FRAMES[b.type];
+    const atlas = supportFrame ? _loadSupportAtlas() : _loadRasterAtlas();
+    const frame = supportFrame || _RASTER_ATLAS_FRAMES[b.type];
+    if (atlas && frame) {
+      const size = _SPRITE_SIZES[b.type] || { w: 36, h: 42 };
+      const trims = supportFrame ? _SUPPORT_ATLAS_TRIMS : _RASTER_ATLAS_TRIMS;
+      const trim = trims[b.type] || { x: 0, y: 0, w: frame.w, h: frame.h };
+      const targetH = size.h;
+      const targetW = Math.max(size.w, targetH * (trim.w / trim.h));
+      ctx.drawImage(
+        atlas,
+        frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
+        s.x - targetW / 2, s.y - targetH, targetW, targetH
+      );
+      return true;
+    }
+    // If the bitmap sheet is still loading or unavailable, keep the SVG
+    // path visible instead of flashing back to primitive canvas art.
+  }
+
   // Phase B step 5: pass kingdom name to enable per-realm variants.
   const img = _loadSprite(b.type, G.kingdomName);
   if (!img) return false;  // still loading or failed; fall through
@@ -252,21 +509,63 @@ function drawSpriteIfReady(ctx, b, s) {
 // realm is acceptable).
 if (typeof window !== 'undefined') {
   setTimeout(() => {
+    _loadRasterAtlas();
+    _loadSupportAtlas();
+    _loadNatureAtlas();
+    _loadTerrainAtlas();
     for (const t of _SPRITE_TYPES) _loadSprite(t, '');
   }, 0);
 }
 
-// Debug helpers — flip via console: `window.__realm.toggleSVG()`.
+// Debug helpers — flip via console:
+// `window.__realm.spriteMode('svg')`, `spriteMode('canvas')`, or
+// `spriteMode('raster')`. The legacy toggleSVG helper is preserved.
 if (typeof window !== 'undefined') {
   window.__realm = window.__realm || {};
+  window.__realm.spriteMode = (mode) => {
+    if (mode === undefined) return _SPRITE_MODE;
+    if (!['raster', 'svg', 'canvas'].includes(mode)) {
+      console.warn('[realm] spriteMode must be raster, svg, or canvas');
+      return _SPRITE_MODE;
+    }
+    _SPRITE_MODE = mode;
+    if (_SPRITE_MODE === 'raster') {
+      _loadRasterAtlas();
+      _loadSupportAtlas();
+    }
+    if (_SPRITE_MODE === 'svg') for (const t of _SPRITE_TYPES) _loadSprite(t, G.kingdomName);
+    console.log(`[realm] spriteMode = ${_SPRITE_MODE}`);
+    return _SPRITE_MODE;
+  };
   window.__realm.toggleSVG = (on) => {
-    _USE_SVG_SPRITES = on === undefined ? !_USE_SVG_SPRITES : !!on;
+    const useSvg = on === undefined ? _SPRITE_MODE !== 'svg' : !!on;
+    _SPRITE_MODE = useSvg ? 'svg' : 'canvas';
     // Eagerly preload all sprite types when enabled. Pass current
     // G.kingdomName so step 5's per-realm variants load eagerly too.
-    if (_USE_SVG_SPRITES) for (const t of _SPRITE_TYPES) _loadSprite(t, G.kingdomName);
-    console.log(`[realm] _USE_SVG_SPRITES = ${_USE_SVG_SPRITES}`);
-    return _USE_SVG_SPRITES;
+    if (_SPRITE_MODE === 'svg') for (const t of _SPRITE_TYPES) _loadSprite(t, G.kingdomName);
+    console.log(`[realm] spriteMode = ${_SPRITE_MODE}`);
+    return _SPRITE_MODE === 'svg';
   };
+  window.__realm.rasterAtlas = () => ({
+    url: _RASTER_ATLAS_URL,
+    state: _rasterAtlasState,
+    frames: _RASTER_ATLAS_FRAMES,
+  });
+  window.__realm.supportAtlas = () => ({
+    url: _SUPPORT_ATLAS_URL,
+    state: _supportAtlasState,
+    frames: _SUPPORT_ATLAS_FRAMES,
+  });
+  window.__realm.natureAtlas = () => ({
+    url: _NATURE_ATLAS_URL,
+    state: _natureAtlasState,
+    frames: _NATURE_ATLAS_FRAMES,
+  });
+  window.__realm.terrainAtlas = () => ({
+    url: _TERRAIN_ATLAS_URL,
+    state: _terrainAtlasState,
+    frames: _TERRAIN_ATLAS_FRAMES,
+  });
   window.__realm.spriteCache = () => Array.from(_spriteCache.keys()).map(k => ({
     type: k, state: _spriteCache.get(k) === 'loading' ? 'loading' : (_spriteCache.get(k) ? 'ready' : 'failed'),
   }));
@@ -543,8 +842,8 @@ export function render() {
       // Water uses large-scale smooth noise — no per-tile checkerboard seams
       if (tile === TILE.WATER) {
         const n = (Math.sin(x * 0.3 + 0.7) + Math.cos(y * 0.4 + 0.5)) * 0.5 + 0.5;
-        const tint = Math.floor(n * 20) - 10;
-        tileColor = `rgb(${0x18 + tint}, ${0x52 + tint}, ${0xb8 + tint})`;
+        const tint = Math.floor(n * 14) - 7;
+        tileColor = `rgb(${0x1d + tint}, ${0x5f + tint}, ${0x96 + tint})`;
       }
 
       // Grass/sand shade variation via position hash + season tint.
@@ -559,14 +858,14 @@ export function render() {
         const n1 = ((h & 0xf) / 15) - 0.5;  // -0.5 .. 0.5
         const n2 = (((h >> 4) & 0xf) / 15) - 0.5;
         if (tile === TILE.GRASS) {
-          const r = 74 + Math.round(n1 * 6);
-          const g = 168 + Math.round(n2 * 10);
-          const b = 80 + Math.round(n1 * 4);
+          const r = 64 + Math.round(n1 * 8);
+          const g = 128 + Math.round(n2 * 10);
+          const b = 66 + Math.round(n1 * 5);
           tileColor = shiftColor(`rgb(${r},${g},${b})`, seasonShift);
         } else {
-          const r = 228 + Math.round(n1 * 8);
-          const g = 186 + Math.round(n2 * 6);
-          const b = 116 + Math.round(n1 * 6);
+          const r = 198 + Math.round(n1 * 8);
+          const g = 164 + Math.round(n2 * 6);
+          const b = 102 + Math.round(n1 * 6);
           tileColor = shiftColor(`rgb(${r},${g},${b})`, seasonShift);
         }
       }
@@ -584,6 +883,7 @@ export function render() {
       ctx.lineTo(s.x - TW/2, s.y);
       ctx.closePath();
       ctx.fill();
+      drawTerrainSprite(ctx, tile, s, daylight * 0.92);
 
       // Atmospheric haze — outer edge tiles fade to pale blue-grey
       if (tile !== TILE.WATER) {
@@ -837,19 +1137,23 @@ export function render() {
         ctx.globalAlpha = daylight;
         // Reduced from gh<140 (~55%) to gh<70 (~27%) — was too busy, read as noise/artifacts
         if (gh < 70) {
-          ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
-          const gx = s.x - 8 + (gh % 16), gy = s.y - 4 + ((gh >> 4) % 6);
-          ctx.beginPath();
-          ctx.moveTo(gx, gy); ctx.lineTo(gx - 1, gy - 4); ctx.lineTo(gx + 1.5, gy - 3);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3, gy - 5); ctx.lineTo(gx + 5, gy - 1.5);
-          ctx.fill();
-          // Third blade for denser tufts — also halved from gh<80 to gh<35
-          if (gh < 35) {
+          const drewFlower = gh < 10 && drawNatureSprite(ctx, 'flowers', s.x + ((gh % 7) - 3), s.y + 5, 16, daylight * 0.9);
+          ctx.globalAlpha = daylight;
+          if (!drewFlower) {
+            ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
+            const gx = s.x - 8 + (gh % 16), gy = s.y - 4 + ((gh >> 4) % 6);
             ctx.beginPath();
-            ctx.moveTo(gx + 5, gy); ctx.lineTo(gx + 6, gy - 4); ctx.lineTo(gx + 7.5, gy - 2);
+            ctx.moveTo(gx, gy); ctx.lineTo(gx - 1, gy - 4); ctx.lineTo(gx + 1.5, gy - 3);
             ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(gx + 2, gy); ctx.lineTo(gx + 3, gy - 5); ctx.lineTo(gx + 5, gy - 1.5);
+            ctx.fill();
+            // Third blade for denser tufts — also halved from gh<80 to gh<35
+            if (gh < 35) {
+              ctx.beginPath();
+              ctx.moveTo(gx + 5, gy); ctx.lineTo(gx + 6, gy - 4); ctx.lineTo(gx + 7.5, gy - 2);
+              ctx.fill();
+            }
           }
         }
         if (G.season === 'spring' && gh > 192) {
@@ -1433,10 +1737,18 @@ export function render() {
     // Tones chosen to stay clearly distinct from all job body colors (no warm-orange clashes)
     const skinColor = ['#ffe0c0', '#f5c99a', '#d0845a', '#9e5c38'][skinHash];
     const faceScreenX = faceX - faceZ; // screen-X component of movement direction
-    // Lean into walk direction — body + head shift slightly forward
-    const walkLean = isMoving ? faceScreenX * 0.9 : 0;
-    const headX = s.x + faceScreenX * 0.5 + walkLean * 0.4;
-    const headY = cy - 19;  // Loop 1 (render S3): dropped 1px so jaw overlaps body top, kills the "severed head" read
+    const faceScreenY = (faceX + faceZ) * 0.5; // screen-depth component; positive walks down/toward camera
+    const faceScreenLen = Math.hypot(faceScreenX, faceScreenY);
+    const fwdX = faceScreenLen > 0.01 ? faceScreenX / faceScreenLen : 0;
+    const fwdY = faceScreenLen > 0.01 ? faceScreenY / faceScreenLen : 0;
+    const sideX = faceScreenLen > 0.01 ? -fwdY : 1;
+    const sideY = faceScreenLen > 0.01 ?  fwdX : 0;
+    // Lean into the projected screen direction. The Y term is intentionally
+    // smaller so up/down walking reads as intent without bobbing the head loose.
+    const walkLeanX = isMoving ? fwdX * 0.9 : 0;
+    const walkLeanY = isMoving ? fwdY * 0.7 : 0;
+    const headX = s.x + fwdX * 0.5 + walkLeanX * 0.4;
+    const headY = cy - 19 + walkLeanY * 0.35;  // Loop 1 (render S3): dropped 1px so jaw overlaps body top, kills the "severed head" read
 
     // Job color — vibrant saturated palette so citizens stand out
     let bodyColor = '#8899bb';
@@ -1509,10 +1821,11 @@ export function render() {
     // Loop 48 (render S4): real walk cycle. Prior code had feet sliding
     // left/right via sine — looked slidey. Now each foot follows a proper
     // up+forward swing phase then a planted stance phase, mirrored L/R.
-    // stepL is positive during left-foot swing, negative during right.
+    // Loop 358: stride now follows the isometric screen direction. Walking
+    // up/down no longer reuses a horizontal shuffle meant for side movement.
     const walkPhase = G.gameTick * 0.22 + phaseOffset;
     const stepSin = Math.sin(walkPhase);
-    const step = isMoving ? stepSin * 1.5 : 0;
+    const step = isMoving ? stepSin : 0;
     const pantsColor = '#3a2618';
     // Per-foot lift: the foot is UP when it's swinging forward (cos>0),
     // PLANTED when cos<0. Use half-rectified cosines so only the swing
@@ -1520,37 +1833,41 @@ export function render() {
     const cosP = Math.cos(walkPhase);
     const liftL = isMoving ? Math.max(0, cosP) * 1.6 : 0;
     const liftR = isMoving ? Math.max(0, -cosP) * 1.6 : 0;
-    // Forward shift also comes from the same phase — foot ahead when lifted
-    const shiftL = isMoving ? Math.max(0, cosP) * 1.1 : 0;
-    const shiftR = isMoving ? Math.max(0, -cosP) * 1.1 : 0;
+    // Forward/back shift travels along the projected walking vector. This is
+    // the key difference between walking across screen and walking into depth.
+    const strideL = isMoving ? cosP * 1.35 : 0;
+    const strideR = isMoving ? -cosP * 1.35 : 0;
 
     // Legs
     ctx.fillStyle = pantsColor;
-    const legL_x = s.x - 2.0 + shiftL * 0.6 - step * 0.15;
-    const legR_x = s.x + 2.0 - shiftR * 0.6 + step * 0.15;
+    const footSep = 2.0;
+    const legL_x = s.x - sideX * footSep + fwdX * strideL - sideX * step * 0.25;
+    const legR_x = s.x + sideX * footSep + fwdX * strideR + sideX * step * 0.25;
+    const legL_y = cy - sideY * footSep * 0.35 + fwdY * strideL;
+    const legR_y = cy + sideY * footSep * 0.35 + fwdY * strideR;
     const legL_len = 5 - liftL * 0.6;  // leg shortens when foot lifts
     const legR_len = 5 - liftR * 0.6;
-    ctx.fillRect(legL_x - 1.2, cy - 1 - liftL - legL_len, 2.4, legL_len);
-    ctx.fillRect(legR_x - 1.2, cy - 1 - liftR - legR_len, 2.4, legR_len);
+    ctx.fillRect(legL_x - 1.2, legL_y - 1 - liftL - legL_len, 2.4, legL_len);
+    ctx.fillRect(legR_x - 1.2, legR_y - 1 - liftR - legR_len, 2.4, legR_len);
     // Leg highlight
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(legL_x - 1.2, cy - 1 - liftL - legL_len, 0.6, legL_len);
-    ctx.fillRect(legR_x - 1.2, cy - 1 - liftR - legR_len, 0.6, legR_len);
+    ctx.fillRect(legL_x - 1.2, legL_y - 1 - liftL - legL_len, 0.6, legL_len);
+    ctx.fillRect(legR_x - 1.2, legR_y - 1 - liftR - legR_len, 0.6, legR_len);
 
     // Feet — lifted by liftL/liftR for the swing arc
     ctx.fillStyle = '#2a1a10';
     ctx.beginPath();
-    ctx.ellipse(legL_x, cy + 0.5 - liftL, 2.6, 1.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(legL_x, legL_y + 0.5 - liftL, 2.6, 1.6, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(legR_x, cy + 0.5 - liftR, 2.6, 1.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(legR_x, legR_y + 0.5 - liftR, 2.6, 1.6, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Body — torso ellipse, slightly tapered (shoulders wider than waist).
     // Draw as two overlapping ellipses for subtle taper without bespoke
     // path code.
-    const bodyX = s.x + walkLean * 0.35;
-    const bodyTilt = walkLean * 0.055;
+    const bodyX = s.x + walkLeanX * 0.35;
+    const bodyTilt = walkLeanX * 0.055;
     ctx.fillStyle = bodyColor;
     // Lower body (narrower waist)
     ctx.beginPath();
@@ -3173,6 +3490,7 @@ function canPlaceCheck(type, x, y) {
 function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   if (!def) return; // guard against unknown building types
+  const rasterSprite = _usesRasterSprite(b.type);
   const buildAlpha = (b.buildProgress !== undefined && b.buildProgress < 1) ? b.buildProgress : 1;
   // Keep buildings fully opaque — night overlay darkens them later
   ctx.globalAlpha = buildAlpha;
@@ -3203,9 +3521,9 @@ function drawBuilding(ctx, b, s, daylight) {
 
   // AO contact ring — always at base, grounds the building visually
   if (b.type !== 'road' && b.type !== 'wall') {
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillStyle = rasterSprite ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.25)';
     ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 2, 10, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(s.x, s.y + 2, rasterSprite ? 13 : 10, rasterSprite ? 4 : 3, 0, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -3226,7 +3544,7 @@ function drawBuilding(ctx, b, s, daylight) {
     // style as citizens, which anchors the building visually.
     const footprintW = (b.type === 'castle') ? 14 : (b.type === 'church' || b.type === 'tower') ? 11 : (b.type === 'wall' || b.type === 'road') ? 0 : 10;
     if (footprintW > 0) {
-      ctx.globalAlpha = daylight * 0.5;
+      ctx.globalAlpha = daylight * (rasterSprite ? 0.16 : 0.5);
       ctx.fillStyle = 'rgba(0,0,0,0.10)';
       ctx.beginPath();
       ctx.ellipse(s.x, s.y + 3, footprintW + 3, (footprintW + 3) * 0.4, 0, 0, Math.PI * 2);
@@ -3246,7 +3564,7 @@ function drawBuilding(ctx, b, s, daylight) {
     const isGolden = (dayT < 0.15 || (dayT > 0.55 && dayT < 0.75));
     const shadowBaseColor = isGolden ? '120,60,40' : '0,0,0';
     // Create a slanted quadrilateral shadow shape
-    ctx.globalAlpha = daylight * 0.3;
+    ctx.globalAlpha = daylight * (rasterSprite ? 0.14 : 0.3);
     ctx.fillStyle = '#1a1010';
     ctx.beginPath();
     // Base of building (4 corners of foundation)
@@ -6137,6 +6455,12 @@ function drawTree(ctx, x, y, a, seasonShift) {
   else if (variantPick < 18) variant = 2;  // birch (20%)
   else variant = 3;                         // dead (10%)
 
+  const natureType = variant === 0 ? 'pine' : variant === 1 ? 'oak' : variant === 2 ? 'birch' : 'dead';
+  const natureH = variant === 1 ? 34 : variant === 2 ? 40 : 42;
+  if (drawNatureSprite(ctx, natureType, x, y + 9, natureH, a)) {
+    return;
+  }
+
   // Shadow
   ctx.globalAlpha = a * 0.15;
   ctx.fillStyle = '#000';
@@ -6260,6 +6584,8 @@ function drawTree(ctx, x, y, a, seasonShift) {
 }
 
 function drawRock(ctx, x, y, a) {
+  if (drawNatureSprite(ctx, 'stone', x, y + 8, 25, a)) return;
+
   ctx.globalAlpha = a * 0.9;
 
   // Main large rock — gradient for 3D rounded look
@@ -6328,6 +6654,8 @@ function drawRock(ctx, x, y, a) {
 }
 
 function drawIronOre(ctx, x, y, a) {
+  if (drawNatureSprite(ctx, 'iron', x, y + 8, 25, a)) return;
+
   ctx.globalAlpha = a*0.95;
   ctx.fillStyle = '#4a6cb8';
   ctx.beginPath(); ctx.moveTo(x-5,y+2); ctx.lineTo(x-3,y-5); ctx.lineTo(x+4,y-4); ctx.lineTo(x+5,y+2); ctx.closePath(); ctx.fill();

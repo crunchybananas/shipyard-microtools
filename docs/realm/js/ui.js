@@ -252,6 +252,10 @@ export function renderBuildBar() {
   bar.innerHTML = '';
   _visibleBuildKeys = [];
   const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
+  const spriteTypes = new Set([
+    'granary','castle','church','windmill','tower','house','tavern','blacksmith','market','bakery','barracks','townhall','well',
+    'farm','lumber','quarry','mine','fisherman','tradingpost','school','archery','wall','road','chickencoop','cowpen',
+  ]);
 
   for (const cat of CATEGORIES) {
     const unlockedKeys = cat.keys.filter(key => BUILDINGS[key] && isBuildingUnlocked(key));
@@ -293,7 +297,10 @@ export function renderBuildBar() {
       const countBadge = count > 0 ? `<span class="build-count">${count}</span>` : '';
       // Lock badge on unaffordable buildings — secondary signal for colorblind players
       const lockBadge = !affordable ? `<span class="build-lock" aria-label="Cannot afford">🔒</span>` : '';
-      btn.innerHTML = `${shortcutBadge}${lockBadge}<span class="icon">${def.icon}</span><span>${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
+      const iconHtml = spriteTypes.has(key)
+        ? `<img class="build-sprite" src="assets/sprites/${key}.svg" alt="" aria-hidden="true">`
+        : `<span class="build-emoji">${def.icon}</span>`;
+      btn.innerHTML = `${shortcutBadge}${lockBadge}${iconHtml}<span class="build-name">${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
       btn.onclick = () => {
         // Always select on click — don't toggle off when clicking the same
         // button again (that was causing "House button doesn't work" confusion
