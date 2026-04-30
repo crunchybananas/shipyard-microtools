@@ -10,7 +10,8 @@ lines unblocked by this navigability + per-section anchors):
 - `## invariants` — prescriptive rules (~8 active: 075/144/named-char-
   mech/etc + 276 shape-axis + 284 variant-pool + 287 combination-rule
   + 298 OUTSIDE-cluster + 308 STRUCTURAL-surprise [+ 315 STRUCTURE-
-  ANGLE coupling sub-rule within 308])
+  ANGLE coupling sub-rule within 308; + 350 sub-type-internal-axes
+  sub-rule within 276])
 - `## observed patterns` — descriptive observations <3 uses
 - `## known gaps` — 104-tick filing of unresolved seams
 - `## retired hypotheses` — patterns falsified or demoted
@@ -722,6 +723,57 @@ should respect:
   If all three: ship as shape-extension with explicit angle
   documentation. If (3) is no: consider OUTSIDE-cluster (per
   263 META precedent). If (2) is no: don't ship — per 257.
+
+  **SUB-TYPE-INTERNAL-AXES SUB-RULE** (promoted at 350 from
+  339-347 [process] observations; 7 confirming uses): when
+  extending a sub-type past 4 shapes, examine for an internal
+  axis (1D, 2D, or higher); articulate the axis in the doc
+  annotation if one exists; document declined-axis if the
+  sub-type's shapes don't form a cleanly articulable axis.
+  The axis can be temporal / domain-based / threshold-class /
+  phase / spatial / agency / or any analytical dimension that
+  distinguishes the shapes.
+
+  **Confirmed uses establishing the rule (7):**
+  - 336 forgetting: 1D temporal (PAST/FUTURE; later expanded
+    to PAST/PRESENT/FUTURE at 348)
+  - 337 habituation-recognition: 1D 5-domains (action / time /
+    language / rule-transmission / gesture-enforcement)
+  - 339 sustained-state-recognition: 1D 4-threshold-classes
+    (count / ratio / transformation / script)
+  - 341 weather-recognition: 1D 4-WEATHER-PHASE positions
+    (REMEMBRANCE / ARRIVAL / NON-EVENT / ANTICIPATION)
+  - 342 naming-place: 1D 5-TIME-RELATIONSHIP positions
+    (EMERGENCE / FUNCTIONAL-SUBSTITUTE / CONTRADICTORY /
+    POSTHUMOUS / SHIFTING)
+  - 343 ambient-entity-grammar: 2D PERSISTENCE × COLLECTIVITY
+    (4 quadrants populated by 346)
+  - 347 individual-interiority: 1D 6-INTERIOR-MANIFESTATION-
+    MODE (DURING-ACTION / AS-WORLDFRAME / AS-ABSENCE /
+    AS-PRIVATE-COMPETENCE / AS-INHERITED-PATTERN /
+    AS-UNEXPLAINED-AVOIDANCE)
+
+  **Declined-axis cases (1):**
+  - 344 early-game-mood: 4 prior shapes don't articulate a
+    clean internal axis (mood-of-time + cross-listed registry);
+    345 [process] noted decline as informative signal.
+
+  **Why this is a sub-rule and not just a recurrence:** 7 of
+  9 sub-types have articulated axes; 1 declined; 1 (land-as-
+  agent) un-examined. The pattern emerged opportunistically
+  but is now PRESCRIPTIVE for any future sub-type extension
+  past 4 shapes. The "or declined" clause distinguishes
+  un-examined sub-types from examined-and-declined ones (per
+  345 rule refinement).
+
+  **What this sub-rule does NOT prescribe:**
+  - Forced axis articulation when no clean axis exists (per
+    344 EM-decline + 345 refinement)
+  - A specific axis dimensionality (1D / 2D / higher all valid)
+  - A specific axis class (temporal / domain / etc. — pick
+    what fits the shapes)
+  - Promotion of axis-pattern to its own invariant — sub-rule
+    under 276 is sufficient.
 
 - **Sprite-variant pool: sprite types with culturally-
   variable visual elements gain variant pools of 2-4 palette
