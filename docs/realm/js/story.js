@@ -1844,6 +1844,54 @@ const NARRATIVE_BEATS = [
   { flag: 'afternoon_quiet_known', tag: 'misc',
     trigger: G => G.storyFlags.year2 && G.day >= 80,
     text: 'There is a moment in the late afternoon when the realm goes quiet for the length of one breath. No one calls it. No one remembers when it started. The realm has stopped distinguishing the silence from the time.' },
+  // Loop 357 (surprise, un-filed; the-optimist per 356 plan): SINGLE-AXIS
+  // surprise — 6th SUSTAINED-STATE-RECOGNITION shape per 276 invariant.
+  // Sub-type 5→6 shapes; advances cluster-uniform sweep (4@5→3@5+1@6
+  // post-357; SS joins Am/II/HB at 6). NEW THRESHOLD CLASS:
+  // EQUILIBRIUM-AS-DEFAULT.
+  // Distinct from prior 4 SS threshold classes:
+  //  - 211 sustained-peace 50d: COUNT (no raid days)
+  //  - 228 no-death 100d: COUNT (days since last death)
+  //  - 230 full-pop 60d: RATIO (current/max = 1)
+  //  - 331 winter-normalized: TRANSFORMATION (cycle-becomes-background)
+  //  - 339 raid_routine: COUNT + SCRIPT (threats-survived + script-
+  //    internalization)
+  //  - 357 EQUILIBRIUM-AS-DEFAULT — flow-balance over time. Two streams
+  //    (birth/death, in/out, growth/loss) reach approximate balance and
+  //    the realm settles at unchanging size without anyone deciding.
+  //    Distinct from 230 RATIO because 230 is static peak (current = max);
+  //    357 is dynamic balance (flows continuing but matching). Distinct
+  //    from 331 TRANSFORMATION because 331 is cycle-becoming-background
+  //    (rhythmic); 357 is flat-line equilibrium (non-rhythmic stability).
+  // Sub-type-internal-axis advance: SS adds 5th threshold class
+  // (COUNT/RATIO/TRANSFORMATION/SCRIPT/EQUILIBRIUM); 6 shapes across
+  // 5 classes (211/228 share COUNT). Per 350 sub-type-internal-axes
+  // sub-rule extension.
+  // Distinct from related sub-types:
+  //  - 322 recurrence_known (CONTENTMENT register; settled-place
+  //    repetition mood): 357 is SS mechanic of flow-balance, not
+  //    register-mood; 322 is citizen-experience, 357 is realm-state
+  //  - 230 full_pop_known (RATIO at peak): 357 is flow-balance,
+  //    not count-at-static
+  //  - 331 winter_normalized (TRANSFORMATION cycle-as-background):
+  //    357 is non-rhythmic equilibrium
+  //  - 354 afternoon_quiet (HB rhythmic-collective-moment): 354 is
+  //    sub-second collective rhythm; 357 is multi-year flow-balance
+  // Lift "without anyone deciding to stop" captures equilibrium-without-
+  // intent: the balance happened on its own; no one chose growth-cessation;
+  // the realm simply BALANCED.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Sub-type 5→6 shapes; SS joins Am/II/HB at 6.
+  // INSIDE cluster post-357: 2@7 (forgetting + LA) / 4@6 (Am, II,
+  // HB, SS) / 3@5 (WE, NP, EM). 53 total INSIDE shapes (was 52).
+  // **Cluster-uniform sweep advance**: 3 sub-types remain at 5; 3
+  // more shapes needed for cluster-uniform-6. Gate: year3 + day>=90
+  // per 321 authoring guideline (year3 for "two years" plausibility;
+  // day>=90 spreads from 354 d>=80 + 348 d>=160). Once-per-realm; tag
+  // misc.
+  { flag: 'realm_equilibrium_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 90,
+    text: 'For two years the realm has stayed the same size. There is a name added for every name lost. The realm has stopped growing without anyone deciding to stop.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

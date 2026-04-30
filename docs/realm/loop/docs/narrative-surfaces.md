@@ -741,7 +741,8 @@ should respect:
     language / rule-transmission / gesture-enforcement);
     extended to 6 domains at 354 with rhythmic-collective-moment
   - 339 sustained-state-recognition: 1D 4-threshold-classes
-    (count / ratio / transformation / script)
+    (count / ratio / transformation / script); extended to 5
+    threshold-classes at 357 with EQUILIBRIUM (flow-balance)
   - 341 weather-recognition: 1D 4-WEATHER-PHASE positions
     (REMEMBRANCE / ARRIVAL / NON-EVENT / ANTICIPATION)
   - 342 naming-place: 1D 5-TIME-RELATIONSHIP positions
@@ -1857,10 +1858,10 @@ prescriptive AND consistently applied.
       sub-rule ledger (8/9 formalized
       post-352).
     Per 276 invariant + 352 axis articulation.
-  - *Sustained-state-recognition* (211/228/230/331/339):
+  - *Sustained-state-recognition* (211/228/230/331/339/357):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.
-    **5 shapes** post-339:
+    **6 shapes** post-357 (5 threshold classes):
     - 211 sustained-peace 50d ("watch still
       climbs the walls but hands rest") — count
       threshold (no raid days).
@@ -1901,11 +1902,30 @@ prescriptive AND consistently applied.
     339 = THREAT-PRESENCE-METABOLIZED. Distinct
     from 314 morning_dread (acute fear, OUTSIDE
     TERROR); 339 is INSIDE-CHRONIC-SCRIPTED-FEAR.
-    Sub-type now spans 4 threshold CLASSES:
+    **357 realm_equilibrium_known — EQUILIBRIUM-
+    AS-DEFAULT**: 6th shape. "For two years
+    the realm has stayed the same size. There
+    is a name added for every name lost. The
+    realm has stopped growing without anyone
+    deciding to stop." Flow-balance over time:
+    two streams (birth/death; in/out) reach
+    approximate balance and the realm settles
+    at unchanging size without anyone deciding.
+    Distinct from 230 RATIO (static peak;
+    current=max) because 357 is dynamic balance
+    (flows continuing but matching). Distinct
+    from 331 TRANSFORMATION (cycle-becoming-
+    background; rhythmic) because 357 is flat-
+    line equilibrium (non-rhythmic stability).
+    Lift "without anyone deciding to stop"
+    captures equilibrium-without-intent.
+    Gate: year3 + day>=90; no per-realm tracker
+    needed.
+    Sub-type now spans 5 threshold CLASSES:
     COUNT (211/228) / RATIO (230) /
-    TRANSFORMATION (331) / SCRIPT (339) — adds
-    sub-type-internal-axis per 337 [process]
-    meta-pattern.
+    TRANSFORMATION (331) / SCRIPT (339) /
+    EQUILIBRIUM (357) — sub-type-internal-axis
+    extends from 4 to 5 classes post-357.
     Future literary-uses welcome (peak
     no-death + peace already shipped); ship
     if prose surprises per 203 positive rule,

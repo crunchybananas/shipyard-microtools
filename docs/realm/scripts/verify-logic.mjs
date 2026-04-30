@@ -445,6 +445,19 @@ const afternoonQuietFire = await page.evaluate(async () => {
 });
 rec('354: afternoon_quiet_known fires year2 + d>=80', afternoonQuietFire.fired, `text="${afternoonQuietFire.text}…" tag=${afternoonQuietFire.tag}`);
 
+// Test: 357 realm_equilibrium_known — single-axis (6th sustained-state-recognition; EQUILIBRIUM-AS-DEFAULT; SS axis 4→5 threshold-classes; cluster-uniform sweep)
+const realmEquilibriumFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.day = 95;
+  delete window.G.storyFlags.realm_equilibrium_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.realm_equilibrium_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('For two years the realm has stayed'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('357: realm_equilibrium_known fires year3 + d>=90', realmEquilibriumFire.fired, `text="${realmEquilibriumFire.text}…" tag=${realmEquilibriumFire.tag}`);
+
 // Test: 356 G.debug.disableEvents knob suppresses random-event rolls (closes 355 pessimist finding)
 const disableEventsTest = await page.evaluate(async () => {
   const events = await import('./js/events.js');
