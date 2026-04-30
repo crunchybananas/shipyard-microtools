@@ -734,7 +734,7 @@ should respect:
   phase / spatial / agency / or any analytical dimension that
   distinguishes the shapes.
 
-  **Confirmed uses establishing the rule (7):**
+  **Confirmed uses establishing the rule (8):**
   - 336 forgetting: 1D temporal (PAST/FUTURE; later expanded
     to PAST/PRESENT/FUTURE at 348)
   - 337 habituation-recognition: 1D 5-domains (action / time /
@@ -752,19 +752,26 @@ should respect:
     MODE (DURING-ACTION / AS-WORLDFRAME / AS-ABSENCE /
     AS-PRIVATE-COMPETENCE / AS-INHERITED-PATTERN /
     AS-UNEXPLAINED-AVOIDANCE)
+  - 352 land-as-agent: 1D 6-TEMPORAL-AGENCY positions
+    (ATEMPORAL / PAST-RETAINED / PAST-IMPORTED / PAST-ACCRETED
+    / FUTURE-PROJECTED / PRESENT-RECURRENT) — 7 shapes across
+    6 positions (227+229 share PAST-RETAINED). Closes the
+    last un-examined sub-type case identified at 350 letter.
 
   **Declined-axis cases (1):**
   - 344 early-game-mood: 4 prior shapes don't articulate a
     clean internal axis (mood-of-time + cross-listed registry);
     345 [process] noted decline as informative signal.
 
-  **Why this is a sub-rule and not just a recurrence:** 7 of
-  9 sub-types have articulated axes; 1 declined; 1 (land-as-
-  agent) un-examined. The pattern emerged opportunistically
+  **Why this is a sub-rule and not just a recurrence:** 8 of
+  9 sub-types have articulated axes; 1 declined; 0 un-examined
+  (LA closed at 352). The pattern emerged opportunistically
   but is now PRESCRIPTIVE for any future sub-type extension
   past 4 shapes. The "or declined" clause distinguishes
   un-examined sub-types from examined-and-declined ones (per
-  345 rule refinement).
+  345 rule refinement). **8/9 formalization status post-352**:
+  the only outstanding sub-type axis status is 344 EM-decline
+  itself, which is informative-not-deficient.
 
   **What this sub-rule does NOT prescribe:**
   - Forced axis articulation when no clean axis exists (per
@@ -1788,24 +1795,47 @@ prescriptive AND consistently applied.
     MANDATORY — sub-type-internal-axes
     remains at 6/9 post-344. Per 276
     invariant.
-  - *Land-as-agent* (207/227/229/290/294/307):
+  - *Land-as-agent* (207/227/229/290/294/307/352):
     land/object/relational-keeper has subjective
-    voice. **6 shapes** (sole-leading sub-type):
-    - 207 broad LAND collective
-    - 227 OBJECT-HOLDS-MEMORY (well water)
-    - 229 OBJECT-HOLDS-NAMES (hearth)
-    - 290 INHERITED-FROM-OUTSIDE (sea-bell)
-    - 294 RESHAPED-BY-USE (worn step)
+    voice. **7 shapes** (TIES forgetting at 7
+    post-352; both co-leaders):
+    - 207 broad LAND-EXISTENCE (ATEMPORAL)
+    - 227 OBJECT-HOLDS-MEMORY (well water;
+      PAST-RETAINED)
+    - 229 OBJECT-HOLDS-NAMES (hearth;
+      PAST-RETAINED)
+    - 290 INHERITED-FROM-OUTSIDE (sea-bell;
+      PAST-IMPORTED)
+    - 294 RESHAPED-BY-USE (worn step;
+      PAST-ACCRETED)
     - 307 ANTICIPATORY-AGENCY ("the path
       knows where you are going before you
       do. The realm has no need to ask
       where") — object KNOWS in advance;
-      anticipation as agency. **3rd
-      structural surprise**: SECOND-PERSON
-      address (after 301 question / 305
-      imperative). Per 308 STRUCTURAL-
+      anticipation as agency; FUTURE-PROJECTED.
+      **3rd structural surprise**: SECOND-
+      PERSON address (after 301 question /
+      305 imperative). Per 308 STRUCTURAL-
       surprise invariant.
-    Per 276 invariant.
+    - 352 PRESENT-INDEPENDENT-AGENCY ("There
+      is a hill on the south coast that
+      gathers fog every autumn morning. The
+      fog finds the hill before the sun
+      finds the realm. The hill does not
+      need a name for what it does.") — land
+      acts in PRESENT-RECURRENT mode; cyclic
+      atmospheric agency; citizens are
+      spectators; land does not need them.
+      **Articulates LA temporal axis**:
+      ATEMPORAL → PAST-RETAINED → PAST-
+      IMPORTED → PAST-ACCRETED → FUTURE-
+      PROJECTED → PRESENT-RECURRENT (1D 6-
+      position; 7 shapes; 227+229 share
+      PAST-RETAINED). **Closes un-examined
+      LA case** in sub-type-internal-axes
+      sub-rule ledger (8/9 formalized
+      post-352).
+    Per 276 invariant + 352 axis articulation.
   - *Sustained-state-recognition* (211/228/230/331/339):
     the realm crosses a temporal threshold and
     notices the change in collective behavior.

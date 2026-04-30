@@ -1745,6 +1745,53 @@ const NARRATIVE_BEATS = [
   { flag: 'present_forgetting_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 160,
     text: 'The realm is forgetting something at this moment. No one knows what. By the time someone says "we used to," the something will be the gap.' },
+  // Loop 352 (surprise, un-filed; the-optimist mutated to surprise per
+  // 351 plan): SINGLE-AXIS surprise — 7th LAND-AS-AGENT shape per 276
+  // invariant. Sub-type 6→7 shapes; LA TIES forgetting at 7 (LA/forgetting
+  // = co-leaders at 7; Am/II remain at 6). NEW ANGLE: PRESENT-INDEPENDENT-
+  // AGENCY — land actively SHAPES atmospheric phenomenon RIGHT NOW,
+  // repeatedly, on its own schedule. Citizens are spectators; the land
+  // does not need them to know what it's doing.
+  // Distinct from prior 6 LA shapes:
+  //  - 207 broad LAND-EXISTENCE (atemporal collective claim)
+  //  - 227 OBJECT-HOLDS-MEMORY (well water; PAST-RETAINED)
+  //  - 229 OBJECT-HOLDS-NAMES (hearth; PAST-RETAINED)
+  //  - 290 INHERITED-FROM-OUTSIDE (sea-bell; PAST-IMPORTED)
+  //  - 294 RESHAPED-BY-USE (worn step; PAST-ACCRETED)
+  //  - 307 ANTICIPATORY-AGENCY (path knows; FUTURE-PROJECTED)
+  //  - 352 PRESENT-INDEPENDENT-AGENCY — land acts in PRESENT-RECURRENT
+  //    mode; no citizen interaction needed; cyclic atmospheric agency.
+  // **Land-as-agent temporal axis articulation (NEW at 352)**:
+  //   ATEMPORAL (207) → PAST-RETAINED (227, 229) → PAST-IMPORTED (290)
+  //   → PAST-ACCRETED (294) → FUTURE-PROJECTED (307) → PRESENT-RECURRENT
+  //   (352). 1D temporal axis with 6 positions, 7 shapes. **Closes
+  //   un-examined LA case in 350 sub-type-internal-axes sub-rule
+  //   ledger**: 7→8 of 9 sub-types formalized (only EM declined remains).
+  // Distinct from related sub-types:
+  //  - 266 summer-falling-star (ambient-entity-grammar; TRANSIENT
+  //    presence; star-as-spectacle): 352 is PERSISTENT cyclic land-
+  //    behavior, not a single transient event
+  //  - 343 collective_waking (ambient 2D PERSISTENCE × COLLECTIVITY):
+  //    352 is land-as-agent not entity-grammar; the FOG isn't an entity
+  //    being witnessed, the HILL is the agent gathering it
+  //  - 307 path-anticipates (FUTURE-PROJECTED): 352 is PRESENT-RECURRENT;
+  //    cyclic action, not future projection
+  //  - 322 recurrence_known (CONTENTMENT register; settled-place
+  //    repetition): 322 is citizen-experience of recurrence; 352 is
+  //    LAND'S OWN recurrence independent of citizens
+  // Lift "The hill does not need a name for what it does" captures
+  // independence-of-purpose: land has function without nomenclature;
+  // citizens are not the audience.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. LA TIES forgetting at 7 shapes; Am/II remain
+  // at 6. Total INSIDE shapes: 51. Gate: autumn + year2+ + day>=50
+  // per 321 authoring guideline (autumn fits the "fog at autumn
+  // morning" prose); year2+ ensures realm has accumulated enough
+  // tenure that "every autumn morning" is plural-recurrent. Once-
+  // per-realm; tag misc.
+  { flag: 'hill_gathers_fog_known', tag: 'misc',
+    trigger: G => G.season === 'autumn' && G.storyFlags.year2 && G.day >= 50,
+    text: 'There is a hill on the south coast that gathers fog every autumn morning. The fog finds the hill before the sun finds the realm. The hill does not need a name for what it does.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
