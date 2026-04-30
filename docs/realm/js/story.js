@@ -1592,6 +1592,53 @@ const NARRATIVE_BEATS = [
   { flag: 'realm_begun_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 145,
     text: 'There is an evening in the first year when the realm goes to sleep without thinking of itself as a realm trying to be one. The realm has begun.' },
+  // Loop 346 (surprise, 343 [code] filing): SINGLE-AXIS surprise — 6th
+  // ambient-entity-grammar shape per 276 invariant. Sub-type 5→6
+  // shapes; joins land-as-agent (6) and forgetting (6) at sole-leader
+  // level (3 sub-types tied at 6). Completes the 2D PERSISTENCE ×
+  // COLLECTIVITY axis with all 4 quadrants populated.
+  // NEW ANGLE: SUSTAINED-COLLECTIVE-AWARENESS-WITHOUT-NAMING. Every
+  // citizen expects the same sustained presence; the expectation is
+  // shared across the realm but the thing itself is unnamed. Fills
+  // the SUSTAINED × COLLECTIVE quadrant of 343's 2D axis.
+  // 2D axis at 346:
+  //  - SUSTAINED × INDIVIDUAL: 148 wanderer / 152 night-shape / 166
+  //    frog-voices (each citizen aware separately of persistent
+  //    entity)
+  //  - TRANSIENT × INDIVIDUAL: 266 falling-star (single-instant
+  //    unsharable; "star is gone before anyone can ask if anyone
+  //    else saw it")
+  //  - TRANSIENT × COLLECTIVE: 343 collective-waking (single-instant
+  //    SHARED but UNSPOKEN; realm carries memory of simultaneity)
+  //  - SUSTAINED × COLLECTIVE: 346 autumn-sound (sustained shared
+  //    expectation; unnamed)
+  // **First sub-type to populate full 2D axis** (4/4 quadrants).
+  // Lift "no one alive has named it; everyone alive expects it"
+  // captures sustained-collective-awareness-as-cultural-fact: the
+  // expectation is a feature of the realm, transmitted without
+  // articulation.
+  // Distinct from related angles:
+  //  - 312 SOCIAL-NORMS (rule TRANSMITTED via shush): 346 = no
+  //    transmission needed; expectation is collectively pre-loaded
+  //  - 322 RECURRENCE (CONTENTMENT in repetition; OUTSIDE register):
+  //    346 = expectation OF unnamed thing; 322 = recognition OF
+  //    pattern
+  //  - 343 collective-waking (transient): 346 is sustained
+  //  - 148/152/166 (individual): 346 is collective
+  //  - 277 INFERENCE-BY-ABSENCE (citizen empty seat noticed): 346
+  //    is presence noticed collectively without articulation
+  // Sub-type-internal-axes meta-pattern remains at 6/9 (Am already
+  // articulated 2D at 343); 346 doesn't add new axis but COMPLETES
+  // existing 2D axis. Worth filing for 350 letter as cluster-axis-
+  // completion observation: when sub-type articulates a 2D axis,
+  // future ships can target empty quadrants.
+  // **Single-axis ship**; STRUCTURE declarative; REGISTER INSIDE
+  // cluster; TAG misc. Gate: year3 + season=autumn + day>=150 (per
+  // 321 authoring guideline + autumn fits prose). Once-per-realm;
+  // tag misc.
+  { flag: 'autumn_sound_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.season === 'autumn' && G.day >= 150,
+    text: 'There is a sound the realm hears in autumn evenings, never the same week, never the same hour. Citizens know to listen for it. No one alive has named it; everyone alive expects it.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The

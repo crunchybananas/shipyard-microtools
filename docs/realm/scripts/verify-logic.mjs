@@ -405,6 +405,20 @@ const chronicleSelfFire = await page.evaluate(async () => {
 });
 rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelfFire.fired, `text="${chronicleSelfFire.text}…" tag=${chronicleSelfFire.tag}`);
 
+// Test: 346 autumn_sound_known — single-axis (6th ambient-entity-grammar; SUSTAINED-COLLECTIVE-AWARENESS-WITHOUT-NAMING; completes 2D axis)
+const autumnSoundFire = await page.evaluate(async () => {
+  const story = await import('./js/story.js');
+  window.G.storyFlags.year3 = true;
+  window.G.season = 'autumn';
+  window.G.day = 155;
+  delete window.G.storyFlags.autumn_sound_known;
+  story.checkStoryBeats();
+  const fired = window.G.storyFlags.autumn_sound_known === true;
+  const lastEntry = window.G.chronicle.find(e => e.text?.startsWith('There is a sound the realm hears'));
+  return { fired, text: lastEntry?.text?.slice(0, 70), tag: lastEntry?.tag };
+});
+rec('346: autumn_sound_known fires year3 + autumn + d>=150', autumnSoundFire.fired, `text="${autumnSoundFire.text}…" tag=${autumnSoundFire.tag}`);
+
 // Test: 344 realm_begun_known — single-axis (5th early-game-mood shape; REALM-AS-CONTINUITY-UNNOTICED; CLUSTER-UNIFORM-5 milestone)
 const realmBegunFire = await page.evaluate(async () => {
   const story = await import('./js/story.js');

@@ -1556,36 +1556,43 @@ prescriptive AND consistently applied.
     YEAR-CYCLE PAIR at seasonal endpoints)
 
   **Sub-types within the cluster:**
-  - *Ambient-entity-grammar* (148/152/166/266/343):
+  - *Ambient-entity-grammar* (148/152/166/266/343/346):
     1-beat acknowledgment of an entity or
     shared-moment present but unnamed. Codified
     separately as the silent-walker grammar
-    invariant. **5 shapes** spanning **2D AXIS**
-    (PERSISTENCE × COLLECTIVITY) — first sub-
-    type with explicit 2D internal axis:
-    - 148 wanderer / 152 night-shape / 166
-      frog-voices: SUSTAINED × INDIVIDUAL
-      witness (entity persists; each citizen
-      aware separately)
-    - 266 summer_falling_star: TRANSIENT ×
-      INDIVIDUAL ("the star is gone before
-      anyone can ask if anyone else saw it")
-    - 343 collective_waking: TRANSIENT ×
-      COLLECTIVE ("There is a winter night
-      when every citizen wakes at the same
-      hour... The realm carries the memory of
-      being all awake at once, without naming
-      it.") — single-instant SHARED but
-      UNSPOKEN; the realm knows the simultaneity
-      despite no individual reporting it.
-    SUSTAINED × COLLECTIVE quadrant remains
-    empty (possible 6th shape candidate:
-    sustained shared-presence acknowledged
-    collectively).
-    Per 276 invariant + 343 axis-articulation
-    extending to 2D. Sub-type-internal-axes
-    pattern now at 6/9 sub-types formalized
-    (67%); 343 is first 2D axis case.
+    invariant. **6 shapes** spanning **2D AXIS
+    fully populated** (PERSISTENCE × COLLECTIVITY)
+    — first sub-type to complete 4/4 quadrants:
+    - **SUSTAINED × INDIVIDUAL**: 148 wanderer
+      / 152 night-shape / 166 frog-voices
+      (entity persists; each citizen aware
+      separately)
+    - **TRANSIENT × INDIVIDUAL**: 266
+      summer_falling_star ("the star is gone
+      before anyone can ask if anyone else saw
+      it")
+    - **TRANSIENT × COLLECTIVE**: 343
+      collective_waking ("There is a winter
+      night when every citizen wakes at the
+      same hour... The realm carries the memory
+      of being all awake at once, without
+      naming it.")
+    - **SUSTAINED × COLLECTIVE**: 346
+      autumn_sound ("There is a sound the
+      realm hears in autumn evenings... no
+      one alive has named it; everyone alive
+      expects it.") — sustained shared
+      expectation of unnamed thing.
+    **First sub-type to populate FULL 2D axis**
+    (4/4 quadrants). Joins land-as-agent (6)
+    and forgetting (6) at sole-leader level —
+    3 sub-types tied at 6 shapes.
+    Per 276 invariant + 343/346 2D axis
+    completion. Sub-type-internal-axes pattern
+    remains at 6/9 sub-types formalized (Am
+    already articulated 2D at 343; 346 does
+    not add new axis but COMPLETES existing
+    one).
   - *Weather-recognition* (147/174/246/272/341):
     the realm notices or remembers weather as
     a marker of the year. **5 shapes** spanning
