@@ -1162,6 +1162,16 @@ prescriptive AND consistently applied.
   current state (340 archivist update post-331/332/
   334/336/337/339 ships).**
 
+  **Snapshot status (per 333 [code], shipped 353):**
+  FROZEN at tick 330. Counts in this entry refer to
+  state at 330 only. For state past 330 see "Framework
+  state at 340" below or 350 milestone-letter at
+  `loop/journal/350.md` or current doc-body counts.
+  Do not silently update body counts; archivist may
+  ship a fresh snapshot observation at the next
+  milestone (e.g. "Framework state at 400") rather
+  than mutating this one.
+
   **NARRATIVE_BEATS inventory at 330**: 73 entries.
 
   **INSIDE cluster** (9 sub-types, **33 shapes total**,
@@ -1289,6 +1299,16 @@ prescriptive AND consistently applied.
   state observation with 331-339 ship-arc results.
   Synthesis-only; no new invariants (preserves 315
   prediction at 0/2 with 10 ticks remaining).
+
+  **Snapshot status (per 333 [code], shipped 353):**
+  FROZEN at tick 340. Counts in this entry refer to
+  state at 340 only. For state past 340 see 350
+  milestone-letter at `loop/journal/350.md`, the LA
+  axis articulation at 352, or current doc-body
+  counts. Do not silently update body counts; the
+  archivist may ship a fresh snapshot observation at
+  the next milestone (e.g. "Framework state at 400")
+  rather than mutating this one.
 
   **NARRATIVE_BEATS inventory at 340**: 79 entries
   (was 73 at 330; +6 in 10 ticks).
