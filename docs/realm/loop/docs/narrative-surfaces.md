@@ -1420,11 +1420,11 @@ prescriptive AND consistently applied.
     weather NOT arriving. Lift "is given the
     night intact" acknowledges passive grace.
     Per 276 invariant.
-  - *Forgetting* (184/190/292/301/305):
+  - *Forgetting* (184/190/292/301/305/336):
     closure of a long-lived object's or
-    practice's KNOWLEDGE. **5 shapes**
+    practice's KNOWLEDGE. **6 shapes**
     spanning loss / persistence /
-    emergence:
+    emergence / active-pedagogy:
     - 184 stone_forgotten — OBJECT WEATHERED.
     - 190 constellation_forgotten — PATTERN
       UNNAMED.
@@ -1444,9 +1444,23 @@ prescriptive AND consistently applied.
       surprise**: imperative-opening (vs
       301 question-opening). Per 308
       STRUCTURAL-surprise invariant.
-    5 shapes — second-leading sub-type after
-    307 promoted land-as-agent to 6. Per 276
-    invariant.
+    - 336 unteach_known — ACTIVE-FORGETTING-
+      AS-PEDAGOGY ("There is a custom the
+      elders remember and have chosen not
+      to teach... The forgetting will be
+      complete in one generation.") — the
+      realm CHOOSES not to transmit; elders
+      remember + transmission DELIBERATELY
+      WITHHELD; future-oriented forgetting.
+      First FUTURE-ORIENTED shape (prior 5
+      are PAST-ORIENTED: things lost or
+      origin obscured).
+    **6 shapes — joins land-as-agent (6) at
+    sole-leader level**; 2 sub-types now
+    tied at 6. Forgetting now has TWO
+    temporal orientations: PAST-ORIENTED
+    (184/190/292/301/305) + FUTURE-ORIENTED
+    (336). Per 276 invariant.
   - *Naming-place* (193/325/327/332): the realm
     gives a place a colloquial name. Third
     member of the realm-environment naming

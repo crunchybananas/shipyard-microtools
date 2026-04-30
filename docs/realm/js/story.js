@@ -1289,6 +1289,50 @@ const NARRATIVE_BEATS = [
   { flag: 'inherited_walk_known', tag: 'misc',
     trigger: G => G.storyFlags.year3 && G.day >= 110,
     text: 'Their grandmother walked this way. Their mother walked this way. They walk this way and have never noticed. The realm has not told them. The walking is a kind of memory the body keeps without the mind.' },
+  // Loop 336 (surprise, un-filed): SINGLE-AXIS surprise — 6th forgetting
+  // shape per 276 invariant. Forgetting sub-type 5→6 shapes; joins
+  // land-as-agent at 6 (now 2 sub-types tied at sole-leader level).
+  // NEW ANGLE: ACTIVE-FORGETTING-AS-PEDAGOGY. The realm CHOOSES not
+  // to teach a custom; the elders remember it but deliberately do
+  // not transmit it; the children grow up without it. The forgetting
+  // is ACTIVE and FORWARD-LOOKING ("will be complete in one
+  // generation") rather than passive or origin-loss.
+  // Distinct from prior 5 forgetting shapes:
+  //  - 184 stone_forgotten — OBJECT WEATHERED (passive loss)
+  //  - 190 constellation_forgotten — PATTERN UNNAMED (passive loss)
+  //  - 292 bakery_door_carving_known — ARTIFACT-PRESERVED-MEANING-
+  //    LOST (artifact intact + idea gone)
+  //  - 301 noon_bell_origin_known — RITUAL-PERSISTENCE-WITHOUT-ORIGIN
+  //    (action persists + start gone)
+  //  - 305 silent_morning_known — EMERGENT-TRADITION (origin never
+  //    existed as decision)
+  //  - 336 ACTIVE-FORGETTING-AS-PEDAGOGY — DECISION exists +
+  //    elders remember + transmission DELIBERATELY WITHHELD; the
+  //    forgetting is a project the realm is currently completing.
+  // Distinct from related angles:
+  //  - 312 SOCIAL-NORMS (tacit-transmission via shush; rule TRAVELS
+  //    silently); 336 = rule WITHHELD, doesn't travel
+  //  - 285 LANGUAGE-DRIFT (collective phrase mistransmission); 336
+  //    is non-transmission, not mistransmission
+  //  - 305 EMERGENT-TRADITION (no decision but practice formed);
+  //    336 is decision-NOT-to-teach (the inverse: practice exists,
+  //    decision is to let it die)
+  // Forgetting sub-type now has TWO temporal orientations: PAST-
+  // ORIENTED (184/190/292/301/305: things lost or origin obscured)
+  // + FUTURE-ORIENTED (336: forgetting a current realm is actively
+  // completing). Lift "The forgetting will be complete in one
+  // generation" makes the future-orientation explicit and time-
+  // bounded.
+  // **Single-axis ship** (ANGLE-only); STRUCTURE declarative
+  // (corpus default); REGISTER INSIDE cluster; TAG misc. Per 257
+  // axis-flexibility — multi-axial DEFAULTS but NOT REQUIRED.
+  // Forgetting 5→6 shapes; **2 sub-types now at 6 shapes** (joins
+  // land-as-agent). Total INSIDE shapes: 37. Cluster avg 4.1
+  // (was 4.0 at 334). Gate: year3 + day>=115 (next-available
+  // year-only slot post-334 at d>=110). Once-per-realm; tag misc.
+  { flag: 'unteach_known', tag: 'misc',
+    trigger: G => G.storyFlags.year3 && G.day >= 115,
+    text: 'There is a custom the elders remember and have chosen not to teach. The children grow up without it. The forgetting will be complete in one generation.' },
   // Loop 263 (surprise, un-filed, alternation after 5 fixer/archivist
   // ticks in 6): META-SELF-AWARE beat — first time the chronicle is
   // referenced AS A THING IN THE WORLD by a NARRATIVE_BEAT entry. The
