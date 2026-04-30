@@ -213,7 +213,7 @@ const _SPRITE_SIZES = {
   church:     { w: 48, h: 68 },  // +20% / +21%
   windmill:   { w: 44, h: 64 },  // +16% / +23%
   tower:      { w: 38, h: 64 },  // +19% / +23%
-  house:      { w: 42, h: 48 },  // +17% / +20%
+  house:      { w: 50, h: 54 },  // 351: bumped from 42×48 per 349 visual audit
   tavern:     { w: 46, h: 54 },  // +21% / +23%
   blacksmith: { w: 46, h: 52 },  // +21% / +24%
   market:     { w: 50, h: 46 },  // +19% / +21%
