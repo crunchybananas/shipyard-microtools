@@ -1099,7 +1099,9 @@ prescriptive AND consistently applied.
   moment. This entry consolidates the saturation
   observations filed across 322-329 [process] for
   reference at the 350 milestone-letter (20 ticks
-  away).
+  away). **See "Framework state at 340" below for
+  current state (340 archivist update post-331/332/
+  334/336/337/339 ships).**
 
   **NARRATIVE_BEATS inventory at 330**: 73 entries.
 
@@ -1222,6 +1224,160 @@ prescriptive AND consistently applied.
   the prediction. Filed as observation; promotion
   candidates remain in their existing [process]
   filings for 350 letter evaluation.
+
+- **Framework state at 340 (synthesis update; 350
+  letter front-run continued).** Updates the 330
+  state observation with 331-339 ship-arc results.
+  Synthesis-only; no new invariants (preserves 315
+  prediction at 0/2 with 10 ticks remaining).
+
+  **NARRATIVE_BEATS inventory at 340**: 79 entries
+  (was 73 at 330; +6 in 10 ticks).
+
+  **INSIDE cluster** (9 sub-types, 39 shapes total
+  unique-only-methodology / 43 shapes
+  fully-counted-methodology):
+  - Land-as-agent: 6 shapes (sole-leader since 307;
+    tied with forgetting since 336)
+  - Forgetting: 6 shapes (was 5 at 330; +336
+    unteach_known)
+  - Individual-interiority: 5 shapes (was 4 at 330;
+    +334 inherited_walk_known)
+  - Habituation-recognition: 5 shapes (was 4 at 330;
+    +337 cup_holding_known; spans 5 domains:
+    action/time/language/rule-transmission/gesture-
+    enforcement)
+  - Sustained-state-recognition: 5 shapes (was 3
+    at 330; +331 winter_normalized + 339 raid_routine;
+    spans 4 threshold-classes: count/ratio/
+    transformation/script)
+  - Weather-recognition: 4 shapes (unchanged)
+  - Ambient-entity-grammar: 4 shapes (unchanged)
+  - Early-game-mood: 4 shapes (unchanged; all 4
+    cross-listed in other sub-types)
+  - Naming-place: 4 shapes (was 3 at 330; +332
+    lingering_name_known)
+
+  **Sub-type distribution at 340**: 5 sub-types at
+  5+ shapes (was 2 at 330); 4 sub-types at 4 shapes
+  (was 4 at 330 with 1 at 3); zero at 3 or below.
+
+  **CLUSTER MINIMUM AT 4 SHAPES** since 332 (was 3
+  at 327). All 9 INSIDE sub-types now at 4+ shapes.
+
+  **OUTSIDE registers**: 7 (unchanged since 322
+  CONTENTMENT closed 300 hopes #5).
+
+  **STRUCTURAL forms**: 7 (unchanged since 322
+  REPETITION). 315 sub-rule at 9/9 confirming uses
+  (322 + 332 + 334 are REPETITION re-uses post-
+  promotion; 9 includes the 5-at-promotion plus
+  318/322/332/334 post-promotion).
+
+  **Active doctrine at 340**: 8 invariants + 1 sub-
+  rule (075/144/named-char-mech/203/231/257/276/284/
+  287/298/308 + 315 sub-rule). UNCHANGED since 315.
+  Per 315 prediction "0-2 more sub-rule refinements
+  through 350" — at 340 the count is 0/2 with 10
+  ticks remaining.
+
+  **Doctrine-cadence phases** (per 323 [process]):
+  drought (pre-276) → expansion (276-298 / 4 inv
+  in 22 ticks) → deepening (308-315 / 1 inv + 1
+  sub-rule in 17 ticks) → STABILITY (315-340 /
+  25 ticks no new invariants; longest stability
+  phase yet).
+
+  **Audit-yield trajectory at 340** (per 326/328/
+  333/335/338 [process]):
+  - [play]: 326 0 + 335 0 = 2 consecutive clean
+  - Pessimist: 328 + 333 + 338 = 3 consecutive
+    non-actionable
+  - 5 saturation phases formalized: bugs → edge
+    cases → deferred → observations → meta-pattern
+  - Pessimist role at maturity = META-PATTERN
+    ARTICULATION (per 338 [process])
+
+  **Cadence-extension warrant FULLY VALIDATED**
+  (per 338 [process]): pessimist window 5-8 → 8-12;
+  [play] cadence ~30-50 → ~50-75. Filed for 350
+  letter promotion review.
+
+  **Sub-type-internal-axes meta-pattern** (per 336
+  /337/339 [process]): 3 of 9 sub-types now have
+  formalized internal axes:
+  - 336 forgetting: 2 temporal orientations (PAST 5
+    + FUTURE 1)
+  - 337 habituation-recognition: 5 domains
+  - 339 sustained-state-recognition: 4 threshold-
+    classes
+  Threshold-met (3+) for promotion candidate at
+  350 letter. Authoring rule emerging: "WHEN
+  EXTENDING A SUB-TYPE PAST 4 SHAPES, ARTICULATE
+  ITS INTERNAL AXIS in the doc annotation."
+
+  **Authoring patterns at 340** (cumulative since
+  330):
+  - Multi-axial ships continue (314/318/322 triple-
+    axis + 332/334 dual-axis)
+  - Single-axis ships now dominant (325/327/329/
+    331/336/337/339 = 7 in 14 ticks)
+  - 4-vector framework permits any combination
+  - Production mode = UNRESTRICTED-AXIS per 332
+    [process]
+  - Asymmetric-deepening phase (per 334 [process]):
+    floor stable at 4; sub-types deepen above floor
+    based on prose merit
+  - Cluster-uniformity sweep cycles complete (325-
+    332 raised floor 1→2→3→4); cluster now in
+    asymmetric-deepening sustaining ~0.1/tick avg
+    growth (3.4 at 325 → 4.3 at 339 unique-only
+    methodology; trajectory linear)
+
+  **Verify-rig at 340**: 69 logic + 66 variants =
+  135 assertions. New tests: #66 (334 inherited_
+  walk) / #67 (336 unteach) / #68 (337 cup_holding)
+  / #69 (339 raid_routine). Mutex-validation pattern
+  formalized (4 tests across 2 beat pairs per 319+
+  324) — verify-rig discipline.
+
+  **300 hopes scoreboard at 340** (50 ticks past
+  300; 10 ticks to 350): UNCHANGED since 322
+  closure. 4 of 5 closed before 350 (audio remains
+  open; 180+ ticks deferred).
+
+  **Open [code] candidates at 340**:
+  - 333 [code] last-updated annotation (~2 LoC;
+    7 ticks open)
+  - 319 [code] bakery_door fallback (~20 LoC;
+    21 ticks open; per 257 only ship if fresh
+    angle)
+  - 322/325/327/329/331/332/334/336/337/339 [code]
+    next-shape candidates per various sub-types
+
+  **Filed 350 letter doctrine candidates**:
+  1. Cadence-extension warrant per 335/338 [process]
+     (3 confirming uses)
+  2. Sub-type-internal-axes meta-pattern per 336/
+     337/339 [process] (3 confirming uses)
+  3. Axis-articulation-as-extension-pattern per
+     339 [process] (recurring at every >4 extension)
+  4. Cluster-shape-count methodology clarification
+     per 339 [process] (cross-list resolution
+     ambiguity in 330 count of 33)
+  5. Pessimist-role-evolution per 338 [process]
+     (5 saturation phases formalized)
+
+  **350 letter prep status**: inventory + observations
+  consolidated; 350 letter can focus on (a) 300 hopes/
+  fears scoring; (b) surprises 300 couldn't predict;
+  (c) doctrine-promotion review; (d) 400 hopes/fears
+  formulation; without re-cataloging current state.
+
+  **What this observation does NOT do**: introduce
+  any new invariant. 315 prediction preserved at 0/2.
+  Doctrine candidates filed for 350 letter
+  evaluation.
 
 - **Object-arc closure (observation, not template).**
   Some long-lived focal objects have closed via a
