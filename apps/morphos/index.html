@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MORPHOS — Seed the Field</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Courier New',Courier,monospace;color:#e2e8f0}
+canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
+#scanlines{position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);opacity:0.35}
+#vignette{position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.72) 100%)}
+
+.overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:0}
+.overlay.hidden{display:none}
+
+/* ── Title ── */
+#ov-title{background:linear-gradient(to bottom,rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.28) 50%,rgba(0,0,0,0.78) 100%)}
+.t-logo{font-size:clamp(52px,8vw,84px);font-weight:900;letter-spacing:-0.02em;background:linear-gradient(135deg,#38bdf8 0%,#818cf8 50%,#c084fc 100%);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.t-sub{font-size:clamp(10px,1.4vw,13px);letter-spacing:0.32em;text-transform:uppercase;color:#475569;margin-top:6px;margin-bottom:36px}
+.t-prompt{font-size:12px;color:#64748b;letter-spacing:0.1em;margin-bottom:16px;text-transform:uppercase}
+.sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px;width:min(520px,90vw)}
+.sp-btn{padding:14px 8px;border:1px solid rgba(255,255,255,0.08);border-radius:10px;background:rgba(255,255,255,0.04);color:#94a3b8;font-family:inherit;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:all 0.15s;text-align:center;line-height:1.5}
+.sp-btn:hover{background:rgba(14,165,233,0.1);color:#e2e8f0;border-color:rgba(56,189,248,0.25)}
+.sp-btn.active{background:rgba(14,165,233,0.18);border-color:rgba(56,189,248,0.5);color:#7dd3fc}
+.sp-emoji{font-size:20px;display:block;margin-bottom:5px}
+.sp-name{font-weight:700;display:block;font-size:11px}
+.sp-desc{font-size:9px;color:#475569;display:block;margin-top:3px;text-transform:none;letter-spacing:0.02em}
+.sp-btn.active .sp-desc{color:#38bdf850}
+.go-btn{padding:13px 48px;border:1px solid rgba(56,189,248,0.35);border-radius:12px;background:rgba(14,165,233,0.1);color:#7dd3fc;font-family:inherit;font-size:13px;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;font-weight:600}
+.go-btn:hover{background:rgba(14,165,233,0.22);border-color:rgba(56,189,248,0.65);color:#e0f2fe;transform:scale(1.02)}
+.t-hint{font-size:10px;color:#1e293b;letter-spacing:0.14em;text-transform:uppercase;margin-top:22px}
+
+/* ── Seeding HUD ── */
+#seed-hud{position:fixed;inset:0;pointer-events:none;z-index:101;display:none}
+#seed-top{position:absolute;top:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;padding-top:22px;gap:6px}
+#seed-dots{display:flex;gap:9px}
+.sdot{width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(56,189,248,0.28);background:transparent;transition:all 0.25s}
+.sdot.placed{background:#38bdf8;border-color:#38bdf8;box-shadow:0 0 10px #38bdf870}
+#seed-count{font-size:11px;color:#38bdf8;letter-spacing:0.14em;text-transform:uppercase}
+#seed-hint{font-size:10px;color:#1e293b;letter-spacing:0.1em;margin-top:2px}
+#release-btn{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);padding:12px 44px;border:1px solid rgba(56,189,248,0.25);border-radius:12px;background:rgba(10,10,20,0.6);backdrop-filter:blur(8px);color:#38bdf850;font-family:inherit;font-size:13px;letter-spacing:0.22em;text-transform:uppercase;cursor:default;transition:all 0.3s;font-weight:600;pointer-events:none}
+#release-btn.ready{border-color:rgba(56,189,248,0.5);color:#7dd3fc;cursor:pointer;pointer-events:all}
+#release-btn.ready:hover{background:rgba(14,165,233,0.2);border-color:rgba(56,189,248,0.8);color:#e0f2fe;transform:translateX(-50%) scale(1.03)}
+#canvas-cursor{position:fixed;border:1.5px solid rgba(56,189,248,0.5);border-radius:50%;pointer-events:none;z-index:102;display:none;transform:translate(-50%,-50%)}
+
+/* ── Running HUD ── */
+#run-hud{position:fixed;top:0;left:0;right:0;display:none;flex-direction:column;align-items:center;padding-top:18px;gap:4px;z-index:101;pointer-events:none}
+#run-bar-bg{width:220px;height:3px;border-radius:2px;background:rgba(255,255,255,0.07)}
+#run-bar{height:100%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:2px;width:100%;transition:width 0.6s linear}
+#run-time{font-size:11px;color:#334155;letter-spacing:0.14em;text-transform:uppercase;margin-top:2px}
+#run-pct{font-size:32px;font-weight:700;color:#38bdf8;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1;margin-top:8px}
+#run-pct-label{font-size:9px;color:#1e293b;letter-spacing:0.12em;text-transform:uppercase}
+
+/* ── Results ── */
+#ov-results{background:rgba(0,0,0,0.68);backdrop-filter:blur(8px)}
+.r-label{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#475569;margin-bottom:6px}
+.r-score{font-size:clamp(72px,14vw,110px);font-weight:900;color:#38bdf8;letter-spacing:-0.03em;line-height:1;text-shadow:0 0 80px #0ea5e930}
+.r-record{font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#818cf8;min-height:18px;margin-top:4px}
+.r-best{font-size:11px;color:#1e293b;letter-spacing:0.1em;margin-top:3px;min-height:16px}
+.r-btns{display:flex;gap:12px;margin-top:28px}
+.r-btn{padding:11px 26px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;background:rgba(255,255,255,0.04);color:#64748b;font-family:inherit;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.18s}
+.r-btn:hover{background:rgba(255,255,255,0.09);color:#e2e8f0}
+.r-btn.primary{background:rgba(14,165,233,0.13);border-color:rgba(56,189,248,0.38);color:#7dd3fc}
+.r-btn.primary:hover{background:rgba(14,165,233,0.24);color:#e0f2fe}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#ov-title>*{animation:fadeUp 0.5s ease both}
+#ov-title .t-logo{animation-delay:0.05s}
+#ov-title .t-sub{animation-delay:0.15s}
+#ov-title .t-prompt{animation-delay:0.25s}
+#ov-title .sp-grid{animation-delay:0.3s}
+#ov-title .go-btn{animation-delay:0.4s}
+#ov-title .t-hint{animation-delay:0.5s}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="scanlines"></div>
+<div id="vignette"></div>
+
+<!-- Title -->
+<div class="overlay" id="ov-title">
+  <div class="t-logo">MORPHOS</div>
+  <div class="t-sub">Seed the Field</div>
+  <div class="t-prompt">Choose your species</div>
+  <div class="sp-grid" id="sp-grid"></div>
+  <button class="go-btn" id="begin-btn">BEGIN SEEDING</button>
+  <div class="t-hint">place 6 seeds · watch chemistry self-organise · score = coverage</div>
+</div>
+
+<!-- Seeding HUD -->
+<div id="seed-hud">
+  <div id="seed-top">
+    <div id="seed-dots"></div>
+    <div id="seed-count">6 seeds remaining</div>
+    <div id="seed-hint">click to place a seed</div>
+  </div>
+  <button id="release-btn">RELEASE CHEMISTRY →</button>
+</div>
+<div id="canvas-cursor"></div>
+
+<!-- Running HUD -->
+<div id="run-hud">
+  <div id="run-bar-bg"><div id="run-bar"></div></div>
+  <div id="run-time">30s remaining</div>
+  <div id="run-pct">0.0%</div>
+  <div id="run-pct-label">coverage</div>
+</div>
+
+<!-- Results -->
+<div class="overlay hidden" id="ov-results">
+  <div class="r-label">Final Coverage</div>
+  <div class="r-score" id="r-score">—</div>
+  <div class="r-record" id="r-record"></div>
+  <div class="r-best" id="r-best"></div>
+  <div class="r-btns">
+    <button class="r-btn primary" id="btn-retry">↺ Reseed</button>
+    <button class="r-btn" id="btn-species">Change Species</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// MORPHOS — Seed the Field
+// Pure HTML5 / WebGL / Web Audio — zero external dependencies
+//
+// Gray-Scott reaction-diffusion puzzle:
+//   Place 6 chemical seeds on a blank field.
+//   Hit Release — watch Turing patterns self-organise for 30 seconds.
+//   Score = % of field covered at the end.
+//   Different species, different patterns, different strategies.
+// ═══════════════════════════════════════════════════════════════════
+
+const GRID        = 512;
+const SIM_STEPS   = 6;   // steps per frame during running
+const RUN_SECS    = 30;
+const MAX_SEEDS   = 6;
+const SEED_RADIUS = 0.038;
+const COV_THRESH  = 0.12;
+const HS_KEY      = 'morphos_v2';
+
+const SPECIES = [
+  { name: 'Spots',  emoji: '🔵', F: 0.030, k: 0.057, desc: 'expanding rings' },
+  { name: 'Maze',   emoji: '🌊', F: 0.037, k: 0.060, desc: 'channels & walls' },
+  { name: 'Coral',  emoji: '🪸', F: 0.054, k: 0.063, desc: 'dense branching' },
+  { name: 'Spiral', emoji: '🌀', F: 0.018, k: 0.051, desc: 'pulsing waves' },
+];
+
+// ── High scores ───────────────────────────────────────────────────
+function getScores() { try { return JSON.parse(localStorage.getItem(HS_KEY)) || {}; } catch { return {}; } }
+function getBest(sp) { return getScores()[sp] || 0; }
+function setBest(sp, v) {
+  const s = getScores();
+  if (v > (s[sp] || 0)) { s[sp] = v; localStorage.setItem(HS_KEY, JSON.stringify(s)); return true; }
+  return false;
+}
+
+// ── State ─────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+let gl, ping, pong, simProg, displayProg, splatProg, coverProg, quadBuf, coverBuf;
+let phase = 'title'; // title | seeding | running | results
+let playerSpecies = 0;
+let seedsLeft = MAX_SEEDS;
+let runTimer = RUN_SECS;
+let coverage = 0;
+let frameCount = 0;
+let lastTime = 0;
+let audioReady = false, audioCtx;
+
+// ── Shaders ───────────────────────────────────────────────────────
+const VERT = `
+  attribute vec2 pos;
+  varying vec2 uv;
+  void main(){ uv = pos*0.5+0.5; gl_Position = vec4(pos,0,1); }
+`;
+
+const SIM_FRAG = `
+  precision highp float;
+  varying vec2 uv;
+  uniform sampler2D state;
+  uniform vec2 texel;
+  uniform float F, k;
+  void main(){
+    vec4 c = texture2D(state, uv);
+    float l = texture2D(state, uv-vec2(texel.x,0)).r;
+    float r = texture2D(state, uv+vec2(texel.x,0)).r;
+    float t = texture2D(state, uv+vec2(0,texel.y)).r;
+    float b = texture2D(state, uv-vec2(0,texel.y)).r;
+    float nl = texture2D(state, uv-vec2(texel.x,0)).b;
+    float nr = texture2D(state, uv+vec2(texel.x,0)).b;
+    float nt = texture2D(state, uv+vec2(0,texel.y)).b;
+    float nb = texture2D(state, uv-vec2(0,texel.y)).b;
+    float v = c.r, n = c.b;
+    float lv = l+r+t+b - 4.*v;
+    float ln = nl+nr+nt+nb - 4.*n;
+    float reaction = n*v*v;
+    float nv = clamp(v + 0.105*lv + reaction - (F+k)*v, 0., 1.);
+    float nn = clamp(n + 0.21 *ln - reaction + F*(1.-n), 0., 1.);
+    gl_FragColor = vec4(nv, 0., nn, 1.);
+  }
+`;
+
+const DISPLAY_FRAG = `
+  precision mediump float;
+  varying vec2 uv;
+  uniform sampler2D state;
+  void main(){
+    float v = texture2D(state, uv).r;
+    vec3 dark = vec3(0.004, 0.006, 0.016);
+    vec3 mid  = vec3(0.015, 0.52, 0.92);
+    vec3 hi   = vec3(0.42,  0.88, 1.00);
+    float t = pow(clamp(v*2.8, 0., 1.), 0.55);
+    gl_FragColor = vec4(mix(dark, mix(mid, hi, t*0.6), t), 1.);
+  }
+`;
+
+const SPLAT_FRAG = `
+  precision highp float;
+  varying vec2 uv;
+  uniform sampler2D state;
+  uniform vec2 pt;
+  uniform float rad;
+  void main(){
+    vec4 c = texture2D(state, uv);
+    float s = smoothstep(rad, 0., length(uv - pt));
+    gl_FragColor = vec4(min(c.r+s, 1.), 0., max(c.b-s*0.5, 0.), 1.);
+  }
+`;
+
+const COVER_FRAG = `
+  precision mediump float;
+  varying vec2 uv;
+  uniform sampler2D state;
+  uniform float thresh;
+  void main(){
+    gl_FragColor = vec4(texture2D(state,uv).r > thresh ? 1. : 0., 0., 0., 1.);
+  }
+`;
+
+// ── WebGL setup ───────────────────────────────────────────────────
+function mkShader(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s); return s;
+}
+function mkProg(vs, fs) {
+  const p = gl.createProgram();
+  gl.attachShader(p, mkShader(gl.VERTEX_SHADER, vs));
+  gl.attachShader(p, mkShader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(p); return p;
+}
+function mkFBO(w, h, type) {
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, type, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  const fbo = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  return { fbo, tex };
+}
+function setupGL() {
+  gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'high-performance' });
+  if (!gl || !gl.getExtension('OES_texture_float')) return false;
+  gl.getExtension('OES_texture_float_linear');
+  quadBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+  ping = mkFBO(GRID, GRID, gl.FLOAT);
+  pong = mkFBO(GRID, GRID, gl.FLOAT);
+  coverBuf = mkFBO(128, 128, gl.UNSIGNED_BYTE);
+  simProg     = mkProg(VERT, SIM_FRAG);
+  displayProg = mkProg(VERT, DISPLAY_FRAG);
+  splatProg   = mkProg(VERT, SPLAT_FRAG);
+  coverProg   = mkProg(VERT, COVER_FRAG);
+  window.addEventListener('resize', onResize); onResize();
+  return true;
+}
+function onResize() {
+  canvas.width  = Math.round(window.innerWidth  * devicePixelRatio);
+  canvas.height = Math.round(window.innerHeight * devicePixelRatio);
+}
+function bindQuad(p) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  const loc = gl.getAttribLocation(p, 'pos');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+}
+function useTex(p, name, unit, tex) {
+  gl.activeTexture(gl.TEXTURE0 + unit);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.uniform1i(gl.getUniformLocation(p, name), unit);
+}
+
+// ── Simulation ────────────────────────────────────────────────────
+function uploadField(data) {
+  [ping, pong].forEach(({ tex }) => {
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, GRID, GRID, 0, gl.RGBA, gl.FLOAT, data);
+  });
+}
+
+function initBlank() {
+  const d = new Float32Array(GRID * GRID * 4);
+  for (let i = 0; i < GRID * GRID; i++) { d[i*4+2] = 1; d[i*4+3] = 1; }
+  uploadField(d);
+}
+
+function initTitleField() {
+  const d = new Float32Array(GRID * GRID * 4);
+  for (let i = 0; i < GRID * GRID; i++) {
+    const v = Math.random() < 0.05 ? Math.random() * 0.5 : 0;
+    d[i*4] = v; d[i*4+2] = 1 - v * 0.5; d[i*4+3] = 1;
+  }
+  uploadField(d);
+}
+
+function doSplat(nx, ny) {
+  gl.useProgram(splatProg);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, pong.fbo);
+  gl.viewport(0, 0, GRID, GRID);
+  bindQuad(splatProg);
+  useTex(splatProg, 'state', 0, ping.tex);
+  gl.uniform2f(gl.getUniformLocation(splatProg, 'pt'), nx, ny);
+  gl.uniform1f(gl.getUniformLocation(splatProg, 'rad'), SEED_RADIUS);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  [ping, pong] = [pong, ping];
+}
+
+function simFrame(steps) {
+  const sp = SPECIES[playerSpecies];
+  gl.useProgram(simProg);
+  gl.uniform2f(gl.getUniformLocation(simProg, 'texel'), 1/GRID, 1/GRID);
+  gl.uniform1f(gl.getUniformLocation(simProg, 'F'), sp.F);
+  gl.uniform1f(gl.getUniformLocation(simProg, 'k'), sp.k);
+  bindQuad(simProg);
+  for (let s = 0; s < steps; s++) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pong.fbo);
+    gl.viewport(0, 0, GRID, GRID);
+    useTex(simProg, 'state', 0, ping.tex);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    [ping, pong] = [pong, ping];
+  }
+}
+
+function displayFrame() {
+  gl.useProgram(displayProg);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  bindQuad(displayProg);
+  useTex(displayProg, 'state', 0, ping.tex);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+function measureCoverage() {
+  gl.useProgram(coverProg);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, coverBuf.fbo);
+  gl.viewport(0, 0, 128, 128);
+  bindQuad(coverProg);
+  useTex(coverProg, 'state', 0, ping.tex);
+  gl.uniform1f(gl.getUniformLocation(coverProg, 'thresh'), COV_THRESH);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  const px = new Uint8Array(128 * 128 * 4);
+  gl.readPixels(0, 0, 128, 128, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  let c = 0;
+  for (let i = 0; i < 128 * 128; i++) if (px[i*4] > 128) c++;
+  coverage = c / (128 * 128);
+}
+
+// ── Game flow ─────────────────────────────────────────────────────
+function showTitle() {
+  phase = 'title';
+  document.getElementById('ov-title').classList.remove('hidden');
+  document.getElementById('ov-results').classList.add('hidden');
+  document.getElementById('seed-hud').style.display = 'none';
+  document.getElementById('run-hud').style.display = 'none';
+  canvas.style.cursor = 'default';
+  initTitleField();
+}
+
+function startSeeding() {
+  phase = 'seeding';
+  seedsLeft = MAX_SEEDS;
+  document.getElementById('ov-title').classList.add('hidden');
+  document.getElementById('seed-hud').style.display = 'block';
+  initBlank();
+  updateSeedUI();
+  canvas.style.cursor = 'none';
+}
+
+function releaseChemistry() {
+  if (seedsLeft === MAX_SEEDS) return;
+  phase = 'running';
+  runTimer = RUN_SECS;
+  frameCount = 0;
+  coverage = 0;
+  document.getElementById('seed-hud').style.display = 'none';
+  document.getElementById('canvas-cursor').style.display = 'none';
+  document.getElementById('run-hud').style.display = 'flex';
+  canvas.style.cursor = 'default';
+  updateRunUI();
+  initAudio();
+}
+
+function endRun() {
+  phase = 'results';
+  measureCoverage();
+  document.getElementById('run-hud').style.display = 'none';
+  const pct = coverage * 100;
+  const isNew = setBest(playerSpecies, pct);
+  const best  = getBest(playerSpecies);
+  document.getElementById('r-score').textContent  = pct.toFixed(1) + '%';
+  document.getElementById('r-record').textContent = isNew ? '✦ NEW RECORD' : '';
+  document.getElementById('r-best').textContent   = isNew ? '' : 'Best: ' + best.toFixed(1) + '%';
+  document.getElementById('ov-results').classList.remove('hidden');
+  if (pct >= 50) playWin(); else playLose();
+}
+
+// ── UI helpers ────────────────────────────────────────────────────
+function updateSeedUI() {
+  const wrap = document.getElementById('seed-dots');
+  wrap.innerHTML = '';
+  for (let i = 0; i < MAX_SEEDS; i++) {
+    const d = document.createElement('div');
+    d.className = 'sdot' + (i >= seedsLeft ? ' placed' : '');
+    wrap.appendChild(d);
+  }
+  const n = seedsLeft;
+  document.getElementById('seed-count').textContent =
+    n > 0 ? `${n} seed${n !== 1 ? 's' : ''} remaining` : 'all seeds placed — ready to release';
+  const btn = document.getElementById('release-btn');
+  btn.classList.toggle('ready', seedsLeft < MAX_SEEDS);
+}
+
+function updateRunUI() {
+  const frac = Math.max(runTimer / RUN_SECS, 0);
+  document.getElementById('run-bar').style.width = (frac * 100) + '%';
+  document.getElementById('run-time').textContent = Math.ceil(Math.max(runTimer, 0)) + 's remaining';
+  document.getElementById('run-pct').textContent  = (coverage * 100).toFixed(1) + '%';
+}
+
+// ── Main loop ─────────────────────────────────────────────────────
+function loop(ts) {
+  requestAnimationFrame(loop);
+  const dt = Math.min((ts - lastTime) / 1000, 0.05);
+  lastTime = ts;
+
+  if (phase === 'title') {
+    simFrame(5); displayFrame(); return;
+  }
+  if (phase === 'seeding') {
+    displayFrame(); return;            // no sim — seeds sit frozen
+  }
+  if (phase === 'running') {
+    simFrame(SIM_STEPS); displayFrame();
+    runTimer -= dt;
+    frameCount++;
+    if (frameCount % 50 === 0) { measureCoverage(); updateRunUI(); }
+    if (runTimer <= 0) endRun();
+    return;
+  }
+  if (phase === 'results') {
+    simFrame(2); displayFrame();       // gentle drift on results screen
+  }
+}
+
+// ── Input ─────────────────────────────────────────────────────────
+function canvasNorm(e) {
+  const rect = canvas.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - rect.left) / rect.width,
+    y: 1 - (src.clientY - rect.top) / rect.height,
+  };
+}
+
+// Cursor ring that follows mouse during seeding
+canvas.addEventListener('mousemove', e => {
+  if (phase !== 'seeding') return;
+  const cur = document.getElementById('canvas-cursor');
+  const sz = Math.round(SEED_RADIUS * window.innerWidth * 2);
+  cur.style.width  = sz + 'px';
+  cur.style.height = sz + 'px';
+  cur.style.left   = e.clientX + 'px';
+  cur.style.top    = e.clientY + 'px';
+  cur.style.display = 'block';
+});
+canvas.addEventListener('mouseleave', () => {
+  document.getElementById('canvas-cursor').style.display = 'none';
+});
+
+canvas.addEventListener('click', e => {
+  if (phase !== 'seeding' || seedsLeft <= 0) return;
+  const p = canvasNorm(e);
+  doSplat(p.x, p.y);
+  seedsLeft--;
+  updateSeedUI();
+  e.preventDefault();
+});
+
+canvas.addEventListener('touchend', e => {
+  if (phase !== 'seeding' || seedsLeft <= 0) return;
+  const p = canvasNorm(e);
+  doSplat(p.x, p.y);
+  seedsLeft--;
+  updateSeedUI();
+  e.preventDefault();
+}, { passive: false });
+
+// ── Button wiring ─────────────────────────────────────────────────
+const spGrid = document.getElementById('sp-grid');
+SPECIES.forEach((sp, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'sp-btn' + (i === 0 ? ' active' : '');
+  btn.innerHTML = `<span class="sp-emoji">${sp.emoji}</span><span class="sp-name">${sp.name}</span><span class="sp-desc">${sp.desc}</span>`;
+  btn.addEventListener('click', () => {
+    playerSpecies = i;
+    document.querySelectorAll('.sp-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+  });
+  spGrid.appendChild(btn);
+});
+
+document.getElementById('begin-btn').addEventListener('click', () => {
+  initAudio(); startSeeding();
+});
+document.getElementById('release-btn').addEventListener('click', releaseChemistry);
+document.getElementById('btn-retry').addEventListener('click', () => {
+  document.getElementById('ov-results').classList.add('hidden');
+  startSeeding();
+});
+document.getElementById('btn-species').addEventListener('click', () => {
+  document.getElementById('ov-results').classList.add('hidden');
+  showTitle();
+});
+
+// ── Audio ─────────────────────────────────────────────────────────
+function initAudio() {
+  if (audioReady) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const gain   = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 500; filter.Q.value = 2;
+  gain.gain.value = 0.035;
+  gain.connect(filter); filter.connect(audioCtx.destination);
+  [[55, 'sawtooth'], [82.4, 'sine']].forEach(([freq, type]) => {
+    const o = audioCtx.createOscillator();
+    o.type = type; o.frequency.value = freq;
+    o.connect(gain); o.start();
+  });
+  audioReady = true;
+}
+
+function playWin() {
+  if (!audioCtx) return;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0, audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.04);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.6);
+  g.connect(audioCtx.destination);
+  [523, 659, 784, 1047].forEach((f, i) => {
+    const o = audioCtx.createOscillator();
+    o.type = 'sine'; o.frequency.value = f;
+    o.connect(g);
+    o.start(audioCtx.currentTime + i * 0.11);
+    o.stop(audioCtx.currentTime + 1.6);
+  });
+}
+
+function playLose() {
+  if (!audioCtx) return;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+  g.connect(audioCtx.destination);
+  [220, 174].forEach((f, i) => {
+    const o = audioCtx.createOscillator();
+    o.type = 'sawtooth'; o.frequency.value = f;
+    o.connect(g);
+    o.start(audioCtx.currentTime + i * 0.25);
+    o.stop(audioCtx.currentTime + 1.2);
+  });
+}
+
+// ── Boot ──────────────────────────────────────────────────────────
+if (setupGL()) {
+  showTitle();
+  requestAnimationFrame(loop);
+} else {
+  document.body.innerHTML = '<div style="color:#f87171;display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;padding:2rem;text-align:center">WebGL not supported</div>';
+}
+</script>
+</body>
+</html>
