@@ -5,6 +5,7 @@ node_modules/
 dist/
 .vite/
 tmp/
+.tmp/
 
 # Ember
 .ember-cli
@@ -27,4 +28,5 @@ Thumbs.db
 # Built Ember apps (regenerated on CI)
 docs/ember/*/
 !docs/ember/.gitkeep
+docs/morphogen/
 .eslintcache
