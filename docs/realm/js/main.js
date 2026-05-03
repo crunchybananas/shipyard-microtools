@@ -8,7 +8,7 @@ import { generateWorld } from './world.js';
 import { initRenderer, resizeCanvas, render, renderBuildingIsolated, renderMinimap } from './render.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
-import { updateProduction, checkRaids, collectTaxes, updateFires, processQueue } from './economy.js';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
@@ -528,12 +528,6 @@ function simTick() {
     enhUpdateAll(window.innerWidth, window.innerHeight);
     updateProduction();
     updateFires();
-    // `crossed(N)` fires when gameTick just crossed a multiple of N in this
-    // simTick. Plain `% N === 0` MISSES ENTIRELY when G.speed and G.gameTick
-    // don't align (e.g., speed=4 with an odd gameTick never lands on any
-    // multiple of 30) — which caused the HUD to freeze mid-game until you
-    // paused and resumed. This is robust to any speed ≥ 1.
-    if (crossed(60)) processQueue();
     updateParticles();
     updateSmokeEmitters();
     updateResearch();

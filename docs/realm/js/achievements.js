@@ -76,7 +76,6 @@ export function checkAchievements() {
 }
 
 export function getUnlockedCount() { return unlocked.size; }
-export function isUnlocked(id) { return unlocked.has(id); }
 
 function showAchievementToast(a) {
   const el = document.getElementById('achievement-toast');

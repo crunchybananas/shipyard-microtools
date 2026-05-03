@@ -47,10 +47,6 @@ export function updateParticles() {
   }
 }
 
-export function spawnParticle(tx, ty, text) {
-  G.particles.push({ tx, ty, offsetY: 0, text, alpha: 1.5, vy: -0.4, type: 'text' });
-}
-
 export function spawnSmoke(tx, ty) {
   G.particles.push({
     tx: tx + (Math.random() - 0.5) * 0.1,
