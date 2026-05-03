@@ -142,6 +142,82 @@ function _loadSupportAtlas() {
   return null;
 }
 
+const _ACTOR_ATLAS_URL = 'assets/sprites/actors-atlas.png';
+const _ACTOR_FRAME_W = 32;
+const _ACTOR_FRAME_H = 42;
+const _ACTOR_FRAMES = 4;
+const _ACTOR_DIRS = ['down', 'up', 'left', 'right'];
+const _ACTOR_ACTIONS = ['idle', 'walk', 'work', 'carry'];
+const _ACTOR_VARIANTS = ['settler', 'farmer', 'lumber', 'miner', 'fisher', 'trader', 'builder', 'guard', 'forager'];
+let _actorAtlas = null;
+let _actorAtlasState = 'idle';
+function _loadActorAtlas() {
+  if (_actorAtlasState === 'ready') return _actorAtlas;
+  if (_actorAtlasState === 'loading' || _actorAtlasState === 'failed') return null;
+  _actorAtlasState = 'loading';
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    _actorAtlas = img;
+    _actorAtlasState = 'ready';
+  };
+  img.onerror = () => {
+    _actorAtlas = null;
+    _actorAtlasState = 'failed';
+  };
+  img.src = _ACTOR_ATLAS_URL;
+  return null;
+}
+
+function actorVariantForCitizen(c) {
+  const jt = c.jobBuilding?.type;
+  if (c.state === 'foraging') return 'forager';
+  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery' || jt === 'chickencoop' || jt === 'cowpen' || c.state === 'eating') return 'farmer';
+  if (jt === 'lumber') return 'lumber';
+  if (jt === 'mine' || jt === 'quarry' || jt === 'blacksmith') return 'miner';
+  if (jt === 'fisherman') return 'fisher';
+  if (jt === 'market' || jt === 'tradingpost' || jt === 'tavern') return 'trader';
+  if (jt === 'barracks' || jt === 'tower' || jt === 'archery') return 'guard';
+  if (jt === 'school' || jt === 'church' || jt === 'townhall') return 'builder';
+  return 'settler';
+}
+
+function actorActionForCitizen(c, isMoving) {
+  if (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver') return 'carry';
+  if (c.state === 'working' || c.state === 'foraging' || c.state === 'eating') return 'work';
+  if (isMoving || c.state === 'walk_to_work') return 'walk';
+  return 'idle';
+}
+
+function actorDirection(faceScreenX, faceScreenY, facingAway) {
+  if (Math.abs(faceScreenX) > Math.abs(faceScreenY) * 1.15) return faceScreenX < 0 ? 'left' : 'right';
+  return facingAway ? 'up' : 'down';
+}
+
+function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facingAway, isMoving, phaseOffset) {
+  const atlas = _loadActorAtlas();
+  if (!atlas) return false;
+  const variant = actorVariantForCitizen(c);
+  const action = actorActionForCitizen(c, isMoving);
+  const dir = actorDirection(faceScreenX, faceScreenY, facingAway);
+  const variantIdx = Math.max(0, _ACTOR_VARIANTS.indexOf(variant));
+  const actionIdx = Math.max(0, _ACTOR_ACTIONS.indexOf(action));
+  const dirIdx = Math.max(0, _ACTOR_DIRS.indexOf(dir));
+  const row = (variantIdx * _ACTOR_ACTIONS.length + actionIdx) * _ACTOR_DIRS.length + dirIdx;
+  const frameRate = action === 'work' ? 7 : 8;
+  const frame = action === 'idle'
+    ? 0
+    : Math.floor(G.gameTick / frameRate + phaseOffset * 2) % _ACTOR_FRAMES;
+  const targetW = 30;
+  const targetH = 39;
+  ctx.drawImage(
+    atlas,
+    frame * _ACTOR_FRAME_W, row * _ACTOR_FRAME_H, _ACTOR_FRAME_W, _ACTOR_FRAME_H,
+    s.x - targetW / 2, cy + 4 - targetH, targetW, targetH
+  );
+  return true;
+}
+
 const _NATURE_ATLAS_URL = 'assets/sprites/nature-atlas.png';
 const _NATURE_ATLAS_CELL = 128;
 const _NATURE_ATLAS_COLS = 4;
@@ -232,7 +308,7 @@ function terrainSpriteKey(tile) {
   if (tile === TILE.MOUNTAIN) return 'mountain';
   return null;
 }
-function drawTerrainSprite(ctx, tile, s, alpha = 1) {
+function drawTerrainSprite(ctx, tile, s, alpha = 1, clipToTile = true) {
   const key = terrainSpriteKey(tile);
   const atlas = key ? _loadTerrainAtlas() : null;
   const frame = key ? _TERRAIN_ATLAS_FRAMES[key] : null;
@@ -241,12 +317,23 @@ function drawTerrainSprite(ctx, tile, s, alpha = 1) {
   const targetW = TW * 1.18;
   const targetH = targetW * (trim.h / trim.w);
   const oldAlpha = ctx.globalAlpha;
+  ctx.save();
+  if (clipToTile) {
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y - TH / 2);
+    ctx.lineTo(s.x + TW / 2, s.y);
+    ctx.lineTo(s.x, s.y + TH / 2);
+    ctx.lineTo(s.x - TW / 2, s.y);
+    ctx.closePath();
+    ctx.clip();
+  }
   ctx.globalAlpha = oldAlpha * alpha;
   ctx.drawImage(
     atlas,
     frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
     s.x - targetW / 2, s.y - TH / 2 - 4, targetW, targetH
   );
+  ctx.restore();
   ctx.globalAlpha = oldAlpha;
   return true;
 }
@@ -459,6 +546,11 @@ const _SPRITE_SIZES = {
   chickencoop: { w: 46, h: 40 },
   cowpen:      { w: 50, h: 40 },
 };
+
+function fallbackBuildingShadowFootprint(type) {
+  const wide = (type === 'castle') ? 15 : (type === 'church' || type === 'tower') ? 12 : 10;
+  return { wide, tall: wide * 0.36, y: 3 };
+}
 // drawSpriteIfReady: returns true if it drew the sprite, false if
 // the caller should fall through to the canvas dispatch. CALLED
 // FROM INSIDE the parent translate/scale envelope in drawBuilding,
@@ -511,6 +603,7 @@ if (typeof window !== 'undefined') {
   setTimeout(() => {
     _loadRasterAtlas();
     _loadSupportAtlas();
+    _loadActorAtlas();
     _loadNatureAtlas();
     _loadTerrainAtlas();
     for (const t of _SPRITE_TYPES) _loadSprite(t, '');
@@ -532,6 +625,7 @@ if (typeof window !== 'undefined') {
     if (_SPRITE_MODE === 'raster') {
       _loadRasterAtlas();
       _loadSupportAtlas();
+      _loadActorAtlas();
     }
     if (_SPRITE_MODE === 'svg') for (const t of _SPRITE_TYPES) _loadSprite(t, G.kingdomName);
     console.log(`[realm] spriteMode = ${_SPRITE_MODE}`);
@@ -556,6 +650,13 @@ if (typeof window !== 'undefined') {
     state: _supportAtlasState,
     frames: _SUPPORT_ATLAS_FRAMES,
   });
+  window.__realm.actorAtlas = () => ({
+    url: _ACTOR_ATLAS_URL,
+    state: _actorAtlasState,
+    variants: _ACTOR_VARIANTS,
+    directions: _ACTOR_DIRS,
+    frames: _ACTOR_FRAMES,
+  });
   window.__realm.natureAtlas = () => ({
     url: _NATURE_ATLAS_URL,
     state: _natureAtlasState,
@@ -572,13 +673,6 @@ if (typeof window !== 'undefined') {
 }
 
 // ── Performance caches ────────────────────────────────────────
-// Fog-of-war gradient cache keyed by direction ('N'|'S'|'E'|'W')
-// These are relative gradients that are re-applied via translate, so they
-// can be shared. We store them keyed to a canonical tile position and
-// invalidate when the map scrolls far enough (handled by always re-checking
-// the logical tile position encoded in the key).
-const fogGradCache = {};
-
 // Night glow gradient cache — keyed by "type_glowR" since gradient shape is
 // the same for all buildings of the same type; position is applied via ctx offset
 const nightGlowCache = new Map();
@@ -832,9 +926,25 @@ export function render() {
 
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
-      if (!G.fog[y][x]) continue;
       const tile = G.map[y][x];
       const s = toScreen(x, y);
+      if (!G.fog[y][x]) {
+        const fogPulse = 0.025 + 0.015 * Math.sin((x * 17 + y * 23 + G.gameTick) * 0.025);
+        ctx.globalAlpha = 0.32;
+        ctx.fillStyle = tile === TILE.WATER ? '#17314d' : '#223450';
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y - TH/2);
+        ctx.lineTo(s.x + TW/2, s.y);
+        ctx.lineTo(s.x, s.y + TH/2);
+        ctx.lineTo(s.x - TW/2, s.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = fogPulse;
+        ctx.fillStyle = '#d6e4ff';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        continue;
+      }
       const colors = TILE_COLORS[tile];
       let tileColor = colors[(x+y)%2];
       const seasonShift = getSeasonData().tileShift;
@@ -842,8 +952,8 @@ export function render() {
       // Water uses large-scale smooth noise — no per-tile checkerboard seams
       if (tile === TILE.WATER) {
         const n = (Math.sin(x * 0.3 + 0.7) + Math.cos(y * 0.4 + 0.5)) * 0.5 + 0.5;
-        const tint = Math.floor(n * 14) - 7;
-        tileColor = `rgb(${0x1d + tint}, ${0x5f + tint}, ${0x96 + tint})`;
+        const tint = Math.floor(n * 10) - 5;
+        tileColor = `rgb(${0x22 + tint}, ${0x63 + tint}, ${0x86 + tint})`;
       }
 
       // Grass/sand shade variation via position hash + season tint.
@@ -883,7 +993,15 @@ export function render() {
       ctx.lineTo(s.x - TW/2, s.y);
       ctx.closePath();
       ctx.fill();
-      drawTerrainSprite(ctx, tile, s, daylight * 0.92);
+      if (tile === TILE.GRASS || tile === TILE.FOREST) {
+        drawTerrainSprite(ctx, tile, s, daylight * 0.88, false);
+      } else {
+        const terrainAlpha =
+          tile === TILE.SAND ? 0.62 :
+          tile === TILE.WATER ? 0.56 :
+          0.74;
+        drawTerrainSprite(ctx, tile, s, daylight * terrainAlpha);
+      }
 
       // Atmospheric haze — outer edge tiles fade to pale blue-grey
       if (tile !== TILE.WATER) {
@@ -1133,12 +1251,14 @@ export function render() {
         // the whole map that user-reported as "tiles pulsing" and made the
         // tiny 3-blade tuft shapes impossible to identify as grass. Fixed
         // positions let the eye lock onto them as static texture.
-        // User feedback: "less transparencies" — bump 0.7→1.0 so tufts read as clear grass blades, not ghosts
-        ctx.globalAlpha = daylight;
+        // Keep ground details present, but under the painted terrain texture.
+        // Full-opacity dots and blades read as screen noise once the raster atlas
+        // is carrying most of the meadow color.
+        ctx.globalAlpha = daylight * 0.66;
         // Reduced from gh<140 (~55%) to gh<70 (~27%) — was too busy, read as noise/artifacts
         if (gh < 70) {
-          const drewFlower = gh < 10 && drawNatureSprite(ctx, 'flowers', s.x + ((gh % 7) - 3), s.y + 5, 16, daylight * 0.9);
-          ctx.globalAlpha = daylight;
+          const drewFlower = gh < 5 && drawNatureSprite(ctx, 'flowers', s.x + ((gh % 7) - 3), s.y + 5, 12, daylight * 0.52);
+          ctx.globalAlpha = daylight * 0.66;
           if (!drewFlower) {
             ctx.fillStyle = G.season === 'autumn' ? '#8a9a50' : '#3a8a3a';
             const gx = s.x - 8 + (gh % 16), gy = s.y - 4 + ((gh >> 4) % 6);
@@ -1156,13 +1276,12 @@ export function render() {
             }
           }
         }
-        if (G.season === 'spring' && gh > 192) {
-          ctx.fillStyle = ['#f0a0c0','#ffe066','#a0c0f0'][gh % 3];
-          // User feedback: "less transparencies" — bump 0.8→1.0 for crisp spring flower dots
-          ctx.globalAlpha = daylight;
+        if (G.season === 'spring' && gh > 244) {
+          ctx.fillStyle = ['#e6a6b9','#d9c763','#91b6c9'][gh % 3];
+          ctx.globalAlpha = daylight * 0.42;
           const fx = s.x - 6 + (gh % 12), fy = s.y - 2 + ((gh >> 3) % 5);
           ctx.beginPath();
-          ctx.arc(fx, fy, 1.8, 0, Math.PI * 2);
+          ctx.ellipse(fx, fy, 1.05, 0.7, (gh % 5) * 0.25, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = daylight;
@@ -1191,8 +1310,7 @@ export function render() {
         if (ch < 12) {
           const cx = s.x + (ch % 16) - 8;
           const cy = s.y + ((ch >> 3) % 8) - 4;
-          // User feedback: "less transparencies" — bump 0.8→1.0 for distinct clover trefoils
-          ctx.globalAlpha = daylight;
+          ctx.globalAlpha = daylight * 0.55;
           ctx.fillStyle = '#7ab85a';
           for (let i = 0; i < 3; i++) {
             const ang = i * Math.PI * 2 / 3;
@@ -1385,6 +1503,9 @@ export function render() {
         }
       }
       else if (tile === TILE.MOUNTAIN) {
+        if (drawNatureSprite(ctx, 'mountain', s.x, s.y + 11, 48, daylight)) {
+          ctx.globalAlpha = daylight;
+        } else {
         // Loop 2 (render S3): per-tile silhouette variance. Before this, every
         // mountain shared identical base widths, peak positions, and snow shape
         // even though `mh` was being computed — only height varied. Fresh-eyes
@@ -1401,14 +1522,6 @@ export function render() {
         // Twin peak modifier: ~1 in 4 mountains gets a secondary sub-peak
         const twin = (mh & 0x3) === 0;
         const snowless = (mh & 0x1f) === 0; // ~1 in 32 = bare rocky outcrop
-
-        // Base shadow — scaled with baseHW so wider mountains have bigger shadow
-        ctx.globalAlpha = daylight * 0.3;
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.ellipse(s.x + 2, s.y + 5, baseHW + 4, 5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = daylight;
 
         // Back peak (taller, darker) — apex shifts with lean
         const bx = s.x - 3 + lean, byTop = s.y - peakH - (mh % 4);
@@ -1499,6 +1612,7 @@ export function render() {
           ctx.fillRect(fx - 4, fyTop + 8, 1, 3);
           ctx.fillRect(fx + 2, fyTop + 7, 1, 4);
         }
+        }
       }
       else if (tile === TILE.SAND) {
         // Sand grain dots for beach texture
@@ -1508,31 +1622,6 @@ export function render() {
         if (sh < 8) {
           ctx.fillRect(s.x - 5 + sh, s.y + (sh%3) - 1, 1.5, 1);
           ctx.fillRect(s.x + 3 - sh%4, s.y - 2 + sh%3, 1, 1.5);
-        }
-      }
-
-      // Valid-tile highlight: when a building is selected, highlight all viewport
-      // tiles where placement is valid. Loop 009 (the-fixer, 007 finding #6):
-      // bumped pulse range + added a pale-green edge stroke so the grid reads
-      // against grass tiles rather than blending into them.
-      if (G.selectedBuild && !(G.hoveredTile && G.hoveredTile.x===x && G.hoveredTile.y===y)) {
-        if (canPlaceCheck(G.selectedBuild, x, y)) {
-          const pulse = 0.28 + 0.14 * Math.sin(G.gameTick * 0.08 + (x+y)*0.3);
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(s.x, s.y - TH/2);
-          ctx.lineTo(s.x + TW/2, s.y);
-          ctx.lineTo(s.x, s.y + TH/2);
-          ctx.lineTo(s.x - TW/2, s.y);
-          ctx.closePath();
-          ctx.globalAlpha = pulse;
-          ctx.fillStyle = '#4ade80';
-          ctx.fill();
-          ctx.globalAlpha = Math.min(1, pulse * 2);
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = '#bbf7d0';
-          ctx.stroke();
-          ctx.restore();
         }
       }
 
@@ -1563,21 +1652,18 @@ export function render() {
   }
 
   // ── Fog of war soft edges ─────────────────────────────────
-  // Fog gradients only depend on direction (N/S/E/W) — cache 4 objects at the
-  // tile origin (0,0), then use ctx.translate so the same gradient reuses every
-  // edge tile. This replaces O(edge_tiles * 4) gradient allocations per frame
-  // with just 4 cached gradients total.
+  // Fog gradients are created after translating to each tile. Caching these
+  // across transforms can pin the gradient to the first edge tile and make the
+  // fog look like a dark sheet, so keep this tiny allocation local and correct.
   function getFogGrad(dir) {
-    if (fogGradCache[dir]) return fogGradCache[dir];
     const hw = TW / 2, hh = TH / 2;
     let g;
     if (dir === 'N')      g = ctx.createLinearGradient(0, -hh, 0, 0);
     else if (dir === 'S') g = ctx.createLinearGradient(0, hh, 0, 0);
     else if (dir === 'W') g = ctx.createLinearGradient(-hw, 0, 0, 0);
     else                  g = ctx.createLinearGradient(hw, 0, 0, 0);
-    g.addColorStop(0, 'rgba(10,14,26,0.72)');
+    g.addColorStop(0, 'rgba(14,21,36,0.22)');
     g.addColorStop(1, 'rgba(10,14,26,0)');
-    fogGradCache[dir] = g;
     return g;
   }
 
@@ -1686,7 +1772,7 @@ export function render() {
     const hurtAlpha = c.hurtTimer > 0 ? Math.min(0.6, c.hurtTimer / 12 * 0.6) : 0;
 
     // Walking bob when moving — smooth sine, reduced amplitude.
-    // Idle citizens still get a small breathing bob so they don't look frozen.
+    // Idle citizens stay anchored so they don't read as walking in place.
     // Loop 4 (render S3): phase derived from name-hash instead of c.x so
     // neighbors don't bob in stadium-wave lockstep. Prior (c.x * N) meant
     // two citizens on adjacent tiles had near-identical phase.
@@ -1695,7 +1781,7 @@ export function render() {
     const phaseOffset = phaseHash * Math.PI / 180;
     const bob = isMoving
       ? Math.sin(G.gameTick * 0.2 + phaseOffset) * 0.8
-      : Math.sin(G.gameTick * 0.05 + phaseOffset) * 0.35;
+      : 0;
     const cy = s.y + bob;
 
     // Facing direction (x = left/right, z = depth/forward-back in iso)
@@ -1802,6 +1888,81 @@ export function render() {
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(s.x, s.y - 4, 7, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      continue;
+    }
+
+    if (drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facingAway, isMoving, phaseOffset)) {
+      if (G.camera.zoom >= 0.7) {
+        const emote = c.state==='eating' ? '🍎' :
+          c.state==='working' ? null : c.state==='foraging' ? '🌿' :
+          (c.state==='walk_to_work'||c.state==='walk_to_deliver') ? '🚶' : null;
+        if (emote && G.gameTick % 120 < 80) {
+          ctx.globalAlpha = 0.75;
+          ctx.font = '9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(emote, s.x, cy - 31);
+          ctx.globalAlpha = Math.max(0.85, daylight);
+        }
+        if (c.carrying) {
+          const cc = {
+            wood:'#a3714f', stone:'#9ca3af', food:'#d96060',
+            gold:'#ffd166', iron:'#60a5fa',
+          }[c.carrying] || '#ddd';
+          const packX = s.x - faceScreenX * 3.5;
+          const packY = cy - 17;
+          ctx.fillStyle = cc;
+          ctx.beginPath();
+          ctx.ellipse(packX, packY, 2.1, 2.8, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(60,35,15,0.85)';
+          ctx.beginPath();
+          ctx.ellipse(packX, packY - 2, 1.5, 0.8, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      if (hurtAlpha > 0) {
+        const hurtGrad = ctx.createRadialGradient(s.x, cy - 12, 2, s.x, cy - 12, 14);
+        hurtGrad.addColorStop(0, `rgba(255, 60, 60, ${hurtAlpha})`);
+        hurtGrad.addColorStop(1, 'rgba(255, 60, 60, 0)');
+        ctx.fillStyle = hurtGrad;
+        ctx.beginPath();
+        ctx.arc(s.x, cy - 12, 14, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (c.hp !== undefined && c.hp < 40 && c.hp > 0 && G.camera.zoom >= 0.8) {
+        const droplet = 0.5 + 0.5 * Math.sin(G.gameTick * 0.1 + phaseOffset);
+        ctx.globalAlpha = Math.max(0.85, daylight) * (0.6 + 0.4 * droplet);
+        ctx.fillStyle = '#c8201c';
+        ctx.beginPath();
+        ctx.moveTo(s.x, cy - 31);
+        ctx.bezierCurveTo(s.x - 1.5, cy - 29, s.x - 1.5, cy - 26, s.x, cy - 25);
+        ctx.bezierCurveTo(s.x + 1.5, cy - 26, s.x + 1.5, cy - 29, s.x, cy - 31);
+        ctx.fill();
+        ctx.globalAlpha = Math.max(0.85, daylight);
+      }
+
+      if (c === hoveredCitizen) {
+        ctx.strokeStyle = 'rgba(255,209,102,0.8)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(s.x, s.y + 2, 7, 3.0, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      if (c === G.selectedCitizen) {
+        const pulse = 0.55 + 0.35 * Math.sin(G.gameTick * 0.1);
+        ctx.strokeStyle = `rgba(120,210,255,${pulse})`;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.ellipse(s.x, s.y + 2, 8, 3.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = `rgba(120,210,255,${pulse * 0.75})`;
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.arc(s.x, cy - 31, 4.5, Math.PI * 1.15, Math.PI * 1.85);
         ctx.stroke();
       }
       continue;
@@ -3065,9 +3226,17 @@ export function render() {
       ctx.fillStyle = '#fff8dc';
       ctx.beginPath(); ctx.arc(sx, sy, sz * 0.55, 0, Math.PI * 2); ctx.fill();
     } else if (p.type === 'pollen') {
-      ctx.fillStyle = `rgba(255, 240, 180, ${ctx.globalAlpha})`;
+      ctx.fillStyle = `rgba(235, 220, 150, ${ctx.globalAlpha * 0.58})`;
       ctx.beginPath();
-      ctx.arc(s.x + Math.sin(G.gameTick * 0.02 + p.tx) * 4, s.y + p.offsetY, p.size, 0, Math.PI * 2);
+      ctx.ellipse(
+        s.x + Math.sin(G.gameTick * 0.02 + p.tx) * 3,
+        s.y + p.offsetY,
+        p.size * 0.85,
+        p.size * 0.55,
+        0,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
     } else if (p.type === 'firefly') {
       const pulse = 0.5 + 0.5 * Math.sin(G.gameTick * 0.15 + p.phase);
@@ -3519,16 +3688,8 @@ function drawBuilding(ctx, b, s, daylight) {
     }
   }
 
-  // AO contact ring — always at base, grounds the building visually
-  if (b.type !== 'road' && b.type !== 'wall') {
-    ctx.fillStyle = rasterSprite ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.25)';
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 2, rasterSprite ? 13 : 10, rasterSprite ? 4 : 3, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
   // Long directional shadow — proper isometric cast shadow
-  if (b.type !== 'road' && b.type !== 'wall') {
+  if (b.type !== 'road' && b.type !== 'wall' && !rasterSprite) {
     const buildingH = (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 32 :
                       (b.type === 'house' || b.type === 'tavern' || b.type === 'barracks' || b.type === 'bakery') ? 20 : 12;
     // Shadow length scales with sun angle — dramatically longer at dawn/dusk
@@ -3536,46 +3697,26 @@ function drawBuilding(ctx, b, s, daylight) {
     const shadowMultiplier = 1 + sunAngle; // shadows 1x at noon, up to ~3x at sunrise/set
     const shadowLen = buildingH * 0.8 * shadowMultiplier;
 
-    // Loop 62 (render S4): ground-contact shadow to match citizen style.
-    // Prior code only drew the long directional cast shadow — at noon or
-    // when the sun was nearly overhead, the building had NO contact shadow
-    // so it looked like it was floating a tile above the ground. Now there's
-    // always a soft ground-contact ellipse beneath the base, same stacked
-    // style as citizens, which anchors the building visually.
-    const footprintW = (b.type === 'castle') ? 14 : (b.type === 'church' || b.type === 'tower') ? 11 : (b.type === 'wall' || b.type === 'road') ? 0 : 10;
-    if (footprintW > 0) {
-      ctx.globalAlpha = daylight * (rasterSprite ? 0.16 : 0.5);
-      ctx.fillStyle = 'rgba(0,0,0,0.10)';
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 3, footprintW + 3, (footprintW + 3) * 0.4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(0,0,0,0.18)';
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 3, footprintW, footprintW * 0.4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'rgba(0,0,0,0.22)';
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 3, footprintW - 3, (footprintW - 3) * 0.4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
+    const fp = fallbackBuildingShadowFootprint(b.type);
     // Warm shadow tint during golden hours
     const dayT = G.dayPhase / G.dayLength;
     const isGolden = (dayT < 0.15 || (dayT > 0.55 && dayT < 0.75));
     const shadowBaseColor = isGolden ? '120,60,40' : '0,0,0';
     // Create a slanted quadrilateral shadow shape
-    ctx.globalAlpha = daylight * (rasterSprite ? 0.14 : 0.3);
+    ctx.globalAlpha = daylight * 0.3;
     ctx.fillStyle = '#1a1010';
     ctx.beginPath();
     // Base of building (4 corners of foundation)
-    ctx.moveTo(s.x - 10, s.y + 2);
-    ctx.lineTo(s.x + 10, s.y + 2);
+    const shadowHalf = Math.max(10, fp.wide);
+    const baseY = s.y + fp.y;
+    ctx.moveTo(s.x - shadowHalf, baseY);
+    ctx.lineTo(s.x + shadowHalf, baseY);
     // Shadow tip (projected to lower-right)
-    ctx.lineTo(s.x + 10 + shadowLen, s.y + 2 + shadowLen * 0.5);
-    ctx.lineTo(s.x - 10 + shadowLen, s.y + 2 + shadowLen * 0.5);
+    ctx.lineTo(s.x + shadowHalf + shadowLen, baseY + shadowLen * 0.5);
+    ctx.lineTo(s.x - shadowHalf + shadowLen, baseY + shadowLen * 0.5);
     ctx.closePath();
     // Use radial gradient for soft fade
-    const shadowGrad = ctx.createRadialGradient(s.x, s.y + 2, 5, s.x + shadowLen, s.y + 2 + shadowLen * 0.5, shadowLen);
+    const shadowGrad = ctx.createRadialGradient(s.x, baseY, Math.max(5, fp.tall), s.x + shadowLen, baseY + shadowLen * 0.5, shadowLen);
     shadowGrad.addColorStop(0, `rgba(${shadowBaseColor},0.45)`);
     shadowGrad.addColorStop(0.6, `rgba(${shadowBaseColor},0.2)`);
     shadowGrad.addColorStop(1, `rgba(${shadowBaseColor},0)`);
@@ -3590,7 +3731,7 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.save();
   ctx.translate(s.x, s.y);
   ctx.scale(1.1, 1.1);
-  ctx.translate(-s.x, -s.y + 3);
+  ctx.translate(-s.x, -s.y + (rasterSprite ? 4 : 3));
 
   // Loop 217 (PHASE B step 2): SVG path runs INSIDE the same
   // scale/translate envelope as canvas drawX so damage cracks +
@@ -3804,16 +3945,32 @@ function drawBuilding(ctx, b, s, daylight) {
     // 035's photo-mode hid ~15 HUD elements via CSS but this label is
     // canvas-drawn, invisible to CSS rules.
     const needed = def.workers || 0;
-    if (needed > 0 && !G.photoMode) {
+    const showWorkerBadge = G.selectedBuilding === b ||
+      (G.hoveredTile && G.hoveredTile.x === b.x && G.hoveredTile.y === b.y);
+    if (needed > 0 && !G.photoMode && showWorkerBadge) {
       const have = b.workers.length;
       const full = have >= needed;
-      ctx.globalAlpha = 0.85;
-      ctx.font = '8px -apple-system,sans-serif';
+      const label = `${have}/${needed}`;
+      const bw = Math.max(18, label.length * 5 + 8);
+      const bh = 10;
+      const bx = s.x - bw / 2;
+      const by = s.y + 10;
+      ctx.save();
+      ctx.globalAlpha = 0.82;
+      ctx.fillStyle = full ? 'rgba(13,50,31,0.72)' : 'rgba(55,38,10,0.74)';
+      ctx.strokeStyle = full ? 'rgba(86,220,135,0.68)' : 'rgba(251,191,36,0.72)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.globalAlpha = 0.95;
+      ctx.font = '7px -apple-system,sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillStyle = full ? 'rgba(74,222,128,0.9)' : 'rgba(251,191,36,0.9)';
-      const wy = b.type === 'tower' ? s.y - 48 : b.type === 'church' ? s.y - 50 : b.type === 'castle' ? s.y - 54 : s.y - 38;
-      ctx.fillText(`${have}/${needed}👤`, s.x, wy);
-      ctx.globalAlpha = 1;
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = full ? '#a7f3d0' : '#ffe08a';
+      ctx.fillText(label, s.x, by + bh / 2 + 0.5);
+      ctx.restore();
     }
   } // end zoom >= 0.5
 
@@ -6450,14 +6607,15 @@ function drawTree(ctx, x, y, a, seasonShift) {
   const posHash = (Math.abs(Math.round(x)) * 374761 + Math.abs(Math.round(y)) * 668265) >>> 0;
   const variantPick = posHash % 20;
   let variant;
-  if (variantPick < 8) variant = 0;       // pine (40%)
-  else if (variantPick < 14) variant = 1;  // oak (30%)
-  else if (variantPick < 18) variant = 2;  // birch (20%)
-  else variant = 3;                         // dead (10%)
+  if (variantPick < 9) variant = 0;        // pine (45%)
+  else if (variantPick < 17) variant = 1;  // oak (40%)
+  else if (variantPick < 19) variant = 2;  // birch (10%)
+  else variant = 3;                        // dead (5%)
 
   const natureType = variant === 0 ? 'pine' : variant === 1 ? 'oak' : variant === 2 ? 'birch' : 'dead';
-  const natureH = variant === 1 ? 34 : variant === 2 ? 40 : 42;
-  if (drawNatureSprite(ctx, natureType, x, y + 9, natureH, a)) {
+  const natureH = variant === 1 ? 34 : variant === 2 ? 36 : 42;
+  const natureAlpha = variant === 2 ? a * 0.74 : a;
+  if (drawNatureSprite(ctx, natureType, x, y + 9, natureH, natureAlpha)) {
     return;
   }
 
@@ -6674,10 +6832,10 @@ function drawWater(ctx, x, y, a, tx, ty) {
 
   // ── Layer 1: deep colour base with slow hue shift ────────────
   const colorShift = 0.5 + 0.5 * Math.sin(t * 0.6 + phase);
-  const cr = Math.round(18 + colorShift * 16);
-  const cg = Math.round(78 + colorShift * 38);
-  const cb = Math.round(178 + colorShift * 30);
-  ctx.globalAlpha = a * 0.9;
+  const cr = Math.round(24 + colorShift * 12);
+  const cg = Math.round(82 + colorShift * 24);
+  const cb = Math.round(130 + colorShift * 24);
+  ctx.globalAlpha = a * 0.58;
   ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
@@ -6688,17 +6846,17 @@ function drawWater(ctx, x, y, a, tx, ty) {
   // Loop 6 (render S3): shimmer halved (0.18+0.12 → 0.08+0.06) and hue darkened
   // toward the base so cyan doesn't crust tile edges. Fresh-eyes critique
   // #2 saw the tiles as "disconnected blue diamonds with hard white borders".
-  const shimmer = 0.08 + 0.06 * Math.sin(t * 0.9 + phase + 1.5);
+  const shimmer = 0.045 + 0.035 * Math.sin(t * 0.9 + phase + 1.5);
   ctx.globalAlpha = a * shimmer;
-  ctx.fillStyle = 'rgba(70,150,210,1)';
+  ctx.fillStyle = 'rgba(70,135,165,1)';
   ctx.beginPath();
   ctx.moveTo(x, y - 16); ctx.lineTo(x + 32, y); ctx.lineTo(x, y + 16); ctx.lineTo(x - 32, y);
   ctx.closePath();
   ctx.fill();
 
   // ── Layer 3: animated wave crests ────────────────────────────
-  ctx.lineWidth = 1.5;
-  const waveRows = [-8, -3, 2, 7];
+  ctx.lineWidth = 1.1;
+  const waveRows = [-5, 4];
   for (let i = 0; i < waveRows.length; i++) {
     const rowY = waveRows[i];
     const dir = (i % 2 === 0) ? 1 : -1;
@@ -6706,9 +6864,9 @@ function drawWater(ctx, x, y, a, tx, ty) {
     // Loop 6 (render S3): wave crest alpha reduced (0.3+0.2 → 0.18+0.12)
     // and color shifted from near-white to a muted blue-white so waves
     // look like water movement, not painted lines on puzzle pieces.
-    const wAlpha = 0.18 + 0.12 * Math.sin(t * 1.4 + phase + i * 1.3);
-    ctx.globalAlpha = a * Math.max(0.05, wAlpha);
-    ctx.strokeStyle = 'rgba(180,215,235,1)';
+    const wAlpha = 0.10 + 0.07 * Math.sin(t * 1.4 + phase + i * 1.3);
+    ctx.globalAlpha = a * Math.max(0.035, wAlpha);
+    ctx.strokeStyle = 'rgba(168,205,218,1)';
     ctx.beginPath();
     const halfW = 32 * (1 - Math.abs(rowY) / 20);
     const step = 4;
@@ -6725,20 +6883,20 @@ function drawWater(ctx, x, y, a, tx, ty) {
   }
 
   // ── Layer 4: specular glints (2 per tile, slow-moving) ───────
-  const numGlints = 2;
+  const numGlints = 1;
   for (let gi = 0; gi < numGlints; gi++) {
     const gPhase = phase + gi * 2.1;
     const gx = x + Math.sin(t * 0.8 + gPhase) * 14;
     const gy = y + Math.cos(t * 0.6 + gPhase) * 7;
-    const gSize = 2.0 + 1.2 * Math.abs(Math.sin(t * 1.8 + gPhase));
-    const gAlpha = 0.35 + 0.25 * Math.sin(t * 2.0 + gPhase); // gentle, ~3s cycle
+    const gSize = 1.4 + 0.8 * Math.abs(Math.sin(t * 1.8 + gPhase));
+    const gAlpha = 0.16 + 0.12 * Math.sin(t * 2.0 + gPhase); // gentle, ~3s cycle
     ctx.globalAlpha = a * Math.max(0, gAlpha);
-    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.fillStyle = 'rgba(220,240,235,1)';
     ctx.beginPath();
     ctx.arc(gx, gy, gSize * 0.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = a * Math.max(0, gAlpha) * 0.35;
-    ctx.fillStyle = 'rgba(200,240,255,1)';
+    ctx.fillStyle = 'rgba(170,220,230,1)';
     ctx.beginPath();
     ctx.arc(gx, gy, gSize, 0, Math.PI * 2);
     ctx.fill();
@@ -6747,11 +6905,11 @@ function drawWater(ctx, x, y, a, tx, ty) {
   // ── Layer 4b: shimmering highlight streaks (light reflections) ──
   ctx.lineWidth = 1;
   const streakPhase = G.gameTick * 0.008 + tx * 0.1 + ty * 0.07;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const off = Math.sin(streakPhase + i * 1.5) * 6;
-    const alpha = 0.08 + 0.06 * Math.sin(streakPhase + i * 2);
+    const alpha = 0.035 + 0.025 * Math.sin(streakPhase + i * 2);
     ctx.globalAlpha = a * Math.max(0, alpha);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillStyle = 'rgba(220, 240, 235, 0.65)';
     ctx.fillRect(x - 10 + off, y - 3 + i * 4, 16, 0.8);
   }
 
@@ -6759,8 +6917,8 @@ function drawWater(ctx, x, y, a, tx, ty) {
   const flashPhase = G.gameTick * 0.03 + (tx * 0.7 + ty * 0.3);
   const flashIntensity = Math.max(0, Math.sin(flashPhase) - 0.7) * 3; // spikes rarely
   if (flashIntensity > 0) {
-    ctx.globalAlpha = a * flashIntensity * 0.6;
-    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.globalAlpha = a * flashIntensity * 0.28;
+    ctx.fillStyle = 'rgba(220,240,235,1)';
     ctx.beginPath();
     ctx.ellipse(x + (tx*3)%15-7, y + (ty*3)%5-2, 2, 1, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -6771,9 +6929,9 @@ function drawWater(ctx, x, y, a, tx, ty) {
   const sparkPhase = (G.gameTick * 0.02) + (tx * 1.7 + ty * 0.9);
   const sparkle = Math.max(0, Math.sin(sparkPhase * 0.3) - 0.85) * 6; // rare bright peak
   if (sparkle > 0 && a > 0.7) {
-    ctx.globalAlpha = sparkle * a;
+    ctx.globalAlpha = sparkle * a * 0.38;
     // Small cross-shaped sparkle
-    ctx.strokeStyle = 'rgba(255, 240, 180, 0.9)';
+    ctx.strokeStyle = 'rgba(225, 218, 170, 0.75)';
     ctx.lineWidth = 1;
     const sx = x + (tx * 5 % 16) - 8, sy = y + (ty * 3 % 6) - 3;
     ctx.beginPath();
@@ -6791,7 +6949,7 @@ function drawWater(ctx, x, y, a, tx, ty) {
     { dx: -1, dy:  0, ex: x - 32, ey: y,      ax: x,      ay: y - 16, bx: x,      by: y + 16 }, // left
   ];
   // Foam pulses visibly between 0.5 and 1.0
-  const foamPulse = 0.7 + 0.3 * Math.sin(t * 2.0 + phase);
+  const foamPulse = 0.42 + 0.18 * Math.sin(t * 2.0 + phase);
   for (const n of neighbours) {
     const nx = tx + n.dx, ny = ty + n.dy;
     const isLand = nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H
@@ -6801,35 +6959,35 @@ function drawWater(ctx, x, y, a, tx, ty) {
     const m2x = (n.ex + n.bx) / 2, m2y = (n.ey + n.by) / 2;
     // Bold primary foam stripe
     ctx.globalAlpha = a * foamPulse;
-    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(225,240,235,0.70)';
+    ctx.lineWidth = 1.6;
     ctx.beginPath();
     ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
     ctx.stroke();
     // Secondary softer foam halo
-    ctx.globalAlpha = a * foamPulse * 0.5;
-    ctx.strokeStyle = 'rgba(200,240,255,1)';
-    ctx.lineWidth = 5;
+    ctx.globalAlpha = a * foamPulse * 0.32;
+    ctx.strokeStyle = 'rgba(170,220,225,0.8)';
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(m1x, m1y); ctx.lineTo(n.ex, n.ey); ctx.lineTo(m2x, m2y);
     ctx.stroke();
     // Foam dot clusters along each half of the edge
-    ctx.globalAlpha = a * foamPulse * 0.8;
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    for (let fi = 0; fi < 5; fi++) {
+    ctx.globalAlpha = a * foamPulse * 0.38;
+    ctx.fillStyle = 'rgba(225,240,235,0.72)';
+    for (let fi = 0; fi < 3; fi++) {
       const frac = (fi + 1) / 6;
       const fx = m1x + (n.ex - m1x) * frac + Math.sin(t * 3.0 + phase + fi) * 1.5;
       const fy = m1y + (n.ey - m1y) * frac + Math.cos(t * 2.5 + phase + fi) * 1.0;
       ctx.beginPath();
-      ctx.arc(fx, fy, 1.5, 0, Math.PI * 2);
+      ctx.arc(fx, fy, 1.0, 0, Math.PI * 2);
       ctx.fill();
     }
-    for (let fi = 0; fi < 5; fi++) {
+    for (let fi = 0; fi < 3; fi++) {
       const frac = (fi + 1) / 6;
       const fx = n.ex + (m2x - n.ex) * frac + Math.sin(t * 3.0 + phase + fi + 5) * 1.5;
       const fy = n.ey + (m2y - n.ey) * frac + Math.cos(t * 2.5 + phase + fi + 5) * 1.0;
       ctx.beginPath();
-      ctx.arc(fx, fy, 1.5, 0, Math.PI * 2);
+      ctx.arc(fx, fy, 1.0, 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -6870,52 +7028,78 @@ function drawWater(ctx, x, y, a, tx, ty) {
 }
 
 // ── Minimap ─────────────────────────────────────────────────
-const MINI_COLORS = {0:'#1a6aaa',1:'#d4a76a',2:'#4a7c4f',3:'#2d5a30',4:'#6b7280',5:'#4b6fa0',6:'#4a4a5a'};
+const MINI_COLORS = {
+  0:'#356f7f', 1:'#d3b06d', 2:'#6ea95a', 3:'#3d7240',
+  4:'#918a7a', 5:'#638aa2', 6:'#7e7c78',
+};
 // Loop 36 (render S3): expanded to cover fisherman/archery/blacksmith/
 // bakery/windmill/chickencoop/cowpen (previously rendered as white fallback)
 const MINI_BUILD = {
-  house:'#d4a574', farm:'#7cb342', lumber:'#a3714f',
-  quarry:'#8a8e9a', mine:'#5a85b8', market:'#e8a040',
-  barracks:'#6a7a8a', tower:'#8a8a9a', church:'#e0e0e0',
-  castle:'#ffd166', tavern:'#c07040', wall:'#7a7a7a',
-  road:'#8a7a60', well:'#60a5fa', granary:'#c7a060',
-  tradingpost:'#e8a040', school:'#d4b890',
-  fisherman:'#4a90c8', archery:'#8a4a3a', blacksmith:'#aa5a30',
-  bakery:'#dca858', windmill:'#e0d0a0', chickencoop:'#e8d060',
-  cowpen:'#a88050',
+  house:'#c99655', farm:'#8caf54', lumber:'#8b5f36',
+  quarry:'#a0a29d', mine:'#6f95ac', market:'#d49445',
+  barracks:'#75818a', tower:'#aaa8a0', church:'#d8c79a',
+  castle:'#e0bd66', tavern:'#b76342', wall:'#8a8174',
+  road:'#a38b5f', well:'#76a8ba', granary:'#b9874a',
+  tradingpost:'#d19b55', school:'#c9a46e',
+  fisherman:'#5e9bad', archery:'#8a5d44', blacksmith:'#9b5839',
+  bakery:'#d2a25c', windmill:'#d7c085', chickencoop:'#d0b45a',
+  cowpen:'#9a744a',
 };
 // Tile type for road detection (matches TILE.ROAD in state.js)
 const MINI_ROAD_TILE = 5;
 
-function renderMinimap() {
+function shadeColor(hex, amt) {
+  const c = hex.startsWith('#') ? hex.slice(1) : hex;
+  const n = parseInt(c.length === 3 ? c.split('').map(ch => ch + ch).join('') : c, 16);
+  const r = Math.max(0, Math.min(255, ((n >> 16) & 255) + amt));
+  const g = Math.max(0, Math.min(255, ((n >> 8) & 255) + amt));
+  const b = Math.max(0, Math.min(255, (n & 255) + amt));
+  return `rgb(${r | 0},${g | 0},${b | 0})`;
+}
+
+export function renderMinimap() {
   const mc = minimapCtx;
   const mw = minimapC.width, mh = minimapC.height;
   const sx = mw / MAP_W, sy = mh / MAP_H;
 
   // Background
-  mc.fillStyle = '#08090f';
+  mc.fillStyle = '#15231c';
+  mc.fillRect(0, 0, mw, mh);
+  const paper = mc.createRadialGradient(mw * 0.48, mh * 0.45, mw * 0.12, mw * 0.48, mh * 0.45, mw * 0.76);
+  paper.addColorStop(0, 'rgba(218,184,112,0.17)');
+  paper.addColorStop(0.62, 'rgba(70,104,64,0.08)');
+  paper.addColorStop(1, 'rgba(0,0,0,0.20)');
+  mc.fillStyle = paper;
   mc.fillRect(0, 0, mw, mh);
 
   // Terrain tiles — explored tiles at normal color, unexplored as dimmed silhouette
   // (was '#070810' which matched the #08090f background — island was invisible on Day 1)
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
+      const n = ((x * 17 + y * 31 + (x ^ y) * 7) & 15) - 7;
       if (G.fog[y][x]) {
         mc.globalAlpha = 1;
-        mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
+        mc.fillStyle = shadeColor(MINI_COLORS[G.map[y][x]] || '#111', n * 0.85);
       } else {
         // Show island shape at low alpha so player can see the map from turn 1
-        mc.globalAlpha = 0.28;
-        mc.fillStyle = MINI_COLORS[G.map[y][x]] || '#111';
+        mc.globalAlpha = G.map[y][x] === TILE.WATER ? 0.20 : 0.30;
+        mc.fillStyle = shadeColor(MINI_COLORS[G.map[y][x]] || '#111', -10 + n * 0.6);
       }
       mc.fillRect(x * sx, y * sy, Math.ceil(sx), Math.ceil(sy));
     }
   }
   mc.globalAlpha = 1;
 
+  const wash = mc.createLinearGradient(0, 0, mw, mh);
+  wash.addColorStop(0, 'rgba(255,238,170,0.07)');
+  wash.addColorStop(0.45, 'rgba(255,255,255,0.00)');
+  wash.addColorStop(1, 'rgba(4,7,9,0.16)');
+  mc.fillStyle = wash;
+  mc.fillRect(0, 0, mw, mh);
+
   // Roads as tiny brown lines — draw road tiles as connected segments
-  mc.strokeStyle = '#6b5a3e';
-  mc.lineWidth = 1;
+  mc.strokeStyle = 'rgba(128,94,48,0.74)';
+  mc.lineWidth = 1.2;
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
       if (!G.fog[y][x]) continue;
@@ -6939,35 +7123,40 @@ function renderMinimap() {
     }
   }
 
-  // Buildings as colored circle dots with a dark halo so they pop against terrain
+  // Buildings as painted map glyphs with a dark halo so they pop against terrain
   // Only show buildings on explored tiles
   for (const b of G.buildings) {
     if (!G.fog[b.y]?.[b.x]) continue;
     const bx = (b.x + 0.5) * sx;
     const by = (b.y + 0.5) * sy;
-    const r = b.type === 'castle' ? 4 : b.type === 'tower' || b.type === 'church' ? 3.5 : 3;
+    const r = b.type === 'castle' ? 4.4 : b.type === 'tower' || b.type === 'church' ? 3.6 : b.type === 'road' || b.type === 'wall' ? 1.8 : 3.0;
     // Dark halo
     mc.beginPath();
-    mc.arc(bx, by, r + 1.5, 0, Math.PI * 2);
-    mc.fillStyle = 'rgba(0,0,0,0.65)';
+    mc.ellipse(bx, by + 0.6, r + 1.4, r * 0.62 + 1, 0, 0, Math.PI * 2);
+    mc.fillStyle = 'rgba(0,0,0,0.34)';
     mc.fill();
-    // Building dot with actual color
+    // Building diamond with actual color
     mc.beginPath();
-    mc.arc(bx, by, r, 0, Math.PI * 2);
+    mc.moveTo(bx, by - r);
+    mc.lineTo(bx + r, by);
+    mc.lineTo(bx, by + r);
+    mc.lineTo(bx - r, by);
+    mc.closePath();
     mc.fillStyle = MINI_BUILD[b.type] || '#fff';
     mc.fill();
+    mc.strokeStyle = 'rgba(255,236,180,0.35)';
+    mc.lineWidth = 0.75;
+    mc.stroke();
   }
 
-  // Citizens as bright yellow dots with a slight glow (3px, up from 2px)
+  // Citizens as small warm paint flecks
   for (const c of G.citizens) {
     const cx = Math.round(c.x * sx);
     const cy = Math.round(c.y * sy);
-    // Glow halo
-    mc.fillStyle = 'rgba(250,204,21,0.3)';
-    mc.fillRect(cx - 2, cy - 2, 5, 5);
-    // Solid dot
-    mc.fillStyle = '#facc15';
-    mc.fillRect(cx - 1, cy - 1, 3, 3);
+    mc.fillStyle = 'rgba(40,24,10,0.42)';
+    mc.fillRect(cx - 1, cy, 3, 2);
+    mc.fillStyle = '#e7c36d';
+    mc.fillRect(cx, cy - 1, 2, 2);
   }
 
   // Enemies on minimap
@@ -6995,22 +7184,22 @@ function renderMinimap() {
   const br = screenToWorld(logicalW, logicalH - 50);
   const vx = tl.x * sx, vy = tl.y * sy;
   const vw = (br.x - tl.x) * sx, vh = (br.y - tl.y) * sy;
-  mc.strokeStyle = 'rgba(0,0,0,0.6)';
+  mc.strokeStyle = 'rgba(22,18,12,0.58)';
   mc.lineWidth = 3.5;
   mc.strokeRect(vx, vy, vw, vh);
-  mc.strokeStyle = 'rgba(100,220,255,0.95)';
+  mc.strokeStyle = 'rgba(250,215,126,0.88)';
   mc.lineWidth = 1.5;
   mc.strokeRect(vx, vy, vw, vh);
 
   // Thin border around entire minimap for island definition
-  mc.strokeStyle = 'rgba(180,160,120,0.5)';
+  mc.strokeStyle = 'rgba(220,184,112,0.48)';
   mc.lineWidth = 1;
   mc.strokeRect(0.5, 0.5, mw - 1, mh - 1);
 
   // Subtle inner vignette for depth
   const vign = mc.createRadialGradient(mw / 2, mh / 2, mw * 0.3, mw / 2, mh / 2, mw * 0.72);
   vign.addColorStop(0, 'rgba(0,0,0,0)');
-  vign.addColorStop(1, 'rgba(0,0,0,0.45)');
+  vign.addColorStop(1, 'rgba(0,0,0,0.26)');
   mc.fillStyle = vign;
   mc.fillRect(0, 0, mw, mh);
 }

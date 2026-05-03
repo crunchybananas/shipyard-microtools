@@ -111,9 +111,9 @@ export function updateUI() {
       _triggerFoodWarning();
     }
   }
-  $('pop-display').textContent = `👤 ${G.population}/${G.maxPop}`;
   const popEl = $('pop-display');
   if (popEl) {
+    popEl.innerHTML = `<span class="res-img res-pop" aria-label="Population"></span>${G.population}/${G.maxPop}`;
     if (G.population >= G.maxPop && G.population > 3) popEl.classList.add('pop-full');
     else popEl.classList.remove('pop-full');
     // Explain the denominator. Fresh-eyes readers parse "3/3" as "at cap",

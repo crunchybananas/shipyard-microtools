@@ -110,10 +110,10 @@ void main() {
   // ── Vignette ──
   float dist = length(uv - 0.5) * 1.6;
   float vig = 1.0 - smoothstep(0.4, 1.2, dist);
-  color.rgb *= mix(0.6, 1.0, vig);
+  color.rgb *= mix(0.94, 1.0, vig);
 
   // ── Subtle chromatic aberration at edges ──
-  float caStr = 0.001 * dist * dist; // dist from vignette calculation
+  float caStr = 0.00045 * dist * dist; // dist from vignette calculation
   vec2 caOffset = (uv - 0.5) * caStr;
   float r = texture(u_scene, uv + caOffset).r;
   float b = texture(u_scene, uv - caOffset).b;
@@ -121,7 +121,7 @@ void main() {
   color.b = mix(color.b, b, 0.4);
 
   // ── Contrast S-curve ──
-  color.rgb = smoothstep(vec3(0.0), vec3(1.0), color.rgb * 1.05 - 0.025);
+  color.rgb = smoothstep(vec3(0.0), vec3(1.0), color.rgb * 1.02 - 0.006);
 
   // ── Film Grain (subtle) ──
   float grain = fract(sin(dot(uv * u_resolution + u_time * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
@@ -168,7 +168,7 @@ void main() {
   color.rgb = mix(coolGrade, warmGrade, smoothstep(0.55, 0.9, u_daylight));
   float dist = length(uv - 0.5) * 1.6;
   float vig = 1.0 - smoothstep(0.4, 1.2, dist);
-  color.rgb *= mix(0.6, 1.0, vig);
+  color.rgb *= mix(0.94, 1.0, vig);
   gl_FragColor = vec4(clamp(color.rgb, 0.0, 1.0), 1.0);
 }`;
 

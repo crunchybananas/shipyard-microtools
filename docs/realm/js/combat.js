@@ -43,10 +43,28 @@ export function updateEnemies() {
         return !best || bd < best.d ? { b, d: bd } : best;
       }, null);
       if (target) {
-        target.b.hp -= 1;
+        e.attackTimer = (e.attackTimer || 0) - G.speed;
+        if (e.attackTimer > 0) continue;
+        e.attackTimer = 55;
+        const dmg = e.damage || 7;
+        target.b.hp -= dmg;
+        e.plundered = (e.plundered || 0) + dmg;
         if (target.b.hp <= 0) {
           // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
           demolishBuilding(target.b, true);
+          e.plundered = e.plunderGoal || e.plundered;
+        }
+        if ((e.plundered || 0) >= (e.plunderGoal || 35)) {
+          e.retreating = true;
+          const distX = Math.min(e.x, MAP_W - 1 - e.x);
+          const distY = Math.min(e.y, MAP_H - 1 - e.y);
+          if (distX < distY) {
+            e.tx = e.x < MAP_W / 2 ? 0 : MAP_W - 1;
+            e.ty = e.y;
+          } else {
+            e.tx = e.x;
+            e.ty = e.y < MAP_H / 2 ? 0 : MAP_H - 1;
+          }
         }
       } else {
         // No buildings left to attack — retreat toward the nearest map edge
@@ -73,8 +91,9 @@ export function updateEnemies() {
       const dx = c.x - e.x, dy = c.y - e.y;
       const d = Math.hypot(dx, dy);
       if (d > 2.5) continue;
-      // Citizen takes 0.3 dmg/frame when within 2.5 tiles of an enemy
-      c.hp = (c.hp !== undefined ? c.hp : 100) - 0.3 * G.speed;
+      // Raiders should scare citizens into fleeing, not erase the town
+      // population before the player can react.
+      c.hp = (c.hp !== undefined ? c.hp : 100) - 0.08 * G.speed;
       // Loop 71 (render S4): set a hurt timer so the renderer can flash the
       // citizen red briefly. Refresh on each damage tick so continuous harm
       // reads as a sustained flash rather than stuttering.

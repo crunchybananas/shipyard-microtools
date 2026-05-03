@@ -1,1751 +1,874 @@
-// ════════════════════════════════════════════════════════════
-// WebGL 3D Terrain Renderer — isometric settlement-builder
-// Parallel 3D renderer using the same tile grid as real 3D
-// geometry with directional lighting.
-// ════════════════════════════════════════════════════════════
+// Realm 3D Diorama Renderer
+//
+// This replaces the old experimental WebGL voxel renderer with a canvas-based
+// raised diorama view. It keeps the same exported API so main/input can toggle
+// it exactly as before, but it draws from the painted sprite atlases and the
+// current game state instead of maintaining a separate visual language.
 
-import { G, TILE, MAP_W, MAP_H, TW, TH } from './state.js';
-import { loadGLBGeometry } from './glb-loader.js';
+import { G, TILE, TILE_COLORS, MAP_W, MAP_H, TW, TH, getDaylight } from './state.js';
 
-// ── GLB tree geometry (loaded async, used in buildTerrainMesh) ─
-let glbTreeVariants = null; // array of {positions, normals, indices} once loaded
+let canvas = null;
+let ctx = null;
+let logicalW = 0;
+let logicalH = 0;
 
-// ── GLB building geometry (loaded async, keyed by building type) ─
-const glbBuildings = {}; // { house, tower, church, farm, … } → {positions,normals,indices}
-const BUILDING_GLB_MAP = {
-  house:      './assets/meshes/buildings/building_house.glb',
-  farm:       './assets/meshes/buildings/building_farm.glb',
-  tower:      './assets/meshes/buildings/building_tower.glb',
-  church:     './assets/meshes/buildings/building_church.glb',
-  barracks:   './assets/meshes/buildings/building_barracks.glb',
-  market:     './assets/meshes/buildings/building_market.glb',
-  castle:     './assets/meshes/buildings/building_castle.glb',
-  tavern:     './assets/meshes/buildings/building_tavern.glb',
-  blacksmith: './assets/meshes/buildings/building_blacksmith.glb',
-  windmill:   './assets/meshes/buildings/building_windmill.glb',
+const TILE_W = 74;
+const TILE_H = 38;
+const HEIGHT_PX = {
+  [TILE.WATER]: 0,
+  [TILE.SAND]: 3,
+  [TILE.GRASS]: 6,
+  [TILE.FOREST]: 6,
+  [TILE.STONE]: 7,
+  [TILE.IRON]: 7,
+  [TILE.MOUNTAIN]: 6,
 };
 
-// ── Module-level GL state ──────────────────────────────────
-let gl = null;
-let program = null;
-let vao = null;          // WebGL2 VAO (or null for WebGL1)
-let vertexBuf = null;
-let indexBuf = null;
-let indexCount = 0;
-let terrainIndexCount = 0;
-let treeIndexCount = 0;
-let isWebGL2 = false;
-
-// Buildings mesh state
-let buildingsVao = null;
-let buildingsVertexBuf = null;
-let buildingsIndexBuf = null;
-let buildingsIndexCount = 0;
-let lastBuildingRebuild = 0;
-
-// Citizens mesh state (rebuilt every frame for smooth movement)
-let citizensVao = null;
-let citizensVertexBuf = null;
-let citizensIndexBuf = null;
-let citizensIndexCount = 0;
-
-// Hover tile highlight mesh (rebuilt every frame)
-let hoverVao = null;
-let hoverVertexBuf = null;
-let hoverIndexBuf = null;
-let hoverIndexCount = 0;
-
-// Uniform locations
-let uViewProjLoc = null;
-let uLightDirLoc = null;
-let uTimeLoc = null;
-let uSeasonTintLoc = null;
-let uCameraCenterLoc = null;
-let uSnowAmountLoc = null;
-let uAutumnAmountLoc = null;
-let uDayPhaseLoc = null;
-let uRainAmountLoc = null;
-
-// Extension for VAO in WebGL1
-let oeVao = null;
-
-// ── Tile heights ───────────────────────────────────────────
-const TILE_HEIGHT = {
-  [TILE.WATER]:    0.0,
-  [TILE.SAND]:     0.4,
-  [TILE.GRASS]:    0.8,
-  [TILE.FOREST]:   0.8,
-  [TILE.STONE]:    1.3,
-  [TILE.IRON]:     1.3,
-  [TILE.MOUNTAIN]: 3.5,
+const TOP_TINT = {
+  [TILE.WATER]: '#2f6f8f',
+  [TILE.SAND]: '#d0aa62',
+  [TILE.GRASS]: '#4fb254',
+  [TILE.FOREST]: '#337642',
+  [TILE.STONE]: '#8a8580',
+  [TILE.IRON]: '#587f9e',
+  [TILE.MOUNTAIN]: '#77777f',
 };
 
-// ── Tile colors (RGB 0–1 matching existing palette) ────────
-const TILE_COLOR_3D = {
-  [TILE.WATER]:    [0.38, 0.65, 0.87],
-  [TILE.SAND]:     [0.91, 0.78, 0.49],
-  [TILE.GRASS]:    [0.40, 0.78, 0.42],
-  [TILE.FOREST]:   [0.18, 0.48, 0.21],
-  [TILE.STONE]:    [0.60, 0.58, 0.56],
-  [TILE.IRON]:     [0.35, 0.52, 0.72],
-  [TILE.MOUNTAIN]: [0.42, 0.42, 0.48],
+const SIDE_TINT = {
+  [TILE.WATER]: '#174c7a',
+  [TILE.SAND]: '#9a733c',
+  [TILE.GRASS]: '#2f7137',
+  [TILE.FOREST]: '#234f2c',
+  [TILE.STONE]: '#555358',
+  [TILE.IRON]: '#395974',
+  [TILE.MOUNTAIN]: '#666670',
 };
 
-// ── Shader sources ─────────────────────────────────────────
-const VS_SRC_300 = `#version 300 es
-in vec3 aPos;
-in vec3 aNormal;
-in vec3 aColor;
-uniform mat4 uViewProj;
-uniform float uTime;
-out vec3 vNormal;
-out vec3 vColor;
-out vec3 vWorldPos;
-void main() {
-  vec3 pos = aPos;
-  // Water animation: tiles where color is water blue get wave displacement
-  bool isWater = aColor.b > 0.6 && aColor.r < 0.2;
-  if (isWater && aPos.y < 0.01) {
-    float wave = sin(aPos.x * 0.8 + uTime * 1.5) * 0.08
-               + cos(aPos.z * 0.8 + uTime * 1.2) * 0.06;
-    pos.y += wave;
-  }
-  // Grass wind sway: gentle ripple on top faces of green tiles
-  bool isGrassV = aColor.g > aColor.r * 1.1 && aColor.g > aColor.b && aColor.b < 0.55;
-  if (isGrassV && aNormal.y > 0.5) {
-    float sway = sin(aPos.x * 1.3 + aPos.z * 0.9 + uTime * 1.1) * 0.025
-               + cos(aPos.x * 0.8 + aPos.z * 1.4 + uTime * 0.8) * 0.018;
-    pos.y += sway;
-  }
-  gl_Position = uViewProj * vec4(pos, 1.0);
-  vNormal = aNormal;
-  vColor = aColor;
-  vWorldPos = pos;
-}`;
+const TERRAIN_ATLAS = {
+  url: 'assets/sprites/terrain-atlas.png',
+  cell: 128,
+  frames: {
+    grass:    { x:   0, y:   0, trim: { x: 12, y: 32, w: 116, h: 84 } },
+    forest:   { x: 128, y:   0, trim: { x:  0, y: 31, w: 125, h: 85 } },
+    sand:     { x: 256, y:   0, trim: { x:  0, y: 31, w: 128, h: 85 } },
+    water:    { x: 384, y:   0, trim: { x:  0, y: 31, w: 114, h: 86 } },
+    stone:    { x:   0, y: 128, trim: { x: 12, y:  6, w: 116, h: 86 } },
+    iron:     { x: 128, y: 128, trim: { x:  0, y:  6, w: 128, h: 86 } },
+    mountain: { x: 256, y: 128, trim: { x:  0, y:  3, w: 128, h: 91 } },
+    road:     { x: 384, y: 128, trim: { x:  0, y:  6, w: 114, h: 88 } },
+  },
+};
 
-const FS_SRC_300 = `#version 300 es
-precision highp float;
-in vec3 vNormal;
-in vec3 vColor;
-in vec3 vWorldPos;
-out vec4 fragColor;
-uniform vec3 uLightDir;
-uniform vec3 uSeasonTint;
-uniform float uTime;
-uniform vec2 uCameraCenter;
-uniform float uSnowAmount;
-uniform float uAutumnAmount;
-uniform float uDayPhase;
-uniform float uRainAmount;
-void main() {
-  vec3 N = normalize(vNormal);
-  float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.25;
-  vec3 diffuse = vColor * NdotL * 1.1;
-  vec3 litColor = (ambient + diffuse) * uSeasonTint;
-  // Forest rim light: sky-fill on side faces of tree/forest geometry makes canopy feel 3D
-  bool isForest = vColor.g > 0.38 && vColor.g > vColor.r * 1.05 && vColor.b < 0.45 && vColor.g < 0.72;
-  if (isForest && N.y < 0.35) {
-    float skyFill = max(0.0, -dot(N, vec3(0.0, -1.0, 0.0)) + 0.5);
-    litColor += vec3(0.18, 0.32, 0.42) * skyFill * 0.28;
-  }
-  bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
-  // Grass micro-variation: per-tile hash breaks up uniform green carpet
-  if (isGrass && N.y > 0.5) {
-    vec2 tileId = floor(vWorldPos.xz);
-    float h = fract(sin(dot(tileId, vec2(23.7, 57.3))) * 31241.9);
-    float brightVar = 0.88 + h * 0.22;
-    float hueShift = h * 0.08 - 0.04; // subtle yellow↔cool shift
-    litColor *= vec3(brightVar + hueShift, brightVar, brightVar - hueShift * 0.5);
-  }
-  // Sand ripple: noise-based shading on warm sandy tiles (beach/desert)
-  bool isSand = vColor.r > 0.80 && vColor.g > 0.68 && vColor.g < 0.85 && vColor.b < 0.60;
-  if (isSand && N.y > 0.5) {
-    vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
-    float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
-    litColor *= 0.90 + ripple * 0.18;
-    float wetness = 1.0 - smoothstep(0.0, 0.85, vWorldPos.y);
-    vec3 wetSandCol = vec3(0.58, 0.46, 0.26);
-    litColor = mix(litColor, wetSandCol * (0.38 + NdotL * 0.75), wetness * 0.60);
-  }
-  // Stone mottling: mineral veins and rock surface texture variation
-  bool isStone = vColor.r > 0.38 && vColor.r < 0.72 && abs(vColor.r - vColor.g) < 0.10 && abs(vColor.g - vColor.b) < 0.10;
-  if (isStone) {
-    float sv1 = sin(vWorldPos.x * 3.7 + vWorldPos.y * 2.1 + vWorldPos.z * 4.3);
-    float sv2 = cos(vWorldPos.x * 2.9 + vWorldPos.z * 3.1 + vWorldPos.y * 1.7);
-    float mottle = sv1 * sv2 * 0.5 + 0.5;
-    float vein = smoothstep(0.68, 0.74, mottle) * 0.18;
-    litColor = mix(litColor * (0.88 + mottle * 0.18), litColor + vec3(0.08, 0.07, 0.05) * vein, 0.8);
-  }
-  // Autumn: shift green foliage/grass to orange-amber
-  if (isGrass && uAutumnAmount > 0.0) {
-    vec3 autumnCol = vec3(0.88, 0.50, 0.06);
-    litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
-  }
-  // Compute night amount early — needed for water and sky sections
-  float nightPhase = abs(uDayPhase - 0.5); // 0=noon, 0.5=midnight
-  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
-  // Cloud shadows: drifting dark patches on top-facing terrain during daytime
-  if (N.y > 0.5 && nightAmt < 0.8 && uRainAmount < 0.5) {
-    vec2 cUV = vWorldPos.xz * 0.07 + vec2(uTime * 0.018, uTime * 0.011);
-    float c1 = sin(cUV.x * 3.1 + sin(cUV.y * 2.3)) * 0.5 + 0.5;
-    float c2 = sin(cUV.x * 1.7 + cUV.y * 2.9 + 1.4) * 0.5 + 0.5;
-    float cloud = smoothstep(0.55, 0.75, c1 * c2);
-    litColor *= 1.0 - cloud * 0.22 * (1.0 - nightAmt);
-  }
-  // Winter snow: height-scaled gradient + crisp alpine snowline above y=2.5
-  bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
-  if (!isWater && uSnowAmount > 0.0) {
-    float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
-    float snowLine = smoothstep(2.3, 2.65, vWorldPos.y); // sharp alpine line
-    float snowBlend = mix(heightFactor, 1.0, snowLine);
-    vec3 snowCol = vec3(0.90, 0.93, 0.98);
-    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * snowBlend);
-    // Snow specular: sun glint on snowfields and alpine peaks
-    if (N.y > 0.4) {
-      vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
-      vec3 halfVec = normalize(uLightDir + viewDir);
-      float snowSpec = pow(max(0.0, dot(N, halfVec)), 28.0);
-      litColor += vec3(0.95, 0.97, 1.0) * snowSpec * uSnowAmount * snowBlend * 0.6;
-    }
-  }
-  // Animated water sparkle + specular — sun glint by day, moonpath by night
-  if (isWater) {
-    // Depth variation: shallow coastal water is turquoise, deep open water is navy
-    float depthNoise = sin(vWorldPos.x * 0.22 + 1.3) * cos(vWorldPos.z * 0.19 + 0.7) * 0.5 + 0.5;
-    vec3 shallowCol = vec3(0.28, 0.68, 0.75); // turquoise-teal
-    vec3 deepCol    = vec3(0.08, 0.18, 0.42); // deep navy
-    vec3 waterBase  = mix(deepCol, shallowCol, depthNoise * 0.65);
-    litColor = mix(waterBase * (0.3 + NdotL * 0.5), litColor, 0.35);
-    float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
-    float sparkle = pow(max(0.0, s), 6.0) * 0.35;
-    litColor += mix(vec3(sparkle * 0.7, sparkle * 0.85, sparkle),
-                    vec3(sparkle * 0.55, sparkle * 0.65, sparkle), nightAmt);
-    float wnx = sin(vWorldPos.x * 4.1 + uTime * 1.8) * 0.28;
-    float wnz = cos(vWorldPos.z * 3.7 + uTime * 2.1) * 0.28;
-    vec3 waveN = normalize(vec3(-wnx, 1.0, -wnz));
-    vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
-    vec3 halfVec = normalize(uLightDir + viewDir);
-    float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
-    // Day: warm sun glint. Night: bright silver moonpath (boosted intensity)
-    litColor += mix(vec3(1.0, 0.97, 0.88) * spec * 0.5,
-                    vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
-    // Whitecap foam: wave crests bleach to white-blue
-    float crest = smoothstep(0.05, 0.10, vWorldPos.y);
-    litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
-    // Moon reflection path: bright silver band runs diagonally across night water
-    if (nightAmt > 0.3) {
-      float moonPath = vWorldPos.x * 0.6 - vWorldPos.z * 0.8;
-      float moonBand = exp(-abs(moonPath - 8.0) * 0.18) + exp(-abs(moonPath + 4.0) * 0.28);
-      float moonRipple = 0.6 + 0.4 * sin(vWorldPos.x * 5.2 + uTime * 2.8) * cos(vWorldPos.z * 4.7 + uTime * 1.9);
-      litColor += vec3(0.82, 0.90, 1.0) * moonBand * moonRipple * nightAmt * 0.45;
-    }
-  }
-  // Rooftop sun specular: bright spot on building tops from direct sunlight
-  bool isRooftop = N.y > 0.7 && vWorldPos.y > 1.0 && !isGrass && !isWater && !isSand;
-  if (isRooftop && nightAmt < 0.7) {
-    vec3 roofView = normalize(vec3(0.57, 1.0, 0.57));
-    vec3 roofHalf = normalize(uLightDir + roofView);
-    float roofSpec = pow(max(0.0, dot(N, roofHalf)), 18.0) * (1.0 - nightAmt);
-    litColor += vec3(1.0, 0.96, 0.88) * roofSpec * 0.45;
-  }
-  // Night window glow: warm amber patches on building walls simulate lit windows
-  bool isBuildingWall = N.y < 0.3 && vWorldPos.y > 0.5 && vColor.r > 0.55 && vColor.r > vColor.b * 1.3;
-  if (isBuildingWall && nightAmt > 0.1) {
-    vec2 winHash = floor(vWorldPos.xz * 3.0 + vec2(vWorldPos.y * 1.7, 0.0));
-    float h = fract(sin(dot(winHash, vec2(17.3, 41.7))) * 8273.5);
-    float flicker = 0.85 + 0.15 * sin(uTime * (3.0 + h * 5.0) + h * 6.28);
-    float windowGlow = step(0.55, h) * nightAmt * 0.55 * flicker;
-    litColor += vec3(1.0, 0.72, 0.20) * windowGlow;
-  }
-  // Rain: overcast darkening + diagonal streaks on terrain tops
-  if (uRainAmount > 0.0) {
-    litColor *= mix(1.0, 0.70, uRainAmount);
-    if (N.y > 0.5) {
-      float streak = fract((vWorldPos.x - vWorldPos.z * 0.5) * 5.0 + uTime * 9.0);
-      float drop = step(0.93, streak) * 0.4;
-      litColor += vec3(0.55, 0.65, 0.80) * drop * uRainAmount;
-    }
-  }
-  float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
-  float fog = smoothstep(30.0, 46.0, fogDist);
-  // Atmospheric perspective: distant tiles desaturate before fog takes over
-  float atmDist = smoothstep(18.0, 30.0, fogDist);
-  float lum = dot(litColor, vec3(0.299, 0.587, 0.114));
-  litColor = mix(litColor, vec3(lum) * 0.9 + vec3(0.06, 0.09, 0.14) * 0.1, atmDist * 0.45);
-  // Sky/fog color shifts with time of day: dawn amber → noon blue → dusk purple → night navy
-  float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
-  float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
-  vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
-  vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
-  vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
-  vec3 skyNight = vec3(0.04, 0.07, 0.18);
-  vec3 skyCol = mix(mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk), skyNight, nightAmt);
-  // Warm sunrise/sunset tint bleeds into lit surfaces
-  litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
-  // God rays: diagonal light shafts sweep terrain at dawn/dusk
-  float goldenHour = max(dawn, dusk * 0.8);
-  if (goldenHour > 0.05 && N.y > 0.4) {
-    float rayDir = dawn > dusk ? 1.0 : -1.0;
-    float shaftCoord = (vWorldPos.x * 0.6 + vWorldPos.z * 0.4) * 0.18 + uTime * 0.04 * rayDir;
-    float shaft = pow(max(0.0, sin(shaftCoord * 6.28318) * 0.5 + 0.5), 6.0);
-    vec3 rayCol = mix(vec3(1.0, 0.80, 0.45), vec3(0.90, 0.55, 0.70), dusk);
-    litColor += rayCol * shaft * goldenHour * 0.22;
-  }
-  // Night: dim scene to moonlit blue-silver
-  vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
-  litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
-  vec3 finalCol = mix(litColor, skyCol, fog * 0.8);
-  // Stars: random bright points in the dark fogged sky
-  if (nightAmt > 0.2 && fog > 0.55) {
-    vec2 sGrid = floor(vWorldPos.xz * 1.8);
-    float h = fract(sin(dot(sGrid, vec2(127.1, 311.7))) * 43758.5453);
-    float twinkle = 0.5 + 0.5 * sin(uTime * (2.0 + h * 4.0) + h * 31.4);
-    float star = step(0.965, h) * twinkle * nightAmt * fog;
-    finalCol += vec3(0.88, 0.92, 1.0) * star * 1.4;
-  }
-  // Final grade: gentle saturation boost + soft contrast lift
-  float finalLum = dot(finalCol, vec3(0.299, 0.587, 0.114));
-  finalCol = mix(vec3(finalLum), finalCol, 1.18);
-  finalCol = finalCol * 1.04 - 0.02;
-  fragColor = vec4(clamp(finalCol, 0.0, 1.0), 1.0);
-}`;
+const NATURE_ATLAS = {
+  url: 'assets/sprites/nature-atlas.png',
+  frames: {
+    pine:     { x:   0, y:   0, trim: { x: 25, y:  3, w:  81, h: 120 } },
+    oak:      { x: 128, y:   0, trim: { x: 12, y: 10, w: 104, h: 110 } },
+    birch:    { x: 256, y:   0, trim: { x: 20, y:  3, w:  75, h: 123 } },
+    stone:    { x:   0, y: 128, trim: { x: 13, y: 21, w: 102, h:  85 } },
+    iron:     { x: 128, y: 128, trim: { x: 11, y: 19, w:  98, h:  86 } },
+    mountain: { x: 256, y: 128, trim: { x:  7, y:  8, w: 104, h: 104 } },
+    flowers:  { x: 384, y: 128, trim: { x: 11, y: 24, w:  96, h:  85 } },
+  },
+};
 
-// WebGL1 fallback shaders
-const VS_SRC_100 = `
-attribute vec3 aPos;
-attribute vec3 aNormal;
-attribute vec3 aColor;
-uniform mat4 uViewProj;
-uniform float uTime;
-varying vec3 vNormal;
-varying vec3 vColor;
-varying vec3 vWorldPos;
-void main() {
-  vec3 pos = aPos;
-  bool isWater = aColor.b > 0.6 && aColor.r < 0.2;
-  if (isWater && aPos.y < 0.01) {
-    float wave = sin(aPos.x * 0.8 + uTime * 1.5) * 0.08
-               + cos(aPos.z * 0.8 + uTime * 1.2) * 0.06;
-    pos.y += wave;
-  }
-  bool isGrassV = aColor.g > aColor.r * 1.1 && aColor.g > aColor.b && aColor.b < 0.55;
-  if (isGrassV && aNormal.y > 0.5) {
-    float sway = sin(aPos.x * 1.3 + aPos.z * 0.9 + uTime * 1.1) * 0.025
-               + cos(aPos.x * 0.8 + aPos.z * 1.4 + uTime * 0.8) * 0.018;
-    pos.y += sway;
-  }
-  gl_Position = uViewProj * vec4(pos, 1.0);
-  vNormal = aNormal;
-  vColor = aColor;
-  vWorldPos = pos;
-}`;
+const BUILDING_ATLAS = {
+  url: 'assets/sprites/buildings-atlas-painted.png',
+  cell: 128,
+  cols: 4,
+  types: [
+    'granary', 'castle', 'church', 'windmill',
+    'tower', 'house', 'tavern', 'blacksmith',
+    'market', 'bakery', 'barracks', 'townhall',
+    'well',
+  ],
+  trims: {
+    granary:    { x: 17, y:  8, w: 100, h: 120 },
+    castle:     { x:  3, y:  9, w: 125, h: 114 },
+    church:     { x:  0, y:  7, w: 109, h: 118 },
+    windmill:   { x:  6, y:  8, w:  97, h: 118 },
+    tower:      { x: 19, y:  1, w:  86, h: 123 },
+    house:      { x:  2, y: 13, w: 110, h: 106 },
+    tavern:     { x:  2, y: 10, w: 113, h: 112 },
+    blacksmith: { x:  1, y:  6, w: 112, h: 118 },
+    market:     { x:  8, y: 21, w: 105, h:  97 },
+    bakery:     { x:  1, y:  9, w: 118, h: 110 },
+    barracks:   { x:  0, y:  9, w: 128, h: 109 },
+    townhall:   { x:  0, y:  0, w: 112, h: 121 },
+    well:       { x: 12, y:  6, w:  94, h: 112 },
+  },
+  sizes: {
+    granary: 64, castle: 88, church: 84, windmill: 84, tower: 82,
+    house: 66, tavern: 70, blacksmith: 68, market: 64, bakery: 66,
+    barracks: 70, townhall: 74, well: 50,
+  },
+};
 
-const FS_SRC_100 = `
-precision highp float;
-varying vec3 vNormal;
-varying vec3 vColor;
-varying vec3 vWorldPos;
-uniform vec3 uLightDir;
-uniform vec3 uSeasonTint;
-uniform float uTime;
-uniform vec2 uCameraCenter;
-uniform float uSnowAmount;
-uniform float uAutumnAmount;
-uniform float uDayPhase;
-uniform float uRainAmount;
-void main() {
-  vec3 N = normalize(vNormal);
-  float NdotL = max(0.0, dot(N, uLightDir));
-  vec3 ambient = vColor * 0.25;
-  vec3 diffuse = vColor * NdotL * 1.1;
-  vec3 litColor = (ambient + diffuse) * uSeasonTint;
-  bool isForest = vColor.g > 0.38 && vColor.g > vColor.r * 1.05 && vColor.b < 0.45 && vColor.g < 0.72;
-  if (isForest && N.y < 0.35) {
-    float skyFill = max(0.0, -dot(N, vec3(0.0, -1.0, 0.0)) + 0.5);
-    litColor += vec3(0.18, 0.32, 0.42) * skyFill * 0.28;
-  }
-  bool isGrass = vColor.g > vColor.r * 1.1 && vColor.g > vColor.b && vColor.b < 0.55;
-  if (isGrass && N.y > 0.5) {
-    vec2 tileId = floor(vWorldPos.xz);
-    float h = fract(sin(dot(tileId, vec2(23.7, 57.3))) * 31241.9);
-    float brightVar = 0.88 + h * 0.22;
-    float hueShift = h * 0.08 - 0.04;
-    litColor *= vec3(brightVar + hueShift, brightVar, brightVar - hueShift * 0.5);
-  }
-  bool isSand = vColor.r > 0.80 && vColor.g > 0.68 && vColor.g < 0.85 && vColor.b < 0.60;
-  if (isSand && N.y > 0.5) {
-    vec2 rp = vWorldPos.xz * 2.4 + vec2(uTime * 0.06, uTime * 0.04);
-    float ripple = sin(rp.x + sin(rp.y * 0.7)) * 0.5 + 0.5;
-    litColor *= 0.90 + ripple * 0.18;
-    // Wet sand near waterline: darker, cooler, more saturated toward y=0
-    float wetness = 1.0 - smoothstep(0.0, 0.85, vWorldPos.y);
-    vec3 wetSandCol = vec3(0.58, 0.46, 0.26);
-    litColor = mix(litColor, wetSandCol * (0.38 + NdotL * 0.75), wetness * 0.60);
-  }
-  bool isStone = vColor.r > 0.38 && vColor.r < 0.72 && abs(vColor.r - vColor.g) < 0.10 && abs(vColor.g - vColor.b) < 0.10;
-  if (isStone) {
-    float sv1 = sin(vWorldPos.x * 3.7 + vWorldPos.y * 2.1 + vWorldPos.z * 4.3);
-    float sv2 = cos(vWorldPos.x * 2.9 + vWorldPos.z * 3.1 + vWorldPos.y * 1.7);
-    float mottle = sv1 * sv2 * 0.5 + 0.5;
-    float vein = smoothstep(0.68, 0.74, mottle) * 0.18;
-    litColor = mix(litColor * (0.88 + mottle * 0.18), litColor + vec3(0.08, 0.07, 0.05) * vein, 0.8);
-  }
-  if (isGrass && uAutumnAmount > 0.0) {
-    vec3 autumnCol = vec3(0.88, 0.50, 0.06);
-    litColor = mix(litColor, autumnCol * (0.40 + NdotL * 0.9), uAutumnAmount * 0.72);
-  }
-  float nightPhase = abs(uDayPhase - 0.5);
-  float nightAmt = smoothstep(0.30, 0.47, nightPhase);
-  if (N.y > 0.5 && nightAmt < 0.8 && uRainAmount < 0.5) {
-    vec2 cUV = vWorldPos.xz * 0.07 + vec2(uTime * 0.018, uTime * 0.011);
-    float c1 = sin(cUV.x * 3.1 + sin(cUV.y * 2.3)) * 0.5 + 0.5;
-    float c2 = sin(cUV.x * 1.7 + cUV.y * 2.9 + 1.4) * 0.5 + 0.5;
-    float cloud = smoothstep(0.55, 0.75, c1 * c2);
-    litColor *= 1.0 - cloud * 0.22 * (1.0 - nightAmt);
-  }
-  bool isWater = vColor.b > 0.55 && vColor.r < 0.25;
-  if (!isWater && uSnowAmount > 0.0) {
-    float heightFactor = clamp((vWorldPos.y - 0.5) / 2.0, 0.12, 1.0);
-    float snowLine = smoothstep(2.3, 2.65, vWorldPos.y);
-    float snowBlend = mix(heightFactor, 1.0, snowLine);
-    vec3 snowCol = vec3(0.90, 0.93, 0.98);
-    litColor = mix(litColor, snowCol * (0.55 + NdotL * 0.6), uSnowAmount * snowBlend);
-    if (N.y > 0.4) {
-      vec3 viewDir2 = normalize(vec3(0.57, 1.0, 0.57));
-      vec3 halfVec2 = normalize(uLightDir + viewDir2);
-      float snowSpec = pow(max(0.0, dot(N, halfVec2)), 28.0);
-      litColor += vec3(0.95, 0.97, 1.0) * snowSpec * uSnowAmount * snowBlend * 0.6;
-    }
-  }
-  if (isWater) {
-    float depthNoise = sin(vWorldPos.x * 0.22 + 1.3) * cos(vWorldPos.z * 0.19 + 0.7) * 0.5 + 0.5;
-    vec3 shallowCol = vec3(0.28, 0.68, 0.75);
-    vec3 deepCol    = vec3(0.08, 0.18, 0.42);
-    vec3 waterBase  = mix(deepCol, shallowCol, depthNoise * 0.65);
-    litColor = mix(waterBase * (0.3 + NdotL * 0.5), litColor, 0.35);
-    float s = sin(vWorldPos.x * 2.8 + uTime * 2.2) * cos(vWorldPos.z * 2.1 + uTime * 1.7);
-    float sparkle = pow(max(0.0, s), 6.0) * 0.35;
-    litColor += mix(vec3(sparkle * 0.7, sparkle * 0.85, sparkle),
-                    vec3(sparkle * 0.55, sparkle * 0.65, sparkle), nightAmt);
-    float wnx = sin(vWorldPos.x * 4.1 + uTime * 1.8) * 0.28;
-    float wnz = cos(vWorldPos.z * 3.7 + uTime * 2.1) * 0.28;
-    vec3 waveN = normalize(vec3(-wnx, 1.0, -wnz));
-    vec3 viewDir = normalize(vec3(0.57, 1.0, 0.57));
-    vec3 halfVec = normalize(uLightDir + viewDir);
-    float spec = pow(max(0.0, dot(waveN, halfVec)), 12.0);
-    litColor += mix(vec3(1.0, 0.97, 0.88) * spec * 0.5,
-                    vec3(0.75, 0.85, 1.0) * spec * 1.2, nightAmt);
-    float crest = smoothstep(0.05, 0.10, vWorldPos.y);
-    litColor = mix(litColor, vec3(0.91, 0.95, 1.0), crest * 0.75 * (1.0 - nightAmt * 0.5));
-    if (nightAmt > 0.3) {
-      float moonPath = vWorldPos.x * 0.6 - vWorldPos.z * 0.8;
-      float moonBand = exp(-abs(moonPath - 8.0) * 0.18) + exp(-abs(moonPath + 4.0) * 0.28);
-      float moonRipple = 0.6 + 0.4 * sin(vWorldPos.x * 5.2 + uTime * 2.8) * cos(vWorldPos.z * 4.7 + uTime * 1.9);
-      litColor += vec3(0.82, 0.90, 1.0) * moonBand * moonRipple * nightAmt * 0.45;
-    }
-  }
-  bool isRooftop = N.y > 0.7 && vWorldPos.y > 1.0 && !isGrass && !isWater && !isSand;
-  if (isRooftop && nightAmt < 0.7) {
-    vec3 roofView = normalize(vec3(0.57, 1.0, 0.57));
-    vec3 roofHalf = normalize(uLightDir + roofView);
-    float roofSpec = pow(max(0.0, dot(N, roofHalf)), 18.0) * (1.0 - nightAmt);
-    litColor += vec3(1.0, 0.96, 0.88) * roofSpec * 0.45;
-  }
-  bool isBuildingWall = N.y < 0.3 && vWorldPos.y > 0.5 && vColor.r > 0.55 && vColor.r > vColor.b * 1.3;
-  if (isBuildingWall && nightAmt > 0.1) {
-    vec2 winHash = floor(vWorldPos.xz * 3.0 + vec2(vWorldPos.y * 1.7, 0.0));
-    float h = fract(sin(dot(winHash, vec2(17.3, 41.7))) * 8273.5);
-    float flicker = 0.85 + 0.15 * sin(uTime * (3.0 + h * 5.0) + h * 6.28);
-    float windowGlow = step(0.55, h) * nightAmt * 0.55 * flicker;
-    litColor += vec3(1.0, 0.72, 0.20) * windowGlow;
-  }
-  if (uRainAmount > 0.0) {
-    litColor *= mix(1.0, 0.70, uRainAmount);
-    if (N.y > 0.5) {
-      float streak = fract((vWorldPos.x - vWorldPos.z * 0.5) * 5.0 + uTime * 9.0);
-      float drop = step(0.93, streak) * 0.4;
-      litColor += vec3(0.55, 0.65, 0.80) * drop * uRainAmount;
-    }
-  }
-  float fogDist = length(vec2(vWorldPos.x - uCameraCenter.x, vWorldPos.z - uCameraCenter.y));
-  float fog = smoothstep(30.0, 46.0, fogDist);
-  float atmDist = smoothstep(18.0, 30.0, fogDist);
-  float lum = dot(litColor, vec3(0.299, 0.587, 0.114));
-  litColor = mix(litColor, vec3(lum) * 0.9 + vec3(0.06, 0.09, 0.14) * 0.1, atmDist * 0.45);
-  float dawn = max(0.0, 1.0 - abs(uDayPhase - 0.15) * 6.0);
-  float dusk = max(0.0, 1.0 - abs(uDayPhase - 0.85) * 6.0);
-  vec3 skyNoon  = vec3(0.45, 0.68, 0.88);
-  vec3 skyDawn  = vec3(0.96, 0.65, 0.38);
-  vec3 skyDusk  = vec3(0.70, 0.45, 0.72);
-  vec3 skyNight = vec3(0.04, 0.07, 0.18);
-  vec3 skyCol = mix(mix(mix(skyNoon, skyDawn, dawn), skyDusk, dusk), skyNight, nightAmt);
-  litColor = mix(litColor, litColor * mix(vec3(1.0), vec3(1.18, 0.90, 0.72), dawn + dusk * 0.7), 0.35);
-  float goldenHour = max(dawn, dusk * 0.8);
-  if (goldenHour > 0.05 && N.y > 0.4) {
-    float rayDir = dawn > dusk ? 1.0 : -1.0;
-    float shaftCoord = (vWorldPos.x * 0.6 + vWorldPos.z * 0.4) * 0.18 + uTime * 0.04 * rayDir;
-    float shaft = pow(max(0.0, sin(shaftCoord * 6.28318) * 0.5 + 0.5), 6.0);
-    vec3 rayCol = mix(vec3(1.0, 0.80, 0.45), vec3(0.90, 0.55, 0.70), dusk);
-    litColor += rayCol * shaft * goldenHour * 0.22;
-  }
-  vec3 moonlit = vec3(0.50, 0.60, 0.82) * 0.15;
-  litColor = mix(litColor, litColor * 0.10 + moonlit, nightAmt);
-  vec3 finalCol = mix(litColor, skyCol, fog * 0.8);
-  if (nightAmt > 0.2 && fog > 0.55) {
-    vec2 sGrid = floor(vWorldPos.xz * 1.8);
-    float h = fract(sin(dot(sGrid, vec2(127.1, 311.7))) * 43758.5453);
-    float twinkle = 0.5 + 0.5 * sin(uTime * (2.0 + h * 4.0) + h * 31.4);
-    float star = step(0.965, h) * twinkle * nightAmt * fog;
-    finalCol += vec3(0.88, 0.92, 1.0) * star * 1.4;
-  }
-  float finalLum = dot(finalCol, vec3(0.299, 0.587, 0.114));
-  finalCol = mix(vec3(finalLum), finalCol, 1.18);
-  finalCol = finalCol * 1.04 - 0.02;
-  gl_FragColor = vec4(clamp(finalCol, 0.0, 1.0), 1.0);
-}`;
+const SUPPORT_ATLAS = {
+  url: 'assets/sprites/support-atlas.png',
+  cell: 128,
+  cols: 4,
+  types: [
+    'farm', 'lumber', 'quarry', 'mine',
+    'fisherman', 'tradingpost', 'school', 'archery',
+    'wall', 'road', 'chickencoop', 'cowpen',
+  ],
+  trims: {
+    farm:        { x:  4, y: 37, w: 124, h:  86 },
+    lumber:      { x:  0, y: 23, w: 127, h: 100 },
+    quarry:      { x:  5, y: 24, w: 117, h:  99 },
+    mine:        { x:  1, y: 23, w: 122, h:  99 },
+    fisherman:   { x:  4, y:  9, w: 121, h: 102 },
+    tradingpost: { x:  5, y:  6, w: 118, h: 108 },
+    school:      { x:  6, y:  2, w: 114, h: 126 },
+    archery:     { x:  0, y: 12, w: 124, h: 116 },
+    wall:        { x: 11, y:  7, w: 117, h: 121 },
+    road:        { x:  0, y:  8, w: 123, h: 120 },
+    chickencoop: { x:  3, y:  0, w: 125, h: 128 },
+    cowpen:      { x:  0, y:  0, w: 123, h: 128 },
+  },
+  sizes: {
+    farm: 54, lumber: 66, quarry: 62, mine: 64, fisherman: 66,
+    tradingpost: 66, school: 68, archery: 62, wall: 44, road: 40,
+    chickencoop: 52, cowpen: 56,
+  },
+};
 
-// ── Matrix math ────────────────────────────────────────────
-function mat4Identity() {
-  return new Float32Array([
-    1,0,0,0,
-    0,1,0,0,
-    0,0,1,0,
-    0,0,0,1,
-  ]);
+const ACTOR_ATLAS = {
+  url: 'assets/sprites/actors-atlas.png',
+  w: 32,
+  h: 42,
+  frames: 4,
+  dirs: ['down', 'up', 'left', 'right'],
+  actions: ['idle', 'walk', 'work', 'carry'],
+  variants: ['settler', 'farmer', 'lumber', 'miner', 'fisher', 'trader', 'builder', 'guard', 'forager'],
+};
+
+const imgCache = new Map();
+
+function loadImage(url) {
+  const cached = imgCache.get(url);
+  if (cached) return cached.complete && cached.naturalWidth ? cached : null;
+  const img = new Image();
+  img.decoding = 'async';
+  img.src = url;
+  imgCache.set(url, img);
+  return null;
 }
 
-function mat4Multiply(a, b) {
-  const out = new Float32Array(16);
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 4; c++) {
-      let sum = 0;
-      for (let k = 0; k < 4; k++) {
-        sum += a[r + k*4] * b[k + c*4];
-      }
-      out[r + c*4] = sum;
-    }
-  }
-  return out;
+function prewarmImages() {
+  for (const url of [
+    TERRAIN_ATLAS.url,
+    NATURE_ATLAS.url,
+    BUILDING_ATLAS.url,
+    SUPPORT_ATLAS.url,
+    ACTOR_ATLAS.url,
+  ]) loadImage(url);
 }
 
-function mat4Ortho(left, right, bottom, top, near, far) {
-  const out = new Float32Array(16);
-  const rl = right - left;
-  const tb = top - bottom;
-  const fn = far - near;
-  out[0]  =  2 / rl;
-  out[5]  =  2 / tb;
-  out[10] = -2 / fn;
-  out[12] = -(right + left) / rl;
-  out[13] = -(top + bottom) / tb;
-  out[14] = -(far + near) / fn;
-  out[15] = 1;
-  return out;
+function clamp(n, lo, hi) {
+  return Math.max(lo, Math.min(hi, n));
 }
 
-function mat4RotateX(rad) {
-  const c = Math.cos(rad), s = Math.sin(rad);
-  return new Float32Array([
-    1, 0,  0, 0,
-    0, c,  s, 0,
-    0,-s,  c, 0,
-    0, 0,  0, 1,
-  ]);
+function hash2(x, y, salt = 0) {
+  let h = ((x * 374761393) ^ (y * 668265263) ^ (salt * 362437)) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+  return (h ^ (h >>> 16)) >>> 0;
 }
 
-function mat4RotateY(rad) {
-  const c = Math.cos(rad), s = Math.sin(rad);
-  return new Float32Array([
-     c, 0,-s, 0,
-     0, 1, 0, 0,
-     s, 0, c, 0,
-     0, 0, 0, 1,
-  ]);
+function shadeColor(hex, amt) {
+  let c = hex.startsWith('#') ? hex.slice(1) : hex;
+  if (c.length === 3) c = c.split('').map(ch => ch + ch).join('');
+  const num = parseInt(c, 16);
+  let r = (num >> 16) & 255;
+  let g = (num >> 8) & 255;
+  let b = num & 255;
+  r = clamp(Math.round(r + amt), 0, 255);
+  g = clamp(Math.round(g + amt), 0, 255);
+  b = clamp(Math.round(b + amt), 0, 255);
+  return `rgb(${r},${g},${b})`;
 }
 
-function mat4Translate(tx, ty, tz) {
-  return new Float32Array([
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    tx, ty, tz, 1,
-  ]);
+function tileHeight(tile) {
+  return HEIGHT_PX[tile] ?? 10;
 }
 
-// ── Shader compilation helpers ─────────────────────────────
-function compileShader(glCtx, type, src) {
-  const sh = glCtx.createShader(type);
-  glCtx.shaderSource(sh, src);
-  glCtx.compileShader(sh);
-  if (!glCtx.getShaderParameter(sh, glCtx.COMPILE_STATUS)) {
-    const log = glCtx.getShaderInfoLog(sh);
-    glCtx.deleteShader(sh);
-    throw new Error('Shader compile error: ' + log);
-  }
-  return sh;
-}
-
-function createProgram(glCtx, vsSrc, fsSrc) {
-  const vs = compileShader(glCtx, glCtx.VERTEX_SHADER, vsSrc);
-  const fs = compileShader(glCtx, glCtx.FRAGMENT_SHADER, fsSrc);
-  const prog = glCtx.createProgram();
-  glCtx.attachShader(prog, vs);
-  glCtx.attachShader(prog, fs);
-  glCtx.linkProgram(prog);
-  if (!glCtx.getProgramParameter(prog, glCtx.LINK_STATUS)) {
-    const log = glCtx.getProgramInfoLog(prog);
-    glCtx.deleteProgram(prog);
-    throw new Error('Program link error: ' + log);
-  }
-  glCtx.deleteShader(vs);
-  glCtx.deleteShader(fs);
-  return prog;
-}
-
-// ── Mesh geometry helpers ──────────────────────────────────
-// We build a flat array:  [x,y,z, nx,ny,nz, r,g,b]  per vertex
-// and a separate Uint32Array of indices.
-
-function pushFace(verts, indices, positions, normal, color) {
-  // positions: array of 4 [x,y,z], normal: [nx,ny,nz], color: [r,g,b]
-  const base = verts.length / 9;  // 9 floats per vertex
-  for (const p of positions) {
-    verts.push(p[0], p[1], p[2], normal[0], normal[1], normal[2], color[0], color[1], color[2]);
-  }
-  // Two triangles: base+0,1,2 and base+0,2,3
-  indices.push(base, base+1, base+2, base, base+2, base+3);
-}
-
-// Per-vertex normals variant — for height-field top faces
-function pushFaceNormals(verts, indices, positions, normals, color) {
-  const base = verts.length / 9;
-  for (let i = 0; i < 4; i++) {
-    const p = positions[i], n = normals[i];
-    verts.push(p[0], p[1], p[2], n[0], n[1], n[2], color[0], color[1], color[2]);
-  }
-  indices.push(base, base+1, base+2, base, base+2, base+3);
-}
-
-function pushTri(verts, indices, p0, p1, p2, normal, color) {
-  const base = verts.length / 9;
-  for (const p of [p0, p1, p2]) {
-    verts.push(p[0], p[1], p[2], normal[0], normal[1], normal[2], color[0], color[1], color[2]);
-  }
-  indices.push(base, base+1, base+2);
-}
-
-function pushBox(verts, indices, x0, y0, z0, x1, y1, z1, color) {
-  // Top
-  pushFace(verts, indices, [[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]], [0,1,0], color);
-  // Bottom
-  pushFace(verts, indices, [[x0,y0,z0],[x0,y0,z1],[x1,y0,z1],[x1,y0,z0]], [0,-1,0], color);
-  // Front (+Z)
-  pushFace(verts, indices, [[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]], [0,0,1], color);
-  // Back (-Z)
-  pushFace(verts, indices, [[x1,y0,z0],[x0,y0,z0],[x0,y1,z0],[x1,y1,z0]], [0,0,-1], color);
-  // Right (+X)
-  pushFace(verts, indices, [[x1,y0,z1],[x1,y0,z0],[x1,y1,z0],[x1,y1,z1]], [1,0,0], color);
-  // Left (-X)
-  pushFace(verts, indices, [[x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0]], [-1,0,0], color);
-}
-
-// ── Tree geometry ──────────────────────────────────────────
-function addTree(verts, indices, cx, cz, groundY, S = 2.8) {
-  const baseY = groundY;
-  // Canopy only — no trunk box, keeps forest floor readable
-  const trunkH = 0.3 * S;  // canopy base height above ground
-  const canopyColor     = [0.18, 0.60, 0.22];
-  const canopyColorDark = [0.11, 0.40, 0.14];
-  const topY = baseY + trunkH + 1.6 * S;
-  const midY = baseY + trunkH;
-  const cw = 0.6 * S;
-  const apex = [cx, topY, cz];
-  // Front
-  pushTri(verts, indices,
-    [cx-cw, midY, cz+cw], [cx+cw, midY, cz+cw], apex,
-    [0, 0.3, 1], canopyColor
-  );
-  // Right
-  pushTri(verts, indices,
-    [cx+cw, midY, cz+cw], [cx+cw, midY, cz-cw], apex,
-    [1, 0.3, 0], canopyColorDark
-  );
-  // Back
-  pushTri(verts, indices,
-    [cx+cw, midY, cz-cw], [cx-cw, midY, cz-cw], apex,
-    [0, 0.3, -1], canopyColor
-  );
-  // Left
-  pushTri(verts, indices,
-    [cx-cw, midY, cz-cw], [cx-cw, midY, cz+cw], apex,
-    [-1, 0.3, 0], canopyColorDark
-  );
-}
-
-// ── Inline a GLB geometry at (cx, groundY, cz) with uniform scale ──
-// baseColor: optional color for the lower 38% of model height (hex base layer)
-// If omitted, the entire model uses `color`.
-// clipBase: if true, skip all triangles whose verts are in the bottom 36% of the model height.
-// Used for buildings to remove the Kenney hex tile base platform.
-// color = mid/wall color, trunkColor = lower 28%, roofColor = upper 32%
-function inlineGLBTree(verts, indices, geom, cx, groundY, cz, scale, color, clipBase, trunkColor, roofColor) {
-  const { positions, normals } = geom;
-  const vCount = positions.length / 3;
-
-  let minY = Infinity, maxY = -Infinity;
-  for (let i = 1; i < positions.length; i += 3) {
-    if (positions[i] < minY) minY = positions[i];
-    if (positions[i] > maxY) maxY = positions[i];
-  }
-  const range = maxY - minY;
-  const baseThreshold = minY + range * 0.36;
-  const trunkThreshold = minY + range * 0.28; // lower 28% = trunk/base
-  const roofThreshold  = minY + range * 0.68; // upper 32% = roof/top
-
-  // Map original vert index → new packed index (-1 = skipped)
-  const vertMap = new Int32Array(vCount).fill(-1);
-  const vertBase = verts.length / 9;
-  let newIdx = 0;
-
-  for (let i = 0; i < vCount; i++) {
-    if (clipBase && positions[i*3+1] < baseThreshold) continue;
-    vertMap[i] = vertBase + newIdx++;
-    const px = positions[i*3+0] * scale + cx;
-    const py = (positions[i*3+1] - minY) * scale + groundY;
-    const pz = positions[i*3+2] * scale + cz;
-    let c = color;
-    if (trunkColor && positions[i*3+1] < trunkThreshold) c = trunkColor;
-    else if (roofColor && positions[i*3+1] > roofThreshold)  c = roofColor;
-    verts.push(px, py, pz,
-      normals[i*3+0], normals[i*3+1], normals[i*3+2],
-      c[0], c[1], c[2]);
-  }
-
-  // Only emit triangles where all 3 verts survived clipping
-  const idxArr = geom.indices;
-  for (let t = 0; t < idxArr.length; t += 3) {
-    const a = vertMap[idxArr[t]], b = vertMap[idxArr[t+1]], c = vertMap[idxArr[t+2]];
-    if (a < 0 || b < 0 || c < 0) continue;
-    indices.push(a, b, c);
-  }
-}
-
-// ── Building geometry helpers ──────────────────────────────
-
-function addBuildingMesh(verts, indices, b, groundY) {
-  const cx = b.x + 0.5;
-  const cz = b.y + 0.5;
-  const gy = groundY;
-  const type = b.type;
-  const S = 4.0; // global building size multiplier for visibility
-
-  // Record vertex count before building; we'll scale them at the end
-  const vertStart = verts.length;
-  if (type === 'house') {
-    // Base box
-    const baseColor = [0.94, 0.88, 0.72];
-    const hw = 0.4;
-    const bh = 0.6;
-    pushBox(verts, indices, cx-hw, gy, cz-hw, cx+hw, gy+bh, cz+hw, baseColor);
-    // Pyramid roof
-    const roofColor = [0.88, 0.18, 0.12];
-    const roofBase = gy + bh;
-    const roofApex = roofBase + 0.5;
-    const rw = 0.42;
-    const apex = [cx, roofApex, cz];
-    pushTri(verts, indices, [cx-rw,roofBase,cz+rw], [cx+rw,roofBase,cz+rw], apex, [0,0.3,1], roofColor);
-    pushTri(verts, indices, [cx+rw,roofBase,cz+rw], [cx+rw,roofBase,cz-rw], apex, [1,0.3,0], roofColor);
-    pushTri(verts, indices, [cx+rw,roofBase,cz-rw], [cx-rw,roofBase,cz-rw], apex, [0,0.3,-1], roofColor);
-    pushTri(verts, indices, [cx-rw,roofBase,cz-rw], [cx-rw,roofBase,cz+rw], apex, [-1,0.3,0], roofColor);
-
-  } else if (type === 'farm') {
-    // Flat wooden platform
-    const platformColor = [0.72, 0.55, 0.30];
-    pushBox(verts, indices, cx-0.48, gy, cz-0.48, cx+0.48, gy+0.05, cz+0.48, platformColor);
-    // 4 crop boxes in 2x2 grid
-    const cropColor = [0.35, 0.22, 0.10];
-    const offsets = [[-0.2,-0.2],[0.2,-0.2],[-0.2,0.2],[0.2,0.2]];
-    for (const [ox, oz] of offsets) {
-      pushBox(verts, indices, cx+ox-0.08, gy+0.05, cz+oz-0.08, cx+ox+0.08, gy+0.18, cz+oz+0.08, cropColor);
-    }
-
-  } else if (type === 'tower') {
-    // Tall thin box
-    const towerColor = [0.55, 0.55, 0.60];
-    pushBox(verts, indices, cx-0.2, gy, cz-0.2, cx+0.2, gy+1.4, cz+0.2, towerColor);
-    // Turret on top
-    const turretColor = [0.40, 0.40, 0.45];
-    pushBox(verts, indices, cx-0.25, gy+1.4, cz-0.25, cx+0.25, gy+1.65, cz+0.25, turretColor);
-
-  } else if (type === 'church') {
-    // Wide base
-    const stoneColor = [0.87, 0.82, 0.74];
-    pushBox(verts, indices, cx-0.45, gy, cz-0.45, cx+0.45, gy+0.7, cz+0.45, stoneColor);
-    // Steeple tower on +X side
-    const steepleColor = [0.80, 0.75, 0.68];
-    pushBox(verts, indices, cx+0.15, gy, cz-0.15, cx+0.45, gy+1.4, cz+0.15, steepleColor);
-    // Steeple apex
-    const apexY = gy + 1.4 + 0.4;
-    const sc = 0.15;
-    const sa = [cx+0.3, apexY, cz];
-    pushTri(verts, indices, [cx+0.15,gy+1.4,cz+sc],[cx+0.45,gy+1.4,cz+sc], sa, [0,0.3,1], steepleColor);
-    pushTri(verts, indices, [cx+0.45,gy+1.4,cz+sc],[cx+0.45,gy+1.4,cz-sc], sa, [1,0.3,0], steepleColor);
-    pushTri(verts, indices, [cx+0.45,gy+1.4,cz-sc],[cx+0.15,gy+1.4,cz-sc], sa, [0,0.3,-1], steepleColor);
-    pushTri(verts, indices, [cx+0.15,gy+1.4,cz-sc],[cx+0.15,gy+1.4,cz+sc], sa, [-1,0.3,0], steepleColor);
-
-  } else if (type === 'barracks') {
-    // Grey stone, wide and lower
-    const barColor = [0.42, 0.45, 0.52];
-    pushBox(verts, indices, cx-0.48, gy, cz-0.38, cx+0.48, gy+0.55, cz+0.38, barColor);
-    // Flag stick (thin dark red box on top)
-    const flagColor = [0.55, 0.10, 0.10];
-    pushBox(verts, indices, cx+0.35, gy+0.55, cz-0.03, cx+0.42, gy+0.9, cz+0.03, flagColor);
-
-  } else if (type === 'market') {
-    // Low open platform
-    const platColor = [0.80, 0.72, 0.55];
-    pushBox(verts, indices, cx-0.48, gy, cz-0.48, cx+0.48, gy+0.2, cz+0.48, platColor);
-    // Red awning
-    const awningColor = [0.85, 0.22, 0.18];
-    pushBox(verts, indices, cx-0.4, gy+0.2, cz-0.4, cx+0.4, gy+0.35, cz+0.4, awningColor);
-
-  } else if (type === 'castle') {
-    // Main keep
-    const castleColor = [0.65, 0.62, 0.60];
-    pushBox(verts, indices, cx-0.35, gy, cz-0.35, cx+0.35, gy+1.3, cz+0.35, castleColor);
-    // Corner towers
-    const towerColor2 = [0.58, 0.55, 0.52];
-    pushBox(verts, indices, cx-0.48, gy, cz-0.48, cx-0.22, gy+1.0, cz-0.22, towerColor2);
-    pushBox(verts, indices, cx+0.22, gy, cz+0.22, cx+0.48, gy+1.0, cz+0.48, towerColor2);
-
-  } else if (type === 'well') {
-    // Stone ring base
-    const wellColor = [0.62, 0.58, 0.55];
-    pushBox(verts, indices, cx-0.22, gy, cz-0.22, cx+0.22, gy+0.25, cz+0.22, wellColor);
-    // Hollow out the top by just leaving a platform (visual approximation)
-    // Wooden crossbar
-    const woodColor = [0.55, 0.38, 0.18];
-    pushBox(verts, indices, cx-0.25, gy+0.25, cz-0.04, cx+0.25, gy+0.32, cz+0.04, woodColor);
-
-  } else if (type === 'tavern') {
-    // Warmer wood color, similar to house
-    const tavColor = [0.72, 0.48, 0.25];
-    pushBox(verts, indices, cx-0.42, gy, cz-0.42, cx+0.42, gy+0.65, cz+0.42, tavColor);
-    // Roof
-    const roofColor = [0.55, 0.30, 0.15];
-    const rb = gy + 0.65;
-    const ra = rb + 0.45;
-    const rw = 0.44;
-    const rapex = [cx, ra, cz];
-    pushTri(verts, indices, [cx-rw,rb,cz+rw],[cx+rw,rb,cz+rw], rapex, [0,0.3,1], roofColor);
-    pushTri(verts, indices, [cx+rw,rb,cz+rw],[cx+rw,rb,cz-rw], rapex, [1,0.3,0], roofColor);
-    pushTri(verts, indices, [cx+rw,rb,cz-rw],[cx-rw,rb,cz-rw], rapex, [0,0.3,-1], roofColor);
-    pushTri(verts, indices, [cx-rw,rb,cz-rw],[cx-rw,rb,cz+rw], rapex, [-1,0.3,0], roofColor);
-    // Chimney
-    const chimneyColor = [0.50, 0.45, 0.42];
-    pushBox(verts, indices, cx+0.2, gy+0.65, cz-0.08, cx+0.30, gy+0.95, cz+0.08, chimneyColor);
-
-  } else if (type === 'blacksmith') {
-    // Dark grey box
-    const smithColor = [0.35, 0.35, 0.40];
-    pushBox(verts, indices, cx-0.38, gy, cz-0.38, cx+0.38, gy+0.6, cz+0.38, smithColor);
-    // Chimney
-    const chimneyColor = [0.28, 0.28, 0.32];
-    pushBox(verts, indices, cx+0.18, gy+0.6, cz-0.08, cx+0.28, gy+0.95, cz+0.08, chimneyColor);
-
-  } else if (type === 'windmill') {
-    // Tall body
-    const wmColor = [0.78, 0.72, 0.62];
-    pushBox(verts, indices, cx-0.2, gy, cz-0.2, cx+0.2, gy+1.1, cz+0.2, wmColor);
-    // Cross blades (2 overlapping flat boxes)
-    const bladeColor = [0.90, 0.85, 0.70];
-    pushBox(verts, indices, cx-0.55, gy+0.85, cz-0.04, cx+0.55, gy+0.96, cz+0.04, bladeColor);
-    pushBox(verts, indices, cx-0.04, gy+0.55, cz-0.04, cx+0.04, gy+1.25, cz+0.04, bladeColor);
-
-  } else {
-    // Generic grey box for all others (quarry, mine, lumber, granary, etc.)
-    const genericColor = [0.55, 0.55, 0.55];
-    pushBox(verts, indices, cx-0.35, gy, cz-0.35, cx+0.35, gy+0.55, cz+0.35, genericColor);
-  }
-
-  // Scale all vertices of this building by S around (cx, gy, cz)
-  // Vertex layout is [x,y,z, nx,ny,nz, r,g,b] — 9 floats per vertex
-  for (let i = vertStart; i < verts.length; i += 9) {
-    verts[i]   = cx + (verts[i]   - cx) * S;
-    verts[i+1] = gy + (verts[i+1] - gy) * S;
-    verts[i+2] = cz + (verts[i+2] - cz) * S;
-  }
-}
-
-// ── Upload a mesh to a VAO/buffer pair ─────────────────────
-function uploadMesh(targetVao, targetVertBuf, targetIdxBuf, verts, indices) {
-  const vertData = new Float32Array(verts);
-  const idxData  = new Uint32Array(indices);
-  const STRIDE   = 9 * 4;
-
-  if (isWebGL2) {
-    gl.bindVertexArray(targetVao);
-  } else if (oeVao) {
-    oeVao.bindVertexArrayOES(targetVao);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, targetVertBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, vertData, gl.DYNAMIC_DRAW);
-
-  const aPosLoc    = gl.getAttribLocation(program, 'aPos');
-  const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
-  const aColorLoc  = gl.getAttribLocation(program, 'aColor');
-
-  gl.enableVertexAttribArray(aPosLoc);
-  gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
-
-  gl.enableVertexAttribArray(aNormalLoc);
-  gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
-
-  gl.enableVertexAttribArray(aColorLoc);
-  gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, targetIdxBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idxData, gl.DYNAMIC_DRAW);
-
-  if (isWebGL2) {
-    gl.bindVertexArray(null);
-  } else if (oeVao) {
-    oeVao.bindVertexArrayOES(null);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-  return idxData.length;
-}
-
-export function buildTerrainMesh() {
-  if (!gl) return;
-
-  const verts = [];
-  const indices = [];
-  const treeTiles = []; // collected during terrain loop, drawn after terrain
-
-  // Base height of a tile — used for side-face culling (only draw when neighbor is lower)
-  const tileBaseH = (r, c) => {
-    const tr = Math.max(0, Math.min(MAP_H - 1, r));
-    const tc = Math.max(0, Math.min(MAP_W - 1, c));
-    const tt = (G.map[tr] && G.map[tr][tc] !== undefined) ? G.map[tr][tc] : TILE.GRASS;
-    return TILE_HEIGHT[tt] !== undefined ? TILE_HEIGHT[tt] : 0.5;
+function iso(tx, ty) {
+  return {
+    x: (tx - ty) * TILE_W / 2,
+    y: (tx + ty) * TILE_H / 2,
   };
+}
 
-  // Noisy height for slope-normal computation only (not for geometry)
-  const tileH = (r, c) => {
-    const tr = Math.max(0, Math.min(MAP_H - 1, r));
-    const tc = Math.max(0, Math.min(MAP_W - 1, c));
-    const tt = (G.map[tr] && G.map[tr][tc] !== undefined) ? G.map[tr][tc] : TILE.GRASS;
-    const bh = TILE_HEIGHT[tt] !== undefined ? TILE_HEIGHT[tt] : 0.5;
-    if (tt === TILE.WATER) return bh;
-    const s = (tc * 374761 + tr * 668265) >>> 0;
-    return bh + ((s & 0xff) / 255 - 0.5) * 0.12;
+function worldToScreen(tx, ty) {
+  const p = iso(tx, ty);
+  const scale = G.camera?.zoom || 1.3;
+  const camX = (G.camera?.x || 0) * (TILE_W / TW);
+  const camY = (G.camera?.y || 0) * (TILE_H / TH);
+  return {
+    x: logicalW / 2 + (p.x - camX) * scale,
+    y: logicalH / 2 + (p.y - camY) * scale,
   };
-
-  // Compute smooth normal for a top-face vertex at (row, col) using Sobel-filter on heights
-  const vertNormal = (r, c) => {
-    const dx = (tileH(r, c + 1) - tileH(r, c - 1)) * 0.4; // moderate slope factor
-    const dz = (tileH(r + 1, c) - tileH(r - 1, c)) * 0.4;
-    const nx = -dx, ny = 1.0, nz = -dz;
-    const len = Math.sqrt(nx * nx + ny * ny + nz * nz);
-    return [nx / len, ny / len, nz / len];
-  };
-
-  for (let row = 0; row < MAP_H; row++) {
-    for (let col = 0; col < MAP_W; col++) {
-      const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
-      const baseH = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.5;
-      const baseColor = TILE_COLOR_3D[tileType] || [0.5, 0.5, 0.5];
-
-      // Per-tile deterministic noise for variety (breaks up the uniform-square look)
-      const seed = (col * 374761 + row * 668265) >>> 0;
-      const noise1 = ((seed & 0xff) / 255 - 0.5); // -0.5..0.5
-      const noise2 = (((seed >>> 8) & 0xff) / 255 - 0.5);
-
-      // Flat geometry within each biome — eliminates tile-edge ledges and triangle grid.
-      // tileH() still uses noise for slope normal computation (subtle shading variation).
-      const h = baseH;
-
-      // Subtle per-tile brightness jitter (±10%) breaks up the uniform-square look
-      const cv = 0.20 * noise1;
-      const color = [
-        Math.max(0, Math.min(1, baseColor[0] * (1 + cv))),
-        Math.max(0, Math.min(1, baseColor[1] * (1 + cv))),
-        Math.max(0, Math.min(1, baseColor[2] * (1 + cv))),
-      ];
-
-      const x0 = col;
-      const x1 = col + 1;
-      const z0 = row;
-      const z1 = row + 1;
-      const y  = h;    // top face at height h
-      const yb = -0.5;  // bottom goes below sea so no gaps
-
-      // Top face normal: flat for water (no grid), slope-based for land
-      let tileNormal;
-      if (tileType === TILE.WATER) {
-        tileNormal = [0, 1, 0];
-      } else {
-        const dx3 = (tileH(row, col + 1) - tileH(row, col - 1)) * 0.4;
-        const dz3 = (tileH(row + 1, col) - tileH(row - 1, col)) * 0.4;
-        const tnx = -dx3, tny = 1.0, tnz = -dz3;
-        const tlen = Math.sqrt(tnx * tnx + tny * tny + tnz * tnz);
-        tileNormal = [tnx / tlen, tny / tlen, tnz / tlen];
-      }
-      // Rock/mountain top faces get a lighter cap; grey sides stay dark
-      const topColor = tileType === TILE.MOUNTAIN
-        ? [0.88, 0.88, 0.92]   // snow cap
-        : tileType === TILE.STONE
-        ? [0.74, 0.70, 0.66]   // warm pale rock top
-        : color;
-      pushFace(verts, indices,
-        [ [x0,y,z0], [x1,y,z0], [x1,y,z1], [x0,y,z1] ],
-        tileNormal,
-        topColor
-      );
-
-      // Skip water side faces entirely — water is a flat plane
-      if (tileType === TILE.WATER) continue;
-
-      // Only draw a side face when the neighbor on that side is lower — avoids
-      // same-height tile walls that create the triangle grid within flat biomes
-      if (h > 0.0) {
-        const sideColor = color;
-        if (tileBaseH(row + 1, col) < h) {
-          pushFace(verts, indices,
-            [ [x0,yb,z1], [x1,yb,z1], [x1,y,z1], [x0,y,z1] ],
-            [0, 0, 1], sideColor
-          );
-        }
-        if (tileBaseH(row - 1, col) < h) {
-          pushFace(verts, indices,
-            [ [x1,yb,z0], [x0,yb,z0], [x0,y,z0], [x1,y,z0] ],
-            [0, 0, -1], sideColor
-          );
-        }
-        if (tileBaseH(row, col + 1) < h) {
-          pushFace(verts, indices,
-            [ [x1,yb,z1], [x1,yb,z0], [x1,y,z0], [x1,y,z1] ],
-            [1, 0, 0], sideColor
-          );
-        }
-        if (tileBaseH(row, col - 1) < h) {
-          pushFace(verts, indices,
-            [ [x0,yb,z0], [x0,yb,z1], [x0,y,z1], [x0,y,z0] ],
-            [-1, 0, 0], sideColor
-          );
-        }
-      }
-
-      // ~28% of FOREST tiles get a tree — keeps canopy readable without solid carpet
-      if (tileType === TILE.FOREST) {
-        const treeSeed = (col * 4517 + row * 2971) >>> 0;
-        if ((treeSeed % 25) < 7) {
-          // Vary tree height 1.4–2.6 — smaller canopy radius reduces overlap
-          const treeScale = 1.4 + ((treeSeed >>> 8) & 0xff) / 255 * 1.2;
-          treeTiles.push([col + 0.5, row + 0.5, h, treeScale, treeSeed]);
-        }
-      }
-    }
-  }
-
-  // Record terrain-only index count, then append tree geometry
-  terrainIndexCount = indices.length;
-  for (const [cx, cz, groundY, scale, treeSeed] of treeTiles) {
-    if (glbTreeVariants && glbTreeVariants.length > 0) {
-      const variantIdx = treeSeed % glbTreeVariants.length;
-      const variant = glbTreeVariants[variantIdx];
-      const glbScale = scale * 0.55;
-      // Slight color variation per variant so forest isn't uniform
-      const treeColors = [
-        [0.18, 0.60, 0.22], // default — medium forest green
-        [0.14, 0.50, 0.18], // tall — darker spruce
-        [0.22, 0.64, 0.26], // small — lighter young pine
-      ];
-      const canopyColor = treeColors[variantIdx];
-      const trunkColor = [0.42, 0.28, 0.14]; // warm brown bark
-      // Raise tree 0.08 above ground so base geometry doesn't clip terrain
-      inlineGLBTree(verts, indices, variant, cx, groundY + 0.08, cz, glbScale, canopyColor, false, trunkColor);
-    } else {
-      addTree(verts, indices, cx, cz, groundY, scale);
-    }
-  }
-  treeIndexCount = indices.length - terrainIndexCount;
-
-  const vertData = new Float32Array(verts);
-  const idxData  = new Uint32Array(indices);
-  indexCount = idxData.length;
-
-  const STRIDE = 9 * 4; // 9 floats × 4 bytes
-
-  if (isWebGL2) {
-    // Bind VAO then upload buffers
-    gl.bindVertexArray(vao);
-  } else if (oeVao) {
-    oeVao.bindVertexArrayOES(vao);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, vertData, gl.STATIC_DRAW);
-
-  const aPosLoc    = gl.getAttribLocation(program, 'aPos');
-  const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
-  const aColorLoc  = gl.getAttribLocation(program, 'aColor');
-
-  gl.enableVertexAttribArray(aPosLoc);
-  gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
-
-  gl.enableVertexAttribArray(aNormalLoc);
-  gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
-
-  gl.enableVertexAttribArray(aColorLoc);
-  gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idxData, gl.STATIC_DRAW);
-
-  if (isWebGL2) {
-    gl.bindVertexArray(null);
-  } else if (oeVao) {
-    oeVao.bindVertexArrayOES(null);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 }
 
-// ── Buildings mesh ─────────────────────────────────────────
-export function buildBuildingsMesh() {
-  if (!gl || !program) return;
-
-  const verts   = [];
-  const indices = [];
-
-  if (!G.buildings || G.buildings.length === 0) {
-    buildingsIndexCount = 0;
-    lastBuildingRebuild = performance.now();
-    return;
-  }
-  for (const b of G.buildings) {
-    // Skip non-structural types that have no visual presence worth rendering
-    if (b.type === 'road' || b.type === 'wall') continue;
-
-    const row = b.y;
-    const col = b.x;
-    const tileType = (G.map[row] && G.map[row][col] !== undefined)
-      ? G.map[row][col]
-      : TILE.GRASS;
-    const baseH = TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8;
-    const seed = (col * 374761 + row * 668265) >>> 0;
-    const noise1 = ((seed & 0xff) / 255 - 0.5);
-    const groundY = baseH + (tileType === TILE.WATER ? 0 : noise1 * 0.12) + 0.02;
-
-    const glbGeom = glbBuildings[b.type];
-    if (glbGeom) {
-      const cx = col + 0.5, cz = row + 0.5;
-      const bldScale = 0.80;
-      const GLB_COLORS = {
-        house:      [0.95, 0.82, 0.60],
-        farm:       [0.68, 0.52, 0.28],
-        tower:      [0.62, 0.65, 0.70],
-        church:     [0.95, 0.90, 0.80],
-        barracks:   [0.48, 0.52, 0.58],
-        market:     [0.92, 0.72, 0.28],
-        castle:     [0.58, 0.55, 0.52],
-        tavern:     [0.78, 0.50, 0.25],
-        blacksmith: [0.32, 0.32, 0.38],
-        windmill:   [0.88, 0.82, 0.65],
-      };
-      // Contrasting roof/top color per building type for visual identity
-      const GLB_ROOF = {
-        house:      [0.70, 0.22, 0.18], // red tile roof
-        farm:       [0.55, 0.40, 0.18], // brown thatch
-        tower:      [0.38, 0.42, 0.48], // dark slate cap
-        church:     [0.48, 0.46, 0.44], // stone spire
-        barracks:   [0.50, 0.20, 0.16], // dark red roof
-        market:     [0.82, 0.24, 0.14], // bright red awning
-        castle:     [0.42, 0.40, 0.38], // dark stone merlon
-        tavern:     [0.55, 0.35, 0.16], // brown thatch
-        blacksmith: [0.22, 0.22, 0.26], // dark iron roof
-        windmill:   [0.72, 0.28, 0.18], // red cap
-      };
-      const color    = GLB_COLORS[b.type] || [0.80, 0.78, 0.72];
-      const roofColor = GLB_ROOF[b.type] || null;
-      // Clip bottom 36% of model (Kenney hex base platform) — building structure only
-      inlineGLBTree(verts, indices, glbGeom, cx, groundY - 0.30, cz, bldScale, color, true, null, roofColor);
-    } else {
-      addBuildingMesh(verts, indices, b, groundY);
-    }
-  }
-
-  if (indices.length === 0) {
-    buildingsIndexCount = 0;
-    lastBuildingRebuild = performance.now();
-    return;
-  }
-
-  buildingsIndexCount = uploadMesh(buildingsVao, buildingsVertexBuf, buildingsIndexBuf, verts, indices);
-  lastBuildingRebuild = performance.now();
-}
-
-// ── Citizens mesh (rebuilt every frame) ────────────────────
-// Loop 14 (render S3): upgraded voxel citizens from 2-box (torso+head)
-// to 6-box chibi (legs+torso+head+hair+arms). Hair color varies per-citizen
-// via name hash to match the 2D renderer's variety. Enemies get a darker
-// palette + spear/helmet accent box.
-const CITIZEN_COLORS = [
-  [0.85, 0.25, 0.20], // red
-  [0.25, 0.45, 0.85], // blue
-  [0.20, 0.70, 0.25], // green
-  [0.85, 0.72, 0.18], // yellow
-  [0.70, 0.25, 0.75], // purple
-  [0.20, 0.72, 0.72], // teal
-];
-const SKIN_TONES = [
-  [0.98, 0.85, 0.71],
-  [0.92, 0.75, 0.55],
-  [0.78, 0.55, 0.35],
-  [0.55, 0.38, 0.22],
-];
-const HAIR_COLORS = [
-  [0.30, 0.20, 0.12],  // dark brown
-  [0.68, 0.48, 0.18],  // blonde
-  [0.22, 0.12, 0.22],  // raven-plum
-  [0.82, 0.42, 0.22],  // auburn
-];
-const LEG_COLOR = [0.28, 0.20, 0.12];
-
-function nameHash(s, mod) {
-  const a = s?.charCodeAt(0) || 0;
-  const b = s?.charCodeAt(1) || 0;
-  return (a * 53 + b * 17) % mod;
-}
-
-function buildCitizensMesh() {
-  if (!gl || !program || !G.citizens || G.citizens.length === 0) {
-    citizensIndexCount = 0;
-    return;
-  }
-  const verts = [], indices = [];
-
-  function addPerson(cx, cz, bodyColor, S, opts) {
-    const col = Math.floor(cx), row = Math.floor(cz);
-    const tileType = (G.map[row] && G.map[row][col] !== undefined) ? G.map[row][col] : TILE.GRASS;
-    const groundY = (TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8) + 0.02;
-    const skin = (opts && opts.skin) || SKIN_TONES[1];
-    const hair = (opts && opts.hair) || HAIR_COLORS[0];
-    // Legs: two thin boxes from ground to S (shin height), split L/R
-    pushBox(verts, indices, cx-S*0.85, groundY, cz-S*0.35, cx-S*0.15, groundY+S*1.0, cz+S*0.35, LEG_COLOR);
-    pushBox(verts, indices, cx+S*0.15, groundY, cz-S*0.35, cx+S*0.85, groundY+S*1.0, cz+S*0.35, LEG_COLOR);
-    // Torso (body color): S*1 to S*3.5
-    pushBox(verts, indices, cx-S, groundY+S*1.0, cz-S*0.7, cx+S, groundY+S*3.5, cz+S*0.7, bodyColor);
-    // Arms — thin boxes on sides of torso (same color, slightly darker)
-    const armCol = [bodyColor[0]*0.85, bodyColor[1]*0.85, bodyColor[2]*0.85];
-    pushBox(verts, indices, cx-S*1.25, groundY+S*1.4, cz-S*0.35, cx-S*0.95, groundY+S*3.2, cz+S*0.35, armCol);
-    pushBox(verts, indices, cx+S*0.95, groundY+S*1.4, cz-S*0.35, cx+S*1.25, groundY+S*3.2, cz+S*0.35, armCol);
-    // Head (skin): S*3.5 to S*5.2 — wider than torso for chibi proportion
-    pushBox(verts, indices, cx-S*1.1, groundY+S*3.5, cz-S*0.9, cx+S*1.1, groundY+S*5.2, cz+S*0.9, skin);
-    // Hair cap on top of head
-    pushBox(verts, indices, cx-S*1.15, groundY+S*4.8, cz-S*0.95, cx+S*1.15, groundY+S*5.35, cz+S*0.95, hair);
-  }
-
-  for (let i = 0; i < G.citizens.length; i++) {
-    const c = G.citizens[i];
-    const nm = c.name || '';
-    const skin = SKIN_TONES[nameHash(nm, 4)];
-    const hair = HAIR_COLORS[(nameHash(nm, 4) + 1) % 4];
-    // Job-based body color when assigned, else a hash-picked default palette entry
-    let body;
-    if (c.jobBuilding) {
-      const jt = c.jobBuilding.type;
-      if (jt === 'farm') body = [0.31, 0.78, 0.13];
-      else if (jt === 'lumber') body = [0.75, 0.47, 0.13];
-      else if (jt === 'quarry' || jt === 'mine') body = [0.31, 0.50, 0.66];
-      else if (jt === 'market') body = [0.94, 0.66, 0.02];
-      else if (jt === 'barracks') body = [0.22, 0.35, 0.63];
-      else if (jt === 'tavern') body = [0.78, 0.22, 0.13];
-      else body = [0.31, 0.50, 0.78];
-    } else {
-      body = CITIZEN_COLORS[nameHash(nm, CITIZEN_COLORS.length)];
-    }
-    if (c.state === 'eating') body = [0.13, 0.85, 0.38];
-    addPerson(c.x, c.y, body, 0.10, {skin, hair});
-  }
-
-  // Enemies: darker palette, helmet-like accent box
-  const ENEMY_BODY = [0.42, 0.10, 0.10];
-  const ENEMY_HELM = [0.18, 0.18, 0.20];
-  const ENEMY_SKIN = [0.62, 0.52, 0.42];
-  for (const e of (G.enemies || [])) {
-    addPerson(e.x, e.y, ENEMY_BODY, 0.12, {skin: ENEMY_SKIN, hair: ENEMY_HELM});
-  }
-
-  if (indices.length === 0) { citizensIndexCount = 0; return; }
-  citizensIndexCount = uploadMesh(citizensVao, citizensVertexBuf, citizensIndexBuf, verts, indices);
-}
-
-// ── Hover tile highlight ────────────────────────────────────
-function buildHoverMesh() {
-  hoverIndexCount = 0;
-  const ht = G.hoveredTile;
-  if (!gl || !ht) return;
-  const col = ht.x, row = ht.y;
-  if (col < 0 || col >= MAP_W || row < 0 || row >= MAP_H) return;
-  const tileType = (G.map[row]?.[col] !== undefined) ? G.map[row][col] : TILE.GRASS;
-  const h = (TILE_HEIGHT[tileType] !== undefined ? TILE_HEIGHT[tileType] : 0.8) + 0.06;
-  const inset = 0.06;
-  const x0 = col + inset, x1 = col + 1 - inset;
-  const z0 = row + inset, z1 = row + 1 - inset;
-  const r = 1.0, g = 0.92, b = 0.1; // bright yellow
-  const verts = [
-    x0, h, z0,  0,1,0,  r,g,b,
-    x1, h, z0,  0,1,0,  r,g,b,
-    x1, h, z1,  0,1,0,  r,g,b,
-    x0, h, z1,  0,1,0,  r,g,b,
-  ];
-  const indices = [0,1,2, 0,2,3];
-  hoverIndexCount = uploadMesh(hoverVao, hoverVertexBuf, hoverIndexBuf, verts, indices);
-}
-
-// ── Camera / VP matrix ─────────────────────────────────────
-function buildViewProjection() {
-  const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.7;
-  const orthoSize = 26 / zoom;
-
-  const aspect = (gl.drawingBufferWidth || 800) / (gl.drawingBufferHeight || 600);
-  const hw = orthoSize * aspect;
-  const hh = orthoSize;
-
-  const ortho = mat4Ortho(-hw, hw, -hh, hh, -300, 300);
-
-  // Pitch: arctan(1/sqrt(2)) ≈ 35.264° (true isometric)
-  const pitchRad = -Math.atan(1 / Math.sqrt(2));
-  const yawRad   = -Math.PI / 4; // -45°
-
-  const rx = mat4RotateX(pitchRad);
-  const ry = mat4RotateY(yawRad);
-
-  // Convert 2D isometric screen-pixel camera to 3D tile coordinates
-  // G.camera.x/y are isometric screen offsets; toWorld formula: wx=camX/(TW/2), wy=camY/(TH/2)
-  const halfTW = TW / 2, halfTH = TH / 2;
-  const wx = (G.camera?.x ?? 0) / halfTW;
-  const wy = (G.camera?.y ?? (MAP_H * halfTH)) / halfTH;
-  const cx = (wx + wy) / 2;   // 3D world X = tile col
-  const cz = (wy - wx) / 2;   // 3D world Z = tile row
-  const tr = mat4Translate(-cx, 0, -cz);
-
-  // VP = ortho * rotateX * rotateY * translate
-  const vp = mat4Multiply(ortho, mat4Multiply(rx, mat4Multiply(ry, tr)));
-  return vp;
-}
-
-// ── Tile picking (inverse VP projection) ───────────────────
-export function screenToTile3D(mx, my) {
-  if (!gl) return null;
-  const canvas = gl.canvas;
+function screenToWorldRaw(mx, my) {
   const rect = canvas.getBoundingClientRect();
-  const px = (mx - rect.left) * (canvas.width / rect.width);
-  const py = (my - rect.top)  * (canvas.height / rect.height);
-  const zoom = (G.camera && G.camera.zoom) ? G.camera.zoom : 1.7;
-  const aspect = canvas.width / canvas.height;
-  const hh = 26 / zoom;
-  const hw = hh * aspect;
-  const ndcX =  2 * px / canvas.width  - 1;
-  const ndcY =  1 - 2 * py / canvas.height;
-  const vx = ndcX * hw;
-  const vy = ndcY * hh;
-  // Inverse isometric VP: vy = (X'+Z')/√6 + h·√(2/3), vx = (X'-Z')/√2
-  // Solving: X'+Z' = √6·vy − 2h, X'-Z' = √2·vx
-  // col = (X'+Z' + X'-Z')/2 + cx,  row = (X'+Z' - X'-Z')/2 + cz
-  const halfTW = TW / 2, halfTH = TH / 2;
-  const wx = (G.camera?.x ?? 0) / halfTW;
-  const wy = (G.camera?.y ?? 0) / halfTH;
-  const SQ2 = Math.sqrt(2), SQ6 = Math.sqrt(6);
-  const diff = wx + SQ2 * vx;
-
-  function pickWithH(h) {
-    const sum = wy + SQ6 * vy - 2 * h;
-    return { x: Math.round((sum + diff) / 2), y: Math.round((sum - diff) / 2) };
-  }
-
-  // Pass 1: guess with average grass height
-  const rough = pickWithH(0.8);
-  // Pass 2: look up actual tile height and refine
-  const row = Math.max(0, Math.min(MAP_H - 1, rough.y));
-  const col = Math.max(0, Math.min(MAP_W - 1, rough.x));
-  const tileType = G.map?.[row]?.[col];
-  const h = (tileType !== undefined && TILE_HEIGHT[tileType] !== undefined)
-    ? TILE_HEIGHT[tileType] : 0.8;
-  return pickWithH(h);
+  const cx = (mx - rect.left) * (logicalW / rect.width);
+  const cy = (my - rect.top) * (logicalH / rect.height);
+  const scale = G.camera?.zoom || 1.3;
+  const camX = (G.camera?.x || 0) * (TILE_W / TW);
+  const camY = (G.camera?.y || 0) * (TILE_H / TH);
+  const sx = (cx - logicalW / 2) / scale + camX;
+  const sy = (cy - logicalH / 2) / scale + camY;
+  const wx = sx / (TILE_W / 2);
+  const wy = sy / (TILE_H / 2);
+  return { x: (wx + wy) / 2, y: (wy - wx) / 2 };
 }
 
-// ── Public API ─────────────────────────────────────────────
+export function screenToTile3D(mx, my) {
+  const w = screenToWorldRaw(mx, my);
+  return {
+    x: clamp(Math.round(w.x), 0, MAP_W - 1),
+    y: clamp(Math.round(w.y), 0, MAP_H - 1),
+  };
+}
 
-export function initGL3D(canvas) {
-  if (!canvas) {
-    console.warn('initGL3D: no canvas provided');
-    return false;
-  }
+function projectTile(tx, ty) {
+  const s = worldToScreen(tx, ty);
+  const scale = G.camera?.zoom || 1.3;
+  const tile = G.map?.[ty]?.[tx] ?? TILE.GRASS;
+  const h = tileHeight(tile) * scale;
+  return { x: s.x, y: s.y - h, baseY: s.y, h, scale, tile };
+}
 
-  // Try WebGL2 first, fall back to WebGL1
-  gl = canvas.getContext('webgl2', { antialias: true, depth: true });
-  if (gl) {
-    isWebGL2 = true;
-  } else {
-    gl = canvas.getContext('webgl', { antialias: true, depth: true }) ||
-         canvas.getContext('experimental-webgl', { antialias: true, depth: true });
-    isWebGL2 = false;
-    if (!gl) {
-      console.error('WebGL not supported');
-      return false;
-    }
-    // Check for VAO extension in WebGL1
-    oeVao = gl.getExtension('OES_vertex_array_object');
-  }
+function pathDiamond(p, topY = p.y, inflate = 0) {
+  const hw = TILE_W * p.scale / 2 + inflate;
+  const hh = TILE_H * p.scale / 2 + inflate * 0.5;
+  ctx.beginPath();
+  ctx.moveTo(p.x, topY - hh);
+  ctx.lineTo(p.x + hw, topY);
+  ctx.lineTo(p.x, topY + hh);
+  ctx.lineTo(p.x - hw, topY);
+  ctx.closePath();
+}
 
-  // Compile shaders
-  try {
-    if (isWebGL2) {
-      program = createProgram(gl, VS_SRC_300, FS_SRC_300);
-    } else {
-      program = createProgram(gl, VS_SRC_100, FS_SRC_100);
-    }
-  } catch (e) {
-    console.error('WebGL3D shader error:', e);
-    return false;
-  }
+function fillDiamond(p, color, topY = p.y, inflate = 0) {
+  pathDiamond(p, topY, inflate);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
 
-  // Get uniform locations
-  uViewProjLoc      = gl.getUniformLocation(program, 'uViewProj');
-  uLightDirLoc      = gl.getUniformLocation(program, 'uLightDir');
-  uTimeLoc          = gl.getUniformLocation(program, 'uTime');
-  uSeasonTintLoc    = gl.getUniformLocation(program, 'uSeasonTint');
-  uCameraCenterLoc  = gl.getUniformLocation(program, 'uCameraCenter');
-  uSnowAmountLoc    = gl.getUniformLocation(program, 'uSnowAmount');
-  uAutumnAmountLoc  = gl.getUniformLocation(program, 'uAutumnAmount');
-  uDayPhaseLoc      = gl.getUniformLocation(program, 'uDayPhase');
-  uRainAmountLoc    = gl.getUniformLocation(program, 'uRainAmount');
-
-  // Create terrain VAO
-  if (isWebGL2) {
-    vao = gl.createVertexArray();
-  } else if (oeVao) {
-    vao = oeVao.createVertexArrayOES();
-  }
-
-  // Create terrain GPU buffers
-  vertexBuf = gl.createBuffer();
-  indexBuf  = gl.createBuffer();
-
-  // Create buildings VAO
-  if (isWebGL2) {
-    buildingsVao = gl.createVertexArray();
-  } else if (oeVao) {
-    buildingsVao = oeVao.createVertexArrayOES();
-  }
-
-  // Create buildings GPU buffers
-  buildingsVertexBuf = gl.createBuffer();
-  buildingsIndexBuf  = gl.createBuffer();
-
-  // Create citizens VAO + buffers
-  if (isWebGL2) {
-    citizensVao = gl.createVertexArray();
-  } else if (oeVao) {
-    citizensVao = oeVao.createVertexArrayOES();
-  }
-  citizensVertexBuf = gl.createBuffer();
-  citizensIndexBuf  = gl.createBuffer();
-
-  // Create hover tile VAO + buffers
-  if (isWebGL2) {
-    hoverVao = gl.createVertexArray();
-  } else if (oeVao) {
-    hoverVao = oeVao.createVertexArrayOES();
-  }
-  hoverVertexBuf = gl.createBuffer();
-  hoverIndexBuf  = gl.createBuffer();
-
-  // GL state
-  gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
-  gl.enable(gl.CULL_FACE);
-  gl.cullFace(gl.BACK);
-  gl.clearColor(0.45, 0.68, 0.88, 1.0);
-
-  // Size canvas to match display
-  resize3D();
-
-  // Load Kenney tree GLBs asynchronously — terrain rebuilds when ready
-  Promise.all([
-    loadGLBGeometry('./assets/meshes/tree_pineDefaultA.glb'),
-    loadGLBGeometry('./assets/meshes/tree_pineTallA.glb'),
-    loadGLBGeometry('./assets/meshes/tree_pineSmallC.glb'),
-  ]).then(variants => {
-    glbTreeVariants = variants;
-    buildTerrainMesh();
-    console.log('GLB tree meshes loaded');
-  }).catch(e => console.warn('GLB tree load failed, using pyramids:', e));
-
-  // Load building GLBs — buildings mesh rebuilds when ready
-  Promise.all(
-    Object.entries(BUILDING_GLB_MAP).map(([type, url]) =>
-      loadGLBGeometry(url).then(geom => { glbBuildings[type] = geom; })
-        .catch(e => console.warn(`GLB building ${type} failed:`, e))
-    )
-  ).then(() => {
-    lastBuildingRebuild = 0; // force rebuild on next render tick
-    console.log('GLB building meshes loaded');
-  });
-
-  console.log(`WebGL3D initialized (WebGL${isWebGL2 ? '2' : '1'})`);
+function drawTerrainSprite(tile, p, alpha) {
+  const atlas = loadImage(TERRAIN_ATLAS.url);
+  if (!atlas) return false;
+  const key =
+    tile === TILE.WATER ? 'water' :
+    tile === TILE.SAND ? 'sand' :
+    tile === TILE.GRASS ? 'grass' :
+    tile === TILE.FOREST ? 'forest' :
+    tile === TILE.STONE ? 'stone' :
+    tile === TILE.IRON ? 'iron' :
+    tile === TILE.MOUNTAIN ? 'mountain' : null;
+  const frame = key ? TERRAIN_ATLAS.frames[key] : null;
+  if (!frame) return false;
+  const trim = frame.trim;
+  const targetW = TILE_W * p.scale * 1.18;
+  const targetH = targetW * (trim.h / trim.w);
+  ctx.save();
+  pathDiamond(p, p.y, 1.4 * p.scale);
+  ctx.clip();
+  ctx.globalAlpha *= alpha;
+  ctx.drawImage(
+    atlas,
+    frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
+    p.x - targetW / 2,
+    p.y - TILE_H * p.scale / 2 - 4 * p.scale,
+    targetW,
+    targetH
+  );
+  ctx.restore();
   return true;
 }
 
-export function render3D() {
-  if (!gl || !program || indexCount === 0) return;
+function groundTileFor3D(tile) {
+  return (
+    tile === TILE.STONE ||
+    tile === TILE.IRON ||
+    tile === TILE.FOREST ||
+    tile === TILE.MOUNTAIN
+  ) ? TILE.GRASS : tile;
+}
 
-  // Throttled buildings mesh rebuild (~500ms)
-  const now = performance.now();
-  if (now - lastBuildingRebuild > 500) {
-    buildBuildingsMesh();
+function drawWaterShoreline(tx, ty, p, hw, hh) {
+  const top = { x: p.x, y: p.y - hh };
+  const right = { x: p.x + hw, y: p.y };
+  const bottom = { x: p.x, y: p.y + hh };
+  const left = { x: p.x - hw, y: p.y };
+  const edges = [
+    { nx: tx - 1, ny: ty, a: top, b: left },
+    { nx: tx, ny: ty - 1, a: top, b: right },
+    { nx: tx + 1, ny: ty, a: right, b: bottom },
+    { nx: tx, ny: ty + 1, a: left, b: bottom },
+  ];
+
+  const shoreEdges = edges.filter(edge => {
+    if (edge.nx < 0 || edge.nx >= MAP_W || edge.ny < 0 || edge.ny >= MAP_H) return false;
+    return (G.map?.[edge.ny]?.[edge.nx] ?? TILE.WATER) !== TILE.WATER;
+  });
+  if (!shoreEdges.length) return;
+
+  ctx.save();
+  pathDiamond(p, p.y, 0.8 * p.scale);
+  ctx.clip();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  for (const edge of shoreEdges) {
+    const wobble = Math.sin((tx * 1.7 + ty * 2.1 + G.gameTick * 0.035)) * 0.45 * p.scale;
+    const ax = edge.a.x * 0.86 + edge.b.x * 0.14;
+    const ay = edge.a.y * 0.86 + edge.b.y * 0.14;
+    const bx = edge.a.x * 0.14 + edge.b.x * 0.86;
+    const by = edge.a.y * 0.14 + edge.b.y * 0.86;
+    const mx = (ax + bx) / 2 + wobble;
+    const my = (ay + by) / 2 - wobble * 0.35;
+
+    ctx.globalAlpha = 0.23;
+    ctx.strokeStyle = '#ebd49a';
+    ctx.lineWidth = Math.max(2.2, p.scale * 2.8);
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.quadraticCurveTo(mx, my, bx, by);
+    ctx.stroke();
+
+    ctx.globalAlpha = 0.30;
+    ctx.strokeStyle = '#d7f0ef';
+    ctx.lineWidth = Math.max(1, p.scale * 1.05);
+    ctx.beginPath();
+    ctx.moveTo(ax, ay - 0.9 * p.scale);
+    ctx.quadraticCurveTo(mx, my - 1.2 * p.scale, bx, by - 0.9 * p.scale);
+    ctx.stroke();
   }
+  ctx.restore();
+}
 
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-  // Dynamic clear color tracks day/night phase so background matches fog sky
-  {
-    const t = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
-    const dawn = Math.max(0, 1 - Math.abs(t - 0.15) * 6);
-    const dusk = Math.max(0, 1 - Math.abs(t - 0.85) * 6);
-    const nightPhase = Math.abs(t - 0.5);
-    const night = Math.max(0, Math.min(1, (nightPhase - 0.30) / 0.17));
-    const lerp = (a, b, f) => a + (b - a) * f;
-    let r = lerp(lerp(0.45, 0.96, dawn), 0.70, dusk);
-    let g = lerp(lerp(0.68, 0.65, dawn), 0.45, dusk);
-    let b = lerp(lerp(0.88, 0.38, dawn), 0.72, dusk);
-    r = lerp(r, 0.04, night); g = lerp(g, 0.07, night); b = lerp(b, 0.18, night);
-    gl.clearColor(r, g, b, 1.0);
-  }
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+function drawGroundAccents(tx, ty, groundTile, sourceTile, p, hw, hh) {
+  const seed = hash2(tx, ty, 29);
+  if (groundTile !== TILE.GRASS && groundTile !== TILE.SAND) return;
 
-  gl.useProgram(program);
+  ctx.save();
+  pathDiamond(p, p.y, 0.8 * p.scale);
+  ctx.clip();
 
-  // View-projection matrix
-  const vp = buildViewProjection();
-  gl.uniformMatrix4fv(uViewProjLoc, false, vp);
-
-  // Directional light: upper-right-front — illuminates both visible isometric faces
-  // (+X right face and +Z front face both lit, right face slightly brighter)
-  const lx = 0.6, ly = 0.8, lz = 0.5;
-  const len = Math.sqrt(lx*lx + ly*ly + lz*lz);
-  gl.uniform3f(uLightDirLoc, lx/len, ly/len, lz/len);
-
-  // Time uniform for water animation
-  if (uTimeLoc) gl.uniform1f(uTimeLoc, performance.now() * 0.001);
-
-  // Season tint: shifts entire scene color to match current season
-  if (uSeasonTintLoc) {
-    const ST = {
-      spring: [1.00, 1.00, 1.00],
-      summer: [1.06, 1.02, 0.93],
-      autumn: [1.14, 0.90, 0.80],
-      winter: [0.85, 0.90, 1.10],
-    }[G.season] || [1, 1, 1];
-    gl.uniform3f(uSeasonTintLoc, ST[0], ST[1], ST[2]);
-  }
-
-  // Snow cover: full white blanket in winter, none otherwise
-  if (uSnowAmountLoc) {
-    gl.uniform1f(uSnowAmountLoc, G.season === 'winter' ? 1.0 : 0.0);
-  }
-  // Autumn foliage: shift green grass/trees to amber-orange
-  if (uAutumnAmountLoc) {
-    gl.uniform1f(uAutumnAmountLoc, G.season === 'autumn' ? 1.0 : 0.0);
-  }
-  // Day phase: 0=midnight, 0.15=dawn, 0.5=noon, 0.85=dusk, 1=midnight
-  if (uDayPhaseLoc) {
-    gl.uniform1f(uDayPhaseLoc, (G.dayPhase ?? 0) / (G.dayLength ?? 3600));
-  }
-  if (uRainAmountLoc) {
-    gl.uniform1f(uRainAmountLoc, G.weather === 'rain' || G.weather === 'storm' ? 1.0 : 0.0);
-  }
-
-  // Fog center: follow camera tile position so fog fades from view center
-  if (uCameraCenterLoc) {
-    const halfTW2 = TW / 2, halfTH2 = TH / 2;
-    const wx2 = (G.camera?.x ?? 0) / halfTW2;
-    const wy2 = (G.camera?.y ?? (MAP_H * halfTH2)) / halfTH2;
-    gl.uniform2f(uCameraCenterLoc, (wx2 + wy2) / 2, (wy2 - wx2) / 2);
-  }
-
-  // ── Draw terrain (includes trees) ──────────────────────────
-  if (isWebGL2) {
-    gl.bindVertexArray(vao);
-  } else if (oeVao) {
-    oeVao.bindVertexArrayOES(vao);
-  } else {
-    // No VAO support: re-bind attributes manually
-    const STRIDE = 9 * 4;
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuf);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuf);
-    const aPosLoc    = gl.getAttribLocation(program, 'aPos');
-    const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
-    const aColorLoc  = gl.getAttribLocation(program, 'aColor');
-    gl.enableVertexAttribArray(aPosLoc);
-    gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
-    gl.enableVertexAttribArray(aNormalLoc);
-    gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
-    gl.enableVertexAttribArray(aColorLoc);
-    gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
-  }
-
-  gl.drawElements(gl.TRIANGLES, terrainIndexCount, gl.UNSIGNED_INT, 0);
-
-  if (isWebGL2) {
-    gl.bindVertexArray(null);
-  } else if (oeVao) {
-    oeVao.bindVertexArrayOES(null);
-  }
-
-  // ── Draw trees — after terrain, depth ALWAYS so they appear above their tiles ──
-  if (treeIndexCount > 0) {
-    if (isWebGL2) {
-      gl.bindVertexArray(vao);
-    } else if (oeVao) {
-      oeVao.bindVertexArrayOES(vao);
-    } else {
-      const STRIDE = 9 * 4;
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuf);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuf);
-      const aPosLoc2    = gl.getAttribLocation(program, 'aPos');
-      const aNormalLoc2 = gl.getAttribLocation(program, 'aNormal');
-      const aColorLoc2  = gl.getAttribLocation(program, 'aColor');
-      gl.enableVertexAttribArray(aPosLoc2);
-      gl.vertexAttribPointer(aPosLoc2,    3, gl.FLOAT, false, STRIDE, 0);
-      gl.enableVertexAttribArray(aNormalLoc2);
-      gl.vertexAttribPointer(aNormalLoc2, 3, gl.FLOAT, false, STRIDE, 3*4);
-      gl.enableVertexAttribArray(aColorLoc2);
-      gl.vertexAttribPointer(aColorLoc2,  3, gl.FLOAT, false, STRIDE, 6*4);
+  if (groundTile === TILE.GRASS) {
+    const isResourceGround = sourceTile === TILE.FOREST || sourceTile === TILE.STONE || sourceTile === TILE.IRON || sourceTile === TILE.MOUNTAIN;
+    const count = isResourceGround ? 1 : 2 + (seed % 2);
+    ctx.lineCap = 'round';
+    ctx.lineWidth = Math.max(0.8, 0.85 * p.scale);
+    for (let i = 0; i < count; i++) {
+      const h = hash2(tx, ty, 41 + i);
+      const px = p.x + (((h & 255) / 255) - 0.5) * hw * 1.22;
+      const py = p.y + ((((h >> 8) & 255) / 255) - 0.5) * hh * 1.08;
+      const len = (3.6 + ((h >> 16) & 7)) * p.scale;
+      const lean = (((h >> 20) & 15) - 7) * 0.16 * p.scale;
+      ctx.globalAlpha = isResourceGround ? 0.055 : 0.075;
+      ctx.strokeStyle = ((h >> 24) & 1) ? '#e6d789' : '#123f24';
+      ctx.beginPath();
+      ctx.moveTo(px - len * 0.45, py + len * 0.20);
+      ctx.quadraticCurveTo(px + lean, py - len * 0.25, px + len * 0.50, py + len * 0.08);
+      ctx.stroke();
     }
-    gl.depthFunc(gl.ALWAYS);
-    gl.drawElements(gl.TRIANGLES, treeIndexCount, gl.UNSIGNED_INT, terrainIndexCount * 4);
-    gl.depthFunc(gl.LEQUAL);
-    if (isWebGL2) {
-      gl.bindVertexArray(null);
-    } else if (oeVao) {
-      oeVao.bindVertexArrayOES(null);
+  } else if (groundTile === TILE.SAND) {
+    const count = 2 + (seed % 3);
+    ctx.fillStyle = '#815f32';
+    for (let i = 0; i < count; i++) {
+      const h = hash2(tx, ty, 71 + i);
+      const px = p.x + (((h & 255) / 255) - 0.5) * hw * 1.18;
+      const py = p.y + ((((h >> 8) & 255) / 255) - 0.5) * hh * 1.02;
+      ctx.globalAlpha = 0.07;
+      ctx.beginPath();
+      ctx.ellipse(px, py, (1.2 + ((h >> 16) & 3) * 0.25) * p.scale, 0.48 * p.scale, 0.2, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
-  // ── Draw buildings ──────────────────────────────────────────
-  if (buildingsIndexCount > 0) {
-    if (isWebGL2) {
-      gl.bindVertexArray(buildingsVao);
-    } else if (oeVao) {
-      oeVao.bindVertexArrayOES(buildingsVao);
-    } else {
-      const STRIDE = 9 * 4;
-      gl.bindBuffer(gl.ARRAY_BUFFER, buildingsVertexBuf);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buildingsIndexBuf);
-      const aPosLoc    = gl.getAttribLocation(program, 'aPos');
-      const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
-      const aColorLoc  = gl.getAttribLocation(program, 'aColor');
-      gl.enableVertexAttribArray(aPosLoc);
-      gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
-      gl.enableVertexAttribArray(aNormalLoc);
-      gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
-      gl.enableVertexAttribArray(aColorLoc);
-      gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
-    }
+  ctx.restore();
+}
 
-    gl.depthFunc(gl.ALWAYS);
-    gl.drawElements(gl.TRIANGLES, buildingsIndexCount, gl.UNSIGNED_INT, 0);
-    gl.depthFunc(gl.LEQUAL);
+function drawTile(tx, ty, visible) {
+  const tile = G.map?.[ty]?.[tx] ?? TILE.GRASS;
+  const groundTile = groundTileFor3D(tile);
+  const p = projectTile(tx, ty);
+  const hw = TILE_W * p.scale / 2;
+  const hh = TILE_H * p.scale / 2;
+  const nextX = tx + 1 < MAP_W ? tileHeight(G.map[ty][tx + 1]) * p.scale : 0;
+  const nextY = ty + 1 < MAP_H ? tileHeight(G.map[ty + 1][tx]) * p.scale : 0;
+  const baseCol = TOP_TINT[groundTile] || TILE_COLORS[groundTile]?.[0] || '#528a4c';
+  const sideCol = SIDE_TINT[groundTile] || shadeColor(baseCol, -45);
+  const sideThreshold = 2 * p.scale;
+  const sideAlpha = tile === TILE.MOUNTAIN ? 0.24 : tile === TILE.STONE || tile === TILE.IRON ? 0.34 : 0.50;
 
-    if (isWebGL2) {
-      gl.bindVertexArray(null);
-    } else if (oeVao) {
-      oeVao.bindVertexArrayOES(null);
-    }
+  if (p.h > nextY + sideThreshold || tx === 0 || ty === MAP_H - 1) {
+    ctx.save();
+    ctx.globalAlpha = sideAlpha;
+    ctx.fillStyle = shadeColor(sideCol, tile === TILE.MOUNTAIN ? 20 : 6);
+    ctx.beginPath();
+    ctx.moveTo(p.x - hw, p.y);
+    ctx.lineTo(p.x, p.y + hh);
+    ctx.lineTo(p.x, p.baseY + hh);
+    ctx.lineTo(p.x - hw, p.baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  if (p.h > nextX + sideThreshold || ty === 0 || tx === MAP_W - 1) {
+    ctx.save();
+    ctx.globalAlpha = sideAlpha + 0.05;
+    ctx.fillStyle = shadeColor(sideCol, tile === TILE.MOUNTAIN ? 28 : 14);
+    ctx.beginPath();
+    ctx.moveTo(p.x + hw, p.y);
+    ctx.lineTo(p.x, p.y + hh);
+    ctx.lineTo(p.x, p.baseY + hh);
+    ctx.lineTo(p.x + hw, p.baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
 
-  // ── Draw citizens (rebuilt every frame for smooth movement) ──
-  buildCitizensMesh();
-  if (citizensIndexCount > 0) {
-    if (isWebGL2) {
-      gl.bindVertexArray(citizensVao);
-    } else if (oeVao) {
-      oeVao.bindVertexArrayOES(citizensVao);
-    } else {
-      const STRIDE = 9 * 4;
-      gl.bindBuffer(gl.ARRAY_BUFFER, citizensVertexBuf);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, citizensIndexBuf);
-      const aPosLoc    = gl.getAttribLocation(program, 'aPos');
-      const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
-      const aColorLoc  = gl.getAttribLocation(program, 'aColor');
-      gl.enableVertexAttribArray(aPosLoc);
-      gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
-      gl.enableVertexAttribArray(aNormalLoc);
-      gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
-      gl.enableVertexAttribArray(aColorLoc);
-      gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
-    }
-    gl.depthFunc(gl.ALWAYS);
-    gl.drawElements(gl.TRIANGLES, citizensIndexCount, gl.UNSIGNED_INT, 0);
-    gl.depthFunc(gl.LEQUAL);
-    if (isWebGL2) {
-      gl.bindVertexArray(null);
-    } else if (oeVao) {
-      oeVao.bindVertexArrayOES(null);
-    }
+  const jitterScale =
+    groundTile === TILE.GRASS || groundTile === TILE.FOREST ? 0.22 :
+    groundTile === TILE.SAND || groundTile === TILE.WATER ? 0.30 :
+    0.46;
+  const jitter = ((hash2(tx, ty) & 31) - 15) * jitterScale;
+  fillDiamond(p, shadeColor(baseCol, jitter), p.y, 1.6 * p.scale);
+  const terrainAlpha =
+    groundTile === TILE.WATER ? 0.46 :
+    groundTile === TILE.GRASS ? (tile === TILE.FOREST ? 0.48 : tile === TILE.MOUNTAIN ? 0.42 : tile === groundTile ? 0.42 : 0.38) :
+    groundTile === TILE.FOREST ? 0.48 :
+    groundTile === TILE.SAND ? 0.46 :
+    0.58;
+  drawTerrainSprite(groundTile, p, terrainAlpha);
+  if (visible) drawGroundAccents(tx, ty, groundTile, tile, p, hw, hh);
+
+  if (groundTile === TILE.WATER) {
+    const wave = Math.sin((tx * 0.9 + ty * 0.5 + G.gameTick * 0.05)) * 0.5 + 0.5;
+    ctx.save();
+    pathDiamond(p);
+    ctx.clip();
+    ctx.globalAlpha = 0.08 + wave * 0.045;
+    ctx.strokeStyle = '#c6e5ef';
+    ctx.lineWidth = Math.max(1, p.scale * 0.75);
+    ctx.beginPath();
+    ctx.moveTo(p.x - hw * 0.48, p.y - hh * 0.08);
+    ctx.lineTo(p.x + hw * 0.40, p.y + hh * 0.04);
+    ctx.stroke();
+    ctx.restore();
+    drawWaterShoreline(tx, ty, p, hw, hh);
   }
 
-  // ── Draw hover tile highlight ──────────────────────────────
-  if (G.selectedBuild) {
-    buildHoverMesh();
-    if (hoverIndexCount > 0) {
-      if (isWebGL2) {
-        gl.bindVertexArray(hoverVao);
-      } else if (oeVao) {
-        oeVao.bindVertexArrayOES(hoverVao);
-      } else {
-        const STRIDE = 9 * 4;
-        gl.bindBuffer(gl.ARRAY_BUFFER, hoverVertexBuf);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, hoverIndexBuf);
-        const aPosLoc    = gl.getAttribLocation(program, 'aPos');
-        const aNormalLoc = gl.getAttribLocation(program, 'aNormal');
-        const aColorLoc  = gl.getAttribLocation(program, 'aColor');
-        gl.enableVertexAttribArray(aPosLoc);
-        gl.vertexAttribPointer(aPosLoc,    3, gl.FLOAT, false, STRIDE, 0);
-        gl.enableVertexAttribArray(aNormalLoc);
-        gl.vertexAttribPointer(aNormalLoc, 3, gl.FLOAT, false, STRIDE, 3*4);
-        gl.enableVertexAttribArray(aColorLoc);
-        gl.vertexAttribPointer(aColorLoc,  3, gl.FLOAT, false, STRIDE, 6*4);
-      }
-      gl.depthFunc(gl.ALWAYS);
-      gl.drawElements(gl.TRIANGLES, hoverIndexCount, gl.UNSIGNED_INT, 0);
-      gl.depthFunc(gl.LEQUAL);
-      if (isWebGL2) {
-        gl.bindVertexArray(null);
-      } else if (oeVao) {
-        oeVao.bindVertexArrayOES(null);
-      }
-    }
+  if (!visible) {
+    ctx.save();
+    ctx.globalAlpha = 0.62;
+    fillDiamond(p, tile === TILE.WATER ? '#071423' : '#11192a', p.y, 1.6 * p.scale);
+    ctx.restore();
   }
 }
 
+function drawAtlasFrame(atlasDef, type, x, y, height, alpha = 1) {
+  const atlas = loadImage(atlasDef.url);
+  const idx = atlasDef.types?.indexOf(type) ?? -1;
+  if (!atlas || idx < 0) return false;
+  const trim = atlasDef.trims[type] || { x: 0, y: 0, w: atlasDef.cell, h: atlasDef.cell };
+  const frameX = (idx % atlasDef.cols) * atlasDef.cell;
+  const frameY = Math.floor(idx / atlasDef.cols) * atlasDef.cell;
+  const targetH = height;
+  const targetW = targetH * (trim.w / trim.h);
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  ctx.drawImage(
+    atlas,
+    frameX + trim.x, frameY + trim.y, trim.w, trim.h,
+    x - targetW / 2,
+    y - targetH,
+    targetW,
+    targetH
+  );
+  ctx.restore();
+  return true;
+}
+
+function drawNature(type, x, y, height, alpha = 1, seed = 0) {
+  const atlas = loadImage(NATURE_ATLAS.url);
+  const frame = NATURE_ATLAS.frames[type];
+  if (!atlas || !frame) return false;
+  const trim = frame.trim;
+  const variantScale = seed ? 0.92 + ((seed >>> 12) & 15) * 0.012 : 1;
+  const targetH = height * variantScale;
+  const targetW = targetH * (trim.w / trim.h);
+  const flip = !!(seed & 64);
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  if (flip) {
+    ctx.translate(x, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(
+      atlas,
+      frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
+      -targetW / 2,
+      y - targetH,
+      targetW,
+      targetH
+    );
+  } else {
+    ctx.drawImage(
+      atlas,
+      frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
+      x - targetW / 2,
+      y - targetH,
+      targetW,
+      targetH
+    );
+  }
+  ctx.restore();
+  return true;
+}
+
+function drawProceduralTree(x, y, scale, seed) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = 0.95;
+  ctx.fillStyle = '#5a351b';
+  ctx.fillRect(-1.7, -13, 3.4, 15);
+  const hue = (seed % 3) * 12;
+  ctx.fillStyle = hue === 0 ? '#1f7a3a' : hue === 12 ? '#2b8b42' : '#176434';
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    const top = -36 + i * 9;
+    const wide = 13 - i * 2;
+    ctx.moveTo(0, top);
+    ctx.lineTo(wide, top + 19);
+    ctx.lineTo(-wide, top + 19);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawTerrainDetail(tx, ty) {
+  if (!G.fog?.[ty]?.[tx]) return;
+  const tile = G.map?.[ty]?.[tx] ?? TILE.GRASS;
+  const p = projectTile(tx, ty);
+  const seed = hash2(tx, ty, 11);
+  const x = p.x + (((seed & 255) / 255) - 0.5) * TILE_W * p.scale * 0.22;
+  const y = p.y + TILE_H * p.scale * 0.18;
+
+  if (tile === TILE.FOREST && (seed % 100) < 58) {
+    const roll = seed % 10;
+    const treeType = roll < 5 ? 'pine' : roll < 9 ? 'oak' : 'birch';
+    const treeH = treeType === 'birch' ? 52 : treeType === 'oak' ? 56 : 60;
+    const treeAlpha = treeType === 'birch' ? 0.72 : 0.95;
+    if (!drawNature(treeType, x, y + 3 * p.scale, treeH * p.scale, treeAlpha, seed)) {
+      drawProceduralTree(x, y, p.scale * 0.75, seed);
+    }
+  } else if (tile === TILE.STONE && (seed % 100) < 48) {
+    drawNature('stone', x, y + 2 * p.scale, 32 * p.scale, 0.90, seed);
+  } else if (tile === TILE.IRON && (seed % 100) < 48) {
+    drawNature('iron', x, y + 2 * p.scale, 34 * p.scale, 0.90, seed);
+  } else if (tile === TILE.MOUNTAIN) {
+    drawNature('mountain', p.x, y + 6 * p.scale, 78 * p.scale, 0.95, seed);
+  } else if ((tile === TILE.GRASS || tile === TILE.FOREST) && (seed % 100) < 3) {
+    drawNature('flowers', x, y + 1 * p.scale, 14 * p.scale, 0.42, seed);
+  }
+}
+
+function buildingSpriteInfo(type) {
+  if (BUILDING_ATLAS.types.includes(type)) {
+    return { atlas: BUILDING_ATLAS, height: BUILDING_ATLAS.sizes[type] || 66 };
+  }
+  if (SUPPORT_ATLAS.types.includes(type)) {
+    return { atlas: SUPPORT_ATLAS, height: SUPPORT_ATLAS.sizes[type] || 58 };
+  }
+  return null;
+}
+
+function actorIdentitySeed(c) {
+  const label = c?.name || `${Math.round((c?.x || 0) * 10)},${Math.round((c?.y || 0) * 10)}`;
+  let h = 2166136261;
+  for (let i = 0; i < label.length; i++) {
+    h ^= label.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function drawBuilding(b) {
+  if (!b || b.type === 'road') return;
+  const p = projectTile(b.x, b.y);
+  const scale = p.scale;
+  const baseX = p.x;
+  const baseY = p.y + TILE_H * scale * 0.34;
+  const visible = G.fog?.[b.y]?.[b.x] !== false;
+  if (!visible) return;
+
+  if (b.type === 'wall') {
+    ctx.save();
+    pathDiamond(p, p.y + TILE_H * scale * 0.04, -4 * scale);
+    ctx.fillStyle = '#5d5a5a';
+    ctx.fill();
+    ctx.fillStyle = '#38373a';
+    ctx.fillRect(baseX - 18 * scale, p.y - 4 * scale, 36 * scale, 12 * scale);
+    ctx.restore();
+    return;
+  }
+
+  const info = buildingSpriteInfo(b.type);
+  const spriteH = (info?.height || 62) * scale * 1.12;
+
+  if (info && drawAtlasFrame(info.atlas, b.type, baseX, baseY + 5 * scale, spriteH, Math.min(1, b.buildProgress ?? 1))) return;
+
+  ctx.save();
+  ctx.fillStyle = '#8c6a3d';
+  ctx.fillRect(baseX - 18 * scale, baseY - 42 * scale, 36 * scale, 42 * scale);
+  ctx.fillStyle = '#3f2a1b';
+  ctx.beginPath();
+  ctx.moveTo(baseX - 24 * scale, baseY - 42 * scale);
+  ctx.lineTo(baseX, baseY - 64 * scale);
+  ctx.lineTo(baseX + 24 * scale, baseY - 42 * scale);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function actorVariant(c) {
+  const jt = c.jobBuilding?.type;
+  if (c.state === 'foraging') return 'forager';
+  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery' || jt === 'chickencoop' || jt === 'cowpen' || c.state === 'eating') return 'farmer';
+  if (jt === 'lumber') return 'lumber';
+  if (jt === 'mine' || jt === 'quarry' || jt === 'blacksmith') return 'miner';
+  if (jt === 'fisherman') return 'fisher';
+  if (jt === 'market' || jt === 'tradingpost' || jt === 'tavern') return 'trader';
+  if (jt === 'barracks' || jt === 'tower' || jt === 'archery') return 'guard';
+  if (jt === 'school' || jt === 'church' || jt === 'townhall') return 'builder';
+  const townfolk = ['settler', 'farmer', 'builder', 'trader', 'forager'];
+  return townfolk[actorIdentitySeed(c) % townfolk.length];
+}
+
+function actorAction(c, moving) {
+  if (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver') return 'carry';
+  if (c.state === 'working' || c.state === 'foraging' || c.state === 'eating') return 'work';
+  if (moving || c.state === 'walk_to_work') return 'walk';
+  return 'idle';
+}
+
+function actorDir(entity) {
+  const dx = (entity.tx ?? entity.x) - entity.x;
+  const dy = (entity.ty ?? entity.y) - entity.y;
+  const sx = (dx - dy) * TILE_W / 2;
+  const sy = (dx + dy) * TILE_H / 2;
+  if (Math.abs(sx) > Math.abs(sy) * 1.15) return sx < 0 ? 'left' : 'right';
+  return sy < 0 ? 'up' : 'down';
+}
+
+function drawActorGroundShadow(x, y, scale, moving, stride, dir, enemy) {
+  ctx.save();
+  ctx.fillStyle = `rgba(3,7,4,${enemy ? 0.24 : 0.18})`;
+
+  if (moving) {
+    const step = Math.sign(stride || 1);
+    const side = dir === 'up' || dir === 'down' ? 1 : 0;
+    const footSpreadX = (side ? 2.2 : 3.2) * scale;
+    const footSpreadY = (side ? 0.9 : 0.45) * scale;
+    ctx.fillRect(x - footSpreadX * step - 1.0 * scale, y + 1.9 * scale - footSpreadY, 2.0 * scale, 1.0 * scale);
+    ctx.fillRect(x + footSpreadX * step - 0.9 * scale, y + 1.9 * scale + footSpreadY, 1.8 * scale, 0.9 * scale);
+  } else {
+    const side = dir === 'left' || dir === 'right' ? 1 : 0;
+    const footSpreadX = (side ? 2.7 : 2.0) * scale;
+    const footSpreadY = (side ? 0.35 : 0.75) * scale;
+    ctx.fillRect(x - footSpreadX - 0.8 * scale, y + 2.0 * scale - footSpreadY, 1.6 * scale, 0.85 * scale);
+    ctx.fillRect(x + footSpreadX - 0.8 * scale, y + 2.0 * scale + footSpreadY, 1.6 * scale, 0.85 * scale);
+  }
+
+  ctx.restore();
+}
+
+function drawActor(c, enemy = false) {
+  const atlas = loadImage(ACTOR_ATLAS.url);
+  const p = projectTile(clamp(Math.floor(c.x), 0, MAP_W - 1), clamp(Math.floor(c.y), 0, MAP_H - 1));
+  const base = worldToScreen(c.x, c.y);
+  const y = base.y - p.h + TILE_H * p.scale * 0.20;
+  const x = base.x;
+  const scale = p.scale;
+  const moving = Math.abs((c.tx ?? c.x) - c.x) + Math.abs((c.ty ?? c.y) - c.y) > 0.03;
+  const stride = moving ? Math.sin(G.gameTick * 0.42 + (c.x + c.y) * 2.8) : 0;
+  const bob = moving ? Math.abs(stride) * 0.45 * scale : 0;
+  const dir = actorDir(c);
+
+  ctx.save();
+  drawActorGroundShadow(x, y, scale, moving, stride, dir, enemy);
+
+  if (atlas) {
+    const variant = enemy ? 'miner' : actorVariant(c);
+    const action = enemy ? (moving ? 'walk' : 'idle') : actorAction(c, moving);
+    const variantIdx = Math.max(0, ACTOR_ATLAS.variants.indexOf(variant));
+    const actionIdx = Math.max(0, ACTOR_ATLAS.actions.indexOf(action));
+    const dirIdx = Math.max(0, ACTOR_ATLAS.dirs.indexOf(dir));
+    const row = (variantIdx * ACTOR_ATLAS.actions.length + actionIdx) * ACTOR_ATLAS.dirs.length + dirIdx;
+    const frameRate = action === 'idle' ? 18 : action === 'work' ? 7 : 8;
+    const frame = action === 'idle'
+      ? 0
+      : Math.floor(G.gameTick / frameRate + (c.x + c.y) * 2) % ACTOR_ATLAS.frames;
+    const h = 42 * scale;
+    const w = h * (ACTOR_ATLAS.w / ACTOR_ATLAS.h);
+    if (enemy) ctx.filter = 'hue-rotate(135deg) saturate(0.85) brightness(0.75)';
+    ctx.drawImage(atlas, frame * ACTOR_ATLAS.w, row * ACTOR_ATLAS.h, ACTOR_ATLAS.w, ACTOR_ATLAS.h, x - w / 2, y - h + 2 * scale - bob, w, h);
+  } else {
+    ctx.fillStyle = enemy ? '#5c1414' : '#4f8bc9';
+    ctx.beginPath();
+    ctx.ellipse(x, y - 13 * scale - bob, 5.6 * scale, 10 * scale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e6b27a';
+    ctx.beginPath();
+    ctx.arc(x, y - 26 * scale - bob, 5.5 * scale, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawSelection() {
+  const ht = G.hoveredTile;
+  if (!ht || ht.x < 0 || ht.y < 0 || ht.x >= MAP_W || ht.y >= MAP_H) return;
+  const p = projectTile(ht.x, ht.y);
+  ctx.save();
+  ctx.strokeStyle = G.selectedBuild ? '#ffd166' : 'rgba(255,255,255,0.42)';
+  ctx.lineWidth = Math.max(1.5, p.scale * 1.4);
+  ctx.globalAlpha = G.selectedBuild ? 0.92 : 0.45;
+  pathDiamond(p, p.y - 1 * p.scale, 2 * p.scale);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function visibleBounds() {
+  const pad = 5;
+  const corners = [
+    screenToWorldRaw(0, 0),
+    screenToWorldRaw(logicalW, 0),
+    screenToWorldRaw(0, logicalH),
+    screenToWorldRaw(logicalW, logicalH),
+  ];
+  return {
+    minX: clamp(Math.floor(Math.min(...corners.map(c => c.x)) - pad), 0, MAP_W - 1),
+    maxX: clamp(Math.ceil(Math.max(...corners.map(c => c.x)) + pad), 0, MAP_W - 1),
+    minY: clamp(Math.floor(Math.min(...corners.map(c => c.y)) - pad), 0, MAP_H - 1),
+    maxY: clamp(Math.ceil(Math.max(...corners.map(c => c.y)) + pad), 0, MAP_H - 1),
+  };
+}
+
+function drawSky() {
+  const t = (G.dayPhase ?? 0) / (G.dayLength ?? 3600);
+  const daylight = getDaylight();
+  const grad = ctx.createLinearGradient(0, 0, 0, logicalH);
+  const dawn = Math.max(0, 1 - Math.abs(t - 0.15) * 6);
+  const dusk = Math.max(0, 1 - Math.abs(t - 0.85) * 6);
+  const top = dusk > dawn ? '#557192' : dawn > 0.15 ? '#7799aa' : '#6aa3c9';
+  grad.addColorStop(0, daylight < 0.84 ? '#172641' : top);
+  grad.addColorStop(1, daylight < 0.84 ? '#0b1224' : '#9ec9d9');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, logicalW, logicalH);
+
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = '#fff8dc';
+  ctx.beginPath();
+  ctx.ellipse(logicalW * 0.18, logicalH * 0.18, 120, 36, -0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+export function initGL3D(c) {
+  canvas = c;
+  ctx = canvas?.getContext('2d', { alpha: false });
+  if (!canvas || !ctx) return false;
+  canvas.style.position = 'absolute';
+  canvas.style.left = '0';
+  canvas.style.top = '0';
+  canvas.style.zIndex = '5';
+  canvas.style.imageRendering = 'auto';
+  resize3D();
+  prewarmImages();
+  return true;
+}
+
 export function resize3D() {
-  if (!gl) return;
-  const canvas = gl.canvas;
-  if (!canvas) return;
+  if (!canvas || !ctx) return;
   const dpr = window.devicePixelRatio || 1;
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  canvas.width  = Math.round(w * dpr);
-  canvas.height = Math.round(h * dpr);
-  canvas.style.width  = w + 'px';
-  canvas.style.height = h + 'px';
+  logicalW = window.innerWidth;
+  logicalH = window.innerHeight;
+  canvas.width = Math.round(logicalW * dpr);
+  canvas.height = Math.round(logicalH * dpr);
+  canvas.style.width = `${logicalW}px`;
+  canvas.style.height = `${logicalH}px`;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+export function buildTerrainMesh() {
+  prewarmImages();
+}
+
+export function buildBuildingsMesh() {
+  prewarmImages();
+}
+
+export function render3D() {
+  if (!ctx || !G.map || G.map.length === 0) return;
+  prewarmImages();
+  drawSky();
+
+  const b = visibleBounds();
+  const objects = [];
+  for (let y = b.minY; y <= b.maxY; y++) {
+    for (let x = b.minX; x <= b.maxX; x++) {
+      drawTile(x, y, G.fog?.[y]?.[x] !== false);
+      objects.push({ depth: x + y + 0.25, draw: () => drawTerrainDetail(x, y) });
+    }
+  }
+
+  for (const building of G.buildings || []) {
+    if (building.x < b.minX - 1 || building.x > b.maxX + 1 || building.y < b.minY - 1 || building.y > b.maxY + 1) continue;
+    objects.push({ depth: building.x + building.y + 0.70, draw: () => drawBuilding(building) });
+  }
+  for (const c of G.citizens || []) {
+    if (c.x < b.minX - 1 || c.x > b.maxX + 1 || c.y < b.minY - 1 || c.y > b.maxY + 1) continue;
+    objects.push({ depth: c.x + c.y + 0.95, draw: () => drawActor(c, false) });
+  }
+  for (const e of G.enemies || []) {
+    if (e.x < b.minX - 1 || e.x > b.maxX + 1 || e.y < b.minY - 1 || e.y > b.maxY + 1) continue;
+    objects.push({ depth: e.x + e.y + 1.0, draw: () => drawActor(e, true) });
+  }
+
+  objects.sort((a, b2) => a.depth - b2.depth);
+  for (const obj of objects) obj.draw();
+  drawSelection();
+
+  const daylight = getDaylight();
+  if (daylight < 0.96) {
+    ctx.save();
+    ctx.globalAlpha = clamp((0.96 - daylight) * 0.85, 0, 0.32);
+    ctx.fillStyle = '#081123';
+    ctx.fillRect(0, 0, logicalW, logicalH);
+    ctx.restore();
+  }
+
+  if (G.weather === 'rain' || G.weather === 'storm') {
+    ctx.save();
+    ctx.globalAlpha = G.weather === 'storm' ? 0.28 : 0.18;
+    ctx.strokeStyle = '#c7ddff';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 90; i++) {
+      const x = (hash2(i, G.gameTick, 3) % logicalW);
+      const y = (hash2(i, G.gameTick, 9) % logicalH);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 8, y + 18);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
 }

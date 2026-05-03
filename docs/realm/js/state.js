@@ -145,6 +145,7 @@ export const G = {
   stats: {
     buildingsBuilt: 0,
     buildingsLost: 0,
+    raidsFaced: 0,
     citizensBorn: 0,
     citizensDied: 0,
     raidsSurvived: 0,
@@ -228,10 +229,10 @@ export function getSeasonData() {
 
 export function getDaylight() {
   const t = G.dayPhase / G.dayLength;
-  if (t < 0.1) return 0.55 + (t/0.1)*0.45;
+  if (t < 0.1) return 0.72 + (t/0.1)*0.28;
   if (t < 0.6) return 1;
   if (t < 0.75) return 1 - ((t-0.6)/0.15)*0.35;
-  return 0.65 - ((t-0.75)/0.25)*0.1;
+  return 0.72 - ((t-0.75)/0.25)*0.04;
 }
 
 // Instrumentation for loop 004 (the-profiler): sample the lighting

@@ -419,20 +419,19 @@ export function checkRaids() {
     // Loop 16 + 20 + 26 (render S3): raid scaling adapts to the player's
     // defensive posture. Without walls/barracks/towers the game can't
     // realistically scale up wave size — each raid is a wipe.
-    // - First raid: 2 raiders (tutorial event)
-    // - Defenseless (0 defensive buildings): cap at 3 lifetime. Players
-    //   who never research defense get a quiet island, not nightly massacres.
-    // - Before day 20 with defense: cap at 5 (ramp)
-    // - Day 20+: 2 + day/5 capped at 12
-    const isFirstRaid = !G.stats?.raidsSurvived;
+    // - First raid: small warning raid.
+    // - Defenseless towns get nuisance plunderers, not wipe waves.
+    // - Defended towns ramp slowly enough that rebuilding is possible.
+    const raidsFaced = G.stats?.raidsFaced || (G.lastRaidDay !== undefined ? 1 : 0);
+    const isFirstRaid = raidsFaced === 0;
     const hasDefense = G.buildings.some(b =>
       b.type === 'wall' || b.type === 'barracks' || b.type === 'tower' || b.type === 'archery' || b.type === 'castle'
     );
     let baseCount;
     if (isFirstRaid) baseCount = 2;
-    else if (!hasDefense) baseCount = 3;
-    else if (G.day < 20) baseCount = Math.min(5, 3 + G.day/8);
-    else baseCount = Math.min(12, 2 + G.day/5);
+    else if (!hasDefense) baseCount = raidsFaced < 3 ? 2 : 3;
+    else if (G.day < 28) baseCount = Math.min(4, 2 + G.day/12);
+    else baseCount = Math.min(9, 2 + G.day/9);
     // Loop 206 (the-fixer, 105 filed 101 ticks): named rival adds +10%
     // raider count when present. Adversarial inverse of the cooperative
     // named-character mechanic pattern (101 teacher / 102 merchant /
@@ -444,7 +443,7 @@ export function checkRaids() {
     // at baseCount ≥ ~10 — soft difficulty curve that rises with
     // realm age (early raids unaffected; deep-realm raids meaner).
     const rivalMult = G.namedCharacters?.rival ? 1.1 : 1;
-    const raiders = Math.max(2, Math.floor(baseCount * getDifficulty().raidMult * rivalMult));
+    const raiders = Math.max(1, Math.floor(baseCount * getDifficulty().raidMult * rivalMult));
     playSound('raid');
 
     const report = [`⚔️ RAID: ${raiders} raiders approach!`];
@@ -490,7 +489,10 @@ export function checkRaids() {
       else { ex = 0; ey = Math.random() * MAP_H; }
       G.enemies.push({
         x: ex, y: ey, tx: MAP_W/2, ty: MAP_H/2,
-        hp: 30, maxHp: 30,
+        hp: isFirstRaid ? 24 : 30,
+        maxHp: isFirstRaid ? 24 : 30,
+        damage: isFirstRaid ? 5 : 7,
+        plunderGoal: isFirstRaid ? 20 : (hasDefense ? 42 : 30),
         type: 'raider',
         state: 'approach',
         variant: Math.floor(Math.random() * 3), // 0=swordsman 1=spearman 2=berserker
@@ -513,8 +515,10 @@ export function checkRaids() {
     // Screen flash — add a brief red overlay particle at map center
     G.raidFlash = 1.0;
 
-    G.nextRaidDay = G.day + G.raidInterval + rngInt(-1,2);
-    G.raidInterval = Math.max(4, G.raidInterval - 1);
+    const recoveryWindow = hasDefense ? 8 : 10;
+    const interval = Math.max(recoveryWindow, G.raidInterval || recoveryWindow);
+    G.nextRaidDay = G.day + interval + rngInt(0,3);
+    G.raidInterval = Math.max(recoveryWindow, (G.raidInterval || interval) - (hasDefense && G.day > 40 ? 1 : 0));
     // Loop 211 (surprise, closes 060 filed ~150 ticks): track the day
     // each raid happened. Enables the sustained-peace beat (story.js
     // sustained_peace_known) which fires when raidsSurvived ≥ 1 AND
@@ -527,7 +531,10 @@ export function checkRaids() {
     // incremented unconditionally in main.js, so 5/5 was achievable by
     // standing still through five raids with zero military buildings.
     // hasDefense is computed above (line ~371) for raid-scaling; reuse.
-    if (G.stats && hasDefense) G.stats.raidsSurvived++;
+    if (G.stats) {
+      G.stats.raidsFaced = (G.stats.raidsFaced || 0) + 1;
+      if (hasDefense) G.stats.raidsSurvived++;
+    }
   }
 }
 

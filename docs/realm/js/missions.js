@@ -14,7 +14,7 @@ export const missions = [
   { id:'market1', text:'Build a market',                 check:()=>G.buildings.some(b=>b.type==='market'),    done:false, reward:{gold:25} },
   { id:'defense', text:'Build barracks or tower',        check:()=>G.buildings.some(b=>b.type==='barracks'||b.type==='tower'), done:false, reward:{iron:5} },
   { id:'pop25',   text:'Reach 25 population',           check:()=>G.population>=25,                          done:false, reward:{iron:10,gold:20} },
-  { id:'survive', text:'Survive the first raid',         check:()=>G.day>G.nextRaidDay,                      done:false, reward:{gold:30} },
+  { id:'survive', text:'Survive the first raid',         check:()=> (G.stats?.raidsFaced || 0) >= 1 && G.enemies.length === 0, done:false, reward:{gold:30} },
   { id:'tavern1', text:'Build a tavern',                 check:()=>G.buildings.some(b=>b.type==='tavern'),    done:false, reward:{gold:15} },
   { id:'pop50',   text:'Reach 50 population',           check:()=>G.population>=50,                          done:false, reward:{gold:50} },
   { id:'iron1',   text:'Build an iron mine',             check:()=>G.buildings.some(b=>b.type==='mine'),      done:false, reward:{gold:20} },

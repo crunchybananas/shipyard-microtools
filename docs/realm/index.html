@@ -99,9 +99,10 @@ canvas#game{display:block;position:absolute;top:0;left:0}
    on #kingdom-display below so unusually long names can't re-introduce the
    overflow. justify-content stays center; min-width:0 on shrinkable children
    lets the long items (kingdom/date) shrink rather than push neighbors off. */
-#hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0.6rem 1rem;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);font-size:var(--fs-base)}
+#hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:flex-start;gap:1rem;padding:0.55rem 1rem 0.65rem;background:linear-gradient(to bottom,rgba(10,12,23,0.88) 0%,rgba(12,16,28,0.74) 70%,rgba(12,16,28,0.20) 100%);border-bottom:1px solid rgba(255,255,255,0.07);box-shadow:0 14px 28px rgba(4,6,12,0.14);z-index:10;backdrop-filter:blur(12px);font-size:var(--fs-base);overflow-x:auto;scrollbar-width:none}
+#hud::-webkit-scrollbar{display:none}
 #kingdom-display{max-width:10rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-#day-display{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#day-display{flex:0 0 auto;overflow:visible;white-space:nowrap}
 /* Loop 035: photo mode — hide all HUD chrome so the canvas shows a clean frame. Toggled by H key via window.togglePhotoMode. */
 body.photo-mode #hud,body.photo-mode #build-bar,body.photo-mode #missions,body.photo-mode #controls,body.photo-mode #minimap,body.photo-mode #info-panel,body.photo-mode #tutorial-tip,body.photo-mode #toast,body.photo-mode #activity-feed,body.photo-mode #event-banner,body.photo-mode #raid-banner,body.photo-mode #chronicle-panel,body.photo-mode #happiness-panel,body.photo-mode #research-panel,body.photo-mode #stats-panel,body.photo-mode #achievements-panel,body.photo-mode #notification-log,body.photo-mode #trade-panel,body.photo-mode #pop-panel{display:none !important}
 /* Loop 036: sticky raid banner — prominent but non-modal. Sits below the HUD, center-anchored. Red-tinted so it reads "urgent" without a modal feel. */
@@ -148,39 +149,39 @@ body.photo-mode #photo-mode-badge{display:block}
 @keyframes threatPulse{0%,100%{opacity:1}50%{opacity:0.6}}
 
 /* Build bar */
-#build-bar{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:stretch;justify-content:flex-start;gap:0.4rem;padding:0.5rem 0.8rem;background:var(--panel);border-top:1px solid var(--border);z-index:10;backdrop-filter:blur(10px);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent}
+#build-bar{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:stretch;justify-content:flex-start;gap:0.42rem;padding:0.5rem 0.8rem 0.55rem;background:linear-gradient(to top,rgba(10,12,23,0.88) 0%,rgba(12,16,28,0.78) 68%,rgba(12,16,28,0.28) 100%);border-top:1px solid rgba(255,255,255,0.07);box-shadow:0 -16px 34px rgba(4,6,12,0.18);z-index:10;backdrop-filter:blur(12px);flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent}
 #build-bar::-webkit-scrollbar{height:4px}
 #build-bar::-webkit-scrollbar-track{background:transparent}
 #build-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}
 #build-bar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.3)}
-.build-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.42rem 0.62rem;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.11);border-radius:8px;color:var(--text);cursor:pointer;font-size:0.68rem;font-family:inherit;min-width:72px;transition:background 0.15s,border-color 0.15s,transform 0.15s;overflow:hidden}
+.build-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:0.18rem;padding:0.42rem 0.62rem;background:linear-gradient(180deg,rgba(255,255,255,0.075),rgba(255,255,255,0.035));border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--text);cursor:pointer;font-size:0.68rem;font-family:inherit;min-width:82px;transition:background 0.15s,border-color 0.15s,transform 0.15s,box-shadow 0.15s;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.06)}
 .build-btn-shortcut{position:absolute;top:3px;left:4px;font-size:0.55rem;font-family:'SF Mono',Monaco,monospace;font-weight:700;color:rgba(255,255,255,0.35);line-height:1;pointer-events:none;letter-spacing:0}
 .build-btn:hover .build-btn-shortcut,.build-btn.active .build-btn-shortcut{color:rgba(255,255,255,0.6)}
 .build-count{font-size:0.55rem;background:rgba(129,140,248,0.25);color:var(--accent);padding:0.05rem 0.3rem;border-radius:6px;font-weight:700;margin-left:auto;flex-shrink:0}
-.build-btn:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.24)}
+.build-btn:hover{background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.055));border-color:rgba(255,255,255,0.24);box-shadow:0 8px 20px rgba(0,0,0,0.24),inset 0 1px 0 rgba(255,255,255,0.08)}
 .build-btn.active{background:rgba(129,140,248,0.35);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 12px rgba(129,140,248,0.5);transform:translateY(-3px)}
 .build-btn.disabled{opacity:0.35;pointer-events:none}
 .build-btn .icon{font-size:1.4rem;line-height:1}
 .build-sprite{width:46px;height:36px;object-fit:contain;object-position:center bottom;display:block;margin:-0.15rem 0 -0.05rem;filter:drop-shadow(0 4px 4px rgba(0,0,0,0.35))}
 .build-emoji{font-size:1.35rem;line-height:36px;height:36px;display:block}
-.build-name{display:block;max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.build-name{display:-webkit-box;width:70px;min-height:1.5rem;line-height:1.1;white-space:normal;overflow:hidden;text-align:center;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .build-btn .cost{font-size:0.6rem;color:rgba(255,255,255,0.5)}
 .build-btn .cost .cost-short{color:#ef4444;font-weight:700}
 .build-btn .cost .cost-close{color:#f5c94a;font-weight:600}
 .build-btn .build-lock{position:absolute;top:3px;right:5px;font-size:0.7rem;opacity:0.85;pointer-events:none}
 .build-btn .terrain{color:var(--food);font-size:0.55rem;display:block;margin-top:0.1rem}
-.build-cat{color:rgba(255,255,255,0.62);font-weight:600;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.12em;writing-mode:vertical-lr;padding:0 0.25rem;display:flex;align-items:center;user-select:none;border-left:1px solid rgba(255,255,255,0.08);border-right:1px solid rgba(255,255,255,0.08)}
+.build-cat{color:rgba(255,255,255,0.55);font-weight:600;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.12em;writing-mode:vertical-lr;padding:0 0.25rem;display:flex;align-items:center;user-select:none;border-left:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06);text-shadow:0 1px 2px rgba(0,0,0,0.55)}
 
 /* Mission panel */
-#missions{position:fixed;top:3rem;right:0.8rem;width:220px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.8rem;z-index:10;backdrop-filter:blur(10px);font-size:var(--fs-sm)}
+#missions{position:fixed;top:3rem;right:0.8rem;width:220px;background:linear-gradient(180deg,rgba(11,14,24,0.86),rgba(10,12,22,0.70));border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.7rem 0.8rem;z-index:10;backdrop-filter:blur(13px);font-size:var(--fs-sm);box-shadow:0 12px 28px rgba(0,0,0,0.24),inset 0 1px 0 rgba(255,255,255,0.06)}
 #missions h3{font-size:0.8rem;margin-bottom:0.5rem;color:var(--gold);letter-spacing:0.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;user-select:none}
 #missions h3:hover{opacity:0.85}
 #missions-toggle{font-size:var(--fs-xs);opacity:0.6;margin-left:0.4rem}
 #missions-content{max-height:280px;overflow-y:auto}
-.mission{padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:0.4rem}
+.mission{padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.045);display:flex;align-items:center;gap:0.4rem}
 .mission:last-child{border-bottom:none}
 .mission.done{opacity:0.4;text-decoration:line-through}
-.mission.mission-next{background:rgba(255,210,80,0.08);border-left:2px solid #f5c94a;padding-left:0.5rem;font-weight:600}
+.mission.mission-next{background:linear-gradient(90deg,rgba(255,210,80,0.16),rgba(255,210,80,0.04));border-left:2px solid #f5c94a;padding-left:0.5rem;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,0.045)}
 .mission.mission-next .check{border-color:#f5c94a;box-shadow:0 0 4px rgba(245,201,74,0.5)}
 .mission.mission-later{opacity:0.55}
 .mission-progress{font-variant-numeric:tabular-nums;color:var(--gold);font-size:0.72rem;font-weight:700;margin-left:0.15rem}
@@ -202,13 +203,13 @@ body.photo-mode #photo-mode-badge{display:block}
 }
 .mission.mission-celebrate{animation:mission-celebrate-pulse 2.2s ease-out forwards;border-left:2px solid #f5c94a;padding-left:0.5rem;opacity:1 !important;text-decoration:none !important}
 .mission.mission-celebrate .check{animation:mission-celebrate-check 0.55s cubic-bezier(.34,1.56,.64,1) forwards;background:var(--food);border-color:var(--food);color:#000}
-.scenario-header{padding:0.35rem 0 0.4rem;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:0.3rem}
+.scenario-header{padding:0.35rem 0 0.4rem;border-bottom:1px solid rgba(255,255,255,0.075);margin-bottom:0.3rem}
 .scen-name{font-weight:700;font-size:0.8rem;color:var(--gold);margin-bottom:0.15rem}
 .scen-desc{font-size:0.68rem;color:rgba(255,255,255,0.45);font-style:italic}
 .scen-progress{font-size:0.7rem;color:var(--accent);float:right}
 
 /* Toast — type-aware styles */
-#toast{position:fixed;top:5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.90);color:var(--gold);padding:1rem 2rem;border-radius:10px;font-size:1.1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:2px solid rgba(255,209,102,0.35);box-shadow:0 4px 32px rgba(0,0,0,0.6)}
+#toast{position:fixed;top:5.15rem;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(11,18,32,0.86),rgba(8,12,24,0.78));color:#d8ecff;padding:0.62rem 1.25rem;border-radius:8px;font-size:1rem;font-weight:700;pointer-events:none;opacity:0;transition:opacity 0.35s;z-index:100;text-align:center;border:1px solid rgba(147,197,253,0.55);box-shadow:0 8px 26px rgba(0,0,0,0.42),inset 0 1px 0 rgba(255,255,255,0.12);backdrop-filter:blur(10px);max-width:min(420px,70vw);line-height:1.35}
 #toast.show{opacity:1}
 #toast.toast-info{color:#93c5fd;border-color:rgba(147,197,253,0.45);box-shadow:0 4px 32px rgba(96,165,250,0.25)}
 #toast.toast-danger{color:var(--danger);border-color:rgba(248,113,113,0.55);box-shadow:0 4px 32px rgba(248,113,113,0.3)}
@@ -238,12 +239,11 @@ body.photo-mode #photo-mode-badge{display:block}
 #tooltip .tt-terrain{color:var(--food);font-size:0.68rem}
 
 /* Speed + save controls */
-#controls{position:fixed;top:3rem;left:0.8rem;display:flex;flex-direction:column;gap:0.3rem;z-index:10}
-#speed{display:flex;gap:0.25rem}
-#speed button,#save-controls button{background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);padding:0.3rem 0.55rem;border-radius:5px;font-size:0.7rem;cursor:pointer;font-family:inherit}
-#speed button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-#save-controls{display:flex;gap:0.25rem}
-#save-controls button:hover{background:rgba(255,255,255,0.12)}
+#controls{position:fixed;top:3rem;left:0.8rem;display:flex;flex-direction:column;gap:0.35rem;z-index:10}
+#speed,#save-controls{display:flex;gap:0.22rem;width:max-content;padding:0.18rem;background:linear-gradient(180deg,rgba(24,39,34,0.68),rgba(7,15,16,0.58));border:1px solid rgba(220,190,112,0.18);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.24),inset 0 1px 0 rgba(255,255,255,0.06);backdrop-filter:blur(10px)}
+#speed button,#save-controls button{min-width:2rem;background:linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.045));border:1px solid rgba(255,255,255,0.12);color:rgba(246,241,221,0.88);padding:0.28rem 0.52rem;border-radius:6px;font-size:0.68rem;line-height:1.1;cursor:pointer;font-family:inherit;text-shadow:0 1px 1px rgba(0,0,0,0.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);transition:background 0.15s ease,border-color 0.15s ease,transform 0.15s ease}
+#speed button.active{background:linear-gradient(180deg,#7f8cff,#5968de);color:#fff;border-color:rgba(204,213,255,0.72);box-shadow:0 0 0 1px rgba(105,118,255,0.22),0 8px 20px rgba(60,70,180,0.26),inset 0 1px 0 rgba(255,255,255,0.2)}
+#speed button:hover,#save-controls button:hover{background:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.07));border-color:rgba(231,203,126,0.32);transform:translateY(-1px)}
 
 /* Info panel */
 #info-panel{position:fixed;top:calc(3rem + 240px);right:0.8rem;width:230px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:0.75rem 0.9rem;z-index:15;backdrop-filter:blur(12px);font-size:0.78rem;line-height:1.5;display:none;box-shadow:0 4px 24px rgba(0,0,0,0.5);transform:translateX(20px);opacity:0;transition:transform 0.2s ease,opacity 0.2s ease}
@@ -272,7 +272,8 @@ body.photo-mode #photo-mode-badge{display:block}
 @media(max-width:600px){#info-panel{top:auto;bottom:5.5rem;right:0.4rem;width:200px;font-size:0.72rem}}
 
 /* Minimap */
-#minimap{position:fixed;bottom:4.5rem;right:0.8rem;width:220px;height:220px;border:2px solid rgba(129,140,248,0.55);border-radius:10px;z-index:10;cursor:pointer;background:#000;image-rendering:pixelated;box-shadow:0 0 0 1px rgba(0,0,0,0.6),0 4px 20px rgba(0,0,0,0.6),inset 0 0 8px rgba(0,0,0,0.4)}
+#minimap{position:fixed;bottom:5.1rem;right:0.9rem;width:184px;height:184px;border:1px solid rgba(209,170,96,0.52);border-radius:8px;z-index:10;cursor:pointer;background:#0d1110;image-rendering:auto;box-shadow:0 10px 28px rgba(0,0,0,0.48),inset 0 0 0 1px rgba(255,235,180,0.08),inset 0 0 24px rgba(126,93,44,0.20);opacity:0.95}
+#minimap.minimap-raid{box-shadow:0 0 12px rgba(239,68,68,0.68),0 10px 28px rgba(0,0,0,0.48),inset 0 0 0 1px rgba(255,235,180,0.08),inset 0 0 24px rgba(126,93,44,0.20)}
 
 /* Notification log */
 #log-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(430px,90vw);max-height:72vh;background:var(--panel);border:1px solid var(--border);border-radius:12px;z-index:50;backdrop-filter:blur(12px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
@@ -375,7 +376,7 @@ body.photo-mode #photo-mode-badge{display:block}
 .vic-btn:hover{background:rgba(255,209,102,0.12);box-shadow:0 0 20px rgba(255,209,102,0.2)}
 
 /* Achievement toast */
-#achievement-toast{position:fixed;bottom:5rem;right:1rem;display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1rem;background:rgba(15,15,30,0.95);border:1.5px solid var(--gold);border-radius:10px;z-index:100;font-size:0.8rem;pointer-events:none;opacity:0;transition:opacity 0.4s,transform 0.4s;transform:translateX(20px);max-width:300px;backdrop-filter:blur(10px)}
+#achievement-toast{position:fixed;bottom:16.9rem;right:1rem;display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1rem;background:linear-gradient(180deg,rgba(16,18,31,0.96),rgba(9,12,24,0.92));border:1.5px solid var(--gold);border-radius:10px;z-index:100;font-size:0.8rem;pointer-events:none;opacity:0;transition:opacity 0.4s,transform 0.4s;transform:translateX(20px);max-width:300px;backdrop-filter:blur(10px);box-shadow:0 12px 30px rgba(0,0,0,0.38),inset 0 1px 0 rgba(255,255,255,0.08)}
 #achievement-toast.show{opacity:1;transform:translateX(0)}
 .at-icon{font-size:1.8rem}
 .at-title{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:0.1rem}
@@ -404,11 +405,11 @@ body.photo-mode #photo-mode-badge{display:block}
 .ach-check{font-size:0.8rem;color:var(--food);font-weight:700;flex-shrink:0;align-self:center}
 
 /* Tutorial */
-#tutorial-tip{position:fixed;top:170px;left:12px;padding:0.65rem 0.9rem;background:rgba(15,15,40,0.94);border:2px solid rgba(129,140,248,0.7);border-radius:10px;z-index:25;backdrop-filter:blur(12px);font-size:0.78rem;color:#e0e8f0;width:230px;text-align:left;animation:tipPulse 2.5s ease-in-out infinite;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
-@keyframes tipPulse{0%,100%{border-color:rgba(129,140,248,0.6);box-shadow:0 8px 30px rgba(0,0,0,0.4)}50%{border-color:rgba(129,140,248,1);box-shadow:0 8px 30px rgba(129,140,248,0.2)}}
-.tut-text{margin-bottom:0.4rem;line-height:1.5}
-.tut-action{font-size:var(--fs-sm);color:var(--accent);font-weight:600;margin-bottom:0.35rem}
-.tut-progress{font-size:0.6rem;color:rgba(255,255,255,0.3);margin-bottom:0.25rem}
+#tutorial-tip{position:fixed;top:172px;left:14px;padding:0.72rem 0.85rem;background:linear-gradient(180deg,rgba(16,24,44,0.88),rgba(10,14,28,0.82));border:1px solid rgba(147,197,253,0.48);border-left:3px solid rgba(255,209,102,0.82);border-radius:8px;z-index:25;backdrop-filter:blur(14px);font-size:0.78rem;color:#e6edf7;width:228px;text-align:left;box-shadow:0 10px 28px rgba(0,0,0,0.34),inset 0 1px 0 rgba(255,255,255,0.09)}
+@keyframes tipPulse{0%,100%{border-color:rgba(147,197,253,0.42);box-shadow:0 10px 28px rgba(0,0,0,0.34)}50%{border-color:rgba(255,209,102,0.65);box-shadow:0 10px 28px rgba(0,0,0,0.34),0 0 18px rgba(255,209,102,0.10)}}
+.tut-text{margin-bottom:0.45rem;line-height:1.45;color:rgba(255,255,255,0.86)}
+.tut-action{font-size:var(--fs-sm);color:#a5b4fc;font-weight:650;margin-bottom:0.35rem}
+.tut-progress{font-size:0.6rem;color:rgba(255,255,255,0.34);margin-bottom:0.28rem;letter-spacing:0.02em;text-transform:uppercase}
 .tut-skip{background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);padding:0.2rem 0.6rem;border-radius:4px;font-size:var(--fs-xs);cursor:pointer;font-family:inherit}
 .tut-skip:hover{color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.3)}
 /* Tutorial highlight pulse — needs to be IMPOSSIBLE to miss. Validator flagged the
@@ -543,12 +544,14 @@ body.photo-mode #photo-mode-badge{display:block}
 .tech-icon{font-size:1.4rem;flex-shrink:0}.tech-info{flex:1;min-width:0}.tech-name{font-weight:700;font-size:var(--fs-base)}.tech-desc{color:rgba(255,255,255,0.55);font-size:0.7rem}.tech-cost{font-size:var(--fs-xs);color:rgba(255,255,255,0.4)}
 
 @media(max-width:600px){
-  #hud{gap:0.6rem;font-size:0.7rem;padding:0.4rem 0.5rem}
+  #hud{gap:0.45rem;font-size:0.7rem;padding:0.4rem 0.55rem}
+  #day-display,#kingdom-display{display:none}
   .build-btn{min-width:56px;padding:0.35rem 0.45rem;font-size:0.62rem}
   .build-btn .icon{font-size:1.1rem}
   .build-sprite{width:36px;height:30px}
   #missions{width:170px;font-size:0.68rem;top:2.5rem;right:0.4rem}
   #minimap{width:150px;height:150px;bottom:3.5rem}
+  #achievement-toast{right:0.5rem;bottom:13.4rem;max-width:min(260px,72vw)}
 }
 </style>
 </head>
@@ -610,14 +613,14 @@ body.photo-mode #photo-mode-badge{display:block}
   <span id="day-display">Day 1</span>
   <button class="hud-btn" id="btn-research" onclick="toggleResearch()" title="Research — unlock new buildings and upgrades (R)">🔬 Research</button>
   <button class="hud-btn" onclick="toggleHappiness()" title="Happiness — view settler mood breakdown">😊</button>
-  <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()" title="Ambient sound on/off">🔊</button>
+  <button class="hud-btn" id="btn-ambient" onclick="toggleAmbientSound()" title="Mute all sound">🔊</button>
   <button class="hud-btn" id="btn-music" onclick="toggleMusicBtn()" title="Music on/off (M)">🎵</button>
   <button class="hud-btn" onclick="toggleAchievements()" title="Achievements">🏆</button>
   <button class="hud-btn" onclick="toggleStats()" title="Statistics — resources, production, population history">📊</button>
   <button class="hud-btn" onclick="toggleLog()" title="Notifications log (L)">📜<span id="log-badge" class="log-badge" style="display:none">•</span></button>
   <button class="hud-btn" onclick="toggleTrade()" title="Trade with merchant partners (T)">🛒</button>
   <button class="hud-btn" onclick="toggleChronicle()" title="Chronicle — recorded history of your realm">📖</button>
-  <button class="hud-btn" id="btn-3d" onclick="toggle3D()" title="Toggle 3D voxel view (experimental)">🧊</button>
+  <button class="hud-btn" id="btn-3d" onclick="toggle3D()" title="Toggle 3D diorama view">🧊</button>
 </div>
 
 <div id="chronicle-panel" style="display:none">

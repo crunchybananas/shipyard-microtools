@@ -4,11 +4,38 @@
 
 import { G } from './state.js';
 
+const AUDIO_PREF_KEY = 'realm-audio-muted-v1';
+
+function readStoredMute() {
+  try {
+    return localStorage.getItem(AUDIO_PREF_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function writeStoredMute(muted) {
+  try {
+    localStorage.setItem(AUDIO_PREF_KEY, muted ? 'true' : 'false');
+  } catch {
+    // Storage can be unavailable in private/file contexts; audio still works.
+  }
+}
+
+let masterMuted = readStoredMute();
+
 export function initAudio() {
   if (G.audioCtx) return;
   try {
     G.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (masterMuted && G.audioCtx.state !== 'suspended') {
+      G.audioCtx.suspend().catch(() => {});
+    }
   } catch { /* browser doesn't support */ }
+}
+
+function isMuted() {
+  return masterMuted || G.audioCtx?.state === 'suspended';
 }
 
 // ── Helper: one-shot oscillator with gain envelope ────────
@@ -56,7 +83,7 @@ function makeNoiseBurst(ctx, dest, gainPeak, durationSec, startTime, filterFreq)
 // ── Diegetic SFX for specific buildings ──────────────────
 // Each building type gets a small sonic signature on placement.
 export function playBuildingSound(buildingType) {
-  if (!G.audioCtx) return;
+  if (!G.audioCtx || isMuted()) return;
   const ctx = G.audioCtx;
   const t = ctx.currentTime;
   const dest = ctx.destination;
@@ -138,7 +165,7 @@ export function playBuildingSound(buildingType) {
 // code was one frequency-sweep shape for all kinds; only the base pitch
 // varied. Now happy/sad/work/hungry/cheer/alarm each have their own shape.
 export function playVoiceBark(kind = 'happy', voiceSeed = 0) {
-  if (!G.audioCtx) return;
+  if (!G.audioCtx || isMuted()) return;
   const ctx = G.audioCtx;
   const t = ctx.currentTime;
   const dest = ctx.destination;
@@ -211,7 +238,7 @@ export function playVoiceBark(kind = 'happy', voiceSeed = 0) {
 }
 
 export function playSound(type) {
-  if (!G.audioCtx) return;
+  if (!G.audioCtx || isMuted()) return;
   const ctx = G.audioCtx;
   const t = ctx.currentTime;
   const dest = ctx.destination;
@@ -599,7 +626,7 @@ let _musicPhraseIdx = 0;
 let _musicLastScaleIdx = 0;
 
 export function tickMusic() {
-  if (!musicEnabled || !G.audioCtx) return;
+  if (!musicEnabled || !G.audioCtx || masterMuted) return;
   const ctx = G.audioCtx;
   if (ctx.state === 'suspended') return;
   const now = ctx.currentTime;
@@ -668,15 +695,25 @@ let ambientEnabled = true;
 let chirpTimer = null;
 
 export function toggleAmbient() {
-  ambientEnabled = !ambientEnabled;
-  if (!ambientEnabled) stopAmbient();
-  return ambientEnabled;
+  masterMuted = !masterMuted;
+  ambientEnabled = !masterMuted;
+  writeStoredMute(masterMuted);
+  if (!G.audioCtx) return !masterMuted;
+  if (masterMuted) {
+    stopAmbient();
+    try { G.audioCtx.suspend(); } catch {}
+  } else {
+    try { G.audioCtx.resume(); } catch {}
+  }
+  return !masterMuted;
 }
 
-export function isAmbientEnabled() { return ambientEnabled; }
+export function isAmbientEnabled() { return !masterMuted; }
+
+export function isMasterMuted() { return masterMuted; }
 
 export function updateAmbient() {
-  if (!G.audioCtx || !ambientEnabled) return;
+  if (!G.audioCtx || !ambientEnabled || masterMuted) return;
   if (G.audioCtx.state === 'suspended') return;
   if (G.season === currentAmbientSeason && ambientNodes) return;
   startSeasonAmbient(G.season);

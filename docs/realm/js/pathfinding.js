@@ -46,7 +46,7 @@ function isWalkable(x, y) {
   const tile = G.map[y][x];
   if (tile === TILE.WATER || tile === TILE.MOUNTAIN) return false;
   const b = G.buildingGrid[y]?.[x];
-  if (b && b.type === 'wall') return false;
+  if (b && b.type !== 'road') return false;
   return true;
 }
 
@@ -59,22 +59,36 @@ function moveCost(x, y) {
 const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
 const SQRT2 = Math.SQRT2;
 
+function nearestWalkableTile(x, y, maxR = 5) {
+  if (isWalkable(x, y)) return { x, y };
+  for (let r = 1; r <= maxR; r++) {
+    let best = null;
+    let bestD = Infinity;
+    for (let yy = y - r; yy <= y + r; yy++) {
+      for (let xx = x - r; xx <= x + r; xx++) {
+        if (Math.abs(xx - x) !== r && Math.abs(yy - y) !== r) continue;
+        if (!isWalkable(xx, yy)) continue;
+        const d = Math.abs(xx - x) + Math.abs(yy - y);
+        if (d < bestD) {
+          bestD = d;
+          best = { x: xx, y: yy };
+        }
+      }
+    }
+    if (best) return best;
+  }
+  return null;
+}
+
 export function findPath(sx, sy, ex, ey, maxIter = 2000) {
   sx = Math.round(sx); sy = Math.round(sy);
   ex = Math.round(ex); ey = Math.round(ey);
 
-  if (!isWalkable(ex, ey)) {
-    // Find nearest walkable to the target
-    for (let r = 1; r <= 3; r++) {
-      for (const [dx, dy] of DIRS) {
-        const nx = ex + dx*r, ny = ey + dy*r;
-        if (isWalkable(nx, ny)) { ex = nx; ey = ny; break; }
-      }
-      if (isWalkable(ex, ey)) break;
-    }
-    if (!isWalkable(ex, ey)) return null;
-  }
-  if (!isWalkable(sx, sy)) return null;
+  const start = nearestWalkableTile(sx, sy, 2);
+  const end = nearestWalkableTile(ex, ey, 5);
+  if (!start || !end) return null;
+  sx = start.x; sy = start.y;
+  ex = end.x; ey = end.y;
   if (sx === ex && sy === ey) return [{x:ex,y:ey}];
 
   const key = (x,y) => y * MAP_W + x;

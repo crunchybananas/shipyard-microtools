@@ -5,7 +5,7 @@
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated } from './render.js';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, renderMinimap } from './render.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
 import { updateProduction, checkRaids, collectTaxes, updateFires, processQueue } from './economy.js';
@@ -16,7 +16,7 @@ import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPan
 import { updateResearch } from './tech.js';
 import { checkRandomEvents, updateEventBanner } from './events.js';
 import { saveGame, loadGame, getSaveSize } from './save.js';
-import { updateAmbient, toggleAmbient, isAmbientEnabled, playSound, tickMusic, toggleMusic } from './audio.js';
+import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js';
 import { toggleNotificationLog, notify } from './notifications.js';
 import { executeTrade } from './trade.js';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js';
@@ -44,17 +44,26 @@ if (!canvas3d) {
 const gl3dReady = initGL3D(canvas3d);
 
 let _3dVisible = false;
-window.toggle3D = () => {
-  _3dVisible = !_3dVisible;
+function set3DVisible(visible) {
+  _3dVisible = !!visible && gl3dReady;
   canvas3d.style.display = _3dVisible ? 'block' : 'none';
   canvas.style.display = _3dVisible ? 'none' : 'block';
   const miniEl = document.getElementById('minimap');
-  if (miniEl) miniEl.style.display = _3dVisible ? 'none' : 'block';
+  if (miniEl) miniEl.style.display = 'block';
+  const btn3d = document.getElementById('btn-3d');
+  if (btn3d) {
+    btn3d.classList.toggle('active', _3dVisible);
+    btn3d.setAttribute('aria-pressed', _3dVisible ? 'true' : 'false');
+  }
   if (_3dVisible && gl3dReady) {
     buildTerrainMesh();
+    buildBuildingsMesh();
     render3D();
+    renderMinimap();
   }
-};
+}
+
+window.toggle3D = () => set3DVisible(!_3dVisible);
 
 initRenderer(canvas, minimap);
 resizeCanvas();
@@ -113,6 +122,12 @@ document.addEventListener('visibilitychange', () => {
 setupSaveButtons();
 loadAchievements();
 
+function syncAudioButtons() {
+  const ambientBtn = document.getElementById('btn-ambient');
+  if (ambientBtn) ambientBtn.textContent = isMasterMuted() ? '🔇' : '🔊';
+}
+syncAudioButtons();
+
 // Check for existing save to show Continue button with friendly summary
 const hasSaveData = !!localStorage.getItem('realm-save-v2');
 if (hasSaveData) {
@@ -170,6 +185,7 @@ function beginGame() {
   renderBuildBar();
   renderMissions();
   updateUI();
+  set3DVisible(true);
   notify('Welcome to Realm. Build your settlement!');
   gameLoop();
 
@@ -310,7 +326,7 @@ window.newGame = () => {
   G.notificationLog = [];
   G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
   G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
-  G.day = 1; G.dayPhase = 0; G.gameTick = 0; G.speed = 1;
+  G.day = 1; G.dayPhase = Math.floor(G.dayLength * 0.22); G.gameTick = 0; G.speed = 1;
   G.selectedBuild = null; G.selectedBuilding = null;
   G.nextRaidDay = 8; G.raidInterval = 8;
   G.researchedTechs = new Set(['agriculture','forestry']);
@@ -329,7 +345,7 @@ window.newGame = () => {
   // Loop 311 (310 [code]): added everHadBuilding tracking. New realm
   // starts with empty experience; placeBuilding (economy.js:69) sets
   // each type true.
-  G.stats = { buildingsBuilt:0, buildingsLost:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0, scenariosWon:[], everHadBuilding:{} };
+  G.stats = { buildingsBuilt:0, buildingsLost:0, raidsFaced:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0, scenariosWon:[], everHadBuilding:{} };
   // Loop 269 (the-fixer, 268 HIGH+MEDIUM): reset realm-end flag and
   // sustained-state trackers. Without these, a player whose realm fell
   // and clicked "New Game" inherited realmEnded=true (chronicle gated +
@@ -629,11 +645,11 @@ function fastForward(days) {
   };
 }
 
-// Loop 261 (the-fixer, 192 also-filed + 260 sibling): render desaturation
+// Loop 261 (the-fixer, 192 also-filed + 260 sibling): render subtle desaturation
 // when G.realmEnded. The 192 commit added G.realmEnded and named two
 // consumers: "chronicle stop" (closed at 260) + "render desat" (closed
 // here). Together they complete the realm-end visual+textual story —
-// chronicle stops writing AND world goes desaturated/dim. CSS filter on
+// chronicle stops writing AND world gets a muted fallen-realm grade. CSS filter on
 // both the game canvas + postfx overlay covers the WebGL post-process
 // path. Tracked variable avoids every-frame DOM writes (only flips on
 // state transition: live realm_fell OR save load with realmEnded=true).
@@ -656,7 +672,7 @@ function _applyRealmEndFilter() {
     const post = document.getElementById('postfx');
     if (post) post.style.transition = 'filter 1.5s ease';
   }
-  const filterStr = G.realmEnded ? 'grayscale(0.85) brightness(0.85)' : '';
+  const filterStr = G.realmEnded ? 'grayscale(0.18) saturate(0.82) brightness(0.94)' : '';
   canvas.style.filter = filterStr;
   const post = document.getElementById('postfx');
   if (post) post.style.filter = filterStr;
@@ -668,6 +684,7 @@ function gameLoop() {
       simTick();
       if (_3dVisible && gl3dReady) {
         render3D();
+        renderMinimap();
       } else {
         render();
         applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());

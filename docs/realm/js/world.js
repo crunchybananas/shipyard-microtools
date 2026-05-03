@@ -114,7 +114,7 @@ export function generateWorld(){
     else             rx += Math.round(rng() * 2 - 1);  // vertical flow → horizontal meander
   }
 
-  revealAround(sx, sy, 9);
+  revealAround(sx, sy, 11);
 
   G.citizens = [];
   for(let i=0;i<3;i++){

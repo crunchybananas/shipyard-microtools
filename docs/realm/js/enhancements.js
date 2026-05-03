@@ -22,6 +22,44 @@ import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
+const _AMBIENT_ATLAS_URL = 'assets/sprites/ambient-atlas.png';
+const _AMBIENT_CELL = 48;
+const _AMBIENT_FRAMES = {
+  cart:     { x:   0, y: 0, w: 48, h: 48 },
+  fishboat: { x:  48, y: 0, w: 48, h: 48 },
+  sailboat: { x:  96, y: 0, w: 48, h: 48 },
+  cargo:    { x: 144, y: 0, w: 48, h: 48 },
+};
+let _ambientAtlas = null;
+let _ambientAtlasState = 'idle';
+function _loadAmbientAtlas() {
+  if (_ambientAtlasState === 'ready') return _ambientAtlas;
+  if (_ambientAtlasState === 'loading' || _ambientAtlasState === 'failed') return null;
+  _ambientAtlasState = 'loading';
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => { _ambientAtlas = img; _ambientAtlasState = 'ready'; };
+  img.onerror = () => { _ambientAtlas = null; _ambientAtlasState = 'failed'; };
+  img.src = _AMBIENT_ATLAS_URL;
+  return null;
+}
+function drawAmbientSprite(ctx, type, x, baseY, w, h, alpha = 1, flip = false) {
+  const atlas = _loadAmbientAtlas();
+  const frame = _AMBIENT_FRAMES[type];
+  if (!atlas || !frame) return false;
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  if (flip) {
+    ctx.translate(x, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(atlas, frame.x, frame.y, frame.w, frame.h, -w / 2, baseY - h, w, h);
+  } else {
+    ctx.drawImage(atlas, frame.x, frame.y, frame.w, frame.h, x - w / 2, baseY - h, w, h);
+  }
+  ctx.restore();
+  return true;
+}
+
 // ── Loop 22: Cherry blossom canopy on forest tiles in spring
 export function renderBlossoms(ctx) {
   if (G.season !== 'spring' || G.camera.zoom < 0.7) return;
@@ -35,26 +73,22 @@ export function renderBlossoms(ctx) {
   for (let ty = ty0; ty <= ty1; ty++) {
     for (let tx = tx0; tx <= tx1; tx++) {
       if (G.map[ty][tx] !== TILE.FOREST) continue;
+      if (G.fog?.[ty]?.[tx] === false) continue;
       const h = ((tx * 2654435761) ^ (ty * 1597463007)) >>> 0;
-      if (h % 100 > 25) continue; // 25% of forest tiles bloom
+      if (h % 100 > 12) continue; // sparse accents, not a screen-wide confetti layer
       const s = toScreen(tx, ty);
-      // Cluster of 5-7 pink puffs
-      const N = 5 + (h % 3);
+      const N = 3 + (h % 2);
       const isWhite = h & 8;
+      const bloom = isWhite ? '#ffe5ee' : '#f4a7ba';
       for (let i = 0; i < N; i++) {
         const off = ((h + i * 911) % 100) / 100;
         const off2 = ((h + i * 1373) % 100) / 100;
-        const px = s.x + (off - 0.5) * 14;
-        const py = s.y - 8 + (off2 - 0.5) * 6;
-        ctx.globalAlpha = 0.85;
-        ctx.fillStyle = isWhite ? '#ffeef5' : (i & 1 ? '#ffb0c8' : '#ff8aa8');
+        const px = s.x + (off - 0.5) * 11;
+        const py = s.y - 10 + (off2 - 0.5) * 5;
+        ctx.globalAlpha = 0.42;
+        ctx.fillStyle = bloom;
         ctx.beginPath();
-        ctx.arc(px, py, 1.6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 0.4;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(px - 0.4, py - 0.4, 0.7, 0, Math.PI * 2);
+        ctx.ellipse(px, py, 1.25, 0.75, (h % 7) * 0.25 + i, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -505,6 +539,10 @@ export function renderCarts(ctx) {
     const s = toScreen(c.x, c.y);
     const bob = Math.sin(G.gameTick * 0.15 + c.bobPhase) * 0.4;
     ctx.globalAlpha = dayl;
+    const mdx = c.tx - c.x;
+    if (drawAmbientSprite(ctx, 'cart', s.x, s.y + 8 + bob, 48, 38, 1, mdx < 0)) {
+      continue;
+    }
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.beginPath();
@@ -536,7 +574,7 @@ export function renderCarts(ctx) {
     ctx.beginPath(); ctx.arc(s.x + 5, s.y + 1, 0.8, 0, Math.PI * 2); ctx.fill();
     // Horse pulling (small) — drawn ahead of cart in motion direction
     if (c.state !== 'unloading') {
-      const mdx = c.tx - c.x, mdy = c.ty - c.y;
+      const mdy = c.ty - c.y;
       const md = Math.hypot(mdx, mdy) || 1;
       const hsx = s.x + (mdx / md) * 9;
       const hsy = s.y + bob - 2;
@@ -1087,6 +1125,12 @@ export function renderBoats(ctx) {
     const s = toScreen(b.x, b.y);
     const bob = Math.sin(G.gameTick * 0.06 + b.bobPhase) * 0.6;
     ctx.globalAlpha = daylight;
+    const mdx = b.tx - b.x;
+    const spriteType = b.kind === 'sail' ? 'sailboat' : 'fishboat';
+    const spriteH = b.kind === 'sail' ? 31 : 24;
+    if (drawAmbientSprite(ctx, spriteType, s.x, s.y + 10 + bob, 44, spriteH + 6, 1, mdx < 0)) {
+      continue;
+    }
     // Wake (small white V trail behind boat)
     ctx.strokeStyle = 'rgba(220,235,255,0.45)';
     ctx.lineWidth = 0.8;
@@ -4217,15 +4261,15 @@ registerScreenRenderer(renderEagles);
 // ── Loop 94: Pollen burst on flowers in spring meadows ─────
 function updatePollenBurst() {
   // Loop 44 (render S4): fresh-eyes critique called out pollen "bleeding
-  // over citizen torsos". Root was sheer density (5 particles × 4 attempts
+  // over citizen torsos". Root was sheer density (5 particles x 4 attempts
   // every 90 ticks = up to 20 per burst) plus post-citizen z-order. Halved
   // density (2 per burst) and doubled interval (180 ticks). Also skip
   // tiles with citizens within 0.8 so they don't puff directly through a
   // person's face.
   if (G.season !== 'spring') return;
   if (!G.particles) G.particles = [];
-  if (G.gameTick % 180 !== 0 || G.particles.length > 220) return;
-  for (let attempt = 0; attempt < 3; attempt++) {
+  if (G.gameTick % 360 !== 0 || G.particles.length > 150) return;
+  for (let attempt = 0; attempt < 2; attempt++) {
     const x = Math.floor(Math.random() * MAP_W);
     const y = Math.floor(Math.random() * MAP_H);
     if (!(G.map[y] && G.map[y][x] === TILE.GRASS)) continue;
@@ -4235,17 +4279,17 @@ function updatePollenBurst() {
       if (Math.abs(c.x - x) < 0.9 && Math.abs(c.y - y) < 0.9) { occupied = true; break; }
     }
     if (occupied) continue;
-    for (let k = 0; k < 2; k++) {
+    for (let k = 0; k < 1; k++) {
       G.particles.push({
         tx: x + (Math.random() - 0.5) * 0.5,
         ty: y + (Math.random() - 0.5) * 0.5,
         offsetY: -3 - Math.random() * 4,
-        text: null, alpha: 0.65,
-        vy: -0.04 - Math.random() * 0.04,
-        decay: 0.006,
+        text: null, alpha: 0.38,
+        vy: -0.025 - Math.random() * 0.03,
+        decay: 0.008,
         type: 'pollen',
-        size: 0.55 + Math.random() * 0.4,
-        vx: (Math.random() - 0.5) * 0.04,
+        size: 0.35 + Math.random() * 0.25,
+        vx: (Math.random() - 0.5) * 0.025,
       });
     }
     break;
@@ -5682,7 +5726,7 @@ function updateMinimapFlash() {
   }
   const mm = document.getElementById('minimap');
   if (mm) {
-    mm.style.boxShadow = _minimapFlash ? '0 0 10px rgba(239,68,68,0.6)' : 'none';
+    mm.classList.toggle('minimap-raid', !!_minimapFlash);
   }
 }
 registerUpdater(updateMinimapFlash);

@@ -24,11 +24,13 @@ function nearestBuilding(c, typeOrNull) {
 }
 
 function pathTo(c, tx, ty) {
+  c.tx = tx;
+  c.ty = ty;
   c.path = findPath(Math.round(c.x), Math.round(c.y), tx, ty);
   c.pathIdx = 0;
   if (!c.path) {
-    c.tx = tx + rngRange(-0.3, 0.3);
-    c.ty = ty + rngRange(-0.3, 0.3);
+    c.tx = c.x;
+    c.ty = c.y;
   }
 }
 
@@ -48,7 +50,8 @@ function tileWalkable(x, y) {
   const mx = Math.round(x), my = Math.round(y);
   if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return false;
   const t = G.map[my][mx];
-  return t !== TILE.WATER && t !== TILE.MOUNTAIN;
+  const b = G.buildingGrid[my]?.[mx];
+  return t !== TILE.WATER && t !== TILE.MOUNTAIN && (!b || b.type === 'road');
 }
 
 function isActivelyMoving(c) {
@@ -162,8 +165,20 @@ export function updateCitizens() {
           const penalty = Math.min(0.4, (c.hunger - 60) / 100);
           spd *= (1 - penalty);
         }
-        c.x += (dx/d) * Math.min(spd, d);
-        c.y += (dy/d) * Math.min(spd, d);
+        const step = Math.min(spd, d);
+        const nx = c.x + (dx/d) * step;
+        const ny = c.y + (dy/d) * step;
+        if (tileWalkable(nx, ny)) {
+          c.x = nx;
+          c.y = ny;
+        } else {
+          c.path = findPath(Math.round(c.x), Math.round(c.y), Math.round(c.tx ?? wp.x), Math.round(c.ty ?? wp.y));
+          c.pathIdx = 0;
+          if (!c.path) {
+            c.tx = c.x;
+            c.ty = c.y;
+          }
+        }
       }
       continue; // still moving — next citizen
     }
@@ -178,8 +193,17 @@ export function updateCitizens() {
           const penalty = Math.min(0.4, (c.hunger - 60) / 100);
           spd *= (1 - penalty);
         }
-        c.x += (dx/d) * Math.min(spd, d);
-        c.y += (dy/d) * Math.min(spd, d);
+        const step = Math.min(spd, d);
+        const nx = c.x + (dx/d) * step;
+        const ny = c.y + (dy/d) * step;
+        if (tileWalkable(nx, ny)) {
+          c.x = nx;
+          c.y = ny;
+        } else {
+          c.path = null;
+          c.tx = c.x;
+          c.ty = c.y;
+        }
         continue;
       }
     }
