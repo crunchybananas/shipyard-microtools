@@ -19,30 +19,18 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
+import { makeAtlasLoader } from './atlas-loader.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
 const _AMBIENT_ATLAS_URL = 'assets/sprites/ambient-atlas.png';
-const _AMBIENT_CELL = 48;
 const _AMBIENT_FRAMES = {
   cart:     { x:   0, y: 0, w: 48, h: 48 },
   fishboat: { x:  48, y: 0, w: 48, h: 48 },
   sailboat: { x:  96, y: 0, w: 48, h: 48 },
   cargo:    { x: 144, y: 0, w: 48, h: 48 },
 };
-let _ambientAtlas = null;
-let _ambientAtlasState = 'idle';
-function _loadAmbientAtlas() {
-  if (_ambientAtlasState === 'ready') return _ambientAtlas;
-  if (_ambientAtlasState === 'loading' || _ambientAtlasState === 'failed') return null;
-  _ambientAtlasState = 'loading';
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => { _ambientAtlas = img; _ambientAtlasState = 'ready'; };
-  img.onerror = () => { _ambientAtlas = null; _ambientAtlasState = 'failed'; };
-  img.src = _AMBIENT_ATLAS_URL;
-  return null;
-}
+const _loadAmbientAtlas = makeAtlasLoader(_AMBIENT_ATLAS_URL);
 function drawAmbientSprite(ctx, type, x, baseY, w, h, alpha = 1, flip = false) {
   const atlas = _loadAmbientAtlas();
   const frame = _AMBIENT_FRAMES[type];

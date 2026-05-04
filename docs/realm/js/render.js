@@ -4,6 +4,7 @@
 
 import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js';
 import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js';
+import { makeAtlasLoader } from './atlas-loader.js';
 
 let C, ctx, minimapC, minimapCtx;
 let logicalW, logicalH;
@@ -122,25 +123,7 @@ const _SUPPORT_ATLAS_TRIMS = {
   orchard:     { x:  0, y:  0, w: 128, h:  94 },
   hay:         { x:  0, y:  0, w: 122, h:  90 },
 };
-let _supportAtlas = null;
-let _supportAtlasState = 'idle';
-function _loadSupportAtlas() {
-  if (_supportAtlasState === 'ready') return _supportAtlas;
-  if (_supportAtlasState === 'loading' || _supportAtlasState === 'failed') return null;
-  _supportAtlasState = 'loading';
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => {
-    _supportAtlas = img;
-    _supportAtlasState = 'ready';
-  };
-  img.onerror = () => {
-    _supportAtlas = null;
-    _supportAtlasState = 'failed';
-  };
-  img.src = _SUPPORT_ATLAS_URL;
-  return null;
-}
+const _loadSupportAtlas = makeAtlasLoader(_SUPPORT_ATLAS_URL);
 
 const _ACTOR_ATLAS_URL = 'assets/sprites/actors-atlas.png';
 const _ACTOR_FRAME_W = 32;
@@ -149,25 +132,7 @@ const _ACTOR_FRAMES = 4;
 const _ACTOR_DIRS = ['down', 'up', 'left', 'right'];
 const _ACTOR_ACTIONS = ['idle', 'walk', 'work', 'carry'];
 const _ACTOR_VARIANTS = ['settler', 'farmer', 'lumber', 'miner', 'fisher', 'trader', 'builder', 'guard', 'forager'];
-let _actorAtlas = null;
-let _actorAtlasState = 'idle';
-function _loadActorAtlas() {
-  if (_actorAtlasState === 'ready') return _actorAtlas;
-  if (_actorAtlasState === 'loading' || _actorAtlasState === 'failed') return null;
-  _actorAtlasState = 'loading';
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => {
-    _actorAtlas = img;
-    _actorAtlasState = 'ready';
-  };
-  img.onerror = () => {
-    _actorAtlas = null;
-    _actorAtlasState = 'failed';
-  };
-  img.src = _ACTOR_ATLAS_URL;
-  return null;
-}
+const _loadActorAtlas = makeAtlasLoader(_ACTOR_ATLAS_URL);
 
 function actorVariantForCitizen(c) {
   const jt = c.jobBuilding?.type;
@@ -219,8 +184,6 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
 }
 
 const _NATURE_ATLAS_URL = 'assets/sprites/nature-atlas.png';
-const _NATURE_ATLAS_CELL = 128;
-const _NATURE_ATLAS_COLS = 4;
 const _NATURE_ATLAS_FRAMES = {
   pine:     { x:   0, y:   0, trim: { x: 25, y:  3, w:  81, h: 120 } },
   oak:      { x: 128, y:   0, trim: { x: 12, y: 10, w: 104, h: 110 } },
@@ -231,25 +194,7 @@ const _NATURE_ATLAS_FRAMES = {
   mountain: { x: 256, y: 128, trim: { x:  7, y:  8, w: 104, h: 104 } },
   flowers:  { x: 384, y: 128, trim: { x: 11, y: 24, w:  96, h:  85 } },
 };
-let _natureAtlas = null;
-let _natureAtlasState = 'idle';
-function _loadNatureAtlas() {
-  if (_natureAtlasState === 'ready') return _natureAtlas;
-  if (_natureAtlasState === 'loading' || _natureAtlasState === 'failed') return null;
-  _natureAtlasState = 'loading';
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => {
-    _natureAtlas = img;
-    _natureAtlasState = 'ready';
-  };
-  img.onerror = () => {
-    _natureAtlas = null;
-    _natureAtlasState = 'failed';
-  };
-  img.src = _NATURE_ATLAS_URL;
-  return null;
-}
+const _loadNatureAtlas = makeAtlasLoader(_NATURE_ATLAS_URL);
 function drawNatureSprite(ctx, type, x, baseY, targetH, alpha = 1) {
   const atlas = _loadNatureAtlas();
   const frame = _NATURE_ATLAS_FRAMES[type];
@@ -268,7 +213,6 @@ function drawNatureSprite(ctx, type, x, baseY, targetH, alpha = 1) {
 }
 
 const _TERRAIN_ATLAS_URL = 'assets/sprites/terrain-atlas.png';
-const _TERRAIN_ATLAS_CELL = 128;
 const _TERRAIN_ATLAS_FRAMES = {
   grass:    { x:   0, y:   0, trim: { x: 12, y: 32, w: 116, h: 84 } },
   forest:   { x: 128, y:   0, trim: { x:  0, y: 31, w: 125, h: 85 } },
@@ -279,25 +223,7 @@ const _TERRAIN_ATLAS_FRAMES = {
   mountain: { x: 256, y: 128, trim: { x:  0, y:  3, w: 128, h: 91 } },
   road:     { x: 384, y: 128, trim: { x:  0, y:  6, w: 114, h: 88 } },
 };
-let _terrainAtlas = null;
-let _terrainAtlasState = 'idle';
-function _loadTerrainAtlas() {
-  if (_terrainAtlasState === 'ready') return _terrainAtlas;
-  if (_terrainAtlasState === 'loading' || _terrainAtlasState === 'failed') return null;
-  _terrainAtlasState = 'loading';
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => {
-    _terrainAtlas = img;
-    _terrainAtlasState = 'ready';
-  };
-  img.onerror = () => {
-    _terrainAtlas = null;
-    _terrainAtlasState = 'failed';
-  };
-  img.src = _TERRAIN_ATLAS_URL;
-  return null;
-}
+const _loadTerrainAtlas = makeAtlasLoader(_TERRAIN_ATLAS_URL);
 function terrainSpriteKey(tile) {
   if (tile === TILE.WATER) return 'water';
   if (tile === TILE.SAND) return 'sand';
@@ -337,25 +263,7 @@ function drawTerrainSprite(ctx, tile, s, alpha = 1, clipToTile = true) {
   ctx.globalAlpha = oldAlpha;
   return true;
 }
-let _rasterAtlas = null;
-let _rasterAtlasState = 'idle';
-function _loadRasterAtlas() {
-  if (_rasterAtlasState === 'ready') return _rasterAtlas;
-  if (_rasterAtlasState === 'loading' || _rasterAtlasState === 'failed') return null;
-  _rasterAtlasState = 'loading';
-  const img = new Image();
-  img.decoding = 'async';
-  img.onload = () => {
-    _rasterAtlas = img;
-    _rasterAtlasState = 'ready';
-  };
-  img.onerror = () => {
-    _rasterAtlas = null;
-    _rasterAtlasState = 'failed';
-  };
-  img.src = _RASTER_ATLAS_URL;
-  return null;
-}
+const _loadRasterAtlas = makeAtlasLoader(_RASTER_ATLAS_URL);
 
 const _spriteCache = new Map(); // `${type}__${kname}` → HTMLImageElement (or 'loading' / null)
 function _loadSprite(type, kname) {
@@ -641,30 +549,30 @@ if (typeof window !== 'undefined') {
     return _SPRITE_MODE === 'svg';
   };
   window.__realm.rasterAtlas = () => ({
-    url: _RASTER_ATLAS_URL,
-    state: _rasterAtlasState,
+    url: _loadRasterAtlas.url,
+    state: _loadRasterAtlas.state,
     frames: _RASTER_ATLAS_FRAMES,
   });
   window.__realm.supportAtlas = () => ({
-    url: _SUPPORT_ATLAS_URL,
-    state: _supportAtlasState,
+    url: _loadSupportAtlas.url,
+    state: _loadSupportAtlas.state,
     frames: _SUPPORT_ATLAS_FRAMES,
   });
   window.__realm.actorAtlas = () => ({
-    url: _ACTOR_ATLAS_URL,
-    state: _actorAtlasState,
+    url: _loadActorAtlas.url,
+    state: _loadActorAtlas.state,
     variants: _ACTOR_VARIANTS,
     directions: _ACTOR_DIRS,
     frames: _ACTOR_FRAMES,
   });
   window.__realm.natureAtlas = () => ({
-    url: _NATURE_ATLAS_URL,
-    state: _natureAtlasState,
+    url: _loadNatureAtlas.url,
+    state: _loadNatureAtlas.state,
     frames: _NATURE_ATLAS_FRAMES,
   });
   window.__realm.terrainAtlas = () => ({
-    url: _TERRAIN_ATLAS_URL,
-    state: _terrainAtlasState,
+    url: _loadTerrainAtlas.url,
+    state: _loadTerrainAtlas.state,
     frames: _TERRAIN_ATLAS_FRAMES,
   });
   window.__realm.spriteCache = () => Array.from(_spriteCache.keys()).map(k => ({
