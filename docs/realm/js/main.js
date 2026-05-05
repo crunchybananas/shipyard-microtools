@@ -189,7 +189,6 @@ function beginGame() {
   renderMissions();
   updateUI();
   set3DVisible(true);
-  notify('Welcome to Realm. Build your settlement!');
   gameLoop();
 
   // Cinematic zoom-in over 1.5 seconds
