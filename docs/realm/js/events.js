@@ -33,23 +33,6 @@ export const EVENT_DEFS = [
     endMsg:   '🪙 The gold rush fades. Income returns to normal.',
   },
   {
-    id: 'plague',
-    name: '🦠 Plague',
-    desc: 'Illness spreads! Happiness −20 and citizens move 30% slower for 3 days.',
-    duration: 3,
-    color: '#a855f7',
-    positive: false,
-    onStart() {
-      G.eventModifiers.happinessOffset = -20;
-      G.eventModifiers.speedMult = 0.7;
-    },
-    onEnd() {
-      G.eventModifiers.happinessOffset = 0;
-      G.eventModifiers.speedMult = 1;
-    },
-    endMsg: '🦠 The plague subsides. Citizens recover.',
-  },
-  {
     id: 'migration',
     name: '🚶 Migration Wave',
     desc: 'Refugees arrive seeking shelter! +5 settlers.',
@@ -270,7 +253,10 @@ export const EVENT_DEFS = [
       // the fallen. Cycle 49 fixed the same class of bug for combat deaths;
       // this brings plague to parity.
       const intent = 1 + Math.floor(Math.random() * 2); // 1 or 2
-      const losses = Math.min(intent, G.citizens.length);
+      // Always leave at least one survivor. Plague should be a setback,
+      // not a wipe — with a 2-citizen settlement, intent=2 would have
+      // hit population zero and tripped realm_fell mid-event.
+      const losses = Math.max(0, Math.min(intent, G.citizens.length - 1));
       for (let i = 0; i < losses; i++) {
         const c = G.citizens.pop();
         if (!c) continue;
