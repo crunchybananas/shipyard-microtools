@@ -119,8 +119,8 @@ export const EVENT_DEFS = [
     duration: 0,
     color: '#dc2626',
     positive: false,
+    canFire: () => G.buildings.length > 0,
     onStart() {
-      if (G.buildings.length === 0) return;
       const target = G.buildings[rngInt(0, G.buildings.length - 1)];
       target.hp = Math.max(10, (target.hp ?? 100) - 30);
     },
@@ -247,6 +247,10 @@ export const EVENT_DEFS = [
     duration: 3,
     color: '#a855f7',
     positive: false,
+    // Need at least 2 citizens for plague to actually claim one — the
+    // last-survivor cap below would otherwise leave losses=0 and the
+    // toast would lie about "1-2 deaths" while no one died.
+    canFire: () => G.citizens.length > 1,
     onStart() {
       // Deep-play (cycle 71) caught: old code always took 2 (contradicting the
       // "−1–2" description) AND deaths were silent — population quietly dropped
