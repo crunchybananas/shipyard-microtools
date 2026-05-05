@@ -39,6 +39,7 @@ export const EVENT_DEFS = [
     duration: 0,
     color: '#4ade80',
     positive: true,
+    canFire: () => G.maxPop - G.population >= 1,
     onStart() {
       const count = Math.min(5, G.maxPop - G.population);
       if (count > 0) trySpawnSettlers(count);
@@ -229,9 +230,9 @@ export const EVENT_DEFS = [
     duration: 0,
     color: '#f97316',
     positive: false,
+    canFire: () => G.buildings.some(b => ['house','tavern','bakery','lumber','windmill'].includes(b.type)),
     onStart() {
       const flammable = G.buildings.filter(b => ['house','tavern','bakery','lumber','windmill'].includes(b.type));
-      if (flammable.length === 0) return;
       const b = flammable[Math.floor(Math.random() * flammable.length)];
       b.onFire = true;
       b._fireTimer = 0;
@@ -372,7 +373,13 @@ export function checkRandomEvents() {
   // 8% chance per day
   if (rng() > 0.08) return;
 
-  const def = EVENT_DEFS[rngInt(0, EVENT_DEFS.length - 1)];
+  // Only consider events whose preconditions are currently satisfied.
+  // Events without `canFire` are always eligible. Picking from the eligible
+  // set (instead of rolling-and-skipping on the full pool) avoids the
+  // "fire toast but nothing burns" UX bug when no flammable buildings exist.
+  const eligible = EVENT_DEFS.filter(e => !e.canFire || e.canFire());
+  if (eligible.length === 0) return;
+  const def = eligible[rngInt(0, eligible.length - 1)];
   G.activeEvent = {
     id: def.id,
     name: def.name,

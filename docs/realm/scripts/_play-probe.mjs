@@ -45,32 +45,22 @@ await page.waitForTimeout(500);
 const shot2 = await page.screenshot({ fullPage: false });
 await writeFile('/tmp/realm-probe-2-2d-fresh.png', shot2);
 
-// Cheat resources, then place a starter settlement near spawn
+// Cheat resources & defense and let the game run long enough for events to surface
 await page.evaluate(() => {
   const G = window.G;
   if (!G) return;
   Object.assign(G.resources, { wood: 9999, stone: 9999, gold: 9999, food: 9999, iron: 9999 });
+  G.defense = 999;
+  G.nextRaidDay = 9999;
   G.speed = 4;
-  // Find a flat spot near the castle to plant a settlement
-  const castle = G.buildings.find(b => b.type === 'castle') || { x: 40, y: 30 };
-  const layout = [
-    ['house',     -3, -2], ['house',     -1, -2], ['house',     1, -2],
-    ['farm',      -3,  1], ['farm',       0,  2],
-    ['lumber',     3,  1],
-    ['well',      -1,  0],
-    ['granary',    2, -1],
-  ];
-  for (const [type, dx, dy] of layout) {
-    const tx = Math.max(0, Math.min(79, castle.x + dx));
-    const ty = Math.max(0, Math.min(79, castle.y + dy));
-    // Try every realm-internal placement helper
-    const fn = window.placeBuilding || window.__realm?.placeBuilding;
-    if (fn) {
-      try { fn(type, tx, ty); } catch {}
-    }
-  }
 });
-await page.waitForTimeout(8000); // ~32 sim seconds at speed 4
+// Use the in-game fastForward (exposed at window) if available — it advances
+// real day count without waiting for animation frames
+await page.evaluate(() => {
+  const ff = window.G?.debug?.fastForward;
+  if (ff) ff(200);
+});
+await page.waitForTimeout(2000);
 
 const shot3 = await page.screenshot({ fullPage: false });
 await writeFile('/tmp/realm-probe-3-2d-after-sim.png', shot3);
@@ -88,17 +78,13 @@ const stateInfo = await page.evaluate(() => {
     day: G.day,
     population: G.population,
     maxPop: G.maxPop,
-    buildings: (G.buildings || []).length,
     citizens: (G.citizens || []).length,
-    enemies: (G.enemies || []).length,
-    soldiers: (G.soldiers || []).length,
-    resources: G.resources,
+    citizensDied: G.stats?.citizensDied,
+    citizensBorn: G.stats?.citizensBorn,
+    realmEnded: G.realmEnded,
+    activeEvent: G.activeEvent?.name || null,
     happiness: G.happiness,
     tick: G.gameTick,
-    speed: G.speed,
-    realmEnded: G.realmEnded,
-    fps: window.__realm?.fps || null,
-    spriteMode: typeof window.__realm?.spriteMode === 'function' ? window.__realm.spriteMode() : null,
   };
 });
 console.log('[probe] state:', JSON.stringify(stateInfo, null, 2));
