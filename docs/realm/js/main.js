@@ -5,7 +5,8 @@
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, renderMinimap } from './render.js';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
 import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js';
@@ -65,7 +66,9 @@ function set3DVisible(visible) {
 
 window.toggle3D = () => set3DVisible(!_3dVisible);
 
-initRenderer(canvas, minimap);
+initRenderer(canvas);
+initMinimap(minimap);
+setMinimapViewportResolver(screenToWorld);
 resizeCanvas();
 initPostFX(canvas);
 window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); if (gl3dReady) resize3D(); });
@@ -678,17 +681,18 @@ function gameLoop() {
       simTick();
       if (_3dVisible && gl3dReady) {
         render3D();
-        renderMinimap();
       } else {
         render();
         applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
       }
+      renderMinimap();
       _applyRealmEndFilter();
       requestAnimationFrame(gameLoop);
     } else {
       for (let i = 0; i < 60; i++) simTick();
       render();
       applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
+      renderMinimap();
       _applyRealmEndFilter();
       setTimeout(gameLoop, 16);
     }
