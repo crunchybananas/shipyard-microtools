@@ -33,15 +33,15 @@ export function toggleFPS() { showFPS = !showFPS; }
 // canonical sprites. First draw of a (type, kingdom) pair kicks off
 // load (returns false from `drawSpriteIfReady`); subsequent draws
 // hit cache and dispatch to ctx.drawImage. While not loaded, the
-// dispatch falls through to the existing canvas drawX.
+// dispatch simply skips that sprite for the current frame.
 //
 // Loop 221 (Phase B step 6 — final): default flipped to sprite art.
 // Loop 357: raster atlas mode became the first draw path.
-// Live game now ships sprite art through a layered fallback chain:
-// raster atlas -> SVG sprites -> canvas drawX functions. The atlas is
-// the first bridge toward real bitmap/game-art sprites while keeping the
-// mature SVG and canvas paths one console toggle away.
-let _SPRITE_MODE = 'raster'; // 'raster' | 'svg' | 'canvas'
+// Live game now ships sprite art through a raster-first chain:
+// raster atlas -> SVG compatibility wrappers. The old procedural canvas
+// drawX functions remain in this file for isolated/debug use, but the
+// live dispatcher no longer falls back to them.
+let _SPRITE_MODE = 'raster'; // 'raster' | 'svg'
 const _SPRITE_TYPES = new Set([
   'granary', 'castle', 'church', 'windmill', 'tower',
   'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
@@ -127,31 +127,39 @@ const _SUPPORT_ATLAS_TRIMS = {
 const _loadSupportAtlas = makeAtlasLoader(_SUPPORT_ATLAS_URL);
 
 const _ACTOR_ATLAS_URL = 'assets/sprites/actors-atlas.png';
-const _ACTOR_FRAME_W = 32;
-const _ACTOR_FRAME_H = 42;
+const _ACTOR_FRAME_W = 64;
+const _ACTOR_FRAME_H = 84;
 const _ACTOR_FRAMES = 4;
 const _ACTOR_DIRS = ['down', 'up', 'left', 'right'];
 const _ACTOR_ACTIONS = ['idle', 'walk', 'work', 'carry'];
-const _ACTOR_VARIANTS = ['settler', 'farmer', 'lumber', 'miner', 'fisher', 'trader', 'builder', 'guard', 'forager'];
+const _ACTOR_VARIANTS = [
+  'settler', 'farmer', 'rancher', 'lumber', 'miner', 'stonecutter',
+  'fisher', 'trader', 'innkeeper', 'builder', 'blacksmith', 'guard',
+  'scholar', 'forager',
+];
 const _loadActorAtlas = makeAtlasLoader(_ACTOR_ATLAS_URL);
 
 function actorVariantForCitizen(c) {
   const jt = c.jobBuilding?.type;
-  if (c.state === 'foraging') return 'forager';
-  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery' || jt === 'chickencoop' || jt === 'cowpen' || c.state === 'eating') return 'farmer';
+  if (jt === 'chickencoop' || jt === 'cowpen') return 'rancher';
+  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery') return 'farmer';
   if (jt === 'lumber') return 'lumber';
-  if (jt === 'mine' || jt === 'quarry' || jt === 'blacksmith') return 'miner';
+  if (jt === 'quarry') return 'stonecutter';
+  if (jt === 'blacksmith') return 'blacksmith';
+  if (jt === 'mine') return 'miner';
   if (jt === 'fisherman') return 'fisher';
-  if (jt === 'market' || jt === 'tradingpost' || jt === 'tavern') return 'trader';
+  if (jt === 'tavern') return 'innkeeper';
+  if (jt === 'market' || jt === 'tradingpost') return 'trader';
   if (jt === 'barracks' || jt === 'tower' || jt === 'archery') return 'guard';
-  if (jt === 'school' || jt === 'church' || jt === 'townhall') return 'builder';
+  if (jt === 'school' || jt === 'church') return 'scholar';
+  if (jt === 'townhall') return 'builder';
   return 'settler';
 }
 
 function actorActionForCitizen(c, isMoving) {
-  if (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver') return 'carry';
+  if (isMoving && (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver')) return 'carry';
   if (c.state === 'working' || c.state === 'foraging' || c.state === 'eating') return 'work';
-  if (isMoving || c.state === 'walk_to_work') return 'walk';
+  if (isMoving) return 'walk';
   return 'idle';
 }
 
@@ -176,11 +184,17 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
     : Math.floor(G.gameTick / frameRate + phaseOffset * 2) % _ACTOR_FRAMES;
   const targetW = 30;
   const targetH = 39;
+  const dx = Math.round(s.x - targetW / 2);
+  const dy = Math.round(cy + 4 - targetH);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(
     atlas,
     frame * _ACTOR_FRAME_W, row * _ACTOR_FRAME_H, _ACTOR_FRAME_W, _ACTOR_FRAME_H,
-    s.x - targetW / 2, cy + 4 - targetH, targetW, targetH
+    dx, dy, targetW, targetH
   );
+  ctx.restore();
   return true;
 }
 
@@ -460,16 +474,30 @@ function fallbackBuildingShadowFootprint(type) {
   const wide = (type === 'castle') ? 15 : (type === 'church' || type === 'tower') ? 12 : 10;
   return { wide, tall: wide * 0.36, y: 3 };
 }
-// drawSpriteIfReady: returns true if it drew the sprite, false if
-// the caller should fall through to the canvas dispatch. CALLED
-// FROM INSIDE the parent translate/scale envelope in drawBuilding,
-// so damage cracks and winter cap compose on top regardless of
-// path. Step 2 (217): sized per-building + bottom-anchored at s.
+// drawSpriteIfReady: returns true if it drew the sprite. CALLED FROM
+// INSIDE the parent translate/scale envelope in drawBuilding, so damage
+// cracks and winter cap compose on top. Step 2 (217): sized per-building
+// + bottom-anchored at s.
 // Day/night tint is NOT applied here; the screen-space
 // `applyNightTint` after the world pass tints the entire frame
 // uniformly so per-sprite tinting would double-apply.
-function drawSpriteIfReady(ctx, b, s) {
-  if (_SPRITE_MODE === 'canvas') return false;
+function drawImageWithReveal(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh, reveal = 1) {
+  const r = Math.max(0, Math.min(1, reveal));
+  if (r >= 0.995) {
+    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+    return;
+  }
+  const visibleH = Math.max(2, dh * r);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(dx - 4, dy + dh - visibleH - 2, dw + 8, visibleH + 4);
+  ctx.clip();
+  ctx.globalAlpha *= 0.48 + r * 0.52;
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+  ctx.restore();
+}
+
+function drawSpriteIfReady(ctx, b, s, reveal = 1) {
   if (!_SPRITE_TYPES.has(b.type)) return false;
 
   if (_SPRITE_MODE === 'raster') {
@@ -482,10 +510,12 @@ function drawSpriteIfReady(ctx, b, s) {
       const trim = trims[b.type] || { x: 0, y: 0, w: frame.w, h: frame.h };
       const targetH = size.h;
       const targetW = Math.max(size.w, targetH * (trim.w / trim.h));
-      ctx.drawImage(
+      drawImageWithReveal(
+        ctx,
         atlas,
         frame.x + trim.x, frame.y + trim.y, trim.w, trim.h,
-        s.x - targetW / 2, s.y - targetH, targetW, targetH
+        s.x - targetW / 2, s.y - targetH, targetW, targetH,
+        reveal
       );
       return true;
     }
@@ -495,19 +525,18 @@ function drawSpriteIfReady(ctx, b, s) {
 
   // Phase B step 5: pass kingdom name to enable per-realm variants.
   const img = _loadSprite(b.type, G.kingdomName);
-  if (!img) return false;  // still loading or failed; fall through
+  if (!img) return false;  // still loading or failed; skip this frame
   const size = _SPRITE_SIZES[b.type] || { w: 36, h: 42 };
   // Bottom-anchored at (s.x, s.y); building "stands on" the tile.
-  ctx.drawImage(img, s.x - size.w / 2, s.y - size.h, size.w, size.h);
+  drawImageWithReveal(ctx, img, 0, 0, img.naturalWidth || img.width, img.naturalHeight || img.height, s.x - size.w / 2, s.y - size.h, size.w, size.h, reveal);
   return true;
 }
 // Phase B step 6 (221): preload all sprites at module init so the
-// first frame after game-start dispatches to SVG immediately rather
-// than canvas-fallback for ~200ms while loads complete. Kingdom name
+// first frame after game-start dispatches to sprites immediately rather
+// than skipping while loads complete. Kingdom name
 // isn't yet known at module init (G.kingdomName is set per-game), so
 // preload the unvariant default; per-kingdom variants populate
-// lazily on first dispatch (one-frame canvas fallback per type per
-// realm is acceptable).
+// lazily on first dispatch.
 if (typeof window !== 'undefined') {
   setTimeout(() => {
     _loadRasterAtlas();
@@ -520,14 +549,14 @@ if (typeof window !== 'undefined') {
 }
 
 // Debug helpers — flip via console:
-// `window.__realm.spriteMode('svg')`, `spriteMode('canvas')`, or
-// `spriteMode('raster')`. The legacy toggleSVG helper is preserved.
+// `window.__realm.spriteMode('svg')` or `spriteMode('raster')`.
+// The legacy toggleSVG helper is preserved.
 if (typeof window !== 'undefined') {
   window.__realm = window.__realm || {};
   window.__realm.spriteMode = (mode) => {
     if (mode === undefined) return _SPRITE_MODE;
-    if (!['raster', 'svg', 'canvas'].includes(mode)) {
-      console.warn('[realm] spriteMode must be raster, svg, or canvas');
+    if (!['raster', 'svg'].includes(mode)) {
+      console.warn('[realm] spriteMode must be raster or svg');
       return _SPRITE_MODE;
     }
     _SPRITE_MODE = mode;
@@ -542,7 +571,7 @@ if (typeof window !== 'undefined') {
   };
   window.__realm.toggleSVG = (on) => {
     const useSvg = on === undefined ? _SPRITE_MODE !== 'svg' : !!on;
-    _SPRITE_MODE = useSvg ? 'svg' : 'canvas';
+    _SPRITE_MODE = useSvg ? 'svg' : 'raster';
     // Eagerly preload all sprite types when enabled. Pass current
     // G.kingdomName so step 5's per-realm variants load eagerly too.
     if (_SPRITE_MODE === 'svg') for (const t of _SPRITE_TYPES) _loadSprite(t, G.kingdomName);
@@ -1874,6 +1903,10 @@ export function render() {
       }
       continue;
     }
+
+    // Actor atlas only: if the sprite sheet is still decoding, keep the
+    // ground shadow but do not flash into the old hand-drawn canvas citizen.
+    continue;
 
     // Loop 41 (render S3 revisited): rebuilt the citizen silhouette so
     // they have actual LEGS between body and feet, and proper arms instead
@@ -3319,7 +3352,7 @@ export function render() {
     ctx.stroke();
 
     // Render actual building sprite as ghost
-    const ghostBuilding = { type: G.selectedBuild, level: 1, workers: [], hp: 100, maxHp: 100 };
+    const ghostBuilding = { type: G.selectedBuild, x: ghostX, y: ghostY, level: 1, workers: [], hp: 100, maxHp: 100 };
     drawBuilding(ctx, ghostBuilding, s, valid ? 0.45 : 0.25);
     ctx.globalAlpha = daylight;
   }
@@ -3560,13 +3593,219 @@ function canPlaceCheck(type, x, y) {
 }
 
 // ── Building sprites ────────────────────────────────────────
+function drawConstructionOverlay(ctx, b, s, progress) {
+  if (progress >= 1 || b.type === 'road') return;
+  const p = Math.max(0, Math.min(1, progress));
+  const phase = (G.gameTick || 0) * 0.12 + b.x * 1.7 + b.y * 2.3;
+  const w = b.type === 'wall' ? 26 : (b.type === 'castle' || b.type === 'church' || b.type === 'townhall') ? 42 : 34;
+  const h = b.type === 'wall' ? 18 : (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 54 : 38;
+  const raise = Math.min(h, h * (0.28 + p * 0.72));
+
+  ctx.save();
+  ctx.globalAlpha = 0.95 - p * 0.35;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  ctx.fillStyle = 'rgba(82,60,38,0.22)';
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - TH / 2 + 2);
+  ctx.lineTo(s.x + TW / 2 - 4, s.y);
+  ctx.lineTo(s.x, s.y + TH / 2 - 2);
+  ctx.lineTo(s.x - TW / 2 + 4, s.y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#7c5b35';
+  ctx.lineWidth = 2;
+  const left = s.x - w / 2;
+  const right = s.x + w / 2;
+  const top = s.y - raise;
+  const foot = s.y - 3;
+  ctx.beginPath();
+  ctx.moveTo(left, foot);
+  ctx.lineTo(left + 4, top);
+  ctx.moveTo(right, foot);
+  ctx.lineTo(right - 4, top + 2);
+  ctx.moveTo(left + 4, top);
+  ctx.lineTo(right - 4, top + 2);
+  ctx.moveTo(left + 6, foot - 10);
+  ctx.lineTo(right - 6, top + 10);
+  ctx.moveTo(right - 6, foot - 9);
+  ctx.lineTo(left + 8, top + 12);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#b48a54';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 3; i++) {
+    const x = left + 7 + i * ((w - 14) / 2);
+    ctx.beginPath();
+    ctx.moveTo(x, foot - 1);
+    ctx.lineTo(x + Math.sin(phase + i) * 1.3, top + 5 + i);
+    ctx.stroke();
+  }
+
+  if (p > 0.08 && p < 0.96) {
+    const lift = Math.sin(phase) * 2;
+    ctx.fillStyle = 'rgba(196,164,102,0.75)';
+    ctx.beginPath();
+    ctx.ellipse(s.x + w * 0.34, s.y - 8 + lift, 4, 2, -0.35, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(93,68,42,0.7)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(s.x + w * 0.34, s.y - 9 + lift);
+    ctx.lineTo(s.x + w * 0.42, s.y - 15 + lift);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawConnectedWall(ctx, s, b, progress = 1) {
+  const p = Math.max(0.08, Math.min(1, progress));
+  const hasN = b && G.buildingGrid[b.y - 1]?.[b.x]?.type === 'wall';
+  const hasS = b && G.buildingGrid[b.y + 1]?.[b.x]?.type === 'wall';
+  const hasE = b && G.buildingGrid[b.y]?.[b.x + 1]?.type === 'wall';
+  const hasW = b && G.buildingGrid[b.y]?.[b.x - 1]?.type === 'wall';
+  const height = 16 * p;
+  const low = s.y - 3;
+  const top = s.y - height;
+
+  ctx.save();
+  ctx.globalAlpha = 0.45 + 0.55 * p;
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - TH / 2 + 3);
+  ctx.lineTo(s.x + TW / 2 - 6, s.y);
+  ctx.lineTo(s.x, s.y + TH / 2 - 3);
+  ctx.lineTo(s.x - TW / 2 + 6, s.y);
+  ctx.closePath();
+  ctx.fill();
+
+  const segment = (dx, dy, shade) => {
+    const ex = s.x + dx;
+    const ey = s.y + dy;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = shade;
+    ctx.lineWidth = 11;
+    ctx.beginPath();
+    ctx.moveTo(s.x, low);
+    ctx.lineTo(ex, ey - 3);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#8f867d';
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(s.x, top);
+    ctx.lineTo(ex, ey - height);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(226,210,184,0.32)';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(s.x - 1, top - 2);
+    ctx.lineTo(ex - 1, ey - height - 2);
+    ctx.stroke();
+  };
+
+  if (hasE) segment(TW / 2, TH / 2, '#5c5752');
+  if (hasS) segment(-TW / 2, TH / 2, '#514d49');
+  if (!hasE && hasW) segment(-TW / 2, -TH / 2, '#625d58');
+  if (!hasS && hasN) segment(TW / 2, -TH / 2, '#6b655f');
+
+  ctx.fillStyle = '#6e6862';
+  ctx.fillRect(s.x - 5, top, 10, height);
+  ctx.fillStyle = '#958b81';
+  ctx.fillRect(s.x - 7, top - 4, 14, 4);
+  ctx.fillStyle = '#a1978d';
+  ctx.fillRect(s.x - 3, top - 8, 6, 5);
+  ctx.fillStyle = 'rgba(255,255,255,0.16)';
+  ctx.fillRect(s.x - 6, top - 3, 12, 1);
+  ctx.restore();
+
+  drawConstructionOverlay(ctx, b, s, progress);
+  drawBuildingEventPulse2D(ctx, b, s);
+}
+
+function drawBuildingEventPulse2D(ctx, b, s) {
+  const now = G.gameTick || 0;
+  const upgradeAge = Number.isFinite(b.upgradeTick) ? now - b.upgradeTick : Infinity;
+  const completeAge = Number.isFinite(b.completeTick) ? now - b.completeTick : Infinity;
+  const age = Math.min(upgradeAge, completeAge);
+  if (age < 0 || age > 140) return;
+
+  const t = age / 140;
+  const isUpgrade = upgradeAge <= completeAge;
+  const radiusX = 18 + t * 18;
+  const radiusY = 7 + t * 8;
+  ctx.save();
+  ctx.globalAlpha = (1 - t) * (isUpgrade ? 0.72 : 0.48);
+  ctx.strokeStyle = isUpgrade ? '#f6d58f' : '#b8e0ad';
+  ctx.lineWidth = 2 - t * 0.8;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y - 5, radiusX, radiusY, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawUpgradeAccents2D(ctx, b, s) {
+  const level = Math.max(1, b.level || 1);
+  if (level < 2 || b.type === 'road' || b.type === 'wall') return;
+  const bands = Math.min(3, level - 1);
+  const upgradeAge = Number.isFinite(b.upgradeTick) ? (G.gameTick || 0) - b.upgradeTick : Infinity;
+  const upgradeBoost = upgradeAge >= 0 && upgradeAge < 140 ? (1 - upgradeAge / 140) * 0.32 : 0;
+  const pulse = 0.78 + upgradeBoost + Math.sin((G.gameTick || 0) * 0.06 + b.x * 1.9 + b.y * 1.4) * 0.12;
+  const colors = ['#d7c083', '#cfa463', '#bf854c'];
+  const baseY = s.y - 7;
+  const width = b.type === 'castle' || b.type === 'church' || b.type === 'townhall' ? 28 : 22;
+
+  ctx.save();
+  ctx.globalAlpha = pulse;
+  for (let i = 0; i < bands; i++) {
+    const y = baseY - i * 3;
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(s.x - width / 2, y);
+    ctx.lineTo(s.x + width / 2, y);
+    ctx.stroke();
+  }
+
+  // Pennants at level 3+ make higher tiers obvious during zoomed-out play.
+  if (level >= 3) {
+    const pennantY = s.y - (b.type === 'tower' ? 36 : 28);
+    const flap = Math.sin((G.gameTick || 0) * 0.14 + b.x + b.y) * 1.5;
+    ctx.fillStyle = level >= 4 ? '#e6c18b' : '#d6a864';
+    ctx.strokeStyle = 'rgba(78,52,26,0.65)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(s.x + 9, pennantY);
+    ctx.lineTo(s.x + 15 + flap, pennantY + 2);
+    ctx.lineTo(s.x + 9, pennantY + 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(s.x - 9, pennantY + 2);
+    ctx.lineTo(s.x - 15 - flap, pennantY + 4);
+    ctx.lineTo(s.x - 9, pennantY + 7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   if (!def) return; // guard against unknown building types
+  const progress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
+  if (b.type === 'wall') {
+    drawConnectedWall(ctx, s, b, progress);
+    return;
+  }
   const rasterSprite = _usesRasterSprite(b.type);
-  const buildAlpha = (b.buildProgress !== undefined && b.buildProgress < 1) ? b.buildProgress : 1;
   // Keep buildings fully opaque — night overlay darkens them later
-  ctx.globalAlpha = buildAlpha;
+  ctx.globalAlpha = 1;
 
   // Foundation — darken the tile under the building for grounding
   if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
@@ -3637,41 +3876,24 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.scale(1.1, 1.1);
   ctx.translate(-s.x, -s.y + (rasterSprite ? 4 : 3));
 
-  // Loop 217 (PHASE B step 2): SVG path runs INSIDE the same
-  // scale/translate envelope as canvas drawX so damage cracks +
-  // winter cap (drawn after `restore`) compose on top of either.
-  // Returns false → fall through to canvas; true → SVG drew already.
-  if (drawSpriteIfReady(ctx, b, s)) {
+  // Sprite path runs INSIDE the same scale/translate envelope so damage
+  // cracks + winter cap (drawn after `restore`) compose on top. If the
+  // image is not ready, skip the building sprite this frame rather than
+  // flashing back to the legacy procedural canvas drawing.
+  if (drawSpriteIfReady(ctx, b, s, progress)) {
     ctx.restore();
-  } else { switch (b.type) {
-    case 'house': drawHouse(ctx, s, b); break;
-    case 'farm': drawFarm(ctx, s, b); break;
-    case 'lumber': drawLumber(ctx, s, b); break;
-    case 'quarry': drawQuarry(ctx, s); break;
-    case 'mine': drawMine(ctx, s); break;
-    case 'market': drawMarket(ctx, s, b); break;
-    case 'barracks': drawBarracks(ctx, s); break;
-    case 'archery': drawArchery(ctx, s); break;
-    case 'tower': drawTower(ctx, s); break;
-    case 'well': drawWell(ctx, s); break;
-    case 'tavern': drawTavern(ctx, s, b); break;
-    case 'wall': drawWall(ctx, s, b); break;
-    case 'road': drawRoad(ctx, s); break;
-    case 'tradingpost': drawTradingPost(ctx, s, b); break;
-    case 'castle': drawCastle(ctx, s); break;
-    case 'granary': drawGranary(ctx, s); break;
-    case 'church': drawChurch(ctx, s, b); break;
-    case 'school': drawSchool(ctx, s); break;
-    case 'windmill': drawWindmill(ctx, s, b); break;
-    case 'bakery': drawBakery(ctx, s); break;
-    case 'chickencoop': drawChickenCoop(ctx, s); break;
-    case 'cowpen': drawCowPen(ctx, s); break;
-    case 'fisherman': drawFisherman(ctx, s, b); break;
-    case 'blacksmith': drawBlacksmith(ctx, s, b); break;
-    default: drawGeneric(ctx, s, def); break;
-    }
-    ctx.restore(); // undo the 1.1x scale (canvas path)
+  } else {
+    ctx.restore();
+    return;
   }
+
+  drawConstructionOverlay(ctx, b, s, progress);
+  if (progress < 1) {
+    ctx.globalAlpha = 1;
+    return;
+  }
+  drawUpgradeAccents2D(ctx, b, s);
+  drawBuildingEventPulse2D(ctx, b, s);
 
   // Building damage cracks when HP is below 70%
   if (b.hp !== undefined && b.maxHp !== undefined && b.hp < b.maxHp * 0.7) {
@@ -6519,9 +6741,7 @@ function drawTree(ctx, x, y, a, seasonShift) {
   const natureType = variant === 0 ? 'pine' : variant === 1 ? 'oak' : variant === 2 ? 'birch' : 'dead';
   const natureH = variant === 1 ? 34 : variant === 2 ? 36 : 42;
   const natureAlpha = variant === 2 ? a * 0.74 : a;
-  if (drawNatureSprite(ctx, natureType, x, y + 9, natureH, natureAlpha)) {
-    return;
-  }
+  if (!drawNatureSprite(ctx, natureType, x, y + 9, natureH, natureAlpha)) return;
 
   // Shadow
   ctx.globalAlpha = a * 0.15;
@@ -6647,6 +6867,7 @@ function drawTree(ctx, x, y, a, seasonShift) {
 
 function drawRock(ctx, x, y, a) {
   if (drawNatureSprite(ctx, 'stone', x, y + 8, 25, a)) return;
+  return;
 
   ctx.globalAlpha = a * 0.9;
 
@@ -6717,6 +6938,7 @@ function drawRock(ctx, x, y, a) {
 
 function drawIronOre(ctx, x, y, a) {
   if (drawNatureSprite(ctx, 'iron', x, y + 8, 25, a)) return;
+  return;
 
   ctx.globalAlpha = a*0.95;
   ctx.fillStyle = '#4a6cb8';

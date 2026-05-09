@@ -531,6 +531,7 @@ export function renderCarts(ctx) {
     if (drawAmbientSprite(ctx, 'cart', s.x, s.y + 8 + bob, 48, 38, 1, mdx < 0)) {
       continue;
     }
+    continue;
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.beginPath();
@@ -1119,6 +1120,7 @@ export function renderBoats(ctx) {
     if (drawAmbientSprite(ctx, spriteType, s.x, s.y + 10 + bob, 44, spriteH + 6, 1, mdx < 0)) {
       continue;
     }
+    continue;
     // Wake (small white V trail behind boat)
     ctx.strokeStyle = 'rgba(220,235,255,0.45)';
     ctx.lineWidth = 0.8;
@@ -4599,12 +4601,8 @@ registerUpdater(updateResourceWarnings);
 // ── Loop 122: Build progress animation ─────────────────────
 // Buildings "grow" visually during their first few seconds.
 function renderBuildProgress(ctx) {
-  if (G.camera.zoom < 0.5) return;
   for (const b of G.buildings) {
-    if (b.buildProgress === undefined) b.buildProgress = 0;
-    if (b.buildProgress < 1) {
-      b.buildProgress = Math.min(1, b.buildProgress + 0.015 * G.speed);
-    }
+    if (b.buildProgress === undefined) b.buildProgress = 1;
   }
 }
 registerUpdater(renderBuildProgress);
@@ -4615,62 +4613,8 @@ registerUpdater(renderBuildProgress);
 // corners + horizontal plank + a "tarp" gradient that shrinks as the
 // building rises. Reads as active construction.
 function renderScaffolding(ctx) {
-  if (G.camera.zoom < 0.6) return;
-  for (const b of G.buildings) {
-    const p = b.buildProgress ?? 1;
-    if (p >= 1 || p <= 0.02) continue;
-    const s = toScreen(b.x, b.y);
-    const h = (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 32 :
-              (b.type === 'house' || b.type === 'tavern' || b.type === 'barracks' || b.type === 'bakery') ? 20 : 14;
-    // 4 scaffolding posts at the tile corners
-    ctx.strokeStyle = 'rgba(120,85,40,0.85)';
-    ctx.lineWidth = 1.1;
-    const postPositions = [
-      [-TW/2 + 4, 0], [TW/2 - 4, 0],
-      [0, -TH/2 + 4], [0, TH/2 - 4],
-    ];
-    for (const [dx, dy] of postPositions) {
-      ctx.beginPath();
-      ctx.moveTo(s.x + dx, s.y + dy);
-      ctx.lineTo(s.x + dx, s.y + dy - h);
-      ctx.stroke();
-    }
-    // Horizontal plank at ~60% of post height
-    const plankY = s.y - h * 0.6;
-    ctx.strokeStyle = 'rgba(150,110,60,0.8)';
-    ctx.lineWidth = 0.9;
-    ctx.beginPath();
-    ctx.moveTo(s.x - TW/2 + 4, plankY);
-    ctx.lineTo(s.x + TW/2 - 4, plankY);
-    ctx.stroke();
-    // Diagonal brace
-    ctx.strokeStyle = 'rgba(130,95,50,0.6)';
-    ctx.lineWidth = 0.7;
-    ctx.beginPath();
-    ctx.moveTo(s.x - TW/2 + 4, s.y);
-    ctx.lineTo(s.x - TW/2 + 4, s.y - h * 0.5);
-    ctx.lineTo(s.x, s.y - h * 0.3);
-    ctx.stroke();
-    // Progress flag on the highest pole — fluttering red (classic builder's flag)
-    const flagFly = Math.sin(G.gameTick * 0.18 + (b.x * 3 + b.y * 7)) * 1.5;
-    ctx.fillStyle = '#cc3020';
-    ctx.beginPath();
-    ctx.moveTo(s.x, s.y - h);
-    ctx.lineTo(s.x + 5 + flagFly, s.y - h + 1.5);
-    ctx.lineTo(s.x, s.y - h + 3);
-    ctx.closePath();
-    ctx.fill();
-    // Progress tag — "N%" text over the scaffolding at close zoom
-    if (G.camera.zoom >= 1.2) {
-      ctx.font = 'bold 8px -apple-system,sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.shadowColor = 'rgba(0,0,0,0.6)';
-      ctx.shadowBlur = 2;
-      ctx.fillText(`${Math.round(p * 100)}%`, s.x, s.y - h + 12);
-      ctx.shadowBlur = 0;
-    }
-  }
+  // Construction scaffolding is now drawn inside the building renderers so
+  // 2D and 3D share the same timing and buildings reveal from the foundation.
 }
 registerWorldRenderer(renderScaffolding);
 

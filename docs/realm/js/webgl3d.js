@@ -136,12 +136,16 @@ const SUPPORT_ATLAS = {
 
 const ACTOR_ATLAS = {
   url: 'assets/sprites/actors-atlas.png',
-  w: 32,
-  h: 42,
+  w: 64,
+  h: 84,
   frames: 4,
   dirs: ['down', 'up', 'left', 'right'],
   actions: ['idle', 'walk', 'work', 'carry'],
-  variants: ['settler', 'farmer', 'lumber', 'miner', 'fisher', 'trader', 'builder', 'guard', 'forager'],
+  variants: [
+    'settler', 'farmer', 'rancher', 'lumber', 'miner', 'stonecutter',
+    'fisher', 'trader', 'innkeeper', 'builder', 'blacksmith', 'guard',
+    'scholar', 'forager',
+  ],
 };
 
 const imgCache = new Map();
@@ -225,8 +229,12 @@ function screenToWorldRaw(mx, my) {
   return { x: (wx + wy) / 2, y: (wy - wx) / 2 };
 }
 
+export function screenToWorld3D(mx, my) {
+  return screenToWorldRaw(mx, my);
+}
+
 export function screenToTile3D(mx, my) {
-  const w = screenToWorldRaw(mx, my);
+  const w = screenToWorld3D(mx, my);
   return {
     x: clamp(Math.round(w.x), 0, MAP_W - 1),
     y: clamp(Math.round(w.y), 0, MAP_H - 1),
@@ -404,7 +412,8 @@ function drawTile(tx, ty, visible) {
   const baseCol = TOP_TINT[groundTile] || TILE_COLORS[groundTile]?.[0] || '#528a4c';
   const sideCol = SIDE_TINT[groundTile] || shadeColor(baseCol, -45);
   const sideThreshold = 2 * p.scale;
-  const sideAlpha = tile === TILE.MOUNTAIN ? 0.24 : tile === TILE.STONE || tile === TILE.IRON ? 0.34 : 0.50;
+  const naturalSideAlpha = tile === TILE.MOUNTAIN ? 0.24 : tile === TILE.STONE || tile === TILE.IRON ? 0.34 : 0.50;
+  const sideAlpha = visible ? naturalSideAlpha : Math.min(naturalSideAlpha, 0.12);
 
   if (p.h > nextY + sideThreshold || tx === 0 || ty === MAP_H - 1) {
     ctx.save();
@@ -437,18 +446,22 @@ function drawTile(tx, ty, visible) {
     groundTile === TILE.GRASS || groundTile === TILE.FOREST ? 0.22 :
     groundTile === TILE.SAND || groundTile === TILE.WATER ? 0.30 :
     0.46;
-  const jitter = ((hash2(tx, ty) & 31) - 15) * jitterScale;
-  fillDiamond(p, shadeColor(baseCol, jitter), p.y, 1.6 * p.scale);
+  const visibleJitter = ((hash2(tx, ty) & 31) - 15) * jitterScale;
+  const hiddenJitter = ((hash2(tx, ty, 3) & 15) - 7) * 0.10;
+  const topColor = visible
+    ? shadeColor(baseCol, visibleJitter)
+    : shadeColor(groundTile === TILE.WATER ? '#14314a' : '#26483a', hiddenJitter);
+  fillDiamond(p, topColor, p.y, 1.6 * p.scale);
   const terrainAlpha =
     groundTile === TILE.WATER ? 0.46 :
     groundTile === TILE.GRASS ? (tile === TILE.FOREST ? 0.48 : tile === TILE.MOUNTAIN ? 0.42 : tile === groundTile ? 0.42 : 0.38) :
     groundTile === TILE.FOREST ? 0.48 :
     groundTile === TILE.SAND ? 0.46 :
     0.58;
-  drawTerrainSprite(groundTile, p, terrainAlpha);
+  drawTerrainSprite(groundTile, p, visible ? terrainAlpha : terrainAlpha * 0.12);
   if (visible) drawGroundAccents(tx, ty, groundTile, tile, p, hw, hh);
 
-  if (groundTile === TILE.WATER) {
+  if (visible && groundTile === TILE.WATER) {
     const wave = Math.sin((tx * 0.9 + ty * 0.5 + G.gameTick * 0.05)) * 0.5 + 0.5;
     ctx.save();
     pathDiamond(p);
@@ -466,13 +479,22 @@ function drawTile(tx, ty, visible) {
 
   if (!visible) {
     ctx.save();
-    ctx.globalAlpha = 0.62;
-    fillDiamond(p, tile === TILE.WATER ? '#071423' : '#11192a', p.y, 1.6 * p.scale);
+    pathDiamond(p, p.y, 1.6 * p.scale);
+    const fogGrad = ctx.createLinearGradient(p.x, p.y - hh, p.x, p.y + hh);
+    if (tile === TILE.WATER) {
+      fogGrad.addColorStop(0, 'rgba(9,31,48,0.34)');
+      fogGrad.addColorStop(1, 'rgba(6,18,31,0.44)');
+    } else {
+      fogGrad.addColorStop(0, 'rgba(24,43,38,0.30)');
+      fogGrad.addColorStop(1, 'rgba(10,24,29,0.40)');
+    }
+    ctx.fillStyle = fogGrad;
+    ctx.fill();
     ctx.restore();
   }
 }
 
-function drawAtlasFrame(atlasDef, type, x, y, height, alpha = 1) {
+function drawAtlasFrame(atlasDef, type, x, y, height, alpha = 1, reveal = 1) {
   const atlas = loadImage(atlasDef.url);
   const idx = atlasDef.types?.indexOf(type) ?? -1;
   if (!atlas || idx < 0) return false;
@@ -481,8 +503,16 @@ function drawAtlasFrame(atlasDef, type, x, y, height, alpha = 1) {
   const frameY = Math.floor(idx / atlasDef.cols) * atlasDef.cell;
   const targetH = height;
   const targetW = targetH * (trim.w / trim.h);
+  const r = Math.max(0, Math.min(1, reveal));
   ctx.save();
   ctx.globalAlpha *= alpha;
+  if (r < 0.995) {
+    const visibleH = Math.max(2, targetH * r);
+    ctx.beginPath();
+    ctx.rect(x - targetW / 2 - 4 * pScale(), y - visibleH - 2 * pScale(), targetW + 8 * pScale(), visibleH + 4 * pScale());
+    ctx.clip();
+    ctx.globalAlpha *= 0.48 + r * 0.52;
+  }
   ctx.drawImage(
     atlas,
     frameX + trim.x, frameY + trim.y, trim.w, trim.h,
@@ -493,6 +523,10 @@ function drawAtlasFrame(atlasDef, type, x, y, height, alpha = 1) {
   );
   ctx.restore();
   return true;
+}
+
+function pScale() {
+  return G.camera?.zoom || 1.3;
 }
 
 function drawNature(type, x, y, height, alpha = 1, seed = 0) {
@@ -566,9 +600,7 @@ function drawTerrainDetail(tx, ty) {
     const treeType = roll < 5 ? 'pine' : roll < 9 ? 'oak' : 'birch';
     const treeH = treeType === 'birch' ? 52 : treeType === 'oak' ? 56 : 60;
     const treeAlpha = treeType === 'birch' ? 0.72 : 0.95;
-    if (!drawNature(treeType, x, y + 3 * p.scale, treeH * p.scale, treeAlpha, seed)) {
-      drawProceduralTree(x, y, p.scale * 0.75, seed);
-    }
+    drawNature(treeType, x, y + 3 * p.scale, treeH * p.scale, treeAlpha, seed);
   } else if (tile === TILE.STONE && (seed % 100) < 48) {
     drawNature('stone', x, y + 2 * p.scale, 32 * p.scale, 0.90, seed);
   } else if (tile === TILE.IRON && (seed % 100) < 48) {
@@ -600,6 +632,177 @@ function actorIdentitySeed(c) {
   return h >>> 0;
 }
 
+function drawConstructionOverlay(b, p, baseX, baseY, progress) {
+  if (progress >= 1 || b.type === 'road') return;
+  const r = Math.max(0, Math.min(1, progress));
+  const scale = p.scale;
+  const phase = (G.gameTick || 0) * 0.12 + b.x * 1.7 + b.y * 2.3;
+  const w = (b.type === 'wall' ? 28 : (b.type === 'castle' || b.type === 'church' || b.type === 'townhall') ? 48 : 38) * scale;
+  const h = (b.type === 'wall' ? 20 : (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 62 : 42) * scale;
+  const raised = Math.min(h, h * (0.28 + r * 0.72));
+
+  ctx.save();
+  ctx.globalAlpha = 0.95 - r * 0.35;
+  pathDiamond(p, p.y + TILE_H * scale * 0.08, -2 * scale);
+  ctx.fillStyle = 'rgba(82,60,38,0.25)';
+  ctx.fill();
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#7c5b35';
+  ctx.lineWidth = Math.max(1.5, 2 * scale);
+  const left = baseX - w / 2;
+  const right = baseX + w / 2;
+  const top = baseY - raised;
+  const foot = baseY - 4 * scale;
+  ctx.beginPath();
+  ctx.moveTo(left, foot);
+  ctx.lineTo(left + 5 * scale, top);
+  ctx.moveTo(right, foot);
+  ctx.lineTo(right - 5 * scale, top + 2 * scale);
+  ctx.moveTo(left + 5 * scale, top);
+  ctx.lineTo(right - 5 * scale, top + 2 * scale);
+  ctx.moveTo(left + 7 * scale, foot - 11 * scale);
+  ctx.lineTo(right - 7 * scale, top + 11 * scale);
+  ctx.moveTo(right - 7 * scale, foot - 10 * scale);
+  ctx.lineTo(left + 8 * scale, top + 12 * scale);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(196,164,102,0.75)';
+  ctx.beginPath();
+  ctx.ellipse(baseX + w * 0.34, baseY - 9 * scale + Math.sin(phase) * 2 * scale, 4 * scale, 2 * scale, -0.35, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawConnectedWall(b, p, baseX, baseY, progress) {
+  const r = Math.max(0.08, Math.min(1, progress));
+  const scale = p.scale;
+  const hasN = b && G.buildingGrid[b.y - 1]?.[b.x]?.type === 'wall';
+  const hasS = b && G.buildingGrid[b.y + 1]?.[b.x]?.type === 'wall';
+  const hasE = b && G.buildingGrid[b.y]?.[b.x + 1]?.type === 'wall';
+  const hasW = b && G.buildingGrid[b.y]?.[b.x - 1]?.type === 'wall';
+  const h = 19 * scale * r;
+  const low = baseY - 4 * scale;
+  const top = baseY - h;
+
+  ctx.save();
+  ctx.globalAlpha = 0.45 + 0.55 * r;
+  pathDiamond(p, p.y + TILE_H * scale * 0.04, -3 * scale);
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.fill();
+
+  const segment = (dx, dy, shade) => {
+    const ex = baseX + dx * scale;
+    const ey = baseY + dy * scale;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = shade;
+    ctx.lineWidth = Math.max(5, 11 * scale);
+    ctx.beginPath();
+    ctx.moveTo(baseX, low);
+    ctx.lineTo(ex, ey - 4 * scale);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#8f867d';
+    ctx.lineWidth = Math.max(3, 7 * scale);
+    ctx.beginPath();
+    ctx.moveTo(baseX, top);
+    ctx.lineTo(ex, ey - h);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(226,210,184,0.32)';
+    ctx.lineWidth = Math.max(1, 1.2 * scale);
+    ctx.beginPath();
+    ctx.moveTo(baseX - scale, top - 2 * scale);
+    ctx.lineTo(ex - scale, ey - h - 2 * scale);
+    ctx.stroke();
+  };
+
+  if (hasE) segment(TILE_W / 2, TILE_H / 2, '#5c5752');
+  if (hasS) segment(-TILE_W / 2, TILE_H / 2, '#514d49');
+  if (!hasE && hasW) segment(-TILE_W / 2, -TILE_H / 2, '#625d58');
+  if (!hasS && hasN) segment(TILE_W / 2, -TILE_H / 2, '#6b655f');
+
+  ctx.fillStyle = '#6e6862';
+  ctx.fillRect(baseX - 5 * scale, top, 10 * scale, h);
+  ctx.fillStyle = '#958b81';
+  ctx.fillRect(baseX - 7 * scale, top - 4 * scale, 14 * scale, 4 * scale);
+  ctx.fillStyle = '#a1978d';
+  ctx.fillRect(baseX - 3 * scale, top - 8 * scale, 6 * scale, 5 * scale);
+  ctx.fillStyle = 'rgba(255,255,255,0.16)';
+  ctx.fillRect(baseX - 6 * scale, top - 3 * scale, 12 * scale, scale);
+  ctx.restore();
+
+  drawConstructionOverlay(b, p, baseX, baseY, progress);
+  drawBuildingEventPulse3D(b, baseX, baseY, scale);
+}
+
+function drawBuildingEventPulse3D(b, baseX, baseY, scale) {
+  const now = G.gameTick || 0;
+  const upgradeAge = Number.isFinite(b.upgradeTick) ? now - b.upgradeTick : Infinity;
+  const completeAge = Number.isFinite(b.completeTick) ? now - b.completeTick : Infinity;
+  const age = Math.min(upgradeAge, completeAge);
+  if (age < 0 || age > 140) return;
+
+  const t = age / 140;
+  const isUpgrade = upgradeAge <= completeAge;
+  ctx.save();
+  ctx.globalAlpha = (1 - t) * (isUpgrade ? 0.72 : 0.48);
+  ctx.strokeStyle = isUpgrade ? '#f6d58f' : '#b8e0ad';
+  ctx.lineWidth = Math.max(1, (2 - t * 0.8) * scale);
+  ctx.beginPath();
+  ctx.ellipse(baseX, baseY - 6 * scale, (19 + t * 20) * scale, (8 + t * 9) * scale, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawUpgradeAccents3D(b, baseX, baseY, scale) {
+  const level = Math.max(1, b.level || 1);
+  if (level < 2 || b.type === 'road' || b.type === 'wall') return;
+  const bands = Math.min(3, level - 1);
+  const upgradeAge = Number.isFinite(b.upgradeTick) ? (G.gameTick || 0) - b.upgradeTick : Infinity;
+  const upgradeBoost = upgradeAge >= 0 && upgradeAge < 140 ? (1 - upgradeAge / 140) * 0.32 : 0;
+  const pulse = 0.78 + upgradeBoost + Math.sin((G.gameTick || 0) * 0.06 + b.x * 1.9 + b.y * 1.4) * 0.12;
+  const colors = ['#d7c083', '#cfa463', '#bf854c'];
+  const width = (b.type === 'castle' || b.type === 'church' || b.type === 'townhall' ? 30 : 24) * scale;
+  const baseBandY = baseY - 8 * scale;
+
+  ctx.save();
+  ctx.globalAlpha = pulse;
+  for (let i = 0; i < bands; i++) {
+    const y = baseBandY - i * 3 * scale;
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = Math.max(1, 1.5 * scale);
+    ctx.beginPath();
+    ctx.moveTo(baseX - width / 2, y);
+    ctx.lineTo(baseX + width / 2, y);
+    ctx.stroke();
+  }
+
+  if (level >= 3) {
+    const pennantY = baseY - (b.type === 'tower' ? 39 : 30) * scale;
+    const flap = Math.sin((G.gameTick || 0) * 0.14 + b.x + b.y) * 1.7 * scale;
+    ctx.fillStyle = level >= 4 ? '#e6c18b' : '#d6a864';
+    ctx.strokeStyle = 'rgba(78,52,26,0.65)';
+    ctx.lineWidth = Math.max(1, scale);
+    ctx.beginPath();
+    ctx.moveTo(baseX + 9 * scale, pennantY);
+    ctx.lineTo(baseX + 15 * scale + flap, pennantY + 2 * scale);
+    ctx.lineTo(baseX + 9 * scale, pennantY + 5 * scale);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(baseX - 9 * scale, pennantY + 2 * scale);
+    ctx.lineTo(baseX - 15 * scale - flap, pennantY + 4 * scale);
+    ctx.lineTo(baseX - 9 * scale, pennantY + 7 * scale);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawBuilding(b) {
   if (!b || b.type === 'road') return;
   const p = projectTile(b.x, b.y);
@@ -608,22 +811,24 @@ function drawBuilding(b) {
   const baseY = p.y + TILE_H * scale * 0.34;
   const visible = G.fog?.[b.y]?.[b.x] !== false;
   if (!visible) return;
+  const progress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
 
   if (b.type === 'wall') {
-    ctx.save();
-    pathDiamond(p, p.y + TILE_H * scale * 0.04, -4 * scale);
-    ctx.fillStyle = '#5d5a5a';
-    ctx.fill();
-    ctx.fillStyle = '#38373a';
-    ctx.fillRect(baseX - 18 * scale, p.y - 4 * scale, 36 * scale, 12 * scale);
-    ctx.restore();
+    drawConnectedWall(b, p, baseX, baseY, progress);
     return;
   }
 
   const info = buildingSpriteInfo(b.type);
   const spriteH = (info?.height || 62) * scale * 1.12;
 
-  if (info && drawAtlasFrame(info.atlas, b.type, baseX, baseY + 5 * scale, spriteH, Math.min(1, b.buildProgress ?? 1))) return;
+  if (info && drawAtlasFrame(info.atlas, b.type, baseX, baseY + 5 * scale, spriteH, 1, progress)) {
+    drawConstructionOverlay(b, p, baseX, baseY + 5 * scale, progress);
+    if (progress >= 1) {
+      drawUpgradeAccents3D(b, baseX, baseY + 5 * scale, scale);
+      drawBuildingEventPulse3D(b, baseX, baseY + 5 * scale, scale);
+    }
+    return;
+  }
 
   ctx.save();
   ctx.fillStyle = '#8c6a3d';
@@ -640,22 +845,27 @@ function drawBuilding(b) {
 
 function actorVariant(c) {
   const jt = c.jobBuilding?.type;
-  if (c.state === 'foraging') return 'forager';
-  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery' || jt === 'chickencoop' || jt === 'cowpen' || c.state === 'eating') return 'farmer';
+  if (jt === 'chickencoop' || jt === 'cowpen') return 'rancher';
+  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery') return 'farmer';
   if (jt === 'lumber') return 'lumber';
-  if (jt === 'mine' || jt === 'quarry' || jt === 'blacksmith') return 'miner';
+  if (jt === 'quarry') return 'stonecutter';
+  if (jt === 'blacksmith') return 'blacksmith';
+  if (jt === 'mine') return 'miner';
   if (jt === 'fisherman') return 'fisher';
-  if (jt === 'market' || jt === 'tradingpost' || jt === 'tavern') return 'trader';
+  if (jt === 'tavern') return 'innkeeper';
+  if (jt === 'market' || jt === 'tradingpost') return 'trader';
   if (jt === 'barracks' || jt === 'tower' || jt === 'archery') return 'guard';
-  if (jt === 'school' || jt === 'church' || jt === 'townhall') return 'builder';
-  const townfolk = ['settler', 'farmer', 'builder', 'trader', 'forager'];
-  return townfolk[actorIdentitySeed(c) % townfolk.length];
+  if (jt === 'school' || jt === 'church') return 'scholar';
+  if (jt === 'townhall') return 'builder';
+  const townfolk = ['settler', 'farmer', 'builder', 'trader', 'scholar', 'forager'];
+  const citizenIdx = Array.isArray(G.citizens) ? Math.max(0, G.citizens.indexOf(c)) : 0;
+  return townfolk[(actorIdentitySeed(c) + citizenIdx * 5) % townfolk.length];
 }
 
 function actorAction(c, moving) {
-  if (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver') return 'carry';
+  if (moving && (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver')) return 'carry';
   if (c.state === 'working' || c.state === 'foraging' || c.state === 'eating') return 'work';
-  if (moving || c.state === 'walk_to_work') return 'walk';
+  if (moving) return 'walk';
   return 'idle';
 }
 
@@ -670,21 +880,32 @@ function actorDir(entity) {
 
 function drawActorGroundShadow(x, y, scale, moving, stride, dir, enemy) {
   ctx.save();
-  ctx.fillStyle = `rgba(3,7,4,${enemy ? 0.24 : 0.18})`;
+  const baseAlpha = enemy ? 0.18 : 0.115;
+  ctx.lineCap = 'round';
+  ctx.lineWidth = Math.max(1, 0.75 * scale);
+
+  const markFoot = (cx, cy, len, alpha, tilt = 0) => {
+    ctx.strokeStyle = `rgba(3,7,4,${alpha})`;
+    ctx.beginPath();
+    ctx.moveTo(cx - len * 0.5, cy - tilt);
+    ctx.lineTo(cx + len * 0.5, cy + tilt);
+    ctx.stroke();
+  };
 
   if (moving) {
     const step = Math.sign(stride || 1);
     const side = dir === 'up' || dir === 'down' ? 1 : 0;
-    const footSpreadX = (side ? 2.2 : 3.2) * scale;
-    const footSpreadY = (side ? 0.9 : 0.45) * scale;
-    ctx.fillRect(x - footSpreadX * step - 1.0 * scale, y + 1.9 * scale - footSpreadY, 2.0 * scale, 1.0 * scale);
-    ctx.fillRect(x + footSpreadX * step - 0.9 * scale, y + 1.9 * scale + footSpreadY, 1.8 * scale, 0.9 * scale);
+    const footSpreadX = (side ? 2.1 : 3.0) * scale;
+    const footSpreadY = (side ? 0.75 : 0.36) * scale;
+    const tilt = (dir === 'left' ? -0.18 : dir === 'right' ? 0.18 : 0.08) * scale;
+    markFoot(x - footSpreadX * step, y + 1.6 * scale - footSpreadY, 3.0 * scale, baseAlpha, tilt);
+    markFoot(x + footSpreadX * step, y + 1.9 * scale + footSpreadY, 2.2 * scale, baseAlpha * 0.55, -tilt);
   } else {
     const side = dir === 'left' || dir === 'right' ? 1 : 0;
-    const footSpreadX = (side ? 2.7 : 2.0) * scale;
-    const footSpreadY = (side ? 0.35 : 0.75) * scale;
-    ctx.fillRect(x - footSpreadX - 0.8 * scale, y + 2.0 * scale - footSpreadY, 1.6 * scale, 0.85 * scale);
-    ctx.fillRect(x + footSpreadX - 0.8 * scale, y + 2.0 * scale + footSpreadY, 1.6 * scale, 0.85 * scale);
+    const footSpreadX = (side ? 2.3 : 1.75) * scale;
+    const footSpreadY = (side ? 0.28 : 0.55) * scale;
+    markFoot(x - footSpreadX, y + 1.75 * scale - footSpreadY, 1.9 * scale, baseAlpha * 0.72);
+    markFoot(x + footSpreadX, y + 1.75 * scale + footSpreadY, 1.9 * scale, baseAlpha * 0.72);
   }
 
   ctx.restore();
@@ -697,7 +918,11 @@ function drawActor(c, enemy = false) {
   const y = base.y - p.h + TILE_H * p.scale * 0.20;
   const x = base.x;
   const scale = p.scale;
-  const moving = Math.abs((c.tx ?? c.x) - c.x) + Math.abs((c.ty ?? c.y) - c.y) > 0.03;
+  const hasActivePath = c.path && c.pathIdx < (c.path?.length ?? 0);
+  const targetDist = Math.abs((c.tx ?? c.x) - c.x) + Math.abs((c.ty ?? c.y) - c.y);
+  const moving = enemy
+    ? targetDist > 0.03
+    : !!hasActivePath || ((c.state === 'walk_to_work' || c.state === 'walk_to_deliver') && targetDist > 0.14);
   const stride = moving ? Math.sin(G.gameTick * 0.42 + (c.x + c.y) * 2.8) : 0;
   const bob = moving ? Math.abs(stride) * 0.45 * scale : 0;
   const dir = actorDir(c);
@@ -705,31 +930,29 @@ function drawActor(c, enemy = false) {
   ctx.save();
   drawActorGroundShadow(x, y, scale, moving, stride, dir, enemy);
 
-  if (atlas) {
-    const variant = enemy ? 'miner' : actorVariant(c);
-    const action = enemy ? (moving ? 'walk' : 'idle') : actorAction(c, moving);
-    const variantIdx = Math.max(0, ACTOR_ATLAS.variants.indexOf(variant));
-    const actionIdx = Math.max(0, ACTOR_ATLAS.actions.indexOf(action));
-    const dirIdx = Math.max(0, ACTOR_ATLAS.dirs.indexOf(dir));
-    const row = (variantIdx * ACTOR_ATLAS.actions.length + actionIdx) * ACTOR_ATLAS.dirs.length + dirIdx;
-    const frameRate = action === 'idle' ? 18 : action === 'work' ? 7 : 8;
-    const frame = action === 'idle'
-      ? 0
-      : Math.floor(G.gameTick / frameRate + (c.x + c.y) * 2) % ACTOR_ATLAS.frames;
-    const h = 42 * scale;
-    const w = h * (ACTOR_ATLAS.w / ACTOR_ATLAS.h);
-    if (enemy) ctx.filter = 'hue-rotate(135deg) saturate(0.85) brightness(0.75)';
-    ctx.drawImage(atlas, frame * ACTOR_ATLAS.w, row * ACTOR_ATLAS.h, ACTOR_ATLAS.w, ACTOR_ATLAS.h, x - w / 2, y - h + 2 * scale - bob, w, h);
-  } else {
-    ctx.fillStyle = enemy ? '#5c1414' : '#4f8bc9';
-    ctx.beginPath();
-    ctx.ellipse(x, y - 13 * scale - bob, 5.6 * scale, 10 * scale, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#e6b27a';
-    ctx.beginPath();
-    ctx.arc(x, y - 26 * scale - bob, 5.5 * scale, 0, Math.PI * 2);
-    ctx.fill();
+  if (!atlas) {
+    ctx.restore();
+    return;
   }
+
+  const variant = enemy ? 'miner' : actorVariant(c);
+  const action = enemy ? (moving ? 'walk' : 'idle') : actorAction(c, moving);
+  const variantIdx = Math.max(0, ACTOR_ATLAS.variants.indexOf(variant));
+  const actionIdx = Math.max(0, ACTOR_ATLAS.actions.indexOf(action));
+  const dirIdx = Math.max(0, ACTOR_ATLAS.dirs.indexOf(dir));
+  const row = (variantIdx * ACTOR_ATLAS.actions.length + actionIdx) * ACTOR_ATLAS.dirs.length + dirIdx;
+  const frameRate = action === 'idle' ? 18 : action === 'work' ? 7 : 8;
+  const frame = action === 'idle'
+    ? 0
+    : Math.floor(G.gameTick / frameRate + (c.x + c.y) * 2) % ACTOR_ATLAS.frames;
+  const h = Math.max(20, Math.round(42 * scale));
+  const w = Math.round(h * (ACTOR_ATLAS.w / ACTOR_ATLAS.h));
+  const dx = Math.round(x - w / 2);
+  const dy = Math.round(y - h + 2 * scale - bob);
+  if (enemy) ctx.filter = 'hue-rotate(135deg) saturate(0.85) brightness(0.75)';
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(atlas, frame * ACTOR_ATLAS.w, row * ACTOR_ATLAS.h, ACTOR_ATLAS.w, ACTOR_ATLAS.h, dx, dy, w, h);
   ctx.restore();
 }
 

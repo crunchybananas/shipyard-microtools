@@ -12,6 +12,38 @@ import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 import { isBuildingUnlocked } from './tech.js';
 
+const CONSTRUCTION_TICKS = {
+  road: 45,
+  wall: 90,
+  well: 120,
+  farm: 150,
+  chickencoop: 150,
+  cowpen: 170,
+  house: 220,
+  lumber: 240,
+  quarry: 260,
+  mine: 270,
+  fisherman: 240,
+  bakery: 280,
+  blacksmith: 320,
+  market: 320,
+  tavern: 340,
+  school: 340,
+  tradingpost: 340,
+  archery: 360,
+  barracks: 380,
+  tower: 400,
+  church: 420,
+  windmill: 420,
+  townhall: 460,
+  granary: 340,
+  castle: 600,
+};
+
+function constructionTicks(type) {
+  return CONSTRUCTION_TICKS[type] || 300;
+}
+
 export function canPlace(type, tx, ty) {
   if (tx<0||tx>=MAP_W||ty<0||ty>=MAP_H) return false;
   if (!G.fog[ty][tx]) return false;
@@ -41,7 +73,13 @@ export function placeBuilding(type, tx, ty) {
   if (!canPlace(type,tx,ty) || !canAfford(type)) return false;
   const def = BUILDINGS[type];
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] -= v;
-  const b = { type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0, produced:null, prodShowCount:0, level:1, buildProgress: 0 };
+  const b = {
+    type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0,
+    produced:null, prodShowCount:0, level:1,
+    buildProgress: 0,
+    buildTotal: constructionTicks(type),
+    buildStartedAt: G.gameTick || 0,
+  };
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
   if (def.pop) { G.maxPop += def.pop; trySpawnSettlers(def.pop); }
@@ -165,9 +203,24 @@ export function trySpawnSettlers(count) {
 
 export function updateProduction() {
   for (const b of G.buildings) {
-    // Construction animation: grow from 0 to 1 over ~100 ticks
+    // Construction animation: every placed structure now spends a short,
+    // readable time in a scaffold/foundation phase before fully appearing.
     if (b.buildProgress !== undefined && b.buildProgress < 1) {
-      b.buildProgress = Math.min(1, b.buildProgress + 0.01 * G.speed);
+      const total = b.buildTotal || constructionTicks(b.type);
+      const before = b.buildProgress;
+      b.buildProgress = Math.min(1, b.buildProgress + (G.speed || 1) / total);
+      if ((G.gameTick || 0) % 18 === 0 && G.particles.length < 280) {
+        spawnDust(b.x, b.y);
+      }
+      if (before < 1 && b.buildProgress >= 1) {
+        b.completeTick = G.gameTick || 0;
+        G.particles.push({
+          tx: b.x, ty: b.y, offsetY: -18,
+          text: 'Complete', alpha: 1.4, vy: -0.18,
+          decay: 0.012, type: 'text',
+        });
+      }
+      if (b.buildProgress < 1) continue;
     }
 
     // Archery range: train archers
@@ -626,9 +679,14 @@ export function upgradeBuilding(b) {
   for (const [k, v] of Object.entries(nextUpgrade.cost)) G.resources[k] -= v;
 
   b.level++;
-  playSound('build');
+  b.upgradeTick = G.gameTick || 0;
+  playSound('upgrade');
   spawnDust(b.x, b.y);
-  const costStr = Object.entries(nextUpgrade.cost).map(([k,v]) => `${v} ${resourceEmoji(k)}`).join(', ');
+  G.particles.push({
+    tx: b.x, ty: b.y, offsetY: -22,
+    text: `Level ${b.level}`, alpha: 1.6, vy: -0.2,
+    decay: 0.011, type: 'text',
+  });
   notify(`${def.icon} ${def.name} upgraded to ${nextUpgrade.name}! Production ×${nextUpgrade.prodMult}`, 'event');
   return true;
 }

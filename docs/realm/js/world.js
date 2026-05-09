@@ -95,23 +95,43 @@ export function generateWorld(){
   const [dxDir, dyDir] = [[1,0], [0,1], [-1,0], [0,-1]][dir];
   let rx = sx + 4 * dxDir;
   let ry = sy + 4 * dyDir;
-  for (let step = 0; step < 35; step++) {
-    if (rx < 1 || rx >= MAP_W-1 || ry < 1 || ry >= MAP_H-1) break;
-    if (G.map[ry][rx] === TILE.WATER) break;
-    // River tile
-    G.map[ry][rx] = TILE.WATER;
-    // Sand banks
+  const riverCells = new Set();
+  const riverKey = (x, y) => `${x},${y}`;
+  const inRiverBounds = (x, y) => x >= 1 && x < MAP_W - 1 && y >= 1 && y < MAP_H - 1;
+  const isUncarvedWater = (x, y) => G.map[y][x] === TILE.WATER && !riverCells.has(riverKey(x, y));
+  const carveRiverTile = (x, y) => {
+    if (!inRiverBounds(x, y)) return false;
+    G.map[y][x] = TILE.WATER;
+    riverCells.add(riverKey(x, y));
     for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-      const bx = rx+dx, by = ry+dy;
-      if (bx>=0 && bx<MAP_W && by>=0 && by<MAP_H && G.map[by][bx] !== TILE.WATER) {
+      const bx = x + dx, by = y + dy;
+      if (bx >= 0 && bx < MAP_W && by >= 0 && by < MAP_H && G.map[by][bx] !== TILE.WATER) {
         if (G.map[by][bx] !== TILE.SAND) G.map[by][bx] = TILE.SAND;
       }
     }
-    // Flow in primary direction with perpendicular meander
-    rx += dxDir;
-    ry += dyDir;
-    if (dxDir !== 0) ry += Math.round(rng() * 2 - 1);  // horizontal flow → vertical meander
-    else             rx += Math.round(rng() * 2 - 1);  // vertical flow → horizontal meander
+    return true;
+  };
+
+  for (let step = 0; step < 35; step++) {
+    if (!inRiverBounds(rx, ry) || isUncarvedWater(rx, ry)) break;
+    carveRiverTile(rx, ry);
+
+    const nextX = rx + dxDir;
+    const nextY = ry + dyDir;
+    if (!inRiverBounds(nextX, nextY) || isUncarvedWater(nextX, nextY)) break;
+    rx = nextX;
+    ry = nextY;
+    carveRiverTile(rx, ry);
+
+    const meander = Math.round(rng() * 2 - 1);
+    if (meander !== 0) {
+      const bendX = dxDir !== 0 ? rx : rx + meander;
+      const bendY = dxDir !== 0 ? ry + meander : ry;
+      if (!inRiverBounds(bendX, bendY) || isUncarvedWater(bendX, bendY)) break;
+      rx = bendX;
+      ry = bendY;
+      carveRiverTile(rx, ry);
+    }
   }
 
   revealAround(sx, sy, 11);

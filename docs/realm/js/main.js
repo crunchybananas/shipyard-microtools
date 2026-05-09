@@ -26,7 +26,7 @@ import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios
 import { updateWalkers } from './walkers.js';
 import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
-import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D } from './webgl3d.js';
+import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D, screenToWorld3D } from './webgl3d.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
 import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js';
 
@@ -45,8 +45,13 @@ if (!canvas3d) {
 const gl3dReady = initGL3D(canvas3d);
 
 let _3dVisible = false;
+function updateMinimapViewportResolver() {
+  setMinimapViewportResolver((_3dVisible && gl3dReady) ? screenToWorld3D : screenToWorld);
+}
+
 function set3DVisible(visible) {
   _3dVisible = !!visible && gl3dReady;
+  updateMinimapViewportResolver();
   canvas3d.style.display = _3dVisible ? 'block' : 'none';
   canvas.style.display = _3dVisible ? 'none' : 'block';
   const miniEl = document.getElementById('minimap');
@@ -68,7 +73,7 @@ window.toggle3D = () => set3DVisible(!_3dVisible);
 
 initRenderer(canvas);
 initMinimap(minimap);
-setMinimapViewportResolver(screenToWorld);
+updateMinimapViewportResolver();
 resizeCanvas();
 initPostFX(canvas);
 window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); if (gl3dReady) resize3D(); });

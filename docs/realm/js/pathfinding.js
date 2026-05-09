@@ -41,7 +41,7 @@ class BinaryHeap {
   }
 }
 
-function isWalkable(x, y) {
+export function isWalkable(x, y) {
   if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) return false;
   const tile = G.map[y][x];
   if (tile === TILE.WATER || tile === TILE.MOUNTAIN) return false;
@@ -59,7 +59,7 @@ function moveCost(x, y) {
 const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
 const SQRT2 = Math.SQRT2;
 
-function nearestWalkableTile(x, y, maxR = 5) {
+export function nearestWalkableTile(x, y, maxR = 5, fromX = x, fromY = y) {
   if (isWalkable(x, y)) return { x, y };
   for (let r = 1; r <= maxR; r++) {
     let best = null;
@@ -68,7 +68,7 @@ function nearestWalkableTile(x, y, maxR = 5) {
       for (let xx = x - r; xx <= x + r; xx++) {
         if (Math.abs(xx - x) !== r && Math.abs(yy - y) !== r) continue;
         if (!isWalkable(xx, yy)) continue;
-        const d = Math.abs(xx - x) + Math.abs(yy - y);
+        const d = Math.abs(xx - fromX) + Math.abs(yy - fromY) + (Math.abs(xx - x) + Math.abs(yy - y)) * 0.1;
         if (d < bestD) {
           bestD = d;
           best = { x: xx, y: yy };
@@ -80,16 +80,20 @@ function nearestWalkableTile(x, y, maxR = 5) {
   return null;
 }
 
-export function findPath(sx, sy, ex, ey, maxIter = 2000) {
+export function findPath(sx, sy, ex, ey, maxIter = 5000) {
   sx = Math.round(sx); sy = Math.round(sy);
   ex = Math.round(ex); ey = Math.round(ey);
 
   const start = nearestWalkableTile(sx, sy, 2);
-  const end = nearestWalkableTile(ex, ey, 5);
+  const end = nearestWalkableTile(ex, ey, 7, start?.x ?? sx, start?.y ?? sy);
   if (!start || !end) return null;
   sx = start.x; sy = start.y;
   ex = end.x; ey = end.y;
-  if (sx === ex && sy === ey) return [{x:ex,y:ey}];
+  if (sx === ex && sy === ey) {
+    const path = [{x:ex,y:ey}];
+    path.goal = { x: ex, y: ey };
+    return path;
+  }
 
   const key = (x,y) => y * MAP_W + x;
   const gScore = new Map();
@@ -106,7 +110,9 @@ export function findPath(sx, sy, ex, ey, maxIter = 2000) {
     iterations++;
     const current = open.pop();
     if (current === key(ex, ey)) {
-      return reconstructPath(cameFrom, current);
+      const path = reconstructPath(cameFrom, current);
+      path.goal = { x: ex, y: ey };
+      return path;
     }
     closed.add(current);
     const cx = current % MAP_W, cy = (current / MAP_W) | 0;

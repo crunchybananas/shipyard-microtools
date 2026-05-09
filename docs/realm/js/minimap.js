@@ -70,13 +70,11 @@ function drawViewport(mc, sx, sy) {
   const vw = Math.max(2, (maxX - minX + 1) * sx);
   const vh = Math.max(2, (maxY - minY + 1) * sy);
 
-  mc.fillStyle = 'rgba(250,215,126,0.08)';
-  mc.fillRect(vx, vy, vw, vh);
-  mc.strokeStyle = 'rgba(22,18,12,0.58)';
-  mc.lineWidth = 3.5;
+  mc.strokeStyle = 'rgba(18,14,10,0.52)';
+  mc.lineWidth = 2.5;
   mc.strokeRect(vx, vy, vw, vh);
-  mc.strokeStyle = 'rgba(250,215,126,0.88)';
-  mc.lineWidth = 1.5;
+  mc.strokeStyle = 'rgba(250,215,126,0.82)';
+  mc.lineWidth = 1.15;
   mc.strokeRect(vx, vy, vw, vh);
 }
 

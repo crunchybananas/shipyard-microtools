@@ -18,21 +18,29 @@ const page = await browser.newPage({ viewport: { width: 768, height: 768 }, devi
 
 try {
   const { actors, ambient } = await page.evaluate(() => {
-    const actorW = 32;
-    const actorH = 42;
+    const actorBaseW = 32;
+    const actorBaseH = 42;
+    const actorScale = 2;
+    const actorW = actorBaseW * actorScale;
+    const actorH = actorBaseH * actorScale;
     const frames = 4;
     const dirs = ['down', 'up', 'left', 'right'];
     const actions = ['idle', 'walk', 'work', 'carry'];
     const roles = [
-      { key: 'settler', tunic: '#5279bd', trim: '#efd27b', hair: '#5b351c', tool: null },
-      { key: 'farmer', tunic: '#4f9b37', trim: '#f0cf73', hair: '#bd7d31', tool: 'hoe' },
-      { key: 'lumber', tunic: '#af642b', trim: '#f0cf8a', hair: '#4f2d18', tool: 'axe' },
-      { key: 'miner', tunic: '#557d96', trim: '#c6d0d7', hair: '#312720', tool: 'pick' },
-      { key: 'fisher', tunic: '#3f93a6', trim: '#d8eadb', hair: '#73502a', tool: 'rod' },
-      { key: 'trader', tunic: '#d3952c', trim: '#ffe089', hair: '#6d3a1e', tool: 'ledger' },
-      { key: 'builder', tunic: '#a9793a', trim: '#ffe2a0', hair: '#3e2b1d', tool: 'hammer' },
-      { key: 'guard', tunic: '#3f5f9f', trim: '#d7dbe3', hair: '#2e261f', tool: 'spear' },
-      { key: 'forager', tunic: '#6a9146', trim: '#d7c36b', hair: '#6a4425', tool: 'bundle' },
+      { key: 'settler', tunic: '#3f668d', trim: '#c7a95e', hair: '#4a2c19', tool: null },
+      { key: 'farmer', tunic: '#4f7b38', trim: '#c9b15d', hair: '#8a582a', tool: 'hoe', hat: 'straw' },
+      { key: 'rancher', tunic: '#657a37', trim: '#d0b263', hair: '#704827', tool: 'pail', hat: 'kerchief' },
+      { key: 'lumber', tunic: '#8f562b', trim: '#c9a166', hair: '#3e2618', tool: 'axe', hat: 'cap' },
+      { key: 'miner', tunic: '#536f7e', trim: '#aeb8be', hair: '#2b241f', tool: 'pick', hat: 'helmet' },
+      { key: 'stonecutter', tunic: '#656b6f', trim: '#b6bdc2', hair: '#342a24', tool: 'chisel', hat: 'cloth' },
+      { key: 'fisher', tunic: '#367b88', trim: '#bed0c5', hair: '#624528', tool: 'rod', hat: 'brim' },
+      { key: 'trader', tunic: '#a9772b', trim: '#d6bb69', hair: '#5a321e', tool: 'ledger', satchel: true },
+      { key: 'innkeeper', tunic: '#914533', trim: '#d2a35c', hair: '#4a2c1b', tool: 'mug', apron: '#d4bd91' },
+      { key: 'builder', tunic: '#8b6738', trim: '#d1b676', hair: '#35271c', tool: 'hammer', hat: 'cap' },
+      { key: 'blacksmith', tunic: '#3f4851', trim: '#c27a22', hair: '#221d19', tool: 'tongs', apron: '#20262b' },
+      { key: 'guard', tunic: '#344f80', trim: '#b7bec8', hair: '#29231e', tool: 'spear', shield: true },
+      { key: 'scholar', tunic: '#65528b', trim: '#c8b6df', hair: '#3e281c', tool: 'book' },
+      { key: 'forager', tunic: '#5c7d3f', trim: '#b9ad5e', hair: '#553a23', tool: 'bundle', hat: 'leaf' },
     ];
 
     const actorCanvas = document.createElement('canvas');
@@ -79,6 +87,35 @@ try {
       ctx.roundRect(x, y, w, h, r);
       ctx.fill();
       ctx.restore();
+    }
+
+    function actorHash(x, y) {
+      let h = (Math.floor(x) * 374761393) ^ (Math.floor(y) * 668265263);
+      h = (h ^ (h >>> 13)) * 1274126177;
+      return (h ^ (h >>> 16)) >>> 0;
+    }
+
+    function shadeHex(hex, amt) {
+      const raw = hex.replace('#', '');
+      const r = parseInt(raw.slice(0, 2), 16);
+      const g = parseInt(raw.slice(2, 4), 16);
+      const b = parseInt(raw.slice(4, 6), 16);
+      const mix = amt < 0 ? 0 : 255;
+      const t = Math.abs(amt);
+      const rr = Math.round(r + (mix - r) * t);
+      const gg = Math.round(g + (mix - g) * t);
+      const bb = Math.round(b + (mix - b) * t);
+      return `rgb(${rr},${gg},${bb})`;
+    }
+
+    function bodyPath(ctx, x, y) {
+      ctx.beginPath();
+      ctx.moveTo(x - 5.8, y - 7.0);
+      ctx.quadraticCurveTo(x, y - 10.4, x + 5.8, y - 7.0);
+      ctx.lineTo(x + 5.0, y + 5.8);
+      ctx.quadraticCurveTo(x + 3.8, y + 8.8, x, y + 8.5);
+      ctx.quadraticCurveTo(x - 3.8, y + 8.8, x - 5.0, y + 5.8);
+      ctx.closePath();
     }
 
     function drawTool(ctx, role, action, dir, frame, cx, torsoY, handX, handY, sx) {
@@ -138,6 +175,29 @@ try {
       } else if (role.tool === 'bundle') {
         ellipse(ctx, 0, 1, 4.2, 3.0, '#7d5732', 0.95);
         ellipse(ctx, 1.5, -1, 3.0, 2.0, '#6b9b43', 0.85);
+      } else if (role.tool === 'pail') {
+        ctx.rotate(work ? swing * 0.12 : walk ? swing * 0.08 : 0);
+        rounded(ctx, -3.5, -1, 7, 7, 2, '#8b97a3', 0.95);
+        line(ctx, -3, -1, 3, -1, '#d6dde3', 0.8, 0.85);
+        if (work) ellipse(ctx, 1, 8, 3.2, 0.9, '#d9c28a', 0.35);
+      } else if (role.tool === 'chisel') {
+        ctx.rotate(work ? -0.2 + swing * 0.35 : -0.55);
+        line(ctx, -4, 4, 5, -5, '#bec8d0', 1.35);
+        line(ctx, -7, -4, -2, -8, '#7a4d2a', 1.35);
+        if (work) ellipse(ctx, 7, -7, 1.4, 1.4, '#d7dde2', 0.75);
+      } else if (role.tool === 'mug') {
+        rounded(ctx, -3.5, -2, 7, 6, 1.5, '#d6a24f', 0.95);
+        line(ctx, 3, 0, 6, 1, '#f3d17b', 1.1, 0.9);
+        if (work) line(ctx, -6, -5, -1, -2, '#f3d17b', 1.2, 0.85);
+      } else if (role.tool === 'tongs') {
+        ctx.rotate(work ? -0.35 + swing * 0.5 : -0.15);
+        line(ctx, -2, 7, 2, -6, '#8f969c', 1.0);
+        line(ctx, 2, 7, -2, -6, '#8f969c', 1.0);
+        if (work) ellipse(ctx, -3, -8, 2.4, 1.5, '#f97316', 0.9);
+      } else if (role.tool === 'book') {
+        ctx.rotate(work ? swing * 0.08 : 0);
+        rounded(ctx, -5, -3, 10, 7, 1.5, '#8b5cf6', 0.95);
+        line(ctx, 0, -3, 0, 4, '#f4e7c8', 0.75, 0.9);
       } else if (action === 'carry') {
         ellipse(ctx, 0, 0, 3.2, 3.8, '#a8743f', 0.95);
       }
@@ -162,8 +222,9 @@ try {
       const cx = ox + 16;
       const footY = oy + 35;
       const torsoY = oy + 25;
-      const skin = '#e5b17e';
-      const skinShade = '#a96f4c';
+      const skin = '#d6a06f';
+      const skinHi = '#e2b887';
+      const skinShade = '#8d5d43';
       const pants = role.key === 'guard' ? '#1d2637' : '#2d2630';
       const stride = moving ? Math.cos(t) * 2.2 : 0;
       const workLean = working ? Math.sin(t) * 1.0 : 0;
@@ -171,32 +232,56 @@ try {
       const headY = oy + 13 + headBob;
       const legSep = profile ? 1.7 : 2.7;
 
-      ellipse(ctx, cx, oy + 36.6, 8.8, 3.0, '#000', 0.22);
-
       const liftA = moving ? Math.max(0, Math.cos(t)) * 1.8 : 0;
       const liftB = moving ? Math.max(0, -Math.cos(t)) * 1.8 : 0;
       const legAx = cx - legSep + (profile ? stride * sx : stride * 0.38);
       const legBx = cx + legSep - (profile ? stride * sx : stride * 0.38);
-      line(ctx, legAx, torsoY + 5, legAx, footY - liftA, pants, 2.3);
-      line(ctx, legBx, torsoY + 5, legBx, footY - liftB, pants, 2.3);
-      ellipse(ctx, legAx + (profile ? sx * 1.0 : 0), footY + 0.6 - liftA, 2.8, 1.45, '#211716');
-      ellipse(ctx, legBx + (profile ? -sx * 1.0 : 0), footY + 0.6 - liftB, 2.8, 1.45, '#211716');
+      line(ctx, legAx, torsoY + 5, legAx, footY - liftA, '#17100d', 3.4, 0.62);
+      line(ctx, legBx, torsoY + 5, legBx, footY - liftB, '#17100d', 3.4, 0.62);
+      line(ctx, legAx, torsoY + 5, legAx, footY - liftA, pants, 2.25);
+      line(ctx, legBx, torsoY + 5, legBx, footY - liftB, pants, 2.25);
+      ellipse(ctx, legAx + (profile ? sx * 1.0 : 0), footY + 0.6 - liftA, 3.2, 1.65, '#120d0b', 0.8);
+      ellipse(ctx, legBx + (profile ? -sx * 1.0 : 0), footY + 0.6 - liftB, 3.2, 1.65, '#120d0b', 0.8);
+      ellipse(ctx, legAx + (profile ? sx * 1.0 : 0), footY + 0.2 - liftA, 2.55, 1.25, '#2a1b14');
+      ellipse(ctx, legBx + (profile ? -sx * 1.0 : 0), footY + 0.2 - liftB, 2.55, 1.25, '#2a1b14');
 
       const bodyX = cx + (profile ? sx * workLean * 0.45 : workLean * 0.25);
-      const grad = ctx.createLinearGradient(bodyX - 6, torsoY - 8, bodyX + 6, torsoY + 7);
-      grad.addColorStop(0, '#ffffff2e');
-      grad.addColorStop(0.2, role.tunic);
-      grad.addColorStop(1, '#17202acc');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(bodyX - 5.7, torsoY - 7);
-      ctx.quadraticCurveTo(bodyX, torsoY - 10, bodyX + 5.7, torsoY - 7);
-      ctx.lineTo(bodyX + 4.4, torsoY + 6);
-      ctx.quadraticCurveTo(bodyX, torsoY + 9, bodyX - 4.4, torsoY + 6);
-      ctx.closePath();
+      ctx.fillStyle = 'rgba(25,17,12,0.68)';
+      bodyPath(ctx, bodyX, torsoY + 0.5);
       ctx.fill();
-      line(ctx, bodyX - 3.7, torsoY - 3, bodyX + 3.7, torsoY - 2, role.trim, 1.0, 0.78);
+      const grad = ctx.createLinearGradient(bodyX - 6, torsoY - 9, bodyX + 6, torsoY + 8);
+      grad.addColorStop(0, shadeHex(role.tunic, 0.24));
+      grad.addColorStop(0.38, role.tunic);
+      grad.addColorStop(1, shadeHex(role.tunic, -0.48));
+      ctx.fillStyle = grad;
+      bodyPath(ctx, bodyX, torsoY);
+      ctx.fill();
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,244,210,0.16)';
+      bodyPath(ctx, bodyX - 1.8, torsoY - 1.2);
+      ctx.clip();
+      ellipse(ctx, bodyX - 3.3, torsoY - 4.8, 2.0, 6.8, '#fff6d5', 0.13, -0.18);
+      ctx.restore();
+      line(ctx, bodyX - 3.7, torsoY - 3, bodyX + 3.7, torsoY - 2, role.trim, 0.9, 0.62);
 
+      if (role.apron) {
+        ctx.save();
+        ctx.fillStyle = role.apron;
+        ctx.globalAlpha *= 0.9;
+        ctx.beginPath();
+        ctx.moveTo(bodyX - 3.4, torsoY - 4);
+        ctx.lineTo(bodyX + 3.4, torsoY - 4);
+        ctx.lineTo(bodyX + 3.0, torsoY + 6.5);
+        ctx.lineTo(bodyX - 3.0, torsoY + 6.5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        line(ctx, bodyX - 4.2, torsoY - 1, bodyX + 4.2, torsoY - 1, role.trim, 0.85, 0.75);
+      }
+      if (role.satchel) {
+        rounded(ctx, bodyX - 8.1, torsoY + 1.2, 5.4, 6.4, 1.4, '#6f4224', 0.95);
+        line(ctx, bodyX - 4.6, torsoY - 6, bodyX + 4.6, torsoY + 6, '#ffe1a0', 0.9, 0.7);
+      }
       if (role.key === 'guard') {
         rounded(ctx, bodyX - 4.6, torsoY - 7, 9.2, 12, 2, 'rgba(180,188,196,0.28)', 0.8);
       }
@@ -206,50 +291,108 @@ try {
       const rightHandX = bodyX + 7.3;
       const leftHandY = torsoY + 4 + armSwing;
       const rightHandY = torsoY + 4 - armSwing;
-      line(ctx, bodyX - 5.3, torsoY - 3, leftHandX, leftHandY, role.tunic, 2.3);
-      line(ctx, bodyX + 5.3, torsoY - 3, rightHandX, rightHandY, role.tunic, 2.3);
-      ellipse(ctx, leftHandX, leftHandY, 1.35, 1.15, skin);
-      ellipse(ctx, rightHandX, rightHandY, 1.35, 1.15, skin);
+      line(ctx, bodyX - 5.3, torsoY - 3, leftHandX, leftHandY, '#17100d', 3.2, 0.45);
+      line(ctx, bodyX + 5.3, torsoY - 3, rightHandX, rightHandY, '#17100d', 3.2, 0.45);
+      line(ctx, bodyX - 5.3, torsoY - 3, leftHandX, leftHandY, shadeHex(role.tunic, -0.10), 2.25);
+      line(ctx, bodyX + 5.3, torsoY - 3, rightHandX, rightHandY, shadeHex(role.tunic, -0.10), 2.25);
+      ellipse(ctx, leftHandX, leftHandY, 1.45, 1.2, '#3b2418', 0.38);
+      ellipse(ctx, rightHandX, rightHandY, 1.45, 1.2, '#3b2418', 0.38);
+      ellipse(ctx, leftHandX - 0.2, leftHandY - 0.2, 1.25, 1.05, skin);
+      ellipse(ctx, rightHandX - 0.2, rightHandY - 0.2, 1.25, 1.05, skin);
+
+      if (role.shield && !away) {
+        const shieldX = profile ? bodyX - sx * 7.4 : bodyX - 7.4;
+        ctx.fillStyle = '#2c477e';
+        ctx.beginPath();
+        ctx.moveTo(shieldX, torsoY - 5.5);
+        ctx.quadraticCurveTo(shieldX + 4.3, torsoY - 4.2, shieldX + 3.2, torsoY + 2.4);
+        ctx.quadraticCurveTo(shieldX, torsoY + 6.0, shieldX - 3.2, torsoY + 2.4);
+        ctx.quadraticCurveTo(shieldX - 4.3, torsoY - 4.2, shieldX, torsoY - 5.5);
+        ctx.fill();
+        line(ctx, shieldX - 2.2, torsoY - 1, shieldX + 2.2, torsoY - 1, '#d8dce4', 0.9, 0.8);
+      }
 
       const toolHandX = profile && sx < 0 ? leftHandX : rightHandX;
       const toolHandY = profile && sx < 0 ? leftHandY : rightHandY;
       drawPayload(ctx, action, bodyX, torsoY, -side);
       drawTool(ctx, role, action, dir, frame, bodyX, torsoY, toolHandX, toolHandY, side);
 
-      ellipse(ctx, cx, headY, 6.2, 6.5, skin);
-      ellipse(ctx, cx + 1.9, headY + 1.1, 3.7, 4.0, skinShade, 0.16);
+      ellipse(ctx, cx, headY + 0.35, 5.45, 5.75, '#2a1b14', 0.54);
+      const faceGrad = ctx.createRadialGradient(cx - 2.1, headY - 2.3, 0.6, cx + 1.5, headY + 1.5, 6.45);
+      faceGrad.addColorStop(0, skinHi);
+      faceGrad.addColorStop(0.55, skin);
+      faceGrad.addColorStop(1, skinShade);
+      ellipse(ctx, cx - 0.2, headY, 5.2, 5.45, faceGrad);
+      ellipse(ctx, cx + 1.7, headY + 0.9, 3.0, 3.4, skinShade, 0.14);
 
       if (role.key === 'guard') {
         ctx.fillStyle = '#bac4cd';
         ctx.beginPath();
-        ctx.ellipse(cx, headY - 3.0, 6.1, 4.8, 0, Math.PI * 0.82, Math.PI * 2.18);
+        ctx.ellipse(cx, headY - 2.8, 5.5, 4.3, 0, Math.PI * 0.82, Math.PI * 2.18);
         ctx.closePath();
         ctx.fill();
-        line(ctx, cx - 4.5, headY - 2, cx + 4.5, headY - 2, '#f3d27b', 0.9, 0.85);
+        line(ctx, cx - 4.0, headY - 1.9, cx + 4.0, headY - 1.9, '#d8b95f', 0.9, 0.85);
+      } else if (role.hat === 'helmet') {
+        ctx.fillStyle = '#aeb8c2';
+        ctx.beginPath();
+        ctx.ellipse(cx, headY - 2.9, 5.7, 4.1, 0, Math.PI * 0.86, Math.PI * 2.14);
+        ctx.closePath();
+        ctx.fill();
+        ellipse(ctx, cx + (profile ? sx * 0.8 : 0), headY - 4.9, 1.25, 1.0, '#d6b957', 0.95);
+      } else if (role.hat === 'straw') {
+        ellipse(ctx, cx, headY - 3.9, 6.8, 1.3, '#cdb052', 0.95);
+        rounded(ctx, cx - 3.6, headY - 7.4, 7.2, 3.8, 1.2, '#b98e36', 0.95);
+        line(ctx, cx - 3.0, headY - 5.4, cx + 3.0, headY - 5.4, '#7b5d2d', 0.75, 0.7);
+      } else if (role.hat === 'brim') {
+        ellipse(ctx, cx, headY - 3.8, 6.4, 1.25, '#607c6a', 0.95);
+        rounded(ctx, cx - 3.4, headY - 7.2, 6.8, 3.4, 1.1, '#496654', 0.95);
+      } else if (role.hat === 'cap') {
+        ctx.fillStyle = role.trim;
+        ctx.beginPath();
+        ctx.ellipse(cx, headY - 4.0, 5.2, 2.7, 0, Math.PI * 0.88, Math.PI * 2.12);
+        ctx.closePath();
+        ctx.fill();
+        line(ctx, cx + (profile ? sx * 2.1 : 2.7), headY - 3.7, cx + (profile ? sx * 5.4 : 5.4), headY - 3.3, role.trim, 1.3, 0.95);
+      } else if (role.hat === 'kerchief') {
+        ctx.fillStyle = '#b64634';
+        ctx.beginPath();
+        ctx.ellipse(cx, headY - 3.9, 5.3, 2.8, 0, Math.PI * 0.82, Math.PI * 2.18);
+        ctx.closePath();
+        ctx.fill();
+        line(ctx, cx + 4.0, headY - 2.9, cx + 6.2, headY - 1.1, '#b64634', 0.95, 0.85);
+      } else if (role.hat === 'cloth') {
+        ctx.fillStyle = '#bfb7aa';
+        ctx.beginPath();
+        ctx.ellipse(cx, headY - 4.0, 5.3, 2.7, 0, Math.PI * 0.84, Math.PI * 2.16);
+        ctx.closePath();
+        ctx.fill();
+      } else if (role.hat === 'leaf') {
+        ellipse(ctx, cx - 1.4, headY - 5.1, 3.4, 1.35, '#536f34', 0.95, -0.5);
+        ellipse(ctx, cx + 1.9, headY - 5.1, 2.9, 1.2, '#6d8e43', 0.9, 0.45);
       } else {
         ctx.fillStyle = role.hair;
         ctx.beginPath();
         if (away) {
-          ctx.ellipse(cx, headY - 2.0, 6.0, 5.0, 0, Math.PI * 0.92, Math.PI * 2.08);
+          ctx.ellipse(cx, headY - 1.9, 5.4, 4.5, 0, Math.PI * 0.92, Math.PI * 2.08);
         } else if (profile) {
-          ctx.ellipse(cx - sx * 1.2, headY - 2.8, 5.8, 4.5, 0, Math.PI * 0.78, Math.PI * 2.12);
+          ctx.ellipse(cx - sx * 1.1, headY - 2.6, 5.2, 4.1, 0, Math.PI * 0.78, Math.PI * 2.12);
         } else {
-          ctx.ellipse(cx, headY - 2.7, 6.1, 4.5, 0, Math.PI * 0.82, Math.PI * 2.18);
+          ctx.ellipse(cx, headY - 2.5, 5.5, 4.1, 0, Math.PI * 0.82, Math.PI * 2.18);
         }
         ctx.closePath();
         ctx.fill();
-        ellipse(ctx, cx - 2.3, headY - 5.4, 2.1, 1.35, '#ffffff', 0.11);
+        ellipse(ctx, cx - 2.0, headY - 5.0, 1.8, 1.15, '#ffffff', 0.08);
       }
 
       if (!away) {
         if (profile) {
-          ellipse(ctx, cx + sx * 1.8, headY + 0.2, 1.1, 1.1, '#211512');
-          line(ctx, cx + sx * 0.9, headY + 3.1, cx + sx * 2.4, headY + 3.3, '#6f432c', 0.75);
+          ellipse(ctx, cx + sx * 1.55, headY + 0.2, 0.95, 0.95, '#211512');
+          line(ctx, cx + sx * 0.8, headY + 2.8, cx + sx * 2.1, headY + 3.0, '#6f432c', 0.7);
         } else {
-          ellipse(ctx, cx - 2.1, headY + 0.25, 1.0, 1.05, '#211512');
-          ellipse(ctx, cx + 2.1, headY + 0.25, 1.0, 1.05, '#211512');
-          if (working) line(ctx, cx - 1.5, headY + 3.0, cx + 1.5, headY + 3.0, '#6f432c', 0.75);
-          else line(ctx, cx - 1.3, headY + 2.8, cx + 1.3, headY + 3.2, '#6f432c', 0.75);
+          ellipse(ctx, cx - 1.8, headY + 0.25, 0.9, 0.95, '#211512');
+          ellipse(ctx, cx + 1.8, headY + 0.25, 0.9, 0.95, '#211512');
+          if (working) line(ctx, cx - 1.3, headY + 2.7, cx + 1.3, headY + 2.7, '#6f432c', 0.7);
+          else line(ctx, cx - 1.1, headY + 2.55, cx + 1.1, headY + 2.9, '#6f432c', 0.7);
         }
       }
 
@@ -269,11 +412,48 @@ try {
         for (let di = 0; di < dirs.length; di++) {
           for (let f = 0; f < frames; f++) {
             const row = (ri * actions.length + ai) * dirs.length + di;
-            drawActor(a, f * actorW, row * actorH, roles[ri], dirs[di], actions[ai], f);
+            a.save();
+            a.translate(f * actorW, row * actorH);
+            a.scale(actorScale, actorScale);
+            drawActor(a, 0, 0, roles[ri], dirs[di], actions[ai], f);
+            a.restore();
           }
         }
       }
     }
+
+    function applyPaintGrain(ctx, canvas, cellW, cellH) {
+      const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = image.data;
+      const src = new Uint8ClampedArray(data);
+      const w = canvas.width;
+      const h = canvas.height;
+      for (let y = 1; y < h - 1; y++) {
+        const localY = (y % cellH) / cellH;
+        for (let x = 1; x < w - 1; x++) {
+          const i = (y * w + x) * 4;
+          const alpha = src[i + 3];
+          if (alpha < 8) continue;
+
+          const n =
+            (src[i - 4 + 3] < 24 ? 1 : 0) +
+            (src[i + 4 + 3] < 24 ? 1 : 0) +
+            (src[i - w * 4 + 3] < 24 ? 1 : 0) +
+            (src[i + w * 4 + 3] < 24 ? 1 : 0);
+          const edgeShade = n > 0 ? 0.16 : 0;
+          const lowerShade = Math.max(0, localY - 0.54) * 0.10;
+          const grain = ((actorHash(x, y) & 255) - 128) / 128;
+          const fleck = ((actorHash(x + 19, y + 37) & 1023) === 0) ? 12 : 0;
+          const shade = 1 - edgeShade - lowerShade;
+          data[i] = Math.max(0, Math.min(255, data[i] * shade + grain * 5 + fleck));
+          data[i + 1] = Math.max(0, Math.min(255, data[i + 1] * shade + grain * 4 + fleck));
+          data[i + 2] = Math.max(0, Math.min(255, data[i + 2] * shade + grain * 3 + fleck * 0.6));
+        }
+      }
+      ctx.putImageData(image, 0, 0);
+    }
+
+    applyPaintGrain(a, actorCanvas, actorW, actorH);
 
     const ambientCanvas = document.createElement('canvas');
     ambientCanvas.width = 48 * 4;

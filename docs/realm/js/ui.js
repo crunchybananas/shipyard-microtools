@@ -549,6 +549,7 @@ export function showInfoPanel(b) {
   // Effective production multiplier for current level
   const upgrades = def.upgrades || [];
   const levelMult = level >= 2 ? (upgrades[level - 2]?.prodMult ?? 1) : 1;
+  const buildProgress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
 
   // HP bar
   const hp = Math.max(0, Math.min(100, b.hp ?? 100));
@@ -608,6 +609,18 @@ export function showInfoPanel(b) {
     </div>`;
 
   // Workers
+  if (buildProgress < 1) {
+    const pct = Math.round(buildProgress * 100);
+    html += `
+    <div class="ip-row">
+      <span class="ip-label">Status</span>
+      <span class="ip-hpbar">
+        <span class="ip-hpfill" style="width:${pct}%;background:#d6a864"></span>
+      </span>
+      <span class="ip-hpval">${pct}%</span>
+    </div>`;
+  }
+
   if (workerCount > 0) {
     const staffed = b.workers.length;
     const workerDots = '●'.repeat(staffed) + '○'.repeat(workerCount - staffed);
@@ -623,6 +636,9 @@ export function showInfoPanel(b) {
         return `${perCycle} ${k}<span class="ip-perday"> (${perDay}/day)</span>`;
       }).join(', ');
     html += `<div class="ip-row"><span class="ip-label">Produces</span><span class="ip-val">${effectiveProd}</span></div>`;
+    if (levelMult > 1) {
+      html += `<div class="ip-row"><span class="ip-label">Upgrade</span><span class="ip-val ip-happy">×${levelMult} production</span></div>`;
+    }
   }
 
   // Defense

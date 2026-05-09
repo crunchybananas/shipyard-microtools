@@ -3,7 +3,7 @@
 // ══════════════���═══════════════════════════���═════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js';
-import { findPath } from './pathfinding.js';
+import { findPath, isWalkable } from './pathfinding.js';
 import { getCitizenSpeedMult } from './events.js';
 import { revealAround } from './world.js';
 
@@ -23,14 +23,75 @@ function nearestBuilding(c, typeOrNull) {
   return best;
 }
 
+function citizenHash(c) {
+  const label = c?.name || `${Math.round((c?.x || 0) * 10)},${Math.round((c?.y || 0) * 10)}`;
+  let h = 2166136261;
+  for (let i = 0; i < label.length; i++) {
+    h ^= label.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function targetCrowdPenalty(c, x, y) {
+  let penalty = 0;
+  for (const other of G.citizens || []) {
+    if (other === c) continue;
+    const dist = Math.hypot(other.x - x, other.y - y);
+    if (dist < 0.72) penalty += 1.6;
+    if (Math.round(other.tx ?? other.x) === x && Math.round(other.ty ?? other.y) === y) penalty += 1.1;
+    const goal = other.path?.goal;
+    if (goal && goal.x === x && goal.y === y) penalty += 1.1;
+  }
+  return penalty;
+}
+
+function chooseCrowdAwareTarget(c, tx, ty) {
+  const rx = Math.round(tx), ry = Math.round(ty);
+  const directCrowd = targetCrowdPenalty(c, rx, ry);
+  if (isWalkable(rx, ry) && directCrowd < 1.2) return { x: rx, y: ry };
+
+  const candidates = [];
+  const maxR = isWalkable(rx, ry) ? 2 : 4;
+  for (let y = ry - maxR; y <= ry + maxR; y++) {
+    for (let x = rx - maxR; x <= rx + maxR; x++) {
+      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
+      if (!isWalkable(x, y)) continue;
+      const ring = Math.abs(x - rx) + Math.abs(y - ry);
+      if (ring > maxR) continue;
+      const crowd = targetCrowdPenalty(c, x, y);
+      const fromHere = Math.abs(x - c.x) + Math.abs(y - c.y);
+      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -0.35 : 0;
+      const jitter = ((citizenHash(c) ^ (x * 73856093) ^ (y * 19349663)) >>> 0) / 0xffffffff * 0.18;
+      candidates.push({
+        x, y,
+        score: ring * 2.0 + fromHere * 0.16 + crowd * 4.5 + roadBonus + jitter,
+      });
+    }
+  }
+  candidates.sort((a, b) => a.score - b.score);
+  return candidates[0] || { x: rx, y: ry };
+}
+
 function pathTo(c, tx, ty) {
-  c.tx = tx;
-  c.ty = ty;
-  c.path = findPath(Math.round(c.x), Math.round(c.y), tx, ty);
+  c._requestedTx = tx;
+  c._requestedTy = ty;
+  const target = chooseCrowdAwareTarget(c, tx, ty);
+  c._pathGoal = target;
+  c.path = findPath(Math.round(c.x), Math.round(c.y), target.x, target.y);
   c.pathIdx = 0;
-  if (!c.path) {
+  c._stuckTicks = 0;
+  c._lastPathX = c.x;
+  c._lastPathY = c.y;
+  if (c.path) {
+    const goal = c.path.goal || c.path[c.path.length - 1] || { x: tx, y: ty };
+    c.tx = goal.x;
+    c.ty = goal.y;
+    c._pathFailedAt = 0;
+  } else {
     c.tx = c.x;
     c.ty = c.y;
+    c._pathFailedAt = G.gameTick || 0;
   }
 }
 
@@ -48,10 +109,42 @@ const SEP_STRENGTH = 0.22;
 
 function tileWalkable(x, y) {
   const mx = Math.round(x), my = Math.round(y);
+  return isWalkable(mx, my);
+}
+
+function terrainWalkable(x, y) {
+  const mx = Math.round(x), my = Math.round(y);
   if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return false;
-  const t = G.map[my][mx];
+  const t = G.map[my]?.[mx];
+  return t !== undefined && t !== TILE.WATER && t !== TILE.MOUNTAIN;
+}
+
+function standingOnBlockedTile(c) {
+  const mx = Math.round(c.x), my = Math.round(c.y);
+  if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return false;
+  const t = G.map[my]?.[mx];
   const b = G.buildingGrid[my]?.[mx];
-  return t !== TILE.WATER && t !== TILE.MOUNTAIN && (!b || b.type === 'road');
+  return t !== TILE.WATER && t !== TILE.MOUNTAIN && !!b && b.type !== 'road';
+}
+
+function canStepCitizen(c, nx, ny) {
+  if (tileWalkable(nx, ny)) return true;
+  // If a player drops a building onto/against a citizen, their rounded
+  // current tile can be blocked for several frames. Let them step out toward
+  // a walkable waypoint instead of replanning forever inside the footprint.
+  return standingOnBlockedTile(c) && terrainWalkable(nx, ny);
+}
+
+function replanToRequestedTarget(c) {
+  const tx = Math.round(c._requestedTx ?? c.tx ?? c.x);
+  const ty = Math.round(c._requestedTy ?? c.ty ?? c.y);
+  pathTo(c, tx, ty);
+}
+
+function clearPath(c) {
+  c.path = null;
+  c.pathIdx = 0;
+  c._stuckTicks = 0;
 }
 
 function isActivelyMoving(c) {
@@ -61,39 +154,39 @@ function isActivelyMoving(c) {
 function applyCitizenSeparation() {
   const cs = G.citizens;
   const r2 = PERSONAL_SPACE * PERSONAL_SPACE;
-  for (let i = 0; i < cs.length; i++) {
-    const a = cs[i];
-    const aMoving = isActivelyMoving(a);
-    for (let j = i + 1; j < cs.length; j++) {
-      const b = cs[j];
-      const bMoving = isActivelyMoving(b);
-      // Both moving: skip — path following handles de-stacking naturally and
-      // separation would knock them off waypoints (the stuck-citizens bug).
-      if (aMoving && bMoving) continue;
-      const dx = a.x - b.x, dy = a.y - b.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 >= r2) continue;
-      let nx, ny, d;
-      if (d2 < 0.0004) {
-        const angle = (i * 37 + j * 53) % 360 * Math.PI / 180;
-        nx = Math.cos(angle);
-        ny = Math.sin(angle);
-        d = 0.02;
-      } else {
-        d = Math.sqrt(d2);
-        nx = dx / d;
-        ny = dy / d;
+  for (let pass = 0; pass < 2; pass++) {
+    for (let i = 0; i < cs.length; i++) {
+      const a = cs[i];
+      const aMoving = isActivelyMoving(a);
+      for (let j = i + 1; j < cs.length; j++) {
+        const b = cs[j];
+        const bMoving = isActivelyMoving(b);
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 >= r2) continue;
+        if (aMoving && bMoving && d2 > 0.09) continue;
+        let nx, ny, d;
+        if (d2 < 0.0004) {
+          const angle = (i * 37 + j * 53 + pass * 97) % 360 * Math.PI / 180;
+          nx = Math.cos(angle);
+          ny = Math.sin(angle);
+          d = 0.02;
+        } else {
+          d = Math.sqrt(d2);
+          nx = dx / d;
+          ny = dy / d;
+        }
+        const baseP = ((PERSONAL_SPACE - d) / PERSONAL_SPACE) * SEP_STRENGTH * (pass === 0 ? 0.72 : 0.44);
+        // Moving citizens get less push so their path is corrected, not derailed.
+        const aWeight = aMoving ? 0.22 : 1.0;
+        const bWeight = bMoving ? 0.22 : 1.0;
+        const ax = a.x + nx * baseP * 0.5 * aWeight;
+        const ay = a.y + ny * baseP * 0.5 * aWeight;
+        const bx = b.x - nx * baseP * 0.5 * bWeight;
+        const by = b.y - ny * baseP * 0.5 * bWeight;
+        if (canStepCitizen(a, ax, ay)) { a.x = ax; a.y = ay; }
+        if (canStepCitizen(b, bx, by)) { b.x = bx; b.y = by; }
       }
-      const baseP = ((PERSONAL_SPACE - d) / PERSONAL_SPACE) * SEP_STRENGTH;
-      // Moving citizen gets less push so their path isn't derailed.
-      const aWeight = aMoving ? 0.4 : 1.0;
-      const bWeight = bMoving ? 0.4 : 1.0;
-      const ax = a.x + nx * baseP * 0.5 * aWeight;
-      const ay = a.y + ny * baseP * 0.5 * aWeight;
-      const bx = b.x - nx * baseP * 0.5 * bWeight;
-      const by = b.y - ny * baseP * 0.5 * bWeight;
-      if (tileWalkable(ax, ay)) { a.x = ax; a.y = ay; }
-      if (tileWalkable(bx, by)) { b.x = bx; b.y = by; }
     }
   }
 }
@@ -148,6 +241,10 @@ export function updateCitizens() {
     // Follow path if we have one
     if (c.path && c.pathIdx < c.path.length) {
       const wp = c.path[c.pathIdx];
+      if (!isWalkable(wp.x, wp.y)) {
+        replanToRequestedTarget(c);
+        continue;
+      }
       const dx = wp.x - c.x, dy = wp.y - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d < 0.15) {
@@ -168,23 +265,32 @@ export function updateCitizens() {
         const step = Math.min(spd, d);
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
-        if (tileWalkable(nx, ny)) {
+        const beforeX = c.x, beforeY = c.y;
+        if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
-        } else {
-          c.path = findPath(Math.round(c.x), Math.round(c.y), Math.round(c.tx ?? wp.x), Math.round(c.ty ?? wp.y));
-          c.pathIdx = 0;
-          if (!c.path) {
-            c.tx = c.x;
-            c.ty = c.y;
+          const moved = Math.hypot(c.x - beforeX, c.y - beforeY);
+          const progressMoved = Math.hypot(c.x - (c._lastPathX ?? c.x), c.y - (c._lastPathY ?? c.y));
+          if (moved < 0.001 || progressMoved < 0.01) c._stuckTicks = (c._stuckTicks || 0) + 1;
+          else {
+            c._stuckTicks = 0;
+            c._lastPathX = c.x;
+            c._lastPathY = c.y;
           }
+          if ((c._stuckTicks || 0) > 45) replanToRequestedTarget(c);
+        } else {
+          replanToRequestedTarget(c);
         }
       }
       continue; // still moving — next citizen
     }
 
+    if (c.path && c.pathIdx >= c.path.length) {
+      clearPath(c);
+    }
+
     // No path or path complete — fallback straight-line for non-pathfound movement
-    if (!c.path) {
+    if (!c.path && c.state !== 'walk_to_work' && c.state !== 'walk_to_deliver' && c.state !== 'foraging') {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {
@@ -196,11 +302,11 @@ export function updateCitizens() {
         const step = Math.min(spd, d);
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
-        if (tileWalkable(nx, ny)) {
+        if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
         } else {
-          c.path = null;
+          clearPath(c);
           c.tx = c.x;
           c.ty = c.y;
         }
@@ -254,6 +360,12 @@ function runStateMachine(c) {
       if (c.jobBuilding) {
         c.state = 'walk_to_work';
         pathTo(c, c.jobBuilding.x, c.jobBuilding.y);
+        if (!c.path) {
+          c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
+          c.jobBuilding = null;
+          c.state = 'idle';
+          c.stateTimer = 25 + rngInt(0, 35);
+        }
       } else {
         // No building job — forage from nearby resource tiles
         const gx = Math.round(c.x), gy = Math.round(c.y);
@@ -292,10 +404,26 @@ function runStateMachine(c) {
       break;
 
     case 'walk_to_work':
+      if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
+        c.jobBuilding = null;
+        c.state = 'find_job';
+        c.stateTimer = 0;
+        clearPath(c);
+        break;
+      }
+      if (dist2(c.x, c.y, c.jobBuilding.x, c.jobBuilding.y) > 2.2) {
+        pathTo(c, c.jobBuilding.x, c.jobBuilding.y);
+        if (c.path) break;
+        c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
+        c.jobBuilding = null;
+        c.state = 'idle';
+        c.stateTimer = 25 + rngInt(0, 35);
+        break;
+      }
       // Arrived at workplace
       c.state = 'working';
       c.stateTimer = 60 + rngInt(0, 30);
-      c.path = null;
+      clearPath(c);
       break;
 
     case 'working':
@@ -337,14 +465,19 @@ function runStateMachine(c) {
       // Nothing to carry — cycle back to working
       c.state = 'find_job';
       c.stateTimer = 10;
-      c.path = null;
+      clearPath(c);
       break;
 
     case 'walk_to_deliver':
+      if (c.path && c.pathIdx < c.path.length) break;
+      if (dist2(c.x, c.y, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty) > 2.2) {
+        pathTo(c, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty);
+        if (c.path) break;
+      }
       // Arrived at delivery point
       c.state = 'deliver';
       c.stateTimer = 0;
-      c.path = null;
+      clearPath(c);
       break;
 
     case 'deliver':
@@ -370,6 +503,15 @@ function runStateMachine(c) {
       break;
 
     case 'foraging':
+      if (c.forageTarget && dist2(c.x, c.y, c.forageTarget.x, c.forageTarget.y) > 1.2) {
+        pathTo(c, c.forageTarget.x, c.forageTarget.y);
+        if (c.path) break;
+        c.forageTarget = null;
+        c.state = 'find_job';
+        c.stateTimer = 20;
+        clearPath(c);
+        break;
+      }
       // Arrived at forage tile — gather a small amount
       if (c.forageTarget) {
         const t = c.forageTarget.tile;
@@ -389,19 +531,19 @@ function runStateMachine(c) {
       c.forageTarget = null;
       c.state = 'find_job';
       c.stateTimer = 0; // immediately look for building jobs
-      c.path = null;
+      clearPath(c);
       break;
 
     case 'eating':
       c.state = 'find_job';
       c.stateTimer = 5;
-      c.path = null;
+      clearPath(c);
       break;
 
     default:
       c.state = 'idle';
       c.stateTimer = 10;
-      c.path = null;
+      clearPath(c);
   }
 }
 
