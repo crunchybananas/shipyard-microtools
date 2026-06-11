@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MANIFEST — every byte, declared</title>
+<meta name="description" content="Customs inspection for files. Drop anything — the browser identifies it by its bytes, parses its structure, verifies its checksums, maps its entropy, and extracts its cargo. Zero dependencies. Nothing leaves your machine." />
+<meta name="theme-color" content="#0b0e1a" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E" />
+<style>
+:root {
+  --bg: #0b0e1a;
+  --panel: #11152a;
+  --panel-2: #0d1124;
+  --line: rgba(148, 163, 184, 0.16);
+  --text: #e8eefc;
+  --muted: #8fa1bd;
+  --faint: #5a6a85;
+  --cyan: #22d3ee;
+  --violet: #8b7cf6;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --red: #f76d6d;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: radial-gradient(circle at 20% -10%, #161c38, var(--bg) 55%);
+  color: var(--text); font-family: var(--sans); font-size: 14px;
+  display: flex; flex-direction: column; height: 100svh; overflow: clip;
+}
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+::selection { background: rgba(34, 211, 238, 0.3); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #25304d; border-radius: 5px; }
+
+header {
+  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+  padding: 18px 22px 14px; border-bottom: 1px solid var(--line);
+}
+header h1 { font-family: var(--mono); font-size: 19px; letter-spacing: 0.34em; font-weight: 600; }
+header h1 .pin { color: var(--cyan); }
+header .tag { color: var(--muted); font-size: 13px; }
+header .privacy { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+header .privacy b { color: var(--green); font-weight: 600; }
+header a.back { color: var(--faint); text-decoration: none; font-size: 12px; }
+header a.back:hover { color: var(--cyan); }
+
+/* ---------- drop stage ---------- */
+#stage { flex: 1; display: grid; place-content: center; text-align: center; padding: 30px; overflow-y: auto; }
+#dropzone {
+  width: min(640px, 92vw); padding: 56px 36px; border-radius: 18px;
+  border: 1.5px dashed rgba(148, 163, 184, 0.35);
+  background: rgba(17, 21, 42, 0.5);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+body.dragging #dropzone { border-color: var(--cyan); background: rgba(34, 211, 238, 0.06); transform: scale(1.01); }
+#dropzone .glyph { font-size: 44px; }
+#dropzone h2 { font-family: var(--mono); margin-top: 14px; font-size: 17px; font-weight: 600; letter-spacing: 0.08em; }
+#dropzone p { color: var(--muted); margin-top: 10px; line-height: 1.65; max-width: 46ch; margin-inline: auto; }
+#dropzone .pick {
+  margin-top: 22px; display: inline-block; padding: 10px 24px; border-radius: 999px;
+  background: rgba(34, 211, 238, 0.12); border: 1px solid rgba(34, 211, 238, 0.4);
+  font-family: var(--mono); font-size: 13px;
+}
+#dropzone .pick:hover { background: rgba(34, 211, 238, 0.22); }
+#samples { margin-top: 26px; color: var(--faint); font-size: 12.5px; }
+#samples button {
+  font-family: var(--mono); font-size: 12px; color: var(--violet);
+  padding: 3px 10px; border: 1px solid rgba(139, 124, 246, 0.35); border-radius: 999px; margin: 4px 3px 0;
+}
+#samples button:hover { background: rgba(139, 124, 246, 0.14); }
+
+/* ---------- report ---------- */
+#report { display: none; flex: 1; min-height: 0; flex-direction: column; }
+body.loaded #stage { display: none; }
+body.loaded #report { display: flex; }
+
+#overview {
+  display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
+  padding: 14px 22px; border-bottom: 1px solid var(--line); position: relative;
+}
+#overview .fileglyph { font-size: 30px; }
+#overview .id .name { font-family: var(--mono); font-size: 15px; font-weight: 600; word-break: break-all; }
+#overview .id .sub { color: var(--muted); font-size: 12px; margin-top: 3px; font-family: var(--mono); }
+#overview .id .sub b { color: var(--cyan); font-weight: 600; }
+.kv { display: flex; gap: 22px; flex-wrap: wrap; font-family: var(--mono); font-size: 11.5px; }
+.kv > div { min-width: 0; }
+.kv .k { color: var(--faint); text-transform: uppercase; letter-spacing: 0.12em; font-size: 9.5px; }
+.kv .v { margin-top: 3px; color: var(--text); word-break: break-all; }
+.kv .v.ok { color: var(--green); }
+#histo { image-rendering: pixelated; border: 1px solid var(--line); border-radius: 4px; }
+#newfile {
+  margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+  border: 1px solid var(--line); padding: 7px 14px; border-radius: 999px;
+}
+#newfile:hover { color: var(--cyan); border-color: rgba(34, 211, 238, 0.4); }
+
+/* customs stamp */
+#stamp {
+  font-family: var(--mono); font-weight: 700; letter-spacing: 0.18em; text-align: center;
+  border: 2.5px solid; border-radius: 8px; padding: 7px 16px 6px; rotate: -6deg;
+  font-size: 13px; line-height: 1.5; pointer-events: none; mix-blend-mode: screen;
+  margin: 4px 10px; max-width: min(340px, 80vw);
+  animation: stamppop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+@keyframes stamppop { from { opacity: 0; scale: 1.7; rotate: 4deg; } }
+#stamp .why { display: block; font-size: 8.5px; letter-spacing: 0.1em; font-weight: 400; opacity: 0.85; }
+#stamp.cleared { color: var(--green); border-color: var(--green); box-shadow: 0 0 22px rgba(52, 211, 153, 0.15); }
+#stamp.flagged { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 22px rgba(251, 191, 36, 0.15); }
+#stamp.undeclared { color: var(--red); border-color: var(--red); box-shadow: 0 0 22px rgba(247, 109, 109, 0.15); }
+
+/* entropy strip */
+#entropy-row { padding: 10px 22px 12px; border-bottom: 1px solid var(--line); }
+#entropy-row .lbl { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--faint); letter-spacing: 0.12em; margin-bottom: 6px; }
+#entropy-wrap { position: relative; }
+#entropy { display: block; width: 100%; height: 30px; border-radius: 5px; cursor: crosshair; }
+#viewport-marker {
+  position: absolute; top: -3px; bottom: -3px; min-width: 3px;
+  border: 1px solid rgba(232, 238, 252, 0.85); border-radius: 3px;
+  pointer-events: none; box-shadow: 0 0 8px rgba(34, 211, 238, 0.35);
+}
+#entropy-tip {
+  position: absolute; top: -26px; translate: -50% 0; padding: 2px 8px; border-radius: 4px;
+  background: #1b2240; font-family: var(--mono); font-size: 10.5px; white-space: nowrap;
+  pointer-events: none; display: none; border: 1px solid var(--line);
+}
+
+/* ---------- main grid ---------- */
+#main { flex: 1; display: grid; grid-template-columns: minmax(300px, 380px) 1fr; min-height: 0; }
+@media (max-width: 900px) {
+  /* narrow: the page flows and each pane gets its own bounded scroll
+     (#main-prefixed so these outrank the base rules that appear later) */
+  body { height: auto; min-height: 100svh; overflow: auto; }
+  #main { grid-template-columns: 1fr; }
+  #main #left { max-height: 42svh; border-right: none; border-bottom: 1px solid var(--line); }
+  #main #hexwrap { flex: none; height: 54svh; }
+}
+
+#left { border-right: 1px solid var(--line); overflow-y: auto; padding: 14px 16px 30px; background: var(--panel-2); }
+.sect-h {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--faint); margin: 18px 0 8px; display: flex; align-items: center; gap: 8px;
+}
+.sect-h:first-child { margin-top: 0; }
+.sect-h::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* structure tree */
+.node { font-family: var(--mono); font-size: 12px; }
+.node details { margin-left: 0; }
+.node .node { margin-left: 14px; border-left: 1px solid rgba(148, 163, 184, 0.1); padding-left: 8px; }
+.row-line {
+  display: flex; align-items: center; gap: 8px; padding: 3.5px 6px; border-radius: 6px; cursor: pointer;
+  list-style: none;
+}
+.row-line::-webkit-details-marker { display: none; }
+.row-line:hover { background: rgba(34, 211, 238, 0.07); }
+.row-line .dot { width: 8px; height: 8px; border-radius: 2.5px; flex: 0 0 8px; }
+.row-line .nm { font-weight: 600; white-space: nowrap; }
+.row-line .meta { color: var(--muted); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-line .rng { margin-left: auto; color: var(--faint); font-size: 9.5px; white-space: nowrap; }
+.node .note { color: var(--muted); font-size: 11px; padding: 1px 6px 4px 22px; line-height: 1.5; }
+.node .note b { color: var(--text); font-weight: 600; }
+.node .err { color: var(--amber); }
+.node .act {
+  font-size: 10px; color: var(--violet); border: 1px solid rgba(139, 124, 246, 0.35);
+  border-radius: 999px; padding: 1px 8px; margin-left: 6px;
+}
+.node .act:hover { background: rgba(139, 124, 246, 0.15); }
+details > .kids { padding-top: 1px; }
+
+/* strings */
+#strings { font-family: var(--mono); font-size: 11px; }
+#strings .s { display: flex; gap: 10px; padding: 2.5px 6px; border-radius: 5px; cursor: pointer; }
+#strings .s:hover { background: rgba(34, 211, 238, 0.07); }
+#strings .off { color: var(--faint); flex: 0 0 76px; }
+#strings .txt { color: #c7d6ef; word-break: break-all; }
+#more-strings { font-family: var(--mono); font-size: 11px; color: var(--violet); padding: 5px 6px; }
+
+/* ---------- hex pane ---------- */
+#right { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+#hex-toolbar {
+  display: flex; gap: 10px; align-items: center; padding: 9px 16px;
+  border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px; flex-wrap: wrap;
+}
+#hex-toolbar input {
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); border-radius: 7px;
+  color: var(--text); font: inherit; padding: 5px 10px;
+}
+#hex-toolbar input:focus { outline: none; border-color: rgba(34, 211, 238, 0.5); }
+#search { width: 220px; }
+#goto { width: 110px; }
+#search-info { color: var(--faint); font-size: 11px; }
+#hex-toolbar .nav { color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px; font-size: 11px; }
+#hex-toolbar .nav:hover { color: var(--cyan); }
+
+#hexwrap { flex: 1; overflow-y: auto; position: relative; font-family: var(--mono); font-size: 12.5px; }
+#hex-spacer { position: relative; }
+#hex-rows { position: absolute; left: 0; right: 0; }
+.hrow { display: flex; gap: 18px; height: 22px; line-height: 22px; padding: 0 16px; white-space: nowrap; }
+.hrow:hover { background: rgba(255, 255, 255, 0.025); }
+.hrow .off { color: var(--faint); flex: 0 0 86px; }
+.hrow .bytes { display: flex; }
+.hrow .bytes span { padding: 0 3.5px; border-radius: 3px; }
+.hrow .bytes span:nth-child(8) { margin-right: 9px; }
+.hrow .asc { color: var(--muted); letter-spacing: 1px; }
+.hrow .asc span { border-radius: 2px; }
+.hrow span.cur { outline: 1.5px solid var(--cyan); background: rgba(34, 211, 238, 0.22) !important; }
+.hrow span.hit { background: rgba(251, 191, 36, 0.3) !important; }
+.hrow .b-zero { color: #4a5872; }
+.hrow .b-print { color: #cfe0f6; }
+.hrow .b-other { color: #8ba3c7; }
+
+#inspector {
+  border-top: 1px solid var(--line); padding: 10px 16px 12px;
+  font-family: var(--mono); font-size: 11.5px; background: var(--panel-2);
+}
+#inspector .ins-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 6px; }
+#inspector .ins-grid div { color: var(--muted); }
+#inspector .ins-grid b { color: var(--text); font-weight: 600; margin-left: 6px; }
+#inspector .where { color: var(--cyan); }
+#region-path { color: var(--violet); margin-left: 10px; }
+
+/* extraction preview dialog */
+dialog {
+  margin: auto; border: 1px solid var(--line); border-radius: 14px; background: #11162c; color: var(--text);
+  width: min(720px, calc(100vw - 40px)); max-height: 80vh; padding: 0;
+}
+dialog::backdrop { background: rgba(4, 7, 16, 0.6); backdrop-filter: blur(3px); }
+dialog .d-head { display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 13px; }
+dialog .d-head .close { margin-left: auto; color: var(--muted); font-size: 18px; }
+dialog .d-body { padding: 16px 18px; overflow: auto; max-height: calc(80vh - 56px); }
+dialog pre { font-family: var(--mono); font-size: 12px; white-space: pre-wrap; word-break: break-all; color: #c7d6ef; line-height: 1.55; }
+dialog img { max-width: 100%; border-radius: 8px; }
+
+footer { padding: 10px 22px; border-top: 1px solid var(--line); color: var(--faint); font-size: 11px; font-family: var(--mono); display: flex; gap: 18px; flex-wrap: wrap; }
+footer span b { color: var(--muted); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="pin">⚓</span> MANIFEST</h1>
+  <span class="tag">every byte, declared — customs inspection for files</span>
+  <span class="privacy"><b>●</b> inspection happens entirely in your browser — nothing is uploaded</span>
+  <a class="back" href="../index.html">← docks</a>
+</header>
+
+<!-- ============ DROP STAGE ============ -->
+<div id="stage">
+  <div id="dropzone">
+    <div class="glyph">📦</div>
+    <h2>PRESENT CARGO FOR INSPECTION</h2>
+    <p>Drop any file here. It will be identified by its bytes — not its name — then parsed,
+       checksummed, entropy-mapped, and laid open in hex. Archives can be unpacked on the spot.</p>
+    <button class="pick" id="pick">choose a file</button>
+    <div id="samples">
+      no file handy? inspect cargo forged on the spot:<br/>
+      <button data-s="png">PNG image</button>
+      <button data-s="jpeg">JPEG image</button>
+      <button data-s="zip">ZIP archive</button>
+      <button data-s="wav">WAV audio</button>
+      <button data-s="wasm">WASM module</button>
+      <button data-s="liar">a file that lies about itself</button>
+      <button data-s="noise">encrypted-looking noise</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REPORT ============ -->
+<div id="report">
+  <div id="overview">
+    <div class="fileglyph" id="fileglyph">📄</div>
+    <div class="id">
+      <div class="name" id="f-name"></div>
+      <div class="sub" id="f-sub"></div>
+    </div>
+    <div class="kv">
+      <div><div class="k">sha-256</div><div class="v" id="f-hash" style="max-width:24ch">…</div></div>
+      <div><div class="k">entropy</div><div class="v" id="f-entropy">…</div></div>
+      <div><div class="k">byte spread</div><canvas id="histo" width="128" height="36"></canvas></div>
+    </div>
+    <div id="stamp" hidden></div>
+    <button id="newfile">⟲ inspect another</button>
+  </div>
+
+  <div id="entropy-row">
+    <div class="lbl"><span>ENTROPY CHART — calm water is structure, hot water is compression or encryption</span><span id="entropy-scale">0 ░░▒▒▓▓██ 8 bits/byte</span></div>
+    <div id="entropy-wrap">
+      <canvas id="entropy" height="30"></canvas>
+      <div id="viewport-marker"></div>
+      <div id="entropy-tip"></div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="left">
+      <div class="sect-h">cargo structure</div>
+      <div id="tree" class="node"></div>
+      <div class="sect-h">strings found aboard</div>
+      <div id="strings"></div>
+      <button id="more-strings" hidden>show more…</button>
+    </div>
+
+    <div id="right">
+      <div id="hex-toolbar">
+        <input id="search" placeholder="search text or hex (de ad be ef)" />
+        <button class="nav" id="prev-hit" title="previous match">↑</button>
+        <button class="nav" id="next-hit" title="next match">↓</button>
+        <span id="search-info"></span>
+        <input id="goto" placeholder="goto 0x…" style="margin-left:auto" />
+      </div>
+      <div id="hexwrap">
+        <div id="hex-spacer"><div id="hex-rows"></div></div>
+      </div>
+      <div id="inspector">
+        <span class="where" id="ins-where">offset —</span><span id="region-path"></span>
+        <div class="ins-grid" id="ins-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span><b>click</b> a byte to inspect it</span>
+    <span><b>click</b> a structure row to jump there</span>
+    <span><b>g</b> focus goto</span>
+    <span><b>/</b> focus search</span>
+    <span>built with File API · DataView · Web Crypto · DecompressionStream · zero dependencies</span>
+  </footer>
+</div>
+
+<dialog id="preview">
+  <div class="d-head"><span id="d-title"></span><button class="close" id="d-close">✕</button></div>
+  <div class="d-body" id="d-body"></div>
+</dialog>
+
+<input type="file" id="file-input" hidden />
+
+<script>
+/* ============================================================
+   MANIFEST — the whole customs office in one file.
+   ============================================================ */
+(() => {
+"use strict";
+const $ = (s) => document.querySelector(s);
+const MAXBYTES = 256 * 1024 * 1024;     /* hard cap on full load */
+const ROWH = 22, PERROW = 16;
+
+const st = {
+  u8: null, dv: null, name: "", size: 0,
+  regions: [], leaves: [], cursor: -1, hits: [], hitIx: -1,
+  truncated: false,
+};
+
+const fmtSize = (n) => n < 1024 ? n + " B"
+  : n < 1048576 ? (n / 1024).toFixed(1) + " KB"
+  : n < 1073741824 ? (n / 1048576).toFixed(2) + " MB"
+  : (n / 1073741824).toFixed(2) + " GB";
+const hex = (n, w = 2) => n.toString(16).toUpperCase().padStart(w, "0");
+const off8 = (n) => n.toString(16).padStart(8, "0");
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ascii = (u8, a, b) => { let s = ""; for (let i = a; i < b; i++) s += String.fromCharCode(u8[i]); return s; };
+const latin = ascii;
+
+/* ---------- crc32 (PNG verify + zip forging) ---------- */
+const CRCT = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c; }
+  return t;
+})();
+const crc32 = (u8, a = 0, b = u8.length) => {
+  let c = 0xffffffff;
+  for (let i = a; i < b; i++) c = CRCT[(c ^ u8[i]) & 255] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+};
+
+/* ============================================================
+   REGION MODEL — parsers emit nested {a, b, nm, meta, notes[], kids[]}
+   ============================================================ */
+const PALETTE = ["#22d3ee", "#8b7cf6", "#34d399", "#fbbf24", "#f472b6", "#60a5fa", "#fb923c", "#a3e635", "#2dd4bf", "#c084fc"];
+const R = (a, b, nm, meta = "", kids = []) => ({ a, b, nm, meta, kids, notes: [], acts: [] });
+
+/* ============================================================
+   FORMAT DETECTION — by magic, never by name
+   ============================================================ */
+const MAGICS = [
+  { id: "png",    glyph: "🖼", name: "PNG image",         exts: ["png"],          test: (u) => u[0] === 0x89 && u[1] === 0x50 && u[2] === 0x4e && u[3] === 0x47 },
+  { id: "jpeg",   glyph: "🖼", name: "JPEG image",        exts: ["jpg", "jpeg", "jfif"], test: (u) => u[0] === 0xff && u[1] === 0xd8 && u[2] === 0xff },
+  { id: "gif",    glyph: "🖼", name: "GIF image",         exts: ["gif"],          test: (u) => ascii(u, 0, 4) === "GIF8" },
+  { id: "zip",    glyph: "🗜", name: "ZIP archive",       exts: ["zip", "jar", "apk", "docx", "xlsx", "pptx", "epub", "ipa"], test: (u) => u[0] === 0x50 && u[1] === 0x4b && (u[2] === 3 || u[2] === 5 || u[2] === 7) },
+  { id: "gzip",   glyph: "🗜", name: "GZIP archive",      exts: ["gz", "tgz", "svgz"], test: (u) => u[0] === 0x1f && u[1] === 0x8b },
+  { id: "wav",    glyph: "🔊", name: "WAV audio (RIFF)",  exts: ["wav"],          test: (u) => ascii(u, 0, 4) === "RIFF" && ascii(u, 8, 12) === "WAVE" },
+  { id: "webp",   glyph: "🖼", name: "WebP image (RIFF)", exts: ["webp"],         test: (u) => ascii(u, 0, 4) === "RIFF" && ascii(u, 8, 12) === "WEBP" },
+  { id: "mp3",    glyph: "🔊", name: "MP3 audio",         exts: ["mp3"],          test: (u) => ascii(u, 0, 3) === "ID3" || (u[0] === 0xff && (u[1] & 0xe0) === 0xe0) },
+  { id: "mp4",    glyph: "🎬", name: "MP4 / ISO media",   exts: ["mp4", "m4a", "m4v", "mov", "heic", "avif"], test: (u) => u.length > 11 && ascii(u, 4, 8) === "ftyp" },
+  { id: "pdf",    glyph: "📕", name: "PDF document",      exts: ["pdf"],          test: (u) => ascii(u, 0, 5) === "%PDF-" },
+  { id: "wasm",   glyph: "⚙️", name: "WebAssembly module", exts: ["wasm"],        test: (u) => u[0] === 0 && ascii(u, 1, 4) === "asm" },
+  { id: "sqlite", glyph: "🗄", name: "SQLite database",   exts: ["db", "sqlite", "sqlite3"], test: (u) => ascii(u, 0, 15) === "SQLite format 3" },
+  { id: "tar",    glyph: "🗜", name: "TAR archive",       exts: ["tar"],          test: (u) => u.length > 262 && ascii(u, 257, 262) === "ustar" },
+  { id: "elf",    glyph: "⚙️", name: "ELF executable",    exts: ["", "so", "o", "elf"], test: (u) => u[0] === 0x7f && ascii(u, 1, 4) === "ELF" },
+  { id: "macho",  glyph: "⚙️", name: "Mach-O executable", exts: ["", "dylib", "o"], test: (u) => { const m = (u[0]<<24|u[1]<<16|u[2]<<8|u[3])>>>0; return [0xfeedface,0xfeedfacf,0xcefaedfe,0xcffaedfe,0xcafebabe].includes(m); } },
+  { id: "pe",     glyph: "⚙️", name: "Windows PE executable", exts: ["exe", "dll"], test: (u) => u[0] === 0x4d && u[1] === 0x5a },
+  { id: "class",  glyph: "⚙️", name: "Java class file",   exts: ["class"],        test: (u) => (u[0]<<24|u[1]<<16|u[2]<<8|u[3])>>>0 === 0xcafebabe && u[7] > 30 },
+  { id: "flac",   glyph: "🔊", name: "FLAC audio",        exts: ["flac"],         test: (u) => ascii(u, 0, 4) === "fLaC" },
+  { id: "ogg",    glyph: "🔊", name: "OGG container",     exts: ["ogg", "opus", "oga"], test: (u) => ascii(u, 0, 4) === "OggS" },
+  { id: "sevenz", glyph: "🗜", name: "7-Zip archive",     exts: ["7z"],           test: (u) => u[0] === 0x37 && u[1] === 0x7a && u[2] === 0xbc && u[3] === 0xaf },
+  { id: "rar",    glyph: "🗜", name: "RAR archive",       exts: ["rar"],          test: (u) => ascii(u, 0, 4) === "Rar!" },
+  { id: "xz",     glyph: "🗜", name: "XZ archive",        exts: ["xz"],           test: (u) => u[0] === 0xfd && ascii(u, 1, 6) === "7zXZ\0" },
+  { id: "zstd",   glyph: "🗜", name: "Zstandard archive", exts: ["zst"],          test: (u) => u[0] === 0x28 && u[1] === 0xb5 && u[2] === 0x2f && u[3] === 0xfd },
+  { id: "bmp",    glyph: "🖼", name: "BMP image",         exts: ["bmp"],          test: (u) => u[0] === 0x42 && u[1] === 0x4d },
+  { id: "ico",    glyph: "🖼", name: "ICO icon",          exts: ["ico"],          test: (u) => u[0] === 0 && u[1] === 0 && u[2] === 1 && u[3] === 0 },
+  { id: "ttf",    glyph: "🔤", name: "TrueType font",     exts: ["ttf"],          test: (u) => (u[0]<<24|u[1]<<16|u[2]<<8|u[3])>>>0 === 0x00010000 && u[12] !== undefined },
+  { id: "otf",    glyph: "🔤", name: "OpenType font",     exts: ["otf"],          test: (u) => ascii(u, 0, 4) === "OTTO" },
+  { id: "woff2",  glyph: "🔤", name: "WOFF2 font",        exts: ["woff2"],        test: (u) => ascii(u, 0, 4) === "wOF2" },
+  { id: "xml",    glyph: "📃", name: "XML document",      exts: ["xml", "svg", "plist"], test: (u) => ascii(u, 0, 5) === "<?xml" },
+  { id: "json",   glyph: "📃", name: "JSON (probably)",   exts: ["json"],         test: (u) => { const c = u[0]; return (c === 0x7b || c === 0x5b) && looksTexty(u); } },
+];
+
+const looksTexty = (u) => {
+  const n = Math.min(u.length, 2048); if (!n) return false;
+  let printable = 0;
+  for (let i = 0; i < n; i++) { const b = u[i]; if (b === 9 || b === 10 || b === 13 || (b >= 32 && b < 127) || b >= 128) printable++; if (b === 0) return false; }
+  return printable / n > 0.97;
+};
+
+/* ============================================================
+   PARSERS — each returns {root: R, kv: [[k,v]], errors: []}
+   ============================================================ */
+const P = {};
+
+P.png = (u8, dv) => {
+  const root = R(0, u8.length, "PNG"), kv = [], errors = [];
+  root.kids.push(R(0, 8, "signature", "89 50 4E 47 0D 0A 1A 0A"));
+  let p = 8, crcOK = 0, crcBad = 0, idatTotal = 0, idatGroup = null, idatParts = [];
+  while (p + 8 <= u8.length) {
+    const len = dv.getUint32(p), type = ascii(u8, p + 4, p + 8), end = p + 12 + len;
+    if (end > u8.length) { errors.push(`chunk ${type} at 0x${hex(p, 8)} runs past end of file (truncated?)`); break; }
+    const node = R(p, end, type, fmtSize(len));
+    const calc = crc32(u8, p + 4, p + 8 + len), stored = dv.getUint32(p + 8 + len);
+    calc === stored ? crcOK++ : (crcBad++, node.notes.push(`<span class="err">CRC mismatch — stored ${hex(stored, 8)}, computed ${hex(calc, 8)}</span>`));
+    if (type === "IHDR") {
+      const w = dv.getUint32(p + 8), h = dv.getUint32(p + 12), depth = u8[p + 16], ct = u8[p + 17];
+      const cts = { 0: "grayscale", 2: "truecolor", 3: "indexed", 4: "gray+alpha", 6: "RGBA" };
+      node.notes.push(`<b>${w} × ${h}</b> px · ${depth}-bit ${cts[ct] ?? "?"}${u8[p+20] ? " · interlaced" : ""}`);
+      kv.push(["dimensions", `${w} × ${h}`]);
+    }
+    if (type === "tEXt" || type === "iTXt") {
+      const z = u8.indexOf(0, p + 8);
+      if (z > 0 && z < p + 8 + len) node.notes.push(`<b>${esc(ascii(u8, p + 8, z))}</b>: ${esc(ascii(u8, type === "iTXt" ? z + 5 : z + 1, Math.min(p + 8 + len, z + 220)))}`);
+    }
+    if (type === "pHYs") node.notes.push(`${dv.getUint32(p+8)} × ${dv.getUint32(p+12)} px/${u8[p+16] === 1 ? "meter" : "unit"}`);
+    if (type === "IDAT") {
+      idatTotal += len; idatParts.push([p + 8, p + 8 + len]);
+      /* group all IDATs into one row */
+      if (!idatGroup) { idatGroup = node; root.kids.push(node); }
+      else { idatGroup.b = end; idatGroup.nm = `IDAT × ${idatParts.length}`; idatGroup.meta = fmtSize(idatTotal); }
+    } else root.kids.push(node);
+    p = end;
+    if (type === "IEND") break;
+  }
+  if (!root.kids.some((k) => k.nm === "IEND")) errors.push("no IEND chunk — file is truncated");
+  kv.push(["chunk CRCs", crcBad ? `${crcBad} bad / ${crcOK + crcBad}` : `all ${crcOK} verified ✓`]);
+  if (idatTotal && "DecompressionStream" in window) {
+    const idatNode = root.kids.find((k) => k.nm.startsWith("IDAT"));
+    idatNode?.acts.push({ label: "inflate pixels", run: async () => {
+      const joined = new Uint8Array(idatTotal); let o = 0;
+      for (const [a, b] of idatParts) { joined.set(u8.subarray(a, b), o); o += b - a; }
+      const raw = await inflate(joined, "deflate");
+      return { title: "IDAT inflated", html: `<pre>compressed   ${fmtSize(idatTotal)}\ndecompressed ${fmtSize(raw.length)}  (${(raw.length / idatTotal).toFixed(1)}× expansion)\n\nThis is the raw filtered scanline data the PNG stores —\nevery row prefixed by a filter byte, then pixel deltas.</pre>` };
+    }});
+  }
+  return { root, kv, errors };
+};
+
+P.jpeg = (u8, dv) => {
+  const root = R(0, u8.length, "JPEG"), kv = [], errors = [];
+  let p = 2, dims = null, exif = false, progressive = false;
+  root.kids.push(R(0, 2, "SOI", "start of image"));
+  while (p + 4 <= u8.length) {
+    if (u8[p] !== 0xff) { errors.push(`expected marker at 0x${hex(p, 8)}`); break; }
+    const m = u8[p + 1];
+    if (m === 0xd9) { root.kids.push(R(p, p + 2, "EOI", "end of image")); break; }
+    if (m === 0xda) { /* SOS — entropy-coded data follows to EOI */
+      let q = u8.length - 2;
+      while (q > p && !(u8[q] === 0xff && u8[q + 1] === 0xd9)) q--;
+      root.kids.push(R(p, q, "SOS + scan data", fmtSize(q - p), []));
+      if (q > p) root.kids.push(R(q, q + 2, "EOI", "end of image"));
+      break;
+    }
+    const len = dv.getUint16(p + 2), end = p + 2 + len;
+    const names = { 0xe0: "APP0 (JFIF)", 0xe1: "APP1", 0xdb: "DQT", 0xc0: "SOF0 baseline", 0xc2: "SOF2 progressive", 0xc4: "DHT", 0xfe: "COM" };
+    const nm = names[m] ?? `marker FF${hex(m)}`;
+    const node = R(p, end, nm, fmtSize(len));
+    if (m === 0xc0 || m === 0xc2) {
+      dims = [dv.getUint16(p + 7), dv.getUint16(p + 5)];
+      progressive = m === 0xc2;
+      node.notes.push(`<b>${dims[0]} × ${dims[1]}</b> px · ${u8[p + 4]}-bit · ${u8[p + 9]} component${u8[p+9] > 1 ? "s" : ""}`);
+    }
+    if (m === 0xe1 && ascii(u8, p + 4, p + 8) === "Exif") { exif = true; node.meta = "EXIF metadata · " + fmtSize(len); }
+    if (m === 0xfe) node.notes.push(esc(ascii(u8, p + 4, Math.min(end, p + 4 + 160))));
+    root.kids.push(node); p = end;
+  }
+  if (dims) kv.push(["dimensions", `${dims[0]} × ${dims[1]}`]);
+  kv.push(["encoding", progressive ? "progressive" : "baseline"]);
+  kv.push(["EXIF", exif ? "present" : "none"]);
+  return { root, kv, errors };
+};
+
+P.gif = (u8, dv) => {
+  const root = R(0, u8.length, "GIF"), kv = [], errors = [];
+  const w = dv.getUint16(6, true), h = dv.getUint16(8, true), gct = u8[10] & 0x80, gctSize = 2 << (u8[10] & 7);
+  root.kids.push(R(0, 6, "header", ascii(u8, 0, 6)));
+  const lsd = R(6, 13, "logical screen", `${w} × ${h}`); root.kids.push(lsd);
+  let p = 13;
+  if (gct) { root.kids.push(R(p, p + gctSize * 3, "global palette", gctSize + " colors")); p += gctSize * 3; }
+  let frames = 0, loops = null, delay = 0;
+  while (p < u8.length) {
+    const b = u8[p];
+    if (b === 0x3b) { root.kids.push(R(p, p + 1, "trailer", "end")); break; }
+    if (b === 0x21) { /* extension */
+      const lbl = u8[p + 1]; let q = p + 2;
+      if (lbl === 0xf9) delay += dv.getUint16(q + 2, true);
+      if (lbl === 0xff && ascii(u8, q + 1, q + 12) === "NETSCAPE2.0") loops = dv.getUint16(q + 14, true);
+      while (q < u8.length && u8[q] !== 0) q += u8[q] + 1;
+      p = q + 1;
+    } else if (b === 0x2c) { /* image */
+      frames++;
+      let q = p + 10;
+      if (u8[p + 9] & 0x80) q += (2 << (u8[p + 9] & 7)) * 3;
+      q++; /* LZW min code size */
+      while (q < u8.length && u8[q] !== 0) q += u8[q] + 1;
+      q++;
+      if (frames <= 24) root.kids.push(R(p, q, `frame ${frames}`, fmtSize(q - p)));
+      p = q;
+    } else { errors.push(`unknown block 0x${hex(b)} at 0x${hex(p, 8)}`); break; }
+  }
+  if (frames > 24) root.kids.push(R(0, 0, `… ${frames - 24} more frames`, ""));
+  kv.push(["dimensions", `${w} × ${h}`], ["frames", String(frames)]);
+  if (frames > 1) kv.push(["animation", `${(delay / 100).toFixed(1)}s${loops === 0 ? " · loops forever" : loops ? ` · ${loops} loops` : ""}`]);
+  return { root, kv, errors };
+};
+
+P.zip = (u8, dv) => {
+  const root = R(0, u8.length, "ZIP"), kv = [], errors = [];
+  /* find EOCD in the last 64KB */
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65558); i--)
+    if (u8[i] === 0x50 && u8[i + 1] === 0x4b && u8[i + 2] === 5 && u8[i + 3] === 6) { eocd = i; break; }
+  if (eocd < 0) { errors.push("no end-of-central-directory record — truncated or not a complete ZIP"); return { root, kv, errors }; }
+  const count = dv.getUint16(eocd + 10, true), cdOff = dv.getUint32(eocd + 16, true), cdSize = dv.getUint32(eocd + 12, true);
+  const dir = R(cdOff, cdOff + cdSize, "central directory", count + " entries");
+  let p = cdOff, shown = 0, totalUnc = 0, totalCmp = 0, encrypted = 0;
+  const entries = R(0, cdOff, "entries", "");
+  for (let n = 0; n < count && p + 46 <= u8.length; n++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) { errors.push("central directory corrupt at 0x" + hex(p, 8)); break; }
+    const method = dv.getUint16(p + 10, true), csz = dv.getUint32(p + 20, true), usz = dv.getUint32(p + 24, true);
+    const nlen = dv.getUint16(p + 28, true), elen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true);
+    const lho = dv.getUint32(p + 42, true), name = ascii(u8, p + 46, p + 46 + nlen);
+    const enc = dv.getUint16(p + 8, true) & 1; if (enc) encrypted++;
+    totalUnc += usz; totalCmp += csz;
+    if (shown < 60 && !name.endsWith("/")) {
+      const node = R(lho, Math.min(u8.length, lho + 30 + nlen + csz), name.split("/").pop(),
+        `${fmtSize(usz)}${method === 8 ? " · deflated " + (usz ? Math.round(100 - csz / usz * 100) + "%" : "") : method === 0 ? " · stored" : " · method " + method}${enc ? " · 🔒" : ""}`);
+      if (name.includes("/")) node.notes.push(esc(name));
+      if (!enc && (method === 0 || (method === 8 && "DecompressionStream" in window)) && usz < 32 * 1048576) {
+        node.acts.push({ label: "extract", run: async () => {
+          /* local header gives the actual data offset */
+          const ln = dv.getUint16(lho + 26, true), le = dv.getUint16(lho + 28, true);
+          const a = lho + 30 + ln + le;
+          const raw = method === 0 ? u8.slice(a, a + csz) : await inflate(u8.subarray(a, a + csz), "deflate-raw");
+          return previewBytes(name, raw);
+        }});
+      }
+      entries.kids.push(node); shown++;
+    }
+    p += 46 + nlen + elen + clen;
+  }
+  if (count > shown) entries.kids.push(R(0, 0, `… ${count - shown} more`, ""));
+  entries.meta = `${count} files · ${fmtSize(totalUnc)} unpacked`;
+  root.kids.push(entries, dir, R(eocd, eocd + 22, "end of central directory", ""));
+  kv.push(["entries", String(count)], ["compression", totalUnc ? Math.round(100 - totalCmp / totalUnc * 100) + "% saved" : "—"]);
+  if (encrypted) kv.push(["encrypted entries", String(encrypted)]);
+  /* container sniff: docx/jar/apk/epub are zips wearing uniforms */
+  const first = ascii(u8, 30, 30 + dv.getUint16(26, true));
+  const uniform = first === "META-INF/MANIFEST.MF" ? "Java JAR" : first.startsWith("word/") || first === "[Content_Types].xml" ? "Office document" : first === "mimetype" ? "EPUB" : first === "AndroidManifest.xml" ? "Android APK" : null;
+  if (uniform) kv.push(["wearing uniform of", uniform]);
+  return { root, kv, errors };
+};
+
+P.gzip = (u8, dv) => {
+  const root = R(0, u8.length, "GZIP"), kv = [], errors = [];
+  const flg = u8[3], mtime = dv.getUint32(4, true);
+  let p = 10, fname = null;
+  if (flg & 4) p += 2 + dv.getUint16(p, true);
+  if (flg & 8) { const z = u8.indexOf(0, p); fname = ascii(u8, p, z); p = z + 1; }
+  const head = R(0, p, "header", fname ? "original name: " + fname : "");
+  if (mtime) head.notes.push("modified " + new Date(mtime * 1000).toISOString().slice(0, 19).replace("T", " "));
+  root.kids.push(head, R(p, u8.length - 8, "deflate stream", fmtSize(u8.length - 8 - p)), R(u8.length - 8, u8.length, "trailer", "crc32 + size"));
+  const isize = dv.getUint32(u8.length - 4, true);
+  kv.push(["declared size", fmtSize(isize)], ["ratio", isize ? (isize / u8.length).toFixed(1) + "× expansion" : "—"]);
+  if (fname) kv.push(["original name", fname]);
+  if ("DecompressionStream" in window && isize < 64 * 1048576) {
+    root.acts.push({ label: "decompress", run: async () => previewBytes(fname || "decompressed", await inflate(u8, "gzip")) });
+  }
+  return { root, kv, errors };
+};
+
+P.wav = (u8, dv) => {
+  const root = R(0, u8.length, "WAV"), kv = [], errors = [];
+  root.kids.push(R(0, 12, "RIFF header", fmtSize(dv.getUint32(4, true)) + " declared"));
+  let p = 12, rate = 0, byteRate = 0, ch = 0, bits = 0, dataLen = 0;
+  while (p + 8 <= u8.length) {
+    const id = ascii(u8, p, p + 4), len = dv.getUint32(p + 4, true), end = p + 8 + len + (len & 1);
+    const node = R(p, Math.min(end, u8.length), id.trim(), fmtSize(len));
+    if (id === "fmt ") {
+      ch = dv.getUint16(p + 10, true); rate = dv.getUint32(p + 12, true);
+      byteRate = dv.getUint32(p + 16, true); bits = dv.getUint16(p + 22, true);
+      const fmt = dv.getUint16(p + 8, true);
+      node.notes.push(`<b>${rate.toLocaleString()} Hz</b> · ${bits}-bit · ${ch === 1 ? "mono" : ch === 2 ? "stereo" : ch + " ch"} · ${fmt === 1 ? "PCM" : fmt === 3 ? "float" : "format " + fmt}`);
+    }
+    if (id === "data") dataLen = len;
+    root.kids.push(node); p = end;
+  }
+  if (rate) kv.push(["sample rate", rate.toLocaleString() + " Hz"], ["channels", String(ch)], ["bit depth", bits + "-bit"]);
+  if (dataLen && byteRate) kv.push(["duration", (dataLen / byteRate).toFixed(2) + " s"]);
+  return { root, kv, errors };
+};
+
+P.mp3 = (u8, dv) => {
+  const root = R(0, u8.length, "MP3"), kv = [], errors = [];
+  let p = 0;
+  if (ascii(u8, 0, 3) === "ID3") {
+    const size = (u8[6] << 21) | (u8[7] << 14) | (u8[8] << 7) | u8[9];
+    const ver = u8[3];
+    const id3 = R(0, 10 + size, `ID3v2.${ver}`, fmtSize(10 + size));
+    let q = 10;
+    const FR = { TIT2: "title", TPE1: "artist", TALB: "album", TYER: "year", TDRC: "year", TRCK: "track", TCON: "genre", COMM: "comment", TPE2: "album artist" };
+    while (q + 10 < 10 + size) {
+      const fid = ascii(u8, q, q + 4);
+      if (!/^[A-Z0-9]{4}$/.test(fid)) break;
+      const flen = ver === 4 ? ((u8[q+4] << 21) | (u8[q+5] << 14) | (u8[q+6] << 7) | u8[q+7]) : dv.getUint32(q + 4);
+      if (flen <= 0 || q + 10 + flen > 10 + size) break;
+      if (FR[fid]) {
+        const encb = u8[q + 10];
+        let txt;
+        if (encb === 1 || encb === 2) txt = new TextDecoder("utf-16").decode(u8.subarray(q + 11, q + 10 + flen));
+        else txt = new TextDecoder(encb === 3 ? "utf-8" : "latin1").decode(u8.subarray(q + 11, q + 10 + flen));
+        txt = txt.replace(/\0/g, "").trim();
+        if (txt) { id3.notes.push(`<b>${FR[fid]}</b>: ${esc(txt.slice(0, 120))}`); if (["title","artist","album"].includes(FR[fid])) kv.push([FR[fid], txt.slice(0, 40)]); }
+      }
+      if (fid === "APIC") id3.notes.push("<b>cover art</b> embedded · " + fmtSize(flen));
+      q += 10 + flen;
+    }
+    root.kids.push(id3); p = 10 + size;
+  }
+  /* first MPEG frame header */
+  while (p + 4 < u8.length && !(u8[p] === 0xff && (u8[p + 1] & 0xe0) === 0xe0)) p++;
+  if (p + 4 < u8.length) {
+    const b1 = u8[p + 1], b2 = u8[p + 2];
+    const verBits = (b1 >> 3) & 3, layer = 4 - ((b1 >> 1) & 3);
+    const BR = [0,32,40,48,56,64,80,96,112,128,160,192,224,256,320];
+    const SR = [44100, 48000, 32000];
+    const br = verBits === 3 && layer === 3 ? BR[(b2 >> 4) & 15] : 0;
+    const sr = SR[(b2 >> 2) & 3] ?? 0;
+    const node = R(p, u8.length, "MPEG audio stream", fmtSize(u8.length - p));
+    if (br && sr) {
+      node.notes.push(`MPEG1 layer ${layer} · <b>${br} kbps</b> · ${(sr/1000).toFixed(1)} kHz`);
+      kv.push(["bitrate", br + " kbps"], ["duration", "≈ " + Math.round((u8.length - p) * 8 / (br * 1000)) + " s"]);
+    }
+    root.kids.push(node);
+  }
+  return { root, kv, errors };
+};
+
+P.mp4 = (u8, dv) => {
+  const root = R(0, u8.length, "MP4"), kv = [], errors = [];
+  const CONTAINERS = new Set(["moov", "trak", "mdia", "minf", "stbl", "udta", "edts", "mvex", "dinf"]);
+  const walk = (a, b, into, depth) => {
+    let p = a, guard = 0;
+    while (p + 8 <= b && guard++ < 400) {
+      let size = dv.getUint32(p); const type = ascii(u8, p + 4, p + 8);
+      let hdr = 8;
+      if (size === 1) { size = Number(dv.getBigUint64(p + 8)); hdr = 16; }
+      if (size === 0) size = b - p;
+      if (size < hdr || p + size > b || !/^[\x20-\x7e]{4}$/.test(type)) { errors.push(`bad box at 0x${hex(p, 8)}`); return; }
+      const node = R(p, p + size, type, fmtSize(size));
+      if (type === "ftyp") node.notes.push("brand <b>" + esc(ascii(u8, p + 8, p + 12)) + "</b> · compatible: " + esc(ascii(u8, p + 16, Math.min(p + size, p + 32))));
+      if (type === "mvhd") {
+        const v = u8[p + hdr];
+        const ts = v === 1 ? dv.getUint32(p + hdr + 20) : dv.getUint32(p + hdr + 12);
+        const dur = v === 1 ? Number(dv.getBigUint64(p + hdr + 24)) : dv.getUint32(p + hdr + 16);
+        if (ts) { node.notes.push(`duration <b>${(dur / ts).toFixed(2)} s</b>`); kv.push(["duration", (dur / ts).toFixed(2) + " s"]); }
+      }
+      if (type === "hdlr") node.notes.push("handler: <b>" + esc(ascii(u8, p + hdr + 8, p + hdr + 12)) + "</b>");
+      into.push(node);
+      if (CONTAINERS.has(type) && depth < 5) walk(p + hdr, p + size, node.kids, depth + 1);
+      p += size;
+    }
+  };
+  walk(0, u8.length, root.kids, 0);
+  const ftypBrand = ascii(u8, 8, 12);
+  kv.push(["brand", ftypBrand]);
+  return { root, kv, errors };
+};
+
+P.wasm = (u8, dv) => {
+  const root = R(0, u8.length, "WASM"), kv = [], errors = [];
+  root.kids.push(R(0, 8, "magic + version", "\\0asm v" + dv.getUint32(4, true)));
+  const NAMES = ["custom", "type", "import", "function", "table", "memory", "global", "export", "start", "element", "code", "data", "data count"];
+  let p = 8, fns = 0;
+  while (p < u8.length) {
+    const id = u8[p]; let q = p + 1, size = 0, shift = 0;
+    while (q < u8.length) { const b = u8[q++]; size |= (b & 0x7f) << shift; shift += 7; if (!(b & 0x80)) break; }
+    const node = R(p, q + size, (NAMES[id] ?? "section " + id) + " section", fmtSize(size));
+    if (id === 0) { /* custom: name */
+      let n = 0, sh = 0, r = q; while (r < u8.length) { const b = u8[r++]; n |= (b & 0x7f) << sh; sh += 7; if (!(b & 0x80)) break; }
+      node.meta = `"${esc(ascii(u8, r, r + Math.min(n, 32)))}" · ` + fmtSize(size);
+    }
+    if (id === 10) { let n = 0, sh = 0, r = q; while (r < u8.length) { const b = u8[r++]; n |= (b & 0x7f) << sh; sh += 7; if (!(b & 0x80)) break; } fns = n; node.notes.push(`<b>${n}</b> function bodies`); }
+    root.kids.push(node);
+    p = q + size;
+  }
+  if (fns) kv.push(["functions", String(fns)]);
+  return { root, kv, errors };
+};
+
+P.pdf = (u8) => {
+  const root = R(0, u8.length, "PDF"), kv = [], errors = [];
+  const ver = ascii(u8, 5, 8);
+  root.kids.push(R(0, 8, "header", "version " + ver));
+  const scan = ascii(u8, 0, Math.min(u8.length, 4 * 1048576));
+  const objs = (scan.match(/\d+ \d+ obj/g) || []).length;
+  const pages = (scan.match(/\/Type\s*\/Page[^s]/g) || []).length;
+  kv.push(["version", ver], ["objects", objs + (u8.length > 4194304 ? "+ (first 4MB)" : "")]);
+  if (pages) kv.push(["pages", "≈ " + pages]);
+  if (scan.includes("/Encrypt")) kv.push(["encryption", "present 🔒"]);
+  if (scan.includes("/JavaScript") || scan.includes("/JS")) root.notes.push('<span class="err">contains embedded JavaScript — common in malicious PDFs</span>');
+  const tail = ascii(u8, Math.max(0, u8.length - 1024), u8.length);
+  if (!tail.includes("%%EOF")) errors.push("no %%EOF marker — file may be truncated");
+  return { root, kv, errors };
+};
+
+P.sqlite = (u8, dv) => {
+  const root = R(0, u8.length, "SQLite"), kv = [], errors = [];
+  let pageSize = dv.getUint16(16); if (pageSize === 1) pageSize = 65536;
+  const pages = dv.getUint32(28);
+  root.kids.push(R(0, 100, "header", `page size ${pageSize}`));
+  kv.push(["page size", fmtSize(pageSize)], ["pages", pages.toLocaleString()]);
+  if (pages * pageSize !== u8.length) errors.push(`header declares ${fmtSize(pages * pageSize)} but file is ${fmtSize(u8.length)}`);
+  const scan = ascii(u8, 0, Math.min(u8.length, 1048576));
+  const tables = [...scan.matchAll(/CREATE TABLE "?([A-Za-z0-9_]+)/gi)].map((m) => m[1]).slice(0, 12);
+  if (tables.length) kv.push(["tables", tables.join(", ")]);
+  return { root, kv, errors };
+};
+
+P.tar = (u8) => {
+  const root = R(0, u8.length, "TAR"), kv = [], errors = [];
+  let p = 0, n = 0;
+  while (p + 512 <= u8.length && n < 5000) {
+    if (u8[p] === 0) break;
+    const name = ascii(u8, p, p + 100).replace(/\0.*/, "");
+    const size = parseInt(ascii(u8, p + 124, p + 136).replace(/\0.*/, "").trim(), 8) || 0;
+    const blocks = Math.ceil(size / 512);
+    if (n < 50 && name) root.kids.push(R(p, p + 512 + blocks * 512, name.split("/").pop() || name, fmtSize(size)));
+    p += 512 + blocks * 512; n++;
+  }
+  if (n >= 50) root.kids.push(R(0, 0, `… ${n - 50} more entries`, ""));
+  kv.push(["entries", String(n)]);
+  return { root, kv, errors };
+};
+
+P.elf = (u8, dv) => {
+  const root = R(0, u8.length, "ELF"), kv = [], errors = [];
+  const is64 = u8[4] === 2, le = u8[5] === 1;
+  const machine = dv.getUint16(18, le);
+  const MACH = { 3: "x86", 62: "x86-64", 40: "ARM", 183: "AArch64", 243: "RISC-V" };
+  const TYPE = { 1: "relocatable", 2: "executable", 3: "shared object", 4: "core dump" };
+  root.kids.push(R(0, is64 ? 64 : 52, "ELF header", `${is64 ? 64 : 32}-bit ${le ? "LE" : "BE"}`));
+  kv.push(["arch", MACH[machine] ?? "machine " + machine], ["type", TYPE[dv.getUint16(16, le)] ?? "?"]);
+  return { root, kv, errors };
+};
+
+P.macho = (u8, dv) => {
+  const root = R(0, u8.length, "Mach-O"), kv = [], errors = [];
+  const m = dv.getUint32(0);
+  if (m === 0xcafebabe) { kv.push(["kind", "universal (fat) binary"], ["slices", String(dv.getUint32(4))]); root.kids.push(R(0, 8, "fat header", "")); return { root, kv, errors }; }
+  const le = m === 0xcefaedfe || m === 0xcffaedfe;
+  const cpu = dv.getUint32(4, le);
+  const CPU = { 7: "x86", 0x01000007: "x86-64", 12: "ARM", 0x0100000c: "ARM64" };
+  kv.push(["arch", CPU[cpu >>> 0] ?? "cpu " + (cpu >>> 0).toString(16)], ["load commands", String(dv.getUint32(16, le))]);
+  root.kids.push(R(0, 32, "mach header", ""));
+  return { root, kv, errors };
+};
+
+P.webp = (u8, dv) => {
+  const root = R(0, u8.length, "WebP"), kv = [], errors = [];
+  root.kids.push(R(0, 12, "RIFF/WEBP header", ""));
+  let p = 12;
+  while (p + 8 <= u8.length) {
+    const id = ascii(u8, p, p + 4), len = dv.getUint32(p + 4, true);
+    root.kids.push(R(p, p + 8 + len + (len & 1), id, fmtSize(len)));
+    p += 8 + len + (len & 1);
+  }
+  return { root, kv, errors };
+};
+
+/* generic texty fallback */
+P.text = (u8) => {
+  const root = R(0, u8.length, "Text"), kv = [], errors = [];
+  const sample = new TextDecoder().decode(u8.subarray(0, 4096));
+  const lines = sample.split("\n").length;
+  kv.push(["looks like", "plain text"], ["lines (first 4KB)", String(lines)]);
+  root.acts.push({ label: "view as text", run: async () => previewBytes(st.name, u8.subarray(0, 256 * 1024)) });
+  return { root, kv, errors };
+};
+
+/* ============================================================
+   SHARED HELPERS
+   ============================================================ */
+async function inflate(u8, format) {
+  const ds = new DecompressionStream(format);
+  const stream = new Blob([u8]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function previewBytes(name, raw) {
+  const extm = name.toLowerCase().match(/\.(png|jpe?g|gif|webp|bmp|svg)$/);
+  if (extm) {
+    const mime = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp", bmp: "image/bmp", svg: "image/svg+xml" }[extm[1]];
+    const url = URL.createObjectURL(new Blob([raw], { type: mime }));
+    return { title: `${name} · ${fmtSize(raw.length)}`, html: `<img src="${url}" alt="">` };
+  }
+  if (looksTexty(raw)) {
+    const txt = new TextDecoder().decode(raw.subarray(0, 128 * 1024));
+    return { title: `${name} · ${fmtSize(raw.length)}`, html: `<pre>${esc(txt)}${raw.length > 131072 ? "\n\n… (truncated)" : ""}</pre>` };
+  }
+  let dump = "";
+  for (let r = 0; r < Math.min(raw.length, 512); r += 16) {
+    dump += off8(r) + "  ";
+    for (let i = r; i < r + 16 && i < raw.length; i++) dump += hex(raw[i]) + " ";
+    dump += "\n";
+  }
+  return { title: `${name} · ${fmtSize(raw.length)} (binary)`, html: `<pre>${dump}${raw.length > 512 ? "…" : ""}</pre>` };
+}
+
+/* ============================================================
+   ANALYZE
+   ============================================================ */
+async function loadFile(file) {
+  const full = file.size <= MAXBYTES;
+  const buf = await (full ? file.arrayBuffer() : file.slice(0, MAXBYTES).arrayBuffer());
+  loadBytes(new Uint8Array(buf), file.name, full ? null : file.size);
+}
+
+async function loadBytes(u8, name, realSize = null) {
+  st.u8 = u8; st.dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  st.name = name; st.size = realSize ?? u8.length; st.truncated = realSize !== null;
+  st.cursor = -1; st.hits = []; st.hitIx = -1;
+  document.body.classList.add("loaded");
+  $("#left").scrollTop = 0;
+  $("#search").value = ""; $("#search-info").textContent = "";
+
+  /* --- detect --- */
+  let magic = MAGICS.find((m) => { try { return m.test(u8); } catch { return false; } });
+  if (!magic && looksTexty(u8)) magic = { id: "text", glyph: "📃", name: "Plain text", exts: ["txt", "md", "csv", "log", "js", "ts", "css", "html", "py", "sh", "yml", "yaml", "toml", "ini"] };
+
+  /* --- parse --- */
+  let parsed = { root: R(0, u8.length, "unidentified cargo"), kv: [], errors: [] };
+  if (magic && P[magic.id]) {
+    try { parsed = P[magic.id](u8, st.dv); }
+    catch (e) { parsed.errors.push("parser ran aground: " + e.message); }
+  }
+  st.regions = [parsed.root];
+
+  /* flatten leaves for hex coloring */
+  st.leaves = [];
+  let ci = 0;
+  const flat = (n, path) => {
+    n.path = path ? path + " › " + n.nm : n.nm;
+    if (!n.kids.length) { if (n.b > n.a) { n.color = PALETTE[ci++ % PALETTE.length]; st.leaves.push(n); } }
+    else { n.color = PALETTE[ci++ % PALETTE.length]; n.kids.forEach((k) => flat(k, n.path)); }
+  };
+  flat(parsed.root, "");
+  st.leaves.sort((x, y) => x.a - y.a);
+
+  /* --- overview --- */
+  $("#fileglyph").textContent = magic?.glyph ?? "❓";
+  $("#f-name").textContent = name;
+  const typeLabel = magic ? magic.name : "unknown format";
+  $("#f-sub").innerHTML = `${fmtSize(st.size)}${st.truncated ? " (first " + fmtSize(u8.length) + " inspected)" : ""} · detected: <b>${typeLabel}</b>`;
+
+  /* --- the customs verdict --- */
+  const ext = (name.match(/\.([a-z0-9]+)$/i)?.[1] ?? "").toLowerCase();
+  const reasons = [];
+  let verdict = "cleared";
+  if (!magic) { verdict = "undeclared"; reasons.push("format not recognized by any known magic"); }
+  else if (ext && !magic.exts.includes(ext)) {
+    verdict = "flagged";
+    reasons.push(`declared ".${ext}" — cargo is ${magic.name}`);
+  }
+  if (parsed.errors.length) { if (verdict === "cleared") verdict = "flagged"; reasons.push(parsed.errors[0]); }
+  const stamp = $("#stamp");
+  stamp.hidden = false;
+  stamp.className = verdict;
+  stamp.innerHTML = (verdict === "cleared" ? "CARGO CLEARED ✓" : verdict === "flagged" ? "⚠ FLAGGED FOR INSPECTION" : "✗ UNDECLARED CARGO")
+    + (reasons.length ? `<span class="why">${esc(reasons.slice(0, 2).join(" · "))}</span>` : `<span class="why">contents match declaration</span>`);
+  stamp.style.animation = "none"; void stamp.offsetWidth; stamp.style.animation = ""; /* replay the slam */
+
+  /* --- kv extras from parser --- */
+  renderTree(parsed);
+
+  /* --- hex view --- */
+  buildHex();
+  seek(0, false);
+
+  /* --- async lab work: hash, entropy, histogram, strings --- */
+  $("#f-hash").textContent = "…";
+  computeEntropy();
+  computeHistogram();
+  computeStrings();
+  if (u8.length) {
+    try {
+      const d = await crypto.subtle.digest("SHA-256", u8);
+      $("#f-hash").textContent = [...new Uint8Array(d)].map((b) => hex(b).toLowerCase()).join("").slice(0, 32) + "…";
+      $("#f-hash").title = [...new Uint8Array(d)].map((b) => hex(b).toLowerCase()).join("");
+    } catch { $("#f-hash").textContent = "unavailable"; }
+  }
+}
+
+/* ---------- tree ---------- */
+function renderTree(parsed) {
+  const box = $("#tree");
+  box.innerHTML = "";
+  if (parsed.kv.length) {
+    const kvDiv = document.createElement("div");
+    kvDiv.className = "kv"; kvDiv.style.cssText = "margin-bottom:12px; gap:14px;";
+    kvDiv.innerHTML = parsed.kv.map(([k, v]) => `<div><div class="k">${esc(k)}</div><div class="v">${esc(String(v))}</div></div>`).join("");
+    box.appendChild(kvDiv);
+  }
+  parsed.errors.forEach((e) => {
+    const d = document.createElement("div");
+    d.className = "note err"; d.style.paddingLeft = "0"; d.textContent = "⚠ " + e;
+    box.appendChild(d);
+  });
+  const make = (n) => {
+    const hasKids = n.kids.length > 0, hasBody = hasKids || n.notes.length || n.acts.length;
+    const head = `
+      <span class="dot" style="background:${n.color ?? "#334"}"></span>
+      <span class="nm">${esc(n.nm)}</span>
+      <span class="meta">${n.meta}</span>
+      ${n.b > n.a ? `<span class="rng">0x${hex(n.a, 6)}</span>` : ""}`;
+    let el;
+    if (hasBody) {
+      el = document.createElement("details");
+      if (n.kids.length && n.kids.length < 30) el.open = true;
+      el.innerHTML = `<summary class="row-line">${head}</summary><div class="kids"></div>`;
+      const kids = el.querySelector(".kids");
+      n.notes.forEach((note) => { const d = document.createElement("div"); d.className = "note"; d.innerHTML = note; kids.appendChild(d); });
+      n.acts.forEach((act) => {
+        const b = document.createElement("button"); b.className = "act"; b.textContent = "▸ " + act.label;
+        b.style.margin = "2px 0 4px 22px";
+        b.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          b.textContent = "…";
+          try { openPreview(await act.run()); } catch (err) { openPreview({ title: "extraction failed", html: `<pre>${esc(err.message)}</pre>` }); }
+          b.textContent = "▸ " + act.label;
+        });
+        kids.appendChild(b);
+      });
+      n.kids.forEach((k) => { const kw = document.createElement("div"); kw.className = "node"; kw.appendChild(make(k)); kids.appendChild(kw); });
+      el.querySelector("summary").addEventListener("click", (e) => { if (n.b > n.a && !e.target.closest(".act")) seek(n.a, true); });
+    } else {
+      el = document.createElement("div");
+      el.innerHTML = `<div class="row-line">${head}</div>`;
+      el.firstElementChild.addEventListener("click", () => { if (n.b > n.a) seek(n.a, true); });
+    }
+    return el;
+  };
+  st.regions.forEach((r) => box.appendChild(make(r)));
+}
+
+/* ---------- entropy ---------- */
+let entBlocks = null, entBlockSize = 0;
+function computeEntropy() {
+  const u8 = st.u8, cv = $("#entropy"), ctx = cv.getContext("2d");
+  const W = (cv.width = cv.clientWidth * (devicePixelRatio || 1));
+  const H = cv.height = 30 * (devicePixelRatio || 1);
+  const nBlocks = Math.min(1024, Math.max(64, Math.floor(W / 3)));
+  entBlockSize = Math.max(256, Math.ceil(u8.length / nBlocks));
+  const count = Math.ceil(u8.length / entBlockSize) || 1;
+  entBlocks = new Float32Array(count);
+  const freq = new Uint32Array(256), global = new Uint32Array(256);
+  for (let bI = 0; bI < count; bI++) {
+    freq.fill(0);
+    const a = bI * entBlockSize, b = Math.min(u8.length, a + entBlockSize), n = b - a;
+    for (let i = a; i < b; i++) { freq[u8[i]]++; global[u8[i]]++; }
+    let e = 0;
+    for (let i = 0; i < 256; i++) if (freq[i]) { const pr = freq[i] / n; e -= pr * Math.log2(pr); }
+    entBlocks[bI] = e;
+  }
+  let gE = 0;
+  for (let i = 0; i < 256; i++) if (global[i]) { const pr = global[i] / u8.length; gE -= pr * Math.log2(pr); }
+  $("#f-entropy").textContent = (u8.length ? gE : 0).toFixed(2) + " bits/B";
+  /* paint: blue (order) → teal → amber → red (chaos) */
+  const bw = W / count;
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < count; i++) {
+    const e = entBlocks[i] / 8;
+    const hue = 215 - e * 215 + (e > 0.9 ? -10 : 0);
+    ctx.fillStyle = `hsl(${Math.max(0, hue)}, ${55 + e * 40}%, ${22 + e * 36}%)`;
+    ctx.fillRect(i * bw, 0, Math.ceil(bw), H);
+  }
+}
+
+/* ---------- histogram ---------- */
+function computeHistogram() {
+  const u8 = st.u8, cv = $("#histo"), ctx = cv.getContext("2d");
+  const f = new Uint32Array(256);
+  const step = Math.max(1, Math.floor(u8.length / 2097152));
+  for (let i = 0; i < u8.length; i += step) f[u8[i]]++;
+  const max = Math.max(...f, 1);
+  ctx.clearRect(0, 0, 128, 36);
+  for (let i = 0; i < 256; i += 2) {
+    const v = Math.max(f[i], f[i + 1]);
+    const h = v ? Math.max(1, Math.log(v + 1) / Math.log(max + 1) * 34) : 0;
+    ctx.fillStyle = i === 0 ? "#5a6a85" : "#22d3ee";
+    ctx.fillRect(i / 2, 36 - h, 1, h);
+  }
+}
+
+/* ---------- strings ---------- */
+let allStrings = [], shownStrings = 0;
+function computeStrings() {
+  const u8 = st.u8; allStrings = []; shownStrings = 0;
+  let start = -1;
+  const lim = Math.min(u8.length, 32 * 1048576);
+  for (let i = 0; i <= lim && allStrings.length < 600; i++) {
+    const b = u8[i], printable = b >= 32 && b < 127;
+    if (printable && start < 0) start = i;
+    if ((!printable || i === lim) && start >= 0) {
+      if (i - start >= 6) allStrings.push([start, ascii(u8, start, Math.min(i, start + 120))]);
+      start = -1;
+    }
+  }
+  $("#strings").innerHTML = "";
+  renderMoreStrings();
+}
+function renderMoreStrings() {
+  const box = $("#strings");
+  const chunk = allStrings.slice(shownStrings, shownStrings + 60);
+  for (const [o, s] of chunk) {
+    const d = document.createElement("div");
+    d.className = "s";
+    d.innerHTML = `<span class="off">0x${hex(o, 6)}</span><span class="txt">${esc(s)}</span>`;
+    d.addEventListener("click", () => seek(o, true));
+    box.appendChild(d);
+  }
+  shownStrings += chunk.length;
+  if (!allStrings.length) box.innerHTML = '<div class="note" style="padding-left:0">no readable strings aboard</div>';
+  $("#more-strings").hidden = shownStrings >= allStrings.length;
+}
+$("#more-strings").addEventListener("click", renderMoreStrings);
+
+/* ============================================================
+   HEX VIEW — virtualized
+   ============================================================ */
+const wrap = $("#hexwrap"), spacer = $("#hex-spacer"), rowsEl = $("#hex-rows");
+let leafPtr = 0;
+function leafAt(i) {
+  /* leaves sorted; advance/rewind pointer — rows render in order so this is ~O(1) */
+  while (leafPtr < st.leaves.length - 1 && st.leaves[leafPtr].b <= i) leafPtr++;
+  while (leafPtr > 0 && st.leaves[leafPtr].a > i) leafPtr--;
+  const L = st.leaves[leafPtr];
+  return L && i >= L.a && i < L.b ? L : null;
+}
+function buildHex() {
+  const rows = Math.ceil(st.u8.length / PERROW);
+  spacer.style.height = rows * ROWH + "px";
+  wrap.scrollTop = 0;
+  renderHex();
+}
+function renderHex() {
+  const u8 = st.u8; if (!u8) return;
+  const first = Math.max(0, Math.floor(wrap.scrollTop / ROWH) - 6);
+  /* clamped so a layout regression can never ask for the whole file as one string */
+  const visible = Math.min(400, Math.ceil(wrap.clientHeight / ROWH) + 12);
+  const last = Math.min(Math.ceil(u8.length / PERROW), first + visible);
+  rowsEl.style.top = first * ROWH + "px";
+  leafPtr = 0;
+  let html = "";
+  const hitSet = new Set();
+  if (st.hits.length) {
+    const a = first * PERROW, b = last * PERROW;
+    for (const h of st.hits) { if (h.a < b && h.b > a) for (let i = Math.max(h.a, a); i < Math.min(h.b, b); i++) hitSet.add(i); }
+  }
+  for (let r = first; r < last; r++) {
+    const a = r * PERROW, b = Math.min(u8.length, a + PERROW);
+    let bytes = "", asc = "";
+    for (let i = a; i < b; i++) {
+      const v = u8[i], L = leafAt(i);
+      const cls = (v === 0 ? "b-zero" : v >= 32 && v < 127 ? "b-print" : "b-other")
+        + (i === st.cursor ? " cur" : "") + (hitSet.has(i) ? " hit" : "");
+      const bg = L ? `style="background:${L.color}24"` : "";
+      bytes += `<span class="${cls}" ${bg} data-i="${i}">${hex(v)}</span>`;
+      asc += `<span class="${cls}" data-i="${i}">${v >= 32 && v < 127 ? esc(String.fromCharCode(v)) : "·"}</span>`;
+    }
+    for (let i = b; i < a + PERROW; i++) bytes += `<span>&nbsp;&nbsp;</span>`;
+    html += `<div class="hrow"><span class="off">${off8(a)}</span><span class="bytes">${bytes}</span><span class="asc">${asc}</span></div>`;
+  }
+  rowsEl.innerHTML = html;
+  updateViewportMarker();
+}
+wrap.addEventListener("scroll", () => requestAnimationFrame(renderHex), { passive: true });
+addEventListener("resize", () => { if (st.u8) { computeEntropy(); renderHex(); } });
+rowsEl.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-i]");
+  if (t) { st.cursor = +t.dataset.i; renderHex(); inspect(st.cursor); }
+});
+
+function seek(offset, flash) {
+  offset = Math.max(0, Math.min(st.u8.length - 1, offset));
+  wrap.scrollTop = Math.max(0, Math.floor(offset / PERROW) * ROWH - wrap.clientHeight * 0.3);
+  st.cursor = offset;
+  renderHex();
+  inspect(offset);
+}
+
+function inspect(i) {
+  const u8 = st.u8, dv = st.dv;
+  $("#ins-where").textContent = `offset 0x${hex(i, 8)} (${i.toLocaleString()})`;
+  const L = leafAt(i);
+  $("#region-path").textContent = L ? "· " + L.path : "";
+  const g = $("#ins-grid"), parts = [];
+  const can = (n) => i + n <= u8.length;
+  parts.push(`<div>u8<b>${u8[i]}</b></div>`);
+  parts.push(`<div>i8<b>${dv.getInt8(i)}</b></div>`);
+  parts.push(`<div>bin<b>${u8[i].toString(2).padStart(8, "0")}</b></div>`);
+  if (can(2)) parts.push(`<div>u16le<b>${dv.getUint16(i, true).toLocaleString()}</b></div>`, `<div>u16be<b>${dv.getUint16(i).toLocaleString()}</b></div>`);
+  if (can(4)) parts.push(`<div>u32le<b>${dv.getUint32(i, true).toLocaleString()}</b></div>`, `<div>u32be<b>${dv.getUint32(i).toLocaleString()}</b></div>`, `<div>f32<b>${fmtFloat(dv.getFloat32(i, true))}</b></div>`);
+  if (can(8)) parts.push(`<div>u64le<b>${dv.getBigUint64(i, true).toLocaleString()}</b></div>`, `<div>f64<b>${fmtFloat(dv.getFloat64(i, true))}</b></div>`);
+  let run = "";
+  for (let q = i; q < Math.min(u8.length, i + 24); q++) { const b = u8[q]; if (b >= 32 && b < 127) run += String.fromCharCode(b); else break; }
+  if (run.length > 1) parts.push(`<div>text<b>"${esc(run)}"</b></div>`);
+  g.innerHTML = parts.join("");
+}
+const fmtFloat = (f) => !isFinite(f) ? String(f) : Math.abs(f) > 1e15 || (Math.abs(f) < 1e-6 && f !== 0) ? f.toExponential(3) : String(+f.toPrecision(6));
+
+/* viewport marker on entropy strip */
+function updateViewportMarker() {
+  const m = $("#viewport-marker"), total = st.u8.length || 1;
+  const a = wrap.scrollTop / ROWH * PERROW, b = a + wrap.clientHeight / ROWH * PERROW;
+  m.style.left = Math.min(100, a / total * 100) + "%";
+  m.style.width = Math.max(0.4, (b - a) / total * 100) + "%";
+}
+$("#entropy").addEventListener("click", (e) => {
+  const r = e.target.getBoundingClientRect();
+  seek(Math.floor((e.clientX - r.left) / r.width * st.u8.length), true);
+});
+$("#entropy").addEventListener("mousemove", (e) => {
+  const r = e.target.getBoundingClientRect(), frac = (e.clientX - r.left) / r.width;
+  const bI = Math.floor(frac * (entBlocks?.length ?? 0));
+  const tip = $("#entropy-tip");
+  if (entBlocks && entBlocks[bI] !== undefined) {
+    tip.style.display = "block"; tip.style.left = (frac * 100) + "%";
+    tip.textContent = `0x${hex(bI * entBlockSize, 6)} · ${entBlocks[bI].toFixed(2)} bits/B`;
+  }
+});
+$("#entropy").addEventListener("mouseleave", () => $("#entropy-tip").style.display = "none");
+
+/* ---------- search & goto ---------- */
+function doSearch(q) {
+  st.hits = []; st.hitIx = -1;
+  q = q.trim();
+  if (!q) { $("#search-info").textContent = ""; renderHex(); return; }
+  let needle;
+  if (/^([0-9a-f]{2}[\s:,-]*)+$/i.test(q)) needle = new Uint8Array(q.replace(/[^0-9a-f]/gi, "").match(/../g).map((h) => parseInt(h, 16)));
+  else needle = new TextEncoder().encode(q);
+  const u8 = st.u8, n = needle.length, lim = u8.length - n;
+  outer: for (let i = 0; i <= lim && st.hits.length < 500; i++) {
+    if (u8[i] !== needle[0]) continue;
+    for (let j = 1; j < n; j++) if (u8[i + j] !== needle[j]) continue outer;
+    st.hits.push({ a: i, b: i + n });
+  }
+  $("#search-info").textContent = st.hits.length ? `${st.hits.length}${st.hits.length === 500 ? "+" : ""} found` : "no matches";
+  if (st.hits.length) { st.hitIx = 0; seek(st.hits[0].a, true); } else renderHex();
+}
+let searchTimer;
+$("#search").addEventListener("input", (e) => { clearTimeout(searchTimer); searchTimer = setTimeout(() => doSearch(e.target.value), 300); });
+const stepHit = (d) => {
+  if (!st.hits.length) return;
+  st.hitIx = (st.hitIx + d + st.hits.length) % st.hits.length;
+  $("#search-info").textContent = `${st.hitIx + 1} / ${st.hits.length}`;
+  seek(st.hits[st.hitIx].a, true);
+};
+$("#next-hit").addEventListener("click", () => stepHit(1));
+$("#prev-hit").addEventListener("click", () => stepHit(-1));
+$("#goto").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const v = e.target.value.trim();
+    const n = v.startsWith("0x") ? parseInt(v, 16) : /^[0-9a-f]+$/i.test(v) && /[a-f]/i.test(v) ? parseInt(v, 16) : parseInt(v, 10);
+    if (!isNaN(n)) seek(n, true);
+  }
+});
+addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.key === "g") { e.preventDefault(); $("#goto").focus(); }
+  if (e.key === "/") { e.preventDefault(); $("#search").focus(); }
+});
+
+/* ---------- preview dialog ---------- */
+function openPreview({ title, html }) {
+  $("#d-title").textContent = title;
+  $("#d-body").innerHTML = html;
+  $("#preview").showModal();
+}
+$("#d-close").addEventListener("click", () => $("#preview").close());
+$("#preview").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+
+/* ============================================================
+   INTAKE — drag, drop, pick, paste
+   ============================================================ */
+const fi = $("#file-input");
+$("#pick").addEventListener("click", () => fi.click());
+fi.addEventListener("change", () => fi.files[0] && loadFile(fi.files[0]));
+$("#newfile").addEventListener("click", () => { document.body.classList.remove("loaded"); fi.value = ""; });
+let dragDepth = 0;
+addEventListener("dragenter", (e) => { e.preventDefault(); dragDepth++; document.body.classList.add("dragging"); });
+addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove("dragging"); } });
+addEventListener("dragover", (e) => e.preventDefault());
+addEventListener("drop", (e) => {
+  e.preventDefault(); dragDepth = 0; document.body.classList.remove("dragging");
+  const f = e.dataTransfer.files?.[0];
+  if (f) loadFile(f);
+});
+addEventListener("paste", (e) => {
+  const f = e.clipboardData?.files?.[0];
+  if (f) loadFile(f);
+});
+
+/* ============================================================
+   FORGED SAMPLES — cargo built on the spot
+   ============================================================ */
+function drawSample(cb, type, q) {
+  const c = document.createElement("canvas");
+  c.width = 320; c.height = 200;
+  const x = c.getContext("2d");
+  const g = x.createLinearGradient(0, 0, 320, 200);
+  g.addColorStop(0, "#22d3ee"); g.addColorStop(1, "#8b7cf6");
+  x.fillStyle = g; x.fillRect(0, 0, 320, 200);
+  x.fillStyle = "#0b0e1a"; x.font = "bold 28px monospace"; x.fillText("⚓ MANIFEST", 60, 105);
+  c.toBlob((b) => cb(b), type, q);
+}
+const SAMPLES = {
+  png: () => drawSample(async (b) => loadBytes(new Uint8Array(await b.arrayBuffer()), "forged-sample.png"), "image/png"),
+  jpeg: () => drawSample(async (b) => loadBytes(new Uint8Array(await b.arrayBuffer()), "forged-sample.jpg"), "image/jpeg", 0.82),
+  liar: () => drawSample(async (b) => loadBytes(new Uint8Array(await b.arrayBuffer()), "vacation-photo.jpg"), "image/png"),
+  noise: () => {
+    const u8 = new Uint8Array(96 * 1024);
+    for (let o = 0; o < u8.length; o += 65536) crypto.getRandomValues(u8.subarray(o, Math.min(o + 65536, u8.length)));
+    loadBytes(u8, "definitely-not-encrypted.bin");
+  },
+  wav: () => {
+    const rate = 22050, secs = 1.2, n = Math.floor(rate * secs);
+    const buf = new ArrayBuffer(44 + n * 2), dv = new DataView(buf), u8 = new Uint8Array(buf);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) u8[o + i] = s.charCodeAt(i); };
+    w(0, "RIFF"); dv.setUint32(4, 36 + n * 2, true); w(8, "WAVEfmt ");
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, rate, true); dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+    w(36, "data"); dv.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) dv.setInt16(44 + i * 2, Math.sin(i / rate * 2 * Math.PI * 440) * 12000 * Math.exp(-i / n * 3), true);
+    loadBytes(u8, "foghorn-440hz.wav");
+  },
+  wasm: () => {
+    /* (module (func (export "add") (param i32 i32) (result i32) local.get 0 local.get 1 i32.add)) */
+    loadBytes(new Uint8Array([0,97,115,109,1,0,0,0,1,7,1,96,2,127,127,1,127,3,2,1,0,7,7,1,3,97,100,100,0,0,10,9,1,7,0,32,0,32,1,106,11,0,18,4,110,97,109,101,1,6,1,0,3,97,100,100,2,3,1,0,0]), "add.wasm");
+  },
+  zip: async () => {
+    /* a real ZIP, stored entries, forged byte by byte */
+    const enc = new TextEncoder();
+    const files = [
+      ["manifest.txt", "CARGO MANIFEST\n==============\nvessel: M/V DOCKHAND\ncargo:  three honest files\nport:   the browser, no further\n"],
+      ["captain.log", "Day 1: built a zip by hand.\nDay 2: the bytes held.\n"],
+      ["readme.md", "# Hello from inside a ZIP\n\nExtracted in your browser by DecompressionStream —\nexcept this entry is *stored*, so it's just a slice.\n"],
+    ];
+    const parts = [], central = [];
+    let off = 0;
+    for (const [name, text] of files) {
+      const nameB = enc.encode(name), data = enc.encode(text), crc = crc32(data);
+      const lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(8, 0, true);
+      lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true);
+      lh.setUint16(26, nameB.length, true);
+      parts.push(new Uint8Array(lh.buffer), nameB, data);
+      const cd = new DataView(new ArrayBuffer(46));
+      cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true);
+      cd.setUint32(16, crc, true); cd.setUint32(20, data.length, true); cd.setUint32(24, data.length, true);
+      cd.setUint16(28, nameB.length, true); cd.setUint32(42, off, true);
+      central.push(new Uint8Array(cd.buffer), nameB);
+      off += 30 + nameB.length + data.length;
+    }
+    const cdLen = central.reduce((s, p) => s + p.length, 0);
+    const eocd = new DataView(new ArrayBuffer(22));
+    eocd.setUint32(0, 0x06054b50, true); eocd.setUint16(8, files.length, true); eocd.setUint16(10, files.length, true);
+    eocd.setUint32(12, cdLen, true); eocd.setUint32(16, off, true);
+    const all = new Blob([...parts, ...central, new Uint8Array(eocd.buffer)]);
+    loadBytes(new Uint8Array(await all.arrayBuffer()), "hand-forged.zip");
+  },
+};
+$("#samples").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-s]");
+  if (b) SAMPLES[b.dataset.s]();
+});
+
+/* expose for tinkering + tests */
+window.manifest = { loadBytes, loadFile };
+})();
+</script>
+</body>
+</html>

@@ -139,6 +139,16 @@ Health check your ship's configuration.
 
 ## 🛠️ Developer Tools
 
+### Manifest 📋 🆕
+Customs inspection for files — every byte, declared. Drop any file and the browser identifies it by its magic bytes (flagging files whose extension lies), parses its structure (PNG chunks with CRC verification, ZIP central directories, ID3 tags, MP4 box trees, WASM sections, and ~30 more formats), maps its Shannon entropy to expose compressed or encrypted regions, computes SHA-256, extracts strings, and lays it open in a virtualized hex viewer with a live data inspector. ZIP entries and gzip streams extract **in the browser** via `DecompressionStream` — no libraries, no upload, one HTML file.
+
+| | Vanilla |
+|---|---|
+| **Demo** | [Inspect](https://crunchybananas.github.io/shipyard-microtools/manifest/) |
+| **Source** | `docs/manifest/` |
+
+**Tech:** File API, DataView, Web Crypto, DecompressionStream, Canvas 2D — zero dependencies
+
 ### Harbor API ⚓ 🆕
 Hoppscotch-style API client built with pure Ember modifiers — zero wrapper addons.
 
