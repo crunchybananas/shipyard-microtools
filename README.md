@@ -61,6 +61,20 @@ Classic falling blocks with a nautical twist.
 
 ---
 
+## 🌊 Experiences
+
+### Fathom 🆕
+Scroll 10,935 meters down a lost anchor chain to the floor of the Challenger Deep. A single HTML file with zero dependencies — the descent is told entirely by the browser: scroll-driven CSS animations (`animation-timeline: scroll()`/`view()`), oklch color interpolation, CSS motion paths, the Popover API with `@starting-style`, a fully synthesized Web Audio soundscape (no audio files), a sonar ping that reveals what hides in the dark, and pointer-reactive bioluminescence. Two dozen hand-drawn SVG inhabitants at their true depths.
+
+| | Vanilla |
+|---|---|
+| **Demo** | [Descend](https://crunchybananas.github.io/shipyard-microtools/fathom/) |
+| **Source** | `docs/fathom/` |
+
+**Tech:** Pure HTML/CSS/JS, scroll-driven animations, Web Audio synthesis, Canvas 2D, SVG
+
+---
+
 ## 📊 Shipyard Tools
 
 Tools for the [Shipyard](https://shipyard.bot) proof-of-work platform.
