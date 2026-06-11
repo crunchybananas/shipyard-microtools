@@ -1,0 +1,1855 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>MAELSTROM — the whirlpool that swallows light</title>
+<meta name="description" content="A real-time general-relativity ray tracer. Every pixel is a ray of light integrated backwards through the curved spacetime of a spinning black hole — gravitational lensing, photon ring, Doppler-beamed accretion disk. One HTML file. Zero dependencies. The physics is not faked." />
+<meta name="theme-color" content="#040302" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%F0%9F%8C%80%3C/text%3E%3C/svg%3E" />
+<style>
+/* ============================================================
+   MAELSTROM — sailors told of whirlpools that swallowed ships.
+   This one swallows light.
+
+   Every pixel on this page is a null geodesic of the Kerr
+   metric, integrated by RK4 in a fragment shader. The disk's
+   blue blaze and red fade are not painted on — they are the
+   relativistic invariant I ∝ g⁴ doing what it must.
+   No frameworks. No libraries. One file.
+   ============================================================ */
+:root {
+  --ink: #f2ece2;
+  --ink-dim: rgba(235, 222, 200, 0.55);
+  --ink-faint: rgba(235, 222, 200, 0.28);
+  --amber: #ffc66b;
+  --amber-hot: #ffe3ae;
+  --teal: #7adfe0;
+  --red: #ff7a6b;
+  --panel: rgba(12, 9, 6, 0.58);
+  --panel-line: rgba(255, 198, 107, 0.14);
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: #030202;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: rgba(255, 198, 107, 0.3); }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+#gl {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  display: block; cursor: grab; touch-action: none;
+}
+#gl.dragging { cursor: grabbing; }
+
+/* ---------- panels share a hull ---------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 12px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* ---------- brand ---------- */
+#brand {
+  position: fixed; top: 18px; left: 22px; z-index: 10;
+  pointer-events: none; user-select: none;
+  transition: opacity 0.6s;
+}
+#brand h1 {
+  font-family: var(--sans);
+  font-weight: 200; font-size: 21px; letter-spacing: 0.42em;
+  color: var(--ink);
+  text-shadow: 0 0 24px rgba(255, 198, 107, 0.25);
+}
+#brand p { margin-top: 5px; color: var(--ink-dim); font-size: 10.5px; letter-spacing: 0.08em; }
+#brand p em { color: var(--amber); font-style: normal; }
+
+/* ---------- telemetry ---------- */
+#telemetry {
+  position: fixed; top: 18px; right: 18px; z-index: 10;
+  padding: 12px 14px; min-width: 230px;
+  font-size: 10.5px; line-height: 1.9;
+  user-select: none;
+  transition: opacity 0.6s;
+}
+#telemetry .trow { display: flex; justify-content: space-between; gap: 18px; }
+#telemetry .trow span:first-child { color: var(--ink-faint); letter-spacing: 0.06em; }
+#telemetry .trow span:last-child { color: var(--ink); }
+#telemetry .trow span.warm { color: var(--amber); }
+#telemetry hr { border: none; border-top: 1px solid var(--panel-line); margin: 6px 0; }
+
+/* ---------- the dock (controls) ---------- */
+#dock {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
+  z-index: 10; padding: 12px 16px 10px;
+  display: flex; gap: 22px; align-items: flex-start;
+  max-width: min(96vw, 1060px);
+  transition: opacity 0.6s, transform 0.4s;
+}
+#dock.stowed { transform: translateX(-50%) translateY(calc(100% + 24px)); }
+.ctl-group { display: flex; flex-direction: column; gap: 7px; min-width: 118px; }
+.ctl-group > .ctl-title {
+  color: rgba(235, 222, 200, 0.52); font-size: 9px; letter-spacing: 0.22em;
+  text-transform: uppercase; margin-bottom: 1px; user-select: none;
+}
+.ctl { display: flex; flex-direction: column; gap: 3px; }
+.ctl label { display: flex; justify-content: space-between; color: var(--ink-dim); font-size: 10px; user-select: none; }
+.ctl label output { color: var(--amber); }
+
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 138px; height: 16px; background: transparent; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px; border-radius: 1px;
+  background: linear-gradient(90deg, rgba(255,198,107,0.55), rgba(255,198,107,0.12));
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  margin-top: -5px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--amber-hot);
+  box-shadow: 0 0 10px rgba(255, 198, 107, 0.7);
+}
+input[type="range"]::-moz-range-track {
+  height: 2px; border-radius: 1px;
+  background: linear-gradient(90deg, rgba(255,198,107,0.55), rgba(255,198,107,0.12));
+}
+input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px; border: none; border-radius: 50%;
+  background: var(--amber-hot); box-shadow: 0 0 10px rgba(255, 198, 107, 0.7);
+}
+
+/* toggle pills */
+.toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pill {
+  padding: 5px 9px; border-radius: 999px;
+  border: 1px solid var(--panel-line);
+  color: var(--ink-dim); font-size: 10px; letter-spacing: 0.04em;
+  transition: all 0.18s; white-space: nowrap; text-align: center;
+  user-select: none;
+}
+.pill.on {
+  color: #1b1206; background: var(--amber);
+  border-color: var(--amber);
+  box-shadow: 0 0 14px rgba(255, 198, 107, 0.35);
+}
+.pill:focus-visible, .seg button:focus-visible, .act:focus-visible {
+  outline: 1px solid var(--teal); outline-offset: 2px;
+}
+
+/* segmented quality */
+.seg { display: flex; border: 1px solid var(--panel-line); border-radius: 8px; overflow: hidden; }
+.seg button {
+  flex: 1; padding: 5px 0; font-size: 9.5px; color: var(--ink-dim);
+  letter-spacing: 0.05em; transition: all 0.18s;
+}
+.seg button + button { border-left: 1px solid var(--panel-line); }
+.seg button.on { color: #1b1206; background: var(--amber); }
+
+/* action buttons */
+.act {
+  padding: 6px 10px; border-radius: 8px;
+  border: 1px solid var(--panel-line);
+  color: var(--ink); font-size: 10.5px; letter-spacing: 0.04em;
+  transition: all 0.18s; white-space: nowrap;
+}
+.act:hover { border-color: rgba(255, 198, 107, 0.5); background: rgba(255, 198, 107, 0.08); }
+.act:active { transform: translateY(1px); }
+
+/* dock stow handle */
+#stow {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
+  z-index: 9; padding: 5px 16px; border-radius: 999px;
+  color: var(--ink-faint); font-size: 10px; letter-spacing: 0.14em;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s;
+}
+#stow.shown { opacity: 1; pointer-events: auto; }
+
+/* ---------- probe panel ---------- */
+#probe {
+  position: fixed; right: 18px; bottom: 16px; z-index: 10;
+  width: 252px; padding: 13px 15px;
+  font-size: 10.5px; line-height: 1.8;
+  opacity: 0; pointer-events: none; transform: translateY(8px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+#probe.live { opacity: 1; pointer-events: auto; transform: none; }
+#probe h3 {
+  font-size: 9.5px; letter-spacing: 0.22em; color: var(--ink-faint);
+  text-transform: uppercase; font-weight: 400; margin-bottom: 7px;
+}
+#probe .clock { display: flex; justify-content: space-between; }
+#probe .clock b { font-weight: 400; color: var(--teal); font-variant-numeric: tabular-nums; }
+#probe .clock b.you { color: var(--ink); }
+#probe .gaugewrap { margin: 8px 0 4px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.07); overflow: hidden; }
+#probe #pgauge { height: 100%; width: 0%; border-radius: 2px; background: linear-gradient(90deg, var(--teal), var(--amber), var(--red)); transition: width 0.1s linear; }
+#probe .sig { display: flex; align-items: center; gap: 8px; margin-top: 6px; color: var(--ink-dim); }
+#probe #pdot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px var(--teal); }
+#probe .fate { margin-top: 7px; color: var(--ink-dim); font-style: italic; font-size: 10px; min-height: 14px; }
+
+/* ---------- intro ---------- */
+#intro {
+  position: fixed; inset: 0; z-index: 30; display: grid; place-items: center;
+  background: radial-gradient(ellipse at center, rgba(3,2,2,0.1), rgba(3,2,2,0.82));
+  transition: opacity 1.4s; pointer-events: none; user-select: none;
+}
+#intro.gone { opacity: 0; }
+#intro .card { text-align: center; max-width: 560px; padding: 0 24px; }
+#intro h2 {
+  font-family: var(--sans); font-weight: 200;
+  font-size: clamp(30px, 6vw, 52px); letter-spacing: 0.5em; padding-left: 0.5em;
+  color: var(--ink); text-shadow: 0 0 40px rgba(255, 198, 107, 0.4);
+}
+#intro p { margin-top: 18px; color: var(--ink-dim); font-size: 13px; line-height: 2; letter-spacing: 0.05em; }
+#intro p em { color: var(--amber); font-style: normal; }
+#intro .hint { margin-top: 26px; font-size: 11px; color: var(--ink-faint); letter-spacing: 0.18em; }
+
+/* ---------- info modal ---------- */
+#info {
+  position: fixed; inset: 0; z-index: 40; display: none;
+  background: rgba(2, 1, 1, 0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+#info.open { display: block; }
+#info .sheet {
+  max-width: 640px; margin: 7vh auto 8vh; padding: 34px 38px 30px;
+  background: rgba(14, 10, 7, 0.92);
+  border: 1px solid var(--panel-line); border-radius: 16px;
+  font-size: 12.5px; line-height: 1.95; color: var(--ink-dim);
+}
+#info h2 {
+  font-family: var(--sans); font-weight: 200; letter-spacing: 0.3em;
+  color: var(--ink); font-size: 19px; margin-bottom: 4px;
+}
+#info h3 {
+  margin: 22px 0 6px; font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--amber); font-weight: 400;
+}
+#info p { margin: 8px 0; }
+#info .eq {
+  display: block; margin: 10px 0; padding: 10px 14px;
+  background: rgba(255, 198, 107, 0.05); border-left: 2px solid rgba(255, 198, 107, 0.35);
+  border-radius: 0 8px 8px 0; color: var(--ink); font-size: 12px;
+  overflow-x: auto; white-space: nowrap;
+}
+#info table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+#info td { padding: 3.5px 0; vertical-align: top; }
+#info td:first-child { color: var(--ink); white-space: nowrap; padding-right: 22px; }
+#info kbd {
+  padding: 1px 6px; border: 1px solid var(--panel-line); border-bottom-width: 2px;
+  border-radius: 5px; font-family: var(--mono); font-size: 10.5px; color: var(--ink);
+}
+#info .selftest { color: var(--teal); }
+#info .close { float: right; color: var(--ink-faint); font-size: 18px; padding: 2px 8px; }
+#info .close:hover { color: var(--ink); }
+#info .sig-line { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--panel-line); font-size: 10.5px; color: var(--ink-faint); }
+
+/* ---------- toast & misc ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%) translateY(6px);
+  z-index: 20; padding: 8px 16px; border-radius: 999px;
+  font-size: 11px; letter-spacing: 0.05em; color: var(--ink);
+  opacity: 0; transition: opacity 0.35s, transform 0.35s; pointer-events: none;
+  max-width: 86vw; text-align: center;
+}
+#toast.shown { opacity: 1; transform: translateX(-50%); }
+
+#nogl {
+  position: fixed; inset: 0; z-index: 50; display: none; place-items: center;
+  background: #030202; text-align: center; padding: 24px;
+}
+#nogl.shown { display: grid; }
+#nogl h2 { font-family: var(--sans); font-weight: 200; letter-spacing: 0.3em; margin-bottom: 14px; }
+#nogl p { color: var(--ink-dim); line-height: 2; }
+
+body.zen #brand, body.zen #telemetry, body.zen #dock {
+  opacity: 0; pointer-events: none; visibility: hidden;
+  transition: opacity 0.6s, visibility 0.6s;   /* visibility flips after the fade — and exits the tab order */
+}
+
+@media (max-width: 880px) {
+  #dock {
+    flex-wrap: wrap; justify-content: center; row-gap: 14px;
+    max-width: 94vw; gap: 18px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    max-height: 46vh; overflow-y: auto;
+  }
+  #telemetry { display: none; }
+  #brand h1 { font-size: 16px; }
+  #probe { right: 10px; bottom: auto; top: 64px; width: 210px; }
+}
+@media (pointer: coarse) {
+  .pill { padding: 10px 12px; }
+  .act { padding: 11px 12px; }
+  .seg button { padding: 10px 0; }
+  input[type="range"] { height: 30px; }
+  input[type="range"]::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -8px; }
+  input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #intro, #dock, #probe { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="gl" aria-label="Black hole renderer. Drag to orbit, scroll to approach."></canvas>
+
+<div id="nogl" role="alert">
+  <div>
+    <h2>MAELSTROM</h2>
+    <p>This page bends light with WebGL2, and your browser declined to lend it a GPU.<br />
+    The black hole is still out there. Try a recent Chrome, Firefox, or Safari.</p>
+  </div>
+</div>
+
+<header id="brand">
+  <h1>MAELSTROM</h1>
+  <p>a general-relativity ray tracer — <em>every pixel is light, falling</em></p>
+</header>
+
+<aside id="telemetry" class="panel" aria-label="telemetry">
+  <div class="trow"><span>mass</span><span id="t-mass">—</span></div>
+  <div class="trow"><span>spin a/M</span><span id="t-spin" class="warm">—</span></div>
+  <div class="trow"><span>horizon r₊</span><span id="t-horizon">—</span></div>
+  <div class="trow"><span>ISCO</span><span id="t-isco">—</span></div>
+  <div class="trow"><span>photon orbit</span><span id="t-ph">—</span></div>
+  <hr />
+  <div class="trow"><span>camera r</span><span id="t-cam">—</span></div>
+  <div class="trow"><span>inclination</span><span id="t-inc">—</span></div>
+  <hr />
+  <div class="trow"><span>render</span><span id="t-res">—</span></div>
+  <div class="trow"><span>fps</span><span id="t-fps">—</span></div>
+  <div class="trow"><span>integration</span><span id="t-acc">live</span></div>
+</aside>
+
+<nav id="dock" class="panel" aria-label="controls">
+  <div class="ctl-group">
+    <span class="ctl-title">Spacetime</span>
+    <div class="ctl">
+      <label>spin a/M <output id="o-spin">0.70</output></label>
+      <input id="c-spin" type="range" min="0" max="0.998" step="0.002" value="0.70" />
+    </div>
+    <div class="ctl">
+      <label>mass <output id="o-mass">Sgr A*</output></label>
+      <input id="c-mass" type="range" min="0" max="2" step="1" value="1" list="masses" />
+    </div>
+  </div>
+
+  <div class="ctl-group">
+    <span class="ctl-title">The Disk</span>
+    <div class="ctl">
+      <label>temperature <output id="o-temp">5800 K</output></label>
+      <input id="c-temp" type="range" min="3200" max="20000" step="100" value="5800" />
+    </div>
+    <div class="ctl">
+      <label>flow <output id="o-flow">1.0×</output></label>
+      <input id="c-flow" type="range" min="0" max="4" step="0.1" value="1" />
+    </div>
+  </div>
+
+  <div class="ctl-group" style="min-width:170px">
+    <span class="ctl-title">Physics — see for yourself</span>
+    <div class="toggles">
+      <button class="pill on" id="p-lens"  aria-pressed="true">lensing</button>
+      <button class="pill on" id="p-beam"  aria-pressed="true">beaming</button>
+      <button class="pill on" id="p-shift" aria-pressed="true">redshift</button>
+      <button class="pill on" id="p-disk"  aria-pressed="true">disk</button>
+    </div>
+  </div>
+
+  <div class="ctl-group" style="min-width:150px">
+    <span class="ctl-title">Ship</span>
+    <div class="seg" id="quality" role="radiogroup" aria-label="quality">
+      <button data-q="0" role="radio" aria-checked="false">low</button>
+      <button data-q="1" class="on" role="radio" aria-checked="true">auto</button>
+      <button data-q="2" role="radio" aria-checked="false">high</button>
+      <button data-q="3" role="radio" aria-checked="false">ultra</button>
+    </div>
+    <div style="display:flex; gap:6px; margin-top:2px">
+      <button class="act" id="b-probe" title="drop a probe past the horizon (D)">⚓ probe</button>
+      <button class="act" id="b-photo" title="long-exposure photograph (P)">◉ photo</button>
+    </div>
+    <div style="display:flex; gap:6px">
+      <button class="act" id="b-sound" title="ambient sound (S)" aria-pressed="false">🔇 sound</button>
+      <button class="act" id="b-info"  title="the physics (I)">? physics</button>
+    </div>
+  </div>
+</nav>
+<button id="stow" class="panel">⌃ controls</button>
+
+<aside id="probe" class="panel">
+  <h3>Probe telemetry — last contact</h3>
+  <div class="clock"><span>probe clock τ</span><b id="p-tau">0.0 s</b></div>
+  <div class="clock"><span>your clock t</span><b class="you" id="p-t">0.0 s</b></div>
+  <div class="gaugewrap"><div id="pgauge"></div></div>
+  <div class="clock"><span>radius</span><b id="p-r">—</b></div>
+  <div class="sig"><span id="pdot"></span><span id="p-sig">signal nominal</span></div>
+  <div class="fate" id="p-fate" role="status"></div>
+</aside>
+
+<div id="intro">
+  <div class="card">
+    <h2>MAELSTROM</h2>
+    <p>sailors told of whirlpools that swallowed ships.<br />
+    this one swallows <em>light</em>.</p>
+    <p style="font-size:11.5px">every pixel is a ray, traced backwards through the curved<br />
+    spacetime of a spinning black hole. nothing here is painted on.</p>
+    <p class="hint">drag to sail &nbsp;·&nbsp; scroll to approach</p>
+  </div>
+</div>
+
+<div id="toast" class="panel" role="status"></div>
+
+<div id="info" role="dialog" aria-modal="true" aria-label="the physics">
+  <div class="sheet">
+    <button class="close" id="b-close" aria-label="close">×</button>
+    <h2>MAELSTROM</h2>
+    <p style="font-size:11px; color:var(--ink-faint); letter-spacing:0.1em">THE WHIRLPOOL THAT SWALLOWS LIGHT</p>
+
+    <h3>What you are looking at</h3>
+    <p>A black hole, computed honestly. For every pixel, this page fires a ray of light
+    <i>backwards</i> from your eye and integrates it step by step through the spacetime of a
+    rotating (Kerr) black hole until it escapes to the stars, lands on the glowing disk of
+    in-falling matter, or crosses the event horizon and is never seen again.</p>
+    <p>The strange things you see are not effects. They are consequences.</p>
+
+    <h3>The machinery</h3>
+    <p>Light follows null geodesics — the straightest possible paths through curved spacetime.
+    Each ray is evolved with a 4th-order Runge–Kutta integrator under the Kerr Hamiltonian
+    (Boyer–Lindquist coordinates, G&nbsp;=&nbsp;c&nbsp;=&nbsp;M&nbsp;=&nbsp;1):</p>
+    <span class="eq">2H = Δ⁄Σ p<sub>r</sub>² + p<sub>θ</sub>²⁄Σ + g<sup>φφ</sup>L² − 2g<sup>tφ</sup>EL + g<sup>tt</sup>E² = 0</span>
+    <p>with energy E and angular momentum L conserved along the ray, Σ&nbsp;=&nbsp;r²+a²cos²θ and
+    Δ&nbsp;=&nbsp;r²−2r+a². Set the spin <b>a</b> to zero and this collapses exactly to the
+    Schwarzschild solution.</p>
+
+    <h3>Why the disk is brighter on one side</h3>
+    <p>The disk orbits at a respectable fraction of the speed of light — at the inner edge,
+    roughly half of it. Matter racing <i>toward</i> you beams its light forward like a
+    headlamp; matter racing away dims and reddens. Both follow from one number, the
+    relativistic g-factor:</p>
+    <span class="eq">g = 1 ⁄ [u<sup>t</sup>(E − ΩL)] &nbsp;&nbsp;·&nbsp;&nbsp; I<sub>obs</sub> = g⁴ I<sub>em</sub> &nbsp;&nbsp;·&nbsp;&nbsp; T<sub>obs</sub> = g·T<sub>em</sub></span>
+    <p>Each patch of disk is a blackbody at temperature T(r) ∝ r<sup>−3/4</sup>(1−√(r<sub>in</sub>/r))<sup>1/4</sup>
+    (the Shakura–Sunyaev profile); its colour is the Planck colour of g·T. Toggle
+    <b>beaming</b> and <b>redshift</b> in the dock and compare. That asymmetric blaze is
+    relativity, doing arithmetic.</p>
+
+    <h3>The thin bright ring</h3>
+    <p>At r&nbsp;=&nbsp;1.5&nbsp;r<sub>s</sub> (for zero spin) photons can orbit the black hole in circles.
+    Light that grazes this <b>photon sphere</b> can loop once, twice, many times before
+    escaping to your eye — so you see the disk again and again, infinitely thinner each
+    time, stacked against the shadow's edge. You also see the disk <i>behind</i> the hole,
+    bent over the top and under the bottom: that is the halo.</p>
+
+    <h3>Spin</h3>
+    <p>Drag the spin slider. A rotating black hole drags spacetime around with it —
+    orbits in the dragged direction survive closer in, so the inner edge of the disk
+    (the ISCO) crawls inward from 6M toward the horizon, and the shadow goes lopsided.
+    At a/M&nbsp;=&nbsp;0.998 you are looking at the fastest black hole nature is believed to build.</p>
+
+    <h3>The probe</h3>
+    <p>Drop a probe and watch the two clocks. Its own clock τ ticks at its usual pace —
+    falling feels like nothing. But measured by <i>your</i> clock t, the probe slows, its
+    signal stretches and reddens, and at the horizon it freezes mid-fall, fading forever.
+    Both clocks are integrated from the same geodesic equations as the picture.
+    Neither clock is lying. That is rather the point.</p>
+
+    <h3>Controls</h3>
+    <table>
+      <tr><td>drag / arrows</td><td>orbit the maelstrom</td></tr>
+      <tr><td>scroll / pinch</td><td>approach, retreat</td></tr>
+      <tr><td><kbd>+</kbd> / <kbd>−</kbd></td><td>approach, retreat (keyboard)</td></tr>
+      <tr><td><kbd>D</kbd></td><td>drop a probe</td></tr>
+      <tr><td><kbd>P</kbd></td><td>long-exposure photograph (PNG)</td></tr>
+      <tr><td><kbd>H</kbd></td><td>hide the instruments (zen)</td></tr>
+      <tr><td><kbd>S</kbd> / <kbd>I</kbd></td><td>sound / this card</td></tr>
+      <tr><td><kbd>space</kbd></td><td>freeze the disk's flow</td></tr>
+    </table>
+
+    <h3>Honesty</h3>
+    <p id="selftest-line">On load, this page re-derives known results from its own integrator —
+    the photon-capture impact parameter b<sub>crit</sub> = 3√3 M, the ISCO at 6M for zero spin,
+    Hamiltonian conservation along rays — and prints the receipts to the console.
+    <span class="selftest" id="selftest-badge">self-test: running…</span></p>
+
+    <p class="sig-line">One HTML file · no frameworks · no libraries · no textures ·
+    WebGL2 + Web Audio · written for the Shipyard.
+    <br />The mathematics is from Kerr (1963), Bardeen (1972), and Shakura–Sunyaev (1973).
+    The vertigo is original.</p>
+  </div>
+</div>
+
+<datalist id="masses">
+  <option value="0"></option><option value="1"></option><option value="2"></option>
+</datalist>
+
+<script>
+'use strict';
+/* ============================================================
+   PART I — THE ENGINE ROOM
+   WebGL2 pipeline: geodesic ray tracer → accumulation → bloom
+   → filmic composite. Geometrized units: G = c = M = 1, so the
+   Schwarzschild radius r_s = 2 and the whole maelstrom is a
+   few dozen floats wide.
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+
+const S = {
+  a: 0.70,                      // spin a/M
+  massIdx: 1,                   // 0 stellar · 1 Sgr A* · 2 M87*
+  Tpeak: 5800,                  // disk peak temperature, K (as rendered)
+  flow: 1.0,                    // disk pattern speed
+  lensing: true, beaming: true, redshift: true, disk: true,
+  quality: 1,                   // 0 low · 1 auto · 2 high · 3 ultra
+  resScale: 0.62, maxSteps: 220, hScale: 1.0,
+  cam: { r: 26.0, th: 1.37, ph: 0.0 },
+  camVel: { th: 0, ph: 0, zoom: 0 },
+  autoSail: true,               // gentle drift until first touch
+  diskTime: 0, paused: false,
+  accumN: 0,                    // progressive supersampling counter
+  zen: false,
+  interacting: false,
+  ldr: false,                   // float-buffer fallback
+};
+const MASSES = [
+  { label: '21 M☉ (Cygnus X-1)', msun: 21 },
+  { label: 'Sgr A*', msun: 4.3e6 },
+  { label: 'M87*', msun: 6.5e9 },
+];
+const QUALITY = [
+  { resScale: 0.42, maxSteps: 150, hScale: 1.35, accumCap: 48 },
+  { resScale: 0.62, maxSteps: 220, hScale: 1.00, accumCap: 64 },  // auto adapts resScale
+  { resScale: 0.85, maxSteps: 320, hScale: 0.75, accumCap: 96 },
+  { resScale: 1.00, maxSteps: 440, hScale: 0.55, accumCap: 160 },
+];
+const DISK_OUT = 17.0;
+
+/* ---------- canvas & context ---------- */
+const canvas = $('gl');
+const gl = canvas.getContext('webgl2', {
+  antialias: false, depth: false, stencil: false, alpha: false,
+  preserveDrawingBuffer: true, powerPreference: 'high-performance',
+});
+if (!gl) { $('nogl').classList.add('shown'); throw new Error('webgl2 unavailable'); }
+const extFloat = gl.getExtension('EXT_color_buffer_float')
+              || gl.getExtension('EXT_color_buffer_half_float');  // 16F renderable is all we need
+S.ldr = !extFloat;
+gl.getExtension('OES_texture_float_linear'); // nice-to-have for upscale
+
+/* ---------- shader sources ---------- */
+const VS = `#version 300 es
+void main(){
+  vec2 p = vec2(float((gl_VertexID<<1)&2), float(gl_VertexID&2));
+  gl_Position = vec4(p*2.0-1.0, 0.0, 1.0);
+}`;
+
+/* The scene shader. The physics lives here. */
+const FS_SCENE = `#version 300 es
+precision highp float;
+out vec4 frag;
+
+uniform vec2  uRes;
+uniform float uA;        // spin a/M
+uniform float uHor;      // outer horizon r+ = 1 + sqrt(1-a²)
+uniform float uDiskIn;   // ISCO(a)
+uniform float uDiskOut;
+uniform float uPhPro;    // prograde photon orbit radius
+uniform float uPhRet;    // retrograde photon orbit radius
+uniform vec3  uCam;      // r, θ, φ
+uniform float uTanF;     // tan(fov/2)
+uniform float uTpeak;
+uniform float uDiskTime;
+uniform int   uMaxSteps;
+uniform float uHScale;
+uniform vec2  uJitter;   // subpixel jitter for accumulation
+uniform int   uLens, uBeam, uShift, uDiskOn;
+uniform int   uLdr;
+
+const float PI = 3.141592653589793;
+
+/* ---------- hashes & noise (the only randomness aboard) ---------- */
+float hash13(vec3 p){ p = fract(p*0.1031); p += dot(p, p.yzx+33.33); return fract((p.x+p.y)*p.z); }
+vec3  hash33(vec3 p){
+  p = fract(p*vec3(0.1031, 0.1030, 0.0973));
+  p += dot(p, p.yxz+33.33);
+  return fract((p.xxy+p.yxx)*p.zyx);
+}
+float vnoise(vec3 p){
+  vec3 i = floor(p), f = fract(p);
+  f = f*f*(3.0-2.0*f);
+  float n000 = hash13(i+vec3(0,0,0)), n100 = hash13(i+vec3(1,0,0));
+  float n010 = hash13(i+vec3(0,1,0)), n110 = hash13(i+vec3(1,1,0));
+  float n001 = hash13(i+vec3(0,0,1)), n101 = hash13(i+vec3(1,0,1));
+  float n011 = hash13(i+vec3(0,1,1)), n111 = hash13(i+vec3(1,1,1));
+  return mix(mix(mix(n000,n100,f.x), mix(n010,n110,f.x), f.y),
+             mix(mix(n001,n101,f.x), mix(n011,n111,f.x), f.y), f.z);
+}
+float fbm(vec3 p){
+  float a = 0.5, s = 0.0;
+  for (int i = 0; i < 4; i++){ s += a*vnoise(p); p = p*2.13 + 17.7; a *= 0.5; }
+  return s;
+}
+
+/* ---------- blackbody: kelvin → (approx) linear RGB ---------- */
+vec3 blackbody(float T){
+  T = clamp(T, 800.0, 40000.0);
+  vec3 c;
+  c.r = 56100000.0*pow(T, -1.5) + 148.0;
+  c.g = (T > 6500.0) ? 35200000.0*pow(T, -1.5) + 184.0 : 100.04*log(T) - 623.6;
+  c.b = 194.18*log(T) - 1448.6;
+  c = clamp(c, 0.0, 255.0)/255.0;
+  if (T < 1300.0) c *= T/1300.0;       // dim the embers
+  return c*c;                          // ~gamma 2 → linear-ish
+}
+
+/* ============================================================
+   KERR SPACETIME — Boyer–Lindquist, Hamiltonian form.
+   State y = (r, θ, φ, p_r, p_θ); E and L conserved per ray.
+   dy/dλ comes from H = ½ g^{μν} p_μ p_ν with analytic ∂H/∂r, ∂H/∂θ.
+   ============================================================ */
+struct St { float r, th, ph, pr, pth; };
+
+St geoDeriv(St s, float E, float L){
+  float r = s.r, a = uA;
+  float sn = sin(s.th), cs = cos(s.th);
+  float s2 = max(sn*sn, 1e-7), c2 = cs*cs, sc = sn*cs;
+  float r2 = r*r, a2 = a*a;
+  float Sg = r2 + a2*c2,      Sg_r = 2.0*r,        Sg_t = -2.0*a2*sc;
+  float Dl = r2 - 2.0*r + a2, Dl_r = 2.0*r - 2.0;
+  float Aa = (r2+a2)*(r2+a2) - a2*Dl*s2;
+  float Aa_r = 4.0*r*(r2+a2) - a2*Dl_r*s2;
+  float Aa_t = -a2*Dl*2.0*sc;
+  float iSg = 1.0/Sg, iSg2 = iSg*iSg;
+  float SD = Sg*Dl, iSD2 = 1.0/(SD*SD);
+  float SD_r = Sg_r*Dl + Sg*Dl_r, SD_t = Sg_t*Dl;
+
+  // inverse metric
+  float grr = Dl*iSg, gthth = iSg;
+  float W = Dl - a2*s2;
+  float D3 = SD*s2;
+  float gphph = W/D3;
+  float gtph = -2.0*a*r/SD;
+  float gtt  = -Aa/SD;
+
+  St d;
+  d.r   = grr*s.pr;
+  d.th  = gthth*s.pth;
+  d.ph  = gphph*L - gtph*E;
+
+  // ∂(inverse metric)/∂r and /∂θ — product rule, nothing clever
+  float dgrr_r   = (Dl_r*Sg - Dl*Sg_r)*iSg2;
+  float dgrr_t   = -Dl*Sg_t*iSg2;
+  float dgthth_r = -Sg_r*iSg2;
+  float dgthth_t = -Sg_t*iSg2;
+  float D3_r = SD_r*s2;
+  float D3_t = SD_t*s2 + SD*2.0*sc;
+  float dgphph_r = (Dl_r*D3 - W*D3_r)/(D3*D3);
+  float dgphph_t = (-2.0*a2*sc*D3 - W*D3_t)/(D3*D3);
+  float dgtph_r  = -2.0*a*(SD - r*SD_r)*iSD2;
+  float dgtph_t  =  2.0*a*r*SD_t*iSD2;
+  float dgtt_r   = -(Aa_r*SD - Aa*SD_r)*iSD2;
+  float dgtt_t   = -(Aa_t*SD - Aa*SD_t)*iSD2;
+
+  float pr2 = s.pr*s.pr, pth2 = s.pth*s.pth;
+  d.pr  = -0.5*(dgrr_r*pr2 + dgthth_r*pth2 + dgphph_r*L*L - 2.0*dgtph_r*E*L + dgtt_r*E*E);
+  d.pth = -0.5*(dgrr_t*pr2 + dgthth_t*pth2 + dgphph_t*L*L - 2.0*dgtph_t*E*L + dgtt_t*E*E);
+  return d;
+}
+
+St stAdd(St a, St b, float h){
+  return St(a.r + h*b.r, a.th + h*b.th, a.ph + h*b.ph, a.pr + h*b.pr, a.pth + h*b.pth);
+}
+
+// 2H — zero along every honest null ray; drift means the step lied
+float ham2(St s, float E, float L){
+  float r = s.r, sn = sin(s.th), cs = cos(s.th);
+  float s2 = max(sn*sn, 1e-7), c2 = cs*cs;
+  float r2 = r*r, a2 = uA*uA;
+  float Sg = r2 + a2*c2, Dl = r2 - 2.0*r + a2;
+  float Aa = (r2+a2)*(r2+a2) - a2*Dl*s2;
+  return Dl/Sg*s.pr*s.pr + s.pth*s.pth/Sg
+       + (Dl - a2*s2)/(Sg*Dl*s2)*L*L
+       + 4.0*uA*r/(Sg*Dl)*E*L
+       - Aa/(Sg*Dl)*E*E;
+}
+
+void rk4(inout St y, float h, float E, float L, St k1){
+  St k2 = geoDeriv(stAdd(y, k1, 0.5*h), E, L);
+  St k3 = geoDeriv(stAdd(y, k2, 0.5*h), E, L);
+  St k4 = geoDeriv(stAdd(y, k3, h), E, L);
+  y.r   += h/6.0*(k1.r   + 2.0*k2.r   + 2.0*k3.r   + k4.r);
+  y.th  += h/6.0*(k1.th  + 2.0*k2.th  + 2.0*k3.th  + k4.th);
+  y.ph  += h/6.0*(k1.ph  + 2.0*k2.ph  + 2.0*k3.ph  + k4.ph);
+  y.pr  += h/6.0*(k1.pr  + 2.0*k2.pr  + 2.0*k3.pr  + k4.pr);
+  y.pth += h/6.0*(k1.pth + 2.0*k2.pth + 2.0*k3.pth + k4.pth);
+}
+
+/* ---------- the stars we are falling away from ---------- */
+vec3 starfield(vec3 d){
+  d = normalize(d);
+  vec3 col = vec3(0.0);
+  // two shells of stars — near-point sources, so lensing magnification
+  // stretches them honestly instead of inflating soft blobs
+  for (int s = 0; s < 3; s++){
+    float scl = (s == 0) ? 16.0 : (s == 1) ? 37.0 : 83.0;
+    vec3 p = d*scl;
+    vec3 cell = floor(p);
+    vec3 h = hash33(cell);
+    vec3 sp = cell + 0.18 + 0.64*h;            // star kept off cell walls
+    float dist = length(p - sp);
+    float mag = pow(hash13(cell + 7.1), 18.0); // most stars are faint
+    float core = exp(-dist*dist*230.0)*mag*((s == 0) ? 12.0 : (s == 1) ? 7.0 : 3.5);
+    vec3 tint = blackbody(mix(2600.0, 11000.0, h.z));
+    col += core*tint;
+  }
+  // the galactic shoal — a band of fbm light with dust lanes
+  vec3 gz = normalize(vec3(0.18, 1.0, 0.46));        // tilted galactic pole
+  float bx = dot(d, gz)*3.4;                          // (pow(neg, 2.0) is UB in GLSL ES)
+  float band = exp(-bx*bx);
+  float wisps = fbm(d*5.2 + 3.0);
+  float dust  = smoothstep(0.45, 0.85, fbm(d*7.7 - 11.0));
+  col += band*(0.040 + 0.085*wisps)*(1.0 - 0.75*dust)*vec3(0.62, 0.71, 0.95);
+  col += band*0.010*vec3(0.9, 0.6, 0.45);            // warm core dust glow
+  return col;
+}
+
+/* ---------- disk emission at an equatorial crossing ---------- */
+/* returns rgb premultiplied emission; alpha = opacity of this pass */
+vec4 diskSample(float r, float ph, float E, float L){
+  // Shakura–Sunyaev temperature profile, zero torque at the inner edge
+  float x = clamp(r/uDiskIn, 1.0001, 40.0);
+  float prof = pow(x, -0.75)*pow(max(1.0 - inversesqrt(x), 1e-4), 0.25);
+  // T-profile peaks at 0.4877 (x = 49/36) — normalize so the peak is uTpeak
+  float Tem = uTpeak*prof/0.4877;
+
+  // relativistic g-factor for a prograde Keplerian emitter:
+  // Ω = 1/(r^1.5 + a);  u^t = 1/sqrt(-(g_tt + 2Ωg_tφ + Ω²g_φφ));  g = 1/(u^t(E − ΩL))
+  float a = uA, r2 = r*r, a2 = a*a;
+  float Sg = r2;                       // θ = π/2 → Σ = r²
+  float Om = 1.0/(pow(r, 1.5) + a);
+  float g_tt  = -(1.0 - 2.0*r/Sg);
+  float g_tph = -2.0*a*r/Sg;
+  float g_phph = r2 + a2 + 2.0*a2*r/Sg;
+  float denom = -(g_tt + 2.0*Om*g_tph + Om*Om*g_phph);
+  float ut = inversesqrt(max(denom, 1e-6));
+  float g = 1.0/max(ut*(E - Om*L), 1e-4);
+
+  // the turbulent face of the flow, sheared by differential rotation
+  float phw = ph - Om*uDiskTime;
+  vec3 q = vec3(cos(phw), sin(phw), 0.0);
+  float lr = log(r);
+  float n1 = fbm(vec3(q.xy*2.4, lr*3.1));
+  float n2 = fbm(vec3(q.xy*1.1, lr*9.5) + 5.0);      // tight rings of shear
+  float fil = pow(1.0 - abs(2.0*fbm(vec3(q.xy*1.6, lr*6.0) - 9.0) - 1.0), 3.0);
+  float density = mix(0.36, 1.4, pow(n1, 1.25))*mix(0.62, 1.0, n2) + 0.5*fil;
+
+  // edges: sharp at the ISCO, ragged fade outward
+  float edge = smoothstep(uDiskIn, uDiskIn*1.06, r)
+             * (1.0 - smoothstep(uDiskOut*0.60, uDiskOut*0.99, r + 1.2*n1));
+
+  float gc = (uShift == 1) ? g : 1.0;   // colour follows the photon's energy
+  float gi = (uBeam  == 1) ? g : 1.0;   // intensity follows the beam
+  float Tobs = Tem*gc;
+  float I = pow(Tem/5300.0, 4.0);
+  I += 0.14*pow(I, 0.35);               // scattered-light floor — T⁴ spans decades,
+                                        // the eye deserves to see the dim outskirts
+  I *= pow(gi, 4.0);
+  I = I/(1.0 + 0.02*I);                 // soft shoulder — keep the blaze, lose the clip
+
+  vec3 emit = blackbody(Tobs)*I*density*edge;
+  // the flow is optically thick — faint translucency only at the ragged rim
+  float alpha = clamp(edge*(0.86 + 0.14*n1), 0.0, 0.985);
+  return vec4(emit, alpha);
+}
+
+/* BL position → flat 3-vector (exact enough far out, fine for skies) */
+vec3 blToCart(float r, float th, float ph){
+  float sn = sin(th);
+  return vec3(r*sn*cos(ph), r*sn*sin(ph), r*cos(th));
+}
+
+void main(){
+  // normalize by the short axis so portrait phones aren't zoomed into the shadow
+  vec2 uv = (gl_FragCoord.xy + uJitter - 0.5*uRes)/min(uRes.x, uRes.y);
+  float a = uA, a2 = a*a;
+
+  /* ---------- the camera: a ZAMO mooring at (r,θ,φ) ---------- */
+  float rc = uCam.x, tc = uCam.y, pc = uCam.z;
+  float snc = sin(tc), csc = cos(tc);
+  float s2c = max(snc*snc, 1e-7);
+  float r2c = rc*rc;
+  float Sgc = r2c + a2*csc*csc;
+  float Dlc = r2c - 2.0*rc + a2;
+  float Aac = (r2c+a2)*(r2c+a2) - a2*Dlc*s2c;
+  float alpha = sqrt(Sgc*Dlc/Aac);          // lapse
+  float omega = 2.0*a*rc/Aac;               // frame-drag rate
+
+  // local view direction in the (r̂, θ̂, φ̂) orthonormal frame
+  float k = 2.0*uTanF;
+  vec3 nL = normalize(vec3(-1.0, -uv.y*k, uv.x*k)); // forward = inward
+
+  /* ---------- LENSING OFF: light forgets how to fall ---------- */
+  if (uLens == 0){
+    vec3 rhat = vec3(snc*cos(pc), snc*sin(pc), csc);
+    vec3 that = vec3(csc*cos(pc), csc*sin(pc), -snc);
+    vec3 phat = vec3(-sin(pc), cos(pc), 0.0);
+    vec3 P = rc*rhat;
+    vec3 D = normalize(nL.x*rhat + nL.y*that + nL.z*phat);
+    vec3 col = vec3(0.0); float trans = 1.0;
+    // flat disk hit
+    if (uDiskOn == 1 && abs(D.z) > 1e-6){
+      float t = -P.z/D.z;
+      if (t > 0.0){
+        vec3 hit = P + t*D;
+        float hr = length(hit.xy);
+        if (hr > uDiskIn && hr < uDiskOut){
+          // shadow check: does the straight ray reach the disk first?
+          float b = dot(-P, D);
+          float h2 = dot(P, P) - b*b;
+          bool blocked = (h2 < uHor*uHor) && (b > 0.0) && (b - sqrt(max(uHor*uHor - h2, 0.0)) < t);
+          if (!blocked){
+            // straight-line photon: E = 1, L_z = (hit × D)·ẑ — the same
+            // emitter machinery in diskSample then yields the honest
+            // "no lensing, same matter" comparison.
+            float Lz = hit.x*D.y - hit.y*D.x;
+            vec4 dk = diskSample(hr, atan(hit.y, hit.x), 1.0, Lz);
+            col += trans*dk.rgb; trans *= (1.0 - dk.a);
+          }
+        }
+      }
+    }
+    // the bare shadow, no photon sphere — smaller than it should be
+    float b = dot(-P, D);
+    float h2 = dot(P, P) - b*b;
+    if (!(b > 0.0 && h2 < uHor*uHor)) col += trans*starfield(D);
+    frag = vec4(col, 1.0); return;
+  }
+
+  /* ---------- LENSING ON: the true maelstrom ---------- */
+  // photon 4-momentum from the ZAMO tetrad (local energy = 1)
+  float ert = sqrt(Dlc/Sgc);                 // e_r factor
+  float eth = 1.0/sqrt(Sgc);                 // e_θ factor
+  float gphphc = Aac*s2c/Sgc;                // covariant g_φφ
+  float eph = 1.0/sqrt(gphphc);              // e_φ factor
+
+  float pt_up = 1.0/alpha;                   // p^t
+  float pr_up = nL.x*ert;                    // p^r
+  float pth_up = nL.y*eth;                   // p^θ
+  float pph_up = omega/alpha + nL.z*eph;     // p^φ
+
+  float g_tt_c  = -(1.0 - 2.0*rc/Sgc);
+  float g_tph_c = -2.0*a*rc*s2c/Sgc;
+  float E = -(g_tt_c*pt_up + g_tph_c*pph_up);
+  float L = gphphc*pph_up + g_tph_c*pt_up;
+
+  St y; y.r = rc; y.th = tc; y.ph = pc;
+  y.pr = (Sgc/Dlc)*pr_up;
+  y.pth = Sgc*pth_up;
+
+  float rEsc = max(rc*1.4, uDiskOut*1.8);
+  vec3 col = vec3(0.0);
+  float trans = 1.0;
+  bool captured = false, escaped = false;
+  float prevCos = cos(y.th), prevR = y.r, prevPh = y.ph;
+  float Hcur = ham2(y, E, L);    // ≈0 at launch; tracked so we test per-step drift
+
+  for (int i = 0; i < 600; i++){
+    if (i >= uMaxSteps) break;
+    // adaptive step: tight near the horizon and the photon sphere, long far
+    // out — but never long enough for a substep to jump the horizon, where
+    // Δ → 0 and the algebra turns to NaN.
+    float d = y.r - uHor;
+    float h = uHScale*clamp(0.20*d, 0.02, 0.85 + 1.6*smoothstep(20.0, 46.0, y.r));
+    // extra care across the whole band of unstable photon orbits (spin-aware)
+    float bandD = max(uPhPro - y.r, max(y.r - uPhRet, 0.0));
+    h *= 0.6 + 0.4*smoothstep(0.0, 2.5, bandD);
+    h = min(h, 0.45*d);
+    // Step-doubling with a constraint monitor: H must stay 0 along a null
+    // ray. Rays skimming the polar centrifugal barrier (small L near the
+    // axis) can overshoot their θ turning point in one step, go off shell,
+    // and paint a seam of garbage down the camera's meridian — reject and
+    // halve instead. Testing the per-step increment (not the running total)
+    // keeps the monitor winnable even after roundoff has accumulated.
+    St k1 = geoDeriv(y, E, L);
+    h = min(h, 0.5/max(abs(k1.th), 1e-3));
+    St yT = y;
+    rk4(yT, h, E, L, k1);
+    float Hnew = ham2(yT, E, L);
+    float tol = 0.008*(1.0 + abs(Hcur));
+    for (int retry = 0; retry < 3; retry++){
+      if (abs(Hnew - Hcur) < tol) break;
+      h *= 0.25; yT = y;
+      rk4(yT, h, E, L, k1);
+      Hnew = ham2(yT, E, L);
+    }
+    y = yT; Hcur = Hnew;
+
+    if (!(y.r > uHor*1.004)){ captured = true; break; }     // catches NaN too
+
+    // equatorial crossing → disk
+    float c = cos(y.th);
+    if (uDiskOn == 1 && c*prevCos < 0.0){
+      float f = prevCos/(prevCos - c);                     // linear crossing fraction
+      float rx = mix(prevR, y.r, f);
+      if (rx > uDiskIn && rx < uDiskOut){
+        // shortest angular difference — a ray that just lapped the pole
+        // reports φ jumps of ~π, and feeding those to the noise pattern
+        // paints a seam of garbage beads down the meridian
+        float dph = mod(y.ph - prevPh + PI, 2.0*PI) - PI;
+        float phx = prevPh + f*dph;
+        vec4 dk = diskSample(rx, phx, E, L);
+        col += trans*dk.rgb;
+        trans *= (1.0 - dk.a);
+        if (trans < 0.02){ captured = true; break; }       // opaque enough
+      }
+    }
+    prevCos = c; prevR = y.r; prevPh = y.ph;
+
+    if (y.r > rEsc && y.pr > 0.0){ escaped = true; break; }  // g^rr > 0 out here
+  }
+
+  if (!captured && (escaped || y.r > 6.0)){
+    // escape direction from the coordinate velocity, flattened to a sky vector.
+    // Rays that burned their budget still circling deep stay dark — wrong
+    // stars there would dirty the shadow's edge.
+    St d2 = geoDeriv(y, E, L);
+    float sn = sin(y.th), cs = cos(y.th);
+    vec3 er = vec3(sn*cos(y.ph), sn*sin(y.ph), cs);
+    vec3 et = vec3(cs*cos(y.ph), cs*sin(y.ph), -sn);
+    vec3 ep = vec3(-sin(y.ph), cos(y.ph), 0.0);
+    vec3 v = er*d2.r + et*(y.r*d2.th) + ep*(y.r*sn*d2.ph);
+    col += trans*starfield(v);
+  }
+
+  // a single NaN texel would snowball through the bloom blur — refuse it.
+  // isnan() may be optimized away under fast-math; the finite clamp (under
+  // the float16 ceiling of 65504) is the backstop that always holds.
+  if (any(isnan(col)) || any(isinf(col))) col = vec3(0.0);
+  col = clamp(col, vec3(0.0), vec3(6.0e4));
+  if (uLdr == 1) col = col/(1.0 + col);                    // poor-man's HDR
+  frag = vec4(col, 1.0);
+}`;
+
+/* ---------- accumulation: mix this frame into the long exposure ---------- */
+const FS_ACCUM = `#version 300 es
+precision highp float;
+precision highp sampler2D;
+out vec4 frag;
+uniform sampler2D uPrev, uNew;
+uniform float uBlend;
+void main(){
+  ivec2 p = ivec2(gl_FragCoord.xy);
+  vec3 a = texelFetch(uPrev, p, 0).rgb;
+  vec3 b = texelFetch(uNew, p, 0).rgb;
+  frag = vec4(mix(a, b, uBlend), 1.0);
+}`;
+
+/* ---------- bloom: bright pass at quarter res ---------- */
+const FS_BRIGHT = `#version 300 es
+precision highp float;
+precision highp sampler2D;
+out vec4 frag;
+uniform sampler2D uTex;
+uniform vec2 uTexel;
+uniform vec2 uInvBloom;  // 1/own size — exact even when the ¼ clamp kicks in
+void main(){
+  // 2×2 box over the full-res frame — point-sampling every 4th texel would
+  // alias single-texel stars into a blinking lattice after the blur
+  vec2 uv = gl_FragCoord.xy*uInvBloom;
+  vec3 c = texture(uTex, uv + vec2(-1.0, -1.0)*uTexel).rgb
+         + texture(uTex, uv + vec2( 1.0, -1.0)*uTexel).rgb
+         + texture(uTex, uv + vec2(-1.0,  1.0)*uTexel).rgb
+         + texture(uTex, uv + vec2( 1.0,  1.0)*uTexel).rgb;
+  c *= 0.25;
+  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  frag = vec4(c*smoothstep(0.55, 1.7, l), 1.0);
+}`;
+
+const FS_BLUR = `#version 300 es
+precision highp float;
+precision highp sampler2D;
+out vec4 frag;
+uniform sampler2D uTex;
+uniform vec2 uDir;   // texel-scaled direction
+void main(){
+  vec2 uv = gl_FragCoord.xy/vec2(textureSize(uTex, 0));
+  vec3 s = texture(uTex, uv).rgb*0.227027;
+  vec2 o1 = uDir*1.3846153846, o2 = uDir*3.2307692308;
+  s += (texture(uTex, uv+o1).rgb + texture(uTex, uv-o1).rgb)*0.3162162162;
+  s += (texture(uTex, uv+o2).rgb + texture(uTex, uv-o2).rgb)*0.0702702703;
+  frag = vec4(s, 1.0);
+}`;
+
+/* ---------- final composite: tonemap, vignette, grain, a kiss of CA ---------- */
+const FS_FINAL = `#version 300 es
+precision highp float;
+precision highp sampler2D;
+out vec4 frag;
+uniform sampler2D uScene, uBloom;
+uniform vec2 uRes;       // canvas size
+uniform float uTime;
+uniform float uBloomAmt;
+uniform int uLdr;
+vec3 aces(vec3 x){
+  return clamp((x*(2.51*x + 0.03))/(x*(2.43*x + 0.59) + 0.14), 0.0, 1.0);
+}
+void main(){
+  vec2 uv = gl_FragCoord.xy/uRes;
+  vec2 cc = uv - 0.5;
+  float r2 = dot(cc, cc);
+  // chromatic whisper at the rim
+  float ca = 0.0035*r2;
+  vec3 col;
+  col.r = texture(uScene, uv + cc*ca).r;
+  col.g = texture(uScene, uv).g;
+  col.b = texture(uScene, uv - cc*ca).b;
+  vec3 bloom = texture(uBloom, uv).rgb;
+  if (uLdr == 1){ col = col/max(1.0 - col, 1e-3); }   // undo poor-man's HDR
+  col += bloom*uBloomAmt;
+  col *= 1.0 - 0.42*r2;                                // vignette
+  col = aces(col*1.18);
+  col = pow(col, vec3(1.0/2.2));
+  // grain so the darkness breathes
+  float g = fract(sin(dot(gl_FragCoord.xy + uTime*61.7, vec2(12.9898, 78.233)))*43758.5453);
+  col += (g - 0.5)*0.012;
+  frag = vec4(col, 1.0);
+}`;
+
+/* ---------- GL plumbing ---------- */
+function compile(type, src){
+  const sh = gl.createShader(type);
+  gl.shaderSource(sh, src); gl.compileShader(sh);
+  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+    console.error(gl.getShaderInfoLog(sh), src.split('\n').map((l,i)=>`${i+1}: ${l}`).join('\n'));
+    throw new Error('shader compile failed');
+  }
+  return sh;
+}
+function program(fsSrc){
+  const p = gl.createProgram();
+  gl.attachShader(p, compile(gl.VERTEX_SHADER, VS));
+  gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fsSrc));
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  const uni = {};
+  const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+  for (let i = 0; i < n; i++){
+    const info = gl.getActiveUniform(p, i);
+    uni[info.name] = gl.getUniformLocation(p, info.name);
+  }
+  return { p, uni };
+}
+const progScene  = program(FS_SCENE);
+const progAccum  = program(FS_ACCUM);
+const progBright = program(FS_BRIGHT);
+const progBlur   = program(FS_BLUR);
+const progFinal  = program(FS_FINAL);
+
+function makeTarget(w, h){
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texStorage2D(gl.TEXTURE_2D, 1, S.ldr ? gl.RGBA8 : gl.RGBA16F, w, h);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  const fbo = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+  return { tex, fbo, w, h };
+}
+
+let rt = null;            // render targets, rebuilt on resize/scale change
+function allocTargets(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cw = Math.max(1, Math.round(canvas.clientWidth*dpr)), ch = Math.max(1, Math.round(canvas.clientHeight*dpr));
+  if (canvas.width !== cw || canvas.height !== ch){ canvas.width = cw; canvas.height = ch; }
+  // cap internal resolution: geodesics are expensive, retina is greedy
+  const capW = 1920;
+  const eff = Math.min(S.resScale, capW/cw);
+  const w = Math.max(64, Math.round(cw*eff)), h = Math.max(64, Math.round(ch*eff));
+  if (rt && rt.scene.w === w && rt.scene.h === h) return;
+  if (rt) for (const t of Object.values(rt)){ gl.deleteTexture(t.tex); gl.deleteFramebuffer(t.fbo); }
+  const bw = Math.max(32, w>>2), bh = Math.max(32, h>>2);
+  rt = {
+    scene:  makeTarget(w, h),
+    accumA: makeTarget(w, h),
+    accumB: makeTarget(w, h),
+    bloomA: makeTarget(bw, bh),
+    bloomB: makeTarget(bw, bh),
+  };
+  S.accumN = 0;
+}
+
+function drawTo(target, prog){
+  gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.fbo : null);
+  gl.viewport(0, 0, target ? target.w : canvas.width, target ? target.h : canvas.height);
+  gl.useProgram(prog.p);
+}
+function bindTex(unit, tex, loc){
+  gl.activeTexture(gl.TEXTURE0 + unit);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.uniform1i(loc, unit);
+}
+const quad = () => gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+/* ---------- per-frame render ---------- */
+let accumFlip = false;
+function renderFrame(now){
+  const u = progScene.uni;
+  const jitterAmt = S.accumN > 0 ? 1.0 : 0.0;     // jitter only while accumulating
+  const jx = (Math.random() - 0.5)*jitterAmt, jy = (Math.random() - 0.5)*jitterAmt;
+
+  drawTo(rt.scene, progScene);
+  gl.uniform2f(u.uRes, rt.scene.w, rt.scene.h);
+  gl.uniform1f(u.uA, S.a);
+  gl.uniform1f(u.uHor, PHY.horizon(S.a));
+  gl.uniform1f(u.uDiskIn, PHY.isco(S.a));
+  gl.uniform1f(u.uDiskOut, DISK_OUT);
+  gl.uniform1f(u.uPhPro, PHY.photonOrbit(S.a, true));
+  gl.uniform1f(u.uPhRet, PHY.photonOrbit(S.a, false));
+  gl.uniform3f(u.uCam, S.cam.r, S.cam.th, S.cam.ph);
+  gl.uniform1f(u.uTanF, Math.tan(28*Math.PI/180));
+  gl.uniform1f(u.uTpeak, S.Tpeak);
+  gl.uniform1f(u.uDiskTime, S.diskTime);
+  gl.uniform1i(u.uMaxSteps, S.maxSteps);
+  gl.uniform1f(u.uHScale, S.hScale);
+  gl.uniform2f(u.uJitter, jx, jy);
+  gl.uniform1i(u.uLens, S.lensing ? 1 : 0);
+  gl.uniform1i(u.uBeam, S.beaming ? 1 : 0);
+  gl.uniform1i(u.uShift, S.redshift ? 1 : 0);
+  gl.uniform1i(u.uDiskOn, S.disk ? 1 : 0);
+  gl.uniform1i(u.uLdr, S.ldr ? 1 : 0);
+  quad();
+
+  // accumulate (uBlend = 1 on reset → plain copy); 8-bit buffers quantize
+  // away tiny increments, so don't pretend to converge past what they hold
+  const cap = S.ldr ? 16 : QUALITY[S.quality].accumCap;
+  S.accumN = Math.min(S.accumN + 1, cap);
+  const blend = 1.0/S.accumN;
+  const src = accumFlip ? rt.accumA : rt.accumB;
+  const dst = accumFlip ? rt.accumB : rt.accumA;
+  drawTo(dst, progAccum);
+  bindTex(0, src.tex, progAccum.uni.uPrev);
+  bindTex(1, rt.scene.tex, progAccum.uni.uNew);
+  gl.uniform1f(progAccum.uni.uBlend, blend);
+  quad();
+  accumFlip = !accumFlip;
+
+  // bloom chain from the accumulated frame
+  drawTo(rt.bloomA, progBright);
+  bindTex(0, dst.tex, progBright.uni.uTex);
+  gl.uniform2f(progBright.uni.uTexel, 1/rt.scene.w, 1/rt.scene.h);
+  gl.uniform2f(progBright.uni.uInvBloom, 1/rt.bloomA.w, 1/rt.bloomA.h);
+  quad();
+  for (let i = 0; i < 3; i++){
+    drawTo(rt.bloomB, progBlur);
+    bindTex(0, rt.bloomA.tex, progBlur.uni.uTex);
+    gl.uniform2f(progBlur.uni.uDir, 1.35/rt.bloomA.w, 0);
+    quad();
+    drawTo(rt.bloomA, progBlur);
+    bindTex(0, rt.bloomB.tex, progBlur.uni.uTex);
+    gl.uniform2f(progBlur.uni.uDir, 0, 1.35/rt.bloomA.h);
+    quad();
+  }
+
+  // composite to screen
+  drawTo(null, progFinal);
+  bindTex(0, dst.tex, progFinal.uni.uScene);
+  bindTex(1, rt.bloomA.tex, progFinal.uni.uBloom);
+  gl.uniform2f(progFinal.uni.uRes, canvas.width, canvas.height);
+  gl.uniform1f(progFinal.uni.uTime, now*0.001);
+  gl.uniform1f(progFinal.uni.uBloomAmt, 0.55);
+  gl.uniform1i(progFinal.uni.uLdr, S.ldr ? 1 : 0);
+  quad();
+}
+
+/* ============================================================
+   PART II — THE CHART TABLE
+   The same Kerr machinery, mirrored in float64 JavaScript.
+   It steers the probe, and on load it re-derives textbook
+   results to prove the shader isn't bluffing.
+   ============================================================ */
+const PHY = {
+  horizon: (a) => 1 + Math.sqrt(Math.max(0, 1 - a*a)),
+  isco(a){
+    const Z1 = 1 + Math.cbrt(1 - a*a)*(Math.cbrt(1 + a) + Math.cbrt(1 - a));
+    const Z2 = Math.sqrt(3*a*a + Z1*Z1);
+    return 3 + Z2 - Math.sqrt((3 - Z1)*(3 + Z1 + 2*Z2));   // prograde
+  },
+  photonOrbit(a, prograde){
+    return 2*(1 + Math.cos(2/3*Math.acos(prograde ? -a : a)));
+  },
+  // inverse-metric pieces at (r, θ)
+  inv(r, th, a){
+    const sn = Math.sin(th), cs = Math.cos(th);
+    const s2 = Math.max(sn*sn, 1e-12), c2 = cs*cs;
+    const r2 = r*r, a2 = a*a;
+    const Sg = r2 + a2*c2, Dl = r2 - 2*r + a2;
+    const Aa = (r2 + a2)*(r2 + a2) - a2*Dl*s2;
+    return {
+      Sg, Dl, Aa, s2,
+      grr: Dl/Sg, gthth: 1/Sg,
+      gphph: (Dl - a2*s2)/(Sg*Dl*s2),
+      gtph: -2*a*r/(Sg*Dl),
+      gtt: -Aa/(Sg*Dl),
+    };
+  },
+  // 2H = g^rr p_r² + g^θθ p_θ² + g^φφ L² − 2g^tφ E L + g^tt E²  (− m² for matter)
+  ham2(y, E, L, a){
+    const m = PHY.inv(y.r, y.th, a);
+    return m.grr*y.pr*y.pr + m.gthth*y.pth*y.pth + m.gphph*L*L - 2*m.gtph*E*L + m.gtt*E*E;
+  },
+  geoDeriv(y, E, L, a){
+    const r = y.r;
+    const sn = Math.sin(y.th), cs = Math.cos(y.th);
+    const s2 = Math.max(sn*sn, 1e-12), c2 = cs*cs, sc = sn*cs;
+    const r2 = r*r, a2 = a*a;
+    const Sg = r2 + a2*c2, Sg_r = 2*r, Sg_t = -2*a2*sc;
+    const Dl = r2 - 2*r + a2, Dl_r = 2*r - 2;
+    const Aa = (r2 + a2)*(r2 + a2) - a2*Dl*s2;
+    const Aa_r = 4*r*(r2 + a2) - a2*Dl_r*s2;
+    const Aa_t = -a2*Dl*2*sc;
+    const iSg = 1/Sg, iSg2 = iSg*iSg;
+    const SD = Sg*Dl, iSD2 = 1/(SD*SD);
+    const SD_r = Sg_r*Dl + Sg*Dl_r, SD_t = Sg_t*Dl;
+    const grr = Dl*iSg, gthth = iSg;
+    const W = Dl - a2*s2, D3 = SD*s2;
+    const gphph = W/D3, gtph = -2*a*r/SD;
+    const dgrr_r = (Dl_r*Sg - Dl*Sg_r)*iSg2;
+    const dgrr_t = -Dl*Sg_t*iSg2;
+    const dgthth_r = -Sg_r*iSg2, dgthth_t = -Sg_t*iSg2;
+    const D3_r = SD_r*s2, D3_t = SD_t*s2 + SD*2*sc;
+    const dgphph_r = (Dl_r*D3 - W*D3_r)/(D3*D3);
+    const dgphph_t = (-2*a2*sc*D3 - W*D3_t)/(D3*D3);
+    const dgtph_r = -2*a*(SD - r*SD_r)*iSD2;
+    const dgtph_t = 2*a*r*SD_t*iSD2;
+    const dgtt_r = -(Aa_r*SD - Aa*SD_r)*iSD2;
+    const dgtt_t = -(Aa_t*SD - Aa*SD_t)*iSD2;
+    const pr2 = y.pr*y.pr, pth2 = y.pth*y.pth;
+    return {
+      r: grr*y.pr,
+      th: gthth*y.pth,
+      ph: gphph*L - gtph*E,
+      t: -(-Aa/SD)*E + gtph*L,   // dt/dλ = −g^tt E + g^tφ L
+      pr: -0.5*(dgrr_r*pr2 + dgthth_r*pth2 + dgphph_r*L*L - 2*dgtph_r*E*L + dgtt_r*E*E),
+      pth: -0.5*(dgrr_t*pr2 + dgthth_t*pth2 + dgphph_t*L*L - 2*dgtph_t*E*L + dgtt_t*E*E),
+    };
+  },
+  rk4(y, h, E, L, a){
+    const d1 = PHY.geoDeriv(y, E, L, a);
+    const y2 = { r: y.r + 0.5*h*d1.r, th: y.th + 0.5*h*d1.th, ph: y.ph + 0.5*h*d1.ph, pr: y.pr + 0.5*h*d1.pr, pth: y.pth + 0.5*h*d1.pth };
+    const d2 = PHY.geoDeriv(y2, E, L, a);
+    const y3 = { r: y.r + 0.5*h*d2.r, th: y.th + 0.5*h*d2.th, ph: y.ph + 0.5*h*d2.ph, pr: y.pr + 0.5*h*d2.pr, pth: y.pth + 0.5*h*d2.pth };
+    const d3 = PHY.geoDeriv(y3, E, L, a);
+    const y4 = { r: y.r + h*d3.r, th: y.th + h*d3.th, ph: y.ph + h*d3.ph, pr: y.pr + h*d3.pr, pth: y.pth + h*d3.pth };
+    const d4 = PHY.geoDeriv(y4, E, L, a);
+    y.r   += h/6*(d1.r + 2*d2.r + 2*d3.r + d4.r);
+    y.th  += h/6*(d1.th + 2*d2.th + 2*d3.th + d4.th);
+    y.ph  += h/6*(d1.ph + 2*d2.ph + 2*d3.ph + d4.ph);
+    y.pr  += h/6*(d1.pr + 2*d2.pr + 2*d3.pr + d4.pr);
+    y.pth += h/6*(d1.pth + 2*d2.pth + 2*d3.pth + d4.pth);
+    return h/6*(d1.t + 2*d2.t + 2*d3.t + d4.t);   // Δ(coordinate time)
+  },
+};
+
+/* ---------- the receipts: re-derive textbook GR on load ---------- */
+function selfTest(){
+  const out = [];
+  const ok = (name, pass, detail) => out.push({ test: name, pass: pass ? '✓' : '✗', detail });
+
+  ok('ISCO(a=0) = 6M', Math.abs(PHY.isco(0) - 6) < 1e-12, PHY.isco(0).toFixed(12));
+  ok('ISCO(a=0.998) ≈ 1.237M', Math.abs(PHY.isco(0.998) - 1.237) < 2e-3, PHY.isco(0.998).toFixed(4));
+  ok('photon orbit (a=0) = 3M', Math.abs(PHY.photonOrbit(0, true) - 3) < 1e-12, PHY.photonOrbit(0, true).toFixed(12));
+
+  // photon capture threshold: b_crit = 3√3 M ≈ 5.196 for a = 0
+  const fire = (b) => {
+    const a = 0, rh = PHY.horizon(a);
+    const m0 = PHY.inv(60, Math.PI/2, a);
+    // full null condition incl. the 2g^tφEL cross term (zero at a=0, but
+    // kept so the test stays honest if anyone extends it to spinning holes)
+    const y = { r: 60, th: Math.PI/2, ph: 0, pr: -Math.sqrt((-m0.gtt + 2*m0.gtph*b - m0.gphph*b*b)/m0.grr), pth: 0 };
+    let drift = 0;
+    for (let i = 0; i < 30000; i++){
+      const h = Math.min(Math.max(0.02*(y.r - rh), 0.005), 0.4);
+      PHY.rk4(y, h, 1, b, a);
+      // |2H| is only a fair conservation gauge away from the horizon —
+      // its terms scale as 1/Δ and diverge at the doorstep regardless
+      if (y.r > 3) drift = Math.max(drift, Math.abs(PHY.ham2(y, 1, b, a)));
+      if (y.r < rh*1.01) return { fate: 'captured', drift };
+      if (y.r > 61 && y.pr > 0) return { fate: 'escaped', drift };
+    }
+    return { fate: 'lost', drift };
+  };
+  const below = fire(5.10), above = fire(5.30);
+  ok('b = 5.10M < b_crit → captured', below.fate === 'captured', `3√3 = ${(3*Math.sqrt(3)).toFixed(3)}`);
+  ok('b = 5.30M > b_crit → escapes', above.fate === 'escaped', `H drift ${above.drift.toExponential(1)}`);
+  ok('Hamiltonian conserved on ray', above.drift < 1e-6, `|2H| ≤ ${above.drift.toExponential(2)}`);
+  ok('… and on the captured ray (r > 3M)', below.drift < 1e-5, `|2H| ≤ ${below.drift.toExponential(2)}`);
+
+  // frame dragging: an L = 0 photon at a = 0.9 is swept prograde anyway
+  {
+    const a = 0.9, m0 = PHY.inv(6, Math.PI/2, a);
+    const y = { r: 6, th: Math.PI/2, ph: 0, pr: -Math.sqrt(-m0.gtt/m0.grr), pth: 0 };
+    for (let i = 0; i < 400; i++) PHY.rk4(y, 0.02, 1, 0, a);
+    ok('frame dragging (a=0.9, L=0 → dφ>0)', y.ph > 0, `Δφ = +${y.ph.toFixed(4)} rad`);
+  }
+
+  // ZAMO camera rays must be born null — the exact code path the shader uses
+  {
+    const a = 0.7, rc = 16, tc = 1.42;
+    const snc = Math.sin(tc), csc = Math.cos(tc), s2c = snc*snc;
+    const r2c = rc*rc, a2 = a*a;
+    const Sgc = r2c + a2*csc*csc, Dlc = r2c - 2*rc + a2;
+    const Aac = (r2c + a2)*(r2c + a2) - a2*Dlc*s2c;
+    const alpha = Math.sqrt(Sgc*Dlc/Aac), omega = 2*a*rc/Aac;
+    const gphphc = Aac*s2c/Sgc;
+    const nL = [-0.6, 0.5, Math.sqrt(1 - 0.36 - 0.25)];   // arbitrary unit direction
+    const pt = 1/alpha, pr = nL[0]*Math.sqrt(Dlc/Sgc), pth = nL[1]/Math.sqrt(Sgc);
+    const pph = omega/alpha + nL[2]/Math.sqrt(gphphc);
+    const g_tt = -(1 - 2*rc/Sgc), g_tph = -2*a*rc*s2c/Sgc;
+    const E = -(g_tt*pt + g_tph*pph), L = gphphc*pph + g_tph*pt;
+    const y = { r: rc, th: tc, ph: 0, pr: (Sgc/Dlc)*pr, pth: Sgc*pth };
+    const H2 = PHY.ham2(y, E, L, a);
+    ok('camera tetrad emits null rays (|2H| ≈ 0)', Math.abs(H2) < 1e-12, `|2H| = ${Math.abs(H2).toExponential(1)}`);
+  }
+
+  const allPass = out.every(o => o.pass === '✓');
+  console.groupCollapsed(
+    `%c MAELSTROM %c GR self-test: ${allPass ? 'PASS' : 'FAIL'} — every pixel is an integrated null geodesic `,
+    'background:#ffc66b;color:#1b1206;font-weight:bold', 'background:none;color:inherit');
+  console.table(out);
+  console.groupEnd();
+  const badge = $('selftest-badge');
+  badge.textContent = allPass
+    ? `self-test: ${out.length}/${out.length} PASS ✓ (receipts in console)`
+    : 'self-test: FAILED — see console';
+  badge.style.color = allPass ? 'var(--teal)' : 'var(--red)';
+  return allPass;
+}
+
+/* ============================================================
+   PART III — THE HELM
+   Camera, controls, probe, sound, photographs, the loop.
+   ============================================================ */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduceMotion) S.autoSail = false;
+
+const resetAccum = () => { S.accumN = 0; };
+
+/* ---------- pointer: drag to sail, scroll to approach ---------- */
+const pointers = new Map();
+let pinchDist = 0;
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+canvas.addEventListener('pointerdown', (e) => {
+  if (shooting) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;  // right-click ≠ a hand on the wheel
+  canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 2){
+    const [p1, p2] = [...pointers.values()];
+    pinchDist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    S.camVel.ph = 0; S.camVel.th = 0;   // a pinch shouldn't inherit drag inertia
+  }
+  S.autoSail = false; S.interacting = true;
+  canvas.classList.add('dragging');
+  dismissIntro(); audioStart();
+});
+canvas.addEventListener('pointermove', (e) => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 1){
+    S.camVel.ph = -dx*0.0045;
+    S.camVel.th = -dy*0.0032;
+    S.cam.ph += S.camVel.ph;
+    S.cam.th = clampTh(S.cam.th + S.camVel.th);
+    resetAccum();
+  } else if (pointers.size === 2){
+    const [p1, p2] = [...pointers.values()];
+    const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    if (pinchDist > 0) zoomBy(Math.pow(1.012, pinchDist - d));
+    pinchDist = d;
+  }
+});
+const endPointer = (e) => {
+  pointers.delete(e.pointerId);
+  if (pointers.size === 2){
+    const [p1, p2] = [...pointers.values()];
+    pinchDist = Math.hypot(p1.x - p2.x, p1.y - p2.y);   // 3→2 fingers: re-baseline
+  } else { pinchDist = 0; }
+  if (pointers.size === 0){ S.interacting = false; canvas.classList.remove('dragging'); }
+};
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+canvas.addEventListener('lostpointercapture', endPointer);
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (shooting) return;
+  zoomBy(Math.exp(e.deltaY*0.0011));
+  dismissIntro();
+}, { passive: false });
+
+const clampTh = (th) => Math.min(Math.max(th, 0.04), Math.PI - 0.04);
+function zoomBy(f){
+  S.cam.r = Math.min(Math.max(S.cam.r*f, Math.max(4.2, PHY.horizon(S.a)*2.4)), 80);
+  S.autoSail = false; resetAccum();
+}
+
+/* ---------- keyboard ---------- */
+addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;   // Cmd+P should print, not photograph
+  if (e.target.tagName === 'INPUT') return;
+  if (shooting) return;
+  const k = e.key.toLowerCase();
+  if ($('info').classList.contains('open')){        // modal traps keys: close or nothing
+    if (k === 'i' || k === 'escape') toggleInfo();
+    return;
+  }
+  if (k === ' ' && e.target.tagName === 'BUTTON') return;  // let space press the button
+  if (k === 'arrowleft'){ S.cam.ph -= 0.05; bump(); }
+  else if (k === 'arrowright'){ S.cam.ph += 0.05; bump(); }
+  else if (k === 'arrowup'){ S.cam.th = clampTh(S.cam.th - 0.03); bump(); }
+  else if (k === 'arrowdown'){ S.cam.th = clampTh(S.cam.th + 0.03); bump(); }
+  else if (k === '=' || k === '+'){ zoomBy(0.93); }
+  else if (k === '-' || k === '_'){ zoomBy(1.075); }
+  else if (k === 'h'){ toggleZen(); }
+  else if (k === 'p'){ photograph(); }
+  else if (k === 'd'){ dropProbe(); }
+  else if (k === 's'){ toggleSound(); }
+  else if (k === 'i'){ toggleInfo(); }
+  else if (k === ' '){ e.preventDefault(); S.paused = !S.paused; toast(S.paused ? 'disk flow frozen' : 'disk flow resumed'); resetAccum(); }
+  else return;
+  dismissIntro();
+});
+function bump(){ S.autoSail = false; resetAccum(); }
+
+/* ---------- dock wiring ---------- */
+function bindSlider(id, outId, fmt, apply){
+  const el = $(id), out = $(outId);
+  el.addEventListener('input', () => {
+    if (shooting) return;
+    apply(parseFloat(el.value));
+    out.textContent = fmt(parseFloat(el.value));
+    resetAccum(); dismissIntro();
+  });
+}
+const fmtKm = (xM) => {
+  const v = xM*1.476625*MASSES[S.massIdx].msun;
+  return v >= 1e6 ? `${(v/1e6).toFixed(1)} million km` : v >= 1e3 ? `${(v/1e3).toFixed(0)} thousand km` : `${v.toFixed(0)} km`;
+};
+bindSlider('c-spin', 'o-spin', (v) => v.toFixed(2), (v) => {
+  S.a = v;
+  S.cam.r = Math.max(S.cam.r, Math.max(4.2, PHY.horizon(S.a)*2.4));
+  if (PR.live && !PR.done){
+    // its conserved E and L belong to the old metric — be honest about it
+    PR.done = true;
+    $('p-sig').textContent = 'telemetry void — metric changed';
+    $('p-fate').textContent = 'you altered the spacetime under a falling probe. it forgives you; its data does not.';
+  }
+});
+bindSlider('c-mass', 'o-mass', (v) => MASSES[v|0].label.split(' (')[0], (v) => {
+  S.massIdx = v|0;
+  toast(`a black hole has no scale — the horizon is now ${fmtKm(PHY.horizon(S.a))} across in radius; only the clocks and kilometres care`);
+});
+bindSlider('c-temp', 'o-temp', (v) => `${v|0} K`, (v) => { S.Tpeak = v; });
+bindSlider('c-flow', 'o-flow', (v) => `${v.toFixed(1)}×`, (v) => { S.flow = v; });
+
+function bindPill(id, key){
+  const el = $(id);
+  el.addEventListener('click', () => {
+    if (shooting) return;
+    S[key] = !S[key];
+    el.classList.toggle('on', S[key]);
+    el.setAttribute('aria-pressed', S[key]);
+    resetAccum(); dismissIntro();
+    const lesson = {
+      lensing: ['light sails straight — see how small the shadow becomes', 'light falls again'],
+      beaming: ['beaming off — the headlamp dims; only colour still betrays the motion', 'beaming on — the approaching side blazes'],
+      redshift: ['redshift off — every patch shows its rest-frame colour', 'redshift on — colour follows the photon'],
+      disk: ['the maelstrom, unlit', 'the disk returns'],
+    }[key];
+    if (lesson) toast(S[key] ? lesson[1] : lesson[0]);
+  });
+}
+bindPill('p-lens', 'lensing');
+bindPill('p-beam', 'beaming');
+bindPill('p-shift', 'redshift');
+bindPill('p-disk', 'disk');
+
+$('quality').addEventListener('click', (e) => {
+  if (shooting) return;
+  const b = e.target.closest('button'); if (!b) return;
+  [...$('quality').children].forEach((c) => {
+    c.classList.toggle('on', c === b);
+    c.setAttribute('aria-checked', c === b);
+  });
+  S.quality = +b.dataset.q;
+  const q = QUALITY[S.quality];
+  S.resScale = q.resScale; S.maxSteps = q.maxSteps; S.hScale = q.hScale;
+  resetAccum();
+  try { localStorage.setItem('maelstrom.q', S.quality); } catch {}
+});
+
+/* ---------- zen, info, toast ---------- */
+const dock = $('dock'), stow = $('stow');
+function toggleZen(){
+  S.zen = !S.zen;
+  document.body.classList.toggle('zen', S.zen);
+  stow.classList.toggle('shown', S.zen);
+}
+stow.addEventListener('click', toggleZen);
+let infoReturnFocus = null;
+function toggleInfo(){
+  const opening = !$('info').classList.contains('open');
+  $('info').classList.toggle('open');
+  if (opening){ infoReturnFocus = document.activeElement; $('b-close').focus(); }
+  else if (infoReturnFocus && infoReturnFocus.focus){ infoReturnFocus.focus(); infoReturnFocus = null; }
+}
+$('b-info').addEventListener('click', toggleInfo);
+$('b-close').addEventListener('click', toggleInfo);
+$('info').addEventListener('click', (e) => { if (e.target === $('info')) toggleInfo(); });
+
+let toastTimer = 0;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('shown');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('shown'), 2600);
+}
+
+let introGone = false;
+function dismissIntro(){
+  if (introGone) return;
+  introGone = true;
+  $('intro').classList.add('gone');
+  setTimeout(() => $('intro').remove(), 1600);
+}
+setTimeout(dismissIntro, 8000);
+
+/* ---------- sound: the hull groans, the deep hums ---------- */
+const AU = { ctx: null, master: null, whoosh: null, on: false };
+function toggleSound(){
+  AU.on = !AU.on;
+  $('b-sound').textContent = AU.on ? '🔊 sound' : '🔇 sound';
+  $('b-sound').setAttribute('aria-pressed', AU.on);
+  if (AU.on) audioStart();
+  else if (AU.ctx){
+    const t = AU.ctx.currentTime;
+    // cancel any pending ramp-up, anchor, then fade — else a quick off-toggle
+    // lets the still-scheduled rise un-mute the page
+    AU.master.gain.cancelScheduledValues(t);
+    AU.master.gain.setValueAtTime(AU.master.gain.value, t);
+    AU.master.gain.linearRampToValueAtTime(0, t + 0.4);
+    setTimeout(() => { if (!AU.on && AU.ctx) AU.ctx.suspend().catch(() => {}); }, 500);
+  }
+  try { localStorage.setItem('maelstrom.sound', AU.on ? '1' : '0'); } catch {}
+}
+$('b-sound').addEventListener('click', toggleSound);
+function audioStart(){
+  if (!AU.on) return;
+  if (!AU.ctx){
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    AU.ctx = ctx;
+    AU.master = ctx.createGain(); AU.master.gain.value = 0;
+    AU.master.connect(ctx.destination);
+    // the swell stage: the tidal LFO lives here so the master stays a clean
+    // on/off fader (an LFO summed onto master.gain would defeat the mute)
+    const swell = ctx.createGain(); swell.gain.value = 1.0;
+    swell.connect(AU.master);
+    // the drone: two slow sines a breath apart, under a felt blanket
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 150;
+    lp.connect(swell);
+    for (const [f, g] of [[36.4, 0.06], [54.8, 0.035], [73.1, 0.012]]){
+      const o = ctx.createOscillator(); o.frequency.value = f;
+      const og = ctx.createGain(); og.gain.value = g;
+      o.connect(og); og.connect(lp); o.start();
+    }
+    // slow tidal swell on the drone
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.07;
+    const lfoG = ctx.createGain(); lfoG.gain.value = 0.35;
+    lfo.connect(lfoG); lfoG.connect(swell.gain); lfo.start();
+    // wind off the disk: filtered noise, steered by how hard you sail
+    const len = 2*ctx.sampleRate;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const ch = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++){ last = 0.98*last + 0.02*(Math.random()*2 - 1); ch[i] = last*3.5; }
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 240; bp.Q.value = 0.8;
+    AU.whoosh = ctx.createGain(); AU.whoosh.gain.value = 0;
+    src.connect(bp); bp.connect(AU.whoosh); AU.whoosh.connect(swell); src.start();
+  }
+  AU.ctx.resume().catch(() => {});
+  const t = AU.ctx.currentTime;
+  AU.master.gain.cancelScheduledValues(t);
+  AU.master.gain.setValueAtTime(AU.master.gain.value, t);
+  AU.master.gain.linearRampToValueAtTime(0.65, t + 1.2);
+}
+function audioFrame(speed){
+  if (!AU.ctx || !AU.on || !AU.whoosh) return;
+  const t = AU.ctx.currentTime;
+  const target = Math.min(speed*5, 0.16);
+  AU.whoosh.gain.setTargetAtTime(target, t, 0.12);
+}
+function ping(g){
+  if (!AU.ctx || !AU.on) return;
+  const ctx = AU.ctx, t = ctx.currentTime;
+  const o = ctx.createOscillator(); o.type = 'sine';
+  o.frequency.value = Math.max(740*g, 40);
+  const env = ctx.createGain();
+  env.gain.setValueAtTime(0, t);
+  env.gain.linearRampToValueAtTime(Math.min(0.16*g*g + 0.012, 0.2), t + 0.012);
+  env.gain.exponentialRampToValueAtTime(1e-4, t + 0.55);
+  o.connect(env); env.connect(AU.master);
+  o.start(t); o.stop(t + 0.6);
+}
+
+/* ---------- the probe: two clocks, one truth ---------- */
+const PR = { live: false, y: null, E: 0, L: 0, tau: 0, t: 0, r0: 0, rate: 1, lastPing: 0, done: false };
+$('b-probe').addEventListener('click', () => { dropProbe(); dismissIntro(); });
+function dropProbe(){
+  const a = S.a, r0 = S.cam.r, th0 = clampTh(S.cam.th);
+  // released at rest from your mooring: u = (u^t, 0, 0, 0)
+  const sn = Math.sin(th0), s2 = Math.max(sn*sn, 1e-12);
+  const r2 = r0*r0, Sg = r2 + a*a*Math.cos(th0)**2;
+  const g_tt = -(1 - 2*r0/Sg);
+  const g_tph = -2*a*r0*s2/Sg;
+  if (g_tt >= 0){ toast('too deep to hover — sail out before launching'); return; }
+  const ut = 1/Math.sqrt(-g_tt);
+  PR.live = true; PR.done = false;
+  PR.y = { r: r0, th: th0, ph: S.cam.ph, pr: 0, pth: 0 };
+  PR.E = -g_tt*ut;          // E = −p_t
+  PR.L = g_tph*ut;          // the price of having hovered in dragged space
+  PR.tau = 0; PR.t = 0; PR.tYou = 0; PR.r0 = r0; PR.lastPing = 0;
+  // pace the plunge to ~18 wall-seconds, whatever the drop height
+  PR.rate = Math.max((Math.PI/2)*Math.pow(r0, 1.5)/Math.SQRT2/18, 0.5);
+  $('probe').classList.add('live');
+  $('p-fate').textContent = 'probe away. it feels nothing unusual.';
+  toast('probe away — watch the two clocks');
+  ping(1);
+}
+function probeStep(dt){
+  if (!PR.live || PR.done) return;
+  const a = S.a, rh = PHY.horizon(a);
+  const mc = PHY.inv(S.cam.r, S.cam.th, a);
+  const alphaCam = Math.sqrt(Math.max(mc.Sg*mc.Dl/mc.Aa, 1e-9));
+  let dTau = PR.rate*dt;
+  while (dTau > 0 && !PR.done){
+    const h = Math.min(0.02, dTau, Math.max(0.0005, 0.05*(PR.y.r - rh)));
+    const dtCoord = PHY.rk4(PR.y, h, PR.E, PR.L, a);   // timelike: same field equations
+    PR.t += dtCoord;
+    PR.tYou += alphaCam*dtCoord;   // YOUR wristwatch: dτ_cam = α·dt for a hovering camera
+    PR.tau += h; dTau -= h;
+    if (PR.y.r - rh < 5e-3){ PR.done = true; }
+  }
+  // signal redshift: radial photon from probe to your ZAMO mooring
+  const m = PHY.inv(PR.y.r, PR.y.th, a);
+  const prPh = Math.sqrt(Math.max(-m.gtt/m.grr, 0));     // outgoing, L=0, E_ph=1
+  const uT = -m.gtt*PR.E + m.gtph*PR.L;                  // u^t = −g^tt E + g^tφ L
+  const uR = m.grr*PR.y.pr;
+  const nuEm = uT - prPh*uR;
+  const g = Math.max((1/alphaCam)/Math.max(nuEm, 1e-9), 0);
+
+  // panel
+  const ms = MASSES[S.massIdx].msun;
+  $('p-tau').textContent = fmtTime(PR.tau, ms);
+  $('p-t').textContent = PR.done ? '∞ (frozen)' : fmtTime(PR.tYou, ms);
+  $('p-r').textContent = `${PR.y.r.toFixed(2)} M  (${(PR.y.r/2).toFixed(2)} r_s)`;
+  $('pgauge').style.width = `${Math.min(100, 100*(PR.r0 - PR.y.r)/(PR.r0 - rh))}%`;
+  const dot = $('pdot');
+  const hue = Math.max(0, Math.min(1, g));
+  dot.style.background = `rgb(${255 - 130*hue}, ${60 + 130*hue}, ${80 + 100*hue})`;
+  dot.style.boxShadow = `0 0 8px rgb(${255 - 130*hue}, ${60 + 130*hue}, ${80 + 100*hue})`;
+  if (PR.done){
+    $('p-sig').textContent = 'signal lost below the horizon';
+    $('p-fate').textContent = 'its clock kept ticking. yours never saw it cross. neither clock lied.';
+  } else {
+    $('p-sig').textContent = `signal shift 1+z = ${(1/Math.max(g, 1e-4)).toFixed(2)}`;
+    if (PR.y.r < PHY.isco(a) && PR.y.r > PHY.photonOrbit(a, true))
+      $('p-fate').textContent = 'inside the last stable orbit — no engine could hover now.';
+    else if (PR.y.r <= PHY.photonOrbit(a, true))
+      $('p-fate').textContent = 'inside the photon sphere. even light only orbits here briefly.';
+  }
+  // pings, spaced by the probe's own clock, heard through stretched time
+  if (!PR.done && PR.tau - PR.lastPing > 1.6){ PR.lastPing = PR.tau; ping(Math.min(g, 1.2)); }
+}
+function fmtTime(tGeo, msun){
+  let s = tGeo*4.925490947e-6*msun;   // GM/c³ per solar mass
+  const units = [[86400, 'd'], [3600, 'h'], [60, 'm']];
+  if (s >= 60){
+    for (const [k, u] of units) if (s >= k) return `${(s/k).toFixed(1)} ${u}`;
+  }
+  if (s >= 1) return `${s.toFixed(2)} s`;
+  if (s >= 1e-3) return `${(s*1e3).toFixed(2)} ms`;
+  return `${(s*1e6).toFixed(1)} µs`;
+}
+
+/* ---------- photographs ---------- */
+let shooting = false;
+async function photograph(){
+  if (shooting) return;
+  shooting = true;
+  toast('developing long-exposure photograph…');
+  const wasPaused = S.paused;
+  S.paused = true; resetAccum();
+  // rAF never fires in a hidden tab — race it with a timeout so a
+  // backgrounded photograph can't wedge the shutter open
+  const nextFrame = () => new Promise((r) => {
+    const t = setTimeout(r, 300);
+    requestAnimationFrame(() => { clearTimeout(t); r(); });
+  });
+  await nextFrame();
+  for (let burst = 0; burst < 6; burst++){
+    for (let i = 0; i < 8; i++) renderFrame(performance.now());
+    await nextFrame();
+  }
+  renderFrame(performance.now());
+  canvas.toBlob((blob) => {
+    if (blob){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `maelstrom-a${S.a.toFixed(2)}-${Date.now()}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast('photograph saved — light, as it actually fell');
+    }
+    S.paused = wasPaused;
+    shooting = false;
+  }, 'image/png');
+}
+$('b-photo').addEventListener('click', () => { photograph(); dismissIntro(); });
+
+/* ---------- telemetry ---------- */
+let fpsEma = 60, frameMsEma = 16, lastTelem = 0, autoTick = 0;
+function telemetry(now){
+  if (now - lastTelem < 250) return;
+  lastTelem = now;
+  const ms = MASSES[S.massIdx];
+  const kmPerM = 1.476625*ms.msun;     // GM/c² in km, per solar mass
+  const km = (xM) => {
+    const v = xM*kmPerM;
+    return v >= 1e6 ? `${(v/1e6).toFixed(1)}M km` : v >= 1e3 ? `${(v/1e3).toFixed(0)}k km` : `${v.toFixed(0)} km`;
+  };
+  $('t-mass').textContent = ms.label;
+  $('t-spin').textContent = S.a.toFixed(3);
+  $('t-horizon').textContent = `${PHY.horizon(S.a).toFixed(2)} M · ${km(PHY.horizon(S.a))}`;
+  $('t-isco').textContent = `${PHY.isco(S.a).toFixed(2)} M · ${km(PHY.isco(S.a))}`;
+  $('t-ph').textContent = `${PHY.photonOrbit(S.a, true).toFixed(2)} / ${PHY.photonOrbit(S.a, false).toFixed(2)} M`;
+  $('t-cam').textContent = `${S.cam.r.toFixed(1)} M (${(S.cam.r/2).toFixed(1)} r_s)`;
+  $('t-inc').textContent = `${(90 - S.cam.th*180/Math.PI).toFixed(0)}°`;
+  $('t-res').textContent = rt ? `${rt.scene.w}×${rt.scene.h} (${Math.round(100*rt.scene.w/canvas.width)}%)` : '—';
+  $('t-fps').textContent = fpsEma.toFixed(0);
+  $('t-acc').textContent = S.accumN > 1 ? `long exposure ×${S.accumN}` : 'live';
+}
+
+/* ---------- the loop ---------- */
+let lastNow = 0;
+function loop(now){
+  requestAnimationFrame(loop);
+  const raw = (now - lastNow)/1000;
+  const dt = Math.min(raw, 0.1) || 0.016;
+  lastNow = now;
+  if (shooting) return;          // photograph() drives its own frames
+
+  // frame-time bookkeeping — but a tab waking from the background reports
+  // one giant fake frame; feeding it to the EMA would trigger a phantom
+  // auto-quality downscale
+  if (raw < 0.25){
+    const ms = raw*1000;
+    frameMsEma = frameMsEma*0.92 + ms*0.08;
+    fpsEma = fpsEma*0.92 + (1000/Math.max(ms, 1))*0.08;
+  }
+
+  // auto quality: a vsync-aware ratchet. rAF deltas sit at ~16.7 ms when all
+  // is well, so "holding 60" means upscale slowly; real drops downscale fast.
+  if (S.quality === 1 && ++autoTick % 45 === 0){
+    if (frameMsEma > 22 && S.resScale > 0.34){ S.resScale *= 0.85; }
+    else if (frameMsEma < 17.4 && S.resScale < 0.92){ S.resScale *= 1.06; }
+  }
+
+  // gentle drift until the first hand takes the wheel
+  if (S.autoSail){
+    S.cam.ph += dt*0.028;
+    S.cam.th = clampTh(1.37 + 0.05*Math.sin(now*0.00009));
+    resetAccum();
+  }
+  // inertia after release
+  if (!S.interacting && !S.autoSail){
+    S.camVel.ph *= 0.93; S.camVel.th *= 0.93;
+    if (Math.abs(S.camVel.ph) > 1e-4 || Math.abs(S.camVel.th) > 1e-4){
+      S.cam.ph += S.camVel.ph;
+      S.cam.th = clampTh(S.cam.th + S.camVel.th);
+      resetAccum();
+    }
+  }
+  // the disk turns; the picture is a movie, not a still
+  if (!S.paused && S.flow > 0 && S.disk){
+    S.diskTime += dt*S.flow*2.6;
+    resetAccum();
+  }
+
+  allocTargets();
+  renderFrame(now);
+  probeStep(dt);
+  audioFrame(Math.abs(S.camVel.ph) + Math.abs(S.camVel.th) + (S.interacting ? 0.01 : 0));
+  telemetry(now);
+}
+
+/* ---------- shove off ---------- */
+try {
+  const q = localStorage.getItem('maelstrom.q');
+  if (q !== null && QUALITY[+q]){
+    S.quality = +q;
+    const qq = QUALITY[S.quality];
+    S.resScale = qq.resScale; S.maxSteps = qq.maxSteps; S.hScale = qq.hScale;
+    [...$('quality').children].forEach((c) => c.classList.toggle('on', +c.dataset.q === S.quality));
+  }
+  if (localStorage.getItem('maelstrom.sound') === '1'){
+    // restore the flag and the label only — the AudioContext waits for a
+    // real gesture, or autoplay policy leaves it mute with a lying icon
+    AU.on = true;
+    $('b-sound').textContent = '🔊 sound';
+    $('b-sound').setAttribute('aria-pressed', 'true');
+    const wake = () => audioStart();
+    addEventListener('pointerdown', wake, { once: true });
+    addEventListener('keydown', wake, { once: true });
+  }
+} catch {}
+
+// touch devices pinch; only mice scroll
+if (matchMedia('(pointer: coarse)').matches){
+  const hint = document.querySelector('#intro .hint');
+  if (hint) hint.textContent = 'drag to sail · pinch to approach';
+  canvas.setAttribute('aria-label', 'Black hole renderer. Drag to orbit, pinch to approach.');
+}
+
+canvas.addEventListener('webglcontextlost', (e) => {
+  e.preventDefault();
+  let lost = 0;
+  try {
+    lost = (+sessionStorage.getItem('maelstrom.ctxlost') || 0) + 1;
+    sessionStorage.setItem('maelstrom.ctxlost', lost);
+  } catch {}
+  if (lost > 2){ $('nogl').classList.add('shown'); return; }   // a flapping GPU: stop reloading
+  toast('the GPU went under — refitting…');
+  setTimeout(() => location.reload(), 800);
+});
+
+allocTargets();
+requestAnimationFrame(loop);
+setTimeout(selfTest, 400);
+</script>
+</body>
+</html>
