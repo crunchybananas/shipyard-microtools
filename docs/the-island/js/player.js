@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { clamp, lerp } from './util.js';
-import { walkableY, wallBlocked } from './terrain.js';
+import { walkableY, wallBlocked, heightAt } from './terrain.js';
 import { W, waterY } from './world.js';
 
 export class Player {
@@ -91,7 +91,20 @@ export class Player {
       const thereY = walkableY(nx, nz);
       if (thereY - hereY > 1.05) return false;          // too steep a step up
       if (hereY - thereY > 2.2) return false;           // no leaping off cliffs
-      if (thereY < waterY() - 0.5) return false;        // the sea refuses you
+      // natural slopes steeper than ~53° are unclimbable (cliffs, the bluff,
+      // chasm walls) — structures (bridge, stairs, pads) are exempt because
+      // their walkable height diverges from the raw terrain
+      const tHere = heightAt(this.pos.x, this.pos.z), tThere = heightAt(nx, nz);
+      const structural = Math.abs(hereY - tHere) > 0.4 || Math.abs(thereY - tThere) > 0.4;
+      if (!structural) {
+        const stride = Math.max(Math.hypot(nx - this.pos.x, nz - this.pos.z), 1e-4);
+        if ((tThere - tHere) / stride > 1.35) return false;
+      }
+      // the sea refuses you — but if the tide caught you, wade out
+      if (thereY < waterY() - 0.5) {
+        if (hereY >= waterY() - 0.45) return false;        // no walking in
+        if (thereY < hereY - 0.05) return false;           // submerged: only upslope
+      }
       if (wallBlocked(this.pos.x, this.pos.z, nx, nz)) return false;
       return true;
     };

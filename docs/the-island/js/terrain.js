@@ -27,8 +27,8 @@ const LIGHTHOUSE_H = 13.5;
 const STONES_H = 8.8;
 const HATCH_H = 23.5;
 export const BRIDGE_DECK = 18.45;
-const BRIDGE_W = new THREE.Vector2(36, 25);
-const BRIDGE_E = new THREE.Vector2(58, 25);
+const BRIDGE_W = new THREE.Vector2(35, 25);
+const BRIDGE_E = new THREE.Vector2(59, 25);
 
 function distSeg(px, pz, ax, az, bx, bz) {
   const abx = bx - ax, abz = bz - az;
@@ -60,10 +60,12 @@ export function heightAt(x, z) {
   }
 
   // ---- east bluff (steep plateau, cliff on its west flank) ----
+  // edges deliberately steeper than the 1.35 climb limit: the only way up
+  // is the carved bridge pad. The ruler IS the route.
   {
     const dx = x - SPOTS.bluff.x, dz = z - SPOTS.bluff.y;
     const d = Math.sqrt(dx * dx + dz * dz * 0.8) / 64;
-    const m = 1 - smoothstep(0.52, 0.95, d);
+    const m = 1 - smoothstep(0.58, 0.76, d);
     if (m > 0) {
       const strata = fbm(x * 0.05, z * 0.05, 3) * 2;
       const hh = Math.pow(m, 0.6) * 25 + strata * m - 2;
@@ -91,10 +93,12 @@ export function heightAt(x, z) {
   }
 
   // ---- the chasm: a crack splitting bluff from main island ----
+  // long enough that both ends drown below the lowest tide; walls steeper
+  // than the climb limit — without the ruler there is no crossing
   {
-    const d = distSeg(x, z, 46, -28, 47, 84);
+    const d = distSeg(x, z, 46, -55, 47, 112);
     const wobble = fbm(z * 0.04, x * 0.04, 2) * 3;
-    const mask = 1 - smoothstep(4 + wobble, 11 + wobble, d);
+    const mask = 1 - smoothstep(4 + wobble, 9 + wobble, d);
     if (mask > 0) h = lerp(h, Math.min(h, -8.5), Math.pow(mask, 1.3));
   }
 
@@ -102,9 +106,21 @@ export function heightAt(x, z) {
   h = padFlatten(h, x, z, SPOTS.lighthouse, 11, LIGHTHOUSE_H);
   h = padFlatten(h, x, z, SPOTS.stones, 13, STONES_H);
   h = padFlatten(h, x, z, SPOTS.hatch, 8, HATCH_H);
-  // bridge approach pads on either rim of the chasm
-  h = padFlatten(h, x, z, BRIDGE_W, 7, BRIDGE_DECK - 0.45);
-  h = padFlatten(h, x, z, BRIDGE_E, 7, BRIDGE_DECK - 0.45);
+  // bridge approach pads: small radius so their skirts never refill the
+  // chasm floor between them (influence ends ~9m out; the crack is ~11m away)
+  h = padFlatten(h, x, z, BRIDGE_W, 5, BRIDGE_DECK - 0.45);
+  h = padFlatten(h, x, z, BRIDGE_E, 5, BRIDGE_DECK - 0.45);
+
+  // ramp corridor: the one walkable way up from the bridge onto the plateau
+  {
+    const ax = 59, az = 25, bx = 80, bz = 29;
+    const d = distSeg(x, z, ax, az, bx, bz);
+    if (d < 8) {
+      const t = clamp(((x - ax) * (bx - ax) + (z - az) * (bz - az)) / ((bx - ax) ** 2 + (bz - az) ** 2), 0, 1);
+      const rampH = (BRIDGE_DECK - 0.45) + t * (24.2 - (BRIDGE_DECK - 0.45));
+      h = lerp(rampH, h, smoothstep(2.5, 8, d));
+    }
+  }
 
   // ---- beach: soften everything low near the south shore, keep it dry sand ----
   {
@@ -136,22 +152,24 @@ export function walkableY(x, z) {
   // ruler bridge across the chasm
   if (W.flags.rulerPlaced) {
     const bz = SPOTS.chasmBridgeZ;
-    if (Math.abs(z - bz) < 2.1 && x > 35 && x < 59) {
+    if (Math.abs(z - bz) < 2.1 && x > 34 && x < 60) {
       return BRIDGE_DECK; // deck height, rim-to-rim
     }
   }
 
-  // the vault under the bluff (stairs + room)
+  // the vault under the bluff: enter THROUGH the open hole, stairs run south
   if (W.flags.hatchOpen) {
     const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y;
     const lx = x - hx, lz = z - hz;
-    // stair shaft: descends southward from the hatch
-    if (lx > -1.6 && lx < 1.6 && lz < -1.2 && lz > -9.5) {
-      const t = clamp((-lz - 1.2) / 7.2, 0, 1);
-      return HATCH_H - t * 5.2;
+    // stair ramp: top inside the hole's north half, descending southward
+    if (lx > -1.6 && lx < 1.6 && lz < 1.0 && lz > -8.6) {
+      const t = clamp((1.0 - lz) / 7.0, 0, 1);
+      return HATCH_H - 0.1 - t * 5.1;
     }
+    // remainder of the open hole is a pit, not invisible ground
+    if (Math.hypot(lx, lz) < 1.25) return HATCH_H - 5.2;
     // room
-    if (lx > -4.5 && lx < 4.5 && lz < -9.5 && lz > -17) {
+    if (lx > -4.5 && lx < 4.5 && lz < -8.6 && lz > -17) {
       return HATCH_H - 5.2;
     }
   }
@@ -271,16 +289,17 @@ export function buildTerrain() {
 
 // height texture for the water shader (depth → color/foam)
 export function buildHeightTexture() {
+  // half-float: linear filtering of fp16 is core WebGL2; fp32 linear is not
   const N = 256;
-  const data = new Float32Array(N * N);
+  const data = new Uint16Array(N * N);
   for (let j = 0; j < N; j++) {
     for (let i = 0; i < N; i++) {
       const x = (i / (N - 1) - 0.5) * DOMAIN;
       const z = (j / (N - 1) - 0.5) * DOMAIN;
-      data[j * N + i] = heightAt(x, z);
+      data[j * N + i] = THREE.DataUtils.toHalfFloat(heightAt(x, z));
     }
   }
-  const tex = new THREE.DataTexture(data, N, N, THREE.RedFormat, THREE.FloatType);
+  const tex = new THREE.DataTexture(data, N, N, THREE.RedFormat, THREE.HalfFloatType);
   tex.magFilter = THREE.LinearFilter;
   tex.minFilter = THREE.LinearFilter;
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;

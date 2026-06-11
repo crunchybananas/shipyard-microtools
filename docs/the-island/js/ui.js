@@ -26,6 +26,9 @@ export const UI = {
 
   // ---- whisper: one quiet italic line at a time ----
   whisper(text, holdMs = 4200) {
+    if (this.whisperEl.textContent === text && this.whisperEl.classList.contains('show')) return;
+    if (this._whisperQueue.some((w) => w.text === text)) return;
+    if (this._whisperQueue.length >= 3) this._whisperQueue.shift();
     this._whisperQueue.push({ text, holdMs });
     if (!this._whisperTimer) this._nextWhisper();
   },

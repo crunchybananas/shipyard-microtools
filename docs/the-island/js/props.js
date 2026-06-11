@@ -622,7 +622,7 @@ export function buildWorld() {
     const deck = new THREE.Group();
     deck.name = 'rulerWorld';
     deck.visible = false;
-    const big = new THREE.Mesh(new THREE.BoxGeometry(26, 1.0, 4.4), matBrassSolid);
+    const big = new THREE.Mesh(new THREE.BoxGeometry(28, 1.0, 4.4), matBrassSolid);
     big.position.set(47, 17.95, SPOTS.chasmBridgeZ);
     big.castShadow = true;
     deck.add(big);
@@ -631,7 +631,7 @@ export function buildWorld() {
     for (let i = 0; i <= 16; i++) {
       const mark = new THREE.Mesh(new THREE.PlaneGeometry(0.18, i % 2 ? 1.0 : 1.9), markMat);
       mark.rotation.x = -Math.PI / 2;
-      mark.position.set(35 + i * 1.5, 18.47, SPOTS.chasmBridgeZ - 1.2 + (i % 2 ? 0.4 : 0.85));
+      mark.position.set(34.2 + i * 1.6, 18.47, SPOTS.chasmBridgeZ - 1.2 + (i % 2 ? 0.4 : 0.85));
       deck.add(mark);
     }
     core.add(deck);
@@ -685,10 +685,10 @@ export function buildWorld() {
     const room = new THREE.Mesh(new THREE.BoxGeometry(9.4, 4.45, 8.4), cm);
     room.position.set(hx, hy - 3.03, hz - 13.6);
     cellar.add(room);
-    // stairs (visual steps)
-    for (let i = 0; i < 9; i++) {
-      const st = new THREE.BoxGeometry(3.0, 0.35, 0.8);
-      stone.add(st, place(hx, hy - 0.4 - i * 0.55, hz - 1.6 - i * 0.85), grad(C.stoneOld, C.boneDark));
+    // stairs (visual steps) — match the walkable ramp from inside the hole
+    for (let i = 0; i < 10; i++) {
+      const st = new THREE.BoxGeometry(3.0, 0.35, 0.95);
+      stone.add(st, place(hx, hy - 0.45 - i * 0.53, hz + 0.4 - i * 0.92), grad(C.stoneOld, C.boneDark));
       st.dispose();
     }
     // pedestal + plumb bob
@@ -1005,7 +1005,7 @@ export function instantiateModel(core, modelAnchor) {
 const NAMES = [
   'water', 'lampLens', 'beamPivot', 'beamCone', 'shaftBeam', 'valveWheel',
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
-  'innerDoor', 'plumbHung', 'plumbBob', 'vaultDoor', 'lensItem', 'chestLid',
+  'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',

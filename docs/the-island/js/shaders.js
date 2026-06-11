@@ -96,7 +96,8 @@ export function makeWaterMaterial(heightTex, domain) {
       ${GLSL_NOISE}
 
       void main() {
-        vec2 uv = vLocal.xz / uDomain + 0.5;
+        // vertex-registered data: remap so texel centers land on grid points
+        vec2 uv = (vLocal.xz / uDomain + 0.5) * (255.0 / 256.0) + 0.5 / 256.0;
         float terrainH = texture2D(uHeightTex, uv).r;
         float depth = vLocal.y - terrainH;
         if (depth < 0.02) discard;

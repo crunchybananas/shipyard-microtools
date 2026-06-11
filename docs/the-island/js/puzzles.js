@@ -36,7 +36,6 @@ export class Game {
     this.stoneSeq = [];
     this.birdTimer = 8; // sing soon after dawn arrives
     this.boxPlaying = false;
-    this._once = new Set(W.journal.map((j) => j.text)); // restored one-times
 
     this._buildHotspots(modelAnchor);
   }
@@ -48,9 +47,12 @@ export class Game {
     return true;
   }
 
+  // one-time beats, persisted so reloads don't replay cinematics
   once(key, fn) {
-    if (this._once.has(key)) return;
-    this._once.add(key);
+    W.onceKeys = W.onceKeys || [];
+    if (W.onceKeys.includes(key)) return;
+    W.onceKeys.push(key);
+    save(this.player.pos);
     fn();
   }
 
@@ -240,9 +242,12 @@ export class Game {
       },
     });
 
-    // the hook above the chart table
+    // the hook above the chart table (plus a fat invisible proxy — the torus is tiny)
+    const hookProxy = Interactions.proxy(0.45);
+    hookProxy.position.copy(R.plumbHook.position);
+    R.plumbHook.parent.add(hookProxy);
     I.add({
-      id: 'hook', targets: [this.refs.plumbHung.parent.getObjectByName('plumbHook') || R.plumbHung], label: 'the plumb hook', maxDist: 5,
+      id: 'hook', targets: [R.plumbHook, hookProxy], label: 'the plumb hook', maxDist: 6,
       when: () => W.flags.plumbTaken && !W.flags.plumbHung,
       onClick: () => {
         this.flag('plumbHung');
@@ -268,10 +273,12 @@ export class Game {
 
     // the bell — the end
     I.add({
-      id: 'bell', targets: [R.bell], label: 'a small bright bell',
+      id: 'bell', targets: [R.bell], label: 'a small bright bell', maxDist: 2.2,
       when: () => W.level >= 2,
       onClick: () => {
-        if (W.flags.bellRung) return;
+        // session-local guard: a reload during the finale must allow re-ringing
+        if (this._bellBusy) return;
+        this._bellBusy = true;
         this.flag('bellRung');
         this.onFinale();
       },

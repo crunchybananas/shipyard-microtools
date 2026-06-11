@@ -56,11 +56,36 @@ export class Interactions {
         this._pending = null;
       }
     });
+
+    // releasing the button outside the window must not latch the drag
+    const dropDrag = () => {
+      if (this.activeDrag) {
+        this.activeDrag.spot.onDragEnd?.();
+        this.activeDrag = null;
+        this.player.dragCaptured = false;
+        this.iris.classList.remove('drag');
+      }
+      this._pending = null;
+    };
+    window.addEventListener('pointercancel', dropDrag);
+    window.addEventListener('blur', dropDrag);
   }
 
   add(spot) {
     spot.maxDist = spot.maxDist ?? 4.5;
     spot.type = spot.type ?? 'click';
+    // glintable meshes get a private material so the hover highlight can't
+    // bleed across every prop sharing a module-level material (both islands!)
+    if (!spot.noGlint) {
+      for (const t of spot.targets) {
+        t.traverse((o) => {
+          if (o.material && o.material.emissive !== undefined && !o.userData.glintMat) {
+            o.material = o.material.clone();
+            o.userData.glintMat = true;
+          }
+        });
+      }
+    }
     this.hotspots.push(spot);
     return spot;
   }
@@ -97,9 +122,10 @@ export class Interactions {
 
   _setHover(spot) {
     if (spot === this.hovered) return;
-    // restore old glint
+    // restore old glint: both the emissive color and its intensity
     for (const [mat, orig] of this._glinted) {
-      if (mat.emissiveIntensity !== undefined) mat.emissiveIntensity = orig;
+      mat.emissive.setHex(orig.hex);
+      mat.emissiveIntensity = orig.intensity;
     }
     this._glinted.clear();
     this.hovered = spot;
@@ -109,7 +135,7 @@ export class Interactions {
         t.traverse((o) => {
           const mat = o.material;
           if (mat && mat.emissive !== undefined && !this._glinted.has(mat)) {
-            this._glinted.set(mat, mat.emissiveIntensity ?? 1);
+            this._glinted.set(mat, { hex: mat.emissive.getHex(), intensity: mat.emissiveIntensity ?? 1 });
             if (mat.emissive.r + mat.emissive.g + mat.emissive.b < 0.01) mat.emissive.setHex(0xffb454);
             mat.emissiveIntensity = Math.max(0.25, (mat.emissiveIntensity ?? 1) * 1.6);
           }

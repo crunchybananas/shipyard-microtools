@@ -165,7 +165,9 @@ btnBegin.addEventListener('click', () => {
 btnContinue.addEventListener('click', () => {
   A.init();
   if (load()) {
-    for (let n = 1; n <= W.stems; n++) A.addStem(n);
+    // stems restore from the flags that earned them, not a counter
+    const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen' };
+    for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
     titleEl.classList.add('fading');
     const pos = W.playerPos || new THREE.Vector3(4, 0, -104);
     player.spawn(pos, 2.72);
@@ -311,6 +313,10 @@ function tickFinale(dt) {
 // ---------------- per-frame: grade → everything ----------------
 const _sunV = new THREE.Vector3();
 const _moonV = new THREE.Vector3();
+const MOONLIGHT = new THREE.Color(0x9fb8d9);
+const swayMats = ['grass', 'canopies']
+  .map((n) => core.children.find((o) => o.name === n)?.material)
+  .filter(Boolean);
 let flash = 0, prevEl = sunElevation(W.time), introCamA = new THREE.Vector3(), introCamB = new THREE.Vector3();
 let saveTimer = 0;
 
@@ -331,7 +337,7 @@ function applyAtmosphere(elapsed, dt) {
   const lightDir = night > 0.6 && moonUp ? _moonV : _sunV;
   sun.position.copy(camera.position).addScaledVector(lightDir, 220);
   sun.target.position.copy(camera.position);
-  sun.color.copy(night > 0.6 ? new THREE.Color(0x9fb8d9) : g.sunCol);
+  sun.color.copy(night > 0.6 ? MOONLIGHT : g.sunCol);
   sun.intensity = night > 0.6 ? 0.5 * night : g.sunInt * 2.6 * clamp((el + 0.06) / 0.2, 0.05, 1);
 
   hemi.color.copy(g.hemiSky);
@@ -389,9 +395,8 @@ function applyAtmosphere(elapsed, dt) {
   for (const r of [refs.beamCone, refs.shaftBeam]) {
     if (r?.material?.uniforms) r.material.uniforms.uTime.value = elapsed;
   }
-  for (const name of ['grass', 'canopies']) {
-    const m = core.getObjectByName(name);
-    const sh = m?.material?.userData?.shader;
+  for (const m of swayMats) {
+    const sh = m.userData.shader;
     if (sh) sh.uniforms.uTime.value = elapsed;
   }
 

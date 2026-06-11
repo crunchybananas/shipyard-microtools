@@ -282,7 +282,13 @@ const A = {
     wet.gain.setTargetAtTime(0.0001, t0 + durSec * 0.85, 1.2);
     const notes = [220, 329.63, 440, 523.25, 659.25, 880];
     notes.forEach((f, i) => this.pluck(f, i * (durSec / 8), 0.12, 2.5));
-    setTimeout(() => { try { old.disconnect(feed); } catch (_) {} }, (durSec + 6) * 1000);
+    setTimeout(() => {
+      try {
+        old.disconnect(feed);
+        fb.gain.value = 0;
+        feed.disconnect(); del.disconnect(); fb.disconnect(); wet.disconnect();
+      } catch (_) {}
+    }, (durSec + 8) * 1000);
   },
 };
 

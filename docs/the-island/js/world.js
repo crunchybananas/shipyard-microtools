@@ -45,6 +45,8 @@ export const W = {
   stems: 0,              // musical layers earned (0..5)
   inventory: [],         // 'ruler' | 'lens' | 'plumb'
   journal: [],           // [{text, sketch}]
+  onceKeys: [],          // one-time cinematics already played
+  dials: [0, 0, 0, 0],   // hatch glyph dials
   playerPos: null,       // saved position
   level: 1,
 };
@@ -144,6 +146,7 @@ export function save(playerPos) {
       time: W.time, tide: W.tideTarget, lensPlaced: W.lensPlaced,
       beamAngle: W.beamAngle, flags: W.flags, stems: W.stems,
       inventory: W.inventory, journal: W.journal, level: W.level,
+      onceKeys: W.onceKeys, dials: W.dials,
       pos: playerPos ? [playerPos.x, playerPos.y, playerPos.z] : null,
     }));
   } catch (_) { /* private mode: the island forgets */ }
@@ -162,6 +165,8 @@ export function load() {
     W.stems = s.stems ?? 0;
     W.inventory = s.inventory || [];
     W.journal = s.journal || [];
+    W.onceKeys = s.onceKeys || [];
+    W.dials = Array.isArray(s.dials) && s.dials.length === 4 ? s.dials : [0, 0, 0, 0];
     W.level = s.level ?? 1;
     // a save written mid-dive has dove=true but level 1 — land the dive
     if (W.flags.dove && W.level < 2) W.level = 2;
