@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 6 — 2026-06-12 — puzzle clarity (the stones face their players)
+
+**Shipped:** The music glyphs were not "too subtle" — they were on the
+WRONG FACES. Stone rotation puts local +z toward the arc center; the
+glyphs sat at local −z, etched for an audience of open sea. Flipped to
+the inner faces, given the cellar-carve treatment (0.78 size and opacity,
+soft halo), named `stoneMark0–4` (added to NAMES), and wired in `_apply`
+to pulse to full brightness while that stone's tone sings (rides the
+existing `an.stoneGlow` envelope — post-solve clicks still pulse, so the
+instrument keeps feeling alive after the puzzle).
+
+**Evidence:** dawn arc-center before (five blank monoliths, bird hovering)
+vs after (all five glyphs reading: sight, triangle, wave, arrow, ring);
+golden-hour after (read on sun-warmed faces — dawn-shade and golden-light
+bracket noon); real-input projection click on stone 2 → screenshot caught
+the mid-pulse flood with the wave glyph at white heat, numerics
+stoneGlow 0.973 → mark opacity 0.994 (= 0.78 + 0.973×0.22), birdSolved
+flag untouched. Zero console errors, +5 draws (halos). Preview server had
+died between ticks — restarted from the launch config; owner save (browser
+localStorage) unaffected, restored & re-saved after testing.
+
+**Debt:** none added.
+
+**Next tick suggestion:** the intro dolly underuses the sea (backlog) —
+the approach should skim wave-top with spray before rising to the beach,
+title timing breathing more. It's every player's first 19 seconds and the
+only first impression the game gets; cinematics axis untouched so far.
+Verify by autostart-reloading with the skip DISARMED (watch the full
+dolly at least once), screenshots at 3-4 beats along the path.
+
+---
+
 ## 5 — 2026-06-12 — story/worldbuilding (the cartographer's marginalia)
 
 **Shipped:** First story beat: the cartographer annotated their own model.
@@ -256,8 +288,8 @@ nothing may break it.
   cone); could use a soft volumetric impostor or inner cone.
 - ~~Cellar is flat~~ — fixed in iteration 4 (fill light, carve halo, light
   shaft, motes).
-- **Stone glyphs barely visible** — the etched music glyphs on the standing
-  stones are too subtle to serve as the clue they are.
+- ~~Stone glyphs barely visible~~ — fixed in iteration 6: they were facing
+  the open sea; flipped inboard, brightened, halo'd, tone-pulsed.
 - **Trees pop flat at distance** — no LOD/imposters; distant canopies could
   be cheaper AND prettier (billboard ring?).
 - **Gulls are two quads** — fine at range, comic up close; they also never

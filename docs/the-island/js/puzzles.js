@@ -472,6 +472,8 @@ export class Game {
     for (let i = 0; i < 5; i++) {
       const shell = R[`stoneGlow${i}`];
       if (shell && !isModel) shell.material.opacity = an.stoneGlow[i] * 0.55;
+      const mk = R[`stoneMark${i}`];
+      if (mk && !isModel) mk.material.opacity = 0.78 + an.stoneGlow[i] * 0.22;
     }
 
     if (R.lampLens) {

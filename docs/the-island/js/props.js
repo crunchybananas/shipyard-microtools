@@ -557,11 +557,20 @@ export function buildWorld() {
       shell.name = `stoneGlow${i}`;
       m.add(shell);
 
-      // carved music glyph: i dots
-      const gl = glyphSprite(atlas, [0, 4, 2, 1, 7][i], 0x9adfca, 0.55);
-      gl.position.set(0, 0.4, -0.42);
-      gl.material.opacity = 0.5;
+      // carved music glyph: i dots — etched to read as the clue it is
+      // (cellar-carve treatment: bigger, brighter, soft halo), named so
+      // _apply can pulse it while the stone's tone sings, and on the
+      // INNER face: local +z points at the arc center where the player
+      // stands to play — the old -z placement faced the open sea
+      const gl = glyphSprite(atlas, [0, 4, 2, 1, 7][i], 0x9adfca, 0.78);
+      gl.position.set(0, 0.4, 0.42);
+      gl.material.opacity = 0.78;
+      gl.name = `stoneMark${i}`;
       m.add(gl);
+      const halo = glyphSprite(atlas, [0, 4, 2, 1, 7][i], 0x9adfca, 1.25);
+      halo.position.set(0, 0.4, 0.43);
+      halo.material.opacity = 0.12;
+      m.add(halo);
     }
 
     // the song bird, visible at dawn, perched on stone 2
@@ -1103,6 +1112,7 @@ const NAMES = [
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
+  'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
 ];
 
 export function collectRefs(root) {
