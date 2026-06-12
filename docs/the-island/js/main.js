@@ -1,7 +1,7 @@
 // main.js — boot, light, loop. ABYME: an island within an island.
 
 import * as THREE from 'three';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, waterY, wavePhase, SCALE_MODEL } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, mistTargetAt, waterY, wavePhase, SCALE_MODEL } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
 import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
@@ -384,7 +384,9 @@ function applyAtmosphere(elapsed, dt) {
   sun.position.copy(camera.position).addScaledVector(lightDir, 220);
   sun.target.position.copy(camera.position);
   sun.color.copy(night > 0.6 ? MOONLIGHT : g.sunCol);
-  sun.intensity = night > 0.6 ? 0.5 * night : g.sunInt * 2.6 * clamp((el + 0.06) / 0.2, 0.05, 1);
+  // mist rolls in and out on its own slow weather clock
+  mistCur = lerp(mistCur, mistTargetAt(W.time), 1 - Math.exp(-dt / 16));
+  sun.intensity = (night > 0.6 ? 0.5 * night : g.sunInt * 2.6 * clamp((el + 0.06) / 0.2, 0.05, 1)) * (1 - mistCur * 0.3);
 
   hemi.color.copy(g.hemiSky);
   hemi.groundColor.copy(g.hemiGnd);
@@ -392,7 +394,7 @@ function applyAtmosphere(elapsed, dt) {
   scene.environmentIntensity = lerp(0.38, 0.08, night);
 
   scene.fog.color.copy(g.fog);
-  scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1);
+  scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4);
 
   const su = skyMat.uniforms;
   su.uTime.value = elapsed;
@@ -506,7 +508,9 @@ if (DEBUG) {
   window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE,
     tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
     setIntroT: (t) => { if (intro) intro.t = t; },
-    setPerch: (t) => { perchT = clamp(t, 0, 1); } };
+    setPerch: (t) => { perchT = clamp(t, 0, 1); },
+    setMist: (m) => { mistCur = clamp(m, 0, 1); },
+    getMist: () => mistCur };
 }
 function buildDebugPanel() {
   const el = document.createElement('div');
@@ -563,6 +567,7 @@ let elapsed = 0, fps = 60;
 let lastTickMs = 0;
 let dprNow = BASE_DPR, restUntil = 0;
 const REST_DPR = Math.min(BASE_DPR, 1.3);
+let mistCur = 0;
 
 renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
@@ -616,6 +621,7 @@ renderer.setAnimationLoop((tMs) => {
     altitude: player.pos.y,
     interior: player.interior(),
     night: isNight() ? 1 : 0,
+    mist: mistCur,
   });
 
   if (MODE === 'play') {

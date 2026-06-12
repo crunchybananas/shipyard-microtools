@@ -51,6 +51,11 @@ const A = {
     this.wind.gain.gain.value = 0;
     this.wind.out.connect(this.amb);
 
+    // ---- drizzle: a soft patter bed, alive only when the mist is thick ----
+    this.rain = this._noiseLoop('white', 2600, 'bandpass', 0.8);
+    this.rain.gain.gain.value = 0;
+    this.rain.out.connect(this.amb);
+
     // ---- interior room tone ----
     this.room = this._noiseLoop('brown', 130);
     this.room.gain.gain.value = 0;
@@ -97,6 +102,9 @@ const A = {
     // wind: altitude raises pitch and volume, ducked indoors
     const windBase = s.interior ? 0.012 : clamp(0.05 + s.altitude * 0.004, 0.05, 0.17);
     this.wind.gain.gain.setTargetAtTime(windBase * (0.7 + 0.3 * Math.sin(t * 0.31)), t, 0.3);
+    // drizzle rises with thick mist, muffled under a roof
+    const rainBase = (s.mist ?? 0) > 0.45 ? ((s.mist - 0.45) * 0.11) : 0;
+    this.rain.gain.gain.setTargetAtTime(rainBase * (s.interior ? 0.3 : 1), t, 1.4);
     this.wind.filt.frequency.setTargetAtTime(550 + s.altitude * 26, t, 0.5);
     // room tone indoors
     this.room.gain.gain.setTargetAtTime(s.interior ? 0.16 : 0.0, t, 0.25);

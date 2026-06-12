@@ -3,7 +3,7 @@
 // which is why they can never fall out of sync.
 
 import * as THREE from 'three';
-import { clamp, lerp, lerpColor, smoothstep, TAU } from './util.js';
+import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './util.js';
 
 export const SCALE_MODEL = 1 / 240;
 
@@ -76,6 +76,19 @@ export function moonDir(t, out = new THREE.Vector3()) {
 export const isNight = () => sunElevation(W.time) < -0.06;
 export const isDawn = () => W.time > 5.4 && W.time < 8.6;
 export const isGolden = () => W.time > 17.1 && W.time < 18.5;
+
+// weather: mist is a pure function of the clock — a deterministic roll per
+// 3-hour slot (seeded), eased by the renderer. No save state: scrub the sun
+// and the weather scrubs with it, identical on every machine. Golden hour
+// is protected (the stone-shadow puzzle needs its sun) and night stays thin
+// enough for the beam to write its glyphs.
+export function mistTargetAt(t) {
+  const h = ((t % 24) + 24) % 24;
+  const r = mulberry32((SEED ^ (Math.floor(h / 3) * 2654435761)) >>> 0)();
+  const m = r < 0.45 ? 0 : 0.2 + (r - 0.45) * 1.1;
+  const ceil = (h > 16.5 && h < 18.6) ? 0.08 : (h < 5 || h > 21) ? 0.45 : 0.8;
+  return Math.min(m, ceil);
+}
 
 // ---------------- the five master grades -------------------------------------
 // Only these palettes exist; every hour interpolates between them.

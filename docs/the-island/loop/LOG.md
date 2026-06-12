@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 15 — 2026-06-12 — weather (mist on its own slow clock)
+
+**Shipped:** The island has weather now. Mist is a pure function of the
+clock (`world.mistTargetAt`): a seeded deterministic roll per 3-hour slot
+— no save state, scrub the sun and the weather scrubs with it, identical
+on every machine. The renderer eases toward the target (τ≈16 s roll-in),
+thickening fog (×1 + mist×2.4), dimming the sun (−30 % at full), and a
+soft drizzle bed rises on the ambience bus once mist passes 0.45
+(muffled indoors). Protections by construction: golden hour ceiling 0.08
+(the stone-shadow puzzle keeps its sun — measured max 0.00 across the
+window), night ceiling 0.45 (the beam still writes). Zero new draw
+calls — the power directive holds.
+
+**Evidence:** full-day weather map probed (misty nights at the ceiling,
+clear morning, 0.39 midday mist, clear golden); beach-vantage pair —
+crisp tick-13 shot vs milky 0.39 mist vs heavier 0.8 veil, all same
+vantage; fog density formula confirmed numerically (0.00873 at 0.8);
+drizzle gain measured at exactly (mist−0.45)×0.11 = 0.038; draws 189
+unchanged; zero console errors. Debug knobs setMist/getMist added.
+
+**Debt:** weather axis opened, "Weather axis absent" cleared. This
+seed's daytime rolls are mild (max 0.39); if a moodier day is wanted,
+the roll range is one constant. Dawn mist coexists with the songbird —
+intentional; revisit only if the owner finds the bird moment muddied.
+
+**Batch 3 pushed with this entry** — bell signature, power tick, tree
+haze + index relabel, the bell's stem-gathering, weather.
+
+**Next tick suggestion:** the chest-lid continuity nit (backlog:
+`chestOpen` is session-local — reload after taking the ruler shows a
+closed chest). Small, surgical, save-schema touch done the
+backward-compatible way (`save()/load()` default). Pair with a look at
+the secret axis if appetite: the model's model speck at night.
+
+---
+
 ## 14 — 2026-06-12 — audio (the bell gathers its stems)
 
 **Shipped:** The finale's bell now explicitly gathers every stem the
@@ -581,6 +617,6 @@ nothing may break it.
 - **Finale could resolve more** — the day-wheel happens, but the credits
   sky could spell the constellation/leitmotif; the bell could audibly
   gather all five stems into the final chord more explicitly.
-- **Weather axis absent** — the grades support fog density already; a slow
-  drizzle or mist roll-in (synth rain on the amb bus) would be a mood
-  multiplier, if it can stay 60fps and grade-consistent.
+- ~~Weather axis absent~~ — iteration 15: deterministic per-slot mist on
+  the clock, fog/sun/drizzle integration, golden+night ceilings, zero new
+  draws.
