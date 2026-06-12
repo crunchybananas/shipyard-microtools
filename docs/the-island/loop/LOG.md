@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 18 — 2026-06-12 — finale (the credits sky spells the leitmotif)
+
+**Shipped:** The finale resolves in the sky now. Five warm stars — set
+in the standing stones' own arc shape — wait dark among the starfield
+and ignite one per note of the leitmotif as the day-wheel turns through
+night (cues at t=6+0.9i, 1.2 s blooms, `uConstelDir/uConstelGlow`
+uniform arrays in the sky shader, gated by the existing uNight so they
+live wherever the wheel brings darkness). And the missing
+cinematography: after the credits land (t>8) the camera's gaze lifts
+from the lighthouse to the north sky over six seconds — the island
+sinks away and the constellation hangs above the title card. Zero new
+draws; shader cost is five dot-products inside the existing night
+branch.
+
+**Evidence:** tuning pass photographed — first placement sat in the
+southern sky behind the camera (the finale gazes NORTH; fixed), first
+magnitudes read as streetlights (pow 5200/700 → 60000/9000; now
+star-sized, clearly brighter than the hash stars, unmistakably an arc);
+final frame: the five-star arc among the field with the milky way
+right and moon left; credits-card composition over the night island;
+save verified untouched through all runs (finale mode never autosaves;
+`game.onFinale()` bypasses the bell flag — bellRung false, pos intact).
+setFinaleT debug knob added. Zero console errors.
+
+**Debt:** "finale could resolve more" — both halves now done (bell
+gathers stems, sky spells the arc). Cleared.
+
+**Next tick suggestion:** iteration 20 next-but-one pushes batch 4.
+For 19: dawn-mist × songbird interplay check + the 15-noted mild-day
+tuning in one weather-polish tick, OR the journal's empty sketch field
+(every entry carries `sketch: ""` — tiny line-art sketches per entry
+would make J a keepsake; story axis, contained).
+
+---
+
 ## 17 — 2026-06-12 — code health (the chest remembers)
 
 **Shipped:** `chestOpen` moved from session-local Game state into
@@ -676,9 +711,8 @@ nothing may break it.
   pages / etched marginalia on the chart table / a name somewhere.
 - ~~Secret axis unexplored~~ — iteration 16: the nested speck keeps a
   night pinprick lit; leaning in earns a once-per-save whisper.
-- **Finale could resolve more** — the day-wheel happens, but the credits
-  sky could spell the constellation/leitmotif; the bell could audibly
-  gather all five stems into the final chord more explicitly.
+- ~~Finale could resolve more~~ — iteration 14 (the bell gathers its
+  stems) + iteration 18 (the credits sky spells the arc, gaze lift).
 - ~~Weather axis absent~~ — iteration 15: deterministic per-slot mist on
   the clock, fog/sun/drizzle integration, golden+night ceilings, zero new
   draws.

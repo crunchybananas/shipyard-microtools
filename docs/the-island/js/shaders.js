@@ -172,6 +172,12 @@ export function makeSkyMaterial() {
       uHorizon: { value: new THREE.Color(0xbfe0ee) },
       uNight: { value: 0 },
       uFlash: { value: 0 },
+      // the credits constellation: five stars that learn to burn, one per
+      // note of the leitmotif (lit by the finale; zero cost while dark)
+      uConstelDir: { value: [
+        new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(),
+        new THREE.Vector3(), new THREE.Vector3()] },
+      uConstelGlow: { value: new Float32Array(5) },
     },
     vertexShader: /* glsl */`
       varying vec3 vDir;
@@ -191,6 +197,8 @@ export function makeSkyMaterial() {
       uniform vec3 uHorizon;
       uniform float uNight;
       uniform float uFlash;
+      uniform vec3 uConstelDir[5];
+      uniform float uConstelGlow[5];
       varying vec3 vDir;
       ${GLSL_NOISE}
 
@@ -241,6 +249,16 @@ export function makeSkyMaterial() {
           float wisps = fbm2(sp * 6.0) * band;
           col += vec3(0.8, 0.85, 1.0) * star * tw * uNight * smoothstep(0.0, 0.15, d.y);
           col += vec3(0.45, 0.5, 0.72) * wisps * wisps * uNight * 0.5;
+
+          // the credits constellation — five stars in the stones' arc,
+          // each igniting on its note of the leitmotif
+          for (int i = 0; i < 5; i++) {
+            float g = uConstelGlow[i];
+            if (g > 0.001) {
+              float a = max(dot(d, uConstelDir[i]), 0.0);
+              col += vec3(1.0, 0.94, 0.8) * (pow(a, 60000.0) * 1.7 + pow(a, 9000.0) * 0.22) * g * uNight;
+            }
+          }
         }
 
         // drifting cirrus, tinted by the sun

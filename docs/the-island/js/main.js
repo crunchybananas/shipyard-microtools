@@ -84,6 +84,15 @@ scene.add(diveGroup);
 // sky + far sea (outside the dive group: they are the "outside" of the world)
 const skyMat = makeSkyMaterial();
 const sky = new THREE.Mesh(new THREE.SphereGeometry(7000, 32, 16), skyMat);
+// the credits constellation: five stars in the stones' own arc, waiting
+// dark until the finale lights them note by note
+for (let i = 0; i < 5; i++) {
+  // due-north arc: the finale camera rises in the NE and gazes north-west
+  const az = (350 + i * 4) * Math.PI / 180;
+  const el = (36 + [0, 2, 3.5, 2, 0][i]) * Math.PI / 180;
+  skyMat.uniforms.uConstelDir.value[i].set(
+    Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+}
 sky.frustumCulled = false;
 scene.add(sky);
 
@@ -309,9 +318,16 @@ function tickFinale(dt) {
     lerp(finale.camStart.x, LH.x + 60, e),
     lerp(finale.camStart.y, LH.y + 90, e),
     lerp(finale.camStart.z, LH.z - 110, e));
-  const look = new THREE.Matrix4().lookAt(camera.position, new THREE.Vector3(LH.x, LH.y + 8, LH.z), new THREE.Vector3(0, 1, 0));
+  // gaze down at the lighthouse, then lift to the north sky as the
+  // credits land — that's where the constellation waits
+  const lookY = lerp(LH.y + 8, LH.y + 260, easeInOut(clamp((finale.t - 8) / 6, 0, 1)));
+  const look = new THREE.Matrix4().lookAt(camera.position, new THREE.Vector3(LH.x, lookY, LH.z), new THREE.Vector3(0, 1, 0));
   const q = new THREE.Quaternion().setFromRotationMatrix(look);
   camera.quaternion.slerpQuaternions(finale.quatStart, q, Math.min(1, f * 4));
+  // the constellation ignites note by note as the day wheels into night
+  for (let i = 0; i < 5; i++) {
+    skyMat.uniforms.uConstelGlow.value[i] = clamp((finale.t - (6 + i * 0.9)) / 1.2, 0, 1);
+  }
   if (finale.t > 9 && !finale.shown) {
     finale.shown = true;
     document.getElementById('finale').classList.remove('hidden');
@@ -525,7 +541,8 @@ if (DEBUG) {
     setIntroT: (t) => { if (intro) intro.t = t; },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
-    getMist: () => mistCur };
+    getMist: () => mistCur,
+    setFinaleT: (t) => { if (finale) finale.t = t; } };
 }
 function buildDebugPanel() {
   const el = document.createElement('div');
