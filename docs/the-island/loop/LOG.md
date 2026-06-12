@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 9 — 2026-06-12 — ambient life (the gull that lands)
+
+**Shipped:** At dawn the first gull leaves the gyre, glides to the gallery
+rail's east side, and settles facing the sun — wings tucked (rotation.x
+fold + flap amplitude fading with the ease), a 2 cm breathing bob, heading
+eased to due east. When dawn ends it lifts off back into the orbit. One
+eased scalar (`perchT`, 4.5 s in / 3 s out) drives the whole behavior;
+no state, no saves, gulls aren't cloned into the model. Debug gains
+`ABYME.setPerch()` beside `setIntroT` — the scrub-knob pattern is now
+the standard way to verify slow eases under frame-starved captures.
+
+**Evidence:** dawn approach observed accumulating live (wing fold growing
+from −0.0005 — which first looked like a dead branch and was actually
+the capture windows advancing only ~0.2 s of frames each; chased a NaN
+ghost before measuring); settled numerics dist-to-perch 0.008 m, fold
+−0.12, flap 0, heading −π/2; settled visual (white bird-form resting on
+the gallery rim while gull 2 still rides the gyre); post-dawn departure
+visual (mid-blend, half-spread wings, empty rail). Zero console errors.
+Also fixed in-flight: the new tickGulls(dt) signature's call site —
+an undefined dt would have NaN-poisoned perchT permanently.
+
+**Debt:** none added.
+
+**Next tick suggestion:** iteration 10 closes batch 2 — push everything
+(stone glyphs, intro flight, M toggle, the gull, plus this tick) per
+MISSION step 3, submodule first. For the work itself: "model sea reads
+chalky up close" (backlog) — the speckle at 1:240 overwhelms the body
+color; sample the shared-material constraint carefully (water material
+is shared BY DESIGN between world and model — a derivative-based fade
+keyed on mesh scale, not a material clone, is the likely shape).
+
+---
+
 ## 8 — 2026-06-12 — UX (the promised sound toggle)
 
 **Shipped:** `M` toggles sound — the owner's deferred request from the
@@ -355,8 +388,9 @@ nothing may break it.
   the open sea; flipped inboard, brightened, halo'd, tone-pulsed.
 - **Trees pop flat at distance** — no LOD/imposters; distant canopies could
   be cheaper AND prettier (billboard ring?).
-- **Gulls are two quads** — fine at range, comic up close; they also never
-  land. A gull landing on the gallery rail at dawn would be free soul.
+- ~~Gulls never land~~ — iteration 9: the first gull takes the gallery rail
+  at dawn, folds its wings, faces the sun, departs after. (Still two quads
+  up close — that half of the item stands if anyone ever cares.)
 - **Intro dolly underuses the sea** — the approach should skim wave-top
   with spray before rising to the beach; title timing could breathe more.
 - **Story axis is thin** — who was the cartographer? The coat, the

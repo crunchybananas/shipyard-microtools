@@ -1,7 +1,7 @@
 // main.js — boot, light, loop. ABYME: an island within an island.
 
 import * as THREE from 'three';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, waterY, wavePhase, SCALE_MODEL } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, waterY, wavePhase, SCALE_MODEL } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
 import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
@@ -454,8 +454,16 @@ function applyAtmosphere(elapsed, dt) {
 }
 
 // ---------------- gulls ----------------
-function tickGulls(elapsed) {
+// at dawn the first gull leaves the gyre and takes the gallery rail,
+// east side, facing the sun — wings folded, riding the keeper's view
+const GULL_PERCH = new THREE.Vector3(LH.x + 3.05, LH.y + 21.95, LH.z);
+let perchT = 0;
+
+function tickGulls(elapsed, dt) {
   const day = 1 - clamp((-sunElevation(W.time) - 0.02) / 0.15, 0, 1);
+  const wantPerch = isDawn() && MODE !== 'dive';
+  perchT = clamp(perchT + (wantPerch ? dt / 4.5 : -dt / 3), 0, 1);
+  const settle = easeInOut(perchT);
   for (const g of gulls) {
     g.visible = day > 0.3 && MODE !== 'dive';
     if (!g.visible) continue;
@@ -463,8 +471,17 @@ function tickGulls(elapsed) {
     const a = elapsed * u.speed + u.phase;
     g.position.set(LH.x + Math.cos(a) * u.radius, LH.y + u.h + Math.sin(a * 2.3) * 2, LH.z + Math.sin(a) * u.radius);
     g.rotation.y = -a - Math.PI / 2;
-    const flap = Math.sin(elapsed * 6 + u.phase) * 0.5;
-    u.l.rotation.z = flap; u.r.rotation.z = -flap;
+    let flapAmp = 0.5;
+    if (g === gulls[0] && settle > 0) {
+      g.position.lerp(GULL_PERCH, settle);
+      g.position.y += Math.sin(elapsed * 2.2) * 0.02 * settle;   // breathing
+      g.rotation.y = lerp(g.rotation.y, -Math.PI / 2, settle);   // face the dawn
+      flapAmp = 0.5 * (1 - settle);                              // fold
+      u.l.rotation.x = u.r.rotation.x = -0.12 * settle;          // wings tucked
+    }
+    const flap = Math.sin(elapsed * 6 + u.phase) * flapAmp;
+    u.l.rotation.z = flap + 0.16 * (g === gulls[0] ? settle : 0);
+    u.r.rotation.z = -flap - 0.16 * (g === gulls[0] ? settle : 0);
   }
 }
 
@@ -483,7 +500,8 @@ if (DEBUG) {
   buildDebugPanel();
   window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE,
     tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
-    setIntroT: (t) => { if (intro) intro.t = t; } };
+    setIntroT: (t) => { if (intro) intro.t = t; },
+    setPerch: (t) => { perchT = clamp(t, 0, 1); } };
 }
 function buildDebugPanel() {
   const el = document.createElement('div');
@@ -567,7 +585,7 @@ renderer.setAnimationLoop(() => {
   game.tick(dt, elapsed);
   interact.update();
   applyAtmosphere(elapsed, dt);
-  tickGulls(elapsed);
+  tickGulls(elapsed, dt);
 
   A.update(dt, {
     wavePhase: clamp(wavePhase(elapsed), 0, 1),
