@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 5 — 2026-06-12 — story/worldbuilding (the cartographer's marginalia)
+
+**Shipped:** First story beat: the cartographer annotated their own model.
+Five small burnished marks on the chart-table's wood margin — a tide glyph
+by the valve, a sun glyph by the crank, the plumb diagram on the south
+edge facing the model's beach (the SAME glyph as the cellar carve: one
+hand, everywhere), and a tiny paired maker's mark tucked into the
+south-east corner like a signature stamp. No words, no state, no UI —
+pure environmental authorship, found only by leaning in over the thesis
+object.
+
+**Evidence:** close-look screenshots: SE-corner pair at noon and golden
+(reads as a stamp catching the light, model islands behind); plumb-mark
+lean-in (full arrow on the margin between the model sea and the rim).
+Zero console errors, +5 draws (one per sprite, frustum-culled outside
+the study), no state/save surface touched, chain untouched. Sizing
+lesson recorded: the margin band is 25 cm (model water sheet edge 1.29 →
+rim face 1.54) and the sheet sits 5 cm proud of the wood, so marks
+larger than ~0.2 duck under its overhang at glancing angles — first two
+attempts hid their inner halves; final marks are 0.13–0.2.
+
+**Debt:** none added. The "model sea reads chalky up close" backlog item
+was visibly confirmed again in the golden close-ups.
+
+**Next tick suggestion:** the stone glyphs (backlog: "barely visible") —
+they are the clue for the music sequence and now the islet meadow draws
+the eye to the stones; etch them brighter the way the cellar carve got
+its halo, and consider a faint glow only while the stone's tone plays
+(material already cloned per-shell). Close-look + puzzle-clarity in one.
+
+---
+
 ## 4 — 2026-06-12 — graphics wow (the cellar deserves mood)
 
 **Shipped:** The plumb-bob room is an altar now, not a void. Cool teal fill

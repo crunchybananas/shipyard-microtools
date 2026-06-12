@@ -295,6 +295,29 @@ export function buildWorld() {
   modelAnchor.position.set(LH.x, LH.y + 1.01, LH.z);
   core.add(modelAnchor);
 
+  // the cartographer annotated their own model: small burnished marks on
+  // the table margin by each station — a tide glyph by the valve, a sun
+  // glyph by the crank, the plumb diagram facing the model's beach (the
+  // same hand as the cellar carve), and a tiny paired maker's mark tucked
+  // in the south-east corner. No words anywhere; the same hand, everywhere.
+  {
+    const mark = (gi, x, z, s, rz, op) => {
+      const g = glyphSprite(atlas, gi, 0xc08a3e, s);
+      g.rotation.x = -Math.PI / 2;
+      g.rotation.z = rz;
+      g.position.set(x, LH.y + 0.956, z);
+      g.material.opacity = op;
+      core.add(g);
+    };
+    // the margin band is only 25 cm wide (model water sheet edge 1.29 to
+    // rim inner face 1.54) — marks must fit inside it or duck under the sheet
+    mark(2, LH.x + 1.405, LH.z + 1.02, 0.2, 0.4, 0.65);   // tide, by the valve
+    mark(7, LH.x - 1.405, LH.z - 1.02, 0.2, -1.1, 0.65);  // sun, by the crank
+    mark(4, LH.x - 0.02, LH.z - 1.405, 0.2, 0.05, 0.7);   // plumb, facing the model's beach
+    mark(1, LH.x + 1.33, LH.z - 1.38, 0.17, 0.3, 0.55);   // the maker's pair
+    mark(0, LH.x + 1.46, LH.z - 1.35, 0.13, -0.2, 0.55);
+  }
+
   // valve pedestal + wheel (tide)
   {
     const ped = new THREE.CylinderGeometry(0.14, 0.2, 1.0, 8);
