@@ -1,6 +1,7 @@
 // ui.js — the few words the game ever says, and the chrome around them.
 
 import { W } from './world.js';
+import A from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -20,6 +21,10 @@ export const UI = {
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyJ') this.toggleJournal();
       if (e.code === 'Escape') this.journalEl.classList.add('hidden');
+      if (e.code === 'KeyM') {
+        A.setMuted(!A.muted);
+        this.whisper(A.muted ? 'The sea goes quiet.' : 'The sea breathes again.', 2400);
+      }
     });
     this.renderJournal();
   },

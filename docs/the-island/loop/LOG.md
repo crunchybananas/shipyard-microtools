@@ -12,6 +12,34 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 8 — 2026-06-12 — UX (the promised sound toggle)
+
+**Shipped:** `M` toggles sound — the owner's deferred request from the
+persistent-mute commit, paid back. Wired in `ui.js` beside the `J`
+journal key, through the existing `A.setMuted()` (so it persists via
+`abyme-muted` across reloads and New Game). Feedback is diegetic, not
+chrome: a whisper — "The sea goes quiet." / "The sea breathes again." —
+and the controls hint now reads `… · J journal · M sound`. Works on the
+title screen too (flag flips before audio init; init respects it).
+
+**Evidence:** real keydown dispatches: muted 1→0 (master gain 0→0.6,
+localStorage '0', whisper "breathes again" in DOM) then 0→1 (gain 0,
+'1', "goes quiet"); hint line with `M sound` captured on screen; zero
+console errors; owner's save untouched and session left MUTED as they
+prefer. Whisper photography note: whisper hold timers are wall-clock,
+so they expire between hidden-tab evals and captures — DOM textContent
+is the reliable evidence; the visual was confirmed via the hint line.
+
+**Debt:** cleared the "Audio mute UX" backlog item.
+
+**Next tick suggestion:** the gull that lands (backlog: "gulls are two
+quads… they never land; a gull landing on the gallery rail at dawn would
+be free soul"). Contained: at dawn, one gull breaks orbit, glides to the
+gallery rail anchor, perches for a minute, departs. Pure ambient
+behavior in main.js tickGulls — no state, no saves, big soul-per-line.
+
+---
+
 ## 7 — 2026-06-12 — cinematics (the approach earns the sea)
 
 **Shipped:** The intro dolly is a flight now, not an elevator: Catmull-Rom
@@ -304,12 +332,8 @@ nothing may break it.
 
 # Backlog (unordered; claim items into iterations)
 
-- **Audio mute UX** — owner asked for sound-off (done: `abyme-muted`
-  localStorage pref, `A.setMuted()` in audio.js, applied at init) and
-  explicitly deferred the control surface. Needs a no-HUD-chrome way to
-  toggle: candidates — title-screen line, or a diegetic object (conch on
-  the title beach?). Keyboard `M` is acceptable per the existing J-journal
-  precedent.
+- ~~Audio mute UX~~ — done in iteration 8: `M` toggles via `A.setMuted()`,
+  whisper feedback, hint line updated.
 
 - **Grass inside structures** — blades spawn inside the lighthouse study and
   annex (scatter lacks exclusion radii that the tree scatter has). The
