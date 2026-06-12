@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 14 — 2026-06-12 — audio (the bell gathers its stems)
+
+**Shipped:** The finale's bell now explicitly gathers every stem the
+player earned into its final chord: the A2/E3 drones swell against the
+toll (2.4× for a long breath, stem gains now kept in `_stemGains`),
+stem 3 strikes the actual five-note leitmotif (E G A D C) as a strummed
+chord at +0.6 s, stem 4 lands one deep 55 Hz gathered beat, stem 5
+crowns it with three high bells at +2.2–2.9 s — each conditional on
+`stems.includes(n)`, so partial playthroughs resolve with exactly the
+voices they earned. The bell's own vast toll and rising farewell are
+unchanged. Wiring untouched: `A.bellToll()` was already the finale call.
+
+**Evidence:** synthesized audio verified WITHOUT ears — an AnalyserNode
+tapped on the music bus (pre-master, so the owner's mute doesn't blind
+it; the audio clock runs even in hidden tabs). Partial set [1,3,4] from
+the owner's real flags: all five leitmotif bins ignite in the chord
+window (171–184), A2 drone-swell becomes the strongest bin by mid-decay
+(224), RMS arcs 4→18→6, shimmer bins stay quiet (stem 5 absent ✓).
+Full set after RAM-only addStem(2,5): RMS peaks 22.4, E3 swell 196, and
+the crown bins jump 4→122–127 exactly in their window. Zero console
+errors; save untouched this tick (audio-only verification, no movement).
+
+**Debt:** none added. The other finale half ("credits sky could spell
+the constellation/leitmotif") remains in backlog.
+
+**Next tick suggestion:** iteration 15 closes batch 3 — PUSH per
+MISSION step 3 (submodule then parent; five commits waiting: bell
+signature, power tick, tree haze + relabel, this, plus 15's own). For
+the work: weather axis is the last untouched one — a slow mist roll-in
+on the existing fog density (grade-consistent, power-safe: fog is
+already in every shader) with a synth drizzle on the amb bus only while
+overcast. Verify fps + the power directive (no new draws), screenshots
+across grades, analyser for the rain bed.
+
+---
+
 ## 13 — 2026-06-12 — close-look at distance (the tree line melts, not pops)
 
 **Shipped:** Distant canopies no longer cut hard low-poly silhouettes:

@@ -229,9 +229,10 @@ const A = {
         o.start(); lfo.start();
       }
     });
+    this._stemGains = this._stemGains || {};
     switch (n) {
-      case 1: drone(110, 0.05); break;                       // A2 root
-      case 2: drone(164.8, 0.04); break;                     // E3 fifth
+      case 1: this._stemGains[1] = drone(110, 0.05); break;  // A2 root
+      case 2: this._stemGains[2] = drone(164.8, 0.04); break; // E3 fifth
       case 3: { // slow leitmotif arp
         const notes = [329.63, 392.0, 440.0, 293.66, 261.63];
         let i = 0;
@@ -260,9 +261,35 @@ const A = {
 
   bellToll() {
     if (!this.ready) return;
+    const t0 = ctx.currentTime;
     // the final bell: the leitmotif's tonic, vast
     this.pluck(110, 0, 0.7, 9);
     this.pluck(220, 0.02, 0.5, 8);
+    // …and every stem the player earned answers it, gathered into one chord
+    const has = (n) => this.stems.includes(n);
+    for (const n of [1, 2]) {                      // the drones swell against the toll
+      const g = this._stemGains?.[n];
+      if (g) {
+        g.gain.cancelScheduledValues(t0);
+        g.gain.setTargetAtTime(2.4, t0 + 0.1, 0.7);
+        g.gain.setTargetAtTime(1.0, t0 + 5.5, 2.0);
+      }
+    }
+    if (has(3)) {                                  // the leitmotif itself, strummed as a chord
+      const LEIT = [329.63, 392.0, 440.0, 293.66, 261.63]; // E G A D C
+      LEIT.forEach((f, i) => this.pluck(f, 0.6 + i * 0.09, 0.22, 7));
+    }
+    if (has(4)) {                                  // one deep gathered beat
+      const o = ctx.createOscillator(); o.frequency.value = 55;
+      const g = ctx.createGain(); this._env(g, t0 + 1.2, 0.5, 0.4, 5);
+      o.connect(g).connect(this.music); o.start(t0 + 1.2); o.stop(t0 + 7);
+    }
+    if (has(5)) {                                  // the shimmer crowns it
+      this.pluck(1760, 2.2, 0.06, 6);
+      this.pluck(2093, 2.5, 0.05, 6);
+      this.pluck(2637, 2.9, 0.04, 6);
+    }
+    // the rising tail — for the bell's own long farewell
     this.pluck(329.63, 1.8, 0.3, 7);
     this.pluck(440, 3.6, 0.3, 7);
     this.pluck(523.25, 5.4, 0.25, 8);
