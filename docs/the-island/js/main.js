@@ -448,7 +448,10 @@ function applyAtmosphere(elapsed, dt) {
   }
   for (const m of swayMats) {
     const sh = m.userData.shader;
-    if (sh) sh.uniforms.uTime.value = elapsed;
+    if (sh) {
+      sh.uniforms.uTime.value = elapsed;
+      if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
+    }
   }
 
   // sky follows the camera

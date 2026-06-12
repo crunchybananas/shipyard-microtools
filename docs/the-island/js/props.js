@@ -949,6 +949,7 @@ function buildVegetation(core, r) {
   // wind sway via shader patch
   canopyMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     canopyMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
@@ -957,6 +958,16 @@ function buildVegetation(core, r) {
         transformed.x += sin(uTime * 1.4 + windSeed) * 0.14 * smoothstep(1.0, 5.5, transformed.y);
       #endif
     `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
+    // distant canopies melt toward the grade's haze before global fog
+    // reaches them — softens the hard low-poly pop at the tree line;
+    // fragment-only, zero added draws (power directive holds)
+    sh.fragmentShader = sh.fragmentShader
+      .replace('void main() {', 'uniform vec3 uHaze;\nvoid main() {')
+      .replace('#include <fog_fragment>', `
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze,
+          smoothstep(120.0, 300.0, length(vViewPosition)) * 0.45);
+        #include <fog_fragment>
+      `);
   };
 
   const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, spots.length);

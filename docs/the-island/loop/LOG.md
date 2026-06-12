@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 13 — 2026-06-12 — close-look at distance (the tree line melts, not pops)
+
+**Shipped:** Distant canopies no longer cut hard low-poly silhouettes:
+a fragment-only patch in the canopy material blends them toward the
+grade's haze color (45 % max, smoothstep 120→300 m, `uHaze` follows
+`scene.fog.color` per grade) before global fog touches them. Zero new
+draws or geometry — the power directive holds (draws/tris byte-identical
+at matched vantages). Near trees (<120 m) untouched. Rider: the Pages
+root card now says "Play ABYME" / "ABYME Source" instead of the stale
+"Vanilla" labels (docs/index.html — the owner noticed).
+
+**Evidence:** noon beach vantage — near trees crisp (inside threshold);
+islet→main-island sightline (250 m+) — ridge pines melt into pale haze
+at noon and into the rose sunset haze at golden (grade-correct), while
+the islet's own pine stays sharp in the same frame; draws 189/200 and
+tris 519k unchanged at matched vantages (200 is a pre-existing golden
+vantage peak, not from this change). Zero console errors.
+
+**Debt:** none added. Backlog's "trees pop flat" is half-cleared: the
+POP is fixed; true LOD/billboards (the "cheaper" half) remain unclaimed
+— only worth it if the power directive ever needs vertex savings.
+
+**Next tick suggestion:** iteration 15 next-but-one closes batch 3 —
+keep 14 substantive: the finale resolution items (backlog: "the credits
+sky could spell the constellation/leitmotif; the bell could audibly
+gather all five stems") — the audio half is synth-only work in audio.js
+(the bell chord gathering the stems), verifiable by ear-proxy (waveform
+peaks/oscillator graph via eval) plus the existing finale path. Story+
+audio axes both underfed.
+
+---
+
 ## 12 — 2026-06-12 — performance (the power tick — owner directive)
 
 **Shipped:** Three multiplier cuts, look held: (1) **60 fps frame
