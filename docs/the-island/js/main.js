@@ -4,13 +4,13 @@ import * as THREE from 'three';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, waterY, wavePhase, SCALE_MODEL } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
-import { makeSkyMaterial } from './shaders.js';
+import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
 import { UI } from './ui.js';
 import A from './audio.js';
-import { clamp, lerp, easeInOut, TAU } from './util.js';
+import { clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED } from './util.js';
 
 const canvas = document.getElementById('scene');
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -194,7 +194,8 @@ if (sessionStorage.getItem('abyme-autostart')) {
 
 function beginIntro() {
   A.init();
-  titleEl.classList.add('fading');
+  // let the title hold a breath over the first seconds of sea
+  setTimeout(() => titleEl.classList.add('fading'), 1400);
   UI.cinematic(true);
   UI.fadeIn();
   MODE = 'intro';
@@ -206,6 +207,7 @@ function beginIntro() {
 function endIntro() {
   intro = null;
   MODE = 'play';
+  scene.remove(spray);
   UI.cinematic(false);
   player.spawn(new THREE.Vector3(4, 0, -104), 2.19, 0.05);
   player.locked = false;
@@ -325,7 +327,41 @@ const MOONLIGHT = new THREE.Color(0x9fb8d9);
 const swayMats = ['grass', 'canopies']
   .map((n) => core.children.find((o) => o.name === n)?.material)
   .filter(Boolean);
-let flash = 0, prevEl = sunElevation(W.time), introCamA = new THREE.Vector3(), introCamB = new THREE.Vector3();
+let flash = 0, prevEl = sunElevation(W.time);
+
+// the approach: fall from the high sea, skim the swell, rise to the beach
+const INTRO_PATH = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(170, 16, -260),
+  new THREE.Vector3(96, 2.3, -192),
+  new THREE.Vector3(40, 2.5, -142),
+  new THREE.Vector3(10, 4.0, -118),
+], false, 'catmullrom', 0.5);
+const INTRO_LOOK = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-20, 10, 20),
+  new THREE.Vector3(20, 4, -80),
+  new THREE.Vector3(4, 3.2, -98),
+  new THREE.Vector3(LH.x, LH.y + 12, LH.z),
+], false, 'catmullrom', 0.5);
+const _introLookV = new THREE.Vector3();
+
+// spume blown off the swell along the skim leg — alive only mid-approach
+const spray = (() => {
+  const r = mulberry32(SEED ^ 0x5947);
+  const pts = [];
+  for (let i = 0; i < 72; i++) {
+    const t = r();
+    pts.push(
+      lerp(96, 40, t) + (r() - 0.5) * 10,
+      0.5 + r() * 2.3,
+      lerp(-192, -142, t) + (r() - 0.5) * 10);
+  }
+  const p = makeGlowPoints(pts, 0xf2faff, 0.7);
+  p.material.uniforms.uDrift.value = 1;
+  p.material.uniforms.uFlare.value = 8;
+  p.name = 'introSpray';
+  return p;
+})();
+scene.add(spray);
 let saveTimer = 0;
 
 function applyAtmosphere(elapsed, dt) {
@@ -446,7 +482,8 @@ player.onFootstep = (kind, pos) => {
 if (DEBUG) {
   buildDebugPanel();
   window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE,
-    tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch) };
+    tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
+    setIntroT: (t) => { if (intro) intro.t = t; } };
 }
 function buildDebugPanel() {
   const el = document.createElement('div');
@@ -509,15 +546,17 @@ renderer.setAnimationLoop(() => {
     intro.t += dt;
     const f = clamp(intro.t / intro.dur, 0, 1);
     const e = easeInOut(f);
-    introCamA.set(170, 16, -260);
-    introCamB.set(10, 4.0, -118);
-    camera.position.lerpVectors(introCamA, introCamB, e);
-    camera.position.y += Math.sin(elapsed * 0.7) * 0.35 * (1 - f); // swell
-    const look = new THREE.Vector3(
-      lerp(-20, LH.x, e * e),
-      lerp(10, LH.y + 12, e * e),
-      lerp(20, LH.z, e * e));
-    camera.lookAt(look);
+    INTRO_PATH.getPoint(e, camera.position);
+    // the lower the flight, the more the swell owns the camera
+    const lowness = clamp(1 - (camera.position.y - 1.6) / 12, 0, 1);
+    camera.position.y += Math.sin(elapsed * 0.9) * lerp(0.12, 0.55, lowness) * (1 - f * f);
+    INTRO_LOOK.getPoint(e * e, _introLookV);
+    camera.lookAt(_introLookV);
+    camera.rotation.z += Math.sin(elapsed * 0.55 + 1.7) * 0.022 * lowness; // banking
+    const su = spray.material.uniforms;
+    su.uGlobal.value = smoothstep(0.18, 0.38, e) * (1 - smoothstep(0.72, 0.9, e));
+    su.uTime.value = elapsed;
+    su.uPlayer.value.copy(camera.position);
     if (f >= 1) endIntro();
   }
 

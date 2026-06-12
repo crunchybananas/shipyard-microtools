@@ -12,6 +12,45 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 7 — 2026-06-12 — cinematics (the approach earns the sea)
+
+**Shipped:** The intro dolly is a flight now, not an elevator: Catmull-Rom
+path that falls from the high offshore start, SKIMS the swell for a third
+of the run (camera ~1.8–2.5 m over the water, swell-coupled bob that
+strengthens as the flight drops, gentle banking roll), then rises along
+the coast to the beach. 72 seeded spume points (`introSpray`, glow-points
+with drift) blow past only during the skim leg (smoothstep window on
+uGlobal), removed from the scene at endIntro. The title now holds for
+1.4 s over the first seconds of sea before fading — the breath the
+backlog asked for. Debug gains `ABYME.setIntroT()` to scrub the dolly.
+
+**Evidence:** beat screenshots — skim leg (camera among the swell, foam
+rushing, a crest shouldering into frame, island at eye level), brighter
+spume pass (flecks at several depths, one flaring near-camera; first
+attempt was invisible against the foam — size 0.34→0.7, count 56→72),
+rise leg (coastal flyby past pines toward the tower, draws peak 189 of
+the 200 budget — transient), settle and endIntro handoff (spray removed,
+beach spawn). Zero console errors. Verification traps hit and recorded:
+hidden-tab captures advance intro.t only ~0.1–0.3 s each, so beat
+sampling needs setIntroT jumps and the final second needs an overshoot;
+sessionStorage autostart flags are PER-ORIGIN (set on localhost, lost on
+127.0.0.1 — looked like autostart silently failing); the localhost
+origin still holds a STALE save from early ticks (looked like the owner
+had wiped — they hadn't; 127's save was intact the whole time).
+endIntro force-saves the beach over the live save — stash/restore of the
+real save string is mandatory around intro testing.
+
+**Debt:** none added. Title-breath uses a setTimeout against the existing
+CSS fade — if the title CSS ever changes, re-check the overlap.
+
+**Next tick suggestion:** audio mute UX from the backlog (owner request
+waiting since tick "persistent mute") — an `M` key toggle via
+`A.setMuted()` plus a one-line `· M sound` addition to the existing
+hint/controls whisper line; no HUD chrome, ~20 lines, and it pays back a
+promise. Alternatively the gull-lands-on-the-rail-at-dawn soul beat.
+
+---
+
 ## 6 — 2026-06-12 — puzzle clarity (the stones face their players)
 
 **Shipped:** The music glyphs were not "too subtle" — they were on the
