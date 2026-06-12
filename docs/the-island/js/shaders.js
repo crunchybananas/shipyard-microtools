@@ -290,8 +290,12 @@ export function makeBeamMaterial(color = 0xfff0c0) {
     },
     vertexShader: /* glsl */`
       varying vec2 vUv;
+      varying vec3 vN;
+      varying vec3 vW;
       void main() {
         vUv = uv;
+        vN = normalize(mat3(modelMatrix) * normal);
+        vW = (modelMatrix * vec4(position, 1.0)).xyz;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `,
@@ -301,12 +305,17 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       uniform float uTime;
       uniform float uFlip;
       varying vec2 vUv;
+      varying vec3 vN;
+      varying vec3 vW;
       void main() {
         // t: normalized distance from the light source along the volume
         float t = mix(vUv.y, 1.0 - vUv.y, uFlip);
         float along = pow(1.0 - t, 1.4);
         float shimmer = 0.85 + 0.15 * sin(uTime * 3.0 + vUv.y * 40.0);
-        float a = along * uIntensity * shimmer * 0.5;
+        // glancing fragments fade: the open cone's silhouette walls were
+        // reading as two hard streaks — face-on light fills the body
+        float facing = smoothstep(0.02, 0.32, abs(dot(normalize(vN), normalize(cameraPosition - vW))));
+        float a = along * uIntensity * shimmer * 0.5 * facing;
         gl_FragColor = vec4(uColor, a);
         #include <colorspace_fragment>
       }

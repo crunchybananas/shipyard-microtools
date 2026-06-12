@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 20 — 2026-06-12 — graphics wow (the beam becomes light)
+
+**Shipped:** The night beam no longer reads as two hard streaks. Two
+composed fixes in the shared beam material family: a view-facing fade
+in the fragment shader (glancing silhouette walls — the streak makers —
+feather out; face-on body fills in), and a hot inner shell at ~55%
+radius sharing the SAME material instance, so it follows `uIntensity`
+and the model clone for free. The study's oculus shaft and the cellar's
+hatch spill inherit the improvement automatically — one factory, three
+beams. +1 draw call total.
+
+**Evidence:** night side-on vantage from the south bay: the beam sweeps
+the pines as a filled, graded wedge — hot at the lamp, feathered wide,
+no parallel rails (screenshot; compare the backlog's wording against
+it). draws 190 < 200 with the beam live; zero console errors. Save
+restored to canonical afterward (lensPlaced was a RAM-only test flag;
+restore keeps tick-17's migrated chestOpen=true).
+
+**Debt:** cleared "beam reads as two streaks".
+
+**Batch 4 pushed with this entry** — nested light, chest persistence,
+credits constellation + gaze lift, journal marginalia + load re-render
+fix, the beam. Twenty iterations, four batches.
+
+**Next tick suggestion:** the backlog's survivors are thinning: gull
+close-up geometry ("still two quads"), tree LOD's vertex half, weather
+mild-day tuning + dawn-bird check, story umbrella close-out. Suggest
+the weather tuning + dawn-mist songbird verification as one
+mood-coherence tick — it touches the most-seen hours of play and pays
+the 15-tick note. Then consider asking the owner where the loop should
+lean next: more soul, more polish, or a pass through Ember parity.
+
+---
+
 ## 19 — 2026-06-12 — story (the journal learns to draw)
 
 **Shipped:** Field Notes is a keepsake: fifteen tiny ink sketches — the
@@ -728,8 +762,8 @@ nothing may break it.
   ×0.55 at 1:240, shared material intact, world ocean untouched.
 - ~~Chest lid state is session-local~~ — iteration 17: persisted via
   W.flags + load-time migration (rulerTaken implies the lid).
-- **Beam reads as two streaks** from some angles (open-ended double-sided
-  cone); could use a soft volumetric impostor or inner cone.
+- ~~Beam reads as two streaks~~ — iteration 20: view-facing fade + hot
+  inner shell; the shaft and cellar spill inherit the fix.
 - ~~Cellar is flat~~ — fixed in iteration 4 (fill light, carve halo, light
   shaft, motes).
 - ~~Stone glyphs barely visible~~ — fixed in iteration 6: they were facing

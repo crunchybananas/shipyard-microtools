@@ -253,6 +253,14 @@ export function buildWorld() {
     const beam = new THREE.Mesh(beamGeo, makeBeamMaterial());
     beam.name = 'beamCone';
     beam.frustumCulled = false;
+    // hot inner shell — same material instance, so it follows uIntensity
+    // for free; fills the cone's body so it reads as light, not two walls
+    const beamInnerGeo = new THREE.CylinderGeometry(4.0, 0.22, 208, 10, 1, true);
+    beamInnerGeo.rotateX(Math.PI / 2);
+    beamInnerGeo.translate(0, 0, 104);
+    const beamInner = new THREE.Mesh(beamInnerGeo, beam.material);
+    beamInner.frustumCulled = false;
+    beam.add(beamInner);
     beamPivot.add(beam);
     lhGroup.add(beamPivot);
 
