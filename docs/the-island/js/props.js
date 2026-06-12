@@ -806,7 +806,12 @@ function buildVegetation(core, r) {
   const LHX = SPOTS.lighthouse.x, LHZ = SPOTS.lighthouse.y;
   const aa = 15 * Math.PI / 180;
   const ANX = LHX + Math.sin(aa) * 7.4, ANZ = LHZ + Math.cos(aa) * 7.4;
-  const KEEPOUT = [[LHX, LHZ, 7.2], [ANX, ANZ, 4.6]];
+  const KEEPOUT = [
+    [LHX, LHZ, 7.2], [ANX, ANZ, 4.6],
+    [SPOTS.stones.x, SPOTS.stones.y, 9.0],  // pad + stone arc: the dance floor stays bare
+    [SPOTS.stones.x - 11, SPOTS.stones.y - 4, 5.0], // vault outcrop + slab swing
+    [SPOTS.chest.x, SPOTS.chest.y, 3.0],
+  ];
   const open = (x, z) => {
     for (const [kx, kz, kr] of KEEPOUT) if (Math.hypot(x - kx, z - kz) < kr) return false;
     return true;
@@ -940,17 +945,11 @@ function buildVegetation(core, r) {
     `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
   };
 
-  const G_COUNT = 9000;
-  const grass = new THREE.InstancedMesh(bladeGeo, grassMat, G_COUNT);
+  const G_MAIN = 9000, G_ISLET = 1500;
+  const grass = new THREE.InstancedMesh(bladeGeo, grassMat, G_MAIN + G_ISLET);
   let gi = 0;
   const gcol = new THREE.Color();
-  for (let i = 0; i < G_COUNT * 4 && gi < G_COUNT; i++) {
-    const a = r() * TAU, d = 15 + Math.sqrt(r()) * 150;
-    const x = SPOTS.mainCenter.x + Math.sin(a) * d;
-    const z = SPOTS.mainCenter.y + Math.cos(a) * d;
-    const h = heightAt(x, z);
-    if (h < 2.2 || h > 16) continue;
-    if (!open(x, z) || grade(x, z) > 1.0) continue;
+  const plant = (x, h, z) => {
     const s = 0.7 + r() * 0.9;
     m4.compose(
       new THREE.Vector3(x, h - 0.06, z),
@@ -960,6 +959,27 @@ function buildVegetation(core, r) {
     gcol.setHSL(0.14 + r() * 0.07, 0.38 + r() * 0.2, 0.3 + r() * 0.14);
     grass.setColorAt(gi, gcol);
     gi++;
+  };
+  for (let i = 0; i < G_MAIN * 4 && gi < G_MAIN; i++) {
+    const a = r() * TAU, d = 15 + Math.sqrt(r()) * 150;
+    const x = SPOTS.mainCenter.x + Math.sin(a) * d;
+    const z = SPOTS.mainCenter.y + Math.cos(a) * d;
+    const h = heightAt(x, z);
+    if (h < 2.2 || h > 16) continue;
+    if (!open(x, z) || grade(x, z) > 1.0) continue;
+    plant(x, h, z);
+  }
+  // the islet was bald — and players study it through the whole music
+  // sequence. Same gates; its own band: the pad (8.8) sits in a shallow
+  // bowl whose shoulder rises to ~10.5 before falling to the beach.
+  for (let i = 0; i < G_ISLET * 6 && gi < G_MAIN + G_ISLET; i++) {
+    const a = r() * TAU, d = Math.sqrt(r()) * 28;
+    const x = SPOTS.islet.x + Math.sin(a) * d;
+    const z = SPOTS.islet.y + Math.cos(a) * d;
+    const h = heightAt(x, z);
+    if (h < 2.2 || h > 11.2) continue;
+    if (!open(x, z) || grade(x, z) > 1.0) continue;
+    plant(x, h, z);
   }
   grass.count = gi;
   grass.name = 'grass';

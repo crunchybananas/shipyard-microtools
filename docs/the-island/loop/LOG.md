@@ -12,6 +12,47 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 2 — 2026-06-11 — graphics wow (the islet meadow)
+
+**Shipped:** The islet is no longer bald. A second grass ring (1500 blades,
+same blade pool/material — zero new draw calls) around SPOTS.islet, with
+keep-out discs for the stones pad (r 9 — the dance floor and its shadow
+stage stay bare), the vault outcrop (r 5) and the chest (r 3), plus the
+slope gate. Its own height band 2.2–11.2: probing revealed the pad sits in
+a shallow BOWL whose shoulder rises to ~10.5 before falling to the beach —
+the first attempt capped at 8.4 and left the visible ring empty (caught by
+a nearest-blade-to-pad assertion of 22 m instead of ~9).
+
+**Evidence:** golden-hour south vantage (tick 1's bald "before" now has a
+backlit meadow ring behind the stones); dawn 7.0 with the songbird perched;
+on-pad close-up (floor bare to exactly the keep-out edge, meadow line
+beyond); vault outcrop apron clean; noon wide. Numeric: 1500/1500 islet
+blades placed, 0 in any keep-out disc, nearest blade 9.04 m from pad
+center, main-island layout untouched (same PRNG draw order — 9000 blades,
+0 in lighthouse/annex discs). Night skipped: the islet is unlit dark at
+23h and grass adds no luminous material. Perf: 60 fps settled, draws ≤145,
+tris ≤519k, render submission 0.31 ms/frame, no console errors. Owner's
+live level-2 session preserved via Continue (never Begin — Begin wipes
+saves) and restored to the exact spot afterward, audio re-muted.
+
+**Debt:** none added; "Islet is bald" cleared from backlog. Added the
+drained-seabed softlock (below) — observed live: the owner fell into a
+bay-floor ravine at (52, −5) on level 2 and was pinned by >1.35 gradients,
+with see-through-the-world sightlines below the waterline and the 12 s
+autosave ready to trap the position permanently.
+
+**Next tick suggestion:** fix that softlock — it's the only known way to
+ruin a playthrough and the owner personally hit it within an hour of play.
+Axis switch (two vegetation ticks in a row). Sketch: in `player.js step()`,
+when tide is drained, treat sub-waterline terrain that has no walkable
+exit gradient as water-equivalent (block entry the way swimming is
+blocked), OR clamp walkable depth to ≥ −2 m except along the causeway
+corridor; verify by walking into the ravine mouth at (52, −1) and along
+the full causeway (chest must stay reachable), plus a reload-while-deep
+test. Cheap, owner-validated, protects every future player.
+
+---
+
 ## 1 — 2026-06-11 — close-look jank
 
 **Shipped:** Vegetation scatter correctness — grass keep-out discs for the
@@ -80,8 +121,11 @@ nothing may break it.
 - **Grass inside structures** — blades spawn inside the lighthouse study and
   annex (scatter lacks exclusion radii that the tree scatter has). The
   owner's literal example of the jank class.
-- **Islet is bald** — grass scatter only covers the main island; the stones
-  islet reads naked, especially at golden hour.
+- **Drained-seabed softlock** — with the tide out, the exposed bay floor has
+  ravines (e.g. mouth near (52, −1), floor at −5) whose walls all exceed the
+  1.35 walkable gradient: walk in, never out. Below the waterline the world
+  also reads hollow (water-sheet edge + unskinned skirt), and the 12 s
+  autosave can persist the trapped position. Owner hit this live on level 2.
 - **Model sea reads chalky up close** — sun-glitter speckle at 1:240 scale
   overwhelms the body color; consider damping spec/foam by a uniform set on
   the model instance's material clone... careful: water material is shared
