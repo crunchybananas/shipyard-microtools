@@ -94,7 +94,7 @@ scene.add(farSea);
 // ---------------- lights ----------------
 const sun = new THREE.DirectionalLight(0xfff4e0, 3);
 sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.mapSize.set(1024, 1024); // power directive: half the map, look verified per-grade
 sun.shadow.camera.left = -60; sun.shadow.camera.right = 60;
 sun.shadow.camera.top = 60; sun.shadow.camera.bottom = -60;
 sun.shadow.camera.near = 20; sun.shadow.camera.far = 420;
@@ -225,7 +225,8 @@ function startDive() {
   interact.enabled = false;
   UI.cinematic(true);
   A.diveSweep(21);
-  renderer.setPixelRatio(Math.min(BASE_DPR, 1.0));
+  dprNow = Math.min(BASE_DPR, 1.0);
+  renderer.setPixelRatio(dprNow);
   farSea.visible = false;
 
   // pivot: the model's beach, in world space
@@ -273,7 +274,8 @@ function tickDive(dt) {
   if (f >= 1) {
     dive = null;
     MODE = 'play';
-    renderer.setPixelRatio(BASE_DPR);
+    dprNow = BASE_DPR;
+    renderer.setPixelRatio(dprNow);
     farSea.visible = true;
     player.locked = false;
     interact.enabled = true;
@@ -552,10 +554,27 @@ function buildDebugPanel() {
 const clock = new THREE.Clock();
 let elapsed = 0, fps = 60;
 
-renderer.setAnimationLoop(() => {
+// power policy (owner directive): the island only needs 60 — on 120 Hz
+// displays skip excess vsync ticks; and full resolution only while the
+// hand is on the world, easing to a calmer ratio at rest
+let lastTickMs = 0;
+let dprNow = BASE_DPR, restUntil = 0;
+const REST_DPR = Math.min(BASE_DPR, 1.3);
+
+renderer.setAnimationLoop((tMs) => {
+  const nowMs = tMs ?? performance.now();
+  if (nowMs - lastTickMs < 15.5) return; // ~64 fps ceiling, no-op at 60 Hz
+  lastTickMs = nowMs;
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
   fps = lerp(fps, 1 / Math.max(dt, 1e-4), 0.05);
+
+  const active = player.keys.size > 0 || player.dragging || player.dragCaptured || MODE !== 'play';
+  if (active) restUntil = elapsed + 1.2;
+  if (MODE !== 'dive') {
+    const want = elapsed < restUntil ? BASE_DPR : REST_DPR;
+    if (want !== dprNow) { dprNow = want; renderer.setPixelRatio(dprNow); }
+  }
 
   // idle drift of the sun — barely perceptible, but the island lives
   if (MODE === 'play') W.time = (W.time + W.timeDrift * dt) % 24;

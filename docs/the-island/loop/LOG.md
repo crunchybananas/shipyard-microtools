@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 12 — 2026-06-12 — performance (the power tick — owner directive)
+
+**Shipped:** Three multiplier cuts, look held: (1) **60 fps frame
+governor** — setAnimationLoop skips vsync ticks under 15.5 ms (halves
+everything on 120 Hz ProMotion displays, no-op at 60 Hz; timestamp belt
+`tMs ?? performance.now()`); (2) **adaptive resolution** — full
+DPR 1.75 while the hand is on the world (keys/drag/cinematics), easing
+to 1.3 after 1.2 s of stillness: 55 % of the pixels for the posture a
+Myst-like spends most of its time in (the dive's DPR-drop precedent,
+generalized; dive transitions keep `dprNow` truthful); (3) **shadow map
+2048→1024**, PCFSoft kept.
+
+**Evidence:** rest 1.3 organically engaged at boot (probe), snapped to
+1.75 on a real held W (probe + walking capture), rest/active stills at
+the golden stones are visually indistinguishable; long stone shadows
+clean at 1024 (golden) and interiors clean (study noon); zero console
+errors. Honest limits recorded: my preview tab runs ~60 Hz so the
+governor's 120→60 halving is proven by arithmetic, not measurement —
+the owner's fans are the real instrument; the rest-return transition
+was verified at boot rather than post-keyup (capture windows advance
+only ~0.2 s each — the gull lesson applies to every ease).
+
+**Debt:** standing OWNER DIRECTIVE noted in backlog stays open as
+policy: future graphics ticks ride inside freed budget. Candidate next
+lever if fans persist: water fbm2 octaves at rest, or REST_DPR 1.15.
+
+**Next tick suggestion:** the index card on the Pages root labels the
+ABYME build "Vanilla" (owner noticed) — tiny copy fix in
+docs/index.html (outside the-island/, same repo) plus consider a
+"What's new" line. Pair it with the trees-pop-flat LOD softening if
+there's appetite for a second slice — or keep the tick small ahead of
+the batch-3 push at iteration 15.
+
+---
+
 ## 11 — 2026-06-12 — story/worldbuilding (the same hand built the way out)
 
 **Shipped:** The cartographer's throughline closes: the maker's pair from
@@ -431,6 +466,16 @@ nothing may break it.
 ---
 
 # Backlog (unordered; claim items into iterations)
+
+- **OWNER DIRECTIVE (2026-06-12): power efficiency** — "improve the
+  graphics while reducing the power load; this game causes my fans to
+  kick in." Standing policy, not one tick: every graphics tick should
+  leave power flat or lower. Known multipliers: uncapped rAF (120 Hz on
+  ProMotion = 2× everything), DPR 1.75 + MSAA (~3× pixels), 2048² PCFSoft
+  shadows every frame. Levers: 60 fps frame governor, adaptive DPR
+  (full while moving, ~1.3 at rest — the dive already drops DPR, pattern
+  exists at main.js setPixelRatio calls), shadow map 1024/PCF, water
+  fragment cost. Claimed first by iteration 12.
 
 - ~~Audio mute UX~~ — done in iteration 8: `M` toggles via `A.setMuted()`,
   whisper feedback, hint line updated.
