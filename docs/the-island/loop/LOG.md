@@ -12,6 +12,47 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 3 — 2026-06-11 — performance/code health (the drained-bay softlock)
+
+**Shipped:** The only known way to ruin a playthrough is sealed. Walking can
+no longer descend onto raw terrain below −2.2 m (`player.js step()`, inside
+the `!structural` branch so the bridge deck, stairs and pads are exempt) —
+this re-seals the chasm's drowned ends, which were designed to be locked by
+water ("both ends drown below the lowest tide") but opened into one-way pits
+when the valve drained the bay (down-ramps walk at any grade; up beats the
+1.35 limit; floor at −5 sits below even the drained waterline of −4.2).
+Upslope steps below the line stay legal, so stale saves can still scramble
+shallower. Continue also sanitizes: a save below −2.2 respawns on the beach
+("the tide returns you", `main.js`).
+
+**Evidence:** real-input tests (held KeyW via dispatched key events, frames
+flushed by screenshots): descent from the bluff shoulder (terrain 16.6)
+halts at the rim, terrain −1.80, and two further bursts only slide along
+the contour — the flooded crack below stays a vista; causeway sprint
+60→69.3 m straight through its deepest saddle (crest −1.42) with zero
+false blocks; chest path probed (min +6.0 — untouched); bridge exemption
+proven by predicate (walkableY 18.45 vs raw −8.5 → structural). Planted a
+trapped save at (52, −5.18): Continue spawns the beach. Owner's real save
+restored and re-written after testing (live pos == saved pos, meadow).
+No console errors; geometry untouched so no perf delta; times-of-day N/A
+(movement logic only). Constants from in-page probes, not guesses:
+causeway walk-line min −1.42, drained waterY −4.2, clamp −2.2.
+
+**Debt:** cleared the drained-seabed softlock backlog item. The sub-
+waterline void sightlines (entry 1's chasm-seam note) are now unreachable
+by walking — only debug teleports can still see them; deprioritized.
+
+**Next tick suggestion:** "Cellar is flat" — the room that hands over the
+plumb bob is one point light and a barely-readable wall carve. Mood pass:
+warm key from the hatch shaft, cool fill, dust motes in the shaft beam
+(glow-points pattern already exists), brighter carve glyph. Contained,
+big before/after, and it's the next axis in the rotation (light/graphics
+after jank → vegetation → movement). Alternative if feeling literary:
+first story beat — etched marginalia on the chart table rim (cartographer's
+hand, no text dumps).
+
+---
+
 ## 2 — 2026-06-11 — graphics wow (the islet meadow)
 
 **Shipped:** The islet is no longer bald. A second grass ring (1500 blades,
@@ -128,11 +169,8 @@ nothing may break it.
 - **Grass inside structures** — blades spawn inside the lighthouse study and
   annex (scatter lacks exclusion radii that the tree scatter has). The
   owner's literal example of the jank class.
-- **Drained-seabed softlock** — with the tide out, the exposed bay floor has
-  ravines (e.g. mouth near (52, −1), floor at −5) whose walls all exceed the
-  1.35 walkable gradient: walk in, never out. Below the waterline the world
-  also reads hollow (water-sheet edge + unskinned skirt), and the 12 s
-  autosave can persist the trapped position. Owner hit this live on level 2.
+- ~~Drained-seabed softlock~~ — fixed in iteration 3 (rim clamp at −2.2 +
+  Continue-time rescue).
 - **Model sea reads chalky up close** — sun-glitter speckle at 1:240 scale
   overwhelms the body color; consider damping spec/foam by a uniform set on
   the model instance's material clone... careful: water material is shared

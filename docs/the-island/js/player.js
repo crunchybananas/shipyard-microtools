@@ -99,6 +99,12 @@ export class Player {
       if (!structural) {
         const stride = Math.max(Math.hypot(nx - this.pos.x, nz - this.pos.z), 1e-4);
         if ((tThere - tHere) / stride > 1.35) return false;
+        // the drained bay still refuses you: below-tide basins (the chasm's
+        // drowned ends, bay-floor bowls) walk in but never out — their walls
+        // beat the climb limit. Block the descent at the rim; upslope stays
+        // open so a stale save below the line can still scramble shallower.
+        // (The causeway crest never dips under -1.42, so it passes freely.)
+        if (tThere < -2.2 && tThere <= tHere + 0.02) return false;
       }
       // the sea refuses you — but if the tide caught you, wade out
       if (thereY < waterY() - 0.5) {

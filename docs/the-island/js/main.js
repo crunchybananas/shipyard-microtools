@@ -170,6 +170,9 @@ btnContinue.addEventListener('click', () => {
     for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
     titleEl.classList.add('fading');
     const pos = W.playerPos || new THREE.Vector3(4, 0, -104);
+    // a save written below the drained-tide line predates the basin rim
+    // block — those spots have no walkable exit; the tide returns you
+    if (heightAt(pos.x, pos.z) < -2.2) pos.set(4, 0, -104);
     player.spawn(pos, 2.72);
     player.locked = false;
     interact.enabled = true;
