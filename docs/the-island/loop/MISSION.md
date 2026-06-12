@@ -96,9 +96,13 @@ The owner's bar is explicit: *"I really want to be wow'd."*
 
 1. Commit in the submodule, message prefix `the-island:`, on top of
    `origin/main` (fetch & rebase if it moved).
-2. Push: `git push origin HEAD:main` (docs/ is the live GitHub Pages site).
-3. Update the Dockhand parent pointer: `git add shipyard-microtools`,
-   commit `submodule: The Island — <one-line summary>`, rebase on
-   `origin/main` if needed (gitlink conflicts: resolve to the submodule's
-   pushed HEAD), push to main.
+2. Update the Dockhand parent pointer: `git add shipyard-microtools`,
+   commit `submodule: The Island — <one-line summary>`.
+3. Push **every 5th iteration only** (owner's cadence, 2026-06-11: after
+   LOG entries 5, 10, 15, …). Order matters: first the submodule
+   (`git push origin HEAD:main` — docs/ is the live GitHub Pages site),
+   then the parent (rebase on `origin/main` if it moved; gitlink
+   conflicts resolve to the submodule's pushed HEAD). Between batches,
+   commits stay local — still one commit per iteration in both repos,
+   so a batch push ships cleanly even if a session ends mid-cycle.
 4. End with the co-author trailer on commits, as established in history.
