@@ -29,6 +29,7 @@ export const W = {
     crankUsed: false,
     rulerTaken: false,
     rulerPlaced: false,
+    chestOpen: false,
     heardBox: false,
     heardBird: false,
     birdSolved: false,
@@ -175,6 +176,8 @@ export function load() {
     W.lensPlaced = !!s.lensPlaced;
     W.beamAngle = s.beamAngle ?? W.beamAngle;
     Object.assign(W.flags, s.flags || {});
+    // saves from before the lid was persistent: the taken ruler proves it
+    if (W.flags.rulerTaken && !('chestOpen' in (s.flags || {}))) W.flags.chestOpen = true;
     W.stems = s.stems ?? 0;
     W.inventory = s.inventory || [];
     W.journal = s.journal || [];

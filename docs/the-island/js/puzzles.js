@@ -121,8 +121,8 @@ export class Game {
       id: 'chest', targets: [R.chestLid.parent], label: 'a half-buried chest',
       when: () => !W.flags.rulerTaken,
       onClick: () => {
-        if (!this.chestOpen) {
-          this.chestOpen = true; A.chime();
+        if (!W.flags.chestOpen) {
+          this.flag('chestOpen'); A.chime();
           UI.whisper('The hinges remember how.');
         } else if (!W.flags.rulerTaken) {
           this.flag('rulerTaken');
@@ -348,7 +348,7 @@ export class Game {
 
     // eased anims
     const ease = (k, target, rate = 2.2) => { an[k] = lerp(an[k], target, 1 - Math.exp(-rate * dt)); };
-    ease('chest', this.chestOpen ? 1 : 0);
+    ease('chest', W.flags.chestOpen ? 1 : 0);
     ease('vault', F.birdSolved ? 1 : 0, 0.9);
     ease('hatch', F.hatchOpen ? 1 : 0, 1.2);
     ease('boxLid', this.boxPlaying ? 1 : 0, 3);

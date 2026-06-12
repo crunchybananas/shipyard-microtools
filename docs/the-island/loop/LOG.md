@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 17 — 2026-06-12 — code health (the chest remembers)
+
+**Shipped:** `chestOpen` moved from session-local Game state into
+`W.flags` — the looted chest no longer re-seals itself on reload. Done
+the save-rule way: flag declared with a false default, written through
+the existing `flag()` (which force-saves on set, so the open lid is
+durable the moment the hinges move), lid ease reads the flag, and
+`load()` carries a one-line migration: a pre-fix save with `rulerTaken`
+but no `chestOpen` key infers the lid open — the taken ruler proves it.
+
+**Evidence:** the owner's REAL save was the legacy case (rulerTaken
+true, no chestOpen key): after load, `W.flags.chestOpen === true` via
+the migration, and the chest renders lid-up at the drained shore
+(screenshot — with tick 15's midday mist over the water behind it, a
+nice compounding). Forced save shows the flag persisted in the JSON.
+Zero console errors. This closes the backlog's last continuity nit.
+
+**Debt:** cleared "chest lid state is session-local".
+
+**Next tick suggestion:** finale's visual half from the backlog — "the
+credits sky could spell the constellation/leitmotif." Sketch: during
+the credits, five stars among the existing starfield brighten in the
+leitmotif's rhythm (E G A D C timing), tracing the same five-dot
+pattern the stones carry — sky shader already has stars; a uniform
+array of five brightened directions driven by the finale clock. Story
++ sky in one; verify with the finale path (stash/restore the save
+around it — endFinale force-saves like endIntro).
+
+---
+
 ## 16 — 2026-06-12 — secret (far down, a light is still lit)
 
 **Shipped:** The first secret. At night the model's model — the speck
@@ -626,9 +656,8 @@ nothing may break it.
 - ~~Model sea reads chalky up close~~ — iteration 10: per-pixel instance
   scale from the world/object derivative ratio; glitter ×0.16 and ripple
   ×0.55 at 1:240, shared material intact, world ocean untouched.
-- **Chest lid state is session-local** — `chestOpen` lives on Game, not W:
-  reload after taking the ruler shows a closed chest (cosmetic, but a
-  continuity break).
+- ~~Chest lid state is session-local~~ — iteration 17: persisted via
+  W.flags + load-time migration (rulerTaken implies the lid).
 - **Beam reads as two streaks** from some angles (open-ended double-sided
   cone); could use a soft volumetric impostor or inner cone.
 - ~~Cellar is flat~~ — fixed in iteration 4 (fill light, carve halo, light
