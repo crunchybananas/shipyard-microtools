@@ -86,7 +86,9 @@ export const isGolden = () => W.time > 17.1 && W.time < 18.5;
 export function mistTargetAt(t) {
   const h = ((t % 24) + 24) % 24;
   const r = mulberry32((SEED ^ (Math.floor(h / 3) * 2654435761)) >>> 0)();
-  const m = r < 0.45 ? 0 : 0.2 + (r - 0.45) * 1.1;
+  // tuned against the actual seeded rolls: sea-fret dawn (0.58), burn-off,
+  // a drizzle-crossing midday (0.51), then a clearing golden evening
+  const m = r < 0.38 ? 0 : 0.18 + (r - 0.38) * 1.35;
   const ceil = (h > 16.5 && h < 18.6) ? 0.08 : (h < 5 || h > 21) ? 0.45 : 0.8;
   return Math.min(m, ceil);
 }

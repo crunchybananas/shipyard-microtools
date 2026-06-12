@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 21 — 2026-06-12 — weather (the day gets its arc)
+
+**Shipped:** The mist curve tuned against the ACTUAL seeded slot rolls —
+computed offline in node with the game's own mulberry32/SEED before
+choosing constants (threshold 0.45→0.38, slope 1.1→1.35). The day now
+arcs: thick sea-fret dawn (0.58), late-morning burn-off (0.22), a
+midday 0.51 that crosses the drizzle threshold — the rain bed finally
+plays in natural rotation, not just under debug forcing — then a
+clearing afternoon, protected golden (max 0.000 across the window,
+re-measured), clear evening, misty nights at the ceiling.
+
+**Evidence:** offline candidate table vs in-page mistTargetAt sweep —
+identical (0.45/0.45/0.58/0.22/0.51/0/0/0.45); the dawn-bird moment
+verified under the new 0.58 fret: the bluff across the water dissolves
+but all five stone glyphs blaze through and the songbird hangs clear
+(screenshot — the 15-tick worry resolved: mist and the music moment
+coexist); midday marine haze visual; drizzle gain measured 0.0066 ==
+(0.51−0.45)×0.11 exactly. Zero errors; save restored. Noted, not
+chased: the sky dome ignores mist (fog is geometry-only) — a
+mist-aware horizon would deepen heavy fret days.
+
+**Debt:** the 15-tick "mild day" note cleared. Sky-dome mist awareness
+added as a small backlog idea below.
+
+**Next tick suggestion:** ASK THE OWNER first — twenty-one iterations
+in, the original backlog is nearly spent; the loop should learn where
+to lean: more soul (story/secrets), more polish (gull geometry, tree
+LOD verts, sky-mist), Ember parity, or something new entirely. Pending
+their answer: gull close-up geometry is the strongest survivor.
+
+---
+
 ## 20 — 2026-06-12 — graphics wow (the beam becomes light)
 
 **Shipped:** The night beam no longer reads as two hard streaks. Two
@@ -738,6 +770,10 @@ nothing may break it.
 ---
 
 # Backlog (unordered; claim items into iterations)
+
+- **Sky dome ignores mist** — scene fog whitens geometry but the sky/horizon
+  stays clear-day blue under heavy fret (noticed in 21's midday check); a
+  uMist uniform lifting the horizon band would sell thick days properly.
 
 - **OWNER DIRECTIVE (2026-06-12): power efficiency** — "improve the
   graphics while reducing the power load; this game causes my fans to
