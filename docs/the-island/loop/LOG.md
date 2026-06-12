@@ -12,6 +12,37 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 11 — 2026-06-12 — story/worldbuilding (the same hand built the way out)
+
+**Shipped:** The cartographer's throughline closes: the maker's pair from
+the chart table's south-east corner appears once more, small and worn,
+on the annex floor beside the bell stand — the object that ends the game.
+Same glyphs (triangle + ringed dot), same burnish, lower opacity (0.5 —
+floor wear, not fresh etching). A player who leaned over the model and
+noticed the signature finds it again at the journey's end: the same hand
+made everything, including the way out. No words, no state, two sprites.
+
+**Evidence:** noon close-look in the annex — bell above, signature below,
+sitting in the doorway's light patch; reads subtle but unmistakable at
+lean-in. Zero console errors; marks are not raycast targets (bell hotspot
+untouched). Owner save re-seeded this tick: the preview tab arrived with
+a FRESH browser profile (no Continue button — first time the tool has
+done this) — restored verbatim from the tick-7 stash plus abyme-muted,
+verified level-2 Continue works. The stash-in-context practice earns
+its keep again.
+
+**Debt:** none added.
+
+**Next tick suggestion:** trees pop flat at distance (backlog) — distant
+canopies could be cheaper AND prettier. Sketch: a billboard ring at the
+far LOD (impostor quad per tree past ~120 m, swapping by camera distance
+in the canopy shader via the same derivative/scale trick family), or
+simply fade distant canopy color toward the terrain palette to soften
+the pop. Perf axis not yet visited by the loop; budget headroom exists
+(draws ≤166, tris ≤519k) but the win is visual softness at the horizon.
+
+---
+
 ## 10 — 2026-06-12 — graphics wow (the model sea learns its scale)
 
 **Shipped:** The chart-table sea no longer reads as chalk. The water

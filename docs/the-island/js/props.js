@@ -510,6 +510,19 @@ export function buildWorld() {
     bell.position.set(ax + 1.0, LH.y + 1.35, az - 0.4);
     bell.name = 'bell';
     core.add(bell);
+
+    // the maker's pair once more, small on the floor by the bell stand —
+    // the hand that signed the chart table also built the way out
+    const sig = (gi, x, z, s, rz) => {
+      const g = glyphSprite(atlas, gi, 0xc08a3e, s);
+      g.rotation.x = -Math.PI / 2;
+      g.rotation.z = rz;
+      g.position.set(x, LH.y + 0.078, z);
+      g.material.opacity = 0.5;
+      core.add(g);
+    };
+    sig(1, ax + 0.6, az - 0.06, 0.17, 0.4);
+    sig(0, ax + 0.76, az + 0.07, 0.13, -0.15);
   }
 
   // =================== STANDING STONES (the islet) ==========================
