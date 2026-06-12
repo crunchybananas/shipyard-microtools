@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 19 — 2026-06-12 — story (the journal learns to draw)
+
+**Shipped:** Field Notes is a keepsake: fifteen tiny ink sketches — the
+keeper's marginalia — one for every journal entry, from the chart table
+with its island to the crossed valve wheel to the nested-rectangles
+recursion of "one level down." All code-generated inline SVG (zero
+assets), stroke supplied by CSS in the marginalia teal, matched at
+render time by each entry's own words — the stored `sketch` field stays
+untouched, so every save old and new gets its pictures retroactively.
+Bonus kill: a real pre-existing bug exposed by verification — the
+journal rendered once at boot (empty) and NEVER re-rendered after a
+save loaded, so Continue-players always opened an empty journal until
+a new entry arrived. toggleJournal now re-renders on open.
+
+**Evidence:** real-input J keydown after Continue on the owner's save:
+3 entries, 3 sketches (screenshot — table, valve, recursion all
+legible at 46 px in the journal's ink palette); before the re-render
+fix the same flow showed 0 entries (the exposed bug, captured in the
+numbers); zero console errors; no state mutation (J never saves).
+
+**Debt:** none added. The remaining unsketched entries ship art the
+moment those entries are earned — same dictionary.
+
+**Next tick suggestion:** iteration 20 closes batch 4 — PUSH (MISSION
+step 3: submodule then parent; nested light, chest persistence,
+constellation, journal sketches + this tick's). For the work: the
+"Story axis is thin" umbrella item — the journal now draws, the
+marginalia signs, the annex echoes; consider closing that backlog
+bullet with a final pass: ONE more environmental beat tying the
+cartographer to the recursion (the coat's pocket? initials under the
+table?) — or simply promote the dawn-mist/songbird + mild-day weather
+tuning if the story feels complete enough.
+
+---
+
 ## 18 — 2026-06-12 — finale (the credits sky spells the leitmotif)
 
 **Shipped:** The finale resolves in the sky now. Five warm stars — set

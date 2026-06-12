@@ -232,6 +232,12 @@ html, body {
   color: var(--amber);
   opacity: 0.9;
 }
+#journal-entries .entry .sketch svg {
+  display: block;
+  height: 46px;
+  stroke: #9adfca;
+  opacity: 0.7;
+}
 #journal-entries .empty { font-style: italic; color: var(--ink-dim); }
 .journal-foot {
   margin-top: 1.3rem;
