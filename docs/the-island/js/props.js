@@ -800,6 +800,24 @@ export function buildWorld() {
 
 // ---------------------------------------------------------------------------
 function buildVegetation(core, r) {
+  // keep-outs: floors the scatter must respect. Discs match the structures
+  // built in buildWorld — lighthouse base (r 5.2 + wall + apron) and the
+  // annex (attached at azimuth 15°, baseR + 2.2 from the tower, r 2.8).
+  const LHX = SPOTS.lighthouse.x, LHZ = SPOTS.lighthouse.y;
+  const aa = 15 * Math.PI / 180;
+  const ANX = LHX + Math.sin(aa) * 7.4, ANZ = LHZ + Math.cos(aa) * 7.4;
+  const KEEPOUT = [[LHX, LHZ, 7.2], [ANX, ANZ, 4.6]];
+  const open = (x, z) => {
+    for (const [kx, kz, kr] of KEEPOUT) if (Math.hypot(x - kx, z - kz) < kr) return false;
+    return true;
+  };
+  // grass can't grip a cliff: gradient ~1.0 is already steeper than any
+  // walkable meadow (player limit 1.35); the chasm and sea cliffs are >2
+  const grade = (x, z) => {
+    const e = 0.7;
+    return Math.hypot(heightAt(x + e, z) - heightAt(x - e, z),
+                      heightAt(x, z + e) - heightAt(x, z - e)) / (2 * e);
+  };
   // --- pines, wind-bent ---
   const trunkGeo = new THREE.CylinderGeometry(0.12, 0.3, 2.6, 6);
   trunkGeo.translate(0, 1.3, 0);
@@ -932,6 +950,7 @@ function buildVegetation(core, r) {
     const z = SPOTS.mainCenter.y + Math.cos(a) * d;
     const h = heightAt(x, z);
     if (h < 2.2 || h > 16) continue;
+    if (!open(x, z) || grade(x, z) > 1.0) continue;
     const s = 0.7 + r() * 0.9;
     m4.compose(
       new THREE.Vector3(x, h - 0.06, z),

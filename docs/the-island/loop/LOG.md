@@ -12,6 +12,47 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 1 — 2026-06-11 — close-look jank
+
+**Shipped:** Vegetation scatter correctness — grass keep-out discs for the
+lighthouse study and annex (the owner's "blades through the furniture" class:
+59 blades stood inside the study disc, the nearest 1.07 m from the tower axis,
+growing through the chart table; 16 more in the annex where the bell stands),
+plus a slope gate (analytic gradient > 1.0) that strips blades off the chasm
+walls and sea cliffs. The meadow keeps its full 9000 blades — rejected spawns
+resample onto legal ground.
+
+**Evidence:** before/after screenshots at identical vantages: study chart
+table (noon), annex floor (noon), chasm east wall; exteriors at dawn 7.5h and
+golden 17.7h (the bare apron at the tower base reads like a worn doorstep,
+not a crop circle); night render clean. Numeric proof: in-disc blade counts
+59→0 and 16→0, nearest-to-tower 1.07 m→7.25 m, count 9000→9000. Real-input
+valve click (pointermove → rAF → pointerdown/up) drains the tide 1→0 — chain
+link 1 re-verified; nothing else in the chain touched. 60 fps, draws ≤131,
+tris ≤495k, zero console errors.
+
+**Debt:** none added. Tooling fix recorded here because it will bite again:
+python http.server's missing cache headers let Chrome serve stale modules
+under heuristic freshness — verification ran OLD code while the server had
+the new file. The launch config now serves `Cache-Control: no-store`; if a
+stale ghost persists anyway, load via `http://127.0.0.1:8741` (separate cache
+keys from localhost). Also: the pointer pipeline only advances during visible
+frames — to drive a click, queue pointermove + pointerdown/up inside nested
+`requestAnimationFrame` callbacks in ONE eval, then screenshot to flush.
+Backlog note: from inside the chasm slot a pale terrain-skirt seam is visible
+overhead (reachable only by falling in); logged, not chased.
+
+**Next tick suggestion:** "Islet is bald" — this tick's golden-hour stones-pad
+screenshot shows the puzzle islet utterly naked while the main meadow is lush,
+and players stare at exactly that ground through the whole music sequence.
+The scatter now has keep-outs and a slope gate, so seeding the islet is
+low-risk: a second spawn ring around SPOTS.islet with keep-outs for the
+stones pad (r ~9 so the dance floor stays readable) and the vault outcrop,
+reusing the same blade pool budget (+~1500 instances stays far under tri
+budget). Highest wow-per-line-of-code on the board.
+
+---
+
 ## 0 — 2026-06-11 — the overhaul itself (baseline)
 
 **Shipped:** Complete rebuild as ABYME — recursive island, six-puzzle chain,
