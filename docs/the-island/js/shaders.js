@@ -30,6 +30,7 @@ export function makeWaterMaterial(heightTex, domain) {
   const mat = new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: true,
+    extensions: { derivatives: true }, // fwidth on WebGL1 fallbacks
     uniforms: {
       uTime: { value: 0 },
       uWaterY: { value: 0 },
@@ -102,11 +103,19 @@ export function makeWaterMaterial(heightTex, domain) {
         float depth = vLocal.y - terrainH;
         if (depth < 0.02) discard;
 
-        // ripple normal detail
+        // instance scale, sensed per-pixel from the world/object derivative
+        // ratio: ~1.0 on the sea, ~1/240 on the chart-table model. The
+        // material is shared by design — this is how the model gets calmer
+        // water without a clone. View-independent, so the world's grazing
+        // glitter path keeps its full sparkle at any distance.
+        float scl = (fwidth(vWorld.x) + fwidth(vWorld.z)) / max(fwidth(vLocal.x) + fwidth(vLocal.z), 1e-6);
+        float mini = 1.0 - smoothstep(0.05, 0.5, scl);
+
+        // ripple normal detail — gentled at 1:240 where it reads as chalk
         vec2 rp = vLocal.xz * 0.35 + vec2(uTime * 0.07, -uTime * 0.05);
         float r1 = fbm2(rp);
         float r2 = fbm2(rp * 1.7 + 19.0 + vec2(-uTime * 0.06, uTime * 0.04));
-        vec3 N = normalize(vNorm + vec3(r1 - 0.5, 0.0, r2 - 0.5) * 0.45);
+        vec3 N = normalize(vNorm + vec3(r1 - 0.5, 0.0, r2 - 0.5) * 0.45 * mix(1.0, 0.55, mini));
 
         vec3 V = normalize(cameraPosition - vWorld);
         float fresnel = pow(1.0 - max(dot(V, N), 0.0), 3.0);
@@ -118,12 +127,12 @@ export function makeWaterMaterial(heightTex, domain) {
         // sky reflection
         vec3 col = mix(body, uSkyCol, fresnel * 0.75);
 
-        // sun glitter
+        // sun glitter — damped to a sheen on the model, full at sea
         vec3 R = reflect(-normalize(uSunDir), N);
         float spec = pow(max(dot(R, V), 0.0), 220.0) * smoothstep(-0.05, 0.12, uSunDir.y);
-        col += uSunCol * spec * 2.4;
+        col += uSunCol * spec * 2.4 * mix(1.0, 0.16, mini);
         // moon-glitter at night
-        col += vec3(0.55, 0.65, 0.8) * pow(max(dot(R, V), 0.0), 350.0) * uNight * 1.2;
+        col += vec3(0.55, 0.65, 0.8) * pow(max(dot(R, V), 0.0), 350.0) * uNight * 1.2 * mix(1.0, 0.16, mini);
 
         // shoreline foam
         float foamBand = 1.0 - smoothstep(0.0, 0.85, depth + (r1 - 0.5) * 0.4);

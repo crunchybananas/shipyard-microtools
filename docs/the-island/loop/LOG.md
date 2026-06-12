@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 10 — 2026-06-12 — graphics wow (the model sea learns its scale)
+
+**Shipped:** The chart-table sea no longer reads as chalk. The water
+shader now senses its instance scale per-pixel — the ratio of world-space
+to object-space screen derivatives (`fwidth(vWorld)/fwidth(vLocal)`),
+~1.0 on the real sea, ~1/240 on the model — and at miniature scale damps
+the sun/moon glitter to a sheen (×0.16) and gentles the ripple normals
+(×0.55). One shared material, as the hard rule demands: no clone, and
+the discriminator is view-independent so the world ocean's grazing-angle
+glitter path keeps full sparkle at every distance. WebGL1 fallback
+covered (`extensions.derivatives`).
+
+**Evidence:** noon over the table — the model sea is a calm blue-green
+BODY with readable shallows around both islands (vs the white speckle
+storm in tick 5's screenshots of the same vantage); golden-hour beach
+horizon — world ocean sheen rich and unchanged out to the horizon
+(the regression risk: an fwidth-only fade would have gutted exactly
+this, which is why the ratio discriminator, not raw fwidth). Zero
+console errors, draws/tris unchanged. Owner save restored, muted.
+
+**Debt:** cleared "model sea reads chalky up close".
+
+**Batch 2 pushed** (this entry rides in it): stone glyphs inboard,
+intro flight, M sound toggle, the dawn gull, the model sea — five
+iterations, submodule then parent, per the every-5 cadence.
+
+**Next tick suggestion:** story axis again — the cartographer needs a
+THROUGHLINE, not just marks: candidate is "the same hand" motif
+completing in the annex (the coat, the bell): a final marginalia mark
+ON the bell stand matching the maker's pair, or footprint wear at the
+chart table's south margin (where someone stood for years). Quiet,
+two-object echo, closes the loop the marginalia opened. Alternative:
+trees pop flat at distance (LOD billboards) if feeling technical.
+
+---
+
 ## 9 — 2026-06-12 — ambient life (the gull that lands)
 
 **Shipped:** At dawn the first gull leaves the gyre, glides to the gallery
@@ -373,10 +409,9 @@ nothing may break it.
   owner's literal example of the jank class.
 - ~~Drained-seabed softlock~~ — fixed in iteration 3 (rim clamp at −2.2 +
   Continue-time rescue).
-- **Model sea reads chalky up close** — sun-glitter speckle at 1:240 scale
-  overwhelms the body color; consider damping spec/foam by a uniform set on
-  the model instance's material clone... careful: water material is shared
-  by design. Maybe derivative-based fade instead.
+- ~~Model sea reads chalky up close~~ — iteration 10: per-pixel instance
+  scale from the world/object derivative ratio; glitter ×0.16 and ripple
+  ×0.55 at 1:240, shared material intact, world ocean untouched.
 - **Chest lid state is session-local** — `chestOpen` lives on Game, not W:
   reload after taking the ruler shows a closed chest (cosmetic, but a
   continuity break).
