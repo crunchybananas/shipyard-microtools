@@ -7,18 +7,28 @@ import { clamp, lerp } from './util.js';
 
 let ctx = null;
 
+const MASTER_LEVEL = 0.6;
+
 const A = {
   master: null, amb: null, music: null, fx: null,
   diveFilter: null,
   surf: null, wind: null, room: null,
   stems: [],
   ready: false,
+  // device preference, not world state: survives saves AND New Game wipes
+  muted: localStorage.getItem('abyme-muted') === '1',
+
+  setMuted(m) {
+    this.muted = !!m;
+    localStorage.setItem('abyme-muted', this.muted ? '1' : '0');
+    if (this.master) this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+  },
 
   init() {
     if (this.ready) return;
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     this.master = ctx.createGain();
-    this.master.gain.value = 0.6;
+    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
     this.diveFilter = ctx.createBiquadFilter();
     this.diveFilter.type = 'lowpass';
     this.diveFilter.frequency.value = 19000;

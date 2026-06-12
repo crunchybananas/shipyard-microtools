@@ -118,6 +118,13 @@ nothing may break it.
 
 # Backlog (unordered; claim items into iterations)
 
+- **Audio mute UX** — owner asked for sound-off (done: `abyme-muted`
+  localStorage pref, `A.setMuted()` in audio.js, applied at init) and
+  explicitly deferred the control surface. Needs a no-HUD-chrome way to
+  toggle: candidates — title-screen line, or a diegetic object (conch on
+  the title beach?). Keyboard `M` is acceptable per the existing J-journal
+  precedent.
+
 - **Grass inside structures** — blades spawn inside the lighthouse study and
   annex (scatter lacks exclusion radii that the tree scatter has). The
   owner's literal example of the jank class.
