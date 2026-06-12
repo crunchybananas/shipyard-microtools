@@ -1118,6 +1118,14 @@ export function instantiateModel(core, modelAnchor) {
       new THREE.MeshStandardMaterial({ color: 0xcfc8b8, flatShading: true }));
     peak.position.y = 0.7;
     impostor.add(disc, peak);
+    // the secret, for whoever leans all the way in at night: far down the
+    // recursion, a light is still lit — a pinprick where the next
+    // lighthouse stands (~1 mm in world space; additive, day-invisible)
+    const glint = new THREE.Mesh(new THREE.SphereGeometry(0.45, 6, 5),
+      new THREE.MeshBasicMaterial({ color: 0xffe2a8, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    glint.position.set(-0.4, 0.5, -0.55);
+    glint.name = 'nestedGlint';
+    impostor.add(glint);
     impostor.scale.setScalar(SCALE_MODEL * 120);
     nestedAnchor.add(impostor);
   }

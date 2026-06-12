@@ -71,6 +71,8 @@ addEventListener('resize', () => {
 // ---------------- world ----------------
 const { core, waterMat, modelAnchor, biolume, fireflies, motes } = buildWorld();
 const modelRoot = instantiateModel(core, modelAnchor);
+const nestedGlint = modelRoot.getObjectByName('nestedGlint');
+const _glintV = new THREE.Vector3();
 const refs = collectRefs(core);
 const modelRefs = collectRefs(modelRoot);
 // the clone captured pre-clone children only; nothing model-side needs Points
@@ -395,6 +397,19 @@ function applyAtmosphere(elapsed, dt) {
 
   scene.fog.color.copy(g.fog);
   scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4);
+
+  // the secret pinprick on the model's model — alive only at night, and
+  // leaning all the way in earns the whisper exactly once per save
+  if (nestedGlint) {
+    const nf = isNight() ? 1 : 0;
+    nestedGlint.material.opacity = nf * (0.55 + 0.25 * Math.sin(elapsed * 1.7));
+    if (nf && MODE === 'play' && game) {
+      nestedGlint.getWorldPosition(_glintV);
+      if (camera.position.distanceTo(_glintV) < 1.5) {
+        game.once('nestedLight', () => UI.whisper('Far down, a light is still lit.'));
+      }
+    }
+  }
 
   const su = skyMat.uniforms;
   su.uTime.value = elapsed;

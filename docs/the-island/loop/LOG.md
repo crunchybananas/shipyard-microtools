@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 16 — 2026-06-12 — secret (far down, a light is still lit)
+
+**Shipped:** The first secret. At night the model's model — the speck
+impostor on the model's chart table — keeps a pinprick of warm light
+where the next lighthouse down would stand (~1 mm in world space,
+additive, gently pulsing, exactly invisible by day). Walk in close over
+the chart table at night and a whisper lands, once per save: "Far down,
+a light is still lit." The recursion is inhabited all the way down.
+Implementation: one tiny mesh on the nested impostor (`nestedGlint`,
+driven in applyAtmosphere — refs can't reach inside modelAnchor by
+design, so main.js holds a direct handle), proximity 1.5 m via the
+existing `once()`/onceKeys persistence — zero schema change, zero chain
+contact, one draw call.
+
+**Evidence:** night lean-in screenshot with the whisper ON SCREEN over
+the model; glint opacity 0.70 at night (the 0.55±0.25 pulse), exactly 0
+at noon (visual + numeric); onceKeys gained `nestedLight` on approach
+and the whisper fired exactly once; threshold corrected mid-tick from
+0.75 m (unreachable: eye-to-table-center is ≥1.35 m from any rim — the
+camera never lowers when "leaning") to 1.5 m, with the crank (1.73 m)
+and valve (2.9 m) stations verified outside it. Owner's save restored
+WITHOUT the once-key — their first discovery is still ahead of them.
+Trap recorded: window.__ stashes die on reload; the context-held
+verbatim stash is the durable one.
+
+**Debt:** secret axis opened; "the model's model is begging" cleared.
+
+**Next tick suggestion:** the chest-lid continuity fix deferred from
+last tick (chestOpen → save/load with backward-compatible default), OR
+if the owner has played the new batch, fold their feedback first. Also
+worthy: dawn-mist × songbird interplay check (15's note).
+
+---
+
 ## 15 — 2026-06-12 — weather (mist on its own slow clock)
 
 **Shipped:** The island has weather now. Mist is a pure function of the
@@ -611,9 +645,8 @@ nothing may break it.
 - **Story axis is thin** — who was the cartographer? The coat, the
   footprints, the warm window are beats without a throughline. Journal
   pages / etched marginalia on the chart table / a name somewhere.
-- **Secret axis unexplored** — the model's model (the speck impostor on the
-  model's chart table) is begging to do something for players who lean in
-  with the time cranked to night.
+- ~~Secret axis unexplored~~ — iteration 16: the nested speck keeps a
+  night pinprick lit; leaning in earns a once-per-save whisper.
 - **Finale could resolve more** — the day-wheel happens, but the credits
   sky could spell the constellation/leitmotif; the bell could audibly
   gather all five stems into the final chord more explicitly.
