@@ -481,6 +481,7 @@ export class Game {
     if (R.beamPivot) R.beamPivot.rotation.y = W.beamAngle;
     if (R.beamCone && !isModel) R.beamCone.material.uniforms.uIntensity.value = an.beamI;
     if (R.shaftBeam && !isModel) R.shaftBeam.material.uniforms.uIntensity.value = an.shaft;
+    if (R.cellarShaft && !isModel) R.cellarShaft.material.uniforms.uIntensity.value = an.hatch * 0.9;
     if (R.glyphPlane) R.glyphPlane.visible = this.glyphsLit;
 
     if (R.plumbHung) R.plumbHung.visible = F.plumbHung;

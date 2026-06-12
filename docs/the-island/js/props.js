@@ -638,6 +638,7 @@ export function buildWorld() {
   }
 
   // =================== THE HATCH + CELLAR VAULT (bluff) ======================
+  let cellarMotes = null;
   {
     const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y, hy = 23.5;
     // stone ring + brass lid + four glyph dials
@@ -705,10 +706,39 @@ export function buildWorld() {
     bobRing.position.set(hx, hy - 3.8, hz - 13.5);
     bobG.add(bobRing);
     cellar.add(bobG);
-    // wall carving: the plumb-line diagram (a hint, drawn in glyphs)
-    const carve = glyphSprite(atlas, 4, 0x9adfca, 1.4);
+    // wall carving: the plumb-line diagram (a hint, drawn in glyphs) —
+    // sized to read across the room, with a faint halo so the wall holds it
+    const carve = glyphSprite(atlas, 4, 0x9adfca, 1.9);
     carve.position.set(hx, hy - 3.4, hz - 17.2);
     cellar.add(carve);
+    const carveHalo = glyphSprite(atlas, 4, 0x9adfca, 3.1);
+    carveHalo.material.opacity = 0.16;
+    carveHalo.position.set(hx, hy - 3.4, hz - 17.25);
+    cellar.add(carveHalo);
+
+    // daylight spills down the open hatch: a dusty shaft of it on the stairs
+    const cellarShaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.95, 1.7, 5.4, 10, 1, true),
+      makeBeamMaterial(0xffe2a8));
+    cellarShaft.material.uniforms.uFlip.value = 1;
+    cellarShaft.position.set(hx, hy - 2.6, hz);
+    cellarShaft.name = 'cellarShaft';
+    cellar.add(cellarShaft);
+
+    // dust motes hanging in the spill — through the shaft AND the room
+    // (two overlapping interior boxes; both volumes need their floaters)
+    const moteR = mulberry32(SEED ^ 0xd057);
+    const motePos = [];
+    for (let i = 0; i < 64; i++) {
+      const inRoom = i % 2;
+      motePos.push(
+        hx + (moteR() - 0.5) * (inRoom ? 7.8 : 2.6),
+        hy - 4.9 + moteR() * (inRoom ? 3.6 : 4.9),
+        inRoom ? hz - 10.2 - moteR() * 6.6 : hz - 0.4 - moteR() * 8.6);
+    }
+    cellarMotes = makeGlowPoints(motePos, 0xffe2a8, 0.22);
+    cellarMotes.material.uniforms.uDrift.value = 1;
+    cellarMotes.name = 'cellarMotes';
     core.add(cellar);
   }
 
@@ -795,7 +825,7 @@ export function buildWorld() {
   fireflies.material.uniforms.uDrift.value = 1;
   fireflies.name = 'fireflies';
 
-  return { core, waterMat, modelAnchor, biolume, fireflies, atlas };
+  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, atlas };
 }
 
 // ---------------------------------------------------------------------------
@@ -1044,7 +1074,7 @@ export function instantiateModel(core, modelAnchor) {
 const NAMES = [
   'water', 'lampLens', 'beamPivot', 'beamCone', 'shaftBeam', 'valveWheel',
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
-  'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid',
+  'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',

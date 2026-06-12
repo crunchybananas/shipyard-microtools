@@ -69,14 +69,14 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const { core, waterMat, modelAnchor, biolume, fireflies } = buildWorld();
+const { core, waterMat, modelAnchor, biolume, fireflies, motes } = buildWorld();
 const modelRoot = instantiateModel(core, modelAnchor);
 const refs = collectRefs(core);
 const modelRefs = collectRefs(modelRoot);
 // the clone captured pre-clone children only; nothing model-side needs Points
 
 const diveGroup = new THREE.Group();
-diveGroup.add(core, biolume, fireflies);
+diveGroup.add(core, biolume, fireflies, motes);
 scene.add(diveGroup);
 
 // sky + far sea (outside the dive group: they are the "outside" of the world)
@@ -117,6 +117,11 @@ scene.add(lampSpill);
 const cellarLight = new THREE.PointLight(0xffb454, 0, 18, 1.6);
 cellarLight.position.set(SPOTS.hatch.x, 21.6, SPOTS.hatch.y - 12);
 scene.add(cellarLight);
+
+// cool fill on the carve wall — separates the room from the shaft's warmth
+const cellarFill = new THREE.PointLight(0x7fd9c0, 0, 13, 1.7);
+cellarFill.position.set(SPOTS.hatch.x, 21.0, SPOTS.hatch.y - 15.5);
+scene.add(cellarFill);
 
 // ---------------- gulls ----------------
 const gulls = [];
@@ -380,6 +385,7 @@ function applyAtmosphere(elapsed, dt) {
   studyLight.intensity = lerp(4, 16, night);
   lampSpill.intensity = W.lampLit ? 220 : 0;
   cellarLight.intensity = W.flags.hatchOpen ? 9 : 0;
+  cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
 
   // iris cursor only exists while playing
   document.getElementById('iris').classList.toggle('gone', MODE !== 'play');
@@ -393,6 +399,10 @@ function applyAtmosphere(elapsed, dt) {
   fu.uTime.value = elapsed;
   fu.uPlayer.value.copy(camera.position);
   fu.uGlobal.value = night;
+  const mu = motes.material.uniforms;
+  mu.uTime.value = elapsed;
+  mu.uPlayer.value.copy(camera.position);
+  mu.uGlobal.value = W.flags.hatchOpen ? 0.8 : 0;
 
   // beams + sway
   for (const r of [refs.beamCone, refs.shaftBeam]) {

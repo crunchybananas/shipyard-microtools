@@ -12,6 +12,48 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 4 — 2026-06-12 — graphics wow (the cellar deserves mood)
+
+**Shipped:** The plumb-bob room is an altar now, not a void. Cool teal fill
+light on the carve wall (separates room from the shaft's warm key), the
+carve glyph at 1.9 with a 0.16-alpha halo behind it (reads as etched
+relief — and its arrow points up from exactly where the bob hangs, item
+and hint in one sightline), a dusty light shaft falling from the open
+hatch onto the stairs (`cellarShaft`, beam material, intensity eased with
+`an.hatch` so it fades in as the lid slides), and 64 seeded dust motes
+split between both interior volumes. Bonus discovered in verification:
+at night the open hatch now spills warm light up through its ring —
+visible across the bluff, beckons.
+
+**Evidence:** before shots (uniform murk; a flat tan wall) vs after: room
+composition (bob + blazing carve + motes in fill light), shaft view
+(stairs climbing into falling light, motes hanging in the dark, hatch
+ring silhouetted), night exterior (glow through the ring, no bleed
+through rock — verified the beam/motes are depth-occluded). fps 60,
+draws +2 (beam + motes, 46 in-room view), tris +0.4k, zero console
+errors. Interior light is flag-driven, not time-driven, so single-time
+screenshots suffice; night exterior covered the only outdoor-visible
+surface. Trap learned: the cellar is two overlapping BackSide boxes —
+a camera in the shaft stares at the shaft's own end wall, so room
+vantages must stand z < 22.6; first mote pass landed entirely in the
+shaft for the same reason.
+
+**Debt:** cleared "Cellar is flat". Nuance noted, not chased: the shaft
+beam implies daylight but burns constant at night (reads fine as lantern
+glow). Pre-existing: makeGlowPoints seeds via Math.random() (visual
+phase only, not world-gen — but it's the one PRNG-rule hole in the file).
+
+**Next tick suggestion:** iteration 5 closes the push batch — ship
+something story-flavored so the batch lands with soul, then PUSH ALL
+(submodule first, then parent; five the-island commits + cadence doc are
+waiting). Concrete pick: the cartographer's marginalia — tiny etched
+marks on the chart-table rim (brass Baker pass exists; glyphSprite for a
+hand symbol), placed where the orrery crank, valve and basin sit, as if
+someone annotated their own model. Quiet, close-look, thesis-room. The
+push protocol is MISSION.md step 3.
+
+---
+
 ## 3 — 2026-06-11 — performance/code health (the drained-bay softlock)
 
 **Shipped:** The only known way to ruin a playthrough is sealed. Walking can
@@ -180,8 +222,8 @@ nothing may break it.
   continuity break).
 - **Beam reads as two streaks** from some angles (open-ended double-sided
   cone); could use a soft volumetric impostor or inner cone.
-- **Cellar is flat** — one point light, no dust motes, the carve barely
-  reads; this room delivers the plumb bob and deserves mood.
+- ~~Cellar is flat~~ — fixed in iteration 4 (fill light, carve halo, light
+  shaft, motes).
 - **Stone glyphs barely visible** — the etched music glyphs on the standing
   stones are too subtle to serve as the clue they are.
 - **Trees pop flat at distance** — no LOD/imposters; distant canopies could
