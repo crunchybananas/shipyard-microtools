@@ -12,6 +12,37 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 22 — 2026-06-12 — close-look (the gulls get bodies — and stop flying sideways)
+
+**Shipped:** The gulls are birds now: a cone body and sphere head (the
+songbird's recipe at gull proportions) between the flapping wing quads —
+the dawn percher reads as a creature on the rail, not two cards. And
+the body exposed a day-one quirk invisible in the abstract chevrons:
+the gulls flew SIDEWAYS — `rotation.y = -a - π/2` pointed local +z at
+the gyre's center, with the wing quads' long axis along the tangent.
+Heading fixed to `-a` (nose along the flight tangent, wings spanning
+across it) and the perch's face-the-dawn target flipped to +π/2 (east,
+as written) — it had been facing the lamp room. +4 draws (2 meshes × 2
+gulls, shared material).
+
+**Evidence:** heading verified two ways — a motion-vs-nose sampling
+that returned garbage under tab suspension (matrix-update gremlin,
+recorded as a verification trap: prefer DIRECT relation probes), then
+the conclusive one: ry ≡ −a exactly in-page, and nose(−a) ≡ tangent(a)
+by identity. Visuals: perched body-and-head profile on the east rail at
+dawn from below; flight silhouette with body mass between banking
+wings. Zero errors; draws within budget at all checked vantages.
+
+**Debt:** "gulls are two quads" fully cleared (the landing was tick 9,
+the body is this tick).
+
+**Next tick suggestion:** owner direction still pending (asked at 21).
+Strongest survivors: sky-dome mist awareness (new, from 21), tree-LOD
+vertex half. Suggest sky-mist — it completes the weather feature and
+the uMist uniform slot is one edit in the sky shader's horizon band.
+
+---
+
 ## 21 — 2026-06-12 — weather (the day gets its arc)
 
 **Shipped:** The mist curve tuned against the ACTUAL seeded slot rolls —
@@ -806,9 +837,8 @@ nothing may break it.
   the open sea; flipped inboard, brightened, halo'd, tone-pulsed.
 - **Trees pop flat at distance** — no LOD/imposters; distant canopies could
   be cheaper AND prettier (billboard ring?).
-- ~~Gulls never land~~ — iteration 9: the first gull takes the gallery rail
-  at dawn, folds its wings, faces the sun, departs after. (Still two quads
-  up close — that half of the item stands if anyone ever cares.)
+- ~~Gulls are two quads / never land~~ — iteration 9 (the dawn perch) +
+  iteration 22 (bodies, and the sideways-flight quirk the bodies exposed).
 - **Intro dolly underuses the sea** — the approach should skim wave-top
   with spray before rising to the beach; title timing could breathe more.
 - **Story axis is thin** — who was the cartographer? The coat, the

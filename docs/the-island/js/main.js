@@ -144,7 +144,13 @@ const gulls = [];
     l.position.x = -0.7;
     const r = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.4), wingMat);
     r.position.x = 0.7;
-    g.add(l, r);
+    // a body between the wings — songbird recipe, gull proportions —
+    // so the dawn percher reads as a bird up close, not two cards
+    const body = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.6, 6), wingMat);
+    body.rotation.x = Math.PI / 2.15;   // nose forward, tail riding up
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), wingMat);
+    head.position.set(0, 0.07, 0.33);
+    g.add(l, r, body, head);
     g.userData = { phase: i * 2.4, radius: 24 + i * 9, h: 32 + i * 6, speed: 0.14 + i * 0.03, l, r };
     scene.add(g);
     gulls.push(g);
@@ -508,12 +514,12 @@ function tickGulls(elapsed, dt) {
     const u = g.userData;
     const a = elapsed * u.speed + u.phase;
     g.position.set(LH.x + Math.cos(a) * u.radius, LH.y + u.h + Math.sin(a * 2.3) * 2, LH.z + Math.sin(a) * u.radius);
-    g.rotation.y = -a - Math.PI / 2;
+    g.rotation.y = -a; // nose along the flight tangent (the body made the old sideways heading visible)
     let flapAmp = 0.5;
     if (g === gulls[0] && settle > 0) {
       g.position.lerp(GULL_PERCH, settle);
       g.position.y += Math.sin(elapsed * 2.2) * 0.02 * settle;   // breathing
-      g.rotation.y = lerp(g.rotation.y, -Math.PI / 2, settle);   // face the dawn
+      g.rotation.y = lerp(g.rotation.y, Math.PI / 2, settle);    // face the dawn (east)
       flapAmp = 0.5 * (1 - settle);                              // fold
       u.l.rotation.x = u.r.rotation.x = -0.12 * settle;          // wings tucked
     }
