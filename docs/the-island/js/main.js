@@ -419,6 +419,7 @@ function applyAtmosphere(elapsed, dt) {
 
   scene.fog.color.copy(g.fog);
   scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4);
+  skyMat.uniforms.uMist.value = mistCur;
 
   // the secret pinprick on the model's model — alive only at night, and
   // leaning all the way in earns the whisper exactly once per save

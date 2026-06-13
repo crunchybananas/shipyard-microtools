@@ -172,6 +172,7 @@ export function makeSkyMaterial() {
       uHorizon: { value: new THREE.Color(0xbfe0ee) },
       uNight: { value: 0 },
       uFlash: { value: 0 },
+      uMist: { value: 0 },
       // the credits constellation: five stars that learn to burn, one per
       // note of the leitmotif (lit by the finale; zero cost while dark)
       uConstelDir: { value: [
@@ -197,6 +198,7 @@ export function makeSkyMaterial() {
       uniform vec3 uHorizon;
       uniform float uNight;
       uniform float uFlash;
+      uniform float uMist;
       uniform vec3 uConstelDir[5];
       uniform float uConstelGlow[5];
       varying vec3 vDir;
@@ -265,6 +267,11 @@ export function makeSkyMaterial() {
         float cl = fbm2(d.xz / (up + 0.25) * 2.2 + vec2(uTime * 0.004, 0.0));
         float cirrus = smoothstep(0.55, 0.85, cl) * smoothstep(0.02, 0.2, up) * (1.0 - uNight * 0.85);
         col = mix(col, mix(uHorizon, uSunCol, 0.45) * 1.06, cirrus * 0.5);
+
+        // sea fret: mist lifts a pale band off the horizon, veiling stars
+        // and blue alike — the sky finally agrees with the fogged ground
+        float fret = uMist * (1.0 - smoothstep(0.0, 0.4 + uMist * 0.25, d.y));
+        col = mix(col, mix(uHorizon, vec3(0.78, 0.81, 0.83), 0.4) * mix(1.0, 0.35, uNight), fret * 0.85);
 
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>

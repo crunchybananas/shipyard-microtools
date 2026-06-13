@@ -12,6 +12,34 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 23 — 2026-06-12 — weather (the sky agrees with the ground)
+
+**Shipped:** The weather feature completes: a `uMist` uniform in the sky
+shader lifts a pale fret band off the horizon as mist thickens
+(width grows with density, dimmed at night so it veils stars without
+glowing), driven from the same eased `mistCur` as fog, sun and
+drizzle — one scalar, five effects. On a heavy fret day the sea and
+sky now meet in a single milk band with no horizon line; clear days
+keep their crisp edge.
+
+**Evidence:** heavy-fret beach pair — toward the island (washed tower,
+pale low sky grading to blue) and the money shot toward open sea
+(horizon fully dissolved); clear-slot regression (mist 0): crisp line,
+natural thin horizon glow only, byte-identical path. Zero errors;
+sky cost is two mix lines in the existing fragment.
+
+**Debt:** cleared the sky-dome backlog item from 21. The weather system
+is now whole: deterministic clock → fog + sun + drizzle + sky.
+
+**Next tick suggestion:** owner direction still pending. Iteration 25
+pushes batch 5 in two ticks. Remaining named survivor: tree-LOD vertex
+half (power headroom is fine, so it's optional polish). Consider a
+"state of the island" tick at 25: replay the full chain end-to-end via
+debug walkthrough as a regression sweep before the push — 23 ticks of
+changes deserve one integration pass.
+
+---
+
 ## 22 — 2026-06-12 — close-look (the gulls get bodies — and stop flying sideways)
 
 **Shipped:** The gulls are birds now: a cone body and sphere head (the
@@ -802,9 +830,8 @@ nothing may break it.
 
 # Backlog (unordered; claim items into iterations)
 
-- **Sky dome ignores mist** — scene fog whitens geometry but the sky/horizon
-  stays clear-day blue under heavy fret (noticed in 21's midday check); a
-  uMist uniform lifting the horizon band would sell thick days properly.
+- ~~Sky dome ignores mist~~ — iteration 23: uMist fret band, night-dimmed,
+  driven from the same eased scalar as fog/sun/drizzle.
 
 - **OWNER DIRECTIVE (2026-06-12): power efficiency** — "improve the
   graphics while reducing the power load; this game causes my fans to
