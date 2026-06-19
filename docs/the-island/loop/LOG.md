@@ -12,6 +12,51 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 53 — 2026-06-19 — design/story (the ascent, stage 2 — the way UP, in-play)
+
+**Shipped:** UP is now in the player's hands. The brass plate — the dive — becomes the
+CLIMB at the bottom: you descend, one level deeper each commit, until MAX_DEPTH, and
+there the plate's only direction left is up. From the moment you turn back you're in a
+one-way `climbing` mode (you can't dive again until you reach the surface) — so you
+cannot yo-yo, and the shape of it is the thesis itself: **the only way out is down
+first, then up.** The integration arc, made mechanical, and still fork-NEUTRAL (no
+ring-vs-climb choice, no who-am-I reveal, no final camera — the bell finale is
+untouched; climbing is simply an available action, like diving always was).
+
+- `world.js`: `flags.climbing` (one-way ascent mode; backward-compatible default false).
+- `main.js`: `onAscend: () => startAscent(false)` wired into the Game; `landAscent`
+  clears `climbing` at the surface so a fresh descent is possible.
+- `puzzles.js`: the plate `onClick` now picks direction — descend while there's deeper
+  to go and you haven't turned back; otherwise (at the bottom, or already climbing) the
+  two-touch brink commits an ASCENT (sets `climbing`, calls `onAscend`). Direction-aware
+  brink whispers. The dive path is byte-for-byte the same when descending.
+
+Implements the SPINE's "you cannot yo-yo" via the one-way mode rather than re-arming
+chain puzzles — same goal, zero chain-breakage risk.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors.
+- Direction (fired the real `game.interact` plate hotspot's onClick): commit at L4 and
+  while climbing sets `climbing=true` (UP); commit at L2 not-climbing sets `dove=true`
+  (DOWN). Brink arms for all 3 valid states; at the surface (L1) the ascend is refused
+  (no brink).
+- `climbing` one-way: persists mid-climb (L3→L2), clears at the surface (L2→L1).
+- END-TO-END in PLAY MODE (Begin+skip-intro): standing on the plate at the bottom, two
+  touches → brink arms (ascend copy shows: "Touch the plate again to rise another
+  level…"), commit sets `climbing` and STARTS THE REAL ASCENT CINEMATIC (`getAscent`
+  live, player locked). Dive path intact.
+
+**Debt:** none broken. The full 21s cinematic still can't be watched to its snap
+headless (verified the snap via the instant path in #52). Stage 3 remains: the one
+UNMISSABLE beat (the felt shrink + the keeper's voice falling silent behind you).
+
+**Next tick suggestion:** ASCENT STAGE 3 — the unmissable beat. As the world draws in,
+the keeper's voice should fall silent behind you (audio.js + the keeperVoice register),
+and the ascent should land with a felt arrival (a whisper/journal line per level up is
+shipped; add the silence + maybe a brief look-back). Keep fork-neutral. NOTE iter 55 is
+the push boundary — batch 11 deploys 51–55 (the critique + the whole ascent).
+
+---
+
 ## 52 — 2026-06-19 — design/story KEYSTONE (the ascent, stage 1 — the dive run backward)
 
 **Shipped:** The first half of the verb the SPINE has promised since Panel #1 — **UP.**

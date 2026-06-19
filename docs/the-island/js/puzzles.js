@@ -25,12 +25,13 @@ const KEEPER_LINES = {
 };
 
 export class Game {
-  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onFinale }) {
+  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale }) {
     this.refs = refs;
     this.modelRefs = modelRefs;
     this.player = player;
     this.interact = interact;
     this.onDive = onDive;
+    this.onAscend = onAscend;
     this.onFinale = onFinale;
 
     W.dials = W.dials || [0, 0, 0, 0];
@@ -270,30 +271,50 @@ export class Game {
       },
     });
 
-    // the brass floor plate — THE DIVE. A committed descent, not a slide: the
-    // first touch brings you to the brink (the world goes quiet, the cost is
-    // named); a second, deliberate touch commits. Step off and the brink lets
-    // go. Repeatable — each dive takes you one level deeper toward the keeper.
+    // the brass floor plate — THE DIVE, and then THE CLIMB. A committed crossing,
+    // not a slide: the first touch brings you to the brink (the world goes quiet,
+    // the cost is named); a second, deliberate touch commits. Step off and it lets
+    // go. You descend, one level deeper each time, until the bottom — and there the
+    // plate's only direction left is UP. Once you turn back you cannot dive again
+    // (W.flags.climbing, one-way) until you reach the surface: the only way out is
+    // down first, then up — the integration arc made mechanical (#12 stage 2).
     I.add({
       id: 'plate', targets: [R.deskPlate], label: 'the brass plate', maxDist: 3.5,
       when: () => W.flags.plumbHung,
       onClick: () => {
         const d = Math.hypot(this.player.pos.x - R.deskPlate.position.x, this.player.pos.z - R.deskPlate.position.z);
         if (d > 1.0) { UI.whisper('Stand on it.'); return; }
-        if (W.level >= MAX_DEPTH) { UI.whisper('There is nowhere further down. Something below has the last of the light.'); return; }
-        if (!this._brink) {
-          // arm: the threshold. The world holds its breath; name what it costs.
-          this._brink = true;
-          A.duckAmbient(true);
-          UI.whisper(W.flags.dove
-            ? 'The way back closes behind the light. Touch the plate again to go under.'
-            : 'The journal will not follow you down. Touch the plate again to descend — there is no climbing back.');
+        // direction: descend while there's deeper to go and you haven't turned back;
+        // otherwise (at the bottom, or already climbing) the plate is the way up
+        const goingUp = W.flags.climbing || W.level >= MAX_DEPTH;
+        if (!goingUp) {
+          // ---- DESCEND ----
+          if (!this._brink) {
+            this._brink = true;
+            A.duckAmbient(true);
+            UI.whisper(W.flags.dove
+              ? 'The way back closes behind the light. Touch the plate again to go under.'
+              : 'The journal will not follow you down. Touch the plate again to descend — there is no climbing back.');
+            return;
+          }
+          this._brink = false;
+          this.flag('dove');
+          this.onDive();
           return;
         }
-        // commit
+        // ---- ASCEND (the bottom turns you back, or you are already climbing) ----
+        if (W.level <= 1) { UI.whisper('You are at the surface. There is nowhere above to rise to.'); return; }
+        if (!this._brink) {
+          this._brink = true;
+          A.duckAmbient(true);
+          UI.whisper(W.flags.climbing
+            ? 'Touch the plate again to rise another level. What lies below will not let you down again.'
+            : 'There is nowhere further down. Touch the plate again to begin the long climb up — and carry what you found here.');
+          return;
+        }
         this._brink = false;
-        this.flag('dove');
-        this.onDive();
+        this.flag('climbing');   // one-way: from here the plate only rises, until the surface
+        if (this.onAscend) this.onAscend();
       },
     });
 

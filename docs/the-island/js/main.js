@@ -212,6 +212,7 @@ const interact = new Interactions(camera, player, canvas);
 const game = new Game({
   refs, modelRefs, modelAnchor, interact, player,
   onDive: startDive,
+  onAscend: () => startAscent(false),  // #12 stage 2: the in-play way UP
   onFinale: startFinale,
 });
 
@@ -398,6 +399,7 @@ function landAscent() {
   diveGroup.scale.setScalar(1);
   diveGroup.position.set(0, 0, 0);
   W.level = Math.max(W.level - 1, 1); // one recursion shallower — clamp at the surface
+  if (W.level <= 1) W.flags.climbing = false; // back at the surface — a new descent is possible
   save(player.pos);
   // rise out at the study / chart table of the level above
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
