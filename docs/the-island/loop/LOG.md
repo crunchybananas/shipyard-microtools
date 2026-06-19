@@ -12,6 +12,44 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 27 — 2026-06-19 — story/process (the reframe — the loop stops fleeing story)
+
+**Shipped:** The narrative foundation. Owner reframed ABYME as Myst-*inspired*,
+not a clone (Journeyman Project / Phantasmagoria / 7th Guest) and asked the
+real questions: what's the story, the reveal, and what happens when you leave?
+A persona panel (skeptic, art director, narrative architect, genre historian,
+finisher → showrunner) answered. Three artifacts committed:
+- **SPINE.md** — the working bible: recommended direction (**grief rendered as
+  recursion** — the keeper's refusal to let go; the "light still lit far down"
+  IS the keeper), the candidate **One Truth** (grief / quarantine / transmission
+  / watched-loop — owner's call, NOT canon yet), the *leaving* endgame (down is
+  the trap, **up** is the story), five new environments, borrowed techniques,
+  and the live tensions kept un-flattened.
+- **CRITIQUES.md** — the panel's full pushback, establishing the persona-review
+  convention in the shared dev markdown (the owner's ask).
+- **MISSION.md** — amended: story now gates graphics (a pretty tick that dodges
+  the thesis can be *rejected*); story/puzzle/environment ticks must cite a SPINE
+  beat; persona iterations defined (~every 5 builds).
+
+16 issues (#9–#24) + narrative epic (#25) filed under the `abyme`/`story` labels.
+
+**Evidence:** SPINE.md 107 lines / CRITIQUES.md 137 lines committed; 16 issues +
+epic created and verified in the tracker (the gh-in-detached-shell keyring hang
+was the only snag — foreground batches fixed it). No game code touched; build
+unaffected.
+
+**Debt:** none. The headline blocker is now **owner-facing**: pick the One Truth
+(#9). Until then the loop builds truth-agnostic work (environments, the ascent,
+level divergence, the deep grade) that pays off under any reveal.
+
+**Next tick suggestion:** #3 (movement wedge-escape — safety, already queued),
+then truth-agnostic story structure: #13 (diverge every level — highest wow,
+turns the recursion into a felt decay) or #19 (the deep grade, the mechanism
+every dark room needs). Hold the reveal-dependent beats (#14 Keeper voice, #22
+finale fork) until the owner picks the Truth.
+
+---
+
 ## 26 — 2026-06-19 — UX/dev (the test builds stay quiet) — closes #5
 
 **Shipped:** `?debug` builds now start muted unless the player has

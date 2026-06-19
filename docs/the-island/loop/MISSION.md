@@ -13,6 +13,40 @@ codebase is meaningfully healthier. A tweak is not an iteration. Half-shipped
 is worse than nothing — finish it or revert it; main never holds a broken game.
 The owner's bar is explicit: *"I really want to be wow'd."*
 
+## The story comes first now (2026-06-19 reframe)
+
+The game is **Myst-*inspired*, not a Myst clone** — the lineage is Journeyman
+Project, Phantasmagoria, The 7th Guest: rich environments and a story with a
+**reveal**. A persona panel diagnosed the hard truth: 26 iterations polished a
+beautiful snow globe because "finished and verified" rewards graphics and
+punishes story. That stops here.
+
+- **[SPINE.md](SPINE.md)** is the working bible — the recommended direction
+  (grief rendered as recursion), the candidate **One Truth** (owner's call),
+  the "leaving the island" endgame, the new environments, and the live
+  tensions. Every **story / puzzle / environment** tick must cite a named beat
+  or environment from SPINE.md. The recursion is the *mechanic*; the keeper and
+  the choice are the *reveal*.
+- **Graphics / audio ticks must serve an answered question**, not substitute
+  for one. A graphics tick that is pure avoidance of the story may be
+  **rejected** by a persona review. Genuine polish, perf, and jank fixes are
+  always welcome — but the loop no longer flees uphill.
+- **The One Truth (grief / quarantine / transmission / watched-loop) is the
+  owner's decision** and is NOT yet canon. Build what pays off under any of
+  them (environments, the ascent, divergence, structure); do not hard-code a
+  reveal until the owner picks.
+
+## Persona iterations
+
+Some iterations are not for building — they are for **pushback**. Adopt a
+critical persona (the skeptic, the art director, the narrative architect, the
+genre historian, the finisher, or a new one the moment calls for) and attack
+the shipped or planned work: what is hollow, unmotivated, or merely pretty?
+Record the critique in **[CRITIQUES.md](CRITIQUES.md)** (newest panel first).
+Run one roughly every ~5 build iterations, or whenever a thread feels adrift.
+A persona's job is friction, not kindness; its findings become the next
+iterations' work. The synthesis of a panel updates SPINE.md and files issues.
+
 ## Procedure
 
 1. **Read `LOG.md`** (same directory): the last 3 entries, the backlog, and the
