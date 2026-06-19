@@ -12,6 +12,55 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 46 — 2026-06-19 — story/secret (the house remembers — a tally of descents)
+
+**Shipped:** The chart table now keeps count. Raw-scratched into the clear east
+margin, one stroke appears for every level you've descended — 0 at the surface,
+then one… two… three as you dive. It's the same compulsive hand that burnished the
+tide/sun/plumb glyphs, now just *counting*: how many times have you gone down? And
+because the 1:240 model carries every mark its island bears, the tally recurses —
+table within table within table, each keeping the same grim count. The 7th-Guest
+"the house remembers," built from systems already shipped (SPINE "Borrowed from the
+90s canon"). No text, no cutscene — a discoverable beat for the attentive.
+
+- `props.js`: a named `chartTally` group (3 = `MAX_DEPTH-1` jittered scratch-strokes)
+  on the east margin, all hidden by default; imported `MAX_DEPTH`; added to `NAMES`
+  so `collectRefs` resolves it on BOTH island and model.
+- `puzzles.js _apply`: reveal stroke `i` when `i < W.level - 1` — driven on island
+  AND model (no `isModel` guard; per-mesh visibility), so the count propagates inward.
+
+Reachable in-play: the dive increments `W.level` (since iter 33), so the marks
+accrue as the player actually descends — not a debug-only payoff. Surface (L1)
+shows none, so the normal game is visually identical. All metaphor, no biography,
+no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`). Drove `ABYME.game.tick` per level (rAF is
+suspended headless, so ticked the real update directly): visibility =
+`000 / 100 / 110 / 111` for L1–L4, IDENTICAL on `refs.chartTally` and
+`modelRefs.chartTally`. Screenshots (noon, camera parked over the east margin):
+L4 shows three gold strokes on the margin; L1 shows none (the original glyphs
+only) — regression-clean. Zero console errors. 60fps (cap), tris 521k. Draws ~256
+is the pre-existing scene baseline (the new environments); this tick adds ≤3 draws
+and only at depth.
+
+**Debt:** none added. Observed (not introduced here): draw calls (~256–314) sit
+over MISSION's <200 soft budget since the abyss environments shipped — a candidate
+perf tick (instancing the bookshelves / colonnade) but not urgent at 60fps.
+
+**Deploy:** LOCAL only — iter 46 is not a cadence boundary (next ~50) and no deploy
+was requested. Everything through iter 45 is live; this commits locally and waits.
+
+**Next tick suggestion:** the ENDGAME is the big remaining piece — the
+ring-vs-DON'T-ring / climb-out integration ending (#22-full / #12 ascent), the
+SPINE's culmination. BUT its creative forks are the owner's call (single authored
+ending vs a choice; who the player ultimately is; final camera down-at-seafloor vs
+up-at-horizon — SPINE "Live tensions"). Surface the decision; build it once the
+owner picks. Until then, safe deepening: the second half of this 7th-Guest beat —
+a space that *reacts the 2nd time you enter* (onceKeys-driven), or the standing
+nestedGlint dread-look enrichment; or the audio audition pass.
+
+---
+
 ## 45 — 2026-06-19 — story (the journal fills with a hand that isn't yours) — #21
 
 **Shipped:** The journal-hands merge. From level 3 down, the keeper's words begin

@@ -607,6 +607,16 @@ export class Game {
       R.disagreeSea.visible = flood > 0.02;
     }
     if (R.disagreeLamp) R.disagreeLamp.material.emissiveIntensity = W.lampLit ? 0.35 : 4.5;
+
+    // the descent tally (#7thGuest "the house remembers"): one margin stroke
+    // revealed per level descended. Accrues in-play as you dive (W.level grows
+    // since iter 33), and — driven on BOTH island and model — the count recurses
+    // table-within-table. Surface (level 1) shows none: the normal game is untouched.
+    if (R.chartTally) {
+      const n = (W.level | 0) - 1;
+      const kids = R.chartTally.children;
+      for (let i = 0; i < kids.length; i++) kids[i].visible = i < n;
+    }
   }
 }
 

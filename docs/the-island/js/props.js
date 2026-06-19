@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { Baker, mulberry32, SEED, vary, clamp, lerp, TAU } from './util.js';
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
-import { SCALE_MODEL } from './world.js';
+import { SCALE_MODEL, MAX_DEPTH } from './world.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
@@ -324,6 +324,33 @@ export function buildWorld() {
     mark(4, LH.x - 0.02, LH.z - 1.405, 0.2, 0.05, 0.7);   // plumb, facing the model's beach
     mark(1, LH.x + 1.33, LH.z - 1.38, 0.17, 0.3, 0.55);   // the maker's pair
     mark(0, LH.x + 1.46, LH.z - 1.35, 0.13, -0.2, 0.55);
+  }
+
+  // the count of descents, raw-scratched into the clear east margin — one stroke
+  // per dive, in a cruder hand than the burnished glyphs around it. The table
+  // keeps a tally of how many times you have gone down; and because the model
+  // carries every mark its island does, the count recurses inward, table within
+  // table. Hidden until you descend (driven by W.level in puzzles `_apply`), so
+  // it accrues in-play. SPINE "Borrowed from the 90s": the house remembers.
+  {
+    const tally = new THREE.Group();
+    tally.name = 'chartTally';
+    const tMat = new THREE.MeshBasicMaterial({
+      color: 0xceae6a, transparent: true, opacity: 0.62,
+      depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    });
+    // small hand jitter per stroke (dx, rotZ, length) — scratched, not printed
+    const JIT = [[-0.004, 0.07, 0.158], [0.006, -0.06, 0.172], [-0.002, 0.03, 0.149]];
+    for (let i = 0; i < MAX_DEPTH - 1; i++) {
+      const [dx, rz, len] = JIT[i % JIT.length];
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.026), tMat);
+      m.rotation.x = -Math.PI / 2;
+      m.rotation.z = rz;
+      m.position.set(LH.x + 1.43 + dx, LH.y + 0.9575, LH.z - 0.18 + i * 0.18);
+      m.visible = false;       // revealed one-per-descent by _apply
+      tally.add(m);
+    }
+    core.add(tally);
   }
 
   // valve pedestal + wheel (tide)
@@ -1444,7 +1471,7 @@ const NAMES = [
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
-  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp',
+  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
