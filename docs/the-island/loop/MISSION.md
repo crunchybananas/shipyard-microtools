@@ -128,6 +128,15 @@ iterations' work. The synthesis of a panel updates SPINE.md and files issues.
   `window.addEventListener('error', ...)` before reproducing a suspected crash.
 - Seeded determinism: all randomness through `util.js` PRNG. No
   `Math.random()` in world generation.
+- **Never add a `Points` (makeGlowPoints) to `core`.** `instantiateModel`
+  clones `core` and strips `Points` mid-`traverse` (`o.isPoints &&
+  o.removeFromParent()`) — removing during traversal corrupts the iteration and
+  throws (`Cannot read properties of undefined (reading 'traverse')`), killing
+  module init silently (no preview-console error; `window.ABYME` never set, so
+  it looks like the page just won't start). Glow points go to `diveGroup` in
+  main (like `biolume`/`fireflies`/`motes`): return them from `buildWorld` and
+  `diveGroup.add(...)` them; drive their uniforms via the direct reference, not
+  `refs`. (Cost the loop #38 ~10 evals to diagnose.)
 
 ## Verification protocol (non-negotiable)
 

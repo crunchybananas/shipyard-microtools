@@ -74,7 +74,7 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const { core, waterMat, modelAnchor, biolume, fireflies, motes } = buildWorld();
+const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow } = buildWorld();
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
@@ -92,7 +92,7 @@ const modelRefs = collectRefs(modelRoot);
 // the clone captured pre-clone children only; nothing model-side needs Points
 
 const diveGroup = new THREE.Group();
-diveGroup.add(core, biolume, fireflies, motes);
+diveGroup.add(core, biolume, fireflies, motes, galleryGlow);
 scene.add(diveGroup);
 
 // sky + far sea (outside the dive group: they are the "outside" of the world)
@@ -537,6 +537,13 @@ function applyAtmosphere(elapsed, dt) {
   fu.uTime.value = elapsed;
   fu.uPlayer.value.copy(camera.position);
   fu.uGlobal.value = night;
+  // the drowned gallery's cold light in the chasm, exposed as the tide falls (#16)
+  if (galleryGlow) {
+    const gg = galleryGlow.material.uniforms;
+    gg.uTime.value = elapsed;
+    gg.uPlayer.value.copy(camera.position);
+    gg.uGlobal.value = (1 - W.tide);
+  }
   const mu = motes.material.uniforms;
   mu.uTime.value = elapsed;
   mu.uPlayer.value.copy(camera.position);

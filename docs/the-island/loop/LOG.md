@@ -12,6 +12,50 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 38 — 2026-06-19 — environment (the Drowned Gallery — a sealed vista) — #16
+
+**Shipped:** The first abyss-as-architecture, as a SAFE sealed-vista slice (#16,
+panel critical-path step 6). The sea you woke beside hides a drowned colonnade:
+two rows of dark stone columns with capitals + lintels, standing on the tidal
+shelf just off the wake-up beach. At high tide only the capitals break the
+surface (mysterious); turn the valve and as the water falls the full hall stands
+revealed on the exposed flats, at the lip of the deep shelf. Draining is not
+safe — it OPENS things below; descent is the real direction. Cold drowned-light
+glints (`galleryGlow`) wash the floor as the tide falls. **Static decorative
+geometry on the seabed — NO collision / walkability / chain change**, so main
+can't break or softlock. The walkable sunless INTERIOR is the noted follow-up.
+All metaphor, no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`) from the **reachable wake-up beach** looking
+seaward — high-tide screenshot (capitals breaking the calm surface, shafts faint
+through the water) and drained screenshot (full colonnade exposed on the seabed,
+sea retreated to the shelf edge). `galleryGlow` uGlobal = 1 when drained (glints
+active). Zero console logs/errors; 273–466 fps, draws ≤41 (vista) / 236 (full).
+
+**Build notes / debt:** (1) FIRST PLACED the colonnade in the chasm crack (the
+thematically ideal "mouth of the deep") but the chasm has sheer walls on every
+side + a high bridge — verified there is NO reachable standable vantage of the
+crack floor (occluded from the bridge by deck/lip; rims are cliffs). It only read
+from a free-cam, which fails the no-debug-only gate — so **relocated** to the
+beach shelf, where it's plainly visible from a reachable spot. (2) Hit a real
+init crash: adding the glow `Points` to `core` made `instantiateModel` throw
+mid-`traverse` (it strips Points while cloning core) — silent (no console error,
+`ABYME` just never set). Fixed by routing `galleryGlow` through `diveGroup` like
+`biolume`; recorded as a MISSION known-trap. NOTE: a future tick should give the
+chasm-floor reveal its proper payoff via the walkable descent (#17 Vault).
+
+**Next tick suggestion:** **#17 The Vault Beneath** (panel critical-path step 6,
+the sublime). The literal abyss the word 'abyme' demands: one vast inverted cone
+of rock with the next island's lighthouse hanging full-size and UPSIDE-DOWN from
+the cave roof across black water (a `modelAnchor` clone), far wall lit only at
+its base by `waterShallow` glow, top lost in fog, drips falling a real ~2s as
+scale cues. The first time the player SEES the recursion as architecture, not a
+teleport cut. Reuse the giant-ruler scale trick. As with #16: prefer a COMPLETE
+sealed-vista slice (see the inverted lighthouse across the void, not yet reach
+it) over a half-built walkable space; keep it additive + safe.
+
+---
+
 ## 37 — 2026-06-19 — environment (the Keeper's Quarters — a life mid-sentence) — #15
 
 **Shipped:** The first real ENVIRONMENT, now earned (you can descend #33, someone's

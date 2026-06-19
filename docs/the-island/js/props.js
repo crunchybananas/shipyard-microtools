@@ -614,6 +614,44 @@ export function buildWorld() {
     q.add(lamp);
   }
 
+  // =================== THE DROWNED GALLERY (#16 — sealed vista) =============
+  // The sea you woke beside hides a drowned colonnade. At high tide only its
+  // capitals break the surface off the beach; turn the valve and as the water
+  // falls a sunken hall stands revealed on the exposed flats, at the lip of the
+  // deep shelf. Draining is not safe — it OPENS things below; descent, not the
+  // 240x gimmick, is the real direction. A SEALED VISTA: seen plainly from the
+  // wake-up beach looking seaward, the walkable sunless interior the follow-up.
+  // Static decorative geometry on the tidal shelf (no collision/walkability
+  // change); the existing water hides it and draining reveals it.
+  let galleryGlow = null;
+  {
+    const drownedMat = new THREE.MeshStandardMaterial({ color: 0x39424a, flatShading: true, roughness: 0.55, metalness: 0.15 });
+    const ROWS = [0, 8];                              // two colonnades flanking a seaward aisle
+    const ZS = [-108, -111.5, -115, -118.5];
+    const gallery = new THREE.Group(); gallery.name = 'drownedGallery';
+    for (const z of ZS) {
+      for (const x of ROWS) {
+        const col = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.82, 7.6, 9), drownedMat);
+        col.position.set(x, -2.2, z); gallery.add(col);     // rooted at -6, top at +1.6
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.4, 1.9), drownedMat);
+        cap.position.set(x, 1.45, z); gallery.add(cap);
+      }
+    }
+    for (const x of ROWS) {                            // lintels along each colonnade
+      const lintel = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.62, 12.5), drownedMat);
+      lintel.position.set(x, 1.55, -113.25); gallery.add(lintel);
+    }
+    core.add(gallery);
+    // cold drowned-light over the flooded floor — the sunless luminance, exposed
+    // as the tide falls. Kept OUT of core: it's a Points, and instantiateModel
+    // strips Points mid-traverse while cloning core (which chokes). Added to
+    // diveGroup in main, like biolume; driven there (shows as the tide falls).
+    const glintPos = [];
+    for (let i = 0; i < 44; i++) glintPos.push(-2 + r() * 12, -3.6 + r() * 0.6, -106 - r() * 15);
+    galleryGlow = makeGlowPoints(glintPos, 0x4fd8d0, 0.34);
+    galleryGlow.name = 'galleryGlow';
+  }
+
   // =================== STANDING STONES (the islet) ==========================
   const stonesGroup = new THREE.Group();
   stonesGroup.name = 'stonesGroup';
@@ -968,7 +1006,7 @@ export function buildWorld() {
   fireflies.material.uniforms.uDrift.value = 1;
   fireflies.name = 'fireflies';
 
-  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, atlas };
+  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, atlas };
 }
 
 // ---------------------------------------------------------------------------

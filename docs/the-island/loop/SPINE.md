@@ -75,8 +75,8 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > behind a debug flag). Re-ordered build queue: **(1) make `W.level` reachable + cost the dive
 > [✓ iter 33] → (2) #14 Keeper voice + promote the figure [✓ iter 34] → (3) #22 finale fork + exempt
 > the finale from `gradeBias` [✓ iter 35] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author
-> casts [✓ iter 36] → (5) #15 Keeper's Quarters [✓ iter 37] → (6) #16/#17 abyss rooms [NEXT] →
-> (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
+> casts [✓ iter 36] → (5) #15 Keeper's Quarters [✓ iter 37] → (6) #16 Drowned Gallery [✓ iter 38,
+> vista] / #17 Vault [NEXT] → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
 1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set
@@ -105,7 +105,7 @@ What it MEANS: the recursion was never a puzzle, it was the shape of a search. D
 - **Palette:** the ONE space with a local point-light at the lamp-oil color; grade biased toward golden/dawn warmth regardless of clock, all from existing channels
 - **Narrative role:** The person the game has only implied. A cot, a cold stove, a calcified half-eaten meal, a chart in progress, the wall papered in nested island sketches shrinking toward a single dot — and the smallest sketch has the nestedGlint pinprick bleeding through the paper from behind. Converts the existing 'far down a light is still lit' secret into a narrative wound: the keeper KNEW where the descent led and drew themselves down it anyway.
 
-### The Drowned Gallery  *(large)*
+### The Drowned Gallery  *(large)* — ✓ VISTA SHIPPED iter 38 (a drowned colonnade off the wake-up beach: capitals break the surface at high tide, the full hall stands revealed on the exposed shelf when the valve drains the sea. Walkable sunless interior still to come.)
 
 - **Mood:** claustrophobic, sunless, water-pressure dread — the first space with a ceiling you can touch and no horizon
 - **Palette:** no sun; lit entirely by waterShallow caustics (the one warm-ish channel) against near-black fog walls — the proposed 'deep' grade built only from existing channels pushed to their limits
