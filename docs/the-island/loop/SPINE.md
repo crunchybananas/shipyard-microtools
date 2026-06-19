@@ -76,7 +76,8 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > [✓ iter 33] → (2) #14 Keeper voice + promote the figure [✓ iter 34] → (3) #22 finale fork + exempt
 > the finale from `gradeBias` [✓ iter 35] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author
 > casts [✓ iter 36] → (5) #15 Keeper's Quarters [✓ iter 37] → (6) #16 Drowned Gallery [✓ iter 38,
-> vista] / #17 Vault [NEXT] → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
+> vista] / #17 Vault [NEXT — needs careful cellar surgery, not safely additive] → (7) #18 Room That
+> Disagrees / #24 Threshold [✓ iter 39, the jetty+dory standing-promise].** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
 1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set
@@ -123,7 +124,7 @@ What it MEANS: the recursion was never a puzzle, it was the shape of a search. D
 - **Palette:** the existing study cloned and lit cold (deep grade), one inverted assumption
 - **Narrative role:** Reached only at depth: a second study identical to the first, but its chart-table model shows a WorldState the world is NOT in (sea drained when it's full; beam lit by day), and through its window is weather that contradicts yours. Give this room a private ghostState that ignores live W for the model only. The whole game taught the player to trust that the model tells the truth about the world; this room breaks that trust, and the break asks: which level is real, and am I the keeper or a thing someone else is turning?
 
-### The Threshold (jetty + dory)  *(large)*
+### The Threshold (jetty + dory)  *(large)* — ✓ STANDING-PROMISE SHIPPED iter 39 (a planked jetty into the sea + a beached dory with an oar, on the wake-up beach; additive, does nothing yet. The finale boat-ride / "looking back" shot waits on #22's full ring-vs-climb-out ending choice.)
 
 - **Mood:** departure, the promise of 'beyond' — the first exterior that is a destination, not decoration
 - **Palette:** grade horizon at golden/night; wood/brass/cloth, all existing materials

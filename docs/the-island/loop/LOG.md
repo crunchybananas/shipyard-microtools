@@ -12,6 +12,52 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 39 — 2026-06-19 — environment (the Threshold — the way out made physical) — #24
+
+**Shipped:** The owner's whole "what happens as we leave?" question, answered in
+SPACE: a little wooden **jetty** reaching off the wake-up beach into the sea
+(deck, cross-planks, posts to the seabed, mooring bollards at the seaward end)
+and a **beached dory** on the sand beside it (a keeled-over hull tapered at bow
+and stern, two thwarts, an oar). They do nothing yet — a STANDING PROMISE that
+this island can be left (#24, SPINE "The Threshold"). Same proven-safe pattern as
+#16: additive decorative geometry, NO collision / walkability / chain change, set
+west of the drowned colonnade. All metaphor, no biography, no JS dep, no asset.
+
+**Why #24 and not #17 (the planned Vault):** chose the safe build under the
+cardinal rule. #17 (the inverted-lighthouse Vault) needs a downward/cavern view,
+and the only reachable interior that could host it is the **cellar** — a puzzle
+room built as a single closed `BackSide` box. Opening it into a vault means
+rebuilding that puzzle room's wall into panels: NON-additive surgery on a puzzle
+space (the carve hint, the plumb bob, the stairs), with a real risk of a broken
+cellar shipped to main overnight. The prompt's own rule — "additive + SAFE; if
+anything is shaky, ship a complete slice" — points away from rushing that. So I
+shipped the next safe, additive, reachable critical-path piece (#24) and left #17
+for a careful dedicated cellar-interior tick. (Loop suggestions are advisory per
+MISSION; picked highest-wow-per-SAFE-effort.)
+
+**Evidence:** in-play (`?debug`) from the **reachable wake-up beach** — screenshot
+of the jetty reaching into the calm sea with the beached dory + oar on the sand.
+`jetty`/`dory` build on the island (the `getObjectByName`-finds-model-clone trap
+noted again — they read at the chart-table copy; the island copies are at the
+beach as placed). Zero console logs/errors; 486–530 fps, draws ≤273.
+
+**Debt:** none added. #17 Vault Beneath remains open — needs a dedicated tick that
+either (a) carefully rebuilds the cellar room as panels (open one non-carve wall
+into the vault) or (b) adds a NEW reachable overlook; not safely additive in one
+unattended tick. The finale boat-ride use of the dory waits on #22's full
+ring-vs-climb-out choice (don't animate leaving until the ending verb is decided).
+
+**Next tick suggestion:** **#17 The Vault Beneath** — but as a CAREFUL dedicated
+build (cellar surgery), or reconsider a new safe reachable overlook. Treat it like
+#16's first attempt: verify a reachable standable vantage can SEE it BEFORE
+building, and if the cellar-panel rebuild looks shaky, ship a smaller complete
+slice. Alternatively #18 (Room That Disagrees) — but that also needs a new room
+(study clone), so it carries the same new-space risk; weigh against a polish/
+audio tick (the keeper voice still wants an owner audition; the dory/jetty could
+gain a gentle lap-of-water sound).
+
+---
+
 ## 38 — 2026-06-19 — environment (the Drowned Gallery — a sealed vista) — #16
 
 **Shipped:** The first abyss-as-architecture, as a SAFE sealed-vista slice (#16,

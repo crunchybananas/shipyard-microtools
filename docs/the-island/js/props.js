@@ -652,6 +652,60 @@ export function buildWorld() {
     galleryGlow.name = 'galleryGlow';
   }
 
+  // =================== THE THRESHOLD (#24 — jetty + dory) ===================
+  // The way out, made physical: a little jetty reaching off the wake-up beach
+  // into the sea, and a beached dory on the sand beside it. They do nothing for
+  // most of the game — a standing promise that this island CAN be left (the
+  // owner's question, answered in space). Additive decorative geometry, no
+  // collision/walkability change, set west of the drowned colonnade.
+  {
+    const weather = new THREE.MeshStandardMaterial({ color: 0x6a5234, flatShading: true, roughness: 0.95 });
+    const jx = -18;
+    const jetty = new THREE.Group(); jetty.name = 'jetty';
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 12), weather);
+    deck.position.set(jx, 1.05, -110.5); jetty.add(deck);
+    for (let i = 0; i < 7; i++) {                       // proud cross-planks
+      const pl = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.06, 0.5), weather);
+      pl.position.set(jx, 1.16, -105 - i * 1.85); jetty.add(pl);
+    }
+    for (let i = 0; i < 5; i++) {                       // posts to the seabed
+      const z = -105.5 - i * 2.6;
+      for (const px of [jx - 1.05, jx + 1.05]) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6), weather);
+        post.position.set(px, -1.1, z); jetty.add(post);
+      }
+    }
+    for (const px of [jx - 1.0, jx + 1.0]) {            // mooring bollards at the seaward end
+      const mp = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 1.5, 6), weather);
+      mp.position.set(px, 1.75, -116.2); jetty.add(mp);
+    }
+    core.add(jetty);
+
+    // the dory — beached on the dry sand, bow toward the water, keeled over
+    const dory = new THREE.Group(); dory.name = 'dory';
+    dory.position.set(-26, heightAt(-26, -102) + 0.3, -102);
+    dory.rotation.y = 0.7; dory.rotation.z = 0.13;
+    const hg = new THREE.BoxGeometry(1.3, 0.52, 3.1, 1, 1, 5);
+    const pa = hg.attributes.position;
+    for (let v = 0; v < pa.count; v++) {
+      const y = pa.getY(v), z = pa.getZ(v);
+      let nx = pa.getX(v);
+      nx *= 1 - Math.min(Math.abs(z) / 1.55, 1) * 0.86;   // pinch bow & stern
+      if (y < 0) nx *= 0.55;                              // narrow the keel
+      pa.setX(v, nx);
+    }
+    hg.computeVertexNormals();
+    const hull = new THREE.Mesh(hg, weather); dory.add(hull);
+    for (const tz of [-0.7, 0.7]) {                      // thwarts (seat planks)
+      const thwart = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.07, 0.22), weather);
+      thwart.position.set(0, 0.16, tz); dory.add(thwart);
+    }
+    const oar = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 2.5, 6), weather);
+    oar.position.set(0.25, 0.28, -0.2); oar.rotation.x = 0.45; oar.rotation.z = 0.5;
+    dory.add(oar);
+    core.add(dory);
+  }
+
   // =================== STANDING STONES (the islet) ==========================
   const stonesGroup = new THREE.Group();
   stonesGroup.name = 'stonesGroup';
