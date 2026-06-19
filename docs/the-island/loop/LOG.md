@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 44 — 2026-06-19 — deepening (the disagreeing model comes alive) — #18 live ghostState
+
+**Shipped:** The Room That Disagrees (#18) was a frozen tableau; now its model
+ACTIVELY contradicts the world — it always shows the opposite of what you do.
+Drained when the real sea is full; floods blue as you drain the real sea; its
+little lamp burns while yours is dark, goes out when you light yours. The
+disagreement shifts as the player acts — the uncanny isn't a fixed wrongness, it's
+a mirror that inverts you.
+- `props.js`: added a flooded-sea ring (`disagreeSea`, opacity-driven) over the
+  drained seabed; named it + `disagreeLamp` into NAMES.
+- `puzzles.js _apply`: drive `disagreeSea` opacity = `1 - W.tide` (flood as you
+  drain) and `disagreeLamp` emissive = `W.lampLit ? 0.35 : 4.5` (lit while you're
+  dark) — on both island + model-clone instances (shared material, harmless).
+
+A contained, safe deepening (drives only the dg props, inverse of W; no new state
+object needed — the inverse IS a state the world is never in). No JS dep, no asset.
+
+**Evidence:** in-play (`?debug`, hatch-open save + Continue) at the west window —
+screenshots: real sea FULL → dg model drained (dark seabed); real sea DRAINED → dg
+model flooded (blue sea covers the seabed). Numeric: `disagreeLamp` emissive 4.5
+while `W.lampLit` false; `disagreeSea` opacity 1 at drained. Zero console errors;
+486 fps.
+
+**Next tick = ITERATION 45, the BATCH-9 PUSH BOUNDARY.** Build one more safe item
+(e.g. journal-hands merge #21, or a small polish/ambient-audio pass), then PUSH:
+submodule `git push origin HEAD:main` FIRST, then the Dockhand parent gitlink from
+the worktree root. Submodule is 4 ahead of origin/main (iters 41–44); after iter
+45 it's 5 → push all five (Vault + drips, Room That Disagrees + live ghostState).
+Update the push-cadence memory after.
+
+---
+
 ## 43 — 2026-06-19 — environment (The Room That Disagrees) — #18 · the env set is complete
 
 **Shipped:** The last big SPINE environment, as a framed static slice — and it

@@ -597,6 +597,16 @@ export class Game {
         if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look;
       }
     }
+
+    // The Room That Disagrees (#18 live ghostState): the model on its table always
+    // shows the OPPOSITE of the world — its sea floods as you drain the real one,
+    // its lamp burns while yours is dark. The disagreement shifts as you act.
+    if (R.disagreeSea) {
+      const flood = 1 - W.tide;                 // flooded when the real sea is drained
+      R.disagreeSea.material.opacity = flood;
+      R.disagreeSea.visible = flood > 0.02;
+    }
+    if (R.disagreeLamp) R.disagreeLamp.material.emissiveIntensity = W.lampLit ? 0.35 : 4.5;
   }
 }
 

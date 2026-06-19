@@ -1014,6 +1014,12 @@ export function buildWorld() {
     const dgSeabed = new THREE.Mesh(new THREE.RingGeometry(1.4, 2.3, 22),
       new THREE.MeshStandardMaterial({ color: 0x2c2820, roughness: 1, side: THREE.DoubleSide }));
     dgSeabed.rotation.x = -Math.PI / 2; dgSeabed.position.set(dgx, 18.9, cz); cellar.add(dgSeabed);
+    // a flooded sea over the seabed, faded in INVERSELY to the real tide (#18 live
+    // ghostState, driven in puzzles._apply): drained when the real sea is full,
+    // flooded when you drain it — the model always shows the opposite
+    const dgSea = new THREE.Mesh(new THREE.RingGeometry(1.35, 2.35, 22),
+      new THREE.MeshStandardMaterial({ color: 0x2f6f74, transparent: true, opacity: 0, roughness: 0.4, metalness: 0.2, side: THREE.DoubleSide }));
+    dgSea.rotation.x = -Math.PI / 2; dgSea.position.set(dgx, 18.95, cz); dgSea.name = 'disagreeSea'; cellar.add(dgSea);
     const dgTower = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 0.7, 8),
       new THREE.MeshStandardMaterial({ color: 0xd8d2c4, flatShading: true }));
     dgTower.position.set(dgx + 0.35, 19.4, cz - 0.25); cellar.add(dgTower);
@@ -1438,7 +1444,7 @@ const NAMES = [
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
-  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell',
+  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
