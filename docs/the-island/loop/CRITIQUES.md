@@ -7,6 +7,94 @@
 
 ---
 
+## Panel #3 — 2026-06-19 — the waiting room (polish while the endgame is gated)
+
+_Convened (iter 51, ~5 builds since Panel #2) to pressure-test the LIVE build —
+everything through iter 50 is deployed: the spine, all environments, the keeper
+voice, era-color decay, and the recent deepenings (journal-merge #45, chart tally
+#46, night beacon #48, perf #47/#49, the house-remembers re-entry #50). The endgame
+(ring-vs-climb / ascent) sits behind the owner's three forks, and the loop has
+shipped five "safe" ticks while waiting. Three critics played the deployed game and
+read the loop's own trajectory._
+
+### THE FINISHER — played the live build top to bottom, then sat in the chair again
+
+**Verdict.** It's better — and it has quietly recreated the exact disease Panel #1
+named. The new soul-beats are real (the keeper writing in my own hand, the tally
+counting my descents, the study "too exactly" as I left it) — but every one of them
+is a LEAN-IN: a whisper, a depth-gated journal line, three sub-pixel scratches on a
+table margin. I can play the whole thing, dive to the bottom, ring the bell, and
+never once be FORCED to feel the grief — it's all optional marginalia again,
+gorgeously written marginalia, but marginalia. You moved the easter egg; you didn't
+promote it. And the ending is still the iter-35 fork: the bell withholds at depth
+(good), but I still can't LEAVE. I dive, I bottom out, I… reload. The one verb the
+SPINE has promised since Panel #1 — UP — still isn't in my hands. The grief has a
+setup and no exhale.
+
+### THE SKEPTIC — read five loop entries and found one pattern
+
+**Verdict.** The loop found a new way to flee uphill. Panel #1's diagnosis was
+"MISSION rewards finished-and-verified, so the loop ships easy graphics instead of
+hard story." You patched the rule — then found a legal loophole: "the owner must
+decide the forks." For five iterations the endgame has been *correctly* deferred to
+the owner… and used as cover to ship a tally, a halo, two perf passes, and a
+whisper. The uncomfortable question: how much of the endgame ACTUALLY needs the
+owner? The forks are (a) closed-vs-choice ending, (b) who-is-the-player, (c) final
+camera. **None of those block the ASCENT mechanic** — running the dive backward and
+rising one level up. The SPINE already settled the only thing the ascent depends on
+("you can never exit the nest — climbing out = diving down"). The loop has been
+waiting for permission it does not need.
+
+### THE NARRATIVE ARCHITECT — holding the live arc against the bible
+
+**Verdict.** The descent is now a real descent — curdling grade, the keeper's voice,
+the merging hand, the counting table. That half lands. But "grief → INTEGRATION" is
+a TWO-beat thesis and only the first beat exists. Integration is, by definition, the
+turn UP carrying the wounded self — and there is no up. So the game currently says
+"grief," full stop, and worse, ends on the bell at the bottom, which (even withheld)
+reads as *staying down* — the opposite of the thesis. Until the player can ascend,
+ABYME is not the story in the SPINE; it is the setup to it, shipped as if it were the
+whole. Integration isn't blocked by the owner's taste in endings. It's blocked by a
+missing staircase.
+
+### SHOWRUNNER — synthesis & the one move
+
+The three forks the loop keeps surfacing are real and ARE the owner's — but they
+have been **conflated with the ascent**, which is fork-NEUTRAL and is the actual
+keystone.
+
+1. **BUILD THE ASCENT (#12) NEXT — it pre-decides no fork.** Inverse swell → rise
+   onto the chart table one level up, a puzzle re-locking below so you can't yo-yo.
+   This is true under closed-OR-choice, under any answer to who-the-player-is, and
+   under either final camera. It converts ABYME from the SPINE's *setup* into the
+   SPINE's *story*, and it is the literal answer to the owner's founding question
+   ("what happens as we LEAVE").
+2. **Make ONE beat of it UNMISSABLE.** The descent's soul lives in optional
+   whispers; the ascent must have at least one beat the player cannot skip — the
+   world shrinking around them as they rise, the keeper's voice falling silent
+   behind. Stop burying the spine in lean-ins.
+3. **The owner's forks layer ON TOP, later.** Once "up" exists, the ring-vs-climb
+   CHOICE, the who-am-I reveal, and the final camera are small additions to a
+   working staircase — and THOSE are where the loop legitimately waits for the owner.
+4. **Do NOT** ship more subtle marginalia, more perf (draws are healthy at 307), or
+   another environment (all shipped). The gap is not polish and not pixels.
+
+**Process note (build safely):** the ascent is large and the headless harness can't
+watch the 21s dive, so build it in STAGES — the inverse-swell math behind `?debug`
+first (verify by state + screenshot at swell endpoints), then the re-lock, then the
+unmissable beat — committing each stage only when verified, reverting if shaky.
+Never leave main broken. → sharpened issue #12.
+
+### Response — iteration 51
+
+Filed the critique (this panel), updated SPINE.md's endgame section to mark the
+**ascent as the fork-neutral keystone / recommended next build**, and sharpened
+issue #12 with the staged, fork-neutral framing. Did NOT build this tick (critique
+iteration). Next build tick begins the ascent, stage 1 (inverse-swell behind
+`?debug`), unless the owner redirects to their ending fork first.
+
+---
+
 ## Panel #2 — 2026-06-19 — the descent-so-far (the shipped decay)
 
 _Convened (iter 33, the panel due ~iter 34) to pressure-test what loops 30–32 actually shipped —

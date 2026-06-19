@@ -12,6 +12,46 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 51 — 2026-06-19 — persona critique (Panel #3: the waiting room)
+
+**Shipped (a critique, not a build — a valid iteration per MISSION):** Panel #3
+convened (~5 builds since Panel #2) to pressure-test the LIVE deployed game. Three
+critics — the Finisher (replayed it), the Skeptic (read the trajectory), the
+Narrative Architect (held it to the bible) — converged hard:
+
+- The recent deepenings are real but ALL optional lean-ins (whispers, depth-gated
+  journal, sub-pixel marks) — Panel #1's "buried the ending in an easter egg" disease,
+  quietly recreated. The beats moved; they weren't promoted.
+- "grief → INTEGRATION" is a two-beat thesis and only beat one exists. The game ends
+  on the bell at the bottom = *staying down*, the opposite of the thesis. There is no UP.
+- The loop deferred the WHOLE endgame to the owner for five ticks — but that's a
+  loophole. Only THREE things are the owner's call (closed-vs-choice ending,
+  who-is-the-player, final camera). **The ascent MECHANIC is fork-NEUTRAL** and is the
+  actual keystone; the loop has been waiting for permission it doesn't need.
+
+**Synthesis (Showrunner):** BUILD THE ASCENT (#12) NEXT — inverse-swell → rise onto
+the chart table one level up, a puzzle re-locking below. It pre-decides no fork, it
+converts ABYME from the SPINE's *setup* into its *story*, and it answers the owner's
+founding question. Make ONE beat of it UNMISSABLE. The owner's three forks layer on
+top of a working staircase, later. Stop shipping marginalia/perf/environments — the
+gap is the staircase.
+
+- `loop/CRITIQUES.md`: Panel #3 (newest first).
+- `loop/SPINE.md`: endgame section now flags the ascent as the fork-neutral keystone /
+  recommended next build.
+- Issue #12 sharpened with the staged, fork-neutral build plan (gh, foreground).
+
+**Evidence:** N/A (doc-only critique tick; no code changed, nothing to verify in-play).
+Committed locally; not a push boundary (next at 55).
+
+**Next tick suggestion:** BEGIN THE ASCENT (#12), stage 1 — the inverse-swell math
+behind `?debug` (rise 240× back onto the chart table one level up), verified by state
++ screenshot at the swell endpoints; commit only when verified; revert if shaky. If
+the owner has by then chosen an ending fork, fold that in. Stages 2 (re-lock on
+ascent) and 3 (the unmissable shrink/keeper-silence beat) follow in later ticks.
+
+---
+
 ## 50 — 2026-06-19 — story (the house remembers — return to the study) — BATCH 10 PUSH
 
 **Shipped:** The SPINE's 7th-Guest beat: *a house that remembers the player across

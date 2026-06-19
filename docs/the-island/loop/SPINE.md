@@ -70,6 +70,21 @@ GRIEF — the recursion is a person's refusal to let go. At the deepest reachabl
 
 Make LEAVING the true endgame and the mirror of the dive — the game currently has only DOWN, and that is the bug, not a detail. The sequence, built entirely from systems already shipped or cheaply extended:
 
+> **★★ Panel #3 (iter 51) — the ASCENT is the fork-NEUTRAL keystone; build it next.**
+> The loop has deferred the WHOLE endgame to the owner, but only three things are
+> genuinely the owner's call: (a) closed-vs-choice ending, (b) who-is-the-player,
+> (c) final camera (seafloor vs horizon). The **ascent mechanic itself** (step 4 below
+> — run the dive backward, rise onto the chart table one level up, a puzzle re-locking
+> below) pre-decides NONE of those: it is true under every fork, because the SPINE has
+> already settled the only thing it depends on ("you can never exit the nest —
+> climbing out = diving down"). It converts ABYME from the *setup* of grief→integration
+> into the *story* (integration = the turn UP carrying the wounded self), and it is the
+> literal answer to the owner's founding question. **So: build the ascent next, in SAFE
+> stages (inverse-swell behind `?debug` → re-lock → one UNMISSABLE beat), each committed
+> only when verified. The owner's three forks then layer on top of a working staircase.**
+> Stop shipping subtle marginalia / perf / environments — the gap is the staircase, not
+> polish. (Issue #12; full panel in [CRITIQUES.md](CRITIQUES.md).)
+
 > **★ Critical path (Panel #2, 2026-06-19 — [CRITIQUES.md](CRITIQUES.md)):** the panel proved the
 > decay shipped in loops 30–32 was *unreachable* (`W.level` never exceeded 2 — the era-eras lived
 > behind a debug flag). Re-ordered build queue: **(1) make `W.level` reachable + cost the dive
