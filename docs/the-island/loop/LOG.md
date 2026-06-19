@@ -12,6 +12,44 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 50 — 2026-06-19 — story (the house remembers — return to the study) — BATCH 10 PUSH
+
+**Shipped:** The SPINE's 7th-Guest beat: *a house that remembers the player across
+visits.* Wander off — the chain always sends you out to the bridge / stones / cliff —
+and the first time you RETURN to the study, it is exactly as you left it. Too exactly.
+A whisper ("You have stood here before. The room is exactly as you left it — too
+exactly.") and a journal line in the grief register the SPINE canonises — *time does
+not pass inside the model; grief preserves*: "I keep leaving this study and coming
+back to find it untouched… Either no time passes here, or I have stopped being the
+one who disturbs it." At depth the line arrives in the keeper's hand (the iter-45
+merge), so returning deeper = becoming him.
+
+- `puzzles.js`: a transient `_leftStudy` arm (set when you go >12m from the
+  lighthouse) + `once('studyReturns')` firing when you come back within 4.6m. Pure
+  whisper + journal — zero geometry, zero puzzle-prop risk (right for a push tick).
+  Journal hand = keeper at `W.level>=2`, self otherwise.
+
+Reachable in normal play; surface (no return yet) is unchanged. No JS dep, no asset.
+
+**Evidence:** in-play (`?debug`), drove the real `game.tick` per teleport (rAF
+suspended headless): enter→`['study']`; wander 126m→`_leftStudy` armed;
+return→`studyReturns` fires once, journal +1, whisper element shows the line; never
+fires without leaving first. Depth run (L2): journal hand = `keeper`. Zero console
+errors. PRE-PUSH BOOT CHECK on the clean player URL `/` (no debug): title + Begin
+render, canvas/WebGL OK, no errors, debug surface off.
+
+**Deployed:** BATCH 10 — pushed iters 46–50 live (submodule → main, then Dockhand
+parent gitlink). Push-cadence memory updated (boundary #10; next at 55).
+
+**Next tick suggestion:** the ENDGAME is the one big move left (ring-vs-climb-out
+integration ending #22-full / #12 ascent) — its forks remain the owner's call
+(surfaced repeatedly). If still unanswered: more "house remembers" reactions (a
+visible one — e.g. the cold stove showing a faint ember on a return), a beacon
+water-glimmer, or an audio-audition pass. Consider a persona-critique tick soon
+(last panel was #2; ~5 build iters have passed) to re-aim before the endgame.
+
+---
+
 ## 49 — 2026-06-19 — performance/code health (prune the model clone)
 
 **Shipped:** The 1:240 model clones the WHOLE island — including interiors and beach

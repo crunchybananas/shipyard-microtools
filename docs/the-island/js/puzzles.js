@@ -46,6 +46,7 @@ export class Game {
     this.boxPlaying = false;
     this._keeperLook = 0;        // eased 0..1: the figure turning to face you
     this._keeperLookTarget = 0;
+    this._leftStudy = false;     // armed once you wander off, for the return beat
 
     this._buildHotspots(modelAnchor);
   }
@@ -443,6 +444,20 @@ export class Game {
         UI.whisper('The inner door stands open. A coat, still warm. Footprints — your size.');
         UI.addJournal('One level down, the study is the same study. The model on its table shows a tiny figure standing on the beach. The annex holds a bell.');
       });
+    }
+    // the house remembers (#7thGuest "remembers the player across visits"): wander
+    // off, return, and the study is exactly as you left it — too exactly. The grief
+    // reading the SPINE canonises: time does not pass inside the model. Fires once,
+    // on the first return (the chain always sends you out to the bridge/stones/cliff).
+    if (F.enteredStudy) {
+      const dStudy = Math.hypot(p.x - LH.x, p.z - LH.z);
+      if (dStudy > 12) this._leftStudy = true;
+      if (dStudy < 4.6 && this._leftStudy) {
+        this.once('studyReturns', () => {
+          UI.whisper('You have stood here before. The room is exactly as you left it — too exactly.');
+          UI.addJournal('I keep leaving this study and coming back to find it untouched: the same chair, the same cold cup, the same hour held on the glass. Either no time passes here, or I have stopped being the one who disturbs it.', '', W.level >= 2 ? 'keeper' : 'self');
+        });
+      }
     }
     // the keeper looks back (#14): lean over the chart-table model at depth and
     // the figure on it turns, tips its head up to your giant eye, and speaks —
