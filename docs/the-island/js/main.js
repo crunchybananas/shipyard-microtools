@@ -23,7 +23,12 @@ try {
   document.getElementById('webgl-fail').classList.remove('hidden');
   throw e;
 }
-const BASE_DPR = Math.min(devicePixelRatio || 1, 1.75);
+// one fixed pixel ratio for the whole session — reactive setPixelRatio()
+// reallocates the drawing buffer (a per-call frame hitch), so the old
+// move/rest DPR thrash read as stutter. 1.5 cuts motion-state pixels vs
+// the prior 1.75 and stays crisp at rest; the 60fps cap + 1024 shadows
+// remain the power levers (issues #1, #2).
+const BASE_DPR = Math.min(devicePixelRatio || 1, 1.5);
 renderer.setPixelRatio(BASE_DPR);
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -251,8 +256,7 @@ function startDive() {
   interact.enabled = false;
   UI.cinematic(true);
   A.diveSweep(21);
-  dprNow = Math.min(BASE_DPR, 1.0);
-  renderer.setPixelRatio(dprNow);
+  renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
   farSea.visible = false;
 
   // pivot: the model's beach, in world space
@@ -300,8 +304,7 @@ function tickDive(dt) {
   if (f >= 1) {
     dive = null;
     MODE = 'play';
-    dprNow = BASE_DPR;
-    renderer.setPixelRatio(dprNow);
+    renderer.setPixelRatio(BASE_DPR);
     farSea.visible = true;
     player.locked = false;
     interact.enabled = true;
@@ -616,28 +619,23 @@ function buildDebugPanel() {
 const clock = new THREE.Clock();
 let elapsed = 0, fps = 60;
 
-// power policy (owner directive): the island only needs 60 — on 120 Hz
-// displays skip excess vsync ticks; and full resolution only while the
-// hand is on the world, easing to a calmer ratio at rest
+// power policy (owner directive): the island only needs 60fps. The frame
+// governor skips ticks only when clearly ahead of the 60fps budget — the
+// 12.5ms threshold sits safely between the 60Hz (16.7ms) and 120Hz (8.3ms)
+// intervals, so a 60Hz display never drops a frame (the old 15.5ms gate
+// sat against the 60Hz interval and stuttered) while a 120Hz display still
+// renders every other tick. Resolution is fixed (see BASE_DPR) — no
+// per-frame setPixelRatio, no framebuffer-realloc hitches.
 let lastTickMs = 0;
-let dprNow = BASE_DPR, restUntil = 0;
-const REST_DPR = Math.min(BASE_DPR, 1.3);
 let mistCur = 0;
 
 renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
-  if (nowMs - lastTickMs < 15.5) return; // ~64 fps ceiling, no-op at 60 Hz
+  if (nowMs - lastTickMs < 12.5) return; // 60fps cap; never drops a 60Hz frame
   lastTickMs = nowMs;
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
   fps = lerp(fps, 1 / Math.max(dt, 1e-4), 0.05);
-
-  const active = player.keys.size > 0 || player.dragging || player.dragCaptured || MODE !== 'play';
-  if (active) restUntil = elapsed + 1.2;
-  if (MODE !== 'dive') {
-    const want = elapsed < restUntil ? BASE_DPR : REST_DPR;
-    if (want !== dprNow) { dprNow = want; renderer.setPixelRatio(dprNow); }
-  }
 
   // idle drift of the sun — barely perceptible, but the island lives
   if (MODE === 'play') W.time = (W.time + W.timeDrift * dt) % 24;

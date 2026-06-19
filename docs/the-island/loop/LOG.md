@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 25 — 2026-06-19 — performance (the jitter goes) — closes #1, #2
+
+**Shipped:** Fixed the stutter, which was self-inflicted by iteration 12's
+power pass. Two changes in `main.js`: (1) the adaptive-DPR logic called
+`renderer.setPixelRatio()` on every move-start and ~1.2s after every stop —
+each call reallocates the drawing buffer, a per-transition frame hitch.
+Removed it entirely; resolution is now a fixed DPR 1.5. (2) the 60fps
+governor's 15.5ms gate sat against the 60Hz vsync interval (16.7ms) — any
+slightly-early frame got dropped → micro-stutter. Lowered to 12.5ms, which
+sits safely between the 60Hz and 120Hz intervals so a 60Hz display never
+drops a frame and 120Hz still halves.
+
+**Evidence:** passive frame-timing over 148 frames at the beach (no input):
+mean 16.67ms = **60.0fps, stddev 0.39ms, zero spikes >25ms, DPR constant**
+(was a razor-thin 0.1ms margin under the old gate). Crispness preserved —
+golden-hour lighthouse/study/glyphs read clean at 1.5. Zero console errors;
+boot, intro-skip, teleports all fine.
+
+**Debt:** POWER TRADE, flagged for the owner: rest no longer downscales to
+1.3 (so pure-standing rest renders ~33% more pixels than iteration-12), but
+motion is cut (1.75→1.5) and the realloc waste is gone. The 60fps cap +
+1024 shadows remain the primary power levers, so fans should stay quiet.
+The owner's fresh "jittery / performance tuning" directive refines the
+older power one: smoothness + crispness over the marginal rest-DPR saving.
+Dial: BASE_DPR is one constant (drop to 1.4/1.3 if fans return).
+
+**Next tick suggestion:** #5 (sound-toggle discoverability + `?debug`
+starts muted) — tiny, and makes the agent's own test sessions silent for
+real. Then #3 (movement wedge-escape) for safety, then #4 (the voiced
+layer) as the big wow.
+
+---
+
 ## 24 — 2026-06-19 — story (the coat remembers its keeper)
 
 **Shipped:** The cartographer's throughline closes on the last object that
