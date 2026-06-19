@@ -12,6 +12,49 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 49 — 2026-06-19 — performance/code health (prune the model clone)
+
+**Shipped:** The 1:240 model clones the WHOLE island — including interiors and beach
+structures that are sub-pixel and invisible at that scale. `instantiateModel` now
+prunes four such groups from the clone only: `drownedGallery`, `jetty`, `quarters`,
+`vaultDrips`. The real island keeps them all; the model loses ~39 draw calls of
+detail no one can see. Combined with #47, draws are down **408 → 307 (−25%)**.
+A pure power/health win, visually invisible, honoring the standing power policy.
+
+Also HARDENED a known trap: the prune uses **collect-then-remove** instead of
+`removeFromParent()` during `traverse` — the latent cause of the Points-in-core
+crash (removing mid-traverse corrupts the iteration). Now a stray Points in core
+would be pruned safely rather than killing init. (Routing glow via `diveGroup` is
+still the preferred pattern; this is belt-and-suspenders.)
+
+- `props.js`: `MODEL_PRUNE` set + collect-then-remove in `instantiateModel`. Each
+  pruned group confirmed decorative / island-ref-driven only (gallery+jetty are
+  exterior repeats; quarters is interior furniture; vaultDrips is driven off the
+  island ref in main, not modelRefs) — so the "apply to both instances" invariant
+  is untouched (nothing state-driven was in the clone copies).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Island still has
+all four groups (`[1,1,1,1]`) and `refs.jettyLantern` resolves; scene shows ONE copy
+of each (model pruned); `modelRefs.jettyLantern` is null (expected). Draws 346 → 307
+overview / 256 → 188 in the chart-table view. Screenshot of the chart-table model:
+island, islet, glyphs, bookshelves, plumb all identical — the recursion looks
+exactly the same. 487fps, tris 520k.
+
+**Debt:** cleared ~39 more draws (cumulative −101 with #47). Remaining lever: the
+cellar interior in the clone (~27 draws) is bigger but bundles state-driven nodes
+(hatch/vault/disagree*) so pruning it would break the both-instances invariant —
+left alone deliberately.
+
+**Next tick (iter 50 = PUSH BOUNDARY, batch 10):** ship one more SAFE item, then
+push iters 46–50 (submodule `git push origin HEAD:main` first, then the Dockhand
+parent gitlink from the worktree ROOT) and update the push-cadence memory
+(boundary #10, next at 55). The ENDGAME (ring-vs-climb-out, #22-full/#12) is still
+the big move pending the owner's fork choice; safe iter-50 candidates: the
+"rearranges-on-2nd-entry" house-remembers beat, a beacon water-glimmer, or a small
+visual refinement.
+
+---
+
 ## 48 — 2026-06-19 — graphics/atmosphere (the shore beacon comes to light)
 
 **Shipped:** The jetty lantern was a static emissive dot with a point-light; now

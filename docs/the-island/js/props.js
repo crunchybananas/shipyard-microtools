@@ -1464,14 +1464,24 @@ function buildVegetation(core, r) {
 // Clone the island into the chart-table model. Shares all geometry; disables
 // shadows; swaps the nested model anchor for a tiny impostor (the model's model).
 // =============================================================================
+// groups whose detail is sub-pixel at 1:240 and carries no state the recursion
+// shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
+// confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
+// quarters is interior furniture, vaultDrips is driven off the island ref only.
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips']);
+
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
   modelRoot.name = 'modelIsland';
+  // collect-then-remove: removing a node DURING traverse corrupts the iteration
+  // (the latent cause of the Points-in-core crash). Gather here, prune after.
+  const prune = [];
   modelRoot.traverse((o) => {
     o.castShadow = false;
     o.receiveShadow = false;
-    if (o.isPoints) o.removeFromParent?.();
+    if (o.isPoints || MODEL_PRUNE.has(o.name)) prune.push(o);
   });
+  for (const o of prune) o.removeFromParent();
   // the model's own model: a speck impostor on its chart table
   const nestedAnchor = modelRoot.getObjectByName('modelAnchor');
   if (nestedAnchor) {
