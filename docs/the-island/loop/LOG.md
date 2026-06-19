@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 42 — 2026-06-19 — polish (drips fall the height of the Vault — scale cues) — #17 cont.
+
+**Shipped:** The SPINE's "drips that fall for a real two seconds" — 11 cold
+droplets (elongated, faintly self-lit) fall the full ~31m height of the Vault
+Beneath, vanishing at the black water and reappearing at the roof, concentrated
+in the framed window's sightline so they READ from the cellar ledge. You measure
+the abyss by how long they fall — scale + life for the marquee vault. Animated in
+`main.js` (returned `vaultDrips` group, gated to `hatchOpen`); safe additive
+geometry in the cellar group (meshes, not Points). No JS dep, no asset.
+
+**Why a polish, not #18:** #18 (The Room That Disagrees) needs a second study with
+a DYNAMIC private ghostState model contradicting the live world — the most complex
+environment, genuinely a multi-tick build. Coming off four heavy environment ticks
+(38–41, incl. the big Vault), the balanced call was a safe, verifiable enrichment
+of the freshest feature rather than another large risky room. #18 remains the next
+big build.
+
+**Evidence:** in-play (`?debug`, constructed hatch-open save + Continue) at the
+cellar ledge — two screenshots show the drips at DIFFERENT heights between frames
+(confirming they fall), alongside the inverted lighthouse + ember + cold pool.
+Zero console errors; 486–530 fps, draws ≤37.
+
+**Next tick suggestion:** **#18 The Room That Disagrees** as a dedicated careful
+build (the last big SPINE environment) — a second study reached at depth, framed
+like the vault, its chart-table model + window driven by a private ghostState that
+contradicts the live `W` (sea drained when full; beam lit by day). Verify a
+reachable vantage first; if the dynamic ghostState is too large for one clean
+tick, ship a FRAMED static slice (the contradicting model frozen) + note the rest.
+Alternatively a consolidation tick: ambient audio for the new spaces (vault
+drip/room-tone, jetty water-lap) — note it needs an owner audition.
+
+---
+
 ## 41 — 2026-06-19 — environment (the Vault Beneath — the recursion as architecture) — #17
 
 **Shipped:** The marquee "abyme" image, at last. The cellar's closed `BackSide`-box

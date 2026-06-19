@@ -875,6 +875,7 @@ export function buildWorld() {
 
   // =================== THE HATCH + CELLAR VAULT (bluff) ======================
   let cellarMotes = null;
+  let vaultDrips = null;
   {
     const hx = SPOTS.hatch.x, hz = SPOTS.hatch.y, hy = 23.5;
     // stone ring + brass lid + four glyph dials
@@ -968,6 +969,19 @@ export function buildWorld() {
     const vlamp = new THREE.Mesh(new THREE.SphereGeometry(0.72, 12, 9),
       new THREE.MeshStandardMaterial({ color: 0xdcf3f6, emissive: 0x9fdce8, emissiveIntensity: 6, flatShading: true }));
     vlamp.position.set(ilx, 18.9, ilz); vlamp.name = 'vaultLamp'; cellar.add(vlamp);   // a bare ember below the dome tip, still lit
+    // slow drips falling the full height of the void — scale cues; you read how
+    // deep the vault is by how long they fall (SPINE). Returned + animated in main.
+    vaultDrips = new THREE.Group(); vaultDrips.name = 'vaultDrips';
+    const dripMat = new THREE.MeshStandardMaterial({ color: 0xeaf8fb, emissive: 0x9fdcec, emissiveIntensity: 3, flatShading: true });
+    for (let i = 0; i < 11; i++) {
+      const drop = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.14, 0.8, 5), dripMat);
+      // kept within the window's sightline (z near the opening) so they READ as
+      // falling through the void, fanned across its depth in x
+      drop.userData = { x: hx + 12 + r() * 34, z: cz + (r() - 0.5) * 8.5, phase: r(), speed: 0.34 + r() * 0.16 };
+      drop.position.set(drop.userData.x, 45, drop.userData.z);
+      vaultDrips.add(drop);
+    }
+    cellar.add(vaultDrips);
     // stairs (visual steps) — match the walkable ramp from inside the hole
     for (let i = 0; i < 10; i++) {
       const st = new THREE.BoxGeometry(3.0, 0.35, 0.95);
@@ -1116,7 +1130,7 @@ export function buildWorld() {
   fireflies.material.uniforms.uDrift.value = 1;
   fireflies.name = 'fireflies';
 
-  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, atlas };
+  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, vaultDrips, atlas };
 }
 
 // ---------------------------------------------------------------------------

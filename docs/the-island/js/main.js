@@ -74,7 +74,7 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow } = buildWorld();
+const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, vaultDrips } = buildWorld();
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
@@ -543,6 +543,17 @@ function applyAtmosphere(elapsed, dt) {
   // the vault's cold lamp, with a slow drowned pulse — lit only with the cellar open
   vaultGlow.intensity = W.flags.hatchOpen ? 42 * (1 + 0.07 * Math.sin(elapsed * 1.3)) : 0;
   vaultFill.intensity = W.flags.hatchOpen ? 12 : 0;
+  // slow drips falling the height of the void — scale cues (vanish at the water,
+  // reappear at the roof); only while the vault is open
+  if (vaultDrips) {
+    vaultDrips.visible = W.flags.hatchOpen;
+    if (W.flags.hatchOpen) for (const d of vaultDrips.children) {
+      const u = d.userData;
+      u.phase = (u.phase + dt * u.speed) % 1;
+      d.position.y = lerp(45, 13.9, u.phase);
+      d.scale.setScalar(clamp(Math.min(u.phase / 0.07, (1 - u.phase) / 0.07), 0, 1));
+    }
+  }
   // the keeper's lamp burns one level down, with a faint lamp-oil flicker
   keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
   // the jetty beacon: a low warm glow by day, a real beacon by night
