@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 31 — 2026-06-19 — story (the descent decays in objects too) — #13 prop divergence
+
+**Shipped:** The era-color descent (iteration 30) now has matching *object*
+decay — the keeper and the partner fade as you go down, keyed off `W.level`:
+- **The keeper's coat** (annex): on its hook at level 2 → slumped to the floor
+  at level 3 → gone at level 4+ (`puzzles.js _apply`, translation-only on the
+  coat group so the stitched maker's-mark marginalia stays with it).
+- **The partner's warm window** (the study glow): full at level 2, fading with
+  depth (`windowFade` on `studyLight`: L2 1.0 → L3 0.58 → L4 0.16 → L5+ 0.12) —
+  the lit study going cold the deeper you are.
+
+Both metaphor, no biography. No new dep, no asset.
+
+**Evidence:** coat numeric (L2 on-hook visible → L3 y−0.95 visible → L4 hidden)
++ visual (L2 upright on hook with stitches → L3 pooled on the floor and dimmer);
+window numeric (windowFade L2→L5 = 1/0.58/0.16/0.12) + visual (study warm and
+glowing at L2 night → markedly dim at L4 night). Zero console errors. Levels
+3–5 via debug `W.level` (reachable once the ascent/multi-dive ships). Note:
+the per-frame JS read of studyLight reads stale between hidden-tab rAF frames
+— the screenshot path renders live, so visuals are the source of truth.
+
+**Debt:** #13's remaining slivers — footprints (out-of-sea → into-sea reversal)
+and the bell's faint deepening sway — left as small follow-ons; the coat +
+window carry the emotional load. Kept #13 open.
+
+**Next tick suggestion:** environment #16 (The Drowned Gallery) — the first
+sunless, low-ceilinged interior, revealed when the tide drains; reuses the
+cellar's BackSide-box recipe and reframes descent as the real direction. Or
+finish #13's footprints/bell slivers for a quick close. Persona panel due
+~iteration 34.
+
+---
+
 ## 30 — 2026-06-19 — story/graphics (the descent decays — era color-psychology) — #13
 
 **Shipped:** The keystone of the integration arc: descending the recursion now

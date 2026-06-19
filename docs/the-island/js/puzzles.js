@@ -490,7 +490,14 @@ export class Game {
     if (R.plumbBob) R.plumbBob.visible = !F.plumbTaken;
 
     if (R.songBird) R.songBird.visible = isDawn();
-    if (R.coat) R.coat.visible = W.level >= 2;
+    // the keeper's coat fades with the descent (#13): on its hook at level 2,
+    // slumped to the floor at level 3, gone below — the keeper more absent the
+    // deeper you go (translation-only, so the stitched marginalia stays with it)
+    if (R.coat) {
+      R.coat.visible = W.level >= 2 && W.level <= 3;
+      const dropped = W.level >= 3;
+      R.coat.position.set(0, dropped ? -0.95 : 0, dropped ? 0.15 : 0);
+    }
     if (R.footprints) R.footprints.visible = W.level >= 2;
     if (R.tinyFigure) R.tinyFigure.visible = W.level >= 2 && isModel;
   }

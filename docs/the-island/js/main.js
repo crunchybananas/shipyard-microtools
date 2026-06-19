@@ -478,8 +478,10 @@ function applyAtmosphere(elapsed, dt) {
   farSea.material.color.copy(g.water).lerp(g.fog, 0.35);
   farSea.position.y = waterY() - 0.15;
 
-  // study glow: warm by night, faint by day
-  studyLight.intensity = lerp(4, 16, night);
+  // study glow: warm by night, faint by day — and the partner's warm window
+  // goes dark the deeper you descend (one prop change per level, #13)
+  const windowFade = Math.max(1 - 0.42 * Math.max(0, W.level - 2), 0.12);
+  studyLight.intensity = lerp(4, 16, night) * windowFade;
   lampSpill.intensity = W.lampLit ? 220 : 0;
   cellarLight.intensity = W.flags.hatchOpen ? 9 : 0;
   cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
