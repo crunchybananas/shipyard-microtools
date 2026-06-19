@@ -936,7 +936,10 @@ export function buildWorld() {
     panel(9.4, 8.4, hx, yBot, cz, -Math.PI / 2, 0);            // floor
     panel(9.4, 8.4, hx, yTop, cz, -Math.PI / 2, 0);            // ceiling
     panel(9.4, 4.45, hx, cy, hz - 17.8, 0, 0);                 // south (carve wall)
-    panel(8.4, 4.45, hx - 4.7, cy, cz, 0, Math.PI / 2);        // west
+    // WEST wall: a framed window onto The Room That Disagrees (#18) — mirrors east
+    panel(8.4, 0.75, hx - 4.7, yTop - 0.375, cz, 0, Math.PI / 2);       // top lintel
+    panel(1.7, 3.7, hx - 4.7, cy - 0.35, hz - 10.15, 0, Math.PI / 2);   // north jamb
+    panel(1.9, 3.7, hx - 4.7, cy - 0.35, hz - 16.95, 0, Math.PI / 2);   // south jamb
     panel(2.7, 4.45, hx - 3.35, cy, hz - 9.4, 0, 0);           // north — west of the doorway
     panel(2.7, 4.45, hx + 3.35, cy, hz - 9.4, 0, 0);           // north — east of the doorway
     // EAST wall: a framed window onto the vault — a lintel + two jambs seal the
@@ -982,6 +985,41 @@ export function buildWorld() {
       vaultDrips.add(drop);
     }
     cellar.add(vaultDrips);
+
+    // ----- THE ROOM THAT DISAGREES (#18, framed static slice) ----------------
+    // West of the cellar, a second study like the one above — but the model on
+    // its chart table shows a world this one is NOT in: the sea drained that you
+    // never drained, a lamp lit that you never lit, and a window onto weather
+    // that isn't yours. The whole game taught you the model tells the truth about
+    // the world; this room breaks that. (Frozen for the slice; live ghostState +
+    // the contradiction deepening are the follow-up.)
+    const dgx = hx - 4.7 - 6;        // study centre, west of the framed window
+    const dgMat = new THREE.MeshStandardMaterial({ color: 0x6a6456, flatShading: true, roughness: 0.95, side: THREE.BackSide });
+    const study2 = new THREE.Mesh(new THREE.BoxGeometry(12, 5, 11), dgMat);
+    study2.position.set(dgx, 20.0, cz); cellar.add(study2);                       // east face flush with the window
+    const dgWin = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.7),              // a window onto contradicting weather (static)
+      new THREE.MeshStandardMaterial({ color: 0xaebfd2, emissive: 0x718aa6, emissiveIntensity: 0.8, flatShading: true, side: THREE.DoubleSide }));
+    dgWin.rotation.y = Math.PI / 2; dgWin.position.set(dgx - 5.92, 20.5, cz); cellar.add(dgWin);
+    const dgTable = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.22, 2.6), matWood);
+    dgTable.position.set(dgx, 18.75, cz); cellar.add(dgTable);
+    for (const lx of [-1.5, 1.5]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.4, 2.4), matWood);
+      leg.position.set(dgx + lx, 17.95, cz); cellar.add(leg);
+    }
+    // the contradicting model: an island whose SEA IS DRAINED (dark exposed
+    // seabed, no blue), its little lighthouse LAMP LIT
+    const dgIsland = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.55, 0.16, 16),
+      new THREE.MeshStandardMaterial({ color: 0xb8ad8e, flatShading: true }));
+    dgIsland.position.set(dgx, 18.97, cz); cellar.add(dgIsland);
+    const dgSeabed = new THREE.Mesh(new THREE.RingGeometry(1.4, 2.3, 22),
+      new THREE.MeshStandardMaterial({ color: 0x2c2820, roughness: 1, side: THREE.DoubleSide }));
+    dgSeabed.rotation.x = -Math.PI / 2; dgSeabed.position.set(dgx, 18.9, cz); cellar.add(dgSeabed);
+    const dgTower = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 0.7, 8),
+      new THREE.MeshStandardMaterial({ color: 0xd8d2c4, flatShading: true }));
+    dgTower.position.set(dgx + 0.35, 19.4, cz - 0.25); cellar.add(dgTower);
+    const dgLamp = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6),
+      new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffc060, emissiveIntensity: 4.5, flatShading: true }));
+    dgLamp.position.set(dgx + 0.35, 19.78, cz - 0.25); dgLamp.name = 'disagreeLamp'; cellar.add(dgLamp);
     // stairs (visual steps) — match the walkable ramp from inside the hole
     for (let i = 0; i < 10; i++) {
       const st = new THREE.BoxGeometry(3.0, 0.35, 0.95);

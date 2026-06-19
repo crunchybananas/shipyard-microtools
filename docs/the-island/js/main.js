@@ -177,6 +177,11 @@ scene.add(vaultGlow);
 const vaultFill = new THREE.PointLight(0x4f8a9c, 0, 44, 1.6);
 vaultFill.position.set(SPOTS.hatch.x + 22, 30, SPOTS.hatch.y - 13.6);
 scene.add(vaultFill);
+// The Room That Disagrees (#18) — a warm study light west of the cellar (the
+// uncanny twin of the study above), so it reads warm against the cold vault.
+const disagreeLight = new THREE.PointLight(0xffc98a, 0, 16, 1.7);
+disagreeLight.position.set(SPOTS.hatch.x - 9, 20.6, SPOTS.hatch.y - 13.6);
+scene.add(disagreeLight);
 
 // ---------------- gulls ----------------
 const gulls = [];
@@ -543,6 +548,7 @@ function applyAtmosphere(elapsed, dt) {
   // the vault's cold lamp, with a slow drowned pulse — lit only with the cellar open
   vaultGlow.intensity = W.flags.hatchOpen ? 42 * (1 + 0.07 * Math.sin(elapsed * 1.3)) : 0;
   vaultFill.intensity = W.flags.hatchOpen ? 12 : 0;
+  disagreeLight.intensity = W.flags.hatchOpen ? 13 : 0;
   // slow drips falling the height of the void — scale cues (vanish at the water,
   // reappear at the roof); only while the vault is open
   if (vaultDrips) {

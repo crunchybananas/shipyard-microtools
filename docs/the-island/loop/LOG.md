@@ -12,6 +12,50 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 43 — 2026-06-19 — environment (The Room That Disagrees) — #18 · the env set is complete
+
+**Shipped:** The last big SPINE environment, as a framed static slice — and it
+turns the cellar into the nexus of the descent: the cold abyss VAULT to the east
+(#17), the warm DISAGREEING STUDY to the west (#18), the plumb bob between. The
+cellar's west wall is opened into a framed window (mirroring the vault's) onto a
+second study like the one above — but the model on its chart table shows a world
+this one is NOT in: the bay DRAINED that you never drained (dark exposed seabed,
+no blue), a lighthouse LAMP LIT that you never lit, and a window onto weather
+that isn't yours. The game spent itself teaching you the model tells the truth
+about the world; this room breaks that. A whisper names it on approach
+("...a sea you never drained, a lamp you never lit. Which of you is the copy?").
+- `props.js`: west wall → framed window (lintel + jambs); a warm second-study box
+  with a chart table, the contradicting model (island disc + dark drained-seabed
+  ring + tiny lit lighthouse), and a contradicting-weather window.
+- `main.js`: `disagreeLight` (warm), gated `hatchOpen` — warm vs the cold vault.
+- `puzzles.js`: a `roomDisagrees` once-key whisper + journal on approach.
+
+Framed STATIC slice: the contradiction is frozen. The live private ghostState
+(model + window updating to actively contradict W) is the follow-up. All metaphor,
+no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`, constructed hatch-open save + Continue) — screenshots
+from the cellar: the disagreeing study through the west window (drained-sea model,
+lit lamp, weather window) at range and up close, and the vault still intact through
+the east window. Verified: `roomDisagrees` whisper FIRED; **containment** (walkableY
+18.3 in-room, 24.1 solid bluff west of the opening — looks in, can't walk out); the
+east vault lamp + drips intact; zero console errors; 388–530 fps, draws ≤338.
+
+**Milestone:** the full SPINE environment set is now shipped — Keeper's Quarters
+#15, Drowned Gallery #16, Vault Beneath #17, The Room That Disagrees #18,
+Threshold #24 — atop the structural arc (reachable descent, keeper, finale fork,
+legible grade). (All local since iter 41; deploys at the iter-45 push.)
+
+**Next tick suggestion:** with the big environments done, shift to DEEPENING +
+polish: (a) the live ghostState for #18 (the model/window actively contradicting
+W); (b) the don't-ring / climb-out terminal ending (#22 full) — the ring-vs-leave
+choice, now that the Threshold + the spaces exist; (c) the journal-hands merge #21
+(the player's notes blurring into the keeper's at depth); (d) an owner-audition
+pass on the synthesized voices + ambient audio for the new rooms. Pick by
+highest-wow-per-safe-effort; iter 45 is the batch-9 push.
+
+---
+
 ## 42 — 2026-06-19 — polish (drips fall the height of the Vault — scale cues) — #17 cont.
 
 **Shipped:** The SPINE's "drips that fall for a real two seconds" — 11 cold

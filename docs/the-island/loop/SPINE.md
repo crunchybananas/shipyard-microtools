@@ -77,7 +77,9 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > the finale from `gradeBias` [✓ iter 35] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author
 > casts [✓ iter 36] → (5) #15 Keeper's Quarters [✓ iter 37] → (6) #16 Drowned Gallery [✓ iter 38,
 > vista] / #17 Vault [✓ iter 41 — cellar opened into the inverted-lighthouse abyss] → (7) #18 Room
-> That Disagrees [NEXT] / #24 Threshold [✓ iter 39, the jetty+dory standing-promise].** Do NOT build the abyss rooms (#16/#17) before the
+> That Disagrees [✓ iter 43, framed static slice] / #24 Threshold [✓ iter 39, the jetty+dory
+> standing-promise].** — ALL major SPINE environments shipped. Remaining: deepening/polish (live
+> ghostState for #18, the don't-ring/climb-out ending #22-full, journal-merge #21, audio audition).** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
 1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set
@@ -118,7 +120,7 @@ What it MEANS: the recursion was never a puzzle, it was the shape of a search. D
 - **Palette:** deep grade; a far wall lit only at its base by waterShallow glow, the top lost in fog; drips that fall for a real two seconds as scale cues
 - **Narrative role:** At the bottom of the Drowned Gallery, one vast inverted cone of rock with the next island's lighthouse hanging full-size and upside-down from the cave roof across black water (a modelAnchor clone). The first time the player SEES the recursion as architecture instead of a teleport cut — turning a clever transition into a vista of dread. Reuses the giant-ruler scale trick that already works.
 
-### The Room That Disagrees  *(medium)*
+### The Room That Disagrees  *(medium)* — ✓ FRAMED SLICE SHIPPED iter 43 (cellar west wall → framed window onto a second study whose chart-table model shows a drained sea you never drained + a lamp you never lit, with a contradicting-weather window; a whisper names the unease. The live private ghostState is the follow-up.)
 
 - **Mood:** uncanny, trust-breaking — the cozy register betrayed in exactly one room
 - **Palette:** the existing study cloned and lit cold (deep grade), one inverted assumption

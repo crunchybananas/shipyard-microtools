@@ -465,6 +465,17 @@ export class Game {
     }
     this._keeperLook = lerp(this._keeperLook, this._keeperLookTarget, 1 - Math.exp(-4 * dt));
 
+    // The Room That Disagrees (#18): in the cellar, drawn to the west window, the
+    // player sees a model that contradicts the world — name the unease, once
+    if (W.flags.hatchOpen && !this._roomDisagrees && p.y < 19.6 && p.y > 17
+        && Math.abs(p.z - (SPOTS.hatch.y - 13.6)) < 4.6 && p.x > SPOTS.hatch.x - 6 && p.x < SPOTS.hatch.x - 2.5) {
+      this._roomDisagrees = true;
+      this.once('roomDisagrees', () => {
+        UI.whisper('Another study, west of this one. On its table: a sea you never drained, a lamp you never lit. Which of you is the copy?');
+        UI.addJournal('A second study faces mine across the dark. Its model shows an island I never made — the bay drained, the light burning. I have trusted the model to tell the truth about the world. Here, one of them is lying.');
+      });
+    }
+
     // the brink lets go if you step off the plate — a felt drawing-back
     if (this._brink) {
       const plate = this.refs.deskPlate;
