@@ -160,6 +160,13 @@ keeperLamp.position.set(
   LH.z + Math.cos(_annexAA) * 7.4 + 0.52);
 scene.add(keeperLamp);
 
+// the jetty lantern — a small shore beacon at the end of the pier (#24); warm
+// always, brightening into the dark like a light left for a return. Position
+// matches the hung globe in props.js (jetty at x-18; globe local 0.33,3.66,-115.4).
+const jettyLamp = new THREE.PointLight(0xffc06a, 0, 16, 1.6);
+jettyLamp.position.set(-17.67, 3.66, -115.4);
+scene.add(jettyLamp);
+
 // ---------------- gulls ----------------
 const gulls = [];
 {
@@ -524,6 +531,8 @@ function applyAtmosphere(elapsed, dt) {
   cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
   // the keeper's lamp burns one level down, with a faint lamp-oil flicker
   keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
+  // the jetty beacon: a low warm glow by day, a real beacon by night
+  jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7));
 
   // iris cursor only exists while playing
   document.getElementById('iris').classList.toggle('gone', MODE !== 'play');

@@ -679,6 +679,16 @@ export function buildWorld() {
       const mp = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 1.5, 6), weather);
       mp.position.set(px, 1.75, -116.2); jetty.add(mp);
     }
+    // a lantern on a post at the jetty's end — the way out, kept lit. Someone
+    // leaves a light for a return that may never come (the point-light is in
+    // main.js, warm and brightening at night, like a small shore beacon).
+    const lpost = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 2.8, 6), weather);
+    lpost.position.set(jx + 0.9, 2.45, -115.4); jetty.add(lpost);
+    const larm = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.08, 0.08), weather);
+    larm.position.set(jx + 0.62, 3.75, -115.4); jetty.add(larm);
+    const lglobe = new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 6),
+      new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffc06a, emissiveIntensity: 1.5, flatShading: true }));
+    lglobe.position.set(jx + 0.33, 3.66, -115.4); lglobe.name = 'jettyLantern'; jetty.add(lglobe);
     core.add(jetty);
 
     // the dory — beached on the dry sand, bow toward the water, keeled over

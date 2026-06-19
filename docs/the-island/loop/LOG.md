@@ -12,6 +12,48 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 40 — 2026-06-19 — polish (the jetty beacon) + batch-8 push — #24 cont.
+
+**Shipped:** A lantern on a post at the jetty's seaward end — the way out, kept
+lit. A warm globe (emissive) + a `jettyLamp` point-light (warm 0xffc06a): a low
+glow by day, a real shore beacon by night with a faint flicker. "Someone leaves a
+light for a return that may never come" — it ties the Threshold (#24) to the
+grief/integration register. Additive, no collision/walkability change.
+
+**Why a polish and not #17 (the Vault):** this iteration is a PUSH boundary and
+the owner may be waking. I went into the cellar (set shadowRevealed/hatchOpen,
+teleported to the room floor y18.3) and confirmed the baseline: the Vault needs
+the cellar's closed `BackSide`-box room rebuilt into panels (to open a non-carve
+wall) plus a vast inverted-lighthouse cavern — a large, fiddly, RISKY build whose
+verification needs the full hatch-puzzle setup. Rebuilding a puzzle room (carve
+hint, plumb bob, shaft junction, containment) at a push boundary, unattended, is
+exactly what the cardinal rule guards against. The prompt sanctioned the fallback
+("if shaky, ship a small safe polish; do NOT push anything broken"), so I shipped
+the beacon and reserved the Vault for a focused, non-boundary tick with room to
+revert freely. (#17 has now been deferred three ticks for sound safety reasons —
+it is the explicit next focus.)
+
+**Evidence:** in-play (`?debug`) from the reachable beach at night — screenshot of
+the jetty with the lantern glowing, casting a warm pool on the deck + water under
+the stars. Zero console errors; 60 fps, draws ≤254.
+
+**Batch-8 push:** iters 36–40 (era-color legibility, Keeper's Quarters, Drowned
+Gallery vista, Threshold jetty+dory, jetty beacon) → origin/main, submodule first
+then the Dockhand parent gitlink.
+
+**Next tick suggestion:** **#17 The Vault Beneath — a dedicated, careful build.**
+Rebuild the cellar room as panels (floor/ceiling/north-with-shaft-doorway/south-
+carve/WEST), OMIT the EAST wall, and build the vault east of x=hx+4.7 (hx=97):
+a vast dark `BackSide` cavern, a full-size inverted lighthouse hanging from the
+roof across a black-water plane, base-lit by a cold waterShallow-tone glow. Keep
+walkableY UNCHANGED (player contained to the room region lx±4.5, lz hz-17..hz-8.6;
+terrain beyond is solid → contained). Verify IN the cellar: carve/plumb/stairs
+intact, no seams, player can't walk out, vault visible through the east opening.
+Route any glow via diveGroup (never Points in core). If clean → ship; if shaky →
+fall back again. NOT a push boundary (next push at 45), so attempt it freely.
+
+---
+
 ## 39 — 2026-06-19 — environment (the Threshold — the way out made physical) — #24
 
 **Shipped:** The owner's whole "what happens as we leave?" question, answered in
