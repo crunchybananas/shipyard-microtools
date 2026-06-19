@@ -181,7 +181,10 @@ export function gradeAt(t) {
   lerpColor(_grade.waterShallow, a.waterShallow, b.waterShallow, f);
   _grade.sunInt = lerp(a.sunInt, b.sunInt, f);
   _grade.fogDen = lerp(a.fogDen, b.fogDen, f);
-  return gradeBias(_grade, W.level);
+  // the finale is the resolution — it must NOT inherit the descent's curdle.
+  // W._finaleWarm forces the clean (level-1) grade so the ending lands warm,
+  // not desaturated by how deep you rang the bell (#22).
+  return gradeBias(_grade, W._finaleWarm ? 1 : W.level);
 }
 
 // ---------------- water level -------------------------------------------------

@@ -284,9 +284,26 @@ const A = {
     }
   },
 
-  bellToll() {
+  bellToll(withhold = false) {
     if (!this.ready) return;
     const t0 = ctx.currentTime;
+    // the bell rung at depth WITHHOLDS — the gathered score thins instead of
+    // swelling, and the leitmotif never crowns. Awe and dread live in
+    // subtraction; the bottom must sound like the bottom (#22).
+    if (withhold) {
+      this.pluck(110, 0, 0.5, 9);          // a lone tonic, no answering chord
+      this.pluck(220, 0.02, 0.28, 8);
+      for (const n of [1, 2]) {            // the drones you earned fade away
+        const g = this._stemGains?.[n];
+        if (g) { g.gain.cancelScheduledValues(t0); g.gain.setTargetAtTime(0.0001, t0 + 0.4, 3.2); }
+      }
+      clearInterval(this._arp); clearInterval(this._pulse); clearInterval(this._shimmer);
+      // a single falling figure into the quiet — descent, not crown
+      this.pluck(329.63, 1.3, 0.18, 6);
+      this.pluck(261.63, 3.1, 0.16, 7);
+      this.pluck(174.61, 5.4, 0.14, 9);
+      return;
+    }
     // the final bell: the leitmotif's tonic, vast
     this.pluck(110, 0, 0.7, 9);
     this.pluck(220, 0.02, 0.5, 8);

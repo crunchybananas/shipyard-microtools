@@ -12,6 +12,55 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 35 — 2026-06-19 — story (the finale forks — the bottom withholds) — #22 · batch-7 push
+
+**Shipped:** The ending no longer plays the old golden victory parade at the
+floor of a grief, and no longer inherits the descent's decay curdle (#22, panel
+critical-path step 3). Two fixes, one beat:
+- **Exempt the finale from `gradeBias`** (`world.js`): a new transient
+  `W._finaleWarm` forces the clean (level-1) grade during the finale, so the
+  resolution lands warm — never desaturated by how deep you rang the bell.
+- **Fork the finale TONE by depth** (`main.js` startFinale/tickFinale,
+  `audio.js bellToll(withhold)`):
+  - **Surface (level 2)** — the loved ending, preserved and now un-curdled: the
+    day wheels to a clean night, the score gathers its earned stems, the 5-star
+    constellation completes. Card: "the tide brought you back".
+  - **Deep (level ≥ 3)** — the bottom WITHHOLDS: the day holds at a bittersweet
+    golden hour the night (and its stars) never reaches, the constellation never
+    lights, `bellToll(true)` thins the gathered score to a lone tonic + a single
+    falling figure (the drones fade, the leitmotif/pulse/shimmer intervals stop),
+    and the keeper murmurs once from below. Card: "you keep the light now".
+
+All metaphor, no biography, no JS dep, no asset. "Awe and dread live in subtraction."
+
+**Evidence:** in-play (`?debug`) — drove the bell hotspot's `onClick` at L4 →
+deep branch (`W._finaleWarm` true, card "you keep the light now", `uConstelGlow`
+all 0, card shown) + **screenshot**: warm pink/lavender/peach golden-hour sky,
+NO stars, NOT the L4 isolation-blue curdle. Then reloaded, L2 → surface branch
+(card "the tide brought you back") + **screenshot**: clean night, full 5-star
+constellation lit, moon + Milky Way — the loved ending intact and un-muddied.
+Zero console errors; 60 fps.
+
+**Debt:** the withheld toll + keeper murmur are synthesized and verified
+ERROR-FREE but **not auditioned** (muted headless), as with all `audio.js` work.
+Still open from the arc: the UP/ascent (#12 remainder — running the dive
+backward), and the don't-ring / climb-out terminal branch (#22 full / SPINE
+endgame step 5) — this tick forked the RING-at-depth tone, not the ring-vs-leave
+choice.
+
+**Next tick suggestion:** **#13 redux — make the descent's color actually READ**
+(panel critical-path step 4). Now that the levels are reachable AND the finale is
+protected, fix the era-grade legibility the Art Director flagged: in
+`world.js gradeBias`, reorder to **tint the cast onto the full-chroma color
+FIRST, then desaturate the result, then darken** (today desat runs first and
+kills the hue before the cast applies — a neutral wall at L2 lands one 8-bit
+value off grey), and re-author the four casts as saturated, separated hues
+(emotion via chroma, depth via the dark multiplier) with a per-channel darkness
+floor so night×depth isn't unreadable black. Verify on-screen as an L1–L5 strip
+a stranger could name without labels.
+
+---
+
 ## 34 — 2026-06-19 — story (the keeper — a second person at the bottom) — #14
 
 **Shipped:** The descent now descends TOWARD someone. Grief is transitive (panel

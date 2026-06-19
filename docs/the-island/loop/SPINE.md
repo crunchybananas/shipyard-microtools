@@ -74,8 +74,8 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > decay shipped in loops 30–32 was *unreachable* (`W.level` never exceeded 2 — the era-eras lived
 > behind a debug flag). Re-ordered build queue: **(1) make `W.level` reachable + cost the dive
 > [✓ iter 33] → (2) #14 Keeper voice + promote the figure [✓ iter 34] → (3) #22 finale fork + exempt
-> the finale from `gradeBias` [NEXT] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author casts → (5) #15 Keeper's
-> Quarters → (6) #16/#17 abyss rooms → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
+> the finale from `gradeBias` [✓ iter 35] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author
+> casts [NEXT] → (5) #15 Keeper's Quarters → (6) #16/#17 abyss rooms → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
 1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set
@@ -92,7 +92,7 @@ finale fires the old golden parade at depth (step 3), and there is no UP yet (st
 
 4) BUILD THE WAY UP (large — the answer to the owner's question). In the lamp room, after the bell, the player can run the mechanism BACKWARD: the world SHRINKS 240× around them (the dive's swell math, inverted) and they rise OUT onto the chart table one level up — and realize the lighthouse island they woke on is itself a model on someone's table. Ascending COSTS what descending never did: each level up, a puzzle re-locks below, so you cannot yo-yo. As you pass the keeper going the other way, his voice falls silent behind you.
 
-5) THE TWO TERMINAL STATES (medium — the Finisher's off-ramp, kept as a real fork the owner can choose to ship or collapse). At the top, or at the bottom: RING THE BELL = acceptance/descent, the current finale (stems gather, constellation lights), now read as choosing the loop. DON'T RING / CLIMB OUT = the surf holds, the light far down goes OUT, the constellation never completes — escape as ABANDONMENT. The last whisper is his, fading: 'Don't leave the light on for me. I never could.' The title screen afterward reflects which world you left.
+5) THE TWO TERMINAL STATES (medium — the Finisher's off-ramp, kept as a real fork the owner can choose to ship or collapse). **PARTIAL ✓ iter 35:** the RING-at-depth *tone* now forks — the surface bell keeps the golden parade, the deep bell withholds (held golden, no constellation, thinned score, the keeper murmurs; card "you keep the light now"), all exempt from the descent curdle. Still unbuilt: the DON'T-RING / CLIMB-OUT branch (needs the ascent #12). At the top, or at the bottom: RING THE BELL = acceptance/descent, the current finale (stems gather, constellation lights), now read as choosing the loop. DON'T RING / CLIMB OUT = the surf holds, the light far down goes OUT, the constellation never completes — escape as ABANDONMENT. The last whisper is his, fading: 'Don't leave the light on for me. I never could.' The title screen afterward reflects which world you left.
 
 What it MEANS: the recursion was never a puzzle, it was the shape of a search. Down is the trap; up is the story; the choice between them is the only stake that isn't curiosity. Leaving doesn't escape the nest — it reveals you were always inside one too, and that someone is always still down there.
 

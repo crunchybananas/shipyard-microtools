@@ -334,14 +334,26 @@ function startFinale() {
   player.locked = true;
   interact.enabled = false;
   UI.cinematic(true);
-  A.bellToll();
-  finale = { t: 0, camStart: camera.position.clone(), quatStart: camera.quaternion.clone() };
+  // the resolution must land warm, never inheriting the descent's curdle (#22)
+  W._finaleWarm = true;
+  // fork the TONE by depth: level 2 keeps the loved golden parade (constellation
+  // + gathered stems); ringing deeper WITHHOLDS — the bottom sounds like the
+  // bottom, a held bittersweet golden hour the stars never reach
+  const deep = W.level >= 3;
+  A.bellToll(deep);
+  if (deep) setTimeout(() => A.keeperVoice('resigned'), 4200); // the keeper, still below
+  const line1 = document.querySelector('#finale .fin-line1');
+  if (line1) line1.textContent = deep ? 'you keep the light now' : 'the tide brought you back';
+  finale = { t: 0, deep, camStart: camera.position.clone(), quatStart: camera.quaternion.clone() };
 }
 
 function tickFinale(dt) {
   finale.t += dt;
   const f = clamp(finale.t / 18, 0, 1);
-  W.time = (W.time + dt * 1.6) % 24;
+  // surface (level 2): wheel the day into night so the constellation can land.
+  // deep: hold a bittersweet golden hour — the night, and its stars, never come.
+  if (finale.deep) W.time = lerp(W.time, 17.6, 1 - Math.exp(-dt * 0.5));
+  else W.time = (W.time + dt * 1.6) % 24;
   // rise above the island, gaze back down at the lighthouse
   const e = easeInOut(f);
   camera.position.set(
@@ -354,9 +366,10 @@ function tickFinale(dt) {
   const look = new THREE.Matrix4().lookAt(camera.position, new THREE.Vector3(LH.x, lookY, LH.z), new THREE.Vector3(0, 1, 0));
   const q = new THREE.Quaternion().setFromRotationMatrix(look);
   camera.quaternion.slerpQuaternions(finale.quatStart, q, Math.min(1, f * 4));
-  // the constellation ignites note by note as the day wheels into night
+  // the constellation ignites note by note as the day wheels into night — but
+  // the deep ending withholds it: no night comes, so the stars never gather
   for (let i = 0; i < 5; i++) {
-    skyMat.uniforms.uConstelGlow.value[i] = clamp((finale.t - (6 + i * 0.9)) / 1.2, 0, 1);
+    skyMat.uniforms.uConstelGlow.value[i] = finale.deep ? 0 : clamp((finale.t - (6 + i * 0.9)) / 1.2, 0, 1);
   }
   if (finale.t > 9 && !finale.shown) {
     finale.shown = true;
