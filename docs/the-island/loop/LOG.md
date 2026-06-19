@@ -12,6 +12,48 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 47 — 2026-06-19 — performance/code health (instance the colonnade + jetty)
+
+**Shipped:** A power/draw-call win that's visually invisible. The Drowned Gallery
+and the Threshold jetty were each built from dozens of identical single-material
+meshes (8 columns + 8 caps + 2 lintels; 7 planks + 10 posts + 2 bollards). Both
+are now `InstancedMesh` runs — the existing house pattern (trees/grass/rocks) — so
+each structure draws in 3 calls instead of 18/19, and the saving DOUBLES because
+the 1:240 model clones them too. Honors the standing power-efficiency policy and
+moves toward MISSION's <200-draw budget. Off the story axis (last two ticks were
+story); no gameplay touched.
+
+- `props.js` drownedGallery: 18 meshes → 3 InstancedMeshes (colInst×8, capInst×8,
+  lintelInst×2), `computeBoundingSphere()` for correct culling.
+- `props.js` jetty: planks/posts/bollards → 3 InstancedMeshes; deck, lamp-post,
+  lamp-arm, and the named `jettyLantern` globe kept as individual meshes.
+
+Nothing state-driven, named (NAMES), or interactive was touched; `instantiateModel`
+already clones InstancedMesh (the trees prove it), so the model recursion is intact.
+No JS dep, no asset, no new import (InstancedMesh is core three.js).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Draw calls in
+the chart-table overview **408 → 346 (−62, ~15%)**; tris unchanged (instancing cuts
+calls, not triangles). Structure check: both the island AND the model-clone copies
+report gallery `i8,i8,i2` and jetty 3 instanced runs; 0 bad instances. Screenshot
+(noon, near-drained tide, beach vantage) shows the jetty (deck/planks/posts/lantern)
+and the colonnade (columns/caps/lintels) rendering identically to before — visual
+parity. 60fps.
+
+**Debt:** cleared ~62 draws of the perf debt noted in #46. Remaining: the biggest
+lever is the model clone duplicating sub-pixel interior detail (cellar 54, quarters
+38, vaultDrips 22 — counts span both copies); a future tick could prune
+interior-only decor from the clone (it's invisible at 1:240) or instance those
+groups too. Not urgent at a steady 60fps.
+
+**Next tick suggestion:** the ENDGAME remains the big move (ring-vs-climb-out
+integration ending #22-full / #12 ascent) — its creative forks are the owner's call
+(surfaced; awaiting a pick). Until then, safe options: continue the perf sweep
+(prune/instance the cloned interiors for another big draw cut), the "rearranges-on-
+2nd-entry" half of the house-remembers beat, or an audio-audition pass.
+
+---
+
 ## 46 — 2026-06-19 — story/secret (the house remembers — a tally of descents)
 
 **Shipped:** The chart table now keeps count. Raw-scratched into the clear east

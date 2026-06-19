@@ -656,18 +656,24 @@ export function buildWorld() {
     const ROWS = [0, 8];                              // two colonnades flanking a seaward aisle
     const ZS = [-108, -111.5, -115, -118.5];
     const gallery = new THREE.Group(); gallery.name = 'drownedGallery';
+    // the colonnade is many identical single-material pieces — instance it so the
+    // whole hall (and its model clone) costs 3 draw calls, not 18 (perf, loop #47)
+    const gm4 = new THREE.Matrix4();
+    const nCol = ZS.length * ROWS.length;
+    const colInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.62, 0.82, 7.6, 9), drownedMat, nCol);
+    const capInst = new THREE.InstancedMesh(new THREE.BoxGeometry(1.9, 0.4, 1.9), drownedMat, nCol);
+    let ci = 0;
     for (const z of ZS) {
       for (const x of ROWS) {
-        const col = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.82, 7.6, 9), drownedMat);
-        col.position.set(x, -2.2, z); gallery.add(col);     // rooted at -6, top at +1.6
-        const cap = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.4, 1.9), drownedMat);
-        cap.position.set(x, 1.45, z); gallery.add(cap);
+        gm4.makeTranslation(x, -2.2, z); colInst.setMatrixAt(ci, gm4);  // rooted at -6, top +1.6
+        gm4.makeTranslation(x, 1.45, z); capInst.setMatrixAt(ci, gm4);
+        ci++;
       }
     }
-    for (const x of ROWS) {                            // lintels along each colonnade
-      const lintel = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.62, 12.5), drownedMat);
-      lintel.position.set(x, 1.55, -113.25); gallery.add(lintel);
-    }
+    const lintelInst = new THREE.InstancedMesh(new THREE.BoxGeometry(0.7, 0.62, 12.5), drownedMat, ROWS.length);
+    ROWS.forEach((x, i) => { gm4.makeTranslation(x, 1.55, -113.25); lintelInst.setMatrixAt(i, gm4); });
+    for (const inst of [colInst, capInst, lintelInst]) inst.computeBoundingSphere();
+    gallery.add(colInst, capInst, lintelInst);
     core.add(gallery);
     // cold drowned-light over the flooded floor — the sunless luminance, exposed
     // as the tide falls. Kept OUT of core: it's a Points, and instantiateModel
@@ -691,21 +697,21 @@ export function buildWorld() {
     const jetty = new THREE.Group(); jetty.name = 'jetty';
     const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 12), weather);
     deck.position.set(jx, 1.05, -110.5); jetty.add(deck);
-    for (let i = 0; i < 7; i++) {                       // proud cross-planks
-      const pl = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.06, 0.5), weather);
-      pl.position.set(jx, 1.16, -105 - i * 1.85); jetty.add(pl);
-    }
+    // planks/posts/bollards are identical single-material repeats — instance each
+    // run so the jetty (and its model clone) costs 3 draws, not 19 (perf, loop #47)
+    const jm4 = new THREE.Matrix4();
+    const plankInst = new THREE.InstancedMesh(new THREE.BoxGeometry(2.5, 0.06, 0.5), weather, 7);
+    for (let i = 0; i < 7; i++) { jm4.makeTranslation(jx, 1.16, -105 - i * 1.85); plankInst.setMatrixAt(i, jm4); }
+    const postInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6), weather, 10);
+    let pj = 0;
     for (let i = 0; i < 5; i++) {                       // posts to the seabed
       const z = -105.5 - i * 2.6;
-      for (const px of [jx - 1.05, jx + 1.05]) {
-        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6), weather);
-        post.position.set(px, -1.1, z); jetty.add(post);
-      }
+      for (const px of [jx - 1.05, jx + 1.05]) { jm4.makeTranslation(px, -1.1, z); postInst.setMatrixAt(pj++, jm4); }
     }
-    for (const px of [jx - 1.0, jx + 1.0]) {            // mooring bollards at the seaward end
-      const mp = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 1.5, 6), weather);
-      mp.position.set(px, 1.75, -116.2); jetty.add(mp);
-    }
+    const bollardInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.15, 0.18, 1.5, 6), weather, 2);
+    [jx - 1.0, jx + 1.0].forEach((px, i) => { jm4.makeTranslation(px, 1.75, -116.2); bollardInst.setMatrixAt(i, jm4); });
+    for (const inst of [plankInst, postInst, bollardInst]) inst.computeBoundingSphere();
+    jetty.add(plankInst, postInst, bollardInst);
     // a lantern on a post at the jetty's end — the way out, kept lit. Someone
     // leaves a light for a return that may never come (the point-light is in
     // main.js, warm and brightening at night, like a small shore beacon).
