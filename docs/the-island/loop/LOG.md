@@ -12,6 +12,44 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 30 — 2026-06-19 — story/graphics (the descent decays — era color-psychology) — #13
+
+**Shipped:** The keystone of the integration arc: descending the recursion now
+*curdles through emotional eras*. A `gradeBias(level)` in `world.js` applied
+inside `gradeAt` (one caller, so it propagates to sky, fog, water, and lights
+at once) desaturates toward luminance, blends a per-depth era cast, darkens,
+and thickens fog — all scaling with `W.level`. Level 1 (the surface) is exact
+identity, so the normal game is untouched; every level down compounds. Era
+casts: L2 streetlight green → L3 sickly false-gold → L4 isolation blue → L5+
+near-dark, bottoming out toward the keeper. The model and world bias together
+(one WorldState). Pure scalar/color math — no per-frame allocation, no
+dependency, no asset (constraint honored).
+
+**Evidence:** numeric sweep at fixed noon — L1 identity, then monotonic decay
+L1→L5: sky luminance 0.182→0.063, saturation 0.91→0.56, sunInt 1.25→0.70,
+fogDen 0.003→0.0064. Visual triplet (same vantage/time): L1 bright normal noon
+→ L2 subtly muddier/dimmer (intended faint first step) → L4 cold grey-blue and
+dim. Zero console errors; draws/tris unchanged (grade math only). Levels 3–5
+verified via debug `W.level` (not yet reachable in play — they come online with
+the ascent #12 / multi-dive; the system is ready for them).
+
+**Debt:** #13's *prop* divergence remains (coat on hook→floor→gone, footprints
+reversed, window dark, bell swinging) — a natural follow-on, smaller than the
+grade keystone. Kept #13 open for it. NOTE: the finale runs at level 2, so it
+now carries a faint d=1 curdle — acceptable (the deep levels *should* feel
+different), revisit if the integration finale wants the pure golden grade.
+
+**Batch 6 pushed** (26–30): ?debug mute, the narrative reframe, the Truth +
+constraint, the wedge net, and this divergence.
+
+**Next tick suggestion:** #19 (the explicit "deep" grade as a named sixth
+palette) is now partly subsumed by gradeBias — re-scope it toward the
+*deepest* level's bespoke look (the keeper's near-dark with the one warm lamp),
+or pivot to the prop-divergence half of #13, or environment #16 (the Drowned
+Gallery). All serve the descent.
+
+---
+
 ## 29 — 2026-06-19 — movement/safety (the wedge net) — closes #3
 
 **Shipped:** A general "stuck in a wall" fix. The owner hit it twice (drained

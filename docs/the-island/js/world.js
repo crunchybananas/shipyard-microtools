@@ -124,6 +124,40 @@ const KEYS = [
 
 const _grade = G(0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // scratch, mutated in place
 
+// ---------------- per-depth divergence (the descent's color psychology) ------
+// As you dive, the world curdles through emotional eras — desaturated,
+// era-cast, darkened, mistier with every level down. Level 1 (the surface) is
+// identity, so the normal game is untouched. Keys off W.level so the world and
+// its 1:240 model bias together (one WorldState). Casts precomputed — no
+// per-frame allocation. The grammar of a life, abstracted; no biography.
+const ERA_CASTS = [
+  null,                       // L1 — surface, no cast
+  new THREE.Color(0x3a4a3a), // L2 — desaturated streetlight green
+  new THREE.Color(0x6b5a2a), // L3 — sickly false-gold
+  new THREE.Color(0x24304a), // L4 — cold isolation blue
+  new THREE.Color(0x141a1c), // L5+ — near-dark, bottoming out toward the keeper
+];
+const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
+
+function gradeBias(g, level) {
+  const d = Math.max(0, (level | 0) - 1);
+  if (d === 0) return g;                                   // surface: untouched
+  const cast = ERA_CASTS[Math.min(d, ERA_CASTS.length - 1)];
+  const desat = Math.min(0.16 * d, 0.62);
+  const dark = Math.max(1 - 0.11 * d, 0.42);
+  const tint = Math.min(0.10 * d, 0.40);
+  for (const key of _BIAS_KEYS) {
+    const c = g[key];
+    const lum = c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+    c.r = lerp(lerp(c.r, lum, desat), cast.r, tint) * dark;
+    c.g = lerp(lerp(c.g, lum, desat), cast.g, tint) * dark;
+    c.b = lerp(lerp(c.b, lum, desat), cast.b, tint) * dark;
+  }
+  g.sunInt *= dark;
+  g.fogDen *= 1 + 0.28 * d;                                // claustrophobia deepens
+  return g;
+}
+
 export function gradeAt(t) {
   t = ((t % 24) + 24) % 24;
   let i = 0;
@@ -141,7 +175,7 @@ export function gradeAt(t) {
   lerpColor(_grade.waterShallow, a.waterShallow, b.waterShallow, f);
   _grade.sunInt = lerp(a.sunInt, b.sunInt, f);
   _grade.fogDen = lerp(a.fogDen, b.fogDen, f);
-  return _grade;
+  return gradeBias(_grade, W.level);
 }
 
 // ---------------- water level -------------------------------------------------
