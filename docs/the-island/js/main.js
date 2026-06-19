@@ -167,6 +167,17 @@ const jettyLamp = new THREE.PointLight(0xffc06a, 0, 16, 1.6);
 jettyLamp.position.set(-17.67, 3.66, -115.4);
 scene.add(jettyLamp);
 
+// the Vault Beneath's cold base glow (#17) — a waterShallow-toned light low in
+// the cavern, lighting the inverted lighthouse's lamp + black water against the
+// dark. Lit only with the cellar open. Position matches the vault lamp in props.
+const vaultGlow = new THREE.PointLight(0x7fc0d0, 0, 64, 1.25);
+vaultGlow.position.set(SPOTS.hatch.x + 30, 19.2, SPOTS.hatch.y - 13.6);
+scene.add(vaultGlow);
+// a dim higher fill so the inverted tower rims out of the dark before its top is lost
+const vaultFill = new THREE.PointLight(0x4f8a9c, 0, 44, 1.6);
+vaultFill.position.set(SPOTS.hatch.x + 22, 30, SPOTS.hatch.y - 13.6);
+scene.add(vaultFill);
+
 // ---------------- gulls ----------------
 const gulls = [];
 {
@@ -529,6 +540,9 @@ function applyAtmosphere(elapsed, dt) {
   lampSpill.intensity = W.lampLit ? 220 : 0;
   cellarLight.intensity = W.flags.hatchOpen ? 9 : 0;
   cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
+  // the vault's cold lamp, with a slow drowned pulse — lit only with the cellar open
+  vaultGlow.intensity = W.flags.hatchOpen ? 42 * (1 + 0.07 * Math.sin(elapsed * 1.3)) : 0;
+  vaultFill.intensity = W.flags.hatchOpen ? 12 : 0;
   // the keeper's lamp burns one level down, with a faint lamp-oil flicker
   keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
   // the jetty beacon: a low warm glow by day, a real beacon by night

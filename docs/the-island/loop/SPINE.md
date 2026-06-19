@@ -76,8 +76,8 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > [✓ iter 33] → (2) #14 Keeper voice + promote the figure [✓ iter 34] → (3) #22 finale fork + exempt
 > the finale from `gradeBias` [✓ iter 35] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author
 > casts [✓ iter 36] → (5) #15 Keeper's Quarters [✓ iter 37] → (6) #16 Drowned Gallery [✓ iter 38,
-> vista] / #17 Vault [NEXT — needs careful cellar surgery, not safely additive] → (7) #18 Room That
-> Disagrees / #24 Threshold [✓ iter 39, the jetty+dory standing-promise].** Do NOT build the abyss rooms (#16/#17) before the
+> vista] / #17 Vault [✓ iter 41 — cellar opened into the inverted-lighthouse abyss] → (7) #18 Room
+> That Disagrees [NEXT] / #24 Threshold [✓ iter 39, the jetty+dory standing-promise].** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
 1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set
@@ -112,7 +112,7 @@ What it MEANS: the recursion was never a puzzle, it was the shape of a search. D
 - **Palette:** no sun; lit entirely by waterShallow caustics (the one warm-ish channel) against near-black fog walls — the proposed 'deep' grade built only from existing channels pushed to their limits
 - **Narrative role:** When the tide valve drains, the chasm reveals a submerged stone corridor (reuse the cellar's BackSide box recipe at a low 2.2m ceiling), flooded to the knee as a function of W.tide. Teaches that draining is not safe — it OPENS things below — and reframes descent, not the 240x gimmick, as the real direction of the game.
 
-### The Vault Beneath  *(large)*
+### The Vault Beneath  *(large)* — ✓ SHIPPED iter 41 (the cellar's east wall opened into a framed window onto a vast dark cavern; a full-size lighthouse hangs INVERTED across black water, its cold ember still lit, the top lost in dark. The recursion seen as architecture, from the cellar ledge.)
 
 - **Mood:** the sublime — awe at scale, the literal abyss the word 'abyme' demands
 - **Palette:** deep grade; a far wall lit only at its base by waterShallow glow, the top lost in fog; drips that fall for a real two seconds as scale cues

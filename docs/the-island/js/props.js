@@ -919,9 +919,55 @@ export function buildWorld() {
     const shaft = new THREE.Mesh(new THREE.BoxGeometry(3.6, 5.4, 11.4), cm);
     shaft.position.set(hx, hy - 2.8, hz - 3.9);
     cellar.add(shaft);
-    const room = new THREE.Mesh(new THREE.BoxGeometry(9.4, 4.45, 8.4), cm);
-    room.position.set(hx, hy - 3.03, hz - 13.6);
-    cellar.add(room);
+    // the room — rebuilt from panels (was a closed box) so its EAST wall can
+    // open onto the Vault Beneath (#17). Floor / ceiling / south(carve) / west
+    // kept; north split to flank the shaft doorway; EAST omitted (the opening).
+    // The player stays contained by the unchanged walkableY room region; beyond
+    // the opening is solid-bluff walkableY, so they look in but cannot walk out.
+    const roomMat = new THREE.MeshStandardMaterial({ color: 0x6e685c, flatShading: true, roughness: 0.95, side: THREE.DoubleSide });
+    const cy = hy - 3.03, cz = hz - 13.6;          // room centre (20.47, 18.4)
+    const yTop = cy + 2.225, yBot = cy - 2.225;
+    const panel = (w, h, x, y, z, rx, ry) => {
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), roomMat);
+      p.position.set(x, y, z); if (rx) p.rotation.x = rx; if (ry) p.rotation.y = ry;
+      cellar.add(p);
+    };
+    panel(9.4, 8.4, hx, yBot, cz, -Math.PI / 2, 0);            // floor
+    panel(9.4, 8.4, hx, yTop, cz, -Math.PI / 2, 0);            // ceiling
+    panel(9.4, 4.45, hx, cy, hz - 17.8, 0, 0);                 // south (carve wall)
+    panel(8.4, 4.45, hx - 4.7, cy, cz, 0, Math.PI / 2);        // west
+    panel(2.7, 4.45, hx - 3.35, cy, hz - 9.4, 0, 0);           // north — west of the doorway
+    panel(2.7, 4.45, hx + 3.35, cy, hz - 9.4, 0, 0);           // north — east of the doorway
+    // EAST wall: a framed window onto the vault — a lintel + two jambs seal the
+    // corners; the frame crops the inverted tower's top (the rest lost in dark)
+    panel(8.4, 0.75, hx + 4.7, yTop - 0.375, cz, 0, Math.PI / 2);       // top lintel
+    panel(1.7, 3.7, hx + 4.7, cy - 0.35, hz - 10.15, 0, Math.PI / 2);   // north jamb
+    panel(1.9, 3.7, hx + 4.7, cy - 0.35, hz - 16.95, 0, Math.PI / 2);   // south jamb
+
+    // ----- THE VAULT BENEATH (#17): the sublime abyss ------------------------
+    // East of the cellar opens a vast dark cavern; a full-size lighthouse hangs
+    // INVERTED from its roof, tapering DOWN to a cold lamp still lit far out over
+    // black water — the recursion seen as ARCHITECTURE, not a teleport cut. Seen
+    // from the cellar ledge, never entered. (cold base glow: vaultGlow in main.js)
+    const vaultMat = new THREE.MeshStandardMaterial({ color: 0x12171c, flatShading: true, roughness: 1, side: THREE.BackSide });
+    const cavern = new THREE.Mesh(new THREE.BoxGeometry(56, 44, 50), vaultMat);
+    cavern.position.set(hx + 4.7 + 28, 26, cz);    // west face flush with the opening
+    cellar.add(cavern);
+    const vwater = new THREE.Mesh(new THREE.PlaneGeometry(54, 48),
+      new THREE.MeshStandardMaterial({ color: 0x070b0e, roughness: 0.35, metalness: 0.25, side: THREE.DoubleSide }));
+    vwater.rotation.x = -Math.PI / 2; vwater.position.set(hx + 30, 13.5, cz); cellar.add(vwater);
+    const towerMat = new THREE.MeshStandardMaterial({ color: 0x3a444e, flatShading: true, roughness: 0.85 });
+    const ilx = hx + 30, ilz = cz;                  // the inverted lighthouse, across the void
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 1.1, 24, 12), towerMat);
+    tower.position.set(ilx, 34, ilz);               // wide top at the roof (y46), narrow at y22
+    cellar.add(tower);
+    const gallery = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 1.4, 12), towerMat);
+    gallery.position.set(ilx, 21.4, ilz); cellar.add(gallery);
+    const lampDome = new THREE.Mesh(new THREE.ConeGeometry(1.3, 1.6, 12), towerMat);
+    lampDome.rotation.x = Math.PI; lampDome.position.set(ilx, 20.0, ilz); cellar.add(lampDome);
+    const vlamp = new THREE.Mesh(new THREE.SphereGeometry(0.72, 12, 9),
+      new THREE.MeshStandardMaterial({ color: 0xdcf3f6, emissive: 0x9fdce8, emissiveIntensity: 6, flatShading: true }));
+    vlamp.position.set(ilx, 18.9, ilz); vlamp.name = 'vaultLamp'; cellar.add(vlamp);   // a bare ember below the dome tip, still lit
     // stairs (visual steps) — match the walkable ramp from inside the hole
     for (let i = 0; i < 10; i++) {
       const st = new THREE.BoxGeometry(3.0, 0.35, 0.95);

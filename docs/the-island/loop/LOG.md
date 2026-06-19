@@ -12,6 +12,50 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 41 — 2026-06-19 — environment (the Vault Beneath — the recursion as architecture) — #17
+
+**Shipped:** The marquee "abyme" image, at last. The cellar's closed `BackSide`-box
+room is rebuilt from panels and its EAST wall opened into a **framed window** onto
+a vast dark cavern: a full-size lighthouse hangs INVERTED from the roof, tapering
+DOWN to a cold ember still lit at its bottom — upside-down, across black water,
+the top lost up in the dark. The recursion seen as ARCHITECTURE, not a teleport
+cut. Seen from the cellar ledge; never entered. (#17, the dedicated careful build.)
+- `props.js`: room → 6 panels (floor/ceiling/south-carve/west/north-doorway-flanks)
+  + an east **lintel + two jambs** framing the window (sealed the corners). The
+  vault: a dark cavern box, a black-water plane, the inverted tower + gallery +
+  down-pointing dome + a bright cold ember (`vaultLamp`).
+- `main.js`: `vaultGlow` (cold, pulsing) + `vaultFill` point-lights, gated to
+  `hatchOpen`, lighting the base while the top stays dark — the SPINE's "lit only
+  at its base, top lost in fog."
+
+All metaphor, no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`, Continue into a hatch-open save) standing on the
+cellar ledge — screenshot of the inverted lighthouse + lit ember through the
+window. Verified the rebuild didn't break the puzzle: the carve glyph + plumb bob
+intact (screenshot), the stairs/shaft doorway intact (screenshot). **Containment:**
+walkableY 18.3 in-room, jumps to 23.9 (solid bluff) just east of the opening — the
+player looks in but can't walk out. An early daylight seam at the open east edge
+was fixed by framing the window (re-verified: corners sealed, no leak). Zero
+console errors / no init crash; 47–100 fps, draws ≤67.
+
+**Build notes:** known traps avoided — no Points in `core` (the cold glow is a
+main.js PointLight); the vault meshes clone harmlessly into the 1:240 model.
+The begin→intro handshake was flaky for setup, so verified via a constructed
+hatch-open save + Continue (deterministic). Committed LOCALLY (next push at 45),
+leaving runway to polish before it deploys.
+
+**Next tick suggestion:** **#18 The Room That Disagrees** (the last big SPINE
+environment) — a second study, reached at depth, identical to the first but its
+chart-table model shows a WorldState the world is NOT in (sea drained when it's
+full; beam lit by day), and its window shows contradicting weather. Give it a
+private ghostState the live `W` doesn't touch. Same discipline: reachable vantage
+first, additive/safe, framed if it needs a new space. OR a quieter tick: an owner
+audition pass on the synthesized voices (keeper #14, vault ambience), or wiring a
+faint cold drip/room-tone for the vault in `audio.js`.
+
+---
+
 ## 40 — 2026-06-19 — polish (the jetty beacon) + batch-8 push — #24 cont.
 
 **Shipped:** A lantern on a post at the jetty's seaward end — the way out, kept
