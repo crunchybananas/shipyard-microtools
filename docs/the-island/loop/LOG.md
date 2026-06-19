@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 55 — 2026-06-19 — story polish + BATCH 11 PUSH (the ascent goes live)
+
+**Shipped:** A small, re-readable payoff for the climb, then the deploy. On the first
+ascent the journal records the integration — in your OWN hand again (you were becoming
+the keeper on the way down; rising, the pen is yours once more): "I went all the way
+down … and found him still there, still tending it. I could not bring myself to put it
+out. So I have started back up the stairs, and I am carrying what I found at the bottom.
+The light is still burning behind me. Let it." A persistent record of the turn back up —
+not a lean-in whisper that scrolls away, but a line you can re-read.
+
+- `main.js` `landAscent`: one `UI.addJournal(…, 'self')` in the first-ascent block
+  (gated by `keeperSilenced`, so once only).
+
+Fork-neutral; additive; mirrors the verified iter-45/50 journal pattern.
+
+**Evidence:** in-play (`?debug`): first ascent adds the entry (hand `self`), second ascent
+does NOT duplicate (count stays 1), zero console errors. PRE-PUSH BOOT CHECK on clean
+URL `/`: title+Begin render, canvas/WebGL ok, debug off, no console errors.
+
+**Deployed:** BATCH 11 — pushed iters 51–55 live (submodule → main, then Dockhand parent
+gitlink). The ASCENT is now LIVE: descend to the bottom on the brass plate, then touch it
+again to climb back up, the keeper falling silent behind you. Push-cadence memory updated
+(boundary #11; next at 60).
+
+**Next tick suggestion:** the ascent is live and the staircase is built — the owner's
+three ending forks (closed-vs-choice / who-is-the-player / final camera) are now SMALL
+additions on top. Best next move depends on the owner: if they pick a fork, build it; if
+not, a SAFE deepening (e.g. the surface-arrival when you climb all the way out to level 1
+— what the player sees/feels back at the top, fork-neutral) or a persona check on the
+now-complete arc. Invite the owner to playtest the live ascent first.
+
+---
+
 ## 54 — 2026-06-19 — design/story (the ascent, stage 3 — the keeper falls silent) — ASCENT COMPLETE
 
 **Shipped:** The unmissable beat that makes the ascent a beat, not another lean-in

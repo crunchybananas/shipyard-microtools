@@ -413,6 +413,9 @@ function landAscent() {
     UI.whisper('“…go on up. Don’t leave the light on for me. I never could.”');
     W.flags.keeperSilenced = true;
     keeperFarewell = true;
+    // the integration, in your own hand again (you were becoming his; rising, the pen is
+    // yours once more): the re-readable record of the turn back up (#12 polish, iter 55)
+    UI.addJournal('I went all the way down — to the smallest room, the coldest light — and found him still there, still tending it. I could not bring myself to put it out. So I have started back up the stairs, and I am carrying what I found at the bottom. The light is still burning behind me. Let it.', '', 'self');
   }
   save(player.pos);
   // rise out at the study / chart table of the level above
