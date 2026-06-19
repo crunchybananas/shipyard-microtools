@@ -76,9 +76,19 @@ iterations' work. The synthesis of a panel updates SPINE.md and files issues.
 
 ## Hard rules
 
-- Pure web tech. Static ES modules, **no build step, no new dependencies**
-  (three.js 0.180 via the CDN import map is the only one), **zero asset
-  files** — every mesh, texture, and sound is generated in code.
+- **No external JavaScript dependencies or frameworks.** This is THE
+  constraint (owner, 2026-06-19). three.js (via the CDN import map) is the
+  one sanctioned exception, because it earns its weight; lodash, React, Vue,
+  and friends are **non-starters**. Static ES modules, no build step. Add a
+  JS dependency only with a compelling, stated reason and owner sign-off.
+- **Assets may now come from Bender or open-source** (meshes, textures,
+  audio) — the old "zero asset files / everything is math" rule is
+  *relaxing over time*. Prefer code-generated when it's as good (it's lean,
+  seeds well, and is the house style), but a generated/open-source asset is
+  allowed when it genuinely raises the bar. Use restraint; keep the download
+  honest. NOTE: when the first non-generated asset ships, update
+  `README.md` and the title-screen "everything you will see and hear is made
+  of math" line — that claim becomes false and must change.
 - The island and its 1:240 model render from one `WorldState` (`js/world.js`).
   Anything state-driven must be applied to BOTH instances (`puzzles.js
   _apply`) or shared by material. Never let them disagree.

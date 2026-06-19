@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 28 — 2026-06-19 — story/process (the Truth is chosen; the constraint reframes)
+
+**Shipped:** Two owner decisions, encoded.
+- **The One Truth = GRIEF → INTEGRATION.** Grief is the descent (the keeper's
+  refusal rendered as nested geometry); the figure at the bottom is the
+  *wounded self*, and the true ending is **integration** — embrace it and
+  ascend whole, not loop-forever or abandon-the-light. This dissolves the
+  down-vs-up tension (up, *by integration*). The emotional architecture is
+  drawn — **as pure metaphor** — from the owner's personal narrative
+  (`~/code/MyStory`, private); **no biography enters committed docs or the
+  deployed game.** SPINE.md rewritten: Truth chosen, the deepening added, the
+  three alternatives demoted to "roads not taken — do not build." #9 closed.
+- **Constraint reframe.** The real rule is **no external JS dependencies**
+  (three.js is the one sanctioned exception; lodash/React/etc. are
+  non-starters). The old "zero-asset / everything is math" rule is *relaxing*
+  — meshes/textures/audio may now come from Bender or open-source, with
+  restraint. MISSION.md Hard rules updated; voice issue #4 no longer needs
+  opt-in for purity. When the first non-generated asset ships, README + the
+  title "everything you will see and hear is made of math" line must change.
+
+**Evidence:** SPINE.md + MISSION.md committed; #9 closed with the decision;
+#4/#13/#22 annotated with the deepening; narrative epic #25 ticked + bannered.
+No game code touched.
+
+**Debt:** README still claims zero-asset (currently still true — no asset has
+shipped). Flagged in MISSION to update at first asset.
+
+**Next tick suggestion:** now build *toward the chosen arc*. #13 (diverge
+every level) is the strongest first move — it's the era-colored descent the
+integration reveal needs, pure shader/grade work (no new JS dep, no asset),
+high wow. #3 (movement safety) still queued ahead of it. Hold the Keeper
+voice (#14) until there's a divergence to speak over.
+
+---
+
 ## 27 — 2026-06-19 — story/process (the reframe — the loop stops fleeing story)
 
 **Shipped:** The narrative foundation. Owner reframed ABYME as Myst-*inspired*,
