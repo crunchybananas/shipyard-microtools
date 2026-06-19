@@ -75,7 +75,7 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > behind a debug flag). Re-ordered build queue: **(1) make `W.level` reachable + cost the dive
 > [✓ iter 33] → (2) #14 Keeper voice + promote the figure [✓ iter 34] → (3) #22 finale fork + exempt
 > the finale from `gradeBias` [✓ iter 35] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author
-> casts [NEXT] → (5) #15 Keeper's Quarters → (6) #16/#17 abyss rooms → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
+> casts [✓ iter 36] → (5) #15 Keeper's Quarters [NEXT] → (6) #16/#17 abyss rooms → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
 1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set

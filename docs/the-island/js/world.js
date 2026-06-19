@@ -136,31 +136,46 @@ const _grade = G(0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // scratch, mutated in place
 // identity, so the normal game is untouched. Keys off W.level so the world and
 // its 1:240 model bias together (one WorldState). Casts precomputed — no
 // per-frame allocation. The grammar of a life, abstracted; no biography.
+// The casts carry the EMOTION through chroma, not darkness — saturated and
+// hue-separated, sequenced as a felt descent: sickly-warm false comforts up top
+// (sodium green, jaundice gold) draining into cold isolation, then a dead violet
+// floor. Depth itself is supplied by the dark multiplier, not by muddy casts.
 const ERA_CASTS = [
   null,                       // L1 — surface, no cast
-  new THREE.Color(0x3a4a3a), // L2 — desaturated streetlight green
-  new THREE.Color(0x6b5a2a), // L3 — sickly false-gold
-  new THREE.Color(0x24304a), // L4 — cold isolation blue
-  new THREE.Color(0x141a1c), // L5+ — near-dark, bottoming out toward the keeper
+  new THREE.Color(0x8aa830), // L2 — sodium streetlight green-yellow (false comfort)
+  new THREE.Color(0xc29a1c), // L3 — sickly jaundice / fluorescent gold
+  new THREE.Color(0x2f6cc8), // L4 — cold isolation blue
+  new THREE.Color(0x573a72), // L5+ — dead violet, the keeper's near-dark floor
 ];
 const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
+const _LUM_FLOOR = 0.045; // no channel crushes to unresolvable black (night × depth)
 
 function gradeBias(g, level) {
   const d = Math.max(0, (level | 0) - 1);
   if (d === 0) return g;                                   // surface: untouched
   const cast = ERA_CASTS[Math.min(d, ERA_CASTS.length - 1)];
-  const desat = Math.min(0.16 * d, 0.62);
-  const dark = Math.max(1 - 0.11 * d, 0.42);
-  const tint = Math.min(0.10 * d, 0.40);
+  // ORDER MATTERS (#13 redux): tint the cast onto the FULL-chroma colour FIRST
+  // so the hue actually shifts, THEN desaturate the tinted result toward grey,
+  // THEN darken. (The old order desaturated first and killed the hue before the
+  // cast could speak — a neutral wall landed one 8-bit value off pure grey.)
+  const tint = Math.min(0.18 * d, 0.6);
+  const desat = Math.min(0.12 * d, 0.5);
+  const dark = Math.max(1 - 0.12 * d, 0.4);
   for (const key of _BIAS_KEYS) {
     const c = g[key];
-    const lum = c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
-    c.r = lerp(lerp(c.r, lum, desat), cast.r, tint) * dark;
-    c.g = lerp(lerp(c.g, lum, desat), cast.g, tint) * dark;
-    c.b = lerp(lerp(c.b, lum, desat), cast.b, tint) * dark;
+    let r = lerp(c.r, cast.r, tint), gg = lerp(c.g, cast.g, tint), b = lerp(c.b, cast.b, tint);
+    const lum = r * 0.299 + gg * 0.587 + b * 0.114;
+    r = lerp(r, lum, desat) * dark;
+    gg = lerp(gg, lum, desat) * dark;
+    b = lerp(b, lum, desat) * dark;
+    // darkness floor — lift toward a resolvable ember rather than pure black,
+    // preserving hue (capped so a near-black input can't over-brighten/clip)
+    const l2 = r * 0.299 + gg * 0.587 + b * 0.114;
+    if (l2 > 1e-5 && l2 < _LUM_FLOOR) { const s = Math.min(_LUM_FLOOR / l2, 4); r *= s; gg *= s; b *= s; }
+    c.r = r; c.g = gg; c.b = b;
   }
   g.sunInt *= dark;
-  g.fogDen *= 1 + 0.28 * d;                                // claustrophobia deepens
+  g.fogDen *= 1 + 0.26 * d;                                // claustrophobia deepens
   return g;
 }
 

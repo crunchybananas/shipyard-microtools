@@ -12,6 +12,57 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 36 — 2026-06-19 — graphics (the descent's era-colors finally READ) — #13 redux
+
+**Shipped:** The reachable decay (loops 30–33) was a grey value-ramp, not a
+color-arc — the Art Director (panel #2) proved `gradeBias` desaturated toward
+luminance FIRST, then blended the cast at only 0.10·d, so the hue was dead before
+the cast spoke (a neutral wall at L2 landed one 8-bit value off pure grey).
+Fixed (`world.js gradeBias`, panel critical-path step 4):
+- **Reordered: tint → desat → darken.** The cast is now tinted onto the
+  FULL-chroma colour first (so the hue actually shifts), then the tinted result
+  is desaturated toward grey, then darkened. Emotion rides chroma; depth rides
+  the dark multiplier.
+- **Re-authored the four casts as saturated, hue-separated, sequenced** as a felt
+  descent: L2 sodium streetlight green-yellow (false comfort) → L3 sickly
+  jaundice/fluorescent gold (sickness) → L4 cold isolation blue → L5 dead violet
+  floor. The old warm-cold-warm-cold zigzag is gone; warmth drains to cold as you
+  sink.
+- **Per-channel darkness floor** (`_LUM_FLOOR = 0.045`, hue-preserving, capped) so
+  night × depth lifts to a resolvable ember instead of crushing to black.
+
+All metaphor, no biography, no JS dep, no asset. L1 surface is untouched (the
+`d===0` early return); the finale is untouched (it grades at level 1 via
+`W._finaleWarm`).
+
+**Evidence:** on-screen L1→L5 strip at a fixed noon beach vantage (5 screenshots)
+— now reads as distinct FEELINGS without labels: L1 bright clean blue (alive) →
+L2 pale sickly (faint false comfort) → L3 jaundiced grey-gold (sickness) → L4
+cold deep blue (isolation) → L5 dim dead violet (the floor), each a distinct
+temperature, none a grey ramp. Night × L4 screenshot: deep cold blue, oppressive
+but fully READABLE (lighthouse/trees/stars resolvable, not black) — the floor
+works. Numeric: `gradeAt` with `W._finaleWarm` at L4 === L1 identity
+(`warmEqualsL1: true`) — finale provably unaffected; L4-curdled skyTop
+[.054,.109,.258] vs L1 [.042,.195,.479]. Zero console errors; 242–486 fps.
+
+**Debt:** none added. The Art Director's remaining note — ONE warm key light at
+the deepest level — is folded into #15 (Keeper's Quarters), the next tick, not a
+gradeBias concern.
+
+**Next tick suggestion:** **#15 — The Keeper's Quarters** (panel critical-path
+step 5). The first real ENVIRONMENT, and only now earned: the player can descend
+(#33), there's a someone at the bottom (#14), the ending resolves (#22), and the
+levels read (#36). Build the inhabited room mid-descent — a cot, a cold stove, a
+chart in progress, the wall papered in nested island sketches shrinking toward a
+single dot — with the ONE warm lamp-oil point-light that makes every cold room
+frightening by contrast (the Art Director's deep-level key light, folding in #19).
+It converts the nestedGlint secret into a wound: the keeper KNEW where the descent
+led and drew himself down it anyway. Reuse the cellar BackSide-box recipe; keep
+collision + wedge-net safe; do NOT half-ship a walkable space (a sealed vista
+slice is acceptable if it can't finish cleanly).
+
+---
+
 ## 35 — 2026-06-19 — story (the finale forks — the bottom withholds) — #22 · batch-7 push
 
 **Shipped:** The ending no longer plays the old golden victory parade at the
