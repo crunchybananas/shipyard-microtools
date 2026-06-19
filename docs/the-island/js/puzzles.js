@@ -498,7 +498,16 @@ export class Game {
       const dropped = W.level >= 3;
       R.coat.position.set(0, dropped ? -0.95 : 0, dropped ? 0.15 : 0);
     }
-    if (R.footprints) R.footprints.visible = W.level >= 2;
+    if (R.footprints) {
+      R.footprints.visible = W.level >= 2;
+      // the keeper's trail washes away the deeper you descend (#13); prints
+      // share one material, so fading the first fades the whole trail
+      const fp0 = R.footprints.children[0];
+      if (fp0 && fp0.material) fp0.material.opacity = 0.5 * Math.max(1 - 0.42 * Math.max(0, W.level - 2), 0.12);
+    }
+    // the bell stirs, faintly, the deeper you are — as if something below
+    // keeps disturbing it; still at the surface, growing with the descent (#13)
+    if (R.bell) R.bell.rotation.z = Math.sin(elapsed * 0.9) * 0.022 * Math.min(Math.max(0, W.level - 1), 4);
     if (R.tinyFigure) R.tinyFigure.visible = W.level >= 2 && isModel;
   }
 }

@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 32 — 2026-06-19 — story (the trail washes away, the bell stirs) — closes #13
+
+**Shipped:** The last two prop-divergence beats, completing #13 (grade +
+coat + window + footprints + bell all diverge by depth now):
+- **The keeper's footprints wash away** with the descent — the trail's shared
+  material fades L2 0.5 → L3 0.29 → L4 0.08 → L5+ 0.06 (`puzzles.js _apply`).
+  The path that led in is erased the deeper you are.
+- **The bell stirs faintly**, growing with depth — still at the surface, then
+  a slow `sin(elapsed)` sway scaled by level (0 → ±0.022 → … → ±0.088 rad,
+  capped), as if something below keeps disturbing it.
+
+Both metaphor, no biography, no dep, no asset.
+
+**Evidence:** numeric sweep L1–L5 — footprints opacity 0.5/0.5/0.29/0.08/0.06,
+bell rotZ 0/−0.022/−0.043/−0.065/−0.086; L1 untouched (bell still, prints
+hidden). Visual: the bell + maker's-pair signature render correctly in the
+annex at L2 (footprints are deliberately faint dark prints on sand — their
+fade is numeric-verified, as with the grade work). Zero console errors.
+
+**Debt:** none — **#13 fully closed** (the descent now decays in light AND
+every object: sky/fog/water/sun, coat, window, footprints, bell).
+
+**Next tick suggestion:** environment **#16 The Drowned Gallery** — a proper
+dedicated build (the first sunless, low-ceiling interior the drained tide
+reveals; cellar BackSide-box recipe, knee-deep water keyed to W.tide). It is
+"large" — give it a full, carefully-verified iteration; do not half-ship a new
+walkable space. Persona panel due ~iteration 34 (next).
+
+---
+
 ## 31 — 2026-06-19 — story (the descent decays in objects too) — #13 prop divergence
 
 **Shipped:** The era-color descent (iteration 30) now has matching *object*
