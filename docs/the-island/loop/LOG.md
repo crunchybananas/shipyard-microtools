@@ -12,6 +12,57 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 34 — 2026-06-19 — story (the keeper — a second person at the bottom) — #14
+
+**Shipped:** The descent now descends TOWARD someone. Grief is transitive (panel
+#2's sharpest point); loops 30–33 rendered an absent keeper's *belongings*, so
+this iteration gives the keeper a voice and a face — the cheapest possible
+second person, no human mesh, all synthesis (#14, panel critical-path step 2):
+- **The keeper's voice** (`audio.js keeperVoice`): a band-limited, formant-based
+  *drowned voice* — a glottal sawtooth through two vowel formants, low-passed to
+  a murmur and echoed as if rising through the floor. NOT words (the whisper text
+  carries those); a vocal TIMBRE that makes the floor below feel inhabited.
+  Register bends the contour (curious rises / pleading wavers / resigned falls).
+- **He answers your arrival** (`main.js` post-dive): from L3 down, a few seconds
+  after you land deeper, the keeper speaks — his words in quotes ("Oh. You came
+  down too." → "There is no bottom. I looked.") over the voice murmur. The first
+  "I/you" in the game, and unmissable.
+- **The doll's house looks back** (`puzzles.js` + `props.js`): the model figure
+  (`tinyFigure`) — restructured to pivot at its feet, with a brow giving it a
+  FRONT — now turns to face you, tips its head up to your giant eye, and flares
+  as you lean over the chart-table model at L3+. Surf ducks for a breath; the
+  keeper speaks ("Oh. Not again." → "You're faster than I was…"). Once per level.
+  Also: the figure breathes (subtle emissive) and the coat-style look eases back
+  to rest when you step away.
+
+All metaphor, no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`) — figure look mechanic verified numerically at
+look=1 (faces player rotY, tips head rotX −0.6, body emissive 1.8→3.57, head
+1.0→2.3, brow child present) and the proximity beat FIRED (`keeperLook3` once-key
+set → voice+whisper+duck ran); `keeperVoice` runs error-free; look eases back to
+0 (upright, emissive 1.8) when you step away; **close-up screenshot** of the
+keeper standing on the model beach, head tipped up, brow toward the eye, glowing.
+Arrival beat verified by composition (dive→L3 reachable since #33; the post-snap
+block calls the verified voice+whisper gated `level>=3`). Zero console errors;
+272–530 fps, draws ≤180.
+
+**Debt:** the keeper voice is synthesized and verified ERROR-FREE but **not
+auditioned** (headless `?debug` session is muted; no audio out) — same honest
+limitation as all `audio.js` work this loop. Timbre is documented in code; an
+owner listen is the real test. Still open from the critical path: finale
+double-booking (#22) and the UP/ascent (#12 remainder).
+
+**Next tick suggestion:** **#22 — the finale fork + exempt the finale from
+`gradeBias`** (panel critical-path step 3). Today the bell fires the old golden
+victory parade at the floor of a grief, AND that finale inherits a d=1 decay
+curdle. Fork `startFinale` by depth: the surface bell stays golden; the bell rung
+at depth WITHHOLDS (stems thin instead of gather, the constellation hesitates,
+the keeper-glint pulses alone) and renders at a clean warm grade, not decay math.
+"Awe and dread live in subtraction" — the bottom must sound like the bottom.
+
+---
+
 ## 33 — 2026-06-19 — story (persona panel #2 → the descent becomes reachable) — #12 keystone
 
 **Shipped:** Persona panel #2 (skeptic / art director / narrative architect / finisher →

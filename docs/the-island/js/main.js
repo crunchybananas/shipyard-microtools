@@ -319,6 +319,12 @@ function tickDive(dt) {
       4: 'The same room, gone cold and far. Below it, a light still burns.',
     }[W.level] || 'Down, and down.');
     if (W.level === 2) setTimeout(() => UI.whisper('Somewhere above, a door stands open now.'), 6000);
+    // from level 3 down, the keeper answers your arrival — the first 'I' in the
+    // game: a drowned voice under the floor, his words in quotes (#14)
+    if (W.level >= 3) setTimeout(() => {
+      A.keeperVoice(W.level >= 4 ? 'resigned' : 'curious');
+      UI.whisper(W.level >= 4 ? '“There is no bottom. I looked.”' : '“Oh. You came down too.”');
+    }, 3600);
   }
 }
 

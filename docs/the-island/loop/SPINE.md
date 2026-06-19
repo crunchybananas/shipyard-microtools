@@ -73,8 +73,8 @@ Make LEAVING the true endgame and the mirror of the dive — the game currently 
 > **★ Critical path (Panel #2, 2026-06-19 — [CRITIQUES.md](CRITIQUES.md)):** the panel proved the
 > decay shipped in loops 30–32 was *unreachable* (`W.level` never exceeded 2 — the era-eras lived
 > behind a debug flag). Re-ordered build queue: **(1) make `W.level` reachable + cost the dive
-> [✓ iter 33] → (2) #14 Keeper voice + promote the figure → (3) #22 finale fork + exempt the finale
-> from `gradeBias` → (4) #13 redux: fix `gradeBias` order-of-ops + re-author casts → (5) #15 Keeper's
+> [✓ iter 33] → (2) #14 Keeper voice + promote the figure [✓ iter 34] → (3) #22 finale fork + exempt
+> the finale from `gradeBias` [NEXT] → (4) #13 redux: fix `gradeBias` order-of-ops + re-author casts → (5) #15 Keeper's
 > Quarters → (6) #16/#17 abyss rooms → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
 > spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
 
@@ -88,7 +88,7 @@ finale fires the old golden parade at depth (step 3), and there is no UP yet (st
 
 2) DIVERGE EACH LEVEL (medium). Drive the existing W.level integer into the grades and prop set so descent reads as decay, not a copy machine: a gradeBias(level) that desaturates/darkens the five master grades (no new hex — the Art Director's deep-via-existing-channels rule), the seeded mist ceiling rises so the fret never fully burns off by level 3, and one prop changes per level (coat on the hook → on the floor → gone; footprints out of the sea → into the sea; warm window lit → dark; the bell already faintly swinging). The chain stays solvable; the WORLD curdles. The bell's pitch drops a semitone per level as a HUD-free depth cue.
 
-3) THE KEEPER, ONE LEVEL DOWN (large, opt-in voiced layer earns its existence). The 'light still lit far down' gets a mouth — a band-limited synthesized voice keyed off the chain flags the game already tracks: valveTurned → 'Oh. Not again.'; rulerPlaced → 'You're faster than I was. Don't be proud of it.'; lensPlaced → 'When the beam writes, don't read all four.'; plumbHung → 'Step off the plate. I'm begging you.' He arcs curious → pleading → resigned. He is the first and only 'I/you' in the game.
+3) THE KEEPER, ONE LEVEL DOWN — **✓ SHIPPED iter 34** (the voice + the figure-looks-back; keying to chain flags vs depth can deepen later). The 'light still lit far down' gets a mouth — a band-limited synthesized voice keyed off the chain flags the game already tracks: valveTurned → 'Oh. Not again.'; rulerPlaced → 'You're faster than I was. Don't be proud of it.'; lensPlaced → 'When the beam writes, don't read all four.'; plumbHung → 'Step off the plate. I'm begging you.' He arcs curious → pleading → resigned. He is the first and only 'I/you' in the game.
 
 4) BUILD THE WAY UP (large — the answer to the owner's question). In the lamp room, after the bell, the player can run the mechanism BACKWARD: the world SHRINKS 240× around them (the dive's swell math, inverted) and they rise OUT onto the chart table one level up — and realize the lighthouse island they woke on is itself a model on someone's table. Ascending COSTS what descending never did: each level up, a puzzle re-locks below, so you cannot yo-yo. As you pass the keeper going the other way, his voice falls silent behind you.
 

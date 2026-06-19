@@ -320,6 +320,49 @@ const A = {
     this.pluck(523.25, 5.4, 0.25, 8);
   },
 
+  // the keeper — a voice one floor down, heard through water. NOT words (the
+  // whisper text carries those); a vocal TIMBRE: formant pulses on a low glottal
+  // source, band-limited to a murmur and echoed as if rising through the floor.
+  // Quiet on purpose — a presence, not a narrator. Register bends the contour:
+  // curious rises, pleading wavers, resigned falls.
+  keeperVoice(register = 'curious') {
+    if (!this.ready) return;
+    const t0 = ctx.currentTime;
+    // the drowned bus: lowpass to a murmur, one-floor-down echo, into fx
+    const vg = ctx.createGain(); vg.gain.value = 0.85; vg.connect(this.fx);
+    const drown = ctx.createBiquadFilter(); drown.type = 'lowpass';
+    drown.frequency.value = 1500; drown.Q.value = 0.6; drown.connect(vg);
+    const del = ctx.createDelay(0.6); del.delayTime.value = 0.19;
+    const fb = ctx.createGain(); fb.gain.value = 0.34;
+    drown.connect(del); del.connect(fb).connect(del); del.connect(vg);
+    const base = register === 'resigned' ? 104 : register === 'pleading' ? 126 : 116;
+    const dir = register === 'resigned' ? -1 : register === 'pleading' ? 0 : 1;
+    const syls = register === 'resigned' ? 3 : 4;
+    for (let i = 0; i < syls; i++) {
+      const ts = t0 + i * 0.27;
+      const dur = 0.17 + 0.04 * Math.abs(Math.sin(i * 1.3));
+      // a small melodic contour so it reads as speech, not a tone
+      const semis = dir * i * 0.7 + (i % 2 ? 0.4 : -0.2) + (register === 'pleading' ? Math.sin(i * 2) * 1.2 : 0);
+      const f = base * Math.pow(2, semis / 12);
+      const o = ctx.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f, ts);
+      o.frequency.linearRampToValueAtTime(f * (1 + dir * 0.03), ts + dur);
+      const vib = ctx.createOscillator(); vib.frequency.value = 5.5;
+      const vibg = ctx.createGain(); vibg.gain.value = f * 0.013;
+      vib.connect(vibg).connect(o.frequency);
+      // two band-pass formants → a vowel-ish color between 'uh' and 'oh'
+      const fm1 = ctx.createBiquadFilter(); fm1.type = 'bandpass'; fm1.frequency.value = 430 + i * 18; fm1.Q.value = 6;
+      const fm2 = ctx.createBiquadFilter(); fm2.type = 'bandpass'; fm2.frequency.value = 920 - i * 22; fm2.Q.value = 9;
+      const g = ctx.createGain(); this._env(g, ts, 0.035, 0.16, dur);
+      o.connect(fm1).connect(g);
+      o.connect(fm2).connect(g);
+      g.connect(drown);
+      o.start(ts); o.stop(ts + dur + 0.25);
+      vib.start(ts); vib.stop(ts + dur + 0.25);
+    }
+    setTimeout(() => { try { fb.gain.value = 0; del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {} }, 2600);
+  },
+
   // the dive: the whole island drops an octave and comes back
   diveSweep(durSec) {
     if (!this.ready) return;

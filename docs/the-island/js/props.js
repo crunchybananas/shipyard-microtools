@@ -834,21 +834,30 @@ export function buildWorld() {
   // =================== VEGETATION ===========================================
   buildVegetation(core, r);
 
-  // =================== TINY FIGURE (level 2: you, on the model) =============
+  // =================== TINY FIGURE (the keeper, on the model) ===============
+  // The second person — the keeper one level down, standing on the model's
+  // beach. The group sits AT the figure's feet so it can turn and tip in place
+  // when it "looks back" (#14); children are local offsets. Exaggerated ~3x so
+  // it reads as a luminous speck at 1:240.
   {
-    // exaggerated ~3x so it reads as a luminous speck at 1:240
     const fig = new THREE.Group();
     fig.name = 'tinyFigure';
     fig.visible = false;
     const fy = heightAt(SPOTS.beach.x, SPOTS.beach.y);
+    fig.position.set(SPOTS.beach.x, fy, SPOTS.beach.y);
     const fb = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 3.4, 6),
-      new THREE.MeshStandardMaterial({ color: 0x355560, emissive: 0x58f2c2, emissiveIntensity: 1.6, flatShading: true }));
-    fb.position.set(SPOTS.beach.x, fy + 1.7, SPOTS.beach.y);
+      new THREE.MeshStandardMaterial({ color: 0x355560, emissive: 0x58f2c2, emissiveIntensity: 1.8, flatShading: true }));
+    fb.position.y = 1.7;
     fig.add(fb);
     const fh = new THREE.Mesh(new THREE.SphereGeometry(0.55, 6, 5),
-      new THREE.MeshStandardMaterial({ color: 0xd9c9a8, emissive: 0xffe2a8, emissiveIntensity: 0.8, flatShading: true }));
-    fh.position.set(SPOTS.beach.x, fy + 3.9, SPOTS.beach.y);
+      new THREE.MeshStandardMaterial({ color: 0xd9c9a8, emissive: 0xffe2a8, emissiveIntensity: 1.0, flatShading: true }));
+    fh.position.y = 3.9;
     fig.add(fh);
+    // a small brow gives the figure a FRONT (+z) so it visibly turns to face you
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.26, 0.34),
+      new THREE.MeshStandardMaterial({ color: 0x1a2730, emissive: 0x0a1a24, emissiveIntensity: 0.5, flatShading: true }));
+    brow.position.set(0, 3.98, 0.5);
+    fig.add(brow);
     core.add(fig);
   }
 

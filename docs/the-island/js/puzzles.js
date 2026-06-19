@@ -15,6 +15,14 @@ const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
 const CLIFF = new THREE.Vector3(57.5, 14, 50);
 const CLIFF_AZ = Math.atan2(CLIFF.x - LH.x, CLIFF.z - LH.z);
+const _kv = new THREE.Vector3();
+
+// the keeper's words, spoken when the figure looks back (#14). Universal,
+// metaphor only — recognition curdling into resignation the deeper you go.
+const KEEPER_LINES = {
+  3: '“Oh. Not again.”',
+  4: '“You’re faster than I was. Don’t be proud of it.”',
+};
 
 export class Game {
   constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onFinale }) {
@@ -36,6 +44,8 @@ export class Game {
     this.stoneSeq = [];
     this.birdTimer = 8; // sing soon after dawn arrives
     this.boxPlaying = false;
+    this._keeperLook = 0;        // eased 0..1: the figure turning to face you
+    this._keeperLookTarget = 0;
 
     this._buildHotspots(modelAnchor);
   }
@@ -434,6 +444,26 @@ export class Game {
         UI.addJournal('One level down, the study is the same study. The model on its table shows a tiny figure standing on the beach. The annex holds a bell.');
       });
     }
+    // the keeper looks back (#14): lean over the chart-table model at depth and
+    // the figure on it turns, tips its head up to your giant eye, and speaks —
+    // the world hushing for a breath. Once per level; the figure's turn is eased
+    // toward the player in _apply while you stay near.
+    if (W.level >= 3 && this.modelRefs.tinyFigure) {
+      this.modelRefs.tinyFigure.getWorldPosition(_kv);
+      const near = this.player.pos.distanceTo(_kv) < 2.4;
+      this._keeperLookTarget = near ? 1 : 0;
+      if (near) {
+        this.once('keeperLook' + W.level, () => {
+          A.duckAmbient(true);
+          A.keeperVoice(W.level >= 4 ? 'resigned' : 'pleading');
+          UI.whisper(KEEPER_LINES[Math.min(W.level, 4)] || KEEPER_LINES[4]);
+          setTimeout(() => A.duckAmbient(false), 2700);
+        });
+      }
+    } else {
+      this._keeperLookTarget = 0;
+    }
+    this._keeperLook = lerp(this._keeperLook, this._keeperLookTarget, 1 - Math.exp(-4 * dt));
 
     // the brink lets go if you step off the plate — a felt drawing-back
     if (this._brink) {
@@ -539,7 +569,23 @@ export class Game {
     // the bell stirs, faintly, the deeper you are — as if something below
     // keeps disturbing it; still at the surface, growing with the descent (#13)
     if (R.bell) R.bell.rotation.z = Math.sin(elapsed * 0.9) * 0.022 * Math.min(Math.max(0, W.level - 1), 4);
-    if (R.tinyFigure) R.tinyFigure.visible = W.level >= 2 && isModel;
+    if (R.tinyFigure) {
+      const fig = R.tinyFigure;
+      fig.visible = W.level >= 2 && isModel;
+      if (fig.visible) {
+        const look = this._keeperLook;
+        // turn to face the player and tip the brow up toward the giant eye
+        fig.getWorldPosition(_kv);
+        const wantYaw = Math.atan2(this.player.pos.x - _kv.x, this.player.pos.z - _kv.z);
+        fig.rotation.y = lerpAngle(fig.rotation.y, wantYaw, look);
+        fig.rotation.x = -0.6 * look;
+        // breathing — and a notice-flare in the chest as it looks back
+        const body = fig.children[0];
+        if (body?.material) body.material.emissiveIntensity = 1.8 * (1 + 0.12 * Math.sin(elapsed * 1.5)) + 1.7 * look;
+        const head = fig.children[1];
+        if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look;
+      }
+    }
   }
 }
 
