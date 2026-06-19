@@ -148,6 +148,18 @@ const cellarFill = new THREE.PointLight(0x7fd9c0, 0, 13, 1.7);
 cellarFill.position.set(SPOTS.hatch.x, 21.0, SPOTS.hatch.y - 15.5);
 scene.add(cellarFill);
 
+// the keeper's lamp — the one warm light in the annex (the Keeper's Quarters,
+// #15). Lit only one level down, it burns against the cold deep grade: a hearth
+// the descent threatens, not a black frame. Position matches the hung globe in
+// props.js (annex at azimuth 15°, baseR+2.2 = 7.4 out; globe local 0.05,2.28,0.55).
+const _annexAA = 15 * Math.PI / 180;
+const keeperLamp = new THREE.PointLight(0xffb45a, 0, 12, 1.7);
+keeperLamp.position.set(
+  LH.x + Math.sin(_annexAA) * 7.4 + 0.19,
+  LH.y + 2.28,
+  LH.z + Math.cos(_annexAA) * 7.4 + 0.52);
+scene.add(keeperLamp);
+
 // ---------------- gulls ----------------
 const gulls = [];
 {
@@ -510,6 +522,8 @@ function applyAtmosphere(elapsed, dt) {
   lampSpill.intensity = W.lampLit ? 220 : 0;
   cellarLight.intensity = W.flags.hatchOpen ? 9 : 0;
   cellarFill.intensity = W.flags.hatchOpen ? 3.4 : 0;
+  // the keeper's lamp burns one level down, with a faint lamp-oil flicker
+  keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
 
   // iris cursor only exists while playing
   document.getElementById('iris').classList.toggle('gone', MODE !== 'play');

@@ -546,6 +546,74 @@ export function buildWorld() {
     sig(0, ax + 0.76, az + 0.07, 0.13, -0.15);
   }
 
+  // =================== THE KEEPER'S QUARTERS (#15) =========================
+  // The annex IS the keeper's room — furnish it into a life left mid-sentence:
+  // a cot, a cold dead stove, and on the far wall the recursion drawn in his own
+  // hand, nested islands shrinking to a single lit dot. The one WARM lamp (its
+  // point-light lives in main.js, gated to depth) is the hearth the cold descent
+  // threatens — darkness defined by a light, not a black frame. He KNEW where it
+  // led and drew himself down it anyway. Static geometry: hidden behind the
+  // closed inner door at the surface, revealed when you go one level down.
+  {
+    const aa = deg(15);
+    const ax = LH.x + Math.sin(aa) * (baseR + 2.2), az = LH.z + Math.cos(aa) * (baseR + 2.2);
+    const q = new THREE.Group();
+    q.name = 'quarters';
+    q.position.set(ax, LH.y, az);
+    q.rotation.y = aa;                       // local +z → far wall, +x → along it
+    core.add(q);
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a4632, flatShading: true, roughness: 0.92 });
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x20242a, flatShading: true, roughness: 0.8, metalness: 0.3 });
+
+    // the cot — against the far-left wall, the blanket cold and unmade
+    const cot = new THREE.Group(); cot.position.set(-0.95, 0, 1.35);
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.34, 0.78), woodMat); frame.position.y = 0.21; cot.add(frame);
+    const blanket = new THREE.Mesh(new THREE.BoxGeometry(1.74, 0.18, 0.64),
+      new THREE.MeshStandardMaterial({ color: 0x3a4654, flatShading: true, roughness: 0.95 }));
+    blanket.position.y = 0.45; cot.add(blanket);
+    const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 0.56),
+      new THREE.MeshStandardMaterial({ color: 0x756b5c, flatShading: true, roughness: 1 }));
+    pillow.position.set(-0.62, 0.51, 0); cot.add(pillow);
+    q.add(cot);
+
+    // the cold stove — fire long dead, its mouth a black hole; the contrast the
+    // warm lamp needs
+    const stove = new THREE.Group(); stove.position.set(1.4, 0, 1.2);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.4, 0.82, 10), ironMat); body.position.y = 0.41; stove.add(body);
+    const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.08, 10), ironMat); lid.position.y = 0.85; stove.add(lid);
+    const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 2.5, 8), ironMat); pipe.position.y = 2.05; stove.add(pipe);
+    const mouth = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.26), new THREE.MeshBasicMaterial({ color: 0x070504 })); mouth.position.set(0, 0.41, 0.401); stove.add(mouth);
+    q.add(stove);
+
+    // the wound: the recursion drawn by his own hand — nested islands receding
+    // to a single warm dot, pinned to the far wall (echoes the nestedGlint)
+    const sketch = new THREE.Group(); sketch.position.set(-0.15, 1.75, 2.32); sketch.rotation.y = Math.PI;
+    const paper = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.9),
+      new THREE.MeshStandardMaterial({ color: 0xc9bd9e, roughness: 1, side: THREE.DoubleSide }));
+    sketch.add(paper);
+    const inkMat = new THREE.MeshBasicMaterial({ color: 0x241b12 });
+    for (let i = 0; i < 7; i++) {
+      const rr = 0.4 - i * 0.052;
+      const ring = new THREE.Mesh(new THREE.RingGeometry(rr - 0.014, rr, 22), inkMat);
+      ring.position.set(-0.022 * i, -0.022 * i, 0.006 + i * 0.0012);
+      ring.scale.y = 0.82;                   // islands, not circles
+      sketch.add(ring);
+    }
+    const dot = new THREE.Mesh(new THREE.CircleGeometry(0.02, 10), new THREE.MeshBasicMaterial({ color: 0xffd98a }));
+    dot.position.set(-0.022 * 6, -0.022 * 6, 0.02);
+    sketch.add(dot);
+    q.add(sketch);
+
+    // the warm lamp source, hung over the room (the point-light is in main.js)
+    const lamp = new THREE.Group(); lamp.position.set(0.05, 0, 0.55);
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.9, 5), matBrassSolid); rod.position.y = 2.78; lamp.add(rod);
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.16, 8), matBrassSolid); cap.position.y = 2.42; lamp.add(cap);
+    const globe = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8),
+      new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffb45a, emissiveIntensity: 2.4, flatShading: true }));
+    globe.position.y = 2.28; lamp.add(globe);
+    q.add(lamp);
+  }
+
   // =================== STANDING STONES (the islet) ==========================
   const stonesGroup = new THREE.Group();
   stonesGroup.name = 'stonesGroup';

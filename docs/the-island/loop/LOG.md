@@ -12,6 +12,51 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 37 — 2026-06-19 — environment (the Keeper's Quarters — a life mid-sentence) — #15
+
+**Shipped:** The first real ENVIRONMENT, now earned (you can descend #33, someone's
+there #14, the ending resolves #22, the levels read #36). The annex — already the
+keeper's space (coat, bell, footprints) and already reachable at depth — is
+furnished into a life left mid-sentence (#15, panel critical-path step 5):
+- **A cot** against the far wall, blanket cold and unmade, a pale pillow.
+- **A cold dead stove** — iron body, lid, a flue to the roof, its mouth a black
+  hole. The fire long out; the contrast the warm lamp needs.
+- **The wound on the wall**: the recursion drawn in the keeper's own hand —
+  nested islands receding to a single warm-lit dot (echoes the nestedGlint). He
+  KNEW where the descent led and drew himself down it anyway.
+- **The one WARM lamp**, hung over the room (brass cap + emissive globe in
+  `props.js`; the `keeperLamp` point-light in `main.js`, warm 0xffb45a, gated to
+  `W.level >= 2` with a faint lamp-oil flicker). Darkness defined by a light it
+  threatens, not a black frame — folds in the Art Director's deep-level key light
+  and issue #19's remaining piece.
+
+SAFE BUILD: purely additive geometry + one gated light — NO new walkable space,
+NO collision/walkableY change (the annex was already reachable), so main can't
+break or softlock. All metaphor, no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`) at L2 — teleported into the annex (player on the
+annex floor y13.5, reachable at depth via the verified dive). Screenshots: the
+study→open-inner-door vista with the warm lamp glowing through; a 3/4 interior
+(cot, warm lamp globe, nested-sketch wound, coat all reading); a wide interior
+(lamp + sketch + cot + coat + bell + maker's marks, warm-lit). Numeric: quarters
+group has 4 furnishing subgroups (cot/stove/sketch/lamp); `keeperLamp` intensity
+~25 at L2, **0 at L1** (no surface leak — furnishings hidden behind the closed
+inner door). Zero console errors; 198–530 fps, draws ≤243.
+
+**Debt:** none added. The quarters is a furnished reachable room, not a sealed
+vista — the fuller-walkability worry didn't apply (the annex was already walkable).
+
+**Next tick suggestion:** **#16 The Drowned Gallery** (panel critical-path step 6
+— abyss as architecture, NOW allowed since the spine carries weight). The first
+sunless, low-ceiling interior the drained tide reveals: reuse the cellar
+BackSide-box recipe at a ~2.2m ceiling, knee-deep water keyed to `W.tide`, lit by
+`waterShallow` caustics against the (now-legible) deep grade — no sun. This one
+IS a new walkable space, so build it carefully and fully-verified, or ship a
+COMPLETE sealed-vista slice (see into the drowned corridor through the drained
+chasm before you can enter) and note the rest — never half-ship a walkable space.
+
+---
+
 ## 36 — 2026-06-19 — graphics (the descent's era-colors finally READ) — #13 redux
 
 **Shipped:** The reachable decay (loops 30–33) was a grey value-ramp, not a
