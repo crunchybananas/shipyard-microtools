@@ -12,6 +12,47 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 48 — 2026-06-19 — graphics/atmosphere (the shore beacon comes to light)
+
+**Shipped:** The jetty lantern was a static emissive dot with a point-light; now
+it's a real beacon. A soft warm halo blooms around the globe and the globe burns
+brighter as night falls — a light left at the end of the jetty for a return that may
+never come (the Threshold, #24; the SPINE's image of leaving). By day it's the same
+quiet dim glow as before; by night the halo opens, the deck pools warm, and against
+the cold star-lit sea with the moon rising beyond it reads as the one warm point in
+the dark. Restraint over spectacle, in the house aesthetic.
+
+- `props.js`: a billboarded additive `jettyHalo` Sprite at the globe (a Sprite, not
+  Points — Points in core crash instantiateModel); a shared code-generated radial
+  glow texture (`radialGlowTex`, a 64px canvas gradient); both `jettyLantern` and
+  `jettyHalo` added to `NAMES`.
+- `main.js` applyAtmosphere: drive halo opacity `lerp(0.12,0.92,night)` + scale
+  `lerp(1.2,2.5,night)` + lantern emissive `lerp(1.0,2.8,night)`, all with the
+  existing beacon flicker. Net ~1 draw — paid for many times over by #47's −62.
+
+Axis: graphics/atmosphere (45+46 story, 47 perf — varied). No JS dep; the one
+generated texture is code-made (the "everything is math" claim still holds). No
+gameplay/chain/walkability touched.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Halo resolves
+on island + model clone, `isSprite` true, 64px map present. NIGHT screenshot
+(W.time=23): the lantern blooms a warm halo, pools light on the deck, posts lit warm
+against the dark sea, moon on the horizon. DAY: halo opacity ~0.105 (faint, as
+before) — confirmed the driver computes day vs night correctly (the screenshot frame
+runs applyAtmosphere; rAF is otherwise suspended headless). 487fps, draws 27 in the
+beacon view, tris 287k.
+
+**Debt:** none added. Perf headroom from #47 amply covers the one new draw.
+
+**Next tick suggestion:** the ENDGAME remains the big move (ring-vs-climb-out
+integration ending #22-full / #12 ascent) — its forks are the owner's call
+(surfaced; awaiting a pick). Until then, safe options: a matching warm reflection of
+the beacon on the water (shader-touch, verify carefully); the "rearranges-on-2nd-
+entry" house-remembers beat; the small model-clone perf prune (~21 draws); or an
+audio-audition pass.
+
+---
+
 ## 47 — 2026-06-19 — performance/code health (instance the colonnade + jetty)
 
 **Shipped:** A power/draw-call win that's visually invisible. The Drowned Gallery

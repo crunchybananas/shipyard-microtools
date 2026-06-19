@@ -570,6 +570,16 @@ function applyAtmosphere(elapsed, dt) {
   keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
   // the jetty beacon: a low warm glow by day, a real beacon by night
   jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7));
+  // the globe blooms a soft halo and burns brighter as night falls — a light
+  // left for a return that may never come (the Threshold, #24)
+  {
+    const flick = 1 + 0.10 * Math.sin(elapsed * 4.7) + 0.05 * Math.sin(elapsed * 11.3);
+    if (refs.jettyHalo) {
+      refs.jettyHalo.material.opacity = lerp(0.12, 0.92, night) * flick;
+      refs.jettyHalo.scale.setScalar(lerp(1.2, 2.5, night) * flick);
+    }
+    if (refs.jettyLantern) refs.jettyLantern.material.emissiveIntensity = lerp(1.0, 2.8, night) * flick;
+  }
 
   // iris cursor only exists while playing
   document.getElementById('iris').classList.toggle('gone', MODE !== 'play');

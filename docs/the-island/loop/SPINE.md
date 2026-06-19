@@ -126,7 +126,7 @@ What it MEANS: the recursion was never a puzzle, it was the shape of a search. D
 - **Palette:** the existing study cloned and lit cold (deep grade), one inverted assumption
 - **Narrative role:** Reached only at depth: a second study identical to the first, but its chart-table model shows a WorldState the world is NOT in (sea drained when it's full; beam lit by day), and through its window is weather that contradicts yours. Give this room a private ghostState that ignores live W for the model only. The whole game taught the player to trust that the model tells the truth about the world; this room breaks that trust, and the break asks: which level is real, and am I the keeper or a thing someone else is turning?
 
-### The Threshold (jetty + dory)  *(large)* — ✓ STANDING-PROMISE SHIPPED iter 39 (a planked jetty into the sea + a beached dory with an oar, on the wake-up beach; additive, does nothing yet. The finale boat-ride / "looking back" shot waits on #22's full ring-vs-climb-out ending choice.)
+### The Threshold (jetty + dory)  *(large)* — ✓ STANDING-PROMISE SHIPPED iter 39 (a planked jetty into the sea + a beached dory with an oar, on the wake-up beach; additive, does nothing yet. The finale boat-ride / "looking back" shot waits on #22's full ring-vs-climb-out ending choice.) **[✓ iter 48 — the jetty lantern now blooms a warm beacon-halo at night: the light left for a return.]**
 
 - **Mood:** departure, the promise of 'beyond' — the first exterior that is a destination, not decoration
 - **Palette:** grade horizon at golden/night; wood/brass/cloth, all existing materials

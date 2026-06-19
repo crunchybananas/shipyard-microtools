@@ -89,6 +89,22 @@ export function glyphSprite(atlas, index, color, size = 1) {
   return m;
 }
 
+// a soft round glow, code-generated once and shared — for billboarded halos
+// (additive). A Sprite, never a Points: instantiateModel strips Points from core.
+let _glowTex = null;
+function radialGlowTex() {
+  if (_glowTex) return _glowTex;
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0.0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.35, 'rgba(255,255,255,0.5)');
+  g.addColorStop(1.0, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  _glowTex = new THREE.CanvasTexture(c);
+  return _glowTex;
+}
+
 // =============================================================================
 // build the whole world. Returns { core, refs, modelRefs, hotspots, ... }
 // =============================================================================
@@ -722,6 +738,17 @@ export function buildWorld() {
     const lglobe = new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 6),
       new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffc06a, emissiveIntensity: 1.5, flatShading: true }));
     lglobe.position.set(jx + 0.33, 3.66, -115.4); lglobe.name = 'jettyLantern'; jetty.add(lglobe);
+    // a soft halo that blooms around the globe at night — the beacon read as light,
+    // not just an emissive dot (driven by `night` in main.js applyAtmosphere). A
+    // billboarded Sprite (clone-safe; a Points here would crash instantiateModel).
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: radialGlowTex(), color: 0xffc483, transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    }));
+    halo.position.copy(lglobe.position);
+    halo.scale.setScalar(1.4);
+    halo.name = 'jettyHalo';
+    jetty.add(halo);
     core.add(jetty);
 
     // the dory — beached on the dry sand, bow toward the water, keeled over
@@ -1478,6 +1505,7 @@ const NAMES = [
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally',
+  'jettyLantern', 'jettyHalo',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
