@@ -550,6 +550,7 @@ function tickGulls(elapsed, dt) {
 }
 
 // ---------------- footsteps ----------------
+player.onRescue = () => UI.whisper('The ground gives you back.');
 player.onFootstep = (kind, pos) => {
   A.footstep(kind);
   // wet seabed sparkles underfoot

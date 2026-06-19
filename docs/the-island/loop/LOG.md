@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 29 — 2026-06-19 — movement/safety (the wedge net) — closes #3
+
+**Shipped:** A general "stuck in a wall" fix. The owner hit it twice (drained
+bay, water-filled chasm rim); the iteration-3 rim clamp only covered the
+drained case. Now `player.js` carries a conservative wedge-escape net: if the
+player is *pushing* but fully pinned for >0.6s **and** a 16-direction ring
+test finds no walkable heading out, they're set back on the nearest dry,
+gently-sloped ground (`_escapeWedge` spiral search), with a diegetic whisper —
+"The ground gives you back." The ring test is the guard: against a normal
+wall some heading is always open, so it never fires for ordinary walking.
+Catches any wedge regardless of cause (rim, stale save, forced input).
+
+**Evidence:** four checks, zero console errors —
+- TRUE WEDGE (chasm floor, terrain −8.5, underwater): held W → detected after
+  ~0.6s, escaped to dry ground (18.0), exactly **1** rescue, whisper shown.
+- NORMAL WALL (lighthouse exterior, held W 2s): **0** rescues — player just
+  stops at the wall, free to turn away (the safety-critical case).
+- OPEN-GROUND WALK (beach, held W): moved 3.49 m normally, 0 rescues.
+- DIRECT unit test of `_escapeWedge` from the chasm rim: repositions above
+  water (gradient 0.87 < 0.9), zeroes velocity, fires `onRescue`.
+
+No new dependency, no asset — pure logic. `TAU` added to player.js imports.
+
+**Debt:** none.
+
+**Next tick suggestion:** the keystone — **#13, diverge every level** as the
+era color-psychology descent the integration reveal needs (saturated gold →
+streetlight green → sickly false-gold → isolation blue → golden-hour
+bittersweet). Pure grade/shader work, no dep, no asset, high wow. Drive a
+`gradeBias(level)` so descent reads as decay, then one prop change per level.
+
+---
+
 ## 28 — 2026-06-19 — story/process (the Truth is chosen; the constraint reframes)
 
 **Shipped:** Two owner decisions, encoded.

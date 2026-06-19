@@ -2,7 +2,7 @@
 // No pointer lock required (WKWebView-safe); dragging the world looks around.
 
 import * as THREE from 'three';
-import { clamp, lerp } from './util.js';
+import { clamp, lerp, TAU } from './util.js';
 import { walkableY, wallBlocked, heightAt } from './terrain.js';
 import { W, waterY } from './world.js';
 
@@ -20,7 +20,9 @@ export class Player {
     this.keys = new Set();
     this.bobPhase = 0;
     this.bobAmp = 0;
+    this._stuckT = 0;            // seconds fully pinned while pushing (wedge net)
     this.onFootstep = null;      // cb(kind)
+    this.onRescue = null;        // cb() when the wedge net repositions the player
 
     this._drag = null;
 
@@ -115,6 +117,8 @@ export class Player {
       return true;
     };
 
+    const px0 = this.pos.x, pz0 = this.pos.z;
+    const pushing = wish.lengthSq() > 1e-3;
     const nx = this.pos.x + this.vel.x * dt;
     const nz = this.pos.z + this.vel.z * dt;
     let blocked = false;
@@ -130,6 +134,22 @@ export class Player {
     }
     this.blockedByWater = blocked && walkableY(nx, nz) < waterY() - 0.5;
 
+    // wedge safety net: if the player is pushing but fully pinned for >0.6s
+    // AND no heading out is walkable (steep walls up, water/clamp down), they
+    // are wedged — set them back on the nearest safe ground. The ring test is
+    // the real guard: against a normal wall some heading is always open, so
+    // this never fires for ordinary "walking into a wall." Rare by design.
+    const moved = Math.abs(this.pos.x - px0) + Math.abs(this.pos.z - pz0) > 1e-4;
+    this._stuckT = (pushing && !moved) ? this._stuckT + dt : 0;
+    if (this._stuckT > 0.6) {
+      let anyOut = false;
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * TAU;
+        if (step(px0 + Math.cos(a) * 0.5, pz0 + Math.sin(a) * 0.5)) { anyOut = true; break; }
+      }
+      if (!anyOut) { this._escapeWedge(); this._stuckT = 0; }
+    }
+
     // head bob + footsteps
     const groundSpeed = Math.hypot(this.vel.x, this.vel.z);
     this.bobAmp = lerp(this.bobAmp, clamp(groundSpeed / 4, 0, 1), 1 - Math.exp(-6 * dt));
@@ -142,6 +162,28 @@ export class Player {
     }
 
     this.syncCamera();
+  }
+
+  // spiral outward for the nearest dry, gently-sloped ground and set the
+  // player there — the wedge net's extraction. Conservative thresholds so it
+  // lands on real walkable terrain, never back in the trap.
+  _escapeWedge() {
+    const px = this.pos.x, pz = this.pos.z, e = 0.7;
+    const grad = (x, z) => Math.hypot(
+      heightAt(x + e, z) - heightAt(x - e, z),
+      heightAt(x, z + e) - heightAt(x, z - e)) / (2 * e);
+    for (let R = 3; R <= 60; R += 1.5) {
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * TAU;
+        const x = px + Math.cos(a) * R, z = pz + Math.sin(a) * R;
+        if (heightAt(x, z) > waterY() + 0.4 && grad(x, z) < 0.9) {
+          this.pos.set(x, walkableY(x, z), z);
+          this.vel.set(0, 0, 0);
+          this.onRescue?.();
+          return;
+        }
+      }
+    }
   }
 
   interior() {
