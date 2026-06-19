@@ -493,6 +493,19 @@ export function buildWorld() {
     const coatBody = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.5, 8), new THREE.MeshStandardMaterial({ color: 0x355560, flatShading: true, roughness: 0.9 }));
     coatBody.position.set(ax - 1.9, LH.y + 1.2, az + 0.6);
     coat.add(coatBody);
+    // the maker's pair once more, stitched small at the hem — the same
+    // hand that signed the table and the bell wore this coat
+    const stitch = (gi, ox, oy, s, rz) => {
+      const g = glyphSprite(atlas, gi, 0xc08a3e, s);
+      const dir = Math.atan2(1.9, -0.6); // outward, toward the annex room
+      g.position.set(ax - 1.9 + Math.sin(dir) * 0.34 + ox, LH.y + oy, az + 0.6 + Math.cos(dir) * 0.34);
+      g.rotation.y = dir;
+      g.rotation.z = rz;
+      g.material.opacity = 0.45;
+      coat.add(g);
+    };
+    stitch(1, -0.02, 0.78, 0.11, 0.25);
+    stitch(0, 0.09, 0.72, 0.085, -0.1);
     core.add(coat);
 
     const prints = new THREE.Group();

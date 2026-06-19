@@ -73,6 +73,15 @@ const { core, waterMat, modelAnchor, biolume, fireflies, motes } = buildWorld();
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
+// the coat on its annex hook (level 2): annex azimuth 15°, baseR+2.2 out
+// (built from SPOTS — LH isn't declared until the lighting section)
+const COAT_POS = (() => {
+  const aa = 15 * Math.PI / 180;
+  return new THREE.Vector3(
+    SPOTS.lighthouse.x + Math.sin(aa) * 7.4 - 1.9,
+    13.5 + 1.2,
+    SPOTS.lighthouse.y + Math.cos(aa) * 7.4 + 0.6);
+})();
 const refs = collectRefs(core);
 const modelRefs = collectRefs(modelRoot);
 // the clone captured pre-clone children only; nothing model-side needs Points
@@ -420,6 +429,13 @@ function applyAtmosphere(elapsed, dt) {
   scene.fog.color.copy(g.fog);
   scene.fog.density = g.fogDen * (MODE === 'dive' ? 0.5 : 1) * (1 + mistCur * 2.4);
   skyMat.uniforms.uMist.value = mistCur;
+
+  // the coat remembers its keeper — one quiet line, up close, once
+  if (MODE === 'play' && game && W.level >= 2) {
+    if (camera.position.distanceTo(COAT_POS) < 1.7) {
+      game.once('coatScent', () => UI.whisper('Salt and lamp oil, still.'));
+    }
+  }
 
   // the secret pinprick on the model's model — alive only at night, and
   // leaning all the way in earns the whisper exactly once per save

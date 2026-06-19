@@ -12,6 +12,33 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 24 — 2026-06-19 — story (the coat remembers its keeper)
+
+**Shipped:** The cartographer's throughline closes on the last object that
+was theirs: the maker's pair (triangle + ringed dot) is stitched small and
+worn into the annex coat's hem — the same hand that signed the chart table
+and the bell wore this coat. Standing close to it at level 2 earns one
+quiet whisper, once per save: "Salt and lamp oil, still." Table → bell →
+coat: three echoes of one person, found only by leaning in.
+
+**Evidence:** lean-in screenshot — both glyphs legible on the hem at
+opacity 0.45 in dim dawn light; the `coatScent` once-key fired exactly
+once and the whisper rendered ("Salt and lamp oil, still."). Level-2 only
+(R.coat.visible gates it); not a raycast target; zero console errors.
+
+**Debt:** none added. NEAR-MISS recorded: COAT_POS was first built from
+`LH`, which main.js declares far below in the lighting section — a TDZ that
+white-screened the whole module. Rebuilt from `SPOTS` (imported at top).
+LESSON: module-top consts must only reference top-level imports, never
+section-local declarations. (This is the crash class to grep for.)
+
+**Next tick suggestion:** the perf jitter (issues #1 + #2) — the
+adaptive-DPR pass reallocates the framebuffer on every move/stop and the
+60fps governor sits against the 60Hz vsync interval; both stutter. Highest
+felt-wow because it smooths the whole game.
+
+---
+
 ## 23 — 2026-06-12 — weather (the sky agrees with the ground)
 
 **Shipped:** The weather feature completes: a `uMist` uniform in the sky
