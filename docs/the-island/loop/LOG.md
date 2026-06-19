@@ -12,6 +12,51 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 54 — 2026-06-19 — design/story (the ascent, stage 3 — the keeper falls silent) — ASCENT COMPLETE
+
+**Shipped:** The unmissable beat that makes the ascent a beat, not another lean-in
+(Panel #3's whole complaint). As you rise, the world draws quiet (held silence); the
+FIRST time you turn back from the depths the keeper gives one last resigned line —
+"…go on up. Don't leave the light on for me. I never could." — and then the floor below
+goes silent for good. The arrival names it: "Below you, the voice has stopped. The light
+still burns — you did not put it out." That last clause is the INTEGRATION beat: you
+leave him where he chose to stay, but you leave the light burning — wholeness, not
+abandonment. **This completes the ascent (#12) — all three stages.** grief→INTEGRATION
+now has both halves, in the player's hands.
+
+- `world.js`: `flags.keeperSilenced` (backward-compatible default false).
+- `main.js`: `startAscent` now holds the ambient quiet (`A.duckAmbient(true)`) and resets
+  the farewell transient; `landAscent` speaks the keeper's last line once (`wasLevel>=3`,
+  `keeperVoice('resigned')`) and sets `keeperSilenced`; `tickAscent` f>=1 releases the
+  ambient (`duckAmbient(false)`) and, the once, fires the named-silence whisper.
+
+Uses the EXISTING keeperVoice('resigned') register + duckAmbient — no new synthesis, so
+no owner audition needed. Fork-neutral (no ring-vs-climb, no who-am-I, no final camera).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Instant path
+(landAscent): first ascent L4→L3 flips `keeperSilenced` false→true and calls
+`keeperVoice('resigned')` with NO throw; second ascent L3→L2 stays silenced (no second
+voice). The keeper's farewell line confirmed in the whisper element verbatim. Play mode:
+the real cinematic with the new held-silence starts clean (`ascend(false)` true,
+`getAscent` live, player locked, no throw). HARNESS LIMIT: the f>=1 release + delayed
+named-silence whisper run only in the full 21s cinematic (can't be watched to its end
+headless) — both are single calls mirroring the dive/verified-elsewhere patterns, gated
+on the verified `keeperFarewell`.
+
+**Debt:** none broken. AXIS NOTE: 52/53/54 were all the ascent — a deliberate exception
+to the no-3x-axis rule, because this is one coherent keystone built in safe stages (the
+opposite of fleeing to easy wins). Done now.
+
+**Next tick (iter 55 = PUSH BOUNDARY, batch 11):** ship one SAFE item then push iters
+51–55 (submodule → main, then Dockhand parent gitlink from the worktree ROOT) and update
+the push-cadence memory (boundary #11, next at 60). The ascent will then be LIVE — worth
+the owner experiencing it. Candidate safe iter-55 item: a tasteful ascent polish (a
+look-back at the shrinking world on the first climb), OR surface the now-unblocked ending
+forks again (with the staircase built, the owner's choices are small additions). Consider
+whether the owner wants to playtest the ascent before more is layered on.
+
+---
+
 ## 53 — 2026-06-19 — design/story (the ascent, stage 2 — the way UP, in-play)
 
 **Shipped:** UP is now in the player's hands. The brass plate — the dive — becomes the

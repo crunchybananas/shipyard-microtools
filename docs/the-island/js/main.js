@@ -377,6 +377,7 @@ function tickDive(dt) {
 // settle, started from a debug hook (ABYME.ascend). The owner's ending forks (ring-vs-climb,
 // who-you-are, the final camera) layer ON TOP later — none of them are decided here.
 let ascent = null;
+let keeperFarewell = false;   // transient: the arrival names the keeper's silence (#12 stage 3)
 function startAscent(instant = false) {
   if (W.level <= 1) { if (!instant) UI.whisper('There is no level above the surface. Not yet.'); return false; }
   if (instant) { landAscent(); return true; } // debug/verify: skip the cinematic AND the mode-gate
@@ -387,6 +388,8 @@ function startAscent(instant = false) {
   UI.cinematic(true);
   renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
   farSea.visible = false;
+  keeperFarewell = false;          // reset; landAscent sets it on the silencing ascent
+  A.duckAmbient(true);             // the world draws quiet as you rise — the held silence (#12 s3)
   // pivot: the chart table in THIS world — the world collapses toward the very place its
   // own model stands, becoming that model one level up
   const pivot = new THREE.Vector3(SPOTS.lighthouse.x, 14.5, SPOTS.lighthouse.y);
@@ -398,8 +401,19 @@ function landAscent() {
   // the snap: the shrunk world becomes the model above; you stand at its chart table
   diveGroup.scale.setScalar(1);
   diveGroup.position.set(0, 0, 0);
+  const wasLevel = W.level;
   W.level = Math.max(W.level - 1, 1); // one recursion shallower — clamp at the surface
   if (W.level <= 1) W.flags.climbing = false; // back at the surface — a new descent is possible
+  // the keeper falls silent behind you (#12 stage 3): the first time you turn back from the
+  // depths, his voice gives one last fading line — then the floor below goes quiet for good.
+  // You leave him where he chose to stay, and you leave the light BURNING (integration, not
+  // abandonment). The arrival (tickAscent f>=1) names the silence.
+  if (!W.flags.keeperSilenced && wasLevel >= 3) {
+    A.keeperVoice('resigned');
+    UI.whisper('“…go on up. Don’t leave the light on for me. I never could.”');
+    W.flags.keeperSilenced = true;
+    keeperFarewell = true;
+  }
   save(player.pos);
   // rise out at the study / chart table of the level above
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
@@ -438,12 +452,18 @@ function tickAscent(dt) {
     UI.cinematic(false);
     UI.fadeIn(false);
     setTimeout(() => document.getElementById('curtain').classList.remove('white'), 800);
+    A.duckAmbient(false);  // the surface sounds return — the held silence releases (#12 s3)
     // up, and the colour comes back — the inverse of the dive's curdle
     UI.whisper({
       1: 'The surface. The sea you woke beside — and the door you came in by.',
       2: 'One level up. The colour creeps back into things.',
       3: 'Up, and the room warms by a degree.',
     }[W.level] || 'Up. And up.');
+    // name the silence, the once it happens — the integration beat: you did not put it out
+    if (keeperFarewell) {
+      keeperFarewell = false;
+      setTimeout(() => UI.whisper('Below you, the voice has stopped. The light still burns — you did not put it out.'), 5200);
+    }
   }
 }
 

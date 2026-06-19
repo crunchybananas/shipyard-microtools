@@ -47,6 +47,7 @@ export const W = {
     plumbHung: false,
     dove: false,          // level 2: one recursion down
     climbing: false,      // one-way ascent mode: reached the bottom, now rising back up (#12)
+    keeperSilenced: false,// the keeper's last words spoken on the first ascent; then silence (#12)
     bellRung: false,
   },
 
