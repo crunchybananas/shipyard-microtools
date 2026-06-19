@@ -12,6 +12,44 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 45 — 2026-06-19 — story (the journal fills with a hand that isn't yours) — #21
+
+**Shipped:** The journal-hands merge. From level 3 down, the keeper's words begin
+appearing in your journal — in HIS hand: a colder ink (cyan #9adfca), italic, a
+marginal rule, a faint slant — bleeding in among your own warm, upright field
+notes. "I drew the bay drained so the sea could not take her twice…"; deeper,
+"…or I am writing this through you now. I can no longer tell which of us holds the
+pen." A silent reveal that you are becoming him.
+- `ui.js`: `addJournal(text, sketch, hand='self')` records a `hand`; `renderJournal`
+  tags keeper entries `class="entry keeper"`. Backward-compatible (old/saved
+  entries default to your hand).
+- `style.css`: `.entry.keeper` — the keeper's distinct hand.
+- `main.js`: the arrival beat (L3+) now also writes a keeper-hand journal line.
+
+All metaphor, no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`) — injected a player entry + a keeper entry and
+opened the journal. Verified at the **computed-style level** (definitive for CSS):
+player hand = `rgb(232,224,207)` upright, no rule; keeper hand = `rgb(154,223,202)`
+italic, 2px cyan margin-rule, −0.45° slant. DOM: 2 entries tagged `entry keeper`,
+2 plain `entry`; journal z-order/visibility correct (z26 over the scene, display
+block). Zero console errors. NOTE: the transform-centered journal panel does not
+capture in the headless preview screenshot (the bottom-anchored debug panel does)
+— a capture quirk, not a game bug; verified via computed styles + DOM instead.
+Worth an owner eyeball in the live game.
+
+**Deploy:** iters 41–44 were already pushed live at the owner's request (between
+44 and 45). This tick pushes #21 (batch continues). Submodule was 0 ahead after
+that deploy; iter 45 → 1 ahead → pushed.
+
+**Next tick suggestion:** the endgame — #12-remainder/#22-full: the ring-vs-DON'T-
+ring / climb-out CHOICE (the integration ending the SPINE points at, now that the
+Threshold + all spaces exist), or the UP/ascent (running the dive backward). Big,
+narrative — give it a careful dedicated tick. Or quieter polish: an owner-audition
+pass on the synthesized voices; ambient audio for the new rooms.
+
+---
+
 ## 44 — 2026-06-19 — deepening (the disagreeing model comes alive) — #18 live ghostState
 
 **Shipped:** The Room That Disagrees (#18) was a frozen tableau; now its model

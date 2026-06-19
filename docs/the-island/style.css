@@ -238,6 +238,17 @@ html, body {
   stroke: #9adfca;
   opacity: 0.7;
 }
+/* the keeper's hand — at depth the journal fills with words you never wrote (#21);
+   a colder ink, a different slant, a marginal rule: another hand bleeding into yours */
+#journal-entries .entry.keeper {
+  color: #9adfca;
+  font-style: italic;
+  padding-left: 0.95rem;
+  border-left: 2px solid rgba(154, 223, 202, 0.38);
+  transform: rotate(-0.45deg);
+  opacity: 0.9;
+}
+#journal-entries .entry.keeper .sketch svg { stroke: #9adfca; }
 #journal-entries .empty { font-style: italic; color: var(--ink-dim); }
 .journal-foot {
   margin-top: 1.3rem;

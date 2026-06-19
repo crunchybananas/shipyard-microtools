@@ -359,6 +359,12 @@ function tickDive(dt) {
     if (W.level >= 3) setTimeout(() => {
       A.keeperVoice(W.level >= 4 ? 'resigned' : 'curious');
       UI.whisper(W.level >= 4 ? '“There is no bottom. I looked.”' : '“Oh. You came down too.”');
+      // the journal fills with a hand that isn't yours — the keeper's, blurring
+      // into your own field notes the deeper you go (#21)
+      UI.addJournal(W.level >= 4
+        ? 'You are deeper than I ever went — or I am writing this through you now. I can no longer tell which of us holds the pen.'
+        : 'I drew the bay drained so the sea could not take her twice. The model does not lie; it only hopes. (This is not my handwriting. And yet I know it.)',
+        '', 'keeper');
     }, 3600);
   }
 }

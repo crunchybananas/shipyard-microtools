@@ -73,9 +73,9 @@ export const UI = {
     // re-render on open: a loaded save fills W.journal after init()
     if (!this.journalEl.classList.contains('hidden')) this.renderJournal();
   },
-  addJournal(text, sketch = '') {
+  addJournal(text, sketch = '', hand = 'self') {
     if (W.journal.some((j) => j.text === text)) return;
-    W.journal.push({ text, sketch });
+    W.journal.push({ text, sketch, hand });
     this.renderJournal();
     this.journalTab.classList.remove('pulse');
     void this.journalTab.offsetWidth; // restart the animation
@@ -88,7 +88,8 @@ export const UI = {
     }
     this.journalEntries.innerHTML = W.journal.map((j) => {
       const sk = j.sketch || (SKETCHES.find(([m]) => j.text.includes(m))?.[1] ?? '');
-      return `<div class="entry">${j.text}${sk ? `<div class="sketch">${sk}</div>` : ''}</div>`;
+      const cls = j.hand === 'keeper' ? 'entry keeper' : 'entry';
+      return `<div class="${cls}">${j.text}${sk ? `<div class="sketch">${sk}</div>` : ''}</div>`;
     }).join('');
   },
 };
