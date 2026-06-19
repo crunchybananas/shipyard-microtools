@@ -15,8 +15,17 @@ const A = {
   surf: null, wind: null, room: null,
   stems: [],
   ready: false,
-  // device preference, not world state: survives saves AND New Game wipes
-  muted: localStorage.getItem('abyme-muted') === '1',
+  // device preference, not world state: survives saves AND New Game wipes.
+  // `?mute` forces silence; `?debug` builds start muted unless the player
+  // has explicitly unmuted (abyme-muted==='0') — so developer/agent test
+  // sessions are quiet by default, players (no ?debug) are unaffected.
+  muted: (() => {
+    const stored = localStorage.getItem('abyme-muted');
+    if (stored === '1') return true;
+    if (stored === '0') return false;
+    const q = new URLSearchParams(location.search);
+    return q.has('mute') || q.has('debug');
+  })(),
 
   setMuted(m) {
     this.muted = !!m;

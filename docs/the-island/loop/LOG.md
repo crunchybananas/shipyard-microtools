@@ -12,6 +12,30 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 26 — 2026-06-19 — UX/dev (the test builds stay quiet) — closes #5
+
+**Shipped:** `?debug` builds now start muted unless the player has
+explicitly unmuted (`abyme-muted === '0'`), and a new `?mute` param forces
+silence. So agent/developer test sessions are quiet by default while the
+deployed game (no `?debug`) is untouched. Completes the sound-toggle story:
+M-key toggle + persistent pref + the "M sound" controls hint (iteration 8)
++ this default-muted dev behaviour.
+
+**Evidence:** predicate verified across all four cases — `?debug` no-pref →
+muted; `?debug` + explicit unmute → unmuted (choice wins); plain player →
+unmuted; `?mute` → muted. Live `?debug` session confirmed muted at boot,
+no stored pref. One line of logic in `audio.js`, zero errors.
+
+**Debt:** none. (The "subtle on-screen affordance" the issue floated is
+already served by the controls-hint line; no new HUD chrome added.)
+
+**Next tick suggestion:** #3 — movement wedge-escape. The owner hit
+"stuck in a wall" at the water-filled chasm rim; the iteration-3 clamp only
+covers the drained bay. A general wedge detector (or relaxed climb-out
+below the safety line) protects every future player. Safety > flash.
+
+---
+
 ## 25 — 2026-06-19 — performance (the jitter goes) — closes #1, #2
 
 **Shipped:** Fixed the stutter, which was self-inflicted by iteration 12's
