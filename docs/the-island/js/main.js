@@ -369,6 +369,82 @@ function tickDive(dt) {
   }
 }
 
+// ---------------- the ascent (the dive run backward — #12, the fork-neutral keystone) ----
+// Run the swell BACKWARD: the whole world shrinks 240x around you until it is the model
+// on a chart table one level up, and you rise OUT into the level above. The mirror of the
+// dive; W.level DECREMENTS (clamped at 1, the surface). Stage 1 = the mechanic + the state
+// settle, started from a debug hook (ABYME.ascend). The owner's ending forks (ring-vs-climb,
+// who-you-are, the final camera) layer ON TOP later — none of them are decided here.
+let ascent = null;
+function startAscent(instant = false) {
+  if (W.level <= 1) { if (!instant) UI.whisper('There is no level above the surface. Not yet.'); return false; }
+  if (instant) { landAscent(); return true; } // debug/verify: skip the cinematic AND the mode-gate
+  if (MODE !== 'play') return false;
+  MODE = 'ascend';
+  player.locked = true;
+  interact.enabled = false;
+  UI.cinematic(true);
+  renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
+  farSea.visible = false;
+  // pivot: the chart table in THIS world — the world collapses toward the very place its
+  // own model stands, becoming that model one level up
+  const pivot = new THREE.Vector3(SPOTS.lighthouse.x, 14.5, SPOTS.lighthouse.y);
+  ascent = { t: 0, dur: 21, pivot, startQuat: camera.quaternion.clone(), snapDone: false, fading: false };
+  UI.whisper('You run the mechanism backward. The world begins to draw in.');
+  return true;
+}
+function landAscent() {
+  // the snap: the shrunk world becomes the model above; you stand at its chart table
+  diveGroup.scale.setScalar(1);
+  diveGroup.position.set(0, 0, 0);
+  W.level = Math.max(W.level - 1, 1); // one recursion shallower — clamp at the surface
+  save(player.pos);
+  // rise out at the study / chart table of the level above
+  player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
+}
+function tickAscent(dt) {
+  ascent.t += dt;
+  const f = clamp(ascent.t / ascent.dur, 0, 1);
+  if (!ascent.snapDone) {
+    // inverse of the dive: scale DOWN from 1 to SCALE_MODEL (the world becomes a model)
+    const s = Math.exp(easeInOut(f) * Math.log(SCALE_MODEL));
+    diveGroup.scale.setScalar(s);
+    diveGroup.position.set(
+      ascent.pivot.x * (1 - s),
+      ascent.pivot.y * (1 - s),
+      ascent.pivot.z * (1 - s));
+    // camera: lift away from the world drawing in below you
+    const lookUp = Math.sin(Math.min(f * 2.4, 1) * Math.PI) * 0.6;
+    const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(lookUp, player.yaw - f * 0.4, 0, 'YXZ'));
+    camera.quaternion.slerpQuaternions(ascent.startQuat, q, Math.min(1, f * 5));
+  }
+  if (f > 0.86 && !ascent.fading) {
+    ascent.fading = true;
+    UI.fadeOut(true, true);
+  }
+  if (f > 0.95 && !ascent.snapDone) {
+    ascent.snapDone = true;
+    landAscent();
+  }
+  if (f >= 1) {
+    ascent = null;
+    MODE = 'play';
+    renderer.setPixelRatio(BASE_DPR);
+    farSea.visible = true;
+    player.locked = false;
+    interact.enabled = true;
+    UI.cinematic(false);
+    UI.fadeIn(false);
+    setTimeout(() => document.getElementById('curtain').classList.remove('white'), 800);
+    // up, and the colour comes back — the inverse of the dive's curdle
+    UI.whisper({
+      1: 'The surface. The sea you woke beside — and the door you came in by.',
+      2: 'One level up. The colour creeps back into things.',
+      3: 'Up, and the room warms by a degree.',
+    }[W.level] || 'Up. And up.');
+  }
+}
+
 // ---------------- the finale ----------------
 function startFinale() {
   MODE = 'finale';
@@ -673,7 +749,9 @@ if (DEBUG) {
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
     setMist: (m) => { mistCur = clamp(m, 0, 1); },
     getMist: () => mistCur,
-    setFinaleT: (t) => { if (finale) finale.t = t; } };
+    setFinaleT: (t) => { if (finale) finale.t = t; },
+    ascend: (instant = false) => startAscent(instant),  // #12 stage 1: the dive run backward
+    getAscent: () => ascent && { t: ascent.t, dur: ascent.dur, snapDone: ascent.snapDone } };
 }
 function buildDebugPanel() {
   const el = document.createElement('div');
@@ -764,6 +842,7 @@ renderer.setAnimationLoop((tMs) => {
   }
 
   if (MODE === 'dive' && dive) tickDive(dt);
+  if (MODE === 'ascend' && ascent) tickAscent(dt);
   if (MODE === 'finale' && finale) tickFinale(dt);
 
   player.update(dt);

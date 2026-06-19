@@ -12,6 +12,52 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 52 — 2026-06-19 — design/story KEYSTONE (the ascent, stage 1 — the dive run backward)
+
+**Shipped:** The first half of the verb the SPINE has promised since Panel #1 — **UP.**
+The dive's 240× swell, run backward: the whole world shrinks until it is the model on
+a chart table one level up, and `W.level` DECREMENTS (clamped at 1, the surface). This
+is the fork-NEUTRAL keystone Panel #3 demanded — it pre-decides none of the owner's
+three forks (closed-vs-choice / who-you-are / final camera); those layer on top later.
+Stage 1 = the mechanic + the state settle, started from a debug hook; the in-play
+trigger and the unmissable beat are stages 2–3.
+
+- `main.js`: `startAscent(instant)` / `tickAscent` / `landAscent()` — exact mirror of
+  `startDive`/`tickDive`: scale `1 → SCALE_MODEL` (vs the dive's `1 → 1/SCALE_MODEL`),
+  pivot on the chart table, snap at f>0.95 → `W.level = max(level-1, 1)`, save, respawn
+  at the study/chart-table (rise OUT, one level up). Wired into the loop
+  (`MODE === 'ascend'`); exposed `ABYME.ascend(instant)` + `getAscent()`.
+- Fork-neutral by construction: NO ring-vs-climb choice, NO who-am-I reveal, NO final
+  camera move. Just the staircase.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors.
+- Swell math (numeric): ascent scale `1 → 0.00417` (=1/240) vs dive `1 → 240` — exact
+  inverses.
+- State transition (instant path): L4→3→2→1, each respawning at the chart table
+  (-82.8, -41.4); L1→clamp (returns false, stays 1). Re-grade is automatic (the same
+  `W.level`-driven `_apply`/`gradeAt`).
+- Real cinematic (play mode, via Begin+skip-intro): `ascend(false)` returns true,
+  enters `MODE='ascend'`, player locked, swell begins (scale dips below 1), no crash.
+- Visual: a mid-swell screenshot (forced scale) shows the entire world shrunk to a
+  small island-and-water tile floating in the full-size sea — "the world becomes a
+  model." HARNESS LIMIT (honest): the full 21s cinematic can't be watched to its snap
+  headless (a capture frame advances only ~0.11s; rAF otherwise suspended), so the snap
+  OUTCOME was verified via the instant path (same `landAscent`), and the swell via the
+  numeric formula + the started cinematic.
+
+**Debt:** none broken. The ascent has no IN-PLAY trigger yet (debug-only) — that's
+stage 2, deliberately. The receiving "chart table above" geometry the player lands at
+is the current study (fine); a bespoke arrival framing is later polish.
+
+**Next tick suggestion:** ASCENT STAGE 2 — give it an in-play trigger that costs (SPINE
+step 4: "each level up, a puzzle re-locks below, so you cannot yo-yo"). E.g. running the
+lamp/orrery mechanism backward, or a second brink-ritual at the plate that ascends
+instead of dives, with a chain flag re-arming on the level below. Keep fork-neutral.
+Then stage 3: the one UNMISSABLE beat (the shrink you feel + the keeper's voice falling
+silent behind you). NOTE iter 55 is the next push boundary — batch 11 will deploy 51–55.
+
+---
+
 ## 51 — 2026-06-19 — persona critique (Panel #3: the waiting room)
 
 **Shipped (a critique, not a build — a valid iteration per MISSION):** Panel #3
