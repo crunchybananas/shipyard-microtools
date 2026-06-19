@@ -119,6 +119,14 @@ const A = {
     this.room.gain.gain.setTargetAtTime(s.interior ? 0.16 : 0.0, t, 0.25);
   },
 
+  // the brink of a dive: the world holds its breath. Surf and wind pull back
+  // to near-silence so the choice to descend stands in the quiet alone; it
+  // swells back as the dive carries you down (or when you step away).
+  duckAmbient(on) {
+    if (!this.ready) return;
+    this.amb.gain.setTargetAtTime(on ? 0.05 : 1, ctx.currentTime, on ? 0.45 : 1.4);
+  },
+
   // ---------------- one-shots ----------------
   _env(node, t0, a, peak, dec) {
     node.gain.setValueAtTime(0.0001, t0);

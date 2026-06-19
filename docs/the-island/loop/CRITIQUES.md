@@ -7,6 +7,87 @@
 
 ---
 
+## Panel #2 — 2026-06-19 — the descent-so-far (the shipped decay)
+
+_Convened (iter 33, the panel due ~iter 34) to pressure-test what loops 30–32 actually shipped —
+the era-decay grade (gradeBias) + prop divergence (coat / window / footprints / bell) — BEFORE
+sinking a large iteration into the Drowned Gallery (#16). Four critics read the real code, not the
+pitch. Verdict was unanimous and, on inspection, correct. **Acted on the same iteration** — see the
+"Response" below and [LOG.md](LOG.md) #33._
+
+### THE SKEPTIC — back to check whether four "story" loops built a story or turned a knob
+
+**Verdict.** No — and the proof is in our own code: `W.level` is only ever set to `2`. A real player
+reaches L1 and L2; the entire five-era instrument (streetlight-green, false-gold, isolation-blue,
+near-dark) lives at L3–L5, **behind a debug flag, reachable by no one.** Loops 30–32 shipped a curve
+no player can walk and verified it via a console command. Grief is transitive — it needs a *someone* —
+and we faded the *belongings* of a person who has never appeared (an estate sale, not a bereavement).
+The dive is still a frictionless `flag('dove'); onDive()` — no fear, no cost, "a slide, not a leap."
+
+### THE ART DIRECTOR — judged the casts as shipped, ran the arithmetic first
+
+**Verdict.** Even when reachable, the grade won't read. `gradeBias` desaturates toward luminance
+FIRST, then blends the cast at only `0.10·d`, then darkens — so the cast arrives after its chroma is
+dead. A neutral wall at L2 lands **one 8-bit value off pure grey.** L4 and L5 collapse into the same
+blue-grey one notch dimmer; night×depth crushes to unreadable black. The descent is "a value-ramp
+cosplaying as a color-arc." **Fix (one line):** tint onto the full-chroma color FIRST, then desaturate
+the result, then darken — plus re-author the casts as saturated, separated hues (emotion via chroma,
+not darkness), resolve the warm-cold-warm-cold zigzag, and floor the darkness with one warm key light.
+
+### THE NARRATIVE ARCHITECT — holding the shipped code instead of the bible
+
+**Verdict.** "A spectacular ribcage and no legs." The level integer is a lie the world tells itself —
+richly branched in `gradeBias`/`_apply`, never incremented past 2. Three keystone loops built against
+a phantom input. Integration is unwritten and unwritable today: the ending needs a *self* to embrace
+and an *up* to ascend, and neither exists. **Critical path = make `W.level` move (down past 2, and
+back up) FIRST** — it retroactively converts three shipped loops from dead code into the felt descent
+they were meant to be. Then a voice at the bottom; then resolve the finale double-booking; THEN rooms.
+
+### THE FINISHER — dove, rang the bell, reporting from the chair
+
+**Verdict.** "Closer to landing, and that's the cruel part." The plate slides me down with no dread and
+`save()`s me at the bottom — the literal opposite of the SPINE's "the journal will not follow you
+down." Then the OLD golden victory finale plays at the floor of a grief: a parade in the wrong key.
+The one reachable level (L2, d=1) is the faintest rung, so the decay I can see is almost invisible.
+"You built a five-octave descent and shipped the first quarter-tone, then capped the game before the
+notes that hurt."
+
+### SHOWRUNNER — synthesis & re-prioritized critical path
+
+The descent is **not landing** — not for lack of atmosphere but for lack of **structure**: the
+vertical axis, the second person, and a recontextualized finale. Re-ordered build queue:
+
+1. **#12 the ASCENT / multi-dive** — make `W.level` reachable past 2 (and back up), with the dive's
+   COST (SPINE step 1). THE keystone; everything shipped depends on it.
+2. **#14 the Keeper voice + promote the figure** — the cheapest second person; grief needs an object.
+3. **#22 integration finale fork** (+ exempt the finale from `gradeBias`) — stop the wrong-key parade.
+4. **#13 redux** — fix `gradeBias` order-of-ops + re-author casts (now that levels are reachable).
+5. **#15 Keeper's Quarters** — first environment, the inhabited warm-lamp contrast (folds in #19).
+6. **#16 Drowned Gallery + #17 Vault** — abyss as architecture, once the spine carries weight.
+7. **#18 Room That Disagrees + #24 Threshold/dory** — payoffs that need the whole spine standing.
+
+**Do NOT build yet:** #16/#17 next (what LOG 31/32 wanted — the snow-globe sin at larger scale);
+#19 standalone; more prop-divergence beats; #18; #24; re-tuning casts in isolation; re-polishing the
+finale; coding the coat `visible:false` at L4+ (builds against the coat-is-yours reveal).
+
+**Process fix (all five voices):** amend MISSION so a tick gated on `W.level > 2` must ALSO ship the
+path that makes that level reachable in play — "verified via debug `W.level`" is the loophole that let
+three keystone loops ship dead code.
+
+### Response — iteration 33 (same loop)
+
+Did not just file it. **Shipped the keystone (#12 minimal) the same iteration:** the dive is now a
+committed, repeatable descent — a two-touch *brink ritual* (the world goes quiet, the cost is named:
+"The journal will not follow you down" / "The way back closes behind the light"; step off and it lets
+go), and the dive increments `W.level` to a capped `MAX_DEPTH` (4 for now — L5 is the keeper's
+near-dark floor, reserved until a keeper + warm lamp inhabit it). **The decay is reachable for the
+first time**, verified on-screen L1→L4 (progressive and distinct). Also applied the panel's coat fix
+(no longer vanishes at L4+) and paused autosave at the brink. Deferred per the showrunner's ordering:
+the grade-legibility reorder (#13 redux, step 4) and the keeper voice (step 2) are the next ticks —
+NOT half-fixed here. The finale double-booking and full ascent (up) remain open.
+
+---
+
 ## Panel — 2026-06-19 — story & world expansion
 
 _Convened when the owner reframed the game: Myst-**inspired**, not a clone (Journeyman Project,

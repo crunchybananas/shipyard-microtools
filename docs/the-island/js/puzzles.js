@@ -3,7 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL } from './world.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { SPOTS, heightAt } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
@@ -259,13 +259,28 @@ export class Game {
       },
     });
 
-    // the brass floor plate — THE DIVE
+    // the brass floor plate — THE DIVE. A committed descent, not a slide: the
+    // first touch brings you to the brink (the world goes quiet, the cost is
+    // named); a second, deliberate touch commits. Step off and the brink lets
+    // go. Repeatable — each dive takes you one level deeper toward the keeper.
     I.add({
       id: 'plate', targets: [R.deskPlate], label: 'the brass plate', maxDist: 3.5,
-      when: () => W.flags.plumbHung && !W.flags.dove,
+      when: () => W.flags.plumbHung,
       onClick: () => {
         const d = Math.hypot(this.player.pos.x - R.deskPlate.position.x, this.player.pos.z - R.deskPlate.position.z);
         if (d > 1.0) { UI.whisper('Stand on it.'); return; }
+        if (W.level >= MAX_DEPTH) { UI.whisper('There is nowhere further down. Something below has the last of the light.'); return; }
+        if (!this._brink) {
+          // arm: the threshold. The world holds its breath; name what it costs.
+          this._brink = true;
+          A.duckAmbient(true);
+          UI.whisper(W.flags.dove
+            ? 'The way back closes behind the light. Touch the plate again to go under.'
+            : 'The journal will not follow you down. Touch the plate again to descend — there is no climbing back.');
+          return;
+        }
+        // commit
+        this._brink = false;
         this.flag('dove');
         this.onDive();
       },
@@ -420,10 +435,24 @@ export class Game {
       });
     }
 
+    // the brink lets go if you step off the plate — a felt drawing-back
+    if (this._brink) {
+      const plate = this.refs.deskPlate;
+      if (!plate || Math.hypot(p.x - plate.position.x, p.z - plate.position.z) > 1.25) {
+        this._brink = false;
+        A.duckAmbient(false);
+        UI.whisper('You step back from the edge. The sea comes back.');
+      }
+    }
+
     // apply to both islands
     this._apply(this.refs, false, elapsed);
     this._apply(this.modelRefs, true, elapsed);
   }
+
+  // the player is poised on the plate, one touch from a committed descent —
+  // the main loop pauses autosave here (the journal won't follow you down)
+  atBrink() { return !!this._brink; }
 
   // ---------------------------------------------------- state → scene graph
   _apply(R, isModel, elapsed) {
@@ -494,7 +523,9 @@ export class Game {
     // slumped to the floor at level 3, gone below — the keeper more absent the
     // deeper you go (translation-only, so the stitched marginalia stays with it)
     if (R.coat) {
-      R.coat.visible = W.level >= 2 && W.level <= 3;
+      // present at every depth — the coat is the climb-out reveal (it is yours);
+      // it slumps from the hook to the floor as you descend, but never vanishes
+      R.coat.visible = W.level >= 2;
       const dropped = W.level >= 3;
       R.coat.position.set(0, dropped ? -0.95 : 0, dropped ? 0.15 : 0);
     }

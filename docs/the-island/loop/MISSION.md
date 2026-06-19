@@ -96,6 +96,14 @@ iterations' work. The synthesis of a panel updates SPINE.md and files issues.
   valve → chest/ruler → bridge → birdsong → lens → shadows → beam glyphs →
   dials → plumb → dive → bell. If you touch terrain, puzzles, props, or
   player movement, re-verify the affected links of that chain.
+- **No debug-only payoffs (Panel #2, 2026-06-19).** A tick whose effect is only
+  reachable by forcing state through `?debug` — e.g. behavior gated on
+  `W.level > 2`, a flag a player can't yet set — is NOT shippable as a "story"
+  or "wow" feature unless it ALSO ships the in-play path that makes that state
+  reachable. "Verified via debug `W.level`" is not verification: loops 30–32
+  shipped a five-level decay no player could reach (the dive only ever set
+  `W.level = 2`). If you can't make the effect reachable this tick, it is
+  **VISUAL DEBT**, logged as such — not a shipped feature, and not "verified."
 - Saves must survive: new persistent state goes through `world.js`
   `save()/load()` with a backward-compatible default.
 

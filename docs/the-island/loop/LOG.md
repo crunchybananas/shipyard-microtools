@@ -12,6 +12,51 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 33 — 2026-06-19 — story (persona panel #2 → the descent becomes reachable) — #12 keystone
+
+**Shipped:** Persona panel #2 (skeptic / art director / narrative architect / finisher →
+showrunner) on the decay shipped in loops 30–32 — and **acted on its verdict the same iteration.**
+The panel's unanimous, code-verified finding: the entire five-era decay was **unreachable** —
+`W.level` was only ever set to `2` (`main.js:300`), so L3–L5 (false-gold / isolation-blue /
+near-dark) lived behind a debug flag, "a five-octave instrument playing one quarter-tone." And the
+dive cost nothing ("a slide, not a leap"). So I built the keystone (#12 minimal, = SPINE endgame
+step 1):
+- **The dive is a committed *brink ritual*** (`puzzles.js` plate): first touch brings you to the
+  brink — `A.duckAmbient(true)` drops surf/wind to near-silence, a loss-whisper names the cost
+  ("The journal will not follow you down." / "The way back closes behind the light.") — and a
+  **second deliberate touch** commits. Step off the plate and the brink lets go ("You step back from
+  the edge."). Autosave pauses at the brink (`game.atBrink()` gate in `main.js`).
+- **The dive now increments the level** (`main.js` tickDive: `W.level = Math.min(W.level+1, MAX_DEPTH)`,
+  was hardcoded `2`), repeatable, capped at `MAX_DEPTH = 4` (new in `world.js`). L5 (the keeper's
+  near-dark floor) is reserved until a keeper + warm lamp inhabit it — an empty near-black room ships
+  with #14/#15, not before. **The decay is reachable for the first time.**
+- **Panel coat fix:** the coat no longer vanishes at L4+ (it slumps but stays) — it's the
+  climb-out "it was always yours" reveal; deleting it builds against the SPINE.
+
+All metaphor, no biography, no JS dep, no asset.
+
+**Evidence:** in-play (`?debug`, muted) verification — decay reachable & **progressive** L1→L4
+at fixed noon vantage (4 screenshots: bright→subtly-muddier→duller-grey→cold-dim-hazy); brink ritual
+verified by driving the plate hotspot in play — arm (`atBrink` true, not committed, movement free) →
+commit (`dove` set, player locked, dive cinematic runs); brink-cancel watchdog (step off → released);
+re-divable at L2 (`when()` true); cap at L4 refuses; **save/load round-trip** (reload→Continue
+restores level 2 via the dove-load rule). Zero console errors. fps 275–466, draws ~180–204, tris 519k.
+
+**Debt:** **NEW VISUAL DEBT (panel, deferred by design):** `gradeBias` desaturates before tinting,
+so the era *casts don't read as their named hues* (L3 "false-gold" reads grey, not gold) — the decay
+is a value-ramp, not yet a color-arc. The fix (tint→desat→darken reorder + re-author casts as
+saturated separated hues + darkness floor + warm key light) is **#13 redux**, the panel's step 4 —
+deliberately NOT half-fixed here (reachability before refinement). Also open: finale double-booking
+(step 3) and the UP/ascent (step 4).
+
+**Next tick suggestion:** **#14 the Keeper voice + promote the figure** (panel critical-path step 2) —
+the cheapest second person: a band-limited synthesized line keyed off existing chain flags ("Oh. Not
+again." on the second dive) + promoting `tinyFigure`/`nestedGlint` from a 1mm speck to a met, facing
+presence at the deepest reachable level. Grief is transitive; now that the player can descend, they
+must descend TOWARD someone. (#13 redux is also strong, but a person at the bottom outranks legibility.)
+
+---
+
 ## 32 — 2026-06-19 — story (the trail washes away, the bell stirs) — closes #13
 
 **Shipped:** The last two prop-divergence beats, completing #13 (grade +

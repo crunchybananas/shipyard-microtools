@@ -1,7 +1,7 @@
 // main.js — boot, light, loop. ABYME: an island within an island.
 
 import * as THREE from 'three';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, mistTargetAt, waterY, wavePhase, SCALE_MODEL } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
 import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
@@ -255,6 +255,7 @@ function startDive() {
   player.locked = true;
   interact.enabled = false;
   UI.cinematic(true);
+  A.duckAmbient(false); // the held breath releases — the sea swells back as you fall
   A.diveSweep(21);
   renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
   farSea.visible = false;
@@ -297,7 +298,7 @@ function tickDive(dt) {
     dive.snapDone = true;
     diveGroup.scale.setScalar(1);
     diveGroup.position.set(0, 0, 0);
-    W.level = 2;
+    W.level = Math.min(W.level + 1, MAX_DEPTH); // one recursion deeper each dive
     save(player.pos);
     player.spawn(new THREE.Vector3(4, 0, -104), 2.19, 0.02);
   }
@@ -311,8 +312,13 @@ function tickDive(dt) {
     UI.cinematic(false);
     UI.fadeIn(false);
     setTimeout(() => document.getElementById('curtain').classList.remove('white'), 800);
-    UI.whisper('The same sand. The same sky.');
-    setTimeout(() => UI.whisper('Somewhere above, a door stands open now.'), 6000);
+    // the same island, more drowned each time — the sameness is the wound
+    UI.whisper({
+      2: 'The same sand. The same sky.',
+      3: 'The same sand — the colour going out of it.',
+      4: 'The same room, gone cold and far. Below it, a light still burns.',
+    }[W.level] || 'Down, and down.');
+    if (W.level === 2) setTimeout(() => UI.whisper('Somewhere above, a door stands open now.'), 6000);
   }
 }
 
@@ -680,7 +686,9 @@ renderer.setAnimationLoop((tMs) => {
     mist: mistCur,
   });
 
-  if (MODE === 'play') {
+  // autosave — but not while poised on the brink of a dive: the journal will
+  // not follow you down, so the world stops recording as you cross the threshold
+  if (MODE === 'play' && !game.atBrink()) {
     saveTimer += dt;
     if (saveTimer > 12) { saveTimer = 0; save(player.pos); }
   }

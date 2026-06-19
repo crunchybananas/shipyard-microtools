@@ -7,6 +7,12 @@ import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './uti
 
 export const SCALE_MODEL = 1 / 240;
 
+// the deepest reachable descent for now. The decay system (gradeBias) and the
+// prop divergence run to L5+, but L5 is the keeper's near-dark floor — an empty
+// near-black room until a keeper + a warm lamp inhabit it (#14/#15). So the
+// playable descent bottoms at L4 (isolation-blue, still legible) until then.
+export const MAX_DEPTH = 4;
+
 export const W = {
   // master clock, hours 0..24. Sun stands where you leave it (plus a slow drift).
   time: 7.4,

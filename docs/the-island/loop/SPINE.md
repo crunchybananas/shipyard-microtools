@@ -70,7 +70,21 @@ GRIEF — the recursion is a person's refusal to let go. At the deepest reachabl
 
 Make LEAVING the true endgame and the mirror of the dive — the game currently has only DOWN, and that is the bug, not a detail. The sequence, built entirely from systems already shipped or cheaply extended:
 
-1) RECONTEXTUALIZE THE DIVE (small). The brass-plate dive that today just sets W.level = 2 (main.js:300) becomes a CHOICE with a cost, not a slide. When the plumb bob hangs and the plate goes live, autosave visibly stops ('The journal will not follow you down.'), surf and wind drop to near-silence, and a deliberate SECOND input is required to commit. One whisper frames it as loss, not arrival ('The way back closes behind the light.'). The leap must be feared before it can mean anything.
+> **★ Critical path (Panel #2, 2026-06-19 — [CRITIQUES.md](CRITIQUES.md)):** the panel proved the
+> decay shipped in loops 30–32 was *unreachable* (`W.level` never exceeded 2 — the era-eras lived
+> behind a debug flag). Re-ordered build queue: **(1) make `W.level` reachable + cost the dive
+> [✓ iter 33] → (2) #14 Keeper voice + promote the figure → (3) #22 finale fork + exempt the finale
+> from `gradeBias` → (4) #13 redux: fix `gradeBias` order-of-ops + re-author casts → (5) #15 Keeper's
+> Quarters → (6) #16/#17 abyss rooms → (7) #18/#24.** Do NOT build the abyss rooms (#16/#17) before the
+> spine carries weight; do NOT re-tune casts in isolation; do NOT code the coat `visible:false` at L4+.
+
+1) RECONTEXTUALIZE THE DIVE (small) — **✓ SHIPPED iter 33.** The brass-plate dive that just set
+W.level = 2 is now a CHOICE with a cost: a two-touch *brink ritual* (first touch → the world goes
+quiet via `A.duckAmbient`, the cost is named — 'The journal will not follow you down.' /
+'The way back closes behind the light.'; step off the plate and it lets go; a second touch commits),
+autosave pauses at the brink, and the dive now *increments* `W.level` to a capped `MAX_DEPTH` (4 for
+now) — so the descent is **reachable** and **repeatable** for the first time. Still open: the bell
+finale fires the old golden parade at depth (step 3), and there is no UP yet (step 4).
 
 2) DIVERGE EACH LEVEL (medium). Drive the existing W.level integer into the grades and prop set so descent reads as decay, not a copy machine: a gradeBias(level) that desaturates/darkens the five master grades (no new hex — the Art Director's deep-via-existing-channels rule), the seeded mist ceiling rises so the fret never fully burns off by level 3, and one prop changes per level (coat on the hook → on the floor → gone; footprints out of the sea → into the sea; warm window lit → dark; the bell already faintly swinging). The chain stays solvable; the WORLD curdles. The bell's pitch drops a semitone per level as a HUD-free depth cue.
 
