@@ -12,6 +12,44 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 65 — 2026-06-20 — GRAPHICS LANE #2: per-grade exposure (five MOODS, not five hue-swaps) — BATCH PUSH
+
+**Shipped:** the first real Quality-Bar win. ACES was running at a FIXED 1.06 exposure, so the
+five master grades differed only in HUE, never in TONE (the art director's core complaint: night
+and noon shared identical highlight clamping). Now each grade carries its own `exposure` and
+`renderer.toneMappingExposure` is driven from the active grade every frame — noon reads **airy /
+lifted (1.16)**, golden **warm (1.10)**, dawn 1.05, dusk 0.98, night **crushed / cool (0.92)**.
+The world finally has five moods.
+
+- `world.js`: `exposure` added to the `G()` grade factory (default 1.06, backward-compatible) +
+  per-grade values; lerped in `gradeAt` alongside sunInt/fogDen. Left OUT of `gradeBias` on
+  purpose so the L2–L4 depth-decay (colour-based, with `_LUM_FLOOR`) never compounds with a low
+  night exposure into pure black.
+- `main.js`: `renderer.toneMappingExposure = g.exposure` in `applyAtmosphere`.
+
+**POWER LEDGER (MISSION requirement) — power-neutral by construction.** `toneMappingExposure` is a
+uniform multiply inside the already-running ACES output; it changes no draws, no tris, no GPU
+workload. From the `?debug` bench pose: noon 279 draws / 522k tris, night 238 / 522k, golden 238 /
+522k (draw variance = camera/level framing, not this change); GPU-ms readings fluctuated 6–16ms =
+headless-virtualization noise, NOT the exposure (a uniform cannot change GPU cost). BEFORE == AFTER.
+
+**Evidence:** in-play (`?debug`). `renderer.toneMappingExposure` reads 1.16 at noon, 1.10 golden,
+0.92 night (driven by the grade). Four-mood screenshots: noon airy-bright, golden warm-coral, night
+crushed-cool-starry — they read as distinct MOODS now, not hue swaps. **Depth safety:** L4 + night
+(worst-case) stays legible — terrain/trees/lighthouse visible, NOT black. Clean URL `/`: title +
+WebGL OK, no debug panel, zero console errors — players unaffected.
+
+**Deployed:** pushed — this batch carries the GRAPHICS MISSION AMENDMENT + lane #1 (Power Ledger) +
+lane #2 (per-grade exposure). (iters 61–63 + the UX fixes / see-through-wall fix already went out
+on-demand earlier.) Push-cadence memory updated; next boundary ~iter 70.
+
+**Next tick:** axis must leave graphics (lane = ≤1 in 3, not two in a row) — a story/secret or
+polish beat, OR the owner's endgame fork if they call it. The graphics lane resumes later at #3
+(the cheap CUT stack: gate the 7 conditional point-lights on state edges, particle frustum-cull,
+beam .visible gate, water fbm 4→3 — banks headroom for the eventual bloom).
+
+---
+
 ## 64 — 2026-06-20 — GRAPHICS LANE #1: the Power Ledger (GPU-frame-ms + bench pose) — THE GATE
 
 **Shipped:** the measurement gate the whole graphics roadmap depends on (MISSION "Graphics

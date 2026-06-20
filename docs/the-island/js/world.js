@@ -104,7 +104,11 @@ export function mistTargetAt(t) {
 
 // ---------------- the five master grades -------------------------------------
 // Only these palettes exist; every hour interpolates between them.
-const G = (skyTop, skyHorizon, sunCol, sunInt, hemiSky, hemiGnd, fog, fogDen, water, waterShallow) => ({
+// exposure (last arg) feeds renderer.toneMappingExposure per grade — the ACES tonemap
+// was running at a FIXED 1.06, so the five grades differed only in hue, never in TONE.
+// Now noon reads airy/lifted, night crushed/cool — five MOODS, not five colour swaps.
+// (Modest deltas around 1.06; depth-decay stays colour-based so it never compounds to black.)
+const G = (skyTop, skyHorizon, sunCol, sunInt, hemiSky, hemiGnd, fog, fogDen, water, waterShallow, exposure = 1.06) => ({
   skyTop: new THREE.Color(skyTop),
   skyHorizon: new THREE.Color(skyHorizon),
   sunCol: new THREE.Color(sunCol),
@@ -115,14 +119,15 @@ const G = (skyTop, skyHorizon, sunCol, sunInt, hemiSky, hemiGnd, fog, fogDen, wa
   fogDen,
   water: new THREE.Color(water),
   waterShallow: new THREE.Color(waterShallow),
+  exposure,
 });
 
 const GRADES = {
-  night:  G(0x070b1c, 0x101b30, 0x9fb8d9, 0.22, 0x1a2440, 0x0b0e14, 0x0a1322, 0.0042, 0x06141c, 0x0d2c33),
-  dawn:   G(0x32507c, 0xf5c99b, 0xffd9a0, 0.85, 0x7fa8c9, 0x4a4030, 0xc9b49a, 0.0055, 0x16444e, 0x3f8d85),
-  noon:   G(0x3a7ab8, 0xbfe0ee, 0xfff4e0, 1.25, 0x9ec7e0, 0x6a6048, 0xcfe3e8, 0.0030, 0x15454f, 0x4fae9d),
-  golden: G(0x4a5e96, 0xff8a5c, 0xffc37a, 1.05, 0x9b89b8, 0x5c4a36, 0xe8b08a, 0.0050, 0x1c4250, 0x52938b),
-  dusk:   G(0x1c2350, 0x5c4d7d, 0xff9a76, 0.45, 0x47446e, 0x231f22, 0x4a4366, 0.0052, 0x0c2733, 0x2a5a58),
+  night:  G(0x070b1c, 0x101b30, 0x9fb8d9, 0.22, 0x1a2440, 0x0b0e14, 0x0a1322, 0.0042, 0x06141c, 0x0d2c33, 0.92),
+  dawn:   G(0x32507c, 0xf5c99b, 0xffd9a0, 0.85, 0x7fa8c9, 0x4a4030, 0xc9b49a, 0.0055, 0x16444e, 0x3f8d85, 1.05),
+  noon:   G(0x3a7ab8, 0xbfe0ee, 0xfff4e0, 1.25, 0x9ec7e0, 0x6a6048, 0xcfe3e8, 0.0030, 0x15454f, 0x4fae9d, 1.16),
+  golden: G(0x4a5e96, 0xff8a5c, 0xffc37a, 1.05, 0x9b89b8, 0x5c4a36, 0xe8b08a, 0.0050, 0x1c4250, 0x52938b, 1.10),
+  dusk:   G(0x1c2350, 0x5c4d7d, 0xff9a76, 0.45, 0x47446e, 0x231f22, 0x4a4366, 0.0052, 0x0c2733, 0x2a5a58, 0.98),
 };
 
 // time → blend of grades, by hour
@@ -199,6 +204,7 @@ export function gradeAt(t) {
   lerpColor(_grade.waterShallow, a.waterShallow, b.waterShallow, f);
   _grade.sunInt = lerp(a.sunInt, b.sunInt, f);
   _grade.fogDen = lerp(a.fogDen, b.fogDen, f);
+  _grade.exposure = lerp(a.exposure, b.exposure, f);
   // the finale is the resolution — it must NOT inherit the descent's curdle.
   // W._finaleWarm forces the clean (level-1) grade so the ending lands warm,
   // not desaturated by how deep you rang the bell (#22).

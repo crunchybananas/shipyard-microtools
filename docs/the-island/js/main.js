@@ -603,6 +603,7 @@ let saveTimer = 0;
 
 function applyAtmosphere(elapsed, dt) {
   const g = gradeAt(W.time);
+  renderer.toneMappingExposure = g.exposure; // per-grade tone (#2): noon airy, night crushed
   sunDir(W.time, _sunV);
   moonDir(W.time, _moonV);
   const el = sunElevation(W.time);
