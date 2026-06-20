@@ -14,6 +14,7 @@ export const UI = {
     this.journalEntries = $('journal-entries');
     this.journalTab = $('journal-tab');
     this.soundTab = $('sound-tab');
+    this.motionTab = $('motion-tab');
     this.hint = $('controls-hint');
     this._whisperTimer = null;
     this._whisperQueue = [];
@@ -21,6 +22,9 @@ export const UI = {
     this.journalTab.addEventListener('click', () => this.toggleJournal());
     this.soundTab.addEventListener('click', () => this.toggleMute());
     this.soundTab.classList.toggle('muted', A.muted); // reflect the persisted/?param state
+    this.motionTab.addEventListener('click', () => this.toggleMotion());
+    this.motionTab.classList.toggle('reduced', W.reduceMotion); // reflect persisted/OS state
+    this.motionTab.title = W.reduceMotion ? 'Motion: reduced' : 'Motion: full';
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyJ') this.toggleJournal();
       if (e.code === 'Escape') this.journalEl.classList.add('hidden');
@@ -35,6 +39,15 @@ export const UI = {
     this.soundTab.classList.toggle('muted', A.muted);
     this.soundTab.title = A.muted ? 'Sound: off (M)' : 'Sound: on (M)';
     this.whisper(A.muted ? 'The sea goes quiet.' : 'The sea breathes again.', 2400);
+  },
+
+  // ---- reduced motion: a visible comfort toggle, persisted ----
+  toggleMotion() {
+    W.reduceMotion = !W.reduceMotion;
+    try { localStorage.setItem('abyme-reduce-motion', W.reduceMotion ? '1' : '0'); } catch (e) {}
+    this.motionTab.classList.toggle('reduced', W.reduceMotion);
+    this.motionTab.title = W.reduceMotion ? 'Motion: reduced' : 'Motion: full';
+    this.whisper(W.reduceMotion ? 'The world steadies.' : 'The world sways again.', 2400);
   },
 
   // ---- whisper: one quiet italic line at a time ----
@@ -74,6 +87,7 @@ export const UI = {
     setTimeout(() => this.hint.classList.remove('show'), 9000);
     this.journalTab.classList.add('show');
     this.soundTab.classList.add('show');
+    this.motionTab.classList.add('show');
   },
 
   // ---- journal ----

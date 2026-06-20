@@ -955,11 +955,12 @@ renderer.setAnimationLoop((tMs) => {
     INTRO_PATH.getPoint(e, camera.position);
     // the lower the flight, the more the swell owns the camera
     const lowness = clamp(1 - (camera.position.y - 1.6) / 12, 0, 1);
-    camera.position.y += Math.sin(elapsed * 0.9) * lerp(0.12, 0.55, lowness) * (1 - f * f);
+    const sway = W.reduceMotion ? 0 : 1; // reduced-motion: keep the flight, drop the sway/bank
+    camera.position.y += Math.sin(elapsed * 0.9) * lerp(0.12, 0.55, lowness) * (1 - f * f) * sway;
     INTRO_LOOK.getPoint(e * e, _introLookV);
     camera.lookAt(_introLookV);
     // banking — damped to zero as we land, so the handoff has no residual roll
-    camera.rotation.z += Math.sin(elapsed * 0.55 + 1.7) * 0.022 * lowness * (1 - f * f);
+    camera.rotation.z += Math.sin(elapsed * 0.55 + 1.7) * 0.022 * lowness * (1 - f * f) * sway;
     const su = spray.material.uniforms;
     su.uGlobal.value = smoothstep(0.18, 0.38, e) * (1 - smoothstep(0.72, 0.9, e));
     su.uTime.value = elapsed;

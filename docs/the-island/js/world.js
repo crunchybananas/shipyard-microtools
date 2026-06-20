@@ -18,6 +18,17 @@ export const W = {
   time: 7.4,
   timeDrift: 1 / 240, // game-hours per real second when idle
 
+  // accessibility: when set, dampen head-bob + the intro flight's sway/bank.
+  // Honors the OS prefers-reduced-motion by default; the in-game toggle overrides
+  // and persists. NOT in flags — it's a client comfort preference, not save state.
+  reduceMotion: (() => {
+    try {
+      const s = localStorage.getItem('abyme-reduce-motion');
+      if (s !== null) return s === '1';
+      return matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) { return false; }
+  })(),
+
   // tide: 1 = high, 0 = drained. Driven by the brass valve.
   tide: 1,
   tideTarget: 1,

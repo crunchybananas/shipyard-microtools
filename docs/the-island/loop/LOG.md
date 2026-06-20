@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 73 — 2026-06-20 — accessibility: a reduced-motion comfort toggle
+
+**Shipped:** the game had no motion-comfort option — the intro flight's sway/bank and the walking
+head-bob played for everyone, and nothing honored the OS's prefers-reduced-motion. Now a third
+top-right tab (beside sound + journal) toggles reduced motion: head-bob and the intro flight's
+sway/bank drop to zero (the flight and the dive's essential scale stay). It DEFAULTS from the OS
+prefers-reduced-motion setting and persists, so motion-sensitive players get a steady world
+automatically and can flip it any time — a visible in-UI toggle, exactly the affordance the owner
+asked for (not a query param), matching the sound-tab vocabulary.
+
+**How:** `W.reduceMotion` (client preference, NOT save state) inits from localStorage
+'abyme-reduce-motion' else `matchMedia('(prefers-reduced-motion: reduce)')`. A `#motion-tab` button
+mirrors the sound-tab (icon = motion arcs + a slash when reduced); `UI.toggleMotion()` flips +
+persists + updates the button + whispers ("The world steadies." / "The world sways again."). Gated:
+player.js head-bob × `(reduceMotion?0:1)`; main.js intro flight bob + bank × the same `sway` factor.
+The dive/ascent SCALE is a smooth zoom (not oscillatory) and is left intact.
+
+**Evidence (`?debug`):** motion-tab renders as the third tab (right:110, top:18, no overlap with
+sound@64 / journal@18); defaults full (headless has no OS pref). Click → reduceMotion true, 'reduced'
+class, title "Motion: reduced", localStorage '1', whisper "The world steadies."; head-bob term = 0
+when reduced vs 0.045 full; click again reverts + persists '0'. Screenshot confirms the slashed-motion
+icon in the reduced state. ZERO console errors. Non-graphics, fork-neutral, +0 runtime.
+
+**Debt:** none. (Future option: a gentler ease for the dive/ascent 240× zoom under reduced-motion —
+but it's a smooth scale, low nausea risk; left for a dedicated tick if asked.)
+
+**Next tick (74):** GRAPHICS is eligible again (axis: 71 graphics, 72 story, 73 story) — cut-stack
+#3b (gate the conditional point-lights on state edges, with a Power Ledger) or #5a aerial haze. Honor
+an owner endgame-fork redirect FIRST.
+
+---
+
 ## 72 — 2026-06-20 — story (the journal's emotional climaxes get their marginalia)
 
 **Shipped:** the journal draws a hand-inked sketch beside each entry — but only the PUZZLE entries

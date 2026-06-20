@@ -63,7 +63,7 @@ export class Player {
     this.pos.y = groundY;
     this.camera.position.set(
       this.pos.x,
-      groundY + this.eye + Math.sin(this.bobPhase) * 0.045 * this.bobAmp,
+      groundY + this.eye + Math.sin(this.bobPhase) * 0.045 * this.bobAmp * (W.reduceMotion ? 0 : 1),
       this.pos.z);
     this.camera.rotation.set(0, 0, 0);
     this.camera.rotateY(this.yaw);
