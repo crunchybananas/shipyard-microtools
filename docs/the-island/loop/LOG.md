@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 56 — 2026-06-19 — persona critique (Panel #4: the return, the arc now whole)
+
+**Shipped (a critique, not a build — valid per MISSION):** Panel #4 convened the moment
+the ascent went live, to pause-and-assess after the four-tick build before piling on more.
+Three critics (the Finisher replayed the full descent-and-return; the Skeptic; the
+Narrative Architect) judged: the arc is structurally whole and lands ~80%, the keeper's
+silence as you turn back is the best beat in the game — but THREE fork-neutral gaps remain:
+
+1. **DISCOVERABILITY (highest, small):** a player who rings the bell at the bottom — the
+   obvious action — may never learn the plate turns back into the way up. The one true
+   payoff is gated behind a guess. Point at it unmissably (without forcing the choice).
+2. **THE RETURN LEAVES A MARK (small-med):** climbing out to the surface lands you back
+   exactly as you started; the arc promised you return CHANGED. Show one fingerprint.
+3. **GIVE THE CLIMB WEIGHT (med, optional):** the climb is too symmetric with the dive (a
+   surrender vs an effort); make it slower/lonelier/a per-level re-lock.
+
+Plus a larger, filed note: ACT TWO (the puzzle chain) still reads as clever toys
+disconnected from the grief — cheapest fix is making 1–2 existing beats rhyme with the
+keeper's story. Not rushed.
+
+- `loop/CRITIQUES.md`: Panel #4 (newest first).
+- `loop/SPINE.md`: endgame note records the three ranked gaps.
+- Issue #12 sharpened with the ranked fork-neutral polish list.
+
+**Evidence:** N/A (doc-only critique tick; no code changed). Committed locally; not a push
+boundary (next at 60). Axis: critique (varies from the 52–55 ascent build run).
+
+**Next tick suggestion:** BUILD GAP #1 — the climb's discoverability. At the bottom (after
+the keeper beat and/or after the bell), an unmissable pointer that the plate is the way
+back ("The plate is still here. It only ever went one way before." + maybe a brass glint /
+the keeper naming it once). Fork-neutral; protects the whole ascent. Then gap #2 (the
+return leaves a mark) next.
+
+---
+
 ## 55 — 2026-06-19 — story polish + BATCH 11 PUSH (the ascent goes live)
 
 **Shipped:** A small, re-readable payoff for the climb, then the deploy. On the first

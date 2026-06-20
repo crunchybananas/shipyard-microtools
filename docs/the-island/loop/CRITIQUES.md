@@ -7,6 +7,90 @@
 
 ---
 
+## Panel #4 — 2026-06-19 — the return (the arc, now whole)
+
+_Convened (iter 56, ~5 builds since Panel #3) the moment the ascent went LIVE — the
+structural gap Panel #1/#3 named is filled: descend to the bottom on the brass plate,
+then climb back up one level at a time, the keeper falling silent behind you, the light
+left burning. Three critics played the complete descent-and-return and asked the only
+question left: does it LAND, and what's the highest-wow move that ISN'T the owner's to
+decide? (Pause-and-assess after a big four-tick build, before piling on more.)_
+
+### THE FINISHER — played it all the way down and all the way back up
+
+**Verdict.** For the first time I felt the SHAPE. Going down had weight before; now it has
+a counterweight, and that retroactively changes the descent — every level I sank, I knew
+I'd have to climb back through. The keeper's last line as I turned ("don't leave the light
+on for me; I never could") and then the silence behind me is the best beat in the game.
+BUT two problems a real player WILL hit. (1) DISCOVERABILITY: I only found the climb
+because I'd exhausted the dive and idly touched the plate again. A player who rings the
+bell at the bottom — the obvious, sign-posted action — may never learn the plate turns
+back. The one true payoff is gated behind a guess. (2) THE RETURN IS UNDERWRITTEN at the
+top: I climb all the way out and get "The surface. The sea you woke beside…" and then
+nothing — I'm back at level 1 exactly as I started. The arc PROMISED I'd return changed;
+the world doesn't show it. The descent curdles the world per level; the return should
+leave ONE mark that I went down and came back.
+
+### THE SKEPTIC — is "complete" the same as "lands"?
+
+**Verdict.** Structurally yes, emotionally almost. The ascent is real and not a lean-in —
+credit where due, the loop built the hard thing. But the climb is mechanically symmetric
+to the dive (same swell, inverted) and that's a touch TOO clean: going up feels like going
+down with the sign flipped, not a different ACT. The dive is a surrender (you fall); the
+climb should be an EFFORT (you carry something heavy up). They cost the same (one brink
+touch) and move the same (21s swell). The SPINE says "carrying them, whole" — but the
+player carries nothing; they just touch the plate the other way. Where is the weight? And
+the discoverability gap is the real risk: you can 100% the game and never climb, which
+makes your thesis OPTIONAL. The thing you spent four loops building can be missed.
+
+### THE NARRATIVE ARCHITECT — the arc is whole; is the middle?
+
+**Verdict.** The bookends are now superb: wash-up (mystery) → descent (grief) → bottom
+(the keeper) → ascent (integration) → surface (return). What still doesn't pull its weight
+is ACT TWO — the puzzle chain (valve, ruler, bird, lens, shadow, plumb). It's the same
+"sequence of clever toys" I flagged in Panel #1, and the contrast is now sharper: the
+descent and ascent MEAN something and the puzzles between them mostly don't. The cheap fix
+isn't new puzzles — it's making one or two EXISTING beats rhyme with the keeper's story
+(the valve = the day he tried to hold the water back; the plumb = measuring a depth he
+already knew). Some of this is in whispers; promote it. Larger than the ascent gaps — file
+it, don't rush it.
+
+### SHOWRUNNER — synthesis & the fork-neutral next moves
+
+The arc is whole and lands ~80%. Three fork-NEUTRAL gaps to close before the owner's forks
+even matter — ranked by wow-per-effort:
+
+1. **DISCOVERABILITY of the climb (HIGHEST, small).** The one true payoff cannot be
+   missable. At the bottom — after the keeper beat, and/or after the bell — the world must
+   POINT at the plate as the way back (an unmissable whisper: "The plate is still here. It
+   only ever went one way before."; the keeper naming it once; a glint on the brass). Do
+   NOT force the choice (that's the ring-vs-climb fork) — just make sure the player KNOWS
+   the way up exists. This protects everything loops 52–55 built.
+2. **THE RETURN LEAVES A MARK (small-medium, fork-neutral).** Climbing out to the surface
+   should show ONE change proving you went down and came back — not an ending (that's the
+   fork), just evidence: the chart-table tally still scratched there; a keeper-hand journal
+   line that's now in YOUR hand; the coat on your shoulders / gone from its hook because
+   it's yours now. One detail. The descent curdles; the return should leave a fingerprint.
+3. **GIVE THE CLIMB WEIGHT (medium).** Make ascending feel different from diving, not
+   symmetric — slower, or lonelier in the keeper's silence, or a per-level re-lock (the
+   SPINE's literal "re-lock below," currently the blunt one-way flag). Optional; #1 and #2
+   matter more.
+
+**NOT now:** the three ending forks (owner's); more environments (all shipped); more perf
+(healthy). Act-two rhyme (Architect) is real but larger — filed, not rushed.
+
+**Process:** the owner hasn't playtested the live ascent yet. #1 (discoverability) is the
+thing most likely to make that playtest LAND instead of confuse — build it next. → #12.
+
+### Response — iteration 56
+
+Filed this panel; sharpened issue #12 with the discoverability + return-mark + climb-weight
+priorities; updated SPINE step 4/5 notes. Did NOT build this tick (critique iteration). Next
+build tick = #1, the climb's discoverability (an unmissable pointer at the bottom), kept
+fork-neutral.
+
+---
+
 ## Panel #3 — 2026-06-19 — the waiting room (polish while the endgame is gated)
 
 _Convened (iter 51, ~5 builds since Panel #2) to pressure-test the LIVE build —
