@@ -24,11 +24,12 @@ export const UI = {
     this.soundTab.classList.toggle('muted', A.muted); // reflect the persisted/?param state
     this.motionTab.addEventListener('click', () => this.toggleMotion());
     this.motionTab.classList.toggle('reduced', W.reduceMotion); // reflect persisted/OS state
-    this.motionTab.title = W.reduceMotion ? 'Motion: reduced' : 'Motion: full';
+    this.motionTab.title = W.reduceMotion ? 'Motion: reduced (C)' : 'Motion: full (C)';
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyJ') this.toggleJournal();
       if (e.code === 'Escape') this.journalEl.classList.add('hidden');
       if (e.code === 'KeyM') this.toggleMute();
+      if (e.code === 'KeyC') this.toggleMotion();   // comfort/reduced-motion, key parity with M + J
     });
     this.renderJournal();
   },
@@ -46,7 +47,7 @@ export const UI = {
     W.reduceMotion = !W.reduceMotion;
     try { localStorage.setItem('abyme-reduce-motion', W.reduceMotion ? '1' : '0'); } catch (e) {}
     this.motionTab.classList.toggle('reduced', W.reduceMotion);
-    this.motionTab.title = W.reduceMotion ? 'Motion: reduced' : 'Motion: full';
+    this.motionTab.title = W.reduceMotion ? 'Motion: reduced (C)' : 'Motion: full (C)';
     this.whisper(W.reduceMotion ? 'The world steadies.' : 'The world sways again.', 2400);
   },
 

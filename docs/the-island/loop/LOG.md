@@ -12,6 +12,28 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 78 — 2026-06-20 — accessibility: keyboard + hint parity for the reduced-motion toggle
+
+**Shipped:** the reduced-motion comfort toggle (iter 73) was the only one of the three
+top-right toggles with NO keyboard shortcut and no mention in the control hint — sound has
+M, journal has J, motion was tab-only and the least discoverable (ironic for the
+accessibility affordance). Added the **C** key (comfort/motion) for parity, added "· C
+motion" to the control hint, and the tab tooltip now shows "(C)" like sound's "(M)". The
+accessibility feature is now as findable as the others.
+
+**Evidence (`?debug`):** dispatched a real `KeyC` keydown in play → `W.reduceMotion` toggled
+false→true→false; hint reads "…M sound · C motion"; motion-tab tooltip "Motion: full (C)";
+the setting persists to localStorage. Zero console errors. Pure text + one keydown case, no
+logic change, fork-neutral, non-graphics, +0 runtime.
+
+**Debt:** none.
+
+**Next tick (79):** Panel #5 flagged the fork-neutral well is nearly dry — favor the
+owner-gated Bender voice/texture integration (highest wow) once steered, or hold cadence
+rather than manufacture risky polish. Boundary push at iter 80.
+
+---
+
 ## 77 — 2026-06-20 — story: act-two grief-rhyme promoted out of the journal (Panel #4)
 
 **Shipped:** Panel #4 flagged that act two's puzzle beats don't pull their weight — the
