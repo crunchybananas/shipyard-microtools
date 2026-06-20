@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 67 — 2026-06-20 — close-look jank (a black box on the chart-table model) — fixed
+
+**Fixed:** leaning over the chart-table model (the recursion centerpiece the player stares at
+most) revealed a big BLACK BOX sitting on the tiny island where the lighthouse should be —
+ugly, illusion-breaking. Diagnosed (raycast/traverse): it was the Vault Beneath (#17) cavern —
+a 56×44×50 near-black (`#12171c`) BackSide box + the inverted-lighthouse vista — cloned into the
+1:240 model, where it pokes up through the model terrain. (Intended ONLY in the full island, seen
+through the cellar window; junk in the model.)
+
+- `props.js`: wrapped the vault-vista decor (cavern, black-water plane, inverted tower + gallery +
+  dome + `vaultLamp`) in a named `vaultVista` group and added it to `MODEL_PRUNE` — so
+  `instantiateModel` strips it from the clone (same pattern as iter 49's gallery/jetty/quarters/
+  vaultDrips). None of it is state-driven via `modelRefs` (only `vaultDoor`/`cellarShaft` are, and
+  they're separate), so the "apply to both instances" invariant holds.
+
+**Evidence:** in-play (`?debug`). `vaultVista` present in `core` (full island keeps the vault) =1,
+pruned from `modelIsland` =0; `modelRefs.vaultDoor` + `modelRefs.cellarShaft` still present
+(invariant intact). Screenshot of the close model view: the black box is GONE — the tiny
+lighthouse + bluff now read cleanly. Bonus: model view 227→221 draws (power-neutral-or-better).
+Restarted the preview for a clean console buffer and confirmed ZERO errors in real play (the 6
+earlier "Raycaster.camera"/sprite warnings were from my whole-scene diagnostic raycast — the
+game's only raycasts are interact's `setFromCamera` over hotspot meshes + a terrain-only ray, so
+the game never raycasts sprites). Players unaffected.
+
+**Next tick:** GRAPHICS LANE #3 (the cheap CUT stack — gate the 7 conditional point-lights on
+state edges + particle frustum-cull + beam .visible gate + water fbm 4→3, with a Power Ledger),
+OR the owner's endgame fork if called. Push boundary ~iter 70.
+
+---
+
 ## 66 — 2026-06-20 — story/worldbuilding (act two rhymes — the ruler & the birdsong) — RHYME COMPLETE
 
 **Shipped (non-graphics, axis stepped off the lane):** the last two act-two beats now rhyme with

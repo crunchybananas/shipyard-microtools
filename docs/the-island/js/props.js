@@ -1025,25 +1025,31 @@ export function buildWorld() {
     // INVERTED from its roof, tapering DOWN to a cold lamp still lit far out over
     // black water — the recursion seen as ARCHITECTURE, not a teleport cut. Seen
     // from the cellar ledge, never entered. (cold base glow: vaultGlow in main.js)
+    // the vault-vista DECOR (cavern, black water, the inverted lighthouse) — seen ONLY
+    // through the cellar window in the full island; pure decoration, nothing state-driven.
+    // Wrapped + named so instantiateModel PRUNES it from the 1:240 model clone, where the
+    // big BackSide cavern box otherwise pokes up as a black box on the model island (#67).
+    const vaultVista = new THREE.Group(); vaultVista.name = 'vaultVista';
     const vaultMat = new THREE.MeshStandardMaterial({ color: 0x12171c, flatShading: true, roughness: 1, side: THREE.BackSide });
     const cavern = new THREE.Mesh(new THREE.BoxGeometry(56, 44, 50), vaultMat);
     cavern.position.set(hx + 4.7 + 28, 26, cz);    // west face flush with the opening
-    cellar.add(cavern);
+    vaultVista.add(cavern);
     const vwater = new THREE.Mesh(new THREE.PlaneGeometry(54, 48),
       new THREE.MeshStandardMaterial({ color: 0x070b0e, roughness: 0.35, metalness: 0.25, side: THREE.DoubleSide }));
-    vwater.rotation.x = -Math.PI / 2; vwater.position.set(hx + 30, 13.5, cz); cellar.add(vwater);
+    vwater.rotation.x = -Math.PI / 2; vwater.position.set(hx + 30, 13.5, cz); vaultVista.add(vwater);
     const towerMat = new THREE.MeshStandardMaterial({ color: 0x3a444e, flatShading: true, roughness: 0.85 });
     const ilx = hx + 30, ilz = cz;                  // the inverted lighthouse, across the void
     const tower = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 1.1, 24, 12), towerMat);
     tower.position.set(ilx, 34, ilz);               // wide top at the roof (y46), narrow at y22
-    cellar.add(tower);
+    vaultVista.add(tower);
     const gallery = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 1.4, 12), towerMat);
-    gallery.position.set(ilx, 21.4, ilz); cellar.add(gallery);
+    gallery.position.set(ilx, 21.4, ilz); vaultVista.add(gallery);
     const lampDome = new THREE.Mesh(new THREE.ConeGeometry(1.3, 1.6, 12), towerMat);
-    lampDome.rotation.x = Math.PI; lampDome.position.set(ilx, 20.0, ilz); cellar.add(lampDome);
+    lampDome.rotation.x = Math.PI; lampDome.position.set(ilx, 20.0, ilz); vaultVista.add(lampDome);
     const vlamp = new THREE.Mesh(new THREE.SphereGeometry(0.72, 12, 9),
       new THREE.MeshStandardMaterial({ color: 0xdcf3f6, emissive: 0x9fdce8, emissiveIntensity: 6, flatShading: true }));
-    vlamp.position.set(ilx, 18.9, ilz); vlamp.name = 'vaultLamp'; cellar.add(vlamp);   // a bare ember below the dome tip, still lit
+    vlamp.position.set(ilx, 18.9, ilz); vlamp.name = 'vaultLamp'; vaultVista.add(vlamp);   // a bare ember below the dome tip, still lit
+    cellar.add(vaultVista);
     // slow drips falling the full height of the void — scale cues; you read how
     // deep the vault is by how long they fall (SPINE). Returned + animated in main.
     vaultDrips = new THREE.Group(); vaultDrips.name = 'vaultDrips';
@@ -1480,7 +1486,7 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
