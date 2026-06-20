@@ -500,6 +500,18 @@ export function buildWorld() {
     plateRing.rotation.x = Math.PI / 2;
     plateRing.position.set(LH.x + 2.2, LH.y + 0.06, LH.z - 1.4);
     core.add(plateRing);
+    // a soft amber glow that wakes on the plate ONLY at the bottom (Panel #4 #1, the visual
+    // half of discoverability): when there is nowhere further down, the way back GLINTS, so a
+    // player who came to ring the bell still sees the plate is live. A Sprite (clone-safe; a
+    // Points here would crash instantiateModel); driven by W.level in puzzles _apply.
+    const plateGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: radialGlowTex(), color: 0xffb45a, transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    }));
+    plateGlow.position.set(LH.x + 2.2, LH.y + 0.14, LH.z - 1.4);
+    plateGlow.scale.setScalar(1.7);
+    plateGlow.name = 'plateGlow';
+    core.add(plateGlow);
   }
 
   // =================== THE ANNEX (locked until one level down) ==============
@@ -1515,7 +1527,7 @@ const NAMES = [
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally',
-  'jettyLantern', 'jettyHalo',
+  'jettyLantern', 'jettyHalo', 'plateGlow',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',

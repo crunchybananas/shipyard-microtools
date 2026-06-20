@@ -658,6 +658,14 @@ export class Game {
     // revealed per level descended. Accrues in-play as you dive (W.level grows
     // since iter 33), and — driven on BOTH island and model — the count recurses
     // table-within-table. Surface (level 1) shows none: the normal game is untouched.
+    // the brass plate glints amber ONLY at the bottom (Panel #4 #1, visual discoverability):
+    // when there is nowhere further down, the way back wakes — so a player who came to ring
+    // the bell still sees the plate is live. Off at every other depth and while climbing.
+    if (R.plateGlow) {
+      const atBottom = W.level >= MAX_DEPTH && !W.flags.climbing;
+      R.plateGlow.visible = atBottom;
+      if (atBottom) R.plateGlow.material.opacity = 0.34 + 0.22 * Math.sin(elapsed * 2.0);
+    }
     if (R.chartTally) {
       // grows one mark per level descended; once you have climbed all the way back the
       // record STAYS full at the surface — the fingerprint that you went down and returned (#12)

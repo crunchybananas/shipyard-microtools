@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 60 — 2026-06-19 — polish + BATCH 12 PUSH (the plate glints; the whole ascent goes live)
+
+**Shipped:** The visual half of discoverability (Panel #4 #1), then the deploy. The brass
+plate now wakes with a soft amber glow ONLY at the bottom — when there is nowhere further
+down, the way back GLINTS, so a player who walked over to ring the bell still sees the
+plate is live. Completes the discoverability triad: the whisper (#57) + the journal (#57)
++ now the glint. Off at every other depth and the whole time you're climbing.
+
+- `props.js`: a `plateGlow` Sprite (shared `radialGlowTex`, amber, additive) above the
+  deskPlate; added to `NAMES`. A Sprite (clone-safe) — no shared-material touch, no Points.
+- `puzzles.js` `_apply`: `plateGlow.visible = W.level >= MAX_DEPTH && !W.flags.climbing`,
+  a gentle opacity pulse when lit.
+
+Fork-neutral; mirrors the verified jettyHalo pattern (#48).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Gating (via game.tick):
+plateGlow visible ONLY at L4-not-climbing; hidden at L4-climbing, L2, L1. Screenshot at the
+bottom shows the warm amber cue on the floor at the plate (lower-right of the chart table).
+60fps. PRE-PUSH BOOT CHECK on clean URL `/`: title+Begin render, canvas/WebGL ok, no errors.
+
+**Deployed:** BATCH 12 — pushed iters 56–60 live (submodule → main, then Dockhand parent
+gitlink): Panel #4 + all its fork-neutral polish (climb discoverable [whisper/journal/glint],
+the return leaves a mark + the tally stays full, the climb has weight). Push-cadence memory
+updated (boundary #12; next at 65). The ascent is now LIVE, complete, AND polished.
+
+**Next tick suggestion:** the big remaining FORK-NEUTRAL build is the Architect's act-two
+rhyme — make 1–2 existing puzzle beats rhyme with the keeper's grief (valve = the day he
+held the water back; plumb = a depth he already knew) so the middle stops reading as clever
+toys disconnected from the spine. A careful dedicated tick (chain-adjacent — verify the chain
+stays solvable). OR await the owner's forks (now small additions on a fully-polished
+staircase). Invite playtest.
+
+---
+
 ## 59 — 2026-06-19 — story/design (give the climb weight — Panel #4 gap #3) — PANEL #4 CLOSED
 
 **Shipped:** The climb is no longer the dive with the sign flipped. The Skeptic's note:
