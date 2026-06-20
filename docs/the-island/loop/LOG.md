@@ -12,6 +12,48 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 83 — 2026-06-20 — THE PIVOT: pure-math era closed; the asset factory; the twist chosen
+
+**Shipped (a hinge iteration, owner-directed):**
+- **The pivot.** Owner: "tag a commit and pivot away from [pure math]. I want a rich vibrant
+  world, deep story, and a lot of content." The all-code-generated era is preserved as the
+  annotated tag **`abyme-pure-math-v1`** (submodule `72c8fdf`, iter 81) — pushed. Assets are now
+  FIRST-CLASS, not a restrained exception.
+- **Two design panels** (the SPINE-building pattern). A 6-agent **roadmap panel** set the north
+  star ("a place with a mouth and a memory"), 5 pillars, and a sequenced first wave — and caught
+  our own wrong assumptions (the keeper is ALREADY a real abstract mesh; the gap is the VOICE, not
+  the body — a hero keeper mesh was CUT). A 13-agent **twist panel** (6 divergent turns → adversarial
+  critique → showrunner) produced the player-identity twist.
+- **The twist — CHOSEN by the owner: "THE ONE THE LIGHT WAS LIT FOR."** You are not the searcher —
+  you are the bottom, the lost self the keeper has been descending toward. At the mandatory bottom
+  beat the figure turns and walks UP, the bell-pitch inverts to rise, the voice migrates to
+  eye-level: "There you are. I've been coming down for you." Integration's non-negotiable lock: the
+  embrace is a player ACTION (turn-and-rise), never a cutscene. Kills the telegraphed
+  coat-as-successor reveal. Locked into `loop/SPINE.md` ("THE PLAYER & THE TWIST"). Tone fork also
+  settled: cozy-that-wounds.
+- **First-wave item 1 — the asset factory.** New `js/assets.js`: a single MANIFEST (id, file, bytes,
+  license, source, prompt, sampler settings) + a lazy, cached loader (`getTexture`/`applyTexture`
+  for textures; `loadAudioBuffer` ready for the voice/music items) + a provenance `ledger()`. New
+  `ASSETS.md` style guide: the abstract-poem prompt preamble, the five era palette anchors, a
+  per-class power/memory budget, the per-asset acceptance test, the Bender peer-trust gotcha.
+  Migrated the iter-82 inline `TextureLoader` (props.js) to `applyTexture(weather, 'driftwood')` —
+  the first manifest row. Look-before-volume: the factory exists before any texture batch.
+
+**Evidence (`?debug`):** app boots clean (ABYME object, title, no console errors). Driftwood loads
+through the manifest and reaches the dory **hull + oar** (map present, 1024px image loaded) and the
+1:240 model clone — 76 meshes share the one loaded texture. Power-neutral: a loader refactor adds no
+geometry and no draws.
+
+**Debt:** `driftwood.png` is 1.05 MB (oversized) — re-export ≤256 KB in the first texture batch
+(logged in ASSETS.md). The keeper-mesh and walkable Drowned-Gallery proposals are consciously
+parked (post-voice, behind a Power Ledger).
+
+**Next tick (84):** first-wave item 2 — extract `js/content.js` (journal / whispers / keeper lines
+become data), behavior-identical, so the voice (item 3) and the twist's re-subtexting become content
+edits, not engine edits.
+
+---
+
 ## 82 — 2026-06-20 — assets: the first Bender texture ships — driftwood on the jetty + dory (+ lazy glint-clone engine fix)
 
 **Shipped:** the first non-generated asset — a Bender tileable driftwood texture

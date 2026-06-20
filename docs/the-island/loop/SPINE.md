@@ -14,6 +14,54 @@
 >    lighthouse poem. No real events, people, places, or company names ever appear.
 > 2. **No external JS dependencies** (three.js only) is the real constraint; the old "zero-asset"
 >    rule is relaxing — meshes/textures/audio may come from Bender or open-source, used with restraint.
+>    **(2026-06-20 PIVOT: this relaxed further — assets are now FIRST-CLASS for richness, not a
+>    restrained exception. Pure-math era tagged `abyme-pure-math-v1`. See loop/MISSION + memory.)**
+
+## ★★ THE PLAYER & THE TWIST — CHOSEN (owner, 2026-06-20)
+
+> Decided like the Oar ending: a design panel generated six divergent twists, an adversarial critic
+> scored each, the showrunner ranked them, the owner picked. Owner's steer: "stranger or next reader,
+> but with a twist… since this is essentially my life in metaphor there should be a story arc that
+> surprises." **CHOSEN: "THE ONE THE LIGHT WAS LIT FOR."**
+
+**Surface identity:** a STRANGER washed ashore — and, beneath it, the NEXT READER who arrives after
+the story is over and walks its leftovers, framed as the searcher following a dead keeper's footsteps
+down. (NOT "the maker returning" stated plainly.)
+
+**The twist (the surprise):** you are not the searcher. **You are the bottom** — the lost/drowned self
+the keeper's whole nested recursion was built to descend toward and bring home. The keeper is the half
+that never stopped searching; you are the half that waited to be found. This is the grammatical
+OPPOSITE of the telegraphed "you were the keeper all along" (now KILLED): you are the OBJECT of the
+search, not its subject. The coat is no longer yours-as-successor — it is **yours-as-the-mourned**,
+carried down to put your own warmth back on your shoulders.
+
+**How it lands INTEGRATION (the non-negotiable lock):** the embrace MUST be a player ACTION, not a
+cutscene — at the bottom you **turn the keeper around and choose to rise.** That single input flips you
+from found-object to holding-subject; it is the only thing separating this twist from "you were
+rescued," which is the dead escape branch. Three build locks:
+1. **Active verb** — the turn-and-rise is the player's input, never an automatic cutscene.
+2. **Body before line** — rising bell-pitch + the figure walking UP + the voice migrating to eye-level
+   all land a beat BEFORE he speaks, so the one line confirms what the player already felt.
+3. **Unmissable** — fire the turn at the mandatory bottom beat, regardless of whether the player rang
+   the bell; never a max-depth easter egg.
+
+**The re-pointings (mostly systems already shipped):**
+- the nestedGlint / tinyFigure: promote stands-and-faces → **turns and walks UP** (the trigger).
+- the keeper voice: reweight from below → **eye-level** on the final approach; one new line:
+  **"There you are. I've been coming down for you."**
+- the bell: **invert** its per-level semitone cue to RISE on the final leg.
+- "Step off the plate, I'm begging you" re-reads from *don't doom yourself* → *don't sink any further
+  from me — I'm almost there.*
+- the coat: mourned, not successor. The journal-merge: untouched on descent; on ascent it is the lost
+  self carrying the searcher home.
+- the Room That Disagrees: re-reads as the keeper's WORKING side of ONE search — the drained-sea /
+  lit-lamp world is his; you live in the drowned mirror.
+- one borrowed image (from a cut proposal): **one lamp, lit at both ends of the staircase.**
+
+**Guardrails:** keep the keeper unambiguously the SAME self on a search ("two studies = two sides of
+one search" must read explicit) so it never slides into the forbidden WATCHED-LOOP; counterweight "he
+came down for you" with his exhaustion ("You're faster than I was") so the love is COSTLY, not
+flattering. Strictly all-metaphor — no biography. This SUPERSEDES the old coat-as-successor reveal.
 
 ## What this game is — candidate loglines
 
