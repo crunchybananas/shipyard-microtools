@@ -192,7 +192,8 @@ and the auto boundingSphere ignores the shader's ±0.6 drift + proximity point-s
 dive-edge frustumCull toggle + dive-scale cull check; water fbm 4→3; (4) vertex-baked AO ✓ DONE iter 71
 (terrain.js: concavity AO read from the finished 257² height grid — FREE, no extra heightAt — multiplied
 into the existing terrain vertex colours; chasm/cliff folds get depth, flats untouched, +0 runtime,
-grade-safe, model clone inherits it); (5a) distance aerial-perspective (generalize the canopy haze to terrain/stone)
+grade-safe, model clone inherits it); (5a) distance aerial-perspective — terrain ✓ DONE iter 71→74 (terrain melts toward the grade haze past
+170 m via its onBeforeCompile, like the canopy; fragment-only, power-neutral; stone props still TODO but near-field)
 [near-free] — ship this FIRST and SEPARATELY from (5b) the triplanar normal/roughness break-up
 [treat as adds-MEDIUM, terrain fills the frame — bench-profile at noon before shipping]; (6)
 in-shader beam god-rays [bench-check; additive overdraw near the beam isn't free]; (7) EffectComposer

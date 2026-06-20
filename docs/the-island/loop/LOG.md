@@ -12,6 +12,34 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 74 — 2026-06-20 — graphics #5a: aerial perspective on the terrain
+
+**Shipped:** distant land read crisp where the eye expects atmosphere. The canopy already melted into
+the grade's haze with distance; now the TERRAIN does too — far shores, the bluff's far flank, the
+horizon land recede toward the grade's haze colour, deepening distance and vastness. It begins at
+170 m, so the near/mid ground — the beach, the chasm, the cliff AO from iter 71 — stays crisp and
+untouched (no washing of the mid-ground depth).
+
+**How:** extended the terrain material's existing `onBeforeCompile` (which already cuts the hatch
+hole) to add a `uHaze` uniform + a fragment mix `mix(col, uHaze, smoothstep(170,520,length(vViewPosition))
+* 0.3)` before `<fog_fragment>` — the same technique as the canopy haze. main.js tracks `uHaze` to the
+active grade's fog colour each frame. Fragment-only; shared by both island + model instances (the model
+sits <2 m from the lean-in camera, so it gets zero haze).
+
+**Evidence (Power Ledger + visual, `?debug`):** noon aerial before→after — far shores/island edges
+melt more into haze while near/mid (chasm, bluff, AO) is unchanged. Bench noon: 226 draws / 521k tris
+/ 8.2ms gpu — draws/tris IDENTICAL (fragment-only), GPU within budget and within the frame-to-frame
+noise of the iter-68/71 baseline (11.3–11.7ms): power-neutral. Night aerial: far land recedes into the
+dark night haze, atmospheric, no artifacts. ZERO console errors. Model clone unaffected.
+
+**Debt:** cleared roadmap #5a (terrain). Stone props could take the same haze later but are mostly
+near-field; terrain is the dominant distant surface. #5b triplanar is the next (power-MEDIUM) step.
+
+**Next tick (75):** PUSH BOUNDARY + NON-graphics (74 graphics now sits in the rolling 3-window). Ship
+one non-graphics beat, then push the batch (iters 71–75). Honor an owner endgame-fork redirect FIRST.
+
+---
+
 ## 73 — 2026-06-20 — accessibility: a reduced-motion comfort toggle
 
 **Shipped:** the game had no motion-comfort option — the intro flight's sway/bank and the walking

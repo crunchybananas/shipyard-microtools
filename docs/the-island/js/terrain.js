@@ -295,13 +295,21 @@ export function buildTerrain() {
   // cut the hatch hole into the heightfield (local space, so the model
   // island inherits the same hole — recursion demands it)
   mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
+    mat.userData.shader = sh; // so main.js can track uHaze to the active grade's fog
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec2 vLXZ;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLXZ = position.xz;');
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vLXZ;')
+      .replace('#include <common>', '#include <common>\nuniform vec3 uHaze;\nvarying vec2 vLXZ;')
       .replace('#include <clipping_planes_fragment>',
-        `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;\n#include <clipping_planes_fragment>`);
+        `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;\n#include <clipping_planes_fragment>`)
+      // aerial perspective (#5a): the FAR land melts toward the grade's haze before
+      // global fog reaches it — depth + vastness without washing the near/mid ground
+      // (gentle, begins at 170 m); fragment-only, +0 draws. Matches the canopy haze.
+      .replace('#include <fog_fragment>', `
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze, smoothstep(170.0, 520.0, length(vViewPosition)) * 0.3);
+        #include <fog_fragment>`);
   };
 
   const mesh = new THREE.Mesh(geo, mat);

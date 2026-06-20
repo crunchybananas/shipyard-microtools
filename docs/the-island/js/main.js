@@ -92,6 +92,9 @@ const COAT_POS = (() => {
 })();
 const refs = collectRefs(core);
 const modelRefs = collectRefs(modelRoot);
+// terrain material (shared by island + model clone) — its aerial-haze uniform
+// tracks the active grade's fog colour each frame (set in applyAtmosphere)
+const terrainMat = core.getObjectByName('terrain')?.material;
 // the clone captured pre-clone children only; nothing model-side needs Points
 
 const diveGroup = new THREE.Group();
@@ -775,6 +778,10 @@ function applyAtmosphere(elapsed, dt) {
       sh.uniforms.uTime.value = elapsed;
       if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
     }
+  }
+  // terrain aerial perspective (#5a): far land melts toward the grade's haze
+  if (terrainMat?.userData.shader?.uniforms.uHaze) {
+    terrainMat.userData.shader.uniforms.uHaze.value.copy(scene.fog.color);
   }
 
   // sky follows the camera
