@@ -466,6 +466,16 @@ export class Game {
         UI.addJournal('One level down, the study is the same study. The model on its table shows a tiny figure standing on the beach. The annex holds a bell.');
       });
     }
+    // discoverability of the climb (Panel #4 #1): at the bottom, in the study (near both
+    // the plate AND the bell), make sure the player learns the plate turns back — the one
+    // true payoff must not be missable behind a guess. Fork-NEUTRAL: it names the EXISTENCE
+    // of the way up, never a choice; the bell finale is untouched. Fires once.
+    if (W.level >= MAX_DEPTH && !W.flags.climbing && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
+      this.once('climbHint', () => {
+        UI.whisper('Nowhere deeper. The plate that brought you down only ever went one way — try it again.');
+        UI.addJournal('There is no further down — I have stood at the bottom of my own making. The plate is the only door left, and it is under my feet. If it only goes one way, then the way on is the way back up.', '', 'self');
+      });
+    }
     // the house remembers (#7thGuest "remembers the player across visits"): wander
     // off, return, and the study is exactly as you left it — too exactly. The grief
     // reading the SPINE canonises: time does not pass inside the model. Fires once,

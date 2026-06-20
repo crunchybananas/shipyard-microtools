@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 57 — 2026-06-19 — story/design (the climb made discoverable — Panel #4 gap #1)
+
+**Shipped:** The one true payoff can no longer be missed. Panel #4's top gap: a player who
+rings the bell at the bottom might never learn the brass plate turns back into the way up.
+Now, at the bottom (`W.level >= MAX_DEPTH`, not yet climbing) and standing in the study —
+near BOTH the plate and the bell — the game points at the way up, once: a whisper, "Nowhere
+deeper. The plate that brought you down only ever went one way — try it again," and a
+re-readable self-hand journal line, "There is no further down… the plate is the only door
+left, and it is under my feet. If it only goes one way, then the way on is the way back up."
+
+Fork-NEUTRAL by construction: it names the EXISTENCE of the climb, never a choice or its
+consequences. The bell finale and the dive are byte-for-byte unchanged.
+
+- `puzzles.js`: a `once('climbHint')` proximity beat gated on `W.level >= MAX_DEPTH &&
+  !W.flags.climbing` + within 4.8m of the lighthouse (the study, covering plate + bell).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Drove `game.tick`
+across states: `climbHint` fires ONLY at L4 in the study, NOT while climbing, NOT on the
+beach, NOT at L2 or L1 (the once-key gates exactly as designed). Clean isolated run
+confirms the whisper text + the self-hand journal entry verbatim.
+
+**Debt:** none broken. Panel #4 gaps #2 (the return leaves a mark) and #3 (give the climb
+weight) remain. A plate brass-glint visual cue was deferred (the plate shares
+`matBrassSolid`; a dedicated glow would be a separate safe tick) — the whisper+journal is
+the discoverability for now.
+
+**Next tick suggestion:** Panel #4 GAP #2 — the return leaves a mark. Climbing out to the
+surface (level 1) currently lands you back exactly as you started; show ONE fork-neutral
+fingerprint that you went down and came back (the chart-table tally still scratched; a
+keeper-hand journal line now in your own hand; the coat on your shoulders / gone from its
+hook). NOTE iter 60 is the next push boundary — batch 12 deploys 56–60.
+
+---
+
 ## 56 — 2026-06-19 — persona critique (Panel #4: the return, the arc now whole)
 
 **Shipped (a critique, not a build — valid per MISSION):** Panel #4 convened the moment
