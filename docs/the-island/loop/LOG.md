@@ -12,6 +12,31 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 77 — 2026-06-20 — story: act-two grief-rhyme promoted out of the journal (Panel #4)
+
+**Shipped:** Panel #4 flagged that act two's puzzle beats don't pull their weight — the
+keeper's grief-rhyme sits in the OPTIONAL journal while the in-the-moment whisper stays
+mechanical, so most players never feel it. Promoted two beats: the RULER (measuring as a
+thing to do with grieving hands) and the BIRD (a correction that came a lifetime too late)
+now each fire a distilled grief whisper right after the mechanical one — "You do not need a
+ruler for a distance you already know by heart." / "Some corrections only ever arrive too
+late." The rhyme lands unmissably now, not buried behind a journal open.
+
+**Evidence (`?debug`):** drove the real 'crack' hotspot handler in play (rulerTaken armed →
+onClick → rulerPlaced); the #whisper element advanced to the new grief line. The bird edit
+is structurally identical (a second `UI.whisper` after the existing one). Zero console
+errors. Pure text (two whisper lines), no logic change, fork-neutral, non-graphics, +0
+runtime; the journal keeps its fuller reflection.
+
+**Debt:** none. Act-two rhyme now spans valve/plumb/lens/shadows (prior) + ruler/bird.
+
+**Next tick (78):** still fork-neutral until the owner steers the Bender voice/texture
+integration (gated on their timbre pick + green-light) — a replay/new-game+ hook, the
+"house rearranges on 2nd entry" onceKeys beat, or an onboarding pass. Graphics eligible
+again (75 story, 76 jank-fix, 77 story).
+
+---
+
 ## 76 — 2026-06-20 — jank fix: the night stars were a grid (owner-reported)
 
 **Shipped:** the night sky's stars rendered as a regular lattice. `step(0.9985,
