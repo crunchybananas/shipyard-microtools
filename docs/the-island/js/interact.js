@@ -74,18 +74,10 @@ export class Interactions {
   add(spot) {
     spot.maxDist = spot.maxDist ?? 4.5;
     spot.type = spot.type ?? 'click';
-    // glintable meshes get a private material so the hover highlight can't
-    // bleed across every prop sharing a module-level material (both islands!)
-    if (!spot.noGlint) {
-      for (const t of spot.targets) {
-        t.traverse((o) => {
-          if (o.material && o.material.emissive !== undefined && !o.userData.glintMat) {
-            o.material = o.material.clone();
-            o.userData.glintMat = true;
-          }
-        });
-      }
-    }
+    // the private glint material is cloned LAZILY, on first hover (see _setHover) — not here.
+    // Cloning at add() raced ahead of async texture loads (the material got cloned before its
+    // map finished loading, so the clone showed untextured); deferring to first hover lets the
+    // shared material settle first, and skips the clone for hotspots the player never hovers.
     this.hotspots.push(spot);
     return spot;
   }
@@ -133,8 +125,13 @@ export class Interactions {
     if (spot && !spot.noGlint) {
       for (const t of spot.targets) {
         t.traverse((o) => {
+          if (!(o.material && o.material.emissive !== undefined)) return;
+          // clone a private glint material the first time this mesh is hovered (lazily, so any
+          // async texture is already on the shared material) — so the highlight can't bleed
+          // across other props sharing a module-level material
+          if (!o.userData.glintMat) { o.material = o.material.clone(); o.userData.glintMat = true; }
           const mat = o.material;
-          if (mat && mat.emissive !== undefined && !this._glinted.has(mat)) {
+          if (!this._glinted.has(mat)) {
             this._glinted.set(mat, { hex: mat.emissive.getHex(), intensity: mat.emissiveIntensity ?? 1 });
             if (mat.emissive.r + mat.emissive.g + mat.emissive.b < 0.01) mat.emissive.setHex(0xffb454);
             mat.emissiveIntensity = Math.max(0.25, (mat.emissiveIntensity ?? 1) * 1.6);

@@ -720,7 +720,19 @@ export function buildWorld() {
   // owner's question, answered in space). Additive decorative geometry, no
   // collision/walkability change, set west of the drowned colonnade.
   {
-    const weather = new THREE.MeshStandardMaterial({ color: 0x6a5234, flatShading: true, roughness: 0.95 });
+    const weather = new THREE.MeshStandardMaterial({ color: 0x8a7050, flatShading: true, roughness: 0.95 });
+    // weathered driftwood grain on the jetty + dory — a Bender-generated tileable texture
+    // (FLUX.1-schnell, Apache-2.0). They are the only wood props and the only users of this
+    // material; the 1:240 model clone shares it (the grain is invisible at that scale). The
+    // base colour is lightened toward bone so the texture multiplies to weathered grey-brown.
+    new THREE.TextureLoader().load('assets/driftwood.png', (tex) => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1.4, 1.4);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      weather.map = tex;
+      weather.needsUpdate = true;
+    });
     const jx = -18;
     const jetty = new THREE.Group(); jetty.name = 'jetty';
     const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 12), weather);

@@ -12,6 +12,37 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 82 — 2026-06-20 — assets: the first Bender texture ships — driftwood on the jetty + dory (+ lazy glint-clone engine fix)
+
+**Shipped:** the first non-generated asset — a Bender tileable driftwood texture
+(FLUX.1-schnell, Apache-2.0) on the jetty and dory (the game's only wood props, their
+dedicated `weather` material). The flat brown wood now reads as weathered grey-brown planks
+with grain; the 1:240 model clone shares the material (grain invisible at that scale).
+- ENGINE fix (root cause, not a patch): the interact hover-glint cloned each hotspot's
+  material EAGERLY at `add()`, racing ahead of the async texture load — the dory hull/oar
+  (interact targets) were cloned BEFORE the map loaded and showed untextured, while the jetty
+  (no hotspot) textured fine. Moved the glint-clone to be LAZY (first hover, after assets
+  load); also skips cloning for never-hovered hotspots. Fixes the async-asset-vs-clone race
+  for ALL future textured interactables. [[feedback-root-cause-over-workaround]]
+- The "made of math" claim is reframed (index.html title-foot + meta): "almost everything …
+  is made of math" / "nearly every mesh, texture and sound is synthesized in code" — the first
+  non-code asset has shipped.
+
+**Evidence (`?debug`):** the island dory hull + oar carry the map (untextured pre-fix);
+hover-glint verified — the oar glints amber on hover (intensity 1→1.6), the map SURVIVES the
+lazy clone and restores clean. Power Ledger (bench, noon + night): 237 draws / 521k tris /
+~6.6 ms gpu — UNCHANGED from baseline (the texture adds no geometry, only a fragment fetch).
+Zero console errors. Asset: `docs/the-island/assets/driftwood.png`.
+
+**Debt:** the lighthouse-plaster texture is NOT shipped — the tower is baked into the shared
+`matStone` merge (with a painted band in its vertex colours), so it would need a de-merge;
+deferred for the owner's call (the tower's clean painted look may not want generic plaster).
+
+**Next tick (83):** owner-gated — the keeper VOICE (bm_george starting point) + a voice-routing
+layer; OR the plaster-on-tower de-merge if wanted.
+
+---
+
 ## 81 — 2026-06-20 — ENGINE fix: the slope gate misread local terrain bumps as walls (root cause; replaces #80's causeway workaround)
 
 **Shipped:** the real root cause behind #80's "invisible wall." The walkability slope gate
