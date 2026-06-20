@@ -951,6 +951,13 @@ if (DEBUG) {
     armOar: () => { W.level = 1; W.flags.returned = true; },   // #22: arm the oar terminal (the climb-out)
     leave: () => startOarFinale(),                              // #22: trigger the oar terminal (the surface end)
     ring: () => startFinale(),                                  // the bell terminal (the bottom end) — regression check
+    bottom: () => {                                             // item 4: jump to the bottom, leaning over the keeper
+      W.level = MAX_DEPTH; W.flags.plumbHung = true; W.flags.dove = true;
+      const fp = new THREE.Vector3(); game.modelRefs.tinyFigure.getWorldPosition(fp);
+      player.spawn(new THREE.Vector3(fp.x + 0.8, 0, fp.z + 0.8), Math.atan2(-0.8, -0.8), -0.5);
+    },
+    getTwist: () => ({ keeperRose: !!W.flags.keeperRose, carried: !!W.flags.carried,
+      rise: +game._keeperRise.toFixed(2), climbing: !!W.flags.climbing, level: W.level }),
     getFinale: () => finale && { kind: finale.kind, t: finale.t, shown: !!finale.shown } };
 }
 function buildDebugPanel() {

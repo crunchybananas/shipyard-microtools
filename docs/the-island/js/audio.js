@@ -389,14 +389,15 @@ const A = {
   // below, never a clean narrator. Lazy-loaded + cached via the asset manifest;
   // if the clip can't load (offline / missing), it falls back to the FM murmur,
   // so the keeper always speaks one way or another. register is for that fallback.
-  say(id, register = 'curious') {
+  say(id, register = 'curious', eyeLevel = false) {
     if (!this.ready) return;
     loadAudioBuffer(id, ctx).then((buf) => {
-      const vg = ctx.createGain(); vg.gain.value = 0.85; vg.connect(this.fx);
+      const vg = ctx.createGain(); vg.gain.value = eyeLevel ? 1.0 : 0.85; vg.connect(this.fx);
       const drown = ctx.createBiquadFilter(); drown.type = 'lowpass';
-      drown.frequency.value = 1500; drown.Q.value = 0.6; drown.connect(vg);
+      // eye-level (the twist): the water thins — he is right at your face now, clearer + less echo
+      drown.frequency.value = eyeLevel ? 5200 : 1500; drown.Q.value = 0.6; drown.connect(vg);
       const del = ctx.createDelay(0.6); del.delayTime.value = 0.19;
-      const fb = ctx.createGain(); fb.gain.value = 0.34;
+      const fb = ctx.createGain(); fb.gain.value = eyeLevel ? 0.12 : 0.34;
       drown.connect(del); del.connect(fb).connect(del); del.connect(vg);
       const src = ctx.createBufferSource(); src.buffer = buf; src.connect(drown);
       src.start();
@@ -404,6 +405,25 @@ const A = {
         try { fb.gain.value = 0; src.disconnect(); del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {}
       }, 1200);   // let the one-floor-down echo ring out before tearing the bus down
     }).catch(() => this.keeperVoice(register));   // offline / missing asset → the synth murmur, as before
+  },
+
+  // the keeper RISES (the twist): a slow upward glide — the inverse of the descent's
+  // dropping pitch — as the figure comes up to meet your eye at the bottom of the nest.
+  keeperRise() {
+    if (!this.ready) return;
+    const t0 = ctx.currentTime;
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(88, t0);
+    o.frequency.exponentialRampToValueAtTime(330, t0 + 2.6);   // pitch RISES, inverting the dive's drop
+    const ov = ctx.createOscillator(); ov.type = 'sine';       // a shimmer a fifth above
+    ov.frequency.setValueAtTime(132, t0);
+    ov.frequency.exponentialRampToValueAtTime(495, t0 + 2.6);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(0.16, t0 + 0.5);
+    g.gain.linearRampToValueAtTime(0, t0 + 2.8);
+    o.connect(g); ov.connect(g); g.connect(this.music);
+    o.start(t0); o.stop(t0 + 2.9); ov.start(t0); ov.stop(t0 + 2.9);
   },
 
   // the dive: the whole island drops an octave and comes back

@@ -46,6 +46,7 @@ export class Game {
     this.boxPlaying = false;
     this._keeperLook = 0;        // eased 0..1: the figure turning to face you
     this._keeperLookTarget = 0;
+    this._keeperRise = 0;        // eased 0..1: the twist — the figure rising to meet your eye
     this._leftStudy = false;     // armed once you wander off, for the return beat
 
     this._buildHotspots(modelAnchor);
@@ -306,15 +307,26 @@ export class Game {
         }
         // ---- ASCEND (the bottom turns you back, or you are already climbing) ----
         if (W.level <= 1) { UI.whisper('You are at the surface. There is nowhere above to rise to.'); return; }
+        // THE EMBRACE (item 4): once the keeper has RISEN to meet you (keeperRose, at the bottom,
+        // not yet climbing), this committed plate-touch IS the integration — you turn him around
+        // and rise CARRYING him. The active verb is yours: the rising is your CHOICE, the only
+        // thing that separates integration from being rescued. A two-touch, deliberate, like the dive.
+        const embrace = W.flags.keeperRose && !W.flags.climbing;
         if (!this._brink) {
           this._brink = true;
           A.duckAmbient(true);
-          UI.whisper(W.flags.climbing
-            ? 'Touch the plate again to rise another level. What lies below will not let you down again.'
-            : 'There is nowhere further down. Touch the plate again to begin the long climb up — and carry what you found here.');
+          UI.whisper(embrace
+            ? 'He is here, at the foot of the stairs, looking up. Stand, and rise — and take him with you. Touch again.'
+            : W.flags.climbing
+              ? 'Touch the plate again to rise another level. What lies below will not let you down again.'
+              : 'There is nowhere further down. Touch the plate again to begin the long climb up — and carry what you found here.');
           return;
         }
         this._brink = false;
+        if (embrace) {
+          this.flag('carried');   // the twist: you did not leave him at the bottom
+          UI.addJournal('I turned him around. Whatever I came down all this way looking for, it was him — it was me — and I would not leave him at the bottom. We go up together: one lamp, lit at both ends of the staircase.', '', 'self');
+        }
         this.flag('climbing');   // one-way: from here the plate only rises, until the surface
         if (this.onAscend) this.onAscend();
       },
@@ -537,7 +549,23 @@ export class Game {
       this.modelRefs.tinyFigure.getWorldPosition(_kv);
       const near = this.player.pos.distanceTo(_kv) < 2.4;
       this._keeperLookTarget = near ? 1 : 0;
-      if (near) {
+      if (near && W.level >= MAX_DEPTH) {
+        // THE TWIST (item 4) — at the bottom, the figure does not just look back: it TURNS and
+        // walks UP to you. You were never the searcher; you are the one it has been descending
+        // toward. BODY BEFORE LINE: the weary recognition, then it RISES (W.flags.keeperRose +
+        // the pitch inverts), then — at eye-level, the water thinned — the line CONFIRMS it.
+        this.once('keeperTwist', () => {
+          A.duckAmbient(true);
+          A.say('keeper_look_4', 'resigned');                 // costly love: it is spent ("faster than I was")
+          UI.whisper(KEEPER.look[4]);
+          setTimeout(() => { W.flags.keeperRose = true; A.keeperRise(); }, 2700);   // the body begins to rise
+          setTimeout(() => {
+            A.say('keeper_there_you_are', 'resigned', true);  // eye-level: clear, close, no longer below
+            UI.whisper('There you are. I’ve been coming down for you.');
+          }, 4600);
+          setTimeout(() => A.duckAmbient(false), 8200);
+        });
+      } else if (near) {
         this.once('keeperLook' + W.level, () => {
           A.duckAmbient(true);
           A.say(W.level === 3 ? 'keeper_look_3' : 'keeper_look_4', W.level >= 4 ? 'resigned' : 'pleading');
@@ -549,6 +577,8 @@ export class Game {
       this._keeperLookTarget = 0;
     }
     this._keeperLook = lerp(this._keeperLook, this._keeperLookTarget, 1 - Math.exp(-4 * dt));
+    // the rise eases in only at the bottom, after the revelation; it relaxes as you climb away
+    this._keeperRise = lerp(this._keeperRise, (W.flags.keeperRose && W.level >= MAX_DEPTH) ? 1 : 0, 1 - Math.exp(-1.6 * dt));
 
     // The Room That Disagrees (#18): in the cellar, drawn to the west window, the
     // player sees a model that contradicts the world — name the unease, once
@@ -684,16 +714,19 @@ export class Game {
       fig.visible = W.level >= 2 && isModel;
       if (fig.visible) {
         const look = this._keeperLook;
+        const rise = this._keeperRise;   // the twist: it climbs up to meet your eye at the bottom
         // turn to face the player and tip the brow up toward the giant eye
         fig.getWorldPosition(_kv);
         const wantYaw = Math.atan2(this.player.pos.x - _kv.x, this.player.pos.z - _kv.z);
-        fig.rotation.y = lerpAngle(fig.rotation.y, wantYaw, look);
-        fig.rotation.x = -0.6 * look;
-        // breathing — and a notice-flare in the chest as it looks back
+        fig.rotation.y = lerpAngle(fig.rotation.y, wantYaw, Math.max(look, rise));
+        fig.rotation.x = -0.6 * look - 0.5 * rise;                              // brow fully up as it rises
+        fig.position.y = (fig.userData.baseY ?? fig.position.y) + rise * 1.8;   // lifts toward you
+        fig.scale.setScalar(1 + rise * 1.6);                                    // and looms larger, coming up
+        // breathing — a notice-flare as it looks back, then a steady glow as it rises to you
         const body = fig.children[0];
-        if (body?.material) body.material.emissiveIntensity = 1.8 * (1 + 0.12 * Math.sin(elapsed * 1.5)) + 1.7 * look;
+        if (body?.material) body.material.emissiveIntensity = 1.8 * (1 + 0.12 * Math.sin(elapsed * 1.5)) + 1.7 * look + 1.4 * rise;
         const head = fig.children[1];
-        if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look;
+        if (head?.material) head.material.emissiveIntensity = 1.0 + 1.3 * look + 1.6 * rise;
       }
     }
 

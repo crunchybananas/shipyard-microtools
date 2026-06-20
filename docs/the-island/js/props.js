@@ -1203,6 +1203,7 @@ export function buildWorld() {
     fig.visible = false;
     const fy = heightAt(SPOTS.beach.x, SPOTS.beach.y);
     fig.position.set(SPOTS.beach.x, fy, SPOTS.beach.y);
+    fig.userData.baseY = fy;   // the twist's rise (puzzles _apply) lifts from here
     const fb = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 3.4, 6),
       new THREE.MeshStandardMaterial({ color: 0x355560, emissive: 0x58f2c2, emissiveIntensity: 1.8, flatShading: true }));
     fb.position.y = 1.7;

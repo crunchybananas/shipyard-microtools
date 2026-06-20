@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 86 — 2026-06-20 — THE TWIST lands: the keeper rises, and you choose to carry him up (item 4, core)
+
+**Shipped (the bottom beat — LOCAL, not deployed):** the emotional centre of the pivot —
+"THE ONE THE LIGHT WAS LIT FOR." At the bottom (MAX_DEPTH), leaning over the model no longer just
+makes the keeper look back — it ESCALATES into the twist:
+- **BODY BEFORE LINE:** the weary recognition (`keeper_look_4`, "You're faster than I was") → a beat
+  later the figure RISES and looms toward your eye (`W.flags.keeperRose`; eased `_keeperRise` lifts +
+  scales the `tinyFigure` ×2.6, brow fully up, glow swelling) with a rising-pitch cue (`A.keeperRise`,
+  inverting the dive's drop) → then, at **EYE-LEVEL** (`A.say(…, eyeLevel)` thins the drowned lowpass
+  so he's close, not below), the line confirms: *"There you are. I've been coming down for you."*
+- **THE ACTIVE EMBRACE (the integration lock):** once he's risen, the bottom plate-touch becomes the
+  embrace — a deliberate two-touch (like the dive/oar): *"Stand, and rise — and take him with you."*
+  On commit it sets `W.flags.carried` + a self-hand journal ("one lamp, lit at both ends of the
+  staircase") and runs the existing ascent — you rise CARRYING him. The rising is the PLAYER's act,
+  never a cutscene — the only thing separating integration from being rescued.
+- Reuses the proven plate two-touch + the ascent cinematic (no new raycast / terminal); the bell
+  (descent terminal) and the L3 look are untouched. New audio: `A.say` eyeLevel mode + `A.keeperRise`.
+
+**Evidence (`?debug`, new `ABYME.bottom()`/`getTwist()`):** boots clean, zero console errors. Drove
+to the bottom — the revelation fires once: keeperRose true, `_keeperRise` eases to 1 (figure scale
+2.6, lifted +1.8, brow x −1.1), "There you are" at eye-level. The embrace: first plate-touch → brink
++ the embrace whisper; second → carried + climbing + the ascent starts. Power Ledger (bench, noon):
+**219 draws / 521k tris / 5.3 ms — UNCHANGED** (transform-only on an existing figure; audio GPU-free).
+
+**Debt / next:** (1) an adversarial review is running (integration lock, canon, regressions,
+narrative). (2) NARRATIVE RECONCILIATION — the existing ascent farewell ("don't leave the light on
+for me") was written for "he stays below"; with `carried` it should read as rising WITH you.
+(3) make the revelation more unmissable. (4) OWNER FEEL: the rise/timing want a watch + listen
+(local server, `ABYME.bottom()`).
+
+**Next tick (87):** address the adversarial review's must-fixes + the narrative reconciliation.
+
+---
+
 ## 85 — 2026-06-20 — the keeper SPEAKS: real bm_george voice through the drowned bus (item 3) [PUSH: 82–85]
 
 **Shipped:** first-wave item 3 — the keeper's synth murmur becomes a real human voice. Six
