@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 64 — 2026-06-20 — GRAPHICS LANE #1: the Power Ledger (GPU-frame-ms + bench pose) — THE GATE
+
+**Shipped:** the measurement gate the whole graphics roadmap depends on (MISSION "Graphics
+Quality Bar & Power Ledger"). The `?debug` readout now shows real **GPU-frame-ms** beside
+fps/draws/tris, and there's a fixed **bench pose** so every Power Ledger is measured from an
+identical view. Without this, "power-neutral" was unfalsifiable — the 60fps cap (main.js:873)
+makes fps read a flat 60 right up until it falls off a cliff. (The loop pivoted to this off the
+stale act-two prompt because the owner explicitly redirected to graphics quality + approved the
+MISSION amendment; #1 is the gate I'd flagged as next.)
+
+- `main.js`: `makeGpuTimer(renderer)` — one `EXT_disjoint_timer_query_webgl2` query in flight,
+  polled when ready (CPU rAF-delta fallback, labelled `(cpu~)`). Wrapped the single
+  `renderer.render` with `gpuTimer.beginFrame()/endFrame()`, **null-guarded so players never
+  create it** (DEBUG-only → zero shipped cost). Readout shows `…· N.Nms gpu`, color turns red
+  at draws≥360 / tris≥800k / fps<58. A `bench` button + `ABYME.bench(t=12)` / `ABYME.gpuMs()` /
+  `ABYME.gpuMode()` (fixed pose = the canonical SPAWN beach-island view; pass a time for noon/night).
+
+**Evidence:** in-play (`?debug`). FIXED a TDZ bug first (the DEBUG block set `gpuTimer` before its
+`let` → ReferenceError killed all debug init, no panel/ABYME, no console error — moved the `let`
+above the block). After: `gpuMode()==='gpu'` (real timer present), `gpuMs()` reads ~14–24ms,
+the panel line shows `59fps · 231 draws · 521k tris · 24.2ms gpu` at the noon bench, bench button
+present + repositions to the fixed pose. Clean player URL `/`: no debug panel, no timer, title +
+WebGL OK, zero console errors — players unaffected.
+
+**Debt:** none. The gate is in; every future graphics tick now logs a Power Ledger (draws/tris/
+GPU-ms before→after at noon+night from `bench`) or it's VISUAL DEBT.
+
+**Next graphics-lane tick: roadmap #2 — per-grade `toneMappingExposure`** (zero GPU cost; makes the
+five grades read as five MOODS, not hue-swaps). NOTE iter 65 is the push boundary (batch 13).
+
+---
+
 ## ★ owner ask (2026-06-20) — graphics-quality strategy (6-agent workflow → MISSION amendment)
 
 **Shipped (process):** the owner asked whether to adjust the loop/agents to push graphics

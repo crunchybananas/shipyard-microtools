@@ -30,6 +30,7 @@ try {
 // remain the power levers (issues #1, #2).
 const BASE_DPR = Math.min(devicePixelRatio || 1, 1.5);
 renderer.setPixelRatio(BASE_DPR);
+let gpuTimer = null; // Power Ledger (#1): real GPU-frame-ms; created in DEBUG only (declared early so the debug block can set it without a TDZ)
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -798,8 +799,12 @@ player.onFootstep = (kind, pos) => {
 
 // ---------------- debug ----------------
 if (DEBUG) {
+  gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
   buildDebugPanel();
   window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE,
+    bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
+    gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
+    gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
     tp: (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch),
     setIntroT: (t) => { if (intro) intro.t = t; },
     setPerch: (t) => { perchT = clamp(t, 0, 1); },
@@ -821,7 +826,7 @@ function buildDebugPanel() {
       <button data-act="ruler">+ruler</button><button data-act="bird">bird✓</button>
       <button data-act="lens">+lens</button><button data-act="shadow">shadow✓</button>
       <button data-act="code">code✓</button><button data-act="plumb">+plumb✓</button>
-      <button data-act="L2">level2</button>
+      <button data-act="L2">level2</button><button data-act="bench">bench</button>
     </div>
     <div id="dbg-fps"></div>`;
   document.body.appendChild(el);
@@ -845,13 +850,50 @@ function buildDebugPanel() {
       code: () => { W.dials = [...[3, 7, 1, 5]]; W.flags.shadowRevealed = true; W.flags.hatchOpen = true; },
       plumb: () => { W.flags.plumbTaken = true; W.flags.plumbHung = true; },
       L2: () => { W.level = 2; },
+      // fixed bench pose for the Power Ledger — identical view every measurement
+      bench: () => { W.time = 12; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); },
     })[act]?.();
   });
   setInterval(() => {
     el.querySelector('#dbg-time-v').textContent = W.time.toFixed(1) + 'h';
-    el.querySelector('#dbg-fps').textContent = `${fps.toFixed(0)} fps · draws ${renderer.info.render.calls} · tris ${(renderer.info.render.triangles / 1000).toFixed(0)}k`;
+    const calls = renderer.info.render.calls, tris = renderer.info.render.triangles;
+    const gms = gpuTimer ? gpuTimer.ms : 0;
+    const fpsEl = el.querySelector('#dbg-fps');
+    // the Power Ledger line: fps can't prove power-neutrality (the 60fps cap hides
+    // headroom) — GPU-frame-ms is the real signal. Reconciled budget: draws <360.
+    fpsEl.textContent = `${fps.toFixed(0)}fps · ${calls} draws · ${(tris / 1000).toFixed(0)}k tris · ${gms.toFixed(1)}ms gpu${gpuTimer && gpuTimer.mode === 'cpu' ? '(cpu~)' : ''}`;
+    fpsEl.style.color = (calls >= 360 || tris >= 800000 || fps < 58) ? '#e8a0a0' : '#9fe8c5';
     slider.value = W.time;
   }, 400);
+}
+
+// GPU-frame-ms timer (Power Ledger #1). The 60fps governor caps fps, so fps reads a flat
+// 60 right up until it falls off a cliff — only true GPU time can prove a graphics tick is
+// power-neutral. EXT_disjoint_timer_query_webgl2 (one query in flight, polled when ready);
+// CPU rAF-delta fallback, LABELLED 'cpu~' (wall-clock around render, NOT true GPU time).
+// DEBUG-only — never created for players, so zero shipped cost.
+function makeGpuTimer(renderer) {
+  const gl = renderer.getContext();
+  const ext = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+  let active = null, pending = null, started = false, cpuT0 = 0, lastMs = 0;
+  return {
+    mode: ext ? 'gpu' : 'cpu',
+    beginFrame() {
+      started = false;
+      if (!ext) { cpuT0 = performance.now(); started = true; return; }
+      if (pending !== null && gl.getQueryParameter(pending, gl.QUERY_RESULT_AVAILABLE)) {
+        if (!gl.getParameter(ext.GPU_DISJOINT_EXT)) lastMs = gl.getQueryParameter(pending, gl.QUERY_RESULT) / 1e6;
+        gl.deleteQuery(pending); pending = null;
+      }
+      if (pending === null) { active = gl.createQuery(); gl.beginQuery(ext.TIME_ELAPSED_EXT, active); started = true; }
+    },
+    endFrame() {
+      if (!started) return;
+      if (!ext) { lastMs = performance.now() - cpuT0; return; }
+      gl.endQuery(ext.TIME_ELAPSED_EXT); pending = active; active = null;
+    },
+    get ms() { return lastMs; },
+  };
 }
 
 // ---------------- main loop ----------------
@@ -925,5 +967,7 @@ renderer.setAnimationLoop((tMs) => {
     if (saveTimer > 12) { saveTimer = 0; save(player.pos); }
   }
 
+  if (gpuTimer) gpuTimer.beginFrame();
   renderer.render(scene, camera);
+  if (gpuTimer) gpuTimer.endFrame();
 });
