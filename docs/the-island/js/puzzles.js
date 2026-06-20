@@ -183,7 +183,7 @@ export class Game {
         W.inventory = W.inventory.filter((s) => s !== 'lens');
         A.chime();
         UI.whisper('Far above, glass settles into brass.');
-        UI.addJournal('Set the small lens into the model’s lamp room. The real lighthouse has its eye back. It will want the dark.');
+        UI.addJournal('Set the small lens into the model’s lamp room. The real lighthouse has its eye back. Whoever kept this light must have ground and polished that glass a thousand nights, so it could see a way home for someone out on the water. It will want the dark now.');
         save(this.player.pos);
       },
     });
@@ -218,7 +218,7 @@ export class Game {
         this.flag('shadowRevealed');
         A.chime();
         UI.whisper('The sand slides from a brass door, dialled shut.');
-        UI.addJournal('At golden hour the stones’ shadows leaned together, all pointing across the water — to a hatch buried on the bluff. Four glyph dials seal it.');
+        UI.addJournal('At golden hour the stones’ shadows leaned together, all pointing across the water — to a hatch buried on the bluff. Four glyph dials seal it. He must have read this same hour off these same stones, day on day; some hours you set your whole life by, and they arrive whether or not you are ready.');
         save(this.player.pos);
       },
     });

@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 62 — 2026-06-19 — story/worldbuilding (act two rhymes — the lens & the shadows)
+
+**Shipped:** Pass 2 of Panel #4's act-two rhyme — two more puzzle-completion JOURNALS now
+carry the keeper's grief while keeping their surface clue. With iter 61 (valve, plumb), the
+FOUR most thematically loaded beats of the chain now rhyme with his story:
+- The LENS: "…Whoever kept this light must have ground and polished that glass a thousand
+  nights, so it could see a way home for someone out on the water." — the keeper's vocation,
+  a light sent home for someone who may never come.
+- The SHADOWS: "…He must have read this same hour off these same stones, day on day; some
+  hours you set your whole life by, and they arrive whether or not you are ready." — the
+  golden-hour ritual, and the day that came anyway.
+
+TEXT-ONLY; no mechanic / solve-order change; metaphor, no biography; fork-neutral.
+
+- `puzzles.js`: the `lensSlot` (lensPlaced) and `shimmer` (shadowRevealed) journal strings
+  deepened. Whispers unchanged (they carry the clue).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Fired the real `lensSlot`
+and `shimmer` hotspots: `W.lensPlaced` and `W.flags.shadowRevealed` still set (mechanics +
+chain intact), enriched journals fire once each (text confirmed — "a way home for someone" /
+"whether or not you are ready"). Chain stays solvable.
+
+**Debt:** none. The act-two rhyme is now substantially done (4 of ~6 beats; the remaining
+ruler / birdsong / crank / music-box are less central — optional). Time to SHIFT AXIS off
+story next.
+
+**Next tick suggestion:** shift axis to avoid over-working story — a graphics/atmosphere
+polish, an audio-audition pass, OR a Panel #5 to take stock of where ABYME stands now that
+the arc is complete+polished AND the middle rhymes. NOTE iter 65 is the next push boundary
+(batch 13 = 61–65). The owner's three forks remain the only thing between here and a finished
+ending.
+
+---
+
 ## 61 — 2026-06-19 — story/worldbuilding (act two begins to rhyme with the grief)
 
 **Shipped:** The first pass at Panel #4's act-two gap — the middle puzzles reading as
