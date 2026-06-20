@@ -12,6 +12,29 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 79 — 2026-06-20 — jank fix: intro fly-over clipped through the drowned colonnade (owner-reported)
+
+**Shipped:** the opening fly-over skimmed straight through the sunken colonnade ("the docks")
+off the wake-up beach right before landing — the descent crossed the colonnade's z-band
+(z≈-108..-119) at y≈1.8-2.0, grazing its caps/lintels (top ~1.86) and threading the x=8 column
+row. Now a smooth parabolic LIFT in `tickIntro` raises the camera over the drowned hall (to
+y≈2.9-3.8, clearing the lintels by ≥1 m) and tapers to exactly 0 at the landing (z=-104) and
+seaward of it (z=-123), so the seamless handover to gameplay is untouched — it reads as a
+gentle rise over the breaking columns, not a clip-through.
+
+**Evidence (`?debug`):** reproduced the live `INTRO_PATH × easeInOut × lift` across the
+colonnade band — base y 1.77–2.07 (clipping the 1.86 lintels) → lifted 2.85–3.83, clears at
+every sample; lift = 0 at the landing (camera settles to (4,1.71,-104), clean handoff). Zero
+console errors. (Mid-flight can't be watched headless — a screenshot fires an rAF burst that
+completes the intro — so the *feel* of the rise wants a live playthrough confirm.)
+
+**Debt:** none. Pure camera-path tweak; no curve restructure, no geometry/feature change.
+
+**Next tick (80):** PUSH BOUNDARY. Still owner-gated on the Bender voice/texture integration
+(highest wow); otherwise hold per Panel #5.
+
+---
+
 ## 78 — 2026-06-20 — accessibility: keyboard + hint parity for the reduced-motion toggle
 
 **Shipped:** the reduced-motion comfort toggle (iter 73) was the only one of the three

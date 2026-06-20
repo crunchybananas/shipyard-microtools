@@ -1064,6 +1064,13 @@ renderer.setAnimationLoop((tMs) => {
     const f = clamp(intro.t / intro.dur, 0, 1);
     const e = easeInOut(f);
     INTRO_PATH.getPoint(e, camera.position);
+    // lift gently OVER the drowned colonnade (the "docks" off the beach: columns at x=0/8,
+    // z≈-108..-119, caps/lintels topping ~1.9). The descent into the beach otherwise skims
+    // straight through that sunken hall. A smooth parabolic rise centred on the colonnade,
+    // tapering to exactly 0 at the landing (z=-104) and seaward of it (z=-123) — so the
+    // seamless handover to gameplay is untouched.
+    const colz = (camera.position.z + 113.5) / 9.5;        // 0 at the colonnade's centre
+    camera.position.y += Math.max(0, 1 - colz * colz) * 1.9;
     // the lower the flight, the more the swell owns the camera
     const lowness = clamp(1 - (camera.position.y - 1.6) / 12, 0, 1);
     const sway = W.reduceMotion ? 0 : 1; // reduced-motion: keep the flight, drop the sway/bank
