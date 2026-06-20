@@ -219,7 +219,8 @@ const game = new Game({
   refs, modelRefs, modelAnchor, interact, player,
   onDive: startDive,
   onAscend: () => startAscent(false),  // #12 stage 2: the in-play way UP
-  onFinale: startFinale,
+  onFinale: startFinale,               // the bell — descent terminal (at the bottom)
+  onLeave: startOarFinale,             // the oar — integration terminal (at the surface, #22)
 });
 
 UI.init();
@@ -237,7 +238,10 @@ const btnContinue = document.getElementById('btn-continue');
 if (hasSave()) btnContinue.classList.remove('hidden');
 
 btnBegin.addEventListener('click', () => {
-  if (hasSave()) { wipe(); sessionStorage.setItem('abyme-autostart', '1'); location.reload(); return; }
+  // a fresh start discards any old save. W is still at its defaults on the title screen, so
+  // begin IN PLACE — the old wipe()+reload bounced the page and flashed the title back up for
+  // a beat ("a second window that just says Begin, then fades"); no reload is needed here.
+  if (hasSave()) wipe();
   beginIntro();
 });
 btnContinue.addEventListener('click', () => {
@@ -262,13 +266,15 @@ btnContinue.addEventListener('click', () => {
 
 if (sessionStorage.getItem('abyme-autostart')) {
   sessionStorage.removeItem('abyme-autostart');
-  beginIntro();
+  titleEl.style.display = 'none';   // a replay reload ('begin again') must not flash the title
+  beginIntro(true);
 }
 
-function beginIntro() {
+function beginIntro(instant = false) {
   A.init();
-  // let the title hold a breath over the first seconds of sea
-  setTimeout(() => titleEl.classList.add('fading'), 1400);
+  // let the title hold a breath over the first seconds of sea (skipped on a replay reload,
+  // where the title is already hidden — no second "Begin" flash)
+  if (!instant) setTimeout(() => titleEl.classList.add('fading'), 1400);
   UI.cinematic(true);
   UI.fadeIn();
   setIntroLanding();        // aim the approach to land exactly on the standing frame
@@ -421,7 +427,11 @@ function landAscent() {
     if (!W.flags.returned) {
       W.flags.returned = true;
       UI.whisper('Back at the surface. The door, the coat, the jetty — all as you left them. Only you are different.');
-      UI.addJournal('I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay.', '', 'self');
+      UI.addJournal('I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay. There is the dory on the beach, and an oar — the one thing here I have never used. The light is lit; the only thing left undone is to go.', '', 'self');
+      // POINT THE WAY OUT: the climb-out terminal (#22) is the dory, ~80 m south on the wake-up
+      // beach. Name it, or a player re-dives / rings the bell and never finds the choice the
+      // whole fork exists to offer. (The oar also glints on hover once armed; this draws them to it.)
+      setTimeout(() => { if (W.level <= 1 && MODE === 'play') UI.whisper('Down on the beach, the beached dory waits — and its oar, the last thing here you have not touched.'); }, 6800);
     }
   }
   // the keeper falls silent behind you (#12 stage 3): the first time you turn back from the
@@ -506,11 +516,99 @@ function startFinale() {
   if (deep) setTimeout(() => A.keeperVoice('resigned'), 4200); // the keeper, still below
   const line1 = document.querySelector('#finale .fin-line1');
   if (line1) line1.textContent = deep ? 'you keep the light now' : 'the tide brought you back';
-  finale = { t: 0, deep, camStart: camera.position.clone(), quatStart: camera.quaternion.clone() };
+  finale = { kind: 'bell', t: 0, deep, camStart: camera.position.clone(), quatStart: camera.quaternion.clone() };
+}
+
+// ---------------- the oar — the integration terminal (#22, owner fork: choice + The Oar) ----
+// The climb-out's missing last breath. Reached only after climbing all the way out
+// (W.flags.returned, at the surface): you row off the wake-up beach, the camera swings
+// to the only look-BACK shot in the game, and the whole world shrinks 240x toward the
+// island's heart until it is a tiny lit model floating on the dark sea — the recursion
+// seen once more, chosen and warm. Held golden hour, no stars (those belong to the bell's
+// 'stay'). The bell is struck at the bottom; the oar is rowed at the top. Reuses the
+// finale's cinematic spine (re-aimed low-and-back) + the ascent's inverse-swell scale math.
+let oarSea = null;   // a dark water disc filling the farSea ring's centre hole under the model
+function startOarFinale() {
+  if (MODE === 'finale') return;   // idempotent: never stack a second terminal / sea disc
+  MODE = 'finale';
+  player.locked = true;
+  interact.enabled = false;
+  UI.cinematic(true);
+  W._finaleWarm = true;            // the clean warm grade, exempt from the descent curdle (#22)
+  A.duckAmbient(true);             // the shore draws quiet as you push off
+  farSea.visible = false;          // the oarSea disc replaces it — no double-shaded overlap (power)
+  // the look-back shot: start low beside the dory, drift seaward and rise a touch,
+  // always gazing back at the island as it shrinks to a model on the water
+  const camStartPos = new THREE.Vector3(-26, 2.6, -116);
+  const pivot = new THREE.Vector3(2, 0.9, -64); // the island's heart — the model collapses here
+  camera.position.copy(camStartPos);
+  // a dark sea under the model: farSea is a RingGeometry(280,9000) with a 280-unit hole at
+  // the origin that the full-size island normally fills; once the island shrinks away the
+  // model would float over a void, so lay a flat dark disc across the gap for the terminal.
+  oarSea = new THREE.Mesh(new THREE.CircleGeometry(1400, 48),
+    new THREE.MeshBasicMaterial({ color: 0x10333c }));
+  oarSea.rotation.x = -Math.PI / 2;
+  oarSea.position.set(pivot.x, 0.03, pivot.z);
+  scene.add(oarSea);
+  // the low sea-level look-back exposes interior-only shells the island was never built to
+  // be seen-from-the-sea with (the vault vista's inverted lighthouse, the drowned gallery,
+  // the annex/cellar innards — backstage that only reads from inside). Hide them for the
+  // terminal; the game ends here, so nothing needs restoring.
+  for (const nm of ['vaultVista', 'vaultDrips', 'drownedGallery', 'quarters']) {
+    core.traverse((o) => { if (o.name === nm) o.visible = false; });
+  }
+  const lookAt = pivot.clone().add(new THREE.Vector3(0, 2, 0)); // aim a touch high so the model rides just below frame-centre
+  finale = {
+    kind: 'oar', t: 0, pivot, lookAt,
+    camStart: camStartPos.clone(),
+    camEnd: new THREE.Vector3(-30, 9.5, -178),  // drift seaward (south) and rise a little: the long look back
+    quatStart: camera.quaternion.clone(),
+  };
+  const line1 = document.querySelector('#finale .fin-line1');
+  if (line1) line1.textContent = 'you left the light on';
+  // the rower's own realization, at peace, fades in as you pull away — NOT the keeper (no
+  // keeper styling, no leading ellipsis, so it doesn't re-read as his voice after his silence)
+  setTimeout(() => { if (finale && finale.kind === 'oar') UI.whisper('The way out was the way in. It always was.'); }, 4400);
+  // one warm bell-partial as the island becomes a model (the withheld, leitmotif-warm toll)
+  setTimeout(() => { if (finale && finale.kind === 'oar') A.bellToll(true); }, 9500);
+}
+
+function tickOarFinale(dt) {
+  const e = easeInOut(clamp(finale.t / 16, 0, 1));
+  // hold a bittersweet golden hour — the night, and its stars, never come
+  W.time = lerp(W.time, 17.6, 1 - Math.exp(-dt * 0.5));
+  for (let i = 0; i < 5; i++) skyMat.uniforms.uConstelGlow.value[i] = 0;
+  // camera: rise and drift seaward off the beach, always looking back at the island
+  camera.position.lerpVectors(finale.camStart, finale.camEnd, e);
+  const look = new THREE.Matrix4().lookAt(camera.position, finale.lookAt, new THREE.Vector3(0, 1, 0));
+  const q = new THREE.Quaternion().setFromRotationMatrix(look);
+  camera.quaternion.slerpQuaternions(finale.quatStart, q, Math.min(1, finale.t * 0.3));
+  // the whole world shrinks toward the island's heart, becoming a tiny lit model floating on
+  // the dark sea (the inverse-swell, run one last time) — clamped to a readable model size
+  // (1/48), not the dive's vanishing 1/240 speck: the held final image must stay legible.
+  const sf = clamp((finale.t - 4.5) / 8, 0, 1);
+  const s = Math.exp(easeInOut(sf) * Math.log(1 / 48));
+  diveGroup.scale.setScalar(s);
+  diveGroup.position.set(
+    finale.pivot.x * (1 - s),
+    finale.pivot.y * (1 - s),
+    finale.pivot.z * (1 - s));
+  // the card rises (held shot, no fade): 'you left the light on'
+  if (finale.t > 13 && !finale.shown) {
+    finale.shown = true;
+    document.getElementById('finale').classList.remove('hidden');
+    requestAnimationFrame(() => document.getElementById('finale').classList.add('show'));
+    document.getElementById('btn-again').addEventListener('click', () => {
+      wipe();
+      sessionStorage.setItem('abyme-autostart', '1');
+      location.reload();
+    });
+  }
 }
 
 function tickFinale(dt) {
   finale.t += dt;
+  if (finale.kind === 'oar') { tickOarFinale(dt); return; }
   const f = clamp(finale.t / 18, 0, 1);
   // surface (level 2): wheel the day into night so the constellation can land.
   // deep: hold a bittersweet golden hour — the night, and its stars, never come.
@@ -721,7 +819,9 @@ function applyAtmosphere(elapsed, dt) {
   // slow drips falling the height of the void — scale cues (vanish at the water,
   // reappear at the roof); only while the vault is open
   if (vaultDrips) {
-    vaultDrips.visible = W.flags.hatchOpen;
+    // hidden during any finale: the oar terminal's sea look-back would otherwise expose this
+    // cellar backstage (a returned player has hatchOpen=true, so this drive re-shows it)
+    vaultDrips.visible = W.flags.hatchOpen && MODE !== 'finale';
     if (W.flags.hatchOpen) for (const d of vaultDrips.children) {
       const u = d.userData;
       u.phase = (u.phase + dt * u.speed) % 1;
@@ -846,7 +946,11 @@ if (DEBUG) {
     getMist: () => mistCur,
     setFinaleT: (t) => { if (finale) finale.t = t; },
     ascend: (instant = false) => startAscent(instant),  // #12 stage 1: the dive run backward
-    getAscent: () => ascent && { t: ascent.t, dur: ascent.dur, snapDone: ascent.snapDone } };
+    getAscent: () => ascent && { t: ascent.t, dur: ascent.dur, snapDone: ascent.snapDone },
+    armOar: () => { W.level = 1; W.flags.returned = true; },   // #22: arm the oar terminal (the climb-out)
+    leave: () => startOarFinale(),                              // #22: trigger the oar terminal (the surface end)
+    ring: () => startFinale(),                                  // the bell terminal (the bottom end) — regression check
+    getFinale: () => finale && { kind: finale.kind, t: finale.t, shown: !!finale.shown } };
 }
 function buildDebugPanel() {
   const el = document.createElement('div');

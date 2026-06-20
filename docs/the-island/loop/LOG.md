@@ -12,6 +12,43 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 75 — 2026-06-20 — ENDGAME: THE OAR — the climb-out terminal (owner fork #22)
+
+**Shipped:** the game's missing last breath. Ringing the bell at the bottom always
+terminated; CLIMBING all the way out did not — you returned to the surface and the game
+just continued, so the integration the whole SPINE points at (UP, carrying the wounded
+self, the light left burning) dead-ended in "go dive again". Now the long-promised beached
+dory (a standing promise since #39) arms once you have gone all the way down AND back
+(`W.flags.returned`, at the surface): a two-touch committed crossing rows you out to the
+ONLY look-BACK shot in the game — the whole island recedes and shrinks into a tiny lit
+model floating on the dark sea (the recursion seen once more, chosen and warm), golden hour
+held, no stars (those belong to the bell's STAY) — and the card lands "you left the light
+on / an island within an island / begin again". The bell is struck at the bottom (accept
+the loop); the oar is rowed at the top (leave, changed). Owner fork #22 made real: a CHOICE
+shape, who-you-are held open. Designed by a multi-agent ending panel (5 blind generative
+lenses → adversarial critique → showrunner synthesis → owner picked from 4 option-sketches),
+built via an implement → adversarial-review pipeline (4 reviewers; 3 must-fixes caught + fixed).
+
+**Evidence (`?debug`, Chrome):** full real-input path verified — the oar hotspot gates on
+`W.level<=1 && returned` (false before arming, true after); hover→1st touch (brink whisper)→
+2nd touch (self-hand journal + terminal). The cinematic plays: low look-back with the lit
+jetty lantern → island shrinks to a model on the dark sea (NO backstage box) → golden-hour
+card framing the tiny model between "ABYME" and "an island within an island". BELL
+regression intact (deep: "you keep the light now", constellation withheld). Review fixes
+verified live: `vaultDrips` no longer flickers back during the finale (mode-gated); the oar
+brink RESETS on walk-away ("You set the oar back down"); discoverability — a seaward return
+whisper + journal name the dory, plus a proximity nudge fires AT the boat; `farSea` hidden +
+the sea disc shrunk (295 draws < 360, 6.2ms gpu, 60fps). Zero console errors. (Also fixed:
+clicking Begin with a save no longer reloads and flashes the title screen back up.)
+
+**Debt:** none added. The dive/ascent code is untouched. The warm `A.bellToll(true)` at the
+oar's 9.5s mark is a deliberate light-kept-AND-left callback (owner may re-judge on listen).
+
+**Next tick (76):** the owner-reported night-stars-grid jank fix ships next; then keep
+polishing — an audio-audition pass, or owner playtest notes on the live ending.
+
+---
+
 ## 74 — 2026-06-20 — graphics #5a: aerial perspective on the terrain
 
 **Shipped:** distant land read crisp where the eye expects atmosphere. The canopy already melted into

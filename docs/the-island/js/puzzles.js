@@ -16,6 +16,7 @@ const LH = new THREE.Vector3(-85, 13.5, -40);
 const CLIFF = new THREE.Vector3(57.5, 14, 50);
 const CLIFF_AZ = Math.atan2(CLIFF.x - LH.x, CLIFF.z - LH.z);
 const _kv = new THREE.Vector3();
+const _ov = new THREE.Vector3();   // scratch for the oar's world position (nested in the dory group)
 
 // the keeper's words, spoken when the figure looks back (#14). Universal,
 // metaphor only — recognition curdling into resignation the deeper you go.
@@ -25,7 +26,7 @@ const KEEPER_LINES = {
 };
 
 export class Game {
-  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale }) {
+  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale, onLeave }) {
     this.refs = refs;
     this.modelRefs = modelRefs;
     this.player = player;
@@ -33,6 +34,7 @@ export class Game {
     this.onDive = onDive;
     this.onAscend = onAscend;
     this.onFinale = onFinale;
+    this.onLeave = onLeave;     // the climb-out terminal: row off the wake-up beach (#22, The Oar)
 
     W.dials = W.dials || [0, 0, 0, 0];
 
@@ -318,7 +320,9 @@ export class Game {
       },
     });
 
-    // the bell — the end
+    // the bell — the END at the bottom (descent / accept the loop). Struck below, it
+    // withholds; struck at the surface it keeps the golden parade. The OTHER terminal
+    // is the oar, at the top (below).
     I.add({
       id: 'bell', targets: [R.bell], label: 'a small bright bell', maxDist: 2.2,
       when: () => W.level >= 2,
@@ -328,6 +332,30 @@ export class Game {
         this._bellBusy = true;
         this.flag('bellRung');
         this.onFinale();
+      },
+    });
+
+    // the oar — the END at the top (#22, owner fork: choice + The Oar). The beached
+    // dory has been a standing promise since loop #39; it arms ONLY once you have gone
+    // all the way down and climbed all the way back out (W.flags.returned at the
+    // surface). The bell is a thing you STRIKE at the bottom (you must stay below to
+    // keep it lit — the loop accepted); the oar is a thing you ROW at the top (the
+    // light kept AND left — you leave, changed). A committed crossing, like the plate:
+    // one touch to weigh it, a second to push off. There is no rowing back.
+    I.add({
+      id: 'oar', targets: [R.doryOar, R.doryHull], label: 'the oar', maxDist: 3.2,
+      when: () => W.level <= 1 && W.flags.returned,
+      onClick: () => {
+        if (this._oarBusy) return;               // session guard: the leave is underway
+        if (!this._oarBrink) {
+          this._oarBrink = true;
+          UI.whisper('The oar is light in your hands now. The water is calm, and the light is lit behind you. Touch it again to push off — there is no rowing back.');
+          return;
+        }
+        this._oarBrink = false;
+        this._oarBusy = true;
+        UI.addJournal('I have left the light on, and I have left. The boat is small and the water is calm. The island is behind me now — and getting smaller, the way a thing does when you finally stop being inside it.', '', 'self');
+        if (this.onLeave) this.onLeave();
       },
     });
   }
@@ -459,6 +487,14 @@ export class Game {
       this._walkedBridge = true;
       this.once('bridge', () => UI.whisper('Centimetre marks underfoot, tall as doorways.'));
     }
+    // the oar terminal (#22) is undiscoverable on text alone — so when a player who has come
+    // all the way back (returned, at the surface) wanders near the dory, name the way out
+    // unmissably, the moment they are AT it. Session-local (no save flag); the hover-glint
+    // then confirms the oar is live.
+    if (W.flags.returned && W.level <= 1 && !this._sawOarNudge && Math.hypot(p.x - (-26), p.z - (-102)) < 9) {
+      this._sawOarNudge = true;
+      UI.whisper('The dory, and its one unused oar. You went down and climbed back; this is the way out, when you are ready to take it.');
+    }
     if (W.level >= 2 && !this._level2Study && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
       this._level2Study = true;
       this.once('level2study', () => {
@@ -529,6 +565,16 @@ export class Game {
         this._brink = false;
         A.duckAmbient(false);
         UI.whisper('You step back from the edge. The sea comes back.');
+      }
+    }
+    // the OAR's brink lets go the same way — walk away from the dory and it resets, so leaving
+    // is always a deliberate two-touch and never fires on a single touch with a stale brink
+    // (the oar sits in the dory group, so use its WORLD position, not its local .position)
+    if (this._oarBrink) {
+      const oar = this.refs.doryOar;
+      if (!oar || (oar.getWorldPosition(_ov), Math.hypot(p.x - _ov.x, p.z - _ov.z) > 3.6)) {
+        this._oarBrink = false;
+        UI.whisper('You set the oar back down. The boat waits.');
       }
     }
 

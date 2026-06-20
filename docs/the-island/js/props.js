@@ -777,14 +777,14 @@ export function buildWorld() {
       pa.setX(v, nx);
     }
     hg.computeVertexNormals();
-    const hull = new THREE.Mesh(hg, weather); dory.add(hull);
+    const hull = new THREE.Mesh(hg, weather); hull.name = 'doryHull'; dory.add(hull);
     for (const tz of [-0.7, 0.7]) {                      // thwarts (seat planks)
       const thwart = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.07, 0.22), weather);
       thwart.position.set(0, 0.16, tz); dory.add(thwart);
     }
     const oar = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 2.5, 6), weather);
     oar.position.set(0.25, 0.28, -0.2); oar.rotation.x = 0.45; oar.rotation.z = 0.5;
-    dory.add(oar);
+    oar.name = 'doryOar'; dory.add(oar);
     core.add(dory);
   }
 
@@ -1557,7 +1557,7 @@ const NAMES = [
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally',
-  'jettyLantern', 'jettyHalo', 'plateGlow',
+  'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
