@@ -7,6 +7,70 @@
 
 ---
 
+## Panel #5 — 2026-06-20 — stock-take (the fork-neutral work is done)
+
+_Convened (iter 63, ~7 builds since Panel #4) to take stock. Since Panel #4 the loop has:
+polished the ascent on all three fronts (discoverable — whisper+journal+plate-glint; leaves
+a mark — surface beat + the tally stays full; weight — a 28s laboured climb), made act two
+rhyme with the grief (valve/plumb/lens/shadows), and the environments + five grades are
+shipped and beautiful (golden-hour overview: coral sky, long pine shadows, soft surf,
+60fps/220 draws). Is ABYME finished? What's the highest-wow move the loop can still make
+WITHOUT the owner's forks?_
+
+### THE FINISHER — played it end to end, both endings
+
+**Verdict.** It's a real game now, and it moved me — the descent curdles, the keeper speaks
+then goes silent, the climb is heavier than the fall, the journal fills with two hands
+becoming one. The bell-at-depth withholds beautifully (no constellation, the keeper
+murmuring) — that ending LANDS. But the one real hole is exactly the owner's to fill: I
+climbed ALL the way out to the surface… and the game just kept going. The "return leaves a
+mark" beat is lovely but it is not an ENDING — no credits, no last image, no "you left."
+Ring-the-bell terminates; climb-out doesn't. So the integration ending the whole SPINE
+points at — UP, carrying him, changed — currently dead-ends in "you're back on the beach,
+go dive again." That's not a flaw in the loop's work; it's the CLOSED-vs-CHOICE / terminal-
+states fork, and it cannot be authored without the owner.
+
+### THE SKEPTIC — what's left that the loop can actually do?
+
+**Verdict.** Honestly, not much that's high-wow AND fork-neutral. The big fork-neutral wins
+are spent: the ascent (8 loops), the act-two rhyme, the environments, the grades, the perf.
+What remains fork-neutral is SECOND-tier — the last two act-two beats (ruler/bird), an
+audio-audition pass (unverifiable headless), onboarding/accessibility, a replay/"new game+"
+hook. All worth doing; none of them the thing that finishes the game. The thing that
+finishes the game is the ending fork, and that's a creative decision, not a build. The loop
+has reached the honest edge of its autonomy: it can keep polishing, but it can't decide what
+leaving MEANS.
+
+### SHOWRUNNER — synthesis & the recommendation
+
+ABYME is strong and substantially shippable as an EXPERIENCE — the descent-and-return is
+complete, polished, and emotionally landing. The one structural incompleteness is the
+climb-out's missing TERMINAL, and that is the owner's CLOSED-vs-CHOICE fork (issue #22), not
+fork-neutral work.
+
+- **Crispest recommendation to the owner:** pick the ending SHAPE. The minimum decision that
+  unblocks a finished game is just fork #1 (one authored ending vs a ring-vs-climb choice) —
+  even a one-line steer ("climb-out should end with X feeling, camera at Y") lets the loop
+  build the terminal in 1–2 ticks. Forks #2 (who-the-player-is) and #3 (final camera) can
+  ride on that.
+- **Until then the loop continues fork-neutral, second-tier:** finish the act-two rhyme
+  (ruler/bird); an onboarding/accessibility pass; a replay hook; an audio-audition pass
+  (flagged for the owner). Keep cadence; don't manufacture risky polish on a finished thing.
+- **Do NOT** autonomously author the terminal/ending (it bakes in the fork), add environments
+  (done), or chase graphics the power policy would reject.
+
+**One-line state for the owner:** *the game is whole except its last breath — climbing out
+has no ending yet, and only you can say what leaving means.*
+
+### Response — iteration 63
+
+Filed this panel; sharpened issue #22 (the climb-out terminal is the owner's fork, with the
+minimal-decision framing); noted it in SPINE step 5. Did NOT build (critique tick). Next
+fork-neutral build: finish the act-two rhyme (ruler/bird) or an onboarding pass, until the
+owner steers the ending.
+
+---
+
 ## Panel #4 — 2026-06-19 — the return (the arc, now whole)
 
 _Convened (iter 56, ~5 builds since Panel #3) the moment the ascent went LIVE — the
