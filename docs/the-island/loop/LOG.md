@@ -12,6 +12,39 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 68 — 2026-06-20 — graphics (CUT stack #3a: gate the dormant volumetric beams)
+
+**Shipped:** the lighthouse beam, its inner shaft, and the cellar light-shaft are all
+`AdditiveBlending` transparent cones — they cost overdraw fill EVERY frame they're drawn, even at
+~0 intensity (invisible but not free). They're dormant most of the game (the lamp needs lens+night;
+the shaft needs the hatch open). `puzzles.js _apply` now sets `.visible = animatedIntensity > 0.004`
+for `beamCone` / `shaftBeam` / `cellarShaft` — driven on BOTH instances so the chart-table model's
+tiny beam mirrors the island lamp; the `uIntensity` uniform stays island-only (unchanged). The
+beams fade in exactly as before as their intensity ramps past the threshold — one coherent thing.
+
+**Evidence (Power Ledger, `?debug` bench pose):** measured via direct `renderer.render` (bypasses
+`game.tick`, so forced-visible vs gated visibility is cleanly isolated), dormant lamp+hatch:
+draws **235→232 (−3)**, tris **521,528→521,464 (−64)**, IDENTICAL at noon (12h) and night (23h) —
+and these are additive-transparent draws, so the real win is the per-frame overdraw FILL eliminated
+(biggest when the camera is near/under the beam in play, smaller at the far overview pose). GPU-frame-ms
+HOLDS: 11.3ms noon / 11.6ms night, ~60fps capped (488/407fps uncapped → ample headroom). No-regression
+verified: beam+shaft VISIBLE when lit (lens placed @22h → beamI 1; screenshot shows the cone streaking
+into the stars); cellar shaft VISIBLE at hatchOpen; all three hidden when dormant; model beam mirrors
+the island lamp. ZERO console errors (preview restarted for a clean buffer).
+
+**Debt:** cleared part of CUT-stack #3. Backlogged (with reasons): (a) particle `frustumCulled=true`
+is NOT a safe one-liner — the Points live in `diveGroup` which rescales 240× mid-dive, and the auto
+boundingSphere ignores the shader's ±0.6 drift + player-proximity point-size; needs a dive-edge
+frustumCull toggle + dive-scale cull verification. (b) the 7-light `.visible` edge-gating (the biggest
+fill cut) still wants its own careful tick (hide the recompile hitch on a curtain + verify no light
+that should be lit goes dark).
+
+**Next tick:** CUT-stack #3b — gate the conditional point-lights on state edges (the bigger fill win)
+if cleanly edge-safe, else the particle frustumCull-with-dive-toggle; then baked AO (#4). Honor any
+owner endgame-fork redirect FIRST.
+
+---
+
 ## 67 — 2026-06-20 — close-look jank (a black box on the chart-table model) — fixed
 
 **Fixed:** leaning over the chart-table model (the recursion centerpiece the player stares at

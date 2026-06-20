@@ -181,11 +181,15 @@ a downloaded image/normal-map/mesh, update **`index.html:33`** (the title line) 
 
 **Roadmap, sequenced cheap-and-power-neutral FIRST (banks headroom for the one power-raiser):**
 (1) the Power Ledger + bench pose + reconciled draw budget [gate]; (2) per-grade
-`toneMappingExposure` from the active grade [zero GPU cost]; (3) cheap CUT stack — gate the 7
-conditional point-lights via `.visible` on state EDGES (a zero-intensity light STILL costs a
-per-fragment loop iteration — only `.visible=false` drops it; hide the one-time shader recompile on
-the hatch-open/dive curtain), `frustumCulled=true`+boundingSphere on the Points, beam `.visible`
-gate, water fbm 4→3; (4) vertex-baked AO into the Baker [bake-time only; keep sampling coarse so
+`toneMappingExposure` from the active grade [zero GPU cost]; (3) cheap CUT stack, ONE safe item per
+tick: beam/shaft/cellar-shaft `.visible` gate when animated intensity~0 ✓ DONE iter 68 (−3 additive
+draws + the overdraw fill when dormant; the beams are AdditiveBlending so they cost fill even at 0
+intensity). REMAINING — gate the 7 conditional point-lights via `.visible` on state EDGES (a
+zero-intensity light STILL costs a per-fragment loop iteration — only `.visible=false` drops it;
+hide the one-time shader recompile on the hatch-open/dive curtain) [biggest cut]; `frustumCulled=true`
++boundingSphere on the Points — NOT a one-liner: they live in `diveGroup` which rescales 240× mid-dive
+and the auto boundingSphere ignores the shader's ±0.6 drift + proximity point-size, so it needs a
+dive-edge frustumCull toggle + dive-scale cull check; water fbm 4→3; (4) vertex-baked AO into the Baker [bake-time only; keep sampling coarse so
 load stays snappy]; (5a) distance aerial-perspective (generalize the canopy haze to terrain/stone)
 [near-free] — ship this FIRST and SEPARATELY from (5b) the triplanar normal/roughness break-up
 [treat as adds-MEDIUM, terrain fills the frame — bench-profile at noon before shipping]; (6)

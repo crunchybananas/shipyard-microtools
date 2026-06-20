@@ -597,9 +597,13 @@ export class Game {
       if (!isModel) R.lampLens.material.emissiveIntensity = W.lampLit ? 2.6 : 0.25;
     }
     if (R.beamPivot) R.beamPivot.rotation.y = W.beamAngle;
-    if (R.beamCone && !isModel) R.beamCone.material.uniforms.uIntensity.value = an.beamI;
-    if (R.shaftBeam && !isModel) R.shaftBeam.material.uniforms.uIntensity.value = an.shaft;
-    if (R.cellarShaft && !isModel) R.cellarShaft.material.uniforms.uIntensity.value = an.hatch * 0.9;
+    // gate the volumetric beams (#3 power-cut): additive transparent overdraw still costs
+    // fill at ~0 intensity, and they're dormant most of the game (lamp/hatch off). Hide them
+    // when dark. Visibility driven on BOTH instances so the model beam mirrors the island lamp;
+    // the uIntensity uniform stays island-only (the model beam isn't separately animated).
+    if (R.beamCone) { R.beamCone.visible = an.beamI > 0.004; if (!isModel) R.beamCone.material.uniforms.uIntensity.value = an.beamI; }
+    if (R.shaftBeam) { R.shaftBeam.visible = an.shaft > 0.004; if (!isModel) R.shaftBeam.material.uniforms.uIntensity.value = an.shaft; }
+    if (R.cellarShaft) { R.cellarShaft.visible = an.hatch > 0.004; if (!isModel) R.cellarShaft.material.uniforms.uIntensity.value = an.hatch * 0.9; }
     if (R.glyphPlane) R.glyphPlane.visible = this.glyphsLit;
 
     if (R.plumbHung) R.plumbHung.visible = F.plumbHung;
