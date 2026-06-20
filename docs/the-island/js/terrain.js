@@ -267,6 +267,7 @@ export function buildTerrain() {
     flatShading: true,
     roughness: 0.95,
     metalness: 0.0,
+    side: THREE.DoubleSide, // chasm/valley walls + the underside read solid, never see-through
   });
   // cut the hatch hole into the heightfield (local space, so the model
   // island inherits the same hole — recursion demands it)

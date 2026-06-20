@@ -12,6 +12,33 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## ★ owner bug (2026-06-20) — see-through chasm/valley walls (terrain was single-sided)
+
+**Fixed (owner-reported):** "falling into the valley is still super buggy — I still see
+through the wall." Walking down a chasm/valley lip puts the camera below the surrounding
+rim (e.g. (39.7, -0.8, -14.6), the chasm's west lip — chasm centreline x≈46), and from
+there you could see STRAIGHT THROUGH the terrain walls. Cause: the terrain mesh material
+was `MeshStandardMaterial` with no `side` set → `FrontSide` (single-sided), so any wall
+viewed from its back/inside was backface-culled and invisible.
+
+- `terrain.js`: terrain material → `side: THREE.DoubleSide`. Walls and the underside now
+  read solid from any angle. (The 1:240 model shares this material, so the recursion's
+  terrain is fixed too.)
+
+POWER: effectively neutral — DoubleSide only disables backface culling; it adds no draws
+and no tris (verified 231 draws / 521k tris, unchanged), and backfaces only rasterise
+where they're actually visible (inside the chasm), which normal play occludes.
+
+**Evidence:** in-play (`?debug`). From the exact stuck spot (the chasm lip, looking across)
+the wall now renders as a SOLID terrain face (was: see-through with the world showing
+through). Normal beach view unchanged (no regression). `terrain.material.side === 2`
+(DoubleSide). Zero console errors. NOTE: you can still walk down to the lip (the deeper
+descent below -2.2 is already blocked in player.js); it just no longer looks broken. If you
+want the player blocked from the lip entirely, that's a separate walkability tweak (care:
+the causeway crest at -1.42 must stay passable).
+
+---
+
 ## ★ owner request (2026-06-20) — the intro lands continuously (no cut to standing)
 
 **Shipped (owner-reported):** "the flow across the water is amazing, but then it pauses and
