@@ -82,7 +82,7 @@ export class Game {
         if (this.flag('valveTurned')) {
           A.addStem(1); W.stems = Math.max(W.stems, 1);
           UI.whisper('Below the window, the sea obeys.');
-          UI.addJournal('A valve beside the chart table. When I turn it, the basin drains — and so does the bay.');
+          UI.addJournal('A valve beside the chart table. Turn it, and the basin drains — and so does the bay. Someone built a machine to make the sea go back, and must have turned it, and turned it. As if, on some one day, holding the water back was the only thing left worth wanting.');
         }
         save(this.player.pos);
       },
@@ -266,7 +266,7 @@ export class Game {
         W.inventory = W.inventory.filter((s) => s !== 'plumb');
         A.chime();
         UI.whisper('It hangs dead-centre over the model. Over the beach where you woke.');
-        UI.addJournal('Hung the plumb line. It points at the model’s beach — at a brass plate on the floor, big enough to stand on.');
+        UI.addJournal('Hung the plumb line. It hangs dead-centre over the model’s beach — over a brass plate in the floor, big enough to stand on. The weight knows the depth before it drops. Whoever hung it first already knew how far down this goes.');
         save(this.player.pos);
       },
     });

@@ -12,6 +12,41 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 61 — 2026-06-19 — story/worldbuilding (act two begins to rhyme with the grief)
+
+**Shipped:** The first pass at Panel #4's act-two gap — the middle puzzles reading as
+"clever toys" disconnected from the keeper's story. TEXT-ONLY: the two most loaded
+puzzle-completion JOURNAL entries now rhyme with his grief, while keeping their surface
+clue intact for a first-time player.
+- The VALVE (the tide): "…Someone built a machine to make the sea go back, and must have
+  turned it, and turned it. As if, on some one day, holding the water back was the only
+  thing left worth wanting." — draining re-read as the day he tried to hold the water back.
+- The PLUMB (the depth): "…The weight knows the depth before it drops. Whoever hung it
+  first already knew how far down this goes." — measuring a depth he already knew.
+
+No mechanic / solve-order change — purely the diegetic record. Metaphor, no biography.
+Fork-neutral.
+
+- `puzzles.js`: the `valveTurned` and `plumbHung` `UI.addJournal(...)` strings deepened
+  (whispers unchanged — they carry the puzzle clue).
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Fired the real `valve`
+and `hook` hotspots' onClick: `W.flags.valveTurned` and `W.flags.plumbHung` still set
+(mechanics + chain intact), and the enriched journals fire once each (text confirmed —
+"holding the water back" / "how far down this goes"). The chain stays solvable.
+
+**Debt:** none broken. Remaining act-two beats (ruler, birdsong, lens, shadows) could get
+the same rhyme in a later tick — optional; valve+plumb are the two most thematically
+loaded, so this is the highest-value slice.
+
+**Next tick suggestion:** finish the act-two rhyme on 1–2 more beats (the LENS — "don't
+read all four"; the SHADOWS — the keeper read the same hour), OR shift axis (a graphics/
+atmosphere polish, an audio-audition pass, or a Panel #5). NOTE iter 65 is the next push
+boundary (batch 13 = 61–65). The owner's three forks remain the only thing between here and
+a finished ending.
+
+---
+
 ## 60 — 2026-06-19 — polish + BATCH 12 PUSH (the plate glints; the whole ascent goes live)
 
 **Shipped:** The visual half of discoverability (Panel #4 #1), then the deploy. The brass
