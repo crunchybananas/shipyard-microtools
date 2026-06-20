@@ -403,7 +403,17 @@ function landAscent() {
   diveGroup.position.set(0, 0, 0);
   const wasLevel = W.level;
   W.level = Math.max(W.level - 1, 1); // one recursion shallower — clamp at the surface
-  if (W.level <= 1) W.flags.climbing = false; // back at the surface — a new descent is possible
+  if (W.level <= 1) {
+    W.flags.climbing = false; // back at the surface — a new descent is possible
+    // THE RETURN LEAVES A MARK (#12, Panel #4 #2): you climbed all the way out. The world is
+    // as you left it; only you are different — and the chart-table tally stays full (the
+    // fingerprint, driven in puzzles _apply by W.flags.returned). Fork-neutral; not an ending.
+    if (!W.flags.returned) {
+      W.flags.returned = true;
+      UI.whisper('Back at the surface. The door, the coat, the jetty — all as you left them. Only you are different.');
+      UI.addJournal('I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay.', '', 'self');
+    }
+  }
   // the keeper falls silent behind you (#12 stage 3): the first time you turn back from the
   // depths, his voice gives one last fading line — then the floor below goes quiet for good.
   // You leave him where he chose to stay, and you leave the light BURNING (integration, not

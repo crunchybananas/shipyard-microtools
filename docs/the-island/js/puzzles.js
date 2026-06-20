@@ -659,7 +659,9 @@ export class Game {
     // since iter 33), and — driven on BOTH island and model — the count recurses
     // table-within-table. Surface (level 1) shows none: the normal game is untouched.
     if (R.chartTally) {
-      const n = (W.level | 0) - 1;
+      // grows one mark per level descended; once you have climbed all the way back the
+      // record STAYS full at the surface — the fingerprint that you went down and returned (#12)
+      const n = W.flags.returned ? (MAX_DEPTH - 1) : (W.level | 0) - 1;
       const kids = R.chartTally.children;
       for (let i = 0; i < kids.length; i++) kids[i].visible = i < n;
     }

@@ -12,6 +12,46 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 58 — 2026-06-19 — story/design (the return leaves a mark — Panel #4 gap #2)
+
+**Shipped:** Climbing all the way out to the surface no longer lands you back exactly as
+you started — the arc promised you return CHANGED, and now the world shows it, two ways:
+- A felt beat the once you reach the surface after a climb: a whisper ("Back at the
+  surface. The door, the coat, the jetty — all as you left them. Only you are different.")
+  + a re-readable self-hand journal line ("I have been all the way down and all the way
+  back… the hand that writes this is mine again, and I left his still burning below. I did
+  not put it out. I did not stay.").
+- A persistent VISIBLE fingerprint: the chart-table descent tally (iter 46) now STAYS full
+  at the surface once you've returned — three scratches that used to vanish when you came
+  up now remain, the record that you went to the bottom of your own making and climbed back.
+
+Fork-NEUTRAL: evidence of the journey, not an ending or a who-you-are reveal. Additive;
+the dive/chain/finale/ascent untouched.
+
+- `world.js`: `flags.returned` (backward-compatible default false).
+- `main.js` `landAscent`: on reaching the surface (level 1) via a climb, set `returned`
+  once + fire the whisper/journal.
+- `puzzles.js` `_apply` tally: `n = W.flags.returned ? MAX_DEPTH-1 : W.level-1` — full and
+  permanent once returned, unchanged behaviour before.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. A normal level-1 start
+does NOT set `returned` or add a journal entry; a full dive-to-bottom-then-climb-out sets
+`returned` exactly at the surface (L2→L1), adds the self-hand entry (verbatim confirmed),
+and `returned` stays false until the surface. Tally at the surface after return = `[1,1,1]`
+(numeric) and SCREENSHOT shows the three gold marks on the chart-table east margin at
+level 1 (in iter 46 the surface showed none). 60fps.
+
+**Debt:** Panel #4 gap #3 (give the climb weight — it's too symmetric with the dive)
+remains, plus the larger filed act-two-rhyme note. None broken.
+
+**Next tick suggestion:** Panel #4 GAP #3 — give the climb WEIGHT so ascending feels like
+an effort, not the dive with the sign flipped: e.g. a slower ascent swell, a lonelier
+audio bed in the keeper's silence, or the SPINE's literal per-level re-lock. OR (iter 60 is
+the PUSH boundary — batch 12 deploys 56–60) keep it safe and consider a Panel #5 / owner
+playtest check before the push. Re-surface the three forks.
+
+---
+
 ## 57 — 2026-06-19 — story/design (the climb made discoverable — Panel #4 gap #1)
 
 **Shipped:** The one true payoff can no longer be missed. Panel #4's top gap: a player who
