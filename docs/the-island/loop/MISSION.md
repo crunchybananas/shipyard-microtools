@@ -47,6 +47,41 @@ Run one roughly every ~5 build iterations, or whenever a thread feels adrift.
 A persona's job is friction, not kindness; its findings become the next
 iterations' work. The synthesis of a panel updates SPINE.md and files issues.
 
+### Running a panel as a multi-agent workflow (subagents that confer)
+
+A panel can run inside one head (sequential personas) OR — preferred for big
+decisions like the endgame — as a **Workflow** where each persona is its own
+subagent. The point of separate agents is DIVERGENCE: blind, independent voices
+that don't converge on the first plausible answer. Conferral protocol:
+
+1. **GENERATE (parallel, blind).** Each *generative* persona proposes 1–2
+   concrete concepts FROM ITS LENS, not seeing the others' first — diversity by
+   construction. Generative lenses: **The Finisher** (does it END + land
+   emotionally? would a real player feel closure?), **The Narrative Architect**
+   (does it pay off grief→INTEGRATION + the two-hands motif? is it earned?),
+   **The Genre Historian** (how do Myst / Outer Wilds / Gone Home / Firewatch
+   end — the canonical move, and the tasteful subversion?), **The Art Director /
+   Cinematographer** (the final IMAGE: last shot, light, composition, camera
+   move), **The Player-Avatar lens** (WHO is the player — does this concept
+   answer or hold it?).
+2. **ADVERSARIAL CROSS-CRITIQUE.** Every concept is attacked by **The Skeptic**
+   + an independent refute-pass (default to "this is sentimental / over-explained
+   / rings false / contradicts canon / leaks biography" and try to kill it).
+   Only concepts that survive a majority advance. Diverse lenses, not redundant
+   refuters.
+3. **SYNTHESIZE (The Showrunner).** Judges the survivors against the SPINE and
+   the open forks, merges the best ideas, and produces **3–4 distinct
+   option-sketches for the OWNER** — never a single pre-decided answer.
+4. **OWNER DECIDES the shape** (the forks below are HIS). Then **IMPLEMENT →
+   adversarial-review** pipeline: build, then independent reviewers verify it
+   plays clean end-to-end, lands, stays all-metaphor (no biography), and is
+   power-safe.
+
+**Decision rights:** the panel PROPOSES and pressure-tests; the owner DECIDES
+the forks. Subagents must never bake in fork #2 (who-is-the-player) or #3 (final
+camera) — they surface options. (Past panels live in CRITIQUES.md; the endgame
+forks are the live tensions at the foot of SPINE.md.)
+
 ## Procedure
 
 1. **Read `LOG.md`** (same directory): the last 3 entries, the backlog, and the
