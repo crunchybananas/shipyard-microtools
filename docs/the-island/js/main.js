@@ -265,6 +265,7 @@ function beginIntro() {
   setTimeout(() => titleEl.classList.add('fading'), 1400);
   UI.cinematic(true);
   UI.fadeIn();
+  setIntroLanding();        // aim the approach to land exactly on the standing frame
   MODE = 'intro';
   intro = { t: 0, dur: 19 };
   const skip = () => { if (intro) intro.t = intro.dur; canvas.removeEventListener('pointerdown', skip); };
@@ -276,7 +277,7 @@ function endIntro() {
   MODE = 'play';
   scene.remove(spray);
   UI.cinematic(false);
-  player.spawn(new THREE.Vector3(4, 0, -104), 2.19, 0.05);
+  player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); // == the flight's final frame: no cut
   player.locked = false;
   interact.enabled = true;
   UI.whisper('The tide brought you back.');
@@ -561,6 +562,23 @@ const INTRO_LOOK = new THREE.CatmullRomCurve3([
   new THREE.Vector3(LH.x, LH.y + 12, LH.z),
 ], false, 'catmullrom', 0.5);
 const _introLookV = new THREE.Vector3();
+
+// the play-start frame — one source of truth, so the approach can LAND on it: the
+// flythrough decelerates into exactly where (and how) the player will stand, and
+// endIntro hands over with no cut. Before, the flight ended high over the water and
+// then SNAPPED to standing on the beach — that jump is what read as a pause.
+const SPAWN_POS = new THREE.Vector3(4, 0, -104);
+const SPAWN_YAW = 2.19, SPAWN_PITCH = 0.05;
+function setIntroLanding() {
+  // place the camera exactly at the standing frame, then aim the approach curves'
+  // final points at it so the glide eases seamlessly into gameplay
+  player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH);
+  const eye = camera.position.clone();
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  INTRO_PATH.points[INTRO_PATH.points.length - 1].copy(eye);
+  INTRO_LOOK.points[INTRO_LOOK.points.length - 1].copy(eye).addScaledVector(fwd, 40);
+  player.locked = true; // the approach owns the camera until endIntro hands it back
+}
 
 // spume blown off the swell along the skim leg — alive only mid-approach
 const spray = (() => {
@@ -871,7 +889,8 @@ renderer.setAnimationLoop((tMs) => {
     camera.position.y += Math.sin(elapsed * 0.9) * lerp(0.12, 0.55, lowness) * (1 - f * f);
     INTRO_LOOK.getPoint(e * e, _introLookV);
     camera.lookAt(_introLookV);
-    camera.rotation.z += Math.sin(elapsed * 0.55 + 1.7) * 0.022 * lowness; // banking
+    // banking — damped to zero as we land, so the handoff has no residual roll
+    camera.rotation.z += Math.sin(elapsed * 0.55 + 1.7) * 0.022 * lowness * (1 - f * f);
     const su = spray.material.uniforms;
     su.uGlobal.value = smoothstep(0.18, 0.38, e) * (1 - smoothstep(0.72, 0.9, e));
     su.uTime.value = elapsed;

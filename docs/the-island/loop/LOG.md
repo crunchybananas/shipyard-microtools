@@ -12,6 +12,31 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## ★ owner request (2026-06-20) — the intro lands continuously (no cut to standing)
+
+**Shipped (owner-reported):** "the flow across the water is amazing, but then it pauses and
+we are suddenly on land — should be one continuous scene." The approach flythrough ended
+high over the water at `(10, 4, -118)` and then `endIntro` HARD-SNAPPED the player to a
+different spot/orientation `(4, 0, -104)` — that jump is the "pause / suddenly on land."
+
+Fixed so the flight LANDS on the exact standing frame and hands over seamlessly:
+- `main.js`: a single source of truth `SPAWN_POS/YAW/PITCH` + `setIntroLanding()` (called at
+  the start of `beginIntro`): it positions the camera at the standing frame, then sets the
+  approach curves' FINAL points to that eye position and forward (`INTRO_PATH[last]=eye`,
+  `INTRO_LOOK[last]=eye+fwd*40`) so the glide eases right into where the player will stand.
+- The intro's banking roll now damps to 0 at the end (`*(1 - f*f)`, matching the bob), so
+  there's no residual motion at handoff.
+- `endIntro` spawns the same `SPAWN_*` — identical to the flight's final frame → no cut.
+
+**Evidence:** in-play (`?debug`). Math proof: the flight's final frame vs the spawn frame —
+posDelta 0, quatDot 1.000000 (identical position AND orientation). Real path: clicked Begin
+(real `setIntroLanding`), drove the intro to its end — near-landing screenshot and post-
+`endIntro` screenshot are continuous (same standing view of the beach/lighthouse); after
+handoff `playerLocked:false`, `introDone:true`, chrome shown, camera at `(4,1.71,-104)`. Zero
+console errors. 60fps.
+
+---
+
 ## ★ owner request (2026-06-20, between iters 63 and 64) — a visible SOUND TOGGLE (UX)
 
 **Shipped (owner-requested, not a numbered loop iteration):** sound could only be toggled by
