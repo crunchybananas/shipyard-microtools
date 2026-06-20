@@ -12,6 +12,43 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 87 — 2026-06-20 — the twist HOLDS: 4 adversarial-review must-fixes (the integration lock + canon)
+
+**Shipped (local):** the adversarial review of #86 (4 lenses) found the twist's integration lock and
+canon-safety did NOT hold as built. All four must-fixes landed, plus the key should-fixes:
+1. **UNMISSABLE** — a player could reach the bottom, ring the bell, and skip the whole beat
+   (violating SPINE lock #3 by name). The deep bell now REFUSES at MAX_DEPTH until keeperRose
+   ("Not yet. Something at the chart table has lifted its head…") — the revelation can't be bypassed.
+2. **CANON INVERSION** — the carried ascent reused the "he stays below / don't leave the light on for
+   me / I left his still burning below" farewell + journals, telling the player the OPPOSITE of what
+   they did. `landAscent` / the surface return / the arrival now BRANCH on `W.flags.carried`: carried
+   reads as rising WITH him ("I did not leave him… two lights, both climbing"; "his voice is beside
+   you now, not below"). The old text remains only for a non-carried climb-out.
+3. **SINGLE-TAP EMBRACE** — a stale shared `_brink` could collapse the integration two-touch into one
+   tap with the embrace line never shown. The embrace got its OWN `_embraceBrink` + step-off release
+   (mirroring the oar): the turn-and-rise is always a fresh, deliberate two-touch.
+4. **RELOAD STRANDED IT** — keeperRose was set by a non-saving assignment AFTER its once-key
+   persisted, so a mid-beat reload killed the twist forever. keeperRose is now `flag()`'d IMMEDIATELY,
+   atomic with the once-key + self-healing.
+- Plus: the player is HELD for the ~5 s revelation (the eye-level line never plays to an empty room);
+  the rise relaxes once you've CARRIED him out (no mute re-raise on re-descent) and the moment you
+  ring the bell instead (you turned away from him).
+
+**Evidence (`?debug`):** boots clean, no console errors. Verified each: deep bell with keeperRose
+false → no finale (gate held); keeperRose true within a few frames of `ABYME.bottom()`, player held
+then released; with a STALE `_brink=true` the first embrace touch does NOT commit (carried false,
+`_embraceBrink` true), the second does (carried + climbing + ascent); carried ascent journals "I did
+not leave him…" vs the plain climb-out "I went all the way down…". Power unchanged.
+
+**Review verdict:** "land the four must-fixes and the emotional centre will hold" — done. Deferred
+should-fix: differentiate the embrace INPUT further (face-the-figure) — the embrace line is now
+mandatory (narrating the verb at commit); revisit with owner feel.
+
+**Next tick (88):** OWNER FEEL on the twist (`ABYME.bottom()` on the local server), then item 5 —
+the five era ambient music stems.
+
+---
+
 ## 86 — 2026-06-20 — THE TWIST lands: the keeper rises, and you choose to carry him up (item 4, core)
 
 **Shipped (the bottom beat — LOCAL, not deployed):** the emotional centre of the pivot —

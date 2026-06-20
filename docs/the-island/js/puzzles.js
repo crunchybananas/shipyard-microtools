@@ -47,6 +47,7 @@ export class Game {
     this._keeperLook = 0;        // eased 0..1: the figure turning to face you
     this._keeperLookTarget = 0;
     this._keeperRise = 0;        // eased 0..1: the twist — the figure rising to meet your eye
+    this._embraceBrink = false;  // the embrace's OWN two-touch (never shares the plate's _brink)
     this._leftStudy = false;     // armed once you wander off, for the return beat
 
     this._buildHotspots(modelAnchor);
@@ -310,23 +311,32 @@ export class Game {
         // THE EMBRACE (item 4): once the keeper has RISEN to meet you (keeperRose, at the bottom,
         // not yet climbing), this committed plate-touch IS the integration — you turn him around
         // and rise CARRYING him. The active verb is yours: the rising is your CHOICE, the only
-        // thing that separates integration from being rescued. A two-touch, deliberate, like the dive.
-        const embrace = W.flags.keeperRose && !W.flags.climbing;
+        // thing that separates integration from being rescued. It gets its OWN two-touch brink so a
+        // stale plate-brink can never collapse it into one tap, and the embrace line always shows.
+        if (W.flags.keeperRose && !W.flags.climbing) {
+          if (!this._embraceBrink) {
+            this._embraceBrink = true;
+            A.duckAmbient(true);
+            UI.whisper('He is here, at the foot of the stairs, looking up. Stand, and rise — and take him with you. Touch again.');
+            return;
+          }
+          this._embraceBrink = false;
+          this.flag('carried');   // the twist: you did not leave him at the bottom
+          UI.addJournal('I turned him around. Whatever I came down all this way looking for, it was him — it was me — and I would not leave him at the bottom. We go up together: one lamp, lit at both ends of the staircase.', '', 'self');
+          this.flag('climbing');
+          if (this.onAscend) this.onAscend();
+          return;
+        }
+        // ---- the plain climb (no keeper risen, or already climbing through the levels) ----
         if (!this._brink) {
           this._brink = true;
           A.duckAmbient(true);
-          UI.whisper(embrace
-            ? 'He is here, at the foot of the stairs, looking up. Stand, and rise — and take him with you. Touch again.'
-            : W.flags.climbing
-              ? 'Touch the plate again to rise another level. What lies below will not let you down again.'
-              : 'There is nowhere further down. Touch the plate again to begin the long climb up — and carry what you found here.');
+          UI.whisper(W.flags.climbing
+            ? 'Touch the plate again to rise another level. What lies below will not let you down again.'
+            : 'There is nowhere further down. Touch the plate again to begin the long climb up — and carry what you found here.');
           return;
         }
         this._brink = false;
-        if (embrace) {
-          this.flag('carried');   // the twist: you did not leave him at the bottom
-          UI.addJournal('I turned him around. Whatever I came down all this way looking for, it was him — it was me — and I would not leave him at the bottom. We go up together: one lamp, lit at both ends of the staircase.', '', 'self');
-        }
         this.flag('climbing');   // one-way: from here the plate only rises, until the surface
         if (this.onAscend) this.onAscend();
       },
@@ -341,6 +351,13 @@ export class Game {
       onClick: () => {
         // session-local guard: a reload during the finale must allow re-ringing
         if (this._bellBusy) return;
+        // the bottom is the keeper's: you may not toll the deep bell until you have met him
+        // rising (the twist is the MANDATORY bottom beat, never skippable — SPINE lock). Nudge
+        // toward the chart table; once he has risen, ringing here is a real choice (you stay below).
+        if (W.level >= MAX_DEPTH && !W.flags.keeperRose) {
+          UI.whisper('Not yet. Something at the chart table has lifted its head, and is looking up at you.');
+          return;
+        }
         this._bellBusy = true;
         this.flag('bellRung');
         this.onFinale();
@@ -555,15 +572,21 @@ export class Game {
         // toward. BODY BEFORE LINE: the weary recognition, then it RISES (W.flags.keeperRose +
         // the pitch inverts), then — at eye-level, the water thinned — the line CONFIRMS it.
         this.once('keeperTwist', () => {
+          // persist the revelation IMMEDIATELY (atomic with the once-key) so a mid-beat reload can
+          // never strand you in a twist-less bottom; this also arms the embrace AND the visual rise.
+          this.flag('keeperRose');
+          // hold the player (like the dive/ascent) so the rise and the eye-level line always land
+          // with the figure in view — never blasted into an empty room behind your back.
+          this.player.locked = true;
           A.duckAmbient(true);
-          A.say('keeper_look_4', 'resigned');                 // costly love: it is spent ("faster than I was")
+          A.keeperRise();                                     // the pitch inverts to RISE as he climbs
+          A.say('keeper_look_4', 'resigned');                 // costly love: he is spent ("faster than I was")
           UI.whisper(KEEPER.look[4]);
-          setTimeout(() => { W.flags.keeperRose = true; A.keeperRise(); }, 2700);   // the body begins to rise
-          setTimeout(() => {
+          setTimeout(() => {                                   // body before line: after he has risen
             A.say('keeper_there_you_are', 'resigned', true);  // eye-level: clear, close, no longer below
             UI.whisper('There you are. I’ve been coming down for you.');
-          }, 4600);
-          setTimeout(() => A.duckAmbient(false), 8200);
+          }, 3800);
+          setTimeout(() => { this.player.locked = false; A.duckAmbient(false); }, 6000);   // release the held breath
         });
       } else if (near) {
         this.once('keeperLook' + W.level, () => {
@@ -577,8 +600,11 @@ export class Game {
       this._keeperLookTarget = 0;
     }
     this._keeperLook = lerp(this._keeperLook, this._keeperLookTarget, 1 - Math.exp(-4 * dt));
-    // the rise eases in only at the bottom, after the revelation; it relaxes as you climb away
-    this._keeperRise = lerp(this._keeperRise, (W.flags.keeperRose && W.level >= MAX_DEPTH) ? 1 : 0, 1 - Math.exp(-1.6 * dt));
+    // the rise eases in only at the bottom, after the revelation, while the choice is still open:
+    // it relaxes as you climb away, once you have CARRIED him out (don't silently re-raise the mute
+    // figure on a re-descent), or the moment you ring the bell instead (you turned away from him).
+    const risen = W.flags.keeperRose && W.level >= MAX_DEPTH && !W.flags.carried && !W.flags.bellRung;
+    this._keeperRise = lerp(this._keeperRise, risen ? 1 : 0, 1 - Math.exp(-1.6 * dt));
 
     // The Room That Disagrees (#18): in the cellar, drawn to the west window, the
     // player sees a model that contradicts the world — name the unease, once
@@ -598,6 +624,16 @@ export class Game {
         this._brink = false;
         A.duckAmbient(false);
         UI.whisper('You step back from the edge. The sea comes back.');
+      }
+    }
+    // the EMBRACE's brink lets go the same way — step off the plate and the offer waits, so the
+    // turn-and-rise is always a fresh, deliberate two-touch (never a stale single tap)
+    if (this._embraceBrink) {
+      const plate = this.refs.deskPlate;
+      if (!plate || Math.hypot(p.x - plate.position.x, p.z - plate.position.z) > 1.25) {
+        this._embraceBrink = false;
+        A.duckAmbient(false);
+        UI.whisper('You step back. He waits at the foot of the stairs, looking up.');
       }
     }
     // the OAR's brink lets go the same way — walk away from the dory and it resets, so leaving

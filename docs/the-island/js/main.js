@@ -392,6 +392,7 @@ function tickDive(dt) {
 // who-you-are, the final camera) layer ON TOP later — none of them are decided here.
 let ascent = null;
 let keeperFarewell = false;   // transient: the arrival names the keeper's silence (#12 stage 3)
+let keeperCarried = false;    // transient: the arrival names that he rose WITH you (the twist, #item4)
 function startAscent(instant = false) {
   if (W.level <= 1) { if (!instant) UI.whisper('There is no level above the surface. Not yet.'); return false; }
   if (instant) { landAscent(); return true; } // debug/verify: skip the cinematic AND the mode-gate
@@ -402,7 +403,8 @@ function startAscent(instant = false) {
   UI.cinematic(true);
   renderer.setPixelRatio(Math.min(BASE_DPR, 1.0)); // one-time drop for the 240x zoom
   farSea.visible = false;
-  keeperFarewell = false;          // reset; landAscent sets it on the silencing ascent
+  keeperFarewell = false;          // reset; landAscent sets one of these on the silencing ascent
+  keeperCarried = false;
   A.duckAmbient(true);             // the world draws quiet as you rise — the held silence (#12 s3)
   // pivot: the chart table in THIS world — the world collapses toward the very place its
   // own model stands, becoming that model one level up
@@ -427,8 +429,13 @@ function landAscent() {
     // fingerprint, driven in puzzles _apply by W.flags.returned). Fork-neutral; not an ending.
     if (!W.flags.returned) {
       W.flags.returned = true;
-      UI.whisper('Back at the surface. The door, the coat, the jetty — all as you left them. Only you are different.');
-      UI.addJournal('I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay. There is the dory on the beach, and an oar — the one thing here I have never used. The light is lit; the only thing left undone is to go.', '', 'self');
+      if (W.flags.carried) {
+        UI.whisper('Back at the surface — and you did not come up alone. The door, the coat, the jetty, all as you left them. You are not.');
+        UI.addJournal('I have been all the way down and all the way back, and I did not come up empty-handed. The hand that writes this is mine again — both of them mine. The light is lit, below and above, and nothing is left burning alone. There is the dory on the beach, and an oar I have never used. The only thing left undone is to go.', '', 'self');
+      } else {
+        UI.whisper('Back at the surface. The door, the coat, the jetty — all as you left them. Only you are different.');
+        UI.addJournal('I have been all the way down and all the way back. The same beach, the same light — but the hand that writes this is mine again, and I left his still burning below. I did not put it out. I did not stay. There is the dory on the beach, and an oar — the one thing here I have never used. The light is lit; the only thing left undone is to go.', '', 'self');
+      }
       // POINT THE WAY OUT: the climb-out terminal (#22) is the dory, ~80 m south on the wake-up
       // beach. Name it, or a player re-dives / rings the bell and never finds the choice the
       // whole fork exists to offer. (The oar also glints on hover once armed; this draws them to it.)
@@ -440,13 +447,20 @@ function landAscent() {
   // You leave him where he chose to stay, and you leave the light BURNING (integration, not
   // abandonment). The arrival (tickAscent f>=1) names the silence.
   if (!W.flags.keeperSilenced && wasLevel >= 3) {
-    A.say('keeper_farewell', 'resigned');
-    UI.whisper(KEEPER.farewell);
     W.flags.keeperSilenced = true;
-    keeperFarewell = true;
-    // the integration, in your own hand again (you were becoming his; rising, the pen is
-    // yours once more): the re-readable record of the turn back up (#12 polish, iter 55)
-    UI.addJournal('I went all the way down — to the smallest room, the coldest light — and found him still there, still tending it. I could not bring myself to put it out. So I have started back up the stairs, and I am carrying what I found at the bottom. The light is still burning behind me. Let it.', '', 'self');
+    if (W.flags.carried) {
+      // THE TWIST (#item4): you turned him around and rose CARRYING him — his voice is no longer
+      // BELOW you but at your shoulder. No farewell; he is not left behind. (Wordless: the held
+      // breath of two climbing as one — the arrival names it.)
+      keeperCarried = true;
+      UI.addJournal('I did not leave him. I turned him around at the bottom and we started up together — the lost thing I came all this way to find was the one still carrying the lamp. Two lights now, lit at both ends of the same stair, and both of them climbing.', '', 'self');
+    } else {
+      // the climb-out without the embrace: he stays below, tending the light; you leave it BURNING
+      A.say('keeper_farewell', 'resigned');
+      UI.whisper(KEEPER.farewell);
+      keeperFarewell = true;
+      UI.addJournal('I went all the way down — to the smallest room, the coldest light — and found him still there, still tending it. I could not bring myself to put it out. So I have started back up the stairs, and I am carrying what I found at the bottom. The light is still burning behind me. Let it.', '', 'self');
+    }
   }
   save(player.pos);
   // rise out at the study / chart table of the level above
@@ -493,8 +507,11 @@ function tickAscent(dt) {
       2: 'One level up. The colour creeps back into things.',
       3: 'Up, and the room warms by a degree.',
     }[W.level] || 'Up. And up.');
-    // name the silence, the once it happens — the integration beat: you did not put it out
-    if (keeperFarewell) {
+    // name it, the once it happens — the integration beat
+    if (keeperCarried) {
+      keeperCarried = false;
+      setTimeout(() => UI.whisper('His voice is beside you now, not below. You did not put the light out — you carried it up.'), 5200);
+    } else if (keeperFarewell) {
       keeperFarewell = false;
       setTimeout(() => UI.whisper('Below you, the voice has stopped. The light still burns — you did not put it out.'), 5200);
     }
