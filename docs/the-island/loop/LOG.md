@@ -12,6 +12,26 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 76 — 2026-06-20 — jank fix: the night stars were a grid (owner-reported)
+
+**Shipped:** the night sky's stars rendered as a regular lattice. `step(0.9985,
+hash21(floor(sp*280)))` lit an ENTIRE projection cell whenever its hash passed, so each
+"star" was a cell-aligned square and the whole field read as a grid (the owner caught it).
+Now each star is a small ROUND point, jittered inside its cell (kept to 0.25–0.75 so it
+never clips the cell edge) with a soft `smoothstep` falloff — the field scatters naturally.
+
+**Evidence (`?debug`):** night sky at 23h and 1h — stars now read as scattered round
+points, no lattice; the milky-way wisps and the credits-constellation path are untouched.
+Sky shader recompiles clean (zero console errors). Fragment-only, power-neutral (same
+per-fragment cost class); `fbm2` (shared by sky AND water) left alone.
+
+**Debt:** none.
+
+**Next tick (77):** keep polishing — an audio-audition pass, or owner playtest notes on the
+new Oar ending.
+
+---
+
 ## 75 — 2026-06-20 — ENDGAME: THE OAR — the climb-out terminal (owner fork #22)
 
 **Shipped:** the game's missing last breath. Ringing the bell at the bottom always

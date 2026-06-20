@@ -243,8 +243,14 @@ export function makeSkyMaterial() {
         // stars + milky way
         if (uNight > 0.01 && d.y > -0.1) {
           vec2 sp = d.xz / (d.y + 0.4);
-          float star = step(0.9985, hash21(floor(sp * 280.0)));
-          float tw = 0.6 + 0.4 * sin(uTime * 2.0 + hash21(floor(sp * 280.0) + 7.0) * 40.0);
+          vec2 sg = sp * 280.0;
+          vec2 cid = floor(sg);
+          float sh = hash21(cid);
+          // a small round star jittered inside its cell — lighting the WHOLE cell (the old
+          // step()) made the stars square and lattice-aligned, reading as a grid
+          vec2 jit = 0.25 + 0.5 * vec2(hash21(cid + 3.7), hash21(cid + 9.1));
+          float star = step(0.9965, sh) * smoothstep(0.12, 0.0, length(fract(sg) - jit));
+          float tw = 0.6 + 0.4 * sin(uTime * 2.0 + sh * 40.0);
           // milky way band: distance to a tilted great circle
           vec3 mwN = normalize(vec3(0.6, 0.25, 0.76));
           float band = 1.0 - smoothstep(0.0, 0.5, abs(dot(d, mwN)));
