@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 69 — 2026-06-20 — story / world-detail (the abyme made literal: "you are here" on the model)
+
+**Shipped:** the chart-table model is the recursion centerpiece — but it was a static portrait of
+the island. Now a cool cyan beacon tracks the player's REAL position on the 1:240 model: walk the
+beach, climb the bluff, stand in the study, and a little light that is YOU moves across the model of
+the island you are standing on. The abyme made literal — you are a speck on your own map. Leaning in
+to find yourself earns one quiet line: *"There you are — a speck on your own map."* Fork-neutral: it
+asserts presence-in-the-recursion, never WHO you are (issue #22 untouched). All metaphor, no biography.
+
+**How:** `instantiateModel` builds a clone-safe `youMarker` (a Mesh cone + an additive glow Sprite —
+never Points) added to `modelRoot` AFTER the clone/prune, in island-unit local coords (modelRoot's
+~1/240 scale shrinks it to a ~0.16-world cursor). `applyAtmosphere` sets its local position to
+`player.pos` each frame — modelRoot's transform IS the world→model map, so the marker lands exactly
+where the player stands — pulses the glow, and fires the once-per-save lean-in whisper (the same
+pattern as the shipped `nestedGlint` pinprick). The marker lives ONLY on the model (the player IS the
+figure on the full island); it's not in refs/modelRefs, so `_apply` never touches it and the
+both-instances invariant is intact.
+
+**Evidence (`?debug`, in-play):** exactly one `youMarker` in the scene (model-side only), absent
+from refs/modelRefs; tracks exactly — `markerLocal` == player.pos (-82,14,-42.5) → maps to the
+lighthouse on the model; moving the player to the south beach moved the speck to the model's south
+shore. Reads beautifully at NIGHT (a bright cyan beacon on the dark miniature) and is
+subtle-but-present at NOON, clearly visible on lean-in (close-up verified) — matching the
+lean-in-to-discover language of `nestedGlint`. The lean-in whisper fires (camera 1.56 < 2.2 →
+"There you are — a speck on your own map.", confirmed after a real intro→play handoff). +2 draws on
+the model only (179→181 at the study; 168 elsewhere) — far under the 360 interior budget; per-frame
+cost is a vector set + a sine. ZERO console errors. Clone/refs/dive invariants all intact.
+
+**Debt:** none added. Power-trivial, clone-safe, fork-neutral.
+
+**Next tick (70):** still NON-graphics (iter 68 graphics sits inside the rolling 3-window, so 70
+can't be graphics; graphics is eligible again at 71) — a story/world-detail/legibility beat, a Panel
+#3/#4/#5 item, or a real jank fix. Honor an owner endgame-fork (#22) redirect FIRST if it comes.
+
+---
+
 ## 68 — 2026-06-20 — graphics (CUT stack #3a: gate the dormant volumetric beams)
 
 **Shipped:** the lighthouse beam, its inner shaft, and the cellar light-shaft are all

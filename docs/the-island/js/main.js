@@ -79,6 +79,8 @@ const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, vau
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
+const youMarker = modelRoot.getObjectByName('youMarker');
+const _youV = new THREE.Vector3();
 // the coat on its annex hook (level 2): annex azimuth 15°, baseR+2.2 out
 // (built from SPOTS — LH isn't declared until the lighting section)
 const COAT_POS = (() => {
@@ -649,6 +651,25 @@ function applyAtmosphere(elapsed, dt) {
       nestedGlint.getWorldPosition(_glintV);
       if (camera.position.distanceTo(_glintV) < 1.5) {
         game.once('nestedLight', () => UI.whisper('Far down, a light is still lit.'));
+      }
+    }
+  }
+
+  // "you are here": the cool speck on the chart-table model tracks where you
+  // actually stand on the island — the abyme made literal. Shown once you're in
+  // the world; leaning over the table to find yourself earns one quiet line.
+  if (youMarker) {
+    const show = W.flags.introDone;
+    youMarker.visible = show;
+    if (show) {
+      youMarker.position.set(player.pos.x, player.pos.y + 0.5, player.pos.z);
+      const spark = youMarker.children[1];
+      if (spark) spark.material.opacity = 0.55 + 0.35 * Math.sin(elapsed * 2.2);
+      if (MODE === 'play' && game) {
+        youMarker.getWorldPosition(_youV);
+        if (camera.position.distanceTo(_youV) < 2.2) {
+          game.once('youOnModel', () => UI.whisper('There you are — a speck on your own map.'));
+        }
       }
     }
   }

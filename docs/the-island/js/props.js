@@ -1521,6 +1521,30 @@ export function instantiateModel(core, modelAnchor) {
     impostor.scale.setScalar(SCALE_MODEL * 120);
     nestedAnchor.add(impostor);
   }
+  // "you are here" — the abyme made literal. A cool pinprick (vs the world's warm
+  // glints) tracks the player's real island position on the chart-table model:
+  // you are a speck on your own map. A Mesh+Sprite (never Points — this is added
+  // post-clone, but stay clone-safe); island-unit local coords (modelRoot scales
+  // them by SCALE_MODEL). Position + pulse driven in main.js applyAtmosphere.
+  // sizes are in island units; modelRoot scales them by SCALE_MODEL (~1/240), so a
+  // ~30-unit pin reads as a ~0.12-world cursor on the table — visible when you lean
+  // in, but clearly smaller than the table's brass instruments.
+  const youMarker = new THREE.Group();
+  youMarker.name = 'youMarker';
+  const youPin = new THREE.Mesh(
+    new THREE.ConeGeometry(2.8, 38, 5),
+    new THREE.MeshBasicMaterial({ color: 0x2fccff })
+  );
+  youPin.position.y = 19; // base on the model surface, tip up
+  const youSpark = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: radialGlowTex(), color: 0xc8f4ff, transparent: true, opacity: 0.9,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  youSpark.scale.setScalar(26); // the eye-catcher at table distance
+  youSpark.position.y = 42; // glow at the pin's tip
+  youMarker.add(youPin, youSpark);
+  youMarker.visible = false; // shown once the player is in the world (introDone)
+  modelRoot.add(youMarker);
   modelRoot.scale.setScalar(SCALE_MODEL);
   modelAnchor.add(modelRoot);
   return modelRoot;
