@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## ★ owner ask (2026-06-20) — graphics-quality strategy (6-agent workflow → MISSION amendment)
+
+**Shipped (process):** the owner asked whether to adjust the loop/agents to push graphics
+quality (textures, quality, performance). Ran a 6-agent workflow (art director · tech-art
+feasibility · performance/power · process, then synthesis, then adversarial) reading the real
+rendering code. Verdict: ABYME is graphics-limited, but the binding constraint is the
+SURFACE/POST layer, not the art direction — the grades + sky + water shaders are genuine
+craft; but every solid is flat-shaded MeshStandard with NO normal/roughness/AO maps, ACES is
+set with nothing feeding it (no bloom), post is CSS-only, and the MISSION's `<200 draws`
+budget was FICTIONAL (real ~307–340).
+
+**Applied to MISSION.md:** a new "Graphics Quality Bar & Power Ledger" section + reconciled the
+draw budget (both occurrences) + a rate-limited graphics lane (≤1 in 3 builds) in the axis list.
+The bar: serves the five grades · power-neutral-or-better proven by a Power Ledger (draws/tris/
+**GPU-frame-ms** before→after at noon+night from a fixed bench pose; fps≥60 is necessary-not-
+sufficient because the cap hides headroom) · shared-material-safe on BOTH islands · one thing
+finished. WebGL post (three/addons jsm) pre-authorized but fenced (MSAA trap: a composer discards
+the free antialias — SMAA must land same-tick; bloom selective/half-res/DPR-clamped/gated).
+Asset-honesty pointer corrected to index.html:33 + :7 (NOT README — it doesn't hold the claim).
+
+**Roadmap (cheap power-neutral FIRST, banks headroom for the one power-raiser):** (1) Power
+Ledger = GPU-ms readout + bench pose + reconciled budget [GATE — do first]; (2) per-grade
+toneMappingExposure [zero GPU cost — makes the 5 grades read as 5 MOODS not hue-swaps]; (3) cheap
+CUT stack [gate the 7 conditional point-lights via .visible on state edges — a 0-intensity light
+still costs a per-fragment loop iteration; +particle frustum-cull, beam .visible gate, water fbm
+4→3]; (4) vertex-baked AO into the Baker [bake-time only]; (5a) distance aerial-perspective
+[near-free] then SEPARATELY (5b) triplanar normal/roughness break-up [adds-medium, bench first];
+(6) in-shader beam god-rays [bench-check]; (7) EffectComposer bloom+SMAA as its OWN gated tick
+AFTER 1–6. DEFER (owner-ask only): PMREM env, planar/SSR water reflection, DOF.
+
+**Next graphics-lane tick: build #1 (the Power Ledger) — it gates everything else.**
+
+---
+
 ## ★ owner bug (2026-06-20) — see-through chasm/valley walls (terrain was single-sided)
 
 **Fixed (owner-reported):** "falling into the valley is still super buggy — I still see

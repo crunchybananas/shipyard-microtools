@@ -62,11 +62,17 @@ iterations' work. The synthesis of a panel updates SPINE.md and files issues.
    - **Close-look jank** — the "grass poking through a table" class: things
      that betray the illusion within 2 metres. Hunt them with screenshots.
    - **Graphics wow** — sky, water, light, weather, post. The five master
-     grades in `world.js` are the only palettes; extend, don't fork.
+     grades in `world.js` are the only palettes; extend, don't fork. Pure
+     quality-bar ticks obey "The Graphics Quality Bar & Power Ledger" (below)
+     and are RATE-LIMITED: at most 1 in every 3 build iterations, never two in
+     a row, each carries a Power Ledger or it is logged VISUAL DEBT. Story still
+     leads — a graphics tick can still be REJECTED by a persona panel as avoidance.
    - **Audio / music** — everything synthesized in `audio.js`; the 5-note
      leitmotif (E G A D C) is the seed of all melody.
-   - **Performance / code health** — budget: ≥60fps, <200 draw calls,
-     <800k tris (`?debug` panel shows all three).
+   - **Performance / code health** — budget: **locked 60fps; draws < 360
+     (interior/overview), < 260 (open beach); tris < 800k** (`?debug` shows all
+     three). (The old "<200 draws" was fictional — the real island runs ~307–340;
+     measure at the `?debug` bench pose, never guess.)
    - **UX / onboarding / accessibility** — never adding HUD chrome.
 3. **Build it.**
 4. **Verify it** (see protocol below).
@@ -138,6 +144,56 @@ iterations' work. The synthesis of a panel updates SPINE.md and files issues.
   `diveGroup.add(...)` them; drive their uniforms via the direct reference, not
   `refs`. (Cost the loop #38 ~10 evals to diagnose.)
 
+## The Graphics Quality Bar & Power Ledger (2026-06-20, owner-asked; Panel-of-4 + adversarial)
+
+Story still leads (the 2026-06-19 reframe). This is a PARALLEL, rate-limited graphics-quality
+lane (≤1 in 3 builds, never two in a row; still rejectable as story-avoidance). A graphics
+tick ships only if it clears ALL of:
+
+1. **SERVES THE FIVE GRADES** — reads right at dawn 7.4h / noon 12h / golden 17.7h / night 23h
+   AND under the L2–L4 `gradeBias` decay. Extends the grades; never forks them.
+2. **POWER-NEUTRAL OR BETTER (the Power Ledger)** — record, from the fixed `?debug` bench pose,
+   the BEFORE→AFTER of **draws · tris · GPU-frame-ms** at **noon AND night**. May not raise any
+   of the three net; if it adds cost it must pay it back IN THE SAME TICK (bake/instance/cull/
+   LOD/resolution) and show the math. `fps ≥ 60` is necessary but NOT sufficient — the 60fps cap
+   hides headroom loss; **GPU-frame-ms is the real signal.** No Ledger ⇒ VISUAL DEBT, not a ship.
+3. **SHARED-MATERIAL SAFE** — anything touching `matStone`/`matBrass`/water/Baker-merged or
+   cloned geometry must look right on BOTH the island AND the 1:240 model (scale procedural
+   frequencies so the model reads as chalk, not noise mush).
+4. **ONE THING, FINISHED** — one effect/material/pass per tick.
+
+**Precondition (do FIRST, before any other graphics tick):** extend the `?debug` panel with a
+rolling **GPU-frame-ms** (`EXT_disjoint_timer_query_webgl2`; CPU-rAF fallback on Safari, LABELLED
+— and note the fallback measures wall-clock, not true GPU time) + a fixed **bench teleport+time
+preset** so every Ledger is from an identical pose. Without GPU-ms, clause 2 is unfalsifiable.
+
+**WebGL post is PRE-AUTHORIZED but fenced:** `three/addons/` jsm passes (EffectComposer, bloom,
+SMAA, Output) are allowed (they ship inside three@0.180 — one import-map line). Each is a POWER
+EVENT. ⚠️ MSAA TRAP: a composer renders to a plain RT and SILENTLY discards the free
+`antialias:true` MSAA — so the SAME tick that adds a composer MUST add SMAAPass and prove edges
+aren't worse at night against the sky. Bloom must be SELECTIVE (high emissive threshold), half-res
+buffers, DPR-clamped, near-zero during the 240× dive/ascent — and gated behind the GPU-ms readout.
+
+**Asset honesty:** all planned work is generated (procedural-noise CanvasTextures, in-shader math,
+baked vertex AO) — the "everything … is made of math" claim holds. The moment any tick reaches for
+a downloaded image/normal-map/mesh, update **`index.html:33`** (the title line) AND **`index.html:7`**
+(the synthesized-in-code meta) — NOT README (it doesn't hold the claim).
+
+**Roadmap, sequenced cheap-and-power-neutral FIRST (banks headroom for the one power-raiser):**
+(1) the Power Ledger + bench pose + reconciled draw budget [gate]; (2) per-grade
+`toneMappingExposure` from the active grade [zero GPU cost]; (3) cheap CUT stack — gate the 7
+conditional point-lights via `.visible` on state EDGES (a zero-intensity light STILL costs a
+per-fragment loop iteration — only `.visible=false` drops it; hide the one-time shader recompile on
+the hatch-open/dive curtain), `frustumCulled=true`+boundingSphere on the Points, beam `.visible`
+gate, water fbm 4→3; (4) vertex-baked AO into the Baker [bake-time only; keep sampling coarse so
+load stays snappy]; (5a) distance aerial-perspective (generalize the canopy haze to terrain/stone)
+[near-free] — ship this FIRST and SEPARATELY from (5b) the triplanar normal/roughness break-up
+[treat as adds-MEDIUM, terrain fills the frame — bench-profile at noon before shipping]; (6)
+in-shader beam god-rays [bench-check; additive overdraw near the beam isn't free]; (7) EffectComposer
+bloom+SMAA as its OWN gated iteration AFTER 1–6 bank headroom. DEFER (owner-ask only): PMREM env
+refresh, planar/SSR water reflection (a 2nd scene render + breaks the shared-water invariant), DOF
+(fights puzzle legibility). Full panel: the iter-63 graphics-strategy workflow.
+
 ## Verification protocol (non-negotiable)
 
 - Serve with the existing launch config (`preview_start` name `abyme`, port
@@ -151,7 +207,8 @@ iterations' work. The synthesis of a panel updates SPINE.md and files issues.
 - Puzzle-affecting changes: drive the real input pipeline at least once
   (dispatch pointermove → next eval → pointerdown/up) or walk the debug
   buttons through the affected steps.
-- Check the `?debug` readout after: fps ≥60, draws <200, no console errors.
+- Check the `?debug` readout after: 60fps locked, draws within the reconciled
+  budget (< 360 interior/overview, < 260 beach), tris < 800k, no console errors.
 
 ## Ship protocol
 
