@@ -12,6 +12,31 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 81 — 2026-06-20 — ENGINE fix: the slope gate misread local terrain bumps as walls (root cause; replaces #80's causeway workaround)
+
+**Shipped:** the real root cause behind #80's "invisible wall." The walkability slope gate
+computed `(rise)/(per-frame stride)` — dividing the rise by the tiny per-frame step distance,
+so ANY small local terrain hummock read as a near-vertical wall (a 0.6 m bump crossed in a
+0.06 m step = slope ~10) and could pin the player anywhere on noisy ground, not just that
+causeway. Fixed at the engine: the gate now measures the terrain gradient over a FIXED 0.7 m
+look-ahead — longer than a noise hummock, shorter than a real wall — so it ignores sub-step
+noise but still blocks sustained cliffs; the absolute per-step rise stays capped by the
+existing 1.05 m step-up gate. REVERTED #80's workarounds (the reshaped causeway terrain + the
+rim-clamp corridor exemption) — the engine fix makes the ORIGINAL causeway traversable.
+(Owner principle: fix the root cause in the engine, not surgical symptom patches —
+[[feedback-root-cause-over-workaround]].)
+
+**Evidence (`?debug`):** drove `player.update` across the ORIGINAL (reverted) causeway when
+drained → reaches the islet (was stuck at (98,-116)); bridge→plateau still works; walking into
+the sea (0.9 m), into the chasm without the bridge (pinned at the rim), still blocked; normal
+walking free (~24 m/6 s) in every open direction. Zero console errors.
+
+**Debt:** none — removed two workarounds, replaced with one engine fix.
+
+**Next tick (82):** owner-gated Bender voice integration, or hold per Panel #5.
+
+---
+
 ## 80 — 2026-06-20 — bug fix: drained causeway stranded the player short of the islet + debug panel to top-left (owner-reported)
 
 **Shipped:** two owner-reported fixes.

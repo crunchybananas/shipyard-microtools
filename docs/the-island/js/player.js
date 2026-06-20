@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { clamp, lerp, TAU } from './util.js';
-import { walkableY, wallBlocked, heightAt, nearCauseway } from './terrain.js';
+import { walkableY, wallBlocked, heightAt } from './terrain.js';
 import { W, waterY } from './world.js';
 
 export class Player {
@@ -99,14 +99,22 @@ export class Player {
       const tHere = heightAt(this.pos.x, this.pos.z), tThere = heightAt(nx, nz);
       const structural = Math.abs(hereY - tHere) > 0.4 || Math.abs(thereY - tThere) > 0.4;
       if (!structural) {
+        // measure the terrain gradient over a FIXED look-ahead, not the per-frame step.
+        // dividing the rise by the tiny per-frame stride turned any local hummock into a
+        // phantom cliff — a 0.6 m bump crossed in a 0.06 m step read as slope ~10 and walled
+        // the player anywhere on noisy ground (this stranded the causeway crossing). A fixed
+        // reference reads the real slope and ignores sub-step noise; the absolute per-step
+        // rise is still capped by the `thereY - hereY > 1.05` gate above.
         const stride = Math.max(Math.hypot(nx - this.pos.x, nz - this.pos.z), 1e-4);
-        if ((tThere - tHere) / stride > 1.35) return false;
-        // the drained bay still refuses you: below-tide basins (the chasm's
-        // drowned ends, bay-floor bowls) walk in but never out — their walls
-        // beat the climb limit. Block the descent at the rim; upslope stays
-        // open so a stale save below the line can still scramble shallower.
-        // (The causeway crest never dips under -1.42, so it passes freely.)
-        if (tThere < -2.2 && tThere <= tHere + 0.02 && !nearCauseway(nx, nz)) return false;
+        const LOOK = 0.7;   // longer than a noise hummock, shorter than a real wall:
+        const tAhead = heightAt(  // ignores sub-step pits, still catches sustained cliffs
+          this.pos.x + (nx - this.pos.x) / stride * LOOK,
+          this.pos.z + (nz - this.pos.z) / stride * LOOK);
+        if ((tAhead - tHere) / LOOK > 1.35) return false;
+        // the drained bay still refuses you: below-tide basins (the chasm's drowned ends,
+        // bay-floor bowls) walk in but never out. Block the descent at the rim; upslope
+        // stays open so the causeway crest and a stale save below the line still pass.
+        if (tThere < -2.2 && tThere <= tHere + 0.02) return false;
       }
       // the sea refuses you — but if the tide caught you, wade out
       if (thereY < waterY() - 0.5) {
