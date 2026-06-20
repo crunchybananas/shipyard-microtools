@@ -12,6 +12,42 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 59 — 2026-06-19 — story/design (give the climb weight — Panel #4 gap #3) — PANEL #4 CLOSED
+
+**Shipped:** The climb is no longer the dive with the sign flipped. The Skeptic's note:
+the dive is a SURRENDER (you fall, 21s, easeInOut swoop); the ascent should be an EFFORT
+(you heave the world up). Now the ascent runs a third longer — `ascent.dur = 28` vs the
+dive's 21 — a heavier, more laboured rise, and the opening whisper names the resistance:
+"You run the mechanism backward. It fights you — the world comes up by inches." Paired with
+the keeper's silence (stage 3), the climb now FEELS distinct from the dive — lonelier and
+harder, the way carrying something heavy up should be. **This closes Panel #4's three
+fork-neutral gaps (discoverability ✓57, return-mark ✓58, weight ✓59).**
+
+- `main.js` `startAscent`: `dur` 21 → 28 (ascent only; the dive's 21 is untouched); the
+  start whisper reworded to convey effort/resistance.
+
+Fork-neutral; the dur change scales the existing f-thresholds (fade f>0.86, snap f>0.95)
+so all the ascent beats still land. No new deps.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Real ascent (play
+mode): `getAscent().dur === 28`, cinematic live, the effort whisper confirmed verbatim. The
+dive's `dur` stays 21 (startDive untouched). REGRESSION via the instant path: a full
+climb-out still decrements 4→3→2→1, fires the keeper-silence (first ascent) and the
+return-mark (`returned` at the surface, climbing cleared), journal grows — all intact.
+
+**Debt:** none broken. A richer laboured-easing / heavier audio bed could deepen the
+"weight" further but needs the owner to feel the 28s cinematic (filed as optional polish).
+The larger act-two-rhyme note (Panel #4) remains.
+
+**Next tick (iter 60 = PUSH BOUNDARY, batch 12):** the ascent is complete AND polished
+(Panel #4 fully addressed). Ship one SAFE item or run a quick check, then PUSH iters 56–60
+(submodule → main, then Dockhand parent gitlink from worktree ROOT), update push memory
+(boundary #12, next at 65), boot-check the clean URL first. Strong candidate: a Panel #5 /
+owner-playtest-readiness pass, OR re-surface the three forks now that the staircase is
+fully polished — the owner's call is the only thing between here and a finished arc.
+
+---
+
 ## 58 — 2026-06-19 — story/design (the return leaves a mark — Panel #4 gap #2)
 
 **Shipped:** Climbing all the way out to the surface no longer lands you back exactly as

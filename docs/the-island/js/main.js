@@ -393,8 +393,11 @@ function startAscent(instant = false) {
   // pivot: the chart table in THIS world — the world collapses toward the very place its
   // own model stands, becoming that model one level up
   const pivot = new THREE.Vector3(SPOTS.lighthouse.x, 14.5, SPOTS.lighthouse.y);
-  ascent = { t: 0, dur: 21, pivot, startQuat: camera.quaternion.clone(), snapDone: false, fading: false };
-  UI.whisper('You run the mechanism backward. The world begins to draw in.');
+  // the climb is heavier than the dive — a third longer (28s vs the dive's 21): the dive is
+  // a surrender (you fall); the ascent is an EFFORT (you heave the world up by inches).
+  // Panel #4 gap #3 — give the climb weight, so it isn't the dive with the sign flipped.
+  ascent = { t: 0, dur: 28, pivot, startQuat: camera.quaternion.clone(), snapDone: false, fading: false };
+  UI.whisper('You run the mechanism backward. It fights you — the world comes up by inches.');
   return true;
 }
 function landAscent() {
