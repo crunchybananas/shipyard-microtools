@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 66 — 2026-06-20 — story/worldbuilding (act two rhymes — the ruler & the birdsong) — RHYME COMPLETE
+
+**Shipped (non-graphics, axis stepped off the lane):** the last two act-two beats now rhyme with
+the keeper's grief, completing the pass begun in #61/#62. TEXT-ONLY journal enrichment; surface
+clue intact; no mechanic / solve-order change.
+- The RULER: "…He measured this rift a hundred times, I think — you do not need a ruler for a
+  distance you already know by heart. You measure it to have something to do with your hands."
+  (grief as a thing to do with your hands.)
+- The BIRDSONG: "…The box always bent that fourth note wrong; the bird sings it true. He must have
+  heard it right a thousand mornings and never could make his own hands play it — some corrections
+  only ever arrive too late." (the one note he kept getting wrong; a correction that came too late.)
+
+With #61 (valve, plumb) + #62 (lens, shadows), ALL six chain beats now carry the keeper's story —
+act two no longer reads as "clever toys disconnected from the grief" (Panel #1/#4's complaint, closed).
+
+- `puzzles.js`: the `rulerPlaced` (crack) and `birdSolved` (stone-sequence) `addJournal` strings.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Fired the real `crack` hotspot
+→ `rulerPlaced` set (chain intact), enriched ruler journal present ("…distance you already know by
+heart"), once-only. Birdsong is a text-only string change on the unchanged stone-sequence
+`birdSolved` trigger; module parsed (ABYME present) so the string is valid. Clean URL `/`: title +
+WebGL OK, zero console errors — chain (valve→ruler→bird→lens→shadow→plumb→dive) unaffected.
+
+**Next tick:** axis is open (last 3: graphics #65, then this story #66 — graphics lane may run
+again next if due). Candidates: GRAPHICS LANE #3 (the cheap CUT stack — must carry a Power Ledger
+from the ?debug bench at noon+night), an onboarding/accessibility pass, or a close-look jank fix.
+The owner's endgame fork still trumps everything. NOTE next push boundary ~iter 70.
+
+---
+
 ## 65 — 2026-06-20 — GRAPHICS LANE #2: per-grade exposure (five MOODS, not five hue-swaps) — BATCH PUSH
 
 **Shipped:** the first real Quality-Bar win. ACES was running at a FIXED 1.06 exposure, so the

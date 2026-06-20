@@ -168,7 +168,7 @@ export class Game {
         UI.cinematic(true);
         setTimeout(() => UI.cinematic(false), 5200);
         UI.whisper('Across the island, something vast settles into place.');
-        UI.addJournal('Laid the ruler over the crack in the model. Out east, a brass bridge now spans the chasm — etched with centimetre marks the size of doors.');
+        UI.addJournal('Laid the ruler over the crack in the model. Out east, a brass bridge now spans the chasm — etched with centimetre marks the size of doors. He measured this rift a hundred times, I think — you do not need a ruler for a distance you already know by heart. You measure it to have something to do with your hands.');
         save(this.player.pos);
       },
     });
@@ -353,7 +353,7 @@ export class Game {
       A.addStem(3); W.stems = Math.max(W.stems, 3);
       setTimeout(() => A.chime(), 800);
       UI.whisper('The outcrop opens like a held breath.');
-      UI.addJournal('The stones accepted the bird’s correction. A vault in the outcrop holds a small, perfect lens.');
+      UI.addJournal('The stones accepted the bird’s correction. A vault in the outcrop holds a small, perfect lens. The box always bent that fourth note wrong; the bird sings it true. He must have heard it right a thousand mornings and never could make his own hands play it — some corrections only ever arrive too late.');
       save(this.player.pos);
     }
   }
