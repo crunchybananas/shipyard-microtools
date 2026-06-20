@@ -668,7 +668,12 @@ function applyAtmosphere(elapsed, dt) {
       if (MODE === 'play' && game) {
         youMarker.getWorldPosition(_youV);
         if (camera.position.distanceTo(_youV) < 2.2) {
-          game.once('youOnModel', () => UI.whisper('There you are — a speck on your own map.'));
+          game.once('youOnModel', () => {
+            UI.whisper('There you are — a speck on your own map.');
+            // the discovery lands in the journal, not just the air — and names the abyme
+            // without naming who you are (fork-neutral: self-recognition, not identity).
+            UI.addJournal('A mark has appeared on the model where I stand — a little light that moves when I move. I have bent over this map for days, trusting it to show me the island truly. It was showing me ON it the whole time. You can study a place a long while before you notice you are also a figure in it.', '', 'self');
+          });
         }
       }
     }

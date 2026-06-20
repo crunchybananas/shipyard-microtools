@@ -12,6 +12,34 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 70 — 2026-06-20 — story (the "you are here" discovery becomes a journal beat) + BOUNDARY PUSH
+
+**Shipped:** iter 69's "you are here" marker fired only a fleeting whisper — unlike every other
+recursion discovery (the 1:240 model entry, the tiny figure at depth), it never landed in the
+JOURNAL, the game's permanent narrative artifact. Now leaning in to find yourself on the model writes
+a once-per-save journal entry in the player's own hand: *"A mark has appeared on the model where I
+stand — a little light that moves when I move. I have bent over this map for days, trusting it to
+show me the island truly. It was showing me ON it the whole time. You can study a place a long while
+before you notice you are also a figure in it."* Self-recognition, named without naming WHO you are
+(fork-neutral re #22). The abyme beat now persists in the spine where the player can re-read it.
+
+**How:** the `game.once('youOnModel', …)` callback in `applyAtmosphere` (main.js) now also calls
+`UI.addJournal(…, 'self')` beside the whisper — once per save (game.once), dedup-safe (addJournal
+dedupes by text). One coherent thing; no new objects, no power cost.
+
+**Evidence (`?debug`, real intro→play handoff):** leaned the camera to 1.56 (<2.2) from the marker →
+whisper "There you are — a speck on your own map." AND journal count 0→1, latest entry hand='self'
+with the new text. Player-facing boot-check on the clean URL: title renders (THE ISLAND / ABYME /
+Begin), WebGL OK, ZERO console errors.
+
+**Debt:** none. **Boundary push:** deployed the batch (iters 66–70) to main — see the memory note.
+
+**Next tick (71):** graphics is ELIGIBLE again (axis: 68 graphics, 69 story, 70 story → 68 has rolled
+out of the 3-window) — CUT-stack #3b (gate the conditional point-lights on state edges) if cleanly
+edge-safe, else baked AO (#4). Honor an owner endgame-fork redirect FIRST.
+
+---
+
 ## 69 — 2026-06-20 — story / world-detail (the abyme made literal: "you are here" on the model)
 
 **Shipped:** the chart-table model is the recursion centerpiece — but it was a static portrait of
