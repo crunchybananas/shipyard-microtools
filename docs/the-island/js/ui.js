@@ -13,20 +13,28 @@ export const UI = {
     this.journalEl = $('journal');
     this.journalEntries = $('journal-entries');
     this.journalTab = $('journal-tab');
+    this.soundTab = $('sound-tab');
     this.hint = $('controls-hint');
     this._whisperTimer = null;
     this._whisperQueue = [];
 
     this.journalTab.addEventListener('click', () => this.toggleJournal());
+    this.soundTab.addEventListener('click', () => this.toggleMute());
+    this.soundTab.classList.toggle('muted', A.muted); // reflect the persisted/?param state
     window.addEventListener('keydown', (e) => {
       if (e.code === 'KeyJ') this.toggleJournal();
       if (e.code === 'Escape') this.journalEl.classList.add('hidden');
-      if (e.code === 'KeyM') {
-        A.setMuted(!A.muted);
-        this.whisper(A.muted ? 'The sea goes quiet.' : 'The sea breathes again.', 2400);
-      }
+      if (e.code === 'KeyM') this.toggleMute();
     });
     this.renderJournal();
+  },
+
+  // ---- sound: a visible toggle (and the M key), kept in sync ----
+  toggleMute() {
+    A.setMuted(!A.muted);                                // setMuted persists to localStorage
+    this.soundTab.classList.toggle('muted', A.muted);
+    this.soundTab.title = A.muted ? 'Sound: off (M)' : 'Sound: on (M)';
+    this.whisper(A.muted ? 'The sea goes quiet.' : 'The sea breathes again.', 2400);
   },
 
   // ---- whisper: one quiet italic line at a time ----
@@ -65,6 +73,7 @@ export const UI = {
     this.hint.classList.add('show');
     setTimeout(() => this.hint.classList.remove('show'), 9000);
     this.journalTab.classList.add('show');
+    this.soundTab.classList.add('show');
   },
 
   // ---- journal ----

@@ -12,6 +12,31 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## ★ owner request (2026-06-20, between iters 63 and 64) — a visible SOUND TOGGLE (UX)
+
+**Shipped (owner-requested, not a numbered loop iteration):** sound could only be toggled by
+the `M` key or the `?mute`/`?debug` query params — no visible control. Added a clickable mute
+button matching the journal tab.
+- `index.html`: a `#sound-tab` button (top-right, left of the journal tab) with an inline-SVG
+  speaker icon — sound-waves when on, a slash when muted. `aria-label` + dynamic `title`.
+- `style.css`: `#sound-tab` styled to match `#journal-tab` (38px circle, `right: 64px`,
+  ink-dim → amber on hover); `.muted` swaps waves↔slash.
+- `ui.js`: a shared `toggleMute()` (the button AND the `M` key call it, so the icon stays in
+  sync); the icon reflects the persisted/`?param` state on init; shown alongside the journal
+  tab in `showHint()`. Mute already persisted via `audio.js setMuted` → `localStorage` — kept.
+
+Fork-neutral, additive; no audio-engine change.
+
+**Evidence:** in-play (`?debug`). Reload clean, zero console errors. Verified: tab shows the
+muted icon on a `?debug` (muted) load; click AND the `M` key both flip muted state + the icon
+class + the persisted pref `abyme-muted` + the title, IN SYNC; an unmute persists across reload
+(stored '0' overrides the debug-mute default); screenshots confirm both icon states (waves vs
+slash) beside the journal tab. 60fps.
+
+**Deploy:** committed locally; owner to say whether to push now or roll with the next batch.
+
+---
+
 ## 63 — 2026-06-20 — persona critique (Panel #5: stock-take — the fork-neutral work is done)
 
 **Shipped (a critique, axis shift off story):** considered a graphics polish first — booted the
