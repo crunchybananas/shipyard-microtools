@@ -12,6 +12,33 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 80 — 2026-06-20 — bug fix: drained causeway stranded the player short of the islet + debug panel to top-left (owner-reported)
+
+**Shipped:** two owner-reported fixes.
+(1) THE INVISIBLE WALL — when the bay is drained, walking the causeway toward the stones islet
+stranded the player partway across. Root cause: the old causeway was a NARROW, LOW ridge
+(crest -1.6, falloff `(d/10)²·6`) sitting BELOW the noisy seabed off-centre, so the bumpy
+natural floor poked through it — leaving micro-pits (found one at y -1.97 ringed by terrain
+0.65 m higher just 0.06 m away) that the per-frame slope gate read as inescapable walls (slope
+~10). Rebuilt the causeway as a generous SMOOTH land bridge ALL THE WAY to the islet (crest
+-1.05, wider/gentler `(d/15)²·5`, segment extended causewayA→stones) so the ridge dominates the
+seabed noise across a forgiving corridor; also exempted that corridor from the below-tide rim
+clamp (belt-and-suspenders). Stays ~0.8–1 m under the high-tide surface (hidden until drained).
+(2) Moved the `?debug` panel from bottom-left to TOP-left.
+
+**Evidence (`?debug`):** drove the player (stepping `player.update`) from causewayA toward the
+islet when drained — previously STUCK at (98,-116,-1.97); now reaches it (minDist 11, no stuck).
+High-tide vantage: causeway submerged (a faint underwater ridge, not breaking the surface).
+Drained vantage: a clean wide land bridge to the islet. Zero console errors. 60fps / 50 draws.
+
+**Debt:** none. Terrain change localized to the causeway segment; the chasm bridge (far at z=25)
+is unaffected.
+
+**Next tick (81):** owner-gated Bender voice integration (the keeper, voice-per-character), or
+hold per Panel #5.
+
+---
+
 ## 79 — 2026-06-20 — jank fix: intro fly-over clipped through the drowned colonnade (owner-reported)
 
 **Shipped:** the opening fly-over skimmed straight through the sunken colonnade ("the docks")

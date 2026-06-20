@@ -42,6 +42,14 @@ function smax(a, b, k = 4) { // smooth max
   return lerp(a, b, h) + k * h * (1 - h);
 }
 
+// the drained-tide route to the stones islet: a corridor along the causeway ridge
+// (causewayA → the islet) where the below-tide rim clamp must NOT trap the player.
+// The clamp exists to wall off no-exit drained basins, but the causeway/islet approach
+// is a legitimate path whose crest dips under the -2.2 line a few metres off-centre —
+// so without this exemption the player gets an invisible wall partway across.
+export const nearCauseway = (x, z) =>
+  distSeg(x, z, SPOTS.causewayA.x, SPOTS.causewayA.y, SPOTS.stones.x, SPOTS.stones.y) < 8;
+
 export function heightAt(x, z) {
   // sea floor with gentle dunes
   let h = SEA_FLOOR + fbm(x * 0.013 + 7, z * 0.013 - 3, 3) * 2.5;
@@ -84,12 +92,17 @@ export function heightAt(x, z) {
     }
   }
 
-  // ---- causeway: a drowned ridge, exposed only at low tide ----
+  // ---- causeway: a drowned ridge to the stones islet, exposed only at low tide ----
+  // A generous, SMOOTH land bridge all the way to the islet: the ridge sits high and wide
+  // enough to dominate the noisy seabed across a forgiving corridor, so the drained crossing
+  // never strands the player in a local pit. (The old narrow, low ridge let the bumpy natural
+  // floor poke through it — micro-slopes the per-frame slope gate read as inescapable walls.)
+  // Still ~1 m under the high-tide surface, so it stays hidden until the valve drains the bay.
   {
-    const d = distSeg(x, z, SPOTS.causewayA.x, SPOTS.causewayA.y, SPOTS.causewayB.x, SPOTS.causewayB.y);
-    const crest = -1.6 + Math.sin(x * 0.11 + z * 0.07) * 0.25;
-    const ridgeH = crest - Math.pow(d / 10, 2) * 6;
-    h = smax(h, ridgeH, 1.5);
+    const d = distSeg(x, z, SPOTS.causewayA.x, SPOTS.causewayA.y, SPOTS.stones.x, SPOTS.stones.y);
+    const crest = -1.05 + Math.sin(x * 0.11 + z * 0.07) * 0.18;
+    const ridgeH = crest - Math.pow(d / 15, 2) * 5;
+    h = smax(h, ridgeH, 1.8);
   }
 
   // ---- the chasm: a crack splitting bluff from main island ----

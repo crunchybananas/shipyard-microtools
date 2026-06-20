@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { clamp, lerp, TAU } from './util.js';
-import { walkableY, wallBlocked, heightAt } from './terrain.js';
+import { walkableY, wallBlocked, heightAt, nearCauseway } from './terrain.js';
 import { W, waterY } from './world.js';
 
 export class Player {
@@ -106,7 +106,7 @@ export class Player {
         // beat the climb limit. Block the descent at the rim; upslope stays
         // open so a stale save below the line can still scramble shallower.
         // (The causeway crest never dips under -1.42, so it passes freely.)
-        if (tThere < -2.2 && tThere <= tHere + 0.02) return false;
+        if (tThere < -2.2 && tThere <= tHere + 0.02 && !nearCauseway(nx, nz)) return false;
       }
       // the sea refuses you — but if the tide caught you, wade out
       if (thereY < waterY() - 0.5) {
