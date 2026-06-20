@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 72 — 2026-06-20 — story (the journal's emotional climaxes get their marginalia)
+
+**Shipped:** the journal draws a hand-inked sketch beside each entry — but only the PUZZLE entries
+had them; the emotional and recursion climaxes rendered PLAIN. The most-read, most-moving pages (the
+bottom of one's own making, the return to the surface, the ascent carrying the light, the disagreeing
+second study, the keeper's shared pen, the model that only hopes, and iter 70's "you are here" beat)
+looked poorer than the puzzles. Now EVERY journal entry carries marginalia: an X on a little map (you
+are here), nested frames around a figure (the bottom), a stair rising to a sun (the return), a stair
+with a flame left burning at its foot (the ascent), two facing model-frames across a gap (the
+disagreeing studies), a shared quill (the merging hands), a drained-bay island with a small flame
+(the model that only hopes). The narrative artifact is now fully illustrated.
+
+**How:** 8 new `[textMarker, S(svg)]` pairs appended to ui.js `SKETCHES` (the same line-art helper,
+viewBox 96×40, stroke paths), each matched to its entry by a unique text substring. Pure UI/SVG
+content — +0 runtime, +0 draws; the two hands stay visually distinct (self = cream, keeper = green
+italic).
+
+**Evidence (`?debug`):** injected all 8 previously-plain climax entries → 8/8 now render WITH a
+sketch (none plain). Journal screenshots confirm the marginalia match the existing hand-drawn style
+and read clearly (X-on-map, nested-frames-with-figure, stair-to-sun, stair-with-flame at the foot,
+two-facing-frames), with the keeper hand in green italic. ZERO console errors. Non-graphics, no power
+cost.
+
+**Debt:** none — the journal has no plain entries left.
+
+**Next tick (73):** still NON-graphics (graphics eligible again at iter 74) — a world-detail/
+legibility beat, a Panel item, or a jank fix. Honor an owner endgame-fork redirect FIRST.
+
+---
+
 ## 71 — 2026-06-20 — graphics #4: vertex-baked ambient occlusion on the terrain
 
 **Shipped:** the low-poly terrain read FLAT in its folds — the chasm, the drained basin, the feet of
