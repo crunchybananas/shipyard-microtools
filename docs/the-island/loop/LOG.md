@@ -12,6 +12,37 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 71 — 2026-06-20 — graphics #4: vertex-baked ambient occlusion on the terrain
+
+**Shipped:** the low-poly terrain read FLAT in its folds — the chasm, the drained basin, the feet of
+the cliffs all caught the same flat skylight as the open beach. Now a vertex-baked AO darkens concave
+ground by how far it sits below its surroundings: the chasm reads as a shadowed rift, cliff bases are
+grounded, valley folds gain depth — while flat beach and plateau are untouched. Real contact-shadow
+depth at literally ZERO runtime cost — the visible-quality win the owner asked for, power-free.
+
+**How:** in `buildTerrain` (terrain.js), after heights+colours are baked, a second pass reads each
+vertex's eight neighbours straight from the finished 257² height grid (FREE — no extra `heightAt`, so
+load stays snappy) and multiplies the vertex colour by `1 - min(0.3, (ringAvg - h) * 0.05)` wherever
+the point sits below its ring (R=3 cells ≈ 7.3 m). Convex ridges/flats get nothing. The terrain
+already used `vertexColors`, so this is pure data — +0 draws, +0 runtime, grade-safe (multiplies the
+base, reads in every light). The 1:240 model clone inherits it (same geometry).
+
+**Evidence (Power Ledger + visual, `?debug`):** AO probed from the live grid — chasm centre concave
+10.3 → 30% darker, cliff base 6.3 → 30%, flat beach −0.03 → 0%, island top −0.47 → 0% (flats
+correctly untouched). Bench noon AFTER: **226 draws / 521k tris / 11.7ms gpu** — UNCHANGED from the
+iter-68 baseline (232 / 521k / 11.3ms): power-NEUTRAL by construction (vertex colours) AND by
+measurement. Visual: close bluff→chasm view at noon shows natural fold/cliff depth with clean flats
+(no splotch); night view confirms consistent base-multiply (no artifacts). ZERO console errors. Load
+stays snappy (grid array reads only — no extra heightAt).
+
+**Debt:** cleared roadmap #4. Costs no power and banks none — pure quality.
+
+**Next tick (72):** NON-graphics (71 graphics is now in the rolling 3-window) — a story/world-detail/
+legibility beat or a Panel item; graphics eligible again at iter 74 (after two non-graphics ticks),
+e.g. cut-stack #3b light-gating or #5a aerial haze. Honor an owner endgame-fork redirect FIRST.
+
+---
+
 ## 70 — 2026-06-20 — story (the "you are here" discovery becomes a journal beat) + BOUNDARY PUSH
 
 **Shipped:** iter 69's "you are here" marker fired only a fleeting whisper — unlike every other

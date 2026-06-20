@@ -189,8 +189,10 @@ zero-intensity light STILL costs a per-fragment loop iteration — only `.visibl
 hide the one-time shader recompile on the hatch-open/dive curtain) [biggest cut]; `frustumCulled=true`
 +boundingSphere on the Points — NOT a one-liner: they live in `diveGroup` which rescales 240× mid-dive
 and the auto boundingSphere ignores the shader's ±0.6 drift + proximity point-size, so it needs a
-dive-edge frustumCull toggle + dive-scale cull check; water fbm 4→3; (4) vertex-baked AO into the Baker [bake-time only; keep sampling coarse so
-load stays snappy]; (5a) distance aerial-perspective (generalize the canopy haze to terrain/stone)
+dive-edge frustumCull toggle + dive-scale cull check; water fbm 4→3; (4) vertex-baked AO ✓ DONE iter 71
+(terrain.js: concavity AO read from the finished 257² height grid — FREE, no extra heightAt — multiplied
+into the existing terrain vertex colours; chasm/cliff folds get depth, flats untouched, +0 runtime,
+grade-safe, model clone inherits it); (5a) distance aerial-perspective (generalize the canopy haze to terrain/stone)
 [near-free] — ship this FIRST and SEPARATELY from (5b) the triplanar normal/roughness break-up
 [treat as adds-MEDIUM, terrain fills the frame — bench-profile at noon before shipping]; (6)
 in-shader beam god-rays [bench-check; additive overdraw near the beam isn't free]; (7) EffectComposer

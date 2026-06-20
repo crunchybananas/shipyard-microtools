@@ -259,6 +259,29 @@ export function buildTerrain() {
     colors[i * 3] = tmp.r; colors[i * 3 + 1] = tmp.g; colors[i * 3 + 2] = tmp.b;
   }
 
+  // ---- ambient occlusion bake (#4) ----------------------------------------
+  // A vertex sunk below its surroundings — the chasm, the drained basin, the
+  // folds at a cliff's foot — catches less skylight. Read the eight neighbours
+  // straight from the finished height grid (FREE: no extra heightAt, so load
+  // stays snappy) and darken by how far below the ring average each point sits;
+  // convex ridges are untouched. Power-neutral by construction (vertex colours →
+  // +0 draws / +0 runtime) and grade-safe (multiplies the base, so the contact
+  // shadow reads in every light).
+  const W1 = N + 1;            // 257 vertices per side
+  const R = 3;                 // ~7.3 m ring (DOMAIN/N ≈ 2.42 m / cell)
+  const clamp01 = (n) => (n < 0 ? 0 : n > N ? N : n);
+  const yAt = (c, rw) => pos.getY(clamp01(c) + clamp01(rw) * W1);
+  for (let i = 0; i < pos.count; i++) {
+    const c = i % W1, rw = (i / W1) | 0;
+    const ring = (yAt(c + R, rw) + yAt(c - R, rw) + yAt(c, rw + R) + yAt(c, rw - R) +
+      yAt(c + R, rw + R) + yAt(c - R, rw + R) + yAt(c + R, rw - R) + yAt(c - R, rw - R)) * 0.125;
+    const concave = ring - pos.getY(i);            // > 0 in cavities
+    if (concave > 0) {
+      const ao = 1 - Math.min(0.3, concave * 0.05); // up to 30% darker in deep folds
+      colors[i * 3] *= ao; colors[i * 3 + 1] *= ao; colors[i * 3 + 2] *= ao;
+    }
+  }
+
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.computeVertexNormals();
 
