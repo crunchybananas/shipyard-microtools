@@ -540,7 +540,7 @@ export class Game {
       if (near) {
         this.once('keeperLook' + W.level, () => {
           A.duckAmbient(true);
-          A.keeperVoice(W.level >= 4 ? 'resigned' : 'pleading');
+          A.say(W.level === 3 ? 'keeper_look_3' : 'keeper_look_4', W.level >= 4 ? 'resigned' : 'pleading');
           UI.whisper(KEEPER.look[Math.min(W.level, 4)] || KEEPER.look[4]);
           setTimeout(() => A.duckAmbient(false), 2700);
         });

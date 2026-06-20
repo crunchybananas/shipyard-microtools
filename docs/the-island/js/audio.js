@@ -1,9 +1,12 @@
-// audio.js — every sound is synthesized. The surf gain is driven by the same
-// wave function the water shader displaces, so the swell you hear is the
-// swell you see. Solved puzzles add permanent stems to the island's score.
+// audio.js — nearly every sound is synthesized: the surf gain is driven by the
+// same wave function the water shader displaces, so the swell you hear is the
+// swell you see, and solved puzzles add permanent stems to the island's score.
+// The one exception is the keeper's VOICE (say()) — a real recording, played
+// through the same drowned bus as the synth murmur so it stays one floor down.
 
 import { STONE_NOTES } from './props.js';
 import { clamp, lerp } from './util.js';
+import { loadAudioBuffer } from './assets.js';
 
 let ctx = null;
 
@@ -378,6 +381,29 @@ const A = {
       vib.start(ts); vib.stop(ts + dur + 0.25);
     }
     setTimeout(() => { try { fb.gain.value = 0; del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {} }, 2600);
+  },
+
+  // The keeper's REAL voice (bm_george, Kokoro-82M) for the lines in content.js
+  // KEEPER — played through the SAME drowned bus as keeperVoice() (lowpass to a
+  // murmur + one-floor-down echo) so recorded speech still sounds overheard from
+  // below, never a clean narrator. Lazy-loaded + cached via the asset manifest;
+  // if the clip can't load (offline / missing), it falls back to the FM murmur,
+  // so the keeper always speaks one way or another. register is for that fallback.
+  say(id, register = 'curious') {
+    if (!this.ready) return;
+    loadAudioBuffer(id, ctx).then((buf) => {
+      const vg = ctx.createGain(); vg.gain.value = 0.85; vg.connect(this.fx);
+      const drown = ctx.createBiquadFilter(); drown.type = 'lowpass';
+      drown.frequency.value = 1500; drown.Q.value = 0.6; drown.connect(vg);
+      const del = ctx.createDelay(0.6); del.delayTime.value = 0.19;
+      const fb = ctx.createGain(); fb.gain.value = 0.34;
+      drown.connect(del); del.connect(fb).connect(del); del.connect(vg);
+      const src = ctx.createBufferSource(); src.buffer = buf; src.connect(drown);
+      src.start();
+      src.onended = () => setTimeout(() => {
+        try { fb.gain.value = 0; src.disconnect(); del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {}
+      }, 1200);   // let the one-floor-down echo ring out before tearing the bus down
+    }).catch(() => this.keeperVoice(register));   // offline / missing asset → the synth murmur, as before
   },
 
   // the dive: the whole island drops an octave and comes back

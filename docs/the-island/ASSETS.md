@@ -94,7 +94,14 @@ in the next texture batch (the budget above is the target, not the current state
 Assets are generated on the big node ("Bender") via Peel: `asset_texture_generate`
 (FLUX.1-schnell), `asset_voice_generate` (Kokoro-82M), `asset_music_generate`,
 `asset_mesh_generate`. Outputs land in `~/.peel/assets/`; copy the chosen file into
-`docs/the-island/assets/` and add its `MANIFEST` row.
+`docs/the-island/assets/` and add its `MANIFEST` row. **Voice/music come back as WAV** —
+transcode to a compact mono mp3 before shipping (`ffmpeg -i in.wav -ac 1 -ar 24000 -b:a 64k
+out.mp3` — ~6× smaller, and mp3 is WKWebView-safe for `decodeAudioData`, unlike Opus). The
+keeper's 6 lines shipped this way at ~148 KB total (`assets/voice/`).
+
+> **Dispatch note:** `asset_voice_generate` / `asset_texture_generate` default to the LOCAL
+> backend, which lacks the ML venvs and fails instantly. Pass **`node: "tree"`** to route the
+> job to Bender (the heavy node) — that is what actually generates.
 
 > **First troubleshooting line:** if jobs fail around ~40 s with *"Identity not verified,"*
 > **restart Peel ON Bender** (not the local Mac) — it's a peer-trust handshake, not a prompt error.

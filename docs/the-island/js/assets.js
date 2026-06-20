@@ -27,6 +27,16 @@ export const MANIFEST = {
     prompt: 'seamless tileable weathered driftwood plank grain, grey-brown, soft daylight, top-down',
     wrap: 'repeat', repeat: [1.4, 1.4], colorSpace: 'srgb', anisotropy: 4,
   },
+
+  // the keeper's voice — bm_george (Kokoro-82M), generated on Bender, transcoded to
+  // mono 24 kHz mp3, played through the drowned bus (audio.js say()). `prompt` is the
+  // spoken line (provenance). Lazy-loaded by id when the keeper first speaks at depth.
+  keeper_arrive_shallow: { kind: 'voice', file: 'voice/keeper_arrive_shallow.mp3', bytes: 20205, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: 'Oh. You came down too.' },
+  keeper_arrive_deep:    { kind: 'voice', file: 'voice/keeper_arrive_deep.mp3',    bytes: 22125, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: 'There is no bottom. I looked.' },
+  keeper_look_3:         { kind: 'voice', file: 'voice/keeper_look_3.mp3',         bytes: 15981, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: 'Oh. Not again.' },
+  keeper_look_4:         { kind: 'voice', file: 'voice/keeper_look_4.mp3',         bytes: 28269, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "You're faster than I was. Don't be proud of it." },
+  keeper_farewell:       { kind: 'voice', file: 'voice/keeper_farewell.mp3',       bytes: 32685, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "Go on up. Don't leave the light on for me. I never could." },
+  keeper_there_you_are:  { kind: 'voice', file: 'voice/keeper_there_you_are.mp3',  bytes: 26733, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "There you are. I've been coming down for you." },
 };
 
 const _texCache = new Map();   // id -> THREE.Texture (shared)

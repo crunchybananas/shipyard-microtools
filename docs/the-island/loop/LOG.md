@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 85 — 2026-06-20 — the keeper SPEAKS: real bm_george voice through the drowned bus (item 3) [PUSH: 82–85]
+
+**Shipped:** first-wave item 3 — the keeper's synth murmur becomes a real human voice. Six
+**bm_george** lines (Kokoro-82M, generated on Bender, Apache-2.0) for the lines centralised in
+`content.js` KEEPER: the two depth-arrivals, the two figure-looks-back lines, the ascent farewell,
+plus the twist's eye-level "There you are. I've been coming down for you." (staged for item 4).
+- **`A.say(id, register)`** in `audio.js` plays the decoded clip through the SAME drowned bus as
+  `keeperVoice()` (lowpass 1500 + 0.19 s feedback echo) so recorded speech still sounds heard
+  through a floor of water — *overheard, not addressed*. If a clip can't load it falls back to the
+  FM-synth murmur, so the keeper always speaks.
+- The call sites (`main.js` arrival + farewell, `puzzles.js` look) now call `A.say` with the
+  matching voice id; the whisper TEXT still pairs every line (accessibility).
+- Assets: 6 WAVs transcoded to mono 24 kHz mp3 (`ffmpeg`) → `assets/voice/` (~148 KB total, ~6×
+  smaller than WAV; WKWebView-safe). Six `MANIFEST` rows carry license + provenance.
+- First audio asset → the "made of math" claim retired honestly: the title-foot now reads "a world
+  made of code, and a voice at the bottom that isn't" — the keeper, the one real thing down there.
+
+**Evidence (`?debug`):** boots clean, zero console errors; all 6 voice rows in the manifest;
+`keeper_there_you_are` + `keeper_farewell` fetch + decode (3.25 s / 4.0 s, mono); `A.say()`'s
+drowned-bus node graph builds without error (mirrors the shipped `keeperVoice` bus). Power: audio
+is GPU-free; resident audio ~148 KB, lazy-loaded only when the keeper first speaks at depth.
+**NOT yet verified by EAR** — the "overheard, not addressed" timbre is an owner listen (dive to L3+).
+
+**Dispatch gotcha (logged to ASSETS.md + memory):** `asset_voice_generate` defaults to the LOCAL
+backend (no ML venv → instant fail); pass `node:"tree"` to route to Bender.
+
+**Pushed:** the 82–85 batch (driftwood factory, content layer, the voice) — submodule then parent.
+
+**Next tick (86):** item 4 — the twist's structural core: the figure turns and walks UP at the
+mandatory bottom beat, the bell-pitch inverts to rise, the eye-level "There you are" plays (the
+voice is ready), and the embrace is a PLAYER ACTION (turn-and-rise), never a cutscene.
+
+---
+
 ## 84 — 2026-06-20 — content layer (item 2): the keeper's lines + journal sketches move to js/content.js
 
 **Shipped:** first-wave item 2, the content layer's first slice. New `js/content.js` holds the

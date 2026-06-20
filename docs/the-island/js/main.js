@@ -372,7 +372,7 @@ function tickDive(dt) {
     // from level 3 down, the keeper answers your arrival — the first 'I' in the
     // game: a drowned voice under the floor, his words in quotes (#14)
     if (W.level >= 3) setTimeout(() => {
-      A.keeperVoice(W.level >= 4 ? 'resigned' : 'curious');
+      A.say(W.level >= 4 ? 'keeper_arrive_deep' : 'keeper_arrive_shallow', W.level >= 4 ? 'resigned' : 'curious');
       UI.whisper(W.level >= 4 ? KEEPER.arrive.deep : KEEPER.arrive.shallow);
       // the journal fills with a hand that isn't yours — the keeper's, blurring
       // into your own field notes the deeper you go (#21)
@@ -440,7 +440,7 @@ function landAscent() {
   // You leave him where he chose to stay, and you leave the light BURNING (integration, not
   // abandonment). The arrival (tickAscent f>=1) names the silence.
   if (!W.flags.keeperSilenced && wasLevel >= 3) {
-    A.keeperVoice('resigned');
+    A.say('keeper_farewell', 'resigned');
     UI.whisper(KEEPER.farewell);
     W.flags.keeperSilenced = true;
     keeperFarewell = true;
