@@ -9,6 +9,7 @@ import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
 import { UI } from './ui.js';
+import { KEEPER } from './content.js';
 import A from './audio.js';
 import { clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED } from './util.js';
 
@@ -372,7 +373,7 @@ function tickDive(dt) {
     // game: a drowned voice under the floor, his words in quotes (#14)
     if (W.level >= 3) setTimeout(() => {
       A.keeperVoice(W.level >= 4 ? 'resigned' : 'curious');
-      UI.whisper(W.level >= 4 ? '“There is no bottom. I looked.”' : '“Oh. You came down too.”');
+      UI.whisper(W.level >= 4 ? KEEPER.arrive.deep : KEEPER.arrive.shallow);
       // the journal fills with a hand that isn't yours — the keeper's, blurring
       // into your own field notes the deeper you go (#21)
       UI.addJournal(W.level >= 4
@@ -440,7 +441,7 @@ function landAscent() {
   // abandonment). The arrival (tickAscent f>=1) names the silence.
   if (!W.flags.keeperSilenced && wasLevel >= 3) {
     A.keeperVoice('resigned');
-    UI.whisper('“…go on up. Don’t leave the light on for me. I never could.”');
+    UI.whisper(KEEPER.farewell);
     W.flags.keeperSilenced = true;
     keeperFarewell = true;
     // the integration, in your own hand again (you were becoming his; rising, the pen is

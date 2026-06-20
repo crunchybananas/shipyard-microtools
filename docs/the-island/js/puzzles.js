@@ -10,6 +10,7 @@ import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
 import { clamp, lerp, lerpAngle, TAU } from './util.js';
+import { KEEPER } from './content.js';
 
 const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
@@ -18,12 +19,8 @@ const CLIFF_AZ = Math.atan2(CLIFF.x - LH.x, CLIFF.z - LH.z);
 const _kv = new THREE.Vector3();
 const _ov = new THREE.Vector3();   // scratch for the oar's world position (nested in the dory group)
 
-// the keeper's words, spoken when the figure looks back (#14). Universal,
-// metaphor only — recognition curdling into resignation the deeper you go.
-const KEEPER_LINES = {
-  3: '“Oh. Not again.”',
-  4: '“You’re faster than I was. Don’t be proud of it.”',
-};
+// the keeper's words (KEEPER.look) live in content.js now, alongside his arrival and
+// farewell lines — one place for the voice layer and the twist to re-point (#14).
 
 export class Game {
   constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale, onLeave }) {
@@ -544,7 +541,7 @@ export class Game {
         this.once('keeperLook' + W.level, () => {
           A.duckAmbient(true);
           A.keeperVoice(W.level >= 4 ? 'resigned' : 'pleading');
-          UI.whisper(KEEPER_LINES[Math.min(W.level, 4)] || KEEPER_LINES[4]);
+          UI.whisper(KEEPER.look[Math.min(W.level, 4)] || KEEPER.look[4]);
           setTimeout(() => A.duckAmbient(false), 2700);
         });
       }

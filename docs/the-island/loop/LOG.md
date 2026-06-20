@@ -12,6 +12,33 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 84 — 2026-06-20 — content layer (item 2): the keeper's lines + journal sketches move to js/content.js
+
+**Shipped:** first-wave item 2, the content layer's first slice. New `js/content.js` holds the
+narrative DATA that the voice (item 3) and the twist (item 4) will edit: the **KEEPER** spoken lines
+— `look` (the figure-looks-back lines, by level), `arrive` (depth-arrival), `farewell` (the ascent
+goodbye) — plus the journal **SKETCHES** atlas. `puzzles.js` (`KEEPER_LINES` const → `KEEPER.look`),
+`main.js` (the two inline arrival/farewell whisper strings → `KEEPER.arrive`/`KEEPER.farewell`), and
+`ui.js` (local `SKETCHES`/`S` → imported) now read from it. Behavior-IDENTICAL — a pure relocation,
+so the keeper's voice and the twist's re-subtexting become CONTENT edits, not engine surgery.
+
+**Evidence (`?debug`):** boots clean, zero console errors; `content.js` imports resolve in all three
+consumers; every `KEEPER` value + all **23 SKETCHES** verified byte-identical to the originals;
+END-TO-END render check — `renderJournal()` pulls the valve sketch from `content.js` SKETCHES (the
+valve-specific SVG path renders for a matching entry), so the journal's pictures still draw through
+the import. No grep stragglers. Power-neutral (data relocation, no geometry).
+
+**Debt:** the diegetic whisper / journal-PAGE catalogue is still inline at its call sites in
+`puzzles.js`/`main.js` (coupled to puzzle logic) — that's the next content slice (item 2b), and it
+does not block the voice.
+
+**Next tick (85, a PUSH boundary):** item 3 — the keeper's real **bm_george** voice through the
+drowned bus (`audio.js`), routed at the KEEPER triggers now centralised here, plus the twist's
+eye-level new line ("There you are. I've been coming down for you."). First audio asset → reframe
+the `index.html` "made of math" line. Push the 82–85 batch.
+
+---
+
 ## 83 — 2026-06-20 — THE PIVOT: pure-math era closed; the asset factory; the twist chosen
 
 **Shipped (a hinge iteration, owner-directed):**
