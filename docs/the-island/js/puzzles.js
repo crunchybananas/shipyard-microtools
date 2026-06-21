@@ -124,7 +124,10 @@ export class Game {
     // standing stones
     for (let i = 0; i < 5; i++) {
       I.add({
-        id: `stone${i}`, targets: [R[`stone${i}`]], label: 'a humming stone', maxDist: 5.5,
+        id: `stone${i}`, targets: [R[`stone${i}`]], label: 'a humming stone', maxDist: 13,
+        // reach the WHOLE arc (radius 6.5) from one vantage where you can see all five — it's a
+        // sequence you play by ear, so standing back and touching them in order must work (was 5.5,
+        // which forced walking up to each stone and broke the rhythm)
         onClick: () => this._touchStone(i),
       });
     }
