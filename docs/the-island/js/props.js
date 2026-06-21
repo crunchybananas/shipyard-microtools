@@ -935,6 +935,25 @@ export function buildWorld() {
       ag.computeVertexNormals();
       const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: true });
       applyRelief(apronMat, 'pebble', { normalScale: 0.5, strength: 2.0 });
+      // DE-TILE: the [53,5] repeat prints ~53 identical pebble columns down the 48m band.
+      // Warp the albedo sample coord with low-freq value-noise so the lattice dissolves. Compile-safe:
+      // samples at a warped LOCAL, never mutates the read-only vMapUv varying. +0 texture fetches.
+      // (vMapUv already carries the [53,5] repeat, so 1.0 unit ≈ one pebble.)
+      apronMat.onBeforeCompile = (sh) => {
+        sh.fragmentShader = sh.fragmentShader
+          .replace('#include <common>', '#include <common>\n' +
+            'float apHash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n' +
+            'float apVN(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);\n' +
+            '  float a=apHash(i),b=apHash(i+vec2(1.0,0.0)),c=apHash(i+vec2(0.0,1.0)),d=apHash(i+vec2(1.0,1.0));\n' +
+            '  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y); }')
+          .replace('#include <map_fragment>',
+            '#ifdef USE_MAP\n' +
+            '  vec2 apW = (vec2(apVN(vMapUv * 0.4), apVN(vMapUv * 0.4 + 19.7)) - 0.5) * 0.7;\n' +
+            '  vec4 sampledDiffuseColor = texture2D( map, vMapUv + apW );\n' +
+            '  diffuseColor *= sampledDiffuseColor;\n' +
+            '#endif');
+      };
+      apronMat.needsUpdate = true;
       const apron = new THREE.Mesh(ag, apronMat);
       apron.name = 'pebbleApron';
       apron.receiveShadow = true;
