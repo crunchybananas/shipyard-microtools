@@ -97,6 +97,24 @@ export const LORE = {
     ],
     journal: 'Found the keeper’s private journal by his cot — kept under the pillow, against his own ear. He is afraid of being the last one awake; he draws the island smaller each night; he trims a light at every dusk for someone he will not name.',
   },
+  // legible ONLY once you hold the keeper's reading glass — lampblack written too small for the
+  // naked eye. The found-lens reveal (puzzles.js): these marks fade in when W.flags.readGlass.
+  lens_mark_study: {
+    kind: 'inscription', hand: 'keeper', title: 'Lampblack, too small to read by eye',
+    pages: [
+      '(the glass makes it legible) I write the true things small, in lampblack, where only a patient hand with a glass will ever find them. The inspector reads the big log and goes home satisfied.',
+      'You have a glass, and a patient hand, so here is a true thing: I am not keeping the light to save a ship. There are no ships. I am keeping it so that when I finally go down to look, there will be something lit above me to climb back toward.',
+    ],
+    journal: 'Through the keeper’s reading glass, lampblack on the chart too small for the eye: he keeps the light not for ships — there are none — but so that when he goes down, something stays lit above him to climb back toward.',
+  },
+  lens_mark_stone: {
+    kind: 'inscription', hand: 'keeper', title: 'Scratched into the stone, hair-fine',
+    pages: [
+      '(only the glass shows it) Whoever you are, holding this glass: you are not the first to read these. You will not be the last.',
+      'We each think we are the one who went down. We are each also the light left lit. The whole trick of it is to be the one who fell AND the one who keeps the lamp — at once, without choosing. Hold both. And climb.',
+    ],
+    journal: 'Hair-fine letters on a standing stone, shown only by the glass: “We each think we are the one who went down. We are each also the light left lit. Hold both, and climb.”',
+  },
 };
 
 // ---- journal marginalia (SKETCHES) -----------------------------------------

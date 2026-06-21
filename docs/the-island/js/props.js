@@ -350,6 +350,17 @@ export function buildWorld() {
     book.rotation.y = 0.22;
     core.add(book);
   }
+  // a line of the keeper's lampblack on the chart margin, too fine to read by eye — INVISIBLE
+  // until you hold his reading glass (the found-lens reveal; opacity driven by F.readGlass in
+  // puzzles _apply, then it's a readable hotspot → lens_mark_study).
+  {
+    const mk = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.1),
+      new THREE.MeshBasicMaterial({ color: 0x6f5630, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+    mk.rotation.x = -Math.PI / 2;
+    mk.position.set(LH.x - 1.40, LH.y + 0.957, LH.z + 0.05);
+    mk.name = 'lensMarkStudy';
+    core.add(mk);
+  }
   // the model sits here (filled in later with the clone)
   const modelAnchor = new THREE.Group();
   modelAnchor.name = 'modelAnchor';
@@ -955,6 +966,16 @@ export function buildWorld() {
       halo.position.set(0, 0.4, 0.43);
       halo.material.opacity = 0.12;
       m.add(halo);
+
+      // hair-fine letters scratched high on ONE stone's inner face — invisible to the naked
+      // eye, revealed only once you hold the reading glass (found-lens reveal → lens_mark_stone).
+      if (i === 4) {
+        const lm = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.14),
+          new THREE.MeshBasicMaterial({ color: 0x6f5630, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+        lm.position.set(0, 1.35, 0.37);
+        lm.name = 'lensMarkStone';
+        m.add(lm);
+      }
     }
 
     // the song bird, visible at dawn, perched on stone 2
@@ -969,6 +990,23 @@ export function buildWorld() {
     const s2 = stonesGroup.getObjectByName('stone2');
     bird.position.copy(s2.position).add(new THREE.Vector3(0, 2.6, 0));
     stonesGroup.add(bird);
+
+    // THE READING GLASS — a hidden found-item half-buried on the islet among the stones. Take it
+    // and the keeper's lampblack marks (lens_mark_*), invisible to the naked eye, reveal across
+    // the world. A brass loupe catching the light; hotspot in puzzles.js sets W.flags.readGlass.
+    const gx = SPOTS.stones.x + 3.2, gz = SPOTS.stones.y + 5.0;
+    const glass = new THREE.Group(); glass.name = 'readGlass';
+    const gring = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.03, 8, 18), matBrassSolid);
+    glass.add(gring);
+    const gdisc = new THREE.Mesh(new THREE.CircleGeometry(0.15, 18),
+      new THREE.MeshStandardMaterial({ color: 0xcfe8ea, transparent: true, opacity: 0.32, roughness: 0.08, metalness: 0, side: THREE.DoubleSide }));
+    gdisc.position.z = 0.004; glass.add(gdisc);
+    const ghandle = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.03, 0.34, 6), matBrassSolid);
+    ghandle.position.set(0, -0.32, 0); glass.add(ghandle);
+    glass.position.set(gx, heightAt(gx, gz) + 0.13, gz);
+    glass.rotation.set(Math.PI / 2 - 0.5, 0.4, 0.7);   // tilted, half-buried, catching the light
+    glass.castShadow = true;
+    core.add(glass);
   }
 
   // =================== VAULT OF THE LENS (in the stones pad) ================
@@ -1667,6 +1705,7 @@ const NAMES = [
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
   'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
+  'readGlass', 'lensMarkStudy', 'lensMarkStone',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',

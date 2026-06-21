@@ -414,6 +414,28 @@ export class Game {
       when: () => W.level >= 1,                 // the quarters open one level down
       onClick: () => UI.openReader('quarters_journal'),
     });
+
+    // ---- the found-lens reveal: take the keeper's reading glass and his lampblack marks appear ----
+    if (R.readGlass) I.add({
+      id: 'readGlass', targets: [R.readGlass], label: 'a brass reading glass', maxDist: 3.4,
+      when: () => !W.flags.readGlass,
+      onClick: () => {
+        this.flag('readGlass');
+        if (!W.inventory.includes('readglass')) W.inventory.push('readglass');
+        UI.whisper('A keeper’s reading glass. Through it, the faint marks resolve — there is writing everywhere you did not see.');
+        UI.addJournal('Found the keeper’s reading glass on the islet. He wrote the true things small, in lampblack; with the glass, they surface. There is more here than the eye admits.', '', 'self');
+      },
+    });
+    if (R.lensMarkStudy) I.add({
+      id: 'lensMarkStudy', targets: [R.lensMarkStudy], label: 'lampblack, resolved by the glass', maxDist: 2.8,
+      when: () => W.flags.readGlass,
+      onClick: () => UI.openReader('lens_mark_study'),
+    });
+    if (R.lensMarkStone) I.add({
+      id: 'lensMarkStone', targets: [R.lensMarkStone], label: 'hair-fine letters', maxDist: 4.5,
+      when: () => W.flags.readGlass,
+      onClick: () => UI.openReader('lens_mark_stone'),
+    });
   }
 
   _touchStone(i) {
@@ -712,6 +734,20 @@ export class Game {
     if (R.lensItem) {
       R.lensItem.visible = F.birdSolved && !F.lensTaken;
       R.lensItem.rotation.y = elapsed * 0.8;
+    }
+
+    // the found-lens reveal — the reading glass vanishes when taken; the keeper's lampblack
+    // marks fade up once you hold it (legible only through the glass). Opacity lerped on the
+    // real island; the marks become readable hotspots once visible.
+    if (R.readGlass) { R.readGlass.visible = !F.readGlass; R.readGlass.rotation.y = 0.4 + elapsed * 0.5; }
+    for (const id of ['lensMarkStudy', 'lensMarkStone']) {
+      const mk = R[id];
+      if (!mk) continue;
+      if (!isModel) {
+        const t = F.readGlass ? 0.88 : 0;        // sepia ink resolving (normal blend, won't bloom)
+        mk.material.opacity += (t - mk.material.opacity) * 0.05;
+      }
+      mk.visible = mk.material.opacity > 0.02;
     }
 
     if (R.hatchLid) {
