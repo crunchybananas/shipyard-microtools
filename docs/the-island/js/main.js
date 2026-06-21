@@ -833,6 +833,7 @@ function applyAtmosphere(elapsed, dt) {
   su.uSunCol.value.copy(g.sunCol);
   su.uTop.value.copy(g.skyTop);
   su.uHorizon.value.copy(g.skyHorizon);
+  su.uHorizonHaze.value.copy(g.fog);          // match the terrain's aerial-perspective haze so the horizon seam dissolves
   su.uNight.value = night;
   su.uFlash.value = flash;
 

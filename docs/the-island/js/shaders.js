@@ -170,6 +170,7 @@ export function makeSkyMaterial() {
       uSunCol: { value: new THREE.Color(0xfff4e0) },
       uTop: { value: new THREE.Color(0x3a7ab8) },
       uHorizon: { value: new THREE.Color(0xbfe0ee) },
+      uHorizonHaze: { value: new THREE.Color(0xcfe3e8) },   // the fog colour the far terrain hazes into
       uNight: { value: 0 },
       uFlash: { value: 0 },
       uMist: { value: 0 },
@@ -196,6 +197,7 @@ export function makeSkyMaterial() {
       uniform vec3 uSunCol;
       uniform vec3 uTop;
       uniform vec3 uHorizon;
+      uniform vec3 uHorizonHaze;
       uniform float uNight;
       uniform float uFlash;
       uniform float uMist;
@@ -208,12 +210,25 @@ export function makeSkyMaterial() {
         vec3 d = normalize(vDir);
         float up = max(d.y, 0.0);
 
-        // base gradient
+        // base gradient — three bands: horizon → mid sky → a deepened zenith (more air, more depth)
         vec3 col = mix(uHorizon, uTop, pow(up, 0.55));
+        col = mix(col, uTop * 0.82, pow(up, 2.2));
+        // horizon-haze fuse: the lowest sky band settles toward the FOG colour the far terrain
+        // hazes into, so the seam where the untextured distance meets the sky dissolves
+        col = mix(col, uHorizonHaze, (1.0 - smoothstep(0.0, 0.085, up)) * 0.6);
         // below the horizon: deep sea haze
         col = mix(col, uHorizon * 0.55, smoothstep(0.0, -0.25, d.y));
 
         float sunDot = dot(d, normalize(uSunDir));
+
+        // wide warm sun-side scatter — the air glows toward the sun; taken FROM uSunCol so it
+        // desaturates WITH the descent eras instead of being a hardcoded warmth
+        col += uSunCol * pow(max(sunDot, 0.0), 3.0) * 0.12 * smoothstep(-0.1, 0.2, uSunDir.y);
+        // faked crepuscular rays near the sun — the half-res bloom amplifies them into shafts;
+        // hard-gated on pow(sunDot,6) + elevation so they only live beside the sun and vanish at night
+        float rayAng = atan(d.x - uSunDir.x, d.z - uSunDir.z);
+        float rays = (0.5 + 0.5 * sin(rayAng * 14.0 + uTime * 0.05)) * pow(max(sunDot, 0.0), 6.0);
+        col += uSunCol * rays * 0.07 * (1.0 - uNight) * smoothstep(0.0, 0.25, uSunDir.y);
 
         // sun disc + halo
         float disc = smoothstep(0.9996, 0.99985, sunDot);
