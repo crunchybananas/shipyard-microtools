@@ -5,7 +5,7 @@
 
 import * as THREE from 'three';
 import { Baker, mulberry32, SEED, vary, clamp, lerp, TAU } from './util.js';
-import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture } from './terrain.js';
+import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { applyRelief, getTexture } from './assets.js';
@@ -1640,7 +1640,8 @@ function buildVegetation(core, r) {
 
   // --- shore rocks ---
   const rockGeo = new THREE.IcosahedronGeometry(1, 0);
-  const rockMat = new THREE.MeshStandardMaterial({ color: 0xa9a08c, flatShading: true, roughness: 0.95 });
+  const rockMat = new THREE.MeshStandardMaterial({ color: 0xd6ccb8, flatShading: true, roughness: 0.95 }); // lightened so the rock albedo multiplies to natural stone
+  applyRelief(rockMat, 'rock', { normalScale: 0.6, strength: 2.2 });   // natural cracked-granite texture + derived crack relief on the shore boulders
   const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 70);
   let ri = 0;
   for (let i = 0; i < 400 && ri < 70; i++) {
@@ -1655,6 +1656,9 @@ function buildVegetation(core, r) {
       q.setFromEuler(e.set(r() * TAU, r() * TAU, r() * TAU)),
       new THREE.Vector3(s, s * (0.6 + r() * 0.5), s));
     rocks.setMatrixAt(ri, m4);
+    // make the substantial boulders SOLID (you walked through them) — register a collider
+    // footprint; small pebbles (s<0.9) stay passable so you don't bump invisible nubs
+    if (s >= 0.9) addCollider(x, z, s * 0.82);
     ri++;
   }
   rocks.count = ri;

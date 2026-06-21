@@ -141,7 +141,21 @@ function padFlatten(h, x, z, spot, r, target) {
 
 // ----------------------------------------------------------------------------
 // Walkable height: terrain + structures the player can stand on.
+// ---- solid colliders + the jetty deck ----
+// Circular footprints props register (shore rocks, …) so the player can't walk THROUGH solid
+// scatter. props.js pushes via addCollider during buildWorld; wallBlocked() reads them.
+const COLLIDERS = [];
+export function addCollider(x, z, r) { COLLIDERS.push({ x, z, r }); }
+export function clearColliders() { COLLIDERS.length = 0; }
+// the jetty deck — a walkable plank surface standing over the water off the wake-up beach
+// (mesh in props.js: centre jx=-18, z=-110.5, 2.4×12, plank top ~1.16). Mirror it here so
+// you stand ON it instead of falling through to the seabed.
+const JETTY = { x: -18, z: -110.5, hx: 1.3, hz: 6.1, y: 1.16 };
+
 export function walkableY(x, z) {
+  // the jetty deck: a real surface over the water (was a fall-through)
+  if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
+
   // lighthouse interior: flat disc
   const dl = Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y);
   if (dl < 5.4) return LIGHTHOUSE_H;
@@ -198,6 +212,12 @@ export function wallBlocked(x0, z0, x1, z1) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;
   } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.65) {
     return true;
+  }
+  // solid scatter (shore rocks, …) — block stepping INTO a registered collider circle (the
+  // player._step slide-resolves along x/z, so you brush past instead of sticking)
+  for (let i = 0; i < COLLIDERS.length; i++) {
+    const c = COLLIDERS[i];
+    if ((x1 - c.x) * (x1 - c.x) + (z1 - c.z) * (z1 - c.z) < c.r * c.r) return true;
   }
   return false;
 }

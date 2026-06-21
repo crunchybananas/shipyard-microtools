@@ -67,6 +67,14 @@ export const MANIFEST = {
     prompt: 'seamless tileable aged conifer bark, deep vertical grooves, weathered grey-brown, top-down',
     wrap: 'repeat', repeat: [1, 3], colorSpace: 'srgb', anisotropy: 4,
   },
+  // the shore boulders — NATURAL cracked granite (no masonry seams, unlike the lighthouse 'stone'),
+  // on the rocks InstancedMesh via applyRelief (albedo + derived normal so the cracks catch light).
+  rock: {
+    kind: 'texture', file: 'rock.jpg', bytes: 149380,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable natural weathered granite boulder, cracked rough stone, lichen flecks, no block seams, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
+  },
   // the tree-top canopy — a STYLIZED painterly foliage, sampled object-space in the canopy shader
   // (no UVs) as a subtle luminance multiply to break the flat uniform green. Kept low-detail.
   foliage: {
