@@ -907,6 +907,29 @@ export function buildWorld() {
     oar.position.set(0.25, 0.28, -0.2); oar.rotation.x = 0.45; oar.rotation.z = 0.5;
     oar.name = 'doryOar'; dory.add(oar);
     core.add(dory);
+
+    // a wet-PEBBLE apron draped over the south wake-up-beach waterline — the shingle where the sea
+    // meets the sand (the campaign's shoreline detail). A thin PlaneGeometry strip y-conformed to
+    // the terrain so it never floats/z-fights; the seaward edge sits under the shallow water (wet
+    // pebbles), the landward edge on the wet sand. Decorative, no collision. ONE mesh.
+    {
+      const cx = -8, cz = -104.5, w = 48, d = 4.5, nx = 40, nz = 6;   // thin band hugging the south waterline
+      const ag = new THREE.PlaneGeometry(w, d, nx, nz);
+      ag.rotateX(-Math.PI / 2);
+      const ap = ag.attributes.position;
+      for (let v = 0; v < ap.count; v++) {
+        const wx = ap.getX(v) + cx, wz = ap.getZ(v) + cz;
+        ap.setX(v, wx); ap.setZ(v, wz);
+        ap.setY(v, heightAt(wx, wz) + 0.04);                      // drape on the shore
+      }
+      ag.computeVertexNormals();
+      const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: true });
+      applyRelief(apronMat, 'pebble', { normalScale: 0.5, strength: 2.0 });
+      const apron = new THREE.Mesh(ag, apronMat);
+      apron.name = 'pebbleApron';
+      apron.receiveShadow = true;
+      core.add(apron);
+    }
   }
 
   // =================== STANDING STONES (the islet) ==========================

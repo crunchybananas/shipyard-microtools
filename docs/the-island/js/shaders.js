@@ -46,6 +46,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uFogDen: { value: 0.003 },
       uNight: { value: 0 },
       uCaustic: { value: getTexture('water_ripple') },   // scrolling dapple for the sunlit shallows
+      uFoam: { value: getTexture('foam') },              // lacy structure for the shoreline foam band
     },
     vertexShader: /* glsl */`
       uniform float uTime;
@@ -94,6 +95,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uniform float uFogDen;
       uniform float uNight;
       uniform sampler2D uCaustic;
+      uniform sampler2D uFoam;
       varying vec3 vLocal;
       varying vec3 vWorld;
       varying vec3 vNorm;
@@ -147,7 +149,11 @@ export function makeWaterMaterial(heightTex, domain) {
         float foamBand = 1.0 - smoothstep(0.0, 0.85, depth + (r1 - 0.5) * 0.4);
         float foamPulse = 0.65 + 0.35 * sin(uTime * 1.3 + vLocal.x * 0.18 + vLocal.z * 0.13);
         float foam = foamBand * foamPulse;
-        col = mix(col, vec3(0.93, 0.96, 0.94), clamp(foam, 0.0, 1.0) * 0.85);
+        // lacy foam structure — a sampled froth breaks the flat white band into strands (smoothed
+        // toward solid white on the 1:240 clone via mini so the tiny model stays clean)
+        float foamTex = texture2D(uFoam, vLocal.xz * 0.25 + vec2(uTime * 0.02, -uTime * 0.015)).r;
+        vec3 foamCol = mix(vec3(0.86, 0.90, 0.88), vec3(0.95, 0.97, 0.95), mix(foamTex, 1.0, mini));
+        col = mix(col, foamCol, clamp(foam, 0.0, 1.0) * 0.85);
 
         // alpha: clear at the very shore, solid over depth
         float alpha = clamp(0.55 + dfac * 0.45 + fresnel * 0.2 + foam * 0.4, 0.0, 0.96);

@@ -82,6 +82,22 @@ export const MANIFEST = {
     prompt: 'seamless tileable dry coastal dune grass and pale scrub over sandy soil, top-down',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
   },
+  // the shoreline FOAM lace — sampled in the water shader's foam band for animated structure
+  // (shaders.js makeWaterMaterial; gated by the clone `mini`).
+  foam: {
+    kind: 'texture', file: 'foam.jpg', bytes: 123027,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable wet sea-foam lace, thin bubbly white froth strands over dark wet sand, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
+  },
+  // wet PEBBLE apron at the south waterline — a thin RingGeometry hugging the shore (props.js),
+  // MeshStandardMaterial + applyRelief (sea-glass pebbles + derived relief).
+  pebble: {
+    kind: 'texture', file: 'pebble.jpg', bytes: 107139,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable wet rounded sea-glass pebbles and shingle, pale grey-green, top-down',
+    wrap: 'repeat', repeat: [3, 3], colorSpace: 'srgb', anisotropy: 4,
+  },
   // the sea's CAUSTICS — a scrolling luminance dapple sampled in the water shader for sunlit
   // shallows (shaders.js makeWaterMaterial; additive, capped under the bloom threshold).
   water_ripple: {
