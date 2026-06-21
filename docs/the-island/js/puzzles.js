@@ -696,9 +696,56 @@ export class Game {
       }
     }
 
+    this._tickWatcher(dt);
+
     // apply to both islands
     this._apply(this.refs, false, elapsed);
     this._apply(this.modelRefs, true, elapsed);
+  }
+
+  // THE WATCHER — grief given form (the owner's "goblins"). Active only deep (W.level>=3) and
+  // once per game (W.flags.watcherSeen). It DRIFTS toward you when you are not looking at it and
+  // FREEZES when you are; resolved by REGARD, not flight or force — hold its gaze and it lifts its
+  // head, lets go, and dissolves into a cold rising light (integration: faced, grief becomes
+  // bearable). Full-scale, real island only. Runs in tick() so it has dt + the player.
+  _tickWatcher(dt) {
+    const w = this.refs.watcher;
+    if (!w) return;
+    const active = W.level >= 3 && !W.flags.watcherSeen;
+    if (!active) {
+      // resolution: once seen, it shrinks and rises out of being, then stays gone
+      if (W.flags.watcherSeen && w.visible) {
+        w.scale.multiplyScalar(Math.max(0, 1 - dt * 1.6));
+        w.position.y += dt * 0.5;
+        if (w.scale.x < 0.05) w.visible = false;
+      } else if (!W.flags.watcherSeen) {
+        w.visible = false;                 // not deep enough yet
+      }
+      return;
+    }
+    w.visible = true;
+    const p = this.player.pos;
+    const dx = w.position.x - p.x, dz = w.position.z - p.z;
+    const dist = Math.hypot(dx, dz) || 1e-3;
+    w.lookAt(p.x, w.position.y, p.z);      // always turns its face (+z) toward you
+    const fx = -Math.sin(this.player.yaw), fz = -Math.cos(this.player.yaw);   // player forward (horizontal)
+    const looked = (fx * dx + fz * dz) / dist > 0.82 && dist < 70;            // watcher within ~35° of, and in front of, your gaze
+    if (looked) {
+      this._watcherRegard = Math.min((this._watcherRegard || 0) + dt, 3);
+      if (this._watcherRegard >= 2.6 && this.flag('watcherSeen')) {
+        UI.whisper('You did not run. You looked, and kept looking, until the shape stopped being a threat and was only what it had always been — something of yours, come back to be carried up.');
+        UI.addJournal('On the deep shore a figure walked — toward me when I looked away, still when I looked at it. I did not run. I held its gaze until it lifted its head, let go, and dissolved into a small cold light that rose. Not everything down here wants to keep you. Some of it only wants to be seen.', '', 'self');
+      }
+    } else {
+      this._watcherRegard = Math.max((this._watcherRegard || 0) - dt * 1.5, 0);
+      if (dist > 2.4) {                    // drift toward you when unwatched, but it waits at arm's length to be seen
+        const step = 1.5 * dt;
+        w.position.x -= (dx / dist) * step;
+        w.position.z -= (dz / dist) * step;
+        const gy = heightAt(w.position.x, w.position.z);
+        if (Number.isFinite(gy)) w.position.y = gy;
+      }
+    }
   }
 
   // the player is poised on the plate, one touch from a committed descent —

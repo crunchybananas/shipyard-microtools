@@ -1360,6 +1360,33 @@ export function buildWorld() {
     core.add(fig);
   }
 
+  // =================== THE WATCHER (grief given form) =======================
+  // The owner's "goblins, and a lot more" — an abstract presence, NOT a monster and
+  // NEVER literal biography. A dark hooded figure that only walks the shore once you
+  // have gone deep (W.level>=3): it DRIFTS toward you when unobserved and FREEZES when
+  // watched, and is resolved NOT by flight or force but by REGARD — look at it steadily
+  // and it lifts its head, lets go, and dissolves into a cold rising light. Integration:
+  // some of what waits in the deep only wants to be seen. Driven in puzzles _tickWatcher;
+  // full-scale, real island only (pruned from the model). Starts hidden + inactive.
+  {
+    const wfig = new THREE.Group();
+    wfig.name = 'watcher';
+    wfig.visible = false;
+    const wmat = new THREE.MeshStandardMaterial({ color: 0x28323a, emissive: 0x13212a, emissiveIntensity: 0.6, flatShading: true, roughness: 1 });
+    const wbody = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.52, 1.5, 7), wmat);
+    wbody.position.y = 0.75; wfig.add(wbody);
+    const whood = new THREE.Mesh(new THREE.SphereGeometry(0.32, 8, 6, 0, Math.PI * 2, 0, Math.PI * 0.62), wmat);
+    whood.position.y = 1.5; whood.scale.set(1, 1.3, 1); wfig.add(whood);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x9fe8e0 });   // two cold pinpoints, barely there
+    for (const ex of [-0.09, 0.09]) {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.026, 5, 4), eyeMat);
+      eye.position.set(ex, 1.46, 0.26); wfig.add(eye);   // local +z = the figure's FRONT (lookAt aims +z at you)
+    }
+    const wx = 24, wz = -88;
+    wfig.position.set(wx, heightAt(wx, wz), wz);
+    core.add(wfig);
+  }
+
   // ---------- merge static bakers ----------
   const stoneMesh = new THREE.Mesh(stone.build(), matStone);
   stoneMesh.castShadow = true;
@@ -1633,7 +1660,7 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -1705,7 +1732,7 @@ const NAMES = [
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
   'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
-  'readGlass', 'lensMarkStudy', 'lensMarkStone',
+  'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
