@@ -116,6 +116,20 @@ export const MANIFEST = {
     prompt: 'seamless tileable natural weathered granite boulder, cracked rough stone, lichen flecks, no block seams, top-down',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
   },
+  // two more boulder stones so the shore rocks aren't all one granite (the rocks split into 3
+  // InstancedMeshes by a positional hash in props.js — granite + basalt + limestone).
+  basalt: {
+    kind: 'texture', file: 'rock_basalt.jpg', bytes: 120063,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable dark basalt boulder, angular fractured volcanic stone, charcoal grey, sparse lichen, no seams, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
+  },
+  limestone: {
+    kind: 'texture', file: 'rock_limestone.jpg', bytes: 124050,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable pale weathered limestone boulder, soft rounded eroded stone, cream-grey, moss patches, no seams, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
+  },
   // the tree-top canopy — a STYLIZED painterly foliage, sampled object-space in the canopy shader
   // (no UVs) as a subtle luminance multiply to break the flat uniform green. Kept low-detail.
   foliage: {

@@ -1677,9 +1677,22 @@ function buildVegetation(core, r) {
 
   // --- shore rocks ---
   const rockGeo = new THREE.IcosahedronGeometry(1, 0);
-  const rockMat = new THREE.MeshStandardMaterial({ color: 0xd6ccb8, flatShading: true, roughness: 0.95 }); // lightened so the rock albedo multiplies to natural stone
-  applyRelief(rockMat, 'rock', { normalScale: 0.6, strength: 2.2 });   // natural cracked-granite texture + derived crack relief on the shore boulders
-  const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 70);
+  // three stone types so the shore isn't 70 copies of one granite — split into 3 InstancedMeshes
+  // (granite / basalt / limestone), each its own albedo + derived relief. The per-instance random
+  // rotation already hides UV-orientation repeat, so distinct albedos read as natural variety (+2 draws).
+  const rockDefs = [
+    { id: 'rock', color: 0xd6ccb8 },       // weathered granite (lightened so the albedo reads as stone)
+    { id: 'basalt', color: 0xb8bcc4 },     // dark volcanic
+    { id: 'limestone', color: 0xe6ddc8 },  // pale eroded
+  ];
+  const rockMeshes = rockDefs.map((d) => {
+    const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: true, roughness: 0.95 });
+    applyRelief(mat, d.id, { normalScale: 0.6, strength: 2.2 });
+    const im = new THREE.InstancedMesh(rockGeo, mat, 70);
+    im.castShadow = true; im.name = 'rocks';
+    return im;
+  });
+  const riCount = [0, 0, 0];
   let ri = 0;
   for (let i = 0; i < 400 && ri < 70; i++) {
     const a = r() * TAU, d = 120 + r() * 90;
@@ -1692,16 +1705,17 @@ function buildVegetation(core, r) {
       new THREE.Vector3(x, h + s * 0.2, z),
       q.setFromEuler(e.set(r() * TAU, r() * TAU, r() * TAU)),
       new THREE.Vector3(s, s * (0.6 + r() * 0.5), s));
-    rocks.setMatrixAt(ri, m4);
+    // route to a stone bucket by a POSITIONAL hash (NOT r() — keeps the scatter RNG draw-order
+    // identical so positions + colliders are byte-unchanged): ~50% granite / 28% basalt / 22% limestone
+    const hv = (Math.abs(Math.sin(x * 12.9898 + z * 78.233)) * 43758.5453) % 1;
+    const bucket = hv < 0.5 ? 0 : hv < 0.78 ? 1 : 2;
+    rockMeshes[bucket].setMatrixAt(riCount[bucket]++, m4);
     // make the substantial boulders SOLID (you walked through them) — register a collider
     // footprint; small pebbles (s<0.9) stay passable so you don't bump invisible nubs
     if (s >= 0.9) addCollider(x, z, s * 0.82);
     ri++;
   }
-  rocks.count = ri;
-  rocks.castShadow = true;
-  rocks.name = 'rocks';
-  core.add(rocks);
+  rockMeshes.forEach((im, b) => { im.count = riCount[b]; core.add(im); });   // trim each to its filled count
 }
 
 // =============================================================================

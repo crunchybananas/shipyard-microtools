@@ -329,7 +329,9 @@ export function buildTerrain() {
       .replace('#include <common>', `#include <common>
         uniform vec3 uHaze; uniform sampler2D uSand; uniform sampler2D uGrass;
         uniform float uTexAmt; uniform float uTexScale;
-        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH;`)
+        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH;
+        float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
+        float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
       .replace('#include <clipping_planes_fragment>',
         `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;\n#include <clipping_planes_fragment>`)
       // ground DETAIL: sand (low/beach) → dune-grass (high), sampled object-space and multiplied as
@@ -345,7 +347,14 @@ export function buildTerrain() {
                         smoothstep(2.2, 3.4, vTerH));
         float detL = dot(detT, vec3(0.299, 0.587, 0.114));
         float land = smoothstep(0.3, 1.1, vTerH);             // off the seabed / waterline
-        diffuseColor.rgb *= mix(1.0, detL * 1.85, uTexAmt * land * (1.0 - mini * 0.85));
+        // DE-GRID: the ~1.2m tile repeat reads as a lattice — break it with a low-frequency fbm
+        // swell (~12m period) + a per-tile value jitter so the grid dissolves into soft large-scale
+        // variation (LUMINANCE only, hue untouched). +0 texture fetches; fades to 1.0 on the clone via mini.
+        float macro = vnoise(vLXZ * uTexScale * 0.1);        // one low-freq octave = the big soft swell (cheap)
+        float cellJ = hash21(floor(vLXZ * uTexScale));
+        float deGrid = (0.84 + 0.32 * macro) * (0.93 + 0.14 * cellJ);
+        float detail = detL * 1.85 * mix(1.0, deGrid, 1.0 - mini);
+        diffuseColor.rgb *= mix(1.0, detail, uTexAmt * land * (1.0 - mini * 0.85));
       `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
       // global fog reaches it — depth + vastness without washing the near/mid ground
