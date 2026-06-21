@@ -955,7 +955,7 @@ player.onFootstep = (kind, pos) => {
 if (DEBUG) {
   gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
   buildDebugPanel();
-  window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE,
+  window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI,
     bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
     gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
@@ -1118,7 +1118,7 @@ renderer.setAnimationLoop((tMs) => {
   if (MODE === 'ascend' && ascent) tickAscent(dt);
   if (MODE === 'finale' && finale) tickFinale(dt);
 
-  player.update(dt);
+  if (!W.reading) player.update(dt);   // a fragment is open: the world holds still while you read
   game.tick(dt, elapsed);
   interact.update();
   applyAtmosphere(elapsed, dt);

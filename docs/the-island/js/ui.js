@@ -2,7 +2,7 @@
 
 import { W } from './world.js';
 import A from './audio.js';
-import { SKETCHES } from './content.js';
+import { SKETCHES, LORE } from './content.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,6 +17,13 @@ export const UI = {
     this.soundTab = $('sound-tab');
     this.motionTab = $('motion-tab');
     this.hint = $('controls-hint');
+    this.readerEl = $('reader');
+    this.readerTitle = $('reader-title');
+    this.readerBody = $('reader-body');
+    this.readerPageno = $('reader-pageno');
+    this.readerPrev = $('reader-prev');
+    this.readerNext = $('reader-next');
+    this._reader = null;
     this._whisperTimer = null;
     this._whisperQueue = [];
 
@@ -26,13 +33,66 @@ export const UI = {
     this.motionTab.addEventListener('click', () => this.toggleMotion());
     this.motionTab.classList.toggle('reduced', W.reduceMotion); // reflect persisted/OS state
     this.motionTab.title = W.reduceMotion ? 'Motion: reduced (C)' : 'Motion: full (C)';
+    this.readerPrev.addEventListener('click', () => this._readerPage(-1));
+    this.readerNext.addEventListener('click', () => this._readerPage(1));
+    this.readerEl.addEventListener('click', (e) => { if (e.target === this.readerEl) this.closeReader(); });
     window.addEventListener('keydown', (e) => {
+      // while a fragment is open the reader owns input — pages, closes, nothing leaks to the world
+      if (W.reading) {
+        if (e.code === 'Escape') this.closeReader();
+        else if (e.code === 'ArrowLeft') this._readerPage(-1);
+        else if (e.code === 'ArrowRight' || e.code === 'Space') this._readerPage(1);
+        e.preventDefault();
+        return;
+      }
       if (e.code === 'KeyJ') this.toggleJournal();
       if (e.code === 'Escape') this.journalEl.classList.add('hidden');
       if (e.code === 'KeyM') this.toggleMute();
       if (e.code === 'KeyC') this.toggleMotion();   // comfort/reduced-motion, key parity with M + J
     });
     this.renderJournal();
+  },
+
+  // ---- the reading surface: open a fragment (book / letter / inscription) and read it ----
+  // pages reveal in fragments; a fragment's `deep` pages only surface once you've dived deep
+  // enough (W.level >= deepFrom) — the same object says more the further down you've gone.
+  openReader(loreId) {
+    const lore = LORE[loreId];
+    if (!lore || W.reading) return;
+    const deepUnlocked = lore.deep && W.level >= (lore.deepFrom ?? 99);
+    const pages = deepUnlocked ? lore.pages.concat(lore.deep) : lore.pages.slice();
+    this._reader = { id: loreId, lore, page: 0, pages, surfaceLen: lore.pages.length };
+    // first time read: remember it (persists) and let the journal note that it was found
+    if (!W.readKeys.includes(loreId)) {
+      W.readKeys.push(loreId);
+      if (lore.journal) this.addJournal(lore.journal, '', 'self');
+    }
+    W.reading = true;
+    this.readerEl.classList.remove('hidden');
+    this._renderReader();
+  },
+  closeReader() {
+    if (!W.reading) return;
+    W.reading = false;
+    this.readerEl.classList.add('hidden');
+    this._reader = null;
+  },
+  _readerPage(delta) {
+    const r = this._reader;
+    if (!r) return;
+    r.page = Math.max(0, Math.min(r.pages.length - 1, r.page + delta));
+    this._renderReader();
+  },
+  _renderReader() {
+    const r = this._reader;
+    if (!r) return;
+    const isDeep = r.page >= r.surfaceLen;  // a colder, later hand for the pages from the deep
+    this.readerTitle.textContent = r.lore.title;
+    this.readerBody.textContent = r.pages[r.page];
+    this.readerBody.classList.toggle('keeper-deep', isDeep);
+    this.readerPageno.textContent = r.pages.length > 1 ? `${r.page + 1} / ${r.pages.length}` : '';
+    this.readerPrev.disabled = r.page === 0;
+    this.readerNext.disabled = r.page >= r.pages.length - 1;
   },
 
   // ---- sound: a visible toggle (and the M key), kept in sync ----

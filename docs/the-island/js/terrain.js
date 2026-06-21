@@ -6,7 +6,7 @@ import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.j
 import { W } from './world.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
-export const SEA_FLOOR = -13;
+const SEA_FLOOR = -13;
 
 // landmarks (north = +z, east = +x)
 export const SPOTS = {
@@ -26,7 +26,7 @@ export const SPOTS = {
 const LIGHTHOUSE_H = 13.5;
 const STONES_H = 8.8;
 const HATCH_H = 23.5;
-export const BRIDGE_DECK = 18.45;
+const BRIDGE_DECK = 18.45;
 const BRIDGE_W = new THREE.Vector2(35, 25);
 const BRIDGE_E = new THREE.Vector2(59, 25);
 

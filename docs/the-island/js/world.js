@@ -67,6 +67,8 @@ export const W = {
   inventory: [],         // 'ruler' | 'lens' | 'plumb'
   journal: [],           // [{text, sketch}]
   onceKeys: [],          // one-time cinematics already played
+  readKeys: [],          // lore fragment ids the player has READ (the unfolding story; saved)
+  reading: false,        // transient: the reading surface is open (input paused while reading)
   dials: [0, 0, 0, 0],   // hatch glyph dials
   playerPos: null,       // saved position
   level: 1,
@@ -223,7 +225,7 @@ export function gradeAt(t) {
 }
 
 // ---------------- water level -------------------------------------------------
-export const TIDE_DROP = 4.2; // metres between high and drained
+const TIDE_DROP = 4.2; // metres between high and drained
 export const waterY = () => -TIDE_DROP * (1 - W.tide);
 
 // the same wave the shader displaces — audio locks onto this
@@ -240,7 +242,7 @@ export function save(playerPos) {
       time: W.time, tide: W.tideTarget, lensPlaced: W.lensPlaced,
       beamAngle: W.beamAngle, flags: W.flags, stems: W.stems,
       inventory: W.inventory, journal: W.journal, level: W.level,
-      onceKeys: W.onceKeys, dials: W.dials,
+      onceKeys: W.onceKeys, readKeys: W.readKeys, dials: W.dials,
       pos: playerPos ? [playerPos.x, playerPos.y, playerPos.z] : null,
     }));
   } catch (_) { /* private mode: the island forgets */ }
@@ -262,6 +264,7 @@ export function load() {
     W.inventory = s.inventory || [];
     W.journal = s.journal || [];
     W.onceKeys = s.onceKeys || [];
+    W.readKeys = s.readKeys || [];
     W.dials = Array.isArray(s.dials) && s.dials.length === 4 ? s.dials : [0, 0, 0, 0];
     W.level = s.level ?? 1;
     // a save written mid-dive has dove=true but level 1 — land the dive

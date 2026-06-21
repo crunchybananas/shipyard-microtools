@@ -329,6 +329,24 @@ export function buildWorld() {
     sheet.name = 'chartSheet';
     core.add(sheet);
   }
+  // the keeper's logbook, left closed on the clear west margin of the chart table — the
+  // first readable fragment (the reading surface). Click it to open and read his account:
+  // the lens-grinding, the rising sea, the model built to hold one whole day back.
+  {
+    const book = new THREE.Group();
+    book.name = 'logbook';
+    const cover = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.072, 0.42), matWood);
+    book.add(cover);
+    const leaves = new THREE.Mesh(
+      new THREE.BoxGeometry(0.272, 0.052, 0.392),
+      new THREE.MeshStandardMaterial({ color: 0xded3ba, roughness: 0.95, flatShading: true }),
+    );
+    leaves.position.y = 0.006;
+    book.add(leaves);
+    book.position.set(LH.x - 1.40, LH.y + 0.99, LH.z + 0.66);
+    book.rotation.y = 0.22;
+    core.add(book);
+  }
   // the model sits here (filled in later with the clone)
   const modelAnchor = new THREE.Group();
   modelAnchor.name = 'modelAnchor';
@@ -785,6 +803,33 @@ export function buildWorld() {
     halo.name = 'jettyHalo';
     jetty.add(halo);
     core.add(jetty);
+
+    // a low standing stone at the foot of the jetty, where a body would wash up — its face
+    // cut with words worn soft by the sea (the stone_inscription fragment). Granite, like the
+    // islet's standing stones; click to read what those who went down left for whoever arrives.
+    {
+      const ix = jx + 2.0, iz = -103.2;
+      const ig = new THREE.BoxGeometry(1.25, 1.7, 0.34);
+      const ipa = ig.attributes.position;
+      for (let v = 0; v < ipa.count; v++) {                 // taper the crown, like the standing stones
+        if (ipa.getY(v) > 0) { ipa.setX(v, ipa.getX(v) * 0.78); ipa.setZ(v, ipa.getZ(v) * 0.8); }
+      }
+      ig.computeVertexNormals();
+      const icols = new Float32Array(ipa.count * 3);
+      const iBase = vary(C.stoneOld, r, 0.02, 0.05, 0.06);
+      for (let v = 0; v < ipa.count; v++) {
+        const t = (ipa.getY(v) / 1.7) + 0.5;
+        const cc = iBase.clone().lerp(C.bone, t * 0.35);
+        icols[v * 3] = cc.r; icols[v * 3 + 1] = cc.g; icols[v * 3 + 2] = cc.b;
+      }
+      ig.setAttribute('color', new THREE.BufferAttribute(icols, 3));
+      const slab = new THREE.Mesh(ig, matStone);
+      slab.name = 'inscribedStone';
+      slab.position.set(ix, heightAt(ix, iz) + 0.62, iz);
+      slab.rotation.y = -0.6;       // face turned toward the jetty / the one arriving
+      slab.castShadow = true;
+      core.add(slab);
+    }
 
     // the dory — beached on the dry sand, bow toward the water, keeled over
     const dory = new THREE.Group(); dory.name = 'dory';
@@ -1580,8 +1625,8 @@ const NAMES = [
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
-  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally',
-  'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull',
+  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
+  'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',

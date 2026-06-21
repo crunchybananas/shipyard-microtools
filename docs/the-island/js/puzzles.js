@@ -387,6 +387,24 @@ export class Game {
         if (this.onLeave) this.onLeave();
       },
     });
+
+    // ---- the reading surface: fragments of the keeper's life, found in any order ----
+    // Books, letters, inscriptions you OPEN and READ; the story assembles non-linearly as you
+    // explore (Meow-Wolf). Each opens UI.openReader(loreId), which marks W.readKeys + drops a
+    // journal line on first read. The logbook says MORE the deeper you've gone (LORE.deepFrom).
+    if (R.logbook) I.add({
+      id: 'logbook', targets: [R.logbook], label: 'the keeper’s logbook', maxDist: 2.8,
+      onClick: () => UI.openReader('keeper_logbook'),
+    });
+    if (R.coat) I.add({
+      id: 'coatLetter', targets: [R.coat], label: 'a letter in the coat', maxDist: 2.8,
+      when: () => W.level >= 2,                 // the folded letter surfaces once you've begun to descend
+      onClick: () => UI.openReader('coat_letter'),
+    });
+    if (R.inscribedStone) I.add({
+      id: 'inscription', targets: [R.inscribedStone], label: 'words cut in the stone', maxDist: 5.5,
+      onClick: () => UI.openReader('stone_inscription'),
+    });
   }
 
   _touchStone(i) {

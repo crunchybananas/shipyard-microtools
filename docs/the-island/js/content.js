@@ -32,6 +32,48 @@ export const KEEPER = {
   farewell: '“…go on up. Don’t leave the light on for me. I never could.”',
 };
 
+// ---- THE LORE CORPUS (the reading surface / Meow-Wolf unfolding) -------------
+// Books, letters, charts, inscriptions the player OPENS and READS — the keeper's life
+// assembled in fragments, found in any order across the world. Each fragment: { kind, hand,
+// title, pages[], deepFrom?+deep[] (extra pages legible only at W.level>=deepFrom — the surface
+// read vs the deep read), journal? (a story-bearing line added to the journal on first read) }.
+// All metaphor: the lensmaker who keeps a light for someone out on the water, the rising sea,
+// the model built to hold one day back. Reading marks W.readKeys (the Codex + the endgame book).
+export const LORE = {
+  keeper_logbook: {
+    kind: 'book', hand: 'keeper', title: 'The Keeper’s Logbook',
+    pages: [
+      'I keep the light. That is the whole of it, set down plainly, the way you are taught to set it down. Wind from the south-west. The lamp trimmed. The glass clear. A keeper’s hand should be dull on the page. Mine wants to say more, and must not.',
+      'Ground a new lens today — the fourth this season. The last one fogged where I breathed on it too long. A lens is only patience made solid: you take a flaw, and you turn it, and turn it against the stone, until the flaw becomes a way of seeing. I keep the light so that someone out on the water can find the way back to the shore. That is the use of patience. That is the use of me.',
+      'The sea stands higher this month than last, and last than the month before. I marked the old line on the third step, and the new one has gone over it. No one else has marked it. I do not say it aloud. To say a thing is to let it be true.',
+      'I have begun to build the island again, small, upon the chart table. A foolishness. But if I can hold the whole of it in my two hands — the shore, the stones, this room with its very small lamp — then perhaps I am holding the day it was still whole. The model does not lie. It only hopes.',
+      'Smaller. The model needs a model, for the model has a sea too, and that sea is rising in it. So I built one smaller still inside it, and the smallest holds a lamp the size of a grain of light. I cannot stop. Each one is the day held a little tighter. Each one drowns a little slower.',
+      'If you are reading this, you have come a long way down to find it. Do not be proud of how fast you came; I was slow, and the slowness was the only mercy I had. Keep the light, or do not. But do not leave it burning for no one — that is the cruelty I taught myself, and I would not teach it to you.',
+    ],
+    deepFrom: 3,
+    deep: [
+      '(The hand here is not steady. It may be mine. It may be yours.) There is no bottom — I have looked. Each room I make to be safe becomes the next room I am afraid in. The trick the sea teaches: you do not drown all at once. You drown a little, and call it keeping busy.',
+    ],
+    journal: 'Found the keeper’s logbook on the chart table. He ground lenses to keep a light for someone out on the water — and when the sea began to rise, he started building the island again, small, to hold one whole day back.',
+  },
+  coat_letter: {
+    kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
+    pages: [
+      'I write this and I will not send it, because to send it is to admit you are far enough away to need a letter.',
+      'The light still turns. I want you to know that. Whatever you saw from the water — whatever it looked like, out there — the light still turns, and I am the one turning it, and I have not stopped, and I will not.',
+      'Come up the stairs. The kettle is on. It has been on a long time.\n\n— the one who keeps it',
+    ],
+    journal: 'A letter in the coat pocket, never sent. The kettle has been on a long time.',
+  },
+  stone_inscription: {
+    kind: 'inscription', hand: 'keeper', title: 'Cut into the standing stone',
+    pages: [
+      'WE WHO WENT DOWN\nLEFT THE LIGHT FOR\nWHOEVER WASHES UP\n\n— turn it, and turn it',
+    ],
+    journal: 'Words cut into a standing stone, worn soft by the sea: “We who went down left the light for whoever washes up.”',
+  },
+};
+
 // ---- journal marginalia (SKETCHES) -----------------------------------------
 // A small ink sketch for each journal entry, matched by words the entry contains — so
 // every save, old or new, gets its pictures (loop #72). renderJournal() in ui.js looks
