@@ -43,6 +43,22 @@ export const MANIFEST = {
     prompt: 'seamless tileable coarse weathered burlap weave, oatmeal, soft daylight, top-down',
     wrap: 'repeat', repeat: [2, 2], colorSpace: 'srgb', anisotropy: 4,
   },
+  // the island's STONE — lighthouse, study walls, floor, the standing stones (the shared matStone
+  // Baker, vertexColors:true, so the granite MULTIPLIES the existing bone/grey vertex colors and the
+  // copper band stays coppery — no de-merge needed). Achromatic granite; the grades still color it.
+  stone: {
+    kind: 'texture', file: 'study_stone.jpg', bytes: 135333,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable weathered grey granite blocks, lichen-flecked, soft daylight, top-down',
+    wrap: 'repeat', repeat: [3, 3], colorSpace: 'srgb', anisotropy: 4,
+  },
+  // the chart-table surface — a sheet of aged vellum the model sits on (a thin plane in props.js).
+  chart_vellum: {
+    kind: 'texture', file: 'chart_vellum.jpg', bytes: 21786,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable aged blank vellum chart paper, faint creases, soft daylight, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
+  },
 
   // the keeper's voice — bm_george (Kokoro-82M), generated on Bender, transcoded to
   // mono 24 kHz mp3, played through the drowned bus (audio.js say()). `prompt` is the
@@ -125,11 +141,4 @@ export function evictAudio(id) { _bufCache.delete(id); }
 export function keepOnlyAudio(ids) {
   const keep = ids instanceof Set ? ids : new Set(ids);
   for (const id of _bufCache.keys()) if (!keep.has(id)) _bufCache.delete(id);
-}
-
-// The provenance ledger — every asset's license + source, for the honesty line and
-// any credits roll. Pure data; loads nothing.
-export function ledger() {
-  return Object.entries(MANIFEST).map(([id, a]) =>
-    ({ id, kind: a.kind, file: a.file, bytes: a.bytes, license: a.license, source: a.source }));
 }

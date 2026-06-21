@@ -12,6 +12,31 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 90 — 2026-06-20 — FULLY TEXTURED: granite on the stone + vellum on the chart table
+
+**Shipped (local):** the owner granted full creative autonomy on music/voice/textures ("I'd like to
+wake up to a fully textured game with music and voice"), so the last two textures land — completing
+the hero surfaces. [[feedback-abyme-overnight-autonomy]]
+- **STONE** (`study_stone.jpg` granite) on the shared `matStone` — the lighthouse, study walls, floor,
+  and the standing stones. Applied to the vertex-colored `matStone` so the granite MULTIPLIES the
+  bone/grey (a subtle textured stone, not flat cream) and the painted copper band stays coppery — NO
+  de-merge needed. Achromatic, so the grades still color it.
+- **VELLUM** (`chart_vellum.jpg`) — a thin sheet on the chart table, framing the 1:240 model: the
+  island's own model standing on a cartographer's chart of itself. Sits below the model's sea, so it
+  shows as the cream border around it (verified top-down — a fold crease reads).
+- The texture family is COMPLETE: driftwood (jetty/dory), wood (interior props), cloth (coat), stone
+  (lighthouse/study/stones), vellum (chart table). The terrain + water stay procedural shaders.
+
+**Evidence (`?debug`):** boots clean, no console errors; both maps confirmed; renders correctly (the
+granite reads on the tower close-up; the vellum frames the model from above). Power held: bench 222
+draws / 521k tris / 6.1 ms. The granite is deliberately SUBTLE (clean-but-textured) — owner can ask
+for stronger blocks (bump the `stone` repeat).
+
+**Next:** the 5 era music stems are generating on Bender — wire them (crossfade by W.level), then
+round out the voice.
+
+---
+
 ## 89 — 2026-06-20 — texture pass: interior wood + the keeper's coat (+ driftwood slimmed)
 
 **Shipped (local):** the owner liked the driftwood, so the hero-surface family expands — two clean

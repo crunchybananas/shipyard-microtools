@@ -20,6 +20,8 @@ export const BIRD_MELODY = [2, 3, 4, 3, 0];  // E G A G C — the bird corrects 
 export const matStone = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: true, roughness: 0.92, metalness: 0.0, side: THREE.DoubleSide,
 });
+applyTexture(matStone, 'stone');   // granite over the lighthouse/study/stones — multiplies the
+                                    // vertex colours (bone walls → granite, the copper band stays coppery)
 export const matBrass = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: true, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
 });
@@ -314,6 +316,18 @@ export function buildWorld() {
       brass.add(rim, place(LH.x + dx, LH.y + 0.97, LH.z + dz, ry), grad(C.brassDark, C.brass));
     }
     rim.dispose();
+  }
+  // the chart-table surface is a sheet of aged vellum — the cartographer's chart, with the
+  // island's own 1:240 model standing on it. A thin plane just above the table top, inside the
+  // brass rim and below the model, so the chart paper shows in the border around the model.
+  {
+    const sheetMat = new THREE.MeshStandardMaterial({ color: 0xd2ccbe, roughness: 0.96, flatShading: true });
+    applyTexture(sheetMat, 'chart_vellum');
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 2.95), sheetMat);
+    sheet.rotation.x = -Math.PI / 2;
+    sheet.position.set(LH.x, LH.y + 0.953, LH.z);
+    sheet.name = 'chartSheet';
+    core.add(sheet);
   }
   // the model sits here (filled in later with the clone)
   const modelAnchor = new THREE.Group();
@@ -1262,7 +1276,7 @@ export function buildWorld() {
   fireflies.material.uniforms.uDrift.value = 1;
   fireflies.name = 'fireflies';
 
-  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, vaultDrips, atlas };
+  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, vaultDrips };
 }
 
 // ---------------------------------------------------------------------------
