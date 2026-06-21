@@ -67,6 +67,21 @@ export const MANIFEST = {
     prompt: 'seamless tileable aged conifer bark, deep vertical grooves, weathered grey-brown, top-down',
     wrap: 'repeat', repeat: [1, 3], colorSpace: 'srgb', anisotropy: 4,
   },
+  // the beach SAND + dune GRASS — sampled object-space INSIDE the terrain shader (terrain.js
+  // onBeforeCompile) as a luminance multiply; the vertex-colour bands keep the hue. wrap so the
+  // in-shader tiling repeats. (No material.map — terrain has vertex colours, not vUv.)
+  sand: {
+    kind: 'texture', file: 'sand.jpg', bytes: 58051,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable fine beach sand, gentle wind ripples, pale warm grains, tiny shell flecks, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
+  },
+  dunegrass: {
+    kind: 'texture', file: 'dunegrass.jpg', bytes: 103707,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable dry coastal dune grass and pale scrub over sandy soil, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
+  },
   // the shore boulders — NATURAL cracked granite (no masonry seams, unlike the lighthouse 'stone'),
   // on the rocks InstancedMesh via applyRelief (albedo + derived normal so the cracks catch light).
   rock: {

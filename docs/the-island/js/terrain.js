@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
 import { W } from './world.js';
+import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
 const SEA_FLOOR = -13;
@@ -313,14 +314,39 @@ export function buildTerrain() {
   // island inherits the same hole — recursion demands it)
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
+    sh.uniforms.uSand = { value: getTexture('sand') };        // beach grain (low band)
+    sh.uniforms.uGrass = { value: getTexture('dunegrass') };  // dune scrub (high band)
+    sh.uniforms.uTexAmt = { value: 0.7 };
+    sh.uniforms.uTexScale = { value: 0.85 };                  // fine tiling so the sand grain/ripples read underfoot
     mat.userData.shader = sh; // so main.js can track uHaze to the active grade's fog
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vLXZ;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLXZ = position.xz;');
+      .replace('#include <common>', '#include <common>\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vLXZ = position.xz;
+        vTerH = position.y;                                   // baked height (the band key)
+        vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uHaze;\nvarying vec2 vLXZ;')
+      .replace('#include <common>', `#include <common>
+        uniform vec3 uHaze; uniform sampler2D uSand; uniform sampler2D uGrass;
+        uniform float uTexAmt; uniform float uTexScale;
+        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH;`)
       .replace('#include <clipping_planes_fragment>',
         `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;\n#include <clipping_planes_fragment>`)
+      // ground DETAIL: sand (low/beach) → dune-grass (high), sampled object-space and multiplied as
+      // LUMINANCE so the vertex-coloured bands keep their hue but gain grain/tufts. Land-masked above
+      // the waterline; FADED on the 1:240 clone via the water shader's fwidth `mini` trick so the
+      // dense-tiled model never moirés. Appended after color_fragment; +0 draws.
+      .replace('#include <color_fragment>', `
+        #include <color_fragment>
+        float gScl = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
+        float mini = 1.0 - smoothstep(0.05, 0.5, gScl);
+        vec3 detT = mix(texture2D(uSand, vLXZ * uTexScale).rgb,
+                        texture2D(uGrass, vLXZ * uTexScale * 0.8).rgb,
+                        smoothstep(2.2, 3.4, vTerH));
+        float detL = dot(detT, vec3(0.299, 0.587, 0.114));
+        float land = smoothstep(0.3, 1.1, vTerH);             // off the seabed / waterline
+        diffuseColor.rgb *= mix(1.0, detL * 1.85, uTexAmt * land * (1.0 - mini * 0.85));
+      `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
       // global fog reaches it — depth + vastness without washing the near/mid ground
       // (gentle, begins at 170 m); fragment-only, +0 draws. Matches the canopy haze.
