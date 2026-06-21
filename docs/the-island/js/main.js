@@ -1,6 +1,10 @@
 // main.js — boot, light, loop. ABYME: an island within an island.
 
 import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
@@ -69,10 +73,32 @@ scene.fog = new THREE.FogExp2(0xcfe3e8, 0.003);
 
 const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.08, 12000);
 
+// ---- post: a gentle bloom so the lit things actually GLOW ----
+// EffectComposer is a BUILT-IN three addon (examples/jsm — same three@0.180.0 package,
+// no new dependency). RenderPass → UnrealBloomPass → OutputPass; OutputPass applies the
+// renderer's tone mapping + sRGB at the end of the chain (correct order for post). The
+// bloom THRESHOLD is high so only the truly bright things bleed — the lamp, the beam, the
+// bioluminescence, the jetty beacon, emissive glints — never the broad daylight beach.
+// The blur runs at HALF resolution — bloom is soft by nature, so half-res looks identical
+// and costs ~a quarter of the fill rate (full-res measured +4.1ms; half-res ~+1ms — the
+// power policy: a graphics win must HOLD or cut load). setPixelRatio + setSize are called
+// BEFORE the passes are added, so the bloom keeps its half-res; resize re-asserts it.
+const BLOOM_RES = () => new THREE.Vector2(Math.max(1, innerWidth >> 1), Math.max(1, innerHeight >> 1));
+const composer = new EffectComposer(renderer);
+composer.setPixelRatio(BASE_DPR);
+composer.setSize(innerWidth, innerHeight);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.5, 0.6, 0.85); // strength, radius, threshold (only bright things bloom)
+composer.addPass(bloomPass);
+composer.addPass(new OutputPass());
+
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);   // re-sizes RenderPass + OutputPass (full res)...
+  const r = BLOOM_RES();
+  bloomPass.setSize(r.x, r.y);                  // ...then re-assert the bloom's half-res
 });
 
 // ---------------- world ----------------
@@ -955,7 +981,7 @@ player.onFootstep = (kind, pos) => {
 if (DEBUG) {
   gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
   buildDebugPanel();
-  window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI,
+  window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI, composer, bloomPass,
     bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
     gpuMode: () => (gpuTimer ? gpuTimer.mode : null),
@@ -1142,6 +1168,7 @@ renderer.setAnimationLoop((tMs) => {
   }
 
   if (gpuTimer) gpuTimer.beginFrame();
-  renderer.render(scene, camera);
+  if (bloomPass.enabled) composer.render();   // bloomPass.enabled is the on/off lever (debug + perf fallback)
+  else renderer.render(scene, camera);
   if (gpuTimer) gpuTimer.endFrame();
 });
