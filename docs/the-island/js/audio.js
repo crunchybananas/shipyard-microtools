@@ -6,7 +6,7 @@
 
 import { STONE_NOTES } from './props.js';
 import { clamp, lerp } from './util.js';
-import { loadAudioBuffer } from './assets.js';
+import { loadAudioBuffer, evictAudio } from './assets.js';
 
 let ctx = null;
 
@@ -403,6 +403,7 @@ const A = {
       src.start();
       src.onended = () => setTimeout(() => {
         try { fb.gain.value = 0; src.disconnect(); del.disconnect(); fb.disconnect(); drown.disconnect(); vg.disconnect(); } catch (_) {}
+        evictAudio(id);   // free the decoded PCM — voice is one-shot; re-decode on the rare replay
       }, 1200);   // let the one-floor-down echo ring out before tearing the bus down
     }).catch(() => this.keeperVoice(register));   // offline / missing asset → the synth murmur, as before
   },

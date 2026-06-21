@@ -6,6 +6,8 @@ import { clamp, lerp, TAU } from './util.js';
 import { walkableY, wallBlocked, heightAt } from './terrain.js';
 import { W, waterY } from './world.js';
 
+const _wish = new THREE.Vector2();   // scratch: the per-frame movement wish (no alloc in update())
+
 export class Player {
   constructor(camera, dom) {
     this.camera = camera;
@@ -82,65 +84,25 @@ export class Player {
     const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
     const wishX = (-sin * fwd + cos * strafe);
     const wishZ = (-cos * fwd - sin * strafe);
-    const wish = new THREE.Vector2(wishX, wishZ);
+    const wish = _wish.set(wishX, wishZ);
     if (wish.lengthSq() > 1) wish.normalize();
 
     this.vel.x = lerp(this.vel.x, wish.x * speed, 1 - Math.exp(-10 * dt));
     this.vel.z = lerp(this.vel.z, wish.y * speed, 1 - Math.exp(-10 * dt));
 
-    const step = (nx, nz) => {
-      const hereY = walkableY(this.pos.x, this.pos.z);
-      const thereY = walkableY(nx, nz);
-      if (thereY - hereY > 1.05) return false;          // too steep a step up
-      if (hereY - thereY > 2.2) return false;           // no leaping off cliffs
-      // natural slopes steeper than ~53° are unclimbable (cliffs, the bluff,
-      // chasm walls) — structures (bridge, stairs, pads) are exempt because
-      // their walkable height diverges from the raw terrain
-      const tHere = heightAt(this.pos.x, this.pos.z), tThere = heightAt(nx, nz);
-      const structural = Math.abs(hereY - tHere) > 0.4 || Math.abs(thereY - tThere) > 0.4;
-      if (!structural) {
-        // measure the terrain gradient over a FIXED look-ahead, not the per-frame step.
-        // dividing the rise by the tiny per-frame stride turned any local hummock into a
-        // phantom cliff — a 0.6 m bump crossed in a 0.06 m step read as slope ~10 and walled
-        // the player anywhere on noisy ground (this stranded the causeway crossing). A fixed
-        // reference reads the real slope and ignores sub-step noise; the absolute per-step
-        // rise is still capped by the `thereY - hereY > 1.05` gate above.
-        const stride = Math.max(Math.hypot(nx - this.pos.x, nz - this.pos.z), 1e-4);
-        const LOOK = 0.7;   // longer than a noise hummock, shorter than a real wall:
-        const tAhead = heightAt(  // ignores sub-step pits, still catches sustained cliffs
-          this.pos.x + (nx - this.pos.x) / stride * LOOK,
-          this.pos.z + (nz - this.pos.z) / stride * LOOK);
-        if ((tAhead - tHere) / LOOK > 1.35) return false;
-        // the drained bay still refuses you: below-tide basins (the chasm's drowned ends,
-        // bay-floor bowls) walk in but never out. Block the descent at the rim; upslope
-        // stays open so the causeway crest and a stale save below the line still pass.
-        if (tThere < -2.2 && tThere <= tHere + 0.02) return false;
-      }
-      // the sea refuses you — but if the tide caught you, wade out
-      if (thereY < waterY() - 0.5) {
-        if (hereY >= waterY() - 0.45) return false;        // no walking in
-        if (thereY < hereY - 0.05) return false;           // submerged: only upslope
-      }
-      if (wallBlocked(this.pos.x, this.pos.z, nx, nz)) return false;
-      return true;
-    };
-
     const px0 = this.pos.x, pz0 = this.pos.z;
     const pushing = wish.lengthSq() > 1e-3;
     const nx = this.pos.x + this.vel.x * dt;
     const nz = this.pos.z + this.vel.z * dt;
-    let blocked = false;
-    if (step(nx, nz)) {
+    if (this._step(nx, nz)) {
       this.pos.x = nx; this.pos.z = nz;
-    } else if (step(nx, this.pos.z)) {
-      this.pos.x = nx; blocked = true;
-    } else if (step(this.pos.x, nz)) {
-      this.pos.z = nz; blocked = true;
+    } else if (this._step(nx, this.pos.z)) {
+      this.pos.x = nx;
+    } else if (this._step(this.pos.x, nz)) {
+      this.pos.z = nz;
     } else {
       this.vel.set(0, 0, 0);
-      blocked = true;
     }
-    this.blockedByWater = blocked && walkableY(nx, nz) < waterY() - 0.5;
 
     // wedge safety net: if the player is pushing but fully pinned for >0.6s
     // AND no heading out is walkable (steep walls up, water/clamp down), they
@@ -153,7 +115,7 @@ export class Player {
       let anyOut = false;
       for (let i = 0; i < 16; i++) {
         const a = (i / 16) * TAU;
-        if (step(px0 + Math.cos(a) * 0.5, pz0 + Math.sin(a) * 0.5)) { anyOut = true; break; }
+        if (this._step(px0 + Math.cos(a) * 0.5, pz0 + Math.sin(a) * 0.5)) { anyOut = true; break; }
       }
       if (!anyOut) { this._escapeWedge(); this._stuckT = 0; }
     }
@@ -170,6 +132,45 @@ export class Player {
     }
 
     this.syncCamera();
+  }
+
+  // one walk-collision probe from the current position toward (nx,nz) — moved out of update()
+  // so the closure is not rebuilt every frame (GC). Body is the former step() closure, verbatim.
+  _step(nx, nz) {
+    const hereY = walkableY(this.pos.x, this.pos.z);
+    const thereY = walkableY(nx, nz);
+    if (thereY - hereY > 1.05) return false;          // too steep a step up
+    if (hereY - thereY > 2.2) return false;           // no leaping off cliffs
+    // natural slopes steeper than ~53° are unclimbable (cliffs, the bluff,
+    // chasm walls) — structures (bridge, stairs, pads) are exempt because
+    // their walkable height diverges from the raw terrain
+    const tHere = heightAt(this.pos.x, this.pos.z), tThere = heightAt(nx, nz);
+    const structural = Math.abs(hereY - tHere) > 0.4 || Math.abs(thereY - tThere) > 0.4;
+    if (!structural) {
+      // measure the terrain gradient over a FIXED look-ahead, not the per-frame step.
+      // dividing the rise by the tiny per-frame stride turned any local hummock into a
+      // phantom cliff — a 0.6 m bump crossed in a 0.06 m step read as slope ~10 and walled
+      // the player anywhere on noisy ground (this stranded the causeway crossing). A fixed
+      // reference reads the real slope and ignores sub-step noise; the absolute per-step
+      // rise is still capped by the `thereY - hereY > 1.05` gate above.
+      const stride = Math.max(Math.hypot(nx - this.pos.x, nz - this.pos.z), 1e-4);
+      const LOOK = 0.7;   // longer than a noise hummock, shorter than a real wall:
+      const tAhead = heightAt(  // ignores sub-step pits, still catches sustained cliffs
+        this.pos.x + (nx - this.pos.x) / stride * LOOK,
+        this.pos.z + (nz - this.pos.z) / stride * LOOK);
+      if ((tAhead - tHere) / LOOK > 1.35) return false;
+      // the drained bay still refuses you: below-tide basins (the chasm's drowned ends,
+      // bay-floor bowls) walk in but never out. Block the descent at the rim; upslope
+      // stays open so the causeway crest and a stale save below the line still pass.
+      if (tThere < -2.2 && tThere <= tHere + 0.02) return false;
+    }
+    // the sea refuses you — but if the tide caught you, wade out
+    if (thereY < waterY() - 0.5) {
+      if (hereY >= waterY() - 0.45) return false;        // no walking in
+      if (thereY < hereY - 0.05) return false;           // submerged: only upslope
+    }
+    if (wallBlocked(this.pos.x, this.pos.z, nx, nz)) return false;
+    return true;
   }
 
   // spiral outward for the nearest dry, gently-sloped ground and set the
@@ -207,6 +208,4 @@ export class Player {
     }
     return false;
   }
-
-  altitude() { return this.pos.y; }
 }

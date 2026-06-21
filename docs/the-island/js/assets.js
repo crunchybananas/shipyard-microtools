@@ -97,6 +97,20 @@ export function loadAudioBuffer(id, ctx) {
   return p;
 }
 
+// Evict a decoded audio buffer from the cache so its PCM can be GC'd once no BufferSource
+// references it. Voice is one-shot + depth-gated, so audio.js drops each clip when it finishes
+// playing (a rare replay just re-fetches + re-decodes — cheap). The Promise-dedupe cache itself
+// stays — it is the iter-82 race fix; we only make entries evictable, never remove the cache.
+export function evictAudio(id) { _bufCache.delete(id); }
+
+// Keep ONLY the given audio ids cached, evicting the rest — for the era music stems' bounded
+// working set (current level + adjacent), called at the W.level transitions. Born bounded so the
+// 5 long music loops never all sit decoded at once.
+export function keepOnlyAudio(ids) {
+  const keep = ids instanceof Set ? ids : new Set(ids);
+  for (const id of _bufCache.keys()) if (!keep.has(id)) _bufCache.delete(id);
+}
+
 // The provenance ledger — every asset's license + source, for the honesty line and
 // any credits roll. Pure data; loads nothing.
 export function ledger() {

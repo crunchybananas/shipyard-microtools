@@ -2,7 +2,7 @@
 // Geometry, player collision, water depth and foam all read the same math.
 
 import * as THREE from 'three';
-import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED, vary } from './util.js';
+import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
 import { W } from './world.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
@@ -141,9 +141,6 @@ function padFlatten(h, x, z, spot, r, target) {
 
 // ----------------------------------------------------------------------------
 // Walkable height: terrain + structures the player can stand on.
-// refs is filled in by props.js (bridge deck, interior floors, vault).
-export const walkable = { bridge: null, vault: null };
-
 export function walkableY(x, z) {
   // lighthouse interior: flat disc
   const dl = Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y);

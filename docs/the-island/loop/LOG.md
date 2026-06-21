@@ -12,6 +12,40 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 88 — 2026-06-20 — optimization pass: memory + GC + dead code (from the audit)
+
+**Shipped (local):** the safe, high-value wins from the 4-lens memory/code audit. (The owner asked
+for a memory + code optimization pass; analytics via `performance.memory` + `renderer.info` confirmed
+the targets.)
+- **Voice cache eviction (rank 1, the headline memory win):** `assets.js` `_bufCache` pinned ~3 MB of
+  decoded voice PCM forever (heap 28.5 → 38.9 MB once the 6 clips load). Added `evictAudio(id)` +
+  `keepOnlyAudio(ids)`; `audio.js` `say()` now drops each clip on `src.onended` (voice is one-shot +
+  depth-gated; a rare replay just re-decodes). The Promise-dedupe structure stays (the iter-82 race
+  fix). `keepOnlyAudio` is ready so the 5 era music stems are born bounded (current + adjacent level).
+- **player.update GC (rank 5, the per-frame hot path):** the `new THREE.Vector2()` every frame → a
+  module `_wish` scratch; the `step` closure (rebuilt every frame) → a `_step()` method (verbatim
+  body). Eliminates the only steady-play heap churn. Behavior-IDENTICAL.
+- **Dead code (rank 2):** removed `terrain.walkable` (+ unused `vary` import), `Player.altitude()`
+  (main.js uses `player.pos.y` directly) and the never-read `blockedByWater` per-frame write,
+  `util.easeOut`. Kept `assets.ledger()` (intentional provenance API).
+
+**Evidence (`?debug`):** boots clean, zero console errors. Movement behavior-identical — walked 2.9 m
+NW through the full `update()` path, `_step` blocks the open sea + passes a tiny on-land step. Audio
+cache verified: cache hit → same Promise; post-`evictAudio` → new Promise; `keepOnlyAudio` evicts the
+non-kept clip. No geometry touched, so power is unchanged.
+
+**Deferred (consciously):** rank 3/4 (model-clone prune / distance-LOD, −121k…−260k tris) — the model
+water is load-bearing (shows the tide when you lean over) and `youMarker`/`nestedGlint` are model-side,
+so the LOD needs `youMarker` re-parenting + careful testing; draws/tris have headroom (251/360,
+521k/800k) so it's not urgent. Rank 5's heightAt-memoization (CPU, ~half the heaviest per-frame call)
+and rank 6 (cinematic alloc scratch) — next, with movement re-verified. (Audit watch-outs noted: the
+clone SHARES geometry/materials, the 31 programs are genuine — do NOT "dedupe" them.)
+
+**Next tick (89):** apply the 4 hero textures (process to compressed JPG + wire to the study floor /
+chart sheet / coat / stone) + the cloth regen.
+
+---
+
 ## 87 — 2026-06-20 — the twist HOLDS: 4 adversarial-review must-fixes (the integration lock + canon)
 
 **Shipped (local):** the adversarial review of #86 (4 lenses) found the twist's integration lock and
