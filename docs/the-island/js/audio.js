@@ -48,6 +48,8 @@ const A = {
 
     this.amb = ctx.createGain(); this.amb.connect(this.master);
     this.music = ctx.createGain(); this.music.gain.value = 0.5; this.music.connect(this.master);
+    this.musicBed = ctx.createGain(); this.musicBed.gain.value = 0.55; this.musicBed.connect(this.master); // the era music stems
+    this._music = null; this._musicLevel = 0;
     this.fx = ctx.createGain(); this.fx.connect(this.master);
 
     // ---- surf: two filtered noise layers ----
@@ -425,6 +427,40 @@ const A = {
     g.gain.linearRampToValueAtTime(0, t0 + 2.8);
     o.connect(g); ov.connect(g); g.connect(this.music);
     o.start(t0); o.stop(t0 + 2.9); ov.start(t0); ov.stop(t0 + 2.9);
+  },
+
+  // the era MUSIC bed: a looping ambient stem per descent level (the color-psychology arc made
+  // HEARD), crossfaded as W.level changes. Lazy-decoded current + adjacent; offline → silent (the
+  // procedural score carries it). Called every frame in play — early-returns unless the level moved.
+  musicTo(level) {
+    if (!this.ready) return;
+    const lv = Math.max(1, Math.min(5, level | 0));
+    if (this._musicLevel === lv && this._music) return;
+    this._musicLevel = lv;
+    const id = `music_l${lv}`;
+    loadAudioBuffer(id, ctx).then((buf) => {
+      if (this._musicLevel !== lv) return;             // level moved on while decoding
+      const old = this._music;
+      const g = ctx.createGain(); g.gain.value = 0;
+      const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      src.connect(g).connect(this.musicBed);
+      src.start();
+      g.gain.setTargetAtTime(1, ctx.currentTime, 3.5);  // ease the new stem in
+      this._music = { src, g };
+      if (old) {
+        old.g.gain.setTargetAtTime(0, ctx.currentTime, 3.5);
+        setTimeout(() => { try { old.src.stop(); old.src.disconnect(); old.g.disconnect(); } catch (_) {} }, 9000);
+      }
+      for (let n = 1; n <= 5; n++) if (Math.abs(n - lv) > 1) evictAudio(`music_l${n}`); // keep current + adjacent
+    }).catch(() => {});
+  },
+
+  // stop the era bed (the finale / leaving owns the soundscape from here)
+  musicStop() {
+    const old = this._music; this._music = null; this._musicLevel = 0;
+    if (!old) return;
+    try { old.g.gain.setTargetAtTime(0, ctx.currentTime, 2); } catch (_) {}
+    setTimeout(() => { try { old.src.stop(); old.src.disconnect(); old.g.disconnect(); } catch (_) {} }, 5000);
   },
 
   // the dive: the whole island drops an octave and comes back

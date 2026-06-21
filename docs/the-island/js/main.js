@@ -523,6 +523,7 @@ function startFinale() {
   MODE = 'finale';
   player.locked = true;
   interact.enabled = false;
+  A.musicStop();   // the bell finale owns the soundscape (the era bed fades out)
   UI.cinematic(true);
   // the resolution must land warm, never inheriting the descent's curdle (#22)
   W._finaleWarm = true;
@@ -551,6 +552,7 @@ function startOarFinale() {
   MODE = 'finale';
   player.locked = true;
   interact.enabled = false;
+  A.musicStop();   // leaving owns the soundscape from here
   UI.cinematic(true);
   W._finaleWarm = true;            // the clean warm grade, exempt from the descent curdle (#22)
   A.duckAmbient(true);             // the shore draws quiet as you push off
@@ -1083,6 +1085,7 @@ renderer.setAnimationLoop((tMs) => {
 
   // idle drift of the sun — barely perceptible, but the island lives
   if (MODE === 'play') W.time = (W.time + W.timeDrift * dt) % 24;
+  if (MODE === 'play') A.musicTo(W.level);   // the era music bed follows the descent (crossfades by level)
 
   if (MODE === 'intro' && intro) {
     intro.t += dt;

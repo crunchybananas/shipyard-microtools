@@ -69,6 +69,15 @@ export const MANIFEST = {
   keeper_look_4:         { kind: 'voice', file: 'voice/keeper_look_4.mp3',         bytes: 28269, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "You're faster than I was. Don't be proud of it." },
   keeper_farewell:       { kind: 'voice', file: 'voice/keeper_farewell.mp3',       bytes: 32685, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "Go on up. Don't leave the light on for me. I never could." },
   keeper_there_you_are:  { kind: 'voice', file: 'voice/keeper_there_you_are.mp3',  bytes: 26733, license: 'Apache-2.0', source: 'Bender · Kokoro-82M · bm_george', prompt: "There you are. I've been coming down for you." },
+
+  // the era music — five looping ambient stems, one per descent level (the color-psychology arc
+  // made HEARD). ACE-Step, all from the E-G-A-D-C pentatonic family; crossfaded by W.level in
+  // audio.js, decoded lazily (current + adjacent) via keepOnlyAudio. mono mp3.
+  music_l1: { kind: 'music', file: 'music/music_l1.mp3', bytes: 144765, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'warm ambient, lighthouse at golden hour — the surface (L1)' },
+  music_l2: { kind: 'music', file: 'music/music_l2.mp3', bytes: 144765, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'uneasy detuned ambient, sodium-lamp false comfort (L2)' },
+  music_l3: { kind: 'music', file: 'music/music_l3.mp3', bytes: 144765, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'queasy jaundiced ambient, fluorescent shimmer (L3)' },
+  music_l4: { kind: 'music', file: 'music/music_l4.mp3', bytes: 144765, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'cold lonely submerged ambient (L4)' },
+  music_l5: { kind: 'music', file: 'music/music_l5.mp3', bytes: 144765, license: 'Apache-2.0', source: 'Bender · ACE-Step-v1-3.5B', prompt: 'desolate near-silent ambient, the bottom of grief (L5)' },
 };
 
 const _texCache = new Map();   // id -> THREE.Texture (shared)

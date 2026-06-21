@@ -12,6 +12,27 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 91 — 2026-06-20 — the descent gets a SOUND: five era music stems, crossfaded by depth
+
+**Shipped (local):** the color-psychology arc is now HEARD. Five looping ambient stems (ACE-Step,
+from the E-G-A-D-C pentatonic family, generated on Bender) crossfade by `W.level`: warm-gold surface
+→ sodium-green L2 → jaundice L3 → isolation-blue L4 → dead-violet L5.
+- `A.musicTo(level)` in `audio.js`: a dedicated `musicBed` gain; loads the stem lazily, crossfades
+  over ~3.5 s, evicts non-adjacent stems (the bounded cache from #88 — only current + adjacent
+  decoded, ~4 MB resident). Called every play frame (early-returns unless the level moved).
+  `musicStop()` on the bell finale + the oar (they own the soundscape). Offline → silent (the
+  procedural score carries it).
+- Mono mp3, ~145 KB each / 720 KB total, in `assets/music/`.
+
+**Evidence (`?debug`):** boots clean, no console errors; the surface stem starts at L1 in play
+(`_music` set), descending to L3 crossfades to the L3 stem (`_musicLevel`→3); `music_l1` decodes
+(12 s mono). Audio is GPU-free. The MIX level is an owner-listen (a subtle bed under the procedural
+score; tune the `musicBed` gain).
+
+**Next:** final verification (textures + music + voice together) + push so the owner wakes to it live.
+
+---
+
 ## 90 — 2026-06-20 — FULLY TEXTURED: granite on the stone + vellum on the chart table
 
 **Shipped (local):** the owner granted full creative autonomy on music/voice/textures ("I'd like to
