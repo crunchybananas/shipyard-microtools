@@ -12,6 +12,28 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 92 — 2026-06-20 — responsive UI: the debug panel no longer hides the mute + a mobile pass
+
+**Shipped (local):** owner — "we need better responsive UI. on a small screen the debug panel hides
+the mute."
+- The top-right controls (mute / motion / journal) were `z-index: 24` UNDER the debug panel
+  (`z-index: 60`), and the panel had no width cap → on a narrow screen it sprawled over the mute.
+  Raised the controls to `z-index: 61` (always on top + clickable) AND capped the panel
+  `max-width: min(680px, calc(100vw - 140px))` + `max-height` + `overflow-y: auto`, so it never
+  reaches the controls.
+- Added a `@media (max-width: 600px)` pass: the panel shrinks (min-width 0, smaller font, scrollable);
+  the title h1 + subtitle letter-spacing tighten so "THE ISLAND" fits; the title-foot, `#whisper`,
+  and the control hint wrap within the viewport; the controls tuck to the corner. A
+  `@media (max-height: 480px)` keeps the panel reachable on landscape phones.
+
+**Evidence (mobile 375×812):** the panel right edge (243) clears the mute left edge (279); the mute
+is the topmost clickable element (`elementFromPoint` = sound-tab); "THE ISLAND" + the title-foot fit
+the viewport (verified rects + screenshot). No console errors.
+
+**Next:** the de-flatten richness campaign + the darker/longer music (both in flight) — execute aggressively.
+
+---
+
 ## 91 — 2026-06-20 — the descent gets a SOUND: five era music stems, crossfaded by depth
 
 **Shipped (local):** the color-psychology arc is now HEARD. Five looping ambient stems (ACE-Step,

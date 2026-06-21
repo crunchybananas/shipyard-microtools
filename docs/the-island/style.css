@@ -179,7 +179,7 @@ html, body {
 
 /* ---------- journal ---------- */
 #journal-tab {
-  position: fixed; top: 18px; right: 18px; z-index: 24;
+  position: fixed; top: 18px; right: 18px; z-index: 61;
   width: 38px; height: 38px;
   border-radius: 50%;
   background: rgba(10, 14, 24, 0.5);
@@ -200,7 +200,7 @@ html, body {
 
 /* ---------- sound toggle (matches the journal tab, sits to its left) ---------- */
 #sound-tab {
-  position: fixed; top: 18px; right: 64px; z-index: 24;
+  position: fixed; top: 18px; right: 64px; z-index: 61;
   width: 38px; height: 38px;
   border-radius: 50%;
   background: rgba(10, 14, 24, 0.5);
@@ -222,7 +222,7 @@ html, body {
 
 /* ---------- reduced-motion toggle (matches the sound tab, sits to its left) ---------- */
 #motion-tab {
-  position: fixed; top: 18px; right: 110px; z-index: 24;
+  position: fixed; top: 18px; right: 110px; z-index: 61;
   width: 38px; height: 38px;
   border-radius: 50%;
   background: rgba(10, 14, 24, 0.5);
@@ -349,6 +349,8 @@ html, body {
   color: #9fe8c5;
   display: flex; flex-direction: column; gap: 6px;
   min-width: 260px;
+  max-width: min(680px, calc(100vw - 140px));   /* never overlap the top-right controls */
+  max-height: calc(100vh - 24px); overflow-y: auto;
 }
 #debug-panel label { display: flex; align-items: center; gap: 8px; }
 #debug-panel input[type=range] { flex: 1; }
@@ -358,3 +360,25 @@ html, body {
   border-radius: 3px; font-size: 10px; padding: 3px 7px; cursor: pointer;
 }
 #debug-panel button:hover { background: #1f3329; }
+
+/* ---- responsive: phones / narrow viewports ---- */
+@media (max-width: 600px) {
+  #debug-panel { min-width: 0; left: 8px; top: 8px; font-size: 10px; max-height: 44vh; padding: 8px 9px; }
+  #debug-panel button { font-size: 9px; padding: 3px 6px; }
+  #journal-tab { top: 10px; right: 12px; }
+  #sound-tab   { top: 10px; right: 58px; }
+  #motion-tab  { top: 10px; right: 104px; }
+  #controls-hint {
+    font-size: 0.6rem; letter-spacing: 0.06em; line-height: 1.6;
+    max-width: 92vw; white-space: normal; text-align: center; bottom: 2vh;
+  }
+  #whisper { max-width: 90vw; font-size: 1.1rem; }
+  #title-screen h1 { font-size: clamp(1.7rem, 9vw, 5rem); letter-spacing: 0.2em; margin-left: 0.2em; }
+  .subtitle { letter-spacing: 0.5em; margin-left: 0.5em; }
+  .title-foot { font-size: 0.62rem; max-width: 86vw; margin-left: auto; margin-right: auto; line-height: 1.5; }
+  .title-actions { gap: 0.9rem; }
+  .title-btn { padding: 0.7rem 1.6rem 0.7rem 1.84em; font-size: 0.92rem; }
+}
+@media (max-height: 480px) {
+  #debug-panel { max-height: 88vh; }   /* landscape phones: keep the panel reachable */
+}
