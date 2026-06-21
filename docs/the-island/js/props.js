@@ -935,17 +935,32 @@ export function buildWorld() {
       ag.computeVertexNormals();
       const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: true });
       applyRelief(apronMat, 'pebble', { normalScale: 0.5, strength: 2.0 });
-      // DE-TILE: the [53,5] repeat prints ~53 identical pebble columns down the 48m band.
-      // Warp the albedo sample coord with low-freq value-noise so the lattice dissolves. Compile-safe:
-      // samples at a warped LOCAL, never mutates the read-only vMapUv varying. +0 texture fetches.
-      // (vMapUv already carries the [53,5] repeat, so 1.0 unit ≈ one pebble.)
+      // DE-TILE the pebbles + DISSOLVE the rectangular edge into the sand.
+      //  - de-tile: warp the albedo sample coord with low-freq value-noise so the [53,5] column
+      //    lattice dissolves. Compile-safe: sample a warped LOCAL, never mutate the read-only vMapUv.
+      //  - edge dissolve: scatter pebble DENSITY to 0 toward the border on a noisy threshold, so
+      //    pebbles thin into the de-tiled sand terrain just beneath (apron sits at height+0.04)
+      //    instead of ending on a hard line. +0 texture fetches either way (pure ALU value-noise).
       apronMat.onBeforeCompile = (sh) => {
+        // carry the strip's 0..1 uv to the fragment stage for the edge math
+        sh.vertexShader = sh.vertexShader
+          .replace('#include <common>', '#include <common>\nvarying vec2 vApUv;')
+          .replace('#include <uv_vertex>', '#include <uv_vertex>\n  vApUv = uv;');
         sh.fragmentShader = sh.fragmentShader
           .replace('#include <common>', '#include <common>\n' +
+            'varying vec2 vApUv;\n' +
             'float apHash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n' +
             'float apVN(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);\n' +
             '  float a=apHash(i),b=apHash(i+vec2(1.0,0.0)),c=apHash(i+vec2(0.0,1.0)),d=apHash(i+vec2(1.0,1.0));\n' +
             '  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y); }')
+          // edge dissolve (early discard): apDens = 0 at the border → 1 a metre or so in; a per-pebble
+          // value-noise threshold makes the boundary scatter (stray pebbles on the sand, sand intruding
+          // into pebbles) rather than a straight fade. Strip is 48m (u) x 4.5m (v).
+          .replace('#include <clipping_planes_fragment>',
+            '#include <clipping_planes_fragment>\n' +
+            '  float apEdge = min(min(vApUv.x, 1.0 - vApUv.x) * 48.0, min(vApUv.y, 1.0 - vApUv.y) * 4.5);\n' +
+            '  float apDens = smoothstep(0.0, 1.5, apEdge);\n' +
+            '  if (apDens < apVN(vApUv * vec2(64.0, 6.0))) discard;')
           .replace('#include <map_fragment>',
             '#ifdef USE_MAP\n' +
             '  vec2 apW = (vec2(apVN(vMapUv * 0.4), apVN(vMapUv * 0.4 + 19.7)) - 0.5) * 0.7;\n' +
