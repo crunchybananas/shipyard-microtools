@@ -405,6 +405,15 @@ export class Game {
       id: 'inscription', targets: [R.inscribedStone], label: 'words cut in the stone', maxDist: 5.5,
       onClick: () => UI.openReader('stone_inscription'),
     });
+    if (R.messageBottle) I.add({
+      id: 'bottle', targets: [R.messageBottle], label: 'a bottle in the sand', maxDist: 2.6,
+      onClick: () => UI.openReader('bottle_note'),
+    });
+    if (R.quartersJournal) I.add({
+      id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
+      when: () => W.level >= 1,                 // the quarters open one level down
+      onClick: () => UI.openReader('quarters_journal'),
+    });
   }
 
   _touchStone(i) {

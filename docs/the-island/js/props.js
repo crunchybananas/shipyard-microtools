@@ -707,6 +707,19 @@ export function buildWorld() {
       new THREE.MeshStandardMaterial({ color: 0xffe6b0, emissive: 0xffb45a, emissiveIntensity: 2.4, flatShading: true }));
     globe.position.y = 2.28; lamp.add(globe);
     q.add(lamp);
+
+    // the keeper's PRIVATE journal, left on the cot by the pillow — the intimate counterpart to
+    // the chart-table logbook (the reading surface). Found only here, behind the inner door, one
+    // level down; its deep page turns toward the descent. A worn dark book; click to read it.
+    const jbook = new THREE.Group(); jbook.name = 'quartersJournal';
+    const jcover = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.36), woodMat);
+    jbook.add(jcover);
+    const jleaves = new THREE.Mesh(new THREE.BoxGeometry(0.235, 0.045, 0.335),
+      new THREE.MeshStandardMaterial({ color: 0xded3ba, roughness: 0.95, flatShading: true }));
+    jleaves.position.y = 0.005; jbook.add(jleaves);
+    jbook.position.set(-1.2, 0.57, 1.32);     // on the cot blanket, near the pillow
+    jbook.rotation.y = -0.5;
+    q.add(jbook);
   }
 
   // =================== THE DROWNED GALLERY (#16 — sealed vista) =============
@@ -833,6 +846,29 @@ export function buildWorld() {
       slab.rotation.y = -0.6;       // face turned toward the jetty / the one arriving
       slab.castShadow = true;
       core.add(slab);
+    }
+
+    // a corked bottle half-buried at the wake-up beach — the FIRST readable fragment most
+    // players meet (the reading surface, surface tier): a note washed up in the sand, an
+    // invitation. A curl of paper shows through the green sea-glass; click to read it.
+    {
+      const bx = 6.5, bz = -101;
+      const bottle = new THREE.Group();
+      bottle.name = 'messageBottle';
+      const glass = new THREE.MeshStandardMaterial({ color: 0x4a7a5e, transparent: true, opacity: 0.5, roughness: 0.22, metalness: 0 });
+      bottle.add(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.12, 0.46, 10), glass));
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.07, 0.2, 8), glass);
+      neck.position.y = 0.32; bottle.add(neck);
+      const cork = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.045, 0.08, 8),
+        new THREE.MeshStandardMaterial({ color: 0x8a6b3e, roughness: 1 }));
+      cork.position.y = 0.45; bottle.add(cork);
+      const note = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.34, 6),
+        new THREE.MeshBasicMaterial({ color: 0xe8dcc0 }));    // the curl of paper inside
+      note.rotation.z = 0.2; bottle.add(note);
+      bottle.position.set(bx, heightAt(bx, bz) + 0.08, bz);
+      bottle.rotation.z = Math.PI / 2 - 0.22;                 // lying tilted, half-buried
+      bottle.rotation.y = 0.6;
+      core.add(bottle);
     }
 
     // the dory — beached on the dry sand, bow toward the water, keeled over
@@ -1630,7 +1666,7 @@ const NAMES = [
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
-  'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone',
+  'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',

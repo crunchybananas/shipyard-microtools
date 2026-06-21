@@ -72,6 +72,31 @@ export const LORE = {
     ],
     journal: 'Words cut into a standing stone, worn soft by the sea: “We who went down left the light for whoever washes up.”',
   },
+  // washed up at the wake-up beach — the FIRST fragment most players meet, an invitation.
+  bottle_note: {
+    kind: 'letter', hand: 'keeper', title: 'A note in a bottle, washed up',
+    pages: [
+      'To whoever finds this — and someone always does; the sea is a poor keeper of secrets — the light you can see from here is mine.',
+      'If you are reading this on my beach, you have already come further than most turn back. Keep going, or do not. But know the light is lit, and it is lit for someone.\n\nToday I have decided that someone can be you.',
+    ],
+    journal: 'A bottle on the beach, a note inside: the keeper says the light is lit for someone — and today he has decided that someone can be you.',
+  },
+  // the keeper's PRIVATE bedside journal, in the quarters behind the inner door (revealed one
+  // level down). The intimate counterpart to the public logbook; its deep page turns toward the
+  // descent — he begins to suspect the one he keeps the light for went DOWN, not out to sea.
+  quarters_journal: {
+    kind: 'book', hand: 'keeper', title: 'A journal kept by the cot',
+    pages: [
+      'The public log is for the inspector. This one is for me, and I keep it where no inspector goes — under the pillow, against my own ear. Here I am allowed to say it plainly: I am afraid. Not of the sea. Of being the last one awake when it comes.',
+      'I drew the island again tonight — smaller — on the wall where I can see it from the cot. My hand does this without me now. They say a man draws what he cannot say, and I have said nothing aloud in a long while, so my hand has a great deal of work.',
+      'There was someone I keep the light for. I will not set the name down — to write it is to admit how long the lamp has burned with no boat coming. But I trim it every dusk. A light kept for no one is only a fire; a light kept for someone is a promise. I choose, each dusk, to call it a promise.',
+    ],
+    deepFrom: 3,
+    deep: [
+      '(later, in a worse hand) I have begun to suspect the one I keep the light for is not out on the water, rowing up toward me. I think they are already here — that they came, and went DOWN, and that I have aimed the beam at the wrong horizon all this time. Tomorrow I will turn it to face the deep. Tomorrow I will go down and look.',
+    ],
+    journal: 'Found the keeper’s private journal by his cot — kept under the pillow, against his own ear. He is afraid of being the last one awake; he draws the island smaller each night; he trims a light at every dusk for someone he will not name.',
+  },
 };
 
 // ---- journal marginalia (SKETCHES) -----------------------------------------
