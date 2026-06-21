@@ -47,9 +47,9 @@ export const MANIFEST = {
   // Baker, vertexColors:true, so the granite MULTIPLIES the existing bone/grey vertex colors and the
   // copper band stays coppery — no de-merge needed). Achromatic granite; the grades still color it.
   stone: {
-    kind: 'texture', file: 'study_stone.jpg', bytes: 135333,
+    kind: 'texture', file: 'study_stone.jpg', bytes: 162296,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
-    prompt: 'seamless tileable weathered grey granite blocks, lichen-flecked, soft daylight, top-down',
+    prompt: 'seamless tileable weathered granite ashlar masonry, deep recessed mortar lines, lichen and salt-weathering flecks, high micro-contrast, top-down — bolder relief source for the derived normal map',
     wrap: 'repeat', repeat: [3, 3], colorSpace: 'srgb', anisotropy: 4,
   },
   // the chart-table surface — a sheet of aged vellum the model sits on (a thin plane in props.js).
@@ -81,6 +81,7 @@ export const MANIFEST = {
 };
 
 const _texCache = new Map();   // id -> THREE.Texture (shared)
+const _normCache = new Map();  // id -> THREE.DataTexture (a normal map DERIVED from the albedo, shared)
 const _bufCache = new Map();   // id -> Promise<AudioBuffer>
 const _loader = new THREE.TextureLoader();
 
@@ -122,6 +123,74 @@ export function applyTexture(material, id, slot = 'map') {
   material[slot] = getTexture(id, () => { material.needsUpdate = true; });
   material.needsUpdate = true;
   return material[slot];
+}
+
+// ---- relief: a NORMAL MAP derived from the albedo's own luminance ------------
+// The de-flatten lever. Our textures are albedo-only and read as evenly-lit paper;
+// real PBR relief maps weren't available from the FLUX backend (kind:"pbr" returns a
+// single albedo, not a map set). So we DERIVE one: the recesses in these surfaces —
+// granite mortar, wood grain, burlap weave, driftwood cracks — are exactly the dark
+// pixels, so the albedo's luminance IS a usable heightfield. A wrap-aware Sobel pass
+// turns it into a tangent-space normal map at load. Zero new files, stays tileable,
+// no jpg-on-normals artifacts, and the engine owns the capability (no external PBR gen).
+function buildNormalFromImage(img, strength) {
+  let w = img.width, h = img.height;
+  const cap = 512;                                   // bound cost + VRAM; normals don't need full res
+  const s = Math.min(1, cap / Math.max(w, h));
+  w = Math.round(w * s); h = Math.round(h * s);
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  cx.drawImage(img, 0, 0, w, h);
+  const src = cx.getImageData(0, 0, w, h).data;
+  const lum = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) lum[i] = (src[i * 4] * 0.299 + src[i * 4 + 1] * 0.587 + src[i * 4 + 2] * 0.114) / 255;
+  const at = (x, y) => lum[((y % h) + h) % h * w + (((x % w) + w) % w)];   // wrap → tileable
+  const out = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const dx = (at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1)) - (at(x - 1, y - 1) + 2 * at(x - 1, y) + at(x - 1, y + 1));
+      const dy = (at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1)) - (at(x - 1, y - 1) + 2 * at(x, y - 1) + at(x + 1, y - 1));
+      let nx = -dx * strength, ny = -dy * strength, nz = 1;
+      const inv = 1 / Math.hypot(nx, ny, nz);
+      const i = (y * w + x) * 4;
+      out[i] = (nx * inv * 0.5 + 0.5) * 255;
+      out[i + 1] = (ny * inv * 0.5 + 0.5) * 255;
+      out[i + 2] = (nz * inv * 0.5 + 0.5) * 255;
+      out[i + 3] = 255;
+    }
+  }
+  const tex = new THREE.DataTexture(out, w, h, THREE.RGBAFormat);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// Apply an albedo AND a derived normal map (relief) to a material. Same race-free path
+// as applyTexture, plus: when the albedo's image is decoded, derive its normal map ONCE
+// (cached + shared, like the albedo — so the island and its 1:240 clone share one upload),
+// match its repeat, and wire it. Does NOT touch flatShading — in three.js the normal map
+// perturbs the (flat or smooth) base normal via derivative TBN either way, so we keep the
+// material's crisp box edges and still get relief. opts: { normalScale, strength, roughness }.
+export function applyRelief(material, id, opts = {}) {
+  const ns = opts.normalScale ?? 0.7;
+  material.normalScale = new THREE.Vector2(ns, ns);
+  if (opts.roughness != null) material.roughness = opts.roughness;
+  material.map = getTexture(id, (t) => {
+    material.needsUpdate = true;
+    if (!t.image) return;
+    let nt = _normCache.get(id);
+    if (!nt) {
+      nt = buildNormalFromImage(t.image, opts.strength ?? 2.0);
+      const a = MANIFEST[id];
+      if (a?.repeat) nt.repeat.set(a.repeat[0], a.repeat[1]);
+      if (a?.anisotropy) nt.anisotropy = a.anisotropy;
+      _normCache.set(id, nt);
+    }
+    material.normalMap = nt;
+    material.needsUpdate = true;
+  });
+  material.needsUpdate = true;
+  return material;
 }
 
 // Decode an audio asset (voice/music) to an AudioBuffer via the given AudioContext.

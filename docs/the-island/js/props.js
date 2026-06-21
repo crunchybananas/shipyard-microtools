@@ -8,7 +8,7 @@ import { Baker, mulberry32, SEED, vary, clamp, lerp, TAU } from './util.js';
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
-import { applyTexture } from './assets.js';
+import { applyRelief } from './assets.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
@@ -20,8 +20,10 @@ export const BIRD_MELODY = [2, 3, 4, 3, 0];  // E G A G C — the bird corrects 
 export const matStone = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: true, roughness: 0.92, metalness: 0.0, side: THREE.DoubleSide,
 });
-applyTexture(matStone, 'stone');   // granite over the lighthouse/study/stones — multiplies the
-                                    // vertex colours (bone walls → granite, the copper band stays coppery)
+applyRelief(matStone, 'stone', { normalScale: 0.85, strength: 2.4 });   // granite over the lighthouse/
+                                    // study/stones — multiplies the vertex colours (bone walls → granite,
+                                    // the copper band stays coppery) + a derived normal map so the mortar
+                                    // lines and block faces catch the raking sun and the keeper's lamp
 export const matBrass = new THREE.MeshStandardMaterial({
   vertexColors: true, flatShading: true, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
 });
@@ -31,7 +33,8 @@ const matBrassSolid = new THREE.MeshStandardMaterial({
 const matWood = new THREE.MeshStandardMaterial({
   color: 0x8f7a5c, flatShading: true, roughness: 0.85, metalness: 0.0,  // lightened so the wood grain reads
 });
-applyTexture(matWood, 'wood');   // the interior wood grain — doors, the music box, the tables, the plate ring
+applyRelief(matWood, 'wood', { normalScale: 0.55, strength: 1.8 });   // the interior wood grain — doors,
+                                  // the music box, the tables, the plate ring — now with grain-channel relief
 const matGlass = new THREE.MeshStandardMaterial({
   color: 0xcfe8ea, transparent: true, opacity: 0.16, roughness: 0.08, metalness: 0.1,
   side: THREE.DoubleSide, depthWrite: false,
@@ -322,7 +325,7 @@ export function buildWorld() {
   // brass rim and below the model, so the chart paper shows in the border around the model.
   {
     const sheetMat = new THREE.MeshStandardMaterial({ color: 0xd2ccbe, roughness: 0.96, flatShading: true });
-    applyTexture(sheetMat, 'chart_vellum');
+    applyRelief(sheetMat, 'chart_vellum', { normalScale: 0.3, strength: 1.2 });   // faint paper-fibre relief
     const sheet = new THREE.Mesh(new THREE.PlaneGeometry(2.95, 2.95), sheetMat);
     sheet.rotation.x = -Math.PI / 2;
     sheet.position.set(LH.x, LH.y + 0.953, LH.z);
@@ -580,7 +583,8 @@ export function buildWorld() {
     const coat = new THREE.Group();
     coat.name = 'coat';
     const coatMat = new THREE.MeshStandardMaterial({ color: 0x6a6f74, flatShading: true, roughness: 0.9 }); // lightened so the weave reads
-    applyTexture(coatMat, 'cloth');   // the keeper's coat — a coarse weathered burlap weave
+    applyRelief(coatMat, 'cloth', { normalScale: 0.6, strength: 2.0 });   // the keeper's coat — a coarse
+                                      // weathered burlap weave, now with woven-thread relief under the lamp
     const coatBody = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.5, 8), coatMat);
     coatBody.position.set(ax - 1.9, LH.y + 1.2, az + 0.6);
     coat.add(coatBody);
@@ -761,7 +765,7 @@ export function buildWorld() {
     // the asset manifest (assets.js). They are the only wood props and the only users of this
     // material; the 1:240 model clone shares it (the grain is invisible at that scale). The
     // base colour is lightened toward bone so the texture multiplies to weathered grey-brown.
-    applyTexture(weather, 'driftwood');
+    applyRelief(weather, 'driftwood', { normalScale: 0.7, strength: 2.2 });   // cracked-plank relief on the jetty + dory
     const jx = -18;
     const jetty = new THREE.Group(); jetty.name = 'jetty';
     const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 12), weather);
