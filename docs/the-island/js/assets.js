@@ -22,10 +22,26 @@ const BASE = 'assets/';
 //   texture rows carry their sampler settings (wrap/repeat/colorSpace/anisotropy).
 export const MANIFEST = {
   driftwood: {
-    kind: 'texture', file: 'driftwood.png', bytes: 1054836,
+    kind: 'texture', file: 'driftwood.jpg', bytes: 58012,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
     prompt: 'seamless tileable weathered driftwood plank grain, grey-brown, soft daylight, top-down',
     wrap: 'repeat', repeat: [1.4, 1.4], colorSpace: 'srgb', anisotropy: 4,
+  },
+  // the interior wood — every wooden prop's grain (doors, the music box, the tables, the plate
+  // ring). Worn pine floorboards reused as a generic wood grain; base tint kept warm so the pale
+  // texture multiplies to a mid weathered wood. Shared via matWood (props.js).
+  wood: {
+    kind: 'texture', file: 'wood.jpg', bytes: 69542,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable worn oiled pine floorboards, grey-brown, soft daylight, top-down',
+    wrap: 'repeat', repeat: [1.5, 1.5], colorSpace: 'srgb', anisotropy: 4,
+  },
+  // the keeper's coat (and its clone on the model) — coarse weathered burlap weave.
+  cloth: {
+    kind: 'texture', file: 'cloth.jpg', bytes: 166206,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable coarse weathered burlap weave, oatmeal, soft daylight, top-down',
+    wrap: 'repeat', repeat: [2, 2], colorSpace: 'srgb', anisotropy: 4,
   },
 
   // the keeper's voice — bm_george (Kokoro-82M), generated on Bender, transcoded to

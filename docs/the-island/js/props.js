@@ -27,8 +27,9 @@ const matBrassSolid = new THREE.MeshStandardMaterial({
   color: 0xb08d4f, flatShading: true, roughness: 0.35, metalness: 0.9,
 });
 const matWood = new THREE.MeshStandardMaterial({
-  color: 0x5e4127, flatShading: true, roughness: 0.85, metalness: 0.0,
+  color: 0x8f7a5c, flatShading: true, roughness: 0.85, metalness: 0.0,  // lightened so the wood grain reads
 });
+applyTexture(matWood, 'wood');   // the interior wood grain — doors, the music box, the tables, the plate ring
 const matGlass = new THREE.MeshStandardMaterial({
   color: 0xcfe8ea, transparent: true, opacity: 0.16, roughness: 0.08, metalness: 0.1,
   side: THREE.DoubleSide, depthWrite: false,
@@ -546,7 +547,9 @@ export function buildWorld() {
     core.add(hookM);
     const coat = new THREE.Group();
     coat.name = 'coat';
-    const coatBody = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.5, 8), new THREE.MeshStandardMaterial({ color: 0x355560, flatShading: true, roughness: 0.9 }));
+    const coatMat = new THREE.MeshStandardMaterial({ color: 0x6a6f74, flatShading: true, roughness: 0.9 }); // lightened so the weave reads
+    applyTexture(coatMat, 'cloth');   // the keeper's coat — a coarse weathered burlap weave
+    const coatBody = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.5, 8), coatMat);
     coatBody.position.set(ax - 1.9, LH.y + 1.2, az + 0.6);
     coat.add(coatBody);
     // the maker's pair once more, stitched small at the hem — the same

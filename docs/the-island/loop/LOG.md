@@ -12,6 +12,34 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## 89 — 2026-06-20 — texture pass: interior wood + the keeper's coat (+ driftwood slimmed)
+
+**Shipped (local):** the owner liked the driftwood, so the hero-surface family expands — two clean
+applications + a memory-minded re-export, all Bender FLUX.1-schnell, JPG-compressed.
+- **Interior WOOD** (`wood.jpg`, 70 KB): worn pine grain on the shared `matWood` — every wooden prop
+  (doors, the music box, the tables, the plate ring). `matWood` lightened (`0x5e4127`→`0x8f7a5c`) so
+  the pale grain multiplies to a mid weathered wood. 98 meshes now carry a map.
+- **The keeper's COAT** (`cloth.jpg`, 166 KB): the coat's own material extracted + given a coarse
+  burlap weave (it clones to the model too) — the coat-reveal prop has texture now.
+- **Driftwood SLIMMED:** re-exported the oversized `driftwood.png` (1.05 MB) → `driftwood.jpg`
+  (58 KB, ~18× smaller — the memory pass made literal) and removed the PNG.
+- All processed `sips -Z 512 -s format jpeg` (≤512², JPG) per ASSETS.md.
+
+**Evidence (`?debug`):** boots clean, no console errors; all 3 textures load (512², jpg); 98 meshes
+textured; coat + dory maps confirmed; renders correctly (surface + study screenshots). Power: bench
+72 draws / 288k tris / 8.5 ms, 300+ fps — maps add NO geometry. Heap 18.2 MB (down, from the
+optimization + slimmer textures).
+
+**Deferred (the de-merge tick):** `chart_vellum` + `study_stone` are generated + parked — both targets
+(the chart-table top, the lighthouse/study stone) are baked into the merged `matStone` Baker with a
+painted copper band, so they need a careful tower/sheet de-merge (ASSETS.md flagged it; roadmap #7).
+Not rushed onto a shared vertex-colored material.
+
+**Next tick (90, PUSH boundary):** the stone de-merge (vellum + stone) OR item 5 (era music stems);
+push the 86–90 batch.
+
+---
+
 ## 88 — 2026-06-20 — optimization pass: memory + GC + dead code (from the audit)
 
 **Shipped (local):** the safe, high-value wins from the 4-lens memory/code audit. (The owner asked
