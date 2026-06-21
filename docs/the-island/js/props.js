@@ -1585,6 +1585,7 @@ function buildVegetation(core, r) {
     m4.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(s, s * (0.9 + r() * 0.4), s));
     trunks.setMatrixAt(i, m4);
     canopies.setMatrixAt(i, m4);
+    addCollider(x, z, 0.3 * s);   // the trunk is solid — you walked through every tree in the forest
     col.setHSL(0.21 + r() * 0.06, 0.32 + r() * 0.15, 0.3 + r() * 0.1);
     canopies.setColorAt(i, col);
   }
