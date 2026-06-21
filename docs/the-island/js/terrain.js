@@ -342,8 +342,17 @@ export function buildTerrain() {
         #include <color_fragment>
         float gScl = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
         float mini = 1.0 - smoothstep(0.05, 0.5, gScl);
-        vec3 detT = mix(texture2D(uSand, vLXZ * uTexScale).rgb,
-                        texture2D(uGrass, vLXZ * uTexScale * 0.8).rgb,
+        // DE-TILE: the de-grid above only wobbles BRIGHTNESS — the texture's own baked
+        // grain/pits still recur every ~1.18m, which reads as a pock-mark lattice. Warp the
+        // SAMPLE COORDS with a low-freq vnoise so the grain stops landing on a regular grid.
+        //   freq 0.18 (~5.5m wavelength) is well below the 1.18m tile → smears the LATTICE,
+        //   not the grain; amp ~0.8m (>half a tile) breaks the repeat without swimmy folding.
+        //   *(1.0-mini) → off on the dense 1:240 clone (never seen there). +0 texture fetches.
+        vec2 warp = vec2(vnoise(vLXZ * 0.18 + 11.3), vnoise(vLXZ * 0.18 + 41.7)) - 0.5;
+        warp += 0.4 * (vec2(vnoise(vLXZ * 0.55 + 5.0), vnoise(vLXZ * 0.55 + 23.0)) - 0.5);  // 2nd octave (~1.8m) de-correlates adjacent tiles up close
+        vec2 uvW  = vLXZ + warp * 1.6 * (1.0 - mini);
+        vec3 detT = mix(texture2D(uSand,  uvW * uTexScale).rgb,
+                        texture2D(uGrass, uvW * uTexScale * 0.8).rgb,
                         smoothstep(2.2, 3.4, vTerH));
         float detL = dot(detT, vec3(0.299, 0.587, 0.114));
         float land = smoothstep(0.3, 1.1, vTerH);             // off the seabed / waterline
