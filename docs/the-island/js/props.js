@@ -8,7 +8,7 @@ import { Baker, mulberry32, SEED, vary, clamp, lerp, TAU } from './util.js';
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
-import { applyRelief } from './assets.js';
+import { applyRelief, getTexture } from './assets.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
@@ -1499,26 +1499,37 @@ function buildVegetation(core, r) {
     if (h > 2.5 && h < 8 && Math.hypot(x - SPOTS.stones.x, z - SPOTS.stones.y) > 14) spots.push([x, h - 0.2, z]);
   }
 
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5e4127, flatShading: true, roughness: 0.9 });
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: true, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
+  applyRelief(trunkMat, 'bark', { normalScale: 0.8, strength: 2.4, roughness: 0.95 });   // grooved bark + derived normal on every trunk + the model clone (shared)
   const canopyMat = new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.85, vertexColors: false });
   canopyMat.color = new THREE.Color(0x6d7a3e);
   // wind sway via shader patch
   canopyMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = { value: 0 };
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
+    sh.uniforms.uFoliage = { value: getTexture('foliage') };   // stylized canopy texture (no UVs → object-space sample)
+    sh.uniforms.uFolAmt = { value: 0.5 };
+    sh.uniforms.uFolScale = { value: 1.0 };
     canopyMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
+      vLPos = position;                       // object-space coords for the foliage sample (pre-wind)
       #ifdef USE_INSTANCING
         float windSeed = instanceMatrix[3].x * 0.13 + instanceMatrix[3].z * 0.17;
         transformed.x += sin(uTime * 1.4 + windSeed) * 0.14 * smoothstep(1.0, 5.5, transformed.y);
       #endif
-    `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
-    // distant canopies melt toward the grade's haze before global fog
-    // reaches them — softens the hard low-poly pop at the tree line;
-    // fragment-only, zero added draws (power directive holds)
+    `).replace('void main() {', 'uniform float uTime;\nvarying vec3 vLPos;\nvoid main() {');
+    // (1) a STYLIZED foliage texture breaks the flat uniform green — sampled object-space (the
+    // cones have no UVs) as a LUMINANCE multiply so each canopy keeps its hue + low-poly silhouette
+    // but gains dappled value variation. (2) distant canopies melt toward the grade's haze before
+    // global fog reaches them — softens the hard low-poly pop at the tree line. Fragment-only.
     sh.fragmentShader = sh.fragmentShader
-      .replace('void main() {', 'uniform vec3 uHaze;\nvoid main() {')
+      .replace('void main() {', 'uniform vec3 uHaze;\nuniform sampler2D uFoliage;\nuniform float uFolAmt;\nuniform float uFolScale;\nvarying vec3 vLPos;\nvoid main() {')
+      .replace('#include <color_fragment>', `
+        #include <color_fragment>
+        float folL = dot(texture2D(uFoliage, vLPos.xz * uFolScale).rgb, vec3(0.299, 0.587, 0.114));
+        diffuseColor.rgb *= mix(1.0, folL * 1.9, uFolAmt);
+      `)
       .replace('#include <fog_fragment>', `
         gl_FragColor.rgb = mix(gl_FragColor.rgb, uHaze,
           smoothstep(120.0, 300.0, length(vViewPosition)) * 0.45);

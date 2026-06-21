@@ -59,6 +59,22 @@ export const MANIFEST = {
     prompt: 'seamless tileable aged blank vellum chart paper, faint creases, soft daylight, top-down',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
   },
+  // the pines' bark — on the shared trunkMat (buildVegetation), via applyRelief (albedo+derived
+  // normal). repeat [1,3] wraps once around the 6-gon barrel and tiles ~3x up the 2.6m trunk.
+  bark: {
+    kind: 'texture', file: 'bark.jpg', bytes: 173161,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable aged conifer bark, deep vertical grooves, weathered grey-brown, top-down',
+    wrap: 'repeat', repeat: [1, 3], colorSpace: 'srgb', anisotropy: 4,
+  },
+  // the tree-top canopy — a STYLIZED painterly foliage, sampled object-space in the canopy shader
+  // (no UVs) as a subtle luminance multiply to break the flat uniform green. Kept low-detail.
+  foliage: {
+    kind: 'texture', file: 'foliage.jpg', bytes: 150591,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable stylized painterly pine canopy foliage, soft dabbed needle clusters, gentle value variation, low detail',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
+  },
 
   // the keeper's voice — bm_george (Kokoro-82M), generated on Bender, transcoded to
   // mono 24 kHz mp3, played through the drowned bus (audio.js say()). `prompt` is the
