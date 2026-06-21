@@ -488,6 +488,16 @@ export function buildWorld() {
     lid.name = 'musicBoxLid';
     box.add(lid);
     core.add(box);
+
+    // a folded note resting on the shelf beside the music box — a readable fragment (music_note)
+    // tying the box's five-note tune to the keeper's grief. Separate mesh (NOT a child of the box,
+    // whose hotspot raycasts its children) so it's its own hotspot.
+    const note = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.14),
+      new THREE.MeshStandardMaterial({ color: 0xded3ba, roughness: 0.95, flatShading: true }));
+    note.position.set(LH.x - 3.78, LH.y + 1.34, LH.z - 2.78);
+    note.rotation.set(0, deg(35) + 0.4, 0.04);
+    note.name = 'musicNote';
+    core.add(note);
   }
 
   // bookshelves (baked)
@@ -1773,7 +1783,7 @@ const NAMES = [
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
   'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
-  'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher',
+  'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher', 'musicNote',
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',

@@ -115,6 +115,16 @@ export const LORE = {
     ],
     journal: 'Hair-fine letters on a standing stone, shown only by the glass: “We each think we are the one who went down. We are each also the light left lit. Hold both, and climb.”',
   },
+  // folded into the music box on the study shelf — ties the box/bird puzzle (the fourth note he
+  // bends DOWN where the bird bends it UP) to his grief: the thing he could never do, that you do.
+  music_note: {
+    kind: 'letter', hand: 'keeper', title: 'A note folded into the music box',
+    pages: [
+      'I wind it more than I should. Five notes — E, G, A, D, C — and then I wind it again. The fourth note is wrong; I have always known it is wrong; I bend it down where it ought to bend up, and I cannot make my hands do otherwise. A man plays the song he can play, not the song he means.',
+      'I wound it for someone who is not here to hear the fourth note come out wrong. If you are the one who finally hears the bird sing it right — the way I never could — then you have done the one small thing I came all this way down to do, and could not.\n\nWind it once for me. Then let it stop.',
+    ],
+    journal: 'A note folded into the music box: he wound it for someone not there to hear, and could never play the fourth note right — he bends it down where the bird bends it up. “Wind it once for me. Then let it stop.”',
+  },
 };
 
 // ---- journal marginalia (SKETCHES) -----------------------------------------
