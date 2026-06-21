@@ -96,7 +96,9 @@ export const MANIFEST = {
     kind: 'texture', file: 'pebble.jpg', bytes: 107139,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
     prompt: 'seamless tileable wet rounded sea-glass pebbles and shingle, pale grey-green, top-down',
-    wrap: 'repeat', repeat: [3, 3], colorSpace: 'srgb', anisotropy: 4,
+    // repeat is PROPORTIONAL to the apron strip's world size (48m × 4.5m) so the pebbles read SQUARE,
+    // not stretched 10:1 across the shore — ~0.9m tiles (53/5 ≈ the 48:4.5 aspect)
+    wrap: 'repeat', repeat: [53, 5], colorSpace: 'srgb', anisotropy: 4,
   },
   // the sea's CAUSTICS — a scrolling luminance dapple sampled in the water shader for sunlit
   // shallows (shaders.js makeWaterMaterial; additive, capped under the bloom threshold).
