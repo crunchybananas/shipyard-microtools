@@ -4,6 +4,7 @@
 // 1:240 waves for free.
 
 import * as THREE from 'three';
+import { getTexture } from './assets.js';
 
 const GLSL_NOISE = /* glsl */`
   float hash21(vec2 p) {
@@ -44,6 +45,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uFogColor: { value: new THREE.Color(0xcfe3e8) },
       uFogDen: { value: 0.003 },
       uNight: { value: 0 },
+      uCaustic: { value: getTexture('water_ripple') },   // scrolling dapple for the sunlit shallows
     },
     vertexShader: /* glsl */`
       uniform float uTime;
@@ -91,6 +93,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uniform vec3 uFogColor;
       uniform float uFogDen;
       uniform float uNight;
+      uniform sampler2D uCaustic;
       varying vec3 vLocal;
       varying vec3 vWorld;
       varying vec3 vNorm;
@@ -126,6 +129,12 @@ export function makeWaterMaterial(heightTex, domain) {
 
         // sky reflection
         vec3 col = mix(body, uSkyCol, fresnel * 0.75);
+
+        // caustics — sunlight dappling the sunlit SHALLOWS (daytime + shallow only, capped at
+        // 0.3*sun so the broad sea never crosses the 0.85 bloom threshold; damped on the 1:240 clone)
+        vec2 cuv = vLocal.xz * 0.07 + vec2(uTime * 0.03, -uTime * 0.024);
+        float caus = smoothstep(0.55, 0.93, dot(texture2D(uCaustic, cuv).rgb, vec3(0.299, 0.587, 0.114)));
+        col += uSunCol * caus * (1.0 - dfac) * 0.3 * smoothstep(-0.02, 0.14, uSunDir.y) * mix(1.0, 0.2, mini);
 
         // sun glitter — damped to a sheen on the model, full at sea
         vec3 R = reflect(-normalize(uSunDir), N);

@@ -82,6 +82,14 @@ export const MANIFEST = {
     prompt: 'seamless tileable dry coastal dune grass and pale scrub over sandy soil, top-down',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 4,
   },
+  // the sea's CAUSTICS — a scrolling luminance dapple sampled in the water shader for sunlit
+  // shallows (shaders.js makeWaterMaterial; additive, capped under the bloom threshold).
+  water_ripple: {
+    kind: 'texture', file: 'water_ripple.jpg', bytes: 41298,
+    license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
+    prompt: 'seamless tileable calm sea water surface, gentle wavelets and soft caustic dapple, top-down',
+    wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
+  },
   // the shore boulders — NATURAL cracked granite (no masonry seams, unlike the lighthouse 'stone'),
   // on the rocks InstancedMesh via applyRelief (albedo + derived normal so the cracks catch light).
   rock: {

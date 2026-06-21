@@ -759,6 +759,7 @@ export function buildWorld() {
       for (const x of ROWS) {
         gm4.makeTranslation(x, -2.2, z); colInst.setMatrixAt(ci, gm4);  // rooted at -6, top +1.6
         gm4.makeTranslation(x, 1.45, z); capInst.setMatrixAt(ci, gm4);
+        addCollider(x, z, 0.75);                                        // solid when the hall is drained + walkable
         ci++;
       }
     }
@@ -885,6 +886,7 @@ export function buildWorld() {
     // the dory — beached on the dry sand, bow toward the water, keeled over
     const dory = new THREE.Group(); dory.name = 'dory';
     dory.position.set(-26, heightAt(-26, -102) + 0.3, -102);
+    addCollider(-26, -102, 1.5);   // the beached boat is solid (was walk-through)
     dory.rotation.y = 0.7; dory.rotation.z = 0.13;
     const hg = new THREE.BoxGeometry(1.3, 0.52, 3.1, 1, 1, 5);
     const pa = hg.attributes.position;
@@ -939,6 +941,7 @@ export function buildWorld() {
       }
       g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
       m.position.set(px, heightAt(px, pz) + h / 2 - 0.25, pz);
+      addCollider(px, pz, 0.7);   // the standing stones are solid (you played through them)
       m.rotation.y = a + Math.PI + (r() - 0.5) * 0.2;
       m.castShadow = true;
       m.name = `stone${i}`;
