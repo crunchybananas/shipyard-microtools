@@ -500,7 +500,7 @@ export class Game {
     // tide easing + valve sound
     const dTide = W.tideTarget - W.tide;
     if (Math.abs(dTide) > 0.0004) {
-      W.tide = clamp(W.tide + Math.sign(dTide) * dt / 13, 0, 1);
+      W.tide = clamp(W.tide + Math.sign(dTide) * dt / 13, 0, 2); // [0,2]: tide>1 RAISES the sea for SEA-STRATA depths
       an.valveSpin += dt * 4 * Math.sign(dTide);
       A.valveRush(true);
       if (!this._causewayNoted && W.tide < 0.25) {

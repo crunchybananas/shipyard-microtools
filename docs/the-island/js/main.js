@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
 import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
@@ -981,7 +981,6 @@ player.onFootstep = (kind, pos) => {
 // ---------------- debug ----------------
 if (DEBUG) {
   gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
-  buildDebugPanel();
   window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI, composer, bloomPass,
     bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
@@ -1004,58 +1003,213 @@ if (DEBUG) {
     },
     getTwist: () => ({ keeperRose: !!W.flags.keeperRose, carried: !!W.flags.carried,
       rise: +game._keeperRise.toFixed(2), climbing: !!W.flags.climbing, level: W.level }),
-    getFinale: () => finale && { kind: finale.kind, t: finale.t, shown: !!finale.shown } };
+    getFinale: () => finale && { kind: finale.kind, t: finale.t, shown: !!finale.shown },
+    // --- testing toolkit (loop #118): Sea-Strata level jumps + encounter/state handles ---
+    goLevel: (n) => {                                  // jump to a level the RIGHT way (apply its LEVELS row)
+      n = Math.max(1, Math.min(n | 0, MAX_DEPTH));
+      const L = LEVELS[n];
+      W.level = n;
+      W.tide = W.tideTarget = L.tide;                  // raised tide (set both: skip the 13s ease)
+      if (n >= 2) W.regions.l2seen = true;
+      if (n >= 3) W.regions.l3seen = true;
+      if (n >= 4) W.regions.l4seen = true;
+      player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
+      save(player.pos);
+      return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };
+    },
+    dive: (instant = false) => {                       // the missing counterpart to ascend()
+      if (W.level >= MAX_DEPTH) { UI.whisper('Already at the bottom.'); return false; }
+      W.flags.plumbHung = true;                         // arm the plate so the mechanic is valid
+      if (instant) return window.ABYME.goLevel(Math.min(W.level + 1, MAX_DEPTH));
+      if (MODE !== 'play') return false;
+      startDive();
+      return true;
+    },
+    watcher: (cmd) => {                                 // 'spawn' | 'resolve' | 'reset' (the L3 grief figure)
+      const w = game.refs.watcher; if (!w) return null;
+      if (cmd === 'resolve') { W.flags.watcherSeen = true; return 'resolved'; }
+      if (cmd === 'reset') {
+        W.flags.watcherSeen = false; w.visible = false; w.scale.setScalar(1);
+        w.position.set(24, heightAt(24, -88) || 0, -88); game._watcherRegard = 0; return 'reset';
+      }
+      if (W.level < 3) W.level = 3;                      // Watcher only active at L>=3
+      W.flags.watcherSeen = false;
+      const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+      const wx = player.pos.x + fx * 12, wz = player.pos.z + fz * 12;
+      w.scale.setScalar(1); w.visible = true;
+      w.position.set(wx, heightAt(wx, wz) || 0, wz); game._watcherRegard = 0;
+      return { level: W.level, at: [+wx.toFixed(1), +wz.toFixed(1)] };
+    },
+    resetFlags: () => {                                 // in-world soft reset (no reload) for replaying chains
+      Object.keys(W.flags).forEach((k) => { W.flags[k] = false; });
+      W.level = 1; W.tide = W.tideTarget = 1; W.stems = 0;
+      W.lensPlaced = false; W.beamAngle = 2.2; W.dials = [0, 0, 0, 0]; W.inventory = [];
+      W.onceKeys = []; W.readKeys = [];
+      W.regions = { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] };
+      save(player.pos);
+      return 'flags reset (in-world)';
+    },
+    tideFigure: () => { UI.whisper('Tide-Figure encounter not yet implemented (LEVELS[2], region2/shallows).'); return 'not-implemented'; },
+    read: (loreId) => UI.openReader(loreId),            // open any lore fragment (verify deep pages at L>=3)
+    state: () => {                                      // one structured snapshot — feeds the panel readout too
+      const F = W.flags, L = LEVELS[W.level] || {};
+      const CLIFF_AZ = Math.atan2(57.5 - (-85), 50 - (-40));
+      const bd = Math.abs(((W.beamAngle - CLIFF_AZ + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+      return {
+        level: W.level, levelId: L.id, region: L.region || 'none', encounter: L.encounter,
+        time: +W.time.toFixed(2), window: isDawn() ? 'dawn' : isGolden() ? 'golden' : isNight() ? 'night' : 'day',
+        sunFrozen: W.timeDrift === 0,
+        tide: +W.tide.toFixed(2), tideTarget: +W.tideTarget.toFixed(2), waterY: +waterY().toFixed(2),
+        beamDelta: +bd.toFixed(3),
+        regions: { l2: W.regions.l2seen, l3: W.regions.l3seen, l4: W.regions.l4seen, fragments: W.regions.fragmentsFound.slice() },
+        inventory: W.inventory.slice(), stems: W.stems, once: W.onceKeys.length,
+        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'bellRung', 'readGlass'].filter((k) => F[k]),
+      };
+    },
+  };
+  buildDebugPanel();   // AFTER window.ABYME is assigned — the panel readout + buttons reference it
 }
 function buildDebugPanel() {
+  const A = window.ABYME;
+  const tp = (x, z, yaw = 0, pitch = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw, pitch);
+  const CLIFF_AZ = Math.atan2(57.5 - (-85), 50 - (-40));
+  // Every control's action, keyed; fed to ONE delegated click handler. Tooltips live in `groups`.
+  const acts = {
+    // Teleport
+    beach: () => tp(4, -104, 2.19), study: () => tp(LH.x + 3, LH.z - 2.5, 2.6),
+    stones: () => tp(SPOTS.stones.x, SPOTS.stones.y - 12, 0), islet: () => tp(138, -141, 0),
+    cliff: () => tp(40, 38, Math.atan2(57.5 - 40, 50 - 38)), bridge: () => tp(47, 25, 0),
+    dory: () => tp(-26, -104, 1.2), bluff: () => tp(SPOTS.hatch.x - 4, SPOTS.hatch.y + 4, Math.PI),
+    cellar: () => { W.flags.hatchOpen = true; tp(SPOTS.hatch.x, 20, Math.PI); },   // room center (z=20), not the surface pad
+    // Time & Tide (the two sliders are above, always visible)
+    dawn: () => { W.time = 6.5; W.timeDrift = 0; }, golden: () => { W.time = 17.8; W.timeDrift = 0; },
+    night: () => { W.time = 22; W.timeDrift = 0; }, freezeSun: () => { W.timeDrift = W.timeDrift > 0 ? 0 : 1 / 240; },
+    drain: () => { W.tide = W.tideTarget = 0; }, high: () => { W.tide = W.tideTarget = 1; },
+    mist: () => A.setMist(A.getMist() > 0.5 ? 0 : 1),
+    // Grant — surface chain
+    ruler: () => { W.flags.chestOpen = W.flags.rulerTaken = true; if (!W.inventory.includes('ruler')) W.inventory.push('ruler'); },
+    rulerPlace: () => { W.flags.chestOpen = W.flags.rulerTaken = W.flags.rulerPlaced = true; W.inventory = W.inventory.filter((i) => i !== 'ruler'); W.stems = Math.max(W.stems, 2); },
+    bird: () => { W.flags.heardBox = W.flags.heardBird = W.flags.birdSolved = true; W.stems = Math.max(W.stems, 3); },
+    lens: () => { W.flags.lensTaken = true; if (!W.inventory.includes('lens')) W.inventory.push('lens'); },
+    beamOn: () => { W.flags.lensTaken = true; W.lensPlaced = true; if (W.time > 4.6 && W.time < 20.6) W.time = 22; W.beamAngle = CLIFF_AZ; },
+    glyphs: () => { W.flags.glyphsSeen = true; W.stems = Math.max(W.stems, 5); },
+    glass: () => { W.flags.readGlass = true; if (!W.inventory.includes('readglass')) W.inventory.push('readglass'); },
+    allSurface: () => {
+      ['valveTurned', 'crankUsed', 'chestOpen', 'rulerTaken', 'rulerPlaced', 'heardBox', 'heardBird', 'birdSolved', 'lensTaken', 'glyphsSeen', 'shadowRevealed', 'hatchOpen', 'plumbTaken', 'plumbHung'].forEach((f) => { W.flags[f] = true; });
+      W.lensPlaced = true; W.dials = [3, 7, 1, 5]; W.beamAngle = CLIFF_AZ; W.stems = 5;
+      W.inventory = W.inventory.filter((x) => x !== 'ruler' && x !== 'lens');
+      if (!W.inventory.includes('plumb')) W.inventory.push('plumb');
+    },
+    // Grant — bluff / dive chain
+    shadow: () => { W.flags.shadowRevealed = true; },
+    hatch: () => { W.dials = [3, 7, 1, 5]; W.flags.shadowRevealed = W.flags.hatchOpen = true; W.stems = Math.max(W.stems, 4); },
+    plumb: () => { W.flags.plumbTaken = true; if (!W.inventory.includes('plumb')) W.inventory.push('plumb'); },
+    diveArm: () => { W.flags.plumbTaken = W.flags.plumbHung = true; if (!W.inventory.includes('plumb')) W.inventory.push('plumb'); },
+    // Levels & dives (SEA-STRATA)
+    L1: () => A.goLevel(1), L2: () => A.goLevel(2), L3: () => A.goLevel(3), L4: () => A.goLevel(4),
+    dive: () => A.dive(false), diveI: () => A.dive(true), asc: () => A.ascend(false), ascI: () => A.ascend(true),
+    bottom: () => A.bottom(),
+    // Encounters
+    birdSing: () => { tp(SPOTS.stones.x, SPOTS.stones.y - 12, 0); if (game._birdSing) game._birdSing(); },   // tp first — _birdSing no-ops >38m
+    wSpawn: () => A.watcher('spawn'), wResolve: () => A.watcher('resolve'), wReset: () => A.watcher('reset'),
+    twist: () => { A.bottom(); W.onceKeys = W.onceKeys.filter((k) => k !== 'keeperTwist'); W.flags.keeperRose = true; },
+    carried: () => { W.flags.keeperRose = true; W.flags.carried = true; }, tideFig: () => A.tideFigure(),
+    // Endings
+    ring: () => A.ring(), oar: () => { A.armOar(); A.leave(); }, replayIntro: () => A.setIntroT(0),
+    // Power & Reset
+    bench: () => { W.time = 12; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); },
+    replayCine: () => { W.onceKeys.length = 0; },
+    markLore: () => { W.readKeys = ['keeper_logbook', 'coat_letter', 'stone_inscription', 'music_note', 'bottle_note', 'quarters_journal', 'lens_mark_study', 'lens_mark_stone']; },
+    clearLore: () => { W.readKeys.length = 0; },
+    readLog: () => UI.openReader('keeper_logbook'), readQ: () => UI.openReader('quarters_journal'),
+    fragAdd: () => { W.regions.fragmentsFound.push('test-' + W.regions.fragmentsFound.length); },
+    fragClear: () => { W.regions.fragmentsFound.length = 0; },
+    clrRegions: () => { W.regions.l2seen = W.regions.l3seen = W.regions.l4seen = false; },
+    saveNow: () => save(player.pos), wipe: () => { wipe(); location.reload(); }, reset: () => A.resetFlags(),
+  };
+  // [act, label, tooltip] grouped into collapsible sections.
+  const groups = [
+    { title: 'Teleport', open: true, items: [
+      ['beach', 'beach', 'Wake-up / dive-landing beach (4,-104)'], ['study', 'study', 'Lighthouse study / chart table — the hub (valve, crank, model, plate, hook, bell)'],
+      ['stones', 'stones', 'Standing-stones vantage — all 5 in view'], ['islet', 'islet', 'Reading-glass islet (138,-141) — grab the brass glass + lens-mark stone'],
+      ['cliff', 'cliff', 'In front of the glyph cliff — watch the lighthouse beam write glyphs'], ['bridge', 'bridge', 'Chasm bridge deck (needs ruler✓ first, or you fall)'],
+      ['dory', 'dory', 'Beached dory / oar — the surface LEAVE terminal'], ['bluff', 'bluff', 'Bluff hatch TOP (surface pad above the cellar)'],
+      ['cellar', 'cellar↓', 'DOWN into the cellar/vault interior (auto-opens the hatch) — plumb, vault vista, room-that-disagrees'],
+    ] },
+    { title: 'Time & Tide', open: true, items: [
+      ['dawn', 'dawn', 'Jump to dawn 6.5h (songbird window) + freeze the sun'], ['golden', 'golden', 'Jump to golden hour 17.8h (hatch shimmer) + freeze the sun'],
+      ['night', 'night', 'Jump to night 22h (lamp/beam/glyphs) + freeze the sun'], ['freezeSun', '❄ sun', 'Freeze/unfreeze the sun drift — stops the clock creeping out of a window mid-setup'],
+      ['drain', 'drain', 'Tide → 0 (drained): exposes the chest, causeway, drowned gallery'], ['high', 'high', 'Tide → 1 (normal high water)'],
+      ['mist', 'mist', 'Toggle fog clear/full, independent of the hour'],
+    ] },
+    { title: 'Grant — surface chain', open: false, items: [
+      ['ruler', 'ruler+', 'Grant the ruler item (rulerTaken + inventory, de-duped)'], ['rulerPlace', 'ruler✓ bridge', 'Place the ruler → raises the chasm bridge (rulerPlaced, stem 2)'],
+      ['bird', 'bird✓', 'Solve the stones in one tap (opens the lens vault). Use Encounters→"bird sing" to actually hear it'], ['lens', 'lens+', 'Grant the first lens item (does NOT place it — use "beam on")'],
+      ['beamOn', 'beam on', 'Place the lens + go to night + aim the beam at the cliff. Teleport→cliff to see the glyphs light'], ['glyphs', 'glyphs✓', 'Grant glyphsSeen (the beam endgame) + stem 5, without perfect alignment'],
+      ['glass', 'glass+', 'Grant the reading glass — fades up the two lampblack lens-marks (study + stone)'], ['allSurface', 'ALL surface✓', 'Grant the ENTIRE surface→dive-armed chain + stems 1–5. Does NOT dive — leaves you at L1, plate armed'],
+    ] },
+    { title: 'Grant — bluff / dive chain', open: false, items: [
+      ['shadow', 'shadow✓', 'Reveal the 4 hatch glyph dials (the golden-hour shimmer click)'], ['hatch', 'hatch✓ code', 'Set dials to 3·7·1·5 + open the hatch (stem 4)'],
+      ['plumb', 'plumb+', 'Grant the plumb-bob item (does NOT hang it)'], ['diveArm', 'dive armed', 'Hang the plumb → the dive plate goes live (plumbHung). Adds plumb to inventory'],
+    ] },
+    { title: 'Levels & dives — SEA-STRATA', open: true, items: [
+      ['L1', 'L1 surface', 'Jump to L1 (surface): LEVELS[1] spawn (4,-104), tide 1.0, regions cleared'], ['L2', 'L2 shallows', 'Jump to L2 (shallows): raised tide 1.35, region2 visible, marks l2seen'],
+      ['L3', 'L3 midwater', 'Jump to L3 (midwater): bluff spawn, raised tide 1.65, region3 visible (Watcher active)'], ['L4', 'L4 source', 'Jump to L4 (bottom): study spawn, raised tide 1.9, region4 visible (keeper twist)'],
+      ['dive', 'dive ▼', 'Run the REAL 21s dive cinematic (+1 level). Auto-arms the plate'], ['diveI', 'dive ▼ i', 'Instant dive: +1 level with LEVELS spawn/tide/region applied, no cinematic'],
+      ['asc', 'ascend ▲', 'Run the REAL 28s ascent cinematic (−1 level)'], ['ascI', 'ascend ▲ i', 'Instant ascent: −1 level, no cinematic'],
+      ['bottom', 'bottom', 'Jump to the bottom (L4) leaning over the keeper figure — fires the twist proximity'],
+    ] },
+    { title: 'Encounters', open: true, items: [
+      ['birdSing', 'bird sing', 'Teleport to the stones + force the dawn songbird to sing now (set time→dawn for full audio)'], ['wSpawn', 'Watcher spawn', 'Spawn/reset the Watcher ~12m ahead (forces L≥3). Hold its gaze ~2.6s to resolve it for real'],
+      ['wResolve', 'Watcher resolve', 'Force-resolve the Watcher (watcherSeen) — it lifts its head and dissolves'], ['wReset', 'Watcher reset', 'Reset the Watcher to its origin + clear watcherSeen so it can be re-tested'],
+      ['twist', 'keeper twist', 'Force the bottom twist: jump to the bottom + set keeperRose (the figure has risen)'], ['carried', 'carried ✓', 'Set the "rose with you" branch (keeperRose+carried) to test the carried ending'],
+      ['tideFig', 'Tide-Fig n/i', 'PLACEHOLDER — the L2 Tide-Figure encounter is not yet built; this just prints a note'],
+    ] },
+    { title: 'Endings', open: false, items: [
+      ['ring', 'ring bell', 'BELL ending (accept the loop). Tone forks by depth — set the level first'], ['oar', 'row oar', 'OAR ending (leave, changed): arms + runs the look-back finale'],
+      ['replayIntro', 'replay intro', 'Restart the 19s intro flight (if one is live; else wipe+reload)'],
+    ] },
+    { title: 'Power & Reset', open: false, items: [
+      ['bench', 'bench (perf)', 'Fixed power-benchmark pose (noon + identical spawn) so the readout below is comparable run-to-run'],
+      ['replayCine', 'replay cines', 'Clear onceKeys so every one-time cinematic can fire again — the #1 reason a beat "won’t replay"'],
+      ['markLore', 'mark lore read', 'Mark every lore fragment read (audit the deep-reveal economy). Use "read log/Q" to actually display them'], ['clearLore', 'clear lore', 'Empty readKeys so first-read lines + deep reveals fire fresh'],
+      ['readLog', 'read log', 'Open the keeper’s logbook reader (deep page at L≥3)'], ['readQ', 'read Q', 'Open the quarters journal reader (deep page at L≥3)'],
+      ['fragAdd', 'frag+', 'Push a test id into regions.fragmentsFound (exercise the strata persistence)'], ['fragClear', 'frag clr', 'Empty regions.fragmentsFound'], ['clrRegions', 'clr seen', 'Clear l2/l3/l4 seen — re-test "first reach" growth'],
+      ['saveNow', 'save', 'Force a save() of current state + position'], ['reset', 'reset flags', 'Soft-reset all flags/level/tide/inventory/onceKeys to defaults WITHOUT reloading'], ['wipe', 'wipe ↻', 'Wipe the save + reload for a clean first-run — the cure for stale state'],
+    ] },
+  ];
+  const btn = ([act, label, tip]) => `<button data-act="${act}" title="${tip.replace(/"/g, '&quot;')}">${label}</button>`;
+  const grp = (g) => `<details class="dbg-grp"${g.open ? ' open' : ''}><summary>${g.title}</summary><div class="dbg-row">${g.items.map(btn).join('')}</div></details>`;
   const el = document.createElement('div');
   el.id = 'debug-panel';
   el.innerHTML = `
-    <label>time <input type="range" id="dbg-time" min="0" max="24" step="0.05"><span id="dbg-time-v"></span></label>
-    <div class="row">
-      <button data-act="tide">tide</button>
-      <button data-act="beach">beach</button><button data-act="study">study</button>
-      <button data-act="stones">stones</button><button data-act="bluff">bluff</button>
-      <button data-act="ruler">+ruler</button><button data-act="bird">bird✓</button>
-      <button data-act="lens">+lens</button><button data-act="shadow">shadow✓</button>
-      <button data-act="code">code✓</button><button data-act="plumb">+plumb✓</button>
-      <button data-act="L2">level2</button><button data-act="bench">bench</button>
-    </div>
+    <div id="dbg-state-1"></div><div id="dbg-state-2"></div>
+    <label class="dbg-sl">time <input type="range" id="dbg-time" min="0" max="24" step="0.05" title="Sun clock 0–24h"><span id="dbg-time-v"></span></label>
+    <label class="dbg-sl">tide <input type="range" id="dbg-tide" min="0" max="2" step="0.05" title="Sea level — 0 drained · 1 high · 2 fully raised (>1 = raised strata sea)"><span id="dbg-tide-v"></span></label>
+    ${groups.map(grp).join('')}
     <div id="dbg-fps"></div>`;
   document.body.appendChild(el);
-  const slider = el.querySelector('#dbg-time');
-  slider.value = W.time;
-  slider.addEventListener('input', () => { W.time = parseFloat(slider.value); });
-  el.addEventListener('click', (e) => {
-    const act = e.target?.dataset?.act;
-    if (!act) return;
-    const tp = (x, z, yaw = 0) => player.spawn(new THREE.Vector3(x, 0, z), yaw);
-    ({
-      tide: () => { W.tideTarget = W.tideTarget > 0.5 ? 0 : 1; },
-      beach: () => tp(4, -104, 2.19),
-      study: () => tp(LH.x + 3, LH.z - 2.5, 2.6),
-      stones: () => tp(SPOTS.stones.x, SPOTS.stones.y - 12, 0),
-      bluff: () => tp(SPOTS.hatch.x - 4, SPOTS.hatch.y + 4, Math.PI),
-      ruler: () => { W.flags.rulerTaken = true; W.inventory.push('ruler'); },
-      bird: () => { W.flags.heardBox = W.flags.heardBird = W.flags.birdSolved = true; },
-      lens: () => { W.flags.lensTaken = true; W.inventory.push('lens'); },
-      shadow: () => { W.flags.shadowRevealed = true; },
-      code: () => { W.dials = [...[3, 7, 1, 5]]; W.flags.shadowRevealed = true; W.flags.hatchOpen = true; },
-      plumb: () => { W.flags.plumbTaken = true; W.flags.plumbHung = true; },
-      L2: () => { W.level = 2; },
-      // fixed bench pose for the Power Ledger — identical view every measurement
-      bench: () => { W.time = 12; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); },
-    })[act]?.();
-  });
+  const tslider = el.querySelector('#dbg-time'); tslider.value = W.time;
+  tslider.addEventListener('input', () => { W.time = parseFloat(tslider.value); });
+  const dslider = el.querySelector('#dbg-tide'); dslider.value = W.tide;
+  dslider.addEventListener('input', () => { W.tide = W.tideTarget = parseFloat(dslider.value); });
+  el.addEventListener('click', (e) => { const act = e.target?.dataset?.act; if (act && acts[act]) acts[act](); });
   setInterval(() => {
+    const s = A.state();
     el.querySelector('#dbg-time-v').textContent = W.time.toFixed(1) + 'h';
+    el.querySelector('#dbg-tide-v').textContent = W.tide.toFixed(2);
+    const s1 = el.querySelector('#dbg-state-1'), s2 = el.querySelector('#dbg-state-2');
+    s1.textContent = `L${s.level} ${s.levelId} · ${s.region} · ${s.encounter} · tide ${s.tide}${s.tide !== s.tideTarget ? '→' + s.tideTarget : ''} (y${s.waterY}) · ${s.window} ${s.time}h${s.sunFrozen ? ' ❄' : ''}`;
+    s1.className = s.tide > 1 ? 'raised' : '';
+    const seen = [s.regions.l2 && '2', s.regions.l3 && '3', s.regions.l4 && '4'].filter(Boolean).join('') || '—';
+    s2.textContent = `inv:[${s.inventory.join(',') || '—'}] · stems ${s.stems} · once ${s.once} · beamΔ${s.beamDelta} · ${s.flags.join(' ') || 'no key flags'} · seen:${seen} frags:${s.regions.fragments.length}`;
+    s2.className = s.flags.length ? '' : 'dim';
     const calls = renderer.info.render.calls, tris = renderer.info.render.triangles;
     const gms = gpuTimer ? gpuTimer.ms : 0;
     const fpsEl = el.querySelector('#dbg-fps');
-    // the Power Ledger line: fps can't prove power-neutrality (the 60fps cap hides
-    // headroom) — GPU-frame-ms is the real signal. Reconciled budget: draws <360.
     fpsEl.textContent = `${fps.toFixed(0)}fps · ${calls} draws · ${(tris / 1000).toFixed(0)}k tris · ${gms.toFixed(1)}ms gpu${gpuTimer && gpuTimer.mode === 'cpu' ? '(cpu~)' : ''}`;
     fpsEl.style.color = (calls >= 360 || tris >= 800000 || fps < 58) ? '#e8a0a0' : '#9fe8c5';
-    slider.value = W.time;
+    tslider.value = W.time; dslider.value = W.tide;
   }, 400);
 }
 
