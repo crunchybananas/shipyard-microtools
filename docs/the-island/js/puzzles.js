@@ -212,7 +212,9 @@ export class Game {
         this.flag('lensTaken');
         W.inventory.push('lens');
         A.chime();
-        UI.whisper('Cold as seawater, clear as morning.');
+        UI.whisper('Cold as seawater, clear as morning — a lamp’s eye, far too fine for a pocket.');
+        // forward thread: the stones puzzle dead-ended here for testers — say where the glass wants to go.
+        UI.addJournal('Took the first lens from the stones’ vault. It is a lighthouse lamp’s eye, ground and polished thin — and back in the study, the model on the chart table stands eyeless in its little lamp room. Glass like this only ever wants to be put back.');
         save(this.player.pos);
       },
     });
