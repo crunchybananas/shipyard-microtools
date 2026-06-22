@@ -923,7 +923,7 @@ export function buildWorld() {
     // the terrain so it never floats/z-fights; the seaward edge sits under the shallow water (wet
     // pebbles), the landward edge on the wet sand. Decorative, no collision. ONE mesh.
     {
-      const cx = -8, cz = -104.5, w = 48, d = 4.5, nx = 40, nz = 6;   // thin band hugging the south waterline
+      const cx = -8, cz = -102.5, w = 48, d = 8, nx = 40, nz = 10;   // band: waterline (z~-106.5) up the beach (z~-98.5), room for pebbles to gradient into sand
       const ag = new THREE.PlaneGeometry(w, d, nx, nz);
       ag.rotateX(-Math.PI / 2);
       const ap = ag.attributes.position;
@@ -935,43 +935,44 @@ export function buildWorld() {
       ag.computeVertexNormals();
       const apronMat = new THREE.MeshStandardMaterial({ color: 0xb9b3a6, roughness: 0.9, flatShading: true });
       applyRelief(apronMat, 'pebble', { normalScale: 0.5, strength: 2.0 });
-      // DE-TILE the pebbles + DISSOLVE the rectangular edge into the sand.
-      //  - de-tile: warp the albedo sample coord with low-freq value-noise so the [53,5] column
+      // DE-TILE the pebbles + GRADIENT-BLEND the shingle into the sand (no hard line anywhere).
+      //  - de-tile: warp the albedo sample coord with low-freq value-noise so the [53,12] column
       //    lattice dissolves. Compile-safe: sample a warped LOCAL, never mutate the read-only vMapUv.
-      //  - edge dissolve: scatter pebble DENSITY to 0 toward the border on a noisy threshold, so
-      //    pebbles thin into the de-tiled sand terrain just beneath (apron sits at height+0.04)
-      //    instead of ending on a hard line. +0 texture fetches either way (pure ALU value-noise).
+      //  - blend: pebble DENSITY is full at the waterline and thins to nothing up the beach over a
+      //    ~6.5m band, gated by a per-pebble value-noise threshold so the thinning SCATTERS (stray
+      //    pebbles strand out on the de-tiled sand beneath) rather than ending on a boundary. The
+      //    seaward lip + x-ends are softened too. Early discard, +0 texture fetches (pure ALU noise).
       apronMat.onBeforeCompile = (sh) => {
-        // carry the strip's 0..1 uv to the fragment stage for the edge math
+        // carry world XZ to the fragment stage (geometry positions are baked world coords)
         sh.vertexShader = sh.vertexShader
-          .replace('#include <common>', '#include <common>\nvarying vec2 vApUv;')
-          .replace('#include <uv_vertex>', '#include <uv_vertex>\n  vApUv = uv;');
+          .replace('#include <common>', '#include <common>\nvarying vec2 vApW;')
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\n  vApW = position.xz;');
         sh.fragmentShader = sh.fragmentShader
           .replace('#include <common>', '#include <common>\n' +
-            'varying vec2 vApUv;\n' +
+            'varying vec2 vApW;\n' +
             'float apHash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n' +
             'float apVN(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);\n' +
             '  float a=apHash(i),b=apHash(i+vec2(1.0,0.0)),c=apHash(i+vec2(0.0,1.0)),d=apHash(i+vec2(1.0,1.0));\n' +
             '  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y); }')
-          // edge dissolve (early discard): apDens = 0 at the border → 1 a metre or so in; a per-pebble
-          // value-noise threshold makes the boundary scatter (stray pebbles on the sand, sand intruding
-          // into pebbles) rather than a straight fade. Strip is 48m (u) x 4.5m (v).
+          // shingle->sand density gradient (vApW.y = world z; seaward ~-106, landward ~-96):
           .replace('#include <clipping_planes_fragment>',
             '#include <clipping_planes_fragment>\n' +
-            '  float apEdge = min(min(vApUv.x, 1.0 - vApUv.x) * 48.0, min(vApUv.y, 1.0 - vApUv.y) * 4.5);\n' +
-            '  float apDens = smoothstep(0.0, 1.5, apEdge);\n' +
-            '  if (apDens < apVN(vApUv * vec2(64.0, 6.0))) discard;')
+            '  float apDens = 1.0 - smoothstep(-104.5, -99.0, vApW.y);            // full at the water, ->0 up the beach\n' +
+            '  apDens *= smoothstep(-106.5, -105.3, vApW.y);                      // soften the seaward lip into the water\n' +
+            '  apDens *= smoothstep(-32.0, -29.5, vApW.x) * smoothstep(16.0, 13.5, vApW.x);  // soften the two ends\n' +
+            '  if (apDens < apVN(vApW * 1.3)) discard;                            // noisy threshold -> scattered thinning\n')
           .replace('#include <map_fragment>',
             '#ifdef USE_MAP\n' +
-            '  vec2 apW = (vec2(apVN(vMapUv * 0.4), apVN(vMapUv * 0.4 + 19.7)) - 0.5) * 0.7;\n' +
-            '  vec4 sampledDiffuseColor = texture2D( map, vMapUv + apW );\n' +
+            '  vec2 apWarp = (vec2(apVN(vMapUv * 0.4), apVN(vMapUv * 0.4 + 19.7)) - 0.5) * 0.7;\n' +
+            '  vec4 sampledDiffuseColor = texture2D( map, vMapUv + apWarp );\n' +
             '  diffuseColor *= sampledDiffuseColor;\n' +
             '#endif');
       };
       apronMat.needsUpdate = true;
       const apron = new THREE.Mesh(ag, apronMat);
       apron.name = 'pebbleApron';
-      apron.receiveShadow = true;
+      apron.receiveShadow = false;   // flat open-shore pebbles barely catch shadows; skipping the PCF
+                                     // sample per fragment cuts the deep strip's grazing-angle GPU cost
       core.add(apron);
     }
   }
