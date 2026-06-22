@@ -135,6 +135,55 @@ export function buildWorld() {
   const region3 = new THREE.Group(); region3.name = 'region3'; region3.visible = false; core.add(region3);
   const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
 
+  // SEA-STRATA L2 "shallows" (loop #119): a kelp forest along the sunk causeway + south-shore
+  // shallows — submerged at the raised L2 tide, so diving here wades a drowned kelp avenue, not the
+  // dry beach. One InstancedMesh (1 draw), swaying on the wave clock via swayMats. region2-only
+  // (pruned from the clone). Own rng so it never shifts the world scatter.
+  {
+    const kr = mulberry32(SEED ^ 0x4e19);
+    const frond = new THREE.PlaneGeometry(0.55, 4.2, 1, 5);
+    frond.translate(0, 2.1, 0);                       // base at y=0, rises up
+    const kelpMat = new THREE.MeshStandardMaterial({ color: 0x3c5a3e, roughness: 0.8, side: THREE.DoubleSide });
+    kelpMat.onBeforeCompile = (sh) => {
+      sh.uniforms.uTime = { value: 0 };
+      kelpMat.userData.shader = sh;
+      sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
+        #include <begin_vertex>
+        #ifdef USE_INSTANCING
+          float kw = instanceMatrix[3].x * 0.21 + instanceMatrix[3].z * 0.17;   // per-frond phase
+          float kh = pow(max(position.y, 0.0), 1.6);                            // tips sway most
+          transformed.x += sin(uTime * 0.7 + kw) * 0.55 * kh;                   // slow languid underwater drift
+          transformed.z += cos(uTime * 0.55 + kw * 1.3) * 0.4 * kh;
+        #endif
+      `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
+    };
+    const KN = 420;
+    const kelp = new THREE.InstancedMesh(frond, kelpMat, KN);
+    kelp.name = 'kelp'; kelp.castShadow = false; kelp.receiveShadow = false;
+    const km = new THREE.Matrix4(), kq = new THREE.Quaternion(), ke = new THREE.Euler(), kc = new THREE.Color();
+    let ki = 0;
+    const plantKelp = (x, z) => {
+      const h = heightAt(x, z);
+      if (!Number.isFinite(h) || h > 1.6) return;     // only the low shore zone that the L2 tide floods
+      const s = 0.7 + kr() * 0.9;
+      km.compose(new THREE.Vector3(x, h, z),
+        kq.setFromEuler(ke.set((kr() - 0.5) * 0.22, kr() * TAU, (kr() - 0.5) * 0.22)),
+        new THREE.Vector3(s, s * (0.8 + kr() * 0.85), s));
+      kelp.setMatrixAt(ki, km);
+      kc.setHSL(0.32 + kr() * 0.07, 0.32 + kr() * 0.18, 0.2 + kr() * 0.13);
+      kelp.setColorAt(ki, kc); ki++;
+    };
+    for (let i = 0; i < KN * 5 && ki < KN; i++) {
+      let x, z;
+      if (kr() < 0.6) { x = -38 + kr() * 96; z = -98 - kr() * 16; }                 // south-shore shallows band
+      else { const t = kr(); x = 48 + 64 * t + (kr() - 0.5) * 10; z = -78 - 54 * t + (kr() - 0.5) * 10; }  // sunk causeway A→B
+      plantKelp(x, z);
+    }
+    kelp.count = ki; kelp.instanceMatrix.needsUpdate = true;
+    if (kelp.instanceColor) kelp.instanceColor.needsUpdate = true;
+    region2.add(kelp);
+  }
+
   const waterMat = makeWaterMaterial(heightTex, DOMAIN);
   const water = new THREE.Mesh(new THREE.PlaneGeometry(DOMAIN, DOMAIN, 120, 120), waterMat);
   water.geometry.rotateX(-Math.PI / 2);

@@ -695,6 +695,7 @@ const _moonV = new THREE.Vector3();
 const MOONLIGHT = new THREE.Color(0x9fb8d9);
 const swayMats = ['grass', 'canopies']
   .map((n) => core.children.find((o) => o.name === n)?.material)
+  .concat(core.getObjectByName('kelp')?.material)   // kelp lives in region2 (pruned from clone, so unique)
   .filter(Boolean);
 let flash = 0, prevEl = sunElevation(W.time);
 
