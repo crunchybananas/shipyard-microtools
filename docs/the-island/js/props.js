@@ -127,6 +127,14 @@ export function buildWorld() {
   const heightTex = buildHeightTexture();
   core.add(terrain);
 
+  // SEA-STRATA regions (loop #117, Phase 0): one content shell per drowned level, built
+  // once and shown one-at-a-time by W.level in puzzles _apply (region<N>.visible). Empty
+  // until each level is authored. Pruned from the 1:240 clone (the model is the surface
+  // island only). Named so collectRefs() finds them on the island instance.
+  const region2 = new THREE.Group(); region2.name = 'region2'; region2.visible = false; core.add(region2);
+  const region3 = new THREE.Group(); region3.name = 'region3'; region3.visible = false; core.add(region3);
+  const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
+
   const waterMat = makeWaterMaterial(heightTex, DOMAIN);
   const water = new THREE.Mesh(new THREE.PlaneGeometry(DOMAIN, DOMAIN, 120, 120), waterMat);
   water.geometry.rotateX(-Math.PI / 2);
@@ -1761,7 +1769,7 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -1838,6 +1846,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
+  'region2', 'region3', 'region4',   // SEA-STRATA per-level content shells (loop #117)
 ];
 
 export function collectRefs(root) {

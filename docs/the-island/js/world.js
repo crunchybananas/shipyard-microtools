@@ -72,6 +72,9 @@ export const W = {
   dials: [0, 0, 0, 0],   // hatch glyph dials
   playerPos: null,       // saved position
   level: 1,
+  // SEA-STRATA (loop #117): persisted explored-state per drowned region — which deeper
+  // levels you have reached + the fragments found, so the Meow-Wolf map stays "grown".
+  regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
 };
 
 // ---------------- celestial mechanics (fantasy sky, art-directed) -------------
@@ -168,6 +171,22 @@ const ERA_CASTS = [
   new THREE.Color(0x2f6cc8), // L4 — cold isolation blue
   new THREE.Color(0x573a72), // L5+ — dead violet, the keeper's near-dark floor
 ];
+// ---- SEA-STRATA level-areas (loop #117): the canonical per-level descriptor table ----
+// Each dive-level is a deeper register of the SAME island, drowned further by a rising
+// tide. A region<N> content group (built once in props.buildWorld, shown by W.level in
+// puzzles _apply) plus the per-level spawn / tide / encounter live HERE so designers edit
+// one place instead of the scattered {2:,3:,4:} literals.
+//   tide > 1 RAISES the sea ABOVE high-water (waterY = -TIDE_DROP*(1-tide), so tide 1.35
+//   ≈ +1.5m). The spawn-override + tide-raise are wired with each level's content; this
+//   table is the data they read. Indexed by W.level (1..MAX_DEPTH); [0] unused.
+export const LEVELS = [
+  null,
+  { id: 'surface',  region: null,       spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.0,  encounter: 'songbird' },
+  { id: 'shallows', region: 'region2',  spawn: { pos: [4, 0, -104],      yaw: 2.19, pitch: 0.02 },  tide: 1.35, encounter: 'tideFigure' },
+  { id: 'midwater', region: 'region3',  spawn: { pos: [90, 0, 30],       yaw: 3.7,  pitch: -0.05 }, tide: 1.65, encounter: 'watcher' },
+  { id: 'source',   region: 'region4',  spawn: { pos: [-82.8, 0, -41.4], yaw: 2.19, pitch: 0.02 },  tide: 1.9,  encounter: 'keeper' },
+];
+
 const _BIAS_KEYS = ['skyTop', 'skyHorizon', 'sunCol', 'hemiSky', 'hemiGnd', 'fog', 'water', 'waterShallow'];
 const _LUM_FLOOR = 0.045; // no channel crushes to unresolvable black (night × depth)
 
@@ -242,7 +261,7 @@ export function save(playerPos) {
       time: W.time, tide: W.tideTarget, lensPlaced: W.lensPlaced,
       beamAngle: W.beamAngle, flags: W.flags, stems: W.stems,
       inventory: W.inventory, journal: W.journal, level: W.level,
-      onceKeys: W.onceKeys, readKeys: W.readKeys, dials: W.dials,
+      onceKeys: W.onceKeys, readKeys: W.readKeys, dials: W.dials, regions: W.regions,
       pos: playerPos ? [playerPos.x, playerPos.y, playerPos.z] : null,
     }));
   } catch (_) { /* private mode: the island forgets */ }
@@ -267,6 +286,7 @@ export function load() {
     W.readKeys = s.readKeys || [];
     W.dials = Array.isArray(s.dials) && s.dials.length === 4 ? s.dials : [0, 0, 0, 0];
     W.level = s.level ?? 1;
+    if (s.regions) W.regions = Object.assign(W.regions, s.regions); // keep defaults for new keys
     // a save written mid-dive has dove=true but level 1 — land the dive
     if (W.flags.dove && W.level < 2) W.level = 2;
     W.playerPos = s.pos ? new THREE.Vector3(...s.pos) : null;

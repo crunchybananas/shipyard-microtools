@@ -767,6 +767,13 @@ export class Game {
     const an = this.anim;
     const F = W.flags;
 
+    // SEA-STRATA (loop #117): show exactly the active level's region shell. Driven from
+    // W.level every frame (not imperatively at dive time) so a reload restores the right
+    // register. Guarded — the regions are pruned from the clone, so this no-ops on isModel.
+    if (R.region2) R.region2.visible = W.level === 2;
+    if (R.region3) R.region3.visible = W.level === 3;
+    if (R.region4) R.region4.visible = W.level === 4;
+
     // orrery follows the sky
     const az = sunAzimuth(W.time), el = sunElevation(W.time);
     if (R.orreryPivot) R.orreryPivot.rotation.y = az - Math.PI / 2;
