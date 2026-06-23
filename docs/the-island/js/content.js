@@ -231,4 +231,7 @@ export const SKETCHES = [
   ['the cot-journal turns', S('<path d="M40 11h16l-2 7H42z"/><path d="M44 18v5h8v-5" opacity=".7"/><path d="M48 23v3M43 26l5 9 5-9z" opacity=".6"/><path d="M30 15l9 4M66 15l-9 4" opacity=".4"/>')],
   ['below the worn cut a fainter line is bared', S('<path d="M34 37V15c0-3 3-5 7-5h10c4 0 7 2 7 5v22z"/><path d="M40 18h16" opacity=".85"/><path d="M40 25h16" opacity=".3"/><path d="M14 37h68" opacity=".4"/>')],
   ['inside of the fold', S('<path d="M28 30l30-8 2 8-30 8z" opacity=".7"/><path d="M58 22l-6 2 2 6" opacity=".5"/><circle cx="40" cy="31" r="2"/><circle cx="51" cy="28" r="2"/><path d="M42 31v-8M53 28v-8" opacity=".75"/>')],
+  // the two BONUS deep-read lines (loop #146) — finishing the journal marginalia.
+  ['the kettle was never for someone else', S('<path d="M32 33c-2-8-1-14 4-16h20c5 2 6 8 4 16z"/><path d="M40 17c2-4 14-4 16 0" opacity=".7"/><path d="M56 22l8-3 1 4" opacity=".6"/><path d="M44 11q2-3 0-6M52 11q2-3 0-6" opacity=".5"/><path d="M28 36h36" opacity=".4"/>')],
+  ['note has writing on its back', S('<path d="M22 23h26v12H22z"/><path d="M48 25l8 1v8l-8 1" opacity=".8"/><path d="M56 27h6v6h-6" opacity=".7"/><path d="M26 27h18M26 31h12" opacity=".45"/>')],
 ];
