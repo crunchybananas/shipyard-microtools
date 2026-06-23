@@ -1961,7 +1961,11 @@ function buildVegetation(core, r) {
       q.setFromEuler(e.set(0, r() * TAU, (r() - 0.5) * 0.25)),
       new THREE.Vector3(s, s * (0.7 + r() * 0.7), s));
     grass.setMatrixAt(gi, m4);
-    gcol.setHSL(0.14 + r() * 0.07, 0.38 + r() * 0.2, 0.3 + r() * 0.14);
+    // per-tuft tone (loop #144): the old hue was locked to gold (.14-.21) → one flat dry dune. Widen
+    // toward green with a gv² skew so MOST tufts stay sun-bleached gold but some are lush olive-green,
+    // plus more value range — a living coastal meadow, not uniform dead brush. (× the 0xb39a52 base.)
+    const gv = r();
+    gcol.setHSL(0.13 + gv * gv * 0.18, 0.34 + r() * 0.26, 0.27 + r() * 0.2);
     grass.setColorAt(gi, gcol);
     gi++;
   };
