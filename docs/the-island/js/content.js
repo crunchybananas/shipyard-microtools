@@ -220,4 +220,10 @@ export const SKETCHES = [
   ['keep leaving this study', S('<path d="M22 35V17l7-4v22M22 23h7" opacity=".85"/><path d="M20 35h13"/><path d="M52 24h16v5q0 4-8 4t-8-4z"/><path d="M68 26q5 0 5 4t-5 3" opacity=".6"/>')],
   ['which of us holds the pen', S('<path d="M30 31l23-19 6 6-23 19-9 3z" opacity=".85"/><path d="M51 12l6 6" opacity=".5"/><path d="M20 35h9" opacity=".6"/>')],
   ['it only hopes', S('<path d="M16 26c4-8 14-11 24-11s20 3 26 11" opacity=".55"/><path d="M12 30h72"/><path d="M28 30h40" opacity=".7"/><path d="M70 13l2-4 2 4-2 3z" opacity=".6"/>')],
+  // SEA-STRATA fragments + the deep-read close (loop #142) — give the accreting journal entries
+  // from #131-140 their marginalia too, in the same low-stroke hand.
+  ['wax slate tangled', S('<path d="M30 31c-6-6-9-14-8-23" opacity=".45"/><path d="M70 32c5-7 7-15 5-24" opacity=".45"/><rect x="36" y="9" width="24" height="23" rx="2"/><path d="M41 15h14M41 20h14M41 25h9" opacity=".7"/>')],
+  ['cairn on the L3 bluff', S('<ellipse cx="48" cy="33" rx="17" ry="4.5"/><ellipse cx="46" cy="26" rx="12.5" ry="4"/><ellipse cx="49" cy="20" rx="8.5" ry="3.5"/><circle cx="48" cy="13" r="3"/><path d="M48 10v-3" opacity=".5"/>')],
+  ['weighted with a stone on the cold floor', S('<path d="M30 26l28-7 3 10-28 7z"/><path d="M58 19l-7 2 3 7" opacity=".55"/><path d="M35 24l16-4M35 28l13-3" opacity=".4"/><ellipse cx="38" cy="28" rx="4" ry="3"/><path d="M18 35h60" opacity=".35"/>')],
+  ['All four said more', S('<circle cx="48" cy="11" r="4.5"/><path d="M48 15v9"/><path d="M48 17l-9 5M48 17l9 5"/><path d="M40 23q-14 9 8 13t8-13" opacity=".6"/><path d="M12 36h72" opacity=".3"/>')],
 ];
