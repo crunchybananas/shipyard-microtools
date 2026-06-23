@@ -38,12 +38,18 @@ While a **reading surface is open**, the reader owns input — J/M/C and walking
 
 ## 2. Tester's fast-travel toolkit (`?debug` only)
 
-### Debug PANEL chips (top of screen)
-- **time** slider (0–24h) — sets `W.time` instantly (same effect as the in-world crank). Use it for every time-gated beat.
-- **tide** — toggles `W.tideTarget` 0↔1 (sea eases over ~13s). Drain to expose the chest/causeway/gallery.
-- **Teleports:** `beach` (4,−104) · `study` (≈−82,−42.5) · `stones` (135,−158, dropped back so all 5 stones are visible) · `bluff` (near hatch 97,32).
-- **State grants:** `+ruler` (rulerTaken+inv) · `bird✓` (heardBox+heardBird+birdSolved) · `+lens` (lensTaken+inv) · `shadow✓` (shadowRevealed) · `code✓` (dials=[3,7,1,5]+shadowRevealed+hatchOpen) · `+plumb✓` (plumbTaken+plumbHung) · `level2` (W.level=2 raw, no `dove`).
-- **bench** — fixed Power-Ledger pose (time 12, standard spawn); read the fps/draws/tris/GPU-ms line below it (turns red if calls≥360, tris≥800k, or fps<58).
+### Debug PANEL (top-left, 8 collapsible groups) + the live STATE readout
+The `?debug` panel is grouped, labelled and tooltipped, with a 2-line live **state readout** at the top
+(level/region · encounter · tide+waterY · window · inv · stems · beamΔ · key flags · regions-seen · frags;
+the tide line turns **amber when tide>1**). Press **`` ` ``** (backtick) — or the **▾ hide** header button — to toggle the panel.
+- **Teleport:** `beach` · `study` · `stones` · `islet` · `cliff` · `bridge` · `dory` · `bluff` · `cellar↓`.
+- **Time & Tide:** `dawn` · `golden` · `night` · `❄ sun` · `drain` · `high` · `mist`, plus a **time** slider (0–24h → `W.time`) and a **tide** slider **(0–2)**. NOTE: tide **>1 RAISES** the sea above high-water (`waterY = -TIDE_DROP·(1-tide)`); the dive-levels use 1.35 / 1.65 / 1.9. `drain`→low, `high`→raised.
+- **Grant — surface chain:** `ruler+` · `ruler✓ bridge` · `bird✓` · `lens+` · `beam on` · `glyphs✓` · `glass+` · `ALL surface✓` (the whole surface chain at once).
+- **Grant — bluff / dive chain:** `shadow✓` · `hatch✓ code` (dials=[3,7,1,5]+`hatchOpen`) · `plumb+` · `dive armed`.
+- **Levels & dives — SEA-STRATA:** `L1 surface` · `L2 shallows` · `L3 midwater` · `L4 source` (each = `ABYME.goLevel(n)`: applies the LEVELS row — region + raised tide + spawn) · `dive ▼` / `dive ▼ i` (instant) · `ascend ▲` / `ascend ▲ i` · `bottom`.
+- **Encounters:** `bird sing` · `Watcher spawn` / `Watcher resolve` / `Watcher reset` · `keeper twist` · `carried ✓` · `Tide-Figure`.
+- **Endings** (collapsed) · **Power & Reset:** `ring bell` · `row oar` · `replay intro` · `bench (perf)` · `replay cines` · `mark lore read` · `clear lore` · `read log` · `read Q` · `frag+` / `frag clr` · `clr seen` · `save` · `reset flags` · `wipe ↻`.
+- **bench (perf)** — fixed Power-Ledger pose (time 12); read the fps/draws/tris/GPU-ms line (red if calls≥360, tris≥800k, or fps<58).
 
 ### `window.ABYME` console API
 Handles: `player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI, composer, bloomPass`.
@@ -63,7 +69,15 @@ ABYME.W.time = 22             // night (lamp/beam)  sunElev < -0.06
 // --- grant state directly ---
 ABYME.W.flags.readGlass = true        // reveal lens marks without the islet trip
 ABYME.W.lensPlaced = true             // (top-level field, NOT under flags!)
-ABYME.W.level = 3                     // raw level set (Watcher / keeper-look tier)
+
+// --- SEA-STRATA levels (PREFER goLevel over raw W.level — it applies the whole LEVELS row) ---
+ABYME.goLevel(3)    // jump to a level: region + raised tide + spawn  (1 surface · 2 shallows · 3 midwater · 4 source)
+ABYME.dive(true)    // run the real dive snap (true = instant) ; ABYME.ascend(true) to rise
+ABYME.watcher('spawn')        // L3 Watcher encounter: 'spawn' | 'resolve' | 'reset'
+ABYME.tideFigure()            // arm the L2 Tide-Figure encounter
+ABYME.read('keeper_logbook')  // open a lore fragment by id (marks readKeys + journal; deep pages unlock at depth)
+ABYME.state()                 // dump the live state line ; ABYME.resetFlags() clears puzzle flags for a fresh run
+// (raw `ABYME.W.level = 3` sets only the number — it does NOT apply the region/tide/spawn; use goLevel.)
 
 // --- jump to the deep beats / endings ---
 ABYME.bottom()      // W.level=MAX_DEPTH(4), plumbHung+dove, spawns leaning over the keeper → the TWIST fires
@@ -155,6 +169,17 @@ Readable fragments (click → `UI.openReader`; first read drops a journal line):
 - **Keeper's logbook** — study chart table (~−86.4,−39.3). Click **`logbook`** (6 pages). **Deep 7th page** only appears on a **re-read at L≥3**.
 - **Coat letter** — annex, on the keeper's coat. Click **`coatLetter`** — needs **L≥2** (coat is hidden above that). Dive once first.
 - **Quarters journal** — on the cot in the annex. Click **`quartersJournal`** — practically reached at **L≥2** (inner door). **Deep 4th page** at **L≥3**.
+
+**SEA-STRATA per-level hidden readables** (each lives in its level's region, readable only there):
+- **Kelp slate** — L2, on the wade-line from the L2 spawn (~8,−101). Click **`kelpSlate`** (`when: W.level===2`). Diegetically hints the **Tide-Figure**.
+- **Bluff cairn** — L3, by the bluff spawn (~91.5,31.5), a faint cold ring on the top stone. Click **`bluffCairn`** (`when: W.level===3`). Hints the **Watcher**.
+- **Source note** — L4, on the study floor by the chart table (~−83.8,−41.8). Click **`sourceNote`** (`when: W.level===4`). Frames the keeper-look twist.
+
+**The deep-read economy** (cross-level, Meow-Wolf): the 4 CANONICAL deep-capable fragments — **stone** (deepFrom 2) · **logbook** (3) · **quarters** (3) · **music** (4) — each accretes a colder *journalDeep* line the first time you reach its deep page; reading **all 4** fires the **integration** payoff (a self-hand entry + whisper, once). A **"N of 4 read from the deep"** tally rides the journal header, and a count-aware whisper marks each. Two **bonus** deep-reads (**coat**@L3, **bottle**@L2) accrete + whisper but stay OUT of the 4-tally. *Audit: `ABYME.read(id)` at the right level, page to the last page; or panel `mark lore read`.*
+
+**Tide-Figure** (L2 encounter — the shallow counterpart to the Watcher): a soft dark humanoid in the kelp. It **disperses if you wade at it**, and **resolves if you stand still and watch** (~2.6s of stillness → a chime, it sinks). *Arm: `ABYME.tideFigure()` or panel `Tide-Figure`.*
+
+**Ambient detail:** drifting **fish-shadows** over the L2 kelp; two **lampblack tide-lines** (old + risen) on the jetty-foot standing stone (the keeper measured the rising sea — the logbook's "the new one has gone over it").
 
 The **FOUND-LENS reveal** (the key to two hidden fragments):
 - **Take the reading glass** on the islet (~138,−141). Click **`readGlass`** → sets `readGlass`, adds `readglass`. Two lampblack marks fade up.
