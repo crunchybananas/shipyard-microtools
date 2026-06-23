@@ -356,12 +356,14 @@ export function buildTerrain() {
                         smoothstep(2.2, 3.4, vTerH));
         float detL = dot(detT, vec3(0.299, 0.587, 0.114));
         float land = smoothstep(0.3, 1.1, vTerH);             // off the seabed / waterline
-        // DE-GRID: the ~1.2m tile repeat reads as a lattice — break it with a low-frequency fbm
-        // swell (~12m period) + a per-tile value jitter so the grid dissolves into soft large-scale
-        // variation (LUMINANCE only, hue untouched). +0 texture fetches; fades to 1.0 on the clone via mini.
-        float macro = vnoise(vLXZ * uTexScale * 0.1);        // one low-freq octave = the big soft swell (cheap)
-        float cellJ = hash21(floor(vLXZ * uTexScale));
-        float deGrid = (0.84 + 0.32 * macro) * (0.93 + 0.14 * cellJ);
+        // DE-GRID: break the ~1.2m tile repeat with SMOOTH multi-scale luminance variation (hue
+        // untouched). NOTE (loop #123): the old term used hash21(floor(vLXZ*uTexScale)) — a per-TILE
+        // hash, which is itself a grid of constant-brightness cells (masked on the busy beach, but a
+        // visible lattice on the smooth dune). Replaced with continuous vnoise so there are no tile
+        // edges. +0 texture fetches; fades to 1.0 on the clone via mini.
+        float macro = vnoise(vLXZ * uTexScale * 0.1);        // big soft low-freq swell (~12m)
+        float fine  = vnoise(vLXZ * uTexScale * 0.5 + 17.0); // smooth mid-freq variation (NOT a per-tile grid)
+        float deGrid = (0.84 + 0.30 * macro) * (0.92 + 0.16 * fine);
         float detail = detL * 1.85 * mix(1.0, deGrid, 1.0 - mini);
         diffuseColor.rgb *= mix(1.0, detail, uTexAmt * land * (1.0 - mini * 0.85));
       `)
