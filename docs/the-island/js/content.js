@@ -155,7 +155,12 @@ export const LORE = {
       '(the glass makes it legible) I write the true things small, in lampblack, where only a patient hand with a glass will ever find them. The inspector reads the big log and goes home satisfied.',
       'You have a glass, and a patient hand, so here is a true thing: I am not keeping the light to save a ship. There are no ships. I am keeping it so that when I finally go down to look, there will be something lit above me to climb back toward.',
     ],
+    deepFrom: 3,
+    deep: [
+      '(smaller still, and the glass shakes as you read it — or your hand is mine) If you are reading even this, with the glass, from down here, then you already know the thing I could write only at the very bottom of the very small: there is no inspector, no ship, no other light kept by anyone else. There is only this — one hand, grinding one lens, to read one true line by which to find the way back up. You are the patient hand. You always were. Now put the glass down, and climb.',
+    ],
     journal: 'Through the keeper’s reading glass, lampblack on the chart too small for the eye: he keeps the light not for ships — there are none — but so that when he goes down, something stays lit above him to climb back toward.',
+    journalDeep: 'The smallest lampblack line, read with the glass from the deep: there is no inspector, no ship, no other light — only one hand grinding one lens to read one true line by which to climb back up. “You are the patient hand. You always were. Put the glass down, and climb.”',
   },
   lens_mark_stone: {
     kind: 'inscription', hand: 'keeper', title: 'Scratched into the stone, hair-fine',
@@ -234,4 +239,5 @@ export const SKETCHES = [
   // the two BONUS deep-read lines (loop #146) — finishing the journal marginalia.
   ['the kettle was never for someone else', S('<path d="M32 33c-2-8-1-14 4-16h20c5 2 6 8 4 16z"/><path d="M40 17c2-4 14-4 16 0" opacity=".7"/><path d="M56 22l8-3 1 4" opacity=".6"/><path d="M44 11q2-3 0-6M52 11q2-3 0-6" opacity=".5"/><path d="M28 36h36" opacity=".4"/>')],
   ['note has writing on its back', S('<path d="M22 23h26v12H22z"/><path d="M48 25l8 1v8l-8 1" opacity=".8"/><path d="M56 27h6v6h-6" opacity=".7"/><path d="M26 27h18M26 31h12" opacity=".45"/>')],
+  ['one hand grinding one lens', S('<circle cx="40" cy="19" r="11"/><path d="M48 27l16 13" /><path d="M35 14a8 8 0 0 1 8 1" opacity=".5"/><path d="M40 19h0" /><path d="M58 30l8 4" opacity="0"/>')],
 ];
