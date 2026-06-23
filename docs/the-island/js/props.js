@@ -1705,27 +1705,46 @@ function buildVegetation(core, r) {
   trunks.name = 'trunks'; canopies.name = 'canopies';
   core.add(trunks, canopies);
 
-  // --- grass: narrow tapered blades, crossed ---
+  // --- grass: a TUFT of curved blades (loop #122). The old single straight cross-blade read as
+  // a spike in the ground; a clump of blades that arc OUTWARD and droop at the tips reads as grass.
   const bladeGeo = (() => {
-    const g1 = new THREE.PlaneGeometry(0.13, 0.85, 1, 2);
-    g1.translate(0, 0.42, 0);
-    {
-      // taper to a point
-      const p = g1.attributes.position;
+    // one curved, tapered blade rooted at y=0, arcing forward (+z) and drooping toward the tip
+    const makeBlade = (h, w, bend) => {
+      const g = new THREE.PlaneGeometry(w, h, 1, 3);
+      g.translate(0, h / 2, 0);                       // base at y=0
+      const p = g.attributes.position;
       for (let i = 0; i < p.count; i++) {
-        const t = p.getY(i) / 0.85;
-        p.setX(i, p.getX(i) * (1 - t * 0.9));
+        const y = p.getY(i);
+        const t = Math.max(0, Math.min(1, y / h));    // 0 root → 1 tip
+        p.setX(i, p.getX(i) * (1 - t * 0.82));        // taper toward the tip
+        p.setZ(i, p.getZ(i) + bend * t * t * h);      // arc forward, accelerating to the tip
+        p.setY(i, y - bend * 0.4 * t * t * h);        // droop the arcing tip down
       }
+      g.computeVertexNormals();
+      return g.toNonIndexed();
+    };
+    // fan 5 blades around the base at varied yaw / height / arc — a fountain-shaped clump
+    const blades = [];
+    const N = 5;
+    for (let i = 0; i < N; i++) {
+      const yaw = (i / N) * TAU + i * 1.3;
+      const h = 0.4 + (i % 3) * 0.08;                 // 0.40 .. 0.56
+      const w = 0.055 + (i % 2) * 0.02;
+      const bend = 0.45 + (i % 4) * 0.14;             // varied droop so it isn't a uniform spray
+      const b = makeBlade(h, w, bend);
+      b.rotateY(yaw);
+      b.translate(Math.cos(yaw) * 0.03, 0, Math.sin(yaw) * 0.03);  // slight base spread
+      blades.push(b);
     }
-    const g2 = g1.clone();
-    g2.rotateY(Math.PI / 2);
-    const a = g1.toNonIndexed(), b = g2.toNonIndexed();
-    const pos = new Float32Array((a.attributes.position.count + b.attributes.position.count) * 3);
-    const nor = new Float32Array(pos.length);
-    pos.set(a.attributes.position.array, 0);
-    pos.set(b.attributes.position.array, a.attributes.position.count * 3);
-    nor.set(a.attributes.normal.array, 0);
-    nor.set(b.attributes.normal.array, a.attributes.position.count * 3);
+    let total = 0;
+    for (const b of blades) total += b.attributes.position.count;
+    const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
+    let off = 0;
+    for (const b of blades) {
+      pos.set(b.attributes.position.array, off * 3);
+      nor.set(b.attributes.normal.array, off * 3);
+      off += b.attributes.position.count;
+    }
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
@@ -1741,12 +1760,14 @@ function buildVegetation(core, r) {
       #include <begin_vertex>
       #ifdef USE_INSTANCING
         float gw = instanceMatrix[3].x * 0.31 + instanceMatrix[3].z * 0.23;
-        transformed.x += sin(uTime * 2.1 + gw) * 0.16 * pow(max(position.y, 0.0), 2.0);
+        float gt = pow(max(position.y, 0.0), 1.5);            // tips drift most, roots stay put
+        transformed.x += sin(uTime * 1.5 + gw) * 0.32 * gt;   // gentle two-axis wave (not a rigid waggle)
+        transformed.z += cos(uTime * 1.2 + gw * 1.4) * 0.18 * gt;
       #endif
     `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
   };
 
-  const G_MAIN = 9000, G_ISLET = 1500;
+  const G_MAIN = 3800, G_ISLET = 650;   // fewer instances — each is now a full 5-blade tuft, not one blade
   const grass = new THREE.InstancedMesh(bladeGeo, grassMat, G_MAIN + G_ISLET);
   let gi = 0;
   const gcol = new THREE.Color();
