@@ -233,6 +233,43 @@ export function buildWorld() {
     region2.add(kelp);
   }
 
+  // SEA-STRATA L2 LIFE (loop #143): a few fish-shadows gliding over the kelp floor — dark, flat,
+  // unlit silhouettes that drift in slow circles (driven in main.js updateEnv by elapsed). region2
+  // only → pruned from the clone. Power: 7 tiny transparent meshes sharing one geo+mat, no shadow.
+  {
+    const fishShadows = new THREE.Group();
+    fishShadows.name = 'fishShadows';
+    // a flat fish silhouette, baked flat in XZ with the nose toward +x (so per-fish needs only a Y-heading)
+    const fs = new THREE.Shape();
+    fs.moveTo(0.52, 0);
+    fs.quadraticCurveTo(0.0, 0.17, -0.44, 0.12);
+    fs.lineTo(-0.72, 0.24);
+    fs.lineTo(-0.58, 0);
+    fs.lineTo(-0.72, -0.24);
+    fs.lineTo(-0.44, -0.12);
+    fs.quadraticCurveTo(0.0, -0.17, 0.52, 0);
+    const fishGeo = new THREE.ShapeGeometry(fs);   // VERTICAL body (XY plane, nose +x): a fish swims upright,
+    // so its broad side profile reads from the wading player's eye-level view; only rotation.y (heading) is set.
+    const fishMat = new THREE.MeshBasicMaterial({ color: 0x0a1a1c, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false });
+    const fr = mulberry32(SEED ^ 0xf15a);
+    let placed = 0;
+    for (let i = 0; i < 90 && placed < 7; i++) {
+      const cx = 2 + fr() * 26, cz = -113 + fr() * 13;     // over the FLOODED south-shore kelp shelf (z -113..-100), near spawn
+      const h = heightAt(cx, cz);
+      if (!Number.isFinite(h) || h > 0.3) continue;          // only the genuinely-drowned floor, so fish sit ABOVE it
+      const fish = new THREE.Mesh(fishGeo, fishMat);
+      fish.scale.setScalar(0.9 + fr() * 0.8);
+      // suspend them in the UPPER water — above the kelp (so they read as dark silhouettes, not lost
+      // on the floor) yet always under the L2 surface (~+1.47).
+      const baseY = 0.7 + fr() * 0.45;
+      fish.userData = { cx, cz, r: 1.8 + fr() * 3.0, y: baseY, spd: 0.12 + fr() * 0.16, ph: fr() * TAU };
+      fish.position.set(cx, baseY, cz);
+      fishShadows.add(fish);
+      placed++;
+    }
+    region2.add(fishShadows);
+  }
+
   // SEA-STRATA L2 encounter: the TIDE-FIGURE — a soft dark humanoid waist-deep in the kelp.
   // It disperses when you wade for it; it settles when you stand still and watch. Driven in
   // puzzles _tickTideFigure. region2-only (pruned from the clone). Starts hidden + inactive.
@@ -2098,7 +2135,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote',   // SEA-STRATA shells + L2/L3/L4 encounters & hidden fragments (loop #117/#121/#127/#132/#134/#135)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments & L2 fish-shadows (loop #117/#121/#127/#132/#134/#135/#143)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];
 

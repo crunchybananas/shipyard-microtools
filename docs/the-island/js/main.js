@@ -946,6 +946,19 @@ function applyAtmosphere(elapsed, dt) {
     terrainMat.userData.shader.uniforms.uHaze.value.copy(scene.fog.color);
   }
 
+  // L2 fish-shadows: dark silhouettes gliding over the kelp floor in slow circles (#143).
+  // Driven from elapsed (no accumulation); only at L2, where region2 shows them.
+  if (refs.fishShadows && W.level === 2) {
+    for (const f of refs.fishShadows.children) {
+      const u = f.userData;
+      const a = elapsed * u.spd + u.ph;
+      f.position.x = u.cx + Math.cos(a) * u.r;
+      f.position.z = u.cz + Math.sin(a) * u.r;
+      f.position.y = u.y + Math.sin(elapsed * 0.5 + u.ph) * 0.12;   // gentle rise and fall
+      f.rotation.y = Math.atan2(-Math.cos(a), -Math.sin(a));        // face the direction of travel
+    }
+  }
+
   // sky follows the camera
   sky.position.set(camera.position.x, 0, camera.position.z);
 }
