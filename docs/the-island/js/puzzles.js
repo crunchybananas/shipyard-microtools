@@ -827,6 +827,9 @@ export class Game {
     if (R.region2) R.region2.visible = W.level === 2;
     if (R.region3) R.region3.visible = W.level === 3;
     if (R.region4) R.region4.visible = W.level === 4;
+    // L3 'midwater': the drowned colonnade rises ~2.6m so its capitals + upper columns break the
+    // raised surface (a drowned cathedral); at L1 it sits low (only capitals breaking high tide).
+    if (R.drownedGallery) R.drownedGallery.position.y = (W.level === 3 ? 2.6 : 0);
 
     // orrery follows the sky
     const az = sunAzimuth(W.time), el = sunElevation(W.time);

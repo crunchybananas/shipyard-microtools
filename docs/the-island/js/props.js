@@ -1967,7 +1967,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure',   // SEA-STRATA per-level content shells + L2 encounter (loop #117/#121)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery',   // SEA-STRATA shells + L2 encounter + L3 colonnade (loop #117/#121/#127)
 ];
 
 export function collectRefs(root) {
