@@ -1985,6 +1985,7 @@ const NAMES = [
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery',   // SEA-STRATA shells + L2 encounter + L3 colonnade (loop #117/#121/#127)
+  'trunks', 'canopies', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129)
 ];
 
 export function collectRefs(root) {

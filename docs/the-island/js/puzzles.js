@@ -830,6 +830,14 @@ export class Game {
     // L3 'midwater': the drowned colonnade rises ~2.6m so its capitals + upper columns break the
     // raised surface (a drowned cathedral); at L1 it sits low (only capitals breaking high tide).
     if (R.drownedGallery) R.drownedGallery.position.y = (W.level === 3 ? 2.6 : 0);
+    // L4 'source': strip the surface forest + grass on the REAL island (a cold bare floor at the
+    // bottom of the recursion) — the 1:240 chart-table CLONE keeps them (it's the surface island model).
+    if (!isModel) {
+      const surfaceUp = W.level !== 4;
+      if (R.trunks) R.trunks.visible = surfaceUp;
+      if (R.canopies) R.canopies.visible = surfaceUp;
+      if (R.grass) R.grass.visible = surfaceUp;
+    }
 
     // orrery follows the sky
     const az = sunAzimuth(W.time), el = sunElevation(W.time);
