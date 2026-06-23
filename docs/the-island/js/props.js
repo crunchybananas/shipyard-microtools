@@ -1810,12 +1810,13 @@ function buildVegetation(core, r) {
   // r() stream — and thus every tree's POSITION, scale, lean and tone — is byte-unchanged; only
   // which of the two shapes a tree wears differs. ~55% broad fir (A), ~45% slim spruce (B).
   const vr = mulberry32(SEED ^ 0x5eed);
+  const br = mulberry32(SEED ^ 0xba24);   // per-trunk bark tone (loop #141): separate rng so the shared r() (positions + canopy tones) stays byte-unchanged
   const variant = spots.map(() => (vr() < 0.55 ? 0 : 1));
   const nA = variant.reduce((s, v) => s + (v === 0 ? 1 : 0), 0);
   const canopiesA = new THREE.InstancedMesh(canopyGeoA, canopyMat, nA);
   const canopiesB = new THREE.InstancedMesh(canopyGeoB, canopyMat, spots.length - nA);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
-  const col = new THREE.Color();
+  const col = new THREE.Color(), bark = new THREE.Color();
   let ia = 0, ib = 0;
   for (let i = 0; i < spots.length; i++) {
     const [x, y, z] = spots[i];
@@ -1824,6 +1825,10 @@ function buildVegetation(core, r) {
     q.setFromEuler(e);
     m4.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(s, s * (0.9 + r() * 0.4), s));
     trunks.setMatrixAt(i, m4);
+    // per-trunk bark tone (loop #141): warm browns, light↔dark, so the trunks aren't 131 identical
+    // poles; multiplies the shared bark albedo. Uses the separate br() rng (canopy tone unchanged).
+    bark.setHSL(0.055 + br() * 0.05, 0.28 + br() * 0.24, 0.40 + br() * 0.2);
+    trunks.setColorAt(i, bark);
     addCollider(x, z, 0.3 * s);   // the trunk is solid — you walked through every tree in the forest
     // per-tree foliage tone (loop #133): widen hue (warm yellow-green ↔ cool blue-green), saturation
     // AND value so the stand reads as individuals — sunlit crowns, shadowed elders — not a clone.
