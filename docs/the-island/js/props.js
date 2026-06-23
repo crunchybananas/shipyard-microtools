@@ -1765,7 +1765,16 @@ function buildVegetation(core, r) {
     trunks.setMatrixAt(i, m4);
     canopies.setMatrixAt(i, m4);
     addCollider(x, z, 0.3 * s);   // the trunk is solid — you walked through every tree in the forest
-    col.setHSL(0.21 + r() * 0.06, 0.32 + r() * 0.15, 0.3 + r() * 0.1);
+    // per-tree foliage tone (loop #133): the old range was too narrow (hue .21-.27, value .30-.40)
+    // → multiplied by the olive base it read as one flat green. Widen hue (warm yellow-green ↔ cool
+    // blue-green), saturation, AND value so the stand reads as individuals — sunlit crowns, shadowed
+    // elders — not a cloned asset. A few are pushed notably dark/light to break the uniformity.
+    const tv = r();
+    col.setHSL(
+      0.19 + r() * 0.13,                          // 68°(yellow-green) → 115°(cool green)
+      0.30 + r() * 0.26,                          // dusty → vivid
+      0.24 + tv * tv * 0.30                        // tv² skews most trees darker, a few crowns bright
+    );
     canopies.setColorAt(i, col);
   }
   trunks.castShadow = true;
