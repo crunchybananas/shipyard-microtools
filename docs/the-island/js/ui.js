@@ -99,6 +99,18 @@ export const UI = {
     if (isDeep && r.lore.journalDeep && !W.regions.fragmentsFound.includes(r.id)) {
       W.regions.fragmentsFound.push(r.id);
       this.addJournal(r.lore.journalDeep, '', 'keeper');
+      // a quiet cue that the deep-read is a SYSTEM accreting toward something — poetic, not gamey;
+      // 1..3 here, the 4/4 close is _maybeIntegrate's own whisper. The journal header keeps the tally.
+      const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
+      if (deep < DEEP_FRAGMENTS.length) {
+        const lines = [
+          '',
+          'It said more this time — because you came back to it from further down. Others here will do the same, if you return to them deeper.',
+          'Another turns its colder hand. The deeper readings are starting to rhyme with one another.',
+          'Three of them have shown their deepest pages now. One more, and they will want to be laid side by side.',
+        ];
+        this.whisper(lines[deep] || lines[1], 5200);
+      }
       this._maybeIntegrate();
     }
   },
@@ -184,6 +196,15 @@ export const UI = {
     this.journalTab.classList.add('pulse');
   },
   renderJournal() {
+    // codex tally: how many fragments have given up their DEEPEST pages (the cross-level deep-read
+    // economy) — a persistent progress cue in the header so the assembly is legible (loop #137)
+    const h2 = this.journalEl.querySelector('h2');
+    if (h2) {
+      const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
+      h2.innerHTML = deep > 0
+        ? `Field Notes<span class="deep-tally">${deep} of ${DEEP_FRAGMENTS.length} read from the deep</span>`
+        : 'Field Notes';
+    }
     if (!W.journal.length) {
       this.journalEntries.innerHTML = '<div class="empty">Nothing written yet. The island will dictate.</div>';
       return;
