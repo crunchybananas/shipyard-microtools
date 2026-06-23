@@ -55,6 +55,7 @@ export const LORE = {
       '(The hand here is not steady. It may be mine. It may be yours.) There is no bottom — I have looked. Each room I make to be safe becomes the next room I am afraid in. The trick the sea teaches: you do not drown all at once. You drown a little, and call it keeping busy.',
     ],
     journal: 'Found the keeper’s logbook on the chart table. He ground lenses to keep a light for someone out on the water — and when the sea began to rise, he started building the island again, small, to hold one whole day back.',
+    journalDeep: 'Read again from the deep, the logbook’s last page turns colder, the hand no longer steady: there is no bottom — he has looked. Each room built to be safe becomes the next room he is afraid in. You do not drown all at once; you drown a little, and call it keeping busy.',
   },
   coat_letter: {
     kind: 'letter', hand: 'keeper', title: 'A letter, folded small',
@@ -70,7 +71,12 @@ export const LORE = {
     pages: [
       'WE WHO WENT DOWN\nLEFT THE LIGHT FOR\nWHOEVER WASHES UP\n\n— turn it, and turn it',
     ],
+    deepFrom: 2,
+    deep: [
+      '(the tide has been over the stone, and below the old cut a fainter line is bared — the same chisel, later, set lower than any dry hand would reach)\n\nAND WHOEVER WASHES UP\nIS WHO WENT DOWN.\nTHERE WAS ONLY EVER ONE.',
+    ],
     journal: 'Words cut into a standing stone, worn soft by the sea: “We who went down left the light for whoever washes up.”',
+    journalDeep: 'The tide has been over the standing stone, and below the worn cut a fainter line is bared — set lower than any dry hand would reach: “and whoever washes up is who went down. there was only ever one.”',
   },
   // washed up at the wake-up beach — the FIRST fragment most players meet, an invitation.
   bottle_note: {
@@ -96,6 +102,7 @@ export const LORE = {
       '(later, in a worse hand) I have begun to suspect the one I keep the light for is not out on the water, rowing up toward me. I think they are already here — that they came, and went DOWN, and that I have aimed the beam at the wrong horizon all this time. Tomorrow I will turn it to face the deep. Tomorrow I will go down and look.',
     ],
     journal: 'Found the keeper’s private journal by his cot — kept under the pillow, against his own ear. He is afraid of being the last one awake; he draws the island smaller each night; he trims a light at every dusk for someone he will not name.',
+    journalDeep: 'From further down, the cot-journal turns: he stopped trusting the horizon. He came to suspect the one he kept the light for went DOWN, not out to sea — and resolved to turn the lamp to face the deep, and go down after them.',
   },
   // legible ONLY once you hold the keeper's reading glass — lampblack written too small for the
   // naked eye. The found-lens reveal (puzzles.js): these marks fade in when W.flags.readGlass.
@@ -123,9 +130,20 @@ export const LORE = {
       'I wind it more than I should. Five notes — E, G, A, D, C — and then I wind it again. The fourth note is wrong; I have always known it is wrong; I bend it down where it ought to bend up, and I cannot make my hands do otherwise. A man plays the song he can play, not the song he means.',
       'I wound it for someone who is not here to hear the fourth note come out wrong. If you are the one who finally hears the bird sing it right — the way I never could — then you have done the one small thing I came all this way down to do, and could not.\n\nWind it once for me. Then let it stop.',
     ],
+    deepFrom: 4,
+    deep: [
+      '(unfolded all the way, there is writing on the inside of the fold, pressed so faint it needs the deep dark to show)\n\nI was wrong to ask you to let it stop. Wind it once for me — yes — and then keep it. The fourth note will always bend the way your hands bend it; that is not the flaw to be ground out. That is the playing. Carry the song up wrong, and call the wrongness yours, and it is music.',
+    ],
     journal: 'A note folded into the music box: he wound it for someone not there to hear, and could never play the fourth note right — he bends it down where the bird bends it up. “Wind it once for me. Then let it stop.”',
+    journalDeep: 'Unfolded all the way, faint on the inside of the fold, he takes the asking-back: “Wind it once — and then keep it. The fourth note bends the way your hands bend it. That is not the flaw; that is the playing. Carry the song up wrong, and call it yours, and it is music.”',
   },
 };
+
+// The fragments that say MORE the deeper you read them (LORE.deepFrom). Reaching a deep
+// page records the id in W.regions.fragmentsFound and accretes a journalDeep line; reading
+// ALL of them assembles the grief→integration arc (ui.js _renderReader fires the payoff).
+// Spread across the descent: the stone bares at L2, logbook+cot turn at L3, the box at L4.
+export const DEEP_FRAGMENTS = ['stone_inscription', 'keeper_logbook', 'quarters_journal', 'music_note'];
 
 // ---- journal marginalia (SKETCHES) -----------------------------------------
 // A small ink sketch for each journal entry, matched by words the entry contains — so

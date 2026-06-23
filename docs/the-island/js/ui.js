@@ -2,7 +2,7 @@
 
 import { W } from './world.js';
 import A from './audio.js';
-import { SKETCHES, LORE } from './content.js';
+import { SKETCHES, LORE, DEEP_FRAGMENTS } from './content.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -93,6 +93,23 @@ export const UI = {
     this.readerPageno.textContent = r.pages.length > 1 ? `${r.page + 1} / ${r.pages.length}` : '';
     this.readerPrev.disabled = r.page === 0;
     this.readerNext.disabled = r.page >= r.pages.length - 1;
+    // the first time the player actually reaches a fragment's deep page, the deep read
+    // accretes its OWN journal line (the keeper's colder hand) — so the story assembles as
+    // you descend, the same object saying more the further down you've gone (Meow-Wolf).
+    if (isDeep && r.lore.journalDeep && !W.regions.fragmentsFound.includes(r.id)) {
+      W.regions.fragmentsFound.push(r.id);
+      this.addJournal(r.lore.journalDeep, '', 'keeper');
+      this._maybeIntegrate();
+    }
+  },
+  // when EVERY deep-reading fragment has been read at depth, they close into one: the
+  // grief→integration payoff — a final self-hand entry naming the shape, and a whisper. Once.
+  _maybeIntegrate() {
+    if (W.onceKeys.includes('deepIntegrated')) return;
+    if (!DEEP_FRAGMENTS.every((id) => W.regions.fragmentsFound.includes(id))) return;
+    W.onceKeys.push('deepIntegrated');
+    this.addJournal('All four said more the deeper I read them. Laid end to end they stop being his story and become the shape of the thing: whoever washes up is who went down; there is no bottom but the one you make; the wrong note is not the flaw but the playing; turn the light to face the deep — and climb back toward it carrying what you found. One person, holding both ends of the same rope. That is the whole of it.', '', 'self');
+    this.whisper('The fragments close like a hand. There was only ever one of you — the one who fell, and the one who keeps the light. Hold both, and climb.', 6000);
   },
 
   // ---- sound: a visible toggle (and the M key), kept in sync ----
