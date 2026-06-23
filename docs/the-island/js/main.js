@@ -1209,12 +1209,19 @@ function buildDebugPanel() {
   const el = document.createElement('div');
   el.id = 'debug-panel';
   el.innerHTML = `
+    <div id="dbg-hdr"><span id="dbg-hide" title="Hide the panel — backtick (\`) toggles it back">▾ hide</span><span class="dim"> · press \` to toggle</span></div>
     <div id="dbg-state-1"></div><div id="dbg-state-2"></div>
     <label class="dbg-sl">time <input type="range" id="dbg-time" min="0" max="24" step="0.05" title="Sun clock 0–24h"><span id="dbg-time-v"></span></label>
     <label class="dbg-sl">tide <input type="range" id="dbg-tide" min="0" max="2" step="0.05" title="Sea level — 0 drained · 1 high · 2 fully raised (>1 = raised strata sea)"><span id="dbg-tide-v"></span></label>
     ${groups.map(grp).join('')}
     <div id="dbg-fps"></div>`;
   document.body.appendChild(el);
+  // hide/show the panel (owner request): the "hide" header collapses it; backtick (`) toggles it back.
+  const hideBtn = el.querySelector('#dbg-hide');
+  if (hideBtn) hideBtn.addEventListener('click', () => { el.style.display = 'none'; });
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Backquote') { e.preventDefault(); el.style.display = (el.style.display === 'none') ? '' : 'none'; }
+  });
   const tslider = el.querySelector('#dbg-time'); tslider.value = W.time;
   tslider.addEventListener('input', () => { W.time = parseFloat(tslider.value); });
   const dslider = el.querySelector('#dbg-tide'); dslider.value = W.tide;

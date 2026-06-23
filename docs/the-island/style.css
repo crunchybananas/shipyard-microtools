@@ -411,6 +411,10 @@ html, body {
 #debug-panel #dbg-state-1, #debug-panel #dbg-state-2 { font-size: 10px; line-height: 1.3; white-space: normal; word-break: break-word; color: #8fd9b8; }
 #debug-panel #dbg-state-1.raised { color: #f0c674; }
 #debug-panel #dbg-state-2.dim { color: #7c8a96; }
+#debug-panel #dbg-hdr { font-size: 10px; display: flex; align-items: center; }
+#debug-panel #dbg-hide { cursor: pointer; color: #bfe6d4; padding: 1px 5px; border: 1px solid #2e3a46; border-radius: 4px; }
+#debug-panel #dbg-hide:hover { background: #28384a; }
+#debug-panel .dim { color: #6a7782; }
 
 /* ---- responsive: phones / narrow viewports ---- */
 @media (max-width: 600px) {
