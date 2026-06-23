@@ -162,6 +162,27 @@ export function buildWorld() {
     region3.add(cairn);
   }
   const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
+  // SEA-STRATA L4 'source' hidden fragment (loop #135): a folded note weighted with a stone, left
+  // on the study floor by the chart table — the keeper's last instruction, a diegetic frame for the
+  // look-back + carry-up. region4's FIRST content; region4-only → clone-pruned with parent; read at L4.
+  {
+    const note = new THREE.Group();
+    note.name = 'sourceNote';
+    const paperMat = new THREE.MeshStandardMaterial({ color: 0xd8cca8, roughness: 0.9, side: THREE.DoubleSide, emissive: 0x1a1408, emissiveIntensity: 0.15 });
+    const paper = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.46), paperMat);
+    paper.rotation.set(-Math.PI / 2 + 0.16, 0.3, 0); paper.position.y = 0.012;
+    const curl = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.16), paperMat);   // a half-curled top edge
+    curl.rotation.set(-Math.PI / 2 - 0.5, 0.3, 0); curl.position.set(0.0, 0.06, -0.2);
+    const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(0.08, 0),
+      new THREE.MeshStandardMaterial({ color: 0x3a3d3e, roughness: 1, flatShading: true }));
+    stone.position.set(0.03, 0.05, 0.05); stone.scale.set(1, 0.7, 1.15);
+    note.add(paper, curl, stone);
+    note.children.forEach((c) => { c.castShadow = true; });
+    const nx = -83.8, nz = -41.8;
+    note.position.set(nx, (Number.isFinite(heightAt(nx, nz)) ? heightAt(nx, nz) : 0) + 0.02, nz);
+    note.rotation.y = 0.5;
+    region4.add(note);
+  }
 
   // SEA-STRATA L2 "shallows" (loop #119): a kelp forest along the sunk causeway + south-shore
   // shallows — submerged at the raised L2 tide, so diving here wades a drowned kelp avenue, not the
@@ -2057,7 +2078,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn',   // SEA-STRATA shells + L2 encounter/fragment + L3 colonnade/fragment (loop #117/#121/#127/#132/#134)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote',   // SEA-STRATA shells + L2/L3/L4 encounters & hidden fragments (loop #117/#121/#127/#132/#134/#135)
   'trunks', 'canopies', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129)
 ];
 

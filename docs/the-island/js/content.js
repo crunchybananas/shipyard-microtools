@@ -109,6 +109,17 @@ export const LORE = {
     ],
     journal: 'A cairn on the L3 bluff, the keeper’s mark scratched in the top stone: from the last dry place he watches the drowned hall break the surface — the rooms he built AND the sea that took them, both at once. A warning, too: there is a watcher in the deep water; don’t run, don’t look away. “Hold its gaze until it lets you go. It is your own attention, come to find you.”',
   },
+  // SEA-STRATA L4 'source': a note left at the bottom (loop #135), the keeper's last instruction —
+  // a diegetic frame for the chart-table look-back + carry-up (the integration). Lives in region4,
+  // readable only at L4. Completes the per-level hint set (L2 Tide-Figure, L3 Watcher, L4 keeper).
+  source_note: {
+    kind: 'letter', hand: 'keeper', title: 'A note left at the bottom, weighted with a stone',
+    pages: [
+      'If you have come all the way down to the source, then there is only the one errand left, and I will set it down plainly so you cannot pretend you did not understand. Go to the chart table. Lean over the model — over the smallest island, the one with the grain-of-light lamp.',
+      'Someone is bent over it. Do not flinch when he lifts his head. He is not a stranger and he is not the sea; he is the one you came down here to find, which is to say he is you, at the worst hour, still keeping a light. Turn him to face you. Then carry him up. Do not leave him at the bottom — leaving him is the only way to lose, and I have lost that way before, and I would not have you learn it.',
+    ],
+    journal: 'A note weighted with a stone on the cold floor of the source: the last errand. Lean over the chart-table model; the one bent over it is not a stranger, not the sea — he is you, at the worst hour, still keeping a light. Turn him to face you and carry him up. “Leaving him at the bottom is the only way to lose.”',
+  },
   // the keeper's PRIVATE bedside journal, in the quarters behind the inner door (revealed one
   // level down). The intimate counterpart to the public logbook; its deep page turns toward the
   // descent — he begins to suspect the one he keeps the light for went DOWN, not out to sea.

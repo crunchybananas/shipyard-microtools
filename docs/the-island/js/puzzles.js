@@ -430,6 +430,11 @@ export class Game {
       when: () => W.level === 3,               // exists only on the L3 bluff (region3)
       onClick: () => UI.openReader('bluff_cairn'),
     });
+    if (R.sourceNote) I.add({
+      id: 'sourceNote', targets: [R.sourceNote], label: 'a note weighted with a stone', maxDist: 2.6,
+      when: () => W.level === 4,               // exists only at the L4 source (region4)
+      onClick: () => UI.openReader('source_note'),
+    });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
       when: () => W.level >= 1,                 // the quarters open one level down
