@@ -64,7 +64,12 @@ export const LORE = {
       'The light still turns. I want you to know that. Whatever you saw from the water — whatever it looked like, out there — the light still turns, and I am the one turning it, and I have not stopped, and I will not.',
       'Come up the stairs. The kettle is on. It has been on a long time.\n\n— the one who keeps it',
     ],
+    deepFrom: 3,
+    deep: [
+      '(folded inside the fold, in a smaller hand — the part I did not let myself write the first time) The kettle is not on for you. I have known that a while now. It is on for me — for the version of me still out on the water, who has not yet understood he is allowed to come in. I keep it warm so that when he finally rows up to the door, soaked and ashamed and years too late, there is something waiting that does not ask him where he has been.',
+    ],
     journal: 'A letter in the coat pocket, never sent. The kettle has been on a long time.',
+    journalDeep: 'Read again from deeper down, the unsent letter gives up its smaller hand: the kettle was never for someone else. It is on for the part of him still out on the water — kept warm for the soaked, ashamed, years-too-late self, so that when he finally rows up to the door, something waits that does not ask where he has been.',
   },
   stone_inscription: {
     kind: 'inscription', hand: 'keeper', title: 'Cut into the standing stone',

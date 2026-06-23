@@ -99,19 +99,25 @@ export const UI = {
     if (isDeep && r.lore.journalDeep && !W.regions.fragmentsFound.includes(r.id)) {
       W.regions.fragmentsFound.push(r.id);
       this.addJournal(r.lore.journalDeep, '', 'keeper');
-      // a quiet cue that the deep-read is a SYSTEM accreting toward something — poetic, not gamey;
-      // 1..3 here, the 4/4 close is _maybeIntegrate's own whisper. The journal header keeps the tally.
-      const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
-      if (deep < DEEP_FRAGMENTS.length) {
-        const lines = [
-          '',
-          'It said more this time — because you came back to it from further down. Others here will do the same, if you return to them deeper.',
-          'Another turns its colder hand. The deeper readings are starting to rhyme with one another.',
-          'Three of them have shown their deepest pages now. One more, and they will want to be laid side by side.',
-        ];
-        this.whisper(lines[deep] || lines[1], 5200);
+      if (DEEP_FRAGMENTS.includes(r.id)) {
+        // the canonical set — a count-aware cue that the deep-read is a SYSTEM accreting toward
+        // something (poetic, not gamey); 1..N-1 here, the close is _maybeIntegrate's own whisper.
+        const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
+        if (deep < DEEP_FRAGMENTS.length) {
+          const lines = [
+            '',
+            'It said more this time — because you came back to it from further down. Others here will do the same, if you return to them deeper.',
+            'Another turns its colder hand. The deeper readings are starting to rhyme with one another.',
+            'Three of them have shown their deepest pages now. One more, and they will want to be laid side by side.',
+          ];
+          this.whisper(lines[deep] || lines[1], 5200);
+        }
+        this._maybeIntegrate();
+      } else {
+        // a BONUS deep reading — not one of the four that close the circle, but it deepens the story
+        // all the same; a quieter acknowledgement, and it stays out of the 'N of 4' tally.
+        this.whisper('This one, too, says more from the deep — a page you would have walked past, on the way down.', 5000);
       }
-      this._maybeIntegrate();
     }
   },
   // when EVERY deep-reading fragment has been read at depth, they close into one: the
