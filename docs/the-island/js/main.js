@@ -1058,7 +1058,18 @@ if (DEBUG) {
       save(player.pos);
       return 'flags reset (in-world)';
     },
-    tideFigure: () => { UI.whisper('Tide-Figure encounter not yet implemented (LEVELS[2], region2/shallows).'); return 'not-implemented'; },
+    tideFigure: () => {                                // spawn/reset the L2 Tide-Figure ~12m ahead, for testing
+      if (W.level !== 2) window.ABYME.goLevel(2);
+      W.flags.tideFigureSeen = false;
+      const f = game.refs.tideFigure; if (!f) return null;
+      const fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
+      const wx = player.pos.x + fx * 12, wz = player.pos.z + fz * 12;
+      f.scale.setScalar(1); f.visible = true;
+      for (const m of (f.userData.mats || [])) m.opacity = 0.8;
+      f.position.set(wx, heightAt(wx, wz) || 0, wz);
+      game._tideRegard = 0; game._tfPrev = null;
+      return { level: W.level, at: [+wx.toFixed(1), +wz.toFixed(1)] };
+    },
     read: (loreId) => UI.openReader(loreId),            // open any lore fragment (verify deep pages at L>=3)
     state: () => {                                      // one structured snapshot — feeds the panel readout too
       const F = W.flags, L = LEVELS[W.level] || {};
@@ -1072,7 +1083,7 @@ if (DEBUG) {
         beamDelta: +bd.toFixed(3),
         regions: { l2: W.regions.l2seen, l3: W.regions.l3seen, l4: W.regions.l4seen, fragments: W.regions.fragmentsFound.slice() },
         inventory: W.inventory.slice(), stems: W.stems, once: W.onceKeys.length,
-        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'bellRung', 'readGlass'].filter((k) => F[k]),
+        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'tideFigureSeen', 'bellRung', 'readGlass'].filter((k) => F[k]),
       };
     },
   };
@@ -1172,7 +1183,7 @@ function buildDebugPanel() {
       ['birdSing', 'bird sing', 'Teleport to the stones + force the dawn songbird to sing now (set time→dawn for full audio)'], ['wSpawn', 'Watcher spawn', 'Spawn/reset the Watcher ~12m ahead (forces L≥3). Hold its gaze ~2.6s to resolve it for real'],
       ['wResolve', 'Watcher resolve', 'Force-resolve the Watcher (watcherSeen) — it lifts its head and dissolves'], ['wReset', 'Watcher reset', 'Reset the Watcher to its origin + clear watcherSeen so it can be re-tested'],
       ['twist', 'keeper twist', 'Force the bottom twist: jump to the bottom + set keeperRose (the figure has risen)'], ['carried', 'carried ✓', 'Set the "rose with you" branch (keeperRose+carried) to test the carried ending'],
-      ['tideFig', 'Tide-Fig n/i', 'PLACEHOLDER — the L2 Tide-Figure encounter is not yet built; this just prints a note'],
+      ['tideFig', 'Tide-Figure', 'Spawn the L2 Tide-Figure ~12m ahead (forces L2). Stand still and watch ~2.6s to resolve it; wade toward it and it disperses'],
     ] },
     { title: 'Endings', open: false, items: [
       ['ring', 'ring bell', 'BELL ending (accept the loop). Tone forks by depth — set the level first'], ['oar', 'row oar', 'OAR ending (leave, changed): arms + runs the look-back finale'],

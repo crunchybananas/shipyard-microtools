@@ -708,6 +708,7 @@ export class Game {
     }
 
     this._tickWatcher(dt);
+    this._tickTideFigure(dt);
 
     // apply to both islands
     this._apply(this.refs, false, elapsed);
@@ -756,6 +757,57 @@ export class Game {
         const gy = heightAt(w.position.x, w.position.z);
         if (Number.isFinite(gy)) w.position.y = gy;
       }
+    }
+  }
+
+  // THE TIDE-FIGURE — the L2 (shallows) encounter, grief that will not be CAUGHT, only WITNESSED.
+  // Active at W.level===2 only. Inverse of the Watcher: it does NOT approach — when you WADE for it
+  // it disperses and reforms a few metres on, keeping the kelp between you; resolved by STILLNESS —
+  // stop chasing, stand and watch ~2.6s and it settles, lays one bell-note, and sinks. (#121)
+  _tickTideFigure(dt) {
+    const f = this.refs.tideFigure;
+    if (!f) return;
+    const active = W.level === 2 && !W.flags.tideFigureSeen;
+    if (!active) {
+      if (W.flags.tideFigureSeen && f.visible) {        // resolved: settle, sink, fade, stay gone
+        f.position.y -= dt * 0.5;
+        f.scale.multiplyScalar(Math.max(0, 1 - dt * 1.1));
+        for (const m of (f.userData.mats || [])) m.opacity = Math.max(0, m.opacity - dt * 0.6);
+        if (f.scale.x < 0.06) f.visible = false;
+      } else if (!W.flags.tideFigureSeen) {
+        f.visible = false;                              // wrong level: hidden
+      }
+      return;
+    }
+    f.visible = true;
+    const p = this.player.pos;
+    // player speed from position delta (robust — player.vel semantics vary)
+    const prev = this._tfPrev || { x: p.x, z: p.z };
+    const speed = dt > 0 ? Math.hypot(p.x - prev.x, p.z - prev.z) / dt : 0;
+    this._tfPrev = { x: p.x, z: p.z };
+    const dx = f.position.x - p.x, dz = f.position.z - p.z;
+    const dist = Math.hypot(dx, dz) || 1e-3;
+    f.lookAt(p.x, f.position.y, p.z);
+    const fx = -Math.sin(this.player.yaw), fz = -Math.cos(this.player.yaw);
+    const looking = (fx * dx + fz * dz) / dist > 0.66 && dist < 42;
+    if (looking && speed > 1.3 && dist < 16) {
+      // you wade for it → it disperses: back off + drift laterally to keep the kelp between
+      this._tideRegard = 0;
+      const ax = dx / dist, az = dz / dist;
+      f.position.x += (ax - az * 0.55) * dt * 2.6;
+      f.position.z += (az + ax * 0.55) * dt * 2.6;
+      const gy = heightAt(f.position.x, f.position.z);
+      if (Number.isFinite(gy)) f.position.y = gy;
+    } else if (looking && speed < 0.6 && dist > 2.2 && dist < 34) {
+      // you stop chasing and only watch → it settles, and lets go
+      this._tideRegard = Math.min((this._tideRegard || 0) + dt, 3);
+      if (this._tideRegard >= 2.6 && this.flag('tideFigureSeen')) {
+        A.chime();   // one bell-note across the water
+        UI.whisper('You stop wading for it. You only watch. It settles, surfaces — and lays a single note across the water before it sinks.');
+        UI.addJournal('A shape stood in the kelp and slipped off whenever I waded toward it. So I stopped, and stood, and only watched. It settled then, and surfaced, and laid one bell-note across the bay before the water took it. Some things will not be chased down — only witnessed. And that is enough to let them go.', '', 'self');
+      }
+    } else {
+      this._tideRegard = Math.max((this._tideRegard || 0) - dt, 0);
     }
   }
 

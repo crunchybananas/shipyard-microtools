@@ -184,6 +184,25 @@ export function buildWorld() {
     region2.add(kelp);
   }
 
+  // SEA-STRATA L2 encounter: the TIDE-FIGURE — a soft dark humanoid waist-deep in the kelp.
+  // It disperses when you wade for it; it settles when you stand still and watch. Driven in
+  // puzzles _tickTideFigure. region2-only (pruned from the clone). Starts hidden + inactive.
+  {
+    const tf = new THREE.Group();
+    tf.name = 'tideFigure'; tf.visible = false;
+    const tmat = new THREE.MeshStandardMaterial({ color: 0x182a2c, emissive: 0x081416, emissiveIntensity: 0.45,
+      transparent: true, opacity: 0.8, roughness: 1, flatShading: true });
+    tf.userData.mats = [tmat];
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.62, 1.7, 7), tmat);
+    body.position.y = 0.85; tf.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), tmat);
+    head.position.y = 1.78; head.scale.set(1, 1.12, 1); tf.add(head);
+    const tfx = 12, tfz = -100;
+    tf.position.set(tfx, Number.isFinite(heightAt(tfx, tfz)) ? heightAt(tfx, tfz) : 0, tfz);
+    tf.castShadow = false; tf.receiveShadow = false;
+    region2.add(tf);
+  }
+
   const waterMat = makeWaterMaterial(heightTex, DOMAIN);
   const water = new THREE.Mesh(new THREE.PlaneGeometry(DOMAIN, DOMAIN, 120, 120), waterMat);
   water.geometry.rotateX(-Math.PI / 2);
@@ -1895,7 +1914,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4',   // SEA-STRATA per-level content shells (loop #117)
+  'region2', 'region3', 'region4', 'tideFigure',   // SEA-STRATA per-level content shells + L2 encounter (loop #117/#121)
 ];
 
 export function collectRefs(root) {
