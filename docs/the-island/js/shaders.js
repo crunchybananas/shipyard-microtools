@@ -314,10 +314,18 @@ export function makeSkyMaterial() {
           }
         }
 
-        // drifting cirrus, tinted by the sun
-        float cl = fbm2(d.xz / (up + 0.25) * 2.2 + vec2(uTime * 0.004, 0.0));
-        float cirrus = smoothstep(0.55, 0.85, cl) * smoothstep(0.02, 0.2, up) * (1.0 - uNight * 0.85);
-        col = mix(col, mix(uHorizon, uSunCol, 0.45) * 1.06, cirrus * 0.5);
+        // drifting clouds — ONE noise field (power-neutral vs the old cirrus) but SHAPED by density
+        // and sun-lighting so they read as volumetric form: thick lit cores, feathered shadowed edges,
+        // brighter on the sun-facing side. Tint from uHorizon/uSunCol so they warm at dusk and
+        // desaturate with the descent eras; horizon-bunched projection; day only.
+        float cl = fbm2(d.xz / (up + 0.2) * 2.6 + vec2(uTime * 0.005, uTime * 0.002));
+        float cover = smoothstep(0.52, 0.82, cl) * smoothstep(0.015, 0.18, up) * (1.0 - uNight * 0.93);
+        float cdens = smoothstep(0.52, 0.95, cl);                              // thick cores vs feathered edges
+        float clit  = 0.5 + 0.5 * smoothstep(-0.25, 0.65, sunDot);            // sun-facing side brighter
+        vec3 cloudCol = mix(mix(uHorizon, uTop, 0.22) * 0.9, mix(vec3(1.0), uSunCol, 0.5) * 1.12, clit);
+        cloudCol = mix(cloudCol * 0.78, cloudCol, cdens);                      // shadowed undersides in the cores
+        cloudCol *= (1.0 - uNight * 0.62);                                     // clouds darken + thin at night so the starfield reads
+        col = mix(col, cloudCol, cover * (0.4 + 0.5 * cdens));
 
         // sea fret: mist lifts a pale band off the horizon, veiling stars
         // and blue alike — the sky finally agrees with the fogged ground
