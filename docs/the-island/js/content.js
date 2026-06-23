@@ -90,7 +90,12 @@ export const LORE = {
       'To whoever finds this — and someone always does; the sea is a poor keeper of secrets — the light you can see from here is mine.',
       'If you are reading this on my beach, you have already come further than most turn back. Keep going, or do not. But know the light is lit, and it is lit for someone.\n\nToday I have decided that someone can be you.',
     ],
+    deepFrom: 2,
+    deep: [
+      '(the paper has a back, and the back was written on too, in a smaller hand that did not expect to be read — because by the time you turn it over, you have already gone under) You found this on the beach and thought it was meant for some stranger the light was waiting on. It was not. I wrote "someone can be you" because I could not yet write the truer thing. The someone was always you. The light was always yours. I have kept it lit on your own behalf, against the day you would come back up the beach from the wrong direction — out of the water, not down the road — and need to be told you are allowed to come in.',
+    ],
     journal: 'A bottle on the beach, a note inside: the keeper says the light is lit for someone — and today he has decided that someone can be you.',
+    journalDeep: 'Turned over once you have gone under, the bottle’s note has writing on its back: “someone can be you” was the truer thing he could not yet say — the someone was always you, the light always yours, kept lit against the day you would come back up the beach out of the WATER, not down the road, and need telling that you are allowed to come in.',
   },
   // SEA-STRATA L2: a wax slate hidden in the kelp (loop #132) — the keeper's FIRST shallow
   // descent, and a diegetic hint for the Tide-Figure that stands in this same water. Lives in
