@@ -102,7 +102,7 @@ addEventListener('resize', () => {
 });
 
 // ---------------- world ----------------
-const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, vaultDrips } = buildWorld();
+const { core, waterMat, modelAnchor, biolume, fireflies, motes, galleryGlow, l3motes, vaultDrips } = buildWorld();
 const modelRoot = instantiateModel(core, modelAnchor);
 const nestedGlint = modelRoot.getObjectByName('nestedGlint');
 const _glintV = new THREE.Vector3();
@@ -125,7 +125,7 @@ const terrainMat = core.getObjectByName('terrain')?.material;
 // the clone captured pre-clone children only; nothing model-side needs Points
 
 const diveGroup = new THREE.Group();
-diveGroup.add(core, biolume, fireflies, motes, galleryGlow);
+diveGroup.add(core, biolume, fireflies, motes, galleryGlow, l3motes);
 scene.add(diveGroup);
 
 // sky + far sea (outside the dive group: they are the "outside" of the world)
@@ -917,7 +917,13 @@ function applyAtmosphere(elapsed, dt) {
     const gg = galleryGlow.material.uniforms;
     gg.uTime.value = elapsed;
     gg.uPlayer.value.copy(camera.position);
-    gg.uGlobal.value = (1 - W.tide);
+    gg.uGlobal.value = Math.max(1 - W.tide, W.level >= 3 ? 0.9 : 0);   // tide-drained at L1, + the drowned hall glows in the deep
+  }
+  if (l3motes) {                                  // SEA-STRATA L3: cold bioluminal midwater motes
+    const lm = l3motes.material.uniforms;
+    lm.uTime.value = elapsed;
+    lm.uPlayer.value.copy(camera.position);
+    lm.uGlobal.value = W.level >= 3 ? 1 : 0;
   }
   const mu = motes.material.uniforms;
   mu.uTime.value = elapsed;

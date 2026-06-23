@@ -864,6 +864,20 @@ export function buildWorld() {
     galleryGlow.name = 'galleryGlow';
   }
 
+  // SEA-STRATA L3 'midwater' (loop #124): a field of cold bioluminal motes drifting over the
+  // drowned island — the only kind light in the lightless deep, by which you navigate at L3.
+  // A Points (1 draw), kept OUT of core like galleryGlow (core.clone chokes on Points); added to
+  // diveGroup + shown only at W.level>=3. Own rng so it never shifts the world scatter.
+  const l3motePos = [];
+  {
+    const mr = mulberry32(SEED ^ 0x3c0d);
+    for (let i = 0; i < 150; i++) {
+      l3motePos.push(-55 + mr() * 190, 1.4 + mr() * 3.6, -130 + mr() * 180);   // around/above the L3 water (~+2.7)
+    }
+  }
+  const l3motes = makeGlowPoints(l3motePos, 0x66cfe6, 0.5);
+  l3motes.name = 'l3motes';
+
   // =================== THE THRESHOLD (#24 — jetty + dory) ===================
   // The way out, made physical: a little jetty reaching off the wake-up beach
   // into the sea, and a beached dory on the sand beside it. They do nothing for
@@ -1573,7 +1587,7 @@ export function buildWorld() {
   fireflies.material.uniforms.uDrift.value = 1;
   fireflies.name = 'fireflies';
 
-  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, vaultDrips };
+  return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, l3motes, vaultDrips };
 }
 
 // ---------------------------------------------------------------------------
