@@ -375,8 +375,14 @@ function tickDive(dt) {
     diveGroup.scale.setScalar(1);
     diveGroup.position.set(0, 0, 0);
     W.level = Math.min(W.level + 1, MAX_DEPTH); // one recursion deeper each dive
+    // SEA-STRATA: drop into THIS level's place — its spawn + raised tide (the same island, drowned further)
+    const L = LEVELS[W.level];
+    if (W.level > 1) W.tide = W.tideTarget = L.tide;
+    if (W.level >= 2) W.regions.l2seen = true;
+    if (W.level >= 3) W.regions.l3seen = true;
+    if (W.level >= 4) W.regions.l4seen = true;
     save(player.pos);
-    player.spawn(new THREE.Vector3(4, 0, -104), 2.19, 0.02);
+    player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
   }
   if (f >= 1) {
     dive = null;
@@ -488,8 +494,10 @@ function landAscent() {
       UI.addJournal('I went all the way down — to the smallest room, the coldest light — and found him still there, still tending it. I could not bring myself to put it out. So I have started back up the stairs, and I am carrying what I found at the bottom. The light is still burning behind me. Let it.', '', 'self');
     }
   }
+  // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
+  W.tide = W.tideTarget = (W.level > 1 ? LEVELS[W.level].tide : 1);
   save(player.pos);
-  // rise out at the study / chart table of the level above
+  // rise out at the study / chart table of the level above (canon: you climb to the chart table)
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
 }
 function tickAscent(dt) {

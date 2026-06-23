@@ -78,6 +78,8 @@ export class Game {
     I.add({
       id: 'valve', targets: [R.valveWheel], label: 'the brass valve',
       onClick: () => {
+        // SEA-STRATA: below the surface the tide is the descent's, not yours — the wheel goes dead.
+        if (W.level > 1) { UI.whisper('The sea no longer answers the wheel down here.'); return; }
         W.tideTarget = W.tideTarget > 0.5 ? 0 : 1;
         A.chime();
         if (this.flag('valveTurned')) {
