@@ -1619,10 +1619,28 @@ function buildVegetation(core, r) {
   const trunkGeo = new THREE.CylinderGeometry(0.12, 0.3, 2.6, 6);
   trunkGeo.translate(0, 1.3, 0);
   const canopyGeo = (() => {
+    // A conifer, not a stack of smooth cones (loop #125): 5 OVERLAPPING tiers whose base rims are
+    // jagged + drooped, so the silhouette reads as ragged frond-skirts instead of clean geometry.
+    const jr = mulberry32(SEED ^ 0x7a3c);
     const parts = [];
-    for (let i = 0; i < 3; i++) {
-      const cone = new THREE.ConeGeometry(1.6 - i * 0.42, 1.7, 7);
-      cone.translate(0.35 * i, 2.2 + i * 1.05, 0); // lee-lean
+    const N = 5;
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      const radius = 1.75 * (1 - t * 0.82);                 // wide skirt → narrow crown
+      const h = 1.55;
+      const cone = new THREE.ConeGeometry(radius, h, 9, 1, true);   // openEnded (DoubleSide mat)
+      const p = cone.attributes.position;
+      for (let v = 0; v < p.count; v++) {
+        if (p.getY(v) < -h / 2 + 0.02) {                    // base-rim vertices → frond tips
+          const x = p.getX(v), z = p.getZ(v);
+          const f = 1 + (jr() - 0.5) * 0.5;                 // ±25% radial jag
+          p.setX(v, x * f); p.setZ(v, z * f);
+          p.setY(v, p.getY(v) - jr() * 0.4);                // droop some fronds down
+        }
+      }
+      cone.rotateY(i * 1.1);                                 // de-align facets/jags between tiers
+      cone.translate(0.26 * i, 1.85 + i * 0.86, 0);         // overlapping stack, gentle lee-lean
+      cone.computeVertexNormals();
       parts.push(cone);
     }
     // merge cones manually (convert to non-indexed FIRST, then size the arrays)
@@ -1662,7 +1680,7 @@ function buildVegetation(core, r) {
 
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: true, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
   applyRelief(trunkMat, 'bark', { normalScale: 0.8, strength: 2.4, roughness: 0.95 });   // grooved bark + derived normal on every trunk + the model clone (shared)
-  const canopyMat = new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.85, vertexColors: false });
+  const canopyMat = new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.85, vertexColors: false, side: THREE.DoubleSide });
   canopyMat.color = new THREE.Color(0x6d7a3e);
   // wind sway via shader patch
   canopyMat.onBeforeCompile = (sh) => {
