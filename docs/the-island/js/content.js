@@ -98,6 +98,17 @@ export const LORE = {
     ],
     journal: 'A wax slate tangled in the L2 kelp — the keeper’s first shallow descent. A soft dark shape stands in the kelp: wade at it and it scatters like silt; be still and it resolves. “It was me, waiting for me. It is not cruel. It is only early.”',
   },
+  // SEA-STRATA L3: a cairn on the bluff (loop #134), the keeper's note from deeper in the descent
+  // — the high dry vantage over the drowned hall, and a diegetic hint for the Watcher (don't run,
+  // don't look away — hold its gaze and it lets go). Lives in region3, readable only at L3.
+  bluff_cairn: {
+    kind: 'inscription', hand: 'keeper', title: 'A cairn on the bluff, scratched in the top stone',
+    pages: [
+      'I stacked these stones where the water has not yet reached, to mark the last dry place I know. From here you can see it: the drowned hall, the tops of the columns breaking the surface like a hand going under. I built those rooms, every one, to be safe in. I am also the sea that took them. Both. At once. That is the thing no one tells you.',
+      'There is a watcher in the deep water below. It comes toward you when you turn away, and stops when you face it. Do not run — running is only how it follows. Do not look away. Hold its gaze, and keep holding, until it lifts its head and lets you go. It was never the sea’s. It is your own attention, walked all this way down to find you. Meet it. Then climb.',
+    ],
+    journal: 'A cairn on the L3 bluff, the keeper’s mark scratched in the top stone: from the last dry place he watches the drowned hall break the surface — the rooms he built AND the sea that took them, both at once. A warning, too: there is a watcher in the deep water; don’t run, don’t look away. “Hold its gaze until it lets you go. It is your own attention, come to find you.”',
+  },
   // the keeper's PRIVATE bedside journal, in the quarters behind the inner door (revealed one
   // level down). The intimate counterpart to the public logbook; its deep page turns toward the
   // descent — he begins to suspect the one he keeps the light for went DOWN, not out to sea.

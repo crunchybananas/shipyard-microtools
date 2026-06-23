@@ -133,6 +133,34 @@ export function buildWorld() {
   // island only). Named so collectRefs() finds them on the island instance.
   const region2 = new THREE.Group(); region2.name = 'region2'; region2.visible = false; core.add(region2);
   const region3 = new THREE.Group(); region3.name = 'region3'; region3.visible = false; core.add(region3);
+  // SEA-STRATA L3 hidden fragment (loop #134): a small cairn on the bluff (90,30) — the keeper's
+  // high dry vantage over the drowned hall, and a diegetic hint for the Watcher (don't run, don't
+  // look away). region3's FIRST content; region3-only → clone-pruned with its parent; read at L3.
+  {
+    const cairn = new THREE.Group();
+    cairn.name = 'bluffCairn';
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x6a6e70, roughness: 0.95, flatShading: true });
+    const sizes = [[0.7, 0.28], [0.55, 0.24], [0.4, 0.2]];   // [radius, height], stacked bottom→top
+    let yy = 0;
+    for (let si = 0; si < sizes.length; si++) {
+      const [rad, h] = sizes[si];
+      const st = new THREE.Mesh(new THREE.CylinderGeometry(rad * 0.82, rad, h, 7), stoneMat);
+      st.position.set(si % 2 ? 0.06 : -0.05, yy + h / 2, si % 2 ? -0.04 : 0.05);
+      st.rotation.y = si * 0.9; st.scale.y = 0.82 + si * 0.05;
+      st.castShadow = true; cairn.add(st);
+      yy += h * 0.86;
+    }
+    // a faint cold ring scratched into the top stone — the keeper's sign, just bright enough to
+    // find in the deep dark (kept dim, well under the 0.85 bloom threshold)
+    const mark = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.018, 6, 12),
+      new THREE.MeshStandardMaterial({ color: 0x9fcfe0, emissive: 0x2a5a66, emissiveIntensity: 0.5, roughness: 1 }));
+    mark.position.set(0, yy + 0.02, 0.1); mark.rotation.x = -1.15;
+    cairn.add(mark);
+    const cx = 91.5, cz = 31.5;
+    cairn.position.set(cx, (Number.isFinite(heightAt(cx, cz)) ? heightAt(cx, cz) : 0), cz);
+    cairn.receiveShadow = false;
+    region3.add(cairn);
+  }
   const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
 
   // SEA-STRATA L2 "shallows" (loop #119): a kelp forest along the sunk causeway + south-shore
@@ -2029,7 +2057,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate',   // SEA-STRATA shells + L2 encounter/fragment + L3 colonnade (loop #117/#121/#127/#132)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn',   // SEA-STRATA shells + L2 encounter/fragment + L3 colonnade/fragment (loop #117/#121/#127/#132/#134)
   'trunks', 'canopies', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129)
 ];
 

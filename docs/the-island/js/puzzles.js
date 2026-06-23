@@ -425,6 +425,11 @@ export class Game {
       when: () => W.level === 2,               // exists only in the L2 shallows (region2)
       onClick: () => UI.openReader('kelp_slate'),
     });
+    if (R.bluffCairn) I.add({
+      id: 'bluffCairn', targets: [R.bluffCairn], label: 'a cairn, a mark scratched in the stone', maxDist: 3.2,
+      when: () => W.level === 3,               // exists only on the L3 bluff (region3)
+      onClick: () => UI.openReader('bluff_cairn'),
+    });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
       when: () => W.level >= 1,                 // the quarters open one level down
