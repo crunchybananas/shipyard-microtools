@@ -138,12 +138,27 @@ export function makeWaterMaterial(heightTex, domain) {
         float caus = smoothstep(0.55, 0.93, dot(texture2D(uCaustic, cuv).rgb, vec3(0.299, 0.587, 0.114)));
         col += uSunCol * caus * (1.0 - dfac) * 0.3 * smoothstep(-0.02, 0.14, uSunDir.y) * mix(1.0, 0.2, mini);
 
-        // sun glitter — damped to a sheen on the model, full at sea
+        // sun glitter — a tight sun-disc core PLUS a broad, broken glitter road so
+        // the low sun scatters across the swell (the single biggest "alive" cue).
+        // Facets are cheap moving sines, not fbm, to hold GPU load over the broad sea.
         vec3 R = reflect(-normalize(uSunDir), N);
-        float spec = pow(max(dot(R, V), 0.0), 220.0) * smoothstep(-0.05, 0.12, uSunDir.y);
-        col += uSunCol * spec * 2.4 * mix(1.0, 0.16, mini);
-        // moon-glitter at night
+        float sunUp = smoothstep(-0.05, 0.12, uSunDir.y);
+        float spec = pow(max(dot(R, V), 0.0), 220.0) * sunUp;
+        col += uSunCol * spec * 2.4 * mix(1.0, 0.16, mini);          // bright sun-disc core
+        // tilt the normal with a couple of drifting sinusoidal facets, reflect, take a
+        // broad lobe, then gate it into twinkling glints (kept under the 0.85 bloom cap)
+        float gph = uTime * 1.7;
+        vec2  gp  = vLocal.xz;
+        float gf1 = sin(gp.x * 0.85 + gph)             * sin(gp.y * 0.77 - gph * 0.90);
+        float gf2 = sin(gp.x * 1.63 - gph * 1.20 + 2.1) * sin(gp.y * 1.41 + gph * 1.05 + 0.7);
+        vec3  Ng  = normalize(N + vec3(gf1, 0.0, gf2) * 0.16 * (1.0 - mini));  // glassy on the 1:240 clone
+        vec3  Rg  = reflect(-normalize(uSunDir), Ng);
+        float road = pow(max(dot(Rg, V), 0.0), 26.0) * sunUp;
+        float glitter = smoothstep(0.18, 0.85, road);
+        col += uSunCol * glitter * 0.32 * mix(1.0, 0.14, mini);      // the glitter road
+        // moon-glitter at night — tight disc + a dim cool road on the same facets
         col += vec3(0.55, 0.65, 0.8) * pow(max(dot(R, V), 0.0), 350.0) * uNight * 1.2 * mix(1.0, 0.16, mini);
+        col += vec3(0.50, 0.62, 0.80) * smoothstep(0.30, 0.92, pow(max(dot(Rg, V), 0.0), 40.0)) * uNight * 0.5 * mix(1.0, 0.14, mini);
 
         // shoreline foam
         float foamBand = 1.0 - smoothstep(0.0, 0.85, depth + (r1 - 0.5) * 0.4);
