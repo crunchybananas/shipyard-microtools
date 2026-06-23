@@ -1079,6 +1079,23 @@ export function buildWorld() {
       slab.position.set(ix, heightAt(ix, iz) + 0.62, iz);
       slab.rotation.y = -0.6;       // face turned toward the jetty / the one arriving
       slab.castShadow = true;
+      // the keeper measured the rising sea on this stone (keeper_logbook: "I marked the old line on
+      // the third step, and the new one has gone over it"). Two chalk tide-lines on the low face —
+      // an old, faded one and a newer, brighter one risen above it — environmental storytelling of
+      // the flood, in the lower (near-waterline) band of the slab. (loop #147) (children → ride the
+      // slab's transform + clone to the chart-table model; 3 tiny transparent quads, no shadow.)
+      {
+        // LAMPBLACK, not chalk — the keeper marks true things in lampblack (per the lore), and dark
+        // marks read on the PALE granite where pale chalk would vanish. The new line darker/heavier.
+        const mark = (op) => new THREE.MeshBasicMaterial({ color: 0x241f18, transparent: true, opacity: op, side: THREE.DoubleSide, depthWrite: false });
+        const line = (ly, w, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.04), mark(op)); m.position.set(0, ly, 0.185); return m; };
+        // the stone's base is buried ~0.23 below the beach (center y = ground+0.62, half-height 0.85),
+        // so keep both lines in the lower-MID face (local y > -0.62) to stay above the sand.
+        slab.add(line(-0.52, 0.82, 0.5));    // the OLD line, faded, lower — last season's reach
+        slab.add(line(-0.28, 0.78, 0.82));    // the NEW line, heavier — "the new one has gone over it"
+        const tick = new THREE.Mesh(new THREE.PlaneGeometry(0.03, 0.14), mark(0.72));   // a tally scratch by the new line
+        tick.position.set(0.30, -0.28, 0.185); slab.add(tick);
+      }
       core.add(slab);
     }
 
