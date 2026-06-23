@@ -420,6 +420,11 @@ export class Game {
       id: 'bottle', targets: [R.messageBottle], label: 'a bottle in the sand', maxDist: 2.6,
       onClick: () => UI.openReader('bottle_note'),
     });
+    if (R.kelpSlate) I.add({
+      id: 'kelpSlate', targets: [R.kelpSlate], label: 'a wax slate in the kelp', maxDist: 2.8,
+      when: () => W.level === 2,               // exists only in the L2 shallows (region2)
+      onClick: () => UI.openReader('kelp_slate'),
+    });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
       when: () => W.level >= 1,                 // the quarters open one level down

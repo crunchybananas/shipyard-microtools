@@ -203,6 +203,42 @@ export function buildWorld() {
     region2.add(tf);
   }
 
+  // SEA-STRATA L2 hidden fragment (loop #132): a wax slate tangled in the kelp — the keeper's
+  // note from his FIRST shallow descent, and a diegetic hint for the Tide-Figure (wade at it and
+  // it scatters; be still and it resolves). Placed on the wade-line between the L2 spawn (4,-104)
+  // and the figure (12,-100), so you find the hint, then look up and see what it describes.
+  // region2-only → pruned from the clone with its parent; read only at L2 (puzzles when-guard).
+  {
+    const slate = new THREE.Group();
+    slate.name = 'kelpSlate';
+    // a driftwood stake driven into the kelp bed — so the slate breaks the raised L2 surface
+    // (water sits ~+1.5 here; a floor-level note would drown). A marker, where he first went down.
+    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.055, 1.7, 6),
+      new THREE.MeshStandardMaterial({ color: 0x4a3a26, roughness: 1 }));
+    stake.position.y = 0.85; stake.castShadow = true; slate.add(stake);
+    // the slate mounted near the top, leaning, face toward the one wading out
+    const head = new THREE.Group();
+    head.position.y = 1.5; head.rotation.set(-0.16, 2.4, 0.1);
+    const board = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.54, 0.04),
+      new THREE.MeshStandardMaterial({ color: 0x5c4a30, roughness: 0.95 }));        // driftwood backing
+    board.castShadow = true;
+    const wax = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.44, 0.05),
+      new THREE.MeshStandardMaterial({ color: 0x241f18, roughness: 0.85 }));        // dark wax face
+    wax.position.z = 0.02; head.add(board, wax);
+    // a few hair-fine incised lines, paler where the stylus cut the wax (close-up detail)
+    const inkMat = new THREE.MeshStandardMaterial({ color: 0x9a8f72, roughness: 1, emissive: 0x14110b, emissiveIntensity: 0.2 });
+    for (let li = 0; li < 4; li++) {
+      const line = new THREE.Mesh(new THREE.BoxGeometry(0.22 - (li % 2) * 0.05, 0.012, 0.01), inkMat);
+      line.position.set(-0.02 + (li % 2) * 0.02, 0.14 - li * 0.09, 0.055);
+      head.add(line);
+    }
+    slate.add(head);
+    const sx = 8, sz = -101;
+    slate.position.set(sx, (Number.isFinite(heightAt(sx, sz)) ? heightAt(sx, sz) : 0), sz);
+    slate.receiveShadow = false;
+    region2.add(slate);
+  }
+
   const waterMat = makeWaterMaterial(heightTex, DOMAIN);
   const water = new THREE.Mesh(new THREE.PlaneGeometry(DOMAIN, DOMAIN, 120, 120), waterMat);
   water.geometry.rotateX(-Math.PI / 2);
@@ -1984,7 +2020,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery',   // SEA-STRATA shells + L2 encounter + L3 colonnade (loop #117/#121/#127)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate',   // SEA-STRATA shells + L2 encounter/fragment + L3 colonnade (loop #117/#121/#127/#132)
   'trunks', 'canopies', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129)
 ];
 

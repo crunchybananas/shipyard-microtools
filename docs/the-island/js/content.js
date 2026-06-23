@@ -87,6 +87,17 @@ export const LORE = {
     ],
     journal: 'A bottle on the beach, a note inside: the keeper says the light is lit for someone — and today he has decided that someone can be you.',
   },
+  // SEA-STRATA L2: a wax slate hidden in the kelp (loop #132) — the keeper's FIRST shallow
+  // descent, and a diegetic hint for the Tide-Figure that stands in this same water. Lives in
+  // region2, so it is reachable (and readable) only at L2 — a depth-specific hidden fragment.
+  kelp_slate: {
+    kind: 'inscription', hand: 'keeper', title: 'A wax slate, tangled in the kelp',
+    pages: [
+      'I went down the first time only as far as the kelp — no deeper. I told myself I was checking the mooring. A keeper is allowed his small lies; they are the ballast that lets a man sink slowly enough to bear it.',
+      'There is a shape that stands in the kelp at this depth. Soft, and dark, and patient. The first dive I waded at it, certain it was the one I keep the light for — and it scattered like silt and was gone. The second dive I did not chase. I stood, and was still, and let it be what it was: which was me, waiting for me. Be still with it. It is not cruel. It is only early.',
+    ],
+    journal: 'A wax slate tangled in the L2 kelp — the keeper’s first shallow descent. A soft dark shape stands in the kelp: wade at it and it scatters like silt; be still and it resolves. “It was me, waiting for me. It is not cruel. It is only early.”',
+  },
   // the keeper's PRIVATE bedside journal, in the quarters behind the inner door (revealed one
   // level down). The intimate counterpart to the public logbook; its deep page turns toward the
   // descent — he begins to suspect the one he keeps the light for went DOWN, not out to sea.
