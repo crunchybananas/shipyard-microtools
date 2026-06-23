@@ -62,7 +62,7 @@ This chain runs in parallel with the stones and is the one that actually **opens
 **Stand on the brass plate** (you have to be right on its center) and touch it. The first touch is the **brink** — a warning. Touch again to **commit**, and you dive one level deeper, waking on the same beach in a dimmer copy of the island.
 
 **Repeat the dive.** There are **four levels**; from the surface, that's **three dives down** to the bottom. Each level reveals more:
-- **One down:** the keeper's quarters open up.
+- **One down:** the shallows flood into a drowned **kelp forest**, fish-shadows drifting over it. A soft dark figure stands among the fronds — the **Tide-Figure**. Don't wade at it (it scatters like silt); **stand still and watch**, and it settles and lets go. The keeper's quarters open, and a wax slate is tangled in the kelp.
 - **Two down:** an inner door opens — a coat still warm, footprints your size, and a **bell** in the annex. A tiny keeper figure now stands on the model.
 - **Three down:** the keeper speaks when you arrive, and a **Watcher** walks the deep shore (see below).
 - **The bottom:** the plate only goes **up** now.
@@ -91,7 +91,8 @@ Both endings are final. The only way back is **Begin again.**
 ## Optional discoveries (the world is deeper than the main path)
 
 None of these gate the ending — they're the story unfolding as you explore:
-- **Readable fragments** — the bottle note (beach), a stone inscription (jetty), the **keeper's logbook** (study; says *more* the deeper you've been), a **letter on the coat** and a **journal on the cot** (both two levels down). Each one read adds a line to your journal.
+- **Readable fragments** — found in any order: the bottle note (beach), a stone inscription (jetty), the **keeper's logbook** (study), a **letter on the coat** and a **journal on the cot** (down a level or two), and a **hidden marker on each dive-level** — a wax slate in the L2 kelp, a cairn on the L3 bluff, a note on the cold floor at the bottom. Each one read adds a line to your journal.
+- **The deep readings** — the keeper wrote some things that only surface *the deeper you go*. Re-read the **logbook**, the **cot-journal**, the **standing stone**, and the **music-box note** from far enough down and each gives up a colder, truer page — your journal keeps a tally (*"N of 4 read from the deep"*). Read all four and they close into one understanding: you were always both the one who went down and the one who kept the light. (The unsent letter and the bottle note hide deeper pages too.)
 - **The reading glass** — on the islet. Take it, and faint **lampblack marks** you couldn't see before surface — one in the study, one high on a stone. The keeper wrote the true things small.
 - **Vistas** (just look, no click): the **drowned gallery** when the tide is out; the **inverted vault** through the cellar's east window; **the room that disagrees** at the west window — a second study whose model floods *opposite* to your tide.
 - **The Watcher** (three levels down): a figure on the deep shore that drifts toward you when you look away and freezes when you look at it. **Don't run.** Hold it in your gaze for a few seconds — *regard* it — and it lifts its head, lets go, and rises away as a small cold light. Some things down there only want to be seen.
