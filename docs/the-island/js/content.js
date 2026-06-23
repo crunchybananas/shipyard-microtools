@@ -226,4 +226,9 @@ export const SKETCHES = [
   ['cairn on the L3 bluff', S('<ellipse cx="48" cy="33" rx="17" ry="4.5"/><ellipse cx="46" cy="26" rx="12.5" ry="4"/><ellipse cx="49" cy="20" rx="8.5" ry="3.5"/><circle cx="48" cy="13" r="3"/><path d="M48 10v-3" opacity=".5"/>')],
   ['weighted with a stone on the cold floor', S('<path d="M30 26l28-7 3 10-28 7z"/><path d="M58 19l-7 2 3 7" opacity=".55"/><path d="M35 24l16-4M35 28l13-3" opacity=".4"/><ellipse cx="38" cy="28" rx="4" ry="3"/><path d="M18 35h60" opacity=".35"/>')],
   ['All four said more', S('<circle cx="48" cy="11" r="4.5"/><path d="M48 15v9"/><path d="M48 17l-9 5M48 17l9 5"/><path d="M40 23q-14 9 8 13t8-13" opacity=".6"/><path d="M12 36h72" opacity=".3"/>')],
+  // the DEEP-READ marginalia (loop #145) — the colder hand each fragment turns from below.
+  ['the logbook’s last page turns colder', S('<path d="M48 11c-7-4-15-4-22 0v20c7-4 15-4 22 0 7-4 15-4 22 0V11c-7-4-15-4-22 0z" opacity=".6"/><path d="M48 11v20" opacity=".45"/><path d="M48 30v8M44 35l4 4 4-4" opacity=".75"/>')],
+  ['the cot-journal turns', S('<path d="M40 11h16l-2 7H42z"/><path d="M44 18v5h8v-5" opacity=".7"/><path d="M48 23v3M43 26l5 9 5-9z" opacity=".6"/><path d="M30 15l9 4M66 15l-9 4" opacity=".4"/>')],
+  ['below the worn cut a fainter line is bared', S('<path d="M34 37V15c0-3 3-5 7-5h10c4 0 7 2 7 5v22z"/><path d="M40 18h16" opacity=".85"/><path d="M40 25h16" opacity=".3"/><path d="M14 37h68" opacity=".4"/>')],
+  ['inside of the fold', S('<path d="M28 30l30-8 2 8-30 8z" opacity=".7"/><path d="M58 22l-6 2 2 6" opacity=".5"/><circle cx="40" cy="31" r="2"/><circle cx="51" cy="28" r="2"/><path d="M42 31v-8M53 28v-8" opacity=".75"/>')],
 ];
