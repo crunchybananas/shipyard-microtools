@@ -1839,8 +1839,25 @@ function buildVegetation(core, r) {
   grass.name = 'grass';
   core.add(grass);
 
-  // --- shore rocks ---
-  const rockGeo = new THREE.IcosahedronGeometry(1, 0);
+  // --- shore rocks: irregular angular boulders, not regular faceted balls (loop #128) ---
+  // Displace an icosahedron's verts (lumpy radial + angular jitter) so each reads as a weathered
+  // boulder; one distinct shape per stone type (granite/basalt/limestone) for free variety.
+  const makeRock = (seed) => {
+    const g = new THREE.IcosahedronGeometry(1, 1);      // 80 faces (non-indexed)
+    const p = g.attributes.position, v = new THREE.Vector3();
+    for (let i = 0; i < p.count; i++) {
+      v.fromBufferAttribute(p, i);
+      // RADIAL lumps keyed on the QUANTIZED position, so the non-indexed shared verts of each face
+      // displace TOGETHER (no shattering): a lumpy weathered boulder. seed varies the shape per type.
+      const k = Math.round(v.x * 100) * 0.137 + Math.round(v.y * 100) * 0.071 + Math.round(v.z * 100) * 0.193 + seed * 1.7;
+      const hn = Math.abs(Math.sin(k) * 43758.5453) % 1;
+      v.multiplyScalar(0.74 + hn * 0.5);                // 0.74 .. 1.24
+      p.setXYZ(i, v.x, v.y, v.z);
+    }
+    g.computeVertexNormals();
+    return g;
+  };
+  const rockVariants = [makeRock(SEED ^ 0x2b91), makeRock(SEED ^ 0x5d17), makeRock(SEED ^ 0x8c3f)];
   // three stone types so the shore isn't 70 copies of one granite — split into 3 InstancedMeshes
   // (granite / basalt / limestone), each its own albedo + derived relief. The per-instance random
   // rotation already hides UV-orientation repeat, so distinct albedos read as natural variety (+2 draws).
@@ -1849,10 +1866,10 @@ function buildVegetation(core, r) {
     { id: 'basalt', color: 0xb8bcc4 },     // dark volcanic
     { id: 'limestone', color: 0xe6ddc8 },  // pale eroded
   ];
-  const rockMeshes = rockDefs.map((d) => {
+  const rockMeshes = rockDefs.map((d, idx) => {
     const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: true, roughness: 0.95 });
     applyRelief(mat, d.id, { normalScale: 0.6, strength: 2.2 });
-    const im = new THREE.InstancedMesh(rockGeo, mat, 70);
+    const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
   });
