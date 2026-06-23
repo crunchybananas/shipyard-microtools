@@ -1703,28 +1703,28 @@ function buildVegetation(core, r) {
   // --- pines, wind-bent ---
   const trunkGeo = new THREE.CylinderGeometry(0.12, 0.3, 2.6, 6);
   trunkGeo.translate(0, 1.3, 0);
-  const canopyGeo = (() => {
-    // A conifer, not a stack of smooth cones (loop #125): 5 OVERLAPPING tiers whose base rims are
-    // jagged + drooped, so the silhouette reads as ragged frond-skirts instead of clean geometry.
-    const jr = mulberry32(SEED ^ 0x7a3c);
+  // A conifer, not a stack of smooth cones (loop #125): OVERLAPPING tiers whose base rims are
+  // jagged + drooped, so the silhouette reads as ragged frond-skirts instead of clean geometry.
+  // Factored (loop #139) so TWO silhouettes can share the builder — a broad fir and a slim spruce —
+  // breaking the cloned-shape look that per-tree TONE (#133) alone couldn't fix.
+  const makeCanopy = ({ n, baseR, taperK, tierH, spacing, lean, jag, droop, seedXor }) => {
+    const jr = mulberry32(SEED ^ seedXor);
     const parts = [];
-    const N = 5;
-    for (let i = 0; i < N; i++) {
-      const t = i / (N - 1);
-      const radius = 1.75 * (1 - t * 0.82);                 // wide skirt → narrow crown
-      const h = 1.55;
-      const cone = new THREE.ConeGeometry(radius, h, 9, 1, true);   // openEnded (DoubleSide mat)
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const radius = baseR * (1 - t * taperK);              // wide skirt → narrow crown
+      const cone = new THREE.ConeGeometry(radius, tierH, 9, 1, true);   // openEnded (DoubleSide mat)
       const p = cone.attributes.position;
       for (let v = 0; v < p.count; v++) {
-        if (p.getY(v) < -h / 2 + 0.02) {                    // base-rim vertices → frond tips
+        if (p.getY(v) < -tierH / 2 + 0.02) {                // base-rim vertices → frond tips
           const x = p.getX(v), z = p.getZ(v);
-          const f = 1 + (jr() - 0.5) * 0.5;                 // ±25% radial jag
+          const f = 1 + (jr() - 0.5) * jag;                 // radial jag
           p.setX(v, x * f); p.setZ(v, z * f);
-          p.setY(v, p.getY(v) - jr() * 0.4);                // droop some fronds down
+          p.setY(v, p.getY(v) - jr() * droop);              // droop some fronds down
         }
       }
       cone.rotateY(i * 1.1);                                 // de-align facets/jags between tiers
-      cone.translate(0.26 * i, 1.85 + i * 0.86, 0);         // overlapping stack, gentle lee-lean
+      cone.translate(lean * i, 1.85 + i * spacing, 0);       // overlapping stack, gentle lee-lean
       cone.computeVertexNormals();
       parts.push(cone);
     }
@@ -1743,7 +1743,11 @@ function buildVegetation(core, r) {
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
     return g;
-  })();
+  };
+  // A: the broad fir (byte-identical to the loop-#125 canopy — same seed + params, so existing
+  // trees don't move). B: a slimmer, taller spruce — narrower skirt, tighter taper, one more tier.
+  const canopyGeoA = makeCanopy({ n: 5, baseR: 1.75, taperK: 0.82, tierH: 1.55, spacing: 0.86, lean: 0.26, jag: 0.5, droop: 0.4, seedXor: 0x7a3c });
+  const canopyGeoB = makeCanopy({ n: 6, baseR: 1.28, taperK: 0.9, tierH: 1.5, spacing: 0.96, lean: 0.16, jag: 0.42, droop: 0.34, seedXor: 0x3b71 });
 
   const spots = [];
   for (let i = 0; i < 600 && spots.length < 130; i++) {
@@ -1802,9 +1806,17 @@ function buildVegetation(core, r) {
   };
 
   const trunks = new THREE.InstancedMesh(trunkGeo, trunkMat, spots.length);
-  const canopies = new THREE.InstancedMesh(canopyGeo, canopyMat, spots.length);
+  // per-spot canopy SHAPE variant (loop #139). A SEPARATE rng picks the silhouette so the shared
+  // r() stream — and thus every tree's POSITION, scale, lean and tone — is byte-unchanged; only
+  // which of the two shapes a tree wears differs. ~55% broad fir (A), ~45% slim spruce (B).
+  const vr = mulberry32(SEED ^ 0x5eed);
+  const variant = spots.map(() => (vr() < 0.55 ? 0 : 1));
+  const nA = variant.reduce((s, v) => s + (v === 0 ? 1 : 0), 0);
+  const canopiesA = new THREE.InstancedMesh(canopyGeoA, canopyMat, nA);
+  const canopiesB = new THREE.InstancedMesh(canopyGeoB, canopyMat, spots.length - nA);
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
   const col = new THREE.Color();
+  let ia = 0, ib = 0;
   for (let i = 0; i < spots.length; i++) {
     const [x, y, z] = spots[i];
     const s = 0.8 + r() * 0.8;
@@ -1812,24 +1824,27 @@ function buildVegetation(core, r) {
     q.setFromEuler(e);
     m4.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(s, s * (0.9 + r() * 0.4), s));
     trunks.setMatrixAt(i, m4);
-    canopies.setMatrixAt(i, m4);
     addCollider(x, z, 0.3 * s);   // the trunk is solid — you walked through every tree in the forest
-    // per-tree foliage tone (loop #133): the old range was too narrow (hue .21-.27, value .30-.40)
-    // → multiplied by the olive base it read as one flat green. Widen hue (warm yellow-green ↔ cool
-    // blue-green), saturation, AND value so the stand reads as individuals — sunlit crowns, shadowed
-    // elders — not a cloned asset. A few are pushed notably dark/light to break the uniformity.
+    // per-tree foliage tone (loop #133): widen hue (warm yellow-green ↔ cool blue-green), saturation
+    // AND value so the stand reads as individuals — sunlit crowns, shadowed elders — not a clone.
     const tv = r();
     col.setHSL(
       0.19 + r() * 0.13,                          // 68°(yellow-green) → 115°(cool green)
       0.30 + r() * 0.26,                          // dusty → vivid
       0.24 + tv * tv * 0.30                        // tv² skews most trees darker, a few crowns bright
     );
-    canopies.setColorAt(i, col);
+    const cm = variant[i] === 0 ? canopiesA : canopiesB;
+    const ci = variant[i] === 0 ? ia++ : ib++;
+    cm.setMatrixAt(ci, m4);
+    cm.setColorAt(ci, col);
   }
   trunks.castShadow = true;
-  canopies.castShadow = true;
-  trunks.name = 'trunks'; canopies.name = 'canopies';
-  core.add(trunks, canopies);
+  canopiesA.castShadow = true;
+  canopiesB.castShadow = true;
+  // 'canopies' is the name swayMats (main.js) finds to drive uTime on the SHARED canopyMat → both
+  // meshes sway. The L4 surface-strip (_apply) hides both via R.canopies + R.canopies2.
+  trunks.name = 'trunks'; canopiesA.name = 'canopies'; canopiesB.name = 'canopies2';
+  core.add(trunks, canopiesA, canopiesB);
 
   // --- grass: a TUFT of curved blades (loop #122). The old single straight cross-blade read as
   // a spike in the ground; a clump of blades that arc OUTWARD and droop at the tips reads as grass.
@@ -2079,7 +2094,7 @@ const NAMES = [
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote',   // SEA-STRATA shells + L2/L3/L4 encounters & hidden fragments (loop #117/#121/#127/#132/#134/#135)
-  'trunks', 'canopies', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129)
+  'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];
 
 export function collectRefs(root) {

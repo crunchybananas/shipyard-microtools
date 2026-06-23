@@ -850,7 +850,8 @@ export class Game {
     if (!isModel) {
       const surfaceUp = W.level !== 4;
       if (R.trunks) R.trunks.visible = surfaceUp;
-      if (R.canopies) R.canopies.visible = surfaceUp;
+      if (R.canopies) R.canopies.visible = surfaceUp;     // fir silhouette
+      if (R.canopies2) R.canopies2.visible = surfaceUp;   // spruce silhouette (loop #139)
       if (R.grass) R.grass.visible = surfaceUp;
     }
 
