@@ -2040,7 +2040,12 @@ function buildVegetation(core, r) {
   ];
   const rockMeshes = rockDefs.map((d, idx) => {
     const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: true, roughness: 0.95 });
-    applyRelief(mat, d.id, { normalScale: 0.6, strength: 2.2 });
+    // DEEPER crack relief (loop #153, owner "depth on meshes"): the shore boulders are prominent
+    // natural features but had the weakest relief of any prop (0.6/2.2) — their granite/basalt cracks
+    // read nearly flat up close. Push the derived-normal so the fractures actually catch light. Still
+    // a normal-map perturbation on the flat-shaded low-poly boulder → +0 draws/tris, keeps the chunky
+    // silhouette. (normalScale 0.6→0.95, Sobel strength 2.2→3.1.)
+    applyRelief(mat, d.id, { normalScale: 0.95, strength: 3.1 });
     const im = new THREE.InstancedMesh(rockVariants[idx], mat, 70);
     im.castShadow = true; im.name = 'rocks';
     return im;
