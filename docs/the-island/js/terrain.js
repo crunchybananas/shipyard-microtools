@@ -4,7 +4,6 @@
 import * as THREE from 'three';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
 import { W } from './world.js';
-import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
 const SEA_FLOOR = -13;
@@ -317,10 +316,11 @@ export function buildTerrain() {
   // island inherits the same hole — recursion demands it)
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
-    sh.uniforms.uSand = { value: getTexture('sand') };        // beach grain (low band)
-    sh.uniforms.uGrass = { value: getTexture('dunegrass') };  // dune scrub (high band)
-    sh.uniforms.uTexAmt = { value: 0.7 };
-    sh.uniforms.uTexScale = { value: 0.85 };                  // fine tiling so the sand grain/ripples read underfoot
+    sh.uniforms.uTexAmt = { value: 0.7 };   // strength of the procedural sand-grain luminance detail
+    // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
+    // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
+    // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
+    // calls + uniforms entirely (saves loading sand.jpg + dunegrass.jpg and their VRAM uploads).
     mat.userData.shader = sh; // so main.js can track uHaze to the active grade's fog
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;')
@@ -330,8 +330,7 @@ export function buildTerrain() {
         vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-        uniform vec3 uHaze; uniform sampler2D uSand; uniform sampler2D uGrass;
-        uniform float uTexAmt; uniform float uTexScale;
+        uniform vec3 uHaze; uniform float uTexAmt;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)

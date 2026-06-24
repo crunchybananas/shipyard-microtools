@@ -67,9 +67,10 @@ export const MANIFEST = {
     prompt: 'seamless tileable aged conifer bark, deep vertical grooves, weathered grey-brown, top-down',
     wrap: 'repeat', repeat: [1, 3], colorSpace: 'srgb', anisotropy: 4,
   },
-  // the beach SAND + dune GRASS — sampled object-space INSIDE the terrain shader (terrain.js
-  // onBeforeCompile) as a luminance multiply; the vertex-colour bands keep the hue. wrap so the
-  // in-shader tiling repeats. (No material.map — terrain has vertex colours, not vUv.)
+  // the beach SAND + dune GRASS. NOTE (loop #152): the terrain USED to sample these object-space as a
+  // luminance multiply, but their ~1.18m tile read as a pock-mark GRID (owner-flagged); #152 replaced
+  // that with continuous PROCEDURAL grain + a wind-ripple normal bump, so the terrain no longer loads
+  // either texture. Kept in the manifest for provenance / possible reuse (currently unreferenced).
   sand: {
     kind: 'texture', file: 'sand.jpg', bytes: 58051,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',
