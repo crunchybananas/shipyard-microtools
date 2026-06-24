@@ -305,7 +305,10 @@ export function buildTerrain() {
 
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
-    flatShading: true,
+    // flatShading OFF (loop #152): the hard low-poly facet seams read as flat plastic once the tiling
+    // grain was removed. Smooth vertex normals (computeVertexNormals above) blend the facets; the
+    // procedural detail-normal bump in onBeforeCompile supplies the surface's 3-D structure instead.
+    flatShading: false,
     roughness: 0.95,
     metalness: 0.0,
     side: THREE.DoubleSide, // chasm/valley walls + the underside read solid, never see-through
@@ -334,38 +337,48 @@ export function buildTerrain() {
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
       .replace('#include <clipping_planes_fragment>',
         `if (distance(vLXZ, vec2(${SPOTS.hatch.x.toFixed(1)}, ${SPOTS.hatch.y.toFixed(1)})) < 1.22) discard;\n#include <clipping_planes_fragment>`)
-      // ground DETAIL: sand (low/beach) → dune-grass (high), sampled object-space and multiplied as
-      // LUMINANCE so the vertex-coloured bands keep their hue but gain grain/tufts. Land-masked above
-      // the waterline; FADED on the 1:240 clone via the water shader's fwidth `mini` trick so the
-      // dense-tiled model never moirés. Appended after color_fragment; +0 draws.
+      // MICRO-RELIEF (loop #152, owner: "depth on meshes"): the ground was flat-lit — with the tiling
+      // grain gone, the bare low-poly facets showed through. Add a tangent-free, derivative-based
+      // detail-normal bump (Mikkelsen) driven by procedural sand grain + gentle wind ripples, so the
+      // surface catches light with real 3-D ripple structure. Reuses `grain` for the albedo below.
+      // bAmt fades the bump out with distance (no far-field shimmer) and on the 1:240 clone (`mini`).
+      .replace('#include <normal_fragment_begin>', `
+        #include <normal_fragment_begin>
+        float gScl  = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
+        float mini  = 1.0 - smoothstep(0.05, 0.5, gScl);      // ~1 on the dense 1:240 clone
+        float land0 = smoothstep(0.3, 1.1, vTerH);            // off the seabed / waterline
+        // RELIEF = gentle, LOW-frequency wind ripples only. High-freq grain in the NORMAL reads as a
+        // harsh per-pixel dapple (looks scaly, not sandy) — fine grain stays in albedo; the bump just
+        // gives the surface a soft 3-D roll so it isn't flat-lit. Amplitude kept low on purpose.
+        float rip1 = sin(dot(vLXZ, vec2(0.9, 0.42)) * 2.3 + vnoise(vLXZ * 0.22) * 6.2831);  // ~2.7m crests, meandered
+        float rip2 = sin(dot(vLXZ, vec2(-0.35, 0.94)) * 4.1 + vnoise(vLXZ * 0.38) * 6.2831); // ~1.5m cross-set, weaker
+        float roll = vnoise(vLXZ * 1.1) - 0.5;               // soft ~0.9m undulation
+        float Hb   = rip1 * 0.5 + rip2 * 0.22 + roll * 0.5;
+        float bDist = 1.0 - smoothstep(45.0, 130.0, length(vViewPosition));
+        float bAmt  = 0.20 * land0 * bDist * (1.0 - mini);
+        vec2 dHdxy  = vec2(dFdx(Hb), dFdy(Hb)) * bAmt;
+        vec3 bSx = dFdx(-vViewPosition), bSy = dFdy(-vViewPosition);
+        vec3 bR1 = cross(bSy, normal), bR2 = cross(normal, bSx);
+        float bDet = dot(bSx, bR1);
+        vec3 bGrad = sign(bDet) * (dHdxy.x * bR1 + dHdxy.y * bR2);
+        normal = normalize(abs(bDet) * normal - bGrad);`)
+      // ground DETAIL (loop #152): the old approach TILED the uSand/uGrass texture as luminance —
+      // its baked grain recurred every ~1.18m and read as a pock-mark GRID (owner-flagged); every
+      // warp to hide the tile just traded the grid for a smear. Replaced with CONTINUOUS procedural
+      // grain (no tile → no grid → no smear) multiplied as luminance so the vertex-coloured bands
+      // keep their hue. Self-contained (the <normal_fragment_begin> block is a separate GLSL scope,
+      // so we recompute here rather than share). -2 texture fetches; +0 draws.
       .replace('#include <color_fragment>', `
         #include <color_fragment>
-        float gScl = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
-        float mini = 1.0 - smoothstep(0.05, 0.5, gScl);
-        // DE-TILE: the de-grid above only wobbles BRIGHTNESS — the texture's own baked
-        // grain/pits still recur every ~1.18m, which reads as a pock-mark lattice. Warp the
-        // SAMPLE COORDS with a low-freq vnoise so the grain stops landing on a regular grid.
-        //   freq 0.18 (~5.5m wavelength) is well below the 1.18m tile → smears the LATTICE,
-        //   not the grain; amp ~0.8m (>half a tile) breaks the repeat without swimmy folding.
-        //   *(1.0-mini) → off on the dense 1:240 clone (never seen there). +0 texture fetches.
-        vec2 warp = vec2(vnoise(vLXZ * 0.18 + 11.3), vnoise(vLXZ * 0.18 + 41.7)) - 0.5;
-        warp += 0.4 * (vec2(vnoise(vLXZ * 0.55 + 5.0), vnoise(vLXZ * 0.55 + 23.0)) - 0.5);  // 2nd octave (~1.8m) de-correlates adjacent tiles up close
-        vec2 uvW  = vLXZ + warp * 1.6 * (1.0 - mini);
-        vec3 detT = mix(texture2D(uSand,  uvW * uTexScale).rgb,
-                        texture2D(uGrass, uvW * uTexScale * 0.8).rgb,
-                        smoothstep(2.2, 3.4, vTerH));
-        float detL = dot(detT, vec3(0.299, 0.587, 0.114));
-        float land = smoothstep(0.3, 1.1, vTerH);             // off the seabed / waterline
-        // DE-GRID: break the ~1.2m tile repeat with SMOOTH multi-scale luminance variation (hue
-        // untouched). NOTE (loop #123): the old term used hash21(floor(vLXZ*uTexScale)) — a per-TILE
-        // hash, which is itself a grid of constant-brightness cells (masked on the busy beach, but a
-        // visible lattice on the smooth dune). Replaced with continuous vnoise so there are no tile
-        // edges. +0 texture fetches; fades to 1.0 on the clone via mini.
-        float macro = vnoise(vLXZ * uTexScale * 0.1);        // big soft low-freq swell (~12m)
-        float fine  = vnoise(vLXZ * uTexScale * 0.5 + 17.0); // smooth mid-freq variation (NOT a per-tile grid)
-        float deGrid = (0.84 + 0.30 * macro) * (0.92 + 0.16 * fine);
-        float detail = detL * 1.85 * mix(1.0, deGrid, 1.0 - mini);
-        diffuseColor.rgb *= mix(1.0, detail, uTexAmt * land * (1.0 - mini * 0.85));
+        float cScl  = (fwidth(vWPos.x) + fwidth(vWPos.z)) / max(fwidth(vLXZ.x) + fwidth(vLXZ.y), 1e-6);
+        float cMini = 1.0 - smoothstep(0.05, 0.5, cScl);
+        float cLand = smoothstep(0.3, 1.1, vTerH);           // off the seabed / waterline
+        float cGrain = vnoise(vLXZ * 2.6) * 0.62 + vnoise(vLXZ * 6.7 + 5.0) * 0.38;
+        float macro = vnoise(vLXZ * 0.085 + 2.0);            // big soft swell (~12m), continuous
+        float fine  = vnoise(vLXZ * 0.42 + 17.0);            // mid variation (NOT a per-tile grid)
+        float deGrid = (0.86 + 0.26 * macro) * (0.93 + 0.14 * fine);
+        float detail = mix(0.82, 1.07, cGrain) * mix(1.0, deGrid, 1.0 - cMini);
+        diffuseColor.rgb *= mix(1.0, detail, uTexAmt * cLand * (1.0 - cMini * 0.85));
       `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
       // global fog reaches it — depth + vastness without washing the near/mid ground
