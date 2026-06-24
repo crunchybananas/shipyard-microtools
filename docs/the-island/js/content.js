@@ -168,7 +168,12 @@ export const LORE = {
       '(only the glass shows it) Whoever you are, holding this glass: you are not the first to read these. You will not be the last.',
       'We each think we are the one who went down. We are each also the light left lit. The whole trick of it is to be the one who fell AND the one who keeps the lamp — at once, without choosing. Hold both. And climb.',
     ],
+    deepFrom: 3,
+    deep: [
+      '(below the hair-fine line, fainter, as if added on a different night — or by the same hand much later) Count the scratches under this one, if you can hold the glass steady. Each is someone who stood here, went down, and came back up far enough to add a mark and leave the glass for the next. You think your grief is the deepest, and the first. It is neither — and that is the only comfort the stone has to give: the way down is worn smooth by everyone who climbed back. Add your mark. Leave the glass. Climb.',
+    ],
     journal: 'Hair-fine letters on a standing stone, shown only by the glass: “We each think we are the one who went down. We are each also the light left lit. Hold both, and climb.”',
+    journalDeep: 'Below the hair-fine letters, fainter, read with the glass from the deep: count the scratches — each is someone who stood here, went down, and climbed back up far enough to add a mark and leave the glass for the next. “You think your grief is the deepest and the first. It is neither. The way down is worn smooth by everyone who climbed back. Add your mark. Leave the glass. Climb.”',
   },
   // folded into the music box on the study shelf — ties the box/bird puzzle (the fourth note he
   // bends DOWN where the bird bends it UP) to his grief: the thing he could never do, that you do.
@@ -240,4 +245,5 @@ export const SKETCHES = [
   ['the kettle was never for someone else', S('<path d="M32 33c-2-8-1-14 4-16h20c5 2 6 8 4 16z"/><path d="M40 17c2-4 14-4 16 0" opacity=".7"/><path d="M56 22l8-3 1 4" opacity=".6"/><path d="M44 11q2-3 0-6M52 11q2-3 0-6" opacity=".5"/><path d="M28 36h36" opacity=".4"/>')],
   ['note has writing on its back', S('<path d="M22 23h26v12H22z"/><path d="M48 25l8 1v8l-8 1" opacity=".8"/><path d="M56 27h6v6h-6" opacity=".7"/><path d="M26 27h18M26 31h12" opacity=".45"/>')],
   ['one hand grinding one lens', S('<circle cx="40" cy="19" r="11"/><path d="M48 27l16 13" /><path d="M35 14a8 8 0 0 1 8 1" opacity=".5"/><path d="M40 19h0" /><path d="M58 30l8 4" opacity="0"/>')],
+  ['worn smooth by everyone who climbed back', S('<path d="M30 12v16M37 12v16M44 12v16M51 12v16" /><path d="M26 26l29-18" opacity=".8"/><path d="M20 32h54" opacity=".45"/>')],
 ];
