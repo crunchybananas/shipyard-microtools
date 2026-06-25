@@ -1946,6 +1946,44 @@ function buildVegetation(core, r) {
   trunks.name = 'trunks'; canopiesA.name = 'canopies'; canopiesB.name = 'canopies2';
   core.add(trunks, canopiesA, canopiesB);
 
+  // FOREST-FLOOR detail: fallen logs + cut stumps among the trees — the bare tree-line given a real
+  // woodland floor (the world rang flat). Two InstancedMeshes (+2 draws); own rng so the world scatter
+  // stays byte-identical; reuses the bark material with darker, mossier per-instance tones (decaying wood).
+  {
+    const ffr = mulberry32(SEED ^ 0xf07e);
+    const logInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.16, 0.22, 2.4, 6), trunkMat, 9);
+    const stumpInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.3, 0.36, 0.6, 7), trunkMat, 6);
+    const fm = new THREE.Matrix4(), fq = new THREE.Quaternion(), fe = new THREE.Euler(), fc = new THREE.Color();
+    let li = 0, si = 0;
+    for (let k = 0; k < 240 && (li < 9 || si < 6); k++) {
+      const sp = spots[(ffr() * spots.length) | 0];                 // near a tree, offset onto the floor
+      const ang = ffr() * TAU, off = 2 + ffr() * 5;
+      const x = sp[0] + Math.sin(ang) * off, z = sp[2] + Math.cos(ang) * off;
+      const h = heightAt(x, z);
+      if (h < 3.0 || h > 15) continue;
+      if (ffr() < 0.6 && li < 9) {
+        const s = 0.7 + ffr() * 0.7;                                // fallen log, lying flat
+        fe.set(Math.PI / 2 + (ffr() - 0.5) * 0.2, ffr() * TAU, (ffr() - 0.5) * 0.3); fq.setFromEuler(fe);
+        fm.compose(new THREE.Vector3(x, h + 0.12 * s, z), fq, new THREE.Vector3(s, s * (0.8 + ffr() * 0.6), s));
+        logInst.setMatrixAt(li, fm);
+        fc.setHSL(0.07 + ffr() * 0.05, 0.24 + ffr() * 0.14, 0.32 + ffr() * 0.14); logInst.setColorAt(li, fc);   // weathered brown, not near-black
+        li++;
+      } else if (si < 6) {
+        const s = 0.7 + ffr() * 0.6;                                // cut stump, short + vertical
+        fe.set((ffr() - 0.5) * 0.1, ffr() * TAU, (ffr() - 0.5) * 0.1); fq.setFromEuler(fe);
+        fm.compose(new THREE.Vector3(x, h + 0.28 * s, z), fq, new THREE.Vector3(s, s, s));
+        stumpInst.setMatrixAt(si, fm);
+        fc.setHSL(0.08 + ffr() * 0.05, 0.26 + ffr() * 0.12, 0.36 + ffr() * 0.12); stumpInst.setColorAt(si, fc);   // weathered brown, readable in shade
+        si++;
+      }
+    }
+    logInst.count = li; stumpInst.count = si;
+    logInst.computeBoundingSphere(); stumpInst.computeBoundingSphere();
+    logInst.castShadow = logInst.receiveShadow = true; logInst.name = 'fallenLogs';
+    stumpInst.castShadow = stumpInst.receiveShadow = true; stumpInst.name = 'stumps';
+    core.add(logInst, stumpInst);
+  }
+
   // --- grass: a TUFT of curved blades (loop #122). The old single straight cross-blade read as
   // a spike in the ground; a clump of blades that arc OUTWARD and droop at the tips reads as grass.
   const bladeGeo = (() => {
