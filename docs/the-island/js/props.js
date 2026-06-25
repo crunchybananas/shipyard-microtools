@@ -39,6 +39,15 @@ const matGlass = new THREE.MeshStandardMaterial({
   color: 0xcfe8ea, transparent: true, opacity: 0.16, roughness: 0.08, metalness: 0.1,
   side: THREE.DoubleSide, depthWrite: false,
 });
+// the STUDY WINDOW glaze — distinct from the lamp-room glass (matGlass, which must stay near-clear so
+// the beam reads). At 0.16 opacity the window looked like an open HOLE (owner-flagged); this pane has
+// real presence: ~0.46 opacity + a cool tint so it's visibly glazed, and roughness 0.05 so the low sun
+// throws a specular GLINT across it — the cue that sells "glass". depthWrite off (transparent sort).
+const matWinGlass = new THREE.MeshStandardMaterial({
+  color: 0xaecdd6, transparent: true, opacity: 0.46, roughness: 0.05, metalness: 0.0,
+  side: THREE.DoubleSide, depthWrite: false,
+});
+const matWinFrame = new THREE.MeshStandardMaterial({ color: 0x2c2824, roughness: 0.7, metalness: 0.05 }); // dark painted glazing bars
 const matLamp = new THREE.MeshStandardMaterial({
   color: 0xffb454, emissive: 0xffb454, emissiveIntensity: 1.6, roughness: 0.4,
 });
@@ -431,12 +440,17 @@ export function buildWorld() {
     const lampGlass = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 2.4, 16, 1, true), matGlass);
     lampGlass.position.set(0, 22.05, 0);
     lhGroup.add(lampGlass);
-    const winGlass = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.7), matGlass);
+    // the study window: a GLAZED pane + a cross of glazing bars, so it reads as a window and not a hole
+    const winGroup = new THREE.Group();
     const wa = deg(110);
-    winGlass.position.set(Math.sin(wa) * (baseR - 0.05), 2.0, Math.cos(wa) * (baseR - 0.05));
-    winGlass.rotation.y = wa;
-    winGlass.name = 'studyWindow';
-    lhGroup.add(winGlass);
+    winGroup.position.set(Math.sin(wa) * (baseR - 0.05), 2.0, Math.cos(wa) * (baseR - 0.05));
+    winGroup.rotation.y = wa;
+    winGroup.name = 'studyWindow';
+    const winGlass = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.7), matWinGlass);
+    winGroup.add(winGlass);
+    const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.78, 0.09), matWinFrame); vBar.position.z = 0.05; winGroup.add(vBar);
+    const hBar = new THREE.Mesh(new THREE.BoxGeometry(2.68, 0.07, 0.09), matWinFrame); hBar.position.z = 0.05; winGroup.add(hBar);
+    lhGroup.add(winGroup);
   }
   // the study door, forever ajar
   {
