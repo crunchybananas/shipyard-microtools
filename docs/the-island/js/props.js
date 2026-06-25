@@ -1188,6 +1188,35 @@ export function buildWorld() {
       core.add(driftInst);
     }
 
+    // TIDELINE WRACK: dark-olive seaweed/kelp clumps the tide cast up along the south waterline. Colour
+    // contrast on the pale sand (the world rang tan/green-monotone) + real-shore detail. One InstancedMesh
+    // (+1 draw); own rng so the world scatter is byte-identical; flat lumpy clumps laid on the wet sand
+    // (naturally flat — no card artifact). Canon: the sea leaves wrack on a shore no one tends.
+    {
+      const wrackMat = new THREE.MeshStandardMaterial({ color: 0x3a4a2e, roughness: 0.92, flatShading: true });
+      const wrackInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.34, 0), wrackMat, 18);
+      const rngK = mulberry32(SEED ^ 0x5eac);
+      const km = new THREE.Matrix4(), kq = new THREE.Quaternion(), ke = new THREE.Euler(), kc = new THREE.Color();
+      let kn = 0;
+      for (let i = 0; i < 220 && kn < 18; i++) {
+        const x = -40 + rngK() * 66, z = -98 - rngK() * 22;        // south waterline band
+        const h = heightAt(x, z);
+        if (h < -0.7 || h > 0.9) continue;                          // the WET tideline (low shingle → waterline)
+        const sx = 0.6 + rngK() * 1.0, sz = 0.6 + rngK() * 1.3;
+        ke.set(0, rngK() * TAU, 0); kq.setFromEuler(ke);
+        km.compose(new THREE.Vector3(x, h - 0.03, z), kq, new THREE.Vector3(sx, 0.16 + rngK() * 0.08, sz));   // flat clump
+        wrackInst.setMatrixAt(kn, km);
+        kc.setHSL(0.18 + rngK() * 0.12, 0.22 + rngK() * 0.22, 0.14 + rngK() * 0.12);   // dark olive → muddy kelp-brown
+        wrackInst.setColorAt(kn, kc);
+        kn++;
+      }
+      wrackInst.count = kn;
+      wrackInst.computeBoundingSphere();
+      wrackInst.name = 'wrack';
+      wrackInst.receiveShadow = true;
+      core.add(wrackInst);
+    }
+
     // a wet-PEBBLE apron draped over the south wake-up-beach waterline — the shingle where the sea
     // meets the sand (the campaign's shoreline detail). A thin PlaneGeometry strip y-conformed to
     // the terrain so it never floats/z-fights; the seaward edge sits under the shallow water (wet
