@@ -253,6 +253,41 @@ const gulls = [];
   }
 }
 
+// ---------------- perched shore gulls ----------------
+// gulls resting on the south shingle — the first life you meet at the wake-up beach. They startle and
+// flush off when you come close, and settle back once you've moved on. Static when perched (verifiable);
+// added to `scene` (not core) → no 1:240 model clone. Surface + day only.
+const perched = [];
+{
+  const white = new THREE.MeshStandardMaterial({ color: 0xe7e3d8, flatShading: true, roughness: 0.82 });
+  const grey  = new THREE.MeshStandardMaterial({ color: 0x95938b, flatShading: true, roughness: 0.85 });
+  const beakM = new THREE.MeshStandardMaterial({ color: 0xd6a233, flatShading: true, roughness: 0.7 });
+  const mk = () => {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.16, 7, 6), white); body.scale.set(1, 0.86, 1.62); body.position.y = 0.17; g.add(body);
+    const mantle = new THREE.Mesh(new THREE.SphereGeometry(0.155, 7, 5), grey); mantle.scale.set(0.92, 0.46, 1.5); mantle.position.set(0, 0.25, -0.02); g.add(mantle);   // folded wings / back
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.26, 4), grey); tail.rotation.x = -1.95; tail.position.set(0, 0.18, -0.32); g.add(tail);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.097, 7, 6), white); head.position.set(0, 0.36, 0.25); g.add(head);
+    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.12, 4), beakM); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.355, 0.38); g.add(beak);
+    return g;
+  };
+  const rngP = mulberry32(SEED ^ 0x9c0f);   // own rng — world scatter byte-unchanged
+  let placed = 0;
+  for (let i = 0; i < 80 && placed < 5; i++) {
+    const x = -22 + rngP() * 52;            // south shingle span
+    const z = -98 - rngP() * 22;
+    const h = heightAt(x, z);
+    if (h < 0.25 || h > 2.2) continue;       // dry shingle above the waterline only
+    const g = mk();
+    g.position.set(x, h, z);
+    g.rotation.y = (rngP() - 0.5) * 1.7;     // facing roughly seaward (yaw 0 = −z), spread
+    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0 };
+    scene.add(g);
+    perched.push(g);
+    placed++;
+  }
+}
+
 // ---------------- actors ----------------
 const player = new Player(camera, canvas);
 const interact = new Interactions(camera, player, canvas);
@@ -1012,6 +1047,38 @@ function tickGulls(elapsed, dt) {
   }
 }
 
+function tickPerched(elapsed, dt) {
+  const day = 1 - clamp((-sunElevation(W.time) - 0.02) / 0.15, 0, 1);
+  const active = day > 0.3 && MODE !== 'dive' && W.level === 1;
+  const pp = player.pos;
+  for (const g of perched) {
+    const u = g.userData;
+    if (!active) { g.visible = false; continue; }
+    const d = Math.hypot(pp.x - u.px, pp.z - u.pz);
+    if (u.flush === 0) {
+      // perched + idle: a gentle bob and a slow look-around
+      g.visible = true; g.rotation.x = 0;
+      g.position.set(u.px, u.py + Math.sin(elapsed * 1.5 + u.ph) * 0.012, u.pz);
+      g.rotation.y = u.yaw + Math.sin(elapsed * 0.45 + u.ph) * 0.18;
+      if (d < 3.6) u.flush = 0.001;                        // startle → flush
+    } else if (u.flush < 1) {
+      // flush: a quick climb up + away (flew off)
+      u.flush = Math.min(1, u.flush + dt / 0.9);
+      const e = u.flush;
+      const dx = u.px - pp.x, dz = u.pz - pp.z, dl = Math.hypot(dx, dz) || 1;
+      g.position.set(u.px + (dx / dl) * e * 5, u.py + e * 7, u.pz + (dz / dl) * e * 5);
+      g.rotation.x = -e * 0.6;                             // nose up, climbing
+      g.visible = e < 0.97;
+      if (e >= 1) u.cool = 14;
+    } else {
+      // gone: hidden; settle back once the cooldown elapses and the coast is clear
+      g.visible = false;
+      u.cool -= dt;
+      if (u.cool <= 0 && d > 14) u.flush = 0;
+    }
+  }
+}
+
 // ---------------- footsteps ----------------
 player.onRescue = () => UI.whisper('The ground gives you back.');
 player.onFootstep = (kind, pos) => {
@@ -1367,6 +1434,7 @@ renderer.setAnimationLoop((tMs) => {
   interact.update();
   applyAtmosphere(elapsed, dt);
   tickGulls(elapsed, dt);
+  tickPerched(elapsed, dt);
 
   A.update(dt, {
     wavePhase: clamp(wavePhase(elapsed), 0, 1),
