@@ -88,7 +88,7 @@ const composer = new EffectComposer(renderer);
 composer.setPixelRatio(BASE_DPR);
 composer.setSize(innerWidth, innerHeight);
 composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.5, 0.6, 0.85); // strength, radius, threshold (only bright things bloom)
+const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 0.85); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 
@@ -780,11 +780,14 @@ function applyAtmosphere(elapsed, dt) {
   sun.color.copy(night > 0.6 ? MOONLIGHT : g.sunCol);
   // mist rolls in and out on its own slow weather clock
   mistCur = lerp(mistCur, mistTargetAt(W.time), 1 - Math.exp(-dt / 16));
-  sun.intensity = (night > 0.6 ? 0.5 * night : g.sunInt * 2.6 * clamp((el + 0.06) / 0.2, 0.05, 1)) * (1 - mistCur * 0.3);
+  // WOW pass (anti-flat): a stronger directional KEY + a lower ambient FILL = sculptural chiaroscuro
+  // instead of flat even light. Keeps the per-grade COLOUR identity (only contrast changes), so the
+  // melancholy reads as depth, not washout.
+  sun.intensity = (night > 0.6 ? 0.5 * night : g.sunInt * 2.95 * clamp((el + 0.06) / 0.2, 0.05, 1)) * (1 - mistCur * 0.3);
 
   hemi.color.copy(g.hemiSky);
   hemi.groundColor.copy(g.hemiGnd);
-  hemi.intensity = lerp(0.55, 0.18, night);
+  hemi.intensity = lerp(0.44, 0.15, night);
   scene.environmentIntensity = lerp(0.38, 0.08, night);
 
   scene.fog.color.copy(g.fog);
