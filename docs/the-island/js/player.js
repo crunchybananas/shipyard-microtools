@@ -199,7 +199,7 @@ export class Player {
     // inside the lighthouse study (or its annex)
     const dx = this.pos.x - (-85), dz = this.pos.z - (-40);
     if (dx * dx + dz * dz < 5.4 * 5.4) return true;
-    const ax = this.pos.x - (-85 + Math.sin(0.2618) * 7.4), az = this.pos.z - (-40 + Math.cos(0.2618) * 7.4);
+    const ax = this.pos.x - (-85 + Math.sin(0.2618) * 8.1), az = this.pos.z - (-40 + Math.cos(0.2618) * 8.1);
     if (ax * ax + az * az < 2.8 * 2.8) return true;
     // the cellar vault
     if (W.flags.hatchOpen) {

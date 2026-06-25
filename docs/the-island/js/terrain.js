@@ -156,9 +156,10 @@ export function walkableY(x, z) {
   // the jetty deck: a real surface over the water (was a fall-through)
   if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
 
-  // lighthouse interior: flat disc
+  // lighthouse interior: the study drum, plus the keeper's annex (now a walkable room)
   const dl = Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y);
   if (dl < 5.4) return LIGHTHOUSE_H;
+  if (Math.hypot(x - ANX, z - ANZ) < 2.8) return LIGHTHOUSE_H;   // annex floor (meets the drum disc at r5.4)
 
   // ruler bridge across the chasm
   if (W.flags.rulerPlaced) {
@@ -190,7 +191,7 @@ export function walkableY(x, z) {
 
 // Wall collision: the lighthouse and annex are rings with door gaps.
 const LHX = SPOTS.lighthouse.x, LHZ = SPOTS.lighthouse.y;
-const ANX = LHX + Math.sin(0.2618) * 7.4, ANZ = LHZ + Math.cos(0.2618) * 7.4;
+const ANX = LHX + Math.sin(0.2618) * 8.1, ANZ = LHZ + Math.cos(0.2618) * 8.1;  // annex pushed clear of the drum
 const deg = (d) => d * Math.PI / 180;
 
 function ringBlocked(x0, z0, x1, z1, cx, cz, r, doorA0, doorA1) {
@@ -204,9 +205,25 @@ function ringBlocked(x0, z0, x1, z1, cx, cz, r, doorA0, doorA1) {
   return !inDoor;
 }
 
+// like ringBlocked but with several door gaps — block only if the wall is crossed AWAY from every gap.
+function ringBlockedGaps(x0, z0, x1, z1, cx, cz, r, gaps) {
+  const d0 = Math.hypot(x0 - cx, z0 - cz), d1 = Math.hypot(x1 - cx, z1 - cz);
+  if ((d0 - r) * (d1 - r) >= 0) return false;        // not crossing the ring
+  let az = Math.atan2(x1 - cx, z1 - cz);
+  if (az < 0) az += Math.PI * 2;
+  for (let i = 0; i < gaps.length; i++) {
+    const a0 = gaps[i][0], a1 = gaps[i][1];
+    const inDoor = a0 < a1 ? (az > a0 && az < a1) : (az > a0 || az < a1);
+    if (inDoor) return false;                        // passing through a doorway
+  }
+  return true;                                       // crossed solid wall
+}
+// the drum's two openings: the beach door (az 153..177°) and the annex doorway (az 5..25°)
+const LH_GAPS = [[deg(153), deg(177)], [deg(5), deg(25)]];
+
 export function wallBlocked(x0, z0, x1, z1) {
-  // lighthouse wall: door gap az 153..177°
-  if (ringBlocked(x0, z0, x1, z1, LHX, LHZ, 5.2, deg(153), deg(177))) return true;
+  // lighthouse wall: the beach door + the annex doorway
+  if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
   // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2
   if (W.level >= 2) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;

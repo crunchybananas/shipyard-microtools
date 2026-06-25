@@ -363,10 +363,11 @@ export function buildWorld() {
   core.add(lhGroup);
 
   const deg = (d) => d * Math.PI / 180;
-  // wall arcs: full circle minus door gap (az 165±14, faces the beach path)
-  // and window gap (az 110±15, overlooks the cove and the causeway)
-  const gaps = [[deg(151), deg(179)], [deg(95), deg(125)]];
-  const arcs = [[deg(179), deg(95) + TAU], [deg(125), deg(151)]]; // complementary
+  // wall arcs: full circle minus the beach door (az 165±14), the window (az 110±15,
+  // overlooks the cove and causeway), and the ANNEX DOORWAY (az 15±12 — Phase A: a real
+  // walkable opening through to the keeper's quarters, where before the wall was solid).
+  const gaps = [[deg(151), deg(179)], [deg(95), deg(125)], [deg(3), deg(27)]];
+  const arcs = [[deg(179), deg(3) + TAU], [deg(27), deg(95)], [deg(125), deg(151)]]; // complementary
   const baseR = 5.2, baseH = 4.6, wallT = 0.5;
   for (const [a0, a1] of arcs) {
     const len = a1 - a0;
@@ -787,8 +788,12 @@ export function buildWorld() {
   // =================== THE ANNEX (locked until one level down) ==============
   {
     const aa = deg(15); // north-ish attachment
-    const ax = LH.x + Math.sin(aa) * (baseR + 2.2), az = LH.z + Math.cos(aa) * (baseR + 2.2);
-    const wall = new THREE.CylinderGeometry(2.7, 2.8, 3.4, 12, 1, true, aa + deg(140), deg(280));
+    // Phase A bones: pushed clear of the drum (centre baseR+2.9 → near edge r5.3 > drum r5.2, killing
+    // the wall-in-wall z-fight the owner flagged), and the wall opening RE-AIMED to face the study
+    // (gap centred az195° from the annex, thetaStart aa+220) so the inner door stands in a true
+    // doorway and you look straight in at the keeper's room instead of obliquely past a solid wall.
+    const ax = LH.x + Math.sin(aa) * (baseR + 2.9), az = LH.z + Math.cos(aa) * (baseR + 2.9);
+    const wall = new THREE.CylinderGeometry(2.7, 2.8, 3.4, 12, 1, true, aa + deg(220), deg(280));
     stone.add(wall, new THREE.Matrix4().makeTranslation(ax, LH.y + 1.7, az), grad(C.boneDark, C.bone));
     wall.dispose();
     const roof = new THREE.ConeGeometry(3.0, 1.4, 12);
@@ -797,6 +802,22 @@ export function buildWorld() {
     const afloor = new THREE.CylinderGeometry(2.8, 2.8, 0.2, 12);
     stone.add(afloor, new THREE.Matrix4().makeTranslation(ax, LH.y - 0.03, az), grad(C.stoneOld, C.boneDark));
     afloor.dispose();
+
+    // the threshold throat — a short stone doorway bridging the drum wall (r5.2) and the annex
+    // (r5.3) so the two read as ONE connected structure, not two buildings kissing. Baked into
+    // `stone` (clone-safe); the jambs sit inside the drum's az-15° gap so nothing z-fights.
+    {
+      const hw = deg(8.5);                       // doorway half-width (~0.8m of clear opening here)
+      for (const s of [-1, 1]) {                 // two radial jamb slabs flanking the opening
+        const ja = aa + s * hw;
+        const jamb = new THREE.BoxGeometry(0.22, 3.4, 0.95);
+        stone.add(jamb, place(LH.x + Math.sin(ja) * 5.3, LH.y + 1.7, LH.z + Math.cos(ja) * 5.3, ja), grad(C.boneDark, C.bone));
+        jamb.dispose();
+      }
+      const lintel = new THREE.BoxGeometry(2.0, 0.4, 0.95);   // a lintel across the top of the throat
+      stone.add(lintel, place(LH.x + Math.sin(aa) * 5.3, LH.y + 3.5, LH.z + Math.cos(aa) * 5.3, aa), grad(C.bone, C.bone));
+      lintel.dispose();
+    }
 
     // inner door between study and annex
     const innerDoor = new THREE.Group();
@@ -884,7 +905,7 @@ export function buildWorld() {
   // closed inner door at the surface, revealed when you go one level down.
   {
     const aa = deg(15);
-    const ax = LH.x + Math.sin(aa) * (baseR + 2.2), az = LH.z + Math.cos(aa) * (baseR + 2.2);
+    const ax = LH.x + Math.sin(aa) * (baseR + 2.9), az = LH.z + Math.cos(aa) * (baseR + 2.9);  // matches the pushed-out annex shell
     const q = new THREE.Group();
     q.name = 'quarters';
     q.position.set(ax, LH.y, az);
