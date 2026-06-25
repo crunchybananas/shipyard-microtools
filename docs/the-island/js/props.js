@@ -1161,6 +1161,33 @@ export function buildWorld() {
     oar.name = 'doryOar'; dory.add(oar);
     core.add(dory);
 
+    // weathered DRIFTWOOD on the bare shore — sea-worn logs the tide left, half-buried in the shingle.
+    // Density against the empty beach (the world rang flat). One InstancedMesh (+1 draw); own rng so the
+    // world scatter stays byte-identical; reuses the jetty/dory driftwood material + relief.
+    {
+      const driftInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.1, 0.15, 1.5, 6), weather, 12);
+      const rngW = mulberry32(SEED ^ 0xd71f);
+      const dm = new THREE.Matrix4(), dq = new THREE.Quaternion(), de = new THREE.Euler(), dv = new THREE.Vector3();
+      let dn = 0;
+      for (let i = 0; i < 140 && dn < 12; i++) {
+        const x = -46 + rngW() * 78, z = -90 - rngW() * 34;        // south wake-up shore span
+        const h = heightAt(x, z);
+        if (h < -0.4 || h > 2.6) continue;                          // the shore band (shingle → low sand)
+        if (Math.hypot(x + 18, z + 110) < 3.5) continue;            // clear of the jetty footprint
+        const s = 0.7 + rngW() * 0.95;
+        de.set((rngW() - 0.5) * 0.22, rngW() * TAU, Math.PI / 2 + (rngW() - 0.5) * 0.28);  // lying flat, random yaw + slight tilt
+        dq.setFromEuler(de);
+        dv.set(x, h - 0.06, z);                                     // half-buried
+        dm.compose(dv, dq, new THREE.Vector3(s, s * (0.8 + rngW() * 0.5), s));
+        driftInst.setMatrixAt(dn++, dm);
+      }
+      driftInst.count = dn;
+      driftInst.computeBoundingSphere();
+      driftInst.name = 'driftwood';
+      driftInst.castShadow = true; driftInst.receiveShadow = true;
+      core.add(driftInst);
+    }
+
     // a wet-PEBBLE apron draped over the south wake-up-beach waterline — the shingle where the sea
     // meets the sand (the campaign's shoreline detail). A thin PlaneGeometry strip y-conformed to
     // the terrain so it never floats/z-fights; the seaward edge sits under the shallow water (wet
