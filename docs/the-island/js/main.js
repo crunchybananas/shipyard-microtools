@@ -220,7 +220,21 @@ scene.add(disagreeLight);
 const gulls = [];
 {
   const wingMat = new THREE.MeshStandardMaterial({ color: 0xe8e4da, flatShading: true, side: THREE.DoubleSide });
-  for (let i = 0; i < 2; i++) {
+  // a WHEELING FLOCK over the island (loop: life). Varied radius/height/speed (some negative =
+  // counter-wheeling) so it reads as a living gyre, not identical circles — and several fly LOW + CLOSE
+  // so you actually see gulls pass overhead, not two specks at 50 m. gulls[0] still leaves the gyre to
+  // perch on the gallery rail at dawn (the keeper's-view beat). +0 model-clone cost (added to scene, not core).
+  const FLOCK = [
+    { radius: 24, h: 32, speed:  0.14, phase: 0.0 },   // [0] the dawn percher — keep first
+    { radius: 33, h: 38, speed:  0.17, phase: 2.4 },
+    { radius: 17, h: 15, speed:  0.25, phase: 1.1 },   // low + tight, passes close overhead
+    { radius: 47, h: 25, speed: -0.11, phase: 3.7 },   // wide, counter-wheeling
+    { radius: 21, h: 18, speed: -0.20, phase: 5.0 },   // low, counter
+    { radius: 62, h: 29, speed:  0.09, phase: 0.8 },   // sweeping the whole island
+    { radius: 13, h: 12, speed:  0.29, phase: 4.2 },   // lowest/closest — clear life near the ground
+    { radius: 39, h: 44, speed: -0.13, phase: 2.0 },   // high counter
+  ];
+  for (const f of FLOCK) {
     const g = new THREE.Group();
     const l = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.4), wingMat);
     l.position.x = -0.7;
@@ -233,7 +247,7 @@ const gulls = [];
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), wingMat);
     head.position.set(0, 0.07, 0.33);
     g.add(l, r, body, head);
-    g.userData = { phase: i * 2.4, radius: 24 + i * 9, h: 32 + i * 6, speed: 0.14 + i * 0.03, l, r };
+    g.userData = { phase: f.phase, radius: f.radius, h: f.h, speed: f.speed, l, r };
     scene.add(g);
     gulls.push(g);
   }
@@ -983,7 +997,7 @@ function tickGulls(elapsed, dt) {
     const u = g.userData;
     const a = elapsed * u.speed + u.phase;
     g.position.set(LH.x + Math.cos(a) * u.radius, LH.y + u.h + Math.sin(a * 2.3) * 2, LH.z + Math.sin(a) * u.radius);
-    g.rotation.y = -a; // nose along the flight tangent (the body made the old sideways heading visible)
+    g.rotation.y = -a + (u.speed < 0 ? Math.PI : 0); // nose along the flight tangent (flip for counter-wheelers)
     let flapAmp = 0.5;
     if (g === gulls[0] && settle > 0) {
       g.position.lerp(GULL_PERCH, settle);
