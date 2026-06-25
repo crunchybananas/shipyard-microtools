@@ -2013,6 +2013,37 @@ function buildVegetation(core, r) {
     core.add(logInst, stumpInst);
   }
 
+  // FOREST UNDERGROWTH: low moss + scrub patches among the trees — green on the bare forest floor (the
+  // world rang tan-monotone). One InstancedMesh (+1 draw); own rng so the world scatter stays byte-
+  // identical; flat lumpy mounds with per-instance mossy-to-ferny green tones. Canon: a wood reclaiming
+  // a place no one tends.
+  {
+    const mossMat = new THREE.MeshStandardMaterial({ color: 0x4c5a30, roughness: 0.95, flatShading: true });
+    const mossInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.42, 0), mossMat, 24);
+    const mr = mulberry32(SEED ^ 0x6a55);
+    const mm = new THREE.Matrix4(), mq = new THREE.Quaternion(), me2 = new THREE.Euler(), mc = new THREE.Color();
+    let mn = 0;
+    for (let k = 0; k < 280 && mn < 24; k++) {
+      const sp = spots[(mr() * spots.length) | 0];
+      const ang = mr() * TAU, off = 1.5 + mr() * 6;
+      const x = sp[0] + Math.sin(ang) * off, z = sp[2] + Math.cos(ang) * off;
+      const h = heightAt(x, z);
+      if (h < 3.0 || h > 15) continue;
+      const sx = 0.7 + mr() * 1.3, sz = 0.7 + mr() * 1.4;
+      me2.set(0, mr() * TAU, 0); mq.setFromEuler(me2);
+      mm.compose(new THREE.Vector3(x, h - 0.08, z), mq, new THREE.Vector3(sx, 0.22 + mr() * 0.18, sz));   // flat mossy mound
+      mossInst.setMatrixAt(mn, mm);
+      mc.setHSL(0.22 + mr() * 0.12, 0.30 + mr() * 0.22, 0.24 + mr() * 0.13);   // mossy → ferny green, varied (lit + shade readable)
+      mossInst.setColorAt(mn, mc);
+      mn++;
+    }
+    mossInst.count = mn;
+    mossInst.computeBoundingSphere();
+    mossInst.name = 'undergrowth';
+    mossInst.receiveShadow = true;
+    core.add(mossInst);
+  }
+
   // --- grass: a TUFT of curved blades (loop #122). The old single straight cross-blade read as
   // a spike in the ground; a clump of blades that arc OUTWARD and droop at the tips reads as grass.
   const bladeGeo = (() => {
