@@ -510,6 +510,45 @@ export function buildWorld() {
     lhGroup.add(shaft);
   }
 
+  // =================== THE CLIMB (hub Phase B) ==============================
+  // A wooden spiral stair winds up the tower interior, around the light shaft, from just above
+  // the study oculus to the lamp-room gallery. You earn the climb by lighting the lamp; until
+  // then a rope hangs across its foot. Reaching the top opens the whole island — and a foreshadow
+  // of where the next tide means to rise (the vista). The ascent itself is a committed crossing
+  // (puzzles.js), not free-walked: the tower is too narrow to wind a multi-turn floor through.
+  {
+    const startAng = deg(200);
+    const N = 34, yB = LH.y + baseH, yTop = LH.y + 19.4;   // study-ceiling level -> just under the gallery (LH.y+20.6)
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      const ang = startAng + i * (2.5 * TAU / N);          // ~2.5 turns
+      const rad = 2.5 - t * 0.5;                            // spiral inward as it rises (2.5 -> 2.0)
+      const yy = yB + 0.6 + t * (yTop - yB - 0.6);
+      const step = new THREE.BoxGeometry(0.82, 0.13, 0.56);
+      stone.add(step, place(LH.x + Math.sin(ang) * rad, yy, LH.z + Math.cos(ang) * rad, ang), grad(C.woodDark, C.wood));
+      step.dispose();
+    }
+    // the FOOT — a bottom step + a brass newel in the study, under the oculus, where you step on
+    const footAng = startAng, footR = 1.95;
+    const fx = LH.x + Math.sin(footAng) * footR, fz = LH.z + Math.cos(footAng) * footR;
+    const foot = new THREE.Group(); foot.name = 'stairFoot'; foot.position.set(fx, LH.y + 0.02, fz);
+    const fstep = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.16, 0.7), matWood); fstep.position.y = 0.08; foot.add(fstep);
+    const newel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 1.15, 8), matBrassSolid); newel.position.set(0.42, 0.6, 0.28); foot.add(newel);
+    lhGroup.add(foot);
+    // the rope across the foot — the gate; hangs until the lamp is lit (puzzles _apply)
+    const rope = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.035, 6, 12, Math.PI), new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 1 }));
+    rope.rotation.x = Math.PI / 2; rope.rotation.z = footAng;
+    rope.position.set(fx, LH.y + 0.95, fz); rope.name = 'stairRope';
+    lhGroup.add(rope);
+    // the DESCEND point — a brass trap-ring on the gallery, where the stair tops out
+    const topAng = startAng + (N - 1) * (2.5 * TAU / N);
+    const hatch = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 16), matBrassSolid);
+    hatch.rotation.x = Math.PI / 2;
+    hatch.position.set(LH.x + Math.sin(topAng) * 2.0, LH.y + 20.55, LH.z + Math.cos(topAng) * 2.0);
+    hatch.name = 'galleryHatch';
+    lhGroup.add(hatch);
+  }
+
   // =================== THE STUDY ============================================
   const study = new THREE.Group();
   study.name = 'study';
@@ -2278,7 +2317,7 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -2351,6 +2390,7 @@ const NAMES = [
   'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
   'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
   'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher', 'musicNote',
+  'stairFoot', 'galleryHatch', 'stairRope',   // hub Phase B: the climb foot, descend point, and the lamp-lit gate
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',

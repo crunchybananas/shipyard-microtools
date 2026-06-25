@@ -23,7 +23,7 @@ const _ov = new THREE.Vector3();   // scratch for the oar's world position (nest
 // farewell lines — one place for the voice layer and the twist to re-point (#14).
 
 export class Game {
-  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale, onLeave }) {
+  constructor({ refs, modelRefs, modelAnchor, interact, player, onDive, onAscend, onFinale, onLeave, onClimb }) {
     this.refs = refs;
     this.modelRefs = modelRefs;
     this.player = player;
@@ -32,6 +32,7 @@ export class Game {
     this.onAscend = onAscend;
     this.onFinale = onFinale;
     this.onLeave = onLeave;     // the climb-out terminal: row off the wake-up beach (#22, The Oar)
+    this.onClimb = onClimb;     // hub Phase B: ascend/descend the lamp-room stair (up = true/false)
 
     W.dials = W.dials || [0, 0, 0, 0];
 
@@ -349,6 +350,26 @@ export class Game {
       },
     });
 
+    // ---- THE CLIMB (hub Phase B) — earn the way up by lighting the lamp ----
+    // the foot of the tower stair: when the lamp is lit, climb to the lamp-room gallery + the vista.
+    I.add({
+      id: 'climbStair', targets: [R.stairFoot], label: 'the stair to the lamp', maxDist: 2.8,
+      when: () => W.lampLit && !W.atTop,
+      onClick: () => { if (this.onClimb) this.onClimb(true); },
+    });
+    // the rope across the foot, before the lamp is lit — names what lighting it opens
+    I.add({
+      id: 'stairRope', targets: [R.stairRope, R.stairFoot], label: 'a rope across the stair', maxDist: 2.8,
+      when: () => !W.lampLit && !W.atTop,
+      onClick: () => UI.whisper('The stair is roped off and dark. Light the lamp, and the way up opens.'),
+    });
+    // the descend ring on the gallery — the way back down to the working room
+    I.add({
+      id: 'galleryHatch', targets: [R.galleryHatch], label: 'the way down', maxDist: 3.0,
+      when: () => W.atTop,
+      onClick: () => { if (this.onClimb) this.onClimb(false); },
+    });
+
     // the bell — the END at the bottom (descent / accept the loop). Struck below, it
     // withholds; struck at the surface it keeps the golden parade. The OTHER terminal
     // is the oar, at the top (below).
@@ -549,6 +570,8 @@ export class Game {
     }
     ease('beamI', W.lampLit ? 1 : 0, 1.5);
     ease('shaft', W.lampLit ? 0.5 : 0, 1.5);
+    // hub Phase B: the stair is roped off until the lamp is lit — lighting it opens the climb
+    if (R.stairRope) R.stairRope.visible = !W.lampLit;
 
     // golden-hour shimmer on the buried hatch
     const shimmerOn = isGolden() && !F.shadowRevealed;

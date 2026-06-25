@@ -1,7 +1,11 @@
 # THE LIGHTHOUSE AS A PROGRESSION HUB — design (APPROVED, building)
 
 > Status: **APPROVED — building.** Owner reviewed + answered the six questions (2026-06-25) and said
-> "start building". **Phase A (bones) is BUILT + SHIPPED.** Decisions are recorded in §7.
+> "start building". **Phase A (bones) SHIPPED. Phase B (the climb) — first slice SHIPPED:** the
+> walkable lamp-room gallery + the vista + the next-tide FORESHADOW, reached by a committed climb
+> gated on `lampLit`; an enclosed spiral stair winds the tower (shows in the chart-table model).
+> **B2 (next):** a flythrough up the stair so the climb is *seen* (the stair is currently enclosed),
+> and making the stair more prominent. Decisions are recorded in §7.
 > Canon guardrails: zero-dep three.js · ALL-METAPHOR · grief → INTEGRATION · power-safe 60fps ·
 > the 1:240 chart-table model mirrors the island (recursion) · never literal.
 >

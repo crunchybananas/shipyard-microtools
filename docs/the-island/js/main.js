@@ -5,7 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS } from './world.js';
+import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
 import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
@@ -148,6 +148,19 @@ const farSea = new THREE.Mesh(
   new THREE.MeshBasicMaterial({ color: 0x15454f }));
 farSea.rotation.x = -Math.PI / 2;
 scene.add(farSea);
+
+// hub Phase B — the FORESHADOW: from the lamp-room gallery you glimpse the line the NEXT level's
+// tide means to rise to. A faint luminous ring lying flat at that higher water height, encircling
+// the island; shown ONLY while atTop, its height + glow driven in applyAtmosphere by W.level.
+const foreshadow = new THREE.Mesh(
+  new THREE.TorusGeometry(118, 0.45, 6, 96),
+  new THREE.MeshBasicMaterial({ color: 0x9fe4ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+foreshadow.rotation.x = -Math.PI / 2;
+foreshadow.position.set(0, 1.5, -40);   // centred on the island (x0,z-40); y driven to the next tide's waterline
+foreshadow.renderOrder = 3;
+foreshadow.visible = false;
+foreshadow.name = 'foreshadow';
+scene.add(foreshadow);
 
 // ---------------- lights ----------------
 const sun = new THREE.DirectionalLight(0xfff4e0, 3);
@@ -331,6 +344,7 @@ const game = new Game({
   onAscend: () => startAscent(false),  // #12 stage 2: the in-play way UP
   onFinale: startFinale,               // the bell — descent terminal (at the bottom)
   onLeave: startOarFinale,             // the oar — integration terminal (at the surface, #22)
+  onClimb: (up) => startClimb(up),     // hub Phase B: the lamp-room climb
 });
 
 UI.init();
@@ -633,6 +647,37 @@ function tickAscent(dt) {
       setTimeout(() => UI.whisper('Below you, the voice has stopped. The light still burns — you did not put it out.'), 5200);
     }
   }
+}
+
+// ---------------- the climb (hub Phase B) ----------------
+// The lamp-room stair as a committed fade-crossing up to the gallery and back. The tower is too
+// narrow to wind a free-walked multi-turn floor through, so the climb lands you on the walkable
+// balcony (W.atTop drives the gallery floor + rail in terrain.js and the foreshadow ring in
+// applyAtmosphere). You arrive looking seaward, the whole island open below — and out past the
+// shallows, the line the next tide means to rise to. Gated on W.lampLit (you earn it by lighting
+// the lamp). Set atTop BEFORE spawn so syncCamera snaps to the gallery height, not the study floor.
+function startClimb(up) {
+  if (MODE !== 'play') return;
+  player.locked = true;
+  interact.enabled = false;
+  UI.fadeOut(false, false);
+  A.duckAmbient(true);
+  setTimeout(() => {
+    if (up) {
+      W.atTop = true;
+      player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 1.6, 0, SPOTS.lighthouse.y - 1.9), 5.59, -0.10);
+    } else {
+      W.atTop = false;
+      player.spawn(new THREE.Vector3(SPOTS.lighthouse.x - 0.8, 0, SPOTS.lighthouse.y - 2.0), 3.49, 0);
+    }
+    UI.fadeIn(true);
+    player.locked = false;
+    interact.enabled = true;
+    A.duckAmbient(false);
+    UI.whisper(up
+      ? 'You climb the long stair to the lamp. From up here the whole island lies open — and out past the shallows, the sea shows you the line it means to rise to.'
+      : 'Down the stair, back to the working room.');
+  }, 850);
 }
 
 // ---------------- the finale ----------------
@@ -946,6 +991,15 @@ function applyAtmosphere(elapsed, dt) {
 
   farSea.material.color.copy(g.water).lerp(g.fog, 0.35);
   farSea.position.y = waterY() - 0.15;
+
+  // the foreshadow ring — only while up on the gallery; sits at the NEXT level's waterline (the
+  // line the rising tide means to reach), faint and slowly breathing so it reads as a premonition.
+  foreshadow.visible = W.atTop;
+  if (W.atTop) {
+    const nextTide = LEVELS[Math.min(W.level + 1, MAX_DEPTH)].tide;
+    foreshadow.position.y = -TIDE_DROP * (1 - nextTide) + 0.06;
+    foreshadow.material.opacity = 0.30 + Math.sin(elapsed * 0.9) * 0.08;
+  }
 
   // study glow: warm by night, faint by day — and the partner's warm window
   // goes dark the deeper you descend (one prop change per level, #13)

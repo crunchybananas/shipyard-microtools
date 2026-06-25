@@ -36,6 +36,7 @@ export const W = {
   // lighthouse
   lensPlaced: false,
   lampLit: false,        // derived: lensPlaced && night
+  atTop: false,          // transient: standing on the lamp-room gallery (the climb, hub Phase B)
   beamAngle: 2.2,        // radians, azimuth of the beam
 
   // progression flags
@@ -244,7 +245,7 @@ export function gradeAt(t) {
 }
 
 // ---------------- water level -------------------------------------------------
-const TIDE_DROP = 4.2; // metres between high and drained
+export const TIDE_DROP = 4.2; // metres between high and drained
 export const waterY = () => -TIDE_DROP * (1 - W.tide);
 
 // the same wave the shader displaces — audio locks onto this

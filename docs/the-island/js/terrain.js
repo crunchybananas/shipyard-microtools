@@ -24,6 +24,7 @@ export const SPOTS = {
 };
 
 const LIGHTHOUSE_H = 13.5;
+const GALLERY_H = LIGHTHOUSE_H + 20.6;   // the lamp-room balcony floor (hub Phase B, the climb)
 const STONES_H = 8.8;
 const HATCH_H = 23.5;
 const BRIDGE_DECK = 18.45;
@@ -153,6 +154,9 @@ export function clearColliders() { COLLIDERS.length = 0; }
 const JETTY = { x: -18, z: -110.5, hx: 1.3, hz: 6.1, y: 1.16 };
 
 export function walkableY(x, z) {
+  // the lamp-room gallery: while up top, the lighthouse footprint IS the balcony floor (the climb)
+  if (W.atTop && Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 3.3) return GALLERY_H;
+
   // the jetty deck: a real surface over the water (was a fall-through)
   if (Math.abs(x - JETTY.x) < JETTY.hx && Math.abs(z - JETTY.z) < JETTY.hz) return JETTY.y;
 
@@ -222,6 +226,9 @@ function ringBlockedGaps(x0, z0, x1, z1, cx, cz, r, gaps) {
 const LH_GAPS = [[deg(153), deg(177)], [deg(5), deg(25)]];
 
 export function wallBlocked(x0, z0, x1, z1) {
+  // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
+  if (W.atTop) return Math.hypot(x1 - LHX, z1 - LHZ) > 3.0;
+
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
   // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2
