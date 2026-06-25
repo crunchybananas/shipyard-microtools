@@ -288,6 +288,40 @@ const perched = [];
   }
 }
 
+// ---------------- crows ----------------
+// a few crows inland on the dune / tree line — a darker, warier bird; the lone caw of an island gone
+// quiet (life persisting in the keeper's absence). Reuses the perched-bird model with dark plumage +
+// a sleeker body / longer tail + beak, and the same `perched` idle+flush logic. scene-only (no clone).
+{
+  const blk  = new THREE.MeshStandardMaterial({ color: 0x2e3035, flatShading: true, roughness: 0.68, metalness: 0.12 });
+  const blkD = new THREE.MeshStandardMaterial({ color: 0x1c1e22, flatShading: true, roughness: 0.72, metalness: 0.12 });
+  const mkCrow = () => {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.15, 7, 6), blk); body.scale.set(0.92, 0.8, 1.9); body.position.y = 0.16; g.add(body);
+    const mantle = new THREE.Mesh(new THREE.SphereGeometry(0.145, 7, 5), blkD); mantle.scale.set(0.88, 0.42, 1.6); mantle.position.set(0, 0.24, -0.04); g.add(mantle);
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.4, 4), blkD); tail.rotation.x = -1.72; tail.position.set(0, 0.16, -0.44); g.add(tail);     // longer tail
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.092, 7, 6), blk); head.position.set(0, 0.34, 0.27); g.add(head);
+    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.17, 4), blkD); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.335, 0.44); g.add(beak);  // longer beak
+    return g;
+  };
+  const rngC = mulberry32(SEED ^ 0x4c0a);
+  let pc = 0;
+  for (let i = 0; i < 100 && pc < 4; i++) {
+    const a = rngC() * TAU, d = 24 + rngC() * 110;
+    const x = SPOTS.mainCenter.x + Math.sin(a) * d, z = SPOTS.mainCenter.y + Math.cos(a) * d;
+    const h = heightAt(x, z);
+    if (h < 2.0 || h > 12) continue;                                          // inland dune / tree line, dry
+    if (Math.hypot(x - SPOTS.lighthouse.x, z - SPOTS.lighthouse.y) < 14) continue;
+    const g = mkCrow();
+    g.position.set(x, h, z);
+    g.rotation.y = rngC() * TAU;
+    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0 };
+    scene.add(g);
+    perched.push(g);
+    pc++;
+  }
+}
+
 // ---------------- actors ----------------
 const player = new Player(camera, canvas);
 const interact = new Interactions(camera, player, canvas);
