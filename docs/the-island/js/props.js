@@ -2190,6 +2190,7 @@ function buildVegetation(core, r) {
     return im;
   });
   const riCount = [0, 0, 0];
+  const boulders = [];   // substantial rocks captured for the lichen pass below
   let ri = 0;
   for (let i = 0; i < 400 && ri < 70; i++) {
     const a = r() * TAU, d = 120 + r() * 90;
@@ -2209,10 +2210,43 @@ function buildVegetation(core, r) {
     rockMeshes[bucket].setMatrixAt(riCount[bucket]++, m4);
     // make the substantial boulders SOLID (you walked through them) — register a collider
     // footprint; small pebbles (s<0.9) stay passable so you don't bump invisible nubs
-    if (s >= 0.9) addCollider(x, z, s * 0.82);
+    if (s >= 0.9) { addCollider(x, z, s * 0.82); boulders.push([x, h, z, s]); }
     ri++;
   }
   rockMeshes.forEach((im, b) => { im.count = riCount[b]; core.add(im); });   // trim each to its filled count
+
+  // LICHEN on the shore boulders — sage-grey and rust crusty patches weathering the bare granite (the
+  // rocks rang plain grey; this gives them coastal character + a touch of colour). One InstancedMesh
+  // (+1 draw); own rng so the world scatter stays byte-identical; placed on the upper boulder surfaces.
+  // Canon: weathering on stone no one has cleaned.
+  {
+    const lichMat = new THREE.MeshStandardMaterial({ color: 0x8a9476, roughness: 1.0, flatShading: true });
+    const lichInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.3, 0), lichMat, boulders.length * 2 + 1);
+    const lr = mulberry32(SEED ^ 0x71c4);
+    const lm = new THREE.Matrix4(), lq = new THREE.Quaternion(), le = new THREE.Euler(), lc = new THREE.Color();
+    let ln = 0;
+    for (const [bx, bh, bz, bs] of boulders) {
+      const npatch = 1 + (lr() < 0.55 ? 1 : 0);
+      for (let p = 0; p < npatch; p++) {
+        const ang = lr() * TAU, rad = bs * (0.25 + lr() * 0.45);
+        const px = bx + Math.cos(ang) * rad, pz = bz + Math.sin(ang) * rad;
+        const py = bh + bs * (0.35 + lr() * 0.6);                        // crusting the upper boulder
+        const psc = bs * (0.16 + lr() * 0.2);
+        le.set((lr() - 0.5) * 0.7, lr() * TAU, (lr() - 0.5) * 0.7); lq.setFromEuler(le);
+        lm.compose(new THREE.Vector3(px, py, pz), lq, new THREE.Vector3(psc, psc * 0.32, psc));   // flat crust
+        lichInst.setMatrixAt(ln, lm);
+        const rust = lr() < 0.4;                                          // ~40% rust/ochre for colour pops on grey
+        lc.setHSL(rust ? 0.07 + lr() * 0.05 : 0.21 + lr() * 0.12, rust ? 0.42 + lr() * 0.18 : 0.16 + lr() * 0.16, 0.42 + lr() * 0.16);
+        lichInst.setColorAt(ln, lc);
+        ln++;
+      }
+    }
+    lichInst.count = ln;
+    lichInst.computeBoundingSphere();
+    lichInst.name = 'lichen';
+    lichInst.receiveShadow = true;
+    core.add(lichInst);
+  }
 }
 
 // =============================================================================
