@@ -1183,8 +1183,11 @@ player.onFootstep = (kind, pos) => {
 };
 
 // ---------------- debug ----------------
-if (DEBUG) {
-  gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
+{
+  // The debug panel + ABYME hooks are built for ALL builds now (owner request: backtick (`) opens
+  // debug even without ?debug — the panel just starts hidden for players). The GPU timer stays
+  // DEBUG-only: its timer-query polling costs real GPU time, so players never pay for it.
+  if (DEBUG) gpuTimer = makeGpuTimer(renderer); // Power Ledger: real GPU-frame-ms in the debug readout
   window.ABYME = { player, W, camera, scene, core, refs, modelRefs, renderer, game, THREE, UI, composer, bloomPass,
     bench: (t = 12) => { W.time = t; player.spawn(SPAWN_POS, SPAWN_YAW, SPAWN_PITCH); }, // fixed Power-Ledger pose
     gpuMs: () => (gpuTimer ? +gpuTimer.ms.toFixed(2) : null),
@@ -1405,6 +1408,7 @@ function buildDebugPanel() {
     ${groups.map(grp).join('')}
     <div id="dbg-fps"></div>`;
   document.body.appendChild(el);
+  el.style.display = DEBUG ? '' : 'none';   // players: hidden by default, revealed with backtick (`)
   // hide/show the panel (owner request): the "hide" header collapses it; backtick (`) toggles it back.
   const hideBtn = el.querySelector('#dbg-hide');
   if (hideBtn) hideBtn.addEventListener('click', () => { el.style.display = 'none'; });
@@ -1417,6 +1421,7 @@ function buildDebugPanel() {
   dslider.addEventListener('input', () => { W.tide = W.tideTarget = parseFloat(dslider.value); });
   el.addEventListener('click', (e) => { const act = e.target?.dataset?.act; if (act && acts[act]) acts[act](); });
   setInterval(() => {
+    if (el.style.display === 'none') return;   // skip readout work while hidden (near-zero cost for players)
     const s = A.state();
     el.querySelector('#dbg-time-v').textContent = W.time.toFixed(1) + 'h';
     el.querySelector('#dbg-tide-v').textContent = W.tide.toFixed(2);

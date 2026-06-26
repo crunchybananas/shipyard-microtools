@@ -1510,7 +1510,10 @@ export function buildWorld() {
   {
     const cx = 132, cz = -150, fy = 4.0, ceilY = 8.5, hw = 4.2;   // chamber under the stones pad (surface 8.8)
     const drain = new THREE.Group(); drain.name = 'drain'; core.add(drain);
-    const dMat = new THREE.MeshStandardMaterial({ color: 0x6f695c, flatShading: true, roughness: 1, side: THREE.DoubleSide });
+    // self-lit stone (emissive) instead of a dynamic light: the scene already runs 9 point lights,
+    // and a 10th globally recompiles every material's shader — which overflows the fragment-uniform
+    // budget on tighter GPUs and renders the WHOLE scene black (no JS error). Emissive adds no light.
+    const dMat = new THREE.MeshStandardMaterial({ color: 0x6f695c, emissive: 0x46423a, emissiveIntensity: 1.0, flatShading: true, roughness: 1, side: THREE.DoubleSide });
     const dp = (w, h, x, y, z, rx, ry) => {
       const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), dMat);
       p.position.set(x, y, z); if (rx) p.rotation.x = rx; if (ry) p.rotation.y = ry;
@@ -1539,9 +1542,7 @@ export function buildWorld() {
     const throat = new THREE.Mesh(new THREE.CircleGeometry(1.65, 18),
       new THREE.MeshBasicMaterial({ color: 0x0d0c09 }));
     throat.rotation.x = -Math.PI / 2; throat.position.set(rx1, 8.82, cz); drain.add(throat);
-    // daylight spills down the mouth onto the ramp + floor — the one light in the buried room
-    const fill = new THREE.PointLight(0xbcd0d8, 26, 17, 1.6);
-    fill.position.set(rx0 - 0.5, 7.4, cz); drain.add(fill);
+    // a shaft of daylight down the mouth (a glowing mesh, NOT a dynamic light — see dMat note)
     const shaftMat = makeBeamMaterial(0xdfeaf0); shaftMat.uniforms.uFlip.value = 1;
     const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 1.5, 5.2, 10, 1, true), shaftMat);
     shaft.rotation.z = 0.72; shaft.position.set(rx0 + 0.6, 6.4, cz); drain.add(shaft);   // a slanted shaft of it
