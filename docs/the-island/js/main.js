@@ -1001,6 +1001,10 @@ function applyAtmosphere(elapsed, dt) {
     foreshadow.material.opacity = 0.30 + Math.sin(elapsed * 0.9) * 0.08;
   }
 
+  // the drain's flood rises with the depth you carry (Phase C, flood-per-depth): below the chamber
+  // floor (4.0) at the surface, drowning the room by the bottom. The floor stays walkable throughout.
+  if (refs.drainFlood) refs.drainFlood.position.y = 3.5 + 3.5 * (W.level - 1) / (MAX_DEPTH - 1);
+
   // study glow: warm by night, faint by day — and the partner's warm window
   // goes dark the deeper you descend (one prop change per level, #13)
   const windowFade = Math.max(1 - 0.42 * Math.max(0, W.level - 2), 0.12);

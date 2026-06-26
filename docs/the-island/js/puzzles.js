@@ -370,6 +370,13 @@ export class Game {
       onClick: () => { if (this.onClimb) this.onClimb(false); },
     });
 
+    // hub Phase C — the drain's one carved line (the first tunnel's lore beat)
+    I.add({
+      id: 'drainMark', targets: [R.drainMark], label: 'a line carved in the wall', maxDist: 2.6,
+      when: () => true,
+      onClick: () => UI.whisper('A line cut low into the wet stone, in the keeper’s hand: “what you bury, the tide still finds.”'),
+    });
+
     // the bell — the END at the bottom (descent / accept the loop). Struck below, it
     // withholds; struck at the surface it keeps the golden parade. The OTHER terminal
     // is the oar, at the top (below).

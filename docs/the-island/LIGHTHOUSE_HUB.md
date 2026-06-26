@@ -4,8 +4,13 @@
 > "start building". **Phase A (bones) SHIPPED. Phase B (the climb) — first slice SHIPPED:** the
 > walkable lamp-room gallery + the vista + the next-tide FORESHADOW, reached by a committed climb
 > gated on `lampLit`; an enclosed spiral stair winds the tower (shows in the chart-table model).
-> **B2 (next):** a flythrough up the stair so the climb is *seen* (the stair is currently enclosed),
-> and making the stair more prominent. Decisions are recorded in §7.
+> **B2 (later):** a flythrough up the stair so the climb is *seen* (the stair is currently enclosed).
+> **Phase C (the tunnels) — first slice SHIPPED:** owner chose a fresh entrance (the sealed cellar
+> can't sprout tunnels). A collapsed **drain** on the standing-stones pad drops to a small buried
+> chamber that **floods with depth** (dry at the surface, drowned at the bottom — the real flood-per-
+> depth mechanic, decision #4) with one carved line of lore. This proves the Phase C pattern
+> (entrance + buried chamber + collision + flood + lore). **C-next:** grow the warren (more chambers,
+> the cross-level descents that connect the strata, the cellar joining in). Decisions in §7.
 > Canon guardrails: zero-dep three.js · ALL-METAPHOR · grief → INTEGRATION · power-safe 60fps ·
 > the 1:240 chart-table model mirrors the island (recursion) · never literal.
 >

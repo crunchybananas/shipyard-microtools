@@ -190,6 +190,14 @@ export function walkableY(x, z) {
     }
   }
 
+  // the drain (Phase C, first tunnel): a ramp off the stones pad down to a buried flooding chamber
+  if (x > 127.5 && x < 142.5 && z > -154.5 && z < -145.5) {
+    if (x > 127.8 && x < 136.2 && z > -154.2 && z < -145.8) return 4.0;     // chamber floor
+    if (x >= 136.2 && x <= 142 && z > -151.5 && z < -148.5) {               // ramp 8.8 -> 4.0
+      return 8.8 - clamp((142 - x) / 5.8, 0, 1) * 4.8;
+    }
+  }
+
   return heightAt(x, z);
 }
 

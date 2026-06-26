@@ -1501,6 +1501,61 @@ export function buildWorld() {
     core.add(chest);
   }
 
+  // =================== THE DRAIN (hub Phase C — the first tunnel) ===========
+  // A collapsed drain on the south of the standing-stones pad drops to a small buried chamber —
+  // the first reach of the network the lighthouse cellar will one day join. It FLOODS as you carry
+  // the grief deeper: dry at the surface, drowned at the bottom (the flood plane rises with
+  // W.level, driven in main.js). One line of the keeper's hand is carved on the wall. The chamber
+  // floor sits at y4.0 — above waterY-0.5 at every depth, so it stays walkable while it floods.
+  {
+    const cx = 132, cz = -150, fy = 4.0, ceilY = 8.5, hw = 4.2;   // chamber under the stones pad (surface 8.8)
+    const drain = new THREE.Group(); drain.name = 'drain'; core.add(drain);
+    const dMat = new THREE.MeshStandardMaterial({ color: 0x6f695c, flatShading: true, roughness: 1, side: THREE.DoubleSide });
+    const dp = (w, h, x, y, z, rx, ry) => {
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), dMat);
+      p.position.set(x, y, z); if (rx) p.rotation.x = rx; if (ry) p.rotation.y = ry;
+      drain.add(p);
+    };
+    const my = (fy + ceilY) / 2, rh = ceilY - fy;
+    dp(8.4, 8.4, cx, fy, cz, -Math.PI / 2, 0);              // floor
+    dp(8.4, 8.4, cx, ceilY, cz, -Math.PI / 2, 0);           // ceiling
+    dp(8.4, rh, cx - hw, my, cz, 0, Math.PI / 2);           // west wall (carries the carved line)
+    dp(8.4, rh, cx, my, cz - hw, 0, 0);                     // south wall
+    dp(8.4, rh, cx, my, cz + hw, 0, 0);                     // north wall
+    dp(2.7, rh, cx + hw, my, cz + 2.85, 0, Math.PI / 2);    // east wall — north of the ramp opening
+    dp(2.7, rh, cx + hw, my, cz - 2.85, 0, Math.PI / 2);    // east wall — south of the ramp opening
+    // the ramp tunnel up to the surface mouth (walkable floor lives in terrain.js)
+    const rx0 = cx + hw, rx1 = 142;
+    for (const zs of [cz - 1.5, cz + 1.5]) {                // ramp side walls
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(rx1 - rx0, 5.4), dMat);
+      w.rotation.y = Math.PI / 2; w.position.set((rx0 + rx1) / 2, 6.6, zs);
+      drain.add(w);
+    }
+    const rim = new THREE.TorusGeometry(1.9, 0.3, 8, 18);   // a stone lip around the surface mouth
+    rim.rotateX(Math.PI / 2);
+    stone.add(rim, place(rx1, 8.85, cz), grad(C.stoneOld, C.boneDark));
+    rim.dispose();
+    // a dark disc inside the lip so the mouth reads as a shadowed opening from above (not bare sand)
+    const throat = new THREE.Mesh(new THREE.CircleGeometry(1.65, 18),
+      new THREE.MeshBasicMaterial({ color: 0x0d0c09 }));
+    throat.rotation.x = -Math.PI / 2; throat.position.set(rx1, 8.82, cz); drain.add(throat);
+    // daylight spills down the mouth onto the ramp + floor — the one light in the buried room
+    const fill = new THREE.PointLight(0xbcd0d8, 26, 17, 1.6);
+    fill.position.set(rx0 - 0.5, 7.4, cz); drain.add(fill);
+    const shaftMat = makeBeamMaterial(0xdfeaf0); shaftMat.uniforms.uFlip.value = 1;
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 1.5, 5.2, 10, 1, true), shaftMat);
+    shaft.rotation.z = 0.72; shaft.position.set(rx0 + 0.6, 6.4, cz); drain.add(shaft);   // a slanted shaft of it
+    // the flood — a plane that rises with the tide-by-depth (driven in main.js by W.level)
+    const flood = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 8.2),
+      new THREE.MeshStandardMaterial({ color: 0x223a3c, transparent: true, opacity: 0.72, roughness: 0.3, metalness: 0.2, side: THREE.DoubleSide }));
+    flood.rotation.x = -Math.PI / 2; flood.position.set(cx, 3.5, cz); flood.name = 'drainFlood';
+    drain.add(flood);
+    // the one line, carved on the west wall — a mark you read (puzzles.js)
+    const mark = glyphSprite(atlas, 4, 0x9adfca, 1.3);
+    mark.position.set(cx - hw + 0.12, my, cz); mark.name = 'drainMark';
+    drain.add(mark);
+  }
+
   // =================== THE GIANT RULER (bridges the chasm) ==================
   {
     const deck = new THREE.Group();
@@ -2317,7 +2372,7 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -2391,6 +2446,7 @@ const NAMES = [
   'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
   'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher', 'musicNote',
   'stairFoot', 'galleryHatch', 'stairRope',   // hub Phase B: the climb foot, descend point, and the lamp-lit gate
+  'drainFlood', 'drainMark',                   // hub Phase C: the first tunnel's flood plane + carved line
   'dial0', 'dial1', 'dial2', 'dial3', 'dialGlyph0', 'dialGlyph1', 'dialGlyph2', 'dialGlyph3',
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
