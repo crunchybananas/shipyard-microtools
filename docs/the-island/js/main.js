@@ -91,6 +91,12 @@ composer.addPass(new RenderPass(scene, camera));
 const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 0.85); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
+// Post-processing safety net: some browser/GPU combos render the bloom composer's half-float
+// buffers as solid black while a direct render is perfect — a foreground-only black screen with
+// NO js error. `?safe` forces a direct (no-bloom) render; the loop also SELF-TESTS this once
+// (below) and auto-falls-back if the composer comes back black, so the game is never stuck black.
+if (new URLSearchParams(location.search).has('safe')) bloomPass.enabled = false;
+let bloomSelfTested = false, bloomTestN = 0;
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
@@ -1548,6 +1554,24 @@ renderer.setAnimationLoop((tMs) => {
   if (MODE === 'play' && !game.atBrink()) {
     saveTimer += dt;
     if (saveTimer > 12) { saveTimer = 0; save(player.pos); }
+  }
+
+  // one-time post-processing self-test (see the note at the composer setup): on the first BRIGHT
+  // frame, compare a direct render against the composed one — if the composer came back black while
+  // the direct frame was bright, this device can't do the bloom buffers, so fall back to direct.
+  if (!bloomSelfTested && bloomPass.enabled && (MODE === 'intro' || MODE === 'play')) {
+    if (++bloomTestN > 200) bloomSelfTested = true;   // give up on a persistently dark scene; keep bloom
+    const gl2 = renderer.getContext(), _p = new Uint8Array(4);
+    const mid = () => { gl2.readPixels(renderer.domElement.width >> 1, renderer.domElement.height >> 1, 1, 1, gl2.RGBA, gl2.UNSIGNED_BYTE, _p); return _p[0] + _p[1] + _p[2]; };
+    renderer.render(scene, camera);
+    if (mid() > 60) {                                 // a bright frame to judge against
+      composer.render();
+      bloomSelfTested = true;
+      if (mid() < 8) {                                // composer returned black while direct was bright
+        bloomPass.enabled = false;
+        console.warn('[ABYME] post-processing returned a black frame on this device — bloom disabled, rendering direct.');
+      }
+    }
   }
 
   if (gpuTimer) gpuTimer.beginFrame();
