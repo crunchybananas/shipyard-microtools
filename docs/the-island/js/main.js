@@ -294,6 +294,30 @@ const gulls = [];
   }
 }
 
+// ---------------- bird wings (perched gulls + crows) ----------------
+// A resting bird shows FOLDED wings (the grey/dark mantle); when it FLUSHES it needs real ones. One
+// pivoted wing per side: swept back along the body at rest, spread + flapping on takeoff (driven by
+// u.flush in tickPerched). Shared geometry + material across all birds — cheap, scene-only (no clone).
+const _wingGeo = (side) => {
+  const geo = new THREE.PlaneGeometry(0.52, 0.24, 1, 1);
+  geo.translate(side * 0.26, 0, 0);                                   // shoulder at x0, tip at x=side*0.52
+  const pa = geo.attributes.position;
+  for (let v = 0; v < pa.count; v++) if (side * pa.getX(v) > 0.42) pa.setY(v, pa.getY(v) * 0.28); // pointed tip
+  geo.rotateX(-Math.PI / 2);                                          // lie flat (span x, chord z)
+  geo.computeVertexNormals();
+  return geo;
+};
+const WING_GEO_L = _wingGeo(-1), WING_GEO_R = _wingGeo(1);
+const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xb9b5a9, flatShading: true, roughness: 0.82, side: THREE.DoubleSide });
+const crowWingMat = new THREE.MeshStandardMaterial({ color: 0x24262b, flatShading: true, roughness: 0.7, metalness: 0.1, side: THREE.DoubleSide });
+const addWings = (g, mat) => {
+  const lw = new THREE.Group(), rw = new THREE.Group();
+  lw.position.set(-0.05, 0.27, 0.03); rw.position.set(0.05, 0.27, 0.03);
+  lw.rotation.set(0, -1.5, 0.13); rw.rotation.set(0, 1.5, -0.13);     // start folded (tucked along the back)
+  lw.add(new THREE.Mesh(WING_GEO_L, mat)); rw.add(new THREE.Mesh(WING_GEO_R, mat));
+  g.add(lw, rw); g.lw = lw; g.rw = rw;
+};
+
 // ---------------- perched shore gulls ----------------
 // gulls resting on the south shingle — the first life you meet at the wake-up beach. They startle and
 // flush off when you come close, and settle back once you've moved on. Static when perched (verifiable);
@@ -310,6 +334,7 @@ const perched = [];
     const tail = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.26, 4), grey); tail.rotation.x = -1.95; tail.position.set(0, 0.18, -0.32); g.add(tail);
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.097, 7, 6), white); head.position.set(0, 0.36, 0.25); g.add(head);
     const beak = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.12, 4), beakM); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.355, 0.38); g.add(beak);
+    addWings(g, gullWingMat);
     return g;
   };
   const rngP = mulberry32(SEED ^ 0x9c0f);   // own rng — world scatter byte-unchanged
@@ -343,6 +368,7 @@ const perched = [];
     const tail = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.4, 4), blkD); tail.rotation.x = -1.72; tail.position.set(0, 0.16, -0.44); g.add(tail);     // longer tail
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.092, 7, 6), blk); head.position.set(0, 0.34, 0.27); g.add(head);
     const beak = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.17, 4), blkD); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.335, 0.44); g.add(beak);  // longer beak
+    addWings(g, crowWingMat);
     return g;
   };
   const rngC = mulberry32(SEED ^ 0x4c0a);
@@ -1195,6 +1221,13 @@ function tickPerched(elapsed, dt) {
       g.visible = false;
       u.cool -= dt;
       if (u.cool <= 0 && d > 14) u.flush = 0;
+    }
+    // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the climb)
+    if (g.lw) {
+      const spread = u.flush === 0 ? 0 : clamp(u.flush * 5, 0, 1);
+      const flap = 0.18 + Math.sin(elapsed * 22 + u.ph) * 0.72;
+      g.rw.rotation.y = lerp(1.5, 0, spread); g.rw.rotation.z = lerp(-0.13, flap, spread);
+      g.lw.rotation.y = lerp(-1.5, 0, spread); g.lw.rotation.z = lerp(0.13, -flap, spread);
     }
   }
 }
