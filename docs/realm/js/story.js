@@ -2416,7 +2416,7 @@ const NARRATIVE_BEATS = [
   // forgotten. SECOND use of the object-arc closure template (188
   // invariant): 116 constellation_named → 190 constellation_forgotten.
   // Constellation has narrative anchor (116) + visual support (151
-  // SVG-rendered asterism + 159 shooting-star-once) — the closure
+  // painted asterism + 159 shooting-star-once) — the closure
   // beat acknowledges that named patterns fade across generations.
   // Different cycle shape from stone (4 beats) — constellation has
   // 1 narrative anchor, so this is a 2-beat closure (named + un-

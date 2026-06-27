@@ -9,6 +9,30 @@ import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgr
 import { notify } from './notifications.js';
 import { TRADE_PARTNERS, executeTrade } from './trade.js';
 
+const BUILDING_ATLAS_TYPES = [
+  'granary', 'castle', 'church', 'windmill',
+  'tower', 'house', 'tavern', 'blacksmith',
+  'market', 'bakery', 'barracks', 'townhall',
+  'well',
+];
+const SUPPORT_ATLAS_TYPES = [
+  'farm', 'lumber', 'quarry', 'mine',
+  'fisherman', 'tradingpost', 'school', 'archery',
+  'wall', 'road', 'chickencoop', 'cowpen',
+  'palisade', 'campfire', 'orchard', 'hay',
+];
+
+function buildAtlasIcon(type) {
+  const supportIdx = SUPPORT_ATLAS_TYPES.indexOf(type);
+  const coreIdx = BUILDING_ATLAS_TYPES.indexOf(type);
+  const idx = supportIdx >= 0 ? supportIdx : coreIdx;
+  if (idx < 0) return null;
+  const atlas = supportIdx >= 0 ? 'assets/sprites/support-atlas.png' : 'assets/sprites/buildings-atlas-painted.png';
+  const col = idx % 4;
+  const row = Math.floor(idx / 4);
+  return `<span class="build-sprite" style="--atlas:url('${atlas}');--atlas-col:${col};--atlas-row:${row}" aria-hidden="true"></span>`;
+}
+
 function _triggerFoodWarning() {
   // Loop 077: {chronicle:false} (076 MEDIUM) — live UI prompt, not realm memory
   notify('⚠️ Food running low! Build more farms!', 'danger', { chronicle: false });
@@ -233,7 +257,7 @@ const CATEGORIES = [
   { name: 'Production',     keys: ['farm', 'lumber', 'quarry', 'mine', 'windmill', 'bakery', 'chickencoop', 'cowpen', 'fisherman'] },
   { name: 'Economy',        keys: ['market', 'tradingpost', 'school'] },
   { name: 'Defense',        keys: ['barracks', 'archery', 'tower', 'wall', 'blacksmith'] },
-  { name: 'Infrastructure', keys: ['road', 'well', 'granary'] },
+  { name: 'Infrastructure', keys: ['road', 'well', 'granary', 'storehouse'] },
   { name: 'Culture',        keys: ['tavern', 'church', 'townhall'] },  // 243: townhall in Culture; gated by mayor presence in isBuildingUnlocked
   { name: 'Victory',        keys: ['castle'] },
 ];
@@ -252,11 +276,6 @@ export function renderBuildBar() {
   bar.innerHTML = '';
   _visibleBuildKeys = [];
   const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
-  const spriteTypes = new Set([
-    'granary','castle','church','windmill','tower','house','tavern','blacksmith','market','bakery','barracks','townhall','well',
-    'farm','lumber','quarry','mine','fisherman','tradingpost','school','archery','wall','road','chickencoop','cowpen',
-  ]);
-
   for (const cat of CATEGORIES) {
     const unlockedKeys = cat.keys.filter(key => BUILDINGS[key] && isBuildingUnlocked(key));
     if (unlockedKeys.length === 0) continue;
@@ -297,9 +316,7 @@ export function renderBuildBar() {
       const countBadge = count > 0 ? `<span class="build-count">${count}</span>` : '';
       // Lock badge on unaffordable buildings — secondary signal for colorblind players
       const lockBadge = !affordable ? `<span class="build-lock" aria-label="Cannot afford">🔒</span>` : '';
-      const iconHtml = spriteTypes.has(key)
-        ? `<img class="build-sprite" src="assets/sprites/${key}.svg" alt="" aria-hidden="true">`
-        : `<span class="build-emoji">${def.icon}</span>`;
+      const iconHtml = buildAtlasIcon(key) || `<span class="build-emoji">${def.icon}</span>`;
       btn.innerHTML = `${shortcutBadge}${lockBadge}${iconHtml}<span class="build-name">${def.name}</span>${countBadge}<span class="cost">${costStr}</span>${terrainTag}`;
       btn.onclick = () => {
         // Always select on click — don't toggle off when clicking the same

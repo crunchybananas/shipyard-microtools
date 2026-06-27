@@ -5,7 +5,7 @@
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=111';
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
@@ -26,57 +26,65 @@ import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios
 import { updateWalkers } from './walkers.js';
 import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
-import { initGL3D, buildTerrainMesh, buildBuildingsMesh, render3D, resize3D, screenToWorld3D } from './webgl3d.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
 import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js';
+import { initSpriteLab } from './sprite-lab.js?realm=111';
+import { initSpriteMuster } from './sprite-muster.js?realm=111';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
 const minimap = document.getElementById('minimap');
-
-// ── WebGL 3D canvas setup ──────────────────────────────────
-let canvas3d = document.getElementById('game3d');
-if (!canvas3d) {
-  canvas3d = document.createElement('canvas');
-  canvas3d.id = 'game3d';
-  canvas3d.style.cssText = 'display:none;position:absolute;top:0;left:0;z-index:5;';
-  document.body.appendChild(canvas3d);
-}
-const gl3dReady = initGL3D(canvas3d);
-
-let _3dVisible = false;
-function updateMinimapViewportResolver() {
-  setMinimapViewportResolver((_3dVisible && gl3dReady) ? screenToWorld3D : screenToWorld);
-}
-
-function set3DVisible(visible) {
-  _3dVisible = !!visible && gl3dReady;
-  updateMinimapViewportResolver();
-  canvas3d.style.display = _3dVisible ? 'block' : 'none';
-  canvas.style.display = _3dVisible ? 'none' : 'block';
-  const miniEl = document.getElementById('minimap');
-  if (miniEl) miniEl.style.display = 'block';
-  const btn3d = document.getElementById('btn-3d');
-  if (btn3d) {
-    btn3d.classList.toggle('active', _3dVisible);
-    btn3d.setAttribute('aria-pressed', _3dVisible ? 'true' : 'false');
-  }
-  if (_3dVisible && gl3dReady) {
-    buildTerrainMesh();
-    buildBuildingsMesh();
-    render3D();
-    renderMinimap();
-  }
-}
-
-window.toggle3D = () => set3DVisible(!_3dVisible);
+const queryParams = new URLSearchParams(location.search);
+const spriteMusterMode = queryParams.has('spritemuster');
+const runtimeCaptureMode = queryParams.has('runtimecapture');
 
 initRenderer(canvas);
 initMinimap(minimap);
-updateMinimapViewportResolver();
+setMinimapViewportResolver(screenToWorld);
 resizeCanvas();
 initPostFX(canvas);
-window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); if (gl3dReady) resize3D(); });
+window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); });
+
+// Query-gated visual verification hook for the sprite production pipeline.
+// The in-app browser can inspect DOM attributes reliably even when its generic
+// tab screenshot path times out on Realm's two high-resolution canvases.
+// Nothing is encoded or added to the DOM during ordinary gameplay.
+let _runtimeCaptureCanvas = null;
+let _lastRuntimeCaptureAt = -Infinity;
+function _publishRuntimeCapture(now) {
+  if (!runtimeCaptureMode || now - _lastRuntimeCaptureAt < 750) return;
+  _lastRuntimeCaptureAt = now;
+
+  if (!_runtimeCaptureCanvas) {
+    _runtimeCaptureCanvas = document.createElement('canvas');
+  }
+  if (
+    _runtimeCaptureCanvas.width !== canvas.width
+    || _runtimeCaptureCanvas.height !== canvas.height
+  ) {
+    _runtimeCaptureCanvas.width = canvas.width;
+    _runtimeCaptureCanvas.height = canvas.height;
+  }
+
+  const captureCtx = _runtimeCaptureCanvas.getContext('2d');
+  captureCtx.clearRect(0, 0, _runtimeCaptureCanvas.width, _runtimeCaptureCanvas.height);
+  captureCtx.drawImage(canvas, 0, 0);
+  const post = document.getElementById('postfx');
+  if (post && post.style.display !== 'none') {
+    captureCtx.drawImage(post, 0, 0);
+  }
+
+  let sink = document.getElementById('realm-runtime-capture');
+  if (!sink) {
+    sink = document.createElement('img');
+    sink.id = 'realm-runtime-capture';
+    sink.hidden = true;
+    sink.alt = '';
+    document.body.appendChild(sink);
+  }
+  sink.src = _runtimeCaptureCanvas.toDataURL('image/png');
+  sink.dataset.tick = String(G.gameTick);
+}
 
 // Loop 127 (the-fixer, 030 filed 96 ticks + 126 HIGH): welcome-back
 // summary. On tab blur, snapshot G state. On focus, diff and render a
@@ -129,6 +137,25 @@ document.addEventListener('visibilitychange', () => {
 
 setupSaveButtons();
 loadAchievements();
+initSpriteLab();
+if (spriteMusterMode) {
+  try {
+    initSpriteMuster(canvas);
+  } catch (error) {
+    console.error('Actor Muster failed to start:', error);
+  }
+}
+
+window.openSpriteMuster = () => {
+  const url = new URL(location.href);
+  url.searchParams.delete('spritelab');
+  url.searchParams.delete('role');
+  url.searchParams.delete('action');
+  url.searchParams.delete('dir');
+  url.searchParams.delete('ambient');
+  url.searchParams.set('spritemuster', '1');
+  location.href = url.toString();
+};
 
 function syncAudioButtons() {
   const ambientBtn = document.getElementById('btn-ambient');
@@ -142,7 +169,7 @@ if (hasSaveData) {
   const loadBtn = document.getElementById('title-load');
   if (loadBtn) {
     // Parse save for kingdom name + day instead of raw byte size
-    let label = '📁 Continue';
+    let label = 'Continue';
     try {
       const raw = localStorage.getItem('realm-save-v2');
       if (raw) {
@@ -153,8 +180,8 @@ if (hasSaveData) {
         const year = Math.floor((day - 1) / 28) + 1;
         const dayInYear = ((day - 1) % 28) + 1;
         label = kName
-          ? `📁 Continue ${kName} · Year ${year} Day ${dayInYear} · 👤${pop}`
-          : `📁 Continue · Year ${year} Day ${dayInYear} · 👤${pop}`;
+          ? `Continue ${kName} · Year ${year} Day ${dayInYear} · Pop ${pop}`
+          : `Continue · Year ${year} Day ${dayInYear} · Pop ${pop}`;
       }
     } catch (e) { /* fall back to plain label */ }
     loadBtn.textContent = label;
@@ -176,12 +203,13 @@ try {
 } catch (_e) {}
 
 function beginGame() {
+  document.body.classList.remove('title-active');
   const titleEl = document.getElementById('title-screen');
   titleEl.style.transition = 'opacity 0.5s';
   titleEl.style.opacity = '0';
   setTimeout(() => { titleEl.style.display = 'none'; }, 500);
 
-  setupInput(canvas, canvas3d);
+  setupInput(canvas);
   initChronicle();
   if (G.chronicle.length === 0) {
     // Avoid "The realm of Realm" collision when the player keeps the default kingdom name
@@ -193,7 +221,6 @@ function beginGame() {
   renderBuildBar();
   renderMissions();
   updateUI();
-  set3DVisible(true);
   gameLoop();
 
   // Cinematic zoom-in over 1.5 seconds
@@ -244,7 +271,6 @@ window.startNewGame = () => {
   }
   setSeed(Math.abs(kh) || 1);
   generateWorld();
-  if (gl3dReady) buildTerrainMesh(); // pre-build 3D mesh after world gen
   G.resources.food = diff.startFood;
   G.resources.wood = diff.startWood;
   G.resources.gold = diff.startGold;
@@ -261,7 +287,6 @@ window.startNewGame = () => {
 
 window.loadAndStart = () => {
   generateWorld();
-  if (gl3dReady) buildTerrainMesh(); // pre-build 3D mesh after world gen
   if (loadGame()) {
     renderBuildBar();
     updateUI();
@@ -379,7 +404,6 @@ window.newGame = () => {
   G.birds = [];
   G._raidWarningGiven = false;
   generateWorld();
-  if (gl3dReady) buildTerrainMesh(); // rebuild 3D mesh for new world
   renderBuildBar(); renderMissions(); updateUI();
   notify('New game started!');
 };
@@ -651,8 +675,8 @@ function fastForward(days) {
 // consumers: "chronicle stop" (closed at 260) + "render desat" (closed
 // here). Together they complete the realm-end visual+textual story —
 // chronicle stops writing AND world gets a muted fallen-realm grade. CSS filter on
-// both the game canvas + postfx overlay covers the WebGL post-process
-// path. Tracked variable avoids every-frame DOM writes (only flips on
+// both the game canvas + postfx overlay covers the post-process layer.
+// Tracked variable avoids every-frame DOM writes (only flips on
 // state transition: live realm_fell OR save load with realmEnded=true).
 let _lastRealmEndedApplied = null;
 let _realmEndTransitionInstalled = false;
@@ -679,26 +703,75 @@ function _applyRealmEndFilter() {
   if (post) post.style.filter = filterStr;
 }
 
+let _loopFrame = 0;
+let _lastMinimapFrame = -Infinity;
+let _perfAvgMs = 16.7;
+let _rafAvgMs = 16.7;
+let _lastLoopStart = 0;
+let _postFxSuspendedUntil = 0;
+let _postFxWasSuspended = false;
+const _MINIMAP_FRAME_INTERVAL = 6;
+const _POSTFX_SUSPEND_MS = 5000;
+
+function _setPostFxSuspended(suspended) {
+  if (suspended === _postFxWasSuspended) return;
+  _postFxWasSuspended = suspended;
+  const post = document.getElementById('postfx');
+  if (post) post.style.display = suspended ? 'none' : '';
+}
+
+function _renderFrame({ allowPostFx = true, allowMinimap = true } = {}) {
+  const frameStart = performance.now();
+  render();
+  const now = performance.now();
+  const postFxSuspended = now < _postFxSuspendedUntil;
+  _setPostFxSuspended(postFxSuspended);
+  if (allowPostFx && !postFxSuspended) {
+    applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
+  }
+  if (allowMinimap && (_loopFrame - _lastMinimapFrame >= _MINIMAP_FRAME_INTERVAL)) {
+    renderMinimap();
+    _lastMinimapFrame = _loopFrame;
+  }
+  _applyRealmEndFilter();
+  _publishRuntimeCapture(now);
+
+  const frameMs = performance.now() - frameStart;
+  _perfAvgMs = _perfAvgMs * 0.92 + frameMs * 0.08;
+  if (allowPostFx && _perfAvgMs > 34) {
+    _postFxSuspendedUntil = performance.now() + _POSTFX_SUSPEND_MS;
+  }
+  G.debug.perf = {
+    avgFrameMs: Math.round(_perfAvgMs * 10) / 10,
+    avgRafMs: Math.round(_rafAvgMs * 10) / 10,
+    postFxSuspended: performance.now() < _postFxSuspendedUntil,
+    minimapInterval: _MINIMAP_FRAME_INTERVAL,
+  };
+}
+
 function gameLoop() {
   try {
     if (document.visibilityState === 'visible') {
-      simTick();
-      if (_3dVisible && gl3dReady) {
-        render3D();
-      } else {
-        render();
-        applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
+      const loopStart = performance.now();
+      if (_lastLoopStart > 0) {
+        const rafMs = loopStart - _lastLoopStart;
+        _rafAvgMs = _rafAvgMs * 0.90 + rafMs * 0.10;
+        if (_rafAvgMs > 34) {
+          _postFxSuspendedUntil = loopStart + _POSTFX_SUSPEND_MS;
+        }
       }
-      renderMinimap();
-      _applyRealmEndFilter();
+      _lastLoopStart = loopStart;
+      _loopFrame++;
+      simTick();
+      _renderFrame();
       requestAnimationFrame(gameLoop);
     } else {
-      for (let i = 0; i < 60; i++) simTick();
-      render();
-      applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
-      renderMinimap();
-      _applyRealmEndFilter();
-      setTimeout(gameLoop, 16);
+      for (let i = 0; i < 4; i++) simTick();
+      if (runtimeCaptureMode) {
+        _loopFrame++;
+        _renderFrame({ allowMinimap: false });
+      }
+      setTimeout(gameLoop, 250);
     }
   } catch (e) {
     console.error('Game loop error:', e);

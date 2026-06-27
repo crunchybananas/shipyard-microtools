@@ -1,0 +1,554 @@
+{
+  "rows": {
+    "guard/work/left": {
+      "acceptedAt": "2026-06-26T04:37:17Z",
+      "allowedWarnings": [
+        "direction-scale-mismatch"
+      ],
+      "file": "guard/work-left.png",
+      "note": "Removed tiny cropped edge fragments from the spear-thrust side-work frame while preserving the painted guard body and weapon reach; side/front scale mismatch remains for a future full guard repaint.",
+      "provenance": "edge-fragment-clean",
+      "quality": {
+        "bodyBottomRange": 4,
+        "bodyHeightRange": 10,
+        "bodyWidthRange": 6,
+        "directionReference": {
+          "bodyHeightDelta": 10.5,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 61.5,
+          "medianBodyWidth": 27.5,
+          "medianColor": [
+            76.95,
+            69.6,
+            68.35
+          ],
+          "paletteDelta": 8.19
+        },
+        "flickerScore": 41.0,
+        "maxAlphaRatio": 1.084,
+        "maxBodyCenterJump": 5.92,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.26,
+        "medianBodyHeight": 51.0,
+        "medianBodyWidth": 25.5,
+        "medianColor": [
+          70.3,
+          64.9,
+          69.2
+        ],
+        "warnings": [
+          "direction-scale-mismatch"
+        ]
+      },
+      "sha256": "7db172455c741f34fbefd18ae0c8e6ab0c6a729f1a040243f9bcff3059f16ca6",
+      "status": "accepted-with-waiver"
+    },
+    "guard/work/right": {
+      "acceptedAt": "2026-06-26T04:37:18Z",
+      "allowedWarnings": [
+        "direction-scale-mismatch"
+      ],
+      "file": "guard/work-right.png",
+      "note": "Removed tiny cropped edge fragments from the spear-thrust side-work frame while preserving the painted guard body and weapon reach; side/front scale mismatch remains for a future full guard repaint.",
+      "provenance": "edge-fragment-clean",
+      "quality": {
+        "bodyBottomRange": 4,
+        "bodyHeightRange": 10,
+        "bodyWidthRange": 6,
+        "directionReference": {
+          "bodyHeightDelta": 10.5,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 61.5,
+          "medianBodyWidth": 27.5,
+          "medianColor": [
+            76.95,
+            69.6,
+            68.35
+          ],
+          "paletteDelta": 8.19
+        },
+        "flickerScore": 41.0,
+        "maxAlphaRatio": 1.084,
+        "maxBodyCenterJump": 5.92,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.26,
+        "medianBodyHeight": 51.0,
+        "medianBodyWidth": 25.5,
+        "medianColor": [
+          70.3,
+          64.9,
+          69.2
+        ],
+        "warnings": [
+          "direction-scale-mismatch"
+        ]
+      },
+      "sha256": "29f093ec85352d1a6cbcf14d8f931d01187434a762eac29c7e5a8db611a46788",
+      "status": "accepted-with-waiver"
+    },
+    "miner/work/left": {
+      "acceptedAt": "2026-06-26T04:15:49Z",
+      "allowedWarnings": [
+        "body-center-jump",
+        "body-height-drift",
+        "body-width-drift",
+        "ground-anchor-drift"
+      ],
+      "file": "miner/work-left.png",
+      "note": "Removed duplicated detached side tool head and green key-color remnants from the side-work row; body and anchor drift remain waived for full repaint.",
+      "provenance": "mechanical-tool-dedupe-key-clean",
+      "quality": {
+        "bodyBottomRange": 6,
+        "bodyHeightRange": 14,
+        "bodyWidthRange": 24,
+        "directionReference": {
+          "bodyHeightDelta": 2.5,
+          "bodyWidthDelta": 0.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 41.5,
+          "medianColor": [
+            96.85,
+            75.8,
+            58.0
+          ],
+          "paletteDelta": 0.0
+        },
+        "flickerScore": 119.2,
+        "maxAlphaRatio": 1.797,
+        "maxBodyCenterJump": 12.5,
+        "maxEdgePixels": 36,
+        "maxFragmentPixels": 132,
+        "maxPaletteDrift": 9.37,
+        "medianBodyHeight": 69.5,
+        "medianBodyWidth": 41.5,
+        "medianColor": [
+          96.85,
+          75.8,
+          58.0
+        ],
+        "warnings": [
+          "body-height-drift",
+          "body-width-drift",
+          "ground-anchor-drift",
+          "body-center-jump"
+        ]
+      },
+      "sha256": "90b74c67c1b5ab4e848b6dd47e52a5a2f76976d76f6c3ffc69ecf8e97fa4a7f3",
+      "status": "accepted-with-waiver"
+    },
+    "miner/work/right": {
+      "acceptedAt": "2026-06-26T04:00:24Z",
+      "allowedWarnings": [
+        "body-center-jump",
+        "body-height-drift",
+        "body-width-drift",
+        "ground-anchor-drift"
+      ],
+      "file": "miner/work-right.png",
+      "note": "Removed duplicated detached side tool head and green key-color remnants from the side-work row; body and anchor drift remain waived for full repaint.",
+      "provenance": "mechanical-tool-dedupe-key-clean",
+      "quality": {
+        "bodyBottomRange": 6,
+        "bodyHeightRange": 14,
+        "bodyWidthRange": 24,
+        "directionReference": {
+          "bodyHeightDelta": 2.5,
+          "bodyWidthDelta": 0.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 41.5,
+          "medianColor": [
+            96.85,
+            75.8,
+            58.0
+          ],
+          "paletteDelta": 0.0
+        },
+        "flickerScore": 119.2,
+        "maxAlphaRatio": 1.797,
+        "maxBodyCenterJump": 12.5,
+        "maxEdgePixels": 36,
+        "maxFragmentPixels": 132,
+        "maxPaletteDrift": 9.37,
+        "medianBodyHeight": 69.5,
+        "medianBodyWidth": 41.5,
+        "medianColor": [
+          96.85,
+          75.8,
+          58.0
+        ],
+        "warnings": [
+          "body-height-drift",
+          "body-width-drift",
+          "ground-anchor-drift",
+          "body-center-jump"
+        ]
+      },
+      "sha256": "d0ee091fb99ff357b7042a596983be9af817c7a4e75cd8e844e30c24f0500805",
+      "status": "accepted-with-waiver"
+    },
+    "miner/work/up": {
+      "acceptedAt": "2026-06-19T04:34:27Z",
+      "allowedWarnings": [],
+      "file": "miner/work-up.png",
+      "note": "Back-facing miner work row; imagegen pose content with peer-scale body normalization.",
+      "provenance": "imagegen-direction-locked-peer-scale",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 13,
+        "directionReference": {
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 8.0,
+          "medianBodyHeight": 71.5,
+          "medianBodyWidth": 42.5,
+          "medianColor": [
+            95.6,
+            75.4,
+            57.3
+          ],
+          "paletteDelta": 6.4
+        },
+        "flickerScore": 27.8,
+        "maxAlphaRatio": 1.356,
+        "maxBodyCenterJump": 5.5,
+        "maxEdgePixels": 24,
+        "maxFragmentPixels": 11,
+        "maxPaletteDrift": 4.19,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          98.15,
+          75.85,
+          63.15
+        ],
+        "warnings": []
+      },
+      "sha256": "1c3b22a0b817e81ff44dc2babe16c8ee3d519d043e2aef54221e94a89a5c5aa0",
+      "status": "accepted"
+    },
+    "settler/idle/down": {
+      "acceptedAt": "2026-06-20T06:03:03Z",
+      "allowedWarnings": [],
+      "file": "settler/idle-down.png",
+      "note": "Front-facing imagegen idle normalized to the locked walk family 72px body height.",
+      "provenance": "imagegen-peer-action-scale-normalized",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 9.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            59.9
+          ],
+          "paletteDelta": 5.42
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.084,
+        "maxBodyCenterJump": 1.27,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.42,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          96.4,
+          75.8,
+          62.6
+        ],
+        "warnings": []
+      },
+      "sha256": "dbcb3053d702613db406ff335a4b1337153d51fa0bc5181967757e0cb276ebd7",
+      "status": "accepted"
+    },
+    "settler/idle/left": {
+      "acceptedAt": "2026-06-20T06:03:04Z",
+      "allowedWarnings": [],
+      "file": "settler/idle-left.png",
+      "note": "Cell-wise reflected from the right-facing idle row after normalization to the locked walk family scale.",
+      "provenance": "imagegen-peer-direction-reflection",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            62.6
+          ],
+          "paletteDelta": 2.7
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.14,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          92.0,
+          74.15,
+          59.9
+        ],
+        "warnings": []
+      },
+      "sha256": "695f3b5ec48d229e658a01703d75635bc0750953f6b79030cc79629d5ea234f1",
+      "status": "accepted"
+    },
+    "settler/idle/right": {
+      "acceptedAt": "2026-06-20T06:03:04Z",
+      "allowedWarnings": [],
+      "file": "settler/idle-right.png",
+      "note": "Right-facing imagegen idle normalized to the locked walk family 72px body height.",
+      "provenance": "imagegen-peer-action-scale-normalized",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            62.6
+          ],
+          "paletteDelta": 2.7
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.14,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          92.0,
+          74.15,
+          59.9
+        ],
+        "warnings": []
+      },
+      "sha256": "45b4401ee936d158ec6cff20129628665382622c4897b27bb9c282f1a724a2cb",
+      "status": "accepted"
+    },
+    "settler/idle/up": {
+      "acceptedAt": "2026-06-20T06:03:03Z",
+      "allowedWarnings": [],
+      "file": "settler/idle-up.png",
+      "note": "Back-facing imagegen idle normalized to the locked walk family 72px body height.",
+      "provenance": "imagegen-peer-action-scale-normalized",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            59.9
+          ],
+          "paletteDelta": 15.48
+        },
+        "flickerScore": 1.2,
+        "maxAlphaRatio": 1.045,
+        "maxBodyCenterJump": 0.84,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.66,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          79.75,
+          66.0,
+          64.7
+        ],
+        "warnings": []
+      },
+      "sha256": "785aaae4fe63072b2e1bb81a190534925007dc091eb51be57bfd05e2ae8aa52d",
+      "status": "accepted"
+    },
+    "settler/walk/down": {
+      "acceptedAt": "2026-06-20T06:35:37Z",
+      "allowedWarnings": [],
+      "file": "settler/walk-down.png",
+      "note": "Imagegen identity preserved; only the pants/boots region is reflected on alternating frames to enforce a readable front-facing two-foot gait.",
+      "provenance": "imagegen-lower-body-alternation-repair",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            86.15,
+            64.45,
+            55.25
+          ],
+          "paletteDelta": 14.49
+        },
+        "flickerScore": 5.6,
+        "maxAlphaRatio": 1.067,
+        "maxBodyCenterJump": 0.88,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.82,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          95.3,
+          74.25,
+          60.75
+        ],
+        "warnings": []
+      },
+      "sha256": "81f192f61a346feadf1f7e3273867b6a272e525c7d2521340637541644dc18d9",
+      "status": "accepted"
+    },
+    "settler/walk/left": {
+      "acceptedAt": "2026-06-20T05:33:24Z",
+      "allowedWarnings": [],
+      "file": "settler/walk-left.png",
+      "note": "Cell-wise reflected from the clean right-facing peer after two generated left rows failed dense-width stability.",
+      "provenance": "imagegen-peer-direction-reflection",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            86.15,
+            64.45,
+            59.25
+          ],
+          "paletteDelta": 4.0
+        },
+        "flickerScore": 28.8,
+        "maxAlphaRatio": 1.157,
+        "maxBodyCenterJump": 3.63,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.53,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          86.15,
+          64.45,
+          55.25
+        ],
+        "warnings": []
+      },
+      "sha256": "902ca5e65167a5832f9088efc4f391e74c1e11d2e830ed267d5fcd59b5ebf884",
+      "status": "accepted"
+    },
+    "settler/walk/right": {
+      "acceptedAt": "2026-06-20T05:33:25Z",
+      "allowedWarnings": [],
+      "file": "settler/walk-right.png",
+      "note": "Right-facing frontier settler walk matched to the action identity master.",
+      "provenance": "imagegen-frontier-settler-family",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            86.15,
+            64.45,
+            59.25
+          ],
+          "paletteDelta": 4.0
+        },
+        "flickerScore": 28.8,
+        "maxAlphaRatio": 1.157,
+        "maxBodyCenterJump": 3.63,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.53,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          86.15,
+          64.45,
+          55.25
+        ],
+        "warnings": []
+      },
+      "sha256": "0f32258cfc767245fbe64b2b7ca3bd4b7f1f3f69dfd01e78e8f1ca97b324e5b3",
+      "status": "accepted"
+    },
+    "settler/walk/up": {
+      "acceptedAt": "2026-06-20T06:35:38Z",
+      "allowedWarnings": [],
+      "file": "settler/walk-up.png",
+      "note": "Back-facing locked identity with lower-leg cadence regenerated after gait audit.",
+      "provenance": "imagegen-gait-corrected-identity-lock",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            86.15,
+            64.45,
+            55.25
+          ],
+          "paletteDelta": 10.61
+        },
+        "flickerScore": 1.2,
+        "maxAlphaRatio": 1.058,
+        "maxBodyCenterJump": 1.41,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.42,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          81.25,
+          67.35,
+          64.2
+        ],
+        "warnings": []
+      },
+      "sha256": "d0628fba2270a11414544d67f5dd056a2d83b1df1dcc8c98d7ce9fdb6ea4b9a4",
+      "status": "accepted"
+    }
+  },
+  "updatedAt": "2026-06-26T04:37:18Z",
+  "version": 1
+}

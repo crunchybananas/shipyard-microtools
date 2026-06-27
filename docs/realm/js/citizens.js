@@ -3,7 +3,7 @@
 // ══════════════���═══════════════════════════���═════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js';
-import { findPath, isWalkable } from './pathfinding.js';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js';
 import { getCitizenSpeedMult } from './events.js';
 import { revealAround } from './world.js';
 
@@ -21,6 +21,31 @@ function nearestBuilding(c, typeOrNull) {
     if (d < bestD) { bestD = d; best = b; }
   }
   return best;
+}
+
+function deliveryDropoff(c, resKey) {
+  if (resKey === 'food') {
+    return nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+  }
+  if (resKey === 'gold') {
+    return nearestBuilding(c, 'market') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+  }
+  return nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'house');
+}
+
+function requestDeliveryStorage(c) {
+  c.state = 'needs_delivery';
+  c.stateTimer = 90 + rngInt(0, 60);
+  clearPath(c);
+  const now = G.gameTick || 0;
+  if (!c._needsDeliveryNoticeAt || now - c._needsDeliveryNoticeAt > 180) {
+    c._needsDeliveryNoticeAt = now;
+    G.particles.push({
+      tx: c.x, ty: c.y, offsetY: -28,
+      text: 'Need storage',
+      alpha: 1.25, vy: -0.12, decay: 0.018, type: 'speech',
+    });
+  }
 }
 
 function citizenHash(c) {
@@ -73,12 +98,30 @@ function chooseCrowdAwareTarget(c, tx, ty) {
   return candidates[0] || { x: rx, y: ry };
 }
 
+function compressPath(path) {
+  if (!path || path.length <= 2) return path;
+  const compact = [path[0]];
+  let lastDx = 0, lastDy = 0;
+  for (let i = 1; i < path.length; i++) {
+    const prev = path[i - 1];
+    const cur = path[i];
+    const dx = Math.sign(cur.x - prev.x);
+    const dy = Math.sign(cur.y - prev.y);
+    if (i > 1 && (dx !== lastDx || dy !== lastDy)) compact.push(prev);
+    lastDx = dx;
+    lastDy = dy;
+  }
+  compact.push(path[path.length - 1]);
+  compact.goal = path.goal;
+  return compact;
+}
+
 function pathTo(c, tx, ty) {
   c._requestedTx = tx;
   c._requestedTy = ty;
   const target = chooseCrowdAwareTarget(c, tx, ty);
   c._pathGoal = target;
-  c.path = findPath(Math.round(c.x), Math.round(c.y), target.x, target.y);
+  c.path = compressPath(findPath(Math.round(c.x), Math.round(c.y), target.x, target.y));
   c.pathIdx = 0;
   c._stuckTicks = 0;
   c._lastPathX = c.x;
@@ -104,8 +147,8 @@ function pathTo(c, tx, ty) {
 //   - Both-idle pairs: full strength.
 // Also shrank PERSONAL_SPACE 0.75 → 0.55 — 0.75 was knocking pathing citizens
 // off their waypoints even before the stuck bug manifested.
-const PERSONAL_SPACE = 0.55;
-const SEP_STRENGTH = 0.22;
+const PERSONAL_SPACE = 0.50;
+const SEP_STRENGTH = 0.16;
 
 function tileWalkable(x, y) {
   const mx = Math.round(x), my = Math.round(y);
@@ -119,12 +162,135 @@ function terrainWalkable(x, y) {
   return t !== undefined && t !== TILE.WATER && t !== TILE.MOUNTAIN;
 }
 
+function resourceWorkTarget(c, b, tileType, radius = 7) {
+  const bx = Math.round(b.x), by = Math.round(b.y);
+  let best = null, bestScore = Infinity;
+  for (let y = by - radius; y <= by + radius; y++) {
+    for (let x = bx - radius; x <= bx + radius; x++) {
+      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
+      if (G.map[y]?.[x] !== tileType) continue;
+      if (G.buildingGrid[y]?.[x] && G.buildingGrid[y][x].type !== 'road') continue;
+      if (!terrainWalkable(x, y) || !isWalkable(x, y)) continue;
+      const fromMill = dist2(x, y, bx, by);
+      if (fromMill > radius) continue;
+      const fromCitizen = dist2(c.x, c.y, x, y);
+      const crowd = targetCrowdPenalty(c, x, y);
+      const jitter = ((citizenHash(c) ^ (x * 374761393) ^ (y * 668265263)) >>> 0) / 0xffffffff * 0.2;
+      const score = fromMill * 2.2 + fromCitizen * 0.16 + crowd * 3.5 + jitter;
+      if (score < bestScore) {
+        bestScore = score;
+        best = { x, y, resource: tileType };
+      }
+    }
+  }
+  return best;
+}
+
+function buildingEdgeWorkTarget(c, b, radius = 2) {
+  const bx = Math.round(b.x), by = Math.round(b.y);
+  let best = null, bestScore = Infinity;
+  for (let y = by - radius; y <= by + radius; y++) {
+    for (let x = bx - radius; x <= bx + radius; x++) {
+      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
+      if (!isWalkable(x, y)) continue;
+      const ring = dist2(x, y, bx, by);
+      if (ring < 1 || ring > radius) continue;
+      const crowd = targetCrowdPenalty(c, x, y);
+      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -0.45 : 0;
+      const jitter = ((citizenHash(c) ^ (x * 83492791) ^ (y * 2654435761)) >>> 0) / 0xffffffff * 0.18;
+      const score = ring * 1.7 + dist2(c.x, c.y, x, y) * 0.16 + crowd * 3.8 + roadBonus + jitter;
+      if (score < bestScore) {
+        bestScore = score;
+        best = { x, y };
+      }
+    }
+  }
+  return best;
+}
+
+function workTargetForBuilding(c, b) {
+  if (!b) return { x: c.x, y: c.y };
+  if (b.type === 'lumber') return resourceWorkTarget(c, b, TILE.FOREST, 7) || buildingEdgeWorkTarget(c, b, 3) || { x: b.x, y: b.y };
+  if (b.type === 'quarry') return resourceWorkTarget(c, b, TILE.STONE, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
+  if (b.type === 'mine') return resourceWorkTarget(c, b, TILE.IRON, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
+  const def = BUILDINGS[b.type];
+  if (def?.workers || def?.prod) return buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
+  return { x: b.x, y: b.y };
+}
+
+function pathToWork(c) {
+  const target = workTargetForBuilding(c, c.jobBuilding);
+  c.workTarget = target;
+  pathTo(c, target.x, target.y);
+}
+
+function settlementAnchor(c) {
+  return nearestBuilding(c, 'house') ||
+    nearestBuilding(c, 'storehouse') ||
+    nearestBuilding(c, 'granary') ||
+    nearestBuilding(c, null) ||
+    { x: Math.round(MAP_W / 2), y: Math.round(MAP_H / 2) };
+}
+
+function idleLoiterTarget(c) {
+  const anchor = settlementAnchor(c);
+  const ax = Math.round(anchor.x), ay = Math.round(anchor.y);
+  let best = null, bestScore = Infinity;
+  for (let y = ay - 5; y <= ay + 5; y++) {
+    for (let x = ax - 5; x <= ax + 5; x++) {
+      if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) continue;
+      if (!isWalkable(x, y)) continue;
+      const ring = dist2(x, y, ax, ay);
+      if (ring < 1 || ring > 5) continue;
+      const fromHere = dist2(c.x, c.y, x, y);
+      const crowd = targetCrowdPenalty(c, x, y);
+      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -0.35 : 0;
+      const jitter = ((citizenHash(c) ^ (x * 92837111) ^ (y * 689287499)) >>> 0) / 0xffffffff * 0.22;
+      const score = Math.abs(ring - 3) * 1.6 + fromHere * 0.18 + crowd * 4 + roadBonus + jitter;
+      if (score < bestScore) {
+        bestScore = score;
+        best = { x, y };
+      }
+    }
+  }
+  return best || chooseCrowdAwareTarget(c, ax, ay);
+}
+
 function standingOnBlockedTile(c) {
   const mx = Math.round(c.x), my = Math.round(c.y);
   if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return false;
   const t = G.map[my]?.[mx];
   const b = G.buildingGrid[my]?.[mx];
   return t !== TILE.WATER && t !== TILE.MOUNTAIN && !!b && b.type !== 'road';
+}
+
+function evacuateBlockedCitizen(c) {
+  if (!standingOnBlockedTile(c)) return false;
+  const mx = Math.round(c.x), my = Math.round(c.y);
+  const target = nearestWalkableTile(mx, my, 4, c.x, c.y);
+  if (!target) return false;
+  c.tx = target.x;
+  c.ty = target.y;
+  c._requestedTx = target.x;
+  c._requestedTy = target.y;
+
+  const dx = target.x - c.x;
+  const dy = target.y - c.y;
+  const d = Math.hypot(dx, dy);
+  if (d > 0.001) {
+    const step = Math.min(0.24 * Math.max(1, G.speed || 1), d);
+    c.x += (dx / d) * step;
+    c.y += (dy / d) * step;
+    c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
+    c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
+  }
+
+  if (!standingOnBlockedTile(c)) {
+    clearPath(c);
+  } else {
+    pathTo(c, target.x, target.y);
+  }
+  return true;
 }
 
 function canStepCitizen(c, nx, ny) {
@@ -197,6 +363,8 @@ export function updateCitizens() {
     if (c.hurtTimer > 0) c.hurtTimer -= G.speed;
   }
   for (const c of G.citizens) {
+    if (evacuateBlockedCitizen(c)) continue;
+
     // Track tile wear — citizens walking over tiles gradually create dirt paths
     const _wx = Math.round(c.x), _wy = Math.round(c.y);
     if (_wx >= 0 && _wx < MAP_W && _wy >= 0 && _wy < MAP_H) {
@@ -269,6 +437,10 @@ export function updateCitizens() {
         if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
+          if (Math.abs(dx) > 0.04 || Math.abs(dy) > 0.04) {
+            c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
+            c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
+          }
           const moved = Math.hypot(c.x - beforeX, c.y - beforeY);
           const progressMoved = Math.hypot(c.x - (c._lastPathX ?? c.x), c.y - (c._lastPathY ?? c.y));
           if (moved < 0.001 || progressMoved < 0.01) c._stuckTicks = (c._stuckTicks || 0) + 1;
@@ -305,6 +477,10 @@ export function updateCitizens() {
         if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
+          if (Math.abs(dx) > 0.04 || Math.abs(dy) > 0.04) {
+            c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
+            c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
+          }
         } else {
           clearPath(c);
           c.tx = c.x;
@@ -359,10 +535,11 @@ function runStateMachine(c) {
 
       if (c.jobBuilding) {
         c.state = 'walk_to_work';
-        pathTo(c, c.jobBuilding.x, c.jobBuilding.y);
+        pathToWork(c);
         if (!c.path) {
           c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
           c.jobBuilding = null;
+          c.workTarget = null;
           c.state = 'idle';
           c.stateTimer = 25 + rngInt(0, 35);
         }
@@ -389,16 +566,18 @@ function runStateMachine(c) {
           }
         }
 
-        if (forageTarget && rng() < 0.6) {
+        const needsFood = G.resources.food < Math.max(20, G.population * 6);
+        if (forageTarget && (needsFood || rng() < 0.25)) {
           c.state = 'foraging';
           c.forageTarget = forageTarget;
           pathTo(c, forageTarget.x, forageTarget.y);
         } else {
-          // Truly idle — wander near center
-          const cx = MAP_W/2, cy = MAP_H/2;
-          pathTo(c, Math.round(cx + rngRange(-4, 4)), Math.round(cy + rngRange(-4, 4)));
+          // Truly idle — loiter near settlement anchors instead of taking
+          // long, map-center wander paths that read as aimless churn.
+          const target = idleLoiterTarget(c);
+          pathTo(c, target.x, target.y);
           c.state = 'idle';
-          c.stateTimer = 60 + rngInt(0, 60);
+          c.stateTimer = 120 + rngInt(0, 140);
         }
       }
       break;
@@ -406,16 +585,21 @@ function runStateMachine(c) {
     case 'walk_to_work':
       if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
         c.jobBuilding = null;
+        c.workTarget = null;
         c.state = 'find_job';
         c.stateTimer = 0;
         clearPath(c);
         break;
       }
-      if (dist2(c.x, c.y, c.jobBuilding.x, c.jobBuilding.y) > 2.2) {
-        pathTo(c, c.jobBuilding.x, c.jobBuilding.y);
+      if (!c.workTarget || (c.workTarget.resource != null && G.map[c.workTarget.y]?.[c.workTarget.x] !== c.workTarget.resource)) {
+        c.workTarget = workTargetForBuilding(c, c.jobBuilding);
+      }
+      if (dist2(c.x, c.y, c.workTarget.x, c.workTarget.y) > 1.8) {
+        pathToWork(c);
         if (c.path) break;
         c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
         c.jobBuilding = null;
+        c.workTarget = null;
         c.state = 'idle';
         c.stateTimer = 25 + rngInt(0, 35);
         break;
@@ -440,23 +624,14 @@ function runStateMachine(c) {
             c.state = 'walk_to_deliver';
             // User-reported: citizens were walking to map midpoint (MAP_W/2, MAP_H/2)
             // because "town center" was an imaginary coordinate, not a building.
-            // Pick a real drop-off: resource-specific storage if present (granary
-            // for food, market for gold), else nearest house (settlement hearth),
-            // else any building. Only fall back to map center if the world is
-            // literally empty of buildings (shouldn't happen — citizen has a job).
-            let dropoff = null;
-            if (resKey === 'food') {
-              dropoff = nearestBuilding(c, 'granary') || nearestBuilding(c, 'house');
-            } else if (resKey === 'gold') {
-              dropoff = nearestBuilding(c, 'market') || nearestBuilding(c, 'house');
-            } else {
-              dropoff = nearestBuilding(c, 'house');
-            }
-            if (!dropoff) dropoff = nearestBuilding(c, null);
+            // Pick a real drop-off: resource-specific storage if present
+            // (granary/storehouse for food and goods, market for gold), then
+            // nearest house only as a last inhabited fallback.
+            const dropoff = deliveryDropoff(c, resKey);
             if (dropoff) {
               pathTo(c, dropoff.x, dropoff.y);
             } else {
-              pathTo(c, Math.round(MAP_W/2), Math.round(MAP_H/2));
+              requestDeliveryStorage(c);
             }
             return;
           }
@@ -467,6 +642,19 @@ function runStateMachine(c) {
       c.stateTimer = 10;
       clearPath(c);
       break;
+
+    case 'needs_delivery': {
+      const dropoff = c.carrying ? deliveryDropoff(c, c.carrying) : null;
+      if (dropoff) {
+        c.state = 'walk_to_deliver';
+        pathTo(c, dropoff.x, dropoff.y);
+        break;
+      }
+      const target = idleLoiterTarget(c);
+      if (dist2(c.x, c.y, target.x, target.y) > 1.5) pathTo(c, target.x, target.y);
+      requestDeliveryStorage(c);
+      break;
+    }
 
     case 'walk_to_deliver':
       if (c.path && c.pathIdx < c.path.length) break;
@@ -498,6 +686,7 @@ function runStateMachine(c) {
       }
       c.carrying = null;
       c.carryAmount = 0;
+      c.workTarget = null;
       c.state = 'find_job';
       c.stateTimer = 5;
       break;

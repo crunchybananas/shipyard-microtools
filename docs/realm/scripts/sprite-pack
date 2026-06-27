@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHON_BIN=${REALM_SPRITE_PYTHON:-python3}
+
+if ! "$PYTHON_BIN" -c "from PIL import Image" >/dev/null 2>&1; then
+  BUNDLED_PYTHON="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3"
+  if [ -x "$BUNDLED_PYTHON" ]; then
+    PYTHON_BIN="$BUNDLED_PYTHON"
+  else
+    echo "sprite-pack requires Python with Pillow; set REALM_SPRITE_PYTHON to a compatible interpreter" >&2
+    exit 1
+  fi
+fi
+
+exec "$PYTHON_BIN" "$SCRIPT_DIR/pack-generated-sprite-strip.py" "$@"

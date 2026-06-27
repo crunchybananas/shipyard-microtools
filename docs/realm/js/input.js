@@ -3,21 +3,14 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js';
-import { screenToWorld, toScreen, toggleFPS } from './render.js';
-import { screenToTile3D } from './webgl3d.js';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=110e';
 import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js';
 import { notify } from './notifications.js';
 import { initAudio, playSound } from './audio.js';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js';
 import { renderMissions } from './missions.js';
 
-function is3DActive() {
-  const c3 = document.getElementById('game3d');
-  return c3 && c3.style.display !== 'none';
-}
-
 function pickTile(clientX, clientY) {
-  if (is3DActive()) return screenToTile3D(clientX, clientY);
   return screenToWorld(clientX, clientY);
 }
 
@@ -145,15 +138,14 @@ function tryPlaceAt(tx, ty) {
   return false;
 }
 
-export function setupInput(canvas, canvas3d) {
+export function setupInput(canvas) {
   const C = canvas;
   let touchDist = 0;
 
   C.addEventListener('contextmenu', e => e.preventDefault());
-  if (canvas3d) canvas3d.addEventListener('contextmenu', e => e.preventDefault());
 
   function onMouseDown(e) {
-    if (e.target !== C && e.target !== canvas3d) return;
+    if (e.target !== C) return;
     initAudio();
 
     // Shift + right-click sets rally point for all soldiers
@@ -225,11 +217,10 @@ export function setupInput(canvas, canvas3d) {
     G.camStart = { x: G.camera.x, y: G.camera.y };
   }
   C.addEventListener('mousedown', onMouseDown);
-  if (canvas3d) canvas3d.addEventListener('mousedown', onMouseDown);
 
   function onMouseMove(e) {
     // Drag-to-paint: hold mouse and drag to place roads/walls continuously
-    if (G.selectedBuild && e.buttons === 1 && !is3DActive() && (G.selectedBuild === 'road' || G.selectedBuild === 'wall')) {
+    if (G.selectedBuild && e.buttons === 1 && (G.selectedBuild === 'road' || G.selectedBuild === 'wall')) {
       const t = screenToWorld(e.clientX, e.clientY);
       if (!G._lastPaintTile || t.x !== G._lastPaintTile.x || t.y !== G._lastPaintTile.y) {
         tryPlaceAt(t.x, t.y);
@@ -246,13 +237,10 @@ export function setupInput(canvas, canvas3d) {
     G.mouseX = e.clientX; G.mouseY = e.clientY;
   }
   C.addEventListener('mousemove', onMouseMove);
-  if (canvas3d) canvas3d.addEventListener('mousemove', onMouseMove);
 
   const stopDrag = () => { G.dragging = false; };
   C.addEventListener('mouseup', stopDrag);
   C.addEventListener('mouseleave', stopDrag);
-  if (canvas3d) canvas3d.addEventListener('mouseup', stopDrag);
-  if (canvas3d) canvas3d.addEventListener('mouseleave', stopDrag);
   window.addEventListener('mouseup', stopDrag);
 
   const onWheel = e => {
@@ -261,7 +249,6 @@ export function setupInput(canvas, canvas3d) {
     G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * delta));
   };
   C.addEventListener('wheel', onWheel, { passive: false });
-  if (canvas3d) canvas3d.addEventListener('wheel', onWheel, { passive: false });
 
   // Touch
   C.addEventListener('touchstart', e => {

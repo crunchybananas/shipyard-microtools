@@ -14,7 +14,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 const errs = [];
 page.on('pageerror', e => errs.push(e.message));
 
-await page.goto(`${server.origin}/index.html`);
+await page.goto(`${server.gameUrl}`);
 await page.waitForLoadState('domcontentloaded');
 await page.waitForTimeout(1500);
 

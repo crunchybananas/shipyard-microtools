@@ -7,7 +7,7 @@ import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
-import { panCameraTo } from './render.js';
+import { panCameraTo } from './render.js?realm=110e';
 import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 import { isBuildingUnlocked } from './tech.js';
@@ -311,14 +311,23 @@ export function updateProduction() {
           if (k === 'gold' && G.stats) G.stats.goldEarned += v;
         }
       }
-      // Floating particle — show every 3rd production cycle to keep it subtle
+      // Grounded production glint every 3rd cycle. Keep passive production
+      // feedback in the painted world instead of floating UI text.
       b.prodShowCount = (b.prodShowCount || 0) + 1;
       if (b.prodShowCount % 3 === 0) {
         for (const [k,v] of Object.entries(adjustedProd)) {
           if (v > 0) G.particles.push({
-            tx: b.x, ty: b.y, offsetY: 0,
-            text: `+${v} ${resourceEmoji(k)}`,
-            alpha: 1.5, vy: -0.4, type: 'text',
+            tx: b.x + (Math.random() - 0.5) * 0.16,
+            ty: b.y + (Math.random() - 0.5) * 0.16,
+            offsetY: -3,
+            text: null,
+            alpha: 0.95,
+            vy: -0.012,
+            decay: 0.014,
+            type: 'resource-glint',
+            resource: k,
+            value: v,
+            size: 1.1 + Math.min(2, v) * 0.15,
           });
         }
       }

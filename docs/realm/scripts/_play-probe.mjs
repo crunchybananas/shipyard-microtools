@@ -7,7 +7,7 @@ import { ensureServer } from './_serve.mjs';
 import { writeFile } from 'node:fs/promises';
 
 const server = await ensureServer();
-const ORIGIN = server.origin;
+const GAME_URL = server.gameUrl;
 
 const browser = await chromium.launch({ headless: true });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -18,7 +18,7 @@ const pageErrors = [];
 page.on('console', m => consoleMsgs.push(`${m.type()}: ${m.text()}`));
 page.on('pageerror', e => pageErrors.push(e.message));
 
-await page.goto(`${ORIGIN}/index.html`);
+await page.goto(GAME_URL);
 await page.waitForLoadState('networkidle');
 await page.waitForTimeout(500);
 
@@ -35,15 +35,9 @@ const startedNew = await page.evaluate(() => {
 console.log(`[probe] started new via: ${startedNew}`);
 await page.waitForTimeout(1500);
 
-// Snapshot the default 3D diorama view immediately after game start
+// Snapshot the canonical 2D view immediately after game start
 const shot1 = await page.screenshot({ fullPage: false });
-await writeFile('/tmp/realm-probe-1-start-3d.png', shot1);
-
-// Toggle to 2D, screenshot
-await page.evaluate(() => window.toggle3D && window.toggle3D());
-await page.waitForTimeout(500);
-const shot2 = await page.screenshot({ fullPage: false });
-await writeFile('/tmp/realm-probe-2-2d-fresh.png', shot2);
+await writeFile('/tmp/realm-probe-1-start-2d.png', shot1);
 
 // Cheat resources & defense and let the game run long enough for events to surface
 await page.evaluate(() => {
@@ -64,12 +58,6 @@ await page.waitForTimeout(2000);
 
 const shot3 = await page.screenshot({ fullPage: false });
 await writeFile('/tmp/realm-probe-3-2d-after-sim.png', shot3);
-
-// Back to 3D after some sim time
-await page.evaluate(() => window.toggle3D && window.toggle3D());
-await page.waitForTimeout(500);
-const shot4 = await page.screenshot({ fullPage: false });
-await writeFile('/tmp/realm-probe-4-3d-after-sim.png', shot4);
 
 // Inspect runtime state
 const stateInfo = await page.evaluate(() => {
@@ -96,4 +84,4 @@ for (const m of interesting.slice(0, 20)) console.log('  !', m);
 
 await browser.close();
 await server.stop();
-console.log('[probe] screenshots: /tmp/realm-probe-{1..4}.png');
+console.log('[probe] screenshots: /tmp/realm-probe-1-start-2d.png and /tmp/realm-probe-3-2d-after-sim.png');

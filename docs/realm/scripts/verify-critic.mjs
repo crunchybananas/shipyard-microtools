@@ -1,17 +1,19 @@
-// 238 the-screenshot-critic: comprehensive live-game visual audit.
-// Captures the full 11-sprite grid at default zoom + closer zoom +
-// dawn/midday/dusk/night lighting variants. Reports cache state +
-// page errors. Output PNGs land in scripts/screenshots/critic-*.png
+// Painted-atlas live-game visual audit for the canonical 2D renderer.
+// Captures the full buildable sprite roster at default zoom + closer zoom
+// + dawn/midday/dusk/night lighting variants. Reports atlas state + page
+// errors. Output PNGs land in scripts/screenshots/critic-*.png
 
 import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { mkdir } from 'node:fs/promises';
 import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REALM_ROOT = join(__dirname, '..');
 const server = await ensureServer();
 const SHOTS = join(REALM_ROOT, 'scripts/screenshots');
+await mkdir(SHOTS, { recursive: true });
 
 const HEADLESS = process.env.HEADED !== '1';
 const browser = await chromium.launch({ headless: HEADLESS });
@@ -21,7 +23,7 @@ const errs = [];
 page.on('pageerror', e => errs.push(e.message));
 page.on('console', m => { if (m.type() === 'error') errs.push(`[console] ${m.text()}`); });
 
-await page.goto(`${server.origin}/index.html`);
+await page.goto(`${server.gameUrl}`);
 await page.waitForLoadState('domcontentloaded');
 await page.waitForTimeout(1500);
 
@@ -31,29 +33,72 @@ const start = await page.$('button:has-text("New Game"), #start-game-btn');
 if (start) await start.click();
 await page.waitForTimeout(1500);
 
-// Place all 11 sprite-bearing types in a clustered settlement.
+// Place every live painted-atlas buildable type in a clustered settlement.
 await page.evaluate(() => {
-  window.G.buildings = window.G.buildings || [];
-  // Two rows of 6 + 5 buildings near map center
-  const types = ['castle', 'church', 'tower', 'windmill', 'tavern', 'barracks',
-                 'house', 'house', 'granary', 'market', 'bakery', 'blacksmith'];
-  let cx = 36, cy = 36;
-  for (const t of types) {
-    window.G.buildings.push({
-      type: t, x: cx, y: cy,
+  window.G.buildings = [];
+  window.G.citizens = [];
+  window.G.soldiers = [];
+  window.G.selectedBuild = null;
+  window.G.selectedBuilding = null;
+  window.G.hoveredTile = null;
+  if (Array.isArray(window.G.buildingGrid)) {
+    for (const row of window.G.buildingGrid) {
+      if (Array.isArray(row)) row.fill(null);
+    }
+  }
+  for (let y = 28; y <= 50; y++) {
+    for (let x = 30; x <= 56; x++) {
+      if (window.G.map?.[y]) window.G.map[y][x] = 2; // grass audit pad
+    }
+  }
+  for (let y = 43; y <= 48; y++) {
+    for (let x = 49; x <= 56; x++) {
+      if (window.G.map?.[y]) window.G.map[y][x] = y >= 48 ? 0 : 1; // water + beach edge
+    }
+  }
+  const types = [
+    'castle', 'church', 'townhall', 'tower', 'windmill',
+    'house', 'tavern', 'school', 'market', 'bakery',
+    'blacksmith', 'barracks', 'archery', 'granary', 'well',
+    'farm', 'lumber', 'quarry', 'mine', 'fisherman',
+    'tradingpost', 'chickencoop', 'cowpen', 'wall', 'road',
+  ];
+  const addBuilding = (type, x, y, extra = {}) => {
+    const b = {
+      type, x, y,
       hp: 100, maxHp: 100,
       workers: [], assigned: [],
       buildProgress: 1,
-    });
-    cx += 3;
-    if (cx > 50) { cx = 36; cy += 3; }
+      ...extra,
+    };
+    window.G.buildings.push(b);
+    if (window.G.buildingGrid?.[y]) window.G.buildingGrid[y][x] = b;
+    return b;
+  };
+  const startX = 34;
+  const startY = 34;
+  const cols = 5;
+  for (let i = 0; i < types.length; i++) {
+    const t = types[i];
+    const cx = startX + (i % cols) * 4;
+    const cy = startY + Math.floor(i / cols) * 3;
+    addBuilding(t, cx, cy);
+  }
+  const wallCluster = [
+    [41, 46], [42, 46], [43, 46],
+    [42, 45], [42, 47], [43, 47],
+  ];
+  for (const [x, y] of wallCluster) {
+    addBuilding('wall', x, y);
   }
   // Center camera on the cluster.
   if (window.G.camera) {
-    window.G.camera.x = 0;
-    window.G.camera.y = 1280;
-    window.G.camera.zoom = 1.4;
+    window.G.camera.x = -70;
+    window.G.camera.y = 1260;
+    window.G.camera.zoom = 1.25;
   }
+  window.G.photoMode = true;
+  document.body.classList.add('photo-mode');
 });
 await page.waitForTimeout(1200);  // sprite preload + variant load
 
@@ -91,6 +136,43 @@ await page.evaluate(() => { window.G.camera.zoom = 0.6; });
 await page.waitForTimeout(600);
 await page.screenshot({ path: join(SHOTS, 'critic-zoom-far.png') });
 console.log('[critic] saved critic-zoom-far.png (zoom 0.6)');
+
+// Dedicated connected-wall audit in 2D.
+await page.evaluate(() => {
+  window.G.season = 'spring';
+  window.G.dayPhase = 1500;
+  window.G.camera.x = (42 - 46) * 32;
+  window.G.camera.y = (42 + 46) * 16;
+  window.G.camera.zoom = 2.4;
+});
+await page.waitForTimeout(700);
+await page.screenshot({ path: join(SHOTS, 'critic-walls-2d.png') });
+console.log('[critic] saved critic-walls-2d.png');
+
+// Same wall cluster with staged construction reveal.
+await page.evaluate(() => {
+  const stages = [
+    [41, 46, 0.30],
+    [42, 46, 0.50],
+    [43, 46, 0.72],
+    [42, 45, 0.45],
+    [42, 47, 0.86],
+    [43, 47, 0.62],
+  ];
+  for (const [x, y, progress] of stages) {
+    const b = window.G.buildingGrid?.[y]?.[x];
+    if (b?.type === 'wall') b.buildProgress = progress;
+  }
+});
+await page.waitForTimeout(500);
+await page.screenshot({ path: join(SHOTS, 'critic-walls-construction-2d.png') });
+console.log('[critic] saved critic-walls-construction-2d.png');
+
+await page.evaluate(() => {
+  for (const b of window.G.buildings) {
+    if (b.type === 'wall') b.buildProgress = 1;
+  }
+});
 
 // Winter mode
 await page.evaluate(() => {

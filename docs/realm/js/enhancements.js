@@ -1,29 +1,18 @@
 // ════════════════════════════════════════════════════════════
 // Enhancements — incremental ambient features added across
-// the autonomous improvement loops. Each block is self-contained
-// and additive; do not remove prior blocks.
-//
-// DISABLING A FEATURE: add `return;` as the first statement inside
-// the update/render function (NOT the registerXxx call). The register
-// call stays so the ordering of later features isn't perturbed.
-// Examples: search for `return; // disabled` to see the pattern.
-//
-// CURRENT DISABLED FEATURES (12, as of cycle 41):
-//   - Space effects: meteors, comets, constellations, sun pillars,
-//     dragon, dragon trail, meteor impacts — too "out of place"
-//   - Sunrise burst — too visually dominant
-//   - Swallows — screen-space V-strokes drifted into vignette
-//   - Map boundary dots — appeared as void artifacts
-//   - renderWorkerDots/renderRadiusPreview/renderGhostCost —
-//     referenced undefined BUILDINGS, caused 60fps crash loop
+// the autonomous improvement loops. Active blocks should be grounded,
+// path-aware, and visually justified; retired experiments should be
+// deleted rather than left as registered no-ops.
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js';
 import { makeAtlasLoader } from './atlas-loader.js';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
-const _AMBIENT_ATLAS_URL = 'assets/sprites/ambient-atlas.png';
+const _AMBIENT_ATLAS_REVISION = new URLSearchParams(location.search).get('v') || '111';
+const _AMBIENT_ATLAS_URL = `assets/sprites/ambient-atlas.png?realm=${encodeURIComponent(_AMBIENT_ATLAS_REVISION)}`;
 const _AMBIENT_FRAMES = {
   cart:     { x:   0, y: 0, w: 48, h: 48 },
   fishboat: { x:  48, y: 0, w: 48, h: 48 },
@@ -307,12 +296,8 @@ export function renderPuddles(ctx) {
 }
 
 // ── Loop 16 / 151 — Kingdom constellation ───────────────────
-// 016 shipped hand-crafted 3-constellation patterns but the
-// path was disabled with a "space effects removed" early return.
-// 151 (the-fixer, closes 116 filed 35 ticks) reactivates the
-// path with kingdom-specific content: the constellation named
-// by 116's `constellation_named` narrative beat now actually
-// appears in the night sky.
+// The constellation named by the `constellation_named` narrative beat
+// appears in the night sky with kingdom-specific seeded content.
 //
 // Shape is seeded from the kingdom name (same hash family as
 // story.js:_dreamHash) so each realm has its OWN asterism.
@@ -471,54 +456,101 @@ export function updateCarts() {
   if (G.gameTick % 600 === 0 && G.carts.length < markets.length && G.carts.length < 3) {
     // Spawn at map edge, target a random market
     const m = markets[Math.floor(Math.random() * markets.length)];
-    const edge = Math.floor(Math.random() * 4);
-    let sx, sy;
-    if (edge === 0) { sx = 0; sy = Math.floor(Math.random() * MAP_H); }
-    else if (edge === 1) { sx = MAP_W - 1; sy = Math.floor(Math.random() * MAP_H); }
-    else if (edge === 2) { sx = Math.floor(Math.random() * MAP_W); sy = 0; }
-    else { sx = Math.floor(Math.random() * MAP_W); sy = MAP_H - 1; }
-    G.carts.push({
-      x: sx, y: sy, tx: m.x, ty: m.y,
+    const start = cartEdgeStartNear(m.x, m.y);
+    if (!start) return;
+    const cart = {
+      x: start.x, y: start.y, tx: m.x, ty: m.y,
       state: 'arriving', stateTimer: 0, market: m,
       bobPhase: Math.random() * Math.PI * 2,
-    });
+      path: null, pathIdx: 0,
+    };
+    if (assignCartPath(cart, m.x, m.y)) G.carts.push(cart);
   }
   for (let i = G.carts.length - 1; i >= 0; i--) {
     const c = G.carts[i];
-    const dx = c.tx - c.x, dy = c.ty - c.y;
-    const d = Math.hypot(dx, dy);
     if (c.state === 'arriving') {
-      if (d < 0.6) {
+      if (cartDistanceTo(c, c.market.x, c.market.y) < 1.2) {
         c.state = 'unloading';
         c.stateTimer = 200;
+        c.path = null;
+        c.pathIdx = 0;
       } else {
-        const spd = 0.025 * G.speed;
-        // Skip impassable tiles
-        const stepX = (dx / d) * Math.min(spd, d);
-        const stepY = (dy / d) * Math.min(spd, d);
-        c.x += stepX; c.y += stepY;
+        if (!stepCartAlongPath(c, 0.025)) {
+          if (!assignCartPath(c, c.market.x, c.market.y)) G.carts.splice(i, 1);
+        }
       }
     } else if (c.state === 'unloading') {
       c.stateTimer -= G.speed;
       if (c.stateTimer <= 0) {
         c.state = 'leaving';
-        // pick edge target
-        const edge = Math.floor(Math.random() * 4);
-        if (edge === 0) { c.tx = 0; c.ty = c.y; }
-        else if (edge === 1) { c.tx = MAP_W - 1; c.ty = c.y; }
-        else if (edge === 2) { c.tx = c.x; c.ty = 0; }
-        else { c.tx = c.x; c.ty = MAP_H - 1; }
+        const exit = cartEdgeStartNear(c.x, c.y);
+        if (!exit || !assignCartPath(c, exit.x, exit.y)) G.carts.splice(i, 1);
       }
     } else if (c.state === 'leaving') {
       if (c.x <= 0.3 || c.x >= MAP_W - 1.3 || c.y <= 0.3 || c.y >= MAP_H - 1.3) {
         G.carts.splice(i, 1);
         continue;
       }
-      const spd = 0.025 * G.speed;
-      c.x += (dx / d) * Math.min(spd, d);
-      c.y += (dy / d) * Math.min(spd, d);
+      if (!stepCartAlongPath(c, 0.025)) G.carts.splice(i, 1);
     }
   }
+}
+
+function cartDistanceTo(cart, x, y) {
+  return Math.hypot(cart.x - x, cart.y - y);
+}
+
+function cartEdgeStartNear(fromX, fromY) {
+  const candidates = [];
+  for (let y = 1; y < MAP_H - 1; y++) {
+    candidates.push({ x: 1, y }, { x: MAP_W - 2, y });
+  }
+  for (let x = 1; x < MAP_W - 1; x++) {
+    candidates.push({ x, y: 1 }, { x, y: MAP_H - 2 });
+  }
+  candidates.sort((a, b) => (
+    Math.hypot(a.x - fromX, a.y - fromY) - Math.hypot(b.x - fromX, b.y - fromY)
+  ));
+  for (const c of candidates) {
+    if (isWalkable(c.x, c.y)) return c;
+    const near = nearestWalkableTile(c.x, c.y, 4, fromX, fromY);
+    if (near) return near;
+  }
+  return null;
+}
+
+function assignCartPath(cart, tx, ty) {
+  const target = nearestWalkableTile(Math.round(tx), Math.round(ty), 7, Math.round(cart.x), Math.round(cart.y));
+  if (!target) return false;
+  const path = findPath(Math.round(cart.x), Math.round(cart.y), target.x, target.y, 7000);
+  if (!path || !path.length) return false;
+  cart.path = path;
+  cart.pathIdx = 0;
+  cart.tx = target.x;
+  cart.ty = target.y;
+  return true;
+}
+
+function stepCartAlongPath(cart, baseSpeed) {
+  if (!cart.path || cart.pathIdx >= cart.path.length) return false;
+  let target = cart.path[cart.pathIdx];
+  let dx = target.x - cart.x;
+  let dy = target.y - cart.y;
+  let d = Math.hypot(dx, dy);
+  while (d < 0.08 && cart.pathIdx < cart.path.length - 1) {
+    cart.pathIdx++;
+    target = cart.path[cart.pathIdx];
+    dx = target.x - cart.x;
+    dy = target.y - cart.y;
+    d = Math.hypot(dx, dy);
+  }
+  cart.tx = target.x;
+  cart.ty = target.y;
+  if (d < 0.08) return true;
+  const spd = baseSpeed * G.speed;
+  cart.x += (dx / d) * Math.min(spd, d);
+  cart.y += (dy / d) * Math.min(spd, d);
+  return true;
 }
 export function renderCarts(ctx) {
   if (!G.carts || !G.carts.length || G.camera.zoom < 0.5) return;
@@ -528,6 +560,14 @@ export function renderCarts(ctx) {
     const bob = Math.sin(G.gameTick * 0.15 + c.bobPhase) * 0.4;
     ctx.globalAlpha = dayl;
     const mdx = c.tx - c.x;
+    ctx.fillStyle = 'rgba(25,18,12,0.30)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 8, 13, 3.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,230,170,0.16)';
+    ctx.beginPath();
+    ctx.ellipse(s.x - 1.5, s.y + 7.2, 9, 1.4, 0, 0, Math.PI * 2);
+    ctx.fill();
     if (drawAmbientSprite(ctx, 'cart', s.x, s.y + 8 + bob, 48, 38, 1, mdx < 0)) {
       continue;
     }
@@ -1041,41 +1081,58 @@ export function renderFlocks(ctx, logicalW, logicalH) {
 }
 
 // ── Loop 4: Wandering fishing boats on open water ───────────
+function hasBoatTraffic() {
+  return G.buildings.some((b) => b.type === 'fisherman' || b.type === 'tradingpost');
+}
+
+function isOpenWater(x, y) {
+  const tx = Math.round(x);
+  const ty = Math.round(y);
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (G.map[ty + dy]?.[tx + dx] !== TILE.WATER) return false;
+    }
+  }
+  return true;
+}
+
 function findWaterCluster() {
-  // Find a large connected water area; return a spawn coordinate
-  for (let attempts = 0; attempts < 50; attempts++) {
+  // Keep ambient boats far enough offshore that tall props cannot read as
+  // sliding through beaches or inland grass from the isometric projection.
+  for (let attempts = 0; attempts < 80; attempts++) {
     const x = Math.floor(Math.random() * MAP_W);
     const y = Math.floor(Math.random() * MAP_H);
-    if (!G.map[y] || G.map[y][x] !== TILE.WATER) continue;
-    // Need at least 6 water tiles in a 5x5 box
-    let count = 0;
-    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-      const nx = x + dx, ny = y + dy;
-      if (nx >= 0 && nx < MAP_W && ny >= 0 && ny < MAP_H && G.map[ny][nx] === TILE.WATER) count++;
-    }
-    if (count >= 8) return { x, y };
+    if (isOpenWater(x, y)) return { x, y };
   }
   return null;
 }
 
 export function updateBoats() {
   if (!G.boats) G.boats = [];
-  // Spawn rate: try every 200 ticks if under 4 boats
-  if (G.gameTick % 200 === 0 && G.boats.length < 4) {
+  if (!hasBoatTraffic()) {
+    G.boats.length = 0;
+    return;
+  }
+  // Keep this as waterfront activity, not free-floating map decoration.
+  if (G.gameTick % 360 === 0 && G.boats.length < 2) {
     const spot = findWaterCluster();
     if (spot) {
+      const hasTradingPost = G.buildings.some((b) => b.type === 'tradingpost');
       G.boats.push({
         x: spot.x, y: spot.y,
-        tx: spot.x + (Math.random() - 0.5) * 6,
-        ty: spot.y + (Math.random() - 0.5) * 6,
+        tx: spot.x, ty: spot.y,
         bobPhase: Math.random() * Math.PI * 2,
-        kind: Math.random() < 0.7 ? 'fish' : 'sail',
+        kind: hasTradingPost && Math.random() < 0.18 ? 'sail' : 'fish',
         wakeT: 0,
       });
     }
   }
   for (let i = G.boats.length - 1; i >= 0; i--) {
     const b = G.boats[i];
+    if (!isOpenWater(b.x, b.y)) {
+      G.boats.splice(i, 1);
+      continue;
+    }
     const dx = b.tx - b.x, dy = b.ty - b.y;
     const d = Math.hypot(dx, dy);
     if (d < 0.3) {
@@ -1084,7 +1141,7 @@ export function updateBoats() {
       while (tries-- > 0) {
         const nx = Math.max(1, Math.min(MAP_W - 2, b.x + (Math.random() - 0.5) * 8));
         const ny = Math.max(1, Math.min(MAP_H - 2, b.y + (Math.random() - 0.5) * 8));
-        if (G.map[Math.round(ny)] && G.map[Math.round(ny)][Math.round(nx)] === TILE.WATER) {
+        if (isOpenWater(nx, ny)) {
           b.tx = nx; b.ty = ny; break;
         }
       }
@@ -1092,9 +1149,7 @@ export function updateBoats() {
       const spd = 0.012 * G.speed;
       const stepX = (dx / d) * Math.min(spd, d);
       const stepY = (dy / d) * Math.min(spd, d);
-      // Only move if next tile is still water
-      const nxR = Math.round(b.x + stepX), nyR = Math.round(b.y + stepY);
-      if (G.map[nyR] && G.map[nyR][nxR] === TILE.WATER) {
+      if (isOpenWater(b.x + stepX, b.y + stepY)) {
         b.x += stepX; b.y += stepY;
       } else {
         // Force new target
@@ -1108,16 +1163,34 @@ export function updateBoats() {
 }
 
 export function renderBoats(ctx) {
-  if (!G.boats || !G.boats.length || G.camera.zoom < 0.5) return;
+  if (!hasBoatTraffic() || !G.boats || !G.boats.length || G.camera.zoom < 0.5) return;
   const daylight = getDaylight();
   for (const b of G.boats) {
+    if (!isOpenWater(b.x, b.y)) continue;
     const s = toScreen(b.x, b.y);
     const bob = Math.sin(G.gameTick * 0.06 + b.bobPhase) * 0.6;
     ctx.globalAlpha = daylight;
     const mdx = b.tx - b.x;
     const spriteType = b.kind === 'sail' ? 'sailboat' : 'fishboat';
-    const spriteH = b.kind === 'sail' ? 31 : 24;
-    if (drawAmbientSprite(ctx, spriteType, s.x, s.y + 10 + bob, 44, spriteH + 6, 1, mdx < 0)) {
+    const spriteW = b.kind === 'sail' ? 34 : 32;
+    const spriteH = b.kind === 'sail' ? 25 : 20;
+    ctx.save();
+    ctx.globalAlpha = daylight * 0.55;
+    ctx.strokeStyle = 'rgba(220,235,255,0.52)';
+    ctx.lineWidth = 0.8;
+    const wakeDir = mdx < 0 ? 1 : -1;
+    ctx.beginPath();
+    ctx.moveTo(s.x + wakeDir * 4, s.y + 7 + bob * 0.2);
+    ctx.lineTo(s.x + wakeDir * 12, s.y + 4 + bob * 0.2);
+    ctx.moveTo(s.x + wakeDir * 4, s.y + 7 + bob * 0.2);
+    ctx.lineTo(s.x + wakeDir * 12, s.y + 10 + bob * 0.2);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(20,52,78,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 8, spriteW * 0.42, 2.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    if (drawAmbientSprite(ctx, spriteType, s.x, s.y + 5 + bob, spriteW, spriteH, 1, mdx < 0)) {
       continue;
     }
     continue;
@@ -1492,136 +1565,41 @@ function renderVolcano(ctx) {
 registerUpdater(updateVolcano);
 registerWorldRenderer(renderVolcano);
 
-// ── Loop 24: Floating status bubbles above buildings ───────
-// Indicates idle workers (?) or low food (!) etc.
+// ── Loop 24: Grounded building status marks ─────────────────
 function renderStatusBubbles(ctx) {
   if (G.camera.zoom < 0.7) return;
   for (const b of G.buildings) {
-    let icon = null, color = null;
+    let color = null;
     if ((b.workersNeeded || 0) > (b.workers ? b.workers.length : 0) && b.type !== 'house' && b.type !== 'wall' && b.type !== 'road' && b.type !== 'tower' && b.type !== 'well') {
-      icon = '?'; color = '#ffd166';
+      color = '#d6a53f';
     } else if (b.type === 'farm' && G.resources && G.resources.food < 15) {
-      icon = '!'; color = '#f97070';
+      color = '#d86b56';
     }
-    if (!icon) continue;
+    if (!color) continue;
     const s = toScreen(b.x, b.y);
-    const bob = Math.sin(G.gameTick * 0.05 + (b.x + b.y) * 0.7) * 1.5;
-    const cx = s.x, cy = s.y - 36 + bob;
-    // Bubble
-    ctx.fillStyle = 'rgba(20,20,30,0.85)';
+    const pulse = 0.55 + 0.45 * Math.sin(G.gameTick * 0.045 + (b.x + b.y) * 0.7);
+    ctx.save();
+    ctx.globalAlpha = 0.45 + pulse * 0.25;
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.ellipse(s.x + 12, s.y - 1, 4.5, 1.8, -0.18, 0, Math.PI * 2);
     ctx.fill();
-    // Tail
+    ctx.globalAlpha = 0.8;
+    ctx.strokeStyle = 'rgba(36,26,18,0.58)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.globalAlpha = 0.55 + pulse * 0.3;
+    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(cx - 2, cy + 4);
-    ctx.lineTo(cx, cy + 8);
-    ctx.lineTo(cx + 2, cy + 4);
+    ctx.moveTo(s.x + 8.5, s.y - 4);
+    ctx.lineTo(s.x + 12, s.y - 8);
+    ctx.lineTo(s.x + 15.5, s.y - 4);
     ctx.closePath();
     ctx.fill();
-    // Icon
-    ctx.fillStyle = color;
-    ctx.font = 'bold 7px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(icon, cx, cy + 0.5);
+    ctx.restore();
   }
 }
 registerWorldRenderer(renderStatusBubbles);
-
-// ── Loop 25: Rare dragon flyover (screen space) ────────────
-function updateDragon(logicalW, logicalH) {
-  return; // disabled — flying dragon feels out of place
-  if (!G.dragon) {
-    if (G.gameTick % 2400 === 0 && Math.random() < 0.15) {
-      const goingRight = Math.random() < 0.5;
-      G.dragon = {
-        x: goingRight ? -120 : (logicalW || 1500) + 120,
-        y: (logicalH || 800) * (0.10 + Math.random() * 0.18),
-        vx: (goingRight ? 1 : -1) * 1.5,
-        wing: 0,
-        scale: 1.0,
-        breath: 0,
-      };
-    }
-    return;
-  }
-  const d = G.dragon;
-  d.x += d.vx * G.speed;
-  d.wing += 0.18 * G.speed;
-  d.breath = Math.max(0, d.breath - G.speed);
-  if (Math.random() < 0.005) d.breath = 25;
-  if (d.x < -200 || d.x > (logicalW || 1500) + 200) G.dragon = null;
-}
-function renderDragon(ctx) {
-  const d = G.dragon;
-  if (!d) return;
-  ctx.save();
-  ctx.translate(d.x, d.y);
-  if (d.vx < 0) ctx.scale(-1, 1);
-  // Body
-  ctx.fillStyle = '#3a2050';
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 22, 5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Tail
-  ctx.beginPath();
-  ctx.moveTo(-22, 0);
-  ctx.lineTo(-40, -3);
-  ctx.lineTo(-46, 0);
-  ctx.lineTo(-40, 3);
-  ctx.closePath();
-  ctx.fill();
-  // Tail spike
-  ctx.beginPath();
-  ctx.moveTo(-46, 0);
-  ctx.lineTo(-50, -4);
-  ctx.lineTo(-50, 4);
-  ctx.closePath();
-  ctx.fill();
-  // Head
-  ctx.beginPath();
-  ctx.ellipse(22, -2, 8, 5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Horns
-  ctx.fillStyle = '#1a0a30';
-  ctx.beginPath();
-  ctx.moveTo(24, -6); ctx.lineTo(28, -11); ctx.lineTo(26, -5); ctx.closePath();
-  ctx.fill();
-  // Wings (animated)
-  const wingOff = Math.sin(d.wing) * 14;
-  ctx.fillStyle = 'rgba(80,30,120,0.9)';
-  ctx.beginPath();
-  ctx.moveTo(-4, -2);
-  ctx.lineTo(-12, -22 - wingOff);
-  ctx.lineTo(8, -10 - wingOff * 0.4);
-  ctx.lineTo(8, -2);
-  ctx.closePath();
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(-4, 2);
-  ctx.lineTo(-10, 18 + wingOff * 0.6);
-  ctx.lineTo(8, 8 + wingOff * 0.4);
-  ctx.lineTo(8, 2);
-  ctx.closePath();
-  ctx.fill();
-  // Fire breath
-  if (d.breath > 0) {
-    const a = d.breath / 25;
-    ctx.globalCompositeOperation = 'screen';
-    const grad = ctx.createRadialGradient(38, -1, 0, 38, -1, 22);
-    grad.addColorStop(0, `rgba(255,240,140,${a * 0.95})`);
-    grad.addColorStop(0.5, `rgba(255,120,40,${a * 0.7})`);
-    grad.addColorStop(1, 'rgba(255,40,0,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.ellipse(40, -1, 22, 7, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-registerUpdater(updateDragon, true);
-registerScreenRenderer(renderDragon);
 
 // ── Loop 26: Wind-rippled grass/wheat overlay near farms ───
 function renderWindRipple(ctx) {
@@ -1807,123 +1785,6 @@ function renderWellSparkles(ctx) {
   }
 }
 registerWorldRenderer(renderWellSparkles);
-
-// ── Loop 30: Slow comets at deep night (different from meteors)
-// Meteors are fast, screen-only streaks. Comets are slow, large,
-// have long teardrop tails, and travel arcs across the upper sky.
-function updateComets(logicalW, logicalH) {
-  return; // disabled — space effects removed
-  if (!G.comets) G.comets = [];
-  if (G.gameTick % 1800 === 0 && G.comets.length < 1 && getDaylight() < 0.4 && Math.random() < 0.4) {
-    const goingRight = Math.random() < 0.5;
-    G.comets.push({
-      x: goingRight ? -50 : (logicalW || 1500) + 50,
-      y: (logicalH || 800) * (0.05 + Math.random() * 0.2),
-      vx: (goingRight ? 1 : -1) * 0.45,
-      vy: 0.05,
-      life: 2000,
-    });
-  }
-  for (let i = G.comets.length - 1; i >= 0; i--) {
-    const c = G.comets[i];
-    c.x += c.vx * G.speed; c.y += c.vy * G.speed; c.life -= G.speed;
-    if (c.life <= 0 || c.x < -200 || c.x > (logicalW || 1500) + 200) G.comets.splice(i, 1);
-  }
-}
-function renderComets(ctx) {
-  if (!G.comets || !G.comets.length) return;
-  const dayl = getDaylight();
-  const ns = Math.max(0, Math.min(1, (0.6 - dayl) / 0.3));
-  if (ns < 0.05) return;
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (const c of G.comets) {
-    const dir = c.vx >= 0 ? 1 : -1;
-    // Tail (gradient)
-    const tailLen = 80 * dir;
-    const grad = ctx.createLinearGradient(c.x, c.y, c.x - tailLen, c.y - 6);
-    grad.addColorStop(0, `rgba(220,235,255,${0.85 * ns})`);
-    grad.addColorStop(0.4, `rgba(180,210,255,${0.45 * ns})`);
-    grad.addColorStop(1, 'rgba(120,160,230,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.moveTo(c.x, c.y - 4);
-    ctx.lineTo(c.x - tailLen, c.y - 1);
-    ctx.lineTo(c.x - tailLen, c.y + 1);
-    ctx.lineTo(c.x, c.y + 4);
-    ctx.closePath();
-    ctx.fill();
-    // Head
-    const hg = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 8);
-    hg.addColorStop(0, `rgba(255,255,255,${ns})`);
-    hg.addColorStop(1, 'rgba(180,210,255,0)');
-    ctx.fillStyle = hg;
-    ctx.beginPath();
-    ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-registerUpdater(updateComets, true);
-registerScreenRenderer(renderComets);
-
-// ── Loop 31: Wandering ghost in graveyards (stub: random spot at night)
-function updateGhost() {
-  if (!G.ghosts) G.ghosts = [];
-  const t = G.dayPhase / G.dayLength;
-  if (t < 0.78 && t > 0.05) { G.ghosts.length = 0; return; }
-  if (G.gameTick % 500 === 0 && G.ghosts.length < 1 && Math.random() < 0.3) {
-    for (let attempt = 0; attempt < 20; attempt++) {
-      const x = Math.floor(Math.random() * MAP_W);
-      const y = Math.floor(Math.random() * MAP_H);
-      const tile = G.map[y] && G.map[y][x];
-      if (tile === TILE.GRASS || tile === TILE.FOREST) {
-        G.ghosts.push({ x, y, tx: x, ty: y, life: 800, phase: Math.random() * Math.PI * 2 });
-        break;
-      }
-    }
-  }
-  for (let i = G.ghosts.length - 1; i >= 0; i--) {
-    const g = G.ghosts[i];
-    g.life -= G.speed;
-    if (g.life <= 0) { G.ghosts.splice(i, 1); continue; }
-    const dx = g.tx - g.x, dy = g.ty - g.y, d = Math.hypot(dx, dy);
-    if (d < 0.2) {
-      g.tx = Math.max(1, Math.min(MAP_W - 2, g.x + (Math.random() - 0.5) * 4));
-      g.ty = Math.max(1, Math.min(MAP_H - 2, g.y + (Math.random() - 0.5) * 4));
-    } else {
-      g.x += (dx / d) * 0.008 * G.speed;
-      g.y += (dy / d) * 0.008 * G.speed;
-    }
-  }
-}
-function renderGhost(ctx) {
-  if (!G.ghosts || !G.ghosts.length || G.camera.zoom < 0.7) return;
-  for (const g of G.ghosts) {
-    const s = toScreen(g.x, g.y);
-    const fade = Math.min(1, g.life / 200);
-    const bob = Math.sin(G.gameTick * 0.05 + g.phase) * 1.5;
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.55 * fade;
-    // Wispy body
-    const grad = ctx.createRadialGradient(s.x, s.y - 6 + bob, 0, s.x, s.y - 6 + bob, 10);
-    grad.addColorStop(0, 'rgba(220,255,250,0.95)');
-    grad.addColorStop(1, 'rgba(150,220,220,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y - 5 + bob, 4, 7, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Eyes (dark holes)
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = `rgba(20,30,60,${0.7 * fade})`;
-    ctx.beginPath(); ctx.arc(s.x - 1.2, s.y - 7 + bob, 0.6, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(s.x + 1.2, s.y - 7 + bob, 0.6, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-  }
-}
-registerUpdater(updateGhost);
-registerWorldRenderer(renderGhost);
 
 // ── Loop 32: Frogs hop on water-edge sand at dusk/night ────
 function updateFrogs() {
@@ -2130,69 +1991,6 @@ function renderBeeSwarms(ctx) {
   }
 }
 registerWorldRenderer(renderBeeSwarms);
-
-// ── Loop 36: Will-o-wisps drift near forest at night ───────
-function updateWisps() {
-  if (!G.wisps) G.wisps = [];
-  const t = G.dayPhase / G.dayLength;
-  if (t > 0.05 && t < 0.7) { G.wisps.length = 0; return; }
-  if (G.gameTick % 250 === 0 && G.wisps.length < 4) {
-    for (let attempt = 0; attempt < 30; attempt++) {
-      const x = Math.floor(Math.random() * MAP_W);
-      const y = Math.floor(Math.random() * MAP_H);
-      if (G.map[y] && G.map[y][x] === TILE.FOREST) {
-        G.wisps.push({
-          x, y,
-          tx: x + (Math.random() - 0.5) * 3, ty: y + (Math.random() - 0.5) * 3,
-          life: 600 + Math.random() * 400,
-          color: ['#80ffe0','#a0f0ff','#c8a0ff'][Math.floor(Math.random() * 3)],
-        });
-        break;
-      }
-    }
-  }
-  for (let i = G.wisps.length - 1; i >= 0; i--) {
-    const w = G.wisps[i];
-    w.life -= G.speed;
-    if (w.life <= 0) { G.wisps.splice(i, 1); continue; }
-    const dx = w.tx - w.x, dy = w.ty - w.y, d = Math.hypot(dx, dy);
-    if (d < 0.2) {
-      w.tx = Math.max(1, Math.min(MAP_W - 2, w.x + (Math.random() - 0.5) * 4));
-      w.ty = Math.max(1, Math.min(MAP_H - 2, w.y + (Math.random() - 0.5) * 4));
-    } else {
-      w.x += (dx / d) * 0.01 * G.speed;
-      w.y += (dy / d) * 0.01 * G.speed;
-    }
-  }
-}
-function renderWisps(ctx) {
-  if (!G.wisps || !G.wisps.length || G.camera.zoom < 0.6) return;
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (const w of G.wisps) {
-    const s = toScreen(w.x, w.y);
-    const fade = Math.min(1, w.life / 200);
-    const pulse = 0.7 + 0.3 * Math.sin(G.gameTick * 0.08 + w.x);
-    const cy = s.y - 8 + Math.sin(G.gameTick * 0.04 + w.y) * 2;
-    const grad = ctx.createRadialGradient(s.x, cy, 0, s.x, cy, 9);
-    grad.addColorStop(0, w.color + 'ff'.replace('ff', Math.floor(pulse * 255).toString(16).padStart(2,'0')));
-    grad.addColorStop(1, w.color.replace(')', ',0)').replace('rgb', 'rgba'));
-    // Simpler: use opacity
-    ctx.globalAlpha = fade * pulse * 0.85;
-    ctx.fillStyle = w.color;
-    ctx.beginPath();
-    ctx.arc(s.x, cy, 1.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = fade * pulse * 0.35;
-    ctx.beginPath();
-    ctx.arc(s.x, cy, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-  ctx.globalAlpha = 1;
-}
-registerUpdater(updateWisps);
-registerWorldRenderer(renderWisps);
 
 // ── Loop 37: Spider webs draped in forest tiles in autumn ──
 function renderWebs(ctx) {
@@ -2439,46 +2237,6 @@ function renderCitizenTrails(ctx) {
   }
 }
 registerWorldRenderer(renderCitizenTrails);
-
-// ── Loop 43: Swallows dart in spring sky ───────────────────
-function updateSwallows(logicalW, logicalH) {
-  return; // disabled — renders V-strokes in random screen positions, drifts into vignette void
-  if (G.season !== 'spring') { if (G.swallows) G.swallows.length = 0; return; }
-  if (!G.swallows) G.swallows = [];
-  if (G.gameTick % 200 === 0 && G.swallows.length < 5 && getDaylight() > 0.6) {
-    G.swallows.push({
-      x: Math.random() * (logicalW || 1500),
-      y: Math.random() * (logicalH || 800) * 0.5 + 60,
-      vx: (Math.random() - 0.5) * 4,
-      vy: (Math.random() - 0.5) * 1,
-      life: 800,
-    });
-  }
-  for (let i = G.swallows.length - 1; i >= 0; i--) {
-    const s = G.swallows[i];
-    s.x += s.vx; s.y += s.vy;
-    if (Math.random() < 0.04) { s.vx += (Math.random() - 0.5) * 1.5; s.vy += (Math.random() - 0.5) * 0.6; }
-    s.vx = Math.max(-5, Math.min(5, s.vx));
-    s.vy = Math.max(-1.5, Math.min(1.5, s.vy));
-    s.life -= G.speed;
-    if (s.life <= 0 || s.x < -50 || s.x > (logicalW || 1500) + 50 || s.y < -50 || s.y > (logicalH || 800) * 0.7) G.swallows.splice(i, 1);
-  }
-}
-function renderSwallows(ctx) {
-  if (!G.swallows || !G.swallows.length) return;
-  ctx.strokeStyle = 'rgba(20,20,30,0.7)';
-  ctx.lineWidth = 1;
-  for (const s of G.swallows) {
-    const dir = s.vx >= 0 ? 1 : -1;
-    ctx.beginPath();
-    ctx.moveTo(s.x - 3 * dir, s.y);
-    ctx.lineTo(s.x, s.y - 1);
-    ctx.lineTo(s.x + 2 * dir, s.y + 1);
-    ctx.stroke();
-  }
-}
-registerUpdater(updateSwallows, true);
-registerScreenRenderer(renderSwallows);
 
 // ── Loop 44: Glowing windows on houses at night ────────────
 function renderHouseWindows(ctx) {
@@ -2845,39 +2603,6 @@ function renderLaundry(ctx) {
 }
 registerWorldRenderer(renderLaundry);
 
-// ── Loop 55: Day-1 sunrise burst on screen ─────────────────
-function renderSunriseBurst(ctx, logicalW, logicalH) {
-  return; // disabled — too visually dominant, obscures gameplay
-  if (G.day !== 1) return;
-  const t = G.dayPhase / G.dayLength;
-  if (t > 0.18) return;
-  const fade = Math.max(0, 1 - t / 0.18);
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  const cx = logicalW * 0.15;
-  const cy = logicalH * 0.65;
-  // Radial sunburst
-  for (let i = 0; i < 18; i++) {
-    const ang = (i / 18) * Math.PI * 2;
-    ctx.strokeStyle = `rgba(255,220,150,${fade * 0.18})`;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + Math.cos(ang) * logicalW, cy + Math.sin(ang) * logicalW);
-    ctx.stroke();
-  }
-  // Bright center
-  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 200);
-  grad.addColorStop(0, `rgba(255,250,210,${fade * 0.7})`);
-  grad.addColorStop(1, 'rgba(255,200,100,0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(cx, cy, 200, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-registerScreenRenderer(renderSunriseBurst);
-
 // ── Loop 56: Toad-stool (red&white) clusters around tavern
 function renderTavernToadstools(ctx) {
   if (G.camera.zoom < 0.9) return;
@@ -2941,52 +2666,6 @@ function renderRaidSmoke(ctx) {
 registerUpdater(updateRaidSmoke);
 registerWorldRenderer(renderRaidSmoke);
 
-// ── Loop 58: Floating fishing nets in shallow water near piers/sand
-function renderFishingNets(ctx) {
-  if (G.camera.zoom < 0.7) return;
-  const cx = G.camera.x, cy = G.camera.y;
-  const range = 22 / G.camera.zoom;
-  const tcx = (cx / 32 + cy / 16) / 2;
-  const tcy = (cy / 16 - cx / 32) / 2;
-  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
-  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
-  ctx.save();
-  ctx.strokeStyle = 'rgba(40,30,20,0.6)';
-  ctx.lineWidth = 0.4;
-  for (let ty = ty0; ty <= ty1; ty++) {
-    for (let tx = tx0; tx <= tx1; tx++) {
-      if (G.map[ty][tx] !== TILE.WATER) continue;
-      // adjacent sand?
-      let nearSand = false;
-      for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
-        if (G.map[ty+dy] && G.map[ty+dy][tx+dx] === TILE.SAND) { nearSand = true; break; }
-      }
-      if (!nearSand) continue;
-      const h = ((tx * 0x4f4f) ^ (ty * 0x6363)) >>> 0;
-      if (h % 100 > 12) continue;
-      const s = toScreen(tx, ty);
-      // Float buoys
-      ctx.fillStyle = '#f0a830';
-      ctx.beginPath(); ctx.arc(s.x - 6, s.y, 0.8, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(s.x + 6, s.y, 0.8, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(s.x, s.y - 4, 0.8, 0, Math.PI * 2); ctx.fill();
-      // Net mesh
-      ctx.beginPath();
-      for (let k = 0; k < 4; k++) {
-        ctx.moveTo(s.x - 6 + k * 4, s.y);
-        ctx.lineTo(s.x - 6 + k * 4, s.y - 4);
-      }
-      for (let k = 0; k < 3; k++) {
-        ctx.moveTo(s.x - 6, s.y - k * 1.3);
-        ctx.lineTo(s.x + 6, s.y - k * 1.3);
-      }
-      ctx.stroke();
-    }
-  }
-  ctx.restore();
-}
-registerWorldRenderer(renderFishingNets);
-
 // ── Loop 59: Slow magical aurora over castle when player wins
 function renderVictoryAura(ctx) {
   if (!G.won && !G._scenarioWon) return;
@@ -3010,50 +2689,6 @@ function renderVictoryAura(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderVictoryAura);
-
-// ── Loop 60: Sheep clouds — fluffy little wandering clouds in screen sky
-function updateSheepClouds(logicalW, logicalH) {
-  return;
-  if (!G.sheepClouds) G.sheepClouds = [];
-  if (G.gameTick % 250 === 0 && G.sheepClouds.length < 4 && getDaylight() > 0.65) {
-    G.sheepClouds.push({
-      x: -50,
-      y: Math.random() * (logicalH || 800) * 0.35 + 30,
-      vx: 0.15 + Math.random() * 0.1,
-      size: 10 + Math.random() * 8,
-      puffSeed: Math.random() * 100,
-    });
-  }
-  for (let i = G.sheepClouds.length - 1; i >= 0; i--) {
-    const c = G.sheepClouds[i];
-    c.x += c.vx;
-    if (c.x > (logicalW || 1500) + 80) G.sheepClouds.splice(i, 1);
-  }
-}
-function renderSheepClouds(ctx) {
-  return;
-  if (!G.sheepClouds || !G.sheepClouds.length) return;
-  ctx.save();
-  for (const c of G.sheepClouds) {
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    for (let i = 0; i < 5; i++) {
-      const off = (c.puffSeed + i * 1.7) % 5;
-      const px = c.x + (i - 2) * c.size * 0.6;
-      const py = c.y + Math.sin(off) * 2;
-      ctx.beginPath();
-      ctx.arc(px, py, c.size * (0.6 + (i & 1) * 0.3), 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // Soft shadow
-    ctx.fillStyle = 'rgba(140,160,180,0.25)';
-    ctx.beginPath();
-    ctx.ellipse(c.x, c.y + c.size * 0.4, c.size * 1.5, c.size * 0.3, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-registerUpdater(updateSheepClouds, true);
-registerScreenRenderer(renderSheepClouds);
 
 // ── Loop 61: Spider hangs from web in autumn forest ────────
 function renderSpider(ctx) {
@@ -3524,19 +3159,25 @@ function updateBirthHearts() {
 }
 registerUpdater(updateBirthHearts);
 
-// ── Loop 73: Resource floats up from production buildings
+// ── Loop 73: Grounded production glints
 function updateResourceFloats() {
   if (!G.particles) G.particles = [];
   for (const b of G.buildings) {
     if (!b.prod) continue;
+    if (G.particles.length > 240) return;
     if (Math.random() > 0.0015 * G.speed) continue;
     const key = Object.keys(b.prod)[0];
-    const emojiMap = { wood: '🪵', stone: '🪨', food: '🍎', gold: '🪙', iron: '⚙️' };
     G.particles.push({
-      tx: b.x, ty: b.y, offsetY: -20,
-      text: emojiMap[key] || '+',
-      alpha: 1.2,
-      vy: -0.18, decay: 0.012, type: 'text',
+      tx: b.x,
+      ty: b.y,
+      offsetY: -4,
+      text: null,
+      alpha: 0.85,
+      vy: -0.015,
+      decay: 0.014,
+      type: 'resource-glint',
+      resource: key,
+      size: 1.15,
     });
   }
 }
@@ -3611,6 +3252,11 @@ function updateDeathMarkers() {
 function renderDeathMarkers(ctx) {
   if (!G.deathMarkers || !G.deathMarkers.length || G.camera.zoom < 0.55) return;
   for (const m of G.deathMarkers) {
+    const mx = Math.round(m.x);
+    const my = Math.round(m.y);
+    const occupyingBuilding = G.buildingGrid?.[my]?.[mx];
+    if (occupyingBuilding && occupyingBuilding.type !== 'road') continue;
+
     const s = toScreen(m.x, m.y);
     const cx = s.x;
     const W = 6.2;             // stone width (world px)
@@ -3682,61 +3328,6 @@ function renderDeathMarkers(ctx) {
 }
 registerUpdater(updateDeathMarkers);
 registerWorldRenderer(renderDeathMarkers);
-
-// ── Loop 77: Town crier walks roads occasionally ringing bell
-function updateCrier() {
-  if (!G.crier) {
-    if (G.gameTick % 1500 === 0 && Math.random() < 0.3) {
-      // Spawn crier at edge of map
-      const edge = Math.floor(Math.random() * 2);
-      G.crier = {
-        x: edge === 0 ? 1 : MAP_W - 2, y: MAP_H / 2,
-        tx: edge === 0 ? MAP_W - 2 : 1, ty: MAP_H / 2,
-        bellTimer: 0, bellOn: false,
-      };
-    }
-    return;
-  }
-  const c = G.crier;
-  const dx = c.tx - c.x, dy = c.ty - c.y, d = Math.hypot(dx, dy);
-  if (d < 0.5) { G.crier = null; return; }
-  c.x += (dx / d) * 0.025 * G.speed;
-  c.y += (dy / d) * 0.025 * G.speed;
-  c.bellTimer -= G.speed;
-  if (c.bellTimer <= 0) { c.bellOn = !c.bellOn; c.bellTimer = c.bellOn ? 8 : 60; }
-}
-function renderCrier(ctx) {
-  if (!G.crier || G.camera.zoom < 0.6) return;
-  const c = G.crier;
-  const s = toScreen(c.x, c.y);
-  // Body
-  ctx.fillStyle = '#a02818';
-  ctx.fillRect(s.x - 1.5, s.y - 4, 3, 4);
-  ctx.fillStyle = '#3a2410';
-  ctx.fillRect(s.x - 1.5, s.y, 3, 2);
-  // Head
-  ctx.fillStyle = '#e8c8a0';
-  ctx.beginPath(); ctx.arc(s.x, s.y - 6, 1.5, 0, Math.PI * 2); ctx.fill();
-  // Hat (tall)
-  ctx.fillStyle = '#1a1a20';
-  ctx.fillRect(s.x - 1.5, s.y - 9, 3, 2.5);
-  ctx.fillRect(s.x - 2, s.y - 7, 4, 0.6);
-  // Bell
-  if (c.bellOn) {
-    ctx.fillStyle = '#d4a020';
-    ctx.beginPath(); ctx.arc(s.x + 3, s.y - 3, 0.9, 0, Math.PI * 2); ctx.fill();
-    // Sound waves
-    ctx.strokeStyle = 'rgba(220,200,80,0.6)';
-    ctx.lineWidth = 0.5;
-    for (let r = 2; r <= 5; r += 1.5) {
-      ctx.beginPath();
-      ctx.arc(s.x + 3, s.y - 3, r, -0.6, 0.6);
-      ctx.stroke();
-    }
-  }
-}
-registerUpdater(updateCrier);
-registerWorldRenderer(renderCrier);
 
 // ── Loop 78: Lily pads gain little frogs and dragonflies in summer
 function renderDragonflies(ctx) {
@@ -3913,41 +3504,6 @@ function renderWellSteam(ctx) {
 }
 registerWorldRenderer(renderWellSteam);
 
-// ── Loop 83: Floating bubbles rise from underwater (water tiles)
-function renderUnderwaterBubbles(ctx) {
-  if (G.camera.zoom < 0.8 || G.season === 'winter') return;
-  const tt = G.gameTick;
-  const cx = G.camera.x, cy = G.camera.y;
-  const range = 22 / G.camera.zoom;
-  const tcx = (cx / 32 + cy / 16) / 2;
-  const tcy = (cy / 16 - cx / 32) / 2;
-  const tx0 = Math.max(0, Math.floor(tcx - range)), tx1 = Math.min(MAP_W - 1, Math.ceil(tcx + range));
-  const ty0 = Math.max(0, Math.floor(tcy - range)), ty1 = Math.min(MAP_H - 1, Math.ceil(tcy + range));
-  ctx.save();
-  for (let ty = ty0; ty <= ty1; ty++) {
-    for (let tx = tx0; tx <= tx1; tx++) {
-      if (G.map[ty][tx] !== TILE.WATER) continue;
-      const h = ((tx * 0xc1c1) ^ (ty * 0xd2d2)) >>> 0;
-      if (h % 100 > 18) continue;
-      const s = toScreen(tx, ty);
-      const phase = (tt * 0.05 + h * 0.07) % 30;
-      const a = 1 - phase / 30;
-      const yOff = -phase * 0.4;
-      ctx.globalAlpha = a * 0.5;
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(s.x + ((h % 7) - 3), s.y + yOff, 0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(s.x + ((h % 5) - 2) + 2, s.y + yOff - 1, 0.4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
-  ctx.globalAlpha = 1;
-}
-registerWorldRenderer(renderUnderwaterBubbles);
-
 // ── Loop 84: Cat naps on roofs of houses ───────────────────
 function renderRoofCats(ctx) {
   if (G.camera.zoom < 1.0) return;
@@ -4096,110 +3652,6 @@ function renderBalloonShadows(ctx) {
 }
 registerScreenRenderer(renderBalloonShadows);
 
-// ── Loop 90: School books float around schools ─────────────
-function renderSchoolBooks(ctx) {
-  if (G.camera.zoom < 0.9) return;
-  const tt = G.gameTick * 0.04;
-  for (const b of G.buildings) {
-    if (b.type !== 'school') continue;
-    const s = toScreen(b.x, b.y);
-    for (let i = 0; i < 3; i++) {
-      const phase = i * 2.1 + (b.x + b.y);
-      const ox = Math.sin(tt + phase) * 8;
-      const oy = Math.cos(tt + phase * 0.7) * 4;
-      const bx = s.x + ox, by = s.y - 18 + oy;
-      ctx.fillStyle = ['#a02818','#205080','#608030'][i % 3];
-      ctx.fillRect(bx - 1.4, by - 1, 2.8, 2);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(bx - 1.4, by - 1, 0.4, 2);
-    }
-  }
-}
-registerWorldRenderer(renderSchoolBooks);
-
-// ── Loop 91: Comet impact crash explosion (rare, decorative)
-function updateMeteorImpact(logicalW, logicalH) {
-  return; // disabled — space effects removed
-  if (!G.meteorImpacts) G.meteorImpacts = [];
-  if (!G.particles) G.particles = [];
-  if (G.gameTick % 3000 === 0 && Math.random() < 0.2) {
-    // pick random map tile
-    const tx = Math.floor(Math.random() * MAP_W);
-    const ty = Math.floor(Math.random() * MAP_H);
-    G.meteorImpacts.push({ tx, ty, t: 0 });
-    // shake camera
-    G.cameraShake = (G.cameraShake || 0) + 6;
-  }
-  for (let i = G.meteorImpacts.length - 1; i >= 0; i--) {
-    const m = G.meteorImpacts[i];
-    m.t += G.speed;
-    if (m.t >= 90) G.meteorImpacts.splice(i, 1);
-  }
-}
-function renderMeteorImpact(ctx) {
-  if (!G.meteorImpacts || !G.meteorImpacts.length) return;
-  for (const m of G.meteorImpacts) {
-    const s = toScreen(m.tx, m.ty);
-    const p = m.t / 90;
-    const r = 4 + p * 30;
-    const a = (1 - p) * 0.85;
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
-    grad.addColorStop(0, `rgba(255,240,180,${a})`);
-    grad.addColorStop(0.5, `rgba(255,140,40,${a * 0.6})`);
-    grad.addColorStop(1, 'rgba(120,40,0,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-    // Crater rim
-    if (p > 0.4) {
-      ctx.strokeStyle = `rgba(40,30,20,${(1 - p) * 0.6})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 2, r * 0.5, r * 0.18, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  }
-}
-registerUpdater(updateMeteorImpact, true);
-registerWorldRenderer(renderMeteorImpact);
-
-// ── Loop 92: Smoke trail under flying dragon ───────────────
-function updateDragonTrail() {
-  return; // disabled — space effects removed
-  if (!G.dragon) return;
-  if (!G.dragonTrail) G.dragonTrail = [];
-  if (G.gameTick % 4 === 0) {
-    G.dragonTrail.push({ x: G.dragon.x, y: G.dragon.y, life: 60 });
-    if (G.dragonTrail.length > 30) G.dragonTrail.shift();
-  }
-  for (let i = G.dragonTrail.length - 1; i >= 0; i--) {
-    G.dragonTrail[i].life -= G.speed;
-    if (G.dragonTrail[i].life <= 0) G.dragonTrail.splice(i, 1);
-  }
-}
-function renderDragonTrail(ctx) {
-  if (!G.dragonTrail || !G.dragonTrail.length) return;
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  for (const p of G.dragonTrail) {
-    const a = p.life / 60;
-    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 18);
-    grad.addColorStop(0, `rgba(180,80,160,${a * 0.45})`);
-    grad.addColorStop(1, 'rgba(60,30,80,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-registerUpdater(updateDragonTrail);
-registerScreenRenderer(renderDragonTrail);
-
 // ── Loop 93: Hovering eagles (separate from hawks) over castle
 function updateEagles(logicalW, logicalH) {
   if (!G.eagles) G.eagles = [];
@@ -4317,73 +3769,6 @@ function renderSchoolKids(ctx) {
 registerUpdater(updateSchoolKids);
 registerWorldRenderer(renderSchoolKids);
 
-// ── Loop 96: Stone monoliths placed at compass points (deco)
-function renderMonoliths(ctx) {
-  if (G.camera.zoom < 0.5) return;
-  const spots = [
-    { x: 8, y: 8 }, { x: MAP_W - 8, y: 8 },
-    { x: 8, y: MAP_H - 8 }, { x: MAP_W - 8, y: MAP_H - 8 },
-  ];
-  ctx.save();
-  for (const p of spots) {
-    if (!G.map[p.y] || G.map[p.y][p.x] !== TILE.GRASS) continue;
-    const s = toScreen(p.x, p.y);
-    // Tall stone slab
-    ctx.fillStyle = '#5a5a64';
-    ctx.beginPath();
-    ctx.moveTo(s.x - 2, s.y - 12);
-    ctx.lineTo(s.x + 2, s.y - 12);
-    ctx.lineTo(s.x + 2.5, s.y);
-    ctx.lineTo(s.x - 2.5, s.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = '#3a3a44';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-    // Cap
-    ctx.fillStyle = '#404048';
-    ctx.fillRect(s.x - 2.5, s.y - 12, 5, 1.2);
-    // Rune (subtle)
-    ctx.fillStyle = '#7a7a82';
-    ctx.fillRect(s.x - 0.6, s.y - 8, 1.2, 0.4);
-    ctx.fillRect(s.x - 0.6, s.y - 6, 1.2, 0.4);
-  }
-  ctx.restore();
-}
-registerWorldRenderer(renderMonoliths);
-
-// ── Loop 97: Glowing runes pulse on monoliths at night ─────
-function renderMonolithRunes(ctx) {
-  const dayl = getDaylight();
-  const ns = Math.max(0, Math.min(1, (0.65 - dayl) / 0.3));
-  if (ns < 0.05 || G.camera.zoom < 0.6) return;
-  const spots = [
-    { x: 8, y: 8 }, { x: MAP_W - 8, y: 8 },
-    { x: 8, y: MAP_H - 8 }, { x: MAP_W - 8, y: MAP_H - 8 },
-  ];
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  const tt = G.gameTick * 0.07;
-  for (const p of spots) {
-    if (!G.map[p.y] || G.map[p.y][p.x] !== TILE.GRASS) continue;
-    const s = toScreen(p.x, p.y);
-    const pulse = 0.6 + 0.4 * Math.sin(tt + p.x);
-    ctx.fillStyle = `rgba(120,255,180,${ns * pulse * 0.75})`;
-    ctx.fillRect(s.x - 0.6, s.y - 8, 1.2, 0.4);
-    ctx.fillRect(s.x - 0.6, s.y - 6, 1.2, 0.4);
-    // Halo around top
-    const grad = ctx.createRadialGradient(s.x, s.y - 12, 0, s.x, s.y - 12, 14);
-    grad.addColorStop(0, `rgba(120,255,180,${ns * pulse * 0.4})`);
-    grad.addColorStop(1, 'rgba(120,255,180,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y - 12, 14, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-registerWorldRenderer(renderMonolithRunes);
-
 // ── Loop 98: Rain hits ground - splash ripples ─────────────
 function renderRainSplashes(ctx) {
   if (G.weather !== 'rain' || G.camera.zoom < 0.7) return;
@@ -4417,142 +3802,6 @@ function renderRainSplashes(ctx) {
   ctx.globalAlpha = 1;
 }
 registerWorldRenderer(renderRainSplashes);
-
-// ── Loop 99: Sun pillars (vertical light columns at sunrise/set)
-function renderSunPillars(ctx, logicalW, logicalH) {
-  return; // disabled — space effects removed
-  const t = G.dayPhase / G.dayLength;
-  let strength = 0;
-  if (t > 0.05 && t < 0.18) strength = 1 - Math.abs(t - 0.11) / 0.07;
-  else if (t > 0.62 && t < 0.78) strength = (1 - Math.abs(t - 0.7) / 0.08) * 0.85;
-  if (strength <= 0.05) return;
-  const sunFrac = Math.min(1, Math.max(0, (t - 0.05) / 0.7));
-  const sx = sunFrac * logicalW * 0.85 + logicalW * 0.075;
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  // Vertical pillar rising from horizon
-  const grad = ctx.createLinearGradient(sx, logicalH * 0.5, sx, 0);
-  grad.addColorStop(0, `rgba(255,200,140,${strength * 0.45})`);
-  grad.addColorStop(1, 'rgba(255,200,140,0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(sx - 12, 0, 24, logicalH * 0.5);
-  ctx.restore();
-}
-registerScreenRenderer(renderSunPillars);
-
-// ── Loop 100: Royal procession celebrates loop 100 ──────────
-// A line of figures (king + 4 retinue) walks across the map in a parade
-function updateProcession() {
-  if (!G.procession) {
-    if (G.gameTick % 1800 === 0 && Math.random() < 0.3) {
-      G.procession = {
-        x: 1, y: MAP_H / 2,
-        tx: MAP_W - 2, ty: MAP_H / 2,
-        members: [
-          { off: 0, color: '#ffd166', isKing: true },
-          { off: 1.2, color: '#a02818' },
-          { off: 2.4, color: '#3060c8' },
-          { off: 3.6, color: '#306020' },
-          { off: 4.8, color: '#a02888' },
-        ],
-      };
-    }
-    return;
-  }
-  const p = G.procession;
-  const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
-  if (d < 0.5) { G.procession = null; return; }
-  p.x += (dx / d) * 0.018 * G.speed;
-  p.y += (dy / d) * 0.018 * G.speed;
-}
-function renderProcession(ctx) {
-  if (!G.procession || G.camera.zoom < 0.6) return;
-  const p = G.procession;
-  const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy) || 1;
-  const ux = dx / d, uy = dy / d;
-  for (const m of p.members) {
-    const mx = p.x - ux * m.off;
-    const my = p.y - uy * m.off;
-    const s = toScreen(mx, my);
-    // Body
-    ctx.fillStyle = m.color;
-    ctx.fillRect(s.x - 1.5, s.y - 4, 3, 4);
-    // Head
-    ctx.fillStyle = '#e8c8a0';
-    ctx.beginPath();
-    ctx.arc(s.x, s.y - 6, 1.5, 0, Math.PI * 2);
-    ctx.fill();
-    // Crown for king
-    if (m.isKing) {
-      ctx.fillStyle = '#ffd166';
-      ctx.beginPath();
-      ctx.moveTo(s.x - 2, s.y - 7.5);
-      ctx.lineTo(s.x - 1, s.y - 9);
-      ctx.lineTo(s.x, s.y - 7.5);
-      ctx.lineTo(s.x + 1, s.y - 9);
-      ctx.lineTo(s.x + 2, s.y - 7.5);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = '#a07810';
-      ctx.lineWidth = 0.3;
-      ctx.stroke();
-    }
-  }
-  // Trumpet sparkle ahead
-  const lead = p.members[0];
-  const sx = toScreen(p.x + ux * 1.5, p.y + uy * 1.5);
-  const tt = G.gameTick * 0.1;
-  for (let i = 0; i < 4; i++) {
-    const a = 0.5 + 0.5 * Math.sin(tt + i);
-    ctx.fillStyle = `rgba(255,230,150,${a * 0.7})`;
-    ctx.beginPath();
-    ctx.arc(sx.x + (i - 1.5) * 2, sx.y - 6 - i * 0.5, 0.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-registerUpdater(updateProcession);
-registerWorldRenderer(renderProcession);
-
-// ── Loop 105: Idle citizen indicators ──────────────────────
-// Citizens sitting idle for >3s show a floating '?' bubble so the player
-// can see who has no work and find them easily.
-function renderIdleIndicators(ctx) {
-  if (G.camera.zoom < 0.7) return;
-  // Only surface the yellow "?" when there's actually a job the citizen
-  // could be taking. On Day 1 (3 villagers, 0 buildings) every citizen is
-  // idle by definition, so this used to paint "?" over every sprite and
-  // fresh-eyes readers interpret the whole group as "broken / missing
-  // state". Mirror the understaffed-job check used by the building status
-  // bubbles so the "?" becomes a meaningful "would-work-if-you-built-it"
-  // cue after the settlement has a workplace with an open slot.
-  const hasOpenJob = G.buildings.some(b =>
-    (b.workersNeeded || 0) > (b.workers ? b.workers.length : 0)
-    && b.type !== 'house' && b.type !== 'wall' && b.type !== 'road' && b.type !== 'tower' && b.type !== 'well'
-  );
-  if (!hasOpenJob) return;
-  const tt = G.gameTick * 0.08;
-  for (const c of G.citizens) {
-    if (c.state !== 'idle') { c._idleAge = 0; continue; }
-    c._idleAge = (c._idleAge || 0) + 1;
-    if (c._idleAge < 180) continue; // ~3s at 60 ticks/s
-    const s = toScreen(c.x, c.y);
-    const bob = Math.sin(tt + c.x * 3) * 1.5;
-    const y = s.y - 18 + bob;
-    ctx.save();
-    ctx.globalAlpha = 0.85;
-    ctx.fillStyle = '#ffd166';
-    ctx.beginPath();
-    ctx.arc(s.x, y, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#1a1428';
-    ctx.font = 'bold 7px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('?', s.x, y + 0.5);
-    ctx.restore();
-  }
-}
-registerWorldRenderer(renderIdleIndicators);
 
 // ── Loop 107: Occasional citizen voice barks ───────────────
 import { playVoiceBark as _playBark } from './audio.js';
@@ -4606,17 +3855,6 @@ function renderBuildProgress(ctx) {
   }
 }
 registerUpdater(renderBuildProgress);
-
-// Loop 73 (render S4): scaffolding on under-construction buildings.
-// Previously the building just faded in via buildProgress alpha — looked
-// like a ghost, not like something being built. Now: 4 wooden posts at
-// corners + horizontal plank + a "tarp" gradient that shrinks as the
-// building rises. Reads as active construction.
-function renderScaffolding(ctx) {
-  // Construction scaffolding is now drawn inside the building renderers so
-  // 2D and 3D share the same timing and buildings reveal from the foundation.
-}
-registerWorldRenderer(renderScaffolding);
 
 // ── Loop 123: Hover tooltip showing tile type ──────────────
 function renderTileTooltip(ctx, logicalW, logicalH) {
@@ -5026,71 +4264,11 @@ function updateAdvisorTips() {
 }
 registerUpdater(updateAdvisorTips);
 
-// ── Loop 135: Worker assignment indicator on buildings ───────
-function renderWorkerDots(ctx) {
-  return; // disabled — BUILDINGS not imported, caused 60fps error spam and game lockup
-  for (const b of G.buildings) {
-    const def = BUILDINGS[b.type];
-    if (!def.workers) continue;
-    const s = toScreen(b.x, b.y);
-    const needed = def.workers;
-    const have = b.workers ? b.workers.length : 0;
-    for (let i = 0; i < needed; i++) {
-      const cx = s.x - (needed - 1) * 3 + i * 6;
-      const cy = s.y + 10;
-      ctx.fillStyle = i < have ? '#4ade80' : '#ef4444';
-      ctx.globalAlpha = i < have ? 0.9 : 0.5;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  }
-}
-registerWorldRenderer(renderWorkerDots);
-
 // ── Loop 136: Keyboard shortcut: R to open research ─────────
 // (Handled in input.js — see below. This stub notes the loop.)
 
 // ── Loop 137: Building upgrade particles ────────────────────
 // (Hooked into economy.js upgrade — emits sparkle burst)
-
-// ── Loop 138: Resource gathering animation (citizen carries) ─
-// Render carried resource icon above citizen heads.
-function renderCarryIcons(ctx) {
-  if (G.camera.zoom < 1.0) return;
-  const emoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
-  for (const c of G.citizens) {
-    if (!c.carrying || !c.carryAmount) continue;
-    const s = toScreen(c.x, c.y);
-    ctx.save();
-    ctx.font = '8px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(emoji[c.carrying] || c.carrying, s.x, s.y - 16);
-    ctx.restore();
-  }
-}
-registerWorldRenderer(renderCarryIcons);
-
-// ── Loop 139: Map edge boundary indicator ───────────────────
-function renderMapBoundary(ctx) {
-  return; // disabled: dots appeared as void artifacts outside the visible map area
-  if (G.camera.zoom < 0.5) return;
-  // Draw subtle red dashes at map edge tiles when camera is near edge
-  const edgeAlpha = 0.3;
-  // Top-left edge
-  for (let i = 0; i < MAP_W; i++) {
-    const s = toScreen(i, 0);
-    ctx.fillStyle = `rgba(200,100,80,${edgeAlpha})`;
-    ctx.fillRect(s.x - 1, s.y - 1, 2, 2);
-  }
-  for (let i = 0; i < MAP_H; i++) {
-    const s = toScreen(0, i);
-    ctx.fillStyle = `rgba(200,100,80,${edgeAlpha})`;
-    ctx.fillRect(s.x - 1, s.y - 1, 2, 2);
-  }
-}
-registerWorldRenderer(renderMapBoundary);
 
 // ── Loop 140: Audio: town hum ambient layer ─────────────────
 // When population > 10 and cursor is near center, subtle murmur.
@@ -5284,18 +4462,6 @@ registerUpdater(updateCursorStyle);
 import { playSound as _ps151 } from './audio.js';
 // Hooked via notify — no updater needed. Stub for loop tracking.
 
-// ── Loop 152: Seasonal tree color variations ────────────────
-// Render slight tint overlays on forest tiles per season.
-function renderSeasonalTrees(ctx) {
-  if (G.camera.zoom < 0.8) return;
-  const tints = { spring:'rgba(100,220,120,0.08)', summer:'rgba(80,180,60,0.06)', autumn:'rgba(200,120,40,0.12)', winter:'rgba(180,200,220,0.1)' };
-  const tint = tints[G.season];
-  if (!tint) return;
-  // Apply via composite — handled at tile level already. This adds a subtle per-tree canopy tint.
-  // (Visual effect only; no state change.)
-}
-// Stub registered but noop — actual tinting done in render.js tile pass.
-
 // ── Loop 153: Story — bard writes songs about milestones ────
 function updateBardSongs() {
   if (G.gameTick % 240 !== 0) return;
@@ -5321,7 +4487,7 @@ function renderDragTrail(ctx) {
   const pulse = 0.5 + 0.3 * Math.sin(G.gameTick * 0.15);
   ctx.save();
   ctx.globalAlpha = pulse * 0.4;
-  ctx.strokeStyle = '#818cf8';
+  ctx.strokeStyle = '#6dd4b8';
   ctx.lineWidth = 2;
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
@@ -5350,30 +4516,6 @@ function updateMayorDecrees() {
   }
 }
 registerUpdater(updateMayorDecrees);
-
-// ── Loop 157: Building radius preview ───────────────────────
-// When hovering a building to place that has a radius (well, tavern, etc),
-// show a translucent circle indicating the effect radius.
-function renderRadiusPreview(ctx) {
-  return; // disabled — BUILDINGS not imported, caused 60fps error spam and game lockup
-  const def = BUILDINGS[G.selectedBuild];
-  const radius = def.radius || (def.boost && def.boost.radius);
-  if (!radius) return;
-  const s = toScreen(G.hoveredTile.x, G.hoveredTile.y);
-  const pixelR = radius * TW / 2;
-  ctx.save();
-  ctx.globalAlpha = 0.15;
-  ctx.fillStyle = '#818cf8';
-  ctx.beginPath();
-  ctx.ellipse(s.x, s.y, pixelR, pixelR * 0.5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 0.4;
-  ctx.strokeStyle = '#818cf8';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.restore();
-}
-registerWorldRenderer(renderRadiusPreview);
 
 // ── Loop 158: Keyboard M for minimap toggle ─────────────────
 // (Hooked in input.js)
@@ -5491,23 +4633,6 @@ function updateFireChronicle() {
   }
 }
 registerUpdater(updateFireChronicle);
-
-// ── Loop 169: Show building cost in ghost preview ───────────
-function renderGhostCost(ctx) {
-  return; // disabled — BUILDINGS not imported, caused error spam
-  const def = BUILDINGS[G.selectedBuild];
-  if (!def) return;
-  const s = toScreen(G.hoveredTile.x, G.hoveredTile.y);
-  const emoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
-  const parts = Object.entries(def.cost).map(([k,v]) => `${emoji[k]||k}${v}`);
-  ctx.save();
-  ctx.font = '8px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.fillText(parts.join(' '), s.x, s.y + 20);
-  ctx.restore();
-}
-registerWorldRenderer(renderGhostCost);
 
 // ── Loop 170: Keyboard shortcuts display in HUD ─────────────
 // Extend the help overlay. (Handled in HTML. Stub.)
@@ -5874,10 +4999,6 @@ function update100Buildings() {
   }
 }
 registerUpdater(update100Buildings);
-
-// ── Loop 200: Final polish — ambient volume master control ──
-// Wire mute button to master gain including all ambient layers.
-// The existing toggleAmbient() already handles this. Final stub.
 
 // ── Map vignette mask — hides void clutter and softens hard tile edge ──
 // Renders a radial gradient that fades the outer screen to the body

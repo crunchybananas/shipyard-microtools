@@ -18,7 +18,7 @@ const MINI_BUILD = {
   quarry:'#a0a29d', mine:'#6f95ac', market:'#d49445',
   barracks:'#75818a', tower:'#aaa8a0', church:'#d8c79a',
   castle:'#e0bd66', tavern:'#b76342', wall:'#8a8174',
-  road:'#a38b5f', well:'#76a8ba', granary:'#b9874a',
+  road:'#a38b5f', well:'#76a8ba', granary:'#b9874a', storehouse:'#a87844',
   tradingpost:'#d19b55', school:'#c9a46e',
   fisherman:'#5e9bad', archery:'#8a5d44', blacksmith:'#9b5839',
   bakery:'#d2a25c', windmill:'#d7c085', chickencoop:'#d0b45a',

@@ -19,25 +19,40 @@ async function isUp() {
 }
 
 export async function ensureServer() {
+  const fallback = {
+    origin: null,
+    gameUrl: `file://${join(REALM_ROOT, 'index.html')}`,
+    started: false,
+    mode: 'file',
+    stop: async () => {},
+  };
   if (await isUp()) {
-    return { origin: `http://127.0.0.1:${PORT}`, stop: async () => {}, started: false };
+    const origin = `http://127.0.0.1:${PORT}`;
+    return { origin, gameUrl: `${origin}/index.html`, stop: async () => {}, started: false, mode: 'http' };
   }
   const child = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], {
     cwd: REALM_ROOT,
-    stdio: ['ignore', 'ignore', 'ignore'],
+    stdio: ['ignore', 'pipe', 'pipe'],
     detached: false,
   });
+  let stderr = '';
+  child.stderr?.on('data', d => { stderr += String(d); });
   // Wait for it to come up.
   for (let i = 0; i < 25; i++) {
     await new Promise(r => setTimeout(r, 200));
     if (await isUp()) {
+      const origin = `http://127.0.0.1:${PORT}`;
       return {
-        origin: `http://127.0.0.1:${PORT}`,
+        origin,
+        gameUrl: `${origin}/index.html`,
         started: true,
+        mode: 'http',
         stop: async () => { try { child.kill('SIGTERM'); } catch {} },
       };
     }
   }
-  child.kill('SIGTERM');
-  throw new Error(`HTTP server did not come up on port ${PORT}`);
+  try { child.kill('SIGTERM'); } catch {}
+  const likelyBindDenied = /permission denied|operation not permitted|eacces/i.test(stderr);
+  if (likelyBindDenied) return fallback;
+  throw new Error(`HTTP server did not come up on port ${PORT}${stderr ? `: ${stderr.trim()}` : ''}`);
 }

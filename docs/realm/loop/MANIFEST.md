@@ -92,6 +92,15 @@ When flagging a graphic issue, always attach:
   shadow under the church is too opaque, breaks silhouette" is
   what we want.
 
+### Active graphics handoff loop
+
+For graphics-only work, read `graphics/LOOP.md` after this manifest.
+That directory is the current handoff system for painted bitmap art,
+canonical 2D visual audits, construction/upgrade state, walls, actors,
+and no-SVG live rendering. Use `graphics/CURRENT.md` as the first handoff
+and write one `graphics/rounds/NNN-*.md` entry at the end of each
+graphics round.
+
 ## Constraints
 
 - **One challenge per iteration.** Not two. Not zero.

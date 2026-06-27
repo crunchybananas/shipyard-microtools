@@ -13,8 +13,7 @@ import { ensureServer } from './_serve.mjs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REALM_ROOT = join(__dirname, '..');
 const server = await ensureServer();
-const ORIGIN = server.origin;
-const GAME_PATH = `${ORIGIN}/index.html`;
+const GAME_PATH = server.gameUrl;
 
 const results = [];
 function rec(name, ok, detail) {
@@ -56,6 +55,75 @@ if (!ready) {
   await browser.close();
   process.exit(1);
 }
+
+// Test 0: resource delivery truthfulness — no storage/home should not deliver.
+const noStorageDelivery = await page.evaluate(async () => {
+  const citizens = await import('./js/citizens.js');
+  const c = {
+    name: 'Probe Wood',
+    x: 20,
+    y: 20,
+    tx: 20,
+    ty: 20,
+    faceX: 0,
+    faceZ: 1,
+    speed: 0.05,
+    hunger: 0,
+    state: 'working',
+    stateTimer: 0,
+    path: null,
+    pathIdx: 0,
+  };
+  const job = {
+    type: 'lumber',
+    x: 20,
+    y: 20,
+    workers: [c],
+    produced: { wood: 3 },
+    buildProgress: 1,
+  };
+  c.jobBuilding = job;
+  const before = {
+    buildings: window.G.buildings,
+    citizens: window.G.citizens,
+    particles: window.G.particles,
+    wood: window.G.resources.wood,
+    speed: window.G.speed,
+    gameTick: window.G.gameTick,
+  };
+  window.G.buildings = [job];
+  window.G.citizens = [c];
+  window.G.particles = [];
+  window.G.resources.wood = 0;
+  window.G.speed = 1;
+  window.G.gameTick = 1000;
+  citizens.updateCitizens();
+  const result = {
+    state: c.state,
+    carrying: c.carrying,
+    carryAmount: c.carryAmount,
+    wood: window.G.resources.wood,
+    hasNeedStorage: window.G.particles.some((p) => p.text === 'Need storage'),
+    hasDelivered: window.G.particles.some((p) => p.text === 'Delivered!'),
+  };
+  window.G.buildings = before.buildings;
+  window.G.citizens = before.citizens;
+  window.G.particles = before.particles;
+  window.G.resources.wood = before.wood;
+  window.G.speed = before.speed;
+  window.G.gameTick = before.gameTick;
+  return result;
+});
+rec(
+  'delivery: produced wood with no storage/home stays carried',
+  noStorageDelivery.state === 'needs_delivery' &&
+    noStorageDelivery.carrying === 'wood' &&
+    noStorageDelivery.carryAmount === 3 &&
+    noStorageDelivery.wood === 0 &&
+    noStorageDelivery.hasNeedStorage &&
+    !noStorageDelivery.hasDelivered,
+  `state=${noStorageDelivery.state} carrying=${noStorageDelivery.carrying} wood=${noStorageDelivery.wood} need=${noStorageDelivery.hasNeedStorage} delivered=${noStorageDelivery.hasDelivered}`,
+);
 
 // Test 1: 192/197 — G.realmEnded field exists / can be set
 const realmEnded = await page.evaluate(() => {

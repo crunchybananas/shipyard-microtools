@@ -1,76 +1,113 @@
-// Phase C step 1 verifier — confirms windmill sail animation works.
-// Loads the sprite sandbox (which renders windmill at zoom 4), takes
-// screenshots ~4 seconds apart, asserts that a frame-diff exists in
-// the sail region.
+// Raster animation verifier. Confirms the live actor atlas is loaded,
+// exposes eight frames, and has real per-frame bitmap motion in several
+// role/action/direction rows.
 
 import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { ensureServer } from './_serve.mjs';
-import { readFileSync, statSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REALM_ROOT = join(__dirname, '..');
 const server = await ensureServer();
-const ORIGIN = server.origin;
 const SHOTS = join(REALM_ROOT, 'scripts/screenshots');
 
 const HEADLESS = process.env.HEADED !== '1';
 const browser = await chromium.launch({ headless: HEADLESS });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 const page = await ctx.newPage();
+const errs = [];
+page.on('pageerror', e => errs.push(e.message));
+page.on('console', m => { if (m.type() === 'error') errs.push(`[console] ${m.text()}`); });
 
-await page.goto(`${ORIGIN}/svg-test/index.html`);
+await page.goto(`${server.gameUrl}`);
 await page.waitForLoadState('domcontentloaded');
-await page.waitForTimeout(1000);
+await page.waitForTimeout(1200);
 
-// Sprites to verify: each must show a frame-diff after the wait.
-const SPRITES = [
-  { name: 'windmill',   file: 'windmill.svg',   wait: 4000 },  // sails 180° in 4s + dust pulse
-  { name: 'castle',     file: 'castle.svg',     wait: 2000 },  // pennants ±5°
-  { name: 'tower',      file: 'tower.svg',      wait: 1500 },  // banner + lantern flicker
-  { name: 'house',      file: 'house.svg',      wait: 2400 },  // smoke drift
-  { name: 'bakery',     file: 'bakery.svg',     wait: 3000 },  // smoke drift
-  { name: 'market',     file: 'market.svg',     wait: 2300 },  // awning sway 4.5s/2
-  { name: 'blacksmith', file: 'blacksmith.svg', wait: 1700 },  // forge fire pulse 1.6s
-  { name: 'tavern',     file: 'tavern.svg',     wait: 1900 },  // sign-swing 3.6s/2
-  { name: 'barracks',   file: 'barracks.svg',   wait: 2900 },  // dummy idle 5.5s/2
-  { name: 'granary',    file: 'granary.svg',    wait: 2400 },  // dome dust drift 4.4-5s
-  // Note: church bell is occasional (32s cycle, 85% rest); skip in routine verify
-  // because waiting 30s+ per run is too slow. Manual verify if needed.
-];
+const start = await page.$('button:has-text("New Game"), #start-game-btn');
+if (start) await start.click();
+await page.waitForTimeout(1400);
+await page.screenshot({ path: join(SHOTS, 'anim-live-actors.png'), fullPage: false });
+await page.evaluate(() => {
+  if (!window.G || !window.G.camera) return;
+  window.G.camera.zoom = 2.2;
+  window.forceRender?.();
+});
+await page.waitForTimeout(500);
 
-let allPass = true;
-for (const sp of SPRITES) {
-  const box = await page.evaluate((file) => {
-    const imgs = Array.from(document.querySelectorAll('img'));
-    const target = imgs.filter(i => i.src.includes(file)).sort((a,b) => b.width - a.width)[0];
-    if (!target) return null;
-    target.scrollIntoView({ block: 'center' });
-    const r = target.getBoundingClientRect();
-    return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) };
-  }, sp.file);
-  if (!box) { console.log(`[anim] ${sp.name}: not found`); allPass = false; continue; }
-  await page.waitForTimeout(300);  // let scroll settle
+const result = await page.evaluate(async () => {
+  const atlasInfo = window.__realm?.actorAtlas?.();
+  const img = new Image();
+  img.decoding = 'async';
+  img.src = `assets/sprites/actors-atlas.png?verify=${Date.now()}`;
+  await img.decode();
 
-  const shot1 = join(SHOTS, `anim-${sp.name}-t0.png`);
-  const shot2 = join(SHOTS, `anim-${sp.name}-tN.png`);
-  await page.screenshot({ path: shot1, clip: box });
-  await page.waitForTimeout(sp.wait);
-  await page.screenshot({ path: shot2, clip: box });
+  const frameW = 64;
+  const frameH = 84;
+  const frames = 8;
+  const rows = [
+    { label: 'settler walk down', row: 4 },
+    { label: 'farmer work right', row: 27 },
+    { label: 'guard carry left', row: 191 },
+  ];
+  const canvas = document.createElement('canvas');
+  canvas.width = frameW * frames;
+  canvas.height = frameH;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-  const buf1 = readFileSync(shot1);
-  const buf2 = readFileSync(shot2);
-  const identical = buf1.length === buf2.length && buf1.equals(buf2);
-  const sizeDiff = Math.abs(buf1.length - buf2.length);
-  if (identical) {
-    console.log(`[anim] ✗ ${sp.name}: byte-identical after ${sp.wait}ms — animation not running`);
-    allPass = false;
-  } else {
-    console.log(`[anim] ✓ ${sp.name}: frames differ (size delta ${sizeDiff}B) — animation active`);
-  }
+  const rowReports = rows.map(({ label, row }) => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, row * frameH, frameW * frames, frameH, 0, 0, frameW * frames, frameH);
+    const diffs = [];
+    for (let f = 0; f < frames - 1; f++) {
+      const a = ctx.getImageData(f * frameW, 0, frameW, frameH).data;
+      const b = ctx.getImageData((f + 1) * frameW, 0, frameW, frameH).data;
+      let delta = 0;
+      for (let i = 0; i < a.length; i += 4) {
+        delta += Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) +
+          Math.abs(a[i + 2] - b[i + 2]) + Math.abs(a[i + 3] - b[i + 3]);
+      }
+      diffs.push(delta);
+    }
+    return {
+      label,
+      minDelta: Math.min(...diffs),
+      maxDelta: Math.max(...diffs),
+      movingPairs: diffs.filter(d => d > 5000).length,
+    };
+  });
+
+  return {
+    atlasInfo,
+    naturalWidth: img.naturalWidth,
+    naturalHeight: img.naturalHeight,
+    rowReports,
+  };
+});
+
+await page.screenshot({ path: join(SHOTS, 'anim-live-actors-close.png'), fullPage: false });
+
+let ok = true;
+if (result.atlasInfo?.frames !== 8) ok = false;
+if (result.naturalWidth !== 512 || result.naturalHeight !== 18816) ok = false;
+for (const row of result.rowReports) {
+  const pass = row.movingPairs >= 5 && row.minDelta > 1000;
+  ok = ok && pass;
+  console.log(`[anim] ${pass ? 'ok' : 'fail'} ${row.label}: minDelta=${row.minDelta} maxDelta=${row.maxDelta} movingPairs=${row.movingPairs}/7`);
 }
+
+const realErrs = errs.filter(e => !/favicon/i.test(e));
+if (realErrs.length) {
+  ok = false;
+  console.log('[anim] page errors:');
+  realErrs.slice(0, 8).forEach(e => console.log('  ', e));
+} else {
+  console.log('[anim] page errors: none');
+}
+console.log(`[anim] actor atlas ${result.naturalWidth}x${result.naturalHeight}, frames=${result.atlasInfo?.frames}`);
+console.log('[anim] saved screenshots/anim-live-actors.png');
+console.log('[anim] saved screenshots/anim-live-actors-close.png');
 
 await browser.close();
 await server.stop();
-process.exit(allPass ? 0 : 1);
+process.exit(ok ? 0 : 1);

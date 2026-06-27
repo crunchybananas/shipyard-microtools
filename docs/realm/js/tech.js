@@ -12,7 +12,7 @@ export const TECHS = {
     desc: 'Unlocks farms for food production',
     cost: { gold: 0 },
     time: 0,
-    unlocks: ['farm', 'granary', 'fisherman'],
+    unlocks: ['farm', 'granary', 'storehouse', 'fisherman'],
     icon: '🌾',
     prereq: null,
   },

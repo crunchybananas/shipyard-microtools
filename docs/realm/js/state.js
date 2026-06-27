@@ -56,6 +56,7 @@ export const BUILDINGS = {
   tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
   castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50}, defense:50, happiness:20, pop:10, desc:'The ultimate structure. Build this to win!' },
   granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
+  storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, desc:'Receives delivered wood, stone, iron, and overflow goods' },
   church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
   windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, boost:{type:'food',radius:4,multiplier:1.5,target:'farm'}, desc:'Boosts nearby farms by 50%. Works with wind!' },
@@ -72,7 +73,7 @@ export const BUILDINGS = {
   // radius 6 + pop +5 — civic governance brings stability + housing
   // capacity. Cost mirrors mid-tier civic buildings (church 30 stone +
   // 15 gold; townhall is stone-heavier as governance is durable).
-  // Loop 255: SVG sprite shipped (Phase E — 12-of-12 roster).
+  // Loop 255: townhall art shipped (Phase E — 12-of-12 roster).
   // Loop 258 (the-fixer, 256 MEDIUM finding): maxCount:1 — townhall is a
   // ONE-SHOT structural unlock per realm. Narrative-coherence rationale:
   // 244 BUILDING_FIRST_BEATS + 253 mayor_first_in_hall both presume a

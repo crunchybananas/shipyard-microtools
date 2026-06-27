@@ -3,9 +3,10 @@
 // adding a heavy dep to this monorepo.
 //
 // Usage:
-//   node docs/realm/scripts/verify.mjs [--game | --sandbox | --logic | --all]
+//   node docs/realm/scripts/verify.mjs [--game | --logic | --all]
 //
-// Defaults to --all. Non-headless so the user can watch.
+// Defaults to live game + logic. Graphics verification targets the canonical
+// painted-PNG canvas renderer only.
 //
 // Loop 215 → 216: Phase B verification driver. Bridge replaced by
 // Playwright per chrome-extension MCP outage.
@@ -20,15 +21,12 @@ const REALM_ROOT = join(__dirname, '..');
 const SCREENSHOT_DIR = join(REALM_ROOT, 'scripts/screenshots');
 
 const server = await ensureServer();
-console.log(`[verify] http origin ${server.origin} (started=${server.started})`);
-const ORIGIN = server.origin;
-const GAME_PATH = `${ORIGIN}/index.html`;
-const SANDBOX_PATH = `${ORIGIN}/svg-test/index.html`;
+console.log(`[verify] game url ${server.gameUrl} (mode=${server.mode}, started=${server.started})`);
+const GAME_PATH = server.gameUrl;
 
 const args = process.argv.slice(2);
 const flags = {
   game: args.includes('--game') || args.includes('--all') || args.length === 0,
-  sandbox: args.includes('--sandbox') || args.includes('--all') || args.length === 0,
   logic: args.includes('--logic') || args.includes('--all') || args.length === 0,
   hold: args.includes('--hold'),  // keep browser open at end
 };
@@ -88,32 +86,7 @@ if (flags.game) {
   await page.close();
 }
 
-// ─── 2. sandbox SVG sprite check ────────────────────────────
-if (flags.sandbox) {
-  console.log('\n[verify] === SVG SANDBOX (11 sprites) ===');
-  const page = await ctx.newPage();
-  await page.goto(SANDBOX_PATH);
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(1500);
-
-  const sprites = await page.evaluate(() => {
-    const imgs = Array.from(document.querySelectorAll('img, object, svg'));
-    return imgs.slice(0, 50).map(el => ({
-      tag: el.tagName,
-      src: el.src || el.data || '(inline svg)',
-      width: el.getBoundingClientRect().width,
-      height: el.getBoundingClientRect().height,
-    }));
-  });
-  console.log(`[verify] sandbox elements found: ${sprites.length}`);
-  sprites.slice(0, 15).forEach(s => console.log(`  ${s.tag} ${s.width}×${s.height} ${s.src.slice(-50)}`));
-
-  await page.screenshot({ path: join(SCREENSHOT_DIR, 'sandbox.png'), fullPage: true });
-  console.log('[verify] saved screenshots/sandbox.png (full page)');
-  await page.close();
-}
-
-// ─── 3. logic correctness queue ─────────────────────────────
+// ─── 2. logic correctness queue ─────────────────────────────
 if (flags.logic) {
   console.log('\n[verify] === LOGIC CORRECTNESS QUEUE ===');
   const page = await ctx.newPage();
