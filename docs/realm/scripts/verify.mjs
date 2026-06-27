@@ -38,6 +38,72 @@ console.log(`[verify] launching chromium (headless=${HEADLESS})…`);
 const browser = await chromium.launch({ headless: HEADLESS });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 
+async function startGameIfNeeded(page) {
+  const started = await page.evaluate(() => {
+    if (!document.body.classList.contains('title-active')) return false;
+    if (typeof window.startNewGame === 'function') {
+      window.startNewGame();
+      return true;
+    }
+    return false;
+  });
+  if (started) {
+    console.log('[verify] starting game from title screen');
+    await page.waitForTimeout(1000);
+  }
+}
+
+async function verifyFarmPlacement(page) {
+  await page.click('[data-build-key="farm"]');
+  await page.waitForTimeout(100);
+
+  const target = await page.evaluate(() => {
+    const g = window.G;
+    const canvas = document.getElementById('game');
+    const rect = canvas.getBoundingClientRect();
+    const TW = 64, TH = 32;
+    const candidates = [];
+    for (let y = 0; y < g.map.length; y++) {
+      for (let x = 0; x < g.map[y].length; x++) {
+        if (g.map[y][x] !== 2 || !g.fog[y]?.[x] || g.buildingGrid[y]?.[x]) continue;
+        const sx = (x - y) * TW / 2;
+        const sy = (x + y) * TH / 2;
+        const clientX = rect.left + (sx - g.camera.x) * g.camera.zoom + rect.width / 2;
+        const clientY = rect.top + (sy - g.camera.y) * g.camera.zoom + rect.height / 2;
+        if (clientX > 80 && clientX < rect.width - 80 && clientY > 80 && clientY < rect.height - 180) {
+          candidates.push({ x, y, clientX, clientY });
+        }
+      }
+    }
+    candidates.sort((a, b) => {
+      const ac = Math.hypot(a.clientX - rect.width / 2, a.clientY - rect.height / 2);
+      const bc = Math.hypot(b.clientX - rect.width / 2, b.clientY - rect.height / 2);
+      return ac - bc;
+    });
+    return {
+      beforeWood: g.resources.wood,
+      beforeBuildings: g.buildings.length,
+      target: candidates[0] || null,
+    };
+  });
+
+  if (!target.target) throw new Error('No visible explored grass tile found for farm placement smoke test');
+  await page.mouse.move(target.target.clientX, target.target.clientY);
+  await page.mouse.click(target.target.clientX, target.target.clientY);
+  await page.waitForTimeout(300);
+
+  const placed = await page.evaluate(({ beforeWood, beforeBuildings }) => ({
+    selectedBuild: window.G.selectedBuild,
+    woodDelta: beforeWood - window.G.resources.wood,
+    newBuildings: window.G.buildings.length - beforeBuildings,
+    farm: window.G.buildings.find(b => b.type === 'farm') || null,
+  }), target);
+  if (!placed.farm || placed.newBuildings !== 1) {
+    throw new Error(`Farm placement failed: ${JSON.stringify(placed)}`);
+  }
+  console.log(`[verify] farm placement ok at ${placed.farm.x},${placed.farm.y} (wood delta ${placed.woodDelta})`);
+}
+
 // ─── 1. live game smoke test ─────────────────────────────────
 if (flags.game) {
   console.log('\n[verify] === LIVE GAME SMOKE ===');
@@ -50,13 +116,8 @@ if (flags.game) {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);  // let modules + initial render settle
 
-  // Try to bypass title screen if there is one.
-  const startBtn = await page.$('button:has-text("Start"), button:has-text("Begin"), .diff-btn');
-  if (startBtn) {
-    console.log('[verify] clicking start/diff button to enter game');
-    await startBtn.click();
-    await page.waitForTimeout(1000);
-  }
+  await startGameIfNeeded(page);
+  await verifyFarmPlacement(page);
 
   // Snapshot core game state via window.G (if exposed).
   const state = await page.evaluate(() => {
@@ -96,8 +157,7 @@ if (flags.logic) {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
 
-  const startBtn = await page.$('button:has-text("Start"), button:has-text("Begin"), .diff-btn');
-  if (startBtn) { await startBtn.click(); await page.waitForTimeout(1000); }
+  await startGameIfNeeded(page);
 
   // Pull the diagnostic surface.
   const diag = await page.evaluate(() => {

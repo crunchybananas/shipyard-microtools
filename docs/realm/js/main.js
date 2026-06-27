@@ -5,7 +5,7 @@
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=111';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=112';
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
@@ -28,8 +28,8 @@ import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
 import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js';
-import { initSpriteLab } from './sprite-lab.js?realm=111';
-import { initSpriteMuster } from './sprite-muster.js?realm=111';
+import { initSpriteLab } from './sprite-lab.js?realm=112';
+import { initSpriteMuster } from './sprite-muster.js?realm=112';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');

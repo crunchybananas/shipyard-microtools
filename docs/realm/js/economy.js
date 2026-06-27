@@ -7,7 +7,7 @@ import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
-import { panCameraTo } from './render.js?realm=110e';
+import { panCameraTo } from './render.js?realm=112';
 import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 import { isBuildingUnlocked } from './tech.js';
