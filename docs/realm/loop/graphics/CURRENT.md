@@ -2,7 +2,7 @@
 
 ## Baseline
 
-Current baseline: `rounds/111-frontier-settler-opening.md`
+Current baseline: `rounds/112-round-player-cleanup.md`
 
 The live game still uses painted PNG atlases in the canonical 2D canvas
 renderer. Actor and ambient source files remain the editable source of truth:
@@ -281,6 +281,24 @@ legacy figures. Evidence:
 `scripts/screenshots/runtime-settler-opening-round-111.png`,
 `scripts/screenshots/anim-live-actors.png`, and
 `scripts/screenshots/anim-live-actors-close.png`.
+
+Round 112 continued the cleanup from the user's "weird round players" report
+instead of only chasing the highest numeric motion scores. The broad legacy
+actor painter now targets 39 old round or hooded role/action blocks across 13
+source sheets, including idle rows for builder, blacksmith, guard, farmer,
+miner, rancher, fisher, trader, innkeeper, scholar, stonecutter, and forager.
+Those BASE rows now use slimmer tapered bodies, smaller heads, belts, boots,
+and role-specific headgear/props rather than circular placeholder silhouettes.
+
+The remaining settler action pop was fixed more strictly through row overrides:
+`scripts/refit-settler-frontier-rows.mjs` derives `settler/work/*` and
+`settler/carry/*` from the locked frontier settler idle/walk strips, adds small
+cargo bundles to carry rows, and accepts all eight rows with no warning waivers.
+The settler family is now fully locked across idle, walk, work, and carry, and
+Actor Muster shows 17 locked settler/worker rows plus 4 existing waivers and
+203 BASE rows. Full runtime verification still reports `224/224` rows,
+`1,792/1,792` frames, no blanks, no low-variety rows, no mapping failures, and
+row digest `34a267348715`.
 
 Round 102 resumed imagegen-assisted row replacement on the next old-port work
 family. A blacksmith-only side-facing hammer/anvil strip was generated on

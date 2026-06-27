@@ -228,6 +228,166 @@
       "sha256": "1c3b22a0b817e81ff44dc2babe16c8ee3d519d043e2aef54221e94a89a5c5aa0",
       "status": "accepted"
     },
+    "settler/carry/down": {
+      "acceptedAt": "2026-06-27T14:08:46Z",
+      "allowedWarnings": [],
+      "file": "settler/carry-down.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 34.5,
+          "medianColor": [
+            91.8,
+            67.0,
+            52.7
+          ],
+          "paletteDelta": 10.78
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.058,
+        "maxBodyCenterJump": 0.95,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.58,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 33.0,
+        "medianColor": [
+          98.2,
+          74.45,
+          57.15
+        ],
+        "warnings": []
+      },
+      "sha256": "87d92180ba7de3fbb325ae6586af09e796a24f074a74856de1eb7c477e832d4b",
+      "status": "accepted"
+    },
+    "settler/carry/left": {
+      "acceptedAt": "2026-06-27T14:08:48Z",
+      "allowedWarnings": [],
+      "file": "settler/carry-left.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            91.8,
+            68.8,
+            57.15
+          ],
+          "paletteDelta": 4.8
+        },
+        "flickerScore": 24.0,
+        "maxAlphaRatio": 1.149,
+        "maxBodyCenterJump": 2.81,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.55,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          91.8,
+          67.0,
+          52.7
+        ],
+        "warnings": []
+      },
+      "sha256": "4cffbc3a8a4085cbce5cc331b67d8691fe49d1067ba116d157f4d4655e1324c5",
+      "status": "accepted"
+    },
+    "settler/carry/right": {
+      "acceptedAt": "2026-06-27T14:08:48Z",
+      "allowedWarnings": [],
+      "file": "settler/carry-right.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            91.8,
+            68.8,
+            57.15
+          ],
+          "paletteDelta": 4.8
+        },
+        "flickerScore": 24.0,
+        "maxAlphaRatio": 1.149,
+        "maxBodyCenterJump": 2.81,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.55,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          91.8,
+          67.0,
+          52.7
+        ],
+        "warnings": []
+      },
+      "sha256": "92517e50f6d7c608165e3695528bf34612d459718dc6a9d872327f84f85a2d5c",
+      "status": "accepted"
+    },
+    "settler/carry/up": {
+      "acceptedAt": "2026-06-27T14:08:47Z",
+      "allowedWarnings": [],
+      "file": "settler/carry-up.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 34.5,
+          "medianColor": [
+            91.8,
+            67.0,
+            52.7
+          ],
+          "paletteDelta": 11.52
+        },
+        "flickerScore": 0.0,
+        "maxAlphaRatio": 1.043,
+        "maxBodyCenterJump": 1.15,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.82,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 33.0,
+        "medianColor": [
+          85.25,
+          68.8,
+          62.0
+        ],
+        "warnings": []
+      },
+      "sha256": "10d4c993ab146a262c5426d116f529cc3da2386c34f9056820f9eebdb8689ae9",
+      "status": "accepted"
+    },
     "settler/idle/down": {
       "acceptedAt": "2026-06-20T06:03:03Z",
       "allowedWarnings": [],
@@ -547,8 +707,168 @@
       },
       "sha256": "d0628fba2270a11414544d67f5dd056a2d83b1df1dcc8c98d7ce9fdb6ea4b9a4",
       "status": "accepted"
+    },
+    "settler/work/down": {
+      "acceptedAt": "2026-06-27T14:08:44Z",
+      "allowedWarnings": [],
+      "file": "settler/work-down.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 9.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            59.95
+          ],
+          "paletteDelta": 5.39
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.084,
+        "maxBodyCenterJump": 1.27,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.42,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          96.4,
+          75.8,
+          62.6
+        ],
+        "warnings": []
+      },
+      "sha256": "4d78d6b5588d81d1019bccf12cb10b04da3bbc83089fbe5b26fdeb09412f0217",
+      "status": "accepted"
+    },
+    "settler/work/left": {
+      "acceptedAt": "2026-06-27T14:08:45Z",
+      "allowedWarnings": [],
+      "file": "settler/work-left.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            62.6
+          ],
+          "paletteDelta": 2.65
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.2,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          92.0,
+          74.15,
+          59.95
+        ],
+        "warnings": []
+      },
+      "sha256": "decff993a76584cdb4b35db7cf62e2eb6a94baf7f1816a82f6576ed33b08b3ba",
+      "status": "accepted"
+    },
+    "settler/work/right": {
+      "acceptedAt": "2026-06-27T14:08:46Z",
+      "allowedWarnings": [],
+      "file": "settler/work-right.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            62.6
+          ],
+          "paletteDelta": 2.65
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.2,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          92.0,
+          74.15,
+          59.95
+        ],
+        "warnings": []
+      },
+      "sha256": "2b0a611fb11247aa893d593523a5aad6f4325391d05b147a948d6104698e04c7",
+      "status": "accepted"
+    },
+    "settler/work/up": {
+      "acceptedAt": "2026-06-27T14:08:45Z",
+      "allowedWarnings": [],
+      "file": "settler/work-up.png",
+      "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
+      "provenance": "frontier-settler-row-derivative",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            92.0,
+            74.15,
+            59.95
+          ],
+          "paletteDelta": 15.46
+        },
+        "flickerScore": 1.2,
+        "maxAlphaRatio": 1.045,
+        "maxBodyCenterJump": 0.84,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.72,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          79.75,
+          66.0,
+          64.7
+        ],
+        "warnings": []
+      },
+      "sha256": "c9c8534aa7734bc0bc4bef91a4bd7fcdbf6034eebc83573e9ae03763e1a5564b",
+      "status": "accepted"
     }
   },
-  "updatedAt": "2026-06-26T04:37:18Z",
+  "updatedAt": "2026-06-27T14:08:48Z",
   "version": 1
 }
