@@ -578,7 +578,8 @@ export class Game {
     ease('beamI', W.lampLit ? 1 : 0, 1.5);
     ease('shaft', W.lampLit ? 0.5 : 0, 1.5);
     // hub Phase B: the stair is roped off until the lamp is lit — lighting it opens the climb
-    if (R.stairRope) R.stairRope.visible = !W.lampLit;
+    // (this is `tick`, not `_apply` — refs are reached via this.refs here, NOT the `R` param)
+    if (this.refs.stairRope) this.refs.stairRope.visible = !W.lampLit;
 
     // golden-hour shimmer on the buried hatch
     const shimmerOn = isGolden() && !F.shadowRevealed;

@@ -20,6 +20,28 @@ import { clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED } from './uti
 const canvas = document.getElementById('scene');
 const DEBUG = new URLSearchParams(location.search).has('debug');
 
+// ?diag — surface render/shader errors + the GPU string ON-SCREEN, so a machine that renders black
+// can be diagnosed without ever opening the dev console (the black-screen box couldn't be reproduced
+// headless). Installed before any rendering so it catches shader-compile errors (THREE.WebGLProgram).
+if (new URLSearchParams(location.search).has('diag')) {
+  const lines = [];
+  const box = document.createElement('div');
+  box.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:48vh;z-index:99999;background:rgba(0,0,0,.9);color:#9fe8c5;font:11px/1.45 monospace;padding:10px;overflow:auto;white-space:pre-wrap;-webkit-user-select:text;user-select:text';
+  const show = () => { box.textContent = '[ABYME ?diag — read this to Claude]\n' + lines.join('\n'); if (!box.parentNode && document.body) document.body.appendChild(box); };
+  const push = (tag, parts) => { lines.push(tag + ' ' + parts.map((x) => { try { return typeof x === 'string' ? x : JSON.stringify(x); } catch (e) { return String(x); } }).join(' ')); if (lines.length > 120) lines.shift(); show(); };
+  const oe = console.error.bind(console), ow = console.warn.bind(console);
+  console.error = (...a) => { push('ERR', a); oe(...a); };
+  console.warn = (...a) => { push('WARN', a); ow(...a); };
+  addEventListener('error', (e) => push('UNCAUGHT', [e.message, (e.filename || '') + ':' + e.lineno]));
+  try {
+    const c = document.createElement('canvas'), gl = c.getContext('webgl2') || c.getContext('webgl');
+    const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+    push('GPU', [ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'n/a', '· webgl2=' + !!(c.getContext('webgl2'))]);
+  } catch (e) { push('GPU-ERR', [String(e)]); }
+  push('UA', [navigator.userAgent]);
+  push('—', ['waiting for render… (errors will appear below)']);
+}
+
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
