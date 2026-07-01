@@ -623,6 +623,59 @@ def rescale_row(args: argparse.Namespace) -> None:
     print(f"[sprite-workbench] wrote {out}")
 
 
+def stabilize_row(args: argparse.Namespace) -> None:
+    # Jitter repair: normalize each frame's dense-body height to the row
+    # median (ground-anchored, clamped factor) and optionally align the body
+    # center-x to the row median. Kills body-scale flicker and lateral jitter
+    # while preserving every pose; tools may still travel.
+    validate_target(args.role, args.action, args.dir)
+    row = Image.open(args.input).convert("RGBA") if args.input else comparison_row(args.role, args.action, args.dir)
+    with tempfile.NamedTemporaryFile(suffix=".png") as handle:
+        row.save(handle.name)
+        before = analyze_row(Path(handle.name), args.action)
+    heights = [f["body"]["h"] for f in before["frames"] if f["pixels"]]
+    centers = [f["body"]["cx"] for f in before["frames"] if f["pixels"]]
+    bottoms = [f["body"]["maxY"] for f in before["frames"] if f["pixels"]]
+    median_h = statistics.median(heights)
+    median_cx = statistics.median(centers)
+
+    out_image = Image.new("RGBA", (FRAME_W * FRAMES, FRAME_H), (0, 0, 0, 0))
+    for index in range(FRAMES):
+        frame = row.crop((index * FRAME_W, 0, (index + 1) * FRAME_W, FRAME_H))
+        stats = before["frames"][index]
+        if not stats["pixels"]:
+            out_image.paste(frame, (index * FRAME_W, 0))
+            continue
+        factor = max(0.82, min(1.22, median_h / max(1, stats["body"]["h"])))
+        anchor_y = stats["body"]["maxY"]
+        anchor_x = stats["body"]["cx"]
+        scaled = frame.resize(
+            (max(1, round(FRAME_W * factor)), max(1, round(FRAME_H * factor))),
+            Image.Resampling.LANCZOS,
+        )
+        offset_x = round(anchor_x - anchor_x * factor)
+        offset_y = round(anchor_y - anchor_y * factor)
+        if args.align_x:
+            offset_x += round(median_cx - anchor_x)
+        cell = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+        cell.alpha_composite(scaled, dest=(max(0, offset_x), max(0, offset_y)),
+                             source=(max(0, -offset_x), max(0, -offset_y)))
+        out_image.paste(cell, (index * FRAME_W, 0))
+
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_image.save(out)
+    after = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] stabilized {args.role}/{args.action}/{args.dir}: "
+        f"bodyHeightRange {before['bodyHeightRange']} -> {after['bodyHeightRange']}, "
+        f"centerJump {before['maxBodyCenterJump']} -> {after['maxBodyCenterJump']}, "
+        f"flicker {before['flickerScore']} -> {after['flickerScore']}, "
+        f"warnings {','.join(after['warnings']) or 'none'}"
+    )
+    print(f"[sprite-workbench] wrote {out}")
+
+
 def scrub_row(args: argparse.Namespace) -> None:
     # Consolidated from the retired scrub-work-row-particles.mjs one-shot:
     # drop small disconnected alpha components (baked debris, loose chips)
@@ -854,6 +907,13 @@ def main() -> None:
     rescale.add_argument("--input", type=Path)
     rescale.add_argument("--out", type=Path)
     rescale.set_defaults(func=rescale_row)
+
+    stabilize = sub.add_parser("stabilize")
+    target_args(stabilize)
+    stabilize.add_argument("--align-x", action=argparse.BooleanOptionalAction, default=True)
+    stabilize.add_argument("--input", type=Path)
+    stabilize.add_argument("--out", type=Path)
+    stabilize.set_defaults(func=stabilize_row)
 
     scrub = sub.add_parser("scrub")
     target_args(scrub)

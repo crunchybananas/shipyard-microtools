@@ -1037,21 +1037,21 @@
       "status": "accepted"
     },
     "farmer/work/down": {
-      "acceptedAt": "2026-07-01T22:08:05Z",
+      "acceptedAt": "2026-07-01T23:43:13Z",
       "allowedWarnings": [
         "body-width-drift",
-        "ground-anchor-drift"
+        "edge-contact"
       ],
       "file": "farmer/work-down.png",
-      "note": "Loose soil chips scrubbed; connected tilling spray kept as flavor; drift inherited, queued for farmer scale round.",
-      "provenance": "loose-fragment-scrub",
+      "note": "Stabilized: centerJump 9.0->3.3; tilling spray kept; width range is the swing.",
+      "provenance": "per-frame-body-stabilize",
       "quality": {
-        "bodyBottomRange": 7,
-        "bodyHeightRange": 7,
-        "bodyWidthRange": 20,
+        "bodyBottomRange": 4,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 18,
         "directionReference": {
           "bodyHeightDelta": 1.0,
-          "bodyWidthDelta": 9.5,
+          "bodyWidthDelta": 8.0,
           "medianBodyHeight": 79.0,
           "medianBodyWidth": 45.5,
           "medianColor": [
@@ -1059,49 +1059,48 @@
             97.1,
             33.3
           ],
-          "paletteDelta": 18.22
+          "paletteDelta": 18.2
         },
-        "flickerScore": 67.0,
-        "maxAlphaRatio": 1.174,
-        "maxBodyCenterJump": 9.0,
-        "maxEdgePixels": 41,
+        "flickerScore": 37.6,
+        "maxAlphaRatio": 1.234,
+        "maxBodyCenterJump": 3.28,
+        "maxEdgePixels": 65,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 6.98,
+        "maxPaletteDrift": 7.16,
         "medianBodyHeight": 80.0,
-        "medianBodyWidth": 36.0,
+        "medianBodyWidth": 37.5,
         "medianColor": [
-          133.5,
-          102.25,
-          45.2
+          133.55,
+          102.3,
+          45.1
         ],
-        "medianColorCount": 705.5,
-        "medianShadingRatio": 0.6444,
+        "medianColorCount": 735.5,
+        "medianShadingRatio": 0.6607,
         "styleEra": "painted",
         "warnings": [
           "body-width-drift",
-          "ground-anchor-drift"
+          "edge-contact"
         ]
       },
-      "sha256": "d44a985d69d8bde873a29d54053bf556650ec7444ed81c1b327b045b4dbb1c3c",
+      "sha256": "4626a254f24f29d8336117a2777d5a714edc1bbe62db6f1997d438333f94359d",
       "status": "accepted-with-waiver"
     },
     "farmer/work/up": {
-      "acceptedAt": "2026-07-01T22:08:07Z",
+      "acceptedAt": "2026-07-01T23:43:07Z",
       "allowedWarnings": [
-        "body-center-jump",
-        "body-height-drift",
+        "body-width-drift",
         "edge-contact"
       ],
       "file": "farmer/work-up.png",
-      "note": "Loose soil chips scrubbed; drift inherited, queued for farmer scale round.",
-      "provenance": "loose-fragment-scrub",
+      "note": "Stabilized: bodyHeightRange 15->0, centerJump 10.8->3.4; width range is the hoe-swing arm extension.",
+      "provenance": "per-frame-body-stabilize",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 15,
-        "bodyWidthRange": 7,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 24,
         "directionReference": {
           "bodyHeightDelta": 0.0,
-          "bodyWidthDelta": 4.0,
+          "bodyWidthDelta": 1.5,
           "medianBodyHeight": 79.0,
           "medianBodyWidth": 45.5,
           "medianColor": [
@@ -1109,31 +1108,30 @@
             97.1,
             33.3
           ],
-          "paletteDelta": 9.96
+          "paletteDelta": 9.95
         },
-        "flickerScore": 61.8,
-        "maxAlphaRatio": 1.339,
-        "maxBodyCenterJump": 10.77,
-        "maxEdgePixels": 59,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 14.55,
+        "flickerScore": 31.7,
+        "maxAlphaRatio": 1.332,
+        "maxBodyCenterJump": 3.35,
+        "maxEdgePixels": 103,
+        "maxFragmentPixels": 38,
+        "maxPaletteDrift": 14.62,
         "medianBodyHeight": 79.0,
-        "medianBodyWidth": 41.5,
+        "medianBodyWidth": 44.0,
         "medianColor": [
-          113.15,
-          103.55,
+          113.3,
+          103.7,
           32.5
         ],
-        "medianColorCount": 652.0,
-        "medianShadingRatio": 0.6282,
+        "medianColorCount": 687.0,
+        "medianShadingRatio": 0.6368,
         "styleEra": "painted",
         "warnings": [
-          "body-height-drift",
-          "body-center-jump",
+          "body-width-drift",
           "edge-contact"
         ]
       },
-      "sha256": "84191dca23eb6bfaa5c0bf3170b21e208fcd43195bba47254337ad7f3b370d0f",
+      "sha256": "57306d537bb3a3948f794cdee2a536dc6e2cf31a36dd7071fbfe3a552cd8f971",
       "status": "accepted-with-waiver"
     },
     "fisher/carry/down": {
@@ -2994,17 +2992,15 @@
       "status": "accepted-with-waiver"
     },
     "guard/work/up": {
-      "acceptedAt": "2026-07-01T23:22:56Z",
-      "allowedWarnings": [
-        "body-center-jump"
-      ],
+      "acceptedAt": "2026-07-01T23:40:18Z",
+      "allowedWarnings": [],
       "file": "guard/work-up.png",
-      "note": "Rescaled to walk scale; inherited body-center-jump queued for the jitter pass.",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Stabilized: centerJump 9.7->0.9; previous center-jump waiver retired.",
+      "provenance": "per-frame-body-stabilize",
       "quality": {
-        "bodyBottomRange": 0,
-        "bodyHeightRange": 3,
-        "bodyWidthRange": 9,
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 13,
         "directionReference": {
           "bodyHeightDelta": 2.0,
           "bodyWidthDelta": 7.0,
@@ -3015,30 +3011,28 @@
             65.15,
             69.45
           ],
-          "paletteDelta": 7.98
+          "paletteDelta": 7.52
         },
-        "flickerScore": 34.0,
-        "maxAlphaRatio": 1.051,
-        "maxBodyCenterJump": 9.72,
-        "maxEdgePixels": 12,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 2.16,
+        "flickerScore": 21.6,
+        "maxAlphaRatio": 1.122,
+        "maxBodyCenterJump": 0.86,
+        "maxEdgePixels": 13,
+        "maxFragmentPixels": 1,
+        "maxPaletteDrift": 2.45,
         "medianBodyHeight": 74.0,
         "medianBodyWidth": 30.0,
         "medianColor": [
-          76.95,
-          69.35,
-          67.35
+          76.4,
+          69.2,
+          67.15
         ],
-        "medianColorCount": 636.0,
-        "medianShadingRatio": 0.6782,
+        "medianColorCount": 640.5,
+        "medianShadingRatio": 0.6826,
         "styleEra": "painted",
-        "warnings": [
-          "body-center-jump"
-        ]
+        "warnings": []
       },
-      "sha256": "a6a9e68c8234e1334405ecdc773e17bac51124af1e73ba3d3eb18fe51a0ca01c",
-      "status": "accepted-with-waiver"
+      "sha256": "795685238d74c4f07703d2496fb5d91bf6210be77fb8f6b9d50824a12f239790",
+      "status": "accepted"
     },
     "innkeeper/carry/down": {
       "acceptedAt": "2026-07-01T21:55:49Z",
@@ -3729,22 +3723,22 @@
       "status": "accepted"
     },
     "lumber/work/down": {
-      "acceptedAt": "2026-07-01T22:08:03Z",
+      "acceptedAt": "2026-07-01T23:43:18Z",
       "allowedWarnings": [
-        "body-center-jump",
         "body-height-drift",
+        "edge-contact",
         "ground-anchor-drift"
       ],
       "file": "lumber/work-down.png",
-      "note": "Wood-chip debris scrubbed; motion drift is inherited from the imagegen row, queued for repaint.",
-      "provenance": "loose-fragment-scrub",
+      "note": "Stabilized: flicker 87->58; residual range is imagegen frame variance, repaint queued as flavor work.",
+      "provenance": "per-frame-body-stabilize",
       "quality": {
         "bodyBottomRange": 7,
-        "bodyHeightRange": 13,
-        "bodyWidthRange": 14,
+        "bodyHeightRange": 11,
+        "bodyWidthRange": 11,
         "directionReference": {
-          "bodyHeightDelta": 5.0,
-          "bodyWidthDelta": 3.0,
+          "bodyHeightDelta": 4.5,
+          "bodyWidthDelta": 2.0,
           "medianBodyHeight": 78.0,
           "medianBodyWidth": 39.0,
           "medianColor": [
@@ -3752,31 +3746,31 @@
             73.6,
             44.7
           ],
-          "paletteDelta": 21.69
+          "paletteDelta": 21.84
         },
-        "flickerScore": 87.1,
-        "maxAlphaRatio": 1.637,
-        "maxBodyCenterJump": 9.58,
-        "maxEdgePixels": 27,
+        "flickerScore": 58.4,
+        "maxAlphaRatio": 1.374,
+        "maxBodyCenterJump": 5.62,
+        "maxEdgePixels": 56,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 17.95,
-        "medianBodyHeight": 73.0,
-        "medianBodyWidth": 36.0,
+        "maxPaletteDrift": 18.01,
+        "medianBodyHeight": 73.5,
+        "medianBodyWidth": 37.0,
         "medianColor": [
-          121.4,
-          79.35,
-          54.65
+          121.55,
+          79.25,
+          54.75
         ],
-        "medianColorCount": 431.0,
-        "medianShadingRatio": 0.6676,
+        "medianColorCount": 448.5,
+        "medianShadingRatio": 0.6724,
         "styleEra": "painted",
         "warnings": [
           "body-height-drift",
           "ground-anchor-drift",
-          "body-center-jump"
+          "edge-contact"
         ]
       },
-      "sha256": "82e233f3ec1f6ebc4dacb01d520946c9621c3af9e722708d80066bbfb08c3e25",
+      "sha256": "2e77d44d9c0ab9d7e66498803984eb633caa9f573a8860aef28557612dff12a7",
       "status": "accepted-with-waiver"
     },
     "lumber/work/left": {
@@ -3871,6 +3865,55 @@
         ]
       },
       "sha256": "75c706f2a7b0b524fa018956a52e342a9f7f55bac8b1818bb8540295a938bd6f",
+      "status": "accepted-with-waiver"
+    },
+    "lumber/work/up": {
+      "acceptedAt": "2026-07-01T23:43:23Z",
+      "allowedWarnings": [
+        "body-width-drift",
+        "edge-contact"
+      ],
+      "file": "lumber/work-up.png",
+      "note": "Stabilized: bodyHeightRange 23->6, flicker 138->54; width range is the axe swing.",
+      "provenance": "per-frame-body-stabilize",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 6,
+        "bodyWidthRange": 22,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 4.5,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 37.0,
+          "medianColor": [
+            103.0,
+            74.4,
+            45.0
+          ],
+          "paletteDelta": 11.19
+        },
+        "flickerScore": 54.2,
+        "maxAlphaRatio": 1.56,
+        "maxBodyCenterJump": 5.27,
+        "maxEdgePixels": 56,
+        "maxFragmentPixels": 74,
+        "maxPaletteDrift": 8.02,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 41.5,
+        "medianColor": [
+          111.15,
+          70.1,
+          38.65
+        ],
+        "medianColorCount": 430.5,
+        "medianShadingRatio": 0.6502,
+        "styleEra": "painted",
+        "warnings": [
+          "body-width-drift",
+          "edge-contact"
+        ]
+      },
+      "sha256": "4b58bab1bc2ffb183ad2396da14df1d531e42bd7033bec038d35be53880e83c3",
       "status": "accepted-with-waiver"
     },
     "miner/carry/down": {
@@ -4389,24 +4432,72 @@
       "sha256": "1ebd4b0e5467de887bf10aabffd9946f4c526fd5015c1b410bc2466e4067cff3",
       "status": "accepted"
     },
-    "miner/work/left": {
-      "acceptedAt": "2026-06-26T04:15:49Z",
+    "miner/work/down": {
+      "acceptedAt": "2026-07-01T23:43:28Z",
       "allowedWarnings": [
-        "body-center-jump",
+        "body-width-drift",
+        "edge-contact"
+      ],
+      "file": "miner/work-down.png",
+      "note": "Stabilized: bodyHeightRange 15->7, centerJump 9.9->7.0; width range is the pick swing.",
+      "provenance": "per-frame-body-stabilize",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 7,
+        "bodyWidthRange": 19,
+        "directionReference": {
+          "bodyHeightDelta": 7.5,
+          "bodyWidthDelta": 5.5,
+          "medianBodyHeight": 69.5,
+          "medianBodyWidth": 41.0,
+          "medianColor": [
+            97.05,
+            76.0,
+            58.15
+          ],
+          "paletteDelta": 27.97
+        },
+        "flickerScore": 59.8,
+        "maxAlphaRatio": 1.653,
+        "maxBodyCenterJump": 6.97,
+        "maxEdgePixels": 76,
+        "maxFragmentPixels": 55,
+        "maxPaletteDrift": 6.86,
+        "medianBodyHeight": 77.0,
+        "medianBodyWidth": 46.5,
+        "medianColor": [
+          84.0,
+          59.35,
+          39.85
+        ],
+        "medianColorCount": 369.0,
+        "medianShadingRatio": 0.7165,
+        "styleEra": "painted",
+        "warnings": [
+          "body-width-drift",
+          "edge-contact"
+        ]
+      },
+      "sha256": "47ed2706324518b4fe521cfd8f37e0eff25e1c1e3ec69c5d82fcbc9ebdd6e4f8",
+      "status": "accepted-with-waiver"
+    },
+    "miner/work/left": {
+      "acceptedAt": "2026-07-01T23:40:10Z",
+      "allowedWarnings": [
         "body-height-drift",
         "body-width-drift",
-        "ground-anchor-drift"
+        "edge-contact"
       ],
       "file": "miner/work-left.png",
-      "note": "Removed duplicated detached side tool head and green key-color remnants from the side-work row; body and anchor drift remain waived for full repaint.",
-      "provenance": "mechanical-tool-dedupe-key-clean",
+      "note": "Stabilized: centerJump 12.5->3.4, lateral jitter gone; residual height/width range is the crouch-swing pose plus imagegen frame variance \u2014 full repaint queued as flavor work. Direction-scale waiver retired.",
+      "provenance": "per-frame-body-stabilize",
       "quality": {
-        "bodyBottomRange": 6,
-        "bodyHeightRange": 14,
-        "bodyWidthRange": 24,
+        "bodyBottomRange": 3,
+        "bodyHeightRange": 12,
+        "bodyWidthRange": 34,
         "directionReference": {
           "bodyHeightDelta": 2.5,
-          "bodyWidthDelta": 0.0,
+          "bodyWidthDelta": 0.5,
           "medianBodyHeight": 72.0,
           "medianBodyWidth": 41.5,
           "medianColor": [
@@ -4414,79 +4505,82 @@
             75.8,
             58.0
           ],
-          "paletteDelta": 0.0
+          "paletteDelta": 0.32
         },
-        "flickerScore": 119.2,
-        "maxAlphaRatio": 1.797,
-        "maxBodyCenterJump": 12.5,
-        "maxEdgePixels": 36,
-        "maxFragmentPixels": 132,
-        "maxPaletteDrift": 9.37,
+        "flickerScore": 95.1,
+        "maxAlphaRatio": 1.82,
+        "maxBodyCenterJump": 3.43,
+        "maxEdgePixels": 86,
+        "maxFragmentPixels": 114,
+        "maxPaletteDrift": 9.57,
         "medianBodyHeight": 69.5,
-        "medianBodyWidth": 41.5,
+        "medianBodyWidth": 41.0,
         "medianColor": [
-          96.85,
-          75.8,
-          58.0
+          97.05,
+          76.0,
+          58.15
         ],
+        "medianColorCount": 353.0,
+        "medianShadingRatio": 0.7026,
+        "styleEra": "painted",
         "warnings": [
           "body-height-drift",
           "body-width-drift",
-          "ground-anchor-drift",
-          "body-center-jump"
+          "edge-contact"
         ]
       },
-      "sha256": "90b74c67c1b5ab4e848b6dd47e52a5a2f76976d76f6c3ffc69ecf8e97fa4a7f3",
+      "sha256": "1a7cd05b9978a42f43947d7634cf9b02ceda199bdae224575ff2d6b5d2dc3a4e",
       "status": "accepted-with-waiver"
     },
     "miner/work/right": {
-      "acceptedAt": "2026-06-26T04:00:24Z",
+      "acceptedAt": "2026-07-01T23:40:14Z",
       "allowedWarnings": [
-        "body-center-jump",
         "body-height-drift",
         "body-width-drift",
-        "ground-anchor-drift"
+        "edge-contact"
       ],
       "file": "miner/work-right.png",
-      "note": "Removed duplicated detached side tool head and green key-color remnants from the side-work row; body and anchor drift remain waived for full repaint.",
-      "provenance": "mechanical-tool-dedupe-key-clean",
+      "note": "Stabilized: centerJump 12.5->3.4, lateral jitter gone; residual height/width range is the crouch-swing pose plus imagegen frame variance \u2014 full repaint queued as flavor work. Direction-scale waiver retired.",
+      "provenance": "per-frame-body-stabilize",
       "quality": {
-        "bodyBottomRange": 6,
-        "bodyHeightRange": 14,
-        "bodyWidthRange": 24,
+        "bodyBottomRange": 3,
+        "bodyHeightRange": 12,
+        "bodyWidthRange": 34,
         "directionReference": {
           "bodyHeightDelta": 2.5,
           "bodyWidthDelta": 0.0,
           "medianBodyHeight": 72.0,
-          "medianBodyWidth": 41.5,
+          "medianBodyWidth": 41.0,
           "medianColor": [
-            96.85,
-            75.8,
-            58.0
+            97.05,
+            75.85,
+            58.15
           ],
-          "paletteDelta": 0.0
+          "paletteDelta": 0.15
         },
-        "flickerScore": 119.2,
-        "maxAlphaRatio": 1.797,
-        "maxBodyCenterJump": 12.5,
-        "maxEdgePixels": 36,
-        "maxFragmentPixels": 132,
-        "maxPaletteDrift": 9.37,
+        "flickerScore": 95.1,
+        "maxAlphaRatio": 1.82,
+        "maxBodyCenterJump": 3.43,
+        "maxEdgePixels": 86,
+        "maxFragmentPixels": 114,
+        "maxPaletteDrift": 9.57,
         "medianBodyHeight": 69.5,
-        "medianBodyWidth": 41.5,
+        "medianBodyWidth": 41.0,
         "medianColor": [
-          96.85,
-          75.8,
-          58.0
+          97.05,
+          76.0,
+          58.15
         ],
+        "medianColorCount": 353.0,
+        "medianShadingRatio": 0.7026,
+        "styleEra": "painted",
         "warnings": [
           "body-height-drift",
           "body-width-drift",
-          "ground-anchor-drift",
-          "body-center-jump"
+          "edge-contact"
         ]
       },
-      "sha256": "d0ee091fb99ff357b7042a596983be9af817c7a4e75cd8e844e30c24f0500805",
+      "sha256": "a16ccb4c728da8907a08ada98ebedafed9e040aed6e1f516ed74d72e24253d09",
       "status": "accepted-with-waiver"
     },
     "miner/work/up": {
@@ -7922,6 +8016,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T23:27:44Z",
+  "updatedAt": "2026-07-01T23:43:28Z",
   "version": 1
 }
