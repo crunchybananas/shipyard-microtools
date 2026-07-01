@@ -30,3 +30,6 @@ docs/ember/*/
 !docs/ember/.gitkeep
 docs/morphogen/
 .eslintcache
+
+# Realm sprite tooling virtualenv (docs/realm/assets/sprites/README.md)
+docs/realm/scripts/.venv/

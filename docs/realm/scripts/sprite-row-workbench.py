@@ -237,6 +237,7 @@ def accept_row(args: argparse.Namespace) -> None:
             for key in (
                 "flickerScore", "bodyHeightRange", "bodyWidthRange", "bodyBottomRange",
                 "medianBodyHeight", "medianBodyWidth", "medianColor", "directionReference",
+                "styleEra", "medianColorCount", "medianShadingRatio",
                 "maxBodyCenterJump", "maxAlphaRatio", "maxPaletteDrift",
                 "maxFragmentPixels", "maxEdgePixels", "warnings",
             )
@@ -277,6 +278,7 @@ def stage_row(args: argparse.Namespace) -> None:
             for key in (
                 "flickerScore", "bodyHeightRange", "bodyWidthRange", "bodyBottomRange",
                 "medianBodyHeight", "medianBodyWidth", "medianColor", "directionReference",
+                "styleEra", "medianColorCount", "medianShadingRatio",
                 "maxBodyCenterJump", "maxAlphaRatio", "maxPaletteDrift",
                 "maxFragmentPixels", "maxEdgePixels", "warnings",
             )

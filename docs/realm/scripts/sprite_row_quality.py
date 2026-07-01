@@ -25,6 +25,19 @@ FRAMES = 8
 ACTIONS = ("idle", "walk", "work", "carry")
 ALPHA_CUTOFF = 18
 
+# Style-era classifier thresholds. Keep in sync with the ERA constants in
+# scripts/audit-sprite-frames.mjs; both were calibrated 2026-07-01 against
+# visually confirmed rows (blocky: colorCount 80-160, shadingRatio 0.19-0.23;
+# painted: colorCount 315-706, shadingRatio 0.61-0.67). The painted era is the
+# art direction, so any non-painted row earns a `legacy-blocky-style` warning
+# and can only be accepted as an explicit waiver.
+ERA_COLOR_COUNT_PAINTED = 250
+ERA_COLOR_COUNT_BLOCKY = 180
+ERA_SHADING_PAINTED = 0.45
+ERA_SHADING_BLOCKY = 0.30
+SHADING_DELTA_MIN = 12
+SHADING_DELTA_MAX = 96
+
 
 def components(mask: list[list[int]]) -> list[list[tuple[int, int]]]:
     height = len(mask)
@@ -90,6 +103,7 @@ def analyze_frame(frame: Image.Image) -> dict:
     edge_pixels = 0
     rgb_sum = [0.0, 0.0, 0.0]
     alpha_sum = 0.0
+    quantized_colors: set[int] = set()
 
     for y in range(FRAME_H):
         for x in range(FRAME_W):
@@ -103,8 +117,24 @@ def analyze_frame(frame: Image.Image) -> dict:
             rgb_sum[1] += g * weight
             rgb_sum[2] += b * weight
             alpha_sum += weight
+            quantized_colors.add(((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3))
             if x <= 1 or x >= FRAME_W - 2 or y <= 1 or y >= FRAME_H - 2:
                 edge_pixels += 1
+
+    # Shading ratio: fraction of adjacent opaque pixel pairs whose color delta
+    # sits in the continuous-shading band. Flat blocky fills score near zero.
+    pair_total = 0
+    pair_shaded = 0
+    for x, y in points:
+        r, g, b, _ = pixels[x, y]
+        for nx, ny in ((x + 1, y), (x, y + 1)):
+            if nx >= FRAME_W or ny >= FRAME_H or not mask[ny][nx]:
+                continue
+            nr, ng, nb, _ = pixels[nx, ny]
+            delta = abs(r - nr) + abs(g - ng) + abs(b - nb)
+            pair_total += 1
+            if SHADING_DELTA_MIN <= delta <= SHADING_DELTA_MAX:
+                pair_shaded += 1
 
     opaque_components = components(mask)
     fragment_components = opaque_components[1:] if opaque_components else []
@@ -122,6 +152,8 @@ def analyze_frame(frame: Image.Image) -> dict:
         "bounds": full,
         "body": body,
         "meanColor": mean_color,
+        "colorCount": len(quantized_colors),
+        "shadingRatio": round(pair_shaded / pair_total, 4) if pair_total else 0.0,
         "sha256": hashlib.sha256(rgba.tobytes()).hexdigest(),
         "_mask": mask,
     }
@@ -209,6 +241,8 @@ def analyze_row(path: Path, action: str) -> dict:
             round(statistics.median(frame["meanColor"][channel] for frame in populated), 2)
             for channel in range(3)
         ] if populated else [0, 0, 0],
+        "medianColorCount": round(statistics.median(frame["colorCount"] for frame in populated), 1) if populated else 0,
+        "medianShadingRatio": round(statistics.median(frame["shadingRatio"] for frame in populated), 4) if populated else 0.0,
         "maxBodyCenterJump": round(max_point_jump(frames, "body"), 2),
         "maxFullCenterJump": round(max_point_jump(frames, "bounds"), 2),
         "maxAlphaRatio": round(max(alpha_counts, default=1) / max(1, min(alpha_counts, default=1)), 3),
@@ -245,6 +279,21 @@ def analyze_row(path: Path, action: str) -> dict:
         summary["warnings"].append("edge-contact")
     if summary["duplicateFrameCount"] >= 4 and action in ("walk", "work"):
         summary["warnings"].append("low-frame-variety")
+
+    painted_votes = int(summary["medianColorCount"] >= ERA_COLOR_COUNT_PAINTED) + int(
+        summary["medianShadingRatio"] >= ERA_SHADING_PAINTED
+    )
+    blocky_votes = int(summary["medianColorCount"] <= ERA_COLOR_COUNT_BLOCKY) + int(
+        summary["medianShadingRatio"] <= ERA_SHADING_BLOCKY
+    )
+    if painted_votes >= 1 and not blocky_votes:
+        summary["styleEra"] = "painted"
+    elif blocky_votes >= 1 and not painted_votes:
+        summary["styleEra"] = "blocky"
+    else:
+        summary["styleEra"] = "ambiguous"
+    if populated and summary["styleEra"] != "painted":
+        summary["warnings"].append("legacy-blocky-style")
 
     summary["flickerScore"] = round(
         summary["bodyHeightRange"] * 2.0

@@ -58,6 +58,42 @@ node scripts/verify-anim.mjs
 node scripts/verify.mjs --game --logic
 ```
 
+The Python row tooling (`sprite-row`, `sprite_row_quality.py`) needs Pillow,
+and the system `python3` is PEP-668 externally managed. Use the project
+virtualenv (gitignored):
+
+```sh
+python3 -m venv scripts/.venv
+scripts/.venv/bin/pip install pillow
+REALM_SPRITE_PYTHON=scripts/.venv/bin/python scripts/sprite-row status
+```
+
+## Style-Era and Scale Gate
+
+The compiled sheets historically mixed two art generations: legacy flat
+"blocky" toy figures and the painted direction that is the stated art style.
+Both analyzers now classify every row's style era from measurable features
+(distinct quantized color count and the continuous-shading ratio of adjacent
+opaque pixels; painted rows measure roughly 315-706 colors / 0.61-0.67
+shading, blocky rows 80-160 / 0.19-0.23):
+
+- `scripts/sprite_row_quality.py` reports `styleEra` per row and adds a
+  `legacy-blocky-style` warning to any non-painted row, so the row factory
+  cannot silently accept legacy-era art (it becomes an explicit waiver at
+  worst).
+- `node scripts/audit-sprite-frames.mjs` audits every compiled row, prints a
+  full role/action/direction table (era, dense-body height, palette cluster,
+  debris flags), and exits non-zero when a role sheet mixes eras or when a
+  row's dense-body height drifts more than 10px from the same-direction walk
+  row. Manifest rows waived for `direction-scale-mismatch` are reported but do
+  not fail the gate. During the legacy-row repaint campaign, run it with
+  `--allow-mixed` to downgrade gate failures to loud warnings; drop the flag
+  once the sheet set is uniformly painted.
+
+The reference body scale is the locked settler walk family at `72px` dense
+body height (see Round 111 note above); repainted idle/walk rows must land on
+that scale, not merely be internally stable.
+
 Acceptance requires stable identity and viewing direction, stable dense-body
 height/width/anchor inside the row, compatible body scale and palette across
 the other directions of the same action, compatible body scale and palette
