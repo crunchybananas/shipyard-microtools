@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import colorsys
 import hashlib
 import json
 import math
@@ -31,6 +32,58 @@ ROLES = (
     "fisher", "trader", "innkeeper", "builder", "blacksmith", "guard",
     "scholar", "forager",
 )
+
+# Role tunic identity colors, carried over from the retired procedural
+# ROLE_CONFIG (paint-cohesive-legacy-actors round): the palette players
+# already associate with each role. Used by the `derive` command.
+ROLE_CLOTH = {
+    "farmer": "#5c9a43",
+    "rancher": "#8f7938",
+    "lumber": "#9f6334",
+    "miner": "#5e7f93",
+    "stonecutter": "#7a7b78",
+    "fisher": "#4f7f90",
+    "trader": "#9b7b41",
+    "innkeeper": "#a45d3f",
+    "builder": "#9a743e",
+    "blacksmith": "#3f4952",
+    "guard": "#426ca0",
+    "scholar": "#6c627d",
+    "forager": "#70904a",
+}
+
+# The settler reference tunic occupies an isolated slate-blue hue band
+# (everything else on the sheet is warm brown/skin), so cloth pixels can be
+# selected by hue alone and remapped per role while per-pixel value keeps the
+# painted shading intact.
+CLOTH_HUE_MIN = 150 / 360
+CLOTH_HUE_MAX = 240 / 360
+CLOTH_REF_HUE = 195 / 360
+CLOTH_REF_SAT = 0.20
+CLOTH_REF_VAL = 0.45
+
+
+def derive_role_row(source: Image.Image, cloth_hex: str) -> Image.Image:
+    target = cloth_hex.lstrip("#")
+    target_h, target_s, target_v = colorsys.rgb_to_hsv(
+        int(target[0:2], 16) / 255, int(target[2:4], 16) / 255, int(target[4:6], 16) / 255
+    )
+    out = source.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if not a:
+                continue
+            h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if not (CLOTH_HUE_MIN <= h <= CLOTH_HUE_MAX and s >= 0.06 and v >= 0.10):
+                continue
+            nh = (target_h + (h - CLOTH_REF_HUE) * 0.35) % 1.0
+            ns = min(1.0, max(0.02, s * (target_s / CLOTH_REF_SAT)))
+            nv = min(1.0, v * (1 + (target_v / CLOTH_REF_VAL - 1) * 0.5))
+            nr, ng, nb = colorsys.hsv_to_rgb(nh, ns, nv)
+            px[x, y] = (round(nr * 255), round(ng * 255), round(nb * 255), a)
+    return out
 
 
 def now_iso() -> str:
@@ -190,6 +243,31 @@ Output intent: the result will be segmented and packed into eight exact 64x84 tr
         "qualityBefore": report,
     }
     (out / "spec.json").write_text(json.dumps(spec, indent=2) + "\n")
+    print(f"[sprite-workbench] wrote {out}")
+
+
+def derive_row(args: argparse.Namespace) -> None:
+    validate_target(args.role, args.action, args.dir)
+    if args.role == args.source_role:
+        raise SystemExit("derive targets a different role than the source")
+    cloth = ROLE_CLOTH.get(args.role)
+    if not cloth:
+        raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
+    manifest = load_manifest()
+    source_item = manifest["rows"].get(row_key(args.source_role, args.action, args.dir))
+    if not source_item or source_item.get("status") not in ("accepted", "accepted-with-waiver"):
+        raise SystemExit(f"source row {args.source_role}/{args.action}/{args.dir} is not an accepted override")
+    source_path = ROW_DIR / source_item["file"]
+    derived = derive_role_row(Image.open(source_path).convert("RGBA"), cloth)
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    derived.save(out)
+    report = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] derived {args.role}/{args.action}/{args.dir} from "
+        f"{args.source_role} ({report['styleEra']}, body {report['medianBodyHeight']}px, "
+        f"warnings {','.join(report['warnings']) or 'none'})"
+    )
     print(f"[sprite-workbench] wrote {out}")
 
 
@@ -375,6 +453,12 @@ def main() -> None:
     create_work_order = sub.add_parser("work-order")
     target_args(create_work_order)
     create_work_order.set_defaults(func=work_order)
+
+    derive = sub.add_parser("derive")
+    target_args(derive)
+    derive.add_argument("--source-role", default="settler", choices=ROLES)
+    derive.add_argument("--out", type=Path)
+    derive.set_defaults(func=derive_row)
 
     accept = sub.add_parser("accept")
     target_args(accept)

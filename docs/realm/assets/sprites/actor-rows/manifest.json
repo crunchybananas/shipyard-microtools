@@ -1,5 +1,693 @@
 {
   "rows": {
+    "fisher/carry/down": {
+      "acceptedAt": "2026-07-01T21:49:33Z",
+      "allowedWarnings": [],
+      "file": "fisher/carry-down.png",
+      "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 34.5,
+          "medianColor": [
+            88.35,
+            67.6,
+            54.7
+          ],
+          "paletteDelta": 11.32
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.058,
+        "maxBodyCenterJump": 0.95,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.5,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 33.0,
+        "medianColor": [
+          93.4,
+          75.8,
+          60.65
+        ],
+        "medianColorCount": 523.5,
+        "medianShadingRatio": 0.5885,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "531a64d5942685ea24db8fc73499a40c76836eceddcf05c840ff46ebb5148790",
+      "status": "accepted"
+    },
+    "fisher/carry/left": {
+      "acceptedAt": "2026-07-01T21:49:35Z",
+      "allowedWarnings": [],
+      "file": "fisher/carry-left.png",
+      "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            88.4,
+            69.55,
+            60.65
+          ],
+          "paletteDelta": 6.26
+        },
+        "flickerScore": 24.0,
+        "maxAlphaRatio": 1.149,
+        "maxBodyCenterJump": 2.81,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.1,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          88.35,
+          67.6,
+          54.7
+        ],
+        "medianColorCount": 411.0,
+        "medianShadingRatio": 0.634,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "04ce2319e072c85203c7b21ee1a75fe1fdcfa05a6f75e4bfdac51c91533bdd98",
+      "status": "accepted"
+    },
+    "fisher/carry/right": {
+      "acceptedAt": "2026-07-01T21:49:35Z",
+      "allowedWarnings": [],
+      "file": "fisher/carry-right.png",
+      "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            88.35,
+            69.55,
+            60.65
+          ],
+          "paletteDelta": 6.26
+        },
+        "flickerScore": 24.0,
+        "maxAlphaRatio": 1.149,
+        "maxBodyCenterJump": 2.81,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.1,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          88.4,
+          67.6,
+          54.7
+        ],
+        "medianColorCount": 411.0,
+        "medianShadingRatio": 0.6338,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "cf864b56938753ba19d7575590c2f197513aa82a9dd45ade51b5271a48dfac8c",
+      "status": "accepted"
+    },
+    "fisher/carry/up": {
+      "acceptedAt": "2026-07-01T21:49:34Z",
+      "allowedWarnings": [],
+      "file": "fisher/carry-up.png",
+      "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 34.5,
+          "medianColor": [
+            88.4,
+            67.6,
+            54.7
+          ],
+          "paletteDelta": 18.26
+        },
+        "flickerScore": 0.0,
+        "maxAlphaRatio": 1.043,
+        "maxBodyCenterJump": 1.15,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.9,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 33.0,
+        "medianColor": [
+          74.6,
+          69.55,
+          66.5
+        ],
+        "medianColorCount": 466.0,
+        "medianShadingRatio": 0.6392,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "aa67305180ecdf9f5f48c3cda990a49e6f8c6fd5071c25dc7e8fe161094c1bde",
+      "status": "accepted"
+    },
+    "fisher/idle/down": {
+      "acceptedAt": "2026-07-01T21:49:23Z",
+      "allowedWarnings": [],
+      "file": "fisher/idle-down.png",
+      "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 9.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            63.2
+          ],
+          "paletteDelta": 5.12
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.084,
+        "maxBodyCenterJump": 1.27,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.54,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          90.3,
+          77.25,
+          66.8
+        ],
+        "medianColorCount": 570.5,
+        "medianShadingRatio": 0.6321,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "cc9dce22bf6f7f526cc9671ca139c62bf7a39b2d599cec5b9ac798b5ea49ab08",
+      "status": "accepted"
+    },
+    "fisher/idle/left": {
+      "acceptedAt": "2026-07-01T21:49:25Z",
+      "allowedWarnings": [],
+      "file": "fisher/idle-left.png",
+      "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            66.8
+          ],
+          "paletteDelta": 3.6
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.65,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          87.25,
+          75.25,
+          63.2
+        ],
+        "medianColorCount": 442.0,
+        "medianShadingRatio": 0.6706,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "f0bbe85ce1d0683b4abec0e662fb00ccb6bc5c2edaf6292d99309d527b71f82a",
+      "status": "accepted"
+    },
+    "fisher/idle/right": {
+      "acceptedAt": "2026-07-01T21:49:25Z",
+      "allowedWarnings": [],
+      "file": "fisher/idle-right.png",
+      "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            66.8
+          ],
+          "paletteDelta": 3.6
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.65,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          87.25,
+          75.25,
+          63.2
+        ],
+        "medianColorCount": 442.0,
+        "medianShadingRatio": 0.6706,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "3a42656b4bf9c29e91e5a45ac5492f8dac199b4ce7d39abbdf3ef6d83ef852ae",
+      "status": "accepted"
+    },
+    "fisher/idle/up": {
+      "acceptedAt": "2026-07-01T21:49:24Z",
+      "allowedWarnings": [],
+      "file": "fisher/idle-up.png",
+      "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            63.2
+          ],
+          "paletteDelta": 22.95
+        },
+        "flickerScore": 1.2,
+        "maxAlphaRatio": 1.045,
+        "maxBodyCenterJump": 0.84,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.0,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          67.0,
+          66.4,
+          69.4
+        ],
+        "medianColorCount": 489.0,
+        "medianShadingRatio": 0.6932,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "1f1ef4766c7c64cf6a559b85c26be6b6763c75f362521a4a65cb8ebeda1aa652",
+      "status": "accepted"
+    },
+    "fisher/walk/down": {
+      "acceptedAt": "2026-07-01T21:49:26Z",
+      "allowedWarnings": [],
+      "file": "fisher/walk-down.png",
+      "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            81.85,
+            65.2,
+            57.75
+          ],
+          "paletteDelta": 15.03
+        },
+        "flickerScore": 5.6,
+        "maxAlphaRatio": 1.067,
+        "maxBodyCenterJump": 0.88,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.41,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          89.6,
+          75.85,
+          65.0
+        ],
+        "medianColorCount": 559.0,
+        "medianShadingRatio": 0.6277,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "0d1aa344a9cd3ba973e3487d791ccf39b010a2edf7595875993ff97dccdd2327",
+      "status": "accepted"
+    },
+    "fisher/walk/left": {
+      "acceptedAt": "2026-07-01T21:49:27Z",
+      "allowedWarnings": [],
+      "file": "fisher/walk-left.png",
+      "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            81.85,
+            68.05,
+            65.0
+          ],
+          "paletteDelta": 7.79
+        },
+        "flickerScore": 28.8,
+        "maxAlphaRatio": 1.157,
+        "maxBodyCenterJump": 3.63,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.58,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          81.85,
+          65.2,
+          57.75
+        ],
+        "medianColorCount": 416.5,
+        "medianShadingRatio": 0.6958,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "c592973ddb8038f0779a61dc315018e869a90e1f17752093b078ee035f986591",
+      "status": "accepted"
+    },
+    "fisher/walk/right": {
+      "acceptedAt": "2026-07-01T21:49:28Z",
+      "allowedWarnings": [],
+      "file": "fisher/walk-right.png",
+      "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            81.85,
+            68.05,
+            65.0
+          ],
+          "paletteDelta": 7.79
+        },
+        "flickerScore": 28.8,
+        "maxAlphaRatio": 1.157,
+        "maxBodyCenterJump": 3.63,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.58,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          81.85,
+          65.2,
+          57.75
+        ],
+        "medianColorCount": 416.5,
+        "medianShadingRatio": 0.6958,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "4387f015375ae7b3281dde5e2337ff4bb9d2c26d607dbb9bb525ab3533fa083c",
+      "status": "accepted"
+    },
+    "fisher/walk/up": {
+      "acceptedAt": "2026-07-01T21:49:27Z",
+      "allowedWarnings": [],
+      "file": "fisher/walk-up.png",
+      "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            81.85,
+            65.2,
+            57.75
+          ],
+          "paletteDelta": 16.94
+        },
+        "flickerScore": 1.2,
+        "maxAlphaRatio": 1.058,
+        "maxBodyCenterJump": 1.41,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.46,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          69.55,
+          68.05,
+          69.05
+        ],
+        "medianColorCount": 492.5,
+        "medianShadingRatio": 0.681,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "2aee50193833c49e7863a97f0448b5266d8c6af1c472d072f6368048ac9d3e44",
+      "status": "accepted"
+    },
+    "fisher/work/down": {
+      "acceptedAt": "2026-07-01T21:49:29Z",
+      "allowedWarnings": [],
+      "file": "fisher/work-down.png",
+      "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 9.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            63.2
+          ],
+          "paletteDelta": 5.16
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.084,
+        "maxBodyCenterJump": 1.27,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.54,
+        "medianBodyHeight": 71.0,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          90.3,
+          77.25,
+          66.85
+        ],
+        "medianColorCount": 572.5,
+        "medianShadingRatio": 0.6324,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "541c48157f069df6e6f308c6f2ab55c297412536c90e9d2c443f2b1569d77258",
+      "status": "accepted"
+    },
+    "fisher/work/left": {
+      "acceptedAt": "2026-07-01T21:49:31Z",
+      "allowedWarnings": [],
+      "file": "fisher/work-left.png",
+      "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            66.85
+          ],
+          "paletteDelta": 3.65
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.65,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          87.25,
+          75.25,
+          63.2
+        ],
+        "medianColorCount": 443.5,
+        "medianShadingRatio": 0.6708,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "9e4de64b516f5833b1924591f1c6c238b558f787454c918d7a7a06a46a4e2c04",
+      "status": "accepted"
+    },
+    "fisher/work/right": {
+      "acceptedAt": "2026-07-01T21:49:32Z",
+      "allowedWarnings": [],
+      "file": "fisher/work-right.png",
+      "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            66.85
+          ],
+          "paletteDelta": 3.65
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.054,
+        "maxBodyCenterJump": 0.85,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.65,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          87.25,
+          75.25,
+          63.2
+        ],
+        "medianColorCount": 443.5,
+        "medianShadingRatio": 0.6708,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "0d25fe09ac05292a910881e9c5bae545b73d6fe92db45e98fa2fe491824bc2c4",
+      "status": "accepted"
+    },
+    "fisher/work/up": {
+      "acceptedAt": "2026-07-01T21:49:30Z",
+      "allowedWarnings": [],
+      "file": "fisher/work-up.png",
+      "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer (fisher teal).",
+      "provenance": "settler-derived-palette-transfer",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            87.25,
+            75.25,
+            63.2
+          ],
+          "paletteDelta": 22.97
+        },
+        "flickerScore": 1.2,
+        "maxAlphaRatio": 1.045,
+        "maxBodyCenterJump": 0.84,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.98,
+        "medianBodyHeight": 72.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          67.0,
+          66.4,
+          69.45
+        ],
+        "medianColorCount": 487.0,
+        "medianShadingRatio": 0.6933,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "6e2545b1efca302a7081d12b1e7975652c03e199f0f6a44e03af86cdf180a7fb",
+      "status": "accepted"
+    },
     "guard/work/left": {
       "acceptedAt": "2026-06-26T04:37:17Z",
       "allowedWarnings": [
@@ -869,6 +1557,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-06-27T14:08:48Z",
+  "updatedAt": "2026-07-01T21:49:35Z",
   "version": 1
 }
