@@ -2164,6 +2164,350 @@
       "sha256": "d648cdfc217f794f7154007229457fed6635589579869bcd77d66d789e08bec2",
       "status": "accepted"
     },
+    "guard/idle/down": {
+      "acceptedAt": "2026-07-01T22:57:00Z",
+      "allowedWarnings": [],
+      "file": "guard/idle-down.png",
+      "note": "Painted row: settler locked idle/down body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 9.5,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            85.95,
+            75.55,
+            70.85
+          ],
+          "paletteDelta": 2.74
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.07,
+        "maxBodyCenterJump": 1.12,
+        "maxEdgePixels": 1,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.21,
+        "medianBodyHeight": 76.5,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          84.5,
+          74.55,
+          72.95
+        ],
+        "medianColorCount": 683.0,
+        "medianShadingRatio": 0.6263,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "1196aef62c3ba211f778134cc0828b9d2135c73cf232d0fe4a477801815c2048",
+      "status": "accepted"
+    },
+    "guard/idle/left": {
+      "acceptedAt": "2026-07-01T22:57:07Z",
+      "allowedWarnings": [],
+      "file": "guard/idle-left.png",
+      "note": "Painted row: settler locked idle/left body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            84.5,
+            74.55,
+            72.95
+          ],
+          "paletteDelta": 2.78
+        },
+        "flickerScore": 7.6,
+        "maxAlphaRatio": 1.068,
+        "maxBodyCenterJump": 1.04,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.18,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          85.95,
+          75.55,
+          70.8
+        ],
+        "medianColorCount": 529.0,
+        "medianShadingRatio": 0.659,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "090646f117847e1710403ef9e1f7e372a831604f36687363f43ac4fdff4baa85",
+      "status": "accepted"
+    },
+    "guard/idle/right": {
+      "acceptedAt": "2026-07-01T22:57:10Z",
+      "allowedWarnings": [],
+      "file": "guard/idle-right.png",
+      "note": "Painted row: settler locked idle/right body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            84.5,
+            74.55,
+            72.95
+          ],
+          "paletteDelta": 2.8
+        },
+        "flickerScore": 7.6,
+        "maxAlphaRatio": 1.069,
+        "maxBodyCenterJump": 1.03,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.18,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          86.05,
+          75.55,
+          70.85
+        ],
+        "medianColorCount": 529.0,
+        "medianShadingRatio": 0.6582,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "125747716dcdc863fd0a20c3f536484adf0198e164f9dcabf576c1d5cd0e6a19",
+      "status": "accepted"
+    },
+    "guard/idle/up": {
+      "acceptedAt": "2026-07-01T22:57:04Z",
+      "allowedWarnings": [],
+      "file": "guard/idle-up.png",
+      "note": "Painted row: settler locked idle/up body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 3.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 21.0,
+          "medianColor": [
+            85.95,
+            75.55,
+            70.85
+          ],
+          "paletteDelta": 28.54
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.037,
+        "maxBodyCenterJump": 0.84,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.8,
+        "medianBodyHeight": 73.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          63.35,
+          59.4,
+          77.4
+        ],
+        "medianColorCount": 537.5,
+        "medianShadingRatio": 0.6932,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "0d410bc86b2587c0874c9b5f9d26a3051e99d873f8103ef6f5440eb972b7acd6",
+      "status": "accepted"
+    },
+    "guard/walk/down": {
+      "acceptedAt": "2026-07-01T22:57:13Z",
+      "allowedWarnings": [],
+      "file": "guard/walk-down.png",
+      "note": "Painted row: settler locked walk/down body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            65.1
+          ],
+          "paletteDelta": 9.75
+        },
+        "flickerScore": 5.6,
+        "maxAlphaRatio": 1.063,
+        "maxBodyCenterJump": 0.91,
+        "maxEdgePixels": 1,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.1,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          84.9,
+          74.5,
+          71.8
+        ],
+        "medianColorCount": 671.5,
+        "medianShadingRatio": 0.6289,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "cfdd95102bb1fa3f831247f8549b71e30a6f92d6be95df4d2c4211b75f443f7a",
+      "status": "accepted"
+    },
+    "guard/walk/left": {
+      "acceptedAt": "2026-07-01T22:57:20Z",
+      "allowedWarnings": [],
+      "file": "guard/walk-left.png",
+      "note": "Painted row: settler locked walk/left body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            71.8
+          ],
+          "paletteDelta": 6.75
+        },
+        "flickerScore": 30.8,
+        "maxAlphaRatio": 1.143,
+        "maxBodyCenterJump": 3.34,
+        "maxEdgePixels": 3,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.89,
+        "medianBodyHeight": 77.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          82.9,
+          67.7,
+          65.05
+        ],
+        "medianColorCount": 519.5,
+        "medianShadingRatio": 0.6889,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "16a35dddc533952d311a305e1a8a2ae1de02759050acb1c2e5ad29fd42700423",
+      "status": "accepted"
+    },
+    "guard/walk/right": {
+      "acceptedAt": "2026-07-01T22:57:23Z",
+      "allowedWarnings": [],
+      "file": "guard/walk-right.png",
+      "note": "Painted row: settler locked walk/right body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            71.8
+          ],
+          "paletteDelta": 6.7
+        },
+        "flickerScore": 30.8,
+        "maxAlphaRatio": 1.143,
+        "maxBodyCenterJump": 3.34,
+        "maxEdgePixels": 3,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.92,
+        "medianBodyHeight": 77.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          82.9,
+          67.7,
+          65.1
+        ],
+        "medianColorCount": 519.5,
+        "medianShadingRatio": 0.6889,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd",
+      "status": "accepted"
+    },
+    "guard/walk/up": {
+      "acceptedAt": "2026-07-01T22:57:16Z",
+      "allowedWarnings": [],
+      "file": "guard/walk-up.png",
+      "note": "Painted row: settler locked walk/up body with guard palette + guard's own painted helm transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 4.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            65.1
+          ],
+          "paletteDelta": 21.03
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.053,
+        "maxBodyCenterJump": 1.49,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.27,
+        "medianBodyHeight": 73.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          66.95,
+          62.2,
+          77.65
+        ],
+        "medianColorCount": 547.0,
+        "medianShadingRatio": 0.689,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
+      "status": "accepted"
+    },
     "guard/work/left": {
       "acceptedAt": "2026-06-26T04:37:17Z",
       "allowedWarnings": [
@@ -3084,6 +3428,522 @@
       },
       "sha256": "75c706f2a7b0b524fa018956a52e342a9f7f55bac8b1818bb8540295a938bd6f",
       "status": "accepted-with-waiver"
+    },
+    "miner/carry/down": {
+      "acceptedAt": "2026-07-01T22:56:49Z",
+      "allowedWarnings": [],
+      "file": "miner/carry-down.png",
+      "note": "Painted row: settler locked carry/down body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 34.5,
+          "medianColor": [
+            95.05,
+            64.6,
+            43.25
+          ],
+          "paletteDelta": 7.96
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.049,
+        "maxBodyCenterJump": 1.23,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.09,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 33.0,
+        "medianColor": [
+          101.0,
+          69.2,
+          45.85
+        ],
+        "medianColorCount": 419.0,
+        "medianShadingRatio": 0.61,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "9eb846ad71007c842a9c936d250cb5a9a070c402278cd380bf59b89158707104",
+      "status": "accepted"
+    },
+    "miner/carry/left": {
+      "acceptedAt": "2026-07-01T22:56:53Z",
+      "allowedWarnings": [],
+      "file": "miner/carry-left.png",
+      "note": "Painted row: settler locked carry/left body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            97.55,
+            68.0,
+            44.1
+          ],
+          "paletteDelta": 4.81
+        },
+        "flickerScore": 26.0,
+        "maxAlphaRatio": 1.123,
+        "maxBodyCenterJump": 2.96,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.95,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          94.6,
+          64.35,
+          43.05
+        ],
+        "medianColorCount": 362.5,
+        "medianShadingRatio": 0.6444,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "9c7cc8ca179847ea3deac143ed83618453fa98307348dd69d0d2bcdc466db8eb",
+      "status": "accepted"
+    },
+    "miner/carry/right": {
+      "acceptedAt": "2026-07-01T22:56:57Z",
+      "allowedWarnings": [],
+      "file": "miner/carry-right.png",
+      "note": "Painted row: settler locked carry/right body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            97.55,
+            68.0,
+            44.1
+          ],
+          "paletteDelta": 4.3
+        },
+        "flickerScore": 26.0,
+        "maxAlphaRatio": 1.122,
+        "maxBodyCenterJump": 2.8,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.79,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 34.5,
+        "medianColor": [
+          95.05,
+          64.6,
+          43.25
+        ],
+        "medianColorCount": 361.0,
+        "medianShadingRatio": 0.6409,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "d77c0e6cc56920f8e9d4e571eaf9fef705c0d4ff0b3beadc324f054003aca15e",
+      "status": "accepted"
+    },
+    "miner/carry/up": {
+      "acceptedAt": "2026-07-01T22:56:51Z",
+      "allowedWarnings": [],
+      "file": "miner/carry-up.png",
+      "note": "Painted row: settler locked carry/up body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.5,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 34.5,
+          "medianColor": [
+            95.05,
+            64.6,
+            43.25
+          ],
+          "paletteDelta": 4.3
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.033,
+        "maxBodyCenterJump": 1.19,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.77,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 33.0,
+        "medianColor": [
+          97.55,
+          68.0,
+          44.1
+        ],
+        "medianColorCount": 397.0,
+        "medianShadingRatio": 0.6377,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "64f554d9533bd6091dc0a02caa0a42b90422bafed4da480aab7e5116aafd1b90",
+      "status": "accepted"
+    },
+    "miner/idle/down": {
+      "acceptedAt": "2026-07-01T22:56:27Z",
+      "allowedWarnings": [],
+      "file": "miner/idle-down.png",
+      "note": "Painted row: settler locked idle/down body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 6.5,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 24.0,
+          "medianColor": [
+            95.2,
+            67.45,
+            46.05
+          ],
+          "paletteDelta": 6.59
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.071,
+        "maxBodyCenterJump": 1.29,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.32,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          100.75,
+          70.2,
+          48.3
+        ],
+        "medianColorCount": 459.0,
+        "medianShadingRatio": 0.6409,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "ef8cc4e9271cd865c62c030b43b98dfe5f8be7db23da6c0f9fbdd53b0f4f0d5b",
+      "status": "accepted"
+    },
+    "miner/idle/left": {
+      "acceptedAt": "2026-07-01T22:56:35Z",
+      "allowedWarnings": [],
+      "file": "miner/idle-left.png",
+      "note": "Painted row: settler locked idle/left body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 8.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            95.9,
+            67.95,
+            46.25
+          ],
+          "paletteDelta": 0.88
+        },
+        "flickerScore": 2.4,
+        "maxAlphaRatio": 1.045,
+        "maxBodyCenterJump": 0.78,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.1,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 22.0,
+        "medianColor": [
+          95.2,
+          67.45,
+          46.05
+        ],
+        "medianColorCount": 349.5,
+        "medianShadingRatio": 0.6771,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "95bb30cff9b0010549f701a08ffaecdedbbccc755e7996147b2060585f97398b",
+      "status": "accepted"
+    },
+    "miner/idle/right": {
+      "acceptedAt": "2026-07-01T22:56:38Z",
+      "allowedWarnings": [],
+      "file": "miner/idle-right.png",
+      "note": "Painted row: settler locked idle/right body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 6.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            95.2,
+            67.45,
+            46.05
+          ],
+          "paletteDelta": 0.88
+        },
+        "flickerScore": 0.0,
+        "maxAlphaRatio": 1.046,
+        "maxBodyCenterJump": 0.79,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.2,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 24.0,
+        "medianColor": [
+          95.9,
+          67.95,
+          46.25
+        ],
+        "medianColorCount": 347.5,
+        "medianShadingRatio": 0.6738,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "4671ecb0094797e48b7812087c0e89ed045649db3b660498353cc8b752f0326a",
+      "status": "accepted"
+    },
+    "miner/idle/up": {
+      "acceptedAt": "2026-07-01T22:56:31Z",
+      "allowedWarnings": [],
+      "file": "miner/idle-up.png",
+      "note": "Painted row: settler locked idle/up body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 6.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 24.0,
+          "medianColor": [
+            95.9,
+            67.95,
+            46.25
+          ],
+          "paletteDelta": 3.62
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.032,
+        "maxBodyCenterJump": 0.81,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.4,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          93.95,
+          65.95,
+          43.95
+        ],
+        "medianColorCount": 429.5,
+        "medianShadingRatio": 0.6815,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "d5a0a71c8d22d0b5fb036968470c64ebd0f9076cbedfcacdd1468eca6afefebf",
+      "status": "accepted"
+    },
+    "miner/walk/down": {
+      "acceptedAt": "2026-07-01T22:56:42Z",
+      "allowedWarnings": [],
+      "file": "miner/walk-down.png",
+      "note": "Painted row: settler locked walk/down body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            91.0,
+            62.2,
+            43.75
+          ],
+          "paletteDelta": 11.3
+        },
+        "flickerScore": 5.6,
+        "maxAlphaRatio": 1.055,
+        "maxBodyCenterJump": 1.28,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.06,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          99.45,
+          68.7,
+          47.5
+        ],
+        "medianColorCount": 462.0,
+        "medianShadingRatio": 0.6422,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "a631a100f5bb4eb4ffa5d7b6b0c58a07b04e4ae5928c8a1e5e8cf035f955fd21",
+      "status": "accepted"
+    },
+    "miner/walk/left": {
+      "acceptedAt": "2026-07-01T22:56:45Z",
+      "allowedWarnings": [],
+      "file": "miner/walk-left.png",
+      "note": "Painted row: settler locked walk/left body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            95.0,
+            66.7,
+            44.8
+          ],
+          "paletteDelta": 6.76
+        },
+        "flickerScore": 30.8,
+        "maxAlphaRatio": 1.128,
+        "maxBodyCenterJump": 3.52,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.44,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          90.5,
+          61.8,
+          43.6
+        ],
+        "medianColorCount": 375.0,
+        "medianShadingRatio": 0.6929,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "80d953dabe50fb2ddea2a83934e391674b5d08257870d86f6e748c458a0bcc11",
+      "status": "accepted"
+    },
+    "miner/walk/right": {
+      "acceptedAt": "2026-07-01T22:56:47Z",
+      "allowedWarnings": [],
+      "file": "miner/walk-right.png",
+      "note": "Painted row: settler locked walk/right body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 8,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            95.0,
+            66.7,
+            44.8
+          ],
+          "paletteDelta": 6.11
+        },
+        "flickerScore": 29.6,
+        "maxAlphaRatio": 1.127,
+        "maxBodyCenterJump": 3.29,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.2,
+        "medianBodyHeight": 75.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          91.0,
+          62.2,
+          43.75
+        ],
+        "medianColorCount": 373.5,
+        "medianShadingRatio": 0.6907,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "91b6c834a712134c09c3ee1f54931b8fb173c635ad568a8dbe316515f729d0f7",
+      "status": "accepted"
+    },
+    "miner/walk/up": {
+      "acceptedAt": "2026-07-01T22:56:44Z",
+      "allowedWarnings": [],
+      "file": "miner/walk-up.png",
+      "note": "Painted row: settler locked walk/up body with miner palette + miner's own painted hood transplanted.",
+      "provenance": "settler-body-own-headgear-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 75.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            91.0,
+            62.2,
+            43.75
+          ],
+          "paletteDelta": 6.11
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.051,
+        "maxBodyCenterJump": 1.18,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.85,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          95.0,
+          66.7,
+          44.8
+        ],
+        "medianColorCount": 419.0,
+        "medianShadingRatio": 0.674,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "1ebd4b0e5467de887bf10aabffd9946f4c526fd5015c1b410bc2466e4067cff3",
+      "status": "accepted"
     },
     "miner/work/left": {
       "acceptedAt": "2026-06-26T04:15:49Z",
@@ -6618,6 +7478,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T22:41:10Z",
+  "updatedAt": "2026-07-01T22:57:23Z",
   "version": 1
 }

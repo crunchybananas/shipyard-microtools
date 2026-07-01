@@ -320,7 +320,7 @@ def headswap_row(args: argparse.Namespace) -> None:
     validate_target(args.role, args.action, args.dir)
     from sprite_row_quality import ALPHA_CUTOFF
 
-    cloth = ROLE_CLOTH.get(args.role)
+    cloth = args.cloth_hex or ROLE_CLOTH.get(args.role)
     if not cloth:
         raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
 
@@ -445,7 +445,11 @@ def headswap_row(args: argparse.Namespace) -> None:
                 if not a:
                     continue
                 h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
-                if 30 / 360 <= h <= 60 / 360 and s >= 0.25 and v >= 0.35:
+                if (
+                    args.hat_hue_min / 360 <= h <= args.hat_hue_max / 360
+                    and args.hat_sat_min <= s <= args.hat_sat_max
+                    and args.hat_val_min <= v <= args.hat_val_max
+                ):
                     hat_px[x, y] = (r, g, b, a)
         hat_mask = [[1 if hat_px[x, y][3] > 18 else 0 for x in range(hat.width)] for y in range(hat.height)]
         from sprite_row_quality import components as _hat_components
@@ -816,6 +820,13 @@ def main() -> None:
     headswap.add_argument("--hat-only", action="store_true")
     headswap.add_argument("--hat-floor", type=float, default=0.62)
     headswap.add_argument("--hat-lift", type=int, default=2)
+    headswap.add_argument("--hat-hue-min", type=float, default=30)
+    headswap.add_argument("--hat-hue-max", type=float, default=60)
+    headswap.add_argument("--hat-sat-min", type=float, default=0.25)
+    headswap.add_argument("--hat-sat-max", type=float, default=1.0)
+    headswap.add_argument("--hat-val-min", type=float, default=0.35)
+    headswap.add_argument("--hat-val-max", type=float, default=1.0)
+    headswap.add_argument("--cloth-hex")
     headswap.add_argument("--head-scale", type=float, default=1.0)
     headswap.add_argument("--chin-extend", type=int, default=6)
     headswap.add_argument("--head-drop", type=int, default=1)
