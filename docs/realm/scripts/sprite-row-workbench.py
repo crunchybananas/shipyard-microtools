@@ -281,6 +281,69 @@ def derive_row(args: argparse.Namespace) -> None:
     print(f"[sprite-workbench] wrote {out}")
 
 
+def stance_row(args: argparse.Namespace) -> None:
+    # Build an idle row from the most neutral frame of a source row (usually
+    # the role's own painted walk row): pick the narrowest-silhouette frame,
+    # replicate it, and add a 1px upper-body breathing bob. Follows the Round
+    # 111 precedent of repacking idle rows from the locked walk family.
+    validate_target(args.role, args.action, args.dir)
+    from sprite_row_quality import ALPHA_CUTOFF
+
+    source_action = args.source_action or "walk"
+    source_dir = args.source_dir or args.dir
+    validate_target(args.role, source_action, source_dir)
+    source = comparison_row(args.role, source_action, source_dir)
+
+    frames = []
+    for index in range(FRAMES):
+        frame = source.crop((index * FRAME_W, 0, (index + 1) * FRAME_W, FRAME_H))
+        px = frame.load()
+        points = [(x, y) for y in range(FRAME_H) for x in range(FRAME_W) if px[x, y][3] > ALPHA_CUTOFF]
+        if not points:
+            continue
+        top = min(y for _, y in points)
+        bottom = max(y for _, y in points)
+        width = max(x for x, _ in points) - min(x for x, _ in points) + 1
+        # The standing-most frame of a walk cycle is the passing frame: legs
+        # together. Judge by the spread of the leg region (bottom 30% of the
+        # figure), not the full silhouette, which shoulders and arms dominate.
+        leg_floor = bottom - int((bottom - top + 1) * 0.3)
+        leg_xs = [x for x, y in points if y >= leg_floor]
+        leg_width = max(leg_xs) - min(leg_xs) + 1
+        frames.append((leg_width, width, index, frame, top, bottom))
+    if not frames:
+        raise SystemExit("source row is blank")
+    frames.sort()
+    _, _, chosen_index, pose, top, bottom = frames[0] if args.frame is None else next(
+        f for f in frames if f[2] == args.frame
+    )
+
+    # Breathing bob: shift the upper 60% of the figure down 1px on the middle
+    # beats (frames 2-5) so the feet and ground anchor never move.
+    waist = top + int((bottom - top + 1) * 0.6)
+    upper = pose.crop((0, 0, FRAME_W, waist))
+    bobbed = pose.copy()
+    bobbed.paste(Image.new("RGBA", (FRAME_W, 1), (0, 0, 0, 0)), (0, 0))
+    bobbed.paste(upper, (0, 1))
+
+    out_image = Image.new("RGBA", (FRAME_W * FRAMES, FRAME_H), (0, 0, 0, 0))
+    pattern = (0, 0, 1, 1, 1, 1, 0, 0)
+    for index in range(FRAMES):
+        out_image.paste(bobbed if pattern[index] else pose, (index * FRAME_W, 0))
+
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_image.save(out)
+    report = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] stance {args.role}/{args.action}/{args.dir} from "
+        f"{args.role}/{source_action}/{source_dir} frame {chosen_index} "
+        f"({report['styleEra']}, body {report['medianBodyHeight']}px, "
+        f"warnings {','.join(report['warnings']) or 'none'})"
+    )
+    print(f"[sprite-workbench] wrote {out}")
+
+
 def scrub_row(args: argparse.Namespace) -> None:
     # Consolidated from the retired scrub-work-row-particles.mjs one-shot:
     # drop small disconnected alpha components (baked debris, loose chips)
@@ -511,6 +574,14 @@ def main() -> None:
     scrub.add_argument("--min-keep", type=int, default=84)
     scrub.add_argument("--out", type=Path)
     scrub.set_defaults(func=scrub_row)
+
+    stance = sub.add_parser("stance")
+    target_args(stance)
+    stance.add_argument("--source-action", choices=ACTIONS)
+    stance.add_argument("--source-dir", choices=DIRS)
+    stance.add_argument("--frame", type=int)
+    stance.add_argument("--out", type=Path)
+    stance.set_defaults(func=stance_row)
 
     accept = sub.add_parser("accept")
     target_args(accept)

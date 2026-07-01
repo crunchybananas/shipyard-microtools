@@ -1,5 +1,349 @@
 {
   "rows": {
+    "blacksmith/idle/down": {
+      "acceptedAt": "2026-07-01T22:19:19Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/idle-down.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 79.5,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            73.8,
+            51.25,
+            37.55
+          ],
+          "paletteDelta": 9.28
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.014,
+        "maxBodyCenterJump": 0.54,
+        "maxEdgePixels": 11,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.14,
+        "medianBodyHeight": 78.5,
+        "medianBodyWidth": 34.0,
+        "medianColor": [
+          80.7,
+          56.15,
+          41.35
+        ],
+        "medianColorCount": 314.0,
+        "medianShadingRatio": 0.6806,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "2f0db7ee54b6a66568e35614d6ff72be2b093061e8f82dc11f53d1e380619d21",
+      "status": "accepted"
+    },
+    "blacksmith/idle/left": {
+      "acceptedAt": "2026-07-01T22:19:21Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/idle-left.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 78.5,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            73.8,
+            51.25,
+            37.55
+          ],
+          "paletteDelta": 0.0
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.018,
+        "maxBodyCenterJump": 0.49,
+        "maxEdgePixels": 16,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.68,
+        "medianBodyHeight": 79.5,
+        "medianBodyWidth": 29.0,
+        "medianColor": [
+          73.8,
+          51.25,
+          37.55
+        ],
+        "medianColorCount": 304.5,
+        "medianShadingRatio": 0.6843,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "ddb14438d8ae7a332c81da042d2d89e6e705c50f915fa209de0f6e68a5a4919c",
+      "status": "accepted"
+    },
+    "blacksmith/idle/right": {
+      "acceptedAt": "2026-07-01T22:19:22Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/idle-right.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 78.5,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            73.8,
+            51.25,
+            37.55
+          ],
+          "paletteDelta": 0.0
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.018,
+        "maxBodyCenterJump": 0.49,
+        "maxEdgePixels": 16,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.68,
+        "medianBodyHeight": 79.5,
+        "medianBodyWidth": 29.0,
+        "medianColor": [
+          73.8,
+          51.25,
+          37.55
+        ],
+        "medianColorCount": 304.5,
+        "medianShadingRatio": 0.6843,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "690808de5ae9e25aadf99b6f9319405f367dce893d2e08e83ce96795daf0b506",
+      "status": "accepted"
+    },
+    "blacksmith/idle/up": {
+      "acceptedAt": "2026-07-01T22:19:20Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/idle-up.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 79.5,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            73.8,
+            51.25,
+            37.55
+          ],
+          "paletteDelta": 4.52
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.015,
+        "maxBodyCenterJump": 0.54,
+        "maxEdgePixels": 11,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.14,
+        "medianBodyHeight": 78.5,
+        "medianBodyWidth": 34.0,
+        "medianColor": [
+          71.55,
+          48.4,
+          34.85
+        ],
+        "medianColorCount": 313.0,
+        "medianShadingRatio": 0.7184,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "856c74c5fddece1db744ba0846fd12f77a72833390f1f74446ca4aaec02426d0",
+      "status": "accepted"
+    },
+    "builder/idle/down": {
+      "acceptedAt": "2026-07-01T22:19:16Z",
+      "allowedWarnings": [],
+      "file": "builder/idle-down.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 78.5,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            95.1,
+            66.0,
+            41.55
+          ],
+          "paletteDelta": 29.24
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.014,
+        "maxBodyCenterJump": 0.55,
+        "maxEdgePixels": 10,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.14,
+        "medianBodyHeight": 78.5,
+        "medianBodyWidth": 34.0,
+        "medianColor": [
+          116.95,
+          83.25,
+          50.5
+        ],
+        "medianColorCount": 381.0,
+        "medianShadingRatio": 0.653,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "6cc19b11f2b462d4d01401a15b3cc4e8d2b78e64a696e5a67d280a0d631ba29b",
+      "status": "accepted"
+    },
+    "builder/idle/left": {
+      "acceptedAt": "2026-07-01T22:19:18Z",
+      "allowedWarnings": [],
+      "file": "builder/idle-left.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 78.5,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            110.6,
+            74.85,
+            46.4
+          ],
+          "paletteDelta": 18.5
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.017,
+        "maxBodyCenterJump": 0.49,
+        "maxEdgePixels": 14,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.22,
+        "medianBodyHeight": 78.5,
+        "medianBodyWidth": 29.0,
+        "medianColor": [
+          95.1,
+          66.0,
+          41.55
+        ],
+        "medianColorCount": 424.0,
+        "medianShadingRatio": 0.6711,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "90e0697505a15e6b3e1a210e773236195a73ea340eade94453effdc1dd64dfce",
+      "status": "accepted"
+    },
+    "builder/idle/right": {
+      "acceptedAt": "2026-07-01T22:19:19Z",
+      "allowedWarnings": [],
+      "file": "builder/idle-right.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 78.5,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            110.6,
+            74.85,
+            46.4
+          ],
+          "paletteDelta": 18.5
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.017,
+        "maxBodyCenterJump": 0.49,
+        "maxEdgePixels": 14,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.22,
+        "medianBodyHeight": 78.5,
+        "medianBodyWidth": 29.0,
+        "medianColor": [
+          95.1,
+          66.0,
+          41.55
+        ],
+        "medianColorCount": 424.0,
+        "medianShadingRatio": 0.6711,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "30aa10799407a10d0a35e575ff6b77936c2f4b22c7c04388a2c0eb16233bd679",
+      "status": "accepted"
+    },
+    "builder/idle/up": {
+      "acceptedAt": "2026-07-01T22:19:17Z",
+      "allowedWarnings": [],
+      "file": "builder/idle-up.png",
+      "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
+      "provenance": "own-walk-stance-idle",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 5.0,
+          "medianBodyHeight": 78.5,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            95.1,
+            66.0,
+            41.55
+          ],
+          "paletteDelta": 18.5
+        },
+        "flickerScore": 2.0,
+        "maxAlphaRatio": 1.02,
+        "maxBodyCenterJump": 0.43,
+        "maxEdgePixels": 11,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.41,
+        "medianBodyHeight": 78.5,
+        "medianBodyWidth": 34.0,
+        "medianColor": [
+          110.6,
+          74.85,
+          46.4
+        ],
+        "medianColorCount": 455.5,
+        "medianShadingRatio": 0.6849,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "5446967dd1141a9f971d2d8f9aa2af0fe08a8d7beb943a601bdabfc0f91edeb3",
+      "status": "accepted"
+    },
     "farmer/work/down": {
       "acceptedAt": "2026-07-01T22:08:05Z",
       "allowedWarnings": [
@@ -5930,6 +6274,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T22:08:07Z",
+  "updatedAt": "2026-07-01T22:19:22Z",
   "version": 1
 }
