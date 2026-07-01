@@ -172,7 +172,11 @@ def add_direction_comparison(report: dict, role: str, action: str, direction: st
         "bodyWidthDelta": round(width_delta, 2),
         "paletteDelta": round(palette_delta, 2),
     }
-    if height_delta > 8 or width_delta > 10:
+    # Work poses legitimately merge tools and benches into the dense body from
+    # some angles, so cross-direction width gets the same looser allowance the
+    # analyzer grants within-row work width; height stays the scale authority.
+    width_limit = 16 if action == "work" else 10
+    if height_delta > 8 or width_delta > width_limit:
         report["warnings"].append("direction-scale-mismatch")
     if palette_delta > 35:
         report["warnings"].append("direction-palette-mismatch")
@@ -572,6 +576,53 @@ def stance_row(args: argparse.Namespace) -> None:
     print(f"[sprite-workbench] wrote {out}")
 
 
+def rescale_row(args: argparse.Namespace) -> None:
+    # Uniform per-row body rescale about a fixed ground anchor. One transform
+    # for every frame, so relative frame-to-frame motion is preserved exactly
+    # and the operation cannot introduce jitter.
+    validate_target(args.role, args.action, args.dir)
+    row = Image.open(args.input).convert("RGBA") if args.input else comparison_row(args.role, args.action, args.dir)
+    with tempfile.NamedTemporaryFile(suffix=".png") as handle:
+        row.save(handle.name)
+        report = analyze_row(Path(handle.name), args.action)
+    current = report["medianBodyHeight"]
+    if not current:
+        raise SystemExit("row has no measurable body")
+    factor = args.target_height / current
+    bottoms = [frame["body"]["maxY"] for frame in report["frames"] if frame["pixels"]]
+    anchor_y = statistics.median(bottoms)
+    anchor_x = FRAME_W / 2
+
+    out_image = Image.new("RGBA", (FRAME_W * FRAMES, FRAME_H), (0, 0, 0, 0))
+    lost = 0
+    for index in range(FRAMES):
+        frame = row.crop((index * FRAME_W, 0, (index + 1) * FRAME_W, FRAME_H))
+        scaled = frame.resize(
+            (max(1, round(FRAME_W * factor)), max(1, round(FRAME_H * factor))),
+            Image.Resampling.LANCZOS,
+        )
+        offset_x = round(anchor_x - anchor_x * factor)
+        offset_y = round(anchor_y - anchor_y * factor)
+        cell = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+        cell.alpha_composite(scaled, dest=(max(0, offset_x), max(0, offset_y)),
+                             source=(max(0, -offset_x), max(0, -offset_y)))
+        before = sum(1 for _, a in enumerate(scaled.getdata()) if a[3] > 18)
+        after = sum(1 for _, a in enumerate(cell.getdata()) if a[3] > 18)
+        lost += max(0, before - after)
+        out_image.paste(cell, (index * FRAME_W, 0))
+
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_image.save(out)
+    new_report = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] rescaled {args.role}/{args.action}/{args.dir} x{factor:.3f}: "
+        f"body {current} -> {new_report['medianBodyHeight']}px (target {args.target_height}), "
+        f"clipped {lost}px, warnings {','.join(new_report['warnings']) or 'none'}"
+    )
+    print(f"[sprite-workbench] wrote {out}")
+
+
 def scrub_row(args: argparse.Namespace) -> None:
     # Consolidated from the retired scrub-work-row-particles.mjs one-shot:
     # drop small disconnected alpha components (baked debris, loose chips)
@@ -796,6 +847,13 @@ def main() -> None:
     derive.add_argument("--source-dir", choices=DIRS)
     derive.add_argument("--out", type=Path)
     derive.set_defaults(func=derive_row)
+
+    rescale = sub.add_parser("rescale")
+    target_args(rescale)
+    rescale.add_argument("--target-height", type=float, required=True)
+    rescale.add_argument("--input", type=Path)
+    rescale.add_argument("--out", type=Path)
+    rescale.set_defaults(func=rescale_row)
 
     scrub = sub.add_parser("scrub")
     target_args(scrub)

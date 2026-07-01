@@ -172,6 +172,182 @@
       "sha256": "856c74c5fddece1db744ba0846fd12f77a72833390f1f74446ca4aaec02426d0",
       "status": "accepted"
     },
+    "blacksmith/work/down": {
+      "acceptedAt": "2026-07-01T23:27:44Z",
+      "allowedWarnings": [
+        "direction-scale-mismatch"
+      ],
+      "file": "blacksmith/work-down.png",
+      "note": "Rescaled to walk scale (height delta 2px). Width delta 19px is anvil-in-body composition from side angles, not a scale error.",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 8,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 2.0,
+          "bodyWidthDelta": 19.0,
+          "medianBodyHeight": 81.5,
+          "medianBodyWidth": 57.0,
+          "medianColor": [
+            69.45,
+            48.15,
+            34.25
+          ],
+          "paletteDelta": 2.23
+        },
+        "flickerScore": 18.4,
+        "maxAlphaRatio": 1.137,
+        "maxBodyCenterJump": 3.23,
+        "maxEdgePixels": 23,
+        "maxFragmentPixels": 3,
+        "maxPaletteDrift": 3.84,
+        "medianBodyHeight": 79.5,
+        "medianBodyWidth": 38.0,
+        "medianColor": [
+          71.0,
+          48.25,
+          32.65
+        ],
+        "medianColorCount": 465.0,
+        "medianShadingRatio": 0.7362,
+        "styleEra": "painted",
+        "warnings": [
+          "direction-scale-mismatch"
+        ]
+      },
+      "sha256": "5ffdc0e4418ab72dad02cd1326bc5008ab83b5034d48d30a3952684a014dc341",
+      "status": "accepted-with-waiver"
+    },
+    "blacksmith/work/left": {
+      "acceptedAt": "2026-07-01T23:22:50Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/work-left.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 3,
+        "bodyWidthRange": 13,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 7.5,
+          "medianBodyHeight": 80.5,
+          "medianBodyWidth": 49.5,
+          "medianColor": [
+            69.45,
+            48.15,
+            32.65
+          ],
+          "paletteDelta": 1.6
+        },
+        "flickerScore": 21.6,
+        "maxAlphaRatio": 1.137,
+        "maxBodyCenterJump": 2.92,
+        "maxEdgePixels": 47,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 7.17,
+        "medianBodyHeight": 81.5,
+        "medianBodyWidth": 57.0,
+        "medianColor": [
+          69.45,
+          48.15,
+          34.25
+        ],
+        "medianColorCount": 499.5,
+        "medianShadingRatio": 0.6809,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "eefb47126ee89f5219179d1a66070a8f8e9df79888dd1363171083e334ac18d0",
+      "status": "accepted"
+    },
+    "blacksmith/work/right": {
+      "acceptedAt": "2026-07-01T23:22:52Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/work-right.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 3,
+        "bodyWidthRange": 13,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 7.5,
+          "medianBodyHeight": 80.5,
+          "medianBodyWidth": 49.5,
+          "medianColor": [
+            69.45,
+            48.15,
+            32.65
+          ],
+          "paletteDelta": 1.6
+        },
+        "flickerScore": 21.6,
+        "maxAlphaRatio": 1.137,
+        "maxBodyCenterJump": 2.92,
+        "maxEdgePixels": 47,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 7.17,
+        "medianBodyHeight": 81.5,
+        "medianBodyWidth": 57.0,
+        "medianColor": [
+          69.45,
+          48.15,
+          34.25
+        ],
+        "medianColorCount": 499.5,
+        "medianShadingRatio": 0.6809,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "dd57044c4f4b4b5d6e405be6defbf306ce271180d0bf44028c7bbb3dd811fad7",
+      "status": "accepted"
+    },
+    "blacksmith/work/up": {
+      "acceptedAt": "2026-07-01T23:22:47Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/work-up.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 4,
+        "bodyWidthRange": 13,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 7.5,
+          "medianBodyHeight": 81.5,
+          "medianBodyWidth": 57.0,
+          "medianColor": [
+            69.45,
+            48.15,
+            34.25
+          ],
+          "paletteDelta": 8.7
+        },
+        "flickerScore": 27.8,
+        "maxAlphaRatio": 1.124,
+        "maxBodyCenterJump": 5.41,
+        "maxEdgePixels": 38,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.48,
+        "medianBodyHeight": 80.5,
+        "medianBodyWidth": 49.5,
+        "medianColor": [
+          64.55,
+          42.8,
+          29.45
+        ],
+        "medianColorCount": 385.5,
+        "medianShadingRatio": 0.7192,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "971456f0ffe9116d3e5ed06b6bd3594915397f3150aeaee8d0bb13d15c3a16cb",
+      "status": "accepted"
+    },
     "builder/idle/down": {
       "acceptedAt": "2026-07-01T22:19:16Z",
       "allowedWarnings": [],
@@ -342,6 +518,178 @@
         "warnings": []
       },
       "sha256": "5446967dd1141a9f971d2d8f9aa2af0fe08a8d7beb943a601bdabfc0f91edeb3",
+      "status": "accepted"
+    },
+    "builder/work/down": {
+      "acceptedAt": "2026-07-01T23:26:14Z",
+      "allowedWarnings": [],
+      "file": "builder/work-down.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 3,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 11.0,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 51.5,
+          "medianColor": [
+            97.8,
+            64.1,
+            31.35
+          ],
+          "paletteDelta": 15.74
+        },
+        "flickerScore": 9.6,
+        "maxAlphaRatio": 1.08,
+        "maxBodyCenterJump": 3.37,
+        "maxEdgePixels": 46,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.1,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 40.5,
+        "medianColor": [
+          109.1,
+          75.0,
+          32.4
+        ],
+        "medianColorCount": 585.5,
+        "medianShadingRatio": 0.6875,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "bfc93e24f0d68edd25258510701afb16e4832c3317c1a6311b25289adc39a0e0",
+      "status": "accepted"
+    },
+    "builder/work/left": {
+      "acceptedAt": "2026-07-01T23:26:24Z",
+      "allowedWarnings": [],
+      "file": "builder/work-left.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 11.0,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 40.5,
+          "medianColor": [
+            97.8,
+            64.8,
+            31.35
+          ],
+          "paletteDelta": 0.7
+        },
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.118,
+        "maxBodyCenterJump": 2.02,
+        "maxEdgePixels": 44,
+        "maxFragmentPixels": 1,
+        "maxPaletteDrift": 2.88,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 51.5,
+        "medianColor": [
+          97.8,
+          64.1,
+          31.35
+        ],
+        "medianColorCount": 616.0,
+        "medianShadingRatio": 0.6864,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "ff72f01a37b707420376b39b540f1ef96836869577933362be1eecfa7ad03919",
+      "status": "accepted"
+    },
+    "builder/work/right": {
+      "acceptedAt": "2026-07-01T23:26:29Z",
+      "allowedWarnings": [],
+      "file": "builder/work-right.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 5,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 11.0,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 40.5,
+          "medianColor": [
+            97.8,
+            64.8,
+            31.35
+          ],
+          "paletteDelta": 0.7
+        },
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.118,
+        "maxBodyCenterJump": 2.02,
+        "maxEdgePixels": 44,
+        "maxFragmentPixels": 1,
+        "maxPaletteDrift": 2.88,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 51.5,
+        "medianColor": [
+          97.8,
+          64.1,
+          31.35
+        ],
+        "medianColorCount": 616.0,
+        "medianShadingRatio": 0.6864,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "7c0e37b4da8bcb7490bb1b8abb12e93a6e39a4a4960a0d7d0ab46bb561ee95b1",
+      "status": "accepted"
+    },
+    "builder/work/up": {
+      "acceptedAt": "2026-07-01T23:26:19Z",
+      "allowedWarnings": [],
+      "file": "builder/work-up.png",
+      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 11.5,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 51.5,
+          "medianColor": [
+            97.8,
+            64.1,
+            31.35
+          ],
+          "paletteDelta": 2.94
+        },
+        "flickerScore": 7.6,
+        "maxAlphaRatio": 1.125,
+        "maxBodyCenterJump": 2.31,
+        "maxEdgePixels": 42,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 6.58,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 40.0,
+        "medianColor": [
+          95.55,
+          64.8,
+          29.6
+        ],
+        "medianColorCount": 452.0,
+        "medianShadingRatio": 0.7534,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "ea0524b9d434c251d10557da19a1c7337b0ac632a2046aca08b13065d7146b83",
       "status": "accepted"
     },
     "farmer/idle/down": {
@@ -2508,92 +2856,188 @@
       "sha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
       "status": "accepted"
     },
+    "guard/work/down": {
+      "acceptedAt": "2026-07-01T23:22:54Z",
+      "allowedWarnings": [],
+      "file": "guard/work-down.png",
+      "note": "Work row rescaled to the walk-family body scale.",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 2,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 4,
+        "directionReference": {
+          "bodyHeightDelta": 4.0,
+          "bodyWidthDelta": 4.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 37.0,
+          "medianColor": [
+            70.5,
+            65.15,
+            69.45
+          ],
+          "paletteDelta": 10.95
+        },
+        "flickerScore": 23.3,
+        "maxAlphaRatio": 1.104,
+        "maxBodyCenterJump": 8.17,
+        "maxEdgePixels": 20,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 8.57,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 41.0,
+        "medianColor": [
+          79.05,
+          71.25,
+          66.35
+        ],
+        "medianColorCount": 728.0,
+        "medianShadingRatio": 0.6682,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "eff0caa6b53a3e8ab541dc793d864628377ccfe5ee57fdfc0763ebe98f68ac8c",
+      "status": "accepted"
+    },
     "guard/work/left": {
-      "acceptedAt": "2026-06-26T04:37:17Z",
+      "acceptedAt": "2026-07-01T23:22:58Z",
       "allowedWarnings": [
-        "direction-scale-mismatch"
+        "edge-contact"
       ],
       "file": "guard/work-left.png",
-      "note": "Removed tiny cropped edge fragments from the spear-thrust side-work frame while preserving the painted guard body and weapon reach; side/front scale mismatch remains for a future full guard repaint.",
-      "provenance": "edge-fragment-clean",
+      "note": "Rescaled from the 51px waived rows to walk-family scale; spear reach touches the cell edge by design.",
+      "provenance": "uniform-anchor-rescale",
       "quality": {
-        "bodyBottomRange": 4,
-        "bodyHeightRange": 10,
-        "bodyWidthRange": 6,
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 9,
+        "bodyWidthRange": 14,
         "directionReference": {
-          "bodyHeightDelta": 10.5,
-          "bodyWidthDelta": 2.0,
-          "medianBodyHeight": 61.5,
-          "medianBodyWidth": 27.5,
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 0.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 37.0,
           "medianColor": [
             76.95,
-            69.6,
-            68.35
+            69.35,
+            67.35
           ],
-          "paletteDelta": 8.19
+          "paletteDelta": 7.98
         },
-        "flickerScore": 41.0,
-        "maxAlphaRatio": 1.084,
-        "maxBodyCenterJump": 5.92,
-        "maxEdgePixels": 0,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 3.26,
-        "medianBodyHeight": 51.0,
-        "medianBodyWidth": 25.5,
+        "flickerScore": 50.1,
+        "maxAlphaRatio": 1.133,
+        "maxBodyCenterJump": 8.42,
+        "maxEdgePixels": 83,
+        "maxFragmentPixels": 1,
+        "maxPaletteDrift": 3.24,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 37.0,
         "medianColor": [
-          70.3,
-          64.9,
-          69.2
+          70.5,
+          65.15,
+          69.45
         ],
+        "medianColorCount": 538.5,
+        "medianShadingRatio": 0.7328,
+        "styleEra": "painted",
         "warnings": [
-          "direction-scale-mismatch"
+          "edge-contact"
         ]
       },
-      "sha256": "7db172455c741f34fbefd18ae0c8e6ab0c6a729f1a040243f9bcff3059f16ca6",
+      "sha256": "18ad061d0a614305903c1d81ad727c16cb56c911e86deab4c6d43fde770b3781",
       "status": "accepted-with-waiver"
     },
     "guard/work/right": {
-      "acceptedAt": "2026-06-26T04:37:18Z",
+      "acceptedAt": "2026-07-01T23:23:01Z",
       "allowedWarnings": [
-        "direction-scale-mismatch"
+        "edge-contact"
       ],
       "file": "guard/work-right.png",
-      "note": "Removed tiny cropped edge fragments from the spear-thrust side-work frame while preserving the painted guard body and weapon reach; side/front scale mismatch remains for a future full guard repaint.",
-      "provenance": "edge-fragment-clean",
+      "note": "Rescaled from the 51px waived rows to walk-family scale; spear reach touches the cell edge by design.",
+      "provenance": "uniform-anchor-rescale",
       "quality": {
-        "bodyBottomRange": 4,
-        "bodyHeightRange": 10,
-        "bodyWidthRange": 6,
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 9,
+        "bodyWidthRange": 14,
         "directionReference": {
-          "bodyHeightDelta": 10.5,
-          "bodyWidthDelta": 2.0,
-          "medianBodyHeight": 61.5,
-          "medianBodyWidth": 27.5,
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 0.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 37.0,
           "medianColor": [
             76.95,
-            69.6,
-            68.35
+            69.35,
+            67.35
           ],
-          "paletteDelta": 8.19
+          "paletteDelta": 7.98
         },
-        "flickerScore": 41.0,
-        "maxAlphaRatio": 1.084,
-        "maxBodyCenterJump": 5.92,
-        "maxEdgePixels": 0,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 3.26,
-        "medianBodyHeight": 51.0,
-        "medianBodyWidth": 25.5,
+        "flickerScore": 50.1,
+        "maxAlphaRatio": 1.133,
+        "maxBodyCenterJump": 8.42,
+        "maxEdgePixels": 83,
+        "maxFragmentPixels": 1,
+        "maxPaletteDrift": 3.24,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 37.0,
         "medianColor": [
-          70.3,
-          64.9,
-          69.2
+          70.5,
+          65.15,
+          69.45
         ],
+        "medianColorCount": 538.5,
+        "medianShadingRatio": 0.7328,
+        "styleEra": "painted",
         "warnings": [
-          "direction-scale-mismatch"
+          "edge-contact"
         ]
       },
-      "sha256": "29f093ec85352d1a6cbcf14d8f931d01187434a762eac29c7e5a8db611a46788",
+      "sha256": "1fc0a3cb18a23df1362cebf2b7f02bf41f2cd5d3515656781b79c6a962bed12b",
+      "status": "accepted-with-waiver"
+    },
+    "guard/work/up": {
+      "acceptedAt": "2026-07-01T23:22:56Z",
+      "allowedWarnings": [
+        "body-center-jump"
+      ],
+      "file": "guard/work-up.png",
+      "note": "Rescaled to walk scale; inherited body-center-jump queued for the jitter pass.",
+      "provenance": "uniform-anchor-rescale",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 3,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 2.0,
+          "bodyWidthDelta": 7.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 37.0,
+          "medianColor": [
+            70.5,
+            65.15,
+            69.45
+          ],
+          "paletteDelta": 7.98
+        },
+        "flickerScore": 34.0,
+        "maxAlphaRatio": 1.051,
+        "maxBodyCenterJump": 9.72,
+        "maxEdgePixels": 12,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.16,
+        "medianBodyHeight": 74.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          76.95,
+          69.35,
+          67.35
+        ],
+        "medianColorCount": 636.0,
+        "medianShadingRatio": 0.6782,
+        "styleEra": "painted",
+        "warnings": [
+          "body-center-jump"
+        ]
+      },
+      "sha256": "a6a9e68c8234e1334405ecdc773e17bac51124af1e73ba3d3eb18fe51a0ca01c",
       "status": "accepted-with-waiver"
     },
     "innkeeper/carry/down": {
@@ -7478,6 +7922,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T22:57:23Z",
+  "updatedAt": "2026-07-01T23:27:44Z",
   "version": 1
 }
