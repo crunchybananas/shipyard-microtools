@@ -15,7 +15,7 @@ import { Game } from './puzzles.js';
 import { UI } from './ui.js';
 import { KEEPER } from './content.js';
 import A from './audio.js';
-import { clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED } from './util.js';
+import { Baker, mergeGeometries, clamp, lerp, easeInOut, smoothstep, TAU, mulberry32, SEED } from './util.js';
 
 const canvas = document.getElementById('scene');
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -64,6 +64,10 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.06;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// stats we can trust: with autoReset, every composer pass resets renderer.info, so the debug
+// panel always read the LAST pass — 1 draw, 1 triangle. Reset manually once per tick instead
+// (in the animation loop), so draws/tris cover the whole frame: scene + shadow + bloom passes.
+renderer.info.autoReset = false;
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xcfe3e8, 0.003);
@@ -260,7 +264,16 @@ scene.add(disagreeLight);
 // ---------------- gulls ----------------
 const gulls = [];
 {
-  const wingMat = new THREE.MeshStandardMaterial({ color: 0xe8e4da, flatShading: true, side: THREE.DoubleSide });
+  const wingMat = new THREE.MeshStandardMaterial({ color: 0xe8e4da, flatShading: false, side: THREE.DoubleSide });
+  // ONE wing geometry and ONE merged body+head geometry shared by the whole flock
+  // (was 4 meshes and 2 fresh geometries per gull — now 3 draws each, smooth-shaded)
+  const wingGeo = new THREE.PlaneGeometry(1.4, 0.4);
+  const bodyCone = new THREE.ConeGeometry(0.13, 0.6, 8);
+  bodyCone.rotateX(Math.PI / 2.15);                       // nose forward, tail riding up
+  const headBall = new THREE.SphereGeometry(0.09, 8, 6);
+  headBall.translate(0, 0.07, 0.33);
+  const gullBodyGeo = mergeGeometries([bodyCone, headBall]);
+  bodyCone.dispose(); headBall.dispose();
   // a WHEELING FLOCK over the island (loop: life). Varied radius/height/speed (some negative =
   // counter-wheeling) so it reads as a living gyre, not identical circles — and several fly LOW + CLOSE
   // so you actually see gulls pass overhead, not two specks at 50 m. gulls[0] still leaves the gyre to
@@ -277,17 +290,13 @@ const gulls = [];
   ];
   for (const f of FLOCK) {
     const g = new THREE.Group();
-    const l = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.4), wingMat);
+    const l = new THREE.Mesh(wingGeo, wingMat);
     l.position.x = -0.7;
-    const r = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.4), wingMat);
+    const r = new THREE.Mesh(wingGeo, wingMat);
     r.position.x = 0.7;
     // a body between the wings — songbird recipe, gull proportions —
     // so the dawn percher reads as a bird up close, not two cards
-    const body = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.6, 6), wingMat);
-    body.rotation.x = Math.PI / 2.15;   // nose forward, tail riding up
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), wingMat);
-    head.position.set(0, 0.07, 0.33);
-    g.add(l, r, body, head);
+    g.add(l, r, new THREE.Mesh(gullBodyGeo, wingMat));
     g.userData = { phase: f.phase, radius: f.radius, h: f.h, speed: f.speed, l, r };
     scene.add(g);
     gulls.push(g);
@@ -318,22 +327,51 @@ const addWings = (g, mat) => {
   g.add(lw, rw); g.lw = lw; g.rw = rw;
 };
 
+// ---------------- perched-bird bodies ----------------
+// One merged, vertex-coloured geometry per species (via the Baker): the resting body was five
+// meshes across three materials PER BIRD — 45 draw calls of tiny 7×6-segment spheres that read
+// visibly faceted at flush distance. Now each bird is 1 smooth body draw (+2 wings), and both
+// species share one material. Part sizes/poses match the old builders exactly.
+const birdBodyMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0.06 });
+const bakeBirdGeo = (parts) => {
+  const b = new Baker();
+  const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3(), S = new THREE.Vector3();
+  for (const [geo, col, x, y, z, rx = 0, sx = 1, sy = 1, sz = 1] of parts) {
+    b.add(geo, M.compose(V.set(x, y, z), Q.setFromEuler(E.set(rx, 0, 0)), S.set(sx, sy, sz)), col);
+    geo.dispose();
+  }
+  return b.build();
+};
+const gullGeo = (() => {
+  const white = new THREE.Color(0xe7e3d8), grey = new THREE.Color(0x95938b), beak = new THREE.Color(0xd6a233);
+  return bakeBirdGeo([
+    [new THREE.SphereGeometry(0.16, 10, 8), white, 0, 0.17, 0, 0, 1, 0.86, 1.62],          // body
+    [new THREE.SphereGeometry(0.155, 10, 7), grey, 0, 0.25, -0.02, 0, 0.92, 0.46, 1.5],    // mantle (folded wings / back)
+    [new THREE.ConeGeometry(0.085, 0.26, 6), grey, 0, 0.18, -0.32, -1.95],                 // tail
+    [new THREE.SphereGeometry(0.097, 10, 8), white, 0, 0.36, 0.25],                        // head
+    [new THREE.ConeGeometry(0.028, 0.12, 6), beak, 0, 0.355, 0.38, Math.PI / 2],           // beak
+  ]);
+})();
+const crowGeo = (() => {
+  const blk = new THREE.Color(0x2e3035), blkD = new THREE.Color(0x1c1e22);
+  return bakeBirdGeo([
+    [new THREE.SphereGeometry(0.15, 10, 8), blk, 0, 0.16, 0, 0, 0.92, 0.8, 1.9],           // sleeker body
+    [new THREE.SphereGeometry(0.145, 10, 7), blkD, 0, 0.24, -0.04, 0, 0.88, 0.42, 1.6],    // mantle
+    [new THREE.ConeGeometry(0.075, 0.4, 6), blkD, 0, 0.16, -0.44, -1.72],                  // longer tail
+    [new THREE.SphereGeometry(0.092, 10, 8), blk, 0, 0.34, 0.27],                          // head
+    [new THREE.ConeGeometry(0.03, 0.17, 6), blkD, 0, 0.335, 0.44, Math.PI / 2],            // longer beak
+  ]);
+})();
+
 // ---------------- perched shore gulls ----------------
 // gulls resting on the south shingle — the first life you meet at the wake-up beach. They startle and
 // flush off when you come close, and settle back once you've moved on. Static when perched (verifiable);
 // added to `scene` (not core) → no 1:240 model clone. Surface + day only.
 const perched = [];
 {
-  const white = new THREE.MeshStandardMaterial({ color: 0xe7e3d8, flatShading: true, roughness: 0.82 });
-  const grey  = new THREE.MeshStandardMaterial({ color: 0x95938b, flatShading: true, roughness: 0.85 });
-  const beakM = new THREE.MeshStandardMaterial({ color: 0xd6a233, flatShading: true, roughness: 0.7 });
   const mk = () => {
     const g = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.16, 7, 6), white); body.scale.set(1, 0.86, 1.62); body.position.y = 0.17; g.add(body);
-    const mantle = new THREE.Mesh(new THREE.SphereGeometry(0.155, 7, 5), grey); mantle.scale.set(0.92, 0.46, 1.5); mantle.position.set(0, 0.25, -0.02); g.add(mantle);   // folded wings / back
-    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.26, 4), grey); tail.rotation.x = -1.95; tail.position.set(0, 0.18, -0.32); g.add(tail);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.097, 7, 6), white); head.position.set(0, 0.36, 0.25); g.add(head);
-    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.12, 4), beakM); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.355, 0.38); g.add(beak);
+    g.add(new THREE.Mesh(gullGeo, birdBodyMat));
     addWings(g, gullWingMat);
     return g;
   };
@@ -359,15 +397,9 @@ const perched = [];
 // quiet (life persisting in the keeper's absence). Reuses the perched-bird model with dark plumage +
 // a sleeker body / longer tail + beak, and the same `perched` idle+flush logic. scene-only (no clone).
 {
-  const blk  = new THREE.MeshStandardMaterial({ color: 0x2e3035, flatShading: true, roughness: 0.68, metalness: 0.12 });
-  const blkD = new THREE.MeshStandardMaterial({ color: 0x1c1e22, flatShading: true, roughness: 0.72, metalness: 0.12 });
   const mkCrow = () => {
     const g = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.15, 7, 6), blk); body.scale.set(0.92, 0.8, 1.9); body.position.y = 0.16; g.add(body);
-    const mantle = new THREE.Mesh(new THREE.SphereGeometry(0.145, 7, 5), blkD); mantle.scale.set(0.88, 0.42, 1.6); mantle.position.set(0, 0.24, -0.04); g.add(mantle);
-    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.4, 4), blkD); tail.rotation.x = -1.72; tail.position.set(0, 0.16, -0.44); g.add(tail);     // longer tail
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.092, 7, 6), blk); head.position.set(0, 0.34, 0.27); g.add(head);
-    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.17, 4), blkD); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.335, 0.44); g.add(beak);  // longer beak
+    g.add(new THREE.Mesh(crowGeo, birdBodyMat));
     addWings(g, crowWingMat);
     return g;
   };
@@ -476,6 +508,14 @@ function endIntro() {
   save(player.pos);
 }
 
+// shared scratch for the cinematic ticks — they run every frame through the dive/ascent/
+// finale, so they must not allocate (GC pauses read as stutter mid-cinematic)
+const _cinE = new THREE.Euler(0, 0, 0, 'YXZ');
+const _cinQ = new THREE.Quaternion();
+const _cinM = new THREE.Matrix4();
+const _cinUp = new THREE.Vector3(0, 1, 0);
+const _cinV = new THREE.Vector3();
+
 // ---------------- the dive ----------------
 function startDive() {
   MODE = 'dive';
@@ -513,8 +553,8 @@ function tickDive(dt) {
 
     // camera: gaze down into the model, then lift to the growing horizon
     const lookDown = Math.sin(Math.min(f * 2.4, 1) * Math.PI) * 0.9;
-    const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-lookDown, player.yaw + f * 0.4, 0, 'YXZ'));
-    camera.quaternion.slerpQuaternions(dive.startQuat, q, Math.min(1, f * 5));
+    _cinQ.setFromEuler(_cinE.set(-lookDown, player.yaw + f * 0.4, 0));
+    camera.quaternion.slerpQuaternions(dive.startQuat, _cinQ, Math.min(1, f * 5));
   }
 
   if (f > 0.86 && !dive.fading) {
@@ -664,8 +704,8 @@ function tickAscent(dt) {
       ascent.pivot.z * (1 - s));
     // camera: lift away from the world drawing in below you
     const lookUp = Math.sin(Math.min(f * 2.4, 1) * Math.PI) * 0.6;
-    const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(lookUp, player.yaw - f * 0.4, 0, 'YXZ'));
-    camera.quaternion.slerpQuaternions(ascent.startQuat, q, Math.min(1, f * 5));
+    _cinQ.setFromEuler(_cinE.set(lookUp, player.yaw - f * 0.4, 0));
+    camera.quaternion.slerpQuaternions(ascent.startQuat, _cinQ, Math.min(1, f * 5));
   }
   if (f > 0.86 && !ascent.fading) {
     ascent.fading = true;
@@ -816,9 +856,8 @@ function tickOarFinale(dt) {
   for (let i = 0; i < 5; i++) skyMat.uniforms.uConstelGlow.value[i] = 0;
   // camera: rise and drift seaward off the beach, always looking back at the island
   camera.position.lerpVectors(finale.camStart, finale.camEnd, e);
-  const look = new THREE.Matrix4().lookAt(camera.position, finale.lookAt, new THREE.Vector3(0, 1, 0));
-  const q = new THREE.Quaternion().setFromRotationMatrix(look);
-  camera.quaternion.slerpQuaternions(finale.quatStart, q, Math.min(1, finale.t * 0.3));
+  _cinQ.setFromRotationMatrix(_cinM.lookAt(camera.position, finale.lookAt, _cinUp));
+  camera.quaternion.slerpQuaternions(finale.quatStart, _cinQ, Math.min(1, finale.t * 0.3));
   // the whole world shrinks toward the island's heart, becoming a tiny lit model floating on
   // the dark sea (the inverse-swell, run one last time) — clamped to a readable model size
   // (1/48), not the dive's vanishing 1/240 speck: the held final image must stay legible.
@@ -859,9 +898,8 @@ function tickFinale(dt) {
   // gaze down at the lighthouse, then lift to the north sky as the
   // credits land — that's where the constellation waits
   const lookY = lerp(LH.y + 8, LH.y + 260, easeInOut(clamp((finale.t - 8) / 6, 0, 1)));
-  const look = new THREE.Matrix4().lookAt(camera.position, new THREE.Vector3(LH.x, lookY, LH.z), new THREE.Vector3(0, 1, 0));
-  const q = new THREE.Quaternion().setFromRotationMatrix(look);
-  camera.quaternion.slerpQuaternions(finale.quatStart, q, Math.min(1, f * 4));
+  _cinQ.setFromRotationMatrix(_cinM.lookAt(camera.position, _cinV.set(LH.x, lookY, LH.z), _cinUp));
+  camera.quaternion.slerpQuaternions(finale.quatStart, _cinQ, Math.min(1, f * 4));
   // the constellation ignites note by note as the day wheels into night — but
   // the deep ending withholds it: no night comes, so the stars never gather
   for (let i = 0; i < 5; i++) {
@@ -1070,12 +1108,23 @@ function applyAtmosphere(elapsed, dt) {
   vaultGlow.intensity = W.flags.hatchOpen ? 42 * (1 + 0.07 * Math.sin(elapsed * 1.3)) : 0;
   vaultFill.intensity = W.flags.hatchOpen ? 12 : 0;
   disagreeLight.intensity = W.flags.hatchOpen ? 13 : 0;
+  // the Vault Beneath is INTERIOR backstage: its 44m cavern (and the black water + inverted
+  // lighthouse inside) stands far taller than the low coast east of the bluff, so from the
+  // west shore the whole box loomed on the horizon as a fog-grey monolith (pre-existing bug,
+  // caught in this pass). It is only ever legitimately seen through the cellar's east window
+  // — render it only while the player is actually down in the cellar. (The model clone prunes
+  // vaultVista, so this drives the real island only.)
+  const inCellar = Math.abs(player.pos.x - SPOTS.hatch.x) < 6.5 &&
+    player.pos.z > SPOTS.hatch.y - 18.5 && player.pos.z < SPOTS.hatch.y + 1.5 &&
+    player.pos.y < 23.2;
+  if (refs.vaultVista) refs.vaultVista.visible = inCellar;
   // slow drips falling the height of the void — scale cues (vanish at the water,
-  // reappear at the roof); only while the vault is open
+  // reappear at the roof); only while the vault is open AND you're down there to see it
+  // (emissive drips would otherwise hang in the open sky where the hidden cavern stood)
   if (vaultDrips) {
     // hidden during any finale: the oar terminal's sea look-back would otherwise expose this
     // cellar backstage (a returned player has hatchOpen=true, so this drive re-shows it)
-    vaultDrips.visible = W.flags.hatchOpen && MODE !== 'finale';
+    vaultDrips.visible = W.flags.hatchOpen && MODE !== 'finale' && inCellar;
     if (W.flags.hatchOpen) for (const d of vaultDrips.children) {
       const u = d.userData;
       u.phase = (u.phase + dt * u.speed) % 1;
@@ -1548,6 +1597,7 @@ renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
   if (nowMs - lastTickMs < 12.5) return; // 60fps cap; never drops a 60Hz frame
   lastTickMs = nowMs;
+  renderer.info.reset();                 // autoReset is off — one reset per tick = whole-frame stats
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
   fps = lerp(fps, 1 / Math.max(dt, 1e-4), 0.05);

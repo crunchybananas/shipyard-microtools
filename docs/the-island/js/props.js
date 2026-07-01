@@ -4,7 +4,8 @@
 // in BOTH instances of the island (real and chart-table model).
 
 import * as THREE from 'three';
-import { Baker, mulberry32, SEED, vary, clamp, lerp, TAU } from './util.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, TAU } from './util.js';
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
@@ -17,18 +18,22 @@ export const BOX_MELODY = [2, 3, 4, 1, 0];   // stone indices: E G A D C
 export const BIRD_MELODY = [2, 3, 4, 3, 0];  // E G A G C — the bird corrects one note
 
 // ---- shared materials -------------------------------------------------------
+// flatShading OFF on the curved-surface materials (owner: "polygons are low"): the Baker
+// preserves each primitive's SOURCE normals, so cylinders/spheres/domes shade smooth and
+// round while boxes (steps, shelves, books) keep their hard face normals — the tower stops
+// banding into vertical facets without costing a single extra triangle.
 export const matStone = new THREE.MeshStandardMaterial({
-  vertexColors: true, flatShading: true, roughness: 0.92, metalness: 0.0, side: THREE.DoubleSide,
+  vertexColors: true, flatShading: false, roughness: 0.92, metalness: 0.0, side: THREE.DoubleSide,
 });
 applyRelief(matStone, 'stone', { normalScale: 0.85, strength: 2.4 });   // granite over the lighthouse/
                                     // study/stones — multiplies the vertex colours (bone walls → granite,
                                     // the copper band stays coppery) + a derived normal map so the mortar
                                     // lines and block faces catch the raking sun and the keeper's lamp
 export const matBrass = new THREE.MeshStandardMaterial({
-  vertexColors: true, flatShading: true, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
+  vertexColors: true, flatShading: false, roughness: 0.38, metalness: 0.85, side: THREE.DoubleSide,
 });
 const matBrassSolid = new THREE.MeshStandardMaterial({
-  color: 0xb08d4f, flatShading: true, roughness: 0.35, metalness: 0.9,
+  color: 0xb08d4f, flatShading: false, roughness: 0.35, metalness: 0.9,
 });
 const matWood = new THREE.MeshStandardMaterial({
   color: 0x8f7a5c, flatShading: true, roughness: 0.85, metalness: 0.0,  // lightened so the wood grain reads
@@ -335,7 +340,9 @@ export function buildWorld() {
   }
 
   const waterMat = makeWaterMaterial(heightTex, DOMAIN);
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(DOMAIN, DOMAIN, 120, 120), waterMat);
+  // 96 segments (was 120): the longest wave in the vertex shader is ~63m, so a 6.5m grid
+  // still oversamples it 10x — indistinguishable, and ~20k fewer tris with the model clone
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(DOMAIN, DOMAIN, 96, 96), waterMat);
   water.geometry.rotateX(-Math.PI / 2);
   water.name = 'water';
   water.renderOrder = 2;
@@ -371,7 +378,7 @@ export function buildWorld() {
   const baseR = 5.2, baseH = 4.6, wallT = 0.5;
   for (const [a0, a1] of arcs) {
     const len = a1 - a0;
-    const geo = new THREE.CylinderGeometry(baseR, baseR + 0.15, baseH, Math.max(6, Math.round(len * 8)), 1, true, a0, len);
+    const geo = new THREE.CylinderGeometry(baseR, baseR + 0.15, baseH, Math.max(10, Math.round(len * 16)), 1, true, a0, len);
     stone.add(geo, place(0, baseH / 2, 0).clone().premultiply(new THREE.Matrix4().makeTranslation(LH.x, LH.y, LH.z)), grad(C.boneDark, C.bone));
     geo.dispose();
   }
@@ -405,11 +412,11 @@ export function buildWorld() {
   }
   // tower (tapered) + gallery + lamp room + dome
   {
-    const tower = new THREE.CylinderGeometry(2.45, 4.05, 15.9, 14, 4, true);
+    const tower = new THREE.CylinderGeometry(2.45, 4.05, 15.9, 28, 4, true);
     stone.add(tower, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH + 7.95, LH.z), (t) =>
       t > 0.55 && t < 0.72 ? C.copperDark.clone() : C.bone.clone().lerp(C.boneDark, 1 - t)); // painted band
     tower.dispose();
-    const gallery = new THREE.CylinderGeometry(3.3, 3.3, 0.35, 16);
+    const gallery = new THREE.CylinderGeometry(3.3, 3.3, 0.35, 24);
     brass.add(gallery, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 20.6, LH.z), grad(C.brassDark, C.brass));
     gallery.dispose();
     for (let i = 0; i < 10; i++) {
@@ -418,7 +425,7 @@ export function buildWorld() {
       brass.add(post, new THREE.Matrix4().makeTranslation(LH.x + Math.sin(a) * 3.1, LH.y + 21.3, LH.z + Math.cos(a) * 3.1), grad(C.brassDark, C.brass));
       post.dispose();
     }
-    const rail = new THREE.TorusGeometry(3.1, 0.05, 5, 24);
+    const rail = new THREE.TorusGeometry(3.1, 0.05, 8, 48);
     rail.rotateX(Math.PI / 2);
     brass.add(rail, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 21.8, LH.z), grad(C.brass, C.brass));
     rail.dispose();
@@ -429,16 +436,18 @@ export function buildWorld() {
       brass.add(post, new THREE.Matrix4().makeTranslation(LH.x + Math.sin(a) * 2.0, LH.y + 22.05, LH.z + Math.cos(a) * 2.0), grad(C.brassDark, C.brass));
       post.dispose();
     }
-    const dome = new THREE.ConeGeometry(2.55, 2.3, 12);
-    stone.add(dome, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 24.45, LH.z), grad(C.copperDark, C.copper));
+    // a true curved cupola (was a 12-gon cone that read as a paper hat): hemisphere squashed
+    // to the cone's exact height/footprint, base at 23.3 → apex 25.6, eaves overhang kept
+    const dome = new THREE.SphereGeometry(2.55, 24, 12, 0, TAU, 0, Math.PI / 2);
+    stone.add(dome, place(LH.x, LH.y + 23.3, LH.z, 0, 1, 2.3 / 2.55, 1), grad(C.copperDark, C.copper));
     dome.dispose();
-    const finial = new THREE.SphereGeometry(0.22, 8, 6);
+    const finial = new THREE.SphereGeometry(0.22, 10, 7);
     brass.add(finial, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 25.8, LH.z), grad(C.brass, C.brass));
     finial.dispose();
   }
   // glass for lamp room + window
   {
-    const lampGlass = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 2.4, 16, 1, true), matGlass);
+    const lampGlass = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 2.4, 24, 1, true), matGlass);
     lampGlass.position.set(0, 22.05, 0);
     lhGroup.add(lampGlass);
     // the study window: a GLAZED pane + a cross of glazing bars, so it reads as a window and not a hole
@@ -832,13 +841,13 @@ export function buildWorld() {
     // (gap centred az195° from the annex, thetaStart aa+220) so the inner door stands in a true
     // doorway and you look straight in at the keeper's room instead of obliquely past a solid wall.
     const ax = LH.x + Math.sin(aa) * (baseR + 2.9), az = LH.z + Math.cos(aa) * (baseR + 2.9);
-    const wall = new THREE.CylinderGeometry(2.7, 2.8, 3.4, 12, 1, true, aa + deg(220), deg(280));
+    const wall = new THREE.CylinderGeometry(2.7, 2.8, 3.4, 20, 1, true, aa + deg(220), deg(280));
     stone.add(wall, new THREE.Matrix4().makeTranslation(ax, LH.y + 1.7, az), grad(C.boneDark, C.bone));
     wall.dispose();
-    const roof = new THREE.ConeGeometry(3.0, 1.4, 12);
+    const roof = new THREE.ConeGeometry(3.0, 1.4, 18);
     stone.add(roof, new THREE.Matrix4().makeTranslation(ax, LH.y + 4.1, az), grad(C.copperDark, C.copper));
     roof.dispose();
-    const afloor = new THREE.CylinderGeometry(2.8, 2.8, 0.2, 12);
+    const afloor = new THREE.CylinderGeometry(2.8, 2.8, 0.2, 16);
     stone.add(afloor, new THREE.Matrix4().makeTranslation(ax, LH.y - 0.03, az), grad(C.stoneOld, C.boneDark));
     afloor.dispose();
 
@@ -950,8 +959,8 @@ export function buildWorld() {
     q.position.set(ax, LH.y, az);
     q.rotation.y = aa;                       // local +z → far wall, +x → along it
     core.add(q);
-    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a4632, flatShading: true, roughness: 0.92 });
-    const ironMat = new THREE.MeshStandardMaterial({ color: 0x20242a, flatShading: true, roughness: 0.8, metalness: 0.3 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5a4632, flatShading: false, roughness: 0.92 });
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x20242a, flatShading: false, roughness: 0.8, metalness: 0.3 });
 
     // the cot — against the far-left wall, the blanket cold and unmade
     const cot = new THREE.Group(); cot.position.set(-0.95, 0, 1.35);
@@ -1026,7 +1035,7 @@ export function buildWorld() {
   // change); the existing water hides it and draining reveals it.
   let galleryGlow = null;
   {
-    const drownedMat = new THREE.MeshStandardMaterial({ color: 0x39424a, flatShading: true, roughness: 0.55, metalness: 0.15 });
+    const drownedMat = new THREE.MeshStandardMaterial({ color: 0x39424a, flatShading: false, roughness: 0.55, metalness: 0.15 });
     const ROWS = [0, 8];                              // two colonnades flanking a seaward aisle
     const ZS = [-108, -111.5, -115, -118.5];
     const gallery = new THREE.Group(); gallery.name = 'drownedGallery';
@@ -1081,7 +1090,7 @@ export function buildWorld() {
   // owner's question, answered in space). Additive decorative geometry, no
   // collision/walkability change, set west of the drowned colonnade.
   {
-    const weather = new THREE.MeshStandardMaterial({ color: 0x8a7050, flatShading: true, roughness: 0.95 });
+    const weather = new THREE.MeshStandardMaterial({ color: 0x8a7050, flatShading: false, roughness: 0.95 });
     // weathered driftwood grain on the jetty + dory — the first Bender asset, loaded through
     // the asset manifest (assets.js). They are the only wood props and the only users of this
     // material; the 1:240 model clone shares it (the grain is invisible at that scale). The
@@ -1445,7 +1454,7 @@ export function buildWorld() {
     const ox = SC.x - 11, oz = SC.y - 4;
     const oy = heightAt(ox, oz);
     // rock outcrop
-    const rock = new THREE.IcosahedronGeometry(3.2, 1);
+    const rock = new THREE.IcosahedronGeometry(3.2, 2);
     stone.add(rock, place(ox, oy + 1.2, oz, 0.7, 1.3, 0.9, 1.1), grad(C.stoneOld, C.boneDark));
     rock.dispose();
     // sliding slab door (faces the stones)
@@ -1669,9 +1678,9 @@ export function buildWorld() {
     const vwater = new THREE.Mesh(new THREE.PlaneGeometry(54, 48),
       new THREE.MeshStandardMaterial({ color: 0x070b0e, roughness: 0.35, metalness: 0.25, side: THREE.DoubleSide }));
     vwater.rotation.x = -Math.PI / 2; vwater.position.set(hx + 30, 13.5, cz); vaultVista.add(vwater);
-    const towerMat = new THREE.MeshStandardMaterial({ color: 0x3a444e, flatShading: true, roughness: 0.85 });
+    const towerMat = new THREE.MeshStandardMaterial({ color: 0x3a444e, flatShading: false, roughness: 0.85 });
     const ilx = hx + 30, ilz = cz;                  // the inverted lighthouse, across the void
-    const tower = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 1.1, 24, 12), towerMat);
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 1.1, 24, 16), towerMat);
     tower.position.set(ilx, 34, ilz);               // wide top at the roof (y46), narrow at y22
     vaultVista.add(tower);
     const gallery = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 1.4, 12), towerMat);
@@ -1941,47 +1950,49 @@ function buildVegetation(core, r) {
                       heightAt(x, z + e) - heightAt(x, z - e)) / (2 * e);
   };
   // --- pines, wind-bent ---
-  const trunkGeo = new THREE.CylinderGeometry(0.12, 0.3, 2.6, 6);
+  const trunkGeo = new THREE.CylinderGeometry(0.12, 0.3, 2.6, 10);
   trunkGeo.translate(0, 1.3, 0);
   // A conifer, not a stack of smooth cones (loop #125): OVERLAPPING tiers whose base rims are
   // jagged + drooped, so the silhouette reads as ragged frond-skirts instead of clean geometry.
-  // Factored (loop #139) so TWO silhouettes can share the builder — a broad fir and a slim spruce —
-  // breaking the cloned-shape look that per-tree TONE (#133) alone couldn't fix.
+  // Factored (loop #139) so TWO silhouettes can share the builder — a broad fir and a slim spruce.
+  // Fidelity pass (owner: "polygons are low"): 16 radial segments + a jittered mid ring (was 9
+  // flat facets), SMOOTH normals, and baked per-vertex shading — dark toward the trunk, bright at
+  // the frond tips — so each tier has interior depth before the foliage texture even lands.
+  // (Tree POSITIONS are untouched: the scatter draws from the shared r() stream, not jr().)
   const makeCanopy = ({ n, baseR, taperK, tierH, spacing, lean, jag, droop, seedXor }) => {
     const jr = mulberry32(SEED ^ seedXor);
     const parts = [];
     for (let i = 0; i < n; i++) {
       const t = i / (n - 1);
       const radius = baseR * (1 - t * taperK);              // wide skirt → narrow crown
-      const cone = new THREE.ConeGeometry(radius, tierH, 9, 1, true);   // openEnded (DoubleSide mat)
+      const cone = new THREE.ConeGeometry(radius, tierH, 16, 2, true);   // openEnded (DoubleSide mat)
       const p = cone.attributes.position;
+      const shade = new Float32Array(p.count * 3);
       for (let v = 0; v < p.count; v++) {
-        if (p.getY(v) < -tierH / 2 + 0.02) {                // base-rim vertices → frond tips
+        const y = p.getY(v);
+        if (y < -tierH / 2 + 0.02) {                        // base-rim vertices → frond tips
           const x = p.getX(v), z = p.getZ(v);
           const f = 1 + (jr() - 0.5) * jag;                 // radial jag
           p.setX(v, x * f); p.setZ(v, z * f);
-          p.setY(v, p.getY(v) - jr() * droop);              // droop some fronds down
+          p.setY(v, y - jr() * droop);                      // droop some fronds down
+        } else if (Math.abs(y) < tierH * 0.26) {            // mid ring → gentle organic bulge
+          const f = 1 + (jr() - 0.5) * jag * 0.45;
+          p.setX(v, p.getX(v) * f); p.setZ(v, p.getZ(v) * f);
         }
+        // baked canopy depth: luminance by distance from the axis (≈1.0 mean, so the
+        // per-instance HSL tones keep their tuned brightness)
+        const rr = Math.min(Math.hypot(p.getX(v), p.getZ(v)) / Math.max(radius, 1e-3), 1.15);
+        const s = 0.68 + rr * 0.55;
+        shade[v * 3] = shade[v * 3 + 1] = shade[v * 3 + 2] = s;
       }
+      cone.setAttribute('color', new THREE.BufferAttribute(shade, 3));
       cone.rotateY(i * 1.1);                                 // de-align facets/jags between tiers
       cone.translate(lean * i, 1.85 + i * spacing, 0);       // overlapping stack, gentle lee-lean
       cone.computeVertexNormals();
       parts.push(cone);
     }
-    // merge cones manually (convert to non-indexed FIRST, then size the arrays)
-    const flats = parts.map((p) => p.index ? p.toNonIndexed() : p);
-    let total = 0;
-    for (const p of flats) total += p.attributes.position.count;
-    const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
-    let off = 0;
-    for (const np of flats) {
-      pos.set(np.attributes.position.array, off * 3);
-      nor.set(np.attributes.normal.array, off * 3);
-      off += np.attributes.position.count;
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    const g = mergeGeometries(parts);
+    for (const p of parts) p.dispose();
     return g;
   };
   // A: the broad fir (byte-identical to the loop-#125 canopy — same seed + params, so existing
@@ -2007,9 +2018,11 @@ function buildVegetation(core, r) {
     if (h > 2.5 && h < 8 && Math.hypot(x - SPOTS.stones.x, z - SPOTS.stones.y) > 14) spots.push([x, h - 0.2, z]);
   }
 
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: true, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8a6b48, flatShading: false, roughness: 0.9 }); // base lightened so the bark albedo multiplies to bark, not mud
   applyRelief(trunkMat, 'bark', { normalScale: 0.8, strength: 2.4, roughness: 0.95 });   // grooved bark + derived normal on every trunk + the model clone (shared)
-  const canopyMat = new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.85, vertexColors: false, side: THREE.DoubleSide });
+  // smooth-shaded + vertexColors: the baked tier shading (dark core → bright frond tips)
+  // multiplies under the per-instance HSL tone and the foliage-texture dapple
+  const canopyMat = new THREE.MeshStandardMaterial({ flatShading: false, roughness: 0.85, vertexColors: true, side: THREE.DoubleSide });
   canopyMat.color = new THREE.Color(0x6d7a3e);
   // wind sway via shader patch
   canopyMat.onBeforeCompile = (sh) => {
@@ -2191,35 +2204,33 @@ function buildVegetation(core, r) {
       b.translate(Math.cos(yaw) * 0.03, 0, Math.sin(yaw) * 0.03);  // slight base spread
       blades.push(b);
     }
-    let total = 0;
-    for (const b of blades) total += b.attributes.position.count;
-    const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
-    let off = 0;
-    for (const b of blades) {
-      pos.set(b.attributes.position.array, off * 3);
-      nor.set(b.attributes.normal.array, off * 3);
-      off += b.attributes.position.count;
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    const g = mergeGeometries(blades);
+    for (const b of blades) b.dispose();
     return g;
   })();
   const grassMat = new THREE.MeshStandardMaterial({
-    color: 0xb39a52, flatShading: true, roughness: 0.9, side: THREE.DoubleSide,
+    color: 0xc2a75f, flatShading: true, roughness: 0.9, side: THREE.DoubleSide,
   });
   grassMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = { value: 0 };
     grassMat.userData.shader = sh;
     sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `
       #include <begin_vertex>
+      vGUp = normalMatrix * vec3(0.0, 1.0, 0.0);              // the meadow-floor normal, in view space
       #ifdef USE_INSTANCING
         float gw = instanceMatrix[3].x * 0.31 + instanceMatrix[3].z * 0.23;
         float gt = pow(max(position.y, 0.0), 1.5);            // tips drift most, roots stay put
         transformed.x += sin(uTime * 1.5 + gw) * 0.32 * gt;   // gentle two-axis wave (not a rigid waggle)
         transformed.z += cos(uTime * 1.2 + gw * 1.4) * 0.18 * gt;
       #endif
-    `).replace('void main() {', 'uniform float uTime;\nvoid main() {');
+    `).replace('void main() {', 'uniform float uTime;\nvarying vec3 vGUp;\nvoid main() {');
+    // light every blade with the ground's UP normal (the classic grass trick): a thin vertical
+    // card's own normal faces the horizon, so the sun/hemi lit it near-black — and DoubleSide
+    // back-faces went fully dark. With the meadow-floor normal the tufts take the same light as
+    // the terrain they grow from, from every side, and still dim correctly at night.
+    sh.fragmentShader = sh.fragmentShader
+      .replace('void main() {', 'varying vec3 vGUp;\nvoid main() {')
+      .replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\n  normal = normalize(vGUp);');
   };
 
   const G_MAIN = 3800, G_ISLET = 650;   // fewer instances — each is now a full 5-blade tuft, not one blade
@@ -2235,9 +2246,10 @@ function buildVegetation(core, r) {
     grass.setMatrixAt(gi, m4);
     // per-tuft tone (loop #144): the old hue was locked to gold (.14-.21) → one flat dry dune. Widen
     // toward green with a gv² skew so MOST tufts stay sun-bleached gold but some are lush olive-green,
-    // plus more value range — a living coastal meadow, not uniform dead brush. (× the 0xb39a52 base.)
+    // plus more value range — a living coastal meadow, not uniform dead brush. (× the 0xc2a75f base;
+    // lifted with the up-normal relight so the meadow reads sunlit, not scorched.)
     const gv = r();
-    gcol.setHSL(0.13 + gv * gv * 0.18, 0.34 + r() * 0.26, 0.27 + r() * 0.2);
+    gcol.setHSL(0.13 + gv * gv * 0.18, 0.36 + r() * 0.26, 0.33 + r() * 0.22);
     grass.setColorAt(gi, gcol);
     gi++;
   };
@@ -2266,19 +2278,25 @@ function buildVegetation(core, r) {
   grass.name = 'grass';
   core.add(grass);
 
-  // --- shore rocks: irregular angular boulders, not regular faceted balls (loop #128) ---
-  // Displace an icosahedron's verts (lumpy radial + angular jitter) so each reads as a weathered
-  // boulder; one distinct shape per stone type (granite/basalt/limestone) for free variety.
+  // --- shore rocks: irregular weathered boulders, not regular faceted balls (loop #128) ---
+  // Fidelity pass (owner: "polygons are low"): detail-2 icosahedron (320 faces, was 80) with the
+  // duplicated verts WELDED so smooth normals flow over the whole boulder, displaced by two
+  // octaves of triplanar-blended value noise — continuous everywhere (no seam, no shattering):
+  // broad geologic lumps + small weathered knuckles. The derived crack relief rides on top.
   const makeRock = (seed) => {
-    const g = new THREE.IcosahedronGeometry(1, 1);      // 80 faces (non-indexed)
+    const g = mergeVertices(new THREE.IcosahedronGeometry(1, 2));
     const p = g.attributes.position, v = new THREE.Vector3();
+    const s1 = (seed % 97) * 0.71, s2 = (seed % 61) * 1.13;   // per-type shape offsets
     for (let i = 0; i < p.count; i++) {
       v.fromBufferAttribute(p, i);
-      // RADIAL lumps keyed on the QUANTIZED position, so the non-indexed shared verts of each face
-      // displace TOGETHER (no shattering): a lumpy weathered boulder. seed varies the shape per type.
-      const k = Math.round(v.x * 100) * 0.137 + Math.round(v.y * 100) * 0.071 + Math.round(v.z * 100) * 0.193 + seed * 1.7;
-      const hn = Math.abs(Math.sin(k) * 43758.5453) % 1;
-      v.multiplyScalar(0.74 + hn * 0.5);                // 0.74 .. 1.24
+      const ax = Math.abs(v.x), ay = Math.abs(v.y), az = Math.abs(v.z);
+      const wsum = ax + ay + az;
+      const tri = (f, o) => (
+        vnoise(v.y * f + s1 + o, v.z * f - s2) * ax +
+        vnoise(v.z * f + s2 + o, v.x * f + s1) * ay +
+        vnoise(v.x * f - s1 + o, v.y * f + s2) * az) / wsum;
+      const lump = tri(1.6, 0) * 0.42 + tri(4.3, 7.3) * 0.15;
+      v.multiplyScalar(0.76 + lump);                    // ≈ 0.76 .. 1.33, weathered lumps
       p.setXYZ(i, v.x, v.y, v.z);
     }
     g.computeVertexNormals();
@@ -2294,7 +2312,7 @@ function buildVegetation(core, r) {
     { id: 'limestone', color: 0xe6ddc8 },  // pale eroded
   ];
   const rockMeshes = rockDefs.map((d, idx) => {
-    const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: true, roughness: 0.95 });
+    const mat = new THREE.MeshStandardMaterial({ color: d.color, flatShading: false, roughness: 0.95 });
     // DEEPER crack relief (loop #153, owner "depth on meshes"): the shore boulders are prominent
     // natural features but had the weakest relief of any prop (0.6/2.2) — their granite/basalt cracks
     // read nearly flat up close. Push the derived-normal so the fractures actually catch light. Still
@@ -2387,6 +2405,12 @@ export function instantiateModel(core, modelAnchor) {
     if (o.isPoints || MODEL_PRUNE.has(o.name)) prune.push(o);
   });
   for (const o of prune) o.removeFromParent();
+  // the model's meadow: at 1:240 a grass blade is ~0.2 mm wide — sub-pixel even leaning all the
+  // way in. Keep a light speckle for colour (the planting order is spatially random, so a prefix
+  // stays spread across the island) and drop the rest: ~-115k triangles nobody could ever see.
+  // (collectRefs still finds 'grass'; the L4 strip in puzzles _apply null-guards + drives both.)
+  const modelGrass = modelRoot.getObjectByName('grass');
+  if (modelGrass) modelGrass.count = Math.min(modelGrass.count, 600);
   // the model's own model: a speck impostor on its chart table
   const nestedAnchor = modelRoot.getObjectByName('modelAnchor');
   if (nestedAnchor) {
@@ -2443,7 +2467,7 @@ const NAMES = [
   'orreryPivot', 'orreryTilt', 'orreryLamp', 'crankHandle', 'musicBoxLid',
   'innerDoor', 'plumbHung', 'plumbBob', 'plumbHook', 'deskPlate', 'vaultDoor', 'lensItem', 'chestLid', 'cellarShaft',
   'rulerItem', 'rulerWorld', 'hatchLid', 'hatchShimmer', 'glyphPlane',
-  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook',
+  'tinyFigure', 'coat', 'footprints', 'songBird', 'bell', 'disagreeSea', 'disagreeLamp', 'chartTally', 'logbook', 'vaultVista',
   'jettyLantern', 'jettyHalo', 'plateGlow', 'doryOar', 'doryHull', 'inscribedStone', 'messageBottle', 'quartersJournal',
   'readGlass', 'lensMarkStudy', 'lensMarkStone', 'watcher', 'musicNote',
   'stairFoot', 'galleryHatch', 'stairRope',   // hub Phase B: the climb foot, descend point, and the lamp-lit gate

@@ -91,8 +91,8 @@ export const MANIFEST = {
     prompt: 'seamless tileable wet sea-foam lace, thin bubbly white froth strands over dark wet sand, top-down',
     wrap: 'repeat', repeat: [1, 1], colorSpace: 'srgb', anisotropy: 2,
   },
-  // wet PEBBLE apron at the south waterline — a thin RingGeometry hugging the shore (props.js),
-  // MeshStandardMaterial + applyRelief (sea-glass pebbles + derived relief).
+  // wet PEBBLE apron at the south waterline — a terrain-draped PlaneGeometry strip hugging the
+  // shore (props.js), MeshStandardMaterial + applyRelief (sea-glass pebbles + derived relief).
   pebble: {
     kind: 'texture', file: 'pebble.jpg', bytes: 107139,
     license: 'Apache-2.0', source: 'Bender · FLUX.1-schnell',

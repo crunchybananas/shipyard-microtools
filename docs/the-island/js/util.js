@@ -138,6 +138,33 @@ export class Baker {
   }
 }
 
+// Merge BufferGeometries into one non-indexed geometry (position + normal, and
+// color when every part carries it). The de-duplicated twin of Baker: Baker bakes
+// matrices + gradient colors for the big static world merge; this concatenates
+// already-posed parts (canopy tiers, grass blades, bird bodies) as-is.
+export function mergeGeometries(geos) {
+  const flats = geos.map((g) => (g.index ? g.toNonIndexed() : g));
+  let total = 0;
+  for (const g of flats) total += g.attributes.position.count;
+  const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3);
+  const hasCol = flats.every((g) => g.attributes.color);
+  const col = hasCol ? new Float32Array(total * 3) : null;
+  let off = 0;
+  for (let i = 0; i < flats.length; i++) {
+    const g = flats[i];
+    pos.set(g.attributes.position.array, off * 3);
+    nor.set(g.attributes.normal.array, off * 3);
+    if (col) col.set(g.attributes.color.array, off * 3);
+    off += g.attributes.position.count;
+    if (g !== geos[i]) g.dispose();   // dispose the toNonIndexed intermediates
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  if (col) out.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return out;
+}
+
 // Vary a color: returns a fresh THREE.Color jittered in HSL
 export function vary(color, r, dh = 0.015, ds = 0.06, dl = 0.05) {
   const c = color.clone();
