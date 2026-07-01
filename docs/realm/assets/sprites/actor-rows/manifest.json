@@ -344,6 +344,350 @@
       "sha256": "5446967dd1141a9f971d2d8f9aa2af0fe08a8d7beb943a601bdabfc0f91edeb3",
       "status": "accepted"
     },
+    "farmer/idle/down": {
+      "acceptedAt": "2026-07-01T22:41:05Z",
+      "allowedWarnings": [],
+      "file": "farmer/idle-down.png",
+      "note": "Painted row: settler locked idle/down body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 8.5,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 22.0,
+          "medianColor": [
+            107.3,
+            90.95,
+            47.7
+          ],
+          "paletteDelta": 2.9
+        },
+        "flickerScore": 4.4,
+        "maxAlphaRatio": 1.07,
+        "maxBodyCenterJump": 1.11,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.75,
+        "medianBodyHeight": 77.5,
+        "medianBodyWidth": 30.5,
+        "medianColor": [
+          107.95,
+          93.55,
+          46.6
+        ],
+        "medianColorCount": 709.0,
+        "medianShadingRatio": 0.643,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "84448d070fd844f1e9e3dd7297af0478f2868eb736d8679a1302360bf23654d3",
+      "status": "accepted"
+    },
+    "farmer/idle/left": {
+      "acceptedAt": "2026-07-01T22:41:07Z",
+      "allowedWarnings": [],
+      "file": "farmer/idle-left.png",
+      "note": "Painted row: settler locked idle/left body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 2,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 8.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            107.3,
+            93.55,
+            46.6
+          ],
+          "paletteDelta": 2.82
+        },
+        "flickerScore": 2.4,
+        "maxAlphaRatio": 1.049,
+        "maxBodyCenterJump": 0.87,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.4,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 22.0,
+        "medianColor": [
+          107.3,
+          90.95,
+          47.7
+        ],
+        "medianColorCount": 534.5,
+        "medianShadingRatio": 0.6796,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "836d9ac4485ab4db42ae06c7fe38cc7249570cab1aeafccab3d66f6fa9325557",
+      "status": "accepted"
+    },
+    "farmer/idle/right": {
+      "acceptedAt": "2026-07-01T22:41:07Z",
+      "allowedWarnings": [],
+      "file": "farmer/idle-right.png",
+      "note": "Painted row: settler locked idle/right body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 9.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            107.3,
+            93.55,
+            46.6
+          ],
+          "paletteDelta": 2.82
+        },
+        "flickerScore": 3.6,
+        "maxAlphaRatio": 1.049,
+        "maxBodyCenterJump": 0.83,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.4,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 21.0,
+        "medianColor": [
+          107.3,
+          90.95,
+          47.7
+        ],
+        "medianColorCount": 534.5,
+        "medianShadingRatio": 0.6794,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "d111d58d60788425b5ba0824324d7e6a9fd39699b4fb92bfdc29ebf247da3836",
+      "status": "accepted"
+    },
+    "farmer/idle/up": {
+      "acceptedAt": "2026-07-01T22:41:06Z",
+      "allowedWarnings": [],
+      "file": "farmer/idle-up.png",
+      "note": "Painted row: settler locked idle/up body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 2.0,
+          "bodyWidthDelta": 8.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 22.0,
+          "medianColor": [
+            107.3,
+            90.95,
+            47.7
+          ],
+          "paletteDelta": 19.44
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.032,
+        "maxBodyCenterJump": 0.96,
+        "maxEdgePixels": 22,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.46,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          93.2,
+          93.9,
+          34.65
+        ],
+        "medianColorCount": 631.5,
+        "medianShadingRatio": 0.682,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "54883f4b599d20fa21d220b173811dfaca93f72bdfa6a61021ce44916da7e82c",
+      "status": "accepted"
+    },
+    "farmer/walk/down": {
+      "acceptedAt": "2026-07-01T22:41:08Z",
+      "allowedWarnings": [],
+      "file": "farmer/walk-down.png",
+      "note": "Painted row: settler locked walk/down body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            100.9,
+            81.45,
+            45.45
+          ],
+          "paletteDelta": 13.98
+        },
+        "flickerScore": 5.6,
+        "maxAlphaRatio": 1.063,
+        "maxBodyCenterJump": 0.91,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.19,
+        "medianBodyHeight": 77.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          109.15,
+          92.7,
+          46.4
+        ],
+        "medianColorCount": 701.5,
+        "medianShadingRatio": 0.6461,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "fc4c54c825157cf7dcba2c9f6ded10c80a374752de675156103fe4d9fc61f8b2",
+      "status": "accepted"
+    },
+    "farmer/walk/left": {
+      "acceptedAt": "2026-07-01T22:41:10Z",
+      "allowedWarnings": [],
+      "file": "farmer/walk-left.png",
+      "note": "Painted row: settler locked walk/left body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            100.9,
+            92.7,
+            45.45
+          ],
+          "paletteDelta": 11.25
+        },
+        "flickerScore": 30.8,
+        "maxAlphaRatio": 1.14,
+        "maxBodyCenterJump": 3.46,
+        "maxEdgePixels": 5,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.9,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          100.9,
+          81.45,
+          45.45
+        ],
+        "medianColorCount": 522.5,
+        "medianShadingRatio": 0.705,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "ccbc2f1c3187c2e949bd74fb89fb84ab6fd98aeb20c3a71e282926d2ba97ba89",
+      "status": "accepted"
+    },
+    "farmer/walk/right": {
+      "acceptedAt": "2026-07-01T22:41:10Z",
+      "allowedWarnings": [],
+      "file": "farmer/walk-right.png",
+      "note": "Painted row: settler locked walk/right body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 5,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 9,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            100.9,
+            92.7,
+            45.45
+          ],
+          "paletteDelta": 11.25
+        },
+        "flickerScore": 30.8,
+        "maxAlphaRatio": 1.14,
+        "maxBodyCenterJump": 3.46,
+        "maxEdgePixels": 5,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 4.9,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 28.0,
+        "medianColor": [
+          100.9,
+          81.45,
+          45.45
+        ],
+        "medianColorCount": 522.5,
+        "medianShadingRatio": 0.7051,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "f32ac4c869438de5ec9aee8d8860be1ba113d1c8ac4612fa6db19b3443ddc9ea",
+      "status": "accepted"
+    },
+    "farmer/walk/up": {
+      "acceptedAt": "2026-07-01T22:41:09Z",
+      "allowedWarnings": [],
+      "file": "farmer/walk-up.png",
+      "note": "Painted row: settler locked walk/up body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
+      "provenance": "settler-body-own-head-transplant",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 2.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            100.9,
+            81.45,
+            45.45
+          ],
+          "paletteDelta": 16.69
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.042,
+        "maxBodyCenterJump": 1.84,
+        "maxEdgePixels": 22,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.72,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 30.0,
+        "medianColor": [
+          96.8,
+          94.9,
+          36.45
+        ],
+        "medianColorCount": 643.0,
+        "medianShadingRatio": 0.6779,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "0b8063bb2097cea965503fa7abf5469223eff8f59a15e3afa2b56e90a7cf05c8",
+      "status": "accepted"
+    },
     "farmer/work/down": {
       "acceptedAt": "2026-07-01T22:08:05Z",
       "allowedWarnings": [
@@ -6274,6 +6618,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T22:19:22Z",
+  "updatedAt": "2026-07-01T22:41:10Z",
   "version": 1
 }

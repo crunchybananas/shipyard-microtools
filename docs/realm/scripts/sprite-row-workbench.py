@@ -281,6 +281,230 @@ def derive_row(args: argparse.Namespace) -> None:
     print(f"[sprite-workbench] wrote {out}")
 
 
+def _alpha_points(frame: Image.Image, cutoff: int) -> list[tuple[int, int]]:
+    px = frame.load()
+    return [(x, y) for y in range(frame.height) for x in range(frame.width) if px[x, y][3] > cutoff]
+
+
+def _neck_row(frame: Image.Image, cutoff: int) -> tuple[int, int]:
+    """Locate the neck: the narrowest row between the head mass and the
+    shoulders. Returns (neck_y, head_center_x). Search is limited to the top
+    40% of the figure so wide hat brims and tools do not confuse it."""
+    points = _alpha_points(frame, cutoff)
+    if not points:
+        raise SystemExit("frame is blank")
+    top = min(y for _, y in points)
+    bottom = max(y for _, y in points)
+    height = bottom - top + 1
+    widths = {}
+    for y in range(top, top + int(height * 0.4)):
+        xs = [x for x, py in points if py == y]
+        if xs:
+            widths[y] = (max(xs) - min(xs) + 1, (max(xs) + min(xs)) // 2)
+    rows = sorted(widths)
+    if len(rows) < 8:
+        raise SystemExit("figure too small for neck detection")
+    # Find the head width peak in the upper half of the search band, then the
+    # narrowest row after it: that pinch is the neck.
+    upper = rows[: max(4, len(rows) // 2)]
+    peak_y = max(upper, key=lambda y: widths[y][0])
+    after = [y for y in rows if y > peak_y]
+    neck_y = min(after, key=lambda y: widths[y][0])
+    return neck_y, widths[peak_y][1]
+
+
+def headswap_row(args: argparse.Namespace) -> None:
+    # Chimera-role repaint: settler-derived body wearing the role's own
+    # painted head (face + headgear lifted from the role's painted work/carry
+    # frames). Keeps every pixel in-family with the art direction.
+    validate_target(args.role, args.action, args.dir)
+    from sprite_row_quality import ALPHA_CUTOFF
+
+    cloth = ROLE_CLOTH.get(args.role)
+    if not cloth:
+        raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
+
+    # Donor head: the role's own painted row, cleanest-head frame unless a
+    # frame is forced. --head-dir overrides the donor row direction (a straw
+    # hat is nearly round: the clean down-view hat serves side views too).
+    donor_dir = args.head_dir or args.dir
+    donor_row = comparison_row(args.role, args.head_action, donor_dir)
+    donor_frames = []
+    for index in range(FRAMES):
+        frame = donor_row.crop((index * FRAME_W, 0, (index + 1) * FRAME_W, FRAME_H))
+        points = _alpha_points(frame, ALPHA_CUTOFF)
+        if not points:
+            continue
+        # Cleanest donor head = the frame with the LEAST mass above the neck:
+        # raised hands and swung tools inflate the head zone.
+        try:
+            neck_y, _ = _neck_row(frame, ALPHA_CUTOFF)
+        except SystemExit:
+            continue
+        head_mass = sum(1 for _, y in points if y < neck_y)
+        donor_frames.append((head_mass, index, frame))
+    if not donor_frames:
+        raise SystemExit("donor row is blank")
+    donor_frames.sort(key=lambda item: (item[0], item[1]))
+    if args.head_frame is not None:
+        donor_frame = donor_row.crop((args.head_frame * FRAME_W, 0, (args.head_frame + 1) * FRAME_W, FRAME_H))
+        donor_index = args.head_frame
+    else:
+        _, donor_index, donor_frame = donor_frames[0]
+    donor_neck, donor_cx = _neck_row(donor_frame, ALPHA_CUTOFF)
+    donor_px = donor_frame.load()
+    # Keyhole extraction: the full hat width above the face line, but only
+    # face-width pixels for the chin rows below it — on bent work poses the
+    # shoulders overlap the chin rows and must stay behind.
+    face_xs = [x for x, y in _alpha_points(donor_frame, ALPHA_CUTOFF) if y == donor_neck]
+    face_min_x = min(face_xs) - 1
+    face_max_x = max(face_xs) + 1
+    chin_extend = args.chin_extend
+    # Torso-color filter: on bent donor poses the vest/shoulder tops rise into
+    # head rows at the frame edges. Drop head-crop pixels whose hue matches
+    # the role cloth color so only hat, hair, and skin travel.
+    target = cloth.lstrip("#")
+    cloth_h, cloth_s, _ = colorsys.rgb_to_hsv(
+        int(target[0:2], 16) / 255, int(target[2:4], 16) / 255, int(target[4:6], 16) / 255
+    )
+
+    def is_torso_color(x: int, y: int) -> bool:
+        if not args.cloth_filter:
+            return False
+        r, g, b, a = donor_px[x, y]
+        h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+        if s < 0.22 or v < 0.12:
+            return False
+        return min(abs(h - cloth_h), 1 - abs(h - cloth_h)) < 30 / 360
+
+    # Horizontal bound: the hat brim's own x-span (widest head row). Carried
+    # props riding at head height behind the shoulder stay out of the crop.
+    brim_yws = {}
+    for x, y in _alpha_points(donor_frame, ALPHA_CUTOFF):
+        if y < donor_neck:
+            lo, hi = brim_yws.get(y, (x, x))
+            brim_yws[y] = (min(lo, x), max(hi, x))
+    brim_lo, brim_hi = max(brim_yws.values(), key=lambda span: span[1] - span[0])
+    head_points = [
+        (x, y)
+        for x, y in _alpha_points(donor_frame, 0)
+        if (y < donor_neck or (y < donor_neck + chin_extend and face_min_x <= x <= face_max_x))
+        and brim_lo - 1 <= x <= brim_hi + 1
+        and not is_torso_color(x, y)
+    ]
+    if not head_points:
+        raise SystemExit("no head pixels above donor neck")
+    # A head is one connected mass: drop satellite blobs (carried props riding
+    # at head height) by keeping only the largest component of the crop.
+    from sprite_row_quality import components as _components
+
+    keep = set(head_points)
+    crop_mask = [[0] * FRAME_W for _ in range(FRAME_H)]
+    for x, y in head_points:
+        crop_mask[y][x] = 1
+    crop_components = _components(crop_mask)
+    if crop_components:
+        keep = set(crop_components[0])
+    head_points = [p for p in head_points if p in keep]
+    head_min_x = min(x for x, _ in head_points)
+    head_max_x = max(x for x, _ in head_points)
+    head_min_y = min(y for _, y in head_points)
+    head_max_y = max(y for _, y in head_points)
+    head = Image.new("RGBA", (head_max_x - head_min_x + 1, head_max_y - head_min_y + 1), (0, 0, 0, 0))
+    head_px = head.load()
+    for x, y in head_points:
+        head_px[x - head_min_x, y - head_min_y] = donor_px[x, y]
+    if args.head_scale != 1.0:
+        head = head.resize(
+            (max(1, round(head.width * args.head_scale)), max(1, round(head.height * args.head_scale))),
+            Image.Resampling.NEAREST,
+        )
+    head_anchor_x = donor_cx - head_min_x  # donor head center within the head crop
+    if args.head_scale != 1.0:
+        head_anchor_x = round(head_anchor_x * args.head_scale)
+
+    # Body: settler locked row for the same action/dir, palette-shifted to
+    # the role identity color.
+    manifest = load_manifest()
+    body_item = manifest["rows"].get(row_key("settler", args.action, args.dir))
+    if not body_item or body_item.get("status") not in ("accepted", "accepted-with-waiver"):
+        raise SystemExit(f"settler/{args.action}/{args.dir} is not an accepted override")
+    body_row = derive_role_row(Image.open(ROW_DIR / body_item["file"]).convert("RGBA"), cloth)
+
+    if args.hat_only:
+        # Reduce the donor head to its headgear: hue-keyed straw/hat pixels in
+        # the crop's upper rows. The body keeps its own head; the hat sits on
+        # the hair crown.
+        hat = Image.new("RGBA", head.size, (0, 0, 0, 0))
+        hat_px = hat.load()
+        src_px = head.load()
+        hat_floor = int(head.height * args.hat_floor)
+        for y in range(min(hat_floor, head.height)):
+            for x in range(head.width):
+                r, g, b, a = src_px[x, y]
+                if not a:
+                    continue
+                h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+                if 30 / 360 <= h <= 60 / 360 and s >= 0.25 and v >= 0.35:
+                    hat_px[x, y] = (r, g, b, a)
+        hat_mask = [[1 if hat_px[x, y][3] > 18 else 0 for x in range(hat.width)] for y in range(hat.height)]
+        from sprite_row_quality import components as _hat_components
+
+        hat_comps = _hat_components(hat_mask)
+        if not hat_comps:
+            raise SystemExit("no hat pixels found in donor head")
+        keep_hat = set(hat_comps[0])
+        for y in range(hat.height):
+            for x in range(hat.width):
+                if (x, y) not in keep_hat:
+                    hat_px[x, y] = (0, 0, 0, 0)
+        hat_ys = [y for x, y in keep_hat]
+        hat_xs = [x for x, y in keep_hat]
+        head = hat.crop((min(hat_xs), min(hat_ys), max(hat_xs) + 1, max(hat_ys) + 1))
+        head_anchor_x = (min(hat_xs) + max(hat_xs)) // 2 - min(hat_xs)
+
+    out_image = Image.new("RGBA", (FRAME_W * FRAMES, FRAME_H), (0, 0, 0, 0))
+    for index in range(FRAMES):
+        body = body_row.crop((index * FRAME_W, 0, (index + 1) * FRAME_W, FRAME_H)).copy()
+        body_neck, body_cx = _neck_row(body, ALPHA_CUTOFF)
+        body_px = body.load()
+        if args.hat_only:
+            body_points = _alpha_points(body, ALPHA_CUTOFF)
+            body_top = min(y for _, y in body_points)
+            head_xs = [x for x, y in body_points if y < body_neck]
+            body_head_cx = (min(head_xs) + max(head_xs)) // 2 if head_xs else body_cx
+            paste_y = body_top - args.hat_lift
+            body.alpha_composite(head, (max(0, body_head_cx - head_anchor_x), max(0, paste_y)))
+            out_image.paste(body, (index * FRAME_W, 0))
+            continue
+        for x, y in _alpha_points(body, 0):
+            if y < body_neck:
+                body_px[x, y] = (0, 0, 0, 0)
+        paste_x = body_cx - head_anchor_x
+        paste_y = body_neck - head.height + args.head_drop
+        pasted_head = head
+        if paste_y < 0:
+            # The donor head is taller than the space above the neck: crop its
+            # crown instead of shifting it up, so the chin stays anchored on
+            # the collar and never disconnects.
+            pasted_head = head.crop((0, -paste_y, head.width, head.height))
+            paste_y = 0
+        body.alpha_composite(pasted_head, (max(0, paste_x), paste_y))
+        out_image.paste(body, (index * FRAME_W, 0))
+
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_image.save(out)
+    report = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] headswap {args.role}/{args.action}/{args.dir}: settler body + "
+        f"{args.role}/{args.head_action}/{args.dir} frame {donor_index} head "
+        f"({report['styleEra']}, body {report['medianBodyHeight']}px, "
+        f"warnings {','.join(report['warnings']) or 'none'})"
+    )
+    print(f"[sprite-workbench] wrote {out}")
+
+
 def stance_row(args: argparse.Namespace) -> None:
     # Build an idle row from the most neutral frame of a source row (usually
     # the role's own painted walk row): pick the narrowest-silhouette frame,
@@ -351,7 +575,7 @@ def scrub_row(args: argparse.Namespace) -> None:
     validate_target(args.role, args.action, args.dir)
     from sprite_row_quality import ALPHA_CUTOFF, components
 
-    row = comparison_row(args.role, args.action, args.dir)
+    row = Image.open(args.input).convert("RGBA") if args.input else comparison_row(args.role, args.action, args.dir)
     out_image = row.copy()
     removed_total = 0
     for frame_index in range(FRAMES):
@@ -572,6 +796,7 @@ def main() -> None:
     scrub = sub.add_parser("scrub")
     target_args(scrub)
     scrub.add_argument("--min-keep", type=int, default=84)
+    scrub.add_argument("--input", type=Path)
     scrub.add_argument("--out", type=Path)
     scrub.set_defaults(func=scrub_row)
 
@@ -582,6 +807,21 @@ def main() -> None:
     stance.add_argument("--frame", type=int)
     stance.add_argument("--out", type=Path)
     stance.set_defaults(func=stance_row)
+
+    headswap = sub.add_parser("headswap")
+    target_args(headswap)
+    headswap.add_argument("--head-action", default="work", choices=ACTIONS)
+    headswap.add_argument("--head-dir", choices=DIRS)
+    headswap.add_argument("--head-frame", type=int)
+    headswap.add_argument("--hat-only", action="store_true")
+    headswap.add_argument("--hat-floor", type=float, default=0.62)
+    headswap.add_argument("--hat-lift", type=int, default=2)
+    headswap.add_argument("--head-scale", type=float, default=1.0)
+    headswap.add_argument("--chin-extend", type=int, default=6)
+    headswap.add_argument("--head-drop", type=int, default=1)
+    headswap.add_argument("--cloth-filter", action=argparse.BooleanOptionalAction, default=True)
+    headswap.add_argument("--out", type=Path)
+    headswap.set_defaults(func=headswap_row)
 
     accept = sub.add_parser("accept")
     target_args(accept)
