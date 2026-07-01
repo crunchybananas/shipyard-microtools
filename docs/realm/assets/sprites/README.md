@@ -105,7 +105,14 @@ row quality was not treated as sufficient.
 
 The live game references PNG atlases directly. Retired SVG sprites and the old
 SVG sandbox are intentionally absent so future work cannot drift back into a
-second building-art implementation.
+second building-art implementation. The `*-atlas-large.png` variants were
+retired in the 2026-07-01 cleanup: nothing in js/ ever loaded them, and the
+small variants are the only runtime sources. The one-shot repaint scripts
+(`paint-cohesive-legacy-actors`, `refit-settler-frontier-rows`,
+`alternate-walk-feet`, `scrub-work-row-particles`) were retired at the same
+time — their capabilities live on as `sprite-row` workbench verbs (`derive`,
+`stance`, `headswap`, `rescale`, `stabilize`, `scrub`) with the role palette
+table kept as `ROLE_CLOTH` in the workbench.
 
 Sprite review now has an in-app front end:
 
