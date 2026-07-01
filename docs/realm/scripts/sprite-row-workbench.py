@@ -248,25 +248,69 @@ Output intent: the result will be segmented and packed into eight exact 64x84 tr
 
 def derive_row(args: argparse.Namespace) -> None:
     validate_target(args.role, args.action, args.dir)
-    if args.role == args.source_role:
-        raise SystemExit("derive targets a different role than the source")
-    cloth = ROLE_CLOTH.get(args.role)
-    if not cloth:
-        raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
+    source_role = args.source_role
+    source_action = args.source_action or args.action
+    source_dir = args.source_dir or args.dir
+    validate_target(source_role, source_action, source_dir)
+    same_role = args.role == source_role
+    if same_role and source_action == args.action and source_dir == args.dir:
+        raise SystemExit("derive source and target are the same row")
+    cloth = None
+    if not same_role:
+        cloth = ROLE_CLOTH.get(args.role)
+        if not cloth:
+            raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
     manifest = load_manifest()
-    source_item = manifest["rows"].get(row_key(args.source_role, args.action, args.dir))
-    if not source_item or source_item.get("status") not in ("accepted", "accepted-with-waiver"):
-        raise SystemExit(f"source row {args.source_role}/{args.action}/{args.dir} is not an accepted override")
-    source_path = ROW_DIR / source_item["file"]
-    derived = derive_role_row(Image.open(source_path).convert("RGBA"), cloth)
+    source_item = manifest["rows"].get(row_key(source_role, source_action, source_dir))
+    if source_item and source_item.get("status") in ("accepted", "accepted-with-waiver"):
+        source_image = Image.open(ROW_DIR / source_item["file"]).convert("RGBA")
+    else:
+        # No accepted override for the source row: fall back to the compiled
+        # (or base) sheet crop. Same-role pose reuse is the main client here.
+        source_image = crop_row(source_role, source_action, source_dir)
+    derived = derive_role_row(source_image, cloth) if cloth else source_image.copy()
     out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
     out.parent.mkdir(parents=True, exist_ok=True)
     derived.save(out)
     report = analyze_row(out, args.action)
     print(
         f"[sprite-workbench] derived {args.role}/{args.action}/{args.dir} from "
-        f"{args.source_role} ({report['styleEra']}, body {report['medianBodyHeight']}px, "
-        f"warnings {','.join(report['warnings']) or 'none'})"
+        f"{source_role}/{source_action}/{source_dir} ({report['styleEra']}, "
+        f"body {report['medianBodyHeight']}px, warnings {','.join(report['warnings']) or 'none'})"
+    )
+    print(f"[sprite-workbench] wrote {out}")
+
+
+def scrub_row(args: argparse.Namespace) -> None:
+    # Consolidated from the retired scrub-work-row-particles.mjs one-shot:
+    # drop small disconnected alpha components (baked debris, loose chips)
+    # while keeping the actor, tools, and other substantial parts.
+    validate_target(args.role, args.action, args.dir)
+    from sprite_row_quality import ALPHA_CUTOFF, components
+
+    row = comparison_row(args.role, args.action, args.dir)
+    out_image = row.copy()
+    removed_total = 0
+    for frame_index in range(FRAMES):
+        frame = out_image.crop((frame_index * FRAME_W, 0, (frame_index + 1) * FRAME_W, FRAME_H))
+        px = frame.load()
+        mask = [[1 if px[x, y][3] > ALPHA_CUTOFF else 0 for x in range(FRAME_W)] for y in range(FRAME_H)]
+        found = components(mask)
+        for component in found[1:]:
+            if len(component) >= args.min_keep:
+                continue
+            for x, y in component:
+                px[x, y] = (0, 0, 0, 0)
+            removed_total += len(component)
+        out_image.paste(frame, (frame_index * FRAME_W, 0))
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_image.save(out)
+    report = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] scrubbed {args.role}/{args.action}/{args.dir}: removed {removed_total}px "
+        f"of sub-{args.min_keep}px fragments (fragments now {report['maxFragmentPixels']}px/"
+        f"{report['maxFragmentCount']}, warnings {','.join(report['warnings']) or 'none'})"
     )
     print(f"[sprite-workbench] wrote {out}")
 
@@ -457,8 +501,16 @@ def main() -> None:
     derive = sub.add_parser("derive")
     target_args(derive)
     derive.add_argument("--source-role", default="settler", choices=ROLES)
+    derive.add_argument("--source-action", choices=ACTIONS)
+    derive.add_argument("--source-dir", choices=DIRS)
     derive.add_argument("--out", type=Path)
     derive.set_defaults(func=derive_row)
+
+    scrub = sub.add_parser("scrub")
+    target_args(scrub)
+    scrub.add_argument("--min-keep", type=int, default=84)
+    scrub.add_argument("--out", type=Path)
+    scrub.set_defaults(func=scrub_row)
 
     accept = sub.add_parser("accept")
     target_args(accept)

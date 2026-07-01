@@ -1,5 +1,105 @@
 {
   "rows": {
+    "farmer/work/down": {
+      "acceptedAt": "2026-07-01T22:08:05Z",
+      "allowedWarnings": [
+        "body-width-drift",
+        "ground-anchor-drift"
+      ],
+      "file": "farmer/work-down.png",
+      "note": "Loose soil chips scrubbed; connected tilling spray kept as flavor; drift inherited, queued for farmer scale round.",
+      "provenance": "loose-fragment-scrub",
+      "quality": {
+        "bodyBottomRange": 7,
+        "bodyHeightRange": 7,
+        "bodyWidthRange": 20,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 9.5,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 45.5,
+          "medianColor": [
+            120.7,
+            97.1,
+            33.3
+          ],
+          "paletteDelta": 18.22
+        },
+        "flickerScore": 67.0,
+        "maxAlphaRatio": 1.174,
+        "maxBodyCenterJump": 9.0,
+        "maxEdgePixels": 41,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 6.98,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 36.0,
+        "medianColor": [
+          133.5,
+          102.25,
+          45.2
+        ],
+        "medianColorCount": 705.5,
+        "medianShadingRatio": 0.6444,
+        "styleEra": "painted",
+        "warnings": [
+          "body-width-drift",
+          "ground-anchor-drift"
+        ]
+      },
+      "sha256": "d44a985d69d8bde873a29d54053bf556650ec7444ed81c1b327b045b4dbb1c3c",
+      "status": "accepted-with-waiver"
+    },
+    "farmer/work/up": {
+      "acceptedAt": "2026-07-01T22:08:07Z",
+      "allowedWarnings": [
+        "body-center-jump",
+        "body-height-drift",
+        "edge-contact"
+      ],
+      "file": "farmer/work-up.png",
+      "note": "Loose soil chips scrubbed; drift inherited, queued for farmer scale round.",
+      "provenance": "loose-fragment-scrub",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 15,
+        "bodyWidthRange": 7,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 4.0,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 45.5,
+          "medianColor": [
+            120.7,
+            97.1,
+            33.3
+          ],
+          "paletteDelta": 9.96
+        },
+        "flickerScore": 61.8,
+        "maxAlphaRatio": 1.339,
+        "maxBodyCenterJump": 10.77,
+        "maxEdgePixels": 59,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 14.55,
+        "medianBodyHeight": 79.0,
+        "medianBodyWidth": 41.5,
+        "medianColor": [
+          113.15,
+          103.55,
+          32.5
+        ],
+        "medianColorCount": 652.0,
+        "medianShadingRatio": 0.6282,
+        "styleEra": "painted",
+        "warnings": [
+          "body-height-drift",
+          "body-center-jump",
+          "edge-contact"
+        ]
+      },
+      "sha256": "84191dca23eb6bfaa5c0bf3170b21e208fcd43195bba47254337ad7f3b370d0f",
+      "status": "accepted-with-waiver"
+    },
     "fisher/carry/down": {
       "acceptedAt": "2026-07-01T21:49:33Z",
       "allowedWarnings": [],
@@ -2151,6 +2251,151 @@
       },
       "sha256": "66d6af37bb446b6cea55535391d3e30b81b2a4af3f93cc7d9f7dfbc45ab742f3",
       "status": "accepted"
+    },
+    "lumber/work/down": {
+      "acceptedAt": "2026-07-01T22:08:03Z",
+      "allowedWarnings": [
+        "body-center-jump",
+        "body-height-drift",
+        "ground-anchor-drift"
+      ],
+      "file": "lumber/work-down.png",
+      "note": "Wood-chip debris scrubbed; motion drift is inherited from the imagegen row, queued for repaint.",
+      "provenance": "loose-fragment-scrub",
+      "quality": {
+        "bodyBottomRange": 7,
+        "bodyHeightRange": 13,
+        "bodyWidthRange": 14,
+        "directionReference": {
+          "bodyHeightDelta": 5.0,
+          "bodyWidthDelta": 3.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 39.0,
+          "medianColor": [
+            103.0,
+            73.6,
+            44.7
+          ],
+          "paletteDelta": 21.69
+        },
+        "flickerScore": 87.1,
+        "maxAlphaRatio": 1.637,
+        "maxBodyCenterJump": 9.58,
+        "maxEdgePixels": 27,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 17.95,
+        "medianBodyHeight": 73.0,
+        "medianBodyWidth": 36.0,
+        "medianColor": [
+          121.4,
+          79.35,
+          54.65
+        ],
+        "medianColorCount": 431.0,
+        "medianShadingRatio": 0.6676,
+        "styleEra": "painted",
+        "warnings": [
+          "body-height-drift",
+          "ground-anchor-drift",
+          "body-center-jump"
+        ]
+      },
+      "sha256": "82e233f3ec1f6ebc4dacb01d520946c9621c3af9e722708d80066bbfb08c3e25",
+      "status": "accepted-with-waiver"
+    },
+    "lumber/work/left": {
+      "acceptedAt": "2026-07-01T22:07:47Z",
+      "allowedWarnings": [
+        "low-frame-variety"
+      ],
+      "file": "lumber/work-left.png",
+      "note": "Replaces white-vein-damaged side chop row; static stance pending future chop-pose repaint.",
+      "provenance": "own-idle-pose-reuse",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 5.0,
+          "bodyWidthDelta": 3.0,
+          "medianBodyHeight": 73.0,
+          "medianBodyWidth": 36.0,
+          "medianColor": [
+            121.4,
+            79.35,
+            54.65
+          ],
+          "paletteDelta": 21.36
+        },
+        "flickerScore": 0.0,
+        "maxAlphaRatio": 1.0,
+        "maxBodyCenterJump": 0.0,
+        "maxEdgePixels": 7,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.0,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 39.0,
+        "medianColor": [
+          103.0,
+          74.4,
+          45.0
+        ],
+        "medianColorCount": 627.0,
+        "medianShadingRatio": 0.6373,
+        "styleEra": "painted",
+        "warnings": [
+          "low-frame-variety"
+        ]
+      },
+      "sha256": "d0a59c3e5313630dc1b58204627746fca2bb623c18f1702afe4ad31bd273f047",
+      "status": "accepted-with-waiver"
+    },
+    "lumber/work/right": {
+      "acceptedAt": "2026-07-01T22:07:48Z",
+      "allowedWarnings": [
+        "low-frame-variety"
+      ],
+      "file": "lumber/work-right.png",
+      "note": "Replaces white-vein-damaged side chop row; static stance pending future chop-pose repaint.",
+      "provenance": "own-idle-pose-reuse",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 39.0,
+          "medianColor": [
+            111.25,
+            74.4,
+            45.0
+          ],
+          "paletteDelta": 9.89
+        },
+        "flickerScore": 0.0,
+        "maxAlphaRatio": 1.0,
+        "maxBodyCenterJump": 0.0,
+        "maxEdgePixels": 9,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.0,
+        "medianBodyHeight": 78.0,
+        "medianBodyWidth": 37.0,
+        "medianColor": [
+          101.4,
+          73.6,
+          44.7
+        ],
+        "medianColorCount": 597.0,
+        "medianShadingRatio": 0.6275,
+        "styleEra": "painted",
+        "warnings": [
+          "low-frame-variety"
+        ]
+      },
+      "sha256": "75c706f2a7b0b524fa018956a52e342a9f7f55bac8b1818bb8540295a938bd6f",
+      "status": "accepted-with-waiver"
     },
     "miner/work/left": {
       "acceptedAt": "2026-06-26T04:15:49Z",
@@ -5685,6 +5930,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T21:56:14Z",
+  "updatedAt": "2026-07-01T22:08:07Z",
   "version": 1
 }
