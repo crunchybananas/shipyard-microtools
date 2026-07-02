@@ -2409,48 +2409,64 @@ export function render() {
   for (const w of [wEntity]) {
     const ws = toScreen(w.x, w.y);
     ctx.globalAlpha = Math.max(0.85, daylight);
-    // Loop 64 (render S4): ambient walkers (merchant, student, crier, etc.)
-    // upgraded to match citizen silhouette vocabulary — legs + boots under
-    // robe, stacked drop shadow, smaller head. Prior shape was the old
-    // torso-pill + head-dot which stood out against the new chibi citizens.
+    // Service walkers render through the painted actor atlas like citizens
+    // (church -> scholar robes as the priest, tavern -> innkeeper, well ->
+    // settler, market -> trader) so no procedural-era figure walks the
+    // painted town. The old canvas figure remains only as an atlas-loading
+    // fallback.
     // Stacked shadow
     ctx.fillStyle = 'rgba(0,0,0,0.10)';
     ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = 'rgba(0,0,0,0.18)';
     ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 3.5, 1.6, 0, 0, Math.PI*2); ctx.fill();
-    // Legs / under-robe
-    ctx.fillStyle = '#3a2618';
-    ctx.fillRect(ws.x - 2.2, ws.y - 2, 1.8, 3);
-    ctx.fillRect(ws.x + 0.4, ws.y - 2, 1.8, 3);
-    // Boots
-    ctx.fillStyle = '#1e1510';
-    ctx.beginPath(); ctx.ellipse(ws.x - 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(ws.x + 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
-    // Colored robe body — taller than before to extend past the legs
-    ctx.fillStyle = w.color;
-    ctx.beginPath();
-    ctx.ellipse(ws.x, ws.y - 7, 4.2, 5.2, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Robe trim (lighter stripe)
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.fillRect(ws.x - 3.5, ws.y - 8, 7, 1);
-    // Head
-    ctx.fillStyle = '#ffe0c0';
-    ctx.beginPath();
-    ctx.arc(ws.x, ws.y - 14, 3.4, 0, Math.PI*2);
-    ctx.fill();
-    // Tiny dot eyes
-    ctx.fillStyle = '#2a1a0a';
-    ctx.beginPath();
-    ctx.arc(ws.x - 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
-    ctx.arc(ws.x + 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
-    ctx.fill();
-    // Small emoji on chest (trade/role indicator)
+    const walkerRole = { church: 'scholar', tavern: 'innkeeper', well: 'settler', market: 'trader' }[w.home?.type] || 'settler';
+    const wdx = (w.tx ?? w.x) - w.x, wdy = (w.ty ?? w.y) - w.y;
+    const wd = Math.hypot(wdx, wdy);
+    const wMoving = wd > 0.15;
+    const nfx = wd > 0.001 ? wdx / wd : 0, nfy = wd > 0.001 ? wdy / wd : 0.6;
+    const wFaceX = nfx - nfy;
+    const wFaceY = (nfx + nfy) * 0.5;
+    const wDir = actorDirection(wFaceX, wFaceY, wFaceY < -0.02);
+    const wFrame = wMoving ? (Math.floor(G.gameTick / 7) + ((w.home?.x || 0) % ACTOR_FRAMES)) % ACTOR_FRAMES : 0;
+    const wDrawn = drawActorAtlasFrame(ctx, {
+      role: walkerRole, action: wMoving ? 'walk' : 'idle', dir: wDir, frame: wFrame,
+      x: Math.round(ws.x - 13.5), y: Math.round(ws.y + 3 - 35), width: 27, height: 35,
+    });
+    if (!wDrawn) {
+      // Legs / under-robe
+      ctx.fillStyle = '#3a2618';
+      ctx.fillRect(ws.x - 2.2, ws.y - 2, 1.8, 3);
+      ctx.fillRect(ws.x + 0.4, ws.y - 2, 1.8, 3);
+      // Boots
+      ctx.fillStyle = '#1e1510';
+      ctx.beginPath(); ctx.ellipse(ws.x - 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(ws.x + 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
+      // Colored robe body — taller than before to extend past the legs
+      ctx.fillStyle = w.color;
+      ctx.beginPath();
+      ctx.ellipse(ws.x, ws.y - 7, 4.2, 5.2, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Robe trim (lighter stripe)
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.fillRect(ws.x - 3.5, ws.y - 8, 7, 1);
+      // Head
+      ctx.fillStyle = '#ffe0c0';
+      ctx.beginPath();
+      ctx.arc(ws.x, ws.y - 14, 3.4, 0, Math.PI*2);
+      ctx.fill();
+      // Tiny dot eyes
+      ctx.fillStyle = '#2a1a0a';
+      ctx.beginPath();
+      ctx.arc(ws.x - 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
+      ctx.arc(ws.x + 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
+      ctx.fill();
+    }
+    // Small emoji badge above the head (service indicator)
     if (G.camera.zoom >= 1.2) {
       ctx.font = '6px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      ctx.fillText(w.emoji, ws.x, ws.y - 6);
+      ctx.fillText(w.emoji, ws.x, ws.y - 34);
     }
   }
   }
