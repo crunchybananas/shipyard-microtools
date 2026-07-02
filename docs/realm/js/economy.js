@@ -7,7 +7,7 @@ import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
-import { panCameraTo } from './render.js?realm=113';
+import { panCameraTo } from './render.js?realm=114';
 import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 import { isBuildingUnlocked } from './tech.js';
@@ -35,6 +35,7 @@ const CONSTRUCTION_TICKS = {
   tower: 400,
   church: 420,
   windmill: 420,
+  sawmill: 260,
   townhall: 460,
   granary: 340,
   castle: 600,
@@ -288,10 +289,20 @@ export function updateProduction() {
       // from the realm stores and emit the output. A converter with no input
       // this cycle produces nothing — build the upstream chain.
       if (def.convert) {
-        const take = Math.min(def.convert.amount, Math.floor(G.resources[def.convert.from] || 0));
+        const room = def.convert.cap ? Math.max(0, def.convert.cap - Math.floor(G.resources[def.convert.to] || 0)) : Infinity;
+        const take = Math.min(def.convert.amount, Math.floor(G.resources[def.convert.from] || 0), room);
         if (take > 0) {
           G.resources[def.convert.from] -= take;
           adjustedProd[def.convert.to] = (adjustedProd[def.convert.to] || 0) + take * (def.convert.yield || 1);
+        }
+      }
+      // Tools from the blacksmith speed real production: every 4th cycle a
+      // producing building consumes one tool for a half-again output boost.
+      if (def.prod && Object.keys(def.prod).length && !def.convert) {
+        b.toolCycle = (b.toolCycle || 0) + 1;
+        if (b.toolCycle % 4 === 0 && (G.resources.tools || 0) > 0) {
+          G.resources.tools -= 1;
+          for (const k of Object.keys(adjustedProd)) adjustedProd[k] = Math.round(adjustedProd[k] * 1.5);
         }
       }
       if (!Object.values(adjustedProd).some(v => v > 0)) continue;

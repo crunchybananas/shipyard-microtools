@@ -622,7 +622,7 @@ function runStateMachine(c) {
       // Done working — check if building produced something
       if (c.jobBuilding) {
         const def = BUILDINGS[c.jobBuilding.type];
-        if (def.prod && c.jobBuilding.produced) {
+        if ((def.prod || def.convert) && c.jobBuilding.produced) {
           // Pick up the goods
           const [resKey, amount] = Object.entries(c.jobBuilding.produced)[0] || [];
           if (resKey) {

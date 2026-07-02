@@ -39,7 +39,7 @@ export const TECHS = {
     desc: 'Unlocks roads and wells',
     cost: { gold: 20, stone: 15 },
     time: 400,
-    unlocks: ['road', 'well'],
+    unlocks: ['road', 'well', 'sawmill'],
     icon: '⚙️',
     prereq: 'masonry',
   },

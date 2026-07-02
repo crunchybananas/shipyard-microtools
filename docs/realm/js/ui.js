@@ -53,7 +53,7 @@ export function updateUI() {
   const interval = Math.floor(G.dayLength / 2);
   if (G.gameTick % interval === 0 && G.gameTick > 0) {
     if (G.lastResources) {
-      for (const k of ['wood','stone','food','gold','iron','wheat','flour']) {
+      for (const k of ['wood','stone','food','gold','iron','wheat','flour','planks','tools']) {
         // Scale to per-day: measured over half a day, so multiply by 2
         G.resourceRates[k] = Math.round((G.resources[k] - G.lastResources[k]) * 2);
       }
@@ -93,6 +93,14 @@ export function updateUI() {
     flEl.innerHTML = Math.floor(G.resources.flour || 0) + rateStr(G.resourceRates.flour || 0);
     const el = flEl.closest('.res');
     if (el) el.style.display = (G.resources.flour || 0) > 0 || (G.resourceRates.flour || 0) !== 0 ? '' : 'none';
+  }
+
+  for (const [key, elId] of [['planks','r-planks'],['tools','r-tools']]) {
+    const el = $(elId);
+    if (!el) continue;
+    el.innerHTML = Math.floor(G.resources[key] || 0) + rateStr(G.resourceRates[key] || 0);
+    const chip = el.closest('.res');
+    if (chip) chip.style.display = (G.resources[key] || 0) > 0 || (G.resourceRates[key] || 0) !== 0 ? '' : 'none';
   }
 
   // Hide empty categories that would otherwise show "0" with no meaning on Day 1

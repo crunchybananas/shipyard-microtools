@@ -32,6 +32,7 @@ export const BUILDINGS = {
       { cost:{wood:8,stone:15},          prodMult:1.5, name:'Level 2' },
       { cost:{wood:15,stone:25,iron:5},  prodMult:2.0, name:'Level 3' },
     ] },
+  sawmill:   { name:'Sawmill',     icon:'🪚', cost:{wood:20,stone:12}, workers:1, convert:{from:'wood',to:'planks',amount:3,cap:40}, desc:'Cuts stored wood into planks for advanced construction' },
   quarry:    { name:'Quarry',      icon:'⛏️', cost:{wood:10},          prod:{stone:2}, workers:1, on:[TILE.STONE], desc:'Extracts stone',
     upgrades: [
       { cost:{wood:15,stone:10},         prodMult:1.5, name:'Level 2' },
@@ -47,24 +48,24 @@ export const BUILDINGS = {
       { cost:{wood:30,stone:22,gold:10}, prodMult:1.5, name:'Level 2' },
       { cost:{wood:50,stone:38,gold:25,iron:5}, prodMult:2.0, name:'Level 3' },
     ] },
-  barracks:  { name:'Barracks',    icon:'⚔️', cost:{wood:20,stone:20,iron:5}, defense:10, workers:2, desc:'Trains soldiers for defense' },
-  tower:     { name:'Watch Tower', icon:'🗼', cost:{stone:25,iron:5},  defense:15, reveal:4, desc:'Reveals fog and defends' },
+  barracks:  { name:'Barracks',    icon:'⚔️', cost:{wood:20,stone:20,iron:5,planks:10}, defense:10, workers:2, desc:'Trains soldiers for defense' },
+  tower:     { name:'Watch Tower', icon:'🗼', cost:{stone:25,iron:5,planks:8},  defense:15, reveal:4, desc:'Reveals fog and defends' },
   well:      { name:'Well',        icon:'🪣', cost:{stone:10},         happiness:5,  radius:4, desc:'Provides water, boosts happiness' },
   tavern:    { name:'Tavern',      icon:'🍺', cost:{wood:20,gold:10},  happiness:10, radius:5, workers:1, desc:'Entertainment, big happiness boost' },
   wall:      { name:'Wall',        icon:'🧱', cost:{stone:8},          defense:5, desc:'Fortification segment' },
   road:      { name:'Road',        icon:'🛤️', cost:{stone:3},          speedBonus:true, desc:'Citizens move faster on roads' },
   tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
-  castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50}, defense:50, happiness:20, pop:10, desc:'The ultimate structure. Build this to win!' },
+  castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50,planks:20}, defense:50, happiness:20, pop:10, desc:'The ultimate structure. Build this to win!' },
   granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
   storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, desc:'Receives delivered wood, stone, iron, and overflow goods' },
-  church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
+  church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15,planks:8}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
   windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, convert:{from:'wheat',to:'flour',amount:4}, desc:'Mills wheat into flour for the bakery' },
   bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, convert:{from:'flour',to:'food',amount:3,yield:2}, happiness:5, desc:'Bakes flour into bread — two food per flour. Small happiness boost.' },
   chickencoop: { name:'Chicken Coop', icon:'🐔', cost:{wood:15}, prod:{food:1}, workers:1, desc:'Small chicken coop producing eggs and meat' },
   cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
   fisherman: { name:"Fisherman's Hut", icon:'🐟', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
-  blacksmith: { name:'Blacksmith', icon:'🔨', cost:{wood:20,stone:15}, workers:1, desc:'Forges weapons. Boosts soldier damage by 50%.', boost:{type:'soldier',radius:8,multiplier:1.5} },
+  blacksmith: { name:'Blacksmith', icon:'🔨', cost:{wood:20,stone:15}, workers:1, convert:{from:'iron',to:'tools',amount:2,cap:20}, desc:'Forges iron into tools that speed production. Boosts soldier damage by 50%.', boost:{type:'soldier',radius:8,multiplier:1.5} },
   archery:   { name:'Archery Range', icon:'🏹', cost:{wood:30,stone:10}, workers:1, defense:5, desc:'Trains archer units. Archers have longer range but less HP.' },
   // Loop 243 (the-fixer, 101 filed ~140 ticks): mayor structural-unlock.
   // Town Hall — civic governance building gated on a named mayor (set by
@@ -81,7 +82,7 @@ export const BUILDINGS = {
   // townhalls break the named-character-gate framing. Real-world towns
   // also have one civic seat. First use of the maxCount schema field;
   // tech.js isBuildingUnlocked enforces it generically.
-  townhall:  { name:'Town Hall',   icon:'🏛️', cost:{stone:40,wood:30,gold:20}, happiness:8, radius:6, pop:5, maxCount:1, desc:'Civic governance — boosts realm happiness + housing. Requires a named mayor. One per realm.' },
+  townhall:  { name:'Town Hall',   icon:'🏛️', cost:{stone:40,wood:30,gold:20,planks:12}, happiness:8, radius:6, pop:5, maxCount:1, desc:'Civic governance — boosts realm happiness + housing. Requires a named mayor. One per realm.' },
 };
 
 // ── Mutable game state (single source of truth) ───────────
@@ -96,7 +97,7 @@ export const G = {
   animals: [],
   enemies: [],
   projectiles: [],
-  resources: { wood:60, stone:30, food:80, gold:25, iron:0, wheat:0, flour:0 },
+  resources: { wood:60, stone:30, food:80, gold:25, iron:0, wheat:0, flour:0, planks:0, tools:0 },
   population: 3,
   maxPop: 3,
   happiness: 50,
@@ -139,7 +140,7 @@ export const G = {
   difficulty: 'normal', // easy, normal, hard
   scenario: 'peaceful_start', // selected scenario id
   kingdomName: 'Realm',
-  resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0, wheat:0, flour:0 },
+  resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0, wheat:0, flour:0, planks:0, tools:0 },
   notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
   lastResources: null, // snapshot for rate calculation
   stats: {
@@ -176,7 +177,7 @@ const FIRST = ['Ada','Bjorn','Celia','Dag','Elsa','Finn','Greta','Hans','Inga','
 const LAST = ['Stone','Brook','Field','Hill','Dale','Wood','Lake','Ridge','Vale','Forge','Thorn','Frost','Marsh','Glen','Pike','Ash','Birch','Elm','Oak','Pine'];
 export function randomName() { return FIRST[rngInt(0,FIRST.length-1)]+' '+LAST[rngInt(0,LAST.length-1)]; }
 
-export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️',wheat:'🌾',flour:'🫓'}[k]||k; }
+export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️',wheat:'🌾',flour:'🫓',planks:'🪚',tools:'🛠️'}[k]||k; }
 
 export const DIFFICULTY = {
   easy:   { label:'🟢 Easy',   startFood:120, startWood:80, startGold:40, foodMult:0.6, raidMult:0.5, raidStart:12 },

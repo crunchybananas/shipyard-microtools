@@ -32,6 +32,7 @@ const _SPRITE_TYPES = new Set([
   'well',      // 306 — Phase F first; supporting structure with strong narrative anchor (227 well_remembers).
   'farm', 'lumber', 'quarry', 'mine', 'fisherman', 'tradingpost',
   'school', 'archery', 'wall', 'road', 'chickencoop', 'cowpen',
+  'sawmill', // aliases the lumber cell via rasterSpriteKey
 ]);
 
 const _RASTER_ATLAS_URL = 'assets/sprites/buildings-atlas-painted.png';
@@ -53,7 +54,9 @@ const _RASTER_ATLAS_FRAMES = Object.fromEntries(_RASTER_ATLAS_TYPES.map((type, i
   },
 ]));
 function rasterSpriteKey(type) {
-  return type === 'storehouse' ? 'granary' : type;
+  if (type === 'storehouse') return 'granary';
+  if (type === 'sawmill') return 'lumber'; // v1: sawmill reuses the mill art until it gets its own atlas cell
+  return type;
 }
 const _RASTER_ATLAS_TRIMS = {
   granary:    { x: 17, y:  8, w: 100, h: 120 },
@@ -124,7 +127,7 @@ export function actorVariantForCitizen(c) {
   if (!jt && c.state === 'foraging') return 'forager';
   if (jt === 'chickencoop' || jt === 'cowpen') return 'rancher';
   if (jt === 'farm' || jt === 'windmill' || jt === 'bakery') return 'farmer';
-  if (jt === 'lumber') return 'lumber';
+  if (jt === 'lumber' || jt === 'sawmill') return 'lumber';
   if (jt === 'quarry') return 'stonecutter';
   if (jt === 'blacksmith') return 'blacksmith';
   if (jt === 'mine') return 'miner';
@@ -451,6 +454,7 @@ const _SPRITE_SIZES = {
                                  //   (well is supporting; small footprint).
   farm:        { w: 58, h: 38 },
   lumber:      { w: 52, h: 48 },
+  sawmill:     { w: 52, h: 48 },
   quarry:      { w: 50, h: 42 },
   mine:        { w: 50, h: 46 },
   fisherman:   { w: 56, h: 50 },
