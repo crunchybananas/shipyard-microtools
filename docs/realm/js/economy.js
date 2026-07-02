@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=117';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=117';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=117';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=117';
-import { playSound, playBuildingSound } from './audio.js?realm=117';
-import { spawnDust } from './particles.js?realm=117';
-import { panCameraTo } from './render.js?realm=117';
-import { chronicle } from './story.js?realm=117';
-import { notify, notifyBuild } from './notifications.js?realm=117';
-import { isBuildingUnlocked } from './tech.js?realm=117';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=118';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=118';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=118';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=118';
+import { playSound, playBuildingSound } from './audio.js?realm=118';
+import { spawnDust } from './particles.js?realm=118';
+import { panCameraTo } from './render.js?realm=118';
+import { chronicle } from './story.js?realm=118';
+import { notify, notifyBuild } from './notifications.js?realm=118';
+import { isBuildingUnlocked } from './tech.js?realm=118';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -309,8 +309,10 @@ export function updateProduction() {
       // from the realm stores and emit the output. A converter with no input
       // this cycle produces nothing — build the upstream chain.
       if (def.convert) {
+        // Guilds (Era III tech): chartered converters draw half again more input.
+        const guildMult = G.researchedTechs.has('guilds') ? 1.5 : 1;
         const room = def.convert.cap ? Math.max(0, def.convert.cap - Math.floor(G.resources[def.convert.to] || 0)) : Infinity;
-        const take = Math.min(def.convert.amount, Math.floor(G.resources[def.convert.from] || 0), room);
+        const take = Math.min(Math.round(def.convert.amount * guildMult), Math.floor(G.resources[def.convert.from] || 0), room);
         if (take > 0) {
           G.resources[def.convert.from] -= take;
           adjustedProd[def.convert.to] = (adjustedProd[def.convert.to] || 0) + take * (def.convert.yield || 1);

@@ -2,13 +2,13 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=117';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=117';
-import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js?realm=117';
-import { notify } from './notifications.js?realm=117';
-import { initAudio, playSound } from './audio.js?realm=117';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js?realm=117';
-import { renderMissions } from './missions.js?realm=117';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=118';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=118';
+import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js?realm=118';
+import { notify } from './notifications.js?realm=118';
+import { initAudio, playSound } from './audio.js?realm=118';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js?realm=118';
+import { renderMissions } from './missions.js?realm=118';
 
 function pickTile(clientX, clientY) {
   return screenToWorld(clientX, clientY);

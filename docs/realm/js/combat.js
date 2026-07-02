@@ -2,17 +2,17 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=117';
-import { stepEntityToward } from './pathfinding.js?realm=117';
-import { spawnClashFX } from './particles.js?realm=117';
+import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=118';
+import { stepEntityToward } from './pathfinding.js?realm=118';
+import { spawnClashFX } from './particles.js?realm=118';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { playSound } from './audio.js?realm=117';
-import { demolishBuilding } from './economy.js?realm=117';
-import { notify } from './notifications.js?realm=117';
-import { chronicle } from './story.js?realm=117';
+import { playSound } from './audio.js?realm=118';
+import { demolishBuilding } from './economy.js?realm=118';
+import { notify } from './notifications.js?realm=118';
+import { chronicle } from './story.js?realm=118';
 
 export function updateEnemies() {
   // Morale break: when a raid has lost more than 60% of its fighters, the

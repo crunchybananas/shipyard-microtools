@@ -2,13 +2,13 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=117';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=117';
-import { setArmyTargets } from './input.js?realm=117';
-import { saveGame, loadGame, hasSave } from './save.js?realm=117';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=117';
-import { notify } from './notifications.js?realm=117';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=117';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=118';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=118';
+import { setArmyTargets } from './input.js?realm=118';
+import { saveGame, loadGame, hasSave } from './save.js?realm=118';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=118';
+import { notify } from './notifications.js?realm=118';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=118';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',

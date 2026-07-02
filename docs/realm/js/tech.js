@@ -2,10 +2,10 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=117';
-import { playSound } from './audio.js?realm=117';
-import { chronicle } from './story.js?realm=117';
-import { notify } from './notifications.js?realm=117';
+import { G, BUILDINGS } from './state.js?realm=118';
+import { playSound } from './audio.js?realm=118';
+import { chronicle } from './story.js?realm=118';
+import { notify } from './notifications.js?realm=118';
 
 export const TECHS = {
   agriculture: {
@@ -35,17 +35,17 @@ export const TECHS = {
     time: 300,
     // well + road live in Era I so Cottage evolution (well visits,
     // state.js HOUSE_TIERS) is reachable before the Age of Charter.
-    unlocks: ['quarry', 'wall', 'church', 'road', 'well'],
+    unlocks: ['quarry', 'wall', 'road', 'well'],
     icon: '🧱',
     prereq: null,
     era: 1,
   },
   engineering: {
     name: 'Engineering',
-    desc: 'Unlocks sawmills for plank production',
+    desc: 'Unlocks sawmills and churches',
     cost: { gold: 20, stone: 15 },
-    time: 400,
-    unlocks: ['sawmill'],
+    time: 900,
+    unlocks: ['sawmill', 'church'],
     icon: '⚙️',
     prereq: 'masonry',
     era: 2,
@@ -54,7 +54,7 @@ export const TECHS = {
     name: 'Metallurgy',
     desc: 'Unlocks iron mines for advanced materials',
     cost: { gold: 30, stone: 20 },
-    time: 500,
+    time: 1000,
     unlocks: ['mine'],
     icon: '⛏️',
     prereq: 'masonry',
@@ -74,7 +74,7 @@ export const TECHS = {
     name: 'Military',
     desc: 'Unlocks barracks and watch towers',
     cost: { gold: 25, iron: 5 },
-    time: 450,
+    time: 1100,
     unlocks: ['barracks', 'tower'],
     icon: '⚔️',
     prereq: 'metallurgy',
@@ -84,7 +84,7 @@ export const TECHS = {
     name: 'Brewing',
     desc: 'Unlocks taverns for happiness',
     cost: { gold: 15, food: 20 },
-    time: 250,
+    time: 700,
     unlocks: ['tavern'],
     icon: '🍺',
     prereq: 'commerce',
@@ -94,7 +94,7 @@ export const TECHS = {
     name: 'Architecture',
     desc: 'The pinnacle of knowledge. Unlocks the Castle — build it to win!',
     cost: { gold: 50, stone: 30, iron: 10 },
-    time: 800,
+    time: 2000,
     unlocks: ['castle'],
     icon: '🏰',
     prereq: 'military',
@@ -124,7 +124,7 @@ export const TECHS = {
     name: 'Smithing',
     desc: 'Unlocks blacksmith for better weapons',
     cost: { gold: 25, iron: 5 },
-    time: 400,
+    time: 900,
     unlocks: ['blacksmith'],
     icon: '🔨',
     prereq: 'metallurgy',
@@ -134,11 +134,31 @@ export const TECHS = {
     name: 'Archery',
     desc: 'Unlocks archery range for ranged units',
     cost: { gold: 20, wood: 20 },
-    time: 400,
+    time: 900,
     unlocks: ['archery'],
     icon: '🏹',
     prereq: 'military',
     era: 2,
+  },
+  guilds: {
+    name: 'Guilds',
+    desc: 'Charters the craft guilds — converters work half again as fast',
+    cost: { gold: 60, planks: 20 },
+    time: 1500,
+    unlocks: [],
+    icon: '🏛️',
+    prereq: 'smithing',
+    era: 3,
+  },
+  monuments: {
+    name: 'Monuments',
+    desc: 'The realm learns to build for the ages — the path to a Wonder',
+    cost: { gold: 100, stone: 50, planks: 30, tools: 10 },
+    time: 2400,
+    unlocks: ['wonder'],
+    icon: '🕍',
+    prereq: 'architecture',
+    era: 3,
   },
 };
 
@@ -211,6 +231,8 @@ const RESEARCH_BEATS = {
   husbandry:    'Husbandry is grasped. Hoof and horn are counted, named, remembered.',
   smithing:     'Smithing is learned. Hammers now strike with purpose beyond force.',
   archery:      "The fletcher's trade is mastered. Arrows fly true to measure, not to hope.",
+  guilds:       'The guilds receive their charters. Craft now answers to craft, and the wheels turn faster.',
+  monuments:    'The realm learns to build for the ages. Somewhere beyond the scaffolds, a Wonder waits.',
 };
 
 export function updateResearch() {
