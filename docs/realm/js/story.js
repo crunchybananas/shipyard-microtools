@@ -3,7 +3,7 @@
 // diary of the realm. Persists to save.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=123';
+import { G } from './state.js?realm=124';
 
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
@@ -2995,8 +2995,8 @@ export function checkNightmareBeat() {
 // position in the module graph. Set on module-load below.
 let _NIGHTMARE_NOTIFY = null;
 let _PLAY_SOUND = null;
-import('./notifications.js?realm=123').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
-import('./audio.js?realm=123').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
+import('./notifications.js?realm=124').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
+import('./audio.js?realm=124').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
 
 // ── Loop 056: a-scene-that-happens-once (second take) ────────
 //

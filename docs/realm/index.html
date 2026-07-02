@@ -711,6 +711,7 @@ body.sprite-lab-open{overflow:hidden}
 #wonder-chip{position:fixed;left:0.65rem;top:10.2rem;z-index:30;padding:0.32rem 0.6rem;background:var(--panel);border:1px solid rgba(255,209,102,0.45);border-radius:99px;color:var(--gold);font-size:0.7rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,0.35);white-space:nowrap}
 #wonder-chip:hover{background:rgba(255,209,102,0.12)}
 body.photo-mode #wonder-chip{display:none!important}
+.vic-eras{margin:0.55rem 0 0.15rem;font-size:0.72rem;color:rgba(255,255,255,0.62);letter-spacing:0.02em;text-align:center}
 /* old compat aliases (achievements/log panels reuse .research-content) */
 .rp-label{font-size:var(--fs-sm);margin-bottom:0.3rem}
 .rp-pct{font-size:var(--fs-xs);color:rgba(255,255,255,0.5);margin-top:0.2rem;text-align:right}
@@ -919,6 +920,7 @@ body.photo-mode #wonder-chip{display:none!important}
       <div class="vic-stat"><span class="vic-label">Achievements</span><span class="vic-achievements">—</span></div>
       <div class="vic-stat"><span class="vic-label">Prestige</span><span class="vic-prestige">—</span></div>
     </div>
+    <div class="vic-eras" style="display:none"></div>
     <button class="vic-btn" onclick="this.closest('#victory-screen').style.display='none'">Continue Playing</button>
   </div>
 </div>
@@ -943,6 +945,10 @@ body.photo-mode #wonder-chip{display:none!important}
         <span class="hk">H / Home</span><span>Recenter on island</span>
       </div>
       <div class="help-grid">
+        <span class="help-section-title">Army</span>
+        <span class="hk">G</span><span>Cycle army stance: defend → rally → patrol</span>
+        <span class="hk">Shift+Right-click</span><span>Plant / clear the rally flag</span>
+        <span class="hk">Click tower</span><span>Garrison soldiers (+range, faster volleys)</span>
         <span class="help-section-title">Time</span>
         <span class="hk">Space</span><span>Cycle speed: pause → 1× → 2× → 4×</span>
         <span class="hk">P</span><span>Toggle pause</span>
@@ -1106,6 +1112,6 @@ if (localDev && !spriteDev && 'serviceWorker' in navigator) {
   }).catch(() => {});
 }
 </script>
-<script type="module" src="js/main.js?realm=123"></script>
+<script type="module" src="js/main.js?realm=124"></script>
 </body>
 </html>

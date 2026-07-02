@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=123';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=123';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=123';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=123';
-import { playSound, playBuildingSound } from './audio.js?realm=123';
-import { spawnDust } from './particles.js?realm=123';
-import { panCameraTo } from './render.js?realm=123';
-import { chronicle } from './story.js?realm=123';
-import { notify, notifyBuild } from './notifications.js?realm=123';
-import { isBuildingUnlocked } from './tech.js?realm=123';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=124';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=124';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=124';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=124';
+import { playSound, playBuildingSound } from './audio.js?realm=124';
+import { spawnDust } from './particles.js?realm=124';
+import { panCameraTo } from './render.js?realm=124';
+import { chronicle } from './story.js?realm=124';
+import { notify, notifyBuild } from './notifications.js?realm=124';
+import { isBuildingUnlocked } from './tech.js?realm=124';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -870,6 +870,15 @@ export function showVictoryScreen() {
     const isBest = prestige >= best;
     if (isBest) { best = prestige; try { localStorage.setItem('realm-prestige-best', String(best)); } catch (_e) {} }
     prestigeEl.textContent = isBest ? `${prestige} ★ new best` : `${prestige} (best ${best})`;
+  }
+  // Era timeline: when each age began (only shown once the realm advanced).
+  const erasEl = el.querySelector('.vic-eras');
+  if (erasEl) {
+    const names = { 1: '🏕️ Hearth', 2: '📜 Charter', 3: '👑 Crown' };
+    const starts = G.eraStartDay || { 1: 1 };
+    const parts = Object.keys(starts).sort((a, b) => a - b).map(id => `${names[id] || `Age ${id}`} · day ${starts[id]}`);
+    erasEl.style.display = parts.length > 1 ? 'block' : 'none';
+    erasEl.textContent = parts.join('  →  ');
   }
   el.querySelector('.vic-day').textContent = `Day ${G.day}`;
   el.querySelector('.vic-pop').textContent = `${G.population} citizens`;

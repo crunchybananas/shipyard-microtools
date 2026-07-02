@@ -2,17 +2,17 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=123';
-import { stepEntityToward } from './pathfinding.js?realm=123';
-import { spawnClashFX } from './particles.js?realm=123';
+import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=124';
+import { stepEntityToward } from './pathfinding.js?realm=124';
+import { spawnClashFX } from './particles.js?realm=124';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { playSound } from './audio.js?realm=123';
-import { demolishBuilding } from './economy.js?realm=123';
-import { notify } from './notifications.js?realm=123';
-import { chronicle } from './story.js?realm=123';
+import { playSound } from './audio.js?realm=124';
+import { demolishBuilding } from './economy.js?realm=124';
+import { notify } from './notifications.js?realm=124';
+import { chronicle } from './story.js?realm=124';
 
 export function updateEnemies() {
   // Morale break: when a raid has lost more than 60% of its fighters, the
@@ -295,6 +295,8 @@ export function updateTowers() {
   // Towers fire at nearby enemies
   for (const b of G.buildings) {
     if (b.type !== 'tower' && b.type !== 'barracks') continue;
+    // A scaffold doesn't shoot: no fire until construction completes.
+    if (b.buildProgress !== undefined && b.buildProgress < 1) continue;
     b.fireTimer = (b.fireTimer || 0) - G.speed;
     if (b.fireTimer > 0) continue;
     // Find nearest enemy
