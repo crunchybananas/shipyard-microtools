@@ -2386,11 +2386,27 @@ export function render() {
   for (const c of G.citizens) {
     worldDrawQueue.push({ depth: c.x + c.y, order: 1, draw: () => drawOneCitizen(c) });
   }
+  // Walkers, soldiers, caravans, and raiders share the same depth pass so no
+  // entity ever floats above a building it stands behind. Their draw
+  // functions are hoisted declarations defined in their original sections.
+  for (const w of G.walkers) {
+    worldDrawQueue.push({ depth: w.x + w.y, order: 1, draw: () => drawOneWalker(w) });
+  }
+  for (const sld of G.soldiers) {
+    worldDrawQueue.push({ depth: sld.x + sld.y, order: 1, draw: () => drawOneSoldier(sld) });
+  }
+  for (const cv of G.caravans) {
+    worldDrawQueue.push({ depth: cv.x + cv.y, order: 1, draw: () => drawOneCaravan(cv) });
+  }
+  for (const en of G.enemies) {
+    worldDrawQueue.push({ depth: en.x + en.y, order: 1, draw: () => drawOneEnemy(en) });
+  }
   worldDrawQueue.sort((a, b) => a.depth - b.depth || a.order - b.order);
   for (const item of worldDrawQueue) item.draw();
 
-  // ── Service walkers ───────────────────────────────────────
-  for (const w of G.walkers) {
+  // ── Service walkers (drawn via the unified depth pass) ────
+  function drawOneWalker(wEntity) {
+  for (const w of [wEntity]) {
     const ws = toScreen(w.x, w.y);
     ctx.globalAlpha = Math.max(0.85, daylight);
     // Loop 64 (render S4): ambient walkers (merchant, student, crier, etc.)
@@ -2437,6 +2453,7 @@ export function render() {
       ctx.fillText(w.emoji, ws.x, ws.y - 6);
     }
   }
+  }
 
   // ── Selected citizen path visualization ──────────────────
   if (G.selectedCitizen && G.selectedCitizen.path && G.selectedCitizen.pathIdx < G.selectedCitizen.path.length) {
@@ -2468,8 +2485,9 @@ export function render() {
     ctx.globalAlpha = daylight;
   }
 
-  // ── Soldiers ──────────────────────────────────────────────
-  for (const s of G.soldiers) {
+  // ── Soldiers (drawn via the unified depth pass) ───────────
+  function drawOneSoldier(sEntity) {
+  for (const s of [sEntity]) {
     const ss = toScreen(s.x, s.y);
     // Loop 61 (render S4): soldier silhouette rebuild — proper legs, drop
     // shadow, and body-with-shoulders. Prior shape was the pre-L41 body
@@ -2590,6 +2608,7 @@ export function render() {
       ctx.fillRect(ss.x - 5, ss.y - 22, 10 * (s.hp / s.maxHp), 2);
     }
   }
+  }
 
   // ── Rally point flag ──────────────────────────────────────
   if (G.rallyPoint) {
@@ -2673,8 +2692,9 @@ export function render() {
     ctx.globalAlpha = 1;
   }
 
-  // ── Caravans ──────────────────────────────────────────────
-  for (const c of G.caravans) {
+  // ── Caravans (drawn via the unified depth pass) ───────────
+  function drawOneCaravan(cvEntity) {
+  for (const c of [cvEntity]) {
     // Dust trail behind caravan
     if (G.gameTick % 8 === 0) {
       G.particles.push({
@@ -2723,9 +2743,11 @@ export function render() {
     ctx.fill();
 
   }
+  }
 
-  // ── Enemies ───────────────────────────────────────────────
-  for (const e of G.enemies) {
+  // ── Enemies (drawn via the unified depth pass) ────────────
+  function drawOneEnemy(eEntity) {
+  for (const e of [eEntity]) {
     const es = toScreen(e.x, e.y);
     ctx.globalAlpha = daylight;
     // Per-enemy visual variety from fixed spawn variant
@@ -2888,6 +2910,7 @@ export function render() {
       ctx.fillStyle = '#ef4444';
       ctx.fillRect(es.x - 7, es.y - 22, 14 * (e.hp/e.maxHp), 2);
     }
+  }
   }
 
   // ── Projectiles (arrows) ───────────────────────────────────
