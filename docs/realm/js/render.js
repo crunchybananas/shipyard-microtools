@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=126';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=126';
-import { makeAtlasLoader } from './atlas-loader.js?realm=126';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=127';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=127';
+import { makeAtlasLoader } from './atlas-loader.js?realm=127';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -1785,19 +1785,24 @@ export function render() {
     // evacuating instead of vanishing and rematerializing.
     const cGhost = citizenOnBlockedBuildingTile(c);
     const s = toScreen(c.x, c.y);
+    const pathActive = !!(c.path && c.pathIdx < (c.path?.length ?? 0));
     // Road lane offset (render-only): while walking a road tile, drift to
     // the right-hand side of the direction of travel so two-way traffic
-    // reads as lanes instead of head-on overlap. World/collision position
-    // is untouched.
-    if (c.path && c.pathIdx < c.path.length &&
-        G.buildingGrid[Math.round(c.y)]?.[Math.round(c.x)]?.type === 'road') {
+    // reads as lanes instead of head-on overlap. The offset EASES in and
+    // out — road joins/leaves, corners, and one-frame path gaps must never
+    // pop the sprite sideways. World/collision position is untouched.
+    let laneTx = 0, laneTy = 0;
+    if (pathActive && G.buildingGrid[Math.round(c.y)]?.[Math.round(c.x)]?.type === 'road') {
       const wp = c.path[c.pathIdx];
       const ldx = wp.x - c.x, ldy = wp.y - c.y;
       const llen = Math.hypot(ldx, ldy);
-      if (llen > 0.01) {
-        const lane = toScreen(c.x - ldy / llen * 0.16, c.y + ldx / llen * 0.16);
-        s.x = lane.x; s.y = lane.y;
-      }
+      if (llen > 0.01) { laneTx = -ldy / llen * 0.16; laneTy = ldx / llen * 0.16; }
+    }
+    c._laneX = (c._laneX || 0) + (laneTx - (c._laneX || 0)) * 0.12;
+    c._laneY = (c._laneY || 0) + (laneTy - (c._laneY || 0)) * 0.12;
+    if (Math.abs(c._laneX) > 0.002 || Math.abs(c._laneY) > 0.002) {
+      const lane = toScreen(c.x + c._laneX, c.y + c._laneY);
+      s.x = lane.x; s.y = lane.y;
     }
     ctx.globalAlpha = cGhost ? 0.35 : Math.max(0.85, daylight);
     // Loop 71 (render S4): damage flash. When c.hurtTimer > 0 (set by
@@ -1811,7 +1816,12 @@ export function render() {
     // Loop 4 (render S3): phase derived from name-hash instead of c.x so
     // neighbors don't bob in stadium-wave lockstep. Prior (c.x * N) meant
     // two citizens on adjacent tiles had near-identical phase.
-    const isMoving = c.path && c.pathIdx < (c.path?.length ?? 0);
+    // Walk-row hysteresis: paths routinely empty for a single frame between
+    // arrival and the next repath (measured ~2 one-frame walk->idle->walk
+    // row flaps per second per moving citizen). citizens.js stamps _movedAt
+    // on every real step; holding the walk row ~8 ticks after the last step
+    // absorbs the gap without letting stopped citizens walk in place.
+    const isMoving = pathActive || (G.gameTick - (c._movedAt ?? -999)) < 8;
     const phaseHash = (c.name.charCodeAt(0) * 91 + (c.name.charCodeAt(1) || 11) * 41) % 360;
     const phaseOffset = phaseHash * Math.PI / 180;
     const bob = isMoving

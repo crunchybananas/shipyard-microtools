@@ -2,10 +2,10 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=126';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=126';
-import { getCitizenSpeedMult } from './events.js?realm=126';
-import { revealAround } from './world.js?realm=126';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=127';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=127';
+import { getCitizenSpeedMult } from './events.js?realm=127';
+import { revealAround } from './world.js?realm=127';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -368,6 +368,7 @@ function evacuateBlockedCitizen(c) {
     if (canStepCitizen(c, nx, ny)) {
       c.x = nx;
       c.y = ny;
+      c._movedAt = G.gameTick;
     }
     c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
     c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
@@ -579,6 +580,10 @@ export function updateCitizens() {
         if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
+          // Render reads this for walk-row hysteresis: paths empty for a
+          // single frame between arrival and the next repath, and raw
+          // path-presence flapped the walk/idle rows (visible flicker).
+          c._movedAt = G.gameTick;
           if (Math.abs(dx) > 0.04 || Math.abs(dy) > 0.04) {
             c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
             c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
@@ -619,6 +624,7 @@ export function updateCitizens() {
         if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
+          c._movedAt = G.gameTick;
           if (Math.abs(dx) > 0.04 || Math.abs(dy) > 0.04) {
             c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
             c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;

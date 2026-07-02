@@ -2,15 +2,15 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=126';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport, computePrestige, prestigeBest } from './economy.js?realm=126';
-import { getWonderReport } from './wonder.js?realm=126';
-import { panCameraTo } from './render.js?realm=126';
-import { setArmyTargets } from './input.js?realm=126';
-import { saveGame, loadGame, hasSave } from './save.js?realm=126';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=126';
-import { notify } from './notifications.js?realm=126';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=126';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=127';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport, computePrestige, prestigeBest } from './economy.js?realm=127';
+import { getWonderReport } from './wonder.js?realm=127';
+import { panCameraTo } from './render.js?realm=127';
+import { setArmyTargets } from './input.js?realm=127';
+import { saveGame, loadGame, hasSave } from './save.js?realm=127';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=127';
+import { notify } from './notifications.js?realm=127';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=127';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
