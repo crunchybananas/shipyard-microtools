@@ -2,12 +2,12 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
-import { stepEntityToward } from './pathfinding.js';
-import { playSound } from './audio.js';
-import { demolishBuilding } from './economy.js';
-import { notify } from './notifications.js';
-import { chronicle } from './story.js';
+import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=115';
+import { stepEntityToward } from './pathfinding.js?realm=115';
+import { playSound } from './audio.js?realm=115';
+import { demolishBuilding } from './economy.js?realm=115';
+import { notify } from './notifications.js?realm=115';
+import { chronicle } from './story.js?realm=115';
 
 export function updateEnemies() {
   for (let i = G.enemies.length - 1; i >= 0; i--) {

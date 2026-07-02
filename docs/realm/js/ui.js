@@ -2,12 +2,12 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js';
-import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js';
-import { saveGame, loadGame, hasSave } from './save.js';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js';
-import { notify } from './notifications.js';
-import { TRADE_PARTNERS, executeTrade } from './trade.js';
+import { G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js?realm=115';
+import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js?realm=115';
+import { saveGame, loadGame, hasSave } from './save.js?realm=115';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js?realm=115';
+import { notify } from './notifications.js?realm=115';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=115';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',

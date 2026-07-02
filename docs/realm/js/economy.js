@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js';
-import { getProductionMultiplier, getHappinessOffset } from './events.js';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
-import { playSound, playBuildingSound } from './audio.js';
-import { spawnDust } from './particles.js';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js?realm=115';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=115';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=115';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=115';
+import { playSound, playBuildingSound } from './audio.js?realm=115';
+import { spawnDust } from './particles.js?realm=115';
 import { panCameraTo } from './render.js?realm=115';
-import { chronicle } from './story.js';
-import { notify, notifyBuild } from './notifications.js';
-import { isBuildingUnlocked } from './tech.js';
+import { chronicle } from './story.js?realm=115';
+import { notify, notifyBuild } from './notifications.js?realm=115';
+import { isBuildingUnlocked } from './tech.js?realm=115';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
