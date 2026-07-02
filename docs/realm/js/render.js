@@ -2527,6 +2527,30 @@ export function render() {
     ctx.fillStyle = 'rgba(0,0,0,0.22)';
     ctx.beginPath(); ctx.ellipse(ss.x, ss.y + 2, 3.2, 1.4, 0, 0, Math.PI*2); ctx.fill();
 
+    // Painted-atlas soldiers: barracks units wear the guard sprites. Attack
+    // stance (enemy within reach) uses the guard's spear-thrust work rows and
+    // faces the enemy; otherwise walk/idle follows patrol movement. The
+    // procedural chibi below remains as an atlas-loading fallback.
+    const smx = s.x - (s._pdx ?? s.x), smy = s.y - (s._pdy ?? s.y);
+    s._pdx = s.x; s._pdy = s.y;
+    let sFx = smx, sFy = smy;
+    let sAction = Math.hypot(smx, smy) > 0.004 ? 'walk' : 'idle';
+    let sNearE = null, sNearD = Infinity;
+    for (const e of G.enemies) {
+      const d = Math.hypot(e.x - s.x, e.y - s.y);
+      if (d < sNearD) { sNearD = d; sNearE = e; }
+    }
+    if (sNearE && sNearD < 6) { sAction = 'work'; sFx = sNearE.x - s.x; sFy = sNearE.y - s.y; }
+    const sLen = Math.hypot(sFx, sFy) || 1;
+    const sFaceX = (sFx / sLen) - (sFy / sLen);
+    const sFaceY = ((sFx / sLen) + (sFy / sLen)) * 0.5;
+    const sDir = actorDirection(sFaceX, sFaceY, sFaceY < -0.02);
+    const sFrame = sAction === 'idle' ? 0 : Math.floor(G.gameTick / (sAction === 'work' ? 6 : 7)) % ACTOR_FRAMES;
+    const sDrawn = drawActorAtlasFrame(ctx, {
+      role: 'guard', action: sAction, dir: sDir, frame: sFrame,
+      x: Math.round(ss.x - 13.5), y: Math.round(ss.y + 3 - 35), width: 27, height: 35,
+    });
+    if (!sDrawn) {
     const isArcher = s.type === 'archer';
     const bodyColor = isArcher ? '#4a6a2a' : '#5a6a7a';
     const darkerBody = isArcher ? '#3a5020' : '#44525e';
@@ -2617,6 +2641,7 @@ export function render() {
     }
 
     // HP bar when damaged
+    }
     if (s.hp < s.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
       ctx.fillRect(ss.x - 5, ss.y - 22, 10, 2);
