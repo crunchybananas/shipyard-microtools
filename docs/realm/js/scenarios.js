@@ -2,7 +2,7 @@
 // Scenarios — structured objective-based campaigns
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=122';
+import { G } from './state.js?realm=123';
 
 export const SCENARIOS = [
   {

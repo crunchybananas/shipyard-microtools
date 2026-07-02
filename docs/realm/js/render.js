@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=122';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=122';
-import { makeAtlasLoader } from './atlas-loader.js?realm=122';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=123';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=123';
+import { makeAtlasLoader } from './atlas-loader.js?realm=123';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -2427,7 +2427,7 @@ export function render() {
     ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = 'rgba(0,0,0,0.18)';
     ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 3.5, 1.6, 0, 0, Math.PI*2); ctx.fill();
-    const walkerRole = { church: 'scholar', tavern: 'innkeeper', well: 'settler', market: 'trader' }[w.home?.type] || 'settler';
+    const walkerRole = { church: 'scholar', tavern: 'innkeeper', well: 'settler', market: 'trader', wonder: 'builder' }[w.home?.type] || 'settler';
     const wdx = (w.tx ?? w.x) - w.x, wdy = (w.ty ?? w.y) - w.y;
     const wd = Math.hypot(wdx, wdy);
     const wMoving = wd > 0.15;
@@ -2437,7 +2437,7 @@ export function render() {
     const wDir = actorDirection(wFaceX, wFaceY, wFaceY < -0.02);
     const wFrame = wMoving ? (Math.floor(G.gameTick / 7) + ((w.home?.x || 0) % ACTOR_FRAMES)) % ACTOR_FRAMES : 0;
     const wDrawn = drawActorAtlasFrame(ctx, {
-      role: walkerRole, action: wMoving ? 'walk' : 'idle', dir: wDir, frame: wFrame,
+      role: walkerRole, action: wMoving ? (w.hauler ? 'carry' : 'walk') : 'idle', dir: wDir, frame: wFrame,
       x: Math.round(ws.x - 13.5), y: Math.round(ws.y + 3 - 35), width: 27, height: 35,
     });
     if (!wDrawn) {
