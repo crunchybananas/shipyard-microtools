@@ -2,13 +2,13 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=118';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=118';
-import { setArmyTargets } from './input.js?realm=118';
-import { saveGame, loadGame, hasSave } from './save.js?realm=118';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=118';
-import { notify } from './notifications.js?realm=118';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=118';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=120';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=120';
+import { setArmyTargets } from './input.js?realm=120';
+import { saveGame, loadGame, hasSave } from './save.js?realm=120';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=120';
+import { notify } from './notifications.js?realm=120';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=120';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -331,7 +331,7 @@ const CATEGORIES = [
   { name: 'Defense',        keys: ['barracks', 'archery', 'tower', 'wall', 'blacksmith'] },
   { name: 'Infrastructure', keys: ['road', 'well', 'granary', 'storehouse'] },
   { name: 'Culture',        keys: ['tavern', 'church', 'townhall'] },  // 243: townhall in Culture; gated by mayor presence in isBuildingUnlocked
-  { name: 'Victory',        keys: ['castle'] },
+  { name: 'Victory',        keys: ['castle', 'wonder'] },
 ];
 
 // Tracks the 1-indexed order of buttons the player actually sees in the build

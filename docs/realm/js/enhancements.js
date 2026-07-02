@@ -5,9 +5,9 @@
 // deleted rather than left as registered no-ops.
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=118';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=118';
-import { makeAtlasLoader } from './atlas-loader.js?realm=118';
+import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=120';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=120';
+import { makeAtlasLoader } from './atlas-loader.js?realm=120';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
@@ -1566,8 +1566,10 @@ function renderVolcano(ctx) {
   ctx.arc(s.x, s.y - 24, 12, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
-  // Smoke plumes
-  for (const p of G.volcanoSmoke) {
+  // Smoke plumes. The updater lazily creates this array (line ~1532), but a
+  // render can run before the first update tick (paused game, forced frame
+  // right after newGame) — that ordering must not throw the whole frame away.
+  for (const p of G.volcanoSmoke || []) {
     ctx.globalAlpha = Math.max(0, p.alpha);
     ctx.fillStyle = '#7a6a64';
     ctx.beginPath();
@@ -3818,7 +3820,7 @@ function renderRainSplashes(ctx) {
 registerWorldRenderer(renderRainSplashes);
 
 // ── Loop 107: Occasional citizen voice barks ───────────────
-import { playVoiceBark as _playBark } from './audio.js?realm=118';
+import { playVoiceBark as _playBark } from './audio.js?realm=120';
 let _lastBarkTick = 0;
 function updateBarks() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -3924,10 +3926,10 @@ registerScreenRenderer(renderTileTooltip);
 // of lifetime counters, and to tell the truth when the village was razed.
 // Prior code said "Raid repelled. 0 foes slain in total." even when every
 // citizen was dead — a chronicle lie that made the narrative untrustworthy.
-import { chronicle as _chronicle124 } from './story.js?realm=118';
+import { chronicle as _chronicle124 } from './story.js?realm=120';
 // Loop 036 (the-fixer): also surface the raid summary as a toast so the
 // player sees it without opening the chronicle panel.
-import { notify as _notify036 } from './notifications.js?realm=118';
+import { notify as _notify036 } from './notifications.js?realm=120';
 let _lastRaidDay = 0;
 let _raidKillsStart = 0;
 let _raidDiedStart = 0;
@@ -4136,7 +4138,7 @@ registerUpdater(updateBuildRipples);
 registerWorldRenderer(renderBuildRipples);
 
 // ── Loop 129: Water footstep splash sound ───────────────────
-import { playSound as _playSound129 } from './audio.js?realm=118';
+import { playSound as _playSound129 } from './audio.js?realm=120';
 let _lastSplashTick = 0;
 function updateWaterSplash() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -4286,7 +4288,7 @@ registerUpdater(updateAdvisorTips);
 
 // ── Loop 140: Audio: town hum ambient layer ─────────────────
 // When population > 10 and cursor is near center, subtle murmur.
-import { initAudio as _initAudio140 } from './audio.js?realm=118';
+import { initAudio as _initAudio140 } from './audio.js?realm=120';
 let _townHumNode = null;
 function updateTownHum() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -4442,7 +4444,7 @@ registerUpdater(updateSaveAge);
 // `chronicle as _chronicle124` import) was to alias the same
 // helpers under a 144-suffix prefix; the import line was lost.
 // Adding it once here covers all 47 call sites that follow.
-import { hasFlag as _hf144, setFlag as _sf144, chronicle as _chr144 } from './story.js?realm=118';
+import { hasFlag as _hf144, setFlag as _sf144, chronicle as _chr144 } from './story.js?realm=120';
 
 // ── Loop 149: Story — named rival lord sends messengers ─────
 function updateRivalMessages() {
@@ -4473,7 +4475,7 @@ registerUpdater(updateCursorStyle);
 
 // ── Loop 151: Notification sound differs by type ────────────
 // Already handled: raidWarning, mission, etc. This adds a soft chime for info.
-import { playSound as _ps151 } from './audio.js?realm=118';
+import { playSound as _ps151 } from './audio.js?realm=120';
 // Hooked via notify — no updater needed. Stub for loop tracking.
 
 // ── Loop 153: Story — bard writes songs about milestones ────

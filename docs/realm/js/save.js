@@ -2,10 +2,10 @@
 // Save/Load — localStorage serialization
 // ════════════════════════════════════════════════════════════
 
-import { G, getSeed, setSeed } from './state.js?realm=118';
-import { rebuildBuildingGrid } from './world.js?realm=118';
-import { missions } from './missions.js?realm=118';
-import { deriveEra } from './tech.js?realm=118';
+import { G, getSeed, setSeed } from './state.js?realm=120';
+import { rebuildBuildingGrid } from './world.js?realm=120';
+import { missions } from './missions.js?realm=120';
+import { deriveEra } from './tech.js?realm=120';
 
 const SAVE_KEY = 'realm-save-v2';
 
@@ -25,7 +25,11 @@ export function saveGame({ silent = false } = {}) {
         level: b.level || 1,
         visits: b.visits || undefined,
         trainTimer: b.trainTimer || 0,
-        construction: b.construction || 0,
+        // buildProgress is the live 0-1 construction fraction (economy.js).
+        // The old `construction` field was dead weight: nothing wrote it, so
+        // in-progress buildings silently insta-completed on load.
+        buildProgress: b.buildProgress !== undefined ? b.buildProgress : 1,
+        buildTotal: b.buildTotal || 0,
         produced: b.produced || null,
         workerIdxs: b.workers.map(w => G.citizens.indexOf(w)),
       })),
@@ -33,6 +37,8 @@ export function saveGame({ silent = false } = {}) {
       rallyPoint: G.rallyPoint || null,
       era: G.era || 1,
       eraStartDay: G.eraStartDay || { 1: 1 },
+      won: !!G.won,
+      wonder: G.wonder || null,
       soldiers: (G.soldiers || []).map(s => ({
         x: s.x, y: s.y, tx: s.tx, ty: s.ty, type: s.type,
         hp: s.hp, maxHp: s.maxHp, name: s.name,
@@ -158,7 +164,10 @@ export function loadGame() {
       level: b.level || 1,
       visits: b.visits || {},
       trainTimer: b.trainTimer || 0,
-      construction: b.construction || 0,
+      // Legacy saves (construction-field era) have no buildProgress —
+      // restore as complete, matching their old on-load behavior.
+      buildProgress: b.buildProgress !== undefined ? b.buildProgress : 1,
+      buildTotal: b.buildTotal || 0,
       active: true, produced: b.produced || null, prodShowCount: 0,
       workers: (b.workerIdxs || []).map(i => G.citizens[i]).filter(Boolean),
     }));
@@ -255,6 +264,8 @@ export function loadGame() {
       G.eraStartDay = { 1: 1 };
       if (G.era > 1) G.eraStartDay[G.era] = G.day;
     }
+    G.won = !!s.won;
+    G.wonder = s.wonder || null;
     if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
     G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');

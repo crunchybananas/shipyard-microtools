@@ -2,10 +2,10 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=118';
-import { playSound } from './audio.js?realm=118';
-import { chronicle } from './story.js?realm=118';
-import { notify } from './notifications.js?realm=118';
+import { G, BUILDINGS } from './state.js?realm=120';
+import { playSound } from './audio.js?realm=120';
+import { chronicle } from './story.js?realm=120';
+import { notify } from './notifications.js?realm=120';
 
 export const TECHS = {
   agriculture: {
@@ -92,7 +92,7 @@ export const TECHS = {
   },
   architecture: {
     name: 'Architecture',
-    desc: 'The pinnacle of knowledge. Unlocks the Castle — build it to win!',
+    desc: 'Grand designs in stone. Unlocks the Castle — the Wonder\'s foundation',
     cost: { gold: 50, stone: 30, iron: 10 },
     time: 2000,
     unlocks: ['castle'],
@@ -184,6 +184,12 @@ export function isBuildingUnlocked(buildingType) {
   // 034 hook), not a tech. Mayor-as-prerequisite is the 6th and last
   // named-character mechanic per 101 filing.
   if (buildingType === 'townhall') return !!G.namedCharacters?.mayor;
+  // Phase D: the Wonder needs the Monuments tech AND a completed castle
+  // standing — the castle is the prerequisite, not the win (wonder.js).
+  if (buildingType === 'wonder') {
+    if (!G.researchedTechs.has('monuments')) return false;
+    return (G.buildings || []).some(b => b.type === 'castle' && (b.buildProgress === undefined || b.buildProgress >= 1));
+  }
   for (const [techId, tech] of Object.entries(TECHS)) {
     if (tech.unlocks.includes(buildingType) && G.researchedTechs.has(techId)) return true;
   }

@@ -55,7 +55,8 @@ export const BUILDINGS = {
   wall:      { name:'Wall',        icon:'🧱', cost:{stone:8},          defense:5, desc:'Fortification segment' },
   road:      { name:'Road',        icon:'🛤️', cost:{stone:3},          speedBonus:true, desc:'Citizens move faster on roads' },
   tradingpost:{ name:'Trading Post',icon:'⛵', cost:{wood:20,stone:15}, workers:1, on:[1], desc:'Sends caravans for gold (build on sand)' },
-  castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50,planks:20}, defense:50, happiness:20, pop:10, desc:'The ultimate structure. Build this to win!' },
+  castle:    { name:'Castle',      icon:'🏰', cost:{stone:80,wood:60,iron:30,gold:50,planks:20}, defense:50, happiness:20, pop:10, desc:'The realm\'s mightiest defense — and the Wonder\'s foundation stone' },
+  wonder:    { name:'Hall of Ages', icon:'🕍', cost:{stone:50,planks:20,gold:40}, workers:4, happiness:10, radius:8, maxCount:1, desc:'The Wonder. Raise all three stages to win the age' },
   granary:   { name:'Granary',     icon:'🏺', cost:{wood:20,stone:10}, foodStore:30, desc:'Stores +30 food reserves, halves winter food loss' },
   storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, desc:'Receives delivered wood, stone, iron, and overflow goods' },
   church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15,planks:8}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
@@ -137,6 +138,7 @@ export const G = {
   won: false,
   era: 1,                   // The Three Ages (tech.js ERAS): 1 Hearth · 2 Charter · 3 Crown
   eraStartDay: { 1: 1 },    // era id -> G.day it began
+  wonder: null,             // { placed, stage 0-3, delivered:{res:n}, completeDay } — survives demolish (wonder.js)
   clouds: null,
   cameraShake: 0,
   tileWear: null,  // 2D array [MAP_H][MAP_W] of 0-255 wear values, lazy-init

@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=118';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=118';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=118';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=118';
-import { playSound, playBuildingSound } from './audio.js?realm=118';
-import { spawnDust } from './particles.js?realm=118';
-import { panCameraTo } from './render.js?realm=118';
-import { chronicle } from './story.js?realm=118';
-import { notify, notifyBuild } from './notifications.js?realm=118';
-import { isBuildingUnlocked } from './tech.js?realm=118';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=120';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=120';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=120';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=120';
+import { playSound, playBuildingSound } from './audio.js?realm=120';
+import { spawnDust } from './particles.js?realm=120';
+import { panCameraTo } from './render.js?realm=120';
+import { chronicle } from './story.js?realm=120';
+import { notify, notifyBuild } from './notifications.js?realm=120';
+import { isBuildingUnlocked } from './tech.js?realm=120';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -40,6 +40,7 @@ const CONSTRUCTION_TICKS = {
   townhall: 460,
   granary: 340,
   castle: 600,
+  wonder: 600,
 };
 
 function constructionTicks(type) {
@@ -114,10 +115,18 @@ export function placeBuilding(type, tx, ty) {
   // Build ripple effect
   if (!G._buildRipples) G._buildRipples = [];
   G._buildRipples.push({ x: tx, y: ty, radius: 3, alpha: 0.8 });
-  // Victory check
-  if (type === 'castle' && !G.won) {
-    G.won = true;
-    setTimeout(() => showVictoryScreen(), 500);
+  // Phase D: the castle is no longer the instant win — it anchors the
+  // realm's defense and is the Wonder's prerequisite (tech.js gate).
+  if (type === 'castle' && !G.storyFlags?.castleStands) {
+    G.storyFlags = G.storyFlags || {};
+    G.storyFlags.castleStands = true;
+    notify('🏰 The Castle stands — the realm may now raise a Wonder', 'mission', { chronicle: false });
+  }
+  if (type === 'wonder') {
+    const first = !G.wonder;
+    G.wonder = G.wonder || { stage: 0, delivered: {}, completeDay: null };
+    G.wonder.placed = true;
+    notify('🕍 The Hall of Ages rises — deliver its bill of works', 'mission', first ? {} : { chronicle: false });
   }
   return true;
 }
@@ -133,6 +142,12 @@ export function demolishBuilding(b, byEnemy = false) {
       const spot = nearestWalkableTile(b.x, b.y, 3);
       if (spot) { s.x = spot.x; s.y = spot.y; s.tx = spot.x; s.ty = spot.y; }
     }
+  }
+  // Wonder rubble keeps its ledger: stage/delivered persist on G.wonder,
+  // so re-placing costs only the site down-payment (wonder.js).
+  if (b.type === 'wonder' && G.wonder) {
+    G.wonder.placed = false;
+    if (byEnemy) chronicle('The Hall of Ages is thrown down. Its foundations remember what was owed.', 'raid');
   }
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
@@ -804,7 +819,7 @@ export function upgradeBuilding(b) {
   return true;
 }
 
-function showVictoryScreen() {
+export function showVictoryScreen() {
   const el = document.getElementById('victory-screen');
   if (!el) return;
   el.style.display = 'flex';

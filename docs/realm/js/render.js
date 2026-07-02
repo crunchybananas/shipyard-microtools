@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=118';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=118';
-import { makeAtlasLoader } from './atlas-loader.js?realm=118';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=120';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=120';
+import { makeAtlasLoader } from './atlas-loader.js?realm=120';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -33,6 +33,7 @@ const _SPRITE_TYPES = new Set([
   'farm', 'lumber', 'quarry', 'mine', 'fisherman', 'tradingpost',
   'school', 'archery', 'wall', 'road', 'chickencoop', 'cowpen',
   'sawmill', // aliases the lumber cell via rasterSpriteKey
+  'wonder',  // Phase D: aliases the castle cell at x1.3 until it gets its own art
 ]);
 
 const _RASTER_ATLAS_URL = 'assets/sprites/buildings-atlas-painted.png';
@@ -56,6 +57,7 @@ const _RASTER_ATLAS_FRAMES = Object.fromEntries(_RASTER_ATLAS_TYPES.map((type, i
 function rasterSpriteKey(type) {
   if (type === 'storehouse') return 'granary';
   if (type === 'sawmill') return 'lumber'; // v1: sawmill reuses the mill art until it gets its own atlas cell
+  if (type === 'wonder') return 'castle';  // Phase D interim: dedicated Hall of Ages art arrives in D5
   return type;
 }
 const _RASTER_ATLAS_TRIMS = {
@@ -439,6 +441,7 @@ const _SPRITE_SIZES = {
   granary:    { w: 42, h: 50 },  // +17% / +19%
   storehouse: { w: 42, h: 50 },
   castle:     { w: 54, h: 68 },  // +23% / +21%
+  wonder:     { w: 70, h: 88 },  // castle cell at x1.3 — the biggest silhouette on the map
   church:     { w: 48, h: 68 },  // +20% / +21%
   windmill:   { w: 44, h: 64 },  // +16% / +23%
   tower:      { w: 38, h: 64 },  // +19% / +23%
@@ -468,7 +471,7 @@ const _SPRITE_SIZES = {
 };
 
 function fallbackBuildingShadowFootprint(type) {
-  const wide = (type === 'castle') ? 15 : (type === 'church' || type === 'tower') ? 12 : 10;
+  const wide = (type === 'castle' || type === 'wonder') ? 15 : (type === 'church' || type === 'tower') ? 12 : 10;
   return { wide, tall: wide * 0.36, y: 3 };
 }
 
