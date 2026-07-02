@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=120';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=120';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=120';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=120';
-import { playSound, playBuildingSound } from './audio.js?realm=120';
-import { spawnDust } from './particles.js?realm=120';
-import { panCameraTo } from './render.js?realm=120';
-import { chronicle } from './story.js?realm=120';
-import { notify, notifyBuild } from './notifications.js?realm=120';
-import { isBuildingUnlocked } from './tech.js?realm=120';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=121';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=121';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=121';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=121';
+import { playSound, playBuildingSound } from './audio.js?realm=121';
+import { spawnDust } from './particles.js?realm=121';
+import { panCameraTo } from './render.js?realm=121';
+import { chronicle } from './story.js?realm=121';
+import { notify, notifyBuild } from './notifications.js?realm=121';
+import { isBuildingUnlocked } from './tech.js?realm=121';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -602,7 +602,9 @@ export function checkRaids() {
     // at baseCount ≥ ~10 — soft difficulty curve that rises with
     // realm age (early raids unaffected; deep-realm raids meaner).
     const rivalMult = G.namedCharacters?.rival ? 1.1 : 1;
-    const raiders = Math.max(1, Math.floor(baseCount * getDifficulty().raidMult * rivalMult));
+    // Phase D: later ages draw stronger raids — the wonder race has stakes.
+    const eraMult = 1 + 0.25 * ((G.era || 1) - 1);
+    const raiders = Math.max(1, Math.floor(baseCount * getDifficulty().raidMult * rivalMult * eraMult));
     playSound('raid');
 
     const report = [`⚔️ RAID: ${raiders} raiders approach!`];
@@ -819,10 +821,56 @@ export function upgradeBuilding(b) {
   return true;
 }
 
+// Prestige — display-only realm score (Phase D). A weighted census of what
+// the four pillars produce; wonder stages dominate late. No currency, no
+// spend — it exists to be compared across runs ('realm-prestige-best').
+export function computePrestige() {
+  let p = 0;
+  for (const b of G.buildings) {
+    if (b.type === 'house') p += [0, 0, 1, 3, 6][Math.min(4, b.level || 1)];
+    else if (b.type === 'townhall') p += 10;
+    else if (b.type === 'church') p += 4;
+    else if (b.type === 'school' || b.type === 'tavern' || b.type === 'market') p += 2;
+  }
+  p += Math.min(20, Math.floor((G.resources.gold || 0) / 25));
+  p += Math.min(15, (G.soldiers || []).length);
+  p += (G.researchedTechs?.size || 0) * 10;
+  p += (G.stats?.raidsSurvived || 0) * 15;
+  p += (G.wonder?.stage || 0) * 100;
+  return p;
+}
+
+export function prestigeBest() {
+  try { return parseInt(localStorage.getItem('realm-prestige-best') || '0', 10) || 0; } catch (_e) { return 0; }
+}
+
 export function showVictoryScreen() {
   const el = document.getElementById('victory-screen');
   if (!el) return;
   el.style.display = 'flex';
+  // Wonder win vs legacy castle win (pre-D4 saves can load with G.won set).
+  // Stage 3 is the Gilded Spire — WONDER_STAGES lives in wonder.js, which
+  // imports this module, so the stage count is a literal here.
+  const wonderWin = !!(G.wonder && G.wonder.stage >= 3);
+  const title = el.querySelector('.vic-title');
+  const sub = el.querySelector('.vic-subtitle');
+  if (title && sub) {
+    if (wonderWin) {
+      title.textContent = 'The Hall of Ages Stands Eternal';
+      sub.textContent = `Raised across the Three Ages and crowned on day ${G.wonder.completeDay || G.day}. The realm is remembered forever.`;
+    } else {
+      title.textContent = 'Victory!';
+      sub.textContent = 'Your castle stands tall. The realm is yours.';
+    }
+  }
+  const prestige = computePrestige();
+  const prestigeEl = el.querySelector('.vic-prestige');
+  if (prestigeEl) {
+    let best = prestigeBest();
+    const isBest = prestige >= best;
+    if (isBest) { best = prestige; try { localStorage.setItem('realm-prestige-best', String(best)); } catch (_e) {} }
+    prestigeEl.textContent = isBest ? `${prestige} ★ new best` : `${prestige} (best ${best})`;
+  }
   el.querySelector('.vic-day').textContent = `Day ${G.day}`;
   el.querySelector('.vic-pop').textContent = `${G.population} citizens`;
   el.querySelector('.vic-buildings').textContent = `${G.buildings.length} buildings`;

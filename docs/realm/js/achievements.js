@@ -2,8 +2,8 @@
 // Achievements — persistent milestones with toast notifications
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=120';
-import { playSound } from './audio.js?realm=120';
+import { G } from './state.js?realm=121';
+import { playSound } from './audio.js?realm=121';
 
 const STORAGE_KEY = 'realm-achievements';
 

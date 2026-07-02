@@ -2,13 +2,15 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=120';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=120';
-import { setArmyTargets } from './input.js?realm=120';
-import { saveGame, loadGame, hasSave } from './save.js?realm=120';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=120';
-import { notify } from './notifications.js?realm=120';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=120';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=121';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport, computePrestige, prestigeBest } from './economy.js?realm=121';
+import { getWonderReport } from './wonder.js?realm=121';
+import { panCameraTo } from './render.js?realm=121';
+import { setArmyTargets } from './input.js?realm=121';
+import { saveGame, loadGame, hasSave } from './save.js?realm=121';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=121';
+import { notify } from './notifications.js?realm=121';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=121';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -90,6 +92,25 @@ export function updateUI() {
     showInfoPanel(bb);
   }
   const $ = id => document.getElementById(id);
+
+  // Wonder HUD chip: stage + fill percent; click pans to the site.
+  const wc = $('wonder-chip');
+  if (wc) {
+    const wr = G.wonder ? getWonderReport() : null;
+    if (!wr || !wr.placed) {
+      wc.style.display = 'none';
+    } else {
+      wc.style.display = 'block';
+      if (wr.complete) {
+        wc.textContent = '🕍 The Hall of Ages · Eternal';
+      } else {
+        const totalNeed = wr.bill.reduce((a, x) => a + x.need, 0);
+        const totalHave = wr.bill.reduce((a, x) => a + x.have, 0);
+        const pct = totalNeed ? Math.round((totalHave / totalNeed) * 100) : 0;
+        wc.textContent = `🕍 ${wr.stageName} · ${pct}%`;
+      }
+    }
+  }
 
   // Compute rates: compare resources to snapshot taken half a day ago
   const interval = Math.floor(G.dayLength / 2);
@@ -683,6 +704,7 @@ export function showInfoPanel(b) {
     blacksmith: '"Every sword begins as a lump of ore and a question: who will wield it?"',
     sawmill: '"The saw sings all day, and the realm rises plank by plank."',
     archery: '"The arrow knows no rank. It finds the careless and the brave alike."',
+    wonder: '"Ages end. The Hall does not."',
   };
   if (LORE[b.type]) {
     html += `<div class="ip-lore">${LORE[b.type]}</div>`;
@@ -715,6 +737,28 @@ export function showInfoPanel(b) {
     const staffed = b.workers.length;
     const workerDots = '●'.repeat(staffed) + '○'.repeat(workerCount - staffed);
     html += `<div class="ip-row"><span class="ip-label">Workers</span><span class="ip-val">${workerDots} ${staffed}/${workerCount}</span></div>`;
+  }
+
+  // Wonder stage card: bill bars, delivery pace, next housing gate (wonder.js)
+  if (b.type === 'wonder') {
+    const wr = getWonderReport();
+    if (wr && wr.complete) {
+      html += `<div class="ip-row"><span class="ip-label">Wonder</span><span class="ip-val" style="color:var(--gold)">✦ Eternal — crowned day ${G.wonder?.completeDay ?? '—'}</span></div>`;
+    } else if (wr) {
+      html += `<div class="ip-row"><span class="ip-label">Stage</span><span class="ip-val">${wr.stage + 1}/3 · ${wr.stageName}</span></div>`;
+      for (const item of wr.bill) {
+        const pct = Math.round((item.have / item.need) * 100);
+        html += `
+    <div class="ip-row">
+      <span class="ip-label">${resourceEmoji(item.res)}</span>
+      <span class="ip-hpbar"><span class="ip-hpfill" style="width:${pct}%;background:#d6a864"></span></span>
+      <span class="ip-hpval">${item.have}/${item.need}</span>
+    </div>`;
+      }
+      if (wr.gate) {
+        html += `<div class="ip-row"><span class="ip-label">Gate</span><span class="ip-val" style="color:#f0b429">⏳ ${wr.gate}</span></div>`;
+      }
+    }
   }
 
   // Production (per cycle and per day)
@@ -1361,6 +1405,9 @@ export function renderStatsPanel() {
     <div class="stat-row"><span>Raids Survived</span><span>${s.raidsSurvived || 0}</span></div>
     <div class="stat-row"><span>Enemies Defeated</span><span>${s.enemiesKilled || 0}</span></div>
     <div class="stat-row"><span>Gold Earned</span><span>${s.goldEarned || 0} <span class="gold-coin" aria-hidden="true">◉</span></span></div>
+    <div class="stat-group-label">Legacy</div>
+    <div class="stat-row"><span>Prestige</span><span>👑 ${computePrestige()}</span></div>
+    <div class="stat-row"><span>Best Across Realms</span><span>${Math.max(prestigeBest(), 0)}</span></div>
   `;
 }
 
@@ -1371,6 +1418,12 @@ export function toggleStatsPanel() {
   p.style.display = open ? 'none' : 'block';
   if (!open) renderStatsPanel();
 }
+
+// Wonder HUD chip click target (index.html onclick).
+window.panToWonder = () => {
+  const site = G.buildings.find(b => b.type === 'wonder');
+  if (site) panCameraTo(site.x, site.y);
+};
 
 // ── Trade panel ───────────────────────────────────────────
 export function renderTradePanel() {

@@ -2,8 +2,8 @@
 // Animals — wandering wildlife that inhabit the world
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=120';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=120';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=121';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=121';
 
 const SPECIES = {
   deer:    { color: '#8a6a40', speed: 0.02,  size: 4,   prefersForest: true, herdSize: 3 },

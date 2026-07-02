@@ -708,6 +708,9 @@ body.sprite-lab-open{overflow:hidden}
 .era-banner-title{font-size:1.25rem;font-weight:800;color:var(--gold);letter-spacing:0.06em}
 .era-banner-sub{font-size:0.72rem;color:rgba(255,255,255,0.55);margin-top:0.2rem}
 @keyframes eraBanner{0%{opacity:0;transform:translateY(16px) scale(0.96)}12%{opacity:1;transform:none}82%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-12px)}}
+#wonder-chip{position:fixed;left:0.65rem;top:10.2rem;z-index:30;padding:0.32rem 0.6rem;background:var(--panel);border:1px solid rgba(255,209,102,0.45);border-radius:99px;color:var(--gold);font-size:0.7rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,0.35);white-space:nowrap}
+#wonder-chip:hover{background:rgba(255,209,102,0.12)}
+body.photo-mode #wonder-chip{display:none!important}
 /* old compat aliases (achievements/log panels reuse .research-content) */
 .rp-label{font-size:var(--fs-sm);margin-bottom:0.3rem}
 .rp-pct{font-size:var(--fs-xs);color:rgba(255,255,255,0.5);margin-top:0.2rem;text-align:right}
@@ -854,6 +857,8 @@ body.sprite-lab-open{overflow:hidden}
 
 <div id="era-banner" hidden></div>
 
+<div id="wonder-chip" style="display:none" onclick="panToWonder()" title="The Hall of Ages — click to view the site">🕍</div>
+
 <div id="research-panel" style="display:none">
   <div class="rp-header">
     <h3>🔬 Research</h3>
@@ -912,6 +917,7 @@ body.sprite-lab-open{overflow:hidden}
       <div class="vic-stat"><span class="vic-label">Resources Gathered</span><span class="vic-resources">—</span></div>
       <div class="vic-stat"><span class="vic-label">Research</span><span class="vic-techs">—</span></div>
       <div class="vic-stat"><span class="vic-label">Achievements</span><span class="vic-achievements">—</span></div>
+      <div class="vic-stat"><span class="vic-label">Prestige</span><span class="vic-prestige">—</span></div>
     </div>
     <button class="vic-btn" onclick="this.closest('#victory-screen').style.display='none'">Continue Playing</button>
   </div>
@@ -1100,6 +1106,6 @@ if (localDev && !spriteDev && 'serviceWorker' in navigator) {
   }).catch(() => {});
 }
 </script>
-<script type="module" src="js/main.js?realm=120"></script>
+<script type="module" src="js/main.js?realm=121"></script>
 </body>
 </html>
