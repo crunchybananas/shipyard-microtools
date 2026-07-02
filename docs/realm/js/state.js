@@ -135,6 +135,8 @@ export const G = {
   rallyPoint: null,
   armyStance: 'defend', // defend | rally | patrol — the army is a posture, not units to drive
   won: false,
+  era: 1,                   // The Three Ages (tech.js ERAS): 1 Hearth · 2 Charter · 3 Crown
+  eraStartDay: { 1: 1 },    // era id -> G.day it began
   clouds: null,
   cameraShake: 0,
   tileWear: null,  // 2D array [MAP_H][MAP_W] of 0-255 wear values, lazy-init

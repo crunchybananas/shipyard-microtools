@@ -2,9 +2,10 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=115';
-import { playSound } from './audio.js?realm=115';
-import { chronicle } from './story.js?realm=115';
+import { G, BUILDINGS } from './state.js?realm=116';
+import { playSound } from './audio.js?realm=116';
+import { chronicle } from './story.js?realm=116';
+import { notify } from './notifications.js?realm=116';
 
 export const TECHS = {
   agriculture: {
@@ -15,6 +16,7 @@ export const TECHS = {
     unlocks: ['farm', 'granary', 'storehouse', 'fisherman'],
     icon: '🌾',
     prereq: null,
+    era: 1,
   },
   forestry: {
     name: 'Forestry',
@@ -24,24 +26,29 @@ export const TECHS = {
     unlocks: ['lumber'],
     icon: '🪓',
     prereq: null,
+    era: 1,
   },
   masonry: {
     name: 'Masonry',
-    desc: 'Unlocks quarries and stone walls',
+    desc: 'Unlocks quarries, stone walls, roads and wells',
     cost: { gold: 15, wood: 20 },
     time: 300,
-    unlocks: ['quarry', 'wall', 'church'],
+    // well + road live in Era I so Cottage evolution (well visits,
+    // state.js HOUSE_TIERS) is reachable before the Age of Charter.
+    unlocks: ['quarry', 'wall', 'church', 'road', 'well'],
     icon: '🧱',
     prereq: null,
+    era: 1,
   },
   engineering: {
     name: 'Engineering',
-    desc: 'Unlocks roads and wells',
+    desc: 'Unlocks sawmills for plank production',
     cost: { gold: 20, stone: 15 },
     time: 400,
-    unlocks: ['road', 'well', 'sawmill'],
+    unlocks: ['sawmill'],
     icon: '⚙️',
     prereq: 'masonry',
+    era: 2,
   },
   metallurgy: {
     name: 'Metallurgy',
@@ -51,6 +58,7 @@ export const TECHS = {
     unlocks: ['mine'],
     icon: '⛏️',
     prereq: 'masonry',
+    era: 2,
   },
   commerce: {
     name: 'Commerce',
@@ -60,6 +68,7 @@ export const TECHS = {
     unlocks: ['market', 'tradingpost', 'school'],
     icon: '🏪',
     prereq: null,
+    era: 1,
   },
   military: {
     name: 'Military',
@@ -69,6 +78,7 @@ export const TECHS = {
     unlocks: ['barracks', 'tower'],
     icon: '⚔️',
     prereq: 'metallurgy',
+    era: 2,
   },
   brewing: {
     name: 'Brewing',
@@ -78,6 +88,7 @@ export const TECHS = {
     unlocks: ['tavern'],
     icon: '🍺',
     prereq: 'commerce',
+    era: 2,
   },
   architecture: {
     name: 'Architecture',
@@ -87,6 +98,7 @@ export const TECHS = {
     unlocks: ['castle'],
     icon: '🏰',
     prereq: 'military',
+    era: 3,
   },
   baking: {
     name: 'Baking',
@@ -96,6 +108,7 @@ export const TECHS = {
     unlocks: ['windmill', 'bakery'],
     icon: '🍞',
     prereq: 'agriculture',
+    era: 1,
   },
   husbandry: {
     name: 'Animal Husbandry',
@@ -105,6 +118,7 @@ export const TECHS = {
     unlocks: ['chickencoop', 'cowpen'],
     icon: '🐄',
     prereq: 'agriculture',
+    era: 1,
   },
   smithing: {
     name: 'Smithing',
@@ -114,6 +128,7 @@ export const TECHS = {
     unlocks: ['blacksmith'],
     icon: '🔨',
     prereq: 'metallurgy',
+    era: 2,
   },
   archery: {
     name: 'Archery',
@@ -123,6 +138,7 @@ export const TECHS = {
     unlocks: ['archery'],
     icon: '🏹',
     prereq: 'military',
+    era: 2,
   },
 };
 
@@ -160,6 +176,7 @@ export function canResearch(techId) {
   if (G.researchedTechs.has(techId)) return false;
   if (G.currentResearch) return false;
   if (tech.prereq && !G.researchedTechs.has(tech.prereq)) return false;
+  if ((tech.era || 1) > (G.era || 1)) return false;
   for (const [k, v] of Object.entries(tech.cost)) {
     if ((G.resources[k] || 0) < v) return false;
   }
@@ -218,6 +235,7 @@ export function updateResearch() {
     // Loop 065: chronicle beat. Fallback for any future tech.
     const text = RESEARCH_BEATS[techId] || `${tech.name} is mastered. The realm bends a new skill into its lore.`;
     try { chronicle(text, 'research'); } catch (_e) {}
+    checkEraAdvance();
   }
 }
 
@@ -235,4 +253,104 @@ function showToast(msg) {
   el.classList.add('show');
   clearTimeout(el._timer);
   el._timer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ════════════════════════════════════════════════════════════
+// The Three Ages — eras gate tech tiers (canResearch); the realm
+// advances by what it achieves, not by research alone. G.era only
+// ever rises. Checked from research completion and the simTick
+// story-beat cadence (main.js crossed(60)).
+// ════════════════════════════════════════════════════════════
+
+export const ERAS = [
+  { id: 1, name: 'Age of Hearth',    icon: '🏕️' },
+  { id: 2, name: 'Age of Charter',   icon: '📜' },
+  { id: 3, name: 'Age of the Crown', icon: '👑' },
+];
+
+// Count researched techs of one era, excluding the free time-0 starters
+// (agriculture/forestry) so the Era-I gate counts real research choices.
+function researchedTechsOfEra(era) {
+  let n = 0;
+  for (const [id, t] of Object.entries(TECHS)) {
+    if ((t.era || 1) === era && t.time > 0 && G.researchedTechs.has(id)) n++;
+  }
+  return n;
+}
+
+function highestHouseTier() {
+  let best = 0;
+  for (const b of G.buildings) {
+    if (b.type === 'house') best = Math.max(best, b.level || 1);
+  }
+  return best;
+}
+
+// Gate to LEAVE the keyed era. Age of the Crown is terminal — its
+// ladder is the Wonder (Phase D4), not a fourth era.
+const ERA_GATES = {
+  1: () => [
+    { label: 'Research Masonry',          cur: G.researchedTechs.has('masonry') ? 1 : 0, goal: 1 },
+    { label: 'Age of Hearth techs',       cur: researchedTechsOfEra(1),                  goal: 3 },
+    { label: 'Population',                cur: G.population,                             goal: 15 },
+    { label: 'A house becomes a Cottage', cur: highestHouseTier() >= 2 ? 1 : 0,          goal: 1 },
+  ],
+  2: () => [
+    { label: 'Research Military',           cur: G.researchedTechs.has('military') ? 1 : 0, goal: 1 },
+    { label: 'Age of Charter techs',        cur: researchedTechsOfEra(2),                   goal: 4 },
+    { label: 'A house becomes a Homestead', cur: highestHouseTier() >= 3 ? 1 : 0,           goal: 1 },
+    { label: 'Survive a raid',              cur: G.stats?.raidsSurvived || 0,               goal: 1 },
+  ],
+};
+
+function eraGateSatisfied(era) {
+  const gate = ERA_GATES[era];
+  if (!gate) return false;
+  return gate().every(g => g.cur >= g.goal);
+}
+
+// Checklist for the current era's advance gate, for the research
+// panel / HUD. Returns null in the terminal era.
+export function getEraProgress() {
+  const gate = ERA_GATES[G.era || 1];
+  if (!gate) return null;
+  return gate().map(g => ({
+    label: g.label,
+    cur: Math.min(g.cur, g.goal),
+    goal: g.goal,
+    done: g.cur >= g.goal,
+  }));
+}
+
+// Era-up chronicle beats get the dedicated eviction-immune 'era' tag;
+// notify()'s auto-chronicle is suppressed so the beat is written
+// exactly once (notifications.js files 'event' under the generic tag).
+const ERA_BEATS = {
+  2: 'A charter is drawn and sealed. The camp that was is now a town with a name worth defending — the Age of Charter begins.',
+  3: 'Banners rise above stone and slate. The realm speaks of a crown, and of a hall to outlast it — the Age of the Crown begins.',
+};
+
+export function checkEraAdvance() {
+  if (G.realmEnded) return;
+  while ((G.era || 1) < ERAS.length && eraGateSatisfied(G.era || 1)) {
+    G.era = (G.era || 1) + 1;
+    G.eraStartDay = G.eraStartDay || { 1: 1 };
+    G.eraStartDay[G.era] = G.day;
+    const era = ERAS[G.era - 1];
+    playSound('mission');
+    try { notify(`${era.icon} The realm enters the ${era.name}!`, 'event', { chronicle: false }); } catch (_e) {}
+    try { chronicle(ERA_BEATS[G.era] || `The realm enters the ${era.name}.`, 'era'); } catch (_e) {}
+  }
+}
+
+// Backfill for saves written before eras existed: the highest era any
+// researched tech belongs to (nothing already researched may lock out),
+// then climb any gates the loaded realm already satisfies.
+export function deriveEra() {
+  let era = 1;
+  for (const [id, t] of Object.entries(TECHS)) {
+    if (G.researchedTechs.has(id)) era = Math.max(era, t.era || 1);
+  }
+  while (era < ERAS.length && eraGateSatisfied(era)) era++;
+  return era;
 }

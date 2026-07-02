@@ -2,9 +2,10 @@
 // Save/Load — localStorage serialization
 // ════════════════════════════════════════════════════════════
 
-import { G, getSeed, setSeed } from './state.js?realm=115';
-import { rebuildBuildingGrid } from './world.js?realm=115';
-import { missions } from './missions.js?realm=115';
+import { G, getSeed, setSeed } from './state.js?realm=116';
+import { rebuildBuildingGrid } from './world.js?realm=116';
+import { missions } from './missions.js?realm=116';
+import { deriveEra } from './tech.js?realm=116';
 
 const SAVE_KEY = 'realm-save-v2';
 
@@ -30,6 +31,8 @@ export function saveGame({ silent = false } = {}) {
       })),
       armyStance: G.armyStance || 'defend',
       rallyPoint: G.rallyPoint || null,
+      era: G.era || 1,
+      eraStartDay: G.eraStartDay || { 1: 1 },
       soldiers: (G.soldiers || []).map(s => ({
         x: s.x, y: s.y, tx: s.tx, ty: s.ty, type: s.type,
         hp: s.hp, maxHp: s.maxHp, name: s.name,
@@ -241,6 +244,17 @@ export function loadGame() {
     // Housing-tier grace: no devolution until walkers have had time to
     // respawn and refresh b.visits after a load (covers legacy saves too).
     G._tierGraceUntil = G.gameTick + 1200;
+    // The Three Ages: legacy saves derive their era from what the realm
+    // already researched/achieved so nothing is locked out. Must run after
+    // researchedTechs, buildings and stats are restored (deriveEra reads all
+    // three via the era gates in tech.js).
+    G.era = s.era ?? deriveEra();
+    if (s.eraStartDay) {
+      G.eraStartDay = s.eraStartDay;
+    } else {
+      G.eraStartDay = { 1: 1 };
+      if (G.era > 1) G.eraStartDay[G.era] = G.day;
+    }
     if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
     G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');

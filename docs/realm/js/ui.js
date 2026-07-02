@@ -2,13 +2,13 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=115';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=115';
-import { setArmyTargets } from './input.js?realm=115';
-import { saveGame, loadGame, hasSave } from './save.js?realm=115';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js?realm=115';
-import { notify } from './notifications.js?realm=115';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=115';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=116';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=116';
+import { setArmyTargets } from './input.js?realm=116';
+import { saveGame, loadGame, hasSave } from './save.js?realm=116';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS } from './tech.js?realm=116';
+import { notify } from './notifications.js?realm=116';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=116';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -275,7 +275,8 @@ export function updateUI() {
   // Thresholds slightly below the display boundaries so a displayed "50%" shows
   // the 🙂 face (G.happiness often sits at 49.x but rounds to 50% — felt inconsistent)
   const happyEmoji = happyPct >= 70 ? '😊' : happyPct >= 45 ? '🙂' : happyPct >= 20 ? '😐' : '😟';
-  $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · ${season.name} ${weatherEmoji}· <span title="Settler happiness — affects tax income and population growth">${happyEmoji} ${happyPct}%</span>${raidWarn}${streakHTML} ${diffLabel}`;
+  const eraInfo = ERAS[(G.era || 1) - 1] || ERAS[0];
+  $('day-display').innerHTML = `Year ${year}, Day ${dayInYear} · <span title="The realm's age — grow the town to advance">${eraInfo.icon} ${eraInfo.name}</span> · ${season.name} ${weatherEmoji}· <span title="Settler happiness — affects tax income and population growth">${happyEmoji} ${happyPct}%</span>${raidWarn}${streakHTML} ${diffLabel}`;
   const kd = $('kingdom-display');
   if (kd) kd.textContent = G.kingdomName ? `👑 ${G.kingdomName}` : '';
 
@@ -521,13 +522,14 @@ export function renderResearchPanel() {
       const researched = G.researchedTechs.has(id);
       const available = canResearch(id);
       const prereqMet = !tech.prereq || G.researchedTechs.has(tech.prereq);
+      const eraLocked = (tech.era || 1) > (G.era || 1);
       const isActive = G.currentResearch?.techId === id;
 
       // Card state classes
       let cardClass = 'tech-card';
       if (researched)    cardClass += ' done';
       else if (isActive) cardClass += ' active';
-      else if (!prereqMet) cardClass += ' locked';
+      else if (!prereqMet || eraLocked) cardClass += ' locked';
       else if (available)  cardClass += ' available';
 
       // Cost string
@@ -562,7 +564,9 @@ export function renderResearchPanel() {
         </div>
         ${tech.prereq && !prereqMet
           ? `<div class="tc-prereq-note">⚠ Requires ${TECHS[tech.prereq].icon} ${TECHS[tech.prereq].name}</div>`
-          : ''}`;
+          : eraLocked && !researched
+            ? `<div class="tc-prereq-note">⏳ Requires the ${ERAS[(tech.era || 1) - 1].icon} ${ERAS[(tech.era || 1) - 1].name}</div>`
+            : ''}`;
 
       // Research button
       if (available && !isActive) {

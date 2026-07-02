@@ -2,10 +2,10 @@
 // Random Events — drought, gold rush, plague, migration, etc.
 // ════════════════════════════════════════════════════════════
 
-import { G, rng, rngInt } from './state.js?realm=115';
-import { trySpawnSettlers } from './economy.js?realm=115';
-import { playSound } from './audio.js?realm=115';
-import { chronicle, initChronicle } from './story.js?realm=115';
+import { G, rng, rngInt } from './state.js?realm=116';
+import { trySpawnSettlers } from './economy.js?realm=116';
+import { playSound } from './audio.js?realm=116';
+import { chronicle, initChronicle } from './story.js?realm=116';
 
 // positive:true → green banner + 'season' sound
 // positive:false → red banner + 'raidWarning' sound

@@ -3,7 +3,7 @@
 // diary of the realm. Persists to save.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=115';
+import { G } from './state.js?realm=116';
 
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
@@ -23,7 +23,7 @@ export function initChronicle() {
 // 085 enforces it in code: when the cap kicks in, oldest
 // NON-IMMUNE entries drop first; immune entries are preserved
 // even if that means the buffer sits slightly over 300.
-const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem']);
+const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem', 'era']);
 
 export function chronicle(text, tag='misc') {
   initChronicle();
@@ -78,6 +78,7 @@ const TAG_ICONS = {
   season:'🍃', death:'🪦', birth:'👶', victory:'🏆', misc:'📜',
   dream:'🌙', nightmare:'🌑', stone:'🗿', echo:'🔁', research:'📚',
   requiem:'🕯️',  // Loop 103: realm-end beat. 1 tag, 1 beat (so far).
+  era:'🌅',      // The Three Ages (tech.js): at most 2 beats per realm, eviction-immune.
 };
 
 // Module-local filter state (not persisted to save — this is a
@@ -2994,8 +2995,8 @@ export function checkNightmareBeat() {
 // position in the module graph. Set on module-load below.
 let _NIGHTMARE_NOTIFY = null;
 let _PLAY_SOUND = null;
-import('./notifications.js?realm=115').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
-import('./audio.js?realm=115').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
+import('./notifications.js?realm=116').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
+import('./audio.js?realm=116').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
 
 // ── Loop 056: a-scene-that-happens-once (second take) ────────
 //
