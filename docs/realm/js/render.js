@@ -1712,11 +1712,8 @@ export function render() {
   }
 
   // ── Buildings ─────────────────────────────────────────────
-  const sorted = [...G.buildings].sort((a,b) => (a.x+a.y)-(b.x+b.y));
-  for (const b of sorted) {
-    const s = toScreen(b.x, b.y);
-    drawBuilding(ctx, b, s, daylight);
-  }
+  // Drawn in the unified painter's-algorithm pass below, interleaved with
+  // citizens by isometric depth so actors behind a building are occluded.
 
   // ── Selected building highlight ─────────────────────────
   if (G.selectedBuilding) {
@@ -1776,7 +1773,8 @@ export function render() {
     }
   }
 
-  for (const c of G.citizens) {
+  const drawOneCitizen = (cEntity) => {
+  for (const c of [cEntity]) {
     if (citizenOnBlockedBuildingTile(c)) continue;
     const s = toScreen(c.x, c.y);
     ctx.globalAlpha = Math.max(0.85, daylight);
@@ -2373,6 +2371,23 @@ export function render() {
       ctx.stroke();
     }
   }
+  };
+
+  // ── Unified world pass: buildings + citizens by iso depth ──
+  // Painter's algorithm over x+y; ties draw the building first so a worker
+  // standing at a building's door renders in front of it.
+  const worldDrawQueue = [];
+  for (const b of G.buildings) {
+    worldDrawQueue.push({ depth: b.x + b.y, order: 0, draw: () => {
+      const bs = toScreen(b.x, b.y);
+      drawBuilding(ctx, b, bs, daylight);
+    } });
+  }
+  for (const c of G.citizens) {
+    worldDrawQueue.push({ depth: c.x + c.y, order: 1, draw: () => drawOneCitizen(c) });
+  }
+  worldDrawQueue.sort((a, b) => a.depth - b.depth || a.order - b.order);
+  for (const item of worldDrawQueue) item.draw();
 
   // ── Service walkers ───────────────────────────────────────
   for (const w of G.walkers) {
