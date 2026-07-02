@@ -1,4 +1,4 @@
-import { G, BUILDINGS } from './state.js?realm=125';
+import { G, BUILDINGS } from './state.js?realm=126';
 
 const TIPS = [
   { id: 'lowfood', check: () => G.resources.food < 20, text: "Food is running low. Build more farms or fisherman huts!", cooldown: 600 },

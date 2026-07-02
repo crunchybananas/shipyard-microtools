@@ -2,10 +2,10 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=125';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=125';
-import { getCitizenSpeedMult } from './events.js?realm=125';
-import { revealAround } from './world.js?realm=125';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=126';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=126';
+import { getCitizenSpeedMult } from './events.js?realm=126';
+import { revealAround } from './world.js?realm=126';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);

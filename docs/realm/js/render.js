@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=125';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=125';
-import { makeAtlasLoader } from './atlas-loader.js?realm=125';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=126';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=126';
+import { makeAtlasLoader } from './atlas-loader.js?realm=126';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -1785,6 +1785,20 @@ export function render() {
     // evacuating instead of vanishing and rematerializing.
     const cGhost = citizenOnBlockedBuildingTile(c);
     const s = toScreen(c.x, c.y);
+    // Road lane offset (render-only): while walking a road tile, drift to
+    // the right-hand side of the direction of travel so two-way traffic
+    // reads as lanes instead of head-on overlap. World/collision position
+    // is untouched.
+    if (c.path && c.pathIdx < c.path.length &&
+        G.buildingGrid[Math.round(c.y)]?.[Math.round(c.x)]?.type === 'road') {
+      const wp = c.path[c.pathIdx];
+      const ldx = wp.x - c.x, ldy = wp.y - c.y;
+      const llen = Math.hypot(ldx, ldy);
+      if (llen > 0.01) {
+        const lane = toScreen(c.x - ldy / llen * 0.16, c.y + ldx / llen * 0.16);
+        s.x = lane.x; s.y = lane.y;
+      }
+    }
     ctx.globalAlpha = cGhost ? 0.35 : Math.max(0.85, daylight);
     // Loop 71 (render S4): damage flash. When c.hurtTimer > 0 (set by
     // combat code when a citizen takes damage), render a brief red tint
