@@ -48,6 +48,30 @@ function rateStr(val, tooltip) {
 }
 
 if (typeof window !== 'undefined') {
+  window.garrisonTower = () => {
+    const b = G.selectedBuilding;
+    if (!b || b.type !== 'tower') return;
+    const occ = G.soldiers.filter(s => s.garrison === b).length;
+    const free = G.soldiers
+      .filter(s => !s.garrison)
+      .sort((a, c) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(c.x - b.x, c.y - b.y))
+      .slice(0, Math.max(0, 2 - occ));
+    for (const s of free) s.garrison = b;
+    if (free.length) notify(`${free.length} soldier${free.length > 1 ? 's' : ''} garrisoned the tower.`, 'info');
+    showInfoPanel(b);
+  };
+  window.ejectGarrison = () => {
+    const b = G.selectedBuilding;
+    if (!b) return;
+    for (const s of G.soldiers) {
+      if (s.garrison === b) {
+        s.garrison = null;
+        s.x = b.x + 1; s.y = b.y + 1; s.tx = s.x; s.ty = s.y; s.stateTimer = 1;
+      }
+    }
+    notify('Garrison ejected.', 'info');
+    showInfoPanel(b);
+  };
   window.setArmyStance = (stance) => {
     if (stance === 'rally' && !G.rallyPoint) {
       notify('Plant a rally flag first: shift + right-click on the map.', 'warn');
@@ -736,6 +760,20 @@ export function showInfoPanel(b) {
   // Defense
   if (def.defense) {
     html += `<div class="ip-row"><span class="ip-label">Defense</span><span class="ip-val ip-defense">🛡 +${def.defense}</span></div>`;
+  }
+
+  // Tower garrison — selection-free military depth: a manned tower shoots
+  // roughly twice as fast and a third further.
+  if (b.type === 'tower' && buildProgress >= 1) {
+    const occ = G.soldiers.filter(s => s.garrison === b);
+    const idle = G.soldiers.filter(s => !s.garrison).length;
+    html += `<div class="ip-row"><span class="ip-label">Garrison</span><span class="ip-val">${occ.length ? '🛡️'.repeat(occ.length) + ` ${occ.length}/2 — +3 range, faster volleys` : 'Unmanned'}</span></div>`;
+    if (occ.length < 2 && idle > 0) {
+      html += `<button class="upgrade-btn" onclick="window.garrisonTower&&window.garrisonTower()">🛡️ Garrison ${Math.min(2 - occ.length, idle)} nearest soldier${Math.min(2 - occ.length, idle) > 1 ? 's' : ''}</button>`;
+    }
+    if (occ.length > 0) {
+      html += `<button class="upgrade-btn" style="background:#5a4632;border-color:#7a5f42" onclick="window.ejectGarrison&&window.ejectGarrison()">↩ Eject garrison</button>`;
+    }
   }
 
   // Housing

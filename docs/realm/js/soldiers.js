@@ -48,6 +48,14 @@ function armyAnchor(s) {
 
 export function updateSoldiers() {
   for (const s of G.soldiers) {
+    // Garrisoned soldiers man their tower: pinned, protected, and counted
+    // by updateTowers for range/fire-rate — no movement, no melee.
+    if (s.garrison) {
+      if (!G.buildings.includes(s.garrison)) { s.garrison = null; continue; }
+      s.x = s.garrison.x; s.y = s.garrison.y;
+      s.tx = s.garrison.x; s.ty = s.garrison.y;
+      continue;
+    }
     // Track tile wear — soldiers patrolling create dirt paths over time
     const _wx = Math.round(s.x), _wy = Math.round(s.y);
     if (_wx >= 0 && _wx < MAP_W && _wy >= 0 && _wy < MAP_H) {

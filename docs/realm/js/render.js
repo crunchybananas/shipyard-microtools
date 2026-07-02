@@ -2508,6 +2508,16 @@ export function render() {
   function drawOneSoldier(sEntity) {
   for (const s of [sEntity]) {
     const ss = toScreen(s.x, s.y);
+    // Garrisoned soldier: drawn small on the tower parapet, no shadow —
+    // same depth slot as the tower tile so layering stays correct.
+    if (s.garrison) {
+      ctx.globalAlpha = Math.max(0.85, daylight);
+      drawActorAtlasFrame(ctx, {
+        role: 'guard', action: 'idle', dir: 'down', frame: 0,
+        x: Math.round(ss.x - 9), y: Math.round(ss.y - 38 - 24), width: 18, height: 24,
+      });
+      continue;
+    }
     // Loop 61 (render S4): soldier silhouette rebuild — proper legs, drop
     // shadow, and body-with-shoulders. Prior shape was the pre-L41 body
     // pill — no legs, toy-looking. Now matches the citizen/raider chibi
@@ -2543,7 +2553,10 @@ export function render() {
       const d = Math.hypot(e.x - s.x, e.y - s.y);
       if (d < sNearD) { sNearD = d; sNearE = e; }
     }
-    if (sNearE && sNearD < 6) { sAction = 'work'; sFx = sNearE.x - s.x; sFy = sNearE.y - s.y; }
+    // Honest poses: thrust only when actually striking (melee reach) or an
+    // archer just loosed a shot — no more stabbing at air from 6 tiles.
+    if (s._fireAnim > 0) s._fireAnim -= G.speed;
+    if (sNearE && (sNearD <= 1.5 || s._fireAnim > 0)) { sAction = 'work'; sFx = sNearE.x - s.x; sFy = sNearE.y - s.y; }
     // Braced spear-wall: rallied soldiers holding the flag while an enemy is
     // on the map (but not yet in reach) lock into the first thrust frame.
     let sBraced = false;

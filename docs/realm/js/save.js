@@ -33,6 +33,7 @@ export function saveGame({ silent = false } = {}) {
         x: s.x, y: s.y, tx: s.tx, ty: s.ty, type: s.type,
         hp: s.hp, maxHp: s.maxHp, name: s.name,
         homeBuildingIdx: G.buildings.indexOf(s.homeBuilding),
+        garrisonIdx: s.garrison ? G.buildings.indexOf(s.garrison) : -1,
       })),
       citizens: G.citizens.map(c => ({
         x:c.x, y:c.y, tx:c.tx, ty:c.ty, speed:c.speed,
@@ -164,6 +165,7 @@ export function loadGame() {
       x: sd.x, y: sd.y, tx: sd.tx, ty: sd.ty, type: sd.type || 'swordsman',
       hp: sd.hp, maxHp: sd.maxHp || 75, name: sd.name,
       homeBuilding: sd.homeBuildingIdx >= 0 ? G.buildings[sd.homeBuildingIdx] || null : null,
+      garrison: sd.garrisonIdx >= 0 ? G.buildings[sd.garrisonIdx] || null : null,
       state: 'patrol', stateTimer: 1, target: null,
     }));
 

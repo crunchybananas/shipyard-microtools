@@ -15,6 +15,23 @@ import { notify } from './notifications.js?realm=115';
 import { chronicle } from './story.js?realm=115';
 
 export function updateEnemies() {
+  // Morale break: when a raid has lost more than 60% of its fighters, the
+  // survivors break and flee — raids resolve with drama instead of a grind.
+  if (G._raidSpawnCount && G.gameTick % 60 === 0) {
+    const fighting = G.enemies.filter(e => !e.retreating).length;
+    if (fighting > 0 && fighting <= Math.ceil(G._raidSpawnCount * 0.4)) {
+      for (const e of G.enemies) {
+        if (e.retreating) continue;
+        e.retreating = true;
+        const dxEdge = Math.min(e.x, MAP_W - 1 - e.x) <= Math.min(e.y, MAP_H - 1 - e.y);
+        e.tx = dxEdge ? (e.x < MAP_W / 2 ? 0 : MAP_W - 1) : e.x;
+        e.ty = dxEdge ? e.y : (e.y < MAP_H / 2 ? 0 : MAP_H - 1);
+      }
+      G._raidSpawnCount = 0;
+      notify('The raiders break and flee!', 'success');
+    }
+    if (fighting === 0) G._raidSpawnCount = 0;
+  }
   for (let i = G.enemies.length - 1; i >= 0; i--) {
     const e = G.enemies[i];
     // Raiders fight back: engage the nearest soldier in reach instead of
@@ -51,7 +68,12 @@ export function updateEnemies() {
     const wall = G.buildingGrid[ny]?.[nx];
     if (wall && wall.type === 'wall' && wall.hp > 0) {
       // Attack wall instead of passing through
-      wall.hp -= 0.5 * G.speed;
+      wall.hp -= 0.35 * G.speed;
+      wall.hurtTimer = 12;
+      e._swing = 8;
+      if (G.gameTick % 30 === 0) {
+        G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (Math.random()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
+      }
       if (wall.hp <= 0) {
         // Use demolishBuilding so defense/maxPop/workers are all cleaned up properly
         demolishBuilding(wall, true);
@@ -76,7 +98,12 @@ export function updateEnemies() {
         const by = Math.round(e.y) + Math.sign(Math.round(e.ty) - Math.round(e.y));
         const blocker = G.buildingGrid[by]?.[bx] || G.buildingGrid[Math.round(e.y)]?.[bx] || G.buildingGrid[by]?.[Math.round(e.x)];
         if (blocker && blocker.hp > 0) {
-          blocker.hp -= 0.5 * G.speed;
+          blocker.hp -= 0.35 * G.speed;
+          blocker.hurtTimer = 12;
+          e._swing = 8;
+          if (G.gameTick % 30 === 0) {
+            G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (Math.random()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
+          }
           if (blocker.hp <= 0) demolishBuilding(blocker, true);
         } else {
           // Boxed in with nothing to hit — skirt sideways
@@ -267,7 +294,11 @@ export function updateTowers() {
     b.fireTimer = (b.fireTimer || 0) - G.speed;
     if (b.fireTimer > 0) continue;
     // Find nearest enemy
-    const range = b.type === 'tower' ? 10 : 6;
+    // Garrisoned towers see further and reload faster; archer occupants
+    // sharpen every arrow. Player sentence: "a manned tower shoots roughly
+    // twice as fast and a third further."
+    const occupants = b.type === 'tower' ? G.soldiers.filter(s => s.garrison === b) : [];
+    const range = b.type === 'tower' ? (occupants.length ? 13 : 10) : 6;
     let target = null, bestD = Infinity;
     for (const e of G.enemies) {
       const d = Math.sqrt((e.x-b.x)**2 + (e.y-b.y)**2);
@@ -286,10 +317,11 @@ export function updateTowers() {
       // continuous — affects every shot at every HP. Same ~5% DPS
       // magnitude but now perceivable in every engagement.
       const smithBonus = G.namedCharacters?.smith ? 1.05 : 1;
-      b.fireTimer = 60 / smithBonus; // 60 ticks base; ~57.1 with smith
+      b.fireTimer = Math.max(25, 60 - 20 * occupants.length) / smithBonus;
+      const archerBonus = occupants.filter(s => s.type === 'archer').length * 2;
       G.projectiles.push({
         x: b.x, y: b.y, tx: target.x, ty: target.y,
-        target, damage: 10, life: 40,
+        target, damage: 10 + archerBonus, life: 40,
         type: 'arrow',
       });
     }

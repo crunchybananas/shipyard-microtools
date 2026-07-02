@@ -124,9 +124,15 @@ export function placeBuilding(type, tx, ty) {
 
 export function demolishBuilding(b, byEnemy = false) {
   // Orphaned soldiers re-home on their next wander re-roll (armyAnchor
-  // falls back through homeBuilding -> null gracefully).
+  // falls back through homeBuilding -> null gracefully); garrisoned
+  // soldiers are ejected beside the rubble.
   for (const s of G.soldiers || []) {
     if (s.homeBuilding === b) s.homeBuilding = null;
+    if (s.garrison === b) {
+      s.garrison = null;
+      const spot = nearestWalkableTile(b.x, b.y, 3);
+      if (spot) { s.x = spot.x; s.y = spot.y; s.tx = spot.x; s.ty = spot.y; }
+    }
   }
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
@@ -608,6 +614,7 @@ export function checkRaids() {
       try { panCameraTo(firstBuilding.x, firstBuilding.y, 800); } catch (_e) {}
     }
 
+    G._raidSpawnCount = raiders; // morale-break baseline (combat.js)
     // Spawn enemy raiders that visibly approach the settlement
     for (let i = 0; i < raiders; i++) {
       const side = Math.floor(Math.random() * 4);
