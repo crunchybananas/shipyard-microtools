@@ -22,6 +22,7 @@ export function saveGame({ silent = false } = {}) {
       buildings: G.buildings.map(b => ({
         type: b.type, x: b.x, y: b.y, hp: b.hp, prodTimer: b.prodTimer,
         level: b.level || 1,
+        visits: b.visits || undefined,
         workerIdxs: b.workers.map(w => G.citizens.indexOf(w)),
       })),
       citizens: G.citizens.map(c => ({
@@ -141,6 +142,7 @@ export function loadGame() {
     G.buildings = s.buildings.map(b => ({
       type: b.type, x: b.x, y: b.y, hp: b.hp, prodTimer: b.prodTimer,
       level: b.level || 1,
+      visits: b.visits || {},
       active: true, produced: null, prodShowCount: 0,
       workers: (b.workerIdxs || []).map(i => G.citizens[i]).filter(Boolean),
     }));
@@ -213,6 +215,9 @@ export function loadGame() {
     // legacy-saved realms can still experience the beat.
     G.stats.everHadBuilding = G.stats.everHadBuilding || {};
     for (const b of G.buildings || []) G.stats.everHadBuilding[b.type] = true;
+    // Housing-tier grace: no devolution until walkers have had time to
+    // respawn and refresh b.visits after a load (covers legacy saves too).
+    G._tierGraceUntil = G.gameTick + 1200;
     if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
     G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');

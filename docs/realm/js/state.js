@@ -177,6 +177,17 @@ const FIRST = ['Ada','Bjorn','Celia','Dag','Elsa','Finn','Greta','Hans','Inga','
 const LAST = ['Stone','Brook','Field','Hill','Dale','Wood','Lake','Ridge','Vale','Forge','Thorn','Frost','Marsh','Glen','Pike','Ash','Birch','Elm','Oak','Pine'];
 export function randomName() { return FIRST[rngInt(0,FIRST.length-1)]+' '+LAST[rngInt(0,LAST.length-1)]; }
 
+// Housing evolution ladder (index = b.level - 1). A house's b.level is its
+// TIER — never add def.upgrades to the house def, the paid-upgrade path
+// would fight the evolution simulation for the same field.
+// Invariant: HOUSE_TIERS[0].cap === BUILDINGS.house.pop.
+export const HOUSE_TIERS = [
+  { name: 'Hovel',     cap: 4,  taxMult: 0.8, reqs: {} },
+  { name: 'Cottage',   cap: 6,  taxMult: 1.0, reqs: { services: ['well'], food: true } },
+  { name: 'Homestead', cap: 8,  taxMult: 1.4, reqs: { services: ['well', 'market'], anyOf: ['church', 'tavern'], food: true }, evolveCost: { planks: 2 } },
+  { name: 'Manor',     cap: 10, taxMult: 2.0, reqs: { services: ['well', 'market', 'church', 'tavern'], food: true, foodVariety: 2 }, evolveCost: { planks: 2, tools: 1 } },
+];
+
 export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️',wheat:'🌾',flour:'🫓',planks:'🪚',tools:'🛠️'}[k]||k; }
 
 export const DIFFICULTY = {

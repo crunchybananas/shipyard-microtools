@@ -2,8 +2,8 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js?realm=115';
-import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js?realm=115';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=115';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=115';
 import { saveGame, loadGame, hasSave } from './save.js?realm=115';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js?realm=115';
 import { notify } from './notifications.js?realm=115';
@@ -47,6 +47,10 @@ function rateStr(val, tooltip) {
 }
 
 export function updateUI() {
+  if (G._refreshPanelFor && G.selectedBuilding === G._refreshPanelFor) {
+    const bb = G._refreshPanelFor; G._refreshPanelFor = null;
+    showInfoPanel(bb);
+  }
   const $ = id => document.getElementById(id);
 
   // Compute rates: compare resources to snapshot taken half a day ago
@@ -712,7 +716,22 @@ export function showInfoPanel(b) {
   }
 
   // Housing
-  if (def.pop) {
+  if (b.type === 'house') {
+    const report = getHouseTierReport(b);
+    html += `<div class="ip-row"><span class="ip-label">Tier</span><span class="ip-val">🏠 ${report.tier.name} — ${report.tierIdx + 1}/${HOUSE_TIERS.length} · houses ${report.tier.cap} · tax ×${report.tier.taxMult}</span></div>`;
+    if (report.next) {
+      const checks = report.nextReport.checks
+        .map(c => `${c.ok ? '✓' : '✗'} ${c.label}`)
+        .join(' · ');
+      const cost = report.next.evolveCost
+        ? ' · needs ' + Object.entries(report.next.evolveCost).map(([k, v]) => `${v} ${k}`).join(', ')
+        : '';
+      const cls = report.nextReport.pass && report.costOk ? 'ip-happy' : '';
+      html += `<div class="ip-row"><span class="ip-label">Next</span><span class="ip-val ${cls}">${report.next.name}: ${checks}${cost}</span></div>`;
+    } else {
+      html += `<div class="ip-row"><span class="ip-label">Next</span><span class="ip-val ip-happy">Fully evolved — the pride of the realm</span></div>`;
+    }
+  } else if (def.pop) {
     html += `<div class="ip-row"><span class="ip-label">Housing</span><span class="ip-val">🏠 +${def.pop} pop</span></div>`;
   }
 

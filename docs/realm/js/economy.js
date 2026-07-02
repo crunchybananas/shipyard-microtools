@@ -2,7 +2,7 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js?realm=115';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=115';
 import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=115';
 import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=115';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=115';
@@ -127,7 +127,7 @@ export function demolishBuilding(b, byEnemy = false) {
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
   G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-  if (def.pop) G.maxPop = Math.max(0, G.maxPop - def.pop);
+  if (def.pop) G.maxPop = Math.max(0, G.maxPop - houseCap(b));
   if (def.defense) G.defense = Math.max(0, G.defense - def.defense);
   // Refund half the cost only on voluntary demolish — enemies don't give back materials!
   if (!byEnemy) {
@@ -151,7 +151,7 @@ export function undoLastBuild() {
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
   G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-  if (def.pop) G.maxPop -= def.pop;
+  if (def.pop) { G.maxPop -= houseCap(b); if (G.maxPop < 0) { console.warn('[housing] maxPop drifted below zero'); G.maxPop = 0; } }
   if (def.defense) G.defense -= def.defense;
   // Full refund on undo
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + v;
@@ -383,6 +383,55 @@ export function updateProduction() {
     // 105) remain. Closes 101 filed bard idea.
     const bardBonus = G.namedCharacters?.bard ? 5 : 0;
     G.happiness = Math.min(100, Math.max(10, 50 + bardBonus + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
+
+    // ── Housing evolution (Caesar-style tier ladder) ─────────────────
+    // Signed streak with asymmetric hysteresis: +2 checks to evolve,
+    // -3 to devolve (with a warning at -2). Runtime-only; reset-on-load
+    // doubles as post-load grace alongside G._tierGraceUntil.
+    for (const b of houses) {
+      if (b.type !== 'house') continue;
+      if ((b.construction || 0) > 0 && !b.active) continue;
+      const report = getHouseTierReport(b);
+      const graceActive = G._tierGraceUntil && G.gameTick < G._tierGraceUntil;
+      if (report.next && report.nextReport.pass) {
+        b.tierStreak = Math.max(1, (b.tierStreak || 0) + 1);
+        if (b.tierStreak >= 2) {
+          if (report.costOk) {
+            for (const [k, v] of Object.entries(report.next.evolveCost || {})) G.resources[k] -= v;
+            const capDelta = report.next.cap - report.tier.cap;
+            b.level = (b.level || 1) + 1;
+            G.maxPop += capDelta;
+            b.upgradeTick = G.gameTick;
+            b.tierStreak = 0;
+            if (G.stats) G.stats.housesEvolved = (G.stats.housesEvolved || 0) + 1;
+            trySpawnSettlers(1);
+            G._refreshPanelFor = b;
+            G.particles.push({ tx: b.x, ty: b.y, offsetY: -14, text: `⬆ ${report.next.name}`, alpha: 1.5, vy: -0.2, decay: 0.012, type: 'text' });
+            notify(`A ${report.tier.name.toLowerCase()} grew into a ${report.next.name.toLowerCase()}!`, 'success');
+          }
+          // Unaffordable evolve cost: hold the streak at threshold so saved-up
+          // planks/tools trigger the upgrade on the next check.
+        }
+      } else if ((b.level || 1) > 1 && !report.current.pass && !graceActive) {
+        b.tierStreak = Math.min(-1, (b.tierStreak || 0) - 1);
+        if (b.tierStreak === -2) {
+          G.particles.push({ tx: b.x, ty: b.y, offsetY: -14, text: '❗', alpha: 1.4, vy: -0.15, decay: 0.012, type: 'text' });
+        } else if (b.tierStreak <= -3) {
+          const fromTier = HOUSE_TIERS[(b.level || 1) - 1];
+          b.level -= 1;
+          const toTier = HOUSE_TIERS[(b.level || 1) - 1];
+          G.maxPop = Math.max(0, G.maxPop - (fromTier.cap - toTier.cap));
+          b.tierStreak = 0;
+          const now = Date.now();
+          if (!G._lastDevolveNotice || now - G._lastDevolveNotice > 8000) {
+            G._lastDevolveNotice = now;
+            notify(`A ${fromTier.name.toLowerCase()} declined into a ${toTier.name.toLowerCase()} — services lapsed.`, 'warn');
+          }
+        }
+      } else {
+        b.tierStreak = 0;
+      }
+    }
   }
 
   // Food consumption (once per day)
@@ -838,10 +887,69 @@ export function updateFires() {
   }
 }
 
+// Housing tier capacity: houses grow with their tier; everything else uses
+// its static def.pop. The single source for every maxPop mutation site.
+export function houseCap(b) {
+  if (b.type === 'house') return HOUSE_TIERS[Math.min(HOUSE_TIERS.length, b.level || 1) - 1].cap;
+  return BUILDINGS[b.type]?.pop || 0;
+}
+
+// Single-source tier requirement predicates, used by BOTH the evolution
+// simulation and the info-panel checklist so they can never disagree.
+export function getHouseTierReport(b) {
+  const VISIT_WINDOW = Math.floor(G.dayLength * 1.25);
+  const visited = (s) => b.visits?.[s] !== undefined && G.gameTick - b.visits[s] <= VISIT_WINDOW;
+  const tierIdx = Math.min(HOUSE_TIERS.length, b.level || 1) - 1;
+  const evalReqs = (reqs) => {
+    const out = { pass: true, checks: [] };
+    for (const s of (reqs.services || [])) {
+      const ok = visited(s);
+      out.checks.push({ label: `${BUILDINGS[s]?.name || s} access`, ok });
+      if (!ok) out.pass = false;
+    }
+    if (reqs.anyOf) {
+      const ok = reqs.anyOf.some(visited);
+      out.checks.push({ label: reqs.anyOf.map(s => BUILDINGS[s]?.name || s).join(' or '), ok });
+      if (!ok) out.pass = false;
+    }
+    if (reqs.food) {
+      const ok = (G.resources.food + (G.resources.wheat || 0) + (G.resources.flour || 0)) > 0;
+      out.checks.push({ label: 'Food in store', ok });
+      if (!ok) out.pass = false;
+    }
+    if (reqs.foodVariety) {
+      const kinds = ['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery']
+        .filter(t => G.buildings.some(bb => bb.type === t && bb.active && (bb.workers?.length || 0) >= (BUILDINGS[t].workers || 0)));
+      const ok = kinds.length >= reqs.foodVariety;
+      out.checks.push({ label: `${reqs.foodVariety} food sources (${kinds.length})`, ok });
+      if (!ok) out.pass = false;
+    }
+    return out;
+  };
+  const current = evalReqs(HOUSE_TIERS[tierIdx].reqs);
+  const next = tierIdx + 1 < HOUSE_TIERS.length ? HOUSE_TIERS[tierIdx + 1] : null;
+  const nextReport = next ? evalReqs(next.reqs) : null;
+  let costOk = true;
+  if (next?.evolveCost) {
+    for (const [k, v] of Object.entries(next.evolveCost)) {
+      if ((G.resources[k] || 0) < v) { costOk = false; break; }
+    }
+  }
+  return { tierIdx, tier: HOUSE_TIERS[tierIdx], next, current, nextReport, costOk };
+}
+
 export function collectTaxes() {
-  // Only count housed population (not vagrants)
-  const housed = G.buildings.filter(b => b.type === 'house').length * 4;
-  const effectivePop = Math.min(housed, G.population);
+  // Capacity-weighted taxes: each house contributes its tier capacity at its
+  // tier's tax multiplier; vagrants beyond total housing pay nothing.
+  let housedCap = 0, weighted = 0;
+  for (const b of G.buildings) {
+    if (b.type !== 'house') continue;
+    const t = HOUSE_TIERS[Math.min(HOUSE_TIERS.length, b.level || 1) - 1];
+    housedCap += t.cap;
+    weighted += t.cap * t.taxMult;
+  }
+  const occupancy = housedCap > 0 ? Math.min(1, G.population / housedCap) : 0;
+  const effectivePop = weighted * occupancy;
   // Happiness modifier: happy citizens pay more
   const happyMod = G.happiness / 100;
   // Base tax: 0.3 gold per pop per day, scaled by happiness

@@ -7,7 +7,7 @@ export function updateWalkers() {
     for (const b of G.buildings) {
       const def = BUILDINGS[b.type];
       if (!def) continue; // guard against unknown building types
-      if (!def.radius || !def.happiness) continue;
+      if (!def.radius) continue; // walkerTypes below already limits spawns to church/tavern/well/market
       // Don't spawn if we already have a walker from this building
       if (G.walkers.some(w => w.home === b)) continue;
       const walkerTypes = {
