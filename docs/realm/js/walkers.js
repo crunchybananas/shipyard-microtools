@@ -1,6 +1,6 @@
-import { G, BUILDINGS, MAP_W, MAP_H, rngRange, resourceEmoji } from './state.js?realm=124';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=124';
-import { getWonderReport } from './wonder.js?realm=124';
+import { G, BUILDINGS, MAP_W, MAP_H, rngRange, resourceEmoji } from './state.js?realm=125';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=125';
+import { getWonderReport } from './wonder.js?realm=125';
 
 export function updateWalkers() {
   // Spawn walkers from service buildings periodically

@@ -2,7 +2,7 @@
 // Particles — floating resource numbers, smoke, sparkles
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=124';
+import { G } from './state.js?realm=125';
 
 export function updateParticles() {
   for (let i = G.particles.length - 1; i >= 0; i--) {

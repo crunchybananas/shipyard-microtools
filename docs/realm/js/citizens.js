@@ -2,10 +2,10 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=124';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=124';
-import { getCitizenSpeedMult } from './events.js?realm=124';
-import { revealAround } from './world.js?realm=124';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=125';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=125';
+import { getCitizenSpeedMult } from './events.js?realm=125';
+import { revealAround } from './world.js?realm=125';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -23,6 +23,19 @@ function nearestBuilding(c, typeOrNull) {
   return best;
 }
 
+// Chain targets win only within reach: a windmill across the island must
+// not beat the granary next door (AI-audit deferred fix). The carrier
+// takes the chain target when it is close (<=18 Manhattan tiles — dist2
+// above is Manhattan, not squared), or when it is no worse than twice as
+// far as the best generic store.
+function preferChainTarget(c, primary, fallback) {
+  if (!primary) return fallback;
+  if (!fallback) return primary;
+  const dp = dist2(c.x, c.y, primary.x, primary.y);
+  if (dp <= 18) return primary;
+  return dp <= dist2(c.x, c.y, fallback.x, fallback.y) * 2 ? primary : fallback;
+}
+
 function deliveryDropoff(c, resKey) {
   if (resKey === 'food') {
     return nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
@@ -30,13 +43,16 @@ function deliveryDropoff(c, resKey) {
   // Production chain: wheat walks to the mill, flour walks to the bakery,
   // so the goods visibly flow farm -> windmill -> bakery -> granary.
   if (resKey === 'wheat') {
-    return nearestBuilding(c, 'windmill') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+    const store = nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+    return preferChainTarget(c, nearestBuilding(c, 'windmill'), store);
   }
   if (resKey === 'flour') {
-    return nearestBuilding(c, 'bakery') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+    const store = nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+    return preferChainTarget(c, nearestBuilding(c, 'bakery'), store);
   }
   if (resKey === 'gold') {
-    return nearestBuilding(c, 'market') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+    const store = nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+    return preferChainTarget(c, nearestBuilding(c, 'market'), store);
   }
   return nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'house');
 }
