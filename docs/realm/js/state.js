@@ -21,7 +21,7 @@ export const TILE_COLORS = {
 };
 
 export const BUILDINGS = {
-  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, desc:'Shelters 4 settlers. Generates tax income based on happiness.' },
+  house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, desc:'Shelters settlers and pays taxes. Evolves Hovel → Manor with well, market, church, and tavern coverage.' },
   farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{wheat:3}, workers:1, desc:'Grows wheat — eaten raw, or milled and baked into more bread',
     upgrades: [
       { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },

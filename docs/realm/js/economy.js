@@ -406,6 +406,11 @@ export function updateProduction() {
             if (G.stats) G.stats.housesEvolved = (G.stats.housesEvolved || 0) + 1;
             trySpawnSettlers(1);
             G._refreshPanelFor = b;
+            if (b.level === 4 && !(G.storyFlags && G.storyFlags.first_manor)) {
+              G.storyFlags = G.storyFlags || {};
+              G.storyFlags.first_manor = true;
+              try { chronicle('The first manor rises — a family of standing now calls this realm home.', 'milestone'); } catch (_e) {}
+            }
             G.particles.push({ tx: b.x, ty: b.y, offsetY: -14, text: `⬆ ${report.next.name}`, alpha: 1.5, vy: -0.2, decay: 0.012, type: 'text' });
             notify(`A ${report.tier.name.toLowerCase()} grew into a ${report.next.name.toLowerCase()}!`, 'success');
           }

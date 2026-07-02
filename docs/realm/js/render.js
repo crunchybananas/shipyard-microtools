@@ -613,8 +613,11 @@ function drawSpriteIfReady(ctx, b, s, reveal = 1) {
   const size = _SPRITE_SIZES[b.type] || { w: 36, h: 42 };
   const trims = supportFrame ? _SUPPORT_ATLAS_TRIMS : _RASTER_ATLAS_TRIMS;
   const trim = trims[spriteType] || { x: 0, y: 0, w: frame.w, h: frame.h };
-  const targetH = size.h;
-  const targetW = Math.max(size.w, targetH * (trim.w / trim.h));
+  // Housing tiers read at a glance: hovels sit lower, manors stand taller.
+  // Ground-anchored (draw rect is bottom-aligned at s.y), so only height/width scale.
+  const tierScale = b.type === 'house' ? [0.9, 1.0, 1.1, 1.22][Math.min(4, b.level || 1) - 1] : 1;
+  const targetH = size.h * tierScale;
+  const targetW = Math.max(size.w * tierScale, targetH * (trim.w / trim.h));
   drawImageWithReveal(
     ctx,
     atlas,

@@ -953,6 +953,16 @@ export function renderHappinessPanel() {
 
   html += `<div class="hp-row hp-total"><span class="hp-label">Net Happiness</span><span class="hp-val">${total}%</span></div>`;
 
+  // Housing tier census — the growth ladder at a glance
+  {
+    const census = [0, 0, 0, 0];
+    for (const b of G.buildings) if (b.type === 'house') census[Math.min(4, b.level || 1) - 1]++;
+    if (census.some(n => n > 0)) {
+      const line = HOUSE_TIERS.map((t, i) => census[i] ? `${census[i]} ${t.name}` : null).filter(Boolean).join(' · ');
+      html += `<div class="hp-row"><span class="hp-label">🏘️ Housing</span><span class="hp-val">${line}</span></div>`;
+    }
+  }
+
   // Roadmap: show buildings with happiness bonuses that the player hasn't built yet
   // Gives the player a concrete path from 50% → 80%
   const builtTypes = new Set(G.buildings.map(b => b.type));
