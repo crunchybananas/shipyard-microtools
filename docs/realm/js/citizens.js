@@ -543,6 +543,15 @@ function runStateMachine(c) {
   switch (c.state) {
     case 'idle':
     case 'find_job':
+      // Carried goods are an obligation: a citizen holding cargo delivers it
+      // before seeking new work or loitering — this was the stranded-carrier
+      // freeze (idle with wood in hand, goods leaked from the economy).
+      if (c.carrying && c.carryAmount > 0) {
+        c.state = 'needs_delivery';
+        c.stateTimer = 0;
+        clearPath(c);
+        break;
+      }
       // Hungry? Eat first. Citizen eats when hunger > 70 and food is available.
       if (c.hunger > 70 && G.resources.food > 0) {
         G.resources.food--;

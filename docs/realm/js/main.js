@@ -768,10 +768,11 @@ function gameLoop() {
       requestAnimationFrame(gameLoop);
     } else {
       for (let i = 0; i < 4; i++) simTick();
-      if (runtimeCaptureMode) {
-        _loopFrame++;
-        _renderFrame({ allowMinimap: false });
-      }
+      // Always paint at the hidden-tab cadence (timer-clamped to ~1-4fps):
+      // embedded/preview contexts report 'hidden' while still being watched,
+      // and returning to a never-painted canvas reads as frozen citizens.
+      _loopFrame++;
+      _renderFrame({ allowMinimap: false });
       setTimeout(gameLoop, 250);
     }
   } catch (e) {
