@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=127';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=127';
-import { makeAtlasLoader } from './atlas-loader.js?realm=127';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=128';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=128';
+import { makeAtlasLoader } from './atlas-loader.js?realm=128';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -1793,8 +1793,12 @@ export function render() {
     // pop the sprite sideways. World/collision position is untouched.
     let laneTx = 0, laneTy = 0;
     if (pathActive && G.buildingGrid[Math.round(c.y)]?.[Math.round(c.x)]?.type === 'road') {
+      // Lane direction comes from the path SEGMENT so the target is constant
+      // across each leg; near-waypoint renormalization would swing it.
       const wp = c.path[c.pathIdx];
-      const ldx = wp.x - c.x, ldy = wp.y - c.y;
+      const from = c.pathIdx > 0 ? c.path[c.pathIdx - 1] : null;
+      const ldx = from ? wp.x - from.x : wp.x - c.x;
+      const ldy = from ? wp.y - from.y : wp.y - c.y;
       const llen = Math.hypot(ldx, ldy);
       if (llen > 0.01) { laneTx = -ldy / llen * 0.16; laneTy = ldx / llen * 0.16; }
     }
@@ -1829,14 +1833,21 @@ export function render() {
       : 0;
     const cy = s.y + bob;
 
-    // Facing direction (x = left/right, z = depth/forward-back in iso)
+    // Facing direction (x = left/right, z = depth/forward-back in iso).
+    // Face along the path SEGMENT (previous waypoint -> current), not the
+    // instantaneous offset to the waypoint: near arrival the per-axis offset
+    // collapses below the 0.1 gate one axis at a time, flashing a wrong
+    // direction for a frame at diagonal waypoints (verified by tick-exact
+    // simulation). First segment has no previous waypoint — offset form.
     let faceX = 0, faceZ = 0;
-    if (c.path && c.pathIdx < (c.path?.length ?? 0)) {
+    if (pathActive) {
       const wp = c.path[c.pathIdx];
-      const fdx = wp.x - c.x;
-      const fdy = wp.y - c.y;
-      faceX = fdx > 0.1 ? 1 : fdx < -0.1 ? -1 : 0;
-      faceZ = fdy > 0.1 ? 1 : fdy < -0.1 ? -1 : 0;
+      const from = c.pathIdx > 0 ? c.path[c.pathIdx - 1] : null;
+      const fdx = from ? wp.x - from.x : wp.x - c.x;
+      const fdy = from ? wp.y - from.y : wp.y - c.y;
+      const gate = from ? 0.01 : 0.1;
+      faceX = fdx > gate ? 1 : fdx < -gate ? -1 : 0;
+      faceZ = fdy > gate ? 1 : fdy < -gate ? -1 : 0;
     } else if (Math.abs(c.tx - c.x) > 0.1) {
       faceX = c.tx > c.x ? 1 : -1;
     }
@@ -1861,6 +1872,23 @@ export function render() {
         faceX = sdx > 0.1 ? 1 : sdx < -0.1 ? -1 : 0;
         faceZ = sdy > 0.1 ? 1 : sdy < -0.1 ? -1 : 0;
       }
+    }
+    // Direction hysteresis: a new facing must persist 4 consecutive frames
+    // before the drawn row changes. Replans and segment boundaries can pass
+    // through an intermediate direction for a frame or two; without the
+    // hold that reads as a twitch.
+    if (faceX || faceZ) {
+      const dirKey = faceX + ',' + faceZ;
+      if (c._dirKey === undefined || c._dirKey === dirKey) {
+        c._dirKey = dirKey; c._dirPend = null; c._dirPendN = 0;
+      } else if (c._dirPend === dirKey) {
+        c._dirPendN = (c._dirPendN || 0) + 1;
+        if (c._dirPendN >= 4) { c._dirKey = dirKey; c._dirPend = null; c._dirPendN = 0; }
+      } else {
+        c._dirPend = dirKey; c._dirPendN = 1;
+      }
+      const held = c._dirKey.split(',');
+      faceX = +held[0]; faceZ = +held[1];
     }
     // In iso: screen Y = (worldX + worldY)*TH/2, so moving away from camera
     // (up on screen) = faceX + faceZ < 0. Prior "faceX>0 && faceZ<0" only caught
@@ -2575,8 +2603,16 @@ export function render() {
     // procedural chibi below remains as an atlas-loading fallback.
     const smx = s.x - (s._pdx ?? s.x), smy = s.y - (s._pdy ?? s.y);
     s._pdx = s.x; s._pdy = s.y;
-    let sFx = smx, sFy = smy;
-    let sAction = Math.hypot(smx, smy) > 0.004 ? 'walk' : 'idle';
+    // Movement memory (same fix as citizens): a single frame's position
+    // delta strobed walk/idle rows between steps and collapsed facing to a
+    // default whenever the soldier paused. Remember the last real movement
+    // and hold the walk row briefly past it.
+    if (Math.hypot(smx, smy) > 0.004) {
+      s._movedAt = G.gameTick;
+      s._mvx = smx; s._mvy = smy;
+    }
+    let sFx = s._mvx ?? smx, sFy = s._mvy ?? smy;
+    let sAction = (G.gameTick - (s._movedAt ?? -999)) < 8 ? 'walk' : 'idle';
     let sNearE = null, sNearD = Infinity;
     for (const e of G.enemies) {
       const d = Math.hypot(e.x - s.x, e.y - s.y);
