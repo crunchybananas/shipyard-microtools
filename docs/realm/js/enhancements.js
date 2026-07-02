@@ -533,6 +533,20 @@ function assignCartPath(cart, tx, ty) {
 
 function stepCartAlongPath(cart, baseSpeed) {
   if (!cart.path || cart.pathIdx >= cart.path.length) return false;
+  // Obstacle epoch: a building placed on the remaining route invalidates the
+  // stored path; reroute instead of driving through the new footprint.
+  if (cart._pathEpoch !== (G.obstacleEpoch || 0)) {
+    cart._pathEpoch = G.obstacleEpoch || 0;
+    for (let wi = cart.pathIdx; wi < cart.path.length; wi++) {
+      if (!isWalkable(cart.path[wi].x, cart.path[wi].y)) {
+        const goalX = cart.tx, goalY = cart.ty;
+        cart.path = null;
+        if (!assignCartPath(cart, goalX, goalY)) return false;
+        break;
+      }
+    }
+    if (!cart.path || cart.pathIdx >= cart.path.length) return false;
+  }
   let target = cart.path[cart.pathIdx];
   let dx = target.x - cart.x;
   let dy = target.y - cart.y;

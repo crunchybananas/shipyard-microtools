@@ -28,6 +28,7 @@ export function revealAround(cx,cy,r){
 export function rebuildBuildingGrid(){
   G.buildingGrid = Array.from({length:MAP_H}, ()=>Array(MAP_W).fill(null));
   for(const b of G.buildings) G.buildingGrid[b.y][b.x] = b;
+  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
 }
 
 export function makeCitizen(x,y){

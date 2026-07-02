@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, TILE, MAP_W, MAP_H } from './state.js';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js';
 
 const SPECIES = {
   deer:    { color: '#8a6a40', speed: 0.02,  size: 4,   prefersForest: true, herdSize: 3 },
@@ -83,6 +84,8 @@ export function updateAnimals() {
         // Clamp to map bounds
         a.tx = Math.max(1, Math.min(MAP_W - 2, a.tx));
         a.ty = Math.max(1, Math.min(MAP_H - 2, a.ty));
+        const wt = nearestWalkableTile(Math.round(a.tx), Math.round(a.ty), 3);
+        if (wt) { a.tx = wt.x; a.ty = wt.y; }
         a.state = 'walk';
         a.stateTimer = 30 + Math.random() * 60;
       } else {
@@ -96,9 +99,10 @@ export function updateAnimals() {
       const dx = a.tx - a.x, dy = a.ty - a.y;
       const d = Math.sqrt(dx * dx + dy * dy);
       if (d > 0.1) {
-        const spd = spec.speed * G.speed;
-        a.x += (dx / d) * Math.min(spd, d);
-        a.y += (dy / d) * Math.min(spd, d);
+        if (!stepEntityToward(a, a.tx, a.ty, spec.speed * G.speed)) {
+          a.state = 'graze';
+          a.stateTimer = 40 + Math.random() * 60;
+        }
       }
       // Clamp position so animals never render in the void outside the map
       a.x = Math.max(1, Math.min(MAP_W - 2, a.x));

@@ -131,6 +131,7 @@ function pathTo(c, tx, ty) {
   c._pathGoal = target;
   c.path = compressPath(findPath(Math.round(c.x), Math.round(c.y), target.x, target.y));
   c.pathIdx = 0;
+  c._pathEpoch = G.obstacleEpoch || 0;
   c._stuckTicks = 0;
   c._lastPathX = c.x;
   c._lastPathY = c.y;
@@ -287,8 +288,14 @@ function evacuateBlockedCitizen(c) {
   const d = Math.hypot(dx, dy);
   if (d > 0.001) {
     const step = Math.min(0.24 * Math.max(1, G.speed || 1), d);
-    c.x += (dx / d) * step;
-    c.y += (dy / d) * step;
+    const nx = c.x + (dx / d) * step;
+    const ny = c.y + (dy / d) * step;
+    // Evacuation goes through the same step gate as every other mover, so
+    // escaping one footprint can never tunnel through a neighbouring one.
+    if (canStepCitizen(c, nx, ny)) {
+      c.x = nx;
+      c.y = ny;
+    }
     c.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
     c.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
   }
@@ -302,11 +309,21 @@ function evacuateBlockedCitizen(c) {
 }
 
 function canStepCitizen(c, nx, ny) {
-  if (tileWalkable(nx, ny)) return true;
+  const rx = Math.round(nx), ry = Math.round(ny);
+  const cx = Math.round(c.x), cy = Math.round(c.y);
+  if (tileWalkable(nx, ny)) {
+    // Mirror the A* no-corner-cut rule: a diagonal tile transition needs
+    // both orthogonal neighbours open too, or citizens slip between two
+    // diagonally adjacent buildings placed after the path was planned.
+    if (rx !== cx && ry !== cy && (!tileWalkable(rx, cy) || !tileWalkable(cx, ry))) return false;
+    return true;
+  }
   // If a player drops a building onto/against a citizen, their rounded
-  // current tile can be blocked for several frames. Let them step out toward
-  // a walkable waypoint instead of replanning forever inside the footprint.
-  return standingOnBlockedTile(c) && terrainWalkable(nx, ny);
+  // current tile can be blocked for several frames. Let them shuffle within
+  // that one tile toward the exit — but never cross into a DIFFERENT
+  // blocked tile (buildings are 1x1, so any further blocked tile is another
+  // building, and crossing it is the tunnelling bug).
+  return standingOnBlockedTile(c) && rx === cx && ry === cy && terrainWalkable(nx, ny);
 }
 
 function replanToRequestedTarget(c) {
@@ -416,6 +433,21 @@ export function updateCitizens() {
 
     // Follow path if we have one
     if (c.path && c.pathIdx < c.path.length) {
+      // Obstacle epoch: when any building is placed or removed, validate the
+      // REMAINING waypoints once instead of discovering the blockage by
+      // walking into it (compressPath means mid-segment tiles are caught by
+      // the per-step gate below).
+      if (c._pathEpoch !== (G.obstacleEpoch || 0)) {
+        c._pathEpoch = G.obstacleEpoch || 0;
+        let stale = false;
+        for (let wi = c.pathIdx; wi < c.path.length; wi++) {
+          if (!isWalkable(c.path[wi].x, c.path[wi].y)) { stale = true; break; }
+        }
+        if (stale) {
+          replanToRequestedTarget(c);
+          continue;
+        }
+      }
       const wp = c.path[c.pathIdx];
       if (!isWalkable(wp.x, wp.y)) {
         replanToRequestedTarget(c);

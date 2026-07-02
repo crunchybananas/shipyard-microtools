@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js';
 import { playSound } from './audio.js';
 
 function soldierDamage(s) {
@@ -44,9 +45,8 @@ export function updateSoldiers() {
       if (s.type === 'archer') {
         const idealRange = 5;
         if (nearestDist < idealRange - 1) {
-          // Too close — back up
-          s.x -= (nearestEnemy.x - s.x) * 0.02 * G.speed;
-          s.y -= (nearestEnemy.y - s.y) * 0.02 * G.speed;
+          // Too close — back up (collision-checked, slides along buildings)
+          stepEntityToward(s, s.x - (nearestEnemy.x - s.x), s.y - (nearestEnemy.y - s.y), 0.02 * G.speed * Math.max(1, nearestDist));
         } else if (nearestDist < idealRange + 2) {
           // In range — fire arrow
           s.attackTimer = (s.attackTimer || 0) - G.speed;
@@ -62,10 +62,7 @@ export function updateSoldiers() {
           }
         } else {
           // Close the gap
-          const dx = nearestEnemy.x - s.x, dy = nearestEnemy.y - s.y;
-          const d = Math.sqrt(dx*dx + dy*dy);
-          s.x += (dx/d) * 0.035 * G.speed;
-          s.y += (dy/d) * 0.035 * G.speed;
+          stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.035 * G.speed);
         }
         continue; // skip default melee logic
       }
@@ -74,9 +71,7 @@ export function updateSoldiers() {
       const dx = nearestEnemy.x - s.x, dy = nearestEnemy.y - s.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.5) {
-        const spd = 0.04 * G.speed;
-        s.x += (dx/d) * Math.min(spd, d);
-        s.y += (dy/d) * Math.min(spd, d);
+        stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.04 * G.speed);
       } else {
         // Attack cooldown
         s.attackTimer = (s.attackTimer || 0) - G.speed;
@@ -119,9 +114,11 @@ export function updateSoldiers() {
     const dx = s.tx - s.x, dy = s.ty - s.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     if (d > 0.1) {
-      const spd = 0.03 * G.speed;
-      s.x += (dx/d) * Math.min(spd, d);
-      s.y += (dy/d) * Math.min(spd, d);
+      if (!stepEntityToward(s, s.tx, s.ty, 0.03 * G.speed)) {
+        // Blocked — pick a fresh reachable patrol point instead of grinding
+        const t = nearestWalkableTile(Math.round(s.x + rngRange(-4, 4)), Math.round(s.y + rngRange(-4, 4)), 4);
+        if (t) { s.tx = t.x; s.ty = t.y; }
+      }
     } else {
       s.stateTimer--;
       if (s.stateTimer <= 0) {

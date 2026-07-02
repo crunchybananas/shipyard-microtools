@@ -4,10 +4,11 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty } from './state.js';
 import { getProductionMultiplier, getHappinessOffset } from './events.js';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
-import { panCameraTo } from './render.js?realm=114';
+import { panCameraTo } from './render.js?realm=115';
 import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 import { isBuildingUnlocked } from './tech.js';
@@ -83,6 +84,7 @@ export function placeBuilding(type, tx, ty) {
   };
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
+  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
   if (def.pop) { G.maxPop += def.pop; trySpawnSettlers(def.pop); }
   if (def.reveal) revealAround(tx, ty, def.reveal);
   if (def.defense) G.defense += def.defense;
@@ -124,6 +126,7 @@ export function demolishBuilding(b, byEnemy = false) {
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
+  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
   if (def.pop) G.maxPop = Math.max(0, G.maxPop - def.pop);
   if (def.defense) G.defense = Math.max(0, G.defense - def.defense);
   // Refund half the cost only on voluntary demolish — enemies don't give back materials!
@@ -147,6 +150,7 @@ export function undoLastBuild() {
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
+  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
   if (def.pop) G.maxPop -= def.pop;
   if (def.defense) G.defense -= def.defense;
   // Full refund on undo
@@ -168,7 +172,8 @@ export function trySpawnSettlers(count) {
   for (let i = 0; i < max; i++) {
     const cx = MAP_W/2 + rngRange(-3,3);
     const cy = MAP_H/2 + rngRange(-3,3);
-    G.citizens.push(makeCitizen(cx, cy));
+    const spawnTile = nearestWalkableTile(Math.round(cx), Math.round(cy), 6) || { x: cx, y: cy };
+    G.citizens.push(makeCitizen(spawnTile.x, spawnTile.y));
     G.population++;
   }
   if (max > 0 && G.stats) G.stats.citizensBorn += max;
@@ -232,9 +237,10 @@ export function updateProduction() {
       if (b.trainTimer >= 800 && current < cap && G.resources.wood >= 2) {
         b.trainTimer = 0;
         G.resources.wood -= 2;
+        const muster = nearestWalkableTile(b.x, b.y, 3) || { x: b.x, y: b.y };
         G.soldiers.push({
-          x: b.x + 0.5, y: b.y + 0.5,
-          tx: b.x, ty: b.y,
+          x: muster.x, y: muster.y,
+          tx: muster.x, ty: muster.y,
           homeBuilding: b,
           type: 'archer',
           hp: 30, maxHp: 30,
@@ -251,9 +257,10 @@ export function updateProduction() {
       if (b.trainTimer >= 600 && current < cap && G.resources.iron >= 1) {
         b.trainTimer = 0;
         G.resources.iron--;
+        const muster = nearestWalkableTile(b.x, b.y, 3) || { x: b.x, y: b.y };
         G.soldiers.push({
-          x: b.x + 0.5, y: b.y + 0.5,
-          tx: b.x, ty: b.y,
+          x: muster.x, y: muster.y,
+          tx: muster.x, ty: muster.y,
           homeBuilding: b,
           type: 'swordsman',
           hp: 75, maxHp: 75,
@@ -660,9 +667,11 @@ function updateCaravans() {
     const dx = c.tx - c.x, dy = c.ty - c.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist > 0.15) {
-      const spd = c.speed * G.speed;
-      c.x += (dx / dist) * Math.min(spd, dist);
-      c.y += (dy / dist) * Math.min(spd, dist);
+      // Caravans respect building footprints (terrain stays unrestricted so
+      // existing edge routes keep working); if boxed in, skirt sideways.
+      const caravanOpen = (x, y) => { const bb = G.buildingGrid[y]?.[x]; return !bb || bb.type === 'road'; };
+      const moved = stepEntityToward(c, c.tx, c.ty, c.speed * G.speed, caravanOpen);
+      if (!moved) { c.tx += rngRange(-3, 3); c.ty += rngRange(-3, 3); }
     } else {
       if (c.phase === 'outbound') {
         // Reached edge — turn around with gold
@@ -822,6 +831,7 @@ export function updateFires() {
       G.cameraShake = Math.max(G.cameraShake || 0, 10);
       G.buildings = G.buildings.filter(x => x !== b);
       G.buildingGrid[b.y][b.x] = null;
+  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
       if (b.workers) for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
       G.stats.buildingsLost = (G.stats.buildingsLost || 0) + 1;
     }

@@ -56,6 +56,38 @@ function moveCost(x, y) {
   return 1.0;
 }
 
+// Shared collision-checked step for straight-line movers (walkers, soldiers,
+// raiders, caravans, animals). Validates the destination tile against the
+// same walkability model A* plans with, forbids diagonal corner cuts, and
+// slides along the blocking axis instead of stopping dead. Returns true if
+// the entity moved.
+export function stepEntityToward(e, tx, ty, spd, walkableFn = isWalkable) {
+  const dx = tx - e.x, dy = ty - e.y;
+  const d = Math.hypot(dx, dy);
+  if (d < 0.0001) return false;
+  const step = Math.min(spd, d);
+  const cx = Math.round(e.x), cy = Math.round(e.y);
+  const candidates = [
+    [e.x + (dx / d) * step, e.y + (dy / d) * step],
+    [e.x + Math.sign(dx) * step, e.y],
+    [e.x, e.y + Math.sign(dy) * step],
+  ];
+  for (const [nx, ny] of candidates) {
+    if (nx === e.x && ny === e.y) continue;
+    const rx = Math.round(nx), ry = Math.round(ny);
+    // Movement within the entity's current tile is always allowed — an
+    // entity spawned or trapped inside a footprint must be able to shuffle
+    // to the tile edge and exit, exactly like the citizen escape hatch.
+    if (rx === cx && ry === cy) { e.x = nx; e.y = ny; return true; }
+    if (!walkableFn(rx, ry)) continue;
+    // Mirror the A* no-corner-cut rule on diagonal tile transitions.
+    if (rx !== cx && ry !== cy && (!walkableFn(rx, cy) || !walkableFn(cx, ry))) continue;
+    e.x = nx; e.y = ny;
+    return true;
+  }
+  return false;
+}
+
 const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
 const SQRT2 = Math.SQRT2;
 

@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, MAP_W, MAP_H } from './state.js';
+import { stepEntityToward } from './pathfinding.js';
 import { playSound } from './audio.js';
 import { demolishBuilding } from './economy.js';
 import { notify } from './notifications.js';
@@ -24,13 +25,31 @@ export function updateEnemies() {
       continue; // don't move this tick
     }
 
-    // Move toward target
+    // Move toward target — collision-checked; raiders batter what blocks them
     const dx = e.tx - e.x, dy = e.ty - e.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     if (d > 0.3) {
-      const spd = 0.02 * G.speed;
-      e.x += (dx/d) * Math.min(spd, d);
-      e.y += (dy/d) * Math.min(spd, d);
+      // Retreating raiders leave the map unobstructed (edge tiles can be
+      // water); advancing raiders respect footprints and siege blockers.
+      const raiderOpen = e.retreating
+        ? () => true
+        : (x, y) => { const bb = G.buildingGrid[y]?.[x]; return !bb || bb.type === 'road'; };
+      const moved = stepEntityToward(e, e.tx, e.ty, 0.02 * G.speed, raiderOpen);
+      if (!moved && !e.retreating) {
+        // Blocked by a building — attack it (walls and everything else),
+        // so sieges resolve instead of raiders milling at the perimeter.
+        const bx = Math.round(e.x) + Math.sign(Math.round(e.tx) - Math.round(e.x));
+        const by = Math.round(e.y) + Math.sign(Math.round(e.ty) - Math.round(e.y));
+        const blocker = G.buildingGrid[by]?.[bx] || G.buildingGrid[Math.round(e.y)]?.[bx] || G.buildingGrid[by]?.[Math.round(e.x)];
+        if (blocker && blocker.hp > 0) {
+          blocker.hp -= 0.5 * G.speed;
+          if (blocker.hp <= 0) demolishBuilding(blocker, true);
+        } else {
+          // Boxed in with nothing to hit — skirt sideways
+          e.tx += (Math.random() - 0.5) * 5;
+          e.ty += (Math.random() - 0.5) * 5;
+        }
+      }
     } else if (e.retreating) {
       // Reached the retreat edge — leave the map regardless of buildings
       G.enemies.splice(i, 1);

@@ -1,4 +1,5 @@
 import { G, BUILDINGS, MAP_W, MAP_H, rngRange } from './state.js';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js';
 
 export function updateWalkers() {
   // Spawn walkers from service buildings periodically
@@ -17,14 +18,15 @@ export function updateWalkers() {
       };
       const wt = walkerTypes[b.type];
       if (!wt) continue;
+      const spawnAt = nearestWalkableTile(b.x, b.y, 3) || { x: b.x, y: b.y };
       G.walkers.push({
-        x: b.x, y: b.y,
+        x: spawnAt.x, y: spawnAt.y,
         home: b,
         color: wt.color,
         emoji: wt.emoji,
         life: 400, // ticks before returning home
         visitedHouses: new Set(),
-        tx: b.x + rngRange(-4, 4), ty: b.y + rngRange(-4, 4),
+        ...(function () { const t = nearestWalkableTile(Math.round(b.x + rngRange(-4, 4)), Math.round(b.y + rngRange(-4, 4)), 4) || { x: b.x, y: b.y }; return { tx: t.x, ty: t.y }; })(),
       });
     }
   }
@@ -33,14 +35,12 @@ export function updateWalkers() {
     const w = G.walkers[i];
     const dx = w.tx - w.x, dy = w.ty - w.y;
     const d = Math.sqrt(dx*dx + dy*dy);
-    if (d > 0.15) {
-      const spd = 0.03 * G.speed;
-      w.x += (dx/d) * Math.min(spd, d);
-      w.y += (dy/d) * Math.min(spd, d);
-    } else {
-      // Pick new random patrol target near home
-      w.tx = w.home.x + rngRange(-5, 5);
-      w.ty = w.home.y + rngRange(-5, 5);
+    const arrived = d <= 0.15;
+    const moved = arrived ? false : stepEntityToward(w, w.tx, w.ty, 0.03 * G.speed);
+    if (arrived || !moved) {
+      // Pick a new reachable patrol target near home (blocked = repick too)
+      const t = nearestWalkableTile(Math.round(w.home.x + rngRange(-5, 5)), Math.round(w.home.y + rngRange(-5, 5)), 4);
+      if (t) { w.tx = t.x; w.ty = t.y; }
     }
     // Check nearby houses and mark visited
     for (const b of G.buildings) {
