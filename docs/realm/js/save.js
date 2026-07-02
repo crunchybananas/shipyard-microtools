@@ -2,10 +2,11 @@
 // Save/Load — localStorage serialization
 // ════════════════════════════════════════════════════════════
 
-import { G, getSeed, setSeed } from './state.js?realm=121';
-import { rebuildBuildingGrid } from './world.js?realm=121';
-import { missions } from './missions.js?realm=121';
-import { deriveEra } from './tech.js?realm=121';
+import { G, getSeed, setSeed } from './state.js?realm=122';
+import { rebuildBuildingGrid } from './world.js?realm=122';
+import { missions } from './missions.js?realm=122';
+import { deriveEra } from './tech.js?realm=122';
+import { notify } from './notifications.js?realm=122';
 
 const SAVE_KEY = 'realm-save-v2';
 
@@ -266,6 +267,17 @@ export function loadGame() {
     }
     G.won = !!s.won;
     G.wonder = s.wonder || null;
+    // Pre-D4 saves were played under castle-wins law. If such a realm holds
+    // a completed castle un-won, tell the player the law changed — once
+    // (the next save writes a wonder key, so this never re-fires).
+    if (s.wonder === undefined && !G.won
+        && G.buildings.some(b => b.type === 'castle' && (b.buildProgress === undefined || b.buildProgress >= 1))) {
+      G.storyFlags = G.storyFlags || {};
+      G.storyFlags.castleStands = true;
+      setTimeout(() => {
+        try { notify('📜 The law of the realm has changed: the Castle anchors your defense — victory is now the Hall of Ages (research Monuments).', 'mission', { chronicle: false }); } catch (_e) {}
+      }, 800);
+    }
     if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
     G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');

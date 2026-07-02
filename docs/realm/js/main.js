@@ -2,35 +2,35 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=121';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=121';
-import { generateWorld } from './world.js?realm=121';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=121';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=121';
-import { updateCitizens } from './citizens.js?realm=121';
-import { updateSoldiers } from './soldiers.js?realm=121';
-import { placeBuilding, updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=121';
-import { checkMissions, renderMissions } from './missions.js?realm=121';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=121';
-import { setupInput } from './input.js?realm=121';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel } from './ui.js?realm=121';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=121';
-import { updateWonder } from './wonder.js?realm=121';
-import { checkRandomEvents, updateEventBanner } from './events.js?realm=121';
-import { saveGame, loadGame, getSaveSize } from './save.js?realm=121';
-import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=121';
-import { toggleNotificationLog, notify } from './notifications.js?realm=121';
-import { executeTrade } from './trade.js?realm=121';
-import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=121';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=121';
-import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=121';
-import { updateWalkers } from './walkers.js?realm=121';
-import { updateAnimals } from './animals.js?realm=121';
-import { checkAdvisor } from './advisor.js?realm=121';
-import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=121';
-import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=121';
-import { initSpriteLab } from './sprite-lab.js?realm=121';
-import { initSpriteMuster } from './sprite-muster.js?realm=121';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=122';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=122';
+import { generateWorld } from './world.js?realm=122';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=122';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=122';
+import { updateCitizens } from './citizens.js?realm=122';
+import { updateSoldiers } from './soldiers.js?realm=122';
+import { placeBuilding, updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=122';
+import { checkMissions, renderMissions } from './missions.js?realm=122';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=122';
+import { setupInput } from './input.js?realm=122';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel } from './ui.js?realm=122';
+import { updateResearch, checkEraAdvance } from './tech.js?realm=122';
+import { updateWonder } from './wonder.js?realm=122';
+import { checkRandomEvents, updateEventBanner } from './events.js?realm=122';
+import { saveGame, loadGame, getSaveSize } from './save.js?realm=122';
+import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=122';
+import { toggleNotificationLog, notify } from './notifications.js?realm=122';
+import { executeTrade } from './trade.js?realm=122';
+import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=122';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=122';
+import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=122';
+import { updateWalkers } from './walkers.js?realm=122';
+import { updateAnimals } from './animals.js?realm=122';
+import { checkAdvisor } from './advisor.js?realm=122';
+import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=122';
+import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=122';
+import { initSpriteLab } from './sprite-lab.js?realm=122';
+import { initSpriteMuster } from './sprite-muster.js?realm=122';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');

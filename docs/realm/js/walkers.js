@@ -1,5 +1,5 @@
-import { G, BUILDINGS, MAP_W, MAP_H, rngRange } from './state.js?realm=121';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=121';
+import { G, BUILDINGS, MAP_W, MAP_H, rngRange } from './state.js?realm=122';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=122';
 
 export function updateWalkers() {
   // Spawn walkers from service buildings periodically

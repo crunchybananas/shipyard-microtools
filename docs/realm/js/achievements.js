@@ -2,8 +2,8 @@
 // Achievements — persistent milestones with toast notifications
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=121';
-import { playSound } from './audio.js?realm=121';
+import { G } from './state.js?realm=122';
+import { playSound } from './audio.js?realm=122';
 
 const STORAGE_KEY = 'realm-achievements';
 
@@ -28,7 +28,9 @@ export const ACHIEVEMENTS = [
   { id:'scholar',         icon:'📚', name:'Scholar',            desc:'Build a school',                        check:()=>G.buildings.some(b=>b.type==='school') },
   { id:'faithful',        icon:'⛪', name:'Faithful',           desc:'Build a church',                        check:()=>G.buildings.some(b=>b.type==='church') },
   { id:'prepared',        icon:'🏺', name:'Prepared',           desc:'Build a granary before winter',         check:()=>G.buildings.some(b=>b.type==='granary') },
-  { id:'victory',         icon:'👑', name:'Realm Complete',     desc:'Build a Castle and claim your realm',   check:()=>G.won },
+  { id:'victory',         icon:'👑', name:'Realm Complete',     desc:'Raise the Hall of Ages and win the realm', check:()=>G.won },
+  { id:'age_of_crown',    icon:'🌅', name:'Age of the Crown',   desc:'Enter the third and final age',         check:()=>(G.era||1)>=3 },
+  { id:'wonder_begun',    icon:'🕍', name:'Foundations of Eternity', desc:'Complete the first stage of the Hall of Ages', check:()=>(G.wonder?.stage||0)>=1 },
   { id:'peaceful_won',    icon:'🌾', name:'Peaceful Victor',    desc:'Complete the Peaceful Valley scenario',  check:()=>G._scenariosCompleted?.includes('peaceful_start') },
   { id:'military_won',    icon:'⚔️', name:'War Hero',           desc:'Complete the Rise of the Sword scenario', check:()=>G._scenariosCompleted?.includes('military_rise') },
   { id:'day_50',          icon:'📅', name:'Elder',              desc:'Survive 50 days',                          check:()=>G.day>=50 },
