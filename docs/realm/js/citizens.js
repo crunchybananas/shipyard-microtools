@@ -124,6 +124,45 @@ function compressPath(path) {
   return compact;
 }
 
+const BLACKLIST_TICKS = 600;
+
+function blacklistTarget(c, x, y) {
+  c._noGo = c._noGo || {};
+  c._noGo[`${Math.round(x)},${Math.round(y)}`] = G.gameTick;
+}
+
+function isBlacklisted(c, x, y) {
+  const t = c._noGo?.[`${Math.round(x)},${Math.round(y)}`];
+  return t !== undefined && G.gameTick - t < BLACKLIST_TICKS;
+}
+
+function watchProgress(c) {
+  const goalActive = (c.path && c.pathIdx < c.path.length) ||
+    c.state === 'walk_to_work' || c.state === 'walk_to_deliver' ||
+    c.state === 'needs_delivery' || c.state === 'foraging';
+  if (!goalActive) { c._wdBest = null; c._wdTicks = 0; return; }
+  const gx = c._requestedTx ?? c.tx ?? c.x;
+  const gy = c._requestedTy ?? c.ty ?? c.y;
+  const d = Math.hypot(gx - c.x, gy - c.y);
+  if (c._wdBest == null || d < c._wdBest - 0.2) { c._wdBest = d; c._wdTicks = 0; return; }
+  c._wdTicks = (c._wdTicks || 0) + 1;
+  if (c._wdTicks > 120) {
+    blacklistTarget(c, gx, gy);
+    if (c.jobBuilding && c.state === 'walk_to_work') {
+      c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
+      c.jobBuilding = null;
+      c.workTarget = null;
+      G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: "Can't reach it!", alpha: 1.25, vy: -0.12, decay: 0.016, type: 'speech' });
+    }
+    clearPath(c);
+    c.state = 'idle';
+    c.stateTimer = 20 + rngInt(0, 15);
+    c._wdBest = null;
+    c._wdTicks = 0;
+    // carrying is kept — the find_job/heartbeat guards route it to delivery
+  }
+}
+
 function pathTo(c, tx, ty) {
   c._requestedTx = tx;
   c._requestedTy = ty;
@@ -390,6 +429,30 @@ export function updateCitizens() {
   for (const c of G.citizens) {
     if (evacuateBlockedCitizen(c)) continue;
 
+    // ── Decision heartbeat (AI audit): obligations preempt from ANY state
+    // on a short cadence — the brain no longer waits for the body to stop.
+    if ((G.gameTick + (c._hb ?? (c._hb = Math.floor(Math.random() * 12)))) % 12 === 0) {
+      // Eat on the go: a quick bite from the realm stores keeps busy or
+      // stuck citizens from saturating at hunger 100 and crawling.
+      if (c.hunger > 75 && G.resources.food > 0 && c.state !== 'eating') {
+        G.resources.food--;
+        c.hunger = Math.max(0, c.hunger - 60);
+        G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: '🍞', alpha: 1.2, vy: -0.15, decay: 0.02, type: 'text' });
+      }
+      // Idle carriers deliver immediately instead of waiting out the timer.
+      if (c.state === 'idle' && c.carrying && c.carryAmount > 0) {
+        c.state = 'needs_delivery';
+        c.stateTimer = 0;
+        clearPath(c);
+      }
+      // Self-heal any over-long idle (flee aftermath left stale 260-tick timers).
+      if (c.state === 'idle' && c.stateTimer > 140) c.stateTimer = 60;
+    }
+
+    // ── Universal progress watchdog: no measurable progress toward the
+    // active goal for ~120 ticks -> give up cleanly instead of orbiting.
+    watchProgress(c);
+
     // Track tile wear — citizens walking over tiles gradually create dirt paths
     const _wx = Math.round(c.x), _wy = Math.round(c.y);
     if (_wx >= 0 && _wx < MAP_W && _wy >= 0 && _wy < MAP_H) {
@@ -413,8 +476,9 @@ export function updateCitizens() {
       }
     }
 
-    // Hungry emote — show 🍽️ when hunger is high and no food available
-    if (c.hunger > 70 && G.resources.food <= 0) {
+    // Hungry emote — show 🍽️ whenever hunger is high (the on-the-go bite
+    // usually resolves it, but the player should still see the need)
+    if (c.hunger > 70) {
       const emoteInterval = 120; // every 2 seconds at 1x
       if (!c._hungerEmoteTimer) c._hungerEmoteTimer = Math.floor(Math.random() * emoteInterval);
       c._hungerEmoteTimer--;
@@ -567,6 +631,7 @@ function runStateMachine(c) {
         c.jobBuilding = null;
         let bestDist = Infinity, bestB = null;
         for (const b of G.buildings) {
+          if (isBlacklisted(c, b.x, b.y)) continue;
           const def = BUILDINGS[b.type];
           if (!def) continue; // guard against unknown building types (corrupt save, etc.)
           if (!def.prod && !def.workers) continue;
@@ -660,9 +725,20 @@ function runStateMachine(c) {
       break;
 
     case 'working':
+      // Work-site feedback: periodic chips/grain at the workplace so labor
+      // reads as labor even between production cycles.
+      if (c.jobBuilding && G.gameTick % 24 === 0 && Math.random() < 0.6) {
+        G.particles.push({
+          tx: c.jobBuilding.x + (Math.random() - 0.5) * 0.5,
+          ty: c.jobBuilding.y + (Math.random() - 0.5) * 0.5,
+          offsetY: -6, text: null, alpha: 0.85,
+          vx: (Math.random() - 0.5) * 0.25, vy: -0.15, decay: 0.05,
+          type: 'spark', size: 1.0, color: '#c9a86a',
+        });
+      }
       // Done working — check if building produced something
       if (c.jobBuilding) {
-        const def = BUILDINGS[c.jobBuilding.type];
+        const def = BUILDINGS[c.jobBuilding.type] || {};
         if ((def.prod || def.convert) && c.jobBuilding.produced) {
           // Pick up the goods
           const [resKey, amount] = Object.entries(c.jobBuilding.produced)[0] || [];
@@ -707,7 +783,11 @@ function runStateMachine(c) {
 
     case 'walk_to_deliver':
       if (c.path && c.pathIdx < c.path.length) break;
-      if (dist2(c.x, c.y, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty) > 2.2) {
+      // Arrival counts against the SNAPPED path goal too: the raw request
+      // can sit on an unwalkable tile whose ring the citizen legitimately
+      // reached — retrying forever from 2.3 tiles away was the orbit bug.
+      if (dist2(c.x, c.y, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty) > 2.2 &&
+          !(c._pathGoal && dist2(c.x, c.y, c._pathGoal.x, c._pathGoal.y) <= 1.2)) {
         pathTo(c, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty);
         if (c.path) break;
       }
@@ -763,7 +843,8 @@ function runStateMachine(c) {
         });
         // "Found!" bubble removed — the +resource text already communicates the event.
         // Adding a separate speech bubble was redundant and confusing at a distance.
-        c.carrying = res;
+        // resource already credited above — no phantom carry pose
+        c.carrying = null;
         c.carryAmount = 0;
       }
       c.forageTarget = null;
