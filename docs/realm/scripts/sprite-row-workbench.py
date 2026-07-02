@@ -576,6 +576,53 @@ def stance_row(args: argparse.Namespace) -> None:
     print(f"[sprite-workbench] wrote {out}")
 
 
+def pulse_row(args: argparse.Namespace) -> None:
+    # Add a deterministic vertical work-rhythm to a row whose only defect is
+    # zero frame-to-frame motion (all-sprite-maps gate: a moving row needs at
+    # least two unique frames). Per frame, the upper body shifts DOWN by the
+    # pattern offset (windup/strike/recover); feet and ground anchor never
+    # move. Same paste mechanics as stance_row's accepted 1px breathing bob —
+    # only non-negative offsets so no transparent seam can open at the waist.
+    validate_target(args.role, args.action, args.dir)
+    from sprite_row_quality import ALPHA_CUTOFF
+
+    row = Image.open(args.input).convert("RGBA") if args.input else comparison_row(args.role, args.action, args.dir)
+    offsets = [int(v) for v in (args.pattern or "0,0,2,1,0,0,2,1").split(",")]
+    if len(offsets) != FRAMES:
+        raise SystemExit(f"pattern must list {FRAMES} offsets")
+    if any(v < 0 for v in offsets):
+        raise SystemExit("pattern offsets must be >= 0 (down-shifts only)")
+
+    out_image = Image.new("RGBA", (FRAME_W * FRAMES, FRAME_H), (0, 0, 0, 0))
+    for index in range(FRAMES):
+        frame = row.crop((index * FRAME_W, 0, (index + 1) * FRAME_W, FRAME_H))
+        off = offsets[index]
+        if off:
+            px = frame.load()
+            points = [(x, y) for y in range(FRAME_H) for x in range(FRAME_W) if px[x, y][3] > ALPHA_CUTOFF]
+            if points:
+                top = min(y for _, y in points)
+                bottom = max(y for _, y in points)
+                waist = top + int((bottom - top + 1) * 0.55)
+                upper = frame.crop((0, 0, FRAME_W, waist))
+                shifted = frame.copy()
+                shifted.paste(Image.new("RGBA", (FRAME_W, waist), (0, 0, 0, 0)), (0, 0))
+                shifted.paste(upper, (0, off))
+                frame = shifted
+        out_image.paste(frame, (index * FRAME_W, 0))
+
+    out = args.out or (WORK_ORDER_DIR / "derived" / f"{args.role}-{args.action}-{args.dir}.png")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_image.save(out)
+    report = analyze_row(out, args.action)
+    print(
+        f"[sprite-workbench] pulse {args.role}/{args.action}/{args.dir} pattern "
+        f"{','.join(str(v) for v in offsets)} ({report['styleEra']}, "
+        f"body {report['medianBodyHeight']}px, warnings {','.join(report['warnings']) or 'none'})"
+    )
+    print(f"[sprite-workbench] wrote {out}")
+
+
 def rescale_row(args: argparse.Namespace) -> None:
     # Uniform per-row body rescale about a fixed ground anchor. One transform
     # for every frame, so relative frame-to-frame motion is preserved exactly
@@ -929,6 +976,13 @@ def main() -> None:
     stance.add_argument("--frame", type=int)
     stance.add_argument("--out", type=Path)
     stance.set_defaults(func=stance_row)
+
+    pulse = sub.add_parser("pulse")
+    target_args(pulse)
+    pulse.add_argument("--pattern", help="8 comma-separated non-negative upper-body down-shifts, default 0,0,2,1,0,0,2,1")
+    pulse.add_argument("--input", type=Path)
+    pulse.add_argument("--out", type=Path)
+    pulse.set_defaults(func=pulse_row)
 
     headswap = sub.add_parser("headswap")
     target_args(headswap)

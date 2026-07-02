@@ -3774,98 +3774,90 @@
       "status": "accepted-with-waiver"
     },
     "lumber/work/left": {
-      "acceptedAt": "2026-07-01T22:07:47Z",
-      "allowedWarnings": [
-        "low-frame-variety"
-      ],
+      "acceptedAt": "2026-07-02T04:50:27Z",
+      "allowedWarnings": [],
       "file": "lumber/work-left.png",
-      "note": "Replaces white-vein-damaged side chop row; static stance pending future chop-pose repaint.",
-      "provenance": "own-idle-pose-reuse",
+      "note": "two-chop cycle, alternating strike depth, ground-anchored",
+      "provenance": "pulse verb: 5-variant chop rhythm 0,1,4,2,0,1,3,2 over the static painted pose (all-sprite-maps low-variety gate fix)",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 0,
+        "bodyHeightRange": 4,
         "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 5.0,
-          "bodyWidthDelta": 3.0,
-          "medianBodyHeight": 73.0,
-          "medianBodyWidth": 36.0,
+          "bodyHeightDelta": 1.5,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 78.0,
+          "medianBodyWidth": 37.0,
           "medianColor": [
-            121.4,
-            79.35,
-            54.65
+            111.15,
+            73.6,
+            44.7
           ],
-          "paletteDelta": 21.36
+          "paletteDelta": 8.14
         },
-        "flickerScore": 0.0,
-        "maxAlphaRatio": 1.0,
-        "maxBodyCenterJump": 0.0,
+        "flickerScore": 8.0,
+        "maxAlphaRatio": 1.059,
+        "maxBodyCenterJump": 1.39,
         "maxEdgePixels": 7,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 0.0,
-        "medianBodyHeight": 78.0,
+        "maxPaletteDrift": 0.24,
+        "medianBodyHeight": 76.5,
         "medianBodyWidth": 39.0,
         "medianColor": [
-          103.0,
-          74.4,
-          45.0
+          103.05,
+          74.35,
+          44.85
         ],
-        "medianColorCount": 627.0,
-        "medianShadingRatio": 0.6373,
+        "medianColorCount": 618.5,
+        "medianShadingRatio": 0.6356,
         "styleEra": "painted",
-        "warnings": [
-          "low-frame-variety"
-        ]
+        "warnings": []
       },
-      "sha256": "d0a59c3e5313630dc1b58204627746fca2bb623c18f1702afe4ad31bd273f047",
-      "status": "accepted-with-waiver"
+      "sha256": "47c612f544301f9a2e7ae36987452e0c96e3abe703a169a4a1c821a79a926da7",
+      "status": "accepted"
     },
     "lumber/work/right": {
-      "acceptedAt": "2026-07-01T22:07:48Z",
-      "allowedWarnings": [
-        "low-frame-variety"
-      ],
+      "acceptedAt": "2026-07-02T04:50:28Z",
+      "allowedWarnings": [],
       "file": "lumber/work-right.png",
-      "note": "Replaces white-vein-damaged side chop row; static stance pending future chop-pose repaint.",
-      "provenance": "own-idle-pose-reuse",
+      "note": "two-chop cycle, alternating strike depth, ground-anchored",
+      "provenance": "pulse verb: 5-variant chop rhythm 0,1,4,2,0,1,3,2 over the static painted pose (all-sprite-maps low-variety gate fix)",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 0,
+        "bodyHeightRange": 4,
         "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 0.0,
           "bodyWidthDelta": 2.0,
-          "medianBodyHeight": 78.0,
+          "medianBodyHeight": 76.5,
           "medianBodyWidth": 39.0,
           "medianColor": [
-            111.25,
-            74.4,
-            45.0
+            111.15,
+            74.35,
+            44.85
           ],
-          "paletteDelta": 9.89
+          "paletteDelta": 10.17
         },
-        "flickerScore": 0.0,
-        "maxAlphaRatio": 1.0,
-        "maxBodyCenterJump": 0.0,
+        "flickerScore": 8.0,
+        "maxAlphaRatio": 1.051,
+        "maxBodyCenterJump": 1.42,
         "maxEdgePixels": 9,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 0.0,
-        "medianBodyHeight": 78.0,
+        "maxPaletteDrift": 0.87,
+        "medianBodyHeight": 76.5,
         "medianBodyWidth": 37.0,
         "medianColor": [
-          101.4,
-          73.6,
-          44.7
+          101.05,
+          73.25,
+          44.4
         ],
-        "medianColorCount": 597.0,
-        "medianShadingRatio": 0.6275,
+        "medianColorCount": 591.5,
+        "medianShadingRatio": 0.6273,
         "styleEra": "painted",
-        "warnings": [
-          "low-frame-variety"
-        ]
+        "warnings": []
       },
-      "sha256": "75c706f2a7b0b524fa018956a52e342a9f7f55bac8b1818bb8540295a938bd6f",
-      "status": "accepted-with-waiver"
+      "sha256": "1fdab769b77cfaeb1919b7cf743036ab380f534128d8b5cbfb2e76fff083585c",
+      "status": "accepted"
     },
     "lumber/work/up": {
       "acceptedAt": "2026-07-01T23:43:23Z",
@@ -8016,6 +8008,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-01T23:43:28Z",
+  "updatedAt": "2026-07-02T04:50:28Z",
   "version": 1
 }
