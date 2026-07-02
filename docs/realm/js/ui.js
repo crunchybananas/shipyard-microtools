@@ -2,7 +2,7 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js?realm=115';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY } from './state.js?realm=115';
 import { canAfford, getRaidCountdown, upgradeBuilding } from './economy.js?realm=115';
 import { saveGame, loadGame, hasSave } from './save.js?realm=115';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js?realm=115';
@@ -629,6 +629,7 @@ export function showInfoPanel(b) {
     cowpen: '"Patient beasts who turn grass into sustenance."',
     fisherman: '"The sea gives freely to those patient enough to ask."',
     blacksmith: '"Every sword begins as a lump of ore and a question: who will wield it?"',
+    sawmill: '"The saw sings all day, and the realm rises plank by plank."',
     archery: '"The arrow knows no rank. It finds the careless and the brave alike."',
   };
   if (LORE[b.type]) {
@@ -675,6 +676,33 @@ export function showInfoPanel(b) {
     html += `<div class="ip-row"><span class="ip-label">Produces</span><span class="ip-val">${effectiveProd}</span></div>`;
     if (levelMult > 1) {
       html += `<div class="ip-row"><span class="ip-label">Upgrade</span><span class="ip-val ip-happy">×${levelMult} production</span></div>`;
+    }
+  }
+
+  // Production chain status (converters: windmill, bakery, sawmill, blacksmith)
+  if (def.convert) {
+    const from = def.convert.from, to = def.convert.to;
+    const inStock = Math.floor(G.resources[from] || 0);
+    const outStock = Math.floor(G.resources[to] || 0);
+    const outAtCap = def.convert.cap && outStock >= def.convert.cap;
+    const understaffed = (def.workers || 0) > 0 && (b.workers?.length || 0) < def.workers;
+    let status, cls;
+    if (buildProgress < 1) { status = 'Under construction'; cls = ''; }
+    else if (understaffed) { status = 'Needs a worker to run'; cls = 'ip-defense'; }
+    else if (outAtCap) { status = `${to} store full — build something that uses it`; cls = 'ip-defense'; }
+    else if (inStock <= 0) { status = `No ${from} in store — build upstream supply`; cls = 'ip-defense'; }
+    else { status = `Converting ${from} into ${to}`; cls = 'ip-happy'; }
+    html += `<div class="ip-row"><span class="ip-label">Chain</span><span class="ip-val">${resourceEmoji(from)} ${inStock} → ${resourceEmoji(to)} ${outStock}${def.convert.cap ? '/' + def.convert.cap : ''}</span></div>`;
+    html += `<div class="ip-row"><span class="ip-label">Status</span><span class="ip-val ${cls}">${status}</span></div>`;
+  }
+
+  // Tool boost indicator for producing buildings
+  if (def.prod && Object.keys(def.prod).length && !def.convert && (def.workers || 0) > 0) {
+    const toolStock = Math.floor(G.resources.tools || 0);
+    if (toolStock > 0) {
+      html += `<div class="ip-row"><span class="ip-label">Tools</span><span class="ip-val ip-happy">🛠️ +50% output every 4th cycle (${toolStock} in store)</span></div>`;
+    } else if (G.buildings.some(bb => bb.type === 'blacksmith' && bb.active)) {
+      html += `<div class="ip-row"><span class="ip-label">Tools</span><span class="ip-val">No tools in store — give the blacksmith iron</span></div>`;
     }
   }
 
