@@ -2,10 +2,10 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=116';
-import { playSound } from './audio.js?realm=116';
-import { chronicle } from './story.js?realm=116';
-import { notify } from './notifications.js?realm=116';
+import { G, BUILDINGS } from './state.js?realm=117';
+import { playSound } from './audio.js?realm=117';
+import { chronicle } from './story.js?realm=117';
+import { notify } from './notifications.js?realm=117';
 
 export const TECHS = {
   agriculture: {
@@ -340,7 +340,24 @@ export function checkEraAdvance() {
     playSound('mission');
     try { notify(`${era.icon} The realm enters the ${era.name}!`, 'event', { chronicle: false }); } catch (_e) {}
     try { chronicle(ERA_BEATS[G.era] || `The realm enters the ${era.name}.`, 'era'); } catch (_e) {}
+    if (!G.photoMode) showEraBanner(era);
   }
+}
+
+function showEraBanner(era) {
+  const el = document.getElementById('era-banner');
+  if (!el) return;
+  el.innerHTML = `<div class="era-banner-inner">
+    <div class="era-banner-icon">${era.icon}</div>
+    <div class="era-banner-title">${era.name}</div>
+    <div class="era-banner-sub">A new age dawns upon the realm</div>
+  </div>`;
+  el.hidden = false;
+  el.classList.remove('show');
+  void el.offsetWidth;  // restart the CSS animation when ages land back-to-back
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.classList.remove('show'); el.hidden = true; }, 3500);
 }
 
 // Backfill for saves written before eras existed: the highest era any

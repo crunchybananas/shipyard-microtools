@@ -2,13 +2,13 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=116';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=116';
-import { setArmyTargets } from './input.js?realm=116';
-import { saveGame, loadGame, hasSave } from './save.js?realm=116';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS } from './tech.js?realm=116';
-import { notify } from './notifications.js?realm=116';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=116';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=117';
+import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=117';
+import { setArmyTargets } from './input.js?realm=117';
+import { saveGame, loadGame, hasSave } from './save.js?realm=117';
+import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=117';
+import { notify } from './notifications.js?realm=117';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=117';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -455,49 +455,45 @@ export function renderResearchPanel() {
     content.appendChild(progDiv);
   }
 
-  // ── Build a building-icon lookup from BUILDINGS ──────────
-  const resEmoji = { wood:'🪵', stone:'🪨', food:'🍎', gold:'<span class="gold-coin" aria-label="gold">◉</span>', iron:'⚙️' };
+  // ── Cost icons: shared map covers planks/tools; gold keeps its coin glyph ──
+  const resEmoji = (k) => k === 'gold' ? '<span class="gold-coin" aria-label="gold">◉</span>' : resourceEmoji(k);
 
-  // ── Organise techs into tiers by prereq depth ────────────
-  // tier0: no prereq
-  // tier1: prereq is a tier0 tech
-  // tier2: prereq is a tier1 tech
+  // ── Era progress: where the realm stands, what advances it ──
+  const eraInfo = ERAS[(G.era || 1) - 1] || ERAS[0];
+  const nextEra = ERAS[G.era];  // era ids are 1-based, so ERAS[G.era] is the NEXT age
+  const checklist = getEraProgress();
+  const eraDiv = document.createElement('div');
+  eraDiv.className = 'era-progress';
+  if (checklist && nextEra) {
+    eraDiv.innerHTML = `
+      <div class="era-progress-head">
+        <span>${eraInfo.icon} ${eraInfo.name}</span>
+        <span class="era-next">next: ${nextEra.icon} ${nextEra.name}</span>
+      </div>
+      <div class="era-chips">${checklist.map(g =>
+        `<span class="era-chip ${g.done ? 'done' : ''}">${g.done ? '✓' : '○'} ${g.label}${g.goal > 1 ? ` ${g.cur}/${g.goal}` : ''}</span>`
+      ).join('')}</div>`;
+  } else {
+    eraDiv.innerHTML = `
+      <div class="era-progress-head">
+        <span>${eraInfo.icon} ${eraInfo.name}</span>
+        <span class="era-next">the final age</span>
+      </div>`;
+  }
+  content.appendChild(eraDiv);
+
+  // ── Organise techs into the three ages (tech.era) ────────
   const allIds = Object.keys(TECHS);
-  const tierOf = {};
-  // first pass: root nodes
-  for (const id of allIds) {
-    if (!TECHS[id].prereq) tierOf[id] = 0;
-  }
-  // subsequent passes until stable
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const id of allIds) {
-      if (tierOf[id] !== undefined) continue;
-      const prereq = TECHS[id].prereq;
-      if (prereq && tierOf[prereq] !== undefined) {
-        tierOf[id] = tierOf[prereq] + 1;
-        changed = true;
-      }
-    }
-  }
-  // fallback: any unresolved go to tier 3
-  for (const id of allIds) {
-    if (tierOf[id] === undefined) tierOf[id] = 3;
-  }
+  const NUMERALS = ['I', 'II', 'III'];
+  const groups = ERAS.map((era, i) => ({
+    era,
+    label: `${NUMERALS[i]} · ${era.name}`,
+    ids: allIds.filter(id => (TECHS[id].era || 1) === era.id),
+  })).filter(g => g.ids.length > 0);
 
-  const maxTier = Math.max(...Object.values(tierOf));
-  const tiers = [];
-  for (let t = 0; t <= maxTier; t++) {
-    tiers.push(allIds.filter(id => tierOf[id] === t));
-  }
-
-  const tierLabels = ['Foundations', 'Advanced', 'Mastery'];
-
-  // ── Render each tier ─────────────────────────────────────
-  for (let t = 0; t < tiers.length; t++) {
-    const tierIds = tiers[t];
-    if (tierIds.length === 0) continue;
+  // ── Render each age group ────────────────────────────────
+  for (let t = 0; t < groups.length; t++) {
+    const tierIds = groups[t].ids;
 
     // Connector lines between tiers (not before first)
     if (t > 0) {
@@ -509,9 +505,10 @@ export function renderResearchPanel() {
     const tierSection = document.createElement('div');
     tierSection.className = 'tech-tier';
 
+    const reached = groups[t].era.id <= (G.era || 1);
     const tierLabel = document.createElement('div');
-    tierLabel.className = 'tech-tier-label';
-    tierLabel.textContent = tierLabels[t] || `Tier ${t}`;
+    tierLabel.className = 'tech-tier-label' + (reached ? '' : ' era-locked');
+    tierLabel.textContent = groups[t].label + (reached ? '' : ' 🔒');
     tierSection.appendChild(tierLabel);
 
     const row = document.createElement('div');
@@ -535,7 +532,7 @@ export function renderResearchPanel() {
       // Cost string
       const costEntries = Object.entries(tech.cost).filter(([,v]) => v > 0);
       const costStr = costEntries.length
-        ? costEntries.map(([k, v]) => `${resEmoji[k] || k} ${v}`).join('  ')
+        ? costEntries.map(([k, v]) => `${resEmoji(k)} ${v}`).join('  ')
         : 'Free';
       const isFree = costEntries.length === 0;
 
