@@ -7,7 +7,7 @@ import { getProductionMultiplier, getHappinessOffset } from './events.js';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js';
 import { playSound, playBuildingSound } from './audio.js';
 import { spawnDust } from './particles.js';
-import { panCameraTo } from './render.js?realm=112';
+import { panCameraTo } from './render.js?realm=113';
 import { chronicle } from './story.js';
 import { notify, notifyBuild } from './notifications.js';
 import { isBuildingUnlocked } from './tech.js';
@@ -265,7 +265,7 @@ export function updateProduction() {
 
     const def = BUILDINGS[b.type];
     if (!def) continue; // guard against unknown building types
-    if (!def.prod) continue;
+    if (!def.prod && !def.convert) continue;
     const needed = def.workers || 0;
     if (b.workers.length < needed) continue;
 
@@ -279,27 +279,22 @@ export function updateProduction() {
       const upgrades = def.upgrades || [];
       const levelMult = b.level >= 2 ? (upgrades[b.level - 2]?.prodMult ?? 1) : 1;
       const adjustedProd = {};
-      for (const [k,v] of Object.entries(def.prod)) {
+      for (const [k,v] of Object.entries(def.prod || {})) {
         let mult = getProductionMultiplier(k) * levelMult;
-        if (k === 'food') mult *= season.foodMult;
+        if (k === 'food' || k === 'wheat') mult *= season.foodMult; // wheat is the crop
         adjustedProd[k] = Math.round(v * mult);
       }
-      // Apply windmill/bakery boosts to farms
-      if (b.type === 'farm') {
-        let boost = 1;
-        for (const other of G.buildings) {
-          if (!other.active) continue;
-          const odef = BUILDINGS[other.type];
-          if (!odef.boost || odef.boost.target !== 'farm') continue;
-          const d = Math.abs(other.x - b.x) + Math.abs(other.y - b.y);
-          if (d <= odef.boost.radius) boost *= odef.boost.multiplier;
-        }
-        if (boost > 1) {
-          for (const k of Object.keys(adjustedProd)) {
-            adjustedProd[k] = Math.round(adjustedProd[k] * boost);
-          }
+      // Production-chain converters (windmill, bakery): draw the input good
+      // from the realm stores and emit the output. A converter with no input
+      // this cycle produces nothing — build the upstream chain.
+      if (def.convert) {
+        const take = Math.min(def.convert.amount, Math.floor(G.resources[def.convert.from] || 0));
+        if (take > 0) {
+          G.resources[def.convert.from] -= take;
+          adjustedProd[def.convert.to] = (adjustedProd[def.convert.to] || 0) + take * (def.convert.yield || 1);
         }
       }
+      if (!Object.values(adjustedProd).some(v => v > 0)) continue;
       // If a worker is available to carry, set produced flag
       const carrier = b.workers.find(w => w.state === 'working');
       if (carrier) {
@@ -384,8 +379,19 @@ export function updateProduction() {
       const granaries = G.buildings.filter(b => b.type === 'granary').length;
       if (granaries > 0) foodNeeded = Math.ceil(foodNeeded * 0.5);
     }
-    G.resources.food = Math.max(0, G.resources.food - foodNeeded);
-    if (G.resources.food <= 0 && G.population > 1) {
+    let unfed = foodNeeded;
+    const eatBread = Math.min(G.resources.food, unfed);
+    G.resources.food -= eatBread; unfed -= eatBread;
+    // No bread left: the realm eats raw wheat, then flour porridge, 1:1.
+    if (unfed > 0 && (G.resources.wheat || 0) > 0) {
+      const w = Math.min(G.resources.wheat, unfed);
+      G.resources.wheat -= w; unfed -= w;
+    }
+    if (unfed > 0 && (G.resources.flour || 0) > 0) {
+      const f = Math.min(G.resources.flour, unfed);
+      G.resources.flour -= f; unfed -= f;
+    }
+    if (unfed > 0 && G.population > 1) {
       G.happiness = Math.max(0, G.happiness - 10);
       if (G.happiness < 20 && G.citizens.length > 1) {
         // Pick the hungriest citizen to die from starvation

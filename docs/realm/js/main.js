@@ -5,11 +5,11 @@
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js';
 import { generateWorld } from './world.js';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=112';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=113';
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js';
 import { updateCitizens } from './citizens.js';
 import { updateSoldiers } from './soldiers.js';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js';
+import { placeBuilding, updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js';
 import { checkMissions, renderMissions } from './missions.js';
 import { updateParticles, updateSmokeEmitters } from './particles.js';
 import { setupInput } from './input.js';
@@ -28,8 +28,8 @@ import { updateAnimals } from './animals.js';
 import { checkAdvisor } from './advisor.js';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js';
 import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js';
-import { initSpriteLab } from './sprite-lab.js?realm=112';
-import { initSpriteMuster } from './sprite-muster.js?realm=112';
+import { initSpriteLab } from './sprite-lab.js?realm=113';
+import { initSpriteMuster } from './sprite-muster.js?realm=113';
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -331,7 +331,8 @@ G.debug.tintCurve = tintCurve;
 G.debug.dreamLens = _realWorldDreamLens;
 G.debug.renderBuildingIsolated = renderBuildingIsolated;
 G.debug.fastForward = fastForward;  // 081: synchronous N-day advance
-G.debug.disableEvents = false;       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
+G.debug.disableEvents = false;
+G.debug.placeBuilding = placeBuilding;  // probe-harness: programmatic placement for chain/e2e tests       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /
@@ -367,7 +368,7 @@ window.newGame = () => {
   G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0, speedMult:1 };
   G._lightningTimer = null; G._lightningFlash = 0; G.meteors = [];
   G.season = 'spring'; G.won = false; G._scenarioWon = false;
-  G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0 };
+  G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0, wheat:0, flour:0 };
   G.lastResources = null;
   G.tileWear = null;
   // Loop 302 (the-fixer, 271 [code] follow-on audit): added scenariosWon

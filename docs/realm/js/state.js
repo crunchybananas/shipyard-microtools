@@ -22,7 +22,7 @@ export const TILE_COLORS = {
 
 export const BUILDINGS = {
   house:     { name:'House',       icon:'🏠', cost:{wood:15,stone:5},  pop:4, desc:'Shelters 4 settlers. Generates tax income based on happiness.' },
-  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{food:3}, workers:1, desc:'Produces food each cycle',
+  farm:      { name:'Farm',        icon:'🌾', cost:{wood:10},          prod:{wheat:3}, workers:1, desc:'Grows wheat — eaten raw, or milled and baked into more bread',
     upgrades: [
       { cost:{wood:15,stone:8},          prodMult:1.5, name:'Level 2' },
       { cost:{wood:25,stone:20,iron:5},  prodMult:2.0, name:'Level 3' },
@@ -59,8 +59,8 @@ export const BUILDINGS = {
   storehouse:{ name:'Storehouse',  icon:'📦', cost:{wood:18,stone:8},  storage:true, desc:'Receives delivered wood, stone, iron, and overflow goods' },
   church:    { name:'Church',      icon:'⛪', cost:{stone:30,gold:15}, happiness:15, radius:6, desc:'Major happiness boost for your settlement' },
   school:    { name:'School',      icon:'📚', cost:{wood:15,stone:15,gold:10}, researchSpeed:0.5, workers:1, desc:'Speeds up research by 50%' },
-  windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, boost:{type:'food',radius:4,multiplier:1.5,target:'farm'}, desc:'Boosts nearby farms by 50%. Works with wind!' },
-  bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, boost:{type:'food',radius:3,multiplier:1.3,target:'farm'}, happiness:5, desc:'Produces bread from nearby farms. Small happiness boost.' },
+  windmill:  { name:'Windmill',    icon:'🌬️', cost:{wood:25,stone:10}, workers:1, convert:{from:'wheat',to:'flour',amount:4}, desc:'Mills wheat into flour for the bakery' },
+  bakery:    { name:'Bakery',      icon:'🍞', cost:{wood:20,stone:15}, workers:1, convert:{from:'flour',to:'food',amount:3,yield:2}, happiness:5, desc:'Bakes flour into bread — two food per flour. Small happiness boost.' },
   chickencoop: { name:'Chicken Coop', icon:'🐔', cost:{wood:15}, prod:{food:1}, workers:1, desc:'Small chicken coop producing eggs and meat' },
   cowpen:    { name:'Cow Pen',     icon:'🐄', cost:{wood:25,stone:5}, prod:{food:2}, workers:1, desc:'Pastures cattle for milk and meat' },
   fisherman: { name:"Fisherman's Hut", icon:'🐟', cost:{wood:15}, prod:{food:3}, workers:1, on:[TILE.SAND], desc:'Catches fish from nearby waters. Must be on sand adjacent to water.' },
@@ -96,7 +96,7 @@ export const G = {
   animals: [],
   enemies: [],
   projectiles: [],
-  resources: { wood:60, stone:30, food:80, gold:25, iron:0 },
+  resources: { wood:60, stone:30, food:80, gold:25, iron:0, wheat:0, flour:0 },
   population: 3,
   maxPop: 3,
   happiness: 50,
@@ -139,7 +139,7 @@ export const G = {
   difficulty: 'normal', // easy, normal, hard
   scenario: 'peaceful_start', // selected scenario id
   kingdomName: 'Realm',
-  resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0 },
+  resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0, wheat:0, flour:0 },
   notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
   lastResources: null, // snapshot for rate calculation
   stats: {
@@ -176,7 +176,7 @@ const FIRST = ['Ada','Bjorn','Celia','Dag','Elsa','Finn','Greta','Hans','Inga','
 const LAST = ['Stone','Brook','Field','Hill','Dale','Wood','Lake','Ridge','Vale','Forge','Thorn','Frost','Marsh','Glen','Pike','Ash','Birch','Elm','Oak','Pine'];
 export function randomName() { return FIRST[rngInt(0,FIRST.length-1)]+' '+LAST[rngInt(0,LAST.length-1)]; }
 
-export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️'}[k]||k; }
+export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️',wheat:'🌾',flour:'🫓'}[k]||k; }
 
 export const DIFFICULTY = {
   easy:   { label:'🟢 Easy',   startFood:120, startWood:80, startGold:40, foodMult:0.6, raidMult:0.5, raidStart:12 },

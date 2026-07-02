@@ -27,6 +27,14 @@ function deliveryDropoff(c, resKey) {
   if (resKey === 'food') {
     return nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
   }
+  // Production chain: wheat walks to the mill, flour walks to the bakery,
+  // so the goods visibly flow farm -> windmill -> bakery -> granary.
+  if (resKey === 'wheat') {
+    return nearestBuilding(c, 'windmill') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+  }
+  if (resKey === 'flour') {
+    return nearestBuilding(c, 'bakery') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+  }
   if (resKey === 'gold') {
     return nearestBuilding(c, 'market') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
   }

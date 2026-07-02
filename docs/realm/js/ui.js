@@ -53,7 +53,7 @@ export function updateUI() {
   const interval = Math.floor(G.dayLength / 2);
   if (G.gameTick % interval === 0 && G.gameTick > 0) {
     if (G.lastResources) {
-      for (const k of ['wood','stone','food','gold','iron']) {
+      for (const k of ['wood','stone','food','gold','iron','wheat','flour']) {
         // Scale to per-day: measured over half a day, so multiply by 2
         G.resourceRates[k] = Math.round((G.resources[k] - G.lastResources[k]) * 2);
       }
@@ -82,6 +82,18 @@ export function updateUI() {
   fEl.innerHTML = Math.floor(G.resources.food) + rateStr(foodRate, foodTooltip);
   gEl.innerHTML = Math.floor(G.resources.gold) + rateStr(G.resourceRates.gold);
   iEl.innerHTML = Math.floor(G.resources.iron) + rateStr(G.resourceRates.iron);
+
+  const whEl = $('r-wheat'), flEl = $('r-flour');
+  if (whEl) {
+    whEl.innerHTML = Math.floor(G.resources.wheat || 0) + rateStr(G.resourceRates.wheat || 0);
+    const el = whEl.closest('.res');
+    if (el) el.style.display = (G.resources.wheat || 0) > 0 || (G.resourceRates.wheat || 0) !== 0 ? '' : 'none';
+  }
+  if (flEl) {
+    flEl.innerHTML = Math.floor(G.resources.flour || 0) + rateStr(G.resourceRates.flour || 0);
+    const el = flEl.closest('.res');
+    if (el) el.style.display = (G.resources.flour || 0) > 0 || (G.resourceRates.flour || 0) !== 0 ? '' : 'none';
+  }
 
   // Hide empty categories that would otherwise show "0" with no meaning on Day 1
   const ironRes = iEl.closest('.res');
