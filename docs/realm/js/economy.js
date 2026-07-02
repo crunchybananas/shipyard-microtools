@@ -329,7 +329,13 @@ export function updateProduction() {
       // If a worker is available to carry, set produced flag
       const carrier = b.workers.find(w => w.state === 'working');
       if (carrier) {
-        b.produced = { ...adjustedProd };
+        // Merge instead of overwrite: a frozen or slow carrier no longer
+        // wipes the previous unpicked batch every production cycle.
+        if (b.produced) {
+          for (const [pk, pv] of Object.entries(adjustedProd)) b.produced[pk] = (b.produced[pk] || 0) + pv;
+        } else {
+          b.produced = { ...adjustedProd };
+        }
       } else {
         for (const [k,v] of Object.entries(adjustedProd)) {
           G.resources[k] = (G.resources[k]||0) + v;
@@ -483,6 +489,7 @@ export function updateProduction() {
         const sorted = [...G.citizens].sort((a, b) => b.hunger - a.hunger);
         const c = sorted[0];
         if (c.hunger >= 90) {
+          if (c.carrying && c.carryAmount > 0) G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
           G.citizens = G.citizens.filter(x => x !== c);
           if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
           G.population--;

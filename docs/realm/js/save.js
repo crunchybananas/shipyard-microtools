@@ -25,6 +25,7 @@ export function saveGame({ silent = false } = {}) {
         visits: b.visits || undefined,
         trainTimer: b.trainTimer || 0,
         construction: b.construction || 0,
+        produced: b.produced || null,
         workerIdxs: b.workers.map(w => G.citizens.indexOf(w)),
       })),
       armyStance: G.armyStance || 'defend',
@@ -155,7 +156,7 @@ export function loadGame() {
       visits: b.visits || {},
       trainTimer: b.trainTimer || 0,
       construction: b.construction || 0,
-      active: true, produced: null, prodShowCount: 0,
+      active: true, produced: b.produced || null, prodShowCount: 0,
       workers: (b.workerIdxs || []).map(i => G.citizens[i]).filter(Boolean),
     }));
     // Army restoration (additive on v2; legacy saves start fresh at defend)

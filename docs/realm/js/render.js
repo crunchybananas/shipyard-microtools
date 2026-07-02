@@ -1778,9 +1778,11 @@ export function render() {
 
   const drawOneCitizen = (cEntity) => {
   for (const c of [cEntity]) {
-    if (citizenOnBlockedBuildingTile(c)) continue;
+    // A citizen inside a fresh footprint ghosts at low alpha while
+    // evacuating instead of vanishing and rematerializing.
+    const cGhost = citizenOnBlockedBuildingTile(c);
     const s = toScreen(c.x, c.y);
-    ctx.globalAlpha = Math.max(0.85, daylight);
+    ctx.globalAlpha = cGhost ? 0.35 : Math.max(0.85, daylight);
     // Loop 71 (render S4): damage flash. When c.hurtTimer > 0 (set by
     // combat code when a citizen takes damage), render a brief red tint
     // over the full body region via a radial gradient. Timer ticks down

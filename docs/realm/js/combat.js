@@ -179,6 +179,9 @@ export function updateEnemies() {
       // reads as a sustained flash rather than stuttering.
       c.hurtTimer = 12;
       // Flee behavior: set target away from enemy toward map center
+      if (!c._fleeing) {
+        G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: '😱', alpha: 1.3, vy: -0.15, decay: 0.02, type: 'text' });
+      }
       if (!c._fleeing || G.gameTick % 20 === 0) {
         c._fleeing = true;
         const flx = Math.max(1, Math.min(MAP_W-2, c.x + (dx / (d||1)) * 5));
@@ -227,6 +230,7 @@ export function updateEnemies() {
   for (let i = G.citizens.length - 1; i >= 0; i--) {
     const c = G.citizens[i];
     if (c.hp === undefined || c.hp > 0) continue;
+    if (c.carrying && c.carryAmount > 0) G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
     G.citizens.splice(i, 1);
     if (c.jobBuilding) c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
     G.population = Math.max(0, G.population - 1);

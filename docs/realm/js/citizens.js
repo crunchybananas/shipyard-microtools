@@ -313,20 +313,38 @@ function standingOnBlockedTile(c) {
 }
 
 function evacuateBlockedCitizen(c) {
-  if (!standingOnBlockedTile(c)) return false;
+  if (!standingOnBlockedTile(c)) { c._evacTarget = null; return false; }
   const mx = Math.round(c.x), my = Math.round(c.y);
-  const target = nearestWalkableTile(mx, my, 4, c.x, c.y);
-  if (!target) return false;
-  c.tx = target.x;
-  c.ty = target.y;
-  c._requestedTx = target.x;
-  c._requestedTy = target.y;
+  // K-candidate escape with per-citizen rotation: if the current exit stays
+  // corner-blocked for ~90 ticks, try the next ring tile instead of
+  // deterministically retrying the same one forever. The original errand
+  // (_requestedTx/Ty) is never touched — an escaped carrier resumes its
+  // delivery instead of dumping cargo at the evacuation spot.
+  c._evacTicks = (c._evacTicks || 0) + 1;
+  let target = c._evacTarget;
+  if (!target || !tileWalkable(target.x, target.y) || c._evacTicks > 90) {
+    const candidates = [];
+    for (let r = 1; r <= 4 && candidates.length < 8; r++) {
+      for (let yy = my - r; yy <= my + r; yy++) {
+        for (let xx = mx - r; xx <= mx + r; xx++) {
+          if (Math.abs(xx - mx) !== r && Math.abs(yy - my) !== r) continue;
+          if (tileWalkable(xx, yy)) candidates.push({ x: xx, y: yy });
+        }
+      }
+    }
+    if (!candidates.length) return true; // fully entombed — wait for a demolish
+    c._evacRot = ((c._evacRot || 0) + 1) % candidates.length;
+    target = candidates[c._evacRot];
+    c._evacTarget = target;
+    c._evacTicks = 0;
+  }
 
   const dx = target.x - c.x;
   const dy = target.y - c.y;
   const d = Math.hypot(dx, dy);
   if (d > 0.001) {
-    const step = Math.min(0.24 * Math.max(1, G.speed || 1), d);
+    // ~2x walk speed: urgent but no longer a 10x teleport-skate
+    const step = Math.min(0.06 * Math.max(1, G.speed || 1), d);
     const nx = c.x + (dx / d) * step;
     const ny = c.y + (dy / d) * step;
     // Evacuation goes through the same step gate as every other mover, so
@@ -340,9 +358,13 @@ function evacuateBlockedCitizen(c) {
   }
 
   if (!standingOnBlockedTile(c)) {
+    c._evacTarget = null;
+    c._evacTicks = 0;
     clearPath(c);
-  } else {
-    pathTo(c, target.x, target.y);
+    // Resume the interrupted errand rather than standing dazed
+    if (c._requestedTx !== undefined && (c.state === 'walk_to_deliver' || c.state === 'walk_to_work' || c.state === 'needs_delivery')) {
+      replanToRequestedTarget(c);
+    }
   }
   return true;
 }
@@ -427,8 +449,6 @@ export function updateCitizens() {
     if (c.hurtTimer > 0) c.hurtTimer -= G.speed;
   }
   for (const c of G.citizens) {
-    if (evacuateBlockedCitizen(c)) continue;
-
     // ── Decision heartbeat (AI audit): obligations preempt from ANY state
     // on a short cadence — the brain no longer waits for the body to stop.
     if ((G.gameTick + (c._hb ?? (c._hb = Math.floor(Math.random() * 12)))) % 12 === 0) {
@@ -452,6 +472,8 @@ export function updateCitizens() {
     // ── Universal progress watchdog: no measurable progress toward the
     // active goal for ~120 ticks -> give up cleanly instead of orbiting.
     watchProgress(c);
+
+    if (evacuateBlockedCitizen(c)) continue;
 
     // Track tile wear — citizens walking over tiles gradually create dirt paths
     const _wx = Math.round(c.x), _wy = Math.round(c.y);
@@ -798,7 +820,15 @@ function runStateMachine(c) {
       break;
 
     case 'deliver':
+      // Only credit a delivery near the actual dropoff — 'Delivered!' in an
+      // empty field on a failed repath was a lie AND skipped chain routing.
+      if (c.carrying && c.carryAmount > 0 &&
+          dist2(c.x, c.y, c._requestedTx ?? c.x, c._requestedTy ?? c.y) > 4) {
+        requestDeliveryStorage(c);
+        break;
+      }
       if (c.carrying && c.carryAmount > 0) {
+        G.totalResourcesGathered = (G.totalResourcesGathered || 0) + c.carryAmount;
         G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
         // Resource number float
         G.particles.push({
