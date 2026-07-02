@@ -133,6 +133,7 @@ export const G = {
   weather: 'clear',
   season: 'spring',
   rallyPoint: null,
+  armyStance: 'defend', // defend | rally | patrol — the army is a posture, not units to drive
   won: false,
   clouds: null,
   cameraShake: 0,

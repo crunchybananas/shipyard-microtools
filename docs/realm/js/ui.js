@@ -4,6 +4,7 @@
 
 import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=115';
 import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport } from './economy.js?realm=115';
+import { setArmyTargets } from './input.js?realm=115';
 import { saveGame, loadGame, hasSave } from './save.js?realm=115';
 import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress } from './tech.js?realm=115';
 import { notify } from './notifications.js?realm=115';
@@ -44,6 +45,19 @@ function rateStr(val, tooltip) {
   const abs = Math.abs(val);
   const tt = tooltip ? ` title="${tooltip}"` : '';
   return ` <span class="rate ${val>0?'pos':'neg'}"${tt}>${arrow}${abs}/day</span>`;
+}
+
+if (typeof window !== 'undefined') {
+  window.setArmyStance = (stance) => {
+    if (stance === 'rally' && !G.rallyPoint) {
+      notify('Plant a rally flag first: shift + right-click on the map.', 'warn');
+      return;
+    }
+    G.armyStance = stance;
+    setArmyTargets();
+    notify(`Army stance: ${stance === 'defend' ? '🛡️ Defend' : stance === 'rally' ? '🚩 Rally' : '🧱 Patrol'}`, 'info');
+    updateUI();
+  };
 }
 
 export function updateUI() {
@@ -176,11 +190,20 @@ export function updateUI() {
   }
   const maxSoldiers = G.buildings.filter(b => b.type === 'barracks').length * 4 + G.buildings.filter(b => b.type === 'archery').length * 3;
   const soldierEl = $('soldier-count');
+  const armyVisible = maxSoldiers > 0 || (G.soldiers || []).length > 0;
   if (soldierEl) {
     soldierEl.textContent = `${(G.soldiers || []).length}/${maxSoldiers}`;
     // Hide soldier counter when no barracks exist and no soldiers — dead UI weight on Day 1
     const soldierRes = soldierEl.closest('.res');
-    if (soldierRes) soldierRes.style.display = (maxSoldiers > 0 || (G.soldiers || []).length > 0) ? '' : 'none';
+    if (soldierRes) soldierRes.style.display = armyVisible ? '' : 'none';
+  }
+  const stanceEl = document.getElementById('army-stance');
+  if (stanceEl) {
+    stanceEl.style.display = armyVisible ? 'flex' : 'none';
+    for (const btn of stanceEl.querySelectorAll('.stance-btn')) {
+      btn.classList.toggle('active', btn.dataset.stance === G.armyStance);
+      btn.classList.toggle('dimmed', btn.dataset.stance === 'rally' && !G.rallyPoint);
+    }
   }
   const threatEl = $('threat-display');
   const enemyEl = $('enemy-count');

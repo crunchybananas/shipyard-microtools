@@ -123,6 +123,11 @@ export function placeBuilding(type, tx, ty) {
 }
 
 export function demolishBuilding(b, byEnemy = false) {
+  // Orphaned soldiers re-home on their next wander re-roll (armyAnchor
+  // falls back through homeBuilding -> null gracefully).
+  for (const s of G.soldiers || []) {
+    if (s.homeBuilding === b) s.homeBuilding = null;
+  }
   const def = BUILDINGS[b.type];
   G.buildings = G.buildings.filter(x => x !== b);
   G.buildingGrid[b.y][b.x] = null;
@@ -242,6 +247,7 @@ export function updateProduction() {
           x: muster.x, y: muster.y,
           tx: muster.x, ty: muster.y,
           homeBuilding: b,
+          name: randomName(),
           type: 'archer',
           hp: 30, maxHp: 30,
           state: 'patrol', stateTimer: 0, target: null,
@@ -262,6 +268,7 @@ export function updateProduction() {
           x: muster.x, y: muster.y,
           tx: muster.x, ty: muster.y,
           homeBuilding: b,
+          name: randomName(),
           type: 'swordsman',
           hp: 75, maxHp: 75,
           state: 'patrol',
@@ -529,7 +536,8 @@ export function checkRaids() {
   // Pre-raid warning (1 day before)
   if (G.day === G.nextRaidDay - 1 && !G._raidWarningGiven) {
     G._raidWarningGiven = true;
-    notify('⚠️ Raiders approach from the darkness! Prepare your defenses.', 'danger', { chronicle: false });
+    const stanceLabel = G.armyStance === 'rally' ? '🚩 Rally' : G.armyStance === 'patrol' ? '🧱 Patrol' : '🛡️ Defend';
+    notify(`⚠️ Raiders approach from the darkness! Army stance: ${stanceLabel} (g to change).`, 'danger', { chronicle: false });
     playSound('raidWarning');
   }
 

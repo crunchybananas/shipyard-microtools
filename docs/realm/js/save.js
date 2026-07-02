@@ -23,7 +23,16 @@ export function saveGame({ silent = false } = {}) {
         type: b.type, x: b.x, y: b.y, hp: b.hp, prodTimer: b.prodTimer,
         level: b.level || 1,
         visits: b.visits || undefined,
+        trainTimer: b.trainTimer || 0,
+        construction: b.construction || 0,
         workerIdxs: b.workers.map(w => G.citizens.indexOf(w)),
+      })),
+      armyStance: G.armyStance || 'defend',
+      rallyPoint: G.rallyPoint || null,
+      soldiers: (G.soldiers || []).map(s => ({
+        x: s.x, y: s.y, tx: s.tx, ty: s.ty, type: s.type,
+        hp: s.hp, maxHp: s.maxHp, name: s.name,
+        homeBuildingIdx: G.buildings.indexOf(s.homeBuilding),
       })),
       citizens: G.citizens.map(c => ({
         x:c.x, y:c.y, tx:c.tx, ty:c.ty, speed:c.speed,
@@ -143,8 +152,19 @@ export function loadGame() {
       type: b.type, x: b.x, y: b.y, hp: b.hp, prodTimer: b.prodTimer,
       level: b.level || 1,
       visits: b.visits || {},
+      trainTimer: b.trainTimer || 0,
+      construction: b.construction || 0,
       active: true, produced: null, prodShowCount: 0,
       workers: (b.workerIdxs || []).map(i => G.citizens[i]).filter(Boolean),
+    }));
+    // Army restoration (additive on v2; legacy saves start fresh at defend)
+    G.armyStance = s.armyStance || 'defend';
+    G.rallyPoint = s.rallyPoint || null;
+    G.soldiers = (s.soldiers || []).map(sd => ({
+      x: sd.x, y: sd.y, tx: sd.tx, ty: sd.ty, type: sd.type || 'swordsman',
+      hp: sd.hp, maxHp: sd.maxHp || 75, name: sd.name,
+      homeBuilding: sd.homeBuildingIdx >= 0 ? G.buildings[sd.homeBuildingIdx] || null : null,
+      state: 'patrol', stateTimer: 1, target: null,
     }));
 
     // Relink citizen jobBuilding

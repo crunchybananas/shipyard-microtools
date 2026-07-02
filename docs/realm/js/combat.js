@@ -4,6 +4,11 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=115';
 import { stepEntityToward } from './pathfinding.js?realm=115';
+import { spawnClashFX } from './particles.js?realm=115';
+
+// Melee tuning in one place: engage range, disengage range, raider damage,
+// raider attack cooldown (soldier-side numbers live in soldiers.js).
+const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
 import { playSound } from './audio.js?realm=115';
 import { demolishBuilding } from './economy.js?realm=115';
 import { notify } from './notifications.js?realm=115';
@@ -12,6 +17,35 @@ import { chronicle } from './story.js?realm=115';
 export function updateEnemies() {
   for (let i = G.enemies.length - 1; i >= 0; i--) {
     const e = G.enemies[i];
+    // Raiders fight back: engage the nearest soldier in reach instead of
+    // walking through the battle line. Never overwrites e.tx/ty — the raid
+    // target survives the skirmish.
+    if (!e.retreating) {
+      if (e.engaged && (e.engaged.hp <= 0 || !G.soldiers.includes(e.engaged) ||
+          Math.hypot(e.engaged.x - e.x, e.engaged.y - e.y) > MILCFG.disengage)) {
+        e.engaged = null;
+      }
+      if (!e.engaged) {
+        let ns = null, nd = Infinity;
+        for (const s of G.soldiers) {
+          if (s.garrison) continue;
+          const d2 = Math.hypot(s.x - e.x, s.y - e.y);
+          if (d2 < nd) { nd = d2; ns = s; }
+        }
+        if (ns && nd <= MILCFG.engage) e.engaged = ns;
+      }
+      if (e.engaged) {
+        e.attackTimer = (e.attackTimer || 0) - G.speed;
+        if (e.attackTimer <= 0) {
+          e.attackTimer = MILCFG.raiderCooldown;
+          e.engaged.hp -= MILCFG.raiderDmg;
+          e.engaged.hurtTimer = 12;
+          e.attackCue = 12;
+          spawnClashFX(e.engaged.x, e.engaged.y);
+        }
+        continue; // locked in melee — no movement this tick
+      }
+    }
     // Check if there's a wall in path — enemies must go around walls
     const nx = Math.round(e.x), ny = Math.round(e.y);
     const wall = G.buildingGrid[ny]?.[nx];

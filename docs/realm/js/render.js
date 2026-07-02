@@ -2544,11 +2544,19 @@ export function render() {
       if (d < sNearD) { sNearD = d; sNearE = e; }
     }
     if (sNearE && sNearD < 6) { sAction = 'work'; sFx = sNearE.x - s.x; sFy = sNearE.y - s.y; }
+    // Braced spear-wall: rallied soldiers holding the flag while an enemy is
+    // on the map (but not yet in reach) lock into the first thrust frame.
+    let sBraced = false;
+    if (G.armyStance === 'rally' && G.rallyPoint && sNearE && sNearD >= 6 &&
+        Math.hypot(s.x - G.rallyPoint.x, s.y - G.rallyPoint.y) <= 2) {
+      sAction = 'work'; sBraced = true;
+      sFx = sNearE.x - s.x; sFy = sNearE.y - s.y;
+    }
     const sLen = Math.hypot(sFx, sFy) || 1;
     const sFaceX = (sFx / sLen) - (sFy / sLen);
     const sFaceY = ((sFx / sLen) + (sFy / sLen)) * 0.5;
     const sDir = actorDirection(sFaceX, sFaceY, sFaceY < -0.02);
-    const sFrame = sAction === 'idle' ? 0 : Math.floor(G.gameTick / (sAction === 'work' ? 6 : 7)) % ACTOR_FRAMES;
+    const sFrame = (sAction === 'idle' || sBraced) ? 0 : Math.floor(G.gameTick / (sAction === 'work' ? 6 : 7)) % ACTOR_FRAMES;
     const sDrawn = drawActorAtlasFrame(ctx, {
       role: 'guard', action: sAction, dir: sDir, frame: sFrame,
       x: Math.round(ss.x - 13.5), y: Math.round(ss.y + 3 - 35), width: 27, height: 35,
@@ -2657,7 +2665,8 @@ export function render() {
   // ── Rally point flag ──────────────────────────────────────
   if (G.rallyPoint) {
     const rs = toScreen(G.rallyPoint.x, G.rallyPoint.y);
-    ctx.globalAlpha = 0.9;
+    // Dim the flag when the army is not rallying to it
+    ctx.globalAlpha = G.armyStance === 'rally' ? 0.9 : 0.45;
     // Flag pole
     ctx.strokeStyle = '#5a3a1a';
     ctx.lineWidth = 1.5;
@@ -2805,7 +2814,9 @@ export function render() {
       continue;
     }
     // Danger ground ring — red-tinted so raiders read as threat, not citizens
-    ctx.fillStyle = 'rgba(200,0,0,0.28)';
+    // (pulses brighter for a few frames after the raider lands a blow)
+    if (e.attackCue > 0) e.attackCue -= G.speed;
+    ctx.fillStyle = e.attackCue > 0 ? 'rgba(255,40,40,0.5)' : 'rgba(200,0,0,0.28)';
     ctx.beginPath();
     ctx.ellipse(es.x, es.y + 1, 8, 3.5, 0, 0, Math.PI*2);
     ctx.fill();

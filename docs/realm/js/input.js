@@ -138,6 +138,21 @@ function tryPlaceAt(tx, ty) {
   return false;
 }
 
+// Snap every soldier's wander target to its stance anchor immediately so a
+// stance change FEELS instant instead of waiting out each wander timer.
+export function setArmyTargets() {
+  for (const s of G.soldiers) {
+    if (G.armyStance === 'rally' && G.rallyPoint) {
+      s.tx = G.rallyPoint.x + Math.random() * 4 - 2;
+      s.ty = G.rallyPoint.y + Math.random() * 4 - 2;
+    } else if (G.armyStance === 'defend' && s.homeBuilding) {
+      s.tx = s.homeBuilding.x + Math.random() * 6 - 3;
+      s.ty = s.homeBuilding.y + Math.random() * 6 - 3;
+    }
+    s.stateTimer = 1; // re-anchor (incl. patrol posts) on next tick
+  }
+}
+
 export function setupInput(canvas) {
   const C = canvas;
   let touchDist = 0;
@@ -152,13 +167,18 @@ export function setupInput(canvas) {
     if (e.button === 2 && e.shiftKey) {
       e.preventDefault();
       const t = screenToWorld(e.clientX, e.clientY);
-      G.rallyPoint = { x: t.x, y: t.y };
-      // Redirect all soldiers
-      for (const s of G.soldiers) {
-        s.tx = t.x + Math.random() * 2 - 1;
-        s.ty = t.y + Math.random() * 2 - 1;
+      // Clicking on (or near) the existing flag removes it and drops the
+      // army back to defend — one gesture places, the same gesture clears.
+      if (G.rallyPoint && Math.hypot(t.x - G.rallyPoint.x, t.y - G.rallyPoint.y) <= 1.5) {
+        G.rallyPoint = null;
+        G.armyStance = 'defend';
+        setArmyTargets();
+        G.particles.push({ tx: t.x, ty: t.y, offsetY: -10, text: '🚩 removed', alpha: 1.4, vy: -0.15, decay: 0.012, type: 'text' });
+        return;
       }
-      // Visual feedback particle
+      G.rallyPoint = { x: t.x, y: t.y };
+      G.armyStance = 'rally';
+      setArmyTargets();
       G.particles.push({
         tx: t.x, ty: t.y, offsetY: -10,
         text: '🚩 Rally', alpha: 1.5, vy: -0.15, decay: 0.01, type: 'text',
@@ -249,6 +269,23 @@ export function setupInput(canvas) {
     G.camera.zoom = Math.max(0.3, Math.min(3, G.camera.zoom * delta));
   };
   C.addEventListener('wheel', onWheel, { passive: false });
+
+  // 'g' cycles army stance (defend -> rally -> patrol); rally is skipped
+  // when no flag is planted.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'g' && e.key !== 'G') return;
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    const order = ['defend', 'rally', 'patrol'];
+    let idx = order.indexOf(G.armyStance);
+    for (let hop = 0; hop < order.length; hop++) {
+      idx = (idx + 1) % order.length;
+      if (order[idx] === 'rally' && !G.rallyPoint) continue;
+      break;
+    }
+    G.armyStance = order[idx];
+    setArmyTargets();
+    updateUI();
+  });
 
   // Touch
   C.addEventListener('touchstart', e => {

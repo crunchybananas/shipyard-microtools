@@ -47,6 +47,25 @@ export function updateParticles() {
   }
 }
 
+// Shared melee-impact burst: called from BOTH soldier strikes and raider
+// counter-attacks so hits read identically in both directions.
+export function spawnClashFX(tx, ty) {
+  G.particles.push({
+    tx, ty, offsetY: -10,
+    text: '⚔️', alpha: 1.1, vy: -0.2, decay: 0.05, type: 'text',
+  });
+  for (let k = 0; k < 4; k++) {
+    const ang = (k / 4) * Math.PI * 2 + Math.random() * 0.5;
+    G.particles.push({
+      tx, ty, offsetY: -8,
+      text: null, alpha: 1.0,
+      vx: Math.cos(ang) * 0.22, vy: Math.sin(ang) * 0.22 - 0.08,
+      decay: 0.08, type: 'spark',
+      size: 1.1, color: k === 0 ? '#ffcc00' : '#ffffff',
+    });
+  }
+}
+
 export function spawnSmoke(tx, ty) {
   G.particles.push({
     tx: tx + (Math.random() - 0.5) * 0.1,

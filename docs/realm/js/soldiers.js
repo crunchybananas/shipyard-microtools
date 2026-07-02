@@ -4,6 +4,7 @@
 
 import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=115';
 import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=115';
+import { spawnClashFX } from './particles.js?realm=115';
 import { playSound } from './audio.js?realm=115';
 
 function soldierDamage(s) {
@@ -14,6 +15,35 @@ function soldierDamage(s) {
     if (d < 8) { damage *= 1.5; break; }
   }
   return damage;
+}
+
+// Where does this soldier want to stand? The army stance is a posture:
+// defend = spread around home barracks, rally = hold at the flag,
+// patrol = walk the wall/tower line.
+function armyAnchor(s) {
+  if (G.armyStance === 'rally' && G.rallyPoint) {
+    return { x: G.rallyPoint.x + (Math.random() * 4 - 2), y: G.rallyPoint.y + (Math.random() * 4 - 2) };
+  }
+  if (G.armyStance === 'patrol') {
+    if (!G._patrolPosts || G._patrolPostsBuildingCount !== G.buildings.length) {
+      G._patrolPosts = G.buildings.filter(b => b.type === 'wall' || b.type === 'tower');
+      G._patrolPostsBuildingCount = G.buildings.length;
+    }
+    const posts = G._patrolPosts;
+    if (posts.length) {
+      s._postIdx = ((s._postIdx ?? (G.soldiers.indexOf(s) * 7)) + 1) % posts.length;
+      const p = posts[s._postIdx];
+      return { x: p.x + rngRange(-1, 1), y: p.y + rngRange(-1, 1) };
+    }
+    if (!G._patrolEmptyNotified) {
+      G._patrolEmptyNotified = true;
+      G.particles.push({ tx: s.x, ty: s.y, offsetY: -14, text: 'No walls to patrol', alpha: 1.3, vy: -0.12, decay: 0.014, type: 'speech' });
+    }
+  }
+  if (s.homeBuilding) {
+    return { x: s.homeBuilding.x + rngRange(-3, 3), y: s.homeBuilding.y + rngRange(-3, 3) };
+  }
+  return null;
 }
 
 export function updateSoldiers() {
@@ -40,7 +70,10 @@ export function updateSoldiers() {
       if (d < nearestDist) { nearestEnemy = e; nearestDist = d; }
     }
 
-    if (nearestEnemy && nearestDist < 12) {
+    // Rally stance keeps soldiers on a tight leash: they hold the line at
+    // the flag instead of chasing anything that moves across the map.
+    const engageRadius = G.armyStance === 'rally' ? 8 : 12;
+    if (nearestEnemy && nearestDist < engageRadius) {
       // Archer AI — ranged unit stays at distance and fires arrows
       if (s.type === 'archer') {
         const idealRange = 5;
@@ -79,33 +112,12 @@ export function updateSoldiers() {
           s.attackTimer = 40;
           nearestEnemy.hp -= soldierDamage(s);
           if (G.gameTick % 20 === 0) playSound('click'); // avoid spam
-          // Loop 67 (render S4): emoji ⚔️ was readable but cartoonish; now
-          // also emit a radial spark burst at the impact point so the clash
-          // feels physical.
-          G.particles.push({
-            tx: nearestEnemy.x, ty: nearestEnemy.y, offsetY: -10,
-            text: '⚔️', alpha: 1.1, vy: -0.2, decay: 0.05, type: 'text',
-          });
-          for (let k = 0; k < 4; k++) {
-            const ang = (k / 4) * Math.PI * 2 + Math.random() * 0.5;
-            G.particles.push({
-              tx: nearestEnemy.x, ty: nearestEnemy.y, offsetY: -8,
-              text: null, alpha: 1.0,
-              vx: Math.cos(ang) * 0.22, vy: Math.sin(ang) * 0.22 - 0.08,
-              decay: 0.08, type: 'spark',
-              size: 1.1, color: k === 0 ? '#ffcc00' : '#ffffff',
-            });
-          }
+          spawnClashFX(nearestEnemy.x, nearestEnemy.y);
         }
       }
-      // If soldier takes damage back
-      const enemyAttackTimer = (nearestEnemy.attackTimer = (nearestEnemy.attackTimer || 0) - G.speed);
-      if (enemyAttackTimer <= 0 && d < 1.0) {
-        nearestEnemy.attackTimer = 50;
-        s.hp -= 3;
-        s.hurtTimer = 12;
-      }
-      // Also flash enemy when soldier damaged them above
+      // Raider counter-attacks now live in combat.js updateEnemies (the
+      // e.engaged block) so damage flows exactly once per cooldown in each
+      // direction — this block previously double-drove nearestEnemy.attackTimer.
       if (s.attackTimer === 40) nearestEnemy.hurtTimer = 12;
       continue;
     }
@@ -123,13 +135,8 @@ export function updateSoldiers() {
       s.stateTimer--;
       if (s.stateTimer <= 0) {
         s.stateTimer = 60 + Math.floor(rng() * 120);
-        if (G.rallyPoint) {
-          s.tx = G.rallyPoint.x + (Math.random()*4 - 2);
-          s.ty = G.rallyPoint.y + (Math.random()*4 - 2);
-        } else if (s.homeBuilding) {
-          s.tx = s.homeBuilding.x + rngRange(-3, 3);
-          s.ty = s.homeBuilding.y + rngRange(-3, 3);
-        }
+        const anchor = armyAnchor(s);
+        if (anchor) { s.tx = anchor.x; s.ty = anchor.y; }
       }
     }
   }
