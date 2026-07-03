@@ -13,20 +13,20 @@
 // added here MUST pass verify-core-purity + verify-determinism.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData } from './state.js?realm=128';
-import { updateCitizens } from './citizens.js?realm=128';
-import { updateAvatar } from './avatar.js?realm=128';
-import { updateSoldiers } from './soldiers.js?realm=128';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=128';
-import { updateWalkers } from './walkers.js?realm=128';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=128';
-import { checkMissions } from './missions.js?realm=128';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=128';
-import { updateWonder } from './wonder.js?realm=128';
-import { checkRandomEvents } from './events.js?realm=128';
-import { checkScenarioComplete } from './scenarios.js?realm=128';
-import { chronicle, announce, sfx } from './log.js?realm=128';
-import { emit } from './bus.js?realm=128';
+import { G, MAP_W, MAP_H, updateSeason, getSeasonData } from './state.js?realm=129';
+import { updateCitizens } from './citizens.js?realm=129';
+import { updateAvatar } from './avatar.js?realm=129';
+import { updateSoldiers } from './soldiers.js?realm=129';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=129';
+import { updateWalkers } from './walkers.js?realm=129';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=129';
+import { checkMissions } from './missions.js?realm=129';
+import { updateResearch, checkEraAdvance } from './tech.js?realm=129';
+import { updateWonder } from './wonder.js?realm=129';
+import { checkRandomEvents } from './events.js?realm=129';
+import { checkScenarioComplete } from './scenarios.js?realm=129';
+import { chronicle, announce, sfx } from './log.js?realm=129';
+import { emit } from './bus.js?realm=129';
 
 // ── Day/Night clock (moved from main.js updateTime) ─────────────────
 function tickClock() {

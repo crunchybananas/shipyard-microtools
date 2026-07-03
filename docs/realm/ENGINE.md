@@ -46,7 +46,7 @@ different birds; they must never see different granaries.
 
 | Tier | Modules |
 |---|---|
-| CORE | state, world, pathfinding, citizens, soldiers, combat, walkers, economy, events, tech, trade, wonder, scenarios, missions (check half), sim, commands, bus, log |
+| CORE | state, world, pathfinding, citizens, soldiers, combat, walkers, economy, events, tech, trade, wonder, scenarios, missions (check half), sim, commands, bus, log, fx, avatar |
 | SHELL | main (loop/init), render, minimap, postfx, ui, input, audio, notifications (DOM half), story (beats run shell-side; `chronicle()` data-write is core-safe in log.js), achievements, advisor, save (localStorage wrapper; serialize/apply are core-safe), enhancements, particles (update), animals, sprite-lab, sprite-muster, atlas-loader |
 
 ## Core contract rules
@@ -157,34 +157,41 @@ against the JS reference with the golden-master hash on identical command logs.
 
 ## Phase checklist
 
-### Phase 0 — determinism hygiene
-- [ ] Fixed-timestep accumulator (60 ticks/s at 1×; refresh-rate independent)
-- [ ] `coreTick()` = exactly one tick; all `G.speed` factors stripped from tick fns
-- [ ] `Math.random` → `rng()`/hash in CORE files (raids, fires, events, soldiers,
+### Phase 0 — determinism hygiene ✅ (2026-07-03)
+- [x] Fixed-timestep accumulator (60 ticks/s at 1×; refresh-rate independent)
+- [x] `coreTick()` = exactly one tick; all `G.speed` factors stripped from tick fns
+- [x] `Math.random` → `rng()`/hash in CORE files (raids, fires, events, soldiers,
       combat skirt, citizen heartbeat, army targets, story `pick()`)
-- [ ] `fastForward` rewritten as a plain tick loop
+- [x] `fastForward` rewritten as a plain tick loop
 
-### Phase 1 — command funnel
-- [ ] commands.js: typed handlers, validation, tick-stamped command log
-- [ ] input.js / ui.js / main.js rewired through `dispatch()`
-- [ ] Buildings addressed by coordinates in commands (never object refs)
+### Phase 1 — command funnel ✅ (2026-07-03)
+- [x] commands.js: typed handlers, validation, tick-stamped command log
+- [x] input.js / ui.js / main.js rewired through `dispatch()`
+- [x] Buildings addressed by coordinates in commands (never object refs)
 
-### Phase 2 — core extraction
-- [ ] bus.js (emit/on) + log.js (announce/chronicle data-writes core-side)
-- [ ] sim.js: `coreTick()` owns the core system order; ambient updates move to the
+### Phase 2 — core extraction ✅ (2026-07-03)
+- [x] bus.js (emit/on) + log.js (announce/chronicle data-writes core-side)
+- [x] sim.js: `coreTick()` owns the core system order; ambient updates move to the
       shell frame loop (same cadence, out of core)
-- [ ] Core files import no shell files (audio/particles-spawn exempted per rule 4;
+- [x] Core files import no shell files (audio/particles-spawn exempted per rule 4;
       render/notifications/story imports severed; confetti+prestige-localStorage
       moved shell-side; missions renderer moved to ui.js)
-- [ ] save.js split: pure serialize/apply + shell wrapper
-- [ ] scripts/verify-core-purity.mjs (static gate)
-- [ ] scripts/verify-determinism.mjs (golden-master gate, headless Node)
+- [x] save.js split: pure serialize/apply + shell wrapper
+- [x] scripts/verify-core-purity.mjs (static gate — 20 core files)
+- [x] scripts/verify-determinism.mjs (golden-master gate, headless Node; the
+      scenario scripts 11 build/research commands + 2 founder journeys over 12
+      game-days and demands identical sha256 state hashes)
 
-### Phase 3 — citizen intelligence & avatar
-- [ ] 3a schedule: homes, sleep/wake, dusk leisure, dawn rush
-- [ ] 3b needs: rest/joy/faith, real walker services, bounded mood → happiness
-- [ ] 3c job market: utility scoring + crisis reallocation
-- [ ] 3d avatar: entity, commands, follow cam, render, save v3
+### Phase 3 — citizen intelligence & avatar ✅ (2026-07-03)
+- [x] 3a schedule: homes, sleep/wake, dawn rush (+ raid-aware waking; walkers
+      rest at night)
+- [x] 3b needs: joy/faith + rest, real walker services, dusk leisure trips,
+      bounded ±15 mood → happiness (own row in the breakdown panel)
+- [x] 3c job market: utility scoring (food-crisis priority, wonder pull,
+      hysteresis) + famine reallocation into food jobs/foraging
+- [x] 3d avatar: the Founder — command-driven walking (WASD/click), fog
+      scouting, inspiration aura, follow camera (F), pennant + name plate,
+      save v3
 
 ### Later (needs owner input before starting)
 - [ ] Multiplayer transport spike (host-auth over WebSocket, 2 browsers)

@@ -8,12 +8,12 @@
 // (notifications.js, audio.js, main.js).
 //
 // Core files import these as drop-in aliases:
-//   import { announce as notify } from './log.js?realm=128';
-//   import { sfx as playSound } from './log.js?realm=128';
+//   import { announce as notify } from './log.js?realm=129';
+//   import { sfx as playSound } from './log.js?realm=129';
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=128';
-import { emit } from './bus.js?realm=128';
+import { G, BUILDINGS } from './state.js?realm=129';
+import { emit } from './bus.js?realm=129';
 
 // ── Chronicle (moved verbatim from story.js — pure data logic) ──────
 const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem', 'era']);
