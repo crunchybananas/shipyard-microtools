@@ -87,6 +87,17 @@ export function updateWalkers() {
         w.visitedHouses.add(b);
         b.visits = b.visits || {};
         b.visits[w.home.type] = G.gameTick;
+        // Phase 3b: the visit is REAL — residents' needs are satisfied.
+        // (Pre-3b, b.visits only fed the housing-tier checklist.)
+        const kind = w.home.type;
+        for (const c of G.citizens) {
+          if (c.home !== b) continue;
+          if (!c.needs) c.needs = { joy: 55, faith: 55 };
+          if (kind === 'tavern') c.needs.joy = Math.min(100, c.needs.joy + 25);
+          else if (kind === 'church') c.needs.faith = Math.min(100, c.needs.faith + 30);
+          else if (kind === 'market') c.needs.joy = Math.min(100, c.needs.joy + 8);
+          else if (kind === 'well') c.needs.joy = Math.min(100, c.needs.joy + 5);
+        }
       }
     }
     // Expire walker

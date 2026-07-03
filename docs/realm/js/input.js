@@ -83,7 +83,7 @@ function showCitizenPanel(c) {
     idle:'Idle', find_job:'Looking for work', walk_to_work:'Walking to work',
     working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
     foraging:'Foraging', eating:'Eating',
-    go_home:'Heading home', sleep:'Sleeping',
+    go_home:'Heading home', sleep:'Sleeping', leisure:'Off to unwind',
   };
   const state = stateLabels[c.state] || c.state;
   const job = c.jobBuilding ? BUILDINGS[c.jobBuilding.type]?.name : 'Unemployed';
@@ -99,6 +99,8 @@ function showCitizenPanel(c) {
     <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${carrying}</span></div>
     <div class="ip-row"><span class="ip-label">Hunger</span><span class="ip-val">${Math.round(c.hunger)}%</span></div>
     <div class="ip-row"><span class="ip-label">Energy</span><span class="ip-val">${Math.round(c.rest ?? 100)}%</span></div>
+    <div class="ip-row"><span class="ip-label">Joy</span><span class="ip-val">${Math.round(c.needs?.joy ?? 55)}%</span></div>
+    <div class="ip-row"><span class="ip-label">Faith</span><span class="ip-val">${Math.round(c.needs?.faith ?? 55)}%</span></div>
     <div class="ip-hint">Citizens auto-assign to buildings that need workers.</div>
   `;
   panel.style.display = 'block';

@@ -39,6 +39,7 @@ export function makeCitizen(x,y){
     carrying: null, carryAmount: 0,
     name: randomName(),
     hunger: 0, rest: 100, // rest = energy 0–100; sleep restores it (Phase 3a)
+    needs: { joy: 55, faith: 55 }, // satisfied by taverns/churches (Phase 3b)
     home: null,           // house this citizen sleeps in (assigned at dusk)
     state: 'idle', stateTimer: 0,
     path: null, pathIdx: 0,

@@ -55,6 +55,7 @@ export function serializeGame() {
         carrying:c.carrying, carryAmount:c.carryAmount,
         jobBuildingIdx: c.jobBuilding ? G.buildings.indexOf(c.jobBuilding) : -1,
         homeIdx: c.home ? G.buildings.indexOf(c.home) : -1,
+        needs: c.needs ? { joy: c.needs.joy, faith: c.needs.faith } : undefined,
       })),
       resources: { ...G.resources },
       population: G.population,
@@ -165,6 +166,7 @@ export function applySave(s) {
     G.citizens = s.citizens.map(c => ({
       ...c, jobBuilding: null, home: null, path: null, pathIdx: 0,
       rest: s.v >= 3 ? (c.rest ?? 100) : 100,
+      needs: c.needs || { joy: 55, faith: 55 },
     }));
 
     // Rebuild buildings with worker refs

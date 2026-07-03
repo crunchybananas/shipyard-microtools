@@ -418,7 +418,24 @@ export function updateProduction() {
     // mayor (civic-unlock filed 101) + rival (raid-difficulty filed
     // 105) remain. Closes 101 filed bard idea.
     const bardBonus = G.namedCharacters?.bard ? 5 : 0;
-    G.happiness = Math.min(100, Math.max(10, 50 + bardBonus + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
+    // Citizen mood (Phase 3b): per-citizen needs aggregate into a BOUNDED
+    // ±15 contribution — coverage keeps carrying the base balance, mood
+    // makes it emergent (a rested, fed, entertained town runs happier).
+    let moodDelta = 0;
+    if (G.citizens.length > 0) {
+      let sum = 0;
+      for (const c of G.citizens) {
+        const joy = c.needs?.joy ?? 55;
+        const faith = c.needs?.faith ?? 55;
+        const rest = c.rest ?? 100;
+        const fed = 100 - (c.hunger ?? 0);
+        sum += (joy + faith + rest + fed) / 4;
+      }
+      const avgMood = sum / G.citizens.length;
+      moodDelta = Math.max(-15, Math.min(15, (avgMood - 55) * 0.5));
+    }
+    G._moodDelta = Math.round(moodDelta * 10) / 10;
+    G.happiness = Math.min(100, Math.max(10, 50 + bardBonus + moodDelta + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
 
     // ── Housing evolution (Caesar-style tier ladder) ─────────────────
     // Signed streak with asymmetric hysteresis: +2 checks to evolve,

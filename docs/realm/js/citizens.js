@@ -563,6 +563,35 @@ export function updateCitizens() {
       if (c.state !== 'sleep' && c.state !== 'idle') {
         c.rest = Math.max(0, (c.rest ?? 100) - 0.35);
       }
+
+      // ── Needs (Phase 3b) — joy and faith drain slowly; taverns and
+      // churches (via walkers or dusk visits) restore them. Mood feeds
+      // realm happiness with a bounded contribution (economy.js).
+      if (!c.needs) c.needs = { joy: 55, faith: 55 };
+      c.needs.joy = Math.max(0, c.needs.joy - 0.10);
+      c.needs.faith = Math.max(0, c.needs.faith - 0.06);
+
+      // Dusk leisure: unoccupied citizens with a low need seek the venue
+      // that satisfies it — the town square fills in the evening. One
+      // trip per day; night sends everyone home from the tavern.
+      if (period === 'dusk' && !threatened && c._leisureDay !== G.day
+          && (c.state === 'idle' || c.state === 'find_job')
+          && !(c.carrying && c.carryAmount > 0)) {
+        const wantJoy = c.needs.joy < 45;
+        const wantFaith = c.needs.faith < 45;
+        if (wantJoy || wantFaith) {
+          const kind = (wantJoy && (!wantFaith || c.needs.joy <= c.needs.faith)) ? 'tavern' : 'church';
+          const venue = nearestBuilding(c, kind) || nearestBuilding(c, kind === 'tavern' ? 'church' : 'tavern');
+          if (venue && dist2(c.x, c.y, venue.x, venue.y) <= 25) {
+            c._leisureDay = G.day;
+            c._leisureTarget = { x: venue.x, y: venue.y, kind: venue.type };
+            c.state = 'leisure';
+            c.stateTimer = 0;
+            clearPath(c);
+            pathTo(c, venue.x, venue.y);
+          }
+        }
+      }
     }
 
     // ── Universal progress watchdog: no measurable progress toward the
@@ -999,6 +1028,33 @@ function runStateMachine(c) {
       c.stateTimer = 60;
       clearPath(c);
       break;
+
+    case 'leisure': {
+      if (c.path && c.pathIdx < c.path.length) break;
+      const venue = c._leisureTarget;
+      c._leisureTarget = null;
+      if (venue) {
+        if (!c.needs) c.needs = { joy: 55, faith: 55 };
+        if (venue.kind === 'tavern') {
+          c.needs.joy = Math.min(100, c.needs.joy + 40);
+        } else {
+          c.needs.faith = Math.min(100, c.needs.faith + 40);
+        }
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -24,
+          text: venue.kind === 'tavern' ? '🍺' : '🙏',
+          alpha: 1.1, vy: -0.08, decay: 0.014, type: 'speech',
+        });
+        // Linger at the venue until night calls everyone home.
+        c.state = 'idle';
+        c.stateTimer = 90 + rngInt(0, 60);
+      } else {
+        c.state = 'find_job';
+        c.stateTimer = 5;
+      }
+      clearPath(c);
+      break;
+    }
 
     case 'sleep':
       // Sleep restores energy; the dawn heartbeat wakes us. Re-enter on

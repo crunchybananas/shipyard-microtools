@@ -1002,6 +1002,12 @@ export function renderHappinessPanel() {
     factors.push({ label: '🍎 Food shortage', val: -3, category: 'penalty' });
   }
 
+  // Citizen mood (Phase 3b) — bounded aggregate of needs/rest/hunger
+  if (G._moodDelta !== undefined && G._moodDelta !== 0) {
+    const face = G._moodDelta > 0 ? '😊' : '😞';
+    factors.push({ label: `${face} Citizen mood`, val: G._moodDelta, category: G._moodDelta > 0 ? 'building' : 'penalty' });
+  }
+
   // Event modifiers
   if (G.eventModifiers.happinessOffset && G.eventModifiers.happinessOffset !== 0) {
     factors.push({ label: '✨ Event modifier', val: G.eventModifiers.happinessOffset, category: 'event' });
