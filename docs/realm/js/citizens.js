@@ -2,7 +2,7 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, TILE } from './state.js?realm=128';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=128';
 import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=128';
 import { getCitizenSpeedMult } from './events.js?realm=128';
 import { houseCap } from './economy.js?realm=128';
@@ -411,6 +411,46 @@ function replanToRequestedTarget(c) {
   pathTo(c, tx, ty);
 }
 
+// ── Job market (Phase 3c) ───────────────────────────────────────────
+// Greedy-nearest is replaced by utility scoring: distance, dynamic
+// priority (a thin larder surges food jobs), the wonder's pull, and a
+// hysteresis bonus for the current job so citizens don't thrash between
+// equidistant workplaces. Deterministic — ties break by building order.
+const FOOD_JOBS = new Set(['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery', 'windmill']);
+
+let _foodDaysTick = -1, _foodDaysVal = 99;
+function foodDaysLeft() {
+  if (_foodDaysTick !== G.gameTick) {
+    _foodDaysTick = G.gameTick;
+    const daily = Math.max(1, Math.ceil(G.population * getDifficulty().foodMult));
+    const stock = (G.resources.food || 0) + (G.resources.wheat || 0) + (G.resources.flour || 0);
+    _foodDaysVal = stock / daily;
+  }
+  return _foodDaysVal;
+}
+
+let _openFoodJobTick = -1, _openFoodJobVal = false;
+function hasOpenFoodJob() {
+  if (_openFoodJobTick !== G.gameTick) {
+    _openFoodJobTick = G.gameTick;
+    _openFoodJobVal = G.buildings.some(b => {
+      if (!FOOD_JOBS.has(b.type)) return false;
+      const def = BUILDINGS[b.type];
+      return def && (def.workers || 0) > (b.workers?.length || 0);
+    });
+  }
+  return _openFoodJobVal;
+}
+
+function scoreJob(c, b) {
+  let score = -dist2(c.x, c.y, b.x, b.y);
+  const days = foodDaysLeft();
+  if (days < 3 && FOOD_JOBS.has(b.type)) score += (3 - days) * 14;
+  if (b.type === 'wonder') score += 6; // the great work draws hands
+  if (c.jobBuilding === b) score += 6; // hysteresis
+  return score;
+}
+
 // ── Homes & schedule (Phase 3a) ─────────────────────────────────────
 // Citizens sleep in an assigned house at night. Assignment is lazy
 // (first nightfall, or when the old home is gone) and respects tier
@@ -570,6 +610,28 @@ export function updateCitizens() {
       if (!c.needs) c.needs = { joy: 55, faith: 55 };
       c.needs.joy = Math.max(0, c.needs.joy - 0.10);
       c.needs.faith = Math.max(0, c.needs.faith - 0.06);
+
+      // Food crisis (Phase 3c): when the larder runs under two days,
+      // non-food workers start downing tools — into an open food job if
+      // one exists, otherwise into foraging (find_job's shortage branch
+      // sends the unemployed after berries/game). Either way the colony
+      // visibly reallocates labor under pressure and recovers its old
+      // jobs once the granary refills.
+      if (foodDaysLeft() < 2
+          && c.jobBuilding && !FOOD_JOBS.has(c.jobBuilding.type)
+          && (c.state === 'working' || c.state === 'walk_to_work')
+          && rng() < 0.04) {
+        c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
+        c.jobBuilding = null;
+        c.workTarget = null;
+        c.state = 'find_job';
+        c.stateTimer = 0;
+        clearPath(c);
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -26,
+          text: 'To the fields!', alpha: 1.2, vy: -0.12, decay: 0.016, type: 'speech',
+        });
+      }
 
       // Dusk leisure: unoccupied citizens with a low need seek the venue
       // that satisfies it — the town square fills in the evening. One
@@ -780,10 +842,12 @@ function runStateMachine(c) {
         return;
       }
 
-      // Find nearest building that needs workers
+      // Pick the best job by utility score (Phase 3c) — not merely the
+      // nearest. Under a food crisis the colony visibly reallocates
+      // labor toward farms and bakeries.
       if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
         c.jobBuilding = null;
-        let bestDist = Infinity, bestB = null;
+        let bestScore = -Infinity, bestB = null;
         for (const b of G.buildings) {
           if (isBlacklisted(c, b.x, b.y)) continue;
           const def = BUILDINGS[b.type];
@@ -792,8 +856,8 @@ function runStateMachine(c) {
           const needed = def.workers || 0;
           if (b.workers.length >= needed) continue;
           if (b.workers.includes(c)) continue;
-          const d = dist2(c.x, c.y, b.x, b.y);
-          if (d < bestDist) { bestDist = d; bestB = b; }
+          const score = scoreJob(c, b);
+          if (score > bestScore) { bestScore = score; bestB = b; }
         }
         if (bestB) {
           c.jobBuilding = bestB;
