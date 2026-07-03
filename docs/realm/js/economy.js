@@ -305,7 +305,11 @@ export function updateProduction() {
     const needed = def.workers || 0;
     if (b.workers.length < needed) continue;
 
-    b.prodTimer++;
+    // Founder's inspiration (Phase 3d): production quickens near the
+    // avatar — wandering your own town has a reason.
+    const av = G.avatar;
+    const inspired = av && Math.abs(av.x - b.x) <= 5 && Math.abs(av.y - b.y) <= 5;
+    b.prodTimer += inspired ? 1.15 : 1;
     const interval = Math.floor(G.dayLength / 5); // produce ~5 times per day
     if (b.prodTimer >= interval) {
       b.prodTimer = 0;

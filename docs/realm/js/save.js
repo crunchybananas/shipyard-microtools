@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, getSeed, setSeed } from './state.js?realm=128';
+import { makeAvatar, ensureAvatar } from './avatar.js?realm=128';
 import { rebuildBuildingGrid } from './world.js?realm=128';
 import { missions } from './missions.js?realm=128';
 import { deriveEra } from './tech.js?realm=128';
@@ -36,6 +37,7 @@ export function serializeGame() {
         produced: b.produced || null,
         workerIdxs: b.workers.map(w => G.citizens.indexOf(w)),
       })),
+      avatar: G.avatar ? { x: G.avatar.x, y: G.avatar.y, name: G.avatar.name } : null,
       armyStance: G.armyStance || 'defend',
       rallyPoint: G.rallyPoint || null,
       era: G.era || 1,
@@ -204,6 +206,16 @@ export function applySave(s) {
     });
 
     rebuildBuildingGrid();
+
+    // The founder (Phase 3d): restore from v3 saves; legacy realms gain
+    // one at the settlement center on first load.
+    if (s.avatar) {
+      G.avatar = makeAvatar(s.avatar.x, s.avatar.y);
+      if (s.avatar.name) G.avatar.name = s.avatar.name;
+    } else {
+      G.avatar = null;
+      ensureAvatar();
+    }
 
     // Restore mission done states
     for (const ms of s.missions) {

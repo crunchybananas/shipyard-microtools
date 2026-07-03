@@ -22,7 +22,7 @@ const CORE = new Set([
   'state.js', 'world.js', 'pathfinding.js', 'citizens.js', 'soldiers.js',
   'combat.js', 'walkers.js', 'economy.js', 'events.js', 'tech.js',
   'trade.js', 'wonder.js', 'scenarios.js', 'missions.js', 'sim.js',
-  'commands.js', 'bus.js', 'log.js', 'fx.js',
+  'commands.js', 'bus.js', 'log.js', 'fx.js', 'avatar.js',
 ]);
 
 const BANNED = [

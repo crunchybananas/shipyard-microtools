@@ -5,7 +5,7 @@
 import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=128';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=128';
 import { generateWorld } from './world.js?realm=128';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo } from './render.js?realm=128';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=128';
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=128';
 import { dispatch } from './commands.js?realm=128';
 import { coreTick } from './sim.js?realm=128';
@@ -688,6 +688,13 @@ function _setPostFxSuspended(suspended) {
 
 function _renderFrame({ allowPostFx = true, allowMinimap = true } = {}) {
   const frameStart = performance.now();
+  // Follow camera (Phase 3d): glide after the founder; any manual pan
+  // fights it, so dragging is naturally dominant while held.
+  if (G._followAvatar && G.avatar && !G.dragging) {
+    const target = toScreen(G.avatar.x, G.avatar.y);
+    G.camera.x += (target.x - G.camera.x) * 0.10;
+    G.camera.y += (target.y - G.camera.y) * 0.10;
+  }
   render();
   const now = performance.now();
   const postFxSuspended = now < _postFxSuspendedUntil;

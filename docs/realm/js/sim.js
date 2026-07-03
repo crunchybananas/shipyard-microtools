@@ -15,6 +15,7 @@
 
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData } from './state.js?realm=128';
 import { updateCitizens } from './citizens.js?realm=128';
+import { updateAvatar } from './avatar.js?realm=128';
 import { updateSoldiers } from './soldiers.js?realm=128';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=128';
 import { updateWalkers } from './walkers.js?realm=128';
@@ -95,6 +96,7 @@ function checkScenarioVictory() {
 export function coreTick() {
   G.gameTick++;
   tickClock();
+  updateAvatar();
   updateCitizens();
   updateSoldiers();
   updateEnemies();

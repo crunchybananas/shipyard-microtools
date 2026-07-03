@@ -19,6 +19,7 @@ import { G, BUILDINGS, rngRange } from './state.js?realm=128';
 import { placeBuilding, demolishBuilding, undoLastBuild, upgradeBuilding } from './economy.js?realm=128';
 import { startResearch } from './tech.js?realm=128';
 import { executeTrade } from './trade.js?realm=128';
+import { avatarMove, avatarGoto } from './avatar.js?realm=128';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;
@@ -104,6 +105,14 @@ const HANDLERS = {
       .slice(0, Math.max(0, 2 - occ));
     for (const s of free) s.garrison = b;
     return free.length ? { ok: true, count: free.length } : { ok: false, reason: 'no-free-soldiers' };
+  },
+
+  AVATAR_MOVE({ dx, dy }) {
+    return avatarMove(dx || 0, dy || 0) ? { ok: true } : { ok: false, reason: 'no-avatar' };
+  },
+
+  AVATAR_GOTO({ x, y }) {
+    return avatarGoto(x, y) ? { ok: true } : { ok: false, reason: 'no-path' };
   },
 
   EJECT_GARRISON({ x, y }) {

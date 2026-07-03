@@ -3,6 +3,7 @@
 // ════════��═════════════════════════��═════════════════════════
 
 import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=128';
+import { makeAvatar } from './avatar.js?realm=128';
 
 function hash2(x,y){ let n=x*374761393+y*668265263; n=(n^(n>>13))*1274126177; return(n^(n>>16))&0x7fffffff; }
 function noise2(x,y){
@@ -143,6 +144,8 @@ export function generateWorld(){
   for(let i=0;i<3;i++){
     G.citizens.push(makeCitizen(sx+rngRange(-1,1), sy+rngRange(-1,1)));
   }
+  // The founder steps ashore with them (Phase 3d).
+  G.avatar = makeAvatar(sx + 1, sy + 1);
 
   // Center camera on the island (critical — iso projection)
   const centerScreen = { x: (sx-sy)*(64/2), y: (sx+sy)*(32/2) };

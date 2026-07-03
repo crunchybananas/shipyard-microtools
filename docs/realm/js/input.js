@@ -216,6 +216,14 @@ export function setupInput(canvas) {
         G.selectedBuilding = null;
         G.selectedCitizen = null;
         hideInfoPanel();
+        // Follow mode (Phase 3d): a ground click walks the founder there.
+        if (G._followAvatar && G.avatar) {
+          const t = pickTile(e.clientX, e.clientY);
+          if (t) {
+            dispatch({ type: 'AVATAR_GOTO', x: t.x, y: t.y });
+            return; // don't also start a camera drag
+          }
+        }
       }
     }
 
@@ -404,6 +412,16 @@ export function setupInput(canvas) {
       if (window.togglePhotoMode) window.togglePhotoMode();
       return;
     }
+    // Phase 3d: F follows the founder — WASD then steers THEM, not the
+    // camera; click-to-walk on open ground; F again to release.
+    if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
+      G._followAvatar = !G._followAvatar;
+      if (!G._followAvatar) dispatch({ type: 'AVATAR_MOVE', dx: 0, dy: 0 });
+      notify(G._followAvatar
+        ? '🚶 Following the Founder — WASD to walk, click ground to travel, F to release.'
+        : 'Camera released.', 'info', { chronicle: false });
+      return;
+    }
     if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
       const rp = document.getElementById('research-panel');
       if (rp) rp.style.display = rp.style.display === 'none' ? 'flex' : 'none';
@@ -452,17 +470,33 @@ export function setupInput(canvas) {
     heldKeys.delete(e.key.toLowerCase());
   });
 
+  let _lastAvatarDir = '0,0';
   function keyPanTick() {
     if (G.speed >= 0) { // even when paused, allow camera movement
-      const panSpeed = 6 / G.camera.zoom;
-      let dx = 0, dy = 0;
-      if (heldKeys.has('w') || heldKeys.has('arrowup')) dy = -panSpeed;
-      if (heldKeys.has('s') || heldKeys.has('arrowdown')) dy = panSpeed;
-      if (heldKeys.has('a') || heldKeys.has('arrowleft')) dx = -panSpeed;
-      if (heldKeys.has('d') || heldKeys.has('arrowright')) dx = panSpeed;
-      if (dx || dy) {
-        G.camera.x += dx;
-        G.camera.y += dy;
+      let ux = 0, uy = 0;
+      if (heldKeys.has('w') || heldKeys.has('arrowup')) uy = -1;
+      if (heldKeys.has('s') || heldKeys.has('arrowdown')) uy = 1;
+      if (heldKeys.has('a') || heldKeys.has('arrowleft')) ux = -1;
+      if (heldKeys.has('d') || heldKeys.has('arrowright')) ux = 1;
+      if (G._followAvatar && G.avatar) {
+        // Screen-relative intent → iso world axes: screen-up must read as
+        // walking toward the top of the SCREEN, not tile-north.
+        const wx = (ux + uy) * 0.7071, wy = (uy - ux) * 0.7071;
+        const key = `${wx.toFixed(2)},${wy.toFixed(2)}`;
+        if (key !== _lastAvatarDir) {
+          _lastAvatarDir = key;
+          dispatch({ type: 'AVATAR_MOVE', dx: wx, dy: wy });
+        }
+      } else {
+        if (_lastAvatarDir !== '0,0') {
+          _lastAvatarDir = '0,0';
+          dispatch({ type: 'AVATAR_MOVE', dx: 0, dy: 0 });
+        }
+        const panSpeed = 6 / G.camera.zoom;
+        if (ux || uy) {
+          G.camera.x += ux * panSpeed;
+          G.camera.y += uy * panSpeed;
+        }
       }
     }
     requestAnimationFrame(keyPanTick);

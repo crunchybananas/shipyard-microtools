@@ -2446,6 +2446,14 @@ export function render() {
   for (const c of G.citizens) {
     worldDrawQueue.push({ depth: c.x + c.y, order: 1, draw: () => drawOneCitizen(c) });
   }
+  if (G.avatar) {
+    // The founder rides the citizen sprite path (avatar is citizen-shaped)
+    // plus a golden pennant + name so the player can always find themself.
+    worldDrawQueue.push({ depth: G.avatar.x + G.avatar.y, order: 1, draw: () => {
+      drawOneCitizen(G.avatar);
+      drawFounderMarker(G.avatar);
+    } });
+  }
   // Walkers, soldiers, caravans, and raiders share the same depth pass so no
   // entity ever floats above a building it stands behind. Their draw
   // functions are hoisted declarations defined in their original sections.
@@ -2463,6 +2471,41 @@ export function render() {
   }
   worldDrawQueue.sort((a, b) => a.depth - b.depth || a.order - b.order);
   for (const item of worldDrawQueue) item.draw();
+
+  // ── Founder marker (Phase 3d) ─────────────────────────────
+  function drawFounderMarker(a) {
+    const s = toScreen(a.x, a.y);
+    const bob = Math.sin(G.gameTick * 0.08) * 1.5;
+    const topY = s.y - 34 + bob;
+    // Pennant pole + golden flag
+    ctx.save();
+    ctx.strokeStyle = 'rgba(70,50,20,0.9)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(s.x, topY + 10);
+    ctx.lineTo(s.x, topY);
+    ctx.stroke();
+    const wave = Math.sin(G.gameTick * 0.12) * 1.6;
+    ctx.fillStyle = '#ffd166';
+    ctx.beginPath();
+    ctx.moveTo(s.x, topY);
+    ctx.lineTo(s.x + 9 + wave, topY + 2.5);
+    ctx.lineTo(s.x, topY + 5);
+    ctx.closePath();
+    ctx.fill();
+    // Name plate when zoomed in enough to read it
+    if (G.camera.zoom >= 1.0) {
+      ctx.font = '600 8px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      const label = a.name || 'The Founder';
+      const w = ctx.measureText(label).width + 8;
+      ctx.fillRect(s.x - w / 2, topY - 11, w, 10);
+      ctx.fillStyle = '#ffe08a';
+      ctx.fillText(label, s.x, topY - 3);
+    }
+    ctx.restore();
+  }
 
   // ── Service walkers (drawn via the unified depth pass) ────
   function drawOneWalker(wEntity) {

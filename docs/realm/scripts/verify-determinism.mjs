@@ -61,6 +61,8 @@ if (process.env.REALM_DET_CHILD) {
     { at: 1200, type: 'market' },
     { at: 5000, research: 'commerce' },
     { at: 9000, type: 'tavern' },
+    { at: 600,  avatar: { x: 48, y: 48 } },   // founder scouts south-east
+    { at: 14000, avatar: { x: 34, y: 36 } },  // and wanders back
   ];
 
   const TICKS = 12 * G.dayLength; // 12 game-days: crosses events (day 4+) and raids (day 8)
@@ -72,10 +74,12 @@ if (process.env.REALM_DET_CHILD) {
       if (cmd.type) {
         const spot = findSpot(cmd.type);
         res = spot ? dispatch({ type: 'PLACE_BUILDING', building: cmd.type, x: spot.x, y: spot.y }) : { ok: false, reason: 'no-spot' };
+      } else if (cmd.avatar) {
+        res = dispatch({ type: 'AVATAR_GOTO', x: cmd.avatar.x, y: cmd.avatar.y });
       } else {
         res = dispatch({ type: 'START_RESEARCH', tech: cmd.research });
       }
-      applied.push(`${t}:${cmd.type || cmd.research}:${res.ok ? 'ok' : res.reason}`);
+      applied.push(`${t}:${cmd.type || cmd.research || 'avatar-goto'}:${res.ok ? 'ok' : res.reason}`);
     }
     coreTick();
   }
@@ -106,6 +110,7 @@ if (process.env.REALM_DET_CHILD) {
     buildings: G.buildings.map(b => [b.type, b.x, b.y, +b.hp.toFixed(4), b.level || 1, b.prodTimer, (b.workers || []).length, +(b.buildProgress ?? 1).toFixed(4)]),
     citizens: G.citizens.map(c => [+c.x.toFixed(4), +c.y.toFixed(4), c.state, Math.round(c.hunger), c.carrying || '', c.carryAmount || 0]),
     soldiers: G.soldiers.map(s => [s.type, +s.x.toFixed(4), +s.y.toFixed(4), s.hp]),
+    avatar: G.avatar ? [+G.avatar.x.toFixed(4), +G.avatar.y.toFixed(4)] : null,
     enemies: G.enemies.map(e => [+e.x.toFixed(4), +e.y.toFixed(4), e.hp, e.state]),
     walkers: G.walkers.length,
     caravans: G.caravans.map(c => [c.phase, +c.x.toFixed(4), +c.y.toFixed(4), c.gold]),
