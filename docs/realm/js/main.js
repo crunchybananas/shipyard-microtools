@@ -9,7 +9,8 @@ import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWor
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=128';
 import { updateCitizens } from './citizens.js?realm=128';
 import { updateSoldiers } from './soldiers.js?realm=128';
-import { placeBuilding, updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=128';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=128';
+import { dispatch } from './commands.js?realm=128';
 import { checkMissions, renderMissions } from './missions.js?realm=128';
 import { updateParticles, updateSmokeEmitters } from './particles.js?realm=128';
 import { setupInput } from './input.js?realm=128';
@@ -20,7 +21,6 @@ import { checkRandomEvents, updateEventBanner } from './events.js?realm=128';
 import { saveGame, loadGame, getSaveSize } from './save.js?realm=128';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=128';
 import { toggleNotificationLog, notify } from './notifications.js?realm=128';
-import { executeTrade } from './trade.js?realm=128';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=128';
 import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=128';
 import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=128';
@@ -333,7 +333,10 @@ G.debug.dreamLens = _realWorldDreamLens;
 G.debug.renderBuildingIsolated = renderBuildingIsolated;
 G.debug.fastForward = fastForward;  // 081: synchronous N-day advance
 G.debug.disableEvents = false;
-G.debug.placeBuilding = placeBuilding;  // probe-harness: programmatic placement for chain/e2e tests       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
+// probe-harness: programmatic placement for chain/e2e tests — now routed
+// through the command funnel so probe placements land in G._commandLog too.
+G.debug.placeBuilding = (type, x, y) => dispatch({ type: 'PLACE_BUILDING', building: type, x, y }).ok;
+G.debug.dispatch = dispatch;  // probe/console access to the full command surface       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /
@@ -415,8 +418,9 @@ window.togglePopPanel = togglePopPanel;
 window.toggleStats = toggleStatsPanel;
 window.toggleTrade = toggleTradePanel;
 window.doTrade = (partnerId, resource, amount) => {
-  const r = executeTrade(partnerId, resource, amount);
-  if (r) {
+  const res = dispatch({ type: 'TRADE', partner: partnerId, resource, amount });
+  if (res.ok) {
+    const r = res.result;
     const emojis = { wood:'🪵', stone:'🪨', food:'🍎', gold:'🪙', iron:'⚙️' };
     notify(`Traded ${r.given} ${emojis[resource] || resource} for ${r.received} ${emojis[r.export] || r.export}`, 'event');
     renderTradePanel();

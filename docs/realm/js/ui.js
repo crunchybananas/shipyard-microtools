@@ -3,12 +3,12 @@
 // ════════════════════════════════════════════════════════════
 
 import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=128';
-import { canAfford, getRaidCountdown, upgradeBuilding, houseCap, getHouseTierReport, computePrestige, prestigeBest } from './economy.js?realm=128';
+import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige, prestigeBest } from './economy.js?realm=128';
 import { getWonderReport } from './wonder.js?realm=128';
 import { panCameraTo } from './render.js?realm=128';
-import { setArmyTargets } from './input.js?realm=128';
+import { dispatch } from './commands.js?realm=128';
 import { saveGame, loadGame, hasSave } from './save.js?realm=128';
-import { isBuildingUnlocked, TECHS, canResearch, startResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=128';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=128';
 import { notify } from './notifications.js?realm=128';
 import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=128';
 
@@ -53,24 +53,14 @@ if (typeof window !== 'undefined') {
   window.garrisonTower = () => {
     const b = G.selectedBuilding;
     if (!b || b.type !== 'tower') return;
-    const occ = G.soldiers.filter(s => s.garrison === b).length;
-    const free = G.soldiers
-      .filter(s => !s.garrison)
-      .sort((a, c) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(c.x - b.x, c.y - b.y))
-      .slice(0, Math.max(0, 2 - occ));
-    for (const s of free) s.garrison = b;
-    if (free.length) notify(`${free.length} soldier${free.length > 1 ? 's' : ''} garrisoned the tower.`, 'info');
+    const res = dispatch({ type: 'GARRISON', x: b.x, y: b.y });
+    if (res.ok) notify(`${res.count} soldier${res.count > 1 ? 's' : ''} garrisoned the tower.`, 'info');
     showInfoPanel(b);
   };
   window.ejectGarrison = () => {
     const b = G.selectedBuilding;
     if (!b) return;
-    for (const s of G.soldiers) {
-      if (s.garrison === b) {
-        s.garrison = null;
-        s.x = b.x + 1; s.y = b.y + 1; s.tx = s.x; s.ty = s.y; s.stateTimer = 1;
-      }
-    }
+    dispatch({ type: 'EJECT_GARRISON', x: b.x, y: b.y });
     notify('Garrison ejected.', 'info');
     showInfoPanel(b);
   };
@@ -79,8 +69,7 @@ if (typeof window !== 'undefined') {
       notify('Plant a rally flag first: shift + right-click on the map.', 'warn');
       return;
     }
-    G.armyStance = stance;
-    setArmyTargets();
+    dispatch({ type: 'SET_STANCE', stance });
     notify(`Army stance: ${stance === 'defend' ? '🛡️ Defend' : stance === 'rally' ? '🚩 Rally' : '🧱 Patrol'}`, 'info');
     updateUI();
   };
@@ -591,7 +580,7 @@ export function renderResearchPanel() {
         const btn = document.createElement('button');
         btn.className = 'tech-btn';
         btn.textContent = 'Research';
-        btn.onclick = () => { startResearch(id); renderResearchPanel(); renderBuildBar(); };
+        btn.onclick = () => { dispatch({ type: 'START_RESEARCH', tech: id }); renderResearchPanel(); renderBuildBar(); };
         card.appendChild(btn);
       }
 
@@ -871,7 +860,7 @@ export function showInfoPanel(b) {
     btn.className = 'upgrade-btn' + (canAffordUpgrade ? '' : ' disabled');
     btn.innerHTML = `⬆ Upgrade → ${nextUpgrade.name} <small style="opacity:0.75">(×${nextUpgrade.prodMult} prod)</small><br><small class="ip-hint" style="opacity:0.8">${costStr}</small>`;
     btn.onclick = () => {
-      if (upgradeBuilding(b)) showInfoPanel(b);
+      if (dispatch({ type: 'UPGRADE', x: b.x, y: b.y }).ok) showInfoPanel(b);
     };
     panel.appendChild(btn);
   }

@@ -2,9 +2,10 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH, rngRange } from './state.js?realm=128';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=128';
 import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=128';
-import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js?realm=128';
+import { canAfford } from './economy.js?realm=128';
+import { dispatch } from './commands.js?realm=128';
 import { notify } from './notifications.js?realm=128';
 import { initAudio, playSound } from './audio.js?realm=128';
 import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js?realm=128';
@@ -104,7 +105,7 @@ function showCitizenPanel(c) {
 }
 
 function tryPlaceAt(tx, ty) {
-  if (placeBuilding(G.selectedBuild, tx, ty)) {
+  if (dispatch({ type: 'PLACE_BUILDING', building: G.selectedBuild, x: tx, y: ty }).ok) {
     renderBuildBar();
     renderMissions();
     updateUI();
@@ -138,20 +139,8 @@ function tryPlaceAt(tx, ty) {
   return false;
 }
 
-// Snap every soldier's wander target to its stance anchor immediately so a
-// stance change FEELS instant instead of waiting out each wander timer.
-export function setArmyTargets() {
-  for (const s of G.soldiers) {
-    if (G.armyStance === 'rally' && G.rallyPoint) {
-      s.tx = G.rallyPoint.x + rngRange(-2, 2);
-      s.ty = G.rallyPoint.y + rngRange(-2, 2);
-    } else if (G.armyStance === 'defend' && s.homeBuilding) {
-      s.tx = s.homeBuilding.x + rngRange(-3, 3);
-      s.ty = s.homeBuilding.y + rngRange(-3, 3);
-    }
-    s.stateTimer = 1; // re-anchor (incl. patrol posts) on next tick
-  }
-}
+// setArmyTargets moved to commands.js — it mutates sim state, so it lives
+// behind the command funnel (SET_RALLY / SET_STANCE handlers call it).
 
 export function setupInput(canvas) {
   const C = canvas;
@@ -170,15 +159,11 @@ export function setupInput(canvas) {
       // Clicking on (or near) the existing flag removes it and drops the
       // army back to defend — one gesture places, the same gesture clears.
       if (G.rallyPoint && Math.hypot(t.x - G.rallyPoint.x, t.y - G.rallyPoint.y) <= 1.5) {
-        G.rallyPoint = null;
-        G.armyStance = 'defend';
-        setArmyTargets();
+        dispatch({ type: 'SET_RALLY', x: null, y: null });
         G.particles.push({ tx: t.x, ty: t.y, offsetY: -10, text: '🚩 removed', alpha: 1.4, vy: -0.15, decay: 0.012, type: 'text' });
         return;
       }
-      G.rallyPoint = { x: t.x, y: t.y };
-      G.armyStance = 'rally';
-      setArmyTargets();
+      dispatch({ type: 'SET_RALLY', x: t.x, y: t.y });
       G.particles.push({
         tx: t.x, ty: t.y, offsetY: -10,
         text: '🚩 Rally', alpha: 1.5, vy: -0.15, decay: 0.01, type: 'text',
@@ -191,7 +176,7 @@ export function setupInput(canvas) {
       e.preventDefault();
       const b = findBuildingAtClick(e.clientX, e.clientY);
       if (b) {
-        demolishBuilding(b);
+        dispatch({ type: 'DEMOLISH', x: b.x, y: b.y });
         G.selectedBuilding = null;
         hideInfoPanel();
         updateUI(); renderBuildBar();
@@ -282,8 +267,7 @@ export function setupInput(canvas) {
       if (order[idx] === 'rally' && !G.rallyPoint) continue;
       break;
     }
-    G.armyStance = order[idx];
-    setArmyTargets();
+    dispatch({ type: 'SET_STANCE', stance: order[idx] });
     updateUI();
   });
 
@@ -295,7 +279,7 @@ export function setupInput(canvas) {
       const t = e.touches[0];
       if (G.selectedBuild) {
         const tile = pickTile(t.clientX, t.clientY);
-        if (tile && placeBuilding(G.selectedBuild, tile.x, tile.y)) {
+        if (tile && dispatch({ type: 'PLACE_BUILDING', building: G.selectedBuild, x: tile.x, y: tile.y }).ok) {
           renderBuildBar(); renderMissions(); updateUI();
         }
         return;
@@ -337,7 +321,7 @@ export function setupInput(canvas) {
     if (e.key === 'Escape') { G.selectedBuild = null; G.selectedBuilding = null; hideInfoPanel(); renderBuildBar(); }
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      if (undoLastBuild()) { renderBuildBar(); updateUI(); }
+      if (dispatch({ type: 'UNDO' }).ok) { renderBuildBar(); updateUI(); }
       return;
     }
     if (e.key === 'Home') {
