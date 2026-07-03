@@ -74,7 +74,7 @@ export function updateAnimals() {
     const spec = SPECIES[a.type] || SPECIES.deer;
 
     // State machine
-    a.stateTimer -= G.speed;
+    a.stateTimer -= 1;
     if (a.stateTimer <= 0) {
       // Pick new target
       if (Math.random() < 0.3) {
@@ -99,7 +99,7 @@ export function updateAnimals() {
       const dx = a.tx - a.x, dy = a.ty - a.y;
       const d = Math.sqrt(dx * dx + dy * dy);
       if (d > 0.1) {
-        if (!stepEntityToward(a, a.tx, a.ty, spec.speed * G.speed)) {
+        if (!stepEntityToward(a, a.tx, a.ty, spec.speed)) {
           a.state = 'graze';
           a.stateTimer = 40 + Math.random() * 60;
         }

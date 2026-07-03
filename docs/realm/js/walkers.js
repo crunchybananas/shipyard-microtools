@@ -56,7 +56,7 @@ export function updateWalkers() {
     const dx = w.tx - w.x, dy = w.ty - w.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     const arrived = d <= 0.15;
-    const moved = arrived ? false : stepEntityToward(w, w.tx, w.ty, 0.03 * G.speed);
+    const moved = arrived ? false : stepEntityToward(w, w.tx, w.ty, 0.03);
     if (arrived || !moved) {
       if (w.hauler) {
         // Shuttle: store -> site -> store. Retire early if the wonder is
@@ -88,7 +88,7 @@ export function updateWalkers() {
       }
     }
     // Expire walker
-    w.life -= G.speed;
+    w.life -= 1;
     if (w.life <= 0) G.walkers.splice(i, 1);
   }
 }

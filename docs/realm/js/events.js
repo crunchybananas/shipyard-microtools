@@ -233,7 +233,7 @@ export const EVENT_DEFS = [
     canFire: () => G.buildings.some(b => ['house','tavern','bakery','lumber','windmill'].includes(b.type)),
     onStart() {
       const flammable = G.buildings.filter(b => ['house','tavern','bakery','lumber','windmill'].includes(b.type));
-      const b = flammable[Math.floor(Math.random() * flammable.length)];
+      const b = flammable[Math.floor(rng() * flammable.length)];
       b.onFire = true;
       b._fireTimer = 0;
     },
@@ -257,7 +257,7 @@ export const EVENT_DEFS = [
       // 2 while G.stats.citizensDied stayed at 0 and the chronicle never named
       // the fallen. Cycle 49 fixed the same class of bug for combat deaths;
       // this brings plague to parity.
-      const intent = 1 + Math.floor(Math.random() * 2); // 1 or 2
+      const intent = 1 + Math.floor(rng() * 2); // 1 or 2
       // Always leave at least one survivor. Plague should be a setback,
       // not a wipe — with a 2-citizen settlement, intent=2 would have
       // hit population zero and tripped realm_fell mid-event.

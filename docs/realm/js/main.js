@@ -457,7 +457,7 @@ window.toggleMissions = () => {
 
 // ── Day/Night ──────────────────────────────────────────────
 function updateTime() {
-  G.dayPhase += G.speed;
+  G.dayPhase += 1; // one tick = one unit of day-time (ENGINE.md rule 5)
   if (G.dayPhase >= G.dayLength) {
     G.dayPhase = 0;
     G.day++;
@@ -533,46 +533,40 @@ function updateTime() {
 }
 
 // ── Game Loop ──────────────────────────────────────────────
-function simTick() {
-  if (G.speed <= 0) return;
-  // Crossing check: true iff this simTick advanced gameTick across a multiple
-  // of N. Replaces bare `G.gameTick % N === 0`, which silently misses when
-  // G.speed doesn't divide N (e.g., speed=4 with an odd-parity gameTick never
-  // lands on any multiple of 30 → HUD freezes mid-game until you pause).
-  const crossed = (N) => Math.floor(G.gameTick / N) > Math.floor((G.gameTick - G.speed) / N);
-  for (let i = 0; i < G.speed; i++) {
-    G.gameTick++;
-    updateTime();
-    updateCitizens();
-    updateSoldiers();
-    updateEnemies();
-    updateTowers();
-    updateProjectiles();
-    updateWalkers();
-    updateAnimals();
-    updateBoats();
-    updateFlocks(window.innerWidth, window.innerHeight);
-    updateBalloons(window.innerWidth, window.innerHeight);
-    updateWolves();
-    updateCarts();
-    updateRainbow();
-    updateHawks(window.innerWidth, window.innerHeight);
-    updatePuddles();
-    updateFootprints();
-    updateSnowmen();
-    enhUpdateAll(window.innerWidth, window.innerHeight);
-    updateProduction();
-    updateFires();
-    updateParticles();
-    updateSmokeEmitters();
-    updateResearch();
-    if (crossed(60)) {
-      checkMissions();
-      renderMissions();
-      renderResearchPanel();
-    }
-  }
-  if (crossed(30)) {
+// ENGINE.md Phase 0: one coreTick = exactly ONE tick of sim time. G.speed
+// multiplies how many ticks run per frame (via the accumulator below) and
+// must never appear inside a tick function — the old shape multiplied by
+// G.speed inside functions already called G.speed times, so the day clock
+// ran speed² while gameTick-relative logic ran speed¹ (split-brain economy
+// at 2×/4×), and sim rate was tied to display refresh (120 Hz = 2× game).
+function coreTick() {
+  G.gameTick++;
+  updateTime();
+  updateCitizens();
+  updateSoldiers();
+  updateEnemies();
+  updateTowers();
+  updateProjectiles();
+  updateWalkers();
+  updateAnimals();
+  updateBoats();
+  updateFlocks(window.innerWidth, window.innerHeight);
+  updateBalloons(window.innerWidth, window.innerHeight);
+  updateWolves();
+  updateCarts();
+  updateRainbow();
+  updateHawks(window.innerWidth, window.innerHeight);
+  updatePuddles();
+  updateFootprints();
+  updateSnowmen();
+  enhUpdateAll(window.innerWidth, window.innerHeight);
+  updateProduction();
+  updateFires();
+  updateParticles();
+  updateSmokeEmitters();
+  updateResearch();
+  const t = G.gameTick;
+  if (t % 30 === 0) {
     // updateUI() already calls updateBuildBarAffordability() for in-place cost/lock
     // updates. Calling renderBuildBar() here would wipe bar.innerHTML every 500ms
     // — if that fires between a user's mousedown and click, the button element is
@@ -582,10 +576,18 @@ function simTick() {
     updateUI();
     updateTutorialTip();
   }
-  if (crossed(60)) { updateAmbient(); checkAchievements(); checkStoryBeats(); checkEraAdvance(); }
-  if (crossed(120)) { tickMusic(); checkAdvisor(); }
-  if (crossed(720)) updateWonder();
-  if (crossed(120) && !G._scenarioWon) {
+  if (t % 60 === 0) {
+    checkMissions();
+    renderMissions();
+    renderResearchPanel();
+    updateAmbient();
+    checkAchievements();
+    checkStoryBeats();
+    checkEraAdvance();
+  }
+  if (t % 120 === 0) { tickMusic(); checkAdvisor(); }
+  if (t % 720 === 0) updateWonder();
+  if (t % 120 === 0 && !G._scenarioWon) {
     if (checkScenarioComplete()) {
       G._scenarioWon = true;
       G._scenariosCompleted = G._scenariosCompleted || [];
@@ -604,12 +606,12 @@ function simTick() {
       showScenarioVictory();
     }
   }
-  if (G.gameTick % 3600 === 0 && G.gameTick > 0) saveGame({ silent: true });
+  if (t % 3600 === 0 && t > 0) saveGame({ silent: true });
   // Bird spawning — screen-space birds fly across sky during daytime.
   // Spawn fully offscreen-left so they don't appear inside the vignette void;
   // let them fly across the visible map and exit right.
   if (!G.birds) G.birds = [];
-  if (G.gameTick % 400 === 0 && G.birds.length < 3 && getDaylight() > 0.6) {
+  if (t % 400 === 0 && G.birds.length < 3 && getDaylight() > 0.6) {
     G.birds.push({
       x: -80 - Math.random() * 60,
       y: 80 + Math.random() * 120,
@@ -617,6 +619,35 @@ function simTick() {
       vy: 0,
     });
   }
+}
+
+// Fixed-timestep accumulator: 1× speed = 60 ticks per wall-clock second,
+// independent of display refresh rate (ProMotion 120 Hz used to run the
+// game twice as fast) and of tab visibility (hidden tabs now keep real
+// time — the town keeps working, which the welcome-back summary already
+// celebrates). Catch-up is capped; sim time beyond the cap is dropped.
+const TICK_MS = 1000 / 60;
+const MAX_TICKS_PER_FRAME = 30;
+let _tickAccum = 0;
+let _lastTickTime = 0;
+
+function runPendingTicks(nowMs) {
+  if (_lastTickTime === 0) _lastTickTime = nowMs;
+  let frameMs = nowMs - _lastTickTime;
+  _lastTickTime = nowMs;
+  if (frameMs < 0) frameMs = 0;
+  if (frameMs > 500) frameMs = 500; // debugger pause / long stall — drop the excess
+  if (G.speed <= 0) { _tickAccum = 0; return 0; }
+  _tickAccum += (frameMs / TICK_MS) * G.speed;
+  let n = Math.floor(_tickAccum);
+  if (n > MAX_TICKS_PER_FRAME) {
+    n = MAX_TICKS_PER_FRAME;
+    _tickAccum = 0;
+  } else {
+    _tickAccum -= n;
+  }
+  for (let i = 0; i < n; i++) coreTick();
+  return n;
 }
 
 // ── Loop 081 (the-fixer, 069 filed 12 ticks ago) ─────────────
@@ -641,28 +672,16 @@ function fastForward(days) {
   if (!Number.isFinite(days) || days <= 0) return { error: 'days must be positive number' };
   const startDay = G.day;
   const targetDay = startDay + Math.floor(days);
-  const origSpeed = G.speed;
-  // Loop 291 (the-fixer, 289 [code] filing): reduced fastForward G.speed
-  // from 60 to 12 so dayPhase windows are SAMPLED during the run.
-  // Root cause discovered at 291: simTick's inner for-loop calls
-  // updateTime() G.speed times, each adding G.speed to dayPhase. At
-  // G.speed=60 that's 60*60=3600 dayPhase per simTick = a full day per
-  // simTick. checkStoryBeats fires at end-of-simTick with dayPhase=0
-  // (just rolled over). dayPhase-window beats (266 summer-night > 0.75,
-  // 280 late-day > 0.6) silently never fired. With G.speed=12, dayPhase
-  // advances 12*12=144 per simTick (~25 simTicks per game-day);
-  // checkStoryBeats fires at fractions 0.2/0.4/0.6/0.8/1.0 each day,
-  // covering both 266's > 0.75 and 280's > 0.6 gates. ~25× more simTicks
-  // than 60-speed path but still ~25 simTicks/day = fast enough for
-  // verify/play scripts.
-  G.speed = 12;
-  const maxIters = Math.ceil(days * G.dayLength / (G.speed * G.speed)) * 2 + 100;
+  // Phase 0 rewrite: coreTick() is exactly one tick, so fast-forward is a
+  // plain tick loop — no speed tricks. dayPhase advances 1/tick, so every
+  // dayPhase-window story beat (the old Loop 291 hack) is sampled naturally
+  // by the %60 checkStoryBeats gate.
+  const maxIters = days * G.dayLength * 2 + 100;
   let iters = 0;
   while (G.day < targetDay && iters < maxIters) {
-    simTick();
+    coreTick();
     iters++;
   }
-  G.speed = origSpeed;
   return {
     advancedDays: G.day - startDay,
     gameTick: G.gameTick,
@@ -767,11 +786,14 @@ function gameLoop() {
       }
       _lastLoopStart = loopStart;
       _loopFrame++;
-      simTick();
+      runPendingTicks(loopStart);
       _renderFrame();
       requestAnimationFrame(gameLoop);
     } else {
-      for (let i = 0; i < 4; i++) simTick();
+      // Hidden tab: rAF is throttled off, so drive the same accumulator on a
+      // timer. Real elapsed time still converts to ticks (capped), so the
+      // town keeps working at true speed in the background.
+      runPendingTicks(performance.now());
       // Always paint at the hidden-tab cadence (timer-clamped to ~1-4fps):
       // embedded/preview contexts report 'hidden' while still being watched,
       // and returning to a never-painted canvas reads as frozen citizens.

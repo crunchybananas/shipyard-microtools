@@ -153,7 +153,10 @@ const MAYOR_LAST  = ['the Steady','the Bold','Ironheart','of the Vale','Fairwind
 const BARD_FIRST  = ['Lilian','Merek','Oriel','Piper','Roderic','Seraphine','Tomas','Wren'];
 const RIVAL_NAMES = ['Lord Vorgan of the Ashlands','Baroness Sable of Crowhold','The Iron Earl Draven','Duchess Morrigan of Nightshade'];
 
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+// Chronicle text and named characters are SAVED state — variant choice must
+// be deterministic (ENGINE.md rule 2). Keyed off the game clock instead of
+// Math.random so the same realm at the same tick always picks the same prose.
+function pick(arr) { return arr[(G.day * 31 + G.gameTick) % arr.length]; }
 
 export function ensureMayor() {
   initChronicle();

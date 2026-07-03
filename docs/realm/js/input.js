@@ -2,7 +2,7 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=128';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH, rngRange } from './state.js?realm=128';
 import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=128';
 import { placeBuilding, demolishBuilding, undoLastBuild, canPlace, canAfford } from './economy.js?realm=128';
 import { notify } from './notifications.js?realm=128';
@@ -143,11 +143,11 @@ function tryPlaceAt(tx, ty) {
 export function setArmyTargets() {
   for (const s of G.soldiers) {
     if (G.armyStance === 'rally' && G.rallyPoint) {
-      s.tx = G.rallyPoint.x + Math.random() * 4 - 2;
-      s.ty = G.rallyPoint.y + Math.random() * 4 - 2;
+      s.tx = G.rallyPoint.x + rngRange(-2, 2);
+      s.ty = G.rallyPoint.y + rngRange(-2, 2);
     } else if (G.armyStance === 'defend' && s.homeBuilding) {
-      s.tx = s.homeBuilding.x + Math.random() * 6 - 3;
-      s.ty = s.homeBuilding.y + Math.random() * 6 - 3;
+      s.tx = s.homeBuilding.x + rngRange(-3, 3);
+      s.ty = s.homeBuilding.y + rngRange(-3, 3);
     }
     s.stateTimer = 1; // re-anchor (incl. patrol posts) on next tick
   }

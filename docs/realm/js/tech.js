@@ -252,7 +252,7 @@ export function updateResearch() {
   // chronicle beat (034's character-intro already announced teacher).
   const teacherBonus = G.namedCharacters?.teacher ? 0.1 : 0;
   const speedMult = 1 + schools * 0.5 + teacherBonus;
-  G.currentResearch.progress += G.speed * speedMult;
+  G.currentResearch.progress += speedMult;
   if (G.currentResearch.progress >= G.currentResearch.total) {
     const techId = G.currentResearch.techId;
     G.researchedTechs.add(techId);

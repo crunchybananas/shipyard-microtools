@@ -221,11 +221,11 @@ export function trySpawnSettlers(count) {
       playSound('mission');
       for (let i = 0; i < 20; i++) {
         G.particles.push({
-          tx: MAP_W/2 + (Math.random()-0.5)*6,
-          ty: MAP_H/2 + (Math.random()-0.5)*6,
-          offsetY: -15 - Math.random()*25,
-          text: ['🎉','⭐','✨'][Math.floor(Math.random()*3)],
-          alpha: 1.5, vy: -0.15 - Math.random()*0.2,
+          tx: MAP_W/2 + (rng()-0.5)*6,
+          ty: MAP_H/2 + (rng()-0.5)*6,
+          offsetY: -15 - rng()*25,
+          text: ['🎉','⭐','✨'][Math.floor(rng()*3)],
+          alpha: 1.5, vy: -0.15 - rng()*0.2,
           decay: 0.008, type: 'text',
         });
       }
@@ -240,7 +240,7 @@ export function updateProduction() {
     if (b.buildProgress !== undefined && b.buildProgress < 1) {
       const total = b.buildTotal || constructionTicks(b.type);
       const before = b.buildProgress;
-      b.buildProgress = Math.min(1, b.buildProgress + (G.speed || 1) / total);
+      b.buildProgress = Math.min(1, b.buildProgress + 1 / total);
       if ((G.gameTick || 0) % 18 === 0 && G.particles.length < 280) {
         spawnDust(b.x, b.y);
       }
@@ -366,8 +366,8 @@ export function updateProduction() {
       if (b.prodShowCount % 3 === 0) {
         for (const [k,v] of Object.entries(adjustedProd)) {
           if (v > 0) G.particles.push({
-            tx: b.x + (Math.random() - 0.5) * 0.16,
-            ty: b.y + (Math.random() - 0.5) * 0.16,
+            tx: b.x + (rng() - 0.5) * 0.16,
+            ty: b.y + (rng() - 0.5) * 0.16,
             offsetY: -3,
             text: null,
             alpha: 0.95,
@@ -643,12 +643,12 @@ export function checkRaids() {
     G._raidSpawnCount = raiders; // morale-break baseline (combat.js)
     // Spawn enemy raiders that visibly approach the settlement
     for (let i = 0; i < raiders; i++) {
-      const side = Math.floor(Math.random() * 4);
+      const side = Math.floor(rng() * 4);
       let ex, ey;
-      if (side === 0) { ex = Math.random() * MAP_W; ey = 0; }
-      else if (side === 1) { ex = MAP_W - 1; ey = Math.random() * MAP_H; }
-      else if (side === 2) { ex = Math.random() * MAP_W; ey = MAP_H - 1; }
-      else { ex = 0; ey = Math.random() * MAP_H; }
+      if (side === 0) { ex = rng() * MAP_W; ey = 0; }
+      else if (side === 1) { ex = MAP_W - 1; ey = rng() * MAP_H; }
+      else if (side === 2) { ex = rng() * MAP_W; ey = MAP_H - 1; }
+      else { ex = 0; ey = rng() * MAP_H; }
       G.enemies.push({
         x: ex, y: ey, tx: MAP_W/2, ty: MAP_H/2,
         hp: isFirstRaid ? 24 : 30,
@@ -657,19 +657,19 @@ export function checkRaids() {
         plunderGoal: isFirstRaid ? 20 : (hasDefense ? 42 : 30),
         type: 'raider',
         state: 'approach',
-        variant: Math.floor(Math.random() * 3), // 0=swordsman 1=spearman 2=berserker
+        variant: Math.floor(rng() * 3), // 0=swordsman 1=spearman 2=berserker
       });
     }
 
     // Raid visual effects — dramatic particles at settlement center
     for (let i = 0; i < 15; i++) {
       G.particles.push({
-        tx: MAP_W/2 + (Math.random()-0.5)*10,
-        ty: MAP_H/2 + (Math.random()-0.5)*10,
-        offsetY: -10 - Math.random()*20,
-        text: ['⚔️','💥','🔥'][Math.floor(Math.random()*3)],
+        tx: MAP_W/2 + (rng()-0.5)*10,
+        ty: MAP_H/2 + (rng()-0.5)*10,
+        offsetY: -10 - rng()*20,
+        text: ['⚔️','💥','🔥'][Math.floor(rng()*3)],
         alpha: 1.5,
-        vy: -0.2 - Math.random()*0.15,
+        vy: -0.2 - rng()*0.15,
         decay: 0.01,
         type: 'text',
       });
@@ -765,7 +765,7 @@ function updateCaravans() {
       // Caravans respect building footprints (terrain stays unrestricted so
       // existing edge routes keep working); if boxed in, skirt sideways.
       const caravanOpen = (x, y) => { const bb = G.buildingGrid[y]?.[x]; return !bb || bb.type === 'road'; };
-      const moved = stepEntityToward(c, c.tx, c.ty, c.speed * G.speed, caravanOpen);
+      const moved = stepEntityToward(c, c.tx, c.ty, c.speed, caravanOpen);
       if (!moved) { c.tx += rngRange(-3, 3); c.ty += rngRange(-3, 3); }
     } else {
       if (c.phase === 'outbound') {
@@ -901,15 +901,15 @@ function spawnVictoryConfetti() {
   const pieces = [];
   for (let i = 0; i < 80; i++) {
     pieces.push({
-      x: Math.random() * canvas.width,
-      y: -10 - Math.random() * canvas.height * 0.5,
-      w: 6 + Math.random() * 8,
-      h: 4 + Math.random() * 5,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      rot: Math.random() * Math.PI * 2,
-      vx: (Math.random() - 0.5) * 3,
-      vy: 2 + Math.random() * 4,
-      vrot: (Math.random() - 0.5) * 0.2,
+      x: rng() * canvas.width,
+      y: -10 - rng() * canvas.height * 0.5,
+      w: 6 + rng() * 8,
+      h: 4 + rng() * 5,
+      color: COLORS[Math.floor(rng() * COLORS.length)],
+      rot: rng() * Math.PI * 2,
+      vx: (rng() - 0.5) * 3,
+      vy: 2 + rng() * 4,
+      vrot: (rng() - 0.5) * 0.2,
       alpha: 1,
     });
   }
@@ -943,13 +943,13 @@ function spawnVictoryConfetti() {
 export function updateFires() {
   for (const b of [...G.buildings]) {
     if (!b.onFire) continue;
-    b._fireTimer = (b._fireTimer || 0) + G.speed;
-    b.hp -= 0.5 * G.speed;
+    b._fireTimer = (b._fireTimer || 0) + 1;
+    b.hp -= 0.5;
     // Spawn fire particles every 4 ticks
     if (G.gameTick % 4 === 0) {
       G.particles.push({
-        tx: b.x + (Math.random()-0.5)*0.5, ty: b.y + (Math.random()-0.5)*0.5,
-        offsetY: -20 - Math.random()*10,
+        tx: b.x + (rng()-0.5)*0.5, ty: b.y + (rng()-0.5)*0.5,
+        offsetY: -20 - rng()*10,
         text: '🔥', alpha: 1, vy: -0.2, decay: 0.03, type: 'text',
       });
     }
@@ -958,7 +958,7 @@ export function updateFires() {
     for (const w of G.buildings) {
       if (w.type !== 'well') continue;
       const d = Math.abs(w.x - b.x) + Math.abs(w.y - b.y);
-      if (d <= 4 && Math.random() < 0.02) {
+      if (d <= 4 && rng() < 0.02) {
         b.onFire = false;
         doused = true;
         G.particles.push({
@@ -970,7 +970,7 @@ export function updateFires() {
     }
     if (doused) continue;
     // Burn out over time or randomly
-    if (b._fireTimer > 300 || Math.random() < 0.005) {
+    if (b._fireTimer > 300 || rng() < 0.005) {
       b.onFire = false;
       continue;
     }

@@ -360,7 +360,7 @@ function evacuateBlockedCitizen(c) {
   const d = Math.hypot(dx, dy);
   if (d > 0.001) {
     // ~2x walk speed: urgent but no longer a 10x teleport-skate
-    const step = Math.min(0.06 * Math.max(1, G.speed || 1), d);
+    const step = Math.min(0.06, d);
     const nx = c.x + (dx / d) * step;
     const ny = c.y + (dy / d) * step;
     // Evacuation goes through the same step gate as every other mover, so
@@ -463,12 +463,12 @@ function applyCitizenSeparation() {
 export function updateCitizens() {
   // Loop 71 (render S4): decrement hurtTimer each sim tick so the flash fades.
   for (const c of G.citizens) {
-    if (c.hurtTimer > 0) c.hurtTimer -= G.speed;
+    if (c.hurtTimer > 0) c.hurtTimer -= 1;
   }
   for (const c of G.citizens) {
     // ── Decision heartbeat (AI audit): obligations preempt from ANY state
     // on a short cadence — the brain no longer waits for the body to stop.
-    if ((G.gameTick + (c._hb ?? (c._hb = Math.floor(Math.random() * 12)))) % 12 === 0) {
+    if ((G.gameTick + (c._hb ?? (c._hb = citizenHash(c) % 12))) % 12 === 0) {
       // Eat on the go: a quick bite from the realm stores keeps busy or
       // stuck citizens from saturating at hunger 100 and crawling.
       if (c.hunger > 75 && G.resources.food > 0 && c.state !== 'eating') {
@@ -519,10 +519,10 @@ export function updateCitizens() {
     // usually resolves it, but the player should still see the need)
     if (c.hunger > 70) {
       const emoteInterval = 120; // every 2 seconds at 1x
-      if (!c._hungerEmoteTimer) c._hungerEmoteTimer = Math.floor(Math.random() * emoteInterval);
+      if (!c._hungerEmoteTimer) c._hungerEmoteTimer = Math.floor(rng() * emoteInterval);
       c._hungerEmoteTimer--;
       if (c._hungerEmoteTimer <= 0) {
-        c._hungerEmoteTimer = emoteInterval + Math.floor(Math.random() * 60);
+        c._hungerEmoteTimer = emoteInterval + Math.floor(rng() * 60);
         const emote = c.hunger >= 90 ? '❗' : '🍽️';
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -22,
@@ -561,7 +561,7 @@ export function updateCitizens() {
       if (d < 0.15) {
         c.pathIdx++;
       } else {
-        let spd = c.speed * G.speed * getSeasonData().speedMult * getCitizenSpeedMult();
+        let spd = c.speed * getSeasonData().speedMult * getCitizenSpeedMult();
         // Road speed bonus
         const gx = Math.round(c.x), gy = Math.round(c.y);
         if (gx >= 0 && gx < MAP_W && gy >= 0 && gy < MAP_H) {
@@ -613,7 +613,7 @@ export function updateCitizens() {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {
-        let spd = c.speed * G.speed * getCitizenSpeedMult();
+        let spd = c.speed * getCitizenSpeedMult();
         if (c.hunger > 60) {
           const penalty = Math.min(0.4, (c.hunger - 60) / 100);
           spd *= (1 - penalty);
@@ -639,7 +639,7 @@ export function updateCitizens() {
     }
 
     // Arrived or no movement needed — run state machine
-    c.stateTimer -= G.speed;
+    c.stateTimer -= 1;
     if (c.stateTimer > 0) continue;
     runStateMachine(c);
   }
@@ -771,12 +771,12 @@ function runStateMachine(c) {
     case 'working':
       // Work-site feedback: periodic chips/grain at the workplace so labor
       // reads as labor even between production cycles.
-      if (c.jobBuilding && G.gameTick % 24 === 0 && Math.random() < 0.6) {
+      if (c.jobBuilding && G.gameTick % 24 === 0 && rng() < 0.6) {
         G.particles.push({
-          tx: c.jobBuilding.x + (Math.random() - 0.5) * 0.5,
-          ty: c.jobBuilding.y + (Math.random() - 0.5) * 0.5,
+          tx: c.jobBuilding.x + (rng() - 0.5) * 0.5,
+          ty: c.jobBuilding.y + (rng() - 0.5) * 0.5,
           offsetY: -6, text: null, alpha: 0.85,
-          vx: (Math.random() - 0.5) * 0.25, vy: -0.15, decay: 0.05,
+          vx: (rng() - 0.5) * 0.25, vy: -0.15, decay: 0.05,
           type: 'spark', size: 1.0, color: '#c9a86a',
         });
       }

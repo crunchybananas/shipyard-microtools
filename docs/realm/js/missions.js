@@ -2,7 +2,7 @@
 // Missions — goals and progression
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=128';
+import { G, MAP_W, MAP_H, rng } from './state.js?realm=128';
 import { playSound } from './audio.js?realm=128';
 import { getActiveScenario } from './scenarios.js?realm=128';
 
@@ -97,17 +97,17 @@ function celebrateMission(x, y) {
   const confettiColors = ['#ff4d6d','#ffd87a','#4da6ff','#7afca0','#ff9c1c','#c07aff'];
   const glyphs = ['🎉','🎊','🌟','✨'];
   for (let i = 0; i < 12; i++) {
-    const ang = (i / 12) * Math.PI * 2 + Math.random() * 0.5;
-    const radialPush = 0.55 + Math.random() * 0.25;
+    const ang = (i / 12) * Math.PI * 2 + rng() * 0.5;
+    const radialPush = 0.55 + rng() * 0.25;
     G.particles.push({
       tx: x + Math.cos(ang) * radialPush,
       ty: y + Math.sin(ang) * radialPush * 0.6, // squashed for iso
-      offsetY: -8 + Math.random() * 4,
-      vy: -0.5 - Math.random() * 0.35,
+      offsetY: -8 + rng() * 4,
+      vy: -0.5 - rng() * 0.35,
       alpha: 1.9, decay: 0.012, type: 'text',
       text: glyphs[i % glyphs.length],
       color: confettiColors[i % confettiColors.length],
-      _driftX: (Math.random() - 0.5) * 1.6, // per-particle horizontal spread
+      _driftX: (rng() - 0.5) * 1.6, // per-particle horizontal spread
     });
   }
   // Headline ribbon — rises centered over the focal point
@@ -124,7 +124,7 @@ export function checkMissions() {
   for (const m of missions) {
     if (!m.done && m.check()) {
       m.done = true;
-      m._celebratedAt = Date.now();
+      m._celebratedTick = G.gameTick; // tick-based (core file — no Date.now)
       const focal = missionFocalPoint(m);
       celebrateMission(focal.x, focal.y);
       if (m.reward) {
@@ -206,7 +206,7 @@ export function renderMissions() {
     // Loop 78: recent completions pulse the row gold for ~2.2s so the
     // eye catches which mission just finished (rather than just a toast
     // + line-through with no origin cue).
-    if (m._celebratedAt && Date.now() - m._celebratedAt < 2200) {
+    if (m._celebratedTick && G.gameTick - m._celebratedTick < 132) { // ~2.2s at 1×
       cls += ' mission-celebrate';
     }
     div.className = cls;

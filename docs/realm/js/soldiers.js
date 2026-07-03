@@ -22,7 +22,7 @@ function soldierDamage(s) {
 // patrol = walk the wall/tower line.
 function armyAnchor(s) {
   if (G.armyStance === 'rally' && G.rallyPoint) {
-    return { x: G.rallyPoint.x + (Math.random() * 4 - 2), y: G.rallyPoint.y + (Math.random() * 4 - 2) };
+    return { x: G.rallyPoint.x + (rng() * 4 - 2), y: G.rallyPoint.y + (rng() * 4 - 2) };
   }
   if (G.armyStance === 'patrol') {
     if (!G._patrolPosts || G._patrolPostsBuildingCount !== G.buildings.length) {
@@ -87,10 +87,10 @@ export function updateSoldiers() {
         const idealRange = 5;
         if (nearestDist < idealRange - 1) {
           // Too close — back up (collision-checked, slides along buildings)
-          stepEntityToward(s, s.x - (nearestEnemy.x - s.x), s.y - (nearestEnemy.y - s.y), 0.02 * G.speed * Math.max(1, nearestDist));
+          stepEntityToward(s, s.x - (nearestEnemy.x - s.x), s.y - (nearestEnemy.y - s.y), 0.02 * Math.max(1, nearestDist));
         } else if (nearestDist < idealRange + 2) {
           // In range — fire arrow
-          s.attackTimer = (s.attackTimer || 0) - G.speed;
+          s.attackTimer = (s.attackTimer || 0) - 1;
           if (s.attackTimer <= 0) {
             s.attackTimer = 90;
             G.projectiles.push({
@@ -103,7 +103,7 @@ export function updateSoldiers() {
           }
         } else {
           // Close the gap
-          stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.035 * G.speed);
+          stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.035);
         }
         continue; // skip default melee logic
       }
@@ -112,10 +112,10 @@ export function updateSoldiers() {
       const dx = nearestEnemy.x - s.x, dy = nearestEnemy.y - s.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.5) {
-        stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.04 * G.speed);
+        stepEntityToward(s, nearestEnemy.x, nearestEnemy.y, 0.04);
       } else {
         // Attack cooldown
-        s.attackTimer = (s.attackTimer || 0) - G.speed;
+        s.attackTimer = (s.attackTimer || 0) - 1;
         if (s.attackTimer <= 0) {
           s.attackTimer = 40;
           nearestEnemy.hp -= soldierDamage(s);
@@ -134,7 +134,7 @@ export function updateSoldiers() {
     const dx = s.tx - s.x, dy = s.ty - s.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     if (d > 0.1) {
-      if (!stepEntityToward(s, s.tx, s.ty, 0.03 * G.speed)) {
+      if (!stepEntityToward(s, s.tx, s.ty, 0.03)) {
         // Blocked — pick a fresh reachable patrol point instead of grinding
         const t = nearestWalkableTile(Math.round(s.x + rngRange(-4, 4)), Math.round(s.y + rngRange(-4, 4)), 4);
         if (t) { s.tx = t.x; s.ty = t.y; }

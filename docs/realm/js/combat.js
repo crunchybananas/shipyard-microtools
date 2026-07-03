@@ -2,7 +2,7 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H } from './state.js?realm=128';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=128';
 import { stepEntityToward } from './pathfinding.js?realm=128';
 import { spawnClashFX } from './particles.js?realm=128';
 
@@ -52,7 +52,7 @@ export function updateEnemies() {
         if (ns && nd <= MILCFG.engage) e.engaged = ns;
       }
       if (e.engaged) {
-        e.attackTimer = (e.attackTimer || 0) - G.speed;
+        e.attackTimer = (e.attackTimer || 0) - 1;
         if (e.attackTimer <= 0) {
           e.attackTimer = MILCFG.raiderCooldown;
           e.engaged.hp -= MILCFG.raiderDmg;
@@ -68,11 +68,11 @@ export function updateEnemies() {
     const wall = G.buildingGrid[ny]?.[nx];
     if (wall && wall.type === 'wall' && wall.hp > 0) {
       // Attack wall instead of passing through
-      wall.hp -= 0.35 * G.speed;
+      wall.hp -= 0.35;
       wall.hurtTimer = 12;
       e._swing = 8;
       if (G.gameTick % 30 === 0) {
-        G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (Math.random()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
+        G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
       }
       if (wall.hp <= 0) {
         // Use demolishBuilding so defense/maxPop/workers are all cleaned up properly
@@ -90,7 +90,7 @@ export function updateEnemies() {
       const raiderOpen = e.retreating
         ? () => true
         : (x, y) => { const bb = G.buildingGrid[y]?.[x]; return !bb || bb.type === 'road'; };
-      const moved = stepEntityToward(e, e.tx, e.ty, 0.02 * G.speed, raiderOpen);
+      const moved = stepEntityToward(e, e.tx, e.ty, 0.02, raiderOpen);
       if (!moved && !e.retreating) {
         // Blocked by a building — attack it (walls and everything else),
         // so sieges resolve instead of raiders milling at the perimeter.
@@ -98,17 +98,17 @@ export function updateEnemies() {
         const by = Math.round(e.y) + Math.sign(Math.round(e.ty) - Math.round(e.y));
         const blocker = G.buildingGrid[by]?.[bx] || G.buildingGrid[Math.round(e.y)]?.[bx] || G.buildingGrid[by]?.[Math.round(e.x)];
         if (blocker && blocker.hp > 0) {
-          blocker.hp -= 0.35 * G.speed;
+          blocker.hp -= 0.35;
           blocker.hurtTimer = 12;
           e._swing = 8;
           if (G.gameTick % 30 === 0) {
-            G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (Math.random()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
+            G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
           }
           if (blocker.hp <= 0) demolishBuilding(blocker, true);
         } else {
           // Boxed in with nothing to hit — skirt sideways
-          e.tx += (Math.random() - 0.5) * 5;
-          e.ty += (Math.random() - 0.5) * 5;
+          e.tx += (rng() - 0.5) * 5;
+          e.ty += (rng() - 0.5) * 5;
         }
       }
     } else if (e.retreating) {
@@ -123,7 +123,7 @@ export function updateEnemies() {
         return !best || bd < best.d ? { b, d: bd } : best;
       }, null);
       if (target) {
-        e.attackTimer = (e.attackTimer || 0) - G.speed;
+        e.attackTimer = (e.attackTimer || 0) - 1;
         if (e.attackTimer > 0) continue;
         e.attackTimer = 55;
         const dmg = e.damage || 7;
@@ -173,7 +173,7 @@ export function updateEnemies() {
       if (d > 2.5) continue;
       // Raiders should scare citizens into fleeing, not erase the town
       // population before the player can react.
-      c.hp = (c.hp !== undefined ? c.hp : 100) - 0.08 * G.speed;
+      c.hp = (c.hp !== undefined ? c.hp : 100) - 0.08;
       // Loop 71 (render S4): set a hurt timer so the renderer can flash the
       // citizen red briefly. Refresh on each damage tick so continuous harm
       // reads as a sustained flash rather than stuttering.
@@ -214,10 +214,10 @@ export function updateEnemies() {
       // Death particles — dramatic blood splat effect
       for (let p = 0; p < 8; p++) {
         G.particles.push({
-          tx: e.x + (Math.random()-0.5)*0.3, ty: e.y + (Math.random()-0.5)*0.3,
-          offsetY: -5 - Math.random()*10,
+          tx: e.x + (rng()-0.5)*0.3, ty: e.y + (rng()-0.5)*0.3,
+          offsetY: -5 - rng()*10,
           text: p < 2 ? '💀' : '•',
-          alpha: 1.5, vy: -0.15 - Math.random()*0.15, decay: 0.03,
+          alpha: 1.5, vy: -0.15 - rng()*0.15, decay: 0.03,
           type: 'text',
           color: '#8a1a1a',
         });
@@ -272,7 +272,7 @@ export function updateProjectiles() {
         // 5 small white sparks radiating from the impact point, fade fast.
         const hx = p.target.x, hy = p.target.y;
         for (let k = 0; k < 5; k++) {
-          const ang = (k / 5) * Math.PI * 2 + Math.random() * 0.4;
+          const ang = (k / 5) * Math.PI * 2 + rng() * 0.4;
           G.particles.push({
             tx: hx, ty: hy, offsetY: -8,
             text: null, alpha: 1.0,
@@ -284,7 +284,7 @@ export function updateProjectiles() {
       }
       G.projectiles.splice(i, 1);
     } else {
-      const spd = 0.3 * G.speed;
+      const spd = 0.3;
       p.x += (dx/d) * spd;
       p.y += (dy/d) * spd;
     }
@@ -297,7 +297,7 @@ export function updateTowers() {
     if (b.type !== 'tower' && b.type !== 'barracks') continue;
     // A scaffold doesn't shoot: no fire until construction completes.
     if (b.buildProgress !== undefined && b.buildProgress < 1) continue;
-    b.fireTimer = (b.fireTimer || 0) - G.speed;
+    b.fireTimer = (b.fireTimer || 0) - 1;
     if (b.fireTimer > 0) continue;
     // Find nearest enemy
     // Garrisoned towers see further and reload faster; archer occupants

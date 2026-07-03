@@ -175,7 +175,7 @@ export function updateFootprints() {
     }
   }
   for (let i = G.footprints.length - 1; i >= 0; i--) {
-    G.footprints[i].age += G.speed;
+    G.footprints[i].age += 1;
     if (G.footprints[i].age >= G.footprints[i].life) G.footprints.splice(i, 1);
   }
 }
@@ -254,7 +254,7 @@ export function updatePuddles() {
     _puddleAge = PUDDLE_DURATION;
   }
   _prevWeather2 = G.weather;
-  if (_puddleAge > 0) _puddleAge -= G.speed;
+  if (_puddleAge > 0) _puddleAge -= 1;
 }
 export function renderPuddles(ctx) {
   if (_puddleAge <= 0 || G.camera.zoom < 0.7) return;
@@ -371,8 +371,8 @@ export function updateHawks(logicalW, logicalH) {
   }
   for (let i = G.hawks.length - 1; i >= 0; i--) {
     const h = G.hawks[i];
-    h.angle += h.angVel * G.speed;
-    h.life -= G.speed;
+    h.angle += h.angVel;
+    h.life -= 1;
     if (h.life <= 0) G.hawks.splice(i, 1);
   }
 }
@@ -422,7 +422,7 @@ export function updateRainbow() {
     _rainbowAge = RAINBOW_DURATION;
   }
   _prevWeather = G.weather;
-  if (_rainbowAge > 0) _rainbowAge -= G.speed;
+  if (_rainbowAge > 0) _rainbowAge -= 1;
 }
 export function renderRainbow(ctx, logicalW, logicalH) {
   if (_rainbowAge <= 0) return;
@@ -480,7 +480,7 @@ export function updateCarts() {
         }
       }
     } else if (c.state === 'unloading') {
-      c.stateTimer -= G.speed;
+      c.stateTimer -= 1;
       if (c.stateTimer <= 0) {
         c.state = 'leaving';
         const exit = cartEdgeStartNear(c.x, c.y);
@@ -561,7 +561,7 @@ function stepCartAlongPath(cart, baseSpeed) {
   cart.tx = target.x;
   cart.ty = target.y;
   if (d < 0.08) return true;
-  const spd = baseSpeed * G.speed;
+  const spd = baseSpeed;
   cart.x += (dx / d) * Math.min(spd, d);
   cart.y += (dy / d) * Math.min(spd, d);
   return true;
@@ -826,13 +826,13 @@ export function updateWolves() {
         if (tile === TILE.FOREST || tile === TILE.GRASS) { w.tx = nx; w.ty = ny; break; }
       }
     } else {
-      const spd = 0.018 * G.speed;
+      const spd = 0.018;
       w.x += (dx / d) * Math.min(spd, d);
       w.y += (dy / d) * Math.min(spd, d);
     }
-    w.howlTimer -= G.speed;
+    w.howlTimer -= 1;
     if (w.howlTimer <= 0) { w.howling = 30; w.howlTimer = 400 + Math.random() * 600; }
-    if (w.howling > 0) w.howling -= G.speed;
+    if (w.howling > 0) w.howling -= 1;
   }
 }
 export function renderWolves(ctx) {
@@ -1160,7 +1160,7 @@ export function updateBoats() {
         }
       }
     } else {
-      const spd = 0.012 * G.speed;
+      const spd = 0.012;
       const stepX = (dx / d) * Math.min(spd, d);
       const stepY = (dy / d) * Math.min(spd, d);
       if (isOpenWater(b.x + stepX, b.y + stepY)) {
@@ -1170,7 +1170,7 @@ export function updateBoats() {
         b.tx = b.x; b.ty = b.y;
       }
     }
-    b.wakeT += G.speed;
+    b.wakeT += 1;
     // Despawn occasionally to refresh
     if (Math.random() < 0.0001) G.boats.splice(i, 1);
   }
@@ -1430,7 +1430,7 @@ function _wandererTick() {
   const dx = _wanderer.tx - _wanderer.x, dy = _wanderer.ty - _wanderer.y;
   const d = Math.sqrt(dx*dx + dy*dy);
   if (d < 0.5) { _wanderer = null; return; }
-  const spd = _wanderer.speed * (G.speed || 1);
+  const spd = _wanderer.speed;
   _wanderer.x += (dx / d) * spd;
   _wanderer.y += (dy / d) * spd;
 }
@@ -1542,10 +1542,10 @@ function updateVolcano() {
   }
   for (let i = G.volcanoSmoke.length - 1; i >= 0; i--) {
     const p = G.volcanoSmoke[i];
-    p.oy += p.vy * G.speed;
-    p.ox += p.vx * G.speed;
-    p.size += 0.05 * G.speed;
-    p.alpha -= 0.004 * G.speed;
+    p.oy += p.vy;
+    p.ox += p.vx;
+    p.size += 0.05;
+    p.alpha -= 0.004;
     if (p.alpha <= 0) G.volcanoSmoke.splice(i, 1);
   }
 }
@@ -1664,9 +1664,9 @@ function updateOwls() {
     }
   }
   for (const o of G.owls) {
-    o.blinkPhase += G.speed;
+    o.blinkPhase += 1;
     if (Math.random() < 0.005) o.hoot = 30;
-    if (o.hoot > 0) o.hoot -= G.speed;
+    if (o.hoot > 0) o.hoot -= 1;
   }
 }
 function renderOwls(ctx) {
@@ -1731,7 +1731,7 @@ function updateTradeShip() {
   }
   for (let i = G.tradeShips.length - 1; i >= 0; i--) {
     const s = G.tradeShips[i];
-    s.x += s.vx * G.speed; s.y += s.vy * G.speed;
+    s.x += s.vx; s.y += s.vy;
     if (s.x > MAP_W + 4 || s.y > MAP_H + 4) G.tradeShips.splice(i, 1);
   }
 }
@@ -1826,16 +1826,16 @@ function updateFrogs() {
   }
   for (let i = G.frogs.length - 1; i >= 0; i--) {
     const f = G.frogs[i];
-    f.hopTimer -= G.speed;
+    f.hopTimer -= 1;
     if (f.hopTimer <= 0) {
       f.hop = 12;
       f.x += (Math.random() - 0.5) * 0.6;
       f.y += (Math.random() - 0.5) * 0.4;
       f.hopTimer = 100 + Math.random() * 200;
     }
-    if (f.hop > 0) f.hop -= G.speed;
+    if (f.hop > 0) f.hop -= 1;
     if (Math.random() < 0.005) f.croak = 25;
-    if (f.croak > 0) f.croak -= G.speed;
+    if (f.croak > 0) f.croak -= 1;
     if (Math.random() < 0.0005) G.frogs.splice(i, 1);
   }
 }
@@ -1886,7 +1886,7 @@ function updateBolts(logicalW, logicalH) {
     G.bolts.push({ segs, life: 12 });
   }
   for (let i = G.bolts.length - 1; i >= 0; i--) {
-    G.bolts[i].life -= G.speed;
+    G.bolts[i].life -= 1;
     if (G.bolts[i].life <= 0) G.bolts.splice(i, 1);
   }
 }
@@ -1939,8 +1939,8 @@ function updateRams() {
       r.tx = Math.max(1, Math.min(MAP_W - 2, r.x + (Math.random() - 0.5) * 4));
       r.ty = Math.max(1, Math.min(MAP_H - 2, r.y + (Math.random() - 0.5) * 4));
     } else {
-      r.x += (dx / d) * 0.012 * G.speed;
-      r.y += (dy / d) * 0.012 * G.speed;
+      r.x += (dx / d) * 0.012;
+      r.y += (dy / d) * 0.012;
     }
   }
 }
@@ -2064,7 +2064,7 @@ function updateCrabs() {
   }
   for (let i = G.crabs.length - 1; i >= 0; i--) {
     const c = G.crabs[i];
-    c.phase += G.speed;
+    c.phase += 1;
     const dx = c.tx - c.x, dy = c.ty - c.y, d = Math.hypot(dx, dy);
     if (d < 0.2) {
       // Scuttle sideways
@@ -2077,8 +2077,8 @@ function updateCrabs() {
         c.dir *= -1;
       }
     } else {
-      c.x += (dx / d) * 0.02 * G.speed;
-      c.y += (dy / d) * 0.02 * G.speed;
+      c.x += (dx / d) * 0.02;
+      c.y += (dy / d) * 0.02;
     }
     if (Math.random() < 0.0005) G.crabs.splice(i, 1);
   }
@@ -2208,10 +2208,10 @@ function updatePigeons() {
   }
   for (let i = G.pigeons.length - 1; i >= 0; i--) {
     const p = G.pigeons[i];
-    p.pickPhase += G.speed;
+    p.pickPhase += 1;
     const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
     if (d < 0.2) { p.tx = p.x + (Math.random() - 0.5) * 2.5; p.ty = p.y + (Math.random() - 0.5) * 2.5; }
-    else { p.x += (dx / d) * 0.015 * G.speed; p.y += (dy / d) * 0.015 * G.speed; }
+    else { p.x += (dx / d) * 0.015; p.y += (dy / d) * 0.015; }
     if (Math.random() < 0.0005) G.pigeons.splice(i, 1);
   }
 }
@@ -2240,7 +2240,7 @@ function renderCitizenTrails(ctx) {
       c.trail.push({ x: c.x, y: c.y, age: 0 });
       if (c.trail.length > 4) c.trail.shift();
     }
-    for (const pt of c.trail) pt.age += G.speed;
+    for (const pt of c.trail) pt.age += 1;
     for (const pt of c.trail) {
       if (pt.age > 30) continue;
       const s = toScreen(pt.x, pt.y);
@@ -2329,8 +2329,8 @@ function updateAcorns() {
   }
   for (let i = G.acorns.length - 1; i >= 0; i--) {
     const a = G.acorns[i];
-    a.oy += a.vy * G.speed;
-    if (a.oy >= 0) a.life -= G.speed;
+    a.oy += a.vy;
+    if (a.oy >= 0) a.life -= 1;
     if (a.life <= 0) G.acorns.splice(i, 1);
   }
 }
@@ -2415,8 +2415,8 @@ function updateDustDevils() {
   }
   for (let i = G.dustDevils.length - 1; i >= 0; i--) {
     const d = G.dustDevils[i];
-    d.x += d.vx * G.speed; d.y += d.vy * G.speed;
-    d.life -= G.speed;
+    d.x += d.vx; d.y += d.vy;
+    d.life -= 1;
     if (d.life <= 0) G.dustDevils.splice(i, 1);
   }
 }
@@ -2538,7 +2538,7 @@ function updateFishJumps() {
     }
   }
   for (let i = G.fishJumps.length - 1; i >= 0; i--) {
-    G.fishJumps[i].t += G.speed;
+    G.fishJumps[i].t += 1;
     if (G.fishJumps[i].t >= G.fishJumps[i].dur) G.fishJumps.splice(i, 1);
   }
 }
@@ -2663,7 +2663,7 @@ function updateRaidSmoke() {
   }
   for (let i = G.raidSmoke.length - 1; i >= 0; i--) {
     const p = G.raidSmoke[i];
-    p.oy += p.vy * G.speed; p.size += 0.04 * G.speed; p.alpha -= 0.005 * G.speed;
+    p.oy += p.vy; p.size += 0.04; p.alpha -= 0.005;
     if (p.alpha <= 0) G.raidSmoke.splice(i, 1);
   }
 }
@@ -2776,7 +2776,7 @@ function updateResearchSparkles() {
   if (!G.researchSparkles) G.researchSparkles = [];
   for (let i = G.researchSparkles.length - 1; i >= 0; i--) {
     const p = G.researchSparkles[i];
-    p.x += p.vx * G.speed; p.y += p.vy * G.speed; p.life -= G.speed;
+    p.x += p.vx; p.y += p.vy; p.life -= 1;
     if (p.life <= 0) G.researchSparkles.splice(i, 1);
   }
 }
@@ -2850,7 +2850,7 @@ function updateBunnies() {
   }
   for (let i = G.bunnies.length - 1; i >= 0; i--) {
     const b = G.bunnies[i];
-    b.hopTimer -= G.speed;
+    b.hopTimer -= 1;
     if (b.hopTimer <= 0) {
       b.hop = 14;
       b.x += (Math.random() - 0.5) * 1.2;
@@ -2859,7 +2859,7 @@ function updateBunnies() {
       b.y = Math.max(1, Math.min(MAP_H - 2, b.y));
       b.hopTimer = 80 + Math.random() * 120;
     }
-    if (b.hop > 0) b.hop -= G.speed;
+    if (b.hop > 0) b.hop -= 1;
     if (Math.random() < 0.0006) G.bunnies.splice(i, 1);
   }
 }
@@ -3006,7 +3006,7 @@ function updateChurchBeams() {
     G._churchBeam = 100;
   }
   _prevDay = G.day;
-  if (G._churchBeam > 0) G._churchBeam -= G.speed;
+  if (G._churchBeam > 0) G._churchBeam -= 1;
 }
 function renderChurchBeams(ctx) {
   if (!G._churchBeam || G._churchBeam <= 0) return;
@@ -3116,11 +3116,11 @@ function updateBats(logicalW, logicalH) {
   for (let i = G.bats.length - 1; i >= 0; i--) {
     const b = G.bats[i];
     b.x += b.vx; b.y += b.vy;
-    b.phase += 0.4 * G.speed;
+    b.phase += 0.4;
     if (Math.random() < 0.04) { b.vx += (Math.random() - 0.5) * 1.2; b.vy += (Math.random() - 0.5) * 0.5; }
     b.vx = Math.max(-3, Math.min(3, b.vx));
     b.vy = Math.max(-1.5, Math.min(1.5, b.vy));
-    b.life -= G.speed;
+    b.life -= 1;
     if (b.life <= 0 || b.x < -50 || b.x > (logicalW || 1500) + 50 || b.y > (logicalH || 800)) G.bats.splice(i, 1);
   }
 }
@@ -3181,7 +3181,7 @@ function updateResourceFloats() {
   for (const b of G.buildings) {
     if (!b.prod) continue;
     if (G.particles.length > 240) return;
-    if (Math.random() > 0.0015 * G.speed) continue;
+    if (Math.random() > 0.0015) continue;
     const key = Object.keys(b.prod)[0];
     G.particles.push({
       tx: b.x,
@@ -3681,7 +3681,7 @@ function updateEagles(logicalW, logicalH) {
       angVel: 0.005,
     });
   }
-  for (const e of G.eagles) e.ang += e.angVel * G.speed;
+  for (const e of G.eagles) e.ang += e.angVel;
 }
 function renderEagles(ctx) {
   if (!G.eagles || !G.eagles.length) return;
@@ -3764,7 +3764,7 @@ function updateSchoolKids() {
     const s = schools[G.schoolKids.length % schools.length];
     G.schoolKids.push({ school: s, ang: Math.random() * Math.PI * 2, r: 5 + Math.random() * 4, speed: 0.04 + Math.random() * 0.04 });
   }
-  for (const k of G.schoolKids) k.ang += k.speed * G.speed;
+  for (const k of G.schoolKids) k.ang += k.speed;
 }
 function renderSchoolKids(ctx) {
   if (!G.schoolKids || !G.schoolKids.length || G.camera.zoom < 0.9) return;
@@ -4115,8 +4115,8 @@ function updateBuildRipples() {
   if (!G._buildRipples) return;
   for (let i = G._buildRipples.length - 1; i >= 0; i--) {
     const r = G._buildRipples[i];
-    r.radius += 0.4 * G.speed;
-    r.alpha -= 0.02 * G.speed;
+    r.radius += 0.4;
+    r.alpha -= 0.02;
     if (r.alpha <= 0) G._buildRipples.splice(i, 1);
   }
 }
@@ -4191,7 +4191,7 @@ function updateVictoryCinematic() {
     _victoryAnim = { tick: 0 };
   }
   if (_victoryAnim) {
-    _victoryAnim.tick += G.speed;
+    _victoryAnim.tick += 1;
   }
 }
 function renderVictoryCinematic(ctx, w, h) {
