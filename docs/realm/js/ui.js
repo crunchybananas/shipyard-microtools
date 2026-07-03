@@ -3,10 +3,12 @@
 // ════════════════════════════════════════════════════════════
 
 import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=128';
-import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige, prestigeBest } from './economy.js?realm=128';
+import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige } from './economy.js?realm=128';
 import { getWonderReport } from './wonder.js?realm=128';
 import { panCameraTo } from './render.js?realm=128';
 import { dispatch } from './commands.js?realm=128';
+import { missions } from './missions.js?realm=128';
+import { getActiveScenario } from './scenarios.js?realm=128';
 import { saveGame, loadGame, hasSave } from './save.js?realm=128';
 import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=128';
 import { notify } from './notifications.js?realm=128';
@@ -1451,4 +1453,233 @@ export function toggleTradePanel() {
   const open = p.style.display !== 'none';
   p.style.display = open ? 'none' : 'block';
   if (!open) renderTradePanel();
+}
+
+// ════════════════════════════════════════════════════════════
+// Shell-side render functions moved out of core files (ENGINE.md
+// Phase 2): victory screen + confetti (was economy.js), event
+// banner (was events.js), missions panel (was missions.js), era
+// banner (was tech.js). Core emits bus events; main.js subscribes
+// and calls these.
+// ════════════════════════════════════════════════════════════
+
+export function prestigeBest() {
+  try { return parseInt(localStorage.getItem('realm-prestige-best') || '0', 10) || 0; } catch (_e) { return 0; }
+}
+
+export function showVictoryScreen() {
+  const el = document.getElementById('victory-screen');
+  if (!el) return;
+  el.style.display = 'flex';
+  // Wonder win vs legacy castle win (pre-D4 saves can load with G.won set).
+  // Stage 3 is the Gilded Spire — WONDER_STAGES lives in wonder.js, which
+  // imports this module, so the stage count is a literal here.
+  const wonderWin = !!(G.wonder && G.wonder.stage >= 3);
+  const title = el.querySelector('.vic-title');
+  const sub = el.querySelector('.vic-subtitle');
+  if (title && sub) {
+    if (wonderWin) {
+      title.textContent = 'The Hall of Ages Stands Eternal';
+      sub.textContent = `Raised across the Three Ages and crowned on day ${G.wonder.completeDay || G.day}. The realm is remembered forever.`;
+    } else {
+      title.textContent = 'Victory!';
+      sub.textContent = 'Your castle stands tall. The realm is yours.';
+    }
+  }
+  const prestige = computePrestige();
+  const prestigeEl = el.querySelector('.vic-prestige');
+  if (prestigeEl) {
+    let best = prestigeBest();
+    const isBest = prestige >= best;
+    if (isBest) { best = prestige; try { localStorage.setItem('realm-prestige-best', String(best)); } catch (_e) {} }
+    prestigeEl.textContent = isBest ? `${prestige} ★ new best` : `${prestige} (best ${best})`;
+  }
+  // Era timeline: when each age began (only shown once the realm advanced).
+  const erasEl = el.querySelector('.vic-eras');
+  if (erasEl) {
+    const names = { 1: '🏕️ Hearth', 2: '📜 Charter', 3: '👑 Crown' };
+    const starts = G.eraStartDay || { 1: 1 };
+    const parts = Object.keys(starts).sort((a, b) => a - b).map(id => `${names[id] || `Age ${id}`} · day ${starts[id]}`);
+    erasEl.style.display = parts.length > 1 ? 'block' : 'none';
+    erasEl.textContent = parts.join('  →  ');
+  }
+  el.querySelector('.vic-day').textContent = `Day ${G.day}`;
+  el.querySelector('.vic-pop').textContent = `${G.population} citizens`;
+  el.querySelector('.vic-buildings').textContent = `${G.buildings.length} buildings`;
+  el.querySelector('.vic-resources').textContent = `${G.totalResourcesGathered || 0} total`;
+  el.querySelector('.vic-techs').textContent = `${G.researchedTechs.size} technologies`;
+  const ach = document.querySelectorAll ? document.querySelectorAll('.ach-item.done').length : 0;
+  el.querySelector('.vic-achievements').textContent = `${ach} achievements`;
+  // Spawn canvas confetti
+  spawnVictoryConfetti();
+}
+
+function spawnVictoryConfetti() {
+  const canvas = document.getElementById('vic-confetti');
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['#FFD166','#EF476F','#06D6A0','#118AB2','#FFB347','#A8DADC','#FF6B6B','#FFF3B0'];
+  const pieces = [];
+  for (let i = 0; i < 80; i++) {
+    pieces.push({
+      x: rng() * canvas.width,
+      y: -10 - rng() * canvas.height * 0.5,
+      w: 6 + rng() * 8,
+      h: 4 + rng() * 5,
+      color: COLORS[Math.floor(rng() * COLORS.length)],
+      rot: rng() * Math.PI * 2,
+      vx: (rng() - 0.5) * 3,
+      vy: 2 + rng() * 4,
+      vrot: (rng() - 0.5) * 0.2,
+      alpha: 1,
+    });
+  }
+  let frame = 0;
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of pieces) {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.07; // gravity
+      p.rot += p.vrot;
+      if (p.y > canvas.height * 0.85) p.alpha -= 0.03;
+    }
+    frame++;
+    if (frame < 240 && pieces.some(p => p.alpha > 0)) {
+      requestAnimationFrame(drawConfetti);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  drawConfetti();
+}
+
+
+export function updateEventBanner() {
+  const banner = document.getElementById('event-banner');
+  if (!banner) return;
+
+  if (G.activeEvent && G.activeEvent.endDay > G.day) {
+    const remaining = G.activeEvent.endDay - G.day;
+    const isPositive = G.activeEvent.positive ?? true;
+    const borderColor = isPositive ? '#4ade80' : '#f87171';
+    const bgColor = isPositive
+      ? 'rgba(74,222,128,0.08)'
+      : 'rgba(248,113,113,0.08)';
+
+    banner.style.display = 'flex';
+    banner.style.borderColor = borderColor;
+    banner.style.borderWidth = '2px';
+    banner.style.background = bgColor;
+    banner.style.padding = '0.5rem 1.1rem';
+    banner.style.fontSize = '0.82rem';
+    banner.innerHTML = `
+      <span style="color:${G.activeEvent.color};font-weight:800;font-size:0.88rem">${G.activeEvent.name}</span>
+      <span style="opacity:0.85">${G.activeEvent.desc}</span>
+      ${remaining > 0
+        ? `<span class="eb-days" style="background:${bgColor};border:1px solid ${borderColor};color:${borderColor};font-weight:700">${remaining}d left</span>`
+        : ''}`;
+  } else if (G.activeEvent && G.activeEvent.endDay <= G.day) {
+    // Instant events (duration 0): hide immediately
+    banner.style.display = 'none';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+
+export function renderMissions() {
+  const list = document.getElementById('mission-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  // Prepend scenario objectives at the top
+  const scen = getActiveScenario();
+  let firstActiveAssigned = false;
+  if (scen) {
+    const header = document.createElement('div');
+    header.className = 'scenario-header';
+    const progress = scen.objectives.filter(o => o.check()).length;
+    header.innerHTML = `<div class="scen-name">${scen.name} <span class="scen-progress">${progress}/${scen.objectives.length}</span></div><div class="scen-desc">${scen.desc}</div>`;
+    list.appendChild(header);
+    for (const obj of scen.objectives) {
+      const done = obj.check();
+      const row = document.createElement('div');
+      let cls = 'mission' + (done ? ' done' : '');
+      if (!done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
+      else if (!done) cls += ' mission-later';
+      row.className = cls;
+      // Show progress like "3/10" when the objective has a numeric target and isn't done yet
+      let progressText = '';
+      if (!done && typeof obj.progress === 'function') {
+        try {
+          const [cur, target] = obj.progress();
+          if (typeof cur === 'number' && typeof target === 'number') {
+            progressText = ` <span class="mission-progress">(${cur}/${target})</span>`;
+          }
+        } catch (_e) { /* progress is optional; ignore errors */ }
+      }
+      row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}${progressText}`;
+      list.appendChild(row);
+    }
+  }
+
+  // Divider so the global "Side Goals" list is visibly separate from the
+  // scenario's tracked objectives. Without this, the 15 global missions get
+  // appended in the same list with no break and make the scenario counter
+  // ("0/3") look wrong — fresh-eyes reviewers read the full panel as one
+  // mission group and wonder why only 3 count.
+  if (scen && missions.length > 0) {
+    const divider = document.createElement('div');
+    divider.className = 'mission-side-divider';
+    divider.style.cssText = 'margin-top:0.9rem;padding:0.4rem 0 0.25rem;border-top:1px solid rgba(255,255,255,0.08);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.38);font-weight:600';
+    divider.textContent = 'Side Goals';
+    list.appendChild(divider);
+    // After the divider, don't treat the first incomplete global mission as
+    // the "next" pulsing/gold row — the scenario's active objective is the
+    // real next step; keeping them all 'mission-later' preserves hierarchy.
+    firstActiveAssigned = true;
+  }
+
+  for (const m of missions) {
+    const div = document.createElement('div');
+    let cls = 'mission' + (m.done ? ' done' : '');
+    if (!m.done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
+    else if (!m.done) cls += ' mission-later';
+    // Loop 78: recent completions pulse the row gold for ~2.2s so the
+    // eye catches which mission just finished (rather than just a toast
+    // + line-through with no origin cue).
+    if (m._celebratedTick && G.gameTick - m._celebratedTick < 132) { // ~2.2s at 1×
+      cls += ' mission-celebrate';
+    }
+    div.className = cls;
+    div.innerHTML = `<span class="check">${m.done?'✓':''}</span><span>${m.text}</span>`;
+    list.appendChild(div);
+  }
+}
+
+
+export function showEraBanner(era) {
+  const el = document.getElementById('era-banner');
+  if (!el) return;
+  el.innerHTML = `<div class="era-banner-inner">
+    <div class="era-banner-icon">${era.icon}</div>
+    <div class="era-banner-title">${era.name}</div>
+    <div class="era-banner-sub">A new age dawns upon the realm</div>
+  </div>`;
+  el.hidden = false;
+  el.classList.remove('show');
+  void el.offsetWidth;  // restart the CSS animation when ages land back-to-back
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.classList.remove('show'); el.hidden = true; }, 3500);
 }

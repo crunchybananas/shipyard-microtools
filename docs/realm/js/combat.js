@@ -4,15 +4,15 @@
 
 import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=128';
 import { stepEntityToward } from './pathfinding.js?realm=128';
-import { spawnClashFX } from './particles.js?realm=128';
+import { spawnClashFX } from './fx.js?realm=128';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { playSound } from './audio.js?realm=128';
+import { sfx as playSound } from './log.js?realm=128';
 import { demolishBuilding } from './economy.js?realm=128';
-import { notify } from './notifications.js?realm=128';
-import { chronicle } from './story.js?realm=128';
+import { announce as notify } from './log.js?realm=128';
+import { chronicle } from './log.js?realm=128';
 
 export function updateEnemies() {
   // Morale break: when a raid has lost more than 60% of its fighters, the

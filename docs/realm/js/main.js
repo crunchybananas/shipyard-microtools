@@ -5,19 +5,20 @@
 import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=128';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=128';
 import { generateWorld } from './world.js?realm=128';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld } from './render.js?realm=128';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo } from './render.js?realm=128';
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=128';
 import { updateCitizens } from './citizens.js?realm=128';
 import { updateSoldiers } from './soldiers.js?realm=128';
 import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=128';
 import { dispatch } from './commands.js?realm=128';
-import { checkMissions, renderMissions } from './missions.js?realm=128';
+import { on } from './bus.js?realm=128';
+import { checkMissions } from './missions.js?realm=128';
 import { updateParticles, updateSmokeEmitters } from './particles.js?realm=128';
 import { setupInput } from './input.js?realm=128';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel } from './ui.js?realm=128';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=128';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=128';
+import { updateResearch, checkEraAdvance, ERAS } from './tech.js?realm=128';
 import { updateWonder } from './wonder.js?realm=128';
-import { checkRandomEvents, updateEventBanner } from './events.js?realm=128';
+import { checkRandomEvents } from './events.js?realm=128';
 import { saveGame, loadGame, getSaveSize } from './save.js?realm=128';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=128';
 import { toggleNotificationLog, notify } from './notifications.js?realm=128';
@@ -31,6 +32,14 @@ import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, u
 import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=128';
 import { initSpriteLab } from './sprite-lab.js?realm=128';
 import { initSpriteMuster } from './sprite-muster.js?realm=128';
+
+
+// ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────
+// Core systems emit facts; the shell decides how they look and sound.
+on('raid-started', ({ x, y }) => { try { panCameraTo(x, y, 800); } catch (_e) {} });
+on('victory', () => setTimeout(() => showVictoryScreen(), 700));
+on('realm-event', () => updateEventBanner());
+on('era-advanced', ({ era }) => { if (!G.photoMode) showEraBanner(ERAS[era - 1]); });
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');

@@ -8,11 +8,6 @@ import { G } from './state.js?realm=128';
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
 
-export function initChronicle() {
-  if (!G.chronicle) G.chronicle = [];
-  if (!G.storyFlags) G.storyFlags = {};
-  if (!G.namedCharacters) G.namedCharacters = {};
-}
 
 // Loop 085 (the-fixer, 083 filed): once-per-realm beats are
 // eviction-immune at the chronicle cap. 082/083 discovered the
@@ -23,46 +18,12 @@ export function initChronicle() {
 // 085 enforces it in code: when the cap kicks in, oldest
 // NON-IMMUNE entries drop first; immune entries are preserved
 // even if that means the buffer sits slightly over 300.
-const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem', 'era']);
+// chronicle/initChronicle (and the eviction-immune tag set) moved to
+// log.js (core tier — ENGINE.md rule 4). Re-exported here so existing
+// shell imports keep working.
+import { chronicle, initChronicle } from './log.js?realm=128';
+export { chronicle, initChronicle };
 
-export function chronicle(text, tag='misc') {
-  initChronicle();
-  // Loop 260 (the-player [play]): once the realm has fallen, no more
-  // beats. The 192 commit added G.realmEnded but never wired the
-  // consumer ("chronicle stop" was filed at 192, never shipped). 260's
-  // play tick observed 248 beats writing AFTER realm_fell at day 52
-  // through day 720 — raids on a village with no population, echoes
-  // referencing a kingdom no one remembers. Gate at the chronicle()
-  // write itself so ALL call sites (NARRATIVE_BEATS / season-changes /
-  // dreams / nightmares / echoes / raids / events) benefit from a
-  // single check. The realm_fell beat itself still writes its requiem
-  // because `after: G => { G.realmEnded = true; }` runs AFTER chronicle.
-  if (G.realmEnded) return;
-  G.chronicle.push({
-    day: G.day,
-    season: G.season,
-    tick: G.gameTick,
-    text, tag,
-  });
-  // Cap to last 300 entries, preserving eviction-immune tags
-  if (G.chronicle.length > 300) {
-    const excess = G.chronicle.length - 300;
-    const toRemove = [];
-    // Collect oldest-first indices of non-immune entries, up to
-    // `excess`. If all entries are immune, none are removed and the
-    // buffer soft-overflows — acceptable because immune entries are
-    // the point of the protection.
-    for (let i = 0; i < G.chronicle.length && toRemove.length < excess; i++) {
-      if (!_EVICTION_IMMUNE_TAGS.has(G.chronicle[i].tag)) {
-        toRemove.push(i);
-      }
-    }
-    // Remove in reverse so earlier indices stay valid
-    for (let j = toRemove.length - 1; j >= 0; j--) {
-      G.chronicle.splice(toRemove[j], 1);
-    }
-  }
-}
 
 export function hasFlag(key) { initChronicle(); return !!G.storyFlags[key]; }
 export function setFlag(key, val=true) { initChronicle(); G.storyFlags[key] = val; }

@@ -170,7 +170,7 @@ export const G = {
 };
 
 // ── Seeded RNG ─────────────────────────────────────────────
-let _seed = Date.now() % 100000;
+let _seed = 1; // fixed default — every entry point calls setSeed (ENGINE.md rule 2)
 export function rng() { _seed=(_seed*1103515245+12345)&0x7fffffff; return _seed/0x7fffffff; }
 export function rngRange(a,b) { return a + rng()*(b-a); }
 export function rngInt(a,b) { return Math.floor(rngRange(a,b+1)); }

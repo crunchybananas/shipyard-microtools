@@ -4,8 +4,8 @@
 
 import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=128';
 import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=128';
-import { spawnClashFX } from './particles.js?realm=128';
-import { playSound } from './audio.js?realm=128';
+import { spawnClashFX } from './fx.js?realm=128';
+import { sfx as playSound } from './log.js?realm=128';
 
 function soldierDamage(s) {
   let damage = 5;

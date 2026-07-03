@@ -6,11 +6,11 @@ import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, re
 import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=128';
 import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=128';
 import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=128';
-import { playSound, playBuildingSound } from './audio.js?realm=128';
-import { spawnDust } from './particles.js?realm=128';
-import { panCameraTo } from './render.js?realm=128';
-import { chronicle } from './story.js?realm=128';
-import { notify, notifyBuild } from './notifications.js?realm=128';
+import { sfx as playSound, sfxBuild as playBuildingSound } from './log.js?realm=128';
+import { spawnDust } from './fx.js?realm=128';
+import { chronicle } from './log.js?realm=128';
+import { announce as notify, announceBuild as notifyBuild } from './log.js?realm=128';
+import { emit } from './bus.js?realm=128';
 import { isBuildingUnlocked } from './tech.js?realm=128';
 
 const CONSTRUCTION_TICKS = {
@@ -634,11 +634,9 @@ export function checkRaids() {
     // (spawn + intercept + no-defenders hint). See 082 HIGH.
     for (const line of report) notify(line, 'danger', { chronicle: false });
 
-    // Pan camera to an attacked-area preview
+    // Attacked-area preview: shell pans the camera (ENGINE.md rule 4)
     const firstBuilding = G.buildings.find(b => b.type !== 'road' && b.type !== 'wall');
-    if (firstBuilding) {
-      try { panCameraTo(firstBuilding.x, firstBuilding.y, 800); } catch (_e) {}
-    }
+    if (firstBuilding) emit('raid-started', { x: firstBuilding.x, y: firstBuilding.y });
 
     G._raidSpawnCount = raiders; // morale-break baseline (combat.js)
     // Spawn enemy raiders that visibly approach the settlement
@@ -838,106 +836,6 @@ export function computePrestige() {
   p += (G.stats?.raidsSurvived || 0) * 15;
   p += (G.wonder?.stage || 0) * 100;
   return p;
-}
-
-export function prestigeBest() {
-  try { return parseInt(localStorage.getItem('realm-prestige-best') || '0', 10) || 0; } catch (_e) { return 0; }
-}
-
-export function showVictoryScreen() {
-  const el = document.getElementById('victory-screen');
-  if (!el) return;
-  el.style.display = 'flex';
-  // Wonder win vs legacy castle win (pre-D4 saves can load with G.won set).
-  // Stage 3 is the Gilded Spire — WONDER_STAGES lives in wonder.js, which
-  // imports this module, so the stage count is a literal here.
-  const wonderWin = !!(G.wonder && G.wonder.stage >= 3);
-  const title = el.querySelector('.vic-title');
-  const sub = el.querySelector('.vic-subtitle');
-  if (title && sub) {
-    if (wonderWin) {
-      title.textContent = 'The Hall of Ages Stands Eternal';
-      sub.textContent = `Raised across the Three Ages and crowned on day ${G.wonder.completeDay || G.day}. The realm is remembered forever.`;
-    } else {
-      title.textContent = 'Victory!';
-      sub.textContent = 'Your castle stands tall. The realm is yours.';
-    }
-  }
-  const prestige = computePrestige();
-  const prestigeEl = el.querySelector('.vic-prestige');
-  if (prestigeEl) {
-    let best = prestigeBest();
-    const isBest = prestige >= best;
-    if (isBest) { best = prestige; try { localStorage.setItem('realm-prestige-best', String(best)); } catch (_e) {} }
-    prestigeEl.textContent = isBest ? `${prestige} ★ new best` : `${prestige} (best ${best})`;
-  }
-  // Era timeline: when each age began (only shown once the realm advanced).
-  const erasEl = el.querySelector('.vic-eras');
-  if (erasEl) {
-    const names = { 1: '🏕️ Hearth', 2: '📜 Charter', 3: '👑 Crown' };
-    const starts = G.eraStartDay || { 1: 1 };
-    const parts = Object.keys(starts).sort((a, b) => a - b).map(id => `${names[id] || `Age ${id}`} · day ${starts[id]}`);
-    erasEl.style.display = parts.length > 1 ? 'block' : 'none';
-    erasEl.textContent = parts.join('  →  ');
-  }
-  el.querySelector('.vic-day').textContent = `Day ${G.day}`;
-  el.querySelector('.vic-pop').textContent = `${G.population} citizens`;
-  el.querySelector('.vic-buildings').textContent = `${G.buildings.length} buildings`;
-  el.querySelector('.vic-resources').textContent = `${G.totalResourcesGathered || 0} total`;
-  el.querySelector('.vic-techs').textContent = `${G.researchedTechs.size} technologies`;
-  const ach = document.querySelectorAll ? document.querySelectorAll('.ach-item.done').length : 0;
-  el.querySelector('.vic-achievements').textContent = `${ach} achievements`;
-  // Spawn canvas confetti
-  spawnVictoryConfetti();
-}
-
-function spawnVictoryConfetti() {
-  const canvas = document.getElementById('vic-confetti');
-  if (!canvas) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const ctx = canvas.getContext('2d');
-  const COLORS = ['#FFD166','#EF476F','#06D6A0','#118AB2','#FFB347','#A8DADC','#FF6B6B','#FFF3B0'];
-  const pieces = [];
-  for (let i = 0; i < 80; i++) {
-    pieces.push({
-      x: rng() * canvas.width,
-      y: -10 - rng() * canvas.height * 0.5,
-      w: 6 + rng() * 8,
-      h: 4 + rng() * 5,
-      color: COLORS[Math.floor(rng() * COLORS.length)],
-      rot: rng() * Math.PI * 2,
-      vx: (rng() - 0.5) * 3,
-      vy: 2 + rng() * 4,
-      vrot: (rng() - 0.5) * 0.2,
-      alpha: 1,
-    });
-  }
-  let frame = 0;
-  function drawConfetti() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (const p of pieces) {
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-      ctx.restore();
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.07; // gravity
-      p.rot += p.vrot;
-      if (p.y > canvas.height * 0.85) p.alpha -= 0.03;
-    }
-    frame++;
-    if (frame < 240 && pieces.some(p => p.alpha > 0)) {
-      requestAnimationFrame(drawConfetti);
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
-  drawConfetti();
 }
 
 export function updateFires() {

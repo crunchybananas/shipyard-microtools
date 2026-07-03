@@ -3,7 +3,8 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS, resourceEmoji } from './state.js?realm=128';
-import { chronicle } from './story.js?realm=128';
+import { announce } from './log.js?realm=128';
+import { on } from './bus.js?realm=128';
 
 let toastTimer = null;
 let toastShakeTimer = null;
@@ -28,7 +29,16 @@ const FILTER_LABELS = {
 // Active filter state (persists while panel is open)
 let _activeFilter = 'all';
 
+// Shell entry point: delegates the data half (notification log, chronicle
+// bridging) to log.announce, which emits 'notify' back to the DOM renderer
+// below. Core files call announce directly; shell files may call notify.
 export function notify(text, type = 'info', meta = {}) {
+  announce(text, type, meta);
+}
+
+on('notify', ({ text, type, meta }) => renderNotify(text, type, meta || {}));
+
+function renderNotify(text, type = 'info', meta = {}) {
   // ── Toast ─────────────────────────────────────────────────
   const el = document.getElementById('toast');
   if (el) {
@@ -51,23 +61,8 @@ export function notify(text, type = 'info', meta = {}) {
     }, 2800);
   }
 
-  // ── Persistent log (cap at 50 entries) ───────────────────
-  const entry = { text, type, day: G.day, ts: Date.now(), meta };
-  G.notificationLog.push(entry);
-  if (G.notificationLog.length > 50) G.notificationLog.shift();
-
-  // ── Chronicle (story log) — only notable event/danger/mission ──
-  // Loop 15 (render S3): deep-play found "Tile already occupied" showing up
-  // in the chronicle as a "raid" entry because the type=='danger' → tag='raid'
-  // map was too coarse. UI warnings (placement failures, etc.) shouldn't
-  // pollute story history. Callers can now pass `meta.chronicle = false` to
-  // keep a message in the notification log / toast without chronicling it.
-  try {
-    if (meta.chronicle !== false && (type === 'event' || type === 'danger' || type === 'mission')) {
-      const tagMap = { event:'event', danger:'raid', mission:'milestone' };
-      chronicle(text, tagMap[type] || 'misc');
-    }
-  } catch (_e) {}
+  // (Persistent log + chronicle bridging live in log.announce — data is
+  // core-side saved state; this function is pure DOM rendering.)
 
   // Update badge
   updateLogBadge();

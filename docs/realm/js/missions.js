@@ -3,8 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, MAP_W, MAP_H, rng } from './state.js?realm=128';
-import { playSound } from './audio.js?realm=128';
-import { getActiveScenario } from './scenarios.js?realm=128';
+import { sfx as playSound, announce } from './log.js?realm=128';
 
 export const missions = [
   { id:'farm1',   text:'Build a farm',                  check:()=>G.buildings.some(b=>b.type==='farm'),      done:false, reward:{wood:20} },
@@ -23,16 +22,6 @@ export const missions = [
   { id:'pop75',   text:'Reach 75 population',           check:()=>G.population>=75,                          done:false, reward:{gold:100} },
   { id:'happy90', text:'Reach 90% happiness',            check:()=>G.happiness>=90,                           done:false, reward:{gold:40} },
 ];
-
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = 'var(--gold)';
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(()=>el.classList.remove('show'), 2500);
-}
 
 // Loop 78 (render S4): mission-completion celebration.
 // Pick a location meaningful to the mission (building match → town center
@@ -140,77 +129,8 @@ export function checkMissions() {
         });
       }
       playSound('mission');
-      showToast(`✨ Mission complete: ${m.text}`);
+      announce(`✨ Mission complete: ${m.text}`, 'mission', { chronicle: false });
     }
   }
 }
 
-export function renderMissions() {
-  const list = document.getElementById('mission-list');
-  if (!list) return;
-  list.innerHTML = '';
-
-  // Prepend scenario objectives at the top
-  const scen = getActiveScenario();
-  let firstActiveAssigned = false;
-  if (scen) {
-    const header = document.createElement('div');
-    header.className = 'scenario-header';
-    const progress = scen.objectives.filter(o => o.check()).length;
-    header.innerHTML = `<div class="scen-name">${scen.name} <span class="scen-progress">${progress}/${scen.objectives.length}</span></div><div class="scen-desc">${scen.desc}</div>`;
-    list.appendChild(header);
-    for (const obj of scen.objectives) {
-      const done = obj.check();
-      const row = document.createElement('div');
-      let cls = 'mission' + (done ? ' done' : '');
-      if (!done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
-      else if (!done) cls += ' mission-later';
-      row.className = cls;
-      // Show progress like "3/10" when the objective has a numeric target and isn't done yet
-      let progressText = '';
-      if (!done && typeof obj.progress === 'function') {
-        try {
-          const [cur, target] = obj.progress();
-          if (typeof cur === 'number' && typeof target === 'number') {
-            progressText = ` <span class="mission-progress">(${cur}/${target})</span>`;
-          }
-        } catch (_e) { /* progress is optional; ignore errors */ }
-      }
-      row.innerHTML = `<span class="check">${done ? '✓' : ''}</span>${obj.text}${progressText}`;
-      list.appendChild(row);
-    }
-  }
-
-  // Divider so the global "Side Goals" list is visibly separate from the
-  // scenario's tracked objectives. Without this, the 15 global missions get
-  // appended in the same list with no break and make the scenario counter
-  // ("0/3") look wrong — fresh-eyes reviewers read the full panel as one
-  // mission group and wonder why only 3 count.
-  if (scen && missions.length > 0) {
-    const divider = document.createElement('div');
-    divider.className = 'mission-side-divider';
-    divider.style.cssText = 'margin-top:0.9rem;padding:0.4rem 0 0.25rem;border-top:1px solid rgba(255,255,255,0.08);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.38);font-weight:600';
-    divider.textContent = 'Side Goals';
-    list.appendChild(divider);
-    // After the divider, don't treat the first incomplete global mission as
-    // the "next" pulsing/gold row — the scenario's active objective is the
-    // real next step; keeping them all 'mission-later' preserves hierarchy.
-    firstActiveAssigned = true;
-  }
-
-  for (const m of missions) {
-    const div = document.createElement('div');
-    let cls = 'mission' + (m.done ? ' done' : '');
-    if (!m.done && !firstActiveAssigned) { cls += ' mission-next'; firstActiveAssigned = true; }
-    else if (!m.done) cls += ' mission-later';
-    // Loop 78: recent completions pulse the row gold for ~2.2s so the
-    // eye catches which mission just finished (rather than just a toast
-    // + line-through with no origin cue).
-    if (m._celebratedTick && G.gameTick - m._celebratedTick < 132) { // ~2.2s at 1×
-      cls += ' mission-celebrate';
-    }
-    div.className = cls;
-    div.innerHTML = `<span class="check">${m.done?'✓':''}</span><span>${m.text}</span>`;
-    list.appendChild(div);
-  }
-}

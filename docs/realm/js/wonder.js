@@ -10,10 +10,10 @@
 // ════════════════════════════════════════════════════════════
 
 import { G } from './state.js?realm=128';
-import { chronicle } from './story.js?realm=128';
-import { notify } from './notifications.js?realm=128';
-import { playSound } from './audio.js?realm=128';
-import { showVictoryScreen } from './economy.js?realm=128';
+import { chronicle } from './log.js?realm=128';
+import { announce as notify } from './log.js?realm=128';
+import { sfx as playSound } from './log.js?realm=128';
+import { emit } from './bus.js?realm=128';
 
 export const WONDER_STAGES = [
   { name: 'The Foundations',  bill: { stone: 200, wood: 100 } },
@@ -108,7 +108,7 @@ export function updateWonder() {
     chronicle('The Gilded Spire takes the light. The Hall of Ages stands eternal, and the realm with it.', 'victory');
     if (!G.won) {
       G.won = true;
-      setTimeout(() => showVictoryScreen(), 700);
+      emit('victory', {});
     }
   }
 }

@@ -4,8 +4,9 @@
 
 import { G, rng, rngInt } from './state.js?realm=128';
 import { trySpawnSettlers } from './economy.js?realm=128';
-import { playSound } from './audio.js?realm=128';
-import { chronicle, initChronicle } from './story.js?realm=128';
+import { sfx as playSound } from './log.js?realm=128';
+import { emit } from './bus.js?realm=128';
+import { chronicle, initChronicle, announce } from './log.js?realm=128';
 
 // positive:true → green banner + 'season' sound
 // positive:false → red banner + 'raidWarning' sound
@@ -341,16 +342,6 @@ export const EVENT_DEFS = [
   },
 ];
 
-function showToast(msg, danger = false) {
-  const el = document.getElementById('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = danger ? 'var(--danger)' : 'var(--gold)';
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 3000);
-}
-
 export function checkRandomEvents() {
   // Only fire at day transitions, skip early game
   if (G.day < 4) return;
@@ -367,9 +358,9 @@ export function checkRandomEvents() {
       const def = EVENT_DEFS.find(e => e.id === G.activeEvent.id);
       def?.onEnd();
       const endMsg = def?.endMsg;
-      if (endMsg) showToast(endMsg, !def.positive);
+      if (endMsg) announce(endMsg, def.positive ? 'event' : 'danger', { chronicle: false });
       G.activeEvent = null;
-      updateEventBanner();
+      emit('realm-event', { id: null });
     }
     return; // one event at a time
   }
@@ -393,44 +384,12 @@ export function checkRandomEvents() {
     endDay: G.day + def.duration,
   };
   def.onStart();
+  emit('realm-event', { id: def.id, positive: def.positive });
 
   // Sound: wind chimes for positive, raid drums for negative
   playSound(def.positive ? 'season' : 'raidWarning');
 
-  showToast(`📢 Event: ${def.name} — ${def.desc}`, !def.positive);
-  updateEventBanner();
-}
-
-export function updateEventBanner() {
-  const banner = document.getElementById('event-banner');
-  if (!banner) return;
-
-  if (G.activeEvent && G.activeEvent.endDay > G.day) {
-    const remaining = G.activeEvent.endDay - G.day;
-    const isPositive = G.activeEvent.positive ?? true;
-    const borderColor = isPositive ? '#4ade80' : '#f87171';
-    const bgColor = isPositive
-      ? 'rgba(74,222,128,0.08)'
-      : 'rgba(248,113,113,0.08)';
-
-    banner.style.display = 'flex';
-    banner.style.borderColor = borderColor;
-    banner.style.borderWidth = '2px';
-    banner.style.background = bgColor;
-    banner.style.padding = '0.5rem 1.1rem';
-    banner.style.fontSize = '0.82rem';
-    banner.innerHTML = `
-      <span style="color:${G.activeEvent.color};font-weight:800;font-size:0.88rem">${G.activeEvent.name}</span>
-      <span style="opacity:0.85">${G.activeEvent.desc}</span>
-      ${remaining > 0
-        ? `<span class="eb-days" style="background:${bgColor};border:1px solid ${borderColor};color:${borderColor};font-weight:700">${remaining}d left</span>`
-        : ''}`;
-  } else if (G.activeEvent && G.activeEvent.endDay <= G.day) {
-    // Instant events (duration 0): hide immediately
-    banner.style.display = 'none';
-  } else {
-    banner.style.display = 'none';
-  }
+  announce(`📢 Event: ${def.name} — ${def.desc}`, def.positive ? 'event' : 'danger', { chronicle: false });
 }
 
 // Apply event modifiers to production values

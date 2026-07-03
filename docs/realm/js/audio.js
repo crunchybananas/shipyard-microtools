@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════
 
 import { G } from './state.js?realm=128';
+import { on } from './bus.js?realm=128';
 
 const AUDIO_PREF_KEY = 'realm-audio-muted-v1';
 
@@ -990,3 +991,9 @@ function startSeasonAmbient(season) {
   ambientNodes = { masterGain: master, nodes };
   currentAmbientSeason = season;
 }
+
+// ── Core → shell sound wiring (ENGINE.md rule 4) ────────────────────
+// Core files emit 'sfx'/'sfx-build' through the bus; only the shell
+// (this module) knows how to actually make noise.
+on('sfx', (name) => { try { playSound(name); } catch (_e) {} });
+on('sfx-build', (t) => { try { playBuildingSound(t); } catch (_e) {} });

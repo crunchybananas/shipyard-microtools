@@ -8,8 +8,7 @@ import { canAfford } from './economy.js?realm=128';
 import { dispatch } from './commands.js?realm=128';
 import { notify } from './notifications.js?realm=128';
 import { initAudio, playSound } from './audio.js?realm=128';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed } from './ui.js?realm=128';
-import { renderMissions } from './missions.js?realm=128';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=128';
 
 function pickTile(clientX, clientY) {
   return screenToWorld(clientX, clientY);

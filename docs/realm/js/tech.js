@@ -3,9 +3,10 @@
 // ════════════════════════════════════════════════════════════
 
 import { G, BUILDINGS } from './state.js?realm=128';
-import { playSound } from './audio.js?realm=128';
-import { chronicle } from './story.js?realm=128';
-import { notify } from './notifications.js?realm=128';
+import { sfx as playSound } from './log.js?realm=128';
+import { emit } from './bus.js?realm=128';
+import { chronicle } from './log.js?realm=128';
+import { announce as notify } from './log.js?realm=128';
 
 export const TECHS = {
   agriculture: {
@@ -259,7 +260,7 @@ export function updateResearch() {
     G.currentResearch = null;
     playSound('mission');
     const tech = TECHS[techId];
-    showToast(`Research complete: ${tech.name}`);
+    announceInfo(`Research complete: ${tech.name}`);
     // Loop 065: chronicle beat. Fallback for any future tech.
     const text = RESEARCH_BEATS[techId] || `${tech.name} is mastered. The realm bends a new skill into its lore.`;
     try { chronicle(text, 'research'); } catch (_e) {}
@@ -271,16 +272,6 @@ export function getResearchProgress() {
   if (!G.currentResearch) return null;
   const { techId, progress, total } = G.currentResearch;
   return { techId, fraction: Math.min(1, progress / total), name: TECHS[techId].name };
-}
-
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = 'var(--gold)';
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -368,25 +359,11 @@ export function checkEraAdvance() {
     playSound('mission');
     try { notify(`${era.icon} The realm enters the ${era.name}!`, 'event', { chronicle: false }); } catch (_e) {}
     try { chronicle(ERA_BEATS[G.era] || `The realm enters the ${era.name}.`, 'era'); } catch (_e) {}
-    if (!G.photoMode) showEraBanner(era);
+    emit('era-advanced', { era: G.era });
   }
 }
 
-function showEraBanner(era) {
-  const el = document.getElementById('era-banner');
-  if (!el) return;
-  el.innerHTML = `<div class="era-banner-inner">
-    <div class="era-banner-icon">${era.icon}</div>
-    <div class="era-banner-title">${era.name}</div>
-    <div class="era-banner-sub">A new age dawns upon the realm</div>
-  </div>`;
-  el.hidden = false;
-  el.classList.remove('show');
-  void el.offsetWidth;  // restart the CSS animation when ages land back-to-back
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => { el.classList.remove('show'); el.hidden = true; }, 3500);
-}
+
 
 // Backfill for saves written before eras existed: the highest era any
 // researched tech belongs to (nothing already researched may lock out),
