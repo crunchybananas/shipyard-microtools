@@ -2,13 +2,13 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=129';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=129';
-import { canAfford } from './economy.js?realm=129';
-import { dispatch } from './commands.js?realm=129';
-import { notify } from './notifications.js?realm=129';
-import { initAudio, playSound } from './audio.js?realm=129';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=129';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=130';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=130';
+import { canAfford } from './economy.js?realm=130';
+import { dispatch } from './commands.js?realm=130';
+import { notify } from './notifications.js?realm=130';
+import { initAudio, playSound } from './audio.js?realm=130';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=130';
 
 function pickTile(clientX, clientY) {
   return screenToWorld(clientX, clientY);
@@ -86,7 +86,10 @@ function showCitizenPanel(c) {
     go_home:'Heading home', sleep:'Sleeping', leisure:'Off to unwind',
   };
   const state = stateLabels[c.state] || c.state;
-  const job = c.jobBuilding ? BUILDINGS[c.jobBuilding.type]?.name : 'Unemployed';
+  const underConstruction = c.jobBuilding && c.jobBuilding.buildProgress !== undefined && c.jobBuilding.buildProgress < 1;
+  const job = c.jobBuilding
+    ? (underConstruction ? `Building the ${BUILDINGS[c.jobBuilding.type]?.name}` : BUILDINGS[c.jobBuilding.type]?.name)
+    : 'Unemployed';
   const carrying = c.carrying ? `${c.carryAmount} ${c.carrying}` : 'Nothing';
 
   panel.innerHTML = `

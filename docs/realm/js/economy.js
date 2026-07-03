@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=129';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=129';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=129';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=129';
-import { sfx as playSound, sfxBuild as playBuildingSound } from './log.js?realm=129';
-import { spawnDust } from './fx.js?realm=129';
-import { chronicle } from './log.js?realm=129';
-import { announce as notify, announceBuild as notifyBuild } from './log.js?realm=129';
-import { emit } from './bus.js?realm=129';
-import { isBuildingUnlocked } from './tech.js?realm=129';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=130';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=130';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=130';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=130';
+import { sfx as playSound, sfxBuild as playBuildingSound } from './log.js?realm=130';
+import { spawnDust } from './fx.js?realm=130';
+import { chronicle } from './log.js?realm=130';
+import { announce as notify, announceBuild as notifyBuild } from './log.js?realm=130';
+import { emit } from './bus.js?realm=130';
+import { isBuildingUnlocked } from './tech.js?realm=130';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -47,6 +47,17 @@ function constructionTicks(type) {
   return CONSTRUCTION_TICKS[type] || 300;
 }
 
+// Roads and walls are laid instantly-ish by the realm (bulk drag-painting
+// stays fluid); every real STRUCTURE is raised by builders on site.
+export function needsBuilders(type) {
+  return type !== 'road' && type !== 'wall';
+}
+export const BUILDER_SLOTS = 2;
+// With builders gating progress, base times stretch 3x — one builder
+// raises a house in ~11s at 1x, a crew of two in ~5.5s. Construction
+// pauses overnight (builders sleep) and while no one can reach the site.
+const BUILDER_TIME_MULT = 3;
+
 export function canPlace(type, tx, ty) {
   if (tx<0||tx>=MAP_W||ty<0||ty>=MAP_H) return false;
   if (!G.fog[ty][tx]) return false;
@@ -80,7 +91,7 @@ export function placeBuilding(type, tx, ty) {
     type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0,
     produced:null, prodShowCount:0, level:1,
     buildProgress: 0,
-    buildTotal: constructionTicks(type),
+    buildTotal: constructionTicks(type) * (needsBuilders(type) ? BUILDER_TIME_MULT : 1),
     buildStartedAt: G.gameTick || 0,
   };
   G.buildings.push(b);
@@ -235,14 +246,33 @@ export function trySpawnSettlers(count) {
 
 export function updateProduction() {
   for (const b of G.buildings) {
-    // Construction animation: every placed structure now spends a short,
-    // readable time in a scaffold/foundation phase before fully appearing.
+    // Construction (quality pass): structures are RAISED BY BUILDERS.
+    // Citizens take builder slots at the site through the job market;
+    // progress advances only while a crew is physically on site working
+    // — more hands, faster walls. Roads/walls stay timer-laid.
     if (b.buildProgress !== undefined && b.buildProgress < 1) {
       const total = b.buildTotal || constructionTicks(b.type);
       const before = b.buildProgress;
-      b.buildProgress = Math.min(1, b.buildProgress + 1 / total);
-      if ((G.gameTick || 0) % 18 === 0 && G.particles.length < 280) {
-        spawnDust(b.x, b.y);
+      if (!needsBuilders(b.type)) {
+        b.buildProgress = Math.min(1, b.buildProgress + 1 / total);
+      } else {
+        const crew = (b.workers || []).filter(w =>
+          w.state === 'working' &&
+          Math.abs(w.x - b.x) + Math.abs(w.y - b.y) <= 2.6
+        ).length;
+        if (crew > 0) {
+          b.buildProgress = Math.min(1, b.buildProgress + crew / total);
+          if ((G.gameTick || 0) % 18 === 0 && G.particles.length < 280) {
+            spawnDust(b.x, b.y);
+          }
+        } else if ((G.gameTick - (b.buildStartedAt || 0)) > 300 && (G.gameTick || 0) % 600 === 0 && G.particles.length < 280) {
+          // Site sitting idle — surface it in the world, not just a stat.
+          G.particles.push({
+            tx: b.x, ty: b.y, offsetY: -22,
+            text: '🔨 Needs builders', alpha: 1.2, vy: -0.08,
+            decay: 0.012, type: 'speech',
+          });
+        }
       }
       if (before < 1 && b.buildProgress >= 1) {
         b.completeTick = G.gameTick || 0;
@@ -251,6 +281,18 @@ export function updateProduction() {
           text: 'Complete', alpha: 1.4, vy: -0.18,
           decay: 0.012, type: 'text',
         });
+        // Release the crew — some will re-take this building as its
+        // production workers through the ordinary job market.
+        for (const w of (b.workers || [])) {
+          w.jobBuilding = null;
+          w.workTarget = null;
+          if (w.state === 'working' || w.state === 'walk_to_work') {
+            w.state = 'find_job';
+            w.stateTimer = 5;
+            w.path = null;
+          }
+        }
+        b.workers = [];
       }
       if (b.buildProgress < 1) continue;
     }

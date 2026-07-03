@@ -2,29 +2,29 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=129';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=129';
-import { generateWorld } from './world.js?realm=129';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=129';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=129';
-import { dispatch } from './commands.js?realm=129';
-import { coreTick } from './sim.js?realm=129';
-import { on } from './bus.js?realm=129';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=129';
-import { setupInput } from './input.js?realm=129';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=129';
-import { ERAS } from './tech.js?realm=129';
-import { saveGame, loadGame, getSaveSize } from './save.js?realm=129';
-import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=129';
-import { toggleNotificationLog, notify } from './notifications.js?realm=129';
-import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=129';
-import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=129';
-import { updateAnimals } from './animals.js?realm=129';
-import { checkAdvisor } from './advisor.js?realm=129';
-import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=129';
-import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=129';
-import { initSpriteLab } from './sprite-lab.js?realm=129';
-import { initSpriteMuster } from './sprite-muster.js?realm=129';
+import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=130';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=130';
+import { generateWorld } from './world.js?realm=130';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=130';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=130';
+import { dispatch } from './commands.js?realm=130';
+import { coreTick } from './sim.js?realm=130';
+import { on } from './bus.js?realm=130';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=130';
+import { setupInput } from './input.js?realm=130';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=130';
+import { ERAS } from './tech.js?realm=130';
+import { saveGame, loadGame, getSaveSize } from './save.js?realm=130';
+import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=130';
+import { toggleNotificationLog, notify } from './notifications.js?realm=130';
+import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=130';
+import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=130';
+import { updateAnimals } from './animals.js?realm=130';
+import { checkAdvisor } from './advisor.js?realm=130';
+import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=130';
+import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=130';
+import { initSpriteLab } from './sprite-lab.js?realm=130';
+import { initSpriteMuster } from './sprite-muster.js?realm=130';
 
 
 // ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────
@@ -142,8 +142,7 @@ document.addEventListener('visibilitychange', () => {
     _blurSnapshot = null;
     // Only summarize if enough time OR game-state changed to matter
     const daysPassed = G.day - snap.day;
-    const wallMs = Date.now() - snap.wallTime;
-    if (daysPassed < 1 && wallMs < 30_000) return;  // too brief to summarize
+    if (daysPassed < 1) return;  // sub-day absences aren't worth a summary ("0 days" read broken)
     // Build deltas
     const popDelta = G.population - snap.population;
     const bornDelta = (G.stats?.citizensBorn ?? 0) - snap.citizensBorn;
@@ -364,7 +363,10 @@ G.debug.disableEvents = false;
 // probe-harness: programmatic placement for chain/e2e tests — now routed
 // through the command funnel so probe placements land in G._commandLog too.
 G.debug.placeBuilding = (type, x, y) => dispatch({ type: 'PLACE_BUILDING', building: type, x, y }).ok;
-G.debug.dispatch = dispatch;  // probe/console access to the full command surface       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
+G.debug.dispatch = dispatch;  // probe/console access to the full command surface
+// probe-harness: advance exactly n core+shell ticks synchronously (no rAF
+// dependency — background tabs throttle rAF, which starves frame-based probes).
+G.debug.step = (n = 1) => { for (let i = 0; i < n; i++) { coreTick(); shellTick(); } return G.gameTick; };       // 356: probe-harness knob; suppresses drought/plague random-event rolls (active events still expire normally) — closes 355 pessimist finding
 window.forceRender = render;
 window.setSpeed = setSpeed;
 // Loop 035 (the-fixer): photo-mode toggle. Hides HUD / build-bar /
@@ -583,11 +585,29 @@ function runPendingTicks(nowMs) {
     _tickAccum -= n;
   }
   for (let i = 0; i < n; i++) {
+    stashPrevPositions();
     coreTick();
     shellTick();
   }
   if (n > 0) shellGates();
+  // Interpolation alpha: fraction of the way to the NEXT tick. The
+  // renderer draws every mover at lerp(prev, current, alpha), which is
+  // what makes motion smooth at any refresh rate — frames that run 0 or
+  // 2 ticks (accumulator remainder) otherwise strobe walkers (measured
+  // step-size CV 0.47 before interpolation).
+  G._renderAlpha = Math.max(0, Math.min(1, _tickAccum));
   return n;
+}
+
+// Snapshot pre-tick positions of everything the renderer draws in
+// motion. Underscore fields: runtime-only, excluded from save + hash.
+function stashPrevPositions() {
+  const arrays = [G.citizens, G.soldiers, G.enemies, G.walkers, G.caravans, G.animals];
+  for (const arr of arrays) {
+    if (!arr) continue;
+    for (const e of arr) { e._px = e.x; e._py = e.y; }
+  }
+  if (G.avatar) { G.avatar._px = G.avatar.x; G.avatar._py = G.avatar.y; }
 }
 
 

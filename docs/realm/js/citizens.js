@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=129';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=129';
-import { getCitizenSpeedMult } from './events.js?realm=129';
-import { houseCap } from './economy.js?realm=129';
-import { revealAround } from './world.js?realm=129';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=130';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=130';
+import { getCitizenSpeedMult } from './events.js?realm=130';
+import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=130';
+import { revealAround } from './world.js?realm=130';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -275,6 +275,7 @@ function buildingEdgeWorkTarget(c, b, radius = 2) {
 
 function workTargetForBuilding(c, b) {
   if (!b) return { x: c.x, y: c.y };
+  if (isConstructionSite(b)) return buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
   if (b.type === 'lumber') return resourceWorkTarget(c, b, TILE.FOREST, 7) || buildingEdgeWorkTarget(c, b, 3) || { x: b.x, y: b.y };
   if (b.type === 'quarry') return resourceWorkTarget(c, b, TILE.STONE, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
   if (b.type === 'mine') return resourceWorkTarget(c, b, TILE.IRON, 5) || buildingEdgeWorkTarget(c, b, 2) || { x: b.x, y: b.y };
@@ -442,10 +443,15 @@ function hasOpenFoodJob() {
   return _openFoodJobVal;
 }
 
+function isConstructionSite(b) {
+  return b.buildProgress !== undefined && b.buildProgress < 1 && needsBuilders(b.type);
+}
+
 function scoreJob(c, b) {
   let score = -dist2(c.x, c.y, b.x, b.y);
   const days = foodDaysLeft();
   if (days < 3 && FOOD_JOBS.has(b.type)) score += (3 - days) * 14;
+  if (isConstructionSite(b)) score += 12; // fresh sites pull a crew fast
   if (b.type === 'wonder') score += 6; // the great work draws hands
   if (c.jobBuilding === b) score += 6; // hysteresis
   return score;
@@ -580,6 +586,9 @@ export function updateCitizens() {
       // ── Schedule (Phase 3a) ──────────────────────────────────────
       const period = getDayPeriod();
       const threatened = G.enemies.length > 0 && enemyNear(c, 6);
+      // Flee flag clears once the danger passes (it used to stick forever
+      // — set in combat.js, never reset). While fleeing, citizens sprint.
+      if (c._fleeing && !threatened) c._fleeing = false;
       if (period === 'night' && !NIGHT_EXEMPT.has(c.state) && !threatened && !(c.carrying && c.carryAmount > 0)) {
         goHome(c);
       } else if (c.state === 'sleep' && (period !== 'night' || threatened)) {
@@ -745,6 +754,7 @@ export function updateCitizens() {
         }
         // Exhaustion: below 30 energy, up to -25% speed (Phase 3a)
         if ((c.rest ?? 100) < 30) spd *= 0.75 + ((c.rest ?? 100) / 30) * 0.25;
+        if (c._fleeing) spd *= 1.35; // panic sprint — flight should read as flight
         const step = Math.min(spd, d);
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
@@ -790,6 +800,7 @@ export function updateCitizens() {
           const penalty = Math.min(0.4, (c.hunger - 60) / 100);
           spd *= (1 - penalty);
         }
+        if (c._fleeing) spd *= 1.35; // panic sprint
         const step = Math.min(spd, d);
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
@@ -852,8 +863,11 @@ function runStateMachine(c) {
           if (isBlacklisted(c, b.x, b.y)) continue;
           const def = BUILDINGS[b.type];
           if (!def) continue; // guard against unknown building types (corrupt save, etc.)
-          if (!def.prod && !def.workers) continue;
-          const needed = def.workers || 0;
+          const site = isConstructionSite(b);
+          if (!site && !def.prod && !def.workers) continue;
+          // A site under construction offers BUILDER slots regardless of the
+          // finished building's staffing; production slots take over after.
+          const needed = site ? BUILDER_SLOTS : (def.workers || 0);
           if (b.workers.length >= needed) continue;
           if (b.workers.includes(c)) continue;
           const score = scoreJob(c, b);

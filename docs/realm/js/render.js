@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=129';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=129';
-import { makeAtlasLoader } from './atlas-loader.js?realm=129';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=130';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=130';
+import { makeAtlasLoader } from './atlas-loader.js?realm=130';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -338,6 +338,17 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
     width: targetW,
     height: targetH,
   });
+}
+
+// Interpolated draw position (Phase Q: jitter fix). Sim positions step
+// per tick; frames between ticks draw at lerp(prev, cur, G._renderAlpha).
+// Snap on teleports (evacuation, spawn, load) — never lerp across >1.5 tiles.
+function lerpEnt(e) {
+  const a = G._renderAlpha ?? 1;
+  const px = e._px, py = e._py;
+  if (px === undefined || py === undefined) return e;
+  if (Math.abs(px - e.x) + Math.abs(py - e.y) > 1.5) return e;
+  return { x: px + (e.x - px) * a, y: py + (e.y - py) * a };
 }
 
 function citizenOnBlockedBuildingTile(c) {
@@ -965,7 +976,10 @@ export function render() {
         continue;
       }
       const colors = TILE_COLORS[tile];
-      let tileColor = colors[(x+y)%2];
+      // Two-tone alternation reads as a checkerboard once the night
+      // multiply-overlay amplifies relative contrast — flatten it in low
+      // light (the dusk tint masks the transition).
+      let tileColor = daylight < 0.85 ? colors[0] : colors[(x+y)%2];
       const seasonShift = getSeasonData().tileShift;
 
       // Water uses large-scale smooth noise — no per-tile checkerboard seams
@@ -1784,7 +1798,8 @@ export function render() {
     // A citizen inside a fresh footprint ghosts at low alpha while
     // evacuating instead of vanishing and rematerializing.
     const cGhost = citizenOnBlockedBuildingTile(c);
-    const s = toScreen(c.x, c.y);
+    const lp = lerpEnt(c);
+    const s = toScreen(lp.x, lp.y);
     const pathActive = !!(c.path && c.pathIdx < (c.path?.length ?? 0));
     // Road lane offset (render-only): while walking a road tile, drift to
     // the right-hand side of the direction of travel so two-way traffic
@@ -1825,7 +1840,7 @@ export function render() {
     // row flaps per second per moving citizen). citizens.js stamps _movedAt
     // on every real step; holding the walk row ~8 ticks after the last step
     // absorbs the gap without letting stopped citizens walk in place.
-    const isMoving = pathActive || (G.gameTick - (c._movedAt ?? -999)) < 8;
+    const isMoving = pathActive || (G.gameTick - (c._movedAt ?? -999)) < 14;
     const phaseHash = (c.name.charCodeAt(0) * 91 + (c.name.charCodeAt(1) || 11) * 41) % 360;
     const phaseOffset = phaseHash * Math.PI / 180;
     const bob = isMoving
@@ -2474,7 +2489,8 @@ export function render() {
 
   // ── Founder marker (Phase 3d) ─────────────────────────────
   function drawFounderMarker(a) {
-    const s = toScreen(a.x, a.y);
+    const alp = lerpEnt(a);
+    const s = toScreen(alp.x, alp.y);
     const bob = Math.sin(G.gameTick * 0.08) * 1.5;
     const topY = s.y - 34 + bob;
     // Pennant pole + golden flag
@@ -2510,7 +2526,8 @@ export function render() {
   // ── Service walkers (drawn via the unified depth pass) ────
   function drawOneWalker(wEntity) {
   for (const w of [wEntity]) {
-    const ws = toScreen(w.x, w.y);
+    const wlp = lerpEnt(w);
+    const ws = toScreen(wlp.x, wlp.y);
     ctx.globalAlpha = Math.max(0.85, daylight);
     // Service walkers render through the painted actor atlas like citizens
     // (church -> scholar robes as the priest, tavern -> innkeeper, well ->
@@ -2582,7 +2599,8 @@ export function render() {
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    const start = toScreen(c.x, c.y);
+    const clp0 = lerpEnt(c);
+    const start = toScreen(clp0.x, clp0.y);
     ctx.moveTo(start.x, start.y);
     for (let i = c.pathIdx; i < c.path.length; i++) {
       const wp = c.path[i];
@@ -2607,7 +2625,8 @@ export function render() {
   // ── Soldiers (drawn via the unified depth pass) ───────────
   function drawOneSoldier(sEntity) {
   for (const s of [sEntity]) {
-    const ss = toScreen(s.x, s.y);
+    const slp = lerpEnt(s);
+    const ss = toScreen(slp.x, slp.y);
     // Garrisoned soldier: drawn small on the tower parapet, no shadow —
     // same depth slot as the tower tile so layering stays correct.
     if (s.garrison) {
@@ -2655,7 +2674,7 @@ export function render() {
       s._mvx = smx; s._mvy = smy;
     }
     let sFx = s._mvx ?? smx, sFy = s._mvy ?? smy;
-    let sAction = (G.gameTick - (s._movedAt ?? -999)) < 8 ? 'walk' : 'idle';
+    let sAction = (G.gameTick - (s._movedAt ?? -999)) < 14 ? 'walk' : 'idle';
     let sNearE = null, sNearD = Infinity;
     for (const e of G.enemies) {
       const d = Math.hypot(e.x - s.x, e.y - s.y);
@@ -2878,7 +2897,8 @@ export function render() {
       });
     }
 
-    const s = toScreen(c.x, c.y);
+    const clp = lerpEnt(c);
+    const s = toScreen(clp.x, clp.y);
     ctx.globalAlpha = daylight;
     const bob = Math.sin(G.gameTick * 0.2 + c.x * 2) * 1;
 
@@ -2922,8 +2942,22 @@ export function render() {
   // ── Enemies (drawn via the unified depth pass) ────────────
   function drawOneEnemy(eEntity) {
   for (const e of [eEntity]) {
-    const es = toScreen(e.x, e.y);
+    const elp = lerpEnt(e);
+    const es = toScreen(elp.x, elp.y);
     ctx.globalAlpha = daylight;
+    // Threat ring (quality pass): raiders read as hostile at any light
+    // level — a low ember glow underfoot, subtle by day, clear at night.
+    ctx.save();
+    ctx.globalAlpha = 0.38;
+    const emberPulse = 0.8 + Math.sin(G.gameTick * 0.15 + (e.variant ?? 0) * 2.1) * 0.2;
+    const eg = ctx.createRadialGradient(es.x, es.y + 2, 1, es.x, es.y + 2, 11 * emberPulse);
+    eg.addColorStop(0, 'rgba(255,70,40,0.85)');
+    eg.addColorStop(1, 'rgba(255,70,40,0)');
+    ctx.fillStyle = eg;
+    ctx.beginPath();
+    ctx.ellipse(es.x, es.y + 2, 11 * emberPulse, 5.5 * emberPulse, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
     // Per-enemy visual variety from fixed spawn variant
     const eVariant = e.variant ?? 0; // 0=swordsman, 1=spearman, 2=berserker
     const eHash = eVariant * 2.1; // stable phase offset for eye pulse
@@ -3150,7 +3184,8 @@ export function render() {
   // ── Animals ─────────────────────────────────────────────
   if (G.animals && G.camera.zoom >= 0.6) {
     for (const a of G.animals) {
-      const as = toScreen(a.x, a.y);
+      const alp2 = lerpEnt(a);
+      const as = toScreen(alp2.x, alp2.y);
       if (as.x < -20 || as.x > logicalW + 20 || as.y < -20 || as.y > logicalH + 20) continue;
       ctx.globalAlpha = daylight;
       // Shadow

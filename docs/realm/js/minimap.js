@@ -2,7 +2,7 @@
 // Minimap — renderer-independent map overview
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=129';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=130';
 
 let minimapC = null;
 let minimapCtx = null;
