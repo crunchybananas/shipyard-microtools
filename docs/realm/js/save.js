@@ -15,9 +15,11 @@ export function getSaveSize() {
   return raw ? raw.length : 0;
 }
 
-export function saveGame({ silent = false } = {}) {
-  try {
-    const state = {
+// Pure serialization — core-safe (no DOM, no localStorage, no wall
+// clock). The shell wrapper below adds savedAt and persists. This is
+// also the multiplayer join-snapshot format.
+export function serializeGame() {
+  const state = {
       v: 2,
       map: G.map,
       fog: G.fog,
@@ -75,7 +77,7 @@ export function saveGame({ silent = false } = {}) {
         phase:c.phase, gold:c.gold, speed:c.speed,
         buildingIdx: G.buildings.indexOf(c.building),
       })),
-    };
+  };
     if (G.tileWear) {
       state.tileWear = G.tileWear.map(row => Array.from(row));
     }
@@ -100,11 +102,6 @@ export function saveGame({ silent = false } = {}) {
     state.deathMarkers = Array.isArray(G.deathMarkers)
       ? G.deathMarkers.slice(-40)
       : [];
-    // Loop 139 (the-fixer, 133 MEDIUM): record wall-clock time of save
-    // so loadAndStart can compute real-world wait and surface it in
-    // 135's welcome-back notify. Legacy saves without this field
-    // fall back to "no wait info available" on resume.
-    state.savedAt = Date.now();
     // Loop 197 (the-fixer, closes 192 filed): persist G.realmEnded so
     // a fallen-realm save preserves post-end mode across reloads.
     // Without this, future consumers of G.realmEnded (render desat /
@@ -119,6 +116,15 @@ export function saveGame({ silent = false } = {}) {
     // Loop 228: persist lastDeathDay for sustained-no-death beat.
     state.lastDeathDay = G.lastDeathDay;
     state.lastUnderpopDay = G.lastUnderpopDay;  // Loop 230 (sustained-state #3)
+  return state;
+}
+
+export function saveGame({ silent = false } = {}) {
+  try {
+    const state = serializeGame();
+    // Wall-clock stamp lives in the SHELL wrapper (welcome-back feature)
+    // so serializeGame stays deterministic.
+    state.savedAt = Date.now();
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     if (silent) {
       showSaveIndicator();
@@ -130,13 +136,11 @@ export function saveGame({ silent = false } = {}) {
   }
 }
 
-export function loadGame() {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) { showToast('No save found.', true); return false; }
-    const s = JSON.parse(raw);
-    if (s.v !== 2) { showToast('Incompatible save.', true); return false; }
-
+// Pure state restoration — core-safe. Takes a parsed save object and
+// rebuilds G (references re-linked from indices). Shell concerns
+// (localStorage, toasts, the legacy castle-law notice) live in the
+// loadGame wrapper below.
+export function applySave(s) {
     G.map = s.map;
     G.fog = s.fog;
     G.resources = s.resources;
@@ -274,12 +278,26 @@ export function loadGame() {
         && G.buildings.some(b => b.type === 'castle' && (b.buildProgress === undefined || b.buildProgress >= 1))) {
       G.storyFlags = G.storyFlags || {};
       G.storyFlags.castleStands = true;
+      G._castleLawChangedNotice = true; // shell wrapper surfaces the toast
+    }
+    if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
+    G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
+    return true;
+}
+
+export function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) { showToast('No save found.', true); return false; }
+    const s = JSON.parse(raw);
+    if (s.v !== 2) { showToast('Incompatible save.', true); return false; }
+    applySave(s);
+    if (G._castleLawChangedNotice) {
+      delete G._castleLawChangedNotice;
       setTimeout(() => {
         try { notify('📜 The law of the realm has changed: the Castle anchors your defense — victory is now the Hall of Ages (research Monuments).', 'mission', { chronicle: false }); } catch (_e) {}
       }, 800);
     }
-    if (Array.isArray(s.notificationLog)) G.notificationLog = s.notificationLog;
-    G.deathMarkers = Array.isArray(s.deathMarkers) ? s.deathMarkers : [];
     showToast('Game loaded.');
     return true;
   } catch (e) {

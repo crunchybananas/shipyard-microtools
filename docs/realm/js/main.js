@@ -2,30 +2,23 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=128';
+import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=128';
 import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=128';
 import { generateWorld } from './world.js?realm=128';
 import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo } from './render.js?realm=128';
 import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=128';
-import { updateCitizens } from './citizens.js?realm=128';
-import { updateSoldiers } from './soldiers.js?realm=128';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=128';
 import { dispatch } from './commands.js?realm=128';
+import { coreTick } from './sim.js?realm=128';
 import { on } from './bus.js?realm=128';
-import { checkMissions } from './missions.js?realm=128';
 import { updateParticles, updateSmokeEmitters } from './particles.js?realm=128';
 import { setupInput } from './input.js?realm=128';
 import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=128';
-import { updateResearch, checkEraAdvance, ERAS } from './tech.js?realm=128';
-import { updateWonder } from './wonder.js?realm=128';
-import { checkRandomEvents } from './events.js?realm=128';
+import { ERAS } from './tech.js?realm=128';
 import { saveGame, loadGame, getSaveSize } from './save.js?realm=128';
 import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=128';
 import { toggleNotificationLog, notify } from './notifications.js?realm=128';
 import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=128';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=128';
 import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=128';
-import { updateWalkers } from './walkers.js?realm=128';
 import { updateAnimals } from './animals.js?realm=128';
 import { checkAdvisor } from './advisor.js?realm=128';
 import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=128';
@@ -40,6 +33,32 @@ on('raid-started', ({ x, y }) => { try { panCameraTo(x, y, 800); } catch (_e) {}
 on('victory', () => setTimeout(() => showVictoryScreen(), 700));
 on('realm-event', () => updateEventBanner());
 on('era-advanced', ({ era }) => { if (!G.photoMode) showEraBanner(ERAS[era - 1]); });
+on('season-changed', ({ season }) => {
+  const seasonEmojis = { spring:['🌱','🌸','🌿'], summer:['☀️','🌻','🌊'], autumn:['🍂','🍁','🌾'], winter:['❄️','⛄','🌨️'] };
+  const emojis = seasonEmojis[season] || ['✨'];
+  for (let i = 0; i < 15; i++) {
+    G.particles.push({
+      tx: MAP_W/2 + (Math.random()-0.5)*8,
+      ty: MAP_H/2 + (Math.random()-0.5)*8,
+      offsetY: -10 - Math.random()*20,
+      text: emojis[Math.floor(Math.random()*emojis.length)],
+      alpha: 1.5, vy: -0.12 - Math.random()*0.15,
+      decay: 0.007, type: 'text',
+    });
+  }
+});
+on('scenario-won', () => {
+  for (let i = 0; i < 30; i++) {
+    G.particles.push({
+      tx: MAP_W/2 + (Math.random()-0.5)*10,
+      ty: MAP_H/2 + (Math.random()-0.5)*10,
+      offsetY: -20 - Math.random()*40,
+      text: ['🎉','⭐','🏆'][Math.floor(Math.random()*3)],
+      alpha: 2, vy: -0.15, decay: 0.005, type: 'text',
+    });
+  }
+  showScenarioVictory();
+});
 
 // ── Init ───────────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -468,99 +487,16 @@ window.toggleMissions = () => {
 
 // (Welcome notification is fired from beginGame() — avoid duplicate at module load)
 
-// ── Day/Night ──────────────────────────────────────────────
-function updateTime() {
-  G.dayPhase += 1; // one tick = one unit of day-time (ENGINE.md rule 5)
-  if (G.dayPhase >= G.dayLength) {
-    G.dayPhase = 0;
-    G.day++;
-    if (G.stats) G.stats.daysLived++;
-    // Bell toll at dawn if church exists
-    playSound('bellToll');
-    collectTaxes();
-    checkRaids();
-    // Note: raidsSurvived now increments inside checkRaids() only when the
-    // player had defenses at the moment of raid-spawn. Loop 014 fix: the
-    // old unconditional increment here counted raids as "survived" even
-    // against a settlement with zero military buildings.
-    checkRandomEvents();
-    if (updateSeason()) {
-      const s = getSeasonData();
-      const seasonNum = Math.floor((G.day - 1) / 7) + 1;
-      // Loop 070 (the-fixer, 069 HIGH): pass `chronicle: false` so the
-      // notify-toast doesn't ALSO write to chronicle. 069's live play
-      // saw day 8 fire THREE back-to-back chronicle entries at summer
-      // (event from toast-route + season from the direct write below
-      // + misc from advisor). The toast is ephemeral UX; the direct
-      // `chronicle(..., 'season')` below IS the narrative memory. One
-      // chronicle row per event is the right shape.
-      notify(`${s.name} begins! (Season ${seasonNum})`, 'event', { chronicle: false });
-      playSound('mission');
-      // Loop 265 (the-fixer, 264 variant-pool axis 2nd use): season prose
-      // pools. Pre-265 each season fired ONE fixed string every 7 days for
-      // the realm's lifetime — long-lived realm saw "The fields grow golden"
-      // 8+ times. Now each season has 3 variants picked by G.day %
-      // pool.length, so consecutive seasons see different prose. First
-      // variant per pool preserves original prose (backward compat).
-      // Two-sentence rhythm preserved across all variants.
-      const seasonTextPools = {
-        spring: [
-          'The snows melt. Green shoots push through the thawing earth.',
-          'The first warm rain comes. The earth breathes again.',
-          'Spring arrives. The realm wakes to birdsong.',
-        ],
-        summer: [
-          'Long days and warm winds. The fields grow golden.',
-          'The shadows lean long. The noonday sun holds the realm in amber.',
-          'Summer is fully arrived. Bees move thick between the blossoms.',
-        ],
-        autumn: [
-          'Leaves turn amber and crimson. The harvest is upon us.',
-          'The wind sharpens. Smoke from harvest fires drifts low across the fields.',
-          'Autumn comes. The realm gathers what summer made.',
-        ],
-        winter: [
-          'Frost grips the land. Fires burn low in every hearth.',
-          'The first deep cold settles. The realm pulls inward.',
-          'Winter holds the realm. Snow muffles every footfall.',
-        ],
-      };
-      const pool = seasonTextPools[G.season];
-      const seasonText = pool ? pool[((G.day % pool.length) + pool.length) % pool.length] : `${s.name} begins.`;
-      chronicle(seasonText, 'season');
-      // Season banner particles
-      const seasonEmojis = { spring:['🌱','🌸','🌿'], summer:['☀️','🌻','🌊'], autumn:['🍂','🍁','🌾'], winter:['❄️','⛄','🌨️'] };
-      const emojis = seasonEmojis[G.season] || ['✨'];
-      for (let i = 0; i < 15; i++) {
-        G.particles.push({
-          tx: MAP_W/2 + (Math.random()-0.5)*8,
-          ty: MAP_H/2 + (Math.random()-0.5)*8,
-          offsetY: -10 - Math.random()*20,
-          text: emojis[Math.floor(Math.random()*emojis.length)],
-          alpha: 1.5, vy: -0.12 - Math.random()*0.15,
-          decay: 0.007, type: 'text',
-        });
-      }
-    }
-  }
-}
-
 // ── Game Loop ──────────────────────────────────────────────
-// ENGINE.md Phase 0: one coreTick = exactly ONE tick of sim time. G.speed
-// multiplies how many ticks run per frame (via the accumulator below) and
-// must never appear inside a tick function — the old shape multiplied by
-// G.speed inside functions already called G.speed times, so the day clock
-// ran speed² while gameTick-relative logic ran speed¹ (split-brain economy
-// at 2×/4×), and sim rate was tied to display refresh (120 Hz = 2× game).
-function coreTick() {
-  G.gameTick++;
-  updateTime();
-  updateCitizens();
-  updateSoldiers();
-  updateEnemies();
-  updateTowers();
-  updateProjectiles();
-  updateWalkers();
+// The deterministic tick lives in sim.js (coreTick). What remains here
+// is SHELL work: ambient/visual systems that tick alongside the core
+// (per-client, Math.random allowed, excluded from the determinism
+// hash) and throttled UI/meta gates.
+
+// Ambient tick — runs once per core tick, shell-side (ENGINE.md
+// two-tier sim). Two multiplayer clients may see different birds;
+// they must never see different granaries.
+function shellTick() {
   updateAnimals();
   updateBoats();
   updateFlocks(window.innerWidth, window.innerHeight);
@@ -573,64 +509,51 @@ function coreTick() {
   updateFootprints();
   updateSnowmen();
   enhUpdateAll(window.innerWidth, window.innerHeight);
-  updateProduction();
-  updateFires();
   updateParticles();
   updateSmokeEmitters();
-  updateResearch();
-  const t = G.gameTick;
-  if (t % 30 === 0) {
-    // updateUI() already calls updateBuildBarAffordability() for in-place cost/lock
-    // updates. Calling renderBuildBar() here would wipe bar.innerHTML every 500ms
-    // — if that fires between a user's mousedown and click, the button element is
-    // replaced before the click lands, so the first click is lost (reported as
-    // "selecting a building requires two clicks"). Full rebuilds happen on the
-    // events that change bar structure: placement, research, undo, Escape, etc.
-    updateUI();
-    updateTutorialTip();
-  }
-  if (t % 60 === 0) {
-    checkMissions();
-    renderMissions();
-    renderResearchPanel();
-    updateAmbient();
-    checkAchievements();
-    checkStoryBeats();
-    checkEraAdvance();
-  }
-  if (t % 120 === 0) { tickMusic(); checkAdvisor(); }
-  if (t % 720 === 0) updateWonder();
-  if (t % 120 === 0 && !G._scenarioWon) {
-    if (checkScenarioComplete()) {
-      G._scenarioWon = true;
-      G._scenariosCompleted = G._scenariosCompleted || [];
-      if (!G._scenariosCompleted.includes(G.scenario)) G._scenariosCompleted.push(G.scenario);
-      if (G.stats && !G.stats.scenariosWon.includes(G.scenario)) G.stats.scenariosWon.push(G.scenario);
-      // Victory particles
-      for (let i = 0; i < 30; i++) {
-        G.particles.push({
-          tx: MAP_W/2 + (Math.random()-0.5)*10,
-          ty: MAP_H/2 + (Math.random()-0.5)*10,
-          offsetY: -20 - Math.random()*40,
-          text: ['🎉','⭐','🏆'][Math.floor(Math.random()*3)],
-          alpha: 2, vy: -0.15, decay: 0.005, type: 'text',
-        });
-      }
-      showScenarioVictory();
-    }
-  }
-  if (t % 3600 === 0 && t > 0) saveGame({ silent: true });
   // Bird spawning — screen-space birds fly across sky during daytime.
-  // Spawn fully offscreen-left so they don't appear inside the vignette void;
-  // let them fly across the visible map and exit right.
   if (!G.birds) G.birds = [];
-  if (t % 400 === 0 && G.birds.length < 3 && getDaylight() > 0.6) {
+  if (G.gameTick % 400 === 0 && G.birds.length < 3 && getDaylight() > 0.6) {
     G.birds.push({
       x: -80 - Math.random() * 60,
       y: 80 + Math.random() * 120,
       vx: 0.8 + Math.random() * 0.5,
       vy: 0,
     });
+  }
+}
+
+// Throttled UI/meta gates — run after each frame's tick batch. Story
+// beats, achievements, ambient audio and panel refreshes are shell
+// concerns (they read core state, render/persist client-side).
+let _gate30 = 0, _gate60 = 0, _gate120 = 0, _lastAutosave = 0;
+function shellGates() {
+  const t = G.gameTick;
+  if (t - _gate30 >= 30) {
+    _gate30 = t;
+    // updateUI() already calls updateBuildBarAffordability() for in-place
+    // cost/lock updates; full build-bar rebuilds happen on structural
+    // events only (placement, research, undo, Escape) so clicks are
+    // never eaten by an innerHTML wipe.
+    updateUI();
+    updateTutorialTip();
+  }
+  if (t - _gate60 >= 60) {
+    _gate60 = t;
+    renderMissions();
+    renderResearchPanel();
+    updateAmbient();
+    checkAchievements();
+    checkStoryBeats();
+  }
+  if (t - _gate120 >= 120) {
+    _gate120 = t;
+    tickMusic();
+    checkAdvisor();
+  }
+  if (t - _lastAutosave >= 3600) {
+    _lastAutosave = t;
+    if (t > 0) saveGame({ silent: true });
   }
 }
 
@@ -659,9 +582,14 @@ function runPendingTicks(nowMs) {
   } else {
     _tickAccum -= n;
   }
-  for (let i = 0; i < n; i++) coreTick();
+  for (let i = 0; i < n; i++) {
+    coreTick();
+    shellTick();
+  }
+  if (n > 0) shellGates();
   return n;
 }
+
 
 // ── Loop 081 (the-fixer, 069 filed 12 ticks ago) ─────────────
 // Synchronously advance the simulation N game-days by calling
@@ -693,6 +621,7 @@ function fastForward(days) {
   let iters = 0;
   while (G.day < targetDay && iters < maxIters) {
     coreTick();
+    if (G.gameTick % 60 === 0) { checkStoryBeats(); checkAchievements(); }
     iters++;
   }
   return {
