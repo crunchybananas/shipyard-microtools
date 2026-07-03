@@ -463,8 +463,8 @@ export function updateProduction() {
           const toTier = HOUSE_TIERS[(b.level || 1) - 1];
           G.maxPop = Math.max(0, G.maxPop - (fromTier.cap - toTier.cap));
           b.tierStreak = 0;
-          const now = Date.now();
-          if (!G._lastDevolveNotice || now - G._lastDevolveNotice > 8000) {
+          const now = G.gameTick; // tick-based throttle (core file — no Date.now)
+          if (!G._lastDevolveNotice || now - G._lastDevolveNotice > 480) {
             G._lastDevolveNotice = now;
             notify(`A ${fromTier.name.toLowerCase()} declined into a ${toTier.name.toLowerCase()} — services lapsed.`, 'warn');
           }

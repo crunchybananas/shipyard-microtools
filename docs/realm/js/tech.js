@@ -260,7 +260,7 @@ export function updateResearch() {
     G.currentResearch = null;
     playSound('mission');
     const tech = TECHS[techId];
-    announceInfo(`Research complete: ${tech.name}`);
+    notify(`Research complete: ${tech.name}`, 'info', { chronicle: false });
     // Loop 065: chronicle beat. Fallback for any future tech.
     const text = RESEARCH_BEATS[techId] || `${tech.name} is mastered. The realm bends a new skill into its lore.`;
     try { chronicle(text, 'research'); } catch (_e) {}
