@@ -2,9 +2,10 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, TILE } from './state.js?realm=128';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, TILE } from './state.js?realm=128';
 import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=128';
 import { getCitizenSpeedMult } from './events.js?realm=128';
+import { houseCap } from './economy.js?realm=128';
 import { revealAround } from './world.js?realm=128';
 
 function dist2(ax, ay, bx, by) {
@@ -410,6 +411,57 @@ function replanToRequestedTarget(c) {
   pathTo(c, tx, ty);
 }
 
+// ── Homes & schedule (Phase 3a) ─────────────────────────────────────
+// Citizens sleep in an assigned house at night. Assignment is lazy
+// (first nightfall, or when the old home is gone) and respects tier
+// capacity via houseCap. Homeless citizens bed down near the
+// settlement anchor — visible pressure to build housing.
+function assignHome(c) {
+  const counts = new Map();
+  for (const other of G.citizens) {
+    if (other.home) counts.set(other.home, (counts.get(other.home) || 0) + 1);
+  }
+  let best = null, bestD = Infinity;
+  for (const b of G.buildings) {
+    if (b.type !== 'house') continue;
+    if (b.buildProgress !== undefined && b.buildProgress < 1) continue;
+    if ((counts.get(b) || 0) >= houseCap(b)) continue;
+    const d = dist2(c.x, c.y, b.x, b.y);
+    if (d < bestD) { bestD = d; best = b; }
+  }
+  c.home = best;
+  return best;
+}
+
+function goHome(c) {
+  if (!c.home || !G.buildings.includes(c.home)) assignHome(c);
+  clearPath(c);
+  c.state = 'go_home';
+  c.stateTimer = 0;
+  if (c.home) {
+    const spot = nearestWalkableTile(Math.round(c.home.x), Math.round(c.home.y), 3) || { x: c.home.x, y: c.home.y };
+    pathTo(c, spot.x, spot.y);
+  } else {
+    const t = idleLoiterTarget(c);
+    pathTo(c, t.x, t.y);
+  }
+}
+
+// States that must not be interrupted by nightfall: carriers finish
+// their delivery first (goods in hand are an obligation), sleepers and
+// homeward walkers are already handled.
+const NIGHT_EXEMPT = new Set(['sleep', 'go_home', 'walk_to_deliver', 'deliver', 'needs_delivery']);
+
+// Raid awareness for the schedule: a citizen with raiders nearby must
+// never be marched home into the fight (the flee response in combat.js
+// owns them), and sleepers wake when danger gets close.
+function enemyNear(c, r) {
+  for (const e of G.enemies) {
+    if (Math.abs(e.x - c.x) < r && Math.abs(e.y - c.y) < r) return true;
+  }
+  return false;
+}
+
 function clearPath(c) {
   c.path = null;
   c.pathIdx = 0;
@@ -484,6 +536,33 @@ export function updateCitizens() {
       }
       // Self-heal any over-long idle (flee aftermath left stale 260-tick timers).
       if (c.state === 'idle' && c.stateTimer > 140) c.stateTimer = 60;
+
+      // ── Schedule (Phase 3a) ──────────────────────────────────────
+      const period = getDayPeriod();
+      const threatened = G.enemies.length > 0 && enemyNear(c, 6);
+      if (period === 'night' && !NIGHT_EXEMPT.has(c.state) && !threatened && !(c.carrying && c.carryAmount > 0)) {
+        goHome(c);
+      } else if (c.state === 'sleep' && (period !== 'night' || threatened)) {
+        // Dawn: wake with a stagger so the morning rush reads as a town
+        // waking up, not a synchronized swarm. Danger wakes sleepers
+        // immediately — the combat flee response takes them from there.
+        c.state = threatened ? 'idle' : 'find_job';
+        c.stateTimer = threatened ? 0 : rngInt(0, 40);
+        clearPath(c);
+        c.rest = Math.min(100, c.rest ?? 100);
+        if (threatened) {
+          G.particles.push({ tx: c.x, ty: c.y, offsetY: -24, text: '❗', alpha: 1.3, vy: -0.12, decay: 0.02, type: 'speech' });
+        }
+      } else if (c.state === 'go_home' && threatened) {
+        // Abort the walk home if raiders cut the path — flee instead.
+        c.state = 'idle';
+        c.stateTimer = 0;
+        clearPath(c);
+      }
+      // Rest drains while awake and active; sleep restores it (below).
+      if (c.state !== 'sleep' && c.state !== 'idle') {
+        c.rest = Math.max(0, (c.rest ?? 100) - 0.35);
+      }
     }
 
     // ── Universal progress watchdog: no measurable progress toward the
@@ -573,6 +652,8 @@ export function updateCitizens() {
           const penalty = Math.min(0.4, (c.hunger - 60) / 100);
           spd *= (1 - penalty);
         }
+        // Exhaustion: below 30 energy, up to -25% speed (Phase 3a)
+        if ((c.rest ?? 100) < 30) spd *= 0.75 + ((c.rest ?? 100) / 30) * 0.25;
         const step = Math.min(spd, d);
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
@@ -909,6 +990,28 @@ function runStateMachine(c) {
       c.state = 'find_job';
       c.stateTimer = 5;
       clearPath(c);
+      break;
+
+    case 'go_home':
+      // Shared mover walks the path; when it's exhausted we're home.
+      if (c.path && c.pathIdx < c.path.length) break;
+      c.state = 'sleep';
+      c.stateTimer = 60;
+      clearPath(c);
+      break;
+
+    case 'sleep':
+      // Sleep restores energy; the dawn heartbeat wakes us. Re-enter on
+      // a slow cadence and breathe the occasional 💤 so night reads as
+      // rest, not a freeze.
+      c.rest = Math.min(100, (c.rest ?? 100) + 0.15 * 60);
+      if (rng() < 0.25) {
+        G.particles.push({
+          tx: c.x, ty: c.y, offsetY: -24,
+          text: '💤', alpha: 0.9, vy: -0.06, decay: 0.012, type: 'speech',
+        });
+      }
+      c.stateTimer = 60;
       break;
 
     default:

@@ -1,10 +1,12 @@
-import { G, BUILDINGS, MAP_W, MAP_H, rngRange, resourceEmoji } from './state.js?realm=128';
+import { G, BUILDINGS, MAP_W, MAP_H, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=128';
 import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=128';
 import { getWonderReport } from './wonder.js?realm=128';
 
 export function updateWalkers() {
-  // Spawn walkers from service buildings periodically
-  if (G.gameTick % 200 === 0) {
+  // Spawn walkers from service buildings periodically — but not at night
+  // (Phase 3a): the streets empty out while the town sleeps; walkers
+  // already in flight finish their rounds and expire naturally.
+  if (G.gameTick % 200 === 0 && getDayPeriod() !== 'night') {
     for (const b of G.buildings) {
       const def = BUILDINGS[b.type];
       if (!def) continue; // guard against unknown building types

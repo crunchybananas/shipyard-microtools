@@ -38,7 +38,8 @@ export function makeCitizen(x,y){
     job: null, jobBuilding: null,
     carrying: null, carryAmount: 0,
     name: randomName(),
-    hunger: 0, rest: 0,
+    hunger: 0, rest: 100, // rest = energy 0–100; sleep restores it (Phase 3a)
+    home: null,           // house this citizen sleeps in (assigned at dusk)
     state: 'idle', stateTimer: 0,
     path: null, pathIdx: 0,
   };

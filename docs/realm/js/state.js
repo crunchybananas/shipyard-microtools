@@ -252,6 +252,17 @@ export function getDaylight() {
   return 0.72 - ((t-0.75)/0.25)*0.04;
 }
 
+// Day period for citizen schedules (Phase 3a). Boundaries mirror the
+// getDaylight() curve above: dawn ramp 0–0.10, full day to 0.60, dusk
+// fade to 0.75, night after.
+export function getDayPeriod() {
+  const t = G.dayPhase / G.dayLength;
+  if (t < 0.10) return 'dawn';
+  if (t < 0.60) return 'day';
+  if (t < 0.75) return 'dusk';
+  return 'night';
+}
+
 // Instrumentation for loop 004 (the-profiler): sample the lighting
 // pipeline across a day without changing gameplay. The multiply-blend
 // night overlay in render.js kicks in when daylight < 0.95; its

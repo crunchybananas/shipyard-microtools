@@ -54,6 +54,7 @@ export function serializeGame() {
         state:c.state, stateTimer:c.stateTimer,
         carrying:c.carrying, carryAmount:c.carryAmount,
         jobBuildingIdx: c.jobBuilding ? G.buildings.indexOf(c.jobBuilding) : -1,
+        homeIdx: c.home ? G.buildings.indexOf(c.home) : -1,
       })),
       resources: { ...G.resources },
       population: G.population,
@@ -158,9 +159,12 @@ export function applySave(s) {
     G._savedAt = s.savedAt;
     setSeed(s.seed);
 
-    // Rebuild citizens (without jobBuilding refs yet)
+    // Rebuild citizens (without jobBuilding/home refs yet).
+    // v2 saves predate the rest-as-energy semantics (rest was always 0):
+    // migrate to full energy so legacy citizens don't wake up exhausted.
     G.citizens = s.citizens.map(c => ({
-      ...c, jobBuilding: null, path: null, pathIdx: 0,
+      ...c, jobBuilding: null, home: null, path: null, pathIdx: 0,
+      rest: s.v >= 3 ? (c.rest ?? 100) : 100,
     }));
 
     // Rebuild buildings with worker refs
@@ -187,10 +191,13 @@ export function applySave(s) {
       state: 'patrol', stateTimer: 1, target: null,
     }));
 
-    // Relink citizen jobBuilding
+    // Relink citizen jobBuilding + home
     s.citizens.forEach((c, i) => {
       if (c.jobBuildingIdx >= 0 && c.jobBuildingIdx < G.buildings.length) {
         G.citizens[i].jobBuilding = G.buildings[c.jobBuildingIdx];
+      }
+      if (c.homeIdx >= 0 && c.homeIdx < G.buildings.length) {
+        G.citizens[i].home = G.buildings[c.homeIdx];
       }
     });
 
@@ -290,7 +297,7 @@ export function loadGame() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) { showToast('No save found.', true); return false; }
     const s = JSON.parse(raw);
-    if (s.v !== 2) { showToast('Incompatible save.', true); return false; }
+    if (s.v !== 2 && s.v !== 3) { showToast('Incompatible save.', true); return false; }
     applySave(s);
     if (G._castleLawChangedNotice) {
       delete G._castleLawChangedNotice;
