@@ -2,10 +2,10 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=131';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=131';
-import { spawnClashFX } from './fx.js?realm=131';
-import { sfx as playSound } from './log.js?realm=131';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=132';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=132';
+import { spawnClashFX } from './fx.js?realm=132';
+import { sfx as playSound } from './log.js?realm=132';
 
 function soldierDamage(s) {
   let damage = 5;

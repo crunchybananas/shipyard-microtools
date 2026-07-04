@@ -22,12 +22,12 @@ const __filename = fileURLToPath(import.meta.url);
 if (process.env.REALM_DET_CHILD) {
   const seed = Number(process.env.REALM_DET_SEED);
   const { createHash } = await import('node:crypto');
-  const { G, setSeed, getSeed } = await import('../js/state.js?realm=131');
-  const { generateWorld } = await import('../js/world.js?realm=131');
-  const { coreTick } = await import('../js/sim.js?realm=131');
-  const { dispatch } = await import('../js/commands.js?realm=131');
-  const { canPlace } = await import('../js/economy.js?realm=131');
-  const { initChronicle } = await import('../js/log.js?realm=131');
+  const { G, setSeed, getSeed } = await import('../js/state.js?realm=132');
+  const { generateWorld } = await import('../js/world.js?realm=132');
+  const { coreTick } = await import('../js/sim.js?realm=132');
+  const { dispatch } = await import('../js/commands.js?realm=132');
+  const { canPlace } = await import('../js/economy.js?realm=132');
+  const { initChronicle } = await import('../js/log.js?realm=132');
 
   setSeed(seed);
   generateWorld();

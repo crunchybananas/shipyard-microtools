@@ -3,9 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=131';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=131';
-import { makeAtlasLoader } from './atlas-loader.js?realm=131';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=132';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=132';
+import { makeAtlasLoader } from './atlas-loader.js?realm=132';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=132';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -195,10 +196,15 @@ export function drawActorAtlasFrame(targetCtx, {
   targetCtx.globalAlpha *= alpha;
   targetCtx.imageSmoothingEnabled = smoothing;
   if (smoothing) targetCtx.imageSmoothingQuality = 'high';
+  // Feet registration (generated metadata): normalize per-row/per-frame
+  // baseline drift in the painted sheets so walk<->work/carry transitions
+  // and the whole cast share one ground line. Cell-space px scaled to dest.
+  const reg = ACTOR_REGISTRATION[`${role}/${action}/${dir}`];
+  const regDy = reg ? ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (height / ACTOR_FRAME_H) : 0;
   targetCtx.drawImage(
     atlas,
     source.sx, source.sy, source.sw, source.sh,
-    x, y, width, height
+    x, y + regDy, width, height
   );
   targetCtx.restore();
   return true;

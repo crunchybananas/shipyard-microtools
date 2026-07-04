@@ -2,12 +2,36 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=131';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=132';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
 // Wells still auto-douse (economy.updateFires), so placement matters.
 const RAID_FLAMMABLE = new Set(['house', 'tavern', 'bakery', 'lumber', 'windmill', 'farm', 'granary', 'storehouse']);
+
+// Shared sack logic: every building strike pockets stores (gold first,
+// then food, then wood) and counts toward the raider's plunder goal, so
+// a warband stalled at the walls still fills its bags and LEAVES instead
+// of besieging forever. Slain raiders drop their bags (see death block).
+function stealFrom(e, dmg) {
+  e.plundered = (e.plundered || 0) + dmg;
+  let stole = 0;
+  for (const k of ['gold', 'food', 'wood']) {
+    if (stole >= 2) break;
+    const take = Math.min(2 - stole, Math.floor(G.resources[k] || 0));
+    if (take > 0) {
+      G.resources[k] -= take;
+      stole += take;
+      e.loot = e.loot || {};
+      e.loot[k] = (e.loot[k] || 0) + take;
+      G._raidStolen = G._raidStolen || {};
+      G._raidStolen[k] = (G._raidStolen[k] || 0) + take;
+    }
+  }
+  if (stole > 0 && rng() < 0.35) {
+    G.particles.push({ tx: e.x, ty: e.y, offsetY: -18, text: '💰', alpha: 1.1, vy: -0.14, decay: 0.02, type: 'text' });
+  }
+}
 function maybeIgnite(b, notifyFn) {
   if (b.onFire || !RAID_FLAMMABLE.has(b.type)) return;
   if (G._lastRaidFireDay === G.day) return;
@@ -18,16 +42,16 @@ function maybeIgnite(b, notifyFn) {
     notifyFn(`🔥 Raiders set the ${BUILDINGS[b.type]?.name || b.type} ablaze!`, 'danger');
   }
 }
-import { stepEntityToward } from './pathfinding.js?realm=131';
-import { spawnClashFX } from './fx.js?realm=131';
+import { stepEntityToward } from './pathfinding.js?realm=132';
+import { spawnClashFX } from './fx.js?realm=132';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=131';
-import { demolishBuilding } from './economy.js?realm=131';
-import { announce as notify } from './log.js?realm=131';
-import { chronicle } from './log.js?realm=131';
+import { sfx as playSound } from './log.js?realm=132';
+import { demolishBuilding } from './economy.js?realm=132';
+import { announce as notify } from './log.js?realm=132';
+import { chronicle } from './log.js?realm=132';
 
 export function updateEnemies() {
   // Morale break: when a raid has lost more than 60% of its fighters, the
@@ -86,6 +110,7 @@ export function updateEnemies() {
       wall.hp -= 0.35;
       wall.hurtTimer = 12;
       maybeIgnite(wall, notify);
+      if (G.gameTick % 40 === 0) stealFrom(e, 2); // breaching counts toward the goal
       e._swing = 8;
       if (G.gameTick % 30 === 0) {
         G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
@@ -125,6 +150,7 @@ export function updateEnemies() {
           blocker.hp -= 0.35;
           blocker.hurtTimer = 12;
           maybeIgnite(blocker, notify);
+          if (G.gameTick % 40 === 0) stealFrom(e, 2);
           e._swing = 8;
           if (G.gameTick % 30 === 0) {
             G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
@@ -137,8 +163,13 @@ export function updateEnemies() {
         }
       }
     } else if (e.retreating) {
-      // Reached the retreat edge — leave the map regardless of buildings
+      // Reached the retreat edge — gone, with whatever they carried.
       G.enemies.splice(i, 1);
+      if (G.enemies.length === 0 && G._raidStolen && Object.values(G._raidStolen).some(v => v > 0)) {
+        const parts = Object.entries(G._raidStolen).filter(([, v]) => v > 0).map(([k, v]) => `${v} ${k}`).join(', ');
+        notify(`💰 The raiders escaped with ${parts}.`, 'danger');
+        G._raidStolen = null;
+      }
       continue;
     } else {
       // Arrived at town center — attack nearest building
@@ -155,10 +186,7 @@ export function updateEnemies() {
         target.b.hp -= dmg;
         target.b.hurtTimer = 12;
         maybeIgnite(target.b, notify);
-        e.plundered = (e.plundered || 0) + dmg;
-        if (rng() < 0.35) {
-          G.particles.push({ tx: e.x, ty: e.y, offsetY: -18, text: '💰', alpha: 1.1, vy: -0.14, decay: 0.02, type: 'text' });
-        }
+        stealFrom(e, dmg);
         if (target.b.hp <= 0) {
           // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
           demolishBuilding(target.b, true);
@@ -251,6 +279,18 @@ export function updateEnemies() {
       // shipped fully; only mayor structural-unlock remains.
       if (G.namedCharacters?.rival) {
         G.resources.gold += 5;
+      }
+      // Slain raiders drop their loot bag where they fall.
+      if (e.loot) {
+        let dropped = 0;
+        for (const [k, v] of Object.entries(e.loot)) {
+          G.resources[k] = (G.resources[k] || 0) + v;
+          if (G._raidStolen?.[k]) G._raidStolen[k] = Math.max(0, G._raidStolen[k] - v);
+          dropped += v;
+        }
+        if (dropped > 0) {
+          G.particles.push({ tx: e.x, ty: e.y, offsetY: -14, text: `+${dropped} recovered`, alpha: 1.3, vy: -0.15, decay: 0.014, type: 'text' });
+        }
       }
       playSound('demolish');
       // Death particles — dramatic blood splat effect

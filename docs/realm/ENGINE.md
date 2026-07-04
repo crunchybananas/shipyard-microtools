@@ -204,6 +204,7 @@ against the JS reference with the golden-master hash on identical command logs.
 ```
 node docs/realm/scripts/verify-core-purity.mjs     # static tier gate
 node docs/realm/scripts/verify-determinism.mjs     # golden-master hash gate
+node docs/realm/scripts/audit-sprite-registration.mjs  # sprite feet-registration gate (--write after repaints)
 node docs/realm/scripts/verify.mjs --logic         # existing behavior suite
 node docs/realm/scripts/_play-probe.mjs            # browser smoke + screenshots
 ```
