@@ -3,7 +3,7 @@
 // diary of the realm. Persists to save.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=133';
+import { G } from './state.js?realm=134';
 
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
@@ -21,7 +21,7 @@ import { G } from './state.js?realm=133';
 // chronicle/initChronicle (and the eviction-immune tag set) moved to
 // log.js (core tier — ENGINE.md rule 4). Re-exported here so existing
 // shell imports keep working.
-import { chronicle, initChronicle } from './log.js?realm=133';
+import { chronicle, initChronicle } from './log.js?realm=134';
 export { chronicle, initChronicle };
 
 
@@ -2959,8 +2959,8 @@ export function checkNightmareBeat() {
 // position in the module graph. Set on module-load below.
 let _NIGHTMARE_NOTIFY = null;
 let _PLAY_SOUND = null;
-import('./notifications.js?realm=133').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
-import('./audio.js?realm=133').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
+import('./notifications.js?realm=134').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
+import('./audio.js?realm=134').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
 
 // ── Loop 056: a-scene-that-happens-once (second take) ────────
 //

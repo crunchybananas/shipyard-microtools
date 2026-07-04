@@ -67,17 +67,25 @@ docs/realm/
 
 ## Rules for Each Loop Iteration
 1. Read this MISSION.md to pick the top incomplete item
-2. Implement it across the appropriate file(s)
-3. Serve the game (`python3 -m http.server 8889 --directory docs/realm`)
-4. Test in Chrome via the MCP tools — verify the feature works visually and functionally
-5. Commit with a descriptive message
-6. Push to main
-7. Schedule next wake (120-270s depending on task size)
-8. Mark the item as [x] in this file when done
+2. **Read ENGINE.md first if the change touches simulation code** — it is the
+   architecture contract (core/shell tiers, tick rules, command funnel)
+3. Implement it across the appropriate file(s)
+4. Serve the game (`python3 -m http.server 8889 --directory docs/realm`)
+5. Run the engine gates before committing:
+   `node scripts/verify-core-purity.mjs && node scripts/verify-determinism.mjs`
+   (+ `scripts/audit-sprite-registration.mjs` if sprites changed, with
+   `--write` after any repaint)
+6. Test in Chrome via the MCP tools — verify visually and functionally
+7. Commit with a descriptive message; push to main
+8. Schedule next wake (120-270s depending on task size)
+9. Mark the item as [x] in this file when done
 
-## Architecture Notes
-- All files are ES modules (`type="module"` in script tags)
-- Shared state lives in `main.js` and is imported by other modules
-- The game loop runs in `main.js` and calls update/render from other modules
-- No build step — just serve the directory
-- Keep each file under 400 lines for readability
+## Architecture Notes (2026-07-03 — see ENGINE.md for the full contract)
+- Two tiers: CORE (deterministic sim — no DOM/Math.random/Date.now; state.js,
+  sim.js, citizens.js, economy.js, commands.js, bus.js, log.js, avatar.js, …)
+  and SHELL (main.js loop, render.js, ui.js, input.js, audio.js, enhancements).
+- All player intent goes through `dispatch(cmd)` (commands.js); core effects
+  leave via the bus. One coreTick = one tick; G.speed multiplies tick COUNT.
+- Shared state is `G` in state.js; no build step — just serve the directory.
+- The 400-line file rule is long gone; keep new systems in their own modules
+  and keep CORE files pure instead.

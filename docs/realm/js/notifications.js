@@ -2,9 +2,9 @@
 // Notifications — toast display + persistent scrollable log
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, resourceEmoji } from './state.js?realm=133';
-import { announce } from './log.js?realm=133';
-import { on } from './bus.js?realm=133';
+import { G, BUILDINGS, resourceEmoji } from './state.js?realm=134';
+import { announce } from './log.js?realm=134';
+import { on } from './bus.js?realm=134';
 
 let toastTimer = null;
 let toastShakeTimer = null;

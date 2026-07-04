@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=133';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=133';
-import { getCitizenSpeedMult } from './events.js?realm=133';
-import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=133';
-import { revealAround } from './world.js?realm=133';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=134';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=134';
+import { getCitizenSpeedMult } from './events.js?realm=134';
+import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=134';
+import { revealAround } from './world.js?realm=134';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -433,18 +433,6 @@ function foodDaysLeft() {
   return _foodDaysVal;
 }
 
-let _openFoodJobTick = -1, _openFoodJobVal = false;
-function hasOpenFoodJob() {
-  if (_openFoodJobTick !== G.gameTick) {
-    _openFoodJobTick = G.gameTick;
-    _openFoodJobVal = G.buildings.some(b => {
-      if (!FOOD_JOBS.has(b.type)) return false;
-      const def = BUILDINGS[b.type];
-      return def && (def.workers || 0) > (b.workers?.length || 0);
-    });
-  }
-  return _openFoodJobVal;
-}
 
 function isConstructionSite(b) {
   return b.buildProgress !== undefined && b.buildProgress < 1 && needsBuilders(b.type);
