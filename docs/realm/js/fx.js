@@ -5,7 +5,7 @@
 // Particle UPDATE/decay lives shell-side (particles.js).
 // ════════════════════════════════════════════════════════════
 
-import { G, rng } from './state.js?realm=134';
+import { G, rng } from './state.js?realm=135';
 
 export function spawnDust(tx, ty) {
   for (let i = 0; i < 8; i++) {

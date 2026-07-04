@@ -29,3 +29,24 @@ Queue, worst first (area delta vs own walk rows):
 
 Everything not listed measured within tolerance (walk/idle rows across the
 cast are consistent at baseline 79 — use them as the reference art).
+
+
+## 2026-07-03 verdict (owner-authorized fresh-start experiment)
+
+Two remedies were built and measured against the painted art at GAME scale:
+
+1. **Sprite forge** (`scripts/forge-actor-sprites.mjs`) — full procedural
+   rig (poses/gaits/tools/palettes → all 224 rows, drop-in atlas format).
+   A/B at draw size: the painted walk rows WIN on richness (fabric texture,
+   contrast, mass); the forge reads clean but toy-flat. NOT deployed.
+   Kept as tooling: instant placeholder rows for new roles + a working
+   reference for the atlas contract (staging in assets/sprites/actors-forged/).
+2. **Palette harmonization** (`scripts/harmonize-sprite-batches.mjs`) —
+   Reinhard stats transfer pulling each role's work/carry batch onto its
+   walk/idle palette. BAKED for the six queue roles: the two batches now
+   read as one character's wardrobe; walk rows untouched. Combined with the
+   runtime size normalization, the visible break is largely closed.
+
+Remaining gap = body mass/pose style in work/carry rows. That still wants a
+true repaint matching the walk-era character — this queue stays open for
+whenever a paint-capable pipeline is available.
