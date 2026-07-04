@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=132';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=132';
-import { makeAtlasLoader } from './atlas-loader.js?realm=132';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=132';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=133';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=133';
+import { makeAtlasLoader } from './atlas-loader.js?realm=133';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=133';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -196,15 +196,27 @@ export function drawActorAtlasFrame(targetCtx, {
   targetCtx.globalAlpha *= alpha;
   targetCtx.imageSmoothingEnabled = smoothing;
   if (smoothing) targetCtx.imageSmoothingQuality = 'high';
-  // Feet registration (generated metadata): normalize per-row/per-frame
-  // baseline drift in the painted sheets so walk<->work/carry transitions
-  // and the whole cast share one ground line. Cell-space px scaled to dest.
+  // Registration + size normalization (generated metadata): the painted
+  // sheets drift in feet baseline AND body mass between generation batches
+  // (farmer work/carry rows carry ~+50% pixel bulk vs walk; guard/miner
+  // work loops pulse up to 16% height frame-to-frame). Correct both at
+  // draw time, feet-anchored so the ground contact never moves.
   const reg = ACTOR_REGISTRATION[`${role}/${action}/${dir}`];
-  const regDy = reg ? ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (height / ACTOR_FRAME_H) : 0;
+  let dw = width, dh = height, ddx = 0, ddy = 0;
+  if (reg) {
+    const S = (reg.s || 1) * (reg.fs?.[source.frame] || 1);
+    if (S !== 1) {
+      dw = width * S;
+      dh = height * S;
+      ddx = (width - dw) / 2;                                  // stay centered
+      ddy = (79 * (height / ACTOR_FRAME_H)) * (1 - S);         // feet stay planted
+    }
+    ddy += ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (dh / ACTOR_FRAME_H);
+  }
   targetCtx.drawImage(
     atlas,
     source.sx, source.sy, source.sw, source.sh,
-    x, y + regDy, width, height
+    x + ddx, y + ddy, dw, dh
   );
   targetCtx.restore();
   return true;

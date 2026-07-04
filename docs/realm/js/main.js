@@ -2,29 +2,29 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=132';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=132';
-import { generateWorld } from './world.js?realm=132';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=132';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=132';
-import { dispatch } from './commands.js?realm=132';
-import { coreTick } from './sim.js?realm=132';
-import { on } from './bus.js?realm=132';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=132';
-import { setupInput } from './input.js?realm=132';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=132';
-import { ERAS } from './tech.js?realm=132';
-import { saveGame, loadGame, getSaveSize } from './save.js?realm=132';
-import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=132';
-import { toggleNotificationLog, notify } from './notifications.js?realm=132';
-import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=132';
-import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=132';
-import { updateAnimals } from './animals.js?realm=132';
-import { checkAdvisor } from './advisor.js?realm=132';
-import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=132';
-import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=132';
-import { initSpriteLab } from './sprite-lab.js?realm=132';
-import { initSpriteMuster } from './sprite-muster.js?realm=132';
+import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=133';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=133';
+import { generateWorld } from './world.js?realm=133';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=133';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=133';
+import { dispatch } from './commands.js?realm=133';
+import { coreTick } from './sim.js?realm=133';
+import { on } from './bus.js?realm=133';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=133';
+import { setupInput } from './input.js?realm=133';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=133';
+import { ERAS } from './tech.js?realm=133';
+import { saveGame, loadGame, getSaveSize } from './save.js?realm=133';
+import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=133';
+import { toggleNotificationLog, notify } from './notifications.js?realm=133';
+import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=133';
+import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=133';
+import { updateAnimals } from './animals.js?realm=133';
+import { checkAdvisor } from './advisor.js?realm=133';
+import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=133';
+import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=133';
+import { initSpriteLab } from './sprite-lab.js?realm=133';
+import { initSpriteMuster } from './sprite-muster.js?realm=133';
 
 
 // ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────

@@ -15,11 +15,11 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, rngRange } from './state.js?realm=132';
-import { placeBuilding, demolishBuilding, undoLastBuild, upgradeBuilding } from './economy.js?realm=132';
-import { startResearch } from './tech.js?realm=132';
-import { executeTrade } from './trade.js?realm=132';
-import { avatarMove, avatarGoto } from './avatar.js?realm=132';
+import { G, BUILDINGS, rngRange } from './state.js?realm=133';
+import { placeBuilding, demolishBuilding, undoLastBuild, upgradeBuilding } from './economy.js?realm=133';
+import { startResearch } from './tech.js?realm=133';
+import { executeTrade } from './trade.js?realm=133';
+import { avatarMove, avatarGoto } from './avatar.js?realm=133';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;
