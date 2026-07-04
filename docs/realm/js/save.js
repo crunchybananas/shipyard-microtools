@@ -2,12 +2,12 @@
 // Save/Load — localStorage serialization
 // ════════════════════════════════════════════════════════════
 
-import { G, getSeed, setSeed } from './state.js?realm=130';
-import { makeAvatar, ensureAvatar } from './avatar.js?realm=130';
-import { rebuildBuildingGrid } from './world.js?realm=130';
-import { missions } from './missions.js?realm=130';
-import { deriveEra } from './tech.js?realm=130';
-import { notify } from './notifications.js?realm=130';
+import { G, getSeed, setSeed } from './state.js?realm=131';
+import { makeAvatar, ensureAvatar } from './avatar.js?realm=131';
+import { rebuildBuildingGrid } from './world.js?realm=131';
+import { missions } from './missions.js?realm=131';
+import { deriveEra } from './tech.js?realm=131';
+import { notify } from './notifications.js?realm=131';
 
 const SAVE_KEY = 'realm-save-v2';
 

@@ -5,9 +5,9 @@
 // deleted rather than left as registered no-ops.
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=130';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=130';
-import { makeAtlasLoader } from './atlas-loader.js?realm=130';
+import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=131';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=131';
+import { makeAtlasLoader } from './atlas-loader.js?realm=131';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
@@ -3820,7 +3820,7 @@ function renderRainSplashes(ctx) {
 registerWorldRenderer(renderRainSplashes);
 
 // ── Loop 107: Occasional citizen voice barks ───────────────
-import { playVoiceBark as _playBark } from './audio.js?realm=130';
+import { playVoiceBark as _playBark } from './audio.js?realm=131';
 let _lastBarkTick = 0;
 function updateBarks() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -3926,10 +3926,10 @@ registerScreenRenderer(renderTileTooltip);
 // of lifetime counters, and to tell the truth when the village was razed.
 // Prior code said "Raid repelled. 0 foes slain in total." even when every
 // citizen was dead — a chronicle lie that made the narrative untrustworthy.
-import { chronicle as _chronicle124 } from './story.js?realm=130';
+import { chronicle as _chronicle124 } from './story.js?realm=131';
 // Loop 036 (the-fixer): also surface the raid summary as a toast so the
 // player sees it without opening the chronicle panel.
-import { notify as _notify036 } from './notifications.js?realm=130';
+import { notify as _notify036 } from './notifications.js?realm=131';
 let _lastRaidDay = 0;
 let _raidKillsStart = 0;
 let _raidDiedStart = 0;
@@ -4138,7 +4138,7 @@ registerUpdater(updateBuildRipples);
 registerWorldRenderer(renderBuildRipples);
 
 // ── Loop 129: Water footstep splash sound ───────────────────
-import { playSound as _playSound129 } from './audio.js?realm=130';
+import { playSound as _playSound129 } from './audio.js?realm=131';
 let _lastSplashTick = 0;
 function updateWaterSplash() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -4288,7 +4288,7 @@ registerUpdater(updateAdvisorTips);
 
 // ── Loop 140: Audio: town hum ambient layer ─────────────────
 // When population > 10 and cursor is near center, subtle murmur.
-import { initAudio as _initAudio140 } from './audio.js?realm=130';
+import { initAudio as _initAudio140 } from './audio.js?realm=131';
 let _townHumNode = null;
 function updateTownHum() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -4444,7 +4444,7 @@ registerUpdater(updateSaveAge);
 // `chronicle as _chronicle124` import) was to alias the same
 // helpers under a 144-suffix prefix; the import line was lost.
 // Adding it once here covers all 47 call sites that follow.
-import { hasFlag as _hf144, setFlag as _sf144, chronicle as _chr144 } from './story.js?realm=130';
+import { hasFlag as _hf144, setFlag as _sf144, chronicle as _chr144 } from './story.js?realm=131';
 
 // ── Loop 149: Story — named rival lord sends messengers ─────
 function updateRivalMessages() {
@@ -4475,7 +4475,7 @@ registerUpdater(updateCursorStyle);
 
 // ── Loop 151: Notification sound differs by type ────────────
 // Already handled: raidWarning, mission, etc. This adds a soft chime for info.
-import { playSound as _ps151 } from './audio.js?realm=130';
+import { playSound as _ps151 } from './audio.js?realm=131';
 // Hooked via notify — no updater needed. Stub for loop tracking.
 
 // ── Loop 153: Story — bard writes songs about milestones ────
@@ -4578,9 +4578,9 @@ function renderPauseOverlay(ctx, w, h) {
   // compose a screenshot while paused without the dim overlay or label.
   if (G.photoMode) return;
   ctx.save();
-  // Stronger scene-darken so the paused state reads as "world is frozen,"
-  // and so the label has real contrast against bright terrain.
-  ctx.fillStyle = 'rgba(0,0,0,0.42)';
+  // Gentle scene-dim — paused should read as "held breath," not a modal
+  // wall. The pill below carries the label's contrast on its own.
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
   ctx.fillRect(0, 0, w, h);
   // Label lives at top-center below the HUD instead of dead-center. On Day 1
   // the starting citizens spawn mid-map and the old h/2 label landed right on
@@ -4589,18 +4589,24 @@ function renderPauseOverlay(ctx, w, h) {
   // panel layered above the canvas — moved to y=92 so the label sits cleanly
   // in the empty strip between the HUD and the play area, clear of the
   // Save/Load/New buttons which hug the left edge.
-  ctx.font = 'bold 22px sans-serif';
+  ctx.font = 'bold 13px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  // Compact pill behind the label (was a giant 22px shout across the map)
+  const label = '⏸ PAUSED';
+  const tw = ctx.measureText(label).width;
+  ctx.fillStyle = 'rgba(12,14,24,0.86)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(w / 2 - tw / 2 - 12, 92 - 12, tw + 24, 24, 12);
+  ctx.fill();
+  ctx.stroke();
   // Dark stroke behind fully-opaque white fill. At 0.5 alpha the old fill
   // let citizen sprites bleed through the letterforms so the "E" looked
   // z-clipped by a villager — this makes PAUSED legible over anything.
-  ctx.lineWidth = 4;
-  ctx.lineJoin = 'round';
-  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
-  ctx.strokeText('⏸ PAUSED', w/2, 92);
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fillText('⏸ PAUSED', w/2, 92);
+  ctx.fillText(label, w / 2, 92);
   ctx.restore();
 }
 registerScreenRenderer(renderPauseOverlay);

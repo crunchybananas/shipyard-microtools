@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=130';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=130';
-import { getCitizenSpeedMult } from './events.js?realm=130';
-import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=130';
-import { revealAround } from './world.js?realm=130';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=131';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=131';
+import { getCitizenSpeedMult } from './events.js?realm=131';
+import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=131';
+import { revealAround } from './world.js?realm=131';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -310,9 +310,12 @@ function idleLoiterTarget(c) {
       if (ring < 1 || ring > 5) continue;
       const fromHere = dist2(c.x, c.y, x, y);
       const crowd = targetCrowdPenalty(c, x, y);
-      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -0.35 : 0;
+      // Idle life gathers where towns live: on roads and by doorsteps —
+      // not in a loose mob in an open field.
+      const roadBonus = G.buildingGrid[y]?.[x]?.type === 'road' ? -1.0 : 0;
+      const doorstep = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([ax, ay]) => G.buildingGrid[y + ay]?.[x + ax]?.type === 'house') ? -0.6 : 0;
       const jitter = ((citizenHash(c) ^ (x * 92837111) ^ (y * 689287499)) >>> 0) / 0xffffffff * 0.22;
-      const score = Math.abs(ring - 3) * 1.6 + fromHere * 0.18 + crowd * 4 + roadBonus + jitter;
+      const score = Math.abs(ring - 3) * 1.6 + fromHere * 0.18 + crowd * 4 + roadBonus + doorstep + jitter;
       if (score < bestScore) {
         bestScore = score;
         best = { x, y };

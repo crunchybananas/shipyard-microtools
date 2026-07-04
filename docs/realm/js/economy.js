@@ -2,16 +2,16 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=130';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=130';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=130';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=130';
-import { sfx as playSound, sfxBuild as playBuildingSound } from './log.js?realm=130';
-import { spawnDust } from './fx.js?realm=130';
-import { chronicle } from './log.js?realm=130';
-import { announce as notify, announceBuild as notifyBuild } from './log.js?realm=130';
-import { emit } from './bus.js?realm=130';
-import { isBuildingUnlocked } from './tech.js?realm=130';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=131';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=131';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=131';
+import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=131';
+import { sfx as playSound, sfxBuild as playBuildingSound } from './log.js?realm=131';
+import { spawnDust } from './fx.js?realm=131';
+import { chronicle } from './log.js?realm=131';
+import { announce as notify, announceBuild as notifyBuild } from './log.js?realm=131';
+import { emit } from './bus.js?realm=131';
+import { isBuildingUnlocked } from './tech.js?realm=131';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -623,14 +623,19 @@ export function checkRaids() {
   // are the live UX; chronicle is the retrospective.
   const daysUntilRaid = G.nextRaidDay - G.day;
   if (daysUntilRaid === 2 && G.dayPhase < 5) {
-    notify('⚠️ Scouts report raiders approaching! Raid expected in 2 days.', 'danger', { chronicle: false });
+    // The warband comes as ONE force from ONE direction — rolled now so
+    // scouts can name it and the player can face their defenses.
+    G._raidSide = rngInt(0, 3);
+    const dir = ['north', 'east', 'south', 'west'][G._raidSide];
+    notify(`⚠️ Scouts report raiders massing to the ${dir}! Raid expected in 2 days.`, 'danger', { chronicle: false });
     playSound('raid');
   }
   // Pre-raid warning (1 day before)
   if (G.day === G.nextRaidDay - 1 && !G._raidWarningGiven) {
     G._raidWarningGiven = true;
     const stanceLabel = G.armyStance === 'rally' ? '🚩 Rally' : G.armyStance === 'patrol' ? '🧱 Patrol' : '🛡️ Defend';
-    notify(`⚠️ Raiders approach from the darkness! Army stance: ${stanceLabel} (g to change).`, 'danger', { chronicle: false });
+    const dirWord = G._raidSide != null ? ` from the ${['north', 'east', 'south', 'west'][G._raidSide]}` : ' from the darkness';
+    notify(`⚠️ Raiders approach${dirWord}! Army stance: ${stanceLabel} (g to change).`, 'danger', { chronicle: false });
     playSound('raidWarning');
   }
 
@@ -670,7 +675,10 @@ export function checkRaids() {
     const raiders = Math.max(1, Math.floor(baseCount * getDifficulty().raidMult * rivalMult * eraMult));
     playSound('raid');
 
-    const report = [`⚔️ RAID: ${raiders} raiders approach!`];
+    const bandSide = G._raidSide ?? rngInt(0, 3);
+    G._raidSide = null;
+    const bandDir = ['north', 'east', 'south', 'west'][bandSide];
+    const report = [`⚔️ RAID: ${raiders} raiders approach from the ${bandDir}!`];
     if (G.defense > 0 || (G.soldiers && G.soldiers.length > 0)) {
       report.push('Your defenders move to intercept.');
     } else {
@@ -704,12 +712,14 @@ export function checkRaids() {
     G._raidSpawnCount = raiders; // morale-break baseline (combat.js)
     // Spawn enemy raiders that visibly approach the settlement
     for (let i = 0; i < raiders; i++) {
-      const side = Math.floor(rng() * 4);
+      // One warband, one edge — spread along it so they arrive as a line.
+      const side = bandSide;
       let ex, ey;
-      if (side === 0) { ex = rng() * MAP_W; ey = 0; }
-      else if (side === 1) { ex = MAP_W - 1; ey = rng() * MAP_H; }
-      else if (side === 2) { ex = rng() * MAP_W; ey = MAP_H - 1; }
-      else { ex = 0; ey = rng() * MAP_H; }
+      const along = MAP_W * 0.3 + rng() * MAP_W * 0.4; // central 40% of the edge
+      if (side === 0) { ex = along; ey = 0; }
+      else if (side === 1) { ex = MAP_W - 1; ey = along; }
+      else if (side === 2) { ex = along; ey = MAP_H - 1; }
+      else { ex = 0; ey = along; }
       G.enemies.push({
         x: ex, y: ey, tx: MAP_W/2, ty: MAP_H/2,
         hp: isFirstRaid ? 24 : 30,

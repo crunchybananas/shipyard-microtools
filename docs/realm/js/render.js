@@ -3,9 +3,9 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=130';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=130';
-import { makeAtlasLoader } from './atlas-loader.js?realm=130';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=131';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=131';
+import { makeAtlasLoader } from './atlas-loader.js?realm=131';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -998,8 +998,11 @@ export function render() {
       // a bisected checkerboard.
       if (tile === TILE.GRASS || tile === TILE.SAND) {
         const h = ((x * 374761 + y * 668265) & 0xff);
-        const n1 = ((h & 0xf) / 15) - 0.5;  // -0.5 .. 0.5
-        const n2 = (((h >> 4) & 0xf) / 15) - 0.5;
+        // Night multiply-overlay amplifies relative contrast; damp the
+        // per-tile variance in low light so meadows stay meadow, not mesh.
+        const varScale = daylight < 0.85 ? 0.35 : 1;
+        const n1 = (((h & 0xf) / 15) - 0.5) * varScale;
+        const n2 = ((((h >> 4) & 0xf) / 15) - 0.5) * varScale;
         if (tile === TILE.GRASS) {
           const r = 64 + Math.round(n1 * 8);
           const g = 128 + Math.round(n2 * 10);
@@ -4106,6 +4109,22 @@ function drawBuilding(ctx, b, s, daylight) {
 
   drawConstructionOverlay(ctx, b, s, progress);
   if (progress < 1) {
+    // Construction is a project now (builders raise it) — show the site's
+    // progress + crew pips so the player can read staffing at a glance.
+    if (G.camera.zoom >= 0.7) {
+      const bw = 26, bx = s.x - bw / 2, by = s.y - 36;
+      ctx.fillStyle = 'rgba(10,10,16,0.72)';
+      ctx.fillRect(bx - 1, by - 1, bw + 2, 5);
+      ctx.fillStyle = '#d9a441';
+      ctx.fillRect(bx, by, bw * progress, 3);
+      const crew = (b.workers || []).length;
+      for (let i = 0; i < crew; i++) {
+        ctx.fillStyle = '#ffd166';
+        ctx.beginPath();
+        ctx.arc(bx + bw + 5 + i * 6, by + 1.5, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
     ctx.globalAlpha = 1;
     return;
   }

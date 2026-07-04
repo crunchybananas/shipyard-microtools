@@ -2,17 +2,32 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=130';
-import { stepEntityToward } from './pathfinding.js?realm=130';
-import { spawnClashFX } from './fx.js?realm=130';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=131';
+
+// Raiders torch what they sack: a small per-hit arson chance on wooden
+// stock, throttled to ONE blaze per raid-day — drama, not annihilation.
+// Wells still auto-douse (economy.updateFires), so placement matters.
+const RAID_FLAMMABLE = new Set(['house', 'tavern', 'bakery', 'lumber', 'windmill', 'farm', 'granary', 'storehouse']);
+function maybeIgnite(b, notifyFn) {
+  if (b.onFire || !RAID_FLAMMABLE.has(b.type)) return;
+  if (G._lastRaidFireDay === G.day) return;
+  if (rng() < 0.02) {
+    b.onFire = true;
+    b._fireTimer = 0;
+    G._lastRaidFireDay = G.day;
+    notifyFn(`🔥 Raiders set the ${BUILDINGS[b.type]?.name || b.type} ablaze!`, 'danger');
+  }
+}
+import { stepEntityToward } from './pathfinding.js?realm=131';
+import { spawnClashFX } from './fx.js?realm=131';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=130';
-import { demolishBuilding } from './economy.js?realm=130';
-import { announce as notify } from './log.js?realm=130';
-import { chronicle } from './log.js?realm=130';
+import { sfx as playSound } from './log.js?realm=131';
+import { demolishBuilding } from './economy.js?realm=131';
+import { announce as notify } from './log.js?realm=131';
+import { chronicle } from './log.js?realm=131';
 
 export function updateEnemies() {
   // Morale break: when a raid has lost more than 60% of its fighters, the
@@ -70,6 +85,7 @@ export function updateEnemies() {
       // Attack wall instead of passing through
       wall.hp -= 0.35;
       wall.hurtTimer = 12;
+      maybeIgnite(wall, notify);
       e._swing = 8;
       if (G.gameTick % 30 === 0) {
         G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
@@ -90,7 +106,15 @@ export function updateEnemies() {
       const raiderOpen = e.retreating
         ? () => true
         : (x, y) => { const bb = G.buildingGrid[y]?.[x]; return !bb || bb.type === 'road'; };
-      const moved = stepEntityToward(e, e.tx, e.ty, 0.02, raiderOpen);
+      // Forced march far from town, combat pace once close; looted
+      // raiders sprint for the edge. Kills the 30-45s dead air between
+      // the horn and the fight without changing the battle itself.
+      const distC = Math.abs(e.x - MAP_W / 2) + Math.abs(e.y - MAP_H / 2);
+      const marchSpd = e.retreating ? 0.045 : (distC > 22 ? 0.05 : 0.02);
+      if (e.retreating && (e.plundered || 0) > 0 && G.gameTick % 90 === 0) {
+        G.particles.push({ tx: e.x, ty: e.y, offsetY: -16, text: '💰', alpha: 1.0, vy: -0.1, decay: 0.02, type: 'text' });
+      }
+      const moved = stepEntityToward(e, e.tx, e.ty, marchSpd, raiderOpen);
       if (!moved && !e.retreating) {
         // Blocked by a building — attack it (walls and everything else),
         // so sieges resolve instead of raiders milling at the perimeter.
@@ -100,6 +124,7 @@ export function updateEnemies() {
         if (blocker && blocker.hp > 0) {
           blocker.hp -= 0.35;
           blocker.hurtTimer = 12;
+          maybeIgnite(blocker, notify);
           e._swing = 8;
           if (G.gameTick % 30 === 0) {
             G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
@@ -128,7 +153,12 @@ export function updateEnemies() {
         e.attackTimer = 55;
         const dmg = e.damage || 7;
         target.b.hp -= dmg;
+        target.b.hurtTimer = 12;
+        maybeIgnite(target.b, notify);
         e.plundered = (e.plundered || 0) + dmg;
+        if (rng() < 0.35) {
+          G.particles.push({ tx: e.x, ty: e.y, offsetY: -18, text: '💰', alpha: 1.1, vy: -0.14, decay: 0.02, type: 'text' });
+        }
         if (target.b.hp <= 0) {
           // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
           demolishBuilding(target.b, true);
@@ -184,9 +214,21 @@ export function updateEnemies() {
       }
       if (!c._fleeing || G.gameTick % 20 === 0) {
         c._fleeing = true;
-        const flx = Math.max(1, Math.min(MAP_W-2, c.x + (dx / (d||1)) * 5));
-        const fly = Math.max(1, Math.min(MAP_H-2, c.y + (dy / (d||1)) * 5));
-        c.tx = flx; c.ty = fly;
+        // Shelter instinct: run for the nearest house; open flight only
+        // when no roof is close enough.
+        let shelter = null, sd = Infinity;
+        for (const hb of G.buildings) {
+          if (hb.type !== 'house') continue;
+          const hd = Math.abs(hb.x - c.x) + Math.abs(hb.y - c.y);
+          if (hd < sd) { sd = hd; shelter = hb; }
+        }
+        if (shelter && sd < 14) {
+          c.tx = Math.max(1, Math.min(MAP_W - 2, shelter.x + (dx / (d || 1))));
+          c.ty = Math.max(1, Math.min(MAP_H - 2, shelter.y + (dy / (d || 1))));
+        } else {
+          c.tx = Math.max(1, Math.min(MAP_W - 2, c.x + (dx / (d || 1)) * 5));
+          c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / (d || 1)) * 5));
+        }
         c.state = 'idle';
         c.path = null;
       }

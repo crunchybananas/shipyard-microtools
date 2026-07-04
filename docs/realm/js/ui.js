@@ -2,17 +2,17 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=130';
-import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige } from './economy.js?realm=130';
-import { getWonderReport } from './wonder.js?realm=130';
-import { panCameraTo } from './render.js?realm=130';
-import { dispatch } from './commands.js?realm=130';
-import { missions } from './missions.js?realm=130';
-import { getActiveScenario } from './scenarios.js?realm=130';
-import { saveGame, loadGame, hasSave } from './save.js?realm=130';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=130';
-import { notify } from './notifications.js?realm=130';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=130';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=131';
+import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige } from './economy.js?realm=131';
+import { getWonderReport } from './wonder.js?realm=131';
+import { panCameraTo } from './render.js?realm=131';
+import { dispatch } from './commands.js?realm=131';
+import { missions } from './missions.js?realm=131';
+import { getActiveScenario } from './scenarios.js?realm=131';
+import { saveGame, loadGame, hasSave } from './save.js?realm=131';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=131';
+import { notify } from './notifications.js?realm=131';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=131';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -663,6 +663,23 @@ export function showInfoPanel(b) {
       <span class="ip-title">${def.icon} ${def.name}${levelLabel ? ' ' + levelLabel : ''}</span>
       <button class="ip-close" onclick="hideInfoPanel()" title="Close">✕</button>
     </div>`;
+
+  // Under construction: show the site as a PROJECT — progress, crew,
+  // and a nudge when nobody has picked up the job yet.
+  if (buildProgress < 1) {
+    const crew = (b.workers || []);
+    const crewNames = crew.map(w => w.name).join(', ');
+    html += `
+      <div class="ip-desc">🔨 Under construction</div>
+      <div class="ip-row"><span class="ip-label">Progress</span><span class="ip-val">${Math.round(buildProgress * 100)}%</span></div>
+      <div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crew.length}/2${crewNames ? ' — ' + crewNames : ''}</span></div>
+      ${crew.length === 0 ? '<div class="ip-hint">Idle site — free citizens will take the builder job soon.</div>' : ''}
+    `;
+    panel.innerHTML = html + `<div class="ip-hint">Right-click to cancel and refund half.</div>`;
+    panel.style.display = 'block';
+    requestAnimationFrame(() => panel.classList.add('ip-visible'));
+    return;
+  }
 
   // Description
   if (def.desc) {
