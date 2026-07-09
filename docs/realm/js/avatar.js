@@ -11,9 +11,9 @@
 // shell owns the follow-camera and key handling.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=135';
-import { findPath, stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=135';
-import { revealAround } from './world.js?realm=135';
+import { G, MAP_W, MAP_H } from './state.js?realm=157';
+import { findPath, stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=157';
+import { revealAround } from './world.js?realm=157';
 
 export function makeAvatar(x, y) {
   // Citizen-shaped on purpose: the renderer's citizen sprite path

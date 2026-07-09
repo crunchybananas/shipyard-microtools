@@ -173,179 +173,175 @@
       "status": "accepted"
     },
     "blacksmith/work/down": {
-      "acceptedAt": "2026-07-01T23:27:44Z",
-      "allowedWarnings": [
-        "direction-scale-mismatch"
-      ],
+      "acceptedAt": "2026-07-09T18:24:16Z",
+      "allowedWarnings": [],
       "file": "blacksmith/work-down.png",
-      "note": "Rescaled to walk scale (height delta 2px). Width delta 19px is anvil-in-body composition from side angles, not a scale error.",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
+      "provenance": "mechanical-walk-derived-work-rhythm",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 8,
-        "bodyWidthRange": 2,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 2.0,
-          "bodyWidthDelta": 19.0,
-          "medianBodyHeight": 81.5,
-          "medianBodyWidth": 57.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 77.5,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            69.45,
-            48.15,
-            34.25
+            70.65,
+            49.4,
+            36.5
           ],
-          "paletteDelta": 2.23
+          "paletteDelta": 11.21
         },
-        "flickerScore": 18.4,
-        "maxAlphaRatio": 1.137,
-        "maxBodyCenterJump": 3.23,
-        "maxEdgePixels": 23,
-        "maxFragmentPixels": 3,
-        "maxPaletteDrift": 3.84,
-        "medianBodyHeight": 79.5,
-        "medianBodyWidth": 38.0,
-        "medianColor": [
-          71.0,
-          48.25,
-          32.65
-        ],
-        "medianColorCount": 465.0,
-        "medianShadingRatio": 0.7362,
-        "styleEra": "painted",
-        "warnings": [
-          "direction-scale-mismatch"
-        ]
-      },
-      "sha256": "5ffdc0e4418ab72dad02cd1326bc5008ab83b5034d48d30a3952684a014dc341",
-      "status": "accepted-with-waiver"
-    },
-    "blacksmith/work/left": {
-      "acceptedAt": "2026-07-01T23:22:50Z",
-      "allowedWarnings": [],
-      "file": "blacksmith/work-left.png",
-      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-      "provenance": "uniform-anchor-rescale",
-      "quality": {
-        "bodyBottomRange": 0,
-        "bodyHeightRange": 3,
-        "bodyWidthRange": 13,
-        "directionReference": {
-          "bodyHeightDelta": 1.0,
-          "bodyWidthDelta": 7.5,
-          "medianBodyHeight": 80.5,
-          "medianBodyWidth": 49.5,
-          "medianColor": [
-            69.45,
-            48.15,
-            32.65
-          ],
-          "paletteDelta": 1.6
-        },
-        "flickerScore": 21.6,
-        "maxAlphaRatio": 1.137,
-        "maxBodyCenterJump": 2.92,
-        "maxEdgePixels": 47,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.098,
+        "maxBodyCenterJump": 1.03,
+        "maxEdgePixels": 4,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 7.17,
-        "medianBodyHeight": 81.5,
-        "medianBodyWidth": 57.0,
+        "maxPaletteDrift": 0.99,
+        "medianBodyHeight": 75.5,
+        "medianBodyWidth": 35.0,
         "medianColor": [
-          69.45,
-          48.15,
-          34.25
+          78.8,
+          55.5,
+          41.2
         ],
-        "medianColorCount": 499.5,
-        "medianShadingRatio": 0.6809,
+        "medianColorCount": 319.5,
+        "medianShadingRatio": 0.6637,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "eefb47126ee89f5219179d1a66070a8f8e9df79888dd1363171083e334ac18d0",
+      "sha256": "3f5a1bc5d70ca550c5500b77f2ac68cb7ccef536b68fff83322eb4dfa6bb484c",
+      "status": "accepted"
+    },
+    "blacksmith/work/left": {
+      "acceptedAt": "2026-07-09T18:24:17Z",
+      "allowedWarnings": [],
+      "file": "blacksmith/work-left.png",
+      "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
+      "provenance": "mechanical-walk-derived-work-rhythm",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 76.5,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            70.65,
+            49.4,
+            36.5
+          ],
+          "paletteDelta": 2.67
+        },
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.088,
+        "maxBodyCenterJump": 1.06,
+        "maxEdgePixels": 17,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.33,
+        "medianBodyHeight": 77.5,
+        "medianBodyWidth": 35.0,
+        "medianColor": [
+          72.7,
+          50.75,
+          37.55
+        ],
+        "medianColorCount": 325.0,
+        "medianShadingRatio": 0.6988,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "c844601b2b04a3382f5fa0262e9c1b847a2caaece1d77c7825ce7485f8e7e92c",
       "status": "accepted"
     },
     "blacksmith/work/right": {
-      "acceptedAt": "2026-07-01T23:22:52Z",
+      "acceptedAt": "2026-07-09T18:24:18Z",
       "allowedWarnings": [],
       "file": "blacksmith/work-right.png",
-      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
+      "provenance": "mechanical-walk-derived-work-rhythm",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 3,
-        "bodyWidthRange": 13,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 1.0,
-          "bodyWidthDelta": 7.5,
-          "medianBodyHeight": 80.5,
-          "medianBodyWidth": 49.5,
+          "bodyWidthDelta": 3.0,
+          "medianBodyHeight": 76.5,
+          "medianBodyWidth": 35.0,
           "medianColor": [
-            69.45,
-            48.15,
-            32.65
+            72.7,
+            50.75,
+            37.55
           ],
-          "paletteDelta": 1.6
+          "paletteDelta": 2.67
         },
-        "flickerScore": 21.6,
-        "maxAlphaRatio": 1.137,
-        "maxBodyCenterJump": 2.92,
-        "maxEdgePixels": 47,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.088,
+        "maxBodyCenterJump": 1.0,
+        "maxEdgePixels": 16,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 7.17,
-        "medianBodyHeight": 81.5,
-        "medianBodyWidth": 57.0,
+        "maxPaletteDrift": 1.36,
+        "medianBodyHeight": 77.5,
+        "medianBodyWidth": 32.0,
         "medianColor": [
-          69.45,
-          48.15,
-          34.25
+          70.65,
+          49.4,
+          36.5
         ],
-        "medianColorCount": 499.5,
-        "medianShadingRatio": 0.6809,
+        "medianColorCount": 310.0,
+        "medianShadingRatio": 0.6758,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "dd57044c4f4b4b5d6e405be6defbf306ce271180d0bf44028c7bbb3dd811fad7",
+      "sha256": "ec58cbbfccbd68984eca09b683fcde2c44993ab5ab6ab6700aaac70b2d2094d2",
       "status": "accepted"
     },
     "blacksmith/work/up": {
-      "acceptedAt": "2026-07-01T23:22:47Z",
+      "acceptedAt": "2026-07-09T18:24:16Z",
       "allowedWarnings": [],
       "file": "blacksmith/work-up.png",
-      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
+      "provenance": "mechanical-walk-derived-work-rhythm",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 4,
-        "bodyWidthRange": 13,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 1.0,
-          "bodyWidthDelta": 7.5,
-          "medianBodyHeight": 81.5,
-          "medianBodyWidth": 57.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 77.5,
+          "medianBodyWidth": 35.0,
           "medianColor": [
-            69.45,
-            48.15,
-            34.25
+            72.7,
+            50.75,
+            37.55
           ],
-          "paletteDelta": 8.7
+          "paletteDelta": 4.43
         },
-        "flickerScore": 27.8,
-        "maxAlphaRatio": 1.124,
-        "maxBodyCenterJump": 5.41,
-        "maxEdgePixels": 38,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.103,
+        "maxBodyCenterJump": 1.09,
+        "maxEdgePixels": 11,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 5.48,
-        "medianBodyHeight": 80.5,
-        "medianBodyWidth": 49.5,
+        "maxPaletteDrift": 1.04,
+        "medianBodyHeight": 76.5,
+        "medianBodyWidth": 34.0,
         "medianColor": [
-          64.55,
-          42.8,
-          29.45
+          70.4,
+          48.1,
+          34.85
         ],
-        "medianColorCount": 385.5,
-        "medianShadingRatio": 0.7192,
+        "medianColorCount": 299.0,
+        "medianShadingRatio": 0.7207,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "971456f0ffe9116d3e5ed06b6bd3594915397f3150aeaee8d0bb13d15c3a16cb",
+      "sha256": "797dab6c247bad53f97d92997258d89201444b1fc0a191492107b6f983291db8",
       "status": "accepted"
     },
     "builder/idle/down": {
@@ -1037,70 +1033,18 @@
       "status": "accepted"
     },
     "farmer/work/down": {
-      "acceptedAt": "2026-07-01T23:43:13Z",
-      "allowedWarnings": [
-        "body-width-drift",
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:22:57Z",
+      "allowedWarnings": [],
       "file": "farmer/work-down.png",
-      "note": "Stabilized: centerJump 9.0->3.3; tilling spray kept; width range is the swing.",
-      "provenance": "per-frame-body-stabilize",
-      "quality": {
-        "bodyBottomRange": 4,
-        "bodyHeightRange": 4,
-        "bodyWidthRange": 18,
-        "directionReference": {
-          "bodyHeightDelta": 1.0,
-          "bodyWidthDelta": 8.0,
-          "medianBodyHeight": 79.0,
-          "medianBodyWidth": 45.5,
-          "medianColor": [
-            120.7,
-            97.1,
-            33.3
-          ],
-          "paletteDelta": 18.2
-        },
-        "flickerScore": 37.6,
-        "maxAlphaRatio": 1.234,
-        "maxBodyCenterJump": 3.28,
-        "maxEdgePixels": 65,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 7.16,
-        "medianBodyHeight": 80.0,
-        "medianBodyWidth": 37.5,
-        "medianColor": [
-          133.55,
-          102.3,
-          45.1
-        ],
-        "medianColorCount": 735.5,
-        "medianShadingRatio": 0.6607,
-        "styleEra": "painted",
-        "warnings": [
-          "body-width-drift",
-          "edge-contact"
-        ]
-      },
-      "sha256": "4626a254f24f29d8336117a2777d5a714edc1bbe62db6f1997d438333f94359d",
-      "status": "accepted-with-waiver"
-    },
-    "farmer/work/up": {
-      "acceptedAt": "2026-07-01T23:43:07Z",
-      "allowedWarnings": [
-        "body-width-drift",
-        "edge-contact"
-      ],
-      "file": "farmer/work-up.png",
-      "note": "Stabilized: bodyHeightRange 15->0, centerJump 10.8->3.4; width range is the hoe-swing arm extension.",
-      "provenance": "per-frame-body-stabilize",
+      "note": "Recomposed from the cleanest existing farmer work pose; controlled upper-body rhythm removes swing-width and edge instability.",
+      "provenance": "mechanical-stable-work-rhythm",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 0,
-        "bodyWidthRange": 24,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 0.0,
-          "bodyWidthDelta": 1.5,
+          "bodyHeightDelta": 1.5,
+          "bodyWidthDelta": 8.5,
           "medianBodyHeight": 79.0,
           "medianBodyWidth": 45.5,
           "medianColor": [
@@ -1108,31 +1052,71 @@
             97.1,
             33.3
           ],
-          "paletteDelta": 9.95
+          "paletteDelta": 21.93
         },
-        "flickerScore": 31.7,
-        "maxAlphaRatio": 1.332,
-        "maxBodyCenterJump": 3.35,
-        "maxEdgePixels": 103,
-        "maxFragmentPixels": 38,
-        "maxPaletteDrift": 14.62,
-        "medianBodyHeight": 79.0,
-        "medianBodyWidth": 44.0,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.081,
+        "maxBodyCenterJump": 1.01,
+        "maxEdgePixels": 26,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.83,
+        "medianBodyHeight": 77.5,
+        "medianBodyWidth": 37.0,
         "medianColor": [
-          113.3,
-          103.7,
-          32.5
+          135.65,
+          104.85,
+          47.35
         ],
         "medianColorCount": 687.0,
-        "medianShadingRatio": 0.6368,
+        "medianShadingRatio": 0.6388,
         "styleEra": "painted",
-        "warnings": [
-          "body-width-drift",
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "57306d537bb3a3948f794cdee2a536dc6e2cf31a36dd7071fbfe3a552cd8f971",
-      "status": "accepted-with-waiver"
+      "sha256": "2ac121f0ce2d13869cc2565c52223850e5dec1940835624d40fdbd57fa9f3413",
+      "status": "accepted"
+    },
+    "farmer/work/up": {
+      "acceptedAt": "2026-07-09T18:22:58Z",
+      "allowedWarnings": [],
+      "file": "farmer/work-up.png",
+      "note": "Recomposed from the cleanest existing farmer rear work pose; controlled upper-body rhythm removes edge-clipped hoe arcs and fragments.",
+      "provenance": "mechanical-stable-work-rhythm",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 2.5,
+          "bodyWidthDelta": 5.5,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 45.5,
+          "medianColor": [
+            120.7,
+            97.1,
+            33.3
+          ],
+          "paletteDelta": 9.62
+        },
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.08,
+        "maxBodyCenterJump": 0.99,
+        "maxEdgePixels": 31,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.73,
+        "medianBodyHeight": 76.5,
+        "medianBodyWidth": 40.0,
+        "medianColor": [
+          114.95,
+          104.8,
+          33.7
+        ],
+        "medianColorCount": 670.5,
+        "medianShadingRatio": 0.6236,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "90a7bbdd8f3303286f2c0f917d9eba1d269e698d4a87c3255c2c78e21746e78a",
+      "status": "accepted"
     },
     "fisher/carry/down": {
       "acceptedAt": "2026-07-01T21:49:33Z",
@@ -2898,98 +2882,90 @@
       "status": "accepted"
     },
     "guard/work/left": {
-      "acceptedAt": "2026-07-01T23:22:58Z",
-      "allowedWarnings": [
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:23:07Z",
+      "allowedWarnings": [],
       "file": "guard/work-left.png",
-      "note": "Rescaled from the 51px waived rows to walk-family scale; spear reach touches the cell edge by design.",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Recomposed from the cleanest existing guard spear pose; preserves planted role identity while keeping spear and body inside the frame.",
+      "provenance": "mechanical-stable-work-rhythm",
       "quality": {
-        "bodyBottomRange": 1,
-        "bodyHeightRange": 9,
-        "bodyWidthRange": 14,
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 0.0,
-          "bodyWidthDelta": 0.0,
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 3.0,
           "medianBodyHeight": 76.0,
           "medianBodyWidth": 37.0,
           "medianColor": [
-            76.95,
-            69.35,
-            67.35
+            76.4,
+            69.2,
+            67.15
           ],
-          "paletteDelta": 7.98
+          "paletteDelta": 6.55
         },
-        "flickerScore": 50.1,
-        "maxAlphaRatio": 1.133,
-        "maxBodyCenterJump": 8.42,
-        "maxEdgePixels": 83,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.078,
+        "maxBodyCenterJump": 1.02,
+        "maxEdgePixels": 2,
         "maxFragmentPixels": 1,
-        "maxPaletteDrift": 3.24,
-        "medianBodyHeight": 76.0,
-        "medianBodyWidth": 37.0,
+        "maxPaletteDrift": 0.91,
+        "medianBodyHeight": 75.5,
+        "medianBodyWidth": 34.0,
         "medianColor": [
-          70.5,
-          65.15,
-          69.45
+          71.75,
+          65.5,
+          69.9
         ],
-        "medianColorCount": 538.5,
-        "medianShadingRatio": 0.7328,
+        "medianColorCount": 548.5,
+        "medianShadingRatio": 0.7086,
         "styleEra": "painted",
-        "warnings": [
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "18ad061d0a614305903c1d81ad727c16cb56c911e86deab4c6d43fde770b3781",
-      "status": "accepted-with-waiver"
+      "sha256": "d681a561ac699faca127f88c2541a68b2dcd90df1d928247e3840d4f1357e334",
+      "status": "accepted"
     },
     "guard/work/right": {
-      "acceptedAt": "2026-07-01T23:23:01Z",
-      "allowedWarnings": [
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:23:08Z",
+      "allowedWarnings": [],
       "file": "guard/work-right.png",
-      "note": "Rescaled from the 51px waived rows to walk-family scale; spear reach touches the cell edge by design.",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Mirrored from the accepted left-facing anchored guard work rhythm to keep direction timing and scale consistent.",
+      "provenance": "mechanical-stable-work-rhythm-mirrored",
       "quality": {
-        "bodyBottomRange": 1,
-        "bodyHeightRange": 9,
-        "bodyWidthRange": 14,
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 0.0,
           "bodyWidthDelta": 0.0,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 37.0,
+          "medianBodyHeight": 75.5,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            76.95,
-            69.35,
-            67.35
+            76.4,
+            69.2,
+            67.15
           ],
-          "paletteDelta": 7.98
+          "paletteDelta": 6.55
         },
-        "flickerScore": 50.1,
-        "maxAlphaRatio": 1.133,
-        "maxBodyCenterJump": 8.42,
-        "maxEdgePixels": 83,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.078,
+        "maxBodyCenterJump": 1.02,
+        "maxEdgePixels": 2,
         "maxFragmentPixels": 1,
-        "maxPaletteDrift": 3.24,
-        "medianBodyHeight": 76.0,
-        "medianBodyWidth": 37.0,
+        "maxPaletteDrift": 0.91,
+        "medianBodyHeight": 75.5,
+        "medianBodyWidth": 34.0,
         "medianColor": [
-          70.5,
-          65.15,
-          69.45
+          71.75,
+          65.5,
+          69.9
         ],
-        "medianColorCount": 538.5,
-        "medianShadingRatio": 0.7328,
+        "medianColorCount": 548.5,
+        "medianShadingRatio": 0.7086,
         "styleEra": "painted",
-        "warnings": [
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "1fc0a3cb18a23df1362cebf2b7f02bf41f2cd5d3515656781b79c6a962bed12b",
-      "status": "accepted-with-waiver"
+      "sha256": "b9c09329920005959448a0dbd4109d8ffe3ac4a6eab262bb7ad2f37b18ee5f00",
+      "status": "accepted"
     },
     "guard/work/up": {
       "acceptedAt": "2026-07-01T23:40:18Z",
@@ -3722,56 +3698,91 @@
       "sha256": "66d6af37bb446b6cea55535391d3e30b81b2a4af3f93cc7d9f7dfbc45ab742f3",
       "status": "accepted"
     },
-    "lumber/work/down": {
-      "acceptedAt": "2026-07-01T23:43:18Z",
-      "allowedWarnings": [
-        "body-height-drift",
-        "edge-contact",
-        "ground-anchor-drift"
-      ],
-      "file": "lumber/work-down.png",
-      "note": "Stabilized: flicker 87->58; residual range is imagegen frame variance, repaint queued as flavor work.",
-      "provenance": "per-frame-body-stabilize",
+    "lumber/walk/up": {
+      "acceptedAt": "2026-07-09T18:32:57Z",
+      "allowedWarnings": [],
+      "file": "lumber/walk-up.png",
+      "note": "Dedicated rear-facing lumber walk replacement: eight alternating boot contacts, fixed ground anchor, consistent axe side, and stable painted body mass.",
+      "provenance": "imagegen-lumber-rear-walk-v3",
       "quality": {
-        "bodyBottomRange": 7,
-        "bodyHeightRange": 11,
-        "bodyWidthRange": 11,
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 0,
+        "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 4.5,
+          "bodyHeightDelta": 1.0,
           "bodyWidthDelta": 2.0,
           "medianBodyHeight": 78.0,
           "medianBodyWidth": 39.0,
           "medianColor": [
-            103.0,
-            73.6,
+            102.5,
+            73.55,
             44.7
           ],
-          "paletteDelta": 21.84
+          "paletteDelta": 17.45
         },
-        "flickerScore": 58.4,
-        "maxAlphaRatio": 1.374,
-        "maxBodyCenterJump": 5.62,
-        "maxEdgePixels": 56,
+        "flickerScore": 0.0,
+        "maxAlphaRatio": 1.041,
+        "maxBodyCenterJump": 1.01,
+        "maxEdgePixels": 8,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 18.01,
-        "medianBodyHeight": 73.5,
+        "maxPaletteDrift": 2.81,
+        "medianBodyHeight": 79.0,
+        "medianBodyWidth": 41.0,
+        "medianColor": [
+          117.95,
+          79.05,
+          50.65
+        ],
+        "medianColorCount": 413.5,
+        "medianShadingRatio": 0.5734,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "af020b84055ac2aae83621dc255767b68512356709c8312e5b5447f8643cbcbe",
+      "status": "accepted"
+    },
+    "lumber/work/down": {
+      "acceptedAt": "2026-07-09T18:21:49Z",
+      "allowedWarnings": [],
+      "file": "lumber/work-down.png",
+      "note": "Recomposed from the cleanest existing lumber work pose; fixed-foot rhythm preserves the painted identity while removing body-scale and ground-anchor jitter.",
+      "provenance": "mechanical-stable-work-rhythm",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 5.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 76.5,
+          "medianBodyWidth": 39.0,
+          "medianColor": [
+            103.05,
+            73.25,
+            44.4
+          ],
+          "paletteDelta": 29.99
+        },
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.081,
+        "maxBodyCenterJump": 1.13,
+        "maxEdgePixels": 25,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.05,
+        "medianBodyHeight": 71.5,
         "medianBodyWidth": 37.0,
         "medianColor": [
-          121.55,
-          79.25,
-          54.75
+          126.9,
+          85.1,
+          58.2
         ],
-        "medianColorCount": 448.5,
-        "medianShadingRatio": 0.6724,
+        "medianColorCount": 453.0,
+        "medianShadingRatio": 0.6492,
         "styleEra": "painted",
-        "warnings": [
-          "body-height-drift",
-          "ground-anchor-drift",
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "2e77d44d9c0ab9d7e66498803984eb633caa9f573a8860aef28557612dff12a7",
-      "status": "accepted-with-waiver"
+      "sha256": "e4fad311b3cc3ee652328ce7f21807ef1604a51a536d7deaa57ce52c14124472",
+      "status": "accepted"
     },
     "lumber/work/left": {
       "acceptedAt": "2026-07-02T04:50:27Z",
@@ -3860,53 +3871,47 @@
       "status": "accepted"
     },
     "lumber/work/up": {
-      "acceptedAt": "2026-07-01T23:43:23Z",
-      "allowedWarnings": [
-        "body-width-drift",
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:21:49Z",
+      "allowedWarnings": [],
       "file": "lumber/work-up.png",
-      "note": "Stabilized: bodyHeightRange 23->6, flicker 138->54; width range is the axe swing.",
-      "provenance": "per-frame-body-stabilize",
+      "note": "Recomposed from the cleanest existing lumber work pose; compact fixed-foot rhythm preserves the painted rear view without edge clipping or loose chips.",
+      "provenance": "mechanical-stable-work-rhythm",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 6,
-        "bodyWidthRange": 22,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 0.0,
-          "bodyWidthDelta": 4.5,
-          "medianBodyHeight": 78.0,
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 76.5,
           "medianBodyWidth": 37.0,
           "medianColor": [
-            103.0,
-            74.4,
-            45.0
+            103.05,
+            74.35,
+            44.85
           ],
-          "paletteDelta": 11.19
+          "paletteDelta": 8.67
         },
-        "flickerScore": 54.2,
-        "maxAlphaRatio": 1.56,
-        "maxBodyCenterJump": 5.27,
-        "maxEdgePixels": 56,
-        "maxFragmentPixels": 74,
-        "maxPaletteDrift": 8.02,
-        "medianBodyHeight": 78.0,
-        "medianBodyWidth": 41.5,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.075,
+        "maxBodyCenterJump": 1.05,
+        "maxEdgePixels": 18,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.93,
+        "medianBodyHeight": 75.5,
+        "medianBodyWidth": 38.0,
         "medianColor": [
-          111.15,
-          70.1,
-          38.65
+          110.4,
+          71.05,
+          41.65
         ],
-        "medianColorCount": 430.5,
-        "medianShadingRatio": 0.6502,
+        "medianColorCount": 344.5,
+        "medianShadingRatio": 0.6199,
         "styleEra": "painted",
-        "warnings": [
-          "body-width-drift",
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "4b58bab1bc2ffb183ad2396da14df1d531e42bd7033bec038d35be53880e83c3",
-      "status": "accepted-with-waiver"
+      "sha256": "25adfdae5f573aad705ba9eb9bea4fdc0a6a0387e54c56a9a6de800d1b3a47a6",
+      "status": "accepted"
     },
     "miner/carry/down": {
       "acceptedAt": "2026-07-01T22:56:49Z",
@@ -4425,155 +4430,133 @@
       "status": "accepted"
     },
     "miner/work/down": {
-      "acceptedAt": "2026-07-01T23:43:28Z",
-      "allowedWarnings": [
-        "body-width-drift",
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:22:39Z",
+      "allowedWarnings": [],
       "file": "miner/work-down.png",
-      "note": "Stabilized: bodyHeightRange 15->7, centerJump 9.9->7.0; width range is the pick swing.",
-      "provenance": "per-frame-body-stabilize",
+      "note": "Derived from the miner\u2019s canonical down-facing walk palette and posed with a feet-anchored work rhythm; replaces the fragmented, palette-divergent pick-swing frames.",
+      "provenance": "mechanical-walk-derived-work-rhythm",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 7,
-        "bodyWidthRange": 19,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 7.5,
-          "bodyWidthDelta": 5.5,
-          "medianBodyHeight": 69.5,
-          "medianBodyWidth": 41.0,
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 13.5,
+          "medianBodyHeight": 72.0,
+          "medianBodyWidth": 44.5,
           "medianColor": [
-            97.05,
-            76.0,
-            58.15
+            108.65,
+            77.45,
+            54.95
           ],
-          "paletteDelta": 27.97
+          "paletteDelta": 15.34
         },
-        "flickerScore": 59.8,
-        "maxAlphaRatio": 1.653,
-        "maxBodyCenterJump": 6.97,
-        "maxEdgePixels": 76,
-        "maxFragmentPixels": 55,
-        "maxPaletteDrift": 6.86,
-        "medianBodyHeight": 77.0,
-        "medianBodyWidth": 46.5,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.099,
+        "maxBodyCenterJump": 0.98,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 0.77,
+        "medianBodyHeight": 71.5,
+        "medianBodyWidth": 31.0,
         "medianColor": [
-          84.0,
-          59.35,
-          39.85
+          98.55,
+          68.55,
+          47.6
         ],
-        "medianColorCount": 369.0,
-        "medianShadingRatio": 0.7165,
+        "medianColorCount": 441.0,
+        "medianShadingRatio": 0.6456,
         "styleEra": "painted",
-        "warnings": [
-          "body-width-drift",
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "47ed2706324518b4fe521cfd8f37e0eff25e1c1e3ec69c5d82fcbc9ebdd6e4f8",
-      "status": "accepted-with-waiver"
+      "sha256": "548ac798260a9e695133a356b6d289bd105b72b9876af04a10a2b21a74f9fafd",
+      "status": "accepted"
     },
     "miner/work/left": {
-      "acceptedAt": "2026-07-01T23:40:10Z",
-      "allowedWarnings": [
-        "body-height-drift",
-        "body-width-drift",
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:22:49Z",
+      "allowedWarnings": [],
       "file": "miner/work-left.png",
-      "note": "Stabilized: centerJump 12.5->3.4, lateral jitter gone; residual height/width range is the crouch-swing pose plus imagegen frame variance \u2014 full repaint queued as flavor work. Direction-scale waiver retired.",
-      "provenance": "per-frame-body-stabilize",
+      "note": "Recomposed from a clean existing side work pose into an anchored eight-beat pick rhythm; removes the side-row width drift waiver.",
+      "provenance": "mechanical-stable-work-rhythm",
       "quality": {
-        "bodyBottomRange": 3,
-        "bodyHeightRange": 12,
-        "bodyWidthRange": 34,
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 2.5,
-          "bodyWidthDelta": 0.5,
+          "bodyWidthDelta": 8.5,
           "medianBodyHeight": 72.0,
-          "medianBodyWidth": 41.5,
+          "medianBodyWidth": 34.5,
           "medianColor": [
-            96.85,
-            75.8,
-            58.0
+            98.55,
+            75.85,
+            54.95
           ],
-          "paletteDelta": 0.32
+          "paletteDelta": 10.71
         },
-        "flickerScore": 95.1,
-        "maxAlphaRatio": 1.82,
-        "maxBodyCenterJump": 3.43,
-        "maxEdgePixels": 86,
-        "maxFragmentPixels": 114,
-        "maxPaletteDrift": 9.57,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.088,
+        "maxBodyCenterJump": 1.06,
+        "maxEdgePixels": 24,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.17,
         "medianBodyHeight": 69.5,
-        "medianBodyWidth": 41.0,
+        "medianBodyWidth": 43.0,
         "medianColor": [
-          97.05,
-          76.0,
-          58.15
+          109.05,
+          77.8,
+          55.75
         ],
-        "medianColorCount": 353.0,
-        "medianShadingRatio": 0.7026,
+        "medianColorCount": 476.5,
+        "medianShadingRatio": 0.702,
         "styleEra": "painted",
-        "warnings": [
-          "body-height-drift",
-          "body-width-drift",
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "1a7cd05b9978a42f43947d7634cf9b02ceda199bdae224575ff2d6b5d2dc3a4e",
-      "status": "accepted-with-waiver"
+      "sha256": "2c793b19de355394e550eb2a508ba81446f9ac4bd3fcc20cfcd38b7193e001d0",
+      "status": "accepted"
     },
     "miner/work/right": {
-      "acceptedAt": "2026-07-01T23:40:14Z",
-      "allowedWarnings": [
-        "body-height-drift",
-        "body-width-drift",
-        "edge-contact"
-      ],
+      "acceptedAt": "2026-07-09T18:22:50Z",
+      "allowedWarnings": [],
       "file": "miner/work-right.png",
-      "note": "Stabilized: centerJump 12.5->3.4, lateral jitter gone; residual height/width range is the crouch-swing pose plus imagegen frame variance \u2014 full repaint queued as flavor work. Direction-scale waiver retired.",
-      "provenance": "per-frame-body-stabilize",
+      "note": "Mirrored from the accepted left-facing anchored pick rhythm to keep timing, palette, and body scale identical.",
+      "provenance": "mechanical-stable-work-rhythm-mirrored",
       "quality": {
-        "bodyBottomRange": 3,
-        "bodyHeightRange": 12,
-        "bodyWidthRange": 34,
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 5,
+        "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 2.5,
-          "bodyWidthDelta": 0.0,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 41.0,
+          "bodyHeightDelta": 2.0,
+          "bodyWidthDelta": 8.5,
+          "medianBodyHeight": 71.5,
+          "medianBodyWidth": 34.5,
           "medianColor": [
-            97.05,
+            98.55,
             75.85,
-            58.15
+            55.75
           ],
-          "paletteDelta": 0.15
+          "paletteDelta": 10.68
         },
-        "flickerScore": 95.1,
-        "maxAlphaRatio": 1.82,
-        "maxBodyCenterJump": 3.43,
-        "maxEdgePixels": 86,
-        "maxFragmentPixels": 114,
-        "maxPaletteDrift": 9.57,
+        "flickerScore": 10.0,
+        "maxAlphaRatio": 1.088,
+        "maxBodyCenterJump": 1.06,
+        "maxEdgePixels": 24,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.17,
         "medianBodyHeight": 69.5,
-        "medianBodyWidth": 41.0,
+        "medianBodyWidth": 43.0,
         "medianColor": [
-          97.05,
-          76.0,
-          58.15
+          109.05,
+          77.8,
+          55.75
         ],
-        "medianColorCount": 353.0,
-        "medianShadingRatio": 0.7026,
+        "medianColorCount": 476.5,
+        "medianShadingRatio": 0.702,
         "styleEra": "painted",
-        "warnings": [
-          "body-height-drift",
-          "body-width-drift",
-          "edge-contact"
-        ]
+        "warnings": []
       },
-      "sha256": "a16ccb4c728da8907a08ada98ebedafed9e040aed6e1f516ed74d72e24253d09",
-      "status": "accepted-with-waiver"
+      "sha256": "0d6b287829bf957ea53627c1f90063dbb944d3cc31ba8d094e1aa41ae4eba8a7",
+      "status": "accepted"
     },
     "miner/work/up": {
       "acceptedAt": "2026-06-19T04:34:27Z",
@@ -8008,6 +7991,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-02T04:50:28Z",
+  "updatedAt": "2026-07-09T18:32:57Z",
   "version": 1
 }

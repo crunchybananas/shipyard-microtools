@@ -1092,26 +1092,31 @@ body.photo-mode #wonder-chip{display:none!important}
 </div>
 
 <script>
-/* Loop 049 (silent-module): dev cache-buster. On localhost only,
-   register sw.js which forces no-store on /js/*.js fetches. First
-   install reloads once so the SW can intercept module imports that
-   already happened. Production deploys (non-localhost host) see
-   normal browser caching. See loop/journal/049.md for context. */
+/* Local development must not retain a JavaScript-fetching service worker.
+   Module URLs are revisioned, while an intercepted request can survive a
+   stopped local server and leave the title screen visible with no handlers.
+   Clear the legacy development worker once, then reload outside its scope.
+   Production deployments do not enter this branch. */
 const params = new URLSearchParams(location.search);
 const localDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 const devTools = params.has('devtools') || params.has('spritelab') || params.has('spritemuster');
 document.body.classList.toggle('devtools', devTools);
-const spriteDev = devTools;
-if (localDev && !spriteDev && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(() => {
-    if (!navigator.serviceWorker.controller) location.reload();
-  }).catch(() => {});
-} else if (spriteDev && 'serviceWorker' in navigator) {
+if (localDev && 'serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const registration of registrations) registration.unregister();
+    const hadRegistrations = registrations.length > 0;
+    return Promise.all(registrations.map((registration) => registration.unregister()))
+      .then(() => hadRegistrations);
+  }).then((hadRegistrations) => {
+    // A worker controls the current page until a navigation. Reload exactly
+    // once after removing it so this page's module graph comes from the live
+    // local server instead of the old worker response.
+    if (hadRegistrations && !sessionStorage.getItem('realm-local-sw-cleared')) {
+      sessionStorage.setItem('realm-local-sw-cleared', '1');
+      location.reload();
+    }
   }).catch(() => {});
 }
 </script>
-<script type="module" src="js/main.js?realm=135"></script>
+<script type="module" src="js/main.js?realm=157"></script>
 </body>
 </html>

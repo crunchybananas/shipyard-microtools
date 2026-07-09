@@ -125,6 +125,135 @@ rec(
   `state=${noStorageDelivery.state} carrying=${noStorageDelivery.carrying} wood=${noStorageDelivery.wood} need=${noStorageDelivery.hasNeedStorage} delivered=${noStorageDelivery.hasDelivered}`,
 );
 
+// Test 0b: route recovery — unreachable jobs/storage are blacklisted and the
+// citizen tries a reachable alternative instead of repeating the same A* miss.
+const routeRecovery = await page.evaluate(async () => {
+  const citizens = await import('./js/citizens.js');
+  const before = {
+    map: window.G.map, fog: window.G.fog, buildingGrid: window.G.buildingGrid,
+    buildings: window.G.buildings, citizens: window.G.citizens,
+    particles: window.G.particles, resources: window.G.resources,
+    enemies: window.G.enemies, population: window.G.population,
+    gameTick: window.G.gameTick, dayPhase: window.G.dayPhase,
+  };
+  try {
+    const size = 50;
+    const clearMap = () => Array.from({ length: size }, () => Array(size).fill(2)); // grass
+    const gridFor = (buildings) => {
+      const grid = Array.from({ length: size }, () => Array(size).fill(null));
+      for (const b of buildings) grid[b.y][b.x] = b;
+      return grid;
+    };
+    const makeCitizen = (name, x, y, state) => ({
+      name, x, y, tx: x, ty: y, faceX: 0, faceZ: 1, speed: 0.05,
+      hunger: 0, rest: 100, needs: { joy: 55, faith: 55 },
+      state, stateTimer: 0, path: null, pathIdx: 0,
+      carrying: null, carryAmount: 0,
+    });
+
+    // A farm surrounded by a 17x17 water moat has no walkable endpoint in
+    // A*'s destination snap radius. The worker must give it up for a while.
+    const farm = { type: 'farm', x: 25, y: 25, workers: [], buildProgress: 1 };
+    const worker = makeCitizen('Route Probe', 5, 5, 'find_job');
+    const workMap = clearMap();
+    for (let y = 17; y <= 33; y++) for (let x = 17; x <= 33; x++) workMap[y][x] = 0; // water
+    window.G.map = workMap;
+    window.G.fog = Array.from({ length: size }, () => Array(size).fill(true));
+    window.G.buildings = [farm];
+    window.G.buildingGrid = gridFor([farm]);
+    window.G.citizens = [worker];
+    window.G.particles = [];
+    window.G.resources = { ...before.resources, food: 100 };
+    window.G.enemies = [];
+    window.G.population = 1;
+    window.G.dayPhase = (window.G.dayLength || 3600) / 2;
+    window.G.gameTick = 2000;
+    citizens.updateCitizens();
+    const jobReleased = worker.jobBuilding === null &&
+      worker.state === 'idle' && worker._noGo?.['25,25'] === 2000;
+
+    // A carrier sees the same islanded storehouse first, blacklists it, then
+    // routes to the reachable house rather than stalling with the cargo.
+    const storage = { type: 'storehouse', x: 25, y: 25, workers: [], buildProgress: 1 };
+    const house = { type: 'house', x: 8, y: 8, workers: [], buildProgress: 1 };
+    const carrier = makeCitizen('Carrier Probe', 5, 5, 'needs_delivery');
+    carrier.carrying = 'wood';
+    carrier.carryAmount = 3;
+    const deliveryMap = clearMap();
+    for (let y = 17; y <= 33; y++) for (let x = 17; x <= 33; x++) deliveryMap[y][x] = 0;
+    window.G.map = deliveryMap;
+    window.G.buildings = [storage, house];
+    window.G.buildingGrid = gridFor([storage, house]);
+    window.G.citizens = [carrier];
+    window.G.gameTick = 2024;
+    citizens.updateCitizens();
+    const deliveryRecovered = carrier.state === 'walk_to_deliver' &&
+      carrier._deliveryTarget === house && !!carrier.path &&
+      carrier._noGo?.['25,25'] === 2024;
+    return { jobReleased, deliveryRecovered, workerState: worker.state, carrierState: carrier.state };
+  } finally {
+    Object.assign(window.G, before);
+  }
+});
+rec(
+  'citizens abandon unreachable jobs and reroute deliveries to reachable storage',
+  routeRecovery.jobReleased && routeRecovery.deliveryRecovered,
+  `job=${routeRecovery.workerState} delivery=${routeRecovery.carrierState}`,
+);
+
+// Test 0c: actor continuity — a worker keeps their visual identity through
+// a transient no-job delivery gap, work checks do not drop into idle, and a
+// construction assignment uses the builder rows until the site is complete.
+const actorContinuity = await page.evaluate(async () => {
+  const citizens = await import('./js/citizens.js');
+  const before = {
+    buildings: window.G.buildings,
+    citizens: window.G.citizens,
+    particles: window.G.particles,
+    resources: window.G.resources,
+    enemies: window.G.enemies,
+    gameTick: window.G.gameTick,
+  };
+  try {
+    const worker = {
+      name: 'Animation Probe', x: 20, y: 20, tx: 20, ty: 20,
+      faceX: 1, faceZ: 0, speed: 0.05,
+      hunger: 0, rest: 100, needs: { joy: 55, faith: 55 },
+      state: 'working', stateTimer: 0, path: null, pathIdx: 0,
+      carrying: null, carryAmount: 0, visualJob: 'mine', _hb: 0,
+    };
+    const mine = { type: 'mine', x: 20, y: 20, workers: [worker], produced: null, buildProgress: 1 };
+    worker.jobBuilding = mine;
+    window.G.buildings = [mine];
+    window.G.citizens = [worker];
+    window.G.particles = [];
+    window.G.resources = { ...before.resources, food: 100 };
+    window.G.enemies = [];
+    window.G.gameTick = 1;
+    citizens.updateCitizens();
+
+    const mapping = window.__realm?.actorMapping;
+    return {
+      keepsWorking: worker.state === 'working' && worker.stateTimer > 0,
+      locksWorkFacing: worker._workFaceX === 1 && worker._workFaceZ === 0,
+      deliveryRole: mapping?.variantForCitizen({ state: 'walk_to_deliver', visualJob: 'mine' }),
+      constructionRole: mapping?.variantForCitizen({
+        state: 'working', visualJob: 'mine', jobBuilding: { type: 'mine', buildProgress: 0.5 },
+      }),
+      unassignedRole: mapping?.variantForCitizen({ state: 'idle' }),
+    };
+  } finally {
+    Object.assign(window.G, before);
+  }
+});
+rec(
+  'actor continuity: miners keep identity, work loops stay live, construction reads as builder',
+  actorContinuity.keepsWorking && actorContinuity.locksWorkFacing &&
+    actorContinuity.deliveryRole === 'miner' && actorContinuity.constructionRole === 'builder' &&
+    actorContinuity.unassignedRole === 'settler',
+  JSON.stringify(actorContinuity),
+);
+
 // Test 1: 192/197 — G.realmEnded field exists / can be set
 const realmEnded = await page.evaluate(() => {
   const before = window.G.realmEnded;

@@ -48,6 +48,7 @@ const result = await page.evaluate(async () => {
   const rows = [
     { label: 'settler walk down', row: 4 },
     { label: 'farmer work right', row: 27 },
+    { label: 'miner work down', row: 72 },
     { label: 'guard carry left', row: 191 },
   ];
   const canvas = document.createElement('canvas');

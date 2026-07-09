@@ -2,17 +2,17 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=135';
-import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige } from './economy.js?realm=135';
-import { getWonderReport } from './wonder.js?realm=135';
-import { panCameraTo } from './render.js?realm=135';
-import { dispatch } from './commands.js?realm=135';
-import { missions } from './missions.js?realm=135';
-import { getActiveScenario } from './scenarios.js?realm=135';
-import { saveGame, loadGame, hasSave } from './save.js?realm=135';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=135';
-import { notify } from './notifications.js?realm=135';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=135';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=157';
+import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige } from './economy.js?realm=157';
+import { getWonderReport } from './wonder.js?realm=157';
+import { panCameraTo } from './render.js?realm=157';
+import { dispatch } from './commands.js?realm=157';
+import { missions } from './missions.js?realm=157';
+import { getActiveScenario } from './scenarios.js?realm=157';
+import { saveGame, loadGame, hasSave } from './save.js?realm=157';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=157';
+import { notify } from './notifications.js?realm=157';
+import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=157';
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -1331,6 +1331,7 @@ function renderPopPanel() {
       if (c && c.jobBuilding) {
         c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
         c.jobBuilding = null;
+        c.visualJob = null;
         c.state = 'idle';
         c.path = null;
         renderPopPanel();
@@ -1362,6 +1363,7 @@ function renderPopPanel() {
           c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
         }
         c.jobBuilding = b;
+        c.visualJob = b.type;
         b.workers.push(c);
         c.state = 'walk_to_work';
         c.path = null;

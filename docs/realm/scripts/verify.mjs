@@ -54,7 +54,11 @@ async function startGameIfNeeded(page) {
 }
 
 async function verifyFarmPlacement(page) {
-  await page.click('[data-build-key="farm"]');
+  // The tutorial pulse intentionally animates this button, so a normal
+  // Playwright click can wait forever for geometric stability even though the
+  // control is visible and enabled. Force keeps this smoke test focused on
+  // the actual build-command path.
+  await page.locator('[data-build-key="farm"]').click({ force: true });
   await page.waitForTimeout(100);
 
   const target = await page.evaluate(() => {

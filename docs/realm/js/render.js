@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=135';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=135';
-import { makeAtlasLoader } from './atlas-loader.js?realm=135';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=135';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=157';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=157';
+import { makeAtlasLoader } from './atlas-loader.js?realm=157';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=157';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -126,8 +126,15 @@ const _ACTOR_ATLAS_URL = _ACTOR_ATLAS_REVISION
 const _loadActorAtlas = makeAtlasLoader(_ACTOR_ATLAS_URL);
 
 export function actorVariantForCitizen(c) {
-  const jt = c.jobBuilding?.type;
-  if (!jt && c.state === 'foraging') return 'forager';
+  // A citizen's painted identity must survive a temporary job release. Work
+  // routes can be retried, deliveries can outlive a source building, and the
+  // food-crisis allocator can hold a worker between jobs for a few ticks.
+  // Falling straight back to settler in those gaps made miners visibly turn
+  // into townspeople. `visualJob` is updated only when a real job is chosen;
+  // the active job still wins immediately when one exists.
+  if (c.state === 'foraging') return 'forager';
+  if (c.jobBuilding?.buildProgress !== undefined && c.jobBuilding.buildProgress < 1) return 'builder';
+  const jt = c.jobBuilding?.type || c.visualJob;
   if (jt === 'chickencoop' || jt === 'cowpen') return 'rancher';
   if (jt === 'farm' || jt === 'windmill' || jt === 'bakery') return 'farmer';
   if (jt === 'lumber' || jt === 'sawmill') return 'lumber';
@@ -196,15 +203,15 @@ export function drawActorAtlasFrame(targetCtx, {
   targetCtx.globalAlpha *= alpha;
   targetCtx.imageSmoothingEnabled = smoothing;
   if (smoothing) targetCtx.imageSmoothingQuality = 'high';
-  // Registration + size normalization (generated metadata): the painted
-  // sheets drift in feet baseline AND body mass between generation batches
-  // (farmer work/carry rows carry ~+50% pixel bulk vs walk; guard/miner
-  // work loops pulse up to 16% height frame-to-frame). Correct both at
-  // draw time, feet-anchored so the ground contact never moves.
+  // Registration metadata aligns a whole row to the shared feet line. Per-
+  // frame scaling is intentionally forbidden: shrinking a frame to hide a
+  // bad pose makes the actor breathe and masks repaint debt. Source art owns
+  // body consistency; runtime only applies one row-level scale and pixel
+  // anchor offsets.
   const reg = ACTOR_REGISTRATION[`${role}/${action}/${dir}`];
   let dw = width, dh = height, ddx = 0, ddy = 0;
   if (reg) {
-    const S = (reg.s || 1) * (reg.fs?.[source.frame] || 1);
+    const S = reg.s || 1;
     if (S !== 1) {
       dw = width * S;
       dh = height * S;
@@ -1814,6 +1821,39 @@ export function render() {
     }
   }
 
+  // Idle citizens turn toward a nearby neighbor so little clusters read as a
+  // conversation. This used to scan every citizen from every draw call
+  // (quadratic work at exactly the population sizes where busy towns need
+  // frames most). A one-tile spatial hash preserves the 1.4-tile rule while
+  // keeping the per-frame lookup local.
+  const socialNeighbors = new Map();
+  if (G.citizens.length > 1) {
+    const buckets = new Map();
+    const bucketKey = (x, y) => `${Math.floor(x)},${Math.floor(y)}`;
+    for (const citizen of G.citizens) {
+      const key = bucketKey(citizen.x, citizen.y);
+      const bucket = buckets.get(key);
+      if (bucket) bucket.push(citizen);
+      else buckets.set(key, [citizen]);
+    }
+    for (const citizen of G.citizens) {
+      const bx = Math.floor(citizen.x), by = Math.floor(citizen.y);
+      let nearest = null, bestD2 = 1.4 * 1.4;
+      // A 1.4-tile radius can cross two floor buckets near a cell boundary.
+      for (let y = by - 2; y <= by + 2; y++) {
+        for (let x = bx - 2; x <= bx + 2; x++) {
+          for (const other of buckets.get(`${x},${y}`) || []) {
+            if (other === citizen) continue;
+            const dx = other.x - citizen.x, dy = other.y - citizen.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < bestD2) { bestD2 = d2; nearest = other; }
+          }
+        }
+      }
+      if (nearest) socialNeighbors.set(citizen, nearest);
+    }
+  }
+
   const drawOneCitizen = (cEntity) => {
   for (const c of [cEntity]) {
     // A citizen inside a fresh footprint ghosts at low alpha while
@@ -1841,7 +1881,10 @@ export function render() {
     c._laneX = (c._laneX || 0) + (laneTx - (c._laneX || 0)) * 0.12;
     c._laneY = (c._laneY || 0) + (laneTy - (c._laneY || 0)) * 0.12;
     if (Math.abs(c._laneX) > 0.002 || Math.abs(c._laneY) > 0.002) {
-      const lane = toScreen(c.x + c._laneX, c.y + c._laneY);
+      // Keep the render-only lane offset on the interpolated position. Using
+      // the simulation coordinates here cancelled lerpEnt() each time a
+      // citizen stepped onto a road, producing a visible 60 Hz shimmy.
+      const lane = toScreen(lp.x + c._laneX, lp.y + c._laneY);
       s.x = lane.x; s.y = lane.y;
     }
     ctx.globalAlpha = cGhost ? 0.35 : Math.max(0.85, daylight);
@@ -1859,9 +1902,14 @@ export function render() {
     // Walk-row hysteresis: paths routinely empty for a single frame between
     // arrival and the next repath (measured ~2 one-frame walk->idle->walk
     // row flaps per second per moving citizen). citizens.js stamps _movedAt
-    // on every real step; holding the walk row ~8 ticks after the last step
-    // absorbs the gap without letting stopped citizens walk in place.
-    const isMoving = pathActive || (G.gameTick - (c._movedAt ?? -999)) < 14;
+    // on every real step; holding the walk row briefly absorbs the gap.
+    // A path alone is not evidence of motion: a blocked worker used to loop
+    // the walk cycle in place until the watchdog fired. Allow only a short
+    // startup window before the first real step.
+    const movedRecently = (G.gameTick - (c._movedAt ?? -999)) < 14;
+    const pathWarming = pathActive && c._pathStartedAt != null &&
+      (G.gameTick - c._pathStartedAt) < 8;
+    const isMoving = movedRecently || pathWarming;
     const phaseHash = (c.name.charCodeAt(0) * 91 + (c.name.charCodeAt(1) || 11) * 41) % 360;
     const phaseOffset = phaseHash * Math.PI / 180;
     const bob = isMoving
@@ -1876,7 +1924,13 @@ export function render() {
     // direction for a frame at diagonal waypoints (verified by tick-exact
     // simulation). First segment has no previous waypoint — offset form.
     let faceX = 0, faceZ = 0;
-    if (pathActive) {
+    // Work rows are motion, not an orientation lottery. Lock the facing at
+    // the moment the worker reaches the site so nearby idle/social movement
+    // and a resource-target repath cannot swap directions mid-swing.
+    if (c.state === 'working' && (c._workFaceX || c._workFaceZ)) {
+      faceX = c._workFaceX;
+      faceZ = c._workFaceZ;
+    } else if (pathActive) {
       const wp = c.path[c.pathIdx];
       const from = c.pathIdx > 0 ? c.path[c.pathIdx - 1] : null;
       const fdx = from ? wp.x - from.x : wp.x - c.x;
@@ -1896,13 +1950,7 @@ export function render() {
     // conversation, not strangers standing back-to-back. Only fires
     // when no movement direction is set.
     if (faceX === 0 && faceZ === 0) {
-      let nearest = null, ndMin = 1.4;
-      for (const other of G.citizens) {
-        if (other === c) continue;
-        const odx = other.x - c.x, ody = other.y - c.y;
-        const nd = Math.sqrt(odx * odx + ody * ody);
-        if (nd < ndMin) { ndMin = nd; nearest = other; }
-      }
+      const nearest = socialNeighbors.get(c);
       if (nearest) {
         const sdx = nearest.x - c.x, sdy = nearest.y - c.y;
         faceX = sdx > 0.1 ? 1 : sdx < -0.1 ? -1 : 0;
@@ -1931,23 +1979,8 @@ export function render() {
     // one diagonal; this catches all rearward-facing directions.
     const facingAway = faceX + faceZ < 0;
 
-    // Derived per-citizen constants used across head, neck, eyes, cheeks
-    const skinHash = (c.name.charCodeAt(0) * 53 + (c.name.charCodeAt(1) || 29) * 17) % 4;
-    // Tones chosen to stay clearly distinct from all job body colors (no warm-orange clashes)
-    const skinColor = ['#ffe0c0', '#f5c99a', '#d0845a', '#9e5c38'][skinHash];
     const faceScreenX = faceX - faceZ; // screen-X component of movement direction
     const faceScreenY = (faceX + faceZ) * 0.5; // screen-depth component; positive walks down/toward camera
-    const faceScreenLen = Math.hypot(faceScreenX, faceScreenY);
-    const fwdX = faceScreenLen > 0.01 ? faceScreenX / faceScreenLen : 0;
-    const fwdY = faceScreenLen > 0.01 ? faceScreenY / faceScreenLen : 0;
-    const sideX = faceScreenLen > 0.01 ? -fwdY : 1;
-    const sideY = faceScreenLen > 0.01 ?  fwdX : 0;
-    // Lean into the projected screen direction. The Y term is intentionally
-    // smaller so up/down walking reads as intent without bobbing the head loose.
-    const walkLeanX = isMoving ? fwdX * 0.9 : 0;
-    const walkLeanY = isMoving ? fwdY * 0.7 : 0;
-    const headX = s.x + fwdX * 0.5 + walkLeanX * 0.4;
-    const headY = cy - 19 + walkLeanY * 0.35;  // Loop 1 (render S3): dropped 1px so jaw overlaps body top, kills the "severed head" read
 
     // Job color — vibrant saturated palette so citizens stand out
     let bodyColor = '#8899bb';
@@ -1968,7 +2001,7 @@ export function render() {
     // every unit — visually noisy and removes weight." Now just a proper
     // soft elliptical drop-shadow with feathered edge via stacked alphas.
     // Reserve any colored ring for SELECTED citizen only (handled later).
-    const actorShadowScale = _loadActorAtlas() ? 0.84 : 1;
+    const actorShadowScale = 0.84;
     ctx.fillStyle = 'rgba(0,0,0,0.08)';
     ctx.beginPath();
     ctx.ellipse(s.x, s.y + 2, 7.5 * actorShadowScale, 3.2 * actorShadowScale, 0, 0, Math.PI * 2);
@@ -2061,411 +2094,6 @@ export function render() {
     // ground shadow but do not flash into the old hand-drawn canvas citizen.
     continue;
 
-    // Loop 41 (render S3 revisited): rebuilt the citizen silhouette so
-    // they have actual LEGS between body and feet, and proper arms instead
-    // of shoulder stubs. Prior layout had body-bottom (cy-0.6) and feet
-    // (cy-1) touching, so citizens read as floating torsos.
-    //
-    // New stack, bottom-up:
-    //   Feet: cy+1 (below old position to clear room)
-    //   Legs: 2 thin vertical rectangles from cy+1 to cy-4 (pants color)
-    //   Body: ellipse centered at cy-9 (moved up 1px), 5.2×6.6
-    //   Arms: elongated ovals from cy-10 to cy-5, slight outward angle
-    //   Head: unchanged (cy-19, r=6.3)
-    // Loop 48 (render S4): real walk cycle. Prior code had feet sliding
-    // left/right via sine — looked slidey. Now each foot follows a proper
-    // up+forward swing phase then a planted stance phase, mirrored L/R.
-    // Loop 358: stride now follows the isometric screen direction. Walking
-    // up/down no longer reuses a horizontal shuffle meant for side movement.
-    const walkPhase = G.gameTick * 0.22 + phaseOffset;
-    const stepSin = Math.sin(walkPhase);
-    const step = isMoving ? stepSin : 0;
-    const pantsColor = '#3a2618';
-    // Per-foot lift: the foot is UP when it's swinging forward (cos>0),
-    // PLANTED when cos<0. Use half-rectified cosines so only the swing
-    // half has lift. Foot L swings on cos>0, foot R on cos<0.
-    const cosP = Math.cos(walkPhase);
-    const liftL = isMoving ? Math.max(0, cosP) * 1.6 : 0;
-    const liftR = isMoving ? Math.max(0, -cosP) * 1.6 : 0;
-    // Forward/back shift travels along the projected walking vector. This is
-    // the key difference between walking across screen and walking into depth.
-    const strideL = isMoving ? cosP * 1.35 : 0;
-    const strideR = isMoving ? -cosP * 1.35 : 0;
-
-    // Legs
-    ctx.fillStyle = pantsColor;
-    const footSep = 2.0;
-    const legL_x = s.x - sideX * footSep + fwdX * strideL - sideX * step * 0.25;
-    const legR_x = s.x + sideX * footSep + fwdX * strideR + sideX * step * 0.25;
-    const legL_y = cy - sideY * footSep * 0.35 + fwdY * strideL;
-    const legR_y = cy + sideY * footSep * 0.35 + fwdY * strideR;
-    const legL_len = 5 - liftL * 0.6;  // leg shortens when foot lifts
-    const legR_len = 5 - liftR * 0.6;
-    ctx.fillRect(legL_x - 1.2, legL_y - 1 - liftL - legL_len, 2.4, legL_len);
-    ctx.fillRect(legR_x - 1.2, legR_y - 1 - liftR - legR_len, 2.4, legR_len);
-    // Leg highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(legL_x - 1.2, legL_y - 1 - liftL - legL_len, 0.6, legL_len);
-    ctx.fillRect(legR_x - 1.2, legR_y - 1 - liftR - legR_len, 0.6, legR_len);
-
-    // Feet — lifted by liftL/liftR for the swing arc
-    ctx.fillStyle = '#2a1a10';
-    ctx.beginPath();
-    ctx.ellipse(legL_x, legL_y + 0.5 - liftL, 2.6, 1.6, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(legR_x, legR_y + 0.5 - liftR, 2.6, 1.6, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Body — torso ellipse, slightly tapered (shoulders wider than waist).
-    // Draw as two overlapping ellipses for subtle taper without bespoke
-    // path code.
-    const bodyX = s.x + walkLeanX * 0.35;
-    const bodyTilt = walkLeanX * 0.055;
-    ctx.fillStyle = bodyColor;
-    // Lower body (narrower waist)
-    ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 7, 4.6, 4.5, bodyTilt, 0, Math.PI * 2);
-    ctx.fill();
-    // Upper body (broader shoulders)
-    ctx.beginPath();
-    ctx.ellipse(bodyX, cy - 11, 5.4, 4.2, bodyTilt, 0, Math.PI * 2);
-    ctx.fill();
-    // Shadow side
-    ctx.fillStyle = 'rgba(0,0,0,0.16)';
-    ctx.beginPath();
-    ctx.ellipse(bodyX + 1.6, cy - 8.5, 4.2, 5.3, bodyTilt, -Math.PI / 2, Math.PI / 2);
-    ctx.fill();
-    // Loop 46 (render S4): removed the body and arm strokes. Agent #5:
-    // "mix of crisp outlines and soft halos — likely upscaled low-res
-    // art + vector at different render paths." Was from stroked body
-    // ellipses + unstroked head/legs/hands. Unified by dropping all
-    // outlines — silhouette now reads from shape + shadow contrast.
-
-    // Arms — elongated ovals, one slightly in front of body.
-    const armSwing = isMoving ? step * 0.6 : 0;
-    ctx.fillStyle = bodyColor;
-    // Left arm (hangs down and out, full shoulder-to-hand length)
-    ctx.beginPath();
-    ctx.ellipse(bodyX - 5.8, cy - 8 + armSwing, 1.6, 3.8, Math.PI * 0.08, 0, Math.PI * 2);
-    ctx.fill();
-    // Right arm
-    ctx.beginPath();
-    ctx.ellipse(bodyX + 5.8, cy - 8 - armSwing, 1.6, 3.8, -Math.PI * 0.08, 0, Math.PI * 2);
-    ctx.fill();
-    // Hands — small skin-tone dots at the arm bottoms so the eye reads
-    // where the arm ends. Huge silhouette improvement at any zoom.
-    ctx.fillStyle = skinColor;
-    ctx.beginPath();
-    ctx.arc(bodyX - 5.8, cy - 4.5 + armSwing, 1.1, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath();
-    ctx.arc(bodyX + 5.8, cy - 4.5 - armSwing, 1.1, 0, Math.PI * 2); ctx.fill();
-
-    // Neck stub — bridging body to head, X averaged between body and head positions
-    // Loop 1 (render S3): widened 2.2×2.6 → 3.0×3.0 so neck is 45% of head width
-    // (was 35%) — less "ball on a bottle"; and top extends past head bottom to overlap
-    ctx.fillStyle = skinColor;
-    ctx.beginPath();
-    ctx.ellipse((bodyX + headX) * 0.5, cy - 15, 3.0, 3.0, bodyTilt, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Head — large for chibi proportions (oversized head = cute, scaled ~1.4x)
-    // Loop 1 (render S3): dropped the dark head outline. The full-circumference
-    // rgba(10,5,0,0.55) stroke at the jawline read as a literal gap between head
-    // and neck (the "severed" look). Silhouette holds from skin-vs-body contrast.
-    ctx.fillStyle = skinColor;
-    ctx.beginPath();
-    ctx.arc(headX, headY, 6.3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Hair — vibrant colors, cap shifts based on facing direction
-    // When facing away, hair sits on the camera-visible (back) side of the head.
-    // When facing camera, hair sits on the back/opposite side from the face.
-    // Loop 9 (render S3): hair silhouette variants. Prior code used a single
-    // arc shape — 4 colors × 1 silhouette × 4 skins = "four villagers, one
-    // haircut" per fresh-eyes critique #1b. Now 4 colors × 4 silhouettes ×
-    // 4 skins = real crowd variety. Shape is keyed to (name_hash >> 3) so
-    // two citizens sharing a hair COLOR can still differ in shape.
-    const hairColorIdx = (c.name.charCodeAt(0) * 31 + c.name.charCodeAt(1)) % 4;
-    const hairShapeIdx = ((c.name.charCodeAt(0) * 13 + (c.name.charCodeAt(1) || 17) * 7) >> 1) % 4;
-    ctx.fillStyle = ['#5c3a18','#c08020','#3a1a3a','#e8704a'][hairColorIdx];
-    const hairOffX = facingAway ? faceX * 0.5 : -faceX * 0.6;
-    const hairStart = facingAway ? Math.PI * 0.65 : Math.PI * 0.85;
-    const hairEnd   = facingAway ? Math.PI * 2.35 : Math.PI * 2.15;
-
-    if (hairShapeIdx === 0) {
-      // Variant 0: classic cap (the original silhouette)
-      ctx.beginPath();
-      ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
-      ctx.closePath();
-      ctx.fill();
-    } else if (hairShapeIdx === 1) {
-      // Variant 1: tall tuft — cap + cowlick/spike on top
-      ctx.beginPath();
-      ctx.arc(headX + hairOffX, headY - 1.4, 5.9, hairStart, hairEnd);
-      ctx.closePath();
-      ctx.fill();
-      // Small tuft blob above the crown
-      ctx.beginPath();
-      ctx.ellipse(headX + hairOffX - faceX * 1.2, headY - 5.8, 2.4, 2.2, -0.2 * faceX, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (hairShapeIdx === 2) {
-      // Variant 2: asymmetric side-parting — wider on one side
-      ctx.beginPath();
-      ctx.arc(headX + hairOffX + 0.8 * (facingAway ? -faceX : faceX), headY - 1.1, 6.0, hairStart - 0.25, hairEnd + 0.15);
-      ctx.closePath();
-      ctx.fill();
-      // Bang falling forward over the "short" side
-      if (!facingAway) {
-        ctx.beginPath();
-        ctx.ellipse(headX - faceX * 2.8, headY - 1.8, 1.6, 1.1, 0.3 * faceX, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    } else {
-      // Variant 3: buzzed / close-cropped — much smaller radius
-      ctx.beginPath();
-      ctx.arc(headX + hairOffX, headY - 1.9, 4.6, hairStart + 0.15, hairEnd - 0.15);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    // Hair sheen — shape-aware upper-front highlight
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 1.3;
-    const sheenR = hairShapeIdx === 3 ? 3.9 : 4.8;
-    ctx.beginPath();
-    ctx.arc(headX + hairOffX - 0.5, headY - 2.2, sheenR, hairStart, hairStart + Math.PI * 0.6);
-    ctx.stroke();
-
-    // Face — eyes and mouth on facing side, hidden when facing away
-    // Loop 1 (render S3): widened eye spacing ±1.7 → ±2.0 and shrank whites 1.6 → 1.3;
-    // prior config had inner edges at ±0.1 so the whites touched at centerline, making
-    // the face read as "goggles" at zoom ≥2. Now inner edges sit ~0.7px apart.
-    // Loop 47 (render S4): dot-eyes instead of white-eyes. Prior whites
-    // radius 1.3 with pupils 0.9 left a ~0.4px white ring around each
-    // pupil that read as spectacles, especially at zoom 5+. Now: dark
-    // dots directly on skin with a tiny single-pixel white glint.
-    // Classic cute-character eye treatment (Peanuts/Sanrio).
-    if (!facingAway && G.camera.zoom >= 0.8) {
-      const eyeX = headX + faceScreenX * 0.8;
-      const eyeDX = 2.0;
-      // Solid dark eye dots
-      ctx.fillStyle = '#2a1a0a';
-      ctx.beginPath();
-      ctx.arc(eyeX - eyeDX, headY + 0.7, 1.2, 0, Math.PI * 2);
-      ctx.arc(eyeX + eyeDX, headY + 0.7, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-      // Single bright glint upper-left of each eye (lively highlight)
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.beginPath();
-      ctx.arc(eyeX - eyeDX - 0.4, headY + 0.7 - 0.4, 0.35, 0, Math.PI * 2);
-      ctx.arc(eyeX + eyeDX - 0.4, headY + 0.7 - 0.4, 0.35, 0, Math.PI * 2);
-      ctx.fill();
-      // Eyebrows — thin arcs above each eye
-      ctx.strokeStyle = 'rgba(55,28,8,0.75)';
-      ctx.lineWidth = 0.85;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.arc(eyeX - eyeDX, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(eyeX + eyeDX, headY - 0.2, 1.8, Math.PI * 1.15, Math.PI * 1.85);
-      ctx.stroke();
-    }
-    // Mouth — state-driven expression. Loop 28 (render S3): was always a
-    // smile at zoom ≥1.5; now also shows at zoom ≥1.2 (less close) and
-    // varies by c.state (eating = O, working = neutral line, hungry = frown,
-    // default = smile). Cheeks stay at zoom ≥1.5 threshold.
-    if (!facingAway && G.camera.zoom >= 1.2) {
-      ctx.strokeStyle = 'rgba(80,50,30,0.75)';
-      ctx.fillStyle = 'rgba(80,50,30,0.8)';
-      ctx.lineWidth = 0.9;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-      const mouthX = headX + faceScreenX * 0.5;
-      const mouthY = headY + 2.2;
-      if (c.state === 'eating') {
-        // Small O for eating
-        ctx.beginPath();
-        ctx.arc(mouthX, mouthY, 0.9, 0, Math.PI * 2);
-        ctx.stroke();
-      } else if (c.hunger > 70) {
-        // Frown — inverted smile curve
-        ctx.beginPath();
-        ctx.moveTo(mouthX - 1.2, mouthY + 0.3);
-        ctx.quadraticCurveTo(mouthX, mouthY - 0.9, mouthX + 1.2, mouthY + 0.3);
-        ctx.stroke();
-      } else if (c.state === 'working') {
-        // Neutral concentration line
-        ctx.beginPath();
-        ctx.moveTo(mouthX - 1.0, mouthY - 0.2);
-        ctx.lineTo(mouthX + 1.0, mouthY - 0.2);
-        ctx.stroke();
-      } else {
-        // Default smile
-        ctx.beginPath();
-        ctx.moveTo(mouthX - 1.2, mouthY - 0.4);
-        ctx.quadraticCurveTo(mouthX, mouthY + 0.9, mouthX + 1.2, mouthY - 0.4);
-        ctx.stroke();
-      }
-    }
-    if (!facingAway && G.camera.zoom >= 1.5) {
-      // Rosy cheeks — soft blush at close zoom
-      ctx.fillStyle = 'rgba(240,100,80,0.22)';
-      ctx.beginPath();
-      ctx.ellipse(headX + faceScreenX * 0.4 - 2.8, headY + 2.2, 2.2, 1.5, 0, 0, Math.PI * 2);
-      ctx.ellipse(headX + faceScreenX * 0.4 + 2.8, headY + 2.2, 2.2, 1.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    if (G.camera.zoom >= 0.7) {
-      // Loop 51 (render S4): carry tool while WALKING to/from job too, not
-      // just at work. Citizens now visibly wield their trade tool during
-      // walk_to_work (heading out) and walk_to_deliver (heading back).
-      // Slightly smaller + more upright when walking so it reads as
-      // "carried" vs "in use".
-      const showTool = c.jobBuilding && (
-        c.state === 'working' ||
-        c.state === 'walk_to_work' ||
-        c.state === 'walk_to_deliver'
-      );
-      if (showTool) {
-        const jt = c.jobBuilding.type;
-        const isWalking = c.state !== 'working';
-        // Loop 53 (render S4): tool carried on the LEADING side when walking
-        // (opposite the face direction so it doesn't block the face).
-        // Before: tool was always +right-offset — blocked the eyes when a
-        // citizen walked leftward.
-        const toolSide = isWalking && faceScreenX !== 0 ? -faceScreenX : 1;
-        const toolX = s.x + (isWalking ? 6 : 8) * toolSide;
-        const toolY = cy - (isWalking ? 12 : 11);
-        const toolScale = isWalking ? 0.85 : 1.0;
-        ctx.save();
-        ctx.lineCap = 'round';
-        ctx.translate(toolX, toolY);
-        ctx.scale(toolScale, toolScale);
-        if (jt === 'mine' || jt === 'quarry') {
-          // Pickaxe — when walking, shouldered at steeper angle
-          ctx.rotate(isWalking ? -0.8 : -0.4);
-          ctx.strokeStyle = '#8b5e3c';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 5); ctx.stroke();
-          ctx.strokeStyle = '#aaa';
-          ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.moveTo(-2, 0); ctx.lineTo(2, 0); ctx.stroke();
-        } else if (jt === 'lumber') {
-          // Axe — shouldered when walking (vertical) vs swung when working (tilted)
-          ctx.rotate(isWalking ? 0.0 : 0.3);
-          ctx.strokeStyle = '#8b5e3c';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 5); ctx.stroke();
-          ctx.fillStyle = '#aaa';
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(2.5, -1); ctx.lineTo(1.5, 2); ctx.closePath(); ctx.fill();
-        } else if (jt === 'farm') {
-          // Scythe — long handle, curved blade. Carry vertical when walking.
-          ctx.rotate(isWalking ? 0.15 : 0);
-          ctx.strokeStyle = '#8b5e3c';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, -1); ctx.stroke();
-          ctx.strokeStyle = '#ccc';
-          ctx.lineWidth = 1.3;
-          ctx.beginPath(); ctx.arc(-1, -1, 2.5, 0, Math.PI * 0.9); ctx.stroke();
-        } else if (jt === 'fisherman') {
-          // Fishing rod — long thin rod with line
-          ctx.rotate(isWalking ? -0.2 : 0.1);
-          ctx.strokeStyle = '#8b5e3c';
-          ctx.lineWidth = 1.0;
-          ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(1, -5); ctx.stroke();
-          // Line
-          ctx.strokeStyle = 'rgba(220,220,220,0.7)';
-          ctx.lineWidth = 0.4;
-          ctx.beginPath(); ctx.moveTo(1, -5); ctx.lineTo(2.5, 2); ctx.stroke();
-        } else if (jt === 'blacksmith') {
-          // Hammer — short handle with rect head
-          ctx.rotate(isWalking ? 0.2 : 0.6);
-          ctx.strokeStyle = '#8b5e3c';
-          ctx.lineWidth = 1.1;
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 4); ctx.stroke();
-          ctx.fillStyle = '#666';
-          ctx.fillRect(-1.5, -1, 3, 2);
-        } else {
-          ctx.fillStyle = '#ccc';
-          ctx.beginPath(); ctx.arc(0, 0, 1.5, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.restore();
-      }
-
-      drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight);
-    } // end zoom >= 0.7
-
-    // Loop 71 (render S4): damage flash overlay — red radial gradient on
-    // body + head when hurtTimer > 0. Drawn after body so it tints, fades
-    // with the timer. Used for combat hits.
-    if (hurtAlpha > 0) {
-      const hurtGrad = ctx.createRadialGradient(s.x, cy - 10, 2, s.x, cy - 10, 12);
-      hurtGrad.addColorStop(0, `rgba(255, 60, 60, ${hurtAlpha})`);
-      hurtGrad.addColorStop(1, `rgba(255, 60, 60, 0)`);
-      ctx.fillStyle = hurtGrad;
-      ctx.beginPath();
-      ctx.arc(s.x, cy - 10, 12, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Loop 74 (render S4): low-HP indicator. When citizen HP drops below
-    // 40 (out of ~100), show a small red droplet + HP text at close zoom.
-    // Citizens rarely have HP tracked unless combat has happened, so this
-    // doubles as a "this citizen was injured recently" cue.
-    if (c.hp !== undefined && c.hp < 40 && c.hp > 0 && G.camera.zoom >= 0.8) {
-      // Blood droplet floating above head
-      const droplet = 0.5 + 0.5 * Math.sin(G.gameTick * 0.1 + phaseOffset);
-      ctx.globalAlpha = Math.max(0.85, daylight) * (0.6 + 0.4 * droplet);
-      ctx.fillStyle = '#c8201c';
-      ctx.beginPath();
-      ctx.moveTo(s.x, cy - 28);
-      ctx.bezierCurveTo(s.x - 1.5, cy - 26, s.x - 1.5, cy - 23, s.x, cy - 22);
-      ctx.bezierCurveTo(s.x + 1.5, cy - 23, s.x + 1.5, cy - 26, s.x, cy - 28);
-      ctx.fill();
-      // Tiny highlight
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.beginPath();
-      ctx.arc(s.x - 0.5, cy - 26, 0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = Math.max(0.85, daylight);
-    }
-
-    // Hover ring — iso-flat ellipse at feet, gold.
-    // Loop 58 (render S4): was a 10px circle at chest height. Matched the
-    // old selected-citizen style which I just redid in L57. Unified: hover
-    // is a gold version of the foot ring.
-    if (c === hoveredCitizen) {
-      ctx.strokeStyle = 'rgba(255,209,102,0.8)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 2, 7, 3.0, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    // Selected citizen — elliptical ring at feet + faint arc overhead.
-    // Loop 57 (render S4): prior was a big circle centered at chest. Looked
-    // like a targeting reticle from above. Now anchored at the feet (where
-    // the drop shadow is) using iso-flattened ellipse + a subtle overhead
-    // crescent so the selection reads across zoom levels without fighting
-    // the new shadow system.
-    if (c === G.selectedCitizen) {
-      const pulse = 0.55 + 0.35 * Math.sin(G.gameTick * 0.1);
-      // Feet ring — iso-flat ellipse
-      ctx.strokeStyle = `rgba(120,210,255,${pulse})`;
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 2, 8, 3.4, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      // Overhead crescent — light arc above head for easy finding in a crowd
-      ctx.strokeStyle = `rgba(120,210,255,${pulse * 0.75})`;
-      ctx.lineWidth = 1.1;
-      ctx.beginPath();
-      ctx.arc(s.x, cy - 28, 4.5, Math.PI * 1.15, Math.PI * 1.85);
-      ctx.stroke();
-    }
   }
   };
 
@@ -2550,11 +2178,9 @@ export function render() {
     const wlp = lerpEnt(w);
     const ws = toScreen(wlp.x, wlp.y);
     ctx.globalAlpha = Math.max(0.85, daylight);
-    // Service walkers render through the painted actor atlas like citizens
-    // (church -> scholar robes as the priest, tavern -> innkeeper, well ->
-    // settler, market -> trader) so no procedural-era figure walks the
-    // painted town. The old canvas figure remains only as an atlas-loading
-    // fallback.
+    // Service walkers use the same painted actor atlas as citizens. Atlas
+    // decode has no procedural fallback, so a reload cannot flash a second,
+    // incompatible character style into the settlement.
     // Stacked shadow
     ctx.fillStyle = 'rgba(0,0,0,0.10)';
     ctx.beginPath(); ctx.ellipse(ws.x, ws.y + 2, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
@@ -2569,39 +2195,10 @@ export function render() {
     const wFaceY = (nfx + nfy) * 0.5;
     const wDir = actorDirection(wFaceX, wFaceY, wFaceY < -0.02);
     const wFrame = wMoving ? (Math.floor(G.gameTick / 7) + ((w.home?.x || 0) % ACTOR_FRAMES)) % ACTOR_FRAMES : 0;
-    const wDrawn = drawActorAtlasFrame(ctx, {
+    drawActorAtlasFrame(ctx, {
       role: walkerRole, action: wMoving ? (w.hauler ? 'carry' : 'walk') : 'idle', dir: wDir, frame: wFrame,
       x: Math.round(ws.x - 13.5), y: Math.round(ws.y + 3 - 35), width: 27, height: 35,
     });
-    if (!wDrawn) {
-      // Legs / under-robe
-      ctx.fillStyle = '#3a2618';
-      ctx.fillRect(ws.x - 2.2, ws.y - 2, 1.8, 3);
-      ctx.fillRect(ws.x + 0.4, ws.y - 2, 1.8, 3);
-      // Boots
-      ctx.fillStyle = '#1e1510';
-      ctx.beginPath(); ctx.ellipse(ws.x - 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(ws.x + 1.3, ws.y + 1.2, 1.6, 1.1, 0, 0, Math.PI*2); ctx.fill();
-      // Colored robe body — taller than before to extend past the legs
-      ctx.fillStyle = w.color;
-      ctx.beginPath();
-      ctx.ellipse(ws.x, ws.y - 7, 4.2, 5.2, 0, 0, Math.PI*2);
-      ctx.fill();
-      // Robe trim (lighter stripe)
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
-      ctx.fillRect(ws.x - 3.5, ws.y - 8, 7, 1);
-      // Head
-      ctx.fillStyle = '#ffe0c0';
-      ctx.beginPath();
-      ctx.arc(ws.x, ws.y - 14, 3.4, 0, Math.PI*2);
-      ctx.fill();
-      // Tiny dot eyes
-      ctx.fillStyle = '#2a1a0a';
-      ctx.beginPath();
-      ctx.arc(ws.x - 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
-      ctx.arc(ws.x + 1.2, ws.y - 13.8, 0.7, 0, Math.PI*2);
-      ctx.fill();
-    }
     // Small emoji badge above the head (service indicator)
     if (G.camera.zoom >= 1.2) {
       ctx.font = '6px sans-serif';
@@ -2682,8 +2279,7 @@ export function render() {
 
     // Painted-atlas soldiers: barracks units wear the guard sprites. Attack
     // stance (enemy within reach) uses the guard's spear-thrust work rows and
-    // faces the enemy; otherwise walk/idle follows patrol movement. The
-    // procedural chibi below remains as an atlas-loading fallback.
+    // faces the enemy; otherwise walk/idle follows patrol movement.
     const smx = s.x - (s._pdx ?? s.x), smy = s.y - (s._pdy ?? s.y);
     s._pdx = s.x; s._pdy = s.y;
     // Movement memory (same fix as citizens): a single frame's position
@@ -2718,102 +2314,10 @@ export function render() {
     const sFaceY = ((sFx / sLen) + (sFy / sLen)) * 0.5;
     const sDir = actorDirection(sFaceX, sFaceY, sFaceY < -0.02);
     const sFrame = (sAction === 'idle' || sBraced) ? 0 : Math.floor(G.gameTick / (sAction === 'work' ? 6 : 7)) % ACTOR_FRAMES;
-    const sDrawn = drawActorAtlasFrame(ctx, {
+    drawActorAtlasFrame(ctx, {
       role: 'guard', action: sAction, dir: sDir, frame: sFrame,
       x: Math.round(ss.x - 13.5), y: Math.round(ss.y + 3 - 35), width: 27, height: 35,
     });
-    if (!sDrawn) {
-    const isArcher = s.type === 'archer';
-    const bodyColor = isArcher ? '#4a6a2a' : '#5a6a7a';
-    const darkerBody = isArcher ? '#3a5020' : '#44525e';
-    const helmColor = isArcher ? '#6a4a1a' : '#9aa0a8';
-    const plumeColor = isArcher ? '#2a6a30' : '#3a7acc'; // green feather / blue plume
-
-    // Legs — dark brown trousers / metal greaves
-    const legColor = isArcher ? '#3a2818' : '#2a2a2e';
-    ctx.fillStyle = legColor;
-    const legLx = ss.x - 2.0, legRx = ss.x + 2.0;
-    ctx.fillRect(legLx - 1.2, ss.y - 1 - 5, 2.4, 5);
-    ctx.fillRect(legRx - 1.2, ss.y - 1 - 5, 2.4, 5);
-    // Leg highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(legLx - 1.2, ss.y - 1 - 5, 0.6, 5);
-    ctx.fillRect(legRx - 1.2, ss.y - 1 - 5, 0.6, 5);
-    // Boots
-    ctx.fillStyle = '#1e1510';
-    ctx.beginPath(); ctx.ellipse(legLx, ss.y + 0.5, 2.6, 1.6, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(legRx, ss.y + 0.5, 2.6, 1.6, 0, 0, Math.PI*2); ctx.fill();
-
-    // Body — tapered two-ellipse torso
-    ctx.fillStyle = bodyColor;
-    ctx.beginPath(); ctx.ellipse(ss.x, ss.y - 7, 4.6, 4.5, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(ss.x, ss.y - 11, 5.4, 4.2, 0, 0, Math.PI*2); ctx.fill();
-    // Chest band trim (armor belt)
-    ctx.fillStyle = darkerBody;
-    ctx.fillRect(ss.x - 4.2, ss.y - 8.5, 8.4, 1.2);
-
-    // Arms — long ovals with hand dots at tips
-    ctx.fillStyle = bodyColor;
-    ctx.beginPath(); ctx.ellipse(ss.x - 5.8, ss.y - 8, 1.6, 3.8, Math.PI * 0.08, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(ss.x + 5.8, ss.y - 8, 1.6, 3.8, -Math.PI * 0.08, 0, Math.PI*2); ctx.fill();
-    // Gauntlets / leather gloves at arm tips
-    ctx.fillStyle = isArcher ? '#4a3018' : '#3a3a42';
-    ctx.beginPath(); ctx.arc(ss.x - 5.8, ss.y - 4.5, 1.1, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(ss.x + 5.8, ss.y - 4.5, 1.1, 0, Math.PI*2); ctx.fill();
-
-    // Head / helm
-    ctx.fillStyle = helmColor;
-    ctx.beginPath(); ctx.arc(ss.x, ss.y - 15, 4.0, 0, Math.PI*2); ctx.fill();
-    // Face shadow (visible chin under helm)
-    ctx.fillStyle = '#d0a888';
-    ctx.beginPath(); ctx.arc(ss.x, ss.y - 13.5, 2.6, 0.1, Math.PI - 0.1); ctx.fill();
-    // Helmet brim
-    ctx.fillStyle = isArcher ? '#5a3a0a' : '#7a8088';
-    ctx.fillRect(ss.x - 4.8, ss.y - 13.5, 9.6, 1.3);
-
-    // Plume / feather
-    ctx.fillStyle = plumeColor;
-    if (isArcher) {
-      // Green feather sideways
-      ctx.beginPath();
-      ctx.ellipse(ss.x + 3, ss.y - 17, 1.0, 2.5, Math.PI * 0.25, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      // Vertical red→blue plume
-      ctx.beginPath();
-      ctx.ellipse(ss.x, ss.y - 18, 1.3, 2.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Weapon — sword or bow on back
-    if (isArcher) {
-      ctx.strokeStyle = '#8a5a2a';
-      ctx.lineWidth = 1.1;
-      ctx.beginPath();
-      ctx.arc(ss.x - 4, ss.y - 10, 4.5, -0.5, 0.5);
-      ctx.stroke();
-      // Bowstring
-      ctx.strokeStyle = 'rgba(240,230,200,0.7)';
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(ss.x - 6.5, ss.y - 7.8); ctx.lineTo(ss.x - 6.5, ss.y - 12.2);
-      ctx.stroke();
-    } else {
-      // Sword on back — diagonal across torso
-      ctx.strokeStyle = '#aaa';
-      ctx.lineWidth = 1.1;
-      ctx.beginPath();
-      ctx.moveTo(ss.x - 3, ss.y - 14.5); ctx.lineTo(ss.x + 3.5, ss.y - 7.5);
-      ctx.stroke();
-      // Sword handle cross-guard
-      ctx.strokeStyle = '#6a5a30';
-      ctx.lineWidth = 1.3;
-      ctx.beginPath();
-      ctx.moveTo(ss.x - 4, ss.y - 16); ctx.lineTo(ss.x - 2.5, ss.y - 13); ctx.stroke();
-    }
-
-    // HP bar when damaged
-    }
     if (s.hp < s.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
       ctx.fillRect(ss.x - 5, ss.y - 22, 10, 2);

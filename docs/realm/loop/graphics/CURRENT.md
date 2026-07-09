@@ -1,5 +1,117 @@
 # Current Graphics Handoff
 
+## Runtime actor continuity and motion stabilization — 2026-07-09
+
+- A citizen now retains `visualJob` through short-lived route retries,
+  delivery legs, and food-crisis reallocations. The renderer uses that stable
+  profession when there is no active `jobBuilding`, so a miner no longer
+  flashes into the generic settler sprite between real assignments. A newly
+  selected job updates the appearance immediately; an explicitly unassigned
+  citizen returns to the settler appearance.
+- Work-state scheduling no longer detours through `find_job`/idle whenever a
+  production check has no cargo. Workers remain in the active work loop, and
+  their final approach direction is locked for the whole tool beat. This
+  prevents frozen work frames and row changes mid-swing.
+- Road lane offsets now apply to the interpolated actor position rather than
+  overwriting it with the simulation position. Blocked paths also stop using
+  the walk cycle after the short startup grace instead of treading in place.
+  Together these remove the most visible motion shiver without touching
+  accepted sprite art or introducing any runtime frame scaling.
+- `scripts/verify-logic.mjs` now covers miner identity across a delivery gap,
+  continuous work state, locked work facing, and builder art at unfinished
+  sites. Client module imports were revised to `realm=157` so a local tab
+  loads the corrected runtime rather than its prior module graph.
+
+Validation run:
+
+```sh
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-frames.mjs --allow-mixed
+node scripts/audit-walk-gait.mjs
+REALM_PORT=4742 node scripts/verify-logic.mjs
+REALM_PORT=4743 node scripts/verify-anim.mjs
+REALM_PORT=4744 node scripts/verify-all-sprite-maps.mjs
+REALM_PORT=4745 node scripts/verify.mjs --game
+```
+
+## Directional work-row stabilization — 2026-07-09
+
+- Rebuilt every previously waived work-direction row as a strict, role-local
+  animation family: `lumber/work/down|up`, `miner/work/down|left|right`,
+  `farmer/work/down|up`, `guard/work/left|right`, and all four
+  `blacksmith/work` directions. The cleanest native role pose is now used as
+  the fixed body/foot anchor; a compact upper-body work rhythm supplies the
+  eight distinct beats. This removes the frame-scale, ground-anchor,
+  edge-clipping, fragment, and cross-direction scale waivers without
+  reintroducing legacy/vector art or scaling frames at render time.
+- Repainted `lumber/walk/up` as a dedicated eight-frame rear walk cycle. It
+  keeps a 79px painted body, a fixed ground anchor, one consistent axe side,
+  zero loose fragments, and eight unique frames. The conservative rear-view
+  gait heuristic still flags this row for follow-up because the axe and
+  overlapping boots obscure its foot-balance signal; it remains a review cue,
+  not a sprite-contract failure.
+- The blacksmith set was promoted as one four-direction family so its front
+  view no longer carries an anvil-sized body mismatch relative to the other
+  three directions. Miner and guard side directions are mirrored only after
+  their reviewed left rows pass, preserving exact timing, palette, and anchor
+  symmetry.
+- The complete **187-row** accepted override manifest now has **zero**
+  `accepted-with-waiver` rows. A fresh compiled-atlas audit leaves ordinary
+  side-walk stride breadth as the highest remaining metric; it is stable,
+  gait-tested motion rather than body jitter, clipping, fragments, or a style
+  era fault.
+
+Validation run:
+
+```sh
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/audit-sprite-registration.mjs --write
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-frames.mjs --allow-mixed
+node scripts/audit-walk-gait.mjs
+node scripts/verify-all-sprite-maps.mjs
+```
+
+## Release polish pass — 2026-07-09
+
+- Repainted `miner/work/left` with a dedicated eight-frame painted pick
+  cycle, palette-harmonized it toward the miner walk family, then mirrored the
+  reviewed row to `miner/work/right`. Both rows now have a stable 72px
+  effective body height, 1px ground-anchor range, zero loose fragments, and
+  no legacy/vector fallback in the live atlas. The
+  reviewer kept a named `body-width-drift` waiver: the compact crouch and
+  overhead-pick silhouettes still vary in width, but this is visibly a pose
+  difference rather than a scale pop. The audit score fell from `136.6` to
+  `70.3` for each side row; `lumber/work/up` is now the top repaint target.
+- Rebuilt `actors-compiled/miner.png` and `actors-atlas.png`, then regenerated
+  actor registration after the repaint. Registration now uses only stable
+  row-scale/feet-anchor corrections—never whole-frame scale normalization.
+  The registration gate reports no rows above feet/centroid tolerance, and
+  animation/browser checks pass.
+- Removed the unreachable procedural citizen and soldier renderers plus the
+  service-walker fallback from `render.js`. Canonical painted PNG atlases are
+  now the sole near-camera human actor path; the renderer leaves a shadow
+  while an atlas decodes instead of briefly showing the retired canvas/SVG-era
+  look. Idle social facing now uses a spatial hash instead of per-citizen
+  full-population scans.
+- Citizen routes now blacklist unreachable jobs and delivery sites for a
+  bounded period, release bad job assignments, retry alternate real storage,
+  and reacquire a changed resource work tile before continuing to work. The
+  logic suite adds a moat-island regression for both job and delivery recovery.
+
+Validation run:
+
+```sh
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-registration.mjs --write
+node scripts/audit-sprite-frames.mjs --allow-mixed
+REALM_PORT=4714 node scripts/verify-anim.mjs
+REALM_PORT=4713 node scripts/verify-logic.mjs
+```
+
 ## Baseline
 
 Current baseline: `rounds/112-round-player-cleanup.md`

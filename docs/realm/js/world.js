@@ -2,8 +2,8 @@
 // World generation — terrain, fog, noise
 // ════════��═════════════════════════��═════════════════════════
 
-import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=135';
-import { makeAvatar } from './avatar.js?realm=135';
+import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=157';
+import { makeAvatar } from './avatar.js?realm=157';
 
 function hash2(x,y){ let n=x*374761393+y*668265263; n=(n^(n>>13))*1274126177; return(n^(n>>16))&0x7fffffff; }
 function noise2(x,y){
@@ -36,7 +36,7 @@ export function makeCitizen(x,y){
   return {
     x, y, tx:x, ty:y,
     speed: 0.02 + rng()*0.01,
-    job: null, jobBuilding: null,
+    job: null, jobBuilding: null, visualJob: null,
     carrying: null, carryAmount: 0,
     name: randomName(),
     hunger: 0, rest: 100, // rest = energy 0–100; sleep restores it (Phase 3a)

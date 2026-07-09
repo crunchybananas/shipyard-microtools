@@ -2,11 +2,11 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=135';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=135';
-import { getCitizenSpeedMult } from './events.js?realm=135';
-import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=135';
-import { revealAround } from './world.js?realm=135';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=157';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=157';
+import { getCitizenSpeedMult } from './events.js?realm=157';
+import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=157';
+import { revealAround } from './world.js?realm=157';
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -37,31 +37,49 @@ function preferChainTarget(c, primary, fallback) {
   return dp <= dist2(c.x, c.y, fallback.x, fallback.y) * 2 ? primary : fallback;
 }
 
-function deliveryDropoff(c, resKey) {
-  if (resKey === 'food') {
-    return nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
+function buildingsByType(c, types) {
+  const results = [];
+  const seen = new Set();
+  for (const type of types) {
+    const matches = G.buildings
+      .filter(b => b.type === type && !seen.has(b))
+      .sort((a, b) => dist2(c.x, c.y, a.x, a.y) - dist2(c.x, c.y, b.x, b.y));
+    for (const building of matches) {
+      seen.add(building);
+      results.push(building);
+    }
   }
-  // Production chain: wheat walks to the mill, flour walks to the bakery,
-  // so the goods visibly flow farm -> windmill -> bakery -> granary.
-  if (resKey === 'wheat') {
-    const store = nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
-    return preferChainTarget(c, nearestBuilding(c, 'windmill'), store);
-  }
-  if (resKey === 'flour') {
-    const store = nearestBuilding(c, 'granary') || nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
-    return preferChainTarget(c, nearestBuilding(c, 'bakery'), store);
-  }
-  if (resKey === 'gold') {
-    const store = nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'house');
-    return preferChainTarget(c, nearestBuilding(c, 'market'), store);
-  }
-  return nearestBuilding(c, 'storehouse') || nearestBuilding(c, 'granary') || nearestBuilding(c, 'house');
+  return results;
+}
+
+// A carrier needs an ordered *set* of destinations, not only the nearest one.
+// Islands and newly placed buildings can make the visually closest store
+// unreachable; trying the next real building prevents an endless repath loop.
+function deliveryTargets(c, resKey) {
+  let primaryType = null;
+  let storageTypes;
+  if (resKey === 'food') storageTypes = ['granary', 'storehouse', 'house'];
+  else if (resKey === 'wheat') { primaryType = 'windmill'; storageTypes = ['granary', 'storehouse', 'house']; }
+  else if (resKey === 'flour') { primaryType = 'bakery'; storageTypes = ['granary', 'storehouse', 'house']; }
+  else if (resKey === 'gold') { primaryType = 'market'; storageTypes = ['storehouse', 'house']; }
+  else storageTypes = ['storehouse', 'granary', 'house'];
+
+  const storage = buildingsByType(c, storageTypes);
+  if (!primaryType) return storage;
+  const primary = buildingsByType(c, [primaryType]);
+  const preferred = preferChainTarget(c, primary[0], storage[0]);
+  // Keep the intended production chain when it is sensible, but make all
+  // nearby stores viable fallbacks before asking a worker to cross the island.
+  return preferred === primary[0]
+    ? [...primary, ...storage]
+    : [...storage, ...primary];
 }
 
 function requestDeliveryStorage(c) {
   c.state = 'needs_delivery';
   c.stateTimer = 90 + rngInt(0, 60);
   clearPath(c);
+  c._deliveryTarget = null;
   const now = G.gameTick || 0;
   if (!c._needsDeliveryNoticeAt || now - c._needsDeliveryNoticeAt > 180) {
     c._needsDeliveryNoticeAt = now;
@@ -153,6 +171,17 @@ function isBlacklisted(c, x, y) {
   return t !== undefined && G.gameTick - t < BLACKLIST_TICKS;
 }
 
+function releaseJob(c, { unreachable = false } = {}) {
+  const job = c.jobBuilding;
+  if (unreachable) {
+    if (job) blacklistTarget(c, job.x, job.y);
+    if (c.workTarget) blacklistTarget(c, c.workTarget.x, c.workTarget.y);
+  }
+  if (job?.workers) job.workers = job.workers.filter(worker => worker !== c);
+  c.jobBuilding = null;
+  c.workTarget = null;
+}
+
 function watchProgress(c) {
   const goalActive = (c.path && c.pathIdx < c.path.length) ||
     c.state === 'walk_to_work' || c.state === 'walk_to_deliver' ||
@@ -166,9 +195,7 @@ function watchProgress(c) {
   if (c._wdTicks > 120) {
     blacklistTarget(c, gx, gy);
     if (c.jobBuilding && c.state === 'walk_to_work') {
-      c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
-      c.jobBuilding = null;
-      c.workTarget = null;
+      releaseJob(c, { unreachable: true });
       G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: "Can't reach it!", alpha: 1.25, vy: -0.12, decay: 0.016, type: 'speech' });
     }
     clearPath(c);
@@ -187,6 +214,7 @@ function pathTo(c, tx, ty) {
   c._pathGoal = target;
   c.path = compressPath(findPath(Math.round(c.x), Math.round(c.y), target.x, target.y));
   c.pathIdx = 0;
+  c._pathStartedAt = c.path ? G.gameTick : null;
   c._pathEpoch = G.obstacleEpoch || 0;
   c._stuckTicks = 0;
   c._lastPathX = c.x;
@@ -201,6 +229,26 @@ function pathTo(c, tx, ty) {
     c.ty = c.y;
     c._pathFailedAt = G.gameTick || 0;
   }
+  return !!c.path;
+}
+
+function routeDelivery(c, resKey) {
+  for (const dropoff of deliveryTargets(c, resKey)) {
+    if (isBlacklisted(c, dropoff.x, dropoff.y)) continue;
+    if (pathTo(c, dropoff.x, dropoff.y)) {
+      c._deliveryTarget = dropoff;
+      return true;
+    }
+    // Do not keep assigning an islanded store on the next heartbeat. The
+    // short target blacklist expires after the map or settlement can change.
+    blacklistTarget(c, dropoff.x, dropoff.y);
+  }
+  c._deliveryTarget = null;
+  return false;
+}
+
+function deliveryTargetStillValid(c) {
+  return !!c._deliveryTarget && G.buildings.includes(c._deliveryTarget);
 }
 
 // Loop 3 → Loop 7 (render S3): citizens respect each other, but don't get
@@ -502,7 +550,19 @@ function enemyNear(c, r) {
 function clearPath(c) {
   c.path = null;
   c.pathIdx = 0;
+  c._pathStartedAt = null;
   c._stuckTicks = 0;
+}
+
+function startWorking(c, stateTimer) {
+  // Preserve the final approach direction for the complete work beat. This
+  // keeps pick, axe, and hammer rows from flicking between directions when
+  // an otherwise-stationary worker has neighbours nearby.
+  c._workFaceX = c.faceX || 0;
+  c._workFaceZ = c.faceZ || 0;
+  c.state = 'working';
+  c.stateTimer = stateTimer;
+  clearPath(c);
 }
 
 function isActivelyMoving(c) {
@@ -555,6 +615,10 @@ export function updateCitizens() {
     if (c.hurtTimer > 0) c.hurtTimer -= 1;
   }
   for (const c of G.citizens) {
+    // Older saves do not have visualJob. Capture the current profession once
+    // so a transient route failure or food reallocation cannot redraw a
+    // miner as a generic settler before a new job is selected.
+    if (c.jobBuilding?.type && !c.visualJob) c.visualJob = c.jobBuilding.type;
     // ── Decision heartbeat (AI audit): obligations preempt from ANY state
     // on a short cadence — the brain no longer waits for the body to stop.
     if ((G.gameTick + (c._hb ?? (c._hb = citizenHash(c) % 12))) % 12 === 0) {
@@ -866,6 +930,7 @@ function runStateMachine(c) {
         }
         if (bestB) {
           c.jobBuilding = bestB;
+          c.visualJob = bestB.type;
           bestB.workers.push(c);
         }
       }
@@ -874,9 +939,9 @@ function runStateMachine(c) {
         c.state = 'walk_to_work';
         pathToWork(c);
         if (!c.path) {
-          c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
-          c.jobBuilding = null;
-          c.workTarget = null;
+          // An unreachable worksite used to win the utility score again on
+          // the next idle tick, pinning a citizen in an assign/fail loop.
+          releaseJob(c, { unreachable: true });
           c.state = 'idle';
           c.stateTimer = 25 + rngInt(0, 35);
         }
@@ -921,8 +986,7 @@ function runStateMachine(c) {
 
     case 'walk_to_work':
       if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
-        c.jobBuilding = null;
-        c.workTarget = null;
+        releaseJob(c);
         c.state = 'find_job';
         c.stateTimer = 0;
         clearPath(c);
@@ -934,20 +998,39 @@ function runStateMachine(c) {
       if (dist2(c.x, c.y, c.workTarget.x, c.workTarget.y) > 1.8) {
         pathToWork(c);
         if (c.path) break;
-        c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
-        c.jobBuilding = null;
-        c.workTarget = null;
+        releaseJob(c, { unreachable: true });
         c.state = 'idle';
         c.stateTimer = 25 + rngInt(0, 35);
         break;
       }
       // Arrived at workplace
-      c.state = 'working';
-      c.stateTimer = 60 + rngInt(0, 30);
-      clearPath(c);
+      startWorking(c, 60 + rngInt(0, 30));
       break;
 
     case 'working':
+      if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
+        releaseJob(c);
+        c.state = 'find_job';
+        c.stateTimer = 0;
+        clearPath(c);
+        break;
+      }
+      // Resource nodes are consumed/changed by the sim. Reacquire a valid
+      // exterior work tile before the next production beat instead of
+      // continuing to animate against an empty patch of ground.
+      if (c.workTarget?.resource != null &&
+          G.map[c.workTarget.y]?.[c.workTarget.x] !== c.workTarget.resource) {
+        c.workTarget = workTargetForBuilding(c, c.jobBuilding);
+        c.state = 'walk_to_work';
+        c.stateTimer = 0;
+        pathToWork(c);
+        if (!c.path) {
+          releaseJob(c, { unreachable: true });
+          c.state = 'idle';
+          c.stateTimer = 25 + rngInt(0, 35);
+        }
+        break;
+      }
       // Work-site feedback: periodic chips/grain at the workplace so labor
       // reads as labor even between production cycles.
       if (c.jobBuilding && G.gameTick % 24 === 0 && rng() < 0.6) {
@@ -975,27 +1058,22 @@ function runStateMachine(c) {
             // Pick a real drop-off: resource-specific storage if present
             // (granary/storehouse for food and goods, market for gold), then
             // nearest house only as a last inhabited fallback.
-            const dropoff = deliveryDropoff(c, resKey);
-            if (dropoff) {
-              pathTo(c, dropoff.x, dropoff.y);
-            } else {
+            if (!routeDelivery(c, resKey)) {
               requestDeliveryStorage(c);
             }
             return;
           }
         }
       }
-      // Nothing to carry — cycle back to working
-      c.state = 'find_job';
-      c.stateTimer = 10;
-      clearPath(c);
+      // No completed output yet. Stay at the existing workstation instead
+      // of taking a 10-tick find_job/idle detour; that detour froze the work
+      // row between production checks and made miners look broken.
+      startWorking(c, 10 + rngInt(0, 6));
       break;
 
     case 'needs_delivery': {
-      const dropoff = c.carrying ? deliveryDropoff(c, c.carrying) : null;
-      if (dropoff) {
+      if (c.carrying && c.carryAmount > 0 && routeDelivery(c, c.carrying)) {
         c.state = 'walk_to_deliver';
-        pathTo(c, dropoff.x, dropoff.y);
         break;
       }
       const target = idleLoiterTarget(c);
@@ -1005,14 +1083,29 @@ function runStateMachine(c) {
     }
 
     case 'walk_to_deliver':
+      if (!c.carrying || c.carryAmount <= 0) {
+        c._deliveryTarget = null;
+        c.state = 'find_job';
+        c.stateTimer = 0;
+        clearPath(c);
+        break;
+      }
+      if (!deliveryTargetStillValid(c)) {
+        c.state = 'needs_delivery';
+        c.stateTimer = 0;
+        clearPath(c);
+        break;
+      }
       if (c.path && c.pathIdx < c.path.length) break;
       // Arrival counts against the SNAPPED path goal too: the raw request
       // can sit on an unwalkable tile whose ring the citizen legitimately
       // reached — retrying forever from 2.3 tiles away was the orbit bug.
       if (dist2(c.x, c.y, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty) > 2.2 &&
           !(c._pathGoal && dist2(c.x, c.y, c._pathGoal.x, c._pathGoal.y) <= 1.2)) {
-        pathTo(c, c._requestedTx ?? c.tx, c._requestedTy ?? c.ty);
-        if (c.path) break;
+        blacklistTarget(c, c._deliveryTarget.x, c._deliveryTarget.y);
+        if (routeDelivery(c, c.carrying)) break;
+        requestDeliveryStorage(c);
+        break;
       }
       // Arrived at delivery point
       c.state = 'deliver';
@@ -1024,7 +1117,9 @@ function runStateMachine(c) {
       // Only credit a delivery near the actual dropoff — 'Delivered!' in an
       // empty field on a failed repath was a lie AND skipped chain routing.
       if (c.carrying && c.carryAmount > 0 &&
-          dist2(c.x, c.y, c._requestedTx ?? c.x, c._requestedTy ?? c.y) > 4) {
+          (!deliveryTargetStillValid(c) ||
+            dist2(c.x, c.y, c._deliveryTarget.x, c._deliveryTarget.y) > 4)) {
+        if (c._deliveryTarget) blacklistTarget(c, c._deliveryTarget.x, c._deliveryTarget.y);
         requestDeliveryStorage(c);
         break;
       }
@@ -1046,6 +1141,7 @@ function runStateMachine(c) {
       }
       c.carrying = null;
       c.carryAmount = 0;
+      c._deliveryTarget = null;
       c.workTarget = null;
       c.state = 'find_job';
       c.stateTimer = 5;

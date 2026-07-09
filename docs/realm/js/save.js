@@ -2,12 +2,12 @@
 // Save/Load — localStorage serialization
 // ════════════════════════════════════════════════════════════
 
-import { G, getSeed, setSeed } from './state.js?realm=135';
-import { makeAvatar, ensureAvatar } from './avatar.js?realm=135';
-import { rebuildBuildingGrid } from './world.js?realm=135';
-import { missions } from './missions.js?realm=135';
-import { deriveEra } from './tech.js?realm=135';
-import { notify } from './notifications.js?realm=135';
+import { G, getSeed, setSeed } from './state.js?realm=157';
+import { makeAvatar, ensureAvatar } from './avatar.js?realm=157';
+import { rebuildBuildingGrid } from './world.js?realm=157';
+import { missions } from './missions.js?realm=157';
+import { deriveEra } from './tech.js?realm=157';
+import { notify } from './notifications.js?realm=157';
 
 const SAVE_KEY = 'realm-save-v2';
 
@@ -55,6 +55,7 @@ export function serializeGame() {
         name:c.name, hunger:c.hunger, rest:c.rest,
         state:c.state, stateTimer:c.stateTimer,
         carrying:c.carrying, carryAmount:c.carryAmount,
+        visualJob: c.visualJob || null,
         jobBuildingIdx: c.jobBuilding ? G.buildings.indexOf(c.jobBuilding) : -1,
         homeIdx: c.home ? G.buildings.indexOf(c.home) : -1,
         needs: c.needs ? { joy: c.needs.joy, faith: c.needs.faith } : undefined,
@@ -199,6 +200,7 @@ export function applySave(s) {
     s.citizens.forEach((c, i) => {
       if (c.jobBuildingIdx >= 0 && c.jobBuildingIdx < G.buildings.length) {
         G.citizens[i].jobBuilding = G.buildings[c.jobBuildingIdx];
+        if (!G.citizens[i].visualJob) G.citizens[i].visualJob = G.citizens[i].jobBuilding.type;
       }
       if (c.homeIdx >= 0 && c.homeIdx < G.buildings.length) {
         G.citizens[i].home = G.buildings[c.homeIdx];

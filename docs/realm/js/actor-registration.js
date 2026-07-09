@@ -5,10 +5,9 @@
 //   s   — row bulk scale: later-batch work/carry rows carry up to +80%
 //         pixel mass vs the role's walk rows (a different character);
 //         blended (ratio^0.25, clamped 0.88-1.08), anchored at the feet
-//   fs  — per-frame height normalization (kills 10-16% loop pulsing)
 // Applied at draw time in render.drawActorAtlasFrame; sheets untouched.
-// Rerun --write after any repaint. True fix for the bulk break is the
-// repaint queue — see loop docs.
+// Per-frame scales are deliberately absent: repaint a changing body rather
+// than shrinking whole frames at runtime. Rerun --write after any repaint.
 export const ACTOR_REGISTRATION = {
   "farmer/idle/left": {
     "s": 1.068
@@ -17,22 +16,11 @@ export const ACTOR_REGISTRATION = {
     "s": 1.068
   },
   "farmer/work/down": {
-    "dy": -4,
-    "f": [
-      0,
-      0,
-      0,
-      0,
-      4,
-      0,
-      0,
-      0
-    ],
-    "s": 0.916
+    "dy": -4
   },
   "farmer/work/up": {
     "dy": -4,
-    "s": 0.902
+    "s": 0.916
   },
   "farmer/work/left": {
     "dy": -4,
@@ -72,9 +60,6 @@ export const ACTOR_REGISTRATION = {
   "lumber/walk/down": {
     "dy": -3
   },
-  "lumber/walk/up": {
-    "dy": -3
-  },
   "lumber/walk/left": {
     "dy": -3
   },
@@ -83,19 +68,11 @@ export const ACTOR_REGISTRATION = {
   },
   "lumber/work/down": {
     "dy": -4,
-    "fs": [
-      1,
-      1,
-      1,
-      1.067,
-      1.067,
-      1,
-      1,
-      1
-    ]
+    "s": 1.08
   },
   "lumber/work/up": {
-    "dy": -4
+    "dy": -4,
+    "s": 1.077
   },
   "lumber/work/left": {
     "dy": -3
@@ -115,69 +92,11 @@ export const ACTOR_REGISTRATION = {
   "lumber/carry/right": {
     "dy": -3
   },
-  "miner/work/down": {
-    "dy": -4,
-    "s": 0.881
-  },
-  "miner/work/up": {
-    "fs": [
-      1,
-      0.912,
-      0.901,
-      1,
-      1,
-      1,
-      0.912,
-      1
-    ]
-  },
   "miner/work/left": {
-    "dy": -4,
-    "f": [
-      0,
-      0,
-      2,
-      0,
-      0,
-      0,
-      0,
-      0
-    ],
-    "s": 0.926,
-    "fs": [
-      1,
-      0.911,
-      0.923,
-      1,
-      1,
-      1,
-      1,
-      1
-    ]
+    "dy": -1
   },
   "miner/work/right": {
-    "dy": -4,
-    "f": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      2,
-      0,
-      0
-    ],
-    "s": 0.926,
-    "fs": [
-      1,
-      1,
-      1,
-      1,
-      1,
-      0.923,
-      0.911,
-      1
-    ]
+    "dy": -1
   },
   "builder/work/down": {
     "dy": -1,
@@ -191,62 +110,16 @@ export const ACTOR_REGISTRATION = {
     "dy": -1,
     "s": 0.88
   },
-  "blacksmith/work/down": {
-    "dy": -2,
-    "s": 0.926,
-    "fs": [
-      1,
-      1,
-      1,
-      1.108,
-      1.108,
-      1,
-      1,
-      1
-    ]
-  },
-  "blacksmith/work/up": {
-    "dy": -2,
-    "s": 0.901
-  },
-  "blacksmith/work/left": {
-    "dy": -2,
-    "s": 0.88
-  },
-  "blacksmith/work/right": {
-    "dy": -2,
-    "s": 0.88
-  },
   "guard/work/down": {
     "dy": -2,
     "s": 0.901
   },
   "guard/work/left": {
     "dy": -1,
-    "s": 0.914,
-    "fs": [
-      1,
-      1,
-      1.101,
-      1.07,
-      1,
-      0.938,
-      1,
-      0.938
-    ]
+    "s": 0.91
   },
   "guard/work/right": {
     "dy": -1,
-    "s": 0.914,
-    "fs": [
-      0.938,
-      1,
-      0.938,
-      1,
-      1.07,
-      1.101,
-      1,
-      1
-    ]
+    "s": 0.91
   }
 };
