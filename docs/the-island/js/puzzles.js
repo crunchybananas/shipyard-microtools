@@ -82,11 +82,13 @@ export class Game {
         // SEA-STRATA: below the surface the tide is the descent's, not yours — the wheel goes dead.
         if (W.level > 1) { UI.whisper('The sea no longer answers the wheel down here.'); return; }
         W.tideTarget = W.tideTarget > 0.5 ? 0 : 1;
-        A.chime();
         if (this.flag('valveTurned')) {
+          A.leitStrum();   // the first turn earns a stem — the island's own figure answers (#65)
           A.addStem(1); W.stems = Math.max(W.stems, 1);
           UI.whisper('Below the window, the sea obeys.');
           UI.addJournal('A valve beside the chart table. Turn it, and the basin drains — and so does the bay. Someone built a machine to make the sea go back, and must have turned it, and turned it. As if, on some one day, holding the water back was the only thing left worth wanting.');
+        } else {
+          A.chime();       // later toggles keep the plain chime
         }
         save(this.player);
       },
@@ -171,7 +173,7 @@ export class Game {
         this.flag('rulerPlaced');
         W.inventory = W.inventory.filter((s) => s !== 'ruler');
         A.addStem(2); W.stems = Math.max(W.stems, 2);
-        A.chime();
+        A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
         UI.cinematic(true);
         setTimeout(() => UI.cinematic(false), 5200);
         UI.whisper('Across the island, something vast settles into place.');
@@ -243,7 +245,7 @@ export class Game {
           A.crankTick();
           if (W.dials.every((d, n) => d === GLYPH_CODE[n])) {
             this.flag('hatchOpen');
-            A.chime();
+            A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
             A.addStem(4); W.stems = Math.max(W.stems, 4);
             UI.whisper('Stone breath, long held, sighs out.');
           }
@@ -511,7 +513,7 @@ export class Game {
       this.stoneSeq = [];
       this.flag('birdSolved');
       A.addStem(3); W.stems = Math.max(W.stems, 3);
-      setTimeout(() => A.chime(), 800);
+      setTimeout(() => A.leitStrum(), 800);   // stem-earning solve: the leitmotif, not the chime (#65)
       UI.whisper('The outcrop opens like a held breath.');
       // promote the grief-rhyme out of the optional journal into the in-the-moment whisper
       // layer (Panel #4 act-two gap): the correction that came a lifetime too late
@@ -605,7 +607,7 @@ export class Game {
       if (d < 70) {
         this.flag('glyphsSeen');
         A.addStem(5); W.stems = Math.max(W.stems, 5);
-        A.chime();
+        A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
         UI.whisper('The beam writes on the cliff in someone’s patient hand.');
         UI.addJournal(`The lighthouse beam, aimed at the cliff, projects four glyphs:`,
           GLYPH_CODE.map((g) => GLYPH_CHARS[g]).join('  '));

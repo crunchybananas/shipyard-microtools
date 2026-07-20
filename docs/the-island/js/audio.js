@@ -12,6 +12,10 @@ let ctx = null;
 
 const MASTER_LEVEL = 0.6;
 
+// the leitmotif — E G A D C: the figure the music box turns, the bird corrects,
+// the stems arpeggiate, and the final bell gathers. One constant, every voice.
+const LEIT = [329.63, 392.0, 440.0, 293.66, 261.63];
+
 const A = {
   master: null, amb: null, music: null, fx: null,
   diveFilter: null,
@@ -257,6 +261,12 @@ const A = {
   },
 
   chime() { this.pluck(1046.5, 0, 0.3, 1.8); this.pluck(1318.5, 0.09, 0.22, 2.2); },
+  // the five stem-earning solves answer in the island's OWN figure (#65): the
+  // leitmotif strummed quickly — the final bell's crown in miniature — while the
+  // ~10 ordinary solves keep the generic two-note chime.
+  leitStrum() {
+    LEIT.forEach((f, i) => this.pluck(f, i * 0.085, 0.2 - i * 0.018, 2.8));
+  },
   deny() {
     if (!this._running()) return;
     const t0 = ctx.currentTime;
@@ -327,9 +337,8 @@ const A = {
       case 1: this._stemGains[1] = drone(110, 0.05); break;  // A2 root
       case 2: this._stemGains[2] = drone(164.8, 0.04); break; // E3 fifth
       case 3: { // slow leitmotif arp
-        const notes = [329.63, 392.0, 440.0, 293.66, 261.63];
         let i = 0;
-        this._arp = setInterval(() => { this.pluck(notes[i % 5] / 2, 0, 0.10, 3.0); i++; }, 3800);
+        this._arp = setInterval(() => { this.pluck(LEIT[i % 5] / 2, 0, 0.10, 3.0); i++; }, 3800);
         break;
       }
       case 4: { // deep pulse
@@ -386,7 +395,6 @@ const A = {
       }
     }
     if (has(3)) {                                  // the leitmotif itself, strummed as a chord
-      const LEIT = [329.63, 392.0, 440.0, 293.66, 261.63]; // E G A D C
       LEIT.forEach((f, i) => this.pluck(f, 0.6 + i * 0.09, 0.22, 7));
     }
     if (has(4)) {                                  // one deep gathered beat
