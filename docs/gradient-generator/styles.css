@@ -92,23 +92,57 @@ body {
   color: var(--muted);
 }
 
-.color-row {
+.stops-control {
+  grid-column: 1 / -1;
+}
+
+.stops-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stops-header label {
+  margin-bottom: 0;
+}
+
+.stops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stop-row {
   display: grid;
-  grid-template-columns: 48px 1fr auto;
+  grid-template-columns: 48px 1fr 44px auto auto auto;
   gap: 10px;
   align-items: center;
 }
 
-.color-row input[type="range"] {
+.stop-row input[type="range"] {
   width: 100%;
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
+.stop-pos {
   color: var(--muted);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.btn.small {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.btn:disabled,
+.btn:disabled:hover {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 .output {
