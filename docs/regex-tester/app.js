@@ -118,7 +118,14 @@ function updateMatches() {
     return;
   }
 
-  const matches = [...testString.matchAll(regex)];
+  // matchAll throws for non-global regexes; run exec once and show a single match instead
+  let matches;
+  if (regex.global) {
+    matches = [...testString.matchAll(regex)];
+  } else {
+    const singleMatch = regex.exec(testString);
+    matches = singleMatch ? [singleMatch] : [];
+  }
   matchCountEl.textContent = `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
 
   // Highlight matches in text
