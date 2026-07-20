@@ -213,6 +213,7 @@ body {
   height: 4000px;
   pointer-events: none;
   z-index: 1;
+  transform-origin: 0 0;
 }
 
 #connections path {
@@ -386,6 +387,17 @@ body {
 
 .ports-out {
   margin-right: -6px;
+}
+
+/* Node error message */
+.node-error-msg {
+  padding: 6px 10px 8px;
+  font-size: 10px;
+  font-family: 'SF Mono', Monaco, monospace;
+  color: var(--error);
+  border-top: 1px solid var(--border);
+  word-break: break-word;
+  max-width: 220px;
 }
 
 /* Node result badge */

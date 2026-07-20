@@ -78,11 +78,17 @@ const NODE_TYPES = {
     execute: (inputs, fields) => {
       const arr = Array.isArray(inputs.array) ? inputs.array : [inputs.array];
       const expr = fields.expression.trim();
-      const result = arr.map(item => {
+      let fn;
+      try {
+        fn = new Function('item', 'index', `return ${expr}`);
+      } catch (e) {
+        throw new Error(`Invalid expression "${expr}": ${e.message}`);
+      }
+      const result = arr.map((item, index) => {
         try {
-          return new Function('item', 'index', `return ${expr}`)(item);
-        } catch {
-          return item;
+          return fn(item, index);
+        } catch (e) {
+          throw new Error(`Expression "${expr}" failed at index ${index}: ${e.message}`);
         }
       });
       return { result };
@@ -101,11 +107,17 @@ const NODE_TYPES = {
     execute: (inputs, fields) => {
       const arr = Array.isArray(inputs.array) ? inputs.array : [inputs.array];
       const cond = fields.condition.trim();
-      const result = arr.filter(item => {
+      let fn;
+      try {
+        fn = new Function('item', 'index', `return ${cond}`);
+      } catch (e) {
+        throw new Error(`Invalid condition "${cond}": ${e.message}`);
+      }
+      const result = arr.filter((item, index) => {
         try {
-          return new Function('item', 'index', `return ${cond}`)(item);
-        } catch {
-          return true;
+          return fn(item, index);
+        } catch (e) {
+          throw new Error(`Condition "${cond}" failed at index ${index}: ${e.message}`);
         }
       });
       return { result };
@@ -624,24 +636,45 @@ function endConnectionDrag(e) {
     };
     
     // Validate connection
-    if (connectionStart.nodeId !== endPort.nodeId && 
+    if (connectionStart.nodeId !== endPort.nodeId &&
         connectionStart.isOutput !== endPort.isOutput) {
-      
+
       const from = connectionStart.isOutput ? connectionStart : endPort;
       const to = connectionStart.isOutput ? endPort : connectionStart;
-      
-      // Remove existing connection to this input
-      connections = connections.filter(c => 
-        !(c.to.nodeId === to.nodeId && c.to.portName === to.portName)
-      );
-      
-      connections.push({ from, to });
-      updateConnections();
+
+      if (wouldCreateCycle(from.nodeId, to.nodeId)) {
+        showToast('Connection rejected: it would create a cycle', 'error');
+      } else {
+        // Remove existing connection to this input
+        connections = connections.filter(c =>
+          !(c.to.nodeId === to.nodeId && c.to.portName === to.portName)
+        );
+
+        connections.push({ from, to });
+        updateConnections();
+      }
     }
   }
   
   isDraggingConnection = false;
   connectionStart = null;
+}
+
+// A new edge from -> to creates a cycle if `from` is already reachable
+// downstream of `to`
+function wouldCreateCycle(fromNodeId, toNodeId) {
+  const stack = [toNodeId];
+  const visited = new Set();
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (current === fromNodeId) return true;
+    if (visited.has(current)) continue;
+    visited.add(current);
+    connections.forEach(c => {
+      if (c.from.nodeId === current) stack.push(c.to.nodeId);
+    });
+  }
+  return false;
 }
 
 function getPortPosition(nodeId, portName, isOutput) {
@@ -656,9 +689,10 @@ function getPortPosition(nodeId, portName, isOutput) {
   const nodeRect = nodeEl.getBoundingClientRect();
   const dotRect = dotEl.getBoundingClientRect();
   
+  // Rect offsets are in screen pixels; convert to canvas space
   return {
-    x: node.x + (dotRect.left - nodeRect.left) + dotRect.width / 2,
-    y: node.y + (dotRect.top - nodeRect.top) + dotRect.height / 2
+    x: node.x + (dotRect.left - nodeRect.left + dotRect.width / 2) / canvasScale,
+    y: node.y + (dotRect.top - nodeRect.top + dotRect.height / 2) / canvasScale
   };
 }
 
@@ -778,6 +812,41 @@ document.addEventListener('mouseup', (e) => {
   }
 });
 
+// ============================================
+// CANVAS ZOOM
+// ============================================
+
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 2;
+
+canvasContainer.addEventListener('wheel', (e) => {
+  // Let node fields scroll normally
+  if (e.target.closest('input, textarea, select')) return;
+  e.preventDefault();
+
+  const canvasRect = canvasContainer.getBoundingClientRect();
+  const mouseX = e.clientX - canvasRect.left;
+  const mouseY = e.clientY - canvasRect.top;
+
+  // Canvas-space point under the cursor before zooming
+  const worldX = (mouseX + canvasContainer.scrollLeft) / canvasScale;
+  const worldY = (mouseY + canvasContainer.scrollTop) / canvasScale;
+
+  const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+  const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, canvasScale * factor));
+  if (newScale === canvasScale) return;
+  canvasScale = newScale;
+
+  canvas.style.transform = `scale(${canvasScale})`;
+  connectionsEl.style.transform = `scale(${canvasScale})`;
+
+  // Keep that point under the cursor after zooming
+  canvasContainer.scrollLeft = worldX * canvasScale - mouseX;
+  canvasContainer.scrollTop = worldY * canvasScale - mouseY;
+
+  updateMinimap();
+}, { passive: false });
+
 // Hide context menu on click elsewhere
 document.addEventListener('click', (e) => {
   if (!e.target.closest('#context-menu')) {
@@ -816,8 +885,8 @@ document.querySelectorAll('.palette-node').forEach(paletteNode => {
   // Also support click to add
   paletteNode.addEventListener('dblclick', () => {
     const type = paletteNode.dataset.type;
-    const centerX = canvasContainer.scrollLeft + canvasContainer.clientWidth / 2;
-    const centerY = canvasContainer.scrollTop + canvasContainer.clientHeight / 2;
+    const centerX = (canvasContainer.scrollLeft + canvasContainer.clientWidth / 2) / canvasScale;
+    const centerY = (canvasContainer.scrollTop + canvasContainer.clientHeight / 2) / canvasScale;
     createNode(type, centerX - 90, centerY - 50);
   });
 });
@@ -842,69 +911,144 @@ canvasContainer.addEventListener('drop', (e) => {
 // EXECUTION
 // ============================================
 
-async function executeFlow() {
+let stepState = null; // { sorted, index, failedNodes } while stepping through a flow
+
+function resetRunState() {
   executionResults.clear();
-  
-  // Clear node states
   document.querySelectorAll('.node').forEach(el => {
     el.classList.remove('running', 'success', 'error');
     el.querySelector('.node-result')?.remove();
+    el.querySelector('.node-error-msg')?.remove();
   });
-  
+}
+
+function markNodeError(el, message) {
+  el.classList.add('error');
+
+  const badge = document.createElement('div');
+  badge.className = 'node-result error';
+  badge.textContent = '!';
+  badge.title = message;
+  el.appendChild(badge);
+
+  const msg = document.createElement('div');
+  msg.className = 'node-error-msg';
+  msg.textContent = message;
+  el.appendChild(msg);
+}
+
+// Execute a single node. Returns true on success, false on error or skip.
+async function executeNode(node, failedNodes) {
+  const el = document.getElementById(node.id);
+  if (!el) return false;
+
+  // Don't run nodes downstream of a failure
+  const blocked = connections.some(c => c.to.nodeId === node.id && failedNodes.has(c.from.nodeId));
+  if (blocked) {
+    failedNodes.add(node.id);
+    executionResults.set(node.id, { _error: 'Skipped: upstream node failed' });
+    markNodeError(el, 'Skipped: upstream node failed');
+    return false;
+  }
+
+  el.classList.add('running');
+
+  try {
+    const def = NODE_TYPES[node.type];
+
+    // Gather inputs
+    const inputs = {};
+    def.inputs.forEach(input => {
+      const conn = connections.find(c => c.to.nodeId === node.id && c.to.portName === input.name);
+      if (conn) {
+        const sourceResult = executionResults.get(conn.from.nodeId);
+        if (sourceResult) {
+          inputs[input.name] = sourceResult[conn.from.portName];
+        }
+      }
+    });
+
+    // Execute
+    const result = await def.execute(inputs, node.fields);
+    executionResults.set(node.id, result);
+
+    el.classList.remove('running');
+    el.classList.add('success');
+
+    // Add success badge
+    const badge = document.createElement('div');
+    badge.className = 'node-result';
+    badge.textContent = '✓';
+    el.appendChild(badge);
+
+    return true;
+  } catch (err) {
+    el.classList.remove('running');
+    failedNodes.add(node.id);
+    executionResults.set(node.id, { _error: err.message });
+    markNodeError(el, err.message);
+    showToast(`Error in ${NODE_TYPES[node.type].title}: ${err.message}`, 'error');
+    return false;
+  }
+}
+
+async function executeFlow() {
+  stepState = null;
+  resetRunState();
+
   // Topological sort
   const sorted = topologicalSort();
-  
+  const failedNodes = new Set();
+
   for (const node of sorted) {
-    const el = document.getElementById(node.id);
-    el.classList.add('running');
-    
-    try {
-      const def = NODE_TYPES[node.type];
-      
-      // Gather inputs
-      const inputs = {};
-      def.inputs.forEach(input => {
-        const conn = connections.find(c => c.to.nodeId === node.id && c.to.portName === input.name);
-        if (conn) {
-          const sourceResult = executionResults.get(conn.from.nodeId);
-          if (sourceResult) {
-            inputs[input.name] = sourceResult[conn.from.portName];
-          }
-        }
-      });
-      
-      // Execute
-      const result = await def.execute(inputs, node.fields);
-      executionResults.set(node.id, result);
-      
-      el.classList.remove('running');
-      el.classList.add('success');
-      
-      // Add success badge
-      const badge = document.createElement('div');
-      badge.className = 'node-result';
-      badge.textContent = '✓';
-      el.appendChild(badge);
-      
-    } catch (err) {
-      el.classList.remove('running');
-      el.classList.add('error');
-      
-      const badge = document.createElement('div');
-      badge.className = 'node-result error';
-      badge.textContent = '!';
-      el.appendChild(badge);
-      
-      executionResults.set(node.id, { _error: err.message });
-      showToast(`Error in ${NODE_TYPES[node.type].title}: ${err.message}`, 'error');
-    }
-    
+    await executeNode(node, failedNodes);
+
     // Small delay for visual effect
     await new Promise(r => setTimeout(r, 100));
   }
-  
+
   // Show results in preview
   showExecutionResults();
+}
+
+async function stepFlow() {
+  // Start (or restart) a stepping session
+  if (!stepState || stepState.index >= stepState.sorted.length) {
+    const sorted = topologicalSort();
+    if (sorted.length === 0) {
+      showToast('Add nodes to step through');
+      return;
+    }
+    resetRunState();
+    stepState = { sorted, index: 0, failedNodes: new Set() };
+  }
+
+  // Skip nodes removed since the session started (delete, load, examples)
+  let node = null;
+  while (stepState.index < stepState.sorted.length) {
+    const candidate = stepState.sorted[stepState.index++];
+    if (nodes.includes(candidate)) {
+      node = candidate;
+      break;
+    }
+  }
+  if (!node) {
+    stepState = null;
+    showExecutionResults();
+    return;
+  }
+
+  const ok = await executeNode(node, stepState.failedNodes);
+  if (!stepState) return; // Run or Clear happened mid-step
+  selectNode(node);
+
+  if (stepState.index >= stepState.sorted.length) {
+    stepState = null;
+    showExecutionResults();
+    if (ok) showToast('Step complete: end of flow', 'success');
+  } else if (ok) {
+    showToast(`Step ${stepState.index}/${stepState.sorted.length}: ${NODE_TYPES[node.type].title}`);
+  }
 }
 
 function topologicalSort() {
@@ -929,11 +1073,8 @@ function topologicalSort() {
 }
 
 function clearResults() {
-  executionResults.clear();
-  document.querySelectorAll('.node').forEach(el => {
-    el.classList.remove('running', 'success', 'error');
-    el.querySelector('.node-result')?.remove();
-  });
+  stepState = null;
+  resetRunState();
   previewContent.innerHTML = '<div class="preview-empty">Select a node or run the flow to see data</div>';
 }
 
@@ -952,7 +1093,7 @@ function showNodePreview(node) {
       html += `
         <div class="preview-section">
           <div class="preview-label">Error</div>
-          <div class="preview-data" style="color: var(--error)">${result._error}</div>
+          <div class="preview-data" style="color: var(--error)">${escapeHtml(result._error)}</div>
         </div>
       `;
     } else if (result._display !== undefined) {
@@ -1006,7 +1147,7 @@ function showExecutionResults() {
     } else if (result?._error) {
       html += `
         <div class="preview-section">
-          <div class="preview-data" style="color: var(--error)">${result._error}</div>
+          <div class="preview-data" style="color: var(--error)">${escapeHtml(result._error)}</div>
         </div>
       `;
     }
@@ -1060,10 +1201,10 @@ function updateMinimap() {
   minimapCtx.strokeStyle = 'rgba(255,255,255,0.5)';
   minimapCtx.lineWidth = 1;
   minimapCtx.strokeRect(
-    canvasContainer.scrollLeft * scale,
-    canvasContainer.scrollTop * scale,
-    canvasContainer.clientWidth * scale,
-    canvasContainer.clientHeight * scale
+    canvasContainer.scrollLeft / canvasScale * scale,
+    canvasContainer.scrollTop / canvasScale * scale,
+    canvasContainer.clientWidth / canvasScale * scale,
+    canvasContainer.clientHeight / canvasScale * scale
   );
 }
 
@@ -1343,7 +1484,7 @@ function showToast(message, type = '') {
 // ============================================
 
 document.getElementById('runBtn').addEventListener('click', executeFlow);
-document.getElementById('stepBtn').addEventListener('click', executeFlow); // Same as run for now
+document.getElementById('stepBtn').addEventListener('click', stepFlow);
 document.getElementById('clearBtn').addEventListener('click', clearResults);
 
 document.getElementById('newBtn').addEventListener('click', () => {
