@@ -24,6 +24,10 @@ class EffectsChain {
     this.delayEnabled = false;
     this.reverbEnabled = false;
     this.distortionEnabled = false;
+
+    // Wet mix levels (match the default slider values in index.html)
+    this.delayMix = 0.3;
+    this.reverbMix = 0.3;
     
     // Build signal chain
     this.buildChain();

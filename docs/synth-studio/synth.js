@@ -163,6 +163,99 @@ class Synthesizer {
   }
   
   /**
+   * Play a fully scheduled note with a fixed gate duration.
+   * Unlike noteOn/noteOff (which run at currentTime), every envelope event
+   * is scheduled at an explicit time, so this works for sequenced playback
+   * and offline rendering (WAV export).
+   */
+  playNote(note, velocity = 1, time = null, duration = 0.15) {
+    const startTime = time !== null ? time : this.ctx.currentTime;
+    const freq = this.noteToFrequency(note);
+
+    // Create oscillator
+    const osc = this.ctx.createOscillator();
+    osc.type = this.params.waveform;
+    osc.frequency.value = freq;
+    osc.detune.value = this.params.detune;
+
+    // Create filter
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = this.params.filterCutoff;
+    filter.Q.value = this.params.filterResonance;
+
+    // Create gain for ADSR envelope
+    const envelope = this.ctx.createGain();
+    envelope.gain.value = 0;
+
+    // Connect: osc -> filter -> envelope -> output
+    osc.connect(filter);
+    filter.connect(envelope);
+    envelope.connect(this.output);
+
+    // Connect LFO based on target
+    if (this.params.lfoTarget === 'pitch' && this.params.lfoDepth > 0) {
+      const lfoToOsc = this.ctx.createGain();
+      lfoToOsc.gain.value = this.params.lfoDepth;
+      this.lfoGain.connect(lfoToOsc);
+      lfoToOsc.connect(osc.detune);
+    } else if (this.params.lfoTarget === 'filter' && this.params.lfoDepth > 0) {
+      const lfoToFilter = this.ctx.createGain();
+      lfoToFilter.gain.value = this.params.lfoDepth * 100;
+      this.lfoGain.connect(lfoToFilter);
+      lfoToFilter.connect(filter.frequency);
+    }
+
+    // ADSR timing
+    const attack = Math.max(this.params.attack, 0.001);
+    const decay = Math.max(this.params.decay, 0.001);
+    const attackEnd = startTime + attack;
+    const decayEnd = attackEnd + decay;
+    const peakLevel = velocity * 0.8;
+    const sustainLevel = peakLevel * this.params.sustain;
+    const gateEnd = startTime + Math.max(duration, 0.01);
+    const releaseEnd = gateEnd + this.params.release;
+
+    envelope.gain.setValueAtTime(0, startTime);
+
+    if (gateEnd <= attackEnd) {
+      // Gate closes during attack - release from partial attack level
+      const level = peakLevel * ((gateEnd - startTime) / attack);
+      envelope.gain.linearRampToValueAtTime(level, gateEnd);
+    } else if (gateEnd <= decayEnd) {
+      // Gate closes during decay - release from partial decay level
+      envelope.gain.linearRampToValueAtTime(peakLevel, attackEnd);
+      const level = peakLevel + (sustainLevel - peakLevel) * ((gateEnd - attackEnd) / decay);
+      envelope.gain.linearRampToValueAtTime(level, gateEnd);
+    } else {
+      // Full attack/decay, hold sustain until gate closes
+      envelope.gain.linearRampToValueAtTime(peakLevel, attackEnd);
+      envelope.gain.linearRampToValueAtTime(sustainLevel, decayEnd);
+      envelope.gain.setValueAtTime(sustainLevel, gateEnd);
+    }
+
+    envelope.gain.linearRampToValueAtTime(0, releaseEnd);
+
+    // Filter envelope
+    if (this.params.filterEnvAmount > 0) {
+      const filterPeak = Math.min(this.params.filterCutoff + this.params.filterEnvAmount, 20000);
+      filter.frequency.setValueAtTime(this.params.filterCutoff, startTime);
+      filter.frequency.linearRampToValueAtTime(filterPeak, attackEnd);
+      filter.frequency.linearRampToValueAtTime(this.params.filterCutoff, decayEnd);
+    }
+
+    osc.start(startTime);
+    osc.stop(releaseEnd + 0.1);
+
+    // Cleanup once the note has finished
+    osc.onended = () => {
+      osc.disconnect();
+      filter.disconnect();
+      envelope.disconnect();
+    };
+  }
+
+  /**
    * Stop a note
    */
   noteOff(note) {
