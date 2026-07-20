@@ -178,6 +178,7 @@ export function makeWaterMaterial(heightTex, domain) {
         float fogF = 1.0 - exp(-pow(length(cameraPosition - vWorld) * uFogDen, 2.0));
         col = mix(col, uFogColor, fogF);
 
+        col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither: break 8-bit mach banding at dawn/dusk/night
         gl_FragColor = vec4(col, alpha);
         #include <colorspace_fragment>
       }
@@ -332,6 +333,7 @@ export function makeSkyMaterial() {
         float fret = uMist * (1.0 - smoothstep(0.0, 0.4 + uMist * 0.25, d.y));
         col = mix(col, mix(uHorizon, vec3(0.78, 0.81, 0.83), 0.4) * mix(1.0, 0.35, uNight), fret * 0.85);
 
+        col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither: break 8-bit mach banding in the smooth gradients
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }
@@ -373,6 +375,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       varying vec2 vUv;
       varying vec3 vN;
       varying vec3 vW;
+      ${GLSL_NOISE}
       void main() {
         // t: normalized distance from the light source along the volume
         float t = mix(vUv.y, 1.0 - vUv.y, uFlip);
@@ -382,6 +385,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
         // reading as two hard streaks — face-on light fills the body
         float facing = smoothstep(0.02, 0.32, abs(dot(normalize(vN), normalize(cameraPosition - vW))));
         float a = along * uIntensity * shimmer * 0.5 * facing;
+        a += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither the additive ramp: kills the beam's banded rings at night
         gl_FragColor = vec4(uColor, a);
         #include <colorspace_fragment>
       }
