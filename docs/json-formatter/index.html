@@ -32,9 +32,16 @@
         <div class="output-section">
           <div class="output-header">
             <label>Output</label>
-            <span id="stats" class="stats"></span>
+            <div class="output-controls">
+              <div class="view-toggle">
+                <button id="textViewBtn" class="view-btn active">Text</button>
+                <button id="treeViewBtn" class="view-btn">Tree</button>
+              </div>
+              <span id="stats" class="stats"></span>
+            </div>
           </div>
           <pre id="output" class="output"></pre>
+          <div id="treeOutput" class="output tree-output hidden"></div>
         </div>
       </main>
 
