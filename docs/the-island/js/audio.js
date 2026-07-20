@@ -81,7 +81,31 @@ const A = {
     hum.start();
 
     this.ready = true;
-    if (ctx.state === 'suspended') ctx.resume();
+    this._tryResume();
+    this._installUnlock();
+  },
+
+  // ---- autoplay unlock (#62): a replay reload ('begin again') re-enters via
+  // sessionStorage autostart, so init() runs with NO user activation and the
+  // one-shot resume() above is rejected — the whole second playthrough used to
+  // stay silent. Keep permanent gesture listeners plus a per-frame suspended
+  // check (see update()); once the context is actually running, the listeners
+  // come off.
+  _tryResume() {
+    if (!ctx || ctx.state !== 'suspended') return;
+    ctx.resume().catch(() => {});   // rejected without a gesture; the unlock listeners retry
+  },
+  _installUnlock() {
+    if (this._unlockFn) return;
+    this._unlockFn = () => this._tryResume();
+    window.addEventListener('pointerdown', this._unlockFn, true);
+    window.addEventListener('keydown', this._unlockFn, true);
+  },
+  _removeUnlock() {
+    if (!this._unlockFn) return;
+    window.removeEventListener('pointerdown', this._unlockFn, true);
+    window.removeEventListener('keydown', this._unlockFn, true);
+    this._unlockFn = null;
   },
 
   _noiseLoop(kind, freq, type = 'lowpass', q = 0.8) {
@@ -107,6 +131,16 @@ const A = {
   // called every frame from the main loop
   update(dt, s) {
     if (!this.ready) return;
+    if (ctx.state === 'suspended') {
+      // autoplay policy rejected init()'s resume() (#62): keep retrying here —
+      // sticky activation means this succeeds on the first frame after ANY
+      // gesture — but throttled, since a rejected resume() per frame is just
+      // promise churn. Nothing below matters while the clock is frozen.
+      this._resumeT = (this._resumeT || 0) + dt;
+      if (this._resumeT > 0.5) { this._resumeT = 0; this._tryResume(); }
+      return;
+    }
+    if (this._unlockFn) this._removeUnlock();   // running: the unlock job is done
     const t = ctx.currentTime;
     const k = 0.08; // smoothing
     // surf: swell-locked, pulled away by tide, ducked indoors
