@@ -5,6 +5,14 @@
 let gl, program, vao, texture, enabled = false;
 let postCanvas;
 let texReady = false;
+// #79: uniform locations cached once at link time (getUniformLocation is a
+// per-call GL string lookup — the old code paid it 5x every painted frame).
+let uTime, uDaylight, uSeason, uResolution;
+// #79: when the postfx chain runs below the native device resolution, the
+// scene is shrunk into this staging canvas before texture upload (texImage2D
+// from a canvas always uploads at the source's full backing resolution, so
+// the downscale must happen before the upload to win any bandwidth).
+let stageCanvas = null, stageCtx = null;
 
 const VERT = `#version 300 es
 precision highp float;
@@ -213,6 +221,17 @@ export function initPostFX(sourceCanvas) {
     return;
   }
 
+  // #79: query uniform locations once. WebGL1's simplified shader lacks
+  // u_season (and optimizes out u_time/u_resolution) — those come back null
+  // and gl.uniform* on a null location is a spec'd no-op, same as before.
+  uTime = gl.getUniformLocation(program, 'u_time');
+  uDaylight = gl.getUniformLocation(program, 'u_daylight');
+  uSeason = gl.getUniformLocation(program, 'u_season');
+  uResolution = gl.getUniformLocation(program, 'u_resolution');
+  // u_scene is static (always TEXTURE0) — set it once here.
+  gl.useProgram(program);
+  gl.uniform1i(gl.getUniformLocation(program, 'u_scene'), 0);
+
   // Fullscreen triangle (WebGL2 uses gl_VertexID, no VBO needed)
   if (isWebGL2) {
     vao = gl.createVertexArray();
@@ -234,6 +253,8 @@ export function initPostFX(sourceCanvas) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  // Context-level unpack state — set once, persists (#79).
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
   resizePostFX();
   enabled = true;
@@ -244,11 +265,34 @@ export function resizePostFX() {
   const dpr = window.devicePixelRatio || 1;
   const w = window.innerWidth;
   const h = window.innerHeight;
-  postCanvas.width = w * dpr;
-  postCanvas.height = h * dpr;
+  // #79: run the whole postfx chain at HALF the native device resolution
+  // (clamped to never drop below 1x CSS pixels — non-retina displays keep
+  // exactly the old pixel-for-pixel path) and let the compositor linearly
+  // upscale the canvas to its CSS size. Bloom/grading/vignette/grain are
+  // low-frequency effects; at dpr 2 half res equals the dpr-1 reference
+  // look, while per-frame texture upload and fragment work drop to a
+  // quarter (2560x1600 → 1280x800 ≈ 24MB → 6MB uploaded per frame).
+  const postDpr = Math.max(1, dpr * 0.5);
+  postCanvas.width = Math.round(w * postDpr);
+  postCanvas.height = Math.round(h * postDpr);
   postCanvas.style.width = w + 'px';
   postCanvas.style.height = h + 'px';
   gl.viewport(0, 0, postCanvas.width, postCanvas.height);
+  if (postDpr < dpr) {
+    if (!stageCanvas) {
+      stageCanvas = document.createElement('canvas');
+      stageCtx = stageCanvas.getContext('2d');
+    }
+    stageCanvas.width = postCanvas.width;
+    stageCanvas.height = postCanvas.height;
+    // Resizing resets 2D context state — re-apply. 'copy' replaces every
+    // destination pixel (alpha included), so no per-frame clearRect needed.
+    stageCtx.globalCompositeOperation = 'copy';
+    stageCtx.imageSmoothingEnabled = true;
+  } else {
+    stageCanvas = null;
+    stageCtx = null;
+  }
   texReady = false; // force texImage2D on next frame
 }
 
@@ -257,24 +301,30 @@ export function applyPostFX(sourceCanvas, gameTick, daylight, season = 0) {
 
   gl.useProgram(program);
 
+  // #79: shrink the scene to the processing resolution first (GPU-side
+  // canvas→canvas blit) so the GL upload moves a quarter of the bytes.
+  let src = sourceCanvas;
+  if (stageCanvas) {
+    stageCtx.drawImage(sourceCanvas, 0, 0, stageCanvas.width, stageCanvas.height);
+    src = stageCanvas;
+  }
+
   // Upload canvas as texture
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
   if (!texReady) {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
     texReady = true;
   } else {
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, src);
   }
 
-  // Set uniforms
-  gl.uniform1i(gl.getUniformLocation(program, 'u_scene'), 0);
-  gl.uniform1f(gl.getUniformLocation(program, 'u_time'), gameTick / 60.0);
-  gl.uniform1f(gl.getUniformLocation(program, 'u_daylight'), daylight);
-  gl.uniform1f(gl.getUniformLocation(program, 'u_season'), season);
-  gl.uniform2f(gl.getUniformLocation(program, 'u_resolution'), postCanvas.width, postCanvas.height);
+  // Per-frame uniforms — locations cached at init, u_scene set once there (#79)
+  gl.uniform1f(uTime, gameTick / 60.0);
+  gl.uniform1f(uDaylight, daylight);
+  gl.uniform1f(uSeason, season);
+  gl.uniform2f(uResolution, postCanvas.width, postCanvas.height);
 
   // Draw
   if (vao) gl.bindVertexArray(vao);
