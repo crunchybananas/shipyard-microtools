@@ -106,7 +106,8 @@ label {
   color: #d4d4d8;
 }
 
-textarea {
+textarea,
+input[type="text"] {
   width: 100%;
   padding: 1rem;
   font-size: 0.9rem;
@@ -118,7 +119,13 @@ textarea {
   resize: vertical;
 }
 
-textarea:focus {
+input[type="text"] {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+textarea:focus,
+input[type="text"]:focus {
   outline: none;
   border-color: #818cf8;
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
