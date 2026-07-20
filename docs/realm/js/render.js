@@ -2472,41 +2472,55 @@ export function render() {
   // ── Unified world pass: buildings + citizens by iso depth ──
   // Painter's algorithm over x+y; ties draw the building first so a worker
   // standing at a building's door renders in front of it.
+  // #78 perf: (1) entities outside the tile-pass viewport window (plus a
+  // margin for tall sprites/pennants that overhang their anchor tile) are
+  // culled BEFORE being enqueued — an off-screen city used to be closure-
+  // wrapped, depth-sorted, and fully drawn every frame; (2) queue entries
+  // are plain records dispatched through a switch, so the pass no longer
+  // allocates one closure per entity per frame. Draw-order semantics are
+  // unchanged: same (depth, order) sort (Array#sort is stable) over the
+  // visible set.
+  const CULL_MARGIN = 5; // tiles; tallest sprite (wonder ≈ 97px) ÷ (TH/2 px per tile step) + slack
+  const cullMinX = minX - CULL_MARGIN, cullMaxX = maxX + CULL_MARGIN;
+  const cullMinY = minY - CULL_MARGIN, cullMaxY = maxY + CULL_MARGIN;
+  const K_BUILDING = 0, K_CITIZEN = 1, K_AVATAR = 2, K_WALKER = 3,
+        K_SOLDIER = 4, K_CARAVAN = 5, K_ENEMY = 6;
   const worldDrawQueue = [];
-  for (const b of G.buildings) {
-    worldDrawQueue.push({ depth: b.x + b.y, order: 0, draw: () => {
-      const bs = toScreen(b.x, b.y);
-      drawBuilding(ctx, b, bs, daylight);
-    } });
-  }
-  for (const c of G.citizens) {
-    worldDrawQueue.push({ depth: c.x + c.y, order: 1, draw: () => drawOneCitizen(c) });
-  }
+  const enqueueWorld = (kind, ent, x, y, order) => {
+    if (x < cullMinX || x > cullMaxX || y < cullMinY || y > cullMaxY) return;
+    worldDrawQueue.push({ depth: x + y, order, kind, ent });
+  };
+  for (const b of G.buildings) enqueueWorld(K_BUILDING, b, b.x, b.y, 0);
+  for (const c of G.citizens) enqueueWorld(K_CITIZEN, c, c.x, c.y, 1);
   if (G.avatar) {
     // The founder rides the citizen sprite path (avatar is citizen-shaped)
     // plus a golden pennant + name so the player can always find themself.
-    worldDrawQueue.push({ depth: G.avatar.x + G.avatar.y, order: 1, draw: () => {
-      drawOneCitizen(G.avatar);
-      drawFounderMarker(G.avatar);
-    } });
+    enqueueWorld(K_AVATAR, G.avatar, G.avatar.x, G.avatar.y, 1);
   }
   // Walkers, soldiers, caravans, and raiders share the same depth pass so no
   // entity ever floats above a building it stands behind. Their draw
   // functions are hoisted declarations defined in their original sections.
-  for (const w of G.walkers) {
-    worldDrawQueue.push({ depth: w.x + w.y, order: 1, draw: () => drawOneWalker(w) });
-  }
-  for (const sld of G.soldiers) {
-    worldDrawQueue.push({ depth: sld.x + sld.y, order: 1, draw: () => drawOneSoldier(sld) });
-  }
-  for (const cv of G.caravans) {
-    worldDrawQueue.push({ depth: cv.x + cv.y, order: 1, draw: () => drawOneCaravan(cv) });
-  }
-  for (const en of G.enemies) {
-    worldDrawQueue.push({ depth: en.x + en.y, order: 1, draw: () => drawOneEnemy(en) });
-  }
+  for (const w of G.walkers) enqueueWorld(K_WALKER, w, w.x, w.y, 1);
+  for (const sld of G.soldiers) enqueueWorld(K_SOLDIER, sld, sld.x, sld.y, 1);
+  for (const cv of G.caravans) enqueueWorld(K_CARAVAN, cv, cv.x, cv.y, 1);
+  for (const en of G.enemies) enqueueWorld(K_ENEMY, en, en.x, en.y, 1);
   worldDrawQueue.sort((a, b) => a.depth - b.depth || a.order - b.order);
-  for (const item of worldDrawQueue) item.draw();
+  for (let qi = 0; qi < worldDrawQueue.length; qi++) {
+    const item = worldDrawQueue[qi];
+    switch (item.kind) {
+      case K_BUILDING: {
+        const b = item.ent;
+        drawBuilding(ctx, b, toScreen(b.x, b.y), daylight);
+        break;
+      }
+      case K_CITIZEN: drawOneCitizen(item.ent); break;
+      case K_AVATAR: drawOneCitizen(item.ent); drawFounderMarker(item.ent); break;
+      case K_WALKER: drawOneWalker(item.ent); break;
+      case K_SOLDIER: drawOneSoldier(item.ent); break;
+      case K_CARAVAN: drawOneCaravan(item.ent); break;
+      case K_ENEMY: drawOneEnemy(item.ent); break;
+    }
+  }
 
   // ── Founder marker (Phase 3d) ─────────────────────────────
   function drawFounderMarker(a) {
@@ -4035,13 +4049,74 @@ function drawUpgradeAccents2D(ctx, b, s) {
   ctx.restore();
 }
 
-function drawBuilding(ctx, b, s, daylight) {
-  const def = BUILDINGS[b.type];
-  if (!def) return; // guard against unknown building types
-  const progress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
+// ── Building composite cache (#78) ──────────────────────────
+// A COMPLETED building's static stack — foundation diamond + worn ring +
+// grounding shading + the atlas sprite blit — is identical for every
+// building of the same (type, house-tier, daylight-bucket, ring-visibility).
+// Bake that stack once onto an offscreen canvas at 2× world resolution and
+// blit it per building; the dynamic layers (construction overlay, upgrade
+// accents, event pulses, damage cracks, winter caps, night windows, badges,
+// HP bars) still draw live on top in their original order. The live path
+// remains for walls (neighbor-dependent continuity pieces), construction
+// sites (reveal animation), non-atlas types, and zoom > 2 (the bake is 2×
+// world scale; extreme close-ups keep full atlas resolution — few buildings
+// fit on screen that zoomed-in anyway).
+const _COMPOSITE_SCALE = 2;
+const _COMPOSITE_MAX_ZOOM = 2.001;
+const _DAYLIGHT_BUCKETS = 12;   // grounding alpha varies ≤0.03 between adjacent buckets — invisible
+const _COMPOSITE_MAX_ENTRIES = 64; // LRU cap; stale daylight buckets evict naturally
+const _buildingCompositeCache = new Map();
+
+function _compositeTier(b) {
+  // Only the house sprite reads b.level (tier scale) in the static stack;
+  // level accents for other types draw live on top of the composite.
+  return b.type === 'house' ? Math.min(4, b.level || 1) : 0;
+}
+
+function _bakeBuildingComposite(type, tier, daylight, showRing) {
+  const stub = { type, level: tier || 1, buildProgress: 1 };
+  const m = spriteTargetMetrics(type); // already ×1.1 envelope scale
+  const tierScale = type === 'house' ? [0.9, 1.0, 1.1, 1.22][Math.min(4, tier || 1) - 1] : 1;
+  // Extents in world px around the anchor: sprite half-width after the
+  // envelope is tier·m.w/2; grounding ellipses reach ≈0.69·m.w and ≈0.20·m.w
+  // below the anchor; foundation diamond is ±TW/2 × ±TH/2.
+  const halfW = Math.ceil(Math.max(m.w * tierScale * 0.55, m.w * 0.72, TW / 2) + 6);
+  const topH = Math.ceil(m.h * tierScale * 1.1 + 8);
+  const botH = Math.ceil(Math.max(TH / 2, m.w * 0.20 + 8)) + 4;
+  const canvas = document.createElement('canvas');
+  canvas.width = (halfW * 2) * _COMPOSITE_SCALE;
+  canvas.height = (topH + botH) * _COMPOSITE_SCALE;
+  const octx = canvas.getContext('2d');
+  octx.scale(_COMPOSITE_SCALE, _COMPOSITE_SCALE);
+  const drew = drawBuildingBase(octx, stub, { x: halfW, y: topH }, daylight, 1, showRing);
+  if (!drew) return null; // atlas still decoding — retry next frame, do not cache
+  return { canvas, ax: halfW, ay: topH, w: halfW * 2, h: topH + botH };
+}
+
+function _blitBuildingComposite(ctx, b, s, daylight, showRing) {
+  const tier = _compositeTier(b);
+  const dl = Math.round(Math.max(0, Math.min(1, daylight)) * _DAYLIGHT_BUCKETS);
+  const key = b.type + '|' + tier + '|' + dl + '|' + (showRing ? 1 : 0);
+  let entry = _buildingCompositeCache.get(key);
+  if (entry === undefined) {
+    entry = _bakeBuildingComposite(b.type, tier, dl / _DAYLIGHT_BUCKETS, showRing);
+    if (!entry) return false;
+    if (_buildingCompositeCache.size >= _COMPOSITE_MAX_ENTRIES) {
+      _buildingCompositeCache.delete(_buildingCompositeCache.keys().next().value);
+    }
+    _buildingCompositeCache.set(key, entry);
+  }
+  ctx.drawImage(entry.canvas, s.x - entry.ax, s.y - entry.ay, entry.w, entry.h);
+  return true;
+}
+
+// Static per-(type, tier, daylight, ring) layers of a building draw —
+// everything under the dynamic overlays. Extracted verbatim from
+// drawBuilding (#78) so the composite bake and the live path share one
+// implementation. Returns false when the sprite atlas is not ready
+// (caller aborts the rest of the draw, same as before).
+function drawBuildingBase(ctx, b, s, daylight, progress, showRing) {
   const rasterSprite = _usesRasterSprite(b.type);
-  // Keep buildings fully opaque — night overlay darkens them later
-  ctx.globalAlpha = 1;
 
   // Foundation — darken the tile under the building for grounding
   if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
@@ -4055,7 +4130,7 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.closePath();
     ctx.fill();
     // Worn grass ring — subtle brown tint under buildings at normal+ zoom
-    if (b.type !== 'fisherman' && G.camera && G.camera.zoom >= 1.0) {
+    if (b.type !== 'fisherman' && showRing) {
       ctx.fillStyle = rasterSprite ? 'rgba(80, 60, 40, 0.065)' : 'rgba(80, 60, 40, 0.12)';
       ctx.beginPath();
       ctx.moveTo(s.x, s.y - TH/2 + 1);
@@ -4115,15 +4190,33 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.translate(-s.x, -s.y + (rasterSprite ? 4 : 3));
 
   // Sprite path runs INSIDE the same scale/translate envelope so damage
-  // cracks + winter cap (drawn after `restore`) compose on top. If the
-  // image is not ready, skip the building sprite this frame rather than
-  // flashing back to the legacy procedural canvas drawing.
-  if (drawSpriteIfReady(ctx, b, s, progress)) {
-    ctx.restore();
-  } else {
-    ctx.restore();
-    return;
+  // cracks + winter cap (drawn by the caller after this returns) compose
+  // on top. If the image is not ready, skip the building sprite this frame
+  // rather than flashing back to the legacy procedural canvas drawing.
+  const drew = drawSpriteIfReady(ctx, b, s, progress);
+  ctx.restore();
+  return drew;
+}
+
+function drawBuilding(ctx, b, s, daylight) {
+  const def = BUILDINGS[b.type];
+  if (!def) return; // guard against unknown building types
+  const progress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
+  const rasterSprite = _usesRasterSprite(b.type);
+  // Keep buildings fully opaque — night overlay darkens them later
+  ctx.globalAlpha = 1;
+  const showRing = !!(G.camera && G.camera.zoom >= 1.0);
+
+  // #78: completed atlas buildings blit a pre-baked composite; everything
+  // else (walls, construction sites, non-atlas types, zoom > 2) draws the
+  // same static stack live via drawBuildingBase.
+  let drew = false;
+  if (rasterSprite && progress >= 1 && b.type !== 'wall' &&
+      (!G.camera || G.camera.zoom <= _COMPOSITE_MAX_ZOOM)) {
+    drew = _blitBuildingComposite(ctx, b, s, daylight, showRing);
   }
+  if (!drew) drew = drawBuildingBase(ctx, b, s, daylight, progress, showRing);
+  if (!drew) return;
 
   drawConstructionOverlay(ctx, b, s, progress);
   if (progress < 1) {
