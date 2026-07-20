@@ -254,11 +254,32 @@ function checkDocking() {
 }
 
 function spawnShip() {
-  const type = Math.floor(Math.random() * SHIP_TYPES.length);
   const sides = ['top', 'bottom', 'left', 'right'];
-  const side = sides[Math.floor(Math.random() * sides.length)];
-  ships.push(new Ship(type, side));
-  shipCountEl.textContent = ships.filter(s => !s.dead && !s.docked).length;
+
+  // Try a few spots; skip spawning if everything is too close to an existing ship
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const type = Math.floor(Math.random() * SHIP_TYPES.length);
+    const side = sides[Math.floor(Math.random() * sides.length)];
+    const ship = new Ship(type, side);
+
+    let tooClose = false;
+    for (const other of ships) {
+      if (other.dead || other.docked) continue;
+      const dx = other.x - ship.x;
+      const dy = other.y - ship.y;
+      if (Math.sqrt(dx * dx + dy * dy) < 60) {
+        tooClose = true;
+        break;
+      }
+    }
+
+    if (!tooClose) {
+      ships.push(ship);
+      shipCountEl.textContent = ships.filter(s => !s.dead && !s.docked).length;
+      return true;
+    }
+  }
+  return false;
 }
 
 let lastTime = 0;
@@ -276,9 +297,12 @@ function gameLoop(timestamp) {
   // Spawn ships
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
-    spawnShip();
-    spawnTimer = Math.max(2, 5 - difficulty * 0.3);
-    difficulty += 0.1;
+    if (spawnShip()) {
+      spawnTimer = Math.max(2, 5 - difficulty * 0.3);
+      difficulty += 0.1;
+    } else {
+      spawnTimer = 0.5; // all spawn spots blocked — retry shortly
+    }
   }
   
   // Check collisions
@@ -348,8 +372,8 @@ function endGame() {
   gameOverScreen.classList.remove('hidden');
 }
 
-// Mouse handling
-function getMousePos(e) {
+// Pointer handling (mouse + touch)
+function getPointerPos(e) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: (e.clientX - rect.left) * (canvas.width / rect.width),
@@ -357,24 +381,28 @@ function getMousePos(e) {
   };
 }
 
-canvas.addEventListener('mousedown', e => {
-  if (!gameRunning) return;
-  const pos = getMousePos(e);
-  
-  // Find ship under cursor
+let activePointerId = null;
+
+canvas.addEventListener('pointerdown', e => {
+  if (!gameRunning || activePointerId !== null) return;
+  const pos = getPointerPos(e);
+
+  // Find ship under pointer
   for (const ship of ships) {
     if (!ship.docked && ship.containsPoint(pos.x, pos.y)) {
       selectedShip = ship;
       drawingPath = [];
+      activePointerId = e.pointerId;
+      canvas.setPointerCapture(e.pointerId);
       break;
     }
   }
 });
 
-canvas.addEventListener('mousemove', e => {
-  if (!gameRunning || !selectedShip) return;
-  const pos = getMousePos(e);
-  
+canvas.addEventListener('pointermove', e => {
+  if (!gameRunning || !selectedShip || e.pointerId !== activePointerId) return;
+  const pos = getPointerPos(e);
+
   // Add point to path (throttled)
   const last = drawingPath[drawingPath.length - 1];
   if (!last || Math.abs(pos.x - last.x) > 10 || Math.abs(pos.y - last.y) > 10) {
@@ -382,23 +410,19 @@ canvas.addEventListener('mousemove', e => {
   }
 });
 
-canvas.addEventListener('mouseup', () => {
+function finishPath(e) {
+  if (e.pointerId !== activePointerId) return;
   if (selectedShip && drawingPath.length > 0) {
     selectedShip.path = [...drawingPath];
     selectedShip.pathIndex = 0;
   }
   selectedShip = null;
   drawingPath = [];
-});
+  activePointerId = null;
+}
 
-canvas.addEventListener('mouseleave', () => {
-  if (selectedShip && drawingPath.length > 0) {
-    selectedShip.path = [...drawingPath];
-    selectedShip.pathIndex = 0;
-  }
-  selectedShip = null;
-  drawingPath = [];
-});
+canvas.addEventListener('pointerup', finishPath);
+canvas.addEventListener('pointercancel', finishPath);
 
 startBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', startGame);
