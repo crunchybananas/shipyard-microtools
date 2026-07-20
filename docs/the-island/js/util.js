@@ -99,6 +99,7 @@ export class Baker {
     this.positions = [];
     this.normals = [];
     this.colors = [];
+    this.uvs = [];
   }
 
   // geo: BufferGeometry, matrix: Matrix4, color: THREE.Color | (y01)=>Color
@@ -118,13 +119,39 @@ export class Baker {
     }
     const span = Math.max(1e-5, maxY - minY);
 
+    const wp = new Float32Array(pos.count * 3);   // world positions, kept for the uv pass below
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(matrix);
       n.fromBufferAttribute(nor, i).applyMatrix3(nm).normalize();
+      wp[i * 3] = v.x; wp[i * 3 + 1] = v.y; wp[i * 3 + 2] = v.z;
       this.positions.push(v.x, v.y, v.z);
       this.normals.push(n.x, n.y, n.z);
       const c = typeof color === 'function' ? color((pos.getY(i) - minY) / span) : color;
       this.colors.push(c.r, c.g, c.b);
+    }
+
+    // UVs: box-projected in WORLD METERS, dominant axis per triangle (bake-time triplanar).
+    // The merged mesh had no uv at all, so matStone's granite albedo+normal sampled ONE texel —
+    // the headline "tower is flat" bug. We deliberately do NOT copy source uvs: primitives carry
+    // parametric 0..1 uvs per surface, so a 17 m wall arc and the 2.5 m lintel above its own door
+    // would tile ~7x apart. Projecting world x/y/z instead gives ONE continuous masonry scale
+    // across the whole bake, matching the standing stones' read (~1 uv unit per metre — their
+    // BoxGeometry maps 0..1 across a ~1.1 m face). v = world y on every side face, so the ashlar
+    // mortar courses stay level and continuous around corners; the axis-switch seams land on the
+    // 45° diagonals where the stochastic granite hides them.
+    for (let i = 0; i + 2 < pos.count; i += 3) {
+      const ax = wp[i * 3], ay = wp[i * 3 + 1], az = wp[i * 3 + 2];
+      const e1x = wp[i * 3 + 3] - ax, e1y = wp[i * 3 + 4] - ay, e1z = wp[i * 3 + 5] - az;
+      const e2x = wp[i * 3 + 6] - ax, e2y = wp[i * 3 + 7] - ay, e2z = wp[i * 3 + 8] - az;
+      const fx = Math.abs(e1y * e2z - e1z * e2y);   // |face normal| components
+      const fy = Math.abs(e1z * e2x - e1x * e2z);
+      const fz = Math.abs(e1x * e2y - e1y * e2x);
+      for (let k = 0; k < 3; k++) {
+        const px = wp[(i + k) * 3], py = wp[(i + k) * 3 + 1], pz = wp[(i + k) * 3 + 2];
+        if (fy >= fx && fy >= fz) this.uvs.push(px, pz);        // up/down faces: floor plan
+        else if (fx >= fz) this.uvs.push(pz, py);               // ±x faces: v = height
+        else this.uvs.push(px, py);                             // ±z faces: v = height
+      }
     }
     if (src !== geo) src.dispose();
   }
@@ -134,6 +161,7 @@ export class Baker {
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.positions, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.normals, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.colors, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uvs, 2));
     return g;
   }
 }
