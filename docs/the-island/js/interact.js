@@ -3,12 +3,18 @@
 
 import * as THREE from 'three';
 
+// scratch for the per-spot distance pre-cull (perf #29) — never allocated per frame
+const _cullC = new THREE.Vector3();
+const _cullBox = new THREE.Box3();
+const _cullSphere = new THREE.Sphere();
+
 export class Interactions {
   constructor(camera, player, dom) {
     this.camera = camera;
     this.player = player;
     this.dom = dom;
     this.ray = new THREE.Raycaster();
+    this.ray.far = 60;   // hoisted (perf #29): the reach never changes, so set it once
     this.mouse = new THREE.Vector2(0, 0);
     this.mousePx = { x: innerWidth / 2, y: innerHeight / 2 };
     this.hotspots = [];      // {id, targets:[Object3D], label, type, maxDist, when, onClick, onDrag, onDragEnd}
@@ -82,6 +88,22 @@ export class Interactions {
     return spot;
   }
 
+  // world-space radius of a sphere around targets[0]'s origin that encloses every target's
+  // bounding box — measured ONCE per spot, on its first eligible update (matrices are long
+  // settled by then; measuring at add() would race the async model/prop builds). Multi-target
+  // spots (oar+hull, hook+proxy) keep a static relative layout, so one sphere covers them all.
+  _measureCullRadius(spot) {
+    spot.targets[0].getWorldPosition(_cullC);
+    let r = 0;
+    for (const t of spot.targets) {
+      _cullBox.setFromObject(t);
+      if (_cullBox.isEmpty()) continue;
+      _cullBox.getBoundingSphere(_cullSphere);
+      r = Math.max(r, _cullSphere.center.distanceTo(_cullC) + _cullSphere.radius);
+    }
+    return r;
+  }
+
   // invisible raycast proxy sphere, parented anywhere
   static proxy(radius = 0.12) {
     const m = new THREE.Mesh(
@@ -97,12 +119,21 @@ export class Interactions {
       return;
     }
     this.ray.setFromCamera(this.mouse, this.camera);
-    this.ray.far = 60;
 
     let best = null, bestDist = Infinity;
     const camPos = this.camera.position;
     for (const spot of this.hotspots) {
       if (spot.when && !spot.when()) continue;
+      // distance pre-cull (perf #29): a hit only ever counts within maxDist of the camera,
+      // and every possible hit point lies inside the spot's bounding sphere — so beyond
+      // (maxDist + radius + 2m) the recursive raycast cannot land and is pure waste (~33 of
+      // them ran every frame from anywhere on the island). Squared distance, no sqrt. The
+      // radius is measured once, lazily (prop SIZES are static); the centre is re-read each
+      // frame from the cached matrixWorld — one frame stale at worst, which the +2m covers.
+      if (spot._cullR === undefined) spot._cullR = this._measureCullRadius(spot);
+      const reach = spot.maxDist + spot._cullR + 2;
+      _cullC.setFromMatrixPosition(spot.targets[0].matrixWorld);
+      if (camPos.distanceToSquared(_cullC) > reach * reach) continue;
       const hits = this.ray.intersectObjects(spot.targets, true);
       if (!hits.length) continue;
       const hit = hits[0];
