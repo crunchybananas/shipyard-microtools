@@ -116,6 +116,25 @@
       padding: 4px 10px;
     }
     .dropzone.hidden { display: none; }
+    .desync-banner {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: calc(100% - 24px);
+      background: rgba(255, 107, 107, 0.14);
+      border: 1px solid var(--err);
+      color: var(--err);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .desync-banner.show { display: block; }
     .status {
       display: flex;
       justify-content: space-between;
@@ -314,6 +333,7 @@
             <span class="pill">NES supported now · SNES / Apple II coming</span>
             <input type="file" id="fileInput" accept=".nes,.zip" />
           </div>
+          <div class="desync-banner" id="desyncBanner">⚠ Desynced — peers have diverged. Restart co-op to resync.</div>
         </div>
 
         <div class="status">
@@ -421,6 +441,7 @@
     const pauseBtn = document.getElementById("pauseBtn");
     const resetBtn = document.getElementById("resetBtn");
     const ejectBtn = document.getElementById("ejectBtn");
+    const desyncBanner = document.getElementById("desyncBanner");
 
     // initial clear
     ctx.fillStyle = "#000";
@@ -472,6 +493,31 @@
         });
       }
 
+      // FNV-1a over the 2KB CPU RAM + core registers. Cheap enough to run
+      // every SYNC_INTERVAL frames, and any gameplay divergence between
+      // peers shows up in this slice almost immediately.
+      function stateHash() {
+        try {
+          const cpu = nes.cpu;
+          const mem = cpu.mem;
+          let h = 0x811c9dc5;
+          for (let i = 0; i < 0x800; i++) {
+            h ^= mem[i] & 0xff;
+            h = Math.imul(h, 0x01000193);
+          }
+          const regs = [cpu.REG_PC, cpu.REG_SP, cpu.REG_ACC, cpu.REG_X, cpu.REG_Y];
+          for (let i = 0; i < regs.length; i++) {
+            h ^= regs[i] & 0xff;
+            h = Math.imul(h, 0x01000193);
+            h ^= (regs[i] >> 8) & 0xff;
+            h = Math.imul(h, 0x01000193);
+          }
+          return h >>> 0;
+        } catch (err) {
+          return null; // jsnes internals moved — skip the check, don't crash
+        }
+      }
+
       self.onmessage = (e) => {
         const msg = e.data;
         if (msg.type === 'load') {
@@ -492,10 +538,11 @@
           applyInputs(2, msg.p2 || 0);
           audioBuf.length = 0;
           nes.frame();
+          const hash = msg.check ? stateHash() : null;
           const out = new Uint8ClampedArray(framebuffer);
           const samples = new Float32Array(audioBuf);
           self.postMessage(
-            { type: 'frame', pixels: out.buffer, samples: samples.buffer },
+            { type: 'frame', frame: msg.frame, hash: hash, pixels: out.buffer, samples: samples.buffer },
             [out.buffer, samples.buffer]
           );
           return;
@@ -611,7 +658,7 @@
         const msg = e.data;
         if (msg.type === "loaded") {
           coreState.set("running");
-          requestAnimationFrame(tick);
+          scheduleTick();
         } else if (msg.type === "frame") {
           const px = new Uint8ClampedArray(msg.pixels);
           imageData.data.set(px);
@@ -629,6 +676,7 @@
               console.warn("[lockstep] worker returned 0 audio samples — jsnes onAudioSample not firing");
             }
           }
+          if (msg.hash != null && peerRole) recordLocalHash(msg.frame, msg.hash);
           pendingFrame = false;
         } else if (msg.type === "error") {
           coreState.set("error");
@@ -715,6 +763,22 @@
     let loggedFirstSamples = false;
     let loggedNoSamples = false;
 
+    // The NES runs at ~60.0988 fps but rAF fires at the display's refresh
+    // rate (120Hz+ on ProMotion / gaming monitors), so stepping one frame
+    // per rAF runs the game at 2x. Accumulate real elapsed time and only
+    // step the core once a full NES frame's worth has passed.
+    const NES_FPS = 60.0988;
+    const NES_FRAME_MS = 1000 / NES_FPS;
+    const MAX_FRAME_DEBT_MS = NES_FRAME_MS * 4; // don't fast-forward after tab switches
+    let frameDebt = 0;
+    let lastTickTime = null;
+    let tickScheduled = false;
+    function scheduleTick() {
+      if (tickScheduled) return;
+      tickScheduled = true;
+      requestAnimationFrame(tick);
+    }
+
     // Lockstep state
     const INPUT_DELAY = 2;
     let currentFrame = 0;               // frame number to advance next
@@ -735,45 +799,101 @@
       }
     }
 
-    function tick() {
-      if (coreState.get() !== "running" || paused) return;
-      if (!pendingFrame) {
-        if (peerRole) {
-          // lockstep mode
-          // 1. enqueue local input for frame = currentFrame + INPUT_DELAY and ship it
-          const targetFrame = currentFrame + INPUT_DELAY;
-          if (!localInputs.has(targetFrame)) {
-            localInputs.set(targetFrame, p1Mask);
-            sendInput(targetFrame, p1Mask);
-          }
-          // 2. advance currentFrame only if both sides' inputs are ready
-          if (localInputs.has(currentFrame) && remoteInputs.has(currentFrame)) {
-            const hostMask = peerRole === "host" ? localInputs.get(currentFrame) : remoteInputs.get(currentFrame);
-            const guestMask = peerRole === "host" ? remoteInputs.get(currentFrame) : localInputs.get(currentFrame);
-            pendingFrame = true;
-            worker.postMessage({ type: "frame", p1: hostMask, p2: guestMask });
-            // prune old entries
-            if (currentFrame > INPUT_DELAY) {
-              localInputs.delete(currentFrame - INPUT_DELAY - 1);
-              remoteInputs.delete(currentFrame - INPUT_DELAY - 1);
-            }
-            currentFrame++;
-          }
-        } else {
-          // solo mode
-          pendingFrame = true;
-          worker.postMessage({ type: "frame", p1: p1Mask, p2: 0 });
-        }
+    // ---------- desync detection ----------
+    // Every SYNC_INTERVAL frames the worker hashes a small slice of emulator
+    // state (CPU RAM + registers). Peers swap hashes for the same frame and
+    // compare; a mismatch means the simulations diverged.
+    const SYNC_INTERVAL = 60; // ~once a second
+    const localHashes = new Map();  // frame -> our hash
+    const remoteHashes = new Map(); // frame -> peer's hash
+    let desynced = false;
 
+    function resetSyncCheck() {
+      localHashes.clear();
+      remoteHashes.clear();
+      desynced = false;
+      desyncBanner.classList.remove("show");
+    }
+    function recordLocalHash(frame, hash) {
+      if (desynced) return;
+      localHashes.set(frame, hash);
+      sendDc({ type: "hash", frame: frame, hash: hash });
+      compareHashes(frame);
+      pruneHashes(localHashes);
+    }
+    function recordRemoteHash(frame, hash) {
+      if (desynced || typeof frame !== "number" || typeof hash !== "number") return;
+      remoteHashes.set(frame, hash);
+      compareHashes(frame);
+      pruneHashes(remoteHashes);
+    }
+    function compareHashes(frame) {
+      if (!localHashes.has(frame) || !remoteHashes.has(frame)) return;
+      const mismatch = localHashes.get(frame) !== remoteHashes.get(frame);
+      localHashes.delete(frame);
+      remoteHashes.delete(frame);
+      if (mismatch) {
+        desynced = true;
+        desyncBanner.classList.add("show");
+        setP2pStatus("desynced at frame " + frame, "err");
+        console.warn("[lockstep] desync detected at frame", frame);
+      }
+    }
+    function pruneHashes(map) {
+      // cap unmatched entries so a quiet peer can't grow the maps forever
+      while (map.size > 8) map.delete(map.keys().next().value);
+    }
+
+    // Try to advance the emulator by one frame. Returns true only if a
+    // frame was actually dispatched to the worker (lockstep can stall
+    // waiting on the peer's input).
+    function stepFrame() {
+      if (peerRole) {
+        // lockstep mode
+        // 1. enqueue local input for frame = currentFrame + INPUT_DELAY and ship it
+        const targetFrame = currentFrame + INPUT_DELAY;
+        if (!localInputs.has(targetFrame)) {
+          localInputs.set(targetFrame, p1Mask);
+          sendInput(targetFrame, p1Mask);
+        }
+        // 2. advance currentFrame only if both sides' inputs are ready
+        if (!(localInputs.has(currentFrame) && remoteInputs.has(currentFrame))) return false;
+        const hostMask = peerRole === "host" ? localInputs.get(currentFrame) : remoteInputs.get(currentFrame);
+        const guestMask = peerRole === "host" ? remoteInputs.get(currentFrame) : localInputs.get(currentFrame);
+        pendingFrame = true;
+        const check = !desynced && currentFrame > 0 && currentFrame % SYNC_INTERVAL === 0;
+        worker.postMessage({ type: "frame", frame: currentFrame, p1: hostMask, p2: guestMask, check: check });
+        // prune old entries
+        if (currentFrame > INPUT_DELAY) {
+          localInputs.delete(currentFrame - INPUT_DELAY - 1);
+          remoteInputs.delete(currentFrame - INPUT_DELAY - 1);
+        }
+        currentFrame++;
+        return true;
+      }
+      // solo mode
+      pendingFrame = true;
+      worker.postMessage({ type: "frame", p1: p1Mask, p2: 0 });
+      return true;
+    }
+
+    function tick(now) {
+      tickScheduled = false;
+      if (coreState.get() !== "running" || paused) { lastTickTime = null; return; }
+      if (now === undefined) now = performance.now();
+      if (lastTickTime !== null) frameDebt += now - lastTickTime;
+      lastTickTime = now;
+      if (frameDebt > MAX_FRAME_DEBT_MS) frameDebt = MAX_FRAME_DEBT_MS;
+      if (!pendingFrame && frameDebt >= NES_FRAME_MS && stepFrame()) {
+        frameDebt -= NES_FRAME_MS;
         framesSinceFpsTick++;
-        const now = performance.now();
         if (now - lastFpsTime >= 500) {
           fps.set((framesSinceFpsTick * 1000) / (now - lastFpsTime));
           lastFpsTime = now;
           framesSinceFpsTick = 0;
         }
       }
-      requestAnimationFrame(tick);
+      scheduleTick();
     }
 
     // ---------- ROM loading ----------
@@ -878,7 +998,7 @@
         paused = false;
         if (audioCtx && audioCtx.state === "suspended") await audioCtx.resume();
         coreState.set("running");
-        requestAnimationFrame(tick);
+        scheduleTick();
       }
     });
     resetBtn.addEventListener("click", () => {
@@ -957,6 +1077,7 @@
       if (dc) { try { dc.close(); } catch {} dc = null; }
       if (pc) { try { pc.close(); } catch {} pc = null; }
       peerRole = null;
+      resetSyncCheck();
       netState.set("offline");
     }
 
@@ -993,6 +1114,9 @@
 
     // ---------- Join ----------
     joinBtn.addEventListener("click", () => {
+      // The guest never loads a ROM via a local gesture, so this click is
+      // our chance to create/resume the AudioContext inside a user gesture.
+      primeAudio();
       teardownPeer();
       showP2pPanel("Join co-op");
       p2pOut.value = "(answer will appear after you paste the offer)";
@@ -1002,6 +1126,8 @@
     });
 
     p2pSubmitBtn.addEventListener("click", async () => {
+      // prime SYNCHRONOUSLY, before any awaits, or autoplay policy bites
+      primeAudio();
       try {
         const raw = p2pIn.value;
         if (!raw.trim()) { setP2pStatus("paste something first", "warn"); return; }
@@ -1126,6 +1252,8 @@
         } else if (msg.type === "ready") {
           // guest confirms; host begins
           beginLockstep("host");
+        } else if (msg.type === "hash") {
+          recordRemoteHash(msg.frame, msg.hash);
         }
         return;
       }
@@ -1179,6 +1307,7 @@
     function beginLockstep(role) {
       peerRole = role;
       resetLockstepState();
+      resetSyncCheck();
       if (worker) worker.postMessage({ type: "reset" });
       netState.set(role === "host" ? "hosted" : "joined");
       setP2pStatus("lockstep active as " + role, "ok");
@@ -1187,7 +1316,7 @@
       if (coreState.get() === "paused") {
         paused = false;
         coreState.set("running");
-        requestAnimationFrame(tick);
+        scheduleTick();
       }
     }
 
