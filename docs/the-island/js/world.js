@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './util.js';
+import { SAVE_KEY, packSave, applySave } from './save-schema.js';
 
 export const SCALE_MODEL = 1 / 240;
 
@@ -254,17 +255,14 @@ export function wavePhase(timeSec) {
 }
 
 // ---------------- save / load --------------------------------------------------
-const SAVE_KEY = 'abyme-save-v1';
+// The save contract — WHAT persists, the payload version int, and the v(N)→v(N+1)
+// migrations — lives in save-schema.js (#74): one field descriptor table instead
+// of hand-enumerated fields here. This file only owns the storage I/O and the
+// plain-array → THREE.Vector3 conversion at the boundary.
 
 export function save(playerPos) {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({
-      time: W.time, tide: W.tideTarget, lensPlaced: W.lensPlaced,
-      beamAngle: W.beamAngle, flags: W.flags, stems: W.stems,
-      inventory: W.inventory, journal: W.journal, level: W.level,
-      onceKeys: W.onceKeys, readKeys: W.readKeys, dials: W.dials, regions: W.regions,
-      pos: playerPos ? [playerPos.x, playerPos.y, playerPos.z] : null,
-    }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify(packSave(W, playerPos)));
   } catch (_) { /* private mode: the island forgets */ }
 }
 
@@ -272,25 +270,8 @@ export function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
-    const s = JSON.parse(raw);
-    W.time = s.time ?? W.time;
-    W.tide = W.tideTarget = s.tide ?? 1;
-    W.lensPlaced = !!s.lensPlaced;
-    W.beamAngle = s.beamAngle ?? W.beamAngle;
-    Object.assign(W.flags, s.flags || {});
-    // saves from before the lid was persistent: the taken ruler proves it
-    if (W.flags.rulerTaken && !('chestOpen' in (s.flags || {}))) W.flags.chestOpen = true;
-    W.stems = s.stems ?? 0;
-    W.inventory = s.inventory || [];
-    W.journal = s.journal || [];
-    W.onceKeys = s.onceKeys || [];
-    W.readKeys = s.readKeys || [];
-    W.dials = Array.isArray(s.dials) && s.dials.length === 4 ? s.dials : [0, 0, 0, 0];
-    W.level = s.level ?? 1;
-    if (s.regions) W.regions = Object.assign(W.regions, s.regions); // keep defaults for new keys
-    // a save written mid-dive has dove=true but level 1 — land the dive
-    if (W.flags.dove && W.level < 2) W.level = 2;
-    W.playerPos = s.pos ? new THREE.Vector3(...s.pos) : null;
+    applySave(W, JSON.parse(raw)); // migrates old payloads, applies the field table
+    W.playerPos = W.playerPos ? new THREE.Vector3(...W.playerPos) : null;
     return true;
   } catch (_) { return false; }
 }
