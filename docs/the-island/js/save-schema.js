@@ -22,6 +22,11 @@ export const SAVE_VERSION = 3;
 // renaming the key would orphan every existing save.
 export const SAVE_KEY = 'abyme-save-v1';
 
+// Where the outgoing save goes when the player begins anew (#56): wipe() copies
+// the payload here before clearing SAVE_KEY — a single-slot undo for the
+// destructive button on the title screen (each wipe overwrites the stash).
+export const SAVE_KEY_PREV = 'abyme-save-v1-prev';
+
 // ---------------- the field descriptor table ---------------------------------
 // One row per persisted field.
 //   key   — the payload property name.

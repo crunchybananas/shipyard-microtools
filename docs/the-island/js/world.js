@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import { clamp, lerp, lerpColor, smoothstep, TAU, mulberry32, SEED } from './util.js';
-import { SAVE_KEY, packSave, applySave } from './save-schema.js';
+import { SAVE_KEY, SAVE_KEY_PREV, packSave, applySave } from './save-schema.js';
 
 export const SCALE_MODEL = 1 / 240;
 
@@ -284,5 +284,13 @@ export const hasSave = () => {
 };
 
 export function wipe() {
+  // Begin-anew safety net (#56): stash the outgoing payload one slot deep
+  // before clearing, so a mistaken fresh start stays recoverable (a single-slot
+  // undo — the NEXT wipe overwrites it). Restore by copying SAVE_KEY_PREV back
+  // over SAVE_KEY; every wipe path (title screen, debug panel) gets this.
+  try {
+    const cur = localStorage.getItem(SAVE_KEY);
+    if (cur !== null) localStorage.setItem(SAVE_KEY_PREV, cur);
+  } catch (_) { /* private mode: nothing to stash */ }
   try { localStorage.removeItem(SAVE_KEY); } catch (_) {}
 }

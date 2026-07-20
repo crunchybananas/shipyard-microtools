@@ -116,6 +116,17 @@ html, body {
   color: var(--amber);
   background: rgba(255, 180, 84, 0.06);
 }
+/* Begin-anew confirm (#56): Begin sits one pixel from Continue, so wiping a
+   save is never a single click. Same quiet menu language, one shade graver. */
+#begin-confirm .confirm-line {
+  margin-top: 3.2rem;                /* takes the hidden title-actions' place */
+  font-size: 0.84rem;
+  font-style: italic;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  opacity: 0.85;
+}
+#begin-confirm .title-actions { margin-top: 1.7rem; }
 .title-foot {
   margin-top: 3.4rem;
   font-size: 0.72rem;

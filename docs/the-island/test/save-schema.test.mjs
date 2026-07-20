@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  SAVE_VERSION, SAVE_KEY, SAVE_FIELDS, MIGRATIONS,
+  SAVE_VERSION, SAVE_KEY, SAVE_KEY_PREV, SAVE_FIELDS, MIGRATIONS,
   packSave, applySave, migrateSave,
 } from '../js/save-schema.js';
 
@@ -50,6 +50,7 @@ test('payload is stamped with the current version and exactly the table fields',
   const expected = new Set(['v', ...SAVE_FIELDS.map((f) => f.key)]);
   assert.deepEqual(new Set(Object.keys(p)), expected);
   assert.equal(SAVE_KEY, 'abyme-save-v1'); // frozen: renaming orphans every save
+  assert.equal(SAVE_KEY_PREV, 'abyme-save-v1-prev'); // frozen too: the begin-anew stash (#56)
 });
 
 test('save → load round-trips every field through JSON', () => {

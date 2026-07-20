@@ -444,14 +444,32 @@ let finale = null;
 const titleEl = document.getElementById('title-screen');
 const btnBegin = document.getElementById('btn-begin');
 const btnContinue = document.getElementById('btn-continue');
+const titleActions = document.getElementById('title-actions');
+const beginConfirm = document.getElementById('begin-confirm');
 
 if (hasSave()) btnContinue.classList.remove('hidden');
 
 btnBegin.addEventListener('click', () => {
-  // a fresh start discards any old save. W is still at its defaults on the title screen, so
-  // begin IN PLACE — the old wipe()+reload bounced the page and flashed the title back up for
-  // a beat ("a second window that just says Begin, then fades"); no reload is needed here.
-  if (hasSave()) wipe();
+  // a fresh start discards any old save — and Begin sits one pixel from Continue, so that
+  // is never a single click (#56): with a save present, swap the menu row for a confirm
+  // beat first. The eventual wipe() stashes the outgoing payload one slot deep
+  // (SAVE_KEY_PREV) as a last-resort undo.
+  if (hasSave()) {
+    titleActions.classList.add('hidden');
+    beginConfirm.classList.remove('hidden');
+    return;
+  }
+  beginIntro();
+});
+document.getElementById('btn-begin-back').addEventListener('click', () => {
+  beginConfirm.classList.add('hidden');
+  titleActions.classList.remove('hidden');
+});
+document.getElementById('btn-begin-confirm').addEventListener('click', () => {
+  // W is still at its defaults on the title screen, so begin IN PLACE — the old
+  // wipe()+reload bounced the page and flashed the title back up for a beat ("a second
+  // window that just says Begin, then fades"); no reload is needed here.
+  wipe();        // world.js stashes the outgoing save under SAVE_KEY_PREV before clearing
   beginIntro();
 });
 btnContinue.addEventListener('click', () => {
