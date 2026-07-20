@@ -180,6 +180,10 @@ export function makeWaterMaterial(heightTex, domain) {
 
         col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither: break 8-bit mach banding at dawn/dusk/night
         gl_FragColor = vec4(col, alpha);
+        // tonemapping_fragment is renderer-gated to direct-to-screen draws: it applies ACES +
+        // per-grade exposure on the ?safe/no-bloom fallback, and compiles to a no-op inside the
+        // composer, where OutputPass owns the tonemap (#40; same in the sky/beam/glow shaders)
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
@@ -335,6 +339,7 @@ export function makeSkyMaterial() {
 
         col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither: break 8-bit mach banding in the smooth gradients
         gl_FragColor = vec4(col, 1.0);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
@@ -387,6 +392,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
         float a = along * uIntensity * shimmer * 0.5 * facing;
         a += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither the additive ramp: kills the beam's banded rings at night
         gl_FragColor = vec4(uColor, a);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
@@ -447,6 +453,7 @@ export function makeGlowPoints(positions, color, size = 0.5) {
         float a = smoothstep(0.5, 0.05, d) * vA;
         if (a < 0.003) discard;
         gl_FragColor = vec4(uColor, a);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
