@@ -1615,14 +1615,19 @@ function makeGpuTimer(renderer) {
 const clock = new THREE.Clock();
 let elapsed = 0, fps = 60;
 
-// power policy (owner directive): the island only needs 60fps. The frame
-// governor skips ticks only when clearly ahead of the 60fps budget — the
-// 12.5ms threshold sits safely between the 60Hz (16.7ms) and 120Hz (8.3ms)
-// intervals, so a 60Hz display never drops a frame (the old 15.5ms gate
-// sat against the 60Hz interval and stuttered) while a 120Hz display still
-// renders every other tick. Resolution is fixed (see BASE_DPR) — no
-// per-frame setPixelRatio, no framebuffer-realloc hitches.
-let lastTickMs = 0;
+// power policy (owner directive): the island only needs 60fps. The frame governor is a
+// fixed-rate ACCUMULATOR (perf #33): each rendered tick books exactly one 60Hz interval
+// (nextTickMs += 16.67) and CARRIES THE REMAINDER, so every refresh rate averages 60 —
+// the old flat "delta < 12.5ms" gate aliased against the display interval and gave 45fps
+// on 90Hz panels and 72fps on 144Hz. TICK_SLOP absorbs rAF timestamp jitter so a true
+// 60Hz display still renders every one of its frames (the very stutter the 12.5ms gate
+// existed to avoid), while staying under half a 120Hz interval so high-Hz panels keep
+// skipping. After a stall (hidden tab, GC) the schedule clamps to "now" — no banked debt,
+// no burst of catch-up frames. Resolution is fixed (see BASE_DPR) — no per-frame
+// setPixelRatio, no framebuffer-realloc hitches.
+const TICK_MS = 1000 / 60;
+const TICK_SLOP_MS = 4;
+let nextTickMs = 0;
 let mistCur = 0;
 
 // gate the 1:240 chart-table model (perf #26): the clone costs ~270k tris yet lives INSIDE
@@ -1645,8 +1650,8 @@ function tickModelGate(dt) {
 
 renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
-  if (nowMs - lastTickMs < 12.5) return; // 60fps cap; never drops a 60Hz frame
-  lastTickMs = nowMs;
+  if (nowMs < nextTickMs - TICK_SLOP_MS) return; // 60fps cap, remainder-carrying (see above)
+  nextTickMs = Math.max(nextTickMs + TICK_MS, nowMs); // book one tick; a stall re-bases, never banks debt
   renderer.info.reset();                 // autoReset is off — one reset per tick = whole-frame stats
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
