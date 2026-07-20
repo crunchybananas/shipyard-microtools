@@ -1,11 +1,13 @@
 # Dependencies
 node_modules/
+apps/*/node_modules/
 
 # Build outputs
 dist/
 .vite/
 tmp/
 .tmp/
+apps/*/tmp/
 
 # Ember
 .ember-cli
