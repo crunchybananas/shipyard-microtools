@@ -2402,6 +2402,11 @@ export function instantiateModel(core, modelAnchor) {
   modelRoot.traverse((o) => {
     o.castShadow = false;
     o.receiveShadow = false;
+    // re-enable frustum culling (perf #26): the clone inherits frustumCulled=false from the
+    // island's water/beam (huge surfaces that must never cull at world scale). At 1:240 the
+    // whole model is a ~1m prop on the chart table — cull it like any other prop, or its
+    // ~270k tris are submitted every frame from anywhere on the island.
+    o.frustumCulled = true;
     if (o.isPoints || MODEL_PRUNE.has(o.name)) prune.push(o);
   });
   for (const o of prune) o.removeFromParent();

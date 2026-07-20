@@ -1625,6 +1625,24 @@ let elapsed = 0, fps = 60;
 let lastTickMs = 0;
 let mistCur = 0;
 
+// gate the 1:240 chart-table model (perf #26): the clone costs ~270k tris yet lives INSIDE
+// the tower — invisible from almost everywhere on the island. In play mode show it only when
+// the player is within 30m of the lighthouse; every model interaction happens at the chart
+// table (model hotspots crack/lensSlot/beamAim all maxDist ≤ 3.2m, plate demands standing on
+// it), so 30m has huge slack. Non-play modes keep it visible: the dive/ascent zoom THROUGH
+// the model, and the intro/finale cameras roam free. Squared x/z distance, re-checked at 4Hz
+// (or immediately on a mode change) — no sqrt, no per-frame work.
+const MODEL_GATE_R2 = 30 * 30;
+let modelGateTimer = 0, modelGateMode = null;
+function tickModelGate(dt) {
+  modelGateTimer -= dt;
+  if (modelGateTimer > 0 && MODE === modelGateMode) return;
+  modelGateTimer = 0.25;
+  modelGateMode = MODE;
+  const dx = player.pos.x - SPOTS.lighthouse.x, dz = player.pos.z - SPOTS.lighthouse.y;
+  modelRoot.visible = MODE !== 'play' || (dx * dx + dz * dz < MODEL_GATE_R2);
+}
+
 renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
   if (nowMs - lastTickMs < 12.5) return; // 60fps cap; never drops a 60Hz frame
@@ -1671,6 +1689,7 @@ renderer.setAnimationLoop((tMs) => {
 
   if (!W.reading) player.update(dt);   // a fragment is open: the world holds still while you read
   game.tick(dt, elapsed);
+  tickModelGate(dt);
   interact.update();
   applyAtmosphere(elapsed, dt);
   tickGulls(elapsed, dt);
