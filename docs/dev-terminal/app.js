@@ -83,6 +83,15 @@ A bench sits empty, inviting contemplation.`,
   }
 };
 
+// Escape user-supplied text before it goes into innerHTML
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 // Process commands
 function processCommand(cmd) {
   const command = cmd.toLowerCase().trim();
@@ -135,7 +144,7 @@ function processCommand(cmd) {
     return `<p class="hint">Thanks for playing. Refresh to restart.</p>`;
   }
 
-  return `<p class="error">I don't understand "${cmd}". Type HELP for commands.</p>`;
+  return `<p class="error">I don't understand "${escapeHtml(cmd)}". Type HELP for commands.</p>`;
 }
 
 function handleMovement(direction) {
@@ -348,6 +357,12 @@ function handleThink() {
       <p class="thought">Maybe the job is changing. Maybe that's okay.</p>`;
   }
 
+  if (state.mood < 40) {
+    return `<p class="thought">The headlines loop in your head. Obsolete. Replaced. Extinct.</p>
+      <p class="thought">You can't think your way out of this alone.</p>
+      <p class="hint">Maybe talking to others would help. Try GOING to different locations and TALKing to people.</p>`;
+  }
+
   return `<p class="thought">Your mind races with thoughts about AI, your career, the future...</p>
     <p class="hint">Maybe talking to others would help. Try GOING to different locations and TALKing to people.</p>`;
 }
@@ -360,11 +375,20 @@ function showInventory() {
   if (state.flags.talkedToSenior) items.push("Maya's wisdom (valuable)");
   if (state.flags.foundPerspective) items.push("new perspective (hard-won)");
 
-  if (items.length === 0) {
-    return `<p>You're not carrying anything noteworthy. Just your usual developer anxiety.</p>`;
+  let moodLine;
+  if (state.mood >= 70) {
+    moodLine = `<p class="success">Mood: cautiously optimistic. The future feels like a place you could live.</p>`;
+  } else if (state.mood < 40) {
+    moodLine = `<p class="thought">Mood: the dread is winning today.</p>`;
+  } else {
+    moodLine = `<p class="thought">Mood: holding steady. Just your usual developer anxiety.</p>`;
   }
 
-  return `<p class="items">You're carrying: ${items.join(', ')}</p>`;
+  if (items.length === 0) {
+    return `<p>You're not carrying anything noteworthy.</p>${moodLine}`;
+  }
+
+  return `<p class="items">You're carrying: ${items.join(', ')}</p>${moodLine}`;
 }
 
 function showHelp() {
@@ -381,12 +405,18 @@ function showHelp() {
 }
 
 function checkEnding() {
-  // Multiple possible endings based on choices
+  // Multiple possible endings based on choices — each shows only once
+  if (state.flags.ending) return null;
+
   if (state.flags.foundPerspective && state.flags.talkedToSenior && state.flags.talkedToJunior) {
+    state.flags.ending = 'mentor';
+    const closing = state.mood >= 70
+      ? `<p>The tools change. The craft endures. And today, that feels like a promise.</p>`
+      : `<p>The tools change. The craft endures. You're not certain yet — but you're willing to find out.</p>`;
     return `<div class="achievement">
       <p class="success">🏆 ENDING UNLOCKED: "The Mentor"</p>
       <p>You found perspective. You'll help guide the next generation through this transition, just as Maya guided you.</p>
-      <p>The tools change. The craft endures.</p>
+      ${closing}
       <p class="hint">Thanks for playing. Refresh to explore other paths.</p>
     </div>`;
   }
@@ -417,7 +447,7 @@ function init() {
 input.addEventListener('keydown', e => {
   if (e.key === 'Enter' && input.value.trim()) {
     const cmd = input.value.trim();
-    addOutput(`<p class="command">> ${cmd}</p>`);
+    addOutput(`<p class="command">&gt; ${escapeHtml(cmd)}</p>`);
     
     // Handle special multi-word commands
     if (cmd.toLowerCase() === 'code with ai') {
