@@ -219,7 +219,7 @@ class OrbitalStrike {
     document.addEventListener('click', () => {
       if (this.gameState === 'playing') {
         if (!this.mouse.locked) {
-          this.renderer.domElement.requestPointerLock();
+          Promise.resolve(this.renderer.domElement.requestPointerLock()).catch(() => {});
         } else {
           this.shoot();
         }
@@ -240,7 +240,7 @@ class OrbitalStrike {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
-    this.renderer.domElement.requestPointerLock();
+    Promise.resolve(this.renderer.domElement.requestPointerLock()).catch(() => {});
   }
 
   resetGame() {
@@ -426,7 +426,7 @@ class OrbitalStrike {
   closeTerminal() {
     document.getElementById('terminalOverlay').style.display = 'none';
     this.gameState = 'playing';
-    this.renderer.domElement.requestPointerLock();
+    Promise.resolve(this.renderer.domElement.requestPointerLock()).catch(() => {});
   }
   
   gameOver() {
