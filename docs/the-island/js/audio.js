@@ -33,7 +33,14 @@ const A = {
   setMuted(m) {
     this.muted = !!m;
     localStorage.setItem('abyme-muted', this.muted ? '1' : '0');
-    if (this.master) this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+    if (!this.master) return;
+    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+    // mute used to be a volume knob only: six noise loops + the stem LFOs kept
+    // rendering at gain 0 (#68). Halt the whole graph instead. Unmute resumes
+    // through the same autoplay-safe path as #62 — the toggle itself is a
+    // gesture, so in practice it succeeds immediately.
+    if (this.muted) { if (ctx.state === 'running') ctx.suspend().catch(() => {}); }
+    else { this._tryResume(); this._installUnlock(); }
   },
 
   init() {
@@ -81,6 +88,7 @@ const A = {
     hum.start();
 
     this.ready = true;
+    if (this.muted && ctx.state === 'running') ctx.suspend().catch(() => {}); // muted renders NOTHING (#68)
     this._tryResume();
     this._installUnlock();
   },
@@ -92,9 +100,14 @@ const A = {
   // check (see update()); once the context is actually running, the listeners
   // come off.
   _tryResume() {
-    if (!ctx || ctx.state !== 'suspended') return;
+    if (this.muted || !ctx || ctx.state !== 'suspended') return;   // muted-suspend (#68) stays suspended
     ctx.resume().catch(() => {});   // rejected without a gesture; the unlock listeners retry
   },
+
+  // one-shots must not schedule while the context is halted (muted suspend #68,
+  // pre-unlock #62): their clock is frozen, so scheduled nodes would pile up
+  // and all fire in one burst the moment the context resumes.
+  _running() { return this.ready && !!ctx && ctx.state === 'running'; },
   _installUnlock() {
     if (this._unlockFn) return;
     this._unlockFn = () => this._tryResume();
@@ -175,7 +188,7 @@ const A = {
 
   // FM bell-pluck — the music box voice
   pluck(freq, when = 0, vol = 0.5, decay = 1.4) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime + when;
     const car = ctx.createOscillator(); car.frequency.value = freq;
     const mod = ctx.createOscillator(); mod.frequency.value = freq * 3.01;
@@ -191,7 +204,7 @@ const A = {
 
   // the bird sings a note — formant chirp
   chirp(freq, when = 0, vol = 0.35) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime + when;
     const o = ctx.createOscillator();
     o.type = 'sine';
@@ -208,7 +221,7 @@ const A = {
 
   // a standing stone hums
   stoneTone(i, vol = 0.4) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const freq = STONE_NOTES[i] / 2; // an octave down: monoliths, not chimes
     const t0 = ctx.currentTime;
     const g = ctx.createGain();
@@ -229,7 +242,7 @@ const A = {
 
   chime() { this.pluck(1046.5, 0, 0.3, 1.8); this.pluck(1318.5, 0.09, 0.22, 2.2); },
   deny() {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     const o = ctx.createOscillator(); o.frequency.value = 72; o.type = 'sine';
     const g = ctx.createGain(); this._env(g, t0, 0.01, 0.5, 0.5);
@@ -237,7 +250,7 @@ const A = {
   },
 
   crankTick() {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 1400 + Math.random() * 300;
     const g = ctx.createGain(); this._env(g, t0, 0.001, 0.05, 0.03);
@@ -259,7 +272,7 @@ const A = {
   },
 
   footstep(kind) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     const len = 0.09 * ctx.sampleRate;
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
@@ -305,7 +318,7 @@ const A = {
       }
       case 4: { // deep pulse
         this._pulse = setInterval(() => {
-          if (!ctx) return;
+          if (!this._running()) return;   // muted-suspend (#68): no beats onto a frozen clock
           const t0 = ctx.currentTime;
           const o = ctx.createOscillator(); o.frequency.value = 55;
           const g = ctx.createGain(); this._env(g, t0, 0.3, 0.12, 2.4);
@@ -382,7 +395,7 @@ const A = {
   // Quiet on purpose — a presence, not a narrator. Register bends the contour:
   // curious rises, pleading wavers, resigned falls.
   keeperVoice(register = 'curious') {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     // the drowned bus: lowpass to a murmur, one-floor-down echo, into fx
     const vg = ctx.createGain(); vg.gain.value = 0.85; vg.connect(this.fx);
@@ -426,7 +439,7 @@ const A = {
   // if the clip can't load (offline / missing), it falls back to the FM murmur,
   // so the keeper always speaks one way or another. register is for that fallback.
   say(id, register = 'curious', eyeLevel = false) {
-    if (!this.ready) return;
+    if (!this._running()) return;   // muted/halted: don't even decode the clip (#68)
     loadAudioBuffer(id, ctx).then((buf) => {
       const vg = ctx.createGain(); vg.gain.value = eyeLevel ? 1.0 : 0.85; vg.connect(this.fx);
       const drown = ctx.createBiquadFilter(); drown.type = 'lowpass';
@@ -467,7 +480,9 @@ const A = {
   // HEARD), crossfaded as W.level changes. Lazy-decoded current + adjacent; offline → silent (the
   // procedural score carries it). Called every frame in play — early-returns unless the level moved.
   musicTo(level) {
-    if (!this.ready) return;
+    // halted (muted #68 / pre-unlock #62): skip — no point decoding stems into a
+    // frozen graph; this is called every play frame, so it catches up on resume.
+    if (!this._running()) return;
     const lv = Math.max(1, Math.min(5, level | 0));
     if (this._musicLevel === lv && this._music) return;
     this._musicLevel = lv;
