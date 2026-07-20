@@ -709,6 +709,16 @@ let _postFxSuspendedUntil = 0;
 let _postFxWasSuspended = false;
 const _MINIMAP_FRAME_INTERVAL = 6;
 const _POSTFX_SUSPEND_MS = 5000;
+// Paint throttle (#80): rAF fires at display refresh (8.3ms on 120Hz
+// ProMotion), but painting above ~60fps doubles render+postfx work for no
+// visible gain. Sim ticks still run on EVERY rAF — the fixed-timestep
+// accumulator in runPendingTicks is the determinism contract and is
+// untouched — only the paint is skipped when the last one was <~15.5ms ago.
+// The remainder carry (`_lastPaintMs = now - elapsed % interval`) keeps the
+// cadence locked to ~60fps on any refresh rate (a plain reset would drift
+// to refresh/2, e.g. 45fps on 90Hz).
+const _PAINT_INTERVAL_MS = 15.5;
+let _lastPaintMs = 0;
 
 function _setPostFxSuspended(suspended) {
   if (suspended === _postFxWasSuspended) return;
@@ -769,9 +779,18 @@ function gameLoop() {
         }
       }
       _lastLoopStart = loopStart;
-      _loopFrame++;
       runPendingTicks(loopStart);
-      _renderFrame();
+      // Paint gate (#80): runPendingTicks just ran in THIS frame, so
+      // G._renderAlpha is the accumulator remainder at paint time — the
+      // actual render-time interpolation alpha — whenever we do paint.
+      // _loopFrame counts PAINTED frames so the minimap interval keeps
+      // meaning "every 6th paint" independent of refresh rate.
+      const sincePaint = loopStart - _lastPaintMs;
+      if (sincePaint >= _PAINT_INTERVAL_MS) {
+        _lastPaintMs = loopStart - (sincePaint % _PAINT_INTERVAL_MS);
+        _loopFrame++;
+        _renderFrame();
+      }
       requestAnimationFrame(gameLoop);
     } else {
       // Hidden tab: rAF is throttled off, so drive the same accumulator on a
