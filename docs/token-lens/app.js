@@ -13,7 +13,8 @@ const verifyStatus = document.getElementById('verifyStatus');
 const base64UrlDecode = (str) => {
   const pad = str.length % 4 === 0 ? '' : '='.repeat(4 - (str.length % 4));
   const base64 = (str + pad).replace(/-/g, '+').replace(/_/g, '/');
-  return atob(base64);
+  const bytes = Uint8Array.from(atob(base64), (ch) => ch.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);
 };
 
 const prettyJson = (obj) => JSON.stringify(obj, null, 2);
@@ -51,7 +52,9 @@ const decodeJwt = () => {
   }
 };
 
-async function verifyHs256() {
+const HMAC_HASHES = { HS256: 'SHA-256', HS384: 'SHA-384', HS512: 'SHA-512' };
+
+async function verifyHmac() {
   const token = jwtInput.value.trim();
   const secret = secretInput.value.trim();
   if (!token || !secret) {
@@ -60,13 +63,29 @@ async function verifyHs256() {
   }
 
   const [header, payload, signature] = token.split('.');
+
+  let alg;
+  try {
+    alg = JSON.parse(base64UrlDecode(header)).alg;
+  } catch (err) {
+    verifyStatus.textContent = 'Cannot read token header.';
+    return;
+  }
+
+  if (!Object.hasOwn(HMAC_HASHES, alg ?? '')) {
+    verifyStatus.textContent = /^(RS|ES|PS)/.test(alg || '')
+      ? `Signature not checked (${alg} is asymmetric).`
+      : `Unsupported algorithm: ${alg || 'none'}.`;
+    return;
+  }
+
   const data = new TextEncoder().encode(`${header}.${payload}`);
   const keyData = new TextEncoder().encode(secret);
 
   const key = await crypto.subtle.importKey(
     'raw',
     keyData,
-    { name: 'HMAC', hash: 'SHA-256' },
+    { name: 'HMAC', hash: HMAC_HASHES[alg] },
     false,
     ['sign']
   );
@@ -93,7 +112,7 @@ const clearAll = () => {
 };
 
 decodeBtn.addEventListener('click', decodeJwt);
-verifyBtn.addEventListener('click', verifyHs256);
+verifyBtn.addEventListener('click', verifyHmac);
 clearBtn.addEventListener('click', clearAll);
 
 jwtInput.addEventListener('input', decodeJwt);

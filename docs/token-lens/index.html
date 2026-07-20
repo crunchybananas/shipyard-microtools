@@ -39,10 +39,10 @@
           <pre id="signatureOutput">—</pre>
         </div>
         <div>
-          <h3>Verification (HS256)</h3>
-          <p class="helper">Checks HMAC signatures only. No data leaves your browser.</p>
+          <h3>Verification (HMAC)</h3>
+          <p class="helper">Checks HS256/HS384/HS512 signatures only. No data leaves your browser.</p>
           <div class="verify-row">
-            <input id="secretInput" type="text" placeholder="paste HS256 secret" />
+            <input id="secretInput" type="text" placeholder="paste HMAC secret" />
             <button id="verifyBtn" class="btn">Verify</button>
           </div>
           <p id="verifyStatus" class="muted">No verification attempted.</p>
