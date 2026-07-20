@@ -53,7 +53,15 @@ const A = {
     this.diveFilter.frequency.value = 19000;
     this.master.connect(this.diveFilter).connect(ctx.destination);
 
-    this.amb = ctx.createGain(); this.amb.connect(this.master);
+    this.amb = ctx.createGain();
+    // walls are a FILTER, not a volume knob (#67): the whole ambient bed passes
+    // through one shared biquad — wide open outdoors, closing to ~750Hz through
+    // the tower's stone. The hiss and sparkle die at the door; the low sea stays.
+    this.wallFilter = ctx.createBiquadFilter();
+    this.wallFilter.type = 'lowpass';
+    this.wallFilter.frequency.value = 19000;
+    this.wallFilter.Q.value = 0.5;
+    this.amb.connect(this.wallFilter).connect(this.master);
     this.music = ctx.createGain(); this.music.gain.value = 0.5; this.music.connect(this.master);
     this.musicBed = ctx.createGain(); this.musicBed.gain.value = 0.55; this.musicBed.connect(this.master); // the era music stems
     this._music = null; this._musicLevel = 0;
@@ -81,11 +89,13 @@ const A = {
     this.room = this._noiseLoop('brown', 130);
     this.room.gain.gain.value = 0;
     this.room.out.connect(this.amb);
-    const hum = ctx.createOscillator();
-    hum.frequency.value = 55;
-    const humG = ctx.createGain(); humG.gain.value = 0.12;
-    hum.connect(humG).connect(this.room.gain);
-    hum.start();
+    // the old steady 55Hz sine read as electrical mains hum — wrong for a tower
+    // with no wiring (#67). The interior presence is a second, DEEPER brown
+    // layer instead: sub-70Hz filtered noise, the building's own slow breath.
+    // It rides this.room.gain, so it fades in and out with the room tone.
+    this.roomAir = this._noiseLoop('brown', 68);
+    this.roomAir.gain.gain.value = 0.5;
+    this.roomAir.out.connect(this.room.gain);
 
     this.ready = true;
     if (this.muted && ctx.state === 'running') ctx.suspend().catch(() => {}); // muted renders NOTHING (#68)
@@ -156,12 +166,18 @@ const A = {
     if (this._unlockFn) this._removeUnlock();   // running: the unlock job is done
     const t = ctx.currentTime;
     const k = 0.08; // smoothing
-    // surf: swell-locked, pulled away by tide, ducked indoors
-    const surfBase = s.interior ? 0.05 : clamp(0.34 - s.shoreDist * 0.0022, 0.04, 0.34);
+    // walls close in (#67): one shared lowpass over the whole ambient bed swings
+    // from wide open outside to ~750Hz inside — smoothly, so crossing the door
+    // reads as mass, not a volume knob. The hiss dies; the low swell survives.
+    this.wallFilter.frequency.setTargetAtTime(s.interior ? 750 : 19000, t, 0.35);
+    // surf: swell-locked, pulled away by tide. No interior gain-gate here any
+    // more — shoreDist already grows +60 through the door (main.js), and the
+    // wall filter does the muffling.
+    const surfBase = clamp(0.34 - s.shoreDist * 0.0022, 0.04, 0.34);
     this.surf.gain.gain.setTargetAtTime(surfBase * (0.55 + 0.45 * s.wavePhase) * s.tideNear, t, k);
     this.surfHiss.gain.gain.setTargetAtTime(surfBase * 0.16 * s.wavePhase * s.tideNear, t, k);
-    // wind: altitude raises pitch and volume, ducked indoors
-    const windBase = s.interior ? 0.012 : clamp(0.05 + s.altitude * 0.004, 0.05, 0.17);
+    // wind: altitude raises pitch and volume; walls take most of it (the rest is timbre)
+    const windBase = clamp(0.05 + s.altitude * 0.004, 0.05, 0.17) * (s.interior ? 0.35 : 1);
     this.wind.gain.gain.setTargetAtTime(windBase * (0.7 + 0.3 * Math.sin(t * 0.31)), t, 0.3);
     // drizzle rises with thick mist, muffled under a roof
     const rainBase = (s.mist ?? 0) > 0.45 ? ((s.mist - 0.45) * 0.11) : 0;
