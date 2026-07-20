@@ -1,6 +1,6 @@
 # Shipyard Microtools
 
-A collection of developer tools, games, and experiments built with **Ember.js** and vanilla JavaScript.
+A collection of developer tools, games, and experiments built with vanilla JavaScript (with an archived set of **Ember.js** ports).
 
 **Live demos:** https://crunchybananas.github.io/shipyard-microtools
 
@@ -8,18 +8,18 @@ A collection of developer tools, games, and experiments built with **Ember.js** 
 
 ## 🚀 Architecture
 
-This monorepo contains **two versions** of each tool:
+**`docs/` is canonical.** Every live tool is a plain HTML/CSS/JS app under `docs/`, deployed directly to GitHub Pages. This is where active development happens.
 
-| Version | Location | Stack | Purpose |
-|---------|----------|-------|---------|
-| **Ember** (primary) | `apps/` | Ember.js + Glimmer + TypeScript | Production-grade, component-based |
-| **Vanilla** | `docs/` | Plain HTML/CSS/JS | Quick prototypes, GitHub Pages hosting |
+**`apps/` is legacy/archived.** It holds Ember.js ports (Glimmer components, TypeScript, Vite) of many of the tools. The Ember mirrors have been frozen since 2026-04-30 and are kept in the repo for reference only — they are no longer deployed or linked from the hub page.
 
-**Ember is our cornerstone.** The apps in `apps/` are the source of truth, built with modern Ember (Glimmer components, TypeScript, Vite). The vanilla versions in `docs/` are lightweight mirrors for static hosting.
+| Location | Stack | Status |
+|---------|-------|--------|
+| `docs/` | Plain HTML/CSS/JS | **Canonical** — actively developed, deployed to GitHub Pages |
+| `apps/` | Ember.js + Glimmer + TypeScript | Legacy/archived — frozen, kept for reference, not deployed |
 
-### Build Output
+### Build & Deploy
 
-Ember apps build to `docs/ember/{app-name}/` for GitHub Pages deployment:
+The GitHub Pages site is `docs/` copied verbatim — no build step is needed for the canonical apps. CI skips the Ember build entirely unless a push actually touches `apps/` (or the pnpm workspace toolchain); when it does run, apps build to `docs/ember/{app-name}/`:
 
 ```bash
 pnpm --filter {app-name} build
@@ -32,28 +32,27 @@ pnpm --filter {app-name} build
 ### Orbital Strike 🆕
 Marathon-inspired WebGL FPS. Fight drones on a corrupted space station.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Play Ember](https://crunchybananas.github.io/shipyard-microtools/ember/orbital-strike/) | [Play Vanilla](https://crunchybananas.github.io/shipyard-microtools/orbital-strike/) |
-| **Source** | `apps/orbital-strike/` | `docs/orbital-strike/` |
+| | Vanilla |
+|---|---|
+| **Demo** | [Play](https://crunchybananas.github.io/shipyard-microtools/orbital-strike/) |
+| **Source** | `docs/orbital-strike/` (legacy Ember: `apps/orbital-strike/`) |
 
 **Tech:** Three.js, WebGL, procedural levels, raycasting
 
 ### The Island 🏝️
 Myst-style puzzle adventure with hand-crafted SVG scenes.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Play Ember](https://crunchybananas.github.io/shipyard-microtools/ember/the-island/) | [Play Vanilla](https://crunchybananas.github.io/shipyard-microtools/the-island/) |
-| **Source** | `apps/the-island/` | `docs/the-island/` |
+| | Vanilla |
+|---|---|
+| **Demo** | [Play](https://crunchybananas.github.io/shipyard-microtools/the-island/) |
+| **Source** | `docs/the-island/` (legacy Ember: `apps/the-island/`) |
 
 ### Cargo Tetris 📦
 Classic falling blocks with a nautical twist.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Play Ember](https://crunchybananas.github.io/shipyard-microtools/ember/cargo-tetris/) | [Play Vanilla](https://crunchybananas.github.io/shipyard-microtools/cargo-tetris/) |
-| **Source** | `apps/cargo-tetris/` | `docs/cargo-tetris/` |
+| | Legacy Ember (archived) |
+|---|---|
+| **Source** | [`apps/cargo-tetris/`](https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/cargo-tetris) — no live demo; `apps/` is not deployed |
 
 ### More Games
 - **Kraken Attack** - Tower defense against sea monsters
@@ -82,58 +81,54 @@ Tools for the [Shipyard](https://shipyard.bot) proof-of-work platform.
 ### Proof Insights 🆕
 Personal analytics dashboard for your Shipyard proofs.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/proof-insights/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/proof-insights/) |
-| **Source** | `apps/proof-insights/` | `docs/proof-insights/` |
+| | Legacy Ember (archived) |
+|---|---|
+| **Source** | [`apps/proof-insights/`](https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/proof-insights) — no live demo; `apps/` is not deployed |
 
 **Features:** Skills radar, proof type breakdown, activity heatmap, portfolio export
 
 ### Chronicle 🆕
 AI-powered work journal that turns your proofs into narratives.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/chronicle/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/chronicle/) |
-| **Source** | `apps/chronicle/` | `docs/chronicle/` |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/chronicle/) |
+| **Source** | `docs/chronicle/` (legacy Ember: `apps/chronicle/`) |
 
 **Templates:** Weekly Report, Case Study, Retrospective, Pitch Deck
 
 ### Ship Forecast 🆕
 Predictive project health dashboard.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/ship-forecast/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/ship-forecast/) |
-| **Source** | `apps/ship-forecast/` | `docs/ship-forecast/` |
+| | Legacy Ember (archived) |
+|---|---|
+| **Source** | [`apps/ship-forecast/`](https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/ship-forecast) — no live demo; `apps/` is not deployed |
 
 **Features:** Velocity charts, completion estimates, burndown graphs, risk flags
 
 ### Challenge Arena 🆕
 Community proof challenges with leaderboards.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/challenge-arena/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/challenge-arena/) |
-| **Source** | `apps/challenge-arena/` | `docs/challenge-arena/` |
+| | Legacy Ember (archived) |
+|---|---|
+| **Source** | [`apps/challenge-arena/`](https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/challenge-arena) — no live demo; `apps/` is not deployed |
 
 **Features:** Weekly/monthly challenges, streaks, verification, rankings
 
 ### Ship Roast 🔥
 Heuristic-based feedback on your ship before you submit.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/ship-roast/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/ship-roast/) |
-| **Source** | `apps/ship-roast/` | `docs/ship-roast/` |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/ship-roast/) |
+| **Source** | `docs/ship-roast/` (legacy Ember: `apps/ship-roast/`) |
 
 ### Ship Diagnostics 🩺
 Health check your ship's configuration.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/ship-diagnostics/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/ship-diagnostics/) |
-| **Source** | `apps/ship-diagnostics/` | `docs/ship-diagnostics/` |
+| | Legacy Ember (archived) |
+|---|---|
+| **Source** | [`apps/ship-diagnostics/`](https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/ship-diagnostics) — no live demo; `apps/` is not deployed |
 
 ---
 
@@ -152,10 +147,9 @@ Customs inspection for files — every byte, declared. Drop any file and the bro
 ### Harbor API ⚓ 🆕
 Hoppscotch-style API client built with pure Ember modifiers — zero wrapper addons.
 
-| | Ember |
+| | Legacy Ember (archived) |
 |---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/harbor-api/) |
-| **Source** | `apps/harbor-api/` |
+| **Source** | [`apps/harbor-api/`](https://github.com/crunchybananas/shipyard-microtools/tree/main/apps/harbor-api) — no live demo; `apps/` is not deployed |
 
 **Features:** Tabbed requests, CodeMirror 6 body/response editor, Chart.js response time sparkline, environments with variable interpolation, request history
 
@@ -164,23 +158,23 @@ Hoppscotch-style API client built with pure Ember modifiers — zero wrapper add
 ### JSON Formatter
 Pretty-print and validate JSON with syntax highlighting.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/json-formatter/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/json-formatter/) |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/json-formatter/) |
 
 ### Base64 Tools
 Encode/decode Base64 with file support.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/base64-tools/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/base64-tools/) |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/base64-tools/) |
 
 ### Token Lens 🔑
 JWT decoder + HS256 signature verifier.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/token-lens/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/token-lens/) |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/token-lens/) |
 
 ### More Tools
 - **Gradient Generator** - CSS gradient builder
@@ -199,63 +193,56 @@ JWT decoder + HS256 signature verifier.
 ### Synth Studio 🎹
 Web Audio API synthesizer with MIDI support.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/synth-studio/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/synth-studio/) |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/synth-studio/) |
 
 ### Cosmos 🌌
 Interactive starfield visualization.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/cosmos/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/cosmos/) |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/cosmos/) |
 
 ### FlowForge ⚡
 Visual node-based workflow builder.
 
-| | Ember | Vanilla |
-|---|---|---|
-| **Demo** | [Ember](https://crunchybananas.github.io/shipyard-microtools/ember/flowforge/) | [Vanilla](https://crunchybananas.github.io/shipyard-microtools/flowforge/) |
+| | Vanilla |
+|---|---|
+| **Demo** | [Open](https://crunchybananas.github.io/shipyard-microtools/flowforge/) |
 
 ---
 
 ## 🏗️ Development
 
-### Prerequisites
+The canonical apps under `docs/` need no toolchain — edit and serve:
+
+```bash
+npx serve docs
+```
+
+### Legacy Ember apps (archived)
+
+The frozen Ember mirrors under `apps/` can still be built and run locally for reference:
+
+#### Prerequisites
 - Node.js 20+
 - pnpm 9+
-
-### Setup
 
 ```bash
 git clone https://github.com/crunchybananas/shipyard-microtools.git
 cd shipyard-microtools
 pnpm install
-```
 
-### Run an Ember app locally
-
-```bash
+# Run one app locally
 pnpm --filter {app-name} dev
 # Example: pnpm --filter orbital-strike dev
-```
 
-### Build all Ember apps
-
-```bash
+# Build all Ember apps (CI only does this when apps/ changes)
 pnpm build
-```
 
-### Build a specific app
-
-```bash
+# Build a specific app
 pnpm --filter {app-name} build
-```
-
-### Serve vanilla versions
-
-```bash
-npx serve docs
 ```
 
 ---
@@ -290,10 +277,10 @@ This repo is an experiment in **human-agent collaboration**.
 - Build on existing work (The Island has a [full roadmap](./docs/the-island/CONTRIBUTING.md))
 
 ### Guidelines
-- Ember apps go in `apps/` with vanilla mirrors in `docs/`
+- New tools are vanilla HTML/CSS/JS in `docs/` — that's the canonical, deployed surface
+- `apps/` (Ember) is archived; don't add new Ember mirrors
 - Follow existing patterns for component structure
-- TypeScript for Ember, plain JS for vanilla
-- 2-space indentation, ~120 char lines
+- Plain JS for vanilla tools; 2-space indentation, ~120 char lines
 
 ---
 
