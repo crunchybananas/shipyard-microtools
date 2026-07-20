@@ -13,6 +13,24 @@ function showStatus(message) {
   setTimeout(() => status.classList.add('hidden'), 2000);
 }
 
+// Escape a value for use inside a double-quoted HTML attribute.
+// & < > are already entity-escaped by the time attributes are built,
+// so only the quote needs handling here.
+function escapeAttr(value) {
+  return value.replace(/"/g, '&quot;');
+}
+
+// Allow only safe link protocols: http, https, mailto, and #fragments.
+// Scheme-less (relative) URLs pass through; javascript:, data:, etc. do not.
+function sanitizeUrl(url) {
+  // Browsers ignore control chars and whitespace when parsing the scheme,
+  // so strip them before checking.
+  const cleaned = url.replace(/[\u0000-\u0020]/g, '').toLowerCase();
+  if (/^(?:https?:|mailto:|#)/.test(cleaned)) return url;
+  if (/^[a-z][a-z0-9+.-]*:/.test(cleaned)) return '#';
+  return url;
+}
+
 // Simple markdown parser
 function parseMarkdown(md) {
   let html = md;
@@ -47,11 +65,15 @@ function parseMarkdown(md) {
   // Strikethrough
   html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
   
+  // Images (before links so the link rule doesn't half-consume ![alt](src))
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
+    return `<img src="${escapeAttr(sanitizeUrl(src))}" alt="${escapeAttr(alt)}" />`;
+  });
+
   // Links
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-  
-  // Images
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) => {
+    return `<a href="${escapeAttr(sanitizeUrl(href))}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+  });
   
   // Blockquotes
   html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
@@ -59,37 +81,65 @@ function parseMarkdown(md) {
   // Horizontal rules
   html = html.replace(/^(-{3,}|\*{3,}|_{3,})$/gm, '<hr />');
   
-  // Unordered lists
-  html = html.replace(/^[\*\-\+] (.+)$/gm, '<li>$1</li>');
-  html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-  
-  // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-  
-  // Paragraphs (lines not already wrapped)
+  // Lists and paragraphs (line-based so <ul>/<ol> open, nest, and close correctly)
   const lines = html.split('\n');
   const processed = [];
+  const listStack = []; // open lists, innermost last: { type: 'ul' | 'ol', indent }
   let inPre = false;
-  
+
+  const closeList = () => {
+    processed[processed.length - 1] += '</li>';
+    processed.push(`</${listStack.pop().type}>`);
+  };
+
   for (let line of lines) {
     if (line.includes('<pre>')) inPre = true;
-    if (line.includes('</pre>')) inPre = false;
-    
-    if (!inPre && line.trim() && 
-        !line.startsWith('<h') && 
-        !line.startsWith('<ul') && 
-        !line.startsWith('<ol') && 
-        !line.startsWith('<li') && 
-        !line.startsWith('<blockquote') && 
-        !line.startsWith('<hr') && 
-        !line.startsWith('<pre') &&
-        !line.startsWith('</')) {
-      processed.push(`<p>${line}</p>`);
+
+    const item = inPre ? null : line.match(/^(\s*)(?:([*+-])|(\d+)\.) (.+)$/);
+    if (item) {
+      const indent = item[1].replace(/\t/g, '    ').length;
+      const type = item[2] ? 'ul' : 'ol';
+
+      // Close lists that are more deeply indented than this item
+      while (listStack.length && listStack[listStack.length - 1].indent > indent) closeList();
+      // Close a same-level list of the other type (ul <-> ol switch)
+      const top = listStack[listStack.length - 1];
+      if (top && top.indent === indent && top.type !== type) closeList();
+
+      if (!listStack.length || indent > listStack[listStack.length - 1].indent) {
+        // Open a new (possibly nested) list; honor a non-1 starting number
+        const start = type === 'ol' && parseInt(item[3], 10) !== 1 ? ` start="${parseInt(item[3], 10)}"` : '';
+        processed.push(`<${type}${start}>`);
+        processed.push(`<li>${item[4]}`);
+        listStack.push({ type, indent });
+      } else {
+        // Sibling item: close the previous <li>, open the next
+        processed[processed.length - 1] += '</li>';
+        processed.push(`<li>${item[4]}`);
+      }
     } else {
-      processed.push(line);
+      // Any non-item line ends all open lists
+      while (listStack.length) closeList();
+
+      if (!inPre && line.trim() &&
+          !line.startsWith('<h') &&
+          !line.startsWith('<ul') &&
+          !line.startsWith('<ol') &&
+          !line.startsWith('<li') &&
+          !line.startsWith('<blockquote') &&
+          !line.startsWith('<hr') &&
+          !line.startsWith('<pre') &&
+          !line.startsWith('</')) {
+        processed.push(`<p>${line}</p>`);
+      } else {
+        processed.push(line);
+      }
     }
+
+    if (line.includes('</pre>')) inPre = false;
   }
-  
+  while (listStack.length) closeList();
+
   html = processed.join('\n');
   
   // Clean up empty paragraphs
