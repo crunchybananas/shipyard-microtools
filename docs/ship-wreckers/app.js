@@ -20,11 +20,92 @@ const finalCargoEl = document.getElementById('finalCargo');
 let gameRunning = false;
 let score = 0;
 let cargoCollected = 0;
-let player, bullets, rocks, pirates, crates, particles;
+let player, bullets, rocks, pirates, crates, particles, cannonballs;
 let keys = {};
 let lastTime = 0;
 let spawnTimer = 0;
 let difficulty = 1;
+
+// Sound effects — synthesized live with WebAudio, no files (same pattern as docs/fathom)
+const audio = (() => {
+  let ctx = null, master = null;
+
+  const ready = () => {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = 0.5;
+      master.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return true;
+  };
+
+  // Filtered decaying noise burst — the "powder" part of every impact
+  const burst = (dur, freq, q, amp) => {
+    const t = ctx.currentTime;
+    const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = freq;
+    f.Q.value = q;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(amp, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(master);
+    src.start();
+  };
+
+  // Pitch-dropping sine thump — the "body" of booms and splashes
+  const boom = (f0, f1, dur, amp) => {
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(amp, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(master);
+    o.start();
+    o.stop(t + dur + 0.05);
+  };
+
+  return {
+    unlock() { ready(); },
+    cannon() {
+      // Player cannon: sharp crack
+      if (!ready()) return;
+      burst(0.12, 1800, 0.8, 0.16);
+      boom(160, 70, 0.18, 0.14);
+    },
+    enemyCannon() {
+      // Pirate cannon: deeper, more distant
+      if (!ready()) return;
+      burst(0.2, 700, 0.9, 0.13);
+      boom(110, 45, 0.3, 0.16);
+    },
+    hit() {
+      // Shot or collision connects
+      if (!ready()) return;
+      burst(0.15, 2600, 1.2, 0.15);
+      boom(220, 90, 0.12, 0.1);
+    },
+    sink() {
+      // A ship goes down: falling groan + splash
+      if (!ready()) return;
+      boom(180, 35, 0.7, 0.22);
+      burst(0.5, 500, 0.6, 0.15);
+    },
+  };
+})();
 
 // Player ship
 class Ship {
@@ -39,14 +120,20 @@ class Ship {
     this.fireRate = 0.25;
     this.lastFire = 0;
     this.invincible = 0;
+    this.vx = 0;
+    this.vy = 0;
   }
 
   update(dt) {
-    // Movement
-    if (keys['ArrowLeft'] || keys['KeyA']) this.x -= this.speed * dt;
-    if (keys['ArrowRight'] || keys['KeyD']) this.x += this.speed * dt;
-    if (keys['ArrowUp'] || keys['KeyW']) this.y -= this.speed * dt;
-    if (keys['ArrowDown'] || keys['KeyS']) this.y += this.speed * dt;
+    // Movement (velocity tracked so pirates can lead their shots)
+    this.vx = 0;
+    this.vy = 0;
+    if (keys['ArrowLeft'] || keys['KeyA']) this.vx -= this.speed;
+    if (keys['ArrowRight'] || keys['KeyD']) this.vx += this.speed;
+    if (keys['ArrowUp'] || keys['KeyW']) this.vy -= this.speed;
+    if (keys['ArrowDown'] || keys['KeyS']) this.vy += this.speed;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
 
     // Bounds
     this.x = Math.max(this.width / 2, Math.min(canvas.width - this.width / 2, this.x));
@@ -57,6 +144,7 @@ class Ship {
     if (keys['Space'] && this.lastFire <= 0) {
       bullets.push(new Bullet(this.x, this.y - this.height / 2));
       this.lastFire = this.fireRate;
+      audio.cannon();
     }
 
     // Invincibility timer
@@ -113,7 +201,8 @@ class Ship {
     this.health -= amount;
     this.invincible = 1;
     healthFill.style.width = `${Math.max(0, this.health)}%`;
-    
+    audio.hit();
+
     // Screen shake effect via particles
     for (let i = 0; i < 5; i++) {
       particles.push(new Particle(this.x, this.y, '#ff6b6b'));
@@ -147,6 +236,43 @@ class Bullet {
     ctx.beginPath();
     ctx.arc(this.x, this.y + 8, this.radius * 0.7, 0, Math.PI * 2);
     ctx.fill();
+  }
+}
+
+// Pirate cannonball — aimed at the player, with spread so it stays dodgeable
+class CannonBall {
+  constructor(x, y, angle, speed) {
+    this.x = x;
+    this.y = y;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.radius = 5;
+    this.dead = false;
+  }
+
+  update(dt) {
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    if (this.x < -20 || this.x > canvas.width + 20 || this.y < -20 || this.y > canvas.height + 20) {
+      this.dead = true;
+    }
+  }
+
+  draw() {
+    // Smoke trail
+    ctx.fillStyle = 'rgba(160, 174, 192, 0.25)';
+    ctx.beginPath();
+    ctx.arc(this.x - this.vx * 0.03, this.y - this.vy * 0.03, this.radius * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ball
+    ctx.fillStyle = '#1a202c';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#4a5568';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
   }
 }
 
@@ -212,6 +338,7 @@ class Pirate {
     this.wobble = Math.random() * Math.PI * 2;
     this.dead = false;
     this.health = 2;
+    this.fireTimer = 1 + Math.random() * 1.5;
   }
 
   update(dt) {
@@ -219,6 +346,46 @@ class Pirate {
     this.wobble += dt * 3;
     this.x += Math.sin(this.wobble) * 0.5;
     if (this.y > canvas.height + 50) this.dead = true;
+
+    // Return fire once on screen (rate ramps with difficulty, capped)
+    this.fireTimer -= dt;
+    if (this.fireTimer <= 0 && this.y > 20 && this.y < canvas.height - 60) {
+      this.fireAtPlayer();
+      this.fireTimer = Math.max(1.2, 3.2 - (difficulty - 1) * 0.5) + Math.random() * 0.8;
+    }
+  }
+
+  fireAtPlayer() {
+    const speed = Math.min(300, 180 + (difficulty - 1) * 40);
+
+    // Lead the target: solve |target + vel*t - self| = speed*t for the
+    // earliest positive intercept time, falling back to a direct shot
+    const dx = player.x - this.x;
+    const dy = player.y - this.y;
+    const a = player.vx * player.vx + player.vy * player.vy - speed * speed;
+    const b = 2 * (dx * player.vx + dy * player.vy);
+    const c = dx * dx + dy * dy;
+    let t = 0;
+    if (Math.abs(a) < 1e-6) {
+      if (b < -1e-6) t = -c / b;
+    } else {
+      const disc = b * b - 4 * a * c;
+      if (disc >= 0) {
+        const root = Math.sqrt(disc);
+        const t1 = (-b - root) / (2 * a);
+        const t2 = (-b + root) / (2 * a);
+        t = t1 > 0 ? t1 : (t2 > 0 ? t2 : 0);
+      }
+    }
+    t = Math.min(t, 1.5);
+
+    // Spread keeps aimed shots fair
+    const angle = Math.atan2(dy + player.vy * t, dx + player.vx * t) + (Math.random() - 0.5) * 0.24;
+    cannonballs.push(new CannonBall(this.x, this.y + this.height / 3, angle, speed));
+    audio.enemyCannon();
+    for (let i = 0; i < 3; i++) {
+      particles.push(new Particle(this.x, this.y + this.height / 3, '#a0aec0'));
+    }
   }
 
   draw() {
@@ -262,6 +429,7 @@ class Pirate {
     if (this.health <= 0) {
       this.dead = true;
       score += 50;
+      audio.sink();
       for (let i = 0; i < 10; i++) {
         particles.push(new Particle(this.x, this.y, '#ff4757'));
       }
@@ -401,6 +569,9 @@ function gameLoop(timestamp) {
   crates.forEach(c => c.update(dt));
   crates = crates.filter(c => !c.dead);
 
+  cannonballs.forEach(cb => cb.update(dt));
+  cannonballs = cannonballs.filter(cb => !cb.dead);
+
   particles.forEach(p => p.update(dt));
   particles = particles.filter(p => !p.dead);
 
@@ -427,6 +598,7 @@ function gameLoop(timestamp) {
         b.dead = true;
         r.dead = true;
         score += 10;
+        audio.hit();
         for (let i = 0; i < 6; i++) {
           particles.push(new Particle(r.x, r.y, '#718096'));
         }
@@ -439,6 +611,7 @@ function gameLoop(timestamp) {
     pirates.forEach(p => {
       if (circleRect(b.x, b.y, b.radius, p.x - p.width / 2, p.y - p.height / 2, p.width, p.height)) {
         b.dead = true;
+        audio.hit();
         p.takeDamage();
       }
     });
@@ -463,6 +636,14 @@ function gameLoop(timestamp) {
       for (let i = 0; i < 10; i++) {
         particles.push(new Particle(p.x, p.y, '#ff4757'));
       }
+    }
+  });
+
+  // Cannonballs vs player
+  cannonballs.forEach(cb => {
+    if (circleRect(cb.x, cb.y, cb.radius, player.x - player.width / 2, player.y - player.height / 2, player.width, player.height)) {
+      cb.dead = true;
+      player.takeDamage(15);
     }
   });
 
@@ -496,18 +677,21 @@ function gameLoop(timestamp) {
   pirates.forEach(p => p.draw());
   player.draw();
   bullets.forEach(b => b.draw());
+  cannonballs.forEach(cb => cb.draw());
   particles.forEach(p => p.draw());
 
   requestAnimationFrame(gameLoop);
 }
 
 function startGame() {
+  audio.unlock();
   player = new Ship();
   bullets = [];
   rocks = [];
   pirates = [];
   crates = [];
   particles = [];
+  cannonballs = [];
   score = 0;
   cargoCollected = 0;
   difficulty = 1;
@@ -528,6 +712,7 @@ function startGame() {
 
 function endGame() {
   gameRunning = false;
+  audio.sink();
   finalScoreEl.textContent = Math.floor(score);
   finalCargoEl.textContent = cargoCollected;
   hud.classList.add('hidden');
