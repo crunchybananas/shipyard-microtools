@@ -8,8 +8,8 @@ class OrbitalStrike {
     this.renderer = null;
     this.player = { x: 0, y: 1.5, z: 0, health: 100, maxHealth: 100 };
     this.weapons = [
-      { name: 'Pulse Pistol', ammo: 50, maxAmmo: 100, damage: 15, fireRate: 250 },
-      { name: 'Scatter Gun', ammo: 20, maxAmmo: 40, damage: 8, fireRate: 800, pellets: 8 }
+      { name: 'Pulse Pistol', ammo: 50, startAmmo: 50, maxAmmo: 100, damage: 15, fireRate: 250 },
+      { name: 'Scatter Gun', ammo: 20, startAmmo: 20, maxAmmo: 40, damage: 8, fireRate: 800, pellets: 8 }
     ];
     this.currentWeapon = 0;
     this.enemies = [];
@@ -20,6 +20,9 @@ class OrbitalStrike {
     this.yaw = 0;
     this.pitch = 0;
     this.lastShot = 0;
+    this.waveTimer = null;
+    this.muzzleTimer = null;
+    this.hitMarkerTimer = null;
     this.wave = 1;
     this.score = 0;
     this.gameState = 'menu';
@@ -37,6 +40,8 @@ class OrbitalStrike {
   }
   
   init() {
+    this.radarCanvas = document.getElementById('radarCanvas');
+    this.radarCtx = this.radarCanvas.getContext('2d');
     this.setupRenderer();
     this.setupScene();
     this.setupLighting();
@@ -97,15 +102,15 @@ class OrbitalStrike {
     const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e1e3f, roughness: 0.8 });
     const trimMat = new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x22d3ee, emissiveIntensity: 0.5 });
     
-    const corridors = [
+    this.corridors = [
       { x: 0, z: 0, w: 8, d: 30 },
       { x: 15, z: 0, w: 8, d: 30 },
       { x: -15, z: 0, w: 8, d: 30 },
       { x: 0, z: 15, w: 40, d: 8 },
       { x: 0, z: -15, w: 40, d: 8 },
     ];
-    
-    corridors.forEach(c => {
+
+    this.corridors.forEach(c => {
       // Left wall
       const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, c.d), wallMat);
       leftWall.position.set(c.x - c.w / 2, 2, c.z);
@@ -144,11 +149,20 @@ class OrbitalStrike {
     });
   }
   
+  // Walls sit on the rect edges (0.25 inner face), plus a little player radius
+  isWalkable(x, z) {
+    const margin = 0.6;
+    return this.corridors.some(c =>
+      Math.abs(x - c.x) <= c.w / 2 - margin &&
+      Math.abs(z - c.z) <= c.d / 2 - margin
+    );
+  }
+
   spawnEnemies() {
     const count = 3 + this.wave * 2;
-    const droneMat = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0xff0000, emissiveIntensity: 0.3 });
-    
+
     for (let i = 0; i < count; i++) {
+      const droneMat = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0xff0000, emissiveIntensity: 0.3 });
       const drone = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), droneMat);
       const angle = Math.random() * Math.PI * 2;
       const dist = 10 + Math.random() * 20;
@@ -221,11 +235,32 @@ class OrbitalStrike {
   }
   
   startGame() {
+    this.resetGame();
     this.gameState = 'playing';
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameOverScreen').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
     this.renderer.domElement.requestPointerLock();
+  }
+
+  resetGame() {
+    clearTimeout(this.waveTimer);
+    this.player.x = 0;
+    this.player.z = 0;
+    this.player.health = this.player.maxHealth;
+    this.yaw = 0;
+    this.pitch = 0;
+    this.wave = 1;
+    this.score = 0;
+    this.currentWeapon = 0;
+    this.weapons.forEach(w => w.ammo = w.startAmmo);
+    this.enemies.forEach(e => this.scene.remove(e));
+    this.enemies = [];
+    this.pickups.forEach(p => this.scene.remove(p));
+    this.pickups = [];
+    this.spawnEnemies();
+    this.spawnPickups();
+    this.updateUI();
   }
   
   shoot() {
@@ -236,7 +271,13 @@ class OrbitalStrike {
     
     this.lastShot = now;
     weapon.ammo--;
-    
+
+    // Muzzle flash
+    const muzzle = document.getElementById('muzzleFlash');
+    muzzle.classList.add('active');
+    clearTimeout(this.muzzleTimer);
+    this.muzzleTimer = setTimeout(() => muzzle.classList.remove('active'), 70);
+
     const pellets = weapon.pellets || 1;
     for (let i = 0; i < pellets; i++) {
       const spread = weapon.pellets ? 0.1 : 0;
@@ -251,15 +292,25 @@ class OrbitalStrike {
       if (hits.length > 0) {
         const enemy = hits[0].object;
         enemy.userData.health -= weapon.damage;
-        
+
+        // Hit feedback: crosshair marker + flash the enemy
+        const marker = document.getElementById('hitMarker');
+        marker.classList.add('active');
+        clearTimeout(this.hitMarkerTimer);
+        this.hitMarkerTimer = setTimeout(() => marker.classList.remove('active'), 120);
+
+        enemy.material.emissiveIntensity = 1;
+        clearTimeout(enemy.userData.hitTimer);
+        enemy.userData.hitTimer = setTimeout(() => enemy.material.emissiveIntensity = 0.3, 100);
+
         if (enemy.userData.health <= 0) {
           this.scene.remove(enemy);
           this.enemies = this.enemies.filter(e => e !== enemy);
           this.score += 100;
-          
+
           if (this.enemies.length === 0) {
             this.wave++;
-            setTimeout(() => this.spawnEnemies(), 2000);
+            this.waveTimer = setTimeout(() => this.spawnEnemies(), 2000);
           }
         }
       }
@@ -282,9 +333,12 @@ class OrbitalStrike {
     
     dir.normalize();
     dir.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.yaw);
-    
-    this.player.x += dir.x * speed;
-    this.player.z += dir.z * speed;
+
+    // Clamp to corridor rects, per axis so the player slides along walls
+    const nextX = this.player.x + dir.x * speed;
+    if (this.isWalkable(nextX, this.player.z)) this.player.x = nextX;
+    const nextZ = this.player.z + dir.z * speed;
+    if (this.isWalkable(this.player.x, nextZ)) this.player.z = nextZ;
     
     // Weapon switch
     if (this.keys['KeyQ']) {
@@ -378,36 +432,38 @@ class OrbitalStrike {
   gameOver() {
     this.gameState = 'gameover';
     document.exitPointerLock();
-    alert(`Game Over!\nWave: ${this.wave}\nScore: ${this.score}`);
-    location.reload();
+    document.getElementById('hud').style.display = 'none';
+    document.getElementById('finalScore').textContent = this.score;
+    document.getElementById('finalWave').textContent = this.wave;
+    document.getElementById('gameOverScreen').style.display = 'flex';
   }
   
   updateUI() {
     const weapon = this.weapons[this.currentWeapon];
-    document.getElementById('healthFill').style.width = `${this.player.health}%`;
-    document.getElementById('healthText').textContent = Math.round(this.player.health);
+    const health = Math.max(0, this.player.health);
+    document.getElementById('healthFill').style.width = `${health}%`;
+    document.getElementById('healthText').textContent = Math.round(health);
     document.getElementById('ammoCount').textContent = `${weapon.ammo}/${weapon.maxAmmo}`;
     document.getElementById('weaponName').textContent = weapon.name;
     document.getElementById('waveNumber').textContent = this.wave;
     document.getElementById('enemiesRemaining').textContent = this.enemies.length;
     
     // Radar
-    const radar = document.getElementById('radarBlips');
-    radar.innerHTML = '';
+    const ctx = this.radarCtx;
+    const size = this.radarCanvas.width;
+    const half = size / 2;
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = '#ff3366';
     this.enemies.forEach(e => {
       const dx = e.position.x - this.player.x;
       const dz = e.position.z - this.player.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
       if (dist < 30) {
         const angle = Math.atan2(dz, dx) - this.yaw + Math.PI / 2;
-        const r = Math.min(dist / 30 * 35, 35);
-        const x = 40 + Math.sin(angle) * r;
-        const y = 40 - Math.cos(angle) * r;
-        const dot = document.createElement('div');
-        dot.className = 'radar-dot';
-        dot.style.left = `${x}px`;
-        dot.style.top = `${y}px`;
-        radar.appendChild(dot);
+        const r = (dist / 30) * (half - 6);
+        ctx.beginPath();
+        ctx.arc(half + Math.sin(angle) * r, half - Math.cos(angle) * r, 3, 0, Math.PI * 2);
+        ctx.fill();
       }
     });
   }
@@ -417,7 +473,8 @@ class OrbitalStrike {
     
     const loop = () => {
       const now = performance.now();
-      const delta = (now - lastTime) / 1000;
+      // Clamp delta so a paused tab can't produce a huge step that tunnels through walls
+      const delta = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
       
       this.update(delta);
