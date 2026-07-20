@@ -274,6 +274,7 @@ export function buildTerrain() {
   const cSeabed = new THREE.Color(0x33514e);
   const cSeabedDeep = new THREE.Color(0x16313c);
   const tmp = new THREE.Color();
+  const tSand = new THREE.Color(), tGrass = new THREE.Color(), tRock = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getZ(i);
@@ -292,15 +293,23 @@ export function buildTerrain() {
       tmp.lerpColors(cSeabedDeep, cSeabed, smoothstep(-9, -2.5, h));
     } else if (h < 0.8) {
       tmp.lerpColors(cSeabed, cSandWet, smoothstep(-2.5, 0.4, h));
-    } else if (h < 2.6 && slope < 0.45) {
-      tmp.lerpColors(cSandWet, cSand, smoothstep(0.8, 2.0, h));
-    } else if (slope > 0.62) {
-      tmp.lerpColors(cRock, cRockDark, smoothstep(0.6, 1.0, slope));
-      // limestone strata bands
-      tmp.offsetHSL(0, 0, Math.sin(h * 1.7) * 0.03);
     } else {
-      tmp.lerpColors(cGrass, cGrassOlive, n);
-      tmp.offsetHSL(0, 0, (slope - 0.2) * -0.12);
+      // land bands, edge-softened (#41): the old hard if/else at slope 0.62/0.45 and
+      // h 2.6 left categorical grass/rock edges crawling along cliff tops. Same palette
+      // anchors and same per-band lerps as before — only the band CHOICE changed, from a
+      // categorical pick to a smoothstep mix across each threshold (CPU-only at build,
+      // still plain vertex colors: zero runtime cost).
+      tSand.lerpColors(cSandWet, cSand, smoothstep(0.8, 2.0, h));
+      tRock.lerpColors(cRock, cRockDark, smoothstep(0.6, 1.0, slope));
+      tRock.offsetHSL(0, 0, Math.sin(h * 1.7) * 0.03);       // limestone strata bands
+      tGrass.lerpColors(cGrass, cGrassOlive, n);
+      tGrass.offsetHSL(0, 0, (slope - 0.2) * -0.12);
+      // grass -> rock across the old slope 0.62 cut
+      tmp.lerpColors(tGrass, tRock, smoothstep(0.54, 0.70, slope));
+      // sand holds where the ground is BOTH low (h < 2.6) and gentle (slope < 0.45);
+      // fade it out across each of those old cuts instead of snapping
+      const wSand = (1 - smoothstep(2.2, 3.0, h)) * (1 - smoothstep(0.38, 0.52, slope));
+      tmp.lerp(tSand, wSand);
     }
     // global gentle noise so nothing is flat-colored
     tmp.offsetHSL((r() - 0.5) * 0.012, (r() - 0.5) * 0.03, (n - 0.5) * 0.05);
