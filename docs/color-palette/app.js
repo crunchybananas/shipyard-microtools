@@ -363,14 +363,16 @@ document.addEventListener('DOMContentLoaded', () => {
   baseColorInput.addEventListener('input', (e) => {
     baseColor = e.target.value;
     baseColorHex.value = baseColor.toUpperCase();
+    currentPalette = generateHarmony(baseColor, harmony, colorCount);
     renderPalette();
   });
-  
+
   baseColorHex.addEventListener('input', (e) => {
     const hex = e.target.value;
     if (/^#[0-9A-F]{6}$/i.test(hex)) {
       baseColor = hex;
       baseColorInput.value = hex;
+      currentPalette = generateHarmony(baseColor, harmony, colorCount);
       renderPalette();
     }
   });
