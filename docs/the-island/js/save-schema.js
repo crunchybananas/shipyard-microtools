@@ -15,7 +15,7 @@
 // localStorage) so node can import and test it headlessly. world.js owns the
 // storage I/O and the plain-array → THREE.Vector3 conversion at its boundary.
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 // The localStorage key. The '-v1' suffix is historical (it predates the
 // payload version int) and is frozen: the REAL version is payload.v, and
@@ -26,7 +26,8 @@ export const SAVE_KEY = 'abyme-save-v1';
 // One row per persisted field.
 //   key   — the payload property name.
 //   pack  — (W, ctx) → JSON value written by save(). ctx carries call-scoped
-//           extras (today: ctx.pos, the live player position Vector3-like).
+//           extras: the live player-like — ctx.pos (Vector3-like) plus
+//           ctx.yaw / ctx.pitch (radians).
 //   apply — (W, value) → mutate W from a CURRENT-version payload value.
 //           value is undefined when the payload lacks the key, so every apply
 //           must land a sane default (these mirror the historical load()
@@ -58,6 +59,15 @@ export const SAVE_FIELDS = [
     pack: (W, ctx) => (ctx && ctx.pos ? [ctx.pos.x, ctx.pos.y, ctx.pos.z] : null),
     apply: (W, v) => { W.playerPos = Array.isArray(v) && v.length === 3 ? v : null; },
   },
+  // where the player was LOOKING — [yaw, pitch] radians (#58, v3). Continue used
+  // to hardcode the beach facing; now the exact view restores with the position.
+  // Kept apart from pos: pos predates the version int and gets the Vector3
+  // conversion at the world.js boundary; look stays a plain pair.
+  {
+    key: 'look',
+    pack: (W, ctx) => (ctx && Number.isFinite(ctx.yaw) ? [ctx.yaw, Number.isFinite(ctx.pitch) ? ctx.pitch : 0] : null),
+    apply: (W, v) => { W.playerLook = Array.isArray(v) && v.length === 2 && v.every(Number.isFinite) ? v : null; },
+  },
 ];
 
 // ---------------- versioned migrations ---------------------------------------
@@ -77,6 +87,15 @@ export const MIGRATIONS = [
       s.flags = flags;
       return s;
     },
+  },
+  {
+    // v3 added the 'look' field ([yaw, pitch], #58). Purely additive — the
+    // apply is defensive, so a v2 payload just loads with the facing unset and
+    // Continue falls back to the historical beach yaw. This step exists only to
+    // keep the migration chain contiguous and date the change.
+    from: 2,
+    to: 3,
+    migrate: (s) => s,
   },
 ];
 
@@ -104,9 +123,12 @@ function normalize(W) {
 }
 
 // ---------------- pack / apply ------------------------------------------------
-export function packSave(W, playerPos) {
+// `player` is the live player-like ({ pos, yaw, pitch }) — or null when there
+// is no player in scope (headless tests). Passed through to each field's pack
+// as ctx.
+export function packSave(W, player) {
   const out = { v: SAVE_VERSION };
-  const ctx = { pos: playerPos };
+  const ctx = player || null;
   for (const f of SAVE_FIELDS) out[f.key] = f.pack(W, ctx);
   return out;
 }

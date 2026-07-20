@@ -37,6 +37,7 @@ function freshState() {
     readKeys: [],
     dials: [0, 0, 0, 0],
     playerPos: null,
+    playerLook: null,
     level: 1,
     regions: { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] },
   };
@@ -45,7 +46,7 @@ function freshState() {
 test('payload is stamped with the current version and exactly the table fields', () => {
   const p = packSave(freshState(), null);
   assert.equal(p.v, SAVE_VERSION);
-  assert.equal(SAVE_VERSION, 2);
+  assert.equal(SAVE_VERSION, 3);
   const expected = new Set(['v', ...SAVE_FIELDS.map((f) => f.key)]);
   assert.deepEqual(new Set(Object.keys(p)), expected);
   assert.equal(SAVE_KEY, 'abyme-save-v1'); // frozen: renaming orphans every save
@@ -67,8 +68,9 @@ test('save → load round-trips every field through JSON', () => {
   a.level = 3;
   a.regions = { l2seen: true, l3seen: true, l4seen: false, fragmentsFound: ['f1'] };
 
+  // the player-like ctx: position AND facing persist (#58, v3)
   const pos = { x: 4.5, y: 0, z: -104.25 };
-  const wire = JSON.parse(JSON.stringify(packSave(a, pos)));
+  const wire = JSON.parse(JSON.stringify(packSave(a, { pos, yaw: 2.1, pitch: -0.4 })));
 
   const b = freshState();
   applySave(b, wire);
@@ -91,6 +93,7 @@ test('save → load round-trips every field through JSON', () => {
   assert.equal(b.level, 3);
   assert.deepEqual(b.regions, { l2seen: true, l3seen: true, l4seen: false, fragmentsFound: ['f1'] });
   assert.deepEqual(b.playerPos, [4.5, 0, -104.25]); // plain array; world.js makes the Vector3
+  assert.deepEqual(b.playerLook, [2.1, -0.4]);      // the facing rides along (#58)
 });
 
 test('a synthetic v1 payload (no version int) migrates and loads', () => {
@@ -126,6 +129,17 @@ test('a synthetic v1 payload (no version int) migrates and loads', () => {
   assert.deepEqual(w.inventory, ['ruler']);
   assert.deepEqual(w.dials, [1, 1, 1, 1]);
   assert.deepEqual(w.playerPos, [10, 0, -90]);
+  assert.equal(w.playerLook, null); // pre-v3: no facing in the save
+});
+
+test('a v2 payload (pre-look) migrates to v3 with the facing unset', () => {
+  const migrated = migrateSave({ v: 2, flags: {} });
+  assert.equal(migrated.v, SAVE_VERSION);
+  const w = freshState();
+  w.playerLook = [1, 1]; // a stale pre-load value must not survive the apply
+  applySave(w, { v: 2, flags: { introDone: true } });
+  assert.equal(w.playerLook, null);
+  assert.equal(w.flags.introDone, true);
 });
 
 test('v1 migration respects an explicit chestOpen:false', () => {
@@ -138,7 +152,8 @@ test('mid-dive saves land the dive on load — any version', () => {
   // the dive-cinematic snap. Quit in that window and the save says dove+level 1.
   for (const payload of [
     { flags: { dove: true }, level: 1 },                    // v1 shape
-    { v: 2, flags: { dove: true }, level: 1 },              // current shape
+    { v: 2, flags: { dove: true }, level: 1 },              // v2 shape
+    { v: 3, flags: { dove: true }, level: 1 },              // current shape
   ]) {
     const w = freshState();
     applySave(w, payload);
@@ -163,17 +178,23 @@ test('an empty/partial payload lands every documented default', () => {
   assert.deepEqual(w.dials, [0, 0, 0, 0]);
   assert.equal(w.level, 1);
   assert.equal(w.playerPos, null);
+  assert.equal(w.playerLook, null);
 });
 
-test('malformed dials reset; regions/flags merges keep new default keys', () => {
+test('malformed dials/look reset; regions/flags merges keep new default keys', () => {
   const w = freshState();
   applySave(w, {
-    v: 2,
+    v: 3,
     dials: [1, 2],                       // wrong length → reset
+    look: [1.5],                         // wrong length → null (fallback facing)
     regions: { l2seen: true },           // no fragmentsFound in the save
     flags: { introDone: true },          // sparse flags
   });
   assert.deepEqual(w.dials, [0, 0, 0, 0]);
+  assert.equal(w.playerLook, null);
+  const w2 = freshState();
+  applySave(w2, { v: 3, look: ['a', 'b'] }); // non-numeric → null
+  assert.equal(w2.playerLook, null);
   assert.equal(w.regions.l2seen, true);
   assert.deepEqual(w.regions.fragmentsFound, []); // default key survived the merge
   assert.equal(w.flags.introDone, true);

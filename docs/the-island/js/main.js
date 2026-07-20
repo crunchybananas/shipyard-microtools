@@ -462,10 +462,14 @@ btnContinue.addEventListener('click', () => {
     for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
     titleEl.classList.add('fading');
     const pos = W.playerPos || new THREE.Vector3(4, 0, -104);
+    // the facing persists too (#58): [yaw, pitch] from the save, falling back
+    // to the historical hardcoded beach facing for pre-v3 saves.
+    let [yaw, pitch] = W.playerLook || [2.72, 0];
     // a save written below the drained-tide line predates the basin rim
     // block — those spots have no walkable exit; the tide returns you
-    if (heightAt(pos.x, pos.z) < -2.2) pos.set(4, 0, -104);
-    player.spawn(pos, 2.72);
+    // (and the saved facing is meaningless at the fallback spot)
+    if (heightAt(pos.x, pos.z) < -2.2) { pos.set(4, 0, -104); yaw = 2.72; pitch = 0; }
+    player.spawn(pos, yaw, pitch);
     player.locked = false;
     interact.enabled = true;
     MODE = 'play';
@@ -505,7 +509,7 @@ function endIntro() {
   UI.whisper('The tide brought you back.');
   UI.showHint();
   W.flags.introDone = true;
-  save(player.pos);
+  save(player);
 }
 
 // shared scratch for the cinematic ticks — they run every frame through the dive/ascent/
@@ -572,7 +576,7 @@ function tickDive(dt) {
     if (W.level >= 2) W.regions.l2seen = true;
     if (W.level >= 3) W.regions.l3seen = true;
     if (W.level >= 4) W.regions.l4seen = true;
-    save(player.pos);
+    save(player);
     player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
   }
   if (f >= 1) {
@@ -687,7 +691,7 @@ function landAscent() {
   }
   // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
   W.tide = W.tideTarget = (W.level > 1 ? LEVELS[W.level].tide : 1);
-  save(player.pos);
+  save(player);
   // rise out at the study / chart table of the level above (canon: you climb to the chart table)
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
 }
@@ -978,6 +982,16 @@ const spray = (() => {
 })();
 scene.add(spray);
 let saveTimer = 0;
+
+// #58: the 12s autosave used to be the ONLY writer, so closing the tab could
+// throw away up to 12s of play (and, before v3, the facing never persisted at
+// all). Flush a save when the page goes away — pagehide for real closes and
+// navigations, visibilitychange→hidden for tab switches and the mobile-Safari
+// cases where pagehide never fires. Same guard as the timer: only mid-play,
+// never poised on the brink of a dive (the journal will not follow you down).
+const flushSave = () => { if (MODE === 'play' && !game.atBrink()) save(player); };
+addEventListener('pagehide', flushSave);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSave(); });
 
 function applyAtmosphere(elapsed, dt) {
   const g = gradeAt(W.time);
@@ -1331,7 +1345,7 @@ player.onFootstep = (kind, pos) => {
       if (n >= 3) W.regions.l3seen = true;
       if (n >= 4) W.regions.l4seen = true;
       player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
-      save(player.pos);
+      save(player);
       return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };
     },
     dive: (instant = false) => {                       // the missing counterpart to ascend()
@@ -1363,7 +1377,7 @@ player.onFootstep = (kind, pos) => {
       W.lensPlaced = false; W.beamAngle = 2.2; W.dials = [0, 0, 0, 0]; W.inventory = [];
       W.onceKeys = []; W.readKeys = [];
       W.regions = { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] };
-      save(player.pos);
+      save(player);
       return 'flags reset (in-world)';
     },
     tideFigure: () => {                                // spawn/reset the L2 Tide-Figure ~12m ahead, for testing
@@ -1453,7 +1467,7 @@ function buildDebugPanel() {
     fragAdd: () => { W.regions.fragmentsFound.push('test-' + W.regions.fragmentsFound.length); },
     fragClear: () => { W.regions.fragmentsFound.length = 0; },
     clrRegions: () => { W.regions.l2seen = W.regions.l3seen = W.regions.l4seen = false; },
-    saveNow: () => save(player.pos), wipe: () => { wipe(); location.reload(); }, reset: () => A.resetFlags(),
+    saveNow: () => save(player), wipe: () => { wipe(); location.reload(); }, reset: () => A.resetFlags(),
   };
   // [act, label, tooltip] grouped into collapsible sections.
   const groups = [
@@ -1658,7 +1672,7 @@ renderer.setAnimationLoop((tMs) => {
   // not follow you down, so the world stops recording as you cross the threshold
   if (MODE === 'play' && !game.atBrink()) {
     saveTimer += dt;
-    if (saveTimer > 12) { saveTimer = 0; save(player.pos); }
+    if (saveTimer > 12) { saveTimer = 0; save(player); }
   }
 
   // one-time post-processing self-test (see the note at the composer setup): on the first BRIGHT

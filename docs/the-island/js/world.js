@@ -73,6 +73,7 @@ export const W = {
   reading: false,        // transient: the reading surface is open (input paused while reading)
   dials: [0, 0, 0, 0],   // hatch glyph dials
   playerPos: null,       // saved position
+  playerLook: null,      // saved facing [yaw, pitch] radians, or null (pre-v3 saves; #58)
   level: 1,
   // SEA-STRATA (loop #117): persisted explored-state per drowned region — which deeper
   // levels you have reached + the fragments found, so the Meow-Wolf map stays "grown".
@@ -260,9 +261,11 @@ export function wavePhase(timeSec) {
 // of hand-enumerated fields here. This file only owns the storage I/O and the
 // plain-array → THREE.Vector3 conversion at the boundary.
 
-export function save(playerPos) {
+// `player` is the live player-like ({ pos, yaw, pitch }) — position AND facing
+// persist (#58), so callers pass the player itself, not just its position.
+export function save(player) {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(packSave(W, playerPos)));
+    localStorage.setItem(SAVE_KEY, JSON.stringify(packSave(W, player)));
   } catch (_) { /* private mode: the island forgets */ }
 }
 

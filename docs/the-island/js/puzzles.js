@@ -57,7 +57,7 @@ export class Game {
   flag(name, value = true) {
     if (W.flags[name] === value) return false;
     W.flags[name] = value;
-    save(this.player.pos);
+    save(this.player);
     return true;
   }
 
@@ -66,7 +66,7 @@ export class Game {
     W.onceKeys = W.onceKeys || [];
     if (W.onceKeys.includes(key)) return;
     W.onceKeys.push(key);
-    save(this.player.pos);
+    save(this.player);
     fn();
   }
 
@@ -88,7 +88,7 @@ export class Game {
           UI.whisper('Below the window, the sea obeys.');
           UI.addJournal('A valve beside the chart table. Turn it, and the basin drains — and so does the bay. Someone built a machine to make the sea go back, and must have turned it, and turned it. As if, on some one day, holding the water back was the only thing left worth wanting.');
         }
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -149,7 +149,7 @@ export class Game {
           A.chime();
           UI.whisper('A cartographer’s brass rule. Fifteen centimetres of certainty.');
           UI.addJournal('Took a small brass ruler from a chest the tide gave up. It wants to measure something.');
-          save(this.player.pos);
+          save(this.player);
         }
       },
     });
@@ -179,7 +179,7 @@ export class Game {
         // layer (Panel #4 act-two gap): the measuring as a thing to do with grieving hands
         UI.whisper('You do not need a ruler for a distance you already know by heart.');
         UI.addJournal('Laid the ruler over the crack in the model. Out east, a brass bridge now spans the chasm — etched with centimetre marks the size of doors. He measured this rift a hundred times, I think — you do not need a ruler for a distance you already know by heart. You measure it to have something to do with your hands.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -194,7 +194,7 @@ export class Game {
         A.chime();
         UI.whisper('Far above, glass settles into brass.');
         UI.addJournal('Set the small lens into the model’s lamp room. The real lighthouse has its eye back. Whoever kept this light must have ground and polished that glass a thousand nights, so it could see a way home for someone out on the water. It will want the dark now.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
     I.add({
@@ -218,7 +218,7 @@ export class Game {
         UI.whisper('Cold as seawater, clear as morning — a lamp’s eye, far too fine for a pocket.');
         // forward thread: the stones puzzle dead-ended here for testers — say where the glass wants to go.
         UI.addJournal('Took the first lens from the stones’ vault. It is a lighthouse lamp’s eye, ground and polished thin — and back in the study, the model on the chart table stands eyeless in its little lamp room. Glass like this only ever wants to be put back.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -231,7 +231,7 @@ export class Game {
         A.chime();
         UI.whisper('The sand slides from a brass door, dialled shut.');
         UI.addJournal('At golden hour the stones’ shadows leaned together, all pointing across the water — to a hatch buried on the bluff. Four glyph dials seal it. He must have read this same hour off these same stones, day on day; some hours you set your whole life by, and they arrive whether or not you are ready.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
     for (let i = 0; i < 4; i++) {
@@ -247,7 +247,7 @@ export class Game {
             A.addStem(4); W.stems = Math.max(W.stems, 4);
             UI.whisper('Stone breath, long held, sighs out.');
           }
-          save(this.player.pos);
+          save(this.player);
         },
       });
     }
@@ -262,7 +262,7 @@ export class Game {
         A.chime();
         UI.whisper('Heavier than it looks. Truer, too.');
         UI.addJournal('In the cellar: a brass plumb bob on a pedestal, and a carving of it hanging over a little island. The chart table has a hook.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -279,7 +279,7 @@ export class Game {
         A.chime();
         UI.whisper('It hangs dead-centre over the model. Over the beach where you woke.');
         UI.addJournal('Hung the plumb line. It hangs dead-centre over the model’s beach — over a brass plate in the floor, big enough to stand on. The weight knows the depth before it drops. Whoever hung it first already knew how far down this goes.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -517,7 +517,7 @@ export class Game {
       // layer (Panel #4 act-two gap): the correction that came a lifetime too late
       UI.whisper('Some corrections only ever arrive too late.');
       UI.addJournal('The stones accepted the bird’s correction. A vault in the outcrop holds a small, perfect lens. The box always bent that fourth note wrong; the bird sings it true. He must have heard it right a thousand mornings and never could make his own hands play it — some corrections only ever arrive too late.');
-      save(this.player.pos);
+      save(this.player);
     }
   }
 
