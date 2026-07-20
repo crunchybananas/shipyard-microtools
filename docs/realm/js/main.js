@@ -717,7 +717,7 @@ function _setPostFxSuspended(suspended) {
   if (post) post.style.display = suspended ? 'none' : '';
 }
 
-function _renderFrame({ allowPostFx = true, allowMinimap = true } = {}) {
+function _renderFrame({ allowPostFx = true } = {}) {
   const frameStart = performance.now();
   // Follow camera (Phase 3d): glide after the founder; any manual pan
   // fights it, so dragging is naturally dominant while held.
@@ -733,7 +733,11 @@ function _renderFrame({ allowPostFx = true, allowMinimap = true } = {}) {
   if (allowPostFx && !postFxSuspended) {
     applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
   }
-  if (allowMinimap && (_loopFrame - _lastMinimapFrame >= _MINIMAP_FRAME_INTERVAL)) {
+  // Minimap paints whenever its canvas exists (renderMinimap self-guards),
+  // throttled purely by frame cadence — never by tab visibility. Embedded/
+  // preview contexts report 'hidden' from boot while still being watched;
+  // vetoing the minimap there blinded embedded players + screenshot QA (#85).
+  if (_loopFrame - _lastMinimapFrame >= _MINIMAP_FRAME_INTERVAL) {
     renderMinimap();
     _lastMinimapFrame = _loopFrame;
   }
@@ -777,8 +781,9 @@ function gameLoop() {
       // Always paint at the hidden-tab cadence (timer-clamped to ~1-4fps):
       // embedded/preview contexts report 'hidden' while still being watched,
       // and returning to a never-painted canvas reads as frozen citizens.
+      // Minimap included — it follows the same frame-interval throttle (#85).
       _loopFrame++;
-      _renderFrame({ allowMinimap: false });
+      _renderFrame();
       setTimeout(gameLoop, 250);
     }
   } catch (e) {

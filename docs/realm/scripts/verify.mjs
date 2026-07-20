@@ -192,6 +192,56 @@ if (flags.logic) {
     console.log('[verify] no page errors');
   }
   await page.close();
+
+  // ── #85: minimap must paint under hidden-boot visibility ──
+  // Embedded/preview contexts report visibilityState 'hidden' from boot while
+  // still being watched. The hidden-tab loop used to pass allowMinimap:false,
+  // so the minimap never rendered there — blinding embedded players and
+  // screenshot QA. Assert the minimap canvas gets real paint when the page
+  // reports 'hidden' the whole time.
+  console.log('\n[verify] === HIDDEN-BOOT MINIMAP (#85) ===');
+  const hiddenPage = await ctx.newPage();
+  await hiddenPage.addInitScript(() => {
+    Object.defineProperty(document, 'visibilityState', { get: () => 'hidden' });
+    Object.defineProperty(document, 'hidden', { get: () => true });
+  });
+  const hiddenErrors = [];
+  hiddenPage.on('pageerror', e => hiddenErrors.push(e.message));
+  await hiddenPage.goto(GAME_PATH);
+  await hiddenPage.waitForLoadState('domcontentloaded');
+  await hiddenPage.waitForTimeout(2000);
+  await startGameIfNeeded(hiddenPage);
+  await hiddenPage.waitForTimeout(1500); // several hidden-cadence frames (~250ms each)
+  const mini = await hiddenPage.evaluate(() => {
+    const c = document.getElementById('minimap');
+    if (!c) return { exists: false };
+    const data = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let opaque = 0;
+    const colors = new Set();
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] === 255) opaque++;
+      colors.add((data[i] << 16) | (data[i + 1] << 8) | data[i + 2]);
+    }
+    return {
+      exists: true,
+      visibilityState: document.visibilityState,
+      opaqueFrac: Math.round((opaque / (data.length / 4)) * 1000) / 1000,
+      distinctColors: colors.size,
+    };
+  });
+  console.log('[verify] hidden-boot minimap:', JSON.stringify(mini));
+  if (hiddenErrors.length) {
+    throw new Error(`hidden-boot page errors: ${hiddenErrors.slice(0, 5).join(' | ')}`);
+  }
+  if (!mini.exists) throw new Error('minimap canvas missing from DOM');
+  if (mini.visibilityState !== 'hidden') {
+    throw new Error('visibility override failed — hidden-boot path not exercised');
+  }
+  if (mini.opaqueFrac < 0.9 || mini.distinctColors < 8) {
+    throw new Error(`minimap not painted under hidden-boot visibility (#85 regression): ${JSON.stringify(mini)}`);
+  }
+  console.log('[verify] minimap paints under hidden-boot visibility ok');
+  await hiddenPage.close();
 }
 
 if (flags.hold) {
