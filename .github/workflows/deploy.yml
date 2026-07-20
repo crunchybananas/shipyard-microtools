@@ -41,13 +41,34 @@ jobs:
         run: |
           # Create output directory
           mkdir -p _site
-          
-          # Copy vanilla apps (everything in docs/ except ember/)
-          cp -r docs/* _site/
-          
+
+          # Copy docs/ to the site, excluding internal working files
+          # (agent-loop journals, screenshot dirs, scratch dirs, and
+          # internal log/planning markdown). New apps under docs/ still
+          # deploy by default; only these patterns are held back.
+          # README.md files are intentionally NOT excluded.
+          rsync -a \
+            --exclude='loop/' \
+            --exclude='render-log-shots/' \
+            --exclude='tmp/' \
+            --exclude='attic/' \
+            --exclude='MISSION.md' \
+            --exclude='RENDER_LOG.md' \
+            --exclude='CRITIQUES.md' \
+            --exclude='LOG.md' \
+            --exclude='SPINE.md' \
+            docs/ _site/
+
           # Ember apps are built directly into docs/ember/ by vite config
           # so they're already in the right place after build
-          
+
+          # Guard: fail loudly if any internal dir leaks into the site
+          if find _site -type d \( -name 'loop' -o -name 'render-log-shots' -o -name 'tmp' -o -name 'attic' \) | grep -q .; then
+            echo "ERROR: internal directories leaked into _site" >&2
+            find _site -type d \( -name 'loop' -o -name 'render-log-shots' -o -name 'tmp' -o -name 'attic' \) >&2
+            exit 1
+          fi
+
           echo "Build complete!"
           ls -la _site/
 
