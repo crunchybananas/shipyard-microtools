@@ -10,7 +10,8 @@ const sampleProofs = [
 ];
 
 // State
-let proofs = [];
+const STORAGE_KEY = 'chronicle-proofs';
+let proofs = loadProofs();
 let selectedTemplate = 'weekly';
 let currentStory = '';
 
@@ -22,13 +23,16 @@ const timelineEl = document.getElementById('timeline');
 const emptyTimelineEl = document.getElementById('emptyTimeline');
 const templatesEl = document.getElementById('templates');
 const templateLabelEl = document.getElementById('templateLabel');
-const loadingCardEl = document.getElementById('loadingCard');
+const importFileEl = document.getElementById('importFile');
 const storyCardEl = document.getElementById('storyCard');
 const storyOutputEl = document.getElementById('storyOutput');
 
 // Event Listeners
 document.getElementById('addProofBtn').addEventListener('click', addProof);
 document.getElementById('loadSampleBtn').addEventListener('click', loadSample);
+document.getElementById('exportJsonBtn').addEventListener('click', exportJson);
+document.getElementById('importJsonBtn').addEventListener('click', () => importFileEl.click());
+importFileEl.addEventListener('change', importJson);
 document.getElementById('generateBtn').addEventListener('click', generateStory);
 document.getElementById('copyStoryBtn').addEventListener('click', copyStory);
 document.getElementById('exportMdBtn').addEventListener('click', exportMarkdown);
@@ -47,6 +51,38 @@ templatesEl.addEventListener('click', (e) => {
 });
 
 // Functions
+function isValidProof(raw) {
+  return raw && typeof raw === 'object' && typeof raw.url === 'string' && raw.url.trim() !== '';
+}
+
+function normalizeProof(raw, index) {
+  const validTypes = ['github', 'url', 'screenshot', 'demo'];
+  return {
+    id: typeof raw.id === 'string' && /^[\w.-]+$/.test(raw.id) ? raw.id : Date.now().toString() + index,
+    url: raw.url,
+    title: typeof raw.title === 'string' && raw.title ? raw.title : extractTitleFromUrl(raw.url),
+    type: validTypes.includes(raw.type) ? raw.type : detectProofType(raw.url),
+    timestamp: isNaN(new Date(raw.timestamp)) ? new Date().toISOString() : raw.timestamp
+  };
+}
+
+function loadProofs() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return Array.isArray(stored) ? stored.filter(isValidProof).map(normalizeProof) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveProofs() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(proofs));
+  } catch {
+    // Storage unavailable (private mode, quota) - proofs stay in memory only
+  }
+}
+
 function detectProofType(url) {
   if (url.includes('github.com')) return 'github';
   if (url.includes('loom.com') || url.includes('youtube.com') || url.includes('vimeo.com')) return 'demo';
@@ -70,6 +106,7 @@ function addProof() {
   
   proofUrlEl.value = '';
   proofTitleEl.value = '';
+  saveProofs();
   renderTimeline();
 }
 
@@ -88,11 +125,13 @@ function extractTitleFromUrl(url) {
 
 function removeProof(id) {
   proofs = proofs.filter(p => p.id !== id);
+  saveProofs();
   renderTimeline();
 }
 
 function loadSample() {
   proofs = sampleProofs.map(p => ({ ...p, id: Date.now().toString() + Math.random() }));
+  saveProofs();
   renderTimeline();
 }
 
@@ -126,7 +165,7 @@ function renderTimeline() {
           <span class="timeline-type ${proof.type}">${proof.type}</span>
           ${escapeHtml(proof.title)}
         </div>
-        <a href="${escapeHtml(proof.url)}" target="_blank" rel="noopener" class="timeline-url">${escapeHtml(proof.url)}</a>
+        <a href="${safeUrl(proof.url)}" target="_blank" rel="noopener" class="timeline-url">${escapeHtml(proof.url)}</a>
       </div>
       <button class="timeline-remove" onclick="removeProof('${proof.id}')" title="Remove">×</button>
     </div>
@@ -136,24 +175,22 @@ function renderTimeline() {
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-async function generateStory() {
+function safeUrl(url) {
+  const scheme = url.replace(/[\s\u0000-\u001f]/g, '').toLowerCase();
+  return /^(javascript|data|vbscript):/.test(scheme) ? '#' : escapeHtml(url);
+}
+
+function generateStory() {
   if (proofs.length === 0) {
     alert('Add some proofs first to generate a story.');
     return;
   }
-  
-  loadingCardEl.style.display = 'block';
-  storyCardEl.style.display = 'none';
-  
-  // Simulate AI generation delay
-  await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
-  
+
   currentStory = generateNarrative(selectedTemplate);
-  
-  loadingCardEl.style.display = 'none';
+
   storyCardEl.style.display = 'block';
   storyOutputEl.textContent = currentStory;
 }
@@ -328,18 +365,58 @@ async function copyStory() {
   }
 }
 
-function exportMarkdown() {
-  if (!currentStory) return;
-  
-  const blob = new Blob([currentStory], { type: 'text/markdown' });
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `chronicle-${selectedTemplate}-${new Date().toISOString().split('T')[0]}.md`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+function exportMarkdown() {
+  if (!currentStory) return;
+
+  downloadFile(currentStory, `chronicle-${selectedTemplate}-${new Date().toISOString().split('T')[0]}.md`, 'text/markdown');
+}
+
+function exportJson() {
+  if (proofs.length === 0) {
+    alert('No proofs to export.');
+    return;
+  }
+
+  downloadFile(JSON.stringify(proofs, null, 2), `chronicle-proofs-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+}
+
+function importJson() {
+  const file = importFileEl.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data)) throw new Error('Expected a JSON array of proofs');
+
+      const imported = data.filter(isValidProof).map(normalizeProof);
+      if (imported.length === 0) {
+        alert('No valid proofs found in that file.');
+        return;
+      }
+
+      proofs = imported;
+      saveProofs();
+      renderTimeline();
+    } catch {
+      alert('Could not import: not a valid Chronicle JSON export.');
+    }
+  };
+  reader.readAsText(file);
+  importFileEl.value = '';
 }
 
 // Make removeProof available globally
