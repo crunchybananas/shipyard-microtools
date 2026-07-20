@@ -1109,6 +1109,7 @@ function applyAtmosphere(elapsed, dt) {
   wu.uDeep.value.copy(g.water);
   wu.uShallow.value.copy(g.waterShallow);
   wu.uSkyCol.value.copy(g.skyHorizon);
+  wu.uSkyTop.value.copy(g.skyTop);   // #42: the fresnel sky-mirror grades horizon→zenith with the reflection ray
   wu.uFogColor.value.copy(g.fog);
   wu.uFogDen.value = g.fogDen;
   wu.uNight.value = night;

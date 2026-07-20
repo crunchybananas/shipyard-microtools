@@ -41,7 +41,8 @@ export function makeWaterMaterial(heightTex, domain) {
       uSunCol: { value: new THREE.Color(0xfff4e0) },
       uDeep: { value: new THREE.Color(0x15454f) },
       uShallow: { value: new THREE.Color(0x4fae9d) },
-      uSkyCol: { value: new THREE.Color(0xbfe0ee) },
+      uSkyCol: { value: new THREE.Color(0xbfe0ee) },   // sky at the horizon (what grazing reflections see)
+      uSkyTop: { value: new THREE.Color(0x3a7ab8) },   // sky at the zenith (what steep reflections see)
       uFogColor: { value: new THREE.Color(0xcfe3e8) },
       uFogDen: { value: 0.003 },
       uNight: { value: 0 },
@@ -91,6 +92,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uniform vec3 uDeep;
       uniform vec3 uShallow;
       uniform vec3 uSkyCol;
+      uniform vec3 uSkyTop;
       uniform vec3 uFogColor;
       uniform float uFogDen;
       uniform float uNight;
@@ -129,8 +131,11 @@ export function makeWaterMaterial(heightTex, domain) {
         float dfac = 1.0 - exp(-depth * 0.32);
         vec3 body = mix(uShallow, uDeep, dfac);
 
-        // sky reflection
-        vec3 col = mix(body, uSkyCol, fresnel * 0.75);
+        // sky reflection — graded by the reflection ray's elevation, so grazing water mirrors
+        // the horizon band and steeper looks pick up the deeper zenith blue (sqrt ~ the sky
+        // shader's pow(up, 0.55) gradient; ~3 ALU on top of the old flat mix)
+        float refUp = sqrt(clamp(reflect(-V, N).y, 0.0, 1.0));
+        vec3 col = mix(body, mix(uSkyCol, uSkyTop, refUp), fresnel * 0.75);
 
         // caustics — sunlight dappling the sunlit SHALLOWS (daytime + shallow only, capped at
         // 0.3*sun so the broad sea never crosses the 0.85 bloom threshold; damped on the 1:240 clone)
