@@ -266,7 +266,9 @@ function drawBackground() {
   }
 }
 
-function drawGalaxy(galaxy, x, y, size) {
+// Renders a galaxy into the given context (the main canvas or an offscreen
+// sprite). The ctx parameter shadows the global so the body works for both.
+function drawGalaxy(ctx, galaxy, x, y, size) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(galaxy.rotation);
@@ -336,6 +338,44 @@ function drawGalaxy(galaxy, x, y, size) {
   ctx.fill();
   
   ctx.restore();
+}
+
+// Galaxy sprites are cached on offscreen canvases and blitted per frame
+// instead of redrawing hundreds of stars for every visible galaxy.
+const galaxySpriteCache = new Map();
+const GALAXY_SPRITE_MAX = 300;                       // above this, draw directly (only a couple visible)
+const GALAXY_SPRITE_AREA_BUDGET = 24 * 1024 * 1024;  // total cached pixels (~96MB RGBA)
+let galaxySpriteArea = 0;
+
+function getGalaxySprite(galaxy, size) {
+  const cached = galaxySpriteCache.get(galaxy.seed);
+
+  // Reuse until the on-screen size drifts too far from the cached render size
+  if (cached && size >= cached.size * 0.72 && size <= cached.size * 1.4) {
+    return cached;
+  }
+
+  // Bounding radius: elliptical galaxies reach 1.5x size, plus jitter + star radius
+  const half = Math.ceil(size * 1.7);
+  const sprite = document.createElement('canvas');
+  sprite.width = sprite.height = half * 2;
+  drawGalaxy(sprite.getContext('2d'), galaxy, half, half, size);
+
+  if (cached) galaxySpriteArea -= cached.canvas.width * cached.canvas.height;
+  const entry = { canvas: sprite, size, half };
+  galaxySpriteCache.set(galaxy.seed, entry);
+  galaxySpriteArea += sprite.width * sprite.height;
+
+  // Evict oldest sprites when over the pixel budget
+  for (const key of galaxySpriteCache.keys()) {
+    if (galaxySpriteArea <= GALAXY_SPRITE_AREA_BUDGET) break;
+    if (key === galaxy.seed) continue;
+    const old = galaxySpriteCache.get(key);
+    galaxySpriteArea -= old.canvas.width * old.canvas.height;
+    galaxySpriteCache.delete(key);
+  }
+
+  return entry;
 }
 
 function drawStar(star, x, y, size) {
@@ -545,8 +585,15 @@ function renderGalaxies(left, right, top, bottom) {
       
       if (screen.x > -size && screen.x < canvas.width + size &&
           screen.y > -size && screen.y < canvas.height + size) {
-        
-        drawGalaxy(galaxy, screen.x, screen.y, size);
+
+        if (size > GALAXY_SPRITE_MAX) {
+          // Zoomed close: only a couple galaxies fit on screen, draw at full res
+          drawGalaxy(ctx, galaxy, screen.x, screen.y, size);
+        } else {
+          const sprite = getGalaxySprite(galaxy, size);
+          const spriteHalf = sprite.half * (size / sprite.size);
+          ctx.drawImage(sprite.canvas, screen.x - spriteHalf, screen.y - spriteHalf, spriteHalf * 2, spriteHalf * 2);
+        }
         
         // Store for hover detection
         cachedGalaxies.push({
@@ -619,19 +666,22 @@ function renderStars(left, right, top, bottom) {
 }
 
 function renderSystem() {
-  // Find the closest star to focus on
-  if (!cachedSystem || cachedStars.length === 0) {
-    // Generate a system based on camera position
-    const seed = getSeed(Math.floor(camera.x / 50), Math.floor(camera.y / 50), 1);
+  if (!cachedSystem) {
+    // Seed from the star-grid cell origin — the same value renderStars hashes —
+    // so the system star matches the one that was drawn and clicked. Target
+    // coords are used because the camera may still be gliding toward them.
+    const gridSize = 50;
+    const cellX = Math.floor(camera.targetX / gridSize) * gridSize;
+    const cellY = Math.floor(camera.targetY / gridSize) * gridSize;
+    const seed = getSeed(cellX, cellY, 1);
     const star = generateStar(seed);
-    
+
     // Generate planets
     const planets = [];
-    const planetRng = new SeededRandom(seed + 1000);
     for (let i = 0; i < star.planets; i++) {
       planets.push(generatePlanet(seed + i + 100, i, star));
     }
-    
+
     cachedSystem = { star, planets };
   }
   
@@ -747,10 +797,19 @@ function getObjectDescription(obj) {
 
 canvas.addEventListener('wheel', (e) => {
   e.preventDefault();
-  
+
   const zoomFactor = e.deltaY > 0 ? 0.85 : 1.18;
-  camera.targetZoom = Math.max(0.5, Math.min(500000, camera.targetZoom * zoomFactor));
-  
+  const newZoom = Math.max(0.5, Math.min(500000, camera.targetZoom * zoomFactor));
+
+  // Zoom toward the pointer: keep the world point under the cursor fixed.
+  // Target values are used so successive wheel events compose correctly
+  // while the camera is still gliding.
+  const dx = e.clientX - canvas.width / 2;
+  const dy = e.clientY - canvas.height / 2;
+  camera.targetX += dx / camera.targetZoom - dx / newZoom;
+  camera.targetY += dy / camera.targetZoom - dy / newZoom;
+  camera.targetZoom = newZoom;
+
   // Clear cached system when zooming out
   if (camera.targetZoom < 5000) {
     cachedSystem = null;
