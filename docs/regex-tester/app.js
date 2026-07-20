@@ -342,7 +342,8 @@ Strong passwords must have:
 - At least 8 characters
 - Uppercase and lowercase letters
 - Numbers and special characters
-Example: MyP@ssw0rd123!`;
+Example:
+MyP@ssw0rd123!`;
 
   testStringInput.value = testString;
   updateMatches();
