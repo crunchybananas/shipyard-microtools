@@ -37,6 +37,16 @@
           </div>
 
           <div class="generator-card">
+            <h3>ULID</h3>
+            <p class="desc">Sortable 26-char Crockford base32 ID</p>
+            <div class="output-row">
+              <input type="text" id="ulid" readonly />
+              <button class="copy-btn" data-target="ulid">📋</button>
+            </div>
+            <button class="regen-btn" data-type="ulid">🔄 Regenerate</button>
+          </div>
+
+          <div class="generator-card">
             <h3>Nano ID</h3>
             <p class="desc">Compact URL-safe ID (21 chars)</p>
             <div class="output-row">
@@ -63,6 +73,7 @@
             <select id="bulkType">
               <option value="uuid4">UUID v4</option>
               <option value="uuid7">UUID v7</option>
+              <option value="ulid">ULID</option>
               <option value="nanoid">Nano ID</option>
               <option value="shortid">Short ID</option>
             </select>
