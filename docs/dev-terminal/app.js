@@ -85,11 +85,8 @@ A bench sits empty, inviting contemplation.`,
 
 // Escape user-supplied text before it goes into innerHTML
 function escapeHtml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(text).replace(/[&<>"']/g, ch => map[ch]);
 }
 
 // Process commands

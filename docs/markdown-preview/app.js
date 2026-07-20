@@ -172,7 +172,7 @@ copyHtmlBtn.addEventListener('click', () => {
 });
 
 // Initialize with placeholder content
-markdownInput.value = `# Hello Shipyard! 🚀
+markdownInput.value = `# Hello Microtools! 🚀
 
 This is a **live markdown preview** tool.
 
@@ -196,7 +196,7 @@ console.log(ship);
 
 ---
 
-Built for [Shipyard](https://shipyard.bot) 🛠️
+Built for [Microtools](https://github.com/crunchybananas/shipyard-microtools) 🛠️
 `;
 
 updatePreview();

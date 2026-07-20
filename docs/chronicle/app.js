@@ -173,9 +173,8 @@ function renderTimeline() {
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(text).replace(/[&<>"']/g, ch => map[ch]);
 }
 
 function safeUrl(url) {

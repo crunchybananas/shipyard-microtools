@@ -207,9 +207,8 @@ function updateSubstitution() {
 
 // Utility functions
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(text).replace(/[&<>"']/g, ch => map[ch]);
 }
 
 function copyToClipboard(text) {
@@ -331,8 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Sample test string
-  testString = `Contact us at: support@example.com or admin@shipyard.bot
-Visit our website: https://shipyard.bot
+  testString = `Contact us at: support@example.com or admin@example.org
+Visit our website: https://github.com/crunchybananas/shipyard-microtools
 Call us: +1-555-123-4567 or (555) 987-6543
 
 Colors: #FF5733, #C70039, #900C3F, #581845
