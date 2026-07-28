@@ -320,12 +320,20 @@ const _wingGeo = (side) => {
   return geo;
 };
 const WING_GEO_L = _wingGeo(-1), WING_GEO_R = _wingGeo(1);
-const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xb9b5a9, flatShading: true, roughness: 0.82, side: THREE.DoubleSide });
+// wing grey matched to the baked mantle so a folded wing reads as the bird's grey back,
+// not a stuck-on pale board (#46)
+const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xa9a69b, flatShading: true, roughness: 0.82, side: THREE.DoubleSide });
 const crowWingMat = new THREE.MeshStandardMaterial({ color: 0x24262b, flatShading: true, roughness: 0.7, metalness: 0.1, side: THREE.DoubleSide });
+// the FOLDED pose (#46): swept back AND rolled down the flank with the chord tucked
+// short, so the wing hugs the body like real folded primaries — the old pose left both
+// wings sticking out horizontally at shoulder height, the last blob-tell on the shore
+// gulls. tickPerched lerps from these exact constants on takeoff.
+const FOLD_Y = 1.42, FOLD_Z = 0.45, FOLD_CHORD = 0.72;
 const addWings = (g, mat) => {
   const lw = new THREE.Group(), rw = new THREE.Group();
-  lw.position.set(-0.05, 0.27, 0.03); rw.position.set(0.05, 0.27, 0.03);
-  lw.rotation.set(0, -1.5, 0.13); rw.rotation.set(0, 1.5, -0.13);     // start folded (tucked along the back)
+  lw.position.set(-0.05, 0.25, 0.03); rw.position.set(0.05, 0.25, 0.03);
+  lw.rotation.set(0, -FOLD_Y, FOLD_Z); rw.rotation.set(0, FOLD_Y, -FOLD_Z);
+  lw.scale.z = rw.scale.z = FOLD_CHORD;
   lw.add(new THREE.Mesh(WING_GEO_L, mat)); rw.add(new THREE.Mesh(WING_GEO_R, mat));
   g.add(lw, rw); g.lw = lw; g.rw = rw;
 };
@@ -346,7 +354,9 @@ const bakeBirdGeo = (parts) => {
   return b.build();
 };
 const gullGeo = (() => {
-  const white = new THREE.Color(0xe7e3d8), grey = new THREE.Color(0x95938b), beak = new THREE.Color(0xd6a233);
+  // mantle darkened a step (#46): the old 0x95938b washed to white in warm light and the
+  // whole bird read as one pale blob — now the grey back/folded-wing mass reads at range
+  const white = new THREE.Color(0xe7e3d8), grey = new THREE.Color(0x8d8b81), beak = new THREE.Color(0xd6a233);
   return bakeBirdGeo([
     [new THREE.SphereGeometry(0.16, 10, 8), white, 0, 0.17, 0, 0, 1, 0.86, 1.62],          // body
     [new THREE.SphereGeometry(0.155, 10, 7), grey, 0, 0.25, -0.02, 0, 0.92, 0.46, 1.5],    // mantle (folded wings / back)
@@ -1312,12 +1322,15 @@ function tickPerched(elapsed, dt) {
       u.cool -= dt;
       if (u.cool <= 0 && d > 14) u.flush = 0;
     }
-    // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the climb)
+    // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the
+    // climb). Rest pose = the FOLD_* constants from addWings; chord stretches back out as
+    // the wing opens.
     if (g.lw) {
       const spread = u.flush === 0 ? 0 : clamp(u.flush * 5, 0, 1);
       const flap = 0.18 + Math.sin(elapsed * 22 + u.ph) * 0.72;
-      g.rw.rotation.y = lerp(1.5, 0, spread); g.rw.rotation.z = lerp(-0.13, flap, spread);
-      g.lw.rotation.y = lerp(-1.5, 0, spread); g.lw.rotation.z = lerp(0.13, -flap, spread);
+      g.rw.rotation.y = lerp(FOLD_Y, 0, spread); g.rw.rotation.z = lerp(-FOLD_Z, flap, spread);
+      g.lw.rotation.y = lerp(-FOLD_Y, 0, spread); g.lw.rotation.z = lerp(FOLD_Z, -flap, spread);
+      g.lw.scale.z = g.rw.scale.z = lerp(FOLD_CHORD, 1, spread);
     }
   }
 }
