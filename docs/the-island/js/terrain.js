@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
 import { W } from './world.js';
+import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
 const SEA_FLOOR = -13;
@@ -358,6 +359,11 @@ export function buildTerrain() {
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     sh.uniforms.uTexAmt = { value: 0.7 };   // strength of the procedural sand-grain luminance detail
+    // waterline pass (#47/#38): the tide line, in OBJECT space so the 1:240 clone inherits it
+    sh.uniforms.uWaterY = { value: 0 };
+    sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uSunUp = { value: 1 };                       // daylight gate for the caustics
+    sh.uniforms.uCaustic = { value: getTexture('water_ripple') };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
     // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
@@ -372,6 +378,8 @@ export function buildTerrain() {
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
         uniform vec3 uHaze; uniform float uTexAmt;
+        uniform float uWaterY; uniform float uTime; uniform float uSunUp;
+        uniform sampler2D uCaustic;
         varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
@@ -419,6 +427,28 @@ export function buildTerrain() {
         float deGrid = (0.86 + 0.26 * macro) * (0.93 + 0.14 * fine);
         float detail = mix(0.82, 1.07, cGrain) * mix(1.0, deGrid, 1.0 - cMini);
         diffuseColor.rgb *= mix(1.0, detail, uTexAmt * cLand * (1.0 - cMini * 0.85));
+        // WATERLINE PASS — keys off uWaterY in OBJECT space (vTerH is the baked local height,
+        // the sea sits at local y = uWaterY), so the band RIDES the tide at every SEA-STRATA
+        // level and the 1:240 chart-table clone inherits the same tide line for free.
+        float wEdge = (vnoise(vLXZ * 0.6) - 0.5) * 0.34;   // meander the line — no ruler edges
+        float wDepth = uWaterY - vTerH + wEdge;             // >0 = submerged
+        // wet swash band (#47): the metre above the line reads soaked — darker, cooler
+        float wet = smoothstep(0.9, 0.12, -wDepth) * (1.0 - smoothstep(0.05, 0.5, wDepth));
+        wet *= 1.0 - cMini * 0.4;
+        diffuseColor.rgb *= mix(1.0, 0.64, wet);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.93, 0.99, 1.05), wet);
+        // submerged shift (#38): light dies warm-first — the drowned floor cools with depth
+        float subm = 1.0 - exp(-max(wDepth, 0.0) * 0.55);
+        diffuseColor.rgb *= mix(vec3(1.0), vec3(0.55, 0.76, 0.80), subm * (1.0 - cMini * 0.5));
+        // caustics (#38): two counter-scrolled dapple samples — their min makes travelling
+        // bright cells. Banded to the sunlit shallows, gone by ~4.5 m and on the 1:240 clone.
+        vec2 cuv1 = vLXZ * 0.100 + vec2(uTime * 0.020, -uTime * 0.016);
+        vec2 cuv2 = vLXZ * 0.117 + vec2(-uTime * 0.017, uTime * 0.021);
+        float cl1 = dot(texture2D(uCaustic, cuv1).rgb, vec3(0.299, 0.587, 0.114));
+        float cl2 = dot(texture2D(uCaustic, cuv2).rgb, vec3(0.299, 0.587, 0.114));
+        float caus = smoothstep(0.50, 0.88, min(cl1, cl2));
+        float causBand = smoothstep(0.06, 0.5, wDepth) * (1.0 - smoothstep(2.6, 4.5, wDepth));
+        diffuseColor.rgb *= 1.0 + caus * causBand * uSunUp * 1.1 * (1.0 - cMini);
       `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
       // global fog reaches it — depth + vastness without washing the near/mid ground

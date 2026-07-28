@@ -1221,9 +1221,14 @@ function applyAtmosphere(elapsed, dt) {
       if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
     }
   }
-  // terrain aerial perspective (#5a): far land melts toward the grade's haze
-  if (terrainMat?.userData.shader?.uniforms.uHaze) {
-    terrainMat.userData.shader.uniforms.uHaze.value.copy(scene.fog.color);
+  // terrain aerial perspective (#5a): far land melts toward the grade's haze —
+  // plus the waterline pass (#47/#38): tide line + caustics ride the live tide
+  if (terrainMat?.userData.shader) {
+    const tu = terrainMat.userData.shader.uniforms;
+    tu.uHaze.value.copy(scene.fog.color);
+    tu.uWaterY.value = waterY();
+    tu.uTime.value = elapsed;
+    tu.uSunUp.value = clamp((_sunV.y + 0.02) / 0.14, 0, 1);
   }
 
   // L2 fish-shadows: dark silhouettes gliding over the kelp floor in slow circles (#143).

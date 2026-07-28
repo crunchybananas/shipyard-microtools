@@ -138,10 +138,15 @@ export function makeWaterMaterial(heightTex, domain) {
         vec3 col = mix(body, mix(uSkyCol, uSkyTop, refUp), fresnel * 0.75);
 
         // caustics — sunlight dappling the sunlit SHALLOWS (daytime + shallow only, capped at
-        // 0.3*sun so the broad sea never crosses the 0.85 bloom threshold; damped on the 1:240 clone)
+        // 0.3*sun so the broad sea never crosses the 0.85 bloom threshold; damped on the 1:240
+        // clone). Two counter-scrolled samples, min'd (#38): the intersections travel and
+        // sharpen like true caustic cells instead of one sliding dapple sheet.
         vec2 cuv = vLocal.xz * 0.07 + vec2(uTime * 0.03, -uTime * 0.024);
-        float caus = smoothstep(0.55, 0.93, dot(texture2D(uCaustic, cuv).rgb, vec3(0.299, 0.587, 0.114)));
-        col += uSunCol * caus * (1.0 - dfac) * 0.3 * smoothstep(-0.02, 0.14, uSunDir.y) * mix(1.0, 0.2, mini);
+        vec2 cuv2 = vLocal.xz * 0.083 + vec2(-uTime * 0.026, uTime * 0.021);
+        float caus = smoothstep(0.50, 0.90, min(
+          dot(texture2D(uCaustic, cuv).rgb, vec3(0.299, 0.587, 0.114)),
+          dot(texture2D(uCaustic, cuv2).rgb, vec3(0.299, 0.587, 0.114))));
+        col += uSunCol * caus * (1.0 - dfac) * 0.38 * smoothstep(-0.02, 0.14, uSunDir.y) * mix(1.0, 0.2, mini);
 
         // sun glitter — a tight sun-disc core PLUS a broad, broken glitter road so
         // the low sun scatters across the swell (the single biggest "alive" cue).
@@ -165,15 +170,21 @@ export function makeWaterMaterial(heightTex, domain) {
         col += vec3(0.55, 0.65, 0.8) * pow(max(dot(R, V), 0.0), 350.0) * uNight * 1.2 * mix(1.0, 0.16, mini);
         col += vec3(0.50, 0.62, 0.80) * smoothstep(0.30, 0.92, pow(max(dot(Rg, V), 0.0), 40.0)) * uNight * 0.5 * mix(1.0, 0.14, mini);
 
-        // shoreline foam
+        // shoreline foam (#47): a lacy surf band PLUS a crisp bright collar right at the
+        // sand contact, so the waterline reads as surf instead of a clean vector edge.
+        float foamTex2 = texture2D(uFoam, vLocal.xz * 0.55 + vec2(-uTime * 0.013, uTime * 0.017)).r;
         float foamBand = 1.0 - smoothstep(0.0, 0.85, depth + (r1 - 0.5) * 0.4);
         float foamPulse = 0.65 + 0.35 * sin(uTime * 1.3 + vLocal.x * 0.18 + vLocal.z * 0.13);
-        float foam = foamBand * foamPulse;
+        float foam = foamBand * foamPulse * mix(0.72, 1.25, foamTex2);
+        // the collar: a narrow, near-solid white lip where depth -> 0, its edge broken by the
+        // second lace sample so it scallops along the beach like a real swash line
+        float collar = 1.0 - smoothstep(0.02, 0.24, depth + (foamTex2 - 0.5) * 0.10);
+        foam = max(foam, collar * (0.78 + 0.22 * foamPulse));
         // lacy foam structure — a sampled froth breaks the flat white band into strands (smoothed
         // toward solid white on the 1:240 clone via mini so the tiny model stays clean)
         float foamTex = texture2D(uFoam, vLocal.xz * 0.25 + vec2(uTime * 0.02, -uTime * 0.015)).r;
         vec3 foamCol = mix(vec3(0.86, 0.90, 0.88), vec3(0.95, 0.97, 0.95), mix(foamTex, 1.0, mini));
-        col = mix(col, foamCol, clamp(foam, 0.0, 1.0) * 0.85);
+        col = mix(col, foamCol, clamp(foam, 0.0, 1.0) * mix(0.85, 0.96, collar));
 
         // alpha: clear at the very shore, solid over depth
         float alpha = clamp(0.55 + dfac * 0.45 + fresnel * 0.2 + foam * 0.4, 0.0, 0.96);
