@@ -239,23 +239,24 @@ const A = {
     o.start(t0); o.stop(t0 + 0.45);
   },
 
-  // a standing stone hums
-  stoneTone(i, vol = 0.4) {
+  // a standing stone hums. damp 0..1 (#51): the deep's version — darker filter, a shade
+  // flat, quieter and longer, the hum arriving as through water.
+  stoneTone(i, vol = 0.4, damp = 0) {
     if (!this._running()) return;
-    const freq = STONE_NOTES[i] / 2; // an octave down: monoliths, not chimes
+    const freq = (STONE_NOTES[i] / 2) * (1 - damp * 0.028); // an octave down: monoliths, not chimes
     const t0 = ctx.currentTime;
     const g = ctx.createGain();
-    this._env(g, t0, 0.08, vol, 2.2);
+    this._env(g, t0, 0.08 + damp * 0.07, vol * (1 - damp * 0.4), 2.2 + damp * 0.9);
     for (const det of [-4, 3]) {
       const o = ctx.createOscillator();
       o.type = 'sawtooth';
       o.frequency.value = freq;
       o.detune.value = det;
       const f = ctx.createBiquadFilter();
-      f.type = 'lowpass'; f.frequency.setValueAtTime(900, t0);
-      f.frequency.exponentialRampToValueAtTime(220, t0 + 2.0);
+      f.type = 'lowpass'; f.frequency.setValueAtTime(900 - damp * 560, t0);
+      f.frequency.exponentialRampToValueAtTime(220 - damp * 90, t0 + 2.0 + damp * 0.8);
       o.connect(f).connect(g);
-      o.start(t0); o.stop(t0 + 2.6);
+      o.start(t0); o.stop(t0 + 2.6 + damp);
     }
     g.connect(this.fx);
   },

@@ -98,9 +98,13 @@ export class Game {
     I.add({
       id: 'crank', targets: [R.crankHandle], label: 'the sun crank', type: 'drag',
       onDrag: (dx) => {
-        W.time = ((W.time + dx * 0.011) % 24 + 24) % 24;
+        // SEA-STRATA depth response (#51): the hours drag heavy below the surface — the
+        // same pull moves less sky the deeper you carry it
+        const drag = W.level > 1 ? 1 / (1 + 0.5 * (W.level - 1)) : 1;
+        W.time = ((W.time + dx * 0.011 * drag) % 24 + 24) % 24;
         this._crankAcc = (this._crankAcc || 0) + Math.abs(dx);
         if (this._crankAcc > 26) { this._crankAcc = 0; A.crankTick(); }
+        if (W.level > 1) this.once('crankDeep', () => UI.whisper('The crank resists, as if the hours themselves have taken on water.'));
         if (this.flag('crankUsed')) {
           UI.whisper('The little lamp drags the real sun with it.');
           UI.addJournal('A crank turns the orrery lamp around the model — and the sky outside follows it. I hold the hours.');
@@ -114,12 +118,21 @@ export class Game {
       onClick: () => {
         if (this.boxPlaying) return;
         this.boxPlaying = true;
+        // SEA-STRATA depth response (#51): under a drowned sky the box is waterlogged —
+        // flat, slowed, muffled-long; and at the source the FOURTH note (the one he never
+        // could make his hands play true) does not come at all.
+        const depth = Math.max(0, W.level - 1);
+        const det = depth ? 0.945 - 0.015 * depth : 1;     // sinks further flat per level
+        const gap = 620 + depth * 130;                     // the mechanism drags
         BOX_MELODY.forEach((stoneIdx, n) => {
           setTimeout(() => {
-            A.pluck(STONE_NOTES[stoneIdx] * 2, 0, 0.4);
-            if (n === BOX_MELODY.length - 1) setTimeout(() => { this.boxPlaying = false; }, 900);
-          }, n * 620);
+            const missing = W.level >= 4 && n === 3;
+            if (!missing) A.pluck(STONE_NOTES[stoneIdx] * 2 * det, 0, depth ? 0.3 : 0.4, depth ? 2.1 : 1.4);
+            else this.once('boxMissingNote', () => UI.whisper('The fourth note does not come. Down here the box knows which note he never could play.'));
+            if (n === BOX_MELODY.length - 1) setTimeout(() => { this.boxPlaying = false; }, 900 + depth * 250);
+          }, n * gap);
         });
+        if (depth) this.once('boxDeep', () => UI.whisper('The song comes up slow and flat, as through water.'));
         if (this.flag('heardBox')) {
           UI.addJournal('The music box turns five notes: E · G · A · D · C. Someone wound it often.');
         }
@@ -495,7 +508,11 @@ export class Game {
   }
 
   _touchStone(i) {
-    A.stoneTone(i);
+    // SEA-STRATA depth response (#51): the deep air carries the hum damped — darker,
+    // a shade flat, longer — and says so once
+    const damp = W.level > 1 ? Math.min(1, 0.45 + 0.2 * (W.level - 2)) : 0;
+    A.stoneTone(i, 0.4, damp);
+    if (damp) this.once('stonesDeep', () => UI.whisper('The stones hum lower here, as through water.'));
     this.anim.stoneGlow[i] = 1;
     if (W.flags.birdSolved) return;
     this.stoneSeq.push(i);
