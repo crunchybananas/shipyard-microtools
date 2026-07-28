@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## audit-batch — 2026-07-27 — graphics + gameplay: the waterline, the horizon, the pier, the gulls, the depth
+
+**Shipped (owner session, 6 commits):** the 2026-07 audit's highest-impact graphics findings plus the
+gameplay do-first, verified per-issue against baseline screenshots:
+- **#47/#38 the waterline pass** — terrain learned the tide (`uWaterY` in object space): wet-sand
+  swash band with a meandered edge, submerged warm-light falloff, min-of-two counter-scrolled seabed
+  caustics; water got a scalloped foam collar + second lace scale + dual-scroll surface caustic.
+  Rides every SEA-STRATA level (verified L1 + L2 +1.47) and the 1:240 clone inherits the line.
+- **#37 farSea shader** — the horizon annulus mirrors a graded sky, carries the glitter road to the
+  horizon, and fuses into the fog with the near water's own law; shares the water's uniform objects
+  (zero per-frame upkeep). World sea circled at r=310 → the 280-438m double-draw band is gone.
+- **#45 the pier is timber** — silvered driftwood base, four lengthwise deck boards (gaps glint
+  water), per-piece instanceColor tone, baked tide-stain rings on the posts. No draw-count change.
+- **#46 gulls fold their wings** — FOLD constants shared by addWings/tickPerched (sweep+flank
+  roll+chord tuck); mantle darkened a step. Crows inherit.
+- **#51 depth responses** — the box plays waterlogged-flat and loses its FOURTH note at L4 (the note
+  he never could play true), the crank drags at half-pull by L3, the stones hum damped; all with
+  persisted once-whispers. Crank ratio verified exactly 0.5.
+- **#52 (progress) the L3 bell-buoy** — listing channel marker in the flooded chasm, untended
+  distance-faded toll (~13s swell clock) as L3's sound-led-nav cue + a proximity journal beat.
+
+**Evidence:** golden/night/noon shots per issue; clean no-debug boot, 0 console errors; 72 draws /
+403k tris beach pose. **Debt:** #52 still open (L3/L4 micro-puzzle, region4 landmark); deck grain
+relief reads strong at extreme grazing angles (acceptable, driftwood language).
+
+**Next tick suggestion:** #36 slope-aware rock relief (the east bluff is studied from 170m during
+the glyph puzzle and is guaranteed featureless) or finish #52's region4 landmark.
+
+---
+
 ## 92 — 2026-06-20 — responsive UI: the debug panel no longer hides the mute + a mobile pass
 
 **Shipped (local):** owner — "we need better responsive UI. on a small screen the debug panel hides
