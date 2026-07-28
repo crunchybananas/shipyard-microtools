@@ -5,7 +5,7 @@
 
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
-import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, TAU } from './util.js';
+import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, smoothstep, TAU } from './util.js';
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
@@ -1090,31 +1090,78 @@ export function buildWorld() {
   // owner's question, answered in space). Additive decorative geometry, no
   // collision/walkability change, set west of the drowned colonnade.
   {
-    const weather = new THREE.MeshStandardMaterial({ color: 0x8a7050, flatShading: false, roughness: 0.95 });
+    // silvered driftwood, not mud (#45): the old 0x8a7050 base multiplied the grain to a
+    // near-black slab in any backlight — the pier read as unfinished blockout against the
+    // golden sea. Lifted toward weathered bone-grey; the dory + shore scatter share the
+    // lift, so the whole driftwood language silvers together.
+    const weather = new THREE.MeshStandardMaterial({ color: 0xa2937c, flatShading: false, roughness: 0.95 });
     // weathered driftwood grain on the jetty + dory — the first Bender asset, loaded through
-    // the asset manifest (assets.js). They are the only wood props and the only users of this
-    // material; the 1:240 model clone shares it (the grain is invisible at that scale). The
-    // base colour is lightened toward bone so the texture multiplies to weathered grey-brown.
+    // the asset manifest (assets.js). The 1:240 model clone shares it (the grain is
+    // invisible at that scale).
     applyRelief(weather, 'driftwood', { normalScale: 0.7, strength: 2.2 });   // cracked-plank relief on the jetty + dory
     const jx = -18;
     const jetty = new THREE.Group(); jetty.name = 'jetty';
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 12), weather);
-    deck.position.set(jx, 1.05, -110.5); jetty.add(deck);
-    // planks/posts/bollards are identical single-material repeats — instance each
-    // run so the jetty (and its model clone) costs 3 draws, not 19 (perf, loop #47)
     const jm4 = new THREE.Matrix4();
+    const jQ = new THREE.Quaternion(), jV = new THREE.Vector3(), jS = new THREE.Vector3(1, 1, 1), jE = new THREE.Euler();
+    // per-piece timber tone (#45): every run carries instanceColor jitter — sun-bleached
+    // warm to salt-cooled grey — so the pier reads as hand-laid boards, not one extrusion
+    const jRng = mulberry32(SEED ^ 0x7e77);
+    const _jc = new THREE.Color();
+    const timberTone = (inst, i) => {
+      const t = jRng(), v = 0.86 + jRng() * 0.24;
+      inst.setColorAt(i, _jc.setRGB(v * (0.96 + t * 0.06), v * (0.93 + t * 0.03), v * (0.88 + t * 0.02)));
+    };
+    // the deck: four LENGTHWISE boards with tiny lay/height jitter in place of the old
+    // single 2.4x12 slab — the walk surface reads as planking from every angle. UVs
+    // repeat 4x along the run so the grain reads at board scale, not one 12m smear.
+    const deckGeo = new THREE.BoxGeometry(0.55, 0.14, 12.1);
+    { const du = deckGeo.attributes.uv; for (let v = 0; v < du.count; v++) du.setY(v, du.getY(v) * 4); }
+    const deckInst = new THREE.InstancedMesh(deckGeo, weather, 4);
+    [-0.9, -0.3, 0.3, 0.9].forEach((ox, i) => {
+      jm4.compose(jV.set(jx + ox, 1.05 + (jRng() - 0.5) * 0.02, -110.5 + (jRng() - 0.5) * 0.08),
+        jQ.setFromEuler(jE.set(0, (jRng() - 0.5) * 0.012, 0)), jS);
+      deckInst.setMatrixAt(i, jm4); timberTone(deckInst, i);
+    });
     const plankInst = new THREE.InstancedMesh(new THREE.BoxGeometry(2.5, 0.06, 0.5), weather, 7);
-    for (let i = 0; i < 7; i++) { jm4.makeTranslation(jx, 1.16, -105 - i * 1.85); plankInst.setMatrixAt(i, jm4); }
-    const postInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6), weather, 10);
+    for (let i = 0; i < 7; i++) {
+      jm4.compose(jV.set(jx + (jRng() - 0.5) * 0.06, 1.16, -105 - i * 1.85),
+        jQ.setFromEuler(jE.set(0, (jRng() - 0.5) * 0.03, 0)), jS);
+      plankInst.setMatrixAt(i, jm4); timberTone(plankInst, i);
+    }
+    // posts wear the sea (#45): a baked tide-stain ring — dark algae-cooled band through
+    // the waterline (world y -0.25..0.45), weed-green murk below — as VERTEX colour on the
+    // shared cylinder (all instances stand at the same depth, so one bake serves ten).
+    const postGeo = new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6);
+    {
+      const pp = postGeo.attributes.position, pc = new Float32Array(pp.count * 3);
+      for (let v = 0; v < pp.count; v++) {
+        const wy = pp.getY(v) - 1.1;                       // instance centre y = -1.1
+        const stain = smoothstep(0.75, 0.30, wy);          // darkening toward the line
+        const soak = smoothstep(0.05, -0.9, wy);           // always-under murk
+        let rr = 1 - stain * 0.34 - soak * 0.12;
+        let gg = 1 - stain * 0.26 - soak * 0.04;
+        let bb = 1 - stain * 0.28 - soak * 0.10;
+        pc[v * 3] = rr; pc[v * 3 + 1] = gg; pc[v * 3 + 2] = bb;
+      }
+      postGeo.setAttribute('color', new THREE.BufferAttribute(pc, 3));
+    }
+    const postMat = weather.clone();                       // same grain, + the stain bake
+    postMat.vertexColors = true;
+    const postInst = new THREE.InstancedMesh(postGeo, postMat, 10);
     let pj = 0;
     for (let i = 0; i < 5; i++) {                       // posts to the seabed
       const z = -105.5 - i * 2.6;
-      for (const px of [jx - 1.05, jx + 1.05]) { jm4.makeTranslation(px, -1.1, z); postInst.setMatrixAt(pj++, jm4); }
+      for (const px of [jx - 1.05, jx + 1.05]) {
+        jm4.compose(jV.set(px, -1.1, z), jQ.setFromEuler(jE.set(0, jRng() * Math.PI, (jRng() - 0.5) * 0.02)), jS);
+        postInst.setMatrixAt(pj, jm4); timberTone(postInst, pj); pj++;
+      }
     }
     const bollardInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.15, 0.18, 1.5, 6), weather, 2);
-    [jx - 1.0, jx + 1.0].forEach((px, i) => { jm4.makeTranslation(px, 1.75, -116.2); bollardInst.setMatrixAt(i, jm4); });
-    for (const inst of [plankInst, postInst, bollardInst]) inst.computeBoundingSphere();
-    jetty.add(plankInst, postInst, bollardInst);
+    [jx - 1.0, jx + 1.0].forEach((px, i) => {
+      jm4.makeTranslation(px, 1.75, -116.2); bollardInst.setMatrixAt(i, jm4); timberTone(bollardInst, i);
+    });
+    for (const inst of [deckInst, plankInst, postInst, bollardInst]) inst.computeBoundingSphere();
+    jetty.add(deckInst, plankInst, postInst, bollardInst);
     // a lantern on a post at the jetty's end — the way out, kept lit. Someone
     // leaves a light for a return that may never come (the point-light is in
     // main.js, warm and brightening at night, like a small shore beacon).
