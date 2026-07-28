@@ -8,7 +8,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
-import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
+import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
@@ -175,9 +175,12 @@ for (let i = 0; i < 5; i++) {
 sky.frustumCulled = false;
 scene.add(sky);
 
+// the horizon sea (#37): a real shader on the annulus — glitter road, sky mirror, fog —
+// sharing the near water's uniform objects so applyAtmosphere drives both. Inner radius
+// meets the world sea, which the water shader circles at r=310 (no more double-draw band).
 const farSea = new THREE.Mesh(
-  new THREE.RingGeometry(280, 9000, 48),
-  new THREE.MeshBasicMaterial({ color: 0x15454f }));
+  new THREE.RingGeometry(310, 9000, 64),
+  makeFarSeaMaterial(waterMat.uniforms));
 farSea.rotation.x = -Math.PI / 2;
 scene.add(farSea);
 
@@ -840,7 +843,7 @@ function startOarFinale() {
   const camStartPos = new THREE.Vector3(-26, 2.6, -116);
   const pivot = new THREE.Vector3(2, 0.9, -64); // the island's heart — the model collapses here
   camera.position.copy(camStartPos);
-  // a dark sea under the model: farSea is a RingGeometry(280,9000) with a 280-unit hole at
+  // a dark sea under the model: farSea is a RingGeometry(310,9000) with a 310-unit hole at
   // the origin that the full-size island normally fills; once the island shrinks away the
   // model would float over a void, so lay a flat dark disc across the gap for the terminal.
   oarSea = new THREE.Mesh(new THREE.CircleGeometry(1400, 48),
@@ -1114,7 +1117,7 @@ function applyAtmosphere(elapsed, dt) {
   wu.uFogDen.value = g.fogDen;
   wu.uNight.value = night;
 
-  farSea.material.color.copy(g.water).lerp(g.fog, 0.35);
+  // farSea shares the water material's uniform objects — the wu.* writes above drive it
   farSea.position.y = waterY() - 0.15;
 
   // the foreshadow ring — only while up on the gallery; sits at the NEXT level's waterline (the

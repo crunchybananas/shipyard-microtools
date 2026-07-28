@@ -118,6 +118,11 @@ export function makeWaterMaterial(heightTex, domain) {
         float scl = (fwidth(vWorld.x) + fwidth(vWorld.z)) / max(fwidth(vLocal.x) + fwidth(vLocal.z), 1e-6);
         float mini = 1.0 - smoothstep(0.05, 0.5, scl);
 
+        // circle the WORLD sea at r=310 so it meets the farSea ring's inner edge with a
+        // clean circular seam — the square plane's corners used to double-draw under the
+        // ring from 280 to 438m (#37). The 1:240 model keeps its square sheet (mini).
+        if (mini < 0.5 && dot(vLocal.xz, vLocal.xz) > 96100.0) discard;
+
         // ripple normal detail — gentled at 1:240 where it reads as chalk
         vec2 rp = vLocal.xz * 0.35 + vec2(uTime * 0.07, -uTime * 0.05);
         float r1 = fbm2(rp);
@@ -205,6 +210,84 @@ export function makeWaterMaterial(heightTex, domain) {
     `,
   });
   mat.name = 'waterMat';
+  return mat;
+}
+
+// -------------------------------------------------------------- far sea -----
+// The horizon annulus past the animated 620m sea (#37). The old flat
+// MeshBasicMaterial killed the glitter road — "the single biggest alive cue" —
+// at a visible seam. Slim shader, no fetches: fresnel sky mirror, drifting
+// glitter facets (coarse, so they hold up at range), sun + moon roads, and the
+// same exp2 fog law as the near water so the seam dissolves. Shares the near
+// water's uniform OBJECTS, so applyAtmosphere drives both for free.
+export function makeFarSeaMaterial(wu) {
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: wu.uTime,
+      uSunDir: wu.uSunDir,
+      uSunCol: wu.uSunCol,
+      uDeep: wu.uDeep,
+      uSkyCol: wu.uSkyCol,
+      uSkyTop: wu.uSkyTop,
+      uFogColor: wu.uFogColor,
+      uFogDen: wu.uFogDen,
+      uNight: wu.uNight,
+    },
+    vertexShader: /* glsl */`
+      varying vec3 vWorld;
+      void main() {
+        vec4 w = modelMatrix * vec4(position, 1.0);
+        vWorld = w.xyz;
+        gl_Position = projectionMatrix * viewMatrix * w;
+      }
+    `,
+    fragmentShader: /* glsl */`
+      uniform float uTime;
+      uniform vec3 uSunDir;
+      uniform vec3 uSunCol;
+      uniform vec3 uDeep;
+      uniform vec3 uSkyCol;
+      uniform vec3 uSkyTop;
+      uniform vec3 uFogColor;
+      uniform float uFogDen;
+      uniform float uNight;
+      varying vec3 vWorld;
+      ${GLSL_NOISE}
+
+      void main() {
+        vec3 V = normalize(cameraPosition - vWorld);
+        float d = length(cameraPosition - vWorld);
+        // drifting facets, two coarse scales (the near shader's fine facets alias out
+        // here); modulation depth fades with range so the horizon lane stays smooth
+        float att = 1.0 - smoothstep(500.0, 1800.0, d);
+        float gph = uTime * 1.1;
+        vec2 gp = vWorld.xz;
+        float f1 = sin(gp.x * 0.055 + gph)        * sin(gp.y * 0.050 - gph * 0.90);
+        float f2 = sin(gp.x * 0.021 - gph * 0.70) * sin(gp.y * 0.024 + gph * 0.80);
+        vec3 N = normalize(vec3(f1 * 0.10 * att + f2 * 0.05, 1.0, f2 * 0.10 * att + f1 * 0.05));
+        // sky mirror, graded by the reflection ray's elevation (matches the near #42 look)
+        vec3 R = reflect(-V, N);
+        float refUp = sqrt(clamp(R.y, 0.0, 1.0));
+        float fres = pow(1.0 - max(V.y, 0.0), 3.0);
+        vec3 col = mix(uDeep, mix(uSkyCol, uSkyTop, refUp), clamp(0.30 + fres * 0.60, 0.0, 1.0));
+        // the glitter road, restored to the horizon: broad lobe + a hot core near the mirror
+        vec3 Rs = reflect(-normalize(uSunDir), N);
+        float sunUp = smoothstep(-0.05, 0.12, uSunDir.y);
+        float road = pow(max(dot(Rs, V), 0.0), 42.0);
+        col += uSunCol * road * (0.50 + 0.55 * smoothstep(0.70, 0.97, road)) * sunUp;
+        // moon road at night — same facet mirror, cool and dim (the near shader's trick)
+        col += vec3(0.50, 0.62, 0.80) * pow(max(dot(Rs, V), 0.0), 60.0) * uNight * 0.55;
+        // same manual exp2 fog as the near water: the outer ring settles into the haze
+        float fogF = 1.0 - exp(-pow(d * uFogDen, 2.0));
+        col = mix(col, uFogColor, fogF);
+        col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0;   // dither the long smooth lanes
+        gl_FragColor = vec4(col, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
+  });
+  mat.name = 'farSeaMat';
   return mat;
 }
 
