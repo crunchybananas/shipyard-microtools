@@ -429,6 +429,34 @@ export function buildWorld() {
     const floor = new THREE.CylinderGeometry(baseR + 0.2, baseR + 0.2, 0.3, 28);
     stone.add(floor, new THREE.Matrix4().makeTranslation(LH.x, LH.y - 0.07, LH.z), grad(C.stoneOld, C.boneDark));
     floor.dispose();
+    // CONTACT AO (#43): the room players study longest had a gradient floor under
+    // shadowless point lights — table legs and shelves visibly floated. The cylinder cap
+    // is a vertex FAN (centre + rim only), so pools can't bake into it; lay a finely
+    // tessellated ring 5mm proud as the walk surface and darken it by proximity to the
+    // known furniture footprints. CPU-only, +0 draws (same stone bake), clone inherits.
+    {
+      const FEET = [
+        [0, 0, 1.9, 0.14],                                              // chart table's soft under-shadow
+        [-1.25, -1.25, 0.4, 0.42], [1.25, -1.25, 0.4, 0.42],            // its four legs
+        [-1.25, 1.25, 0.4, 0.42], [1.25, 1.25, 0.4, 0.42],
+        [2.3, 1.1, 0.36, 0.4],                                          // valve pedestal
+        [2.2, -1.4, 0.78, 0.2],                                         // brass plate, seated
+        [Math.sin(deg(285)) * 4.4, Math.cos(deg(285)) * 4.4, 1.2, 0.26],  // bookshelf bays
+        [Math.sin(deg(323)) * 4.4, Math.cos(deg(323)) * 4.4, 1.2, 0.26],
+        [-3.6, -2.6, 0.8, 0.2],                                         // music-box shelf
+      ];
+      const floorTop = new THREE.RingGeometry(0.02, baseR + 0.2, 56, 24);
+      floorTop.rotateX(-Math.PI / 2);
+      stone.add(floorTop, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 0.085, LH.z), (t, wv) => {
+        let ao = 0;
+        for (const [fx, fz, fr, fs] of FEET) {
+          const d = Math.hypot(wv.x - (LH.x + fx), wv.z - (LH.z + fz));
+          ao += fs * (1 - smoothstep(fr * 0.4, fr, d));
+        }
+        return C.boneDark.clone().multiplyScalar(1 - Math.min(0.52, ao));
+      });
+      floorTop.dispose();
+    }
     const ceil = new THREE.RingGeometry(1.25, baseR + 0.1, 28);
     ceil.rotateX(Math.PI / 2);
     stone.add(ceil, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH, LH.z), grad(C.boneDark, C.boneDark));

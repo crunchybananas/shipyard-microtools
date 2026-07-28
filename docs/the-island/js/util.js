@@ -102,7 +102,8 @@ export class Baker {
     this.uvs = [];
   }
 
-  // geo: BufferGeometry, matrix: Matrix4, color: THREE.Color | (y01)=>Color
+  // geo: BufferGeometry, matrix: Matrix4, color: THREE.Color | (y01, worldPos)=>Color
+  // (the callback's 2nd arg is the WORLD-space vertex — contact-AO bakes key off it, #43)
   add(geo, matrix, color) {
     const src = geo.index ? geo.toNonIndexed() : geo;
     const pos = src.attributes.position;
@@ -126,7 +127,7 @@ export class Baker {
       wp[i * 3] = v.x; wp[i * 3 + 1] = v.y; wp[i * 3 + 2] = v.z;
       this.positions.push(v.x, v.y, v.z);
       this.normals.push(n.x, n.y, n.z);
-      const c = typeof color === 'function' ? color((pos.getY(i) - minY) / span) : color;
+      const c = typeof color === 'function' ? color((pos.getY(i) - minY) / span, v) : color;
       this.colors.push(c.r, c.g, c.b);
     }
 
