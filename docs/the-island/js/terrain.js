@@ -240,8 +240,10 @@ export function wallBlocked(x0, z0, x1, z1) {
 
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
-  // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2
-  if (W.level >= 2) {
+  // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2 —
+  // and it STAYS open once you have returned from the bottom ("the door, the coat — all as
+  // you left them"): the surface after the descent keeps the quarters walkable.
+  if (W.level >= 2 || W.flags.returned) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;
   } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.65) {
     return true;

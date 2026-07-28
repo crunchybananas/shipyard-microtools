@@ -1178,8 +1178,9 @@ function applyAtmosphere(elapsed, dt) {
       d.scale.setScalar(clamp(Math.min(u.phase / 0.07, (1 - u.phase) / 0.07), 0, 1));
     }
   }
-  // the keeper's lamp burns one level down, with a faint lamp-oil flicker
-  keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
+  // the keeper's lamp burns one level down, with a faint lamp-oil flicker — and stays
+  // warm after the return (integration relights the hearth: "two lights now")
+  keeperLamp.intensity = ((W.level >= 2 || W.flags.returned) ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
   // the jetty beacon: a low warm glow by day, a real beacon by night
   jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7));
   // the globe blooms a soft halo and burns brighter as night falls — a light

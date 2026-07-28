@@ -448,7 +448,9 @@ export class Game {
     });
     if (R.coat) I.add({
       id: 'coatLetter', targets: [R.coat], label: 'a letter in the coat', maxDist: 2.8,
-      when: () => W.level >= 2,                 // the folded letter surfaces once you've begun to descend
+      // surfaces once you've begun to descend — and stays readable after the return
+      // (the quarters keep their door; what you earned below is not re-sealed above)
+      when: () => W.level >= 2 || W.flags.returned,
       onClick: () => UI.openReader('coat_letter'),
     });
     if (R.inscribedStone) I.add({
@@ -480,7 +482,9 @@ export class Game {
     });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
-      when: () => W.level >= 1,                 // the quarters open one level down
+      // the quarters open one level down (the old `>= 1` gate was a no-op that let the
+      // journal be clicked through the sealed doorway at L1); readable again post-return
+      when: () => W.level >= 2 || W.flags.returned,
       onClick: () => UI.openReader('quarters_journal'),
     });
 
@@ -581,7 +585,7 @@ export class Game {
     ease('vault', F.birdSolved ? 1 : 0, 0.9);
     ease('hatch', F.hatchOpen ? 1 : 0, 1.2);
     ease('boxLid', this.boxPlaying ? 1 : 0, 3);
-    ease('innerDoor', W.level >= 2 ? 1 : 0, 1.0);
+    ease('innerDoor', (W.level >= 2 || W.flags.returned) ? 1 : 0, 1.0);   // stays open once returned
 
     // lamp + beam
     W.lampLit = W.lensPlaced && isNight();
