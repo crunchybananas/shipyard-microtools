@@ -175,6 +175,30 @@ export function buildWorld() {
     cairn.receiveShadow = false;
     region3.add(cairn);
   }
+  // SEA-STRATA L3 bell-buoy (#52): region3's open-water LANDMARK — an iron channel
+  // marker listing in the flooded gap between the bluff and the island, visible from the
+  // L3 bluff spawn and passed on the ramp descent. It tolls untended on the swell
+  // (puzzles _tickBuoy: damped, distance-faded — L3's sound-led nav) and lands a journal
+  // beat when first approached. The channel it marked is under all of this now.
+  {
+    const buoy = new THREE.Group();
+    buoy.name = 'bellBuoy';
+    const rust = new THREE.MeshStandardMaterial({ color: 0x8a4b32, roughness: 0.92, flatShading: true });
+    const iron = new THREE.MeshStandardMaterial({ color: 0x2e3134, roughness: 0.85, flatShading: true });
+    const bronze = new THREE.MeshStandardMaterial({ color: 0x7a6a3c, roughness: 0.6, metalness: 0.35, flatShading: true });
+    const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.78, 0.52, 8), rust);
+    const skirt = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.5, 0.4, 8), iron);   // the waterline underbody
+    skirt.position.y = -0.42;
+    const cage = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.05, 4, 1, true), iron);    // 4-sided open frame tower
+    cage.position.y = 0.75;
+    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 0.22, 8), bronze);
+    bell.position.y = 0.62;
+    buoy.add(skirt, hull, cage, bell);
+    buoy.rotation.set(0.07, 0.6, 0.30);            // listing — long untended
+    // floats at the L3 waterline (+2.73; region3 only shows at L3), half-sunk by the list
+    buoy.position.set(52, 2.5, 12);
+    region3.add(buoy);
+  }
   const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
   // SEA-STRATA L4 'source' hidden fragment (loop #135): a folded note weighted with a stone, left
   // on the study floor by the chart table — the keeper's last instruction, a diegetic frame for the
@@ -2528,7 +2552,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments & L2 fish-shadows (loop #117/#121/#127/#132/#134/#135/#143)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];
 

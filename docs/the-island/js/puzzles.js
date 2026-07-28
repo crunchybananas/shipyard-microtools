@@ -774,10 +774,34 @@ export class Game {
 
     this._tickWatcher(dt);
     this._tickTideFigure(dt);
+    this._tickBuoy(dt);
 
     // apply to both islands
     this._apply(this.refs, false, elapsed);
     this._apply(this.modelRefs, true, elapsed);
+  }
+
+  // SEA-STRATA L3 bell-buoy (#52): the drowned channel's marker still keeps its watch.
+  // An untended toll on an uneven swell clock — damped-long like everything down here,
+  // fading with distance but never quite gone (L3's sound-led nav cue) — and a journal
+  // beat the first time you come near it (the ramp descent passes ~15m away).
+  _tickBuoy(dt) {
+    if (!this.refs.bellBuoy || W.level !== 3) return;
+    this._buoyT = (this._buoyT || 0) + dt;
+    const period = 13 + 3.5 * Math.sin((this._buoyRing || 0) * 2.7);
+    if (this._buoyT > period) {
+      this._buoyT = 0; this._buoyRing = (this._buoyRing || 0) + 1;
+      const d = Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12);
+      const vol = Math.max(0.06, 0.34 * (1 - d / 160));
+      A.pluck(174.6, 0, vol, 3.6);              // F3 — a sea-bell's low toll, waterlogged-long
+      A.pluck(352.8, 0.03, vol * 0.35, 2.4);    // detuned octave shimmer over it
+    }
+    if (Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12) < 26) {
+      this.once('bellBuoySeen', () => {
+        UI.whisper('A bell-buoy, listing in the drowned channel. It keeps ringing anyway.');
+        UI.addJournal('A bell-buoy lists out in the flooded channel between the bluff and the island, tolling to no one on the swell. It marked the safe water once. The safe water is under all of this now, and still it keeps its one job — some kept things outlive the thing they kept.', '', 'self');
+      });
+    }
   }
 
   // THE WATCHER — grief given form (the owner's "goblins"). Active only deep (W.level>=3) and
