@@ -18,7 +18,8 @@
 // the line: his words are always in quotes.
 export const KEEPER = {
   // when the figure looks back as you lean over the chart-table model, at depth (#14).
-  // keyed by W.level; level 2 falls through to the level-4 line, as it always has.
+  // keyed by W.level; the look fires only from L3 down (puzzles gates at W.level >= 3),
+  // and at the bottom the look[4] line opens the twist beat.
   look: {
     3: '“Oh. Not again.”',
     4: '“You’re faster than I was. Don’t be proud of it.”',
@@ -246,4 +247,21 @@ export const SKETCHES = [
   ['note has writing on its back', S('<path d="M22 23h26v12H22z"/><path d="M48 25l8 1v8l-8 1" opacity=".8"/><path d="M56 27h6v6h-6" opacity=".7"/><path d="M26 27h18M26 31h12" opacity=".45"/>')],
   ['one hand grinding one lens', S('<circle cx="40" cy="19" r="11"/><path d="M48 27l16 13" /><path d="M35 14a8 8 0 0 1 8 1" opacity=".5"/><path d="M40 19h0" /><path d="M58 30l8 4" opacity="0"/>')],
   ['worn smooth by everyone who climbed back', S('<path d="M30 12v16M37 12v16M44 12v16M51 12v16" /><path d="M26 26l29-18" opacity=".8"/><path d="M20 32h54" opacity=".45"/>')],
+  // STORY PASS (2026-07-27): sixteen journal entries still rendered bare — including the
+  // twist's own climaxes and both endings. The rest of the missing marginalia, same hand.
+  ['lit at both ends of the', S('<path d="M14 36h12v-7h12v-7h12v-7h12v-7h12" opacity=".75"/><path d="M20 33q-2-4 0-6q2 2 0 6z"/><path d="M72 5q-2-4 0-6q2 2 0 6z" transform="translate(0 6)"/><path d="M20 26v-2M72 12v-2" opacity=".4"/>')],
+  ['lighthouse lamp’s eye', S('<path d="M40 8l16 0 -3 24h-10z" opacity=".5"/><circle cx="48" cy="20" r="7"/><circle cx="48" cy="20" r="2.6" opacity=".8"/><path d="M35 20h-6M67 20h-6M48 7v-4" opacity=".45"/>')],
+  ['left the light on, and I have left', S('<path d="M70 30V12l4-5 4 5v18" opacity=".8"/><path d="M74 12h0M70 18h8" opacity=".45"/><path d="M14 32q8 4 16 0l-2-6h-12z"/><path d="M22 26v-8M22 18l6 3" opacity=".7"/><path d="M36 33h52" opacity=".3"/>')],
+  ['keeper’s reading glass on the islet', S('<circle cx="38" cy="18" r="9"/><path d="M45 25l14 11"/><path d="M33 16h10M33 20h7" opacity=".55"/><path d="M60 12h14M60 16h10" opacity=".25"/>')],
+  ['bell-buoy lists', S('<g transform="rotate(14 48 24)"><path d="M38 30h20l-4-8h-12z" opacity=".8"/><path d="M42 22l6-12 6 12"/><path d="M45 17h6v4h-6z" opacity=".85"/></g><path d="M14 32q10 4 20 0t20 0t20 0t14 0" opacity=".45"/>')],
+  ['toward me when I looked away', S('<path d="M64 34c0-8 3-12 6-12s6 4 6 12" opacity=".85"/><circle cx="70" cy="18" r="3.6" opacity=".85"/><circle cx="26" cy="16" r="6"/><circle cx="26" cy="16" r="2" opacity=".8"/><path d="M34 16h22" opacity=".35"/>')],
+  ['stood in the kelp and slipped off', S('<path d="M24 36c-3-8-2-18 2-26M34 36c-2-6-1-14 2-22M74 36c3-8 2-18-2-26M64 36c2-6 1-14-2-22" opacity=".5"/><path d="M44 35c0-7 2-11 5-11s5 4 5 11" opacity=".7"/><circle cx="49" cy="19" r="3.2" opacity=".6"/>')],
+  ['ground lenses to keep a light', S('<path d="M18 32V12h22v20" opacity=".7"/><path d="M18 12q11-5 22 0M22 17h14M22 21h14M22 25h9" opacity=".5"/><path d="M62 30V16l4-5 4 5v14" opacity=".8"/><path d="M66 16h0M62 21h8" opacity=".45"/>')],
+  ['A letter in the coat pocket', S('<path d="M40 6l-9 6v22h34V12l-9-6z" opacity=".6"/><path d="M40 6h16v6H40z" opacity="0"/><rect x="42" y="20" width="16" height="10" rx="1"/><path d="M42 20l8 6 8-6" opacity=".8"/>')],
+  ['worn soft by the sea', S('<path d="M40 36V14c0-4 3-7 8-7s8 3 8 7v22z"/><path d="M45 18h10M45 23h10M45 28h7" opacity=".45"/><path d="M12 36q8-4 16 0M68 36q8-4 16 0" opacity=".5"/>')],
+  ['A bottle on the beach', S('<g transform="rotate(-8 44 24)"><path d="M40 34V18q0-4 4-6v-4h4v4q4 2 4 6v16z"/><path d="M42 22h8v8h-8z" opacity=".5"/></g><path d="M14 36h68" opacity=".4"/><circle cx="76" cy="8" r="4" opacity=".5"/>')],
+  ['under the pillow', S('<path d="M16 30h56v4H16z" opacity=".7"/><path d="M20 30v-4q0-2 2-2h20q4 0 4 4v2" opacity=".85"/><rect x="52" y="22" width="14" height="8" rx="1"/><path d="M59 22v8" opacity=".5"/>')],
+  ['lampblack on the chart too small', S('<rect x="26" y="8" width="34" height="24" rx="1" opacity=".6"/><path d="M30 14h20M30 18h24M30 22h16" opacity=".2"/><circle cx="56" cy="24" r="7"/><path d="M61 29l10 8" /><path d="M52 24h8" opacity=".7"/>')],
+  ['Hair-fine letters on a standing stone', S('<path d="M38 36V13c0-4 3-6 8-6s8 2 8 6v23z"/><path d="M42 17h8M42 20h8M42 23h6" opacity=".18"/><circle cx="60" cy="24" r="6"/><path d="M64 28l9 7" opacity=".8"/>')],
+  ['bends it down where the bird bends it up', S('<rect x="12" y="24" width="20" height="10" rx="2"/><circle cx="46" cy="18" r="2"/><circle cx="54" cy="15" r="2"/><circle cx="62" cy="12" r="2"/><circle cx="70" cy="22" r="2" opacity=".55"/><path d="M70 18q3-6 0-10" opacity=".4"/><circle cx="80" cy="9" r="2"/><path d="M84 6q4-2 6 1" opacity=".5"/>')],
 ];
