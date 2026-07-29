@@ -105,7 +105,16 @@ let waves = [];
 // ── Resize ────────────────────────────────────────────────
 function resize() {
   const s = Math.min(window.innerWidth, window.innerHeight - 120, 900);
+  if (s === canvas.width && s === canvas.height) return;
+  const prev = canvas.width;
   canvas.width = s; canvas.height = s;
+  if (stars.length && prev > 0) {
+    // Rescale the existing layout so the world stays stable across resizes
+    const k = s / prev;
+    for (const st of stars) { st.x *= k; st.y *= k; }
+    for (const w of waves) { w.y *= k; }
+    return;
+  }
   stars = [];
   for (let i = 0; i < 120; i++) {
     stars.push({ x: Math.random()*s, y: Math.random()*s*0.5, r: 0.3+Math.random()*1.2, phase: Math.random()*Math.PI*2 });
@@ -247,6 +256,46 @@ function spawnShip() {
   });
 }
 
+// ── Audio — synthesized from nothing, no files (docs/fathom pattern) ──
+const audio = (() => {
+  let ctx = null, master = null;
+  const ensure = () => {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      ctx = new AC();
+      master = ctx.createGain(); master.gain.value = 0.4; master.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return true;
+  };
+  const tone = (type, f0, f1, start, dur, amp) => {
+    const t = ctx.currentTime + start;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(amp, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(master);
+    o.start(t); o.stop(t + dur + 0.05);
+  };
+  return {
+    unlock() { ensure(); }, // call from a user gesture so cues can play later
+    rescue() { // bright rising chime
+      if (!ensure()) return;
+      tone('sine', 523, 659, 0, 0.18, 0.25);
+      tone('sine', 784, 1047, 0.09, 0.3, 0.2);
+    },
+    danger() { // low groaning descent
+      if (!ctx) return;
+      tone('sawtooth', 130, 55, 0, 0.7, 0.18);
+      tone('sine', 65, 40, 0, 0.9, 0.25);
+    },
+  };
+})();
+
 // ── Signal ────────────────────────────────────────────────
 function flashSignal(color) {
   signalQueue.push(color);
@@ -275,6 +324,7 @@ function checkSignals() {
     score += 100 * wave;
     saved++;
     signalQueue = [];
+    audio.rescue();
     updateHUD();
   } else if (signalQueue.length >= required.length + 2) {
     // Too many wrong signals — clear and penalize
@@ -311,6 +361,7 @@ function update() {
     if (ship.distance <= ship.safeDistance && !ship.wrecked) {
       ship.wrecked = true;
       wrecks++;
+      audio.danger();
       updateHUD();
       if (wrecks >= maxWrecks) endGame();
     }
@@ -327,10 +378,11 @@ function update() {
   if (spawnTimer >= spawnInterval) {
     spawnTimer = 0;
     spawnShip();
-    // Wave progression
-    if (saved > 0 && saved % 5 === 0) {
-      wave++;
-      spawnInterval = Math.max(60, spawnInterval - 12);
+    // Wave progression — one wave per 5 ships saved, advanced once per threshold crossing
+    const targetWave = Math.floor(saved / 5) + 1;
+    if (targetWave > wave) {
+      spawnInterval = Math.max(60, spawnInterval - 12 * (targetWave - wave));
+      wave = targetWave;
       document.getElementById('hud-wave').textContent = wave;
     }
   }
@@ -518,6 +570,7 @@ function startGame() {
   ships = []; signalQueue = []; score = 0; saved = 0; wrecks = 0; wave = 1;
   spawnTimer = 0; spawnInterval = 180; time = 0; beam.angle = 0;
   running = true; gameOver = false;
+  audio.unlock();
   updateHUD();
   document.getElementById('hud-wave').textContent = '1';
   // Initial ship
@@ -549,7 +602,6 @@ document.addEventListener('keydown', (e) => {
 
 // Render start screen background
 (function renderBg() {
-  resize();
   beam.angle += 0.005;
   render();
   if (!running) requestAnimationFrame(renderBg);

@@ -118,7 +118,14 @@ function updateMatches() {
     return;
   }
 
-  const matches = [...testString.matchAll(regex)];
+  // matchAll throws for non-global regexes; run exec once and show a single match instead
+  let matches;
+  if (regex.global) {
+    matches = [...testString.matchAll(regex)];
+  } else {
+    const singleMatch = regex.exec(testString);
+    matches = singleMatch ? [singleMatch] : [];
+  }
   matchCountEl.textContent = `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
 
   // Highlight matches in text
@@ -200,9 +207,8 @@ function updateSubstitution() {
 
 // Utility functions
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(text).replace(/[&<>"']/g, ch => map[ch]);
 }
 
 function copyToClipboard(text) {
@@ -324,8 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Sample test string
-  testString = `Contact us at: support@example.com or admin@shipyard.bot
-Visit our website: https://shipyard.bot
+  testString = `Contact us at: support@example.com or admin@example.org
+Visit our website: https://github.com/crunchybananas/shipyard-microtools
 Call us: +1-555-123-4567 or (555) 987-6543
 
 Colors: #FF5733, #C70039, #900C3F, #581845
@@ -335,7 +341,8 @@ Strong passwords must have:
 - At least 8 characters
 - Uppercase and lowercase letters
 - Numbers and special characters
-Example: MyP@ssw0rd123!`;
+Example:
+MyP@ssw0rd123!`;
 
   testStringInput.value = testString;
   updateMatches();

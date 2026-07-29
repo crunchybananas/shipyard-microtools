@@ -63,10 +63,10 @@
           <div class="pattern-buttons">
             <button class="pattern-btn" data-pattern="\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b" data-flags="i">Email</button>
             <button class="pattern-btn" data-pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)" data-flags="g">URL</button>
-            <button class="pattern-btn" data-pattern="^(?:(?:\+|00)(\d{1,3}))?[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$" data-flags="">Phone</button>
+            <button class="pattern-btn" data-pattern="(?:\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b" data-flags="g">Phone</button>
             <button class="pattern-btn" data-pattern="#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})" data-flags="g">Hex Color</button>
             <button class="pattern-btn" data-pattern="\b(?:\d{1,3}\.){3}\d{1,3}\b" data-flags="g">IPv4</button>
-            <button class="pattern-btn" data-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" data-flags="">Strong Password</button>
+            <button class="pattern-btn" data-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" data-flags="m">Strong Password</button>
           </div>
         </div>
       </section>
@@ -162,7 +162,7 @@
     </div>
 
     <footer class="footer">
-      Built for Shipyard • shipyard.bot
+      Part of <a href="https://github.com/crunchybananas/shipyard-microtools">Microtools</a>
     </footer>
 
     <script src="app.js"></script>

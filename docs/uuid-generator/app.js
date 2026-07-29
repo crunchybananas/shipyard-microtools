@@ -11,6 +11,9 @@ function showStatus(message) {
 
 // UUID v4 (random)
 function generateUUID4() {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0;
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -18,15 +21,38 @@ function generateUUID4() {
   });
 }
 
-// UUID v7 (time-ordered)
+// UUID v7 (time-ordered): 48-bit unix ms timestamp, version 7, variant 10, 74 random bits
 function generateUUID7() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
   const now = Date.now();
-  const timestamp = now.toString(16).padStart(12, '0');
-  const random = Array.from({ length: 4 }, () => 
-    Math.floor(Math.random() * 65536).toString(16).padStart(4, '0')
-  ).join('');
-  
-  return `${timestamp.slice(0, 8)}-${timestamp.slice(8, 12)}-7${random.slice(0, 3)}-${(0x8 | (Math.random() * 4 | 0)).toString(16)}${random.slice(4, 7)}-${random.slice(7, 19)}`;
+  bytes[0] = Math.floor(now / 2 ** 40) & 0xff;
+  bytes[1] = Math.floor(now / 2 ** 32) & 0xff;
+  bytes[2] = Math.floor(now / 2 ** 24) & 0xff;
+  bytes[3] = Math.floor(now / 2 ** 16) & 0xff;
+  bytes[4] = Math.floor(now / 2 ** 8) & 0xff;
+  bytes[5] = now & 0xff;
+  bytes[6] = (bytes[6] & 0x0f) | 0x70; // version nibble = 7
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant bits = 10
+
+  const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+// ULID (Crockford base32: 48-bit timestamp + 80-bit randomness, 26 chars)
+function generateULID() {
+  const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  let time = Date.now();
+  let timePart = '';
+  for (let i = 0; i < 10; i++) {
+    timePart = alphabet[time % 32] + timePart;
+    time = Math.floor(time / 32);
+  }
+  let randomPart = '';
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  for (let i = 0; i < 16; i++) {
+    randomPart += alphabet[bytes[i] % 32];
+  }
+  return timePart + randomPart;
 }
 
 // Nano ID (URL-safe, 21 chars)
@@ -54,6 +80,7 @@ function generateShortID() {
 const generators = {
   uuid4: generateUUID4,
   uuid7: generateUUID7,
+  ulid: generateULID,
   nanoid: generateNanoID,
   shortid: generateShortID
 };

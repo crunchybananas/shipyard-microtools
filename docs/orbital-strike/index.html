@@ -42,7 +42,10 @@
         <div class="crosshair">
           <div class="crosshair-dot"></div>
         </div>
-        
+
+        <!-- Hit Marker -->
+        <div class="hit-marker" id="hitMarker">✕</div>
+
         <!-- Wave Info -->
         <div class="wave-info">
           <div class="wave-number">WAVE</div>
@@ -52,9 +55,9 @@
         
         <!-- Radar -->
         <div class="radar">
+          <canvas id="radarCanvas" width="116" height="116"></canvas>
           <div class="radar-sweep"></div>
           <div class="radar-center"></div>
-          <div id="radarBlips"></div>
         </div>
         
         <!-- Health Bar -->
@@ -79,6 +82,9 @@
         <!-- Pickup Notification -->
         <div class="pickup-notification" id="pickupNotification"></div>
         
+        <!-- Muzzle Flash -->
+        <div class="muzzle-flash" id="muzzleFlash"></div>
+
         <!-- Damage Flash -->
         <div class="damage-flash" id="damageFlash"></div>
         

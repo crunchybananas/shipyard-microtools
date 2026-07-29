@@ -12,6 +12,71 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fires 1-5 — 2026-07-27 (night) — backlog, coherence passes, and the island learns to play itself
+
+**Shipped (owner /loop session, 5 fires, all deployed):**
+- **#36 slope-aware rock relief** — baked vSlope swaps the terrain bump from sand ripples to
+  bedding + wall-plane fracture on cliffs, with ±9% albedo strata (gated to the #41 colour
+  transition) so the east bluff reads bedded through the haze at the 170m glyph-puzzle range.
+  Lesson: fracture noise must sample the wall's (along-wall, height) plane — xz alone renders
+  as diagonal herringbone on vertical faces.
+- **#43 study contact AO** — Baker colour callbacks now receive the world vertex; a finely
+  tessellated ring walk-surface (the cylinder cap is a centre+rim fan that can't hold pools)
+  bakes darkening under every furniture footprint. Legs 0.200 lum vs 0.302 open floor.
+- **STORY pass** — twist locks verified in code (two-touch embrace, body-before-line,
+  carried/farewell exclusivity); the real defect was sixteen unillustrated journal entries
+  including both climaxes and both endings — SKETCHES now cover 49/49 journal strings.
+- **GAMEPLAY pass** — fixed the post-return lockout: the annex (wall, inner door, coat letter,
+  cot journal, keeper lamp) re-sealed at the surface after the full arc; every gate now honors
+  W.flags.returned. The cot journal's old '>=1' no-op gate is a real gate.
+- **GENERATIVE ERA MUSIC** (owner: Bender stems 'not great') — the mp3 beds are replaced by a
+  persistent ~7-node synth graph per era (drone+fifth through a breathing lowpass, sea-breath
+  pad, sparse leitmotif fragments in each era's root E/G/A/D/C). Depth darkens cutoff 950→220,
+  widens detune 4→22c, thins the melody; the FOURTH note plays a shade flat below the surface
+  and never comes at the source — the #51 box canon carried into the score. musicTo() retargets
+  the one graph (the transition IS the crossfade); closes #66's looping-clip complaint.
+
+**Evidence:** per-fire headless verification (screenshots, baked-vertex sampling, statistical
+melody checks — flat fourth present at L2, absent across 58 L4 notes); 0 console errors; all
+budgets held. **Debt:** the generative beds await the owner's EARS (structural verification
+only); #52 remainder (L3/L4 micro-puzzle, region4 landmark); #64/#63 audio still open.
+
+**Next tick suggestion:** #64 (make the day/night cycle audible — dawn chorus/dusk hush keyed
+to W.time, natural companion to the new music engine) or #54 (pay off the reading glass with
+8-12 lampblack micro-finds).
+
+---
+
+## audit-batch — 2026-07-27 — graphics + gameplay: the waterline, the horizon, the pier, the gulls, the depth
+
+**Shipped (owner session, 6 commits):** the 2026-07 audit's highest-impact graphics findings plus the
+gameplay do-first, verified per-issue against baseline screenshots:
+- **#47/#38 the waterline pass** — terrain learned the tide (`uWaterY` in object space): wet-sand
+  swash band with a meandered edge, submerged warm-light falloff, min-of-two counter-scrolled seabed
+  caustics; water got a scalloped foam collar + second lace scale + dual-scroll surface caustic.
+  Rides every SEA-STRATA level (verified L1 + L2 +1.47) and the 1:240 clone inherits the line.
+- **#37 farSea shader** — the horizon annulus mirrors a graded sky, carries the glitter road to the
+  horizon, and fuses into the fog with the near water's own law; shares the water's uniform objects
+  (zero per-frame upkeep). World sea circled at r=310 → the 280-438m double-draw band is gone.
+- **#45 the pier is timber** — silvered driftwood base, four lengthwise deck boards (gaps glint
+  water), per-piece instanceColor tone, baked tide-stain rings on the posts. No draw-count change.
+- **#46 gulls fold their wings** — FOLD constants shared by addWings/tickPerched (sweep+flank
+  roll+chord tuck); mantle darkened a step. Crows inherit.
+- **#51 depth responses** — the box plays waterlogged-flat and loses its FOURTH note at L4 (the note
+  he never could play true), the crank drags at half-pull by L3, the stones hum damped; all with
+  persisted once-whispers. Crank ratio verified exactly 0.5.
+- **#52 (progress) the L3 bell-buoy** — listing channel marker in the flooded chasm, untended
+  distance-faded toll (~13s swell clock) as L3's sound-led-nav cue + a proximity journal beat.
+
+**Evidence:** golden/night/noon shots per issue; clean no-debug boot, 0 console errors; 72 draws /
+403k tris beach pose. **Debt:** #52 still open (L3/L4 micro-puzzle, region4 landmark); deck grain
+relief reads strong at extreme grazing angles (acceptable, driftwood language).
+
+**Next tick suggestion:** #36 slope-aware rock relief (the east bluff is studied from 170m during
+the glyph puzzle and is guaranteed featureless) or finish #52's region4 landmark.
+
+---
+
 ## 92 — 2026-06-20 — responsive UI: the debug panel no longer hides the mute + a mobile pass
 
 **Shipped (local):** owner — "we need better responsive UI. on a small screen the debug panel hides

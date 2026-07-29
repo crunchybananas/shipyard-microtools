@@ -84,6 +84,12 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }
 
+textarea.error-flash,
+textarea.error-flash:focus {
+  border-color: #f87171;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
 .button-row {
   display: flex;
   gap: 0.5rem;
@@ -168,6 +174,39 @@ textarea:focus {
   color: #71717a;
 }
 
+.output-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.view-toggle {
+  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.view-btn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #a1a1aa;
+  cursor: pointer;
+}
+
+.view-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.view-btn.active {
+  background: rgba(129, 140, 248, 0.25);
+  color: #fff;
+}
+
 .output {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
@@ -188,6 +227,83 @@ textarea:focus {
 .output .boolean { color: #ff7b72; }
 .output .null { color: #8b949e; }
 .output .key { color: #7ee787; }
+
+.output.hidden {
+  display: none;
+}
+
+.tree-output {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.tree-node {
+  line-height: 1.5;
+}
+
+.tree-children {
+  margin-left: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tree-row.toggleable {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  border-radius: 4px;
+}
+
+.tree-row.toggleable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tree-caret {
+  display: inline-block;
+  width: 1rem;
+  color: #71717a;
+  transition: transform 0.15s;
+}
+
+.tree-node.collapsed > .tree-row .tree-caret {
+  transform: rotate(-90deg);
+}
+
+.tree-node.collapsed > .tree-children,
+.tree-node.collapsed > .tree-close {
+  display: none;
+}
+
+.tree-summary {
+  display: none;
+  color: #71717a;
+}
+
+.tree-node.collapsed > .tree-row .tree-summary {
+  display: inline;
+}
+
+.tree-bracket {
+  color: #d4d4d8;
+}
+
+.tree-close {
+  padding-left: 1rem;
+}
+
+.tree-index {
+  color: #71717a;
+}
+
+.tree-more,
+.tree-empty {
+  color: #71717a;
+  font-style: italic;
+}
+
+.tree-more {
+  padding-left: 1rem;
+}
 
 footer {
   text-align: center;

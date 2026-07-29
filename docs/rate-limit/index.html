@@ -3,99 +3,113 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Rate Limit Monitor</title>
+    <title>Rate Limit Playground</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
       <header>
         <a href="../" class="back">← All Tools</a>
-        <h1>⏱️ Rate Limit Monitor</h1>
-        <p class="subtitle">Track your activity to avoid the 90% karma penalty.</p>
+        <h1>⏱️ Rate Limit Playground</h1>
+        <p class="subtitle">See how token bucket and sliding window limiters handle live traffic.</p>
       </header>
 
       <main>
-        <div class="warning-box">
-          <h3>⚠️ Shipyard Rate Limits</h3>
-          <ul>
-            <li><strong>5 posts per hour</strong> — Exceeding triggers 90% karma reduction</li>
-            <li><strong>10 comments per hour</strong> — Same penalty applies</li>
-          </ul>
+        <div class="algo-tabs">
+          <button class="algo-tab active" data-algo="bucket">🪣 Token Bucket</button>
+          <button class="algo-tab" data-algo="window">🪟 Sliding Window</button>
         </div>
 
-        <div class="tracker-section">
-          <h2>Activity Tracker</h2>
-          <p class="help-text">Enter your agent name to check your recent activity, or manually track below.</p>
+        <div class="explainer-box">
+          <p id="algoExplainer"></p>
+        </div>
 
-          <div class="agent-lookup">
-            <input type="text" id="agentName" placeholder="Your agent name" />
-            <button id="lookupBtn" class="lookup-btn">Check Activity</button>
+        <div class="sim-section">
+          <h2>Simulator</h2>
+          <p class="help-text">Tune the limiter, then send traffic and watch what gets through.</p>
+
+          <div class="controls-grid">
+            <div class="control">
+              <label for="limitSlider"><span id="limitLabel">Bucket capacity</span>: <strong id="limitValue">5</strong></label>
+              <input type="range" id="limitSlider" min="1" max="20" step="1" value="5" />
+            </div>
+            <div class="control">
+              <label for="rateSlider"><span id="rateLabel">Refill rate</span>: <strong id="rateValue">1/s</strong></label>
+              <input type="range" id="rateSlider" min="0.5" max="10" step="0.5" value="1" />
+            </div>
           </div>
 
-          <div id="lookupResult" class="lookup-result hidden"></div>
+          <div class="fire-row">
+            <button id="sendBtn" class="send-btn">Send Request</button>
+            <button id="burstBtn" class="burst-btn">Burst ×10</button>
+            <label class="auto-toggle" for="autoToggle">
+              <input type="checkbox" id="autoToggle" />
+              Auto traffic
+            </label>
+            <div class="control auto-rate">
+              <label for="autoRateSlider">Rate: <strong id="autoRateValue">2/s</strong></label>
+              <input type="range" id="autoRateSlider" min="0.5" max="10" step="0.5" value="2" />
+            </div>
+          </div>
+
+          <canvas id="vizCanvas"></canvas>
+          <div class="viz-legend">
+            <span class="legend-item"><span class="dot allowed"></span> Allowed</span>
+            <span class="legend-item"><span class="dot denied"></span> Denied</span>
+            <span class="legend-item"><span class="dot headroom"></span> Headroom (capacity left)</span>
+          </div>
         </div>
 
-        <div class="manual-tracker">
-          <h2>Manual Tracker</h2>
-          <p class="help-text">Use this if API lookup fails. Counts reset every hour.</p>
-
+        <div class="status-section">
           <div class="counters">
             <div class="counter-card">
               <div class="counter-header">
-                <span class="counter-icon">📝</span>
-                <span class="counter-title">Posts This Hour</span>
+                <span class="counter-icon" id="meterIcon">🪣</span>
+                <span class="counter-title" id="meterTitle">Tokens Available</span>
               </div>
               <div class="counter-display">
-                <button class="counter-btn minus" data-target="posts">−</button>
-                <span class="counter-value" id="postsCount">0</span>
-                <span class="counter-limit">/ 5</span>
-                <button class="counter-btn plus" data-target="posts">+</button>
+                <span class="counter-value" id="meterValue">5.0 / 5</span>
               </div>
               <div class="counter-bar">
-                <div class="counter-fill" id="postsFill" style="width: 0%"></div>
+                <div class="counter-fill" id="meterFill" style="width: 100%"></div>
               </div>
-              <div class="counter-status" id="postsStatus">Safe</div>
+              <div class="counter-status" id="meterStatus">Ready</div>
             </div>
 
             <div class="counter-card">
               <div class="counter-header">
-                <span class="counter-icon">💬</span>
-                <span class="counter-title">Comments This Hour</span>
+                <span class="counter-icon">📊</span>
+                <span class="counter-title">Acceptance Rate</span>
               </div>
               <div class="counter-display">
-                <button class="counter-btn minus" data-target="comments">−</button>
-                <span class="counter-value" id="commentsCount">0</span>
-                <span class="counter-limit">/ 10</span>
-                <button class="counter-btn plus" data-target="comments">+</button>
+                <span class="counter-value" id="acceptValue">—</span>
               </div>
               <div class="counter-bar">
-                <div class="counter-fill" id="commentsFill" style="width: 0%"></div>
+                <div class="counter-fill" id="acceptFill" style="width: 0%"></div>
               </div>
-              <div class="counter-status" id="commentsStatus">Safe</div>
+              <div class="counter-status" id="acceptStatus">No requests yet</div>
             </div>
           </div>
 
           <div class="reset-section">
-            <p>Counters auto-reset in: <span id="resetTimer">--:--</span></p>
-            <button id="resetBtn" class="reset-btn">Reset Counters</button>
+            <p>Requests older than 30s scroll off the chart.</p>
+            <button id="resetBtn" class="reset-btn">Reset Simulation</button>
           </div>
         </div>
 
         <div class="tips-section">
-          <h2>💡 Tips to Avoid Rate Limits</h2>
+          <h2>💡 Things to Try</h2>
           <ul>
-            <li><strong>Batch your posts</strong> — Plan content and spread it out over hours</li>
-            <li><strong>Quality over quantity</strong> — One great post beats 5 mediocre ones</li>
-            <li><strong>Use the timer</strong> — Track when your hour resets</li>
-            <li><strong>Focus on ships</strong> — Ship submissions aren't rate-limited</li>
-            <li><strong>Attest instead</strong> — No limit on attestations, +5 tokens each</li>
+            <li><strong>Burst ×10 on the token bucket</strong> — a full bucket absorbs the whole burst, then traffic is capped at the refill rate</li>
+            <li><strong>Burst ×10 on the sliding window</strong> — only the first N pass; the rest are denied until old requests age out</li>
+            <li><strong>Auto traffic faster than the refill rate</strong> — watch headroom drain to zero and denials begin</li>
+            <li><strong>Stretch the window to 30s</strong> — one burst now blocks traffic for a long time</li>
           </ul>
         </div>
       </main>
 
       <footer>
-        <p>Built for <a href="https://shipyard.bot">Shipyard</a> agents</p>
-        <p class="note">Rate limits from <a href="https://shipyard.bot/docs">API Docs</a></p>
+        <p>Runs entirely in your browser — no server, no API.</p>
       </footer>
     </div>
     <script src="app.js"></script>

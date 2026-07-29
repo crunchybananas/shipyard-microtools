@@ -18,6 +18,11 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let isRecording = false;
 
+// Persistence state
+const STORAGE_KEY = 'synth-studio-project';
+let pendingProjectState = null;
+let persistTimer = null;
+
 // Keyboard mappings
 const KEY_MAP = {
   'a': 'C3', 'w': 'C#3', 's': 'D3', 'e': 'D#3', 'd': 'E3',
@@ -152,19 +157,27 @@ async function initAudio() {
     
     // Set up sequencer callbacks
     sequencer.onSynthTrigger = (note, velocity, time) => {
-      // For sequencer, use a short note
-      const voice = synth.noteOn(note, velocity);
-      setTimeout(() => synth.noteOff(note), 150);
+      // For sequencer, use a short note scheduled at the step time
+      synth.playNote(note, velocity, time, 0.15);
     };
-    
+
     sequencer.onDrumTrigger = (drumType, velocity, time) => {
       drums.play(drumType, velocity, time);
     };
-    
+
     sequencer.onStep = (step) => {
       updateStepIndicator(step);
     };
-    
+
+    // Restore saved project into the engines
+    if (pendingProjectState) {
+      try {
+        applyProjectToEngines(pendingProjectState);
+      } catch (error) {
+        console.warn('Failed to restore saved project:', error);
+      }
+    }
+
     isAudioInitialized = true;
     console.log('Audio initialized successfully');
     
@@ -188,12 +201,20 @@ async function resumeAudio() {
 // ===== UI Setup =====
 
 document.addEventListener('DOMContentLoaded', () => {
+  pendingProjectState = loadStoredProject();
+
   setupKeyboard();
   setupSequencerGrid();
   setupStepIndicator();
   setupControls();
   setupKeyboardInput();
-  
+  setupPersistence();
+
+  // Restore saved project into the UI (engines get it on audio init)
+  if (pendingProjectState) {
+    applyProjectToUI(pendingProjectState);
+  }
+
   // Initialize audio on first user interaction
   document.body.addEventListener('click', async () => {
     await initAudio();
@@ -317,12 +338,14 @@ function setupKeyboardInput() {
       synth.setParam('octave', octave);
       document.getElementById('octave').value = octave;
       document.getElementById('octave-value').textContent = octave;
+      schedulePersist();
     }
     if (key === 'x' && synth) {
       const octave = Math.min(2, synth.params.octave + 1);
       synth.setParam('octave', octave);
       document.getElementById('octave').value = octave;
       document.getElementById('octave-value').textContent = octave;
+      schedulePersist();
     }
     
     // Space for play/stop
@@ -389,6 +412,7 @@ function setupSequencerGrid() {
         if (!sequencer) return;
         const isActive = sequencer.toggleStep(trackId, i);
         step.classList.toggle('active', isActive);
+        schedulePersist();
       });
       
       stepsContainer.appendChild(step);
@@ -445,6 +469,7 @@ function setupControls() {
       document.querySelectorAll('.wave-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       if (synth) synth.setParam('waveform', btn.dataset.wave);
+      schedulePersist();
     });
   });
   
@@ -472,6 +497,7 @@ function setupControls() {
       document.querySelectorAll('.lfo-target-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       if (synth) synth.setParam('lfoTarget', btn.dataset.target);
+      schedulePersist();
     });
   });
   
@@ -709,62 +735,24 @@ async function toggleRecording() {
 }
 
 /**
- * Export as WAV
+ * Schedule the sequencer pattern into an offline synth/drum pair.
+ * Every event is scheduled at its real pattern time (steps repeat every 16).
  */
-async function exportWAV() {
-  if (!audioContext || !sequencer) return;
-  
-  // Create offline context
-  const duration = (60 / sequencer.bpm) * 4; // 4 bars
-  const sampleRate = audioContext.sampleRate;
-  const offlineCtx = new OfflineAudioContext(2, sampleRate * duration, sampleRate);
-  
-  // Create offline synth and drums
-  const offlineSynth = new Synthesizer(offlineCtx);
-  const offlineDrums = new DrumMachine(offlineCtx);
-  const offlineEffects = new EffectsChain(offlineCtx);
-  const offlineMaster = offlineCtx.createGain();
-  offlineMaster.gain.value = 0.7;
-  
-  // Copy synth settings
-  Object.assign(offlineSynth.params, synth.params);
-  
-  // Connect
-  offlineSynth.connect(offlineEffects.input);
-  offlineEffects.connect(offlineMaster);
-  offlineDrums.connect(offlineMaster);
-  offlineMaster.connect(offlineCtx.destination);
-  
-  // Copy effect settings
-  offlineEffects.setDelayEnabled(document.getElementById('delay-enabled').checked);
-  offlineEffects.setDelayParams(
-    parseFloat(document.getElementById('delay-time').value),
-    parseFloat(document.getElementById('delay-feedback').value),
-    parseFloat(document.getElementById('delay-mix').value)
-  );
-  offlineEffects.setReverbEnabled(document.getElementById('reverb-enabled').checked);
-  offlineEffects.setReverbParams(
-    parseFloat(document.getElementById('reverb-decay').value),
-    parseFloat(document.getElementById('reverb-mix').value)
-  );
-  
-  // Schedule all events
-  const stepDuration = 60 / sequencer.bpm / 4;
-  const totalSteps = 64; // 4 patterns
-  
+function scheduleExportEvents(offlineSynth, offlineDrums, tracks, stepDuration, totalSteps, swing) {
+  const noteDuration = 0.15; // Match the live sequencer gate time
+
   for (let step = 0; step < totalSteps; step++) {
-    const time = step * stepDuration;
     const patternStep = step % 16;
-    
+    // Same swing rule as Sequencer.getSwingOffset (off-beats only)
+    const swingOffset = (patternStep % 2 === 1) ? stepDuration * swing : 0;
+    const time = step * stepDuration + swingOffset;
+
     // Check each track
-    for (const [trackId, track] of Object.entries(sequencer.tracks)) {
+    for (const [trackId, track] of Object.entries(tracks)) {
       if (track.steps[patternStep]) {
         if (trackId.startsWith('synth')) {
-          // Schedule synth note
-          const voice = offlineSynth.noteOn(track.note, track.velocity);
-          // Schedule note off
-          const noteOffTime = time + 0.1;
-          offlineSynth.voices.get(track.note);
+          // Schedule synth note at its pattern time
+          offlineSynth.playNote(track.note, track.velocity, time, noteDuration);
         } else {
           // Schedule drum hit
           offlineDrums.play(trackId, track.velocity, time);
@@ -772,7 +760,76 @@ async function exportWAV() {
       }
     }
   }
-  
+}
+
+/**
+ * Export as WAV
+ */
+async function exportWAV() {
+  if (!audioContext || !sequencer) return;
+
+  // Pattern timing: 64 steps = 4 passes through the 16-step pattern
+  const stepDuration = sequencer.getStepDuration();
+  const totalSteps = 64;
+  const patternLength = totalSteps * stepDuration;
+
+  // Leave room for the final note's release and any effect tails
+  let tail = synth.params.release + 0.5;
+  if (document.getElementById('delay-enabled').checked) {
+    tail = Math.max(tail, parseFloat(document.getElementById('delay-time').value) * 4);
+  }
+  if (document.getElementById('reverb-enabled').checked) {
+    tail = Math.max(tail, parseFloat(document.getElementById('reverb-decay').value));
+  }
+
+  // Create offline context sized to the full pattern plus tail
+  const duration = patternLength + tail;
+  const sampleRate = audioContext.sampleRate;
+  const offlineCtx = new OfflineAudioContext(2, Math.ceil(sampleRate * duration), sampleRate);
+
+  // Create offline synth and drums
+  const offlineSynth = new Synthesizer(offlineCtx);
+  const offlineDrums = new DrumMachine(offlineCtx);
+  const offlineEffects = new EffectsChain(offlineCtx);
+  const offlineMaster = offlineCtx.createGain();
+  offlineMaster.gain.value = masterGain ? masterGain.gain.value : 0.7;
+
+  // Copy synth settings
+  Object.assign(offlineSynth.params, synth.params);
+  // Object.assign skips setParam side effects; sync the LFO nodes so an
+  // LFO-modulated patch renders the same offline as it sounds live
+  offlineSynth.setParam('lfoRate', synth.params.lfoRate);
+  offlineSynth.setParam('lfoDepth', synth.params.lfoDepth);
+
+  // Connect
+  offlineSynth.connect(offlineEffects.input);
+  offlineEffects.connect(offlineMaster);
+  offlineDrums.connect(offlineMaster);
+  offlineMaster.connect(offlineCtx.destination);
+
+  // Copy effect settings (params before enable so mix levels are set)
+  offlineEffects.setDelayParams(
+    parseFloat(document.getElementById('delay-time').value),
+    parseFloat(document.getElementById('delay-feedback').value),
+    parseFloat(document.getElementById('delay-mix').value)
+  );
+  offlineEffects.setDelayEnabled(document.getElementById('delay-enabled').checked);
+  const reverbDecay = parseFloat(document.getElementById('reverb-decay').value);
+  offlineEffects.setReverbParams(
+    reverbDecay,
+    parseFloat(document.getElementById('reverb-mix').value)
+  );
+  offlineEffects.setReverbEnabled(document.getElementById('reverb-enabled').checked);
+  offlineEffects.setDistortionAmount(parseFloat(document.getElementById('distortion-amount').value));
+  offlineEffects.setDistortionEnabled(document.getElementById('distortion-enabled').checked);
+
+  // The reverb impulse response is generated asynchronously; make sure it is
+  // in place before rendering starts
+  offlineEffects.reverb.convolver.buffer = await offlineEffects.generateImpulseResponse(reverbDecay);
+
+  // Schedule all pattern events at their real times
+  scheduleExportEvents(offlineSynth, offlineDrums, sequencer.tracks, stepDuration, totalSteps, sequencer.swing);
+
   // Render
   const buffer = await offlineCtx.startRendering();
   
@@ -892,12 +949,10 @@ function loadPreset(preset) {
 }
 
 /**
- * Save project state
+ * Gather the full project state (patch + patterns + effects)
  */
-function saveProject() {
-  if (!synth || !sequencer) return;
-  
-  const project = {
+function getProjectState() {
+  return {
     synth: { ...synth.params },
     sequencer: sequencer.getState(),
     effects: {
@@ -910,10 +965,20 @@ function saveProject() {
       reverbMix: parseFloat(document.getElementById('reverb-mix').value),
       distortionEnabled: document.getElementById('distortion-enabled').checked,
       distortionAmount: parseFloat(document.getElementById('distortion-amount').value)
-    }
+    },
+    masterVolume: parseFloat(document.getElementById('master-volume').value)
   };
-  
-  const json = JSON.stringify(project, null, 2);
+}
+
+/**
+ * Save project state (persists and downloads as JSON)
+ */
+function saveProject() {
+  if (!synth || !sequencer) return;
+
+  persistState();
+
+  const json = JSON.stringify(getProjectState(), null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -921,6 +986,198 @@ function saveProject() {
   a.download = 'synth-studio-project.json';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ===== Persistence (localStorage) =====
+
+/**
+ * Load the saved project from localStorage
+ */
+function loadStoredProject() {
+  try {
+    const json = localStorage.getItem(STORAGE_KEY);
+    if (!json) return null;
+    const project = JSON.parse(json);
+    return (project && typeof project === 'object') ? project : null;
+  } catch (error) {
+    console.warn('Failed to load saved project:', error);
+    return null;
+  }
+}
+
+/**
+ * Persist the current project to localStorage
+ */
+function persistState() {
+  if (!synth || !sequencer) return;
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(getProjectState()));
+  } catch (error) {
+    console.warn('Failed to save project:', error);
+  }
+}
+
+/**
+ * Debounced persist - call after any edit
+ */
+function schedulePersist() {
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persistState, 400);
+}
+
+/**
+ * Set up auto-persistence and the reset button
+ */
+function setupPersistence() {
+  // Sliders, checkboxes, and selects all bubble input/change to the document
+  document.addEventListener('input', schedulePersist);
+  document.addEventListener('change', schedulePersist);
+
+  document.getElementById('reset-btn').addEventListener('click', resetProject);
+}
+
+/**
+ * Clear the saved project and reload with defaults
+ */
+function resetProject() {
+  if (!confirm('Reset all patterns and settings to defaults?')) return;
+
+  clearTimeout(persistTimer);
+  pendingProjectState = null;
+
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.warn('Failed to clear saved project:', error);
+  }
+
+  location.reload();
+}
+
+/**
+ * Restore a saved project into the UI controls (safe before audio init)
+ */
+function applyProjectToUI(project) {
+  const patch = project.synth || {};
+  const fx = project.effects || {};
+  const seq = project.sequencer || {};
+
+  // Waveform buttons
+  if (patch.waveform) {
+    document.querySelectorAll('.wave-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.wave === patch.waveform);
+    });
+  }
+
+  // LFO target buttons
+  if (patch.lfoTarget) {
+    document.querySelectorAll('.lfo-target-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.target === patch.lfoTarget);
+    });
+  }
+
+  // Sliders - dispatch input so value displays reformat via existing handlers
+  const sliderValues = {
+    'octave': patch.octave,
+    'detune': patch.detune,
+    'attack': patch.attack,
+    'decay': patch.decay,
+    'sustain': patch.sustain,
+    'release': patch.release,
+    'filter-cutoff': patch.filterCutoff,
+    'filter-resonance': patch.filterResonance,
+    'filter-env-amount': patch.filterEnvAmount,
+    'lfo-rate': patch.lfoRate,
+    'lfo-depth': patch.lfoDepth,
+    'delay-time': fx.delayTime,
+    'delay-feedback': fx.delayFeedback,
+    'delay-mix': fx.delayMix,
+    'reverb-decay': fx.reverbDecay,
+    'reverb-mix': fx.reverbMix,
+    'distortion-amount': fx.distortionAmount,
+    'master-volume': project.masterVolume,
+    'swing': seq.swing
+  };
+
+  for (const [id, value] of Object.entries(sliderValues)) {
+    if (value === undefined || value === null) continue;
+    const slider = document.getElementById(id);
+    if (slider) {
+      slider.value = value;
+      slider.dispatchEvent(new Event('input'));
+    }
+  }
+
+  // Effect toggles
+  const checkboxes = {
+    'delay-enabled': fx.delayEnabled,
+    'reverb-enabled': fx.reverbEnabled,
+    'distortion-enabled': fx.distortionEnabled
+  };
+
+  for (const [id, value] of Object.entries(checkboxes)) {
+    if (value === undefined) continue;
+    const box = document.getElementById(id);
+    if (box) box.checked = !!value;
+  }
+
+  // BPM
+  if (seq.bpm) {
+    document.getElementById('bpm').value = seq.bpm;
+  }
+
+  // Pattern grid
+  if (seq.pattern) {
+    for (const [trackId, data] of Object.entries(seq.pattern)) {
+      const trackEl = document.querySelector(`.seq-track[data-track="${trackId}"]`);
+      if (!trackEl || !Array.isArray(data.steps)) continue;
+
+      trackEl.querySelectorAll('.step').forEach((stepEl, i) => {
+        stepEl.classList.toggle('active', !!data.steps[i]);
+      });
+
+      const noteSelect = trackEl.querySelector('.track-note');
+      if (noteSelect && data.note) {
+        noteSelect.value = data.note;
+      }
+    }
+  }
+}
+
+/**
+ * Restore a saved project into the audio engines (after audio init)
+ */
+function applyProjectToEngines(project) {
+  if (project.synth) {
+    for (const [param, value] of Object.entries(project.synth)) {
+      synth.setParam(param, value);
+    }
+  }
+
+  if (project.sequencer) {
+    sequencer.loadState(project.sequencer);
+  }
+
+  const fx = project.effects;
+  if (fx) {
+    if ([fx.delayTime, fx.delayFeedback, fx.delayMix].every(Number.isFinite)) {
+      effects.setDelayParams(fx.delayTime, fx.delayFeedback, fx.delayMix);
+    }
+    effects.setDelayEnabled(!!fx.delayEnabled);
+    if ([fx.reverbDecay, fx.reverbMix].every(Number.isFinite)) {
+      effects.setReverbParams(fx.reverbDecay, fx.reverbMix);
+    }
+    effects.setReverbEnabled(!!fx.reverbEnabled);
+    if (Number.isFinite(fx.distortionAmount)) {
+      effects.setDistortionAmount(fx.distortionAmount);
+    }
+    effects.setDistortionEnabled(!!fx.distortionEnabled);
+  }
+
+  if (Number.isFinite(project.masterVolume)) {
+    masterGain.gain.value = project.masterVolume;
+  }
 }
 
 // Handle window resize

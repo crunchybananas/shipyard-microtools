@@ -22,7 +22,12 @@
             <input type="text" id="proofTitle" placeholder="Title (optional)" />
             <button type="button" class="btn btn-small" id="addProofBtn">Add</button>
           </div>
-          <button type="button" class="btn btn-secondary btn-small" id="loadSampleBtn">Load Sample Data</button>
+          <div class="input-row">
+            <button type="button" class="btn btn-secondary btn-small" id="loadSampleBtn">Load Sample Data</button>
+            <button type="button" class="btn btn-secondary btn-small" id="exportJsonBtn">Export JSON</button>
+            <button type="button" class="btn btn-secondary btn-small" id="importJsonBtn">Import JSON</button>
+            <input type="file" id="importFile" accept=".json,application/json" hidden />
+          </div>
         </div>
       </div>
 
@@ -45,13 +50,6 @@
           <button type="button" class="template-btn" data-template="pitch">🚀 Ship Pitch</button>
         </div>
         <button type="button" class="btn" id="generateBtn">✨ Generate <span id="templateLabel">weekly</span> Story</button>
-      </div>
-
-      <div class="card" id="loadingCard" style="display: none;">
-        <div class="loading">
-          <div class="spinner"></div>
-          AI is analyzing your proofs and crafting a narrative...
-        </div>
       </div>
 
       <div class="card" id="storyCard" style="display: none;">

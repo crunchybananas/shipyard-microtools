@@ -16,12 +16,22 @@
 
       <main>
         <div class="input-section">
-          <label for="codeInput">Enter Status Code</label>
-          <input type="number" id="codeInput" placeholder="404" min="100" max="599" />
-          
+          <label for="codeInput">Enter Status Code or Keyword</label>
+          <input type="text" id="codeInput" placeholder="404 or teapot" autocomplete="off" spellcheck="false" />
+
           <button id="lookupBtn" class="primary-btn">
-            <span class="btn-text">🔍 Look Up Code</span>
+            <span class="btn-text">🔍 Look Up</span>
           </button>
+        </div>
+
+        <div id="noResult" class="no-result hidden">
+          <span class="no-result-emoji">🔎</span>
+          <p id="noResultMessage" class="no-result-message">No matches found.</p>
+        </div>
+
+        <div id="searchResults" class="search-results hidden">
+          <h3 id="searchResultsTitle">Matches</h3>
+          <div id="searchResultsList" class="search-results-list"></div>
         </div>
 
         <div id="result" class="result-card hidden">
@@ -33,8 +43,13 @@
             </div>
           </div>
           <p id="statusMessage" class="status-message">This is not the endpoint you are looking for.</p>
+          <div class="status-guidance">
+            <h4 class="guidance-title">What to do</h4>
+            <p id="statusGuidance" class="guidance-text"></p>
+          </div>
           <div class="status-meta">
             <span id="statusCategory" class="category-badge">Client Error</span>
+            <a id="mdnLink" class="mdn-link" href="#" target="_blank" rel="noopener noreferrer">📖 MDN docs →</a>
           </div>
         </div>
 
@@ -69,7 +84,7 @@
       </main>
 
       <footer>
-        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+        <p>Part of <a href="https://github.com/crunchybananas/shipyard-microtools">Microtools</a></p>
       </footer>
     </div>
     <script src="app.js"></script>

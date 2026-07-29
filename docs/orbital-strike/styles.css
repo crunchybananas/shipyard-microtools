@@ -160,6 +160,25 @@ kbd {
   box-shadow: 0 0 10px var(--text);
 }
 
+/* Hit Marker */
+.hit-marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.6);
+  font-size: 1.6rem;
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  pointer-events: none;
+}
+
+.hit-marker.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 /* Wave Info */
 .wave-info {
   position: absolute;
@@ -223,24 +242,15 @@ kbd {
   transform: translate(-50%, -50%);
 }
 
-.radar-blip {
+.radar canvas {
   position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: blink 0.5s infinite;
+  top: 0;
+  left: 0;
 }
 
 @keyframes sweep {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 /* Health Bar */
@@ -323,6 +333,24 @@ kbd {
 }
 
 .pickup-notification.visible {
+  opacity: 1;
+}
+
+/* Muzzle Flash */
+.muzzle-flash {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 340px;
+  height: 220px;
+  background: radial-gradient(ellipse at bottom, rgba(0, 255, 136, 0.45), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.1s;
+  pointer-events: none;
+}
+
+.muzzle-flash.active {
   opacity: 1;
 }
 

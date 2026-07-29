@@ -246,6 +246,13 @@ function buildNormalFromImage(img, strength) {
   }
   const tex = new THREE.DataTexture(out, w, h, THREE.RGBAFormat);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  // DataTexture defaults to NearestFilter with no mips — fine while the merged stone bake
+  // sampled ONE constant texel, but real sweeping UVs (the #35 tower fix) would alias and
+  // make the walls shimmer in motion. Trilinear + mips is also cheaper to sample (cache-
+  // coherent minification), so this HOLDS the power budget while killing the sparkle.
+  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
   tex.needsUpdate = true;
   return tex;
 }

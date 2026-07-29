@@ -182,9 +182,13 @@ async function checkUrl(url) {
           result.status = 'error';
         }
       } else {
-        // Opaque response from no-cors - URL exists but we can't see details
-        result.details.statusCode = '(CORS blocked)';
-        result.details.statusText = 'Reachable';
+        // Opaque response from no-cors - something responded, but the browser
+        // hides the status code, so we cannot actually verify health
+        result.details.opaque = true;
+        result.details.statusCode = 'unknown (opaque)';
+        result.details.statusText = 'Unknown';
+        result.issues.push({ text: 'Opaque response (CORS) - reachability only, health not verified', type: 'warn' });
+        if (result.status === 'healthy') result.status = 'warning';
       }
 
     } catch (fetchError) {
@@ -235,19 +239,68 @@ async function checkUrl(url) {
 }
 
 function createResultCard(url, index, status) {
+  // Built with DOM nodes (not innerHTML) so untrusted URLs can never break
+  // out of an attribute context
   const card = document.createElement('div');
   card.className = `result-card ${status}`;
-  card.innerHTML = `
-    <div class="result-header">
-      <span class="status-icon">${getStatusIcon(status)}</span>
-      <span class="result-url"><a href="${escapeHtml(url)}" target="_blank">${escapeHtml(url)}</a></span>
-      <span class="status-badge ${status}">${status}</span>
-    </div>
-    <div class="result-details">
-      <span class="detail-item">Checking...</span>
-    </div>
-  `;
+
+  const header = document.createElement('div');
+  header.className = 'result-header';
+
+  const icon = document.createElement('span');
+  icon.className = 'status-icon';
+  icon.textContent = getStatusIcon(status);
+  header.appendChild(icon);
+
+  const urlSpan = document.createElement('span');
+  urlSpan.className = 'result-url';
+  const href = safeHref(url);
+  if (href) {
+    const link = document.createElement('a');
+    link.href = href;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = url;
+    urlSpan.appendChild(link);
+  } else {
+    // Not a valid http(s) URL - show as plain text, never as a link
+    urlSpan.textContent = url;
+  }
+  header.appendChild(urlSpan);
+
+  const badge = document.createElement('span');
+  badge.className = `status-badge ${status}`;
+  badge.textContent = status;
+  header.appendChild(badge);
+
+  const details = document.createElement('div');
+  details.className = 'result-details';
+  const checking = document.createElement('span');
+  checking.className = 'detail-item';
+  checking.textContent = 'Checking...';
+  details.appendChild(checking);
+
+  card.appendChild(header);
+  card.appendChild(details);
   return card;
+}
+
+// Returns a normalized http(s) href for a user-entered URL, or null if it
+// does not parse as a safe web URL (blocks javascript: and friends)
+function safeHref(url) {
+  let normalized = url;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    normalized = 'https://' + url;
+  }
+  try {
+    const parsed = new URL(normalized);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.href;
+    }
+  } catch (e) {
+    // fall through
+  }
+  return null;
 }
 
 function updateResultCard(card, result) {
@@ -263,27 +316,30 @@ function updateResultCard(card, result) {
   let detailsHtml = '';
 
   if (result.details.statusCode !== undefined) {
-    const statusClass = result.statusCode >= 200 && result.statusCode < 400 ? 'good' : 
+    const statusClass = result.statusCode >= 200 && result.statusCode < 400 ? 'good' :
                         result.statusCode >= 400 ? 'bad' : '';
-    detailsHtml += `<span class="detail-item ${statusClass}">Status: <span>${result.details.statusCode}</span></span>`;
+    const opaqueTitle = result.details.opaque
+      ? ' title="The server responded, but browser CORS policy hides the status code (opaque no-cors response). The URL is reachable, but its health could not be verified."'
+      : '';
+    detailsHtml += `<span class="detail-item ${statusClass}"${opaqueTitle}>Status: <span>${escapeHtml(result.details.statusCode)}</span></span>`;
   }
 
   if (result.details.ssl !== undefined) {
     const sslClass = result.ssl ? 'good' : 'warn';
-    detailsHtml += `<span class="detail-item ${sslClass}">SSL: <span>${result.details.ssl}</span></span>`;
+    detailsHtml += `<span class="detail-item ${sslClass}">SSL: <span>${escapeHtml(result.details.ssl)}</span></span>`;
   }
 
   if (result.details.loadTime !== undefined) {
     const speedClass = result.loadTime < 1000 ? 'good' : result.loadTime < 3000 ? '' : 'warn';
-    detailsHtml += `<span class="detail-item ${speedClass}">Load: <span>${result.details.loadTime}</span></span>`;
+    detailsHtml += `<span class="detail-item ${speedClass}">Load: <span>${escapeHtml(result.details.loadTime)}</span></span>`;
   }
 
   if (result.details.platform) {
-    detailsHtml += `<span class="detail-item good">${result.details.platform}</span>`;
+    detailsHtml += `<span class="detail-item good">${escapeHtml(result.details.platform)}</span>`;
   }
 
   if (result.details.repo) {
-    detailsHtml += `<span class="detail-item">Repo: <span>${result.details.repo}</span></span>`;
+    detailsHtml += `<span class="detail-item">Repo: <span>${escapeHtml(result.details.repo)}</span></span>`;
   }
 
   detailsDiv.innerHTML = detailsHtml || '<span class="detail-item">No details available</span>';
@@ -310,9 +366,14 @@ function getStatusIcon(status) {
 }
 
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  // Explicit replacement (not the div/innerHTML trick, which misses quotes)
+  // so the output is safe in both text and attribute contexts
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function sleep(ms) {

@@ -8,7 +8,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { W, save, load, hasSave, wipe, gradeAt, sunDir, moonDir, sunElevation, isNight, isDawn, isGolden, mistTargetAt, waterY, wavePhase, SCALE_MODEL, MAX_DEPTH, LEVELS, TIDE_DROP } from './world.js';
 import { SPOTS, heightAt, walkableY } from './terrain.js';
 import { buildWorld, instantiateModel, collectRefs } from './props.js';
-import { makeSkyMaterial, makeGlowPoints } from './shaders.js';
+import { makeSkyMaterial, makeGlowPoints, makeFarSeaMaterial } from './shaders.js';
 import { Player } from './player.js';
 import { Interactions } from './interact.js';
 import { Game } from './puzzles.js';
@@ -175,9 +175,12 @@ for (let i = 0; i < 5; i++) {
 sky.frustumCulled = false;
 scene.add(sky);
 
+// the horizon sea (#37): a real shader on the annulus — glitter road, sky mirror, fog —
+// sharing the near water's uniform objects so applyAtmosphere drives both. Inner radius
+// meets the world sea, which the water shader circles at r=310 (no more double-draw band).
 const farSea = new THREE.Mesh(
-  new THREE.RingGeometry(280, 9000, 48),
-  new THREE.MeshBasicMaterial({ color: 0x15454f }));
+  new THREE.RingGeometry(310, 9000, 64),
+  makeFarSeaMaterial(waterMat.uniforms));
 farSea.rotation.x = -Math.PI / 2;
 scene.add(farSea);
 
@@ -317,12 +320,20 @@ const _wingGeo = (side) => {
   return geo;
 };
 const WING_GEO_L = _wingGeo(-1), WING_GEO_R = _wingGeo(1);
-const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xb9b5a9, flatShading: true, roughness: 0.82, side: THREE.DoubleSide });
+// wing grey matched to the baked mantle so a folded wing reads as the bird's grey back,
+// not a stuck-on pale board (#46)
+const gullWingMat = new THREE.MeshStandardMaterial({ color: 0xa9a69b, flatShading: true, roughness: 0.82, side: THREE.DoubleSide });
 const crowWingMat = new THREE.MeshStandardMaterial({ color: 0x24262b, flatShading: true, roughness: 0.7, metalness: 0.1, side: THREE.DoubleSide });
+// the FOLDED pose (#46): swept back AND rolled down the flank with the chord tucked
+// short, so the wing hugs the body like real folded primaries — the old pose left both
+// wings sticking out horizontally at shoulder height, the last blob-tell on the shore
+// gulls. tickPerched lerps from these exact constants on takeoff.
+const FOLD_Y = 1.42, FOLD_Z = 0.45, FOLD_CHORD = 0.72;
 const addWings = (g, mat) => {
   const lw = new THREE.Group(), rw = new THREE.Group();
-  lw.position.set(-0.05, 0.27, 0.03); rw.position.set(0.05, 0.27, 0.03);
-  lw.rotation.set(0, -1.5, 0.13); rw.rotation.set(0, 1.5, -0.13);     // start folded (tucked along the back)
+  lw.position.set(-0.05, 0.25, 0.03); rw.position.set(0.05, 0.25, 0.03);
+  lw.rotation.set(0, -FOLD_Y, FOLD_Z); rw.rotation.set(0, FOLD_Y, -FOLD_Z);
+  lw.scale.z = rw.scale.z = FOLD_CHORD;
   lw.add(new THREE.Mesh(WING_GEO_L, mat)); rw.add(new THREE.Mesh(WING_GEO_R, mat));
   g.add(lw, rw); g.lw = lw; g.rw = rw;
 };
@@ -343,7 +354,9 @@ const bakeBirdGeo = (parts) => {
   return b.build();
 };
 const gullGeo = (() => {
-  const white = new THREE.Color(0xe7e3d8), grey = new THREE.Color(0x95938b), beak = new THREE.Color(0xd6a233);
+  // mantle darkened a step (#46): the old 0x95938b washed to white in warm light and the
+  // whole bird read as one pale blob — now the grey back/folded-wing mass reads at range
+  const white = new THREE.Color(0xe7e3d8), grey = new THREE.Color(0x8d8b81), beak = new THREE.Color(0xd6a233);
   return bakeBirdGeo([
     [new THREE.SphereGeometry(0.16, 10, 8), white, 0, 0.17, 0, 0, 1, 0.86, 1.62],          // body
     [new THREE.SphereGeometry(0.155, 10, 7), grey, 0, 0.25, -0.02, 0, 0.92, 0.46, 1.5],    // mantle (folded wings / back)
@@ -444,14 +457,32 @@ let finale = null;
 const titleEl = document.getElementById('title-screen');
 const btnBegin = document.getElementById('btn-begin');
 const btnContinue = document.getElementById('btn-continue');
+const titleActions = document.getElementById('title-actions');
+const beginConfirm = document.getElementById('begin-confirm');
 
 if (hasSave()) btnContinue.classList.remove('hidden');
 
 btnBegin.addEventListener('click', () => {
-  // a fresh start discards any old save. W is still at its defaults on the title screen, so
-  // begin IN PLACE — the old wipe()+reload bounced the page and flashed the title back up for
-  // a beat ("a second window that just says Begin, then fades"); no reload is needed here.
-  if (hasSave()) wipe();
+  // a fresh start discards any old save — and Begin sits one pixel from Continue, so that
+  // is never a single click (#56): with a save present, swap the menu row for a confirm
+  // beat first. The eventual wipe() stashes the outgoing payload one slot deep
+  // (SAVE_KEY_PREV) as a last-resort undo.
+  if (hasSave()) {
+    titleActions.classList.add('hidden');
+    beginConfirm.classList.remove('hidden');
+    return;
+  }
+  beginIntro();
+});
+document.getElementById('btn-begin-back').addEventListener('click', () => {
+  beginConfirm.classList.add('hidden');
+  titleActions.classList.remove('hidden');
+});
+document.getElementById('btn-begin-confirm').addEventListener('click', () => {
+  // W is still at its defaults on the title screen, so begin IN PLACE — the old
+  // wipe()+reload bounced the page and flashed the title back up for a beat ("a second
+  // window that just says Begin, then fades"); no reload is needed here.
+  wipe();        // world.js stashes the outgoing save under SAVE_KEY_PREV before clearing
   beginIntro();
 });
 btnContinue.addEventListener('click', () => {
@@ -462,10 +493,14 @@ btnContinue.addEventListener('click', () => {
     for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
     titleEl.classList.add('fading');
     const pos = W.playerPos || new THREE.Vector3(4, 0, -104);
+    // the facing persists too (#58): [yaw, pitch] from the save, falling back
+    // to the historical hardcoded beach facing for pre-v3 saves.
+    let [yaw, pitch] = W.playerLook || [2.72, 0];
     // a save written below the drained-tide line predates the basin rim
     // block — those spots have no walkable exit; the tide returns you
-    if (heightAt(pos.x, pos.z) < -2.2) pos.set(4, 0, -104);
-    player.spawn(pos, 2.72);
+    // (and the saved facing is meaningless at the fallback spot)
+    if (heightAt(pos.x, pos.z) < -2.2) { pos.set(4, 0, -104); yaw = 2.72; pitch = 0; }
+    player.spawn(pos, yaw, pitch);
     player.locked = false;
     interact.enabled = true;
     MODE = 'play';
@@ -505,7 +540,7 @@ function endIntro() {
   UI.whisper('The tide brought you back.');
   UI.showHint();
   W.flags.introDone = true;
-  save(player.pos);
+  save(player);
 }
 
 // shared scratch for the cinematic ticks — they run every frame through the dive/ascent/
@@ -572,7 +607,7 @@ function tickDive(dt) {
     if (W.level >= 2) W.regions.l2seen = true;
     if (W.level >= 3) W.regions.l3seen = true;
     if (W.level >= 4) W.regions.l4seen = true;
-    save(player.pos);
+    save(player);
     player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
   }
   if (f >= 1) {
@@ -687,7 +722,7 @@ function landAscent() {
   }
   // SEA-STRATA: arriving a level shallower, the sea recedes to that level's tide (surface = 1)
   W.tide = W.tideTarget = (W.level > 1 ? LEVELS[W.level].tide : 1);
-  save(player.pos);
+  save(player);
   // rise out at the study / chart table of the level above (canon: you climb to the chart table)
   player.spawn(new THREE.Vector3(SPOTS.lighthouse.x + 2.2, 0, SPOTS.lighthouse.y - 1.4), 2.19, 0.02);
 }
@@ -818,7 +853,7 @@ function startOarFinale() {
   const camStartPos = new THREE.Vector3(-26, 2.6, -116);
   const pivot = new THREE.Vector3(2, 0.9, -64); // the island's heart — the model collapses here
   camera.position.copy(camStartPos);
-  // a dark sea under the model: farSea is a RingGeometry(280,9000) with a 280-unit hole at
+  // a dark sea under the model: farSea is a RingGeometry(310,9000) with a 310-unit hole at
   // the origin that the full-size island normally fills; once the island shrinks away the
   // model would float over a void, so lay a flat dark disc across the gap for the terminal.
   oarSea = new THREE.Mesh(new THREE.CircleGeometry(1400, 48),
@@ -979,6 +1014,16 @@ const spray = (() => {
 scene.add(spray);
 let saveTimer = 0;
 
+// #58: the 12s autosave used to be the ONLY writer, so closing the tab could
+// throw away up to 12s of play (and, before v3, the facing never persisted at
+// all). Flush a save when the page goes away — pagehide for real closes and
+// navigations, visibilitychange→hidden for tab switches and the mobile-Safari
+// cases where pagehide never fires. Same guard as the timer: only mid-play,
+// never poised on the brink of a dive (the journal will not follow you down).
+const flushSave = () => { if (MODE === 'play' && !game.atBrink()) save(player); };
+addEventListener('pagehide', flushSave);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSave(); });
+
 function applyAtmosphere(elapsed, dt) {
   const g = gradeAt(W.time);
   renderer.toneMappingExposure = g.exposure; // per-grade tone (#2): noon airy, night crushed
@@ -1077,11 +1122,12 @@ function applyAtmosphere(elapsed, dt) {
   wu.uDeep.value.copy(g.water);
   wu.uShallow.value.copy(g.waterShallow);
   wu.uSkyCol.value.copy(g.skyHorizon);
+  wu.uSkyTop.value.copy(g.skyTop);   // #42: the fresnel sky-mirror grades horizon→zenith with the reflection ray
   wu.uFogColor.value.copy(g.fog);
   wu.uFogDen.value = g.fogDen;
   wu.uNight.value = night;
 
-  farSea.material.color.copy(g.water).lerp(g.fog, 0.35);
+  // farSea shares the water material's uniform objects — the wu.* writes above drive it
   farSea.position.y = waterY() - 0.15;
 
   // the foreshadow ring — only while up on the gallery; sits at the NEXT level's waterline (the
@@ -1132,8 +1178,9 @@ function applyAtmosphere(elapsed, dt) {
       d.scale.setScalar(clamp(Math.min(u.phase / 0.07, (1 - u.phase) / 0.07), 0, 1));
     }
   }
-  // the keeper's lamp burns one level down, with a faint lamp-oil flicker
-  keeperLamp.intensity = (W.level >= 2 ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
+  // the keeper's lamp burns one level down, with a faint lamp-oil flicker — and stays
+  // warm after the return (integration relights the hearth: "two lights now")
+  keeperLamp.intensity = ((W.level >= 2 || W.flags.returned) ? 26 : 0) * (1 + 0.05 * Math.sin(elapsed * 6.3));
   // the jetty beacon: a low warm glow by day, a real beacon by night
   jettyLamp.intensity = lerp(3, 20, night) * (1 + 0.07 * Math.sin(elapsed * 4.7));
   // the globe blooms a soft halo and burns brighter as night falls — a light
@@ -1188,9 +1235,14 @@ function applyAtmosphere(elapsed, dt) {
       if (sh.uniforms.uHaze) sh.uniforms.uHaze.value.copy(scene.fog.color);
     }
   }
-  // terrain aerial perspective (#5a): far land melts toward the grade's haze
-  if (terrainMat?.userData.shader?.uniforms.uHaze) {
-    terrainMat.userData.shader.uniforms.uHaze.value.copy(scene.fog.color);
+  // terrain aerial perspective (#5a): far land melts toward the grade's haze —
+  // plus the waterline pass (#47/#38): tide line + caustics ride the live tide
+  if (terrainMat?.userData.shader) {
+    const tu = terrainMat.userData.shader.uniforms;
+    tu.uHaze.value.copy(scene.fog.color);
+    tu.uWaterY.value = waterY();
+    tu.uTime.value = elapsed;
+    tu.uSunUp.value = clamp((_sunV.y + 0.02) / 0.14, 0, 1);
   }
 
   // L2 fish-shadows: dark silhouettes gliding over the kelp floor in slow circles (#143).
@@ -1271,12 +1323,15 @@ function tickPerched(elapsed, dt) {
       u.cool -= dt;
       if (u.cool <= 0 && d > 14) u.flush = 0;
     }
-    // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the climb)
+    // wings: swept-back/folded at rest, snap open + flap fast on takeoff (spread leads the
+    // climb). Rest pose = the FOLD_* constants from addWings; chord stretches back out as
+    // the wing opens.
     if (g.lw) {
       const spread = u.flush === 0 ? 0 : clamp(u.flush * 5, 0, 1);
       const flap = 0.18 + Math.sin(elapsed * 22 + u.ph) * 0.72;
-      g.rw.rotation.y = lerp(1.5, 0, spread); g.rw.rotation.z = lerp(-0.13, flap, spread);
-      g.lw.rotation.y = lerp(-1.5, 0, spread); g.lw.rotation.z = lerp(0.13, -flap, spread);
+      g.rw.rotation.y = lerp(FOLD_Y, 0, spread); g.rw.rotation.z = lerp(-FOLD_Z, flap, spread);
+      g.lw.rotation.y = lerp(-FOLD_Y, 0, spread); g.lw.rotation.z = lerp(FOLD_Z, -flap, spread);
+      g.lw.scale.z = g.rw.scale.z = lerp(FOLD_CHORD, 1, spread);
     }
   }
 }
@@ -1331,7 +1386,7 @@ player.onFootstep = (kind, pos) => {
       if (n >= 3) W.regions.l3seen = true;
       if (n >= 4) W.regions.l4seen = true;
       player.spawn(new THREE.Vector3(L.spawn.pos[0], 0, L.spawn.pos[2]), L.spawn.yaw, L.spawn.pitch);
-      save(player.pos);
+      save(player);
       return { level: n, id: L.id, region: L.region, tide: L.tide, encounter: L.encounter };
     },
     dive: (instant = false) => {                       // the missing counterpart to ascend()
@@ -1363,7 +1418,7 @@ player.onFootstep = (kind, pos) => {
       W.lensPlaced = false; W.beamAngle = 2.2; W.dials = [0, 0, 0, 0]; W.inventory = [];
       W.onceKeys = []; W.readKeys = [];
       W.regions = { l2seen: false, l3seen: false, l4seen: false, fragmentsFound: [] };
-      save(player.pos);
+      save(player);
       return 'flags reset (in-world)';
     },
     tideFigure: () => {                                // spawn/reset the L2 Tide-Figure ~12m ahead, for testing
@@ -1453,7 +1508,7 @@ function buildDebugPanel() {
     fragAdd: () => { W.regions.fragmentsFound.push('test-' + W.regions.fragmentsFound.length); },
     fragClear: () => { W.regions.fragmentsFound.length = 0; },
     clrRegions: () => { W.regions.l2seen = W.regions.l3seen = W.regions.l4seen = false; },
-    saveNow: () => save(player.pos), wipe: () => { wipe(); location.reload(); }, reset: () => A.resetFlags(),
+    saveNow: () => save(player), wipe: () => { wipe(); location.reload(); }, reset: () => A.resetFlags(),
   };
   // [act, label, tooltip] grouped into collapsible sections.
   const groups = [
@@ -1583,20 +1638,43 @@ function makeGpuTimer(renderer) {
 const clock = new THREE.Clock();
 let elapsed = 0, fps = 60;
 
-// power policy (owner directive): the island only needs 60fps. The frame
-// governor skips ticks only when clearly ahead of the 60fps budget — the
-// 12.5ms threshold sits safely between the 60Hz (16.7ms) and 120Hz (8.3ms)
-// intervals, so a 60Hz display never drops a frame (the old 15.5ms gate
-// sat against the 60Hz interval and stuttered) while a 120Hz display still
-// renders every other tick. Resolution is fixed (see BASE_DPR) — no
-// per-frame setPixelRatio, no framebuffer-realloc hitches.
-let lastTickMs = 0;
+// power policy (owner directive): the island only needs 60fps. The frame governor is a
+// fixed-rate ACCUMULATOR (perf #33): each rendered tick books exactly one 60Hz interval
+// (nextTickMs += 16.67) and CARRIES THE REMAINDER, so every refresh rate averages 60 —
+// the old flat "delta < 12.5ms" gate aliased against the display interval and gave 45fps
+// on 90Hz panels and 72fps on 144Hz. TICK_SLOP absorbs rAF timestamp jitter so a true
+// 60Hz display still renders every one of its frames (the very stutter the 12.5ms gate
+// existed to avoid), while staying under half a 120Hz interval so high-Hz panels keep
+// skipping. After a stall (hidden tab, GC) the schedule clamps to "now" — no banked debt,
+// no burst of catch-up frames. Resolution is fixed (see BASE_DPR) — no per-frame
+// setPixelRatio, no framebuffer-realloc hitches.
+const TICK_MS = 1000 / 60;
+const TICK_SLOP_MS = 4;
+let nextTickMs = 0;
 let mistCur = 0;
+
+// gate the 1:240 chart-table model (perf #26): the clone costs ~270k tris yet lives INSIDE
+// the tower — invisible from almost everywhere on the island. In play mode show it only when
+// the player is within 30m of the lighthouse; every model interaction happens at the chart
+// table (model hotspots crack/lensSlot/beamAim all maxDist ≤ 3.2m, plate demands standing on
+// it), so 30m has huge slack. Non-play modes keep it visible: the dive/ascent zoom THROUGH
+// the model, and the intro/finale cameras roam free. Squared x/z distance, re-checked at 4Hz
+// (or immediately on a mode change) — no sqrt, no per-frame work.
+const MODEL_GATE_R2 = 30 * 30;
+let modelGateTimer = 0, modelGateMode = null;
+function tickModelGate(dt) {
+  modelGateTimer -= dt;
+  if (modelGateTimer > 0 && MODE === modelGateMode) return;
+  modelGateTimer = 0.25;
+  modelGateMode = MODE;
+  const dx = player.pos.x - SPOTS.lighthouse.x, dz = player.pos.z - SPOTS.lighthouse.y;
+  modelRoot.visible = MODE !== 'play' || (dx * dx + dz * dz < MODEL_GATE_R2);
+}
 
 renderer.setAnimationLoop((tMs) => {
   const nowMs = tMs ?? performance.now();
-  if (nowMs - lastTickMs < 12.5) return; // 60fps cap; never drops a 60Hz frame
-  lastTickMs = nowMs;
+  if (nowMs < nextTickMs - TICK_SLOP_MS) return; // 60fps cap, remainder-carrying (see above)
+  nextTickMs = Math.max(nextTickMs + TICK_MS, nowMs); // book one tick; a stall re-bases, never banks debt
   renderer.info.reset();                 // autoReset is off — one reset per tick = whole-frame stats
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
@@ -1639,6 +1717,7 @@ renderer.setAnimationLoop((tMs) => {
 
   if (!W.reading) player.update(dt);   // a fragment is open: the world holds still while you read
   game.tick(dt, elapsed);
+  tickModelGate(dt);
   interact.update();
   applyAtmosphere(elapsed, dt);
   tickGulls(elapsed, dt);
@@ -1658,7 +1737,7 @@ renderer.setAnimationLoop((tMs) => {
   // not follow you down, so the world stops recording as you cross the threshold
   if (MODE === 'play' && !game.atBrink()) {
     saveTimer += dt;
-    if (saveTimer > 12) { saveTimer = 0; save(player.pos); }
+    if (saveTimer > 12) { saveTimer = 0; save(player); }
   }
 
   // one-time post-processing self-test (see the note at the composer setup): on the first BRIGHT

@@ -12,6 +12,10 @@ let ctx = null;
 
 const MASTER_LEVEL = 0.6;
 
+// the leitmotif — E G A D C: the figure the music box turns, the bird corrects,
+// the stems arpeggiate, and the final bell gathers. One constant, every voice.
+const LEIT = [329.63, 392.0, 440.0, 293.66, 261.63];
+
 const A = {
   master: null, amb: null, music: null, fx: null,
   diveFilter: null,
@@ -33,7 +37,14 @@ const A = {
   setMuted(m) {
     this.muted = !!m;
     localStorage.setItem('abyme-muted', this.muted ? '1' : '0');
-    if (this.master) this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+    if (!this.master) return;
+    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+    // mute used to be a volume knob only: six noise loops + the stem LFOs kept
+    // rendering at gain 0 (#68). Halt the whole graph instead. Unmute resumes
+    // through the same autoplay-safe path as #62 — the toggle itself is a
+    // gesture, so in practice it succeeds immediately.
+    if (this.muted) { if (ctx.state === 'running') ctx.suspend().catch(() => {}); }
+    else { this._tryResume(); this._installUnlock(); }
   },
 
   init() {
@@ -46,7 +57,15 @@ const A = {
     this.diveFilter.frequency.value = 19000;
     this.master.connect(this.diveFilter).connect(ctx.destination);
 
-    this.amb = ctx.createGain(); this.amb.connect(this.master);
+    this.amb = ctx.createGain();
+    // walls are a FILTER, not a volume knob (#67): the whole ambient bed passes
+    // through one shared biquad — wide open outdoors, closing to ~750Hz through
+    // the tower's stone. The hiss and sparkle die at the door; the low sea stays.
+    this.wallFilter = ctx.createBiquadFilter();
+    this.wallFilter.type = 'lowpass';
+    this.wallFilter.frequency.value = 19000;
+    this.wallFilter.Q.value = 0.5;
+    this.amb.connect(this.wallFilter).connect(this.master);
     this.music = ctx.createGain(); this.music.gain.value = 0.5; this.music.connect(this.master);
     this.musicBed = ctx.createGain(); this.musicBed.gain.value = 0.55; this.musicBed.connect(this.master); // the era music stems
     this._music = null; this._musicLevel = 0;
@@ -74,14 +93,46 @@ const A = {
     this.room = this._noiseLoop('brown', 130);
     this.room.gain.gain.value = 0;
     this.room.out.connect(this.amb);
-    const hum = ctx.createOscillator();
-    hum.frequency.value = 55;
-    const humG = ctx.createGain(); humG.gain.value = 0.12;
-    hum.connect(humG).connect(this.room.gain);
-    hum.start();
+    // the old steady 55Hz sine read as electrical mains hum — wrong for a tower
+    // with no wiring (#67). The interior presence is a second, DEEPER brown
+    // layer instead: sub-70Hz filtered noise, the building's own slow breath.
+    // It rides this.room.gain, so it fades in and out with the room tone.
+    this.roomAir = this._noiseLoop('brown', 68);
+    this.roomAir.gain.gain.value = 0.5;
+    this.roomAir.out.connect(this.room.gain);
 
     this.ready = true;
-    if (ctx.state === 'suspended') ctx.resume();
+    if (this.muted && ctx.state === 'running') ctx.suspend().catch(() => {}); // muted renders NOTHING (#68)
+    this._tryResume();
+    this._installUnlock();
+  },
+
+  // ---- autoplay unlock (#62): a replay reload ('begin again') re-enters via
+  // sessionStorage autostart, so init() runs with NO user activation and the
+  // one-shot resume() above is rejected — the whole second playthrough used to
+  // stay silent. Keep permanent gesture listeners plus a per-frame suspended
+  // check (see update()); once the context is actually running, the listeners
+  // come off.
+  _tryResume() {
+    if (this.muted || !ctx || ctx.state !== 'suspended') return;   // muted-suspend (#68) stays suspended
+    ctx.resume().catch(() => {});   // rejected without a gesture; the unlock listeners retry
+  },
+
+  // one-shots must not schedule while the context is halted (muted suspend #68,
+  // pre-unlock #62): their clock is frozen, so scheduled nodes would pile up
+  // and all fire in one burst the moment the context resumes.
+  _running() { return this.ready && !!ctx && ctx.state === 'running'; },
+  _installUnlock() {
+    if (this._unlockFn) return;
+    this._unlockFn = () => this._tryResume();
+    window.addEventListener('pointerdown', this._unlockFn, true);
+    window.addEventListener('keydown', this._unlockFn, true);
+  },
+  _removeUnlock() {
+    if (!this._unlockFn) return;
+    window.removeEventListener('pointerdown', this._unlockFn, true);
+    window.removeEventListener('keydown', this._unlockFn, true);
+    this._unlockFn = null;
   },
 
   _noiseLoop(kind, freq, type = 'lowpass', q = 0.8) {
@@ -107,14 +158,30 @@ const A = {
   // called every frame from the main loop
   update(dt, s) {
     if (!this.ready) return;
+    if (ctx.state === 'suspended') {
+      // autoplay policy rejected init()'s resume() (#62): keep retrying here —
+      // sticky activation means this succeeds on the first frame after ANY
+      // gesture — but throttled, since a rejected resume() per frame is just
+      // promise churn. Nothing below matters while the clock is frozen.
+      this._resumeT = (this._resumeT || 0) + dt;
+      if (this._resumeT > 0.5) { this._resumeT = 0; this._tryResume(); }
+      return;
+    }
+    if (this._unlockFn) this._removeUnlock();   // running: the unlock job is done
     const t = ctx.currentTime;
     const k = 0.08; // smoothing
-    // surf: swell-locked, pulled away by tide, ducked indoors
-    const surfBase = s.interior ? 0.05 : clamp(0.34 - s.shoreDist * 0.0022, 0.04, 0.34);
+    // walls close in (#67): one shared lowpass over the whole ambient bed swings
+    // from wide open outside to ~750Hz inside — smoothly, so crossing the door
+    // reads as mass, not a volume knob. The hiss dies; the low swell survives.
+    this.wallFilter.frequency.setTargetAtTime(s.interior ? 750 : 19000, t, 0.35);
+    // surf: swell-locked, pulled away by tide. No interior gain-gate here any
+    // more — shoreDist already grows +60 through the door (main.js), and the
+    // wall filter does the muffling.
+    const surfBase = clamp(0.34 - s.shoreDist * 0.0022, 0.04, 0.34);
     this.surf.gain.gain.setTargetAtTime(surfBase * (0.55 + 0.45 * s.wavePhase) * s.tideNear, t, k);
     this.surfHiss.gain.gain.setTargetAtTime(surfBase * 0.16 * s.wavePhase * s.tideNear, t, k);
-    // wind: altitude raises pitch and volume, ducked indoors
-    const windBase = s.interior ? 0.012 : clamp(0.05 + s.altitude * 0.004, 0.05, 0.17);
+    // wind: altitude raises pitch and volume; walls take most of it (the rest is timbre)
+    const windBase = clamp(0.05 + s.altitude * 0.004, 0.05, 0.17) * (s.interior ? 0.35 : 1);
     this.wind.gain.gain.setTargetAtTime(windBase * (0.7 + 0.3 * Math.sin(t * 0.31)), t, 0.3);
     // drizzle rises with thick mist, muffled under a roof
     const rainBase = (s.mist ?? 0) > 0.45 ? ((s.mist - 0.45) * 0.11) : 0;
@@ -141,7 +208,7 @@ const A = {
 
   // FM bell-pluck — the music box voice
   pluck(freq, when = 0, vol = 0.5, decay = 1.4) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime + when;
     const car = ctx.createOscillator(); car.frequency.value = freq;
     const mod = ctx.createOscillator(); mod.frequency.value = freq * 3.01;
@@ -157,7 +224,7 @@ const A = {
 
   // the bird sings a note — formant chirp
   chirp(freq, when = 0, vol = 0.35) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime + when;
     const o = ctx.createOscillator();
     o.type = 'sine';
@@ -172,30 +239,37 @@ const A = {
     o.start(t0); o.stop(t0 + 0.45);
   },
 
-  // a standing stone hums
-  stoneTone(i, vol = 0.4) {
-    if (!this.ready) return;
-    const freq = STONE_NOTES[i] / 2; // an octave down: monoliths, not chimes
+  // a standing stone hums. damp 0..1 (#51): the deep's version — darker filter, a shade
+  // flat, quieter and longer, the hum arriving as through water.
+  stoneTone(i, vol = 0.4, damp = 0) {
+    if (!this._running()) return;
+    const freq = (STONE_NOTES[i] / 2) * (1 - damp * 0.028); // an octave down: monoliths, not chimes
     const t0 = ctx.currentTime;
     const g = ctx.createGain();
-    this._env(g, t0, 0.08, vol, 2.2);
+    this._env(g, t0, 0.08 + damp * 0.07, vol * (1 - damp * 0.4), 2.2 + damp * 0.9);
     for (const det of [-4, 3]) {
       const o = ctx.createOscillator();
       o.type = 'sawtooth';
       o.frequency.value = freq;
       o.detune.value = det;
       const f = ctx.createBiquadFilter();
-      f.type = 'lowpass'; f.frequency.setValueAtTime(900, t0);
-      f.frequency.exponentialRampToValueAtTime(220, t0 + 2.0);
+      f.type = 'lowpass'; f.frequency.setValueAtTime(900 - damp * 560, t0);
+      f.frequency.exponentialRampToValueAtTime(220 - damp * 90, t0 + 2.0 + damp * 0.8);
       o.connect(f).connect(g);
-      o.start(t0); o.stop(t0 + 2.6);
+      o.start(t0); o.stop(t0 + 2.6 + damp);
     }
     g.connect(this.fx);
   },
 
   chime() { this.pluck(1046.5, 0, 0.3, 1.8); this.pluck(1318.5, 0.09, 0.22, 2.2); },
+  // the five stem-earning solves answer in the island's OWN figure (#65): the
+  // leitmotif strummed quickly — the final bell's crown in miniature — while the
+  // ~10 ordinary solves keep the generic two-note chime.
+  leitStrum() {
+    LEIT.forEach((f, i) => this.pluck(f, i * 0.085, 0.2 - i * 0.018, 2.8));
+  },
   deny() {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     const o = ctx.createOscillator(); o.frequency.value = 72; o.type = 'sine';
     const g = ctx.createGain(); this._env(g, t0, 0.01, 0.5, 0.5);
@@ -203,7 +277,7 @@ const A = {
   },
 
   crankTick() {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 1400 + Math.random() * 300;
     const g = ctx.createGain(); this._env(g, t0, 0.001, 0.05, 0.03);
@@ -225,7 +299,7 @@ const A = {
   },
 
   footstep(kind) {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     const len = 0.09 * ctx.sampleRate;
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
@@ -264,14 +338,13 @@ const A = {
       case 1: this._stemGains[1] = drone(110, 0.05); break;  // A2 root
       case 2: this._stemGains[2] = drone(164.8, 0.04); break; // E3 fifth
       case 3: { // slow leitmotif arp
-        const notes = [329.63, 392.0, 440.0, 293.66, 261.63];
         let i = 0;
-        this._arp = setInterval(() => { this.pluck(notes[i % 5] / 2, 0, 0.10, 3.0); i++; }, 3800);
+        this._arp = setInterval(() => { this.pluck(LEIT[i % 5] / 2, 0, 0.10, 3.0); i++; }, 3800);
         break;
       }
       case 4: { // deep pulse
         this._pulse = setInterval(() => {
-          if (!ctx) return;
+          if (!this._running()) return;   // muted-suspend (#68): no beats onto a frozen clock
           const t0 = ctx.currentTime;
           const o = ctx.createOscillator(); o.frequency.value = 55;
           const g = ctx.createGain(); this._env(g, t0, 0.3, 0.12, 2.4);
@@ -323,7 +396,6 @@ const A = {
       }
     }
     if (has(3)) {                                  // the leitmotif itself, strummed as a chord
-      const LEIT = [329.63, 392.0, 440.0, 293.66, 261.63]; // E G A D C
       LEIT.forEach((f, i) => this.pluck(f, 0.6 + i * 0.09, 0.22, 7));
     }
     if (has(4)) {                                  // one deep gathered beat
@@ -348,7 +420,7 @@ const A = {
   // Quiet on purpose — a presence, not a narrator. Register bends the contour:
   // curious rises, pleading wavers, resigned falls.
   keeperVoice(register = 'curious') {
-    if (!this.ready) return;
+    if (!this._running()) return;
     const t0 = ctx.currentTime;
     // the drowned bus: lowpass to a murmur, one-floor-down echo, into fx
     const vg = ctx.createGain(); vg.gain.value = 0.85; vg.connect(this.fx);
@@ -392,7 +464,7 @@ const A = {
   // if the clip can't load (offline / missing), it falls back to the FM murmur,
   // so the keeper always speaks one way or another. register is for that fallback.
   say(id, register = 'curious', eyeLevel = false) {
-    if (!this.ready) return;
+    if (!this._running()) return;   // muted/halted: don't even decode the clip (#68)
     loadAudioBuffer(id, ctx).then((buf) => {
       const vg = ctx.createGain(); vg.gain.value = eyeLevel ? 1.0 : 0.85; vg.connect(this.fx);
       const drown = ctx.createBiquadFilter(); drown.type = 'lowpass';
@@ -429,38 +501,122 @@ const A = {
     o.start(t0); o.stop(t0 + 2.9); ov.start(t0); ov.stop(t0 + 2.9);
   },
 
-  // the era MUSIC bed: a looping ambient stem per descent level (the color-psychology arc made
-  // HEARD), crossfaded as W.level changes. Lazy-decoded current + adjacent; offline → silent (the
-  // procedural score carries it). Called every frame in play — early-returns unless the level moved.
-  musicTo(level) {
-    if (!this.ready) return;
-    const lv = Math.max(1, Math.min(5, level | 0));
-    if (this._musicLevel === lv && this._music) return;
-    this._musicLevel = lv;
-    const id = `music_l${lv}`;
-    loadAudioBuffer(id, ctx).then((buf) => {
-      if (this._musicLevel !== lv) return;             // level moved on while decoding
-      const old = this._music;
-      const g = ctx.createGain(); g.gain.value = 0;
-      const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-      src.connect(g).connect(this.musicBed);
-      src.start();
-      g.gain.setTargetAtTime(1, ctx.currentTime, 3.5);  // ease the new stem in
-      this._music = { src, g };
-      if (old) {
-        old.g.gain.setTargetAtTime(0, ctx.currentTime, 3.5);
-        setTimeout(() => { try { old.src.stop(); old.src.disconnect(); old.g.disconnect(); } catch (_) {} }, 9000);
+  // ---------------- the era MUSIC bed: GENERATIVE (owner: the canned stems were not great) ----
+  // The color-psychology arc made HEARD by the island's own synth voice, not a 12-second loop:
+  // per-level ROOT from the leitmotif's own family (E G A D C), a breathing two-osc drone + fifth,
+  // a slow sea-breath noise pad, and a sparse melody that walks fragments of the LEITMOTIF
+  // transposed into the era's key. Depth darkens everything — cutoff falls, detune widens, the
+  // fragments thin — and the melody carries the story's own wound: the FOURTH note (the one the
+  // keeper bends down where the bird bends it up) plays a shade flat one level down, flatter the
+  // deeper, and at the source it does not come at all (the box's #51 behavior, in the score).
+  // Endless, non-repeating, ~7 nodes; musicTo() keeps its API — it RETARGETS one persistent
+  // graph instead of crossfading buffers.
+  _ERAS: [null,
+    { root: 82.41, cutoff: 950, det: 4, gapLo: 9, gapHi: 15, breath: 16, vol: 1.00 },  // L1 E2 — warm gold
+    { root: 98.00, cutoff: 620, det: 7, gapLo: 11, gapHi: 17, breath: 19, vol: 0.95 }, // L2 G2 — sodium green
+    { root: 110.0, cutoff: 420, det: 11, gapLo: 14, gapHi: 21, breath: 23, vol: 0.90 },// L3 A2 — jaundice
+    { root: 73.42, cutoff: 300, det: 16, gapLo: 17, gapHi: 25, breath: 28, vol: 0.85 },// L4 D2 — isolation blue
+    { root: 65.41, cutoff: 220, det: 22, gapLo: 22, gapHi: 31, breath: 34, vol: 0.80 },// L5 C2 — dead violet
+  ],
+  _buildBed() {
+    const bed = { master: ctx.createGain() };
+    bed.master.gain.value = 0;
+    bed.master.connect(this.musicBed);
+    // the drone: root pair (sine+triangle, detuned) + a quiet fifth, through one breathing lowpass
+    bed.filt = ctx.createBiquadFilter(); bed.filt.type = 'lowpass'; bed.filt.frequency.value = 950; bed.filt.Q.value = 0.4;
+    bed.filt.connect(bed.master);
+    bed.oscs = [];
+    const mkOsc = (type, ratio, vol) => {
+      const o = ctx.createOscillator(); o.type = type; o.frequency.value = 82.41 * ratio;
+      const g = ctx.createGain(); g.gain.value = vol;
+      o.connect(g).connect(bed.filt); o.start();
+      bed.oscs.push({ o, g, ratio });
+      return o;
+    };
+    mkOsc('sine', 1, 0.16); mkOsc('triangle', 1, 0.07); mkOsc('sine', 1.5, 0.05);
+    // the filter breathes on a slow LFO — the sea's own tempo, slower with depth
+    bed.lfo = ctx.createOscillator(); bed.lfo.frequency.value = 1 / 16;
+    bed.lfoG = ctx.createGain(); bed.lfoG.gain.value = 120;
+    bed.lfo.connect(bed.lfoG).connect(bed.filt.frequency); bed.lfo.start();
+    // sea-breath pad: a slow band of noise that swells against the drone
+    bed.breath = this._noiseLoop('brown', 240, 'lowpass', 0.5);
+    bed.breath.gain.gain.value = 0.05;
+    bed.breath.out.connect(bed.master);
+    return bed;
+  },
+  // one soft bed voice: sine swell with slow attack — a pad note, not a pluck
+  _bedNote(freq, when, vol, dur) {
+    if (!this._running()) return;
+    const t0 = ctx.currentTime + when;
+    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+    const ov = ctx.createOscillator(); ov.type = 'sine'; ov.frequency.value = freq * 2.01; // faint octave shimmer
+    const og = ctx.createGain(); og.gain.value = 0.18;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + dur * 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); ov.connect(og).connect(g); g.connect(this._bed.master);
+    o.start(t0); o.stop(t0 + dur + 0.1); ov.start(t0); ov.stop(t0 + dur + 0.1);
+  },
+  _bedMelody() {
+    // a sparse fragment of the leitmotif, transposed into the era key (LEIT is rooted on E;
+    // multiplying by root/E2's octave keeps the figure, moves the mode). Depth thins it.
+    const lv = this._musicLevel || 1;
+    const era = this._ERAS[Math.max(1, Math.min(5, lv))];
+    const depth = Math.max(0, lv - 1);
+    const T = (era.root / 82.41) / 2;                       // into a low, bed-appropriate octave
+    const start = (Math.random() * 5) | 0;
+    const len = Math.max(2, 3 + ((Math.random() * 2) | 0) - (depth > 1 ? 1 : 0));
+    let when = 0;
+    for (let k = 0; k < len; k++) {
+      const idx = (start + k) % 5;
+      let f = LEIT[idx] * T;
+      if (idx === 3) {                                       // the FOURTH note carries the wound
+        if (lv >= 4) continue;                               // at the source it does not come
+        if (depth) f *= 1 - 0.015 * depth;                   // a shade flat, flatter deeper
       }
-      for (let n = 1; n <= 5; n++) if (Math.abs(n - lv) > 1) evictAudio(`music_l${n}`); // keep current + adjacent
-    }).catch(() => {});
+      this._bedNote(f, when, 0.10 - depth * 0.012, 5.5 + depth * 0.8);
+      when += 1.6 + Math.random() * 1.4 + depth * 0.5;
+    }
+  },
+  _bedTick() {
+    if (!this._bed || this._bedStopped) return;
+    if (this._running() && this._musicLevel >= 1) this._bedMelody();
+    const era = this._ERAS[Math.max(1, Math.min(5, this._musicLevel || 1))];
+    const gap = era.gapLo + Math.random() * (era.gapHi - era.gapLo);
+    this._bedTimer = setTimeout(() => this._bedTick(), gap * 1000);
+  },
+  musicTo(level) {
+    // halted (muted #68 / pre-unlock #62): skip — called every play frame, catches up on resume.
+    if (!this._running()) return;
+    const lv = Math.max(1, Math.min(5, level | 0));
+    if (this._musicLevel === lv && this._bed && !this._bedStopped) return;
+    const wasStopped = this._bedStopped;
+    this._musicLevel = lv;
+    this._bedStopped = false;
+    if (!this._bed) { this._bed = this._buildBed(); this._bedTick(); }
+    else if (wasStopped) { clearTimeout(this._bedTimer); this._bedTick(); }   // finale-stop → re-enter: re-arm the melody
+    const bed = this._bed, era = this._ERAS[lv], t = ctx.currentTime;
+    // retarget the one persistent graph — the era transition IS the crossfade
+    bed.master.gain.setTargetAtTime(0.30 * era.vol, t, 3.5);
+    bed.filt.frequency.setTargetAtTime(era.cutoff, t, 3.5);
+    bed.lfo.frequency.setTargetAtTime(1 / era.breath, t, 3.5);
+    for (const { o, g, ratio } of bed.oscs) {
+      o.frequency.setTargetAtTime(era.root * ratio, t, 2.8);
+      g.gain.setTargetAtTime(g.gain.value, t, 3.5);         // (volumes are static per-osc)
+    }
+    // widen the root pair's detune with depth (the drone loses its certainty going down)
+    if (bed.oscs[0]) bed.oscs[0].o.detune.setTargetAtTime(-era.det, t, 3.0);
+    if (bed.oscs[1]) bed.oscs[1].o.detune.setTargetAtTime(era.det, t, 3.0);
+    bed.breath.filt.frequency.setTargetAtTime(Math.max(140, era.cutoff * 0.4), t, 3.5);
   },
 
   // stop the era bed (the finale / leaving owns the soundscape from here)
   musicStop() {
-    const old = this._music; this._music = null; this._musicLevel = 0;
-    if (!old) return;
-    try { old.g.gain.setTargetAtTime(0, ctx.currentTime, 2); } catch (_) {}
-    setTimeout(() => { try { old.src.stop(); old.src.disconnect(); old.g.disconnect(); } catch (_) {} }, 5000);
+    this._musicLevel = 0;
+    this._bedStopped = true;
+    clearTimeout(this._bedTimer);
+    if (this._bed) { try { this._bed.master.gain.setTargetAtTime(0.0001, ctx.currentTime, 2); } catch (_) {} }
   },
 
   // the dive: the whole island drops an octave and comes back

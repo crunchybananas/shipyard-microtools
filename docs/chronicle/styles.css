@@ -249,29 +249,6 @@ h1 { font-size: 2rem; margin-bottom: 8px; }
 .template-btn:hover { background: rgba(124, 58, 237, 0.1); color: var(--text); }
 .template-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-/* Loading */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 24px;
-  color: var(--muted);
-}
-
-.spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent2);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 /* Story Output */
 .story-output {
   background: rgba(0, 0, 0, 0.3);

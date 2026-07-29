@@ -41,7 +41,8 @@ export function makeWaterMaterial(heightTex, domain) {
       uSunCol: { value: new THREE.Color(0xfff4e0) },
       uDeep: { value: new THREE.Color(0x15454f) },
       uShallow: { value: new THREE.Color(0x4fae9d) },
-      uSkyCol: { value: new THREE.Color(0xbfe0ee) },
+      uSkyCol: { value: new THREE.Color(0xbfe0ee) },   // sky at the horizon (what grazing reflections see)
+      uSkyTop: { value: new THREE.Color(0x3a7ab8) },   // sky at the zenith (what steep reflections see)
       uFogColor: { value: new THREE.Color(0xcfe3e8) },
       uFogDen: { value: 0.003 },
       uNight: { value: 0 },
@@ -91,6 +92,7 @@ export function makeWaterMaterial(heightTex, domain) {
       uniform vec3 uDeep;
       uniform vec3 uShallow;
       uniform vec3 uSkyCol;
+      uniform vec3 uSkyTop;
       uniform vec3 uFogColor;
       uniform float uFogDen;
       uniform float uNight;
@@ -116,6 +118,11 @@ export function makeWaterMaterial(heightTex, domain) {
         float scl = (fwidth(vWorld.x) + fwidth(vWorld.z)) / max(fwidth(vLocal.x) + fwidth(vLocal.z), 1e-6);
         float mini = 1.0 - smoothstep(0.05, 0.5, scl);
 
+        // circle the WORLD sea at r=310 so it meets the farSea ring's inner edge with a
+        // clean circular seam — the square plane's corners used to double-draw under the
+        // ring from 280 to 438m (#37). The 1:240 model keeps its square sheet (mini).
+        if (mini < 0.5 && dot(vLocal.xz, vLocal.xz) > 96100.0) discard;
+
         // ripple normal detail — gentled at 1:240 where it reads as chalk
         vec2 rp = vLocal.xz * 0.35 + vec2(uTime * 0.07, -uTime * 0.05);
         float r1 = fbm2(rp);
@@ -129,14 +136,22 @@ export function makeWaterMaterial(heightTex, domain) {
         float dfac = 1.0 - exp(-depth * 0.32);
         vec3 body = mix(uShallow, uDeep, dfac);
 
-        // sky reflection
-        vec3 col = mix(body, uSkyCol, fresnel * 0.75);
+        // sky reflection — graded by the reflection ray's elevation, so grazing water mirrors
+        // the horizon band and steeper looks pick up the deeper zenith blue (sqrt ~ the sky
+        // shader's pow(up, 0.55) gradient; ~3 ALU on top of the old flat mix)
+        float refUp = sqrt(clamp(reflect(-V, N).y, 0.0, 1.0));
+        vec3 col = mix(body, mix(uSkyCol, uSkyTop, refUp), fresnel * 0.75);
 
         // caustics — sunlight dappling the sunlit SHALLOWS (daytime + shallow only, capped at
-        // 0.3*sun so the broad sea never crosses the 0.85 bloom threshold; damped on the 1:240 clone)
+        // 0.3*sun so the broad sea never crosses the 0.85 bloom threshold; damped on the 1:240
+        // clone). Two counter-scrolled samples, min'd (#38): the intersections travel and
+        // sharpen like true caustic cells instead of one sliding dapple sheet.
         vec2 cuv = vLocal.xz * 0.07 + vec2(uTime * 0.03, -uTime * 0.024);
-        float caus = smoothstep(0.55, 0.93, dot(texture2D(uCaustic, cuv).rgb, vec3(0.299, 0.587, 0.114)));
-        col += uSunCol * caus * (1.0 - dfac) * 0.3 * smoothstep(-0.02, 0.14, uSunDir.y) * mix(1.0, 0.2, mini);
+        vec2 cuv2 = vLocal.xz * 0.083 + vec2(-uTime * 0.026, uTime * 0.021);
+        float caus = smoothstep(0.50, 0.90, min(
+          dot(texture2D(uCaustic, cuv).rgb, vec3(0.299, 0.587, 0.114)),
+          dot(texture2D(uCaustic, cuv2).rgb, vec3(0.299, 0.587, 0.114))));
+        col += uSunCol * caus * (1.0 - dfac) * 0.38 * smoothstep(-0.02, 0.14, uSunDir.y) * mix(1.0, 0.2, mini);
 
         // sun glitter — a tight sun-disc core PLUS a broad, broken glitter road so
         // the low sun scatters across the swell (the single biggest "alive" cue).
@@ -160,15 +175,21 @@ export function makeWaterMaterial(heightTex, domain) {
         col += vec3(0.55, 0.65, 0.8) * pow(max(dot(R, V), 0.0), 350.0) * uNight * 1.2 * mix(1.0, 0.16, mini);
         col += vec3(0.50, 0.62, 0.80) * smoothstep(0.30, 0.92, pow(max(dot(Rg, V), 0.0), 40.0)) * uNight * 0.5 * mix(1.0, 0.14, mini);
 
-        // shoreline foam
+        // shoreline foam (#47): a lacy surf band PLUS a crisp bright collar right at the
+        // sand contact, so the waterline reads as surf instead of a clean vector edge.
+        float foamTex2 = texture2D(uFoam, vLocal.xz * 0.55 + vec2(-uTime * 0.013, uTime * 0.017)).r;
         float foamBand = 1.0 - smoothstep(0.0, 0.85, depth + (r1 - 0.5) * 0.4);
         float foamPulse = 0.65 + 0.35 * sin(uTime * 1.3 + vLocal.x * 0.18 + vLocal.z * 0.13);
-        float foam = foamBand * foamPulse;
+        float foam = foamBand * foamPulse * mix(0.72, 1.25, foamTex2);
+        // the collar: a narrow, near-solid white lip where depth -> 0, its edge broken by the
+        // second lace sample so it scallops along the beach like a real swash line
+        float collar = 1.0 - smoothstep(0.02, 0.24, depth + (foamTex2 - 0.5) * 0.10);
+        foam = max(foam, collar * (0.78 + 0.22 * foamPulse));
         // lacy foam structure — a sampled froth breaks the flat white band into strands (smoothed
         // toward solid white on the 1:240 clone via mini so the tiny model stays clean)
         float foamTex = texture2D(uFoam, vLocal.xz * 0.25 + vec2(uTime * 0.02, -uTime * 0.015)).r;
         vec3 foamCol = mix(vec3(0.86, 0.90, 0.88), vec3(0.95, 0.97, 0.95), mix(foamTex, 1.0, mini));
-        col = mix(col, foamCol, clamp(foam, 0.0, 1.0) * 0.85);
+        col = mix(col, foamCol, clamp(foam, 0.0, 1.0) * mix(0.85, 0.96, collar));
 
         // alpha: clear at the very shore, solid over depth
         float alpha = clamp(0.55 + dfac * 0.45 + fresnel * 0.2 + foam * 0.4, 0.0, 0.96);
@@ -178,12 +199,95 @@ export function makeWaterMaterial(heightTex, domain) {
         float fogF = 1.0 - exp(-pow(length(cameraPosition - vWorld) * uFogDen, 2.0));
         col = mix(col, uFogColor, fogF);
 
+        col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither: break 8-bit mach banding at dawn/dusk/night
         gl_FragColor = vec4(col, alpha);
+        // tonemapping_fragment is renderer-gated to direct-to-screen draws: it applies ACES +
+        // per-grade exposure on the ?safe/no-bloom fallback, and compiles to a no-op inside the
+        // composer, where OutputPass owns the tonemap (#40; same in the sky/beam/glow shaders)
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
   });
   mat.name = 'waterMat';
+  return mat;
+}
+
+// -------------------------------------------------------------- far sea -----
+// The horizon annulus past the animated 620m sea (#37). The old flat
+// MeshBasicMaterial killed the glitter road — "the single biggest alive cue" —
+// at a visible seam. Slim shader, no fetches: fresnel sky mirror, drifting
+// glitter facets (coarse, so they hold up at range), sun + moon roads, and the
+// same exp2 fog law as the near water so the seam dissolves. Shares the near
+// water's uniform OBJECTS, so applyAtmosphere drives both for free.
+export function makeFarSeaMaterial(wu) {
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: wu.uTime,
+      uSunDir: wu.uSunDir,
+      uSunCol: wu.uSunCol,
+      uDeep: wu.uDeep,
+      uSkyCol: wu.uSkyCol,
+      uSkyTop: wu.uSkyTop,
+      uFogColor: wu.uFogColor,
+      uFogDen: wu.uFogDen,
+      uNight: wu.uNight,
+    },
+    vertexShader: /* glsl */`
+      varying vec3 vWorld;
+      void main() {
+        vec4 w = modelMatrix * vec4(position, 1.0);
+        vWorld = w.xyz;
+        gl_Position = projectionMatrix * viewMatrix * w;
+      }
+    `,
+    fragmentShader: /* glsl */`
+      uniform float uTime;
+      uniform vec3 uSunDir;
+      uniform vec3 uSunCol;
+      uniform vec3 uDeep;
+      uniform vec3 uSkyCol;
+      uniform vec3 uSkyTop;
+      uniform vec3 uFogColor;
+      uniform float uFogDen;
+      uniform float uNight;
+      varying vec3 vWorld;
+      ${GLSL_NOISE}
+
+      void main() {
+        vec3 V = normalize(cameraPosition - vWorld);
+        float d = length(cameraPosition - vWorld);
+        // drifting facets, two coarse scales (the near shader's fine facets alias out
+        // here); modulation depth fades with range so the horizon lane stays smooth
+        float att = 1.0 - smoothstep(500.0, 1800.0, d);
+        float gph = uTime * 1.1;
+        vec2 gp = vWorld.xz;
+        float f1 = sin(gp.x * 0.055 + gph)        * sin(gp.y * 0.050 - gph * 0.90);
+        float f2 = sin(gp.x * 0.021 - gph * 0.70) * sin(gp.y * 0.024 + gph * 0.80);
+        vec3 N = normalize(vec3(f1 * 0.10 * att + f2 * 0.05, 1.0, f2 * 0.10 * att + f1 * 0.05));
+        // sky mirror, graded by the reflection ray's elevation (matches the near #42 look)
+        vec3 R = reflect(-V, N);
+        float refUp = sqrt(clamp(R.y, 0.0, 1.0));
+        float fres = pow(1.0 - max(V.y, 0.0), 3.0);
+        vec3 col = mix(uDeep, mix(uSkyCol, uSkyTop, refUp), clamp(0.30 + fres * 0.60, 0.0, 1.0));
+        // the glitter road, restored to the horizon: broad lobe + a hot core near the mirror
+        vec3 Rs = reflect(-normalize(uSunDir), N);
+        float sunUp = smoothstep(-0.05, 0.12, uSunDir.y);
+        float road = pow(max(dot(Rs, V), 0.0), 42.0);
+        col += uSunCol * road * (0.50 + 0.55 * smoothstep(0.70, 0.97, road)) * sunUp;
+        // moon road at night — same facet mirror, cool and dim (the near shader's trick)
+        col += vec3(0.50, 0.62, 0.80) * pow(max(dot(Rs, V), 0.0), 60.0) * uNight * 0.55;
+        // same manual exp2 fog as the near water: the outer ring settles into the haze
+        float fogF = 1.0 - exp(-pow(d * uFogDen, 2.0));
+        col = mix(col, uFogColor, fogF);
+        col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0;   // dither the long smooth lanes
+        gl_FragColor = vec4(col, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
+  });
+  mat.name = 'farSeaMat';
   return mat;
 }
 
@@ -332,7 +436,9 @@ export function makeSkyMaterial() {
         float fret = uMist * (1.0 - smoothstep(0.0, 0.4 + uMist * 0.25, d.y));
         col = mix(col, mix(uHorizon, vec3(0.78, 0.81, 0.83), 0.4) * mix(1.0, 0.35, uNight), fret * 0.85);
 
+        col += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither: break 8-bit mach banding in the smooth gradients
         gl_FragColor = vec4(col, 1.0);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
@@ -373,6 +479,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       varying vec2 vUv;
       varying vec3 vN;
       varying vec3 vW;
+      ${GLSL_NOISE}
       void main() {
         // t: normalized distance from the light source along the volume
         float t = mix(vUv.y, 1.0 - vUv.y, uFlip);
@@ -382,7 +489,9 @@ export function makeBeamMaterial(color = 0xfff0c0) {
         // reading as two hard streaks — face-on light fills the body
         float facing = smoothstep(0.02, 0.32, abs(dot(normalize(vN), normalize(cameraPosition - vW))));
         float a = along * uIntensity * shimmer * 0.5 * facing;
+        a += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither the additive ramp: kills the beam's banded rings at night
         gl_FragColor = vec4(uColor, a);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
@@ -443,6 +552,7 @@ export function makeGlowPoints(positions, color, size = 0.5) {
         float a = smoothstep(0.5, 0.05, d) * vA;
         if (a < 0.003) discard;
         gl_FragColor = vec4(uColor, a);
+        #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,

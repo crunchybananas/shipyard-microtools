@@ -7,35 +7,106 @@ let outputFormat = 'json';
 let prettyPrint = true;
 let locale = 'en-US';
 
+// Locale-specific data. Unknown locales (or missing keys) fall back to en-US.
+const localeData = {
+  'en-US': {
+    firstNames: ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth', 'David', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Christopher', 'Karen'],
+    lastNames: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'],
+    cities: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville', 'Fort Worth', 'Columbus', 'San Francisco'],
+    streets: ['Main St', 'Oak Ave', 'Maple Dr', 'Cedar Ln', 'Pine Rd', 'Elm St', 'Park Ave', 'Washington Blvd', 'Lake St', 'Hill Rd'],
+    states: ['CA', 'TX', 'FL', 'NY', 'PA', 'IL', 'OH', 'GA', 'NC', 'MI'],
+    countries: ['United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Spain', 'Italy', 'Japan', 'Australia'],
+    phoneFormat: '(###) ###-####',
+    zipFormat: '#####'
+  },
+  'en-GB': {
+    firstNames: ['Oliver', 'Amelia', 'George', 'Olivia', 'Harry', 'Isla', 'Jack', 'Ava', 'Charlie', 'Mia', 'Thomas', 'Sophie', 'Oscar', 'Grace', 'William', 'Lily', 'James', 'Freya', 'Henry', 'Poppy'],
+    lastNames: ['Smith', 'Jones', 'Taylor', 'Brown', 'Williams', 'Wilson', 'Johnson', 'Davies', 'Robinson', 'Wright', 'Thompson', 'Evans', 'Walker', 'White', 'Roberts', 'Green', 'Hall', 'Wood', 'Jackson', 'Clarke'],
+    cities: ['London', 'Birmingham', 'Manchester', 'Leeds', 'Glasgow', 'Liverpool', 'Bristol', 'Sheffield', 'Edinburgh', 'Cardiff', 'Newcastle', 'Nottingham', 'Belfast', 'Brighton', 'Oxford'],
+    streets: ['High Street', 'Station Road', 'Church Lane', 'Victoria Road', 'Green Lane', 'Kings Road', 'Park Road', 'Mill Lane', 'The Crescent', 'Queensway'],
+    states: ['Kent', 'Essex', 'Surrey', 'Hampshire', 'Yorkshire', 'Lancashire', 'Devon', 'Norfolk', 'Somerset', 'Sussex'],
+    phoneFormat: '0#### ######',
+    zipFormat: '@@# #@@'
+  },
+  es: {
+    firstNames: ['José', 'Antonio', 'Manuel', 'María', 'Carmen', 'Francisco', 'David', 'Ana', 'Juan', 'Isabel', 'Javier', 'Laura', 'Carlos', 'Marta', 'Miguel', 'Lucía', 'Rafael', 'Elena', 'Pablo', 'Sofía'],
+    lastNames: ['García', 'Rodríguez', 'González', 'Fernández', 'López', 'Martínez', 'Sánchez', 'Pérez', 'Gómez', 'Martín', 'Jiménez', 'Ruiz', 'Hernández', 'Díaz', 'Moreno', 'Álvarez', 'Romero', 'Alonso', 'Gutiérrez', 'Navarro'],
+    cities: ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Bilbao', 'Alicante', 'Córdoba', 'Valladolid', 'Granada', 'Vigo', 'Gijón'],
+    streets: ['Calle Mayor', 'Avenida de la Constitución', 'Calle Real', 'Paseo del Prado', 'Calle del Sol', 'Avenida de América', 'Calle Nueva', 'Plaza de España', 'Calle de Alcalá', 'Gran Vía'],
+    states: ['Madrid', 'Cataluña', 'Andalucía', 'Valencia', 'Galicia', 'País Vasco', 'Castilla y León', 'Aragón', 'Murcia', 'Canarias'],
+    countries: ['Estados Unidos', 'Canadá', 'Reino Unido', 'Alemania', 'Francia', 'España', 'Italia', 'Japón', 'Australia'],
+    phoneFormat: '+34 ### ### ###',
+    zipFormat: '#####'
+  },
+  fr: {
+    firstNames: ['Jean', 'Marie', 'Pierre', 'Sophie', 'Michel', 'Camille', 'Louis', 'Julie', 'Nicolas', 'Claire', 'François', 'Émilie', 'Antoine', 'Charlotte', 'Julien', 'Léa', 'Thomas', 'Manon', 'Lucas', 'Chloé'],
+    lastNames: ['Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert', 'Richard', 'Petit', 'Durand', 'Leroy', 'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand', 'Roux', 'Vincent', 'Fournier'],
+    cities: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille', 'Rennes', 'Reims', 'Toulon', 'Grenoble', 'Dijon'],
+    streets: ['Rue de la République', 'Avenue Victor Hugo', 'Rue de la Paix', 'Boulevard Saint-Michel', 'Rue Nationale', 'Place de la Mairie', 'Rue des Écoles', 'Avenue de la Gare', 'Rue du Moulin', 'Rue Pasteur'],
+    states: ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine', 'Occitanie', 'Hauts-de-France', 'Grand Est', 'Bretagne', 'Normandie', 'Pays de la Loire', 'Provence-Alpes-Côte d\'Azur'],
+    countries: ['États-Unis', 'Canada', 'Royaume-Uni', 'Allemagne', 'France', 'Espagne', 'Italie', 'Japon', 'Australie'],
+    phoneFormat: '0# ## ## ## ##',
+    zipFormat: '#####'
+  },
+  de: {
+    firstNames: ['Hans', 'Anna', 'Peter', 'Maria', 'Thomas', 'Ursula', 'Michael', 'Monika', 'Wolfgang', 'Petra', 'Stefan', 'Sabine', 'Andreas', 'Claudia', 'Klaus', 'Julia', 'Jürgen', 'Katharina', 'Lukas', 'Lena'],
+    lastNames: ['Müller', 'Schmidt', 'Schneider', 'Fischer', 'Weber', 'Meyer', 'Wagner', 'Becker', 'Schulz', 'Hoffmann', 'Schäfer', 'Koch', 'Bauer', 'Richter', 'Klein', 'Wolf', 'Schröder', 'Neumann', 'Braun', 'Zimmermann'],
+    cities: ['Berlin', 'Hamburg', 'München', 'Köln', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dortmund', 'Essen', 'Bremen', 'Dresden', 'Hannover', 'Nürnberg', 'Bonn'],
+    streets: ['Hauptstraße', 'Bahnhofstraße', 'Schulstraße', 'Gartenstraße', 'Dorfstraße', 'Bergstraße', 'Kirchstraße', 'Waldstraße', 'Ringstraße', 'Lindenstraße'],
+    states: ['Bayern', 'Nordrhein-Westfalen', 'Baden-Württemberg', 'Niedersachsen', 'Hessen', 'Sachsen', 'Berlin', 'Hamburg', 'Brandenburg', 'Thüringen'],
+    countries: ['USA', 'Kanada', 'Vereinigtes Königreich', 'Deutschland', 'Frankreich', 'Spanien', 'Italien', 'Japan', 'Australien'],
+    phoneFormat: '0### #######',
+    zipFormat: '#####'
+  },
+  ja: {
+    firstNames: ['陽翔', '葵', '蓮', '結衣', '大翔', '紬', '悠真', '凛', '湊', '芽依', '樹', '咲良', '朝陽', '莉子', '悠人', '美月', '颯太', '心春', '陸', '杏'],
+    lastNames: ['佐藤', '鈴木', '高橋', '田中', '伊藤', '渡辺', '山本', '中村', '小林', '加藤', '吉田', '山田', '佐々木', '山口', '松本', '井上', '木村', '林', '斎藤', '清水'],
+    cities: ['東京', '大阪', '横浜', '名古屋', '札幌', '福岡', '神戸', '京都', '川崎', 'さいたま', '広島', '仙台', '千葉', '北九州', '静岡'],
+    streets: ['中央通り', '桜通り', '本町通り', '駅前通り', '公園通り', '銀座通り', '平和通り', '大手町通り', '梅田通り', '旭通り'],
+    states: ['東京都', '大阪府', '北海道', '愛知県', '福岡県', '神奈川県', '京都府', '兵庫県', '埼玉県', '千葉県'],
+    countries: ['アメリカ', 'カナダ', 'イギリス', 'ドイツ', 'フランス', 'スペイン', 'イタリア', '日本', 'オーストラリア'],
+    phoneFormat: '0#0-####-####',
+    zipFormat: '###-####'
+  }
+};
+
+function currentLocale() {
+  return localeData[locale] || localeData['en-US'];
+}
+
+function localePick(key) {
+  const list = currentLocale()[key] || localeData['en-US'][key];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+// Fill a format string: # becomes a random digit, @ a random uppercase letter
+function fillFormat(format) {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  return format.replace(/[#@]/g, c => c === '#'
+    ? String(Math.floor(Math.random() * 10))
+    : letters[Math.floor(Math.random() * letters.length)]);
+}
+
 // Data generators
 const generators = {
   // Personal
-  firstName: () => {
-    const names = ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth', 'David', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Christopher', 'Karen'];
-    return names[Math.floor(Math.random() * names.length)];
-  },
-  
-  lastName: () => {
-    const names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'];
-    return names[Math.floor(Math.random() * names.length)];
-  },
-  
+  firstName: () => localePick('firstNames'),
+
+  lastName: () => localePick('lastNames'),
+
   fullName: () => `${generators.firstName()} ${generators.lastName()}`,
-  
+
   email: () => {
     const domains = ['example.com', 'email.com', 'mail.com', 'test.com', 'demo.com'];
-    const first = generators.firstName().toLowerCase();
-    const last = generators.lastName().toLowerCase();
+    // Strip accents and non-latin characters so the local part stays valid
+    const ascii = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+    const first = ascii(generators.firstName()) || 'user';
+    const last = ascii(generators.lastName()) || String(Math.floor(Math.random() * 1000));
     const domain = domains[Math.floor(Math.random() * domains.length)];
     return `${first}.${last}@${domain}`;
   },
-  
-  phone: () => {
-    const area = Math.floor(Math.random() * 900) + 100;
-    const prefix = Math.floor(Math.random() * 900) + 100;
-    const line = Math.floor(Math.random() * 9000) + 1000;
-    return `(${area}) ${prefix}-${line}`;
-  },
+
+  phone: () => fillFormat(currentLocale().phoneFormat),
   
   avatar: () => `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70) + 1}`,
   
@@ -51,28 +122,15 @@ const generators = {
   gender: () => ['Male', 'Female', 'Other'][Math.floor(Math.random() * 3)],
   
   // Address
-  street: () => {
-    const numbers = Math.floor(Math.random() * 9999) + 1;
-    const streets = ['Main St', 'Oak Ave', 'Maple Dr', 'Cedar Ln', 'Pine Rd', 'Elm St', 'Park Ave', 'Washington Blvd', 'Lake St', 'Hill Rd'];
-    return `${numbers} ${streets[Math.floor(Math.random() * streets.length)]}`;
-  },
-  
-  city: () => {
-    const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville', 'Fort Worth', 'Columbus', 'San Francisco'];
-    return cities[Math.floor(Math.random() * cities.length)];
-  },
-  
-  state: () => {
-    const states = ['CA', 'TX', 'FL', 'NY', 'PA', 'IL', 'OH', 'GA', 'NC', 'MI'];
-    return states[Math.floor(Math.random() * states.length)];
-  },
-  
-  zipCode: () => String(Math.floor(Math.random() * 90000) + 10000),
-  
-  country: () => {
-    const countries = ['United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Spain', 'Italy', 'Japan', 'Australia'];
-    return countries[Math.floor(Math.random() * countries.length)];
-  },
+  street: () => `${Math.floor(Math.random() * 9999) + 1} ${localePick('streets')}`,
+
+  city: () => localePick('cities'),
+
+  state: () => localePick('states'),
+
+  zipCode: () => fillFormat(currentLocale().zipFormat),
+
+  country: () => localePick('countries'),
   
   latitude: () => (Math.random() * 180 - 90).toFixed(6),
   longitude: () => (Math.random() * 360 - 180).toFixed(6),
@@ -380,7 +438,7 @@ function formatOutput(data) {
       const headers = Object.keys(data[0]);
       const csv = [headers.join(',')];
       data.forEach(row => {
-        csv.push(headers.map(h => JSON.stringify(row[h] || '')).join(','));
+        csv.push(headers.map(h => JSON.stringify(row[h] ?? '')).join(','));
       });
       return csv.join('\n');
       
@@ -519,6 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   localeSelect.addEventListener('change', (e) => {
     locale = e.target.value;
+    updatePreview();
   });
   
   addFieldBtn.addEventListener('click', () => addField());

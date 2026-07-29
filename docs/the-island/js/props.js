@@ -5,7 +5,7 @@
 
 import * as THREE from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
-import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, TAU } from './util.js';
+import { Baker, mergeGeometries, mulberry32, SEED, vary, vnoise, clamp, lerp, smoothstep, TAU } from './util.js';
 import { heightAt, SPOTS, DOMAIN, buildTerrain, buildHeightTexture, addCollider } from './terrain.js';
 import { makeWaterMaterial, makeBeamMaterial, makeGlowPoints } from './shaders.js';
 import { SCALE_MODEL, MAX_DEPTH } from './world.js';
@@ -174,6 +174,30 @@ export function buildWorld() {
     cairn.position.set(cx, (Number.isFinite(heightAt(cx, cz)) ? heightAt(cx, cz) : 0), cz);
     cairn.receiveShadow = false;
     region3.add(cairn);
+  }
+  // SEA-STRATA L3 bell-buoy (#52): region3's open-water LANDMARK — an iron channel
+  // marker listing in the flooded gap between the bluff and the island, visible from the
+  // L3 bluff spawn and passed on the ramp descent. It tolls untended on the swell
+  // (puzzles _tickBuoy: damped, distance-faded — L3's sound-led nav) and lands a journal
+  // beat when first approached. The channel it marked is under all of this now.
+  {
+    const buoy = new THREE.Group();
+    buoy.name = 'bellBuoy';
+    const rust = new THREE.MeshStandardMaterial({ color: 0x8a4b32, roughness: 0.92, flatShading: true });
+    const iron = new THREE.MeshStandardMaterial({ color: 0x2e3134, roughness: 0.85, flatShading: true });
+    const bronze = new THREE.MeshStandardMaterial({ color: 0x7a6a3c, roughness: 0.6, metalness: 0.35, flatShading: true });
+    const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.78, 0.52, 8), rust);
+    const skirt = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.5, 0.4, 8), iron);   // the waterline underbody
+    skirt.position.y = -0.42;
+    const cage = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.05, 4, 1, true), iron);    // 4-sided open frame tower
+    cage.position.y = 0.75;
+    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 0.22, 8), bronze);
+    bell.position.y = 0.62;
+    buoy.add(skirt, hull, cage, bell);
+    buoy.rotation.set(0.07, 0.6, 0.30);            // listing — long untended
+    // floats at the L3 waterline (+2.73; region3 only shows at L3), half-sunk by the list
+    buoy.position.set(52, 2.5, 12);
+    region3.add(buoy);
   }
   const region4 = new THREE.Group(); region4.name = 'region4'; region4.visible = false; core.add(region4);
   // SEA-STRATA L4 'source' hidden fragment (loop #135): a folded note weighted with a stone, left
@@ -405,6 +429,34 @@ export function buildWorld() {
     const floor = new THREE.CylinderGeometry(baseR + 0.2, baseR + 0.2, 0.3, 28);
     stone.add(floor, new THREE.Matrix4().makeTranslation(LH.x, LH.y - 0.07, LH.z), grad(C.stoneOld, C.boneDark));
     floor.dispose();
+    // CONTACT AO (#43): the room players study longest had a gradient floor under
+    // shadowless point lights — table legs and shelves visibly floated. The cylinder cap
+    // is a vertex FAN (centre + rim only), so pools can't bake into it; lay a finely
+    // tessellated ring 5mm proud as the walk surface and darken it by proximity to the
+    // known furniture footprints. CPU-only, +0 draws (same stone bake), clone inherits.
+    {
+      const FEET = [
+        [0, 0, 1.9, 0.14],                                              // chart table's soft under-shadow
+        [-1.25, -1.25, 0.4, 0.42], [1.25, -1.25, 0.4, 0.42],            // its four legs
+        [-1.25, 1.25, 0.4, 0.42], [1.25, 1.25, 0.4, 0.42],
+        [2.3, 1.1, 0.36, 0.4],                                          // valve pedestal
+        [2.2, -1.4, 0.78, 0.2],                                         // brass plate, seated
+        [Math.sin(deg(285)) * 4.4, Math.cos(deg(285)) * 4.4, 1.2, 0.26],  // bookshelf bays
+        [Math.sin(deg(323)) * 4.4, Math.cos(deg(323)) * 4.4, 1.2, 0.26],
+        [-3.6, -2.6, 0.8, 0.2],                                         // music-box shelf
+      ];
+      const floorTop = new THREE.RingGeometry(0.02, baseR + 0.2, 56, 24);
+      floorTop.rotateX(-Math.PI / 2);
+      stone.add(floorTop, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 0.085, LH.z), (t, wv) => {
+        let ao = 0;
+        for (const [fx, fz, fr, fs] of FEET) {
+          const d = Math.hypot(wv.x - (LH.x + fx), wv.z - (LH.z + fz));
+          ao += fs * (1 - smoothstep(fr * 0.4, fr, d));
+        }
+        return C.boneDark.clone().multiplyScalar(1 - Math.min(0.52, ao));
+      });
+      floorTop.dispose();
+    }
     const ceil = new THREE.RingGeometry(1.25, baseR + 0.1, 28);
     ceil.rotateX(Math.PI / 2);
     stone.add(ceil, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH, LH.z), grad(C.boneDark, C.boneDark));
@@ -1090,31 +1142,78 @@ export function buildWorld() {
   // owner's question, answered in space). Additive decorative geometry, no
   // collision/walkability change, set west of the drowned colonnade.
   {
-    const weather = new THREE.MeshStandardMaterial({ color: 0x8a7050, flatShading: false, roughness: 0.95 });
+    // silvered driftwood, not mud (#45): the old 0x8a7050 base multiplied the grain to a
+    // near-black slab in any backlight — the pier read as unfinished blockout against the
+    // golden sea. Lifted toward weathered bone-grey; the dory + shore scatter share the
+    // lift, so the whole driftwood language silvers together.
+    const weather = new THREE.MeshStandardMaterial({ color: 0xa2937c, flatShading: false, roughness: 0.95 });
     // weathered driftwood grain on the jetty + dory — the first Bender asset, loaded through
-    // the asset manifest (assets.js). They are the only wood props and the only users of this
-    // material; the 1:240 model clone shares it (the grain is invisible at that scale). The
-    // base colour is lightened toward bone so the texture multiplies to weathered grey-brown.
+    // the asset manifest (assets.js). The 1:240 model clone shares it (the grain is
+    // invisible at that scale).
     applyRelief(weather, 'driftwood', { normalScale: 0.7, strength: 2.2 });   // cracked-plank relief on the jetty + dory
     const jx = -18;
     const jetty = new THREE.Group(); jetty.name = 'jetty';
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 12), weather);
-    deck.position.set(jx, 1.05, -110.5); jetty.add(deck);
-    // planks/posts/bollards are identical single-material repeats — instance each
-    // run so the jetty (and its model clone) costs 3 draws, not 19 (perf, loop #47)
     const jm4 = new THREE.Matrix4();
+    const jQ = new THREE.Quaternion(), jV = new THREE.Vector3(), jS = new THREE.Vector3(1, 1, 1), jE = new THREE.Euler();
+    // per-piece timber tone (#45): every run carries instanceColor jitter — sun-bleached
+    // warm to salt-cooled grey — so the pier reads as hand-laid boards, not one extrusion
+    const jRng = mulberry32(SEED ^ 0x7e77);
+    const _jc = new THREE.Color();
+    const timberTone = (inst, i) => {
+      const t = jRng(), v = 0.86 + jRng() * 0.24;
+      inst.setColorAt(i, _jc.setRGB(v * (0.96 + t * 0.06), v * (0.93 + t * 0.03), v * (0.88 + t * 0.02)));
+    };
+    // the deck: four LENGTHWISE boards with tiny lay/height jitter in place of the old
+    // single 2.4x12 slab — the walk surface reads as planking from every angle. UVs
+    // repeat 4x along the run so the grain reads at board scale, not one 12m smear.
+    const deckGeo = new THREE.BoxGeometry(0.55, 0.14, 12.1);
+    { const du = deckGeo.attributes.uv; for (let v = 0; v < du.count; v++) du.setY(v, du.getY(v) * 4); }
+    const deckInst = new THREE.InstancedMesh(deckGeo, weather, 4);
+    [-0.9, -0.3, 0.3, 0.9].forEach((ox, i) => {
+      jm4.compose(jV.set(jx + ox, 1.05 + (jRng() - 0.5) * 0.02, -110.5 + (jRng() - 0.5) * 0.08),
+        jQ.setFromEuler(jE.set(0, (jRng() - 0.5) * 0.012, 0)), jS);
+      deckInst.setMatrixAt(i, jm4); timberTone(deckInst, i);
+    });
     const plankInst = new THREE.InstancedMesh(new THREE.BoxGeometry(2.5, 0.06, 0.5), weather, 7);
-    for (let i = 0; i < 7; i++) { jm4.makeTranslation(jx, 1.16, -105 - i * 1.85); plankInst.setMatrixAt(i, jm4); }
-    const postInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6), weather, 10);
+    for (let i = 0; i < 7; i++) {
+      jm4.compose(jV.set(jx + (jRng() - 0.5) * 0.06, 1.16, -105 - i * 1.85),
+        jQ.setFromEuler(jE.set(0, (jRng() - 0.5) * 0.03, 0)), jS);
+      plankInst.setMatrixAt(i, jm4); timberTone(plankInst, i);
+    }
+    // posts wear the sea (#45): a baked tide-stain ring — dark algae-cooled band through
+    // the waterline (world y -0.25..0.45), weed-green murk below — as VERTEX colour on the
+    // shared cylinder (all instances stand at the same depth, so one bake serves ten).
+    const postGeo = new THREE.CylinderGeometry(0.13, 0.16, 4.4, 6);
+    {
+      const pp = postGeo.attributes.position, pc = new Float32Array(pp.count * 3);
+      for (let v = 0; v < pp.count; v++) {
+        const wy = pp.getY(v) - 1.1;                       // instance centre y = -1.1
+        const stain = smoothstep(0.75, 0.30, wy);          // darkening toward the line
+        const soak = smoothstep(0.05, -0.9, wy);           // always-under murk
+        let rr = 1 - stain * 0.34 - soak * 0.12;
+        let gg = 1 - stain * 0.26 - soak * 0.04;
+        let bb = 1 - stain * 0.28 - soak * 0.10;
+        pc[v * 3] = rr; pc[v * 3 + 1] = gg; pc[v * 3 + 2] = bb;
+      }
+      postGeo.setAttribute('color', new THREE.BufferAttribute(pc, 3));
+    }
+    const postMat = weather.clone();                       // same grain, + the stain bake
+    postMat.vertexColors = true;
+    const postInst = new THREE.InstancedMesh(postGeo, postMat, 10);
     let pj = 0;
     for (let i = 0; i < 5; i++) {                       // posts to the seabed
       const z = -105.5 - i * 2.6;
-      for (const px of [jx - 1.05, jx + 1.05]) { jm4.makeTranslation(px, -1.1, z); postInst.setMatrixAt(pj++, jm4); }
+      for (const px of [jx - 1.05, jx + 1.05]) {
+        jm4.compose(jV.set(px, -1.1, z), jQ.setFromEuler(jE.set(0, jRng() * Math.PI, (jRng() - 0.5) * 0.02)), jS);
+        postInst.setMatrixAt(pj, jm4); timberTone(postInst, pj); pj++;
+      }
     }
     const bollardInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.15, 0.18, 1.5, 6), weather, 2);
-    [jx - 1.0, jx + 1.0].forEach((px, i) => { jm4.makeTranslation(px, 1.75, -116.2); bollardInst.setMatrixAt(i, jm4); });
-    for (const inst of [plankInst, postInst, bollardInst]) inst.computeBoundingSphere();
-    jetty.add(plankInst, postInst, bollardInst);
+    [jx - 1.0, jx + 1.0].forEach((px, i) => {
+      jm4.makeTranslation(px, 1.75, -116.2); bollardInst.setMatrixAt(i, jm4); timberTone(bollardInst, i);
+    });
+    for (const inst of [deckInst, plankInst, postInst, bollardInst]) inst.computeBoundingSphere();
+    jetty.add(deckInst, plankInst, postInst, bollardInst);
     // a lantern on a post at the jetty's end — the way out, kept lit. Someone
     // leaves a light for a return that may never come (the point-light is in
     // main.js, warm and brightening at night, like a small shore beacon).
@@ -2402,6 +2501,11 @@ export function instantiateModel(core, modelAnchor) {
   modelRoot.traverse((o) => {
     o.castShadow = false;
     o.receiveShadow = false;
+    // re-enable frustum culling (perf #26): the clone inherits frustumCulled=false from the
+    // island's water/beam (huge surfaces that must never cull at world scale). At 1:240 the
+    // whole model is a ~1m prop on the chart table — cull it like any other prop, or its
+    // ~270k tris are submitted every frame from anywhere on the island.
+    o.frustumCulled = true;
     if (o.isPoints || MODEL_PRUNE.has(o.name)) prune.push(o);
   });
   for (const o of prune) o.removeFromParent();
@@ -2476,7 +2580,7 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
-  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments & L2 fish-shadows (loop #117/#121/#127/#132/#134/#135/#143)
+  'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];
 

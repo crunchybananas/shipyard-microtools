@@ -54,13 +54,20 @@
               <button id="copyDataUrlBtn" class="secondary-btn">🔗 Copy as Data URL</button>
             </div>
           </div>
+
+          <div class="input-section">
+            <label for="downloadBase64Input">Base64 → File</label>
+            <textarea id="downloadBase64Input" rows="4" placeholder="Paste Base64 (or a Data URL) to save as a file..."></textarea>
+            <input type="text" id="downloadFileName" placeholder="Filename (e.g. image.png)" />
+            <button id="downloadFileBtn" class="primary-btn">⬇ Download File</button>
+          </div>
         </div>
 
         <div id="status" class="status hidden"></div>
       </main>
 
       <footer>
-        <p>Part of <a href="https://shipyard.bot">Shipyard</a> Microtools</p>
+        <p>Part of <a href="https://github.com/crunchybananas/shipyard-microtools">Microtools</a></p>
       </footer>
     </div>
     <script src="app.js"></script>

@@ -19,35 +19,103 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Full history so the apps-change guard can diff against the
+          # pre-push commit (github.event.before).
+          fetch-depth: 0
+
+      # apps/ holds legacy/archived Ember mirrors (docs/ is canonical).
+      # Rebuilding ~30 Ember apps serially on every push is wasted CI, so
+      # the Ember toolchain + build only run when this push actually
+      # touched apps/ or the pnpm workspace toolchain. The site no longer
+      # links /ember/* demos, so a deploy without Ember builds leaves no
+      # dead links. workflow_dispatch always builds (manual escape hatch).
+      - name: Check for apps/ changes
+        id: apps
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" != "push" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Not a push event ($EVENT_NAME): building Ember apps."
+            exit 0
+          fi
+          if [ -z "$BEFORE_SHA" ] \
+            || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ] \
+            || ! git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "No usable base commit (new branch or force push): building Ember apps."
+            exit 0
+          fi
+          if git diff --name-only "$BEFORE_SHA" "$AFTER_SHA" -- \
+              apps/ package.json pnpm-lock.yaml pnpm-workspace.yaml \
+              | grep -q .; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "apps/ or workspace toolchain changed: building Ember apps."
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No apps/ changes in this push: skipping Ember build (docs/ is canonical)."
+          fi
 
       - name: Setup pnpm
+        if: steps.apps.outputs.changed == 'true'
         uses: pnpm/action-setup@v5
         with:
           version: 9.12.2
 
       - name: Setup Node.js
+        if: steps.apps.outputs.changed == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
+        if: steps.apps.outputs.changed == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Build Ember apps
+        if: steps.apps.outputs.changed == 'true'
         run: pnpm run --filter './apps/*' --workspace-concurrency=1 build
 
       - name: Prepare deployment
         run: |
           # Create output directory
           mkdir -p _site
-          
-          # Copy vanilla apps (everything in docs/ except ember/)
-          cp -r docs/* _site/
-          
-          # Ember apps are built directly into docs/ember/ by vite config
-          # so they're already in the right place after build
-          
+
+          # Copy docs/ to the site, excluding internal working files
+          # (agent-loop journals, screenshot dirs, scratch dirs, and
+          # internal log/planning markdown). New apps under docs/ still
+          # deploy by default; only these patterns are held back.
+          # README.md files are intentionally NOT excluded.
+          rsync -a \
+            --exclude='loop/' \
+            --exclude='render-log-shots/' \
+            --exclude='tmp/' \
+            --exclude='attic/' \
+            --exclude='ember/.gitkeep' \
+            --exclude='MISSION.md' \
+            --exclude='RENDER_LOG.md' \
+            --exclude='CRITIQUES.md' \
+            --exclude='LOG.md' \
+            --exclude='SPINE.md' \
+            docs/ _site/
+
+          # When the Ember build ran, vite writes each app into
+          # docs/ember/{app}/ so the rsync above already picked them up.
+          # When the build was skipped (no apps/ changes), docs/ember/
+          # holds only its .gitkeep (excluded above) and nothing on the
+          # site links /ember/*, so no dead links are deployed.
+
+          # Guard: fail loudly if any internal dir leaks into the site
+          if find _site -type d \( -name 'loop' -o -name 'render-log-shots' -o -name 'tmp' -o -name 'attic' \) | grep -q .; then
+            echo "ERROR: internal directories leaked into _site" >&2
+            find _site -type d \( -name 'loop' -o -name 'render-log-shots' -o -name 'tmp' -o -name 'attic' \) >&2
+            exit 1
+          fi
+
           echo "Build complete!"
           ls -la _site/
 

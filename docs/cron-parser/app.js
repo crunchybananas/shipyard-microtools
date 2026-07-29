@@ -10,7 +10,14 @@ const nextRunsList = document.getElementById('nextRuns');
 const FIELDS = ['minute', 'hour', 'day of month', 'month', 'day of week'];
 const FIELD_NAMES = ['Minute', 'Hour', 'Day of Month', 'Month', 'Day of Week'];
 const MONTHS = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']; // 7 is also Sunday
+const FIELD_RANGES = [
+  { min: 0, max: 59 }, // minute
+  { min: 0, max: 23 }, // hour
+  { min: 1, max: 31 }, // day of month
+  { min: 1, max: 12 }, // month
+  { min: 0, max: 7 }   // day of week (7 = Sunday, normalized to 0)
+];
 
 parseBtn.addEventListener('click', parseCron);
 cronInput.addEventListener('keydown', (e) => {
@@ -119,61 +126,105 @@ function getHumanReadable(parts) {
   return descriptions.filter(d => !d.startsWith('every')).join(', ') || descriptions.join(', ');
 }
 
-function getNextRuns(parts, count = 5) {
-  const [minute, hour, dom, month, dow] = parts;
-  const runs = [];
-  const now = new Date();
-  let candidate = new Date(now);
-  candidate.setSeconds(0);
-  candidate.setMilliseconds(0);
-  
-  // Simple next-run calculation for common patterns
-  const maxIterations = 1000;
-  let iterations = 0;
-  
-  while (runs.length < count && iterations < maxIterations) {
-    candidate = new Date(candidate.getTime() + 60000); // Add 1 minute
-    iterations++;
-    
-    const m = candidate.getMinutes();
-    const h = candidate.getHours();
-    const d = candidate.getDate();
-    const mo = candidate.getMonth() + 1;
-    const wd = candidate.getDay();
-    
-    if (!matchField(minute, m)) continue;
-    if (!matchField(hour, h)) continue;
-    if (!matchField(dom, d)) continue;
-    if (!matchField(month, mo)) continue;
-    if (!matchField(dow, wd)) continue;
-    
-    runs.push(new Date(candidate));
+// Expand a cron field into the set of values it matches.
+// Handles *, lists, ranges, steps, ranges-with-steps (1-30/5),
+// bare-value steps (5/15 = 5 through max, step 15), and day-of-week 7 = Sunday.
+function expandField(field, index) {
+  const { min, max } = FIELD_RANGES[index];
+  const values = new Set();
+
+  for (const part of field.split(',')) {
+    let range = part;
+    let step = 1;
+
+    if (part.includes('/')) {
+      const [r, s] = part.split('/');
+      range = r;
+      step = parseInt(s);
+    }
+    if (isNaN(step) || step < 1) continue;
+
+    let start, end;
+    if (range === '*') {
+      start = min;
+      end = max;
+    } else if (range.includes('-')) {
+      [start, end] = range.split('-').map(Number);
+    } else {
+      start = parseInt(range);
+      end = part.includes('/') ? max : start;
+    }
+    if (isNaN(start) || isNaN(end)) continue;
+
+    start = Math.max(start, min);
+    end = Math.min(end, max);
+    for (let v = start; v <= end; v += step) {
+      values.add(index === 4 && v === 7 ? 0 : v);
+    }
   }
-  
-  return runs;
+
+  return values;
 }
 
-function matchField(field, value) {
-  if (field === '*') return true;
-  
-  if (field.includes('/')) {
-    const [range, step] = field.split('/');
-    const stepNum = parseInt(step);
-    if (range === '*') return value % stepNum === 0;
-    const start = parseInt(range);
-    return value >= start && (value - start) % stepNum === 0;
+function getNextRuns(parts, count = 5) {
+  const [minuteSet, hourSet, domSet, monthSet, dowSet] = parts.map(expandField);
+  const domRestricted = parts[2] !== '*';
+  const dowRestricted = parts[4] !== '*';
+
+  // Standard cron: when BOTH day fields are restricted, a day matches if EITHER does
+  const dayMatches = (date) => {
+    const domOk = domSet.has(date.getDate());
+    const dowOk = dowSet.has(date.getDay());
+    return (domRestricted && dowRestricted) ? (domOk || dowOk) : (domOk && dowOk);
+  };
+
+  const dayPossible = (domRestricted && dowRestricted)
+    ? (domSet.size > 0 || dowSet.size > 0)
+    : (domSet.size > 0 && dowSet.size > 0);
+  if (minuteSet.size === 0 || hourSet.size === 0 || monthSet.size === 0 || !dayPossible) {
+    return [];
   }
-  
-  if (field.includes(',')) {
-    return field.split(',').map(Number).includes(value);
+
+  const runs = [];
+  const now = new Date();
+  const candidate = new Date(now);
+  candidate.setSeconds(0, 0);
+  candidate.setMinutes(candidate.getMinutes() + 1);
+
+  // Field-aware search: skip whole months/days/hours that can't match,
+  // so even sparse schedules (yearly, Feb 29) resolve in a few thousand steps
+  const horizonYear = now.getFullYear() + 25;
+  const maxIterations = 100000;
+  let iterations = 0;
+
+  while (runs.length < count && iterations < maxIterations) {
+    iterations++;
+    if (candidate.getFullYear() > horizonYear) break;
+
+    if (!monthSet.has(candidate.getMonth() + 1)) {
+      candidate.setMonth(candidate.getMonth() + 1, 1);
+      candidate.setHours(0, 0, 0, 0);
+      continue;
+    }
+    if (!dayMatches(candidate)) {
+      candidate.setDate(candidate.getDate() + 1);
+      candidate.setHours(0, 0, 0, 0);
+      continue;
+    }
+    if (!hourSet.has(candidate.getHours())) {
+      candidate.setHours(candidate.getHours() + 1, 0, 0, 0);
+      continue;
+    }
+    if (!minuteSet.has(candidate.getMinutes())) {
+      candidate.setMinutes(candidate.getMinutes() + 1);
+      continue;
+    }
+
+    runs.push(new Date(candidate));
+    candidate.setMinutes(candidate.getMinutes() + 1);
   }
-  
-  if (field.includes('-')) {
-    const [start, end] = field.split('-').map(Number);
-    return value >= start && value <= end;
-  }
-  
-  return parseInt(field) === value;
+
+  return runs;
 }
 
 function formatDate(date) {

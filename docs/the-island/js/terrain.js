@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { fbm, ridged, clamp, lerp, smoothstep, mulberry32, SEED } from './util.js';
 import { W } from './world.js';
+import { getTexture } from './assets.js';
 
 export const DOMAIN = 620;            // metres, square, centered on origin
 const SEA_FLOOR = -13;
@@ -239,8 +240,10 @@ export function wallBlocked(x0, z0, x1, z1) {
 
   // lighthouse wall: the beach door + the annex doorway
   if (ringBlockedGaps(x0, z0, x1, z1, LHX, LHZ, 5.2, LH_GAPS)) return true;
-  // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2
-  if (W.level >= 2) {
+  // annex wall: door faces the study (az ~187..207 from annex centre), locked until level 2 —
+  // and it STAYS open once you have returned from the bottom ("the door, the coat — all as
+  // you left them"): the surface after the descent keeps the quarters walkable.
+  if (W.level >= 2 || W.flags.returned) {
     if (ringBlocked(x0, z0, x1, z1, ANX, ANZ, 2.65, deg(185), deg(212))) return true;
   } else if (Math.hypot(x1 - ANX, z1 - ANZ) < 2.65) {
     return true;
@@ -263,6 +266,7 @@ export function buildTerrain() {
 
   const pos = geo.attributes.position;
   const colors = new Float32Array(pos.count * 3);
+  const slopes = new Float32Array(pos.count);   // baked slope → fragment rock-swap (#36)
   const r = mulberry32(SEED ^ 0x51ab);
 
   const cSand = new THREE.Color(0xe3d2a4);
@@ -274,6 +278,7 @@ export function buildTerrain() {
   const cSeabed = new THREE.Color(0x33514e);
   const cSeabedDeep = new THREE.Color(0x16313c);
   const tmp = new THREE.Color();
+  const tSand = new THREE.Color(), tGrass = new THREE.Color(), tRock = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getZ(i);
@@ -285,6 +290,7 @@ export function buildTerrain() {
     const sx = heightAt(x + e, z) - heightAt(x - e, z);
     const sz = heightAt(x, z + e) - heightAt(x, z - e);
     const slope = Math.min(1, Math.hypot(sx, sz) / (2 * e) * 1.6);
+    slopes[i] = slope;
 
     const n = fbm(x * 0.05 + 31, z * 0.05 + 17, 3);
 
@@ -292,15 +298,23 @@ export function buildTerrain() {
       tmp.lerpColors(cSeabedDeep, cSeabed, smoothstep(-9, -2.5, h));
     } else if (h < 0.8) {
       tmp.lerpColors(cSeabed, cSandWet, smoothstep(-2.5, 0.4, h));
-    } else if (h < 2.6 && slope < 0.45) {
-      tmp.lerpColors(cSandWet, cSand, smoothstep(0.8, 2.0, h));
-    } else if (slope > 0.62) {
-      tmp.lerpColors(cRock, cRockDark, smoothstep(0.6, 1.0, slope));
-      // limestone strata bands
-      tmp.offsetHSL(0, 0, Math.sin(h * 1.7) * 0.03);
     } else {
-      tmp.lerpColors(cGrass, cGrassOlive, n);
-      tmp.offsetHSL(0, 0, (slope - 0.2) * -0.12);
+      // land bands, edge-softened (#41): the old hard if/else at slope 0.62/0.45 and
+      // h 2.6 left categorical grass/rock edges crawling along cliff tops. Same palette
+      // anchors and same per-band lerps as before — only the band CHOICE changed, from a
+      // categorical pick to a smoothstep mix across each threshold (CPU-only at build,
+      // still plain vertex colors: zero runtime cost).
+      tSand.lerpColors(cSandWet, cSand, smoothstep(0.8, 2.0, h));
+      tRock.lerpColors(cRock, cRockDark, smoothstep(0.6, 1.0, slope));
+      tRock.offsetHSL(0, 0, Math.sin(h * 1.7) * 0.03);       // limestone strata bands
+      tGrass.lerpColors(cGrass, cGrassOlive, n);
+      tGrass.offsetHSL(0, 0, (slope - 0.2) * -0.12);
+      // grass -> rock across the old slope 0.62 cut
+      tmp.lerpColors(tGrass, tRock, smoothstep(0.54, 0.70, slope));
+      // sand holds where the ground is BOTH low (h < 2.6) and gentle (slope < 0.45);
+      // fade it out across each of those old cuts instead of snapping
+      const wSand = (1 - smoothstep(2.2, 3.0, h)) * (1 - smoothstep(0.38, 0.52, slope));
+      tmp.lerp(tSand, wSand);
     }
     // global gentle noise so nothing is flat-colored
     tmp.offsetHSL((r() - 0.5) * 0.012, (r() - 0.5) * 0.03, (n - 0.5) * 0.05);
@@ -332,6 +346,7 @@ export function buildTerrain() {
   }
 
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geo.setAttribute('aSlope', new THREE.BufferAttribute(slopes, 1));   // fragment rock-swap key (#36)
   geo.computeVertexNormals();
 
   const mat = new THREE.MeshStandardMaterial({
@@ -349,21 +364,29 @@ export function buildTerrain() {
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uHaze = { value: new THREE.Color(0xcfe3e8) };
     sh.uniforms.uTexAmt = { value: 0.7 };   // strength of the procedural sand-grain luminance detail
+    // waterline pass (#47/#38): the tide line, in OBJECT space so the 1:240 clone inherits it
+    sh.uniforms.uWaterY = { value: 0 };
+    sh.uniforms.uTime = { value: 0 };
+    sh.uniforms.uSunUp = { value: 1 };                       // daylight gate for the caustics
+    sh.uniforms.uCaustic = { value: getTexture('water_ripple') };
     // NOTE (loop #154): the old uSand/uGrass tiling-texture samplers + uTexScale were removed when #152
     // replaced the tiled sand/dune-grass luminance (the owner-flagged GRID) with procedural grain. Those
     // textures are no longer sampled here and nothing else loads them, so we drop the dead getTexture
     // calls + uniforms entirely (saves loading sand.jpg + dunegrass.jpg and their VRAM uploads).
     mat.userData.shader = sh; // so main.js can track uHaze to the active grade's fog
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;')
+      .replace('#include <common>', '#include <common>\nattribute float aSlope;\nvarying vec2 vLXZ;\nvarying vec3 vWPos;\nvarying float vTerH;\nvarying float vSlope;')
       .replace('#include <begin_vertex>', `#include <begin_vertex>
         vLXZ = position.xz;
         vTerH = position.y;                                   // baked height (the band key)
+        vSlope = aSlope;                                      // baked slope (the rock-swap key, #36)
         vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
         uniform vec3 uHaze; uniform float uTexAmt;
-        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH;
+        uniform float uWaterY; uniform float uTime; uniform float uSunUp;
+        uniform sampler2D uCaustic;
+        varying vec2 vLXZ; varying vec3 vWPos; varying float vTerH; varying float vSlope;
         float hash21(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}
         float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.0-2.0*f);float a=hash21(i),b=hash21(i+vec2(1,0)),c=hash21(i+vec2(0,1)),d=hash21(i+vec2(1,1));return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}`)
       .replace('#include <clipping_planes_fragment>',
@@ -386,8 +409,25 @@ export function buildTerrain() {
         float roll = vnoise(vLXZ * 1.1) - 0.5;               // soft ~0.9m undulation
         float Hb   = rip1 * 0.5 + rip2 * 0.22 + roll * 0.5;
         float bDist = 1.0 - smoothstep(45.0, 130.0, length(vViewPosition));
-        float bAmt  = 0.20 * land0 * bDist * (1.0 - mini);
-        vec2 dHdxy  = vec2(dFdx(Hb), dFdy(Hb)) * bAmt;
+        // SLOPE-AWARE ROCK RELIEF (#36): above ~0.5 baked slope the bump SWAPS (never
+        // stacks — same one evaluation) from wind-ripple sand to a cliff language:
+        // horizontal STRATA keyed on the baked height (so the bands double as old
+        // waterlines at the raised SEA-STRATA tides) + fracture chips. The low-frequency
+        // strata carry far past the sand's 130m fade — the east bluff reads as bedded
+        // rock from the 170m glyph-puzzle study, not a featureless wall.
+        float rockW  = smoothstep(0.42, 0.62, vSlope);
+        // beds: bold ~3.7m bands, phase-meandered so they undulate like real bedding, with
+        // a fainter internal lamination; on a near-vertical wall the in-plane coordinates
+        // are (along-wall, height), so the fracture noise samples exactly that plane —
+        // sampling xz alone left it constant across the face (read as diagonal static)
+        float sPhase = vnoise(vLXZ * 0.33) * 2.4;
+        float strata = sin(vTerH * 1.7 + sPhase) + 0.35 * sin(vTerH * 3.9 + sPhase * 1.7);
+        float chip   = vnoise(vec2(vLXZ.x + vLXZ.y, vTerH * 1.3) * 1.15) - 0.5;
+        float bDistR = 1.0 - smoothstep(150.0, 460.0, length(vViewPosition));
+        float Hr     = strata * 0.55 * bDistR + chip * 0.5 * bDist;
+        float Hmix   = mix(Hb, Hr, rockW);
+        float bAmt  = 0.20 * land0 * mix(bDist, 1.0, rockW) * (1.0 - mini);
+        vec2 dHdxy  = vec2(dFdx(Hmix), dFdy(Hmix)) * bAmt;
         vec3 bSx = dFdx(-vViewPosition), bSy = dFdy(-vViewPosition);
         vec3 bR1 = cross(bSy, normal), bR2 = cross(normal, bSx);
         float bDet = dot(bSx, bR1);
@@ -410,6 +450,37 @@ export function buildTerrain() {
         float deGrid = (0.86 + 0.26 * macro) * (0.93 + 0.14 * fine);
         float detail = mix(0.82, 1.07, cGrain) * mix(1.0, deGrid, 1.0 - cMini);
         diffuseColor.rgb *= mix(1.0, detail, uTexAmt * cLand * (1.0 - cMini * 0.85));
+        // rock strata in ALBEDO too (#36): the normal-map beds wash out in the aerial haze
+        // at the 170m glyph-puzzle study range — a gentle lightness banding survives it,
+        // so the east bluff finally reads as BEDDED rock from the stones, not a blank wall
+        float aPhase = vnoise(vLXZ * 0.33) * 2.4;
+        float aStrata = sin(vTerH * 1.7 + aPhase) * 0.5 + 0.5;
+        // gate aligned with the #41 grass->rock COLOUR transition (slope .54-.70) so the
+        // lightness bands land only on rock-coloured faces, never as mow-lines on grass
+        float aRockW = smoothstep(0.50, 0.66, vSlope);
+        diffuseColor.rgb *= mix(1.0, 0.88 + 0.18 * aStrata, aRockW * (1.0 - cMini));
+        // WATERLINE PASS — keys off uWaterY in OBJECT space (vTerH is the baked local height,
+        // the sea sits at local y = uWaterY), so the band RIDES the tide at every SEA-STRATA
+        // level and the 1:240 chart-table clone inherits the same tide line for free.
+        float wEdge = (vnoise(vLXZ * 0.6) - 0.5) * 0.34;   // meander the line — no ruler edges
+        float wDepth = uWaterY - vTerH + wEdge;             // >0 = submerged
+        // wet swash band (#47): the metre above the line reads soaked — darker, cooler
+        float wet = smoothstep(0.9, 0.12, -wDepth) * (1.0 - smoothstep(0.05, 0.5, wDepth));
+        wet *= 1.0 - cMini * 0.4;
+        diffuseColor.rgb *= mix(1.0, 0.64, wet);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.93, 0.99, 1.05), wet);
+        // submerged shift (#38): light dies warm-first — the drowned floor cools with depth
+        float subm = 1.0 - exp(-max(wDepth, 0.0) * 0.55);
+        diffuseColor.rgb *= mix(vec3(1.0), vec3(0.55, 0.76, 0.80), subm * (1.0 - cMini * 0.5));
+        // caustics (#38): two counter-scrolled dapple samples — their min makes travelling
+        // bright cells. Banded to the sunlit shallows, gone by ~4.5 m and on the 1:240 clone.
+        vec2 cuv1 = vLXZ * 0.100 + vec2(uTime * 0.020, -uTime * 0.016);
+        vec2 cuv2 = vLXZ * 0.117 + vec2(-uTime * 0.017, uTime * 0.021);
+        float cl1 = dot(texture2D(uCaustic, cuv1).rgb, vec3(0.299, 0.587, 0.114));
+        float cl2 = dot(texture2D(uCaustic, cuv2).rgb, vec3(0.299, 0.587, 0.114));
+        float caus = smoothstep(0.50, 0.88, min(cl1, cl2));
+        float causBand = smoothstep(0.06, 0.5, wDepth) * (1.0 - smoothstep(2.6, 4.5, wDepth));
+        diffuseColor.rgb *= 1.0 + caus * causBand * uSunUp * 1.1 * (1.0 - cMini);
       `)
       // aerial perspective (#5a): the FAR land melts toward the grade's haze before
       // global fog reaches it — depth + vastness without washing the near/mid ground

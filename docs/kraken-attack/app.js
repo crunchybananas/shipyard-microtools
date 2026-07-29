@@ -2,6 +2,17 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Logical game size comes from the canvas attributes; scale the backing
+// store by devicePixelRatio so rendering stays crisp on high-DPI displays.
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
+const dpr = window.devicePixelRatio || 1;
+canvas.width = WIDTH * dpr;
+canvas.height = HEIGHT * dpr;
+canvas.style.width = `${WIDTH}px`;
+canvas.style.height = `${HEIGHT}px`;
+ctx.scale(dpr, dpr);
+
 const startScreen = document.getElementById('startScreen');
 const victoryScreen = document.getElementById('victoryScreen');
 const gameOverScreen = document.getElementById('gameOverScreen');
@@ -16,8 +27,10 @@ const healthFill = document.getElementById('healthFill');
 const finalScoreEl = document.getElementById('finalScore');
 const victoryScoreEl = document.getElementById('victoryScore');
 
-const CX = canvas.width / 2;
-const CY = canvas.height / 2;
+const CX = WIDTH / 2;
+const CY = HEIGHT / 2;
+
+const PLAYER_ORBIT = 180; // Player's distance from the kraken (arena radius)
 
 let gameRunning = false;
 let score = 0;
@@ -28,7 +41,7 @@ let lastTime = 0;
 class Player {
   constructor() {
     this.angle = -Math.PI / 2; // Start at top
-    this.radius = 180; // Distance from center
+    this.radius = PLAYER_ORBIT; // Distance from center
     this.speed = 2.5;
     this.width = 30;
     this.height = 40;
@@ -112,33 +125,55 @@ class Bullet {
     this.speed = 350;
     this.radius = 5;
     this.dead = false;
+    this.grazedBody = false;
   }
 
   update(dt) {
     this.x += Math.cos(this.angle) * this.speed * dt;
     this.y += Math.sin(this.angle) * this.speed * dt;
 
-    // Check if hit kraken body
+    // Check if hit kraken
     const dx = this.x - CX;
     const dy = this.y - CY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    
+
     if (dist < kraken.bodyRadius) {
-      this.dead = true;
-      // Only damage if eye is vulnerable
-      if (kraken.eyeVulnerable) {
-        kraken.takeDamage(10);
-        score += 100;
-      } else {
-        score += 5;
-        for (let i = 0; i < 3; i++) {
-          particles.push(new Particle(this.x, this.y, '#7c3aed'));
+      if (kraken.hitsEye(this.x, this.y)) {
+        // Struck the eye itself
+        this.dead = true;
+        if (kraken.eyeVulnerable) {
+          // Direct hit on the glowing eye — bonus damage
+          kraken.takeDamage(20);
+          score += 200;
+          for (let i = 0; i < 6; i++) {
+            particles.push(new Particle(this.x, this.y, '#fbbf24'));
+          }
+        } else {
+          // Closed eye is armored
+          score += 5;
+          for (let i = 0; i < 3; i++) {
+            particles.push(new Particle(this.x, this.y, '#7c3aed'));
+          }
+        }
+      } else if (!this.grazedBody) {
+        this.grazedBody = true;
+        if (kraken.eyeVulnerable) {
+          // Soft mantle while the eye glows — base damage, punch through toward the eye
+          kraken.takeDamage(10);
+          score += 100;
+        } else {
+          // Armored hide deflects the shot
+          this.dead = true;
+          score += 5;
+          for (let i = 0; i < 3; i++) {
+            particles.push(new Particle(this.x, this.y, '#7c3aed'));
+          }
         }
       }
     }
 
     // Off screen
-    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+    if (this.x < 0 || this.x > WIDTH || this.y < 0 || this.y > HEIGHT) {
       this.dead = true;
     }
   }
@@ -166,6 +201,8 @@ class Kraken {
     this.x = CX;
     this.y = CY;
     this.bodyRadius = 60;
+    this.eyeRx = 25;
+    this.eyeRy = 35;
     this.health = 500;
     this.maxHealth = 500;
     this.phase = 1;
@@ -196,6 +233,13 @@ class Kraken {
     // Update phase based on health
     if (this.health < this.maxHealth * 0.3) this.phase = 3;
     else if (this.health < this.maxHealth * 0.6) this.phase = 2;
+  }
+
+  hitsEye(x, y) {
+    // Point-in-ellipse test against the drawn eye
+    const dx = x - this.x;
+    const dy = y - this.y;
+    return (dx * dx) / (this.eyeRx * this.eyeRx) + (dy * dy) / (this.eyeRy * this.eyeRy) <= 1;
   }
 
   attack() {
@@ -251,7 +295,7 @@ class Kraken {
     
     ctx.fillStyle = eyeColor;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 25, 35, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, this.eyeRx, this.eyeRy, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Pupil
@@ -400,25 +444,25 @@ function drawBackground() {
   gradient.addColorStop(0, '#1a0a2e');
   gradient.addColorStop(1, '#0a0a1a');
   ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
   // Murky particles
   ctx.fillStyle = 'rgba(124, 58, 237, 0.05)';
   const time = Date.now() / 1000;
   for (let i = 0; i < 20; i++) {
-    const x = (Math.sin(time * 0.5 + i) * 0.5 + 0.5) * canvas.width;
-    const y = (Math.cos(time * 0.3 + i * 1.5) * 0.5 + 0.5) * canvas.height;
+    const x = (Math.sin(time * 0.5 + i) * 0.5 + 0.5) * WIDTH;
+    const y = (Math.cos(time * 0.3 + i * 1.5) * 0.5 + 0.5) * HEIGHT;
     ctx.beginPath();
     ctx.arc(x, y, 20 + Math.sin(time + i) * 10, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Battle arena circle
+  // Battle arena circle (player may not exist yet on the start screen)
   ctx.strokeStyle = 'rgba(124, 58, 237, 0.2)';
   ctx.lineWidth = 2;
   ctx.setLineDash([10, 10]);
   ctx.beginPath();
-  ctx.arc(CX, CY, player.radius, 0, Math.PI * 2);
+  ctx.arc(CX, CY, player ? player.radius : PLAYER_ORBIT, 0, Math.PI * 2);
   ctx.stroke();
   ctx.setLineDash([]);
 }

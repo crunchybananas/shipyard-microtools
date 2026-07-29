@@ -31,9 +31,17 @@
     <div class="title-inner">
       <h1>THE&nbsp;ISLAND</h1>
       <div class="subtitle">A&nbsp;B&nbsp;Y&nbsp;M&nbsp;E</div>
-      <div class="title-actions">
+      <div class="title-actions" id="title-actions">
         <button id="btn-begin" class="title-btn">Begin</button>
         <button id="btn-continue" class="title-btn hidden">Continue</button>
+      </div>
+      <!-- Begin pressed while a save exists (#56): the destructive step gets its own beat -->
+      <div id="begin-confirm" class="hidden">
+        <div class="confirm-line">Begin anew &mdash; the tide takes everything.</div>
+        <div class="title-actions">
+          <button id="btn-begin-confirm" class="title-btn">Begin anew</button>
+          <button id="btn-begin-back" class="title-btn">Back</button>
+        </div>
       </div>
       <div class="title-foot">headphones recommended &middot; a world made of code, and a voice at the bottom that isn't</div>
     </div>

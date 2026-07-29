@@ -57,7 +57,7 @@ export class Game {
   flag(name, value = true) {
     if (W.flags[name] === value) return false;
     W.flags[name] = value;
-    save(this.player.pos);
+    save(this.player);
     return true;
   }
 
@@ -66,7 +66,7 @@ export class Game {
     W.onceKeys = W.onceKeys || [];
     if (W.onceKeys.includes(key)) return;
     W.onceKeys.push(key);
-    save(this.player.pos);
+    save(this.player);
     fn();
   }
 
@@ -82,13 +82,15 @@ export class Game {
         // SEA-STRATA: below the surface the tide is the descent's, not yours — the wheel goes dead.
         if (W.level > 1) { UI.whisper('The sea no longer answers the wheel down here.'); return; }
         W.tideTarget = W.tideTarget > 0.5 ? 0 : 1;
-        A.chime();
         if (this.flag('valveTurned')) {
+          A.leitStrum();   // the first turn earns a stem — the island's own figure answers (#65)
           A.addStem(1); W.stems = Math.max(W.stems, 1);
           UI.whisper('Below the window, the sea obeys.');
           UI.addJournal('A valve beside the chart table. Turn it, and the basin drains — and so does the bay. Someone built a machine to make the sea go back, and must have turned it, and turned it. As if, on some one day, holding the water back was the only thing left worth wanting.');
+        } else {
+          A.chime();       // later toggles keep the plain chime
         }
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -96,9 +98,13 @@ export class Game {
     I.add({
       id: 'crank', targets: [R.crankHandle], label: 'the sun crank', type: 'drag',
       onDrag: (dx) => {
-        W.time = ((W.time + dx * 0.011) % 24 + 24) % 24;
+        // SEA-STRATA depth response (#51): the hours drag heavy below the surface — the
+        // same pull moves less sky the deeper you carry it
+        const drag = W.level > 1 ? 1 / (1 + 0.5 * (W.level - 1)) : 1;
+        W.time = ((W.time + dx * 0.011 * drag) % 24 + 24) % 24;
         this._crankAcc = (this._crankAcc || 0) + Math.abs(dx);
         if (this._crankAcc > 26) { this._crankAcc = 0; A.crankTick(); }
+        if (W.level > 1) this.once('crankDeep', () => UI.whisper('The crank resists, as if the hours themselves have taken on water.'));
         if (this.flag('crankUsed')) {
           UI.whisper('The little lamp drags the real sun with it.');
           UI.addJournal('A crank turns the orrery lamp around the model — and the sky outside follows it. I hold the hours.');
@@ -112,12 +118,21 @@ export class Game {
       onClick: () => {
         if (this.boxPlaying) return;
         this.boxPlaying = true;
+        // SEA-STRATA depth response (#51): under a drowned sky the box is waterlogged —
+        // flat, slowed, muffled-long; and at the source the FOURTH note (the one he never
+        // could make his hands play true) does not come at all.
+        const depth = Math.max(0, W.level - 1);
+        const det = depth ? 0.945 - 0.015 * depth : 1;     // sinks further flat per level
+        const gap = 620 + depth * 130;                     // the mechanism drags
         BOX_MELODY.forEach((stoneIdx, n) => {
           setTimeout(() => {
-            A.pluck(STONE_NOTES[stoneIdx] * 2, 0, 0.4);
-            if (n === BOX_MELODY.length - 1) setTimeout(() => { this.boxPlaying = false; }, 900);
-          }, n * 620);
+            const missing = W.level >= 4 && n === 3;
+            if (!missing) A.pluck(STONE_NOTES[stoneIdx] * 2 * det, 0, depth ? 0.3 : 0.4, depth ? 2.1 : 1.4);
+            else this.once('boxMissingNote', () => UI.whisper('The fourth note does not come. Down here the box knows which note he never could play.'));
+            if (n === BOX_MELODY.length - 1) setTimeout(() => { this.boxPlaying = false; }, 900 + depth * 250);
+          }, n * gap);
         });
+        if (depth) this.once('boxDeep', () => UI.whisper('The song comes up slow and flat, as through water.'));
         if (this.flag('heardBox')) {
           UI.addJournal('The music box turns five notes: E · G · A · D · C. Someone wound it often.');
         }
@@ -149,7 +164,7 @@ export class Game {
           A.chime();
           UI.whisper('A cartographer’s brass rule. Fifteen centimetres of certainty.');
           UI.addJournal('Took a small brass ruler from a chest the tide gave up. It wants to measure something.');
-          save(this.player.pos);
+          save(this.player);
         }
       },
     });
@@ -171,7 +186,7 @@ export class Game {
         this.flag('rulerPlaced');
         W.inventory = W.inventory.filter((s) => s !== 'ruler');
         A.addStem(2); W.stems = Math.max(W.stems, 2);
-        A.chime();
+        A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
         UI.cinematic(true);
         setTimeout(() => UI.cinematic(false), 5200);
         UI.whisper('Across the island, something vast settles into place.');
@@ -179,7 +194,7 @@ export class Game {
         // layer (Panel #4 act-two gap): the measuring as a thing to do with grieving hands
         UI.whisper('You do not need a ruler for a distance you already know by heart.');
         UI.addJournal('Laid the ruler over the crack in the model. Out east, a brass bridge now spans the chasm — etched with centimetre marks the size of doors. He measured this rift a hundred times, I think — you do not need a ruler for a distance you already know by heart. You measure it to have something to do with your hands.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -194,7 +209,7 @@ export class Game {
         A.chime();
         UI.whisper('Far above, glass settles into brass.');
         UI.addJournal('Set the small lens into the model’s lamp room. The real lighthouse has its eye back. Whoever kept this light must have ground and polished that glass a thousand nights, so it could see a way home for someone out on the water. It will want the dark now.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
     I.add({
@@ -218,7 +233,7 @@ export class Game {
         UI.whisper('Cold as seawater, clear as morning — a lamp’s eye, far too fine for a pocket.');
         // forward thread: the stones puzzle dead-ended here for testers — say where the glass wants to go.
         UI.addJournal('Took the first lens from the stones’ vault. It is a lighthouse lamp’s eye, ground and polished thin — and back in the study, the model on the chart table stands eyeless in its little lamp room. Glass like this only ever wants to be put back.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -231,7 +246,7 @@ export class Game {
         A.chime();
         UI.whisper('The sand slides from a brass door, dialled shut.');
         UI.addJournal('At golden hour the stones’ shadows leaned together, all pointing across the water — to a hatch buried on the bluff. Four glyph dials seal it. He must have read this same hour off these same stones, day on day; some hours you set your whole life by, and they arrive whether or not you are ready.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
     for (let i = 0; i < 4; i++) {
@@ -243,11 +258,11 @@ export class Game {
           A.crankTick();
           if (W.dials.every((d, n) => d === GLYPH_CODE[n])) {
             this.flag('hatchOpen');
-            A.chime();
+            A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
             A.addStem(4); W.stems = Math.max(W.stems, 4);
             UI.whisper('Stone breath, long held, sighs out.');
           }
-          save(this.player.pos);
+          save(this.player);
         },
       });
     }
@@ -262,7 +277,7 @@ export class Game {
         A.chime();
         UI.whisper('Heavier than it looks. Truer, too.');
         UI.addJournal('In the cellar: a brass plumb bob on a pedestal, and a carving of it hanging over a little island. The chart table has a hook.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -279,7 +294,7 @@ export class Game {
         A.chime();
         UI.whisper('It hangs dead-centre over the model. Over the beach where you woke.');
         UI.addJournal('Hung the plumb line. It hangs dead-centre over the model’s beach — over a brass plate in the floor, big enough to stand on. The weight knows the depth before it drops. Whoever hung it first already knew how far down this goes.');
-        save(this.player.pos);
+        save(this.player);
       },
     });
 
@@ -433,7 +448,9 @@ export class Game {
     });
     if (R.coat) I.add({
       id: 'coatLetter', targets: [R.coat], label: 'a letter in the coat', maxDist: 2.8,
-      when: () => W.level >= 2,                 // the folded letter surfaces once you've begun to descend
+      // surfaces once you've begun to descend — and stays readable after the return
+      // (the quarters keep their door; what you earned below is not re-sealed above)
+      when: () => W.level >= 2 || W.flags.returned,
       onClick: () => UI.openReader('coat_letter'),
     });
     if (R.inscribedStone) I.add({
@@ -465,7 +482,9 @@ export class Game {
     });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
-      when: () => W.level >= 1,                 // the quarters open one level down
+      // the quarters open one level down (the old `>= 1` gate was a no-op that let the
+      // journal be clicked through the sealed doorway at L1); readable again post-return
+      when: () => W.level >= 2 || W.flags.returned,
       onClick: () => UI.openReader('quarters_journal'),
     });
 
@@ -493,7 +512,11 @@ export class Game {
   }
 
   _touchStone(i) {
-    A.stoneTone(i);
+    // SEA-STRATA depth response (#51): the deep air carries the hum damped — darker,
+    // a shade flat, longer — and says so once
+    const damp = W.level > 1 ? Math.min(1, 0.45 + 0.2 * (W.level - 2)) : 0;
+    A.stoneTone(i, 0.4, damp);
+    if (damp) this.once('stonesDeep', () => UI.whisper('The stones hum lower here, as through water.'));
     this.anim.stoneGlow[i] = 1;
     if (W.flags.birdSolved) return;
     this.stoneSeq.push(i);
@@ -511,13 +534,13 @@ export class Game {
       this.stoneSeq = [];
       this.flag('birdSolved');
       A.addStem(3); W.stems = Math.max(W.stems, 3);
-      setTimeout(() => A.chime(), 800);
+      setTimeout(() => A.leitStrum(), 800);   // stem-earning solve: the leitmotif, not the chime (#65)
       UI.whisper('The outcrop opens like a held breath.');
       // promote the grief-rhyme out of the optional journal into the in-the-moment whisper
       // layer (Panel #4 act-two gap): the correction that came a lifetime too late
       UI.whisper('Some corrections only ever arrive too late.');
       UI.addJournal('The stones accepted the bird’s correction. A vault in the outcrop holds a small, perfect lens. The box always bent that fourth note wrong; the bird sings it true. He must have heard it right a thousand mornings and never could make his own hands play it — some corrections only ever arrive too late.');
-      save(this.player.pos);
+      save(this.player);
     }
   }
 
@@ -562,7 +585,7 @@ export class Game {
     ease('vault', F.birdSolved ? 1 : 0, 0.9);
     ease('hatch', F.hatchOpen ? 1 : 0, 1.2);
     ease('boxLid', this.boxPlaying ? 1 : 0, 3);
-    ease('innerDoor', W.level >= 2 ? 1 : 0, 1.0);
+    ease('innerDoor', (W.level >= 2 || W.flags.returned) ? 1 : 0, 1.0);   // stays open once returned
 
     // lamp + beam
     W.lampLit = W.lensPlaced && isNight();
@@ -605,7 +628,7 @@ export class Game {
       if (d < 70) {
         this.flag('glyphsSeen');
         A.addStem(5); W.stems = Math.max(W.stems, 5);
-        A.chime();
+        A.leitStrum();   // stem-earning solve: the leitmotif, not the chime (#65)
         UI.whisper('The beam writes on the cliff in someone’s patient hand.');
         UI.addJournal(`The lighthouse beam, aimed at the cliff, projects four glyphs:`,
           GLYPH_CODE.map((g) => GLYPH_CHARS[g]).join('  '));
@@ -755,10 +778,34 @@ export class Game {
 
     this._tickWatcher(dt);
     this._tickTideFigure(dt);
+    this._tickBuoy(dt);
 
     // apply to both islands
     this._apply(this.refs, false, elapsed);
     this._apply(this.modelRefs, true, elapsed);
+  }
+
+  // SEA-STRATA L3 bell-buoy (#52): the drowned channel's marker still keeps its watch.
+  // An untended toll on an uneven swell clock — damped-long like everything down here,
+  // fading with distance but never quite gone (L3's sound-led nav cue) — and a journal
+  // beat the first time you come near it (the ramp descent passes ~15m away).
+  _tickBuoy(dt) {
+    if (!this.refs.bellBuoy || W.level !== 3) return;
+    this._buoyT = (this._buoyT || 0) + dt;
+    const period = 13 + 3.5 * Math.sin((this._buoyRing || 0) * 2.7);
+    if (this._buoyT > period) {
+      this._buoyT = 0; this._buoyRing = (this._buoyRing || 0) + 1;
+      const d = Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12);
+      const vol = Math.max(0.06, 0.34 * (1 - d / 160));
+      A.pluck(174.6, 0, vol, 3.6);              // F3 — a sea-bell's low toll, waterlogged-long
+      A.pluck(352.8, 0.03, vol * 0.35, 2.4);    // detuned octave shimmer over it
+    }
+    if (Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12) < 26) {
+      this.once('bellBuoySeen', () => {
+        UI.whisper('A bell-buoy, listing in the drowned channel. It keeps ringing anyway.');
+        UI.addJournal('A bell-buoy lists out in the flooded channel between the bluff and the island, tolling to no one on the swell. It marked the safe water once. The safe water is under all of this now, and still it keeps its one job — some kept things outlive the thing they kept.', '', 'self');
+      });
+    }
   }
 
   // THE WATCHER — grief given form (the owner's "goblins"). Active only deep (W.level>=3) and
