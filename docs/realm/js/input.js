@@ -2,13 +2,25 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=157';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=157';
-import { canAfford } from './economy.js?realm=157';
-import { dispatch } from './commands.js?realm=157';
-import { notify } from './notifications.js?realm=157';
-import { initAudio, playSound } from './audio.js?realm=157';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=157';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=166';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=166';
+import { canAfford } from './economy.js?realm=166';
+import { dispatch } from './commands.js?realm=166';
+import { notify } from './notifications.js?realm=166';
+import { initAudio } from './audio.js?realm=166';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=166';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=166';
+
+const escapeHtml = value => String(value).replace(
+  /[&<>"']/g,
+  character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character],
+);
 
 function pickTile(clientX, clientY) {
   return screenToWorld(clientX, clientY);
@@ -57,7 +69,7 @@ function findCitizenAtClick(clientX, clientY) {
   const wy = (cpy - C.height/2) / G.camera.zoom + G.camera.y;
 
   let best = null, bestDist = Infinity;
-  for (const c of G.citizens) {
+  for (const c of buildCurrentCitizenPresentations()) {
     const cs = toScreen(c.x, c.y);
     const dx = wx - cs.x;
     const dy = wy - (cs.y - 8); // citizen visual center is ~8px above tile
@@ -85,27 +97,39 @@ function showCitizenPanel(c) {
     foraging:'Foraging', eating:'Eating',
     go_home:'Heading home', sleep:'Sleeping', leisure:'Off to unwind',
   };
-  const state = stateLabels[c.state] || c.state;
-  const underConstruction = c.jobBuilding && c.jobBuilding.buildProgress !== undefined && c.jobBuilding.buildProgress < 1;
-  const job = c.jobBuilding
-    ? (underConstruction ? `Building the ${BUILDINGS[c.jobBuilding.type]?.name}` : BUILDINGS[c.jobBuilding.type]?.name)
-    : 'Unemployed';
+  const state = stateLabels[c.activity.kind] || c.activity.kind;
+  const assigned = c.assignment;
+  const jobName = assigned ? BUILDINGS[assigned.building.type]?.name || assigned.building.type : null;
+  const job = assigned
+    ? `${assigned.purpose === 'temporary' ? 'Helping' : 'Assigned'}: ${assigned.building.complete ? jobName : `build ${jobName}`}`
+    : 'Unassigned';
   const carrying = c.carrying ? `${c.carryAmount} ${c.carrying}` : 'Nothing';
+  const safe = {
+    name: escapeHtml(c.identity.name),
+    state: escapeHtml(state),
+    profession: escapeHtml(c.profession.kind),
+    job: escapeHtml(job),
+    reason: escapeHtml(c.activity.reason),
+    carrying: escapeHtml(carrying),
+  };
 
   panel.innerHTML = `
     <div class="ip-header">
-      <span class="ip-title">👤 ${c.name}</span>
+      <span class="ip-title">👤 ${safe.name}</span>
       <button class="ip-close" onclick="hideInfoPanel()">✕</button>
     </div>
-    <div class="ip-desc">${state}</div>
-    <div class="ip-row"><span class="ip-label">Job</span><span class="ip-val">${job}</span></div>
-    <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${carrying}</span></div>
+    <div class="ip-desc">${safe.state}</div>
+    <div class="ip-row"><span class="ip-label">Vocation</span><span class="ip-val">${safe.profession}</span></div>
+    <div class="ip-row"><span class="ip-label">Assignment</span><span class="ip-val">${safe.job}</span></div>
+    <div class="ip-row"><span class="ip-label">Activity</span><span class="ip-val">${safe.state} · ${safe.reason}</span></div>
+    <div class="ip-row"><span class="ip-label">Carrying</span><span class="ip-val">${safe.carrying}</span></div>
     <div class="ip-row"><span class="ip-label">Hunger</span><span class="ip-val">${Math.round(c.hunger)}%</span></div>
     <div class="ip-row"><span class="ip-label">Energy</span><span class="ip-val">${Math.round(c.rest ?? 100)}%</span></div>
-    <div class="ip-row"><span class="ip-label">Joy</span><span class="ip-val">${Math.round(c.needs?.joy ?? 55)}%</span></div>
-    <div class="ip-row"><span class="ip-label">Faith</span><span class="ip-val">${Math.round(c.needs?.faith ?? 55)}%</span></div>
+    <div class="ip-row"><span class="ip-label">Joy</span><span class="ip-val">${Math.round(c.needs.joy)}%</span></div>
+    <div class="ip-row"><span class="ip-label">Faith</span><span class="ip-val">${Math.round(c.needs.faith)}%</span></div>
     <div class="ip-hint">Citizens auto-assign to buildings that need workers.</div>
   `;
+  panel.dataset.citizenActorId = String(c.actorId);
   panel.style.display = 'block';
   requestAnimationFrame(() => panel.classList.add('ip-visible'));
 }
@@ -205,19 +229,19 @@ export function setupInput(canvas) {
       const cit = findCitizenAtClick(e.clientX, e.clientY);
       if (cit) {
         G.selectedBuilding = null;
-        G.selectedCitizen = cit;
+        G.selectedCitizenId = cit.actorId;
         showCitizenPanel(cit);
         return;
       }
       const b = findBuildingAtClick(e.clientX, e.clientY);
       if (b) {
         G.selectedBuilding = b;
-        G.selectedCitizen = null;
+        G.selectedCitizenId = null;
         showInfoPanel(b);
         return;
       } else {
         G.selectedBuilding = null;
-        G.selectedCitizen = null;
+        G.selectedCitizenId = null;
         hideInfoPanel();
         // Follow mode (Phase 3d): a ground click walks the founder there.
         if (G._followAvatar && G.avatar) {

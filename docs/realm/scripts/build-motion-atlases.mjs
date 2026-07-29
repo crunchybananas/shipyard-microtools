@@ -31,7 +31,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from './sprite-source-contract.mjs';
+} from '../js/sprite-source-contract.js?realm=166';
 
 const execFileAsync = promisify(execFile);
 
@@ -123,7 +123,10 @@ async function loadRowOverrides() {
   const rowRoot = `${resolve(ACTOR_ROW_DIR)}${sep}`;
   const byRole = new Map(ROLES.map((role) => [role, []]));
   for (const [key, item] of Object.entries(manifest.rows)) {
-    if (!['accepted', 'accepted-with-waiver'].includes(item.status)) continue;
+    if (!['candidate', 'accepted'].includes(item.status)) {
+      throw new Error(`${key} has unsupported row status ${JSON.stringify(item.status)}; use candidate or accepted`);
+    }
+    if (item.status !== 'accepted') continue;
     const [role, action, dir, ...rest] = key.split('/');
     if (rest.length || !ROLES.includes(role) || !ACTIONS.includes(action) || !DIRS.includes(dir)) {
       throw new Error(`invalid accepted actor row key: ${key}`);

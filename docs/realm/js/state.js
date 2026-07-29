@@ -5,6 +5,19 @@
 export const TILE = { WATER:0, SAND:1, GRASS:2, FOREST:3, STONE:4, IRON:5, MOUNTAIN:6 };
 export const TW = 64, TH = 32;
 export const MAP_W = 80, MAP_H = 80;
+export const RESOURCE_KEYS = Object.freeze([
+  'wood', 'stone', 'food', 'gold', 'iron', 'wheat', 'flour', 'planks', 'tools',
+]);
+
+export function createResourceStock(overrides = {}) {
+  const stock = Object.fromEntries(RESOURCE_KEYS.map(key => [key, 0]));
+  for (const [key, value] of Object.entries(overrides)) {
+    if (!RESOURCE_KEYS.includes(key)) throw new TypeError(`Unknown resource key: ${key}`);
+    if (typeof value !== 'number' || !Number.isFinite(value)) throw new TypeError(`Invalid ${key} resource value`);
+    stock[key] = value;
+  }
+  return stock;
+}
 
 // Loop 45 (render S4): tightened the per-tile two-color alternation so
 // the checkerboard pulse is less visible. Deltas were 8-16pt which read
@@ -92,13 +105,20 @@ export const G = {
   fog: [],
   buildings: [],
   citizens: [],
+  nextActorId: 1,
   soldiers: [],
   buildingGrid: [],    // MAP_H x MAP_W, null or building ref
+  avatar: null,
   particles: [],
   animals: [],
   enemies: [],
   projectiles: [],
-  resources: { wood:60, stone:30, food:80, gold:25, iron:0, wheat:0, flour:0, planks:0, tools:0 },
+  chronicle: [],
+  storyFlags: {},
+  namedCharacters: {},
+  deathMarkers: [],
+  debug: { disableEvents: false },
+  resources: createResourceStock({ wood:60, stone:30, food:80, gold:25 }),
   population: 3,
   maxPop: 3,
   happiness: 50,
@@ -108,6 +128,8 @@ export const G = {
   dayLength: 3600, // ~60 seconds per day at 1x speed — deliberate pacing
   gameTick: 0,
   speed: 1,
+  obstacleEpoch: 0,
+  totalResourcesGathered: 0,
   // Loop 035 (the-fixer, closing 003/011/018 photo-mode cluster):
   // when true, HUD / build-bar / mission panel / minimap / pause-overlay
   // are hidden so the player can compose a clean screenshot. Toggled by
@@ -116,13 +138,17 @@ export const G = {
   camera: { x: 0, y: (MAP_W/2 + MAP_H/2) * TH/2, zoom: 1.3 },
   selectedBuild: null,
   selectedBuilding: null,
-  selectedCitizen: null,
+  selectedCitizenId: null,
   hoveredTile: null,
   dragging: false,
   dragStart: {x:0,y:0},
   camStart: {x:0,y:0},
   nextRaidDay: 8,
   raidInterval: 8,
+  lastRaidDay: null,
+  lastDeathDay: null,
+  lastUnderpopDay: null,
+  realmEnded: false,
   audioCtx: null,
   researchedTechs: new Set(['agriculture', 'forestry']),
   currentResearch: null,
@@ -147,6 +173,24 @@ export const G = {
   kingdomName: 'Realm',
   resourceRates: { wood:0, stone:0, food:0, gold:0, iron:0, wheat:0, flour:0, planks:0, tools:0 },
   notificationLog: [], // { text, type:'info'|'danger'|'event'|'mission', day }
+  storyState: { lastProverbSeason: null, raid: null },
+  _dailyFoodConsumed: 0,
+  _lastDevolveNotice: null,
+  _lastRaidFireDay: null,
+  _milestone10: false,
+  _milestone25: false,
+  _milestone50: false,
+  _milestone75: false,
+  _moodDelta: 0,
+  _patrolEmptyNotified: false,
+  _patrolPosts: null,
+  _patrolPostsBuildingCount: -1,
+  _raidSide: null,
+  _raidSpawnCount: 0,
+  _raidStolen: null,
+  _raidWarningGiven: false,
+  _scenarioWon: false,
+  _undoStack: [],
   lastResources: null, // snapshot for rate calculation
   stats: {
     buildingsBuilt: 0,
@@ -158,6 +202,7 @@ export const G = {
     enemiesKilled: 0,
     goldEarned: 0,
     daysLived: 0,
+    housesEvolved: 0,
     scenariosWon: [],
     // Loop 311 (310 [code] filing): track whether each building type
     // was EVER placed in this realm. Used by narrative gates that should
@@ -168,6 +213,138 @@ export const G = {
     everHadBuilding: {},
   },
 };
+
+// Shell-owned state is deliberately absent from Engine v2 saves. These values
+// are frame/input/ambient queues: they can be rebuilt without changing the
+// deterministic realm and must never make a save large, stale, or schedule-
+// dependent. Add new presentation state here at the same time it is introduced.
+const RESETTABLE_PRESENTATION_ROOT_KEYS = Object.freeze([
+  '_buildRipples', '_churchBeam', '_confetti', '_followAvatar', '_hoveredBiome',
+  '_lastPaintTile', '_lastPlaceFailMsg', '_lightningFlash', '_lightningTimer',
+  '_lastFoodWarnDay', '_lastSaveTick', '_refreshPanelFor', '_renderAlpha',
+  '_renderDeltaMs',
+  'acorns', 'animals', 'balloons', 'bats', 'bigSnow', 'birds', 'boats', 'bolts',
+  'bunnies', 'camStart', 'cameraShake', 'carts', 'clouds', 'crabs', 'dragStart',
+  'dragging', 'dustDevils', 'eagles', 'fishJumps', 'flocks', 'footprints', 'frogs',
+  'hawks', 'hoveredBiome', 'hoveredTile', 'meteors', 'mouseX', 'mouseY', 'owls',
+  'lastResources', 'particles', 'photoMode', 'pigeons', 'raidFlash', 'raidSmoke',
+  'rams', 'resourceRates',
+  'researchSparkles', 'schoolKids', 'selectedBuild', 'selectedBuilding',
+  'selectedCitizenId', 'snowmen', 'tradeShips', 'volcanoSmoke', 'wolves',
+]);
+
+const RESETTABLE_PRESENTATION_ENTITY_KEYS = Object.freeze({
+  citizen: Object.freeze([
+    '_px', '_py', '_movedAt', 'hurtTimer',
+  ]),
+  avatar: Object.freeze([
+    '_px', '_py', '_laneX', '_laneY', '_dirKey', '_dirPend', '_dirPendMs',
+    '_actorAnimationKey', '_actorAnimationStartedAt', '_movedAt',
+  ]),
+  soldier: Object.freeze([
+    '_px', '_py', '_pdx', '_pdy', '_mvx', '_mvy', '_movedAt',
+    '_actorAnimationKey', '_actorAnimationStartedAt',
+  ]),
+  enemy: Object.freeze(['_px', '_py', 'attackCue']),
+  walker: Object.freeze(['_px', '_py', '_actorAnimationKey', '_actorAnimationStartedAt']),
+  caravan: Object.freeze(['_px', '_py']),
+});
+
+export const STATE_OWNERSHIP = Object.freeze({
+  processLocalRoot: Object.freeze(['audioCtx']),
+  resettablePresentationRoot: RESETTABLE_PRESENTATION_ROOT_KEYS,
+  // These are deliberately saved for player experience/history but cannot
+  // influence deterministic simulation outcomes.
+  durableNonAuthoritativeRoot: Object.freeze(['camera', 'deathMarkers', 'tileWear', 'notificationLog']),
+  replayProvenanceRoot: Object.freeze(['_commandLog']),
+  resettablePresentationEntity: RESETTABLE_PRESENTATION_ENTITY_KEYS,
+});
+
+export const RESETTABLE_PRESENTATION_ENTITY_FIELDS = STATE_OWNERSHIP.resettablePresentationEntity;
+export const RESET_ON_LOAD_G_KEYS = Object.freeze([
+  ...STATE_OWNERSHIP.resettablePresentationRoot,
+  ...STATE_OWNERSHIP.replayProvenanceRoot,
+]);
+export const AUTHORITATIVE_SIMULATION_EXCLUDED_G_KEYS = Object.freeze([
+  ...STATE_OWNERSHIP.processLocalRoot,
+  ...STATE_OWNERSHIP.resettablePresentationRoot,
+  ...STATE_OWNERSHIP.durableNonAuthoritativeRoot,
+  ...STATE_OWNERSHIP.replayProvenanceRoot,
+]);
+
+function createPresentationState() {
+  return {
+    _buildRipples: [],
+    _churchBeam: 0,
+    _confetti: [],
+    _followAvatar: false,
+    _hoveredBiome: null,
+    _lastPaintTile: null,
+    _lastPlaceFailMsg: 0,
+    _lastFoodWarnDay: 0,
+    _lastSaveTick: 0,
+    _lightningFlash: 0,
+    _lightningTimer: null,
+    _refreshPanelFor: null,
+    _renderAlpha: 1,
+    _renderDeltaMs: 1000 / 60,
+    acorns: [],
+    animals: [],
+    balloons: [],
+    bats: [],
+    bigSnow: [],
+    birds: [],
+    boats: [],
+    bolts: [],
+    bunnies: [],
+    camStart: { x: 0, y: 0 },
+    cameraShake: 0,
+    carts: [],
+    clouds: null,
+    crabs: [],
+    dragStart: { x: 0, y: 0 },
+    dragging: false,
+    dustDevils: [],
+    eagles: [],
+    fishJumps: [],
+    flocks: [],
+    footprints: [],
+    frogs: [],
+    hawks: [],
+    hoveredBiome: null,
+    hoveredTile: null,
+    lastResources: null,
+    meteors: [],
+    mouseX: 0,
+    mouseY: 0,
+    owls: [],
+    particles: [],
+    photoMode: false,
+    pigeons: [],
+    raidFlash: 0,
+    raidSmoke: [],
+    rams: [],
+    resourceRates: createResourceStock(),
+    researchSparkles: [],
+    schoolKids: [],
+    selectedBuild: null,
+    selectedBuilding: null,
+    selectedCitizenId: null,
+    snowmen: [],
+    tradeShips: [],
+    volcanoSmoke: [],
+    wolves: [],
+  };
+}
+
+export function createResetOnLoadState() {
+  return { ...createPresentationState(), _commandLog: [] };
+}
+
+export function resetRuntimeTransientState(target = G, prepared = createResetOnLoadState()) {
+  Object.assign(target, prepared);
+  return target;
+}
 
 // ── Seeded RNG ─────────────────────────────────────────────
 let _seed = 1; // fixed default — every entry point calls setSeed (ENGINE.md rule 2)
@@ -196,9 +373,9 @@ export const HOUSE_TIERS = [
 export function resourceEmoji(k) { return {wood:'🪵',stone:'🪨',food:'🍎',gold:'🪙',iron:'⚙️',wheat:'🌾',flour:'🫓',planks:'🪚',tools:'🛠️'}[k]||k; }
 
 export const DIFFICULTY = {
-  easy:   { label:'🟢 Easy',   startFood:120, startWood:80, startGold:40, foodMult:0.6, raidMult:0.5, raidStart:12 },
-  normal: { label:'🟡 Normal', startFood:80,  startWood:60, startGold:25, foodMult:1.0, raidMult:1.0, raidStart:8 },
-  hard:   { label:'🔴 Hard',   startFood:50,  startWood:40, startGold:15, foodMult:1.5, raidMult:1.5, raidStart:5 },
+  easy:   { label:'🟢 Easy',   foodMult:0.6, raidMult:0.5 },
+  normal: { label:'🟡 Normal', foodMult:1.0, raidMult:1.0 },
+  hard:   { label:'🔴 Hard',   foodMult:1.5, raidMult:1.5 },
 };
 
 export function getDifficulty() { return DIFFICULTY[G.difficulty] || DIFFICULTY.normal; }

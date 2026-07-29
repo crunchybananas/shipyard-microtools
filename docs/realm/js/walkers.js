@@ -1,6 +1,7 @@
-import { G, BUILDINGS, MAP_W, MAP_H, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=157';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=157';
-import { getWonderReport } from './wonder.js?realm=157';
+import { G, BUILDINGS, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=166';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=166';
+import { getWonderReport } from './wonder.js?realm=166';
+import { resolveGroundTraffic } from './ground-traffic.js?realm=166';
 
 export function updateWalkers() {
   // Spawn walkers from service buildings periodically — but not at night
@@ -29,7 +30,7 @@ export function updateWalkers() {
       if (b.type === 'wonder') {
         const wr = getWonderReport();
         if (!wr || !wr.placed || wr.complete || wr.gate) continue;
-        if (b.buildProgress !== undefined && b.buildProgress < 1) continue;
+        if (b.buildProgress < 1) continue;
         let best = null, bestD = Infinity;
         for (const s of G.buildings) {
           if (s.type !== 'storehouse' && s.type !== 'granary' && s.type !== 'market') continue;
@@ -40,6 +41,11 @@ export function updateWalkers() {
         hauler = { src: best || b, carry: owed ? owed.res : 'stone' };
       }
       const spawnAt = nearestWalkableTile(b.x, b.y, 3) || { x: b.x, y: b.y };
+      const target = hauler
+        // The hauler is presentation-only: route it directly to its source
+        // instead of consuming gameplay RNG for a meaningless first wander.
+        ? (nearestWalkableTile(Math.round(hauler.src.x), Math.round(hauler.src.y), 3) || spawnAt)
+        : (nearestWalkableTile(Math.round(b.x + rngRange(-4, 4)), Math.round(b.y + rngRange(-4, 4)), 4) || { x: b.x, y: b.y });
       G.walkers.push({
         x: spawnAt.x, y: spawnAt.y,
         home: b,
@@ -48,7 +54,7 @@ export function updateWalkers() {
         life: 400, // ticks before returning home
         visitedHouses: new Set(),
         ...(hauler ? { hauler: true, src: hauler.src, leg: 'to-source' } : {}),
-        ...(function () { const t = nearestWalkableTile(Math.round(b.x + rngRange(-4, 4)), Math.round(b.y + rngRange(-4, 4)), 4) || { x: b.x, y: b.y }; return { tx: t.x, ty: t.y }; })(),
+        tx: target.x, ty: target.y,
       });
     }
   }
@@ -104,4 +110,13 @@ export function updateWalkers() {
     w.life -= 1;
     if (w.life <= 0) G.walkers.splice(i, 1);
   }
+
+  // Citizens already resolve citizen/citizen spacing in their own system.
+  // Move only the later systems here so this cross-type pass does not repeat
+  // the dominant population's work or revise citizens after their update.
+  const trafficMovers = [...G.soldiers, ...G.walkers];
+  resolveGroundTraffic({
+    movers: trafficMovers,
+    blockers: [...G.citizens, ...trafficMovers],
+  });
 }

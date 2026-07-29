@@ -1,0 +1,12 @@
+import primary, { named as alias } from './js/static.js';
+import './js/side-effect.js?realm=old';
+export { named } from './js/re-export.js#alternate';
+export * from './js/export-all.js?other=1';
+const dynamic = import('./js/dynamic.js');
+const inTemplateExpression = `${import('./js/template-expression.js')}`;
+import contract from '../runtime-contract.json' with { type: 'json' };
+
+// import './js/comment.js';
+const inertString = "import('./js/string.js')";
+const inertTemplate = `export * from './js/template-text.js'`;
+const inertRegexp = /import\(['"]\.\/js\/regexp\.js/;

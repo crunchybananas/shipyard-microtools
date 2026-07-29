@@ -2,14 +2,22 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=157';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=157';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=157';
-import { revealAround, makeCitizen, rebuildBuildingGrid } from './world.js?realm=157';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=157';
-import { spawnDust } from './fx.js?realm=157';
-import { emit } from './bus.js?realm=157';
-import { isBuildingUnlocked } from './tech.js?realm=157';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=166';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=166';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=166';
+import { revealAround, makeCitizen } from './world.js?realm=166';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=166';
+import { spawnDust, visualJitter } from './fx.js?realm=166';
+import { emit } from './bus.js?realm=166';
+import { isBuildingUnlocked } from './tech.js?realm=166';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=166';
+import {
+  citizenConstructionRequiresStaff,
+  releaseCitizenAssignment,
+  removeCitizenFromWorld,
+  transitionCitizenActivity,
+  workersForBuilding,
+} from './citizen-ownership.js?realm=166';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -45,12 +53,6 @@ function constructionTicks(type) {
   return CONSTRUCTION_TICKS[type] || 300;
 }
 
-// Roads and walls are laid instantly-ish by the realm (bulk drag-painting
-// stays fluid); every real STRUCTURE is raised by builders on site.
-export function needsBuilders(type) {
-  return type !== 'road' && type !== 'wall';
-}
-export const BUILDER_SLOTS = 2;
 // With builders gating progress, base times stretch 3x — one builder
 // raises a house in ~11s at 1x, a crew of two in ~5.5s. Construction
 // pauses overnight (builders sleep) and while no one can reach the site.
@@ -86,16 +88,20 @@ export function placeBuilding(type, tx, ty) {
   const def = BUILDINGS[type];
   for (const [k,v] of Object.entries(def.cost)) G.resources[k] -= v;
   const b = {
-    type, x:tx, y:ty, hp:100, workers:[], active:true, prodTimer:0,
+    type, x:tx, y:ty, hp:100, active:true, prodTimer:0,
     produced:null, prodShowCount:0, level:1,
     buildProgress: 0,
-    buildTotal: constructionTicks(type) * (needsBuilders(type) ? BUILDER_TIME_MULT : 1),
+    buildTotal: constructionTicks(type) * (citizenConstructionRequiresStaff(type) ? BUILDER_TIME_MULT : 1),
     buildStartedAt: G.gameTick || 0,
   };
   G.buildings.push(b);
   G.buildingGrid[ty][tx] = b;
   G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-  if (def.pop) { G.maxPop += def.pop; trySpawnSettlers(def.pop); }
+  if (def.pop) {
+    const capacity = buildingCapacity(b);
+    G.maxPop += capacity;
+    trySpawnSettlers(capacity);
+  }
   if (def.reveal) revealAround(tx, ty, def.reveal);
   if (def.defense) G.defense += def.defense;
   if (def.happiness) G.happiness = Math.min(100, G.happiness + def.happiness);
@@ -140,68 +146,6 @@ export function placeBuilding(type, tx, ty) {
   return true;
 }
 
-export function demolishBuilding(b, byEnemy = false) {
-  // Orphaned soldiers re-home on their next wander re-roll (armyAnchor
-  // falls back through homeBuilding -> null gracefully); garrisoned
-  // soldiers are ejected beside the rubble.
-  for (const s of G.soldiers || []) {
-    if (s.homeBuilding === b) s.homeBuilding = null;
-    if (s.garrison === b) {
-      s.garrison = null;
-      const spot = nearestWalkableTile(b.x, b.y, 3);
-      if (spot) { s.x = spot.x; s.y = spot.y; s.tx = spot.x; s.ty = spot.y; }
-    }
-  }
-  // Wonder rubble keeps its ledger: stage/delivered persist on G.wonder,
-  // so re-placing costs only the site down-payment (wonder.js).
-  if (b.type === 'wonder' && G.wonder) {
-    G.wonder.placed = false;
-    if (byEnemy) chronicle('The Hall of Ages is thrown down. Its foundations remember what was owed.', 'raid');
-  }
-  const def = BUILDINGS[b.type];
-  G.buildings = G.buildings.filter(x => x !== b);
-  G.buildingGrid[b.y][b.x] = null;
-  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-  if (def.pop) G.maxPop = Math.max(0, G.maxPop - houseCap(b));
-  if (def.defense) G.defense = Math.max(0, G.defense - def.defense);
-  // Refund half the cost only on voluntary demolish — enemies don't give back materials!
-  if (!byEnemy) {
-    for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + Math.floor(v/2);
-  }
-  for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
-  if (byEnemy && G.stats) G.stats.buildingsLost++;
-  playSound('demolish');
-}
-
-export function undoLastBuild() {
-  if (!G._undoStack || G._undoStack.length === 0) return false;
-  const entry = G._undoStack.pop();
-  // Loop 025 (the-fixer, closing 024): entries are now `{b, flagsSnapshot,
-  // chronicleLen}` wrappers. Raw-building entries are not expected in the
-  // current codebase (undo stack is in-memory only) but a defensive unwrap
-  // keeps older shapes from crashing this path.
-  const b = entry && entry.b ? entry.b : entry;
-  if (!G.buildings.includes(b)) return false;
-  const def = BUILDINGS[b.type];
-  G.buildings = G.buildings.filter(x => x !== b);
-  G.buildingGrid[b.y][b.x] = null;
-  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-  if (def.pop) { G.maxPop -= houseCap(b); if (G.maxPop < 0) { console.warn('[housing] maxPop drifted below zero'); G.maxPop = 0; } }
-  if (def.defense) G.defense -= def.defense;
-  // Full refund on undo
-  for (const [k,v] of Object.entries(def.cost)) G.resources[k] = (G.resources[k]||0) + v;
-  for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
-  // Restore storyFlags + truncate chronicle to pre-place state so a
-  // first-build beat that already fired is reverted. A later rebuild will
-  // now correctly re-narrate.
-  if (entry && entry.flagsSnapshot) G.storyFlags = entry.flagsSnapshot;
-  if (entry && typeof entry.chronicleLen === 'number' && G.chronicle) {
-    G.chronicle.length = entry.chronicleLen;
-  }
-  playSound('click');
-  return true;
-}
-
 export function trySpawnSettlers(count) {
   const max = Math.min(count, G.maxPop - G.population);
   for (let i = 0; i < max; i++) {
@@ -229,12 +173,13 @@ export function trySpawnSettlers(count) {
       notify(`🎉 Population reached ${m.label}!`, 'event', { chronicle: false });
       playSound('mission');
       for (let i = 0; i < 20; i++) {
+        const unit = channel => visualJitter(MAP_W / 2, MAP_H / 2, 1000 + i * 7 + channel);
         G.particles.push({
-          tx: MAP_W/2 + (rng()-0.5)*6,
-          ty: MAP_H/2 + (rng()-0.5)*6,
-          offsetY: -15 - rng()*25,
-          text: ['🎉','⭐','✨'][Math.floor(rng()*3)],
-          alpha: 1.5, vy: -0.15 - rng()*0.2,
+          tx: MAP_W / 2 + (unit(1) - 0.5) * 6,
+          ty: MAP_H / 2 + (unit(2) - 0.5) * 6,
+          offsetY: -15 - unit(3) * 25,
+          text: ['🎉','⭐','✨'][Math.floor(unit(4) * 3)],
+          alpha: 1.5, vy: -0.15 - unit(5) * 0.2,
           decay: 0.008, type: 'text',
         });
       }
@@ -248,22 +193,22 @@ export function updateProduction() {
     // Citizens take builder slots at the site through the job market;
     // progress advances only while a crew is physically on site working
     // — more hands, faster walls. Roads/walls stay timer-laid.
-    if (b.buildProgress !== undefined && b.buildProgress < 1) {
-      const total = b.buildTotal || constructionTicks(b.type);
+    if (b.buildProgress < 1) {
+      const total = b.buildTotal;
       const before = b.buildProgress;
-      if (!needsBuilders(b.type)) {
+      if (!citizenConstructionRequiresStaff(b.type)) {
         b.buildProgress = Math.min(1, b.buildProgress + 1 / total);
       } else {
-        const crew = (b.workers || []).filter(w =>
-          w.state === 'working' &&
+        const crew = workersForBuilding(b).filter(w =>
+          w.activity.kind === 'working' &&
           Math.abs(w.x - b.x) + Math.abs(w.y - b.y) <= 2.6
         ).length;
         if (crew > 0) {
           b.buildProgress = Math.min(1, b.buildProgress + crew / total);
-          if ((G.gameTick || 0) % 18 === 0 && G.particles.length < 280) {
+          if ((G.gameTick || 0) % 18 === 0) {
             spawnDust(b.x, b.y);
           }
-        } else if ((G.gameTick - (b.buildStartedAt || 0)) > 300 && (G.gameTick || 0) % 600 === 0 && G.particles.length < 280) {
+        } else if ((G.gameTick - b.buildStartedAt) > 300 && (G.gameTick || 0) % 600 === 0) {
           // Site sitting idle — surface it in the world, not just a stat.
           G.particles.push({
             tx: b.x, ty: b.y, offsetY: -22,
@@ -281,22 +226,22 @@ export function updateProduction() {
         });
         // Release the crew — some will re-take this building as its
         // production workers through the ordinary job market.
-        for (const w of (b.workers || [])) {
-          w.jobBuilding = null;
+        for (const w of workersForBuilding(b)) {
+          releaseCitizenAssignment(w, 'construction-complete');
           w.workTarget = null;
-          if (w.state === 'working' || w.state === 'walk_to_work') {
-            w.state = 'find_job';
-            w.stateTimer = 5;
+          if (w.activity.kind === 'working' || w.activity.kind === 'walk_to_work') {
+            transitionCitizenActivity(w, 'find_job', 'construction-complete');
+            w.activityTimer = 5;
             w.path = null;
+            w.pathIdx = 0;
           }
         }
-        b.workers = [];
       }
       if (b.buildProgress < 1) continue;
     }
 
     // Archery range: train archers
-    if (b.type === 'archery' && b.workers.length >= 1) {
+    if (b.type === 'archery' && workersForBuilding(b).length >= 1) {
       b.trainTimer = (b.trainTimer || 0) + 1;
       const cap = 3;
       const current = G.soldiers.filter(s => s.homeBuilding === b).length;
@@ -311,13 +256,13 @@ export function updateProduction() {
           name: randomName(),
           type: 'archer',
           hp: 30, maxHp: 30,
-          state: 'patrol', stateTimer: 0, target: null,
+          state: 'patrol', stateTimer: 0,
         });
       }
     }
 
     // Barracks: train soldiers
-    if (b.type === 'barracks' && b.workers.length >= 1) {
+    if (b.type === 'barracks' && workersForBuilding(b).length >= 1) {
       b.trainTimer = (b.trainTimer || 0) + 1;
       const cap = 4; // max 4 soldiers per barracks
       const current = G.soldiers.filter(s => s.homeBuilding === b).length;
@@ -334,7 +279,6 @@ export function updateProduction() {
           hp: 75, maxHp: 75,
           state: 'patrol',
           stateTimer: 0,
-          target: null,
         });
       }
     }
@@ -343,7 +287,7 @@ export function updateProduction() {
     if (!def) continue; // guard against unknown building types
     if (!def.prod && !def.convert) continue;
     const needed = def.workers || 0;
-    if (b.workers.length < needed) continue;
+    if (workersForBuilding(b).length < needed) continue;
 
     // Founder's inspiration (Phase 3d): production quickens near the
     // avatar — wandering your own town has a reason.
@@ -388,7 +332,7 @@ export function updateProduction() {
       }
       if (!Object.values(adjustedProd).some(v => v > 0)) continue;
       // If a worker is available to carry, set produced flag
-      const carrier = b.workers.find(w => w.state === 'working');
+      const carrier = workersForBuilding(b).find(w => w.activity.kind === 'working');
       if (carrier) {
         // Merge instead of overwrite: a frozen or slow carrier no longer
         // wipes the previous unpicked batch every production cycle.
@@ -408,10 +352,12 @@ export function updateProduction() {
       // feedback in the painted world instead of floating UI text.
       b.prodShowCount = (b.prodShowCount || 0) + 1;
       if (b.prodShowCount % 3 === 0) {
+        let glintIndex = 0;
         for (const [k,v] of Object.entries(adjustedProd)) {
+          const salt = 1200 + glintIndex++ * 2;
           if (v > 0) G.particles.push({
-            tx: b.x + (rng() - 0.5) * 0.16,
-            ty: b.y + (rng() - 0.5) * 0.16,
+            tx: b.x + (visualJitter(b.x, b.y, salt) - 0.5) * 0.16,
+            ty: b.y + (visualJitter(b.x, b.y, salt + 1) - 0.5) * 0.16,
             offsetY: -3,
             text: null,
             alpha: 0.95,
@@ -449,22 +395,7 @@ export function updateProduction() {
         hBonus += def.happiness;
       }
     }
-    // Loop 201 (the-fixer, 101 filed 100 ticks): named bard adds a
-    // flat +5 happiness baseline. Fourth named-character mechanic
-    // (101 teacher / 102 merchant / 105+153 smith / 201 bard).
-    // Additive (not multiplicative) — bards raise spirits, they don't
-    // amplify existing systems. Stacks before the min-100 / max-10
-    // clamp; visible in mid-range realms (10 < base < 95) where it
-    // moves the needle without saturating. No chronicle beat (034
-    // bard-arrival already announces the character). Pattern: when
-    // the bonus is a flat baseline, prefer additive `+= N` over
-    // multiplicative `*= 1.N`. 5 of 6 named-cast now have mechanics;
-    // mayor (civic-unlock filed 101) + rival (raid-difficulty filed
-    // 105) remain. Closes 101 filed bard idea.
     const bardBonus = G.namedCharacters?.bard ? 5 : 0;
-    // Citizen mood (Phase 3b): per-citizen needs aggregate into a BOUNDED
-    // ±15 contribution — coverage keeps carrying the base balance, mood
-    // makes it emergent (a rested, fed, entertained town runs happier).
     let moodDelta = 0;
     if (G.citizens.length > 0) {
       let sum = 0;
@@ -483,20 +414,17 @@ export function updateProduction() {
 
     // ── Housing evolution (Caesar-style tier ladder) ─────────────────
     // Signed streak with asymmetric hysteresis: +2 checks to evolve,
-    // -3 to devolve (with a warning at -2). Runtime-only; reset-on-load
-    // doubles as post-load grace alongside G._tierGraceUntil.
+    // -3 to devolve (with a warning at -2).
     for (const b of houses) {
       if (b.type !== 'house') continue;
-      if ((b.construction || 0) > 0 && !b.active) continue;
       const report = getHouseTierReport(b);
-      const graceActive = G._tierGraceUntil && G.gameTick < G._tierGraceUntil;
       if (report.next && report.nextReport.pass) {
         b.tierStreak = Math.max(1, (b.tierStreak || 0) + 1);
         if (b.tierStreak >= 2) {
           if (report.costOk) {
             for (const [k, v] of Object.entries(report.next.evolveCost || {})) G.resources[k] -= v;
             const capDelta = report.next.cap - report.tier.cap;
-            b.level = (b.level || 1) + 1;
+            b.level += 1;
             G.maxPop += capDelta;
             b.upgradeTick = G.gameTick;
             b.tierStreak = 0;
@@ -514,14 +442,14 @@ export function updateProduction() {
           // Unaffordable evolve cost: hold the streak at threshold so saved-up
           // planks/tools trigger the upgrade on the next check.
         }
-      } else if ((b.level || 1) > 1 && !report.current.pass && !graceActive) {
+      } else if (b.level > 1 && !report.current.pass) {
         b.tierStreak = Math.min(-1, (b.tierStreak || 0) - 1);
         if (b.tierStreak === -2) {
           G.particles.push({ tx: b.x, ty: b.y, offsetY: -14, text: '❗', alpha: 1.4, vy: -0.15, decay: 0.012, type: 'text' });
         } else if (b.tierStreak <= -3) {
-          const fromTier = HOUSE_TIERS[(b.level || 1) - 1];
+          const fromTier = HOUSE_TIERS[b.level - 1];
           b.level -= 1;
-          const toTier = HOUSE_TIERS[(b.level || 1) - 1];
+          const toTier = HOUSE_TIERS[b.level - 1];
           G.maxPop = Math.max(0, G.maxPop - (fromTier.cap - toTier.cap));
           b.tierStreak = 0;
           const now = G.gameTick; // tick-based throttle (core file — no Date.now)
@@ -568,9 +496,7 @@ export function updateProduction() {
         const c = sorted[0];
         if (c.hunger >= 90) {
           if (c.carrying && c.carryAmount > 0) G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
-          G.citizens = G.citizens.filter(x => x !== c);
-          if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
-          G.population--;
+          removeCitizenFromWorld(c);
           if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;  // Loop 242 (241 parity-check discipline applied): starvation was missing the partner stat that lastDeathDay tracks against
           G.lastDeathDay = G.day;  // Loop 228 (sustained-state #2 infrastructure)
           // Death particle
@@ -580,13 +506,12 @@ export function updateProduction() {
             alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
           });
           // Loop 077: {chronicle:false} so direct 'death' write is canonical (076 HIGH)
-          notify(`${c.name} has died of starvation!`, 'danger', { chronicle: false });
-          try { chronicle(`${c.name} perished from hunger. The realm mourns.`, 'death'); } catch(_e){}
+          notify(`${c.identity.name} has died of starvation!`, 'danger', { chronicle: false });
+          try { chronicle(`${c.identity.name} perished from hunger. The realm mourns.`, 'death'); } catch(_e){}
         } else {
           // Citizen flees
-          const c2 = G.citizens.pop();
-          if (c2.jobBuilding) c2.jobBuilding.workers = c2.jobBuilding.workers.filter(w => w !== c2);
-          G.population--;
+          const c2 = G.citizens.at(-1);
+          removeCitizenFromWorld(c2);
           // Loop 077: {chronicle:false} (076 MEDIUM) — UI warning, not a raid event
           notify('A settler has left — they could not find food!', 'danger', { chronicle: false });
         }
@@ -647,7 +572,7 @@ export function checkRaids() {
     // - First raid: small warning raid.
     // - Defenseless towns get nuisance plunderers, not wipe waves.
     // - Defended towns ramp slowly enough that rebuilding is possible.
-    const raidsFaced = G.stats?.raidsFaced || (G.lastRaidDay !== undefined ? 1 : 0);
+    const raidsFaced = G.stats.raidsFaced;
     const isFirstRaid = raidsFaced === 0;
     const hasDefense = G.buildings.some(b =>
       b.type === 'wall' || b.type === 'barracks' || b.type === 'tower' || b.type === 'archery' || b.type === 'castle'
@@ -726,19 +651,21 @@ export function checkRaids() {
         plunderGoal: isFirstRaid ? 20 : (hasDefense ? 42 : 30),
         type: 'raider',
         state: 'approach',
-        variant: Math.floor(rng() * 3), // 0=swordsman 1=spearman 2=berserker
+        // Sprite-only variation is derived without advancing gameplay RNG.
+        variant: Math.floor(visualJitter(ex, ey, 1300 + i) * 3),
       });
     }
 
     // Raid visual effects — dramatic particles at settlement center
     for (let i = 0; i < 15; i++) {
+      const unit = channel => visualJitter(MAP_W / 2, MAP_H / 2, 1400 + i * 7 + channel);
       G.particles.push({
-        tx: MAP_W/2 + (rng()-0.5)*10,
-        ty: MAP_H/2 + (rng()-0.5)*10,
-        offsetY: -10 - rng()*20,
-        text: ['⚔️','💥','🔥'][Math.floor(rng()*3)],
+        tx: MAP_W / 2 + (unit(1) - 0.5) * 10,
+        ty: MAP_H / 2 + (unit(2) - 0.5) * 10,
+        offsetY: -10 - unit(3) * 20,
+        text: ['⚔️','💥','🔥'][Math.floor(unit(4) * 3)],
         alpha: 1.5,
-        vy: -0.2 - rng()*0.15,
+        vy: -0.2 - unit(5) * 0.15,
         decay: 0.01,
         type: 'text',
       });
@@ -820,7 +747,7 @@ function updateCaravans() {
     for (const b of G.buildings) {
       if (b.type !== 'tradingpost') continue;
       if (b.caravanOut) continue;
-      if (b.workers.length < 1) continue;
+      if (workersForBuilding(b).length < 1) continue;
       spawnCaravan(b);
     }
   }
@@ -896,7 +823,7 @@ export function upgradeBuilding(b) {
 export function computePrestige() {
   let p = 0;
   for (const b of G.buildings) {
-    if (b.type === 'house') p += [0, 0, 1, 3, 6][Math.min(4, b.level || 1)];
+    if (b.type === 'house') p += [0, 0, 1, 3, 6][Math.min(4, b.level)];
     else if (b.type === 'townhall') p += 10;
     else if (b.type === 'church') p += 4;
     else if (b.type === 'school' || b.type === 'tavern' || b.type === 'market') p += 2;
@@ -917,8 +844,9 @@ export function updateFires() {
     // Spawn fire particles every 4 ticks
     if (G.gameTick % 4 === 0) {
       G.particles.push({
-        tx: b.x + (rng()-0.5)*0.5, ty: b.y + (rng()-0.5)*0.5,
-        offsetY: -20 - rng()*10,
+        tx: b.x + (visualJitter(b.x, b.y, 1501) - 0.5) * 0.5,
+        ty: b.y + (visualJitter(b.x, b.y, 1502) - 0.5) * 0.5,
+        offsetY: -20 - visualJitter(b.x, b.y, 1503) * 10,
         text: '🔥', alpha: 1, vy: -0.2, decay: 0.03, type: 'text',
       });
     }
@@ -945,23 +873,9 @@ export function updateFires() {
     }
     // Destroy building if HP reaches 0
     if (b.hp <= 0) {
-      // Loop 077: {chronicle:false} (076 MEDIUM) — was writing tag:raid, wrong tag for fire
-      notify(`🔥 ${BUILDINGS[b.type]?.name || b.type} burned down!`, 'danger', { chronicle: false });
-      G.cameraShake = Math.max(G.cameraShake || 0, 10);
-      G.buildings = G.buildings.filter(x => x !== b);
-      G.buildingGrid[b.y][b.x] = null;
-  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-      if (b.workers) for (const w of b.workers) { w.jobBuilding = null; w.state = 'idle'; w.path = null; }
-      G.stats.buildingsLost = (G.stats.buildingsLost || 0) + 1;
+      removeBuilding(b, { cause: 'fire' });
     }
   }
-}
-
-// Housing tier capacity: houses grow with their tier; everything else uses
-// its static def.pop. The single source for every maxPop mutation site.
-export function houseCap(b) {
-  if (b.type === 'house') return HOUSE_TIERS[Math.min(HOUSE_TIERS.length, b.level || 1) - 1].cap;
-  return BUILDINGS[b.type]?.pop || 0;
 }
 
 // Single-source tier requirement predicates, used by BOTH the evolution
@@ -969,7 +883,7 @@ export function houseCap(b) {
 export function getHouseTierReport(b) {
   const VISIT_WINDOW = Math.floor(G.dayLength * 1.25);
   const visited = (s) => b.visits?.[s] !== undefined && G.gameTick - b.visits[s] <= VISIT_WINDOW;
-  const tierIdx = Math.min(HOUSE_TIERS.length, b.level || 1) - 1;
+  const tierIdx = Math.min(HOUSE_TIERS.length, b.level) - 1;
   const evalReqs = (reqs) => {
     const out = { pass: true, checks: [] };
     for (const s of (reqs.services || [])) {
@@ -989,7 +903,7 @@ export function getHouseTierReport(b) {
     }
     if (reqs.foodVariety) {
       const kinds = ['farm', 'fisherman', 'chickencoop', 'cowpen', 'bakery']
-        .filter(t => G.buildings.some(bb => bb.type === t && bb.active && (bb.workers?.length || 0) >= (BUILDINGS[t].workers || 0)));
+        .filter(t => G.buildings.some(bb => bb.type === t && bb.active && workersForBuilding(bb).length >= (BUILDINGS[t].workers || 0)));
       const ok = kinds.length >= reqs.foodVariety;
       out.checks.push({ label: `${reqs.foodVariety} food sources (${kinds.length})`, ok });
       if (!ok) out.pass = false;
@@ -1014,7 +928,7 @@ export function collectTaxes() {
   let housedCap = 0, weighted = 0;
   for (const b of G.buildings) {
     if (b.type !== 'house') continue;
-    const t = HOUSE_TIERS[Math.min(HOUSE_TIERS.length, b.level || 1) - 1];
+    const t = HOUSE_TIERS[Math.min(HOUSE_TIERS.length, b.level) - 1];
     housedCap += t.cap;
     weighted += t.cap * t.taxMult;
   }

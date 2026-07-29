@@ -1,0 +1,17 @@
+{
+  "moduleRevision": 161,
+  "executionMode": "browser-core-plus-shell",
+  "gameTick": 7200,
+  "day": 3,
+  "population": 19,
+  "buildings": 16,
+  "hud": "Year 1, Day 3 · 👑 Age of the Crown · 🌱 Spring · 🙂 59% 🟡",
+  "presentation": {
+    "particles": 179,
+    "animals": 5,
+    "birds": 3,
+    "carts": 0,
+    "footprints": 0
+  },
+  "pageErrors": []
+}

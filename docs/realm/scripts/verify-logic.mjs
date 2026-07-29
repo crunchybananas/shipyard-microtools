@@ -5,7 +5,7 @@
 // Usage:
 //   node docs/realm/scripts/verify-logic.mjs
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { ensureServer } from './_serve.mjs';
@@ -53,14 +53,50 @@ rec('game entered (G.day exists)', ready);
 if (!ready) {
   console.log('[verify-logic] could not enter game; aborting');
   await browser.close();
+  await server.stop();
   process.exit(1);
 }
 
+await page.evaluate(() => {
+  // Logic fixtures replace authoritative arrays directly. Suspend the live
+  // renderer while they do so; otherwise it can observe a half-installed
+  // fixture between statements and report a false lifecycle failure.
+  window.G.speed = 0;
+  window.G.debug.pauseRendering = true;
+  window.__buildingFixture = (type, x, y, overrides = {}) => ({
+    type,
+    x,
+    y,
+    hp: 100,
+    active: true,
+    prodTimer: 0,
+    produced: null,
+    prodShowCount: 0,
+    level: 1,
+    buildProgress: 1,
+    buildTotal: 1,
+    buildStartedAt: 0,
+    ...overrides,
+  });
+});
+
 // Test 0: resource delivery truthfulness — no storage/home should not deliver.
 const noStorageDelivery = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js');
+  const citizens = await import('./js/citizens.js?realm=166');
+  const ownership = await import('./js/citizen-ownership.js?realm=166');
+  const presentation = await import('./js/citizen-presentation.js?realm=166');
+  const before = {
+    buildings: window.G.buildings,
+    citizens: window.G.citizens,
+    particles: window.G.particles,
+    wood: window.G.resources.wood,
+    speed: window.G.speed,
+    gameTick: window.G.gameTick,
+    nextActorId: window.G.nextActorId,
+  };
+  window.G.gameTick = 1000;
   const c = {
-    name: 'Probe Wood',
+    ...ownership.createCitizenOwnership('Probe Wood'),
     x: 20,
     y: 20,
     tx: 20,
@@ -69,37 +105,32 @@ const noStorageDelivery = await page.evaluate(async () => {
     faceZ: 1,
     speed: 0.05,
     hunger: 0,
-    state: 'working',
-    stateTimer: 0,
+    rest: 100,
+    needs: { joy: 55, faith: 55 },
+    activityTimer: 0,
     path: null,
     pathIdx: 0,
+    carrying: null,
+    carryAmount: 0,
   };
-  const job = {
-    type: 'lumber',
-    x: 20,
-    y: 20,
-    workers: [c],
+  const job = window.__buildingFixture('lumber', 20, 20, {
     produced: { wood: 3 },
-    buildProgress: 1,
-  };
-  c.jobBuilding = job;
-  const before = {
-    buildings: window.G.buildings,
-    citizens: window.G.citizens,
-    particles: window.G.particles,
-    wood: window.G.resources.wood,
-    speed: window.G.speed,
-    gameTick: window.G.gameTick,
-  };
+  });
   window.G.buildings = [job];
   window.G.citizens = [c];
+  ownership.resetCitizenOwnershipRuntime();
+  ownership.claimCitizenAssignment(c, job, { reason: 'job-market' });
+  ownership.transitionCitizenActivity(c, 'working', 'arrived-at-work');
   window.G.particles = [];
   window.G.resources.wood = 0;
   window.G.speed = 1;
-  window.G.gameTick = 1000;
   citizens.updateCitizens();
+  const snapshot = presentation.buildCitizenPresentation(c);
   const result = {
-    state: c.state,
+    actorId: snapshot.actorId,
+    activity: snapshot.activity.kind,
+    profession: snapshot.profession.kind,
+    assignmentDuty: snapshot.assignment?.duty,
     carrying: c.carrying,
     carryAmount: c.carryAmount,
     wood: window.G.resources.wood,
@@ -112,29 +143,36 @@ const noStorageDelivery = await page.evaluate(async () => {
   window.G.resources.wood = before.wood;
   window.G.speed = before.speed;
   window.G.gameTick = before.gameTick;
+  window.G.nextActorId = before.nextActorId;
+  ownership.resetCitizenOwnershipRuntime();
   return result;
 });
 rec(
   'delivery: produced wood with no storage/home stays carried',
-  noStorageDelivery.state === 'needs_delivery' &&
+  noStorageDelivery.activity === 'needs_delivery' &&
+    noStorageDelivery.profession === 'lumber' &&
+    noStorageDelivery.assignmentDuty === 'lumber' &&
     noStorageDelivery.carrying === 'wood' &&
     noStorageDelivery.carryAmount === 3 &&
     noStorageDelivery.wood === 0 &&
     noStorageDelivery.hasNeedStorage &&
     !noStorageDelivery.hasDelivered,
-  `state=${noStorageDelivery.state} carrying=${noStorageDelivery.carrying} wood=${noStorageDelivery.wood} need=${noStorageDelivery.hasNeedStorage} delivered=${noStorageDelivery.hasDelivered}`,
+  `actor=${noStorageDelivery.actorId} activity=${noStorageDelivery.activity} profession=${noStorageDelivery.profession} carrying=${noStorageDelivery.carrying} wood=${noStorageDelivery.wood} need=${noStorageDelivery.hasNeedStorage} delivered=${noStorageDelivery.hasDelivered}`,
 );
 
 // Test 0b: route recovery — unreachable jobs/storage are blacklisted and the
 // citizen tries a reachable alternative instead of repeating the same A* miss.
 const routeRecovery = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js');
+  const citizens = await import('./js/citizens.js?realm=166');
+  const ownership = await import('./js/citizen-ownership.js?realm=166');
+  const presentation = await import('./js/citizen-presentation.js?realm=166');
   const before = {
     map: window.G.map, fog: window.G.fog, buildingGrid: window.G.buildingGrid,
     buildings: window.G.buildings, citizens: window.G.citizens,
     particles: window.G.particles, resources: window.G.resources,
     enemies: window.G.enemies, population: window.G.population,
     gameTick: window.G.gameTick, dayPhase: window.G.dayPhase,
+    nextActorId: window.G.nextActorId,
   };
   try {
     const size = 50;
@@ -144,17 +182,21 @@ const routeRecovery = await page.evaluate(async () => {
       for (const b of buildings) grid[b.y][b.x] = b;
       return grid;
     };
-    const makeCitizen = (name, x, y, state) => ({
-      name, x, y, tx: x, ty: y, faceX: 0, faceZ: 1, speed: 0.05,
-      hunger: 0, rest: 100, needs: { joy: 55, faith: 55 },
-      state, stateTimer: 0, path: null, pathIdx: 0,
-      carrying: null, carryAmount: 0,
-    });
+    const makeCitizen = (displayName, x, y, activity, reason) => {
+      const citizen = {
+        ...ownership.createCitizenOwnership(displayName),
+        x, y, tx: x, ty: y, faceX: 0, faceZ: 1, speed: 0.05,
+        hunger: 0, rest: 100, needs: { joy: 55, faith: 55 },
+        activityTimer: 0, path: null, pathIdx: 0,
+        carrying: null, carryAmount: 0,
+      };
+      if (activity !== 'idle') ownership.transitionCitizenActivity(citizen, activity, reason);
+      return citizen;
+    };
 
-    // A farm surrounded by a 17x17 water moat has no walkable endpoint in
-    // A*'s destination snap radius. The worker must give it up for a while.
-    const farm = { type: 'farm', x: 25, y: 25, workers: [], buildProgress: 1 };
-    const worker = makeCitizen('Route Probe', 5, 5, 'find_job');
+    window.G.gameTick = 1999;
+    const farm = window.__buildingFixture('farm', 25, 25);
+    const worker = makeCitizen('Route Probe', 5, 5, 'find_job', 'seek-work');
     const workMap = clearMap();
     for (let y = 17; y <= 33; y++) for (let x = 17; x <= 33; x++) workMap[y][x] = 0; // water
     window.G.map = workMap;
@@ -162,6 +204,7 @@ const routeRecovery = await page.evaluate(async () => {
     window.G.buildings = [farm];
     window.G.buildingGrid = gridFor([farm]);
     window.G.citizens = [worker];
+    ownership.resetCitizenOwnershipRuntime();
     window.G.particles = [];
     window.G.resources = { ...before.resources, food: 100 };
     window.G.enemies = [];
@@ -169,14 +212,16 @@ const routeRecovery = await page.evaluate(async () => {
     window.G.dayPhase = (window.G.dayLength || 3600) / 2;
     window.G.gameTick = 2000;
     citizens.updateCitizens();
-    const jobReleased = worker.jobBuilding === null &&
-      worker.state === 'idle' && worker._noGo?.['25,25'] === 2000;
+    const workerSnapshot = presentation.buildCitizenPresentation(worker);
+    const jobReleased = workerSnapshot.assignment === null &&
+      workerSnapshot.activity.kind === 'idle' && worker._noGo?.['25,25'] === 2000;
 
     // A carrier sees the same islanded storehouse first, blacklists it, then
     // routes to the reachable house rather than stalling with the cargo.
-    const storage = { type: 'storehouse', x: 25, y: 25, workers: [], buildProgress: 1 };
-    const house = { type: 'house', x: 8, y: 8, workers: [], buildProgress: 1 };
-    const carrier = makeCitizen('Carrier Probe', 5, 5, 'needs_delivery');
+    const storage = window.__buildingFixture('storehouse', 25, 25);
+    const house = window.__buildingFixture('house', 8, 8);
+    window.G.gameTick = 2023;
+    const carrier = makeCitizen('Carrier Probe', 5, 5, 'needs_delivery', 'cargo-needs-storage');
     carrier.carrying = 'wood';
     carrier.carryAmount = 3;
     const deliveryMap = clearMap();
@@ -185,27 +230,39 @@ const routeRecovery = await page.evaluate(async () => {
     window.G.buildings = [storage, house];
     window.G.buildingGrid = gridFor([storage, house]);
     window.G.citizens = [carrier];
+    ownership.resetCitizenOwnershipRuntime();
     window.G.gameTick = 2024;
     citizens.updateCitizens();
-    const deliveryRecovered = carrier.state === 'walk_to_deliver' &&
+    const carrierSnapshot = presentation.buildCitizenPresentation(carrier);
+    const deliveryRecovered = carrierSnapshot.activity.kind === 'walk_to_deliver' &&
       carrier._deliveryTarget === house && !!carrier.path &&
       carrier._noGo?.['25,25'] === 2024;
-    return { jobReleased, deliveryRecovered, workerState: worker.state, carrierState: carrier.state };
+    return {
+      jobReleased,
+      deliveryRecovered,
+      workerActorId: workerSnapshot.actorId,
+      carrierActorId: carrierSnapshot.actorId,
+      workerActivity: workerSnapshot.activity.kind,
+      carrierActivity: carrierSnapshot.activity.kind,
+    };
   } finally {
     Object.assign(window.G, before);
+    ownership.resetCitizenOwnershipRuntime();
   }
 });
 rec(
   'citizens abandon unreachable jobs and reroute deliveries to reachable storage',
   routeRecovery.jobReleased && routeRecovery.deliveryRecovered,
-  `job=${routeRecovery.workerState} delivery=${routeRecovery.carrierState}`,
+  `worker=${routeRecovery.workerActorId}:${routeRecovery.workerActivity} carrier=${routeRecovery.carrierActorId}:${routeRecovery.carrierActivity}`,
 );
 
 // Test 0c: actor continuity — a worker keeps their visual identity through
 // a transient no-job delivery gap, work checks do not drop into idle, and a
-// construction assignment uses the builder rows until the site is complete.
+// temporary construction assignment keeps the worker's durable profession row.
 const actorContinuity = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js');
+  const citizens = await import('./js/citizens.js?realm=166');
+  const ownership = await import('./js/citizen-ownership.js?realm=166');
+  const presentation = await import('./js/citizen-presentation.js?realm=166');
   const before = {
     buildings: window.G.buildings,
     citizens: window.G.citizens,
@@ -213,45 +270,229 @@ const actorContinuity = await page.evaluate(async () => {
     resources: window.G.resources,
     enemies: window.G.enemies,
     gameTick: window.G.gameTick,
+    nextActorId: window.G.nextActorId,
   };
   try {
+    window.G.gameTick = 1;
     const worker = {
-      name: 'Animation Probe', x: 20, y: 20, tx: 20, ty: 20,
+      ...ownership.createCitizenOwnership('Animation Probe'),
+      x: 20, y: 20, tx: 20, ty: 20,
       faceX: 1, faceZ: 0, speed: 0.05,
       hunger: 0, rest: 100, needs: { joy: 55, faith: 55 },
-      state: 'working', stateTimer: 0, path: null, pathIdx: 0,
-      carrying: null, carryAmount: 0, visualJob: 'mine', _hb: 0,
+      activityTimer: 0, path: null, pathIdx: 0,
+      carrying: null, carryAmount: 0, _hb: 0,
     };
-    const mine = { type: 'mine', x: 20, y: 20, workers: [worker], produced: null, buildProgress: 1 };
-    worker.jobBuilding = mine;
-    window.G.buildings = [mine];
+    const mine = window.__buildingFixture('mine', 20, 20);
+    const constructionSite = window.__buildingFixture('mine', 22, 20, { buildProgress: 0.5 });
+    window.G.buildings = [mine, constructionSite];
     window.G.citizens = [worker];
+    ownership.resetCitizenOwnershipRuntime();
+    ownership.claimCitizenAssignment(worker, mine, { reason: 'job-market' });
+    ownership.transitionCitizenActivity(worker, 'working', 'arrived-at-work');
     window.G.particles = [];
     window.G.resources = { ...before.resources, food: 100 };
     window.G.enemies = [];
-    window.G.gameTick = 1;
     citizens.updateCitizens();
 
+    const workingSnapshot = presentation.buildCitizenPresentation(worker);
+    ownership.transitionCitizenActivity(worker, 'walk_to_deliver', 'cargo-ready');
+    const deliverySnapshot = presentation.buildCitizenPresentation(worker);
+    ownership.claimCitizenAssignment(worker, constructionSite, { reason: 'construction' });
+    ownership.transitionCitizenActivity(worker, 'working', 'arrived-at-work');
+    const constructionSnapshot = presentation.buildCitizenPresentation(worker);
+    ownership.releaseCitizenAssignment(worker, 'construction-complete');
+    ownership.transitionCitizenActivity(worker, 'idle', 'construction-complete');
+    const releasedSnapshot = presentation.buildCitizenPresentation(worker);
     const mapping = window.__realm?.actorMapping;
     return {
-      keepsWorking: worker.state === 'working' && worker.stateTimer > 0,
+      actorId: workingSnapshot.actorId,
+      appearanceId: workingSnapshot.identity.appearanceId,
+      keepsWorking: workingSnapshot.activity.kind === 'working' && worker.activityTimer > 0,
       locksWorkFacing: worker._workFaceX === 1 && worker._workFaceZ === 0,
-      deliveryRole: mapping?.variantForCitizen({ state: 'walk_to_deliver', visualJob: 'mine' }),
-      constructionRole: mapping?.variantForCitizen({
-        state: 'working', visualJob: 'mine', jobBuilding: { type: 'mine', buildProgress: 0.5 },
-      }),
-      unassignedRole: mapping?.variantForCitizen({ state: 'idle' }),
+      deliveryRole: mapping?.variantForCitizen(deliverySnapshot),
+      constructionRole: mapping?.variantForCitizen(constructionSnapshot),
+      releasedRole: mapping?.variantForCitizen(releasedSnapshot),
+      constructionPurpose: constructionSnapshot.assignment?.purpose,
+      constructionDuty: constructionSnapshot.assignment?.duty,
+      profession: releasedSnapshot.profession.kind,
+      releasedAssignment: releasedSnapshot.assignment,
+      stableIdentity: [deliverySnapshot, constructionSnapshot, releasedSnapshot].every(
+        snapshot => snapshot.actorId === workingSnapshot.actorId &&
+          snapshot.identity.appearanceId === workingSnapshot.identity.appearanceId,
+      ),
+    };
+  } finally {
+    Object.assign(window.G, before);
+    ownership.resetCitizenOwnershipRuntime();
+  }
+});
+rec(
+  'actor continuity: miner identity survives delivery, temporary construction, and release',
+  actorContinuity.keepsWorking && actorContinuity.locksWorkFacing &&
+    actorContinuity.deliveryRole === 'miner' && actorContinuity.constructionRole === 'miner' &&
+    actorContinuity.releasedRole === 'miner' && actorContinuity.profession === 'miner' &&
+    actorContinuity.constructionPurpose === 'temporary' &&
+    actorContinuity.constructionDuty === 'construction' &&
+    actorContinuity.releasedAssignment === null && actorContinuity.stableIdentity,
+  JSON.stringify(actorContinuity),
+);
+
+// Animal context + movement: domestic species must come from their completed
+// husbandry buildings, and arrival clears walking immediately so a stationary
+// sprite cannot keep bobbing.
+const animalContext = await page.evaluate(async () => {
+  const animals = await import('./js/animals.js?realm=166');
+  const { TILE, MAP_W, MAP_H } = await import('./js/state.js?realm=166');
+  const before = {
+    map: window.G.map,
+    buildingGrid: window.G.buildingGrid,
+    buildings: window.G.buildings,
+    animals: window.G.animals,
+    gameTick: window.G.gameTick,
+  };
+  try {
+    window.G.map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(TILE.GRASS));
+    window.G.map[5][5] = TILE.FOREST;
+    window.G.buildingGrid = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(null));
+    const cowpen = window.__buildingFixture('cowpen', 20, 20);
+    const coop = window.__buildingFixture('chickencoop', 30, 30);
+    window.G.buildings = [cowpen, coop];
+    window.G.buildingGrid[20][20] = cowpen;
+    window.G.buildingGrid[30][30] = coop;
+    window.G.animals = [];
+    animals.spawnAnimals();
+
+    const cows = window.G.animals.filter((a) => a.type === 'cow');
+    const chickens = window.G.animals.filter((a) => a.type === 'chicken');
+    const deer = window.G.animals.filter((a) => a.type === 'deer');
+    const grounded = cows.length === 2 && chickens.length === 3 && deer.length === 1 &&
+      cows.every((a) => a.home === cowpen && window.G.map[Math.round(a.y)][Math.round(a.x)] === TILE.GRASS && Math.hypot(a.x - cowpen.x, a.y - cowpen.y) <= 5.1) &&
+      chickens.every((a) => a.home === coop && window.G.map[Math.round(a.y)][Math.round(a.x)] === TILE.GRASS && Math.hypot(a.x - coop.x, a.y - coop.y) <= 4.1) &&
+      deer.every((a) => window.G.map[Math.round(a.y)][Math.round(a.x)] === TILE.FOREST);
+
+    const probe = cows[0];
+    probe.state = 'walk';
+    probe.tx = probe.x - 0.5;
+    probe.ty = probe.y;
+    probe._walkTimeout = 100;
+    window.G.gameTick = 1;
+    animals.updateAnimals();
+    const facesTravel = probe.facing === -1 && probe.state === 'walk';
+    probe.tx = probe.x + 0.001;
+    probe.ty = probe.y;
+    probe.state = 'walk';
+    animals.updateAnimals();
+    const settlesOnArrival = probe.state === 'graze' && probe.x === probe.tx && probe.y === probe.ty;
+
+    window.G.buildings = [coop];
+    window.G.buildingGrid[20][20] = null;
+    animals.spawnAnimals();
+    const demolishedPenClearsCows = !window.G.animals.some((a) => a.type === 'cow');
+
+    window.G.buildings = [];
+    window.G.buildingGrid[30][30] = null;
+    window.G.animals = [];
+    animals.spawnAnimals();
+    const noContextFreeLivestock = window.G.animals.every((a) => a.type === 'deer');
+
+    return {
+      counts: { cow: cows.length, chicken: chickens.length, deer: deer.length },
+      grounded,
+      facesTravel,
+      settlesOnArrival,
+      demolishedPenClearsCows,
+      noContextFreeLivestock,
     };
   } finally {
     Object.assign(window.G, before);
   }
 });
 rec(
-  'actor continuity: miners keep identity, work loops stay live, construction reads as builder',
-  actorContinuity.keepsWorking && actorContinuity.locksWorkFacing &&
-    actorContinuity.deliveryRole === 'miner' && actorContinuity.constructionRole === 'builder' &&
-    actorContinuity.unassignedRole === 'settler',
-  JSON.stringify(actorContinuity),
+  'animals: painted livestock is building-grounded and movement settles cleanly',
+  animalContext.grounded && animalContext.facesTravel && animalContext.settlesOnArrival &&
+    animalContext.demolishedPenClearsCows && animalContext.noContextFreeLivestock,
+  JSON.stringify(animalContext),
+);
+
+// Waypoint transitions: being merely near a corner is not arrival. Citizens
+// must keep moving to the authored point, then consume it on the reaching tick
+// without a zero-motion frame between segments.
+const waypointTransition = await page.evaluate(async () => {
+  const citizens = await import('./js/citizens.js?realm=166');
+  const ownership = await import('./js/citizen-ownership.js?realm=166');
+  const presentation = await import('./js/citizen-presentation.js?realm=166');
+  const { TILE, MAP_W, MAP_H } = await import('./js/state.js?realm=166');
+  const before = {
+    map: window.G.map,
+    fog: window.G.fog,
+    buildingGrid: window.G.buildingGrid,
+    buildings: window.G.buildings,
+    citizens: window.G.citizens,
+    particles: window.G.particles,
+    enemies: window.G.enemies,
+    resources: window.G.resources,
+    gameTick: window.G.gameTick,
+    dayPhase: window.G.dayPhase,
+    tileWear: window.G.tileWear,
+    obstacleEpoch: window.G.obstacleEpoch,
+    nextActorId: window.G.nextActorId,
+  };
+  try {
+    window.G.map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(TILE.GRASS));
+    window.G.fog = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(true));
+    window.G.buildingGrid = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(null));
+    window.G.buildings = [];
+    window.G.particles = [];
+    window.G.enemies = [];
+    window.G.resources = { ...before.resources, food: 100 };
+    window.G.tileWear = null;
+    window.G.obstacleEpoch = 4;
+    window.G.dayPhase = window.G.dayLength / 2;
+    window.G.gameTick = 0;
+    const citizen = {
+      ...ownership.createCitizenOwnership('Corner Probe'),
+      x: 19.9, y: 20, tx: 20, ty: 20,
+      faceX: 1, faceZ: 0, speed: 0.02,
+      hunger: 0, rest: 100, needs: { joy: 55, faith: 55 },
+      activityTimer: 100,
+      path: [{ x: 20, y: 20 }], pathIdx: 0,
+      _pathEpoch: 4, _pathStartedAt: 0, _hb: 5,
+      carrying: null, carryAmount: 0,
+    };
+    window.G.citizens = [citizen];
+    ownership.resetCitizenOwnershipRuntime();
+    window.G.gameTick = 1;
+    citizens.updateCitizens();
+    const doesNotCutCorner = citizen.x > 19.9 && citizen.x < 20 && citizen.pathIdx === 0;
+
+    citizen.x = 19.985;
+    citizen.y = 20;
+    citizen.path = [{ x: 20, y: 20 }];
+    citizen.pathIdx = 0;
+    citizen._pathEpoch = 4;
+    citizen._lastPathX = citizen.x;
+    citizen._lastPathY = citizen.y;
+    window.G.gameTick = 2;
+    citizens.updateCitizens();
+    const consumesOnReach = citizen.x === 20 && citizen.y === 20 && citizen.pathIdx === 1;
+    const snapshot = presentation.buildCitizenPresentation(citizen);
+    return {
+      actorId: snapshot.actorId,
+      activity: snapshot.activity.kind,
+      doesNotCutCorner,
+      consumesOnReach,
+      x: citizen.x,
+      pathIdx: citizen.pathIdx,
+    };
+  } finally {
+    Object.assign(window.G, before);
+    ownership.resetCitizenOwnershipRuntime();
+  }
+});
+rec(
+  'pathing: near-corner movement reaches and consumes waypoints without an idle beat',
+  waypointTransition.doesNotCutCorner && waypointTransition.consumesOnReach,
+  JSON.stringify(waypointTransition),
 );
 
 // Test 1: 192/197 — G.realmEnded field exists / can be set
@@ -276,7 +517,7 @@ rec('211: G.lastRaidDay settable', lastRaidDay.settable, `initial=${lastRaidDay.
 
 // Test 3: 212 first_sigh_seen — advance to summer day 12, force checkStoryBeats
 const sighFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   // Force gate: summer + day 12, no flag yet
   window.G.day = 12;
   window.G.season = 'summer';
@@ -292,7 +533,7 @@ rec('212: first_sigh_seen fires at summer d12', sighFire.fired, `text="${sighFir
 
 // Test 4: 199 first_cold_morning — autumn day 15
 const coldFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.day = 15;
   window.G.season = 'autumn';
   delete window.G.storyFlags.first_cold_morning;
@@ -305,7 +546,7 @@ rec('199: first_cold_morning fires at autumn d15', coldFire.fired, `text="${cold
 
 // Test 5: 207 fields_know_realm — summer day 10
 const fieldsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.day = 10;
   window.G.season = 'summer';
   delete window.G.storyFlags.fields_know_realm;
@@ -317,7 +558,7 @@ rec('207: fields_know_realm fires at summer d10', fieldsFire.fired);
 
 // Test 6: 211 sustained_peace_known — needs raidsSurvived≥1 + lastRaidDay+50 days
 const peaceFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.stats = window.G.stats || {};
   window.G.stats.raidsSurvived = 1;
   window.G.lastRaidDay = 10;
@@ -333,7 +574,7 @@ rec('211: sustained_peace_known fires d65 with raidsSurvived=1, lastRaidDay=10',
 // Test 7: 192 realm_fell after-callback — G.realmEnded set when beat fires
 // Test 7b: 278 — terminal "chronicle closes" entry pushed by after-callback
 const realmFell = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.realmEnded = false;
   window.G.population = 0;
   window.G.day = 50;
@@ -353,7 +594,7 @@ rec('278: terminal "chronicle closes" entry written + tagged requiem', realmFell
 
 // Test 8: 201 bard happiness +5 — set rival false, force ensureBard, check formula
 const bardEffect = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   // Reset state
   window.G.namedCharacters = window.G.namedCharacters || {};
   delete window.G.namedCharacters.bard;
@@ -368,12 +609,12 @@ rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `n
 
 // Test 22: 253 mayor_first_in_hall — mayor + year3 + townhall built
 const mayorFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureMayor();
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'townhall')) {
-    window.G.buildings.push({ type: 'townhall', x: 25, y: 25, hp: 100, maxHp: 100, workers: [] });
+    window.G.buildings.push(window.__buildingFixture('townhall', 25, 25));
   }
   delete window.G.storyFlags.mayor_first_in_hall;
   story.checkStoryBeats();
@@ -419,9 +660,9 @@ const newGameReset = await page.evaluate(async () => {
   };
 });
 const reset = newGameReset.realmEnded === false &&
-              newGameReset.lastRaidDay === undefined &&
-              newGameReset.lastDeathDay === undefined &&
-              newGameReset.lastUnderpopDay === undefined &&
+              newGameReset.lastRaidDay === null &&
+              newGameReset.lastDeathDay === null &&
+              newGameReset.lastUnderpopDay === null &&
               newGameReset.namedCharCount === 0 &&
               newGameReset.filter === '' &&
               newGameReset.undoStackLen === 0 &&
@@ -432,8 +673,122 @@ const reset = newGameReset.realmEnded === false &&
               newGameReset.everHadBuildingEmpty === true;
 rec('269+271+302+311: newGame() resets all leaky fields (realmEnded + trackers + namedCharacters + filter + _undoStack + _buildRipples + birds + _raidWarningGiven + scenariosWon + everHadBuilding)', reset, JSON.stringify(newGameReset));
 
+// Fresh realms must use one initializer regardless of whether they start from
+// the title screen or the in-game restart action.
+const canonicalNewGame = await page.evaluate(async () => {
+  const mapSignature = () => window.G.map
+    .map(row => row.join(''))
+    .join('|');
+  window.setDifficulty('hard');
+  window.setScenario('military_rise');
+  document.getElementById('kingdom-name-input').value = '  Audit Keep  ';
+  window.startNewGame();
+  const titleStart = {
+    difficulty: window.G.difficulty,
+    scenario: window.G.scenario,
+    kingdomName: window.G.kingdomName,
+    resources: { ...window.G.resources },
+    nextRaidDay: window.G.nextRaidDay,
+    signature: mapSignature(),
+  };
+  window.newGame();
+  const restart = {
+    difficulty: window.G.difficulty,
+    scenario: window.G.scenario,
+    kingdomName: window.G.kingdomName,
+    resources: { ...window.G.resources },
+    nextRaidDay: window.G.nextRaidDay,
+    signature: mapSignature(),
+  };
+  window.setDifficulty('easy');
+  window.setScenario('peaceful_start');
+  window.newGame();
+  window.G.speed = 0;
+  return { titleStart, restart };
+});
+const expectedMilitaryResources = {
+  wood: 60, stone: 80, food: 80, gold: 50, iron: 20,
+  wheat: 0, flour: 0, planks: 0, tools: 0,
+};
+const canonicalStart = canonicalNewGame.titleStart;
+const canonicalRestart = canonicalNewGame.restart;
+rec(
+  'new game: title start and in-game restart share scenario defaults and deterministic seed',
+  canonicalStart.difficulty === 'hard' &&
+    canonicalStart.scenario === 'military_rise' &&
+    canonicalStart.kingdomName === 'Audit Keep' &&
+    canonicalStart.nextRaidDay === 8 &&
+    JSON.stringify(canonicalStart.resources) === JSON.stringify(expectedMilitaryResources) &&
+    JSON.stringify(canonicalRestart.resources) === JSON.stringify(expectedMilitaryResources) &&
+    canonicalRestart.signature === canonicalStart.signature &&
+    canonicalRestart.kingdomName === canonicalStart.kingdomName,
+  JSON.stringify({
+    title: { ...canonicalStart, signature: canonicalStart.signature.length },
+    restart: { ...canonicalRestart, signature: canonicalRestart.signature.length },
+  }),
+);
+
+// Chronicle entries, kingdom names, and notifications are saved/user-authored
+// strings. They must remain text when rendered.
+const safeTextRendering = await page.evaluate(async () => {
+  const storyUI = await import('./js/story-ui.js?realm=166');
+  const notifications = await import('./js/notifications.js?realm=166');
+  const payload = '<img id="realm-injection-probe" src=x onerror="window.__realmInjected=true">';
+  window.__realmInjected = false;
+  window.G.chronicle = [{
+    day: window.G.day,
+    season: window.G.season,
+    tag: 'misc',
+    text: payload,
+  }];
+  storyUI.renderChroniclePanel();
+  notifications.notifyTransient(payload, 'info');
+  await new Promise(resolve => setTimeout(resolve, 20));
+  const chronicleText = document.getElementById('chronicle-content')?.textContent || '';
+  const feedText = document.getElementById('activity-feed')?.textContent || '';
+  return {
+    chronicleLiteral: chronicleText.includes(payload),
+    feedLiteral: feedText.includes(payload),
+    injectedElement: !!document.getElementById('realm-injection-probe'),
+    handlerRan: window.__realmInjected,
+  };
+});
+rec(
+  'rendering: saved and user-authored strings remain inert text',
+  safeTextRendering.chronicleLiteral &&
+    safeTextRendering.feedLiteral &&
+    !safeTextRendering.injectedElement &&
+    !safeTextRendering.handlerRan,
+  JSON.stringify(safeTextRendering),
+);
+
+const safeCitizenRendering = await page.evaluate(() => {
+  const citizen = window.G.citizens[0];
+  const originalName = citizen.identity.name;
+  const payload = '<img id="citizen-injection-probe" src=x onerror="window.__citizenInjected=true">';
+  window.__citizenInjected = false;
+  citizen.identity.name = payload;
+  const panel = document.getElementById('pop-panel');
+  panel.style.display = 'none';
+  window.togglePopPanel();
+  const literal = document.getElementById('pop-content')?.textContent.includes(payload) || false;
+  const injectedElement = !!document.getElementById('citizen-injection-probe');
+  const handlerRan = window.__citizenInjected;
+  citizen.identity.name = originalName;
+  window.togglePopPanel();
+  return { literal, injectedElement, handlerRan };
+});
+rec(
+  'rendering: persisted citizen names remain inert text',
+  safeCitizenRendering.literal &&
+    !safeCitizenRendering.injectedElement &&
+    !safeCitizenRendering.handlerRan,
+  JSON.stringify(safeCitizenRendering),
+);
+
 // Test: 261 — render desaturation CSS filter applies when G.realmEnded toggles
 const realmEndFilter = await page.evaluate(async () => {
+  window.G.debug.pauseRendering = false;
   // Reset
   window.G.realmEnded = false;
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -446,6 +801,7 @@ const realmEndFilter = await page.evaluate(async () => {
   window.G.realmEnded = false;
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   const restoreFilter = document.getElementById('game').style.filter || '';
+  window.G.debug.pauseRendering = true;
   return { preFilter, postFilter, restoreFilter };
 });
 const filterApplies = realmEndFilter.preFilter === '' && realmEndFilter.postFilter.includes('grayscale') && realmEndFilter.restoreFilter === '';
@@ -453,15 +809,15 @@ rec('261: realm-end CSS filter applies on G.realmEnded transition', filterApplie
 
 // Test: 260 — chronicle() gates on G.realmEnded (the-player [play] finding)
 const chronicleGate = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const { chronicle } = await import('./js/log.js?realm=166');
   // Establish baseline length, ensure realm not ended
   window.G.realmEnded = false;
-  story.chronicle('test entry pre-end', 'misc');
+  chronicle('test entry pre-end', 'misc');
   const lenBeforeEnd = window.G.chronicle.length;
   // Set realmEnded; further writes must be no-ops
   window.G.realmEnded = true;
-  story.chronicle('attempted write post-end', 'misc');
-  story.chronicle('another attempt', 'misc');
+  chronicle('attempted write post-end', 'misc');
+  chronicle('another attempt', 'misc');
   const lenAfterEnd = window.G.chronicle.length;
   // Reset for downstream tests
   window.G.realmEnded = false;
@@ -471,15 +827,15 @@ rec('260: chronicle() gates on G.realmEnded', chronicleGate.gateHeld, `before=${
 
 // Test: 258 — townhall maxCount:1 enforced via isBuildingUnlocked
 const townhallMaxCount = await page.evaluate(async () => {
-  const tech = await import('./js/tech.js');
-  const story = await import('./js/story.js');
+  const tech = await import('./js/tech.js?realm=166');
+  const story = await import('./js/story.js?realm=166');
   // Ensure mayor exists so the gate's primary check passes
   story.ensureMayor('Auditor');
   // Reset any townhalls
   window.G.buildings = (window.G.buildings || []).filter(b => b.type !== 'townhall');
   const unlockedNoCount = tech.isBuildingUnlocked('townhall');
   // Place one townhall; gate should now refuse a second
-  window.G.buildings.push({ type: 'townhall', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+  window.G.buildings.push(window.__buildingFixture('townhall', 30, 30));
   const unlockedAtCap = tech.isBuildingUnlocked('townhall');
   // Clean up so the 243 mayor-gate test that runs later sees clean state
   window.G.buildings = window.G.buildings.filter(b => b.type !== 'townhall');
@@ -489,11 +845,11 @@ rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.
 
 // Test: 277 absent_citizen_seat_known — inference-by-absence (3rd individual-interiority shape)
 const absentCitizenFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.day = 35;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'tavern')) {
-    window.G.buildings.push({ type: 'tavern', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+    window.G.buildings.push(window.__buildingFixture('tavern', 30, 30));
   }
   delete window.G.storyFlags.absent_citizen_seat_known;
   story.checkStoryBeats();
@@ -505,7 +861,7 @@ rec('277: absent_citizen_seat_known fires d≥30 + tavern', absentCitizenFire.fi
 
 // Test: 275 child_no_elsewhere_known — POV-inversion (2nd individual-interiority shape)
 const childPOVFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensBorn = 1;
@@ -520,7 +876,7 @@ rec('275: child_no_elsewhere_known fires year3 + citizensBorn≥1', childPOVFire
 // Test: 272 storm_passed_seen — negative-space weather (4th weather-recognition use)
 // Test: 273 — beat's after: callback spawns a 'lightning' particle
 const stormPassedFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.season = 'summer';
   window.G.day = 35;
   delete window.G.storyFlags.storm_passed_seen;
@@ -537,7 +893,7 @@ rec('273: lightning particle spawned by beat after: callback', stormPassedFire.p
 
 // Test: 270 inn_confluence_seen — first multi-character beat in corpus
 const confluenceFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureMayor('Mayor Test');
   story.ensureBard('Bard Test');
   story.ensureSmith('Smith Test');
@@ -553,7 +909,7 @@ rec('270: inn_confluence_seen fires year3 + mayor + bard + smith named', conflue
 // Test: 266 summer_falling_star — ambient-entity-grammar 4th use
 // Test: 267 — beat's after: callback spawns a 'shootingstar' particle
 const fallingStarFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.season = 'summer';
   window.G.dayPhase = (window.G.dayLength || 3600) * 0.85;  // deep night
   delete window.G.storyFlags.summer_falling_star;
@@ -571,19 +927,19 @@ rec('267: shooting-star particle spawned by beat after: callback', fallingStarFi
 
 // Test: 264 — variant raid prose pools (260 [play] follow-on)
 const raidProse = await page.evaluate(async () => {
-  const enh = await import('./js/enhancements.js');
+  const raidSummary = await import('./js/raid-summary.js?realm=166');
   // Same outcome shape (victory: kills>0, no losses), different days → different prose
-  const day1 = enh._pickRaidProse(10, 5, 0, 12);
-  const day2 = enh._pickRaidProse(11, 5, 0, 12);
-  const day3 = enh._pickRaidProse(12, 5, 0, 12);
-  const day4 = enh._pickRaidProse(13, 5, 0, 12);
+  const day1 = raidSummary.pickRaidProse(10, 5, 0, 12);
+  const day2 = raidSummary.pickRaidProse(11, 5, 0, 12);
+  const day3 = raidSummary.pickRaidProse(12, 5, 0, 12);
+  const day4 = raidSummary.pickRaidProse(13, 5, 0, 12);
   const distinct = new Set([day1, day2, day3, day4]).size;
   // Razed: popAlive=0 always selects razed pool; spread across 4 days
-  const razed1 = enh._pickRaidProse(50, 0, 5, 0);
-  const razed2 = enh._pickRaidProse(51, 0, 5, 0);
+  const razed1 = raidSummary.pickRaidProse(50, 0, 5, 0);
+  const razed2 = raidSummary.pickRaidProse(51, 0, 5, 0);
   const razedDistinct = razed1 !== razed2;
   // Determinism: same inputs → same output
-  const det1 = enh._pickRaidProse(10, 5, 0, 12);
+  const det1 = raidSummary.pickRaidProse(10, 5, 0, 12);
   const deterministic = det1 === day1;
   return { distinct, razedDistinct, deterministic, sample: day1.slice(0, 70) };
 });
@@ -591,9 +947,10 @@ rec('264: raid prose pools — 4 days span ≥3 distinct prose for same outcome'
 
 // Test: 263 chronicle_self_known — meta-self-aware (chronicle.length ≥ 100)
 const chronicleSelfFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
+  const { chronicle } = await import('./js/log.js?realm=166');
   // Pad chronicle to 100 entries
-  while ((window.G.chronicle || []).length < 100) story.chronicle('padding entry', 'misc');
+  while ((window.G.chronicle || []).length < 100) chronicle('padding entry', 'misc');
   delete window.G.storyFlags.chronicle_self_known;
   story.checkStoryBeats();
   const fired = window.G.storyFlags.chronicle_self_known === true;
@@ -604,7 +961,7 @@ rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelf
 
 // Test: 348 present_forgetting_known — single-axis (7th forgetting; PRESENT-FORGETTING-AS-EMERGING-GAP; sole-leader at 7; first sub-type at 7)
 const presentForgettingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 165;
   delete window.G.storyFlags.present_forgetting_known;
@@ -617,7 +974,7 @@ rec('348: present_forgetting_known fires year3 + d>=160', presentForgettingFire.
 
 // Test: 352 hill_gathers_fog_known — single-axis (7th land-as-agent; PRESENT-INDEPENDENT-AGENCY; ties forgetting at 7; LA temporal axis articulated → 8/9 sub-type-internal-axes formalized)
 const hillGathersFogFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.season = 'autumn';
   window.G.storyFlags.year2 = true;
   window.G.day = 55;
@@ -631,7 +988,7 @@ rec('352: hill_gathers_fog_known fires autumn + year2 + d>=50', hillGathersFogFi
 
 // Test: 354 afternoon_quiet_known — single-axis (6th habituation-recognition; RHYTHMIC-COLLECTIVE-MOMENT; HB→6; cluster-uniform sweep)
 const afternoonQuietFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.day = 85;
   delete window.G.storyFlags.afternoon_quiet_known;
@@ -644,7 +1001,7 @@ rec('354: afternoon_quiet_known fires year2 + d>=80', afternoonQuietFire.fired, 
 
 // Test: 357 realm_equilibrium_known — single-axis (6th sustained-state-recognition; EQUILIBRIUM-AS-DEFAULT; SS axis 4→5 threshold-classes; cluster-uniform sweep)
 const realmEquilibriumFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 95;
   delete window.G.storyFlags.realm_equilibrium_known;
@@ -657,7 +1014,7 @@ rec('357: realm_equilibrium_known fires year3 + d>=90', realmEquilibriumFire.fir
 
 // Test: 356 G.debug.disableEvents knob suppresses random-event rolls (closes 355 pessimist finding)
 const disableEventsTest = await page.evaluate(async () => {
-  const events = await import('./js/events.js');
+  const events = await import('./js/events.js?realm=166');
   // Bypass the day<4 guard
   window.G.day = 100;
   window.G.activeEvent = null;
@@ -686,7 +1043,7 @@ rec('356: G.debug.disableEvents suppresses event-rolls (closes 355 pessimist)', 
 
 // Test: 347 avoided_corner_known — single-axis (6th individual-interiority; AVOIDANCE-UNEXPLAINED; INTERIOR-MANIFESTATION-MODE axis articulated; 7/9 axes)
 const avoidedCornerFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 160;
   delete window.G.storyFlags.avoided_corner_known;
@@ -699,7 +1056,7 @@ rec('347: avoided_corner_known fires year3 + d>=155', avoidedCornerFire.fired, `
 
 // Test: 346 autumn_sound_known — single-axis (6th ambient-entity-grammar; SUSTAINED-COLLECTIVE-AWARENESS-WITHOUT-NAMING; completes 2D axis)
 const autumnSoundFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.season = 'autumn';
   window.G.day = 155;
@@ -713,7 +1070,7 @@ rec('346: autumn_sound_known fires year3 + autumn + d>=150', autumnSoundFire.fir
 
 // Test: 344 realm_begun_known — single-axis (5th early-game-mood shape; REALM-AS-CONTINUITY-UNNOTICED; CLUSTER-UNIFORM-5 milestone)
 const realmBegunFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 150;
   delete window.G.storyFlags.realm_begun_known;
@@ -726,7 +1083,7 @@ rec('344: realm_begun_known fires year3 + d>=145', realmBegunFire.fired, `text="
 
 // Test: 343 collective_waking_known — single-axis (5th ambient-entity-grammar shape; TRANSIENT-COLLECTIVE-WITNESS)
 const collectiveWakingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.season = 'winter';
   window.G.day = 145;
@@ -740,7 +1097,7 @@ rec('343: collective_waking_known fires year3 + winter + d>=140', collectiveWaki
 
 // Test: 342 qualifier_dropped_known — single-axis (5th naming-place shape; COLLECTIVE-RENAMING-VIA-QUALIFIER-DROP)
 const qualifierDroppedFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 140;
   delete window.G.storyFlags.qualifier_dropped_known;
@@ -753,7 +1110,7 @@ rec('342: qualifier_dropped_known fires year3 + d>=135', qualifierDroppedFire.fi
 
 // Test: 341 first_frost_wait_known — single-axis (5th weather-recognition shape; ANTICIPATION-AS-SEASON)
 const frostWaitFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.season = 'autumn';
   window.G.day = 135;
@@ -767,7 +1124,7 @@ rec('341: first_frost_wait_known fires year3 + autumn + d>=130', frostWaitFire.f
 
 // Test: 339 raid_routine_known — single-axis (5th sustained-state-recognition shape; THREAT-NORMALIZATION)
 const raidRoutineFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 130;
   window.G.stats = window.G.stats || {};
@@ -782,7 +1139,7 @@ rec('339: raid_routine_known fires year3 + d>=125 + raidsSurvived>=3', raidRouti
 
 // Test: 337 cup_holding_known — single-axis (5th habituation-recognition shape; NON-CORRECTION-AS-CULTURAL-ENFORCEMENT)
 const cupHoldingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 125;
   delete window.G.storyFlags.cup_holding_known;
@@ -795,7 +1152,7 @@ rec('337: cup_holding_known fires year3 + d>=120', cupHoldingFire.fired, `text="
 
 // Test: 336 unteach_known — single-axis (6th forgetting shape; ACTIVE-FORGETTING-AS-PEDAGOGY)
 const unteachFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 120;
   delete window.G.storyFlags.unteach_known;
@@ -808,7 +1165,7 @@ rec('336: unteach_known fires year3 + d>=115', unteachFire.fired, `text="${untea
 
 // Test: 334 inherited_walk_known — multi-axial (5th individual-interiority BODILY-INHERITED-MEMORY + REPETITION re-use; 3rd structural form use)
 const inheritedWalkFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 115;
   delete window.G.storyFlags.inherited_walk_known;
@@ -821,7 +1178,7 @@ rec('334: inherited_walk_known fires year3 + d>=110', inheritedWalkFire.fired, `
 
 // Test: 332 lingering_name_known — multi-axial (4th naming-place shape NAMED-AFTER-WHO-IS-GONE + REPETITION re-use; 2nd use of STRUCTURAL form)
 const lingeringNameFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 110;
   delete window.G.storyFlags.lingering_name_known;
@@ -834,7 +1191,7 @@ rec('332: lingering_name_known fires year3 + d>=105', lingeringNameFire.fired, `
 
 // Test: 331 winter_normalized_known — single-axis surprise (4th sustained-state-recognition shape; NORMALIZATION-THROUGH-ACCUMULATION)
 const winterNormalFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.season = 'winter';
   delete window.G.storyFlags.winter_normalized_known;
@@ -847,7 +1204,7 @@ rec('331: winter_normalized_known fires year3 + season=winter', winterNormalFire
 
 // Test: 329 bird_namer_known — single-axis surprise (4th individual-interiority shape; PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION)
 const birdNamerFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 105;
   delete window.G.storyFlags.bird_namer_known;
@@ -860,7 +1217,7 @@ rec('329: bird_namer_known fires year3 + d>=100', birdNamerFire.fired, `text="${
 
 // Test: 327 new_road_known — single-axis surprise (3rd naming-place shape; CONTRADICTORY-NAMING-AS-INSIDER-DIRECTION)
 const newRoadFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 98;
   delete window.G.storyFlags.new_road_known;
@@ -873,7 +1230,7 @@ rec('327: new_road_known fires year3 + d>=95', newRoadFire.fired, `text="${newRo
 
 // Test: 325 cold_corner_known — single-axis surprise (2nd naming-place shape; NAME-AS-MEASUREMENT angle)
 const coldCornerFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 92;
   delete window.G.storyFlags.cold_corner_known;
@@ -886,7 +1243,7 @@ rec('325: cold_corner_known fires year3 + d>=90', coldCornerFire.fired, `text="$
 
 // Test: 322 recurrence_known — TRIPLE-AXIS (7th OUTSIDE CONTENTMENT + 7th STRUCTURAL REPETITION + RECURRENCE-AS-SELF-RECOGNITION angle)
 const recurrenceFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 88;
   delete window.G.storyFlags.recurrence_known;
@@ -900,7 +1257,7 @@ rec('322: recurrence_known fires year3 + d>=85', recurrenceFire.fired, `text="${
 // Test: 319-A sea_bell_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
 // 321: gate-spread requires G.day >= 62.
 const seaBellLostFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 65;
   window.G.buildings = []; // church NOT present
@@ -917,7 +1274,7 @@ rec('319-A+321: sea_bell_lost_known fires year3 + d>=62 + everHadBuilding.church
 
 // Test: 319-A mutual exclusion — sea_bell_lost should NOT fire if original sea_bell_known already set
 const seaBellMutexCheck = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 65;
   window.G.buildings = []; // church absent
@@ -933,13 +1290,13 @@ rec('319-A: sea_bell_lost_known does NOT fire when sea_bell_known already set (m
 // Scenario: church destroyed pre-y3, lost fires at y3+d>=62, then church rebuilt. The
 // original gate must reject because !sea_bell_lost_known is false.
 const seaBellRebuildMutex = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 88;
   window.G.stats = window.G.stats || {};
   window.G.stats.everHadBuilding = { church: true };
   window.G.storyFlags.sea_bell_lost_known = true; // lost already fired
-  window.G.buildings = [{ type: 'church', x: 30, y: 30, hp: 100, workers: [] }]; // rebuilt
+  window.G.buildings = [window.__buildingFixture('church', 30, 30)]; // rebuilt
   delete window.G.storyFlags.sea_bell_known;
   story.checkStoryBeats();
   return { fired: window.G.storyFlags.sea_bell_known === true };
@@ -948,13 +1305,13 @@ rec('324: sea_bell_known does NOT fire after sea_bell_lost_known (bidirectional 
 
 // Test: 324 bidirectional mutex — church_step_worn_known should NOT fire after church_step_worn_lost_known
 const stepRebuildMutex = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 88;
   window.G.stats = window.G.stats || {};
   window.G.stats.everHadBuilding = { church: true };
   window.G.storyFlags.church_step_worn_lost_known = true;
-  window.G.buildings = [{ type: 'church', x: 30, y: 30, hp: 100, workers: [] }];
+  window.G.buildings = [window.__buildingFixture('church', 30, 30)];
   delete window.G.storyFlags.church_step_worn_known;
   story.checkStoryBeats();
   return { fired: window.G.storyFlags.church_step_worn_known === true };
@@ -964,7 +1321,7 @@ rec('324: church_step_worn_known does NOT fire after church_step_worn_lost_known
 // Test: 319-B church_step_worn_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
 // 321: gate-spread requires G.day >= 68.
 const stepLostFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 70;
   window.G.buildings = [];
@@ -983,7 +1340,7 @@ rec('319-B+321: church_step_worn_lost_known fires year3 + d>=68 + everHadBuildin
 // Test: 318 empty_seat_known — TRIPLE-AXIS (6th OUTSIDE GRIEF + 6th STRUCTURAL FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS angle)
 // 321: gate-spread requires G.day >= 72.
 const emptySeatFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 75;
   window.G.stats = window.G.stats || {};
@@ -998,7 +1355,7 @@ rec('318+321: empty_seat_known fires year3 + d>=72 + citizensDied>=2', emptySeat
 
 // Test: 314 morning_dread_known — TRIPLE-AXIS (5th OUTSIDE TERROR + 5th STRUCTURAL NEGATION + DREAD-WITHOUT-CAUSE angle)
 const dreadFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 85;
   delete window.G.storyFlags.morning_dread_known;
@@ -1012,7 +1369,7 @@ rec('314: morning_dread_known fires year3 + d>=80', dreadFire.fired, `text="${dr
 // Test: 312 tacit_norms_known — SOCIAL-NORMS habituation-recognition (4th shape; 4th structural-DIALOG-opening)
 // 313: gate-spread requires G.day >= 75 (18 days after y3 d57).
 const tacitNormsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 80;
   delete window.G.storyFlags.tacit_norms_known;
@@ -1026,7 +1383,7 @@ rec('312: tacit_norms_known fires year3 + d>=75', tacitNormsFire.fired, `text="$
 // Test: 307 path_knows_routine_known — anticipatory-agency (6th land-as-agent; 3rd structural-second-person)
 // 313: gate-spread requires G.day >= 70.
 const pathKnowsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 75;
   delete window.G.storyFlags.path_knows_routine_known;
@@ -1042,7 +1399,7 @@ rec('307: path_knows_routine_known fires year3 + d>=70', pathKnowsFire.fired, `t
 // CURRENT building absent + everHadBuilding flag set → fires (raid-survived realm).
 // 321: gate-spread requires G.day >= 58.
 const silentMorningFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 60;
   window.G.buildings = []; // 311: church NOT currently present
@@ -1059,7 +1416,7 @@ rec('305+311+321: silent_morning_known fires year3 + d>=58 + everHadBuilding.chu
 // Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
 // 313: gate-spread requires G.day >= 65.
 const wagonTrackFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 70;
   delete window.G.storyFlags.wagon_track_known;
@@ -1072,11 +1429,11 @@ rec('303: wagon_track_known fires year3 + d>=65', wagonTrackFire.fired, `text="$
 
 // Test: 301 noon_bell_origin_known — ritual-persistence-without-origin (4th forgetting shape)
 const noonBellFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'church')) {
-    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+    window.G.buildings.push(window.__buildingFixture('church', 30, 30));
   }
   delete window.G.storyFlags.noon_bell_origin_known;
   story.checkStoryBeats();
@@ -1088,7 +1445,7 @@ rec('301: noon_bell_origin_known fires year2 + church', noonBellFire.fired, `tex
 
 // Test: 297 unplaceable_sound_known — WONDER (3rd OUTSIDE-cluster register)
 const wonderFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   delete window.G.storyFlags.unplaceable_sound_known;
   story.checkStoryBeats();
@@ -1100,7 +1457,7 @@ rec('297: unplaceable_sound_known fires year2', wonderFire.fired, `text="${wonde
 
 // Test: 296 realm_laughs_known — collective-ease (2nd OUTSIDE-cluster register)
 const realmLaughsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.happiness = 80;
   delete window.G.storyFlags.realm_laughs_known;
@@ -1113,11 +1470,11 @@ rec('296: realm_laughs_known fires year2 + happiness > 65', realmLaughsFire.fire
 
 // Test: 294 church_step_worn_known — reshaped-by-use (5th land-as-agent shape)
 const stepWornFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'church')) {
-    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+    window.G.buildings.push(window.__buildingFixture('church', 30, 30));
   }
   delete window.G.storyFlags.church_step_worn_known;
   delete window.G.storyFlags.church_step_worn_lost_known; // 324: clear mutex set by earlier tests
@@ -1130,11 +1487,11 @@ rec('294: church_step_worn_known fires year3 + church', stepWornFire.fired, `tex
 
 // Test: 292 bakery_door_carving_known — preservation-without-memory (3rd forgetting shape)
 const carvingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'bakery')) {
-    window.G.buildings.push({ type: 'bakery', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+    window.G.buildings.push(window.__buildingFixture('bakery', 30, 30));
   }
   delete window.G.storyFlags.bakery_door_carving_known;
   story.checkStoryBeats();
@@ -1146,11 +1503,11 @@ rec('292: bakery_door_carving_known fires year3 + bakery', carvingFire.fired, `t
 
 // Test: 290 sea_bell_known — inheritance-vs-craft (4th land-as-agent shape)
 const seaBellFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'church')) {
-    window.G.buildings.push({ type: 'church', x: 30, y: 30, hp: 100, maxHp: 100, workers: [], assigned: [], buildProgress: 1 });
+    window.G.buildings.push(window.__buildingFixture('church', 30, 30));
   }
   delete window.G.storyFlags.sea_bell_known;
   delete window.G.storyFlags.sea_bell_lost_known; // 324: clear mutex set by earlier tests
@@ -1164,7 +1521,7 @@ rec('290: sea_bell_known fires year3 + church', seaBellFire.fired, `text="${seaB
 // Test: 285 phrase_misheard_known — language-drift (3rd habituation-recognition shape)
 // 313: gate-spread requires G.day >= 60.
 const phraseFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.day = 65;
   delete window.G.storyFlags.phrase_misheard_known;
@@ -1177,7 +1534,7 @@ rec('285: phrase_misheard_known fires year3 + d>=60', phraseFire.fired, `text="$
 
 // Test: 280 liminal_moment_known — rhythm-awareness (2nd habituation-recognition shape)
 const liminalFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.dayPhase = (window.G.dayLength || 3600) * 0.7;
   delete window.G.storyFlags.liminal_moment_known;
@@ -1190,7 +1547,7 @@ rec('280: liminal_moment_known fires year2 + dayPhase>0.6', liminalFire.fired, `
 
 // Test: 254 nights_blur_known — habituation-recognition (year2 + autumn|winter)
 const nightsBlurFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.season = 'autumn';
   delete window.G.storyFlags.nights_blur_known;
@@ -1203,7 +1560,7 @@ rec('254: nights_blur_known fires year2 + autumn', nightsBlurFire.fired, `text="
 
 // Test 21: 252 rival_banner_distant — rival + year3 + autumn/winter
 const rivalFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureRival();
   window.G.storyFlags.year3 = true;
   window.G.season = 'winter';
@@ -1218,7 +1575,7 @@ rec('252: rival_banner_distant fires rival + year3 + winter', rivalFire.fired, `
 
 // Test 20: 249 merchant_counts_thrice — merchant + autumn + day≥40
 const merchantFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureMerchant();
   window.G.season = 'autumn';
   window.G.day = 45;
@@ -1232,7 +1589,7 @@ rec('249: merchant_counts_thrice fires merchant + autumn d45', merchantFire.fire
 
 // Test 19: 247 teacher_pauses_slate — teacher named + year2
 const teacherFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureTeacher();
   window.G.storyFlags.year2 = true;
   delete window.G.storyFlags.teacher_pauses_slate;
@@ -1245,7 +1602,7 @@ rec('247: teacher_pauses_slate fires teacher + year2', teacherFire.fired, `text=
 
 // Test 18: 246 first_thaw_known — year2 + spring + day≥31
 const thawFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.season = 'spring';
   window.G.day = 32;
@@ -1259,7 +1616,7 @@ rec('246: first_thaw_known fires year2 + spring d32', thawFire.fired, `text="${t
 
 // Test 17: 245 smith_walks_river — smith named + day≥30 + summer/autumn
 const smithFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureSmith();
   window.G.day = 35;
   window.G.season = 'summer';
@@ -1273,11 +1630,11 @@ rec('245: smith_walks_river fires smith + d35 + summer', smithFire.fired, `text=
 
 // Test 16: 244 first-townhall chronicle beat (function-text + mayor reference)
 const townhallBeat = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureMayor();
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'townhall')) {
-    window.G.buildings.push({ type: 'townhall', x: 30, y: 30, hp: 100, maxHp: 100, workers: [] });
+    window.G.buildings.push(window.__buildingFixture('townhall', 30, 30));
   }
   delete window.G.storyFlags.firstTownHall;
   story.checkStoryBeats();
@@ -1290,8 +1647,8 @@ rec('244: firstTownHall fires + uses function-text + mayor reference', townhallB
 
 // Test 15: 243 townhall mayor-gated unlock
 const townhallGate = await page.evaluate(async () => {
-  const tech = await import('./js/tech.js');
-  const story = await import('./js/story.js');
+  const tech = await import('./js/tech.js?realm=166');
+  const story = await import('./js/story.js?realm=166');
   // 258: ensure no townhall exists so maxCount:1 doesn't shadow the mayor-gate semantics
   window.G.buildings = (window.G.buildings || []).filter(b => b.type !== 'townhall');
   // Without mayor: locked
@@ -1306,7 +1663,7 @@ rec('243: townhall locked without mayor + unlocked with mayor', townhallGate.loc
 
 // Test 14: 240 bard_unsung_song — bard named + day≥25 + spring/summer
 const bardSongFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   story.ensureBard();
   window.G.day = 30;
   window.G.season = 'summer';
@@ -1320,7 +1677,7 @@ rec('240: bard_unsung_song fires bard + d30 + summer', bardSongFire.fired, `text
 
 // Test 13: 230 full_pop_known — pop≥10 + lastUnderpopDay+60 days
 const fullPopFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.population = 12;
   window.G.maxPop = 12;
   window.G.lastUnderpopDay = 50;
@@ -1334,7 +1691,7 @@ rec('230: full_pop_known fires d115 with pop=12, lastUnderpopDay=50', fullPopFir
 
 // Test 12: 229 hearth_holds_names — year3 + citizensDied≥1
 const hearthFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year3 = true;
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensDied = 1;
@@ -1347,7 +1704,7 @@ rec('229: hearth_holds_names fires year3 + citizensDied=1', hearthFire.fired);
 
 // Test 11: 228 no_death_known — citizensDied≥1 + lastDeathDay+100 days
 const noDeathFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensDied = 1;
   window.G.lastDeathDay = 10;
@@ -1361,11 +1718,11 @@ rec('228: no_death_known fires d115 with citizensDied=1, lastDeathDay=10', noDea
 
 // Test 10: 227 well_remembers — year2 + well exists
 const wellFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js');
+  const story = await import('./js/story.js?realm=166');
   window.G.storyFlags.year2 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'well')) {
-    window.G.buildings.push({ type: 'well', x: 30, y: 30, hp: 100, maxHp: 100, workers: [] });
+    window.G.buildings.push(window.__buildingFixture('well', 30, 30));
   }
   delete window.G.storyFlags.well_remembers;
   story.checkStoryBeats();
@@ -1393,7 +1750,7 @@ rec('214: founder-conditional offering pre-conditions settable', offeringPool.fo
 // Test: 311 placeBuilding sets G.stats.everHadBuilding[type] (310 [code] closure).
 // Find a buildable tile (revealed grass, not occupied) and call placeBuilding.
 const everHadCheck = await page.evaluate(async () => {
-  const econ = await import('./js/economy.js');
+  const econ = await import('./js/economy.js?realm=166');
   window.G.stats = window.G.stats || {};
   window.G.stats.everHadBuilding = {}; // clean slate
   window.G.resources = { wood: 999, stone: 999, food: 999, gold: 999, iron: 999 };
@@ -1415,40 +1772,6 @@ const everHadCheck = await page.evaluate(async () => {
 });
 rec('311: placeBuilding sets G.stats.everHadBuilding[type] (310 [code])', everHadCheck.everHadWell, `keys=[${everHadCheck.everHadKeys.join(',')}] placed=${JSON.stringify(everHadCheck.placedAt)}`);
 
-// Test: 317 loadGame backfills G.stats.everHadBuilding from G.buildings (316 LOW closure).
-// Simulates a pre-311 save: saveGame() current state, strip everHadBuilding from
-// the persisted blob, then loadGame() — backfill should rehydrate from G.buildings.
-const legacyLoadCheck = await page.evaluate(async () => {
-  const save = await import('./js/save.js');
-  // Place a couple test buildings via direct push so they exist at save-time
-  // (placeBuilding would set the flag we're trying to test the absence of).
-  window.G.buildings = window.G.buildings || [];
-  if (!window.G.buildings.some(b => b.type === 'church')) {
-    window.G.buildings.push({ type: 'church', x: 28, y: 28, hp: 100, prodTimer: 0, level: 1, workers: [] });
-  }
-  if (!window.G.buildings.some(b => b.type === 'bakery')) {
-    window.G.buildings.push({ type: 'bakery', x: 29, y: 28, hp: 100, prodTimer: 0, level: 1, workers: [] });
-  }
-  save.saveGame({ silent: true });
-  // Strip everHadBuilding from the persisted blob to simulate a pre-311 save.
-  const raw = localStorage.getItem('realm-save-v2');
-  const blob = JSON.parse(raw);
-  if (blob.stats) delete blob.stats.everHadBuilding;
-  localStorage.setItem('realm-save-v2', JSON.stringify(blob));
-  // Wipe runtime everHadBuilding so we're testing post-load state, not pre.
-  window.G.stats.everHadBuilding = {};
-  const loaded = save.loadGame();
-  return {
-    loaded,
-    persistedHadField: 'everHadBuilding' in (blob.stats || {}),
-    everHadChurch: window.G.stats.everHadBuilding?.church === true,
-    everHadBakery: window.G.stats.everHadBuilding?.bakery === true,
-    everHadKeys: Object.keys(window.G.stats.everHadBuilding || {}),
-  };
-});
-const backfillOk = legacyLoadCheck.loaded && !legacyLoadCheck.persistedHadField && legacyLoadCheck.everHadChurch && legacyLoadCheck.everHadBakery;
-rec('317: loadGame backfills everHadBuilding from G.buildings (316 [code] closure)', backfillOk, `loaded=${legacyLoadCheck.loaded} stripField=${!legacyLoadCheck.persistedHadField} keys=[${legacyLoadCheck.everHadKeys.join(',')}]`);
-
 // Page errors check
 console.log('\n[verify-logic] === PAGE ERRORS ===');
 if (errs.length === 0) {
@@ -1463,4 +1786,4 @@ console.log(`\n[verify-logic] ${passed}/${results.length} passed`);
 
 await browser.close();
 await server.stop();
-process.exit(passed === results.length ? 0 : 1);
+process.exit(passed === results.length && errs.length === 0 ? 0 : 1);

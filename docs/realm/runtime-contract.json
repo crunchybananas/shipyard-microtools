@@ -1,0 +1,27 @@
+{
+  "moduleRevision": 166,
+  "saveSchema": "realm.engine-v2",
+  "saveKey": "realm-engine-v2-save",
+  "saveVersion": 4,
+  "simulationVersion": 3,
+  "coreSystemOrderVersion": "sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014",
+  "coreSystemOrder": [
+    "advance-clock",
+    "avatar",
+    "citizens",
+    "soldiers",
+    "enemies",
+    "towers",
+    "projectiles",
+    "walkers",
+    "production",
+    "fires",
+    "research",
+    "missions@60",
+    "era@60",
+    "scenario@120",
+    "wonder@720",
+    "raid-summary",
+    "story@60"
+  ]
+}

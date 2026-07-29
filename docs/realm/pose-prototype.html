@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Realm · A2 Motion Gate</title>
+  <link rel="stylesheet" href="assets/sprites/prototypes/actor-pose/review.css">
+</head>
+<body>
+  <header class="site-bar">
+    <a class="realm-mark" href="index.html?runtimecapture=1&amp;v=realm165">
+      <span aria-hidden="true">R</span>
+      <span>Realm</span>
+    </a>
+    <div class="build-state" id="build-state" role="status" aria-live="polite">
+      <span class="state-lamp" aria-hidden="true"></span>
+      Loading the frozen reference
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">RFC 0002 · A2 owner gate</p>
+        <h1>One honest cycle<br><em>before the whole cast.</em></h1>
+        <p class="lede">
+          This is the exact cargo-free carry cycle that must feel grounded,
+          readable, and human at Realm scale. Expansion is frozen until this
+          row passes.
+        </p>
+        <dl class="hero-facts">
+          <div>
+            <dt>Identity</dt>
+            <dd>Watchman</dd>
+          </div>
+          <div>
+            <dt>Garment</dt>
+            <dd>Watch blue</dd>
+          </div>
+          <div>
+            <dt>Motion</dt>
+            <dd>Carry · right</dd>
+          </div>
+          <div>
+            <dt>State</dt>
+            <dd class="pending-copy">Owner review</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="scale-stage" aria-labelledby="scale-title">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow">Do not judge only the zoom</p>
+            <h2 id="scale-title">Native scale</h2>
+          </div>
+          <output id="phase-output">Frame 1 · near contact</output>
+        </div>
+
+        <div class="scale-pair">
+          <figure class="native-figure">
+            <div class="actor-well native-well">
+              <canvas id="native-canvas" width="64" height="84"
+                aria-label="Animated actor at its exact 64 by 84 source size"></canvas>
+              <span class="ground-line" aria-hidden="true"></span>
+            </div>
+            <figcaption>
+              <strong>64 × 84 source cell</strong>
+              <span>1 CSS pixel = 1 source pixel</span>
+            </figcaption>
+          </figure>
+
+          <figure class="runtime-figure">
+            <div class="actor-well runtime-well">
+              <canvas id="runtime-canvas" width="27" height="35"
+                aria-label="Animated actor at its current approximate gameplay size"></canvas>
+              <span class="ground-line" aria-hidden="true"></span>
+            </div>
+            <figcaption>
+              <strong>27 × 35 gameplay sample</strong>
+              <span>Read the gait, hands, and silhouette</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="transport" aria-label="Motion controls">
+      <button class="transport-button primary" id="play-button" type="button"
+        aria-label="Pause the animation">Pause</button>
+      <button class="transport-button step" id="previous-button" type="button"
+        aria-label="Previous frame">←</button>
+      <button class="transport-button step" id="next-button" type="button"
+        aria-label="Next frame">→</button>
+
+      <label class="scrubber">
+        <span>
+          Beat
+          <output id="frame-output">1 / 8</output>
+        </span>
+        <input id="frame-range" type="range" min="0" max="7" value="0">
+      </label>
+
+      <fieldset class="segmented speed-controls">
+        <legend>Speed</legend>
+        <button type="button" data-speed="0.5">½×</button>
+        <button type="button" data-speed="1" aria-pressed="true">1×</button>
+        <button type="button" data-speed="2">2×</button>
+      </fieldset>
+
+      <label class="surface-control">
+        <span>Inspect</span>
+        <select id="surface-select">
+          <option value="final">Final paint</option>
+          <option value="identity">Identity plane</option>
+          <option value="garment">Garment plane</option>
+          <option value="semantic">Semantic mask</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="motion-workbench">
+      <article class="inspection-panel">
+        <header class="panel-heading">
+          <div>
+            <p class="eyebrow">Pixel inspection</p>
+            <h2>Current beat at 4×</h2>
+          </div>
+          <span class="surface-badge" id="surface-badge">Final paint</span>
+        </header>
+        <div class="zoom-stage">
+          <canvas id="zoom-canvas" width="256" height="336"
+            aria-label="Current animation frame enlarged four times"></canvas>
+          <span class="zoom-ground" aria-hidden="true"></span>
+        </div>
+        <p class="panel-note">
+          The enlargement uses nearest-neighbor pixels. It exposes seams and
+          disappearing parts; it does not replace the native-scale judgment.
+        </p>
+      </article>
+
+      <article class="sequence-panel">
+        <header class="panel-heading">
+          <div>
+            <p class="eyebrow">Whole loop</p>
+            <h2>Eight-beat motion rail</h2>
+          </div>
+          <span class="freeze-badge">Expansion frozen</span>
+        </header>
+        <div class="strip-viewport">
+          <canvas id="strip-canvas" width="512" height="84"
+            aria-label="All eight animation frames at native size"></canvas>
+          <span class="strip-playhead" id="strip-playhead"
+            aria-hidden="true"></span>
+        </div>
+        <div class="beat-buttons" id="beat-buttons"
+          aria-label="Choose an animation beat"></div>
+        <dl class="frame-ledger">
+          <div>
+            <dt>Support</dt>
+            <dd id="support-value">—</dd>
+          </div>
+          <div>
+            <dt>Body height</dt>
+            <dd id="height-value">—</dd>
+          </div>
+          <div>
+            <dt>Second hand</dt>
+            <dd id="hand-value">—</dd>
+          </div>
+          <div>
+            <dt>Next transition</dt>
+            <dd id="transition-value">—</dd>
+          </div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="acceptance-section" aria-labelledby="acceptance-title">
+      <header class="section-heading">
+        <div>
+          <p class="eyebrow">What the machine can prove</p>
+          <h2 id="acceptance-title">Reference-cycle evidence</h2>
+        </div>
+        <p>
+          Mechanical checks narrow the review. They cannot decide whether the
+          person feels convincing.
+        </p>
+      </header>
+      <div class="gate-grid" id="gate-grid">
+        <article class="gate-card loading">
+          <span>Loading</span>
+          <h3>Reading reference gate</h3>
+        </article>
+      </div>
+    </section>
+
+    <section class="baseline-section" aria-labelledby="baseline-title">
+      <div class="baseline-copy">
+        <p class="eyebrow">Open-source evidence, bounded</p>
+        <h2 id="baseline-title">A chronology fixture, not Realm art</h2>
+        <p>
+          The pinned CC0 Mixxit walk supplied only the contact → down → pass →
+          up vocabulary and a reproducible registration baseline. Realm copies
+          none of its pixels, body, costume, or style.
+        </p>
+      </div>
+      <figure class="baseline-rail">
+        <img
+          src="assets/sprites/prototypes/actor-pose/output/open-source-walk-baseline/walk-right.png"
+          width="512" height="84"
+          alt="Eight-frame CC0 walk chronology reference at native scale">
+        <figcaption>CC0 motion fixture · retained as test evidence only</figcaption>
+      </figure>
+    </section>
+
+    <section class="decision-section" aria-labelledby="decision-title">
+      <div>
+        <p class="eyebrow">The stop line</p>
+        <h2 id="decision-title">Does this one cycle earn propagation?</h2>
+      </div>
+      <div class="decision-copy">
+        <p>
+          Compare frame 3's far passing boot with frame 7's near passing boot,
+          then watch the frame 8 → 1 wrap. Decide whether the nearly flat foot
+          contacts and rigid two-hand carry pose feel intentional at 1×. If
+          any one fails, the right reference goes back to the pose source.
+        </p>
+        <div class="decision-actions">
+          <button type="button" id="copy-approval">Copy approval phrase</button>
+          <button type="button" class="quiet" id="copy-veto">Copy veto template</button>
+        </div>
+        <p class="copy-state" id="copy-state" aria-live="polite">
+          Paste the copied decision into this Codex task.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Offline evidence only. No live bones, runtime atlas, compatibility path,
+      or second art authority.
+    </p>
+    <a href="index.html?spritelab=1&amp;role=guard&amp;action=carry&amp;dir=right">
+      Open release Sprite Lab
+    </a>
+  </footer>
+
+  <script src="assets/sprites/prototypes/actor-pose/review.js"></script>
+</body>
+</html>

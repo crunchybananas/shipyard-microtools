@@ -1,0 +1,96 @@
+{
+  "simulationVersion": 1,
+  "commandCount": 13,
+  "applied": [
+    { "at": 10, "label": "house", "ok": true, "reason": null, "spot": { "x": 40, "y": 40 } },
+    { "at": 40, "label": "house", "ok": true, "reason": null, "spot": { "x": 39, "y": 39 } },
+    { "at": 90, "label": "farm", "ok": true, "reason": null, "spot": { "x": 40, "y": 39 } },
+    { "at": 140, "label": "lumber", "ok": true, "reason": null, "spot": { "x": 36, "y": 36 } },
+    { "at": 200, "label": "well", "ok": true, "reason": null, "spot": { "x": 41, "y": 39 } },
+    { "at": 260, "label": "granary", "ok": true, "reason": null, "spot": { "x": 39, "y": 40 } },
+    { "at": 400, "label": "quarry", "ok": true, "reason": null, "spot": { "x": 36, "y": 44 } },
+    { "at": 600, "label": "avatar-goto", "ok": true, "reason": null, "spot": null },
+    { "at": 900, "label": "masonry", "ok": true, "reason": null, "spot": null },
+    { "at": 1200, "label": "market", "ok": true, "reason": null, "spot": { "x": 41, "y": 40 } },
+    { "at": 5000, "label": "commerce", "ok": true, "reason": null, "spot": null },
+    { "at": 9000, "label": "tavern", "ok": true, "reason": null, "spot": { "x": 39, "y": 41 } },
+    { "at": 14000, "label": "avatar-goto", "ok": true, "reason": null, "spot": null }
+  ],
+  "checkpoint": {
+    "tick": 21600,
+    "day": 7,
+    "dayPhase": 0,
+    "population": 15,
+    "resources": {
+      "wood": 586,
+      "stone": 565,
+      "food": 515,
+      "gold": 576,
+      "iron": 50,
+      "wheat": 116,
+      "flour": 0,
+      "planks": 0,
+      "tools": 0
+    },
+    "buildings": [
+      { "type": "house", "x": 40, "y": 40, "hp": 100, "buildProgress": 1 },
+      { "type": "house", "x": 39, "y": 39, "hp": 100, "buildProgress": 1 },
+      { "type": "farm", "x": 40, "y": 39, "hp": 100, "buildProgress": 1 },
+      { "type": "lumber", "x": 36, "y": 36, "hp": 100, "buildProgress": 1 },
+      { "type": "well", "x": 41, "y": 39, "hp": 100, "buildProgress": 1 },
+      { "type": "granary", "x": 39, "y": 40, "hp": 100, "buildProgress": 1 },
+      { "type": "quarry", "x": 36, "y": 44, "hp": 100, "buildProgress": 1 },
+      { "type": "market", "x": 41, "y": 40, "hp": 100, "buildProgress": 1 },
+      { "type": "tavern", "x": 39, "y": 41, "hp": 100, "buildProgress": 1 }
+    ],
+    "worldHash": "58a5f5ec7aa2f872bea8ec8e9fda520ed2ed47f7c88381ead79eec2bcf250343"
+  },
+  "finalPopulation": 2,
+  "finalBuildings": [
+    { "type": "house", "x": 40, "y": 40, "hp": 100, "buildProgress": 1 },
+    { "type": "house", "x": 39, "y": 39, "hp": 100, "buildProgress": 1 },
+    { "type": "farm", "x": 40, "y": 39, "hp": 100, "buildProgress": 1 },
+    { "type": "lumber", "x": 36, "y": 36, "hp": 100, "buildProgress": 1 },
+    { "type": "well", "x": 41, "y": 39, "hp": 100, "buildProgress": 1 },
+    { "type": "granary", "x": 39, "y": 40, "hp": 100, "buildProgress": 1 },
+    { "type": "quarry", "x": 36, "y": 44, "hp": 100, "buildProgress": 1 },
+    { "type": "market", "x": 41, "y": 40, "hp": 100, "buildProgress": 1 },
+    { "type": "tavern", "x": 39, "y": 41, "hp": 100, "buildProgress": 1 }
+  ],
+  "mapFingerprint": "090de3ff6c9af74581f9140a1af532f8cc63931c14e6d29fd18554355c378c4c",
+  "worldHash": "d8cf04a527adba585b2488d4b86c754637e1fc3fc7d703ad5044e4298a4f9ce6",
+  "replayHash": "11a0f275467c3f2b120d05cab639ebf4db0492f85e2d9179c653ae3637880b4d",
+  "story": {
+    "chronicleCount": 39,
+    "namedCharacters": {
+      "mayor": { "appointedDay": 3, "name": "Nerys the Just" },
+      "merchant": { "arrivedDay": 1, "name": "Dame Lisbet Saltwater" }
+    },
+    "milestoneTicks": {
+      "firstHouse": 60,
+      "firstFarm": 120,
+      "firstMarket": 1200,
+      "firstTavern": 9000
+    },
+    "flags": [
+      "dream_10",
+      "fields_know_realm",
+      "firstBirth",
+      "firstFarm",
+      "firstGranary",
+      "firstHouse",
+      "firstLumber",
+      "firstMarket",
+      "firstQuarry",
+      "firstTavern",
+      "firstWell",
+      "first_long_evening",
+      "first_sigh_seen",
+      "founders_named",
+      "namesake_born",
+      "pop10",
+      "summer_falling_star"
+    ],
+    "realmEnded": false
+  }
+}

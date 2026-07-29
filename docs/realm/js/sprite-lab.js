@@ -8,7 +8,7 @@ import {
   AMBIENT,
   AMBIENT_SHEET_W,
   AMBIENT_SHEET_H,
-} from '../scripts/sprite-source-contract.mjs';
+} from './sprite-source-contract.js?realm=166';
 
 const STORE_KEY = 'realm-sprite-lab-review-v1';
 const QUERY = new URLSearchParams(location.search);
@@ -99,7 +99,7 @@ export function initSpriteLab() {
   window.openSpriteLab = () => setOpen(true);
 
   const params = new URLSearchParams(location.search);
-  if (params.has('spritelab') || params.has('rolesheet')) setOpen(true);
+  if (params.has('spritelab')) setOpen(true);
 }
 
 function hydrateControls() {
@@ -235,15 +235,6 @@ function applyQuerySelection() {
   if (AMBIENT.includes(ambient)) {
     state.kind = 'ambient';
     state.ambient = ambient;
-  }
-  const roleSheet = params.get('rolesheet') || '';
-  if (roleSheet) {
-    const foundRole = ROLES.find((r) => roleSheet.includes(r));
-    const foundAction = ACTIONS.find((a) => roleSheet.includes(a));
-    const foundDir = DIRS.find((d) => roleSheet.includes(d));
-    if (foundRole) state.role = foundRole;
-    if (foundAction) state.action = foundAction;
-    if (foundDir) state.dir = foundDir;
   }
 }
 
@@ -985,7 +976,6 @@ function sourceForRow(role, action, dir) {
   const item = rowManifest.rows?.[`${role}/${action}/${dir}`] || null;
   if (!item) return { status: 'base', label: 'BASE', item: null };
   if (item.status === 'accepted') return { status: 'accepted', label: 'LOCKED', item };
-  if (item.status === 'accepted-with-waiver') return { status: 'waived', label: 'WAIVED', item };
   if (item.status === 'candidate') return { status: 'candidate', label: 'CANDIDATE', item };
   return { status: 'base', label: 'BASE', item: null };
 }

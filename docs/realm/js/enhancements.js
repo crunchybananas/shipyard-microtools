@@ -5,22 +5,31 @@
 // deleted rather than left as registered no-ops.
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=157';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=157';
-import { makeAtlasLoader } from './atlas-loader.js?realm=157';
+import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=166';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=166';
+import { makeAtlasLoader } from './atlas-loader.js?realm=166';
+import { citizenStaffingCapacity, staffingCount } from './citizen-ownership.js?realm=166';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=166';
+import { citizenRenderRecord } from './citizen-render-cache.js?realm=166';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
-const _AMBIENT_ATLAS_REVISION = new URLSearchParams(location.search).get('v') || '111';
+const _AMBIENT_ATLAS_REVISION = [
+  new URLSearchParams(location.search).get('v'),
+  new URL(import.meta.url).searchParams.get('realm'),
+].filter(Boolean).join('-') || '111';
 const _AMBIENT_ATLAS_URL = `assets/sprites/ambient-atlas.png?realm=${encodeURIComponent(_AMBIENT_ATLAS_REVISION)}`;
 const _AMBIENT_FRAMES = {
   cart:     { x:   0, y: 0, w: 48, h: 48 },
   fishboat: { x:  48, y: 0, w: 48, h: 48 },
   sailboat: { x:  96, y: 0, w: 48, h: 48 },
   cargo:    { x: 144, y: 0, w: 48, h: 48 },
+  deer:     { x: 192, y: 0, w: 48, h: 48 },
+  cow:      { x: 240, y: 0, w: 48, h: 48 },
+  chicken:  { x: 288, y: 0, w: 48, h: 48 },
 };
 const _loadAmbientAtlas = makeAtlasLoader(_AMBIENT_ATLAS_URL);
-function drawAmbientSprite(ctx, type, x, baseY, w, h, alpha = 1, flip = false) {
+export function drawAmbientSprite(ctx, type, x, baseY, w, h, alpha = 1, flip = false) {
   const atlas = _loadAmbientAtlas();
   const frame = _AMBIENT_FRAMES[type];
   if (!atlas || !frame) return false;
@@ -35,6 +44,18 @@ function drawAmbientSprite(ctx, type, x, baseY, w, h, alpha = 1, flip = false) {
   }
   ctx.restore();
   return true;
+}
+
+// Decode before the first world pass so newly spawned animals never appear as
+// a lone shadow while the ambient atlas starts loading.
+if (typeof window !== 'undefined') {
+  setTimeout(() => _loadAmbientAtlas(), 0);
+  window.__realm = window.__realm || {};
+  window.__realm.ambientAtlas = () => ({
+    url: _loadAmbientAtlas.url,
+    state: _loadAmbientAtlas.state,
+    frames: _AMBIENT_FRAMES,
+  });
 }
 
 // ── Loop 22: Cherry blossom canopy on forest tiles in spring
@@ -582,53 +603,7 @@ export function renderCarts(ctx) {
     ctx.beginPath();
     ctx.ellipse(s.x - 1.5, s.y + 7.2, 9, 1.4, 0, 0, Math.PI * 2);
     ctx.fill();
-    if (drawAmbientSprite(ctx, 'cart', s.x, s.y + 8 + bob, 48, 38, 1, mdx < 0)) {
-      continue;
-    }
-    continue;
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y + 4, 10, 2.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Cart bed (brown plank)
-    ctx.fillStyle = '#7a4a20';
-    ctx.fillRect(s.x - 7, s.y - 4 + bob, 14, 4);
-    ctx.fillStyle = '#5a3010';
-    ctx.fillRect(s.x - 7, s.y - 4 + bob, 14, 1);
-    // Canvas cover (arched)
-    ctx.fillStyle = '#e8dcb0';
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y - 5 + bob, 7, 4, 0, Math.PI, 0);
-    ctx.fill();
-    ctx.strokeStyle = '#a08858';
-    ctx.lineWidth = 0.5;
-    for (let r = -2; r <= 2; r++) {
-      ctx.beginPath();
-      ctx.arc(s.x, s.y - 5 + bob, 7, Math.PI + (r + 2) * 0.5, Math.PI + (r + 2) * 0.5 + 0.01);
-      ctx.stroke();
-    }
-    // Wheels
-    ctx.fillStyle = '#3a2410';
-    ctx.beginPath(); ctx.arc(s.x - 5, s.y + 1, 1.8, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(s.x + 5, s.y + 1, 1.8, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#7a5028';
-    ctx.beginPath(); ctx.arc(s.x - 5, s.y + 1, 0.8, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(s.x + 5, s.y + 1, 0.8, 0, Math.PI * 2); ctx.fill();
-    // Horse pulling (small) — drawn ahead of cart in motion direction
-    if (c.state !== 'unloading') {
-      const mdy = c.ty - c.y;
-      const md = Math.hypot(mdx, mdy) || 1;
-      const hsx = s.x + (mdx / md) * 9;
-      const hsy = s.y + bob - 2;
-      ctx.fillStyle = '#6a4828';
-      ctx.beginPath();
-      ctx.ellipse(hsx, hsy, 3, 1.6, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(hsx + (mdx / md) * 2.5, hsy - 1, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    drawAmbientSprite(ctx, 'cart', s.x, s.y + 8 + bob, 48, 38, 1, mdx < 0);
   }
   ctx.globalAlpha = 1;
 }
@@ -743,7 +718,6 @@ export function renderGroundMist(ctx, logicalW, logicalH) {
 // ── Loop 10: Glowing mushroom clusters in dark forest ──────
 // Deterministically placed (seeded by tile coords) — render only at night
 export function renderGlowMushrooms(ctx) {
-  const t = G.dayPhase / G.dayLength;
   const nightStrength = Math.max(0, Math.min(1, (0.75 - getDaylight()) / 0.3));
   if (nightStrength < 0.05 || G.camera.zoom < 0.7) return;
   // Iterate over visible tiles only via camera bounds
@@ -1026,7 +1000,7 @@ export function updateFlocks(logicalW, logicalH) {
   }
 }
 
-export function renderFlocks(ctx, logicalW, logicalH) {
+export function renderFlocks(ctx) {
   if (!G.flocks || !G.flocks.length) return;
   const t = G.dayPhase / G.dayLength;
   const isDawnDusk = (t > 0.05 && t < 0.22) || (t > 0.58 && t < 0.82);
@@ -1204,62 +1178,7 @@ export function renderBoats(ctx) {
     ctx.ellipse(s.x, s.y + 8, spriteW * 0.42, 2.4, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
-    if (drawAmbientSprite(ctx, spriteType, s.x, s.y + 5 + bob, spriteW, spriteH, 1, mdx < 0)) {
-      continue;
-    }
-    continue;
-    // Wake (small white V trail behind boat)
-    ctx.strokeStyle = 'rgba(220,235,255,0.45)';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(s.x - 6, s.y + 4 + bob * 0.3);
-    ctx.lineTo(s.x, s.y + bob * 0.5);
-    ctx.lineTo(s.x - 6, s.y - 4 + bob * 0.3);
-    ctx.stroke();
-    // Hull (dark wood ellipse)
-    ctx.fillStyle = '#5a3a20';
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y + bob, 6, 2.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Hull rim
-    ctx.fillStyle = '#3a2410';
-    ctx.fillRect(s.x - 6, s.y + bob - 2.2, 12, 0.7);
-    if (b.kind === 'sail') {
-      // Mast and triangular sail
-      ctx.strokeStyle = '#3a2a14';
-      ctx.lineWidth = 0.7;
-      ctx.beginPath();
-      ctx.moveTo(s.x, s.y + bob - 1);
-      ctx.lineTo(s.x, s.y + bob - 11);
-      ctx.stroke();
-      ctx.fillStyle = '#f0e8d4';
-      ctx.beginPath();
-      ctx.moveTo(s.x, s.y + bob - 11);
-      ctx.lineTo(s.x + 5, s.y + bob - 3);
-      ctx.lineTo(s.x, s.y + bob - 3);
-      ctx.closePath();
-      ctx.fill();
-    } else {
-      // Fishing pole
-      ctx.strokeStyle = '#3a2a14';
-      ctx.lineWidth = 0.6;
-      ctx.beginPath();
-      ctx.moveTo(s.x - 2, s.y + bob - 1);
-      ctx.lineTo(s.x + 6, s.y + bob - 7);
-      ctx.stroke();
-      // Line
-      ctx.strokeStyle = 'rgba(40,40,40,0.6)';
-      ctx.lineWidth = 0.3;
-      ctx.beginPath();
-      ctx.moveTo(s.x + 6, s.y + bob - 7);
-      ctx.lineTo(s.x + 8, s.y + bob + 2);
-      ctx.stroke();
-      // Tiny figure
-      ctx.fillStyle = '#604030';
-      ctx.beginPath();
-      ctx.arc(s.x - 1, s.y + bob - 2, 1.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    drawAmbientSprite(ctx, spriteType, s.x, s.y + 5 + bob, spriteW, spriteH, 1, mdx < 0);
   }
   ctx.globalAlpha = 1;
 }
@@ -1314,15 +1233,16 @@ export function enhRenderScreen(ctx, logicalW, logicalH) {
 //
 // Respects 016's "space effects too out of place" concern via
 // gating: not generic sky-junk, but a unique moment tied to the
-// realm's naming ceremony. Exactly one occurrence per realm
-// (persistent `G.storyFlags.shooting_star_fired`). Most realms
+// realm's naming ceremony. It occurs at most once per browser session; reload
+// may replay it because cosmetic timing is deliberately not simulation state. Most realms
 // will pass deep nights without seeing it — ~0.3% spawn chance
 // per tick per eligible frame — but long-lived realms past
 // first autumn + day 15 will eventually catch one.
 let _shootingStar = null;
+let _shootingStarSeen = false;
 function _shootingStarTick(logicalW, logicalH) {
+  if (_shootingStarSeen) { _shootingStar = null; return; }
   if (!G.storyFlags) return;
-  if (G.storyFlags.shooting_star_fired) { _shootingStar = null; return; }
   if (!G.storyFlags.constellation_named) return;
   const dayl = getDaylight();
   if (dayl > 0.35) { _shootingStar = null; return; }
@@ -1345,7 +1265,7 @@ function _shootingStarTick(logicalW, logicalH) {
   _shootingStar.life -= 1;
   if (_shootingStar.life <= 0) {
     _shootingStar = null;
-    G.storyFlags.shooting_star_fired = true;
+    _shootingStarSeen = true;
   }
 }
 function renderShootingStar(ctx) {
@@ -1586,7 +1506,8 @@ function renderStatusBubbles(ctx) {
   if (G.camera.zoom < 0.7) return;
   for (const b of G.buildings) {
     let color = null;
-    if ((b.workersNeeded || 0) > (b.workers ? b.workers.length : 0) && b.type !== 'house' && b.type !== 'wall' && b.type !== 'road' && b.type !== 'tower' && b.type !== 'well') {
+    const staffCapacity = citizenStaffingCapacity(b);
+    if (staffCapacity > staffingCount(b)) {
       color = '#d6a53f';
     } else if (b.type === 'farm' && G.resources && G.resources.food < 15) {
       color = '#d86b56';
@@ -2232,16 +2153,24 @@ registerUpdater(updatePigeons);
 registerWorldRenderer(renderPigeons);
 
 // ── Loop 42: Subtle motion trails behind moving citizens ───
-function renderCitizenTrails(ctx) {
-  if (!G.citizens || G.camera.zoom < 1.1) return;
-  for (const c of G.citizens) {
-    if (!c.trail) c.trail = [];
+function updateCitizenTrails() {
+  const citizens = buildCurrentCitizenPresentations();
+  for (const citizen of citizens) {
+    const trail = citizenRenderRecord(citizen.actorId).trail;
     if (G.gameTick % 4 === 0) {
-      c.trail.push({ x: c.x, y: c.y, age: 0 });
-      if (c.trail.length > 4) c.trail.shift();
+      trail.push({ x: citizen.x, y: citizen.y, age: 0 });
+      if (trail.length > 4) trail.shift();
     }
-    for (const pt of c.trail) pt.age += 1;
-    for (const pt of c.trail) {
+    for (const point of trail) point.age += 1;
+  }
+}
+
+function renderCitizenTrails(ctx) {
+  if (G.camera.zoom < 1.1) return;
+  const citizens = buildCurrentCitizenPresentations();
+  for (const c of citizens) {
+    const trail = citizenRenderRecord(c.actorId).trail;
+    for (const pt of trail) {
       if (pt.age > 30) continue;
       const s = toScreen(pt.x, pt.y);
       const a = (1 - pt.age / 30) * 0.18;
@@ -2252,6 +2181,7 @@ function renderCitizenTrails(ctx) {
     }
   }
 }
+registerUpdater(updateCitizenTrails);
 registerWorldRenderer(renderCitizenTrails);
 
 // ── Loop 44: Glowing windows on houses at night ────────────
@@ -3199,33 +3129,6 @@ function updateResourceFloats() {
 }
 registerUpdater(updateResourceFloats);
 
-// ── Loop 74: Chickens scratch and wander near coops ────────
-function renderCoopChickens(ctx) {
-  if (G.camera.zoom < 0.9) return;
-  const tt = G.gameTick;
-  for (const b of G.buildings) {
-    if (b.type !== 'chickencoop') continue;
-    const s = toScreen(b.x, b.y);
-    const seed = (b.x * 53 + b.y * 19) | 0;
-    for (let i = 0; i < 3; i++) {
-      const phase = (tt * 0.04 + i * 2 + seed) % (Math.PI * 2);
-      const cx = s.x + Math.cos(phase) * 7;
-      const cy = s.y + 4 + Math.sin(phase) * 3;
-      const peck = Math.sin(tt * 0.2 + i) * 0.5;
-      // Body white
-      ctx.fillStyle = '#f4f2e8';
-      ctx.beginPath(); ctx.ellipse(cx, cy, 1.5, 1.1, 0, 0, Math.PI * 2); ctx.fill();
-      // Comb red
-      ctx.fillStyle = '#c02020';
-      ctx.beginPath(); ctx.arc(cx + 1, cy - 1.4, 0.5, 0, Math.PI * 2); ctx.fill();
-      // Beak
-      ctx.fillStyle = '#d4a020';
-      ctx.fillRect(cx + 1.4, cy - 0.6 + peck, 0.5, 0.3);
-    }
-  }
-}
-registerWorldRenderer(renderCoopChickens);
-
 // ── Loop 75: Hovering text labels on selected building ──────
 // Already exists in UI? Add hover info above selected building anyway.
 function renderSelectedHalo(ctx) {
@@ -3253,20 +3156,13 @@ registerWorldRenderer(renderSelectedHalo);
 // narrative weight, (3) the shape was a flat grey lozenge with a tiny
 // "+" — unrecognisable as a gravestone at default zoom.
 //
-// New: death sites in combat.js/events.js/soldiers.js push {x,y,name,day,cause}
-// directly. Graves are persistent — they outlive individual deaths and form
-// a visible history of the settlement's losses. Capped at 40 (FIFO) so a
-// long campaign doesn't tile the map with stones. Visual: arched sandstone
+// New: the core death-marker service records {x,y,name,day,cause} at the death
+// site and caps the persistent history. This renderer only reads those graves.
+// Visual: arched sandstone
 // slab with gradient shading, carved cross, moss patch, grass tuft,
 // ground shadow. At z≥0.7 reads instantly as a tombstone.
-const GRAVE_MAX = 40;
-function updateDeathMarkers() {
-  if (!G.deathMarkers) G.deathMarkers = [];
-  // FIFO cap — oldest graves fade out of memory when we exceed the max
-  while (G.deathMarkers.length > GRAVE_MAX) G.deathMarkers.shift();
-}
 function renderDeathMarkers(ctx) {
-  if (!G.deathMarkers || !G.deathMarkers.length || G.camera.zoom < 0.55) return;
+  if (G.deathMarkers.length === 0 || G.camera.zoom < 0.55) return;
   for (const m of G.deathMarkers) {
     const mx = Math.round(m.x);
     const my = Math.round(m.y);
@@ -3342,7 +3238,6 @@ function renderDeathMarkers(ctx) {
     ctx.stroke();
   }
 }
-registerUpdater(updateDeathMarkers);
 registerWorldRenderer(renderDeathMarkers);
 
 // ── Loop 78: Lily pads gain little frogs and dragonflies in summer
@@ -3820,21 +3715,22 @@ function renderRainSplashes(ctx) {
 registerWorldRenderer(renderRainSplashes);
 
 // ── Loop 107: Occasional citizen voice barks ───────────────
-import { playVoiceBark as _playBark } from './audio.js?realm=157';
+import { playVoiceBark as _playBark } from './audio.js?realm=166';
 let _lastBarkTick = 0;
 function updateBarks() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
-  if (G.citizens.length === 0) return;
   // At most one bark every ~4 seconds (240 ticks)
   if (G.gameTick - _lastBarkTick < 240) return;
+  const citizens = buildCurrentCitizenPresentations();
+  if (citizens.length === 0) return;
   if (Math.random() < 0.25) {
-    const c = G.citizens[Math.floor(Math.random() * G.citizens.length)];
+    const c = citizens[Math.floor(Math.random() * citizens.length)];
     if (!c) return;
     let kind = 'work';
     if (c.hunger > 80) kind = 'hungry';
-    else if (c.state === 'eating') kind = 'happy';
-    else if (c.state === 'idle') kind = 'sad';
-    else if (c.state === 'working') kind = 'work';
+    else if (c.activity.kind === 'eating') kind = 'happy';
+    else if (c.activity.kind === 'idle') kind = 'sad';
+    else if (c.activity.kind === 'working') kind = 'work';
     else if (G.happiness > 80) kind = 'cheer';
     _playBark(kind);
     _lastBarkTick = G.gameTick;
@@ -3845,6 +3741,7 @@ registerUpdater(updateBarks);
 // ── Loop 108: Resource shortage warnings ───────────────────
 // Flashing resource icon in HUD when critically low + screen-space warning text.
 let _lastShortageWarnTick = 0;
+const _resourceWarningElements = new Map();
 function updateResourceWarnings() {
   // Check every 120 ticks (~2 sec)
   if ((G.gameTick - _lastShortageWarnTick) < 120) return;
@@ -3852,7 +3749,11 @@ function updateResourceWarnings() {
   const thresholds = { food: 10, wood: 8, stone: 5, gold: 3, iron: 0 };
   for (const [res, minVal] of Object.entries(thresholds)) {
     if (minVal <= 0) continue;
-    const el = document.getElementById('r-' + res);
+    let el = _resourceWarningElements.get(res);
+    if (!el?.isConnected) {
+      el = document.getElementById('r-' + res);
+      if (el) _resourceWarningElements.set(res, el);
+    }
     if (!el) continue;
     if (G.resources[res] <= minVal) {
       el.parentElement.classList.add('res-critical');
@@ -3862,15 +3763,6 @@ function updateResourceWarnings() {
   }
 }
 registerUpdater(updateResourceWarnings);
-
-// ── Loop 122: Build progress animation ─────────────────────
-// Buildings "grow" visually during their first few seconds.
-function renderBuildProgress(ctx) {
-  for (const b of G.buildings) {
-    if (b.buildProgress === undefined) b.buildProgress = 1;
-  }
-}
-registerUpdater(renderBuildProgress);
 
 // ── Loop 123: Hover tooltip showing tile type ──────────────
 function renderTileTooltip(ctx, logicalW, logicalH) {
@@ -3921,119 +3813,28 @@ function renderTileTooltip(ctx, logicalW, logicalH) {
 }
 registerScreenRenderer(renderTileTooltip);
 
-// ── Loop 124: Raid chronicle entry ─────────────────────────
-// Loop 10 (render S3): rewrote to report this-raid kills/losses instead
-// of lifetime counters, and to tell the truth when the village was razed.
-// Prior code said "Raid repelled. 0 foes slain in total." even when every
-// citizen was dead — a chronicle lie that made the narrative untrustworthy.
-import { chronicle as _chronicle124 } from './story.js?realm=157';
-// Loop 036 (the-fixer): also surface the raid summary as a toast so the
-// player sees it without opening the chronicle panel.
-import { notify as _notify036 } from './notifications.js?realm=157';
-let _lastRaidDay = 0;
-let _raidKillsStart = 0;
-let _raidDiedStart = 0;
-
-// Loop 264 (the-fixer, 260 [play] follow-on): variant raid prose pools.
-// 260's [play] tick observed 60+ identical "village was razed" entries
-// in a long-lived realm — most monotonous chronicle prose in the corpus.
-// 260's chronicle-gate fixed the post-end repetition, but PRE-END realms
-// with many raids of the same OUTCOME SHAPE (e.g. 30 successful defenses)
-// still see one prose template. This expands each of the 5 outcome shapes
-// (razed / losses-only / mixed / victory / bloodless-withdraw) to 4
-// variants, picked deterministically by `day % pool.length` so saves
-// remain reproducible. First variant in each pool is the original prose
-// (preserves backward-compat for any test/save that relied on exact text).
-const _RAID_PROSE_POOLS = {
-  razed: [
-    (day) => `Raid on day ${day}: the village was razed. None remain to tell it.`,
-    (day) => `Raid on day ${day}: the realm fell silent. The fires went out one by one.`,
-    (day) => `Raid on day ${day}: the realm did not survive the night. There is no one left to bury the dead.`,
-    (day) => `Raid on day ${day}: the raiders left only smoke and stone.`,
-  ],
-  lossesOnly: [
-    (day, _k, l) => `Raid on day ${day}: ${l} fell, no foe answered. The survivors bury their own.`,
-    (day, _k, l) => `Raid on day ${day}: ${l} lost; no raider met their end. The realm grieves without retort.`,
-    (day, _k, l) => `Raid on day ${day}: the raiders took ${l} and left without a scratch. The graves are dug at dusk.`,
-    (day, _k, l) => `Raid on day ${day}: ${l} dead. The raiders escaped clean into the trees.`,
-  ],
-  mixed: [
-    (day, k, l) => `Raid on day ${day} turned back at a cost: ${l} lost, ${k} foes slain.`,
-    (day, k, l) => `Raid on day ${day}: ${l} fell, but ${k} raiders did not return home.`,
-    (day, k, l) => `Raid on day ${day}: bought back at the price of ${l} — ${k} raiders on the field.`,
-    (day, k, l) => `Raid on day ${day}: ${l} of ours, ${k} of theirs. The cost was counted at dawn.`,
-  ],
-  victory: [
-    (day, k) => `Raid on day ${day} repelled — ${k} foes slain, none of ours lost.`,
-    (day, k) => `Raid on day ${day}: ${k} raiders cut down at the gate. The village slept untroubled.`,
-    (day, k) => `Raid on day ${day}: the raiders broke at first light. ${k} of them never made it home.`,
-    (day, k) => `Raid on day ${day}: ${k} foes ran into the realm's sword and stayed. We took no losses.`,
-  ],
-  bloodless: [
-    (day) => `Raid on day ${day}: the raiders withdrew before either side struck a blow.`,
-    (day) => `Raid on day ${day}: the raiders thought better of it and slipped back into the trees.`,
-    (day) => `Raid on day ${day}: a raid that found nothing. The watch held its breath all night.`,
-    (day) => `Raid on day ${day}: the raiders came and the raiders went. Not a blade was drawn.`,
-  ],
-};
-// Pure function (testable): given outcome state, return the chosen variant.
-export function _pickRaidProse(day, kills, losses, popAlive) {
-  let pool;
-  if (popAlive === 0) pool = _RAID_PROSE_POOLS.razed;
-  else if (losses > 0 && kills === 0) pool = _RAID_PROSE_POOLS.lossesOnly;
-  else if (losses > 0 && kills > 0) pool = _RAID_PROSE_POOLS.mixed;
-  else if (kills > 0) pool = _RAID_PROSE_POOLS.victory;
-  else pool = _RAID_PROSE_POOLS.bloodless;
-  const idx = ((day % pool.length) + pool.length) % pool.length;  // safe modulo
-  return pool[idx](day, kills, losses);
-}
-
-function updateRaidChronicle() {
-  if (!G.stats) return;
-  if (G.enemies.length > 0 && _lastRaidDay !== G.day) {
-    _lastRaidDay = G.day;
-    _raidKillsStart = G.stats.enemiesKilled || 0;
-    _raidDiedStart = G.stats.citizensDied || 0;
-  }
-  // Loop 038 (the-fixer): dropped the `raidsSurvived > 0` gate. Post-014
-  // that counter only increments when hasDefense is true at spawn-time, so
-  // a defenseless raid that kills citizens and leaves used to have no
-  // summary at all — worst-case outcome with least feedback. The message-
-  // picker below already handles all four outcome shapes (razed / losses-
-  // only / mixed / victory / bloodless-withdraw); _lastRaidDay > 0 is
-  // enough to confirm a raid actually occurred.
-  if (G.enemies.length === 0 && _lastRaidDay > 0) {
-    if (_lastRaidDay === G.day - 1 || _lastRaidDay === G.day) {
-      const kills = (G.stats.enemiesKilled || 0) - _raidKillsStart;
-      const losses = (G.stats.citizensDied || 0) - _raidDiedStart;
-      const popAlive = G.citizens.length;
-      const msg = _pickRaidProse(_lastRaidDay, kills, losses, popAlive);
-      try { _chronicle124(msg, 'raid'); } catch(_e){}
-      // Loop 036: also fire a danger toast with the same summary.
-      // `chronicle: false` suppresses re-chronicling in notify since
-      // the chronicle entry was just written above.
-      try { _notify036(msg, popAlive === 0 ? 'danger' : 'event', { chronicle: false }); } catch(_e){}
-    }
-    _lastRaidDay = 0;
-  }
-}
-registerUpdater(updateRaidChronicle);
-
 // ── Loop 036: sticky raid banner — shows while enemies are active ───
 // 010's biggest finding was "raids happen off-screen without ceremony."
 // A HUD-anchored banner during active raids turns ambient combat into
 // a visible emergency the player can't scroll past. Body-count summary
 // already exists in updateRaidChronicle above; this banner is the
 // during-raid counterpart.
+let _raidBannerElement = null;
+let _raidBannerCount = -1;
 function updateRaidBanner() {
-  const el = document.getElementById('raid-banner');
-  if (!el) return;
+  if (!_raidBannerElement?.isConnected) {
+    _raidBannerElement = document.getElementById('raid-banner');
+    _raidBannerCount = -1;
+  }
+  if (!_raidBannerElement) return;
   const n = G.enemies.length;
+  if (n === _raidBannerCount) return;
+  _raidBannerCount = n;
   if (n > 0) {
-    el.style.display = 'block';
-    el.textContent = `⚔ Raid in progress — ${n} raider${n === 1 ? '' : 's'}`;
-  } else if (el.style.display !== 'none') {
-    el.style.display = 'none';
+    _raidBannerElement.style.display = 'block';
+    _raidBannerElement.textContent = `⚔ Raid in progress — ${n} raider${n === 1 ? '' : 's'}`;
+  } else if (_raidBannerElement.style.display !== 'none') {
+    _raidBannerElement.style.display = 'none';
   }
 }
 registerUpdater(updateRaidBanner);
@@ -4138,7 +3939,7 @@ registerUpdater(updateBuildRipples);
 registerWorldRenderer(renderBuildRipples);
 
 // ── Loop 129: Water footstep splash sound ───────────────────
-import { playSound as _playSound129 } from './audio.js?realm=157';
+import { playSound as _playSound129 } from './audio.js?realm=166';
 let _lastSplashTick = 0;
 function updateWaterSplash() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -4209,19 +4010,19 @@ registerScreenRenderer(renderVictoryCinematic);
 // ── Loop 132: Citizen nameplate on hover ────────────────────
 function renderCitizenNameplates(ctx) {
   if (G.camera.zoom < 0.9) return;
-  if (!G.selectedCitizen && !G.hoveredTile) return;
-  for (const c of G.citizens) {
-    if (c !== G.selectedCitizen) continue;
+  if (!G.selectedCitizenId && !G.hoveredTile) return;
+  for (const c of buildCurrentCitizenPresentations()) {
+    if (!c.selected) continue;
     const s = toScreen(c.x, c.y);
     ctx.save();
     ctx.font = 'bold 8px sans-serif';
     ctx.textAlign = 'center';
-    const tw = ctx.measureText(c.name).width + 6;
+    const tw = ctx.measureText(c.identity.name).width + 6;
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(s.x - tw/2, s.y - 24, tw, 12);
     ctx.fillStyle = '#facc15';
     ctx.textBaseline = 'middle';
-    ctx.fillText(c.name, s.x, s.y - 18);
+    ctx.fillText(c.identity.name, s.x, s.y - 18);
     ctx.restore();
   }
 }
@@ -4280,21 +4081,18 @@ function updateAdvisorTips() {
 }
 registerUpdater(updateAdvisorTips);
 
-// ── Loop 136: Keyboard shortcut: R to open research ─────────
-// (Handled in input.js — see below. This stub notes the loop.)
-
-// ── Loop 137: Building upgrade particles ────────────────────
-// (Hooked into economy.js upgrade — emits sparkle burst)
-
 // ── Loop 140: Audio: town hum ambient layer ─────────────────
-// When population > 10 and cursor is near center, subtle murmur.
-import { initAudio as _initAudio140 } from './audio.js?realm=157';
+// When population > 10, add a subtle low murmur.
 let _townHumNode = null;
 function updateTownHum() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
   if (G.population < 10) {
     if (_townHumNode) {
-      try { _townHumNode.gain.linearRampToValueAtTime(0, G.audioCtx.currentTime + 0.5); } catch(_e){}
+      try {
+        const stopAt = G.audioCtx.currentTime + 0.5;
+        _townHumNode.gain.gain.linearRampToValueAtTime(0, stopAt);
+        _townHumNode.osc.stop(stopAt);
+      } catch(_e){}
       _townHumNode = null;
     }
     return;
@@ -4315,7 +4113,7 @@ function updateTownHum() {
     filter.connect(g);
     g.connect(ctx.destination);
     osc.start();
-    _townHumNode = g;
+    _townHumNode = { gain: g, osc };
   } catch(_e){}
 }
 registerUpdater(updateTownHum);
@@ -4409,19 +4207,24 @@ function renderNightDanger(ctx, w, h) {
 registerScreenRenderer(renderNightDanger);
 
 // ── Loop 146: Happiness emotion indicator on HUD ────────────
+let _happinessButton = null;
+let _happinessIcon = '';
 function updateHappinessEmoji() {
   if (G.gameTick % 60 !== 0) return;
-  const el = document.querySelector('[onclick="toggleHappiness()"]');
-  if (!el) return;
-  if (G.happiness >= 80) el.textContent = '😊';
-  else if (G.happiness >= 50) el.textContent = '🙂';
-  else if (G.happiness >= 25) el.textContent = '😟';
-  else el.textContent = '😢';
+  if (!_happinessButton?.isConnected) {
+    _happinessButton = document.querySelector('[onclick="toggleHappiness()"]');
+    _happinessIcon = '';
+  }
+  if (!_happinessButton) return;
+  const icon = G.happiness >= 80 ? '😊'
+    : G.happiness >= 50 ? '🙂'
+      : G.happiness >= 25 ? '😟'
+        : '😢';
+  if (icon === _happinessIcon) return;
+  _happinessIcon = icon;
+  _happinessButton.textContent = icon;
 }
 registerUpdater(updateHappinessEmoji);
-
-// ── Loop 147: Keyboard L for log panel ──────────────────────
-// (Hooked in input.js below)
 
 // ─�� Loop 148: Auto-save indicator enhancement ───────────────
 // Already handled in save.js. This loop adds a "last saved" display.
@@ -4435,64 +4238,18 @@ function updateSaveAge() {
 }
 registerUpdater(updateSaveAge);
 
-// Loop 216 (the-fixer, latent bug found during Phase B verify):
-// 47 references to `_hf144` / `_sf144` / `_chr144` across the
-// post-144 cluster (rival-messages 149 / bard-songs 151 / mayor
-// effects 152 / trading-post chronicle 189) had never been
-// defined or imported, throwing `ReferenceError` continuously
-// in the game loop. The intended pattern (per 4699's
-// `chronicle as _chronicle124` import) was to alias the same
-// helpers under a 144-suffix prefix; the import line was lost.
-// Adding it once here covers all 47 call sites that follow.
-import { hasFlag as _hf144, setFlag as _sf144, chronicle as _chr144 } from './story.js?realm=157';
-
-// ── Loop 149: Story — named rival lord sends messengers ─────
-function updateRivalMessages() {
-  if (G.gameTick % 360 !== 0) return;
-  if (!G.namedCharacters || !G.namedCharacters.rival) return;
-  if (G.day < 15) return;
-  const rival = G.namedCharacters.rival;
-  // Once-per-game message around day 15-20
-  if (!_hf144('rivalMessage1') && G.day >= 15 && G.day <= 25) {
-    _sf144('rivalMessage1');
-    _chr144(`${rival.name} sends a messenger: "Your lands will be mine before the snow falls."`, 'character');
-  }
-  // Second threat when pop > 40
-  if (!_hf144('rivalMessage2') && G.population >= 40) {
-    _sf144('rivalMessage2');
-    _chr144(`${rival.name} is said to be gathering forces. The realm must prepare.`, 'raid');
-  }
-}
-registerUpdater(updateRivalMessages);
-
 // ── Loop 150: Mouse cursor changes when building selected ───
+let _cursorCanvas = null;
+let _cursorMode = '';
 function updateCursorStyle() {
-  const canvas = document.getElementById('game');
-  if (!canvas) return;
-  canvas.style.cursor = G.selectedBuild ? 'crosshair' : 'default';
+  if (!_cursorCanvas?.isConnected) _cursorCanvas = document.getElementById('game');
+  if (!_cursorCanvas) return;
+  const mode = G.selectedBuild ? 'crosshair' : 'default';
+  if (mode === _cursorMode) return;
+  _cursorMode = mode;
+  _cursorCanvas.style.cursor = mode;
 }
 registerUpdater(updateCursorStyle);
-
-// ── Loop 151: Notification sound differs by type ────────────
-// Already handled: raidWarning, mission, etc. This adds a soft chime for info.
-import { playSound as _ps151 } from './audio.js?realm=157';
-// Hooked via notify — no updater needed. Stub for loop tracking.
-
-// ── Loop 153: Story — bard writes songs about milestones ────
-function updateBardSongs() {
-  if (G.gameTick % 240 !== 0) return;
-  if (!G.namedCharacters || !G.namedCharacters.bard) return;
-  const bard = G.namedCharacters.bard;
-  if (!_hf144('bardSong1') && G.stats && G.stats.raidsSurvived >= 2) {
-    _sf144('bardSong1');
-    _chr144(`${bard.name} the bard composes "The Ballad of the Two Raids" in honor of the realm's defenders.`, 'character');
-  }
-  if (!_hf144('bardSong2') && G.population >= 50) {
-    _sf144('bardSong2');
-    _chr144(`${bard.name} sings a new song: "Fifty Hearts Beat as One." The tavern roars with applause.`, 'character');
-  }
-}
-registerUpdater(updateBardSongs);
 
 // ── Loop 154: Drag-to-build visual indicator ────────────────
 // Already exists for walls/roads. Add a subtle trail highlight for all dragged builds.
@@ -4513,45 +4270,6 @@ function renderDragTrail(ctx) {
   ctx.restore();
 }
 registerWorldRenderer(renderDragTrail);
-
-// ── Loop 155: Audio — upgrade sparkle SFX ───────────────────
-// Already exists as playSound('upgrade'). This loop is a stub confirming it's wired.
-
-// ── Loop 156: Story — mayor's decree at high happiness ──────
-function updateMayorDecrees() {
-  if (G.gameTick % 360 !== 0) return;
-  if (!G.namedCharacters || !G.namedCharacters.mayor) return;
-  const mayor = G.namedCharacters.mayor;
-  if (!_hf144('mayorHappy') && G.happiness >= 85) {
-    _sf144('mayorHappy');
-    _chr144(`${mayor.name} declares a day of celebration! "Our people have never been happier."`, 'character');
-  }
-  if (!_hf144('mayorPop') && G.population >= 30) {
-    _sf144('mayorPop');
-    _chr144(`${mayor.name} addresses the crowd: "Thirty strong! Let none doubt our destiny."`, 'character');
-  }
-}
-registerUpdater(updateMayorDecrees);
-
-// ── Loop 158: Keyboard M for minimap toggle ─────────────────
-// (Hooked in input.js)
-
-// ── Loop 159: Chronicle — auto-log building count milestones ─
-let _lastBuildCount = 0;
-function updateBuildMilestones() {
-  if (G.gameTick % 120 !== 0) return;
-  const count = G.buildings.length;
-  const milestones = [10, 25, 50, 75, 100];
-  for (const m of milestones) {
-    if (count >= m && _lastBuildCount < m) {
-      _lastBuildCount = count;
-      try { _chr144(`${m} structures now stand in ${G.kingdomName}. The skyline grows.`, 'milestone'); } catch(_e){}
-      break;
-    }
-  }
-  _lastBuildCount = count;
-}
-registerUpdater(updateBuildMilestones);
 
 // ── Loop 160: Audio — night crickets volume scales with darkness ─
 // Already handled in ambient system. This adds a subtle gain adjustment.
@@ -4611,28 +4329,8 @@ function renderPauseOverlay(ctx, w, h) {
 }
 registerScreenRenderer(renderPauseOverlay);
 
-// ── Loop 163: Story — plague aftermath chronicle ────────────
-function updatePlagueChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (G.activeEvent && G.activeEvent.id === 'plague' && !_hf144('plagueChron')) {
-    _sf144('plagueChron');
-    _chr144('A terrible plague sweeps through the settlement. Citizens fall ill; the healer is overwhelmed.', 'event');
-  }
-}
-registerUpdater(updatePlagueChronicle);
-
 // ── Loop 164: Keyboard C for chronicle ──────────────────────
 // (Hooked in input.js)
-
-// ── Loop 165: Story — drought chronicle ─────────────────────
-function updateDroughtChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (G.activeEvent && G.activeEvent.id === 'drought' && !_hf144('droughtChron')) {
-    _sf144('droughtChron');
-    _chr144('The sun beats down relentlessly. Wells run dry and crops wither in the fields.', 'event');
-  }
-}
-registerUpdater(updateDroughtChronicle);
 
 // ── Loop 166: Audio — population-scaled town ambience volume ─
 function updateTownAmbienceVolume() {
@@ -4646,28 +4344,8 @@ registerUpdater(updateTownAmbienceVolume);
 // Already shown via rate display. This adds color-coded arrow icons next to each.
 // (Handled in ui.js updateUI already. Stub for loop tracking.)
 
-// ── Loop 168: Story — fire aftermath chronicle ──────────────
-function updateFireChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (G.activeEvent && G.activeEvent.id === 'fire' && !_hf144('fireChron')) {
-    _sf144('fireChron');
-    _chr144('Fire! Flames lick at timber walls. Buckets are passed hand to hand.', 'event');
-  }
-}
-registerUpdater(updateFireChronicle);
-
 // ── Loop 170: Keyboard shortcuts display in HUD ─────────────
 // Extend the help overlay. (Handled in HTML. Stub.)
-
-// ── Loop 171: Story — wandering merchant chronicle ──────────
-function updateMerchantChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (G.activeEvent && G.activeEvent.id === 'wandering_merchant' && !_hf144('merchantChron')) {
-    _sf144('merchantChron');
-    _chr144('A wandering merchant arrives with exotic wares. Gold and iron change hands.', 'event');
-  }
-}
-registerUpdater(updateMerchantChronicle);
 
 // ── Loop 172: Double-click to select all of same building type
 // (Handled in input.js)
@@ -4704,28 +4382,8 @@ function updateHeartbeat() {
 }
 registerUpdater(updateHeartbeat);
 
-// ── Loop 174: Chronicle — earthquake events ─────────────────
-function updateEarthquakeChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (G.activeEvent && G.activeEvent.id === 'earthquake' && !_hf144('earthquakeChron')) {
-    _sf144('earthquakeChron');
-    _chr144('The earth trembles. Walls crack and dust fills the air.', 'event');
-  }
-}
-registerUpdater(updateEarthquakeChronicle);
-
 // ── Loop 175: Keyboard B to cycle through build categories ──
 // (Hooked in input.js)
-
-// ── Loop 176: Story — victory chronicle with summary ────────
-function updateVictoryChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (G.won && !_hf144('victoryFinal')) {
-    _sf144('victoryFinal');
-    _chr144(`${G.kingdomName} is victorious! After ${G.day} days, with ${G.population} citizens and ${G.buildings.length} buildings, the castle stands as an eternal monument.`, 'victory');
-  }
-}
-registerUpdater(updateVictoryChronicle);
 
 // ── Loop 177: Audio — sunrise chime ─────────────────────────
 let _lastSunriseDay = 0;
@@ -4754,16 +4412,6 @@ registerUpdater(updateSunriseChime);
 // ── Loop 178: Camera shake on building destruction ──────────
 // Already exists via G.cameraShake. This enhances it for player demolish too.
 // (economy.js demolish already sets it. Stub.)
-
-// ── Loop 179: Story — immigration wave chronicle ────────────
-function updateImmigrationChronicle() {
-  if (G.gameTick % 240 !== 0) return;
-  if (G.activeEvent && G.activeEvent.id === 'migration' && !_hf144('migrationChron')) {
-    _sf144('migrationChron');
-    _chr144('A wave of refugees arrives, seeking shelter in our realm. We welcome them.', 'event');
-  }
-}
-registerUpdater(updateImmigrationChronicle);
 
 // ── Loop 180: Ambient forest rustle based on cursor position ─
 let _rustleTimer = 0;
@@ -4796,17 +4444,15 @@ registerUpdater(updateForestRustle);
 // (Already handled in loop 118 via main.js. This adds variety.)
 
 // ── Loop 182: Minimap flash on raid ─────────────────────────
-let _minimapFlash = 0;
+let _minimapElement = null;
+let _minimapFlashing = false;
 function updateMinimapFlash() {
-  if (G.enemies.length > 0 && G.gameTick % 30 < 15) {
-    _minimapFlash = 1;
-  } else {
-    _minimapFlash = 0;
-  }
-  const mm = document.getElementById('minimap');
-  if (mm) {
-    mm.classList.toggle('minimap-raid', !!_minimapFlash);
-  }
+  if (!_minimapElement?.isConnected) _minimapElement = document.getElementById('minimap');
+  if (!_minimapElement) return;
+  const flashing = G.enemies.length > 0 && G.gameTick % 30 < 15;
+  if (flashing === _minimapFlashing) return;
+  _minimapFlashing = flashing;
+  _minimapElement.classList.toggle('minimap-raid', flashing);
 }
 registerUpdater(updateMinimapFlash);
 
@@ -4836,52 +4482,6 @@ function updateWaterAmbient() {
 }
 registerUpdater(updateWaterAmbient);
 
-// ── Loop 184: Story — seasonal proverbs in chronicle ────────
-// Loop 265 (the-fixer, 264 variant-pool axis 2nd use): expanded each
-// season's pool from 2→4 entries + replaced Math.random() with day-based
-// deterministic selection (saves remain reproducible). 264 [process]
-// observation about templated generators dominating chronicle monotony
-// applies here — long-lived realm with N years saw each proverb
-// repeated ~N/2 times under RNG; now N/4 times under day-based hash.
-// First two entries per season preserve original prose (backward compat).
-let _lastProverbSeason = '';
-function updateSeasonalProverbs() {
-  if (G.gameTick % 240 !== 0) return;
-  if (G.season === _lastProverbSeason) return;
-  _lastProverbSeason = G.season;
-  const proverbs = {
-    spring: [
-      'The old folk say: "Plant with the first bird\'s song."',
-      'An elder speaks: "Spring water runs clearest."',
-      'A farmer murmurs: "Wet soil holds the seed; dry soil holds the weed."',
-      'The schoolteacher tells the children: "Count the buds before you count the fruit."',
-    ],
-    summer: [
-      'A farmer remarks: "Make hay while the sun shines, for it will not last."',
-      'Children play at the well. "Summer is for growing," says the schoolteacher.',
-      'An old shepherd nods: "Long days are short to those who waste them."',
-      'A miller stretches: "The wheel turns easier when the wind is steady."',
-    ],
-    autumn: [
-      'The miller sighs: "Autumn counts what summer sowed."',
-      'A veteran warns: "Fill the granary now. Winter remembers the lazy."',
-      'A baker mutters: "The flour bin is the realm\'s true clock."',
-      'An elder rests on a bench: "Frost is honest. Frost makes everyone hurry."',
-    ],
-    winter: [
-      'Smoke curls from every chimney. "We endure," says the blacksmith.',
-      'The tavern keeper pours another round: "Winter is shorter with good company."',
-      'A child asks the snow a question. The snow does not answer.',
-      'An elder by the fire: "Cold teaches what summer never could."',
-    ],
-  };
-  const arr = proverbs[G.season];
-  if (!arr) return;
-  const idx = ((G.day % arr.length) + arr.length) % arr.length;
-  try { _chr144(arr[idx], 'misc'); } catch(_e){}
-}
-registerUpdater(updateSeasonalProverbs);
-
 // ── Loop 185: UX — click-to-select from minimap buildings ───
 // (Minimap click already navigates. This stub notes the intent.)
 
@@ -4897,16 +4497,6 @@ registerUpdater(updateSeasonalProverbs);
 
 // ── Loop 188: UX — selected building pulse ring ─────────────
 // (Already exists via loop 75 pulsing halo. Stub.)
-
-// ── Loop 189: Story — trading post chronicle ────────────────
-function updateTradingPostChronicle() {
-  if (G.gameTick % 120 !== 0) return;
-  if (!_hf144('firstTradingPost') && G.buildings.some(b => b.type === 'tradingpost')) {
-    _sf144('firstTradingPost');
-    _chr144('A trading post is erected on the sandy shore. Ships will come now, bearing goods from distant lands.', 'milestone');
-  }
-}
-registerUpdater(updateTradingPostChronicle);
 
 // ── Loop 190: Audio — wind gust on camera pan ───────────────
 let _lastPanX = 0;
@@ -5011,16 +4601,6 @@ function updateVictoryFanfare() {
   });
 }
 registerUpdater(updateVictoryFanfare);
-
-// ── Loop 199: Story — 100-building chronicle ────────────────
-function update100Buildings() {
-  if (G.gameTick % 240 !== 0) return;
-  if (!_hf144('100bldg') && G.buildings.length >= 100) {
-    _sf144('100bldg');
-    _chr144('One hundred buildings! The realm stretches across the island. What began as three settlers and an empty field is now a city.', 'victory');
-  }
-}
-registerUpdater(update100Buildings);
 
 // ── Map vignette mask — hides void clutter and softens hard tile edge ──
 // Renders a radial gradient that fades the outer screen to the body

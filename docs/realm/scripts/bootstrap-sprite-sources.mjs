@@ -3,7 +3,7 @@
 // scripts/build-motion-atlases.mjs. Re-running this file overwrites those
 // editable source PNGs from the imported CC0 reset material.
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

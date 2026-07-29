@@ -1,0 +1,62 @@
+{
+  "schema": "realm.actor-pose.concept-references.v1",
+  "policy": {
+    "authority": "Painted texture, palette, and role silhouette only.",
+    "non_authority": [
+      "root",
+      "feet",
+      "sockets",
+      "body scale",
+      "animation phase",
+      "z-order"
+    ],
+    "runtime_network": false,
+    "notes": "These are clean component concepts generated from locked Realm identity references. The compiler verifies their hashes and only deforms individual semantic parts."
+  },
+  "references": {
+    "guard": {
+      "path": "assets/sprites/prototypes/actor-pose/references/guard-component-concept.png",
+      "sha256": "4bf943e254df4bd3d9cc2e10158b2c20b6362a14707f010a1b49490b16fb94c5",
+      "components": {
+        "head_down": {"crop": [158, 51, 374, 254], "target": [23, 23]},
+        "head_up": {"crop": [466, 56, 638, 254], "target": [20, 23]},
+        "head_side": {"crop": [734, 60, 898, 268], "target": [19, 24]},
+        "torso_down": {"crop": [406, 334, 633, 596], "target": [24, 28]},
+        "torso_up": {"crop": [660, 338, 884, 594], "target": [24, 28]},
+        "torso_side": {"crop": [925, 334, 1059, 591], "target": [17, 29]},
+        "arm_front_left": {"crop": [104, 341, 202, 569], "target": [8, 24]},
+        "arm_front_right": {"crop": [257, 340, 352, 569], "target": [8, 24]},
+        "arm_side_left": {"crop": [1145, 339, 1241, 569], "target": [8, 24]},
+        "arm_side_right": {"crop": [1327, 339, 1421, 569], "target": [8, 24]},
+        "leg_front_left": {"crop": [226, 665, 350, 920], "target": [10, 24]},
+        "leg_front_right": {"crop": [346, 664, 447, 920], "target": [9, 24]},
+        "leg_side_left": {"crop": [544, 671, 700, 922], "target": [11, 24]},
+        "leg_side_right": {"crop": [690, 670, 833, 927], "target": [10, 24]},
+        "sword": {"crop": [916, 646, 1006, 954], "target": [7, 27]},
+        "crate": {"crop": [1111, 736, 1313, 930], "target": [24, 18]}
+      }
+    },
+    "builder": {
+      "path": "assets/sprites/prototypes/actor-pose/references/builder-component-concept.png",
+      "sha256": "1ebace2accf6d72c29b0f73b3c40217c815dba39708e124c1510112128542f64",
+      "components": {
+        "head_down": {"crop": [212, 41, 350, 220], "target": [18, 22]},
+        "head_up": {"crop": [527, 49, 654, 214], "target": [17, 22]},
+        "head_side": {"crop": [795, 48, 940, 218], "target": [19, 22]},
+        "torso_down": {"crop": [226, 267, 513, 625], "target": [25, 31]},
+        "torso_up": {"crop": [556, 269, 831, 621], "target": [24, 31]},
+        "torso_side": {"crop": [864, 270, 1075, 625], "target": [19, 31]},
+        "arm_front_left": {"crop": [57, 259, 170, 572], "target": [8, 25]},
+        "arm_front_right": {"crop": [1072, 255, 1173, 570], "target": [8, 25]},
+        "arm_side_left": {"crop": [1072, 255, 1173, 570], "target": [8, 25]},
+        "arm_side_right": {"crop": [1334, 255, 1434, 571], "target": [8, 25]},
+        "leg_front_left": {"crop": [179, 669, 360, 951], "target": [11, 23]},
+        "leg_front_right": {"crop": [330, 669, 436, 951], "target": [9, 23]},
+        "leg_up_left": {"crop": [537, 669, 690, 950], "target": [10, 23]},
+        "leg_up_right": {"crop": [667, 669, 781, 952], "target": [9, 23]},
+        "leg_side": {"crop": [866, 663, 1001, 955], "target": [10, 24]},
+        "hammer": {"crop": [1182, 677, 1365, 766], "target": [18, 9]}
+      }
+    }
+  }
+}

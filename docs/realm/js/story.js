@@ -3,7 +3,7 @@
 // diary of the realm. Persists to save.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=157';
+import { G } from './state.js?realm=166';
 
 // G.chronicle: [{ day, season, text, tag }]
 // tag in: 'milestone','event','character','raid','season','death','birth','victory','misc'
@@ -18,92 +18,17 @@ import { G } from './state.js?realm=157';
 // 085 enforces it in code: when the cap kicks in, oldest
 // NON-IMMUNE entries drop first; immune entries are preserved
 // even if that means the buffer sits slightly over 300.
-// chronicle/initChronicle (and the eviction-immune tag set) moved to
-// log.js (core tier — ENGINE.md rule 4). Re-exported here so existing
-// shell imports keep working.
-import { chronicle, initChronicle } from './log.js?realm=157';
-export { chronicle, initChronicle };
+// Chronicle writes and initialization are owned by log.js (core tier —
+// ENGINE.md rule 4). Story consumes that API directly.
+import { announce, chronicle, initChronicle, sfx } from './log.js?realm=166';
+import { renameCitizen } from './citizen-ownership.js?realm=166';
 
 
 export function hasFlag(key) { initChronicle(); return !!G.storyFlags[key]; }
 export function setFlag(key, val=true) { initChronicle(); G.storyFlags[key] = val; }
 
-// ── Render chronicle panel ─────────────────────────────────
-// Loop 078: chronicle tag-filter UI. Uses the 14-tag taxonomy 075
-// documented in loop/docs/narrative-surfaces.md. Chips above the
-// entry list toggle per-tag filtering: click once to show only
-// matching entries, click the same chip again (or click the All
-// chip) to clear. Active chip gets accent border.
-const TAG_ICONS = {
-  milestone:'🏛️', event:'✨', character:'👤', raid:'⚔️',
-  season:'🍃', death:'🪦', birth:'👶', victory:'🏆', misc:'📜',
-  dream:'🌙', nightmare:'🌑', stone:'🗿', echo:'🔁', research:'📚',
-  requiem:'🕯️',  // Loop 103: realm-end beat. 1 tag, 1 beat (so far).
-  era:'🌅',      // The Three Ages (tech.js): at most 2 beats per realm, eviction-immune.
-};
-
-// Module-local filter state (not persisted to save — this is a
-// viewing preference, not realm state).
-let _chronicleFilter = null;
-
-export function setChronicleFilter(tag) {
-  _chronicleFilter = (tag === _chronicleFilter || tag == null) ? null : tag;
-  renderChroniclePanel();
-}
-
-export function renderChroniclePanel() {
-  initChronicle();
-  const c = document.getElementById('chronicle-content');
-  if (!c) return;
-  if (G.chronicle.length === 0) {
-    c.innerHTML = '<div class="chron-empty">Your chronicle is blank. Shape the realm and it will record your deeds.</div>';
-    return;
-  }
-  const seasonIcons = { spring:'🌱', summer:'☀️', autumn:'🍂', winter:'❄️' };
-
-  // Figure out which tags actually appear in this realm's chronicle —
-  // only show chips for present tags, so empty categories don't
-  // clutter the filter row.
-  const presentTags = new Set(G.chronicle.map(e => e.tag));
-
-  // Build filter chip row: "All" + one chip per present tag
-  let filterRow = '<div class="chron-filters">';
-  filterRow += `<span class="chron-chip${_chronicleFilter == null ? ' active' : ''}" onclick="window.setChronicleFilter(null)">All · ${G.chronicle.length}</span>`;
-  for (const [tag, icon] of Object.entries(TAG_ICONS)) {
-    if (!presentTags.has(tag)) continue;
-    const count = G.chronicle.filter(e => e.tag === tag).length;
-    const active = _chronicleFilter === tag;
-    filterRow += `<span class="chron-chip${active ? ' active' : ''}" onclick="window.setChronicleFilter('${tag}')">${icon} ${count}</span>`;
-  }
-  filterRow += '</div>';
-
-  // Apply filter to entries
-  const entries = _chronicleFilter == null
-    ? G.chronicle
-    : G.chronicle.filter(e => e.tag === _chronicleFilter);
-
-  if (entries.length === 0) {
-    c.innerHTML = filterRow + '<div class="chron-empty">No entries match this filter.</div>';
-    return;
-  }
-
-  const byDay = {};
-  for (const e of entries) {
-    if (!byDay[e.day]) byDay[e.day] = [];
-    byDay[e.day].push(e);
-  }
-  const days = Object.keys(byDay).map(Number).sort((a,b)=>b-a);
-  let html = filterRow;
-  for (const d of days) {
-    const seas = byDay[d][0].season;
-    html += `<div class="chron-day"><div class="chron-day-h">${seasonIcons[seas]||''} Day ${d}</div>`;
-    for (const e of byDay[d]) {
-      html += `<div class="chron-row"><span class="chron-tag">${TAG_ICONS[e.tag]||'📜'}</span><span class="chron-text">${e.text}</span></div>`;
-    }
-    html += '</div>';
-  }
-  c.innerHTML = html;
-}
+// Chronicle DOM/filter presentation lives in story-ui.js. This module is a
+// deterministic core system and cannot read browser or wall-clock state.
 
 // ════════════════════════════════════════════════════════════
 // Story beats — triggered by milestones. Each beat fires once.
@@ -1904,13 +1829,6 @@ const NARRATIVE_BEATS = [
     // center. Particle motion lives in particles.js shootingstar branch
     // and render in render.js shootingstar branch (~30 LoC together).
     after: G => {
-      if (!G.particles || !G.camera) return;
-      // Loop 269 (the-fixer, 268 LOW): respect the 400-particle cap that
-      // neighboring spawn sites in particles.js (lines 87/91/94/115/etc)
-      // gate on. Single-instance can't overflow on its own (once-per-realm
-      // flag), but the convention matters for future synchronized-surprise
-      // applications per 267 [process] template.
-      if (G.particles.length >= 400) return;
       // Loop 273 (the-fixer): use proper inverse iso projection for the
       // spawn tile. Earlier 267 used `camera.x/32, camera.y/16` which only
       // approximates a tile coord when camera.x ≈ 0. The correct math:
@@ -2031,8 +1949,6 @@ const NARRATIVE_BEATS = [
     // with a flicker phase mid-decay matching real distant lightning's
     // primary-then-secondary brightness pattern.
     after: G => {
-      if (!G.particles || !G.camera) return;
-      if (G.particles.length >= 400) return;
       // Inverse iso projection: camera.x = (tx-ty)*32, camera.y = (tx+ty)*16
       // → tx = (camera.y/16 - camera.x/32) / 2, ty = (camera.y/16 + camera.x/32) / 2
       // Spawning at the actual camera-tile keeps the flash visible regardless
@@ -2122,8 +2038,8 @@ const NARRATIVE_BEATS = [
   // beat. New shape — fires when a temporal threshold is crossed
   // (50+ days since last raid) rather than a single state-condition.
   // Gate requires raidsSurvived ≥ 1 (peace must be EARNED, not just
-  // never-threatened) AND lastRaidDay set (defensive against legacy
-  // saves) AND G.day - lastRaidDay ≥ 50. The infrastructure (211
+  // never-threatened) AND lastRaidDay set (the sustained-state tracker
+  // must have an origin) AND G.day - lastRaidDay ≥ 50. The infrastructure (211
   // economy.js + save.js) tracks lastRaidDay; this trigger checks the
   // delta. Realistic firing window: year-2+ for fortified realms
   // that successfully repel raids and accumulate peace. Joins the
@@ -2133,7 +2049,7 @@ const NARRATIVE_BEATS = [
   // quiet differently than it carried the war") rather than just
   // checking a peace-box. Tag: misc.
   { flag: 'sustained_peace_known', tag: 'misc',
-    trigger: G => G.stats && G.stats.raidsSurvived >= 1 && G.lastRaidDay !== undefined && (G.day - G.lastRaidDay) >= 50,
+    trigger: G => G.stats && G.stats.raidsSurvived >= 1 && G.lastRaidDay !== null && (G.day - G.lastRaidDay) >= 50,
     text: 'There comes a stretch of days when the watch still climbs the walls each evening, but their hands rest where weapons would have been. The alarm has not sounded in fifty days. The realm carries the quiet differently than it carried the war.' },
   // Loop 228 (surprise, 211 filed): SUSTAINED-STATE #2 — promotes
   // the sub-type from 1 use (211) to 2 toward 3+ threshold. Mirror
@@ -2147,7 +2063,7 @@ const NARRATIVE_BEATS = [
   // than raids — needs a longer absence to read as remarkable.
   // Sub-type sustained-state-recognition; tag misc; static prose.
   { flag: 'no_death_known', tag: 'misc',
-    trigger: G => G.stats && G.stats.citizensDied >= 1 && G.lastDeathDay !== undefined && (G.day - G.lastDeathDay) >= 100,
+    trigger: G => G.stats && G.stats.citizensDied >= 1 && G.lastDeathDay !== null && (G.day - G.lastDeathDay) >= 100,
     text: 'A hundred days have passed without burial. The grave field is older than the last grave; weeds soften the marker stones. The realm sleeps with a different weight in its chest now.' },
   // Loop 230 (surprise, 228 filed): SUSTAINED-STATE #3. Promotes the
   // sub-type 2 → 3 uses (mirror of 229's land-as-agent promotion).
@@ -2163,7 +2079,7 @@ const NARRATIVE_BEATS = [
   // — meets 3+ promotion threshold but per 188 precedent promotion
   // remains conservative.
   { flag: 'full_pop_known', tag: 'misc',
-    trigger: G => G.population >= 10 && G.lastUnderpopDay !== undefined && (G.day - G.lastUnderpopDay) >= 60,
+    trigger: G => G.population >= 10 && G.lastUnderpopDay !== null && (G.day - G.lastUnderpopDay) >= 60,
     text: 'For sixty days the houses have all stood full. No empty bed, no vacant chair, no spare loaf. The realm is the size it knows how to be, for now.' },
   // Loop 142 (surprise, un-filed): a letter from the other realm.
   // Opens up the WORLD beyond the island — the realm receives news
@@ -2244,7 +2160,7 @@ const NARRATIVE_BEATS = [
       if (!f) return;
       // Newest citizen (most recently born/added).
       const c = G.citizens[G.citizens.length - 1];
-      if (c && c.name !== f) c.name = f;
+      if (c && c.identity.name !== f) renameCitizen(c, f, 'story-namesake');
     } },
   // Loop 128 (surprise, un-filed): the longest night. Once per realm,
   // fires deep in a winter night (first winter is days 22-28;
@@ -2440,9 +2356,102 @@ const NARRATIVE_BEATS = [
 //
 // Usage: add `onFire: 'nameString'` to any NARRATIVE_BEATS entry; the
 // dispatch loop calls `_PLAY_SOUND(beat.onFire)` after chronicle().
-// Backward-compatible: entries without onFire fire silently, unchanged.
+// `onFire` is optional; entries without it fire silently.
 
-// Run each tick/day to detect milestones and fire beats once.
+const BUILDING_COUNT_MILESTONES = Object.freeze([10, 25, 50, 75, 100]);
+const SEASONAL_PROVERBS = Object.freeze({
+  spring: Object.freeze([
+    'The old folk say: "Plant with the first bird\'s song."',
+    'An elder speaks: "Spring water runs clearest."',
+    'A farmer murmurs: "Wet soil holds the seed; dry soil holds the weed."',
+    'The schoolteacher tells the children: "Count the buds before you count the fruit."',
+  ]),
+  summer: Object.freeze([
+    'A farmer remarks: "Make hay while the sun shines, for it will not last."',
+    'Children play at the well. "Summer is for growing," says the schoolteacher.',
+    'An old shepherd nods: "Long days are short to those who waste them."',
+    'A miller stretches: "The wheel turns easier when the wind is steady."',
+  ]),
+  autumn: Object.freeze([
+    'The miller sighs: "Autumn counts what summer sowed."',
+    'A veteran warns: "Fill the granary now. Winter remembers the lazy."',
+    'A baker mutters: "The flour bin is the realm\'s true clock."',
+    'An elder rests on a bench: "Frost is honest. Frost makes everyone hurry."',
+  ]),
+  winter: Object.freeze([
+    'Smoke curls from every chimney. "We endure," says the blacksmith.',
+    'The tavern keeper pours another round: "Winter is shorter with good company."',
+    'A child asks the snow a question. The snow does not answer.',
+    'An elder by the fire: "Cold teaches what summer never could."',
+  ]),
+});
+
+const SUPPLEMENTAL_STORY_BEATS = Object.freeze([
+  { flag: 'rivalMessage1', every: 360, tag: 'character',
+    trigger: state => !!state.namedCharacters?.rival && state.day >= 15 && state.day <= 25,
+    text: state => `${state.namedCharacters.rival.name} sends a messenger: "Your lands will be mine before the snow falls."` },
+  { flag: 'rivalMessage2', every: 360, tag: 'raid',
+    trigger: state => !!state.namedCharacters?.rival && state.population >= 40,
+    text: state => `${state.namedCharacters.rival.name} is said to be gathering forces. The realm must prepare.` },
+  { flag: 'bardSong1', every: 240, tag: 'character',
+    trigger: state => !!state.namedCharacters?.bard && (state.stats?.raidsSurvived || 0) >= 2,
+    text: state => `${state.namedCharacters.bard.name} the bard composes "The Ballad of the Two Raids" in honor of the realm's defenders.` },
+  { flag: 'bardSong2', every: 240, tag: 'character',
+    trigger: state => !!state.namedCharacters?.bard && state.population >= 50,
+    text: state => `${state.namedCharacters.bard.name} sings a new song: "Fifty Hearts Beat as One." The tavern roars with applause.` },
+  { flag: 'mayorHappy', every: 360, tag: 'character',
+    trigger: state => !!state.namedCharacters?.mayor && state.happiness >= 85,
+    text: state => `${state.namedCharacters.mayor.name} declares a day of celebration! "Our people have never been happier."` },
+  { flag: 'mayorPop', every: 360, tag: 'character',
+    trigger: state => !!state.namedCharacters?.mayor && state.population >= 30,
+    text: state => `${state.namedCharacters.mayor.name} addresses the crowd: "Thirty strong! Let none doubt our destiny."` },
+  { flag: 'plagueChron', every: 120, tag: 'event', trigger: state => state.activeEvent?.id === 'plague',
+    text: 'A terrible plague sweeps through the settlement. Citizens fall ill; the healer is overwhelmed.' },
+  { flag: 'droughtChron', every: 120, tag: 'event', trigger: state => state.activeEvent?.id === 'drought',
+    text: 'The sun beats down relentlessly. Wells run dry and crops wither in the fields.' },
+  { flag: 'fireChron', every: 120, tag: 'event', trigger: state => state.activeEvent?.id === 'fire',
+    text: 'Fire! Flames lick at timber walls. Buckets are passed hand to hand.' },
+  { flag: 'merchantChron', every: 120, tag: 'event', trigger: state => state.activeEvent?.id === 'wandering_merchant',
+    text: 'A wandering merchant arrives with exotic wares. Gold and iron change hands.' },
+  { flag: 'earthquakeChron', every: 120, tag: 'event', trigger: state => state.activeEvent?.id === 'earthquake',
+    text: 'The earth trembles. Walls crack and dust fills the air.' },
+  { flag: 'migrationChron', every: 240, tag: 'event', trigger: state => state.activeEvent?.id === 'migration',
+    text: 'A wave of refugees arrives, seeking shelter in our realm. We welcome them.' },
+  { flag: 'firstTradingPost', every: 120, tag: 'milestone',
+    trigger: state => state.buildings.some(building => building.type === 'tradingpost'),
+    text: 'A trading post is erected on the sandy shore. Ships will come now, bearing goods from distant lands.' },
+  { flag: 'victoryFinal', every: 120, tag: 'victory', trigger: state => state.won,
+    text: state => `${state.kingdomName} is victorious! After ${state.day} days, with ${state.population} citizens and ${state.buildings.length} buildings, the Hall of Ages stands as an eternal monument.` },
+  { flag: '100bldg', every: 240, tag: 'victory', trigger: state => state.buildings.length >= 100,
+    text: 'One hundred buildings! The realm stretches across the island. What began as three settlers and an empty field is now a city.' },
+]);
+
+function checkStoryCadence() {
+  if (G.gameTick % 120 === 0) {
+    for (const count of BUILDING_COUNT_MILESTONES) {
+      const flag = `building_count_${count}`;
+      if (G.buildings.length >= count && !hasFlag(flag)) {
+        setFlag(flag);
+        chronicle(`${count} structures now stand in ${G.kingdomName}. The skyline grows.`, 'milestone');
+        break;
+      }
+    }
+  }
+
+  if (G.gameTick % 240 === 0 && G.storyState.lastProverbSeason !== G.season) {
+    G.storyState.lastProverbSeason = G.season;
+    const pool = SEASONAL_PROVERBS[G.season];
+    if (pool) chronicle(pool[((G.day % pool.length) + pool.length) % pool.length], 'misc');
+  }
+
+  for (const beat of SUPPLEMENTAL_STORY_BEATS) {
+    if (G.gameTick % beat.every !== 0 || hasFlag(beat.flag) || !beat.trigger(G)) continue;
+    setFlag(beat.flag);
+    chronicle(typeof beat.text === 'function' ? beat.text(G) : beat.text, beat.tag);
+  }
+}
+
+// Run on the explicit story@60 core cadence to detect milestones and fire beats.
 export function checkStoryBeats() {
   initChronicle();
   // Loop 260 (the-player): also gate the iteration itself so flags
@@ -2481,9 +2490,9 @@ export function checkStoryBeats() {
       // Loop 123 (refactor-only, generalizes 111's inline requiem audio
       // branch): per-entry `onFire` field. Any NARRATIVE_BEATS entry
       // with `onFire: 'soundName'` fires that sound after chronicle
-      // writes. Backward-compatible (entries without onFire fire silently).
+      // writes. Entries without onFire fire silently.
       if (beat.onFire) {
-        try { if (_PLAY_SOUND) _PLAY_SOUND(beat.onFire); } catch (_e) {}
+        sfx(beat.onFire);
       }
       // Loop 144 (the-fixer, 134 filed): `after(G)` callback for
       // arbitrary side effects. Mirrors BUILDING_FIRST_BEATS' after:
@@ -2548,6 +2557,7 @@ export function checkStoryBeats() {
   // firing on happy-peak dawns once the 056 stone is placed.
   // See checkOfferingBeat.
   checkOfferingBeat();
+  checkStoryCadence();
 }
 
 // ── Loop 039: the-dream — collective dreams ─────────────────
@@ -2697,43 +2707,17 @@ const _DREAM_THREADS = {
   },
 };
 
-// ── Loop 044: time-aware — real-world seasoning ──────────────
-// A lens over the dream system: the real-world calendar biases
-// which threads are more likely to surface, and a few special
-// dates override the dream intro entirely. Same realm, same day,
-// different month → different flavor. The game listens to the
-// clock on the wall behind the player.
-//
-// `now` is injectable to keep the function testable.
-export function _realWorldDreamLens(now = new Date()) {
-  const month = now.getMonth(); // 0-11
-  const date = now.getDate();   // 1-31
-  const hour = now.getHours();  // 0-23
-
-  // Seasonal weighting. Threads in `boost` are added to the avail
-  // pool a second time, doubling their selection weight.
-  let boost = [];
-  if (month === 11 || month === 0 || month === 1) boost = ['hearth', 'warning'];          // winter
-  else if (month >= 2 && month <= 4)              boost = ['harvest', 'water'];           // spring
-  else if (month >= 5 && month <= 7)              boost = ['water', 'market'];            // summer
-  else                                            boost = ['warning', 'forge'];           // autumn
-
-  // Special-date overrides: intro line + tag tweak. Checked in
-  // order; first match wins.
-  let special = null;
-  if (month === 9 && date === 31) {
-    special = { intro: 'On the thinnest night of the year the realm wakes to dreams:', closer: 'Tomorrow the veil thickens again.' };
-  } else if (month === 11 && date >= 20 && date <= 22) {
-    special = { intro: 'On the longest night the realm wakes to dreams:', closer: 'The dark will turn now.' };
-  } else if (month === 5 && date >= 20 && date <= 22) {
-    special = { intro: 'On the shortest night the realm wakes to dreams:', closer: 'The light will turn now.' };
-  } else if (month === 2 && date >= 19 && date <= 21) {
-    special = { intro: 'On the balanced night the realm wakes to dreams:', closer: 'The seasons change hands.' };
-  } else if (hour === 0) {
-    special = { intro: 'At the witching hour the realm wakes to dreams:', closer: 'No one speaks of them, but everyone remembers.' };
-  }
-
-  return { boost, special };
+// Dream weighting is authoritative story state, so it derives from the realm's
+// season rather than the host computer's month/hour. The optional wall-clock
+// preview helper remains shell-only in story-ui.js.
+function simulationDreamLens() {
+  const boost = {
+    winter: ['hearth', 'warning'],
+    spring: ['harvest', 'water'],
+    summer: ['water', 'market'],
+    autumn: ['warning', 'forge'],
+  }[G.season] || [];
+  return { boost, special: null };
 }
 
 // ── Loop 064: the approach — pre-event dream bias ────────────
@@ -2802,10 +2786,9 @@ export function checkDreamBeat() {
   }
   if (avail.length === 0) return;
 
-  // 044: the real-world calendar doubles-weight certain threads.
-  // Only threads that are actually available in this realm get
-  // boosted — we don't invent threads that don't apply.
-  const lens = _realWorldDreamLens();
+  // Seasonal weighting is deterministic simulation input. Only threads that
+  // are actually available in this realm get boosted.
+  const lens = simulationDreamLens();
   for (const name of lens.boost) {
     if (avail.includes(name)) avail.push(name);
   }
@@ -2924,7 +2907,6 @@ export function checkNightmareBeat() {
   setFlag('nightmare_fired');
 
   const pool = _nightmareImagesForState(G);
-  const seed = _dreamHash(`${kname}_nightmare_content`);
   // Pick 3 distinct images by per-slot hash
   const rawImages = [];
   for (let i = 0; i < 3; i++) {
@@ -2939,28 +2921,15 @@ export function checkNightmareBeat() {
 
   // Toast the beat so it doesn't pass unnoticed. Chronicle already
   // written above, so chronicle:false suppresses re-chronicling in notify.
-  try {
-    const notif = _NIGHTMARE_NOTIFY;
-    if (notif) notif(`🌑 The realm did not wake well.`, 'danger', { chronicle: false });
-  } catch (_e) {}
+  announce('🌑 The realm did not wake well.', 'danger', { chronicle: false });
 
   // Loop 106 (surprise, un-filed): audio cue. A subtle low-chord
   // plays the one time the nightmare fires per realm. 064 filed a
   // "silent music cue on nightmare-APPROACH" idea; 106 ships the
   // fire-moment counterpart. Quiet enough to miss if the player
   // isn't listening — which fits the "rarest moment" philosophy.
-  try {
-    const ps = _PLAY_SOUND;
-    if (ps) ps('nightmare');
-  } catch (_e) {}
+  sfx('nightmare');
 }
-
-// Late-bound imports to avoid load-order coupling with story.js's
-// position in the module graph. Set on module-load below.
-let _NIGHTMARE_NOTIFY = null;
-let _PLAY_SOUND = null;
-import('./notifications.js?realm=157').then(m => { _NIGHTMARE_NOTIFY = m.notify; }).catch(() => {});
-import('./audio.js?realm=157').then(m => { _PLAY_SOUND = m.playSound; }).catch(() => {});
 
 // ── Loop 056: a-scene-that-happens-once (second take) ────────
 //
@@ -3032,8 +3001,7 @@ export function checkStoneBeat() {
   // Loop 113 (the-fixer, 106-filed): stone chime. 3rd audio cue; Pattern
   // 1 per audio-surfaces.md (dedicated check-function). Ascending fifth
   // (E5 → B5) — brighter, consonant, "a thing was found." Reuses 106's
-  // late-bound _PLAY_SOUND import.
-  try { if (_PLAY_SOUND) _PLAY_SOUND('stone'); } catch (_e) {}
+  sfx('stone');
 }
 
 // ── Loop 059: chronicle-echo — old beats resurface as memory ─
@@ -3173,7 +3141,7 @@ export function checkFounderBeat() {
   // Loop 115 (the-composer, 106/111-filed founders-named cue; first use
   // of the tick-114 expanded challenge pool). Three-note minor triad,
   // one note per founder. Pattern 1 via this dedicated function.
-  try { if (_PLAY_SOUND) _PLAY_SOUND('founders'); } catch (_e) {}
+  sfx('founders');
 }
 
 // ── Loop 079: offering at the stone (surprise) ───────────────
@@ -3248,13 +3216,5 @@ export function checkOfferingBeat() {
   // list): offering gets a minor→major resolution chord. Sibling to
   // 106 nightmare's dissonance — same minor-interval opening, but
   // lifts to major within 0.3s. Pattern 1 (dedicated check-function).
-  try { if (_PLAY_SOUND) _PLAY_SOUND('offering'); } catch (_e) {}
-}
-
-export function toggleChroniclePanel() {
-  const p = document.getElementById('chronicle-panel');
-  if (!p) return;
-  const open = p.style.display !== 'none';
-  p.style.display = open ? 'none' : 'block';
-  if (!open) renderChroniclePanel();
+  sfx('offering');
 }

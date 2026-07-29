@@ -32,6 +32,10 @@ ROLES = (
     "fisher", "trader", "innkeeper", "builder", "blacksmith", "guard",
     "scholar", "forager",
 )
+# Identity references deliberately prefer neutral adjacent actions. The target
+# action is always excluded: a BASE or CANDIDATE action family may be the very
+# semantic mismatch the work order is meant to repair.
+IDENTITY_ACTION_PRIORITY = ("idle", "walk", "work", "carry")
 
 # Role tunic identity colors, carried over from the retired procedural
 # ROLE_CONFIG (paint-cohesive-legacy-actors round): the palette players
@@ -138,7 +142,7 @@ def crop_row(role: str, action: str, direction: str) -> Image.Image:
 def comparison_row(role: str, action: str, direction: str) -> Image.Image:
     manifest = load_manifest()
     item = manifest["rows"].get(row_key(role, action, direction))
-    if item and item.get("status") in ("candidate", "accepted", "accepted-with-waiver"):
+    if item and item.get("status") in ("candidate", "accepted"):
         path = ROW_DIR / item.get("file", "")
         if path.is_file():
             return Image.open(path).convert("RGBA")
@@ -184,24 +188,206 @@ def add_direction_comparison(report: dict, role: str, action: str, direction: st
     return report
 
 
-def make_contact(role: str, action: str, direction: str, out: Path) -> None:
-    image = Image.open(source_sheet(role)).convert("RGBA")
-    entries = [
-        (f"target {action}/{direction}", action, direction, 4),
+def _relative_source(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(ROOT.resolve()))
+    except ValueError:
+        return str(path.resolve())
+
+
+def _manifest_row_path(item: dict, key: str) -> Path:
+    file_value = item.get("file")
+    if not isinstance(file_value, str) or not file_value:
+        raise SystemExit(f"{key} has no row file in the manifest")
+    path = (ROW_DIR / file_value).resolve()
+    row_root = ROW_DIR.resolve()
+    if path != row_root and row_root not in path.parents:
+        raise SystemExit(f"{key} row file escapes {ROW_DIR}")
+    if not path.is_file():
+        raise SystemExit(f"{key} row file is missing: {path}")
+    return path
+
+
+def _reference_metadata(reference: dict) -> dict:
+    return {
+        key: value
+        for key, value in reference.items()
+        if key != "image"
+    }
+
+
+def _locked_identity_reference(
+    manifest: dict,
+    role: str,
+    action: str,
+    direction: str,
+) -> tuple[dict | None, str]:
+    key = row_key(role, action, direction)
+    item = manifest["rows"].get(key)
+    if not item:
+        return None, f"{key}=BASE"
+    status = item.get("status")
+    if status != "accepted":
+        display = "CANDIDATE" if status == "candidate" else repr(status)
+        return None, f"{key}={display}"
+    warnings = item.get("quality", {}).get("warnings")
+    if warnings != []:
+        return None, f"{key}=LOCKED-with-untrusted-warnings"
+    try:
+        path = _manifest_row_path(item, key)
+    except SystemExit as error:
+        return None, f"{key}=invalid-LOCKED ({error})"
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    if digest != item.get("sha256"):
+        return None, f"{key}=LOCKED-hash-mismatch"
+    return {
+        "key": key,
+        "role": role,
+        "action": action,
+        "dir": direction,
+        "status": "LOCKED",
+        "source": _relative_source(path),
+        "sha256": digest,
+        "warnings": [],
+        "image": Image.open(path).convert("RGBA"),
+    }, ""
+
+
+def select_identity_references(
+    manifest: dict,
+    role: str,
+    action: str,
+    direction: str,
+) -> list[dict]:
+    """Return trusted same-role/direction rows from actions other than target.
+
+    BASE, CANDIDATE, missing, warning-bearing, and hash-mismatched rows are
+    diagnostics only. They must never silently become identity authorities.
+    """
+    references = []
+    rejected = []
+    for peer_action in IDENTITY_ACTION_PRIORITY:
+        if peer_action == action:
+            continue
+        reference, reason = _locked_identity_reference(
+            manifest,
+            role,
+            peer_action,
+            direction,
+        )
+        if reference:
+            references.append(reference)
+        else:
+            rejected.append(reason)
+    if not references:
+        checked = "; ".join(rejected)
+        raise SystemExit(
+            f"no trusted identity reference for {row_key(role, action, direction)}; "
+            "a work order requires at least one warning-free, hash-matched LOCKED "
+            f"adjacent action for the same role/direction (checked: {checked}). "
+            "BASE and CANDIDATE rows are motion evidence only."
+        )
+    for index, reference in enumerate(references):
+        reference["identityRole"] = "PRIMARY" if index == 0 else "SUPPORTING"
+    return references
+
+
+def _motion_reference(
+    manifest: dict,
+    role: str,
+    action: str,
+    direction: str,
+) -> dict:
+    key = row_key(role, action, direction)
+    item = manifest["rows"].get(key)
+    if item:
+        status = item.get("status")
+        if status not in ("accepted", "candidate"):
+            raise SystemExit(f"{key} has unsupported manifest status {status!r}")
+        path = _manifest_row_path(item, key)
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest != item.get("sha256"):
+            raise SystemExit(f"{key} manifest hash does not match {path}")
+        display_status = "LOCKED" if status == "accepted" else "CANDIDATE"
+        return {
+            "key": key,
+            "role": role,
+            "action": action,
+            "dir": direction,
+            "status": display_status,
+            "source": _relative_source(path),
+            "sha256": digest,
+            "warnings": item.get("quality", {}).get("warnings", []),
+            "image": Image.open(path).convert("RGBA"),
+        }
+
+    path = BASE_DIR / f"{role}.png"
+    if not path.is_file():
+        raise SystemExit(f"missing BASE role sheet: {path}")
+    image = Image.open(path).convert("RGBA")
+    row_index = ACTIONS.index(action) * len(DIRS) + DIRS.index(direction)
+    y = row_index * FRAME_H
+    return {
+        "key": key,
+        "role": role,
+        "action": action,
+        "dir": direction,
+        "status": "BASE",
+        "source": f"{_relative_source(path)}#row={action}/{direction}",
+        "sha256": None,
+        "warnings": ["unreviewed-base-source"],
+        "image": image.crop((0, y, FRAME_W * FRAMES, y + FRAME_H)),
+    }
+
+
+def select_motion_references(
+    manifest: dict,
+    role: str,
+    action: str,
+    direction: str,
+) -> list[dict]:
+    ordered_dirs = (direction,) + tuple(item for item in DIRS if item != direction)
+    references = [
+        _motion_reference(manifest, role, action, peer_dir)
+        for peer_dir in ordered_dirs
     ]
-    entries.extend((f"{action}/{item}", action, item, 2) for item in DIRS if item != direction)
-    width = FRAME_W * FRAMES * 4
-    heights = [FRAME_H * scale + 28 for _, _, _, scale in entries]
-    contact = Image.new("RGBA", (width, sum(heights)), (15, 20, 24, 255))
+    for index, reference in enumerate(references):
+        reference["motionRole"] = "TARGET" if index == 0 else "PEER"
+    return references
+
+
+def make_contact(
+    references: list[dict],
+    out: Path,
+    *,
+    heading: str,
+    guidance: str,
+    role_field: str,
+    primary_scale: int,
+    peer_scale: int,
+) -> None:
+    width = FRAME_W * FRAMES * primary_scale
+    scales = [primary_scale if index == 0 else peer_scale for index in range(len(references))]
+    header_height = 52
+    label_height = 28
+    heights = [FRAME_H * scale + label_height for scale in scales]
+    contact = Image.new("RGBA", (width, header_height + sum(heights)), (15, 20, 24, 255))
     draw = ImageDraw.Draw(contact)
-    y_out = 0
-    for (label, row_action, row_dir, scale), height in zip(entries, heights):
-        row_index = ACTIONS.index(row_action) * len(DIRS) + DIRS.index(row_dir)
-        strip = image.crop((0, row_index * FRAME_H, FRAME_W * FRAMES, (row_index + 1) * FRAME_H))
+    draw.text((8, 6), heading, fill=(255, 215, 108, 255))
+    draw.text((8, 25), guidance, fill=(232, 237, 240, 255))
+    y_out = header_height
+    for reference, scale, height in zip(references, scales, heights):
+        warnings = reference["warnings"]
+        warning_text = ",".join(warnings) if warnings else "none"
+        label = (
+            f"{reference[role_field]} | {reference['key']} | {reference['status']} | "
+            f"source={reference['source']} | warnings={warning_text}"
+        )
+        strip = reference["image"]
         draw.text((8, y_out + 6), label, fill=(232, 237, 240, 255))
         contact.alpha_composite(
             strip.resize((FRAME_W * FRAMES * scale, FRAME_H * scale), Image.Resampling.NEAREST),
-            (0, y_out + 28),
+            (0, y_out + label_height),
         )
         y_out += height
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -211,20 +397,59 @@ def make_contact(role: str, action: str, direction: str, out: Path) -> None:
 def work_order(args: argparse.Namespace) -> None:
     validate_target(args.role, args.action, args.dir)
     key = row_key(args.role, args.action, args.dir)
-    out = WORK_ORDER_DIR / key.replace("/", "-")
+    manifest = load_manifest()
+    identity_references = select_identity_references(
+        manifest,
+        args.role,
+        args.action,
+        args.dir,
+    )
+    motion_references = select_motion_references(
+        manifest,
+        args.role,
+        args.action,
+        args.dir,
+    )
+    out = args.out_dir or (WORK_ORDER_DIR / key.replace("/", "-"))
     out.mkdir(parents=True, exist_ok=True)
-    current = crop_row(args.role, args.action, args.dir)
+    current = motion_references[0]["image"]
     current_path = out / "current-row.png"
     current.save(current_path)
     current.resize((current.width * 4, current.height * 4), Image.Resampling.NEAREST).save(out / "current-row-x4.png")
-    make_contact(args.role, args.action, args.dir, out / "reference-contact.png")
+    legacy_contact = out / "reference-contact.png"
+    if legacy_contact.exists():
+        legacy_contact.unlink()
+    make_contact(
+        identity_references,
+        out / "identity-reference-contact.png",
+        heading="IDENTITY REFERENCE - AUTHORITATIVE",
+        guidance="Copy the common character identity only; these are warning-free, hash-verified LOCKED adjacent actions.",
+        role_field="identityRole",
+        primary_scale=4,
+        peer_scale=2,
+    )
+    make_contact(
+        motion_references,
+        out / "motion-reference-contact.png",
+        heading="MOTION REFERENCE - NOT AN IDENTITY AUTHORITY",
+        guidance="Use only for target-action pose/cadence; BASE or CANDIDATE rows may depict the wrong costume or equipment.",
+        role_field="motionRole",
+        primary_scale=4,
+        peer_scale=2,
+    )
     report = add_direction_comparison(analyze_row(current_path, args.action), args.role, args.action, args.dir)
     (out / "current-quality.json").write_text(json.dumps(report, indent=2) + "\n")
 
+    identity_keys = ", ".join(reference["key"] for reference in identity_references)
+    motion_statuses = ", ".join(
+        f"{reference['key']} [{reference['status']}]"
+        for reference in motion_references
+    )
     prompt = f"""Use case: stylized-concept
 Asset type: Realm game actor animation source
 Primary request: Create exactly eight animation poses for {args.role} performing {args.action}, facing {args.dir}.
-Input images: Reference contact sheet defines the exact character identity, body scale, palette, painted pixel-cluster style, and direction.
+Input image 1 — IDENTITY AUTHORITY: identity-reference-contact.png contains only warning-free, hash-verified LOCKED rows for the same {args.role} facing {args.dir}: {identity_keys}. Copy their common character identity, costume, face/headgear, body proportions, palette, body scale, and painted pixel-cluster style. The PRIMARY row is the first choice; SUPPORTING rows confirm continuity. Do not copy their action-specific pose or prop.
+Input image 2 — MOTION EVIDENCE ONLY: motion-reference-contact.png shows the {args.action} target and direction peers: {motion_statuses}. Use it only to understand {args.action} pose, cadence, direction, and tool travel. BASE and CANDIDATE rows are untrusted for identity and may contain obsolete, semantically wrong costume, armour, equipment, palette, or legacy art. When the two contacts conflict, identity-reference-contact.png always wins for character identity.
 Scene/backdrop: perfectly flat solid #ff00ff chroma-key background.
 Subject: the same {args.role} in every frame, with identical costume, face, body proportions, and approximate body height.
 Style/medium: compact painterly pixel-art game sprite, crisp clustered pixels, no smooth concept-art rendering.
@@ -235,15 +460,35 @@ Output intent: the result will be segmented and packed into eight exact 64x84 tr
 """
     (out / "prompt.txt").write_text(prompt)
     spec = {
-        "version": 1,
+        "version": 2,
         "key": key,
         "role": args.role,
         "action": args.action,
         "dir": args.dir,
         "expectedPackedSize": [FRAME_W * FRAMES, FRAME_H],
         "chromaKey": "#ff00ff",
-        "reference": "reference-contact.png",
+        "references": {
+            "identity": {
+                "file": "identity-reference-contact.png",
+                "authority": "character-identity",
+                "policy": "warning-free hash-matched LOCKED adjacent actions only",
+                "rows": [
+                    _reference_metadata(reference)
+                    for reference in identity_references
+                ],
+            },
+            "motion": {
+                "file": "motion-reference-contact.png",
+                "authority": "target-action-motion-only",
+                "warning": "BASE and CANDIDATE rows must not define character identity",
+                "rows": [
+                    _reference_metadata(reference)
+                    for reference in motion_references
+                ],
+            },
+        },
         "currentRow": "current-row.png",
+        "currentSource": _reference_metadata(motion_references[0]),
         "qualityBefore": report,
     }
     (out / "spec.json").write_text(json.dumps(spec, indent=2) + "\n")
@@ -266,7 +511,7 @@ def derive_row(args: argparse.Namespace) -> None:
             raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
     manifest = load_manifest()
     source_item = manifest["rows"].get(row_key(source_role, source_action, source_dir))
-    if source_item and source_item.get("status") in ("accepted", "accepted-with-waiver"):
+    if source_item and source_item.get("status") == "accepted":
         source_image = Image.open(ROW_DIR / source_item["file"]).convert("RGBA")
     else:
         # No accepted override for the source row: fall back to the compiled
@@ -431,7 +676,7 @@ def headswap_row(args: argparse.Namespace) -> None:
     # the role identity color.
     manifest = load_manifest()
     body_item = manifest["rows"].get(row_key("settler", args.action, args.dir))
-    if not body_item or body_item.get("status") not in ("accepted", "accepted-with-waiver"):
+    if not body_item or body_item.get("status") != "accepted":
         raise SystemExit(f"settler/{args.action}/{args.dir} is not an accepted override")
     body_row = derive_role_row(Image.open(ROW_DIR / body_item["file"]).convert("RGBA"), cloth)
 
@@ -696,10 +941,17 @@ def stabilize_row(args: argparse.Namespace) -> None:
         factor = max(0.82, min(1.22, median_h / max(1, stats["body"]["h"])))
         anchor_y = stats["body"]["maxY"]
         anchor_x = stats["body"]["cx"]
-        scaled = frame.resize(
-            (max(1, round(FRAME_W * factor)), max(1, round(FRAME_H * factor))),
-            Image.Resampling.LANCZOS,
-        )
+        # Preserve native pixel clusters for ordinary one-pixel pose
+        # variation.  Resampling such a small correction softens the sprite
+        # and can expose low-alpha chroma pixels around painted edges.
+        if abs(factor - 1) < 0.015:
+            factor = 1
+            scaled = frame
+        else:
+            scaled = frame.resize(
+                (max(1, round(FRAME_W * factor)), max(1, round(FRAME_H * factor))),
+                Image.Resampling.LANCZOS,
+            )
         offset_x = round(anchor_x - anchor_x * factor)
         offset_y = round(anchor_y - anchor_y * factor)
         if args.align_x:
@@ -763,13 +1015,11 @@ def accept_row(args: argparse.Namespace) -> None:
     report = add_direction_comparison(analyze_row(source, args.action), args.role, args.action, args.dir)
     if report["errors"]:
         raise SystemExit(f"row has errors: {', '.join(report['errors'])}")
-    allowed = sorted(set(args.allow_warning or []))
-    unapproved = [warning for warning in report["warnings"] if warning not in allowed]
-    if unapproved:
+    if report["warnings"]:
         raise SystemExit(
-            "row has unapproved warnings: "
-            + ", ".join(unapproved)
-            + "; pass --allow-warning for deliberate exceptions"
+            "row has warnings and cannot be accepted: "
+            + ", ".join(report["warnings"])
+            + "; stage it as a candidate and repair the row"
         )
 
     destination = row_file(args.role, args.action, args.dir)
@@ -787,7 +1037,7 @@ def accept_row(args: argparse.Namespace) -> None:
 
     manifest = load_manifest()
     key = row_key(args.role, args.action, args.dir)
-    status = "accepted-with-waiver" if copied_report["warnings"] else "accepted"
+    status = "accepted"
     manifest["rows"][key] = {
         "status": status,
         "file": str(destination.relative_to(ROW_DIR)),
@@ -795,7 +1045,6 @@ def accept_row(args: argparse.Namespace) -> None:
         "provenance": args.provenance,
         "note": args.note or "",
         "acceptedAt": now_iso(),
-        "allowedWarnings": allowed,
         "quality": {
             key: copied_report[key]
             for key in (
@@ -836,7 +1085,6 @@ def stage_row(args: argparse.Namespace) -> None:
         "provenance": args.provenance,
         "note": args.note or "",
         "stagedAt": now_iso(),
-        "allowedWarnings": [],
         "quality": {
             key: report[key]
             for key in (
@@ -872,7 +1120,10 @@ def verify_manifest(_args: argparse.Namespace) -> None:
         path = ROW_DIR / item.get("file", "")
         if item.get("file"):
             declared_files.add(path.resolve())
-        if item.get("status") not in ("accepted", "accepted-with-waiver"):
+        if item.get("status") not in ("candidate", "accepted"):
+            failures.append(f"{key}: unsupported status {item.get('status')!r}")
+            continue
+        if item.get("status") != "accepted":
             continue
         accepted += 1
         try:
@@ -890,10 +1141,8 @@ def verify_manifest(_args: argparse.Namespace) -> None:
         report = add_direction_comparison(analyze_row(path, action), role, action, direction)
         if report["errors"]:
             failures.append(f"{key}: {', '.join(report['errors'])}")
-        allowed = set(item.get("allowedWarnings", []))
-        unapproved = [warning for warning in report["warnings"] if warning not in allowed]
-        if unapproved:
-            failures.append(f"{key}: unapproved warnings {', '.join(unapproved)}")
+        if report["warnings"]:
+            failures.append(f"{key}: warnings {', '.join(report['warnings'])}")
 
     actual_files = {
         path.resolve()
@@ -914,7 +1163,7 @@ def show_status(_args: argparse.Namespace) -> None:
     accepted = {
         key: value
         for key, value in manifest["rows"].items()
-        if value.get("status") in ("accepted", "accepted-with-waiver")
+        if value.get("status") == "accepted"
     }
     print(f"accepted overrides: {len(accepted)} / {len(ROLES) * len(ACTIONS) * len(DIRS)}")
     for key, item in sorted(accepted.items()):
@@ -936,8 +1185,21 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
 
-    create_work_order = sub.add_parser("work-order")
+    create_work_order = sub.add_parser(
+        "work-order",
+        help="write separate trusted identity and target-action motion references",
+        description=(
+            "Create a repaint work order. Identity comes only from warning-free, "
+            "hash-matched LOCKED adjacent actions for the same role/direction; "
+            "BASE and CANDIDATE target-action rows are motion evidence only."
+        ),
+    )
     target_args(create_work_order)
+    create_work_order.add_argument(
+        "--out-dir",
+        type=Path,
+        help="write the work order here instead of tmp/sprite-work-orders/<role>-<action>-<dir>",
+    )
     create_work_order.set_defaults(func=work_order)
 
     derive = sub.add_parser("derive")
@@ -1011,7 +1273,6 @@ def main() -> None:
     accept.add_argument("--input", required=True, type=Path)
     accept.add_argument("--provenance", required=True)
     accept.add_argument("--note")
-    accept.add_argument("--allow-warning", action="append", default=[])
     accept.set_defaults(func=accept_row)
 
     stage = sub.add_parser("stage")
@@ -1025,7 +1286,6 @@ def main() -> None:
     target_args(extract)
     extract.add_argument("--provenance", required=True)
     extract.add_argument("--note")
-    extract.add_argument("--allow-warning", action="append", default=[])
     extract.set_defaults(func=extract_row)
 
     verify = sub.add_parser("verify")

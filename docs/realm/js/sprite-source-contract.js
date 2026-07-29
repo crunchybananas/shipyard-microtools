@@ -1,10 +1,7 @@
-// Canonical motion-sprite source contract.
-//
-// Editable motion sprites are split by sprite type:
-//   - one actor role per PNG in assets/sprites/actors/
-//   - one ambient prop per PNG in assets/sprites/ambient/
-//
-// actors-atlas.png and ambient-atlas.png are compiled runtime artifacts only.
+// Canonical motion-sprite source contract shared by the live renderer, Sprite
+// Lab/Muster, and Node atlas tooling. Because browser code executes this file,
+// it belongs to the versioned runtime graph rather than a queryless scripts/
+// side path.
 
 export const FRAME_W = 64;
 export const FRAME_H = 84;
@@ -18,7 +15,7 @@ export const ROLES = [
   'scholar', 'forager',
 ];
 
-export const AMBIENT = ['cart', 'fishboat', 'sailboat', 'cargo'];
+export const AMBIENT = ['cart', 'fishboat', 'sailboat', 'cargo', 'deer', 'cow', 'chicken'];
 
 export const ACTOR_BASE_DIRNAME = 'actors';
 export const ACTOR_ROW_DIRNAME = 'actor-rows';
@@ -33,10 +30,6 @@ export const AMBIENT_SHEET_W = 48;
 export const AMBIENT_SHEET_H = 48;
 export const AMBIENT_ATLAS_W = AMBIENT_SHEET_W * AMBIENT.length;
 export const AMBIENT_ATLAS_H = AMBIENT_SHEET_H;
-
-export function actorRowIndex(action, dir) {
-  return ACTIONS.indexOf(action) * DIRS.length + DIRS.indexOf(dir);
-}
 
 export function actorRowKey(role, action, dir) {
   return `${role}/${action}/${dir}`;

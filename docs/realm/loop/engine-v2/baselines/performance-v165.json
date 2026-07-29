@@ -1,0 +1,4229 @@
+{
+  "schema": "realm.engine-v2.phase1a-performance-evidence",
+  "schemaVersion": 2,
+  "moduleRevision": 165,
+  "baselineRevision": 163,
+  "capturedAt": "2026-07-19T02:12:03.200Z",
+  "pass": true,
+  "host": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpuModel": "Apple M4",
+    "logicalCpuCount": 10,
+    "node": "v22.22.0"
+  },
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+    "hardwareConcurrency": 10,
+    "deviceMemory": 16,
+    "devicePixelRatio": 1,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "configuration": {
+    "trials": 5,
+    "independentBrowserContexts": true,
+    "sharedBrowserProcess": true,
+    "coreWarmupTicks": 1800,
+    "coreBatchTicks": 120,
+    "coreBatchSamples": 20,
+    "steadyRenderSamples": 120,
+    "particleRenderSamples": 60,
+    "drawCountSamples": 8,
+    "saveSamples": 5,
+    "rafSamples": 120,
+    "snapshotActorCounts": [
+      100,
+      250
+    ],
+    "snapshotWarmupSamples": 5,
+    "snapshotSamples": 30
+  },
+  "budgets": {
+    "maximumRegressionRatio": 1.05,
+    "maximumRegressionPercent": 5.000000000000004,
+    "realm163CoreMicrosecondsPerTickMedian": 182.49999980131784,
+    "realm163RenderSteadyMsMedian": 36.19999998807907,
+    "realm163RetainedHeapDeltaBytes": 2642932,
+    "realm163ActorAtlasDrawsPerFrame": 81,
+    "maximumSaveBytes": 1048576,
+    "maximumSnapshotCacheBytesPerActor": 16384,
+    "maximumReleasedStressHeapBytes": 1048576
+  },
+  "fixture": {
+    "sha256": "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+    "trialSignatures": [
+      "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+      "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+      "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+      "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+      "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97"
+    ],
+    "scenario": {
+      "placed": [
+        {
+          "type": "house",
+          "x": 40,
+          "y": 40
+        },
+        {
+          "type": "house",
+          "x": 40,
+          "y": 39
+        },
+        {
+          "type": "house",
+          "x": 39,
+          "y": 40
+        },
+        {
+          "type": "house",
+          "x": 41,
+          "y": 40
+        },
+        {
+          "type": "house",
+          "x": 40,
+          "y": 41
+        },
+        {
+          "type": "house",
+          "x": 40,
+          "y": 38
+        },
+        {
+          "type": "house",
+          "x": 39,
+          "y": 39
+        },
+        {
+          "type": "house",
+          "x": 41,
+          "y": 39
+        },
+        {
+          "type": "house",
+          "x": 38,
+          "y": 40
+        },
+        {
+          "type": "house",
+          "x": 42,
+          "y": 40
+        },
+        {
+          "type": "house",
+          "x": 39,
+          "y": 41
+        },
+        {
+          "type": "house",
+          "x": 41,
+          "y": 41
+        },
+        {
+          "type": "house",
+          "x": 40,
+          "y": 42
+        },
+        {
+          "type": "house",
+          "x": 40,
+          "y": 37
+        },
+        {
+          "type": "house",
+          "x": 39,
+          "y": 38
+        },
+        {
+          "type": "farm",
+          "x": 41,
+          "y": 38
+        },
+        {
+          "type": "farm",
+          "x": 38,
+          "y": 39
+        },
+        {
+          "type": "farm",
+          "x": 42,
+          "y": 39
+        },
+        {
+          "type": "farm",
+          "x": 37,
+          "y": 40
+        },
+        {
+          "type": "lumber",
+          "x": 35,
+          "y": 40
+        },
+        {
+          "type": "lumber",
+          "x": 40,
+          "y": 33
+        },
+        {
+          "type": "lumber",
+          "x": 35,
+          "y": 38
+        },
+        {
+          "type": "quarry",
+          "x": 35,
+          "y": 39
+        },
+        {
+          "type": "quarry",
+          "x": 34,
+          "y": 40
+        },
+        {
+          "type": "quarry",
+          "x": 35,
+          "y": 41
+        },
+        {
+          "type": "mine",
+          "x": 42,
+          "y": 46
+        },
+        {
+          "type": "mine",
+          "x": 39,
+          "y": 32
+        },
+        {
+          "type": "storehouse",
+          "x": 43,
+          "y": 40
+        },
+        {
+          "type": "storehouse",
+          "x": 38,
+          "y": 41
+        },
+        {
+          "type": "granary",
+          "x": 42,
+          "y": 41
+        },
+        {
+          "type": "granary",
+          "x": 39,
+          "y": 42
+        },
+        {
+          "type": "market",
+          "x": 41,
+          "y": 42
+        },
+        {
+          "type": "market",
+          "x": 40,
+          "y": 43
+        },
+        {
+          "type": "tavern",
+          "x": 40,
+          "y": 36
+        },
+        {
+          "type": "tavern",
+          "x": 39,
+          "y": 37
+        },
+        {
+          "type": "school",
+          "x": 41,
+          "y": 37
+        },
+        {
+          "type": "school",
+          "x": 38,
+          "y": 38
+        },
+        {
+          "type": "blacksmith",
+          "x": 42,
+          "y": 38
+        },
+        {
+          "type": "blacksmith",
+          "x": 37,
+          "y": 39
+        },
+        {
+          "type": "barracks",
+          "x": 43,
+          "y": 39
+        },
+        {
+          "type": "archery",
+          "x": 36,
+          "y": 40
+        },
+        {
+          "type": "church",
+          "x": 37,
+          "y": 41
+        },
+        {
+          "type": "well",
+          "x": 43,
+          "y": 41
+        },
+        {
+          "type": "windmill",
+          "x": 38,
+          "y": 42
+        },
+        {
+          "type": "bakery",
+          "x": 42,
+          "y": 42
+        }
+      ],
+      "population": 63,
+      "buildings": 45,
+      "camera": {
+        "x": -5.688888888888869,
+        "y": 1262.2222222222222,
+        "zoom": 0.900465934220381
+      }
+    },
+    "finalState": {
+      "gameTick": 4200,
+      "day": 2,
+      "population": 67,
+      "buildings": 45,
+      "citizens": 67,
+      "soldiers": 7,
+      "enemies": 0,
+      "walkers": 6,
+      "caravans": 0,
+      "particles": 1135,
+      "activePaths": 9
+    }
+  },
+  "aggregate": {
+    "coreMicrosecondsPerTick": {
+      "samples": 5,
+      "min": 136.66666646798453,
+      "median": 160.83333293596903,
+      "p95": 161.66666646798453,
+      "max": 172.49999940395355,
+      "mean": 154.33333297570547
+    },
+    "renderSteadyMs": {
+      "samples": 5,
+      "min": 30.399999976158142,
+      "median": 36.59999990463257,
+      "p95": 36.60000002384186,
+      "max": 41.40000009536743,
+      "mean": 35.77999999523163
+    },
+    "renderParticleStressMs": {
+      "samples": 5,
+      "min": 33.5,
+      "median": 38.89999997615814,
+      "p95": 40.299999952316284,
+      "max": 40.39999997615814,
+      "mean": 37.679999995231626
+    },
+    "actorAtlasDrawsPerFullFrame": {
+      "samples": 5,
+      "min": 81,
+      "median": 81,
+      "p95": 81,
+      "max": 81,
+      "mean": 81
+    },
+    "actorAtlasDrawsPerCitizenOnlyFrame": {
+      "samples": 5,
+      "min": 67,
+      "median": 67,
+      "p95": 67,
+      "max": 67,
+      "mean": 67
+    },
+    "totalDrawImagesPerFullFrame": {
+      "samples": 5,
+      "min": 2479,
+      "median": 2479,
+      "p95": 2479,
+      "max": 2479,
+      "mean": 2479
+    },
+    "saveSerializeMs": {
+      "samples": 5,
+      "min": 10.899999976158142,
+      "median": 13.699999928474426,
+      "p95": 14.5,
+      "max": 15.5,
+      "mean": 13.539999985694886
+    },
+    "saveBytes": {
+      "samples": 5,
+      "min": 263105,
+      "median": 263105,
+      "p95": 263105,
+      "max": 263105,
+      "mean": 263105
+    },
+    "rafIntervalMs": {
+      "samples": 5,
+      "min": 33.30000000000109,
+      "median": 33.399999999999636,
+      "p95": 33.400000000001455,
+      "max": 49.900000000001455,
+      "mean": 36.68000000000065
+    },
+    "retainedHeapDeltaBytes": {
+      "samples": 5,
+      "min": 1920860,
+      "median": 1992032,
+      "p95": 2348820,
+      "max": 2377268,
+      "mean": 2122564
+    },
+    "gcAfterSetupMs": {
+      "samples": 5,
+      "min": 104.11912500001199,
+      "median": 113.35458400000016,
+      "p95": 119.9429170000003,
+      "max": 128.82279200000266,
+      "mean": 115.37588360000291
+    },
+    "gcAfterWorkloadMs": {
+      "samples": 5,
+      "min": 75.9874589999963,
+      "median": 79.21595800000068,
+      "p95": 85.61074999999983,
+      "max": 91.17604199999914,
+      "mean": 82.23471679999784
+    },
+    "snapshotCacheProbes": {
+      "100": {
+        "buildMsMedianAcrossTrials": {
+          "samples": 5,
+          "min": 0.19999992847442627,
+          "median": 0.19999992847442627,
+          "p95": 0.20000004768371582,
+          "max": 0.20000004768371582,
+          "mean": 0.19999997615814208
+        },
+        "buildMicrosecondsPerActorMedianAcrossTrials": {
+          "samples": 5,
+          "min": 1.9999992847442627,
+          "median": 1.9999992847442627,
+          "p95": 2.000000476837158,
+          "max": 2.000000476837158,
+          "mean": 1.999999761581421
+        },
+        "retainedHeapDeltaBytes": {
+          "samples": 5,
+          "min": 41268,
+          "median": 41664,
+          "p95": 42060,
+          "max": 42152,
+          "mean": 41720.8
+        },
+        "retainedBytesPerActor": {
+          "samples": 5,
+          "min": 412.68,
+          "median": 416.64,
+          "p95": 420.6,
+          "max": 421.52,
+          "mean": 417.20799999999997
+        },
+        "releasedHeapDeltaBytes": {
+          "samples": 5,
+          "min": -41196,
+          "median": -40800,
+          "p95": -40404,
+          "max": -40312,
+          "mean": -40743.2
+        }
+      },
+      "250": {
+        "buildMsMedianAcrossTrials": {
+          "samples": 5,
+          "min": 0.5,
+          "median": 0.5,
+          "p95": 0.6000000238418579,
+          "max": 0.6000000238418579,
+          "mean": 0.5400000095367432
+        },
+        "buildMicrosecondsPerActorMedianAcrossTrials": {
+          "samples": 5,
+          "min": 2,
+          "median": 2,
+          "p95": 2.4000000953674316,
+          "max": 2.4000000953674316,
+          "mean": 2.160000038146973
+        },
+        "retainedHeapDeltaBytes": {
+          "samples": 5,
+          "min": 152548,
+          "median": 152548,
+          "p95": 152548,
+          "max": 152548,
+          "mean": 152548
+        },
+        "retainedBytesPerActor": {
+          "samples": 5,
+          "min": 610.192,
+          "median": 610.192,
+          "p95": 610.192,
+          "max": 610.192,
+          "mean": 610.192
+        },
+        "releasedHeapDeltaBytes": {
+          "samples": 5,
+          "min": 2792,
+          "median": 2792,
+          "p95": 2792,
+          "max": 2792,
+          "mean": 2792
+        }
+      }
+    }
+  },
+  "gates": [
+    {
+      "id": "repeated-same-host-trials",
+      "description": "At least 5 independent trials share the realm-163 host/browser fingerprint.",
+      "pass": true,
+      "trials": 5,
+      "requiredTrials": 5,
+      "baselineFingerprint": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0",
+        "chromium": "147.0.7727.15",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "currentFingerprint": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0",
+        "chromium": "147.0.7727.15",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "id": "reference-town-fixture",
+      "description": "Every trial reproduces the exact realm-163 reference-town setup and final actor counts.",
+      "pass": true,
+      "observedSha256": "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+      "baselineSha256": "297f7973bd557c7189d525861a15f18b9b26d40a2d1d67028b4e3850cdf14c97",
+      "deterministicDiagnostics": {
+        "baseline": {
+          "particles": 1153,
+          "activePaths": 11
+        },
+        "trials": [
+          {
+            "particles": 1135,
+            "activePaths": 9
+          },
+          {
+            "particles": 1135,
+            "activePaths": 9
+          },
+          {
+            "particles": 1135,
+            "activePaths": 9
+          },
+          {
+            "particles": 1135,
+            "activePaths": 9
+          },
+          {
+            "particles": 1135,
+            "activePaths": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "core-plus-five-percent",
+      "description": "Median-of-trial core cost is no more than +5% over realm 163.",
+      "pass": true,
+      "observed": 160.83333293596903,
+      "baseline": 182.49999980131784,
+      "limit": 191.62499979138374,
+      "ratio": 0.8812785375948676,
+      "percentChange": -11.872146240513237
+    },
+    {
+      "id": "steady-render-plus-five-percent",
+      "description": "Median-of-trial steady render cost is no more than +5% over realm 163.",
+      "pass": true,
+      "observed": 36.59999990463257,
+      "baseline": 36.19999998807907,
+      "limit": 38.00999998748303,
+      "ratio": 1.0110497214553928,
+      "percentChange": 1.1049721455392847
+    },
+    {
+      "id": "retained-heap-plus-five-percent",
+      "description": "Median post-GC reference-town retained-heap delta is no more than +5% over realm 163.",
+      "pass": true,
+      "observed": 1992032,
+      "baseline": 2642932,
+      "limit": 2775078.6,
+      "ratio": 0.7537204892142515,
+      "percentChange": -24.62795107857485
+    },
+    {
+      "id": "flattened-actor-draw-count",
+      "description": "The reference town does not exceed realm 163 actor-atlas draws, and each citizen remains one flattened draw.",
+      "pass": true,
+      "observedFullFrameMaximum": 81,
+      "baselineFullFrameBudget": 81,
+      "observedCitizenOnlyMaximum": 67,
+      "expectedCitizenOnly": 67,
+      "baselineDerivation": "citizens + soldiers + walkers + caravans + enemies + founder"
+    },
+    {
+      "id": "actual-render-cache-bound",
+      "description": "The real renderer cache stays unique, actor-ID keyed, and bounded by live citizens.",
+      "pass": true,
+      "trials": [
+        {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        }
+      ]
+    },
+    {
+      "id": "snapshot-cache-100",
+      "description": "100-actor snapshots are immutable/reference-free; cache prune/reset and retained-heap bounds pass.",
+      "pass": true,
+      "actorCount": 100,
+      "retainedBytesPerActorMaximum": 421.52,
+      "retainedBytesPerActorBudget": 16384,
+      "releasedHeapDeltaMaximum": -40312,
+      "releasedHeapDeltaBudget": 1048576
+    },
+    {
+      "id": "snapshot-cache-250",
+      "description": "250-actor snapshots are immutable/reference-free; cache prune/reset and retained-heap bounds pass.",
+      "pass": true,
+      "actorCount": 250,
+      "retainedBytesPerActorMaximum": 610.192,
+      "retainedBytesPerActorBudget": 16384,
+      "releasedHeapDeltaMaximum": 2792,
+      "releasedHeapDeltaBudget": 1048576
+    },
+    {
+      "id": "save-comfort-limit",
+      "description": "Every representative current-schema save remains below 1 MiB.",
+      "pass": true,
+      "observedMaximum": 263105,
+      "limit": 1048576
+    }
+  ],
+  "trials": [
+    {
+      "index": 1,
+      "host": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0"
+      },
+      "browser": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "setup": {
+        "placed": [
+          {
+            "type": "house",
+            "x": 40,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 38
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 38,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 42,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 42
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 37
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 41,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 38,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 42,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 37,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 40,
+            "y": 33
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 38
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 39
+          },
+          {
+            "type": "quarry",
+            "x": 34,
+            "y": 40
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 41
+          },
+          {
+            "type": "mine",
+            "x": 42,
+            "y": 46
+          },
+          {
+            "type": "mine",
+            "x": 39,
+            "y": 32
+          },
+          {
+            "type": "storehouse",
+            "x": 43,
+            "y": 40
+          },
+          {
+            "type": "storehouse",
+            "x": 38,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 42,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 39,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 41,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 40,
+            "y": 43
+          },
+          {
+            "type": "tavern",
+            "x": 40,
+            "y": 36
+          },
+          {
+            "type": "tavern",
+            "x": 39,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 41,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 38,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 42,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 37,
+            "y": 39
+          },
+          {
+            "type": "barracks",
+            "x": 43,
+            "y": 39
+          },
+          {
+            "type": "archery",
+            "x": 36,
+            "y": 40
+          },
+          {
+            "type": "church",
+            "x": 37,
+            "y": 41
+          },
+          {
+            "type": "well",
+            "x": 43,
+            "y": 41
+          },
+          {
+            "type": "windmill",
+            "x": 38,
+            "y": 42
+          },
+          {
+            "type": "bakery",
+            "x": 42,
+            "y": 42
+          }
+        ],
+        "population": 63,
+        "buildings": 45,
+        "camera": {
+          "x": -5.688888888888869,
+          "y": 1262.2222222222222,
+          "zoom": 0.900465934220381
+        }
+      },
+      "finalState": {
+        "gameTick": 4200,
+        "day": 2,
+        "population": 67,
+        "buildings": 45,
+        "citizens": 67,
+        "soldiers": 7,
+        "enemies": 0,
+        "walkers": 6,
+        "caravans": 0,
+        "particles": 1135,
+        "activePaths": 9
+      },
+      "measurements": {
+        "coreBatchMs": {
+          "batchTicks": 120,
+          "samples": 20,
+          "min": 15.800000071525574,
+          "median": 19.299999952316284,
+          "p95": 26.899999976158142,
+          "max": 58.5,
+          "mean": 22.18000000119209
+        },
+        "coreMicrosecondsPerTick": {
+          "samples": 20,
+          "min": 131.6666672627131,
+          "median": 160.83333293596903,
+          "p95": 224.16666646798453,
+          "max": 487.5,
+          "mean": 184.83333334326747
+        },
+        "renderSteadyMs": {
+          "samples": 120,
+          "min": 33.799999952316284,
+          "median": 36.59999990463257,
+          "p95": 39.5,
+          "max": 41.60000002384186,
+          "mean": 36.6375
+        },
+        "renderPassMs": {
+          "skyCamera": {
+            "samples": 120,
+            "min": 0.09999990463256836,
+            "median": 0.19999992847442627,
+            "p95": 0.20000004768371582,
+            "max": 0.7999999523162842,
+            "mean": 0.17166666785875956
+          },
+          "terrainFog": {
+            "samples": 120,
+            "min": 3.100000023841858,
+            "median": 3.6999999284744263,
+            "p95": 4.300000071525574,
+            "max": 6.099999904632568,
+            "mean": 3.7383333345254264
+          },
+          "entitiesWorld": {
+            "samples": 120,
+            "min": 30.40000009536743,
+            "median": 32.60000002384186,
+            "p95": 35.10000002384186,
+            "max": 37.5,
+            "mean": 32.63999999860923
+          },
+          "particles": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.0016666670640309651
+          },
+          "worldOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "mean": 0.0066666672627131145
+          },
+          "screenOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.10000002384185791,
+            "p95": 0.19999992847442627,
+            "max": 0.30000007152557373,
+            "mean": 0.07916666467984518
+          }
+        },
+        "renderParticleStressMs": {
+          "particles": 1135,
+          "samples": 60,
+          "min": 36.300000071525574,
+          "median": 38.89999997615814,
+          "p95": 42.799999952316284,
+          "max": 46.60000002384186,
+          "mean": 39.741666670640306
+        },
+        "renderParticleStressPassMs": {
+          "skyCamera": {
+            "samples": 60,
+            "min": 0.09999990463256836,
+            "median": 0.20000004768371582,
+            "p95": 0.3999999761581421,
+            "max": 0.5,
+            "mean": 0.2200000047683716
+          },
+          "terrainFog": {
+            "samples": 60,
+            "min": 3.200000047683716,
+            "median": 3.6999999284744263,
+            "p95": 5.399999976158142,
+            "max": 6.199999928474426,
+            "mean": 3.980000001192093
+          },
+          "entitiesWorld": {
+            "samples": 60,
+            "min": 28.300000071525574,
+            "median": 34.09999990463257,
+            "p95": 36.89999997615814,
+            "max": 39.60000002384186,
+            "mean": 34.394999998807904
+          },
+          "particles": {
+            "samples": 60,
+            "min": 0.7999999523162842,
+            "median": 1,
+            "p95": 1.6999999284744263,
+            "max": 3.3000000715255737,
+            "mean": 1.075
+          },
+          "worldOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0,
+            "p95": 0.09999990463256836,
+            "max": 0.10000002384185791,
+            "mean": 0.008333331346511841
+          },
+          "screenOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0.09999990463256836,
+            "p95": 0.10000002384185791,
+            "max": 0.20000004768371582,
+            "mean": 0.06333333452542624
+          }
+        },
+        "drawCounts": {
+          "fullFrame": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2479,
+              "median": 2479,
+              "p95": 2479,
+              "max": 2479,
+              "mean": 2479
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 81,
+              "median": 81,
+              "p95": 81,
+              "max": 81,
+              "mean": 81
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 81,
+                "median": 81,
+                "p95": 81,
+                "max": 81,
+                "mean": 81
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          },
+          "citizenOnly": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2465,
+              "median": 2465,
+              "p95": 2465,
+              "max": 2465,
+              "mean": 2465
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 67,
+              "median": 67,
+              "p95": 67,
+              "max": 67,
+              "mean": 67
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 67,
+                "median": 67,
+                "p95": 67,
+                "max": 67,
+                "mean": 67
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          }
+        },
+        "rafIntervalMs": {
+          "samples": 120,
+          "min": 32.30000000000109,
+          "median": 33.400000000001455,
+          "p95": 50.600000000000364,
+          "max": 366.8000000000011,
+          "mean": 45.27833333333333
+        },
+        "saveSerializeMs": {
+          "samples": 5,
+          "min": 12.200000047683716,
+          "median": 15.5,
+          "p95": 17.90000009536743,
+          "max": 27.100000023841858,
+          "mean": 17.0400000333786
+        },
+        "saveBytes": 263105,
+        "actualRenderCache": {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        "memory": {
+          "afterSetup": {
+            "label": "after-setup",
+            "gcCollectionMs": 113.35458400000016,
+            "jsHeapUsedBytes": 4285104,
+            "jsHeapTotalBytes": 6045696,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 4220,
+            "documents": 1,
+            "listeners": 142
+          },
+          "afterWorkload": {
+            "label": "after-workload",
+            "gcCollectionMs": 85.61074999999983,
+            "jsHeapUsedBytes": 6633924,
+            "jsHeapTotalBytes": 7880704,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 3959,
+            "documents": 1,
+            "listeners": 142
+          },
+          "retainedHeapDeltaBytes": 2348820
+        },
+        "snapshotCacheProbes": [
+          {
+            "actorCount": 100,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.09999990463256836,
+              "median": 0.20000004768371582,
+              "p95": 0.30000007152557373,
+              "max": 0.30000007152557373,
+              "mean": 0.20333333412806193
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 0.9999990463256836,
+              "median": 2.000000476837158,
+              "p95": 3.0000007152557373,
+              "max": 3.0000007152557373,
+              "mean": 2.033333341280619
+            },
+            "snapshotCount": 100,
+            "uniqueActorIds": 100,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 100,
+              "uniqueActorIds": 100,
+              "recordsDetached": true,
+              "afterPrune": 50,
+              "expectedAfterPrune": 50,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-100-before",
+                "gcCollectionMs": 6.134999999998399,
+                "jsHeapUsedBytes": 6147668,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-100-retained",
+                "gcCollectionMs": 5.061083000000508,
+                "jsHeapUsedBytes": 6189332,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-100-released",
+                "gcCollectionMs": 3.772084000000177,
+                "jsHeapUsedBytes": 6106868,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 41664,
+              "retainedBytesPerActor": 416.64,
+              "releasedDeltaBytes": -40800
+            }
+          },
+          {
+            "actorCount": 250,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.3999999761581421,
+              "median": 0.6000000238418579,
+              "p95": 0.7000000476837158,
+              "max": 0.8999999761581421,
+              "mean": 0.6
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 1.5999999046325684,
+              "median": 2.4000000953674316,
+              "p95": 2.8000001907348633,
+              "max": 3.5999999046325684,
+              "mean": 2.4
+            },
+            "snapshotCount": 250,
+            "uniqueActorIds": 250,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 250,
+              "uniqueActorIds": 250,
+              "recordsDetached": true,
+              "afterPrune": 125,
+              "expectedAfterPrune": 125,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-250-before",
+                "gcCollectionMs": 2.8137909999968542,
+                "jsHeapUsedBytes": 6106968,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-250-retained",
+                "gcCollectionMs": 4.138249999999971,
+                "jsHeapUsedBytes": 6259516,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-250-released",
+                "gcCollectionMs": 3.060541999999259,
+                "jsHeapUsedBytes": 6109760,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 152548,
+              "retainedBytesPerActor": 610.192,
+              "releasedDeltaBytes": 2792
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "host": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0"
+      },
+      "browser": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "setup": {
+        "placed": [
+          {
+            "type": "house",
+            "x": 40,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 38
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 38,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 42,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 42
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 37
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 41,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 38,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 42,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 37,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 40,
+            "y": 33
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 38
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 39
+          },
+          {
+            "type": "quarry",
+            "x": 34,
+            "y": 40
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 41
+          },
+          {
+            "type": "mine",
+            "x": 42,
+            "y": 46
+          },
+          {
+            "type": "mine",
+            "x": 39,
+            "y": 32
+          },
+          {
+            "type": "storehouse",
+            "x": 43,
+            "y": 40
+          },
+          {
+            "type": "storehouse",
+            "x": 38,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 42,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 39,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 41,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 40,
+            "y": 43
+          },
+          {
+            "type": "tavern",
+            "x": 40,
+            "y": 36
+          },
+          {
+            "type": "tavern",
+            "x": 39,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 41,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 38,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 42,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 37,
+            "y": 39
+          },
+          {
+            "type": "barracks",
+            "x": 43,
+            "y": 39
+          },
+          {
+            "type": "archery",
+            "x": 36,
+            "y": 40
+          },
+          {
+            "type": "church",
+            "x": 37,
+            "y": 41
+          },
+          {
+            "type": "well",
+            "x": 43,
+            "y": 41
+          },
+          {
+            "type": "windmill",
+            "x": 38,
+            "y": 42
+          },
+          {
+            "type": "bakery",
+            "x": 42,
+            "y": 42
+          }
+        ],
+        "population": 63,
+        "buildings": 45,
+        "camera": {
+          "x": -5.688888888888869,
+          "y": 1262.2222222222222,
+          "zoom": 0.9004788942203555
+        }
+      },
+      "finalState": {
+        "gameTick": 4200,
+        "day": 2,
+        "population": 67,
+        "buildings": 45,
+        "citizens": 67,
+        "soldiers": 7,
+        "enemies": 0,
+        "walkers": 6,
+        "caravans": 0,
+        "particles": 1135,
+        "activePaths": 9
+      },
+      "measurements": {
+        "coreBatchMs": {
+          "batchTicks": 120,
+          "samples": 20,
+          "min": 17.899999976158142,
+          "median": 20.699999928474426,
+          "p95": 29.09999990463257,
+          "max": 62.89999997615814,
+          "mean": 23.45
+        },
+        "coreMicrosecondsPerTick": {
+          "samples": 20,
+          "min": 149.16666646798453,
+          "median": 172.49999940395355,
+          "p95": 242.4999992052714,
+          "max": 524.1666664679846,
+          "mean": 195.41666666666666
+        },
+        "renderSteadyMs": {
+          "samples": 120,
+          "min": 37.299999952316284,
+          "median": 41.40000009536743,
+          "p95": 45.90000009536743,
+          "max": 52.60000002384186,
+          "mean": 41.9116666674614
+        },
+        "renderPassMs": {
+          "skyCamera": {
+            "samples": 120,
+            "min": 0.09999990463256836,
+            "median": 0.20000004768371582,
+            "p95": 0.30000007152557373,
+            "max": 0.5,
+            "mean": 0.2058333247900009
+          },
+          "terrainFog": {
+            "samples": 120,
+            "min": 3.399999976158142,
+            "median": 4.200000047683716,
+            "p95": 5.600000023841858,
+            "max": 7.299999952316284,
+            "mean": 4.342500008145968
+          },
+          "entitiesWorld": {
+            "samples": 120,
+            "min": 33.10000002384186,
+            "median": 36.799999952316284,
+            "p95": 40.5,
+            "max": 48.199999928474426,
+            "mean": 37.25333333214124
+          },
+          "particles": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.0016666670640309651
+          },
+          "worldOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "mean": 0.010000001390775044
+          },
+          "screenOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.10000002384185791,
+            "p95": 0.20000004768371582,
+            "max": 0.30000007152557373,
+            "mean": 0.09833333392937978
+          }
+        },
+        "renderParticleStressMs": {
+          "particles": 1135,
+          "samples": 60,
+          "min": 35.699999928474426,
+          "median": 40.39999997615814,
+          "p95": 43.39999997615814,
+          "max": 45.60000002384186,
+          "mean": 40.373333330949144
+        },
+        "renderParticleStressPassMs": {
+          "skyCamera": {
+            "samples": 60,
+            "min": 0.09999990463256836,
+            "median": 0.20000004768371582,
+            "p95": 0.3999999761581421,
+            "max": 1.600000023841858,
+            "mean": 0.2550000031789144
+          },
+          "terrainFog": {
+            "samples": 60,
+            "min": 3.299999952316284,
+            "median": 4,
+            "p95": 5.600000023841858,
+            "max": 6.600000023841858,
+            "mean": 4.224999990065893
+          },
+          "entitiesWorld": {
+            "samples": 60,
+            "min": 27.800000071525574,
+            "median": 34.60000002384186,
+            "p95": 37.299999952316284,
+            "max": 38.60000002384186,
+            "mean": 34.67333333492279
+          },
+          "particles": {
+            "samples": 60,
+            "min": 0.7999999523162842,
+            "median": 1.100000023841858,
+            "p95": 1.5,
+            "max": 1.7000000476837158,
+            "mean": 1.1366666734218598
+          },
+          "worldOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "mean": 0.008333333333333333
+          },
+          "screenOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0.09999990463256836,
+            "p95": 0.19999992847442627,
+            "max": 0.40000009536743164,
+            "mean": 0.07499999602635701
+          }
+        },
+        "drawCounts": {
+          "fullFrame": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2479,
+              "median": 2479,
+              "p95": 2479,
+              "max": 2479,
+              "mean": 2479
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 81,
+              "median": 81,
+              "p95": 81,
+              "max": 81,
+              "mean": 81
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 81,
+                "median": 81,
+                "p95": 81,
+                "max": 81,
+                "mean": 81
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          },
+          "citizenOnly": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2465,
+              "median": 2465,
+              "p95": 2465,
+              "max": 2465,
+              "mean": 2465
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 67,
+              "median": 67,
+              "p95": 67,
+              "max": 67,
+              "mean": 67
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 67,
+                "median": 67,
+                "p95": 67,
+                "max": 67,
+                "mean": 67
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          }
+        },
+        "rafIntervalMs": {
+          "samples": 120,
+          "min": 32.29999999999927,
+          "median": 49.900000000001455,
+          "p95": 50.19999999999891,
+          "max": 83.39999999999964,
+          "mean": 43.74916666666666
+        },
+        "saveSerializeMs": {
+          "samples": 5,
+          "min": 12.600000023841858,
+          "median": 13.100000023841858,
+          "p95": 17.5,
+          "max": 23.799999952316284,
+          "mean": 16.02000000476837
+        },
+        "saveBytes": 263105,
+        "actualRenderCache": {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        "memory": {
+          "afterSetup": {
+            "label": "after-setup",
+            "gcCollectionMs": 128.82279200000266,
+            "jsHeapUsedBytes": 4791636,
+            "jsHeapTotalBytes": 5783552,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 4220,
+            "documents": 1,
+            "listeners": 142
+          },
+          "afterWorkload": {
+            "label": "after-workload",
+            "gcCollectionMs": 91.17604199999914,
+            "jsHeapUsedBytes": 7168904,
+            "jsHeapTotalBytes": 8142848,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 3959,
+            "documents": 1,
+            "listeners": 142
+          },
+          "retainedHeapDeltaBytes": 2377268
+        },
+        "snapshotCacheProbes": [
+          {
+            "actorCount": 100,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.10000002384185791,
+              "median": 0.20000004768371582,
+              "p95": 0.3999999761581421,
+              "max": 0.3999999761581421,
+              "mean": 0.21666666666666667
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 1.000000238418579,
+              "median": 2.000000476837158,
+              "p95": 3.999999761581421,
+              "max": 3.999999761581421,
+              "mean": 2.1666666666666665
+            },
+            "snapshotCount": 100,
+            "uniqueActorIds": 100,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 100,
+              "uniqueActorIds": 100,
+              "recordsDetached": true,
+              "afterPrune": 50,
+              "expectedAfterPrune": 50,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-100-before",
+                "gcCollectionMs": 6.599167000000307,
+                "jsHeapUsedBytes": 6155148,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-100-retained",
+                "gcCollectionMs": 5.318374999995285,
+                "jsHeapUsedBytes": 6197208,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-100-released",
+                "gcCollectionMs": 3.9506249999976717,
+                "jsHeapUsedBytes": 6114744,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 42060,
+              "retainedBytesPerActor": 420.6,
+              "releasedDeltaBytes": -40404
+            }
+          },
+          {
+            "actorCount": 250,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.5,
+              "median": 0.6000000238418579,
+              "p95": 0.7000000476837158,
+              "max": 0.8000000715255737,
+              "mean": 0.6100000023841858
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 2,
+              "median": 2.4000000953674316,
+              "p95": 2.8000001907348633,
+              "max": 3.200000286102295,
+              "mean": 2.4400000095367433
+            },
+            "snapshotCount": 250,
+            "uniqueActorIds": 250,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 250,
+              "uniqueActorIds": 250,
+              "recordsDetached": true,
+              "afterPrune": 125,
+              "expectedAfterPrune": 125,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-250-before",
+                "gcCollectionMs": 3.9355409999989206,
+                "jsHeapUsedBytes": 6114844,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-250-retained",
+                "gcCollectionMs": 4.912417000006826,
+                "jsHeapUsedBytes": 6267392,
+                "jsHeapTotalBytes": 7356416,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-250-released",
+                "gcCollectionMs": 4.0662910000028205,
+                "jsHeapUsedBytes": 6117636,
+                "jsHeapTotalBytes": 7356416,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 152548,
+              "retainedBytesPerActor": 610.192,
+              "releasedDeltaBytes": 2792
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "host": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0"
+      },
+      "browser": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "setup": {
+        "placed": [
+          {
+            "type": "house",
+            "x": 40,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 38
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 38,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 42,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 42
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 37
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 41,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 38,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 42,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 37,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 40,
+            "y": 33
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 38
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 39
+          },
+          {
+            "type": "quarry",
+            "x": 34,
+            "y": 40
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 41
+          },
+          {
+            "type": "mine",
+            "x": 42,
+            "y": 46
+          },
+          {
+            "type": "mine",
+            "x": 39,
+            "y": 32
+          },
+          {
+            "type": "storehouse",
+            "x": 43,
+            "y": 40
+          },
+          {
+            "type": "storehouse",
+            "x": 38,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 42,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 39,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 41,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 40,
+            "y": 43
+          },
+          {
+            "type": "tavern",
+            "x": 40,
+            "y": 36
+          },
+          {
+            "type": "tavern",
+            "x": 39,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 41,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 38,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 42,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 37,
+            "y": 39
+          },
+          {
+            "type": "barracks",
+            "x": 43,
+            "y": 39
+          },
+          {
+            "type": "archery",
+            "x": 36,
+            "y": 40
+          },
+          {
+            "type": "church",
+            "x": 37,
+            "y": 41
+          },
+          {
+            "type": "well",
+            "x": 43,
+            "y": 41
+          },
+          {
+            "type": "windmill",
+            "x": 38,
+            "y": 42
+          },
+          {
+            "type": "bakery",
+            "x": 42,
+            "y": 42
+          }
+        ],
+        "population": 63,
+        "buildings": 45,
+        "camera": {
+          "x": -5.688888888888869,
+          "y": 1262.2222222222222,
+          "zoom": 0.9033730702205709
+        }
+      },
+      "finalState": {
+        "gameTick": 4200,
+        "day": 2,
+        "population": 67,
+        "buildings": 45,
+        "citizens": 67,
+        "soldiers": 7,
+        "enemies": 0,
+        "walkers": 6,
+        "caravans": 0,
+        "particles": 1135,
+        "activePaths": 9
+      },
+      "measurements": {
+        "coreBatchMs": {
+          "batchTicks": 120,
+          "samples": 20,
+          "min": 16.199999928474426,
+          "median": 19.399999976158142,
+          "p95": 31.100000023841858,
+          "max": 58.10000002384186,
+          "mean": 22.524999994039536
+        },
+        "coreMicrosecondsPerTick": {
+          "samples": 20,
+          "min": 134.99999940395355,
+          "median": 161.66666646798453,
+          "p95": 259.1666668653488,
+          "max": 484.1666668653488,
+          "mean": 187.7083332836628
+        },
+        "renderSteadyMs": {
+          "samples": 120,
+          "min": 32,
+          "median": 36.60000002384186,
+          "p95": 38.39999997615814,
+          "max": 53.200000047683716,
+          "mean": 36.50583333472411
+        },
+        "renderPassMs": {
+          "skyCamera": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.19999992847442627,
+            "p95": 0.30000007152557373,
+            "max": 0.40000009536743164,
+            "mean": 0.17166666984558104
+          },
+          "terrainFog": {
+            "samples": 120,
+            "min": 3.0999999046325684,
+            "median": 3.600000023841858,
+            "p95": 4.300000071525574,
+            "max": 6.100000023841858,
+            "mean": 3.6816666662693023
+          },
+          "entitiesWorld": {
+            "samples": 120,
+            "min": 28.59999990463257,
+            "median": 32.700000047683716,
+            "p95": 34.199999928474426,
+            "max": 47.800000071525574,
+            "mean": 32.5708333303531
+          },
+          "particles": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.0008333335320154826
+          },
+          "worldOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.0041666646798451746
+          },
+          "screenOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.10000002384185791,
+            "p95": 0.20000004768371582,
+            "max": 0.5,
+            "mean": 0.07666667004426321
+          }
+        },
+        "renderParticleStressMs": {
+          "particles": 1135,
+          "samples": 60,
+          "min": 34.5,
+          "median": 40.299999952316284,
+          "p95": 43.60000002384186,
+          "max": 46.200000047683716,
+          "mean": 40.62333333492279
+        },
+        "renderParticleStressPassMs": {
+          "skyCamera": {
+            "samples": 60,
+            "min": 0.09999990463256836,
+            "median": 0.20000004768371582,
+            "p95": 0.3999999761581421,
+            "max": 0.5,
+            "mean": 0.21499999562899272
+          },
+          "terrainFog": {
+            "samples": 60,
+            "min": 3.399999976158142,
+            "median": 3.899999976158142,
+            "p95": 5.399999976158142,
+            "max": 10.300000071525574,
+            "mean": 4.1883333365122475
+          },
+          "entitiesWorld": {
+            "samples": 60,
+            "min": 27.600000023841858,
+            "median": 35,
+            "p95": 36.5,
+            "max": 37.10000002384186,
+            "mean": 35.061666669448215
+          },
+          "particles": {
+            "samples": 60,
+            "min": 0.8000000715255737,
+            "median": 1,
+            "p95": 1.5,
+            "max": 1.600000023841858,
+            "mean": 1.0816666682561238
+          },
+          "worldOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.09999990463256836,
+            "mean": 0.0016666650772094727
+          },
+          "screenOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0.10000002384185791,
+            "p95": 0.10000002384185791,
+            "max": 0.2999999523162842,
+            "mean": 0.075
+          }
+        },
+        "drawCounts": {
+          "fullFrame": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2479,
+              "median": 2479,
+              "p95": 2479,
+              "max": 2479,
+              "mean": 2479
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 81,
+              "median": 81,
+              "p95": 81,
+              "max": 81,
+              "mean": 81
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 81,
+                "median": 81,
+                "p95": 81,
+                "max": 81,
+                "mean": 81
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          },
+          "citizenOnly": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2465,
+              "median": 2465,
+              "p95": 2465,
+              "max": 2465,
+              "mean": 2465
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 67,
+              "median": 67,
+              "p95": 67,
+              "max": 67,
+              "mean": 67
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 67,
+                "median": 67,
+                "p95": 67,
+                "max": 67,
+                "mean": 67
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          }
+        },
+        "rafIntervalMs": {
+          "samples": 120,
+          "min": 32.29999999999927,
+          "median": 33.399999999999636,
+          "p95": 50,
+          "max": 66.60000000000036,
+          "mean": 36.24916666666666
+        },
+        "saveSerializeMs": {
+          "samples": 5,
+          "min": 12.100000023841858,
+          "median": 13.699999928474426,
+          "p95": 16.5,
+          "max": 18.600000023841858,
+          "mean": 14.859999990463256
+        },
+        "saveBytes": 263105,
+        "actualRenderCache": {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        "memory": {
+          "afterSetup": {
+            "label": "after-setup",
+            "gcCollectionMs": 119.9429170000003,
+            "jsHeapUsedBytes": 4463560,
+            "jsHeapTotalBytes": 5521408,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 4220,
+            "documents": 1,
+            "listeners": 142
+          },
+          "afterWorkload": {
+            "label": "after-workload",
+            "gcCollectionMs": 79.21595800000068,
+            "jsHeapUsedBytes": 6455592,
+            "jsHeapTotalBytes": 7880704,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 3959,
+            "documents": 1,
+            "listeners": 142
+          },
+          "retainedHeapDeltaBytes": 1992032
+        },
+        "snapshotCacheProbes": [
+          {
+            "actorCount": 100,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.09999990463256836,
+              "median": 0.19999992847442627,
+              "p95": 0.2999999523162842,
+              "max": 0.30000007152557373,
+              "mean": 0.1799999992052714
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 0.9999990463256836,
+              "median": 1.9999992847442627,
+              "p95": 2.999999523162842,
+              "max": 3.0000007152557373,
+              "mean": 1.799999992052714
+            },
+            "snapshotCount": 100,
+            "uniqueActorIds": 100,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 100,
+              "uniqueActorIds": 100,
+              "recordsDetached": true,
+              "afterPrune": 50,
+              "expectedAfterPrune": 50,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-100-before",
+                "gcCollectionMs": 5.4788750000006985,
+                "jsHeapUsedBytes": 6158844,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-100-retained",
+                "gcCollectionMs": 4.446875000001455,
+                "jsHeapUsedBytes": 6200112,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-100-released",
+                "gcCollectionMs": 3.573500000005879,
+                "jsHeapUsedBytes": 6117648,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 41268,
+              "retainedBytesPerActor": 412.68,
+              "releasedDeltaBytes": -41196
+            }
+          },
+          {
+            "actorCount": 250,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.3999999761581421,
+              "median": 0.5,
+              "p95": 0.6999999284744263,
+              "max": 0.7000000476837158,
+              "mean": 0.5333333333333333
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 1.5999999046325684,
+              "median": 2,
+              "p95": 2.799999713897705,
+              "max": 2.8000001907348633,
+              "mean": 2.1333333333333333
+            },
+            "snapshotCount": 250,
+            "uniqueActorIds": 250,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 250,
+              "uniqueActorIds": 250,
+              "recordsDetached": true,
+              "afterPrune": 125,
+              "expectedAfterPrune": 125,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-250-before",
+                "gcCollectionMs": 2.7837089999957243,
+                "jsHeapUsedBytes": 6117748,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-250-retained",
+                "gcCollectionMs": 3.787624999997206,
+                "jsHeapUsedBytes": 6270296,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-250-released",
+                "gcCollectionMs": 2.7644579999978305,
+                "jsHeapUsedBytes": 6120540,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 152548,
+              "retainedBytesPerActor": 610.192,
+              "releasedDeltaBytes": 2792
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "host": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0"
+      },
+      "browser": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "setup": {
+        "placed": [
+          {
+            "type": "house",
+            "x": 40,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 38
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 38,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 42,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 42
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 37
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 41,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 38,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 42,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 37,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 40,
+            "y": 33
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 38
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 39
+          },
+          {
+            "type": "quarry",
+            "x": 34,
+            "y": 40
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 41
+          },
+          {
+            "type": "mine",
+            "x": 42,
+            "y": 46
+          },
+          {
+            "type": "mine",
+            "x": 39,
+            "y": 32
+          },
+          {
+            "type": "storehouse",
+            "x": 43,
+            "y": 40
+          },
+          {
+            "type": "storehouse",
+            "x": 38,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 42,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 39,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 41,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 40,
+            "y": 43
+          },
+          {
+            "type": "tavern",
+            "x": 40,
+            "y": 36
+          },
+          {
+            "type": "tavern",
+            "x": 39,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 41,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 38,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 42,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 37,
+            "y": 39
+          },
+          {
+            "type": "barracks",
+            "x": 43,
+            "y": 39
+          },
+          {
+            "type": "archery",
+            "x": 36,
+            "y": 40
+          },
+          {
+            "type": "church",
+            "x": 37,
+            "y": 41
+          },
+          {
+            "type": "well",
+            "x": 43,
+            "y": 41
+          },
+          {
+            "type": "windmill",
+            "x": 38,
+            "y": 42
+          },
+          {
+            "type": "bakery",
+            "x": 42,
+            "y": 42
+          }
+        ],
+        "population": 63,
+        "buildings": 45,
+        "camera": {
+          "x": -5.688888888888869,
+          "y": 1262.2222222222222,
+          "zoom": 0.9012460942242296
+        }
+      },
+      "finalState": {
+        "gameTick": 4200,
+        "day": 2,
+        "population": 67,
+        "buildings": 45,
+        "citizens": 67,
+        "soldiers": 7,
+        "enemies": 0,
+        "walkers": 6,
+        "caravans": 0,
+        "particles": 1135,
+        "activePaths": 9
+      },
+      "measurements": {
+        "coreBatchMs": {
+          "batchTicks": 120,
+          "samples": 20,
+          "min": 12.699999928474426,
+          "median": 16.799999952316284,
+          "p95": 22.799999952316284,
+          "max": 52,
+          "mean": 19.014999997615813
+        },
+        "coreMicrosecondsPerTick": {
+          "samples": 20,
+          "min": 105.83333273728688,
+          "median": 139.9999996026357,
+          "p95": 189.9999996026357,
+          "max": 433.3333333333333,
+          "mean": 158.45833331346515
+        },
+        "renderSteadyMs": {
+          "samples": 120,
+          "min": 31.799999952316284,
+          "median": 33.89999997615814,
+          "p95": 35.10000002384186,
+          "max": 38.10000002384186,
+          "mean": 33.881666667262714
+        },
+        "renderPassMs": {
+          "skyCamera": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.19999992847442627,
+            "p95": 0.20000004768371582,
+            "max": 0.30000007152557373,
+            "mean": 0.15249999662240346
+          },
+          "terrainFog": {
+            "samples": 120,
+            "min": 3.100000023841858,
+            "median": 3.399999976158142,
+            "p95": 4,
+            "max": 5.600000023841858,
+            "mean": 3.473333331942558
+          },
+          "entitiesWorld": {
+            "samples": 120,
+            "min": 28,
+            "median": 30.200000047683716,
+            "p95": 31.100000023841858,
+            "max": 33.700000047683716,
+            "mean": 30.148333336909612
+          },
+          "particles": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.0016666670640309651
+          },
+          "worldOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0.10000002384185791,
+            "max": 0.10000002384185791,
+            "mean": 0.00916666587193807
+          },
+          "screenOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.10000002384185791,
+            "p95": 0.20000004768371582,
+            "max": 0.6000000238418579,
+            "mean": 0.0966666688521703
+          }
+        },
+        "renderParticleStressMs": {
+          "particles": 1135,
+          "samples": 60,
+          "min": 32,
+          "median": 35.300000071525574,
+          "p95": 38.39999997615814,
+          "max": 40.10000002384186,
+          "mean": 35.64500000278155
+        },
+        "renderParticleStressPassMs": {
+          "skyCamera": {
+            "samples": 60,
+            "min": 0.09999990463256836,
+            "median": 0.20000004768371582,
+            "p95": 0.3999999761581421,
+            "max": 0.5,
+            "mean": 0.1983333428700765
+          },
+          "terrainFog": {
+            "samples": 60,
+            "min": 3,
+            "median": 3.399999976158142,
+            "p95": 4.600000023841858,
+            "max": 6.199999928474426,
+            "mean": 3.7466666599114737
+          },
+          "entitiesWorld": {
+            "samples": 60,
+            "min": 24.100000023841858,
+            "median": 30.600000023841858,
+            "p95": 32.700000047683716,
+            "max": 34.299999952316284,
+            "mean": 30.66333334048589
+          },
+          "particles": {
+            "samples": 60,
+            "min": 0.6999999284744263,
+            "median": 0.8999999761581421,
+            "p95": 1.3000000715255737,
+            "max": 1.399999976158142,
+            "mean": 0.973333328962326
+          },
+          "worldOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.003333332141240438
+          },
+          "screenOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0,
+            "p95": 0.20000004768371582,
+            "max": 0.5999999046325684,
+            "mean": 0.05999999841054281
+          }
+        },
+        "drawCounts": {
+          "fullFrame": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2479,
+              "median": 2479,
+              "p95": 2479,
+              "max": 2479,
+              "mean": 2479
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 81,
+              "median": 81,
+              "p95": 81,
+              "max": 81,
+              "mean": 81
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 81,
+                "median": 81,
+                "p95": 81,
+                "max": 81,
+                "mean": 81
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          },
+          "citizenOnly": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2465,
+              "median": 2465,
+              "p95": 2465,
+              "max": 2465,
+              "mean": 2465
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 67,
+              "median": 67,
+              "p95": 67,
+              "max": 67,
+              "mean": 67
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 67,
+                "median": 67,
+                "p95": 67,
+                "max": 67,
+                "mean": 67
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          }
+        },
+        "rafIntervalMs": {
+          "samples": 120,
+          "min": 16.700000000000728,
+          "median": 33.30000000000109,
+          "p95": 50.100000000000364,
+          "max": 67.60000000000036,
+          "mean": 36.805
+        },
+        "saveSerializeMs": {
+          "samples": 5,
+          "min": 10.5,
+          "median": 14.5,
+          "p95": 15.599999904632568,
+          "max": 19.399999976158142,
+          "mean": 14.199999976158143
+        },
+        "saveBytes": 263105,
+        "actualRenderCache": {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        "memory": {
+          "afterSetup": {
+            "label": "after-setup",
+            "gcCollectionMs": 110.63999999999942,
+            "jsHeapUsedBytes": 4533648,
+            "jsHeapTotalBytes": 5521408,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 4220,
+            "documents": 1,
+            "listeners": 142
+          },
+          "afterWorkload": {
+            "label": "after-workload",
+            "gcCollectionMs": 75.9874589999963,
+            "jsHeapUsedBytes": 6454508,
+            "jsHeapTotalBytes": 7618560,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 3959,
+            "documents": 1,
+            "listeners": 142
+          },
+          "retainedHeapDeltaBytes": 1920860
+        },
+        "snapshotCacheProbes": [
+          {
+            "actorCount": 100,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.10000002384185791,
+              "median": 0.19999992847442627,
+              "p95": 0.2999999523162842,
+              "max": 0.30000007152557373,
+              "mean": 0.18000000317891438
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 1.000000238418579,
+              "median": 1.9999992847442627,
+              "p95": 2.999999523162842,
+              "max": 3.0000007152557373,
+              "mean": 1.8000000317891438
+            },
+            "snapshotCount": 100,
+            "uniqueActorIds": 100,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 100,
+              "uniqueActorIds": 100,
+              "recordsDetached": true,
+              "afterPrune": 50,
+              "expectedAfterPrune": 50,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-100-before",
+                "gcCollectionMs": 5.301833999998053,
+                "jsHeapUsedBytes": 6157212,
+                "jsHeapTotalBytes": 6569984,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-100-retained",
+                "gcCollectionMs": 4.380124999996042,
+                "jsHeapUsedBytes": 6199364,
+                "jsHeapTotalBytes": 6569984,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-100-released",
+                "gcCollectionMs": 2.8958329999950365,
+                "jsHeapUsedBytes": 6116900,
+                "jsHeapTotalBytes": 6569984,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 42152,
+              "retainedBytesPerActor": 421.52,
+              "releasedDeltaBytes": -40312
+            }
+          },
+          {
+            "actorCount": 250,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.3999999761581421,
+              "median": 0.5,
+              "p95": 0.6000000238418579,
+              "max": 0.6999999284744263,
+              "mean": 0.4966666658719381
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 1.5999999046325684,
+              "median": 2,
+              "p95": 2.4000000953674316,
+              "max": 2.799999713897705,
+              "mean": 1.9866666634877523
+            },
+            "snapshotCount": 250,
+            "uniqueActorIds": 250,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 250,
+              "uniqueActorIds": 250,
+              "recordsDetached": true,
+              "afterPrune": 125,
+              "expectedAfterPrune": 125,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-250-before",
+                "gcCollectionMs": 3.0201250000027358,
+                "jsHeapUsedBytes": 6117000,
+                "jsHeapTotalBytes": 6569984,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-250-retained",
+                "gcCollectionMs": 3.4422909999993863,
+                "jsHeapUsedBytes": 6269548,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-250-released",
+                "gcCollectionMs": 3.0789999999979045,
+                "jsHeapUsedBytes": 6119792,
+                "jsHeapTotalBytes": 6569984,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 152548,
+              "retainedBytesPerActor": 610.192,
+              "releasedDeltaBytes": 2792
+            }
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "host": {
+        "platform": "darwin",
+        "release": "25.3.0",
+        "cpuModel": "Apple M4",
+        "logicalCpuCount": 10,
+        "node": "v22.22.0"
+      },
+      "browser": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+        "hardwareConcurrency": 10,
+        "deviceMemory": 16,
+        "devicePixelRatio": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "setup": {
+        "placed": [
+          {
+            "type": "house",
+            "x": 40,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 38
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 39
+          },
+          {
+            "type": "house",
+            "x": 38,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 42,
+            "y": 40
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 41,
+            "y": 41
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 42
+          },
+          {
+            "type": "house",
+            "x": 40,
+            "y": 37
+          },
+          {
+            "type": "house",
+            "x": 39,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 41,
+            "y": 38
+          },
+          {
+            "type": "farm",
+            "x": 38,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 42,
+            "y": 39
+          },
+          {
+            "type": "farm",
+            "x": 37,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 40
+          },
+          {
+            "type": "lumber",
+            "x": 40,
+            "y": 33
+          },
+          {
+            "type": "lumber",
+            "x": 35,
+            "y": 38
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 39
+          },
+          {
+            "type": "quarry",
+            "x": 34,
+            "y": 40
+          },
+          {
+            "type": "quarry",
+            "x": 35,
+            "y": 41
+          },
+          {
+            "type": "mine",
+            "x": 42,
+            "y": 46
+          },
+          {
+            "type": "mine",
+            "x": 39,
+            "y": 32
+          },
+          {
+            "type": "storehouse",
+            "x": 43,
+            "y": 40
+          },
+          {
+            "type": "storehouse",
+            "x": 38,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 42,
+            "y": 41
+          },
+          {
+            "type": "granary",
+            "x": 39,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 41,
+            "y": 42
+          },
+          {
+            "type": "market",
+            "x": 40,
+            "y": 43
+          },
+          {
+            "type": "tavern",
+            "x": 40,
+            "y": 36
+          },
+          {
+            "type": "tavern",
+            "x": 39,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 41,
+            "y": 37
+          },
+          {
+            "type": "school",
+            "x": 38,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 42,
+            "y": 38
+          },
+          {
+            "type": "blacksmith",
+            "x": 37,
+            "y": 39
+          },
+          {
+            "type": "barracks",
+            "x": 43,
+            "y": 39
+          },
+          {
+            "type": "archery",
+            "x": 36,
+            "y": 40
+          },
+          {
+            "type": "church",
+            "x": 37,
+            "y": 41
+          },
+          {
+            "type": "well",
+            "x": 43,
+            "y": 41
+          },
+          {
+            "type": "windmill",
+            "x": 38,
+            "y": 42
+          },
+          {
+            "type": "bakery",
+            "x": 42,
+            "y": 42
+          }
+        ],
+        "population": 63,
+        "buildings": 45,
+        "camera": {
+          "x": -5.688888888888869,
+          "y": 1262.2222222222222,
+          "zoom": 0.9003031608874037
+        }
+      },
+      "finalState": {
+        "gameTick": 4200,
+        "day": 2,
+        "population": 67,
+        "buildings": 45,
+        "citizens": 67,
+        "soldiers": 7,
+        "enemies": 0,
+        "walkers": 6,
+        "caravans": 0,
+        "particles": 1135,
+        "activePaths": 9
+      },
+      "measurements": {
+        "coreBatchMs": {
+          "batchTicks": 120,
+          "samples": 20,
+          "min": 13.5,
+          "median": 16.399999976158142,
+          "p95": 23,
+          "max": 50.700000047683716,
+          "mean": 18.775
+        },
+        "coreMicrosecondsPerTick": {
+          "samples": 20,
+          "min": 112.5,
+          "median": 136.66666646798453,
+          "p95": 191.66666666666666,
+          "max": 422.5000003973643,
+          "mean": 156.45833333333331
+        },
+        "renderSteadyMs": {
+          "samples": 120,
+          "min": 29.700000047683716,
+          "median": 30.399999976158142,
+          "p95": 32.300000071525574,
+          "max": 33,
+          "mean": 30.636666668454804
+        },
+        "renderPassMs": {
+          "skyCamera": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.10000002384185791,
+            "p95": 0.20000004768371582,
+            "max": 0.2999999523162842,
+            "mean": 0.14416666527589161
+          },
+          "terrainFog": {
+            "samples": 120,
+            "min": 2.899999976158142,
+            "median": 3.100000023841858,
+            "p95": 3.4000000953674316,
+            "max": 4.699999928474426,
+            "mean": 3.159999997417132
+          },
+          "entitiesWorld": {
+            "samples": 120,
+            "min": 26.59999990463257,
+            "median": 27.100000023841858,
+            "p95": 28.600000023841858,
+            "max": 29.299999952316284,
+            "mean": 27.27250000735124
+          },
+          "particles": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0,
+            "mean": 0
+          },
+          "worldOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.003333332141240438
+          },
+          "screenOverlays": {
+            "samples": 120,
+            "min": 0,
+            "median": 0.09999990463256836,
+            "p95": 0.10000002384185791,
+            "max": 0.20000004768371582,
+            "mean": 0.05666666626930237
+          }
+        },
+        "renderParticleStressMs": {
+          "particles": 1135,
+          "samples": 60,
+          "min": 29.699999928474426,
+          "median": 33.5,
+          "p95": 35.799999952316284,
+          "max": 36.89999997615814,
+          "mean": 33.70333333214124
+        },
+        "renderParticleStressPassMs": {
+          "skyCamera": {
+            "samples": 60,
+            "min": 0.09999990463256836,
+            "median": 0.19999992847442627,
+            "p95": 0.3999999761581421,
+            "max": 0.3999999761581421,
+            "mean": 0.20499998927116395
+          },
+          "terrainFog": {
+            "samples": 60,
+            "min": 3,
+            "median": 3.3000000715255737,
+            "p95": 4.600000023841858,
+            "max": 6.200000047683716,
+            "mean": 3.6233333349227905
+          },
+          "entitiesWorld": {
+            "samples": 60,
+            "min": 23.600000023841858,
+            "median": 28.700000047683716,
+            "p95": 30,
+            "max": 30.700000047683716,
+            "mean": 28.846666663885117
+          },
+          "particles": {
+            "samples": 60,
+            "min": 0.7000000476837158,
+            "median": 0.8999999761581421,
+            "p95": 1.2000000476837158,
+            "max": 1.5,
+            "mean": 0.9683333396911621
+          },
+          "worldOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0,
+            "p95": 0,
+            "max": 0.10000002384185791,
+            "mean": 0.0033333341280619303
+          },
+          "screenOverlays": {
+            "samples": 60,
+            "min": 0,
+            "median": 0.09999990463256836,
+            "p95": 0.10000002384185791,
+            "max": 0.20000004768371582,
+            "mean": 0.056666670242945354
+          }
+        },
+        "drawCounts": {
+          "fullFrame": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2479,
+              "median": 2479,
+              "p95": 2479,
+              "max": 2479,
+              "mean": 2479
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 81,
+              "median": 81,
+              "p95": 81,
+              "max": 81,
+              "mean": 81
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 81,
+                "median": 81,
+                "p95": 81,
+                "max": 81,
+                "mean": 81
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          },
+          "citizenOnly": {
+            "totalDrawImages": {
+              "samples": 8,
+              "min": 2465,
+              "median": 2465,
+              "p95": 2465,
+              "max": 2465,
+              "mean": 2465
+            },
+            "actorAtlasDrawImages": {
+              "samples": 8,
+              "min": 67,
+              "median": 67,
+              "p95": 67,
+              "max": 67,
+              "mean": 67
+            },
+            "bySource": {
+              "actors-atlas.png": {
+                "samples": 8,
+                "min": 67,
+                "median": 67,
+                "p95": 67,
+                "max": 67,
+                "mean": 67
+              },
+              "buildings-atlas-painted.png": {
+                "samples": 8,
+                "min": 30,
+                "median": 30,
+                "p95": 30,
+                "max": 30,
+                "mean": 30
+              },
+              "nature-atlas.png": {
+                "samples": 8,
+                "min": 417,
+                "median": 417,
+                "p95": 417,
+                "max": 417,
+                "mean": 417
+              },
+              "support-atlas.png": {
+                "samples": 8,
+                "min": 15,
+                "median": 15,
+                "p95": 15,
+                "max": 15,
+                "mean": 15
+              },
+              "terrain-atlas.png": {
+                "samples": 8,
+                "min": 1936,
+                "median": 1936,
+                "p95": 1936,
+                "max": 1936,
+                "mean": 1936
+              }
+            }
+          }
+        },
+        "rafIntervalMs": {
+          "samples": 120,
+          "min": 16.600000000000364,
+          "median": 33.399999999999636,
+          "p95": 50.100000000000364,
+          "max": 66.60000000000036,
+          "mean": 38.194166666666675
+        },
+        "saveSerializeMs": {
+          "samples": 5,
+          "min": 9.699999928474426,
+          "median": 10.899999976158142,
+          "p95": 12.5,
+          "max": 18.700000047683716,
+          "mean": 12.420000004768372
+        },
+        "saveBytes": 263105,
+        "actualRenderCache": {
+          "liveCitizens": 67,
+          "cacheSize": 67,
+          "bounded": true,
+          "onlyLiveActorIds": true,
+          "uniqueActorIds": true
+        },
+        "memory": {
+          "afterSetup": {
+            "label": "after-setup",
+            "gcCollectionMs": 104.11912500001199,
+            "jsHeapUsedBytes": 4466720,
+            "jsHeapTotalBytes": 5521408,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 4220,
+            "documents": 1,
+            "listeners": 142
+          },
+          "afterWorkload": {
+            "label": "after-workload",
+            "gcCollectionMs": 79.18337499999325,
+            "jsHeapUsedBytes": 6440560,
+            "jsHeapTotalBytes": 8404992,
+            "jsHeapLimitBytes": 3760000000,
+            "domNodes": 3959,
+            "documents": 1,
+            "listeners": 142
+          },
+          "retainedHeapDeltaBytes": 1973840
+        },
+        "snapshotCacheProbes": [
+          {
+            "actorCount": 100,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.09999990463256836,
+              "median": 0.19999992847442627,
+              "p95": 0.30000007152557373,
+              "max": 0.30000007152557373,
+              "mean": 0.18666666746139526
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 0.9999990463256836,
+              "median": 1.9999992847442627,
+              "p95": 3.0000007152557373,
+              "max": 3.0000007152557373,
+              "mean": 1.8666666746139526
+            },
+            "snapshotCount": 100,
+            "uniqueActorIds": 100,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 100,
+              "uniqueActorIds": 100,
+              "recordsDetached": true,
+              "afterPrune": 50,
+              "expectedAfterPrune": 50,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-100-before",
+                "gcCollectionMs": 5.132207999995444,
+                "jsHeapUsedBytes": 6152396,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-100-retained",
+                "gcCollectionMs": 4.193375000002561,
+                "jsHeapUsedBytes": 6193856,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-100-released",
+                "gcCollectionMs": 3.2964999999967404,
+                "jsHeapUsedBytes": 6111392,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 41460,
+              "retainedBytesPerActor": 414.6,
+              "releasedDeltaBytes": -41004
+            }
+          },
+          {
+            "actorCount": 250,
+            "buildMs": {
+              "samples": 30,
+              "min": 0.3999999761581421,
+              "median": 0.5,
+              "p95": 0.6000000238418579,
+              "max": 0.6000000238418579,
+              "mean": 0.48333332935969037
+            },
+            "buildMicrosecondsPerActor": {
+              "samples": 30,
+              "min": 1.5999999046325684,
+              "median": 2,
+              "p95": 2.4000000953674316,
+              "max": 2.4000000953674316,
+              "mean": 1.9333333174387615
+            },
+            "snapshotCount": 250,
+            "uniqueActorIds": 250,
+            "immutable": true,
+            "assignmentReferenceFree": true,
+            "cache": {
+              "size": 250,
+              "uniqueActorIds": 250,
+              "recordsDetached": true,
+              "afterPrune": 125,
+              "expectedAfterPrune": 125,
+              "afterReset": 0
+            },
+            "memory": {
+              "before": {
+                "label": "snapshot-cache-250-before",
+                "gcCollectionMs": 3.0494160000089323,
+                "jsHeapUsedBytes": 6111492,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retained": {
+                "label": "snapshot-cache-250-retained",
+                "gcCollectionMs": 4.17683300000499,
+                "jsHeapUsedBytes": 6264040,
+                "jsHeapTotalBytes": 7094272,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "released": {
+                "label": "snapshot-cache-250-released",
+                "gcCollectionMs": 3.185750000004191,
+                "jsHeapUsedBytes": 6114284,
+                "jsHeapTotalBytes": 6832128,
+                "jsHeapLimitBytes": 3760000000,
+                "domNodes": 3959,
+                "documents": 1,
+                "listeners": 142
+              },
+              "retainedDeltaBytes": 152548,
+              "retainedBytesPerActor": 610.192,
+              "releasedDeltaBytes": 2792
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "provenance": {
+    "script": "scripts/capture-engine-v2-performance.mjs",
+    "baseline": "loop/engine-v2/baselines/performance-v163.json",
+    "rfc": "loop/engine-v2/RFC-0003-STABLE-ACTOR-OWNERSHIP.md",
+    "interpretation": "Same-host Phase 1A acceptance gate; wall times are not portable across machines."
+  }
+}

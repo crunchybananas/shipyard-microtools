@@ -1,0 +1,57 @@
+{
+  "schema": "realm.actor-pose.visual-dna.v1",
+  "roles": {
+    "guard": {
+      "identity": "blue-watch-guard",
+      "build": "broad-shouldered",
+      "silhouette": {
+        "head_radius": [9, 10],
+        "shoulder_half_width": 12,
+        "torso_half_width": 10,
+        "side_torso_half_width": 8,
+        "hip_half_width": 6,
+        "boot_width": 7
+      },
+      "palette": {
+        "outline": "#241915",
+        "deep_shadow": "#3c2520",
+        "skin_shadow": "#9a5435",
+        "skin": "#c67a4d",
+        "skin_light": "#e5a06a",
+        "hair": "#59351f",
+        "eye": "#1d1a19"
+      },
+      "face": {
+        "brow": "square",
+        "nose": "strong",
+        "facial_hair": "short-moustache"
+      }
+    },
+    "builder": {
+      "identity": "ochre-apron-builder",
+      "build": "lean-forward",
+      "silhouette": {
+        "head_radius": [8, 10],
+        "shoulder_half_width": 10,
+        "torso_half_width": 9,
+        "side_torso_half_width": 7,
+        "hip_half_width": 6,
+        "boot_width": 7
+      },
+      "palette": {
+        "outline": "#291a13",
+        "deep_shadow": "#493020",
+        "skin_shadow": "#8b4e2e",
+        "skin": "#bd7041",
+        "skin_light": "#dda06a",
+        "hair": "#4b2d1c",
+        "eye": "#201814"
+      },
+      "face": {
+        "brow": "soft",
+        "nose": "compact",
+        "facial_hair": "stubble"
+      }
+    }
+  }
+}

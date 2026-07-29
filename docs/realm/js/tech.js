@@ -2,11 +2,12 @@
 // Technology Tree — research unlocks building tiers
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=157';
-import { sfx as playSound } from './log.js?realm=157';
-import { emit } from './bus.js?realm=157';
-import { chronicle } from './log.js?realm=157';
-import { announce as notify } from './log.js?realm=157';
+import { G, BUILDINGS } from './state.js?realm=166';
+import { sfx as playSound } from './log.js?realm=166';
+import { emit } from './bus.js?realm=166';
+import { staffingCount } from './citizen-ownership.js?realm=166';
+import { chronicle } from './log.js?realm=166';
+import { announce as notify } from './log.js?realm=166';
 
 export const TECHS = {
   agriculture: {
@@ -166,10 +167,6 @@ export const TECHS = {
 // Which building types require NO tech (always available)
 export const FREE_BUILDINGS = ['house'];
 
-export function isTechResearched(techId) {
-  return G.researchedTechs.has(techId);
-}
-
 export function isBuildingUnlocked(buildingType) {
   if (FREE_BUILDINGS.includes(buildingType)) return true;
   // Loop 258 (the-fixer, 256 MEDIUM finding): maxCount enforcement.
@@ -189,7 +186,7 @@ export function isBuildingUnlocked(buildingType) {
   // standing — the castle is the prerequisite, not the win (wonder.js).
   if (buildingType === 'wonder') {
     if (!G.researchedTechs.has('monuments')) return false;
-    return (G.buildings || []).some(b => b.type === 'castle' && (b.buildProgress === undefined || b.buildProgress >= 1));
+    return (G.buildings || []).some(b => b.type === 'castle' && b.buildProgress >= 1);
   }
   for (const [techId, tech] of Object.entries(TECHS)) {
     if (tech.unlocks.includes(buildingType) && G.researchedTechs.has(techId)) return true;
@@ -245,7 +242,7 @@ const RESEARCH_BEATS = {
 export function updateResearch() {
   if (!G.currentResearch) return;
   // Schools boost research speed by 50% each (multiplicative)
-  const schools = G.buildings.filter(b => b.type === 'school' && b.workers.length > 0).length;
+  const schools = G.buildings.filter(b => b.type === 'school' && staffingCount(b) > 0).length;
   // Loop 101 (the-fixer, 050 filed 50+ ticks): named teacher adds a
   // flat +10% speed bonus. Graduates the named-character system from
   // "chronicle decoration" (034) to "game mechanic" — 050 and 100
@@ -300,7 +297,7 @@ function researchedTechsOfEra(era) {
 function highestHouseTier() {
   let best = 0;
   for (const b of G.buildings) {
-    if (b.type === 'house') best = Math.max(best, b.level || 1);
+    if (b.type === 'house') best = Math.max(best, b.level);
   }
   return best;
 }
@@ -361,18 +358,4 @@ export function checkEraAdvance() {
     try { chronicle(ERA_BEATS[G.era] || `The realm enters the ${era.name}.`, 'era'); } catch (_e) {}
     emit('era-advanced', { era: G.era });
   }
-}
-
-
-
-// Backfill for saves written before eras existed: the highest era any
-// researched tech belongs to (nothing already researched may lock out),
-// then climb any gates the loaded realm already satisfies.
-export function deriveEra() {
-  let era = 1;
-  for (const [id, t] of Object.entries(TECHS)) {
-    if (G.researchedTechs.has(id)) era = Math.max(era, t.era || 1);
-  }
-  while (era < ERAS.length && eraGateSatisfied(era)) era++;
-  return era;
 }

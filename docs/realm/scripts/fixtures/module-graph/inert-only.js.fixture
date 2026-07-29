@@ -1,0 +1,6 @@
+// import './js/line-comment.js';
+/* export * from './js/block-comment.js'; */
+const single = "import('./js/double-string.js')";
+const double = 'import("./js/single-string.js")';
+const template = `import('./js/template.js')`;
+const regexp = /import\(['"]\.\/js\/regexp\.js/;

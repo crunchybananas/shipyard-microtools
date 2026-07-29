@@ -8,7 +8,7 @@
 //   node scripts/harmonize-sprite-batches.mjs --strip farmer   # /tmp A/B
 //   node scripts/harmonize-sprite-batches.mjs --write [roles…] # bake PNGs
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

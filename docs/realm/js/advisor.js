@@ -1,10 +1,11 @@
-import { G, BUILDINGS } from './state.js?realm=157';
+import { G, BUILDINGS } from './state.js?realm=166';
+import { staffingCount } from './citizen-ownership.js?realm=166';
 
 const TIPS = [
   { id: 'lowfood', check: () => G.resources.food < 20, text: "Food is running low. Build more farms or fisherman huts!", cooldown: 600 },
   { id: 'nohouses', check: () => G.day > 3 && G.buildings.filter(b=>b.type==='house').length === 0, text: "Your settlers have no homes. Build a House!", cooldown: 600 },
   { id: 'noworkers', check: () => {
-    const jobsNeeded = G.buildings.reduce((sum, b) => sum + (BUILDINGS[b.type]?.workers || 0) - b.workers.length, 0);
+    const jobsNeeded = G.buildings.reduce((sum, b) => sum + (BUILDINGS[b.type]?.workers || 0) - staffingCount(b), 0);
     return jobsNeeded > 3 && G.population < G.maxPop;
   }, text: "More houses needed — jobs are waiting for workers.", cooldown: 600 },
   { id: 'noirongame', check: () => G.day > 15 && !G.buildings.some(b=>b.type==='mine'), text: "Iron mines are crucial for advanced buildings. Find iron tiles!", cooldown: 1200 },

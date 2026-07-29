@@ -1,0 +1,212 @@
+{
+  "candidates": {
+    "a-layered2d": {
+      "code": "A",
+      "directory": "assets/sprites/prototypes/actor-pose/output/a-layered2d",
+      "gates": {
+        "bodyHeight": {
+          "detail": "16/16 hash-tied compiler rows (compiler body mask); ≤2 px within/across views and actions",
+          "pass": true
+        },
+        "completeRows": {
+          "detail": "16/16 rows",
+          "pass": true
+        },
+        "dimensions": {
+          "detail": "8 x 64x84 RGBA frames",
+          "pass": true
+        },
+        "directionPhase": {
+          "detail": "16/16 authored rows; guard/walk zero-shift; guard/carry zero-shift; builder/walk zero-shift; builder/work zero-shift",
+          "pass": true
+        },
+        "identity": {
+          "detail": "Pending blind 1× identity review; Raster cue 16/16 painted; human paint/style review required",
+          "pass": null
+        },
+        "nonblankFrames": {
+          "detail": "128/128 nonblank; 128/128 distinct",
+          "pass": true
+        },
+        "occlusion": {
+          "detail": "Pending seam/occlusion review",
+          "pass": null
+        },
+        "paintedStyle": {
+          "detail": "Raster cue 16/16 painted; human paint/style review required",
+          "pass": null
+        },
+        "reproducible": {
+          "detail": "pass",
+          "pass": true
+        },
+        "rootFeet": {
+          "detail": "16/16 hash-tied compiler rows (compiler body mask); compiler ground/root ≤1 px",
+          "pass": true
+        },
+        "sockets": {
+          "detail": "16/16 rows",
+          "pass": true
+        }
+      },
+      "overallAccepted": false,
+      "paintedStyleSignals": {
+        "expectedRows": 16,
+        "humanPass": null,
+        "mechanicalSignalOnly": true,
+        "medianColorCountAcrossRows": 364.75,
+        "medianShadingRatioAcrossRows": 0.6403,
+        "note": "Color/shading statistics are a style-era cue, not proof of painterly coherence, identity, or final Realm quality.",
+        "paintedRows": 16,
+        "status": "review-required",
+        "styleEraCounts": {
+          "painted": 16
+        }
+      },
+      "proofs": {
+        "animated": "candidate-a-beats.gif",
+        "contact": "candidate-a-contact.png"
+      }
+    },
+    "b-orthographic3d": {
+      "code": "B",
+      "directory": "assets/sprites/prototypes/actor-pose/output/b-orthographic3d",
+      "gates": {
+        "bodyHeight": {
+          "detail": "16/16 hash-tied compiler rows (compiler body ID pass); ≤2 px within/across views and actions",
+          "pass": true
+        },
+        "completeRows": {
+          "detail": "16/16 rows",
+          "pass": true
+        },
+        "dimensions": {
+          "detail": "8 x 64x84 RGBA frames",
+          "pass": true
+        },
+        "directionPhase": {
+          "detail": "16/16 authored rows; guard/walk zero-shift; guard/carry zero-shift; builder/walk zero-shift; builder/work zero-shift",
+          "pass": true
+        },
+        "identity": {
+          "detail": "Pending blind 1× identity review; Raster cue 4/16 painted; human paint/style review required",
+          "pass": null
+        },
+        "nonblankFrames": {
+          "detail": "128/128 nonblank; 128/128 distinct",
+          "pass": true
+        },
+        "occlusion": {
+          "detail": "Pending seam/occlusion review",
+          "pass": null
+        },
+        "paintedStyle": {
+          "detail": "Raster cue 4/16 painted; human paint/style review required",
+          "pass": null
+        },
+        "reproducible": {
+          "detail": "pass",
+          "pass": true
+        },
+        "rootFeet": {
+          "detail": "16/16 hash-tied compiler rows (compiler body ID pass); compiler ground/root ≤1 px",
+          "pass": true
+        },
+        "sockets": {
+          "detail": "16/16 rows",
+          "pass": true
+        }
+      },
+      "overallAccepted": false,
+      "paintedStyleSignals": {
+        "expectedRows": 16,
+        "humanPass": null,
+        "mechanicalSignalOnly": true,
+        "medianColorCountAcrossRows": 218.25,
+        "medianShadingRatioAcrossRows": 0.4381,
+        "note": "Color/shading statistics are a style-era cue, not proof of painterly coherence, identity, or final Realm quality.",
+        "paintedRows": 4,
+        "status": "review-required",
+        "styleEraCounts": {
+          "ambiguous": 9,
+          "blocky": 3,
+          "painted": 4
+        }
+      },
+      "proofs": {
+        "animated": "candidate-b-beats.gif",
+        "contact": "candidate-b-contact.png"
+      }
+    },
+    "c-row-factory": {
+      "code": "C",
+      "directory": "assets/sprites/prototypes/actor-pose/output/c-row-factory",
+      "gates": {
+        "bodyHeight": {
+          "detail": "0/16 hash-tied compiler rows; compiler body evidence unavailable",
+          "pass": null
+        },
+        "completeRows": {
+          "detail": "16/16 rows",
+          "pass": true
+        },
+        "dimensions": {
+          "detail": "8 x 64x84 RGBA frames",
+          "pass": true
+        },
+        "directionPhase": {
+          "detail": "0/16 authored rows; guard/walk zero-shift; guard/carry reversed-chronology; builder/walk zero-shift; builder/work zero-shift",
+          "pass": false
+        },
+        "identity": {
+          "detail": "Pending blind 1× identity review; Raster cue 16/16 painted; human paint/style review required",
+          "pass": null
+        },
+        "nonblankFrames": {
+          "detail": "128/128 nonblank; 128/128 distinct",
+          "pass": true
+        },
+        "occlusion": {
+          "detail": "Pending seam/occlusion review",
+          "pass": null
+        },
+        "paintedStyle": {
+          "detail": "Raster cue 16/16 painted; human paint/style review required",
+          "pass": null
+        },
+        "reproducible": {
+          "detail": "pass",
+          "pass": true
+        },
+        "rootFeet": {
+          "detail": "0/16 hash-tied compiler rows; compiler ground/root evidence unavailable",
+          "pass": null
+        },
+        "sockets": {
+          "detail": "0/16 rows",
+          "pass": false
+        }
+      },
+      "overallAccepted": false,
+      "paintedStyleSignals": {
+        "expectedRows": 16,
+        "humanPass": null,
+        "mechanicalSignalOnly": true,
+        "medianColorCountAcrossRows": 519.5,
+        "medianShadingRatioAcrossRows": 0.6802,
+        "note": "Color/shading statistics are a style-era cue, not proof of painterly coherence, identity, or final Realm quality.",
+        "paintedRows": 16,
+        "status": "review-required",
+        "styleEraCounts": {
+          "painted": 16
+        }
+      },
+      "proofs": {
+        "animated": "candidate-c-beats.gif",
+        "contact": "candidate-c-contact.png"
+      }
+    }
+  },
+  "schema": "realm.actor-pose-prototype.ui-comparison/v1",
+  "summary": "Hash-tied rig evidence and flattened-raster warnings loaded. Identity, occlusion, and paint/style remain mandatory human reviews; no candidate is promoted."
+}

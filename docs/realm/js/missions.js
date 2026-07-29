@@ -2,8 +2,9 @@
 // Missions — goals and progression
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng } from './state.js?realm=157';
-import { sfx as playSound, announce } from './log.js?realm=157';
+import { G, MAP_W, MAP_H } from './state.js?realm=166';
+import { sfx as playSound, announce } from './log.js?realm=166';
+import { visualJitter } from './fx.js?realm=166';
 
 export const missions = [
   { id:'farm1',   text:'Build a farm',                  check:()=>G.buildings.some(b=>b.type==='farm'),      done:false, reward:{wood:20} },
@@ -86,17 +87,18 @@ function celebrateMission(x, y) {
   const confettiColors = ['#ff4d6d','#ffd87a','#4da6ff','#7afca0','#ff9c1c','#c07aff'];
   const glyphs = ['🎉','🎊','🌟','✨'];
   for (let i = 0; i < 12; i++) {
-    const ang = (i / 12) * Math.PI * 2 + rng() * 0.5;
-    const radialPush = 0.55 + rng() * 0.25;
+    const unit = channel => visualJitter(x, y, 200 + i * 7 + channel);
+    const ang = (i / 12) * Math.PI * 2 + unit(1) * 0.5;
+    const radialPush = 0.55 + unit(2) * 0.25;
     G.particles.push({
       tx: x + Math.cos(ang) * radialPush,
       ty: y + Math.sin(ang) * radialPush * 0.6, // squashed for iso
-      offsetY: -8 + rng() * 4,
-      vy: -0.5 - rng() * 0.35,
+      offsetY: -8 + unit(3) * 4,
+      vy: -0.5 - unit(4) * 0.35,
       alpha: 1.9, decay: 0.012, type: 'text',
       text: glyphs[i % glyphs.length],
       color: confettiColors[i % confettiColors.length],
-      _driftX: (rng() - 0.5) * 1.6, // per-particle horizontal spread
+      _driftX: (unit(5) - 0.5) * 1.6, // per-particle horizontal spread
     });
   }
   // Headline ribbon — rises centered over the focal point
@@ -133,4 +135,3 @@ export function checkMissions() {
     }
   }
 }
-

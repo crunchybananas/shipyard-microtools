@@ -1,0 +1,70 @@
+{
+  "schema": "realm.actor-pose.attachments.v1",
+  "attachments": {
+    "guard-sword": {
+      "owner": "guard",
+      "kind": "rear-equipment",
+      "anchor_socket": "belt_rear",
+      "painted_anchor": [3, 21],
+      "dimensions": [8, 29],
+      "palette": {
+        "outline": "#241915",
+        "leather": "#6b3d27",
+        "metal": "#9da9a8",
+        "highlight": "#d2dad4",
+        "accent": "#d0a13c"
+      }
+    },
+    "guard-crate": {
+      "owner": "guard",
+      "kind": "load",
+      "anchor_socket": "load",
+      "painted_anchor": [12, 8],
+      "dimensions": [24, 17],
+      "palette": {
+        "outline": "#2c1b13",
+        "shadow": "#70401f",
+        "wood": "#a8662d",
+        "light": "#d0924a",
+        "iron": "#5c5547"
+      }
+    },
+    "builder-belt-hammer": {
+      "owner": "builder",
+      "kind": "rear-equipment",
+      "anchor_socket": "belt_rear",
+      "painted_anchor": [17, 4],
+      "dimensions": [13, 16],
+      "palette": {
+        "outline": "#291a13",
+        "wood": "#8d572f",
+        "metal": "#8c9697",
+        "highlight": "#c3cbc4"
+      }
+    },
+    "builder-hammer": {
+      "owner": "builder",
+      "kind": "tool",
+      "anchor_socket": "right_hand",
+      "painted_anchor": [17, 4],
+      "dimensions": [8, 22],
+      "palette": {
+        "outline": "#291a13",
+        "wood": "#9d6335",
+        "wood_light": "#c48b50",
+        "metal": "#858f90",
+        "highlight": "#c8cec6"
+      }
+    }
+  },
+  "sets": {
+    "guard": {
+      "walk": ["guard-sword"],
+      "carry": ["guard-sword", "guard-crate"]
+    },
+    "builder": {
+      "walk": ["builder-belt-hammer"],
+      "work": ["builder-hammer"]
+    }
+  }
+}

@@ -1,6 +1,5 @@
-// Realm verify-batch driver. Uses the existing Playwright install at
-// /Users/cloken/code/peel/admin/node_modules/playwright to avoid
-// adding a heavy dep to this monorepo.
+// Realm verify-batch driver. Playwright is declared by the repository so this
+// gate runs identically on local workstations and CI.
 //
 // Usage:
 //   node docs/realm/scripts/verify.mjs [--game | --logic | --all]
@@ -11,7 +10,7 @@
 // Loop 215 → 216: Phase B verification driver. Bridge replaced by
 // Playwright per chrome-extension MCP outage.
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { ensureServer } from './_serve.mjs';
@@ -37,6 +36,7 @@ const HEADLESS = process.env.HEADED !== '1';
 console.log(`[verify] launching chromium (headless=${HEADLESS})…`);
 const browser = await chromium.launch({ headless: HEADLESS });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+const failures = [];
 
 async function startGameIfNeeded(page) {
   const started = await page.evaluate(() => {
@@ -113,8 +113,17 @@ if (flags.game) {
   console.log('\n[verify] === LIVE GAME SMOKE ===');
   const page = await ctx.newPage();
   const consoleMessages = [];
-  page.on('console', m => consoleMessages.push(`[${m.type()}] ${m.text()}`));
-  page.on('pageerror', e => consoleMessages.push(`[pageerror] ${e.message}`));
+  const browserErrors = [];
+  page.on('console', m => {
+    const message = `[${m.type()}] ${m.text()}`;
+    consoleMessages.push(message);
+    if (m.type() === 'error') browserErrors.push(message);
+  });
+  page.on('pageerror', e => {
+    const message = `[pageerror] ${e.message}`;
+    consoleMessages.push(message);
+    browserErrors.push(message);
+  });
 
   await page.goto(GAME_PATH);
   await page.waitForLoadState('domcontentloaded');
@@ -148,6 +157,7 @@ if (flags.game) {
     console.log('[verify] console output (last 20):');
     consoleMessages.slice(-20).forEach(m => console.log('  ', m));
   }
+  if (browserErrors.length) failures.push(...browserErrors.map(message => `live game: ${message}`));
   await page.close();
 }
 
@@ -195,7 +205,52 @@ if (flags.logic) {
   } else {
     console.log('[verify] no page errors');
   }
+  if (errors.length) failures.push(...errors.map(message => `logic page: ${message}`));
   await page.close();
+
+  // Embedded and preview contexts can report "hidden" from boot while still
+  // being watched. The timer-driven branch must paint the minimap too.
+  console.log('\n[verify] === HIDDEN-BOOT MINIMAP ===');
+  const hiddenPage = await ctx.newPage();
+  await hiddenPage.addInitScript(() => {
+    Object.defineProperty(document, 'visibilityState', { get: () => 'hidden' });
+    Object.defineProperty(document, 'hidden', { get: () => true });
+  });
+  const hiddenErrors = [];
+  hiddenPage.on('pageerror', error => hiddenErrors.push(error.message));
+  await hiddenPage.goto(GAME_PATH);
+  await hiddenPage.waitForLoadState('domcontentloaded');
+  await hiddenPage.waitForTimeout(2000);
+  await startGameIfNeeded(hiddenPage);
+  await hiddenPage.waitForTimeout(1500);
+  const minimap = await hiddenPage.evaluate(() => {
+    const canvas = document.getElementById('minimap');
+    if (!canvas) return { exists: false };
+    const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    let opaque = 0;
+    const colors = new Set();
+    for (let index = 0; index < pixels.length; index += 4) {
+      if (pixels[index + 3] === 255) opaque++;
+      colors.add((pixels[index] << 16) | (pixels[index + 1] << 8) | pixels[index + 2]);
+    }
+    return {
+      exists: true,
+      visibilityState: document.visibilityState,
+      opaqueFraction: opaque / (pixels.length / 4),
+      distinctColors: colors.size,
+    };
+  });
+  if (hiddenErrors.length) {
+    failures.push(...hiddenErrors.map(message => `hidden-boot page: ${message}`));
+  }
+  if (!minimap.exists) failures.push('hidden-boot minimap canvas is missing');
+  if (minimap.visibilityState !== 'hidden') failures.push('hidden-boot visibility override failed');
+  if (minimap.opaqueFraction < 0.9 || minimap.distinctColors < 8) {
+    failures.push(`hidden-boot minimap did not paint: ${JSON.stringify(minimap)}`);
+  } else {
+    console.log('[verify] minimap paints under hidden-boot visibility');
+  }
+  await hiddenPage.close();
 }
 
 if (flags.hold) {
@@ -204,5 +259,10 @@ if (flags.hold) {
 } else {
   await browser.close();
   await server.stop();
+  if (failures.length) {
+    console.error(`\n[verify] FAILED — ${failures.length} browser error${failures.length === 1 ? '' : 's'}`);
+    for (const failure of failures) console.error(`  ${failure}`);
+    process.exitCode = 1;
+  }
   console.log('\n[verify] done. Browser closed.');
 }

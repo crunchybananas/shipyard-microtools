@@ -1,0 +1,7 @@
+[
+  { "label": "missing revision", "value": "js/main.js", "error": "expected exactly" },
+  { "label": "stale revision", "value": "js/main.js?realm=158", "error": "stale realm revision" },
+  { "label": "duplicate revision", "value": "js/main.js?realm=159&realm=159", "error": "expected exactly" },
+  { "label": "extra query", "value": "js/main.js?realm=159&debug=1", "error": "expected exactly" },
+  { "label": "fragment identity", "value": "js/main.js?realm=159#copy", "error": "fragment" }
+]

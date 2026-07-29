@@ -512,7 +512,6 @@ body.sprite-lab-open{overflow:hidden}
 .sl-review-count{font-size:0.65rem;min-width:1.25rem;height:1.25rem;display:inline-grid;place-items:center;border-radius:999px;background:#f56054;color:#160d0b}
 .sl-source-badge{font-size:0.55rem;font-weight:800;letter-spacing:0.05em;padding:0.2rem 0.32rem;border-radius:4px;border:1px solid rgba(255,255,255,0.16);color:rgba(232,237,240,0.65);background:rgba(255,255,255,0.045)}
 .sl-source-badge.accepted{border-color:rgba(109,212,184,0.52);background:rgba(109,212,184,0.13);color:#9ff4dc}
-.sl-source-badge.waived{border-color:rgba(245,200,76,0.52);background:rgba(245,200,76,0.13);color:#ffe39a}
 .sl-source-badge.candidate{border-color:rgba(120,174,230,0.5);background:rgba(120,174,230,0.12);color:#b9ddff}
 .sl-source-badge.base{border-color:rgba(245,96,84,0.3);background:rgba(245,96,84,0.08);color:#dca9a4}
 .sl-main{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:0;padding:0.85rem}
@@ -740,8 +739,8 @@ body.photo-mode #wonder-chip{display:none!important}
     <p class="title-sub">A Settlement Builder</p>
     <p class="title-desc">Build, fight, trade, and survive. Grow your island settlement into a medieval kingdom.</p>
     <div class="title-difficulty">
-      <button class="diff-btn active" data-diff="easy" onclick="setDifficulty('easy')">Easy</button>
-      <button class="diff-btn" data-diff="normal" onclick="setDifficulty('normal')">Normal</button>
+      <button class="diff-btn" data-diff="easy" onclick="setDifficulty('easy')">Easy</button>
+      <button class="diff-btn active" data-diff="normal" onclick="setDifficulty('normal')">Normal</button>
       <button class="diff-btn" data-diff="hard" onclick="setDifficulty('hard')">Hard</button>
     </div>
     <div class="scenario-select">
@@ -779,7 +778,7 @@ body.photo-mode #wonder-chip{display:none!important}
     <button type="button" id="sm-lab" class="sm-primary">Inspect in Sprite Lab</button>
     <button type="button" id="sm-exit" class="sm-exit">Exit</button>
   </div>
-  <div id="sm-counts">0 locked · 0 waived · 224 base</div>
+  <div id="sm-counts">0 locked · 0 candidate · 224 base</div>
 </div>
 
 <div id="hud">
@@ -998,7 +997,6 @@ body.photo-mode #wonder-chip{display:none!important}
           <option value="all">All source states</option>
           <option value="base">Inherited base only</option>
           <option value="accepted">Locked clean</option>
-          <option value="waived">Locked with waivers</option>
           <option value="candidate">Candidate</option>
         </select>
         <div id="sl-list" class="sl-list"></div>
@@ -1092,31 +1090,10 @@ body.photo-mode #wonder-chip{display:none!important}
 </div>
 
 <script>
-/* Local development must not retain a JavaScript-fetching service worker.
-   Module URLs are revisioned, while an intercepted request can survive a
-   stopped local server and leave the title screen visible with no handlers.
-   Clear the legacy development worker once, then reload outside its scope.
-   Production deployments do not enter this branch. */
 const params = new URLSearchParams(location.search);
-const localDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 const devTools = params.has('devtools') || params.has('spritelab') || params.has('spritemuster');
 document.body.classList.toggle('devtools', devTools);
-if (localDev && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    const hadRegistrations = registrations.length > 0;
-    return Promise.all(registrations.map((registration) => registration.unregister()))
-      .then(() => hadRegistrations);
-  }).then((hadRegistrations) => {
-    // A worker controls the current page until a navigation. Reload exactly
-    // once after removing it so this page's module graph comes from the live
-    // local server instead of the old worker response.
-    if (hadRegistrations && !sessionStorage.getItem('realm-local-sw-cleared')) {
-      sessionStorage.setItem('realm-local-sw-cleared', '1');
-      location.reload();
-    }
-  }).catch(() => {});
-}
 </script>
-<script type="module" src="js/main.js?realm=157"></script>
+<script type="module" src="js/main.js?realm=166"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 // A* Pathfinding — binary heap, 8-directional, road bonus
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=157';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=166';
 
 class BinaryHeap {
   constructor() { this.data = []; }
@@ -90,6 +90,17 @@ export function stepEntityToward(e, tx, ty, spd, walkableFn = isWalkable) {
 
 const DIRS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
 const SQRT2 = Math.SQRT2;
+const MIN_MOVE_COST = 0.5;
+let findPathCalls = 0;
+
+// Read-only diagnostic surface for deterministic movement baselines. Keeping
+// the counter here is the only reliable way for a harness to include failed
+// and internal citizen replans without changing planner inputs or actor state.
+// It has no reset API: callers take before/after snapshots, so gameplay code
+// cannot steer the value and test fixtures remain isolated from one another.
+export function getPathfindingDiagnostics() {
+  return Object.freeze({ findPathCalls });
+}
 
 export function nearestWalkableTile(x, y, maxR = 5, fromX = x, fromY = y) {
   if (isWalkable(x, y)) return { x, y };
@@ -113,6 +124,7 @@ export function nearestWalkableTile(x, y, maxR = 5, fromX = x, fromY = y) {
 }
 
 export function findPath(sx, sy, ex, ey, maxIter = 5000) {
+  findPathCalls++;
   sx = Math.round(sx); sy = Math.round(sy);
   ex = Math.round(ex); ey = Math.round(ey);
 
@@ -173,15 +185,15 @@ export function findPath(sx, sy, ex, ey, maxIter = 5000) {
 
 function heuristic(x1, y1, x2, y2) {
   const dx = Math.abs(x1 - x2), dy = Math.abs(y1 - y2);
-  return Math.max(dx, dy) + (SQRT2 - 1) * Math.min(dx, dy);
+  return (Math.max(dx, dy) + (SQRT2 - 1) * Math.min(dx, dy)) * MIN_MOVE_COST;
 }
 
 function reconstructPath(cameFrom, current) {
   const path = [];
   while (cameFrom.has(current)) {
     const x = current % MAP_W, y = (current / MAP_W) | 0;
-    path.unshift({x, y});
+    path.push({x, y});
     current = cameFrom.get(current);
   }
-  return path;
+  return path.reverse();
 }

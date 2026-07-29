@@ -1,0 +1,132 @@
+{
+  "schema": "realm.actor-pose.a2-layered2d.v2",
+  "stage": "right-reference-cycle",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1,
+    "beats": 8
+  },
+  "identities": {
+    "watchman": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png",
+      "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca",
+      "generation_source": {
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman-keyed.png",
+        "sha256": "4024420b50e0b463e7a93e2f6712a042db760c35532a87009346daf292df1072"
+      },
+      "parts": {
+        "right": {
+          "head": [864, 31, 1036, 239],
+          "torso": [880, 257, 1054, 537],
+          "arm": [1117, 287, 1236, 610],
+          "leg": [881, 566, 1039, 976]
+        }
+      }
+    },
+    "craftsperson": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png",
+      "sha256": "fa6b11610b0e5cf67ae1c752a1ee7ecf39f462f0b2a74ed2e6af8af4549152bd",
+      "generation_source": {
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson-keyed.png",
+        "sha256": "0f69d684f8c1750ebd544e56275fdbad076faf55036739a3f82bafa576a9144e"
+      },
+      "parts": {
+        "right": {
+          "head": [807, 17, 996, 236],
+          "torso": [937, 263, 1104, 556],
+          "arm": [1172, 277, 1286, 601],
+          "leg": [938, 599, 1095, 972]
+        }
+      }
+    }
+  },
+  "garments": {
+    "watch-blue": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png",
+      "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6",
+      "generation_source": {
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue-keyed.png",
+        "sha256": "d17113b8cc799b01832726c1b650d2d7f3358e12d19c49d486bc3434415f9cfc"
+      },
+      "parts": {
+        "right": {
+          "headgear": [756, 31, 947, 232],
+          "tunic": [986, 284, 1147, 562],
+          "sleeve": [1242, 293, 1370, 470],
+          "belt": [593, 566, 824, 660],
+          "boot": [940, 648, 1101, 963]
+        }
+      }
+    },
+    "ochre-work": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work.png",
+      "sha256": "a01506add562cfcd5bcc54fc86a64728fd7febc7bc600515bfc88b89db3f07e4",
+      "generation_source": {
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work-keyed.png",
+        "sha256": "24bcf7a3eea0349416390e378f3cb0d86cea2ca3736eff51e893938fb5c4631f"
+      },
+      "parts": {
+        "right": {
+          "headgear": [832, 38, 1043, 163],
+          "tunic": [881, 195, 1046, 564],
+          "sleeve": [1114, 243, 1227, 418],
+          "belt": [874, 583, 1049, 642],
+          "boot": [880, 661, 1029, 976]
+        }
+      }
+    }
+  },
+  "source_preflight": {
+    "view": "right",
+    "transparent_margin_px": 12,
+    "identity_parts": ["head", "torso", "arm", "leg"],
+    "garment_parts": ["headgear", "tunic", "sleeve", "belt", "boot"],
+    "toolchain": {
+      "python": "3.9",
+      "pillow": "11.3.0"
+    }
+  },
+  "review_record": "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json",
+  "attachments": ["off", "on"],
+  "directions": ["down", "up", "left", "right"],
+  "ownership": {
+    "identity": ["head", "torso", "arm", "leg"],
+    "garment": ["headgear", "tunic", "sleeve", "belt", "boot"],
+    "attachment": ["sword", "pouch"]
+  },
+  "authority": {
+    "identity": "skin, hair, face, neutral underlayer, bare limbs and neutral boot base only",
+    "garment": "helmet/cap, tunic/apron, sleeve shell, belt and boot shell only",
+    "attachments": "offline socketed sword and pouch only",
+    "pose": "the v2 pose specification's explicit hip/knee/ankle/heel/toe and shoulder/elbow/wrist/hand chains",
+    "scale": "the explicit 76px median Realm scale (75–77px allowed by authored body bob) on ground row 79; opaque padding and sentinel pixels are forbidden"
+  },
+  "reference_gate": {
+    "identity": "watchman",
+    "garment": "watch-blue",
+    "attachment": "off",
+    "action": "carry",
+    "direction": "right",
+    "promotion_policy": "Do not derive left or author down/up until this exact row passes deterministic, biomechanical, painted-style, and native-1x transition review.",
+    "render_parts": {
+      "identity": {
+        "head": [870, 35, 1030, 235],
+        "torso": [885, 260, 1035, 535],
+        "arm": [1120, 290, 1230, 610],
+        "leg": [885, 570, 1035, 975]
+      },
+      "garment": {
+        "headgear": [760, 35, 945, 230],
+        "tunic": [990, 285, 1145, 565],
+        "sleeve": [1245, 295, 1365, 470],
+        "belt": [595, 570, 820, 655],
+        "boot": [945, 650, 1100, 970]
+      }
+    }
+  }
+}

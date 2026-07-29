@@ -2,17 +2,33 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=157';
-import { canAfford, getRaidCountdown, houseCap, getHouseTierReport, computePrestige } from './economy.js?realm=157';
-import { getWonderReport } from './wonder.js?realm=157';
-import { panCameraTo } from './render.js?realm=157';
-import { dispatch } from './commands.js?realm=157';
-import { missions } from './missions.js?realm=157';
-import { getActiveScenario } from './scenarios.js?realm=157';
-import { saveGame, loadGame, hasSave } from './save.js?realm=157';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=157';
-import { notify } from './notifications.js?realm=157';
-import { TRADE_PARTNERS, executeTrade } from './trade.js?realm=157';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=166';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=166';
+import { getWonderReport } from './wonder.js?realm=166';
+import { panCameraTo } from './render.js?realm=166';
+import { dispatch } from './commands.js?realm=166';
+import { missions } from './missions.js?realm=166';
+import { getActiveScenario } from './scenarios.js?realm=166';
+import { saveGame, loadGame } from './save.js?realm=166';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=166';
+import { notify } from './notifications.js?realm=166';
+import { TRADE_PARTNERS } from './trade.js?realm=166';
+import {
+  citizenStaffingCapacity,
+  staffingCount,
+} from './citizen-ownership.js?realm=166';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=166';
+
+const escapeHtml = value => String(value).replace(
+  /[&<>"']/g,
+  character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character],
+);
 
 const BUILDING_ATLAS_TYPES = [
   'granary', 'castle', 'church', 'windmill',
@@ -83,6 +99,15 @@ export function updateUI() {
     showInfoPanel(bb);
   }
   const $ = id => document.getElementById(id);
+  const citizenPanel = $('info-panel');
+  const panelActorId = Number(citizenPanel?.dataset.citizenActorId);
+  if (
+    Number.isSafeInteger(panelActorId)
+    && panelActorId > 0
+    && !buildCurrentCitizenPresentations().some(citizen => citizen.actorId === panelActorId)
+  ) {
+    hideInfoPanel();
+  }
 
   // Wonder HUD chip: stage + fill percent; click pans to the site.
   const wc = $('wonder-chip');
@@ -272,11 +297,11 @@ export function updateUI() {
   // least one prior raid/death so brand-new realms don't trigger
   // either indicator. Hidden in photo-mode via existing #hud rule.
   let streakHTML = '';
-  if (!raidDays && G.stats?.raidsSurvived >= 1 && G.lastRaidDay !== undefined) {
+  if (!raidDays && G.stats?.raidsSurvived >= 1 && G.lastRaidDay !== null) {
     const peaceD = G.day - G.lastRaidDay;
     if (peaceD >= 20) streakHTML += ` · <span title="Days since last raid" style="color:#9bcfa9">☮️${peaceD}d</span>`;
   }
-  if (G.stats?.citizensDied >= 1 && G.lastDeathDay !== undefined) {
+  if (G.stats?.citizensDied >= 1 && G.lastDeathDay !== null) {
     const lifeD = G.day - G.lastDeathDay;
     if (lifeD >= 30) streakHTML += ` · <span title="Days since last death" style="color:#bdb09a">🕯️${lifeD}d</span>`;
   }
@@ -634,9 +659,10 @@ export function showInfoPanel(b) {
   const def = BUILDINGS[b.type];
   const panel = document.getElementById('info-panel');
   if (!panel) return;
+  delete panel.dataset.citizenActorId;
 
   const workerCount = def.workers || 0;
-  const level = b.level || 1;
+  const level = b.level;
 
   // Level stars: ★★☆ for level 2 of 3
   const maxLevel = def.upgrades ? def.upgrades.length + 1 : 1;
@@ -650,7 +676,7 @@ export function showInfoPanel(b) {
   // Effective production multiplier for current level
   const upgrades = def.upgrades || [];
   const levelMult = level >= 2 ? (upgrades[level - 2]?.prodMult ?? 1) : 1;
-  const buildProgress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
+  const buildProgress = Math.max(0, Math.min(1, b.buildProgress));
 
   // HP bar
   const hp = Math.max(0, Math.min(100, b.hp ?? 100));
@@ -667,13 +693,21 @@ export function showInfoPanel(b) {
   // Under construction: show the site as a PROJECT — progress, crew,
   // and a nudge when nobody has picked up the job yet.
   if (buildProgress < 1) {
-    const crew = (b.workers || []);
-    const crewNames = crew.map(w => w.name).join(', ');
+    const capacity = citizenStaffingCapacity(b);
+    const crew = capacity > 0
+      ? buildCurrentCitizenPresentations().filter(citizen => (
+          citizen.assignment?.building.x === b.x
+          && citizen.assignment.building.y === b.y
+        ))
+      : [];
+    const crewNames = crew.map(worker => escapeHtml(worker.identity.name)).join(', ');
     html += `
       <div class="ip-desc">🔨 Under construction</div>
       <div class="ip-row"><span class="ip-label">Progress</span><span class="ip-val">${Math.round(buildProgress * 100)}%</span></div>
-      <div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crew.length}/2${crewNames ? ' — ' + crewNames : ''}</span></div>
-      ${crew.length === 0 ? '<div class="ip-hint">Idle site — free citizens will take the builder job soon.</div>' : ''}
+      ${capacity > 0
+        ? `<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">${crew.length}/${capacity}${crewNames ? ' — ' + crewNames : ''}</span></div>`
+        : '<div class="ip-row"><span class="ip-label">Crew</span><span class="ip-val">Realm-laid infrastructure</span></div>'}
+      ${capacity > 0 && crew.length === 0 ? '<div class="ip-hint">Idle site — free citizens will take the builder job soon.</div>' : ''}
     `;
     panel.innerHTML = html + `<div class="ip-hint">Right-click to cancel and refund half.</div>`;
     panel.style.display = 'block';
@@ -742,7 +776,7 @@ export function showInfoPanel(b) {
   }
 
   if (workerCount > 0) {
-    const staffed = b.workers.length;
+    const staffed = staffingCount(b);
     const workerDots = '●'.repeat(staffed) + '○'.repeat(workerCount - staffed);
     html += `<div class="ip-row"><span class="ip-label">Workers</span><span class="ip-val">${workerDots} ${staffed}/${workerCount}</span></div>`;
   }
@@ -789,7 +823,7 @@ export function showInfoPanel(b) {
     const inStock = Math.floor(G.resources[from] || 0);
     const outStock = Math.floor(G.resources[to] || 0);
     const outAtCap = def.convert.cap && outStock >= def.convert.cap;
-    const understaffed = (def.workers || 0) > 0 && (b.workers?.length || 0) < def.workers;
+    const understaffed = (def.workers || 0) > 0 && staffingCount(b) < def.workers;
     let status, cls;
     if (buildProgress < 1) { status = 'Under construction'; cls = ''; }
     else if (understaffed) { status = 'Needs a worker to run'; cls = 'ip-defense'; }
@@ -887,7 +921,11 @@ export function showInfoPanel(b) {
 
 export function hideInfoPanel() {
   const panel = document.getElementById('info-panel');
-  if (panel) { panel.style.display = 'none'; panel.classList.remove('ip-visible'); }
+  if (panel) {
+    delete panel.dataset.citizenActorId;
+    panel.style.display = 'none';
+    panel.classList.remove('ip-visible');
+  }
 }
 
 function showTooltip(anchor, key, def) {
@@ -1076,7 +1114,7 @@ export function renderHappinessPanel() {
   // Housing tier census — the growth ladder at a glance
   {
     const census = [0, 0, 0, 0];
-    for (const b of G.buildings) if (b.type === 'house') census[Math.min(4, b.level || 1) - 1]++;
+    for (const b of G.buildings) if (b.type === 'house') census[Math.min(4, b.level) - 1]++;
     if (census.some(n => n > 0)) {
       const line = HOUSE_TIERS.map((t, i) => census[i] ? `${census[i]} ${t.name}` : null).filter(Boolean).join(' · ');
       html += `<div class="hp-row"><span class="hp-label">🏘️ Housing</span><span class="hp-val">${line}</span></div>`;
@@ -1092,7 +1130,7 @@ export function renderHappinessPanel() {
     .slice(0, 5);
   if (happinessBuildings.length > 0) {
     html += `<div class="hp-section-title hp-section-roadmap">Ways to Raise Happiness</div>`;
-    html += happinessBuildings.map(([k, def]) =>
+    html += happinessBuildings.map(([, def]) =>
       `<div class="hp-row hp-row-muted"><span class="hp-label">${def.icon} Build a ${def.name}</span><span class="hp-val pot">+${def.happiness}</span></div>`
     ).join('');
   }
@@ -1184,7 +1222,7 @@ export function updateTutorialTip() {
   if (!tutorialDismissed) {
     if (G.buildings.length >= 4) { dismissTutorial(); return; }
     if (G.day >= 6 && G.buildings.length >= 2) { dismissTutorial(); return; }
-    if (G.citizens.length >= 8) { dismissTutorial(); return; }
+    if (G.population >= 8) { dismissTutorial(); return; }
   }
 
   const tipEl = document.getElementById('tutorial-tip');
@@ -1248,24 +1286,26 @@ function renderPopPanel() {
   el.innerHTML = '';
   const stateLabel = { idle:'Idle', find_job:'Seeking work', walk_to_work:'Going to work',
     working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
-    foraging:'Foraging', eating:'Eating' };
+    needs_delivery:'Waiting for storage', foraging:'Foraging', eating:'Eating',
+    go_home:'Going home', sleep:'Sleeping', leisure:'At leisure' };
+  const snapshots = buildCurrentCitizenPresentations();
 
   // Classify citizens
   const isHungry = c => c.hunger >= 70;
-  const isWorking = c => c.jobBuilding && !isHungry(c) &&
-    ['working','walk_to_work','walk_to_deliver','deliver'].includes(c.state);
+  const isWorking = c => c.assignment && !isHungry(c) &&
+    ['working','walk_to_work','walk_to_deliver','deliver'].includes(c.activity.kind);
   const getGroup = c => isHungry(c) ? 2 : isWorking(c) ? 0 : 1;
 
   // Sort: working first (0), idle (1), hungry (2); within group alphabetically
-  const sorted = [...G.citizens].map((c, i) => ({ c, i })).sort((a, b) => {
-    const ga = getGroup(a.c), gb = getGroup(b.c);
-    return ga !== gb ? ga - gb : a.c.name.localeCompare(b.c.name);
+  const sorted = [...snapshots].sort((a, b) => {
+    const ga = getGroup(a), gb = getGroup(b);
+    return ga !== gb ? ga - gb : a.identity.name.localeCompare(b.identity.name) || a.actorId - b.actorId;
   });
 
   // Summary counts
-  const workingCount = G.citizens.filter(isWorking).length;
-  const hungryCount = G.citizens.filter(isHungry).length;
-  const idleCount = G.citizens.length - workingCount - hungryCount;
+  const workingCount = snapshots.filter(isWorking).length;
+  const hungryCount = snapshots.filter(isHungry).length;
+  const idleCount = snapshots.length - workingCount - hungryCount;
 
   // Summary bar
   const summary = document.createElement('div');
@@ -1279,17 +1319,18 @@ function renderPopPanel() {
   // Column header
   const hdr = document.createElement('div');
   hdr.className = 'pop-row pop-header';
-  hdr.innerHTML = `<span>Name</span><span>Job</span><span>State</span><span>Hunger</span><span></span>`;
+  hdr.innerHTML = `<span>Name</span><span>Vocation</span><span>Current task</span><span>Hunger</span><span></span>`;
   el.appendChild(hdr);
 
-  // Compute understaffed buildings up-front so rows can conditionally hide the assign dropdown
-  const hasUnderstaffed = G.buildings.some(b => {
+  const understaffed = G.buildings.filter(b => {
     const def = BUILDINGS[b.type];
-    return def && def.workers && b.workers.length < def.workers;
+    const capacity = citizenStaffingCapacity(b);
+    return def && capacity > 0 && staffingCount(b) < capacity;
   });
+  const hasUnderstaffed = understaffed.length > 0;
 
   let lastGroup = -1;
-  for (const { c, i } of sorted) {
+  for (const c of sorted) {
     const group = getGroup(c);
 
     // Group divider labels
@@ -1304,72 +1345,61 @@ function renderPopPanel() {
       el.appendChild(div);
     }
 
-    const job = c.jobBuilding ? (BUILDINGS[c.jobBuilding.type]?.icon || '') + ' ' + (BUILDINGS[c.jobBuilding.type]?.name || '') : '—';
-    const state = stateLabel[c.state] || c.state;
+    const profession = c.profession.kind[0].toUpperCase() + c.profession.kind.slice(1);
+    const assignment = c.assignment;
+    const buildingDef = assignment ? BUILDINGS[assignment.building.type] : null;
+    const buildingName = assignment ? (buildingDef?.name || assignment.building.type) : null;
+    const state = stateLabel[c.activity.kind] || c.activity.kind;
+    const task = assignment
+      ? `${assignment.purpose === 'temporary' ? 'Helping' : 'Assigned'}: ${assignment.building.complete ? buildingName : `build ${buildingName}`} · ${state}`
+      : state;
+    const activityTitle = assignment
+      ? `${assignment.purpose} · ${assignment.duty} · ${assignment.reason}`
+      : c.activity.reason;
     const hungerBar = Math.round(c.hunger);
     const stateColor = group === 0 ? 'var(--food)' : group === 2 ? 'var(--danger)' : 'var(--gold)';
     const div = document.createElement('div');
     div.className = 'pop-row';
     div.style.borderLeft = `3px solid ${stateColor}`;
     div.innerHTML = `
-      <span class="pop-name">${c.name}</span>
-      <span class="pop-job">${job}</span>
-      <span class="pop-state" style="color:${stateColor}">${state}</span>
+      <span class="pop-name">${escapeHtml(c.identity.name)}</span>
+      <span class="pop-job">${escapeHtml(profession)}</span>
+      <span class="pop-state" style="color:${stateColor}" title="${escapeHtml(activityTitle)}">${escapeHtml(task)}</span>
       <span class="pop-hunger" title="Hunger ${hungerBar}%">
         <span class="pop-hunger-bar" style="width:${hungerBar}%;background:${hungerBar>70?'var(--danger)':hungerBar>40?'var(--gold)':'var(--food)'}"></span>
       </span>
-      <button class="pop-unassign" title="Unassign from job" data-idx="${i}">✕</button>
-      ${!c.jobBuilding && hasUnderstaffed ? `<select class="pop-assign" data-idx="${i}"><option value="">Assign to...</option></select>` : ''}`;
+      ${assignment ? `<button class="pop-unassign" title="Release assignment" data-actor-id="${c.actorId}">✕</button>` : '<span></span>'}
+      ${!assignment && hasUnderstaffed ? `<select class="pop-assign" data-actor-id="${c.actorId}"><option value="">Assign to...</option></select>` : ''}`;
     el.appendChild(div);
   }
 
   // Unassign buttons
   el.querySelectorAll('.pop-unassign').forEach(btn => {
     btn.onclick = () => {
-      const idx = parseInt(btn.dataset.idx);
-      const c = G.citizens[idx];
-      if (c && c.jobBuilding) {
-        c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
-        c.jobBuilding = null;
-        c.visualJob = null;
-        c.state = 'idle';
-        c.path = null;
-        renderPopPanel();
-      }
+      const actorId = Number(btn.dataset.actorId);
+      const result = dispatch({ type: 'RELEASE_CITIZEN', actorId });
+      if (!result.ok) notify('That citizen assignment could not be released.', 'danger', { chronicle: false });
+      renderPopPanel();
     };
   });
 
   // Assignment dropdowns — populate with understaffed buildings
-  const understaffed = G.buildings.filter(b => {
-    const def = BUILDINGS[b.type];
-    return def.workers && b.workers.length < def.workers;
-  });
   el.querySelectorAll('.pop-assign').forEach(sel => {
     for (const b of understaffed) {
       const def = BUILDINGS[b.type];
       const opt = document.createElement('option');
-      opt.value = G.buildings.indexOf(b);
-      opt.textContent = `${def.icon} ${def.name} (${b.workers.length}/${def.workers})`;
+      opt.value = `${b.x},${b.y}`;
+      const capacity = citizenStaffingCapacity(b);
+      opt.textContent = `${def.icon} ${b.buildProgress < 1 ? `Help build ${def.name}` : def.name} (${staffingCount(b)}/${capacity})`;
       sel.appendChild(opt);
     }
     sel.onchange = () => {
-      const cIdx = parseInt(sel.dataset.idx);
-      const bIdx = parseInt(sel.value);
-      const c = G.citizens[cIdx];
-      const b = G.buildings[bIdx];
-      if (c && b) {
-        // Unassign from old job if any
-        if (c.jobBuilding) {
-          c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
-        }
-        c.jobBuilding = b;
-        c.visualJob = b.type;
-        b.workers.push(c);
-        c.state = 'walk_to_work';
-        c.path = null;
-        c.stateTimer = 0;
-        renderPopPanel();
-      }
+      if (!sel.value) return;
+      const actorId = Number(sel.dataset.actorId);
+      const [x, y] = sel.value.split(',').map(Number);
+      const result = dispatch({ type: 'ASSIGN_CITIZEN', actorId, x, y });
+      if (!result.ok) notify('That work assignment is no longer available.', 'danger', { chronicle: false });
+      renderPopPanel();
     };
   });
 
@@ -1380,9 +1410,10 @@ function renderPopPanel() {
     sec.innerHTML = `<div class="pop-section-title">⚠️ Understaffed Buildings</div>`;
     for (const b of understaffed) {
       const def = BUILDINGS[b.type];
+      const capacity = citizenStaffingCapacity(b);
       const div = document.createElement('div');
       div.className = 'pop-understaffed';
-      div.innerHTML = `<span>${def.icon} ${def.name} — ${b.workers.length}/${def.workers} workers</span>`;
+      div.innerHTML = `<span>${def.icon} ${def.name} — ${staffingCount(b)}/${capacity} workers</span>`;
       sec.appendChild(div);
     }
     el.appendChild(sec);
@@ -1496,20 +1527,11 @@ export function showVictoryScreen() {
   const el = document.getElementById('victory-screen');
   if (!el) return;
   el.style.display = 'flex';
-  // Wonder win vs legacy castle win (pre-D4 saves can load with G.won set).
-  // Stage 3 is the Gilded Spire — WONDER_STAGES lives in wonder.js, which
-  // imports this module, so the stage count is a literal here.
-  const wonderWin = !!(G.wonder && G.wonder.stage >= 3);
   const title = el.querySelector('.vic-title');
   const sub = el.querySelector('.vic-subtitle');
   if (title && sub) {
-    if (wonderWin) {
-      title.textContent = 'The Hall of Ages Stands Eternal';
-      sub.textContent = `Raised across the Three Ages and crowned on day ${G.wonder.completeDay || G.day}. The realm is remembered forever.`;
-    } else {
-      title.textContent = 'Victory!';
-      sub.textContent = 'Your castle stands tall. The realm is yours.';
-    }
+    title.textContent = 'The Hall of Ages Stands Eternal';
+    sub.textContent = `Raised across the Three Ages and crowned on day ${G.wonder.completeDay}. The realm is remembered forever.`;
   }
   const prestige = computePrestige();
   const prestigeEl = el.querySelector('.vic-prestige');
@@ -1549,15 +1571,15 @@ function spawnVictoryConfetti() {
   const pieces = [];
   for (let i = 0; i < 80; i++) {
     pieces.push({
-      x: rng() * canvas.width,
-      y: -10 - rng() * canvas.height * 0.5,
-      w: 6 + rng() * 8,
-      h: 4 + rng() * 5,
-      color: COLORS[Math.floor(rng() * COLORS.length)],
-      rot: rng() * Math.PI * 2,
-      vx: (rng() - 0.5) * 3,
-      vy: 2 + rng() * 4,
-      vrot: (rng() - 0.5) * 0.2,
+      x: Math.random() * canvas.width,
+      y: -10 - Math.random() * canvas.height * 0.5,
+      w: 6 + Math.random() * 8,
+      h: 4 + Math.random() * 5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rot: Math.random() * Math.PI * 2,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 4,
+      vrot: (Math.random() - 0.5) * 0.2,
       alpha: 1,
     });
   }

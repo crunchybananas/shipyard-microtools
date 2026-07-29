@@ -1,0 +1,1244 @@
+{
+  "alpha_threshold": 24,
+  "declared_sources": {
+    "garments": {
+      "ochre-work": {
+        "generation_pair": {
+          "dimensions_match": true,
+          "opaque_rgb_mismatches": 0,
+          "passed": true,
+          "zero_alpha_rgb_pixels": 0
+        },
+        "generation_source": {
+          "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work-keyed.png",
+          "sha256": "24bcf7a3eea0349416390e378f3cb0d86cea2ca3736eff51e893938fb5c4631f"
+        },
+        "parts": {
+          "belt": {
+            "alpha_margins": [
+              13,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              874,
+              583,
+              1049,
+              642
+            ],
+            "component_areas": [
+              4286
+            ],
+            "foreground_pixels": 4286,
+            "opaque_bbox_global": [
+              887,
+              595,
+              1037,
+              630
+            ],
+            "opaque_bbox_local": [
+              13,
+              12,
+              163,
+              47
+            ],
+            "passed": true,
+            "size": [
+              175,
+              59
+            ],
+            "trimmed_rgba_sha256": "e6b5364068872924485ffd38737c01714edf32e738ce0755f38f985d174a5631",
+            "trimmed_size": [
+              150,
+              35
+            ]
+          },
+          "boot": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              880,
+              661,
+              1029,
+              976
+            ],
+            "component_areas": [
+              25207
+            ],
+            "foreground_pixels": 25207,
+            "opaque_bbox_global": [
+              892,
+              673,
+              1017,
+              964
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              137,
+              303
+            ],
+            "passed": true,
+            "size": [
+              149,
+              315
+            ],
+            "trimmed_rgba_sha256": "2314ccee5a9e44148d4a97fb34b1e60c526141e1b94a285c8a77670634307a4a",
+            "trimmed_size": [
+              125,
+              291
+            ]
+          },
+          "headgear": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              832,
+              38,
+              1043,
+              163
+            ],
+            "component_areas": [
+              13089
+            ],
+            "foreground_pixels": 13089,
+            "opaque_bbox_global": [
+              844,
+              50,
+              1031,
+              151
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              199,
+              113
+            ],
+            "passed": true,
+            "size": [
+              211,
+              125
+            ],
+            "trimmed_rgba_sha256": "c83dd7e953b54b77b45e84c81661c95eff90f01d3feebc44c0f79cded845761f",
+            "trimmed_size": [
+              187,
+              101
+            ]
+          },
+          "sleeve": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              1114,
+              243,
+              1227,
+              418
+            ],
+            "component_areas": [
+              9314
+            ],
+            "foreground_pixels": 9314,
+            "opaque_bbox_global": [
+              1126,
+              255,
+              1215,
+              406
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              101,
+              163
+            ],
+            "passed": true,
+            "size": [
+              113,
+              175
+            ],
+            "trimmed_rgba_sha256": "a0058c5843ff32cb4377b84c8b57383d058c2c416cf7aff26aaae6e215e66738",
+            "trimmed_size": [
+              89,
+              151
+            ]
+          },
+          "tunic": {
+            "alpha_margins": [
+              12,
+              12,
+              13,
+              12
+            ],
+            "box": [
+              881,
+              195,
+              1046,
+              564
+            ],
+            "component_areas": [
+              38967
+            ],
+            "foreground_pixels": 38967,
+            "opaque_bbox_global": [
+              893,
+              207,
+              1033,
+              552
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              152,
+              357
+            ],
+            "passed": true,
+            "size": [
+              165,
+              369
+            ],
+            "trimmed_rgba_sha256": "e832f24e3ca46df7399f7acf03d476103712d284a112be8546b80188f47534d4",
+            "trimmed_size": [
+              140,
+              345
+            ]
+          }
+        },
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work.png",
+        "sha256": "a01506add562cfcd5bcc54fc86a64728fd7febc7bc600515bfc88b89db3f07e4",
+        "size": [
+          1536,
+          1024
+        ]
+      },
+      "watch-blue": {
+        "generation_pair": {
+          "dimensions_match": true,
+          "opaque_rgb_mismatches": 0,
+          "passed": true,
+          "zero_alpha_rgb_pixels": 0
+        },
+        "generation_source": {
+          "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue-keyed.png",
+          "sha256": "d17113b8cc799b01832726c1b650d2d7f3358e12d19c49d486bc3434415f9cfc"
+        },
+        "parts": {
+          "belt": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              593,
+              566,
+              824,
+              660
+            ],
+            "component_areas": [
+              12234
+            ],
+            "foreground_pixels": 12234,
+            "opaque_bbox_global": [
+              605,
+              578,
+              812,
+              648
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              219,
+              82
+            ],
+            "passed": true,
+            "size": [
+              231,
+              94
+            ],
+            "trimmed_rgba_sha256": "7036cc70e69066181e5026892f89bc3da41839d24ed921a7b6d031b25e2521ee",
+            "trimmed_size": [
+              207,
+              70
+            ]
+          },
+          "boot": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              940,
+              648,
+              1101,
+              963
+            ],
+            "component_areas": [
+              25242
+            ],
+            "foreground_pixels": 25242,
+            "opaque_bbox_global": [
+              952,
+              660,
+              1089,
+              951
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              149,
+              303
+            ],
+            "passed": true,
+            "size": [
+              161,
+              315
+            ],
+            "trimmed_rgba_sha256": "cb8341bfe13e254fd828c910728cf1e4f42ca4cb7f56e2328a5e673518d0dd86",
+            "trimmed_size": [
+              137,
+              291
+            ]
+          },
+          "headgear": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              756,
+              31,
+              947,
+              232
+            ],
+            "component_areas": [
+              20283
+            ],
+            "foreground_pixels": 20283,
+            "opaque_bbox_global": [
+              768,
+              43,
+              935,
+              220
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              179,
+              189
+            ],
+            "passed": true,
+            "size": [
+              191,
+              201
+            ],
+            "trimmed_rgba_sha256": "7617ddf38e9fdd49095f83ebd78399ccb02ae467a53a02dcc91a0ccac41d7e49",
+            "trimmed_size": [
+              167,
+              177
+            ]
+          },
+          "sleeve": {
+            "alpha_margins": [
+              12,
+              12,
+              13,
+              12
+            ],
+            "box": [
+              1242,
+              293,
+              1370,
+              470
+            ],
+            "component_areas": [
+              10131
+            ],
+            "foreground_pixels": 10131,
+            "opaque_bbox_global": [
+              1254,
+              305,
+              1357,
+              458
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              115,
+              165
+            ],
+            "passed": true,
+            "size": [
+              128,
+              177
+            ],
+            "trimmed_rgba_sha256": "4edf8c88e922856c0959f3fb692e98de5ea1afdb2317571df13c7d5468102c31",
+            "trimmed_size": [
+              103,
+              153
+            ]
+          },
+          "tunic": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              986,
+              284,
+              1147,
+              562
+            ],
+            "component_areas": [
+              28120
+            ],
+            "foreground_pixels": 28120,
+            "opaque_bbox_global": [
+              998,
+              296,
+              1135,
+              550
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              149,
+              266
+            ],
+            "passed": true,
+            "size": [
+              161,
+              278
+            ],
+            "trimmed_rgba_sha256": "d0846c929e61f31847ba9fb9248457c4088809df7089dc59d7e25195ad67f9f4",
+            "trimmed_size": [
+              137,
+              254
+            ]
+          }
+        },
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png",
+        "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6",
+        "size": [
+          1536,
+          1024
+        ]
+      }
+    },
+    "identities": {
+      "craftsperson": {
+        "generation_pair": {
+          "dimensions_match": true,
+          "opaque_rgb_mismatches": 0,
+          "passed": true,
+          "zero_alpha_rgb_pixels": 0
+        },
+        "generation_source": {
+          "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson-keyed.png",
+          "sha256": "0f69d684f8c1750ebd544e56275fdbad076faf55036739a3f82bafa576a9144e"
+        },
+        "parts": {
+          "arm": {
+            "alpha_margins": [
+              12,
+              13,
+              12,
+              12
+            ],
+            "box": [
+              1172,
+              277,
+              1286,
+              601
+            ],
+            "component_areas": [
+              16471
+            ],
+            "foreground_pixels": 16471,
+            "opaque_bbox_global": [
+              1184,
+              290,
+              1274,
+              589
+            ],
+            "opaque_bbox_local": [
+              12,
+              13,
+              102,
+              312
+            ],
+            "passed": true,
+            "size": [
+              114,
+              324
+            ],
+            "trimmed_rgba_sha256": "1cc9f4182eecf6b3aeff5d63b49f9c74d6cfc32c92a19f0c2bd4310132cbdb99",
+            "trimmed_size": [
+              90,
+              299
+            ]
+          },
+          "head": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              13
+            ],
+            "box": [
+              807,
+              17,
+              996,
+              236
+            ],
+            "component_areas": [
+              23222
+            ],
+            "foreground_pixels": 23222,
+            "opaque_bbox_global": [
+              819,
+              29,
+              984,
+              223
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              177,
+              206
+            ],
+            "passed": true,
+            "size": [
+              189,
+              219
+            ],
+            "trimmed_rgba_sha256": "d9d8728d7bf08404d15e622fbaa20be2ff6eef6a8d113f7bd179d3bfbf68e418",
+            "trimmed_size": [
+              165,
+              194
+            ]
+          },
+          "leg": {
+            "alpha_margins": [
+              12,
+              12,
+              13,
+              12
+            ],
+            "box": [
+              938,
+              599,
+              1095,
+              972
+            ],
+            "component_areas": [
+              31210
+            ],
+            "foreground_pixels": 31210,
+            "opaque_bbox_global": [
+              950,
+              611,
+              1082,
+              960
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              144,
+              361
+            ],
+            "passed": true,
+            "size": [
+              157,
+              373
+            ],
+            "trimmed_rgba_sha256": "dd337280b04d2bf6bf2c78e092499f1bda6ddd0d7603ccaad9c3cfe48ec5f6b8",
+            "trimmed_size": [
+              132,
+              349
+            ]
+          },
+          "torso": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              937,
+              263,
+              1104,
+              556
+            ],
+            "component_areas": [
+              30097
+            ],
+            "foreground_pixels": 30097,
+            "opaque_bbox_global": [
+              949,
+              275,
+              1092,
+              544
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              155,
+              281
+            ],
+            "passed": true,
+            "size": [
+              167,
+              293
+            ],
+            "trimmed_rgba_sha256": "aa7acfc0bdeabc53cc7ae3d05cd11effd02638afd92047f799649686ee094223",
+            "trimmed_size": [
+              143,
+              269
+            ]
+          }
+        },
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png",
+        "sha256": "fa6b11610b0e5cf67ae1c752a1ee7ecf39f462f0b2a74ed2e6af8af4549152bd",
+        "size": [
+          1536,
+          1024
+        ]
+      },
+      "watchman": {
+        "generation_pair": {
+          "dimensions_match": true,
+          "opaque_rgb_mismatches": 0,
+          "passed": true,
+          "zero_alpha_rgb_pixels": 0
+        },
+        "generation_source": {
+          "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman-keyed.png",
+          "sha256": "4024420b50e0b463e7a93e2f6712a042db760c35532a87009346daf292df1072"
+        },
+        "parts": {
+          "arm": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              1117,
+              287,
+              1236,
+              610
+            ],
+            "component_areas": [
+              18085
+            ],
+            "foreground_pixels": 18085,
+            "opaque_bbox_global": [
+              1129,
+              299,
+              1224,
+              598
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              107,
+              311
+            ],
+            "passed": true,
+            "size": [
+              119,
+              323
+            ],
+            "trimmed_rgba_sha256": "078246aa1f46ac071a09b48e83a3e935787e1ae0d63d913a2dd3dd80c9f854bb",
+            "trimmed_size": [
+              95,
+              299
+            ]
+          },
+          "head": {
+            "alpha_margins": [
+              12,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              864,
+              31,
+              1036,
+              239
+            ],
+            "component_areas": [
+              21109
+            ],
+            "foreground_pixels": 21109,
+            "opaque_bbox_global": [
+              876,
+              43,
+              1024,
+              227
+            ],
+            "opaque_bbox_local": [
+              12,
+              12,
+              160,
+              196
+            ],
+            "passed": true,
+            "size": [
+              172,
+              208
+            ],
+            "trimmed_rgba_sha256": "02d3c98a68f3e93f47ce1d677149a6e329516fc897f7f7695415598ffdb7578f",
+            "trimmed_size": [
+              148,
+              184
+            ]
+          },
+          "leg": {
+            "alpha_margins": [
+              12,
+              13,
+              12,
+              12
+            ],
+            "box": [
+              881,
+              566,
+              1039,
+              976
+            ],
+            "component_areas": [
+              35048
+            ],
+            "foreground_pixels": 35048,
+            "opaque_bbox_global": [
+              893,
+              579,
+              1027,
+              964
+            ],
+            "opaque_bbox_local": [
+              12,
+              13,
+              146,
+              398
+            ],
+            "passed": true,
+            "size": [
+              158,
+              410
+            ],
+            "trimmed_rgba_sha256": "fca980d077cf13d4d3f6f52d74030f73f811249b92e69a9dd54440de0e832ead",
+            "trimmed_size": [
+              134,
+              385
+            ]
+          },
+          "torso": {
+            "alpha_margins": [
+              13,
+              12,
+              12,
+              12
+            ],
+            "box": [
+              880,
+              257,
+              1054,
+              537
+            ],
+            "component_areas": [
+              31127
+            ],
+            "foreground_pixels": 31127,
+            "opaque_bbox_global": [
+              893,
+              269,
+              1042,
+              525
+            ],
+            "opaque_bbox_local": [
+              13,
+              12,
+              162,
+              268
+            ],
+            "passed": true,
+            "size": [
+              174,
+              280
+            ],
+            "trimmed_rgba_sha256": "129b5f94bfc48b20647e85d2933e4e99fb2b906409451999b17c4b89c104b311",
+            "trimmed_size": [
+              149,
+              256
+            ]
+          }
+        },
+        "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png",
+        "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca",
+        "size": [
+          1536,
+          1024
+        ]
+      }
+    }
+  },
+  "factorial_ready": false,
+  "failures": [],
+  "frozen_reference": {
+    "flattened_row": {
+      "actual_sha256": "491bfcd0a3cb5b96c5371f31900531937448ce2219ce1e5b32cc30a64166da9c",
+      "expected_sha256": "491bfcd0a3cb5b96c5371f31900531937448ce2219ce1e5b32cc30a64166da9c",
+      "passed": true,
+      "path": "rows/watchman/watch-blue/off/carry-right.png"
+    },
+    "native_1x_loop": {
+      "actual_sha256": "e9fe0199ff891a39b962adce0ee12366964b5474a28253541beed1fa7a0ac8aa",
+      "expected_sha256": "e9fe0199ff891a39b962adce0ee12366964b5474a28253541beed1fa7a0ac8aa",
+      "passed": true,
+      "path": "proof/carry-right-unlabeled-x1.gif"
+    }
+  },
+  "generated_actor_rows": 0,
+  "minimum_foreground_pixels": 256,
+  "promotion_blockers": [
+    "reference-render-crops-not-cut-over",
+    "left-down-up-view-parts-not-authored",
+    "sword-and-pouch-sources-not-authored",
+    "factorial-compiler-not-built"
+  ],
+  "reference_render_parts": {
+    "audit": {
+      "garment": {
+        "belt": {
+          "alpha_margins": [
+            10,
+            8,
+            8,
+            7
+          ],
+          "box": [
+            595,
+            570,
+            820,
+            655
+          ],
+          "component_areas": [
+            12234
+          ],
+          "findings": [
+            "crop alpha margin [10, 8, 8, 7] is below 12px"
+          ],
+          "foreground_pixels": 12234,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            605,
+            578,
+            812,
+            648
+          ],
+          "opaque_bbox_local": [
+            10,
+            8,
+            217,
+            78
+          ],
+          "passed": false,
+          "size": [
+            225,
+            85
+          ],
+          "trimmed_rgba_sha256": "7036cc70e69066181e5026892f89bc3da41839d24ed921a7b6d031b25e2521ee",
+          "trimmed_size": [
+            207,
+            70
+          ]
+        },
+        "boot": {
+          "alpha_margins": [
+            7,
+            10,
+            11,
+            19
+          ],
+          "box": [
+            945,
+            650,
+            1100,
+            970
+          ],
+          "component_areas": [
+            25242
+          ],
+          "findings": [
+            "crop alpha margin [7, 10, 11, 19] is below 12px"
+          ],
+          "foreground_pixels": 25242,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            952,
+            660,
+            1089,
+            951
+          ],
+          "opaque_bbox_local": [
+            7,
+            10,
+            144,
+            301
+          ],
+          "passed": false,
+          "size": [
+            155,
+            320
+          ],
+          "trimmed_rgba_sha256": "cb8341bfe13e254fd828c910728cf1e4f42ca4cb7f56e2328a5e673518d0dd86",
+          "trimmed_size": [
+            137,
+            291
+          ]
+        },
+        "headgear": {
+          "alpha_margins": [
+            8,
+            8,
+            10,
+            10
+          ],
+          "box": [
+            760,
+            35,
+            945,
+            230
+          ],
+          "component_areas": [
+            20283
+          ],
+          "findings": [
+            "crop alpha margin [8, 8, 10, 10] is below 12px"
+          ],
+          "foreground_pixels": 20283,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            768,
+            43,
+            935,
+            220
+          ],
+          "opaque_bbox_local": [
+            8,
+            8,
+            175,
+            185
+          ],
+          "passed": false,
+          "size": [
+            185,
+            195
+          ],
+          "trimmed_rgba_sha256": "7617ddf38e9fdd49095f83ebd78399ccb02ae467a53a02dcc91a0ccac41d7e49",
+          "trimmed_size": [
+            167,
+            177
+          ]
+        },
+        "sleeve": {
+          "alpha_margins": [
+            9,
+            10,
+            8,
+            12
+          ],
+          "box": [
+            1245,
+            295,
+            1365,
+            470
+          ],
+          "component_areas": [
+            10131
+          ],
+          "findings": [
+            "crop alpha margin [9, 10, 8, 12] is below 12px"
+          ],
+          "foreground_pixels": 10131,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            1254,
+            305,
+            1357,
+            458
+          ],
+          "opaque_bbox_local": [
+            9,
+            10,
+            112,
+            163
+          ],
+          "passed": false,
+          "size": [
+            120,
+            175
+          ],
+          "trimmed_rgba_sha256": "4edf8c88e922856c0959f3fb692e98de5ea1afdb2317571df13c7d5468102c31",
+          "trimmed_size": [
+            103,
+            153
+          ]
+        },
+        "tunic": {
+          "alpha_margins": [
+            8,
+            11,
+            10,
+            15
+          ],
+          "box": [
+            990,
+            285,
+            1145,
+            565
+          ],
+          "component_areas": [
+            28120
+          ],
+          "findings": [
+            "crop alpha margin [8, 11, 10, 15] is below 12px"
+          ],
+          "foreground_pixels": 28120,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            998,
+            296,
+            1135,
+            550
+          ],
+          "opaque_bbox_local": [
+            8,
+            11,
+            145,
+            265
+          ],
+          "passed": false,
+          "size": [
+            155,
+            280
+          ],
+          "trimmed_rgba_sha256": "d0846c929e61f31847ba9fb9248457c4088809df7089dc59d7e25195ad67f9f4",
+          "trimmed_size": [
+            137,
+            254
+          ]
+        }
+      },
+      "identity": {
+        "arm": {
+          "alpha_margins": [
+            9,
+            9,
+            6,
+            12
+          ],
+          "box": [
+            1120,
+            290,
+            1230,
+            610
+          ],
+          "component_areas": [
+            18085
+          ],
+          "findings": [
+            "crop alpha margin [9, 9, 6, 12] is below 12px"
+          ],
+          "foreground_pixels": 18085,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            1129,
+            299,
+            1224,
+            598
+          ],
+          "opaque_bbox_local": [
+            9,
+            9,
+            104,
+            308
+          ],
+          "passed": false,
+          "size": [
+            110,
+            320
+          ],
+          "trimmed_rgba_sha256": "078246aa1f46ac071a09b48e83a3e935787e1ae0d63d913a2dd3dd80c9f854bb",
+          "trimmed_size": [
+            95,
+            299
+          ]
+        },
+        "head": {
+          "alpha_margins": [
+            6,
+            8,
+            6,
+            8
+          ],
+          "box": [
+            870,
+            35,
+            1030,
+            235
+          ],
+          "component_areas": [
+            21109
+          ],
+          "findings": [
+            "crop alpha margin [6, 8, 6, 8] is below 12px"
+          ],
+          "foreground_pixels": 21109,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            876,
+            43,
+            1024,
+            227
+          ],
+          "opaque_bbox_local": [
+            6,
+            8,
+            154,
+            192
+          ],
+          "passed": false,
+          "size": [
+            160,
+            200
+          ],
+          "trimmed_rgba_sha256": "02d3c98a68f3e93f47ce1d677149a6e329516fc897f7f7695415598ffdb7578f",
+          "trimmed_size": [
+            148,
+            184
+          ]
+        },
+        "leg": {
+          "alpha_margins": [
+            8,
+            9,
+            8,
+            11
+          ],
+          "box": [
+            885,
+            570,
+            1035,
+            975
+          ],
+          "component_areas": [
+            35048
+          ],
+          "findings": [
+            "crop alpha margin [8, 9, 8, 11] is below 12px"
+          ],
+          "foreground_pixels": 35048,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            893,
+            579,
+            1027,
+            964
+          ],
+          "opaque_bbox_local": [
+            8,
+            9,
+            142,
+            394
+          ],
+          "passed": false,
+          "size": [
+            150,
+            405
+          ],
+          "trimmed_rgba_sha256": "fca980d077cf13d4d3f6f52d74030f73f811249b92e69a9dd54440de0e832ead",
+          "trimmed_size": [
+            134,
+            385
+          ]
+        },
+        "torso": {
+          "alpha_margins": [
+            8,
+            9,
+            0,
+            10
+          ],
+          "box": [
+            885,
+            260,
+            1035,
+            535
+          ],
+          "component_areas": [
+            30718
+          ],
+          "findings": [
+            "crop alpha margin [8, 9, 0, 10] is below 12px"
+          ],
+          "foreground_pixels": 30718,
+          "matches_preflight_box": false,
+          "opaque_bbox_global": [
+            893,
+            269,
+            1035,
+            525
+          ],
+          "opaque_bbox_local": [
+            8,
+            9,
+            150,
+            265
+          ],
+          "passed": false,
+          "size": [
+            150,
+            275
+          ],
+          "trimmed_rgba_sha256": "94f71cba9fbf3173f0562640a0152a32a8a84f82ac61821291d998ff5fadd2b3",
+          "trimmed_size": [
+            142,
+            256
+          ]
+        }
+      }
+    },
+    "matches_preflight": false
+  },
+  "schema": "realm.actor-pose.a2-source-preflight-report.v1",
+  "source_preflight_passed": true,
+  "stage": "source-readiness-before-owner-gate",
+  "status": "source-parts-ready-reference-cutover-pending",
+  "transparent_margin_px": 12,
+  "view": "right"
+}

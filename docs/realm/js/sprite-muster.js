@@ -4,12 +4,11 @@ import {
   FRAMES,
   ROLES,
   actorRowKey,
-} from '../scripts/sprite-source-contract.mjs';
-import { drawActorAtlasFrame } from './render.js?realm=157';
+} from './sprite-source-contract.js?realm=166';
+import { drawActorAtlasFrame } from './render.js?realm=166';
 
 const STATUS_STYLE = {
   accepted: { label: 'LOCKED', color: '#6dd4b8' },
-  waived: { label: 'WAIVED', color: '#f5c84c' },
   candidate: { label: 'CANDIDATE', color: '#78aee6' },
   base: { label: 'BASE', color: '#d98679' },
 };
@@ -22,7 +21,6 @@ let manifest = { version: 1, rows: {} };
 let page = 0;
 let playing = true;
 let frame = 0;
-let raf = 0;
 let ready = false;
 let manifestReady = false;
 let lastFrameAt = 0;
@@ -165,24 +163,22 @@ function updateControls() {
   if (play) play.textContent = playing ? 'Pause motion' : 'Play motion';
   if (counts) {
     const values = sourceCounts();
-    counts.textContent = `${values.locked} locked · ${values.waived} waived · ${values.base} base`;
+    counts.textContent = `${values.locked} locked · ${values.candidate} candidate · ${values.base} base`;
   }
 }
 
 function sourceFor(role, action, dir) {
   const item = manifest.rows?.[actorRowKey(role, action, dir)] || null;
   if (item?.status === 'accepted') return STATUS_STYLE.accepted;
-  if (item?.status === 'accepted-with-waiver') return STATUS_STYLE.waived;
   if (item?.status === 'candidate') return STATUS_STYLE.candidate;
   return STATUS_STYLE.base;
 }
 
 function sourceCounts() {
-  const counts = { locked: 0, waived: 0, candidate: 0, base: 0 };
+  const counts = { locked: 0, candidate: 0, base: 0 };
   for (const { role, action, dir } of allRows()) {
     const source = sourceFor(role, action, dir);
     if (source.label === 'LOCKED') counts.locked++;
-    else if (source.label === 'WAIVED') counts.waived++;
     else if (source.label === 'CANDIDATE') counts.candidate++;
     else counts.base++;
   }
@@ -206,7 +202,7 @@ function renderLoop(now) {
     lastFrameAt = now;
   }
   draw(now);
-  raf = requestAnimationFrame(renderLoop);
+  requestAnimationFrame(renderLoop);
 }
 
 function draw(now) {

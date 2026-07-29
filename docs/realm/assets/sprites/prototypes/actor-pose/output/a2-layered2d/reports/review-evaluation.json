@@ -1,0 +1,28 @@
+{
+  "artifacts": {
+    "flattened_row": {
+      "path": "rows/watchman/watch-blue/off/carry-right.png",
+      "sha256": "491bfcd0a3cb5b96c5371f31900531937448ce2219ce1e5b32cc30a64166da9c"
+    },
+    "native_unlabeled_loop": {
+      "path": "proof/carry-right-unlabeled-x1.gif",
+      "sha256": "e9fe0199ff891a39b962adce0ee12366964b5474a28253541beed1fa7a0ac8aa"
+    }
+  },
+  "council_reference_pass": true,
+  "decisions": {
+    "luna": "approve-reference-only",
+    "owner": "pending",
+    "terra": "approve-reference-only"
+  },
+  "factorial_authorized": false,
+  "failures": [],
+  "owner_reference_pass": false,
+  "record": "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json",
+  "review_id": "a2-right-reference-v3",
+  "schema": "realm.actor-pose.review-evaluation.v1",
+  "status": "council-approved-owner-pending",
+  "subject_bound": true,
+  "subject_sha256": "9584845536c03912fc266c8d00507123b6878737206c10c548ef930980183849",
+  "valid": true
+}

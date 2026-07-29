@@ -2,7 +2,7 @@
 // art the cast is known by): dominant clusters for skin, hair/hat, top,
 // bottom, boots — feeds the sprite forge so a fresh-start cast keeps the
 // game's established color language.
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

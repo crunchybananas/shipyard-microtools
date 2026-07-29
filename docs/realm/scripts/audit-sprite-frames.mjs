@@ -4,12 +4,8 @@
 // era with the painted art direction, or whose body scale jumps between
 // actions, fails this audit with a non-zero exit instead of compiling
 // silently into the runtime atlas.
-//
-// Flags:
-//   --allow-mixed   downgrade era/scale gate failures to loud warnings
-//                   (transition escape hatch while legacy rows are repainted)
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,8 +15,6 @@ const ROOT = join(__dirname, '..');
 const ACTOR_DIR = join(ROOT, 'assets', 'sprites', 'actors-compiled');
 const ROW_MANIFEST = join(ROOT, 'assets', 'sprites', 'actor-rows', 'manifest.json');
 const SHOTS = join(ROOT, 'scripts', 'screenshots');
-
-const ALLOW_MIXED = process.argv.includes('--allow-mixed');
 
 const FRAME_W = 64;
 const FRAME_H = 84;
@@ -470,19 +464,12 @@ try {
 
 function manifestStatus(row) {
   const item = manifestRows[`${row.role}/${row.action}/${row.dir}`];
-  if (!item) return { label: 'base', waivedScale: false };
-  if (item.status === 'accepted-with-waiver') {
-    return {
-      label: 'waived',
-      waivedScale: (item.allowedWarnings || []).includes('direction-scale-mismatch'),
-    };
-  }
-  if (item.status === 'accepted') return { label: 'locked', waivedScale: false };
-  return { label: item.status, waivedScale: false };
+  if (!item) return 'base';
+  if (item.status === 'accepted') return 'locked';
+  return item.status;
 }
 
 const failures = [];
-const waived = [];
 const byRole = new Map(ROLES.map((role) => [role, tableRows.filter((r) => r.role === role)]));
 
 for (const [role, rows] of byRole) {
@@ -527,15 +514,13 @@ for (const [role, rows] of byRole) {
       if (row.dir !== dir || row.action === 'walk' || !row.medianBodyH) continue;
       const delta = Math.abs(row.medianBodyH - walkRow.medianBodyH);
       if (delta <= SCALE_TOLERANCE_PX) continue;
-      const status = manifestStatus(row);
       const line = `${role}/${row.action}/${row.dir}: body ${row.medianBodyH}px vs walk ${walkRow.medianBodyH}px (Δ${delta}px > ${SCALE_TOLERANCE_PX}px)`;
-      if (status.waivedScale) waived.push(`${line} [manifest waiver]`);
-      else failures.push(line);
+      failures.push(line);
     }
   }
 
   for (const row of rows) {
-    row.manifestStatus = manifestStatus(row).label;
+    row.manifestStatus = manifestStatus(row);
     row.looseFragments = row.fragmentPixels > 160 || row.fragmentCount > 8;
   }
 }
@@ -561,7 +546,7 @@ for (const item of worst.slice(0, 12)) {
 
 await writeFile(join(SHOTS, 'sprite-audit-report.json'), `${JSON.stringify({
   generatedAt: new Date().toISOString(),
-  gate: { failures, waived, allowMixed: ALLOW_MIXED },
+  gate: { failures },
   styleTable: tableRows,
   worst,
   reports,
@@ -569,12 +554,10 @@ await writeFile(join(SHOTS, 'sprite-audit-report.json'), `${JSON.stringify({
 console.log('[sprite-audit] wrote scripts/screenshots/sprite-audit-report.json');
 console.log('[sprite-audit] wrote scripts/screenshots/sprite-audit-worst-rows.png');
 
-for (const line of waived) console.log(`[sprite-audit] WAIVED: ${line}`);
 if (failures.length) {
-  const level = ALLOW_MIXED ? 'GATE (allowed by --allow-mixed)' : 'GATE FAILURE';
-  for (const line of failures) console.log(`[sprite-audit] ${level}: ${line}`);
+  for (const line of failures) console.log(`[sprite-audit] GATE FAILURE: ${line}`);
   console.log(`[sprite-audit] ${failures.length} era/scale gate finding(s); painted era at stable body scale is the contract`);
 }
 
 await browser.close();
-if (failures.length && !ALLOW_MIXED) process.exit(1);
+if (failures.length) process.exit(1);

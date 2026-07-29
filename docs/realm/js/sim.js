@@ -13,20 +13,22 @@
 // added here MUST pass verify-core-purity + verify-determinism.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, updateSeason, getSeasonData } from './state.js?realm=157';
-import { updateCitizens } from './citizens.js?realm=157';
-import { updateAvatar } from './avatar.js?realm=157';
-import { updateSoldiers } from './soldiers.js?realm=157';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=157';
-import { updateWalkers } from './walkers.js?realm=157';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=157';
-import { checkMissions } from './missions.js?realm=157';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=157';
-import { updateWonder } from './wonder.js?realm=157';
-import { checkRandomEvents } from './events.js?realm=157';
-import { checkScenarioComplete } from './scenarios.js?realm=157';
-import { chronicle, announce, sfx } from './log.js?realm=157';
-import { emit } from './bus.js?realm=157';
+import { G, updateSeason, getSeasonData } from './state.js?realm=166';
+import { updateCitizens } from './citizens.js?realm=166';
+import { updateAvatar } from './avatar.js?realm=166';
+import { updateSoldiers } from './soldiers.js?realm=166';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=166';
+import { updateWalkers } from './walkers.js?realm=166';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=166';
+import { checkMissions } from './missions.js?realm=166';
+import { updateResearch, checkEraAdvance } from './tech.js?realm=166';
+import { updateWonder } from './wonder.js?realm=166';
+import { checkRandomEvents } from './events.js?realm=166';
+import { checkScenarioComplete } from './scenarios.js?realm=166';
+import { chronicle, announce, sfx } from './log.js?realm=166';
+import { emit } from './bus.js?realm=166';
+import { checkStoryBeats } from './story.js?realm=166';
+import { updateRaidSummary } from './raid-summary.js?realm=166';
 
 // ── Day/Night clock (moved from main.js updateTime) ─────────────────
 function tickClock() {
@@ -85,9 +87,7 @@ function checkScenarioVictory() {
   if (G._scenarioWon) return;
   if (!checkScenarioComplete()) return;
   G._scenarioWon = true;
-  G._scenariosCompleted = G._scenariosCompleted || [];
-  if (!G._scenariosCompleted.includes(G.scenario)) G._scenariosCompleted.push(G.scenario);
-  if (G.stats && !G.stats.scenariosWon.includes(G.scenario)) G.stats.scenariosWon.push(G.scenario);
+  if (!G.stats.scenariosWon.includes(G.scenario)) G.stats.scenariosWon.push(G.scenario);
   emit('scenario-won', { id: G.scenario });
 }
 
@@ -95,22 +95,39 @@ function checkScenarioVictory() {
 // here — the shell multiplies TICK COUNT, not per-tick deltas.
 export function coreTick() {
   G.gameTick++;
-  tickClock();
-  updateAvatar();
-  updateCitizens();
-  updateSoldiers();
-  updateEnemies();
-  updateTowers();
-  updateProjectiles();
-  updateWalkers();
-  updateProduction();
-  updateFires();
-  updateResearch();
   const t = G.gameTick;
-  if (t % 60 === 0) {
-    checkMissions();
-    checkEraAdvance();
+  for (const system of CORE_SYSTEMS) {
+    if (!system.every || t % system.every === 0) system.run();
   }
-  if (t % 120 === 0) checkScenarioVictory();
-  if (t % 720 === 0) updateWonder();
 }
+
+// This is executable order, not documentation. runtime-contract.json is the
+// authoritative contract and verify-module-graph.mjs compares this exported
+// sequence to it. Reordering or adding a system therefore requires an explicit
+// coreSystemOrderVersion change.
+const CORE_SYSTEMS = Object.freeze([
+  { id: 'advance-clock', run: tickClock },
+  { id: 'avatar', run: updateAvatar },
+  { id: 'citizens', run: updateCitizens },
+  { id: 'soldiers', run: updateSoldiers },
+  { id: 'enemies', run: updateEnemies },
+  { id: 'towers', run: updateTowers },
+  { id: 'projectiles', run: updateProjectiles },
+  { id: 'walkers', run: updateWalkers },
+  { id: 'production', run: updateProduction },
+  { id: 'fires', run: updateFires },
+  { id: 'research', run: updateResearch },
+  { id: 'missions@60', every: 60, run: checkMissions },
+  { id: 'era@60', every: 60, run: checkEraAdvance },
+  { id: 'scenario@120', every: 120, run: checkScenarioVictory },
+  { id: 'wonder@720', every: 720, run: updateWonder },
+  { id: 'raid-summary', run: updateRaidSummary },
+  { id: 'story@60', every: 60, run: checkStoryBeats },
+]);
+
+export const CORE_SYSTEM_ORDER = Object.freeze(CORE_SYSTEMS.map(system => system.id));
+
+// Direct graph-coherence probe used by the determinism gate. Returning the
+// reference makes a split state.js URL identity observable instead of letting
+// another tick-0 false positive pass.
+export function coreStateIdentity() { return G; }

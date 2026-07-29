@@ -1,0 +1,65 @@
+{
+  "schema": "realm.actor-pose.action-clips.v1",
+  "timeline": {
+    "beats": 8,
+    "beat_names": [
+      "left-contact",
+      "left-load",
+      "left-pass",
+      "left-rise",
+      "right-contact",
+      "right-load",
+      "right-pass",
+      "right-rise"
+    ],
+    "policy": "Frame N is the same authored beat in every direction."
+  },
+  "clips": {
+    "walk": {
+      "root_motion": "in-place",
+      "attachment": "role-rear-tool",
+      "beats": [
+        {"left_dx": -3, "right_dx": 3, "left_lift": 0, "right_lift": 0, "arm": 3, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 1, "arm": 2, "contact": ["left"]},
+        {"left_dx": 0, "right_dx": 0, "left_lift": 0, "right_lift": 2, "arm": 0, "contact": ["left"]},
+        {"left_dx": 2, "right_dx": -2, "left_lift": 1, "right_lift": 1, "arm": -2, "contact": []},
+        {"left_dx": 3, "right_dx": -3, "left_lift": 0, "right_lift": 0, "arm": -3, "contact": ["left", "right"]},
+        {"left_dx": 2, "right_dx": -2, "left_lift": 1, "right_lift": 0, "arm": -2, "contact": ["right"]},
+        {"left_dx": 0, "right_dx": 0, "left_lift": 2, "right_lift": 0, "arm": 0, "contact": ["right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 1, "right_lift": 1, "arm": 2, "contact": []}
+      ]
+    },
+    "carry": {
+      "root_motion": "in-place",
+      "attachment": "guard-crate",
+      "beats": [
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 1, "load_dx": 0, "load_dy": 0, "contact": ["left", "right"]},
+        {"left_dx": -1, "right_dx": 1, "left_lift": 0, "right_lift": 1, "arm": 1, "load_dx": 0, "load_dy": -1, "contact": ["left"]},
+        {"left_dx": 0, "right_dx": 0, "left_lift": 0, "right_lift": 1, "arm": 0, "load_dx": 1, "load_dy": -1, "contact": ["left"]},
+        {"left_dx": 1, "right_dx": -1, "left_lift": 1, "right_lift": 1, "arm": -1, "load_dx": 1, "load_dy": 0, "contact": []},
+        {"left_dx": 2, "right_dx": -2, "left_lift": 0, "right_lift": 0, "arm": -1, "load_dx": 0, "load_dy": 0, "contact": ["left", "right"]},
+        {"left_dx": 1, "right_dx": -1, "left_lift": 1, "right_lift": 0, "arm": -1, "load_dx": 0, "load_dy": 1, "contact": ["right"]},
+        {"left_dx": 0, "right_dx": 0, "left_lift": 1, "right_lift": 0, "arm": 0, "load_dx": -1, "load_dy": 1, "contact": ["right"]},
+        {"left_dx": -1, "right_dx": 1, "left_lift": 1, "right_lift": 1, "arm": 1, "load_dx": -1, "load_dy": 0, "contact": []}
+      ]
+    },
+    "work": {
+      "root_motion": "locked",
+      "attachment": "builder-hammer",
+      "beats": [
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 0, "tool_angle": -70, "tool_reach": 17, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 1, "tool_angle": -48, "tool_reach": 18, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 2, "tool_angle": -22, "tool_reach": 19, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 3, "tool_angle": 8, "tool_reach": 19, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 2, "tool_angle": 36, "tool_reach": 18, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": 0, "tool_angle": 58, "tool_reach": 17, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": -1, "tool_angle": 24, "tool_reach": 18, "contact": ["left", "right"]},
+        {"left_dx": -2, "right_dx": 2, "left_lift": 0, "right_lift": 0, "arm": -1, "tool_angle": -30, "tool_reach": 18, "contact": ["left", "right"]}
+      ]
+    }
+  },
+  "assignments": {
+    "guard": ["walk", "carry"],
+    "builder": ["walk", "work"]
+  }
+}

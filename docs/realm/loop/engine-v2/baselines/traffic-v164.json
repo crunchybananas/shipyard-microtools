@@ -1,0 +1,318 @@
+{
+  "schema": "realm.engine-v2.phase0c-traffic-baseline",
+  "schemaVersion": 2,
+  "recordedRevision": 164,
+  "runtime": {
+    "moduleRevision": 164,
+    "saveVersion": 4,
+    "simulationVersion": 3,
+    "coreSystemOrderVersion": "sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014"
+  },
+  "measurementDefinitions": {
+    "pathCallCount": "All production findPath invocations, including failed calls, measured by before/after snapshots of a read-only module counter.",
+    "replanCount": "Production findPath calls after fixture-authored or first-assignment planning calls.",
+    "blockedTimeTicks": "Ticks with movement intent at tick start and less than 0.000001 tile of displacement.",
+    "ownershipTransitions": "Changes observed through immutable presentation snapshots: actorId plus appearanceId, profession, assignment summary, activity, and presentation variant."
+  },
+  "scenarios": {
+    "worksiteCongestion": {
+      "classification": "known-defect",
+      "finding": "legal-worksite-workers-collapse-inside-personal-space",
+      "fixture": {
+        "buildings": [
+          "mine@20,19",
+          "mine@20,21"
+        ],
+        "legalWorkerSlots": 4,
+        "sharedOreTile": {
+          "x": 21,
+          "y": 20
+        },
+        "workerStarts": [
+          {
+            "actorId": 1,
+            "x": 14,
+            "y": 17
+          },
+          {
+            "actorId": 2,
+            "x": 26,
+            "y": 17
+          },
+          {
+            "actorId": 3,
+            "x": 14,
+            "y": 23
+          },
+          {
+            "actorId": 4,
+            "x": 26,
+            "y": 23
+          }
+        ]
+      },
+      "ticksRun": 368,
+      "pathCallCount": 4,
+      "initialPathCallCount": 4,
+      "replanCount": 0,
+      "blockedTimeTicks": {
+        "actor-1": 0,
+        "actor-2": 0,
+        "actor-3": 0,
+        "actor-4": 0
+      },
+      "totalBlockedTimeTicks": 0,
+      "assignmentTransitions": {
+        "identity": 0,
+        "profession": 4,
+        "assignment": 4,
+        "activity": 4,
+        "variant": 4
+      },
+      "ownershipTransitions": {
+        "identity": 0,
+        "profession": 0,
+        "assignment": 0,
+        "activity": 4,
+        "variant": 0
+      },
+      "minimumSeparation": 0.071115189005,
+      "minimumTick": 215,
+      "minimumPair": [
+        "actor-1",
+        "actor-3"
+      ],
+      "ticksInsidePersonalSpace": 59,
+      "maximumWorkersNearSharedTile": 1,
+      "allWorkingTick": 279,
+      "final": [
+        {
+          "actorId": 1,
+          "appearanceId": "identity-01",
+          "profession": "miner",
+          "assignment": {
+            "kind": "work",
+            "building": {
+              "type": "mine",
+              "x": 20,
+              "y": 19,
+              "complete": true
+            },
+            "duty": "mine",
+            "purpose": "vocation",
+            "sinceTick": 1,
+            "reason": "job-market"
+          },
+          "variant": "miner",
+          "activity": "working",
+          "x": 21,
+          "y": 20,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        },
+        {
+          "actorId": 2,
+          "appearanceId": "identity-02",
+          "profession": "miner",
+          "assignment": {
+            "kind": "work",
+            "building": {
+              "type": "mine",
+              "x": 20,
+              "y": 19,
+              "complete": true
+            },
+            "duty": "mine",
+            "purpose": "vocation",
+            "sinceTick": 1,
+            "reason": "job-market"
+          },
+          "variant": "miner",
+          "activity": "working",
+          "x": 21,
+          "y": 19,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        },
+        {
+          "actorId": 3,
+          "appearanceId": "identity-01",
+          "profession": "miner",
+          "assignment": {
+            "kind": "work",
+            "building": {
+              "type": "mine",
+              "x": 20,
+              "y": 21,
+              "complete": true
+            },
+            "duty": "mine",
+            "purpose": "vocation",
+            "sinceTick": 1,
+            "reason": "job-market"
+          },
+          "variant": "miner",
+          "activity": "working",
+          "x": 19.938902779543,
+          "y": 20.003748253369,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        },
+        {
+          "actorId": 4,
+          "appearanceId": "identity-02",
+          "profession": "miner",
+          "assignment": {
+            "kind": "work",
+            "building": {
+              "type": "mine",
+              "x": 20,
+              "y": 21,
+              "complete": true
+            },
+            "duty": "mine",
+            "purpose": "vocation",
+            "sinceTick": 1,
+            "reason": "job-market"
+          },
+          "variant": "miner",
+          "activity": "working",
+          "x": 21,
+          "y": 21,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        }
+      ]
+    },
+    "dynamicObstacleInvalidation": {
+      "classification": "known-defect",
+      "finding": "compressed-segment-not-invalidated-at-obstacle-epoch",
+      "fixture": {
+        "start": {
+          "x": 10,
+          "y": 20
+        },
+        "goal": {
+          "x": 22,
+          "y": 20
+        },
+        "obstacle": {
+          "x": 15,
+          "y": 20,
+          "placedAtTick": 20
+        },
+        "compressedInitialWaypoints": [
+          {
+            "x": 11,
+            "y": 20
+          },
+          {
+            "x": 22,
+            "y": 20
+          }
+        ]
+      },
+      "ticksRun": 470,
+      "pathCallCount": 2,
+      "initialPathCallCount": 1,
+      "replanCount": 1,
+      "blockedTimeTicks": 1,
+      "obstacleEpochInvalidationLatencyTicks": 131,
+      "replanTick": 151,
+      "completionTick": 470,
+      "minimumObstacleCenterDistance": 0.52,
+      "ownershipTransitions": {
+        "identity": 0,
+        "profession": 0,
+        "assignment": 0,
+        "activity": 0,
+        "variant": 0
+      },
+      "final": {
+        "actorId": 1,
+        "appearanceId": "identity-01",
+        "x": 22,
+        "y": 20,
+        "profession": "settler",
+        "assignment": null,
+        "activity": "idle",
+        "variant": "settler"
+      }
+    },
+    "mixedGroundActorTraffic": {
+      "classification": "known-defect",
+      "finding": "ground-actor-systems-have-no-shared-capacity-or-avoidance-contract",
+      "fixture": {
+        "center": {
+          "x": 20,
+          "y": 20,
+          "occupancyRadius": 0.5
+        },
+        "actorTypes": [
+          "citizen",
+          "soldier",
+          "walker",
+          "animal"
+        ],
+        "ticks": 110
+      },
+      "ticksRun": 110,
+      "pathCallCount": 1,
+      "initialPathCallCount": 1,
+      "replanCount": 0,
+      "blockedTimeTicks": {
+        "citizen": 0,
+        "soldier": 0,
+        "walker": 0,
+        "animal": 0
+      },
+      "totalBlockedTimeTicks": 0,
+      "ownershipTransitions": {
+        "identity": 0,
+        "profession": 0,
+        "assignment": 0,
+        "activity": 0,
+        "variant": 0
+      },
+      "minimumSeparation": 0,
+      "minimumTick": 67,
+      "minimumPair": [
+        "citizen",
+        "soldier"
+      ],
+      "ticksWithPairInsidePersonalSpace": 30,
+      "maximumCenterOccupancy": 4,
+      "ticksWithAllFourAtCenter": 21,
+      "final": [
+        {
+          "type": "citizen",
+          "x": 21.24,
+          "y": 20
+        },
+        {
+          "type": "soldier",
+          "x": 18.7,
+          "y": 20
+        },
+        {
+          "type": "walker",
+          "x": 20,
+          "y": 21.3
+        },
+        {
+          "type": "animal",
+          "x": 20,
+          "y": 19.36
+        }
+      ]
+    }
+  }
+}

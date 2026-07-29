@@ -2,8 +2,8 @@
 // Web Audio — SFX + seasonal ambient soundscape
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=157';
-import { on } from './bus.js?realm=157';
+import { G } from './state.js?realm=166';
+import { on } from './bus.js?realm=166';
 
 const AUDIO_PREF_KEY = 'realm-audio-muted-v1';
 
@@ -176,22 +176,6 @@ export function playVoiceBark(kind = 'happy', voiceSeed = 0) {
   const detune = 1 + (((voiceSeed & 0xff) / 255) - 0.5) * 0.24;
   const base = (pitchMap[kind] || 500) * detune;
 
-  // Shared helper
-  const playShape = (type, points, peak) => {
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = type;
-    osc.connect(g); g.connect(dest);
-    for (const [dt, f] of points) {
-      osc.frequency.linearRampToValueAtTime(f, t + dt);
-    }
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(peak, t + 0.02);
-    g.gain.linearRampToValueAtTime(peak * 0.6, t + points[points.length - 1][0] - 0.05);
-    g.gain.linearRampToValueAtTime(0, t + points[points.length - 1][0]);
-    osc.start(t);
-    osc.stop(t + points[points.length - 1][0] + 0.01);
-  };
   // Set starting freq on the oscillator (first point with dt=0)
   const makeOscAt = (type, f) => {
     const osc = ctx.createOscillator();
@@ -708,8 +692,6 @@ export function toggleAmbient() {
   }
   return !masterMuted;
 }
-
-export function isAmbientEnabled() { return !masterMuted; }
 
 export function isMasterMuted() { return masterMuted; }
 

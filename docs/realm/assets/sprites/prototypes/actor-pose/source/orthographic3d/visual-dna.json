@@ -1,0 +1,89 @@
+{
+  "schema": "realm.actor-pose.visual-dna.v1",
+  "coordinate_system": {
+    "x": "actor right",
+    "y": "actor forward",
+    "z": "up",
+    "unit": "normalized actor space"
+  },
+  "roles": {
+    "guard": {
+      "identity": "blue-watch-guard",
+      "signature": [
+        "high domed helmet with short crest",
+        "broad pauldrons and straight tunic",
+        "rear sword sheath"
+      ],
+      "proportions": {
+        "pelvis_z": 1.42,
+        "chest_z": 2.22,
+        "shoulder_z": 2.62,
+        "neck_z": 2.92,
+        "head_z": 3.28,
+        "head_radius": 0.40,
+        "shoulder_width": 1.18,
+        "hip_width": 0.66,
+        "torso_depth": 0.48,
+        "limb_radius": 0.145
+      },
+      "palette": {
+        "skin": "#d99a6c",
+        "skin_shadow": "#a9634e",
+        "hair": "#53352f",
+        "tunic": "#315f91",
+        "tunic_shadow": "#203e66",
+        "tunic_light": "#5688b3",
+        "pants": "#263a52",
+        "boots": "#3a2927",
+        "belt": "#9b493b",
+        "metal": "#8fa2ad",
+        "metal_light": "#c1cbd0",
+        "outline": "#202839",
+        "wood": "#76503a",
+        "load": "#9a673c",
+        "load_light": "#c08a52"
+      }
+    },
+    "builder": {
+      "identity": "stone-yard-builder",
+      "signature": [
+        "wide brim work cap",
+        "stocky rolled-sleeve torso and squared apron",
+        "asymmetric belt pouch"
+      ],
+      "proportions": {
+        "pelvis_z": 1.38,
+        "chest_z": 2.17,
+        "shoulder_z": 2.52,
+        "neck_z": 2.82,
+        "head_z": 3.18,
+        "head_radius": 0.42,
+        "shoulder_width": 1.02,
+        "hip_width": 0.78,
+        "torso_depth": 0.54,
+        "limb_radius": 0.16
+      },
+      "palette": {
+        "skin": "#d49a70",
+        "skin_shadow": "#9d624e",
+        "hair": "#5a392c",
+        "shirt": "#c7aa78",
+        "shirt_shadow": "#8d744f",
+        "shirt_light": "#ddc492",
+        "apron": "#8e573c",
+        "apron_shadow": "#613b31",
+        "pants": "#4a4b48",
+        "boots": "#3b2b25",
+        "belt": "#68432f",
+        "cap": "#b68348",
+        "cap_light": "#d4ad68",
+        "outline": "#2c2928",
+        "wood": "#7a5031",
+        "metal": "#7d8585",
+        "metal_light": "#b5b8ad",
+        "load": "#9a673c",
+        "load_light": "#c08a52"
+      }
+    }
+  }
+}

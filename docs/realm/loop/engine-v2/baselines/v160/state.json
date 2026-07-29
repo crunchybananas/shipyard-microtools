@@ -1,0 +1,1101 @@
+{
+  "schema": 1,
+  "executionMode": "deterministic-core-only",
+  "moduleRevision": 160,
+  "kingdom": "Engine V2 Baseline",
+  "gameTick": 7200,
+  "day": 3,
+  "dayPhase": 0,
+  "population": 19,
+  "maxPop": 19,
+  "resources": {
+    "wood": 9814,
+    "stone": 9908,
+    "food": 9982,
+    "gold": 10081,
+    "iron": 10004,
+    "wheat": 1084,
+    "flour": 1000,
+    "planks": 990,
+    "tools": 989
+  },
+  "transitionCounts": {
+    "role": 135,
+    "job": 114,
+    "state": 591,
+    "carrying": 66
+  },
+  "checkpoints": [
+    {
+      "tick": 1800,
+      "day": 1,
+      "dayPhase": 1800,
+      "population": 19,
+      "resources": {
+        "wood": 9779,
+        "stone": 9887,
+        "food": 10020,
+        "gold": 10057,
+        "iron": 9999,
+        "wheat": 1004,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 1000
+      },
+      "roles": [
+        [
+          "Bjorn Wood",
+          "settler",
+          "idle"
+        ],
+        [
+          "Dag Pike",
+          "settler",
+          "idle"
+        ],
+        [
+          "Finn Forge",
+          "guard",
+          "working"
+        ],
+        [
+          "Greta Lake",
+          "builder",
+          "working"
+        ],
+        [
+          "Inga Forge",
+          "farmer",
+          "working"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "idle"
+        ],
+        [
+          "Kara Frost",
+          "builder",
+          "working"
+        ],
+        [
+          "Lars Lake",
+          "settler",
+          "idle"
+        ],
+        [
+          "Mia Marsh",
+          "stonecutter",
+          "walk_to_deliver"
+        ],
+        [
+          "Nils Marsh",
+          "blacksmith",
+          "working"
+        ],
+        [
+          "Olga Glen",
+          "innkeeper",
+          "working"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "idle"
+        ],
+        [
+          "Runa Ridge",
+          "trader",
+          "working"
+        ],
+        [
+          "Thea Lake",
+          "scholar",
+          "working"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "idle"
+        ],
+        [
+          "Wren Wood",
+          "lumber",
+          "working"
+        ],
+        [
+          "Yara Oak",
+          "guard",
+          "working"
+        ],
+        [
+          "Zev Ash",
+          "farmer",
+          "walk_to_deliver"
+        ],
+        [
+          "Zev Glen",
+          "settler",
+          "idle"
+        ]
+      ]
+    },
+    {
+      "tick": 3600,
+      "day": 2,
+      "dayPhase": 0,
+      "population": 19,
+      "resources": {
+        "wood": 9791,
+        "stone": 9894,
+        "food": 10001,
+        "gold": 10066,
+        "iron": 9998,
+        "wheat": 1030,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 998
+      },
+      "roles": [
+        [
+          "Bjorn Wood",
+          "settler",
+          "sleep"
+        ],
+        [
+          "Dag Pike",
+          "miner",
+          "sleep"
+        ],
+        [
+          "Finn Forge",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Greta Lake",
+          "settler",
+          "sleep"
+        ],
+        [
+          "Inga Forge",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "idle"
+        ],
+        [
+          "Kara Frost",
+          "settler",
+          "sleep"
+        ],
+        [
+          "Lars Lake",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Mia Marsh",
+          "stonecutter",
+          "sleep"
+        ],
+        [
+          "Nils Marsh",
+          "blacksmith",
+          "sleep"
+        ],
+        [
+          "Olga Glen",
+          "innkeeper",
+          "sleep"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Runa Ridge",
+          "trader",
+          "sleep"
+        ],
+        [
+          "Thea Lake",
+          "scholar",
+          "sleep"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Wren Wood",
+          "lumber",
+          "sleep"
+        ],
+        [
+          "Yara Oak",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Zev Ash",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Zev Glen",
+          "miner",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "tick": 5400,
+      "day": 2,
+      "dayPhase": 1800,
+      "population": 19,
+      "resources": {
+        "wood": 9801,
+        "stone": 9901,
+        "food": 10001,
+        "gold": 10072,
+        "iron": 10001,
+        "wheat": 1052,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 994
+      },
+      "roles": [
+        [
+          "Bjorn Wood",
+          "settler",
+          "idle"
+        ],
+        [
+          "Dag Pike",
+          "miner",
+          "working"
+        ],
+        [
+          "Finn Forge",
+          "guard",
+          "working"
+        ],
+        [
+          "Greta Lake",
+          "settler",
+          "idle"
+        ],
+        [
+          "Inga Forge",
+          "farmer",
+          "working"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "idle"
+        ],
+        [
+          "Kara Frost",
+          "forager",
+          "foraging"
+        ],
+        [
+          "Lars Lake",
+          "settler",
+          "idle"
+        ],
+        [
+          "Mia Marsh",
+          "stonecutter",
+          "walk_to_deliver"
+        ],
+        [
+          "Nils Marsh",
+          "blacksmith",
+          "working"
+        ],
+        [
+          "Olga Glen",
+          "innkeeper",
+          "working"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "idle"
+        ],
+        [
+          "Runa Ridge",
+          "trader",
+          "working"
+        ],
+        [
+          "Thea Lake",
+          "scholar",
+          "working"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "idle"
+        ],
+        [
+          "Wren Wood",
+          "lumber",
+          "working"
+        ],
+        [
+          "Yara Oak",
+          "guard",
+          "working"
+        ],
+        [
+          "Zev Ash",
+          "farmer",
+          "walk_to_work"
+        ],
+        [
+          "Zev Glen",
+          "miner",
+          "walk_to_work"
+        ]
+      ]
+    },
+    {
+      "tick": 7200,
+      "day": 3,
+      "dayPhase": 0,
+      "population": 19,
+      "resources": {
+        "wood": 9814,
+        "stone": 9908,
+        "food": 9982,
+        "gold": 10081,
+        "iron": 10004,
+        "wheat": 1084,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 989
+      },
+      "roles": [
+        [
+          "Bjorn Wood",
+          "settler",
+          "sleep"
+        ],
+        [
+          "Dag Pike",
+          "miner",
+          "sleep"
+        ],
+        [
+          "Finn Forge",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Greta Lake",
+          "settler",
+          "sleep"
+        ],
+        [
+          "Inga Forge",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Kara Frost",
+          "settler",
+          "sleep"
+        ],
+        [
+          "Lars Lake",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Mia Marsh",
+          "stonecutter",
+          "sleep"
+        ],
+        [
+          "Nils Marsh",
+          "blacksmith",
+          "sleep"
+        ],
+        [
+          "Olga Glen",
+          "innkeeper",
+          "sleep"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Runa Ridge",
+          "trader",
+          "sleep"
+        ],
+        [
+          "Thea Lake",
+          "scholar",
+          "sleep"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Wren Wood",
+          "lumber",
+          "sleep"
+        ],
+        [
+          "Yara Oak",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Zev Ash",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Zev Glen",
+          "miner",
+          "sleep"
+        ]
+      ]
+    }
+  ],
+  "citizens": [
+    {
+      "name": "Bjorn Wood",
+      "role": "settler",
+      "visualJob": "house",
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 12,
+      "x": 40,
+      "y": 36,
+      "tx": 40,
+      "ty": 36,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Dag Pike",
+      "role": "miner",
+      "visualJob": "mine",
+      "job": "mine",
+      "jobBuildingIndex": 8,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 36,
+      "x": 42,
+      "y": 37,
+      "tx": 42,
+      "ty": 37,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Finn Forge",
+      "role": "guard",
+      "visualJob": "barracks",
+      "job": "barracks",
+      "jobBuildingIndex": 14,
+      "homeBuildingIndex": 3,
+      "state": "sleep",
+      "stateTimer": 18,
+      "x": 42.909236,
+      "y": 39.964501,
+      "tx": 43,
+      "ty": 40,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Greta Lake",
+      "role": "settler",
+      "visualJob": "house",
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 1,
+      "state": "sleep",
+      "stateTimer": 12,
+      "x": 39,
+      "y": 36,
+      "tx": 39,
+      "ty": 36,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Inga Forge",
+      "role": "farmer",
+      "visualJob": "farm",
+      "job": "farm",
+      "jobBuildingIndex": 5,
+      "homeBuildingIndex": 2,
+      "state": "sleep",
+      "stateTimer": 31,
+      "x": 37,
+      "y": 39,
+      "tx": 37,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 93.65
+    },
+    {
+      "name": "Jon Frost",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 3,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 41.299815,
+      "y": 39.524851,
+      "tx": 42,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 34.9
+    },
+    {
+      "name": "Kara Frost",
+      "role": "settler",
+      "visualJob": "house",
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 1,
+      "state": "sleep",
+      "stateTimer": 30,
+      "x": 41,
+      "y": 38,
+      "tx": 41,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Lars Lake",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 2,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 38.507616,
+      "y": 39.753283,
+      "tx": 38,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 37
+    },
+    {
+      "name": "Mia Marsh",
+      "role": "stonecutter",
+      "visualJob": "quarry",
+      "job": "quarry",
+      "jobBuildingIndex": 7,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 25,
+      "x": 36,
+      "y": 39,
+      "tx": 36,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Nils Marsh",
+      "role": "blacksmith",
+      "visualJob": "blacksmith",
+      "job": "blacksmith",
+      "jobBuildingIndex": 13,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 55,
+      "x": 39,
+      "y": 43,
+      "tx": 39,
+      "ty": 43,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Olga Glen",
+      "role": "innkeeper",
+      "visualJob": "tavern",
+      "job": "tavern",
+      "jobBuildingIndex": 12,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 15,
+      "x": 42,
+      "y": 39,
+      "tx": 42,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Per Hill",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 2,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 38.510961,
+      "y": 40.499325,
+      "tx": 38,
+      "ty": 41,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 37.35
+    },
+    {
+      "name": "Runa Ridge",
+      "role": "trader",
+      "visualJob": "market",
+      "job": "market",
+      "jobBuildingIndex": 11,
+      "homeBuildingIndex": 1,
+      "state": "sleep",
+      "stateTimer": 60,
+      "x": 39.926777,
+      "y": 36.981995,
+      "tx": 40,
+      "ty": 37,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 75.5
+    },
+    {
+      "name": "Thea Lake",
+      "role": "scholar",
+      "visualJob": "school",
+      "job": "school",
+      "jobBuildingIndex": 15,
+      "homeBuildingIndex": 3,
+      "state": "sleep",
+      "stateTimer": 10,
+      "x": 43,
+      "y": 38,
+      "tx": 43,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 72
+    },
+    {
+      "name": "Vera Stone",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 2,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 40.045375,
+      "y": 40.496847,
+      "tx": 37,
+      "ty": 40,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 37
+    },
+    {
+      "name": "Wren Wood",
+      "role": "lumber",
+      "visualJob": "lumber",
+      "job": "lumber",
+      "jobBuildingIndex": 6,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 18,
+      "x": 38,
+      "y": 38,
+      "tx": 38,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Yara Oak",
+      "role": "guard",
+      "visualJob": "barracks",
+      "job": "barracks",
+      "jobBuildingIndex": 14,
+      "homeBuildingIndex": 3,
+      "state": "sleep",
+      "stateTimer": 59,
+      "x": 42.907159,
+      "y": 39.027085,
+      "tx": 43,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Zev Ash",
+      "role": "farmer",
+      "visualJob": "farm",
+      "job": "farm",
+      "jobBuildingIndex": 4,
+      "homeBuildingIndex": 1,
+      "state": "sleep",
+      "stateTimer": 20,
+      "x": 39,
+      "y": 38,
+      "tx": 39,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 60.55
+    },
+    {
+      "name": "Zev Glen",
+      "role": "miner",
+      "visualJob": "mine",
+      "job": "mine",
+      "jobBuildingIndex": 8,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 40,
+      "x": 38.902891,
+      "y": 37.009814,
+      "tx": 39,
+      "ty": 37,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 78.1
+    }
+  ],
+  "buildings": [
+    {
+      "index": 0,
+      "type": "house",
+      "x": 40,
+      "y": 40,
+      "buildProgress": 0,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 1,
+      "type": "house",
+      "x": 40,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 2,
+      "type": "house",
+      "x": 39,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 3,
+      "type": "house",
+      "x": 41,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 4,
+      "type": "farm",
+      "x": 40,
+      "y": 41,
+      "buildProgress": 1,
+      "workers": [
+        "Zev Ash"
+      ],
+      "produced": null,
+      "prodTimer": 494.4999999999962
+    },
+    {
+      "index": 5,
+      "type": "farm",
+      "x": 40,
+      "y": 38,
+      "buildProgress": 1,
+      "workers": [
+        "Inga Forge"
+      ],
+      "produced": null,
+      "prodTimer": 2.3
+    },
+    {
+      "index": 6,
+      "type": "lumber",
+      "x": 35,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [
+        "Wren Wood"
+      ],
+      "produced": null,
+      "prodTimer": 292
+    },
+    {
+      "index": 7,
+      "type": "quarry",
+      "x": 35,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [
+        "Mia Marsh"
+      ],
+      "produced": null,
+      "prodTimer": 379
+    },
+    {
+      "index": 8,
+      "type": "mine",
+      "x": 39,
+      "y": 33,
+      "buildProgress": 1,
+      "workers": [
+        "Dag Pike",
+        "Zev Glen"
+      ],
+      "produced": null,
+      "prodTimer": 287
+    },
+    {
+      "index": 9,
+      "type": "storehouse",
+      "x": 39,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 10,
+      "type": "granary",
+      "x": 41,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 11,
+      "type": "market",
+      "x": 38,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [
+        "Runa Ridge"
+      ],
+      "produced": null,
+      "prodTimer": 24.14999999999999
+    },
+    {
+      "index": 12,
+      "type": "tavern",
+      "x": 42,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [
+        "Olga Glen"
+      ],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 13,
+      "type": "blacksmith",
+      "x": 39,
+      "y": 41,
+      "buildProgress": 1,
+      "workers": [
+        "Nils Marsh"
+      ],
+      "produced": null,
+      "prodTimer": 94.3000000000001
+    },
+    {
+      "index": 14,
+      "type": "barracks",
+      "x": 41,
+      "y": 41,
+      "buildProgress": 1,
+      "workers": [
+        "Finn Forge",
+        "Yara Oak"
+      ],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 15,
+      "type": "school",
+      "x": 40,
+      "y": 42,
+      "buildProgress": 1,
+      "workers": [
+        "Thea Lake"
+      ],
+      "produced": null,
+      "prodTimer": 0
+    }
+  ],
+  "fixtureSetup": {
+    "placed": [
+      {
+        "type": "house",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 39
+      },
+      {
+        "type": "house",
+        "x": 39,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 41,
+        "y": 40
+      },
+      {
+        "type": "farm",
+        "x": 40,
+        "y": 41
+      },
+      {
+        "type": "farm",
+        "x": 40,
+        "y": 38
+      },
+      {
+        "type": "lumber",
+        "x": 35,
+        "y": 40
+      },
+      {
+        "type": "quarry",
+        "x": 35,
+        "y": 39
+      },
+      {
+        "type": "mine",
+        "x": 39,
+        "y": 33
+      },
+      {
+        "type": "storehouse",
+        "x": 39,
+        "y": 39
+      },
+      {
+        "type": "granary",
+        "x": 41,
+        "y": 39
+      },
+      {
+        "type": "market",
+        "x": 38,
+        "y": 40
+      },
+      {
+        "type": "tavern",
+        "x": 42,
+        "y": 40
+      },
+      {
+        "type": "blacksmith",
+        "x": 39,
+        "y": 41
+      },
+      {
+        "type": "barracks",
+        "x": 41,
+        "y": 41
+      },
+      {
+        "type": "school",
+        "x": 40,
+        "y": 42
+      }
+    ],
+    "population": 19,
+    "maxPop": 19
+  },
+  "pageErrors": []
+}

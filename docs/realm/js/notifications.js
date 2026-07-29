@@ -2,9 +2,9 @@
 // Notifications — toast display + persistent scrollable log
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, resourceEmoji } from './state.js?realm=157';
-import { announce } from './log.js?realm=157';
-import { on } from './bus.js?realm=157';
+import { G, resourceEmoji } from './state.js?realm=166';
+import { announce } from './log.js?realm=166';
+import { on } from './bus.js?realm=166';
 
 let toastTimer = null;
 let toastShakeTimer = null;
@@ -34,6 +34,13 @@ let _activeFilter = 'all';
 // below. Core files call announce directly; shell files may call notify.
 export function notify(text, type = 'info', meta = {}) {
   announce(text, type, meta);
+}
+
+// Shell-only status such as "welcome back" must not append authoritative
+// notification/chronicle state merely because a save was loaded or a panel was
+// opened. It renders through the same toast/feed surface without touching G.
+export function notifyTransient(text, type = 'info', meta = {}) {
+  renderNotify(text, type, meta);
 }
 
 on('notify', ({ text, type, meta }) => renderNotify(text, type, meta || {}));
@@ -84,7 +91,13 @@ function renderNotify(text, type = 'info', meta = {}) {
         .join(' ');
     }
 
-    item.innerHTML = `<span class="feed-icon">${icon}</span><span class="feed-day">D${G.day}</span>${text}${resourceStr}`;
+    const iconEl = document.createElement('span');
+    iconEl.className = 'feed-icon';
+    iconEl.textContent = icon;
+    const dayEl = document.createElement('span');
+    dayEl.className = 'feed-day';
+    dayEl.textContent = `D${G.day}`;
+    item.append(iconEl, dayEl, document.createTextNode(`${text}${resourceStr}`));
     feed.appendChild(item);
     while (feed.children.length > 5) feed.removeChild(feed.firstChild);
 
@@ -154,10 +167,17 @@ export function renderNotificationLog() {
     const icon = TYPE_ICONS[n.type] || 'ℹ️';
     const div = document.createElement('div');
     div.className = `log-entry log-${n.type}`;
-    div.innerHTML =
-      `<span class="log-icon">${icon}</span>` +
-      `<span class="log-text">${n.text}</span>` +
-      `<span class="log-time" title="Day ${n.day}">${relativeDay(n.day)}</span>`;
+    const iconEl = document.createElement('span');
+    iconEl.className = 'log-icon';
+    iconEl.textContent = icon;
+    const textEl = document.createElement('span');
+    textEl.className = 'log-text';
+    textEl.textContent = n.text;
+    const timeEl = document.createElement('span');
+    timeEl.className = 'log-time';
+    timeEl.title = `Day ${n.day}`;
+    timeEl.textContent = relativeDay(n.day);
+    div.append(iconEl, textEl, timeEl);
     el.appendChild(div);
   }
 }
@@ -171,18 +191,4 @@ export function toggleNotificationLog() {
     _activeFilter = 'all';
     renderNotificationLog();
   }
-}
-
-// ── Convenience wrappers for building placement ───────────
-export function notifyBuild(buildingType) {
-  const def = BUILDINGS[buildingType];
-  if (!def) return;
-  notify(`${def.name} built!`, 'info', { buildingIcon: def.icon });
-}
-
-export function notifyResources(label, resources) {
-  const parts = Object.entries(resources)
-    .map(([k, v]) => `${resourceEmoji(k)}${v > 0 ? '+' : ''}${v}`)
-    .join(' ');
-  notify(`${label} ${parts}`, 'event', { resources });
 }

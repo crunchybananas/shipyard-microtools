@@ -1,0 +1,237 @@
+{
+  "schema": "realm.engine-v2.phase0c-traffic-baseline",
+  "schemaVersion": 1,
+  "recordedRevision": 160,
+  "runtime": {
+    "moduleRevision": 160,
+    "simulationVersion": 1,
+    "coreSystemOrderVersion": "sha256:14621d8fcd8b94594989a9bc8b98e0e67c7f654687e80cdab8cafd940c19c014"
+  },
+  "measurementDefinitions": {
+    "pathCallCount": "All production findPath invocations, including failed calls, measured by before/after snapshots of a read-only module counter.",
+    "replanCount": "Production findPath calls after fixture-authored or first-assignment planning calls.",
+    "blockedTimeTicks": "Ticks with movement intent at tick start and less than 0.000001 tile of displacement.",
+    "professionVisualRoleChurn": "Post-initialization transitions of jobBuilding.type, visualJob, and the renderer-equivalent derived actor role."
+  },
+  "scenarios": {
+    "worksiteCongestion": {
+      "classification": "control",
+      "fixture": {
+        "buildings": [
+          "mine@20,19",
+          "mine@20,21"
+        ],
+        "legalWorkerSlots": 4,
+        "sharedOreTile": {
+          "x": 21,
+          "y": 20
+        },
+        "workerStarts": [
+          "North West",
+          "North East",
+          "South West",
+          "South East"
+        ]
+      },
+      "ticksRun": 375,
+      "pathCallCount": 4,
+      "initialPathCallCount": 4,
+      "replanCount": 0,
+      "blockedTimeTicks": {
+        "North West": 0,
+        "North East": 0,
+        "South West": 0,
+        "South East": 0
+      },
+      "totalBlockedTimeTicks": 0,
+      "assignmentTransitions": {
+        "profession": 4,
+        "visualJob": 4,
+        "visualRole": 4
+      },
+      "professionVisualRoleChurn": {
+        "profession": 0,
+        "visualJob": 0,
+        "visualRole": 0
+      },
+      "minimumSeparation": 1,
+      "minimumTick": 279,
+      "minimumPair": [
+        "North West",
+        "North East"
+      ],
+      "ticksInsidePersonalSpace": 0,
+      "maximumWorkersNearSharedTile": 1,
+      "allWorkingTick": 286,
+      "final": [
+        {
+          "name": "North West",
+          "profession": "mine",
+          "visualJob": "mine",
+          "visualRole": "miner",
+          "state": "working",
+          "x": 21,
+          "y": 20,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        },
+        {
+          "name": "North East",
+          "profession": "mine",
+          "visualJob": "mine",
+          "visualRole": "miner",
+          "state": "working",
+          "x": 21,
+          "y": 19,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        },
+        {
+          "name": "South West",
+          "profession": "mine",
+          "visualJob": "mine",
+          "visualRole": "miner",
+          "state": "working",
+          "x": 21,
+          "y": 21,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        },
+        {
+          "name": "South East",
+          "profession": "mine",
+          "visualJob": "mine",
+          "visualRole": "miner",
+          "state": "working",
+          "x": 22,
+          "y": 20,
+          "workTarget": {
+            "x": 21,
+            "y": 20
+          }
+        }
+      ]
+    },
+    "dynamicObstacleInvalidation": {
+      "classification": "known-defect",
+      "finding": "compressed-segment-not-invalidated-at-obstacle-epoch",
+      "fixture": {
+        "start": {
+          "x": 10,
+          "y": 20
+        },
+        "goal": {
+          "x": 22,
+          "y": 20
+        },
+        "obstacle": {
+          "x": 15,
+          "y": 20,
+          "placedAtTick": 20
+        },
+        "compressedInitialWaypoints": [
+          {
+            "x": 11,
+            "y": 20
+          },
+          {
+            "x": 22,
+            "y": 20
+          }
+        ]
+      },
+      "ticksRun": 470,
+      "pathCallCount": 2,
+      "initialPathCallCount": 1,
+      "replanCount": 1,
+      "blockedTimeTicks": 1,
+      "obstacleEpochInvalidationLatencyTicks": 131,
+      "replanTick": 151,
+      "completionTick": 470,
+      "minimumObstacleCenterDistance": 0.52,
+      "professionVisualRoleChurn": {
+        "profession": 0,
+        "visualJob": 0,
+        "visualRole": 0
+      },
+      "final": {
+        "x": 22,
+        "y": 20,
+        "profession": null,
+        "visualJob": "mine",
+        "visualRole": "miner"
+      }
+    },
+    "mixedGroundActorTraffic": {
+      "classification": "known-defect",
+      "finding": "ground-actor-systems-have-no-shared-capacity-or-avoidance-contract",
+      "fixture": {
+        "center": {
+          "x": 20,
+          "y": 20,
+          "occupancyRadius": 0.5
+        },
+        "actorTypes": [
+          "citizen",
+          "soldier",
+          "walker",
+          "animal"
+        ],
+        "ticks": 110
+      },
+      "ticksRun": 110,
+      "pathCallCount": 1,
+      "initialPathCallCount": 1,
+      "replanCount": 0,
+      "blockedTimeTicks": {
+        "citizen": 0,
+        "soldier": 0,
+        "walker": 0,
+        "animal": 0
+      },
+      "totalBlockedTimeTicks": 0,
+      "professionVisualRoleChurn": {
+        "profession": 0,
+        "visualJob": 0,
+        "visualRole": 0
+      },
+      "minimumSeparation": 0,
+      "minimumTick": 67,
+      "minimumPair": [
+        "citizen",
+        "soldier"
+      ],
+      "ticksWithPairInsidePersonalSpace": 30,
+      "maximumCenterOccupancy": 4,
+      "ticksWithAllFourAtCenter": 21,
+      "final": [
+        {
+          "type": "citizen",
+          "x": 21.24,
+          "y": 20
+        },
+        {
+          "type": "soldier",
+          "x": 18.7,
+          "y": 20
+        },
+        {
+          "type": "walker",
+          "x": 20,
+          "y": 21.3
+        },
+        {
+          "type": "animal",
+          "x": 20,
+          "y": 19.36
+        }
+      ]
+    }
+  }
+}

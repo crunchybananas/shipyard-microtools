@@ -1,0 +1,69 @@
+{
+  "schema": "realm.actor-pose.open-source-walk-baseline.v1",
+  "purpose": "Normalize a CC0 human walk into Realm's phase and registration contract before repainting.",
+  "source_directory": "assets/sprites/prototypes/actor-pose/references/open-source/cc0-mixxit-64x80",
+  "source_frame_order": [6, 7, 0, 1, 2, 3, 4, 5],
+  "frame": {
+    "source_size": [64, 80],
+    "realm_size": [64, 84],
+    "source_y_offset": 0,
+    "ground_y": 79
+  },
+  "timeline": [
+    {
+      "frame": 0,
+      "phase": "a-contact",
+      "contacts": ["a", "b"],
+      "ground_runs": [[22, 25], [39, 42]]
+    },
+    {
+      "frame": 1,
+      "phase": "a-down",
+      "contacts": ["a"],
+      "ground_runs": [[35, 40]]
+    },
+    {
+      "frame": 2,
+      "phase": "a-pass",
+      "contacts": ["a"],
+      "ground_runs": [[30, 35]]
+    },
+    {
+      "frame": 3,
+      "phase": "a-up",
+      "contacts": ["a"],
+      "ground_runs": [[27, 32]]
+    },
+    {
+      "frame": 4,
+      "phase": "b-contact",
+      "contacts": ["a", "b"],
+      "ground_runs": [[26, 29], [37, 38]]
+    },
+    {
+      "frame": 5,
+      "phase": "b-down",
+      "contacts": ["b"],
+      "ground_runs": [[33, 38]]
+    },
+    {
+      "frame": 6,
+      "phase": "b-pass",
+      "contacts": ["b"],
+      "ground_runs": [[27, 32]]
+    },
+    {
+      "frame": 7,
+      "phase": "b-up",
+      "contacts": ["b"],
+      "ground_runs": [[24, 29]]
+    }
+  ],
+  "acceptance": {
+    "exact_ground_runs": true,
+    "height_range_max_px": 1,
+    "all_frames_distinct": true,
+    "loop_delta_ratio_to_internal_median": [0.45, 1.75],
+    "runtime_cargo_baked": false
+  }
+}

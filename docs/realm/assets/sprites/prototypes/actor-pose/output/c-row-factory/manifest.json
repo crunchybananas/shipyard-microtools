@@ -1,0 +1,2006 @@
+{
+  "candidate": "C",
+  "cell": {
+    "frames": 8,
+    "height": 84,
+    "mode": "RGBA",
+    "rowWidth": 512,
+    "width": 64
+  },
+  "expectedRows": [
+    "guard/walk/down",
+    "guard/walk/up",
+    "guard/walk/left",
+    "guard/walk/right",
+    "guard/carry/down",
+    "guard/carry/up",
+    "guard/carry/left",
+    "guard/carry/right",
+    "builder/walk/down",
+    "builder/walk/up",
+    "builder/walk/left",
+    "builder/walk/right",
+    "builder/work/down",
+    "builder/work/up",
+    "builder/work/left",
+    "builder/work/right"
+  ],
+  "generator": {
+    "networkFree": true,
+    "script": "scripts/actor-pose-prototype/control.py",
+    "version": 1
+  },
+  "name": "corrected-current-row-factory-control",
+  "outputs": {
+    "rows/builder/walk/down.png": {
+      "action": "walk",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "c456a55d70fd9faf00e6ecf56266201cc700764ae4222ae634f8d9510d0e8d06",
+        "4b96b75e6786bf65a067c8b34af0f5fd6e834e441fcbfe5077bfb6decce410c8",
+        "46835d454d9d2f151ebeaa7b19ecf971273cde10591e18acaa2550a8881fdaa4",
+        "c21b29e2dd4371a13d4bca8b0e29e9d1baccd45c310c3de9ec95471711b3b4d8",
+        "39e78d529b8de369abfc70d495ce29cc82b10445e8004da0d693944ea1c55d5b",
+        "3177fa13be612c53625d15d017b147a918b1a0a8f598d6e44cd086997edee915",
+        "45ce3f38f676a84d7b93cf700f05fc3d57df1b4febe8f0e296f2a2d8056dcca3",
+        "57037ccc545935d43bd51c573b13781d9e931e6239775c3bc1cb6f7dbc7b412a"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "2c73cbefbede6b47ee267695e787ff47e3c78d753ff538cff9103daf8f1f0a1b",
+      "role": "builder",
+      "sha256": "d82447aefb5e022a0e7494d06a0a2d6676026a63d2f5b2c2703a0c661fb1a974",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "9d1b655aa0764abacecae30d9057fc0a25ba61fd0d7740ee3c3c8ac2d7e25c63",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/builder.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 4,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "rows/builder/walk/left.png": {
+      "action": "walk",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "2dee98ebb21e6341dcfcdad453ad0ff905f7d1326934b390fda55909347be8f7",
+        "5a2b91dd8ca7a2778e3a96ee9413d841f16eac2766248dd56b73ebdff5da3165",
+        "269963fe26e9ddb3e029585eb8f452f18c000fd6b15d274f499ae4f47e94db1f",
+        "b1ff563c55ff9c8b8aa6161dc6d9b6df83139597d4c54f42edaac12238c441f0",
+        "fc85595bd4476b97293a71f398d92cf58ce081e449f127b592ec2b1b7469fdf3",
+        "1b27a736a78212e94c0646f1e2abf69971552bb20dcc0b1cfb99ad31bbe6e1c6",
+        "02392390f9214cd9b5f8b08494e9711c9806b048786ad1244c21f52933948246",
+        "1f457bffb128cd3766209249202adf35fe5619fe4c12f93677a2ccd2f336e13a"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "bc00d628ba2c99984e88a7d40baefbe637975b5249e1afd5d9bdbd25d65d27a3",
+      "role": "builder",
+      "sha256": "8cb1b2913b4f7a7e19dfc2a6ffb1e90515a07fd1c69626cc9e10dd30b4bb77c1",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "9d1b655aa0764abacecae30d9057fc0a25ba61fd0d7740ee3c3c8ac2d7e25c63",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/builder.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 6,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "rows/builder/walk/right.png": {
+      "action": "walk",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "62e6b29e8e4ec3a0a570572867f406dc64f7279bf8179c57fdecfccb4e328042",
+        "ee67874e664b52d8b62f167bdc19ccb2c734b9d2ca482eb4227eed5728450a3d",
+        "f0805ed81ded29225b643e64fa2421fd9782d53ed14b345d1c1c6ced943cafe7",
+        "d5de4077c9f15b0401eba4953b83cc9f2d6ef61de3ef6353d2718f10da8332eb",
+        "1d1e7e3a38c40cb1917f365dc03a2d85b6a08401249007eadd5aa5269a9cb864",
+        "1930a469b0891543e76801d47fe669a7da19873b6f526b13a6b871a9f2bd4722",
+        "4660087ba6ea585213ac6db3cc08c12c10c0cf16d64c0015b6972e47b84fdc0a",
+        "8eda65e9cf2ef43c88205b8a7c2d6b23098debef1c6d02de61ba86da6ac0e7be"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "de8bb9220fcd1cab805cfe97b1ecaf6d6c5ba302bbd603efdc1ad72da15f3647",
+      "role": "builder",
+      "sha256": "aea4488ecfea36eab134718c0ecc52ed204f64fb8246b4cdd4ee1bee96009361",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+        "fileSha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+        "kind": "manifest-accepted",
+        "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
+        "path": "assets/sprites/actor-rows/builder/walk-right.png",
+        "provenance": "deterministic-frame-reversal",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 3,
+          "bodyWidthRange": 11,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 79.0,
+            "medianBodyWidth": 34.0,
+            "medianColor": [
+              107.85,
+              72.75,
+              45.25
+            ],
+            "paletteDelta": 15.55
+          },
+          "flickerScore": 21.2,
+          "maxAlphaRatio": 1.083,
+          "maxBodyCenterJump": 2.98,
+          "maxEdgePixels": 15,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.05,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 35.0,
+          "medianColor": [
+            94.7,
+            65.35,
+            41.5
+          ],
+          "medianColorCount": 429.0,
+          "medianShadingRatio": 0.674,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/builder/walk/up.png": {
+      "action": "walk",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "fe1b703962dd675a113aed12343cf5363eb8a80de1424bcb9fbcb79cfaf2c674",
+        "50d3bceff8864b5811af4f5fcc34f79df42113e442c7c6f869832f1af332d7cb",
+        "1c3084554ac6731a805c46ab9abc462dae19d9bd0033fe126950103f57f3c3ee",
+        "978a273b296b88541e32751f73ed115683434bdea14bb8110ee5e1e9152d8a6f",
+        "b687511c291e767b138433a8bd35680c02bcb9d0eb1a05922e0b97a8a05a52d5",
+        "5670dc6cffa4cc2be498e18047506176bd6bfc80f225a4d439372a5db1cee772",
+        "24ecf77dff943aabd65eccbafe82787d0c0151f93cebd64e53b85d403d3ad9d7",
+        "18792d26435cbe3982d02ae4e14971dda325e65074ab1a0c4e74e96e0788df7c"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "eb6dbba069b967f428bb433246f78035a97c7c429d4e866b0e39d74ee0791d7c",
+      "role": "builder",
+      "sha256": "8e77650c809197a22201676f468a70d28870d2bb636fd7004ce00f15816bcbb2",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "9d1b655aa0764abacecae30d9057fc0a25ba61fd0d7740ee3c3c8ac2d7e25c63",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/builder.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 5,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "rows/builder/work/down.png": {
+      "action": "work",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "2ff4f1a30474e22cb6ec6e8a94679824a3bc81277885343968b927e4586477b8",
+        "b3f2e86c2e895fce71c8381bb660510826eb966b26dbd8b37f3a6e93687f911b",
+        "f85f3e48752eeea3f77af561f7fe10871d2919673205006696b564be25cc208f",
+        "6c4727db58eca9ea3844ac48216e88301a2f5bdb172f576f4213b94335d5efdb",
+        "5dc1c9b33bf5976cc52f0a8174c2cd28b3b88fa369f09898a30e779985211e42",
+        "30b5e8f24c7386b8202041084efbd86249ebf7d4c90eb14ab3fd6c512f079948",
+        "ba38c88ee6bec23a5f6e2699d28ac42a25f23075de4495ed85c7f92ba55c524c",
+        "f293d17ed9b3c8220803f2a51c1b6488d9ae4af777c894d21a5b118cc14b28fc"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "9ad53f15479d821a494aa65be1cf7eda799957d00683070b46bc58b9eb10b844",
+      "role": "builder",
+      "sha256": "5579710511e00ceed514dfb0888a43d6e7f006dd240d0f96b4f8d1cc36bf637c",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "bfc93e24f0d68edd25258510701afb16e4832c3317c1a6311b25289adc39a0e0",
+        "fileSha256": "bfc93e24f0d68edd25258510701afb16e4832c3317c1a6311b25289adc39a0e0",
+        "kind": "manifest-accepted",
+        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+        "path": "assets/sprites/actor-rows/builder/work-down.png",
+        "provenance": "uniform-anchor-rescale",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 3,
+          "bodyWidthRange": 3,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.0,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 51.5,
+            "medianColor": [
+              97.8,
+              64.1,
+              31.35
+            ],
+            "paletteDelta": 15.74
+          },
+          "flickerScore": 9.6,
+          "maxAlphaRatio": 1.08,
+          "maxBodyCenterJump": 3.37,
+          "maxEdgePixels": 46,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 3.1,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 40.5,
+          "medianColor": [
+            109.1,
+            75.0,
+            32.4
+          ],
+          "medianColorCount": 585.5,
+          "medianShadingRatio": 0.6875,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/builder/work/left.png": {
+      "action": "work",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "b1155b66f0790cd3b07bb1ad6a2d795736042bd822e178f16c9d13b06a65a1ef",
+        "f1918d67f3df9affbf8d38f8a1ab82c0629428b0ab4cf28b84d380fdbe50e89a",
+        "3056417f7aef0102806c478663727f576387f47b0855a5754a280a91a0b96013",
+        "53c4310a74907e4e13cbc56d2a75aee827ecc5a6c362959d37bb49388740f5fb",
+        "ad8fdb2c79556bc143b46c744e4536af9648724f121aa986b8af5028bb774d42",
+        "6e1faead4ebe0f1ce807a6660c3655dc1ce808926977e42194071b04b9b07374",
+        "f63a84de0246db598cf423c5ba97d339768cd541145347606453ac8d9f0f4ce6",
+        "63f71a440568e736bc365d353e2c08fdb788024f0821bb5e0fb66a76f57c6793"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "8bcb25de17695d3b5f747f16922566d9e031a258191bfbfe337fcb02b385c421",
+      "role": "builder",
+      "sha256": "e75728b1f460e8d71c157d1e5f4c0f04a5695a0dfb447194b4b2c9d68c730988",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "ff72f01a37b707420376b39b540f1ef96836869577933362be1eecfa7ad03919",
+        "fileSha256": "ff72f01a37b707420376b39b540f1ef96836869577933362be1eecfa7ad03919",
+        "kind": "manifest-accepted",
+        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+        "path": "assets/sprites/actor-rows/builder/work-left.png",
+        "provenance": "uniform-anchor-rescale",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 5,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.0,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 40.5,
+            "medianColor": [
+              97.8,
+              64.8,
+              31.35
+            ],
+            "paletteDelta": 0.7
+          },
+          "flickerScore": 10.0,
+          "maxAlphaRatio": 1.118,
+          "maxBodyCenterJump": 2.02,
+          "maxEdgePixels": 44,
+          "maxFragmentPixels": 1,
+          "maxPaletteDrift": 2.88,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 51.5,
+          "medianColor": [
+            97.8,
+            64.1,
+            31.35
+          ],
+          "medianColorCount": 616.0,
+          "medianShadingRatio": 0.6864,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/builder/work/right.png": {
+      "action": "work",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "98dbac1c7862fb4db16dc0968dd6edc973498bd4feed112b66a7638deb079762",
+        "371c676cedfc5ffd1f0d86f294448f565bce10b00e75f76f0ba77c31ee954f56",
+        "b65f8d3b5e11a5be94d2527869b42eb5cce366f9afbeebb1f662693613007788",
+        "f96a2e045e9bad2bd543d832399f079c1387cd39bc4bdc8731617a796cd8353b",
+        "b860f60a87715514ff62a382eb3a344a3e38d1dee05149bb52410e1795d1a69d",
+        "a6bce404b7d25742a581f8a626a76cf7a70c1c25152ad194859c0ef10c79489c",
+        "32437ffc725c0a406d7193a94df9c806b0966c42d67d02f8dca1005ba97ccc9d",
+        "a999d8caacf64b2751aca61880d23e4d231c81d6bd6bb9f0988c2667d5f42d77"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "59db71718246904427ddffaf23c3c6b26f0773ae4ca7c1a77ccac93f8f26011f",
+      "role": "builder",
+      "sha256": "89ffa4229823661b79c7b8469d41fbd7092592d908859651985c30ad3aff70b8",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "a1447ae1b87f92947c70b19aa2cc74cea8c729584a6d92347af7505fcd94ab2b",
+        "fileSha256": "a1447ae1b87f92947c70b19aa2cc74cea8c729584a6d92347af7505fcd94ab2b",
+        "kind": "manifest-accepted",
+        "note": "Reordered existing right-facing frames 7,6,5,4,3,2,1,0 to match the left-facing work chronology; pixel content, identity, scale, anchor, and handedness are unchanged.",
+        "path": "assets/sprites/actor-rows/builder/work-right.png",
+        "provenance": "deterministic-frame-reversal",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 5,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.0,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 40.5,
+            "medianColor": [
+              97.8,
+              64.8,
+              31.35
+            ],
+            "paletteDelta": 0.7
+          },
+          "flickerScore": 10.0,
+          "maxAlphaRatio": 1.118,
+          "maxBodyCenterJump": 2.02,
+          "maxEdgePixels": 44,
+          "maxFragmentPixels": 1,
+          "maxPaletteDrift": 2.88,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 51.5,
+          "medianColor": [
+            97.8,
+            64.1,
+            31.35
+          ],
+          "medianColorCount": 616.0,
+          "medianShadingRatio": 0.6864,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/builder/work/up.png": {
+      "action": "work",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "182b3534a713175169e2173839f6d11634c194c94766df4dde52eac438ea9661",
+        "3a981135ba095fb46c19f1d295c8990c6f8ba11a02ff584d171735b351f7b753",
+        "da2628bf3a9e296e6931fce8adc5aac33d0562a4ac97dabab65c73ff1d8adab7",
+        "2227acac19fb875fa0619c8069184cce8e161971fb83b2887c9e94466658311d",
+        "870ae902354af68765f4845450d9ffb0a37be0d8e6ea896be7a468e5a31bc954",
+        "2606ecc59ee1f16b1b65ddf229f2973cd72ceea3489d4771cdaeff82bf8f0945",
+        "f84f4260eb582ca29b77d8482be2c7ec84b7272b7a20631bff78397f6f35c361",
+        "f6608f88e37647340b2173feca571f4a352f770ce479cebe2520741ecb599a1c"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "843379688b07d5e6aa83a5f6582743eadc84495b3a6384e4bb32bd7037704252",
+      "role": "builder",
+      "sha256": "773c23ec738dd9c0fe65fc6c9ed62a80e32de91cde82a6ef612a20c030e205cd",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "ea0524b9d434c251d10557da19a1c7337b0ac632a2046aca08b13065d7146b83",
+        "fileSha256": "ea0524b9d434c251d10557da19a1c7337b0ac632a2046aca08b13065d7146b83",
+        "kind": "manifest-accepted",
+        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+        "path": "assets/sprites/actor-rows/builder/work-up.png",
+        "provenance": "uniform-anchor-rescale",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 3,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.5,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 51.5,
+            "medianColor": [
+              97.8,
+              64.1,
+              31.35
+            ],
+            "paletteDelta": 2.94
+          },
+          "flickerScore": 7.6,
+          "maxAlphaRatio": 1.125,
+          "maxBodyCenterJump": 2.31,
+          "maxEdgePixels": 42,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 6.58,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 40.0,
+          "medianColor": [
+            95.55,
+            64.8,
+            29.6
+          ],
+          "medianColorCount": 452.0,
+          "medianShadingRatio": 0.7534,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/guard/carry/down.png": {
+      "action": "carry",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "31ea0320c541a467e7529b41456c8ec0a638b57bd294f9438d6a276b70064e04",
+        "1ee128f96dd2f76042ca5037d410842a3cdadb9aad81efd101f8517a7b95dc41",
+        "16a640becb0337a9ae47f7f9dbb6426ffab9c90072ed69fce8212b13a742ebff",
+        "17f65acb9172d100715766ad95ccaa2fe93105ddaddec6d3987c0afc8565bcf7",
+        "703862f3896fbb83d602f247f72dd48bfc6809103e69c3e2069a7a7b99ad64a3",
+        "6f301077720728da4925f908facd248ce0f750f4edbdd255b55553ab68c6d450",
+        "d6d115704c649d4986d44d3719bdca118a5d7b4ebe64134fa0726431f75ddc00",
+        "52c64178620df18f89f310ab60459a9b10afd97188b32809346b3d71aad558af"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "acf3e86ce221a0474857113f92eb9d7954b9f7882b5e391f4310e7f823c4b66e",
+      "role": "guard",
+      "sha256": "7c2a798d9f0d3912a12271f626731992374732a631fc93797b0bde58cbdad2af",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "1ae7d4e03f615119946956fa391e3944d59f622a0451baf0dc67b96f5c7a2b5f",
+        "fileSha256": "1ae7d4e03f615119946956fa391e3944d59f622a0451baf0dc67b96f5c7a2b5f",
+        "kind": "manifest-candidate",
+        "note": "First semantic-identity pass: blue-tunic guard carry cradle, no baked cargo or shield; pending cross-direction family.",
+        "path": "assets/sprites/actor-rows/guard/carry-down.png",
+        "provenance": "imagegen",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.5,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 27.0,
+            "medianColor": [
+              75.4,
+              67.75,
+              55.4
+            ],
+            "paletteDelta": 24.85
+          },
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.044,
+          "maxBodyCenterJump": 1.49,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.8,
+          "medianBodyHeight": 76.5,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            87.15,
+            77.0,
+            75.25
+          ],
+          "medianColorCount": 670.0,
+          "medianShadingRatio": 0.5996,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "candidate"
+      },
+      "width": 512
+    },
+    "rows/guard/carry/left.png": {
+      "action": "carry",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "2b9c2c0fb462fed789304801f52362c70b7a8148460e2e8b6162b6633ebf52b1",
+        "51021ecb2b65d3edff7ca5de88817af39a030db2196ff3024a70b24f640b2377",
+        "b5af849b29f37d559c3aff00842386fa36bbf7ccf0dd2e1b2bda791a00dd6a23",
+        "d6642fc6b1ac86d0f4b722dc4971f4cc9d8c9ff5fa3de2eeb89bcf706889a698",
+        "fd0d5707ac230898874d3168ec1b2b75e3fc058ce44a7e9ca25dcd53d8172165",
+        "2ea5283be222d51246fc5fe76c4d888d2c385d4f7066596b0a0357ef20f794ee",
+        "8cffeea10b6fbfc23c535b5de6dffe1b2c1aa13c4d2813bd42297d66b20e1ceb",
+        "ed50abbde1a566b626456d8c2473091cb342806cd140c3908c027e2e636d790d"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "7e745069fa8da385773f80408a05e6f767a16cea3a896ddd1c171e27db631a0d",
+      "role": "guard",
+      "sha256": "7be2dab74fa4332b80602537a7ec683f506f1b2f3b1ea0faadc08543c5d3b27e",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "17b43ab142ee91fe0797036557cd2bb167fd6c06d031081483e5a61261a01794",
+        "fileSha256": "17b43ab142ee91fe0797036557cd2bb167fd6c06d031081483e5a61261a01794",
+        "kind": "manifest-candidate",
+        "note": "Blue-tunic guard carry cradle with no baked cargo or shield; semantic family repaint candidate.",
+        "path": "assets/sprites/actor-rows/guard/carry-left.png",
+        "provenance": "imagegen",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 7,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              76.1,
+              69.8,
+              65.2
+            ],
+            "paletteDelta": 13.29
+          },
+          "flickerScore": 10.4,
+          "maxAlphaRatio": 1.207,
+          "maxBodyCenterJump": 2.6,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.79,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
+          "medianColor": [
+            88.5,
+            73.75,
+            67.9
+          ],
+          "medianColorCount": 504.0,
+          "medianShadingRatio": 0.6547,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "candidate"
+      },
+      "width": 512
+    },
+    "rows/guard/carry/right.png": {
+      "action": "carry",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "01621b2a57086e6196a665a5fb5b98c1e6fb8cc68f4bdbed17febbb462aed405",
+        "32aa5095eb062160ad0ddb8b9f01996b82954cd888cefe7b31b7dcb722012c40",
+        "9f6b5f7ce9393ab19f2e846e7bd8a318fa5d762320fe4bcd1dde1f184f49a237",
+        "a3214236b18ea6132427510295fbfdedbcc64fce2c2ea1a3ad2fa12dd204d632",
+        "30fb2bf8288e4443b2a31e3358d4e15ed2c356fc1b168c576016748d032a701f",
+        "dd04935dbfe0a26b8e7b8357af291f46c134a07c8caa67de7d378bacc9125dd9",
+        "dad294de94195fc0f56e51e7b79aed26e10d7f035f3c0ba2254d9d40642ee18c",
+        "a38207e8930c276faf22145975d31fd9ed50d9cf8d5e92766640472457eddc3e"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "b54f1db4a574e7bdf1270eedeb63fa161fc6851eefa79df27625228f4e5a188d",
+      "role": "guard",
+      "sha256": "c609d70723026d8d0957521c44549a0965198baa0a4db5736c6ffdca02c9c7cb",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "f0365cd3882d8dd3855afbec25524e8df6ef1940130d4b184adc547ec3ac90fb",
+        "fileSha256": "f0365cd3882d8dd3855afbec25524e8df6ef1940130d4b184adc547ec3ac90fb",
+        "kind": "manifest-candidate",
+        "note": "Exact mirror of reviewed guard carry-left candidate to preserve frame phase and side-view scale; no baked cargo or shield.",
+        "path": "assets/sprites/actor-rows/guard/carry-right.png",
+        "provenance": "deterministic-mirror",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 7,
+          "directionReference": {
+            "bodyHeightDelta": 0.5,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 76.5,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              87.15,
+              73.75,
+              67.9
+            ],
+            "paletteDelta": 1.35
+          },
+          "flickerScore": 10.4,
+          "maxAlphaRatio": 1.207,
+          "maxBodyCenterJump": 2.6,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.79,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
+          "medianColor": [
+            88.5,
+            73.75,
+            67.9
+          ],
+          "medianColorCount": 504.0,
+          "medianShadingRatio": 0.6547,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "candidate"
+      },
+      "width": 512
+    },
+    "rows/guard/carry/up.png": {
+      "action": "carry",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "1b122c0d17750b08771f97893764f206c732b7f196621d143c8b4384d80f01ff",
+        "df111550a0bc6e1dc9190b864d2de3ef01ec94fce73e0c0d723cc317fc644881",
+        "c3dd77ee7bdbbb9e0000eafb35585bc8a5c0547bbfafc52723e2db9ba3cd2d6b",
+        "272ad128fd4891e3c4a982e617a4ae761651ae976f3e127a8525487c24d1179b",
+        "f0e8c5b4e6d001b4f7b1cafdb9d64fc56e173012562f8f7f8861e5eb562ad65b",
+        "e93e2affb394d543dd36ca71b807171ee64a719fa8fa6c208934b3e2fa7524d7",
+        "d73bd598604b5f06147347a3596efc515fbb428a271a84926bfe0a09ca0e59f5",
+        "50c9edeb64ef3003f8807386355e06265f24bac1e7e6c5e20edd868cbcd688ee"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "9cbee0a634af887f2ff094bf5d5242922847194d563cbee950f26f2b57653b55",
+      "role": "guard",
+      "sha256": "4fb5054b29c5e4686ddf195b7be6346f663484616e70c3bfd14f11380c3e9f44",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "d9c996adbd20e26efb65f99c98bb000476eb47fe985fc4a6e5d5950210cb5dea",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/guard.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 13,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "rows/guard/walk/down.png": {
+      "action": "walk",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "b1c8c265428785e80c8a2eee353698f87d9b9c8e385c14d87d6f2f2559e27866",
+        "957aef0da70bd9bcdec8206562ae7dfd0fafb2718d6fd99ecc727d97f94dca5b",
+        "33633b5fa556660a37893b9dcc40fb6aa9da555fe67869714e56e4cc2cefe902",
+        "89ec2aebd9afe5d462cc524735734dd75fdc013ad366685b78f97d4238a3395c",
+        "f7c4ea9fcb1367eb652ef77fc51e085340e9916abbde13045314a99a68eb0ff8",
+        "35690bbd2c012971c812d9579faa6d39e5eb8f62ca7185b1bbd0d07d154ea43f",
+        "65f1b1c10627eb7188f955ae17cd445c5262930a8dadf892115b60c20d598c0c",
+        "81916f178bae1be06eb22e709956d28b7b836d0f6202a0ba9e7759ec6be9a61b"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "8975d17bdae41520f5f8204b629e16aaa657dad01d48a16a5ab779337ca17bf4",
+      "role": "guard",
+      "sha256": "de88c25dd9ad17c0d728d2b69e85d0cc657aaa2cccb9409a422f1b867bc3ec97",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "cfdd95102bb1fa3f831247f8549b71e30a6f92d6be95df4d2c4211b75f443f7a",
+        "fileSha256": "cfdd95102bb1fa3f831247f8549b71e30a6f92d6be95df4d2c4211b75f443f7a",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/down body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-down.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 3,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              65.1
+            ],
+            "paletteDelta": 9.75
+          },
+          "flickerScore": 5.6,
+          "maxAlphaRatio": 1.063,
+          "maxBodyCenterJump": 0.91,
+          "maxEdgePixels": 1,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 3.1,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            84.9,
+            74.5,
+            71.8
+          ],
+          "medianColorCount": 671.5,
+          "medianShadingRatio": 0.6289,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/guard/walk/left.png": {
+      "action": "walk",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "4cae18ad8264f41274645175af8fb8cb3b81b071720853786df0b2156d2f3c10",
+        "638d4a4528e100c919f739c12854028022eca0c93ce9a7ff8e55f9739d39e305",
+        "ae1e02d2e36a7bc8c1c363d64b17a8ecb4fcae91a856bad01f8a84b97d64014f",
+        "03088f34a0c7e34677380b93d5a901d3c8946d4f3b851d957e9152f33c9639a7",
+        "623a6896ae3132d6e3dc271888b28e2ec8436ec8f8d80ae68eb26726af0ec612",
+        "f9748b8d5a6338892329263d5c62172d379eddefbf82976605af6a847eabd7fe",
+        "e4afcbcfb501340bc3a59fc4091f55c176b7a3800fefd51ec1452314b87d2443",
+        "d1593ff0b6a05130d6e2bfa369a5b2ffaaf6e85c5d1e374da351fb36f50232e3"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "de8b05a2f48efc9e1ae5627821677f11a84ae120227f99f3585c68d4150519fc",
+      "role": "guard",
+      "sha256": "b7982d3bd1ce3703a9422c88f7f91e31ea807878d5540407cdc78b876ad52506",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "16a35dddc533952d311a305e1a8a2ae1de02759050acb1c2e5ad29fd42700423",
+        "fileSha256": "16a35dddc533952d311a305e1a8a2ae1de02759050acb1c2e5ad29fd42700423",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/left body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-left.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 5,
+          "bodyHeightRange": 5,
+          "bodyWidthRange": 9,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              71.8
+            ],
+            "paletteDelta": 6.75
+          },
+          "flickerScore": 30.8,
+          "maxAlphaRatio": 1.143,
+          "maxBodyCenterJump": 3.34,
+          "maxEdgePixels": 3,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.89,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            65.05
+          ],
+          "medianColorCount": 519.5,
+          "medianShadingRatio": 0.6889,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/guard/walk/right.png": {
+      "action": "walk",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "b0f5ea035a7076e8297a8f62986fdf0d74c80c6e84148241884cd8e02753a5c9",
+        "d246ec7aeb9218efe39b2cb1fab152d7aef984060d5d0eb07c15b72b5f9ae83b",
+        "5045658a73a934c5ba50128cd586877d6a85c02ffe409bd2468d79095a10f3d4",
+        "facd98aca164da4bf947fd62e5cfb7319d062c3fdfc35d56ac7e53b33c03a7e7",
+        "d23a27e7a3886d2a388d80cc6fa4077eae4ffeab73bcd1e3136cb48dd8001fa4",
+        "efc32931a10e910d23650998070d01744a377f542cd8ddbc8beaa4d73718514d",
+        "4c93ea8d837eaa7e5c1741f21262eb20c3c793a435e24ae7299f032b5f282e6e",
+        "403ca308c3c910d522bbd0ed0c8efcf4237a8f9d46574aaf8da1a178be0cb9bd"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "28443ba6a3bd26e165faf9cab836e78374192f5f09041b2023e8141319876922",
+      "role": "guard",
+      "sha256": "48ca08d10206202d45fe88acf8a78f35c618863875976d39d82b615262f26ceb",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd",
+        "fileSha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/right body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-right.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 5,
+          "bodyHeightRange": 5,
+          "bodyWidthRange": 9,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              71.8
+            ],
+            "paletteDelta": 6.7
+          },
+          "flickerScore": 30.8,
+          "maxAlphaRatio": 1.143,
+          "maxBodyCenterJump": 3.34,
+          "maxEdgePixels": 3,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.92,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            65.1
+          ],
+          "medianColorCount": 519.5,
+          "medianShadingRatio": 0.6889,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "rows/guard/walk/up.png": {
+      "action": "walk",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "3c3125712a39692a94934fdc1c1f8df1e4c060ea00d2fcfda46269dbb64217db",
+        "a6b22e2f6bae5e3bb6a07b1aebfc0ffa8858da14173b72262b6cec4608de088d",
+        "357557bb73380eb88ceb50e6322b88ea564f8a89a4bfe31f9375bd93ffa658e9",
+        "e666bf7bfd3b56449b2b1dc24352f912409ec54dd7dc5062f9ac97fe3274db98",
+        "fb949b4a8c9bdb2f7a5a59867839a85a6d1a50945bb69a8605882d7e053978fe",
+        "5701f62d565c9af7c880704ae8c4884c0a70c38fe207ce8e24fed11652a64883",
+        "f1f1f0e13b8683be8c4682b2d392155365512f65d987f81bb7bc1ea52a3dd0ba",
+        "90c6e7d9bce8b53dba33e8c00fa6c240346e3a587b9979253cb80112aa0ce7ba"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "pixelSha256": "59a88cf442fd4ab4dd1427bea6d4872de3fd33cf351b921b50c8e50beac24d57",
+      "role": "guard",
+      "sha256": "44aac9414d8ed9da2a29c3d78977054e3fe4a248008031262681c0f0c1cf59a7",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
+        "fileSha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/up body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-up.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 4.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              65.1
+            ],
+            "paletteDelta": 21.03
+          },
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.053,
+          "maxBodyCenterJump": 1.49,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 4.27,
+          "medianBodyHeight": 73.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            66.95,
+            62.2,
+            77.65
+          ],
+          "medianColorCount": 547.0,
+          "medianShadingRatio": 0.689,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    }
+  },
+  "reproducibility": {
+    "byteReproducible": true,
+    "doubleBuildChecked": true,
+    "matched": true,
+    "method": "two isolated clean output directories compared by relative file SHA-256"
+  },
+  "rows": {
+    "builder/walk/down": {
+      "action": "walk",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "c456a55d70fd9faf00e6ecf56266201cc700764ae4222ae634f8d9510d0e8d06",
+        "4b96b75e6786bf65a067c8b34af0f5fd6e834e441fcbfe5077bfb6decce410c8",
+        "46835d454d9d2f151ebeaa7b19ecf971273cde10591e18acaa2550a8881fdaa4",
+        "c21b29e2dd4371a13d4bca8b0e29e9d1baccd45c310c3de9ec95471711b3b4d8",
+        "39e78d529b8de369abfc70d495ce29cc82b10445e8004da0d693944ea1c55d5b",
+        "3177fa13be612c53625d15d017b147a918b1a0a8f598d6e44cd086997edee915",
+        "45ce3f38f676a84d7b93cf700f05fc3d57df1b4febe8f0e296f2a2d8056dcca3",
+        "57037ccc545935d43bd51c573b13781d9e931e6239775c3bc1cb6f7dbc7b412a"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/walk/down.png",
+      "pixelSha256": "2c73cbefbede6b47ee267695e787ff47e3c78d753ff538cff9103daf8f1f0a1b",
+      "role": "builder",
+      "sha256": "d82447aefb5e022a0e7494d06a0a2d6676026a63d2f5b2c2703a0c661fb1a974",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "9d1b655aa0764abacecae30d9057fc0a25ba61fd0d7740ee3c3c8ac2d7e25c63",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/builder.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 4,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "builder/walk/left": {
+      "action": "walk",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "2dee98ebb21e6341dcfcdad453ad0ff905f7d1326934b390fda55909347be8f7",
+        "5a2b91dd8ca7a2778e3a96ee9413d841f16eac2766248dd56b73ebdff5da3165",
+        "269963fe26e9ddb3e029585eb8f452f18c000fd6b15d274f499ae4f47e94db1f",
+        "b1ff563c55ff9c8b8aa6161dc6d9b6df83139597d4c54f42edaac12238c441f0",
+        "fc85595bd4476b97293a71f398d92cf58ce081e449f127b592ec2b1b7469fdf3",
+        "1b27a736a78212e94c0646f1e2abf69971552bb20dcc0b1cfb99ad31bbe6e1c6",
+        "02392390f9214cd9b5f8b08494e9711c9806b048786ad1244c21f52933948246",
+        "1f457bffb128cd3766209249202adf35fe5619fe4c12f93677a2ccd2f336e13a"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/walk/left.png",
+      "pixelSha256": "bc00d628ba2c99984e88a7d40baefbe637975b5249e1afd5d9bdbd25d65d27a3",
+      "role": "builder",
+      "sha256": "8cb1b2913b4f7a7e19dfc2a6ffb1e90515a07fd1c69626cc9e10dd30b4bb77c1",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "9d1b655aa0764abacecae30d9057fc0a25ba61fd0d7740ee3c3c8ac2d7e25c63",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/builder.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 6,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "builder/walk/right": {
+      "action": "walk",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "62e6b29e8e4ec3a0a570572867f406dc64f7279bf8179c57fdecfccb4e328042",
+        "ee67874e664b52d8b62f167bdc19ccb2c734b9d2ca482eb4227eed5728450a3d",
+        "f0805ed81ded29225b643e64fa2421fd9782d53ed14b345d1c1c6ced943cafe7",
+        "d5de4077c9f15b0401eba4953b83cc9f2d6ef61de3ef6353d2718f10da8332eb",
+        "1d1e7e3a38c40cb1917f365dc03a2d85b6a08401249007eadd5aa5269a9cb864",
+        "1930a469b0891543e76801d47fe669a7da19873b6f526b13a6b871a9f2bd4722",
+        "4660087ba6ea585213ac6db3cc08c12c10c0cf16d64c0015b6972e47b84fdc0a",
+        "8eda65e9cf2ef43c88205b8a7c2d6b23098debef1c6d02de61ba86da6ac0e7be"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/walk/right.png",
+      "pixelSha256": "de8bb9220fcd1cab805cfe97b1ecaf6d6c5ba302bbd603efdc1ad72da15f3647",
+      "role": "builder",
+      "sha256": "aea4488ecfea36eab134718c0ecc52ed204f64fb8246b4cdd4ee1bee96009361",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+        "fileSha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+        "kind": "manifest-accepted",
+        "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
+        "path": "assets/sprites/actor-rows/builder/walk-right.png",
+        "provenance": "deterministic-frame-reversal",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 3,
+          "bodyWidthRange": 11,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 79.0,
+            "medianBodyWidth": 34.0,
+            "medianColor": [
+              107.85,
+              72.75,
+              45.25
+            ],
+            "paletteDelta": 15.55
+          },
+          "flickerScore": 21.2,
+          "maxAlphaRatio": 1.083,
+          "maxBodyCenterJump": 2.98,
+          "maxEdgePixels": 15,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.05,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 35.0,
+          "medianColor": [
+            94.7,
+            65.35,
+            41.5
+          ],
+          "medianColorCount": 429.0,
+          "medianShadingRatio": 0.674,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "builder/walk/up": {
+      "action": "walk",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "fe1b703962dd675a113aed12343cf5363eb8a80de1424bcb9fbcb79cfaf2c674",
+        "50d3bceff8864b5811af4f5fcc34f79df42113e442c7c6f869832f1af332d7cb",
+        "1c3084554ac6731a805c46ab9abc462dae19d9bd0033fe126950103f57f3c3ee",
+        "978a273b296b88541e32751f73ed115683434bdea14bb8110ee5e1e9152d8a6f",
+        "b687511c291e767b138433a8bd35680c02bcb9d0eb1a05922e0b97a8a05a52d5",
+        "5670dc6cffa4cc2be498e18047506176bd6bfc80f225a4d439372a5db1cee772",
+        "24ecf77dff943aabd65eccbafe82787d0c0151f93cebd64e53b85d403d3ad9d7",
+        "18792d26435cbe3982d02ae4e14971dda325e65074ab1a0c4e74e96e0788df7c"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/walk/up.png",
+      "pixelSha256": "eb6dbba069b967f428bb433246f78035a97c7c429d4e866b0e39d74ee0791d7c",
+      "role": "builder",
+      "sha256": "8e77650c809197a22201676f468a70d28870d2bb636fd7004ce00f15816bcbb2",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "9d1b655aa0764abacecae30d9057fc0a25ba61fd0d7740ee3c3c8ac2d7e25c63",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/builder.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 5,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "builder/work/down": {
+      "action": "work",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "2ff4f1a30474e22cb6ec6e8a94679824a3bc81277885343968b927e4586477b8",
+        "b3f2e86c2e895fce71c8381bb660510826eb966b26dbd8b37f3a6e93687f911b",
+        "f85f3e48752eeea3f77af561f7fe10871d2919673205006696b564be25cc208f",
+        "6c4727db58eca9ea3844ac48216e88301a2f5bdb172f576f4213b94335d5efdb",
+        "5dc1c9b33bf5976cc52f0a8174c2cd28b3b88fa369f09898a30e779985211e42",
+        "30b5e8f24c7386b8202041084efbd86249ebf7d4c90eb14ab3fd6c512f079948",
+        "ba38c88ee6bec23a5f6e2699d28ac42a25f23075de4495ed85c7f92ba55c524c",
+        "f293d17ed9b3c8220803f2a51c1b6488d9ae4af777c894d21a5b118cc14b28fc"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/work/down.png",
+      "pixelSha256": "9ad53f15479d821a494aa65be1cf7eda799957d00683070b46bc58b9eb10b844",
+      "role": "builder",
+      "sha256": "5579710511e00ceed514dfb0888a43d6e7f006dd240d0f96b4f8d1cc36bf637c",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "bfc93e24f0d68edd25258510701afb16e4832c3317c1a6311b25289adc39a0e0",
+        "fileSha256": "bfc93e24f0d68edd25258510701afb16e4832c3317c1a6311b25289adc39a0e0",
+        "kind": "manifest-accepted",
+        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+        "path": "assets/sprites/actor-rows/builder/work-down.png",
+        "provenance": "uniform-anchor-rescale",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 3,
+          "bodyWidthRange": 3,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.0,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 51.5,
+            "medianColor": [
+              97.8,
+              64.1,
+              31.35
+            ],
+            "paletteDelta": 15.74
+          },
+          "flickerScore": 9.6,
+          "maxAlphaRatio": 1.08,
+          "maxBodyCenterJump": 3.37,
+          "maxEdgePixels": 46,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 3.1,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 40.5,
+          "medianColor": [
+            109.1,
+            75.0,
+            32.4
+          ],
+          "medianColorCount": 585.5,
+          "medianShadingRatio": 0.6875,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "builder/work/left": {
+      "action": "work",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "b1155b66f0790cd3b07bb1ad6a2d795736042bd822e178f16c9d13b06a65a1ef",
+        "f1918d67f3df9affbf8d38f8a1ab82c0629428b0ab4cf28b84d380fdbe50e89a",
+        "3056417f7aef0102806c478663727f576387f47b0855a5754a280a91a0b96013",
+        "53c4310a74907e4e13cbc56d2a75aee827ecc5a6c362959d37bb49388740f5fb",
+        "ad8fdb2c79556bc143b46c744e4536af9648724f121aa986b8af5028bb774d42",
+        "6e1faead4ebe0f1ce807a6660c3655dc1ce808926977e42194071b04b9b07374",
+        "f63a84de0246db598cf423c5ba97d339768cd541145347606453ac8d9f0f4ce6",
+        "63f71a440568e736bc365d353e2c08fdb788024f0821bb5e0fb66a76f57c6793"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/work/left.png",
+      "pixelSha256": "8bcb25de17695d3b5f747f16922566d9e031a258191bfbfe337fcb02b385c421",
+      "role": "builder",
+      "sha256": "e75728b1f460e8d71c157d1e5f4c0f04a5695a0dfb447194b4b2c9d68c730988",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "ff72f01a37b707420376b39b540f1ef96836869577933362be1eecfa7ad03919",
+        "fileSha256": "ff72f01a37b707420376b39b540f1ef96836869577933362be1eecfa7ad03919",
+        "kind": "manifest-accepted",
+        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+        "path": "assets/sprites/actor-rows/builder/work-left.png",
+        "provenance": "uniform-anchor-rescale",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 5,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.0,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 40.5,
+            "medianColor": [
+              97.8,
+              64.8,
+              31.35
+            ],
+            "paletteDelta": 0.7
+          },
+          "flickerScore": 10.0,
+          "maxAlphaRatio": 1.118,
+          "maxBodyCenterJump": 2.02,
+          "maxEdgePixels": 44,
+          "maxFragmentPixels": 1,
+          "maxPaletteDrift": 2.88,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 51.5,
+          "medianColor": [
+            97.8,
+            64.1,
+            31.35
+          ],
+          "medianColorCount": 616.0,
+          "medianShadingRatio": 0.6864,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "builder/work/right": {
+      "action": "work",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "98dbac1c7862fb4db16dc0968dd6edc973498bd4feed112b66a7638deb079762",
+        "371c676cedfc5ffd1f0d86f294448f565bce10b00e75f76f0ba77c31ee954f56",
+        "b65f8d3b5e11a5be94d2527869b42eb5cce366f9afbeebb1f662693613007788",
+        "f96a2e045e9bad2bd543d832399f079c1387cd39bc4bdc8731617a796cd8353b",
+        "b860f60a87715514ff62a382eb3a344a3e38d1dee05149bb52410e1795d1a69d",
+        "a6bce404b7d25742a581f8a626a76cf7a70c1c25152ad194859c0ef10c79489c",
+        "32437ffc725c0a406d7193a94df9c806b0966c42d67d02f8dca1005ba97ccc9d",
+        "a999d8caacf64b2751aca61880d23e4d231c81d6bd6bb9f0988c2667d5f42d77"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/work/right.png",
+      "pixelSha256": "59db71718246904427ddffaf23c3c6b26f0773ae4ca7c1a77ccac93f8f26011f",
+      "role": "builder",
+      "sha256": "89ffa4229823661b79c7b8469d41fbd7092592d908859651985c30ad3aff70b8",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "a1447ae1b87f92947c70b19aa2cc74cea8c729584a6d92347af7505fcd94ab2b",
+        "fileSha256": "a1447ae1b87f92947c70b19aa2cc74cea8c729584a6d92347af7505fcd94ab2b",
+        "kind": "manifest-accepted",
+        "note": "Reordered existing right-facing frames 7,6,5,4,3,2,1,0 to match the left-facing work chronology; pixel content, identity, scale, anchor, and handedness are unchanged.",
+        "path": "assets/sprites/actor-rows/builder/work-right.png",
+        "provenance": "deterministic-frame-reversal",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 5,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.0,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 40.5,
+            "medianColor": [
+              97.8,
+              64.8,
+              31.35
+            ],
+            "paletteDelta": 0.7
+          },
+          "flickerScore": 10.0,
+          "maxAlphaRatio": 1.118,
+          "maxBodyCenterJump": 2.02,
+          "maxEdgePixels": 44,
+          "maxFragmentPixels": 1,
+          "maxPaletteDrift": 2.88,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 51.5,
+          "medianColor": [
+            97.8,
+            64.1,
+            31.35
+          ],
+          "medianColorCount": 616.0,
+          "medianShadingRatio": 0.6864,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "builder/work/up": {
+      "action": "work",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "182b3534a713175169e2173839f6d11634c194c94766df4dde52eac438ea9661",
+        "3a981135ba095fb46c19f1d295c8990c6f8ba11a02ff584d171735b351f7b753",
+        "da2628bf3a9e296e6931fce8adc5aac33d0562a4ac97dabab65c73ff1d8adab7",
+        "2227acac19fb875fa0619c8069184cce8e161971fb83b2887c9e94466658311d",
+        "870ae902354af68765f4845450d9ffb0a37be0d8e6ea896be7a468e5a31bc954",
+        "2606ecc59ee1f16b1b65ddf229f2973cd72ceea3489d4771cdaeff82bf8f0945",
+        "f84f4260eb582ca29b77d8482be2c7ec84b7272b7a20631bff78397f6f35c361",
+        "f6608f88e37647340b2173feca571f4a352f770ce479cebe2520741ecb599a1c"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/builder/work/up.png",
+      "pixelSha256": "843379688b07d5e6aa83a5f6582743eadc84495b3a6384e4bb32bd7037704252",
+      "role": "builder",
+      "sha256": "773c23ec738dd9c0fe65fc6c9ed62a80e32de91cde82a6ef612a20c030e205cd",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "ea0524b9d434c251d10557da19a1c7337b0ac632a2046aca08b13065d7146b83",
+        "fileSha256": "ea0524b9d434c251d10557da19a1c7337b0ac632a2046aca08b13065d7146b83",
+        "kind": "manifest-accepted",
+        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
+        "path": "assets/sprites/actor-rows/builder/work-up.png",
+        "provenance": "uniform-anchor-rescale",
+        "quality": {
+          "bodyBottomRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 3,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 11.5,
+            "medianBodyHeight": 80.0,
+            "medianBodyWidth": 51.5,
+            "medianColor": [
+              97.8,
+              64.1,
+              31.35
+            ],
+            "paletteDelta": 2.94
+          },
+          "flickerScore": 7.6,
+          "maxAlphaRatio": 1.125,
+          "maxBodyCenterJump": 2.31,
+          "maxEdgePixels": 42,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 6.58,
+          "medianBodyHeight": 80.0,
+          "medianBodyWidth": 40.0,
+          "medianColor": [
+            95.55,
+            64.8,
+            29.6
+          ],
+          "medianColorCount": 452.0,
+          "medianShadingRatio": 0.7534,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "guard/carry/down": {
+      "action": "carry",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "31ea0320c541a467e7529b41456c8ec0a638b57bd294f9438d6a276b70064e04",
+        "1ee128f96dd2f76042ca5037d410842a3cdadb9aad81efd101f8517a7b95dc41",
+        "16a640becb0337a9ae47f7f9dbb6426ffab9c90072ed69fce8212b13a742ebff",
+        "17f65acb9172d100715766ad95ccaa2fe93105ddaddec6d3987c0afc8565bcf7",
+        "703862f3896fbb83d602f247f72dd48bfc6809103e69c3e2069a7a7b99ad64a3",
+        "6f301077720728da4925f908facd248ce0f750f4edbdd255b55553ab68c6d450",
+        "d6d115704c649d4986d44d3719bdca118a5d7b4ebe64134fa0726431f75ddc00",
+        "52c64178620df18f89f310ab60459a9b10afd97188b32809346b3d71aad558af"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/carry/down.png",
+      "pixelSha256": "acf3e86ce221a0474857113f92eb9d7954b9f7882b5e391f4310e7f823c4b66e",
+      "role": "guard",
+      "sha256": "7c2a798d9f0d3912a12271f626731992374732a631fc93797b0bde58cbdad2af",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "1ae7d4e03f615119946956fa391e3944d59f622a0451baf0dc67b96f5c7a2b5f",
+        "fileSha256": "1ae7d4e03f615119946956fa391e3944d59f622a0451baf0dc67b96f5c7a2b5f",
+        "kind": "manifest-candidate",
+        "note": "First semantic-identity pass: blue-tunic guard carry cradle, no baked cargo or shield; pending cross-direction family.",
+        "path": "assets/sprites/actor-rows/guard/carry-down.png",
+        "provenance": "imagegen",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.5,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 27.0,
+            "medianColor": [
+              75.4,
+              67.75,
+              55.4
+            ],
+            "paletteDelta": 24.85
+          },
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.044,
+          "maxBodyCenterJump": 1.49,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.8,
+          "medianBodyHeight": 76.5,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            87.15,
+            77.0,
+            75.25
+          ],
+          "medianColorCount": 670.0,
+          "medianShadingRatio": 0.5996,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "candidate"
+      },
+      "width": 512
+    },
+    "guard/carry/left": {
+      "action": "carry",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "2b9c2c0fb462fed789304801f52362c70b7a8148460e2e8b6162b6633ebf52b1",
+        "51021ecb2b65d3edff7ca5de88817af39a030db2196ff3024a70b24f640b2377",
+        "b5af849b29f37d559c3aff00842386fa36bbf7ccf0dd2e1b2bda791a00dd6a23",
+        "d6642fc6b1ac86d0f4b722dc4971f4cc9d8c9ff5fa3de2eeb89bcf706889a698",
+        "fd0d5707ac230898874d3168ec1b2b75e3fc058ce44a7e9ca25dcd53d8172165",
+        "2ea5283be222d51246fc5fe76c4d888d2c385d4f7066596b0a0357ef20f794ee",
+        "8cffeea10b6fbfc23c535b5de6dffe1b2c1aa13c4d2813bd42297d66b20e1ceb",
+        "ed50abbde1a566b626456d8c2473091cb342806cd140c3908c027e2e636d790d"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/carry/left.png",
+      "pixelSha256": "7e745069fa8da385773f80408a05e6f767a16cea3a896ddd1c171e27db631a0d",
+      "role": "guard",
+      "sha256": "7be2dab74fa4332b80602537a7ec683f506f1b2f3b1ea0faadc08543c5d3b27e",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "17b43ab142ee91fe0797036557cd2bb167fd6c06d031081483e5a61261a01794",
+        "fileSha256": "17b43ab142ee91fe0797036557cd2bb167fd6c06d031081483e5a61261a01794",
+        "kind": "manifest-candidate",
+        "note": "Blue-tunic guard carry cradle with no baked cargo or shield; semantic family repaint candidate.",
+        "path": "assets/sprites/actor-rows/guard/carry-left.png",
+        "provenance": "imagegen",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 7,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              76.1,
+              69.8,
+              65.2
+            ],
+            "paletteDelta": 13.29
+          },
+          "flickerScore": 10.4,
+          "maxAlphaRatio": 1.207,
+          "maxBodyCenterJump": 2.6,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.79,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
+          "medianColor": [
+            88.5,
+            73.75,
+            67.9
+          ],
+          "medianColorCount": 504.0,
+          "medianShadingRatio": 0.6547,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "candidate"
+      },
+      "width": 512
+    },
+    "guard/carry/right": {
+      "action": "carry",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "01621b2a57086e6196a665a5fb5b98c1e6fb8cc68f4bdbed17febbb462aed405",
+        "32aa5095eb062160ad0ddb8b9f01996b82954cd888cefe7b31b7dcb722012c40",
+        "9f6b5f7ce9393ab19f2e846e7bd8a318fa5d762320fe4bcd1dde1f184f49a237",
+        "a3214236b18ea6132427510295fbfdedbcc64fce2c2ea1a3ad2fa12dd204d632",
+        "30fb2bf8288e4443b2a31e3358d4e15ed2c356fc1b168c576016748d032a701f",
+        "dd04935dbfe0a26b8e7b8357af291f46c134a07c8caa67de7d378bacc9125dd9",
+        "dad294de94195fc0f56e51e7b79aed26e10d7f035f3c0ba2254d9d40642ee18c",
+        "a38207e8930c276faf22145975d31fd9ed50d9cf8d5e92766640472457eddc3e"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/carry/right.png",
+      "pixelSha256": "b54f1db4a574e7bdf1270eedeb63fa161fc6851eefa79df27625228f4e5a188d",
+      "role": "guard",
+      "sha256": "c609d70723026d8d0957521c44549a0965198baa0a4db5736c6ffdca02c9c7cb",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "f0365cd3882d8dd3855afbec25524e8df6ef1940130d4b184adc547ec3ac90fb",
+        "fileSha256": "f0365cd3882d8dd3855afbec25524e8df6ef1940130d4b184adc547ec3ac90fb",
+        "kind": "manifest-candidate",
+        "note": "Exact mirror of reviewed guard carry-left candidate to preserve frame phase and side-view scale; no baked cargo or shield.",
+        "path": "assets/sprites/actor-rows/guard/carry-right.png",
+        "provenance": "deterministic-mirror",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 7,
+          "directionReference": {
+            "bodyHeightDelta": 0.5,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 76.5,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              87.15,
+              73.75,
+              67.9
+            ],
+            "paletteDelta": 1.35
+          },
+          "flickerScore": 10.4,
+          "maxAlphaRatio": 1.207,
+          "maxBodyCenterJump": 2.6,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.79,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
+          "medianColor": [
+            88.5,
+            73.75,
+            67.9
+          ],
+          "medianColorCount": 504.0,
+          "medianShadingRatio": 0.6547,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "candidate"
+      },
+      "width": 512
+    },
+    "guard/carry/up": {
+      "action": "carry",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "1b122c0d17750b08771f97893764f206c732b7f196621d143c8b4384d80f01ff",
+        "df111550a0bc6e1dc9190b864d2de3ef01ec94fce73e0c0d723cc317fc644881",
+        "c3dd77ee7bdbbb9e0000eafb35585bc8a5c0547bbfafc52723e2db9ba3cd2d6b",
+        "272ad128fd4891e3c4a982e617a4ae761651ae976f3e127a8525487c24d1179b",
+        "f0e8c5b4e6d001b4f7b1cafdb9d64fc56e173012562f8f7f8861e5eb562ad65b",
+        "e93e2affb394d543dd36ca71b807171ee64a719fa8fa6c208934b3e2fa7524d7",
+        "d73bd598604b5f06147347a3596efc515fbb428a271a84926bfe0a09ca0e59f5",
+        "50c9edeb64ef3003f8807386355e06265f24bac1e7e6c5e20edd868cbcd688ee"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/carry/up.png",
+      "pixelSha256": "9cbee0a634af887f2ff094bf5d5242922847194d563cbee950f26f2b57653b55",
+      "role": "guard",
+      "sha256": "4fb5054b29c5e4686ddf195b7be6346f663484616e70c3bfd14f11380c3e9f44",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": null,
+        "fileSha256": "d9c996adbd20e26efb65f99c98bb000476eb47fe985fc4a6e5d5950210cb5dea",
+        "kind": "compiled-sheet",
+        "note": "No candidate or accepted row override exists for this review key.",
+        "path": "assets/sprites/actors-compiled/guard.png",
+        "provenance": "current-compiled-row",
+        "quality": null,
+        "rowIndex": 13,
+        "status": "base"
+      },
+      "width": 512
+    },
+    "guard/walk/down": {
+      "action": "walk",
+      "direction": "down",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "b1c8c265428785e80c8a2eee353698f87d9b9c8e385c14d87d6f2f2559e27866",
+        "957aef0da70bd9bcdec8206562ae7dfd0fafb2718d6fd99ecc727d97f94dca5b",
+        "33633b5fa556660a37893b9dcc40fb6aa9da555fe67869714e56e4cc2cefe902",
+        "89ec2aebd9afe5d462cc524735734dd75fdc013ad366685b78f97d4238a3395c",
+        "f7c4ea9fcb1367eb652ef77fc51e085340e9916abbde13045314a99a68eb0ff8",
+        "35690bbd2c012971c812d9579faa6d39e5eb8f62ca7185b1bbd0d07d154ea43f",
+        "65f1b1c10627eb7188f955ae17cd445c5262930a8dadf892115b60c20d598c0c",
+        "81916f178bae1be06eb22e709956d28b7b836d0f6202a0ba9e7759ec6be9a61b"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/walk/down.png",
+      "pixelSha256": "8975d17bdae41520f5f8204b629e16aaa657dad01d48a16a5ab779337ca17bf4",
+      "role": "guard",
+      "sha256": "de88c25dd9ad17c0d728d2b69e85d0cc657aaa2cccb9409a422f1b867bc3ec97",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "cfdd95102bb1fa3f831247f8549b71e30a6f92d6be95df4d2c4211b75f443f7a",
+        "fileSha256": "cfdd95102bb1fa3f831247f8549b71e30a6f92d6be95df4d2c4211b75f443f7a",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/down body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-down.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 3,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              65.1
+            ],
+            "paletteDelta": 9.75
+          },
+          "flickerScore": 5.6,
+          "maxAlphaRatio": 1.063,
+          "maxBodyCenterJump": 0.91,
+          "maxEdgePixels": 1,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 3.1,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            84.9,
+            74.5,
+            71.8
+          ],
+          "medianColorCount": 671.5,
+          "medianShadingRatio": 0.6289,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "guard/walk/left": {
+      "action": "walk",
+      "direction": "left",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "4cae18ad8264f41274645175af8fb8cb3b81b071720853786df0b2156d2f3c10",
+        "638d4a4528e100c919f739c12854028022eca0c93ce9a7ff8e55f9739d39e305",
+        "ae1e02d2e36a7bc8c1c363d64b17a8ecb4fcae91a856bad01f8a84b97d64014f",
+        "03088f34a0c7e34677380b93d5a901d3c8946d4f3b851d957e9152f33c9639a7",
+        "623a6896ae3132d6e3dc271888b28e2ec8436ec8f8d80ae68eb26726af0ec612",
+        "f9748b8d5a6338892329263d5c62172d379eddefbf82976605af6a847eabd7fe",
+        "e4afcbcfb501340bc3a59fc4091f55c176b7a3800fefd51ec1452314b87d2443",
+        "d1593ff0b6a05130d6e2bfa369a5b2ffaaf6e85c5d1e374da351fb36f50232e3"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/walk/left.png",
+      "pixelSha256": "de8b05a2f48efc9e1ae5627821677f11a84ae120227f99f3585c68d4150519fc",
+      "role": "guard",
+      "sha256": "b7982d3bd1ce3703a9422c88f7f91e31ea807878d5540407cdc78b876ad52506",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "16a35dddc533952d311a305e1a8a2ae1de02759050acb1c2e5ad29fd42700423",
+        "fileSha256": "16a35dddc533952d311a305e1a8a2ae1de02759050acb1c2e5ad29fd42700423",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/left body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-left.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 5,
+          "bodyHeightRange": 5,
+          "bodyWidthRange": 9,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              71.8
+            ],
+            "paletteDelta": 6.75
+          },
+          "flickerScore": 30.8,
+          "maxAlphaRatio": 1.143,
+          "maxBodyCenterJump": 3.34,
+          "maxEdgePixels": 3,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.89,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            65.05
+          ],
+          "medianColorCount": 519.5,
+          "medianShadingRatio": 0.6889,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "guard/walk/right": {
+      "action": "walk",
+      "direction": "right",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "b0f5ea035a7076e8297a8f62986fdf0d74c80c6e84148241884cd8e02753a5c9",
+        "d246ec7aeb9218efe39b2cb1fab152d7aef984060d5d0eb07c15b72b5f9ae83b",
+        "5045658a73a934c5ba50128cd586877d6a85c02ffe409bd2468d79095a10f3d4",
+        "facd98aca164da4bf947fd62e5cfb7319d062c3fdfc35d56ac7e53b33c03a7e7",
+        "d23a27e7a3886d2a388d80cc6fa4077eae4ffeab73bcd1e3136cb48dd8001fa4",
+        "efc32931a10e910d23650998070d01744a377f542cd8ddbc8beaa4d73718514d",
+        "4c93ea8d837eaa7e5c1741f21262eb20c3c793a435e24ae7299f032b5f282e6e",
+        "403ca308c3c910d522bbd0ed0c8efcf4237a8f9d46574aaf8da1a178be0cb9bd"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/walk/right.png",
+      "pixelSha256": "28443ba6a3bd26e165faf9cab836e78374192f5f09041b2023e8141319876922",
+      "role": "guard",
+      "sha256": "48ca08d10206202d45fe88acf8a78f35c618863875976d39d82b615262f26ceb",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd",
+        "fileSha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/right body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-right.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 5,
+          "bodyHeightRange": 5,
+          "bodyWidthRange": 9,
+          "directionReference": {
+            "bodyHeightDelta": 1.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              71.8
+            ],
+            "paletteDelta": 6.7
+          },
+          "flickerScore": 30.8,
+          "maxAlphaRatio": 1.143,
+          "maxBodyCenterJump": 3.34,
+          "maxEdgePixels": 3,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.92,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            82.9,
+            67.7,
+            65.1
+          ],
+          "medianColorCount": 519.5,
+          "medianShadingRatio": 0.6889,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    },
+    "guard/walk/up": {
+      "action": "walk",
+      "direction": "up",
+      "distinctFrameHashes": 8,
+      "framePixelSha256": [
+        "3c3125712a39692a94934fdc1c1f8df1e4c060ea00d2fcfda46269dbb64217db",
+        "a6b22e2f6bae5e3bb6a07b1aebfc0ffa8858da14173b72262b6cec4608de088d",
+        "357557bb73380eb88ceb50e6322b88ea564f8a89a4bfe31f9375bd93ffa658e9",
+        "e666bf7bfd3b56449b2b1dc24352f912409ec54dd7dc5062f9ac97fe3274db98",
+        "fb949b4a8c9bdb2f7a5a59867839a85a6d1a50945bb69a8605882d7e053978fe",
+        "5701f62d565c9af7c880704ae8c4884c0a70c38fe207ce8e24fed11652a64883",
+        "f1f1f0e13b8683be8c4682b2d392155365512f65d987f81bb7bc1ea52a3dd0ba",
+        "90c6e7d9bce8b53dba33e8c00fa6c240346e3a587b9979253cb80112aa0ce7ba"
+      ],
+      "height": 84,
+      "mode": "RGBA",
+      "output": "rows/guard/walk/up.png",
+      "pixelSha256": "59a88cf442fd4ab4dd1427bea6d4872de3fd33cf351b921b50c8e50beac24d57",
+      "role": "guard",
+      "sha256": "44aac9414d8ed9da2a29c3d78977054e3fe4a248008031262681c0f0c1cf59a7",
+      "sockets": {
+        "reason": "Flattened current-row art has no authored socket data.",
+        "status": "missing"
+      },
+      "source": {
+        "declaredSha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
+        "fileSha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
+        "kind": "manifest-accepted",
+        "note": "Painted row: settler locked walk/up body with guard palette + guard's own painted helm transplanted.",
+        "path": "assets/sprites/actor-rows/guard/walk-up.png",
+        "provenance": "settler-body-own-headgear-transplant",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 4.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 77.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              82.9,
+              67.7,
+              65.1
+            ],
+            "paletteDelta": 21.03
+          },
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.053,
+          "maxBodyCenterJump": 1.49,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 4.27,
+          "medianBodyHeight": 73.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            66.95,
+            62.2,
+            77.65
+          ],
+          "medianColorCount": 547.0,
+          "medianShadingRatio": 0.689,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "status": "accepted"
+      },
+      "width": 512
+    }
+  },
+  "schema": "realm.actor-pose-prototype.candidate/v1",
+  "selectionPolicy": [
+    "manifest-candidate",
+    "manifest-accepted",
+    "compiled-sheet",
+    "base-sheet"
+  ],
+  "socketContract": {
+    "reason": "Candidate C contains flattened review art. Socket coordinates must not be inferred and presented as authored data.",
+    "status": "missing"
+  },
+  "sourceSelectionSha256": "86d920a77b7e0a43ece678446c3642eb90432fcc97194a71eb1409c831fb5133",
+  "timeline": {
+    "authoredBeats": false,
+    "frameOrder": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "note": "Runtime frame order is preserved, but the flattened control does not provide authored cross-view beat/contact metadata."
+  }
+}

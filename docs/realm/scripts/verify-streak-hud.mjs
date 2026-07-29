@@ -1,7 +1,7 @@
 // 233 verifier: peace-streak + life-streak HUD indicators.
 // Inject state into a running realm and confirm the HUD text updates.
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { ensureServer } from './_serve.mjs';
@@ -25,7 +25,7 @@ await page.waitForTimeout(1500);
 
 // Inject conditions for both streak indicators + force a UI tick.
 const result = await page.evaluate(async () => {
-  const ui = await import('./js/ui.js');
+  const ui = await import('./js/ui.js?realm=166');
   window.G.stats = window.G.stats || {};
   window.G.stats.raidsSurvived = 1;
   window.G.lastRaidDay = 5;

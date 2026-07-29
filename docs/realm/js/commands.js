@@ -15,11 +15,16 @@
 //   NOT commands.
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, rngRange } from './state.js?realm=157';
-import { placeBuilding, demolishBuilding, undoLastBuild, upgradeBuilding } from './economy.js?realm=157';
-import { startResearch } from './tech.js?realm=157';
-import { executeTrade } from './trade.js?realm=157';
-import { avatarMove, avatarGoto } from './avatar.js?realm=157';
+import { G, BUILDINGS, rngRange } from './state.js?realm=166';
+import { placeBuilding, upgradeBuilding } from './economy.js?realm=166';
+import { removeBuilding, undoLastBuildingPlacement } from './building-lifecycle.js?realm=166';
+import { startResearch } from './tech.js?realm=166';
+import { executeTrade } from './trade.js?realm=166';
+import { avatarMove, avatarGoto } from './avatar.js?realm=166';
+import {
+  commandAssignCitizen,
+  commandReleaseCitizen,
+} from './citizen-ownership.js?realm=166';
 
 function buildingAt(x, y) {
   return G.buildingGrid[Math.round(y)]?.[Math.round(x)] || null;
@@ -52,12 +57,12 @@ const HANDLERS = {
   DEMOLISH({ x, y }) {
     const b = buildingAt(x, y);
     if (!b) return { ok: false, reason: 'no-building' };
-    demolishBuilding(b);
+    removeBuilding(b, { cause: 'manual' });
     return { ok: true };
   },
 
   UNDO() {
-    return undoLastBuild() ? { ok: true } : { ok: false, reason: 'nothing-to-undo' };
+    return undoLastBuildingPlacement() ? { ok: true } : { ok: false, reason: 'nothing-to-undo' };
   },
 
   UPGRADE({ x, y }) {
@@ -73,6 +78,22 @@ const HANDLERS = {
   TRADE({ partner, resource, amount }) {
     const result = executeTrade(partner, resource, amount);
     return result ? { ok: true, result } : { ok: false, reason: 'cannot-trade' };
+  },
+
+  ASSIGN_CITIZEN({ actorId, x, y }) {
+    try {
+      return commandAssignCitizen(actorId, x, y);
+    } catch (error) {
+      return { ok: false, reason: error instanceof RangeError ? 'assignment-rejected' : 'invalid-assignment-command' };
+    }
+  },
+
+  RELEASE_CITIZEN({ actorId }) {
+    try {
+      return commandReleaseCitizen(actorId);
+    } catch (error) {
+      return { ok: false, reason: error instanceof RangeError ? 'release-rejected' : 'invalid-release-command' };
+    }
   },
 
   SET_RALLY({ x, y }) {
@@ -130,16 +151,180 @@ const HANDLERS = {
   },
 };
 
+function canonicalNumber(value) {
+  return Object.is(value, -0) ? 0 : value;
+}
+
+const FIELD = Object.freeze({
+  string(value) {
+    return typeof value === 'string' ? { ok: true, value } : { ok: false };
+  },
+  finiteNumber(value) {
+    return Number.isFinite(value)
+      ? { ok: true, value: canonicalNumber(value) }
+      : { ok: false };
+  },
+  safeInteger(value) {
+    return Number.isSafeInteger(value)
+      ? { ok: true, value: canonicalNumber(value) }
+      : { ok: false };
+  },
+  positiveSafeInteger(value) {
+    return Number.isSafeInteger(value) && value > 0
+      ? { ok: true, value }
+      : { ok: false };
+  },
+  nullableSafeInteger(value) {
+    if (value === null) return { ok: true, value: null };
+    return Number.isSafeInteger(value)
+      ? { ok: true, value: canonicalNumber(value) }
+      : { ok: false };
+  },
+});
+
+function schema(...entries) {
+  return Object.freeze(entries.map(([name, normalize]) => Object.freeze({ name, normalize })));
+}
+
+// This table is the command wire surface. Handlers never receive the caller's
+// object: dispatch first produces one primitive-only record in this declared
+// field order. Unknown fields are rejected rather than copied into replay
+// provenance. `tick` is the sole envelope field accepted in addition to a
+// command schema so a recorded command can be replayed through dispatch; the
+// caller's value is validated and then replaced by the authoritative G tick.
+const COMMAND_SCHEMAS = Object.freeze({
+  PLACE_BUILDING: schema(
+    ['building', FIELD.string],
+    ['x', FIELD.safeInteger],
+    ['y', FIELD.safeInteger],
+  ),
+  DEMOLISH: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
+  UNDO: schema(),
+  UPGRADE: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
+  START_RESEARCH: schema(['tech', FIELD.string]),
+  TRADE: schema(
+    ['partner', FIELD.string],
+    ['resource', FIELD.string],
+    ['amount', FIELD.finiteNumber],
+  ),
+  ASSIGN_CITIZEN: schema(
+    ['actorId', FIELD.positiveSafeInteger],
+    ['x', FIELD.safeInteger],
+    ['y', FIELD.safeInteger],
+  ),
+  RELEASE_CITIZEN: schema(['actorId', FIELD.positiveSafeInteger]),
+  SET_RALLY: schema(
+    ['x', FIELD.nullableSafeInteger],
+    ['y', FIELD.nullableSafeInteger],
+  ),
+  SET_STANCE: schema(['stance', FIELD.string]),
+  GARRISON: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
+  AVATAR_MOVE: schema(['dx', FIELD.finiteNumber], ['dy', FIELD.finiteNumber]),
+  AVATAR_GOTO: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
+  EJECT_GARRISON: schema(['x', FIELD.safeInteger], ['y', FIELD.safeInteger]),
+});
+
+function ownDataValue(value, key) {
+  const descriptor = Object.getOwnPropertyDescriptor(value, key);
+  if (!descriptor || !Object.hasOwn(descriptor, 'value')) return { ok: false };
+  return { ok: true, value: descriptor.value };
+}
+
+function normalizeCommand(cmd) {
+  if (!cmd || typeof cmd !== 'object' || Array.isArray(cmd)) {
+    return { ok: false, result: { ok: false, reason: 'invalid-command' } };
+  }
+  const prototype = Object.getPrototypeOf(cmd);
+  if (prototype !== Object.prototype && prototype !== null) {
+    return { ok: false, result: { ok: false, reason: 'invalid-command' } };
+  }
+
+  const typeField = ownDataValue(cmd, 'type');
+  if (!typeField.ok || typeof typeField.value !== 'string') {
+    return {
+      ok: false,
+      result: { ok: false, reason: 'invalid-command-field', field: 'type' },
+    };
+  }
+  const type = typeField.value;
+  const commandSchema = COMMAND_SCHEMAS[type];
+  if (!commandSchema) {
+    return { ok: false, result: { ok: false, reason: 'unknown-command' } };
+  }
+  const allowed = new Set(['type', 'tick', ...commandSchema.map(field => field.name)]);
+  for (const key of Reflect.ownKeys(cmd)) {
+    if (typeof key !== 'string' || !allowed.has(key)) {
+      return {
+        ok: false,
+        result: {
+          ok: false,
+          reason: 'unknown-command-field',
+          field: typeof key === 'symbol' ? key.toString() : key,
+        },
+      };
+    }
+  }
+
+  if (Object.hasOwn(cmd, 'tick')) {
+    const tickField = ownDataValue(cmd, 'tick');
+    if (
+      !tickField.ok
+      || !Number.isSafeInteger(tickField.value)
+      || tickField.value < 0
+    ) {
+      return {
+        ok: false,
+        result: { ok: false, reason: 'invalid-command-field', field: 'tick' },
+      };
+    }
+  }
+
+  const normalized = { type };
+  for (const field of commandSchema) {
+    const input = ownDataValue(cmd, field.name);
+    if (!input.ok) {
+      return {
+        ok: false,
+        result: { ok: false, reason: 'invalid-command-field', field: field.name },
+      };
+    }
+    const output = field.normalize(input.value);
+    if (!output.ok) {
+      return {
+        ok: false,
+        result: { ok: false, reason: 'invalid-command-field', field: field.name },
+      };
+    }
+    normalized[field.name] = output.value;
+  }
+  if (
+    type === 'SET_RALLY'
+    && ((normalized.x === null) !== (normalized.y === null))
+  ) {
+    return {
+      ok: false,
+      result: { ok: false, reason: 'invalid-command-field', field: 'x,y' },
+    };
+  }
+  return { ok: true, command: Object.freeze(normalized) };
+}
+
 const LOG_CAP = 4000;
 
 export function dispatch(cmd) {
-  const handler = HANDLERS[cmd.type];
-  if (!handler) return { ok: false, reason: 'unknown-command' };
-  const res = handler(cmd) || { ok: false, reason: 'handler-returned-nothing' };
+  const normalized = normalizeCommand(cmd);
+  if (!normalized.ok) return normalized.result;
+  const command = normalized.command;
+  const handler = HANDLERS[command.type];
+  const res = handler(command) || { ok: false, reason: 'handler-returned-nothing' };
   if (res.ok) {
     G._commandLog = G._commandLog || [];
-    G._commandLog.push({ tick: G.gameTick, ...cmd });
+    G._commandLog.push(Object.freeze({ ...command, tick: G.gameTick }));
     if (G._commandLog.length > LOG_CAP) G._commandLog.splice(0, G._commandLog.length - LOG_CAP);
   }
   return res;
 }
+
+// See sim.js coreStateIdentity(). This intentionally exposes only object
+// identity; command mutation still goes through dispatch().
+export function commandStateIdentity() { return G; }

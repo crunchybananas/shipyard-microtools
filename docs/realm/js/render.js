@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=157';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=157';
-import { makeAtlasLoader } from './atlas-loader.js?realm=157';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=157';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=166';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=166';
+import { makeAtlasLoader } from './atlas-loader.js?realm=166';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=166';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -14,28 +14,57 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from '../scripts/sprite-source-contract.mjs';
+} from './sprite-source-contract.js?realm=166';
+import {
+  buildCurrentCitizenPresentations,
+  presentationActionForActivity,
+} from './citizen-presentation.js?realm=166';
+import {
+  citizenRenderRecord,
+  pruneCitizenRenderCache,
+} from './citizen-render-cache.js?realm=166';
+import { staffingCount } from './citizen-ownership.js?realm=166';
 
 let C, ctx;
 let logicalW, logicalH;
+const nonCitizenAnimationCache = new WeakMap();
+const worldDrawQueue = [];
+
+const WORLD_DRAW_KIND = Object.freeze({
+  building: 0,
+  citizen: 1,
+  animal: 2,
+  avatar: 3,
+  walker: 4,
+  soldier: 5,
+  caravan: 6,
+  enemy: 7,
+});
 
 // ── FPS counter ───────────────────────────────────────────────
 let fpsFrames = 0, fpsTime = 0, fpsDisplay = 0;
 export let showFPS = false;
 export function toggleFPS() { showFPS = !showFPS; }
 
-// Live building art is painted raster atlas only. Keep the live path
-// single-renderer and bitmap-first; do not add line-art or SVG fallbacks.
-const _SPRITE_TYPES = new Set([
-  'granary', 'storehouse', 'castle', 'church', 'windmill', 'tower',
-  'house', 'tavern', 'blacksmith', 'market', 'bakery', 'barracks',
-  'townhall',  // 255 — 12th + last user-buildable structure in the atlas roster.
-  'well',      // 306 — Phase F first; supporting structure with strong narrative anchor (227 well_remembers).
-  'farm', 'lumber', 'quarry', 'mine', 'fisherman', 'tradingpost',
-  'school', 'archery', 'wall', 'road', 'chickencoop', 'cowpen',
-  'sawmill', // aliases the lumber cell via rasterSpriteKey
-  'wonder',  // Phase D: aliases the castle cell at x1.3 until it gets its own art
-]);
+let _renderProfiling = false;
+const _renderProfileSamples = [];
+const _RENDER_PROFILE_LIMIT = 500;
+
+export function setRenderProfiling(enabled) {
+  _renderProfiling = !!enabled;
+  if (_renderProfiling) _renderProfileSamples.length = 0;
+}
+
+export function getRenderProfile() {
+  return _renderProfileSamples.map(sample => ({ ...sample }));
+}
+
+function markRenderPass(profile, name) {
+  if (!profile) return;
+  const now = performance.now();
+  profile[name] = now - profile.last;
+  profile.last = now;
+}
 
 const _RASTER_ATLAS_URL = 'assets/sprites/buildings-atlas-painted.png';
 const _RASTER_ATLAS_CELL = 128;
@@ -55,12 +84,12 @@ const _RASTER_ATLAS_FRAMES = Object.fromEntries(_RASTER_ATLAS_TYPES.map((type, i
     h: _RASTER_ATLAS_CELL,
   },
 ]));
-function rasterSpriteKey(type) {
-  if (type === 'storehouse') return 'granary';
-  if (type === 'sawmill') return 'lumber'; // v1: sawmill reuses the mill art until it gets its own atlas cell
-  if (type === 'wonder') return 'castle';  // Phase D interim: dedicated Hall of Ages art arrives in D5
-  return type;
-}
+const _BUILDING_SPRITE_ALIASES = Object.freeze({
+  storehouse: 'granary',
+  sawmill: 'lumber',
+  wonder: 'castle',
+});
+function rasterSpriteKey(type) { return _BUILDING_SPRITE_ALIASES[type] || type; }
 const _RASTER_ATLAS_TRIMS = {
   granary:    { x: 17, y:  8, w: 100, h: 120 },
   castle:     { x:  3, y:  9, w: 125, h: 114 },
@@ -76,10 +105,6 @@ const _RASTER_ATLAS_TRIMS = {
   townhall:   { x:  0, y:  0, w: 112, h: 121 },
   well:       { x: 12, y:  6, w:  94, h: 112 },
 };
-function _usesRasterSprite(type) {
-  return _SPRITE_TYPES.has(type);
-}
-
 const _SUPPORT_ATLAS_URL = 'assets/sprites/support-atlas.png';
 const _SUPPORT_ATLAS_CELL = 128;
 const _SUPPORT_ATLAS_COLS = 4;
@@ -118,43 +143,31 @@ const _SUPPORT_ATLAS_TRIMS = {
 };
 const _loadSupportAtlas = makeAtlasLoader(_SUPPORT_ATLAS_URL);
 
-const _ACTOR_ATLAS_REVISION = new URLSearchParams(location.search).get('v')
-  || new URL(import.meta.url).searchParams.get('realm');
+// Keep an optional inspection label while always including the module build
+// revision. A stable `?v=release-polish` URL must still fetch a newly compiled
+// atlas after a source promotion.
+const _ACTOR_ATLAS_REVISION = [
+  new URLSearchParams(location.search).get('v'),
+  new URL(import.meta.url).searchParams.get('realm'),
+].filter(Boolean).join('-');
 const _ACTOR_ATLAS_URL = _ACTOR_ATLAS_REVISION
   ? `assets/sprites/actors-atlas.png?realm=${encodeURIComponent(_ACTOR_ATLAS_REVISION)}`
   : 'assets/sprites/actors-atlas.png';
 const _loadActorAtlas = makeAtlasLoader(_ACTOR_ATLAS_URL);
 
 export function actorVariantForCitizen(c) {
-  // A citizen's painted identity must survive a temporary job release. Work
-  // routes can be retried, deliveries can outlive a source building, and the
-  // food-crisis allocator can hold a worker between jobs for a few ticks.
-  // Falling straight back to settler in those gaps made miners visibly turn
-  // into townspeople. `visualJob` is updated only when a real job is chosen;
-  // the active job still wins immediately when one exists.
-  if (c.state === 'foraging') return 'forager';
-  if (c.jobBuilding?.buildProgress !== undefined && c.jobBuilding.buildProgress < 1) return 'builder';
-  const jt = c.jobBuilding?.type || c.visualJob;
-  if (jt === 'chickencoop' || jt === 'cowpen') return 'rancher';
-  if (jt === 'farm' || jt === 'windmill' || jt === 'bakery') return 'farmer';
-  if (jt === 'lumber' || jt === 'sawmill') return 'lumber';
-  if (jt === 'quarry') return 'stonecutter';
-  if (jt === 'blacksmith') return 'blacksmith';
-  if (jt === 'mine') return 'miner';
-  if (jt === 'fisherman') return 'fisher';
-  if (jt === 'tavern') return 'innkeeper';
-  if (jt === 'market' || jt === 'tradingpost') return 'trader';
-  if (jt === 'barracks' || jt === 'tower' || jt === 'archery') return 'guard';
-  if (jt === 'school' || jt === 'church') return 'scholar';
-  if (jt === 'townhall') return 'builder';
-  return 'settler';
+  if (c?.presentationKind === 'citizen' && ACTOR_VARIANTS.includes(c.variant)) return c.variant;
+  // The founder is not part of the citizen Phase 1A slice yet.
+  if (c === G.avatar) return 'settler';
+  throw new TypeError('Renderer received a citizen without a valid presentation snapshot.');
 }
 
 export function actorActionForCitizen(c, isMoving) {
-  if (c.carrying || c.state === 'walk_to_deliver' || c.state === 'deliver' || c.state === 'needs_delivery') return 'carry';
-  if (c.state === 'working' || c.state === 'foraging' || c.state === 'eating') return 'work';
-  if (isMoving) return 'walk';
-  return 'idle';
+  if (c?.presentationKind === 'citizen') {
+    return presentationActionForActivity(c.activity.kind, c.carrying, isMoving);
+  }
+  if (c === G.avatar) return isMoving ? 'walk' : 'idle';
+  throw new TypeError('Renderer received an actor without explicit action ownership.');
 }
 
 export function actorDirection(faceScreenX, faceScreenY, facingAway) {
@@ -203,27 +216,18 @@ export function drawActorAtlasFrame(targetCtx, {
   targetCtx.globalAlpha *= alpha;
   targetCtx.imageSmoothingEnabled = smoothing;
   if (smoothing) targetCtx.imageSmoothingQuality = 'high';
-  // Registration metadata aligns a whole row to the shared feet line. Per-
-  // frame scaling is intentionally forbidden: shrinking a frame to hide a
-  // bad pose makes the actor breathe and masks repaint debt. Source art owns
-  // body consistency; runtime only applies one row-level scale and pixel
-  // anchor offsets.
+  // Registration metadata only aligns the shared feet line. Scaling a whole
+  // row from its opaque area made tool-heavy work/carry poses shrink the
+  // actor's body by several visible pixels at every action transition.
+  // Source art owns body consistency; runtime owns anchor offsets only.
   const reg = ACTOR_REGISTRATION[`${role}/${action}/${dir}`];
-  let dw = width, dh = height, ddx = 0, ddy = 0;
-  if (reg) {
-    const S = reg.s || 1;
-    if (S !== 1) {
-      dw = width * S;
-      dh = height * S;
-      ddx = (width - dw) / 2;                                  // stay centered
-      ddy = (79 * (height / ACTOR_FRAME_H)) * (1 - S);         // feet stay planted
-    }
-    ddy += ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (dh / ACTOR_FRAME_H);
-  }
+  const ddy = reg
+    ? ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (height / ACTOR_FRAME_H)
+    : 0;
   targetCtx.drawImage(
     atlas,
     source.sx, source.sy, source.sw, source.sh,
-    x + ddx, y + ddy, dw, dh
+    x, y + ddy, width, height
   );
   targetCtx.restore();
   return true;
@@ -336,6 +340,48 @@ function drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight = 1) {
   ctx.restore();
 }
 
+function actorRenderRecord(entity) {
+  if (entity?.presentationKind === 'citizen') return citizenRenderRecord(entity.actorId);
+  let record = nonCitizenAnimationCache.get(entity);
+  if (!record) {
+    record = {
+      laneX: 0,
+      laneY: 0,
+      dirKey: null,
+      dirPending: null,
+      dirPendingMs: 0,
+      animationKey: null,
+      animationStartedAt: null,
+      trail: [],
+    };
+    nonCitizenAnimationCache.set(entity, record);
+  }
+  return record;
+}
+
+export function actorAnimationFrame(entity, variant, action, {
+  isMoving = false,
+  phaseOffset = 0,
+  hold = false,
+} = {}) {
+  const frameRate = action === 'idle' ? 22 : action === 'work' ? 6 : 7;
+  const framePhase = Math.floor((phaseOffset / (Math.PI * 2)) * ACTOR_FRAMES) % ACTOR_FRAMES;
+  const shouldAnimate = !hold && (action === 'idle' || action === 'work' || isMoving);
+  const animationKey = `${variant}/${action}/${shouldAnimate ? 'active' : 'hold'}`;
+  const animation = actorRenderRecord(entity);
+  if (animation.animationKey !== animationKey) {
+    const firstAnimation = animation.animationKey == null;
+    animation.animationKey = animationKey;
+    // The first time an actor is seen, retain its deterministic per-citizen
+    // phase. Real action transitions start on the authored contact pose
+    // instead of landing on an arbitrary global-tick frame.
+    animation.animationStartedAt = G.gameTick - (firstAnimation ? framePhase * frameRate : 0);
+  }
+  if (!shouldAnimate) return 0;
+  const elapsed = Math.max(0, G.gameTick - (animation.animationStartedAt ?? G.gameTick));
+  return Math.floor(elapsed / frameRate) % ACTOR_FRAMES;
+}
+
 function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facingAway, isMoving, phaseOffset) {
   const atlas = _loadActorAtlas();
   if (!atlas) return false;
@@ -344,15 +390,13 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
   const dir = actorDirection(faceScreenX, faceScreenY, facingAway);
   const row = actorAtlasRowIndex(variant, action, dir);
   if (row < 0) return false;
-  const frameRate = action === 'work' ? 6 : 7;
-  const framePhase = Math.floor((phaseOffset / (Math.PI * 2)) * ACTOR_FRAMES) % ACTOR_FRAMES;
-  const frame = action === 'idle' || (!isMoving && action !== 'work')
-    ? 0
-    : (Math.floor(G.gameTick / frameRate) + framePhase) % ACTOR_FRAMES;
+  const frame = actorAnimationFrame(c, variant, action, { isMoving, phaseOffset });
   const targetW = 27;
   const targetH = 35;
-  const dx = Math.round(s.x - targetW / 2);
-  const dy = Math.round(cy + 3 - targetH);
+  // Keep the subpixel position produced by lerpEnt(). Rounding here threw
+  // away interpolation and reintroduced a one-pixel cadence at common zooms.
+  const dx = s.x - targetW / 2;
+  const dy = cy + 3 - targetH;
   return drawActorAtlasFrame(ctx, {
     role: variant,
     action,
@@ -370,7 +414,8 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
 // Snap on teleports (evacuation, spawn, load) — never lerp across >1.5 tiles.
 function lerpEnt(e) {
   const a = G._renderAlpha ?? 1;
-  const px = e._px, py = e._py;
+  const px = e.presentationKind === 'citizen' ? e.previousX : e._px;
+  const py = e.presentationKind === 'citizen' ? e.previousY : e._py;
   if (px === undefined || py === undefined) return e;
   if (Math.abs(px - e.x) + Math.abs(py - e.y) > 1.5) return e;
   return { x: px + (e.x - px) * a, y: py + (e.y - py) * a };
@@ -506,18 +551,33 @@ const _SPRITE_SIZES = {
   cowpen:      { w: 50, h: 40 },
 };
 
-function fallbackBuildingShadowFootprint(type) {
-  const wide = (type === 'castle' || type === 'wonder') ? 15 : (type === 'church' || type === 'tower') ? 12 : 10;
-  return { wide, tall: wide * 0.36, y: 3 };
+const _BUILDING_SPRITE_CONTRACT = new Map(Object.keys(BUILDINGS).map((type) => {
+  const spriteType = rasterSpriteKey(type);
+  const support = Object.hasOwn(_SUPPORT_ATLAS_FRAMES, spriteType);
+  const frames = support ? _SUPPORT_ATLAS_FRAMES : _RASTER_ATLAS_FRAMES;
+  const trims = support ? _SUPPORT_ATLAS_TRIMS : _RASTER_ATLAS_TRIMS;
+  const frame = frames[spriteType];
+  const trim = trims[spriteType];
+  const size = _SPRITE_SIZES[type];
+  const missing = [
+    !frame && 'frame',
+    !trim && 'trim',
+    !size && 'size',
+  ].filter(Boolean);
+  if (missing.length) {
+    throw new Error(`[render] Building sprite contract is incomplete for "${type}" (${missing.join(', ')})`);
+  }
+  return [type, Object.freeze({ spriteType, support, frame, trim, size })];
+}));
+
+function buildingSpriteContract(type) {
+  const contract = _BUILDING_SPRITE_CONTRACT.get(type);
+  if (!contract) throw new Error(`[render] Unknown building type "${type}"`);
+  return contract;
 }
 
 function spriteTargetMetrics(type) {
-  const spriteType = rasterSpriteKey(type);
-  const supportFrame = _SUPPORT_ATLAS_FRAMES[spriteType];
-  const frame = supportFrame || _RASTER_ATLAS_FRAMES[spriteType];
-  const trims = supportFrame ? _SUPPORT_ATLAS_TRIMS : _RASTER_ATLAS_TRIMS;
-  const trim = trims[spriteType] || frame || { w: 36, h: 42 };
-  const size = _SPRITE_SIZES[type] || { w: 36, h: 42 };
+  const { trim, size } = buildingSpriteContract(type);
   const targetH = size.h * 1.1;
   const targetW = Math.max(size.w, size.h * (trim.w / trim.h)) * 1.1;
   return { w: targetW, h: targetH };
@@ -540,7 +600,6 @@ const _SPRITE_GROUNDING = {
 };
 
 function drawRasterSpriteGrounding(ctx, b, s, daylight = 1, progress = 1) {
-  if (!_usesRasterSprite(b.type)) return;
   const spec = _SPRITE_GROUNDING[b.type] || {};
   if (spec.skip) return;
 
@@ -615,14 +674,12 @@ function drawSupportAtlasPiece(ctx, atlas, frame, trim, x, groundY, targetH, rev
   ctx.restore();
 }
 
-function drawWallSpriteIfReady(ctx, b, s, reveal = 1) {
+function drawWallSpriteIfReady(ctx, b, s, reveal, contract) {
   const atlas = _loadSupportAtlas();
-  const frame = _SUPPORT_ATLAS_FRAMES.wall;
-  const trim = _SUPPORT_ATLAS_TRIMS.wall;
-  if (!atlas || !frame || !trim) return false;
+  if (!atlas) return false;
+  const { frame, trim, size: base } = contract;
 
   const n = wallNeighbors(b);
-  const base = _SPRITE_SIZES.wall;
   const drawPiece = (x, groundY, h, alpha = 1, widthBoost = 1) => {
     drawSupportAtlasPiece(ctx, atlas, frame, trim, x, groundY, h, reveal, alpha, widthBoost);
   };
@@ -640,21 +697,15 @@ function drawWallSpriteIfReady(ctx, b, s, reveal = 1) {
 }
 
 function drawSpriteIfReady(ctx, b, s, reveal = 1) {
-  if (!_SPRITE_TYPES.has(b.type)) return false;
-  if (b.type === 'wall') return drawWallSpriteIfReady(ctx, b, s, reveal);
+  const contract = buildingSpriteContract(b.type);
+  if (b.type === 'wall') return drawWallSpriteIfReady(ctx, b, s, reveal, contract);
 
-  const spriteType = rasterSpriteKey(b.type);
-  const supportFrame = _SUPPORT_ATLAS_FRAMES[spriteType];
-  const atlas = supportFrame ? _loadSupportAtlas() : _loadRasterAtlas();
-  const frame = supportFrame || _RASTER_ATLAS_FRAMES[spriteType];
-  if (!atlas || !frame) return false;
-
-  const size = _SPRITE_SIZES[b.type] || { w: 36, h: 42 };
-  const trims = supportFrame ? _SUPPORT_ATLAS_TRIMS : _RASTER_ATLAS_TRIMS;
-  const trim = trims[spriteType] || { x: 0, y: 0, w: frame.w, h: frame.h };
+  const atlas = contract.support ? _loadSupportAtlas() : _loadRasterAtlas();
+  if (!atlas) return false;
+  const { frame, trim, size } = contract;
   // Housing tiers read at a glance: hovels sit lower, manors stand taller.
   // Ground-anchored (draw rect is bottom-aligned at s.y), so only height/width scale.
-  const tierScale = b.type === 'house' ? [0.9, 1.0, 1.1, 1.22][Math.min(4, b.level || 1) - 1] : 1;
+  const tierScale = b.type === 'house' ? [0.9, 1.0, 1.1, 1.22][Math.min(4, b.level) - 1] : 1;
   const targetH = size.h * tierScale;
   const targetW = Math.max(size.w * tierScale, targetH * (trim.w / trim.h));
   drawImageWithReveal(
@@ -876,6 +927,11 @@ export function applyNightTint(ctx, daylight, dayPhase, dayLength) {
 }
 
 export function render() {
+  const profileStart = _renderProfiling ? performance.now() : 0;
+  const profile = _renderProfiling ? { start: profileStart, last: profileStart } : null;
+  const citizenPresentations = buildCurrentCitizenPresentations();
+  pruneCitizenRenderCache(citizenPresentations.map(citizen => citizen.actorId));
+  const selectedCitizen = citizenPresentations.find(citizen => citizen.selected) || null;
   // Loop 76 (render S4): sky gradient varies with day phase. Before, the
   // off-island area was a flat near-black void at all times. Now: warm
   // orange/amber at dawn and dusk, pale blue midday, deep navy at night.
@@ -941,8 +997,6 @@ export function render() {
   ctx.translate(logicalW/2 + shakeX, logicalH/2 + shakeY);
   ctx.scale(G.camera.zoom, G.camera.zoom);
   ctx.translate(-G.camera.x, -G.camera.y);
-  // Decay shake
-  if (G.cameraShake > 0) G.cameraShake -= 0.5;
 
   const daylight = getDaylight();
 
@@ -961,6 +1015,8 @@ export function render() {
     }
   }
   ctx.globalAlpha = 1;
+
+  markRenderPass(profile, 'skyCamera');
 
   // ── Tiles ─────────────────────────────────────────────────
   // Viewport culling — isometric needs all 4 screen corners
@@ -1759,6 +1815,8 @@ export function render() {
     }
   }
 
+  markRenderPass(profile, 'terrainFog');
+
   // ── Buildings ─────────────────────────────────────────────
   // Drawn in the unified painter's-algorithm pass below, interleaved with
   // citizens by isometric depth so actors behind a building are occluded.
@@ -1809,7 +1867,7 @@ export function render() {
   let hoveredCitizen = null;
   if (G.hoveredTile) {
     let bestDist = 20; // pixel radius threshold
-    for (const c of G.citizens) {
+    for (const c of citizenPresentations) {
       if (citizenOnBlockedBuildingTile(c)) continue;
       const cs = toScreen(c.x, c.y);
       // Convert mouse from world-tile to screen using camera transform
@@ -1827,16 +1885,16 @@ export function render() {
   // frames most). A one-tile spatial hash preserves the 1.4-tile rule while
   // keeping the per-frame lookup local.
   const socialNeighbors = new Map();
-  if (G.citizens.length > 1) {
+  if (citizenPresentations.length > 1) {
     const buckets = new Map();
     const bucketKey = (x, y) => `${Math.floor(x)},${Math.floor(y)}`;
-    for (const citizen of G.citizens) {
+    for (const citizen of citizenPresentations) {
       const key = bucketKey(citizen.x, citizen.y);
       const bucket = buckets.get(key);
       if (bucket) bucket.push(citizen);
       else buckets.set(key, [citizen]);
     }
-    for (const citizen of G.citizens) {
+    for (const citizen of citizenPresentations) {
       const bx = Math.floor(citizen.x), by = Math.floor(citizen.y);
       let nearest = null, bestD2 = 1.4 * 1.4;
       // A 1.4-tile radius can cross two floor buckets near a cell boundary.
@@ -1856,12 +1914,21 @@ export function render() {
 
   const drawOneCitizen = (cEntity) => {
   for (const c of [cEntity]) {
+    const continuity = actorRenderRecord(c);
     // A citizen inside a fresh footprint ghosts at low alpha while
     // evacuating instead of vanishing and rematerializing.
     const cGhost = citizenOnBlockedBuildingTile(c);
     const lp = lerpEnt(c);
     const s = toScreen(lp.x, lp.y);
-    const pathActive = !!(c.path && c.pathIdx < (c.path?.length ?? 0));
+    const pathActive = c.presentationKind === 'citizen'
+      ? c.pathActive
+      : !!(c.path && c.pathIdx < (c.path?.length ?? 0));
+    const currentWaypoint = c.presentationKind === 'citizen'
+      ? c.pathCurrent
+      : (pathActive ? c.path[c.pathIdx] : null);
+    const previousWaypoint = c.presentationKind === 'citizen'
+      ? c.pathPrevious
+      : (pathActive && c.pathIdx > 0 ? c.path[c.pathIdx - 1] : null);
     // Road lane offset (render-only): while walking a road tile, drift to
     // the right-hand side of the direction of travel so two-way traffic
     // reads as lanes instead of head-on overlap. The offset EASES in and
@@ -1871,20 +1938,22 @@ export function render() {
     if (pathActive && G.buildingGrid[Math.round(c.y)]?.[Math.round(c.x)]?.type === 'road') {
       // Lane direction comes from the path SEGMENT so the target is constant
       // across each leg; near-waypoint renormalization would swing it.
-      const wp = c.path[c.pathIdx];
-      const from = c.pathIdx > 0 ? c.path[c.pathIdx - 1] : null;
+      const wp = currentWaypoint;
+      const from = previousWaypoint;
       const ldx = from ? wp.x - from.x : wp.x - c.x;
       const ldy = from ? wp.y - from.y : wp.y - c.y;
       const llen = Math.hypot(ldx, ldy);
       if (llen > 0.01) { laneTx = -ldy / llen * 0.16; laneTy = ldx / llen * 0.16; }
     }
-    c._laneX = (c._laneX || 0) + (laneTx - (c._laneX || 0)) * 0.12;
-    c._laneY = (c._laneY || 0) + (laneTy - (c._laneY || 0)) * 0.12;
-    if (Math.abs(c._laneX) > 0.002 || Math.abs(c._laneY) > 0.002) {
+    const renderDt = G._renderDeltaMs || (1000 / 60);
+    const laneEase = 1 - Math.pow(1 - 0.12, renderDt / (1000 / 60));
+    continuity.laneX += (laneTx - continuity.laneX) * laneEase;
+    continuity.laneY += (laneTy - continuity.laneY) * laneEase;
+    if (Math.abs(continuity.laneX) > 0.002 || Math.abs(continuity.laneY) > 0.002) {
       // Keep the render-only lane offset on the interpolated position. Using
       // the simulation coordinates here cancelled lerpEnt() each time a
       // citizen stepped onto a road, producing a visible 60 Hz shimmy.
-      const lane = toScreen(lp.x + c._laneX, lp.y + c._laneY);
+      const lane = toScreen(lp.x + continuity.laneX, lp.y + continuity.laneY);
       s.x = lane.x; s.y = lane.y;
     }
     ctx.globalAlpha = cGhost ? 0.35 : Math.max(0.85, daylight);
@@ -1906,11 +1975,15 @@ export function render() {
     // A path alone is not evidence of motion: a blocked worker used to loop
     // the walk cycle in place until the watchdog fired. Allow only a short
     // startup window before the first real step.
-    const movedRecently = (G.gameTick - (c._movedAt ?? -999)) < 14;
-    const pathWarming = pathActive && c._pathStartedAt != null &&
-      (G.gameTick - c._pathStartedAt) < 8;
+    const movedAt = c.presentationKind === 'citizen' ? c.movedAt : c._movedAt;
+    const pathStartedAt = c.presentationKind === 'citizen' ? c.pathStartedAt : c._pathStartedAt;
+    const movedRecently = (G.gameTick - (movedAt ?? -999)) < 14;
+    const pathWarming = pathActive && pathStartedAt != null &&
+      (G.gameTick - pathStartedAt) < 8;
     const isMoving = movedRecently || pathWarming;
-    const phaseHash = (c.name.charCodeAt(0) * 91 + (c.name.charCodeAt(1) || 11) * 41) % 360;
+    const phaseHash = c.presentationKind === 'citizen'
+      ? (Math.imul(c.actorId, 2654435761) >>> 0) % 360
+      : 0;
     const phaseOffset = phaseHash * Math.PI / 180;
     const bob = isMoving
       ? Math.sin(G.gameTick * 0.14 + phaseOffset) * 0.55
@@ -1927,12 +2000,15 @@ export function render() {
     // Work rows are motion, not an orientation lottery. Lock the facing at
     // the moment the worker reaches the site so nearby idle/social movement
     // and a resource-target repath cannot swap directions mid-swing.
-    if (c.state === 'working' && (c._workFaceX || c._workFaceZ)) {
-      faceX = c._workFaceX;
-      faceZ = c._workFaceZ;
+    const activityKind = c.presentationKind === 'citizen' ? c.activity.kind : c.state;
+    const workFaceX = c.presentationKind === 'citizen' ? c.workFaceX : c._workFaceX;
+    const workFaceZ = c.presentationKind === 'citizen' ? c.workFaceZ : c._workFaceZ;
+    if (activityKind === 'working' && (workFaceX || workFaceZ)) {
+      faceX = workFaceX;
+      faceZ = workFaceZ;
     } else if (pathActive) {
-      const wp = c.path[c.pathIdx];
-      const from = c.pathIdx > 0 ? c.path[c.pathIdx - 1] : null;
+      const wp = currentWaypoint;
+      const from = previousWaypoint;
       const fdx = from ? wp.x - from.x : wp.x - c.x;
       const fdy = from ? wp.y - from.y : wp.y - c.y;
       const gate = from ? 0.01 : 0.1;
@@ -1957,21 +2033,22 @@ export function render() {
         faceZ = sdy > 0.1 ? 1 : sdy < -0.1 ? -1 : 0;
       }
     }
-    // Direction hysteresis: a new facing must persist 4 consecutive frames
+    // Direction hysteresis: a new facing must persist about 67ms
     // before the drawn row changes. Replans and segment boundaries can pass
     // through an intermediate direction for a frame or two; without the
-    // hold that reads as a twitch.
+    // hold that reads as a twitch. Measure time rather than render frames so
+    // 144Hz displays do not switch directions more than twice as quickly.
     if (faceX || faceZ) {
       const dirKey = faceX + ',' + faceZ;
-      if (c._dirKey === undefined || c._dirKey === dirKey) {
-        c._dirKey = dirKey; c._dirPend = null; c._dirPendN = 0;
-      } else if (c._dirPend === dirKey) {
-        c._dirPendN = (c._dirPendN || 0) + 1;
-        if (c._dirPendN >= 4) { c._dirKey = dirKey; c._dirPend = null; c._dirPendN = 0; }
+      if (continuity.dirKey === null || continuity.dirKey === dirKey) {
+        continuity.dirKey = dirKey; continuity.dirPending = null; continuity.dirPendingMs = 0;
+      } else if (continuity.dirPending === dirKey) {
+        continuity.dirPendingMs += renderDt;
+        if (continuity.dirPendingMs >= 67) { continuity.dirKey = dirKey; continuity.dirPending = null; continuity.dirPendingMs = 0; }
       } else {
-        c._dirPend = dirKey; c._dirPendN = 1;
+        continuity.dirPending = dirKey; continuity.dirPendingMs = renderDt;
       }
-      const held = c._dirKey.split(',');
+      const held = continuity.dirKey.split(',');
       faceX = +held[0]; faceZ = +held[1];
     }
     // In iso: screen Y = (worldX + worldY)*TH/2, so moving away from camera
@@ -1983,18 +2060,7 @@ export function render() {
     const faceScreenY = (faceX + faceZ) * 0.5; // screen-depth component; positive walks down/toward camera
 
     // Job color — vibrant saturated palette so citizens stand out
-    let bodyColor = '#8899bb';
-    if (c.jobBuilding) {
-      const jt = c.jobBuilding.type;
-      if (jt === 'farm') bodyColor = '#4ec820';
-      else if (jt === 'lumber') bodyColor = '#c07820';
-      else if (jt === 'quarry' || jt === 'mine') bodyColor = '#5080a8';
-      else if (jt === 'market') bodyColor = '#f0a800';
-      else if (jt === 'barracks') bodyColor = '#3858a0';
-      else if (jt === 'tavern') bodyColor = '#c83820';
-      else bodyColor = '#5080c8';
-    }
-    if (c.state === 'eating') bodyColor = '#20d860';
+    const bodyColor = '#8899bb';
 
     // Loop 43 (render S4): killed the job-colored ground ring. Fresh-eyes
     // critique: "colored rings read as UI selection indicators stacked on
@@ -2029,7 +2095,7 @@ export function render() {
         ctx.arc(s.x, s.y - 4, 5, 0, Math.PI * 2);
         ctx.stroke();
       }
-      if (c === G.selectedCitizen) {
+      if (c.presentationKind === 'citizen' && c.selected) {
         const pulse = 0.5 + 0.4 * Math.sin(G.gameTick * 0.1);
         ctx.strokeStyle = `rgba(100,200,255,${pulse})`;
         ctx.lineWidth = 2;
@@ -2074,7 +2140,7 @@ export function render() {
         ctx.ellipse(s.x, s.y + 2, 7, 3.0, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
-      if (c === G.selectedCitizen) {
+      if (c.presentationKind === 'citizen' && c.selected) {
         const pulse = 0.55 + 0.35 * Math.sin(G.gameTick * 0.1);
         ctx.strokeStyle = `rgba(120,210,255,${pulse})`;
         ctx.lineWidth = 1.4;
@@ -2097,44 +2163,133 @@ export function render() {
   }
   };
 
+  const animalRenderSize = {
+    deer:    { w: 32, h: 32, shadowW: 6.2, shadowH: 2.0 },
+    cow:     { w: 34, h: 32, shadowW: 7.5, shadowH: 2.3 },
+    chicken: { w: 21, h: 26, shadowW: 3.2, shadowH: 1.2 },
+  };
+  function drawOneAnimal(a, interpolated = lerpEnt(a)) {
+    if (G.camera.zoom < 0.6) return;
+    const style = animalRenderSize[a.type];
+    if (!style) return;
+    if (interpolated.x < minX - 2 || interpolated.x > maxX + 2 ||
+        interpolated.y < minY - 2 || interpolated.y > maxY + 2) return;
+    const mapX = Math.round(interpolated.x), mapY = Math.round(interpolated.y);
+    if (G.fog?.[mapY]?.[mapX] === false) return;
+
+    const s = toScreen(interpolated.x, interpolated.y);
+    const walking = a.state === 'walk' && (G.gameTick - (a._movedAt ?? -999)) < 3;
+    // Move the whole painted animal together. The retired procedural version
+    // bobbed the torso while its legs stayed planted, which read as broken
+    // frame registration rather than a gait.
+    const bob = walking ? Math.sin(G.gameTick * 0.18 + (a.phase || 0)) * 0.38 : 0;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0.82, daylight);
+    ctx.fillStyle = 'rgba(0,0,0,0.20)';
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 2.4, style.shadowW, style.shadowH, 0, 0, Math.PI * 2);
+    ctx.fill();
+    drawAmbientSprite(
+      ctx,
+      a.type,
+      s.x,
+      s.y + 3 + bob,
+      style.w,
+      style.h,
+      1,
+      (a.facing || 1) < 0,
+    );
+    ctx.restore();
+  }
+
   // ── Unified world pass: buildings + citizens by iso depth ──
-  // Painter's algorithm over x+y; ties draw the building first so a worker
-  // standing at a building's door renders in front of it.
-  const worldDrawQueue = [];
+  // Painter's algorithm over x+y; ties draw the building first so actors and
+  // animals at a doorway render in front instead of floating over roofs.
+  let worldDrawCount = 0;
+  const inWorldView = (x, y, extraPad = 2) => (
+    x >= minX - extraPad
+    && x <= maxX + extraPad
+    && y >= minY - extraPad
+    && y <= maxY + extraPad
+  );
+  const enqueueWorld = (kind, entity, x = entity.x, y = entity.y, order = 1) => {
+    let item = worldDrawQueue[worldDrawCount];
+    if (!item) {
+      item = {};
+      worldDrawQueue[worldDrawCount] = item;
+    }
+    item.kind = kind;
+    item.entity = entity;
+    item.x = x;
+    item.y = y;
+    item.depth = x + y;
+    item.order = order;
+    worldDrawCount++;
+  };
+
   for (const b of G.buildings) {
-    worldDrawQueue.push({ depth: b.x + b.y, order: 0, draw: () => {
-      const bs = toScreen(b.x, b.y);
-      drawBuilding(ctx, b, bs, daylight);
-    } });
+    if (inWorldView(b.x, b.y, 4)) enqueueWorld(WORLD_DRAW_KIND.building, b, b.x, b.y, 0);
   }
-  for (const c of G.citizens) {
-    worldDrawQueue.push({ depth: c.x + c.y, order: 1, draw: () => drawOneCitizen(c) });
+  for (const c of citizenPresentations) {
+    if (inWorldView(c.x, c.y)) enqueueWorld(WORLD_DRAW_KIND.citizen, c);
   }
-  if (G.avatar) {
+  for (const a of G.animals || []) {
+    const ap = lerpEnt(a);
+    if (inWorldView(ap.x, ap.y)) enqueueWorld(WORLD_DRAW_KIND.animal, a, ap.x, ap.y);
+  }
+  if (G.avatar && inWorldView(G.avatar.x, G.avatar.y)) {
     // The founder rides the citizen sprite path (avatar is citizen-shaped)
     // plus a golden pennant + name so the player can always find themself.
-    worldDrawQueue.push({ depth: G.avatar.x + G.avatar.y, order: 1, draw: () => {
-      drawOneCitizen(G.avatar);
-      drawFounderMarker(G.avatar);
-    } });
+    enqueueWorld(WORLD_DRAW_KIND.avatar, G.avatar);
   }
   // Walkers, soldiers, caravans, and raiders share the same depth pass so no
   // entity ever floats above a building it stands behind. Their draw
   // functions are hoisted declarations defined in their original sections.
   for (const w of G.walkers) {
-    worldDrawQueue.push({ depth: w.x + w.y, order: 1, draw: () => drawOneWalker(w) });
+    if (inWorldView(w.x, w.y)) enqueueWorld(WORLD_DRAW_KIND.walker, w);
   }
   for (const sld of G.soldiers) {
-    worldDrawQueue.push({ depth: sld.x + sld.y, order: 1, draw: () => drawOneSoldier(sld) });
+    if (inWorldView(sld.x, sld.y)) enqueueWorld(WORLD_DRAW_KIND.soldier, sld);
   }
   for (const cv of G.caravans) {
-    worldDrawQueue.push({ depth: cv.x + cv.y, order: 1, draw: () => drawOneCaravan(cv) });
+    if (inWorldView(cv.x, cv.y)) enqueueWorld(WORLD_DRAW_KIND.caravan, cv);
   }
   for (const en of G.enemies) {
-    worldDrawQueue.push({ depth: en.x + en.y, order: 1, draw: () => drawOneEnemy(en) });
+    if (inWorldView(en.x, en.y)) enqueueWorld(WORLD_DRAW_KIND.enemy, en);
   }
+  worldDrawQueue.length = worldDrawCount;
   worldDrawQueue.sort((a, b) => a.depth - b.depth || a.order - b.order);
-  for (const item of worldDrawQueue) item.draw();
+  for (const item of worldDrawQueue) {
+    switch (item.kind) {
+      case WORLD_DRAW_KIND.building:
+        drawBuilding(ctx, item.entity, toScreen(item.x, item.y), daylight);
+        break;
+      case WORLD_DRAW_KIND.citizen:
+        drawOneCitizen(item.entity);
+        break;
+      case WORLD_DRAW_KIND.animal:
+        drawOneAnimal(item.entity, item);
+        break;
+      case WORLD_DRAW_KIND.avatar:
+        drawOneCitizen(item.entity);
+        drawFounderMarker(item.entity);
+        break;
+      case WORLD_DRAW_KIND.walker:
+        drawOneWalker(item.entity);
+        break;
+      case WORLD_DRAW_KIND.soldier:
+        drawOneSoldier(item.entity);
+        break;
+      case WORLD_DRAW_KIND.caravan:
+        drawOneCaravan(item.entity);
+        break;
+      case WORLD_DRAW_KIND.enemy:
+        drawOneEnemy(item.entity);
+        break;
+      default:
+        break;
+    }
+  }
 
   // ── Founder marker (Phase 3d) ─────────────────────────────
   function drawFounderMarker(a) {
@@ -2194,10 +2349,12 @@ export function render() {
     const wFaceX = nfx - nfy;
     const wFaceY = (nfx + nfy) * 0.5;
     const wDir = actorDirection(wFaceX, wFaceY, wFaceY < -0.02);
-    const wFrame = wMoving ? (Math.floor(G.gameTick / 7) + ((w.home?.x || 0) % ACTOR_FRAMES)) % ACTOR_FRAMES : 0;
+    const wAction = wMoving ? (w.hauler ? 'carry' : 'walk') : 'idle';
+    const wPhase = (((w.home?.x || 0) % ACTOR_FRAMES) / ACTOR_FRAMES) * Math.PI * 2;
+    const wFrame = actorAnimationFrame(w, walkerRole, wAction, { isMoving: wMoving, phaseOffset: wPhase });
     drawActorAtlasFrame(ctx, {
-      role: walkerRole, action: wMoving ? (w.hauler ? 'carry' : 'walk') : 'idle', dir: wDir, frame: wFrame,
-      x: Math.round(ws.x - 13.5), y: Math.round(ws.y + 3 - 35), width: 27, height: 35,
+      role: walkerRole, action: wAction, dir: wDir, frame: wFrame,
+      x: ws.x - 13.5, y: ws.y + 3 - 35, width: 27, height: 35,
     });
     // Small emoji badge above the head (service indicator)
     if (G.camera.zoom >= 1.2) {
@@ -2210,8 +2367,8 @@ export function render() {
   }
 
   // ── Selected citizen path visualization ──────────────────
-  if (G.selectedCitizen && G.selectedCitizen.path && G.selectedCitizen.pathIdx < G.selectedCitizen.path.length) {
-    const c = G.selectedCitizen;
+  if (selectedCitizen?.pathRemaining.length) {
+    const c = selectedCitizen;
     ctx.globalAlpha = 0.4;
     ctx.strokeStyle = 'rgba(100,200,255,0.6)';
     ctx.lineWidth = 1.5;
@@ -2220,8 +2377,7 @@ export function render() {
     const clp0 = lerpEnt(c);
     const start = toScreen(clp0.x, clp0.y);
     ctx.moveTo(start.x, start.y);
-    for (let i = c.pathIdx; i < c.path.length; i++) {
-      const wp = c.path[i];
+    for (const wp of c.pathRemaining) {
       const ws = toScreen(wp.x, wp.y);
       ctx.lineTo(ws.x, ws.y);
     }
@@ -2229,8 +2385,8 @@ export function render() {
     ctx.setLineDash([]);
 
     // Destination marker
-    if (c.path.length > 0) {
-      const dest = c.path[c.path.length - 1];
+    if (c.pathRemaining.length > 0) {
+      const dest = c.pathRemaining.at(-1);
       const ds = toScreen(dest.x, dest.y);
       ctx.fillStyle = 'rgba(100,200,255,0.5)';
       ctx.beginPath();
@@ -2249,9 +2405,10 @@ export function render() {
     // same depth slot as the tower tile so layering stays correct.
     if (s.garrison) {
       ctx.globalAlpha = Math.max(0.85, daylight);
+      const garrisonFrame = actorAnimationFrame(s, 'guard', 'idle');
       drawActorAtlasFrame(ctx, {
-        role: 'guard', action: 'idle', dir: 'down', frame: 0,
-        x: Math.round(ss.x - 9), y: Math.round(ss.y - 38 - 24), width: 18, height: 24,
+        role: 'guard', action: 'idle', dir: 'down', frame: garrisonFrame,
+        x: ss.x - 9, y: ss.y - 38 - 24, width: 18, height: 24,
       });
       continue;
     }
@@ -2299,8 +2456,7 @@ export function render() {
     }
     // Honest poses: thrust only when actually striking (melee reach) or an
     // archer just loosed a shot — no more stabbing at air from 6 tiles.
-    if (s._fireAnim > 0) s._fireAnim -= G.speed;
-    if (sNearE && (sNearD <= 1.5 || s._fireAnim > 0)) { sAction = 'work'; sFx = sNearE.x - s.x; sFy = sNearE.y - s.y; }
+    if (sNearE && sNearD <= 1.5) { sAction = 'work'; sFx = sNearE.x - s.x; sFy = sNearE.y - s.y; }
     // Braced spear-wall: rallied soldiers holding the flag while an enemy is
     // on the map (but not yet in reach) lock into the first thrust frame.
     let sBraced = false;
@@ -2313,10 +2469,13 @@ export function render() {
     const sFaceX = (sFx / sLen) - (sFy / sLen);
     const sFaceY = ((sFx / sLen) + (sFy / sLen)) * 0.5;
     const sDir = actorDirection(sFaceX, sFaceY, sFaceY < -0.02);
-    const sFrame = (sAction === 'idle' || sBraced) ? 0 : Math.floor(G.gameTick / (sAction === 'work' ? 6 : 7)) % ACTOR_FRAMES;
+    const sFrame = actorAnimationFrame(s, 'guard', sAction, {
+      isMoving: sAction === 'walk',
+      hold: sBraced,
+    });
     drawActorAtlasFrame(ctx, {
       role: 'guard', action: sAction, dir: sDir, frame: sFrame,
-      x: Math.round(ss.x - 13.5), y: Math.round(ss.y + 3 - 35), width: 27, height: 35,
+      x: ss.x - 13.5, y: ss.y + 3 - 35, width: 27, height: 35,
     });
     if (s.hp < s.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -2354,14 +2513,19 @@ export function render() {
     // Loop 39 (render S3): tooltip now also shows hunger status with a
     // small bar, and includes carrying-cargo info if applicable.
     const hs = toScreen(hoveredCitizen.x, hoveredCitizen.y);
-    const name = hoveredCitizen.name;
+    const name = hoveredCitizen.identity.name;
     const stateLabel = {
       idle:'Idle', find_job:'Looking for work', walk_to_work:'Going to work',
       working:'Working', walk_to_deliver:'Delivering', deliver:'Delivering',
       needs_delivery:'Needs storage', foraging:'Foraging', eating:'Eating',
-    }[hoveredCitizen.state] || hoveredCitizen.state;
-    const jobLabel = hoveredCitizen.jobBuilding ? BUILDINGS[hoveredCitizen.jobBuilding.type]?.name : null;
-    const line2 = jobLabel ? `${stateLabel} · ${jobLabel}` : stateLabel;
+      go_home:'Going home', sleep:'Sleeping', leisure:'At leisure',
+    }[hoveredCitizen.activity.kind] || hoveredCitizen.activity.kind;
+    const assignment = hoveredCitizen.assignment;
+    const jobLabel = assignment ? BUILDINGS[assignment.building.type]?.name : null;
+    const vocation = hoveredCitizen.profession.kind;
+    const line2 = jobLabel
+      ? `${vocation} · ${assignment.purpose === 'temporary' ? 'helping at' : 'assigned to'} ${jobLabel} · ${stateLabel}`
+      : `${vocation} · ${stateLabel}`;
     // Line 3: carrying info or hunger warning
     let line3 = '';
     if (hoveredCitizen.carrying && hoveredCitizen.carryAmount > 0) {
@@ -2413,15 +2577,6 @@ export function render() {
   // ── Caravans (drawn via the unified depth pass) ───────────
   function drawOneCaravan(cvEntity) {
   for (const c of [cvEntity]) {
-    // Dust trail behind caravan
-    if (G.gameTick % 8 === 0) {
-      G.particles.push({
-        tx: c.x, ty: c.y, offsetY: -2,
-        text: null, alpha: 0.4, vy: 0, decay: 0.02,
-        type: 'dust', size: 2, vx: 0,
-      });
-    }
-
     const clp = lerpEnt(c);
     const s = toScreen(clp.x, clp.y);
     ctx.globalAlpha = daylight;
@@ -2495,7 +2650,6 @@ export function render() {
     }
     // Danger ground ring — red-tinted so raiders read as threat, not citizens
     // (pulses brighter for a few frames after the raider lands a blow)
-    if (e.attackCue > 0) e.attackCue -= G.speed;
     ctx.fillStyle = e.attackCue > 0 ? 'rgba(255,40,40,0.5)' : 'rgba(200,0,0,0.28)';
     ctx.beginPath();
     ctx.ellipse(es.x, es.y + 1, 8, 3.5, 0, 0, Math.PI*2);
@@ -2654,17 +2808,17 @@ export function render() {
   // triangular head — read as a dash, no motion feel.
   for (const p of G.projectiles) {
     const ps = toScreen(p.x, p.y);
+    const target = toScreen(p.tx, p.ty);
     ctx.globalAlpha = Math.max(0.85, daylight);
-    const dxp = p.tx - p.x, dyp = p.ty - p.y;
-    const len = Math.hypot(dxp, dyp) || 1;
-    // In screen space, isometric angles need the iso aspect. Use a simple
-    // atan2 on world delta — close enough for the visual.
-    const angle = Math.atan2(dyp, dxp);
-    const ca = Math.cos(angle), sa = Math.sin(angle);
+    const dxp = target.x - ps.x;
+    const dyp = target.y - ps.y;
+    const distance = Math.hypot(dxp, dyp) || 1;
+    const ca = dxp / distance;
+    const sa = dyp / distance;
     // Motion trail — fading line behind the arrowhead (6px fade)
     const grad = ctx.createLinearGradient(
-      ps.x - ca * 9, ps.y - sa * 5,
-      ps.x + ca * 5, ps.y + sa * 3
+      ps.x - ca * 9, ps.y - sa * 9,
+      ps.x + ca * 5, ps.y + sa * 5
     );
     grad.addColorStop(0, 'rgba(255,240,200,0)');
     grad.addColorStop(0.6, 'rgba(255,240,200,0.35)');
@@ -2672,19 +2826,19 @@ export function render() {
     ctx.strokeStyle = grad;
     ctx.lineWidth = 0.9;
     ctx.beginPath();
-    ctx.moveTo(ps.x - ca * 9, ps.y - sa * 5);
-    ctx.lineTo(ps.x + ca * 5, ps.y + sa * 3);
+    ctx.moveTo(ps.x - ca * 9, ps.y - sa * 9);
+    ctx.lineTo(ps.x + ca * 5, ps.y + sa * 5);
     ctx.stroke();
     // Shaft — solid brown
     ctx.strokeStyle = '#8a6a3a';
     ctx.lineWidth = 1.1;
     ctx.beginPath();
-    ctx.moveTo(ps.x - ca * 4, ps.y - sa * 2);
-    ctx.lineTo(ps.x + ca * 5, ps.y + sa * 3);
+    ctx.moveTo(ps.x - ca * 4, ps.y - sa * 4);
+    ctx.lineTo(ps.x + ca * 5, ps.y + sa * 5);
     ctx.stroke();
     // Arrowhead — steel triangle at leading tip
     ctx.fillStyle = '#c8c8d0';
-    const tipX = ps.x + ca * 5.5, tipY = ps.y + sa * 3.3;
+    const tipX = ps.x + ca * 5.5, tipY = ps.y + sa * 5.5;
     ctx.beginPath();
     ctx.moveTo(tipX + ca * 2.5, tipY + sa * 1.5);
     ctx.lineTo(tipX - sa * 1.3, tipY + ca * 1.3);
@@ -2692,111 +2846,18 @@ export function render() {
     ctx.closePath();
     ctx.fill();
     // Fletching — V-shaped white feathers at the tail
-    const tailX = ps.x - ca * 4, tailY = ps.y - sa * 2;
+    const tailX = ps.x - ca * 4, tailY = ps.y - sa * 4;
     ctx.fillStyle = 'rgba(240,240,230,0.85)';
     ctx.beginPath();
     ctx.moveTo(tailX, tailY);
-    ctx.lineTo(tailX - ca * 2 - sa * 1.3, tailY - sa * 1 + ca * 1.3);
-    ctx.lineTo(tailX - ca * 1.3, tailY - sa * 0.8);
+    ctx.lineTo(tailX - ca * 2 - sa * 1.3, tailY - sa * 2 + ca * 1.3);
+    ctx.lineTo(tailX - ca * 1.3, tailY - sa * 1.3);
     ctx.closePath(); ctx.fill();
     ctx.beginPath();
     ctx.moveTo(tailX, tailY);
     ctx.lineTo(tailX - ca * 2 + sa * 1.3, tailY - sa * 1 - ca * 1.3);
     ctx.lineTo(tailX - ca * 1.3, tailY - sa * 0.8);
     ctx.closePath(); ctx.fill();
-  }
-
-  // ── Animals ─────────────────────────────────────────────
-  if (G.animals && G.camera.zoom >= 0.6) {
-    for (const a of G.animals) {
-      const alp2 = lerpEnt(a);
-      const as = toScreen(alp2.x, alp2.y);
-      if (as.x < -20 || as.x > logicalW + 20 || as.y < -20 || as.y > logicalH + 20) continue;
-      ctx.globalAlpha = daylight;
-      // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.2)';
-      ctx.beginPath();
-      ctx.ellipse(as.x, as.y + 3, 4, 1.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Walking bob
-      const isWalking = a.state === 'walk';
-      const bob = isWalking ? Math.sin(G.gameTick * 0.2 + a.phase) * 0.8 : 0;
-
-      if (a.type === 'deer') {
-        // Brown body
-        ctx.fillStyle = '#8a6a40';
-        ctx.beginPath();
-        ctx.ellipse(as.x, as.y - 3 + bob, 4, 2.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Head (small, forward)
-        ctx.fillStyle = '#9a7a50';
-        ctx.beginPath();
-        ctx.arc(as.x + 3, as.y - 5 + bob, 1.8, 0, Math.PI * 2);
-        ctx.fill();
-        // Antlers (at high zoom)
-        if (G.camera.zoom >= 1.3) {
-          ctx.strokeStyle = '#5a3a1a';
-          ctx.lineWidth = 0.6;
-          ctx.beginPath();
-          ctx.moveTo(as.x + 3, as.y - 7 + bob);
-          ctx.lineTo(as.x + 4.5, as.y - 9 + bob);
-          ctx.moveTo(as.x + 3, as.y - 7 + bob);
-          ctx.lineTo(as.x + 2, as.y - 9 + bob);
-          ctx.stroke();
-        }
-        // Tiny legs (4 small lines)
-        ctx.strokeStyle = '#5a3a1a';
-        ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        ctx.moveTo(as.x - 2, as.y - 1); ctx.lineTo(as.x - 2, as.y + 2);
-        ctx.moveTo(as.x + 2, as.y - 1); ctx.lineTo(as.x + 2, as.y + 2);
-        ctx.stroke();
-      } else if (a.type === 'sheep') {
-        // Fluffy white body
-        ctx.fillStyle = '#f0ece0';
-        ctx.beginPath();
-        ctx.ellipse(as.x, as.y - 2 + bob, 3.5, 2.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Fluff bumps
-        for (let i = -1; i <= 1; i++) {
-          ctx.beginPath();
-          ctx.arc(as.x + i * 1.5, as.y - 3.5 + bob, 1, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        // Dark head
-        ctx.fillStyle = '#1a1a1a';
-        ctx.beginPath();
-        ctx.arc(as.x + 3, as.y - 3 + bob, 1.3, 0, Math.PI * 2);
-        ctx.fill();
-        // Legs
-        ctx.strokeStyle = '#1a1a1a';
-        ctx.lineWidth = 0.6;
-        ctx.beginPath();
-        ctx.moveTo(as.x - 1.5, as.y); ctx.lineTo(as.x - 1.5, as.y + 2);
-        ctx.moveTo(as.x + 1.5, as.y); ctx.lineTo(as.x + 1.5, as.y + 2);
-        ctx.stroke();
-      } else if (a.type === 'chicken') {
-        // White body
-        ctx.fillStyle = '#f4f2e8';
-        ctx.beginPath();
-        ctx.ellipse(as.x, as.y - 2 + bob, 2, 1.8, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Red comb
-        ctx.fillStyle = '#c02020';
-        ctx.beginPath();
-        ctx.arc(as.x + 1.5, as.y - 3.5 + bob, 0.8, 0, Math.PI * 2);
-        ctx.fill();
-        // Beak
-        ctx.fillStyle = '#d4a020';
-        ctx.beginPath();
-        ctx.moveTo(as.x + 2.3, as.y - 3 + bob);
-        ctx.lineTo(as.x + 3.2, as.y - 2.8 + bob);
-        ctx.lineTo(as.x + 2.3, as.y - 2.5 + bob);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
   }
   ctx.globalAlpha = 1;
 
@@ -2822,6 +2883,8 @@ export function render() {
   renderBonfire(ctx);
   // ── Merchant carts (loop 13+) ───────────────────────────
   renderCarts(ctx);
+
+  markRenderPass(profile, 'entitiesWorld');
 
   // ── Particles ─────────────────────────────────────────────
   for (const p of G.particles) {
@@ -3104,19 +3167,11 @@ export function render() {
   }
   ctx.globalAlpha = 1;
 
+  markRenderPass(profile, 'particles');
+
   // ── Cloud shadows ─────────────────────────────────────────
-  if (!G.clouds) {
-    G.clouds = [
-      { x: 100, y: 100, r: 180, vx: 0.15, alpha: 0.18 },
-      { x: 400, y: 300, r: 220, vx: 0.12, alpha: 0.15 },
-      { x: 700, y: 500, r: 160, vx: 0.18, alpha: 0.22 },
-      { x: 1000, y: 800, r: 200, vx: 0.14, alpha: 0.16 },
-    ];
-  }
   if (daylight > 0.5) {
-    for (const cloud of G.clouds) {
-      cloud.x += cloud.vx * G.speed;
-      if (cloud.x > 3000) cloud.x = -500;
+    for (const cloud of G.clouds || []) {
       const cloudAlpha = cloud.alpha * daylight;
       ctx.globalAlpha = cloudAlpha;
       const grad = ctx.createRadialGradient(cloud.x, cloud.y, cloud.r * 0.3, cloud.x, cloud.y, cloud.r);
@@ -3211,16 +3266,15 @@ export function render() {
   ctx.globalAlpha = 1;
   ctx.restore();
 
+  markRenderPass(profile, 'worldOverlays');
+
   // ── Birds (screen space, fly across sky during day) ──────────
   if (G.birds && G.birds.length > 0) {
     ctx.save();
     ctx.globalAlpha = 0.6;
     ctx.strokeStyle = '#222';
     ctx.lineWidth = 1.5;
-    for (let i = G.birds.length - 1; i >= 0; i--) {
-      const b = G.birds[i];
-      b.x += b.vx;
-      if (b.x > logicalW + 50) { G.birds.splice(i, 1); continue; }
+    for (const b of G.birds) {
       // Skip rendering while still inside the vignette's opaque zone (left ~12% of screen)
       // so birds don't appear to "float in void" at the map edge.
       if (b.x < logicalW * 0.12) continue;
@@ -3267,14 +3321,7 @@ export function render() {
 
   // ── Lightning strike during thunderstorm ─────────────────────
   if (G.weather === 'rain' || G.weather === 'storm') {
-    if (!G._lightningTimer) G._lightningTimer = 300 + Math.random() * 600;
-    G._lightningTimer--;
-    if (G._lightningTimer <= 0) {
-      G._lightningFlash = 3; // 3 frames of flash
-      G._lightningTimer = 300 + Math.random() * 600;
-    }
     if (G._lightningFlash > 0) {
-      G._lightningFlash--;
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.fillStyle = `rgba(255, 255, 220, ${G._lightningFlash / 3 * 0.8})`;
@@ -3289,7 +3336,6 @@ export function render() {
     ctx.fillStyle = 'rgba(220,30,30,1)';
     ctx.fillRect(0, 0, logicalW, logicalH);
     ctx.globalAlpha = 1;
-    G.raidFlash = Math.max(0, G.raidFlash - 0.018);
   }
 
   // ── Aurora (loop 7+) — winter nights only ─────────────────
@@ -3387,6 +3433,17 @@ export function render() {
     ctx.font = '11px monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`${fpsDisplay} FPS`, 8, logicalH - 8);
+  }
+
+  if (profile) {
+    markRenderPass(profile, 'screenOverlays');
+    profile.total = profile.last - profile.start;
+    delete profile.start;
+    delete profile.last;
+    _renderProfileSamples.push(Object.freeze(profile));
+    if (_renderProfileSamples.length > _RENDER_PROFILE_LIMIT) {
+      _renderProfileSamples.splice(0, _renderProfileSamples.length - _RENDER_PROFILE_LIMIT);
+    }
   }
 
 }
@@ -3492,7 +3549,7 @@ function drawBuildingEventPulse2D(ctx, b, s) {
 }
 
 function drawUpgradeAccents2D(ctx, b, s) {
-  const level = Math.max(1, b.level || 1);
+  const level = b.level;
   if (level < 2 || b.type === 'road' || b.type === 'wall') return;
   const bands = Math.min(3, level - 1);
   const upgradeAge = Number.isFinite(b.upgradeTick) ? (G.gameTick || 0) - b.upgradeTick : Infinity;
@@ -3539,18 +3596,92 @@ function drawUpgradeAccents2D(ctx, b, s) {
   ctx.restore();
 }
 
-function drawBuilding(ctx, b, s, daylight) {
-  const def = BUILDINGS[b.type];
-  if (!def) return; // guard against unknown building types
-  const progress = Math.max(0, Math.min(1, b.buildProgress ?? 1));
-  const rasterSprite = _usesRasterSprite(b.type);
-  // Keep buildings fully opaque — night overlay darkens them later
-  ctx.globalAlpha = 1;
+// Completed buildings share most of their canvas stack. Bake that static
+// foundation/grounding/sprite stack by type, house tier, daylight bucket, and
+// ring visibility; dynamic construction, damage, weather, glow, and badges
+// remain live. The small LRU bound prevents old daylight buckets accumulating.
+const _COMPOSITE_SCALE = 2;
+const _COMPOSITE_MAX_ZOOM = 2.001;
+const _DAYLIGHT_BUCKETS = 12;
+const _COMPOSITE_MAX_ENTRIES = 64;
+const _buildingCompositeCache = new Map();
+
+function compositeTier(building) {
+  return building.type === 'house' ? Math.min(4, building.level || 1) : 0;
+}
+
+function bakeBuildingComposite(type, tier, daylight, showRing) {
+  const stub = { type, level: tier || 1, buildProgress: 1 };
+  const metrics = spriteTargetMetrics(type);
+  const tierScale = type === 'house'
+    ? [0.9, 1.0, 1.1, 1.22][Math.min(4, tier || 1) - 1]
+    : 1;
+  const halfWidth = Math.ceil(Math.max(
+    metrics.w * tierScale * 0.55,
+    metrics.w * 0.72,
+    TW / 2,
+  ) + 6);
+  const topHeight = Math.ceil(metrics.h * tierScale * 1.1 + 8);
+  const bottomHeight = Math.ceil(Math.max(TH / 2, metrics.w * 0.20 + 8)) + 4;
+  const canvas = document.createElement('canvas');
+  canvas.width = (halfWidth * 2) * _COMPOSITE_SCALE;
+  canvas.height = (topHeight + bottomHeight) * _COMPOSITE_SCALE;
+  const compositeCtx = canvas.getContext('2d');
+  compositeCtx.scale(_COMPOSITE_SCALE, _COMPOSITE_SCALE);
+  const drew = drawBuildingBase(
+    compositeCtx,
+    stub,
+    { x: halfWidth, y: topHeight },
+    daylight,
+    1,
+    showRing,
+  );
+  if (!drew) return null;
+  return {
+    canvas,
+    anchorX: halfWidth,
+    anchorY: topHeight,
+    width: halfWidth * 2,
+    height: topHeight + bottomHeight,
+  };
+}
+
+function blitBuildingComposite(ctx, building, screen, daylight, showRing) {
+  const tier = compositeTier(building);
+  const daylightBucket = Math.round(
+    Math.max(0, Math.min(1, daylight)) * _DAYLIGHT_BUCKETS,
+  );
+  const key = `${building.type}|${tier}|${daylightBucket}|${showRing ? 1 : 0}`;
+  let entry = _buildingCompositeCache.get(key);
+  if (entry === undefined) {
+    entry = bakeBuildingComposite(
+      building.type,
+      tier,
+      daylightBucket / _DAYLIGHT_BUCKETS,
+      showRing,
+    );
+    if (!entry) return false;
+    if (_buildingCompositeCache.size >= _COMPOSITE_MAX_ENTRIES) {
+      _buildingCompositeCache.delete(_buildingCompositeCache.keys().next().value);
+    }
+    _buildingCompositeCache.set(key, entry);
+  }
+  ctx.drawImage(
+    entry.canvas,
+    screen.x - entry.anchorX,
+    screen.y - entry.anchorY,
+    entry.width,
+    entry.height,
+  );
+  return true;
+}
+
+function drawBuildingBase(ctx, b, s, daylight, progress, showRing) {
 
   // Foundation — darken the tile under the building for grounding
   if (b.type !== 'road' && b.type !== 'wall' && b.type !== 'farm') {
     const hw = TW/2, hh = TH/2;
-    ctx.fillStyle = rasterSprite ? 'rgba(24,16,8,0.045)' : 'rgba(0,0,0,0.1)';
+    ctx.fillStyle = 'rgba(24,16,8,0.045)';
     ctx.beginPath();
     ctx.moveTo(s.x, s.y - hh);
     ctx.lineTo(s.x + hw, s.y);
@@ -3559,8 +3690,8 @@ function drawBuilding(ctx, b, s, daylight) {
     ctx.closePath();
     ctx.fill();
     // Worn grass ring — subtle brown tint under buildings at normal+ zoom
-    if (b.type !== 'fisherman' && G.camera && G.camera.zoom >= 1.0) {
-      ctx.fillStyle = rasterSprite ? 'rgba(80, 60, 40, 0.065)' : 'rgba(80, 60, 40, 0.12)';
+    if (b.type !== 'fisherman' && showRing) {
+      ctx.fillStyle = 'rgba(80, 60, 40, 0.065)';
       ctx.beginPath();
       ctx.moveTo(s.x, s.y - TH/2 + 1);
       ctx.lineTo(s.x + TW/2 - 1, s.y);
@@ -3571,43 +3702,6 @@ function drawBuilding(ctx, b, s, daylight) {
     }
   }
 
-  // Long directional shadow — proper isometric cast shadow
-  if (b.type !== 'road' && b.type !== 'wall' && !rasterSprite) {
-    const buildingH = (b.type === 'castle' || b.type === 'church' || b.type === 'tower') ? 32 :
-                      (b.type === 'house' || b.type === 'tavern' || b.type === 'barracks' || b.type === 'bakery') ? 20 : 12;
-    // Shadow length scales with sun angle — dramatically longer at dawn/dusk
-    const sunAngle = Math.abs(daylight - 0.7) * 3; // 0 at midday (~0.7), peaks at dawn/dusk
-    const shadowMultiplier = 1 + sunAngle; // shadows 1x at noon, up to ~3x at sunrise/set
-    const shadowLen = buildingH * 0.8 * shadowMultiplier;
-
-    const fp = fallbackBuildingShadowFootprint(b.type);
-    // Warm shadow tint during golden hours
-    const dayT = G.dayPhase / G.dayLength;
-    const isGolden = (dayT < 0.15 || (dayT > 0.55 && dayT < 0.75));
-    const shadowBaseColor = isGolden ? '120,60,40' : '0,0,0';
-    // Create a slanted quadrilateral shadow shape
-    ctx.globalAlpha = daylight * 0.3;
-    ctx.fillStyle = '#1a1010';
-    ctx.beginPath();
-    // Base of building (4 corners of foundation)
-    const shadowHalf = Math.max(10, fp.wide);
-    const baseY = s.y + fp.y;
-    ctx.moveTo(s.x - shadowHalf, baseY);
-    ctx.lineTo(s.x + shadowHalf, baseY);
-    // Shadow tip (projected to lower-right)
-    ctx.lineTo(s.x + shadowHalf + shadowLen, baseY + shadowLen * 0.5);
-    ctx.lineTo(s.x - shadowHalf + shadowLen, baseY + shadowLen * 0.5);
-    ctx.closePath();
-    // Use radial gradient for soft fade
-    const shadowGrad = ctx.createRadialGradient(s.x, baseY, Math.max(5, fp.tall), s.x + shadowLen, baseY + shadowLen * 0.5, shadowLen);
-    shadowGrad.addColorStop(0, `rgba(${shadowBaseColor},0.45)`);
-    shadowGrad.addColorStop(0.6, `rgba(${shadowBaseColor},0.2)`);
-    shadowGrad.addColorStop(1, `rgba(${shadowBaseColor},0)`);
-    ctx.fillStyle = shadowGrad;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-
   drawRasterSpriteGrounding(ctx, b, s, daylight, progress);
 
   // Ground the sprite: scale from tile-center anchor so buildings grow UP
@@ -3616,18 +3710,35 @@ function drawBuilding(ctx, b, s, daylight) {
   ctx.save();
   ctx.translate(s.x, s.y);
   ctx.scale(1.1, 1.1);
-  ctx.translate(-s.x, -s.y + (rasterSprite ? 4 : 3));
+  ctx.translate(-s.x, -s.y + 4);
 
   // Sprite path runs INSIDE the same scale/translate envelope so damage
-  // cracks + winter cap (drawn after `restore`) compose on top. If the
-  // image is not ready, skip the building sprite this frame rather than
-  // flashing back to the legacy procedural canvas drawing.
-  if (drawSpriteIfReady(ctx, b, s, progress)) {
-    ctx.restore();
-  } else {
-    ctx.restore();
-    return;
+  // cracks + winter cap (drawn after `restore`) compose on top. Atlas decode
+  // is asynchronous, so skip the building for this frame until it is ready.
+  const drew = drawSpriteIfReady(ctx, b, s, progress);
+  ctx.restore();
+  return drew;
+}
+
+function drawBuilding(ctx, b, s, daylight) {
+  const def = BUILDINGS[b.type];
+  if (!def) throw new Error(`[render] Unknown building type "${b.type}"`);
+  buildingSpriteContract(b.type);
+  const progress = b.buildProgress;
+  // Keep buildings fully opaque — night overlay darkens them later
+  ctx.globalAlpha = 1;
+  const showRing = !!(G.camera && G.camera.zoom >= 1.0);
+
+  let drew = false;
+  if (
+    progress >= 1
+    && b.type !== 'wall'
+    && (!G.camera || G.camera.zoom <= _COMPOSITE_MAX_ZOOM)
+  ) {
+    drew = blitBuildingComposite(ctx, b, s, daylight, showRing);
   }
+  if (!drew) drew = drawBuildingBase(ctx, b, s, daylight, progress, showRing);
+  if (!drew) return;
 
   drawConstructionOverlay(ctx, b, s, progress);
   if (progress < 1) {
@@ -3639,7 +3750,7 @@ function drawBuilding(ctx, b, s, daylight) {
       ctx.fillRect(bx - 1, by - 1, bw + 2, 5);
       ctx.fillStyle = '#d9a441';
       ctx.fillRect(bx, by, bw * progress, 3);
-      const crew = (b.workers || []).length;
+      const crew = staffingCount(b);
       for (let i = 0; i < crew; i++) {
         ctx.fillStyle = '#ffd166';
         ctx.beginPath();
@@ -3832,7 +3943,7 @@ function drawBuilding(ctx, b, s, daylight) {
     const showWorkerBadge = G.selectedBuilding === b ||
       (G.hoveredTile && G.hoveredTile.x === b.x && G.hoveredTile.y === b.y);
     if (needed > 0 && !G.photoMode && showWorkerBadge) {
-      const have = b.workers.length;
+      const have = staffingCount(b);
       const full = have >= needed;
       const label = `${have}/${needed}`;
       const bw = Math.max(18, label.length * 5 + 8);
@@ -4030,88 +4141,11 @@ function drawTree(ctx, x, y, a, seasonShift) {
 }
 
 function drawRock(ctx, x, y, a) {
-  if (drawNatureSprite(ctx, 'stone', x, y + 8, 25, a)) return;
-  return;
-
-  ctx.globalAlpha = a * 0.9;
-
-  // Main large rock — gradient for 3D rounded look
-  const mainGrad = ctx.createLinearGradient(x - 6, y - 6, x + 6, y + 2);
-  mainGrad.addColorStop(0, '#a0a0b0');
-  mainGrad.addColorStop(0.4, '#808090');
-  mainGrad.addColorStop(1, '#505060');
-  ctx.fillStyle = mainGrad;
-  ctx.beginPath();
-  ctx.moveTo(x - 6, y + 2);
-  ctx.lineTo(x - 4, y - 6);
-  ctx.lineTo(x + 3, y - 5);
-  ctx.lineTo(x + 6, y + 2);
-  ctx.closePath();
-  ctx.fill();
-  // Dark shadow underside on main rock
-  ctx.fillStyle = 'rgba(20,20,35,0.3)';
-  ctx.beginPath();
-  ctx.moveTo(x - 6, y + 2);
-  ctx.lineTo(x + 6, y + 2);
-  ctx.lineTo(x + 3, y - 1);
-  ctx.lineTo(x - 3, y - 1);
-  ctx.closePath();
-  ctx.fill();
-  // Metallic specular highlight — top-left face catch
-  ctx.fillStyle = 'rgba(200,205,220,0.55)';
-  ctx.beginPath();
-  ctx.moveTo(x - 4, y - 6);
-  ctx.lineTo(x - 2, y - 8);
-  ctx.lineTo(x + 1, y - 6);
-  ctx.lineTo(x - 1, y - 4);
-  ctx.closePath();
-  ctx.fill();
-
-  // Secondary rock (right, slightly smaller) — gradient
-  const secGrad = ctx.createLinearGradient(x + 2, y - 4, x + 8, y + 1);
-  secGrad.addColorStop(0, '#9898a8');
-  secGrad.addColorStop(1, '#585868');
-  ctx.fillStyle = secGrad;
-  ctx.beginPath();
-  ctx.moveTo(x + 2, y);
-  ctx.lineTo(x + 4, y - 4);
-  ctx.lineTo(x + 8, y - 2);
-  ctx.lineTo(x + 7, y + 1);
-  ctx.closePath();
-  ctx.fill();
-  // Specular on secondary rock
-  ctx.fillStyle = 'rgba(210,215,230,0.5)';
-  ctx.beginPath();
-  ctx.moveTo(x + 4, y - 4);
-  ctx.lineTo(x + 6, y - 3);
-  ctx.lineTo(x + 5, y - 1);
-  ctx.lineTo(x + 3, y - 2);
-  ctx.closePath();
-  ctx.fill();
-
-  // Small pebble cluster — lower left
-  ctx.globalAlpha = a * 0.7;
-  const pebGrad = ctx.createRadialGradient(x - 5, y + 4, 0.5, x - 5, y + 4, 2.5);
-  pebGrad.addColorStop(0, '#b0b0be');
-  pebGrad.addColorStop(1, '#606070');
-  ctx.fillStyle = pebGrad;
-  ctx.beginPath(); ctx.ellipse(x - 5, y + 4, 2.5, 1.5, 0.2, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(x - 1, y + 4, 1.8, 1.2, -0.3, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(x + 3, y + 3, 1.5, 1.0, 0.1, 0, Math.PI * 2); ctx.fill();
+  drawNatureSprite(ctx, 'stone', x, y + 8, 25, a);
 }
 
 function drawIronOre(ctx, x, y, a) {
-  if (drawNatureSprite(ctx, 'iron', x, y + 8, 25, a)) return;
-  return;
-
-  ctx.globalAlpha = a*0.95;
-  ctx.fillStyle = '#4a6cb8';
-  ctx.beginPath(); ctx.moveTo(x-5,y+2); ctx.lineTo(x-3,y-5); ctx.lineTo(x+4,y-4); ctx.lineTo(x+5,y+2); ctx.closePath(); ctx.fill();
-  // Metallic sheen — brighter highlight
-  ctx.globalAlpha = a*0.75;
-  ctx.fillStyle = '#a8d4ff';
-  ctx.fillRect(x-1, y-4, 3, 3);
-  ctx.fillRect(x+2, y-1, 2, 2);
+  drawNatureSprite(ctx, 'iron', x, y + 8, 25, a);
 }
 
 function drawWater(ctx, x, y, a, tx, ty) {
@@ -4363,7 +4397,7 @@ export function renderBuildingIsolated(type, opts = {}) {
   // the building grows up from a visible "ground" line
   const mockBuilding = {
     type, x: 0, y: 0, level: 1, hp: 100, maxHp: 100,
-    workers: [], buildProgress: 1, productionTimer: 0, lastProduced: 0,
+    buildProgress: 1, productionTimer: 0, lastProduced: 0,
   };
   const s = { x: width / 2, y: Math.round(height * 0.72) };
 

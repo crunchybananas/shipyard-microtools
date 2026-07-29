@@ -1,0 +1,271 @@
+{
+  "inputs": {
+    "compiler": {
+      "path": "scripts/actor-pose-prototype/compile_open_source_walk_baseline.py",
+      "sha256": "01a73bebebb3a934feb96cf71c8c863ae7fe3be6074cd12207092844d2f8058c"
+    },
+    "contract": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/cc0-walk-baseline.json",
+      "sha256": "3a7a20e049b931c99feaa3bdeb7b13872520340f03622849b1363164f7a8925b"
+    },
+    "selected_files": {
+      "male-body-walk.png": {
+        "bytes": 2404,
+        "sha256": "3d2d7de23883d4e3b937b815525fed611a2ce0d85b351b891ef2c340fff57c34"
+      },
+      "male-pants-walk.png": {
+        "bytes": 2421,
+        "sha256": "70e27883dbbd0c0eaead96f18246674b8c7536c6d9963653b4b42048d18f307a"
+      },
+      "male-shirt-walk.png": {
+        "bytes": 1147,
+        "sha256": "79744a8ae18e9a4bf301f8bc54fd055adb36d14dd35b78c86de9f1178abdda38"
+      }
+    },
+    "source_record": {
+      "path": "assets/sprites/prototypes/actor-pose/references/open-source/cc0-mixxit-64x80/SOURCE.json",
+      "sha256": "0d0f383dc3f9ca8d671b4e6195a043e330f299f1fe27f4486ccf310809a45c7d"
+    }
+  },
+  "license": {
+    "asset_page_declares": "CC0; no attribution required",
+    "deed": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "spdx": "CC0-1.0"
+  },
+  "metrics": {
+    "failures": [],
+    "frames": [
+      {
+        "bbox": [
+          20,
+          12,
+          45,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "a",
+          "b"
+        ],
+        "failures": [],
+        "frame": 0,
+        "ground_runs": [
+          [
+            22,
+            25
+          ],
+          [
+            39,
+            42
+          ]
+        ],
+        "height": 68,
+        "phase": "a-contact",
+        "source_frame": 6
+      },
+      {
+        "bbox": [
+          20,
+          12,
+          41,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "a"
+        ],
+        "failures": [],
+        "frame": 1,
+        "ground_runs": [
+          [
+            35,
+            40
+          ]
+        ],
+        "height": 68,
+        "phase": "a-down",
+        "source_frame": 7
+      },
+      {
+        "bbox": [
+          23,
+          11,
+          41,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "a"
+        ],
+        "failures": [],
+        "frame": 2,
+        "ground_runs": [
+          [
+            30,
+            35
+          ]
+        ],
+        "height": 69,
+        "phase": "a-pass",
+        "source_frame": 0
+      },
+      {
+        "bbox": [
+          23,
+          11,
+          41,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "a"
+        ],
+        "failures": [],
+        "frame": 3,
+        "ground_runs": [
+          [
+            27,
+            32
+          ]
+        ],
+        "height": 69,
+        "phase": "a-up",
+        "source_frame": 1
+      },
+      {
+        "bbox": [
+          23,
+          12,
+          42,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "a",
+          "b"
+        ],
+        "failures": [],
+        "frame": 4,
+        "ground_runs": [
+          [
+            26,
+            29
+          ],
+          [
+            37,
+            38
+          ]
+        ],
+        "height": 68,
+        "phase": "b-contact",
+        "source_frame": 2
+      },
+      {
+        "bbox": [
+          23,
+          12,
+          43,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "b"
+        ],
+        "failures": [],
+        "frame": 5,
+        "ground_runs": [
+          [
+            33,
+            38
+          ]
+        ],
+        "height": 68,
+        "phase": "b-down",
+        "source_frame": 3
+      },
+      {
+        "bbox": [
+          23,
+          11,
+          42,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "b"
+        ],
+        "failures": [],
+        "frame": 6,
+        "ground_runs": [
+          [
+            27,
+            32
+          ]
+        ],
+        "height": 69,
+        "phase": "b-pass",
+        "source_frame": 4
+      },
+      {
+        "bbox": [
+          23,
+          11,
+          41,
+          80
+        ],
+        "bottom": 79,
+        "contacts": [
+          "b"
+        ],
+        "failures": [],
+        "frame": 7,
+        "ground_runs": [
+          [
+            24,
+            29
+          ]
+        ],
+        "height": 69,
+        "phase": "b-up",
+        "source_frame": 5
+      }
+    ],
+    "internal_transition_median": 181753,
+    "loop_delta_ratio": 1.371168563930169,
+    "production_quality": {
+      "errors": [],
+      "median_color_count": 6.0,
+      "median_shading_ratio": 0.0345,
+      "style_era": "blocky",
+      "warnings": [
+        "ground-anchor-drift",
+        "legacy-blocky-style"
+      ]
+    },
+    "transition_deltas": [
+      181753,
+      238628,
+      82080,
+      184634,
+      150766,
+      188292,
+      151109,
+      249214
+    ]
+  },
+  "outputs": {
+    "motion_proof": "walk-right-x5.gif",
+    "proof": "walk-right-x4.png",
+    "quality": {
+      "path": "quality.json",
+      "sha256": "377e9a60977ebf8fee54ebbe68b12ba2730ab136744ee873c27238a76d6085e9"
+    },
+    "quality_proof": {
+      "path": "quality-x4.png",
+      "sha256": "e55122f7388de51731a4ab45e13071c14874a10914c2eb9fbb79aa6fc0487298"
+    },
+    "row": "walk-right.png"
+  },
+  "schema": "realm.actor-pose.open-source-walk-baseline-output.v1",
+  "status": "registration-contact-reference-not-production-art"
+}

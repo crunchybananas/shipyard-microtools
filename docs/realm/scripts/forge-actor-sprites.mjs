@@ -12,7 +12,7 @@
 //   node scripts/forge-actor-sprites.mjs --write            # all roles → actors-forged/
 //   node scripts/forge-actor-sprites.mjs --write --deploy   # → actors-compiled/ (live)
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

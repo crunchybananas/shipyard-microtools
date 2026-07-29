@@ -2,15 +2,17 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=157';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=157';
-import { spawnClashFX } from './fx.js?realm=157';
-import { sfx as playSound } from './log.js?realm=157';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=166';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=166';
+import { spawnClashFX } from './fx.js?realm=166';
+import { sfx as playSound } from './log.js?realm=166';
+import { recordDeathMarker } from './death-markers.js?realm=166';
+import { workersForBuilding } from './citizen-ownership.js?realm=166';
 
 function soldierDamage(s) {
   let damage = 5;
   for (const b of G.buildings) {
-    if (b.type !== 'blacksmith' || !b.workers || b.workers.length === 0) continue;
+    if (b.type !== 'blacksmith' || workersForBuilding(b).length === 0) continue;
     const d = Math.sqrt((b.x - s.x) ** 2 + (b.y - s.y) ** 2);
     if (d < 8) { damage *= 1.5; break; }
   }
@@ -126,7 +128,6 @@ export function updateSoldiers() {
       // Raider counter-attacks now live in combat.js updateEnemies (the
       // e.engaged block) so damage flows exactly once per cooldown in each
       // direction — this block previously double-drove nearestEnemy.attackTimer.
-      if (s.attackTimer === 40) nearestEnemy.hurtTimer = 12;
       continue;
     }
 
@@ -158,8 +159,7 @@ export function updateSoldiers() {
       G.lastDeathDay = G.day;  // Loop 242 (241 pessimist HIGH fix): soldier death is a death site too
       playSound('death');
       // Loop 77: gravestone marker at soldier's actual falling spot
-      if (!G.deathMarkers) G.deathMarkers = [];
-      G.deathMarkers.push({ x: s.x, y: s.y, name: s.name || 'Soldier', day: G.day, cause: 'battle' });
+      recordDeathMarker({ x: s.x, y: s.y, name: s.name || 'Soldier', cause: 'battle' });
     }
   }
 }

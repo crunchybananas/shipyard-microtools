@@ -1,0 +1,114 @@
+{
+  "schema": "realm.actor-pose.views-occlusion.v1",
+  "views": {
+    "down": {
+      "profile": false,
+      "facing": [0, 1],
+      "mirror_x": false,
+      "anchors": {
+        "root": [32, 72],
+        "head": [32, 20],
+        "left_shoulder": [24, 34],
+        "right_shoulder": [40, 34],
+        "left_hip": [28, 54],
+        "right_hip": [36, 54],
+        "left_foot": [27, 76],
+        "right_foot": [37, 76]
+      },
+      "z_order": [
+        "rear_equipment",
+        "far_leg",
+        "far_arm",
+        "torso",
+        "garment",
+        "near_leg",
+        "head",
+        "headgear",
+        "load",
+        "near_arm",
+        "tool",
+        "corrective"
+      ],
+      "occlusion": {
+        "far_side": "actor-left",
+        "load": "between far and near hands",
+        "head": "in front of torso collar"
+      }
+    },
+    "up": {
+      "profile": false,
+      "facing": [0, -1],
+      "mirror_x": false,
+      "anchors": {
+        "root": [32, 72],
+        "head": [32, 20],
+        "left_shoulder": [24, 34],
+        "right_shoulder": [40, 34],
+        "left_hip": [28, 54],
+        "right_hip": [36, 54],
+        "left_foot": [27, 76],
+        "right_foot": [37, 76]
+      },
+      "z_order": [
+        "rear_equipment",
+        "far_leg",
+        "far_arm",
+        "head",
+        "headgear",
+        "torso",
+        "garment",
+        "near_leg",
+        "load",
+        "near_arm",
+        "tool",
+        "corrective"
+      ],
+      "occlusion": {
+        "far_side": "actor-right",
+        "load": "behind near hands",
+        "head": "behind raised collar"
+      }
+    },
+    "left": {
+      "profile": true,
+      "facing": [-1, 0],
+      "mirror_x": false,
+      "anchors": {
+        "root": [32, 72],
+        "head": [31, 20],
+        "left_shoulder": [34, 35],
+        "right_shoulder": [28, 34],
+        "left_hip": [34, 54],
+        "right_hip": [29, 54],
+        "left_foot": [36, 76],
+        "right_foot": [27, 76]
+      },
+      "z_order": [
+        "rear_equipment",
+        "far_leg",
+        "far_arm",
+        "torso",
+        "garment",
+        "near_leg",
+        "head",
+        "headgear",
+        "load",
+        "near_arm",
+        "tool",
+        "corrective"
+      ],
+      "occlusion": {
+        "far_side": "actor-right",
+        "load": "between far and near hands",
+        "head": "profile nose leads left"
+      }
+    },
+    "right": {
+      "profile": true,
+      "facing": [1, 0],
+      "mirror_x": true,
+      "derived_from": "left",
+      "transform": "mirror-x"
+    }
+  }
+}

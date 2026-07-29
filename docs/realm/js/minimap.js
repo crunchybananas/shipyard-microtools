@@ -2,7 +2,8 @@
 // Minimap — renderer-independent map overview
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=157';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=166';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=166';
 
 let minimapC = null;
 let minimapCtx = null;
@@ -159,7 +160,7 @@ export function renderMinimap() {
     mc.stroke();
   }
 
-  for (const c of G.citizens) {
+  for (const c of buildCurrentCitizenPresentations()) {
     const cx = Math.round(c.x * sx);
     const cy = Math.round(c.y * sy);
     mc.fillStyle = 'rgba(40,24,10,0.42)';

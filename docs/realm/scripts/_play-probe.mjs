@@ -2,7 +2,7 @@
 // actually rough when I can't run a full Chrome session. Outputs go
 // to /tmp/realm-probe-*.png so I don't pollute scripts/screenshots.
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 import { writeFile } from 'node:fs/promises';
 

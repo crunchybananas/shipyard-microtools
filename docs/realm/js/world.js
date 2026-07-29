@@ -2,8 +2,12 @@
 // World generation — terrain, fog, noise
 // ════════��═════════════════════════��═════════════════════════
 
-import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=157';
-import { makeAvatar } from './avatar.js?realm=157';
+import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=166';
+import { makeAvatar } from './avatar.js?realm=166';
+import {
+  assertCitizenActorIdAvailable,
+  createCitizenOwnership,
+} from './citizen-ownership.js?realm=166';
 
 function hash2(x,y){ let n=x*374761393+y*668265263; n=(n^(n>>13))*1274126177; return(n^(n>>16))&0x7fffffff; }
 function noise2(x,y){
@@ -26,28 +30,29 @@ export function revealAround(cx,cy,r){
   }
 }
 
-export function rebuildBuildingGrid(){
-  G.buildingGrid = Array.from({length:MAP_H}, ()=>Array(MAP_W).fill(null));
-  for(const b of G.buildings) G.buildingGrid[b.y][b.x] = b;
-  G.obstacleEpoch = (G.obstacleEpoch || 0) + 1;
-}
-
 export function makeCitizen(x,y){
+  // A rejected spawn must not consume gameplay RNG before the allocator
+  // reports exhaustion. createCitizenOwnership() repeats this check at commit.
+  assertCitizenActorIdAvailable();
+  const speed = 0.02 + rng()*0.01;
+  const ownership = createCitizenOwnership(randomName());
   return {
+    ...ownership,
     x, y, tx:x, ty:y,
-    speed: 0.02 + rng()*0.01,
-    job: null, jobBuilding: null, visualJob: null,
+    speed,
     carrying: null, carryAmount: 0,
-    name: randomName(),
     hunger: 0, rest: 100, // rest = energy 0–100; sleep restores it (Phase 3a)
     needs: { joy: 55, faith: 55 }, // satisfied by taverns/churches (Phase 3b)
     home: null,           // house this citizen sleeps in (assigned at dusk)
-    state: 'idle', stateTimer: 0,
+    activityTimer: 0,
     path: null, pathIdx: 0,
   };
 }
 
 export function generateWorld(){
+  if (!Number.isSafeInteger(G.nextActorId) || G.nextActorId < 1) {
+    throw new TypeError('World generation requires an initialized citizen actor allocator.');
+  }
   G.map = Array.from({length:MAP_H}, ()=>Array(MAP_W).fill(TILE.WATER));
   G.fog = Array.from({length:MAP_H}, ()=>Array(MAP_W).fill(false));
   G.buildingGrid = Array.from({length:MAP_H}, ()=>Array(MAP_W).fill(null));

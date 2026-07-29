@@ -2,11 +2,53 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, rngRange, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=157';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=157';
-import { getCitizenSpeedMult } from './events.js?realm=157';
-import { houseCap, needsBuilders, BUILDER_SLOTS } from './economy.js?realm=157';
-import { revealAround } from './world.js?realm=157';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=166';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=166';
+import { getCitizenSpeedMult } from './events.js?realm=166';
+import { buildingCapacity } from './building-lifecycle.js?realm=166';
+import { revealAround } from './world.js?realm=166';
+import { visualJitter } from './fx.js?realm=166';
+import {
+  assignmentDutyForBuilding,
+  assignmentPurposeForCitizen,
+  citizenStaffingCapacity,
+  claimCitizenAssignment,
+  releaseCitizenAssignment,
+  staffingCount,
+  transitionCitizenActivity,
+  vocationForBuilding,
+} from './citizen-ownership.js?realm=166';
+
+const DEFAULT_ACTIVITY_REASON = Object.freeze({
+  idle: 'idle-wait',
+  find_job: 'seek-work',
+  walk_to_work: 'route-to-work',
+  working: 'arrived-at-work',
+  walk_to_deliver: 'route-to-delivery',
+  needs_delivery: 'cargo-needs-storage',
+  deliver: 'cargo-delivered',
+  foraging: 'forage-started',
+  eating: 'eat-food',
+  go_home: 'route-home',
+  sleep: 'sleep-rest',
+  leisure: 'leisure-started',
+});
+
+function setActivity(citizen, kind, {
+  reason = DEFAULT_ACTIVITY_REASON[kind],
+  timer = 0,
+} = {}) {
+  const changed = transitionCitizenActivity(citizen, kind, reason);
+  // The decision cadence is scheduler state, not the causal activity clock.
+  // A same-kind request preserves activity.sinceTick and emits no event while
+  // still allowing the state machine to schedule its next decision.
+  citizen.activityTimer = timer;
+  return changed;
+}
+
+function assignedBuilding(citizen) {
+  return citizen.assignment?.building || null;
+}
 
 function dist2(ax, ay, bx, by) {
   return Math.abs(ax-bx) + Math.abs(ay-by);
@@ -76,8 +118,7 @@ function deliveryTargets(c, resKey) {
 }
 
 function requestDeliveryStorage(c) {
-  c.state = 'needs_delivery';
-  c.stateTimer = 90 + rngInt(0, 60);
+  setActivity(c, 'needs_delivery', { timer: 90 + rngInt(0, 60) });
   clearPath(c);
   c._deliveryTarget = null;
   const now = G.gameTick || 0;
@@ -92,13 +133,11 @@ function requestDeliveryStorage(c) {
 }
 
 function citizenHash(c) {
-  const label = c?.name || `${Math.round((c?.x || 0) * 10)},${Math.round((c?.y || 0) * 10)}`;
-  let h = 2166136261;
-  for (let i = 0; i < label.length; i++) {
-    h ^= label.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
+  const actorId = Number.isSafeInteger(c?.actorId) ? c.actorId : 0;
+  let h = Math.imul(actorId ^ 0x9e3779b9, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  return (h ^ (h >>> 16)) >>> 0;
 }
 
 function targetCrowdPenalty(c, x, y) {
@@ -172,20 +211,19 @@ function isBlacklisted(c, x, y) {
 }
 
 function releaseJob(c, { unreachable = false } = {}) {
-  const job = c.jobBuilding;
+  const job = assignedBuilding(c);
   if (unreachable) {
     if (job) blacklistTarget(c, job.x, job.y);
     if (c.workTarget) blacklistTarget(c, c.workTarget.x, c.workTarget.y);
   }
-  if (job?.workers) job.workers = job.workers.filter(worker => worker !== c);
-  c.jobBuilding = null;
+  releaseCitizenAssignment(c, unreachable ? 'path-unreachable' : 'assignment-invalid');
   c.workTarget = null;
 }
 
 function watchProgress(c) {
   const goalActive = (c.path && c.pathIdx < c.path.length) ||
-    c.state === 'walk_to_work' || c.state === 'walk_to_deliver' ||
-    c.state === 'needs_delivery' || c.state === 'foraging';
+    c.activity.kind === 'walk_to_work' || c.activity.kind === 'walk_to_deliver' ||
+    c.activity.kind === 'needs_delivery' || c.activity.kind === 'foraging';
   if (!goalActive) { c._wdBest = null; c._wdTicks = 0; return; }
   const gx = c._requestedTx ?? c.tx ?? c.x;
   const gy = c._requestedTy ?? c.ty ?? c.y;
@@ -194,13 +232,12 @@ function watchProgress(c) {
   c._wdTicks = (c._wdTicks || 0) + 1;
   if (c._wdTicks > 120) {
     blacklistTarget(c, gx, gy);
-    if (c.jobBuilding && c.state === 'walk_to_work') {
+    if (assignedBuilding(c) && c.activity.kind === 'walk_to_work') {
       releaseJob(c, { unreachable: true });
       G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: "Can't reach it!", alpha: 1.25, vy: -0.12, decay: 0.016, type: 'speech' });
     }
     clearPath(c);
-    c.state = 'idle';
-    c.stateTimer = 20 + rngInt(0, 15);
+    setActivity(c, 'idle', { reason: 'path-unreachable', timer: 20 + rngInt(0, 15) });
     c._wdBest = null;
     c._wdTicks = 0;
     // carrying is kept — the find_job/heartbeat guards route it to delivery
@@ -261,7 +298,6 @@ function deliveryTargetStillValid(c) {
 // Also shrank PERSONAL_SPACE 0.75 → 0.55 — 0.75 was knocking pathing citizens
 // off their waypoints even before the stuck bug manifested.
 const PERSONAL_SPACE = 0.50;
-const SEP_STRENGTH = 0.16;
 
 function tileWalkable(x, y) {
   const mx = Math.round(x), my = Math.round(y);
@@ -333,7 +369,7 @@ function workTargetForBuilding(c, b) {
 }
 
 function pathToWork(c) {
-  const target = workTargetForBuilding(c, c.jobBuilding);
+  const target = workTargetForBuilding(c, assignedBuilding(c));
   c.workTarget = target;
   pathTo(c, target.x, target.y);
 }
@@ -432,7 +468,7 @@ function evacuateBlockedCitizen(c) {
     c._evacTicks = 0;
     clearPath(c);
     // Resume the interrupted errand rather than standing dazed
-    if (c._requestedTx !== undefined && (c.state === 'walk_to_deliver' || c.state === 'walk_to_work' || c.state === 'needs_delivery')) {
+    if (c._requestedTx !== undefined && (c.activity.kind === 'walk_to_deliver' || c.activity.kind === 'walk_to_work' || c.activity.kind === 'needs_delivery')) {
       replanToRequestedTarget(c);
     }
   }
@@ -455,6 +491,63 @@ function canStepCitizen(c, nx, ny) {
   // blocked tile (buildings are 1x1, so any further blocked tile is another
   // building, and crossing it is the tunnelling bug).
   return standingOnBlockedTile(c) && rx === cx && ry === cy && terrainWalkable(nx, ny);
+}
+
+const YIELD_BUCKET_SIZE = 1.1;
+const YIELD_BUCKET_STRIDE = Math.ceil(MAP_W / YIELD_BUCKET_SIZE) + 4;
+let yieldBucketsTick = -1;
+let yieldBucketsCitizens = null;
+let yieldBucketsCount = -1;
+let yieldBuckets = new Map();
+
+function currentYieldBuckets() {
+  if (
+    yieldBucketsTick === G.gameTick
+    && yieldBucketsCitizens === G.citizens
+    && yieldBucketsCount === G.citizens.length
+  ) return yieldBuckets;
+
+  yieldBucketsTick = G.gameTick;
+  yieldBucketsCitizens = G.citizens;
+  yieldBucketsCount = G.citizens.length;
+  yieldBuckets = new Map();
+  for (const citizen of G.citizens) {
+    if (!isActivelyMoving(citizen)) continue;
+    const cellX = Math.floor(citizen.x / YIELD_BUCKET_SIZE);
+    const cellY = Math.floor(citizen.y / YIELD_BUCKET_SIZE);
+    const key = cellY * YIELD_BUCKET_STRIDE + cellX;
+    const bucket = yieldBuckets.get(key);
+    if (bucket) bucket.push(citizen);
+    else yieldBuckets.set(key, [citizen]);
+  }
+  return yieldBuckets;
+}
+
+function shouldYieldToCitizen(c, nx, ny) {
+  if (!isActivelyMoving(c)) return false;
+  const direction = activeMovementDirection(c);
+  if (!direction) return false;
+  const buckets = currentYieldBuckets();
+  const cellX = Math.floor(c.x / YIELD_BUCKET_SIZE);
+  const cellY = Math.floor(c.y / YIELD_BUCKET_SIZE);
+  for (let y = cellY - 1; y <= cellY + 1; y++) {
+    for (let x = cellX - 1; x <= cellX + 1; x++) {
+      for (const other of buckets.get(y * YIELD_BUCKET_STRIDE + x) || []) {
+        if (other === c || (other.actorId || 0) >= (c.actorId || 0)) continue;
+        const otherDirection = activeMovementDirection(other);
+        if (!otherDirection) continue;
+        const alignment = direction.x * otherDirection.x + direction.y * otherDirection.y;
+        // Passing lanes handle opposing traffic, and following traffic can
+        // naturally queue. Yield only for crossing paths at intersections.
+        if (Math.abs(alignment) >= 0.45) continue;
+        const currentDistance = Math.hypot(c.x - other.x, c.y - other.y);
+        if (currentDistance >= YIELD_BUCKET_SIZE) continue;
+        const nextDistance = Math.hypot(nx - other.x, ny - other.y);
+        if (nextDistance < currentDistance && nextDistance < 0.8) return true;
+      }
+    }
+  }
+  return false;
 }
 
 function replanToRequestedTarget(c) {
@@ -483,7 +576,7 @@ function foodDaysLeft() {
 
 
 function isConstructionSite(b) {
-  return b.buildProgress !== undefined && b.buildProgress < 1 && needsBuilders(b.type);
+  return b.buildProgress < 1 && citizenStaffingCapacity(b) > 0;
 }
 
 function scoreJob(c, b) {
@@ -492,14 +585,17 @@ function scoreJob(c, b) {
   if (days < 3 && FOOD_JOBS.has(b.type)) score += (3 - days) * 14;
   if (isConstructionSite(b)) score += 12; // fresh sites pull a crew fast
   if (b.type === 'wonder') score += 6; // the great work draws hands
-  if (c.jobBuilding === b) score += 6; // hysteresis
+  if (assignedBuilding(c) === b) score += 6; // hysteresis
+  if (!isConstructionSite(b) && c.profession.kind !== 'settler') {
+    score += vocationForBuilding(b) === c.profession.kind ? 18 : -8;
+  }
   return score;
 }
 
 // ── Homes & schedule (Phase 3a) ─────────────────────────────────────
 // Citizens sleep in an assigned house at night. Assignment is lazy
 // (first nightfall, or when the old home is gone) and respects tier
-// capacity via houseCap. Homeless citizens bed down near the
+// capacity via buildingCapacity. Homeless citizens bed down near the
 // settlement anchor — visible pressure to build housing.
 function assignHome(c) {
   const counts = new Map();
@@ -509,8 +605,8 @@ function assignHome(c) {
   let best = null, bestD = Infinity;
   for (const b of G.buildings) {
     if (b.type !== 'house') continue;
-    if (b.buildProgress !== undefined && b.buildProgress < 1) continue;
-    if ((counts.get(b) || 0) >= houseCap(b)) continue;
+    if (b.buildProgress < 1) continue;
+    if ((counts.get(b) || 0) >= buildingCapacity(b)) continue;
     const d = dist2(c.x, c.y, b.x, b.y);
     if (d < bestD) { bestD = d; best = b; }
   }
@@ -521,8 +617,7 @@ function assignHome(c) {
 function goHome(c) {
   if (!c.home || !G.buildings.includes(c.home)) assignHome(c);
   clearPath(c);
-  c.state = 'go_home';
-  c.stateTimer = 0;
+  setActivity(c, 'go_home');
   if (c.home) {
     const spot = nearestWalkableTile(Math.round(c.home.x), Math.round(c.home.y), 3) || { x: c.home.x, y: c.home.y };
     pathTo(c, spot.x, spot.y);
@@ -554,14 +649,13 @@ function clearPath(c) {
   c._stuckTicks = 0;
 }
 
-function startWorking(c, stateTimer) {
+function startWorking(c, activityTimer) {
   // Preserve the final approach direction for the complete work beat. This
   // keeps pick, axe, and hammer rows from flicking between directions when
   // an otherwise-stationary worker has neighbours nearby.
   c._workFaceX = c.faceX || 0;
   c._workFaceZ = c.faceZ || 0;
-  c.state = 'working';
-  c.stateTimer = stateTimer;
+  setActivity(c, 'working', { timer: activityTimer });
   clearPath(c);
 }
 
@@ -569,74 +663,137 @@ function isActivelyMoving(c) {
   return c.path && c.pathIdx < c.path.length;
 }
 
+function activeMovementDirection(c) {
+  if (!isActivelyMoving(c)) return null;
+  const target = c.path[c.pathIdx];
+  const dx = target.x - c.x;
+  const dy = target.y - c.y;
+  const length = Math.hypot(dx, dy);
+  return length > 0.0001 ? { x: dx / length, y: dy / length } : null;
+}
+
+function separationAxis(a, b, dx, dy, d2, pass) {
+  const ad = activeMovementDirection(a);
+  const bd = activeMovementDirection(b);
+  if (ad && bd && ad.x * bd.x + ad.y * bd.y < -0.45) {
+    // Opposing walkers need a deterministic passing lane. Pure radial
+    // separation makes a one-tile doorway an permanent tug-of-war; the
+    // perpendicular lane lets one pass on each half of the tile.
+    const travelX = ad.x - bd.x;
+    const travelY = ad.y - bd.y;
+    const sign = (a.actorId || 0) <= (b.actorId || 0) ? 1 : -1;
+    // Lock the lane to the dominant travel axis. Recomputing a continuously
+    // rotated perpendicular while the walkers are offset introduces a small
+    // backwards component that can exactly cancel forward motion in a door.
+    if (Math.abs(travelX) >= Math.abs(travelY)) {
+      return { x: 0, y: sign, perpendicular: true };
+    }
+    return {
+      x: sign,
+      y: 0,
+      perpendicular: true,
+    };
+  }
+  if (d2 >= 0.0004) {
+    const distance = Math.sqrt(d2);
+    return { x: dx / distance, y: dy / distance, perpendicular: false };
+  }
+  const angle = (
+    ((a.actorId || 0) * 37 + (b.actorId || 0) * 53 + pass * 97) % 360
+  ) * Math.PI / 180;
+  return { x: Math.cos(angle), y: Math.sin(angle), perpendicular: false };
+}
+
 function applyCitizenSeparation() {
   const cs = G.citizens;
   const r2 = PERSONAL_SPACE * PERSONAL_SPACE;
-  for (let pass = 0; pass < 2; pass++) {
+  const opposingLookahead = 1.25;
+  const opposingLookahead2 = opposingLookahead * opposingLookahead;
+  const bucketSize = 1;
+  const bucketStride = MAP_W + 8;
+  for (let pass = 0; pass < 4; pass++) {
+    const buckets = new Map();
+    for (let index = 0; index < cs.length; index++) {
+      const citizen = cs[index];
+      const key = Math.floor(citizen.y / bucketSize) * bucketStride
+        + Math.floor(citizen.x / bucketSize);
+      const bucket = buckets.get(key);
+      if (bucket) bucket.push(index);
+      else buckets.set(key, [index]);
+    }
+
     for (let i = 0; i < cs.length; i++) {
       const a = cs[i];
-      const aMoving = isActivelyMoving(a);
-      for (let j = i + 1; j < cs.length; j++) {
-        const b = cs[j];
-        const bMoving = isActivelyMoving(b);
-        const dx = a.x - b.x, dy = a.y - b.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 >= r2) continue;
-        if (aMoving && bMoving && d2 > 0.09) continue;
-        let nx, ny, d;
-        if (d2 < 0.0004) {
-          const angle = (i * 37 + j * 53 + pass * 97) % 360 * Math.PI / 180;
-          nx = Math.cos(angle);
-          ny = Math.sin(angle);
-          d = 0.02;
-        } else {
-          d = Math.sqrt(d2);
-          nx = dx / d;
-          ny = dy / d;
+      const cellX = Math.floor(a.x / bucketSize);
+      const cellY = Math.floor(a.y / bucketSize);
+      for (let by = cellY - 2; by <= cellY + 2; by++) {
+        for (let bx = cellX - 2; bx <= cellX + 2; bx++) {
+          for (const j of buckets.get(by * bucketStride + bx) || []) {
+            if (j <= i) continue;
+            const b = cs[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d2 = dx * dx + dy * dy;
+            const axis = separationAxis(a, b, dx, dy, d2, pass);
+            let totalPush;
+            if (axis.perpendicular) {
+              if (d2 >= opposingLookahead2) continue;
+              const lateralGap = Math.abs(dx * axis.x + dy * axis.y);
+              if (lateralGap >= PERSONAL_SPACE) continue;
+              totalPush = PERSONAL_SPACE - lateralGap + 0.0001;
+            } else {
+              if (d2 >= r2) continue;
+              totalPush = PERSONAL_SPACE - Math.sqrt(d2) + 0.0001;
+            }
+            const halfPush = totalPush * 0.5;
+            const nextA = {
+              x: a.x + axis.x * halfPush,
+              y: a.y + axis.y * halfPush,
+            };
+            const nextB = {
+              x: b.x - axis.x * halfPush,
+              y: b.y - axis.y * halfPush,
+            };
+            const canMoveA = canStepCitizen(a, nextA.x, nextA.y);
+            const canMoveB = canStepCitizen(b, nextB.x, nextB.y);
+            if (canMoveA && canMoveB) {
+              a.x = nextA.x; a.y = nextA.y;
+              b.x = nextB.x; b.y = nextB.y;
+            } else if (canMoveA) {
+              const fullX = a.x + axis.x * totalPush;
+              const fullY = a.y + axis.y * totalPush;
+              if (canStepCitizen(a, fullX, fullY)) { a.x = fullX; a.y = fullY; }
+            } else if (canMoveB) {
+              const fullX = b.x - axis.x * totalPush;
+              const fullY = b.y - axis.y * totalPush;
+              if (canStepCitizen(b, fullX, fullY)) { b.x = fullX; b.y = fullY; }
+            }
+          }
         }
-        const baseP = ((PERSONAL_SPACE - d) / PERSONAL_SPACE) * SEP_STRENGTH * (pass === 0 ? 0.72 : 0.44);
-        // Moving citizens get less push so their path is corrected, not derailed.
-        const aWeight = aMoving ? 0.22 : 1.0;
-        const bWeight = bMoving ? 0.22 : 1.0;
-        const ax = a.x + nx * baseP * 0.5 * aWeight;
-        const ay = a.y + ny * baseP * 0.5 * aWeight;
-        const bx = b.x - nx * baseP * 0.5 * bWeight;
-        const by = b.y - ny * baseP * 0.5 * bWeight;
-        if (canStepCitizen(a, ax, ay)) { a.x = ax; a.y = ay; }
-        if (canStepCitizen(b, bx, by)) { b.x = bx; b.y = by; }
       }
     }
   }
 }
 
 export function updateCitizens() {
-  // Loop 71 (render S4): decrement hurtTimer each sim tick so the flash fades.
   for (const c of G.citizens) {
-    if (c.hurtTimer > 0) c.hurtTimer -= 1;
-  }
-  for (const c of G.citizens) {
-    // Older saves do not have visualJob. Capture the current profession once
-    // so a transient route failure or food reallocation cannot redraw a
-    // miner as a generic settler before a new job is selected.
-    if (c.jobBuilding?.type && !c.visualJob) c.visualJob = c.jobBuilding.type;
     // ── Decision heartbeat (AI audit): obligations preempt from ANY state
     // on a short cadence — the brain no longer waits for the body to stop.
     if ((G.gameTick + (c._hb ?? (c._hb = citizenHash(c) % 12))) % 12 === 0) {
       // Eat on the go: a quick bite from the realm stores keeps busy or
       // stuck citizens from saturating at hunger 100 and crawling.
-      if (c.hunger > 75 && G.resources.food > 0 && c.state !== 'eating') {
+      if (c.hunger > 75 && G.resources.food > 0 && c.activity.kind !== 'eating') {
         G.resources.food--;
         c.hunger = Math.max(0, c.hunger - 60);
         G.particles.push({ tx: c.x, ty: c.y, offsetY: -26, text: '🍞', alpha: 1.2, vy: -0.15, decay: 0.02, type: 'text' });
       }
       // Idle carriers deliver immediately instead of waiting out the timer.
-      if (c.state === 'idle' && c.carrying && c.carryAmount > 0) {
-        c.state = 'needs_delivery';
-        c.stateTimer = 0;
+      if (c.activity.kind === 'idle' && c.carrying && c.carryAmount > 0) {
+        setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
         clearPath(c);
       }
       // Self-heal any over-long idle (flee aftermath left stale 260-tick timers).
-      if (c.state === 'idle' && c.stateTimer > 140) c.stateTimer = 60;
+      if (c.activity.kind === 'idle' && c.activityTimer > 140) c.activityTimer = 60;
 
       // ── Schedule (Phase 3a) ──────────────────────────────────────
       const period = getDayPeriod();
@@ -644,27 +801,28 @@ export function updateCitizens() {
       // Flee flag clears once the danger passes (it used to stick forever
       // — set in combat.js, never reset). While fleeing, citizens sprint.
       if (c._fleeing && !threatened) c._fleeing = false;
-      if (period === 'night' && !NIGHT_EXEMPT.has(c.state) && !threatened && !(c.carrying && c.carryAmount > 0)) {
+      if (period === 'night' && !NIGHT_EXEMPT.has(c.activity.kind) && !threatened && !(c.carrying && c.carryAmount > 0)) {
         goHome(c);
-      } else if (c.state === 'sleep' && (period !== 'night' || threatened)) {
+      } else if (c.activity.kind === 'sleep' && (period !== 'night' || threatened)) {
         // Dawn: wake with a stagger so the morning rush reads as a town
         // waking up, not a synchronized swarm. Danger wakes sleepers
         // immediately — the combat flee response takes them from there.
-        c.state = threatened ? 'idle' : 'find_job';
-        c.stateTimer = threatened ? 0 : rngInt(0, 40);
+        setActivity(c, threatened ? 'idle' : 'find_job', {
+          reason: threatened ? 'threat-response' : 'wake-day',
+          timer: threatened ? 0 : rngInt(0, 40),
+        });
         clearPath(c);
         c.rest = Math.min(100, c.rest ?? 100);
         if (threatened) {
           G.particles.push({ tx: c.x, ty: c.y, offsetY: -24, text: '❗', alpha: 1.3, vy: -0.12, decay: 0.02, type: 'speech' });
         }
-      } else if (c.state === 'go_home' && threatened) {
+      } else if (c.activity.kind === 'go_home' && threatened) {
         // Abort the walk home if raiders cut the path — flee instead.
-        c.state = 'idle';
-        c.stateTimer = 0;
+        setActivity(c, 'idle', { reason: 'threat-response' });
         clearPath(c);
       }
       // Rest drains while awake and active; sleep restores it (below).
-      if (c.state !== 'sleep' && c.state !== 'idle') {
+      if (c.activity.kind !== 'sleep' && c.activity.kind !== 'idle') {
         c.rest = Math.max(0, (c.rest ?? 100) - 0.35);
       }
 
@@ -681,15 +839,14 @@ export function updateCitizens() {
       // sends the unemployed after berries/game). Either way the colony
       // visibly reallocates labor under pressure and recovers its old
       // jobs once the granary refills.
+      const currentAssignment = assignedBuilding(c);
       if (foodDaysLeft() < 2
-          && c.jobBuilding && !FOOD_JOBS.has(c.jobBuilding.type)
-          && (c.state === 'working' || c.state === 'walk_to_work')
+          && currentAssignment && !FOOD_JOBS.has(currentAssignment.type)
+          && (c.activity.kind === 'working' || c.activity.kind === 'walk_to_work')
           && rng() < 0.04) {
-        c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
-        c.jobBuilding = null;
+        releaseCitizenAssignment(c, 'food-crisis');
         c.workTarget = null;
-        c.state = 'find_job';
-        c.stateTimer = 0;
+        setActivity(c, 'find_job', { reason: 'food-crisis' });
         clearPath(c);
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -26,
@@ -701,7 +858,7 @@ export function updateCitizens() {
       // that satisfies it — the town square fills in the evening. One
       // trip per day; night sends everyone home from the tavern.
       if (period === 'dusk' && !threatened && c._leisureDay !== G.day
-          && (c.state === 'idle' || c.state === 'find_job')
+          && (c.activity.kind === 'idle' || c.activity.kind === 'find_job')
           && !(c.carrying && c.carryAmount > 0)) {
         const wantJoy = c.needs.joy < 45;
         const wantFaith = c.needs.faith < 45;
@@ -711,8 +868,7 @@ export function updateCitizens() {
           if (venue && dist2(c.x, c.y, venue.x, venue.y) <= 25) {
             c._leisureDay = G.day;
             c._leisureTarget = { x: venue.x, y: venue.y, kind: venue.type };
-            c.state = 'leisure';
-            c.stateTimer = 0;
+            setActivity(c, 'leisure');
             clearPath(c);
             pathTo(c, venue.x, venue.y);
           }
@@ -749,14 +905,11 @@ export function updateCitizens() {
       }
     }
 
-    // Hungry emote — show 🍽️ whenever hunger is high (the on-the-go bite
-    // usually resolves it, but the player should still see the need)
+    // Hungry emote — derive the cadence from actor identity instead of
+    // storing a presentation timer or advancing the simulation RNG.
     if (c.hunger > 70) {
       const emoteInterval = 120; // every 2 seconds at 1x
-      if (!c._hungerEmoteTimer) c._hungerEmoteTimer = Math.floor(rng() * emoteInterval);
-      c._hungerEmoteTimer--;
-      if (c._hungerEmoteTimer <= 0) {
-        c._hungerEmoteTimer = emoteInterval + Math.floor(rng() * 60);
+      if ((G.gameTick + citizenHash(c)) % emoteInterval === 0) {
         const emote = c.hunger >= 90 ? '❗' : '🍽️';
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -22,
@@ -764,26 +917,17 @@ export function updateCitizens() {
           alpha: 1.4, vy: -0.1, decay: 0.015, type: 'speech',
         });
       }
-    } else {
-      c._hungerEmoteTimer = 0;
     }
 
     // Follow path if we have one
     if (c.path && c.pathIdx < c.path.length) {
-      // Obstacle epoch: when any building is placed or removed, validate the
-      // REMAINING waypoints once instead of discovering the blockage by
-      // walking into it (compressPath means mid-segment tiles are caught by
-      // the per-step gate below).
+      // Building topology changes are rare, while a delayed collision with a
+      // newly blocked compressed segment is expensive. Replan immediately on
+      // an epoch change rather than validating only the sparse waypoints.
       if (c._pathEpoch !== (G.obstacleEpoch || 0)) {
         c._pathEpoch = G.obstacleEpoch || 0;
-        let stale = false;
-        for (let wi = c.pathIdx; wi < c.path.length; wi++) {
-          if (!isWalkable(c.path[wi].x, c.path[wi].y)) { stale = true; break; }
-        }
-        if (stale) {
-          replanToRequestedTarget(c);
-          continue;
-        }
+        replanToRequestedTarget(c);
+        continue;
       }
       const wp = c.path[c.pathIdx];
       if (!isWalkable(wp.x, wp.y)) {
@@ -792,7 +936,9 @@ export function updateCitizens() {
       }
       const dx = wp.x - c.x, dy = wp.y - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
-      if (d < 0.15) {
+      if (d < 0.005) {
+        c.x = wp.x;
+        c.y = wp.y;
         c.pathIdx++;
       } else {
         let spd = c.speed * getSeasonData().speedMult * getCitizenSpeedMult();
@@ -814,9 +960,19 @@ export function updateCitizens() {
         const nx = c.x + (dx/d) * step;
         const ny = c.y + (dy/d) * step;
         const beforeX = c.x, beforeY = c.y;
-        if (canStepCitizen(c, nx, ny)) {
+        if (shouldYieldToCitizen(c, nx, ny)) {
+          // Lower actor IDs have right of way through a contested crossing.
+        } else if (canStepCitizen(c, nx, ny)) {
           c.x = nx;
           c.y = ny;
+          // Consume the waypoint on the same tick that reaches it. The old
+          // 0.15-tile early cutoff both cut visible corners and inserted an
+          // idle simulation beat between path segments.
+          if (step >= d - 0.000001) {
+            c.x = wp.x;
+            c.y = wp.y;
+            c.pathIdx++;
+          }
           // Render reads this for walk-row hysteresis: paths empty for a
           // single frame between arrival and the next repath, and raw
           // path-presence flapped the walk/idle rows (visible flicker).
@@ -846,7 +1002,7 @@ export function updateCitizens() {
     }
 
     // No path or path complete — fallback straight-line for non-pathfound movement
-    if (!c.path && c.state !== 'walk_to_work' && c.state !== 'walk_to_deliver' && c.state !== 'foraging') {
+    if (!c.path && c.activity.kind !== 'walk_to_work' && c.activity.kind !== 'walk_to_deliver' && c.activity.kind !== 'foraging') {
       const dx = c.tx - c.x, dy = c.ty - c.y;
       const d = Math.sqrt(dx*dx + dy*dy);
       if (d > 0.1) {
@@ -877,8 +1033,8 @@ export function updateCitizens() {
     }
 
     // Arrived or no movement needed — run state machine
-    c.stateTimer -= 1;
-    if (c.stateTimer > 0) continue;
+    c.activityTimer -= 1;
+    if (c.activityTimer > 0) continue;
     runStateMachine(c);
   }
   // After all movement — apply personal-space separation
@@ -886,15 +1042,14 @@ export function updateCitizens() {
 }
 
 function runStateMachine(c) {
-  switch (c.state) {
+  switch (c.activity.kind) {
     case 'idle':
     case 'find_job':
       // Carried goods are an obligation: a citizen holding cargo delivers it
       // before seeking new work or loitering — this was the stranded-carrier
       // freeze (idle with wood in hand, goods leaked from the economy).
       if (c.carrying && c.carryAmount > 0) {
-        c.state = 'needs_delivery';
-        c.stateTimer = 0;
+        setActivity(c, 'needs_delivery', { reason: 'cargo-ready' });
         clearPath(c);
         break;
       }
@@ -902,8 +1057,7 @@ function runStateMachine(c) {
       if (c.hunger > 70 && G.resources.food > 0) {
         G.resources.food--;
         c.hunger = Math.max(0, c.hunger - 60);
-        c.state = 'eating';
-        c.stateTimer = 20;
+        setActivity(c, 'eating', { timer: 20 });
         c.path = null;
         return;
       }
@@ -911,8 +1065,10 @@ function runStateMachine(c) {
       // Pick the best job by utility score (Phase 3c) — not merely the
       // nearest. Under a food crisis the colony visibly reallocates
       // labor toward farms and bakeries.
-      if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
-        c.jobBuilding = null;
+      let job = assignedBuilding(c);
+      if (!job || !G.buildings.includes(job)) {
+        if (job) releaseCitizenAssignment(c, 'assignment-invalid');
+        job = null;
         let bestScore = -Infinity, bestB = null;
         for (const b of G.buildings) {
           if (isBlacklisted(c, b.x, b.y)) continue;
@@ -922,28 +1078,32 @@ function runStateMachine(c) {
           if (!site && !def.prod && !def.workers) continue;
           // A site under construction offers BUILDER slots regardless of the
           // finished building's staffing; production slots take over after.
-          const needed = site ? BUILDER_SLOTS : (def.workers || 0);
-          if (b.workers.length >= needed) continue;
-          if (b.workers.includes(c)) continue;
+          const needed = citizenStaffingCapacity(b);
+          if (staffingCount(b) >= needed) continue;
           const score = scoreJob(c, b);
           if (score > bestScore) { bestScore = score; bestB = b; }
         }
         if (bestB) {
-          c.jobBuilding = bestB;
-          c.visualJob = bestB.type;
-          bestB.workers.push(c);
+          const reason = isConstructionSite(bestB)
+            ? 'construction'
+            : (foodDaysLeft() < 2 && FOOD_JOBS.has(bestB.type) ? 'food-crisis' : 'job-market');
+          claimCitizenAssignment(c, bestB, {
+            duty: assignmentDutyForBuilding(bestB),
+            purpose: assignmentPurposeForCitizen(c, bestB),
+            reason,
+          });
+          job = bestB;
         }
       }
 
-      if (c.jobBuilding) {
-        c.state = 'walk_to_work';
+      if (job) {
+        setActivity(c, 'walk_to_work');
         pathToWork(c);
         if (!c.path) {
           // An unreachable worksite used to win the utility score again on
           // the next idle tick, pinning a citizen in an assign/fail loop.
           releaseJob(c, { unreachable: true });
-          c.state = 'idle';
-          c.stateTimer = 25 + rngInt(0, 35);
+          setActivity(c, 'idle', { reason: 'path-unreachable', timer: 25 + rngInt(0, 35) });
         }
       } else {
         // No building job — forage from nearby resource tiles
@@ -970,7 +1130,7 @@ function runStateMachine(c) {
 
         const needsFood = G.resources.food < Math.max(20, G.population * 6);
         if (forageTarget && (needsFood || rng() < 0.25)) {
-          c.state = 'foraging';
+          setActivity(c, 'foraging');
           c.forageTarget = forageTarget;
           pathTo(c, forageTarget.x, forageTarget.y);
         } else {
@@ -978,29 +1138,26 @@ function runStateMachine(c) {
           // long, map-center wander paths that read as aimless churn.
           const target = idleLoiterTarget(c);
           pathTo(c, target.x, target.y);
-          c.state = 'idle';
-          c.stateTimer = 120 + rngInt(0, 140);
+          setActivity(c, 'idle', { timer: 120 + rngInt(0, 140) });
         }
       }
       break;
 
     case 'walk_to_work':
-      if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
+      if (!assignedBuilding(c) || !G.buildings.includes(assignedBuilding(c))) {
         releaseJob(c);
-        c.state = 'find_job';
-        c.stateTimer = 0;
+        setActivity(c, 'find_job', { reason: 'assignment-invalid' });
         clearPath(c);
         break;
       }
       if (!c.workTarget || (c.workTarget.resource != null && G.map[c.workTarget.y]?.[c.workTarget.x] !== c.workTarget.resource)) {
-        c.workTarget = workTargetForBuilding(c, c.jobBuilding);
+        c.workTarget = workTargetForBuilding(c, assignedBuilding(c));
       }
       if (dist2(c.x, c.y, c.workTarget.x, c.workTarget.y) > 1.8) {
         pathToWork(c);
         if (c.path) break;
         releaseJob(c, { unreachable: true });
-        c.state = 'idle';
-        c.stateTimer = 25 + rngInt(0, 35);
+        setActivity(c, 'idle', { reason: 'path-unreachable', timer: 25 + rngInt(0, 35) });
         break;
       }
       // Arrived at workplace
@@ -1008,10 +1165,9 @@ function runStateMachine(c) {
       break;
 
     case 'working':
-      if (!c.jobBuilding || !G.buildings.includes(c.jobBuilding)) {
+      if (!assignedBuilding(c) || !G.buildings.includes(assignedBuilding(c))) {
         releaseJob(c);
-        c.state = 'find_job';
-        c.stateTimer = 0;
+        setActivity(c, 'find_job', { reason: 'assignment-invalid' });
         clearPath(c);
         break;
       }
@@ -1020,39 +1176,42 @@ function runStateMachine(c) {
       // continuing to animate against an empty patch of ground.
       if (c.workTarget?.resource != null &&
           G.map[c.workTarget.y]?.[c.workTarget.x] !== c.workTarget.resource) {
-        c.workTarget = workTargetForBuilding(c, c.jobBuilding);
-        c.state = 'walk_to_work';
-        c.stateTimer = 0;
+        c.workTarget = workTargetForBuilding(c, assignedBuilding(c));
+        setActivity(c, 'walk_to_work');
         pathToWork(c);
         if (!c.path) {
           releaseJob(c, { unreachable: true });
-          c.state = 'idle';
-          c.stateTimer = 25 + rngInt(0, 35);
+          setActivity(c, 'idle', { reason: 'path-unreachable', timer: 25 + rngInt(0, 35) });
         }
         break;
       }
       // Work-site feedback: periodic chips/grain at the workplace so labor
       // reads as labor even between production cycles.
-      if (c.jobBuilding && G.gameTick % 24 === 0 && rng() < 0.6) {
-        G.particles.push({
-          tx: c.jobBuilding.x + (rng() - 0.5) * 0.5,
-          ty: c.jobBuilding.y + (rng() - 0.5) * 0.5,
-          offsetY: -6, text: null, alpha: 0.85,
-          vx: (rng() - 0.5) * 0.25, vy: -0.15, decay: 0.05,
-          type: 'spark', size: 1.0, color: '#c9a86a',
-        });
+      const workplace = assignedBuilding(c);
+      if (workplace && G.gameTick % 24 === 0) {
+        const salt = citizenHash(c);
+        const unit = channel => visualJitter(workplace.x, workplace.y, salt + channel);
+        if (unit(710) < 0.6) {
+          G.particles.push({
+            tx: workplace.x + (unit(711) - 0.5) * 0.5,
+            ty: workplace.y + (unit(712) - 0.5) * 0.5,
+            offsetY: -6, text: null, alpha: 0.85,
+            vx: (unit(713) - 0.5) * 0.25, vy: -0.15, decay: 0.05,
+            type: 'spark', size: 1.0, color: '#c9a86a',
+          });
+        }
       }
       // Done working — check if building produced something
-      if (c.jobBuilding) {
-        const def = BUILDINGS[c.jobBuilding.type] || {};
-        if ((def.prod || def.convert) && c.jobBuilding.produced) {
+      if (workplace) {
+        const def = BUILDINGS[workplace.type] || {};
+        if ((def.prod || def.convert) && workplace.produced) {
           // Pick up the goods
-          const [resKey, amount] = Object.entries(c.jobBuilding.produced)[0] || [];
+          const [resKey, amount] = Object.entries(workplace.produced)[0] || [];
           if (resKey) {
             c.carrying = resKey;
             c.carryAmount = amount;
-            c.jobBuilding.produced = null;
-            c.state = 'walk_to_deliver';
+            workplace.produced = null;
+            setActivity(c, 'walk_to_deliver', { reason: 'cargo-ready' });
             // User-reported: citizens were walking to map midpoint (MAP_W/2, MAP_H/2)
             // because "town center" was an imaginary coordinate, not a building.
             // Pick a real drop-off: resource-specific storage if present
@@ -1073,7 +1232,7 @@ function runStateMachine(c) {
 
     case 'needs_delivery': {
       if (c.carrying && c.carryAmount > 0 && routeDelivery(c, c.carrying)) {
-        c.state = 'walk_to_deliver';
+        setActivity(c, 'walk_to_deliver');
         break;
       }
       const target = idleLoiterTarget(c);
@@ -1085,14 +1244,12 @@ function runStateMachine(c) {
     case 'walk_to_deliver':
       if (!c.carrying || c.carryAmount <= 0) {
         c._deliveryTarget = null;
-        c.state = 'find_job';
-        c.stateTimer = 0;
+        setActivity(c, 'find_job', { reason: 'cargo-delivered' });
         clearPath(c);
         break;
       }
       if (!deliveryTargetStillValid(c)) {
-        c.state = 'needs_delivery';
-        c.stateTimer = 0;
+        setActivity(c, 'needs_delivery');
         clearPath(c);
         break;
       }
@@ -1108,8 +1265,7 @@ function runStateMachine(c) {
         break;
       }
       // Arrived at delivery point
-      c.state = 'deliver';
-      c.stateTimer = 0;
+      setActivity(c, 'deliver');
       clearPath(c);
       break;
 
@@ -1143,8 +1299,7 @@ function runStateMachine(c) {
       c.carryAmount = 0;
       c._deliveryTarget = null;
       c.workTarget = null;
-      c.state = 'find_job';
-      c.stateTimer = 5;
+      setActivity(c, 'find_job', { reason: 'cargo-delivered', timer: 5 });
       break;
 
     case 'foraging':
@@ -1152,8 +1307,7 @@ function runStateMachine(c) {
         pathTo(c, c.forageTarget.x, c.forageTarget.y);
         if (c.path) break;
         c.forageTarget = null;
-        c.state = 'find_job';
-        c.stateTimer = 20;
+        setActivity(c, 'find_job', { reason: 'path-unreachable', timer: 20 });
         clearPath(c);
         break;
       }
@@ -1175,22 +1329,19 @@ function runStateMachine(c) {
         c.carryAmount = 0;
       }
       c.forageTarget = null;
-      c.state = 'find_job';
-      c.stateTimer = 0; // immediately look for building jobs
+      setActivity(c, 'find_job', { reason: 'forage-complete' }); // immediately look for building jobs
       clearPath(c);
       break;
 
     case 'eating':
-      c.state = 'find_job';
-      c.stateTimer = 5;
+      setActivity(c, 'find_job', { timer: 5 });
       clearPath(c);
       break;
 
     case 'go_home':
       // Shared mover walks the path; when it's exhausted we're home.
       if (c.path && c.pathIdx < c.path.length) break;
-      c.state = 'sleep';
-      c.stateTimer = 60;
+      setActivity(c, 'sleep', { timer: 60 });
       clearPath(c);
       break;
 
@@ -1211,11 +1362,9 @@ function runStateMachine(c) {
           alpha: 1.1, vy: -0.08, decay: 0.014, type: 'speech',
         });
         // Linger at the venue until night calls everyone home.
-        c.state = 'idle';
-        c.stateTimer = 90 + rngInt(0, 60);
+        setActivity(c, 'idle', { reason: 'leisure-complete', timer: 90 + rngInt(0, 60) });
       } else {
-        c.state = 'find_job';
-        c.stateTimer = 5;
+        setActivity(c, 'find_job', { reason: 'leisure-complete', timer: 5 });
       }
       clearPath(c);
       break;
@@ -1226,18 +1375,17 @@ function runStateMachine(c) {
       // a slow cadence and breathe the occasional 💤 so night reads as
       // rest, not a freeze.
       c.rest = Math.min(100, (c.rest ?? 100) + 0.15 * 60);
-      if (rng() < 0.25) {
+      if (visualJitter(c.x, c.y, 900 + citizenHash(c)) < 0.25) {
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -24,
           text: '💤', alpha: 0.9, vy: -0.06, decay: 0.012, type: 'speech',
         });
       }
-      c.stateTimer = 60;
+      c.activityTimer = 60;
       break;
 
     default:
-      c.state = 'idle';
-      c.stateTimer = 10;
+      setActivity(c, 'idle', { reason: 'assignment-invalid', timer: 10 });
       clearPath(c);
   }
 }

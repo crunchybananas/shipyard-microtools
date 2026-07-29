@@ -1,0 +1,1101 @@
+{
+  "schema": 1,
+  "executionMode": "deterministic-core-only",
+  "moduleRevision": 159,
+  "kingdom": "Engine V2 Baseline",
+  "gameTick": 7200,
+  "day": 3,
+  "dayPhase": 0,
+  "population": 19,
+  "maxPop": 19,
+  "resources": {
+    "wood": 9805,
+    "stone": 9902,
+    "food": 9982,
+    "gold": 10079,
+    "iron": 10003,
+    "wheat": 1080,
+    "flour": 1000,
+    "planks": 990,
+    "tools": 990
+  },
+  "transitionCounts": {
+    "role": 97,
+    "job": 100,
+    "state": 582,
+    "carrying": 48
+  },
+  "checkpoints": [
+    {
+      "tick": 1800,
+      "day": 1,
+      "dayPhase": 1800,
+      "population": 19,
+      "resources": {
+        "wood": 9777,
+        "stone": 9887,
+        "food": 10020,
+        "gold": 10057,
+        "iron": 10000,
+        "wheat": 1000,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 1000
+      },
+      "roles": [
+        [
+          "Bjorn Forge",
+          "trader",
+          "working"
+        ],
+        [
+          "Dag Pike",
+          "guard",
+          "walk_to_work"
+        ],
+        [
+          "Finn Forge",
+          "miner",
+          "find_job"
+        ],
+        [
+          "Hans Lake",
+          "farmer",
+          "working"
+        ],
+        [
+          "Hans Pine",
+          "settler",
+          "idle"
+        ],
+        [
+          "Inga Hill",
+          "miner",
+          "find_job"
+        ],
+        [
+          "Inga Marsh",
+          "settler",
+          "idle"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "idle"
+        ],
+        [
+          "Jon Pine",
+          "blacksmith",
+          "working"
+        ],
+        [
+          "Lars Pike",
+          "innkeeper",
+          "working"
+        ],
+        [
+          "Nils Marsh",
+          "scholar",
+          "working"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "idle"
+        ],
+        [
+          "Per Vale",
+          "guard",
+          "walk_to_work"
+        ],
+        [
+          "Sven Brook",
+          "farmer",
+          "working"
+        ],
+        [
+          "Ulf Pine",
+          "lumber",
+          "working"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "idle"
+        ],
+        [
+          "Vera Wood",
+          "settler",
+          "idle"
+        ],
+        [
+          "Xander Dale",
+          "settler",
+          "idle"
+        ],
+        [
+          "Zev Ash",
+          "stonecutter",
+          "working"
+        ]
+      ]
+    },
+    {
+      "tick": 3600,
+      "day": 2,
+      "dayPhase": 0,
+      "population": 19,
+      "resources": {
+        "wood": 9786,
+        "stone": 9891,
+        "food": 10001,
+        "gold": 10066,
+        "iron": 9999,
+        "wheat": 1024,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 999
+      },
+      "roles": [
+        [
+          "Bjorn Forge",
+          "trader",
+          "sleep"
+        ],
+        [
+          "Dag Pike",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Finn Forge",
+          "miner",
+          "sleep"
+        ],
+        [
+          "Hans Lake",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Hans Pine",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Inga Hill",
+          "miner",
+          "sleep"
+        ],
+        [
+          "Inga Marsh",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "idle"
+        ],
+        [
+          "Jon Pine",
+          "blacksmith",
+          "sleep"
+        ],
+        [
+          "Lars Pike",
+          "innkeeper",
+          "find_job"
+        ],
+        [
+          "Nils Marsh",
+          "scholar",
+          "sleep"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Per Vale",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Sven Brook",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Ulf Pine",
+          "lumber",
+          "sleep"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Vera Wood",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Xander Dale",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Zev Ash",
+          "stonecutter",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "tick": 5400,
+      "day": 2,
+      "dayPhase": 1800,
+      "population": 19,
+      "resources": {
+        "wood": 9794,
+        "stone": 9898,
+        "food": 10001,
+        "gold": 10070,
+        "iron": 9999,
+        "wheat": 1048,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 995
+      },
+      "roles": [
+        [
+          "Bjorn Forge",
+          "trader",
+          "working"
+        ],
+        [
+          "Dag Pike",
+          "guard",
+          "working"
+        ],
+        [
+          "Finn Forge",
+          "miner",
+          "walk_to_work"
+        ],
+        [
+          "Hans Lake",
+          "farmer",
+          "working"
+        ],
+        [
+          "Hans Pine",
+          "settler",
+          "idle"
+        ],
+        [
+          "Inga Hill",
+          "miner",
+          "working"
+        ],
+        [
+          "Inga Marsh",
+          "settler",
+          "idle"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "idle"
+        ],
+        [
+          "Jon Pine",
+          "blacksmith",
+          "working"
+        ],
+        [
+          "Lars Pike",
+          "innkeeper",
+          "working"
+        ],
+        [
+          "Nils Marsh",
+          "scholar",
+          "working"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "idle"
+        ],
+        [
+          "Per Vale",
+          "guard",
+          "working"
+        ],
+        [
+          "Sven Brook",
+          "farmer",
+          "walk_to_deliver"
+        ],
+        [
+          "Ulf Pine",
+          "lumber",
+          "working"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "idle"
+        ],
+        [
+          "Vera Wood",
+          "settler",
+          "idle"
+        ],
+        [
+          "Xander Dale",
+          "settler",
+          "idle"
+        ],
+        [
+          "Zev Ash",
+          "stonecutter",
+          "working"
+        ]
+      ]
+    },
+    {
+      "tick": 7200,
+      "day": 3,
+      "dayPhase": 0,
+      "population": 19,
+      "resources": {
+        "wood": 9805,
+        "stone": 9902,
+        "food": 9982,
+        "gold": 10079,
+        "iron": 10003,
+        "wheat": 1080,
+        "flour": 1000,
+        "planks": 990,
+        "tools": 990
+      },
+      "roles": [
+        [
+          "Bjorn Forge",
+          "trader",
+          "sleep"
+        ],
+        [
+          "Dag Pike",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Finn Forge",
+          "miner",
+          "sleep"
+        ],
+        [
+          "Hans Lake",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Hans Pine",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Inga Hill",
+          "miner",
+          "sleep"
+        ],
+        [
+          "Inga Marsh",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Jon Frost",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Jon Pine",
+          "blacksmith",
+          "sleep"
+        ],
+        [
+          "Lars Pike",
+          "innkeeper",
+          "find_job"
+        ],
+        [
+          "Nils Marsh",
+          "scholar",
+          "sleep"
+        ],
+        [
+          "Per Hill",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Per Vale",
+          "guard",
+          "sleep"
+        ],
+        [
+          "Sven Brook",
+          "farmer",
+          "sleep"
+        ],
+        [
+          "Ulf Pine",
+          "lumber",
+          "sleep"
+        ],
+        [
+          "Vera Stone",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Vera Wood",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Xander Dale",
+          "settler",
+          "go_home"
+        ],
+        [
+          "Zev Ash",
+          "stonecutter",
+          "sleep"
+        ]
+      ]
+    }
+  ],
+  "citizens": [
+    {
+      "name": "Bjorn Forge",
+      "role": "trader",
+      "visualJob": "market",
+      "job": "market",
+      "jobBuildingIndex": 11,
+      "homeBuildingIndex": 2,
+      "state": "sleep",
+      "stateTimer": 10,
+      "x": 37,
+      "y": 39,
+      "tx": 37,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 83.8
+    },
+    {
+      "name": "Dag Pike",
+      "role": "guard",
+      "visualJob": "barracks",
+      "job": "barracks",
+      "jobBuildingIndex": 14,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 47,
+      "x": 42,
+      "y": 42,
+      "tx": 42,
+      "ty": 42,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Finn Forge",
+      "role": "miner",
+      "visualJob": "mine",
+      "job": "mine",
+      "jobBuildingIndex": 8,
+      "homeBuildingIndex": 1,
+      "state": "sleep",
+      "stateTimer": 24,
+      "x": 39,
+      "y": 38,
+      "tx": 39,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 45
+    },
+    {
+      "name": "Hans Lake",
+      "role": "farmer",
+      "visualJob": "farm",
+      "job": "farm",
+      "jobBuildingIndex": 4,
+      "homeBuildingIndex": 3,
+      "state": "sleep",
+      "stateTimer": 48,
+      "x": 43.056941,
+      "y": 38.919867,
+      "tx": 43,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Hans Pine",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 1,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 40.122557,
+      "y": 41.028876,
+      "tx": 37,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 39.8
+    },
+    {
+      "name": "Inga Hill",
+      "role": "miner",
+      "visualJob": "mine",
+      "job": "mine",
+      "jobBuildingIndex": 8,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 55,
+      "x": 40,
+      "y": 36,
+      "tx": 40,
+      "ty": 36,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Inga Marsh",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": -1,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 39.511013,
+      "y": 41.01552,
+      "tx": 40,
+      "ty": 43,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 39.8
+    },
+    {
+      "name": "Jon Frost",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 3,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 41.48528,
+      "y": 39.51473,
+      "tx": 42,
+      "ty": 41,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 34.9
+    },
+    {
+      "name": "Jon Pine",
+      "role": "blacksmith",
+      "visualJob": "blacksmith",
+      "job": "blacksmith",
+      "jobBuildingIndex": 13,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 57,
+      "x": 37.928294,
+      "y": 41.942891,
+      "tx": 38,
+      "ty": 42,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Lars Pike",
+      "role": "innkeeper",
+      "visualJob": "tavern",
+      "job": "tavern",
+      "jobBuildingIndex": 12,
+      "homeBuildingIndex": 3,
+      "state": "find_job",
+      "stateTimer": 11,
+      "x": 42,
+      "y": 39,
+      "tx": 42,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 99.65
+    },
+    {
+      "name": "Nils Marsh",
+      "role": "scholar",
+      "visualJob": "school",
+      "job": "school",
+      "jobBuildingIndex": 15,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 15,
+      "x": 41,
+      "y": 43,
+      "tx": 41,
+      "ty": 43,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Per Hill",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 2,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 38.526027,
+      "y": 40.067215,
+      "tx": 38,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 37
+    },
+    {
+      "name": "Per Vale",
+      "role": "guard",
+      "visualJob": "barracks",
+      "job": "barracks",
+      "jobBuildingIndex": 14,
+      "homeBuildingIndex": 3,
+      "state": "sleep",
+      "stateTimer": 57,
+      "x": 42,
+      "y": 38,
+      "tx": 42,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Sven Brook",
+      "role": "farmer",
+      "visualJob": "farm",
+      "job": "farm",
+      "jobBuildingIndex": 5,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 9,
+      "x": 39,
+      "y": 37,
+      "tx": 39,
+      "ty": 37,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Ulf Pine",
+      "role": "lumber",
+      "visualJob": "lumber",
+      "job": "lumber",
+      "jobBuildingIndex": 6,
+      "homeBuildingIndex": -1,
+      "state": "sleep",
+      "stateTimer": 9,
+      "x": 44,
+      "y": 39,
+      "tx": 44,
+      "ty": 39,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    },
+    {
+      "name": "Vera Stone",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 2,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 39.949348,
+      "y": 40.499994,
+      "tx": 38,
+      "ty": 41,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 35.25
+    },
+    {
+      "name": "Vera Wood",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 1,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 39.500068,
+      "y": 41.499982,
+      "tx": 40,
+      "ty": 37,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 39.8
+    },
+    {
+      "name": "Xander Dale",
+      "role": "settler",
+      "visualJob": null,
+      "job": null,
+      "jobBuildingIndex": -1,
+      "homeBuildingIndex": 2,
+      "state": "go_home",
+      "stateTimer": 0,
+      "x": 39.820573,
+      "y": 41.016419,
+      "tx": 38,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 39.8
+    },
+    {
+      "name": "Zev Ash",
+      "role": "stonecutter",
+      "visualJob": "quarry",
+      "job": "quarry",
+      "jobBuildingIndex": 7,
+      "homeBuildingIndex": 1,
+      "state": "sleep",
+      "stateTimer": 7,
+      "x": 41,
+      "y": 38,
+      "tx": 41,
+      "ty": 38,
+      "carrying": null,
+      "carryAmount": 0,
+      "hunger": 60,
+      "rest": 100
+    }
+  ],
+  "buildings": [
+    {
+      "index": 0,
+      "type": "house",
+      "x": 40,
+      "y": 40,
+      "buildProgress": 0,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 1,
+      "type": "house",
+      "x": 40,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 2,
+      "type": "house",
+      "x": 39,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 3,
+      "type": "house",
+      "x": 41,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 4,
+      "type": "farm",
+      "x": 40,
+      "y": 41,
+      "buildProgress": 1,
+      "workers": [
+        "Hans Lake"
+      ],
+      "produced": null,
+      "prodTimer": 93.15000000000009
+    },
+    {
+      "index": 5,
+      "type": "farm",
+      "x": 40,
+      "y": 38,
+      "buildProgress": 1,
+      "workers": [
+        "Sven Brook"
+      ],
+      "produced": null,
+      "prodTimer": 379.49999999999847
+    },
+    {
+      "index": 6,
+      "type": "lumber",
+      "x": 35,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [
+        "Ulf Pine"
+      ],
+      "produced": null,
+      "prodTimer": 15
+    },
+    {
+      "index": 7,
+      "type": "quarry",
+      "x": 35,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [
+        "Zev Ash"
+      ],
+      "produced": null,
+      "prodTimer": 676
+    },
+    {
+      "index": 8,
+      "type": "mine",
+      "x": 39,
+      "y": 33,
+      "buildProgress": 1,
+      "workers": [
+        "Finn Forge",
+        "Inga Hill"
+      ],
+      "produced": null,
+      "prodTimer": 96
+    },
+    {
+      "index": 9,
+      "type": "storehouse",
+      "x": 39,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 10,
+      "type": "granary",
+      "x": 41,
+      "y": 39,
+      "buildProgress": 1,
+      "workers": [],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 11,
+      "type": "market",
+      "x": 38,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [
+        "Bjorn Forge"
+      ],
+      "produced": null,
+      "prodTimer": 541.6499999999953
+    },
+    {
+      "index": 12,
+      "type": "tavern",
+      "x": 42,
+      "y": 40,
+      "buildProgress": 1,
+      "workers": [
+        "Lars Pike"
+      ],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 13,
+      "type": "blacksmith",
+      "x": 39,
+      "y": 41,
+      "buildProgress": 1,
+      "workers": [
+        "Jon Pine"
+      ],
+      "produced": null,
+      "prodTimer": 471.49999999999665
+    },
+    {
+      "index": 14,
+      "type": "barracks",
+      "x": 41,
+      "y": 41,
+      "buildProgress": 1,
+      "workers": [
+        "Dag Pike",
+        "Per Vale"
+      ],
+      "produced": null,
+      "prodTimer": 0
+    },
+    {
+      "index": 15,
+      "type": "school",
+      "x": 40,
+      "y": 42,
+      "buildProgress": 1,
+      "workers": [
+        "Nils Marsh"
+      ],
+      "produced": null,
+      "prodTimer": 0
+    }
+  ],
+  "fixtureSetup": {
+    "placed": [
+      {
+        "type": "house",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 39
+      },
+      {
+        "type": "house",
+        "x": 39,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 41,
+        "y": 40
+      },
+      {
+        "type": "farm",
+        "x": 40,
+        "y": 41
+      },
+      {
+        "type": "farm",
+        "x": 40,
+        "y": 38
+      },
+      {
+        "type": "lumber",
+        "x": 35,
+        "y": 40
+      },
+      {
+        "type": "quarry",
+        "x": 35,
+        "y": 39
+      },
+      {
+        "type": "mine",
+        "x": 39,
+        "y": 33
+      },
+      {
+        "type": "storehouse",
+        "x": 39,
+        "y": 39
+      },
+      {
+        "type": "granary",
+        "x": 41,
+        "y": 39
+      },
+      {
+        "type": "market",
+        "x": 38,
+        "y": 40
+      },
+      {
+        "type": "tavern",
+        "x": 42,
+        "y": 40
+      },
+      {
+        "type": "blacksmith",
+        "x": 39,
+        "y": 41
+      },
+      {
+        "type": "barracks",
+        "x": 41,
+        "y": 41
+      },
+      {
+        "type": "school",
+        "x": 40,
+        "y": 42
+      }
+    ],
+    "population": 19,
+    "maxPop": 19
+  },
+  "pageErrors": []
+}

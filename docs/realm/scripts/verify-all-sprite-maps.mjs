@@ -4,7 +4,7 @@
 // muster page, and inspects all 224 role/action/direction rows (1,792 frames)
 // from the exact runtime atlas used by citizens.
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { writeFile } from 'node:fs/promises';
@@ -19,7 +19,7 @@ import {
   FRAMES,
   ROLES,
   actorRowKey,
-} from './sprite-source-contract.mjs';
+} from '../js/sprite-source-contract.js?realm=166';
 import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -130,34 +130,32 @@ const runtime = await page.evaluate(async ({ roles, actions, dirs, frameW, frame
     }
   }
 
-  const mappingCases = [
-    ['settler', {}],
-    ['farmer', { jobBuilding: { type: 'farm' } }],
-    ['rancher', { jobBuilding: { type: 'chickencoop' } }],
-    ['lumber', { jobBuilding: { type: 'lumber' } }],
-    ['miner', { jobBuilding: { type: 'mine' } }],
-    ['stonecutter', { jobBuilding: { type: 'quarry' } }],
-    ['fisher', { jobBuilding: { type: 'fisherman' } }],
-    ['trader', { jobBuilding: { type: 'market' } }],
-    ['innkeeper', { jobBuilding: { type: 'tavern' } }],
-    ['builder', { jobBuilding: { type: 'townhall' } }],
-    ['blacksmith', { jobBuilding: { type: 'blacksmith' } }],
-    ['guard', { jobBuilding: { type: 'barracks' } }],
-    ['scholar', { jobBuilding: { type: 'school' } }],
-    ['forager', { state: 'foraging' }],
-  ].map(([expected, citizen]) => ({
+  const supportedProfessions = [
+    'settler', 'farmer', 'rancher', 'lumber', 'miner', 'stonecutter',
+    'fisher', 'trader', 'innkeeper', 'builder', 'blacksmith', 'guard',
+    'scholar',
+  ];
+  const mappingCases = supportedProfessions.map((expected) => ({
     expected,
-    actual: window.__realm.actorMapping.variantForCitizen(citizen),
+    actual: window.__realm.actorMapping.variantForCitizen({
+      presentationKind: 'citizen',
+      variant: expected,
+    }),
   }));
 
   const actionCases = [
-    ['idle', {}, false],
-    ['walk', {}, true],
-    ['work', { state: 'working' }, false],
-    ['carry', { carrying: 'wood' }, true],
-  ].map(([expected, citizen, moving]) => ({
+    ['idle', 'idle', null, false],
+    ['walk', 'idle', null, true],
+    ['work', 'working', null, false],
+    ['work', 'foraging', null, false],
+    ['carry', 'walk_to_deliver', 'wood', true],
+  ].map(([expected, activity, carrying, moving]) => ({
     expected,
-    actual: window.__realm.actorMapping.actionForCitizen(citizen, moving),
+    actual: window.__realm.actorMapping.actionForCitizen({
+      presentationKind: 'citizen',
+      activity: { kind: activity },
+      carrying,
+    }, moving),
   }));
 
   const directionCases = [

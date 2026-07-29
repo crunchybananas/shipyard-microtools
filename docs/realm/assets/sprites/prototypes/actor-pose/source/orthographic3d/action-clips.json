@@ -1,0 +1,45 @@
+{
+  "schema": "realm.actor-pose.action-clips.v1",
+  "beats_per_clip": 8,
+  "clips": {
+    "walk": {
+      "root_policy": "fixed-ground-authority",
+      "beats": [
+        {"phase": 0.000, "left_stride": 0.42, "right_stride": -0.42, "left_lift": 0.00, "right_lift": 0.10, "arm_swing": -0.34, "contacts": ["left"]},
+        {"phase": 0.125, "left_stride": 0.30, "right_stride": -0.30, "left_lift": 0.00, "right_lift": 0.24, "arm_swing": -0.24, "contacts": ["left"]},
+        {"phase": 0.250, "left_stride": 0.00, "right_stride": 0.00, "left_lift": 0.00, "right_lift": 0.18, "arm_swing": 0.00, "contacts": ["left"]},
+        {"phase": 0.375, "left_stride": -0.30, "right_stride": 0.30, "left_lift": 0.12, "right_lift": 0.00, "arm_swing": 0.24, "contacts": ["right"]},
+        {"phase": 0.500, "left_stride": -0.42, "right_stride": 0.42, "left_lift": 0.10, "right_lift": 0.00, "arm_swing": 0.34, "contacts": ["right"]},
+        {"phase": 0.625, "left_stride": -0.30, "right_stride": 0.30, "left_lift": 0.24, "right_lift": 0.00, "arm_swing": 0.24, "contacts": ["right"]},
+        {"phase": 0.750, "left_stride": 0.00, "right_stride": 0.00, "left_lift": 0.18, "right_lift": 0.00, "arm_swing": 0.00, "contacts": ["right"]},
+        {"phase": 0.875, "left_stride": 0.30, "right_stride": -0.30, "left_lift": 0.00, "right_lift": 0.12, "arm_swing": -0.24, "contacts": ["left"]}
+      ]
+    },
+    "carry": {
+      "root_policy": "fixed-ground-authority",
+      "beats": [
+        {"phase": 0.000, "left_stride": 0.28, "right_stride": -0.28, "left_lift": 0.00, "right_lift": 0.08, "load_z": 1.63, "contacts": ["left"]},
+        {"phase": 0.125, "left_stride": 0.20, "right_stride": -0.20, "left_lift": 0.00, "right_lift": 0.18, "load_z": 1.64, "contacts": ["left"]},
+        {"phase": 0.250, "left_stride": 0.00, "right_stride": 0.00, "left_lift": 0.00, "right_lift": 0.13, "load_z": 1.63, "contacts": ["left"]},
+        {"phase": 0.375, "left_stride": -0.20, "right_stride": 0.20, "left_lift": 0.09, "right_lift": 0.00, "load_z": 1.62, "contacts": ["right"]},
+        {"phase": 0.500, "left_stride": -0.28, "right_stride": 0.28, "left_lift": 0.08, "right_lift": 0.00, "load_z": 1.61, "contacts": ["right"]},
+        {"phase": 0.625, "left_stride": -0.20, "right_stride": 0.20, "left_lift": 0.18, "right_lift": 0.00, "load_z": 1.62, "contacts": ["right"]},
+        {"phase": 0.750, "left_stride": 0.00, "right_stride": 0.00, "left_lift": 0.13, "right_lift": 0.00, "load_z": 1.63, "contacts": ["right"]},
+        {"phase": 0.875, "left_stride": 0.20, "right_stride": -0.20, "left_lift": 0.00, "right_lift": 0.09, "load_z": 1.64, "contacts": ["left"]}
+      ]
+    },
+    "work": {
+      "root_policy": "fixed-planted-feet",
+      "beats": [
+        {"phase": 0.000, "tool_angle": 118, "grip_x": 0.42, "grip_y": 0.24, "grip_z": 2.28, "lean": -0.02, "contacts": ["left", "right"]},
+        {"phase": 0.125, "tool_angle": 104, "grip_x": 0.45, "grip_y": 0.28, "grip_z": 2.34, "lean": -0.01, "contacts": ["left", "right"]},
+        {"phase": 0.250, "tool_angle": 84, "grip_x": 0.49, "grip_y": 0.32, "grip_z": 2.26, "lean": 0.01, "contacts": ["left", "right"]},
+        {"phase": 0.375, "tool_angle": 58, "grip_x": 0.53, "grip_y": 0.38, "grip_z": 2.08, "lean": 0.04, "contacts": ["left", "right"]},
+        {"phase": 0.500, "tool_angle": 28, "grip_x": 0.54, "grip_y": 0.43, "grip_z": 1.83, "lean": 0.08, "contacts": ["left", "right"]},
+        {"phase": 0.625, "tool_angle": 46, "grip_x": 0.51, "grip_y": 0.38, "grip_z": 1.98, "lean": 0.05, "contacts": ["left", "right"]},
+        {"phase": 0.750, "tool_angle": 78, "grip_x": 0.47, "grip_y": 0.31, "grip_z": 2.20, "lean": 0.02, "contacts": ["left", "right"]},
+        {"phase": 0.875, "tool_angle": 104, "grip_x": 0.43, "grip_y": 0.26, "grip_z": 2.31, "lean": 0.00, "contacts": ["left", "right"]}
+      ]
+    }
+  }
+}

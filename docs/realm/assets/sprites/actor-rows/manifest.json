@@ -1,8 +1,49 @@
 {
   "rows": {
+    "blacksmith/carry/right": {
+      "acceptedAt": "2026-07-18T20:58:01Z",
+      "file": "blacksmith/carry-right.png",
+      "note": "Promoted the inherited painted row after reversing its existing 7,6,5,4,3,2,1,0 frame order to match left-facing carry chronology; no pixels were repainted or rescaled.",
+      "provenance": "deterministic-frame-reversal",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 10,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            73.3,
+            50.8,
+            37.25
+          ],
+          "paletteDelta": 0.0
+        },
+        "flickerScore": 18.0,
+        "maxAlphaRatio": 1.116,
+        "maxBodyCenterJump": 2.12,
+        "maxEdgePixels": 17,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.75,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 36.0,
+        "medianColor": [
+          73.3,
+          50.8,
+          37.25
+        ],
+        "medianColorCount": 334.5,
+        "medianShadingRatio": 0.6789,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "b8a52dd88a9bb50360dcf0e161c2f47c489d30a13a8bf3a4ea6f2ee31d4d7395",
+      "status": "accepted"
+    },
     "blacksmith/idle/down": {
       "acceptedAt": "2026-07-01T22:19:19Z",
-      "allowedWarnings": [],
       "file": "blacksmith/idle-down.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -45,7 +86,6 @@
     },
     "blacksmith/idle/left": {
       "acceptedAt": "2026-07-01T22:19:21Z",
-      "allowedWarnings": [],
       "file": "blacksmith/idle-left.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -88,7 +128,6 @@
     },
     "blacksmith/idle/right": {
       "acceptedAt": "2026-07-01T22:19:22Z",
-      "allowedWarnings": [],
       "file": "blacksmith/idle-right.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -131,7 +170,6 @@
     },
     "blacksmith/idle/up": {
       "acceptedAt": "2026-07-01T22:19:20Z",
-      "allowedWarnings": [],
       "file": "blacksmith/idle-up.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -172,9 +210,50 @@
       "sha256": "856c74c5fddece1db744ba0846fd12f77a72833390f1f74446ca4aaec02426d0",
       "status": "accepted"
     },
+    "blacksmith/walk/right": {
+      "acceptedAt": "2026-07-18T20:58:00Z",
+      "file": "blacksmith/walk-right.png",
+      "note": "Promoted the inherited painted row after reversing its existing 7,6,5,4,3,2,1,0 frame order to match left-facing walk chronology; no pixels were repainted or rescaled.",
+      "provenance": "deterministic-frame-reversal",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 10,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            73.3,
+            50.8,
+            37.25
+          ],
+          "paletteDelta": 0.0
+        },
+        "flickerScore": 18.0,
+        "maxAlphaRatio": 1.116,
+        "maxBodyCenterJump": 2.12,
+        "maxEdgePixels": 17,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.75,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 36.0,
+        "medianColor": [
+          73.3,
+          50.8,
+          37.25
+        ],
+        "medianColorCount": 334.5,
+        "medianShadingRatio": 0.6789,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "b8a52dd88a9bb50360dcf0e161c2f47c489d30a13a8bf3a4ea6f2ee31d4d7395",
+      "status": "accepted"
+    },
     "blacksmith/work/down": {
       "acceptedAt": "2026-07-09T18:24:16Z",
-      "allowedWarnings": [],
       "file": "blacksmith/work-down.png",
       "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
       "provenance": "mechanical-walk-derived-work-rhythm",
@@ -217,7 +296,6 @@
     },
     "blacksmith/work/left": {
       "acceptedAt": "2026-07-09T18:24:17Z",
-      "allowedWarnings": [],
       "file": "blacksmith/work-left.png",
       "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
       "provenance": "mechanical-walk-derived-work-rhythm",
@@ -260,7 +338,6 @@
     },
     "blacksmith/work/right": {
       "acceptedAt": "2026-07-09T18:24:18Z",
-      "allowedWarnings": [],
       "file": "blacksmith/work-right.png",
       "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
       "provenance": "mechanical-walk-derived-work-rhythm",
@@ -303,7 +380,6 @@
     },
     "blacksmith/work/up": {
       "acceptedAt": "2026-07-09T18:24:16Z",
-      "allowedWarnings": [],
       "file": "blacksmith/work-up.png",
       "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
       "provenance": "mechanical-walk-derived-work-rhythm",
@@ -344,9 +420,50 @@
       "sha256": "797dab6c247bad53f97d92997258d89201444b1fc0a191492107b6f983291db8",
       "status": "accepted"
     },
+    "builder/carry/right": {
+      "acceptedAt": "2026-07-18T21:39:30Z",
+      "file": "builder/carry-right.png",
+      "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
+      "provenance": "deterministic-frame-reversal",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 3,
+        "bodyWidthRange": 11,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            107.85,
+            72.75,
+            45.25
+          ],
+          "paletteDelta": 15.55
+        },
+        "flickerScore": 21.2,
+        "maxAlphaRatio": 1.083,
+        "maxBodyCenterJump": 2.98,
+        "maxEdgePixels": 15,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.05,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 35.0,
+        "medianColor": [
+          94.7,
+          65.35,
+          41.5
+        ],
+        "medianColorCount": 429.0,
+        "medianShadingRatio": 0.674,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+      "status": "accepted"
+    },
     "builder/idle/down": {
       "acceptedAt": "2026-07-01T22:19:16Z",
-      "allowedWarnings": [],
       "file": "builder/idle-down.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -389,7 +506,6 @@
     },
     "builder/idle/left": {
       "acceptedAt": "2026-07-01T22:19:18Z",
-      "allowedWarnings": [],
       "file": "builder/idle-left.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -432,7 +548,6 @@
     },
     "builder/idle/right": {
       "acceptedAt": "2026-07-01T22:19:19Z",
-      "allowedWarnings": [],
       "file": "builder/idle-right.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -475,7 +590,6 @@
     },
     "builder/idle/up": {
       "acceptedAt": "2026-07-01T22:19:17Z",
-      "allowedWarnings": [],
       "file": "builder/idle-up.png",
       "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
       "provenance": "own-walk-stance-idle",
@@ -516,9 +630,50 @@
       "sha256": "5446967dd1141a9f971d2d8f9aa2af0fe08a8d7beb943a601bdabfc0f91edeb3",
       "status": "accepted"
     },
+    "builder/walk/right": {
+      "acceptedAt": "2026-07-18T21:39:28Z",
+      "file": "builder/walk-right.png",
+      "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
+      "provenance": "deterministic-frame-reversal",
+      "quality": {
+        "bodyBottomRange": 1,
+        "bodyHeightRange": 3,
+        "bodyWidthRange": 11,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 79.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            107.85,
+            72.75,
+            45.25
+          ],
+          "paletteDelta": 15.55
+        },
+        "flickerScore": 21.2,
+        "maxAlphaRatio": 1.083,
+        "maxBodyCenterJump": 2.98,
+        "maxEdgePixels": 15,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.05,
+        "medianBodyHeight": 80.0,
+        "medianBodyWidth": 35.0,
+        "medianColor": [
+          94.7,
+          65.35,
+          41.5
+        ],
+        "medianColorCount": 429.0,
+        "medianShadingRatio": 0.674,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+      "status": "accepted"
+    },
     "builder/work/down": {
       "acceptedAt": "2026-07-01T23:26:14Z",
-      "allowedWarnings": [],
       "file": "builder/work-down.png",
       "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
       "provenance": "uniform-anchor-rescale",
@@ -561,7 +716,6 @@
     },
     "builder/work/left": {
       "acceptedAt": "2026-07-01T23:26:24Z",
-      "allowedWarnings": [],
       "file": "builder/work-left.png",
       "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
       "provenance": "uniform-anchor-rescale",
@@ -603,11 +757,10 @@
       "status": "accepted"
     },
     "builder/work/right": {
-      "acceptedAt": "2026-07-01T23:26:29Z",
-      "allowedWarnings": [],
+      "acceptedAt": "2026-07-18T20:57:58Z",
       "file": "builder/work-right.png",
-      "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-      "provenance": "uniform-anchor-rescale",
+      "note": "Reordered existing right-facing frames 7,6,5,4,3,2,1,0 to match the left-facing work chronology; pixel content, identity, scale, anchor, and handedness are unchanged.",
+      "provenance": "deterministic-frame-reversal",
       "quality": {
         "bodyBottomRange": 1,
         "bodyHeightRange": 1,
@@ -642,12 +795,11 @@
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "7c0e37b4da8bcb7490bb1b8abb12e93a6e39a4a4960a0d7d0ab46bb561ee95b1",
+      "sha256": "a1447ae1b87f92947c70b19aa2cc74cea8c729584a6d92347af7505fcd94ab2b",
       "status": "accepted"
     },
     "builder/work/up": {
       "acceptedAt": "2026-07-01T23:26:19Z",
-      "allowedWarnings": [],
       "file": "builder/work-up.png",
       "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
       "provenance": "uniform-anchor-rescale",
@@ -690,7 +842,6 @@
     },
     "farmer/idle/down": {
       "acceptedAt": "2026-07-01T22:41:05Z",
-      "allowedWarnings": [],
       "file": "farmer/idle-down.png",
       "note": "Painted row: settler locked idle/down body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -733,7 +884,6 @@
     },
     "farmer/idle/left": {
       "acceptedAt": "2026-07-01T22:41:07Z",
-      "allowedWarnings": [],
       "file": "farmer/idle-left.png",
       "note": "Painted row: settler locked idle/left body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -776,7 +926,6 @@
     },
     "farmer/idle/right": {
       "acceptedAt": "2026-07-01T22:41:07Z",
-      "allowedWarnings": [],
       "file": "farmer/idle-right.png",
       "note": "Painted row: settler locked idle/right body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -819,7 +968,6 @@
     },
     "farmer/idle/up": {
       "acceptedAt": "2026-07-01T22:41:06Z",
-      "allowedWarnings": [],
       "file": "farmer/idle-up.png",
       "note": "Painted row: settler locked idle/up body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -862,7 +1010,6 @@
     },
     "farmer/walk/down": {
       "acceptedAt": "2026-07-01T22:41:08Z",
-      "allowedWarnings": [],
       "file": "farmer/walk-down.png",
       "note": "Painted row: settler locked walk/down body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -905,7 +1052,6 @@
     },
     "farmer/walk/left": {
       "acceptedAt": "2026-07-01T22:41:10Z",
-      "allowedWarnings": [],
       "file": "farmer/walk-left.png",
       "note": "Painted row: settler locked walk/left body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -948,7 +1094,6 @@
     },
     "farmer/walk/right": {
       "acceptedAt": "2026-07-01T22:41:10Z",
-      "allowedWarnings": [],
       "file": "farmer/walk-right.png",
       "note": "Painted row: settler locked walk/right body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -991,7 +1136,6 @@
     },
     "farmer/walk/up": {
       "acceptedAt": "2026-07-01T22:41:09Z",
-      "allowedWarnings": [],
       "file": "farmer/walk-up.png",
       "note": "Painted row: settler locked walk/up body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
       "provenance": "settler-body-own-head-transplant",
@@ -1034,7 +1178,6 @@
     },
     "farmer/work/down": {
       "acceptedAt": "2026-07-09T18:22:57Z",
-      "allowedWarnings": [],
       "file": "farmer/work-down.png",
       "note": "Recomposed from the cleanest existing farmer work pose; controlled upper-body rhythm removes swing-width and edge instability.",
       "provenance": "mechanical-stable-work-rhythm",
@@ -1077,7 +1220,6 @@
     },
     "farmer/work/up": {
       "acceptedAt": "2026-07-09T18:22:58Z",
-      "allowedWarnings": [],
       "file": "farmer/work-up.png",
       "note": "Recomposed from the cleanest existing farmer rear work pose; controlled upper-body rhythm removes edge-clipped hoe arcs and fragments.",
       "provenance": "mechanical-stable-work-rhythm",
@@ -1120,7 +1262,6 @@
     },
     "fisher/carry/down": {
       "acceptedAt": "2026-07-01T21:49:33Z",
-      "allowedWarnings": [],
       "file": "fisher/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1163,7 +1304,6 @@
     },
     "fisher/carry/left": {
       "acceptedAt": "2026-07-01T21:49:35Z",
-      "allowedWarnings": [],
       "file": "fisher/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1206,7 +1346,6 @@
     },
     "fisher/carry/right": {
       "acceptedAt": "2026-07-01T21:49:35Z",
-      "allowedWarnings": [],
       "file": "fisher/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1249,7 +1388,6 @@
     },
     "fisher/carry/up": {
       "acceptedAt": "2026-07-01T21:49:34Z",
-      "allowedWarnings": [],
       "file": "fisher/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1292,7 +1430,6 @@
     },
     "fisher/idle/down": {
       "acceptedAt": "2026-07-01T21:49:23Z",
-      "allowedWarnings": [],
       "file": "fisher/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1335,7 +1472,6 @@
     },
     "fisher/idle/left": {
       "acceptedAt": "2026-07-01T21:49:25Z",
-      "allowedWarnings": [],
       "file": "fisher/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1378,7 +1514,6 @@
     },
     "fisher/idle/right": {
       "acceptedAt": "2026-07-01T21:49:25Z",
-      "allowedWarnings": [],
       "file": "fisher/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1421,7 +1556,6 @@
     },
     "fisher/idle/up": {
       "acceptedAt": "2026-07-01T21:49:24Z",
-      "allowedWarnings": [],
       "file": "fisher/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1464,7 +1598,6 @@
     },
     "fisher/walk/down": {
       "acceptedAt": "2026-07-01T21:49:26Z",
-      "allowedWarnings": [],
       "file": "fisher/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1507,7 +1640,6 @@
     },
     "fisher/walk/left": {
       "acceptedAt": "2026-07-01T21:49:27Z",
-      "allowedWarnings": [],
       "file": "fisher/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1550,7 +1682,6 @@
     },
     "fisher/walk/right": {
       "acceptedAt": "2026-07-01T21:49:28Z",
-      "allowedWarnings": [],
       "file": "fisher/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1593,7 +1724,6 @@
     },
     "fisher/walk/up": {
       "acceptedAt": "2026-07-01T21:49:27Z",
-      "allowedWarnings": [],
       "file": "fisher/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1636,7 +1766,6 @@
     },
     "fisher/work/down": {
       "acceptedAt": "2026-07-01T21:49:29Z",
-      "allowedWarnings": [],
       "file": "fisher/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1679,7 +1808,6 @@
     },
     "fisher/work/left": {
       "acceptedAt": "2026-07-01T21:49:31Z",
-      "allowedWarnings": [],
       "file": "fisher/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1722,7 +1850,6 @@
     },
     "fisher/work/right": {
       "acceptedAt": "2026-07-01T21:49:32Z",
-      "allowedWarnings": [],
       "file": "fisher/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1765,7 +1892,6 @@
     },
     "fisher/work/up": {
       "acceptedAt": "2026-07-01T21:49:30Z",
-      "allowedWarnings": [],
       "file": "fisher/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer (fisher teal).",
       "provenance": "settler-derived-palette-transfer",
@@ -1808,7 +1934,6 @@
     },
     "forager/carry/down": {
       "acceptedAt": "2026-07-01T21:56:11Z",
-      "allowedWarnings": [],
       "file": "forager/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -1851,7 +1976,6 @@
     },
     "forager/carry/left": {
       "acceptedAt": "2026-07-01T21:56:13Z",
-      "allowedWarnings": [],
       "file": "forager/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -1894,7 +2018,6 @@
     },
     "forager/carry/right": {
       "acceptedAt": "2026-07-01T21:56:14Z",
-      "allowedWarnings": [],
       "file": "forager/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -1937,7 +2060,6 @@
     },
     "forager/carry/up": {
       "acceptedAt": "2026-07-01T21:56:12Z",
-      "allowedWarnings": [],
       "file": "forager/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -1980,7 +2102,6 @@
     },
     "forager/idle/down": {
       "acceptedAt": "2026-07-01T21:56:03Z",
-      "allowedWarnings": [],
       "file": "forager/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2023,7 +2144,6 @@
     },
     "forager/idle/left": {
       "acceptedAt": "2026-07-01T21:56:04Z",
-      "allowedWarnings": [],
       "file": "forager/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2066,7 +2186,6 @@
     },
     "forager/idle/right": {
       "acceptedAt": "2026-07-01T21:56:05Z",
-      "allowedWarnings": [],
       "file": "forager/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2109,7 +2228,6 @@
     },
     "forager/idle/up": {
       "acceptedAt": "2026-07-01T21:56:04Z",
-      "allowedWarnings": [],
       "file": "forager/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2152,7 +2270,6 @@
     },
     "forager/walk/down": {
       "acceptedAt": "2026-07-01T21:56:06Z",
-      "allowedWarnings": [],
       "file": "forager/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2195,7 +2312,6 @@
     },
     "forager/walk/left": {
       "acceptedAt": "2026-07-01T21:56:07Z",
-      "allowedWarnings": [],
       "file": "forager/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2238,7 +2354,6 @@
     },
     "forager/walk/right": {
       "acceptedAt": "2026-07-01T21:56:08Z",
-      "allowedWarnings": [],
       "file": "forager/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2281,7 +2396,6 @@
     },
     "forager/walk/up": {
       "acceptedAt": "2026-07-01T21:56:07Z",
-      "allowedWarnings": [],
       "file": "forager/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2324,7 +2438,6 @@
     },
     "forager/work/down": {
       "acceptedAt": "2026-07-01T21:56:09Z",
-      "allowedWarnings": [],
       "file": "forager/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2367,7 +2480,6 @@
     },
     "forager/work/left": {
       "acceptedAt": "2026-07-01T21:56:10Z",
-      "allowedWarnings": [],
       "file": "forager/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2410,7 +2522,6 @@
     },
     "forager/work/right": {
       "acceptedAt": "2026-07-01T21:56:11Z",
-      "allowedWarnings": [],
       "file": "forager/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2453,7 +2564,6 @@
     },
     "forager/work/up": {
       "acceptedAt": "2026-07-01T21:56:09Z",
-      "allowedWarnings": [],
       "file": "forager/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -2494,9 +2604,134 @@
       "sha256": "d648cdfc217f794f7154007229457fed6635589579869bcd77d66d789e08bec2",
       "status": "accepted"
     },
+    "guard/carry/down": {
+      "file": "guard/carry-down.png",
+      "note": "First semantic-identity pass: blue-tunic guard carry cradle, no baked cargo or shield; pending cross-direction family.",
+      "provenance": "imagegen",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 4.0,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 27.0,
+          "medianColor": [
+            75.4,
+            67.75,
+            55.4
+          ],
+          "paletteDelta": 24.85
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.044,
+        "maxBodyCenterJump": 1.49,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.8,
+        "medianBodyHeight": 76.5,
+        "medianBodyWidth": 31.0,
+        "medianColor": [
+          87.15,
+          77.0,
+          75.25
+        ],
+        "medianColorCount": 670.0,
+        "medianShadingRatio": 0.5996,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "1ae7d4e03f615119946956fa391e3944d59f622a0451baf0dc67b96f5c7a2b5f",
+      "stagedAt": "2026-07-18T20:34:54Z",
+      "status": "candidate"
+    },
+    "guard/carry/left": {
+      "file": "guard/carry-left.png",
+      "note": "Blue-tunic guard carry cradle with no baked cargo or shield; semantic family repaint candidate.",
+      "provenance": "imagegen",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 7,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 2.5,
+          "medianBodyHeight": 77.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            76.1,
+            69.8,
+            65.2
+          ],
+          "paletteDelta": 13.29
+        },
+        "flickerScore": 10.4,
+        "maxAlphaRatio": 1.207,
+        "maxBodyCenterJump": 2.6,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.79,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 28.5,
+        "medianColor": [
+          88.5,
+          73.75,
+          67.9
+        ],
+        "medianColorCount": 504.0,
+        "medianShadingRatio": 0.6547,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "17b43ab142ee91fe0797036557cd2bb167fd6c06d031081483e5a61261a01794",
+      "stagedAt": "2026-07-18T20:37:08Z",
+      "status": "candidate"
+    },
+    "guard/carry/right": {
+      "file": "guard/carry-right.png",
+      "note": "Exact mirror of reviewed guard carry-left candidate to preserve frame phase and side-view scale; no baked cargo or shield.",
+      "provenance": "deterministic-mirror",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 7,
+        "directionReference": {
+          "bodyHeightDelta": 0.5,
+          "bodyWidthDelta": 2.5,
+          "medianBodyHeight": 76.5,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            87.15,
+            73.75,
+            67.9
+          ],
+          "paletteDelta": 1.35
+        },
+        "flickerScore": 10.4,
+        "maxAlphaRatio": 1.207,
+        "maxBodyCenterJump": 2.6,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.79,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 28.5,
+        "medianColor": [
+          88.5,
+          73.75,
+          67.9
+        ],
+        "medianColorCount": 504.0,
+        "medianShadingRatio": 0.6547,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "f0365cd3882d8dd3855afbec25524e8df6ef1940130d4b184adc547ec3ac90fb",
+      "stagedAt": "2026-07-18T20:39:23Z",
+      "status": "candidate"
+    },
     "guard/idle/down": {
       "acceptedAt": "2026-07-01T22:57:00Z",
-      "allowedWarnings": [],
       "file": "guard/idle-down.png",
       "note": "Painted row: settler locked idle/down body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2539,7 +2774,6 @@
     },
     "guard/idle/left": {
       "acceptedAt": "2026-07-01T22:57:07Z",
-      "allowedWarnings": [],
       "file": "guard/idle-left.png",
       "note": "Painted row: settler locked idle/left body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2582,7 +2816,6 @@
     },
     "guard/idle/right": {
       "acceptedAt": "2026-07-01T22:57:10Z",
-      "allowedWarnings": [],
       "file": "guard/idle-right.png",
       "note": "Painted row: settler locked idle/right body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2625,7 +2858,6 @@
     },
     "guard/idle/up": {
       "acceptedAt": "2026-07-01T22:57:04Z",
-      "allowedWarnings": [],
       "file": "guard/idle-up.png",
       "note": "Painted row: settler locked idle/up body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2668,7 +2900,6 @@
     },
     "guard/walk/down": {
       "acceptedAt": "2026-07-01T22:57:13Z",
-      "allowedWarnings": [],
       "file": "guard/walk-down.png",
       "note": "Painted row: settler locked walk/down body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2711,7 +2942,6 @@
     },
     "guard/walk/left": {
       "acceptedAt": "2026-07-01T22:57:20Z",
-      "allowedWarnings": [],
       "file": "guard/walk-left.png",
       "note": "Painted row: settler locked walk/left body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2754,7 +2984,6 @@
     },
     "guard/walk/right": {
       "acceptedAt": "2026-07-01T22:57:23Z",
-      "allowedWarnings": [],
       "file": "guard/walk-right.png",
       "note": "Painted row: settler locked walk/right body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2797,7 +3026,6 @@
     },
     "guard/walk/up": {
       "acceptedAt": "2026-07-01T22:57:16Z",
-      "allowedWarnings": [],
       "file": "guard/walk-up.png",
       "note": "Painted row: settler locked walk/up body with guard palette + guard's own painted helm transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -2839,180 +3067,175 @@
       "status": "accepted"
     },
     "guard/work/down": {
-      "acceptedAt": "2026-07-01T23:22:54Z",
-      "allowedWarnings": [],
+      "acceptedAt": "2026-07-11T00:26:02Z",
       "file": "guard/work-down.png",
-      "note": "Work row rescaled to the walk-family body scale.",
-      "provenance": "uniform-anchor-rescale",
-      "quality": {
-        "bodyBottomRange": 2,
-        "bodyHeightRange": 1,
-        "bodyWidthRange": 4,
-        "directionReference": {
-          "bodyHeightDelta": 4.0,
-          "bodyWidthDelta": 4.0,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 37.0,
-          "medianColor": [
-            70.5,
-            65.15,
-            69.45
-          ],
-          "paletteDelta": 10.95
-        },
-        "flickerScore": 23.3,
-        "maxAlphaRatio": 1.104,
-        "maxBodyCenterJump": 8.17,
-        "maxEdgePixels": 20,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 8.57,
-        "medianBodyHeight": 80.0,
-        "medianBodyWidth": 41.0,
-        "medianColor": [
-          79.05,
-          71.25,
-          66.35
-        ],
-        "medianColorCount": 728.0,
-        "medianShadingRatio": 0.6682,
-        "styleEra": "painted",
-        "warnings": []
-      },
-      "sha256": "eff0caa6b53a3e8ab541dc793d864628377ccfe5ee57fdfc0763ebe98f68ac8c",
-      "status": "accepted"
-    },
-    "guard/work/left": {
-      "acceptedAt": "2026-07-09T18:23:07Z",
-      "allowedWarnings": [],
-      "file": "guard/work-left.png",
-      "note": "Recomposed from the cleanest existing guard spear pose; preserves planted role identity while keeping spear and body inside the frame.",
-      "provenance": "mechanical-stable-work-rhythm",
+      "note": "Blue-tunic guard identity matched to idle/walk; compact short-sword drill with native-pixel anchor stabilization.",
+      "provenance": "imagegen-packed-native-anchor",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 5,
-        "bodyWidthRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 6,
         "directionReference": {
           "bodyHeightDelta": 0.5,
-          "bodyWidthDelta": 3.0,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 37.0,
-          "medianColor": [
-            76.4,
-            69.2,
-            67.15
-          ],
-          "paletteDelta": 6.55
-        },
-        "flickerScore": 10.0,
-        "maxAlphaRatio": 1.078,
-        "maxBodyCenterJump": 1.02,
-        "maxEdgePixels": 2,
-        "maxFragmentPixels": 1,
-        "maxPaletteDrift": 0.91,
-        "medianBodyHeight": 75.5,
-        "medianBodyWidth": 34.0,
-        "medianColor": [
-          71.75,
-          65.5,
-          69.9
-        ],
-        "medianColorCount": 548.5,
-        "medianShadingRatio": 0.7086,
-        "styleEra": "painted",
-        "warnings": []
-      },
-      "sha256": "d681a561ac699faca127f88c2541a68b2dcd90df1d928247e3840d4f1357e334",
-      "status": "accepted"
-    },
-    "guard/work/right": {
-      "acceptedAt": "2026-07-09T18:23:08Z",
-      "allowedWarnings": [],
-      "file": "guard/work-right.png",
-      "note": "Mirrored from the accepted left-facing anchored guard work rhythm to keep direction timing and scale consistent.",
-      "provenance": "mechanical-stable-work-rhythm-mirrored",
-      "quality": {
-        "bodyBottomRange": 0,
-        "bodyHeightRange": 5,
-        "bodyWidthRange": 0,
-        "directionReference": {
-          "bodyHeightDelta": 0.0,
-          "bodyWidthDelta": 0.0,
+          "bodyWidthDelta": 3.5,
           "medianBodyHeight": 75.5,
           "medianBodyWidth": 34.0,
           "medianColor": [
-            76.4,
-            69.2,
-            67.15
+            71.75,
+            65.5,
+            69.9
           ],
-          "paletteDelta": 6.55
+          "paletteDelta": 27.95
         },
-        "flickerScore": 10.0,
-        "maxAlphaRatio": 1.078,
-        "maxBodyCenterJump": 1.02,
-        "maxEdgePixels": 2,
-        "maxFragmentPixels": 1,
-        "maxPaletteDrift": 0.91,
-        "medianBodyHeight": 75.5,
-        "medianBodyWidth": 34.0,
+        "flickerScore": 9.2,
+        "maxAlphaRatio": 1.049,
+        "maxBodyCenterJump": 1.28,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 6.75,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 30.5,
         "medianColor": [
-          71.75,
-          65.5,
-          69.9
+          93.35,
+          81.2,
+          78.15
         ],
-        "medianColorCount": 548.5,
-        "medianShadingRatio": 0.7086,
+        "medianColorCount": 754.5,
+        "medianShadingRatio": 0.5635,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "b9c09329920005959448a0dbd4109d8ffe3ac4a6eab262bb7ad2f37b18ee5f00",
+      "sha256": "f0bfb1bf5fdb3c93d1fa51a6a5735a5b1313f5d901c274c1958e08ee2fb531c0",
+      "status": "accepted"
+    },
+    "guard/work/left": {
+      "acceptedAt": "2026-07-11T00:26:03Z",
+      "file": "guard/work-left.png",
+      "note": "Side blue-tunic guard identity matched to idle/walk; compact short-sword drill with native-pixel anchor stabilization.",
+      "provenance": "imagegen-packed-native-anchor",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 1.5,
+          "bodyWidthDelta": 5.5,
+          "medianBodyHeight": 75.5,
+          "medianBodyWidth": 30.5,
+          "medianColor": [
+            71.75,
+            65.5,
+            78.15
+          ],
+          "paletteDelta": 26.41
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.028,
+        "maxBodyCenterJump": 0.59,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.29,
+        "medianBodyHeight": 77.0,
+        "medianBodyWidth": 25.0,
+        "medianColor": [
+          93.0,
+          81.1,
+          76.5
+        ],
+        "medianColorCount": 638.5,
+        "medianShadingRatio": 0.612,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "6bdb4430579be57497584df3ce91447281478d9e737aac91b507b009d6550c9a",
+      "status": "accepted"
+    },
+    "guard/work/right": {
+      "acceptedAt": "2026-07-11T00:26:04Z",
+      "file": "guard/work-right.png",
+      "note": "Exact reviewed mirror of the accepted left-facing short-sword drill, preserving timing, scale, and anchors.",
+      "provenance": "derived-imagegen-mirror",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 1,
+        "directionReference": {
+          "bodyHeightDelta": 1.0,
+          "bodyWidthDelta": 5.5,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.5,
+          "medianColor": [
+            93.0,
+            81.1,
+            78.15
+          ],
+          "paletteDelta": 1.65
+        },
+        "flickerScore": 3.2,
+        "maxAlphaRatio": 1.028,
+        "maxBodyCenterJump": 0.59,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 2.29,
+        "medianBodyHeight": 77.0,
+        "medianBodyWidth": 25.0,
+        "medianColor": [
+          93.0,
+          81.1,
+          76.5
+        ],
+        "medianColorCount": 638.5,
+        "medianShadingRatio": 0.612,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "26da55f0f48a8815633c5b09390857066861c085678016d0ae8cd5df617a396a",
       "status": "accepted"
     },
     "guard/work/up": {
-      "acceptedAt": "2026-07-01T23:40:18Z",
-      "allowedWarnings": [],
+      "acceptedAt": "2026-07-11T00:26:03Z",
       "file": "guard/work-up.png",
-      "note": "Stabilized: centerJump 9.7->0.9; previous center-jump waiver retired.",
-      "provenance": "per-frame-body-stabilize",
+      "note": "Rear blue-tunic guard identity matched to idle/walk; compact short-sword drill with native-pixel anchor stabilization.",
+      "provenance": "imagegen-packed-native-anchor",
       "quality": {
-        "bodyBottomRange": 1,
-        "bodyHeightRange": 2,
-        "bodyWidthRange": 13,
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 1,
+        "bodyWidthRange": 3,
         "directionReference": {
-          "bodyHeightDelta": 2.0,
-          "bodyWidthDelta": 7.0,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 37.0,
+          "bodyHeightDelta": 2.5,
+          "bodyWidthDelta": 3.5,
+          "medianBodyHeight": 75.5,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            70.5,
-            65.15,
-            69.45
+            71.75,
+            65.5,
+            69.9
           ],
-          "paletteDelta": 7.52
+          "paletteDelta": 13.25
         },
-        "flickerScore": 21.6,
-        "maxAlphaRatio": 1.122,
-        "maxBodyCenterJump": 0.86,
-        "maxEdgePixels": 13,
-        "maxFragmentPixels": 1,
-        "maxPaletteDrift": 2.45,
-        "medianBodyHeight": 74.0,
-        "medianBodyWidth": 30.0,
+        "flickerScore": 5.6,
+        "maxAlphaRatio": 1.034,
+        "maxBodyCenterJump": 0.58,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 5.5,
+        "medianBodyHeight": 73.0,
+        "medianBodyWidth": 30.5,
         "medianColor": [
-          76.4,
-          69.2,
-          67.15
+          65.55,
+          63.55,
+          81.45
         ],
-        "medianColorCount": 640.5,
-        "medianShadingRatio": 0.6826,
+        "medianColorCount": 552.0,
+        "medianShadingRatio": 0.6656,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "795685238d74c4f07703d2496fb5d91bf6210be77fb8f6b9d50824a12f239790",
+      "sha256": "fe0968616404037f5b5033509f06fde8c62ab259c2bb70592f1e20368b56cb0f",
       "status": "accepted"
     },
     "innkeeper/carry/down": {
       "acceptedAt": "2026-07-01T21:55:49Z",
-      "allowedWarnings": [],
       "file": "innkeeper/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3055,7 +3278,6 @@
     },
     "innkeeper/carry/left": {
       "acceptedAt": "2026-07-01T21:55:50Z",
-      "allowedWarnings": [],
       "file": "innkeeper/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3098,7 +3320,6 @@
     },
     "innkeeper/carry/right": {
       "acceptedAt": "2026-07-01T21:55:51Z",
-      "allowedWarnings": [],
       "file": "innkeeper/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3141,7 +3362,6 @@
     },
     "innkeeper/carry/up": {
       "acceptedAt": "2026-07-01T21:55:50Z",
-      "allowedWarnings": [],
       "file": "innkeeper/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3184,7 +3404,6 @@
     },
     "innkeeper/idle/down": {
       "acceptedAt": "2026-07-01T21:55:40Z",
-      "allowedWarnings": [],
       "file": "innkeeper/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3227,7 +3446,6 @@
     },
     "innkeeper/idle/left": {
       "acceptedAt": "2026-07-01T21:55:42Z",
-      "allowedWarnings": [],
       "file": "innkeeper/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3270,7 +3488,6 @@
     },
     "innkeeper/idle/right": {
       "acceptedAt": "2026-07-01T21:55:42Z",
-      "allowedWarnings": [],
       "file": "innkeeper/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3313,7 +3530,6 @@
     },
     "innkeeper/idle/up": {
       "acceptedAt": "2026-07-01T21:55:41Z",
-      "allowedWarnings": [],
       "file": "innkeeper/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3356,7 +3572,6 @@
     },
     "innkeeper/walk/down": {
       "acceptedAt": "2026-07-01T21:55:43Z",
-      "allowedWarnings": [],
       "file": "innkeeper/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3399,7 +3614,6 @@
     },
     "innkeeper/walk/left": {
       "acceptedAt": "2026-07-01T21:55:44Z",
-      "allowedWarnings": [],
       "file": "innkeeper/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3442,7 +3656,6 @@
     },
     "innkeeper/walk/right": {
       "acceptedAt": "2026-07-01T21:55:45Z",
-      "allowedWarnings": [],
       "file": "innkeeper/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3485,7 +3698,6 @@
     },
     "innkeeper/walk/up": {
       "acceptedAt": "2026-07-01T21:55:44Z",
-      "allowedWarnings": [],
       "file": "innkeeper/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3528,7 +3740,6 @@
     },
     "innkeeper/work/down": {
       "acceptedAt": "2026-07-01T21:55:46Z",
-      "allowedWarnings": [],
       "file": "innkeeper/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3571,7 +3782,6 @@
     },
     "innkeeper/work/left": {
       "acceptedAt": "2026-07-01T21:55:47Z",
-      "allowedWarnings": [],
       "file": "innkeeper/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3614,7 +3824,6 @@
     },
     "innkeeper/work/right": {
       "acceptedAt": "2026-07-01T21:55:48Z",
-      "allowedWarnings": [],
       "file": "innkeeper/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3657,7 +3866,6 @@
     },
     "innkeeper/work/up": {
       "acceptedAt": "2026-07-01T21:55:47Z",
-      "allowedWarnings": [],
       "file": "innkeeper/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -3700,7 +3908,6 @@
     },
     "lumber/walk/up": {
       "acceptedAt": "2026-07-09T18:32:57Z",
-      "allowedWarnings": [],
       "file": "lumber/walk-up.png",
       "note": "Dedicated rear-facing lumber walk replacement: eight alternating boot contacts, fixed ground anchor, consistent axe side, and stable painted body mass.",
       "provenance": "imagegen-lumber-rear-walk-v3",
@@ -3743,7 +3950,6 @@
     },
     "lumber/work/down": {
       "acceptedAt": "2026-07-09T18:21:49Z",
-      "allowedWarnings": [],
       "file": "lumber/work-down.png",
       "note": "Recomposed from the cleanest existing lumber work pose; fixed-foot rhythm preserves the painted identity while removing body-scale and ground-anchor jitter.",
       "provenance": "mechanical-stable-work-rhythm",
@@ -3786,7 +3992,6 @@
     },
     "lumber/work/left": {
       "acceptedAt": "2026-07-02T04:50:27Z",
-      "allowedWarnings": [],
       "file": "lumber/work-left.png",
       "note": "two-chop cycle, alternating strike depth, ground-anchored",
       "provenance": "pulse verb: 5-variant chop rhythm 0,1,4,2,0,1,3,2 over the static painted pose (all-sprite-maps low-variety gate fix)",
@@ -3829,7 +4034,6 @@
     },
     "lumber/work/right": {
       "acceptedAt": "2026-07-02T04:50:28Z",
-      "allowedWarnings": [],
       "file": "lumber/work-right.png",
       "note": "two-chop cycle, alternating strike depth, ground-anchored",
       "provenance": "pulse verb: 5-variant chop rhythm 0,1,4,2,0,1,3,2 over the static painted pose (all-sprite-maps low-variety gate fix)",
@@ -3872,7 +4076,6 @@
     },
     "lumber/work/up": {
       "acceptedAt": "2026-07-09T18:21:49Z",
-      "allowedWarnings": [],
       "file": "lumber/work-up.png",
       "note": "Recomposed from the cleanest existing lumber work pose; compact fixed-foot rhythm preserves the painted rear view without edge clipping or loose chips.",
       "provenance": "mechanical-stable-work-rhythm",
@@ -3915,7 +4118,6 @@
     },
     "miner/carry/down": {
       "acceptedAt": "2026-07-01T22:56:49Z",
-      "allowedWarnings": [],
       "file": "miner/carry-down.png",
       "note": "Painted row: settler locked carry/down body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -3958,7 +4160,6 @@
     },
     "miner/carry/left": {
       "acceptedAt": "2026-07-01T22:56:53Z",
-      "allowedWarnings": [],
       "file": "miner/carry-left.png",
       "note": "Painted row: settler locked carry/left body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4001,7 +4202,6 @@
     },
     "miner/carry/right": {
       "acceptedAt": "2026-07-01T22:56:57Z",
-      "allowedWarnings": [],
       "file": "miner/carry-right.png",
       "note": "Painted row: settler locked carry/right body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4044,7 +4244,6 @@
     },
     "miner/carry/up": {
       "acceptedAt": "2026-07-01T22:56:51Z",
-      "allowedWarnings": [],
       "file": "miner/carry-up.png",
       "note": "Painted row: settler locked carry/up body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4087,7 +4286,6 @@
     },
     "miner/idle/down": {
       "acceptedAt": "2026-07-01T22:56:27Z",
-      "allowedWarnings": [],
       "file": "miner/idle-down.png",
       "note": "Painted row: settler locked idle/down body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4130,7 +4328,6 @@
     },
     "miner/idle/left": {
       "acceptedAt": "2026-07-01T22:56:35Z",
-      "allowedWarnings": [],
       "file": "miner/idle-left.png",
       "note": "Painted row: settler locked idle/left body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4173,7 +4370,6 @@
     },
     "miner/idle/right": {
       "acceptedAt": "2026-07-01T22:56:38Z",
-      "allowedWarnings": [],
       "file": "miner/idle-right.png",
       "note": "Painted row: settler locked idle/right body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4216,7 +4412,6 @@
     },
     "miner/idle/up": {
       "acceptedAt": "2026-07-01T22:56:31Z",
-      "allowedWarnings": [],
       "file": "miner/idle-up.png",
       "note": "Painted row: settler locked idle/up body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4259,7 +4454,6 @@
     },
     "miner/walk/down": {
       "acceptedAt": "2026-07-01T22:56:42Z",
-      "allowedWarnings": [],
       "file": "miner/walk-down.png",
       "note": "Painted row: settler locked walk/down body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4302,7 +4496,6 @@
     },
     "miner/walk/left": {
       "acceptedAt": "2026-07-01T22:56:45Z",
-      "allowedWarnings": [],
       "file": "miner/walk-left.png",
       "note": "Painted row: settler locked walk/left body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4345,7 +4538,6 @@
     },
     "miner/walk/right": {
       "acceptedAt": "2026-07-01T22:56:47Z",
-      "allowedWarnings": [],
       "file": "miner/walk-right.png",
       "note": "Painted row: settler locked walk/right body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4388,7 +4580,6 @@
     },
     "miner/walk/up": {
       "acceptedAt": "2026-07-01T22:56:44Z",
-      "allowedWarnings": [],
       "file": "miner/walk-up.png",
       "note": "Painted row: settler locked walk/up body with miner palette + miner's own painted hood transplanted.",
       "provenance": "settler-body-own-headgear-transplant",
@@ -4431,7 +4622,6 @@
     },
     "miner/work/down": {
       "acceptedAt": "2026-07-09T18:22:39Z",
-      "allowedWarnings": [],
       "file": "miner/work-down.png",
       "note": "Derived from the miner\u2019s canonical down-facing walk palette and posed with a feet-anchored work rhythm; replaces the fragmented, palette-divergent pick-swing frames.",
       "provenance": "mechanical-walk-derived-work-rhythm",
@@ -4474,7 +4664,6 @@
     },
     "miner/work/left": {
       "acceptedAt": "2026-07-09T18:22:49Z",
-      "allowedWarnings": [],
       "file": "miner/work-left.png",
       "note": "Recomposed from a clean existing side work pose into an anchored eight-beat pick rhythm; removes the side-row width drift waiver.",
       "provenance": "mechanical-stable-work-rhythm",
@@ -4516,11 +4705,10 @@
       "status": "accepted"
     },
     "miner/work/right": {
-      "acceptedAt": "2026-07-09T18:22:50Z",
-      "allowedWarnings": [],
+      "acceptedAt": "2026-07-18T21:39:27Z",
       "file": "miner/work-right.png",
-      "note": "Mirrored from the accepted left-facing anchored pick rhythm to keep timing, palette, and body scale identical.",
-      "provenance": "mechanical-stable-work-rhythm-mirrored",
+      "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
+      "provenance": "deterministic-frame-reversal",
       "quality": {
         "bodyBottomRange": 0,
         "bodyHeightRange": 5,
@@ -4555,12 +4743,11 @@
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "0d6b287829bf957ea53627c1f90063dbb944d3cc31ba8d094e1aa41ae4eba8a7",
+      "sha256": "df8a7518d2742eae1c0e28a24ced1d9aa7c93aeb50cfc35068e3b1bb46e2bd2d",
       "status": "accepted"
     },
     "miner/work/up": {
       "acceptedAt": "2026-06-19T04:34:27Z",
-      "allowedWarnings": [],
       "file": "miner/work-up.png",
       "note": "Back-facing miner work row; imagegen pose content with peer-scale body normalization.",
       "provenance": "imagegen-direction-locked-peer-scale",
@@ -4600,7 +4787,6 @@
     },
     "rancher/carry/down": {
       "acceptedAt": "2026-07-01T21:55:15Z",
-      "allowedWarnings": [],
       "file": "rancher/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4643,7 +4829,6 @@
     },
     "rancher/carry/left": {
       "acceptedAt": "2026-07-01T21:55:16Z",
-      "allowedWarnings": [],
       "file": "rancher/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4686,7 +4871,6 @@
     },
     "rancher/carry/right": {
       "acceptedAt": "2026-07-01T21:55:17Z",
-      "allowedWarnings": [],
       "file": "rancher/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4729,7 +4913,6 @@
     },
     "rancher/carry/up": {
       "acceptedAt": "2026-07-01T21:55:15Z",
-      "allowedWarnings": [],
       "file": "rancher/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4772,7 +4955,6 @@
     },
     "rancher/idle/down": {
       "acceptedAt": "2026-07-01T21:55:06Z",
-      "allowedWarnings": [],
       "file": "rancher/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4815,7 +4997,6 @@
     },
     "rancher/idle/left": {
       "acceptedAt": "2026-07-01T21:55:07Z",
-      "allowedWarnings": [],
       "file": "rancher/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4858,7 +5039,6 @@
     },
     "rancher/idle/right": {
       "acceptedAt": "2026-07-01T21:55:08Z",
-      "allowedWarnings": [],
       "file": "rancher/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4901,7 +5081,6 @@
     },
     "rancher/idle/up": {
       "acceptedAt": "2026-07-01T21:55:07Z",
-      "allowedWarnings": [],
       "file": "rancher/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4944,7 +5123,6 @@
     },
     "rancher/walk/down": {
       "acceptedAt": "2026-07-01T21:55:09Z",
-      "allowedWarnings": [],
       "file": "rancher/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -4987,7 +5165,6 @@
     },
     "rancher/walk/left": {
       "acceptedAt": "2026-07-01T21:55:10Z",
-      "allowedWarnings": [],
       "file": "rancher/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5030,7 +5207,6 @@
     },
     "rancher/walk/right": {
       "acceptedAt": "2026-07-01T21:55:11Z",
-      "allowedWarnings": [],
       "file": "rancher/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5073,7 +5249,6 @@
     },
     "rancher/walk/up": {
       "acceptedAt": "2026-07-01T21:55:10Z",
-      "allowedWarnings": [],
       "file": "rancher/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5116,7 +5291,6 @@
     },
     "rancher/work/down": {
       "acceptedAt": "2026-07-01T21:55:12Z",
-      "allowedWarnings": [],
       "file": "rancher/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5159,7 +5333,6 @@
     },
     "rancher/work/left": {
       "acceptedAt": "2026-07-01T21:55:13Z",
-      "allowedWarnings": [],
       "file": "rancher/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5202,7 +5375,6 @@
     },
     "rancher/work/right": {
       "acceptedAt": "2026-07-01T21:55:14Z",
-      "allowedWarnings": [],
       "file": "rancher/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5245,7 +5417,6 @@
     },
     "rancher/work/up": {
       "acceptedAt": "2026-07-01T21:55:12Z",
-      "allowedWarnings": [],
       "file": "rancher/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5288,7 +5459,6 @@
     },
     "scholar/carry/down": {
       "acceptedAt": "2026-07-01T21:56:00Z",
-      "allowedWarnings": [],
       "file": "scholar/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5331,7 +5501,6 @@
     },
     "scholar/carry/left": {
       "acceptedAt": "2026-07-01T21:56:02Z",
-      "allowedWarnings": [],
       "file": "scholar/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5374,7 +5543,6 @@
     },
     "scholar/carry/right": {
       "acceptedAt": "2026-07-01T21:56:02Z",
-      "allowedWarnings": [],
       "file": "scholar/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5417,7 +5585,6 @@
     },
     "scholar/carry/up": {
       "acceptedAt": "2026-07-01T21:56:01Z",
-      "allowedWarnings": [],
       "file": "scholar/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5460,7 +5627,6 @@
     },
     "scholar/idle/down": {
       "acceptedAt": "2026-07-01T21:55:52Z",
-      "allowedWarnings": [],
       "file": "scholar/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5503,7 +5669,6 @@
     },
     "scholar/idle/left": {
       "acceptedAt": "2026-07-01T21:55:53Z",
-      "allowedWarnings": [],
       "file": "scholar/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5546,7 +5711,6 @@
     },
     "scholar/idle/right": {
       "acceptedAt": "2026-07-01T21:55:54Z",
-      "allowedWarnings": [],
       "file": "scholar/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5589,7 +5753,6 @@
     },
     "scholar/idle/up": {
       "acceptedAt": "2026-07-01T21:55:52Z",
-      "allowedWarnings": [],
       "file": "scholar/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5632,7 +5795,6 @@
     },
     "scholar/walk/down": {
       "acceptedAt": "2026-07-01T21:55:55Z",
-      "allowedWarnings": [],
       "file": "scholar/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5675,7 +5837,6 @@
     },
     "scholar/walk/left": {
       "acceptedAt": "2026-07-01T21:55:56Z",
-      "allowedWarnings": [],
       "file": "scholar/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5718,7 +5879,6 @@
     },
     "scholar/walk/right": {
       "acceptedAt": "2026-07-01T21:55:57Z",
-      "allowedWarnings": [],
       "file": "scholar/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5761,7 +5921,6 @@
     },
     "scholar/walk/up": {
       "acceptedAt": "2026-07-01T21:55:55Z",
-      "allowedWarnings": [],
       "file": "scholar/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5804,7 +5963,6 @@
     },
     "scholar/work/down": {
       "acceptedAt": "2026-07-01T21:55:57Z",
-      "allowedWarnings": [],
       "file": "scholar/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5847,7 +6005,6 @@
     },
     "scholar/work/left": {
       "acceptedAt": "2026-07-01T21:55:59Z",
-      "allowedWarnings": [],
       "file": "scholar/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5890,7 +6047,6 @@
     },
     "scholar/work/right": {
       "acceptedAt": "2026-07-01T21:55:59Z",
-      "allowedWarnings": [],
       "file": "scholar/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5933,7 +6089,6 @@
     },
     "scholar/work/up": {
       "acceptedAt": "2026-07-01T21:55:58Z",
-      "allowedWarnings": [],
       "file": "scholar/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -5976,7 +6131,6 @@
     },
     "settler/carry/down": {
       "acceptedAt": "2026-06-27T14:08:46Z",
-      "allowedWarnings": [],
       "file": "settler/carry-down.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6016,7 +6170,6 @@
     },
     "settler/carry/left": {
       "acceptedAt": "2026-06-27T14:08:48Z",
-      "allowedWarnings": [],
       "file": "settler/carry-left.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6056,7 +6209,6 @@
     },
     "settler/carry/right": {
       "acceptedAt": "2026-06-27T14:08:48Z",
-      "allowedWarnings": [],
       "file": "settler/carry-right.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6096,7 +6248,6 @@
     },
     "settler/carry/up": {
       "acceptedAt": "2026-06-27T14:08:47Z",
-      "allowedWarnings": [],
       "file": "settler/carry-up.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6136,7 +6287,6 @@
     },
     "settler/idle/down": {
       "acceptedAt": "2026-06-20T06:03:03Z",
-      "allowedWarnings": [],
       "file": "settler/idle-down.png",
       "note": "Front-facing imagegen idle normalized to the locked walk family 72px body height.",
       "provenance": "imagegen-peer-action-scale-normalized",
@@ -6176,7 +6326,6 @@
     },
     "settler/idle/left": {
       "acceptedAt": "2026-06-20T06:03:04Z",
-      "allowedWarnings": [],
       "file": "settler/idle-left.png",
       "note": "Cell-wise reflected from the right-facing idle row after normalization to the locked walk family scale.",
       "provenance": "imagegen-peer-direction-reflection",
@@ -6216,7 +6365,6 @@
     },
     "settler/idle/right": {
       "acceptedAt": "2026-06-20T06:03:04Z",
-      "allowedWarnings": [],
       "file": "settler/idle-right.png",
       "note": "Right-facing imagegen idle normalized to the locked walk family 72px body height.",
       "provenance": "imagegen-peer-action-scale-normalized",
@@ -6256,7 +6404,6 @@
     },
     "settler/idle/up": {
       "acceptedAt": "2026-06-20T06:03:03Z",
-      "allowedWarnings": [],
       "file": "settler/idle-up.png",
       "note": "Back-facing imagegen idle normalized to the locked walk family 72px body height.",
       "provenance": "imagegen-peer-action-scale-normalized",
@@ -6296,7 +6443,6 @@
     },
     "settler/walk/down": {
       "acceptedAt": "2026-06-20T06:35:37Z",
-      "allowedWarnings": [],
       "file": "settler/walk-down.png",
       "note": "Imagegen identity preserved; only the pants/boots region is reflected on alternating frames to enforce a readable front-facing two-foot gait.",
       "provenance": "imagegen-lower-body-alternation-repair",
@@ -6336,7 +6482,6 @@
     },
     "settler/walk/left": {
       "acceptedAt": "2026-06-20T05:33:24Z",
-      "allowedWarnings": [],
       "file": "settler/walk-left.png",
       "note": "Cell-wise reflected from the clean right-facing peer after two generated left rows failed dense-width stability.",
       "provenance": "imagegen-peer-direction-reflection",
@@ -6376,7 +6521,6 @@
     },
     "settler/walk/right": {
       "acceptedAt": "2026-06-20T05:33:25Z",
-      "allowedWarnings": [],
       "file": "settler/walk-right.png",
       "note": "Right-facing frontier settler walk matched to the action identity master.",
       "provenance": "imagegen-frontier-settler-family",
@@ -6416,7 +6560,6 @@
     },
     "settler/walk/up": {
       "acceptedAt": "2026-06-20T06:35:38Z",
-      "allowedWarnings": [],
       "file": "settler/walk-up.png",
       "note": "Back-facing locked identity with lower-leg cadence regenerated after gait audit.",
       "provenance": "imagegen-gait-corrected-identity-lock",
@@ -6456,7 +6599,6 @@
     },
     "settler/work/down": {
       "acceptedAt": "2026-06-27T14:08:44Z",
-      "allowedWarnings": [],
       "file": "settler/work-down.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6496,7 +6638,6 @@
     },
     "settler/work/left": {
       "acceptedAt": "2026-06-27T14:08:45Z",
-      "allowedWarnings": [],
       "file": "settler/work-left.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6536,7 +6677,6 @@
     },
     "settler/work/right": {
       "acceptedAt": "2026-06-27T14:08:46Z",
-      "allowedWarnings": [],
       "file": "settler/work-right.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6576,7 +6716,6 @@
     },
     "settler/work/up": {
       "acceptedAt": "2026-06-27T14:08:45Z",
-      "allowedWarnings": [],
       "file": "settler/work-up.png",
       "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
       "provenance": "frontier-settler-row-derivative",
@@ -6616,7 +6755,6 @@
     },
     "stonecutter/carry/down": {
       "acceptedAt": "2026-07-01T21:55:26Z",
-      "allowedWarnings": [],
       "file": "stonecutter/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6659,7 +6797,6 @@
     },
     "stonecutter/carry/left": {
       "acceptedAt": "2026-07-01T21:55:27Z",
-      "allowedWarnings": [],
       "file": "stonecutter/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6702,7 +6839,6 @@
     },
     "stonecutter/carry/right": {
       "acceptedAt": "2026-07-01T21:55:28Z",
-      "allowedWarnings": [],
       "file": "stonecutter/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6745,7 +6881,6 @@
     },
     "stonecutter/carry/up": {
       "acceptedAt": "2026-07-01T21:55:27Z",
-      "allowedWarnings": [],
       "file": "stonecutter/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6788,7 +6923,6 @@
     },
     "stonecutter/idle/down": {
       "acceptedAt": "2026-07-01T21:55:17Z",
-      "allowedWarnings": [],
       "file": "stonecutter/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6831,7 +6965,6 @@
     },
     "stonecutter/idle/left": {
       "acceptedAt": "2026-07-01T21:55:19Z",
-      "allowedWarnings": [],
       "file": "stonecutter/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6874,7 +7007,6 @@
     },
     "stonecutter/idle/right": {
       "acceptedAt": "2026-07-01T21:55:20Z",
-      "allowedWarnings": [],
       "file": "stonecutter/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6917,7 +7049,6 @@
     },
     "stonecutter/idle/up": {
       "acceptedAt": "2026-07-01T21:55:18Z",
-      "allowedWarnings": [],
       "file": "stonecutter/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -6960,7 +7091,6 @@
     },
     "stonecutter/walk/down": {
       "acceptedAt": "2026-07-01T21:55:20Z",
-      "allowedWarnings": [],
       "file": "stonecutter/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7003,7 +7133,6 @@
     },
     "stonecutter/walk/left": {
       "acceptedAt": "2026-07-01T21:55:22Z",
-      "allowedWarnings": [],
       "file": "stonecutter/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7046,7 +7175,6 @@
     },
     "stonecutter/walk/right": {
       "acceptedAt": "2026-07-01T21:55:22Z",
-      "allowedWarnings": [],
       "file": "stonecutter/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7089,7 +7217,6 @@
     },
     "stonecutter/walk/up": {
       "acceptedAt": "2026-07-01T21:55:21Z",
-      "allowedWarnings": [],
       "file": "stonecutter/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7132,7 +7259,6 @@
     },
     "stonecutter/work/down": {
       "acceptedAt": "2026-07-01T21:55:23Z",
-      "allowedWarnings": [],
       "file": "stonecutter/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7175,7 +7301,6 @@
     },
     "stonecutter/work/left": {
       "acceptedAt": "2026-07-01T21:55:25Z",
-      "allowedWarnings": [],
       "file": "stonecutter/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7218,7 +7343,6 @@
     },
     "stonecutter/work/right": {
       "acceptedAt": "2026-07-01T21:55:25Z",
-      "allowedWarnings": [],
       "file": "stonecutter/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7261,7 +7385,6 @@
     },
     "stonecutter/work/up": {
       "acceptedAt": "2026-07-01T21:55:24Z",
-      "allowedWarnings": [],
       "file": "stonecutter/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7304,7 +7427,6 @@
     },
     "trader/carry/down": {
       "acceptedAt": "2026-07-01T21:55:37Z",
-      "allowedWarnings": [],
       "file": "trader/carry-down.png",
       "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7347,7 +7469,6 @@
     },
     "trader/carry/left": {
       "acceptedAt": "2026-07-01T21:55:39Z",
-      "allowedWarnings": [],
       "file": "trader/carry-left.png",
       "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7390,7 +7511,6 @@
     },
     "trader/carry/right": {
       "acceptedAt": "2026-07-01T21:55:40Z",
-      "allowedWarnings": [],
       "file": "trader/carry-right.png",
       "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7433,7 +7553,6 @@
     },
     "trader/carry/up": {
       "acceptedAt": "2026-07-01T21:55:38Z",
-      "allowedWarnings": [],
       "file": "trader/carry-up.png",
       "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7476,7 +7595,6 @@
     },
     "trader/idle/down": {
       "acceptedAt": "2026-07-01T21:55:29Z",
-      "allowedWarnings": [],
       "file": "trader/idle-down.png",
       "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7519,7 +7637,6 @@
     },
     "trader/idle/left": {
       "acceptedAt": "2026-07-01T21:55:30Z",
-      "allowedWarnings": [],
       "file": "trader/idle-left.png",
       "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7562,7 +7679,6 @@
     },
     "trader/idle/right": {
       "acceptedAt": "2026-07-01T21:55:31Z",
-      "allowedWarnings": [],
       "file": "trader/idle-right.png",
       "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7605,7 +7721,6 @@
     },
     "trader/idle/up": {
       "acceptedAt": "2026-07-01T21:55:30Z",
-      "allowedWarnings": [],
       "file": "trader/idle-up.png",
       "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7648,7 +7763,6 @@
     },
     "trader/walk/down": {
       "acceptedAt": "2026-07-01T21:55:32Z",
-      "allowedWarnings": [],
       "file": "trader/walk-down.png",
       "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7691,7 +7805,6 @@
     },
     "trader/walk/left": {
       "acceptedAt": "2026-07-01T21:55:33Z",
-      "allowedWarnings": [],
       "file": "trader/walk-left.png",
       "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7734,7 +7847,6 @@
     },
     "trader/walk/right": {
       "acceptedAt": "2026-07-01T21:55:34Z",
-      "allowedWarnings": [],
       "file": "trader/walk-right.png",
       "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7777,7 +7889,6 @@
     },
     "trader/walk/up": {
       "acceptedAt": "2026-07-01T21:55:32Z",
-      "allowedWarnings": [],
       "file": "trader/walk-up.png",
       "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7820,7 +7931,6 @@
     },
     "trader/work/down": {
       "acceptedAt": "2026-07-01T21:55:35Z",
-      "allowedWarnings": [],
       "file": "trader/work-down.png",
       "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7863,7 +7973,6 @@
     },
     "trader/work/left": {
       "acceptedAt": "2026-07-01T21:55:36Z",
-      "allowedWarnings": [],
       "file": "trader/work-left.png",
       "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7906,7 +8015,6 @@
     },
     "trader/work/right": {
       "acceptedAt": "2026-07-01T21:55:37Z",
-      "allowedWarnings": [],
       "file": "trader/work-right.png",
       "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7949,7 +8057,6 @@
     },
     "trader/work/up": {
       "acceptedAt": "2026-07-01T21:55:35Z",
-      "allowedWarnings": [],
       "file": "trader/work-up.png",
       "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
       "provenance": "settler-derived-palette-transfer",
@@ -7991,6 +8098,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-09T18:32:57Z",
+  "updatedAt": "2026-07-18T21:39:30Z",
   "version": 1
 }

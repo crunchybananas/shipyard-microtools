@@ -7,7 +7,7 @@
 //
 // Usage: node docs/realm/scripts/scrub-sprite-debris.mjs [--write]
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

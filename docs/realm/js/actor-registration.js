@@ -2,48 +2,34 @@
 // Per-row/per-frame registration for the actor atlas (64x84 cells):
 //   dy  — row feet-line shift onto the cast baseline (79)
 //   f   — per-frame feet corrections (>=2px deviants)
-//   s   — row bulk scale: later-batch work/carry rows carry up to +80%
-//         pixel mass vs the role's walk rows (a different character);
-//         blended (ratio^0.25, clamped 0.88-1.08), anchored at the feet
 // Applied at draw time in render.drawActorAtlasFrame; sheets untouched.
-// Per-frame scales are deliberately absent: repaint a changing body rather
-// than shrinking whole frames at runtime. Rerun --write after any repaint.
+// Runtime scales are deliberately absent: opaque area includes tools and
+// cargo, so area-derived scaling makes bodies pop between actions. Repaint a
+// changing body instead. Rerun --write after any repaint.
 export const ACTOR_REGISTRATION = {
-  "farmer/idle/left": {
-    "s": 1.068
-  },
-  "farmer/idle/right": {
-    "s": 1.068
-  },
   "farmer/work/down": {
     "dy": -4
   },
   "farmer/work/up": {
-    "dy": -4,
-    "s": 0.916
+    "dy": -4
   },
   "farmer/work/left": {
-    "dy": -4,
-    "s": 0.912
+    "dy": -4
   },
   "farmer/work/right": {
-    "dy": -4,
-    "s": 0.912
+    "dy": -4
   },
   "farmer/carry/down": {
     "dy": -4
   },
   "farmer/carry/up": {
-    "dy": -4,
-    "s": 0.904
+    "dy": -4
   },
   "farmer/carry/left": {
-    "dy": -4,
-    "s": 0.925
+    "dy": -4
   },
   "farmer/carry/right": {
-    "dy": -4,
-    "s": 0.923
+    "dy": -4
   },
   "lumber/idle/down": {
     "dy": -3
@@ -67,12 +53,10 @@ export const ACTOR_REGISTRATION = {
     "dy": -3
   },
   "lumber/work/down": {
-    "dy": -4,
-    "s": 1.08
+    "dy": -4
   },
   "lumber/work/up": {
-    "dy": -4,
-    "s": 1.077
+    "dy": -4
   },
   "lumber/work/left": {
     "dy": -3
@@ -99,27 +83,12 @@ export const ACTOR_REGISTRATION = {
     "dy": -1
   },
   "builder/work/down": {
-    "dy": -1,
-    "s": 0.904
+    "dy": -1
   },
   "builder/work/left": {
-    "dy": -1,
-    "s": 0.88
+    "dy": -1
   },
   "builder/work/right": {
-    "dy": -1,
-    "s": 0.88
-  },
-  "guard/work/down": {
-    "dy": -2,
-    "s": 0.901
-  },
-  "guard/work/left": {
-    "dy": -1,
-    "s": 0.91
-  },
-  "guard/work/right": {
-    "dy": -1,
-    "s": 0.91
+    "dy": -1
   }
 };

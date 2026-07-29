@@ -2,11 +2,13 @@
 // Random Events — drought, gold rush, plague, migration, etc.
 // ════════════════════════════════════════════════════════════
 
-import { G, rng, rngInt } from './state.js?realm=157';
-import { trySpawnSettlers } from './economy.js?realm=157';
-import { sfx as playSound } from './log.js?realm=157';
-import { emit } from './bus.js?realm=157';
-import { chronicle, initChronicle, announce } from './log.js?realm=157';
+import { G, rng, rngInt } from './state.js?realm=166';
+import { trySpawnSettlers } from './economy.js?realm=166';
+import { sfx as playSound } from './log.js?realm=166';
+import { emit } from './bus.js?realm=166';
+import { chronicle, announce } from './log.js?realm=166';
+import { recordDeathMarker } from './death-markers.js?realm=166';
+import { removeCitizenFromWorld } from './citizen-ownership.js?realm=166';
 
 // positive:true → green banner + 'season' sound
 // positive:false → red banner + 'raidWarning' sound
@@ -264,24 +266,22 @@ export const EVENT_DEFS = [
       // hit population zero and tripped realm_fell mid-event.
       const losses = Math.max(0, Math.min(intent, G.citizens.length - 1));
       for (let i = 0; i < losses; i++) {
-        const c = G.citizens.pop();
+        const c = G.citizens.at(-1);
         if (!c) continue;
-        if (c.jobBuilding) c.jobBuilding.workers = c.jobBuilding.workers.filter(w => w !== c);
+        removeCitizenFromWorld(c);
         if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
         G.lastDeathDay = G.day;  // Loop 242 (241 pessimist HIGH fix): plague is a death site too
         G.particles.push({
           tx: c.x, ty: c.y, offsetY: -20,
-          text: `🪦 ${c.name || 'Settler'}`,
+          text: `🪦 ${c.identity.name}`,
           alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
           color: '#a855f7',
         });
         // Loop 77: persistent gravestone at actual death tile for plague victims too
-        if (!G.deathMarkers) G.deathMarkers = [];
-        G.deathMarkers.push({ x: c.x, y: c.y, name: c.name || 'Settler', day: G.day, cause: 'plague' });
-        try { chronicle(`${c.name || 'A settler'} succumbed to the plague. The healer could do nothing.`, 'death'); } catch(_e){}
+        recordDeathMarker({ x: c.x, y: c.y, name: c.identity.name, cause: 'plague' });
+        try { chronicle(`${c.identity.name} succumbed to the plague. The healer could do nothing.`, 'death'); } catch(_e){}
         playSound('death');
       }
-      G.population = Math.max(0, G.population - losses);
       G.eventModifiers.speedMult = 0.7;
     },
     onEnd() { G.eventModifiers.speedMult = 1; },

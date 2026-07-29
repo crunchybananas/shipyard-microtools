@@ -11,9 +11,9 @@
 // shell owns the follow-camera and key handling.
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=157';
-import { findPath, stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=157';
-import { revealAround } from './world.js?realm=157';
+import { G, MAP_W, MAP_H } from './state.js?realm=166';
+import { findPath, stepEntityToward } from './pathfinding.js?realm=166';
+import { revealAround } from './world.js?realm=166';
 
 export function makeAvatar(x, y) {
   // Citizen-shaped on purpose: the renderer's citizen sprite path
@@ -24,16 +24,9 @@ export function makeAvatar(x, y) {
     path: null, pathIdx: 0,
     speed: 0.05, // brisk — faster than citizens (0.02–0.03)
     name: 'The Founder',
-    state: 'idle', hunger: 0, rest: 100,
+    state: 'idle',
     faceX: 0, faceZ: 1, _movedAt: 0,
   };
-}
-
-export function ensureAvatar() {
-  if (G.avatar) return G.avatar;
-  const spot = nearestWalkableTile(Math.round(MAP_W / 2), Math.round(MAP_H / 2), 8) || { x: MAP_W / 2, y: MAP_H / 2 };
-  G.avatar = makeAvatar(spot.x, spot.y);
-  return G.avatar;
 }
 
 // Command handlers (called from commands.js only)
@@ -76,7 +69,16 @@ export function updateAvatar() {
     const wp = a.path[a.pathIdx];
     const dx = wp.x - a.x, dy = wp.y - a.y;
     const d = Math.hypot(dx, dy);
-    if (d < 0.15) {
+    if (d <= Math.max(0.005, a.speed)) {
+      if (d > 0.0001) {
+        a.x = wp.x;
+        a.y = wp.y;
+        a._movedAt = G.gameTick;
+        if (Math.abs(dx) > 0.04 || Math.abs(dy) > 0.04) {
+          a.faceX = dx > 0.04 ? 1 : dx < -0.04 ? -1 : 0;
+          a.faceZ = dy > 0.04 ? 1 : dy < -0.04 ? -1 : 0;
+        }
+      }
       a.pathIdx++;
       if (a.pathIdx >= a.path.length) { a.path = null; a.pathIdx = 0; }
     } else if (stepEntityToward(a, wp.x, wp.y, a.speed)) {

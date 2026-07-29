@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "status": "prototype-only",
+  "runtimePromotion": false,
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "count": 8
+  },
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "targets": [
+    {
+      "role": "guard",
+      "actions": [
+        "walk",
+        "carry"
+      ]
+    },
+    {
+      "role": "builder",
+      "actions": [
+        "walk",
+        "work"
+      ]
+    }
+  ],
+  "pipelines": [
+    {
+      "id": "a-layered2d",
+      "label": "Layered painted 2D",
+      "hypothesis": "painterly-fidelity"
+    },
+    {
+      "id": "b-orthographic3d",
+      "label": "Orthographic 3D/2.5D authority",
+      "hypothesis": "geometry-occlusion"
+    },
+    {
+      "id": "c-row-factory",
+      "label": "Current row-factory control",
+      "hypothesis": "current-workflow-control"
+    }
+  ],
+  "acceptance": {
+    "rootFeetDriftMaxPx": 1,
+    "denseBodyHeightRangeMaxPx": 2,
+    "crossDirectionBodyHeightDeltaMaxPx": 2,
+    "socketResidualMaxPx": 1,
+    "requireEightNonblankDistinctFrames": true,
+    "requireSynchronizedDirectionPhase": true,
+    "requireNoSeamsOrOcclusionFaults": true,
+    "requireDistinctIdentityAtOneX": true,
+    "requireByteReproducibleBuild": true
+  }
+}

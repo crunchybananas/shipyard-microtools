@@ -2,29 +2,34 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, getDifficulty, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, tintCurve, setSeed } from './state.js?realm=157';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=157';
-import { generateWorld } from './world.js?realm=157';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=157';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=157';
-import { dispatch } from './commands.js?realm=157';
-import { coreTick } from './sim.js?realm=157';
-import { on } from './bus.js?realm=157';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=157';
-import { setupInput } from './input.js?realm=157';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=157';
-import { ERAS } from './tech.js?realm=157';
-import { saveGame, loadGame, getSaveSize } from './save.js?realm=157';
-import { updateAmbient, toggleAmbient, isAmbientEnabled, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=157';
-import { toggleNotificationLog, notify } from './notifications.js?realm=157';
-import { loadAchievements, checkAchievements, getUnlockedCount, renderAchievementsPanel, ACHIEVEMENTS } from './achievements.js?realm=157';
-import { getActiveScenario, checkScenarioComplete, SCENARIOS } from './scenarios.js?realm=157';
-import { updateAnimals } from './animals.js?realm=157';
-import { checkAdvisor } from './advisor.js?realm=157';
-import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=157';
-import { initChronicle, chronicle, toggleChroniclePanel, checkStoryBeats, _realWorldDreamLens, setChronicleFilter } from './story.js?realm=157';
-import { initSpriteLab } from './sprite-lab.js?realm=157';
-import { initSpriteMuster } from './sprite-muster.js?realm=157';
+import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=166';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=166';
+import { generateWorld } from './world.js?realm=166';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=166';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=166';
+import { dispatch } from './commands.js?realm=166';
+import { coreTick } from './sim.js?realm=166';
+import { on } from './bus.js?realm=166';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=166';
+import { setupInput } from './input.js?realm=166';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=166';
+import { ERAS } from './tech.js?realm=166';
+import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=166';
+import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=166';
+import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=166';
+import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=166';
+import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=166';
+import { updateAnimals } from './animals.js?realm=166';
+import { checkAdvisor } from './advisor.js?realm=166';
+import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=166';
+import { chronicle, initChronicle } from './log.js?realm=166';
+import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=166';
+import { initSpriteLab } from './sprite-lab.js?realm=166';
+import { initSpriteMuster } from './sprite-muster.js?realm=166';
+import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=166';
+import { updatePresentationCues } from './presentation-cues.js?realm=166';
+import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=166';
+import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=166';
 
 
 // ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────
@@ -66,6 +71,7 @@ const minimap = document.getElementById('minimap');
 const queryParams = new URLSearchParams(location.search);
 const spriteMusterMode = queryParams.has('spritemuster');
 const runtimeCaptureMode = queryParams.has('runtimecapture');
+initCitizenInspector({ enabled: queryParams.has('npcdebug') });
 
 initRenderer(canvas);
 initMinimap(minimap);
@@ -79,10 +85,24 @@ window.addEventListener('resize', () => { resizeCanvas(); resizePostFX(); });
 // tab screenshot path times out on Realm's two high-resolution canvases.
 // Nothing is encoded or added to the DOM during ordinary gameplay.
 let _runtimeCaptureCanvas = null;
-let _lastRuntimeCaptureAt = -Infinity;
-function _publishRuntimeCapture(now) {
-  if (!runtimeCaptureMode || now - _lastRuntimeCaptureAt < 750) return;
-  _lastRuntimeCaptureAt = now;
+let _runtimeCaptureRequested = runtimeCaptureMode;
+let _runtimeCaptureBusy = false;
+let _runtimeCaptureResolvers = [];
+
+function _finishRuntimeCapture(value, resolvers) {
+  _runtimeCaptureBusy = false;
+  for (const resolve of resolvers) resolve(value);
+}
+
+function _publishRuntimeCapture() {
+  if (!runtimeCaptureMode || !_runtimeCaptureRequested || _runtimeCaptureBusy) return;
+  _runtimeCaptureRequested = false;
+  _runtimeCaptureBusy = true;
+  // Only fulfill requests that existed when this capture began. A caller
+  // arriving while PNG encoding is in flight must receive the next frame,
+  // not the older image that happened to finish first.
+  const captureResolvers = _runtimeCaptureResolvers;
+  _runtimeCaptureResolvers = [];
 
   if (!_runtimeCaptureCanvas) {
     _runtimeCaptureCanvas = document.createElement('canvas');
@@ -111,9 +131,32 @@ function _publishRuntimeCapture(now) {
     sink.alt = '';
     document.body.appendChild(sink);
   }
-  sink.src = _runtimeCaptureCanvas.toDataURL('image/png');
-  sink.dataset.tick = String(G.gameTick);
+
+  // Encoding a full-DPR canvas with toDataURL() on every frame sample blocked
+  // the main thread for a visible beat. Capture once on startup, then only on
+  // explicit request, and let the browser encode off the render stack.
+  const captureTick = G.gameTick;
+  _runtimeCaptureCanvas.toBlob((blob) => {
+    if (!blob) {
+      _finishRuntimeCapture(null, captureResolvers);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      sink.src = String(reader.result || '');
+      sink.dataset.tick = String(captureTick);
+      _finishRuntimeCapture(sink.src, captureResolvers);
+    };
+    reader.onerror = () => _finishRuntimeCapture(null, captureResolvers);
+    reader.readAsDataURL(blob);
+  }, 'image/png');
 }
+
+window.captureRealmFrame = () => {
+  if (!runtimeCaptureMode) return Promise.resolve(null);
+  _runtimeCaptureRequested = true;
+  return new Promise((resolve) => _runtimeCaptureResolvers.push(resolve));
+};
 
 // Loop 127 (the-fixer, 030 filed 96 ticks + 126 HIGH): welcome-back
 // summary. On tab blur, snapshot G state. On focus, diff and render a
@@ -191,36 +234,27 @@ function syncAudioButtons() {
 }
 syncAudioButtons();
 
-// Check for existing save to show Continue button with friendly summary
-const hasSaveData = !!localStorage.getItem('realm-save-v2');
-if (hasSaveData) {
+// Only a fully valid save from the current Engine v2 epoch is visible.
+const currentSaveSummary = getSaveSummary();
+if (currentSaveSummary) {
   const loadBtn = document.getElementById('title-load');
   if (loadBtn) {
-    // Parse save for kingdom name + day instead of raw byte size
-    let label = 'Continue';
-    try {
-      const raw = localStorage.getItem('realm-save-v2');
-      if (raw) {
-        const save = JSON.parse(raw);
-        const kName = save.kingdomName && save.kingdomName !== 'Realm' ? save.kingdomName : null;
-        const day = save.day || 1;
-        const pop = Array.isArray(save.citizens) ? save.citizens.length : 0;
-        const year = Math.floor((day - 1) / 28) + 1;
-        const dayInYear = ((day - 1) % 28) + 1;
-        label = kName
-          ? `Continue ${kName} · Year ${year} Day ${dayInYear} · Pop ${pop}`
-          : `Continue · Year ${year} Day ${dayInYear} · Pop ${pop}`;
-      }
-    } catch (e) { /* fall back to plain label */ }
+    const kName = currentSaveSummary.kingdomName !== 'Realm' ? currentSaveSummary.kingdomName : null;
+    const day = currentSaveSummary.day;
+    const pop = currentSaveSummary.population;
+    const year = Math.floor((day - 1) / 28) + 1;
+    const dayInYear = ((day - 1) % 28) + 1;
+    const label = kName
+      ? `Continue ${kName} · Year ${year} Day ${dayInYear} · Pop ${pop}`
+      : `Continue · Year ${year} Day ${dayInYear} · Pop ${pop}`;
     loadBtn.textContent = label;
     loadBtn.style.display = 'inline-block';
   }
 }
 
 // Mark completed scenarios on title screen
-try {
-  const save = JSON.parse(localStorage.getItem('realm-save-v2') || '{}');
-  const won = save.G?._scenariosCompleted || [];
+if (currentSaveSummary) {
+  const won = currentSaveSummary.scenariosWon;
   document.querySelectorAll('.scen-btn').forEach(b => {
     const onclick = b.getAttribute('onclick') || '';
     const match = onclick.match(/setScenario\(['"]([^'"]+)['"]\)/);
@@ -228,9 +262,9 @@ try {
       b.innerHTML = '✓ ' + b.innerHTML;
     }
   });
-} catch (_e) {}
+}
 
-function beginGame() {
+function beginGame({ resume = false } = {}) {
   document.body.classList.remove('title-active');
   const titleEl = document.getElementById('title-screen');
   titleEl.style.transition = 'opacity 0.5s';
@@ -239,6 +273,7 @@ function beginGame() {
 
   setupInput(canvas);
   initChronicle();
+  resetCitizenTransitionLedger();
   if (G.chronicle.length === 0) {
     // Avoid "The realm of Realm" collision when the player keeps the default kingdom name
     const foundingText = G.kingdomName && G.kingdomName !== 'Realm'
@@ -262,6 +297,10 @@ function beginGame() {
   }
   gameLoop();
 
+  // Continue preserves the saved camera. The founding zoom is presentation for
+  // a new realm, not a mutation that should happen as part of loading one.
+  if (resume) return;
+
   // Cinematic zoom-in over 1.5 seconds
   G.camera.zoom = 0.9;
   const zoomStart = performance.now();
@@ -276,6 +315,7 @@ function beginGame() {
 }
 
 window.setDifficulty = (d) => {
+  if (!Object.hasOwn(DIFFICULTY, d)) return;
   G.difficulty = d;
   document.querySelectorAll('.diff-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.diff === d);
@@ -283,6 +323,7 @@ window.setDifficulty = (d) => {
 };
 
 window.setScenario = (id) => {
+  if (!SCENARIOS.some(scenario => scenario.id === id)) return;
   G.scenario = id;
   document.querySelectorAll('.scen-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick').includes(id));
@@ -294,72 +335,153 @@ window.setScenario = (id) => {
   }
 };
 
-window.startNewGame = () => {
-  // Apply difficulty settings to starting resources
-  const diff = getDifficulty();
-  // Loop 132 (the-fixer, 131 HIGH): seed map RNG from kingdom name so
-  // topology is reproducible per kingdom. Before 132, `_seed` was
-  // `Date.now() % 100000` — two realms named the same thing at
-  // different times got different islands. 132 reads the name first,
-  // then seeds the RNG, then generates. Same kingdom → same island.
-  const nameInput = document.getElementById('kingdom-name-input');
-  G.kingdomName = (nameInput && nameInput.value.trim()) || 'Realm';
+function seedFromKingdomName(kingdomName) {
   let kh = 0;
-  for (let i = 0; i < G.kingdomName.length; i++) {
-    kh = ((kh << 5) - kh + G.kingdomName.charCodeAt(i)) | 0;
+  for (let i = 0; i < kingdomName.length; i++) {
+    kh = ((kh << 5) - kh + kingdomName.charCodeAt(i)) | 0;
   }
-  setSeed(Math.abs(kh) || 1);
-  generateWorld();
-  G.resources.food = diff.startFood;
-  G.resources.wood = diff.startWood;
-  G.resources.gold = diff.startGold;
-  G.nextRaidDay = diff.raidStart;
-  // Apply scenario starting conditions (override difficulty defaults)
+  return Math.abs(kh) || 1;
+}
+
+// The sole fresh-realm initializer. Title-screen starts, in-game restarts, and
+// tests all need the same authoritative defaults so newly added state cannot
+// leak simply because one reset path forgot it.
+function resetRealmForNewGame({ kingdomName = G.kingdomName } = {}) {
+  const normalizedName = String(kingdomName || '').trim().slice(0, 20) || 'Realm';
   const scen = getActiveScenario();
-  if (scen) {
-    G.resources = { ...scen.startResources };
-    G.nextRaidDay = scen.raidStart;
-  }
-  G._scenarioWon = false;
+  const debug = G.debug;
+
+  resetRuntimeTransientState(G);
+  resetCitizenOwnershipRuntime();
+  resetCitizenRenderCache();
+
+  Object.assign(G, {
+    map: [],
+    fog: [],
+    buildingGrid: [],
+    buildings: [],
+    citizens: [],
+    nextActorId: 1,
+    avatar: null,
+    caravans: [],
+    walkers: [],
+    soldiers: [],
+    enemies: [],
+    projectiles: [],
+    chronicle: [],
+    storyFlags: {},
+    namedCharacters: {},
+    deathMarkers: [],
+    storyState: { lastProverbSeason: null, raid: null },
+    notificationLog: [],
+    resources: createResourceStock(scen.startResources),
+    population: 3,
+    maxPop: 3,
+    happiness: 50,
+    defense: 0,
+    day: 1,
+    dayPhase: Math.floor(G.dayLength * 0.22),
+    gameTick: 0,
+    speed: 1,
+    obstacleEpoch: 0,
+    totalResourcesGathered: 0,
+    camera: { x: 0, y: (MAP_W / 2 + MAP_H / 2) * TH / 2, zoom: 1.3 },
+    nextRaidDay: scen.raidStart,
+    raidInterval: 8,
+    lastRaidDay: null,
+    lastDeathDay: null,
+    lastUnderpopDay: null,
+    realmEnded: false,
+    researchedTechs: new Set(['agriculture', 'forestry']),
+    currentResearch: null,
+    activeEvent: null,
+    eventModifiers: { foodProd: 1, goldProd: 1, happinessOffset: 0, speedMult: 1 },
+    weather: 'clear',
+    season: 'spring',
+    rallyPoint: null,
+    armyStance: 'defend',
+    won: false,
+    era: 1,
+    eraStartDay: { 1: 1 },
+    wonder: null,
+    tileWear: null,
+    kingdomName: normalizedName,
+    stats: {
+      buildingsBuilt: 0,
+      buildingsLost: 0,
+      raidsFaced: 0,
+      citizensBorn: 0,
+      citizensDied: 0,
+      raidsSurvived: 0,
+      enemiesKilled: 0,
+      goldEarned: 0,
+      daysLived: 0,
+      housesEvolved: 0,
+      scenariosWon: [],
+      everHadBuilding: {},
+    },
+    _dailyFoodConsumed: 0,
+    _lastDevolveNotice: null,
+    _lastRaidFireDay: null,
+    _milestone10: false,
+    _milestone25: false,
+    _milestone50: false,
+    _milestone75: false,
+    _moodDelta: 0,
+    _patrolEmptyNotified: false,
+    _patrolPosts: null,
+    _patrolPostsBuildingCount: -1,
+    _raidSide: null,
+    _raidSpawnCount: 0,
+    _raidStolen: null,
+    _raidWarningGiven: false,
+    _scenarioWon: false,
+    _undoStack: [],
+  });
+  G.debug = debug;
+  if (G.debug) G.debug.disableEvents = false;
+
+  setSeed(seedFromKingdomName(G.kingdomName));
+  generateWorld();
+  resetCitizenTransitionLedger();
+}
+
+window.startNewGame = () => {
+  const nameInput = document.getElementById('kingdom-name-input');
+  resetRealmForNewGame({
+    kingdomName: nameInput ? nameInput.value : 'Realm',
+  });
   beginGame();
 };
 
 window.loadAndStart = () => {
-  generateWorld();
-  if (loadGame()) {
-    renderBuildBar();
-    updateUI();
-    // Loop 135 (the-fixer, 133 HIGH): cross-session welcome-back.
-    // 127 handles within-session absence (tab blur/focus) but NOT
-    // full-session resume. 135 fires a notify showing the last
-    // chronicle entry on Continue so the returning player
-    // reconnects to the realm's voice. `chronicle:false` because
-    // we're just replaying existing history, not adding a new beat.
-    try {
-      const ch = G.chronicle;
-      if (ch && ch.length > 0) {
-        const last = ch[ch.length - 1];
-        // Loop 139 (the-fixer, 133 MEDIUM): real-world wait prefix when
-        // savedAt is available. Thresholds: >= 24h → "Your realm has
-        // been waiting N days." >= 1h → "...a few hours." Below 1h
-        // doesn't warrant a mention — resume feels immediate.
-        let prefix = '';
-        const savedAt = G._savedAt;
-        if (savedAt) {
-          const waitMs = Date.now() - savedAt;
-          const waitDays = Math.floor(waitMs / (24 * 60 * 60 * 1000));
-          if (waitDays >= 1) {
-            prefix = `Your realm has been waiting ${waitDays} day${waitDays === 1 ? '' : 's'}. `;
-          } else if (waitMs >= 60 * 60 * 1000) {
-            prefix = 'Your realm has been waiting a few hours. ';
-          }
+  // Loading prepares and validates a detached candidate before touching the
+  // live realm. A failed Continue stays on the title screen and does not
+  // generate or partially initialize a replacement world.
+  if (!loadGame()) return;
+  renderBuildBar();
+  updateUI();
+  // Cross-session welcome-back. savedAt is shell metadata and never injected
+  // into deterministic G state.
+  try {
+    const ch = G.chronicle;
+    if (ch && ch.length > 0) {
+      const last = ch[ch.length - 1];
+      let prefix = '';
+      const savedAt = getLastLoadedSavedAt();
+      if (savedAt) {
+        const waitMs = Date.now() - savedAt;
+        const waitDays = Math.floor(waitMs / (24 * 60 * 60 * 1000));
+        if (waitDays >= 1) {
+          prefix = `Your realm has been waiting ${waitDays} day${waitDays === 1 ? '' : 's'}. `;
+        } else if (waitMs >= 60 * 60 * 1000) {
+          prefix = 'Your realm has been waiting a few hours. ';
         }
-        notify(`${prefix}Where we left off (day ${last.day}): ${last.text}`, 'info', { chronicle: false });
-        delete G._savedAt;  // one-shot — don't persist after welcome-back
       }
-    } catch (_e) {}
-  }
-  beginGame();
+      notifyTransient(`${prefix}Where we left off (day ${last.day}): ${last.text}`, 'info');
+    }
+  } catch (_e) {}
+  beginGame({ resume: true });
 };
 
 // Expose for inline onclick handlers and console debugging
@@ -367,10 +489,11 @@ window.G = G;
 G.debug = G.debug || {};
 G.debug.lightCurve = lightCurve;
 G.debug.tintCurve = tintCurve;
-G.debug.dreamLens = _realWorldDreamLens;
+G.debug.dreamLens = realWorldDreamLens;
 G.debug.renderBuildingIsolated = renderBuildingIsolated;
 G.debug.fastForward = fastForward;  // 081: synchronous N-day advance
 G.debug.disableEvents = false;
+G.debug.pauseRendering = false;
 // probe-harness: programmatic placement for chain/e2e tests — now routed
 // through the command funnel so probe placements land in G._commandLog too.
 G.debug.placeBuilding = (type, x, y) => dispatch({ type: 'PLACE_BUILDING', building: type, x, y }).ok;
@@ -394,64 +517,7 @@ window.dismissTutorial = dismissTutorial;
 window.hideInfoPanel = hideInfoPanel;
 window.toggleLog = toggleNotificationLog;
 window.newGame = () => {
-  // No confirm dialog — it blocks browser automation and interrupts flow
-  // Reset all state
-  // Loop 25 (render S3): also reset chronicle + storyFlags so new games
-  // start with a blank history. Was leaving old raid entries from previous
-  // runs contaminating the new chronicle panel.
-  G.buildings = []; G.citizens = []; G.caravans = []; G.walkers = []; G.particles = []; G.soldiers = []; G.enemies = []; G.projectiles = []; G.animals = [];
-  G.chronicle = []; G.storyFlags = {};
-  G.notificationLog = [];
-  G.resources = { wood:60, stone:30, food:80, gold:25, iron:0 };
-  G.population = 3; G.maxPop = 3; G.happiness = 50; G.defense = 0;
-  G.day = 1; G.dayPhase = Math.floor(G.dayLength * 0.22); G.gameTick = 0; G.speed = 1;
-  G.selectedBuild = null; G.selectedBuilding = null;
-  G.nextRaidDay = 8; G.raidInterval = 8;
-  G.researchedTechs = new Set(['agriculture','forestry']);
-  G.currentResearch = null;
-  G.activeEvent = null;
-  G.eventModifiers = { foodProd:1, goldProd:1, happinessOffset:0, speedMult:1 };
-  G._lightningTimer = null; G._lightningFlash = 0; G.meteors = [];
-  G.season = 'spring'; G.won = false; G._scenarioWon = false;
-  G.era = 1; G.eraStartDay = { 1: 1 };
-  G.wonder = null;
-  G.resourceRates = { wood:0, stone:0, food:0, gold:0, iron:0, wheat:0, flour:0, planks:0, tools:0 };
-  G.lastResources = null;
-  G.tileWear = null;
-  // Loop 302 (the-fixer, 271 [code] follow-on audit): added scenariosWon
-  // to G.stats reset. Pre-302, newGame omitted scenariosWon → main.js:531
-  // would TypeError on `G.stats.scenariosWon.includes(...)` if a player
-  // restarted mid-scenario. Mirrors state.js initial G.stats schema (155).
-  // Loop 311 (310 [code]): added everHadBuilding tracking. New realm
-  // starts with empty experience; placeBuilding (economy.js:69) sets
-  // each type true.
-  G.stats = { buildingsBuilt:0, buildingsLost:0, raidsFaced:0, citizensBorn:0, citizensDied:0, raidsSurvived:0, enemiesKilled:0, goldEarned:0, daysLived:0, scenariosWon:[], everHadBuilding:{} };
-  // Loop 269 (the-fixer, 268 HIGH+MEDIUM): reset realm-end flag and
-  // sustained-state trackers. Without these, a player whose realm fell
-  // and clicked "New Game" inherited realmEnded=true (chronicle gated +
-  // visuals desaturated + all NARRATIVE_BEATS gated → new realm born
-  // already-dead) AND stale lastXDay values that caused 211/228/230 beats
-  // to fire at off-by-N-day offsets in the new realm.
-  G.realmEnded = false;
-  G.lastRaidDay = undefined;
-  G.lastDeathDay = undefined;
-  G.lastUnderpopDay = undefined;
-  // Loop 271 (the-fixer, 269 [code] filing): also reset namedCharacters
-  // so the new realm doesn't inherit the previous realm's mayor/bard/
-  // smith/teacher/merchant/rival. Without this, the new realm's first
-  // tavern build silently re-uses the previous realm's mayor (per 034
-  // hook + ensureMayor()), and same for the other 5 ensure-character
-  // hooks tied to building first-builds.
-  G.namedCharacters = {};
-  // Loop 302 (the-fixer, 271 [code] follow-on audit): reset other leaky
-  // _underscore-prefixed fields that were missed in 269/271 sweep.
-  // _undoStack / _buildRipples / birds / _raidWarningGiven are all
-  // realm-scoped runtime state that should NOT carry across newGame().
-  G._undoStack = [];
-  G._buildRipples = [];
-  G.birds = [];
-  G._raidWarningGiven = false;
-  generateWorld();
+  resetRealmForNewGame();
   renderBuildBar(); renderMissions(); updateUI();
   notify('New game started!');
 };
@@ -510,6 +576,7 @@ window.toggleMissions = () => {
 // two-tier sim). Two multiplayer clients may see different birds;
 // they must never see different granaries.
 function shellTick() {
+  updatePresentationCues();
   updateAnimals();
   updateBoats();
   updateFlocks(window.innerWidth, window.innerHeight);
@@ -534,11 +601,32 @@ function shellTick() {
       vy: 0,
     });
   }
+  emitCaravanDust();
 }
 
-// Throttled UI/meta gates — run after each frame's tick batch. Story
-// beats, achievements, ambient audio and panel refreshes are shell
-// concerns (they read core state, render/persist client-side).
+let caravanDustTicks = new WeakMap();
+function emitCaravanDust() {
+  if (G.gameTick % 8 !== 0) return;
+  for (const caravan of G.caravans) {
+    if (caravanDustTicks.get(caravan) === G.gameTick) continue;
+    caravanDustTicks.set(caravan, G.gameTick);
+    G.particles.push({
+      tx: caravan.x,
+      ty: caravan.y,
+      offsetY: -2,
+      text: null,
+      alpha: 0.4,
+      vy: 0,
+      decay: 0.02,
+      type: 'dust',
+      size: 2,
+      vx: 0,
+    });
+  }
+}
+
+// Throttled UI/meta gates — run after each frame's tick batch. Authoritative
+// story checks are a core system; this shell cadence only renders/presents.
 let _gate30 = 0, _gate60 = 0, _gate120 = 0, _lastAutosave = 0;
 function shellGates() {
   const t = G.gameTick;
@@ -557,7 +645,6 @@ function shellGates() {
     renderResearchPanel();
     updateAmbient();
     checkAchievements();
-    checkStoryBeats();
   }
   if (t - _gate120 >= 120) {
     _gate120 = t;
@@ -572,25 +659,28 @@ function shellGates() {
 
 // Fixed-timestep accumulator: 1× speed = 60 ticks per wall-clock second,
 // independent of display refresh rate (ProMotion 120 Hz used to run the
-// game twice as fast) and of tab visibility (hidden tabs now keep real
-// time — the town keeps working, which the welcome-back summary already
-// celebrates). Catch-up is capped; sim time beyond the cap is dropped.
+// game twice as fast) and of tab visibility. Visible-frame catch-up stays
+// tight for responsiveness; hidden tabs may recover up to four elapsed
+// seconds per timer pass. Longer stalls are dropped instead of freezing UI.
 const TICK_MS = 1000 / 60;
 const MAX_TICKS_PER_FRAME = 30;
 let _tickAccum = 0;
 let _lastTickTime = 0;
 
-function runPendingTicks(nowMs) {
+function runPendingTicks(nowMs, {
+  maxFrameMs = 500,
+  maxTicks = MAX_TICKS_PER_FRAME,
+} = {}) {
   if (_lastTickTime === 0) _lastTickTime = nowMs;
   let frameMs = nowMs - _lastTickTime;
   _lastTickTime = nowMs;
   if (frameMs < 0) frameMs = 0;
-  if (frameMs > 500) frameMs = 500; // debugger pause / long stall — drop the excess
+  if (frameMs > maxFrameMs) frameMs = maxFrameMs;
   if (G.speed <= 0) { _tickAccum = 0; return 0; }
   _tickAccum += (frameMs / TICK_MS) * G.speed;
   let n = Math.floor(_tickAccum);
-  if (n > MAX_TICKS_PER_FRAME) {
-    n = MAX_TICKS_PER_FRAME;
+  if (n > maxTicks) {
+    n = maxTicks;
     _tickAccum = 0;
   } else {
     _tickAccum -= n;
@@ -646,15 +736,20 @@ function fastForward(days) {
   const targetDay = startDay + Math.floor(days);
   // Phase 0 rewrite: coreTick() is exactly one tick, so fast-forward is a
   // plain tick loop — no speed tricks. dayPhase advances 1/tick, so every
-  // dayPhase-window story beat (the old Loop 291 hack) is sampled naturally
-  // by the %60 checkStoryBeats gate.
+  // dayPhase-window story beats are sampled naturally by coreTick's
+  // deterministic story@60 system.
   const maxIters = days * G.dayLength * 2 + 100;
   let iters = 0;
   while (G.day < targetDay && iters < maxIters) {
     coreTick();
-    if (G.gameTick % 60 === 0) { checkStoryBeats(); checkAchievements(); }
+    // Fast-forward intentionally skips the browser shell. Core systems may
+    // emit presentation descriptors, so discard that resettable queue instead
+    // of retaining days of invisible effects until render/save.
+    if ((iters & 255) === 255 && G.particles.length) G.particles.length = 0;
+    if (G.gameTick % 60 === 0) checkAchievements();
     iters++;
   }
+  G.particles.length = 0;
   return {
     advancedDays: G.day - startDay,
     gameTick: G.gameTick,
@@ -709,6 +804,11 @@ let _postFxSuspendedUntil = 0;
 let _postFxWasSuspended = false;
 const _MINIMAP_FRAME_INTERVAL = 6;
 const _POSTFX_SUSPEND_MS = 5000;
+// rAF follows the display refresh rate, but painting above roughly 60 fps
+// only repeats expensive canvas/post-processing work. Simulation still runs
+// on every rAF; this gate skips presentation work only.
+const _PAINT_INTERVAL_MS = 15.5;
+let _lastPaintMs = 0;
 
 function _setPostFxSuspended(suspended) {
   if (suspended === _postFxWasSuspended) return;
@@ -717,15 +817,55 @@ function _setPostFxSuspended(suspended) {
   if (post) post.style.display = suspended ? 'none' : '';
 }
 
-function _renderFrame({ allowPostFx = true, allowMinimap = true } = {}) {
-  const frameStart = performance.now();
-  // Follow camera (Phase 3d): glide after the founder; any manual pan
-  // fights it, so dragging is naturally dominant while held.
+function advanceFramePresentation(deltaMs) {
+  const frameScale = Math.max(0, Math.min(6, deltaMs / (1000 / 60)));
+
   if (G._followAvatar && G.avatar && !G.dragging) {
     const target = toScreen(G.avatar.x, G.avatar.y);
-    G.camera.x += (target.x - G.camera.x) * 0.10;
-    G.camera.y += (target.y - G.camera.y) * 0.10;
+    const follow = 1 - Math.pow(0.9, frameScale);
+    G.camera.x += (target.x - G.camera.x) * follow;
+    G.camera.y += (target.y - G.camera.y) * follow;
   }
+
+  if (!G.clouds) {
+    G.clouds = [
+      { x: 100, y: 100, r: 180, vx: 0.15, alpha: 0.18 },
+      { x: 400, y: 300, r: 220, vx: 0.12, alpha: 0.15 },
+      { x: 700, y: 500, r: 160, vx: 0.18, alpha: 0.22 },
+      { x: 1000, y: 800, r: 200, vx: 0.14, alpha: 0.16 },
+    ];
+  }
+  for (const cloud of G.clouds) {
+    cloud.x += cloud.vx * G.speed * frameScale;
+    if (cloud.x > 3000) cloud.x = -500;
+  }
+
+  for (let i = G.birds.length - 1; i >= 0; i--) {
+    const bird = G.birds[i];
+    bird.x += bird.vx * frameScale;
+    bird.y += (bird.vy || 0) * frameScale;
+    if (bird.x > window.innerWidth + 50) G.birds.splice(i, 1);
+  }
+
+  if (G.weather === 'rain' || G.weather === 'storm') {
+    if (!G._lightningTimer) G._lightningTimer = 300 + Math.random() * 600;
+    G._lightningTimer -= frameScale;
+    if (G._lightningTimer <= 0) {
+      G._lightningFlash = 3;
+      G._lightningTimer = 300 + Math.random() * 600;
+    }
+  } else {
+    G._lightningTimer = null;
+    G._lightningFlash = 0;
+  }
+  G._lightningFlash = Math.max(0, G._lightningFlash - frameScale);
+  G.cameraShake = Math.max(0, G.cameraShake - 0.5 * frameScale);
+  G.raidFlash = Math.max(0, G.raidFlash - 0.018 * frameScale);
+}
+
+function _renderFrame({ allowPostFx = true } = {}) {
+  const frameStart = performance.now();
+  advanceFramePresentation(G._renderDeltaMs || (1000 / 60));
   render();
   const now = performance.now();
   const postFxSuspended = now < _postFxSuspendedUntil;
@@ -733,12 +873,12 @@ function _renderFrame({ allowPostFx = true, allowMinimap = true } = {}) {
   if (allowPostFx && !postFxSuspended) {
     applyPostFX(canvas, G.gameTick, getDaylight(), getSeasonIndex());
   }
-  if (allowMinimap && (_loopFrame - _lastMinimapFrame >= _MINIMAP_FRAME_INTERVAL)) {
+  if (_loopFrame - _lastMinimapFrame >= _MINIMAP_FRAME_INTERVAL) {
     renderMinimap();
     _lastMinimapFrame = _loopFrame;
   }
   _applyRealmEndFilter();
-  _publishRuntimeCapture(now);
+  _publishRuntimeCapture();
 
   const frameMs = performance.now() - frameStart;
   _perfAvgMs = _perfAvgMs * 0.92 + frameMs * 0.08;
@@ -759,26 +899,40 @@ function gameLoop() {
       const loopStart = performance.now();
       if (_lastLoopStart > 0) {
         const rafMs = loopStart - _lastLoopStart;
+        G._renderDeltaMs = Math.max(1, Math.min(100, rafMs));
         _rafAvgMs = _rafAvgMs * 0.90 + rafMs * 0.10;
         if (_rafAvgMs > 34) {
           _postFxSuspendedUntil = loopStart + _POSTFX_SUSPEND_MS;
         }
+      } else {
+        G._renderDeltaMs = 1000 / 60;
       }
       _lastLoopStart = loopStart;
-      _loopFrame++;
       runPendingTicks(loopStart);
-      _renderFrame();
+      const sincePaint = loopStart - _lastPaintMs;
+      if (sincePaint >= _PAINT_INTERVAL_MS) {
+        const presentationDelta = _lastPaintMs > 0 ? sincePaint : (1000 / 60);
+        _lastPaintMs = loopStart - (sincePaint % _PAINT_INTERVAL_MS);
+        // Presentation state advances at paint cadence, not rAF cadence. On a
+        // 120 Hz display this is about two rAF intervals per painted frame.
+        G._renderDeltaMs = Math.max(1, Math.min(100, presentationDelta));
+        _loopFrame++;
+        if (!G.debug?.pauseRendering) _renderFrame();
+      }
       requestAnimationFrame(gameLoop);
     } else {
       // Hidden tab: rAF is throttled off, so drive the same accumulator on a
-      // timer. Real elapsed time still converts to ticks (capped), so the
-      // town keeps working at true speed in the background.
-      runPendingTicks(performance.now());
+      // timer with a larger bounded catch-up window.
+      runPendingTicks(performance.now(), {
+        maxFrameMs: 4000,
+        maxTicks: 240 * Math.max(1, G.speed),
+      });
       // Always paint at the hidden-tab cadence (timer-clamped to ~1-4fps):
       // embedded/preview contexts report 'hidden' while still being watched,
       // and returning to a never-painted canvas reads as frozen citizens.
+      G._renderDeltaMs = 250;
       _loopFrame++;
-      _renderFrame({ allowMinimap: false });
+      if (!G.debug?.pauseRendering) _renderFrame();
       setTimeout(gameLoop, 250);
     }
   } catch (e) {

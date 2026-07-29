@@ -2,7 +2,8 @@
 // Particles — floating resource numbers, smoke, sparkles
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=157';
+import { G } from './state.js?realm=166';
+import { workersForBuilding } from './citizen-ownership.js?realm=166';
 
 export function updateParticles() {
   for (let i = G.particles.length - 1; i >= 0; i--) {
@@ -47,25 +48,6 @@ export function updateParticles() {
   }
 }
 
-// Shared melee-impact burst: called from BOTH soldier strikes and raider
-// counter-attacks so hits read identically in both directions.
-export function spawnClashFX(tx, ty) {
-  G.particles.push({
-    tx, ty, offsetY: -10,
-    text: '⚔️', alpha: 1.1, vy: -0.2, decay: 0.05, type: 'text',
-  });
-  for (let k = 0; k < 4; k++) {
-    const ang = (k / 4) * Math.PI * 2 + Math.random() * 0.5;
-    G.particles.push({
-      tx, ty, offsetY: -8,
-      text: null, alpha: 1.0,
-      vx: Math.cos(ang) * 0.22, vy: Math.sin(ang) * 0.22 - 0.08,
-      decay: 0.08, type: 'spark',
-      size: 1.1, color: k === 0 ? '#ffcc00' : '#ffffff',
-    });
-  }
-}
-
 export function spawnSmoke(tx, ty) {
   G.particles.push({
     tx: tx + (Math.random() - 0.5) * 0.1,
@@ -80,23 +62,6 @@ export function spawnSmoke(tx, ty) {
   });
 }
 
-export function spawnDust(tx, ty) {
-  for (let i = 0; i < 8; i++) {
-    G.particles.push({
-      tx: tx + (Math.random() - 0.5) * 0.6,
-      ty: ty + (Math.random() - 0.5) * 0.6,
-      offsetY: -5 - Math.random() * 10,
-      text: null,
-      alpha: 0.5 + Math.random() * 0.3,
-      vy: -0.2 - Math.random() * 0.15,
-      decay: 0.008 + Math.random() * 0.005,
-      type: 'dust',
-      size: 1.5 + Math.random() * 2,
-      vx: (Math.random() - 0.5) * 0.3,
-    });
-  }
-}
-
 export function updateSmokeEmitters() {
   // Early exit if too many particles
   if (G.particles.length > 400) return;
@@ -105,7 +70,7 @@ export function updateSmokeEmitters() {
     if (b.type === 'house' || b.type === 'tavern' || b.type === 'lumber') {
       if (G.particles.length < 200) spawnSmoke(b.x, b.y);
     }
-    if (b.type === 'blacksmith' && b.workers && b.workers.length > 0) {
+    if (b.type === 'blacksmith' && workersForBuilding(b).length > 0) {
       if (G.particles.length < 250) {
         // Dark forge smoke
         spawnSmoke(b.x, b.y);
@@ -139,28 +104,6 @@ export function updateSmokeEmitters() {
       decay: 0.002,
       type: 'snow',
       size: 1 + Math.random() * 1.5,
-    });
-  }
-
-  // Spring flower petals floating in the wind — DISABLED.
-  // User reported these as "little squares with circles that come down the
-  // center from time to time...seem out of place." They were pink/salmon/yellow
-  // ellipses drifting through the play area at a high spawn rate (every 12 ticks
-  // across 20x15 tile range).
-  if (false && G.season === 'spring' && G.gameTick % 12 === 0 && G.particles.length < 250) {
-    const cx = G.camera.x / 32, cy = G.camera.y / 16;
-    G.particles.push({
-      tx: cx + (Math.random() - 0.5) * 20,
-      ty: cy + (Math.random() - 0.5) * 15,
-      offsetY: -20 - Math.random() * 30,
-      text: null,
-      alpha: 0.5 + Math.random() * 0.3,
-      vy: 0.08 + Math.random() * 0.06,
-      decay: 0.002,
-      type: 'petal',
-      size: 1.5 + Math.random(),
-      vx: 0.02 + Math.random() * 0.02,
-      color: ['#ffb0c8','#ff90a8','#ffe066','#fff0f0'][Math.floor(Math.random()*4)],
     });
   }
 

@@ -1,0 +1,136 @@
+{
+  "candidate": "a2-layered2d",
+  "outputs": {
+    "proof/garment-ochre-work-right-source.png": {
+      "bytes": 233777,
+      "sha256": "5d29ba59153d425b7b04ba0ddc55746a9e4aea59ade2427a00ff87617adf5e1c"
+    },
+    "proof/garment-watch-blue-right-source.png": {
+      "bytes": 198893,
+      "sha256": "37735e2d25e7390cc35af03b44ba36e879c07968738e0edc7fc89bb2bd89ee94"
+    },
+    "proof/identity-craftsperson-right-source.png": {
+      "bytes": 209091,
+      "sha256": "7a9c1f81c3e0736001f179c59c672f28a2c8bd43f7588d544f37ac873ee553be"
+    },
+    "proof/identity-watchman-right-source.png": {
+      "bytes": 203849,
+      "sha256": "706aac36620b07525392ba5a36a0925c22e6bc68d969f30eee9aba75d172cf14"
+    },
+    "proof/right-source-parts.png": {
+      "bytes": 415968,
+      "sha256": "89eb0a3181e2622757d821cb4c58a4e73ab41f0036bc69de8c8a9f5d88859004"
+    },
+    "reports/crops.json": {
+      "bytes": 29267,
+      "sha256": "e4de6b960bf0976fae560c4a8edd01a566e898f86c9df7977ea89831a146786e"
+    }
+  },
+  "report": "reports/crops.json",
+  "schema": "realm.actor-pose.a2-source-preflight-manifest.v1",
+  "scope": {
+    "garments": [
+      "ochre-work",
+      "watch-blue"
+    ],
+    "generated_actor_rows": 0,
+    "identities": [
+      "craftsperson",
+      "watchman"
+    ],
+    "runtime": "none; source-readiness evidence only",
+    "views": [
+      "right"
+    ]
+  },
+  "sources": {
+    "files": {
+      "assets/sprites/prototypes/actor-pose/output/a2-layered2d/proof/carry-right-unlabeled-x1.gif": {
+        "bytes": 23489,
+        "owner": "frozen-reviewed-output",
+        "sha256": "e9fe0199ff891a39b962adce0ee12366964b5474a28253541beed1fa7a0ac8aa"
+      },
+      "assets/sprites/prototypes/actor-pose/output/a2-layered2d/rows/watchman/watch-blue/off/carry-right.png": {
+        "bytes": 15877,
+        "owner": "frozen-reviewed-output",
+        "sha256": "491bfcd0a3cb5b96c5371f31900531937448ce2219ce1e5b32cc30a64166da9c"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/README.md": {
+        "bytes": 3057,
+        "owner": "source-provenance",
+        "sha256": "cade32dc8664f1c66ab822cf437173aeca380908bf3f7af492812128a86a2774"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work-keyed.png": {
+        "bytes": 1648719,
+        "owner": "generation-provenance",
+        "sha256": "24bcf7a3eea0349416390e378f3cb0d86cea2ca3736eff51e893938fb5c4631f"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work.png": {
+        "bytes": 860223,
+        "owner": "garment",
+        "sha256": "a01506add562cfcd5bcc54fc86a64728fd7febc7bc600515bfc88b89db3f07e4"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue-keyed.png": {
+        "bytes": 1517082,
+        "owner": "generation-provenance",
+        "sha256": "d17113b8cc799b01832726c1b650d2d7f3358e12d19c49d486bc3434415f9cfc"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png": {
+        "bytes": 702824,
+        "owner": "garment",
+        "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson-keyed.png": {
+        "bytes": 1531892,
+        "owner": "generation-provenance",
+        "sha256": "0f69d684f8c1750ebd544e56275fdbad076faf55036739a3f82bafa576a9144e"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png": {
+        "bytes": 747013,
+        "owner": "identity",
+        "sha256": "fa6b11610b0e5cf67ae1c752a1ee7ecf39f462f0b2a74ed2e6af8af4549152bd"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman-keyed.png": {
+        "bytes": 1543875,
+        "owner": "generation-provenance",
+        "sha256": "4024420b50e0b463e7a93e2f6712a042db760c35532a87009346daf292df1072"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png": {
+        "bytes": 768222,
+        "owner": "identity",
+        "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca"
+      },
+      "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json": {
+        "bytes": 1337,
+        "owner": "human-review-authority",
+        "sha256": "52231d039b21da2d5d522e624bac8c8aa651f0cf377117f2aeeb7e523a0b4384"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/a2-contract.json": {
+        "bytes": 4970,
+        "owner": "source-contract",
+        "sha256": "0ef00a3138ecab336e53f3f37b7cc421bd09f0a2ab3c90ff51992a74b86f4593"
+      },
+      "scripts/actor-pose-prototype/a2_source_preflight.py": {
+        "bytes": 22289,
+        "owner": "preflight-implementation",
+        "sha256": "f0577e865ce55732463b423255a765ac54417febb18d2b7b78fccbab29c8fdcb"
+      }
+    },
+    "generation_sources_are_provenance_only": true,
+    "network_required": false,
+    "source_hash": "0d6ea4af9ad962bbafd63a3cf40e241c79d110b1ce22a7f3ace0f1e53ab6d2a5"
+  },
+  "status": "source-parts-ready-reference-cutover-pending",
+  "toolchain": {
+    "pillow": "11.3.0",
+    "python": "3.9"
+  },
+  "verification": {
+    "byte_deterministic_second_pass": true,
+    "factorial_ready": false,
+    "failures": [],
+    "generated_actor_rows": 0,
+    "reference_cutover_required": true,
+    "source_preflight_passed": true
+  }
+}

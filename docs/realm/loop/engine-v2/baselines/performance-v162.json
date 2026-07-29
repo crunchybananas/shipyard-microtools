@@ -1,0 +1,444 @@
+{
+  "schema": "realm.engine-v2.performance-baseline",
+  "schemaVersion": 1,
+  "moduleRevision": 162,
+  "capturedAt": "2026-07-12T12:03:40.237Z",
+  "host": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpuModel": "Apple M4",
+    "logicalCpuCount": 10,
+    "node": "v22.22.0"
+  },
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36",
+    "hardwareConcurrency": 10,
+    "deviceMemory": 16,
+    "devicePixelRatio": 1,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "scenario": {
+    "placed": [
+      {
+        "type": "house",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 39
+      },
+      {
+        "type": "house",
+        "x": 39,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 41,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 41
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 38
+      },
+      {
+        "type": "house",
+        "x": 39,
+        "y": 39
+      },
+      {
+        "type": "house",
+        "x": 41,
+        "y": 39
+      },
+      {
+        "type": "house",
+        "x": 38,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 42,
+        "y": 40
+      },
+      {
+        "type": "house",
+        "x": 39,
+        "y": 41
+      },
+      {
+        "type": "house",
+        "x": 41,
+        "y": 41
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 42
+      },
+      {
+        "type": "house",
+        "x": 40,
+        "y": 37
+      },
+      {
+        "type": "house",
+        "x": 39,
+        "y": 38
+      },
+      {
+        "type": "farm",
+        "x": 41,
+        "y": 38
+      },
+      {
+        "type": "farm",
+        "x": 38,
+        "y": 39
+      },
+      {
+        "type": "farm",
+        "x": 42,
+        "y": 39
+      },
+      {
+        "type": "farm",
+        "x": 37,
+        "y": 40
+      },
+      {
+        "type": "lumber",
+        "x": 35,
+        "y": 40
+      },
+      {
+        "type": "lumber",
+        "x": 45,
+        "y": 40
+      },
+      {
+        "type": "lumber",
+        "x": 44,
+        "y": 41
+      },
+      {
+        "type": "quarry",
+        "x": 46,
+        "y": 40
+      },
+      {
+        "type": "quarry",
+        "x": 45,
+        "y": 41
+      },
+      {
+        "type": "quarry",
+        "x": 40,
+        "y": 33
+      },
+      {
+        "type": "mine",
+        "x": 39,
+        "y": 32
+      },
+      {
+        "type": "mine",
+        "x": 47,
+        "y": 38
+      },
+      {
+        "type": "storehouse",
+        "x": 43,
+        "y": 40
+      },
+      {
+        "type": "storehouse",
+        "x": 38,
+        "y": 41
+      },
+      {
+        "type": "granary",
+        "x": 42,
+        "y": 41
+      },
+      {
+        "type": "granary",
+        "x": 39,
+        "y": 42
+      },
+      {
+        "type": "market",
+        "x": 41,
+        "y": 42
+      },
+      {
+        "type": "market",
+        "x": 40,
+        "y": 43
+      },
+      {
+        "type": "tavern",
+        "x": 40,
+        "y": 36
+      },
+      {
+        "type": "tavern",
+        "x": 39,
+        "y": 37
+      },
+      {
+        "type": "school",
+        "x": 41,
+        "y": 37
+      },
+      {
+        "type": "school",
+        "x": 38,
+        "y": 38
+      },
+      {
+        "type": "blacksmith",
+        "x": 42,
+        "y": 38
+      },
+      {
+        "type": "blacksmith",
+        "x": 37,
+        "y": 39
+      },
+      {
+        "type": "barracks",
+        "x": 43,
+        "y": 39
+      },
+      {
+        "type": "archery",
+        "x": 36,
+        "y": 40
+      },
+      {
+        "type": "church",
+        "x": 44,
+        "y": 40
+      },
+      {
+        "type": "well",
+        "x": 37,
+        "y": 41
+      },
+      {
+        "type": "windmill",
+        "x": 43,
+        "y": 41
+      },
+      {
+        "type": "bakery",
+        "x": 38,
+        "y": 42
+      }
+    ],
+    "population": 63,
+    "buildings": 45
+  },
+  "finalState": {
+    "gameTick": 4200,
+    "day": 2,
+    "population": 66,
+    "buildings": 45,
+    "citizens": 66,
+    "soldiers": 7,
+    "enemies": 0,
+    "walkers": 6,
+    "caravans": 0,
+    "particles": 1162,
+    "activePaths": 10
+  },
+  "measurements": {
+    "coreBatchMs": {
+      "batchTicks": 120,
+      "samples": 20,
+      "min": 14,
+      "median": 18,
+      "p95": 23.899999976158142,
+      "max": 51.80000001192093,
+      "mean": 19.919999998807906
+    },
+    "coreMicrosecondsPerTick": {
+      "samples": 20,
+      "min": 116.66666666666667,
+      "median": 150,
+      "p95": 199.16666646798453,
+      "max": 431.6666667660077,
+      "mean": 165.9999999900659
+    },
+    "renderSteadyMs": {
+      "samples": 120,
+      "min": 24.19999998807907,
+      "median": 27.80000001192093,
+      "p95": 29.899999976158142,
+      "max": 31,
+      "mean": 27.94833333293597
+    },
+    "renderPassMs": {
+      "skyCamera": {
+        "samples": 120,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0.10000002384185791,
+        "mean": 0.0033333336313565573
+      },
+      "terrainFog": {
+        "samples": 120,
+        "min": 2.699999988079071,
+        "median": 2.900000035762787,
+        "p95": 4.199999988079071,
+        "max": 4.5,
+        "mean": 3.025833336512248
+      },
+      "entitiesWorld": {
+        "samples": 120,
+        "min": 20.900000035762787,
+        "median": 24.80000001192093,
+        "p95": 25.69999998807907,
+        "max": 26.5,
+        "mean": 24.869166662792363
+      },
+      "particles": {
+        "samples": 120,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0.10000002384185791,
+        "mean": 0.002500000596046448
+      },
+      "worldOverlays": {
+        "samples": 120,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0.10000002384185791,
+        "mean": 0.005000000198682149
+      },
+      "screenOverlays": {
+        "samples": 120,
+        "min": 0,
+        "median": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.20000004768371582,
+        "mean": 0.0424999992052714
+      }
+    },
+    "renderParticleStressMs": {
+      "particles": 1162,
+      "samples": 60,
+      "min": 30.30000001192093,
+      "median": 31.900000035762787,
+      "p95": 36.19999998807907,
+      "max": 38.10000002384186,
+      "mean": 32.77166666686535
+    },
+    "renderParticleStressPassMs": {
+      "skyCamera": {
+        "samples": 60,
+        "min": 0,
+        "median": 0,
+        "p95": 0.09999996423721313,
+        "max": 0.10000002384185791,
+        "mean": 0.009999999403953552
+      },
+      "terrainFog": {
+        "samples": 60,
+        "min": 4,
+        "median": 4.200000047683716,
+        "p95": 5.800000011920929,
+        "max": 7.699999988079071,
+        "mean": 4.603333328167597
+      },
+      "entitiesWorld": {
+        "samples": 60,
+        "min": 22.799999952316284,
+        "median": 26.900000035762787,
+        "p95": 29.299999952316284,
+        "max": 29.799999952316284,
+        "mean": 27.273333337903022
+      },
+      "particles": {
+        "samples": 60,
+        "min": 0.699999988079071,
+        "median": 0.800000011920929,
+        "p95": 1.199999988079071,
+        "max": 1.4000000357627869,
+        "mean": 0.8433333337306976
+      },
+      "worldOverlays": {
+        "samples": 60,
+        "min": 0,
+        "median": 0,
+        "p95": 0,
+        "max": 0.09999996423721313,
+        "mean": 0.001666666070620219
+      },
+      "screenOverlays": {
+        "samples": 60,
+        "min": 0,
+        "median": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.04000000158945719
+      }
+    },
+    "rafIntervalMs": {
+      "samples": 120,
+      "min": 16.599999999999454,
+      "median": 33.30000000000109,
+      "p95": 35.400000000001455,
+      "max": 50.099999999998545,
+      "mean": 33.62250000000001
+    },
+    "saveSerializeMs": {
+      "samples": 5,
+      "min": 7.699999988079071,
+      "median": 8.899999976158142,
+      "p95": 11,
+      "max": 14.899999976158142,
+      "mean": 10.179999983310699
+    },
+    "saveBytes": 238979,
+    "memory": {
+      "afterSetup": {
+        "label": "after-setup",
+        "gcCollectionMs": 5.601042000000007,
+        "jsHeapUsedBytes": 3500824,
+        "jsHeapTotalBytes": 4210688,
+        "jsHeapLimitBytes": 3760000000,
+        "domNodes": 4220,
+        "documents": 1,
+        "listeners": 142
+      },
+      "afterWorkload": {
+        "label": "after-workload",
+        "gcCollectionMs": 67.8990419999991,
+        "jsHeapUsedBytes": 6002644,
+        "jsHeapTotalBytes": 7094272,
+        "jsHeapLimitBytes": 3760000000,
+        "domNodes": 3959,
+        "documents": 1,
+        "listeners": 142
+      },
+      "retainedHeapDeltaBytes": 2501820
+    }
+  },
+  "interpretation": "Machine-specific descriptive baseline; no release budget is inferred from this sample."
+}

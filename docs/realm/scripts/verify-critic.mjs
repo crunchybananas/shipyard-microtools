@@ -3,7 +3,7 @@
 // + dawn/midday/dusk/night lighting variants. Reports atlas state + page
 // errors. Output PNGs land in scripts/screenshots/critic-*.png
 
-import { chromium } from '/Users/cloken/code/peel/admin/node_modules/playwright/index.mjs';
+import { chromium } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { mkdir } from 'node:fs/promises';
@@ -67,7 +67,6 @@ await page.evaluate(() => {
     const b = {
       type, x, y,
       hp: 100, maxHp: 100,
-      workers: [], assigned: [],
       buildProgress: 1,
       ...extra,
     };

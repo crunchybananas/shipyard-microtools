@@ -9,11 +9,12 @@
 // building) so raiders can level the site without erasing the work.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=157';
-import { chronicle } from './log.js?realm=157';
-import { announce as notify } from './log.js?realm=157';
-import { sfx as playSound } from './log.js?realm=157';
-import { emit } from './bus.js?realm=157';
+import { G } from './state.js?realm=166';
+import { chronicle } from './log.js?realm=166';
+import { announce as notify } from './log.js?realm=166';
+import { sfx as playSound } from './log.js?realm=166';
+import { emit } from './bus.js?realm=166';
+import { staffingCount } from './citizen-ownership.js?realm=166';
 
 export const WONDER_STAGES = [
   { name: 'The Foundations',  bill: { stone: 200, wood: 100 } },
@@ -32,7 +33,7 @@ const STAGE_BEATS = [
 
 function houseCount(minTier) {
   let n = 0;
-  for (const b of G.buildings) if (b.type === 'house' && (b.level || 1) >= minTier) n++;
+  for (const b of G.buildings) if (b.type === 'house' && b.level >= minTier) n++;
   return n;
 }
 
@@ -61,13 +62,13 @@ export function updateWonder() {
   const w = G.wonder;
   if (!w || !w.placed || G.realmEnded || w.stage >= WONDER_STAGES.length) return;
   const site = G.buildings.find(b => b.type === 'wonder');
-  if (!site || (site.buildProgress !== undefined && site.buildProgress < 1)) return;
+  if (!site || site.buildProgress < 1) return;
 
   const stage = WONDER_STAGES[w.stage];
   if (stage.homesteads && houseCount(3) < stage.homesteads) return;
   if (stage.manors && houseCount(4) < stage.manors) return;
 
-  const staffed = Math.min(site.workers.length, 4);
+  const staffed = Math.min(staffingCount(site), 4);
   if (!staffed) return;
 
   const manors = houseCount(4), homesteads = houseCount(3);
@@ -89,7 +90,7 @@ export function updateWonder() {
       moved += take;
     }
   }
-  if (moved > 0 && G.particles && G.particles.length < 280) {
+  if (moved > 0 && G.particles) {
     G.particles.push({ tx: site.x, ty: site.y, offsetY: -20, text: `+${moved}`, alpha: 1.2, vy: -0.15, decay: 0.012, type: 'text' });
   }
 

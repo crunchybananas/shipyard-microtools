@@ -1,0 +1,37 @@
+{
+  "schema": "realm.actor-pose.views.v1",
+  "projection": {
+    "type": "orthographic",
+    "frame_width": 64,
+    "frame_height": 84,
+    "frames_per_row": 8,
+    "pixels_per_unit": 18.25,
+    "screen_center_x": 32.0,
+    "ground_y": 80.0,
+    "supersample": 4
+  },
+  "views": {
+    "down": {"yaw_degrees": 0},
+    "up": {"yaw_degrees": 180},
+    "left": {"yaw_degrees": -90},
+    "right": {"yaw_degrees": 90}
+  },
+  "occlusion": {
+    "sort": "far-to-near projected depth, then stable primitive order",
+    "rear_threshold": -0.07,
+    "front_threshold": 0.07,
+    "layer_order": ["rear", "body", "front"]
+  },
+  "sockets": [
+    "root",
+    "foot_l",
+    "foot_r",
+    "head",
+    "hand_l",
+    "hand_r",
+    "tool",
+    "tool_tip",
+    "load",
+    "equipment"
+  ]
+}

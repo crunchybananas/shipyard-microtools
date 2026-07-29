@@ -1,0 +1,65 @@
+{
+  "schema": "realm.actor-pose.garment-kit.v1",
+  "kits": {
+    "guard": {
+      "kit": "watch-blue",
+      "palette": {
+        "cloth_deep": "#173f5c",
+        "cloth_shadow": "#205c80",
+        "cloth": "#2f82ad",
+        "cloth_light": "#60acd0",
+        "leather_deep": "#4c291c",
+        "leather": "#7f4a2b",
+        "leather_light": "#b07642",
+        "metal_deep": "#4f5960",
+        "metal": "#87959a",
+        "metal_light": "#c6d0cb",
+        "accent": "#d0a13c"
+      },
+      "parts": [
+        "steel-helmet",
+        "wide-blue-tunic",
+        "leather-belt",
+        "split-mail-skirt",
+        "brown-boots"
+      ],
+      "silhouette_rules": {
+        "helmet_horns": false,
+        "helmet_crest": true,
+        "tunic_split": true,
+        "shoulder_tabs": true
+      }
+    },
+    "builder": {
+      "kit": "ochre-workwear",
+      "palette": {
+        "cloth_deep": "#49382a",
+        "cloth_shadow": "#6a5234",
+        "cloth": "#866b42",
+        "cloth_light": "#b3985f",
+        "apron_deep": "#744414",
+        "apron": "#b46f22",
+        "apron_light": "#dc9b42",
+        "leather_deep": "#4c2d1d",
+        "leather": "#805232",
+        "leather_light": "#b27a48",
+        "metal_deep": "#596064",
+        "metal": "#8c9697",
+        "metal_light": "#c3cbc4"
+      },
+      "parts": [
+        "soft-ochre-cap",
+        "rolled-sleeve-shirt",
+        "long-split-apron",
+        "tool-belt",
+        "reinforced-boots"
+      ],
+      "silhouette_rules": {
+        "cap_brim": true,
+        "apron_split": true,
+        "belt_pouches": true,
+        "rolled_sleeves": true
+      }
+    }
+  }
+}

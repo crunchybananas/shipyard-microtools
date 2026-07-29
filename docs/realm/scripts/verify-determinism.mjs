@@ -1,170 +1,224 @@
-// Golden-master determinism gate (ENGINE.md Phase 2c).
+// Non-vacuous deterministic replay gate for the one canonical Realm graph.
 //
-// Boots the CORE headless in Node — no DOM, no canvas, zero bus
-// subscribers — runs 12 game-days of coreTick() with a scripted
-// command log, and hashes the sim-relevant state. The gate holds when:
-//   • two runs with the same seed produce IDENTICAL hashes, and
-//   • a different seed produces a DIFFERENT hash.
-// Same seed + same command log → identical state is the property that
-// makes multiplayer sync verifiable and the native port testable.
-//
-// Each run executes in a child process because G is module-level state
-// (one coherent module graph per process).
-//
-// Usage: node docs/realm/scripts/verify-determinism.mjs
+// Four fresh processes prove:
+//   1. exact executed state at tick 43,200 and a real midpoint checkpoint;
+//   2. byte-identical canonical results for same seed + same commands;
+//   3. different seeds change the derived terrain map (not a seed field);
+//   4. one extra accepted command changes world state even though command-log
+//      and test-label metadata are excluded from the world hash.
 
 import { spawnSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import runtimeContract from '../runtime-contract.json?realm=166' with { type: 'json' };
+import {
+  CORE_SYSTEM_ORDER,
+  canonicalJson,
+  hashCanonical,
+  strictCanonicalize,
+} from './determinism-harness.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const fixtureFile = join(
+  __dirname,
+  'fixtures',
+  'determinism',
+  `simulation-v${runtimeContract.simulationVersion}.json`,
+);
+const WRITE_FIXTURE = process.argv.includes('--write');
 
-// ── Child mode: actually run the sim ────────────────────────────────
-if (process.env.REALM_DET_CHILD) {
-  const seed = Number(process.env.REALM_DET_SEED);
-  const { createHash } = await import('node:crypto');
-  const { G, setSeed, getSeed } = await import('../js/state.js?realm=135');
-  const { generateWorld } = await import('../js/world.js?realm=135');
-  const { coreTick } = await import('../js/sim.js?realm=135');
-  const { dispatch } = await import('../js/commands.js?realm=135');
-  const { canPlace } = await import('../js/economy.js?realm=135');
-  const { initChronicle } = await import('../js/log.js?realm=135');
-
-  setSeed(seed);
-  generateWorld();
-  initChronicle();
-  G.resources = { wood: 500, stone: 500, food: 500, gold: 500, iron: 50, wheat: 0, flour: 0, planks: 0, tools: 0 };
-
-  // Deterministic placement helper: spiral out from map center, first
-  // legal tile wins. Same seed → same map → same spot.
-  const CX = 40, CY = 40;
-  function findSpot(type) {
-    for (let r = 0; r < 25; r++) {
-      for (let dy = -r; dy <= r; dy++) {
-        for (let dx = -r; dx <= r; dx++) {
-          if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
-          if (canPlace(type, CX + dx, CY + dy)) return { x: CX + dx, y: CY + dy };
-        }
-      }
-    }
-    return null;
-  }
-
-  const script = [
-    { at: 10,   type: 'house' },
-    { at: 40,   type: 'house' },
-    { at: 90,   type: 'farm' },
-    { at: 140,  type: 'lumber' },
-    { at: 200,  type: 'well' },
-    { at: 260,  type: 'granary' },
-    { at: 400,  type: 'quarry' },
-    { at: 900,  research: 'masonry' },
-    { at: 1200, type: 'market' },
-    { at: 5000, research: 'commerce' },
-    { at: 9000, type: 'tavern' },
-    { at: 600,  avatar: { x: 48, y: 48 } },   // founder scouts south-east
-    { at: 14000, avatar: { x: 34, y: 36 } },  // and wanders back
-  ];
-
-  const TICKS = 12 * G.dayLength; // 12 game-days: crosses events (day 4+) and raids (day 8)
-  const applied = [];
-  for (let t = 1; t <= TICKS; t++) {
-    for (const cmd of script) {
-      if (cmd.at !== t) continue;
-      let res;
-      if (cmd.type) {
-        const spot = findSpot(cmd.type);
-        res = spot ? dispatch({ type: 'PLACE_BUILDING', building: cmd.type, x: spot.x, y: spot.y }) : { ok: false, reason: 'no-spot' };
-      } else if (cmd.avatar) {
-        res = dispatch({ type: 'AVATAR_GOTO', x: cmd.avatar.x, y: cmd.avatar.y });
-      } else {
-        res = dispatch({ type: 'START_RESEARCH', tech: cmd.research });
-      }
-      applied.push(`${t}:${cmd.type || cmd.research || 'avatar-goto'}:${res.ok ? 'ok' : res.reason}`);
-    }
-    coreTick();
-  }
-
-  // ── Hash the sim-relevant state ────────────────────────────────────
-  // Excluded on purpose: particles (cosmetic), chronicle/notificationLog
-  // (narrative text, host-owned in MP), storyFlags/namedCharacters
-  // (written by shell-side story beats), fog (derived; summarized as a
-  // count), camera (client-local), tileWear (cosmetic).
-  function stable(v) {
-    if (Array.isArray(v)) return v.map(stable);
-    if (v && typeof v === 'object') {
-      const o = {};
-      for (const k of Object.keys(v).sort()) o[k] = stable(v[k]);
-      return o;
-    }
-    return v;
-  }
-  const snapshot = {
-    seed: getSeed(),
-    tick: G.gameTick, day: G.day, dayPhase: G.dayPhase,
-    resources: G.resources,
-    population: G.population, maxPop: G.maxPop,
-    happiness: G.happiness, defense: G.defense,
-    era: G.era, won: G.won,
-    nextRaidDay: G.nextRaidDay, raidInterval: G.raidInterval,
-    fogOpen: G.fog.flat().filter(Boolean).length,
-    buildings: G.buildings.map(b => [b.type, b.x, b.y, +b.hp.toFixed(4), b.level || 1, b.prodTimer, (b.workers || []).length, +(b.buildProgress ?? 1).toFixed(4)]),
-    citizens: G.citizens.map(c => [+c.x.toFixed(4), +c.y.toFixed(4), c.state, Math.round(c.hunger), c.carrying || '', c.carryAmount || 0]),
-    soldiers: G.soldiers.map(s => [s.type, +s.x.toFixed(4), +s.y.toFixed(4), s.hp]),
-    avatar: G.avatar ? [+G.avatar.x.toFixed(4), +G.avatar.y.toFixed(4)] : null,
-    enemies: G.enemies.map(e => [+e.x.toFixed(4), +e.y.toFixed(4), e.hp, e.state]),
-    walkers: G.walkers.length,
-    caravans: G.caravans.map(c => [c.phase, +c.x.toFixed(4), +c.y.toFixed(4), c.gold]),
-    techs: [...G.researchedTechs].sort(),
-    research: G.currentResearch ? [G.currentResearch.techId, Math.round(G.currentResearch.progress)] : null,
-    event: G.activeEvent ? [G.activeEvent.id, G.activeEvent.endDay] : null,
-    modifiers: G.eventModifiers,
-    wonder: G.wonder,
-    stats: { born: G.stats.citizensBorn, died: G.stats.citizensDied, raids: G.stats.raidsFaced, gold: G.stats.goldEarned },
-    commands: (G._commandLog || []).length,
-    applied,
-  };
-  const json = JSON.stringify(stable(snapshot));
-  const hash = createHash('sha256').update(json).digest('hex');
-  console.log(JSON.stringify({ hash, tick: G.gameTick, day: G.day, pop: G.population, buildings: G.buildings.length, applied }));
+if (process.env.REALM_DETERMINISM_CHILD === '1') {
+  const { runDeterminismScenario } = await import('./determinism-harness.mjs');
+  const result = runDeterminismScenario({
+    seed: Number(process.env.REALM_DETERMINISM_SEED),
+    changedCommand: process.env.REALM_DETERMINISM_CHANGED === '1',
+    hostileParticleSchedule: process.env.REALM_DETERMINISM_PARTICLES === '1',
+    mutateChronicle: process.env.REALM_DETERMINISM_CHRONICLE === '1',
+  });
+  process.stdout.write(`REALM_DETERMINISM_RESULT=${canonicalJson(result)}\n`);
   process.exit(0);
 }
 
-// ── Parent mode: orchestrate three runs and compare ─────────────────
-function run(seed) {
-  const r = spawnSync(process.execPath, [__filename], {
-    env: { ...process.env, REALM_DET_CHILD: '1', REALM_DET_SEED: String(seed) },
+function fail(message, detail = '') {
+  console.error(`  ✗ ${message}${detail ? ` — ${detail}` : ''}`);
+  failures++;
+}
+
+function pass(message) {
+  console.log(`  ✓ ${message}`);
+}
+
+function equal(actual, expected, label) {
+  const a = canonicalJson(actual);
+  const e = canonicalJson(expected);
+  if (a !== e) {
+    fail(label, `expected ${e}, got ${a}`);
+    return false;
+  }
+  pass(label);
+  return true;
+}
+
+function run(seed, changedCommand = false, hostileParticleSchedule = false, mutateChronicle = false) {
+  const child = spawnSync(process.execPath, [fileURLToPath(import.meta.url)], {
+    env: {
+      ...process.env,
+      REALM_DETERMINISM_CHILD: '1',
+      REALM_DETERMINISM_SEED: String(seed),
+      REALM_DETERMINISM_CHANGED: changedCommand ? '1' : '0',
+      REALM_DETERMINISM_PARTICLES: hostileParticleSchedule ? '1' : '0',
+      REALM_DETERMINISM_CHRONICLE: mutateChronicle ? '1' : '0',
+    },
     encoding: 'utf8',
     timeout: 120_000,
+    maxBuffer: 4 * 1024 * 1024,
   });
-  if (r.status !== 0) {
-    console.error(`[determinism] child (seed ${seed}) failed:\n${r.stderr || r.stdout}`);
-    process.exit(1);
+  if (child.status !== 0) {
+    throw new Error(`child seed=${seed} changed=${changedCommand} failed:\n${child.stderr || child.stdout}`);
   }
-  const line = r.stdout.trim().split('\n').pop();
-  return JSON.parse(line);
+  const line = child.stdout.split('\n').find(value => value.startsWith('REALM_DETERMINISM_RESULT='));
+  if (!line) throw new Error(`child seed=${seed} did not emit a result:\n${child.stdout}`);
+  return JSON.parse(line.slice('REALM_DETERMINISM_RESULT='.length));
+}
+
+let failures = 0;
+console.log('[determinism] strict canonicalizer…');
+equal(strictCanonicalize({ z: 1, a: [true, null] }), { a: [true, null], z: 1 }, 'sorts object keys without changing values');
+for (const [label, value] of [
+  ['undefined', { bad: undefined }],
+  ['function', { bad() {} }],
+  ['non-finite number', { bad: Infinity }],
+  ['negative zero', { bad: -0 }],
+  ['Map', new Map([['a', 1]])],
+  ['Set', new Set(['a'])],
+  ['cycle', (() => { const value = {}; value.self = value; return value; })()],
+  ['sparse array', (() => { const value = []; value.length = 1; return value; })()],
+  ['symbol-keyed property', { [Symbol('hidden')]: true }],
+]) {
+  try {
+    strictCanonicalize(value);
+    fail(`rejects ${label}`);
+  } catch {
+    pass(`rejects ${label}`);
+  }
+}
+
+const pathWithGoalA = [{ x: 1, y: 2 }];
+pathWithGoalA.goal = { x: 8, y: 9 };
+const pathWithGoalB = [{ x: 1, y: 2 }];
+pathWithGoalB.goal = { x: 9, y: 9 };
+equal(strictCanonicalize(pathWithGoalA), {
+  $array: [{ x: 1, y: 2 }],
+  $properties: { goal: { x: 8, y: 9 } },
+}, 'preserves named enumerable array properties such as path.goal');
+if (hashCanonical(pathWithGoalA) !== hashCanonical(pathWithGoalB)) pass('named array properties affect canonical hashes');
+else fail('named array properties were erased from canonical hashes');
+
+equal(CORE_SYSTEM_ORDER, runtimeContract.coreSystemOrder, 'executable system order matches runtime-contract.json');
+
+let fixture = WRITE_FIXTURE ? null : JSON.parse(readFileSync(fixtureFile, 'utf8'));
+if (fixture && fixture.simulationVersion !== runtimeContract.simulationVersion) {
+  fail('fixture simulation version matches runtime contract');
 }
 
 console.log('[determinism] run A (seed 12345)…');
 const a = run(12345);
-console.log(`  day ${a.day}, pop ${a.pop}, ${a.buildings} buildings, cmds: ${a.applied.join(' | ')}`);
-console.log('[determinism] run B (seed 12345, repeat)…');
+console.log(`[determinism] run B (seed 12345 repeat)…`);
 const b = run(12345);
-console.log('[determinism] run C (seed 99999, control)…');
+console.log('[determinism] run C (seed 99999 derived-map control)…');
 const c = run(99999);
+console.log('[determinism] run D (seed 12345 + accepted SET_RALLY)…');
+const d = run(12345, true);
+console.log('[determinism] run E (seed 12345 + hostile shell particle schedule)…');
+const e = run(12345, false, true);
+console.log('[determinism] run F (seed 12345 + changed chronicle history)…');
+const f = run(12345, false, false, true);
 
-let failed = false;
-if (a.hash === b.hash) {
-  console.log(`✓ same seed + same commands → identical hash (${a.hash.slice(0, 16)}…)`);
-} else {
-  console.error('✗ REPLAY DIVERGENCE: identical runs produced different hashes');
-  console.error(`  A: ${a.hash}\n  B: ${b.hash}`);
-  failed = true;
+if (WRITE_FIXTURE) {
+  fixture = {
+    simulationVersion: runtimeContract.simulationVersion,
+    commandCount: a.commandCount,
+    applied: a.applied,
+    checkpoint: a.checkpoints[0],
+    finalPopulation: a.population,
+    finalBuildings: a.buildings,
+    mapFingerprint: a.mapFingerprint,
+    worldHash: a.worldHash,
+    replayHash: a.replayHash,
+    story: a.story,
+  };
+  writeFileSync(fixtureFile, `${JSON.stringify(fixture, null, 2)}\n`, 'utf8');
+  pass(`wrote reviewed simulation-v${runtimeContract.simulationVersion} fixture`);
 }
-if (a.hash !== c.hash) {
-  console.log('✓ different seed → different hash (control)');
+
+equal({ tick: a.tick, day: a.day, dayPhase: a.dayPhase }, { tick: 43200, day: 13, dayPhase: 0 }, 'executes exactly twelve complete game days');
+equal(a.identity, { rootEqualsCommands: true, rootEqualsCore: true }, 'root imports, dispatch(), and coreTick() share the exact G object');
+equal(a.contract, {
+  simulationVersion: runtimeContract.simulationVersion,
+  coreSystemOrderVersion: runtimeContract.coreSystemOrderVersion,
+}, 'child executed the authoritative runtime contract');
+equal(a.applied, fixture.applied, 'all scripted command outcomes and placements match exactly');
+equal(a.commandCount, fixture.commandCount, 'accepted command-log count matches exactly');
+equal(a.checkpoints, [fixture.checkpoint], 'tick 21,600 checkpoint matches exact state and hash');
+equal(a.buildings, fixture.finalBuildings, 'final building state matches exactly and is non-empty');
+if (!a.buildings.length) fail('final building state is non-empty');
+else pass(`final building state is non-empty (${a.buildings.length})`);
+equal({
+  population: a.population,
+  mapFingerprint: a.mapFingerprint,
+  worldHash: a.worldHash,
+  replayHash: a.replayHash,
+}, {
+  population: fixture.finalPopulation,
+  mapFingerprint: fixture.mapFingerprint,
+  worldHash: fixture.worldHash,
+  replayHash: fixture.replayHash,
+}, 'golden simulation and replay hashes match');
+equal(a.story, fixture.story, 'story milestones run at exact deterministic core ticks');
+
+if (canonicalJson(a) === canonicalJson(b)) pass('same seed + commands produce byte-identical canonical results');
+else fail('same seed + commands diverged', `${a.worldHash} != ${b.worldHash}`);
+
+if (a.mapFingerprint !== c.mapFingerprint) {
+  pass('different seed changes terrain-derived map fingerprint (seed value is not hashed)');
 } else {
-  console.error('✗ CONTROL FAILURE: different seeds produced the same hash — hash is not sensitive');
-  failed = true;
+  fail('different seed did not change terrain-derived map fingerprint');
 }
-if (failed) { console.error('[determinism] FAILED'); process.exit(1); }
-console.log('[determinism] OK — core is headless and deterministic');
+
+if (canonicalJson(a) === canonicalJson(e)) {
+  pass('initial particle saturation and shell queue evolution cannot alter core state or RNG');
+} else {
+  fail('shell-owned particle evolution leaked into authoritative simulation', `${a.replayHash} != ${e.replayHash}`);
+}
+
+if (f.worldHash !== a.worldHash && f.replayHash !== a.replayHash) {
+  pass('future-affecting chronicle history participates in simulation and replay hashes');
+} else {
+  fail('chronicle history was erased from a future-state hash');
+}
+
+const changedApplication = d.applied.find(command => command.label === 'set-rally');
+equal(changedApplication, {
+  at: 15000,
+  label: 'set-rally',
+  ok: true,
+  reason: null,
+  spot: null,
+}, 'changed control command is accepted');
+equal(d.changedCommandState, {
+  armyStance: 'rally',
+  rallyPoint: { x: 31, y: 37 },
+}, 'accepted changed command has an asserted world-state consequence');
+equal(d.commandCount, a.commandCount + 1, 'changed run records exactly one additional accepted command');
+if (d.worldHash !== a.worldHash) {
+  pass('accepted command changes simulation-state hash with command/test metadata excluded');
+} else {
+  fail('accepted command did not change metadata-free simulation state');
+}
+
+if (failures) {
+  console.error(`[determinism] FAILED — ${failures} assertion${failures === 1 ? '' : 's'}`);
+  process.exit(1);
+}
+console.log(`[determinism] OK — tick ${a.tick}, day ${a.day}, ${a.buildings.length} buildings, ${a.commandCount} accepted commands`);

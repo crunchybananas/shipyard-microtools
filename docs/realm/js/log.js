@@ -8,12 +8,12 @@
 // (notifications.js, audio.js, main.js).
 //
 // Core files import these as drop-in aliases:
-//   import { announce as notify } from './log.js?realm=157';
-//   import { sfx as playSound } from './log.js?realm=157';
+//   import { announce as notify } from './log.js?realm=159';
+//   import { sfx as playSound } from './log.js?realm=159';
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS } from './state.js?realm=157';
-import { emit } from './bus.js?realm=157';
+import { G, BUILDINGS } from './state.js?realm=166';
+import { emit } from './bus.js?realm=166';
 
 // ── Chronicle (moved verbatim from story.js — pure data logic) ──────
 const _EVICTION_IMMUNE_TAGS = new Set(['nightmare', 'stone', 'victory', 'requiem', 'era']);
@@ -22,6 +22,7 @@ export function initChronicle() {
   if (!G.chronicle) G.chronicle = [];
   if (!G.storyFlags) G.storyFlags = {};
   if (!G.namedCharacters) G.namedCharacters = {};
+  if (!G.storyState) G.storyState = { lastProverbSeason: null, raid: null };
 }
 
 export function chronicle(text, tag = 'misc') {

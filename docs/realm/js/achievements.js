@@ -2,8 +2,8 @@
 // Achievements — persistent milestones with toast notifications
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=157';
-import { playSound } from './audio.js?realm=157';
+import { G } from './state.js?realm=166';
+import { playSound } from './audio.js?realm=166';
 
 const STORAGE_KEY = 'realm-achievements';
 
@@ -31,8 +31,8 @@ export const ACHIEVEMENTS = [
   { id:'victory',         icon:'👑', name:'Realm Complete',     desc:'Raise the Hall of Ages and win the realm', check:()=>G.won },
   { id:'age_of_crown',    icon:'🌅', name:'Age of the Crown',   desc:'Enter the third and final age',         check:()=>(G.era||1)>=3 },
   { id:'wonder_begun',    icon:'🕍', name:'Foundations of Eternity', desc:'Complete the first stage of the Hall of Ages', check:()=>(G.wonder?.stage||0)>=1 },
-  { id:'peaceful_won',    icon:'🌾', name:'Peaceful Victor',    desc:'Complete the Peaceful Valley scenario',  check:()=>G._scenariosCompleted?.includes('peaceful_start') },
-  { id:'military_won',    icon:'⚔️', name:'War Hero',           desc:'Complete the Rise of the Sword scenario', check:()=>G._scenariosCompleted?.includes('military_rise') },
+  { id:'peaceful_won',    icon:'🌾', name:'Peaceful Victor',    desc:'Complete the Peaceful Valley scenario',  check:()=>G.stats.scenariosWon.includes('peaceful_start') },
+  { id:'military_won',    icon:'⚔️', name:'War Hero',           desc:'Complete the Rise of the Sword scenario', check:()=>G.stats.scenariosWon.includes('military_rise') },
   { id:'day_50',          icon:'📅', name:'Elder',              desc:'Survive 50 days',                          check:()=>G.day>=50 },
   { id:'day_100',         icon:'🌟', name:'Century',            desc:'Survive 100 days',                         check:()=>G.day>=100 },
   { id:'kill_10_enemies', icon:'⚔️', name:'Defender',           desc:'Defeat 10 enemies',                        check:()=>(G.stats?.enemiesKilled||0)>=10 },
@@ -76,8 +76,6 @@ export function checkAchievements() {
     } catch {}
   }
 }
-
-export function getUnlockedCount() { return unlocked.size; }
 
 function showAchievementToast(a) {
   const el = document.getElementById('achievement-toast');

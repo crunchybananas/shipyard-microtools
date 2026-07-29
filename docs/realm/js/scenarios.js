@@ -2,7 +2,7 @@
 // Scenarios — structured objective-based campaigns
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=157';
+import { G } from './state.js?realm=166';
 
 export const SCENARIOS = [
   {
@@ -16,7 +16,6 @@ export const SCENARIOS = [
     ],
     startResources: { wood: 100, stone: 50, food: 100, gold: 30, iron: 0 },
     raidStart: 30,
-    raidIntervalMult: 1.5,
   },
   {
     id: 'military_rise',
@@ -29,7 +28,6 @@ export const SCENARIOS = [
     ],
     startResources: { wood: 60, stone: 80, food: 80, gold: 50, iron: 20 },
     raidStart: 8,
-    raidIntervalMult: 0.8,
   },
   {
     id: 'merchant_kingdom',
@@ -42,7 +40,6 @@ export const SCENARIOS = [
     ],
     startResources: { wood: 80, stone: 40, food: 80, gold: 100, iron: 10 },
     raidStart: 20,
-    raidIntervalMult: 1.2,
   },
   {
     id: 'seafaring',
@@ -55,7 +52,6 @@ export const SCENARIOS = [
     ],
     startResources: { wood: 70, stone: 30, food: 60, gold: 40, iron: 5 },
     raidStart: 15,
-    raidIntervalMult: 1.0,
   },
   {
     id: 'industrial',
@@ -68,7 +64,6 @@ export const SCENARIOS = [
     ],
     startResources: { wood: 100, stone: 60, food: 100, gold: 40, iron: 0 },
     raidStart: 12,
-    raidIntervalMult: 1.0,
   },
 ];
 

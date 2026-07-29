@@ -1,0 +1,249 @@
+{
+  "schema": "realm.actor-pose-prototype.runtime-profile/v2",
+  "candidate": "a-layered2d",
+  "machine": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "chromium": "147.0.7727.15"
+  },
+  "workload": {
+    "viewport": [
+      1280,
+      720
+    ],
+    "frameSize": [
+      64,
+      84
+    ],
+    "warmupFrames": 80,
+    "samplesPerScenario": 300,
+    "framesPerTimingSample": 10,
+    "timedFramesPerScenario": 3000,
+    "actorCounts": [
+      100,
+      250
+    ],
+    "completionDrain": {
+      "method": "createImageBitmap(full canvas), then close ImageBitmap",
+      "everySamples": 30,
+      "includedInCommandSubmissionTiming": false,
+      "note": "This bounds deferred canvas work between sample groups. The async surface snapshot is reported separately because including its copy would distort the game-like draw-command comparison."
+    }
+  },
+  "profiles": [
+    {
+      "mode": "flattened",
+      "isolation": {
+        "freshBrowserProcess": true,
+        "freshBrowserContext": true,
+        "freshMinimalPage": true,
+        "loadedOutputModes": [
+          "flattened"
+        ]
+      },
+      "browserVersion": "147.0.7727.15",
+      "encoded": {
+        "bytes": 199984,
+        "files": 16
+      },
+      "decoded": {
+        "bytes": 2752512,
+        "images": 16,
+        "estimate": "naturalWidth * naturalHeight * 4 RGBA bytes"
+      },
+      "memory": {
+        "before": {
+          "label": "before-mode-assets",
+          "forcedGc": true,
+          "jsHeapUsedBytes": 527424,
+          "jsHeapTotalBytes": 1048576,
+          "documents": 1,
+          "domNodes": 9,
+          "listeners": 0
+        },
+        "after": {
+          "label": "after-mode-profile",
+          "forcedGc": true,
+          "jsHeapUsedBytes": 680688,
+          "jsHeapTotalBytes": 1572864,
+          "documents": 1,
+          "domNodes": 26,
+          "listeners": 0
+        },
+        "delta": {
+          "jsHeapUsedBytes": 153264,
+          "jsHeapTotalBytes": 524288,
+          "documents": 0,
+          "domNodes": 17,
+          "listeners": 0
+        },
+        "caveat": "Forced-GC JS heap excludes browser-managed decoded texture and graphics memory; decoded RGBA bytes are reported separately."
+      },
+      "scenarios": [
+        {
+          "actors": 100,
+          "drawsPerActor": 1,
+          "drawsPerFrame": 100,
+          "commandSubmissionTiming": {
+            "samples": 300,
+            "minMs": 0.02999999523162842,
+            "medianMs": 0.03999999761581421,
+            "p95Ms": 0.05,
+            "maxMs": 0.06000000238418579,
+            "meanMs": 0.04076666665077204
+          },
+          "completionDrainTiming": {
+            "samples": 10,
+            "minMs": 1.2000000476837158,
+            "medianMs": 1.399999976158142,
+            "p95Ms": 1.8000000715255737,
+            "maxMs": 1.8000000715255737,
+            "meanMs": 1.4500000119209289
+          }
+        },
+        {
+          "actors": 250,
+          "drawsPerActor": 1,
+          "drawsPerFrame": 250,
+          "commandSubmissionTiming": {
+            "samples": 300,
+            "minMs": 0.07999999523162842,
+            "medianMs": 0.1,
+            "p95Ms": 0.1100000023841858,
+            "maxMs": 0.1899999976158142,
+            "meanMs": 0.09603333322207143
+          },
+          "completionDrainTiming": {
+            "samples": 10,
+            "minMs": 2.600000023841858,
+            "medianMs": 2.799999952316284,
+            "p95Ms": 2.9000000953674316,
+            "maxMs": 3,
+            "meanMs": 2.780000019073486
+          }
+        }
+      ],
+      "browserErrors": []
+    },
+    {
+      "mode": "layered",
+      "isolation": {
+        "freshBrowserProcess": true,
+        "freshBrowserContext": true,
+        "freshMinimalPage": true,
+        "loadedOutputModes": [
+          "layered"
+        ]
+      },
+      "browserVersion": "147.0.7727.15",
+      "encoded": {
+        "bytes": 280540,
+        "files": 48
+      },
+      "decoded": {
+        "bytes": 8257536,
+        "images": 48,
+        "estimate": "naturalWidth * naturalHeight * 4 RGBA bytes"
+      },
+      "memory": {
+        "before": {
+          "label": "before-mode-assets",
+          "forcedGc": true,
+          "jsHeapUsedBytes": 527424,
+          "jsHeapTotalBytes": 1048576,
+          "documents": 1,
+          "domNodes": 9,
+          "listeners": 0
+        },
+        "after": {
+          "label": "after-mode-profile",
+          "forcedGc": true,
+          "jsHeapUsedBytes": 675164,
+          "jsHeapTotalBytes": 1572864,
+          "documents": 1,
+          "domNodes": 58,
+          "listeners": 0
+        },
+        "delta": {
+          "jsHeapUsedBytes": 147740,
+          "jsHeapTotalBytes": 524288,
+          "documents": 0,
+          "domNodes": 49,
+          "listeners": 0
+        },
+        "caveat": "Forced-GC JS heap excludes browser-managed decoded texture and graphics memory; decoded RGBA bytes are reported separately."
+      },
+      "scenarios": [
+        {
+          "actors": 100,
+          "drawsPerActor": 3,
+          "drawsPerFrame": 300,
+          "commandSubmissionTiming": {
+            "samples": 300,
+            "minMs": 0.10999999046325684,
+            "medianMs": 0.12000000476837158,
+            "p95Ms": 0.13000000715255738,
+            "maxMs": 0.25999999046325684,
+            "meanMs": 0.12056666668256125
+          },
+          "completionDrainTiming": {
+            "samples": 10,
+            "minMs": 3.100000023841858,
+            "medianMs": 3.299999952316284,
+            "p95Ms": 3.399999976158142,
+            "maxMs": 4,
+            "meanMs": 3.3299999952316286
+          }
+        },
+        {
+          "actors": 250,
+          "drawsPerActor": 3,
+          "drawsPerFrame": 750,
+          "commandSubmissionTiming": {
+            "samples": 300,
+            "minMs": 0.26999999284744264,
+            "medianMs": 0.2899999976158142,
+            "p95Ms": 0.3100000023841858,
+            "maxMs": 0.33999999761581423,
+            "meanMs": 0.2903999999761573
+          },
+          "completionDrainTiming": {
+            "samples": 10,
+            "minMs": 6.799999952316284,
+            "medianMs": 7.100000023841858,
+            "p95Ms": 7.299999952316284,
+            "maxMs": 7.399999976158142,
+            "meanMs": 7.1
+          }
+        }
+      ],
+      "browserErrors": []
+    }
+  ],
+  "comparisons": [
+    {
+      "actors": 100,
+      "layeredToFlattenedMedianCommandRatio": 3.0000002980232416,
+      "layeredToFlattenedP95CommandRatio": 2.6000001430511475,
+      "layeredToFlattenedMeanCommandRatio": 2.9574816041595087
+    },
+    {
+      "actors": 250,
+      "layeredToFlattenedMedianCommandRatio": 2.8999999761581416,
+      "layeredToFlattenedP95CommandRatio": 2.8181817787737895,
+      "layeredToFlattenedMeanCommandRatio": 3.023950020610285
+    }
+  ],
+  "validation": {
+    "passed": true,
+    "browserErrors": []
+  },
+  "caveats": [
+    "This is a machine-specific isolated Canvas2D microprofile of draw-loop command/raster workload, not the full Realm renderer.",
+    "It excludes Realm simulation, culling, sorting, camera work, atlas selection, effects, compositing, UI, and browser presentation.",
+    "The flattened asset count represents only the tested fixed rows; it does not include the storage or build cost of combinatorial flattened identity, garment, equipment, and action variants.",
+    "Fresh browser processes make per-mode page heap deltas attributable, but process caches, GPU memory, and decoded textures remain outside the forced-GC JS heap metric."
+  ]
+}

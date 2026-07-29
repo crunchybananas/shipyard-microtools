@@ -12,8 +12,8 @@ The current art direction uses painted PNG assets as the source of truth:
   manifest.
 - `actors-compiled/*.png` as generated per-role sheets with accepted row
   overrides applied.
-- `ambient/*.png` as editable moving-prop source sprites such as carts and
-  boats.
+- `ambient/*.png` as editable moving-prop and animal source sprites such as
+  carts, boats, deer, cows, and chickens.
 - `actors-atlas.png` compiled from `actors-compiled/*.png` for the live
   renderer.
 - `ambient-atlas.png` compiled from `ambient/*.png` for the live renderer.
@@ -29,13 +29,11 @@ Treat one `512x84` action/direction strip as the reviewable actor-art unit:
 eight chronological `64x84` transparent frames. Do not edit
 `actors-compiled/*.png` or `actors-atlas.png` directly.
 
-The row manifest records four visible source states in Sprite Lab:
+The row manifest records three visible source states in Sprite Lab:
 
 - `BASE`: inherited from `actors/<role>.png`; not reviewed or hash-locked.
 - `CANDIDATE`: staged for comparison but not compiled into the runtime atlas.
 - `LOCKED`: accepted override with no analyzer warnings.
-- `WAIVED`: accepted override with named warnings; protected from overwrite
-  but still repaint debt.
 
 Accepted row files are SHA-256 locked. The compiler copies each base role sheet
 and replaces accepted rows with copy semantics, so transparent override pixels
@@ -54,9 +52,42 @@ node scripts/build-motion-atlases.mjs
 node scripts/verify-sprite-source-contract.mjs
 node scripts/audit-sprite-frames.mjs
 node scripts/audit-walk-gait.mjs
+node scripts/audit-sprite-direction-phase.mjs
 node scripts/verify-anim.mjs
 node scripts/verify.mjs --game --logic
 ```
+
+Direction changes preserve the live actor's current frame index. Treat all four
+direction rows for one role/action as a temporal family: frame `N` must remain
+the same gait or tool beat in `down`, `up`, `left`, and `right`.
+`audit-sprite-direction-phase.mjs` compares within-view motion signatures, not
+cross-perspective silhouettes, and rejects only a decisive cyclic offset
+supported by independent views (or the same-perspective left/right pair). It
+runs deliberate in-memory cyclic-shift mutations plus a full right-row
+chronology reversal as self-tests. Exact normalized alpha signatures also
+reject a side family stored as `left[N] = mirror(right[7-N])`, even when cyclic
+scoring alone looks aligned. The audit writes actionable frame mappings to
+`scripts/screenshots/sprite-direction-phase-report.json`, and has no release
+waiver.
+
+`work-order` writes two deliberately separate contacts:
+
+- `identity-reference-contact.png` contains only warning-free, hash-matched
+  `LOCKED` rows from other actions for the same role and direction. Its row
+  labels and `spec.json` entries identify every source path and status. This
+  contact is authoritative for costume, face/headgear, palette, body scale,
+  and painterly style.
+- `motion-reference-contact.png` contains the target action and its direction
+  peers, including their explicit `BASE`, `CANDIDATE`, or `LOCKED` status. It
+  is evidence for pose, cadence, direction, and tool travel only; it must not
+  redefine character identity.
+
+The generated `prompt.txt` states that identity wins whenever the contacts
+conflict. Work-order creation fails when no trusted adjacent-action identity
+row exists; inherited `BASE` art is never silently promoted to an identity
+reference. Use `--out-dir <path>` for an isolated inspection or test output.
+Run `scripts/.venv/bin/python scripts/test-sprite-row-work-order.py` for the
+focused identity/motion reference regression.
 
 The Python row tooling (`sprite-row`, `sprite_row_quality.py`) needs Pillow,
 and the system `python3` is PEP-668 externally managed. Use the project
@@ -79,16 +110,12 @@ shading, blocky rows 80-160 / 0.19-0.23):
 
 - `scripts/sprite_row_quality.py` reports `styleEra` per row and adds a
   `legacy-blocky-style` warning to any non-painted row, so the row factory
-  cannot silently accept legacy-era art (it becomes an explicit waiver at
-  worst).
+  cannot accept legacy-era art.
 - `node scripts/audit-sprite-frames.mjs` audits every compiled row, prints a
   full role/action/direction table (era, dense-body height, palette cluster,
   debris flags), and exits non-zero when a role sheet mixes eras or when a
   row's dense-body height drifts more than 10px from the same-direction walk
-  row. Manifest rows waived for `direction-scale-mismatch` are reported but do
-  not fail the gate. During the legacy-row repaint campaign, run it with
-  `--allow-mixed` to downgrade gate failures to loud warnings; drop the flag
-  once the sheet set is uniformly painted.
+  row. There is no release-path waiver or mixed-era bypass.
 
 The reference body scale is the locked settler walk family at `72px` dense
 body height (see Round 111 note above); repainted idle/walk rows must land on
@@ -124,9 +151,6 @@ Sprite review now has an in-app front end:
   citizens on the real game canvas.
 - Deep-link an actor row with query params such as
   `index.html?spritelab=1&role=miner&action=work&dir=left`.
-- The legacy cache-busting `?rolesheet=...` value is also parsed when it
-  contains a role/action/direction name, for example
-  `?rolesheet=round107-miner-work-left`.
 - Mark bad rows or frames with tags and notes, then use Copy Report or Export
   JSON to turn visual review into a concrete repaint queue.
 - Actor body scale must stay stable across every frame in a row. Tools,

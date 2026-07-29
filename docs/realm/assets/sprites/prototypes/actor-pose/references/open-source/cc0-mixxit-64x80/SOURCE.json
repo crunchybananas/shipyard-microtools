@@ -1,0 +1,46 @@
+{
+  "schema": "realm.open-source-sprite-reference.v1",
+  "status": "benchmark-source-not-runtime-art",
+  "name": "80x64 Male and Female Sprites Character Template",
+  "author": "mixxit",
+  "license": {
+    "spdx": "CC0-1.0",
+    "asset_page_declares": "CC0; no attribution required",
+    "deed": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "source": {
+    "asset_page": "https://opengameart.org/content/80x64-male-and-female-sprites-character-template",
+    "archive_url": "https://opengameart.org/sites/default/files/maleandfemale.zip",
+    "archive_sha256": "4169166467e643f78debaebf5ca59cd59b7d25045294bc568ccf19a4be04e9d7",
+    "fetched_utc": "2026-07-19"
+  },
+  "selected_files": [
+    {
+      "source_path": "Male/Components/Male_Walk.png",
+      "path": "male-body-walk.png",
+      "sha256": "3d2d7de23883d4e3b937b815525fed611a2ce0d85b351b891ef2c340fff57c34"
+    },
+    {
+      "source_path": "Male/Components/Male_Pants_Walk.png",
+      "path": "male-pants-walk.png",
+      "sha256": "70e27883dbbd0c0eaead96f18246674b8c7536c6d9963653b4b42048d18f307a"
+    },
+    {
+      "source_path": "Male/Components/Male_Shirt_Walk.png",
+      "path": "male-shirt-walk.png",
+      "sha256": "79744a8ae18e9a4bf301f8bc54fd055adb36d14dd35b78c86de9f1178abdda38"
+    }
+  ],
+  "native_contract": {
+    "row_size": [512, 80],
+    "frame_size": [64, 80],
+    "frames": 8,
+    "view": "side-right",
+    "layers": ["body", "pants", "shirt"]
+  },
+  "realm_use": {
+    "purpose": "Contact, stride, cadence, registration, and loop-continuity benchmark for one right-facing humanoid walk.",
+    "production_policy": "Do not ship this character unchanged. Realm art may be repainted over the motion baseline after passing native-scale review.",
+    "cargo_policy": "No carried load is baked into this benchmark; Realm runtime attachments remain independent."
+  }
+}

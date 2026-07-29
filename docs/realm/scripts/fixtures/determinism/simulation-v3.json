@@ -1,0 +1,315 @@
+{
+  "simulationVersion": 3,
+  "commandCount": 13,
+  "applied": [
+    {
+      "at": 10,
+      "label": "house",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 40,
+        "y": 40
+      }
+    },
+    {
+      "at": 40,
+      "label": "house",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 39,
+        "y": 39
+      }
+    },
+    {
+      "at": 90,
+      "label": "farm",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 40,
+        "y": 39
+      }
+    },
+    {
+      "at": 140,
+      "label": "lumber",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 36,
+        "y": 36
+      }
+    },
+    {
+      "at": 200,
+      "label": "well",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 41,
+        "y": 39
+      }
+    },
+    {
+      "at": 260,
+      "label": "granary",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 39,
+        "y": 40
+      }
+    },
+    {
+      "at": 400,
+      "label": "quarry",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 36,
+        "y": 44
+      }
+    },
+    {
+      "at": 600,
+      "label": "avatar-goto",
+      "ok": true,
+      "reason": null,
+      "spot": null
+    },
+    {
+      "at": 900,
+      "label": "masonry",
+      "ok": true,
+      "reason": null,
+      "spot": null
+    },
+    {
+      "at": 1200,
+      "label": "market",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 41,
+        "y": 40
+      }
+    },
+    {
+      "at": 5000,
+      "label": "commerce",
+      "ok": true,
+      "reason": null,
+      "spot": null
+    },
+    {
+      "at": 9000,
+      "label": "tavern",
+      "ok": true,
+      "reason": null,
+      "spot": {
+        "x": 39,
+        "y": 41
+      }
+    },
+    {
+      "at": 14000,
+      "label": "avatar-goto",
+      "ok": true,
+      "reason": null,
+      "spot": null
+    }
+  ],
+  "checkpoint": {
+    "buildings": [
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "house",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "house",
+        "x": 39,
+        "y": 39
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "farm",
+        "x": 40,
+        "y": 39
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "lumber",
+        "x": 36,
+        "y": 36
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "well",
+        "x": 41,
+        "y": 39
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "granary",
+        "x": 39,
+        "y": 40
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "quarry",
+        "x": 36,
+        "y": 44
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "market",
+        "x": 41,
+        "y": 40
+      },
+      {
+        "buildProgress": 1,
+        "hp": 100,
+        "type": "tavern",
+        "x": 39,
+        "y": 41
+      }
+    ],
+    "day": 7,
+    "dayPhase": 0,
+    "population": 15,
+    "resources": {
+      "flour": 0,
+      "food": 550,
+      "gold": 576,
+      "iron": 50,
+      "planks": 0,
+      "stone": 566,
+      "tools": 0,
+      "wheat": 116,
+      "wood": 550
+    },
+    "tick": 21600,
+    "worldHash": "262cd34b629873ccfb69e3090e9cca5d82d354a330e1207112c027cf4ec08088"
+  },
+  "finalPopulation": 3,
+  "finalBuildings": [
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "house",
+      "x": 40,
+      "y": 40
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "house",
+      "x": 39,
+      "y": 39
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "farm",
+      "x": 40,
+      "y": 39
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "lumber",
+      "x": 36,
+      "y": 36
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "well",
+      "x": 41,
+      "y": 39
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "granary",
+      "x": 39,
+      "y": 40
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "quarry",
+      "x": 36,
+      "y": 44
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "market",
+      "x": 41,
+      "y": 40
+    },
+    {
+      "buildProgress": 1,
+      "hp": 100,
+      "type": "tavern",
+      "x": 39,
+      "y": 41
+    }
+  ],
+  "mapFingerprint": "090de3ff6c9af74581f9140a1af532f8cc63931c14e6d29fd18554355c378c4c",
+  "worldHash": "69998e02378b7f04a0d34c0e05628090671a48b43895b635c8610c6e046fc12b",
+  "replayHash": "be9b4728c565ceec17698956852d5e31c388b4a7bef2d291ab9c63a98ae8cd81",
+  "story": {
+    "chronicleCount": 38,
+    "flags": [
+      "dream_10",
+      "fields_know_realm",
+      "firstBirth",
+      "firstFarm",
+      "firstGranary",
+      "firstHouse",
+      "firstLumber",
+      "firstMarket",
+      "firstQuarry",
+      "firstTavern",
+      "firstWell",
+      "first_long_evening",
+      "first_sigh_seen",
+      "founders_named",
+      "namesake_born",
+      "pop10",
+      "summer_falling_star"
+    ],
+    "milestoneTicks": {
+      "firstFarm": 120,
+      "firstHouse": 60,
+      "firstMarket": 1200,
+      "firstTavern": 9000
+    },
+    "namedCharacters": {
+      "mayor": {
+        "appointedDay": 3,
+        "name": "Nerys the Just"
+      },
+      "merchant": {
+        "arrivedDay": 1,
+        "name": "Dame Lisbet Saltwater"
+      }
+    },
+    "realmEnded": false
+  }
+}

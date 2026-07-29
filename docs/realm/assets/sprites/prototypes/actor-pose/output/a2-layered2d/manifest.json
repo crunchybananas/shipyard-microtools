@@ -1,0 +1,297 @@
+{
+  "authority": {
+    "attachments": "offline socketed sword and pouch only",
+    "garment": "helmet/cap, tunic/apron, sleeve shell, belt and boot shell only",
+    "identity": "skin, hair, face, neutral underlayer, bare limbs and neutral boot base only",
+    "pose": "the v2 pose specification's explicit hip/knee/ankle/heel/toe and shoulder/elbow/wrist/hand chains",
+    "scale": "the explicit 76px median Realm scale (75\u201377px allowed by authored body bob) on ground row 79; opaque padding and sentinel pixels are forbidden"
+  },
+  "candidate": "a2-layered2d",
+  "compiler": {
+    "path": "scripts/actor-pose-prototype/a2_layered2d.py",
+    "pillow": "11.3.0",
+    "python": "3.9",
+    "supersample": 4
+  },
+  "contract_snapshot": {
+    "frame": {
+      "beats": 8,
+      "body_height": 76,
+      "body_height_tolerance": 1,
+      "clear_rows": [
+        80,
+        81,
+        82,
+        83
+      ],
+      "ground_y": 79,
+      "height": 84,
+      "root": [
+        32,
+        79
+      ],
+      "width": 64
+    },
+    "pose_schema": "realm.actor-pose.a2-pose.v2",
+    "reference_gate": {
+      "action": "carry",
+      "attachment": "off",
+      "direction": "right",
+      "garment": "watch-blue",
+      "identity": "watchman",
+      "promotion_policy": "Do not derive left or author down/up until this exact row passes deterministic, biomechanical, painted-style, and native-1x transition review.",
+      "render_parts": {
+        "garment": {
+          "belt": [
+            595,
+            570,
+            820,
+            655
+          ],
+          "boot": [
+            945,
+            650,
+            1100,
+            970
+          ],
+          "headgear": [
+            760,
+            35,
+            945,
+            230
+          ],
+          "sleeve": [
+            1245,
+            295,
+            1365,
+            470
+          ],
+          "tunic": [
+            990,
+            285,
+            1145,
+            565
+          ]
+        },
+        "identity": {
+          "arm": [
+            1120,
+            290,
+            1230,
+            610
+          ],
+          "head": [
+            870,
+            35,
+            1030,
+            235
+          ],
+          "leg": [
+            885,
+            570,
+            1035,
+            975
+          ],
+          "torso": [
+            885,
+            260,
+            1035,
+            535
+          ]
+        }
+      }
+    },
+    "review_schema": "realm.actor-pose.review-evaluation.v1"
+  },
+  "outputs": {
+    "id-masks/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 2207,
+      "sha256": "23f95cf0773ce61002d26332fa68c36c2929b63fb4a869539f2d11d4b02f7a0c"
+    },
+    "landmarks/carry-right.json": {
+      "bytes": 15092,
+      "sha256": "b8c6581ccc146acaec54572ed8d8a12ac339e44b6237a804404b07ff0884d544"
+    },
+    "planes/attachment/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/garment/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 15421,
+      "sha256": "4c8df7125073d90cb2d442797fb1522e845649324f73cd7d47fc897e5b5392d0"
+    },
+    "planes/identity/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 14528,
+      "sha256": "f0499ba54bbde76c1d5634a4108300ee91b01a25b1c851368df430570489dd48"
+    },
+    "proof/carry-right-joints-x4.png": {
+      "bytes": 37755,
+      "sha256": "fdc1ac6cdde61c3496ac4a52712a27a017a2ddf643668e1aec91a22c86f22330"
+    },
+    "proof/carry-right-review-x5.gif": {
+      "bytes": 129960,
+      "sha256": "520560fe4eb0633056b7628643400570925eeb483b562d287c5752d1fcfb3408"
+    },
+    "proof/carry-right-runtime-27x35.gif": {
+      "bytes": 11233,
+      "sha256": "9c1c1f761ac298d171422f51783f6dd923c3b3391fc0f4c65f65c03c1dd17f48"
+    },
+    "proof/carry-right-still-x4.png": {
+      "bytes": 26851,
+      "sha256": "87a35b36b5a3fec976624b2420d8b3dae94f5789082ac86dca2d7ee16a0390af"
+    },
+    "proof/carry-right-unlabeled-x1.gif": {
+      "bytes": 23489,
+      "sha256": "e9fe0199ff891a39b962adce0ee12366964b5474a28253541beed1fa7a0ac8aa"
+    },
+    "proof/quality-x4.png": {
+      "bytes": 26196,
+      "sha256": "c11bd05195b804f420daa1ee4f20ee25c53758d75f5a15f49629d385d5c371d3"
+    },
+    "reports/quality.json": {
+      "bytes": 6225,
+      "sha256": "3f64d920904e55c2045fd604428f51ef3bc34bc02fbcdb326231d6d9507322ae"
+    },
+    "reports/reference-gate.json": {
+      "bytes": 8754,
+      "sha256": "2458ab654f2261bf1885b24eb132d420eab1261b1897745f8ad7697b701fa664"
+    },
+    "reports/review-evaluation.json": {
+      "bytes": 968,
+      "sha256": "afc8ca3cb3b44dc47003b4ecd02f9a20603a3a0c6deb4bcc09cfef0809d16640"
+    },
+    "rows/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 15877,
+      "sha256": "491bfcd0a3cb5b96c5371f31900531937448ce2219ce1e5b32cc30a64166da9c"
+    }
+  },
+  "proof": {
+    "joint_socket_overlay": "proof/carry-right-joints-x4.png",
+    "labeled_review_loop": "proof/carry-right-review-x5.gif",
+    "native_unlabeled_loop": "proof/carry-right-unlabeled-x1.gif",
+    "quality_proof": "proof/quality-x4.png",
+    "quality_report": "reports/quality.json",
+    "runtime_27x35_loop": "proof/carry-right-runtime-27x35.gif",
+    "still_strip": "proof/carry-right-still-x4.png"
+  },
+  "review": {
+    "artifacts": {
+      "flattened_row": {
+        "path": "rows/watchman/watch-blue/off/carry-right.png",
+        "sha256": "491bfcd0a3cb5b96c5371f31900531937448ce2219ce1e5b32cc30a64166da9c"
+      },
+      "native_unlabeled_loop": {
+        "path": "proof/carry-right-unlabeled-x1.gif",
+        "sha256": "e9fe0199ff891a39b962adce0ee12366964b5474a28253541beed1fa7a0ac8aa"
+      }
+    },
+    "council_reference_pass": true,
+    "decisions": {
+      "luna": "approve-reference-only",
+      "owner": "pending",
+      "terra": "approve-reference-only"
+    },
+    "factorial_authorized": false,
+    "failures": [],
+    "owner_reference_pass": false,
+    "record": "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json",
+    "review_id": "a2-right-reference-v3",
+    "schema": "realm.actor-pose.review-evaluation.v1",
+    "status": "council-approved-owner-pending",
+    "subject_bound": true,
+    "subject_sha256": "9584845536c03912fc266c8d00507123b6878737206c10c548ef930980183849",
+    "valid": true
+  },
+  "row": {
+    "attachment_plane": "planes/attachment/watchman/watch-blue/off/carry-right.png",
+    "garment_plane": "planes/garment/watchman/watch-blue/off/carry-right.png",
+    "identity_plane": "planes/identity/watchman/watch-blue/off/carry-right.png",
+    "landmarks": "landmarks/carry-right.json",
+    "path": "rows/watchman/watch-blue/off/carry-right.png",
+    "semantic_mask": "id-masks/watchman/watch-blue/off/carry-right.png"
+  },
+  "schema": "realm.actor-pose.a2-reference-manifest.v2",
+  "scope": {
+    "action": "carry",
+    "attachment": "off",
+    "direction": "right",
+    "factorial_expansion": "vetoed",
+    "flattened_frames": 8,
+    "flattened_rows": 1,
+    "frame_size": [
+      64,
+      84
+    ],
+    "garment": "watch-blue",
+    "ground_y": 79,
+    "identity": "watchman",
+    "root": [
+      32,
+      79
+    ],
+    "row_size": [
+      512,
+      84
+    ],
+    "runtime": "none; flattened offline evidence only"
+  },
+  "sources": {
+    "current_or_legacy_frame_pixels_copied": false,
+    "files": {
+      "assets/sprites/actor-rows/guard/walk-right.png": {
+        "bytes": 31930,
+        "owner": "scale-and-painted-detail-reference-only",
+        "sha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png": {
+        "bytes": 702824,
+        "owner": "garment",
+        "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png": {
+        "bytes": 768222,
+        "owner": "identity",
+        "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca"
+      },
+      "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json": {
+        "bytes": 1337,
+        "owner": "human-review-authority",
+        "sha256": "52231d039b21da2d5d522e624bac8c8aa651f0cf377117f2aeeb7e523a0b4384"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/a2-contract.json": {
+        "bytes": 4970,
+        "owner": "compiler-source",
+        "sha256": "0ef00a3138ecab336e53f3f37b7cc421bd09f0a2ab3c90ff51992a74b86f4593"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json": {
+        "bytes": 8546,
+        "owner": "sole-pose-authority",
+        "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+      },
+      "scripts/actor-pose-prototype/a2_layered2d.py": {
+        "bytes": 55304,
+        "owner": "compiler-source",
+        "sha256": "603b66159d4449ece337140cf0781b9e8e2115fc8f87bbd66be3a82893e65417"
+      },
+      "scripts/sprite_row_quality.py": {
+        "bytes": 14174,
+        "owner": "quality-gate-source",
+        "sha256": "f1dc8266d07dd4d58057e23d47c680226a73e9ac59da53bf456ca49694439461"
+      }
+    },
+    "final_bitmap_mirroring": false,
+    "network_required": false,
+    "paint_sources_transformed_by_joint_chain": true,
+    "sentinel_or_registration_pixels": false,
+    "source_hash": "5c4e9eb4b26af3cd6fd73b85f30ba4ad7129a15561a0e0c640372fe9ab56be17"
+  },
+  "stage": "right-reference-cycle",
+  "status": "council-approved-owner-pending",
+  "verification": {
+    "byte_deterministic_second_pass": true,
+    "failures": [],
+    "mechanical_passed": true,
+    "report": "reports/reference-gate.json",
+    "review_report": "reports/review-evaluation.json"
+  }
+}

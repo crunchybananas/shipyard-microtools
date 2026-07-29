@@ -1,5 +1,229 @@
 # Current Graphics Handoff
 
+## Offline actor pose-compiler decision — 2026-07-18
+
+- The owner correctly identified a systemic scale change: accepted guard
+  idle/walk/work rows measure `73px` facing up and `76–77px` facing down or
+  sideways. Three blue-tunic guard carry candidates are warning-free but remain
+  candidates. The generated up row was not staged because matching the smaller
+  accepted up family would preserve the visible direction pop.
+- At council review, the cast problem was broader than the `37` inherited rows:
+  `149/187` accepted rows had settler-derived provenance. After the temporal
+  phase repairs, the current manifest contains `191 LOCKED`, `3 CANDIDATE`, and
+  `30` unstaged `BASE` rows; because candidates never compile, the runtime still
+  inherits `33` base rows. Row-local cleanup can therefore produce mechanically
+  stable palette-swapped bodies without a distinct or persistent character
+  identity.
+- RFC 0002's bounded offline comparison is complete; it never enabled a live
+  skeletal renderer. All three candidates produced the same `128`-frame
+  guard/builder comparison and remain outside the runtime manifest.
+- Candidate A is the only continuation. Its `16/16` rows pass hash-tied
+  body-mask scale, root/feet, authored phase/contact, socket, and reproducible
+  build checks. Right-facing frames are exact same-beat derivations of left,
+  eliminating a second horizontal chronology authority. Its style-era cue is
+  painted on `16/16` rows.
+- Candidate B is rejected as visible art: its rig evidence is mechanically
+  clean, but only `4/16` rows register the painted cue and the result is visibly
+  faceted/sterile. Candidate C is rejected as future source authority: it has no
+  authored body/contact/socket surface, and the staged guard-carry family still
+  contains reversed chronology.
+- A is not canonical. It currently bakes identity and base garment together in
+  role concepts; `VisualDNA`/`GarmentKit` interchangeability, handed equipment,
+  target runtime scale, `1x` identity, seams/occlusion, live transitions,
+  authoring economics, and the complete guard pilot remain red.
+- The isolated A output profile selects flattened rows for the next pilot:
+  three synchronized layers measured about `3×` the command submission,
+  `2.8` versus `7.1ms` median drain at `250` actors, and approximately
+  `8.26` versus `2.75 MiB` decoded. All `48` layer strips are unique, so no
+  interchange reuse dividend exists yet. This does not select the permanent
+  runtime strategy.
+- If a winner is adopted, its rig source becomes the sole actor source after
+  conversion and the old row-by-row authoring source is deleted. Runtime output
+  remains raster atlas data; there is no dual source path or compatibility
+  mode.
+
+## Cross-direction temporal phase repair — 2026-07-18
+
+- The runtime intentionally preserves animation frame `N` when facing changes,
+  so warning-free rows can still pop to a different gait or tool beat on a
+  turn. `scripts/audit-sprite-direction-phase.mjs` audits all `56` role/action
+  families and all `224` direction rows as one temporal contract, with a
+  mandatory negative self-test and no waiver path.
+- The first strict run reported decisive left/right cyclic matches of
+  `+3` for `builder/work`, `+1` for `blacksmith/walk`, and `+1` for
+  `blacksmith/carry`. Pixel-level inspection found the deeper common cause:
+  the right rows were not merely cyclically shifted. They were the left rows
+  mirrored and stored in full reverse chronology. Both blacksmith rows match
+  their left peer pixel-for-pixel under `right[N] = mirror(left[7-N])`; builder
+  also matches pixel-for-pixel with its existing one-pixel native horizontal
+  anchor offset.
+- Only the right rows were deterministically reordered from old frames
+  `0,1,2,3,4,5,6,7` to `7,6,5,4,3,2,1,0`. No pixel was repainted, rescaled, or
+  filtered, so identity, body scale, handedness, anchors, and the authored loop
+  are unchanged. Frame `N` is now the same chronological beat in both side
+  views.
+- `builder/work/right`, `blacksmith/walk/right`, and
+  `blacksmith/carry/right` were promoted with
+  `deterministic-frame-reversal` provenance and fresh hashes/proofs. This adds
+  the two formerly inherited blacksmith rows to the protected set, bringing the
+  manifest to `189 LOCKED` overrides. The compiled atlas and actor
+  registration were rebuilt.
+- The hardened exact side-view check then exposed five more rows that were
+  hidden by cyclic-only scoring: `farmer/work/right`, `miner/work/right`,
+  `builder/walk/right`, `builder/carry/right`, and `guard/carry/right`.
+  Independent full-color inspection proved that all `40/40` frames satisfy
+  exact RGBA equality under
+  `left[N] = mirror(oldRight[7-N])`; these were true source-order defects, not
+  silhouette coincidences.
+- `miner/work/right`, `builder/walk/right`, and `builder/carry/right` now have
+  fresh hash-locked `deterministic-frame-reversal` rows. The builder rows add
+  two accepted overrides, bringing the manifest to `191 LOCKED`. The unchanged
+  farmer row still trips the strict `edge-contact` analyzer, so it remains an
+  inherited `BASE` row instead of receiving a waiver. Its canonical base
+  source was reordered directly.
+- `guard/carry/right` also remains inherited at runtime because its manifest
+  slot intentionally holds the newer blue-tunic `CANDIDATE`. Only the old
+  runtime base row was reordered; the candidate PNG, manifest entry, and
+  SHA-256 remain unchanged. This keeps one runtime source and one explicitly
+  non-compiling review candidate without deleting semantic work.
+- The after audit has no findings: all five newly exposed families and the
+  original three repairs now preserve runtime frame `N`, and all `56/56`
+  families pass. Visual evidence is recorded in
+  `assets/sprites/actor-rows/proofs/direction-phase-resequence.png` and
+  `assets/sprites/actor-rows/proofs/direction-phase-resequence-runtime.png`.
+
+Validation run:
+
+```sh
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-registration.mjs
+node scripts/audit-sprite-frames.mjs
+node scripts/audit-walk-gait.mjs
+node scripts/audit-sprite-direction-phase.mjs
+REALM_PORT=4870 node scripts/verify-anim.mjs
+REALM_PORT=4871 node scripts/verify-all-sprite-maps.mjs
+REALM_PORT=4872 node scripts/verify.mjs --game --logic
+```
+
+## Realm 163 strict sprite/runtime clean cut — 2026-07-12
+
+- Realm `163` has one strict actor-row promotion path. The workbench cannot
+  accept a row with analyzer warnings, the compiler and source verifier reject
+  any status outside the current contract, and the frame audit has no
+  `--allow-mixed` escape hatch. Waiver-capable statuses and manifest fields
+  have been removed; source control is the rollback path.
+- Sprite Lab now opens only through `?spritelab=1` and the explicit
+  `role`/`action`/`dir` parameters. The old `?rolesheet=...` parser is gone.
+  Sprite Lab and Actor Muster expose exactly three provenance states:
+  `BASE` for inherited source art, `CANDIDATE` for staged art that does not
+  compile, and `LOCKED` for warning-free, SHA-256-protected row overrides.
+- The realm 163 checkpoint contained `187 LOCKED` overrides and `37 BASE`
+  inherited rows with no candidates or waiver path. The current worktree has
+  `191 LOCKED` overrides after protecting the blacksmith and builder phase
+  repairs, plus three uncompiled guard carry candidates. All source-contract, manifest,
+  frame-continuity, temporal-phase, gait, registration, atlas-addressing,
+  runtime animation, live-mapping, and logic gates are green under the strict
+  path.
+- The remaining blind spot is semantic visual consistency. Structural gates
+  can prove dimensions, nonblank frames, stable body scale/anchor/palette,
+  motion variety, and correct runtime addressing; they cannot prove that two
+  clean rows depict the same character identity, costume, or equipment. The
+  inherited `guard/carry/*` family demonstrates this: it passes mechanical
+  checks but does not match the blue-tunic, simple-helmet, short-sword guard
+  identity established by idle, walk, and work. Promotion still requires a
+  human Sprite Lab and live-runtime comparison across adjacent actions.
+- Repaint work orders now keep that semantic comparison explicit:
+  `identity-reference-contact.png` is assembled only from warning-free,
+  hash-matched `LOCKED` adjacent actions for the same role/direction, while
+  `motion-reference-contact.png` labels target-action rows as `BASE`,
+  `CANDIDATE`, or `LOCKED` and is never authoritative for identity. Generation
+  fails when no trusted identity row exists instead of treating inherited
+  `BASE` art as the character definition.
+
+Strict verification checkpoint:
+
+```sh
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-registration.mjs
+node scripts/audit-sprite-frames.mjs
+node scripts/audit-walk-gait.mjs
+node scripts/audit-sprite-direction-phase.mjs
+node scripts/verify-anim.mjs
+node scripts/verify-all-sprite-maps.mjs
+node scripts/verify.mjs --game --logic
+```
+
+## Guard identity and native-anchor polish — 2026-07-10
+
+- Repainted the complete `guard/work/down|up|left|right` family around the
+  guard's actual idle/walk identity: simple helmet, blue tunic, brown pouch,
+  and boots. The obsolete shielded plate-armour identity is gone from this
+  action, and all four directions now use the same compact short-sword drill.
+- Rejected the first spear passes instead of waiving their defects. Long
+  thrusts either shrank the body, clipped the cell, or introduced 14px center
+  pops. The accepted rows have no blank frames, loose fragments, edge contact,
+  direction-scale warnings, or ground-anchor drift; the reviewed left row is
+  mirrored exactly for right-facing timing and scale symmetry.
+- Native anchor stabilization now skips negligible whole-frame resampling.
+  One-pixel painted pose variation remains intact while integer translation
+  removes lateral body jitter, avoiding the softness and chroma-edge flicker
+  that a 1% LANCZOS resize introduced during review. Actor atlases and
+  registration were rebuilt, and client imports were revised to `realm=159`.
+
+Validation run:
+
+```sh
+scripts/sprite-row verify
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-registration.mjs
+node scripts/audit-sprite-frames.mjs
+node scripts/audit-walk-gait.mjs
+REALM_PORT=4740 node scripts/verify-anim.mjs
+REALM_PORT=4741 node scripts/verify-all-sprite-maps.mjs
+REALM_PORT=4742 node scripts/verify.mjs --game
+REALM_PORT=4743 node scripts/verify-logic.mjs
+node scripts/verify-core-purity.mjs
+node scripts/verify-determinism.mjs
+```
+
+## Engine + ambient animal transition polish — 2026-07-10
+
+- Replaced the context-free procedural sheep with three painted ambient atlas
+  sources: deer remain gradual wild forest life, cows exist only around a
+  completed cow pen, and chickens exist only around a completed coop. Domestic
+  animals are removed with their owning building, stay inside local habitat,
+  face their real travel direction, settle immediately on arrival, and now
+  participate in the same isometric depth queue as buildings and actors.
+- Removed every opaque-area-derived actor row scale. Tools, cargo, and broad
+  work poses were being counted as body mass, shrinking entire work/carry rows
+  by roughly 3–4 screen pixels at the transition. Registration now contains
+  feet-line offsets only; body consistency remains an art-quality gate.
+- Actor animation now has a per-entity action epoch: real action changes begin
+  on frame 0, direction changes preserve phase, idle rows use their authored
+  breathing loop, and stationary carry poses hold frame 0. Interpolated actor
+  coordinates are no longer rounded away at draw time, while lane easing and
+  direction hysteresis are elapsed-time based across 60–144Hz displays.
+- Citizen and founder paths consume a waypoint on the tick that reaches it,
+  eliminating the old 0.15-tile corner shortcut and blank movement beat.
+  Runtime capture no longer performs a full-DPR canvas copy plus synchronous
+  PNG encoding every 750ms; it captures once at startup and thereafter only
+  through the explicit `captureRealmFrame()` inspection hook.
+- The editable ambient roster is now seven `48x48` sources and compiles into a
+  `336x48` atlas. Client imports were revised to `realm=158`.
+
+Validation run:
+
+```sh
+node scripts/verify-sprite-source-contract.mjs
+node scripts/audit-sprite-registration.mjs
+REALM_PORT=4732 node scripts/verify-logic.mjs
+REALM_PORT=4733 node scripts/verify-anim.mjs
+```
+
 ## Runtime actor continuity and motion stabilization — 2026-07-09
 
 - A citizen now retains `visualJob` through short-lived route retries,
@@ -26,7 +250,7 @@ Validation run:
 
 ```sh
 node scripts/verify-sprite-source-contract.mjs
-node scripts/audit-sprite-frames.mjs --allow-mixed
+node scripts/audit-sprite-frames.mjs
 node scripts/audit-walk-gait.mjs
 REALM_PORT=4742 node scripts/verify-logic.mjs
 REALM_PORT=4743 node scripts/verify-anim.mjs
@@ -68,7 +292,7 @@ scripts/sprite-row verify
 node scripts/build-motion-atlases.mjs
 node scripts/audit-sprite-registration.mjs --write
 node scripts/verify-sprite-source-contract.mjs
-node scripts/audit-sprite-frames.mjs --allow-mixed
+node scripts/audit-sprite-frames.mjs
 node scripts/audit-walk-gait.mjs
 node scripts/verify-all-sprite-maps.mjs
 ```
@@ -85,8 +309,8 @@ node scripts/verify-all-sprite-maps.mjs
   difference rather than a scale pop. The audit score fell from `136.6` to
   `70.3` for each side row; `lumber/work/up` is now the top repaint target.
 - Rebuilt `actors-compiled/miner.png` and `actors-atlas.png`, then regenerated
-  actor registration after the repaint. Registration now uses only stable
-  row-scale/feet-anchor corrections—never whole-frame scale normalization.
+  actor registration after the repaint. Registration uses stable feet-anchor
+  corrections and never whole-frame scale normalization.
   The registration gate reports no rows above feet/centroid tolerance, and
   animation/browser checks pass.
 - Removed the unreachable procedural citizen and soldier renderers plus the
@@ -107,7 +331,7 @@ scripts/sprite-row verify
 node scripts/build-motion-atlases.mjs
 node scripts/verify-sprite-source-contract.mjs
 node scripts/audit-sprite-registration.mjs --write
-node scripts/audit-sprite-frames.mjs --allow-mixed
+node scripts/audit-sprite-frames.mjs
 REALM_PORT=4714 node scripts/verify-anim.mjs
 REALM_PORT=4713 node scripts/verify-logic.mjs
 ```
@@ -275,7 +499,7 @@ overlay attempts were rejected because they made the lower body muddy or too
 repetitive.
 
 Round 095 turned the one-file-per-sprite-type workflow into an enforceable
-contract. `scripts/sprite-source-contract.mjs` now defines the canonical actor
+contract. `js/sprite-source-contract.js` now defines the canonical actor
 roles, ambient props, frame geometry, and compiled atlas dimensions.
 `scripts/verify-sprite-source-contract.mjs` fails when actor/ambient source
 folders are missing declared files, contain unexpected extra PNGs, include
@@ -458,15 +682,17 @@ top continuity audit; the remaining worst rows are now deliberate tool/work
 animations such as lumber chopping, miner pick swings, guard spear work, and
 farmer hoeing.
 
-Round 107 added the missing human review surface for sprite iteration. Sprite
-Lab is now available from the title screen, HUD, `?spritelab=1`, or
-`?rolesheet=...` values that contain a role/action/direction name. It imports
-the canonical sprite-source contract, previews exact actor rows, animates and
-scrubs frames, shows grid/onion/alpha overlays, reports row/frame diagnostics,
-and stores row/frame review marks in localStorage with Copy Report and Export
-JSON actions. Ambient prop source PNGs can be reviewed and marked in the same
-queue. This should be the first stop before more row repainting so visual
-judgment, audit scores, and next-pass instructions stay aligned.
+Round 107 added the missing human review surface for sprite iteration. It
+originally included a cache-busting compatibility query alongside
+`?spritelab=1`; realm 162 retired that parser, leaving explicit
+`spritelab`/`role`/`action`/`dir` parameters as the only deep-link contract.
+Sprite Lab imports the canonical sprite-source contract, previews exact actor
+rows, animates and scrubs frames, shows grid/onion/alpha overlays, reports
+row/frame diagnostics, and stores row/frame review marks in localStorage with
+Copy Report and Export JSON actions. Ambient prop source PNGs can be reviewed
+and marked in the same queue. This should be the first stop before more row
+repainting so visual judgment, audit scores, and next-pass instructions stay
+aligned.
 
 ## Invariants
 
@@ -479,8 +705,12 @@ judgment, audit scores, and next-pass instructions stay aligned.
 - Review actor changes one `512x84` action/direction row at a time.
 - Canonical accepted row overrides live under `assets/sprites/actor-rows/` and
   must match their manifest SHA-256.
-- `BASE` rows are inherited and unreviewed; `WAIVED` rows are protected but
-  remain repaint debt; `CANDIDATE` rows never enter runtime output.
+- `BASE` rows are inherited and unreviewed; `CANDIDATE` rows never enter
+  runtime output; `LOCKED` rows are warning-free overrides protected by their
+  manifest SHA-256. There is no waiver-capable status.
+- Rows with analyzer warnings must remain candidates and be repaired before
+  promotion. Do not add a bypass flag, warning allowlist, or compatibility
+  status to the compiler, workbench, or audits.
 - Do not edit generated `actors-compiled/*.png` role sheets directly.
 - `actors-atlas.png` and `ambient-atlas.png` are compiled runtime artifacts.
 - Motion sprite source files must stay split by sprite type: one actor role per
@@ -503,12 +733,41 @@ judgment, audit scores, and next-pass instructions stay aligned.
 - Generated rows also require cross-direction body-scale/palette checks,
   Sprite Lab inspection, and runtime verification before acceptance.
 - The live renderer must import role/action/direction/frame geometry from
-  `scripts/sprite-source-contract.mjs`; do not add a second hand-maintained
+  `js/sprite-source-contract.js`; do not add a second hand-maintained
   actor-atlas map.
 - New actor roles are not integrated until both normal citizen resolution and
   Actor Muster coverage are verified.
 
 ## Last Known Verification
+
+- Runtime and browser modules are on canonical revision `realm=163`.
+- `scripts/sprite-row verify` passed with `187` warning-free accepted row
+  overrides. The remaining `37` runtime rows inherit `BASE` role-sheet art;
+  the manifest contains no candidate or waiver-capable status and no warning
+  allowlist fields.
+- `node scripts/build-motion-atlases.mjs` rebuilt the per-role sheets and actor
+  atlas from the strict current source contract.
+- `node scripts/verify-sprite-source-contract.mjs` passed: `14` base plus
+  compiled role sheets have the expected `512x1344` dimensions, all `187`
+  locked row hashes match, all `7` ambient sources are `48x48`, and the
+  compiled atlases have their declared dimensions.
+- `node scripts/audit-sprite-frames.mjs` passed without an escape flag. Every
+  compiled row is in the painted era and remains within the current
+  cross-action body-scale tolerance.
+- Registration, walk-gait, animation, all-sprite-map, game, and logic gates
+  passed. The exhaustive runtime map still covers `224/224` rows and
+  `1,792/1,792` frames with no blanks, low-variety moving rows, atlas-address
+  mismatches, live mapping failures, or Actor Muster omissions.
+- Browser verification uses
+  `index.html?spritelab=1&role=<role>&action=<action>&dir=<dir>` and
+  `index.html?spritemuster=1`. The retired compatibility deep link is not part
+  of the current review contract.
+- These gates do not certify semantic identity across actions. A row can be
+  mechanically clean while depicting the wrong costume or weapon; compare
+  every promotion against the role's adjacent LOCKED actions in Sprite Lab
+  and on the live canvas.
+
+## Historical Verification Archive (pre-realm162)
 
 - `node scripts/build-motion-atlases.mjs` passed and regenerated:
   - `assets/sprites/actors-atlas.png`
@@ -624,28 +883,32 @@ judgment, audit scores, and next-pass instructions stay aligned.
 - `lumber/work/up` now scores `115.4` and `lumber/work/down` now scores `99.7`
   after the accepted particle scrub; the miner/farmer scrub was rejected and
   restored.
-- Manual live preview target:
-  `http://127.0.0.1:4711/index.html?rolesheet=round100-builder-work-up` or any fresh
-  cache-busted query.
+- Historical round-100 review used the compatibility deep-link parser that
+  realm 162 has since retired. Current reviews use the explicit Sprite Lab
+  URL documented above.
 
 ## Best Next Target
 
-Use the row factory for a true repaint of `miner/work/left`. It is currently
-WAIVED for body height/width drift, center jump, and loose fragments, so it is
-the clearest protected-but-unfinished row next to the clean `work/up` baseline.
-Preserve the miner identity, left-facing read, peer-direction body scale and
-palette, and ground anchor while reducing pickaxe fragments and body motion.
-Do not mirror or accept a right-facing row automatically; review that direction
-as its own row after the left baseline is clean.
+Execute RFC 0002's A2 interchange/handedness proof. Bake two independent
+identities by two independent garment kits from one shared walk clip. Keep
+skin/head/body identity, garment, and attachments in separate source parts;
+include one-sided pouch/sword sentinels; mirror joint transforms before
+semantic recomposition instead of mirroring a finished frame; emit body,
+identity, garment, and attachment ID masks; and match an explicit accepted
+Realm scale target.
+
+Bake flattened review rows only. Review all four turns at `1x`, measure seams,
+occlusion, landmarks, phase, authoring time, and real-renderer `100`/`250`
+actor cost. Do not promote the partial guard carry candidates or keep B/C as a
+second authoring route.
 
 ## Secondary Targets
 
-- Continue true per-role actor source art: replace or repaint
-  `farmer.png`, `lumber.png`, `miner.png`, and `guard.png` directly so roles
-  stop deriving from the same knight base.
-- Service walker art integration: the live `G.walkers` path still draws small
-  procedural walkers in `js/render.js`; consider routing them through the actor
-  atlas vocabulary or a dedicated walker strip.
+- Continue true per-role actor source art after the guard → farmer → lumber
+  sequence, prioritizing the remaining inherited rows rather than repainting
+  already-LOCKED families.
+- After one source pipeline wins, extend the complete guard family and then
+  convert farmer and lumber identity families before the palette-derived cast.
 - Building upgrade states: pre-rendered or atlas-backed visual changes for
   Level 2/3+ instead of only small overlay pennants.
 - Construction-phase polish: painterly scaffolds, material piles, and reveal

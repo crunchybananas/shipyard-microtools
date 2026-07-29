@@ -2,7 +2,7 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=157';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=166';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
@@ -28,7 +28,7 @@ function stealFrom(e, dmg) {
       G._raidStolen[k] = (G._raidStolen[k] || 0) + take;
     }
   }
-  if (stole > 0 && rng() < 0.35) {
+  if (stole > 0 && visualJitter(e.x, e.y, 301) < 0.35) {
     G.particles.push({ tx: e.x, ty: e.y, offsetY: -18, text: '💰', alpha: 1.1, vy: -0.14, decay: 0.02, type: 'text' });
   }
 }
@@ -42,16 +42,30 @@ function maybeIgnite(b, notifyFn) {
     notifyFn(`🔥 Raiders set the ${BUILDINGS[b.type]?.name || b.type} ablaze!`, 'danger');
   }
 }
-import { stepEntityToward } from './pathfinding.js?realm=157';
-import { spawnClashFX } from './fx.js?realm=157';
+import { stepEntityToward } from './pathfinding.js?realm=166';
+import { spawnClashFX, visualJitter } from './fx.js?realm=166';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=157';
-import { demolishBuilding } from './economy.js?realm=157';
-import { announce as notify } from './log.js?realm=157';
-import { chronicle } from './log.js?realm=157';
+import { sfx as playSound } from './log.js?realm=166';
+import { removeBuilding } from './building-lifecycle.js?realm=166';
+import { announce as notify } from './log.js?realm=166';
+import { chronicle } from './log.js?realm=166';
+import { recordDeathMarker } from './death-markers.js?realm=166';
+import {
+  removeCitizenFromWorld,
+  transitionCitizenActivity,
+} from './citizen-ownership.js?realm=166';
+
+function detachProjectileTargets(enemy) {
+  let snapshot = null;
+  for (const projectile of G.projectiles) {
+    if (projectile.target !== enemy) continue;
+    snapshot ||= { x: enemy.x, y: enemy.y, hp: enemy.hp };
+    projectile.target = snapshot;
+  }
+}
 
 export function updateEnemies() {
   // Morale break: when a raid has lost more than 60% of its fighters, the
@@ -95,7 +109,6 @@ export function updateEnemies() {
         if (e.attackTimer <= 0) {
           e.attackTimer = MILCFG.raiderCooldown;
           e.engaged.hp -= MILCFG.raiderDmg;
-          e.engaged.hurtTimer = 12;
           e.attackCue = 12;
           spawnClashFX(e.engaged.x, e.engaged.y);
         }
@@ -108,16 +121,13 @@ export function updateEnemies() {
     if (wall && wall.type === 'wall' && wall.hp > 0) {
       // Attack wall instead of passing through
       wall.hp -= 0.35;
-      wall.hurtTimer = 12;
       maybeIgnite(wall, notify);
       if (G.gameTick % 40 === 0) stealFrom(e, 2); // breaching counts toward the goal
-      e._swing = 8;
       if (G.gameTick % 30 === 0) {
-        G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
+        G.particles.push({ tx: wall.x, ty: wall.y, offsetY: -6, text: null, alpha: 0.9, vx: (visualJitter(wall.x, wall.y, 302)-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
       }
       if (wall.hp <= 0) {
-        // Use demolishBuilding so defense/maxPop/workers are all cleaned up properly
-        demolishBuilding(wall, true);
+        removeBuilding(wall, { cause: 'raid' });
       }
       continue; // don't move this tick
     }
@@ -148,14 +158,12 @@ export function updateEnemies() {
         const blocker = G.buildingGrid[by]?.[bx] || G.buildingGrid[Math.round(e.y)]?.[bx] || G.buildingGrid[by]?.[Math.round(e.x)];
         if (blocker && blocker.hp > 0) {
           blocker.hp -= 0.35;
-          blocker.hurtTimer = 12;
           maybeIgnite(blocker, notify);
           if (G.gameTick % 40 === 0) stealFrom(e, 2);
-          e._swing = 8;
           if (G.gameTick % 30 === 0) {
-            G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (rng()-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
+            G.particles.push({ tx: blocker.x, ty: blocker.y, offsetY: -6, text: null, alpha: 0.9, vx: (visualJitter(blocker.x, blocker.y, 303)-0.5)*0.3, vy: -0.18, decay: 0.06, type: 'spark', size: 1.2, color: '#b9b9b9' });
           }
-          if (blocker.hp <= 0) demolishBuilding(blocker, true);
+          if (blocker.hp <= 0) removeBuilding(blocker, { cause: 'raid' });
         } else {
           // Boxed in with nothing to hit — skirt sideways
           e.tx += (rng() - 0.5) * 5;
@@ -164,6 +172,7 @@ export function updateEnemies() {
       }
     } else if (e.retreating) {
       // Reached the retreat edge — gone, with whatever they carried.
+      detachProjectileTargets(e);
       G.enemies.splice(i, 1);
       if (G.enemies.length === 0 && G._raidStolen && Object.values(G._raidStolen).some(v => v > 0)) {
         const parts = Object.entries(G._raidStolen).filter(([, v]) => v > 0).map(([k, v]) => `${v} ${k}`).join(', ');
@@ -184,12 +193,10 @@ export function updateEnemies() {
         e.attackTimer = 55;
         const dmg = e.damage || 7;
         target.b.hp -= dmg;
-        target.b.hurtTimer = 12;
         maybeIgnite(target.b, notify);
         stealFrom(e, dmg);
         if (target.b.hp <= 0) {
-          // Proper cleanup: frees workers, decrements maxPop/defense, refunds partial resources
-          demolishBuilding(target.b, true);
+          removeBuilding(target.b, { cause: 'raid' });
           e.plundered = e.plunderGoal || e.plundered;
         }
         if ((e.plundered || 0) >= (e.plunderGoal || 35)) {
@@ -257,13 +264,16 @@ export function updateEnemies() {
           c.tx = Math.max(1, Math.min(MAP_W - 2, c.x + (dx / (d || 1)) * 5));
           c.ty = Math.max(1, Math.min(MAP_H - 2, c.y + (dy / (d || 1)) * 5));
         }
-        c.state = 'idle';
+        transitionCitizenActivity(c, 'idle', 'combat-recovery');
+        c.activityTimer = 0;
         c.path = null;
+        c.pathIdx = 0;
       }
     }
 
     // Die if hp drops to 0
     if (e.hp <= 0) {
+      detachProjectileTargets(e);
       G.enemies.splice(i, 1);
       if (G.stats) G.stats.enemiesKilled++;
       // Loop 209 (the-fixer, 206 filed): rival's symmetric +reward arm.
@@ -295,11 +305,12 @@ export function updateEnemies() {
       playSound('demolish');
       // Death particles — dramatic blood splat effect
       for (let p = 0; p < 8; p++) {
+        const unit = channel => visualJitter(e.x, e.y, 400 + p * 5 + channel);
         G.particles.push({
-          tx: e.x + (rng()-0.5)*0.3, ty: e.y + (rng()-0.5)*0.3,
-          offsetY: -5 - rng()*10,
+          tx: e.x + (unit(1)-0.5)*0.3, ty: e.y + (unit(2)-0.5)*0.3,
+          offsetY: -5 - unit(3)*10,
           text: p < 2 ? '💀' : '•',
-          alpha: 1.5, vy: -0.15 - rng()*0.15, decay: 0.03,
+          alpha: 1.5, vy: -0.15 - unit(4)*0.15, decay: 0.03,
           type: 'text',
           color: '#8a1a1a',
         });
@@ -313,29 +324,26 @@ export function updateEnemies() {
     const c = G.citizens[i];
     if (c.hp === undefined || c.hp > 0) continue;
     if (c.carrying && c.carryAmount > 0) G.resources[c.carrying] = (G.resources[c.carrying] || 0) + c.carryAmount;
-    G.citizens.splice(i, 1);
-    if (c.jobBuilding) c.jobBuilding.workers = (c.jobBuilding.workers || []).filter(w => w !== c);
-    G.population = Math.max(0, G.population - 1);
+    removeCitizenFromWorld(c);
     if (G.stats) G.stats.citizensDied = (G.stats.citizensDied || 0) + 1;
     G.lastDeathDay = G.day;  // Loop 228 (sustained-state #2 infrastructure)
     playSound('death');
     G.particles.push({
       tx: c.x, ty: c.y, offsetY: -20,
-      text: `💀 ${c.name || 'Settler'}`,
+      text: `💀 ${c.identity.name}`,
       alpha: 2.0, vy: -0.25, decay: 0.012, type: 'text',
       color: '#8a1a1a',
     });
     // Loop 77 (render S4): persistent gravestone at actual death tile
     // (replaces earlier random-house spawn). Name + day recorded so
     // hovering a grave can eventually surface who fell where.
-    if (!G.deathMarkers) G.deathMarkers = [];
-    G.deathMarkers.push({ x: c.x, y: c.y, name: c.name || 'Settler', day: G.day, cause: 'raid' });
+    recordDeathMarker({ x: c.x, y: c.y, name: c.identity.name, cause: 'raid' });
     // Loop 077 (the-fixer, 076 HIGH): {chronicle:false} on the
     // notify so the direct chronicle('death') below is the sole
     // chronicle row for a raider-kill. 076 audit caught this
     // duplicate (notify→tag:raid + direct→tag:death).
-    try { notify(`${c.name || 'A settler'} was slain by raiders!`, 'danger', { chronicle: false }); } catch(_e){}
-    try { chronicle(`${c.name || 'A settler'} fell to raiders. Their name joins the stone.`, 'death'); } catch(_e){}
+    try { notify(`${c.identity.name} was slain by raiders!`, 'danger', { chronicle: false }); } catch(_e){}
+    try { chronicle(`${c.identity.name} fell to raiders. Their name joins the stone.`, 'death'); } catch(_e){}
   }
 }
 
@@ -348,13 +356,12 @@ export function updateProjectiles() {
       // Hit target
       if (p.target && p.target.hp !== undefined) {
         p.target.hp -= p.damage;
-        p.target.hurtTimer = 12;
         if (G.gameTick % 10 === 0) playSound('combat');
         // Loop 67 (render S4): dedicated impact burst on projectile hit.
         // 5 small white sparks radiating from the impact point, fade fast.
         const hx = p.target.x, hy = p.target.y;
         for (let k = 0; k < 5; k++) {
-          const ang = (k / 5) * Math.PI * 2 + rng() * 0.4;
+          const ang = (k / 5) * Math.PI * 2 + visualJitter(hx, hy, 500 + k) * 0.4;
           G.particles.push({
             tx: hx, ty: hy, offsetY: -8,
             text: null, alpha: 1.0,
@@ -378,7 +385,7 @@ export function updateTowers() {
   for (const b of G.buildings) {
     if (b.type !== 'tower' && b.type !== 'barracks') continue;
     // A scaffold doesn't shoot: no fire until construction completes.
-    if (b.buildProgress !== undefined && b.buildProgress < 1) continue;
+    if (b.buildProgress < 1) continue;
     b.fireTimer = (b.fireTimer || 0) - 1;
     if (b.fireTimer > 0) continue;
     // Find nearest enemy
