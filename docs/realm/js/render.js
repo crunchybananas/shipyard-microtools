@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=166';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=166';
-import { makeAtlasLoader } from './atlas-loader.js?realm=166';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=166';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=167';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=167';
+import { makeAtlasLoader } from './atlas-loader.js?realm=167';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=167';
 import {
   ACTIONS as ACTOR_ACTIONS,
   DIRS as ACTOR_DIRS,
@@ -14,16 +14,16 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=166';
+} from './sprite-source-contract.js?realm=167';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=166';
+} from './citizen-presentation.js?realm=167';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=166';
-import { staffingCount } from './citizen-ownership.js?realm=166';
+} from './citizen-render-cache.js?realm=167';
+import { staffingCount } from './citizen-ownership.js?realm=167';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -658,6 +658,103 @@ function wallNeighbors(b) {
     e: !!(b && G.buildingGrid[b.y]?.[b.x + 1]?.type === 'wall'),
     w: !!(b && G.buildingGrid[b.y]?.[b.x - 1]?.type === 'wall'),
   };
+}
+
+const EMPTY_ROAD_NEIGHBORS = Object.freeze({
+  xNeg: false,
+  xPos: false,
+  yNeg: false,
+  yPos: false,
+});
+
+function roadNeighbors(b) {
+  if (!b) return EMPTY_ROAD_NEIGHBORS;
+  return {
+    xNeg: G.buildingGrid[b.y]?.[b.x - 1]?.type === 'road',
+    xPos: G.buildingGrid[b.y]?.[b.x + 1]?.type === 'road',
+    yNeg: G.buildingGrid[b.y - 1]?.[b.x]?.type === 'road',
+    yPos: G.buildingGrid[b.y + 1]?.[b.x]?.type === 'road',
+  };
+}
+
+function drawRoadSurface(ctx, b, s, daylight = 1, neighbors = roadNeighbors(b)) {
+  const top = { x: s.x, y: s.y - TH / 2 };
+  const right = { x: s.x + TW / 2, y: s.y };
+  const bottom = { x: s.x, y: s.y + TH / 2 };
+  const left = { x: s.x - TW / 2, y: s.y };
+  const winter = G.season === 'winter';
+  const base = winter ? '#9a896f' : G.season === 'autumn' ? '#9a6b3f' : '#9f7548';
+  const edge = winter ? '#625849' : '#65452d';
+  const rut = winter ? 'rgba(73,64,53,0.38)' : 'rgba(82,54,34,0.38)';
+  const light = Math.max(0, Math.min(1, daylight));
+
+  ctx.save();
+  ctx.globalAlpha = 0.88 + light * 0.12;
+  ctx.fillStyle = base;
+  ctx.beginPath();
+  ctx.moveTo(top.x, top.y - 0.35);
+  ctx.lineTo(right.x + 0.7, right.y);
+  ctx.lineTo(bottom.x, bottom.y + 0.35);
+  ctx.lineTo(left.x - 0.7, left.y);
+  ctx.closePath();
+  ctx.fill();
+
+  // Wheel ruts run to the midpoint of every connected edge. Opposite arms
+  // form a straight lane; adjacent arms form a corner; 3–4 arms form a
+  // junction without needing a separate sprite for every road shape.
+  const connections = [
+    [neighbors.xNeg, -TW / 4, -TH / 4],
+    [neighbors.xPos, TW / 4, TH / 4],
+    [neighbors.yNeg, TW / 4, -TH / 4],
+    [neighbors.yPos, -TW / 4, TH / 4],
+  ];
+  ctx.strokeStyle = rut;
+  ctx.lineWidth = 0.9;
+  ctx.lineCap = 'round';
+  for (const [connected, dx, dy] of connections) {
+    if (!connected) continue;
+    const length = Math.hypot(dx, dy);
+    const offsetX = (-dy / length) * 2.2;
+    const offsetY = (dx / length) * 2.2;
+    ctx.beginPath();
+    ctx.moveTo(s.x + offsetX, s.y + offsetY);
+    ctx.lineTo(s.x + dx + offsetX, s.y + dy + offsetY);
+    ctx.moveTo(s.x - offsetX, s.y - offsetY);
+    ctx.lineTo(s.x + dx - offsetX, s.y + dy - offsetY);
+    ctx.stroke();
+  }
+
+  // Only exposed edges get a border. Shared edges stay open, so neighboring
+  // tiles read as one continuous road instead of repeated dirt islands.
+  const exposedEdges = [
+    [!neighbors.xNeg, top, left],
+    [!neighbors.yNeg, top, right],
+    [!neighbors.xPos, right, bottom],
+    [!neighbors.yPos, left, bottom],
+  ];
+  ctx.globalAlpha = 0.62 + light * 0.18;
+  ctx.strokeStyle = edge;
+  ctx.lineWidth = 1.25;
+  ctx.lineCap = 'round';
+  for (const [exposed, from, to] of exposedEdges) {
+    if (!exposed) continue;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+  }
+
+  if (!G.camera || G.camera.zoom >= 0.9) {
+    const seed = (((b?.x || 0) * 73856093) ^ ((b?.y || 0) * 19349663)) >>> 0;
+    ctx.globalAlpha = 0.22 + light * 0.08;
+    ctx.fillStyle = winter ? '#d2c5aa' : '#d0a875';
+    for (let i = 0; i < 3; i++) {
+      const px = ((seed >>> (i * 5)) & 15) - 7.5;
+      const py = ((seed >>> (i * 7 + 3)) & 7) - 3.5;
+      ctx.fillRect(s.x + px, s.y + py, 1.4, 0.8);
+    }
+  }
+  ctx.restore();
 }
 
 function drawSupportAtlasPiece(ctx, atlas, frame, trim, x, groundY, targetH, reveal = 1, alpha = 1, widthBoost = 1) {
@@ -1817,6 +1914,25 @@ export function render() {
 
   markRenderPass(profile, 'terrainFog');
 
+  const inWorldView = (x, y, extraPad = 2) => (
+    x >= minX - extraPad
+    && x <= maxX + extraPad
+    && y >= minY - extraPad
+    && y <= maxY + extraPad
+  );
+
+  // ── Roads ─────────────────────────────────────────────────
+  // Roads are terrain, not buildings. Drawing them before the unified world
+  // pass keeps every citizen and animal above the surface regardless of iso
+  // depth, while neighbor-aware edges make runs and junctions continuous.
+  for (let y = minY; y <= maxY; y++) {
+    for (let x = minX; x <= maxX; x++) {
+      const road = G.buildingGrid[y]?.[x];
+      if (road?.type !== 'road' || !G.fog?.[y]?.[x]) continue;
+      drawRoadSurface(ctx, road, toScreen(x, y), daylight);
+    }
+  }
+
   // ── Buildings ─────────────────────────────────────────────
   // Drawn in the unified painter's-algorithm pass below, interleaved with
   // citizens by isometric depth so actors behind a building are occluded.
@@ -2206,12 +2322,6 @@ export function render() {
   // Painter's algorithm over x+y; ties draw the building first so actors and
   // animals at a doorway render in front instead of floating over roofs.
   let worldDrawCount = 0;
-  const inWorldView = (x, y, extraPad = 2) => (
-    x >= minX - extraPad
-    && x <= maxX + extraPad
-    && y >= minY - extraPad
-    && y <= maxY + extraPad
-  );
   const enqueueWorld = (kind, entity, x = entity.x, y = entity.y, order = 1) => {
     let item = worldDrawQueue[worldDrawCount];
     if (!item) {
@@ -2228,6 +2338,7 @@ export function render() {
   };
 
   for (const b of G.buildings) {
+    if (b.type === 'road') continue;
     if (inWorldView(b.x, b.y, 4)) enqueueWorld(WORLD_DRAW_KIND.building, b, b.x, b.y, 0);
   }
   for (const c of citizenPresentations) {
@@ -3723,6 +3834,10 @@ function drawBuildingBase(ctx, b, s, daylight, progress, showRing) {
 function drawBuilding(ctx, b, s, daylight) {
   const def = BUILDINGS[b.type];
   if (!def) throw new Error(`[render] Unknown building type "${b.type}"`);
+  if (b.type === 'road') {
+    drawRoadSurface(ctx, b, s, daylight, EMPTY_ROAD_NEIGHBORS);
+    return;
+  }
   buildingSpriteContract(b.type);
   const progress = b.buildProgress;
   // Keep buildings fully opaque — night overlay darkens them later

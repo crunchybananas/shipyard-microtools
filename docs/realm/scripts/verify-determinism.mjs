@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import runtimeContract from '../runtime-contract.json?realm=166' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=167' with { type: 'json' };
 import {
   CORE_SYSTEM_ORDER,
   canonicalJson,

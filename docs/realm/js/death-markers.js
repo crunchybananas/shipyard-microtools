@@ -1,7 +1,7 @@
 // Death-marker lifecycle — the simulation records graves at the moment a
 // death is committed; presentation code only reads the resulting history.
 
-import { G } from './state.js?realm=166';
+import { G } from './state.js?realm=167';
 
 export const DEATH_MARKER_LIMIT = 40;
 

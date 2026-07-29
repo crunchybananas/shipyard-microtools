@@ -23,6 +23,7 @@ const checks = [
   ['browser save shell', 'verify-browser-save-shell.mjs'],
   ['browser citizen lifecycle', 'verify-engine-v2-citizen-lifecycle-browser.mjs'],
   ['browser citizen ownership', 'verify-engine-v2-ownership-browser.mjs'],
+  ['browser road rendering', 'verify-road-rendering.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];
 

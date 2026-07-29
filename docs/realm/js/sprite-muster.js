@@ -4,8 +4,8 @@ import {
   FRAMES,
   ROLES,
   actorRowKey,
-} from './sprite-source-contract.js?realm=166';
-import { drawActorAtlasFrame } from './render.js?realm=166';
+} from './sprite-source-contract.js?realm=167';
+import { drawActorAtlasFrame } from './render.js?realm=167';
 
 const STATUS_STYLE = {
   accepted: { label: 'LOCKED', color: '#6dd4b8' },

@@ -2,7 +2,7 @@
 // Combat — enemy AI, tower firing, projectile movement
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=166';
+import { G, BUILDINGS, MAP_W, MAP_H, rng } from './state.js?realm=167';
 
 // Raiders torch what they sack: a small per-hit arson chance on wooden
 // stock, throttled to ONE blaze per raid-day — drama, not annihilation.
@@ -42,21 +42,21 @@ function maybeIgnite(b, notifyFn) {
     notifyFn(`🔥 Raiders set the ${BUILDINGS[b.type]?.name || b.type} ablaze!`, 'danger');
   }
 }
-import { stepEntityToward } from './pathfinding.js?realm=166';
-import { spawnClashFX, visualJitter } from './fx.js?realm=166';
+import { stepEntityToward } from './pathfinding.js?realm=167';
+import { spawnClashFX, visualJitter } from './fx.js?realm=167';
 
 // Melee tuning in one place: engage range, disengage range, raider damage,
 // raider attack cooldown (soldier-side numbers live in soldiers.js).
 const MILCFG = { engage: 2.0, disengage: 2.5, raiderDmg: 4, raiderCooldown: 55 };
-import { sfx as playSound } from './log.js?realm=166';
-import { removeBuilding } from './building-lifecycle.js?realm=166';
-import { announce as notify } from './log.js?realm=166';
-import { chronicle } from './log.js?realm=166';
-import { recordDeathMarker } from './death-markers.js?realm=166';
+import { sfx as playSound } from './log.js?realm=167';
+import { removeBuilding } from './building-lifecycle.js?realm=167';
+import { announce as notify } from './log.js?realm=167';
+import { chronicle } from './log.js?realm=167';
+import { recordDeathMarker } from './death-markers.js?realm=167';
 import {
   removeCitizenFromWorld,
   transitionCitizenActivity,
-} from './citizen-ownership.js?realm=166';
+} from './citizen-ownership.js?realm=167';
 
 function detachProjectileTargets(enemy) {
   let snapshot = null;

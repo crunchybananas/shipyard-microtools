@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=166';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=166';
-import { canAfford } from './economy.js?realm=166';
-import { dispatch } from './commands.js?realm=166';
-import { notify } from './notifications.js?realm=166';
-import { initAudio } from './audio.js?realm=166';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=166';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=166';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=167';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=167';
+import { canAfford } from './economy.js?realm=167';
+import { dispatch } from './commands.js?realm=167';
+import { notify } from './notifications.js?realm=167';
+import { initAudio } from './audio.js?realm=167';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=167';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=167';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
