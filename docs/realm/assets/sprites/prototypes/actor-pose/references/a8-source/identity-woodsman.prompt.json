@@ -1,0 +1,38 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-woodsman",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_PcE2pzoIr7mS9exqb9bHKoUV.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png",
+      "role": "exact modular layout and craftsperson anatomy/style reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png",
+      "role": "second established Realm identity rendering reference"
+    }
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: modular game-sprite identity source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Create a NEW, distinctive lumberjack/woodsman identity component board while matching the exact component-board structure, painted resolution, polish, and anatomy conventions of Images 1 and 2. This is a source-parts board, not a character sheet and not an animation.\nInput images: Image 1 is the exact layout and craftsperson anatomy/style reference. Image 2 is a second established Realm identity rendering reference. Preserve their classic strategy-game rendering language but do not copy either person's face, hair, beard, or body identity.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject identity: one rugged middle-aged woodsman with a broad square face, strong nose, close-cropped dark auburn hair with subtle gray at the temples, a thick short boxed beard, weathered warm-tan skin, and a sturdy broad-shouldered working build. His identity must be unmistakably the same in every view. Base layer clothing is a plain fitted charcoal undershirt and dark neutral trousers/boots so later garment layers can cover it cleanly.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm material highlights, dark readable outline clusters, no photorealism, no blur, no dither, no soft ambient shadow.\nComposition/framing: 1536x1024 landscape. Match Image 1's modular board layout exactly: top row has three isolated heads in front, back, and left-profile views; middle row has an isolated left arm, front torso, back torso, left-profile torso, and isolated right arm; bottom row has separated leg/boot components providing front, back, and side views. All components upright, fully uncropped, separated by generous uniform gaps, and sized like Image 1. No assembled full character anywhere.\nLighting/mood: fixed upper-left warm key light identical across every component and view.\nColor palette: warm-tan skin, dark auburn and restrained gray hair, charcoal cloth, dark brown boots; do not use magenta or bright pink anywhere in the subject.\nConstraints: exact same person, proportions, skin tone, hairline, beard shape, undershirt, and body build across front/back/profile parts; anatomically compatible joint endpoints; hands fully visible; clean neck, shoulder, elbow, wrist, hip, knee, and ankle cut zones; each component isolated; one consistent scale; background one uniform #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, or guides; no text; no watermark.\nAvoid: assembled character, multiple people, duplicated extra heads, fantasy armor, helmet, hat, weapons, tools, props, scenery, perspective views, isometric camera, changing identity, smooth concept-art haze, green/magenta fringe, cast shadow, contact shadow.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#fb02fa"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman-keyed.png",
+  "keyed_sha256": "e9727647dbaaf4f14e2f8f229cf5fed92d9ee300d2f642cbfc16218556df2eba",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman.png",
+  "alpha_sha256": "1b591e84d843f9e9965ac31ae00877d88d39b410e74e81fb586d097205fb104b"
+}

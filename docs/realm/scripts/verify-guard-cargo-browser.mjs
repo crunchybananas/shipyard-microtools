@@ -19,7 +19,7 @@ const reportPath = join(outputDir, 'report.json');
 const resources = ['wood', 'stone', 'food', 'gold', 'iron', 'wheat', 'flour', 'planks', 'tools'];
 const directions = ['down', 'up', 'left', 'right'];
 const actions = ['idle', 'walk', 'work', 'carry'];
-const roles = ['guard', 'farmer'];
+const roles = ['guard', 'farmer', 'lumber'];
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 
@@ -48,7 +48,7 @@ try {
     actions,
     roles,
   }) => {
-    const render = await import('./js/render.js?realm=176');
+    const render = await import('./js/render.js?realm=177');
     const game = window.G;
     game.debug.pauseRendering = true;
     const events = [];
@@ -217,7 +217,10 @@ try {
   assert.equal(observed.preview.enabled, false);
   assert.deepEqual(observed.cargo.resources, resources);
   assert.deepEqual(observed.cargo.directions, directions);
-  assert.deepEqual(observed.cargo.ownerRows, ['guard/carry', 'farmer/carry']);
+  assert.deepEqual(
+    observed.cargo.ownerRows,
+    ['guard/carry', 'farmer/carry', 'lumber/carry'],
+  );
   for (const role of roles) {
     for (const action of actions) {
       assert.equal(
@@ -281,6 +284,11 @@ try {
     false,
     'ordinary production proof loaded an A7 preview row',
   );
+  assert.equal(
+    observed.events.some((event) => event.source.includes('/a8-lumber-actions/')),
+    false,
+    'ordinary production proof loaded an A8 preview row',
+  );
   assert.equal(pageErrors.length, 0, pageErrors.join('\n'));
 
   const report = {
@@ -301,8 +309,8 @@ try {
     passed: true,
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-  console.log('✓ all 9 cargo kinds draw for guard and farmer in four directions at exact x3 scale');
-  console.log('✓ both modular families reset action transitions to authored frame 0');
+  console.log('✓ all 9 cargo kinds draw for guard, farmer, and lumber in four directions at exact x3 scale');
+  console.log('✓ all three modular families reset action transitions to authored frame 0');
   console.log('✓ actor and cargo use identical destination rectangles with smoothing off');
   console.log(`resource proof: ${resourcesScreenshot}`);
   console.log(`transition proof: ${transitionsScreenshot}`);

@@ -57,7 +57,8 @@ def main() -> int:
     if scope.get("rows") != 36 or scope.get("frames") != 288:
         failures.append("manifest must describe 36 rows and 288 frames")
     if (
-        scope.get("ownerRows") != ["guard/carry", "farmer/carry"]
+        scope.get("ownerRows")
+        != ["guard/carry", "farmer/carry", "lumber/carry"]
         or scope.get("bakedContainer") is not True
     ):
         failures.append("manifest baked-container ownership changed")

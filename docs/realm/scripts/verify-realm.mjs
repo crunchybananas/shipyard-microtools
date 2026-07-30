@@ -12,6 +12,7 @@ const checks = [
   ['actor-row candidate isolation', 'verify-actor-row-manifest-v2.mjs'],
   ['A6 resource cargo attachments', 'verify-a6-cargo-payloads.mjs'],
   ['A7 modular farmer family', 'verify-a7-farmer-actions.mjs'],
+  ['A8 modular lumber family', 'verify-a8-lumber-actions.mjs'],
   ['sprite source contract', 'verify-sprite-source-contract.mjs'],
   ['deterministic-core purity', 'verify-core-purity.mjs'],
   ['core/FX isolation', 'verify-core-fx-isolation.mjs'],
@@ -32,6 +33,7 @@ const checks = [
   ['browser actor-row candidate isolation', 'verify-actor-row-candidate-browser.mjs'],
   ['browser actor vertical slice', 'verify-actor-vertical-slice.mjs'],
   ['browser farmer vertical slice', 'verify-farmer-vertical-slice.mjs'],
+  ['browser lumber vertical slice', 'verify-lumber-vertical-slice.mjs'],
   ['browser modular cargo and transitions', 'verify-guard-cargo-browser.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];

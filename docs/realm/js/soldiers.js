@@ -2,12 +2,12 @@
 // Soldiers — AI update for soldier units
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=176';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=176';
-import { spawnClashFX } from './fx.js?realm=176';
-import { sfx as playSound } from './log.js?realm=176';
-import { recordDeathMarker } from './death-markers.js?realm=176';
-import { workersForBuilding } from './citizen-ownership.js?realm=176';
+import { G, MAP_W, MAP_H, rng, rngRange, TILE } from './state.js?realm=177';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=177';
+import { spawnClashFX } from './fx.js?realm=177';
+import { sfx as playSound } from './log.js?realm=177';
+import { recordDeathMarker } from './death-markers.js?realm=177';
+import { workersForBuilding } from './citizen-ownership.js?realm=177';
 
 function soldierDamage(s) {
   let damage = 5;

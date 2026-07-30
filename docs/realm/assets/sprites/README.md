@@ -90,7 +90,8 @@ from the production atlas while the style is being established.
 
 This A3 output is retained as provenance for the first factorial source test.
 Its former single-row guard candidate and preview URL have been retired. The
-complete A5 guard and A7 farmer families supersede it in production.
+  complete A5 guard, A7 farmer, and A8 lumber families supersede it in
+  production.
 
 ## Complete Modular Actor Families
 
@@ -99,14 +100,18 @@ complete A5 guard and A7 farmer families supersede it in production.
 - A7 compiles the farmer from one craftsperson identity, one ochre workwear
   kit, a four-view hoe, and the same socketed cargo crate across all four
   actions and directions.
+- A8 compiles the lumber worker from a distinct woodsman identity, forest
+  workwear kit, four-view felling axe, and the shared directional cargo crate
+  across all four actions and directions.
 - Each family emits 16 independent `512x84` rows, 128 frames, semantic and
   equipment planes, landmarks, body-only proofs, a family contact sheet, and
   four exact runtime tiers.
-- Both compilers require binary runtime alpha, a shared 48-color family
+- All three compilers require binary runtime alpha, a shared 48-color family
   palette, stable `76px` body height, ground row `79`, clear rows `80–83`,
   distinct directions, clean row-quality reports, and a byte-identical clean
   rebuild.
-- `guard/carry` and `farmer/carry` own their baked containers. A6 supplies the
+- `guard/carry`, `farmer/carry`, and `lumber/carry` own their baked
+  containers. A6 supplies the
   nine resource-specific payloads at the same tier, frame, and destination
   rectangle; the procedural fallback is suppressed only for those owners.
 
@@ -115,8 +120,11 @@ Verification:
 ```sh
 python3 scripts/actor-pose-prototype/a7_farmer_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a7_farmer_actions.py
+python3 scripts/actor-pose-prototype/a8_lumber_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a8_lumber_actions.py
 scripts/sprite-row verify
 node scripts/verify-farmer-vertical-slice.mjs
+node scripts/verify-lumber-vertical-slice.mjs
 node scripts/verify-guard-cargo-browser.mjs
 ```
 

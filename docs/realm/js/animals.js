@@ -2,9 +2,9 @@
 // Animals — authored wildlife and building-grounded livestock
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=176';
-import { stepEntityToward } from './pathfinding.js?realm=176';
-import { resolveGroundTraffic } from './ground-traffic.js?realm=176';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=177';
+import { stepEntityToward } from './pathfinding.js?realm=177';
+import { resolveGroundTraffic } from './ground-traffic.js?realm=177';
 
 const SPECIES = {
   deer: {

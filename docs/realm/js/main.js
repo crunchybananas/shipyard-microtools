@@ -2,34 +2,34 @@
 // REALM — Main entry point, game loop, initialization
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=176';
-import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=176';
-import { generateWorld } from './world.js?realm=176';
-import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=176';
-import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=176';
-import { dispatch } from './commands.js?realm=176';
-import { coreTick } from './sim.js?realm=176';
-import { on } from './bus.js?realm=176';
-import { updateParticles, updateSmokeEmitters } from './particles.js?realm=176';
-import { setupInput } from './input.js?realm=176';
-import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=176';
-import { ERAS } from './tech.js?realm=176';
-import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=176';
-import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=176';
-import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=176';
-import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=176';
-import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=176';
-import { updateAnimals } from './animals.js?realm=176';
-import { checkAdvisor } from './advisor.js?realm=176';
-import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=176';
-import { chronicle, initChronicle } from './log.js?realm=176';
-import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=176';
-import { initSpriteLab } from './sprite-lab.js?realm=176';
-import { initSpriteMuster } from './sprite-muster.js?realm=176';
-import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=176';
-import { updatePresentationCues } from './presentation-cues.js?realm=176';
-import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=176';
-import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=176';
+import { G, MAP_W, MAP_H, TH, createResourceStock, DIFFICULTY, getDaylight, getSeasonIndex, lightCurve, resetRuntimeTransientState, tintCurve, setSeed } from './state.js?realm=177';
+import { initPostFX, applyPostFX, resizePostFX } from './postfx.js?realm=177';
+import { generateWorld } from './world.js?realm=177';
+import { initRenderer, resizeCanvas, render, renderBuildingIsolated, screenToWorld, panCameraTo, toScreen } from './render.js?realm=177';
+import { initMinimap, setMinimapViewportResolver, renderMinimap } from './minimap.js?realm=177';
+import { dispatch } from './commands.js?realm=177';
+import { coreTick } from './sim.js?realm=177';
+import { on } from './bus.js?realm=177';
+import { updateParticles, updateSmokeEmitters } from './particles.js?realm=177';
+import { setupInput } from './input.js?realm=177';
+import { updateUI, renderBuildBar, setSpeed, setupSaveButtons, renderResearchPanel, toggleResearchPanel, toggleHappinessPanel, updateTutorialTip, dismissTutorial, togglePopPanel, hideInfoPanel, toggleStatsPanel, toggleTradePanel, renderTradePanel, renderMissions, updateEventBanner, showVictoryScreen, showEraBanner } from './ui.js?realm=177';
+import { ERAS } from './tech.js?realm=177';
+import { saveGame, loadGame, getSaveSummary, getLastLoadedSavedAt } from './save.js?realm=177';
+import { updateAmbient, toggleAmbient, isMasterMuted, playSound, tickMusic, toggleMusic } from './audio.js?realm=177';
+import { toggleNotificationLog, notify, notifyTransient } from './notifications.js?realm=177';
+import { loadAchievements, checkAchievements, renderAchievementsPanel } from './achievements.js?realm=177';
+import { getActiveScenario, SCENARIOS } from './scenarios.js?realm=177';
+import { updateAnimals } from './animals.js?realm=177';
+import { checkAdvisor } from './advisor.js?realm=177';
+import { updateBoats, updateFlocks, updateBalloons, updateWolves, updateCarts, updateRainbow, updateHawks, updatePuddles, updateFootprints, updateSnowmen, enhUpdateAll } from './enhancements.js?realm=177';
+import { chronicle, initChronicle } from './log.js?realm=177';
+import { realWorldDreamLens, setChronicleFilter, toggleChroniclePanel } from './story-ui.js?realm=177';
+import { initSpriteLab } from './sprite-lab.js?realm=177';
+import { initSpriteMuster } from './sprite-muster.js?realm=177';
+import { initCitizenInspector, resetCitizenTransitionLedger } from './citizen-inspector.js?realm=177';
+import { updatePresentationCues } from './presentation-cues.js?realm=177';
+import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=177';
+import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=177';
 
 
 // ── Core → shell effect wiring (ENGINE.md rule 4) ───────────────────

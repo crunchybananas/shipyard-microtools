@@ -42,7 +42,7 @@ try {
     && document.body.dataset.spriteRuntimeSource === 'accepted'
     && document.body.dataset.spriteCandidateFile === undefined
     && document.querySelectorAll('#sl-list .sl-source-badge.candidate').length === 0
-    && document.querySelectorAll('#sl-list .sl-source-badge.accepted').length === 201
+    && document.querySelectorAll('#sl-list .sl-source-badge.accepted').length === 212
   ));
 
   const idle = await page.evaluate(async () => {
@@ -60,6 +60,9 @@ try {
     const farmerProduction = Object.entries(manifest.rows).filter(
       ([key, slots]) => key.startsWith('farmer/') && slots.production,
     );
+    const lumberProduction = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('lumber/') && slots.production,
+    );
     const key = 'guard/idle/down';
     const item = manifest.rows[key].production;
     const bytes = await fetch(`assets/sprites/actor-rows/${item.file}`).then(
@@ -74,6 +77,7 @@ try {
       productionCount: production.length,
       guardProductionCount: guardProduction.length,
       farmerProductionCount: farmerProduction.length,
+      lumberProductionCount: lumberProduction.length,
       productionHash: item.sha256,
       fetchedProductionHash: digest,
       reviewSource: document.body.dataset.spriteReviewSource,
@@ -91,9 +95,10 @@ try {
 
   assert.equal(idle.version, 2);
   assert.equal(idle.candidateCount, 0);
-  assert.equal(idle.productionCount, 201);
+  assert.equal(idle.productionCount, 212);
   assert.equal(idle.guardProductionCount, 16);
   assert.equal(idle.farmerProductionCount, 16);
+  assert.equal(idle.lumberProductionCount, 16);
   assert.equal(idle.candidateBadges, 0);
   assert.equal(idle.reviewSource, 'accepted');
   assert.equal(idle.runtimeSource, 'accepted');
@@ -153,6 +158,7 @@ try {
       production: idle.productionCount,
       guardProduction: idle.guardProductionCount,
       farmerProduction: idle.farmerProductionCount,
+      lumberProduction: idle.lumberProductionCount,
     },
     idle,
     carry,
@@ -161,8 +167,8 @@ try {
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(
-    '[actor-row-candidate-browser] PASS — 201 production rows and 0 candidates; '
-    + 'all guard and farmer rows are LOCKED and ordinary game loads no candidate assets',
+    '[actor-row-candidate-browser] PASS — 212 production rows and 0 candidates; '
+    + 'all guard, farmer, and lumber rows are LOCKED and ordinary game loads no candidate assets',
   );
 } finally {
   await browser.close();

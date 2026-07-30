@@ -1,0 +1,42 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-forest-work",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_Z4xT9YWneFQhz1pauoE8P7dM.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work.png",
+      "role": "exact work-garment layout and part-coverage reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman-keyed.png",
+      "role": "new woodsman body identity and fit reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png",
+      "role": "second established Realm garment rendering reference"
+    }
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: modular game-sprite garment source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Create a NEW lumberjack/woodsman workwear component board that fits the woodsman identity in Image 2 while matching the exact modular board structure, painted resolution, polish, and clothing-part conventions of Images 1 and 3. This is a source-parts board, not an assembled character and not an animation.\nInput images: Image 1 is the exact work-garment layout and part-coverage reference. Image 2 is the new woodsman body/identity and fit reference. Image 3 is a second established Realm garment rendering reference. Preserve their classic strategy-game language while creating a distinct lumber role costume.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject garment: practical medieval frontier forestry workwear: close-fitting dark forest-green wool cap; moss-green heavy wool overshirt with rolled sleeves; deep rust-brown split-leather protective apron/chest panel with two narrow shoulder straps and reinforced edge stitching; broad dark leather belt with a small iron buckle; rugged dark umber work trousers with subtle reinforced knees; weathered high brown leather logging boots. No axe or tool on this board.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, strong readable material separation, warm highlights, dark outline clusters, no photorealism, no blur, no dither, no soft ambient shadow.\nComposition/framing: 1536x1024 landscape. Match Image 1's modular garment-board layout exactly: top row has isolated cap front, cap back, cap left-profile; middle row has isolated left sleeve, front tunic/apron, back tunic/straps, left-profile tunic/apron, isolated right sleeve; next row has isolated front, back, and side belt pieces; bottom row has separated trouser/boot components providing front, back, left-profile, and right-profile coverage. Every part upright, fully uncropped, separated by generous uniform gaps, and sized/placed like Image 1. No assembled full character anywhere.\nLighting/mood: fixed upper-left warm key light identical across every component and view.\nColor palette: moss and dark forest green wool, deep rust/umber leather, aged iron buckle, warm brown boots; do not use magenta or bright pink anywhere in the garment.\nMaterials/textures: coarse wool, scuffed split leather, restrained stitching and repaired seams that remain legible at sprite scale.\nConstraints: exact same garment construction, colors, strap placement, cap, apron length, belt, trousers, and boots across front/back/profile parts; anatomically compatible joint endpoints matching Image 2; clean shoulder, elbow, waist, hip, knee, and ankle cut zones; each component isolated; one consistent scale; background one uniform #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, or guides; no body parts except tiny necessary neck/limb openings; no text; no watermark.\nAvoid: assembled character, multiple outfits, duplicate extra hats, yellow farm apron, blue guard uniform, fantasy armor, fur cape, axe, weapons, tools, props, scenery, perspective views, changing garment identity, green/magenta fringe, cast shadow, contact shadow.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f50bf3"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work-keyed.png",
+  "keyed_sha256": "cc23abf07895031375585e9e3d3e6bcafad6da9d4667a5ae9ccf5ff029e3bf29",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work.png",
+  "alpha_sha256": "b4b95fa5671b44c073f86dc9f60001e7054e0d35c710c140067918e870d203c4"
+}

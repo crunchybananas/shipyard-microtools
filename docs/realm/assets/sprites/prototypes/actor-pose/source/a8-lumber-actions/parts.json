@@ -1,0 +1,224 @@
+{
+  "schema": "realm.actor-pose.a8-lumber-actions.v1",
+  "stage": "lumber-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "woodsman",
+    "path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman.png",
+    "sha256": "1b591e84d843f9e9965ac31ae00877d88d39b410e74e81fb586d097205fb104b",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman-keyed.png",
+      "sha256": "e9727647dbaaf4f14e2f8f229cf5fed92d9ee300d2f642cbfc16218556df2eba"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman.prompt.json",
+    "parts": {
+      "down": {
+        "head": [296, 12, 457, 225],
+        "torso": [270, 256, 575, 550],
+        "arm_screen_left": [118, 265, 240, 590],
+        "arm_screen_right": [1174, 265, 1294, 590],
+        "leg": [252, 586, 524, 978]
+      },
+      "up": {
+        "head": [572, 12, 738, 220],
+        "torso": [604, 260, 906, 550],
+        "arm_screen_left": [118, 265, 240, 590],
+        "arm_screen_right": [1174, 265, 1294, 590],
+        "leg": [596, 590, 738, 978]
+      },
+      "left": {
+        "head": [809, 12, 994, 225],
+        "torso": [935, 250, 1112, 550],
+        "arm": [1174, 265, 1294, 590],
+        "leg": [938, 588, 1098, 978]
+      },
+      "right": {
+        "head": [809, 12, 994, 225],
+        "torso": [935, 250, 1112, 550],
+        "arm": [1174, 265, 1294, 590],
+        "leg": [938, 588, 1098, 978]
+      }
+    }
+  },
+  "garment": {
+    "key": "forest-work",
+    "path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work.png",
+    "sha256": "b4b95fa5671b44c073f86dc9f60001e7054e0d35c710c140067918e870d203c4",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work-keyed.png",
+      "sha256": "cc23abf07895031375585e9e3d3e6bcafad6da9d4667a5ae9ccf5ff029e3bf29"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [284, 44, 452, 170],
+        "tunic": [232, 188, 510, 550],
+        "sleeve_screen_left": [94, 236, 210, 418],
+        "sleeve_screen_right": [1110, 236, 1224, 418],
+        "belt": [244, 566, 486, 630],
+        "boot": [242, 646, 490, 978]
+      },
+      "up": {
+        "headgear": [578, 44, 748, 170],
+        "tunic": [530, 188, 800, 550],
+        "sleeve_screen_left": [94, 236, 210, 418],
+        "sleeve_screen_right": [1110, 236, 1224, 418],
+        "belt": [546, 566, 778, 626],
+        "boot": [542, 646, 780, 978]
+      },
+      "left": {
+        "headgear": [816, 40, 1032, 170],
+        "tunic": [862, 188, 1038, 550],
+        "sleeve": [1110, 236, 1224, 418],
+        "belt": [856, 566, 1040, 628],
+        "boot": [864, 646, 1022, 978]
+      },
+      "right": {
+        "headgear": [816, 40, 1032, 170],
+        "tunic": [862, 188, 1038, 550],
+        "sleeve": [1110, 236, 1224, 418],
+        "belt": [856, 566, 1040, 628],
+        "boot": [864, 646, 1022, 978]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "lumber-axe",
+    "path": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe.png",
+    "sha256": "d7f423965ec6fe30b861ff665500800c3bf54b7bb7e6e18cd173337b3f200d22",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe-keyed.png",
+      "sha256": "a1aad1c30e1d37fe22f00111bc17c2e81e84b472b2ecf88bfe438b8af52ed20e"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe.prompt.json",
+    "parts": {
+      "down": [120, 78, 355, 945],
+      "up": [533, 78, 760, 945],
+      "left": [919, 78, 1007, 945],
+      "right": [1218, 78, 1307, 945]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "axe head at top, handle end at bottom",
+      "grip_fraction_from_top": 0.56,
+      "render_height": 39,
+      "occlusion": "body < axe < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and lumber work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and lumber work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "woodsman",
+    "build": "sturdy, broad-shouldered, grounded forestry stance",
+    "identity_leg_far_width": 7,
+    "identity_leg_near_width": 8,
+    "garment_leg_far_width": 8.2,
+    "garment_leg_near_width": 9.2,
+    "upper_arm_far_width": 6.2,
+    "upper_arm_near_width": 7.2,
+    "forearm_far_width": 5.8,
+    "forearm_near_width": 6.5,
+    "identity_torso_size": [26, 33],
+    "garment_tunic_size": [30, 34],
+    "garment_belt_size": [26, 5],
+    "identity_head_size": [23, 24],
+    "garment_headgear_size": [28, 22]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": "lumber-axe",
+      "motion": "ready, draw back, raise, overhead, drive, timber contact, follow-through, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "axe grip remains at the right-hand socket; blade travels toward the authored facing at timber contact"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "lumber",
+    "identity": "woodsman",
+    "garment": "forest-work",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, and forestry-tool components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, and tool are measured independently before the flattened row is accepted"
+  }
+}

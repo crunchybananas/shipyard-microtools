@@ -1,5 +1,57 @@
 # Current Graphics Handoff
 
+## Realm 177 lumber production family — 2026-07-30
+
+- All `16` lumber rows now come from one deterministic A8 modular family:
+  a new woodsman identity, forest-green/rust forestry workwear, sturdy render
+  profile, one palette/lighting/root contract, four actions, and four real
+  directions.
+- The atomic promotion replaced the five mixed legacy/mechanical lumber rows
+  and filled the eleven inherited gaps. Production now contains `212`
+  accepted overrides and `0` candidates; lumber has no inherited action or
+  direction.
+- A8 stores three independent image-generation authorities instead of
+  generating animation frames: identity parts, garment parts, and a four-view
+  felling axe. Each keeps its keyed source, transparent source, complete
+  prompt, reference roles, chroma-removal settings, crop boxes, and SHA-256
+  hashes.
+- The compiler emits `16` reviewable `512x84` rows / `128` frames plus body,
+  identity, garment, equipment, semantic, landmark, quality, palette, and
+  proof artifacts. Exact `27x35`, `35x46`, `54x70`, and `64x84` runtime tiers
+  remain binary-alpha, warning-free, palette-bounded, and byte deterministic.
+- The lumber axe follows eight authored chopping beats—ready, draw back,
+  raise, overhead, drive, timber contact, follow-through, recover—while the
+  body stays at `76±1px`, root row `79`, and clear rows `80–83`.
+- `lumber/carry` joins the guard and farmer baked-container owners. A6 now
+  proves all `3 roles × 9 resources × 4 directions` through production
+  atlases with one frame index, destination rectangle, tier, and unsmoothed
+  integer scale.
+- The renderer preview registry now supports complete A5, A7, and A8 families
+  without requesting any preview row from an ordinary game URL.
+- Browser gates cover all A8 action/direction rows at exact `3x`, transition
+  reset and cadence, an assigned sawmill worker in all four carry directions,
+  cargo alignment, production-only atlas selection, and the live ordinary
+  world at the default tier.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a8_lumber_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a8_lumber_actions.py
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-lumber-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: complete the remaining missing production coverage for builder
+and blacksmith, then replace the derivative full families role by role with
+distinct modular identities, garments, and equipment.
+
 ## Realm 176 farmer production family — 2026-07-30
 
 - All `16` farmer rows now come from one deterministic A7 modular family:

@@ -1,0 +1,42 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "lumber-axe",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_r3nGJAR5vwbZnZr9c5B7KrOa.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a7-source/farmer-hoe.png",
+      "role": "exact four-view tool-board layout and source orientation reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a5-source/guard-short-sword.png",
+      "role": "second established Realm modular tool rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work-keyed.png",
+      "role": "new lumber costume palette and style reference"
+    }
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: modular game-sprite tool source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Paint exactly four isolated orthographic views of the SAME practical medieval woodsman's felling axe, with identical proportions and construction in every view. The axe has a long slightly curved worn ash-wood handle, a dark forged iron socket, and one broad single-bit iron blade with a restrained bright cutting edge. It must read immediately as a lumber axe when reduced to roughly 28–36 pixels tall; it is a working tool, not an ornate fantasy weapon.\nInput images: Image 1 is the exact four-view tool-board layout and source orientation reference. Image 2 is a second established Realm modular tool rendering-quality reference. Image 3 is the new lumber costume palette/style reference. Do not copy the hoe or sword shape.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm wood highlights, dark readable iron clusters, no photorealism, no blur, no dither, no soft shadow.\nComposition/framing: 1536x1024 landscape source board; exactly four full uncropped axe views in one horizontal row with large equal gaps and generous padding. From left to right: broad blade-face/front view, reverse/back view, left edge/profile view, right edge/profile view. Every axe vertical with the iron head at the top and handle end at the bottom. Keep all four axes the same overall length and head size. Exactly four objects and no labels.\nLighting/mood: fixed upper-left warm key light identical to the actor and costume sources.\nColor palette: warm mid-brown ash wood, dark charcoal forged iron, restrained steel edge highlight; do not use magenta or bright pink anywhere in the axe.\nMaterials/textures: subtle handle grain and wear at the grip, compact hammer-forged iron texture, no decorative carving.\nConstraints: identical tool identity, handle curve, socket, blade width, edge, scale, and length across all views; each object fully separated from every other object and all canvas edges; background one uniform #ff00ff with no shadows, gradients, texture, reflections, floor plane, lighting variation, border, labels, or guides; crisp silhouettes; no cast shadow; no contact shadow; no text; no watermark; no hands; no character; no scenery; no extra tools; no logos.\nAvoid: hoe, sword, spear, pickaxe, double-bit battle axe, ornate fantasy weapon, modern fiberglass, multiple different axes, isometric angle, perspective distortion, blur, antialiased haze, magenta fringe.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f706f3"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe-keyed.png",
+  "keyed_sha256": "a1aad1c30e1d37fe22f00111bc17c2e81e84b472b2ecf88bfe438b8af52ed20e",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe.png",
+  "alpha_sha256": "d7f423965ec6fe30b861ff665500800c3bf54b7bb7e6e18cd173337b3f200d22"
+}

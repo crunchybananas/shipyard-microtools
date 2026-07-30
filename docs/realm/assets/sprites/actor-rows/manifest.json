@@ -4400,223 +4400,707 @@
         "status": "accepted"
       }
     },
-    "lumber/walk/up": {
+    "lumber/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-09T18:32:57Z",
-        "file": "lumber/walk-up.png",
-        "note": "Dedicated rear-facing lumber walk replacement: eight alternating boot contacts, fixed ground anchor, consistent axe side, and stable painted body mass.",
-        "provenance": "imagegen-lumber-rear-walk-v3",
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/carry-down-2a1522f1e9c4.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 39.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
             "medianColor": [
-              102.5,
-              73.55,
-              44.7
+              79.6,
+              58.6,
+              31.25
             ],
-            "paletteDelta": 17.45
+            "paletteDelta": 2.26
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.041,
-          "maxBodyCenterJump": 1.01,
-          "maxEdgePixels": 8,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.034,
+          "maxBodyCenterJump": 2.28,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.81,
-          "medianBodyHeight": 79.0,
-          "medianBodyWidth": 41.0,
+          "maxPaletteDrift": 0.84,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            117.95,
-            79.05,
-            50.65
+            80.65,
+            60.6,
+            31.35
           ],
-          "medianColorCount": 413.5,
-          "medianShadingRatio": 0.5734,
+          "medianColorCount": 309.0,
+          "medianShadingRatio": 0.6859,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "af020b84055ac2aae83621dc255767b68512356709c8312e5b5447f8643cbcbe",
+        "sha256": "2a1522f1e9c41fc6e95f1085c2eb818db8305a74afd42a192a80fdfd51c43749",
+        "status": "accepted"
+      }
+    },
+    "lumber/carry/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/carry-left-43aa1a193056.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              79.6,
+              60.6,
+              31.3
+            ],
+            "paletteDelta": 2.0
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.087,
+          "maxBodyCenterJump": 2.22,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.53,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            79.65,
+            58.6,
+            31.25
+          ],
+          "medianColorCount": 343.5,
+          "medianShadingRatio": 0.6685,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "43aa1a1930567b396dd6bce1e5e196d497cc7244f8ad08cf522a49a3e9ede70e",
+        "status": "accepted"
+      }
+    },
+    "lumber/carry/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/carry-right-a7078720fda5.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              79.65,
+              60.6,
+              31.25
+            ],
+            "paletteDelta": 2.05
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.085,
+          "maxBodyCenterJump": 2.11,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.37,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            79.6,
+            58.55,
+            31.3
+          ],
+          "medianColorCount": 343.5,
+          "medianShadingRatio": 0.6687,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "a7078720fda5755174ec270bd41dd91a74362a4a18ce97d679fc1a35eb4eb9cb",
+        "status": "accepted"
+      }
+    },
+    "lumber/carry/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/carry-up-6f44a6684592.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
+            "medianColor": [
+              79.65,
+              58.6,
+              31.3
+            ],
+            "paletteDelta": 4.23
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.036,
+          "maxBodyCenterJump": 1.81,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 0.81,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            76.1,
+            60.9,
+            31.2
+          ],
+          "medianColorCount": 271.0,
+          "medianShadingRatio": 0.6855,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "6f44a6684592200504a3dd387675b0757a43b4d93856b262299d03c4668705be",
+        "status": "accepted"
+      }
+    },
+    "lumber/idle/down": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/idle-down-c10566deb040.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              77.5,
+              58.7,
+              31.7
+            ],
+            "paletteDelta": 1.06
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.055,
+          "maxBodyCenterJump": 2.12,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 0.83,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            78.4,
+            59.25,
+            31.6
+          ],
+          "medianColorCount": 301.5,
+          "medianShadingRatio": 0.6899,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "c10566deb040f219376a6d938e47284b21f3823b56a17117bbd474d596fe3f22",
+        "status": "accepted"
+      }
+    },
+    "lumber/idle/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/idle-left-e4434ce2509d.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              77.5,
+              59.25,
+              31.6
+            ],
+            "paletteDelta": 0.68
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.7,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.08,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            77.85,
+            58.7,
+            31.8
+          ],
+          "medianColorCount": 345.5,
+          "medianShadingRatio": 0.6713,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "e4434ce2509d240163175ed55dfe546db476f26c5d375e550c67e3f2984437fc",
+        "status": "accepted"
+      }
+    },
+    "lumber/idle/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/idle-right-7d5327dfd557.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              77.85,
+              59.25,
+              31.6
+            ],
+            "paletteDelta": 0.83
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.69,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.08,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            77.5,
+            58.5,
+            31.7
+          ],
+          "medianColorCount": 350.0,
+          "medianShadingRatio": 0.6651,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "7d5327dfd5574a0c8ceb7436e6ebe11a39cdc57b61a28a0ed94380e40c22ea5a",
+        "status": "accepted"
+      }
+    },
+    "lumber/idle/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/idle-up-5ef8884547f3.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              77.85,
+              58.7,
+              31.7
+            ],
+            "paletteDelta": 3.25
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.056,
+          "maxBodyCenterJump": 2.17,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.1,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            74.95,
+            60.0,
+            31.0
+          ],
+          "medianColorCount": 257.5,
+          "medianShadingRatio": 0.6822,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "5ef8884547f3069f22a173c0ca203d7a3651a199b9d56526772be844e471870c",
+        "status": "accepted"
+      }
+    },
+    "lumber/walk/down": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/walk-down-34ec9e9b799c.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              78.55,
+              58.6,
+              31.75
+            ],
+            "paletteDelta": 1.0
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 2.14,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 0.41,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            77.75,
+            59.15,
+            31.5
+          ],
+          "medianColorCount": 305.5,
+          "medianShadingRatio": 0.6896,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "34ec9e9b799c8c9798d5d815b3990713566a276cd529223e5390a4fe6f7fb652",
+        "status": "accepted"
+      }
+    },
+    "lumber/walk/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/walk-left-0698739b3456.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              77.75,
+              59.15,
+              31.5
+            ],
+            "paletteDelta": 1.18
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.089,
+          "maxBodyCenterJump": 2.44,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 4.87,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            78.75,
+            58.6,
+            31.8
+          ],
+          "medianColorCount": 346.5,
+          "medianShadingRatio": 0.6667,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "0698739b3456220eabb1e5b93b13292e5d22a5d4dc0736633eeb1c112570c6e1",
+        "status": "accepted"
+      }
+    },
+    "lumber/walk/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/walk-right-97870a8f5b2e.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              77.75,
+              59.15,
+              31.5
+            ],
+            "paletteDelta": 1.09
+          },
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.089,
+          "maxBodyCenterJump": 2.46,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 4.74,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            78.55,
+            58.45,
+            31.75
+          ],
+          "medianColorCount": 342.0,
+          "medianShadingRatio": 0.6633,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "97870a8f5b2eb9aa3313c1235593b0fe52c7d92376e07a38de279f75ba25e78b",
+        "status": "accepted"
+      }
+    },
+    "lumber/walk/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/walk-up-b2f35721480a.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              78.55,
+              58.6,
+              31.75
+            ],
+            "paletteDelta": 4.57
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.039,
+          "maxBodyCenterJump": 2.05,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.21,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            74.2,
+            59.65,
+            30.8
+          ],
+          "medianColorCount": 264.0,
+          "medianShadingRatio": 0.6862,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "b2f35721480ae2f23b613639a46c8e940f9fbafdc2ac467480b08a00311abb88",
         "status": "accepted"
       }
     },
     "lumber/work/down": {
       "production": {
-        "acceptedAt": "2026-07-09T18:21:49Z",
-        "file": "lumber/work-down.png",
-        "note": "Recomposed from the cleanest existing lumber work pose; fixed-foot rhythm preserves the painted identity while removing body-scale and ground-anchor jitter.",
-        "provenance": "mechanical-stable-work-rhythm",
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/work-down-aec8bd2a3316.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 2,
           "directionReference": {
-            "bodyHeightDelta": 5.0,
+            "bodyHeightDelta": 0.0,
             "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 76.5,
-            "medianBodyWidth": 39.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              103.05,
-              73.25,
-              44.4
+              82.0,
+              60.95,
+              33.45
             ],
-            "paletteDelta": 29.99
+            "paletteDelta": 2.73
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.081,
-          "maxBodyCenterJump": 1.13,
-          "maxEdgePixels": 25,
+          "flickerScore": 4.4,
+          "maxAlphaRatio": 1.041,
+          "maxBodyCenterJump": 2.33,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.05,
-          "medianBodyHeight": 71.5,
-          "medianBodyWidth": 37.0,
+          "maxPaletteDrift": 4.22,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            126.9,
-            85.1,
-            58.2
+            82.45,
+            63.25,
+            34.85
           ],
-          "medianColorCount": 453.0,
-          "medianShadingRatio": 0.6492,
+          "medianColorCount": 350.5,
+          "medianShadingRatio": 0.6758,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "e4fad311b3cc3ee652328ce7f21807ef1604a51a536d7deaa57ce52c14124472",
+        "sha256": "aec8bd2a3316048da36443edce47ffc22a57d1907a26946151c517fb657d1ed8",
         "status": "accepted"
       }
     },
     "lumber/work/left": {
       "production": {
-        "acceptedAt": "2026-07-02T04:50:27Z",
-        "file": "lumber/work-left.png",
-        "note": "two-chop cycle, alternating strike depth, ground-anchored",
-        "provenance": "pulse verb: 5-variant chop rhythm 0,1,4,2,0,1,3,2 over the static painted pose (all-sprite-maps low-variety gate fix)",
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/work-left-4ff450c09d1b.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 4,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.5,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 37.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.5,
             "medianColor": [
-              111.15,
-              73.6,
-              44.7
+              82.0,
+              62.65,
+              33.45
             ],
-            "paletteDelta": 8.14
+            "paletteDelta": 1.73
           },
-          "flickerScore": 8.0,
-          "maxAlphaRatio": 1.059,
-          "maxBodyCenterJump": 1.39,
-          "maxEdgePixels": 7,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 0.75,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.24,
-          "medianBodyHeight": 76.5,
-          "medianBodyWidth": 39.0,
+          "maxPaletteDrift": 2.96,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            103.05,
-            74.35,
-            44.85
+            82.3,
+            60.95,
+            33.45
           ],
-          "medianColorCount": 618.5,
-          "medianShadingRatio": 0.6356,
+          "medianColorCount": 381.5,
+          "medianShadingRatio": 0.6645,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "47c612f544301f9a2e7ae36987452e0c96e3abe703a169a4a1c821a79a926da7",
+        "sha256": "4ff450c09d1bf42f46c072932ec47ce71fa0864f40124fee90561d559e577260",
         "status": "accepted"
       }
     },
     "lumber/work/right": {
       "production": {
-        "acceptedAt": "2026-07-02T04:50:28Z",
-        "file": "lumber/work-right.png",
-        "note": "two-chop cycle, alternating strike depth, ground-anchored",
-        "provenance": "pulse verb: 5-variant chop rhythm 0,1,4,2,0,1,3,2 over the static painted pose (all-sprite-maps low-variety gate fix)",
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/work-right-aa3bf34ea7bb.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 4,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 76.5,
-            "medianBodyWidth": 39.0,
+            "bodyWidthDelta": 1.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.5,
             "medianColor": [
-              111.15,
-              74.35,
-              44.85
+              82.3,
+              62.65,
+              33.45
             ],
-            "paletteDelta": 10.17
+            "paletteDelta": 1.92
           },
-          "flickerScore": 8.0,
-          "maxAlphaRatio": 1.051,
-          "maxBodyCenterJump": 1.42,
-          "maxEdgePixels": 9,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 0.81,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.87,
-          "medianBodyHeight": 76.5,
-          "medianBodyWidth": 37.0,
+          "maxPaletteDrift": 2.96,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            101.05,
-            73.25,
-            44.4
+            82.0,
+            60.75,
+            33.4
           ],
-          "medianColorCount": 591.5,
-          "medianShadingRatio": 0.6273,
+          "medianColorCount": 379.0,
+          "medianShadingRatio": 0.6584,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1fdab769b77cfaeb1919b7cf743036ab380f534128d8b5cbfb2e76fff083585c",
+        "sha256": "aa3bf34ea7bb9b0bce82b3cfd23d7361fb0c99824564dd5c5f587c778651ab91",
         "status": "accepted"
       }
     },
     "lumber/work/up": {
       "production": {
-        "acceptedAt": "2026-07-09T18:21:49Z",
-        "file": "lumber/work-up.png",
-        "note": "Recomposed from the cleanest existing lumber work pose; compact fixed-foot rhythm preserves the painted rear view without edge clipping or loose chips.",
-        "provenance": "mechanical-stable-work-rhythm",
+        "acceptedAt": "2026-07-30T06:41:35Z",
+        "file": "production/lumber/work-up-259e1afaa258.png",
+        "note": "Promote the complete A8 woodsman/forest-work family after deterministic compiler, clean-rebuild, row-quality, and live-canvas verification.",
+        "provenance": "modular-imagegen-a8",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 3,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 76.5,
-            "medianBodyWidth": 37.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              103.05,
-              74.35,
-              44.85
+              82.3,
+              60.95,
+              33.45
             ],
-            "paletteDelta": 8.67
+            "paletteDelta": 4.58
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.075,
-          "maxBodyCenterJump": 1.05,
-          "maxEdgePixels": 18,
+          "flickerScore": 5.6,
+          "maxAlphaRatio": 1.065,
+          "maxBodyCenterJump": 1.77,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.93,
-          "medianBodyHeight": 75.5,
-          "medianBodyWidth": 38.0,
+          "maxPaletteDrift": 3.94,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.5,
           "medianColor": [
-            110.4,
-            71.05,
-            41.65
+            78.05,
+            62.65,
+            33.45
           ],
-          "medianColorCount": 344.5,
-          "medianShadingRatio": 0.6199,
+          "medianColorCount": 321.0,
+          "medianShadingRatio": 0.6677,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "25adfdae5f573aad705ba9eb9bea4fdc0a6a0387e54c56a9a6de800d1b3a47a6",
+        "sha256": "259e1afaa25843fbff3e0ba23d0265e59e45afed4292df2ce420b687965ebc18",
         "status": "accepted"
       }
     },
@@ -8794,6 +9278,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T06:07:45Z",
+  "updatedAt": "2026-07-30T06:41:36Z",
   "version": 2
 }
