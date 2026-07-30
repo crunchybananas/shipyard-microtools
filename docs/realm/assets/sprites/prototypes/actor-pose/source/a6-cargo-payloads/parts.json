@@ -1,0 +1,69 @@
+{
+  "schema": "realm.actor-pose.a6-cargo-payloads.v1",
+  "stage": "resource-specific-cargo-attachments",
+  "source": {
+    "path": "assets/sprites/prototypes/actor-pose/references/a6-source/cargo-payloads.png",
+    "sha256": "a4d28df361705e6ced47cabdf081412b27eb660f519183a715d2749c20b50178",
+    "prompt": "assets/sprites/prototypes/actor-pose/references/a6-source/cargo-payloads.prompt.json",
+    "grid": {
+      "columns": 3,
+      "rows": 3,
+      "edges": [0, 418, 836, 1254]
+    }
+  },
+  "carrier": {
+    "role": "guard",
+    "action": "carry",
+    "identity": "watchman",
+    "garment": "watch-blue",
+    "container": "cargo-crate",
+    "rows_root": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/rows/watchman/watch-blue",
+    "landmarks_root": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/landmarks/watchman/watch-blue",
+    "equipment_root": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/planes/equipment/watchman/watch-blue",
+    "socket": "load"
+  },
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8
+  },
+  "directions": ["down", "up", "left", "right"],
+  "resources": [
+    {"key": "wood", "cell": [0, 0], "max_size": [18, 10]},
+    {"key": "stone", "cell": [1, 0], "max_size": [15, 10]},
+    {"key": "food", "cell": [2, 0], "max_size": [17, 10]},
+    {"key": "gold", "cell": [0, 1], "max_size": [12, 11]},
+    {"key": "iron", "cell": [1, 1], "max_size": [15, 10]},
+    {"key": "wheat", "cell": [2, 1], "max_size": [13, 13]},
+    {"key": "flour", "cell": [0, 2], "max_size": [12, 13]},
+    {"key": "planks", "cell": [1, 2], "max_size": [18, 9]},
+    {"key": "tools", "cell": [2, 2], "max_size": [16, 11]}
+  ],
+  "placement": {
+    "down": {"width_scale": 1.0, "bottom_offset": 2, "mirror": false},
+    "up": {"width_scale": 0.94, "bottom_offset": 1, "mirror": false},
+    "left": {"width_scale": 0.72, "bottom_offset": 2, "mirror": true},
+    "right": {"width_scale": 0.72, "bottom_offset": 2, "mirror": false}
+  },
+  "runtime_tiers": [
+    {"key": "native", "frame_width": 27, "frame_height": 35, "file": "cargo-payloads-native.png"},
+    {"key": "default", "frame_width": 35, "frame_height": 46, "file": "cargo-payloads-default.png"},
+    {"key": "double", "frame_width": 54, "frame_height": 70, "file": "cargo-payloads-double.png"},
+    {"key": "review", "frame_width": 64, "frame_height": 84, "file": "cargo-payloads-review.png"}
+  ],
+  "style": {
+    "alpha_threshold": 72,
+    "colors_per_payload": 16,
+    "dither": "none",
+    "source_downsample": "Lanczos",
+    "tier_downsample": "Box plus bounded unsharp",
+    "transparent_rgb": "#000000"
+  },
+  "authority": {
+    "source_unit": "one independently cropped transparent bitmap part per resource",
+    "animation_unit": "one 512x84 eight-frame overlay row per resource and direction",
+    "runtime": "four prefiltered raster atlases sharing actor tier dimensions and row order",
+    "registration": "A5 per-frame load socket; overlay target rectangle exactly matches actor target rectangle",
+    "fallback": "legacy procedural cargo remains available only for actor rows without a baked cargo container"
+  }
+}

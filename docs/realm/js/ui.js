@@ -2,22 +2,22 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=174';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=174';
-import { getWonderReport } from './wonder.js?realm=174';
-import { panCameraTo } from './render.js?realm=174';
-import { dispatch } from './commands.js?realm=174';
-import { missions } from './missions.js?realm=174';
-import { getActiveScenario } from './scenarios.js?realm=174';
-import { saveGame, loadGame } from './save.js?realm=174';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=174';
-import { notify } from './notifications.js?realm=174';
-import { TRADE_PARTNERS } from './trade.js?realm=174';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=175';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=175';
+import { getWonderReport } from './wonder.js?realm=175';
+import { panCameraTo } from './render.js?realm=175';
+import { dispatch } from './commands.js?realm=175';
+import { missions } from './missions.js?realm=175';
+import { getActiveScenario } from './scenarios.js?realm=175';
+import { saveGame, loadGame } from './save.js?realm=175';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=175';
+import { notify } from './notifications.js?realm=175';
+import { TRADE_PARTNERS } from './trade.js?realm=175';
 import {
   citizenStaffingCapacity,
   staffingCount,
-} from './citizen-ownership.js?realm=174';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=174';
+} from './citizen-ownership.js?realm=175';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=175';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,

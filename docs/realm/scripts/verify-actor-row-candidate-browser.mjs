@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-// Prove that Sprite Lab reviews v2 candidates while the ordinary game remains
-// on compiled production/base art. This is the browser half of the actor-row
-// manifest isolation contract.
+// Prove that Sprite Lab reflects the current v2 slots and that the ordinary
+// game never requests candidate files. Candidate mutation semantics are
+// exercised in the isolated Python gate; the checked production manifest may
+// legitimately contain zero candidates after an atomic family promotion.
 
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -37,13 +38,11 @@ try {
   );
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => (
-    document.body.dataset.spriteReviewSource === 'candidate'
+    document.body.dataset.spriteReviewSource === 'accepted'
     && document.body.dataset.spriteRuntimeSource === 'accepted'
-    && document.body.dataset.spriteCandidateFile === 'candidates/guard/idle-down.png'
-    && document.querySelectorAll('#sl-list .sl-source-badge.candidate').length === 16
-    && performance.getEntriesByType('resource').some(
-      (entry) => entry.name.includes('/actor-rows/candidates/guard/idle-down.png'),
-    )
+    && document.body.dataset.spriteCandidateFile === undefined
+    && document.querySelectorAll('#sl-list .sl-source-badge.candidate').length === 0
+    && document.querySelectorAll('#sl-list .sl-source-badge.accepted').length === 195
   ));
 
   const idle = await page.evaluate(async () => {
@@ -54,10 +53,12 @@ try {
     const manifest = await response.json();
     const records = Object.values(manifest.rows);
     const candidates = records.filter((slots) => slots.candidate);
-    const coexist = candidates.filter((slots) => slots.production);
-    const runtimeBase = candidates.filter((slots) => !slots.production);
+    const production = records.filter((slots) => slots.production);
+    const guardProduction = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('guard/') && slots.production,
+    );
     const key = 'guard/idle/down';
-    const item = manifest.rows[key].candidate;
+    const item = manifest.rows[key].production;
     const bytes = await fetch(`assets/sprites/actor-rows/${item.file}`).then(
       (asset) => asset.arrayBuffer(),
     );
@@ -67,14 +68,13 @@ try {
     return {
       version: manifest.version,
       candidateCount: candidates.length,
-      coexistCount: coexist.length,
-      runtimeBaseCount: runtimeBase.length,
-      productionHash: manifest.rows[key].production.sha256,
-      candidateHash: item.sha256,
-      fetchedCandidateHash: digest,
+      productionCount: production.length,
+      guardProductionCount: guardProduction.length,
+      productionHash: item.sha256,
+      fetchedProductionHash: digest,
       reviewSource: document.body.dataset.spriteReviewSource,
       runtimeSource: document.body.dataset.spriteRuntimeSource,
-      candidateFile: document.body.dataset.spriteCandidateFile,
+      candidateFile: document.body.dataset.spriteCandidateFile || null,
       provenance: document.querySelector('#sl-provenance')?.textContent || '',
       candidateBadges: document.querySelectorAll(
         '#sl-list .sl-source-badge.candidate',
@@ -86,38 +86,35 @@ try {
   });
 
   assert.equal(idle.version, 2);
-  assert.equal(idle.candidateCount, 16);
-  assert.equal(idle.coexistCount, 12);
-  assert.equal(idle.runtimeBaseCount, 4);
-  assert.equal(idle.candidateBadges, 16);
-  assert.equal(idle.reviewSource, 'candidate');
+  assert.equal(idle.candidateCount, 0);
+  assert.equal(idle.productionCount, 195);
+  assert.equal(idle.guardProductionCount, 16);
+  assert.equal(idle.candidateBadges, 0);
+  assert.equal(idle.reviewSource, 'accepted');
   assert.equal(idle.runtimeSource, 'accepted');
-  assert.equal(idle.candidateFile, 'candidates/guard/idle-down.png');
-  assert.notEqual(idle.productionHash, idle.candidateHash);
-  assert.equal(idle.fetchedCandidateHash, idle.candidateHash);
-  assert.match(idle.provenance, /CANDIDATE/);
-  assert.match(idle.provenance, /runtime LOCKED/);
+  assert.equal(idle.candidateFile, null);
+  assert.equal(idle.fetchedProductionHash, idle.productionHash);
+  assert.match(idle.provenance, /LOCKED/);
+  assert.match(idle.provenance, /a5-modular-guard-actions/);
 
   await page.selectOption('#sl-action', 'carry');
   await page.selectOption('#sl-dir', 'down');
   await page.waitForFunction(() => (
-    document.body.dataset.spriteReviewSource === 'candidate'
-    && document.body.dataset.spriteRuntimeSource === 'base'
-    && document.body.dataset.spriteCandidateFile === 'candidates/guard/carry-down.png'
-    && performance.getEntriesByType('resource').some(
-      (entry) => entry.name.includes('/actor-rows/candidates/guard/carry-down.png'),
-    )
+    document.body.dataset.spriteReviewSource === 'accepted'
+    && document.body.dataset.spriteRuntimeSource === 'accepted'
+    && document.body.dataset.spriteCandidateFile === undefined
   ));
   const carry = await page.evaluate(() => ({
     reviewSource: document.body.dataset.spriteReviewSource,
     runtimeSource: document.body.dataset.spriteRuntimeSource,
-    candidateFile: document.body.dataset.spriteCandidateFile,
+    candidateFile: document.body.dataset.spriteCandidateFile || null,
     provenance: document.querySelector('#sl-provenance')?.textContent || '',
   }));
-  assert.equal(carry.reviewSource, 'candidate');
-  assert.equal(carry.runtimeSource, 'base');
-  assert.equal(carry.candidateFile, 'candidates/guard/carry-down.png');
-  assert.match(carry.provenance, /runtime BASE/);
+  assert.equal(carry.reviewSource, 'accepted');
+  assert.equal(carry.runtimeSource, 'accepted');
+  assert.equal(carry.candidateFile, null);
+  assert.match(carry.provenance, /LOCKED/);
+  assert.match(carry.provenance, /a5-modular-guard-actions/);
   assert.equal(errors.length, 0, errors.join('\n'));
   await page.screenshot({ path: screenshotPath, fullPage: false });
 
@@ -144,12 +141,12 @@ try {
   assert.equal(ordinaryErrors.length, 0, ordinaryErrors.join('\n'));
 
   const report = {
-    schema: 'realm.actor-row-candidate-browser-report.v1',
+    schema: 'realm.actor-row-candidate-browser-report.v2',
     manifest: {
       version: idle.version,
       candidates: idle.candidateCount,
-      coexistWithProduction: idle.coexistCount,
-      runtimeBase: idle.runtimeBaseCount,
+      production: idle.productionCount,
+      guardProduction: idle.guardProductionCount,
     },
     idle,
     carry,
@@ -158,8 +155,8 @@ try {
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(
-    '[actor-row-candidate-browser] PASS — 16 candidates visible in Sprite Lab; '
-    + '12 coexist with LOCKED rows, 4 retain BASE runtime, ordinary game loads none',
+    '[actor-row-candidate-browser] PASS — 195 production rows and 0 candidates; '
+    + 'all 16 guard rows are LOCKED and ordinary game loads no candidate assets',
   );
 } finally {
   await browser.close();

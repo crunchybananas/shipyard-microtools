@@ -1,0 +1,60 @@
+{
+  "schema": "realm.cargo-runtime-atlases.v1",
+  "sourceManifest": "assets/sprites/prototypes/actor-pose/output/a6-cargo-payloads/manifest.json",
+  "resources": [
+    "wood",
+    "stone",
+    "food",
+    "gold",
+    "iron",
+    "wheat",
+    "flour",
+    "planks",
+    "tools"
+  ],
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "frames": 8,
+  "atlases": [
+    {
+      "key": "native",
+      "file": "cargo-payloads-native.png",
+      "frameWidth": 27,
+      "frameHeight": 35,
+      "width": 216,
+      "height": 1260,
+      "sha256": "0fad6ae80020aedba570791ff3adfa7ac2de101509ecc6e11ce63c0327746c4e"
+    },
+    {
+      "key": "default",
+      "file": "cargo-payloads-default.png",
+      "frameWidth": 35,
+      "frameHeight": 46,
+      "width": 280,
+      "height": 1656,
+      "sha256": "0e02af076681ee839c42026da04b556c00e58503f11a5a450d772a641b916bf5"
+    },
+    {
+      "key": "double",
+      "file": "cargo-payloads-double.png",
+      "frameWidth": 54,
+      "frameHeight": 70,
+      "width": 432,
+      "height": 2520,
+      "sha256": "56f79ede0a0bc1951b542e9b4223a46500bea616d66737c71f48924bb444078e"
+    },
+    {
+      "key": "review",
+      "file": "cargo-payloads-review.png",
+      "frameWidth": 64,
+      "frameHeight": 84,
+      "width": 512,
+      "height": 3024,
+      "sha256": "41f0573e4f8d02679ba426012e79cd53b5c778225874f260bc38c7e14c113eda"
+    }
+  ]
+}

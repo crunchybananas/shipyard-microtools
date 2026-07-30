@@ -14,6 +14,12 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { normalizeActorRowManifest } from './actor-row-manifest.mjs';
 import {
+  CARGO_DIRECTIONS,
+  CARGO_FRAMES,
+  CARGO_RESOURCES,
+  CARGO_RUNTIME_ATLASES,
+} from '../js/cargo-source-contract.js?realm=175';
+import {
   ACTIONS,
   ACTOR_BASE_DIRNAME,
   ACTOR_COMPILED_DIRNAME,
@@ -34,7 +40,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=174';
+} from '../js/sprite-source-contract.js?realm=175';
 
 const execFileAsync = promisify(execFile);
 
@@ -49,6 +55,7 @@ const ACTOR_ROW_MANIFEST_PATH = join(ACTOR_ROW_DIR, ACTOR_ROW_MANIFEST);
 const AMBIENT_DIR = join(ROOT, 'assets', 'sprites', 'ambient');
 const OUT_ACTORS = join(ROOT, 'assets', 'sprites', 'actors-atlas.png');
 const OUT_ACTOR_RUNTIME_MANIFEST = join(ROOT, 'assets', 'sprites', 'actors-runtime-atlases.json');
+const OUT_CARGO_RUNTIME_MANIFEST = join(ROOT, 'assets', 'sprites', 'cargo-payloads-runtime-atlases.json');
 const OUT_AMBIENT = join(ROOT, 'assets', 'sprites', 'ambient-atlas.png');
 const OUT_PROOF = join(ROOT, 'scripts', 'screenshots', 'actors-compiled-proof.png');
 const ACTOR_DOWNSAMPLE = Object.freeze({
@@ -56,6 +63,14 @@ const ACTOR_DOWNSAMPLE = Object.freeze({
   unsharp: '0x0.7+0.8+0.02',
   transparentRgb: '#000000',
 });
+const A6_CARGO_DIR = join(
+  SPRITES_DIR,
+  'prototypes',
+  'actor-pose',
+  'output',
+  'a6-cargo-payloads',
+);
+const A6_CARGO_MANIFEST_PATH = join(A6_CARGO_DIR, 'manifest.json');
 
 async function magick(args) {
   try {
@@ -163,6 +178,63 @@ async function loadRowOverrides() {
   return byRole;
 }
 
+async function publishCargoRuntimeAtlases() {
+  const manifest = JSON.parse(await readFile(A6_CARGO_MANIFEST_PATH, 'utf8'));
+  if (manifest.schema !== 'realm.actor-pose.a6-cargo-payloads-manifest.v1') {
+    throw new Error('A6 cargo manifest schema changed');
+  }
+  if (
+    JSON.stringify(manifest.scope.resources) !== JSON.stringify(CARGO_RESOURCES)
+    || JSON.stringify(manifest.scope.directions) !== JSON.stringify(CARGO_DIRECTIONS)
+    || manifest.scope.framesPerRow !== CARGO_FRAMES
+  ) {
+    throw new Error('A6 cargo source and runtime contracts disagree');
+  }
+
+  const runtimeManifest = {
+    schema: 'realm.cargo-runtime-atlases.v1',
+    sourceManifest: relative(ROOT, A6_CARGO_MANIFEST_PATH),
+    resources: CARGO_RESOURCES,
+    directions: CARGO_DIRECTIONS,
+    frames: CARGO_FRAMES,
+    atlases: [],
+  };
+  for (const tier of CARGO_RUNTIME_ATLASES) {
+    const record = manifest.atlases.find((item) => item.key === tier.key);
+    if (
+      !record
+      || record.file !== tier.file
+      || record.frameWidth !== tier.frameW
+      || record.frameHeight !== tier.frameH
+    ) {
+      throw new Error(`A6 cargo ${tier.key} tier contract changed`);
+    }
+    const source = join(A6_CARGO_DIR, record.path);
+    const expectedW = tier.frameW * CARGO_FRAMES;
+    const expectedH = tier.frameH * CARGO_RESOURCES.length * CARGO_DIRECTIONS.length;
+    await assertDimensions(source, expectedW, expectedH);
+    if (await sha256(source) !== record.sha256) {
+      throw new Error(`A6 cargo ${tier.key} atlas hash differs from its manifest`);
+    }
+    const destination = join(SPRITES_DIR, tier.file);
+    await copyFile(source, destination);
+    runtimeManifest.atlases.push({
+      key: tier.key,
+      file: tier.file,
+      frameWidth: tier.frameW,
+      frameHeight: tier.frameH,
+      width: expectedW,
+      height: expectedH,
+      sha256: await sha256(destination),
+    });
+  }
+  await writeFile(
+    OUT_CARGO_RUNTIME_MANIFEST,
+    `${JSON.stringify(runtimeManifest, null, 2)}\n`,
+    'utf8',
+  );
+}
+
 async function compileActorRole(role, overrides) {
   const source = join(ACTOR_DIR, `${role}.png`);
   const out = join(ACTOR_COMPILED_DIR, `${role}.png`);
@@ -253,6 +325,7 @@ try {
   await rm(runtimeTempDir, { recursive: true, force: true });
 }
 await magick([...ambientFiles, '+append', '-strip', OUT_AMBIENT]);
+await publishCargoRuntimeAtlases();
 await assertDimensions(OUT_ACTORS, ACTOR_ATLAS_W, ACTOR_ATLAS_H);
 await assertDimensions(OUT_AMBIENT, AMBIENT_ATLAS_W, AMBIENT_ATLAS_H);
 
@@ -341,6 +414,7 @@ await magick(proofArgs);
 console.log(`[motion-atlases] compiled ${ROLES.length} actor source sheets into ${OUT_ACTORS}`);
 console.log(`[motion-atlases] compiled ${ACTOR_RUNTIME_ATLASES.length} deterministic actor runtime scale(s)`);
 console.log(`[motion-atlases] wrote ${OUT_ACTOR_RUNTIME_MANIFEST}`);
+console.log(`[motion-atlases] wrote ${OUT_CARGO_RUNTIME_MANIFEST}`);
 console.log(`[motion-atlases] applied ${[...overridesByRole.values()].reduce((sum, rows) => sum + rows.length, 0)} accepted row override(s)`);
 console.log(`[motion-atlases] compiled ${AMBIENT.length} ambient source sprites into ${OUT_AMBIENT}`);
 console.log(`[motion-atlases] wrote ${OUT_PROOF}`);

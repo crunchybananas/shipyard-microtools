@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=174';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=174';
-import { makeAtlasLoader } from './atlas-loader.js?realm=174';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=174';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=175';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=175';
+import { makeAtlasLoader } from './atlas-loader.js?realm=175';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=175';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,21 +15,30 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=174';
+} from './sprite-source-contract.js?realm=175';
+import {
+  CARGO_DIRECTIONS,
+  CARGO_FRAMES,
+  CARGO_OWNER_ROWS,
+  CARGO_RESOURCES,
+  CARGO_RUNTIME_ATLASES,
+  cargoOwnerRow,
+  cargoRowIndex,
+} from './cargo-source-contract.js?realm=175';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=174';
+} from './render-resolution.js?realm=175';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=174';
+} from './citizen-presentation.js?realm=175';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=174';
-import { staffingCount } from './citizen-ownership.js?realm=174';
+} from './citizen-render-cache.js?realm=175';
+import { staffingCount } from './citizen-ownership.js?realm=175';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -160,6 +169,10 @@ const _actorAtlasUrl = (file) => _ACTOR_ATLAS_REVISION
   ? `assets/sprites/${file}?realm=${encodeURIComponent(_ACTOR_ATLAS_REVISION)}`
   : `assets/sprites/${file}`;
 const _ACTOR_ATLAS_TIERS = ACTOR_RUNTIME_ATLASES.map((tier) => ({
+  ...tier,
+  load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
+}));
+const _CARGO_ATLAS_TIERS = CARGO_RUNTIME_ATLASES.map((tier) => ({
   ...tier,
   load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
 }));
@@ -364,6 +377,71 @@ export function drawActorAtlasFrame(targetCtx, {
   return true;
 }
 
+export function cargoAtlasFrameRect(
+  resource,
+  dir,
+  frame = 0,
+  frameW = ACTOR_FRAME_W,
+  frameH = ACTOR_FRAME_H,
+) {
+  const row = cargoRowIndex(resource, dir);
+  if (row < 0) return null;
+  const normalizedFrame = ((Math.floor(frame) % CARGO_FRAMES) + CARGO_FRAMES) % CARGO_FRAMES;
+  return {
+    sx: normalizedFrame * frameW,
+    sy: row * frameH,
+    sw: frameW,
+    sh: frameH,
+    row,
+    frame: normalizedFrame,
+  };
+}
+
+export function drawCargoAtlasFrame(targetCtx, {
+  role,
+  action,
+  resource,
+  dir,
+  frame = 0,
+  x,
+  y,
+  width = 27,
+  height = 35,
+  alpha = 1,
+} = {}) {
+  if (
+    !targetCtx
+    || !cargoOwnerRow(role, action)
+    || !Number.isFinite(x)
+    || !Number.isFinite(y)
+  ) return false;
+  const actorSelection = actorAtlasSelection(targetCtx, width, height);
+  const tier = actorSelection
+    ? _CARGO_ATLAS_TIERS.find((item) => item.key === actorSelection.key)
+    : null;
+  const atlas = tier?.load();
+  const source = tier
+    ? cargoAtlasFrameRect(resource, dir, frame, tier.frameW, tier.frameH)
+    : null;
+  if (!atlas || !source) return false;
+  const reg = ACTOR_REGISTRATION[`${role}/${action}/${dir}`];
+  const ddy = reg
+    ? ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (height / ACTOR_FRAME_H)
+    : 0;
+  targetCtx.save();
+  targetCtx.globalAlpha *= alpha;
+  const useSmoothing = shouldSmoothActorTier(actorSelection);
+  targetCtx.imageSmoothingEnabled = useSmoothing;
+  if (useSmoothing) targetCtx.imageSmoothingQuality = 'high';
+  targetCtx.drawImage(
+    atlas,
+    source.sx, source.sy, source.sw, source.sh,
+    x, y + ddy, width, height,
+  );
+  targetCtx.restore();
+  return true;
+}
+
 function drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight = 1) {
   if (!c.carrying) return;
   const side = faceScreenX ? -Math.sign(faceScreenX) : 1;
@@ -526,7 +604,7 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
   // away interpolation and reintroduced a one-pixel cadence at common zooms.
   const dx = s.x - targetW / 2;
   const dy = cy + 3 - targetH;
-  return drawActorAtlasFrame(ctx, {
+  const drawn = drawActorAtlasFrame(ctx, {
     role: variant,
     action,
     dir,
@@ -536,6 +614,20 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
     width: targetW,
     height: targetH,
   });
+  if (drawn && c.carrying && cargoOwnerRow(variant, action)) {
+    drawCargoAtlasFrame(ctx, {
+      role: variant,
+      action,
+      resource: c.carrying,
+      dir,
+      frame,
+      x: dx,
+      y: dy,
+      width: targetW,
+      height: targetH,
+    });
+  }
+  return drawn;
 }
 
 // Interpolated draw position (Phase Q: jitter fix). Sim positions step
@@ -950,6 +1042,7 @@ if (typeof window !== 'undefined') {
     _loadRasterAtlas();
     _loadSupportAtlas();
     for (const tier of _ACTOR_ATLAS_TIERS) tier.load();
+    for (const tier of _CARGO_ATLAS_TIERS) tier.load();
     for (const tier of _ACTOR_PREVIEW_TIERS.values()) tier.load();
     _loadNatureAtlas();
     _loadTerrainAtlas();
@@ -1004,6 +1097,21 @@ if (typeof window !== 'undefined') {
       })),
     })),
   });
+  window.__realm.cargoAtlas = () => ({
+    resources: CARGO_RESOURCES,
+    directions: CARGO_DIRECTIONS,
+    frames: CARGO_FRAMES,
+    ownerRows: CARGO_OWNER_ROWS,
+    tiers: _CARGO_ATLAS_TIERS.map((tier) => ({
+      key: tier.key,
+      frameW: tier.frameW,
+      frameH: tier.frameH,
+      url: tier.load.url,
+      state: tier.load.state,
+    })),
+  });
+  window.__realm.cargoFrameRect = (resource, dir, frame = 0) =>
+    cargoAtlasFrameRect(resource, dir, frame);
   window.__realm.actorFrameRect = (role, action, dir, frame = 0) =>
     actorAtlasFrameRect(role, action, dir, frame);
   window.__realm.actorMapping = {
@@ -1027,6 +1135,10 @@ if (typeof window !== 'undefined') {
     { type: 'support-atlas', state: _loadSupportAtlas.state },
     ..._ACTOR_ATLAS_TIERS.map((tier) => ({
       type: `actors-atlas-${tier.key}`,
+      state: tier.load.state,
+    })),
+    ..._CARGO_ATLAS_TIERS.map((tier) => ({
+      type: `cargo-payloads-${tier.key}`,
       state: tier.load.state,
     })),
     ...[..._ACTOR_PREVIEW_TIERS.values()].flatMap((tier) => (
@@ -2392,8 +2504,7 @@ export function render() {
       if (G.camera.zoom >= 0.7) {
         const previewRole = actorVariantForCitizen(c);
         const previewAction = actorActionForCitizen(c, isMoving);
-        const previewDir = actorDirection(faceScreenX, faceScreenY, facingAway);
-        if (!actorPreviewMatches(previewRole, previewAction, previewDir)) {
+        if (!cargoOwnerRow(previewRole, previewAction)) {
           drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight);
         }
       }

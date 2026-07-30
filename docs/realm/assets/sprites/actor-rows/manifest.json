@@ -2729,9 +2729,10 @@
       }
     },
     "guard/carry/down": {
-      "candidate": {
-        "file": "candidates/guard/carry-down.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/carry-down-6f720d295ef7.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -2768,14 +2769,14 @@
           "warnings": []
         },
         "sha256": "6f720d295ef702fa89fc727c45224bdc808708fb0ca726f642d828532f113465",
-        "stagedAt": "2026-07-30T05:00:11Z",
-        "status": "candidate"
+        "status": "accepted"
       }
     },
     "guard/carry/left": {
-      "candidate": {
-        "file": "candidates/guard/carry-left.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/carry-left-beee6b33b9b7.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -2812,14 +2813,14 @@
           "warnings": []
         },
         "sha256": "beee6b33b9b7e8a2e496d8c5e9b605e6c0f894b082d14f76e42a57a0dbbdb55a",
-        "stagedAt": "2026-07-30T05:00:12Z",
-        "status": "candidate"
+        "status": "accepted"
       }
     },
     "guard/carry/right": {
-      "candidate": {
-        "file": "candidates/guard/carry-right.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/carry-right-820efe6c4bb8.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -2856,14 +2857,14 @@
           "warnings": []
         },
         "sha256": "820efe6c4bb8eca35bb83ed8ec0bf398eed880291179a7fd678da5f80f7f0b54",
-        "stagedAt": "2026-07-30T05:00:13Z",
-        "status": "candidate"
+        "status": "accepted"
       }
     },
     "guard/carry/up": {
-      "candidate": {
-        "file": "candidates/guard/carry-up.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/carry-up-906210dd38cf.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -2900,14 +2901,14 @@
           "warnings": []
         },
         "sha256": "906210dd38cf102c6d501cee12bd3378385c0afb939889835228a9b584001e34",
-        "stagedAt": "2026-07-30T05:00:12Z",
-        "status": "candidate"
+        "status": "accepted"
       }
     },
     "guard/idle/down": {
-      "candidate": {
-        "file": "candidates/guard/idle-down.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/idle-down-71040dc0ce0c.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -2944,56 +2945,14 @@
           "warnings": []
         },
         "sha256": "71040dc0ce0c530019a09eb21bc91f099da295d8186fde2a56226627c98c013f",
-        "stagedAt": "2026-07-30T05:00:04Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:00Z",
-        "file": "guard/idle-down.png",
-        "note": "Painted row: settler locked idle/down body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
-          "directionReference": {
-            "bodyHeightDelta": 0.5,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 21.0,
-            "medianColor": [
-              85.95,
-              75.55,
-              70.85
-            ],
-            "paletteDelta": 2.74
-          },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.07,
-          "maxBodyCenterJump": 1.12,
-          "maxEdgePixels": 1,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.21,
-          "medianBodyHeight": 76.5,
-          "medianBodyWidth": 30.5,
-          "medianColor": [
-            84.5,
-            74.55,
-            72.95
-          ],
-          "medianColorCount": 683.0,
-          "medianShadingRatio": 0.6263,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "1196aef62c3ba211f778134cc0828b9d2135c73cf232d0fe4a477801815c2048",
         "status": "accepted"
       }
     },
     "guard/idle/left": {
-      "candidate": {
-        "file": "candidates/guard/idle-left.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/idle-left-899c4d42c4cf.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3030,56 +2989,14 @@
           "warnings": []
         },
         "sha256": "899c4d42c4cfda0dc5d59590295d46c691bfa1f435f95a8a9628407dba1283fe",
-        "stagedAt": "2026-07-30T05:00:05Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:07Z",
-        "file": "guard/idle-left.png",
-        "note": "Painted row: settler locked idle/left body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 2,
-          "bodyWidthRange": 3,
-          "directionReference": {
-            "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 30.0,
-            "medianColor": [
-              84.5,
-              74.55,
-              72.95
-            ],
-            "paletteDelta": 2.78
-          },
-          "flickerScore": 7.6,
-          "maxAlphaRatio": 1.068,
-          "maxBodyCenterJump": 1.04,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.18,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 21.0,
-          "medianColor": [
-            85.95,
-            75.55,
-            70.8
-          ],
-          "medianColorCount": 529.0,
-          "medianShadingRatio": 0.659,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "090646f117847e1710403ef9e1f7e372a831604f36687363f43ac4fdff4baa85",
         "status": "accepted"
       }
     },
     "guard/idle/right": {
-      "candidate": {
-        "file": "candidates/guard/idle-right.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/idle-right-1a5a64a45665.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3116,56 +3033,14 @@
           "warnings": []
         },
         "sha256": "1a5a64a456653b79d707a12968bed545b99972a2cdea8b247cf818025aa6cddf",
-        "stagedAt": "2026-07-30T05:00:06Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:10Z",
-        "file": "guard/idle-right.png",
-        "note": "Painted row: settler locked idle/right body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 2,
-          "bodyWidthRange": 3,
-          "directionReference": {
-            "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 30.0,
-            "medianColor": [
-              84.5,
-              74.55,
-              72.95
-            ],
-            "paletteDelta": 2.8
-          },
-          "flickerScore": 7.6,
-          "maxAlphaRatio": 1.069,
-          "maxBodyCenterJump": 1.03,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.18,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 21.0,
-          "medianColor": [
-            86.05,
-            75.55,
-            70.85
-          ],
-          "medianColorCount": 529.0,
-          "medianShadingRatio": 0.6582,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "125747716dcdc863fd0a20c3f536484adf0198e164f9dcabf576c1d5cd0e6a19",
         "status": "accepted"
       }
     },
     "guard/idle/up": {
-      "candidate": {
-        "file": "candidates/guard/idle-up.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/idle-up-2d29a309d53b.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3202,56 +3077,14 @@
           "warnings": []
         },
         "sha256": "2d29a309d53bf62bc68a869f3c2c04b9daa06aa6978d5dd159e25809378a4fa8",
-        "stagedAt": "2026-07-30T05:00:05Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:04Z",
-        "file": "guard/idle-up.png",
-        "note": "Painted row: settler locked idle/up body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
-          "directionReference": {
-            "bodyHeightDelta": 3.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 21.0,
-            "medianColor": [
-              85.95,
-              75.55,
-              70.85
-            ],
-            "paletteDelta": 28.54
-          },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.037,
-          "maxBodyCenterJump": 0.84,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.8,
-          "medianBodyHeight": 73.0,
-          "medianBodyWidth": 30.0,
-          "medianColor": [
-            63.35,
-            59.4,
-            77.4
-          ],
-          "medianColorCount": 537.5,
-          "medianShadingRatio": 0.6932,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "0d410bc86b2587c0874c9b5f9d26a3051e99d873f8103ef6f5440eb972b7acd6",
         "status": "accepted"
       }
     },
     "guard/walk/down": {
-      "candidate": {
-        "file": "candidates/guard/walk-down.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/walk-down-1ff7b8cb88f3.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3288,56 +3121,14 @@
           "warnings": []
         },
         "sha256": "1ff7b8cb88f34fbde2ae864c623929084dac18a9d667c025801b0aca1c6da51b",
-        "stagedAt": "2026-07-30T05:00:07Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:13Z",
-        "file": "guard/walk-down.png",
-        "note": "Painted row: settler locked walk/down body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
-          "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 77.0,
-            "medianBodyWidth": 28.0,
-            "medianColor": [
-              82.9,
-              67.7,
-              65.1
-            ],
-            "paletteDelta": 9.75
-          },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.063,
-          "maxBodyCenterJump": 0.91,
-          "maxEdgePixels": 1,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.1,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 30.0,
-          "medianColor": [
-            84.9,
-            74.5,
-            71.8
-          ],
-          "medianColorCount": 671.5,
-          "medianShadingRatio": 0.6289,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "cfdd95102bb1fa3f831247f8549b71e30a6f92d6be95df4d2c4211b75f443f7a",
         "status": "accepted"
       }
     },
     "guard/walk/left": {
-      "candidate": {
-        "file": "candidates/guard/walk-left.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/walk-left-a0cf2ee630b0.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3374,56 +3165,14 @@
           "warnings": []
         },
         "sha256": "a0cf2ee630b06d21b8522ed01913b01cabb5177e040ff23fa243cfe9089d9914",
-        "stagedAt": "2026-07-30T05:00:08Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:20Z",
-        "file": "guard/walk-left.png",
-        "note": "Painted row: settler locked walk/left body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 9,
-          "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 30.0,
-            "medianColor": [
-              82.9,
-              67.7,
-              71.8
-            ],
-            "paletteDelta": 6.75
-          },
-          "flickerScore": 30.8,
-          "maxAlphaRatio": 1.143,
-          "maxBodyCenterJump": 3.34,
-          "maxEdgePixels": 3,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.89,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 28.0,
-          "medianColor": [
-            82.9,
-            67.7,
-            65.05
-          ],
-          "medianColorCount": 519.5,
-          "medianShadingRatio": 0.6889,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "16a35dddc533952d311a305e1a8a2ae1de02759050acb1c2e5ad29fd42700423",
         "status": "accepted"
       }
     },
     "guard/walk/right": {
-      "candidate": {
-        "file": "candidates/guard/walk-right.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/walk-right-0040bfe6f63e.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3460,56 +3209,14 @@
           "warnings": []
         },
         "sha256": "0040bfe6f63e6c6c920aed5c8b3051b1e5317327153009a8d10a77eb96e8fc3a",
-        "stagedAt": "2026-07-30T05:00:08Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:23Z",
-        "file": "guard/walk-right.png",
-        "note": "Painted row: settler locked walk/right body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 9,
-          "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 30.0,
-            "medianColor": [
-              82.9,
-              67.7,
-              71.8
-            ],
-            "paletteDelta": 6.7
-          },
-          "flickerScore": 30.8,
-          "maxAlphaRatio": 1.143,
-          "maxBodyCenterJump": 3.34,
-          "maxEdgePixels": 3,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.92,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 28.0,
-          "medianColor": [
-            82.9,
-            67.7,
-            65.1
-          ],
-          "medianColorCount": 519.5,
-          "medianShadingRatio": 0.6889,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "88e2436d5d32f1bf55bca21c23da4f45811be9df47faa673d2d5acf388a0b1cd",
         "status": "accepted"
       }
     },
     "guard/walk/up": {
-      "candidate": {
-        "file": "candidates/guard/walk-up.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/walk-up-90d07fc8c38c.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3546,56 +3253,14 @@
           "warnings": []
         },
         "sha256": "90d07fc8c38c98152d2977af65d80f92f8bfe9c0bfba0862ea39fcda4d978dde",
-        "stagedAt": "2026-07-30T05:00:07Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-01T22:57:16Z",
-        "file": "guard/walk-up.png",
-        "note": "Painted row: settler locked walk/up body with guard palette + guard's own painted helm transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
-          "directionReference": {
-            "bodyHeightDelta": 4.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 77.0,
-            "medianBodyWidth": 28.0,
-            "medianColor": [
-              82.9,
-              67.7,
-              65.1
-            ],
-            "paletteDelta": 21.03
-          },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.053,
-          "maxBodyCenterJump": 1.49,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.27,
-          "medianBodyHeight": 73.0,
-          "medianBodyWidth": 30.0,
-          "medianColor": [
-            66.95,
-            62.2,
-            77.65
-          ],
-          "medianColorCount": 547.0,
-          "medianShadingRatio": 0.689,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "d9340133efad25747bc28061c6f3c005b61e43f0f3194b6222c3a70d1becfbf0",
         "status": "accepted"
       }
     },
     "guard/work/down": {
-      "candidate": {
-        "file": "candidates/guard/work-down.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/work-down-235b5c17e40a.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3632,56 +3297,14 @@
           "warnings": []
         },
         "sha256": "235b5c17e40a227ea0ca1462dee897d48ae5c74ff3c0a19e64ef3b4617d9da91",
-        "stagedAt": "2026-07-30T05:00:09Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-11T00:26:02Z",
-        "file": "guard/work-down.png",
-        "note": "Blue-tunic guard identity matched to idle/walk; compact short-sword drill with native-pixel anchor stabilization.",
-        "provenance": "imagegen-packed-native-anchor",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 6,
-          "directionReference": {
-            "bodyHeightDelta": 0.5,
-            "bodyWidthDelta": 3.5,
-            "medianBodyHeight": 75.5,
-            "medianBodyWidth": 34.0,
-            "medianColor": [
-              71.75,
-              65.5,
-              69.9
-            ],
-            "paletteDelta": 27.95
-          },
-          "flickerScore": 9.2,
-          "maxAlphaRatio": 1.049,
-          "maxBodyCenterJump": 1.28,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 6.75,
-          "medianBodyHeight": 76.0,
-          "medianBodyWidth": 30.5,
-          "medianColor": [
-            93.35,
-            81.2,
-            78.15
-          ],
-          "medianColorCount": 754.5,
-          "medianShadingRatio": 0.5635,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "f0bfb1bf5fdb3c93d1fa51a6a5735a5b1313f5d901c274c1958e08ee2fb531c0",
         "status": "accepted"
       }
     },
     "guard/work/left": {
-      "candidate": {
-        "file": "candidates/guard/work-left.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/work-left-afbe960da80a.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3718,56 +3341,14 @@
           "warnings": []
         },
         "sha256": "afbe960da80a3154d4bcf80d284813698741e98cadc452fbfaea8abf7480aa85",
-        "stagedAt": "2026-07-30T05:00:10Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-11T00:26:03Z",
-        "file": "guard/work-left.png",
-        "note": "Side blue-tunic guard identity matched to idle/walk; compact short-sword drill with native-pixel anchor stabilization.",
-        "provenance": "imagegen-packed-native-anchor",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
-          "directionReference": {
-            "bodyHeightDelta": 1.5,
-            "bodyWidthDelta": 5.5,
-            "medianBodyHeight": 75.5,
-            "medianBodyWidth": 30.5,
-            "medianColor": [
-              71.75,
-              65.5,
-              78.15
-            ],
-            "paletteDelta": 26.41
-          },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.028,
-          "maxBodyCenterJump": 0.59,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.29,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 25.0,
-          "medianColor": [
-            93.0,
-            81.1,
-            76.5
-          ],
-          "medianColorCount": 638.5,
-          "medianShadingRatio": 0.612,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "6bdb4430579be57497584df3ce91447281478d9e737aac91b507b009d6550c9a",
         "status": "accepted"
       }
     },
     "guard/work/right": {
-      "candidate": {
-        "file": "candidates/guard/work-right.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/work-right-e045458d4587.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3804,56 +3385,14 @@
           "warnings": []
         },
         "sha256": "e045458d45879d8a294cb4f3718042138ab61b3e47f8b2304d10123b528725e8",
-        "stagedAt": "2026-07-30T05:00:11Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-11T00:26:04Z",
-        "file": "guard/work-right.png",
-        "note": "Exact reviewed mirror of the accepted left-facing short-sword drill, preserving timing, scale, and anchors.",
-        "provenance": "derived-imagegen-mirror",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
-          "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 5.5,
-            "medianBodyHeight": 76.0,
-            "medianBodyWidth": 30.5,
-            "medianColor": [
-              93.0,
-              81.1,
-              78.15
-            ],
-            "paletteDelta": 1.65
-          },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.028,
-          "maxBodyCenterJump": 0.59,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.29,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 25.0,
-          "medianColor": [
-            93.0,
-            81.1,
-            76.5
-          ],
-          "medianColorCount": 638.5,
-          "medianShadingRatio": 0.612,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "26da55f0f48a8815633c5b09390857066861c085678016d0ae8cd5df617a396a",
         "status": "accepted"
       }
     },
     "guard/work/up": {
-      "candidate": {
-        "file": "candidates/guard/work-up.png",
-        "note": "Realm 173 complete watchman family; review candidate only, production remains locked.",
+      "production": {
+        "acceptedAt": "2026-07-30T05:32:55Z",
+        "file": "production/guard/work-up-e608dac328e8.png",
+        "note": "Realm 175: coherent A5 four-action guard family with A6 resource-specific raster cargo attachments",
         "provenance": "a5-modular-guard-actions",
         "quality": {
           "bodyBottomRange": 0,
@@ -3890,49 +3429,6 @@
           "warnings": []
         },
         "sha256": "e608dac328e81acd75726da6f13dbf5685b1568e744ee5c9ffc3461738222a09",
-        "stagedAt": "2026-07-30T05:00:10Z",
-        "status": "candidate"
-      },
-      "production": {
-        "acceptedAt": "2026-07-11T00:26:03Z",
-        "file": "guard/work-up.png",
-        "note": "Rear blue-tunic guard identity matched to idle/walk; compact short-sword drill with native-pixel anchor stabilization.",
-        "provenance": "imagegen-packed-native-anchor",
-        "quality": {
-          "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
-          "directionReference": {
-            "bodyHeightDelta": 2.5,
-            "bodyWidthDelta": 3.5,
-            "medianBodyHeight": 75.5,
-            "medianBodyWidth": 34.0,
-            "medianColor": [
-              71.75,
-              65.5,
-              69.9
-            ],
-            "paletteDelta": 13.25
-          },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.034,
-          "maxBodyCenterJump": 0.58,
-          "maxEdgePixels": 0,
-          "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.5,
-          "medianBodyHeight": 73.0,
-          "medianBodyWidth": 30.5,
-          "medianColor": [
-            65.55,
-            63.55,
-            81.45
-          ],
-          "medianColorCount": 552.0,
-          "medianShadingRatio": 0.6656,
-          "styleEra": "painted",
-          "warnings": []
-        },
-        "sha256": "fe0968616404037f5b5033509f06fde8c62ab259c2bb70592f1e20368b56cb0f",
         "status": "accepted"
       }
     },
@@ -9034,6 +8530,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T05:00:13Z",
+  "updatedAt": "2026-07-30T05:32:56Z",
   "version": 2
 }

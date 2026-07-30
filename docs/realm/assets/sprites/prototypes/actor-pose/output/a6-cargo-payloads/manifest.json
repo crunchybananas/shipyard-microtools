@@ -1,0 +1,932 @@
+{
+  "atlases": [
+    {
+      "file": "cargo-payloads-native.png",
+      "frameHeight": 35,
+      "frameWidth": 27,
+      "height": 1260,
+      "key": "native",
+      "path": "atlases/cargo-payloads-native.png",
+      "sha256": "0fad6ae80020aedba570791ff3adfa7ac2de101509ecc6e11ce63c0327746c4e",
+      "width": 216
+    },
+    {
+      "file": "cargo-payloads-default.png",
+      "frameHeight": 46,
+      "frameWidth": 35,
+      "height": 1656,
+      "key": "default",
+      "path": "atlases/cargo-payloads-default.png",
+      "sha256": "0e02af076681ee839c42026da04b556c00e58503f11a5a450d772a641b916bf5",
+      "width": 280
+    },
+    {
+      "file": "cargo-payloads-double.png",
+      "frameHeight": 70,
+      "frameWidth": 54,
+      "height": 2520,
+      "key": "double",
+      "path": "atlases/cargo-payloads-double.png",
+      "sha256": "56f79ede0a0bc1951b542e9b4223a46500bea616d66737c71f48924bb444078e",
+      "width": 432
+    },
+    {
+      "file": "cargo-payloads-review.png",
+      "frameHeight": 84,
+      "frameWidth": 64,
+      "height": 3024,
+      "key": "review",
+      "path": "atlases/cargo-payloads-review.png",
+      "sha256": "41f0573e4f8d02679ba426012e79cd53b5c778225874f260bc38c7e14c113eda",
+      "width": 512
+    }
+  ],
+  "compiler": "scripts/actor-pose-prototype/a6_cargo_payloads.py",
+  "contract": "realm.actor-pose.a6-cargo-payloads.v1",
+  "inputs": {
+    "carrier-row-down": {
+      "bytes": 14186,
+      "owner": "A5-baked-container-carrier",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/rows/watchman/watch-blue/carry-down.png",
+      "sha256": "6f720d295ef702fa89fc727c45224bdc808708fb0ca726f642d828532f113465"
+    },
+    "carrier-row-left": {
+      "bytes": 15717,
+      "owner": "A5-baked-container-carrier",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/rows/watchman/watch-blue/carry-left.png",
+      "sha256": "beee6b33b9b7e8a2e496d8c5e9b605e6c0f894b082d14f76e42a57a0dbbdb55a"
+    },
+    "carrier-row-right": {
+      "bytes": 15822,
+      "owner": "A5-baked-container-carrier",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/rows/watchman/watch-blue/carry-right.png",
+      "sha256": "820efe6c4bb8eca35bb83ed8ec0bf398eed880291179a7fd678da5f80f7f0b54"
+    },
+    "carrier-row-up": {
+      "bytes": 13590,
+      "owner": "A5-baked-container-carrier",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/rows/watchman/watch-blue/carry-up.png",
+      "sha256": "906210dd38cf102c6d501cee12bd3378385c0afb939889835228a9b584001e34"
+    },
+    "compiler": {
+      "bytes": 14475,
+      "owner": "compiler-source",
+      "path": "scripts/actor-pose-prototype/a6_cargo_payloads.py",
+      "sha256": "10f3150bff88f3d06a3529bf344c48481f5d2d5d532dc1fc80ccf6a800f1848b"
+    },
+    "contract": {
+      "bytes": 3145,
+      "owner": "attachment-contract",
+      "path": "assets/sprites/prototypes/actor-pose/source/a6-cargo-payloads/parts.json",
+      "sha256": "2e4f95d61184203f787dd8cc9ab24294aa46eb455b0e062da8a438a6a703c39b"
+    },
+    "landmarks-down": {
+      "bytes": 15674,
+      "owner": "A5-load-socket-authority",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/landmarks/watchman/watch-blue/carry-down.json",
+      "sha256": "6cac87c0b901050ec1a218e3be5ff708ca8202c327b66ded38bbd703872542fa"
+    },
+    "landmarks-left": {
+      "bytes": 15282,
+      "owner": "A5-load-socket-authority",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/landmarks/watchman/watch-blue/carry-left.json",
+      "sha256": "d8d215587b642b564f6448fd80bc38e5ad3554c8c59b560f81229dfd207c2e40"
+    },
+    "landmarks-right": {
+      "bytes": 15291,
+      "owner": "A5-load-socket-authority",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/landmarks/watchman/watch-blue/carry-right.json",
+      "sha256": "3b5f15eda73a0a2dd8256f5eb76f82cf6ecabc72c5fb1542a9d23dc83a6ebe0e"
+    },
+    "landmarks-up": {
+      "bytes": 15656,
+      "owner": "A5-load-socket-authority",
+      "path": "assets/sprites/prototypes/actor-pose/output/a5-guard-actions/landmarks/watchman/watch-blue/carry-up.json",
+      "sha256": "00a8d85c40a9d94765a607e8cad58bbc18f52c24e6ddb6af0d126fce13d0e221"
+    },
+    "prompt": {
+      "bytes": 3956,
+      "owner": "imagegen-provenance",
+      "path": "assets/sprites/prototypes/actor-pose/references/a6-source/cargo-payloads.prompt.json",
+      "sha256": "1cdfd1d3c14cccb3569fc6361794575e62a26aca1eb88c10484e7bd33a57a4f2"
+    },
+    "source": {
+      "bytes": 852247,
+      "owner": "imagegen-transparent-source",
+      "path": "assets/sprites/prototypes/actor-pose/references/a6-source/cargo-payloads.png",
+      "sha256": "a4d28df361705e6ced47cabdf081412b27eb660f519183a715d2749c20b50178"
+    }
+  },
+  "layout": {
+    "row": "resource-major then direction",
+    "sourceFrame": [
+      64,
+      84
+    ]
+  },
+  "outputs": {
+    "atlases/cargo-payloads-default.png": {
+      "bytes": 18906,
+      "sha256": "0e02af076681ee839c42026da04b556c00e58503f11a5a450d772a641b916bf5"
+    },
+    "atlases/cargo-payloads-double.png": {
+      "bytes": 35052,
+      "sha256": "56f79ede0a0bc1951b542e9b4223a46500bea616d66737c71f48924bb444078e"
+    },
+    "atlases/cargo-payloads-native.png": {
+      "bytes": 13134,
+      "sha256": "0fad6ae80020aedba570791ff3adfa7ac2de101509ecc6e11ce63c0327746c4e"
+    },
+    "atlases/cargo-payloads-review.png": {
+      "bytes": 28009,
+      "sha256": "41f0573e4f8d02679ba426012e79cd53b5c778225874f260bc38c7e14c113eda"
+    },
+    "proof/cargo-payloads-x3.png": {
+      "bytes": 826659,
+      "sha256": "7d69ef047d4ebbd716390a02cb88a8b1cdd431c3a252d98a453c7c484fee1ff9"
+    },
+    "rows-runtime/default/flour-down.png": {
+      "bytes": 757,
+      "sha256": "afb3691963b12075b53bdb67ffa4bf9bb6af30254e4a4fb9aa4fae9eb9dc0fca"
+    },
+    "rows-runtime/default/flour-left.png": {
+      "bytes": 672,
+      "sha256": "9b640d1017cdfc01a774d945d383de1eb814875940e6d03d77ed66c6ebeeeaf0"
+    },
+    "rows-runtime/default/flour-right.png": {
+      "bytes": 684,
+      "sha256": "c81bfdafa0811df3cafae34ce93150eff3910d521220c77a57e1621924ad0cac"
+    },
+    "rows-runtime/default/flour-up.png": {
+      "bytes": 724,
+      "sha256": "3ad5f38037af7d377b50a89a6cb34838d0d7da861e20a576142243c15e15117f"
+    },
+    "rows-runtime/default/food-down.png": {
+      "bytes": 736,
+      "sha256": "95e079325c3f3c1b9716f3985fca7f1481c83c1329140a2f32d1a374e7d91366"
+    },
+    "rows-runtime/default/food-left.png": {
+      "bytes": 591,
+      "sha256": "2c49b7641b739648b2a6a3f9ed48ec9bacc938bef4a394c297d1f7212c7b3b3d"
+    },
+    "rows-runtime/default/food-right.png": {
+      "bytes": 559,
+      "sha256": "d52fc485531204e4d4e906731de27af02322fd1cf53d5b62eeae5c64e03f8ce9"
+    },
+    "rows-runtime/default/food-up.png": {
+      "bytes": 668,
+      "sha256": "72ce51c8febd4abab484e3c365bab4207eb65966c8e49a02236c4057f61393cf"
+    },
+    "rows-runtime/default/gold-down.png": {
+      "bytes": 726,
+      "sha256": "dc54196f7599f8959ac7213aa8e35df7dd630d3fc4b41fa49d2d9b21b4239100"
+    },
+    "rows-runtime/default/gold-left.png": {
+      "bytes": 601,
+      "sha256": "6b2122d64fb0d642c2ab58401062e1b96ec817c8cab3a9b8c5240153823eb48c"
+    },
+    "rows-runtime/default/gold-right.png": {
+      "bytes": 581,
+      "sha256": "355f64cd9fe379e863c74add0dabc4ce16bae63612e115100b549581689665b2"
+    },
+    "rows-runtime/default/gold-up.png": {
+      "bytes": 653,
+      "sha256": "e97b9d2593502d4b3ee7877b61ca428a09d690532fd723b42790b6fc92c4aed8"
+    },
+    "rows-runtime/default/iron-down.png": {
+      "bytes": 719,
+      "sha256": "4f86046080a370421f0ffdaa2d12f114128fe94ba23136894e860db98f29f715"
+    },
+    "rows-runtime/default/iron-left.png": {
+      "bytes": 595,
+      "sha256": "463dbaec14c4fba4582137eb0714ca7f7ffc87bde53046be7ebec97a1cbcbdb5"
+    },
+    "rows-runtime/default/iron-right.png": {
+      "bytes": 577,
+      "sha256": "32af25cf13e3fe14ca610a47f3dbb3cd5137d8f290eaa1396b3cfa42cc941cab"
+    },
+    "rows-runtime/default/iron-up.png": {
+      "bytes": 675,
+      "sha256": "1bd844e5c38fbaaec4b4775a2c903ef88be45629f31bacc9672bd996576a1421"
+    },
+    "rows-runtime/default/planks-down.png": {
+      "bytes": 620,
+      "sha256": "745de6066baa9687980522f348257d7f6acc5b28f3a7d0af315057284d936ac0"
+    },
+    "rows-runtime/default/planks-left.png": {
+      "bytes": 517,
+      "sha256": "6884511f2fda089c32d0bdfb3c4b98068f08cdadb4986f4665821fea4b736ecf"
+    },
+    "rows-runtime/default/planks-right.png": {
+      "bytes": 521,
+      "sha256": "8586410528922b4eb86a881c56d68af3f155d447f4196f1182d8eb5d24b47305"
+    },
+    "rows-runtime/default/planks-up.png": {
+      "bytes": 589,
+      "sha256": "f6805338f2c775fd1a231bd1b3958cb8f0bc1389a8f76df90c757c0e40e6c046"
+    },
+    "rows-runtime/default/stone-down.png": {
+      "bytes": 670,
+      "sha256": "79fb62ab7ff97ea5c9be2bcb13af5baab02f4782f47c7d5fe7d308111f19d34c"
+    },
+    "rows-runtime/default/stone-left.png": {
+      "bytes": 597,
+      "sha256": "e7523b64a004e3c7584f5f06c34724ea81c2a719778003405b08da5e05373fb8"
+    },
+    "rows-runtime/default/stone-right.png": {
+      "bytes": 583,
+      "sha256": "3e7304957efb4c0f9e425218a606357ec3c46694bc1652c0e8b4d24cf8f30a49"
+    },
+    "rows-runtime/default/stone-up.png": {
+      "bytes": 636,
+      "sha256": "233bac764f815cb5b854f5d75b3e45f8511a2c375460f882268caaa73d387eff"
+    },
+    "rows-runtime/default/tools-down.png": {
+      "bytes": 788,
+      "sha256": "9d7d9293648768f07e85a59571f3356bd6cc8e526346cb1c3de220216c030077"
+    },
+    "rows-runtime/default/tools-left.png": {
+      "bytes": 619,
+      "sha256": "722821b8b1046d1e41c8ceb88014d2c8434e4753fc0c04cd8391ce15ba33a3dc"
+    },
+    "rows-runtime/default/tools-right.png": {
+      "bytes": 614,
+      "sha256": "c966e800cc3315cdb5b28c3703301f4349084b1a940294817267d73d8eb5f445"
+    },
+    "rows-runtime/default/tools-up.png": {
+      "bytes": 698,
+      "sha256": "1de43306ea27188ae92fd1cc65b9a3c183be7730b7fb4e22d004036a2fbf180c"
+    },
+    "rows-runtime/default/wheat-down.png": {
+      "bytes": 789,
+      "sha256": "7bbb1b9ad5171a7b467db2223ced89b2ef636bda0e60f72572760dca23086bd0"
+    },
+    "rows-runtime/default/wheat-left.png": {
+      "bytes": 622,
+      "sha256": "8a5ec27a21d6a6b3ac015d13466b4b79cc7f0d15fbcd4d0b8b6a65220f47b46e"
+    },
+    "rows-runtime/default/wheat-right.png": {
+      "bytes": 655,
+      "sha256": "fbdf17744e77b0be430a79cdda54818621741a0e75f6114ca96e5b6aa31a654e"
+    },
+    "rows-runtime/default/wheat-up.png": {
+      "bytes": 743,
+      "sha256": "5aa204c569cb017c809411847e2c7561373e665263e1da883cf0c400a9d74efd"
+    },
+    "rows-runtime/default/wood-down.png": {
+      "bytes": 681,
+      "sha256": "7040f1ee090fdb6f874b0101273888aeedb241f3d97b4b2c8915639199d46319"
+    },
+    "rows-runtime/default/wood-left.png": {
+      "bytes": 599,
+      "sha256": "4e0ed23e046ec0eb09507af505e61b52661adbc7c529f817de95cc4a09bd4286"
+    },
+    "rows-runtime/default/wood-right.png": {
+      "bytes": 598,
+      "sha256": "8aeb0363d79986a233ad1609016266b347a9cef457be6d533dd9565b2e2f692c"
+    },
+    "rows-runtime/default/wood-up.png": {
+      "bytes": 666,
+      "sha256": "170acc73f0df2f3ea9ca35d726c635014ba5a3a9e58ea869f9396d83f1a4dbe4"
+    },
+    "rows-runtime/double/flour-down.png": {
+      "bytes": 1344,
+      "sha256": "d13a1614227a7d65417ba93b6f743f1937ec5636ad3ad23dc9595df636b15eaa"
+    },
+    "rows-runtime/double/flour-left.png": {
+      "bytes": 1211,
+      "sha256": "64f59c8b5cd6af65505bbb444139682cae3a7e887eafc2cead3f8dacfd153291"
+    },
+    "rows-runtime/double/flour-right.png": {
+      "bytes": 1141,
+      "sha256": "dff2fe72933323b208488912777837063ba884ed6c0b2eaa81b2e65b04dea610"
+    },
+    "rows-runtime/double/flour-up.png": {
+      "bytes": 1296,
+      "sha256": "3207c0a48a970f97a07754df3f3d0e7e07071090a90a487cd4bb39a139dc9292"
+    },
+    "rows-runtime/double/food-down.png": {
+      "bytes": 1207,
+      "sha256": "fc0f6e7d44784a170e29a93e88164f75087368b7f5704458cde0f802498b418a"
+    },
+    "rows-runtime/double/food-left.png": {
+      "bytes": 1103,
+      "sha256": "b00f1fb99686a57274a2672deb27b06cdb23068a06742fc53c0f991d4d05ef8f"
+    },
+    "rows-runtime/double/food-right.png": {
+      "bytes": 1016,
+      "sha256": "fb15a4bdd623ac633fdceb4a50cc74463189dca9ea34f810c2b72f8fad3f9ef6"
+    },
+    "rows-runtime/double/food-up.png": {
+      "bytes": 1170,
+      "sha256": "a02f084e831cc870e4fb42193791aa249bcf4d7eb352072c99e92050b8a7cec9"
+    },
+    "rows-runtime/double/gold-down.png": {
+      "bytes": 1113,
+      "sha256": "0b322f0c7a602a86c00f4fb20bf9c7279658a74626b2194505a6e74b4031cc3a"
+    },
+    "rows-runtime/double/gold-left.png": {
+      "bytes": 1084,
+      "sha256": "378553dc406422a880deca75e09536b15e983af2e24891acf98620afb55c8afc"
+    },
+    "rows-runtime/double/gold-right.png": {
+      "bytes": 1004,
+      "sha256": "5125f489f278ecbadff66f83d20a30551d8048965e21261f3cd95de3ce738ec2"
+    },
+    "rows-runtime/double/gold-up.png": {
+      "bytes": 1089,
+      "sha256": "86550a248a9acfcdef2ac6fbbfc262fc59b7d2a1210d7ed1d088c329ad6da0bc"
+    },
+    "rows-runtime/double/iron-down.png": {
+      "bytes": 1281,
+      "sha256": "6b9e6aa52088b5ea35ca725f54ccd2d0a9909ee6acb2209906ea66ba4451237e"
+    },
+    "rows-runtime/double/iron-left.png": {
+      "bytes": 1014,
+      "sha256": "c4e03a2956d11ea32e586410aa51d351b239219f6cc5f3516a16a15620f517d9"
+    },
+    "rows-runtime/double/iron-right.png": {
+      "bytes": 952,
+      "sha256": "a92b866d78a6d082b3ec0ff26f949719d2b8d5b3e1a960a4f7dd2b3d5f3787f0"
+    },
+    "rows-runtime/double/iron-up.png": {
+      "bytes": 1174,
+      "sha256": "2df5ecd8b3bd628546a0eef1f926ebd981ab752de4dadf9f05b3d33bc2ccb026"
+    },
+    "rows-runtime/double/planks-down.png": {
+      "bytes": 1043,
+      "sha256": "379392e2b53ed3d84a9a5e7d2f9013e387dfbcc17a31a1ceae722695c2c7fd19"
+    },
+    "rows-runtime/double/planks-left.png": {
+      "bytes": 860,
+      "sha256": "83e603b6f698a4494f02611fdb154f839af6bc3293532212012d5dad275200f8"
+    },
+    "rows-runtime/double/planks-right.png": {
+      "bytes": 862,
+      "sha256": "aac5296066378917c640852da3dc663ed66cecc1b2ca79da50d962408771bd4f"
+    },
+    "rows-runtime/double/planks-up.png": {
+      "bytes": 986,
+      "sha256": "dd6acc327f11d33c000be3e7eaf00165f10da03806610e56541bb2c3f3f3ede3"
+    },
+    "rows-runtime/double/stone-down.png": {
+      "bytes": 1189,
+      "sha256": "6cbc61d9f9a9f7197e41f81cd986c60e5057f601d7c2975e2117fb15dd1a503d"
+    },
+    "rows-runtime/double/stone-left.png": {
+      "bytes": 994,
+      "sha256": "3c04be307870edafc0b1caaa87e61049c733bc6b57fbefa38fc9361dbfb7ed88"
+    },
+    "rows-runtime/double/stone-right.png": {
+      "bytes": 965,
+      "sha256": "97cbb074cf6965f3f033977f2d999f96707ce47259e1f2651e72e77cfba9922c"
+    },
+    "rows-runtime/double/stone-up.png": {
+      "bytes": 1169,
+      "sha256": "dbb6833c6b2b7fcf9a3b3786e8e6c565dcdd4f18842cb10cb3c67a936f15497a"
+    },
+    "rows-runtime/double/tools-down.png": {
+      "bytes": 1291,
+      "sha256": "ef4e70f10953ad7ea6c2e949be7fb69f8e14542ae35cf95430898e3e07685d8c"
+    },
+    "rows-runtime/double/tools-left.png": {
+      "bytes": 1044,
+      "sha256": "d33d46de25f5f78569198ec21c50111116741511ec4ba2735560d342848aa184"
+    },
+    "rows-runtime/double/tools-right.png": {
+      "bytes": 970,
+      "sha256": "17e1a5dd0e47e1c4be871cba108fd8392083f746a6e4506d5922d4deea683a05"
+    },
+    "rows-runtime/double/tools-up.png": {
+      "bytes": 1263,
+      "sha256": "084cfbd8798db2de3d574457f184f91775599d578eba2a2fd303b1b4adecfa33"
+    },
+    "rows-runtime/double/wheat-down.png": {
+      "bytes": 1251,
+      "sha256": "f3304cb451aefc7da87b9f8f5fcd17ca4efe30cb66014a4d026604d231bf496f"
+    },
+    "rows-runtime/double/wheat-left.png": {
+      "bytes": 1080,
+      "sha256": "48f32ca19d338a7b718d37fcc96ef576f8fe7f9e140cce65e92dd0e8e4790a99"
+    },
+    "rows-runtime/double/wheat-right.png": {
+      "bytes": 1008,
+      "sha256": "981e45b7de30895e69d69a85dd0f6b5157fee9fdc88feae61a3bc47cb871a9c0"
+    },
+    "rows-runtime/double/wheat-up.png": {
+      "bytes": 1083,
+      "sha256": "1cb6933aa140672c1f5d5113763be1d1e16c77ca9c0e1dc26144861b831df4b7"
+    },
+    "rows-runtime/double/wood-down.png": {
+      "bytes": 1164,
+      "sha256": "f70ef8e07c43f5241c91ebc060a278eb01c53ea9f81b85c894ef407e3b644ff0"
+    },
+    "rows-runtime/double/wood-left.png": {
+      "bytes": 979,
+      "sha256": "1309f08f81ad4670114dad92ff35d32a561ae91dc4c62da40655352c1ed78517"
+    },
+    "rows-runtime/double/wood-right.png": {
+      "bytes": 971,
+      "sha256": "f30b1bde10d4da75ca8dfa58ae78712ec5401ee42e7fd94c86ada865d347d656"
+    },
+    "rows-runtime/double/wood-up.png": {
+      "bytes": 1116,
+      "sha256": "651f26ed667ed884d89e4aeac7fa42fde400a364ae522e0e9f42e66ce2ddc164"
+    },
+    "rows-runtime/native/flour-down.png": {
+      "bytes": 572,
+      "sha256": "6a814187a56fa8025bf112bdd9e235e75a04f836573d89f3481083ff0a204b30"
+    },
+    "rows-runtime/native/flour-left.png": {
+      "bytes": 526,
+      "sha256": "ad404900b24d73ffa66341c76f2f55a323f6833d6c194b2fa42c6318ec52eb92"
+    },
+    "rows-runtime/native/flour-right.png": {
+      "bytes": 522,
+      "sha256": "8aea2b2b2a195d7f2235d3ce6465fe90e6ca2f28e38a3833662344255703c04d"
+    },
+    "rows-runtime/native/flour-up.png": {
+      "bytes": 566,
+      "sha256": "84b22c2f2bfbcf21d7949fb17917eac8083a8f228534a732806a3d62a4a2d7ba"
+    },
+    "rows-runtime/native/food-down.png": {
+      "bytes": 568,
+      "sha256": "26ae6933184504e142c6a5635793c866baa8e05198526e7190d921a82cf6e7c0"
+    },
+    "rows-runtime/native/food-left.png": {
+      "bytes": 471,
+      "sha256": "db7fdebf9e3ae8650c8de54a6837992842beefc90b4c1060c66ebacbcd485c15"
+    },
+    "rows-runtime/native/food-right.png": {
+      "bytes": 427,
+      "sha256": "3cebdc31b940bbb67096059c2af2528bad2c3e77dab97f3e1e980c055dc62063"
+    },
+    "rows-runtime/native/food-up.png": {
+      "bytes": 503,
+      "sha256": "dd4962bb4d4b7b9bda65054a58fb843ccaf891fe97ccbe8ddaeb24833515c11e"
+    },
+    "rows-runtime/native/gold-down.png": {
+      "bytes": 510,
+      "sha256": "980104879086c174a4076b9f6665769274cf4d06254d1556145da38ec886ee19"
+    },
+    "rows-runtime/native/gold-left.png": {
+      "bytes": 450,
+      "sha256": "5b340fd393cd9356cb5af69bc806732a02344b8ea26a912ee9b7d773e2ed5126"
+    },
+    "rows-runtime/native/gold-right.png": {
+      "bytes": 450,
+      "sha256": "cd922d15ea478a2b7f9ac2912182cf70ddf35c282d321f52dd9c65a7655ed573"
+    },
+    "rows-runtime/native/gold-up.png": {
+      "bytes": 505,
+      "sha256": "6e38209495282a2d19acb11b78dbebf59fc7ed2ede36585e986d5fd4636feb32"
+    },
+    "rows-runtime/native/iron-down.png": {
+      "bytes": 537,
+      "sha256": "09a73b92a599a749143c52f306c235773e47a61e9b0567bf3d468592b0ee7bd6"
+    },
+    "rows-runtime/native/iron-left.png": {
+      "bytes": 436,
+      "sha256": "b33628bce8d70830e67aabeb0686064feac6c7710fcc70f1963aa3d754b0b977"
+    },
+    "rows-runtime/native/iron-right.png": {
+      "bytes": 447,
+      "sha256": "f795765af7364a624720c3e418ed3ed4a1b4e15523fdf5d534319627e090b25e"
+    },
+    "rows-runtime/native/iron-up.png": {
+      "bytes": 519,
+      "sha256": "c1d54c9da52a661fb4cbbf6274765261e29543047a9c36c7d653e40d4519b9a7"
+    },
+    "rows-runtime/native/planks-down.png": {
+      "bytes": 437,
+      "sha256": "f8e3d9c58d838614c4d075de1daa06d257b5c58e16974c64187f589c57614fac"
+    },
+    "rows-runtime/native/planks-left.png": {
+      "bytes": 388,
+      "sha256": "97fb56676eb0e8131e8532982f8205a31ec3c25c4271392f54c62c4f47d709e5"
+    },
+    "rows-runtime/native/planks-right.png": {
+      "bytes": 388,
+      "sha256": "0264ea5456fba08bb0a27bfaa24525bb704106635c45ad41e525e1a6bdf74f58"
+    },
+    "rows-runtime/native/planks-up.png": {
+      "bytes": 431,
+      "sha256": "b08c4e57de8893193a1dce6a4e1f22e514016a70213b30374f1e2b4d1aa3b678"
+    },
+    "rows-runtime/native/stone-down.png": {
+      "bytes": 506,
+      "sha256": "6163398206da21021c02a41474bd5695362f034ae1711c79e1cd5a64a43b9e4f"
+    },
+    "rows-runtime/native/stone-left.png": {
+      "bytes": 451,
+      "sha256": "9a87a951197349ec960a5ec8a9df7df5739726cee78e3c8b3c767f4fcfaa737b"
+    },
+    "rows-runtime/native/stone-right.png": {
+      "bytes": 425,
+      "sha256": "25e2750b30b654aa063a877df9915ef2c98ffa89466af5431f912eacab42fffb"
+    },
+    "rows-runtime/native/stone-up.png": {
+      "bytes": 493,
+      "sha256": "a7cb36d80f6e8e0cacd843aa6c575b519400267d421aa59fd84c3bf6d9009ae3"
+    },
+    "rows-runtime/native/tools-down.png": {
+      "bytes": 523,
+      "sha256": "1eb4212da6e2c416536c9d1a6bedd8859bf61981f29658a2ebfb9cf0bf3d8241"
+    },
+    "rows-runtime/native/tools-left.png": {
+      "bytes": 452,
+      "sha256": "ea18e1aade4b01d238c84d3bcde5540fb1b3a5dae2ee7d56c52df1f3b59cd441"
+    },
+    "rows-runtime/native/tools-right.png": {
+      "bytes": 455,
+      "sha256": "8b325a1111b7d1da2dd341ed031dd65c3bfdcd3491d8f886475702019fe6a9aa"
+    },
+    "rows-runtime/native/tools-up.png": {
+      "bytes": 520,
+      "sha256": "90552e1b387cfe75ab38bf8d2e2b7351772316d9cb199214b00e704636265e85"
+    },
+    "rows-runtime/native/wheat-down.png": {
+      "bytes": 570,
+      "sha256": "19c52096825c9279cf740cfabc8414ce514c78074c6d75b8253f9496f2b4565a"
+    },
+    "rows-runtime/native/wheat-left.png": {
+      "bytes": 505,
+      "sha256": "b361e57f0b250fb1b3b652f8439cca6a7e09d0a190c8533e9808ef25fae59688"
+    },
+    "rows-runtime/native/wheat-right.png": {
+      "bytes": 466,
+      "sha256": "d433c51b71e9199fd2955182262a3876ad2ed377bd6e6edc8c2d4c1267b94b7d"
+    },
+    "rows-runtime/native/wheat-up.png": {
+      "bytes": 526,
+      "sha256": "f76d2e4a8fc9101d5c546e82546410c8ab363658647048abe407964df5488916"
+    },
+    "rows-runtime/native/wood-down.png": {
+      "bytes": 518,
+      "sha256": "c54525f0579eb7d7f4df663a61b5f14264621eceab94c96936b2d869f57749a5"
+    },
+    "rows-runtime/native/wood-left.png": {
+      "bytes": 464,
+      "sha256": "489bda2784abcdebb3ba2eb6ec8abac81ed892f8b2f20b0c745ace04e69a6948"
+    },
+    "rows-runtime/native/wood-right.png": {
+      "bytes": 433,
+      "sha256": "96c8d361be49cfec5683c8014690c5ef43e6624ddc2baaa3981f4a5c6b5c659e"
+    },
+    "rows-runtime/native/wood-up.png": {
+      "bytes": 482,
+      "sha256": "8669440cf43fc6abf55e3c5740ca91fd204ebde106e3a7588743bdc9064dc64b"
+    },
+    "rows-runtime/review/flour-down.png": {
+      "bytes": 1063,
+      "sha256": "0d01dd67942543f6a5776c13b6e4ff9f0898d95c703ed9bd39b077b718948ee3"
+    },
+    "rows-runtime/review/flour-left.png": {
+      "bytes": 1029,
+      "sha256": "6475996935e32a5f010fcd64a7b5adae15e74170f4b0139e32f608798a9ed944"
+    },
+    "rows-runtime/review/flour-right.png": {
+      "bytes": 962,
+      "sha256": "37fe70de0cbe5602d71290d76d64f799bf5042af1cc89b3df64058e12cee6be6"
+    },
+    "rows-runtime/review/flour-up.png": {
+      "bytes": 1132,
+      "sha256": "5abe463c4e3fb0791240222ba139ff80364e9cb6cc40ad8cb0a4c1a73c09c9fc"
+    },
+    "rows-runtime/review/food-down.png": {
+      "bytes": 867,
+      "sha256": "be24e6ac1c085a949563e756e78efb366d5127a2eaf9b704f5a4ab0153ebc15e"
+    },
+    "rows-runtime/review/food-left.png": {
+      "bytes": 886,
+      "sha256": "40e66a4f4ebf21bc6447d2c8cb34b77ae9044e0b7275989e139d8fdb2ee35305"
+    },
+    "rows-runtime/review/food-right.png": {
+      "bytes": 872,
+      "sha256": "485f23edcfb2e0aa3e60bf5b6423bf6f7d2b1c2df4cde18b78f32e9fbd663927"
+    },
+    "rows-runtime/review/food-up.png": {
+      "bytes": 882,
+      "sha256": "910786ae72d8c9aa1b2738be319afd2b2c1eaadf1ff0f169d5c9df4f4ba06aa5"
+    },
+    "rows-runtime/review/gold-down.png": {
+      "bytes": 928,
+      "sha256": "11cb19dfdc09a7f3641999c617f67fbf45e51b7bc7a10a1103630cb032084b7a"
+    },
+    "rows-runtime/review/gold-left.png": {
+      "bytes": 884,
+      "sha256": "59459431da8d59787b7170676dc78df57cf4897ff3c1b8c5cd4d5a821e7f17c8"
+    },
+    "rows-runtime/review/gold-right.png": {
+      "bytes": 871,
+      "sha256": "1b97be148841724bd18accf7e50cedc0069884a311cf9d82c3feae9af268cf52"
+    },
+    "rows-runtime/review/gold-up.png": {
+      "bytes": 906,
+      "sha256": "7b23bc849d2129d8c8e46919ddf9501424c8a18c0b97f28b8b4df69a91a858ea"
+    },
+    "rows-runtime/review/iron-down.png": {
+      "bytes": 996,
+      "sha256": "2ef4d02aab5c75004b4f37310b236a313de8f6deb1a54d5874d87c02e3cfed83"
+    },
+    "rows-runtime/review/iron-left.png": {
+      "bytes": 805,
+      "sha256": "b53c14684a548dd674613ba62fbb5e754b3ebe78052b31fefe3e23c0df43d269"
+    },
+    "rows-runtime/review/iron-right.png": {
+      "bytes": 805,
+      "sha256": "33f4ab4cdbae73d12031ed26cdd7c11009810d906139209125b47a935f179307"
+    },
+    "rows-runtime/review/iron-up.png": {
+      "bytes": 889,
+      "sha256": "e815e381f14ae5250f73236f45c74bf6a09a577d352c0b15ed2ef380466d19eb"
+    },
+    "rows-runtime/review/planks-down.png": {
+      "bytes": 833,
+      "sha256": "dd6fb7db755c04de309334172ded2732f8d34835450bcef4e7be903220bd7cb9"
+    },
+    "rows-runtime/review/planks-left.png": {
+      "bytes": 755,
+      "sha256": "037ad177681156a405543ef4238087cbe7eebce1adfeea02850f1b80b60f6ca8"
+    },
+    "rows-runtime/review/planks-right.png": {
+      "bytes": 808,
+      "sha256": "8b9f8010cda349e9c503f3791b060b356afaeca2ba9c34fcc6416fb263cf01cd"
+    },
+    "rows-runtime/review/planks-up.png": {
+      "bytes": 768,
+      "sha256": "aa683cdb0ad86bded958b2e78440cc91e41dbcb077438618f12df36b860b8731"
+    },
+    "rows-runtime/review/stone-down.png": {
+      "bytes": 1003,
+      "sha256": "392a043e357a27804a0b3a9cff9a613b204f9804576a2340a971bb5936023d72"
+    },
+    "rows-runtime/review/stone-left.png": {
+      "bytes": 841,
+      "sha256": "85ea30cc2810ad028a068d722f3f28a059c732e107f537fcf905566f033ab725"
+    },
+    "rows-runtime/review/stone-right.png": {
+      "bytes": 874,
+      "sha256": "5fa8022439269dbea4f2f03363e792b392be5a2f27d23daf9e90602aa7949ecc"
+    },
+    "rows-runtime/review/stone-up.png": {
+      "bytes": 885,
+      "sha256": "6fe3b98d80b32a3ef2bd387f9439cbf07676162716bf74362a5107a8a0c61874"
+    },
+    "rows-runtime/review/tools-down.png": {
+      "bytes": 940,
+      "sha256": "4de2030b5971dd582a1f70c75249a88c145427cc35a2277df9b9c5b657942967"
+    },
+    "rows-runtime/review/tools-left.png": {
+      "bytes": 881,
+      "sha256": "b66dcdfd0d6d2f02d898edd3bfd3a896194d19f466c99084c28edadee64114c9"
+    },
+    "rows-runtime/review/tools-right.png": {
+      "bytes": 889,
+      "sha256": "413829810cbeb0a74ecf2f8e2a3b6a70a79b6a90cb18d8b68b45c58e93d97bae"
+    },
+    "rows-runtime/review/tools-up.png": {
+      "bytes": 936,
+      "sha256": "012068ad821fcaaeafec74d209f6cdc4362503896a883a67e6299cd485d1a7b1"
+    },
+    "rows-runtime/review/wheat-down.png": {
+      "bytes": 998,
+      "sha256": "5654d5e1ffa78184570413ed02bc54462526b4cf50a5366e58eaa6685bd25716"
+    },
+    "rows-runtime/review/wheat-left.png": {
+      "bytes": 849,
+      "sha256": "86701825f2549f06e19593068689a116881281bf776e22aad559307af3950ff8"
+    },
+    "rows-runtime/review/wheat-right.png": {
+      "bytes": 833,
+      "sha256": "46b0bded8b59c3f89683df72f8a53703fc706186f1ff2d61f42f03d1c844541b"
+    },
+    "rows-runtime/review/wheat-up.png": {
+      "bytes": 896,
+      "sha256": "f13a4fb356f6a26ae514e28e9dd422bea2bccdea5a7082f43244063128ed7ee7"
+    },
+    "rows-runtime/review/wood-down.png": {
+      "bytes": 952,
+      "sha256": "fade1c1bb2b84388f8475efdcb819f199787699ae1788c71af67185fa5ebeb9e"
+    },
+    "rows-runtime/review/wood-left.png": {
+      "bytes": 868,
+      "sha256": "475802bf06ee8d56c76cfd624df1e033b71c38b54f864b2c9091e11105eaa2fa"
+    },
+    "rows-runtime/review/wood-right.png": {
+      "bytes": 830,
+      "sha256": "f772db48827da53a8257b1cfd0eb5f2870009699adf265be4d513b662ef61f71"
+    },
+    "rows-runtime/review/wood-up.png": {
+      "bytes": 965,
+      "sha256": "1e1be762309c144ff390ec574c1909494557dace08c7af10d0a553be045e2096"
+    },
+    "rows/flour/down.png": {
+      "bytes": 1063,
+      "sha256": "0d01dd67942543f6a5776c13b6e4ff9f0898d95c703ed9bd39b077b718948ee3"
+    },
+    "rows/flour/left.png": {
+      "bytes": 1029,
+      "sha256": "6475996935e32a5f010fcd64a7b5adae15e74170f4b0139e32f608798a9ed944"
+    },
+    "rows/flour/right.png": {
+      "bytes": 962,
+      "sha256": "37fe70de0cbe5602d71290d76d64f799bf5042af1cc89b3df64058e12cee6be6"
+    },
+    "rows/flour/up.png": {
+      "bytes": 1132,
+      "sha256": "5abe463c4e3fb0791240222ba139ff80364e9cb6cc40ad8cb0a4c1a73c09c9fc"
+    },
+    "rows/food/down.png": {
+      "bytes": 867,
+      "sha256": "be24e6ac1c085a949563e756e78efb366d5127a2eaf9b704f5a4ab0153ebc15e"
+    },
+    "rows/food/left.png": {
+      "bytes": 886,
+      "sha256": "40e66a4f4ebf21bc6447d2c8cb34b77ae9044e0b7275989e139d8fdb2ee35305"
+    },
+    "rows/food/right.png": {
+      "bytes": 872,
+      "sha256": "485f23edcfb2e0aa3e60bf5b6423bf6f7d2b1c2df4cde18b78f32e9fbd663927"
+    },
+    "rows/food/up.png": {
+      "bytes": 882,
+      "sha256": "910786ae72d8c9aa1b2738be319afd2b2c1eaadf1ff0f169d5c9df4f4ba06aa5"
+    },
+    "rows/gold/down.png": {
+      "bytes": 928,
+      "sha256": "11cb19dfdc09a7f3641999c617f67fbf45e51b7bc7a10a1103630cb032084b7a"
+    },
+    "rows/gold/left.png": {
+      "bytes": 884,
+      "sha256": "59459431da8d59787b7170676dc78df57cf4897ff3c1b8c5cd4d5a821e7f17c8"
+    },
+    "rows/gold/right.png": {
+      "bytes": 871,
+      "sha256": "1b97be148841724bd18accf7e50cedc0069884a311cf9d82c3feae9af268cf52"
+    },
+    "rows/gold/up.png": {
+      "bytes": 906,
+      "sha256": "7b23bc849d2129d8c8e46919ddf9501424c8a18c0b97f28b8b4df69a91a858ea"
+    },
+    "rows/iron/down.png": {
+      "bytes": 996,
+      "sha256": "2ef4d02aab5c75004b4f37310b236a313de8f6deb1a54d5874d87c02e3cfed83"
+    },
+    "rows/iron/left.png": {
+      "bytes": 805,
+      "sha256": "b53c14684a548dd674613ba62fbb5e754b3ebe78052b31fefe3e23c0df43d269"
+    },
+    "rows/iron/right.png": {
+      "bytes": 805,
+      "sha256": "33f4ab4cdbae73d12031ed26cdd7c11009810d906139209125b47a935f179307"
+    },
+    "rows/iron/up.png": {
+      "bytes": 889,
+      "sha256": "e815e381f14ae5250f73236f45c74bf6a09a577d352c0b15ed2ef380466d19eb"
+    },
+    "rows/planks/down.png": {
+      "bytes": 833,
+      "sha256": "dd6fb7db755c04de309334172ded2732f8d34835450bcef4e7be903220bd7cb9"
+    },
+    "rows/planks/left.png": {
+      "bytes": 755,
+      "sha256": "037ad177681156a405543ef4238087cbe7eebce1adfeea02850f1b80b60f6ca8"
+    },
+    "rows/planks/right.png": {
+      "bytes": 808,
+      "sha256": "8b9f8010cda349e9c503f3791b060b356afaeca2ba9c34fcc6416fb263cf01cd"
+    },
+    "rows/planks/up.png": {
+      "bytes": 768,
+      "sha256": "aa683cdb0ad86bded958b2e78440cc91e41dbcb077438618f12df36b860b8731"
+    },
+    "rows/stone/down.png": {
+      "bytes": 1003,
+      "sha256": "392a043e357a27804a0b3a9cff9a613b204f9804576a2340a971bb5936023d72"
+    },
+    "rows/stone/left.png": {
+      "bytes": 841,
+      "sha256": "85ea30cc2810ad028a068d722f3f28a059c732e107f537fcf905566f033ab725"
+    },
+    "rows/stone/right.png": {
+      "bytes": 874,
+      "sha256": "5fa8022439269dbea4f2f03363e792b392be5a2f27d23daf9e90602aa7949ecc"
+    },
+    "rows/stone/up.png": {
+      "bytes": 885,
+      "sha256": "6fe3b98d80b32a3ef2bd387f9439cbf07676162716bf74362a5107a8a0c61874"
+    },
+    "rows/tools/down.png": {
+      "bytes": 940,
+      "sha256": "4de2030b5971dd582a1f70c75249a88c145427cc35a2277df9b9c5b657942967"
+    },
+    "rows/tools/left.png": {
+      "bytes": 881,
+      "sha256": "b66dcdfd0d6d2f02d898edd3bfd3a896194d19f466c99084c28edadee64114c9"
+    },
+    "rows/tools/right.png": {
+      "bytes": 889,
+      "sha256": "413829810cbeb0a74ecf2f8e2a3b6a70a79b6a90cb18d8b68b45c58e93d97bae"
+    },
+    "rows/tools/up.png": {
+      "bytes": 936,
+      "sha256": "012068ad821fcaaeafec74d209f6cdc4362503896a883a67e6299cd485d1a7b1"
+    },
+    "rows/wheat/down.png": {
+      "bytes": 998,
+      "sha256": "5654d5e1ffa78184570413ed02bc54462526b4cf50a5366e58eaa6685bd25716"
+    },
+    "rows/wheat/left.png": {
+      "bytes": 849,
+      "sha256": "86701825f2549f06e19593068689a116881281bf776e22aad559307af3950ff8"
+    },
+    "rows/wheat/right.png": {
+      "bytes": 833,
+      "sha256": "46b0bded8b59c3f89683df72f8a53703fc706186f1ff2d61f42f03d1c844541b"
+    },
+    "rows/wheat/up.png": {
+      "bytes": 896,
+      "sha256": "f13a4fb356f6a26ae514e28e9dd422bea2bccdea5a7082f43244063128ed7ee7"
+    },
+    "rows/wood/down.png": {
+      "bytes": 952,
+      "sha256": "fade1c1bb2b84388f8475efdcb819f199787699ae1788c71af67185fa5ebeb9e"
+    },
+    "rows/wood/left.png": {
+      "bytes": 868,
+      "sha256": "475802bf06ee8d56c76cfd624df1e033b71c38b54f864b2c9091e11105eaa2fa"
+    },
+    "rows/wood/right.png": {
+      "bytes": 830,
+      "sha256": "f772db48827da53a8257b1cfd0eb5f2870009699adf265be4d513b662ef61f71"
+    },
+    "rows/wood/up.png": {
+      "bytes": 965,
+      "sha256": "1e1be762309c144ff390ec574c1909494557dace08c7af10d0a553be045e2096"
+    },
+    "source-parts/flour.png": {
+      "bytes": 99776,
+      "sha256": "0c992370bd99d239ef064b16055233c04643fac043579db36cfcd7575e160c28"
+    },
+    "source-parts/food.png": {
+      "bytes": 92001,
+      "sha256": "da352b50ab9d47dce830d8a77cac9741a3f0efdd55fc37ccb29e5b368f586144"
+    },
+    "source-parts/gold.png": {
+      "bytes": 77589,
+      "sha256": "0e6a5d1d8080a7fe7d70b6d80de1d07d9b6d96738693558172325e35d4296c3a"
+    },
+    "source-parts/iron.png": {
+      "bytes": 81879,
+      "sha256": "b70bb7a554d22d7c0789ae754966a1c842e1b6368310122ab6edeff488ec9a81"
+    },
+    "source-parts/planks.png": {
+      "bytes": 85605,
+      "sha256": "224ba2f4cb84f43bda26e5d4ebc63d53bfdf1e27c3ac50d75374ba2f86d57bee"
+    },
+    "source-parts/stone.png": {
+      "bytes": 71820,
+      "sha256": "f9f2be8d02eeb16b3ac39e37de572f61b06fc6a14632220d6153d22ba087bcb3"
+    },
+    "source-parts/tools.png": {
+      "bytes": 93822,
+      "sha256": "641854a20d8bbdf48872f7191b3fc6dc9abe9b6287d68d96de2edab4df8933de"
+    },
+    "source-parts/wheat.png": {
+      "bytes": 108465,
+      "sha256": "7ba349f1d96604627fc71a6576e8c26d071f399859f314ff2eb082445c7173dd"
+    },
+    "source-parts/wood.png": {
+      "bytes": 103602,
+      "sha256": "0c2bfff420aa5050b09af1689bf82d17ab754c24381cf8a8c79d8becc41b7ba0"
+    }
+  },
+  "schema": "realm.actor-pose.a6-cargo-payloads-manifest.v1",
+  "scope": {
+    "bakedContainer": true,
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "frames": 288,
+    "framesPerRow": 8,
+    "ownerRows": [
+      "guard/carry"
+    ],
+    "resources": [
+      "wood",
+      "stone",
+      "food",
+      "gold",
+      "iron",
+      "wheat",
+      "flour",
+      "planks",
+      "tools"
+    ],
+    "rows": 36
+  }
+}

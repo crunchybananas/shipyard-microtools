@@ -1,5 +1,50 @@
 # Current Graphics Handoff
 
+## Realm 175 guard production family and A6 cargo semantics — 2026-07-30
+
+- All `16` A5 guard rows are now production sources: one watchman identity,
+  watch-blue garment, body scale, root, lighting model, and palette across
+  idle, walk, work, and carry in four directions. The atomic promotion raised
+  the production override count from `191` to `195` and cleared all `16`
+  review candidates.
+- The carried crate remains baked into `guard/carry` because it already owns
+  hand occlusion and the per-frame load socket. The renderer no longer paints
+  a duplicate procedural load over that row.
+- A6 adds nine resource-specific raster payloads—wood, stone, food, gold,
+  iron, wheat, flour, planks, and tools. Each is attached to all `32` relevant
+  direction/frame load sockets and compiled into four actor-matched runtime
+  tiers.
+- The project now keeps the keyed and transparent image-generation source,
+  complete prompt/provenance, exact grid/crop authority, hashes, source parts,
+  36 reviewable single-row overlays, composite proof, tier atlases, and
+  exhaustive manifest.
+- Clean A6 rebuilds are byte-identical. The gate checks every source/output
+  hash, `36/36` populated rows, `288/288` populated frames, binary alpha,
+  exact tier dimensions, full `RESOURCE_KEYS` coverage, and exact copies in
+  the production sprite directory.
+- A production-only browser proof draws every resource in every direction and
+  all four guard actions at exact `3x`. Actor and cargo share the same frame
+  index, tier, destination rectangle, and unsmoothed integer scale. Every
+  idle → walk → work → carry transition resets to authored frame `0`, and an
+  ordinary URL requests no A5 preview asset.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-actor-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: build the farmer as the next complete modular identity family.
+Keep idle, walk, work, and carry in reviewable eight-frame rows, give its tools
+and cargo independent socketed parts, and accept the family only after the
+same direction, transition, scale, and live-canvas proofs pass.
+
 ## Realm 174 candidate-safe actor row manifest — 2026-07-30
 
 - The actor-row manifest is now version `2`. Every logical
@@ -1125,18 +1170,15 @@ aligned.
 
 ## Best Next Target
 
-Extend the proven A3 source contract from right-facing carry to the complete
-guard pilot. Author the remaining directions by transforming joints and
-recomposing semantic layers—never by mirroring a finished row—and add
-one-sided equipment sentinels so handedness failures are mechanically visible.
-Then build guard idle, walk, work, and carry from the same watchman identity,
-watch-blue garment, fixed palette, root, lighting, and attachment contracts.
+Build the farmer as the second complete modular actor family. Preserve one
+farmer identity across idle, walk, work, and carry in all four directions;
+keep tools and cargo as independently socketed authoring parts; compile
+reviewable `512x84` rows and exact runtime tiers; and exercise all transitions
+on the live canvas before an atomic family promotion.
 
-Keep every row a reviewable flattened `512x84` promotion unit. Exercise the
-complete guard family in Sprite Lab, Actor Muster, and controlled settlement
-fixtures before accepting any row. Once the guard family passes, use the same
-source authorities for farmer and lumber rather than preserving the current
-palette-derived identities.
+After the farmer, apply the same contract to lumber. Generalize A6 baked-cargo
+ownership only as each new carry family receives a real socketed container;
+legacy inherited rows retain the procedural fallback until then.
 
 ## Secondary Targets
 
@@ -1159,5 +1201,5 @@ palette-derived identities.
 
 ## Handoff Discipline
 
-At the end of the next round, write `rounds/114-<short-name>.md`, update this
+At the end of the next round, write `rounds/118-<short-name>.md`, update this
 file's Best Next Target, and move any completed backlog item to Done.

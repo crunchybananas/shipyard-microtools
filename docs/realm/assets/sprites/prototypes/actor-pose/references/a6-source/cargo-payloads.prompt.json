@@ -1,0 +1,48 @@
+{
+  "schema": "realm.imagegen-provenance.v1",
+  "asset": "cargo-payloads",
+  "generator": "OpenAI built-in image generation",
+  "generated_original": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_V3OwxO61xc8L4p7CHHBCyTh9.png",
+  "style_reference": {
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "authority": "rendering style, material texture, outline, and lighting only"
+  },
+  "prompt": "Use case: stylized-concept\nAsset type: modular bitmap source board for a high-quality 2D strategy-game cargo attachment system\nInput images: Image 1 is a STYLE REFERENCE ONLY. Match its compact painterly pixel-cluster rendering, warm upper-left lighting, readable material texture, dark selective outline, and limited-color game-sprite finish. Do not copy or reproduce the crate.\nPrimary request: create exactly nine separate small medieval resource payload clusters arranged in a strict 3 by 3 grid, in this exact reading order from left to right and top to bottom: (1) three tied wood logs, (2) angular gray stone chunks, (3) red food produce with a small bread loaf, (4) a small gold coin pouch with visible coins, (5) blue-gray iron ore chunks, (6) a tied golden wheat sheaf, (7) a cream flour sack with a dark blue tie, (8) three cut wooden planks, (9) a compact blacksmith tool bundle with hammer and tongs.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local background removal. No floor plane.\nStyle/medium: compact painterly pixel-art game sprites with crisp clustered pixels and controlled shading; high material readability when reduced to roughly 8-14 pixels tall; comparable to classic premium 2D strategy-game resource art, not smooth concept art.\nComposition/framing: square source board; nine equal invisible cells; one payload centered in each cell; equal apparent scale; generous empty gutter between every payload; every payload fully visible and disconnected from every other payload.\nLighting/mood: one consistent warm upper-left key light with a restrained lower-right shade, matching Image 1.\nConstraints: payload contents only; no crate, basket, chest, shelf, character, hands, ground, labels, letters, numbers, panel borders, UI, watermark, shadow, reflection, gradients, texture, or lighting variation in the magenta background; never use #ff00ff inside a payload.\nAvoid: duplicated payloads, extra objects, touching cells, mixed viewpoints, photorealism, vector-flat icons, smooth airbrushing, blurry edges, thick black cartoon outlines.\nOutput intent: the nine cells will be cropped deterministically into project-bound source parts, keyed to transparency, palette-bounded, socketed into an existing carried crate, and compiled into exact-resolution runtime atlases.",
+  "keyed_source": {
+    "path": "assets/sprites/prototypes/actor-pose/references/a6-source/cargo-payloads-keyed.png",
+    "sha256": "cc41e78fa004695e4d7e64debf3907068c639ffb5c411d10ad88a90af7051395",
+    "width": 1254,
+    "height": 1254,
+    "background": "#ff00ff"
+  },
+  "transparent_source": {
+    "path": "assets/sprites/prototypes/actor-pose/references/a6-source/cargo-payloads.png",
+    "sha256": "a4d28df361705e6ced47cabdf081412b27eb660f519183a715d2749c20b50178",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "background_removal": {
+      "key": "#fb03fa",
+      "method": "local chroma distance with soft edge preservation",
+      "transparent_pixels": 1182744,
+      "partially_transparent_pixels": 13802
+    }
+  },
+  "crop_authority": {
+    "layout": "strict 3x3 equal cells",
+    "order": [
+      "wood",
+      "stone",
+      "food",
+      "gold",
+      "iron",
+      "wheat",
+      "flour",
+      "planks",
+      "tools"
+    ],
+    "cell_edges": [0, 418, 836, 1254],
+    "trim": "alpha >= 18 bounding box within each declared cell"
+  }
+}

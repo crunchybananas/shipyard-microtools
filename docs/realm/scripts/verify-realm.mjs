@@ -10,6 +10,7 @@ const checks = [
   ['runtime module graph', 'verify-module-graph.mjs'],
   ['render sharpness', 'verify-render-sharpness.mjs'],
   ['actor-row candidate isolation', 'verify-actor-row-manifest-v2.mjs'],
+  ['A6 resource cargo attachments', 'verify-a6-cargo-payloads.mjs'],
   ['sprite source contract', 'verify-sprite-source-contract.mjs'],
   ['deterministic-core purity', 'verify-core-purity.mjs'],
   ['core/FX isolation', 'verify-core-fx-isolation.mjs'],
@@ -29,6 +30,7 @@ const checks = [
   ['browser road rendering', 'verify-road-rendering.mjs'],
   ['browser actor-row candidate isolation', 'verify-actor-row-candidate-browser.mjs'],
   ['browser actor vertical slice', 'verify-actor-vertical-slice.mjs'],
+  ['browser guard cargo and transitions', 'verify-guard-cargo-browser.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];
 
