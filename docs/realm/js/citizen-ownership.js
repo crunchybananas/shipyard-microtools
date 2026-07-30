@@ -4,8 +4,8 @@
 // profession, assignment, and activity. Buildings never own worker arrays;
 // staffing is a deterministic derived view of citizen assignments.
 
-import { G, BUILDINGS } from './state.js?realm=182';
-import { emit, off, on } from './bus.js?realm=182';
+import { G, BUILDINGS } from './state.js?realm=183';
+import { emit, off, on } from './bus.js?realm=183';
 
 export const CONSTRUCTION_STAFF_LIMIT = 2;
 

@@ -2,9 +2,9 @@
 // move their own actors; shell callers pass only shell-owned movers so the
 // presentation layer never mutates authoritative simulation entities.
 
-import { G, MAP_H, MAP_W, TILE } from './state.js?realm=182';
+import { G, MAP_H, MAP_W, TILE } from './state.js?realm=183';
 
-export const GROUND_ACTOR_SPACE = 0.45;
+export const GROUND_ACTOR_SPACE = 0.60;
 
 function canOccupy(actor, x, y) {
   const rx = Math.round(x);

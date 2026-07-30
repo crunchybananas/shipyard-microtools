@@ -2,12 +2,12 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=182';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=182';
-import { getCitizenSpeedMult } from './events.js?realm=182';
-import { buildingCapacity } from './building-lifecycle.js?realm=182';
-import { revealAround } from './world.js?realm=182';
-import { visualJitter } from './fx.js?realm=182';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=183';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=183';
+import { getCitizenSpeedMult } from './events.js?realm=183';
+import { buildingCapacity } from './building-lifecycle.js?realm=183';
+import { revealAround } from './world.js?realm=183';
+import { visualJitter } from './fx.js?realm=183';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -17,7 +17,7 @@ import {
   staffingCount,
   transitionCitizenActivity,
   vocationForBuilding,
-} from './citizen-ownership.js?realm=182';
+} from './citizen-ownership.js?realm=183';
 
 const DEFAULT_ACTIVITY_REASON = Object.freeze({
   idle: 'idle-wait',
@@ -288,16 +288,12 @@ function deliveryTargetStillValid(c) {
   return !!c._deliveryTarget && G.buildings.includes(c._deliveryTarget);
 }
 
-// Loop 3 → Loop 7 (render S3): citizens respect each other, but don't get
-// stuck. User-reported bug after L3: citizens could freeze in place because
-// separation fought their movement. Now:
-//   - Both-moving pairs: no separation (they'll walk past each other on paths).
-//   - Mixed pairs (one moving, one idle): 40% strength on the moving citizen,
-//     full on the idle one.
-//   - Both-idle pairs: full strength.
-// Also shrank PERSONAL_SPACE 0.75 → 0.55 — 0.75 was knocking pathing citizens
-// off their waypoints even before the stuck bug manifested.
-const PERSONAL_SPACE = 0.50;
+// Deterministic right-of-way prevents crossing and opposing citizens from
+// entering the same space. Separation then supplies a visible passing lane
+// and remains the fallback for newly spawned or stationary crowds. This radius
+// is large enough to keep actor silhouettes distinct without pushing walkers
+// a full tile away from their route.
+const PERSONAL_SPACE = 0.60;
 
 function tileWalkable(x, y) {
   const mx = Math.round(x), my = Math.round(y);
@@ -537,9 +533,11 @@ function shouldYieldToCitizen(c, nx, ny) {
         const otherDirection = activeMovementDirection(other);
         if (!otherDirection) continue;
         const alignment = direction.x * otherDirection.x + direction.y * otherDirection.y;
-        // Passing lanes handle opposing traffic, and following traffic can
-        // naturally queue. Yield only for crossing paths at intersections.
-        if (Math.abs(alignment) >= 0.45) continue;
+        // Following traffic can naturally queue. Crossing and opposing
+        // traffic need a deterministic right-of-way decision before they
+        // enter the same personal-space area; post-move separation remains a
+        // safety net, not the primary traffic rule.
+        if (alignment >= 0.45) continue;
         const currentDistance = Math.hypot(c.x - other.x, c.y - other.y);
         if (currentDistance >= YIELD_BUCKET_SIZE) continue;
         const nextDistance = Math.hypot(nx - other.x, ny - other.y);

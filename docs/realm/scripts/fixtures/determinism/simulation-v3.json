@@ -192,19 +192,19 @@
     "population": 15,
     "resources": {
       "flour": 0,
-      "food": 550,
+      "food": 517,
       "gold": 576,
       "iron": 50,
       "planks": 0,
-      "stone": 566,
+      "stone": 562,
       "tools": 0,
       "wheat": 116,
-      "wood": 550
+      "wood": 563
     },
     "tick": 21600,
-    "worldHash": "262cd34b629873ccfb69e3090e9cca5d82d354a330e1207112c027cf4ec08088"
+    "worldHash": "4c5f033adcea75e3c62783f49b188b603aa545615bac38ae9dc7a9547dd4c256"
   },
-  "finalPopulation": 3,
+  "finalPopulation": 2,
   "finalBuildings": [
     {
       "buildProgress": 1,
@@ -271,10 +271,10 @@
     }
   ],
   "mapFingerprint": "090de3ff6c9af74581f9140a1af532f8cc63931c14e6d29fd18554355c378c4c",
-  "worldHash": "69998e02378b7f04a0d34c0e05628090671a48b43895b635c8610c6e046fc12b",
-  "replayHash": "be9b4728c565ceec17698956852d5e31c388b4a7bef2d291ab9c63a98ae8cd81",
+  "worldHash": "66ee44acf28d73259724eee355446b8acecaf143cd0a9c26f1a6f9c59191a9b7",
+  "replayHash": "3c56b30b4eec53fc40714b045363a0cc2d60adacf9a8afbc9776ed712cffff18",
   "story": {
-    "chronicleCount": 38,
+    "chronicleCount": 39,
     "flags": [
       "dream_10",
       "fields_know_realm",

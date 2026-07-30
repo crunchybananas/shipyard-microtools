@@ -2,22 +2,22 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=182';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=182';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=182';
-import { revealAround, makeCitizen } from './world.js?realm=182';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=182';
-import { spawnDust, visualJitter } from './fx.js?realm=182';
-import { emit } from './bus.js?realm=182';
-import { isBuildingUnlocked } from './tech.js?realm=182';
-import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=182';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=183';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=183';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=183';
+import { revealAround, makeCitizen } from './world.js?realm=183';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=183';
+import { spawnDust, visualJitter } from './fx.js?realm=183';
+import { emit } from './bus.js?realm=183';
+import { isBuildingUnlocked } from './tech.js?realm=183';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=183';
 import {
   citizenConstructionRequiresStaff,
   releaseCitizenAssignment,
   removeCitizenFromWorld,
   transitionCitizenActivity,
   workersForBuilding,
-} from './citizen-ownership.js?realm=182';
+} from './citizen-ownership.js?realm=183';
 
 const CONSTRUCTION_TICKS = {
   road: 45,
@@ -409,7 +409,9 @@ export function updateProduction() {
       const avgMood = sum / G.citizens.length;
       moodDelta = Math.max(-15, Math.min(15, (avgMood - 55) * 0.5));
     }
-    G._moodDelta = Math.round(moodDelta * 10) / 10;
+    // Math.round can preserve JavaScript's signed zero. Canonicalize it so
+    // equivalent neutral moods cannot produce different deterministic state.
+    G._moodDelta = Math.round(moodDelta * 10) / 10 || 0;
     G.happiness = Math.min(100, Math.max(10, 50 + bardBonus + moodDelta + hBonus + getHappinessOffset() - Math.max(0, G.population - G.maxPop) * 5));
 
     // ── Housing evolution (Caesar-style tier ladder) ─────────────────
