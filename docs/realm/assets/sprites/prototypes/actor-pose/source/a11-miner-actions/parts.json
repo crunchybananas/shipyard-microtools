@@ -1,0 +1,267 @@
+{
+  "schema": "realm.actor-pose.a11-miner-actions.v1",
+  "stage": "miner-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "deepdelver",
+    "path": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver.png",
+    "sha256": "e00e8d7d22aa4ef868cb56b175d3be82f8336f2ad098843728c602d5e888d33e",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver-keyed.png",
+      "sha256": "c5b1abfc708a04566f075a7195b40dc3e6f98d82903ba75768854544e61909c5"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver.prompt.json",
+    "parts": {
+      "down": {
+        "head": [294, 12, 455, 228],
+        "torso": [269, 254, 574, 555],
+        "arm_screen_left": [114, 264, 242, 598],
+        "arm_screen_right": [1169, 265, 1296, 598],
+        "leg": [248, 581, 527, 985]
+      },
+      "up": {
+        "head": [580, 12, 735, 220],
+        "torso": [604, 264, 905, 556],
+        "arm_screen_left": [114, 264, 242, 598],
+        "arm_screen_right": [1169, 265, 1296, 598],
+        "leg": [590, 585, 740, 984]
+      },
+      "left": {
+        "head": [808, 12, 984, 228],
+        "torso": [932, 251, 1109, 555],
+        "arm": [1169, 265, 1296, 598],
+        "leg": [935, 583, 1100, 985]
+      },
+      "right": {
+        "head": [808, 12, 984, 228],
+        "torso": [932, 251, 1109, 555],
+        "arm": [1169, 265, 1296, 598],
+        "leg": [935, 583, 1100, 985]
+      }
+    }
+  },
+  "garment": {
+    "key": "slate-brass",
+    "path": "assets/sprites/prototypes/actor-pose/references/a11-source/garment-slate-brass.png",
+    "sha256": "1abafc92043762a916f34151eb8b11ff529946b18ef597a7630fb50fe44e8ce3",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/garment-slate-brass-keyed.png",
+      "sha256": "f384a59fc6480c46d821f7b9daa641db2b20a581759eb69c7ccda2f87a291a12"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a11-source/garment-slate-brass.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [277, 39, 458, 185],
+        "tunic": [225, 185, 511, 554],
+        "sleeve_screen_left": [88, 232, 212, 422],
+        "sleeve_screen_right": [1105, 232, 1230, 422],
+        "belt": [236, 558, 494, 646],
+        "boot": [236, 639, 492, 983]
+      },
+      "up": {
+        "headgear": [574, 38, 746, 175],
+        "tunic": [522, 185, 802, 554],
+        "sleeve_screen_left": [88, 232, 212, 422],
+        "sleeve_screen_right": [1105, 232, 1230, 422],
+        "belt": [539, 560, 782, 642],
+        "boot": [536, 640, 785, 982]
+      },
+      "left": {
+        "headgear": [848, 40, 1033, 178],
+        "tunic": [861, 186, 1041, 554],
+        "sleeve": [1105, 232, 1230, 422],
+        "belt": [846, 558, 1046, 646],
+        "boot": [858, 639, 1022, 983]
+      },
+      "right": {
+        "headgear": [848, 40, 1033, 178],
+        "tunic": [861, 186, 1041, 554],
+        "sleeve": [1105, 232, 1230, 422],
+        "belt": [846, 558, 1046, 646],
+        "boot": [858, 639, 1022, 983]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "miner-pick",
+    "path": "assets/sprites/prototypes/actor-pose/references/a11-source/miner-pick.png",
+    "sha256": "7c09752e6404ecb345fa2e4ecca969f834328f8274e96ee6df063ba4e3f6ecb1",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/miner-pick-keyed.png",
+      "sha256": "32aa77fab62a2924449e7746abd2fe32375d7a8ebb5aceb64df4667cb2584a20"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a11-source/miner-pick.prompt.json",
+    "parts": {
+      "down": [40, 75, 470, 950],
+      "up": [466, 75, 880, 950],
+      "left": [920, 75, 1038, 950],
+      "right": [1214, 75, 1327, 950]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "pickaxe head at top, handle end at bottom",
+      "grip_fraction_from_top": 0.7,
+      "render_height": 33,
+      "occlusion": "body < pickaxe < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "ore-face",
+    "path": "assets/sprites/prototypes/actor-pose/references/a11-source/ore-face.png",
+    "sha256": "5d7bd7f772407b91558a208287e964fdb153e37d1a68c104f14dde1e2ad46985",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/ore-face-keyed.png",
+      "sha256": "4b4decd13778e042edb275ebd9a791dd47e8807ac5c01a4c474aee7ab2f86f9b"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a11-source/ore-face.prompt.json",
+    "parts": {
+      "down": [35, 340, 390, 720],
+      "up": [410, 340, 765, 720],
+      "left": [785, 340, 1120, 720],
+      "right": [1150, 340, 1490, 720]
+    },
+    "render": {
+      "down": {
+        "size": [25, 19],
+        "center": [32, 70],
+        "occlusion": "body < ore < pickaxe < near hand"
+      },
+      "up": {
+        "size": [25, 19],
+        "center": [32, 56],
+        "occlusion": "ore < body < pickaxe < near hand"
+      },
+      "left": {
+        "size": [27, 19],
+        "center": [17, 70],
+        "occlusion": "body < ore < pickaxe < near hand"
+      },
+      "right": {
+        "size": [27, 19],
+        "center": [47, 70],
+        "occlusion": "body < ore < pickaxe < near hand"
+      }
+    },
+    "authority": {
+      "ground_y": 79,
+      "strike_socket": "ore_face",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and miner work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and miner work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "deepdelver",
+    "build": "compact barrel-chested veteran deep-miner stance",
+    "identity_leg_far_width": 7,
+    "identity_leg_near_width": 8,
+    "garment_leg_far_width": 8.2,
+    "garment_leg_near_width": 9.2,
+    "upper_arm_far_width": 6.5,
+    "upper_arm_near_width": 7.5,
+    "forearm_far_width": 6,
+    "forearm_near_width": 6.8,
+    "identity_torso_size": [26, 32],
+    "garment_tunic_size": [30, 34],
+    "garment_belt_size": [27, 5],
+    "identity_head_size": [22, 24],
+    "garment_headgear_size": [28, 22]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": ["miner-pick", "ore-face"],
+      "motion": "ready, set piece, draw back, raise, drive, ore strike, rebound, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "pickaxe grip remains at the right-hand socket; the head travels toward the grounded ore face at the strike beat"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "miner",
+    "identity": "deepdelver",
+    "garment": "slate-brass",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, mining pickaxe, and grounded ore-face components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, pickaxe, and ore are measured independently before the flattened row is accepted"
+  }
+}

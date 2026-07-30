@@ -4,7 +4,7 @@
 // stable actor ownership.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=179' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=180' with { type: 'json' };
 import {
   G,
   MAP_H,
@@ -12,23 +12,23 @@ import {
   TILE,
   createResourceStock,
   setSeed,
-} from '../js/state.js?realm=179';
+} from '../js/state.js?realm=180';
 import {
   findPath,
   getPathfindingDiagnostics,
-} from '../js/pathfinding.js?realm=179';
-import { updateCitizens } from '../js/citizens.js?realm=179';
-import { updateSoldiers } from '../js/soldiers.js?realm=179';
-import { updateWalkers } from '../js/walkers.js?realm=179';
-import { updateAnimals } from '../js/animals.js?realm=179';
+} from '../js/pathfinding.js?realm=180';
+import { updateCitizens } from '../js/citizens.js?realm=180';
+import { updateSoldiers } from '../js/soldiers.js?realm=180';
+import { updateWalkers } from '../js/walkers.js?realm=180';
+import { updateAnimals } from '../js/animals.js?realm=180';
 import {
   createCitizenOwnership,
   resetCitizenOwnershipRuntime,
   transitionCitizenActivity,
-} from '../js/citizen-ownership.js?realm=179';
-import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=179';
+} from '../js/citizen-ownership.js?realm=180';
+import { buildCitizenPresentation } from '../js/citizen-presentation.js?realm=180';
 
-const RECORDED_REVISION = 179;
+const RECORDED_REVISION = 180;
 const RECORDED_SAVE_VERSION = 4;
 const RECORDED_SIMULATION_VERSION = 3;
 const MINIMUM_ACTOR_SEPARATION = 0.40;

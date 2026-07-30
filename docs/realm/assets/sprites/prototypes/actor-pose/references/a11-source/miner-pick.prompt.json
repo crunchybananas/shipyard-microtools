@@ -1,0 +1,38 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "miner-pick",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_L4iXyvSMOESBDcYXOitmahcw.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe-keyed.png",
+      "role": "edit target and exact four-view long-tool board reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/smith-hammer-keyed.png",
+      "role": "established Realm forged-tool material reference"
+    }
+  ],
+  "prompt": "Use case: precise-object-edit. Edit the supplied four-column Realm tool board into exactly four isolated views of the same traditional two-ended mining pickaxe while preserving the 1536x1024 canvas, one-row four-object structure, spacing, vertical source orientation, scale, and source resolution. Replace every axe completely. The pickaxe has a long straight worn hickory handle and a compact forged-steel head with a pointed spike on one side and a narrow chisel/adze edge on the other. It must read immediately as a practical medieval mining pick when reduced to roughly 30–34 pixels tall. Columns from left to right are broad front view, broad reverse view, narrow left-edge profile, and independently authored narrow right-edge profile. Every tool is upright with the steel head at the top and handle end at the bottom. Keep the same handle length, head construction, grip proportions, palette, and upper-left warm lantern lighting in all four views. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, readable steel and wood clusters, no photorealism, no blur, no dither, and no soft shadow. Background must be perfectly flat solid #ff00ff with no gradients, floor, shadows, labels, guides, border, text, watermark, hands, character, scenery, extra objects, or magenta inside the tool. Each pickaxe must be fully contained, separated, and uncropped. Do not mirror finished rows.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f406e9"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a11-source/miner-pick-keyed.png",
+  "keyed_sha256": "32aa77fab62a2924449e7746abd2fe32375d7a8ebb5aceb64df4667cb2584a20",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a11-source/miner-pick.png",
+  "alpha_sha256": "7c09752e6404ecb345fa2e4ecca969f834328f8274e96ee6df063ba4e3f6ecb1"
+}

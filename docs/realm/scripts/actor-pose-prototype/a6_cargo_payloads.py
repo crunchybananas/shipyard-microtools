@@ -363,6 +363,7 @@ def build(
                 "lumber/carry",
                 "builder/carry",
                 "blacksmith/carry",
+                "miner/carry",
             ],
             "bakedContainer": True,
         },

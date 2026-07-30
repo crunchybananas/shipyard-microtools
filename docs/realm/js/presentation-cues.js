@@ -2,7 +2,7 @@
 // reads these fields but never mutates simulation objects; they are excluded
 // from saves and authoritative hashes by STATE_OWNERSHIP.
 
-import { G } from './state.js?realm=179';
+import { G } from './state.js?realm=180';
 
 export function updatePresentationCues() {
   for (const citizen of G.citizens || []) {

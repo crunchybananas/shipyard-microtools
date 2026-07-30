@@ -15,6 +15,7 @@ const checks = [
   ['A8 modular lumber family', 'verify-a8-lumber-actions.mjs'],
   ['A9 modular builder family', 'verify-a9-builder-actions.mjs'],
   ['A10 modular blacksmith family', 'verify-a10-blacksmith-actions.mjs'],
+  ['A11 modular miner family', 'verify-a11-miner-actions.mjs'],
   ['sprite source contract', 'verify-sprite-source-contract.mjs'],
   ['deterministic-core purity', 'verify-core-purity.mjs'],
   ['core/FX isolation', 'verify-core-fx-isolation.mjs'],
@@ -38,6 +39,7 @@ const checks = [
   ['browser lumber vertical slice', 'verify-lumber-vertical-slice.mjs'],
   ['browser builder vertical slice', 'verify-builder-vertical-slice.mjs'],
   ['browser blacksmith vertical slice', 'verify-blacksmith-vertical-slice.mjs'],
+  ['browser miner vertical slice', 'verify-miner-vertical-slice.mjs'],
   ['browser modular cargo and transitions', 'verify-guard-cargo-browser.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];

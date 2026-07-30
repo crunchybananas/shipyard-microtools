@@ -1,0 +1,34 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-deepdelver",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_JHQsm4WaggV0vAhgnSBbctRA.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith-keyed.png",
+      "role": "edit target and exact modular identity-board layout reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve. Edit the supplied modular Realm identity board into one new deep-miner identity while preserving the exact 1536x1024 canvas, isolated component placement, scale, source resolution, generous gaps, and front/back/left-profile coverage. Replace every identity-bearing component consistently. The subject is a compact older man and veteran deep miner with medium copper-olive skin, broad cheekbones, heavy iron-gray brows with a notch in the left brow, a long slightly broken nose, close salt-and-pepper hair with a receding hairline, and a short square iron-gray beard. Give him a barrel torso, thick neck, and sinewy working forearms. The base layer is a plain slate-blue undershirt, smoke-charcoal trousers, and practical dark work boots, intended to sit beneath a later garment layer. Keep the exact component-board structure: three isolated heads across the top; isolated arms and front, back, and profile torsos in the middle; front, back, and side leg/boot sources on the bottom. This is a source-parts board, not an assembled actor and not an animation. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, readable dark clusters, warm upper-left lantern lighting, restrained texture, no photorealism, no blur, no dither, and no soft shadow. Keep the same identity, body proportions, beard, hairline, skin tone, undershirt, and lighting in every part. Background must be perfectly flat solid #ff00ff with no gradients, floor, shadows, labels, border, text, watermark, tools, armor, props, or magenta inside the subject. Every component must remain fully separated and uncropped with clean neck, shoulder, elbow, wrist, hip, knee, and ankle cut zones.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f104ee"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver-keyed.png",
+  "keyed_sha256": "c5b1abfc708a04566f075a7195b40dc3e6f98d82903ba75768854544e61909c5",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver.png",
+  "alpha_sha256": "e00e8d7d22aa4ef868cb56b175d3be82f8336f2ad098843728c602d5e888d33e"
+}

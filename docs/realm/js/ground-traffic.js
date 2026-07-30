@@ -2,7 +2,7 @@
 // move their own actors; shell callers pass only shell-owned movers so the
 // presentation layer never mutates authoritative simulation entities.
 
-import { G, MAP_H, MAP_W, TILE } from './state.js?realm=179';
+import { G, MAP_H, MAP_W, TILE } from './state.js?realm=180';
 
 export const GROUND_ACTOR_SPACE = 0.45;
 

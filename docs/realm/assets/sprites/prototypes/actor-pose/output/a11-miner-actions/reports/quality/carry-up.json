@@ -1,0 +1,309 @@
+{
+  "blankCount": 0,
+  "bodyBottomRange": 0,
+  "bodyHeightRange": 2,
+  "bodyWidthRange": 1,
+  "dimensions": [
+    512,
+    84
+  ],
+  "duplicateFrameCount": 0,
+  "errors": [],
+  "flickerScore": 5.2,
+  "frames": [
+    {
+      "body": {
+        "cx": 31.66,
+        "cy": 37.99,
+        "h": 76,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 18,
+        "minY": 4,
+        "w": 28
+      },
+      "bounds": {
+        "cx": 31.63,
+        "cy": 38.56,
+        "h": 76,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 4,
+        "w": 30
+      },
+      "colorCount": 275,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        63.5,
+        49.8,
+        37.6
+      ],
+      "pixels": 1721,
+      "sha256": "44ac428a69e5e38ed4ec988c01b207d23013e94388aaeed353bddc3ca46bef71",
+      "shadingRatio": 0.7114
+    },
+    {
+      "body": {
+        "cx": 31.67,
+        "cy": 37.75,
+        "h": 75,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 18,
+        "minY": 5,
+        "w": 28
+      },
+      "bounds": {
+        "cx": 31.64,
+        "cy": 38.82,
+        "h": 75,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 5,
+        "w": 30
+      },
+      "colorCount": 273,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        64.2,
+        50.2,
+        37.9
+      ],
+      "pixels": 1690,
+      "sha256": "4acaa7cd00b684ac35a0146b24c0a6559ff658743f9bdf471ab465e974f62a78",
+      "shadingRatio": 0.7144
+    },
+    {
+      "body": {
+        "cx": 31.64,
+        "cy": 35.93,
+        "h": 76,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 18,
+        "minY": 4,
+        "w": 28
+      },
+      "bounds": {
+        "cx": 31.56,
+        "cy": 38.3,
+        "h": 76,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 4,
+        "w": 30
+      },
+      "colorCount": 272,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        63.8,
+        50.0,
+        37.8
+      ],
+      "pixels": 1714,
+      "sha256": "66ceb93aafc122774b4ecebde580f80a1f0d1e311ea8755a7109c7dda0e10f2a",
+      "shadingRatio": 0.7112
+    },
+    {
+      "body": {
+        "cx": 31.85,
+        "cy": 35.12,
+        "h": 77,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 18,
+        "minY": 3,
+        "w": 28
+      },
+      "bounds": {
+        "cx": 31.82,
+        "cy": 37.44,
+        "h": 77,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 3,
+        "w": 30
+      },
+      "colorCount": 271,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        63.8,
+        50.0,
+        37.8
+      ],
+      "pixels": 1721,
+      "sha256": "60c6bd77a769dac9989c05ac2472bf2939c6d257bcf2d3a5c2f016d1ff6ad5af",
+      "shadingRatio": 0.701
+    },
+    {
+      "body": {
+        "cx": 31.73,
+        "cy": 36.52,
+        "h": 76,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 18,
+        "minY": 4,
+        "w": 28
+      },
+      "bounds": {
+        "cx": 31.7,
+        "cy": 39.08,
+        "h": 76,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 4,
+        "w": 30
+      },
+      "colorCount": 272,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        63.1,
+        49.5,
+        37.5
+      ],
+      "pixels": 1750,
+      "sha256": "cc8307974496b4224a597a8d47b9f6abcfbeb148952d5e822290f793d29f6753",
+      "shadingRatio": 0.7079
+    },
+    {
+      "body": {
+        "cx": 31.6,
+        "cy": 36.82,
+        "h": 75,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 18,
+        "minY": 5,
+        "w": 28
+      },
+      "bounds": {
+        "cx": 31.52,
+        "cy": 39.18,
+        "h": 75,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 5,
+        "w": 30
+      },
+      "colorCount": 271,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        63.8,
+        50.0,
+        37.7
+      ],
+      "pixels": 1710,
+      "sha256": "809144f189e601e86ff92dc97b312c08bf92c32a4f124c5489734b2dca1fdd69",
+      "shadingRatio": 0.7097
+    },
+    {
+      "body": {
+        "cx": 31.17,
+        "cy": 37.19,
+        "h": 76,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 4,
+        "w": 29
+      },
+      "bounds": {
+        "cx": 31.09,
+        "cy": 38.17,
+        "h": 76,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 4,
+        "w": 30
+      },
+      "colorCount": 272,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        63.8,
+        49.9,
+        37.7
+      ],
+      "pixels": 1705,
+      "sha256": "05fbaab36ec15401f34e6c5f9631ca6e040a4d32116838fb10e39b3013e4128f",
+      "shadingRatio": 0.7116
+    },
+    {
+      "body": {
+        "cx": 31.22,
+        "cy": 35.87,
+        "h": 77,
+        "maxX": 45,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 3,
+        "w": 29
+      },
+      "bounds": {
+        "cx": 31.13,
+        "cy": 36.94,
+        "h": 77,
+        "maxX": 46,
+        "maxY": 79,
+        "minX": 17,
+        "minY": 3,
+        "w": 30
+      },
+      "colorCount": 272,
+      "edgePixels": 0,
+      "fragmentCount": 0,
+      "fragmentPixels": 0,
+      "meanColor": [
+        64.0,
+        50.1,
+        37.8
+      ],
+      "pixels": 1691,
+      "sha256": "04e706a6c3b97d0ac54cee3eefaa187b06bf8b88c8ec34ed2421c75733797f1d",
+      "shadingRatio": 0.7149
+    }
+  ],
+  "maxAlignedAlphaDelta": 0.108,
+  "maxAlphaRatio": 1.036,
+  "maxBodyCenterJump": 1.82,
+  "maxEdgePixels": 0,
+  "maxFragmentCount": 0,
+  "maxFragmentPixels": 0,
+  "maxFullCenterJump": 1.64,
+  "maxPaletteDrift": 0.91,
+  "measurement": "flattened",
+  "medianBodyHeight": 76.0,
+  "medianBodyWidth": 28.0,
+  "medianColor": [
+    63.8,
+    50.0,
+    37.75
+  ],
+  "medianColorCount": 272.0,
+  "medianShadingRatio": 0.7113,
+  "path": "rows/deepdelver/slate-brass/carry-up.png",
+  "rowSha256": "a0767673533057bde2e5e670aee0467f3a4d20b335ef6675b11cebe135f34c9b",
+  "styleEra": "painted",
+  "warnings": []
+}

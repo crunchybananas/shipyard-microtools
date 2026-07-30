@@ -12,7 +12,7 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from '../js/cargo-source-contract.js?realm=179';
+} from '../js/cargo-source-contract.js?realm=180';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -27,6 +27,7 @@ assert.deepEqual(
     'lumber/carry',
     'builder/carry',
     'blacksmith/carry',
+    'miner/carry',
   ],
 );
 assert.equal(cargoOwnerRow('guard', 'carry'), true);
@@ -34,6 +35,7 @@ assert.equal(cargoOwnerRow('farmer', 'carry'), true);
 assert.equal(cargoOwnerRow('lumber', 'carry'), true);
 assert.equal(cargoOwnerRow('builder', 'carry'), true);
 assert.equal(cargoOwnerRow('blacksmith', 'carry'), true);
+assert.equal(cargoOwnerRow('miner', 'carry'), true);
 assert.equal(cargoOwnerRow('guard', 'walk'), false);
 assert.equal(cargoOwnerRow('settler', 'carry'), false);
 assert.equal(CARGO_RUNTIME_ATLASES.length, 4);

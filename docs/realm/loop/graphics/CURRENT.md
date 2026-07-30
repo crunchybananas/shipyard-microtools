@@ -1,5 +1,55 @@
 # Current Graphics Handoff
 
+## Realm 180 miner production family — 2026-07-30
+
+- All `16` miner rows now come from one deterministic A11 modular family: a
+  compact older veteran deepdelver identity, slate-blue and coal-black mining
+  clothing, one palette/lighting/root contract, four actions, and four
+  independently compiled directions.
+- The atomic promotion replaced the mixed miner assembled from settler-body
+  transplants, reversals, walk-derived work motion, and a separate oversized
+  bearded worker. Production remains complete at `224` accepted overrides and
+  `0` candidates, with all miner rows under A11 provenance.
+- A11 keeps four image-generation authorities separate from animation:
+  identity parts, garment parts, a four-view two-ended mining pick, and a
+  four-view grounded slate ore face with blue-gray iron and quartz. Keyed
+  sources, transparent sources, complete prompts, reference roles,
+  chroma-removal settings, crop boxes, and SHA-256 hashes are checked in.
+- The compiler emits `16` reviewable `512x84` rows / `128` frames plus body,
+  identity, garment, equipment, semantic, landmark, quality, palette, and
+  proof artifacts. Exact `27x35`, `35x46`, `54x70`, and `64x84` runtime tiers
+  remain binary-alpha, warning-free, palette-bounded, and byte deterministic.
+- Work now reads as mining: eight planted beats move the socketed pickaxe
+  through draw-back, raise, drive, ore strike, rebound, and recovery while the
+  direction-specific ore face remains a separate grounded equipment plane.
+- `miner/carry` joins guard, farmer, lumber, builder, and blacksmith as an
+  explicit baked-container owner. A6 proves
+  `6 roles × 9 resources × 4 directions = 216` production cargo pairs with
+  one frame, destination rectangle, runtime tier, and unsmoothed scale.
+- Browser gates cover every A11 row at exact `3x`, action reset and cadence,
+  an assigned miner in all four carry directions, iron payload alignment,
+  production-only atlas selection, and ordinary-world default-tier rendering.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a11_miner_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a11_miner_actions.py
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-miner-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: replace the remaining derivative actor families with equally
+distinct modular identities, garments, and role equipment, then continue
+through world art. Full manifest coverage remains a delivery mechanism, not a
+claim that the remaining art is finished.
+
 ## Realm 179 blacksmith production family — 2026-07-30
 
 - All `16` blacksmith rows now come from one deterministic A10 modular family:

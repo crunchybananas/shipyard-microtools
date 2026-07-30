@@ -59,8 +59,8 @@ const explicitCapture = await page.evaluate(async () => {
 });
 
 const result = await page.evaluate(async () => {
-  const renderModule = await import('./js/render.js?realm=179');
-  const { ACTOR_REGISTRATION } = await import('./js/actor-registration.js?realm=179');
+  const renderModule = await import('./js/render.js?realm=180');
+  const { ACTOR_REGISTRATION } = await import('./js/actor-registration.js?realm=180');
   const atlasInfo = window.__realm?.actorAtlas?.();
   const img = new Image();
   img.decoding = 'async';

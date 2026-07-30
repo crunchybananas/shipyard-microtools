@@ -1,0 +1,42 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-slate-brass",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_cPi7Eje89UCJDLu9Ym4Jbch4.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge-keyed.png",
+      "role": "edit target and exact modular garment-board layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver-keyed.png",
+      "role": "new miner identity and fit reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work-keyed.png",
+      "role": "established Realm work-garment rendering reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve. Edit the supplied modular Realm garment board into one coherent veteran deep-miner work garment while preserving its exact 1536x1024 canvas, isolated component placement, scale, source resolution, gaps, and front/back/left-profile coverage. Replace every forge garment component consistently and fit the deepdelver identity. Create a coal-black leather mining cap with a compact aged-brass unlit lamp; a close deep slate-blue quilted jacket; a coal-black reinforced leather bib and protective apron; a warm ochre-brown cross-back harness; aged brass buckles and rivets; smoke-charcoal reinforced trousers; and heavy iron-capped black-brown mining boots. The role must read immediately as a practical underground miner, not a blacksmith, guard, builder, farmer, or fantasy warrior. Keep the exact modular layout: isolated cap views on top; isolated sleeves and front, back, and profile jacket/apron views in the middle; isolated belt/harness pieces below; front, back, and side trouser/boot sources on the bottom. This is a garment-parts board, not an assembled character and not an animation. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, strong material separation, hard readable clusters, warm upper-left lantern lighting, no photorealism, no blur, no dither, and no soft ambient shadow. Keep garment construction, cap lamp, harness geometry, colors, proportions, and lighting consistent across every view. Background must be perfectly flat solid #ff00ff with no gradients, floor, shadows, labels, guides, border, text, watermark, body parts beyond tiny necessary openings, tools, weapons, scenery, or magenta inside the garment. Every component must remain fully separated and uncropped with clean joint cut zones.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#ea05e8"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a11-source/garment-slate-brass-keyed.png",
+  "keyed_sha256": "f384a59fc6480c46d821f7b9daa641db2b20a581759eb69c7ccda2f87a291a12",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a11-source/garment-slate-brass.png",
+  "alpha_sha256": "1abafc92043762a916f34151eb8b11ff529946b18ef597a7630fb50fe44e8ce3"
+}

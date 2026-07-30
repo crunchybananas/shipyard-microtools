@@ -5634,702 +5634,705 @@
     },
     "miner/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:49Z",
-        "file": "miner/carry-down.png",
-        "note": "Painted row: settler locked carry/down body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/carry-down-525048709300.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
             "medianColor": [
-              95.05,
-              64.6,
-              43.25
+              61.35,
+              49.05,
+              37.7
             ],
-            "paletteDelta": 7.96
+            "paletteDelta": 5.8
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.049,
-          "maxBodyCenterJump": 1.23,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.034,
+          "maxBodyCenterJump": 2.33,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.09,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            101.0,
-            69.2,
-            45.85
+            66.7,
+            51.3,
+            37.7
           ],
-          "medianColorCount": 419.0,
-          "medianShadingRatio": 0.61,
+          "medianColorCount": 318.0,
+          "medianShadingRatio": 0.6832,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9eb846ad71007c842a9c936d250cb5a9a070c402278cd380bf59b89158707104",
+        "sha256": "5250487093005a3e984fa79c39543c20a40e07a562f9371a3f14d82c04fbae33",
         "status": "accepted"
       }
     },
     "miner/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:53Z",
-        "file": "miner/carry-left.png",
-        "note": "Painted row: settler locked carry/left body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/carry-left-08a8633f66ed.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              97.55,
-              68.0,
-              44.1
+              63.8,
+              50.0,
+              37.7
             ],
-            "paletteDelta": 4.81
+            "paletteDelta": 2.63
           },
-          "flickerScore": 26.0,
-          "maxAlphaRatio": 1.123,
-          "maxBodyCenterJump": 2.96,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.089,
+          "maxBodyCenterJump": 2.21,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.95,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.59,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            94.6,
-            64.35,
-            43.05
+            61.35,
+            49.05,
+            37.65
           ],
-          "medianColorCount": 362.5,
-          "medianShadingRatio": 0.6444,
+          "medianColorCount": 312.0,
+          "medianShadingRatio": 0.6949,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9c7cc8ca179847ea3deac143ed83618453fa98307348dd69d0d2bcdc466db8eb",
+        "sha256": "08a8633f66edf3acc06dcc78a7bcf633aa18e1a30a662b9a307f05141c7194b6",
         "status": "accepted"
       }
     },
     "miner/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:57Z",
-        "file": "miner/carry-right.png",
-        "note": "Painted row: settler locked carry/right body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/carry-right-83bd852bc4d0.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              97.55,
-              68.0,
-              44.1
+              63.8,
+              50.0,
+              37.7
             ],
-            "paletteDelta": 4.3
+            "paletteDelta": 2.72
           },
-          "flickerScore": 26.0,
-          "maxAlphaRatio": 1.122,
-          "maxBodyCenterJump": 2.8,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.087,
+          "maxBodyCenterJump": 2.11,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.79,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.44,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            95.05,
-            64.6,
-            43.25
+            61.25,
+            49.05,
+            37.7
           ],
-          "medianColorCount": 361.0,
-          "medianShadingRatio": 0.6409,
+          "medianColorCount": 312.5,
+          "medianShadingRatio": 0.6907,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d77c0e6cc56920f8e9d4e571eaf9fef705c0d4ff0b3beadc324f054003aca15e",
+        "sha256": "83bd852bc4d0c98cf75aac52f744ed94162fb704c91a2e9c3ab358e8eb4b3262",
         "status": "accepted"
       }
     },
     "miner/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:51Z",
-        "file": "miner/carry-up.png",
-        "note": "Painted row: settler locked carry/up body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/carry-up-c46aa6bedc0d.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
             "medianColor": [
-              95.05,
-              64.6,
-              43.25
+              61.35,
+              49.05,
+              37.7
             ],
-            "paletteDelta": 4.3
+            "paletteDelta": 2.63
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.033,
-          "maxBodyCenterJump": 1.19,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.036,
+          "maxBodyCenterJump": 1.82,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.77,
+          "maxPaletteDrift": 0.91,
           "medianBodyHeight": 76.0,
-          "medianBodyWidth": 33.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            97.55,
-            68.0,
-            44.1
+            63.8,
+            50.0,
+            37.75
           ],
-          "medianColorCount": 397.0,
-          "medianShadingRatio": 0.6377,
+          "medianColorCount": 272.0,
+          "medianShadingRatio": 0.7113,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "64f554d9533bd6091dc0a02caa0a42b90422bafed4da480aab7e5116aafd1b90",
+        "sha256": "c46aa6bedc0da2667cf025474ea3a03976a2842100535f59aaff47015c9e778a",
         "status": "accepted"
       }
     },
     "miner/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:27Z",
-        "file": "miner/idle-down.png",
-        "note": "Painted row: settler locked idle/down body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/idle-down-76534ec3e578.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 6.5,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 24.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              95.2,
-              67.45,
-              46.05
+              57.85,
+              47.8,
+              37.6
             ],
-            "paletteDelta": 6.59
+            "paletteDelta": 1.73
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.071,
-          "maxBodyCenterJump": 1.29,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.054,
+          "maxBodyCenterJump": 2.13,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.32,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 0.91,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            100.75,
-            70.2,
-            48.3
+            59.45,
+            48.45,
+            37.75
           ],
-          "medianColorCount": 459.0,
-          "medianShadingRatio": 0.6409,
+          "medianColorCount": 302.0,
+          "medianShadingRatio": 0.6919,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ef8cc4e9271cd865c62c030b43b98dfe5f8be7db23da6c0f9fbdd53b0f4f0d5b",
+        "sha256": "76534ec3e5781a2c57588e4e16ffd9cfe0d371cb39ace1bffabf1fb235f2359b",
         "status": "accepted"
       }
     },
     "miner/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:35Z",
-        "file": "miner/idle-left.png",
-        "note": "Painted row: settler locked idle/left body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/idle-left-d22adb0a6e8b.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 8.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              95.9,
-              67.95,
-              46.25
+              57.85,
+              47.8,
+              37.75
             ],
-            "paletteDelta": 0.88
+            "paletteDelta": 0.31
           },
-          "flickerScore": 2.4,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.78,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.69,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.1,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 22.0,
+          "maxPaletteDrift": 1.05,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            95.2,
-            67.45,
-            46.05
+            58.1,
+            47.9,
+            37.6
           ],
-          "medianColorCount": 349.5,
-          "medianShadingRatio": 0.6771,
+          "medianColorCount": 308.0,
+          "medianShadingRatio": 0.6742,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "95bb30cff9b0010549f701a08ffaecdedbbccc755e7996147b2060585f97398b",
+        "sha256": "d22adb0a6e8b65c8cc2ece1ba3bc03a3aa76f40e23d1b4c3b80ffe9e2dc75756",
         "status": "accepted"
       }
     },
     "miner/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:38Z",
-        "file": "miner/idle-right.png",
-        "note": "Painted row: settler locked idle/right body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/idle-right-f28bdd2c086f.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 6.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              95.2,
-              67.45,
-              46.05
+              58.1,
+              47.9,
+              37.75
             ],
-            "paletteDelta": 0.88
+            "paletteDelta": 0.31
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.046,
-          "maxBodyCenterJump": 0.79,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.68,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.2,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 24.0,
+          "maxPaletteDrift": 1.14,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            95.9,
-            67.95,
-            46.25
+            57.85,
+            47.8,
+            37.6
           ],
-          "medianColorCount": 347.5,
-          "medianShadingRatio": 0.6738,
+          "medianColorCount": 306.0,
+          "medianShadingRatio": 0.6774,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "4671ecb0094797e48b7812087c0e89ed045649db3b660498353cc8b752f0326a",
+        "sha256": "f28bdd2c086fc29d6d6142d8c15780396144c0f4aef5af7e59920b81242d95cd",
         "status": "accepted"
       }
     },
     "miner/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:31Z",
-        "file": "miner/idle-up.png",
-        "note": "Painted row: settler locked idle/up body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/idle-up-c2464fcf18a7.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 6.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 24.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 2.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              95.9,
-              67.95,
-              46.25
+              58.1,
+              47.9,
+              37.6
             ],
-            "paletteDelta": 3.62
+            "paletteDelta": 0.87
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.032,
-          "maxBodyCenterJump": 0.81,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.055,
+          "maxBodyCenterJump": 2.23,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.4,
+          "maxPaletteDrift": 0.75,
           "medianBodyHeight": 76.0,
-          "medianBodyWidth": 30.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            93.95,
-            65.95,
-            43.95
+            57.35,
+            47.7,
+            38.0
           ],
-          "medianColorCount": 429.5,
-          "medianShadingRatio": 0.6815,
+          "medianColorCount": 250.5,
+          "medianShadingRatio": 0.6992,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d5a0a71c8d22d0b5fb036968470c64ebd0f9076cbedfcacdd1468eca6afefebf",
+        "sha256": "c2464fcf18a77d437c93372cdf6af16478bf073f7d68161953fcb47e3498bbcb",
         "status": "accepted"
       }
     },
     "miner/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:42Z",
-        "file": "miner/walk-down.png",
-        "note": "Painted row: settler locked walk/down body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/walk-down-deb055d614e7.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              91.0,
-              62.2,
-              43.75
+              57.5,
+              47.6,
+              37.6
             ],
-            "paletteDelta": 11.3
+            "paletteDelta": 1.94
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.055,
-          "maxBodyCenterJump": 1.28,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 2.16,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.06,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 0.54,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            99.45,
-            68.7,
-            47.5
+            59.25,
+            48.4,
+            37.85
           ],
-          "medianColorCount": 462.0,
-          "medianShadingRatio": 0.6422,
+          "medianColorCount": 308.0,
+          "medianShadingRatio": 0.6857,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a631a100f5bb4eb4ffa5d7b6b0c58a07b04e4ae5928c8a1e5e8cf035f955fd21",
+        "sha256": "deb055d614e7e36dadd246b404d9809b386c67a5cedd5af6f4db98ff530fee9e",
         "status": "accepted"
       }
     },
     "miner/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:45Z",
-        "file": "miner/walk-left.png",
-        "note": "Painted row: settler locked walk/left body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/walk-left-6cc71baacf14.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              95.0,
-              66.7,
-              44.8
+              57.5,
+              47.6,
+              37.85
             ],
-            "paletteDelta": 6.76
+            "paletteDelta": 0.32
           },
-          "flickerScore": 30.8,
-          "maxAlphaRatio": 1.128,
-          "maxBodyCenterJump": 3.52,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.091,
+          "maxBodyCenterJump": 2.43,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.44,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 4.72,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            90.5,
-            61.8,
-            43.6
+            57.7,
+            47.6,
+            37.6
           ],
-          "medianColorCount": 375.0,
-          "medianShadingRatio": 0.6929,
+          "medianColorCount": 295.5,
+          "medianShadingRatio": 0.6869,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "80d953dabe50fb2ddea2a83934e391674b5d08257870d86f6e748c458a0bcc11",
+        "sha256": "6cc71baacf141bb1ab9b62f02ad2f83922c6d631593e4a0d037e75df46a0705f",
         "status": "accepted"
       }
     },
     "miner/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:47Z",
-        "file": "miner/walk-right.png",
-        "note": "Painted row: settler locked walk/right body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/walk-right-54e2975da017.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 8,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              95.0,
-              66.7,
-              44.8
+              57.7,
+              47.6,
+              37.85
             ],
-            "paletteDelta": 6.11
+            "paletteDelta": 0.32
           },
-          "flickerScore": 29.6,
-          "maxAlphaRatio": 1.127,
-          "maxBodyCenterJump": 3.29,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.09,
+          "maxBodyCenterJump": 2.45,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.2,
-          "medianBodyHeight": 75.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 4.71,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            91.0,
-            62.2,
-            43.75
+            57.5,
+            47.6,
+            37.6
           ],
-          "medianColorCount": 373.5,
-          "medianShadingRatio": 0.6907,
+          "medianColorCount": 298.5,
+          "medianShadingRatio": 0.6882,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "91b6c834a712134c09c3ee1f54931b8fb173c635ad568a8dbe316515f729d0f7",
+        "sha256": "54e2975da0170d88d59917fc5893111f9c75c437536cdf1eade91a23a6804990",
         "status": "accepted"
       }
     },
     "miner/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:56:44Z",
-        "file": "miner/walk-up.png",
-        "note": "Painted row: settler locked walk/up body with miner palette + miner's own painted hood transplanted.",
-        "provenance": "settler-body-own-headgear-transplant",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/walk-up-de4ccc00dc0c.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 75.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 3.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              91.0,
-              62.2,
-              43.75
+              57.7,
+              47.6,
+              37.6
             ],
-            "paletteDelta": 6.11
+            "paletteDelta": 0.89
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.051,
-          "maxBodyCenterJump": 1.18,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.041,
+          "maxBodyCenterJump": 2.02,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.85,
+          "maxPaletteDrift": 0.93,
           "medianBodyHeight": 76.0,
-          "medianBodyWidth": 30.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            95.0,
-            66.7,
-            44.8
+            56.9,
+            47.45,
+            37.95
           ],
-          "medianColorCount": 419.0,
-          "medianShadingRatio": 0.674,
+          "medianColorCount": 253.5,
+          "medianShadingRatio": 0.697,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1ebd4b0e5467de887bf10aabffd9946f4c526fd5015c1b410bc2466e4067cff3",
+        "sha256": "de4ccc00dc0cec82a44a21b8af7c22010e87dc5af7f2472f9769e3f4c336795e",
         "status": "accepted"
       }
     },
     "miner/work/down": {
       "production": {
-        "acceptedAt": "2026-07-09T18:22:39Z",
-        "file": "miner/work-down.png",
-        "note": "Derived from the miner\u2019s canonical down-facing walk palette and posed with a feet-anchored work rhythm; replaces the fragmented, palette-divergent pick-swing frames.",
-        "provenance": "mechanical-walk-derived-work-rhythm",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/work-down-fdb914b5d646.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 0.5,
-            "bodyWidthDelta": 13.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 44.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 14.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              108.65,
-              77.45,
-              54.95
+              66.2,
+              56.0,
+              44.45
             ],
-            "paletteDelta": 15.34
+            "paletteDelta": 8.5
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.099,
-          "maxBodyCenterJump": 0.98,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 1.18,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.77,
-          "medianBodyHeight": 71.5,
-          "medianBodyWidth": 31.0,
+          "maxPaletteDrift": 4.31,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            98.55,
-            68.55,
-            47.6
+            72.4,
+            60.6,
+            48.0
           ],
-          "medianColorCount": 441.0,
-          "medianShadingRatio": 0.6456,
+          "medianColorCount": 439.0,
+          "medianShadingRatio": 0.6749,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "548ac798260a9e695133a356b6d289bd105b72b9876af04a10a2b21a74f9fafd",
+        "sha256": "fdb914b5d64697368a30a2da44b6047c2759fe77fcfb887f0b32c7efc09441fd",
         "status": "accepted"
       }
     },
     "miner/work/left": {
       "production": {
-        "acceptedAt": "2026-07-09T18:22:49Z",
-        "file": "miner/work-left.png",
-        "note": "Recomposed from a clean existing side work pose into an anchored eight-beat pick rhythm; removes the side-row width drift waiver.",
-        "provenance": "mechanical-stable-work-rhythm",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/work-left-804451640683.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 2.5,
-            "bodyWidthDelta": 8.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 14.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              98.55,
-              75.85,
-              54.95
+              66.2,
+              56.0,
+              44.65
             ],
-            "paletteDelta": 10.71
+            "paletteDelta": 0.47
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.088,
-          "maxBodyCenterJump": 1.06,
-          "maxEdgePixels": 24,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.6,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.17,
-          "medianBodyHeight": 69.5,
+          "maxPaletteDrift": 3.72,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 43.0,
           "medianColor": [
-            109.05,
-            77.8,
-            55.75
+            66.6,
+            56.15,
+            44.45
           ],
-          "medianColorCount": 476.5,
-          "medianShadingRatio": 0.702,
+          "medianColorCount": 430.0,
+          "medianShadingRatio": 0.6629,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2c793b19de355394e550eb2a508ba81446f9ac4bd3fcc20cfcd38b7193e001d0",
+        "sha256": "804451640683d682da2b70804cc5edb21e89f7a5dd23d7c3ddc82dfbfd090601",
         "status": "accepted"
       }
     },
     "miner/work/right": {
       "production": {
-        "acceptedAt": "2026-07-18T21:39:27Z",
-        "file": "miner/work-right.png",
-        "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
-        "provenance": "deterministic-frame-reversal",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/work-right-aa3a7789b2e7.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 2.0,
-            "bodyWidthDelta": 8.5,
-            "medianBodyHeight": 71.5,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 14.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              98.55,
-              75.85,
-              55.75
+              66.6,
+              56.15,
+              44.45
             ],
-            "paletteDelta": 10.68
+            "paletteDelta": 0.47
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.088,
-          "maxBodyCenterJump": 1.06,
-          "maxEdgePixels": 24,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 0.59,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.17,
-          "medianBodyHeight": 69.5,
+          "maxPaletteDrift": 3.59,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 43.0,
           "medianColor": [
-            109.05,
-            77.8,
-            55.75
+            66.2,
+            56.0,
+            44.65
           ],
-          "medianColorCount": 476.5,
-          "medianShadingRatio": 0.702,
+          "medianColorCount": 418.0,
+          "medianShadingRatio": 0.6726,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "df8a7518d2742eae1c0e28a24ced1d9aa7c93aeb50cfc35068e3b1bb46e2bd2d",
+        "sha256": "aa3a7789b2e74b5b709343479baa9f88d9e978691d42758dabf94da9df3f7d3a",
         "status": "accepted"
       }
     },
     "miner/work/up": {
       "production": {
-        "acceptedAt": "2026-06-19T04:34:27Z",
-        "file": "miner/work-up.png",
-        "note": "Back-facing miner work row; imagegen pose content with peer-scale body normalization.",
-        "provenance": "imagegen-direction-locked-peer-scale",
+        "acceptedAt": "2026-07-30T09:32:07Z",
+        "file": "production/miner/work-up-23253f5ea00a.png",
+        "note": "Promote complete A11 modular miner family",
+        "provenance": "a11-modular-miner-actions",
         "quality": {
-          "bodyBottomRange": 1,
+          "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 13,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 0.5,
-            "bodyWidthDelta": 8.0,
-            "medianBodyHeight": 71.5,
-            "medianBodyWidth": 42.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 14.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              95.6,
-              75.4,
-              57.3
+              66.6,
+              56.15,
+              44.65
             ],
-            "paletteDelta": 6.4
+            "paletteDelta": 10.46
           },
-          "flickerScore": 27.8,
-          "maxAlphaRatio": 1.356,
-          "maxBodyCenterJump": 5.5,
-          "maxEdgePixels": 24,
-          "maxFragmentPixels": 11,
-          "maxPaletteDrift": 4.19,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 1.69,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.82,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            98.15,
-            75.85,
-            63.15
+            60.95,
+            50.0,
+            38.35
           ],
+          "medianColorCount": 316.5,
+          "medianShadingRatio": 0.6808,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1c3b22a0b817e81ff44dc2babe16c8ee3d519d043e2aef54221e94a89a5c5aa0",
+        "sha256": "23253f5ea00a11327f6d5d8b18cb93cb0310459d75d27136f0689714652b5f4b",
         "status": "accepted"
       }
     },
@@ -9806,6 +9809,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T08:12:32Z",
+  "updatedAt": "2026-07-30T09:32:07Z",
   "version": 2
 }
