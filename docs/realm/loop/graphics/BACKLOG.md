@@ -4,19 +4,19 @@ Prioritize work that changes what the player sees in the live game.
 
 ## Ready
 
-1. Finish the opening actor family, then migrate farmer and rancher.
-   - Problem: round 111 replaced and locked the eight visible settler idle/walk
-     rows, but `settler/work` and `settler/carry` can still pop back to legacy
-     art. Farmer and rancher remain especially visible old-role families in
-     established towns.
-   - Push: finish settler work/carry at the same `71-72px` body scale, then
-     migrate farmer and rancher one complete action family at a time through
-     the canonical `actor-rows/` work-order/stage/accept/compile loop. Treat
-     WAIVED rows as protected repaint debt and never hand-edit generated
-     compiled sheets.
-   - Verify: require within-row metrics, peer-direction checks, cross-action
-     body scale/palette checks, Sprite Lab inspection, exhaustive atlas
-     verification, and a real saved/fresh-game close crop.
+1. Finish the modular guard pilot, then migrate the remaining cast.
+   - Problem: A4 proves a coherent four-direction carry family, but the guard's
+     idle, walk, and work rows still come from older independent art. Turning
+     between actions can therefore change proportions and painting language.
+   - Push: add a handed short-sword source and sentinel checks, compile all
+     `16` guard action/direction rows from the same watchman identity,
+     watch-blue garment, pose, palette, lighting, and anchor contracts, then
+     review and promote the complete family as one unit. Migrate other roles
+     one family at a time only after this pilot is green.
+   - Verify: require single-row source review, independent clean rebuilds,
+     identity/garment/equipment invariants, Sprite Lab and Actor Muster review,
+     exact-tier settlement captures, all `224` atlas rows, and all `1,792`
+     runtime frames.
 
 2. Service walker art integration.
    - Problem: `G.walkers` still draws small procedural walkers in
@@ -66,6 +66,15 @@ Prioritize work that changes what the player sees in the live game.
    - Verify: full build-bar screenshot after unlocking all build types.
 
 ## Done
+
+- Modular four-direction guard carry family (round 114): mapped the unused
+  front/back/side components in the watchman, watch-blue, and cargo sheets;
+  corrected the side-crate source; compiled four cargo-free and four socketed
+  cargo rows from joint-driven modular parts; prohibited finished-row
+  mirroring; emitted four exact runtime tiers with a shared 48-color
+  binary-alpha palette; staged all four cargo directions as warning-free
+  candidates; and verified each direction in Actor Muster and on a real guard
+  carrier while proving ordinary URLs stay on production art.
 
 - Frontier settler opening family and live runtime capture (round 111):
   replaced all four settler idle rows and all four settler walk rows with one

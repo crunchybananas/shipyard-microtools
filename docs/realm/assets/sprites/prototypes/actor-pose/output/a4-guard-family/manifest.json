@@ -1,0 +1,2846 @@
+{
+  "candidate": "a4-guard-family",
+  "compiler": {
+    "path": "scripts/actor-pose-prototype/a4_guard_family.py",
+    "pillow": "12.3.0",
+    "python": "3.14",
+    "runtime_proof_downsample": {
+      "filter": "Box",
+      "transparent_rgb": "#000000",
+      "unsharp": {
+        "percent": 80,
+        "radius": 0.7,
+        "threshold": 5
+      }
+    }
+  },
+  "outputs": {
+    "id-masks/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 2154,
+      "sha256": "4cb4e56630b4df3a5570a22295f914881a2628b84b10ab8c3a8d415454e68b9a"
+    },
+    "id-masks/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 2077,
+      "sha256": "5c088b2405fff0b08d2927c726604e3469d53d8341f95e064de69bbaf1f7e02b"
+    },
+    "id-masks/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 2107,
+      "sha256": "1bb59f5a90c2f0e9f4da186205a0efc3592fc0e7a73202730083edc9895e3ea6"
+    },
+    "id-masks/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 1950,
+      "sha256": "8f451d4286d2089ca1704f9651fd9faac6292ab0f60fa0a09d969cf27d728fb2"
+    },
+    "id-masks/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 2092,
+      "sha256": "1e81a055c6e394e5521a0faebe5f34aa691fe83b0fcc2dc75a7a95f9a4267a4d"
+    },
+    "id-masks/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 2162,
+      "sha256": "01c0016b29e8c6819db3d98e0de95fc59b151905651cbdcd9d56f050ddb004ee"
+    },
+    "id-masks/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 2133,
+      "sha256": "f4daca848aa6da34ea43d72392ad343358201942be43718a211573a165983f27"
+    },
+    "id-masks/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 1889,
+      "sha256": "02ecdc4209b318203cb9ae7f75063aa6a48ce0c81574bd05880539c76c10d432"
+    },
+    "landmarks/watchman/watch-blue/cargo-crate/carry-down.json": {
+      "bytes": 15707,
+      "sha256": "838a64610fffd56363fe78bdb03202ef892b17258a8ed1a5931ca499a520b7fe"
+    },
+    "landmarks/watchman/watch-blue/cargo-crate/carry-left.json": {
+      "bytes": 15315,
+      "sha256": "2b06433e6f75a55d184bbfe88fac97c5a8f12d1c8f04336387c4bc415c1fb8b1"
+    },
+    "landmarks/watchman/watch-blue/cargo-crate/carry-right.json": {
+      "bytes": 15324,
+      "sha256": "cfe8d71d9b732be106d1962cc68cceb86a8d68e27b7d60593d1e4e3d6088fb37"
+    },
+    "landmarks/watchman/watch-blue/cargo-crate/carry-up.json": {
+      "bytes": 15689,
+      "sha256": "6e5a2fc32a5eda2718ce3e5ccd6c6af6d320049061c7b18c70807621c0381228"
+    },
+    "landmarks/watchman/watch-blue/off/carry-down.json": {
+      "bytes": 15699,
+      "sha256": "aa58a1045f80fcb4100a768f2551fec2ca1aa10a7b99562fbb8343f713542f8e"
+    },
+    "landmarks/watchman/watch-blue/off/carry-left.json": {
+      "bytes": 15307,
+      "sha256": "f089eda73839111c0bafec02901ab5e7420b08027f1616086727c0c137e4cd71"
+    },
+    "landmarks/watchman/watch-blue/off/carry-right.json": {
+      "bytes": 15316,
+      "sha256": "6fe90dd1355de0bc6d206d8de994110a1ed37afb9b9c1f850fa1008701843f4d"
+    },
+    "landmarks/watchman/watch-blue/off/carry-up.json": {
+      "bytes": 15681,
+      "sha256": "ef3475649243d352260d2060bb7d5f4f084f310a1161ad5564ba653ad3145bf2"
+    },
+    "planes/attachment/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 1281,
+      "sha256": "c014181adf3b8a0885de2da8deecac9f213e1bb42ffe900cad5a623ae89996ae"
+    },
+    "planes/attachment/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 1141,
+      "sha256": "df1d49ccb790eddcc171a748b25f91bd98138b4f0c2d29dbcdc10836129c804c"
+    },
+    "planes/attachment/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 1155,
+      "sha256": "92086882f3d1e85854ac906ab1007668a6142fb04eb8bccfa1f2befde22f6835"
+    },
+    "planes/attachment/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 1238,
+      "sha256": "451eeb572dc780bafaba60f40b9a7380ca6f7b1957fa0766ff8063eadb71038d"
+    },
+    "planes/attachment/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/attachment/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/attachment/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/attachment/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/garment/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 14788,
+      "sha256": "a24e82b07b53778b415e51d39d58b24007494b08d9a952103725d77bb4ba808e"
+    },
+    "planes/garment/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 15906,
+      "sha256": "8bc656137dcfb893d085bc43ff9204dbeea0c6cfec33956a22d8c5a818396420"
+    },
+    "planes/garment/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 16123,
+      "sha256": "caa82850e95aa7745e8d03a9e7286cd03a905198d1e6e4a51fda4e31c2ce1d50"
+    },
+    "planes/garment/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 14085,
+      "sha256": "671c4eb245882ef1ed65f9bfa7201d7c58535711e6bf042208e708fd75a80066"
+    },
+    "planes/garment/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 14788,
+      "sha256": "a24e82b07b53778b415e51d39d58b24007494b08d9a952103725d77bb4ba808e"
+    },
+    "planes/garment/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 15906,
+      "sha256": "8bc656137dcfb893d085bc43ff9204dbeea0c6cfec33956a22d8c5a818396420"
+    },
+    "planes/garment/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 16123,
+      "sha256": "caa82850e95aa7745e8d03a9e7286cd03a905198d1e6e4a51fda4e31c2ce1d50"
+    },
+    "planes/garment/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 14085,
+      "sha256": "671c4eb245882ef1ed65f9bfa7201d7c58535711e6bf042208e708fd75a80066"
+    },
+    "planes/identity/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 12511,
+      "sha256": "1a904be5a9f2dcb388c6a001dd9aa6594a4bf3dcea2f8f25bd744314b8f3364b"
+    },
+    "planes/identity/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 14643,
+      "sha256": "9068cd43d1f926cc3c331dd1ccdd29eac0fd031f7fa09bd3d318106ba82d0ede"
+    },
+    "planes/identity/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 15096,
+      "sha256": "65225f91f65e2082dc5e2f56f6f32ba05c0b57008bac6b4dca4dea7d87df48f7"
+    },
+    "planes/identity/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 12150,
+      "sha256": "735e8f260cba9cf08eb6b5bb9b7ce85a8968f31b33f2a8294e9f24d267556aca"
+    },
+    "planes/identity/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 12511,
+      "sha256": "1a904be5a9f2dcb388c6a001dd9aa6594a4bf3dcea2f8f25bd744314b8f3364b"
+    },
+    "planes/identity/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 14643,
+      "sha256": "9068cd43d1f926cc3c331dd1ccdd29eac0fd031f7fa09bd3d318106ba82d0ede"
+    },
+    "planes/identity/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 15096,
+      "sha256": "65225f91f65e2082dc5e2f56f6f32ba05c0b57008bac6b4dca4dea7d87df48f7"
+    },
+    "planes/identity/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 12150,
+      "sha256": "735e8f260cba9cf08eb6b5bb9b7ce85a8968f31b33f2a8294e9f24d267556aca"
+    },
+    "proof/guard-carry-four-directions-x3.png": {
+      "bytes": 178269,
+      "sha256": "31f057a5e8da3e0fbd6b1840a7e2d70f55bf0215c5adb970110b3169f8c6b450"
+    },
+    "proof/quality/cargo-crate-down-x4.png": {
+      "bytes": 25316,
+      "sha256": "1a0e1c60f3dbcf367cbcbc1c91fb358fd2f000c157d06b11399afc4f21956790"
+    },
+    "proof/quality/cargo-crate-left-x4.png": {
+      "bytes": 27123,
+      "sha256": "a38d56e5a6217a08a5fb951dd4952ebbb6a058165970b37ddc14f95a5c8e8bc7"
+    },
+    "proof/quality/cargo-crate-right-x4.png": {
+      "bytes": 26926,
+      "sha256": "0e2b69a5941f32f7be25c3f038d7e5712e59502e86bb2258cb677d7c378a660d"
+    },
+    "proof/quality/cargo-crate-up-x4.png": {
+      "bytes": 24332,
+      "sha256": "52f1466ee9a80aed59a42b91d479568543e4fa78bca425b0bcd3d1cdbd65262a"
+    },
+    "proof/quality/off-down-x4.png": {
+      "bytes": 25673,
+      "sha256": "0cde5dd59e26c788943552a2ca57f8c16acc2540690f10cd1a68657e606e7fe1"
+    },
+    "proof/quality/off-left-x4.png": {
+      "bytes": 27440,
+      "sha256": "a0cc1cb44ef66d5dcda4d863801adc05e6c9620e0ab9f58e25c2706f67523655"
+    },
+    "proof/quality/off-right-x4.png": {
+      "bytes": 27225,
+      "sha256": "6594716f5f94de6ce421ff34217bd54d1195ad2adf1696111ffecfe540a199c7"
+    },
+    "proof/quality/off-up-x4.png": {
+      "bytes": 25015,
+      "sha256": "f11fc7716406193079582bf818be105b40f5d89c01d558569f624382d08da333"
+    },
+    "reports/guard-family-gate.json": {
+      "bytes": 46506,
+      "sha256": "2d3b7fb7cbc45fe496d94cb8479a08840dea8830fdbe21e08de540850f9ff68c"
+    },
+    "reports/quality/cargo-crate-down.json": {
+      "bytes": 6233,
+      "sha256": "7b6bfa9fbbad223d85d35961111c9fa386cf52bb63eded1060251c39257efd91"
+    },
+    "reports/quality/cargo-crate-left.json": {
+      "bytes": 6230,
+      "sha256": "4205f7a6e93317d391b02b1d06ea9b45b2a7c0bcc5b98ca6bfa45c2fa39e4fe6"
+    },
+    "reports/quality/cargo-crate-right.json": {
+      "bytes": 6234,
+      "sha256": "0fba55cf8db7f2fd0216ad3a800a0698709574ae6837fab684e08c9cc3eb877f"
+    },
+    "reports/quality/cargo-crate-up.json": {
+      "bytes": 6228,
+      "sha256": "a057a6bebbe1a688ea751d8f44db94a85b108bf1818c0aa37162aee2769423c0"
+    },
+    "reports/quality/off-down.json": {
+      "bytes": 6225,
+      "sha256": "ea751d9cb92d36d0ce3c40457be583c40702e31b70071305d0d8b56c287e563c"
+    },
+    "reports/quality/off-left.json": {
+      "bytes": 6227,
+      "sha256": "257477790db8c2205a7cb14bb2d9dbc3d6fac7ca910e91548e5cdcc292224cc5"
+    },
+    "reports/quality/off-right.json": {
+      "bytes": 6226,
+      "sha256": "bd6230fcc15f83f1e31e3ced73e192b9a6df5f43c125db28f03ac564b25f1bc5"
+    },
+    "reports/quality/off-up.json": {
+      "bytes": 6217,
+      "sha256": "28b6099b5b05df8bd43baec40098fa69480e1ae4c46938651707d6417e33017a"
+    },
+    "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 7528,
+      "sha256": "fdf66721f20fe8788cf6c6e31bc25d5d31cf7a623bc8ba56cd83bdafc729d888"
+    },
+    "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 6629,
+      "sha256": "1e19f877e2407015a8bc0382c492cc953d6677fc1dff97e4c1b00dc31d7777e8"
+    },
+    "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 6732,
+      "sha256": "999e15fec7bfa95a07083af5a156aa2abd7c1ea90d1f8fb687ae6c065880f864"
+    },
+    "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 6709,
+      "sha256": "5e87b8f48b3780e5b82882388f2196d0f58603e7d6a5427933b8d36425e5d2af"
+    },
+    "rows-runtime/default/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 7596,
+      "sha256": "876502b8477acd25b852ff02ecadd95c4e34a764f86beb114e20461457deba65"
+    },
+    "rows-runtime/default/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 6430,
+      "sha256": "f3add14e33579c2b34cce95b475f7bf936d0fb438bc47dcb8d4a46c7997ba766"
+    },
+    "rows-runtime/default/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 6507,
+      "sha256": "7336bb8bfae61132fa2f3537f5742c7af13408bf2cfeee87a73825941eca25d2"
+    },
+    "rows-runtime/default/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 6949,
+      "sha256": "3d5687685cc744d690239d583cb91099e36eb4bb750534f6da201bb96e4d501a"
+    },
+    "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 13669,
+      "sha256": "a2e19c02032ff5244fdfcf1229bc070fe38a60e21d23018be6a296d0a5de1d75"
+    },
+    "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 12196,
+      "sha256": "df444d77bdc4e2c2aff896bb5a12d7ac1a02b945853ab186f1721455041b372e"
+    },
+    "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 12280,
+      "sha256": "aaa388f3ef77cfdf5b3bec50b562a2154e24d07ccdac53eee84c7e8126dd2dc6"
+    },
+    "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 12178,
+      "sha256": "9a5faf8ba713c8ff1a70e7c1a63e6d20455991f8d85fbb9916e363a2351166a6"
+    },
+    "rows-runtime/double/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 13794,
+      "sha256": "8504aae90b1eb6f8f43d9ffcb91ee2c355967fceb98e063c50dc09667606823d"
+    },
+    "rows-runtime/double/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 11849,
+      "sha256": "a89c1aa929edcc86fcfc23be07d9a18e61116dfe774d8a6f4373a0e2cfb63a03"
+    },
+    "rows-runtime/double/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 11931,
+      "sha256": "27e8086fdae617c2eecad3bd4ae7e9d22b672396477f93b3ea5fc96458e6bada"
+    },
+    "rows-runtime/double/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 12354,
+      "sha256": "925a03b8c864201ff449eb08d322fcd67168c71a36193767d0b026e0b01bf687"
+    },
+    "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 5180,
+      "sha256": "13079bbf1232aae8d5aacfcaf56976fcca53145ba4dab21c9368963a41e3cdc5"
+    },
+    "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 4613,
+      "sha256": "55a7d09342e303acadeeb7f70d868e22ef6d4320929b9ad1a7ba9c6f5b4fd867"
+    },
+    "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 4594,
+      "sha256": "bb04f5d2d5e852c9bfa228201d1d38841f4af5b8daaeddce63db0686510dba3a"
+    },
+    "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 4727,
+      "sha256": "fe3d6cf87aaec5d92b4b11ec9d0bd348178816467cfbe7a166f3751cc181ec05"
+    },
+    "rows-runtime/native/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 5342,
+      "sha256": "cc78c144165ab99d7d0840accb59a2e380bc90af41d2bd310e736558f1256d6f"
+    },
+    "rows-runtime/native/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 4426,
+      "sha256": "da47990805708d5643daaf1b61be127d2ad945197b7cee56c6f2bcf4cbc39a2f"
+    },
+    "rows-runtime/native/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 4437,
+      "sha256": "97b76cbeb1835b568ad5123b70acce7f369f7c2fee418887d99b12d1fb869faf"
+    },
+    "rows-runtime/native/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 4789,
+      "sha256": "dbc56d81897357e03dd3bbb6aa1b26d73ce12092799e08c70d67c7ded876cf17"
+    },
+    "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 10765,
+      "sha256": "f73afcfc755bec10dd518e6cc8c7add72d472706de2ed7bdd40e6a806b1f7d0c"
+    },
+    "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 11718,
+      "sha256": "14324f2fe375d1b009b6045183eb85c048da8a635f05e6c150c346335d840a0f"
+    },
+    "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 11968,
+      "sha256": "c897cee6290ea1a1fef8f0bbd544e7ef9b5f3d98c3a069ba5b91835cf46c8ed7"
+    },
+    "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 9726,
+      "sha256": "51be6012aba35edf0dc02bfe21af7f0fd204c28fb2b5758d05af66fe5f0441fd"
+    },
+    "rows-runtime/review/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 11204,
+      "sha256": "7793e19d74d4c9a6a7216c59d64f4f737f8e925da13c3c2e5a6788e071b89a11"
+    },
+    "rows-runtime/review/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 11855,
+      "sha256": "be111cdc17ea6caaa515cea3fe94c255b6434c836faf8fae2991bb0adf8ea2c6"
+    },
+    "rows-runtime/review/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 12141,
+      "sha256": "d3e6a4604be321fc92ad082d334fbac8fc6a08ee339a4fda54b4e9608373b7cf"
+    },
+    "rows-runtime/review/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 10183,
+      "sha256": "80bdcd81dfed9386237d9832c7bb022b351aba7ff2bba3969268052dcf3895e1"
+    },
+    "rows/watchman/watch-blue/cargo-crate/carry-down.png": {
+      "bytes": 14186,
+      "sha256": "6f720d295ef702fa89fc727c45224bdc808708fb0ca726f642d828532f113465"
+    },
+    "rows/watchman/watch-blue/cargo-crate/carry-left.png": {
+      "bytes": 15717,
+      "sha256": "beee6b33b9b7e8a2e496d8c5e9b605e6c0f894b082d14f76e42a57a0dbbdb55a"
+    },
+    "rows/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 15822,
+      "sha256": "820efe6c4bb8eca35bb83ed8ec0bf398eed880291179a7fd678da5f80f7f0b54"
+    },
+    "rows/watchman/watch-blue/cargo-crate/carry-up.png": {
+      "bytes": 13590,
+      "sha256": "906210dd38cf102c6d501cee12bd3378385c0afb939889835228a9b584001e34"
+    },
+    "rows/watchman/watch-blue/off/carry-down.png": {
+      "bytes": 14733,
+      "sha256": "28fb4bab2a3d223a7df4a1f5905978f651d4513228f37fc5b3df20a551c46328"
+    },
+    "rows/watchman/watch-blue/off/carry-left.png": {
+      "bytes": 16268,
+      "sha256": "490b6268d4dade0bb5f19cbcacf3cb96499982939b53718a0e1a5c3833a7b957"
+    },
+    "rows/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 16265,
+      "sha256": "1216347a96a348f782fedd08854866d34d91c8daff0863eff995f25b44e021a6"
+    },
+    "rows/watchman/watch-blue/off/carry-up.png": {
+      "bytes": 14284,
+      "sha256": "8ce5db7ef32e1b7bad08a82ae79bab8275232fad3abdd85ddedcfc8fadf52bcb"
+    },
+    "style/actor-palette.json": {
+      "bytes": 986,
+      "sha256": "2330fc5d08841562f62ae9d35548c926d4a6c60c89e071ee92d5f2aa19a72764"
+    },
+    "style/actor-palette.png": {
+      "bytes": 457,
+      "sha256": "63d4f93850fd9d7cf835a7f4b07552f1e02883660cdfe20fad430b9d6077c915"
+    }
+  },
+  "proof": {
+    "directional_still": "proof/guard-carry-four-directions-x3.png",
+    "runtime_palette": "style/actor-palette.png"
+  },
+  "rows": {
+    "down/cargo-crate": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/cargo-crate/carry-down.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/cargo-crate/carry-down.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0377338071102613,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1695.04,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                27,
+                31
+              ],
+              [
+                34,
+                38
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "57b7d47c245550f640f43d253ec3e718e986c2659b64d87d1cd0a091ee2ed997"
+          },
+          {
+            "alpha_mass": 1668.75,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              46,
+              42,
+              60
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                27,
+                31
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "158614c9e786bcd1c3c0f157b6b502a673733431954220cefc0429db76c30d17"
+          },
+          {
+            "alpha_mass": 1694.37,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                25,
+                29
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "6b28d01008e6084ec7e1433453a0137792628fcb05a88d862547ee7f16ade122"
+          },
+          {
+            "alpha_mass": 1697.57,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              44,
+              42,
+              58
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                24,
+                28
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "f40589cd04144385770518783b2877611f9996476a58afb65a50a4d8bf6560b7"
+          },
+          {
+            "alpha_mass": 1725.99,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                23,
+                27
+              ],
+              [
+                37,
+                41
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "ee849c571d8311a783a93f09f18918fa861eebe399f58182f4a45d78f67e628c"
+          },
+          {
+            "alpha_mass": 1683.61,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              46,
+              42,
+              60
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                41
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "753ab2105c3c6b7e70fa3eb4c664d728108b49b0db4482e13be8b08fdff9b6f2"
+          },
+          {
+            "alpha_mass": 1678.71,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                36,
+                40
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "2ad3a9a9672a9025d36950a6209c41c4e9a1af2fa2156aca5ab9ef23effe5279"
+          },
+          {
+            "alpha_mass": 1663.23,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              44,
+              42,
+              58
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                35,
+                39
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "3371fbb65c26689c50c1abf613e77ac58a8ac29d14612ae75b3babf45a550965"
+          }
+        ],
+        "loop_delta_ratio": 0.9436364830885559,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.046,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "down",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          134025,
+          194823,
+          167431,
+          186873,
+          152423,
+          176787,
+          146158,
+          157994
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/cargo-crate/carry-down.png",
+      "landmarks": "landmarks/watchman/watch-blue/cargo-crate/carry-down.json",
+      "quality_proof": "proof/quality/cargo-crate-down-x4.png",
+      "quality_report": "reports/quality/cargo-crate-down.json",
+      "row": "rows/watchman/watch-blue/cargo-crate/carry-down.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-down.png",
+        "double": "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-down.png",
+        "native": "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-down.png",
+        "review": "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-down.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "down",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/cargo-crate/carry-down.png"
+    },
+    "down/off": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/off/carry-down.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/off/carry-down.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0358048257630956,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1692.33,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                27,
+                31
+              ],
+              [
+                34,
+                38
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "fc784d60a48cff8368049271ae867138e91592a3c9f5015660553cd1531c427e"
+          },
+          {
+            "alpha_mass": 1665.59,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                27,
+                31
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "c77d4525f5ac6b2a883eccf8b59405c5a902060c061e36942efe25800a89aa75"
+          },
+          {
+            "alpha_mass": 1689.92,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                25,
+                29
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "f4e56e70b04ef1a30ff222658f57ee2d1f0a1d184e5507a55c250b0da45f23d0"
+          },
+          {
+            "alpha_mass": 1691.13,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                24,
+                28
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "0449abaf65e1757396917d7ae900133613cbb507beaa2dff53d1312fc9b0be67"
+          },
+          {
+            "alpha_mass": 1720.13,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                23,
+                27
+              ],
+              [
+                37,
+                41
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "3fee053f436b6f5b1dbff849ab38355058a9e026669bb80642251d7855c0df85"
+          },
+          {
+            "alpha_mass": 1678.98,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                41
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "309e146f871870a26bac9db37e00f203f564c2b2c54cad858404c9994f5e85ab"
+          },
+          {
+            "alpha_mass": 1676.09,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                36,
+                40
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "8785f0aaed4a8f8c0150232be82a287be0938f737efd4c4c5b873fe5b564f7df"
+          },
+          {
+            "alpha_mass": 1660.67,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                35,
+                39
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "759760fc081d1c1b6adfa8a5367582fa5d3b939c43cb4217ce93c40baade834f"
+          }
+        ],
+        "loop_delta_ratio": 0.935813606536359,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.044,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "down",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          136159,
+          197436,
+          171594,
+          189088,
+          155813,
+          180749,
+          148225,
+          160580
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/off/carry-down.png",
+      "landmarks": "landmarks/watchman/watch-blue/off/carry-down.json",
+      "quality_proof": "proof/quality/off-down-x4.png",
+      "quality_report": "reports/quality/off-down.json",
+      "row": "rows/watchman/watch-blue/off/carry-down.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/off/carry-down.png",
+        "double": "rows-runtime/double/watchman/watch-blue/off/carry-down.png",
+        "native": "rows-runtime/native/watchman/watch-blue/off/carry-down.png",
+        "review": "rows-runtime/review/watchman/watch-blue/off/carry-down.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "down",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/off/carry-down.png"
+    },
+    "left/cargo-crate": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/cargo-crate/carry-left.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/cargo-crate/carry-left.png",
+      "gate": {
+        "alpha_mass_ratio": 1.089701944736219,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1794.75,
+            "bbox": [
+              13,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              45,
+              27,
+              61
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                20,
+                25
+              ],
+              [
+                38,
+                42
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "2275f23813140df2b6536b4772305d22e2d3f66553259e5de7792b3fdaa9f22a"
+          },
+          {
+            "alpha_mass": 1761.37,
+            "bbox": [
+              13,
+              5,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              46,
+              27,
+              62
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                23,
+                28
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "b788d95fd45c3bbb6acf12f20b45a80791abb6096435b9d5e1b55c6d2bb6db02"
+          },
+          {
+            "alpha_mass": 1647.01,
+            "bbox": [
+              13,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              45,
+              27,
+              61
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                28,
+                33
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "8528c9f90a600ab6dbc0bc33f8b2305efa3f6331a220506653a6f4d03001a4f0"
+          },
+          {
+            "alpha_mass": 1739.88,
+            "bbox": [
+              13,
+              3,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              44,
+              27,
+              60
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                34,
+                39
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "b767ffa5ed5a2a1669c7eb5903eabaca7e3d416e65af6c11af4139a0a00f23f0"
+          },
+          {
+            "alpha_mass": 1754.64,
+            "bbox": [
+              13,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              45,
+              27,
+              61
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                20,
+                25
+              ],
+              [
+                38,
+                42
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "2a1c4b7136c2c5a0b8d65a8e72cd33511b79b26324302ef0f615522074177db1"
+          },
+          {
+            "alpha_mass": 1685.49,
+            "bbox": [
+              13,
+              5,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              46,
+              27,
+              62
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                22,
+                27
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "e44406ff67f0a7be4988d6aec6d67a47ba88d6de21d8a6e1199c6a443ef59cf5"
+          },
+          {
+            "alpha_mass": 1744.57,
+            "bbox": [
+              13,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              45,
+              27,
+              61
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                28,
+                33
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "a0249e73e2c8ae42d1656c8fc161bf6ca42c1af9422a03a9e304ccdca6e0310a"
+          },
+          {
+            "alpha_mass": 1745.18,
+            "bbox": [
+              13,
+              3,
+              47,
+              80
+            ],
+            "cargo_bbox": [
+              13,
+              44,
+              27,
+              60
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                34,
+                39
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "a4eff42de3fe6e3ea9a5f643d9f7419f0484e9a2b21ae0e9cef75b1e244947f6"
+          }
+        ],
+        "loop_delta_ratio": 1.141239043119007,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.092,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "left",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          199690,
+          216981,
+          218823,
+          190705,
+          182489,
+          208887,
+          230759,
+          238390
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/cargo-crate/carry-left.png",
+      "landmarks": "landmarks/watchman/watch-blue/cargo-crate/carry-left.json",
+      "quality_proof": "proof/quality/cargo-crate-left-x4.png",
+      "quality_report": "reports/quality/cargo-crate-left.json",
+      "row": "rows/watchman/watch-blue/cargo-crate/carry-left.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-left.png",
+        "double": "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-left.png",
+        "native": "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-left.png",
+        "review": "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-left.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "left",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/cargo-crate/carry-left.png"
+    },
+    "left/off": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/off/carry-left.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/off/carry-left.png",
+      "gate": {
+        "alpha_mass_ratio": 1.093383927947168,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1720.21,
+            "bbox": [
+              14,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                20,
+                25
+              ],
+              [
+                38,
+                42
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "abde5f7204bf4003f819010f75fd356e36d5003152b4ee34adf1e7f9a0134a92"
+          },
+          {
+            "alpha_mass": 1689.8,
+            "bbox": [
+              14,
+              5,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                23,
+                28
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "74cb4b089c45271a85d9478bb8b57b8607e21ae1eefa01b088500758a8da6bd6"
+          },
+          {
+            "alpha_mass": 1573.29,
+            "bbox": [
+              14,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                28,
+                33
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "72a1a5f3550fcda94692aa7db3776e99051f50a5fe334d64e7c5f80b0fa197d7"
+          },
+          {
+            "alpha_mass": 1679.65,
+            "bbox": [
+              14,
+              3,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                34,
+                39
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "9c40836ac3739029975b0790aa17eb227be92f6f1fa18d6ed5e47d7d61c8e5bf"
+          },
+          {
+            "alpha_mass": 1658.63,
+            "bbox": [
+              14,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                20,
+                25
+              ],
+              [
+                38,
+                42
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "127af2a412e3fb0daa925bccd10559025e82587765fe7ef1034f51de83d49ff3"
+          },
+          {
+            "alpha_mass": 1597.71,
+            "bbox": [
+              14,
+              5,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                22,
+                27
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "7ede626d21c5e722f0c79a537222fd1ecdd57b21edc481c17121db3652fdb4dc"
+          },
+          {
+            "alpha_mass": 1693.78,
+            "bbox": [
+              14,
+              4,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                28,
+                33
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "ee0c77db80d5f8d53ff5aec78c63590066d141c39d8dd8b958d96306738f9e73"
+          },
+          {
+            "alpha_mass": 1711.05,
+            "bbox": [
+              13,
+              3,
+              47,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                34,
+                39
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "31f458462025e3a8a8d14a37390608e4a283fc20cd988fd3e998248cdc4bcc4a"
+          }
+        ],
+        "loop_delta_ratio": 1.1835703287745676,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.095,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "left",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          200900,
+          220820,
+          225953,
+          206298,
+          184554,
+          230848,
+          244121,
+          261356
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/off/carry-left.png",
+      "landmarks": "landmarks/watchman/watch-blue/off/carry-left.json",
+      "quality_proof": "proof/quality/off-left-x4.png",
+      "quality_report": "reports/quality/off-left.json",
+      "row": "rows/watchman/watch-blue/off/carry-left.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/off/carry-left.png",
+        "double": "rows-runtime/double/watchman/watch-blue/off/carry-left.png",
+        "native": "rows-runtime/native/watchman/watch-blue/off/carry-left.png",
+        "review": "rows-runtime/review/watchman/watch-blue/off/carry-left.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "left",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/off/carry-left.png"
+    },
+    "right/cargo-crate": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/cargo-crate/carry-right.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/cargo-crate/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0894746713292638,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1800.76,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              45,
+              51,
+              61
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "68d5c15c4f9226282949d7e0cc3ed071ea4820dd26e4948ebb64711559638090"
+          },
+          {
+            "alpha_mass": 1764.04,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              46,
+              51,
+              62
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "dd05ded56c05ca0bfe22c85e5ee7b6b121d726abdf9d794d085405e24508930e"
+          },
+          {
+            "alpha_mass": 1652.87,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              45,
+              51,
+              61
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "a2c19c6b2eb59dbb738b04a6cf2f074bb35e84ee451903b51e58fc1371ba08f8"
+          },
+          {
+            "alpha_mass": 1751.8,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              44,
+              51,
+              60
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "0bd691f3b52c83323060a4cb3f777764f5544d913503c690e91e61f2e518441f"
+          },
+          {
+            "alpha_mass": 1764.62,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              45,
+              51,
+              61
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "10f140f9199dbb66e4b5ac1f838e305469e8bef880805a60f6f278e7c3e5f946"
+          },
+          {
+            "alpha_mass": 1689.85,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              46,
+              51,
+              62
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "30e6284633d16667318e60b0aaf0e25622221401739c2b55fb51c6acc17900d0"
+          },
+          {
+            "alpha_mass": 1749.84,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              45,
+              51,
+              61
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "c088d4b75fcdf761e345a7b20c14182b6e785e4788907b6e7aa793d80d330c33"
+          },
+          {
+            "alpha_mass": 1757.62,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "cargo_bbox": [
+              37,
+              44,
+              51,
+              60
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "994a5541422b7736fa228f03e821cea28b23d95ae55cebb393c1fd5b8f633780"
+          }
+        ],
+        "loop_delta_ratio": 1.1413607370659107,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.094,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "right",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          201556,
+          216138,
+          222931,
+          198256,
+          183941,
+          211650,
+          234245,
+          241569
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/cargo-crate/carry-right.png",
+      "landmarks": "landmarks/watchman/watch-blue/cargo-crate/carry-right.json",
+      "quality_proof": "proof/quality/cargo-crate-right-x4.png",
+      "quality_report": "reports/quality/cargo-crate-right.json",
+      "row": "rows/watchman/watch-blue/cargo-crate/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-right.png",
+        "double": "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-right.png",
+        "native": "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-right.png",
+        "review": "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "right",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/cargo-crate/carry-right.png"
+    },
+    "right/off": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/off/carry-right.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/off/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0928759694332253,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1729.05,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "7f86d4bf9caa14b3b1fbe67390d5e5808f3e9e8d50d321d9ca4042e5f3763b0c"
+          },
+          {
+            "alpha_mass": 1695.3,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "3c54813e59749954f464a119e6dad7f7d2f1f16a6108b9e2416b3bfec20a8bdd"
+          },
+          {
+            "alpha_mass": 1582.11,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "308ab65aa9365cb41572a4b987e643a7be3046a1ee6cc12191d7d89fb406415f"
+          },
+          {
+            "alpha_mass": 1694.73,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "aad99504d4a75c84a5320a47d4e10b2db24c921bfaf23b037d9b3355259584f5"
+          },
+          {
+            "alpha_mass": 1671.35,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "4319bb9ff9eae2defe38ca4c8b3813da60f1a40cd0bd8cf53b18290cca586f38"
+          },
+          {
+            "alpha_mass": 1604.94,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "d236f99880d481c43987cda5497f8c3c158612f81487c03ca6575ece614d40f0"
+          },
+          {
+            "alpha_mass": 1702.17,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "0fefb1c0fbbfd2ba7ed13b2b1d8eb820cecbf1fe208385a6a3a7ac223493ae64"
+          },
+          {
+            "alpha_mass": 1726.4,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "922612f3d281375977612fe39ce8324ebe1d8fd8019594a3015e9eb7d1c95a7a"
+          }
+        ],
+        "loop_delta_ratio": 1.2048060872279498,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.097,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "right",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          203956,
+          221053,
+          231511,
+          215062,
+          187315,
+          234999,
+          249058,
+          266326
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/off/carry-right.png",
+      "landmarks": "landmarks/watchman/watch-blue/off/carry-right.json",
+      "quality_proof": "proof/quality/off-right-x4.png",
+      "quality_report": "reports/quality/off-right.json",
+      "row": "rows/watchman/watch-blue/off/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/off/carry-right.png",
+        "double": "rows-runtime/double/watchman/watch-blue/off/carry-right.png",
+        "native": "rows-runtime/native/watchman/watch-blue/off/carry-right.png",
+        "review": "rows-runtime/review/watchman/watch-blue/off/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "right",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/off/carry-right.png"
+    },
+    "up/cargo-crate": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/cargo-crate/carry-up.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/cargo-crate/carry-up.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0384893866074554,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1690.14,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                26,
+                30
+              ],
+              [
+                33,
+                37
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "bdfba14cfffd73fc9107b53729a79cb4ad3c78ba56eec01e0c9dbfc45d4e1b83"
+          },
+          {
+            "alpha_mass": 1662.34,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              46,
+              42,
+              60
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                33,
+                37
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "b3a6e7eda3b0b470d4b99e2c0dc80e198d5ba24bfb38fa46ea31548805511411"
+          },
+          {
+            "alpha_mass": 1688.36,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                35,
+                39
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "8b5502a911711e43c9bbb3470b4dfdf52bc4f8752ebd71c3487d7189eacefbfc"
+          },
+          {
+            "alpha_mass": 1692.0,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              44,
+              42,
+              58
+            ],
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                36,
+                40
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "2ddd92d1689971dd12800a8ecb4a92b689e65de6bb786b2c493b937e40a06ab6"
+          },
+          {
+            "alpha_mass": 1721.13,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                23,
+                27
+              ],
+              [
+                37,
+                41
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "f0340ede81e4910584eed231be17246cf1660e68ad65cf96e9990a867eec20e8"
+          },
+          {
+            "alpha_mass": 1678.6,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              46,
+              42,
+              60
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                23,
+                27
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "ddedebdfaa4683fd446de33d554db0b787df158674d500532f8eef54ee54f929"
+          },
+          {
+            "alpha_mass": 1671.87,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              45,
+              42,
+              59
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                24,
+                28
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "07718dda077818bc826f5287f679ee937e21c00bf6f6fc66ada0b415a360da0b"
+          },
+          {
+            "alpha_mass": 1657.34,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": [
+              22,
+              44,
+              42,
+              58
+            ],
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                29
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "2e93eaa3a493ae9dd78ae205f9c3459ac49daa78461bf5537b290298a49e6a92"
+          }
+        ],
+        "loop_delta_ratio": 1.0877873881865898,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.043,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "up",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          133439,
+          169706,
+          163410,
+          162324,
+          149267,
+          195158,
+          144398,
+          176574
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/cargo-crate/carry-up.png",
+      "landmarks": "landmarks/watchman/watch-blue/cargo-crate/carry-up.json",
+      "quality_proof": "proof/quality/cargo-crate-up-x4.png",
+      "quality_report": "reports/quality/cargo-crate-up.json",
+      "row": "rows/watchman/watch-blue/cargo-crate/carry-up.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-up.png",
+        "double": "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-up.png",
+        "native": "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-up.png",
+        "review": "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-up.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "up",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/cargo-crate/carry-up.png"
+    },
+    "up/off": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/off/carry-up.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/off/carry-up.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0367568809558363,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1686.6,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 0,
+            "ground_runs": [
+              [
+                26,
+                30
+              ],
+              [
+                33,
+                37
+              ]
+            ],
+            "height": 76,
+            "phase": "near-contact",
+            "sha256_rgba": "938b7fe331f46d63a6c03abefb1e1589a799cb233bc413948293dc042a16a493"
+          },
+          {
+            "alpha_mass": 1658.64,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 1,
+            "ground_runs": [
+              [
+                33,
+                37
+              ]
+            ],
+            "height": 75,
+            "phase": "near-down",
+            "sha256_rgba": "9669804c799441a2821aa4eb364565a63945fa2cd6fe9c631b443c0a63bf11dd"
+          },
+          {
+            "alpha_mass": 1683.82,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 2,
+            "ground_runs": [
+              [
+                35,
+                39
+              ]
+            ],
+            "height": 76,
+            "phase": "near-pass",
+            "sha256_rgba": "b0f7bdd8681cdf3111cbba52b5ba721bf738f19d3fdf2499ca5f6a9ee119b036"
+          },
+          {
+            "alpha_mass": 1685.24,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near"
+            ],
+            "frame": 3,
+            "ground_runs": [
+              [
+                36,
+                40
+              ]
+            ],
+            "height": 77,
+            "phase": "near-up",
+            "sha256_rgba": "ae84db06f0f35e9ce1e96e9fd3bcf255c229a90e3a29553103c75f420d396b2a"
+          },
+          {
+            "alpha_mass": 1714.63,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "frame": 4,
+            "ground_runs": [
+              [
+                23,
+                27
+              ],
+              [
+                37,
+                41
+              ]
+            ],
+            "height": 76,
+            "phase": "far-contact",
+            "sha256_rgba": "3f5b246921f48327f0c218e5634b8d5fa89659b7d47313d6c2b50f8673297347"
+          },
+          {
+            "alpha_mass": 1673.25,
+            "bbox": [
+              16,
+              5,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 5,
+            "ground_runs": [
+              [
+                23,
+                27
+              ]
+            ],
+            "height": 75,
+            "phase": "far-down",
+            "sha256_rgba": "5be45993fa8f5d873fe3ff98fa8722d998e96dc1f5a56eaf470eb544c5a5af7d"
+          },
+          {
+            "alpha_mass": 1668.79,
+            "bbox": [
+              16,
+              4,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 6,
+            "ground_runs": [
+              [
+                24,
+                28
+              ]
+            ],
+            "height": 76,
+            "phase": "far-pass",
+            "sha256_rgba": "f211c52fce8df75353d82925eb30706d3cd1cd77ca59e22dd650d156e24ae785"
+          },
+          {
+            "alpha_mass": 1653.84,
+            "bbox": [
+              16,
+              3,
+              48,
+              80
+            ],
+            "cargo_bbox": null,
+            "contacts": [
+              "far"
+            ],
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                29
+              ]
+            ],
+            "height": 77,
+            "phase": "far-up",
+            "sha256_rgba": "9f7e08c6700261bfcbdc98ec06e52132b171de0d2756f0d80e21b97404c1a684"
+          }
+        ],
+        "loop_delta_ratio": 1.0850825197932934,
+        "mechanical_passed": true,
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.044,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "schema": "realm.actor-pose.a4-row-gate.v1",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "up",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "transition_deltas": [
+          137204,
+          173796,
+          168298,
+          165839,
+          153051,
+          200504,
+          148029,
+          179949
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/off/carry-up.png",
+      "landmarks": "landmarks/watchman/watch-blue/off/carry-up.json",
+      "quality_proof": "proof/quality/off-up-x4.png",
+      "quality_report": "reports/quality/off-up.json",
+      "row": "rows/watchman/watch-blue/off/carry-up.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/off/carry-up.png",
+        "double": "rows-runtime/double/watchman/watch-blue/off/carry-up.png",
+        "native": "rows-runtime/native/watchman/watch-blue/off/carry-up.png",
+        "review": "rows-runtime/review/watchman/watch-blue/off/carry-up.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "up",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/off/carry-up.png"
+    }
+  },
+  "schema": "realm.actor-pose.a4-guard-family-manifest.v1",
+  "scope": {
+    "action": "carry",
+    "attachments": [
+      "off",
+      "cargo-crate"
+    ],
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "flattened_frames": 64,
+    "flattened_rows": 8,
+    "frame_size": [
+      64,
+      84
+    ],
+    "frames": 64,
+    "garment": "watch-blue",
+    "identity": "watchman",
+    "root": [
+      32,
+      79
+    ],
+    "row_size": [
+      512,
+      84
+    ],
+    "rows": 8,
+    "runtime": "none; modular sources compile to flattened rows and prefiltered exact-size runtime tiers",
+    "runtime_tiers": [
+      {
+        "frame_size": [
+          27,
+          35
+        ],
+        "key": "native",
+        "row_size": [
+          216,
+          35
+        ]
+      },
+      {
+        "frame_size": [
+          35,
+          46
+        ],
+        "key": "default",
+        "row_size": [
+          280,
+          46
+        ]
+      },
+      {
+        "frame_size": [
+          54,
+          70
+        ],
+        "key": "double",
+        "row_size": [
+          432,
+          70
+        ]
+      },
+      {
+        "frame_size": [
+          64,
+          84
+        ],
+        "key": "review",
+        "row_size": [
+          512,
+          84
+        ]
+      }
+    ]
+  },
+  "sources": {
+    "files": {
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png": {
+        "bytes": 702824,
+        "owner": "garment",
+        "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png": {
+        "bytes": 768222,
+        "owner": "identity",
+        "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png": {
+        "bytes": 733091,
+        "owner": "attachment",
+        "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json": {
+        "bytes": 8546,
+        "owner": "right-pose-authority",
+        "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a4-guard-family/parts.json": {
+        "bytes": 5113,
+        "owner": "directional-parts-contract",
+        "sha256": "1589c0ad9f1baf64a886307fa6b3446650c1032c36e3b54c55421c5e93626047"
+      },
+      "scripts/actor-pose-prototype/a2_layered2d.py": {
+        "bytes": 56440,
+        "owner": "shared-joint-compiler",
+        "sha256": "70129559b1a19b3d67214ff1928b8db17a962fb6edd029c39bb401b067cbda46"
+      },
+      "scripts/actor-pose-prototype/a3_factorial.py": {
+        "bytes": 43134,
+        "owner": "shared-runtime-style-compiler",
+        "sha256": "9523b4ae5b653286a7ea62b53cb7e2d3501fd0357954a575455a15747718fefb"
+      },
+      "scripts/actor-pose-prototype/a4_guard_family.py": {
+        "bytes": 42176,
+        "owner": "compiler-source",
+        "sha256": "0ad148b9317612c7ed47b3ea0979ec61d4a26c192a10769e7d79c7e3ef091989"
+      },
+      "scripts/sprite_row_quality.py": {
+        "bytes": 14174,
+        "owner": "quality-gate-source",
+        "sha256": "f1dc8266d07dd4d58057e23d47c680226a73e9ac59da53bf456ca49694439461"
+      }
+    },
+    "finished_frame_or_row_mirroring": false,
+    "network_required": false,
+    "paint_sources_transformed_by_joint_chain": true,
+    "runtime_skeletal_renderer": false,
+    "source_hash": "4417cf5af25f25ac3dc57cb0096b032f203e06248fc4e446f40529358ee6b4cd"
+  },
+  "stage": "guard-carry-four-directions",
+  "status": "direction-family-proven",
+  "verification": {
+    "byte_deterministic_second_pass": true,
+    "failures": [],
+    "mechanical_passed": true,
+    "report": "reports/guard-family-gate.json"
+  }
+}

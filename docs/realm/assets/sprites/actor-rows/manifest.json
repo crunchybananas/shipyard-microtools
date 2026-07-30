@@ -2606,128 +2606,170 @@
     },
     "guard/carry/down": {
       "file": "guard/carry-down.png",
-      "note": "First semantic-identity pass: blue-tunic guard carry cradle, no baked cargo or shield; pending cross-direction family.",
-      "provenance": "imagegen",
-      "quality": {
-        "bodyBottomRange": 0,
-        "bodyHeightRange": 1,
-        "bodyWidthRange": 1,
-        "directionReference": {
-          "bodyHeightDelta": 0.5,
-          "bodyWidthDelta": 4.0,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 27.0,
-          "medianColor": [
-            75.4,
-            67.75,
-            55.4
-          ],
-          "paletteDelta": 24.85
-        },
-        "flickerScore": 3.2,
-        "maxAlphaRatio": 1.044,
-        "maxBodyCenterJump": 1.49,
-        "maxEdgePixels": 0,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 1.8,
-        "medianBodyHeight": 76.5,
-        "medianBodyWidth": 31.0,
-        "medianColor": [
-          87.15,
-          77.0,
-          75.25
-        ],
-        "medianColorCount": 670.0,
-        "medianShadingRatio": 0.5996,
-        "styleEra": "painted",
-        "warnings": []
-      },
-      "sha256": "1ae7d4e03f615119946956fa391e3944d59f622a0451baf0dc67b96f5c7a2b5f",
-      "stagedAt": "2026-07-18T20:34:54Z",
-      "status": "candidate"
-    },
-    "guard/carry/left": {
-      "file": "guard/carry-left.png",
-      "note": "Blue-tunic guard carry cradle with no baked cargo or shield; semantic family repaint candidate.",
-      "provenance": "imagegen",
-      "quality": {
-        "bodyBottomRange": 0,
-        "bodyHeightRange": 1,
-        "bodyWidthRange": 7,
-        "directionReference": {
-          "bodyHeightDelta": 1.0,
-          "bodyWidthDelta": 2.5,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 31.0,
-          "medianColor": [
-            76.1,
-            69.8,
-            65.2
-          ],
-          "paletteDelta": 13.29
-        },
-        "flickerScore": 10.4,
-        "maxAlphaRatio": 1.207,
-        "maxBodyCenterJump": 2.6,
-        "maxEdgePixels": 0,
-        "maxFragmentPixels": 0,
-        "maxPaletteDrift": 5.79,
-        "medianBodyHeight": 76.0,
-        "medianBodyWidth": 28.5,
-        "medianColor": [
-          88.5,
-          73.75,
-          67.9
-        ],
-        "medianColorCount": 504.0,
-        "medianShadingRatio": 0.6547,
-        "styleEra": "painted",
-        "warnings": []
-      },
-      "sha256": "17b43ab142ee91fe0797036557cd2bb167fd6c06d031081483e5a61261a01794",
-      "stagedAt": "2026-07-18T20:37:08Z",
-      "status": "candidate"
-    },
-    "guard/carry/right": {
-      "file": "guard/carry-right.png",
-      "note": "A3 vertical-slice candidate compiled from independent watchman identity, watch-blue garment, socketed cargo-crate attachment, and the reviewed eight-beat carry skeleton; candidate only until live-canvas approval.",
-      "provenance": "a3-modular-skeletal",
+      "note": "A4 guard carry candidate compiled from hash-locked watchman identity, watch-blue garment, direction-specific painted components, socketed cargo, and an eight-beat grounded joint contract; staged for four-direction live-canvas review.",
+      "provenance": "a4-modular-directional",
       "quality": {
         "bodyBottomRange": 0,
         "bodyHeightRange": 2,
         "bodyWidthRange": 0,
         "directionReference": {
-          "bodyHeightDelta": 0.5,
-          "bodyWidthDelta": 5.0,
-          "medianBodyHeight": 76.5,
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 1.0,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 31.0,
           "medianColor": [
-            87.15,
+            88.45,
             73.75,
-            67.9
+            67.15
           ],
-          "paletteDelta": 1.52
+          "paletteDelta": 7.71
         },
         "flickerScore": 4.0,
-        "maxAlphaRatio": 1.092,
-        "maxBodyCenterJump": 2.31,
+        "maxAlphaRatio": 1.046,
+        "maxBodyCenterJump": 1.97,
         "maxEdgePixels": 0,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 3.72,
+        "maxPaletteDrift": 1.22,
         "medianBodyHeight": 76.0,
-        "medianBodyWidth": 36.0,
+        "medianBodyWidth": 32.0,
         "medianColor": [
-          88.45,
-          74.0,
-          67.15
+          95.45,
+          76.85,
+          66.2
         ],
-        "medianColorCount": 503.5,
-        "medianShadingRatio": 0.6743,
+        "medianColorCount": 492.0,
+        "medianShadingRatio": 0.6448,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "c1bd8810dbb38389bf09d459d64352eb80999f052f7885380858138c19816acd",
-      "stagedAt": "2026-07-30T03:28:24Z",
+      "sha256": "6f720d295ef702fa89fc727c45224bdc808708fb0ca726f642d828532f113465",
+      "stagedAt": "2026-07-30T04:05:27Z",
+      "status": "candidate"
+    },
+    "guard/carry/left": {
+      "file": "guard/carry-left.png",
+      "note": "A4 guard carry candidate compiled from hash-locked watchman identity, watch-blue garment, direction-specific painted components, socketed cargo, and an eight-beat grounded joint contract; staged for four-direction live-canvas review.",
+      "provenance": "a4-modular-directional",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
+          "medianColor": [
+            95.35,
+            76.85,
+            67.15
+          ],
+          "paletteDelta": 7.85
+        },
+        "flickerScore": 4.0,
+        "maxAlphaRatio": 1.092,
+        "maxBodyCenterJump": 2.29,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.93,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 34.0,
+        "medianColor": [
+          88.05,
+          74.0,
+          67.55
+        ],
+        "medianColorCount": 498.5,
+        "medianShadingRatio": 0.682,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "beee6b33b9b7e8a2e496d8c5e9b605e6c0f894b082d14f76e42a57a0dbbdb55a",
+      "stagedAt": "2026-07-30T04:05:27Z",
+      "status": "candidate"
+    },
+    "guard/carry/right": {
+      "file": "guard/carry-right.png",
+      "note": "A4 guard carry candidate compiled from hash-locked watchman identity, watch-blue garment, direction-specific painted components, socketed cargo, and an eight-beat grounded joint contract; staged for four-direction live-canvas review.",
+      "provenance": "a4-modular-directional",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 2.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
+          "medianColor": [
+            95.35,
+            76.85,
+            67.55
+          ],
+          "paletteDelta": 7.81
+        },
+        "flickerScore": 4.0,
+        "maxAlphaRatio": 1.094,
+        "maxBodyCenterJump": 2.39,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 3.93,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 34.0,
+        "medianColor": [
+          88.1,
+          73.95,
+          67.45
+        ],
+        "medianColorCount": 504.0,
+        "medianShadingRatio": 0.6755,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "820efe6c4bb8eca35bb83ed8ec0bf398eed880291179a7fd678da5f80f7f0b54",
+      "stagedAt": "2026-07-30T04:05:28Z",
+      "status": "candidate"
+    },
+    "guard/carry/up": {
+      "file": "guard/carry-up.png",
+      "note": "A4 guard carry candidate compiled from hash-locked watchman identity, watch-blue garment, direction-specific painted components, socketed cargo, and an eight-beat grounded joint contract; staged for four-direction live-canvas review.",
+      "provenance": "a4-modular-directional",
+      "quality": {
+        "bodyBottomRange": 0,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 0,
+        "directionReference": {
+          "bodyHeightDelta": 0.0,
+          "bodyWidthDelta": 0.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
+          "medianColor": [
+            88.5,
+            74.0,
+            67.15
+          ],
+          "paletteDelta": 12.36
+        },
+        "flickerScore": 4.0,
+        "maxAlphaRatio": 1.043,
+        "maxBodyCenterJump": 1.72,
+        "maxEdgePixels": 0,
+        "maxFragmentPixels": 0,
+        "maxPaletteDrift": 1.51,
+        "medianBodyHeight": 76.0,
+        "medianBodyWidth": 32.0,
+        "medianColor": [
+          95.35,
+          81.3,
+          74.4
+        ],
+        "medianColorCount": 479.0,
+        "medianShadingRatio": 0.6441,
+        "styleEra": "painted",
+        "warnings": []
+      },
+      "sha256": "906210dd38cf102c6d501cee12bd3378385c0afb939889835228a9b584001e34",
+      "stagedAt": "2026-07-30T04:05:27Z",
       "status": "candidate"
     },
     "guard/idle/down": {
@@ -8098,6 +8140,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-30T03:28:24Z",
+  "updatedAt": "2026-07-30T04:05:28Z",
   "version": 1
 }

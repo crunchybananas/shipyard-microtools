@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
-import { G, createResourceStock, setSeed } from '../js/state.js?realm=171';
-import { generateWorld } from '../js/world.js?realm=171';
-import { dispatch } from '../js/commands.js?realm=171';
-import { canPlace } from '../js/economy.js?realm=171';
-import { coreTick } from '../js/sim.js?realm=171';
-import { renameCitizen } from '../js/citizen-ownership.js?realm=171';
+import { G, createResourceStock, setSeed } from '../js/state.js?realm=172';
+import { generateWorld } from '../js/world.js?realm=172';
+import { dispatch } from '../js/commands.js?realm=172';
+import { canPlace } from '../js/economy.js?realm=172';
+import { coreTick } from '../js/sim.js?realm=172';
+import { renameCitizen } from '../js/citizen-ownership.js?realm=172';
 import {
   getCitizenTransitionLedger,
   initCitizenInspector,
   inspectCitizen,
   resetCitizenTransitionLedger,
-} from '../js/citizen-inspector.js?realm=171';
+} from '../js/citizen-inspector.js?realm=172';
 
 setSeed(44017);
 generateWorld();

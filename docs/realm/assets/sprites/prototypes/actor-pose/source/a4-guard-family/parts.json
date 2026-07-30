@@ -1,0 +1,149 @@
+{
+  "schema": "realm.actor-pose.a4-guard-family-parts.v1",
+  "stage": "guard-carry-four-directions",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "watchman",
+    "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png",
+    "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca",
+    "parts": {
+      "down": {
+        "head": [300, 22, 457, 246],
+        "torso": [259, 260, 504, 542],
+        "arm_screen_left": [89, 290, 208, 611],
+        "arm_screen_right": [1117, 287, 1236, 610],
+        "leg": [243, 578, 508, 974]
+      },
+      "up": {
+        "head": [610, 24, 766, 231],
+        "torso": [571, 261, 822, 541],
+        "arm_screen_left": [89, 290, 208, 611],
+        "arm_screen_right": [1117, 287, 1236, 610],
+        "leg": [562, 578, 818, 974]
+      },
+      "left": {
+        "head": [864, 31, 1036, 239],
+        "torso": [880, 257, 1054, 537],
+        "arm": [1117, 287, 1236, 610],
+        "leg": [881, 566, 1039, 976]
+      },
+      "right": {
+        "head": [864, 31, 1036, 239],
+        "torso": [880, 257, 1054, 537],
+        "arm": [1117, 287, 1236, 610],
+        "leg": [881, 566, 1039, 976]
+      }
+    }
+  },
+  "garment": {
+    "key": "watch-blue",
+    "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png",
+    "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6",
+    "parts": {
+      "down": {
+        "headgear": [183, 28, 424, 235],
+        "tunic": [366, 284, 647, 565],
+        "sleeve_screen_left": [161, 293, 288, 467],
+        "sleeve_screen_right": [1242, 293, 1370, 470],
+        "belt": [593, 566, 824, 660],
+        "boot": [243, 651, 516, 963]
+      },
+      "up": {
+        "headgear": [490, 25, 689, 235],
+        "tunic": [681, 284, 951, 565],
+        "sleeve_screen_left": [161, 293, 288, 467],
+        "sleeve_screen_right": [1242, 293, 1370, 470],
+        "belt": [593, 566, 824, 660],
+        "boot": [585, 649, 868, 963]
+      },
+      "left": {
+        "headgear": [756, 31, 947, 232],
+        "tunic": [986, 284, 1147, 562],
+        "sleeve": [1242, 293, 1370, 470],
+        "belt": [593, 566, 824, 660],
+        "boot": [940, 648, 1101, 963]
+      },
+      "right": {
+        "headgear": [756, 31, 947, 232],
+        "tunic": [986, 284, 1147, 562],
+        "sleeve": [1242, 293, 1370, 470],
+        "belt": [593, 566, 824, 660],
+        "boot": [940, 648, 1101, 963]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and hand/load socket timing",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and hand/load socket timing"
+    }
+  },
+  "scope": {
+    "identity": "watchman",
+    "garment": "watch-blue",
+    "action": "carry",
+    "directions": ["down", "up", "left", "right"],
+    "attachments": ["off", "cargo-crate"],
+    "rows": 8,
+    "frames": 64
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, and directional attachment crops",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and unflipped source parts before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear"
+  }
+}

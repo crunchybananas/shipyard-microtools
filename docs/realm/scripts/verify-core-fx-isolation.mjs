@@ -7,10 +7,10 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { G, MAP_H, MAP_W, TILE, getSeed, setSeed } from '../js/state.js?realm=171';
-import { updateFires } from '../js/economy.js?realm=171';
-import { visualJitter } from '../js/fx.js?realm=171';
-import { updateWalkers } from '../js/walkers.js?realm=171';
+import { G, MAP_H, MAP_W, TILE, getSeed, setSeed } from '../js/state.js?realm=172';
+import { updateFires } from '../js/economy.js?realm=172';
+import { visualJitter } from '../js/fx.js?realm=172';
+import { updateWalkers } from '../js/walkers.js?realm=172';
 import { runDeterminismScenario } from './determinism-harness.mjs';
 
 const MODES = ['control', 'suppress', 'perturb'];

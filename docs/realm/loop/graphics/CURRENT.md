@@ -1,5 +1,51 @@
 # Current Graphics Handoff
 
+## Realm 172 A4 four-direction guard carry family — 2026-07-29
+
+- The first modular guard family now covers `down`, `up`, `left`, and `right`
+  from hash-locked painted source parts. The existing watchman identity sheet,
+  watch-blue garment sheet, and cargo sheet already contained the required
+  views, so this round did not invent or trace replacement frames.
+- A4 emits eight reviewable `512x84` rows: four cargo-free rows and four rows
+  with a socketed crate. All `64/64` frames are distinct, register to root
+  `[32,79]`, keep rows `80-83` clear, preserve a `76px` median body height, and
+  pass the strict row analyzer with no warnings.
+- Down and up use their own painted front/back head, torso, helmet, tunic,
+  boot, and crate components. Right uses independently flipped side
+  components. Left reflects the authored joints and uses the original
+  left-facing side components; the compiler never mirrors a finished frame or
+  row.
+- The former A3 attachment contract accidentally reused the perspective/front
+  crate for the side preview even though the source contains a real side
+  crate. A4 maps all three source views explicitly and gives left/right their
+  correct side component.
+- The deterministic compiler retains independent identity, garment,
+  attachment, semantic-mask, and landmark planes; compiles exact
+  `27x35`, `35x46`, `54x70`, and `64x84` tiers; and applies one shared
+  48-color, binary-alpha, no-dither runtime palette.
+- All four `guard/carry/*` rows are staged as warning-free `CANDIDATE` rows.
+  Candidate status still excludes them from the production atlas.
+  `?actorpreview=a4-guard-carry-family` loads the complete family and
+  substitutes the direction selected by the real renderer.
+- Browser verification proves all four rows in Actor Muster and on a
+  controlled guard carrier in the settlement. The settlement uses the exact
+  `35x46` default tier, draws it at `27x35`, and disables smoothing. An
+  ordinary URL creates no preview loaders and remains on production art.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a4_guard_family.py --verify
+python3 scripts/actor-pose-prototype/verify_a4_guard_family.py
+scripts/sprite-row verify
+node scripts/verify-actor-vertical-slice.mjs
+```
+
+Next target: add a handed short-sword source and sentinel checks, then compile
+the guard's idle, walk, and work families from the same identity, garment,
+direction, palette, anchor, and lighting contracts. Review all sixteen action
+rows together before accepting any of them into the production atlas.
+
 ## Realm 171 A3 modular actor vertical slice — 2026-07-29
 
 - A2's reviewed right-facing carry pose is now an offline factorial compiler,
