@@ -9,6 +9,7 @@ const checks = [
   ['runtime URL revision', 'runtime-revision.mjs', '--check'],
   ['runtime module graph', 'verify-module-graph.mjs'],
   ['render sharpness', 'verify-render-sharpness.mjs'],
+  ['actor-row candidate isolation', 'verify-actor-row-manifest-v2.mjs'],
   ['sprite source contract', 'verify-sprite-source-contract.mjs'],
   ['deterministic-core purity', 'verify-core-purity.mjs'],
   ['core/FX isolation', 'verify-core-fx-isolation.mjs'],
@@ -26,6 +27,7 @@ const checks = [
   ['browser citizen lifecycle', 'verify-engine-v2-citizen-lifecycle-browser.mjs'],
   ['browser citizen ownership', 'verify-engine-v2-ownership-browser.mjs'],
   ['browser road rendering', 'verify-road-rendering.mjs'],
+  ['browser actor-row candidate isolation', 'verify-actor-row-candidate-browser.mjs'],
   ['browser actor vertical slice', 'verify-actor-vertical-slice.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];

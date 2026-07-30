@@ -9,10 +9,9 @@ Prioritize work that changes what the player sees in the live game.
      but the family remains opt-in candidate art until close transition review
      decides whether the sword cadence and baked crate should ship unchanged.
    - Push: review idle/walk/work/carry transitions and resource-specific cargo
-     semantics at close game zoom, add candidate-plus-locked coexistence to
-     the row manifest, revise the shared source once if needed, then promote
-     the complete family together. Migrate other roles one family at a time
-     only after this pilot is accepted.
+     semantics at close game zoom, revise the shared source once if needed,
+     then use the v2 manifest's atomic family promotion. Migrate other roles
+     one family at a time only after this pilot is accepted.
    - Verify: require single-row source review, independent clean rebuilds,
      identity/garment/equipment invariants, Sprite Lab and Actor Muster review,
      exact-tier settlement captures, all `224` atlas rows, and all `1,792`
@@ -66,6 +65,14 @@ Prioritize work that changes what the player sees in the live game.
    - Verify: full build-bar screenshot after unlocking all build types.
 
 ## Done
+
+- Candidate-safe actor-row manifest (round 116): replaced the destructive v1
+  single-record schema with independent production and candidate slots;
+  preserved all 191 production hashes and all four compiled atlas hashes;
+  added content-addressed production files, atomic manifest replacement,
+  reject/promote/promote-family commands, migration and corruption tests, and
+  browser-visible runtime-source labels; staged all 16 A5 guard rows as clean
+  canonical candidates without changing the normal game.
 
 - Complete modular guard action family (round 115): generated and hash-locked
   one directional painted short-sword source; added right-hand socket and

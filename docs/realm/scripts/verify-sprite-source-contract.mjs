@@ -12,6 +12,10 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import {
+  actorRowRecords,
+  normalizeActorRowManifest,
+} from './actor-row-manifest.mjs';
+import {
   ACTOR_ATLAS_H,
   ACTOR_ATLAS_W,
   ACTOR_RUNTIME_ATLASES,
@@ -30,7 +34,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=173';
+} from '../js/sprite-source-contract.js?realm=174';
 
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -105,36 +109,52 @@ async function assertNoRetiredCombinedSources() {
   }
 }
 
-async function assertAcceptedRows() {
-  let manifest;
+async function assertActorRows() {
+  let rawManifest;
   try {
-    manifest = JSON.parse(await readFile(ACTOR_ROW_MANIFEST_PATH, 'utf8'));
+    rawManifest = JSON.parse(await readFile(ACTOR_ROW_MANIFEST_PATH, 'utf8'));
   } catch (err) {
-    if (err.code === 'ENOENT') return 0;
+    if (err.code === 'ENOENT') return { accepted: 0, candidates: 0 };
     throw err;
   }
-  if (manifest.version !== 1 || !manifest.rows || typeof manifest.rows !== 'object') {
-    throw new Error(`${relative(ROOT, ACTOR_ROW_MANIFEST_PATH)} must contain version 1 row metadata`);
+  if (rawManifest.version !== 2) {
+    throw new Error(
+      `${relative(ROOT, ACTOR_ROW_MANIFEST_PATH)} must be persisted as version 2`,
+    );
   }
+  const manifest = normalizeActorRowManifest(
+    rawManifest,
+    relative(ROOT, ACTOR_ROW_MANIFEST_PATH),
+  );
   const rowRoot = `${resolve(ACTOR_ROW_DIR)}${sep}`;
+  const candidateRoot = `${resolve(ACTOR_ROW_DIR, 'candidates')}${sep}`;
   let accepted = 0;
-  for (const [key, item] of Object.entries(manifest.rows)) {
-    if (!['candidate', 'accepted'].includes(item.status)) {
-      throw new Error(`${key} has unsupported row status ${JSON.stringify(item.status)}; use candidate or accepted`);
-    }
-    if (item.status !== 'accepted') continue;
+  let candidates = 0;
+  const declaredPaths = new Map();
+  for (const { key, slot, item } of actorRowRecords(manifest)) {
     const [role, action, dir, ...rest] = key.split('/');
     if (rest.length || !ROLES.includes(role) || !ACTIONS.includes(action) || !DIRS.includes(dir)) {
-      throw new Error(`invalid accepted actor row key: ${key}`);
+      throw new Error(`invalid actor row key: ${key}`);
     }
     const path = resolve(ACTOR_ROW_DIR, item.file || '');
     if (!path.startsWith(rowRoot)) throw new Error(`${key} row file escapes assets/sprites/actor-rows/`);
+    if (slot === 'candidate' && manifest.sourceVersion === 2 && !path.startsWith(candidateRoot)) {
+      throw new Error(`${key} candidate must stay under assets/sprites/actor-rows/candidates/`);
+    }
+    const existingOwner = declaredPaths.get(path);
+    if (existingOwner) {
+      throw new Error(`${key}/${slot} row file is also owned by ${existingOwner}`);
+    }
+    declaredPaths.set(path, `${key}/${slot}`);
     await assertDimensions(path, ROLE_SHEET_W, FRAME_H);
     const digest = createHash('sha256').update(await readFile(path)).digest('hex');
-    if (digest !== item.sha256) throw new Error(`${key} row hash differs from the accepted manifest`);
-    accepted++;
+    if (digest !== item.sha256) {
+      throw new Error(`${key}/${slot} row hash differs from the actor-row manifest`);
+    }
+    if (slot === 'production') accepted++;
+    else candidates++;
   }
-  return accepted;
+  return { accepted, candidates };
 }
 
 async function assertRuntimeAtlasManifest() {
@@ -202,10 +222,13 @@ for (const tier of ACTOR_RUNTIME_ATLASES) {
 }
 await assertDimensions(OUT_AMBIENT, AMBIENT_ATLAS_W, AMBIENT_ATLAS_H);
 await assertRuntimeAtlasManifest();
-const acceptedRows = await assertAcceptedRows();
+const actorRows = await assertActorRows();
 
 console.log(`[sprite-source-contract] actors: ${ROLES.length} base + compiled role sheets, ${ROLE_SHEET_W}x${ROLE_SHEET_H} each`);
-console.log(`[sprite-source-contract] accepted row overrides: ${acceptedRows}`);
+console.log(
+  `[sprite-source-contract] actor row manifest v2: ${actorRows.accepted} production, `
+  + `${actorRows.candidates} candidate`,
+);
 console.log(`[sprite-source-contract] runtime actor scales: ${ACTOR_RUNTIME_ATLASES.map((tier) => `${tier.frameW}x${tier.frameH}`).join(', ')}`);
 console.log('[sprite-source-contract] runtime actor atlas provenance and hashes are current');
 console.log(`[sprite-source-contract] ambient: ${AMBIENT.length} prop sprites, ${AMBIENT_SHEET_W}x${AMBIENT_SHEET_H} each`);

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import colorsys
 import hashlib
 import json
@@ -98,23 +99,106 @@ def row_key(role: str, action: str, direction: str) -> str:
     return f"{role}/{action}/{direction}"
 
 
-def row_file(role: str, action: str, direction: str) -> Path:
-    return ROW_DIR / role / f"{action}-{direction}.png"
+def row_file(
+    role: str,
+    action: str,
+    direction: str,
+    digest: str,
+) -> Path:
+    return (
+        ROW_DIR
+        / "production"
+        / role
+        / f"{action}-{direction}-{digest[:12]}.png"
+    )
+
+
+def candidate_file(role: str, action: str, direction: str) -> Path:
+    return ROW_DIR / "candidates" / role / f"{action}-{direction}.png"
+
+
+def empty_manifest() -> dict:
+    return {"version": 2, "updatedAt": now_iso(), "rows": {}}
+
+
+def normalize_manifest(data: dict) -> dict:
+    """Return the v2 two-slot manifest without changing source records.
+
+    Version 1 stored either an accepted row or a candidate at each logical
+    key. Version 2 stores both independently so review work cannot erase the
+    production authority used by clean atlas builds.
+    """
+    rows = data.get("rows")
+    if not isinstance(rows, dict):
+        raise SystemExit(f"invalid row manifest: {MANIFEST_PATH}")
+    if data.get("version") == 2:
+        return data
+    if data.get("version") != 1:
+        raise SystemExit(f"invalid row manifest: {MANIFEST_PATH}")
+
+    migrated = {
+        "version": 2,
+        "updatedAt": data.get("updatedAt", now_iso()),
+        "rows": {},
+    }
+    for key, item in rows.items():
+        if not isinstance(item, dict):
+            raise SystemExit(f"invalid v1 row manifest entry: {key}")
+        status = item.get("status")
+        if status == "accepted":
+            migrated["rows"][key] = {"production": item}
+        elif status == "candidate":
+            migrated["rows"][key] = {"candidate": item}
+        else:
+            raise SystemExit(f"{key} has unsupported v1 status {status!r}")
+    return migrated
 
 
 def load_manifest() -> dict:
     if not MANIFEST_PATH.exists():
-        return {"version": 1, "updatedAt": now_iso(), "rows": {}}
-    data = json.loads(MANIFEST_PATH.read_text())
-    if data.get("version") != 1 or not isinstance(data.get("rows"), dict):
-        raise SystemExit(f"invalid row manifest: {MANIFEST_PATH}")
-    return data
+        return empty_manifest()
+    return normalize_manifest(json.loads(MANIFEST_PATH.read_text()))
 
 
 def save_manifest(data: dict) -> None:
     ROW_DIR.mkdir(parents=True, exist_ok=True)
+    data = normalize_manifest(data)
+    data["version"] = 2
     data["updatedAt"] = now_iso()
-    MANIFEST_PATH.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+    payload = json.dumps(data, indent=2, sort_keys=True) + "\n"
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        dir=ROW_DIR,
+        prefix=".manifest-",
+        suffix=".json",
+        delete=False,
+    ) as handle:
+        handle.write(payload)
+        temporary = Path(handle.name)
+    temporary.replace(MANIFEST_PATH)
+
+
+def row_slots(manifest: dict, key: str) -> dict:
+    entry = manifest["rows"].get(key)
+    if entry is None:
+        return {}
+    if not isinstance(entry, dict):
+        raise SystemExit(f"{key} has invalid row slots")
+    return entry
+
+
+def production_item(manifest: dict, key: str) -> dict | None:
+    item = row_slots(manifest, key).get("production")
+    return item if isinstance(item, dict) else None
+
+
+def candidate_item(manifest: dict, key: str) -> dict | None:
+    item = row_slots(manifest, key).get("candidate")
+    return item if isinstance(item, dict) else None
+
+
+def preferred_review_item(manifest: dict, key: str) -> dict | None:
+    return candidate_item(manifest, key) or production_item(manifest, key)
 
 
 def validate_target(role: str, action: str, direction: str) -> None:
@@ -139,23 +223,47 @@ def crop_row(role: str, action: str, direction: str) -> Image.Image:
     return image.crop((0, y, FRAME_W * FRAMES, y + FRAME_H))
 
 
-def comparison_row(role: str, action: str, direction: str) -> Image.Image:
+def comparison_row(
+    role: str,
+    action: str,
+    direction: str,
+    *,
+    source: str = "review",
+) -> Image.Image:
     manifest = load_manifest()
-    item = manifest["rows"].get(row_key(role, action, direction))
-    if item and item.get("status") in ("candidate", "accepted"):
+    key = row_key(role, action, direction)
+    if source == "production":
+        item = production_item(manifest, key)
+    elif source == "review":
+        item = preferred_review_item(manifest, key)
+    else:
+        raise ValueError(f"unknown comparison source {source!r}")
+    if item:
         path = ROW_DIR / item.get("file", "")
         if path.is_file():
             return Image.open(path).convert("RGBA")
     return crop_row(role, action, direction)
 
 
-def add_direction_comparison(report: dict, role: str, action: str, direction: str) -> dict:
+def add_direction_comparison(
+    report: dict,
+    role: str,
+    action: str,
+    direction: str,
+    *,
+    reference_source: str = "review",
+) -> dict:
     peers = []
     for peer_dir in DIRS:
         if peer_dir == direction:
             continue
         with tempfile.NamedTemporaryFile(suffix=".png") as handle:
-            comparison_row(role, action, peer_dir).save(handle.name)
+            comparison_row(
+                role,
+                action,
+                peer_dir,
+                source=reference_source,
+            ).save(handle.name)
             peers.append(analyze_row(Path(handle.name), action))
     reference_height = statistics.median(peer["medianBodyHeight"] for peer in peers)
     reference_width = statistics.median(peer["medianBodyWidth"] for peer in peers)
@@ -223,13 +331,12 @@ def _locked_identity_reference(
     direction: str,
 ) -> tuple[dict | None, str]:
     key = row_key(role, action, direction)
-    item = manifest["rows"].get(key)
+    item = production_item(manifest, key)
     if not item:
         return None, f"{key}=BASE"
     status = item.get("status")
     if status != "accepted":
-        display = "CANDIDATE" if status == "candidate" else repr(status)
-        return None, f"{key}={display}"
+        return None, f"{key}=invalid-production-{status!r}"
     warnings = item.get("quality", {}).get("warnings")
     if warnings != []:
         return None, f"{key}=LOCKED-with-untrusted-warnings"
@@ -299,7 +406,9 @@ def _motion_reference(
     direction: str,
 ) -> dict:
     key = row_key(role, action, direction)
-    item = manifest["rows"].get(key)
+    candidate = candidate_item(manifest, key)
+    production = production_item(manifest, key)
+    item = candidate or production
     if item:
         status = item.get("status")
         if status not in ("accepted", "candidate"):
@@ -309,6 +418,8 @@ def _motion_reference(
         if digest != item.get("sha256"):
             raise SystemExit(f"{key} manifest hash does not match {path}")
         display_status = "LOCKED" if status == "accepted" else "CANDIDATE"
+        if candidate:
+            display_status += "+RUNTIME-LOCKED" if production else "+RUNTIME-BASE"
         return {
             "key": key,
             "role": role,
@@ -510,8 +621,11 @@ def derive_row(args: argparse.Namespace) -> None:
         if not cloth:
             raise SystemExit(f"no ROLE_CLOTH entry for {args.role}")
     manifest = load_manifest()
-    source_item = manifest["rows"].get(row_key(source_role, source_action, source_dir))
-    if source_item and source_item.get("status") == "accepted":
+    source_item = production_item(
+        manifest,
+        row_key(source_role, source_action, source_dir),
+    )
+    if source_item:
         source_image = Image.open(ROW_DIR / source_item["file"]).convert("RGBA")
     else:
         # No accepted override for the source row: fall back to the compiled
@@ -675,8 +789,11 @@ def headswap_row(args: argparse.Namespace) -> None:
     # Body: settler locked row for the same action/dir, palette-shifted to
     # the role identity color.
     manifest = load_manifest()
-    body_item = manifest["rows"].get(row_key("settler", args.action, args.dir))
-    if not body_item or body_item.get("status") != "accepted":
+    body_item = production_item(
+        manifest,
+        row_key("settler", args.action, args.dir),
+    )
+    if not body_item:
         raise SystemExit(f"settler/{args.action}/{args.dir} is not an accepted override")
     body_row = derive_role_row(Image.open(ROW_DIR / body_item["file"]).convert("RGBA"), cloth)
 
@@ -1009,6 +1126,44 @@ def scrub_row(args: argparse.Namespace) -> None:
     print(f"[sprite-workbench] wrote {out}")
 
 
+QUALITY_FIELDS = (
+    "flickerScore", "bodyHeightRange", "bodyWidthRange", "bodyBottomRange",
+    "medianBodyHeight", "medianBodyWidth", "medianColor", "directionReference",
+    "styleEra", "medianColorCount", "medianShadingRatio",
+    "maxBodyCenterJump", "maxAlphaRatio", "maxPaletteDrift",
+    "maxFragmentPixels", "maxEdgePixels", "warnings",
+)
+
+
+def quality_record(report: dict) -> dict:
+    return {key: report[key] for key in QUALITY_FIELDS}
+
+
+def declared_row_files(manifest: dict) -> set[Path]:
+    declared: set[Path] = set()
+    for entry in manifest["rows"].values():
+        if not isinstance(entry, dict):
+            continue
+        for slot in ("production", "candidate"):
+            item = entry.get(slot)
+            if isinstance(item, dict) and item.get("file"):
+                declared.add((ROW_DIR / item["file"]).resolve())
+    return declared
+
+
+def remove_unreferenced_row_file(manifest: dict, item: dict | None) -> None:
+    if not item or not item.get("file"):
+        return
+    path = (ROW_DIR / item["file"]).resolve()
+    row_root = ROW_DIR.resolve()
+    if path == row_root or row_root not in path.parents:
+        raise SystemExit(f"refusing to remove actor row outside {ROW_DIR}: {path}")
+    if path in declared_row_files(manifest):
+        return
+    if path.is_file():
+        path.unlink()
+
+
 def accept_row(args: argparse.Namespace) -> None:
     validate_target(args.role, args.action, args.dir)
     source = args.input.resolve()
@@ -1022,9 +1177,21 @@ def accept_row(args: argparse.Namespace) -> None:
             + "; stage it as a candidate and repair the row"
         )
 
-    destination = row_file(args.role, args.action, args.dir)
+    manifest = load_manifest()
+    key = row_key(args.role, args.action, args.dir)
+    slots = row_slots(manifest, key).copy()
+    previous_production = slots.get("production")
+    previous_candidate = slots.get("candidate")
+    source_digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    destination = row_file(
+        args.role,
+        args.action,
+        args.dir,
+        source_digest,
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source, destination)
+    if source != destination.resolve():
+        shutil.copyfile(source, destination)
     copied_report = add_direction_comparison(
         analyze_row(destination, args.action),
         args.role,
@@ -1035,28 +1202,20 @@ def accept_row(args: argparse.Namespace) -> None:
     proof = ROW_DIR / "proofs" / f"{args.role}-{args.action}-{args.dir}-x4.png"
     write_proof(destination, proof, copied_report)
 
-    manifest = load_manifest()
-    key = row_key(args.role, args.action, args.dir)
     status = "accepted"
-    manifest["rows"][key] = {
+    production = {
         "status": status,
         "file": str(destination.relative_to(ROW_DIR)),
         "sha256": digest,
         "provenance": args.provenance,
         "note": args.note or "",
         "acceptedAt": now_iso(),
-        "quality": {
-            key: copied_report[key]
-            for key in (
-                "flickerScore", "bodyHeightRange", "bodyWidthRange", "bodyBottomRange",
-                "medianBodyHeight", "medianBodyWidth", "medianColor", "directionReference",
-                "styleEra", "medianColorCount", "medianShadingRatio",
-                "maxBodyCenterJump", "maxAlphaRatio", "maxPaletteDrift",
-                "maxFragmentPixels", "maxEdgePixels", "warnings",
-            )
-        },
+        "quality": quality_record(copied_report),
     }
+    manifest["rows"][key] = {"production": production}
     save_manifest(manifest)
+    remove_unreferenced_row_file(manifest, previous_production)
+    remove_unreferenced_row_file(manifest, previous_candidate)
     print(f"[sprite-workbench] {status} {key}")
     print(f"[sprite-workbench] row {destination}")
     print(f"[sprite-workbench] proof {proof}")
@@ -1068,7 +1227,12 @@ def stage_row(args: argparse.Namespace) -> None:
     report = add_direction_comparison(analyze_row(source, args.action), args.role, args.action, args.dir)
     if report["errors"]:
         raise SystemExit(f"row has errors: {', '.join(report['errors'])}")
-    destination = row_file(args.role, args.action, args.dir)
+
+    manifest = load_manifest()
+    key = row_key(args.role, args.action, args.dir)
+    slots = row_slots(manifest, key).copy()
+    previous_candidate = slots.get("candidate")
+    destination = candidate_file(args.role, args.action, args.dir)
     destination.parent.mkdir(parents=True, exist_ok=True)
     if source != destination.resolve():
         shutil.copyfile(source, destination)
@@ -1076,30 +1240,152 @@ def stage_row(args: argparse.Namespace) -> None:
     proof = ROW_DIR / "proofs" / f"{args.role}-{args.action}-{args.dir}-candidate-x4.png"
     write_proof(destination, proof, report)
 
-    manifest = load_manifest()
-    key = row_key(args.role, args.action, args.dir)
-    manifest["rows"][key] = {
+    slots["candidate"] = {
         "status": "candidate",
         "file": str(destination.relative_to(ROW_DIR)),
         "sha256": digest,
         "provenance": args.provenance,
         "note": args.note or "",
         "stagedAt": now_iso(),
-        "quality": {
-            key: report[key]
-            for key in (
-                "flickerScore", "bodyHeightRange", "bodyWidthRange", "bodyBottomRange",
-                "medianBodyHeight", "medianBodyWidth", "medianColor", "directionReference",
-                "styleEra", "medianColorCount", "medianShadingRatio",
-                "maxBodyCenterJump", "maxAlphaRatio", "maxPaletteDrift",
-                "maxFragmentPixels", "maxEdgePixels", "warnings",
-            )
-        },
+        "quality": quality_record(report),
     }
+    manifest["rows"][key] = slots
     save_manifest(manifest)
+    remove_unreferenced_row_file(manifest, previous_candidate)
     print(f"[sprite-workbench] staged candidate {key}")
     print(f"[sprite-workbench] warnings {','.join(report['warnings']) or 'none'}")
     print(f"[sprite-workbench] proof {proof}")
+
+
+def promote_candidate(args: argparse.Namespace) -> None:
+    validate_target(args.role, args.action, args.dir)
+    manifest = load_manifest()
+    key = row_key(args.role, args.action, args.dir)
+    candidate = candidate_item(manifest, key)
+    if not candidate:
+        raise SystemExit(f"{key} has no candidate to promote")
+    args.input = _manifest_row_path(candidate, key)
+    args.provenance = candidate.get("provenance") or "promoted-candidate"
+    args.note = args.note if args.note is not None else candidate.get("note", "")
+    accept_row(args)
+
+
+def promote_family(args: argparse.Namespace) -> None:
+    """Promote a complete role/action family with one manifest transaction."""
+    role = args.role
+    actions = tuple(args.actions or ACTIONS)
+    manifest = load_manifest()
+    targets = [
+        (action, direction, row_key(role, action, direction))
+        for action in actions
+        for direction in DIRS
+    ]
+    prepared = []
+    for action, direction, key in targets:
+        candidate = candidate_item(manifest, key)
+        if not candidate:
+            raise SystemExit(
+                f"family promotion requires a candidate for every target; missing {key}"
+            )
+        path = _manifest_row_path(candidate, key)
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest != candidate.get("sha256"):
+            raise SystemExit(f"{key} candidate hash does not match its manifest lock")
+        report = add_direction_comparison(
+            analyze_row(path, action),
+            role,
+            action,
+            direction,
+        )
+        if report["errors"] or report["warnings"]:
+            messages = report["errors"] + report["warnings"]
+            raise SystemExit(
+                f"{key} blocks family promotion: {', '.join(messages)}"
+            )
+        prepared.append((action, direction, key, candidate, path, digest, report))
+
+    next_manifest = copy.deepcopy(manifest)
+    accepted_at = now_iso()
+    previous_items = []
+    created_paths = []
+    try:
+        for action, direction, key, candidate, path, digest, report in prepared:
+            destination = row_file(role, action, direction, digest)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            existed = destination.exists()
+            if path != destination.resolve():
+                shutil.copyfile(path, destination)
+            if hashlib.sha256(destination.read_bytes()).hexdigest() != digest:
+                raise SystemExit(f"{key} production copy changed bytes")
+            if not existed:
+                created_paths.append(destination)
+            old_slots = row_slots(manifest, key)
+            previous_items.extend(
+                item
+                for item in (
+                    old_slots.get("production"),
+                    old_slots.get("candidate"),
+                )
+                if item
+            )
+            next_manifest["rows"][key] = {
+                "production": {
+                    "status": "accepted",
+                    "file": str(destination.relative_to(ROW_DIR)),
+                    "sha256": digest,
+                    "provenance": candidate.get("provenance", "promoted-candidate"),
+                    "note": args.note if args.note is not None else candidate.get("note", ""),
+                    "acceptedAt": accepted_at,
+                    "quality": quality_record(report),
+                }
+            }
+            proof = ROW_DIR / "proofs" / f"{role}-{action}-{direction}-x4.png"
+            write_proof(destination, proof, report)
+        save_manifest(next_manifest)
+    except BaseException:
+        for path in created_paths:
+            if path.is_file():
+                path.unlink()
+        raise
+
+    for item in previous_items:
+        remove_unreferenced_row_file(next_manifest, item)
+    print(
+        f"[sprite-workbench] promoted {len(prepared)} {role} row(s) "
+        f"as one family transaction at {accepted_at}"
+    )
+
+
+def reject_candidate(args: argparse.Namespace) -> None:
+    validate_target(args.role, args.action, args.dir)
+    manifest = load_manifest()
+    key = row_key(args.role, args.action, args.dir)
+    slots = row_slots(manifest, key).copy()
+    candidate = slots.pop("candidate", None)
+    if not candidate:
+        raise SystemExit(f"{key} has no candidate to reject")
+    if slots:
+        manifest["rows"][key] = slots
+    else:
+        manifest["rows"].pop(key, None)
+    save_manifest(manifest)
+    remove_unreferenced_row_file(manifest, candidate)
+    print(f"[sprite-workbench] rejected candidate {key}; production source unchanged")
+
+
+def migrate_manifest(_args: argparse.Namespace) -> None:
+    manifest = load_manifest()
+    save_manifest(manifest)
+    production = sum(
+        1 for key in manifest["rows"] if production_item(manifest, key)
+    )
+    candidates = sum(
+        1 for key in manifest["rows"] if candidate_item(manifest, key)
+    )
+    print(
+        "[sprite-workbench] actor row manifest v2 ready: "
+        f"{production} production, {candidates} candidate"
+    )
 
 
 def extract_row(args: argparse.Namespace) -> None:
@@ -1114,62 +1400,131 @@ def extract_row(args: argparse.Namespace) -> None:
 def verify_manifest(_args: argparse.Namespace) -> None:
     manifest = load_manifest()
     failures: list[str] = []
+    if MANIFEST_PATH.is_file():
+        persisted_version = json.loads(MANIFEST_PATH.read_text()).get("version")
+        if persisted_version != 2:
+            failures.append(
+                "manifest is readable but not persisted as version 2; "
+                "run scripts/sprite-row migrate-manifest"
+            )
     accepted = 0
-    declared_files: set[Path] = set()
-    for key, item in sorted(manifest["rows"].items()):
-        path = ROW_DIR / item.get("file", "")
-        if item.get("file"):
-            declared_files.add(path.resolve())
-        if item.get("status") not in ("candidate", "accepted"):
-            failures.append(f"{key}: unsupported status {item.get('status')!r}")
-            continue
-        if item.get("status") != "accepted":
-            continue
-        accepted += 1
+    candidates = 0
+    declared_owners: dict[Path, str] = {}
+    for key, slots in sorted(manifest["rows"].items()):
         try:
             role, action, direction = key.split("/")
             validate_target(role, action, direction)
         except (ValueError, SystemExit):
             failures.append(f"{key}: invalid key")
             continue
-        if not path.is_file():
-            failures.append(f"{key}: missing {path}")
+
+        if not isinstance(slots, dict):
+            failures.append(f"{key}: row slots must be an object")
             continue
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        if digest != item.get("sha256"):
-            failures.append(f"{key}: sha256 mismatch")
-        report = add_direction_comparison(analyze_row(path, action), role, action, direction)
-        if report["errors"]:
-            failures.append(f"{key}: {', '.join(report['errors'])}")
-        if report["warnings"]:
-            failures.append(f"{key}: warnings {', '.join(report['warnings'])}")
+        unexpected = sorted(set(slots) - {"production", "candidate"})
+        if unexpected:
+            failures.append(f"{key}: unsupported slot(s) {', '.join(unexpected)}")
+        if not any(slot in slots for slot in ("production", "candidate")):
+            failures.append(f"{key}: row entry has no production or candidate")
+
+        for slot, expected_status in (
+            ("production", "accepted"),
+            ("candidate", "candidate"),
+        ):
+            item = slots.get(slot)
+            if item is None:
+                continue
+            if not isinstance(item, dict):
+                failures.append(f"{key}/{slot}: metadata must be an object")
+                continue
+            if item.get("status") != expected_status:
+                failures.append(
+                    f"{key}/{slot}: status must be {expected_status!r}, "
+                    f"got {item.get('status')!r}"
+                )
+                continue
+            if slot == "production":
+                accepted += 1
+            else:
+                candidates += 1
+            try:
+                path = _manifest_row_path(item, f"{key}/{slot}")
+            except SystemExit as error:
+                failures.append(f"{key}/{slot}: {error}")
+                continue
+            owner = declared_owners.get(path)
+            if owner:
+                failures.append(f"{key}/{slot}: row file is also owned by {owner}")
+            else:
+                declared_owners[path] = f"{key}/{slot}"
+            if slot == "candidate":
+                relative_path = path.relative_to(ROW_DIR.resolve())
+                if not relative_path.parts or relative_path.parts[0] != "candidates":
+                    failures.append(
+                        f"{key}/candidate: v2 candidates must live under "
+                        "assets/sprites/actor-rows/candidates/"
+                    )
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != item.get("sha256"):
+                failures.append(f"{key}/{slot}: sha256 mismatch")
+                continue
+            report = add_direction_comparison(
+                analyze_row(path, action),
+                role,
+                action,
+                direction,
+                reference_source="production" if slot == "production" else "review",
+            )
+            if report["errors"]:
+                failures.append(f"{key}/{slot}: {', '.join(report['errors'])}")
+            if slot == "production" and report["warnings"]:
+                failures.append(
+                    f"{key}/{slot}: warnings {', '.join(report['warnings'])}"
+                )
 
     actual_files = {
         path.resolve()
-        for path in ROW_DIR.glob("*/*.png")
-        if path.parent.name != "proofs"
+        for path in ROW_DIR.rglob("*.png")
+        if path.relative_to(ROW_DIR).parts[0] != "proofs"
     }
-    extras = sorted(actual_files - declared_files)
+    extras = sorted(actual_files - set(declared_owners))
     for path in extras:
         failures.append(f"unmanifested row: {path.relative_to(ROOT)}")
 
     if failures:
         raise SystemExit("\n".join(f"[sprite-workbench] ERROR {failure}" for failure in failures))
-    print(f"[sprite-workbench] verified {accepted} accepted row override(s)")
+    print(
+        "[sprite-workbench] verified manifest v2: "
+        f"{accepted} production override(s), {candidates} candidate(s)"
+    )
 
 
 def show_status(_args: argparse.Namespace) -> None:
     manifest = load_manifest()
     accepted = {
-        key: value
-        for key, value in manifest["rows"].items()
-        if value.get("status") == "accepted"
+        key: production_item(manifest, key)
+        for key in manifest["rows"]
+        if production_item(manifest, key)
+    }
+    candidates = {
+        key: candidate_item(manifest, key)
+        for key in manifest["rows"]
+        if candidate_item(manifest, key)
     }
     print(f"accepted overrides: {len(accepted)} / {len(ROLES) * len(ACTIONS) * len(DIRS)}")
     for key, item in sorted(accepted.items()):
         quality = item.get("quality", {})
         print(
             f"- {key}: status={item.get('status')} flicker={quality.get('flickerScore', '?')} "
+            f"warnings={','.join(quality.get('warnings', [])) or 'none'} "
+            f"source={item.get('provenance', 'unknown')}"
+        )
+    print(f"review candidates: {len(candidates)}")
+    for key, item in sorted(candidates.items()):
+        quality = item.get("quality", {})
+        runtime = "LOCKED" if key in accepted else "BASE"
+        print(
+            f"- {key}: status=candidate runtime={runtime} "
             f"warnings={','.join(quality.get('warnings', [])) or 'none'} "
             f"source={item.get('provenance', 'unknown')}"
         )
@@ -1281,6 +1636,41 @@ def main() -> None:
     stage.add_argument("--provenance", required=True)
     stage.add_argument("--note")
     stage.set_defaults(func=stage_row)
+
+    promote = sub.add_parser(
+        "promote",
+        help="promote the hash-verified candidate into production and clear its review slot",
+    )
+    target_args(promote)
+    promote.add_argument("--note")
+    promote.set_defaults(func=promote_candidate)
+
+    promote_role = sub.add_parser(
+        "promote-family",
+        help="promote every staged row for a role/action set in one manifest transaction",
+    )
+    promote_role.add_argument("--role", required=True, choices=ROLES)
+    promote_role.add_argument(
+        "--actions",
+        nargs="+",
+        choices=ACTIONS,
+        help="actions to promote; defaults to idle walk work carry",
+    )
+    promote_role.add_argument("--note")
+    promote_role.set_defaults(func=promote_family)
+
+    reject = sub.add_parser(
+        "reject",
+        help="remove a candidate without changing its production or base runtime source",
+    )
+    target_args(reject)
+    reject.set_defaults(func=reject_candidate)
+
+    migrate = sub.add_parser(
+        "migrate-manifest",
+        help="rewrite a v1 actor-row manifest into the v2 production/candidate slot schema",
+    )
+    migrate.set_defaults(func=migrate_manifest)
 
     extract = sub.add_parser("extract")
     target_args(extract)

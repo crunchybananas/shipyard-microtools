@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { normalizeActorRowManifest } from './actor-row-manifest.mjs';
 import {
   ACTIONS,
   ACTOR_BASE_DIRNAME,
@@ -33,7 +34,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=173';
+} from '../js/sprite-source-contract.js?realm=174';
 
 const execFileAsync = promisify(execFile);
 
@@ -121,24 +122,23 @@ async function assertNoRetiredCombinedSources() {
 }
 
 async function loadRowOverrides() {
-  let manifest;
+  let rawManifest;
   try {
-    manifest = JSON.parse(await readFile(ACTOR_ROW_MANIFEST_PATH, 'utf8'));
+    rawManifest = JSON.parse(await readFile(ACTOR_ROW_MANIFEST_PATH, 'utf8'));
   } catch (err) {
     if (err.code === 'ENOENT') return new Map();
     throw err;
   }
-  if (manifest.version !== 1 || !manifest.rows || typeof manifest.rows !== 'object') {
-    throw new Error(`${relative(ROOT, ACTOR_ROW_MANIFEST_PATH)} must contain version 1 row metadata`);
-  }
+  const manifest = normalizeActorRowManifest(
+    rawManifest,
+    relative(ROOT, ACTOR_ROW_MANIFEST_PATH),
+  );
 
   const rowRoot = `${resolve(ACTOR_ROW_DIR)}${sep}`;
   const byRole = new Map(ROLES.map((role) => [role, []]));
-  for (const [key, item] of Object.entries(manifest.rows)) {
-    if (!['candidate', 'accepted'].includes(item.status)) {
-      throw new Error(`${key} has unsupported row status ${JSON.stringify(item.status)}; use candidate or accepted`);
-    }
-    if (item.status !== 'accepted') continue;
+  for (const [key, slots] of Object.entries(manifest.rows)) {
+    const item = slots.production;
+    if (!item) continue;
     const [role, action, dir, ...rest] = key.split('/');
     if (rest.length || !ROLES.includes(role) || !ACTIONS.includes(action) || !DIRS.includes(dir)) {
       throw new Error(`invalid accepted actor row key: ${key}`);

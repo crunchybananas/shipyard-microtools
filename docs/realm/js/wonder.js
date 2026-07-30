@@ -9,12 +9,12 @@
 // building) so raiders can level the site without erasing the work.
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=173';
-import { chronicle } from './log.js?realm=173';
-import { announce as notify } from './log.js?realm=173';
-import { sfx as playSound } from './log.js?realm=173';
-import { emit } from './bus.js?realm=173';
-import { staffingCount } from './citizen-ownership.js?realm=173';
+import { G } from './state.js?realm=174';
+import { chronicle } from './log.js?realm=174';
+import { announce as notify } from './log.js?realm=174';
+import { sfx as playSound } from './log.js?realm=174';
+import { emit } from './bus.js?realm=174';
+import { staffingCount } from './citizen-ownership.js?realm=174';
 
 export const WONDER_STAGES = [
   { name: 'The Foundations',  bill: { stone: 200, wood: 100 } },

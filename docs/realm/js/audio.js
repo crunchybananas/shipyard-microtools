@@ -2,8 +2,8 @@
 // Web Audio — SFX + seasonal ambient soundscape
 // ════════════════════════════════════════════════════════════
 
-import { G } from './state.js?realm=173';
-import { on } from './bus.js?realm=173';
+import { G } from './state.js?realm=174';
+import { on } from './bus.js?realm=174';
 
 const AUDIO_PREF_KEY = 'realm-audio-muted-v1';
 

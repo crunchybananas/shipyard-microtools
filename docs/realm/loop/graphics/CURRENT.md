@@ -1,5 +1,46 @@
 # Current Graphics Handoff
 
+## Realm 174 candidate-safe actor row manifest — 2026-07-30
+
+- The actor-row manifest is now version `2`. Every logical
+  `role/action/direction` key has independent `production` and `candidate`
+  slots, so staging replacement art can no longer delete the hash-locked row
+  used by the production atlas.
+- All `191` existing production overrides migrated without moving or changing
+  a source file. A clean atlas rebuild after migration retained the exact same
+  SHA-256 hashes for the `27x35`, `35x46`, `54x70`, and `64x84` atlases.
+- New candidates live under `actor-rows/candidates/<role>/`. Newly promoted
+  sources use content-addressed filenames under
+  `actor-rows/production/<role>/`; manifest writes use atomic replacement.
+- The workbench now supports candidate rejection, exact single-row promotion,
+  and an atomic `promote-family` command. Family promotion validates every
+  requested row before changing any production authority. The isolated
+  verifier proves v1 migration, staging, rejection, family promotion,
+  candidate hash corruption rejection, and unchanged runtime crops.
+- The full A5 guard family is now staged through the canonical workflow:
+  `16` clean candidates, `12` coexisting with locked runtime rows and `4`
+  retaining base runtime rows. The earlier A4 candidate files were replaced;
+  no production row was displaced.
+- Sprite Lab loads v1 or v2 manifests, draws the candidate row for inspection,
+  and separately labels the actual runtime authority as `LOCKED` or `BASE`.
+  Browser verification proves all `16` candidates are visible and hash
+  matched while an ordinary game loads zero candidate assets.
+
+Validation run:
+
+```sh
+node scripts/verify-actor-row-manifest-v2.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-sprite-source-contract.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+```
+
+Next target: inspect the A5 idle/walk/work/carry transitions at close game zoom
+and replace the generic baked-crate assumption with explicit
+resource-specific cargo semantics. Then promote the complete guard family in
+one transaction or revise its modular source once.
+
 ## Realm 173 A5 complete modular guard action family — 2026-07-30
 
 - The guard now has one coherent offline authoring system for all `16` runtime

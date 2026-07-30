@@ -8,7 +8,7 @@ import {
   AMBIENT,
   AMBIENT_SHEET_W,
   AMBIENT_SHEET_H,
-} from './sprite-source-contract.js?realm=173';
+} from './sprite-source-contract.js?realm=174';
 
 const STORE_KEY = 'realm-sprite-lab-review-v1';
 const QUERY = new URLSearchParams(location.search);
@@ -50,7 +50,7 @@ let lastAnimAt = 0;
 let imageCache = new Map();
 let reviews = new Map();
 let currentMetrics = null;
-let rowManifest = { version: 1, rows: {} };
+let rowManifest = { version: 2, rows: {} };
 
 export function initSpriteLab() {
   const root = document.getElementById('sprite-lab');
@@ -573,6 +573,9 @@ function renderMetrics() {
 function renderProvenance() {
   if (!els.provenance) return;
   if (state.kind !== 'actor') {
+    document.body.dataset.spriteReviewSource = 'ambient';
+    document.body.dataset.spriteRuntimeSource = 'ambient';
+    delete document.body.dataset.spriteCandidateFile;
     els.provenance.innerHTML = `
       <div class="sl-provenance-head">
         <strong>${escapeHtml(titleCase(state.ambient))}</strong>
@@ -584,6 +587,13 @@ function renderProvenance() {
   }
   const source = sourceForRow(state.role, state.action, state.dir);
   const item = source.item;
+  document.body.dataset.spriteReviewSource = source.status;
+  document.body.dataset.spriteRuntimeSource = source.runtimeStatus;
+  if (source.status === 'candidate' && item?.file) {
+    document.body.dataset.spriteCandidateFile = item.file;
+  } else {
+    delete document.body.dataset.spriteCandidateFile;
+  }
   if (!item) {
     els.provenance.innerHTML = `
       <div class="sl-provenance-head">
@@ -596,16 +606,23 @@ function renderProvenance() {
   }
   const quality = item.quality || {};
   const warnings = quality.warnings?.length ? quality.warnings.join(', ') : 'none';
+  const timestamp = source.status === 'candidate'
+    ? item.stagedAt || 'unknown'
+    : item.acceptedAt || 'unknown';
+  const timestampLabel = source.status === 'candidate' ? 'Staged' : 'Accepted';
   els.provenance.innerHTML = `
     <div class="sl-provenance-head">
       <strong>${escapeHtml(state.role)} / ${escapeHtml(state.action)} / ${escapeHtml(state.dir)}</strong>
       <span class="sl-source-badge ${escapeAttr(source.status)}">${escapeHtml(source.label)}</span>
+      ${source.status === 'candidate'
+        ? `<span class="sl-source-badge ${escapeAttr(source.runtimeStatus)}">runtime ${escapeHtml(source.runtimeLabel)}</span>`
+        : ''}
     </div>
     <dl>
       <dt>Source</dt><dd>${escapeHtml(item.provenance || 'unknown')}</dd>
       <dt>Flicker</dt><dd>${escapeHtml(quality.flickerScore ?? 'n/a')}</dd>
       <dt>Warnings</dt><dd title="${escapeAttr(warnings)}">${escapeHtml(warnings)}</dd>
-      <dt>Accepted</dt><dd>${escapeHtml(item.acceptedAt || 'unknown')}</dd>
+      <dt>${timestampLabel}</dt><dd>${escapeHtml(timestamp)}</dd>
       <dt>Hash</dt><dd title="${escapeAttr(item.sha256 || '')}">${escapeHtml((item.sha256 || '').slice(0, 12))}</dd>
     </dl>
     ${item.note ? `<div class="sl-provenance-note">${escapeHtml(item.note)}</div>` : ''}
@@ -964,20 +981,55 @@ async function loadRowManifest() {
     const response = await fetch(cacheBustAsset('assets/sprites/actor-rows/manifest.json'), { cache: 'no-store' });
     if (!response.ok) throw new Error(`manifest ${response.status}`);
     const data = await response.json();
-    if (data?.version === 1 && data.rows) rowManifest = data;
+    if ([1, 2].includes(data?.version) && data.rows) rowManifest = data;
   } catch (_err) {
-    rowManifest = { version: 1, rows: {} };
+    rowManifest = { version: 2, rows: {} };
   }
   renderList();
   renderProvenance();
 }
 
 function sourceForRow(role, action, dir) {
-  const item = rowManifest.rows?.[`${role}/${action}/${dir}`] || null;
-  if (!item) return { status: 'base', label: 'BASE', item: null };
-  if (item.status === 'accepted') return { status: 'accepted', label: 'LOCKED', item };
-  if (item.status === 'candidate') return { status: 'candidate', label: 'CANDIDATE', item };
-  return { status: 'base', label: 'BASE', item: null };
+  const entry = rowManifest.rows?.[`${role}/${action}/${dir}`] || null;
+  let production = null;
+  let candidate = null;
+  if (rowManifest.version === 1 && entry) {
+    if (entry.status === 'accepted') production = entry;
+    if (entry.status === 'candidate') candidate = entry;
+  } else if (entry) {
+    production = entry.production || null;
+    candidate = entry.candidate || null;
+  }
+  const runtimeStatus = production ? 'accepted' : 'base';
+  const runtimeLabel = production ? 'LOCKED' : 'BASE';
+  if (candidate) {
+    return {
+      status: 'candidate',
+      label: 'CANDIDATE',
+      item: candidate,
+      production,
+      runtimeStatus,
+      runtimeLabel,
+    };
+  }
+  if (production) {
+    return {
+      status: 'accepted',
+      label: 'LOCKED',
+      item: production,
+      production,
+      runtimeStatus,
+      runtimeLabel,
+    };
+  }
+  return {
+    status: 'base',
+    label: 'BASE',
+    item: null,
+    production: null,
+    runtimeStatus,
+    runtimeLabel,
+  };
 }
 
 function copyWorkOrder() {
