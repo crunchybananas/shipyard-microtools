@@ -1,0 +1,267 @@
+{
+  "schema": "realm.actor-pose.a10-blacksmith-actions.v1",
+  "stage": "blacksmith-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "smith",
+    "path": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith.png",
+    "sha256": "999f6288af69d95e5dd4f9a68864bbcb4fe5fb33b6579468a3195bd4751eda8c",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith-keyed.png",
+      "sha256": "0d686bcbfa3833f5d04a7d162764d40f4b0b555ed1a292d262017a3b7435ddee"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith.prompt.json",
+    "parts": {
+      "down": {
+        "head": [296, 12, 457, 225],
+        "torso": [270, 256, 575, 550],
+        "arm_screen_left": [118, 265, 240, 590],
+        "arm_screen_right": [1174, 265, 1294, 590],
+        "leg": [252, 586, 524, 978]
+      },
+      "up": {
+        "head": [572, 12, 738, 220],
+        "torso": [604, 260, 906, 550],
+        "arm_screen_left": [118, 265, 240, 590],
+        "arm_screen_right": [1174, 265, 1294, 590],
+        "leg": [596, 590, 738, 978]
+      },
+      "left": {
+        "head": [809, 12, 994, 225],
+        "torso": [935, 250, 1112, 550],
+        "arm": [1174, 265, 1294, 590],
+        "leg": [938, 588, 1098, 978]
+      },
+      "right": {
+        "head": [809, 12, 994, 225],
+        "torso": [935, 250, 1112, 550],
+        "arm": [1174, 265, 1294, 590],
+        "leg": [938, 588, 1098, 978]
+      }
+    }
+  },
+  "garment": {
+    "key": "ember-forge",
+    "path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge.png",
+    "sha256": "1a55655e3710153e650292ccf84cf5b7223463ed5da996c93a6bec3c560f54d7",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge-keyed.png",
+      "sha256": "53232bdb76a407df05cf7e457aeeb850d297956cd9ffc3adc71fd6f423ef25f4"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [280, 40, 460, 185],
+        "tunic": [232, 188, 510, 550],
+        "sleeve_screen_left": [94, 236, 210, 418],
+        "sleeve_screen_right": [1110, 236, 1224, 418],
+        "belt": [244, 566, 486, 630],
+        "boot": [242, 646, 490, 978]
+      },
+      "up": {
+        "headgear": [575, 40, 755, 195],
+        "tunic": [530, 188, 800, 550],
+        "sleeve_screen_left": [94, 236, 210, 418],
+        "sleeve_screen_right": [1110, 236, 1224, 418],
+        "belt": [546, 566, 778, 626],
+        "boot": [542, 646, 780, 978]
+      },
+      "left": {
+        "headgear": [850, 40, 1050, 190],
+        "tunic": [862, 188, 1038, 550],
+        "sleeve": [1110, 236, 1224, 418],
+        "belt": [856, 566, 1040, 640],
+        "boot": [864, 646, 1022, 978]
+      },
+      "right": {
+        "headgear": [850, 40, 1050, 190],
+        "tunic": [862, 188, 1038, 550],
+        "sleeve": [1110, 236, 1224, 418],
+        "belt": [856, 566, 1040, 640],
+        "boot": [864, 646, 1022, 978]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "smith-hammer",
+    "path": "assets/sprites/prototypes/actor-pose/references/a10-source/smith-hammer.png",
+    "sha256": "c7be710ee6ce7c955ba791c78a282a9cc8d9ef16f695a647e1d18edb970e4d12",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/smith-hammer-keyed.png",
+      "sha256": "6a9fa6ed81d70e9acd6a4d46ce44e3a03562afa5cf38f83e54b8058cbe44c62b"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a10-source/smith-hammer.prompt.json",
+    "parts": {
+      "down": [120, 150, 435, 880],
+      "up": [470, 150, 800, 880],
+      "left": [900, 150, 1070, 880],
+      "right": [1180, 150, 1420, 880]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "hammer head at top, handle end at bottom",
+      "grip_fraction_from_top": 0.68,
+      "render_height": 29,
+      "occlusion": "body < hammer < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "forge-anvil",
+    "path": "assets/sprites/prototypes/actor-pose/references/a10-source/forge-anvil.png",
+    "sha256": "4e78e47c052ff5fcd05631c68a4db9cd5610568e5d201bb150b34924c910bb1a",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/forge-anvil-keyed.png",
+      "sha256": "89f63990ae6e9cc18254a8e88781109255bab8d5b405b7b20932833cc482de1b"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a10-source/forge-anvil.prompt.json",
+    "parts": {
+      "down": [70, 290, 390, 740],
+      "up": [430, 290, 750, 740],
+      "left": [760, 290, 1120, 740],
+      "right": [1150, 290, 1515, 740]
+    },
+    "render": {
+      "down": {
+        "size": [25, 19],
+        "center": [32, 69],
+        "occlusion": "body < anvil < hammer < near hand"
+      },
+      "up": {
+        "size": [25, 19],
+        "center": [32, 56],
+        "occlusion": "anvil < body < hammer < near hand"
+      },
+      "left": {
+        "size": [27, 19],
+        "center": [17, 69],
+        "occlusion": "body < anvil < hammer < near hand"
+      },
+      "right": {
+        "size": [27, 19],
+        "center": [47, 69],
+        "occlusion": "body < anvil < hammer < near hand"
+      }
+    },
+    "authority": {
+      "ground_y": 79,
+      "strike_socket": "anvil_face",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and blacksmith work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and blacksmith work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "smith",
+    "build": "compact, sturdy, grounded master-blacksmith stance",
+    "identity_leg_far_width": 7,
+    "identity_leg_near_width": 8,
+    "garment_leg_far_width": 8.2,
+    "garment_leg_near_width": 9.2,
+    "upper_arm_far_width": 6.5,
+    "upper_arm_near_width": 7.5,
+    "forearm_far_width": 6,
+    "forearm_near_width": 6.8,
+    "identity_torso_size": [26, 32],
+    "garment_tunic_size": [30, 34],
+    "garment_belt_size": [27, 5],
+    "identity_head_size": [22, 24],
+    "garment_headgear_size": [28, 22]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": ["smith-hammer", "forge-anvil"],
+      "motion": "ready, set piece, draw back, raise, drive, anvil strike, rebound, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "hammer grip remains at the right-hand socket; the head travels toward the grounded anvil face at the strike beat"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "blacksmith",
+    "identity": "smith",
+    "garment": "ember-forge",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, forge hammer, and grounded anvil components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, hammer, and anvil are measured independently before the flattened row is accepted"
+  }
+}

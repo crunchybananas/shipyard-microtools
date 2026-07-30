@@ -1,5 +1,55 @@
 # Current Graphics Handoff
 
+## Realm 179 blacksmith production family — 2026-07-30
+
+- All `16` blacksmith rows now come from one deterministic A10 modular family:
+  a powerful middle-aged woman master-smith identity, charcoal/oxblood forge
+  clothing, one palette/lighting/root contract, four actions, and four
+  independently compiled directions.
+- The atomic promotion replaced all ten derivative blacksmith rows and filled
+  the six inherited gaps. Production now contains `224` accepted overrides
+  and `0` candidates, so every role/action/direction slot has an explicit
+  production row.
+- A10 keeps four image-generation authorities separate from animation:
+  identity parts, garment parts, a four-view cross-peen hammer, and a
+  four-view anvil on a grounded oak block. Keyed sources, transparent
+  sources, exact prompts, reference roles, chroma-removal settings, crop
+  boxes, and SHA-256 hashes are checked in.
+- The compiler emits `16` reviewable `512x84` rows / `128` frames plus body,
+  identity, garment, equipment, semantic, landmark, quality, palette, and
+  proof artifacts. Exact `27x35`, `35x46`, `54x70`, and `64x84` runtime tiers
+  remain binary-alpha, warning-free, palette-bounded, and byte deterministic.
+- Work now reads as forge work: eight planted beats move a socketed hammer
+  from ready through anvil strike and recovery while the direction-specific
+  anvil remains independently inspectable in the equipment plane.
+- `blacksmith/carry` joins guard, farmer, lumber, and builder as an explicit
+  baked-container owner. A6 proves
+  `5 roles × 9 resources × 4 directions = 180` production cargo pairs with
+  one frame, destination rectangle, runtime tier, and unsmoothed scale.
+- Browser gates cover all A10 rows at exact `3x`, action reset and cadence, an
+  assigned blacksmith in all four carry directions, iron payload alignment,
+  production-only atlas selection, and ordinary-world default-tier rendering.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a10_blacksmith_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a10_blacksmith_actions.py
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-blacksmith-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: replace derivative actor families with equally distinct modular
+identities, garments, and role equipment, then continue through world art.
+Full manifest coverage is not treated as proof that inherited visual design is
+finished.
+
 ## Realm 178 builder production family — 2026-07-30
 
 - All `16` builder rows now come from one deterministic A9 modular family:

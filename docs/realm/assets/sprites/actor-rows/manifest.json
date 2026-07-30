@@ -1,442 +1,706 @@
 {
   "rows": {
-    "blacksmith/carry/right": {
+    "blacksmith/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-18T20:58:01Z",
-        "file": "blacksmith/carry-right.png",
-        "note": "Promoted the inherited painted row after reversing its existing 7,6,5,4,3,2,1,0 frame order to match left-facing carry chronology; no pixels were repainted or rescaled.",
-        "provenance": "deterministic-frame-reversal",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/carry-down-60f6c0592955.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
-          "bodyBottomRange": 1,
+          "bodyBottomRange": 0,
           "bodyHeightRange": 2,
-          "bodyWidthRange": 10,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 79.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 34.0,
             "medianColor": [
-              73.3,
-              50.8,
-              37.25
+              73.2,
+              41.65,
+              29.15
             ],
-            "paletteDelta": 0.0
+            "paletteDelta": 4.47
           },
-          "flickerScore": 18.0,
-          "maxAlphaRatio": 1.116,
-          "maxBodyCenterJump": 2.12,
-          "maxEdgePixels": 17,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.034,
+          "maxBodyCenterJump": 2.0,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.75,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 36.0,
+          "maxPaletteDrift": 1.12,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            73.3,
-            50.8,
-            37.25
+            77.6,
+            41.85,
+            28.4
           ],
-          "medianColorCount": 334.5,
-          "medianShadingRatio": 0.6789,
+          "medianColorCount": 274.0,
+          "medianShadingRatio": 0.67,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "b8a52dd88a9bb50360dcf0e161c2f47c489d30a13a8bf3a4ea6f2ee31d4d7395",
+        "sha256": "60f6c0592955e632e8ef55e9057c59949f213742ec0ba8e75060ce23edfd0ed7",
+        "status": "accepted"
+      }
+    },
+    "blacksmith/carry/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/carry-left-9eac3a54bce7.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              76.6,
+              41.65,
+              28.7
+            ],
+            "paletteDelta": 3.43
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.089,
+          "maxBodyCenterJump": 2.21,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 3.07,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            73.2,
+            41.65,
+            29.15
+          ],
+          "medianColorCount": 268.5,
+          "medianShadingRatio": 0.6808,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "9eac3a54bce768608e5a63ceac6847d31babdcd75cae42f8ee85651d13ad4761",
+        "status": "accepted"
+      }
+    },
+    "blacksmith/carry/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/carry-right-49f783626a49.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              76.6,
+              41.65,
+              28.7
+            ],
+            "paletteDelta": 3.58
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.087,
+          "maxBodyCenterJump": 2.12,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.85,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
+          "medianColor": [
+            73.05,
+            41.65,
+            29.15
+          ],
+          "medianColorCount": 274.0,
+          "medianShadingRatio": 0.6743,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "49f783626a496292235116b6283539f324fa80a1bfc218ba11fa060d1255859e",
+        "status": "accepted"
+      }
+    },
+    "blacksmith/carry/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/carry-up-5670c083e2c3.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
+            "medianColor": [
+              73.2,
+              41.65,
+              29.15
+            ],
+            "paletteDelta": 3.51
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.036,
+          "maxBodyCenterJump": 1.84,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.16,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            76.6,
+            40.9,
+            28.7
+          ],
+          "medianColorCount": 263.0,
+          "medianShadingRatio": 0.7015,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "5670c083e2c33af253d7364385af12b22fc338d633c8cf542d8b4f1db2abdab1",
         "status": "accepted"
       }
     },
     "blacksmith/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:19Z",
-        "file": "blacksmith/idle-down.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/idle-down-b73ba38dca64.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 79.5,
-            "medianBodyWidth": 29.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              73.8,
-              51.25,
-              37.55
+              70.2,
+              39.85,
+              28.8
             ],
-            "paletteDelta": 9.28
+            "paletteDelta": 1.77
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.014,
-          "maxBodyCenterJump": 0.54,
-          "maxEdgePixels": 11,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.055,
+          "maxBodyCenterJump": 2.14,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.14,
-          "medianBodyHeight": 78.5,
-          "medianBodyWidth": 34.0,
+          "maxPaletteDrift": 0.83,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            80.7,
-            56.15,
-            41.35
+            70.35,
+            38.3,
+            27.95
           ],
-          "medianColorCount": 314.0,
-          "medianShadingRatio": 0.6806,
+          "medianColorCount": 257.0,
+          "medianShadingRatio": 0.6756,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2f0db7ee54b6a66568e35614d6ff72be2b093061e8f82dc11f53d1e380619d21",
+        "sha256": "b73ba38dca64c521ef872082f8ffdc1f5aaa97fcd978a9b1075760033119b3ac",
         "status": "accepted"
       }
     },
     "blacksmith/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:21Z",
-        "file": "blacksmith/idle-left.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/idle-left-991bc9628373.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 78.5,
-            "medianBodyWidth": 34.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              73.8,
-              51.25,
-              37.55
+              70.2,
+              38.3,
+              27.95
             ],
-            "paletteDelta": 0.0
+            "paletteDelta": 1.82
           },
-          "flickerScore": 2.0,
+          "flickerScore": 4.0,
           "maxAlphaRatio": 1.018,
-          "maxBodyCenterJump": 0.49,
-          "maxEdgePixels": 16,
+          "maxBodyCenterJump": 0.71,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.68,
-          "medianBodyHeight": 79.5,
-          "medianBodyWidth": 29.0,
+          "maxPaletteDrift": 0.9,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            73.8,
-            51.25,
-            37.55
+            70.5,
+            39.85,
+            28.85
           ],
-          "medianColorCount": 304.5,
-          "medianShadingRatio": 0.6843,
+          "medianColorCount": 267.5,
+          "medianShadingRatio": 0.6627,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ddb14438d8ae7a332c81da042d2d89e6e705c50f915fa209de0f6e68a5a4919c",
+        "sha256": "991bc96283736b17cc908fe1bbddc3a7c899b0287b72a4aea3b8220e19fc151c",
         "status": "accepted"
       }
     },
     "blacksmith/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:22Z",
-        "file": "blacksmith/idle-right.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/idle-right-bb66c14bb032.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 78.5,
-            "medianBodyWidth": 34.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              73.8,
-              51.25,
-              37.55
+              70.35,
+              38.3,
+              27.95
             ],
-            "paletteDelta": 0.0
+            "paletteDelta": 1.77
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.018,
-          "maxBodyCenterJump": 0.49,
-          "maxEdgePixels": 16,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.69,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.68,
-          "medianBodyHeight": 79.5,
-          "medianBodyWidth": 29.0,
+          "maxPaletteDrift": 0.9,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            73.8,
-            51.25,
-            37.55
+            70.2,
+            39.85,
+            28.8
           ],
-          "medianColorCount": 304.5,
-          "medianShadingRatio": 0.6843,
+          "medianColorCount": 265.5,
+          "medianShadingRatio": 0.6697,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "690808de5ae9e25aadf99b6f9319405f367dce893d2e08e83ce96795daf0b506",
+        "sha256": "bb66c14bb0325e8ac14a367f958866aa76f2eefaaca719822dd5d416815d69b8",
         "status": "accepted"
       }
     },
     "blacksmith/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:20Z",
-        "file": "blacksmith/idle-up.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/idle-up-56104cc303b6.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 79.5,
-            "medianBodyWidth": 29.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              73.8,
-              51.25,
-              37.55
+              70.35,
+              39.85,
+              28.8
             ],
-            "paletteDelta": 4.52
+            "paletteDelta": 2.44
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.015,
-          "maxBodyCenterJump": 0.54,
-          "maxEdgePixels": 11,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.055,
+          "maxBodyCenterJump": 2.2,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.14,
-          "medianBodyHeight": 78.5,
-          "medianBodyWidth": 34.0,
+          "maxPaletteDrift": 0.85,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            71.55,
-            48.4,
-            34.85
+            70.1,
+            37.6,
+            27.9
           ],
-          "medianColorCount": 313.0,
-          "medianShadingRatio": 0.7184,
+          "medianColorCount": 240.0,
+          "medianShadingRatio": 0.6849,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "856c74c5fddece1db744ba0846fd12f77a72833390f1f74446ca4aaec02426d0",
+        "sha256": "56104cc303b62770c61f8f2c044da3cd4214ad6f5ede36bf0dc8c5ecbdc827be",
+        "status": "accepted"
+      }
+    },
+    "blacksmith/walk/down": {
+      "production": {
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/walk-down-9e05b607cf5d.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              70.0,
+              39.65,
+              28.95
+            ],
+            "paletteDelta": 1.8
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.03,
+          "maxBodyCenterJump": 1.85,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 0.55,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            70.35,
+            38.2,
+            27.95
+          ],
+          "medianColorCount": 259.0,
+          "medianShadingRatio": 0.6718,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "9e05b607cf5d35a7b3e7b14b42357812074af27547d66006c3b8ac459f475d0f",
+        "status": "accepted"
+      }
+    },
+    "blacksmith/walk/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/walk-left-63eaebb34cff.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
+            "medianColor": [
+              70.0,
+              38.2,
+              27.95
+            ],
+            "paletteDelta": 1.77
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.091,
+          "maxBodyCenterJump": 2.45,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.09,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            70.15,
+            39.65,
+            28.95
+          ],
+          "medianColorCount": 260.5,
+          "medianShadingRatio": 0.67,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "63eaebb34cff908d2eb7b0162d20fdfef3b76fe858d28387e7004e3223119e71",
         "status": "accepted"
       }
     },
     "blacksmith/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-18T20:58:00Z",
-        "file": "blacksmith/walk-right.png",
-        "note": "Promoted the inherited painted row after reversing its existing 7,6,5,4,3,2,1,0 frame order to match left-facing walk chronology; no pixels were repainted or rescaled.",
-        "provenance": "deterministic-frame-reversal",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/walk-right-2cb57a182bff.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
-          "bodyBottomRange": 1,
+          "bodyBottomRange": 0,
           "bodyHeightRange": 2,
-          "bodyWidthRange": 10,
+          "bodyWidthRange": 2,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 79.0,
-            "medianBodyWidth": 34.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              73.3,
-              50.8,
-              37.25
+              70.15,
+              38.2,
+              27.95
             ],
-            "paletteDelta": 0.0
+            "paletteDelta": 1.77
           },
-          "flickerScore": 18.0,
-          "maxAlphaRatio": 1.116,
-          "maxBodyCenterJump": 2.12,
-          "maxEdgePixels": 17,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.09,
+          "maxBodyCenterJump": 2.46,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.75,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 36.0,
+          "maxPaletteDrift": 5.06,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            73.3,
-            50.8,
-            37.25
+            70.0,
+            39.65,
+            28.95
           ],
-          "medianColorCount": 334.5,
-          "medianShadingRatio": 0.6789,
+          "medianColorCount": 266.0,
+          "medianShadingRatio": 0.6699,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "b8a52dd88a9bb50360dcf0e161c2f47c489d30a13a8bf3a4ea6f2ee31d4d7395",
+        "sha256": "2cb57a182bff61cada81b49333577ff3d8cbb44fdbcb3a77947e90e4f17d8b34",
+        "status": "accepted"
+      }
+    },
+    "blacksmith/walk/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/walk-up-49fa9ab99e53.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              70.15,
+              39.65,
+              28.95
+            ],
+            "paletteDelta": 2.52
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.042,
+          "maxBodyCenterJump": 2.08,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 0.71,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
+          "medianColor": [
+            69.85,
+            37.4,
+            27.85
+          ],
+          "medianColorCount": 242.5,
+          "medianShadingRatio": 0.6859,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "49fa9ab99e5365173288e6da857b20d3a6ead221045ed31d160f8093d1865c72",
         "status": "accepted"
       }
     },
     "blacksmith/work/down": {
       "production": {
-        "acceptedAt": "2026-07-09T18:24:16Z",
-        "file": "blacksmith/work-down.png",
-        "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
-        "provenance": "mechanical-walk-derived-work-rhythm",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/work-down-85937f3d8f2b.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 2.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 77.5,
-            "medianBodyWidth": 34.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 9.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.0,
             "medianColor": [
-              70.65,
-              49.4,
-              36.5
+              74.8,
+              44.9,
+              31.15
             ],
-            "paletteDelta": 11.21
+            "paletteDelta": 7.41
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.098,
-          "maxBodyCenterJump": 1.03,
-          "maxEdgePixels": 4,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 1.0,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.99,
-          "medianBodyHeight": 75.5,
-          "medianBodyWidth": 35.0,
+          "maxPaletteDrift": 4.21,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            78.8,
-            55.5,
-            41.2
+            81.7,
+            47.15,
+            32.65
           ],
-          "medianColorCount": 319.5,
-          "medianShadingRatio": 0.6637,
+          "medianColorCount": 341.0,
+          "medianShadingRatio": 0.6676,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "3f5a1bc5d70ca550c5500b77f2ac68cb7ccef536b68fff83322eb4dfa6bb484c",
+        "sha256": "85937f3d8f2b086e1b0f5840dee599810676708bef6b92c4be9ceecce585b92b",
         "status": "accepted"
       }
     },
     "blacksmith/work/left": {
       "production": {
-        "acceptedAt": "2026-07-09T18:24:17Z",
-        "file": "blacksmith/work-left.png",
-        "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
-        "provenance": "mechanical-walk-derived-work-rhythm",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/work-left-7fe4712aaa0f.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 76.5,
-            "medianBodyWidth": 34.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 9.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              70.65,
-              49.4,
-              36.5
+              74.8,
+              44.9,
+              31.15
             ],
-            "paletteDelta": 2.67
+            "paletteDelta": 0.43
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.088,
-          "maxBodyCenterJump": 1.06,
-          "maxEdgePixels": 17,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.017,
+          "maxBodyCenterJump": 0.63,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.33,
-          "medianBodyHeight": 77.5,
-          "medianBodyWidth": 35.0,
+          "maxPaletteDrift": 4.13,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 39.0,
           "medianColor": [
-            72.7,
-            50.75,
-            37.55
+            75.2,
+            44.95,
+            31.3
           ],
-          "medianColorCount": 325.0,
-          "medianShadingRatio": 0.6988,
+          "medianColorCount": 347.5,
+          "medianShadingRatio": 0.6562,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "c844601b2b04a3382f5fa0262e9c1b847a2caaece1d77c7825ce7485f8e7e92c",
+        "sha256": "7fe4712aaa0f6ba633a4394895d37f8357a61a716387b9a36af8edb611fa60de",
         "status": "accepted"
       }
     },
     "blacksmith/work/right": {
       "production": {
-        "acceptedAt": "2026-07-09T18:24:18Z",
-        "file": "blacksmith/work-right.png",
-        "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
-        "provenance": "mechanical-walk-derived-work-rhythm",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/work-right-599be679a3b9.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 3.0,
-            "medianBodyHeight": 76.5,
-            "medianBodyWidth": 35.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 9.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              72.7,
-              50.75,
-              37.55
+              75.2,
+              44.95,
+              31.3
             ],
-            "paletteDelta": 2.67
+            "paletteDelta": 0.43
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.088,
-          "maxBodyCenterJump": 1.0,
-          "maxEdgePixels": 16,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.024,
+          "maxBodyCenterJump": 0.62,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.36,
-          "medianBodyHeight": 77.5,
-          "medianBodyWidth": 32.0,
+          "maxPaletteDrift": 4.21,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 39.0,
           "medianColor": [
-            70.65,
-            49.4,
-            36.5
+            74.8,
+            44.9,
+            31.15
           ],
-          "medianColorCount": 310.0,
-          "medianShadingRatio": 0.6758,
+          "medianColorCount": 347.5,
+          "medianShadingRatio": 0.6572,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ec58cbbfccbd68984eca09b683fcde2c44993ab5ab6ab6700aaac70b2d2094d2",
+        "sha256": "599be679a3b9c13c1c5dfd8402b0419b44eb6bb668cf028143dd8f47eeb21330",
         "status": "accepted"
       }
     },
     "blacksmith/work/up": {
       "production": {
-        "acceptedAt": "2026-07-09T18:24:16Z",
-        "file": "blacksmith/work-up.png",
-        "note": "Derived from the blacksmith\u2019s canonical direction-specific walk palette and recomposed into a feet-anchored forge rhythm; every direction now shares compatible body scale and palette.",
-        "provenance": "mechanical-walk-derived-work-rhythm",
+        "acceptedAt": "2026-07-30T08:12:32Z",
+        "file": "production/blacksmith/work-up-f167c9fba10e.png",
+        "note": "Promote complete A10 modular blacksmith family",
+        "provenance": "a10-modular-blacksmith-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 77.5,
-            "medianBodyWidth": 35.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 9.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.0,
             "medianColor": [
-              72.7,
-              50.75,
-              37.55
+              75.2,
+              44.95,
+              31.3
             ],
-            "paletteDelta": 4.43
+            "paletteDelta": 4.49
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.103,
-          "maxBodyCenterJump": 1.09,
-          "maxEdgePixels": 11,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 1.66,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.04,
-          "medianBodyHeight": 76.5,
-          "medianBodyWidth": 34.0,
+          "maxPaletteDrift": 3.85,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            70.4,
-            48.1,
-            34.85
+            73.9,
+            41.0,
+            29.6
           ],
-          "medianColorCount": 299.0,
-          "medianShadingRatio": 0.7207,
+          "medianColorCount": 310.0,
+          "medianShadingRatio": 0.6836,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "797dab6c247bad53f97d92997258d89201444b1fc0a191492107b6f983291db8",
+        "sha256": "f167c9fba10eb1226ad1e5c0495d625f74d3346ee2c54ca217c1500d0e850b45",
         "status": "accepted"
       }
     },
@@ -9542,6 +9806,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T07:30:40Z",
+  "updatedAt": "2026-07-30T08:12:32Z",
   "version": 2
 }

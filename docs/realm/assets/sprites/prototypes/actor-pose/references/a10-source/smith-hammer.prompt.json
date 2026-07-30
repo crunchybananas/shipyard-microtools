@@ -1,0 +1,46 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "smith-hammer",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_DRenWy6BHtrHVC2jyZeCIdpx.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet-keyed.png",
+      "role": "edit target and exact four-view board layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a7-source/farmer-hoe-keyed.png",
+      "role": "established Realm long-tool rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a5-source/guard-short-sword-keyed.png",
+      "role": "second established Realm modular tool rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge-keyed.png",
+      "role": "new blacksmith costume palette and style reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite tool source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into exactly four isolated orthographic views of the SAME practical medieval blacksmith's cross-peen forging hammer, preserving the exact four-object board layout, canvas, spacing, source orientation, painted resolution, and polish. Replace every builder mallet consistently. The forging hammer has a medium-short straight worn hickory handle, a compact dark forged-steel rectangular striking face on one side, and a restrained cross-peen wedge on the other. It must read immediately as a one-handed smithing hammer when reduced to roughly 24–30 pixels tall; it is a working tool, not a weapon or long construction mallet.\nInput images: Image 1 is the edit target and exact four-view board layout/source-orientation reference. Images 2 and 3 are established Realm modular tool rendering references. Image 4 is the new blacksmith costume palette/style reference. Do not retain the builder mallet's huge wooden head and do not copy the hoe or sword shape.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm hickory highlights, dark readable steel clusters, no photorealism, no blur, no dither, no soft shadow.\nComposition/framing: Keep the 1536x1024 landscape source board and exactly four full uncropped hammer views in one horizontal row with large equal gaps and generous padding. From left to right: broad striking-face/front view, reverse/cross-peen view, left edge/profile view, right edge/profile view. Every hammer vertical with the steel head at the top and handle end at the bottom. All four hammers must have the same medium-short overall length and compact head size, occupying about two-thirds of the source tool height used by Image 1 while remaining centered vertically. Exactly four objects and no labels.\nLighting/mood: fixed upper-left warm forge light identical to the actor and costume sources.\nColor palette: warm medium-brown hickory handle, dark charcoal forged steel, restrained orange-gold reflected forge highlight and pale steel edge; do not use magenta or bright pink anywhere in the hammer.\nMaterials/textures: subtle handle grain and grip wear, compact hammer-forged steel texture, no decorative carving.\nConstraints: replace every mallet with the same hammer identity; identical tool construction, straight handle, compact steel head, striking face, cross-peen, scale, and length across all views; each object fully separated from every other object and all canvas edges; preserve the exact canvas and four-object arrangement; background one uniform #ff00ff with no shadows, gradients, texture, reflections, floor plane, lighting variation, border, labels, or guides; crisp silhouettes; no cast shadow; no contact shadow; no text; no watermark; no hands; no character; no scenery; no extra tools; no logos.\nAvoid: wooden mallet head, long sledgehammer, axe, blade, hoe, sword, spear, pickaxe, warhammer, ornate fantasy weapon, modern rubber or fiberglass, multiple different hammers, isometric angle, perspective distortion, blur, antialiased haze, magenta fringe.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#fa05ee"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a10-source/smith-hammer-keyed.png",
+  "keyed_sha256": "6a9fa6ed81d70e9acd6a4d46ce44e3a03562afa5cf38f83e54b8058cbe44c62b",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a10-source/smith-hammer.png",
+  "alpha_sha256": "c7be710ee6ce7c955ba791c78a282a9cc8d9ef16f695a647e1d18edb970e4d12"
+}

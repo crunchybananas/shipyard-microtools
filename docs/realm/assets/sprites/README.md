@@ -90,8 +90,8 @@ from the production atlas while the style is being established.
 
 This A3 output is retained as provenance for the first factorial source test.
 Its former single-row guard candidate and preview URL have been retired. The
-  complete A5 guard, A7 farmer, A8 lumber, and A9 builder families supersede
-  it in production.
+  complete A5 guard, A7 farmer, A8 lumber, A9 builder, and A10 blacksmith
+  families supersede it in production.
 
 ## Complete Modular Actor Families
 
@@ -106,16 +106,20 @@ Its former single-row guard candidate and preview URL have been retired. The
 - A9 compiles the builder from a distinct master-mason identity, sandstone
   and terracotta workwear, a four-view construction mallet, and the shared
   directional cargo crate across all four actions and directions.
+- A10 compiles the blacksmith from a distinct powerful woman master-smith
+  identity, charcoal and oxblood forge clothing, a four-view cross-peen
+  hammer, a separately authored grounded anvil, and the shared directional
+  cargo crate across all four actions and directions.
 - Each family emits 16 independent `512x84` rows, 128 frames, semantic and
   equipment planes, landmarks, body-only proofs, a family contact sheet, and
   four exact runtime tiers.
-- All four compilers require binary runtime alpha, a shared 48-color family
+- All five compilers require binary runtime alpha, a shared 48-color family
   palette, stable `76px` body height, ground row `79`, clear rows `80–83`,
   distinct directions, clean row-quality reports, and a byte-identical clean
   rebuild.
-- `guard/carry`, `farmer/carry`, `lumber/carry`, and `builder/carry` own their baked
-  containers. A6 supplies the
-  nine resource-specific payloads at the same tier, frame, and destination
+- `guard/carry`, `farmer/carry`, `lumber/carry`, `builder/carry`, and
+  `blacksmith/carry` own their baked containers. A6 supplies the nine
+  resource-specific payloads at the same tier, frame, and destination
   rectangle; the procedural fallback is suppressed only for those owners.
 
 Verification:
@@ -127,10 +131,13 @@ python3 scripts/actor-pose-prototype/a8_lumber_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a8_lumber_actions.py
 python3 scripts/actor-pose-prototype/a9_builder_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a9_builder_actions.py
+python3 scripts/actor-pose-prototype/a10_blacksmith_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a10_blacksmith_actions.py
 scripts/sprite-row verify
 node scripts/verify-farmer-vertical-slice.mjs
 node scripts/verify-lumber-vertical-slice.mjs
 node scripts/verify-builder-vertical-slice.mjs
+node scripts/verify-blacksmith-vertical-slice.mjs
 node scripts/verify-guard-cargo-browser.mjs
 ```
 

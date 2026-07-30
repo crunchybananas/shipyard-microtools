@@ -1,0 +1,42 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "forge-anvil",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_tP0roI7zqyV6Z33LZ3tv65OB.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet-keyed.png",
+      "role": "edit target and exact four-object board and canvas reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge-keyed.png",
+      "role": "new blacksmith costume palette and rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate-keyed.png",
+      "role": "established Realm attachment rendering reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite workstation source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into exactly four isolated orthographic views of the SAME compact medieval blacksmith workstation: a dark forged-iron anvil securely mounted on a low squared oak block. Replace every mallet completely while preserving the 1536x1024 canvas, one-row four-object structure, equal spacing, painted resolution, and polish. This is a grounded workstation attachment for a blacksmith strike animation, not a weapon and not scenery.\nInput images: Image 1 is the edit target and exact four-object board/canvas reference. Image 2 is the new blacksmith costume palette and rendering reference. Image 3 is an established Realm attachment rendering reference. Preserve their classic strategy-game material language.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject workstation: one compact dark charcoal forged-iron anvil with a broad flat face, short horn, square hardy hole, and sturdy feet, bolted onto the same low, thick, squared oak block in every view. The oak block has restrained iron corner straps and a few heat-darkened marks. No fire, coal, sparks, smoke, hammer, tongs, blade, or loose metal.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm oak highlights, dark readable iron clusters, restrained forge reflection, no photorealism, no blur, no dither, no soft shadow.\nComposition/framing: 1536x1024 landscape; exactly four full uncropped workstation views in one horizontal row with large equal gaps and generous padding. From left to right: front view, back view, left-profile view with horn pointing left, right-profile view with horn pointing right. Every workstation upright, grounded within its own object silhouette, same overall height and base size, centered vertically around the middle of the canvas. Exactly four objects and no labels.\nLighting/mood: fixed upper-left warm forge light identical across all four views.\nColor palette: dark charcoal forged iron, restrained steel face highlight, warm aged oak, blackened iron straps, subtle ember-orange reflected edge; do not use magenta or bright pink anywhere in the workstation.\nMaterials/textures: hammer-marked iron, scarred oak end grain, compact bolts and straps legible at sprite scale.\nConstraints: identical anvil, horn length, face, hardy hole, feet, oak-block construction, strap placement, scale, and height across all views; each object fully separated from every other object and all canvas edges; background one uniform #ff00ff with no shadows, gradients, texture, reflections, floor plane, lighting variation, border, labels, or guides; crisp silhouettes; no cast shadow; no contact shadow outside the object; no text; no watermark; no hands; no character; no scenery; no extra objects; no logos.\nAvoid: retaining any mallet or handle; forge building; furnace; flame; sparks; smoke; loose tools; weapon; fantasy ornament; modern machinery; multiple different anvils; isometric angle; perspective distortion; blur; antialiased haze; magenta fringe.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f40aec"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a10-source/forge-anvil-keyed.png",
+  "keyed_sha256": "89f63990ae6e9cc18254a8e88781109255bab8d5b405b7b20932833cc482de1b",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a10-source/forge-anvil.png",
+  "alpha_sha256": "4e78e47c052ff5fcd05631c68a4db9cd5610568e5d201bb150b34924c910bb1a"
+}

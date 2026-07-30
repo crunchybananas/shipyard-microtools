@@ -1,0 +1,5754 @@
+{
+  "actions": [
+    "idle",
+    "walk",
+    "work",
+    "carry"
+  ],
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "failures": [],
+  "finished_row_mirroring": false,
+  "frames": 128,
+  "mechanical_passed": true,
+  "row_gates": {
+    "carry/down": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              27,
+              31
+            ],
+            [
+              34,
+              38
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            26,
+            49
+          ],
+          "sha256_rgba": "7bb7092611c3cff512dee817826f5407a87f8234309386bbe0c8b144560a0ca4",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            22,
+            46,
+            42,
+            60
+          ],
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              27,
+              31
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            26,
+            50
+          ],
+          "sha256_rgba": "c4309f49fc4f4605610d8dbf49a38ff4acf9ddc3f5077e5f9b19f4adf04fb5a6",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            26,
+            49
+          ],
+          "sha256_rgba": "afbaa6772ee3ad52cea1675723e39d7a5286c916fc263bae207ac6f26391979d",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            22,
+            44,
+            42,
+            58
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            26,
+            48
+          ],
+          "sha256_rgba": "b22d9382c20109d7ad435de102311f171c2c01f46bf5d1bd64e91604603aa09c",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            26,
+            49
+          ],
+          "sha256_rgba": "684fa64060cd84a19462e2eeb1a34068198f53b2b2e58790b7b97d519798b913",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            46,
+            42,
+            60
+          ],
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            26,
+            50
+          ],
+          "sha256_rgba": "c9b6638c40471aa774672876d3b1d2fda0e6daa14af6bd30f343ad779c28acec",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            26,
+            49
+          ],
+          "sha256_rgba": "f811e618241fc7bea6e8a643cde62838be25cf17e698fd271b08b04356f20cf0",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            44,
+            42,
+            58
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            26,
+            48
+          ],
+          "sha256_rgba": "81e44f40e40a73448c0115459cf4e220504e4e7670ef83d9c3ac6469c715f8df",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "carry",
+        "direction": "down",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "carry/left": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            14,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            13,
+            45,
+            27,
+            61
+          ],
+          "flattened_bbox": [
+            13,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              20,
+              25
+            ],
+            [
+              38,
+              42
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            17,
+            50
+          ],
+          "sha256_rgba": "6912b44f79055d1666a6decfefa3a62dace9cba7ff4d3fbecc5e4b8a1e653a1c",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            13,
+            46,
+            27,
+            62
+          ],
+          "flattened_bbox": [
+            13,
+            5,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              23,
+              28
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            17,
+            51
+          ],
+          "sha256_rgba": "a8a9e01ad65cf430743cd620270ba9194ecd20f0ce54022ae49b14a191cc832a",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            13,
+            45,
+            27,
+            61
+          ],
+          "flattened_bbox": [
+            13,
+            4,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              28,
+              33
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            17,
+            50
+          ],
+          "sha256_rgba": "53ea47d464ab092493b276ed979cd14aaf685da81d9b9738f7575c159904c049",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            13,
+            44,
+            27,
+            60
+          ],
+          "flattened_bbox": [
+            13,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              34,
+              39
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            17,
+            49
+          ],
+          "sha256_rgba": "78d8956e8065cd3d71c8acce938db5c3eb06762a536ac2371bfb3ed31bc95706",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            13,
+            45,
+            27,
+            61
+          ],
+          "flattened_bbox": [
+            13,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              20,
+              25
+            ],
+            [
+              38,
+              42
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            17,
+            50
+          ],
+          "sha256_rgba": "fff96315d4472a595943b9d9e8d4684054cdf08ef8450af46ca0eb974bb88ab2",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            13,
+            46,
+            27,
+            62
+          ],
+          "flattened_bbox": [
+            13,
+            5,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              22,
+              27
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            17,
+            51
+          ],
+          "sha256_rgba": "2954508423b567ee491aa13ff01149e503bb95a2b625dadc50d641ae4070fbef",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            13,
+            45,
+            27,
+            61
+          ],
+          "flattened_bbox": [
+            13,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              28,
+              33
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            17,
+            50
+          ],
+          "sha256_rgba": "9bba607487571143ab456f9374caf7d6ca45685abcb401165fe0902116a01b68",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            13,
+            44,
+            27,
+            60
+          ],
+          "flattened_bbox": [
+            13,
+            3,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              34,
+              39
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            17,
+            49
+          ],
+          "sha256_rgba": "49d3ef80abf15e2afb38016b19f45416726c95803444afb2d21484f5c98a0a16",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "carry",
+        "direction": "left",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "carry/right": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            37,
+            45,
+            51,
+            61
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              22,
+              26
+            ],
+            [
+              39,
+              44
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            47,
+            50
+          ],
+          "sha256_rgba": "4bcb58feeea74fba2e42f70d54a9ea2ed78262dd98cfd408591ac6262305acb9",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            51,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            37,
+            46,
+            51,
+            62
+          ],
+          "flattened_bbox": [
+            17,
+            5,
+            51,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              36,
+              41
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            47,
+            51
+          ],
+          "sha256_rgba": "eaf6463964e38b31bf14bfb086f845f9bdb68cf658cc5c84d859d4e600a59f9a",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            37,
+            45,
+            51,
+            61
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              31,
+              36
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            47,
+            50
+          ],
+          "sha256_rgba": "f1f93d3493e77c12321f46f6b60beb3480e4e7011c8edece70351860638fd301",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            51,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            37,
+            44,
+            51,
+            60
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            51,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              25,
+              30
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            47,
+            49
+          ],
+          "sha256_rgba": "8195253eee8d8b8d8797c72a0b92f89868160a5e406362a0f0e2acee9408d59e",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            37,
+            45,
+            51,
+            61
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              22,
+              26
+            ],
+            [
+              39,
+              44
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            47,
+            50
+          ],
+          "sha256_rgba": "07959c6ec8dd0a29f79d704d51e605766ed419810b38d55352a1689c5160a2b8",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            51,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            37,
+            46,
+            51,
+            62
+          ],
+          "flattened_bbox": [
+            17,
+            5,
+            51,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              37,
+              42
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            47,
+            51
+          ],
+          "sha256_rgba": "a670c01a0db0843d2e8e59a07c264d671fbf44a0d188089b6bb450b47e5194f0",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            37,
+            45,
+            51,
+            61
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            51,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              31,
+              36
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            47,
+            50
+          ],
+          "sha256_rgba": "3dfed0a549f80beb118f2548bdf54e6a9727b3505ba52e33191cf9de2fed499a",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            51,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            37,
+            44,
+            51,
+            60
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            51,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              25,
+              30
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            47,
+            49
+          ],
+          "sha256_rgba": "f624f5265bae4670f3fdc28baacffdc88bb3a1345c0e85defd565095c0218124",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "carry",
+        "direction": "right",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "carry/up": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              26,
+              30
+            ],
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            38,
+            49
+          ],
+          "sha256_rgba": "5d87ec16bf1fcbd40071108d4b24113621e2f3def117acdc570608e71311fe14",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            22,
+            46,
+            42,
+            60
+          ],
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            38,
+            50
+          ],
+          "sha256_rgba": "6555010e7fbf302a61542e7257fcb783b7de2776c2a63a179050c4655d450dde",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            38,
+            49
+          ],
+          "sha256_rgba": "e2096f47555f8a0bf6c2da68d3c33f6ada4a2d20e7eb5d09664d822f05a50332",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": [
+            22,
+            44,
+            42,
+            58
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            38,
+            48
+          ],
+          "sha256_rgba": "b1723d60fc93b8978b9510a2563977262308424b9fdeb0a55d2b38c555db9da6",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            38,
+            49
+          ],
+          "sha256_rgba": "78ea81f10172e9090bf1d84f1cfe7834af7434e0d12ef48aff96d908a36e4e77",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            46,
+            42,
+            60
+          ],
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              23,
+              27
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            38,
+            50
+          ],
+          "sha256_rgba": "9a97966402a775c5c11c90f5aba2625eaad5f5a1ee1d0b98bedbc9f826b3e449",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            45,
+            42,
+            59
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            38,
+            49
+          ],
+          "sha256_rgba": "fd353d8b0e1ff1874be7e741e32a1a27fc658c52648101d3b5c598321a06ddb8",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": [
+            22,
+            44,
+            42,
+            58
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            38,
+            48
+          ],
+          "sha256_rgba": "6792632bd974f586519355ef731745e8981e3746c7dd3857dcc1ef43ce4c891b",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "carry",
+        "direction": "up",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "idle/down": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        75,
+        75
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              27,
+              31
+            ],
+            [
+              34,
+              38
+            ]
+          ],
+          "phase": "settle",
+          "right_hand": [
+            24,
+            51
+          ],
+          "sha256_rgba": "4eb6480328f65850b293a246eaafe3062fb2eafc2044ce16e758aff07aff1878",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              27,
+              31
+            ]
+          ],
+          "phase": "inhale-a",
+          "right_hand": [
+            23,
+            50
+          ],
+          "sha256_rgba": "fa20e69c060d3b34465e829333b9f4dcebf06e50feafc7deca806664c04d064a",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "inhale-b",
+          "right_hand": [
+            23,
+            48
+          ],
+          "sha256_rgba": "0112df08a90963f14fb0787dd256cb41593a96a7ecd734491538f6e1a881dbdc",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "high-hold",
+          "right_hand": [
+            23,
+            49
+          ],
+          "sha256_rgba": "ee9e5a4b26d19703e43ab7fc1e5357dd92ec995ea23133fba9e689a0a44d57c1",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "exhale-a",
+          "right_hand": [
+            24,
+            51
+          ],
+          "sha256_rgba": "164afbdbb1f717bc5a3aee1023e7b507053e4c9c2c466502c9f813f6c04003e5",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "exhale-b",
+          "right_hand": [
+            24,
+            52
+          ],
+          "sha256_rgba": "00c6098818b7bcd6fd841d094ccdd9170272e0411ad53387668010759dea3f1d",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "low-hold",
+          "right_hand": [
+            25,
+            54
+          ],
+          "sha256_rgba": "243b5d67e2672a96c9eeea1ccf0e2d1ae99a7dd04eab6c8c8ab6891d564f4b27",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "return",
+          "right_hand": [
+            24,
+            53
+          ],
+          "sha256_rgba": "ad1564e69b624a44cab954a0f5a23b546c582378c2721da33fceb10bacd32f2f",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "idle",
+        "direction": "down",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "idle/left": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        75,
+        75
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "settle",
+          "right_hand": [
+            28,
+            51
+          ],
+          "sha256_rgba": "0097d14e1e472dff092fbe3ba4723e90643be75520eb2fa33b994358b43b871c",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "inhale-a",
+          "right_hand": [
+            27,
+            50
+          ],
+          "sha256_rgba": "4cb7e23bc53ad5a024bfbc57b419d5ddd43b34b08d64dec4d4b6f6cb0fe861d5",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "inhale-b",
+          "right_hand": [
+            28,
+            49
+          ],
+          "sha256_rgba": "fd887e4f6429445dbbe96c36467f0ebc5eda9560587748577d23099ba4cf1c1d",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "high-hold",
+          "right_hand": [
+            29,
+            49
+          ],
+          "sha256_rgba": "2f83bc5cf4b9a95be6e30e5ac9caa721bfc5c27d19664f9825ce1cc5cb0dcf76",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "exhale-a",
+          "right_hand": [
+            29,
+            51
+          ],
+          "sha256_rgba": "73aa914b6adca95112d911162dbb1e90286b5e981609c9af7d09b52ac0524c82",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "exhale-b",
+          "right_hand": [
+            28,
+            52
+          ],
+          "sha256_rgba": "ed73219b1643060c8bd33c02177ca5d747dea44eacc7b38a4cab2e1f5f370873",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "low-hold",
+          "right_hand": [
+            27,
+            53
+          ],
+          "sha256_rgba": "ee6d3fad6ee63a9d156f23d6aeca3972a136538262f381a8f7aa29945d5251e8",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "return",
+          "right_hand": [
+            27,
+            52
+          ],
+          "sha256_rgba": "6276f31d35b4620dda21e4e7b94c86b605324198bde251391f60690964a49ced",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "idle",
+        "direction": "left",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "idle/right": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        75,
+        75
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "settle",
+          "right_hand": [
+            36,
+            51
+          ],
+          "sha256_rgba": "029364546f28b9dd9e32fc14e1140fd8ea51b7080b5785ffd7611bd7b257b3f9",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "inhale-a",
+          "right_hand": [
+            37,
+            50
+          ],
+          "sha256_rgba": "afd6c288f32f4d8601c1b77bb4ae828df528b2ccf42277e258a2bf79ab506a44",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "inhale-b",
+          "right_hand": [
+            36,
+            49
+          ],
+          "sha256_rgba": "16a092ede5138b20dae4537488c272b044a021c025363c0620c6873f2c6608d6",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "high-hold",
+          "right_hand": [
+            35,
+            49
+          ],
+          "sha256_rgba": "35e52bd5133d0744cf1ffef8247559263850db0a7b714e8f066049a03fc3837e",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "exhale-a",
+          "right_hand": [
+            35,
+            51
+          ],
+          "sha256_rgba": "5a843c34022cf27cf563bc635599b4a13a2b23ed96955232a262e0c79d5adbb4",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "exhale-b",
+          "right_hand": [
+            36,
+            52
+          ],
+          "sha256_rgba": "27559c9b647d63c2a6120ca514948aabb31429a6d2e03bad80c454c276f8bc6e",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "low-hold",
+          "right_hand": [
+            37,
+            53
+          ],
+          "sha256_rgba": "e8a394a5b97dc4e9c2b9e41f51a07ffd8b474c348525611d4f58467a42fbb0b6",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "return",
+          "right_hand": [
+            37,
+            52
+          ],
+          "sha256_rgba": "cf6261c1c52af020ac26dfd8d9f8c651b13cc18d88ef4258732502673cbb5b6e",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "idle",
+        "direction": "right",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "idle/up": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        75,
+        75
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              26,
+              30
+            ],
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "settle",
+          "right_hand": [
+            40,
+            51
+          ],
+          "sha256_rgba": "a9876582189e4b65fa13706a4c290086890db1574c152b8a7b5c3a07972b98e6",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "inhale-a",
+          "right_hand": [
+            39,
+            50
+          ],
+          "sha256_rgba": "3b7de67e0e8d182d08eb0128150b6277b9e0c37179062fc9e08996c88af6c7cf",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "inhale-b",
+          "right_hand": [
+            39,
+            48
+          ],
+          "sha256_rgba": "7f8584e4c37e3d4ed3a41bcf64f38c1c0c8006b81b9f4c3dafa3275cdcf11b71",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "high-hold",
+          "right_hand": [
+            39,
+            49
+          ],
+          "sha256_rgba": "6e613714c1f1a2ac940526dcb59f54269566545b8beecf458ecbfa82960e6071",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "exhale-a",
+          "right_hand": [
+            40,
+            51
+          ],
+          "sha256_rgba": "236b08c9177e4a0ca4733bb43020d7ef5f0e166ac664f45c1dffac1de38564ac",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              23,
+              27
+            ]
+          ],
+          "phase": "exhale-b",
+          "right_hand": [
+            40,
+            52
+          ],
+          "sha256_rgba": "857203ecf2b53e9eb719fa75271d16a60c4ed017a310eceb212598c98ab74f85",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "low-hold",
+          "right_hand": [
+            41,
+            54
+          ],
+          "sha256_rgba": "09882a3d29209d4dd21f78b6856c1b36cfaecc5fbe003b472d4bf7f5ff97adf8",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "return",
+          "right_hand": [
+            40,
+            53
+          ],
+          "sha256_rgba": "68c051bb1b6bc664e0b12edd5c585a5f056c398a3933d437b518494fa543e900",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "idle",
+        "direction": "up",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "walk/down": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              27,
+              31
+            ],
+            [
+              34,
+              38
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            23,
+            47
+          ],
+          "sha256_rgba": "cbdca1b86d31d317b91c0608bd4a9d99292eaf563c35d4ae5e9d98acd04919a3",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              27,
+              31
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            23,
+            49
+          ],
+          "sha256_rgba": "2d1e63d140b31c3c6f0d927025c14c06f70e6c1a88aa50f44f42bbc5c0eb0929",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            23,
+            50
+          ],
+          "sha256_rgba": "666d2dff9e50a34c0b5b95d3c1b6a16572c263d6621bf26aa4f99804a5c8adc1",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            25,
+            51
+          ],
+          "sha256_rgba": "65ffa86854a1f703b064d04f2f59a64eef81b61c651b53aad9dcbe3fa9dc3f4c",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            25,
+            53
+          ],
+          "sha256_rgba": "58efcf9ebc3f5da11be6532b7ed94bd27f0ccd0ac8816d44b0a887d64c3ea431",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            25,
+            53
+          ],
+          "sha256_rgba": "0aa2ea1c1c29a3b48dd3e30763e321bde300b5b36c2fd7bef401d432d37fd192",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            23,
+            50
+          ],
+          "sha256_rgba": "3f715841833395f0f09f53b6a7fc25a92653cf444746311ad7787f68b22b8c79",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            23,
+            47
+          ],
+          "sha256_rgba": "570e4ad6771aeb0e24b8d4cd95e2389f863684021d9f77252b1cfed6028553c9",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "walk",
+        "direction": "down",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "walk/left": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              20,
+              25
+            ],
+            [
+              38,
+              42
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            34,
+            49
+          ],
+          "sha256_rgba": "114dc693ba9b930585c57d950721339a844a5226ab141bcd7016326450517659",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              23,
+              28
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            32,
+            50
+          ],
+          "sha256_rgba": "25966ba267f837d0a8673e5e81807633acb9eb6406aa99e27f86fed5623140c3",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              28,
+              33
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            29,
+            50
+          ],
+          "sha256_rgba": "78f9ebb94ff365a6cd8bcfc3f1736c6f1551554084fe07e41003a59e4b7ae8b3",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              34,
+              39
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            25,
+            48
+          ],
+          "sha256_rgba": "d6140b3e92420b53742c0040dca3935a2a87f2f387047f085e74df101b99badf",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              20,
+              25
+            ],
+            [
+              38,
+              42
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            24,
+            49
+          ],
+          "sha256_rgba": "050d6849c39dad4254234ccbc6cdcae4cb603fb7a17b8509e92a5fc287997593",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            5,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              22,
+              27
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            26,
+            50
+          ],
+          "sha256_rgba": "f51fabfa2d21c7683663604f6d6cdfbce0d9b7f4d1a081469d4399422fac2dc7",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              28,
+              33
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            29,
+            50
+          ],
+          "sha256_rgba": "7a81fd9337fcf4c55f5077ae695bf5212641d9b85a519f9d94e6dd111bd32889",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            14,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            14,
+            3,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              34,
+              39
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            33,
+            48
+          ],
+          "sha256_rgba": "c4c715108fdb57c9051ff3eda5cab689421203499b478eb091722ce653d54152",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 1,
+          "errors": [],
+          "flicker_score": 5.2,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 1,
+          "errors": [],
+          "flicker_score": 5.2,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "walk",
+        "direction": "left",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "walk/right": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              22,
+              26
+            ],
+            [
+              39,
+              44
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            30,
+            49
+          ],
+          "sha256_rgba": "2df90ae8baf3037a50f32887c65d301786b43f7126b10f786db891e481b94d95",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              36,
+              41
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            32,
+            50
+          ],
+          "sha256_rgba": "284477d4ce702f0044656776c359340a6bb3012c91016d9313e628db29f838e3",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              31,
+              36
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            35,
+            50
+          ],
+          "sha256_rgba": "964021595ab93c5c80ee47eb746be2f23bcc6e91868669360adcdf8e7c0f0bce",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              25,
+              30
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            39,
+            48
+          ],
+          "sha256_rgba": "8520b87e910caf81090cfc1fba564d228cd338308eed936c8bba3fb011cc0518",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              22,
+              26
+            ],
+            [
+              39,
+              44
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            40,
+            49
+          ],
+          "sha256_rgba": "31bcedd270500a8c22a465bcaf25b17b5de38a054d5db4bc9e599e0d5a6cee8d",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            49,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              37,
+              42
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            38,
+            50
+          ],
+          "sha256_rgba": "d3ee9c6cb568f4aa6936780d9177424b2abbd592f0c837e8874e99fbb7b50ac2",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              31,
+              36
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            35,
+            50
+          ],
+          "sha256_rgba": "1e3d6671bd5cf357147acacb1054b54d6df114f9e9774ce1b28462c67e8aeed4",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            50,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            50,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              25,
+              30
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            31,
+            48
+          ],
+          "sha256_rgba": "c0d631d7fd1bf15ff431a6873484e492815cf04c1b68efa74fb95a44dc16084c",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 2,
+          "errors": [],
+          "flicker_score": 6.4,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 2,
+          "errors": [],
+          "flicker_score": 6.4,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "walk",
+        "direction": "right",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "walk/up": {
+      "body_heights": [
+        76,
+        75,
+        76,
+        77,
+        76,
+        75,
+        76,
+        77
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              26,
+              30
+            ],
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "near-contact",
+          "right_hand": [
+            39,
+            47
+          ],
+          "sha256_rgba": "50c73ac59b3907c083f6babed4774d7396ef20f93de2c9f8a78bc930d7692d9c",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "near-down",
+          "right_hand": [
+            39,
+            49
+          ],
+          "sha256_rgba": "40fc2f44f52d7689ed10bf40c2a1cb4ce792f661f95401877f57262499a6fe43",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "near-pass",
+          "right_hand": [
+            39,
+            50
+          ],
+          "sha256_rgba": "8f02534fe97f5116eee3c72bc95143820f0892c062f8f70033cc3f4ea350c4e4",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "near-up",
+          "right_hand": [
+            41,
+            51
+          ],
+          "sha256_rgba": "5043e748a17d657700960feb75e61af5bb569d92bce48510e8cf5e7329e251ab",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "far-contact",
+          "right_hand": [
+            41,
+            53
+          ],
+          "sha256_rgba": "e7e37e1c82fcb49391f7447d89adcb2aca12909d8f8e12c5c23f2ea075ff43b4",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "body_height": 75,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            5,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              23,
+              27
+            ]
+          ],
+          "phase": "far-down",
+          "right_hand": [
+            41,
+            53
+          ],
+          "sha256_rgba": "d0eede41fef0ecfff72b5daf99f0f06eb4559ca09941b57c1ad4af7e05fe7c45",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "far-pass",
+          "right_hand": [
+            39,
+            50
+          ],
+          "sha256_rgba": "385d4146da2d67a744308ff335540649871aa6a83967ef8fecf577c240dabd41",
+          "weapon_tip": null
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "far"
+          ],
+          "equipment_bbox": null,
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "far-up",
+          "right_hand": [
+            39,
+            47
+          ],
+          "sha256_rgba": "a8a3b233f5a77584269b26b14c4827c8b4e2881082fd995df7b33e63b99585f0",
+          "weapon_tip": null
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "walk",
+        "direction": "up",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "work/down": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        76,
+        76
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            29,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              27,
+              31
+            ],
+            [
+              34,
+              38
+            ]
+          ],
+          "phase": "ready",
+          "right_hand": [
+            27,
+            47
+          ],
+          "sha256_rgba": "e7fadfcde8f50bc1177106cf5adfd088ed777ed612a4163bedf0c723bb1f2737",
+          "weapon_tip": [
+            40,
+            32
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            24,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              27,
+              31
+            ]
+          ],
+          "phase": "set-piece",
+          "right_hand": [
+            26,
+            44
+          ],
+          "sha256_rgba": "651b7f8365a56ef2b48bdc3173f3828c1ca942288fbbe41e56e797e840a5d112",
+          "weapon_tip": [
+            33,
+            25
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            19,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "draw-back",
+          "right_hand": [
+            25,
+            39
+          ],
+          "sha256_rgba": "138fd82f96fd03c6fafece3ed561102961c573e6e4740d3c44ef67dbb4e86401",
+          "weapon_tip": [
+            25,
+            19
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            23,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "raise",
+          "right_hand": [
+            27,
+            43
+          ],
+          "sha256_rgba": "4e5f6250a44a9e37608ff20d312b37c84ce5ba3f6cffd124b3d7133ec58a4025",
+          "weapon_tip": [
+            24,
+            23
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            41,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "drive",
+          "right_hand": [
+            28,
+            48
+          ],
+          "sha256_rgba": "114aa1623548d58dd8fc4a617b3effafad9f12b76da82e494497fe9de5176718",
+          "weapon_tip": [
+            42,
+            62
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            40,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "anvil-strike",
+          "right_hand": [
+            29,
+            49
+          ],
+          "sha256_rgba": "3d7e3550bf1e5f068a5416dc4f7af7a121a288d612c7382c128ab894f24dcdf5",
+          "weapon_tip": [
+            29,
+            69
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            38,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "rebound",
+          "right_hand": [
+            29,
+            47
+          ],
+          "sha256_rgba": "2cc319224a2a88a3d2974e04b32e3fb8be6c5cf9a21dbc50715166f95e4e2c23",
+          "weapon_tip": [
+            37,
+            65
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            30,
+            45,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "recover",
+          "right_hand": [
+            27,
+            48
+          ],
+          "sha256_rgba": "6ce23db1ffcf848f46673a3c362061c7716e923c6d2df27856d8215eeaf2e833",
+          "weapon_tip": [
+            40,
+            33
+          ]
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "work",
+        "direction": "down",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "work/left": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        76,
+        76
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            37,
+            37,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "ready",
+          "right_hand": [
+            28,
+            48
+          ],
+          "sha256_rgba": "d14058958b720aee07788d2b7d95b8bfaf3c5430257612fb596eca18faffc5b7",
+          "weapon_tip": [
+            10,
+            39
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            29,
+            37,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            4,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "set-piece",
+          "right_hand": [
+            30,
+            45
+          ],
+          "sha256_rgba": "9ac29cbc8b940998a0f288d380e216839b4224f557e866ae58c0cc28dc821e74",
+          "weapon_tip": [
+            17,
+            30
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            18,
+            34,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            3,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "draw-back",
+          "right_hand": [
+            31,
+            38
+          ],
+          "sha256_rgba": "f0634a60aa8b56ba67e5f7c715e800a628bf93444a7404b208d667fcb110a895",
+          "weapon_tip": [
+            30,
+            18
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            21,
+            33,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "raise",
+          "right_hand": [
+            27,
+            41
+          ],
+          "sha256_rgba": "5e64625838246a34b1dd3191d81daf3e49c248a236959a90d9818bd2bb03e8fc",
+          "weapon_tip": [
+            31,
+            21
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            40,
+            35,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "drive",
+          "right_hand": [
+            26,
+            45
+          ],
+          "sha256_rgba": "3afa88937b99becc732a7bdfaab1353931a6bd9290a543798f0a115a5c104dcd",
+          "weapon_tip": [
+            6,
+            42
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            42,
+            36,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            4,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "anvil-strike",
+          "right_hand": [
+            27,
+            48
+          ],
+          "sha256_rgba": "dc7b930633f717db9a8267bcd2020260ba40c57033ddd8d3163587ea76b1618d",
+          "weapon_tip": [
+            9,
+            57
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            42,
+            37,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "rebound",
+          "right_hand": [
+            30,
+            50
+          ],
+          "sha256_rgba": "439d23dd6d69cf5a2c925bbaa61b2b6d2133a7489f02073eebe8febe9e7842f6",
+          "weapon_tip": [
+            17,
+            65
+          ]
+        },
+        {
+          "body_bbox": [
+            15,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            3,
+            38,
+            37,
+            79
+          ],
+          "flattened_bbox": [
+            3,
+            4,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "recover",
+          "right_hand": [
+            28,
+            49
+          ],
+          "sha256_rgba": "f3ea14cc07be1a0cc282ee25eea9993dcfedbbd2b560592a6512a7e93077d90d",
+          "weapon_tip": [
+            10,
+            40
+          ]
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "work",
+        "direction": "left",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "work/right": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        76,
+        76
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            26,
+            36,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            61,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "ready",
+          "right_hand": [
+            36,
+            48
+          ],
+          "sha256_rgba": "1a2ccd0b097ee68fa5dc02101b2f18e3b184b6b2cd4d4bba80ad8afa7660705e",
+          "weapon_tip": [
+            54,
+            39
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            26,
+            28,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            61,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "set-piece",
+          "right_hand": [
+            34,
+            45
+          ],
+          "sha256_rgba": "11f7bf6907a48a3021b8d09775f84613e3c3cd7950f500083ba0e2b77c511b39",
+          "weapon_tip": [
+            47,
+            30
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            29,
+            17,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            61,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "draw-back",
+          "right_hand": [
+            33,
+            38
+          ],
+          "sha256_rgba": "911b2ea7ed0db450844f503f4b22af127c77c4ffb4555830a38ff50751da0df9",
+          "weapon_tip": [
+            34,
+            18
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            49,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            29,
+            21,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            61,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "raise",
+          "right_hand": [
+            37,
+            41
+          ],
+          "sha256_rgba": "3defe60be2098ad5deb9e26c73d39ae068675c9e53005cef22b6859b141f955b",
+          "weapon_tip": [
+            33,
+            21
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            28,
+            38,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            61,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "drive",
+          "right_hand": [
+            38,
+            45
+          ],
+          "sha256_rgba": "d9eeb304700ab127329271163a46dab84d5936a9b7f6a632fc070403fc7d8d88",
+          "weapon_tip": [
+            58,
+            42
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            29,
+            41,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            61,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "anvil-strike",
+          "right_hand": [
+            37,
+            48
+          ],
+          "sha256_rgba": "34feaa88079917442859f1d24baddba0ae0a1e9fc5830df9b76a44d475580f2f",
+          "weapon_tip": [
+            55,
+            57
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            28,
+            41,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            61,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "rebound",
+          "right_hand": [
+            34,
+            50
+          ],
+          "sha256_rgba": "c8293ed3c8abdd6eb9e2f3853341f36e3514ef92ca19b3f99ec78838997f2db8",
+          "weapon_tip": [
+            47,
+            65
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            49,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            26,
+            37,
+            61,
+            79
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            61,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              24,
+              29
+            ],
+            [
+              35,
+              40
+            ]
+          ],
+          "phase": "recover",
+          "right_hand": [
+            36,
+            49
+          ],
+          "sha256_rgba": "39331c7fc006a2fa35af68361e7b50aaa8bb1e06317daee3061aed81cb563ba3",
+          "weapon_tip": [
+            54,
+            40
+          ]
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "work",
+        "direction": "right",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    },
+    "work/up": {
+      "body_heights": [
+        76,
+        76,
+        77,
+        77,
+        76,
+        76,
+        76,
+        76
+      ],
+      "failures": [],
+      "frame_metrics": [
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            41,
+            45,
+            67
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 0,
+          "ground_runs": [
+            [
+              26,
+              30
+            ],
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "ready",
+          "right_hand": [
+            37,
+            49
+          ],
+          "sha256_rgba": "b8aceb84060c1609c5e4d404e984b3042d6d260a3e4fa669b84a2afd1596c415",
+          "weapon_tip": [
+            24,
+            64
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            38,
+            45,
+            66
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 1,
+          "ground_runs": [
+            [
+              33,
+              37
+            ]
+          ],
+          "phase": "set-piece",
+          "right_hand": [
+            38,
+            47
+          ],
+          "sha256_rgba": "0327cf06474fe1e1a95b7604bb7bd0301472e468041280ade1ef89a3a5193f3a",
+          "weapon_tip": [
+            31,
+            66
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            33,
+            45,
+            66
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 2,
+          "ground_runs": [
+            [
+              35,
+              39
+            ]
+          ],
+          "phase": "draw-back",
+          "right_hand": [
+            39,
+            42
+          ],
+          "sha256_rgba": "846add8504bf4526283fc2e82da39e1c22e7983bcad2fff16d8fb2838d2dafe2",
+          "weapon_tip": [
+            39,
+            62
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "body_height": 77,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            30,
+            46,
+            66
+          ],
+          "flattened_bbox": [
+            17,
+            3,
+            47,
+            80
+          ],
+          "frame": 3,
+          "ground_runs": [
+            [
+              36,
+              40
+            ]
+          ],
+          "phase": "raise",
+          "right_hand": [
+            37,
+            39
+          ],
+          "sha256_rgba": "97e16c63f4dde4c1e0df288009fbdcab014cf4cc4d4a5a8a27fef5c45189b41d",
+          "weapon_tip": [
+            40,
+            59
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            25,
+            45,
+            66
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 4,
+          "ground_runs": [
+            [
+              23,
+              27
+            ],
+            [
+              37,
+              41
+            ]
+          ],
+          "phase": "drive",
+          "right_hand": [
+            36,
+            43
+          ],
+          "sha256_rgba": "04d18752518f5ce6628ff23d91e47de6cbfa2e1ee2c25f73f26bbae3691ac6b5",
+          "weapon_tip": [
+            22,
+            29
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            26,
+            45,
+            66
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 5,
+          "ground_runs": [
+            [
+              23,
+              27
+            ]
+          ],
+          "phase": "anvil-strike",
+          "right_hand": [
+            35,
+            46
+          ],
+          "sha256_rgba": "f417045c6366b95732d81138add53393a5e026ee585041b449ed08f26a92f652",
+          "weapon_tip": [
+            35,
+            26
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            28,
+            45,
+            66
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 6,
+          "ground_runs": [
+            [
+              24,
+              28
+            ]
+          ],
+          "phase": "rebound",
+          "right_hand": [
+            35,
+            48
+          ],
+          "sha256_rgba": "d7dce4c3f1217f6c900d783ef3edc7c03a3c22443f1430361036832fe9a041cd",
+          "weapon_tip": [
+            27,
+            30
+          ]
+        },
+        {
+          "body_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "body_height": 76,
+          "contacts": [
+            "near",
+            "far"
+          ],
+          "equipment_bbox": [
+            19,
+            41,
+            45,
+            67
+          ],
+          "flattened_bbox": [
+            17,
+            4,
+            47,
+            80
+          ],
+          "frame": 7,
+          "ground_runs": [
+            [
+              25,
+              29
+            ]
+          ],
+          "phase": "recover",
+          "right_hand": [
+            37,
+            49
+          ],
+          "sha256_rgba": "a6464ab0233e8b9b340d102493f852cf7b6c31a7fa5c6de173fbbfedf77d9ef0",
+          "weapon_tip": [
+            24,
+            64
+          ]
+        }
+      ],
+      "mechanical_passed": true,
+      "production_quality": {
+        "body": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "flattened": {
+          "body_height_range": 1,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 2.0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        }
+      },
+      "schema": "realm.actor-pose.a10-row-gate.v1",
+      "scope": {
+        "action": "work",
+        "direction": "up",
+        "garment": "ember-forge",
+        "identity": "smith",
+        "role": "blacksmith"
+      }
+    }
+  },
+  "rows": 16,
+  "runtime_style": {
+    "actual_alpha_values": [
+      0,
+      255
+    ],
+    "actual_palette_colors": 48,
+    "alpha_threshold": 61,
+    "contrast": 1.08,
+    "dither": "none",
+    "mechanical_passed": true,
+    "name": "classic-strategy-clusters",
+    "palette_colors": 48,
+    "palette_hex": [
+      "#000000",
+      "#da8335",
+      "#c16c27",
+      "#ba5e1a",
+      "#8b5a30",
+      "#a44d15",
+      "#934914",
+      "#674529",
+      "#8a3812",
+      "#75360e",
+      "#623212",
+      "#413a2f",
+      "#422f21",
+      "#333027",
+      "#ad2321",
+      "#991e1c",
+      "#762010",
+      "#51230e",
+      "#432416",
+      "#35251a",
+      "#3b1d12",
+      "#2d271f",
+      "#2c231b",
+      "#2b1f16",
+      "#2b1b13",
+      "#22221a",
+      "#221d14",
+      "#211912",
+      "#8a1616",
+      "#831012",
+      "#710f0f",
+      "#580c0a",
+      "#4f0506",
+      "#34150c",
+      "#27150e",
+      "#21160f",
+      "#350403",
+      "#240705",
+      "#1c150f",
+      "#1b130c",
+      "#19100a",
+      "#13120c",
+      "#130e08",
+      "#150b07",
+      "#100a06",
+      "#150403",
+      "#0b0805",
+      "#050102"
+    ],
+    "palette_scope": "all factorial rows",
+    "saturation": 1.12
+  },
+  "schema": "realm.actor-pose.a10-blacksmith-actions-gate.v1",
+  "scope": {
+    "actions": [
+      "idle",
+      "walk",
+      "work",
+      "carry"
+    ],
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "frames": 128,
+    "garment": "ember-forge",
+    "identity": "smith",
+    "role": "blacksmith",
+    "rows": 16
+  }
+}

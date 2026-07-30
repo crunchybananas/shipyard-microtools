@@ -3,7 +3,7 @@ import {
   chooseActorRuntimeTier,
   postFXPixelRatio,
   shouldSmoothActorTier,
-} from '../js/render-resolution.js?realm=178';
+} from '../js/render-resolution.js?realm=179';
 
 const atDefaultOneX = chooseActorRuntimeTier({ width: 27 * 1.3, height: 35 * 1.3 });
 assert.equal(atDefaultOneX.key, 'default');

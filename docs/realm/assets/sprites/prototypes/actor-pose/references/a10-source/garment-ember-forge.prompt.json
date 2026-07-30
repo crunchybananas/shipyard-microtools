@@ -1,0 +1,46 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-ember-forge",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_Sib7gxBp8m2BwVm1dbbw9AyW.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work-keyed.png",
+      "role": "edit target and exact garment layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith-keyed.png",
+      "role": "new blacksmith identity and fit reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work-keyed.png",
+      "role": "established Realm work-garment rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png",
+      "role": "second established Realm garment rendering reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite garment source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into a NEW master blacksmith forge-work garment component board that fits the woman smith identity in Image 2 while preserving Image 1's exact modular board structure, canvas proportions, isolated-part placement, painted resolution, polish, and clothing-part conventions. Replace every builder garment component consistently. This is a source-parts board, not an assembled character and not an animation.\nInput images: Image 1 is the edit target and exact garment layout reference. Image 2 is the new blacksmith identity and fit reference. Images 3 and 4 are established Realm garment rendering references. Preserve their classic strategy-game language while creating a clearly distinct forge role costume.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject garment: practical medieval master blacksmith workwear: close-fitting deep ember-red linen headscarf with a compact tied tail at the back; soot-charcoal heavy linen shirt with sleeves rolled tightly to the elbows; deep oxblood and blackened-brown thick leather forge apron ending above the knees, with two narrow crossed back straps, dark iron rivets, and a reinforced center panel; broad nearly black leather belt with an aged iron buckle and one compact side loop; dark smoke-brown reinforced trousers; heavy black-brown leather forge boots with restrained dark iron toe caps. No hammer, tongs, anvil, weapon, or loose tool on this board.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, strong readable material separation, warm forge highlights, dark outline clusters, no photorealism, no blur, no dither, no soft ambient shadow.\nComposition/framing: Keep Image 1's 1536x1024 modular garment-board layout exactly: top row has isolated headscarf front, headscarf back, headscarf left-profile; middle row has isolated left sleeve, front shirt/apron, back shirt/crossed straps, left-profile shirt/apron, isolated right sleeve; next row has isolated front, back, and side belt pieces; bottom row has separated trouser/boot components providing front, back, left-profile, and right-profile coverage. Every part upright, fully uncropped, separated by generous uniform gaps, and sized and placed like Image 1. No assembled full character anywhere.\nLighting/mood: fixed upper-left warm forge light identical across every component and view.\nColor palette: soot charcoal and smoke-brown cloth, deep oxblood leather, muted ember-red headscarf, nearly black belt and boots, dark aged iron rivets and toe caps; do not use builder sandstone, farm yellow, lumber green, guard blue, magenta, or bright pink anywhere in the garment.\nMaterials/textures: heat-scorched heavy linen, thick scuffed forge leather, restrained rivets and stitching, soot wear and warm edge highlights that remain legible at sprite scale.\nConstraints: change every clothing component consistently; exact same garment construction, colors, strap placement, headscarf, apron length, belt, trousers, and boots across front/back/profile parts; anatomically compatible joint endpoints matching Image 2; clean shoulder, elbow, waist, hip, knee, and ankle cut zones; each component isolated; one consistent scale; preserve the exact canvas and board arrangement; background one uniform #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, or guides; no body parts except tiny necessary neck/limb openings; no text; no watermark.\nAvoid: retaining sandstone or terracotta builder clothing; assembled character; multiple outfits; duplicate extra headscarves; yellow farm apron; blue guard uniform; green lumber clothing; fantasy armor; fur; hammer; tongs; anvil; weapons; tools; props; scenery; perspective views; changing garment identity; magenta fringe; cast shadow; contact shadow.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#ed04ec"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge-keyed.png",
+  "keyed_sha256": "53232bdb76a407df05cf7e457aeeb850d297956cd9ffc3adc71fd6f423ef25f4",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a10-source/garment-ember-forge.png",
+  "alpha_sha256": "1a55655e3710153e650292ccf84cf5b7223463ed5da996c93a6bec3c560f54d7"
+}

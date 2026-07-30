@@ -2,12 +2,12 @@
 // Citizen AI — state machine with A* pathfinding
 // ══════════════���═══════════════════════════���═════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=178';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=178';
-import { getCitizenSpeedMult } from './events.js?realm=178';
-import { buildingCapacity } from './building-lifecycle.js?realm=178';
-import { revealAround } from './world.js?realm=178';
-import { visualJitter } from './fx.js?realm=178';
+import { G, BUILDINGS, MAP_W, MAP_H, rng, rngInt, getSeasonData, getDayPeriod, getDifficulty, TILE } from './state.js?realm=179';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=179';
+import { getCitizenSpeedMult } from './events.js?realm=179';
+import { buildingCapacity } from './building-lifecycle.js?realm=179';
+import { revealAround } from './world.js?realm=179';
+import { visualJitter } from './fx.js?realm=179';
 import {
   assignmentDutyForBuilding,
   assignmentPurposeForCitizen,
@@ -17,7 +17,7 @@ import {
   staffingCount,
   transitionCitizenActivity,
   vocationForBuilding,
-} from './citizen-ownership.js?realm=178';
+} from './citizen-ownership.js?realm=179';
 
 const DEFAULT_ACTIVITY_REASON = Object.freeze({
   idle: 'idle-wait',

@@ -1,0 +1,42 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-smith",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_AyhfDxCPPl9Q00jy3G05EKMI.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason-keyed.png",
+      "role": "edit target and exact modular layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png",
+      "role": "established Realm anatomy and rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman-keyed.png",
+      "role": "second established Realm identity rendering reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite identity source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into a NEW, distinctive master blacksmith identity component board while preserving its exact component-board layout, canvas proportions, isolated-part placement, painted resolution, polish, and anatomy conventions. Replace the mason's face, hair, facial hair, body identity, and base clothing across every component. This is a source-parts board, not an assembled character and not an animation.\nInput images: Image 1 is the edit target and exact modular layout reference. Images 2 and 3 are established Realm anatomy and rendering references. Preserve the classic strategy-game rendering language, but do not copy any existing identity.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject identity: one formidable middle-aged woman master blacksmith with a powerful compact working build, broad shoulders and strong forearms, deep warm-brown skin, high cheekbones, a broad square jaw, strong straight nose, close black cornrow braids swept into a very small low braided knot, and one restrained silver streak at the right temple. No facial hair. Her identity must be unmistakably the same in every view and clearly different from every existing male Realm worker. Base layer clothing is a plain fitted soot-charcoal undershirt and dark neutral trousers with practical black-brown work boots, designed to be covered by later garment layers.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm material highlights, dark readable outline clusters, no photorealism, no blur, no dither, no soft ambient shadow.\nComposition/framing: Keep Image 1's 1536x1024 landscape modular layout exactly: top row has three isolated heads in front, back, and left-profile views; middle row has an isolated left arm, front torso, back torso, left-profile torso, and isolated right arm; bottom row has separated leg/boot components providing front, back, and side views. All components upright, fully uncropped, separated by generous uniform gaps, and sized and placed like Image 1. No assembled full character anywhere.\nLighting/mood: fixed upper-left warm forge-like key light identical across every component and view.\nColor palette: deep warm-brown skin, near-black braided hair with one subtle silver streak, soot-charcoal cloth, black-brown boots; do not use magenta or bright pink anywhere in the subject.\nConstraints: change every identity-bearing component consistently; exact same woman, proportions, skin tone, braid pattern, small low knot, silver streak, undershirt, and powerful compact body build across front/back/profile parts; anatomically compatible joint endpoints; hands fully visible; clean neck, shoulder, elbow, wrist, hip, knee, and ankle cut zones; each component isolated; one consistent scale; preserve the exact canvas and board arrangement; background one uniform #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, or guides; no text; no watermark.\nAvoid: retaining the mason's moustache, goatee, male face, or hairstyle; assembled character; multiple people; duplicated extra heads; fantasy armor; helmet; hat; weapons; tools; props; scenery; perspective views; isometric camera; changing identity between views; loose flowing hair; smooth concept-art haze; magenta fringe; cast shadow; contact shadow.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#ef05ef"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith-keyed.png",
+  "keyed_sha256": "0d686bcbfa3833f5d04a7d162764d40f4b0b555ed1a292d262017a3b7435ddee",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a10-source/identity-smith.png",
+  "alpha_sha256": "999f6288af69d95e5dd4f9a68864bbcb4fe5fb33b6579468a3195bd4751eda8c"
+}
