@@ -1,0 +1,46 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-brick-work",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_voRoZO2rwrUhOhtUQWwfyR9x.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/garment-forest-work-keyed.png",
+      "role": "edit target and exact garment layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason-keyed.png",
+      "role": "new builder identity and fit reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work.png",
+      "role": "established Realm work-garment rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png",
+      "role": "second established Realm garment rendering reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite garment source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into a NEW master builder/mason workwear component board that fits the builder identity in Image 2 while preserving Image 1's exact modular board structure, canvas proportions, isolated-part placement, painted resolution, polish, and clothing-part conventions. Replace every lumber garment component consistently. This is a source-parts board, not an assembled character and not an animation.\nInput images: Image 1 is the edit target and exact garment layout reference. Image 2 is the new builder identity and fit reference. Images 3 and 4 are established Realm garment rendering references. Preserve their classic strategy-game language while creating a clearly distinct builder role costume.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject garment: practical medieval master mason and carpenter workwear: close-fitting muted ochre cloth skullcap with no brim; dusty light sandstone heavy-canvas long-sleeve tunic with sleeves rolled to the elbows; muted terracotta brick-red reinforced split-leather short work apron/tabard ending above the knees with two narrow crossed back straps; a broad dark-brown leather tool belt with aged iron buckle and one compact square tool pouch; dark umber work trousers with restrained reinforced knees; tough brown leather ankle boots with stone-dust wear. No hammer, mallet, ruler, or other tool on this board.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, strong readable material separation, warm highlights, dark outline clusters, no photorealism, no blur, no dither, no soft ambient shadow.\nComposition/framing: Keep Image 1's 1536x1024 modular garment-board layout exactly: top row has isolated skullcap front, skullcap back, skullcap left-profile; middle row has isolated left sleeve, front tunic/apron, back tunic/crossed straps, left-profile tunic/apron, isolated right sleeve; next row has isolated front, back, and side belt pieces; bottom row has separated trouser/boot components providing front, back, left-profile, and right-profile coverage. Every part upright, fully uncropped, separated by generous uniform gaps, and sized and placed like Image 1. No assembled full character anywhere.\nLighting/mood: fixed upper-left warm key light identical across every component and view.\nColor palette: dusty sandstone and warm cream canvas, muted terracotta/brick-red leather, dark umber belt and trousers, aged iron buckle, warm brown boots; do not use green, bright yellow, guard blue, magenta, or bright pink anywhere in the garment.\nMaterials/textures: coarse stone-dusted canvas, scuffed split leather, restrained edge stitching and repaired seams that remain legible at sprite scale.\nConstraints: change all clothing components consistently; exact same garment construction, colors, strap placement, skullcap, apron length, tool belt, pouch, trousers, and boots across front/back/profile parts; anatomically compatible joint endpoints matching Image 2; clean shoulder, elbow, waist, hip, knee, and ankle cut zones; each component isolated; one consistent scale; preserve the exact canvas and board arrangement; background one uniform #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, or guides; no body parts except tiny necessary neck/limb openings; no text; no watermark.\nAvoid: retaining forest-green lumber clothing, assembled character, multiple outfits, duplicate extra hats, yellow farmer apron, blue guard uniform, fantasy armor, fur, axe, hammer, weapons, tools, props, scenery, perspective views, changing garment identity, green/magenta fringe, cast shadow, contact shadow.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#ef08f1"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work-keyed.png",
+  "keyed_sha256": "510c37a1272b08e13a8f30fbbae05c9feaf30a11561375ff75ae00c7c522f33b",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work.png",
+  "alpha_sha256": "9ddbfa22564e9e25f042d1816019bf87d31d3b5bd5319a7fc98413bf10188a61"
+}

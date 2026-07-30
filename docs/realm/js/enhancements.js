@@ -5,12 +5,12 @@
 // deleted rather than left as registered no-ops.
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=177';
-import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=177';
-import { makeAtlasLoader } from './atlas-loader.js?realm=177';
-import { citizenStaffingCapacity, staffingCount } from './citizen-ownership.js?realm=177';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=177';
-import { citizenRenderRecord } from './citizen-render-cache.js?realm=177';
+import { G, TILE, TW, TH, MAP_W, MAP_H, getDaylight } from './state.js?realm=178';
+import { findPath, isWalkable, nearestWalkableTile } from './pathfinding.js?realm=178';
+import { makeAtlasLoader } from './atlas-loader.js?realm=178';
+import { citizenStaffingCapacity, staffingCount } from './citizen-ownership.js?realm=178';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=178';
+import { citizenRenderRecord } from './citizen-render-cache.js?realm=178';
 
 function toScreen(tx, ty) { return { x: (tx - ty) * TW / 2, y: (tx + ty) * TH / 2 }; }
 
@@ -3715,7 +3715,7 @@ function renderRainSplashes(ctx) {
 registerWorldRenderer(renderRainSplashes);
 
 // ── Loop 107: Occasional citizen voice barks ───────────────
-import { playVoiceBark as _playBark } from './audio.js?realm=177';
+import { playVoiceBark as _playBark } from './audio.js?realm=178';
 let _lastBarkTick = 0;
 function updateBarks() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;
@@ -3939,7 +3939,7 @@ registerUpdater(updateBuildRipples);
 registerWorldRenderer(renderBuildRipples);
 
 // ── Loop 129: Water footstep splash sound ───────────────────
-import { playSound as _playSound129 } from './audio.js?realm=177';
+import { playSound as _playSound129 } from './audio.js?realm=178';
 let _lastSplashTick = 0;
 function updateWaterSplash() {
   if (!G.audioCtx || G.audioCtx.state === 'suspended') return;

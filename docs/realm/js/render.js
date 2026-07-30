@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=177';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=177';
-import { makeAtlasLoader } from './atlas-loader.js?realm=177';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=177';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=178';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=178';
+import { makeAtlasLoader } from './atlas-loader.js?realm=178';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=178';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,7 +15,7 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=177';
+} from './sprite-source-contract.js?realm=178';
 import {
   CARGO_DIRECTIONS,
   CARGO_FRAMES,
@@ -24,21 +24,21 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from './cargo-source-contract.js?realm=177';
+} from './cargo-source-contract.js?realm=178';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=177';
+} from './render-resolution.js?realm=178';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=177';
+} from './citizen-presentation.js?realm=178';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=177';
-import { staffingCount } from './citizen-ownership.js?realm=177';
+} from './citizen-render-cache.js?realm=178';
+import { staffingCount } from './citizen-ownership.js?realm=178';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -199,6 +199,14 @@ const _ACTOR_PREVIEW_CONFIGS = Object.freeze({
     dirs: Object.freeze(['down', 'up', 'left', 'right']),
     rows: 'prototypes/actor-pose/output/a8-lumber-actions/rows-runtime',
     parts: 'woodsman/forest-work',
+    bakedCargo: true,
+  }),
+  'a9-builder-actions': Object.freeze({
+    role: 'builder',
+    actions: Object.freeze(['idle', 'walk', 'work', 'carry']),
+    dirs: Object.freeze(['down', 'up', 'left', 'right']),
+    rows: 'prototypes/actor-pose/output/a9-builder-actions/rows-runtime',
+    parts: 'mason/brick-work',
     bakedCargo: true,
   }),
 });

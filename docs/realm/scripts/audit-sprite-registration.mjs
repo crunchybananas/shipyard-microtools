@@ -175,7 +175,7 @@ if (asWrite) {
 // to see the uncorrected sheet numbers.
 let REG = {};
 if (!process.argv.includes('--raw')) {
-  try { REG = (await import('../js/actor-registration.js?realm=177')).ACTOR_REGISTRATION; } catch (_e) {}
+  try { REG = (await import('../js/actor-registration.js?realm=178')).ACTOR_REGISTRATION; } catch (_e) {}
 }
 for (const r of results) {
   if (r.empty) continue;

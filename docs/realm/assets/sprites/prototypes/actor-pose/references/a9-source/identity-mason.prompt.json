@@ -1,0 +1,42 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-mason",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_8KhMQNM9wSU7usiGA8cj851q.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/identity-woodsman-keyed.png",
+      "role": "edit target and exact modular layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png",
+      "role": "established Realm anatomy and rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png",
+      "role": "second established Realm identity rendering reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite identity source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into a NEW, distinctive master builder/mason identity component board while preserving its exact component-board layout, canvas proportions, isolated-part placement, painted resolution, polish, and anatomy conventions. Replace the woodsman's face, hair, beard, body identity, and base clothing across every component. This is a source-parts board, not an assembled character and not an animation.\nInput images: Image 1 is the edit target and exact modular layout reference. Images 2 and 3 are established Realm anatomy and rendering references. Preserve the classic strategy-game rendering language, but do not copy any existing person's identity.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nSubject identity: one experienced middle-aged master mason with a compact sturdy working build, olive-warm tan skin, a broad square jaw, strong slightly hooked nose, close-cropped nearly black hair with neatly shaved sides, heavy dark eyebrows, a prominent dark moustache, and a very short pointed goatee. No full beard. His identity must be unmistakably the same in every view and clearly different from the broad auburn-bearded woodsman. Base layer clothing is a plain fitted dark warm-gray undershirt and dark neutral trousers with practical brown boots, designed to be covered by later garment layers.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm material highlights, dark readable outline clusters, no photorealism, no blur, no dither, no soft ambient shadow.\nComposition/framing: Keep Image 1's 1536x1024 landscape modular layout exactly: top row has three isolated heads in front, back, and left-profile views; middle row has an isolated left arm, front torso, back torso, left-profile torso, and isolated right arm; bottom row has separated leg/boot components providing front, back, and side views. All components upright, fully uncropped, separated by generous uniform gaps, and sized and placed like Image 1. No assembled full character anywhere.\nLighting/mood: fixed upper-left warm key light identical across every component and view.\nColor palette: olive warm-tan skin, nearly black hair and facial hair, warm charcoal cloth, dark brown boots; do not use magenta or bright pink anywhere in the subject.\nConstraints: change all identity-bearing components consistently; exact same person, proportions, skin tone, hairline, moustache, short goatee, undershirt, and body build across front/back/profile parts; anatomically compatible joint endpoints; hands fully visible; clean neck, shoulder, elbow, wrist, hip, knee, and ankle cut zones; each component isolated; one consistent scale; preserve the exact canvas and board arrangement; background one uniform #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, or guides; no text; no watermark.\nAvoid: retaining the woodsman's auburn hair or full beard, assembled character, multiple people, duplicated extra heads, fantasy armor, helmet, hat, weapons, tools, props, scenery, perspective views, isometric camera, changing identity between views, smooth concept-art haze, green/magenta fringe, cast shadow, contact shadow.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f703f4"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason-keyed.png",
+  "keyed_sha256": "7e77724e32ab586f8e49c98722efa20fb82a00aec5a55623d02c18917816ad44",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason.png",
+  "alpha_sha256": "201cb29eb3ba231ddd2d5ae7e8f9f322cb230f1e70978bbc37fa8e9738dc04a6"
+}

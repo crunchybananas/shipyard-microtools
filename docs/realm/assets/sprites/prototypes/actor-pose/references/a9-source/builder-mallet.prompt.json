@@ -1,0 +1,46 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "builder-mallet",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_AftISKfSZ73ECQhHfZsifUC0.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a8-source/lumber-axe-keyed.png",
+      "role": "edit target and exact four-view board layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a7-source/farmer-hoe-keyed.png",
+      "role": "established Realm long-tool rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a5-source/guard-short-sword-keyed.png",
+      "role": "second established Realm modular tool rendering reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work-keyed.png",
+      "role": "new builder costume palette and style reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve\nAsset type: modular game-sprite tool source board for Realm's deterministic offline 2D skeletal compiler\nPrimary request: Edit Image 1 into exactly four isolated orthographic views of the SAME practical medieval master builder's construction mallet, preserving the exact four-object board layout, canvas, spacing, scale, source orientation, painted resolution, and polish. Replace every axe consistently. The mallet has a long straight worn ash-wood handle and a compact heavy rectangular dark hardwood head reinforced by two narrow aged-iron bands. Both striking faces are flat and square. It must read immediately as a carpenter/mason construction mallet when reduced to roughly 28–36 pixels tall; it is a working tool, not a weapon.\nInput images: Image 1 is the edit target and exact four-view tool-board layout/source-orientation reference. Images 2 and 3 are established Realm modular tool rendering references. Image 4 is the new builder costume palette/style reference. Do not retain the axe blade and do not copy the hoe or sword shape.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local removal.\nStyle/medium: crisp hand-painted classic 1990s strategy-game sprite source art, controlled pixel-cluster-friendly edges, warm wood highlights, dark readable iron clusters, no photorealism, no blur, no dither, no soft shadow.\nComposition/framing: Keep the 1536x1024 landscape source board and exactly four full uncropped tool views in one horizontal row with large equal gaps and generous padding. From left to right: broad head-face/front view, reverse/back view, left edge/profile view, right edge/profile view. Every mallet vertical with the head at the top and handle end at the bottom. Keep all four mallets the same overall length and head size. Exactly four objects and no labels.\nLighting/mood: fixed upper-left warm key light identical to the actor and costume sources.\nColor palette: warm medium-brown ash handle, very dark walnut head, muted charcoal aged-iron bands, restrained warm edge highlights; do not use magenta or bright pink anywhere in the mallet.\nMaterials/textures: subtle handle grain and grip wear, compact battered hardwood head, narrow workmanlike iron bands, no decorative carving.\nConstraints: replace every axe with the same mallet identity; identical tool construction, straight handle, rectangular head, two iron bands, striking-face dimensions, scale, and length across all views; each object fully separated from every other object and all canvas edges; preserve the exact canvas and four-object arrangement; background one uniform #ff00ff with no shadows, gradients, texture, reflections, floor plane, lighting variation, border, labels, or guides; crisp silhouettes; no cast shadow; no contact shadow; no text; no watermark; no hands; no character; no scenery; no extra tools; no logos.\nAvoid: axe, blade, hoe, sword, spear, pickaxe, warhammer, sledgehammer, ornate fantasy weapon, modern rubber mallet, multiple different mallets, isometric angle, perspective distortion, blur, antialiased haze, magenta fringe.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f705ee"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet-keyed.png",
+  "keyed_sha256": "1ac3bb6c0c1acdf2e53221951e0ae84e5d355637ba3ab2c89f0dfc9cfa388545",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet.png",
+  "alpha_sha256": "c69b1b51af7dd47cccdb6ff19d272aa4f4f88c4fecab5e114914fbca9823d838"
+}

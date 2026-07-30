@@ -361,6 +361,7 @@ def build(
                 "guard/carry",
                 "farmer/carry",
                 "lumber/carry",
+                "builder/carry",
             ],
             "bakedContainer": True,
         },

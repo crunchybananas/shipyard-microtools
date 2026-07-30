@@ -2,13 +2,13 @@
 // Random Events — drought, gold rush, plague, migration, etc.
 // ════════════════════════════════════════════════════════════
 
-import { G, rng, rngInt } from './state.js?realm=177';
-import { trySpawnSettlers } from './economy.js?realm=177';
-import { sfx as playSound } from './log.js?realm=177';
-import { emit } from './bus.js?realm=177';
-import { chronicle, announce } from './log.js?realm=177';
-import { recordDeathMarker } from './death-markers.js?realm=177';
-import { removeCitizenFromWorld } from './citizen-ownership.js?realm=177';
+import { G, rng, rngInt } from './state.js?realm=178';
+import { trySpawnSettlers } from './economy.js?realm=178';
+import { sfx as playSound } from './log.js?realm=178';
+import { emit } from './bus.js?realm=178';
+import { chronicle, announce } from './log.js?realm=178';
+import { recordDeathMarker } from './death-markers.js?realm=178';
+import { removeCitizenFromWorld } from './citizen-ownership.js?realm=178';
 
 // positive:true → green banner + 'season' sound
 // positive:false → red banner + 'raidWarning' sound

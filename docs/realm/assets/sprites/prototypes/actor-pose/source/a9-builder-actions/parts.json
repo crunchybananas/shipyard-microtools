@@ -1,0 +1,224 @@
+{
+  "schema": "realm.actor-pose.a9-builder-actions.v1",
+  "stage": "builder-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "mason",
+    "path": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason.png",
+    "sha256": "201cb29eb3ba231ddd2d5ae7e8f9f322cb230f1e70978bbc37fa8e9738dc04a6",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason-keyed.png",
+      "sha256": "7e77724e32ab586f8e49c98722efa20fb82a00aec5a55623d02c18917816ad44"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a9-source/identity-mason.prompt.json",
+    "parts": {
+      "down": {
+        "head": [296, 12, 457, 225],
+        "torso": [270, 256, 575, 550],
+        "arm_screen_left": [118, 265, 240, 590],
+        "arm_screen_right": [1174, 265, 1294, 590],
+        "leg": [252, 586, 524, 978]
+      },
+      "up": {
+        "head": [572, 12, 738, 220],
+        "torso": [604, 260, 906, 550],
+        "arm_screen_left": [118, 265, 240, 590],
+        "arm_screen_right": [1174, 265, 1294, 590],
+        "leg": [596, 590, 738, 978]
+      },
+      "left": {
+        "head": [809, 12, 994, 225],
+        "torso": [935, 250, 1112, 550],
+        "arm": [1174, 265, 1294, 590],
+        "leg": [938, 588, 1098, 978]
+      },
+      "right": {
+        "head": [809, 12, 994, 225],
+        "torso": [935, 250, 1112, 550],
+        "arm": [1174, 265, 1294, 590],
+        "leg": [938, 588, 1098, 978]
+      }
+    }
+  },
+  "garment": {
+    "key": "brick-work",
+    "path": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work.png",
+    "sha256": "9ddbfa22564e9e25f042d1816019bf87d31d3b5bd5319a7fc98413bf10188a61",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work-keyed.png",
+      "sha256": "510c37a1272b08e13a8f30fbbae05c9feaf30a11561375ff75ae00c7c522f33b"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a9-source/garment-brick-work.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [284, 44, 452, 170],
+        "tunic": [232, 188, 510, 550],
+        "sleeve_screen_left": [94, 236, 210, 418],
+        "sleeve_screen_right": [1110, 236, 1224, 418],
+        "belt": [244, 566, 486, 630],
+        "boot": [242, 646, 490, 978]
+      },
+      "up": {
+        "headgear": [578, 44, 748, 170],
+        "tunic": [530, 188, 800, 550],
+        "sleeve_screen_left": [94, 236, 210, 418],
+        "sleeve_screen_right": [1110, 236, 1224, 418],
+        "belt": [546, 566, 778, 626],
+        "boot": [542, 646, 780, 978]
+      },
+      "left": {
+        "headgear": [816, 40, 1032, 170],
+        "tunic": [862, 188, 1038, 550],
+        "sleeve": [1110, 236, 1224, 418],
+        "belt": [856, 566, 1040, 640],
+        "boot": [864, 646, 1022, 978]
+      },
+      "right": {
+        "headgear": [816, 40, 1032, 170],
+        "tunic": [862, 188, 1038, 550],
+        "sleeve": [1110, 236, 1224, 418],
+        "belt": [856, 566, 1040, 640],
+        "boot": [864, 646, 1022, 978]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "builder-mallet",
+    "path": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet.png",
+    "sha256": "c69b1b51af7dd47cccdb6ff19d272aa4f4f88c4fecab5e114914fbca9823d838",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet-keyed.png",
+      "sha256": "1ac3bb6c0c1acdf2e53221951e0ae84e5d355637ba3ab2c89f0dfc9cfa388545"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a9-source/builder-mallet.prompt.json",
+    "parts": {
+      "down": [120, 70, 450, 960],
+      "up": [480, 70, 785, 960],
+      "left": [870, 70, 1025, 960],
+      "right": [1180, 70, 1335, 960]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "mallet head at top, handle end at bottom",
+      "grip_fraction_from_top": 0.6,
+      "render_height": 36,
+      "occlusion": "body < mallet < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and builder work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and builder work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "mason",
+    "build": "compact, sturdy, grounded master-builder stance",
+    "identity_leg_far_width": 6.5,
+    "identity_leg_near_width": 7.5,
+    "garment_leg_far_width": 7.8,
+    "garment_leg_near_width": 8.8,
+    "upper_arm_far_width": 6,
+    "upper_arm_near_width": 7,
+    "forearm_far_width": 5.5,
+    "forearm_near_width": 6.3,
+    "identity_torso_size": [25, 32],
+    "garment_tunic_size": [29, 34],
+    "garment_belt_size": [26, 5],
+    "identity_head_size": [22, 24],
+    "garment_headgear_size": [27, 21]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": "builder-mallet",
+      "motion": "ready, measure, draw back, raise, drive, strike, rebound, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "mallet grip remains at the right-hand socket; head travels toward the authored facing at construction strike"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "builder",
+    "identity": "mason",
+    "garment": "brick-work",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, and construction-tool components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, and tool are measured independently before the flattened row is accepted"
+  }
+}

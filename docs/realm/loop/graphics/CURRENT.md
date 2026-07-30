@@ -1,5 +1,54 @@
 # Current Graphics Handoff
 
+## Realm 178 builder production family — 2026-07-30
+
+- All `16` builder rows now come from one deterministic A9 modular family:
+  a compact master-mason identity, sandstone/terracotta construction
+  workwear, one palette/lighting/root contract, four actions, and four
+  independently compiled directions.
+- The atomic promotion replaced all ten legacy or mechanically repaired
+  builder rows and filled the six inherited gaps. Production now contains
+  `218` accepted overrides and `0` candidates; builder has no inherited action
+  or direction.
+- A9 keeps three image-generation authorities separate from animation:
+  identity parts, garment parts, and a four-view hardwood construction mallet.
+  Their keyed sources, transparent sources, complete prompts, reference roles,
+  chroma-removal settings, crop boxes, and SHA-256 hashes are checked in.
+- The compiler emits `16` reviewable `512x84` rows / `128` frames plus body,
+  identity, garment, equipment, semantic, landmark, quality, palette, and
+  proof artifacts. Exact `27x35`, `35x46`, `54x70`, and `64x84` runtime tiers
+  remain binary-alpha, warning-free, palette-bounded, and byte deterministic.
+- Builder work uses eight planted mallet beats—ready, measure, draw back,
+  raise, drive, strike, rebound, recover—while the body stays at `76±1px`,
+  root row `79`, and clear rows `80–83`.
+- `builder/carry` joins guard, farmer, and lumber as an explicit
+  baked-container owner. A6 now proves
+  `4 roles × 9 resources × 4 directions = 144` production cargo pairs with
+  one frame, destination rectangle, runtime tier, and unsmoothed scale.
+- Browser gates cover all A9 rows at exact `3x`, action reset and cadence, an
+  assigned Hall-of-Ages builder in all four carry directions, stone payload
+  alignment, production-only atlas selection, and the live ordinary world at
+  the default tier.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a9_builder_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a9_builder_actions.py
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-builder-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: replace the blacksmith as the next full modular role family,
+then continue through the remaining derivative actor and world art without
+preserving development-era artwork.
+
 ## Realm 177 lumber production family — 2026-07-30
 
 - All `16` lumber rows now come from one deterministic A8 modular family:

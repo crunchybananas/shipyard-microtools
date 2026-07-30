@@ -440,443 +440,707 @@
         "status": "accepted"
       }
     },
-    "builder/carry/right": {
+    "builder/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-18T21:39:30Z",
-        "file": "builder/carry-right.png",
-        "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
-        "provenance": "deterministic-frame-reversal",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/carry-down-bcb7ee92c435.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
-          "bodyBottomRange": 1,
-          "bodyHeightRange": 3,
-          "bodyWidthRange": 11,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 79.0,
-            "medianBodyWidth": 34.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 33.0,
             "medianColor": [
-              107.85,
-              72.75,
-              45.25
+              129.85,
+              91.0,
+              59.0
             ],
-            "paletteDelta": 15.55
+            "paletteDelta": 4.9
           },
-          "flickerScore": 21.2,
-          "maxAlphaRatio": 1.083,
-          "maxBodyCenterJump": 2.98,
-          "maxEdgePixels": 15,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.036,
+          "maxBodyCenterJump": 2.27,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.05,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 35.0,
+          "maxPaletteDrift": 2.44,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            94.7,
-            65.35,
-            41.5
+            133.8,
+            93.6,
+            60.3
           ],
-          "medianColorCount": 429.0,
-          "medianShadingRatio": 0.674,
+          "medianColorCount": 411.0,
+          "medianShadingRatio": 0.6619,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+        "sha256": "bcb7ee92c4350a0aeb42ff04f00068ec39194dd0af2f02f98e4948d275aa838f",
+        "status": "accepted"
+      }
+    },
+    "builder/carry/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/carry-left-2f573ad2a36e.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              133.8,
+              93.6,
+              60.3
+            ],
+            "paletteDelta": 4.9
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.086,
+          "maxBodyCenterJump": 1.89,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 6.17,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            129.85,
+            91.0,
+            59.0
+          ],
+          "medianColorCount": 390.5,
+          "medianShadingRatio": 0.6721,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "2f573ad2a36ee2df6e6a604f24aacfe6e0981cb67ca6222aee1c377f4071730a",
+        "status": "accepted"
+      }
+    },
+    "builder/carry/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/carry-right-7db116dd4989.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              133.8,
+              93.6,
+              60.3
+            ],
+            "paletteDelta": 5.29
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.088,
+          "maxBodyCenterJump": 1.83,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 6.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
+          "medianColor": [
+            129.5,
+            90.85,
+            58.9
+          ],
+          "medianColorCount": 396.5,
+          "medianShadingRatio": 0.6712,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "7db116dd49895549e851dd9464965bb15aecebf0e267ca5c5992c48a2f41ca7f",
+        "status": "accepted"
+      }
+    },
+    "builder/carry/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/carry-up-ef18803efb20.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 33.0,
+            "medianColor": [
+              129.85,
+              91.0,
+              59.0
+            ],
+            "paletteDelta": 10.94
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.037,
+          "maxBodyCenterJump": 1.93,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.66,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            136.2,
+            98.5,
+            63.8
+          ],
+          "medianColorCount": 352.5,
+          "medianShadingRatio": 0.6716,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "ef18803efb20fe6572718c1db12b533b0d54f738cce9ea567f7e1731a2385cd5",
         "status": "accepted"
       }
     },
     "builder/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:16Z",
-        "file": "builder/idle-down.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/idle-down-07b7636f96f4.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 78.5,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 29.0,
             "medianColor": [
-              95.1,
-              66.0,
-              41.55
+              130.4,
+              92.3,
+              60.8
             ],
-            "paletteDelta": 29.24
+            "paletteDelta": 2.26
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.014,
-          "maxBodyCenterJump": 0.55,
-          "maxEdgePixels": 10,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.057,
+          "maxBodyCenterJump": 2.17,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.14,
-          "medianBodyHeight": 78.5,
-          "medianBodyWidth": 34.0,
+          "maxPaletteDrift": 2.05,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            116.95,
-            83.25,
-            50.5
+            132.6,
+            92.65,
+            61.2
           ],
-          "medianColorCount": 381.0,
-          "medianShadingRatio": 0.653,
+          "medianColorCount": 400.0,
+          "medianShadingRatio": 0.6713,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "6cc19b11f2b462d4d01401a15b3cc4e8d2b78e64a696e5a67d280a0d631ba29b",
+        "sha256": "07b7636f96f462e964a9f17ca53d3e7cacd6ebc40728f923dfc965e4397dd996",
         "status": "accepted"
       }
     },
     "builder/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:18Z",
-        "file": "builder/idle-left.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/idle-left-079c1ca06d82.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 78.5,
-            "medianBodyWidth": 34.0,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              110.6,
-              74.85,
-              46.4
+              132.6,
+              92.65,
+              61.2
             ],
-            "paletteDelta": 18.5
+            "paletteDelta": 2.26
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.017,
-          "maxBodyCenterJump": 0.49,
-          "maxEdgePixels": 14,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.69,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.22,
-          "medianBodyHeight": 78.5,
+          "maxPaletteDrift": 1.0,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 29.0,
           "medianColor": [
-            95.1,
-            66.0,
-            41.55
+            130.4,
+            92.3,
+            60.8
           ],
-          "medianColorCount": 424.0,
-          "medianShadingRatio": 0.6711,
+          "medianColorCount": 376.5,
+          "medianShadingRatio": 0.6617,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "90e0697505a15e6b3e1a210e773236195a73ea340eade94453effdc1dd64dfce",
+        "sha256": "079c1ca06d822460703d6db3291d54cf3d6672ea59aba0d58c00feed2a8f9136",
         "status": "accepted"
       }
     },
     "builder/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:19Z",
-        "file": "builder/idle-right.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/idle-right-0a1bdf3dc9e9.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 78.5,
-            "medianBodyWidth": 34.0,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              110.6,
-              74.85,
-              46.4
+              132.6,
+              92.65,
+              61.2
             ],
-            "paletteDelta": 18.5
+            "paletteDelta": 3.02
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.017,
-          "maxBodyCenterJump": 0.49,
-          "maxEdgePixels": 14,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.018,
+          "maxBodyCenterJump": 0.7,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.22,
-          "medianBodyHeight": 78.5,
+          "maxPaletteDrift": 0.9,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 29.0,
           "medianColor": [
-            95.1,
-            66.0,
-            41.55
+            129.75,
+            91.95,
+            60.5
           ],
-          "medianColorCount": 424.0,
-          "medianShadingRatio": 0.6711,
+          "medianColorCount": 381.0,
+          "medianShadingRatio": 0.6646,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "30aa10799407a10d0a35e575ff6b77936c2f4b22c7c04388a2c0eb16233bd679",
+        "sha256": "0a1bdf3dc9e96e23eb1902972f58f028502aa83a6759103518f40c6c2144d07c",
         "status": "accepted"
       }
     },
     "builder/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:19:17Z",
-        "file": "builder/idle-up.png",
-        "note": "Idle repacked from the role's own painted walk passing frame with 1px breathing bob (Round 111 precedent).",
-        "provenance": "own-walk-stance-idle",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/idle-up-13408d578969.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 5.0,
-            "medianBodyHeight": 78.5,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 29.0,
             "medianColor": [
-              95.1,
-              66.0,
-              41.55
+              130.4,
+              92.3,
+              60.8
             ],
-            "paletteDelta": 18.5
+            "paletteDelta": 8.9
           },
-          "flickerScore": 2.0,
-          "maxAlphaRatio": 1.02,
-          "maxBodyCenterJump": 0.43,
-          "maxEdgePixels": 11,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.058,
+          "maxBodyCenterJump": 2.29,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.41,
-          "medianBodyHeight": 78.5,
-          "medianBodyWidth": 34.0,
+          "maxPaletteDrift": 2.05,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            110.6,
-            74.85,
-            46.4
+            135.9,
+            98.2,
+            64.55
           ],
-          "medianColorCount": 455.5,
-          "medianShadingRatio": 0.6849,
+          "medianColorCount": 346.0,
+          "medianShadingRatio": 0.6683,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "5446967dd1141a9f971d2d8f9aa2af0fe08a8d7beb943a601bdabfc0f91edeb3",
+        "sha256": "13408d578969264c0866ef16db58940a6316f43b3777357844643819bb191e35",
+        "status": "accepted"
+      }
+    },
+    "builder/walk/down": {
+      "production": {
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/walk-down-3a60dbb27859.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              130.75,
+              91.8,
+              60.5
+            ],
+            "paletteDelta": 2.47
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 2.16,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.46,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            132.7,
+            92.9,
+            61.55
+          ],
+          "medianColorCount": 394.5,
+          "medianShadingRatio": 0.667,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "3a60dbb2785973492906b12495baea2fed9631e32f33679b10edcced2bc0a98d",
+        "status": "accepted"
+      }
+    },
+    "builder/walk/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/walk-left-04bfacb62e10.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
+            "medianColor": [
+              132.7,
+              92.9,
+              61.55
+            ],
+            "paletteDelta": 2.47
+          },
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.09,
+          "maxBodyCenterJump": 2.12,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 8.64,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
+          "medianColor": [
+            130.75,
+            91.8,
+            60.5
+          ],
+          "medianColorCount": 372.5,
+          "medianShadingRatio": 0.6634,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "04bfacb62e103f1e712079adbf385dc13ec5e1e67d1867a1c29f7babba2992be",
         "status": "accepted"
       }
     },
     "builder/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-18T21:39:28Z",
-        "file": "builder/walk-right.png",
-        "note": "Reordered only the existing right-facing frames 7,6,5,4,3,2,1,0; exact RGBA content is unchanged and frame N now mirrors left frame N.",
-        "provenance": "deterministic-frame-reversal",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/walk-right-e6447e214fa8.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
-          "bodyBottomRange": 1,
-          "bodyHeightRange": 3,
-          "bodyWidthRange": 11,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
+            "bodyHeightDelta": 0.0,
             "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 79.0,
-            "medianBodyWidth": 34.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              107.85,
-              72.75,
-              45.25
+              132.7,
+              92.9,
+              61.55
             ],
-            "paletteDelta": 15.55
+            "paletteDelta": 3.13
           },
-          "flickerScore": 21.2,
-          "maxAlphaRatio": 1.083,
-          "maxBodyCenterJump": 2.98,
-          "maxEdgePixels": 15,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.092,
+          "maxBodyCenterJump": 2.03,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.05,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 35.0,
+          "maxPaletteDrift": 8.46,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            94.7,
-            65.35,
-            41.5
+            130.2,
+            91.5,
+            60.3
           ],
-          "medianColorCount": 429.0,
-          "medianShadingRatio": 0.674,
+          "medianColorCount": 379.5,
+          "medianShadingRatio": 0.6659,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "495210a0342d3d881e71cd271275874c65f5a66c2c69f56d0d3bd8aa383bde4b",
+        "sha256": "e6447e214fa8d94bff10b803826e28505d606183dad20a999ca3c10604568483",
+        "status": "accepted"
+      }
+    },
+    "builder/walk/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/walk-up-a9c93276cb1e.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
+            "medianColor": [
+              130.75,
+              91.8,
+              60.5
+            ],
+            "paletteDelta": 8.86
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.044,
+          "maxBodyCenterJump": 2.15,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.72,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
+          "medianColor": [
+            135.55,
+            98.05,
+            64.55
+          ],
+          "medianColorCount": 352.5,
+          "medianShadingRatio": 0.6639,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "a9c93276cb1e587ab57fe4e6753d0062a9c33301a7c1f04bf3fa279425c878c4",
         "status": "accepted"
       }
     },
     "builder/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T23:26:14Z",
-        "file": "builder/work-down.png",
-        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-        "provenance": "uniform-anchor-rescale",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/work-down-fa7021142e94.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 3,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 11.0,
-            "medianBodyHeight": 80.0,
-            "medianBodyWidth": 51.5,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              97.8,
-              64.1,
-              31.35
+              129.1,
+              90.8,
+              59.25
             ],
-            "paletteDelta": 15.74
+            "paletteDelta": 3.6
           },
-          "flickerScore": 9.6,
-          "maxAlphaRatio": 1.08,
-          "maxBodyCenterJump": 3.37,
-          "maxEdgePixels": 46,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.038,
+          "maxBodyCenterJump": 2.3,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.1,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 40.5,
+          "maxPaletteDrift": 5.78,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            109.1,
-            75.0,
-            32.4
+            131.3,
+            93.05,
+            61.0
           ],
-          "medianColorCount": 585.5,
-          "medianShadingRatio": 0.6875,
+          "medianColorCount": 423.0,
+          "medianShadingRatio": 0.6681,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "bfc93e24f0d68edd25258510701afb16e4832c3317c1a6311b25289adc39a0e0",
+        "sha256": "fa7021142e94154c1291cb9bebc6b05c7316c67ed493538657d0c309b7188dc4",
         "status": "accepted"
       }
     },
     "builder/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T23:26:24Z",
-        "file": "builder/work-left.png",
-        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-        "provenance": "uniform-anchor-rescale",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/work-left-2600e581a60c.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
-          "bodyBottomRange": 1,
+          "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 5,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 11.0,
-            "medianBodyHeight": 80.0,
-            "medianBodyWidth": 40.5,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              97.8,
-              64.8,
-              31.35
+              131.3,
+              93.05,
+              61.0
             ],
-            "paletteDelta": 0.7
+            "paletteDelta": 3.6
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.118,
-          "maxBodyCenterJump": 2.02,
-          "maxEdgePixels": 44,
-          "maxFragmentPixels": 1,
-          "maxPaletteDrift": 2.88,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 51.5,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.026,
+          "maxBodyCenterJump": 0.67,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.79,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            97.8,
-            64.1,
-            31.35
+            129.1,
+            90.8,
+            59.25
           ],
-          "medianColorCount": 616.0,
-          "medianShadingRatio": 0.6864,
+          "medianColorCount": 412.0,
+          "medianShadingRatio": 0.6635,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ff72f01a37b707420376b39b540f1ef96836869577933362be1eecfa7ad03919",
+        "sha256": "2600e581a60c8b70e9a291e59f4f6f025f06ea1895c354ed1f38165bfac4d259",
         "status": "accepted"
       }
     },
     "builder/work/right": {
       "production": {
-        "acceptedAt": "2026-07-18T20:57:58Z",
-        "file": "builder/work-right.png",
-        "note": "Reordered existing right-facing frames 7,6,5,4,3,2,1,0 to match the left-facing work chronology; pixel content, identity, scale, anchor, and handedness are unchanged.",
-        "provenance": "deterministic-frame-reversal",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/work-right-bfa4286236ab.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
-          "bodyBottomRange": 1,
+          "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 5,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 11.0,
-            "medianBodyHeight": 80.0,
-            "medianBodyWidth": 40.5,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              97.8,
-              64.8,
-              31.35
+              131.3,
+              93.05,
+              61.0
             ],
-            "paletteDelta": 0.7
+            "paletteDelta": 4.45
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.118,
-          "maxBodyCenterJump": 2.02,
-          "maxEdgePixels": 44,
-          "maxFragmentPixels": 1,
-          "maxPaletteDrift": 2.88,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 51.5,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.025,
+          "maxBodyCenterJump": 0.64,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 5.22,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            97.8,
-            64.1,
-            31.35
+            128.4,
+            90.4,
+            58.9
           ],
-          "medianColorCount": 616.0,
-          "medianShadingRatio": 0.6864,
+          "medianColorCount": 408.5,
+          "medianShadingRatio": 0.6642,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a1447ae1b87f92947c70b19aa2cc74cea8c729584a6d92347af7505fcd94ab2b",
+        "sha256": "bfa4286236abf63885c995baea6d1a92b3eef4288ae9f6085dda075fe0421039",
         "status": "accepted"
       }
     },
     "builder/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T23:26:19Z",
-        "file": "builder/work-up.png",
-        "note": "Work row rescaled to the walk-family body scale (uniform per-row transform, ground-anchored).",
-        "provenance": "uniform-anchor-rescale",
+        "acceptedAt": "2026-07-30T07:30:40Z",
+        "file": "production/builder/work-up-19e43d9df280.png",
+        "note": "Realm 178 A9 modular builder family",
+        "provenance": "modular-builder-family",
         "quality": {
-          "bodyBottomRange": 1,
+          "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 11.5,
-            "medianBodyHeight": 80.0,
-            "medianBodyWidth": 51.5,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              97.8,
-              64.1,
-              31.35
+              129.1,
+              90.8,
+              59.25
             ],
-            "paletteDelta": 2.94
+            "paletteDelta": 8.87
           },
-          "flickerScore": 7.6,
-          "maxAlphaRatio": 1.125,
-          "maxBodyCenterJump": 2.31,
-          "maxEdgePixels": 42,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 2.25,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 6.58,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 40.0,
+          "maxPaletteDrift": 7.12,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            95.55,
-            64.8,
-            29.6
+            133.65,
+            97.15,
+            63.45
           ],
-          "medianColorCount": 452.0,
-          "medianShadingRatio": 0.7534,
+          "medianColorCount": 387.0,
+          "medianShadingRatio": 0.6589,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ea0524b9d434c251d10557da19a1c7337b0ac632a2046aca08b13065d7146b83",
+        "sha256": "19e43d9df280df5368cfe12b5d61b9a22b7475a8c8302cdcb350bcb12042319e",
         "status": "accepted"
       }
     },
@@ -9278,6 +9542,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T06:41:36Z",
+  "updatedAt": "2026-07-30T07:30:40Z",
   "version": 2
 }
