@@ -42,7 +42,7 @@ try {
     && document.body.dataset.spriteRuntimeSource === 'accepted'
     && document.body.dataset.spriteCandidateFile === undefined
     && document.querySelectorAll('#sl-list .sl-source-badge.candidate').length === 0
-    && document.querySelectorAll('#sl-list .sl-source-badge.accepted').length === 195
+    && document.querySelectorAll('#sl-list .sl-source-badge.accepted').length === 201
   ));
 
   const idle = await page.evaluate(async () => {
@@ -57,6 +57,9 @@ try {
     const guardProduction = Object.entries(manifest.rows).filter(
       ([key, slots]) => key.startsWith('guard/') && slots.production,
     );
+    const farmerProduction = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('farmer/') && slots.production,
+    );
     const key = 'guard/idle/down';
     const item = manifest.rows[key].production;
     const bytes = await fetch(`assets/sprites/actor-rows/${item.file}`).then(
@@ -70,6 +73,7 @@ try {
       candidateCount: candidates.length,
       productionCount: production.length,
       guardProductionCount: guardProduction.length,
+      farmerProductionCount: farmerProduction.length,
       productionHash: item.sha256,
       fetchedProductionHash: digest,
       reviewSource: document.body.dataset.spriteReviewSource,
@@ -87,8 +91,9 @@ try {
 
   assert.equal(idle.version, 2);
   assert.equal(idle.candidateCount, 0);
-  assert.equal(idle.productionCount, 195);
+  assert.equal(idle.productionCount, 201);
   assert.equal(idle.guardProductionCount, 16);
+  assert.equal(idle.farmerProductionCount, 16);
   assert.equal(idle.candidateBadges, 0);
   assert.equal(idle.reviewSource, 'accepted');
   assert.equal(idle.runtimeSource, 'accepted');
@@ -147,6 +152,7 @@ try {
       candidates: idle.candidateCount,
       production: idle.productionCount,
       guardProduction: idle.guardProductionCount,
+      farmerProduction: idle.farmerProductionCount,
     },
     idle,
     carry,
@@ -155,8 +161,8 @@ try {
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(
-    '[actor-row-candidate-browser] PASS — 195 production rows and 0 candidates; '
-    + 'all 16 guard rows are LOCKED and ordinary game loads no candidate assets',
+    '[actor-row-candidate-browser] PASS — 201 production rows and 0 candidates; '
+    + 'all guard and farmer rows are LOCKED and ordinary game loads no candidate assets',
   );
 } finally {
   await browser.close();

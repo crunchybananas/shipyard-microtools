@@ -76,6 +76,21 @@ ACTION = "carry"
 IDENTITY = "watchman"
 GARMENT = "watch-blue"
 RUNTIME_SIZE = (35, 46)
+DEFAULT_CARDINAL_RENDER_PROFILE = {
+    "identity_leg_far_width": 7.5,
+    "identity_leg_near_width": 8.8,
+    "garment_leg_far_width": 8.7,
+    "garment_leg_near_width": 10.0,
+    "upper_arm_far_width": 6.5,
+    "upper_arm_near_width": 7.5,
+    "forearm_far_width": 6.0,
+    "forearm_near_width": 6.8,
+    "identity_torso_size": [29, 34],
+    "garment_tunic_size": [32, 34],
+    "garment_belt_size": [27, 5],
+    "identity_head_size": [24, 24],
+    "garment_headgear_size": [30, 22],
+}
 
 
 def file_sha(path: Path) -> str:
@@ -382,7 +397,12 @@ def compose_cardinal_frame(
     parts: dict[str, Image.Image],
     pose_frame: dict[str, Any],
     direction: str,
+    render_profile: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Image.Image], dict[str, Any]]:
+    profile = {
+        **DEFAULT_CARDINAL_RENDER_PROFILE,
+        **(render_profile or {}),
+    }
     near = pose_frame["near"]
     far = pose_frame["far"]
     shoulders = pose_frame["shoulders"]
@@ -403,8 +423,16 @@ def compose_cardinal_frame(
         garment_label = f"garment-boot-{side}"
         identity_source = parts["identity:leg"]
         garment_source = parts["garment:boot"]
-        identity_width = 7.5 if is_far else 8.8
-        garment_width = 8.7 if is_far else 10.0
+        identity_width = profile[
+            "identity_leg_far_width"
+            if is_far
+            else "identity_leg_near_width"
+        ]
+        garment_width = profile[
+            "garment_leg_far_width"
+            if is_far
+            else "garment_leg_near_width"
+        ]
         return [
             (
                 "identity",
@@ -470,7 +498,11 @@ def compose_cardinal_frame(
         side: str,
         is_far: bool,
     ) -> list[tuple[str, str, Image.Image]]:
-        width = 6.5 if is_far else 7.5
+        width = profile[
+            "upper_arm_far_width"
+            if is_far
+            else "upper_arm_near_width"
+        ]
         identity_source = cardinal_texture(
             parts, "identity", "arm", side, direction
         )
@@ -508,7 +540,11 @@ def compose_cardinal_frame(
         side: str,
         is_far: bool,
     ) -> list[tuple[str, str, Image.Image]]:
-        width = 6.0 if is_far else 6.8
+        width = profile[
+            "forearm_far_width"
+            if is_far
+            else "forearm_near_width"
+        ]
         source = cardinal_texture(
             parts, "identity", "arm", side, direction
         )
@@ -550,7 +586,7 @@ def compose_cardinal_frame(
         "identity-torso",
         direct_piece(
             parts["identity:torso"],
-            (29, 34),
+            tuple(profile["identity_torso_size"]),
             tuple(pose_frame["torso"]),
         ),
     )
@@ -559,7 +595,7 @@ def compose_cardinal_frame(
         "garment-tunic",
         direct_piece(
             parts["garment:tunic"],
-            (32, 34),
+            tuple(profile["garment_tunic_size"]),
             tuple(pose_frame["torso"]),
         ),
     )
@@ -568,7 +604,7 @@ def compose_cardinal_frame(
         "garment-belt",
         direct_piece(
             parts["garment:belt"],
-            (27, 5),
+            tuple(profile["garment_belt_size"]),
             tuple(pose_frame["sockets"]["belt"]),
         ),
     )
@@ -579,7 +615,7 @@ def compose_cardinal_frame(
         "identity-head",
         direct_piece(
             parts["identity:head"],
-            (24, 24),
+            tuple(profile["identity_head_size"]),
             tuple(pose_frame["head"]),
         ),
     )
@@ -588,7 +624,7 @@ def compose_cardinal_frame(
         "garment-headgear",
         direct_piece(
             parts["garment:headgear"],
-            (30, 22),
+            tuple(profile["garment_headgear_size"]),
             (pose_frame["head"][0], pose_frame["head"][1] - 1),
         ),
     )

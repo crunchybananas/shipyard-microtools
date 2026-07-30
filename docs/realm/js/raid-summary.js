@@ -3,8 +3,8 @@
 // and changed the chronicle. The core owns the counters; the bus-backed log
 // functions keep presentation in the shell.
 
-import { G } from './state.js?realm=175';
-import { announce, chronicle } from './log.js?realm=175';
+import { G } from './state.js?realm=176';
+import { announce, chronicle } from './log.js?realm=176';
 
 const RAID_PROSE = Object.freeze({
   razed: Object.freeze([

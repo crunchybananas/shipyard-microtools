@@ -2819,9 +2819,9 @@
         "sha256": "9523b4ae5b653286a7ea62b53cb7e2d3501fd0357954a575455a15747718fefb"
       },
       "scripts/actor-pose-prototype/a4_guard_family.py": {
-        "bytes": 42176,
+        "bytes": 43329,
         "owner": "compiler-source",
-        "sha256": "0ad148b9317612c7ed47b3ea0979ec61d4a26c192a10769e7d79c7e3ef091989"
+        "sha256": "6179b836c13444bb22a847d362d2bcd3e13bd6e9f079159891995c3130b84c7e"
       },
       "scripts/sprite_row_quality.py": {
         "bytes": 14174,
@@ -2833,7 +2833,7 @@
     "network_required": false,
     "paint_sources_transformed_by_joint_chain": true,
     "runtime_skeletal_renderer": false,
-    "source_hash": "4417cf5af25f25ac3dc57cb0096b032f203e06248fc4e446f40529358ee6b4cd"
+    "source_hash": "44875e82a6fa8aa772674d638130c9f276469e300e5a8034e20e3c1bed5952a1"
   },
   "stage": "guard-carry-four-directions",
   "status": "direction-family-proven",

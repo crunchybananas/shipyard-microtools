@@ -10,6 +10,9 @@ The current art direction uses painted PNG assets as the source of truth:
 - `actors/*.png` as editable per-role citizen source sheets.
 - `actor-rows/` as canonical reviewed row overrides plus their SHA-256
   manifest.
+- `prototypes/actor-pose/source/` and `references/` as the hash-locked
+  modular identity, garment, equipment, pose, and image-generation
+  authorities used to compile complete replacement families.
 - `actors-compiled/*.png` as generated per-role sheets with accepted row
   overrides applied.
 - `ambient/*.png` as editable moving-prop and animal source sprites such as
@@ -23,10 +26,11 @@ The current art direction uses painted PNG assets as the source of truth:
   provenance, and SHA-256 contract for every actor runtime scale.
 - `ambient-atlas.png` compiled from `ambient/*.png` for the live renderer.
 
-Hard rule for motion sprites: do not create or edit a single mixed actor source
-sheet. Actor source art is one PNG per actor role under `actors/`; ambient
-motion source art is one PNG per prop under `ambient/`. The atlas files are
-generated runtime artifacts only.
+Hard rule for motion sprites: do not edit a compiled role sheet or atlas as
+source art. Review and promote one `512x84` action/direction row at a time.
+Complete modular families compile those rows from separate identity, garment,
+equipment, pose, and attachment authorities. Ambient motion source art remains
+one PNG per prop under `ambient/`.
 
 ## Runtime Actor Resolution
 
@@ -60,7 +64,7 @@ Actor Muster also chooses an exact compiled frame size that fits each review
 cell. It no longer stretches a `35x46` frame to an arbitrary `40x52`
 presentation and accidentally makes good art look soft during review.
 
-## Modular A3 Vertical Slice
+## Historical Modular A3 Vertical Slice
 
 The first replacement-pipeline slice lives under
 `prototypes/actor-pose/output/a3-interchange/`. It is intentionally separate
@@ -84,26 +88,42 @@ from the production atlas while the style is being established.
   gradients into classic-strategy pixel clusters without changing the
   canonical painted source row.
 
-`guard/carry/right` is staged as a `CANDIDATE`, so it cannot enter the normal
-compiled atlas. The opt-in URL
-`index.html?actorpreview=a3-watchman-blue-cargo` substitutes only that row.
-It also suppresses the old procedural carry overlay for the substituted frame
-because the candidate owns its crate and hand occlusion. Without the query,
-no preview image is requested and production rendering is unchanged.
+This A3 output is retained as provenance for the first factorial source test.
+Its former single-row guard candidate and preview URL have been retired. The
+complete A5 guard and A7 farmer families supersede it in production.
+
+## Complete Modular Actor Families
+
+- A5 compiles the guard from one watchman identity, one watch-blue garment,
+  a short sword, and a cargo crate across all four actions and directions.
+- A7 compiles the farmer from one craftsperson identity, one ochre workwear
+  kit, a four-view hoe, and the same socketed cargo crate across all four
+  actions and directions.
+- Each family emits 16 independent `512x84` rows, 128 frames, semantic and
+  equipment planes, landmarks, body-only proofs, a family contact sheet, and
+  four exact runtime tiers.
+- Both compilers require binary runtime alpha, a shared 48-color family
+  palette, stable `76px` body height, ground row `79`, clear rows `80–83`,
+  distinct directions, clean row-quality reports, and a byte-identical clean
+  rebuild.
+- `guard/carry` and `farmer/carry` own their baked containers. A6 supplies the
+  nine resource-specific payloads at the same tier, frame, and destination
+  rectangle; the procedural fallback is suppressed only for those owners.
 
 Verification:
 
 ```sh
-scripts/.venv/bin/python scripts/actor-pose-prototype/a3_factorial.py --verify
-scripts/.venv/bin/python scripts/actor-pose-prototype/verify_a3_factorial.py
-REALM_SPRITE_PYTHON=scripts/.venv/bin/python scripts/sprite-row verify
-node scripts/verify-actor-vertical-slice.mjs
+python3 scripts/actor-pose-prototype/a7_farmer_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a7_farmer_actions.py
+scripts/sprite-row verify
+node scripts/verify-farmer-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
 ```
 
-The live verification checks the candidate on both Actor Muster and an actual
-settlement guard carrier, proves exact zoom-matched tier selection and
-row-local addressing, and separately proves that an ordinary URL has no
-preview loaders.
+The live verification checks preview rows before promotion and production
+atlas rows after promotion. It proves exact zoom-matched tier selection,
+row-local addressing, transition resets, actor/payload alignment, disabled
+smoothing at integer scale, and no preview requests from an ordinary URL.
 
 ## Actor Row Factory
 

@@ -2,12 +2,12 @@
 // World generation — terrain, fog, noise
 // ════════��═════════════════════════��═════════════════════════
 
-import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=175';
-import { makeAvatar } from './avatar.js?realm=175';
+import { G, TILE, MAP_W, MAP_H, rng, rngInt, rngRange, randomName } from './state.js?realm=176';
+import { makeAvatar } from './avatar.js?realm=176';
 import {
   assertCitizenActorIdAvailable,
   createCitizenOwnership,
-} from './citizen-ownership.js?realm=175';
+} from './citizen-ownership.js?realm=176';
 
 function hash2(x,y){ let n=x*374761393+y*668265263; n=(n^(n>>13))*1274126177; return(n^(n>>16))&0x7fffffff; }
 function noise2(x,y){

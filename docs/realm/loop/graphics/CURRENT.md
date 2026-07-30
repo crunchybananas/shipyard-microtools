@@ -1,5 +1,57 @@
 # Current Graphics Handoff
 
+## Realm 176 farmer production family — 2026-07-30
+
+- All `16` farmer rows now come from one deterministic A7 modular family:
+  craftsperson identity, ochre field-work garment, fixed lean build, shared
+  palette/lighting/root, four actions, and four real directions.
+- The family replaces three unrelated systems: the settler-body head
+  transplants used by idle/walk, the separate large mechanical work rows, and
+  the inherited base carry art. The production manifest now contains `201`
+  accepted overrides and `0` candidates.
+- A7 keeps identity, garment, hoe, crate, semantic masks, landmarks, body-only
+  rows, and flattened animation rows independently inspectable. Every
+  animation remains an ordinary eight-frame `512x84` review unit.
+- The new four-view hoe source was generated only once as a modular component.
+  Its keyed image, transparent image, full prompt, reference roles,
+  chroma-removal settings, crop boxes, and SHA-256 hashes are checked in.
+- The compiler emits `16` rows / `128` frames and exact `27x35`, `35x46`,
+  `54x70`, and `64x84` tiers. All row gates are warning-free, body height stays
+  `76±1px`, ground row `79` is fixed, rows `80–83` remain clear, runtime alpha
+  is binary, the family palette stays within `48` colors, and clean rebuilds
+  are byte-identical.
+- `farmer/carry` now joins `guard/carry` as an explicit baked-container owner.
+  A6 payloads draw all nine resources over both families at the same tier,
+  frame, destination rectangle, and unsmoothed integer scale; the generic
+  procedural load does not draw for either owner.
+- The actor preview system is now data-driven rather than hard-coded to A5.
+  It can load complete A5 and A7 families without creating preview loaders on
+  ordinary game URLs.
+- Browser gates cover all `16` A7 rows at exact `3x`, a real assigned farmer
+  in all four carry directions, action reset/advance cadence, all
+  `2 roles × 9 resources × 4 directions` production cargo pairs, and the
+  absence of A5/A7 preview requests from ordinary production rendering.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a7_farmer_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a7_farmer_actions.py
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-farmer-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: replace another complete actor family, beginning with a distinct
+identity/garment source board rather than recoloring the farmer. Keep the same
+atomic 16-row promotion, independent equipment planes, clean rebuild, and
+live-canvas gates.
+
 ## Realm 175 guard production family and A6 cargo semantics — 2026-07-30
 
 - All `16` A5 guard rows are now production sources: one watchman identity,

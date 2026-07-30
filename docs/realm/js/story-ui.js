@@ -3,8 +3,8 @@
 // this shell module may use the DOM and wall clock but cannot mutate story
 // cadence or gameplay state.
 
-import { G } from './state.js?realm=175';
-import { initChronicle } from './log.js?realm=175';
+import { G } from './state.js?realm=176';
+import { initChronicle } from './log.js?realm=176';
 
 const TAG_ICONS = {
   milestone:'🏛️', event:'✨', character:'👤', raid:'⚔️',

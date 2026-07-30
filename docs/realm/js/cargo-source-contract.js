@@ -8,7 +8,10 @@ export const CARGO_RESOURCES = Object.freeze([
 ]);
 
 export const CARGO_DIRECTIONS = Object.freeze(['down', 'up', 'left', 'right']);
-export const CARGO_OWNER_ROWS = Object.freeze(['guard/carry']);
+export const CARGO_OWNER_ROWS = Object.freeze([
+  'guard/carry',
+  'farmer/carry',
+]);
 export const CARGO_FRAMES = 8;
 
 export const CARGO_RUNTIME_ATLASES = Object.freeze([

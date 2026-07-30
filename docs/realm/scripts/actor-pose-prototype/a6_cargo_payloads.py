@@ -357,7 +357,7 @@ def build(
             "framesPerRow": FRAMES,
             "rows": len(rows),
             "frames": len(rows) * FRAMES,
-            "ownerRows": ["guard/carry"],
+            "ownerRows": ["guard/carry", "farmer/carry"],
             "bakedContainer": True,
         },
         "layout": {

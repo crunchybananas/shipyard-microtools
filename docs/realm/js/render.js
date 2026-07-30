@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=175';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=175';
-import { makeAtlasLoader } from './atlas-loader.js?realm=175';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=175';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=176';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=176';
+import { makeAtlasLoader } from './atlas-loader.js?realm=176';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=176';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,7 +15,7 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=175';
+} from './sprite-source-contract.js?realm=176';
 import {
   CARGO_DIRECTIONS,
   CARGO_FRAMES,
@@ -24,21 +24,21 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from './cargo-source-contract.js?realm=175';
+} from './cargo-source-contract.js?realm=176';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=175';
+} from './render-resolution.js?realm=176';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=175';
+} from './citizen-presentation.js?realm=176';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=175';
-import { staffingCount } from './citizen-ownership.js?realm=175';
+} from './citizen-render-cache.js?realm=176';
+import { staffingCount } from './citizen-ownership.js?realm=176';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -176,22 +176,42 @@ const _CARGO_ATLAS_TIERS = CARGO_RUNTIME_ATLASES.map((tier) => ({
   ...tier,
   load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
 }));
-const _ACTOR_PREVIEW_ID = 'a5-guard-actions';
-const _actorPreviewEnabled = new URLSearchParams(location.search).get('actorpreview')
-  === _ACTOR_PREVIEW_ID;
-const _ACTOR_PREVIEW_SCOPE = Object.freeze({
-  role: 'guard',
-  actions: Object.freeze(['idle', 'walk', 'work', 'carry']),
-  dirs: Object.freeze(['down', 'up', 'left', 'right']),
+const _ACTOR_PREVIEW_CONFIGS = Object.freeze({
+  'a5-guard-actions': Object.freeze({
+    role: 'guard',
+    actions: Object.freeze(['idle', 'walk', 'work', 'carry']),
+    dirs: Object.freeze(['down', 'up', 'left', 'right']),
+    rows: 'prototypes/actor-pose/output/a5-guard-actions/rows-runtime',
+    parts: 'watchman/watch-blue',
+    bakedCargo: true,
+  }),
+  'a7-farmer-actions': Object.freeze({
+    role: 'farmer',
+    actions: Object.freeze(['idle', 'walk', 'work', 'carry']),
+    dirs: Object.freeze(['down', 'up', 'left', 'right']),
+    rows: 'prototypes/actor-pose/output/a7-farmer-actions/rows-runtime',
+    parts: 'craftsperson/ochre-work',
+    bakedCargo: true,
+  }),
 });
+const _ACTOR_PREVIEW_ID = new URLSearchParams(location.search).get('actorpreview');
+const _ACTOR_PREVIEW = _ACTOR_PREVIEW_CONFIGS[_ACTOR_PREVIEW_ID] || null;
+const _actorPreviewEnabled = Boolean(_ACTOR_PREVIEW);
+const _ACTOR_PREVIEW_SCOPE = _ACTOR_PREVIEW
+  ? Object.freeze({
+      role: _ACTOR_PREVIEW.role,
+      actions: _ACTOR_PREVIEW.actions,
+      dirs: _ACTOR_PREVIEW.dirs,
+    })
+  : null;
 const _ACTOR_PREVIEW_TIERS = _actorPreviewEnabled
   ? new Map(_ACTOR_ATLAS_TIERS.map((tier) => {
       const rows = new Map(_ACTOR_PREVIEW_SCOPE.actions.flatMap((action) => (
         _ACTOR_PREVIEW_SCOPE.dirs.map((dir) => [
           `${action}/${dir}`,
           makeAtlasLoader(_actorAtlasUrl(
-            `prototypes/actor-pose/output/a5-guard-actions/rows-runtime/${tier.key}`
-            + `/watchman/watch-blue/${action}-${dir}.png`
+            `${_ACTOR_PREVIEW.rows}/${tier.key}`
+            + `/${_ACTOR_PREVIEW.parts}/${action}-${dir}.png`
           )),
         ])
       )));
@@ -215,6 +235,15 @@ function actorPreviewMatches(role, action, dir) {
     && role === _ACTOR_PREVIEW_SCOPE.role
     && _ACTOR_PREVIEW_SCOPE.actions.includes(action)
     && _ACTOR_PREVIEW_SCOPE.dirs.includes(dir);
+}
+
+function actorOwnsBakedCargo(role, action) {
+  return cargoOwnerRow(role, action)
+    || Boolean(
+      _ACTOR_PREVIEW?.bakedCargo
+      && role === _ACTOR_PREVIEW_SCOPE.role
+      && action === 'carry'
+    );
 }
 
 function actorPreviewSelection(role, action, dir, atlasSelection) {
@@ -411,7 +440,7 @@ export function drawCargoAtlasFrame(targetCtx, {
 } = {}) {
   if (
     !targetCtx
-    || !cargoOwnerRow(role, action)
+    || !actorOwnsBakedCargo(role, action)
     || !Number.isFinite(x)
     || !Number.isFinite(y)
   ) return false;
@@ -614,7 +643,7 @@ function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facin
     width: targetW,
     height: targetH,
   });
-  if (drawn && c.carrying && cargoOwnerRow(variant, action)) {
+  if (drawn && c.carrying && actorOwnsBakedCargo(variant, action)) {
     drawCargoAtlasFrame(ctx, {
       role: variant,
       action,
@@ -1080,7 +1109,7 @@ if (typeof window !== 'undefined') {
     id: _actorPreviewEnabled ? _ACTOR_PREVIEW_ID : null,
     enabled: _actorPreviewEnabled,
     scope: _ACTOR_PREVIEW_SCOPE,
-    bakedCargo: _actorPreviewEnabled,
+    bakedCargo: Boolean(_ACTOR_PREVIEW?.bakedCargo),
     tiers: [..._ACTOR_PREVIEW_TIERS.values()].map((tier) => ({
       key: tier.key,
       frameW: tier.frameW,
@@ -2504,7 +2533,7 @@ export function render() {
       if (G.camera.zoom >= 0.7) {
         const previewRole = actorVariantForCitizen(c);
         const previewAction = actorActionForCitizen(c, isMoving);
-        if (!cargoOwnerRow(previewRole, previewAction)) {
+        if (!actorOwnsBakedCargo(previewRole, previewAction)) {
           drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight);
         }
       }

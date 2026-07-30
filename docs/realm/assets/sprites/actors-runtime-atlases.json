@@ -35,7 +35,7 @@
       "frameHeight": 35,
       "width": 216,
       "height": 7840,
-      "sha256": "077b7169c9df50c792d69bf8b79825b34cc1486c236e72ecd79a08bf41a7ff93"
+      "sha256": "fc0ee83b7a09cc3574c6ba24f39016ebc285a00379164612adcff1c8dbe676b4"
     },
     {
       "key": "default",
@@ -44,7 +44,7 @@
       "frameHeight": 46,
       "width": 280,
       "height": 10304,
-      "sha256": "222bb3cc4d2ac09d690116df650e3899d70a3ea445503fde09f934d6e445e595"
+      "sha256": "5a6fee7513ec566a0c8ca9a505ece3e4029330af6db7e83004e7abaffb90a282"
     },
     {
       "key": "double",
@@ -53,7 +53,7 @@
       "frameHeight": 70,
       "width": 432,
       "height": 15680,
-      "sha256": "555291b5439217beb0c6104b52f580136d9ac0f29fe6c6ecc251272fb717364b"
+      "sha256": "b4c192203b8b15d02c8e87b08e70e0df86541ddc7d7ad316ede180ee57b03417"
     },
     {
       "key": "review",
@@ -62,7 +62,7 @@
       "frameHeight": 84,
       "width": 512,
       "height": 18816,
-      "sha256": "f0a1c60072f9a6c2766934ddcc81f8cca6c40caa6d45b2ce397fe719796e17b5"
+      "sha256": "449550585126d940d5b71bf7de5089770bbe28ba7f26bcbf404601512fa0183d"
     }
   ]
 }

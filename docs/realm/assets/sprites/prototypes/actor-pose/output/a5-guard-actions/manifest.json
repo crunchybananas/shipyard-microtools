@@ -7163,14 +7163,14 @@
         "sha256": "9523b4ae5b653286a7ea62b53cb7e2d3501fd0357954a575455a15747718fefb"
       },
       "scripts/actor-pose-prototype/a4_guard_family.py": {
-        "bytes": 42176,
+        "bytes": 43329,
         "owner": "shared-direction-compiler",
-        "sha256": "0ad148b9317612c7ed47b3ea0979ec61d4a26c192a10769e7d79c7e3ef091989"
+        "sha256": "6179b836c13444bb22a847d362d2bcd3e13bd6e9f079159891995c3130b84c7e"
       },
       "scripts/actor-pose-prototype/a5_guard_actions.py": {
-        "bytes": 44150,
+        "bytes": 44286,
         "owner": "compiler-source",
-        "sha256": "589b6210da3d82270cc7930e666580a15be42062cc3a04e4caa85a5c407e0e4e"
+        "sha256": "1c7b45c9df44d594e840699a36b69ace9228db08e8ab748f8d39ebe549bb564b"
       },
       "scripts/sprite_row_quality.py": {
         "bytes": 14174,
@@ -7182,7 +7182,7 @@
     "network_required": false,
     "paint_sources_transformed_by_joint_chain": true,
     "runtime_skeletal_renderer": false,
-    "source_hash": "932fe6fc70470fcf84fde809898f49873c4b0c5c6b95e4129489fa617d1dbc37"
+    "source_hash": "5a7da984e1be1e2f946662c18ba58d92ea070086fafeadb570cb0657a35a204f"
   },
   "stage": "guard-four-action-family",
   "status": "action-family-proven",

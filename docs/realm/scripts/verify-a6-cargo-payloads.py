@@ -56,7 +56,10 @@ def main() -> int:
         failures.append("manifest direction order changed")
     if scope.get("rows") != 36 or scope.get("frames") != 288:
         failures.append("manifest must describe 36 rows and 288 frames")
-    if scope.get("ownerRows") != ["guard/carry"] or scope.get("bakedContainer") is not True:
+    if (
+        scope.get("ownerRows") != ["guard/carry", "farmer/carry"]
+        or scope.get("bakedContainer") is not True
+    ):
         failures.append("manifest baked-container ownership changed")
 
     state_source = (ROOT / "js/state.js").read_text()

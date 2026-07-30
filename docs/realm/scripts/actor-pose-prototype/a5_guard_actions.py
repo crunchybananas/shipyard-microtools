@@ -750,6 +750,10 @@ def validate_row(
     landmarks: list[dict[str, Any]],
     quality: dict[str, Any],
     body_quality: dict[str, Any],
+    *,
+    identity: str = IDENTITY,
+    garment: str = GARMENT,
+    work_tool_label: str = "sword",
 ) -> dict[str, Any]:
     failures: list[str] = []
     frame_metrics: list[dict[str, Any]] = []
@@ -804,7 +808,8 @@ def validate_row(
             socket = info["sockets"]["right_hand"]
             if not socket_has_alpha(equipment, socket):
                 failures.append(
-                    f"frame {index} sword hilt left the right-hand socket"
+                    f"frame {index} {work_tool_label} grip left the "
+                    "right-hand socket"
                 )
             tip = info.get("weapon_tip")
             if tip is None:
@@ -852,8 +857,8 @@ def validate_row(
     return {
         "schema": "realm.actor-pose.a5-row-gate.v1",
         "scope": {
-            "identity": IDENTITY,
-            "garment": GARMENT,
+            "identity": identity,
+            "garment": garment,
             "action": action,
             "direction": direction,
         },

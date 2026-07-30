@@ -880,443 +880,707 @@
         "status": "accepted"
       }
     },
-    "farmer/idle/down": {
+    "farmer/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:05Z",
-        "file": "farmer/idle-down.png",
-        "note": "Painted row: settler locked idle/down body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/carry-down-acbba56053aa.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 0.5,
-            "bodyWidthDelta": 8.5,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 22.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              107.3,
-              90.95,
-              47.7
+              122.85,
+              82.05,
+              38.5
             ],
-            "paletteDelta": 2.9
+            "paletteDelta": 6.64
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.07,
-          "maxBodyCenterJump": 1.11,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 2.04,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.75,
-          "medianBodyHeight": 77.5,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.5,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            107.95,
-            93.55,
-            46.6
+            128.8,
+            85.0,
+            38.7
           ],
-          "medianColorCount": 709.0,
-          "medianShadingRatio": 0.643,
+          "medianColorCount": 311.5,
+          "medianShadingRatio": 0.6844,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "84448d070fd844f1e9e3dd7297af0478f2868eb736d8679a1302360bf23654d3",
+        "sha256": "acbba56053aadbda6046194b3962a29af3f4427315c401858f5cd799d0d13122",
+        "status": "accepted"
+      }
+    },
+    "farmer/carry/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/carry-left-eacc40057455.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
+            "medianColor": [
+              122.85,
+              82.05,
+              38.5
+            ],
+            "paletteDelta": 0.24
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.078,
+          "maxBodyCenterJump": 1.79,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 4.57,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            123.05,
+            82.15,
+            38.6
+          ],
+          "medianColorCount": 333.0,
+          "medianShadingRatio": 0.6821,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "eacc400574555e462b2d86eebb5f9f4fcab528a13b22f78911086f1affd824e8",
+        "status": "accepted"
+      }
+    },
+    "farmer/carry/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/carry-right-006d991dd897.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
+            "medianColor": [
+              123.05,
+              82.15,
+              38.6
+            ],
+            "paletteDelta": 0.24
+          },
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.079,
+          "maxBodyCenterJump": 1.85,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 4.36,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
+          "medianColor": [
+            122.85,
+            82.05,
+            38.5
+          ],
+          "medianColorCount": 336.5,
+          "medianShadingRatio": 0.6877,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "006d991dd8975244e141d5dd20453d83b159f7d29a09a9c5d474a9e053a6f4d8",
+        "status": "accepted"
+      }
+    },
+    "farmer/carry/up": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/carry-up-3c2e254f90be.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
+            "medianColor": [
+              123.05,
+              82.15,
+              38.6
+            ],
+            "paletteDelta": 4.69
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 1.46,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.28,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
+          "medianColor": [
+            119.3,
+            79.6,
+            37.4
+          ],
+          "medianColorCount": 320.5,
+          "medianShadingRatio": 0.6866,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "3c2e254f90bea552f6863c640ee81def6c3fe5ab719c2d0efd6eac58d7ddcadf",
+        "status": "accepted"
+      }
+    },
+    "farmer/idle/down": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/idle-down-1226d4bc1040.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
+            "medianColor": [
+              121.5,
+              82.15,
+              38.75
+            ],
+            "paletteDelta": 9.44
+          },
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.048,
+          "maxBodyCenterJump": 2.21,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 1.46,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
+          "medianColor": [
+            129.65,
+            86.85,
+            39.5
+          ],
+          "medianColorCount": 309.0,
+          "medianShadingRatio": 0.6945,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "1226d4bc10405f18ddef662a654e0c05f67a2a76b57d5e60816f03385d9539f0",
         "status": "accepted"
       }
     },
     "farmer/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:07Z",
-        "file": "farmer/idle-left.png",
-        "note": "Painted row: settler locked idle/left body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/idle-left-7997a829bf47.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 8.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              107.3,
-              93.55,
-              46.6
+              121.5,
+              82.15,
+              38.75
             ],
-            "paletteDelta": 2.82
+            "paletteDelta": 0.84
           },
-          "flickerScore": 2.4,
-          "maxAlphaRatio": 1.049,
-          "maxBodyCenterJump": 0.87,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.022,
+          "maxBodyCenterJump": 0.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.4,
-          "medianBodyHeight": 78.0,
-          "medianBodyWidth": 22.0,
+          "maxPaletteDrift": 0.93,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            107.3,
-            90.95,
-            47.7
+            122.15,
+            82.65,
+            38.95
           ],
-          "medianColorCount": 534.5,
-          "medianShadingRatio": 0.6796,
+          "medianColorCount": 333.5,
+          "medianShadingRatio": 0.6845,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "836d9ac4485ab4db42ae06c7fe38cc7249570cab1aeafccab3d66f6fa9325557",
+        "sha256": "7997a829bf4781058d8ea7fde9f66bf2811c501616fc153326a7f4c7112d8709",
         "status": "accepted"
       }
     },
     "farmer/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:07Z",
-        "file": "farmer/idle-right.png",
-        "note": "Painted row: settler locked idle/right body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/idle-right-a71f95717c46.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              107.3,
-              93.55,
-              46.6
+              122.15,
+              82.65,
+              38.95
             ],
-            "paletteDelta": 2.82
+            "paletteDelta": 0.88
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.049,
-          "maxBodyCenterJump": 0.83,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 0.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.4,
-          "medianBodyHeight": 78.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.93,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            107.3,
-            90.95,
-            47.7
+            121.45,
+            82.15,
+            38.75
           ],
-          "medianColorCount": 534.5,
-          "medianShadingRatio": 0.6794,
+          "medianColorCount": 324.5,
+          "medianShadingRatio": 0.6866,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d111d58d60788425b5ba0824324d7e6a9fd39699b4fb92bfdc29ebf247da3836",
+        "sha256": "a71f95717c4673b5d66f94d760b715f64894deb05f0a09ca609a80bb38fbd744",
         "status": "accepted"
       }
     },
     "farmer/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:06Z",
-        "file": "farmer/idle-up.png",
-        "note": "Painted row: settler locked idle/up body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/idle-up-c8a1e429de90.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 2.0,
-            "bodyWidthDelta": 8.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 22.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              107.3,
-              90.95,
-              47.7
+              122.15,
+              82.65,
+              38.95
             ],
-            "paletteDelta": 19.44
+            "paletteDelta": 1.52
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.032,
-          "maxBodyCenterJump": 0.96,
-          "maxEdgePixels": 22,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.048,
+          "maxBodyCenterJump": 1.62,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.46,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.03,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            93.2,
-            93.9,
-            34.65
+            121.5,
+            81.9,
+            37.8
           ],
-          "medianColorCount": 631.5,
-          "medianShadingRatio": 0.682,
+          "medianColorCount": 297.0,
+          "medianShadingRatio": 0.6821,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "54883f4b599d20fa21d220b173811dfaca93f72bdfa6a61021ce44916da7e82c",
+        "sha256": "c8a1e429de907aee60009ac54e02bc6479b6c36aeec480ffb5f169d0455cf2e1",
         "status": "accepted"
       }
     },
     "farmer/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:08Z",
-        "file": "farmer/walk-down.png",
-        "note": "Painted row: settler locked walk/down body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/walk-down-5aeae6f7150f.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              100.9,
-              81.45,
-              45.45
+              122.95,
+              82.75,
+              38.75
             ],
-            "paletteDelta": 13.98
+            "paletteDelta": 7.71
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.063,
-          "maxBodyCenterJump": 0.91,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.03,
+          "maxBodyCenterJump": 2.27,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.19,
-          "medianBodyHeight": 77.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.4,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            109.15,
-            92.7,
-            46.4
+            129.5,
+            86.75,
+            39.45
           ],
-          "medianColorCount": 701.5,
-          "medianShadingRatio": 0.6461,
+          "medianColorCount": 312.5,
+          "medianShadingRatio": 0.6985,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "fc4c54c825157cf7dcba2c9f6ded10c80a374752de675156103fe4d9fc61f8b2",
+        "sha256": "5aeae6f7150f86fbb9c753065b6030b6b285b79e004809c5c877a7e5e7f2ac7b",
         "status": "accepted"
       }
     },
     "farmer/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:10Z",
-        "file": "farmer/walk-left.png",
-        "note": "Painted row: settler locked walk/left body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/walk-left-eaf859d6e6e4.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              100.9,
-              92.7,
-              45.45
+              122.95,
+              82.75,
+              38.75
             ],
-            "paletteDelta": 11.25
+            "paletteDelta": 0.69
           },
-          "flickerScore": 30.8,
-          "maxAlphaRatio": 1.14,
-          "maxBodyCenterJump": 3.46,
-          "maxEdgePixels": 5,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.081,
+          "maxBodyCenterJump": 2.11,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.9,
-          "medianBodyHeight": 78.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 5.14,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            100.9,
-            81.45,
-            45.45
+            123.45,
+            83.15,
+            39.0
           ],
-          "medianColorCount": 522.5,
-          "medianShadingRatio": 0.705,
+          "medianColorCount": 327.0,
+          "medianShadingRatio": 0.683,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ccbc2f1c3187c2e949bd74fb89fb84ab6fd98aeb20c3a71e282926d2ba97ba89",
+        "sha256": "eaf859d6e6e480d0534fe7668df609630800beb53e4d50a974d2f70c063ac506",
         "status": "accepted"
       }
     },
     "farmer/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:10Z",
-        "file": "farmer/walk-right.png",
-        "note": "Painted row: settler locked walk/right body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/walk-right-721fc78023b0.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              100.9,
-              92.7,
-              45.45
+              123.45,
+              83.15,
+              39.0
             ],
-            "paletteDelta": 11.25
+            "paletteDelta": 0.69
           },
-          "flickerScore": 30.8,
-          "maxAlphaRatio": 1.14,
-          "maxBodyCenterJump": 3.46,
-          "maxEdgePixels": 5,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.083,
+          "maxBodyCenterJump": 1.89,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.9,
-          "medianBodyHeight": 78.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 4.97,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
           "medianColor": [
-            100.9,
-            81.45,
-            45.45
+            122.95,
+            82.75,
+            38.75
           ],
-          "medianColorCount": 522.5,
-          "medianShadingRatio": 0.7051,
+          "medianColorCount": 329.5,
+          "medianShadingRatio": 0.6804,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "f32ac4c869438de5ec9aee8d8860be1ba113d1c8ac4612fa6db19b3443ddc9ea",
+        "sha256": "721fc78023b00f2029445bc26f7770907a6bf64afb441d4b1de088bc45051f7e",
         "status": "accepted"
       }
     },
     "farmer/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T22:41:09Z",
-        "file": "farmer/walk-up.png",
-        "note": "Painted row: settler locked walk/up body with farmer palette + farmer's own painted head/hat transplanted (carry donor; sides use the down-view hat on the settler profile).",
-        "provenance": "settler-body-own-head-transplant",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/walk-up-0d736a77b1e1.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 2.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 78.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              100.9,
-              81.45,
-              45.45
+              123.45,
+              83.15,
+              39.0
             ],
-            "paletteDelta": 16.69
+            "paletteDelta": 3.11
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.042,
-          "maxBodyCenterJump": 1.84,
-          "maxEdgePixels": 22,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.035,
+          "maxBodyCenterJump": 1.57,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.72,
-          "medianBodyHeight": 80.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.63,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            96.8,
-            94.9,
-            36.45
+            121.15,
+            81.65,
+            37.55
           ],
-          "medianColorCount": 643.0,
-          "medianShadingRatio": 0.6779,
+          "medianColorCount": 293.5,
+          "medianShadingRatio": 0.6842,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "0b8063bb2097cea965503fa7abf5469223eff8f59a15e3afa2b56e90a7cf05c8",
+        "sha256": "0d736a77b1e1bcaaf573d31b53a4e03500cdb9a40b1443a45caf85c22c89b80d",
         "status": "accepted"
       }
     },
     "farmer/work/down": {
       "production": {
-        "acceptedAt": "2026-07-09T18:22:57Z",
-        "file": "farmer/work-down.png",
-        "note": "Recomposed from the cleanest existing farmer work pose; controlled upper-body rhythm removes swing-width and edge instability.",
-        "provenance": "mechanical-stable-work-rhythm",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/work-down-e013989b1bc4.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 4,
           "directionReference": {
-            "bodyHeightDelta": 1.5,
-            "bodyWidthDelta": 8.5,
-            "medianBodyHeight": 79.0,
-            "medianBodyWidth": 45.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              120.7,
-              97.1,
-              33.3
+              122.55,
+              82.35,
+              39.45
             ],
-            "paletteDelta": 21.93
+            "paletteDelta": 7.4
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.081,
-          "maxBodyCenterJump": 1.01,
-          "maxEdgePixels": 26,
+          "flickerScore": 6.8,
+          "maxAlphaRatio": 1.038,
+          "maxBodyCenterJump": 2.09,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.83,
-          "medianBodyHeight": 77.5,
-          "medianBodyWidth": 37.0,
+          "maxPaletteDrift": 1.71,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            135.65,
-            104.85,
-            47.35
+            128.8,
+            86.15,
+            40.6
           ],
-          "medianColorCount": 687.0,
-          "medianShadingRatio": 0.6388,
+          "medianColorCount": 330.0,
+          "medianShadingRatio": 0.6956,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2ac121f0ce2d13869cc2565c52223850e5dec1940835624d40fdbd57fa9f3413",
+        "sha256": "e013989b1bc499d9d4716c3705cec4076c453a7d8801ab8b8975acd26d7650c2",
+        "status": "accepted"
+      }
+    },
+    "farmer/work/left": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/work-left-5cdde6e719e3.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
+            "medianColor": [
+              122.55,
+              82.35,
+              39.45
+            ],
+            "paletteDelta": 1.48
+          },
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.045,
+          "maxBodyCenterJump": 0.67,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 3.19,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
+          "medianColor": [
+            123.7,
+            83.2,
+            39.85
+          ],
+          "medianColorCount": 354.0,
+          "medianShadingRatio": 0.6838,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "5cdde6e719e37e91d170ead06814a2d6986ce92b06c36cc8789e0881ef7c5b61",
+        "status": "accepted"
+      }
+    },
+    "farmer/work/right": {
+      "production": {
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/work-right-c5b5e2db2b3b.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
+        "quality": {
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 1,
+          "directionReference": {
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
+            "medianColor": [
+              123.7,
+              83.2,
+              39.85
+            ],
+            "paletteDelta": 1.48
+          },
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.039,
+          "maxBodyCenterJump": 0.68,
+          "maxEdgePixels": 0,
+          "maxFragmentPixels": 0,
+          "maxPaletteDrift": 2.26,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 27.0,
+          "medianColor": [
+            122.55,
+            82.35,
+            39.45
+          ],
+          "medianColorCount": 350.0,
+          "medianShadingRatio": 0.6746,
+          "styleEra": "painted",
+          "warnings": []
+        },
+        "sha256": "c5b5e2db2b3b2c0c456a3975c25b4850f6a9d02a5e49ce282f542e20b6c29179",
         "status": "accepted"
       }
     },
     "farmer/work/up": {
       "production": {
-        "acceptedAt": "2026-07-09T18:22:58Z",
-        "file": "farmer/work-up.png",
-        "note": "Recomposed from the cleanest existing farmer rear work pose; controlled upper-body rhythm removes edge-clipped hoe arcs and fragments.",
-        "provenance": "mechanical-stable-work-rhythm",
+        "acceptedAt": "2026-07-30T06:07:45Z",
+        "file": "production/farmer/work-up-1e2a680563dd.png",
+        "note": "A7 coherent modular farmer family; verified clean rebuild and live-canvas transitions",
+        "provenance": "modular-a7-craftsperson-ochre-hoe",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 5,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 3,
           "directionReference": {
-            "bodyHeightDelta": 2.5,
-            "bodyWidthDelta": 5.5,
-            "medianBodyHeight": 79.0,
-            "medianBodyWidth": 45.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 27.0,
             "medianColor": [
-              120.7,
-              97.1,
-              33.3
+              123.7,
+              83.2,
+              39.85
             ],
-            "paletteDelta": 9.62
+            "paletteDelta": 3.05
           },
-          "flickerScore": 10.0,
-          "maxAlphaRatio": 1.08,
-          "maxBodyCenterJump": 0.99,
-          "maxEdgePixels": 31,
+          "flickerScore": 5.6,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 2.29,
+          "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 0.73,
-          "medianBodyHeight": 76.5,
-          "medianBodyWidth": 40.0,
+          "maxPaletteDrift": 3.45,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            114.95,
-            104.8,
-            33.7
+            121.25,
+            81.8,
+            38.7
           ],
-          "medianColorCount": 670.5,
-          "medianShadingRatio": 0.6236,
+          "medianColorCount": 329.0,
+          "medianShadingRatio": 0.6788,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "90a7bbdd8f3303286f2c0f917d9eba1d269e698d4a87c3255c2c78e21746e78a",
+        "sha256": "1e2a680563dde2954d04c24309f86e82b05d18c71a3bf8168cc2afac5362d877",
         "status": "accepted"
       }
     },
@@ -8530,6 +8794,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T05:32:56Z",
+  "updatedAt": "2026-07-30T06:07:45Z",
   "version": 2
 }
