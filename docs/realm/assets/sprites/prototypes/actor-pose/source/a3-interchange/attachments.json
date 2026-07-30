@@ -1,0 +1,26 @@
+{
+  "schema": "realm.actor-pose.a3-attachments.v1",
+  "attachments": {
+    "cargo-crate": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+      "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+      "generation_source": {
+        "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate-keyed.png",
+        "sha256": "3654e5e74c6570b20f4346784c1cdb6382dd942677d0dc71e12976e7f111162a"
+      },
+      "parts": {
+        "down": [170, 169, 666, 602],
+        "up": [829, 180, 1277, 602],
+        "right": [170, 169, 666, 602]
+      },
+      "render": {
+        "right": {
+          "size": [17, 14],
+          "socket": "load",
+          "offset": [0, 1],
+          "occlusion": "far-hand < cargo < near-hand"
+        }
+      }
+    }
+  }
+}

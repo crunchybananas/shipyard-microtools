@@ -2690,15 +2690,15 @@
     },
     "guard/carry/right": {
       "file": "guard/carry-right.png",
-      "note": "Exact mirror of reviewed guard carry-left candidate to preserve frame phase and side-view scale; no baked cargo or shield.",
-      "provenance": "deterministic-mirror",
+      "note": "A3 vertical-slice candidate compiled from independent watchman identity, watch-blue garment, socketed cargo-crate attachment, and the reviewed eight-beat carry skeleton; candidate only until live-canvas approval.",
+      "provenance": "a3-modular-skeletal",
       "quality": {
         "bodyBottomRange": 0,
-        "bodyHeightRange": 1,
-        "bodyWidthRange": 7,
+        "bodyHeightRange": 2,
+        "bodyWidthRange": 0,
         "directionReference": {
           "bodyHeightDelta": 0.5,
-          "bodyWidthDelta": 2.5,
+          "bodyWidthDelta": 5.0,
           "medianBodyHeight": 76.5,
           "medianBodyWidth": 31.0,
           "medianColor": [
@@ -2706,28 +2706,28 @@
             73.75,
             67.9
           ],
-          "paletteDelta": 1.35
+          "paletteDelta": 1.52
         },
-        "flickerScore": 10.4,
-        "maxAlphaRatio": 1.207,
-        "maxBodyCenterJump": 2.6,
+        "flickerScore": 4.0,
+        "maxAlphaRatio": 1.092,
+        "maxBodyCenterJump": 2.31,
         "maxEdgePixels": 0,
         "maxFragmentPixels": 0,
-        "maxPaletteDrift": 5.79,
+        "maxPaletteDrift": 3.72,
         "medianBodyHeight": 76.0,
-        "medianBodyWidth": 28.5,
+        "medianBodyWidth": 36.0,
         "medianColor": [
-          88.5,
-          73.75,
-          67.9
+          88.45,
+          74.0,
+          67.15
         ],
-        "medianColorCount": 504.0,
-        "medianShadingRatio": 0.6547,
+        "medianColorCount": 503.5,
+        "medianShadingRatio": 0.6743,
         "styleEra": "painted",
         "warnings": []
       },
-      "sha256": "f0365cd3882d8dd3855afbec25524e8df6ef1940130d4b184adc547ec3ac90fb",
-      "stagedAt": "2026-07-18T20:39:23Z",
+      "sha256": "c1bd8810dbb38389bf09d459d64352eb80999f052f7885380858138c19816acd",
+      "stagedAt": "2026-07-30T03:28:24Z",
       "status": "candidate"
     },
     "guard/idle/down": {
@@ -8098,6 +8098,6 @@
       "status": "accepted"
     }
   },
-  "updatedAt": "2026-07-18T21:39:30Z",
+  "updatedAt": "2026-07-30T03:28:24Z",
   "version": 1
 }

@@ -34,7 +34,10 @@
       "evidence_ref": "loop/engine-v2/CONVERSATIONS.md::Session 008"
     },
     "owner": {
-      "verdict": "pending"
+      "verdict": "approve-reference-only",
+      "subject_sha256": "9584845536c03912fc266c8d00507123b6878737206c10c548ef930980183849",
+      "recorded_at": "2026-07-29",
+      "evidence_ref": "codex-task:019fae30-d8df-7de0-ba62-f0d2e218514f::user-delegated-style-and-replaceability"
     }
   }
 }

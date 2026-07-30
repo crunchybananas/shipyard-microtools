@@ -1,0 +1,119 @@
+{
+  "action": "carry",
+  "attachments": [
+    "cargo-crate",
+    "off"
+  ],
+  "direction": "right",
+  "distinct_flattened_rows": 8,
+  "distinct_garment_planes": 2,
+  "distinct_identity_planes": 2,
+  "failures": [],
+  "frames": 64,
+  "garment_fit_variants_by_identity": {
+    "ochre-work": 2,
+    "watch-blue": 2
+  },
+  "garment_runtime_legibility": {
+    "craftsperson": {
+      "mean_silhouette_delta": 0.06462,
+      "mean_visual_delta": 0.0429
+    },
+    "watchman": {
+      "mean_silhouette_delta": 0.05351,
+      "mean_visual_delta": 0.04925
+    }
+  },
+  "garments": [
+    "ochre-work",
+    "watch-blue"
+  ],
+  "identities": [
+    "craftsperson",
+    "watchman"
+  ],
+  "identity_plane_invariant_across_garments": true,
+  "identity_runtime_legibility": {
+    "ochre-work": {
+      "mean_silhouette_delta": 0.10677,
+      "mean_visual_delta": 0.01649
+    },
+    "watch-blue": {
+      "mean_silhouette_delta": 0.10722,
+      "mean_visual_delta": 0.01779
+    }
+  },
+  "mechanical_passed": true,
+  "median_body_height_range": [
+    76.0,
+    76.0
+  ],
+  "rows": 8,
+  "runtime_style": {
+    "actual_alpha_values": [
+      0,
+      255
+    ],
+    "actual_palette_colors": 48,
+    "alpha_threshold": 61,
+    "contrast": 1.08,
+    "dither": "none",
+    "mechanical_passed": true,
+    "name": "classic-strategy-clusters",
+    "palette_colors": 48,
+    "palette_hex": [
+      "#000000",
+      "#f4e0c1",
+      "#e7b87f",
+      "#f8a147",
+      "#b9a081",
+      "#e79135",
+      "#e08732",
+      "#a7895e",
+      "#d27b2a",
+      "#c37828",
+      "#be6d21",
+      "#987a3e",
+      "#a66923",
+      "#6e6f68",
+      "#b35e1a",
+      "#a75c19",
+      "#9f5b1a",
+      "#9d5015",
+      "#8e581e",
+      "#8e4e14",
+      "#8a4710",
+      "#6f5e3d",
+      "#6d5128",
+      "#744415",
+      "#554c38",
+      "#234e87",
+      "#7e3c0c",
+      "#703b0f",
+      "#633a12",
+      "#64330c",
+      "#612b07",
+      "#4b3921",
+      "#4f3214",
+      "#4d2c0e",
+      "#502608",
+      "#44260a",
+      "#471f05",
+      "#333431",
+      "#32291d",
+      "#083677",
+      "#052961",
+      "#3d2109",
+      "#35210b",
+      "#132238",
+      "#2f1a08",
+      "#261204",
+      "#031537",
+      "#060610"
+    ],
+    "palette_scope": "all factorial rows",
+    "saturation": 1.12
+  },
+  "schema": "realm.actor-pose.a3-factorial-gate.v1",
+  "semantic_categorical_valid": true
+}

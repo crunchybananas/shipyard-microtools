@@ -33,7 +33,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=170';
+} from '../js/sprite-source-contract.js?realm=171';
 
 const execFileAsync = promisify(execFile);
 
@@ -50,6 +50,11 @@ const OUT_ACTORS = join(ROOT, 'assets', 'sprites', 'actors-atlas.png');
 const OUT_ACTOR_RUNTIME_MANIFEST = join(ROOT, 'assets', 'sprites', 'actors-runtime-atlases.json');
 const OUT_AMBIENT = join(ROOT, 'assets', 'sprites', 'ambient-atlas.png');
 const OUT_PROOF = join(ROOT, 'scripts', 'screenshots', 'actors-compiled-proof.png');
+const ACTOR_DOWNSAMPLE = Object.freeze({
+  filter: 'Box',
+  unsharp: '0x0.7+0.8+0.02',
+  transparentRgb: '#000000',
+});
 
 async function magick(args) {
   try {
@@ -187,8 +192,13 @@ async function buildRuntimeActorAtlas(tier, actorFiles, tempDir) {
   if (tier.frameW === FRAME_W && tier.frameH === FRAME_H) return out;
 
   // Resize each action/direction row independently. Resizing the combined
-  // sheet would make Lanczos sample across transparent row boundaries and
-  // leak a neighboring animation into the first/last pixels of a row.
+  // sheet could sample across transparent row boundaries and leak a
+  // neighboring animation into the first/last pixels of a row. Box is a
+  // deliberate no-negative-lobes area downsample: LanczosSharp produced
+  // isolated chroma speckles around transparent edges at 27x35 and 35x46.
+  // A bounded post-resize unsharp pass restores local contrast without
+  // reviving those ringing lobes. Fully transparent RGB is normalized first
+  // so discarded chroma-key color cannot bleed back into visible pixels.
   const resizedRoles = [];
   for (let index = 0; index < actorFiles.length; index++) {
     const resized = join(tempDir, `${ROLES[index]}-${tier.key}.png`);
@@ -196,8 +206,11 @@ async function buildRuntimeActorAtlas(tier, actorFiles, tempDir) {
       actorFiles[index],
       '-crop', `${ROLE_SHEET_W}x${FRAME_H}`,
       '+repage',
-      '-filter', 'LanczosSharp',
+      '-background', ACTOR_DOWNSAMPLE.transparentRgb,
+      '-alpha', 'background',
+      '-filter', ACTOR_DOWNSAMPLE.filter,
       '-resize', `${tier.frameW * FRAMES}x${tier.frameH}!`,
+      '-unsharp', ACTOR_DOWNSAMPLE.unsharp,
       '-append',
       '-strip',
       resized,
@@ -255,7 +268,10 @@ const runtimeAtlasManifest = {
   },
   derivation: {
     compiler: 'scripts/build-motion-atlases.mjs',
-    filter: 'LanczosSharp',
+    filter: ACTOR_DOWNSAMPLE.filter,
+    unsharp: ACTOR_DOWNSAMPLE.unsharp,
+    transparentRgb: ACTOR_DOWNSAMPLE.transparentRgb,
+    negativeFilterLobes: false,
     rowsResizedIndependently: true,
     metadataStripped: true,
   },

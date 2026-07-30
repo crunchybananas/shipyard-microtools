@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=170';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=170';
-import { makeAtlasLoader } from './atlas-loader.js?realm=170';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=170';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=171';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=171';
+import { makeAtlasLoader } from './atlas-loader.js?realm=171';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=171';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,21 +15,21 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=170';
+} from './sprite-source-contract.js?realm=171';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=170';
+} from './render-resolution.js?realm=171';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=170';
+} from './citizen-presentation.js?realm=171';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=170';
-import { staffingCount } from './citizen-ownership.js?realm=170';
+} from './citizen-render-cache.js?realm=171';
+import { staffingCount } from './citizen-ownership.js?realm=171';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -163,7 +163,43 @@ const _ACTOR_ATLAS_TIERS = ACTOR_RUNTIME_ATLASES.map((tier) => ({
   ...tier,
   load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
 }));
+const _ACTOR_PREVIEW_ID = 'a3-watchman-blue-cargo';
+const _actorPreviewEnabled = new URLSearchParams(location.search).get('actorpreview')
+  === _ACTOR_PREVIEW_ID;
+const _ACTOR_PREVIEW_SCOPE = Object.freeze({
+  role: 'guard',
+  action: 'carry',
+  dir: 'right',
+});
+const _ACTOR_PREVIEW_TIERS = _actorPreviewEnabled
+  ? new Map(_ACTOR_ATLAS_TIERS.map((tier) => [
+      tier.key,
+      {
+        ...tier,
+        load: makeAtlasLoader(_actorAtlasUrl(
+          `prototypes/actor-pose/output/a3-interchange/rows-runtime/${tier.key}`
+          + '/watchman/watch-blue/cargo-crate/carry-right.png'
+        )),
+      },
+    ]))
+  : new Map();
 let _lastActorAtlasDebugKey = '';
+
+function actorPreviewMatches(role, action, dir) {
+  return _actorPreviewEnabled
+    && role === _ACTOR_PREVIEW_SCOPE.role
+    && action === _ACTOR_PREVIEW_SCOPE.action
+    && dir === _ACTOR_PREVIEW_SCOPE.dir;
+}
+
+function actorPreviewSelection(role, action, dir, atlasSelection) {
+  if (!actorPreviewMatches(role, action, dir)) return null;
+  const tier = _ACTOR_PREVIEW_TIERS.get(atlasSelection.key);
+  if (!tier) return null;
+  const row = tier.load();
+  if (!row) return null;
+  return { ...tier, row };
+}
 
 function actorAtlasSelection(targetCtx, width, height) {
   const projected = projectedActorSize(targetCtx, width, height);
@@ -291,6 +327,9 @@ export function drawActorAtlasFrame(targetCtx, {
     selection.frameH,
   );
   if (!source) return false;
+  const preview = actorPreviewSelection(role, action, dir, selection);
+  const sourceImage = preview?.row || selection.atlas;
+  const sourceY = preview ? 0 : source.sy;
   targetCtx.save();
   targetCtx.globalAlpha *= alpha;
   const useSmoothing = smoothing ?? shouldSmoothActorTier(selection);
@@ -305,8 +344,8 @@ export function drawActorAtlasFrame(targetCtx, {
     ? ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (height / ACTOR_FRAME_H)
     : 0;
   targetCtx.drawImage(
-    selection.atlas,
-    source.sx, source.sy, source.sw, source.sh,
+    sourceImage,
+    source.sx, sourceY, source.sw, source.sh,
     x, y + ddy, width, height
   );
   targetCtx.restore();
@@ -899,6 +938,7 @@ if (typeof window !== 'undefined') {
     _loadRasterAtlas();
     _loadSupportAtlas();
     for (const tier of _ACTOR_ATLAS_TIERS) tier.load();
+    for (const tier of _ACTOR_PREVIEW_TIERS.values()) tier.load();
     _loadNatureAtlas();
     _loadTerrainAtlas();
   }, 0);
@@ -931,6 +971,19 @@ if (typeof window !== 'undefined') {
     directions: ACTOR_DIRS,
     frames: ACTOR_FRAMES,
   });
+  window.__realm.actorPreview = () => ({
+    id: _actorPreviewEnabled ? _ACTOR_PREVIEW_ID : null,
+    enabled: _actorPreviewEnabled,
+    scope: _ACTOR_PREVIEW_SCOPE,
+    bakedCargo: _actorPreviewEnabled,
+    tiers: [..._ACTOR_PREVIEW_TIERS.values()].map((tier) => ({
+      key: tier.key,
+      frameW: tier.frameW,
+      frameH: tier.frameH,
+      url: tier.load.url,
+      state: tier.load.state,
+    })),
+  });
   window.__realm.actorFrameRect = (role, action, dir, frame = 0) =>
     actorAtlasFrameRect(role, action, dir, frame);
   window.__realm.actorMapping = {
@@ -954,6 +1007,10 @@ if (typeof window !== 'undefined') {
     { type: 'support-atlas', state: _loadSupportAtlas.state },
     ..._ACTOR_ATLAS_TIERS.map((tier) => ({
       type: `actors-atlas-${tier.key}`,
+      state: tier.load.state,
+    })),
+    ...[..._ACTOR_PREVIEW_TIERS.values()].map((tier) => ({
+      type: `actor-preview-${tier.key}`,
       state: tier.load.state,
     })),
     { type: 'nature-atlas', state: _loadNatureAtlas.state },
@@ -2311,7 +2368,12 @@ export function render() {
 
     if (drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facingAway, isMoving, phaseOffset)) {
       if (G.camera.zoom >= 0.7) {
-        drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight);
+        const previewRole = actorVariantForCitizen(c);
+        const previewAction = actorActionForCitizen(c, isMoving);
+        const previewDir = actorDirection(faceScreenX, faceScreenY, facingAway);
+        if (!actorPreviewMatches(previewRole, previewAction, previewDir)) {
+          drawCarryLoad(ctx, c, s, cy, faceScreenX, daylight);
+        }
       }
 
       if (hurtAlpha > 0) {

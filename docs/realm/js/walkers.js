@@ -1,7 +1,7 @@
-import { G, BUILDINGS, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=170';
-import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=170';
-import { getWonderReport } from './wonder.js?realm=170';
-import { resolveGroundTraffic } from './ground-traffic.js?realm=170';
+import { G, BUILDINGS, rngRange, resourceEmoji, getDayPeriod } from './state.js?realm=171';
+import { stepEntityToward, nearestWalkableTile } from './pathfinding.js?realm=171';
+import { getWonderReport } from './wonder.js?realm=171';
+import { resolveGroundTraffic } from './ground-traffic.js?realm=171';
 
 export function updateWalkers() {
   // Spawn walkers from service buildings periodically — but not at night

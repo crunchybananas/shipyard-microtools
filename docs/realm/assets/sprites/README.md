@@ -33,8 +33,9 @@ generated runtime artifacts only.
 The `512x84` row remains the editable and reviewable unit. Runtime presentation
 does not repeatedly shrink that row from `64x84` to the actor's on-screen
 footprint. `build-motion-atlases.mjs` resizes every action/direction row in
-isolation with `LanczosSharp`, strips non-visual metadata, and writes four
-hash-locked atlases:
+isolation. It normalizes hidden RGB beneath fully transparent pixels, uses a
+no-negative-lobes `Box` area downsample followed by a bounded unsharp pass,
+strips non-visual metadata, and writes four hash-locked atlases:
 
 | Tier | Frame | Intended presentation |
 | --- | ---: | --- |
@@ -54,6 +55,55 @@ Post-processing preserves the full backing resolution through device pixel
 ratio `2`; it no longer halves every Retina frame before color grading.
 Unusually dense displays cap post-processing at `2x`, while the existing
 slow-frame guard can suspend the effect without hiding the sharp base canvas.
+
+Actor Muster also chooses an exact compiled frame size that fits each review
+cell. It no longer stretches a `35x46` frame to an arbitrary `40x52`
+presentation and accidentally makes good art look soft during review.
+
+## Modular A3 Vertical Slice
+
+The first replacement-pipeline slice lives under
+`prototypes/actor-pose/output/a3-interchange/`. It is intentionally separate
+from the production atlas while the style is being established.
+
+- Two independently painted identities (`watchman`, `craftsperson`) combine
+  with two independently painted garment kits (`watch-blue`, `ochre-work`).
+- Identity-specific render profiles preserve a broad or lean body silhouette
+  while fitting the same garment source.
+- A socketed cargo-crate attachment proves the explicit
+  `far-hand < cargo < near-hand` occlusion contract.
+- One authored eight-beat carry skeleton drives all
+  `2 identities × 2 garments × 2 attachment states`: eight ordinary
+  `512x84` flattened rows and 64 distinct frames.
+- Identity, garment, attachment, semantic-mask, landmark, quality, and
+  provenance outputs remain independently inspectable. Runtime still receives
+  flattened raster rows; no live skeletal renderer was added.
+- Each row has prefiltered `27x35`, `35x46`, `54x70`, and `64x84` derivatives.
+  All derivatives share one deterministic 48-color factorial palette, fixed
+  tone curve, binary alpha, and no dithering. This converts soft painted
+  gradients into classic-strategy pixel clusters without changing the
+  canonical painted source row.
+
+`guard/carry/right` is staged as a `CANDIDATE`, so it cannot enter the normal
+compiled atlas. The opt-in URL
+`index.html?actorpreview=a3-watchman-blue-cargo` substitutes only that row.
+It also suppresses the old procedural carry overlay for the substituted frame
+because the candidate owns its crate and hand occlusion. Without the query,
+no preview image is requested and production rendering is unchanged.
+
+Verification:
+
+```sh
+scripts/.venv/bin/python scripts/actor-pose-prototype/a3_factorial.py --verify
+scripts/.venv/bin/python scripts/actor-pose-prototype/verify_a3_factorial.py
+REALM_SPRITE_PYTHON=scripts/.venv/bin/python scripts/sprite-row verify
+node scripts/verify-actor-vertical-slice.mjs
+```
+
+The live verification checks the candidate on both Actor Muster and an actual
+settlement guard carrier, proves exact zoom-matched tier selection and
+row-local addressing, and separately proves that an ordinary URL has no
+preview loaders.
 
 ## Actor Row Factory
 

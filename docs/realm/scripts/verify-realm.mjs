@@ -26,6 +26,7 @@ const checks = [
   ['browser citizen lifecycle', 'verify-engine-v2-citizen-lifecycle-browser.mjs'],
   ['browser citizen ownership', 'verify-engine-v2-ownership-browser.mjs'],
   ['browser road rendering', 'verify-road-rendering.mjs'],
+  ['browser actor vertical slice', 'verify-actor-vertical-slice.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];
 

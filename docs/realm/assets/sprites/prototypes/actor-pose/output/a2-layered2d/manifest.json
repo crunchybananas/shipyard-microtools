@@ -157,8 +157,8 @@
       "sha256": "2458ab654f2261bf1885b24eb132d420eab1261b1897745f8ad7697b701fa664"
     },
     "reports/review-evaluation.json": {
-      "bytes": 968,
-      "sha256": "afc8ca3cb3b44dc47003b4ecd02f9a20603a3a0c6deb4bcc09cfef0809d16640"
+      "bytes": 975,
+      "sha256": "152b23de0473aac2949f115c715f9e73075809c04ea810d9e1801f6491b1d3cb"
     },
     "rows/watchman/watch-blue/off/carry-right.png": {
       "bytes": 15877,
@@ -188,16 +188,16 @@
     "council_reference_pass": true,
     "decisions": {
       "luna": "approve-reference-only",
-      "owner": "pending",
+      "owner": "approve-reference-only",
       "terra": "approve-reference-only"
     },
-    "factorial_authorized": false,
+    "factorial_authorized": true,
     "failures": [],
-    "owner_reference_pass": false,
+    "owner_reference_pass": true,
     "record": "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json",
     "review_id": "a2-right-reference-v3",
     "schema": "realm.actor-pose.review-evaluation.v1",
-    "status": "council-approved-owner-pending",
+    "status": "owner-approved-reference",
     "subject_bound": true,
     "subject_sha256": "9584845536c03912fc266c8d00507123b6878737206c10c548ef930980183849",
     "valid": true
@@ -215,7 +215,7 @@
     "action": "carry",
     "attachment": "off",
     "direction": "right",
-    "factorial_expansion": "vetoed",
+    "factorial_expansion": "authorized",
     "flattened_frames": 8,
     "flattened_rows": 1,
     "frame_size": [
@@ -254,9 +254,9 @@
         "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca"
       },
       "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json": {
-        "bytes": 1337,
+        "bytes": 1593,
         "owner": "human-review-authority",
-        "sha256": "52231d039b21da2d5d522e624bac8c8aa651f0cf377117f2aeeb7e523a0b4384"
+        "sha256": "33d222dfd8c18338134353580fb069734363f30b411fc11f46178b0819b8943b"
       },
       "assets/sprites/prototypes/actor-pose/source/a2-layered2d/a2-contract.json": {
         "bytes": 4970,
@@ -269,9 +269,9 @@
         "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
       },
       "scripts/actor-pose-prototype/a2_layered2d.py": {
-        "bytes": 55304,
+        "bytes": 56440,
         "owner": "compiler-source",
-        "sha256": "603b66159d4449ece337140cf0781b9e8e2115fc8f87bbd66be3a82893e65417"
+        "sha256": "70129559b1a19b3d67214ff1928b8db17a962fb6edd029c39bb401b067cbda46"
       },
       "scripts/sprite_row_quality.py": {
         "bytes": 14174,
@@ -283,10 +283,10 @@
     "network_required": false,
     "paint_sources_transformed_by_joint_chain": true,
     "sentinel_or_registration_pixels": false,
-    "source_hash": "5c4e9eb4b26af3cd6fd73b85f30ba4ad7129a15561a0e0c640372fe9ab56be17"
+    "source_hash": "b35a533f5b8a8a1bc7a9614c73a95f1fd051d1971c715ca73b106429bbbdd2aa"
   },
   "stage": "right-reference-cycle",
-  "status": "council-approved-owner-pending",
+  "status": "owner-approved-reference",
   "verification": {
     "byte_deterministic_second_pass": true,
     "failures": [],

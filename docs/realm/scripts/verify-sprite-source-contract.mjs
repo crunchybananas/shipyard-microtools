@@ -30,7 +30,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=170';
+} from '../js/sprite-source-contract.js?realm=171';
 
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -143,11 +143,14 @@ async function assertRuntimeAtlasManifest() {
     throw new Error('assets/sprites/actors-runtime-atlases.json has an unsupported schema');
   }
   if (
-    manifest.derivation?.filter !== 'LanczosSharp'
+    manifest.derivation?.filter !== 'Box'
+    || manifest.derivation?.unsharp !== '0x0.7+0.8+0.02'
+    || manifest.derivation?.transparentRgb !== '#000000'
+    || manifest.derivation?.negativeFilterLobes !== false
     || manifest.derivation?.rowsResizedIndependently !== true
     || manifest.derivation?.metadataStripped !== true
   ) {
-    throw new Error('runtime actor atlas derivation must preserve row isolation and deterministic metadata');
+    throw new Error('runtime actor atlas derivation must preserve no-ringing downsampling, row isolation, and deterministic metadata');
   }
   const byKey = new Map((manifest.atlases || []).map((atlas) => [atlas.key, atlas]));
   if (byKey.size !== ACTOR_RUNTIME_ATLASES.length) {

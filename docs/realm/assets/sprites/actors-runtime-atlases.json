@@ -20,7 +20,10 @@
   },
   "derivation": {
     "compiler": "scripts/build-motion-atlases.mjs",
-    "filter": "LanczosSharp",
+    "filter": "Box",
+    "unsharp": "0x0.7+0.8+0.02",
+    "transparentRgb": "#000000",
+    "negativeFilterLobes": false,
     "rowsResizedIndependently": true,
     "metadataStripped": true
   },
@@ -32,7 +35,7 @@
       "frameHeight": 35,
       "width": 216,
       "height": 7840,
-      "sha256": "bf9c6257463e2d20feb72c7f5c0db4ad81fd9a86013a385b6088fc1a892897e2"
+      "sha256": "8068247ac2548e1da8911c115210957b62e461e3063f42f5247b683d31338812"
     },
     {
       "key": "default",
@@ -41,7 +44,7 @@
       "frameHeight": 46,
       "width": 280,
       "height": 10304,
-      "sha256": "0e245d3b5c1858a481c9ca9e867df4bd4a8f80629f884bcc61dde7d80f850d77"
+      "sha256": "29950b0d06e1ac3f8482ec9b0fa63f90d5b65a4b8c1f00f6e6ca6a3122e1c725"
     },
     {
       "key": "double",
@@ -50,7 +53,7 @@
       "frameHeight": 70,
       "width": 432,
       "height": 15680,
-      "sha256": "ff6fe9c10c85fbc236fdb086914305ddeed99e436351edd39fffdfc2f825daac"
+      "sha256": "c5dd0ca4cdaad2f9d3d186b85e2de321743b8b372463414b74f6877f5a05e060"
     },
     {
       "key": "review",

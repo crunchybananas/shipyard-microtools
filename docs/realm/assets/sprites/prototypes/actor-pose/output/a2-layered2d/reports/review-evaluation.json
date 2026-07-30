@@ -12,16 +12,16 @@
   "council_reference_pass": true,
   "decisions": {
     "luna": "approve-reference-only",
-    "owner": "pending",
+    "owner": "approve-reference-only",
     "terra": "approve-reference-only"
   },
-  "factorial_authorized": false,
+  "factorial_authorized": true,
   "failures": [],
-  "owner_reference_pass": false,
+  "owner_reference_pass": true,
   "record": "assets/sprites/prototypes/actor-pose/reviews/a2-right-reference-v3.json",
   "review_id": "a2-right-reference-v3",
   "schema": "realm.actor-pose.review-evaluation.v1",
-  "status": "council-approved-owner-pending",
+  "status": "owner-approved-reference",
   "subject_bound": true,
   "subject_sha256": "9584845536c03912fc266c8d00507123b6878737206c10c548ef930980183849",
   "valid": true

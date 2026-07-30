@@ -1,11 +1,12 @@
 import {
   ACTIONS,
+  ACTOR_RUNTIME_ATLASES,
   DIRS,
   FRAMES,
   ROLES,
   actorRowKey,
-} from './sprite-source-contract.js?realm=170';
-import { drawActorAtlasFrame } from './render.js?realm=170';
+} from './sprite-source-contract.js?realm=171';
+import { drawActorAtlasFrame } from './render.js?realm=171';
 
 const STATUS_STYLE = {
   accepted: { label: 'LOCKED', color: '#6dd4b8' },
@@ -332,8 +333,19 @@ function drawActionCell(target, x, y, width, height, role, action) {
 
   const pad = window.innerWidth < 700 ? 12 : 8;
   const dirW = (width - pad * 2) / DIRS.length;
-  const actorH = Math.max(34, Math.min(window.innerWidth < 700 ? 68 : 52, height - (window.innerWidth < 700 ? 42 : 25)));
-  const actorW = actorH * (27 / 35);
+  const actorRoomH = height - (window.innerWidth < 700 ? 42 : 25);
+  const actorRoomW = dirW - 4;
+  const actorTier = [...ACTOR_RUNTIME_ATLASES]
+    .reverse()
+    .find((tier) => (
+      tier.frameH <= actorRoomH
+      && tier.frameW <= actorRoomW
+    ))
+    || ACTOR_RUNTIME_ATLASES[0];
+  // Review at an exact compiled tier. Fractionally stretching a 35x46 frame
+  // to an arbitrary cell height made good source art look soft in Muster.
+  const actorH = actorTier.frameH;
+  const actorW = actorTier.frameW;
   const actorY = y + Math.max(window.innerWidth < 700 ? 22 : 4, (height - actorH - 14) / 2);
 
   for (let index = 0; index < DIRS.length; index++) {

@@ -8,7 +8,7 @@ import {
   AMBIENT,
   AMBIENT_SHEET_W,
   AMBIENT_SHEET_H,
-} from './sprite-source-contract.js?realm=170';
+} from './sprite-source-contract.js?realm=171';
 
 const STORE_KEY = 'realm-sprite-lab-review-v1';
 const QUERY = new URLSearchParams(location.search);

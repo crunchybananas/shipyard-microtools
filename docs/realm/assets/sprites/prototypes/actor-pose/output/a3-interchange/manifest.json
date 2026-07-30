@@ -1,0 +1,5449 @@
+{
+  "candidate": "a3-interchange",
+  "compiler": {
+    "path": "scripts/actor-pose-prototype/a3_factorial.py",
+    "pillow": "11.3.0",
+    "python": "3.9",
+    "runtime_proof_downsample": {
+      "filter": "Box",
+      "transparent_rgb": "#000000",
+      "unsharp": {
+        "percent": 80,
+        "radius": 0.7,
+        "threshold": 5
+      }
+    }
+  },
+  "outputs": {
+    "id-masks/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 2349,
+      "sha256": "8a71461a77072c635d69027e039fa80309c388ea5bfffb494537430e2f7d1fad"
+    },
+    "id-masks/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 2288,
+      "sha256": "1049f3028dc34ef3d90b67fa6ef29428af9b0b36c605b241139202b5214239e9"
+    },
+    "id-masks/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 2317,
+      "sha256": "6fa439d27507670549e9bdbad8495e3dfd5fe3f2154c354c650bf161eb80f5d1"
+    },
+    "id-masks/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 2286,
+      "sha256": "9b12bd8aab311c8471e8c7bedf0ef82480bb4f8f893573aa3e83740ffdee6409"
+    },
+    "id-masks/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 2303,
+      "sha256": "a04eec9ee2af6891ebc75f601deb50c8f74b03aa91770b14bee3ed4bc85f1c3a"
+    },
+    "id-masks/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 2223,
+      "sha256": "d2fce08efc28f4be436cf021568513d63930446bcdd481c27e2629c78143d9be"
+    },
+    "id-masks/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 2235,
+      "sha256": "cdd6538f1cf6e857107c182307acd5a96a0a93c7551bb0555880dabb164e6d3b"
+    },
+    "id-masks/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 2133,
+      "sha256": "f4daca848aa6da34ea43d72392ad343358201942be43718a211573a165983f27"
+    },
+    "landmarks/craftsperson/ochre-work/cargo-crate/carry-right.json": {
+      "bytes": 15104,
+      "sha256": "b7002e7c2a1c652e644fc0462adca7633bbb476b3fe67201cdff2de6c6630c02"
+    },
+    "landmarks/craftsperson/ochre-work/off/carry-right.json": {
+      "bytes": 15096,
+      "sha256": "effb0b38a31c1f4020962f5505b6e8ef52bcb4ecf83cb758bfa790a7d7a446e4"
+    },
+    "landmarks/craftsperson/watch-blue/cargo-crate/carry-right.json": {
+      "bytes": 15104,
+      "sha256": "efca4969057b5892c72478be563cdb72e540de347967e60309a3e99b070152a3"
+    },
+    "landmarks/craftsperson/watch-blue/off/carry-right.json": {
+      "bytes": 15096,
+      "sha256": "e6ee7504703a95ac04f7f9fba018ae069ecd78f5aa27eb40b1cc5257363b39bd"
+    },
+    "landmarks/watchman/ochre-work/cargo-crate/carry-right.json": {
+      "bytes": 15100,
+      "sha256": "529f0be35b39a5eb9a25c616466980361e39aeb54133d257df41ca8c8589aae4"
+    },
+    "landmarks/watchman/ochre-work/off/carry-right.json": {
+      "bytes": 15092,
+      "sha256": "9c5f72ad47c21c44a6e5df00e878978b33384c5216d5a15b2ed61db884e5229c"
+    },
+    "landmarks/watchman/watch-blue/cargo-crate/carry-right.json": {
+      "bytes": 15100,
+      "sha256": "987c1419945cd7074b915f4987790ca7c2203de9c157aac4307bcddd69983d30"
+    },
+    "landmarks/watchman/watch-blue/off/carry-right.json": {
+      "bytes": 15092,
+      "sha256": "6ef945b89616b8343eca5b6d7bac59779463c85dcbabcd9da2d10f94e49b3644"
+    },
+    "planes/attachment/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 1225,
+      "sha256": "b69174a6c17483e093ea6d45aede1e2393f48669922045951381da14d9989d5b"
+    },
+    "planes/attachment/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/attachment/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 1225,
+      "sha256": "b69174a6c17483e093ea6d45aede1e2393f48669922045951381da14d9989d5b"
+    },
+    "planes/attachment/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/attachment/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 1225,
+      "sha256": "b69174a6c17483e093ea6d45aede1e2393f48669922045951381da14d9989d5b"
+    },
+    "planes/attachment/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/attachment/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 1225,
+      "sha256": "b69174a6c17483e093ea6d45aede1e2393f48669922045951381da14d9989d5b"
+    },
+    "planes/attachment/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 247,
+      "sha256": "ab12977d959f8617c10bcb6a245740fe8a1a1fc9bdede4199e3f594d1092776b"
+    },
+    "planes/garment/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 14477,
+      "sha256": "c6903ca3c2eb7c60d190ad77c5e6a28345c241d54ba97ae2ed0031ca98d94fa7"
+    },
+    "planes/garment/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 14477,
+      "sha256": "c6903ca3c2eb7c60d190ad77c5e6a28345c241d54ba97ae2ed0031ca98d94fa7"
+    },
+    "planes/garment/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 14909,
+      "sha256": "8593e944ba1d3b3c1b357b2adb85654f7be5805feff6fc2780cb9afc08533286"
+    },
+    "planes/garment/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 14909,
+      "sha256": "8593e944ba1d3b3c1b357b2adb85654f7be5805feff6fc2780cb9afc08533286"
+    },
+    "planes/garment/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 15726,
+      "sha256": "093085129b5062df2f4cb180da0e8d23e26ef609bc40b21eced5861014571e52"
+    },
+    "planes/garment/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 15726,
+      "sha256": "093085129b5062df2f4cb180da0e8d23e26ef609bc40b21eced5861014571e52"
+    },
+    "planes/garment/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 16123,
+      "sha256": "caa82850e95aa7745e8d03a9e7286cd03a905198d1e6e4a51fda4e31c2ce1d50"
+    },
+    "planes/garment/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 16123,
+      "sha256": "caa82850e95aa7745e8d03a9e7286cd03a905198d1e6e4a51fda4e31c2ce1d50"
+    },
+    "planes/identity/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 14269,
+      "sha256": "47c28f3280c4894273df14102526c60a43e21f6f453d2f3fd4833f003f3ad941"
+    },
+    "planes/identity/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 14269,
+      "sha256": "47c28f3280c4894273df14102526c60a43e21f6f453d2f3fd4833f003f3ad941"
+    },
+    "planes/identity/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 14269,
+      "sha256": "47c28f3280c4894273df14102526c60a43e21f6f453d2f3fd4833f003f3ad941"
+    },
+    "planes/identity/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 14269,
+      "sha256": "47c28f3280c4894273df14102526c60a43e21f6f453d2f3fd4833f003f3ad941"
+    },
+    "planes/identity/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 15096,
+      "sha256": "65225f91f65e2082dc5e2f56f6f32ba05c0b57008bac6b4dca4dea7d87df48f7"
+    },
+    "planes/identity/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 15096,
+      "sha256": "65225f91f65e2082dc5e2f56f6f32ba05c0b57008bac6b4dca4dea7d87df48f7"
+    },
+    "planes/identity/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 15096,
+      "sha256": "65225f91f65e2082dc5e2f56f6f32ba05c0b57008bac6b4dca4dea7d87df48f7"
+    },
+    "planes/identity/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 15096,
+      "sha256": "65225f91f65e2082dc5e2f56f6f32ba05c0b57008bac6b4dca4dea7d87df48f7"
+    },
+    "proof/factorial-runtime-35x46.gif": {
+      "bytes": 37141,
+      "sha256": "4d6a06c224412f06e4e02edbcbac4e8ea9cbc9a7fb8e271cf431b035cce6712c"
+    },
+    "proof/factorial-still-x3.png": {
+      "bytes": 180143,
+      "sha256": "92c9b4bfffc23c8a897d29bc59441e5c524cf138f10705a5f95ecf7b52dc29e1"
+    },
+    "proof/quality/craftsperson-ochre-work-cargo-crate-x4.png": {
+      "bytes": 24522,
+      "sha256": "3dfd14950acea62e76754f0e042ee33542504840b012bab7abe07e04e19ca68a"
+    },
+    "proof/quality/craftsperson-ochre-work-off-x4.png": {
+      "bytes": 24733,
+      "sha256": "5c24df99096a4609722fb7118aee6315ff45cbe5f59ba1f8a94acaba059ed4d5"
+    },
+    "proof/quality/craftsperson-watch-blue-cargo-crate-x4.png": {
+      "bytes": 25014,
+      "sha256": "37fc8c2ab5dd30daaaf117bb4e39ef4b22d49a16e5eb0118e778e95fe066f04c"
+    },
+    "proof/quality/craftsperson-watch-blue-off-x4.png": {
+      "bytes": 25114,
+      "sha256": "7afd7efa609bbab0aa3a6d85c04b4ef979fcf3fa06e8fd6888648a883803129c"
+    },
+    "proof/quality/watchman-ochre-work-cargo-crate-x4.png": {
+      "bytes": 26014,
+      "sha256": "e78e3fbf98f7dfc152cb647a7d1cbc310047dc54d6b2f077961595a431667767"
+    },
+    "proof/quality/watchman-ochre-work-off-x4.png": {
+      "bytes": 26317,
+      "sha256": "5374c489d6fdcbac2fd5e4b469e2bfb6c9925e1e92a74a72416ba60f3bbb792a"
+    },
+    "proof/quality/watchman-watch-blue-cargo-crate-x4.png": {
+      "bytes": 26610,
+      "sha256": "9d20340a9323365c75cc7667fd89e49dd0cd056c29a527ae7ec1f5400e3d491e"
+    },
+    "proof/quality/watchman-watch-blue-off-x4.png": {
+      "bytes": 26839,
+      "sha256": "04290c55f3c238496a4cf03c5d01fadf0aa90d8d9f26fce86b408dd6383db620"
+    },
+    "reports/factorial-gate.json": {
+      "bytes": 2349,
+      "sha256": "757cef1e870e650c1448f89179d6c0c1e3ab8e932103ce08604710d2b41e9c68"
+    },
+    "reports/quality/craftsperson-ochre-work-cargo-crate.json": {
+      "bytes": 6244,
+      "sha256": "0e4c4940a1b9cac7b0d382f9822fd264580e12e69477455cacedd4156d9f9f9a"
+    },
+    "reports/quality/craftsperson-ochre-work-off.json": {
+      "bytes": 6238,
+      "sha256": "d22ec31eede3ba4403653825cb4bf907b7f0153f7be99809ac11991b9c531e05"
+    },
+    "reports/quality/craftsperson-watch-blue-cargo-crate.json": {
+      "bytes": 6240,
+      "sha256": "b86999a3b68924e02b8a5c18fef9575998ae0ec3b6000b3d97c47a07a0243bbf"
+    },
+    "reports/quality/craftsperson-watch-blue-off.json": {
+      "bytes": 6231,
+      "sha256": "971b862ebac07b8a20285cb8087476399feae05574c27ba858bf27d2ab7b7fc7"
+    },
+    "reports/quality/watchman-ochre-work-cargo-crate.json": {
+      "bytes": 6242,
+      "sha256": "8ec57f51cc68de09e23eac5b04d958371c452df7c5783d2a37cc4c7bd64013a9"
+    },
+    "reports/quality/watchman-ochre-work-off.json": {
+      "bytes": 6230,
+      "sha256": "c2731dac8c862a29eec320f17ff576328ba1be396c62c1c284a7b7b029e3edf6"
+    },
+    "reports/quality/watchman-watch-blue-cargo-crate.json": {
+      "bytes": 6237,
+      "sha256": "b5ff8681a2fb2e2cb517b1f523cf563192674d91ad39e9b6873d48a9d29bfd75"
+    },
+    "reports/quality/watchman-watch-blue-off.json": {
+      "bytes": 6226,
+      "sha256": "bd6230fcc15f83f1e31e3ced73e192b9a6df5f43c125db28f03ac564b25f1bc5"
+    },
+    "rows-runtime/default/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 6279,
+      "sha256": "20c2aa48acc0dc17b1fee4f93be6600ec194a9c9b768b78afb45abee56f53286"
+    },
+    "rows-runtime/default/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 5900,
+      "sha256": "6e153a2de4c0431aafccc6f3e3267fc5ad48bc58ff7a7b1149a3ddf7e78db255"
+    },
+    "rows-runtime/default/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 6251,
+      "sha256": "5018a59ac1904b729950a37d0b3f01806a663080b21170ebc9b4969841ed1e63"
+    },
+    "rows-runtime/default/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 5862,
+      "sha256": "74687e6fc98c8a0931cb256ddd5e022c33806c17e75cabf002f0fc8f1f9f1f4e"
+    },
+    "rows-runtime/default/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 6881,
+      "sha256": "26a5cb7bda0546e953631f16abe558d65d38f1745d24373fc3a56a3104ea6399"
+    },
+    "rows-runtime/default/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 6594,
+      "sha256": "a3f2ae304dcf944d21159f853c30a69acbc47962c60ffbf569fe9056dab27358"
+    },
+    "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 6610,
+      "sha256": "f8022eead87a1492f11eacba94bbc9bf8f79f4a4a04b2ed766f9bbea00dc0cee"
+    },
+    "rows-runtime/default/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 6403,
+      "sha256": "e10456a66ef1e7218ad6c05856ccc6d5100af7c49f827f83195cbec6d384eac6"
+    },
+    "rows-runtime/double/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 11678,
+      "sha256": "deb7c9d122f4d63d2f50f97447eb6606a108be59bf4f59ec4d5276f988838847"
+    },
+    "rows-runtime/double/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 11272,
+      "sha256": "f381ca2ec944817167de44e260f787a09d1953608f6159693dd3a408cc598de1"
+    },
+    "rows-runtime/double/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 10923,
+      "sha256": "568391e40685f2de3a3ee36ebe82a9523891398eabd63d075c6ebb08a6ae40f8"
+    },
+    "rows-runtime/double/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 10541,
+      "sha256": "19243bbe4106cc3f6edac50f16e976b2ec96b33836fb52bcff37817cfe81a0ec"
+    },
+    "rows-runtime/double/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 12918,
+      "sha256": "8a6d8363da2921f1fb35f98c80871a447f81337a9d88986ce9b0da2ecd6dda76"
+    },
+    "rows-runtime/double/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 12618,
+      "sha256": "9137f8859bc785475798a26394fb9973ba33a6f2c3aec51d82edef5a93ed1a3f"
+    },
+    "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 11801,
+      "sha256": "bed8997691ed29d94e6330194f27d91b7055d51d3c8077c3f4a729494aef32ce"
+    },
+    "rows-runtime/double/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 11531,
+      "sha256": "c0af222dc202852e9c21f6cc03440559bad80616b75c9a14f8beb3141fb7141b"
+    },
+    "rows-runtime/native/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 4197,
+      "sha256": "f6aa46909f892e261c4ef0b470ee28ec92f5f06c5d4464df20b4734755384953"
+    },
+    "rows-runtime/native/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 4098,
+      "sha256": "9e57556a20ef602373ef837946dd9ca2037f14cbbc59a637e31f5168aff86a37"
+    },
+    "rows-runtime/native/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 4101,
+      "sha256": "a8a4d43b675a2896098918944ce37c901dee60907a58ade16a5634f97cd72880"
+    },
+    "rows-runtime/native/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 3965,
+      "sha256": "af29b56dd098c210faa50132f09fcce2cf133af35a62afeb5001533619904b49"
+    },
+    "rows-runtime/native/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 4596,
+      "sha256": "6cf338d3ab78a9f49d2341b3afe151b996cc6fd4c93f1cb0850f0a64562c9ec9"
+    },
+    "rows-runtime/native/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 4460,
+      "sha256": "3e797e40192e9bea7db0412be8bfea94f4f494a2a3d17227d3dc2f578eaa04c3"
+    },
+    "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 4544,
+      "sha256": "0d029ba3373cff971a7c19f85b4df48f8bca5cbac75bc7ef0924266424e1b85d"
+    },
+    "rows-runtime/native/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 4384,
+      "sha256": "fb8746011e268e44b25203937b47eabf4250dbe818f5621d81053b6b7288dde9"
+    },
+    "rows-runtime/review/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 10862,
+      "sha256": "c5d9301b3472eccc288772e95a219341665810cc572137807bd49098d0ba3d4a"
+    },
+    "rows-runtime/review/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 10820,
+      "sha256": "d742eb61c2c33e48bddc0d71902b55d358a66ecb8372ff31a57e8a371ee2ac50"
+    },
+    "rows-runtime/review/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 10527,
+      "sha256": "198c0915fa31e02de7d992b12bfe56fb379856590fb6592ccb09daedc47e4cf4"
+    },
+    "rows-runtime/review/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 10551,
+      "sha256": "b67c6f545b23e6a1899c99494204703c1f9aac3c1d1f1e5f7ab3dafd449b3252"
+    },
+    "rows-runtime/review/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 11714,
+      "sha256": "491d6c0d50429556e25ac124767038995fad985011721d23dc327d095b2b104e"
+    },
+    "rows-runtime/review/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 11797,
+      "sha256": "42115b6526979d43998a0c62651a4d7a231d1e5b93b7983e98927118b760c62a"
+    },
+    "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 11719,
+      "sha256": "1fc8c57ee4b2baf166fc93b26d1d085497831a41a7481a2443e8b5805c66eb9f"
+    },
+    "rows-runtime/review/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 11740,
+      "sha256": "b4c7cbb07b45220fe626dc82c1e92941b8ff932ce25a4d7f1cea3e9f4dd38c68"
+    },
+    "rows/craftsperson/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 14654,
+      "sha256": "671d48832ab969ec976bd793fee7981986cd5666b6f29ee964e49e0542a47040"
+    },
+    "rows/craftsperson/ochre-work/off/carry-right.png": {
+      "bytes": 14730,
+      "sha256": "7d7f9242934410627c66fbcb10bad163511951266702df34beebb8cfcb66737c"
+    },
+    "rows/craftsperson/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 14777,
+      "sha256": "ec9a7603cce106c30b367416fdac807162499b075c500b8561a9df3155068be3"
+    },
+    "rows/craftsperson/watch-blue/off/carry-right.png": {
+      "bytes": 14937,
+      "sha256": "00ca2211513525b3dab92ae9336dd41d8d8e98944092b38732c6f08b90720659"
+    },
+    "rows/watchman/ochre-work/cargo-crate/carry-right.png": {
+      "bytes": 15410,
+      "sha256": "6bcef91f4a04190da545dd960d080d5a85ffa5341b381a1fdfc0d7222c737280"
+    },
+    "rows/watchman/ochre-work/off/carry-right.png": {
+      "bytes": 15612,
+      "sha256": "c6e0810ed5f2ac664948890afcb9f9dd9dfe149b46b093ccd1b179192a357135"
+    },
+    "rows/watchman/watch-blue/cargo-crate/carry-right.png": {
+      "bytes": 15915,
+      "sha256": "c1bd8810dbb38389bf09d459d64352eb80999f052f7885380858138c19816acd"
+    },
+    "rows/watchman/watch-blue/off/carry-right.png": {
+      "bytes": 16265,
+      "sha256": "1216347a96a348f782fedd08854866d34d91c8daff0863eff995f25b44e021a6"
+    },
+    "style/actor-palette.json": {
+      "bytes": 986,
+      "sha256": "26b45e664d1fcdb22fd12a2b69f0a9503978425fa57a0c03a8f3c4a2158de90b"
+    },
+    "style/actor-palette.png": {
+      "bytes": 452,
+      "sha256": "c1554391c5a6c46a64ed67477c8670e593a9aa72929f882710f3c0a41285df96"
+    }
+  },
+  "proof": {
+    "factorial_still": "proof/factorial-still-x3.png",
+    "runtime_35x46_loop": "proof/factorial-runtime-35x46.gif",
+    "runtime_palette": "style/actor-palette.png"
+  },
+  "rows": {
+    "craftsperson/ochre-work/cargo-crate": {
+      "attachment_plane": "planes/attachment/craftsperson/ochre-work/cargo-crate/carry-right.png",
+      "garment_plane": "planes/garment/craftsperson/ochre-work/cargo-crate/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0763271953911593,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_interface": {
+          "frames": [
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 0,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 1,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 2,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 3,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 4,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 5,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 6,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 7,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            }
+          ],
+          "occlusion": "far-hand < cargo < near-hand",
+          "semantic_color": [
+            244,
+            190,
+            55,
+            255
+          ]
+        },
+        "cargo_pixels": 210,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1599.25,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "096bda99165c27b407721619d67b205dd7265ce112af7c92d8044a9c5b776af3",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1572.28,
+            "bbox": [
+              19,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "3c9c631c42c6a1182871bc9eaec8c226e82a0c92efbc0a85096166789c41d666",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1485.84,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "be522a55b3e80b2d12be246011bed8a0d97023de3f443f74384d432417aea15f",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1558.18,
+            "bbox": [
+              19,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "9113e554bf8d569a5216c48f652e9721d6d122e6efe588dbfef91141d7a3cef1",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1572.61,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "eb7d418ebaeca81f73020b784bef210080f80a961113d4479ca33846eb21c068",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1505.61,
+            "bbox": [
+              19,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "61ca6a53fe00bb3b10962a226775cbd5f1e7012f899564fff6941753f47d6650",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1564.09,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "f9f3b964288c825e980f6b255197d65e6bcff12af0e158623312c9432515e786",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1562.75,
+            "bbox": [
+              19,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "2a24bd03eb187cf36cdf09685374989d57a641293feb255aa1ddf2d1fc482193",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 199514,
+        "loop_delta_ratio": 1.133163587517668,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 60,
+            "runtime_27x35_visible_pixels": 13,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 166,
+            "runtime_27x35_visible_pixels": 30,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.077,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 443.64,
+          "width_range": [
+            19,
+            19
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "right",
+          "garment": "ochre-work",
+          "identity": "craftsperson"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          191530,
+          199514,
+          212409,
+          188831,
+          168140,
+          203272,
+          221776,
+          226082
+        ]
+      },
+      "identity_plane": "planes/identity/craftsperson/ochre-work/cargo-crate/carry-right.png",
+      "landmarks": "landmarks/craftsperson/ochre-work/cargo-crate/carry-right.json",
+      "quality_proof": "proof/quality/craftsperson-ochre-work-cargo-crate-x4.png",
+      "quality_report": "reports/quality/craftsperson-ochre-work-cargo-crate.json",
+      "row": "rows/craftsperson/ochre-work/cargo-crate/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/craftsperson/ochre-work/cargo-crate/carry-right.png",
+        "double": "rows-runtime/double/craftsperson/ochre-work/cargo-crate/carry-right.png",
+        "native": "rows-runtime/native/craftsperson/ochre-work/cargo-crate/carry-right.png",
+        "review": "rows-runtime/review/craftsperson/ochre-work/cargo-crate/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "right",
+        "garment": "ochre-work",
+        "identity": "craftsperson"
+      },
+      "semantic_mask": "id-masks/craftsperson/ochre-work/cargo-crate/carry-right.png"
+    },
+    "craftsperson/ochre-work/off": {
+      "attachment_plane": "planes/attachment/craftsperson/ochre-work/off/carry-right.png",
+      "garment_plane": "planes/garment/craftsperson/ochre-work/off/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0804186036516794,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_pixels": 0,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1508.34,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "c31df348674aeb565acfc13dc1780b326c1f69b42b5ce7602c100d968731ec35",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1484.24,
+            "bbox": [
+              19,
+              5,
+              50,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "5598b5351dc43687b491c204014425bacb7535675e5e0d80fb67c9a504c47bc5",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1396.07,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "e979feff541bc5c4ce6510075bcc80349332c372cfc1d9deb027a524c2d12aeb",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1481.32,
+            "bbox": [
+              19,
+              3,
+              50,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "303fce0c43883a98628f47a3c3a8bf87bf6910178c69ecd7157e5c759dd5a742",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1465.71,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "6d6daaef02f3a1ed5c33b881fd5afb6d94b6bb7aa32b9c74aa99938a7348b8b1",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1405.48,
+            "bbox": [
+              19,
+              5,
+              50,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "5a055496f924779a20f91534bf2f29d545446fceeb7b3aa6d42ae647da17af92",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1491.65,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "7674cd46b62192548d8374a7c8f70d2eb2cc0b4768b7523923a147a11f5a4234",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1504.31,
+            "bbox": [
+              19,
+              3,
+              50,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "396bea617af6f13f4a0594d38897e4e1c8a5749fe3084075a8ac9db39fdc58d6",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 199475,
+        "loop_delta_ratio": 1.2132197017170072,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 70,
+            "runtime_27x35_visible_pixels": 14,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 218,
+            "runtime_27x35_visible_pixels": 39,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.081,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 415.33,
+          "width_range": [
+            18,
+            18
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "right",
+          "garment": "ochre-work",
+          "identity": "craftsperson"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          188369,
+          199475,
+          215982,
+          198637,
+          166677,
+          216304,
+          230579,
+          242007
+        ]
+      },
+      "identity_plane": "planes/identity/craftsperson/ochre-work/off/carry-right.png",
+      "landmarks": "landmarks/craftsperson/ochre-work/off/carry-right.json",
+      "quality_proof": "proof/quality/craftsperson-ochre-work-off-x4.png",
+      "quality_report": "reports/quality/craftsperson-ochre-work-off.json",
+      "row": "rows/craftsperson/ochre-work/off/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/craftsperson/ochre-work/off/carry-right.png",
+        "double": "rows-runtime/double/craftsperson/ochre-work/off/carry-right.png",
+        "native": "rows-runtime/native/craftsperson/ochre-work/off/carry-right.png",
+        "review": "rows-runtime/review/craftsperson/ochre-work/off/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "right",
+        "garment": "ochre-work",
+        "identity": "craftsperson"
+      },
+      "semantic_mask": "id-masks/craftsperson/ochre-work/off/carry-right.png"
+    },
+    "craftsperson/watch-blue/cargo-crate": {
+      "attachment_plane": "planes/attachment/craftsperson/watch-blue/cargo-crate/carry-right.png",
+      "garment_plane": "planes/garment/craftsperson/watch-blue/cargo-crate/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0770206757300627,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_interface": {
+          "frames": [
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 0,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 1,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 2,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 3,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 4,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 5,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 6,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 6,
+              "frame": 7,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 42
+            }
+          ],
+          "occlusion": "far-hand < cargo < near-hand",
+          "semantic_color": [
+            244,
+            190,
+            55,
+            255
+          ]
+        },
+        "cargo_pixels": 210,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1578.88,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "2dce098dbb49afea5712f7d2747b6e2d682443ccd276f3cdde2185c5c7388dbc",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1552.47,
+            "bbox": [
+              19,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "eb6b4bd8fd730217a94df19ae53e6ad57199d9cdf388e2915465a9cda9ea9a4d",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1465.97,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "8319a66bcd489d1dfd028d0ab9a43a0e2041c42e669ab4a79f483965375b4e5a",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1538.31,
+            "bbox": [
+              19,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "106c675c03cecf5959f9cbe5c2007502670f67f9b844c584e4c78f143bda53fb",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1552.77,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "840d59aa433f6f33248e9650c70a897dba6f6322b80c7ed079095d1caa2234a1",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1485.77,
+            "bbox": [
+              19,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "3e036f673627ef65d3245ba2df2e3e6a764706ca136382dc3950069439d56434",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1544.27,
+            "bbox": [
+              19,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "11fcdc7532094399987c8066b841322857c98577c66508d73794173a9a7e597c",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1542.84,
+            "bbox": [
+              19,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 6,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "c4dd2000241a5b522af524b66184b119bf875316381cdf7dc1a4d8acd2f7a45c",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 213352,
+        "loop_delta_ratio": 1.1250937417975928,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 60,
+            "runtime_27x35_visible_pixels": 13,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 166,
+            "runtime_27x35_visible_pixels": 30,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.077,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 439.32,
+          "width_range": [
+            18,
+            19
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "right",
+          "garment": "watch-blue",
+          "identity": "craftsperson"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          206364,
+          213352,
+          226894,
+          202610,
+          182951,
+          216934,
+          235340,
+          240041
+        ]
+      },
+      "identity_plane": "planes/identity/craftsperson/watch-blue/cargo-crate/carry-right.png",
+      "landmarks": "landmarks/craftsperson/watch-blue/cargo-crate/carry-right.json",
+      "quality_proof": "proof/quality/craftsperson-watch-blue-cargo-crate-x4.png",
+      "quality_report": "reports/quality/craftsperson-watch-blue-cargo-crate.json",
+      "row": "rows/craftsperson/watch-blue/cargo-crate/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/craftsperson/watch-blue/cargo-crate/carry-right.png",
+        "double": "rows-runtime/double/craftsperson/watch-blue/cargo-crate/carry-right.png",
+        "native": "rows-runtime/native/craftsperson/watch-blue/cargo-crate/carry-right.png",
+        "review": "rows-runtime/review/craftsperson/watch-blue/cargo-crate/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "right",
+        "garment": "watch-blue",
+        "identity": "craftsperson"
+      },
+      "semantic_mask": "id-masks/craftsperson/watch-blue/cargo-crate/carry-right.png"
+    },
+    "craftsperson/watch-blue/off": {
+      "attachment_plane": "planes/attachment/craftsperson/watch-blue/off/carry-right.png",
+      "garment_plane": "planes/garment/craftsperson/watch-blue/off/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.081609597527733,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_pixels": 0,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1483.99,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "ea30cfd52d1313a44bb055f2563d16f250337bb82b7f15152964f6230d494687",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1460.56,
+            "bbox": [
+              19,
+              5,
+              50,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "5f147b33413cc368513eeded3fdf8b68f70a0afc4b0f1bdc1df92d731a793e75",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1372.02,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "d5d844f41c905e32c21b5551ca34c0478f9e954ac76f9b90158f7d15762f9c8e",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1457.82,
+            "bbox": [
+              19,
+              3,
+              50,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "8490076555ea8bd003b2abe02a5c18d9d0a950f724498ef2f383103d686b1405",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1441.36,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "baf082f1e51377d5ddc9aed61688467bc0c772cb6c125117694547f24b9cdc3d",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1381.33,
+            "bbox": [
+              19,
+              5,
+              50,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "26433c00ab9475eacac3cda4bc6ecd90252c4fe1d5fbbd906aa071cc9cbb03b6",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1468.92,
+            "bbox": [
+              19,
+              4,
+              50,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "a9722b76a6c768b8a6111427b3739428ba3767c9ef0e9229cd680d4527a426bf",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1482.57,
+            "bbox": [
+              19,
+              3,
+              50,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 10,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "a816803291ff265eb074fc725d3bdba3514028863a1d82d1436abf840532c67c",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 213812,
+        "loop_delta_ratio": 1.2121068976484013,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 70,
+            "runtime_27x35_visible_pixels": 14,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 218,
+            "runtime_27x35_visible_pixels": 39,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.083,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 409.85,
+          "width_range": [
+            17,
+            18
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "right",
+          "garment": "watch-blue",
+          "identity": "craftsperson"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          204400,
+          213766,
+          232046,
+          213812,
+          181388,
+          233178,
+          246731,
+          259163
+        ]
+      },
+      "identity_plane": "planes/identity/craftsperson/watch-blue/off/carry-right.png",
+      "landmarks": "landmarks/craftsperson/watch-blue/off/carry-right.json",
+      "quality_proof": "proof/quality/craftsperson-watch-blue-off-x4.png",
+      "quality_report": "reports/quality/craftsperson-watch-blue-off.json",
+      "row": "rows/craftsperson/watch-blue/off/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/craftsperson/watch-blue/off/carry-right.png",
+        "double": "rows-runtime/double/craftsperson/watch-blue/off/carry-right.png",
+        "native": "rows-runtime/native/craftsperson/watch-blue/off/carry-right.png",
+        "review": "rows-runtime/review/craftsperson/watch-blue/off/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "right",
+        "garment": "watch-blue",
+        "identity": "craftsperson"
+      },
+      "semantic_mask": "id-masks/craftsperson/watch-blue/off/carry-right.png"
+    },
+    "watchman/ochre-work/cargo-crate": {
+      "attachment_plane": "planes/attachment/watchman/ochre-work/cargo-crate/carry-right.png",
+      "garment_plane": "planes/garment/watchman/ochre-work/cargo-crate/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.08762901930456,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_interface": {
+          "frames": [
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 0,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 1,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 2,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 3,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 4,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 5,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 6,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 7,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            }
+          ],
+          "occlusion": "far-hand < cargo < near-hand",
+          "semantic_color": [
+            244,
+            190,
+            55,
+            255
+          ]
+        },
+        "cargo_pixels": 210,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1828.25,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "51844331df9ec2ae554aaf17a4ee5be7dd74ba0fcad593fab147dddcf5313968",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1791.66,
+            "bbox": [
+              17,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "f4145b7ee6fca8ecc119cfcfc49b115acd94b763548b342a191c06efac68e5b4",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1680.95,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "8c0dff3283d17f675dfc7470bdc659fb7771d728ed707fdc75827b7a5a5526fb",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1780.22,
+            "bbox": [
+              17,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "91d0df167321a5d122fe1dfe55ef4302d3ff7f8b605b80f5399000323f086f47",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1788.1,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "07767412a7f74411a092da4564d1c59b81322b668f2064286854cc9926e089b4",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1714.65,
+            "bbox": [
+              17,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "de30a7480263ea691c0c61e357488735b3c8d546aed4093c49ed3429121152f1",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1779.75,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "d9b89ed5daa083b520e9fc5bf09cae53b759dfd1af7bcb88124543acf8225bd5",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1789.27,
+            "bbox": [
+              17,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "9376cc9f321029f991f9293571ddd5aafa97ecf76526bafabd775e228e1658ca",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 201833,
+        "loop_delta_ratio": 1.1451497029722593,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 52,
+            "runtime_27x35_visible_pixels": 8,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 213,
+            "runtime_27x35_visible_pixels": 37,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.091,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 496.89,
+          "width_range": [
+            20,
+            20
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "right",
+          "garment": "ochre-work",
+          "identity": "watchman"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          189113,
+          205252,
+          210371,
+          188598,
+          171413,
+          201833,
+          223053,
+          231129
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/ochre-work/cargo-crate/carry-right.png",
+      "landmarks": "landmarks/watchman/ochre-work/cargo-crate/carry-right.json",
+      "quality_proof": "proof/quality/watchman-ochre-work-cargo-crate-x4.png",
+      "quality_report": "reports/quality/watchman-ochre-work-cargo-crate.json",
+      "row": "rows/watchman/ochre-work/cargo-crate/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/ochre-work/cargo-crate/carry-right.png",
+        "double": "rows-runtime/double/watchman/ochre-work/cargo-crate/carry-right.png",
+        "native": "rows-runtime/native/watchman/ochre-work/cargo-crate/carry-right.png",
+        "review": "rows-runtime/review/watchman/ochre-work/cargo-crate/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "right",
+        "garment": "ochre-work",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/ochre-work/cargo-crate/carry-right.png"
+    },
+    "watchman/ochre-work/off": {
+      "attachment_plane": "planes/attachment/watchman/ochre-work/off/carry-right.png",
+      "garment_plane": "planes/garment/watchman/ochre-work/off/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0914849487078873,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_pixels": 0,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1752.39,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "b9f8a5a41662f6c5c0464cebc009dc4d715374ad98ca893dd7a2b2df0f84169c",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1718.27,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "4423f135497c04ec602a70dd67b29c565b58e9a00d1b41089b693f1337c2e0d4",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1605.51,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "6595421f1afad1ad751f4a66d4dea9262b53b32516c81b6c6e9431688d8af247",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1717.38,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "edfd11e48aaeaa9ff71d2a0b03e8873225a007f03b3b00dc3cd806e4bc7a62bc",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1694.98,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "7214a8576902bd792112d2061726bcdfc16ef3ce0d4145e773d7dda0f4390f11",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1628.35,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "87de513db90e67d03b473450af1a2499b1df440463cb5d837ebb82fbdcd70c26",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1724.0,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "482ca936573ad89814f347d181c905bd409f594292a5266e439e6541ca030ffc",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1746.87,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "c8b08b895d50a1f64ac6ee4b3ca97c34715ac85d3555fbca002094b680269d47",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 207252,
+        "loop_delta_ratio": 1.1961139096365776,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 63,
+            "runtime_27x35_visible_pixels": 11,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 273,
+            "runtime_27x35_visible_pixels": 46,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.094,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 472.14,
+          "width_range": [
+            19,
+            19
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "right",
+          "garment": "ochre-work",
+          "identity": "watchman"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          188050,
+          207252,
+          215129,
+          199970,
+          172225,
+          217517,
+          231438,
+          247897
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/ochre-work/off/carry-right.png",
+      "landmarks": "landmarks/watchman/ochre-work/off/carry-right.json",
+      "quality_proof": "proof/quality/watchman-ochre-work-off-x4.png",
+      "quality_report": "reports/quality/watchman-ochre-work-off.json",
+      "row": "rows/watchman/ochre-work/off/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/ochre-work/off/carry-right.png",
+        "double": "rows-runtime/double/watchman/ochre-work/off/carry-right.png",
+        "native": "rows-runtime/native/watchman/ochre-work/off/carry-right.png",
+        "review": "rows-runtime/review/watchman/ochre-work/off/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "right",
+        "garment": "ochre-work",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/ochre-work/off/carry-right.png"
+    },
+    "watchman/watch-blue/cargo-crate": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/cargo-crate/carry-right.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/cargo-crate/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0884970663457199,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_interface": {
+          "frames": [
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 0,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 1,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 2,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 3,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 4,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                47,
+                53,
+                61
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 5,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                46,
+                53,
+                60
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 6,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            },
+            {
+              "cargo_bbox": [
+                35,
+                45,
+                53,
+                59
+              ],
+              "far_hand_visible_pixels": 5,
+              "frame": 7,
+              "load_socket_owned": true,
+              "near_hand_visible_pixels": 51
+            }
+          ],
+          "occlusion": "far-hand < cargo < near-hand",
+          "semantic_color": [
+            244,
+            190,
+            55,
+            255
+          ]
+        },
+        "cargo_pixels": 210,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1808.81,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "47f41bafffda42d02e245dcb2759474db55beb257ab522e46a34634035b13e50",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1772.55,
+            "bbox": [
+              17,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "80d2b708d8c3bf343d5d8d2c5c0f16abc25835d900cc213ad9db4ed87eaa9245",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1661.75,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "97210ff50a5881f195522a32b90258a965132c98b05e378f3a19138b9c600a74",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1761.02,
+            "bbox": [
+              17,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "1e385ed8744382eaac42722af1252ae150a92ae40e90eeca2c233521a790ce3d",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1768.95,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "626498879b4f7800361a03071da95218d51635e3d14d0f86246924e5a11c8da3",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1695.5,
+            "bbox": [
+              17,
+              5,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "bf3415155fb6a35883bc20ce5b992fa4ec063a839e41c81bffefefd772b7b2f2",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1760.64,
+            "bbox": [
+              17,
+              4,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "753f6d959db3854613014d123862e765f14963033be8df5c51c22dc1138d2f35",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1770.26,
+            "bbox": [
+              17,
+              3,
+              53,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": false,
+            "far_hand_visible_pixels": 5,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "8742b5f6ac2543cbdefea55c11fa06db663a112a4c4176f155c42a04cdd58cf0",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 216000,
+        "loop_delta_ratio": 1.1412222222222221,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 52,
+            "runtime_27x35_visible_pixels": 8,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 213,
+            "runtime_27x35_visible_pixels": 37,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.092,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 494.36,
+          "width_range": [
+            20,
+            20
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "cargo-crate",
+          "direction": "right",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          204331,
+          218842,
+          225340,
+          202352,
+          186661,
+          216000,
+          237716,
+          246504
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/cargo-crate/carry-right.png",
+      "landmarks": "landmarks/watchman/watch-blue/cargo-crate/carry-right.json",
+      "quality_proof": "proof/quality/watchman-watch-blue-cargo-crate-x4.png",
+      "quality_report": "reports/quality/watchman-watch-blue-cargo-crate.json",
+      "row": "rows/watchman/watch-blue/cargo-crate/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/cargo-crate/carry-right.png",
+        "double": "rows-runtime/double/watchman/watch-blue/cargo-crate/carry-right.png",
+        "native": "rows-runtime/native/watchman/watch-blue/cargo-crate/carry-right.png",
+        "review": "rows-runtime/review/watchman/watch-blue/cargo-crate/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "cargo-crate",
+        "direction": "right",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/cargo-crate/carry-right.png"
+    },
+    "watchman/watch-blue/off": {
+      "attachment_plane": "planes/attachment/watchman/watch-blue/off/carry-right.png",
+      "garment_plane": "planes/garment/watchman/watch-blue/off/carry-right.png",
+      "gate": {
+        "alpha_mass_ratio": 1.0928759694332253,
+        "body_heights": [
+          76,
+          75,
+          76,
+          77,
+          76,
+          75,
+          76,
+          77
+        ],
+        "cargo_pixels": 0,
+        "failures": [],
+        "frame_metrics": [
+          {
+            "alpha_mass": 1729.05,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 43,
+            "frame": 0,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 66,
+            "phase": "near-contact",
+            "sha256_rgba": "7f86d4bf9caa14b3b1fbe67390d5e5808f3e9e8d50d321d9ca4042e5f3763b0c",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1695.3,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 107,
+            "frame": 1,
+            "ground_runs": [
+              [
+                36,
+                41
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 99,
+            "phase": "near-down",
+            "sha256_rgba": "3c54813e59749954f464a119e6dad7f7d2f1f16a6108b9e2416b3bfec20a8bdd",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1582.11,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 140,
+            "frame": 2,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 69,
+            "phase": "near-pass",
+            "sha256_rgba": "308ab65aa9365cb41572a4b987e643a7be3046a1ee6cc12191d7d89fb406415f",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1694.73,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "contacts": [
+              "near"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 135,
+            "frame": 3,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 14,
+            "phase": "near-up",
+            "sha256_rgba": "aad99504d4a75c84a5320a47d4e10b2db24c921bfaf23b037d9b3355259584f5",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1671.35,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "near",
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 30,
+            "frame": 4,
+            "ground_runs": [
+              [
+                22,
+                26
+              ],
+              [
+                39,
+                44
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 20,
+            "phase": "far-contact",
+            "sha256_rgba": "4319bb9ff9eae2defe38ca4c8b3813da60f1a40cd0bd8cf53b18290cca586f38",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1604.94,
+            "bbox": [
+              17,
+              5,
+              51,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 7,
+            "frame": 5,
+            "ground_runs": [
+              [
+                37,
+                42
+              ]
+            ],
+            "height": 75,
+            "near_knee_cross": 118,
+            "phase": "far-down",
+            "sha256_rgba": "d236f99880d481c43987cda5497f8c3c158612f81487c03ca6575ece614d40f0",
+            "sockets": {
+              "belt": [
+                35,
+                52
+              ],
+              "left_hand": [
+                40,
+                46
+              ],
+              "load": [
+                44,
+                53
+              ],
+              "right_hand": [
+                47,
+                51
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1702.17,
+            "bbox": [
+              17,
+              4,
+              51,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 4,
+            "frame": 6,
+            "ground_runs": [
+              [
+                31,
+                36
+              ]
+            ],
+            "height": 76,
+            "near_knee_cross": 136,
+            "phase": "far-pass",
+            "sha256_rgba": "0fefb1c0fbbfd2ba7ed13b2b1d8eb820cecbf1fe208385a6a3a7ac223493ae64",
+            "sockets": {
+              "belt": [
+                35,
+                51
+              ],
+              "left_hand": [
+                40,
+                45
+              ],
+              "load": [
+                44,
+                52
+              ],
+              "right_hand": [
+                47,
+                50
+              ]
+            }
+          },
+          {
+            "alpha_mass": 1726.4,
+            "bbox": [
+              17,
+              3,
+              51,
+              80
+            ],
+            "contacts": [
+              "far"
+            ],
+            "far_hand_has_2x2_cluster": true,
+            "far_hand_visible_pixels": 8,
+            "far_knee_cross": 46,
+            "frame": 7,
+            "ground_runs": [
+              [
+                25,
+                30
+              ]
+            ],
+            "height": 77,
+            "near_knee_cross": 131,
+            "phase": "far-up",
+            "sha256_rgba": "922612f3d281375977612fe39ce8324ebe1d8fd8019594a3015e9eb7d1c95a7a",
+            "sockets": {
+              "belt": [
+                35,
+                50
+              ],
+              "left_hand": [
+                40,
+                44
+              ],
+              "load": [
+                44,
+                51
+              ],
+              "right_hand": [
+                47,
+                49
+              ]
+            }
+          }
+        ],
+        "ground_y": 79,
+        "internal_transition_median": 221053,
+        "loop_delta_ratio": 1.2048060872279498,
+        "mechanical_passed": true,
+        "pass_boot_visibility": [
+          {
+            "frame": 2,
+            "native_visible_pixels": 63,
+            "runtime_27x35_visible_pixels": 11,
+            "side": "far"
+          },
+          {
+            "frame": 6,
+            "native_visible_pixels": 273,
+            "runtime_27x35_visible_pixels": 46,
+            "side": "near"
+          }
+        ],
+        "production_quality": {
+          "body_bottom_range": 0,
+          "body_height_range": 2,
+          "body_width_range": 0,
+          "errors": [],
+          "flicker_score": 4.0,
+          "max_alpha_ratio": 1.097,
+          "max_fragment_pixels": 0,
+          "median_body_height": 76.0,
+          "style_era": "painted",
+          "warnings": []
+        },
+        "root": [
+          32,
+          79
+        ],
+        "runtime_legibility": {
+          "all_frames_nonblank": true,
+          "frame_size": [
+            35,
+            46
+          ],
+          "height_range": [
+            41,
+            43
+          ],
+          "minimum_alpha_mass": 468.26,
+          "width_range": [
+            19,
+            19
+          ]
+        },
+        "schema": "realm.actor-pose.a2-right-reference-gate.v2",
+        "scope": {
+          "action": "carry",
+          "attachment": "off",
+          "direction": "right",
+          "garment": "watch-blue",
+          "identity": "watchman"
+        },
+        "semantic_palette": {
+          "garment-belt": [
+            145,
+            208,
+            69,
+            255
+          ],
+          "garment-boot-far": [
+            62,
+            96,
+            180,
+            255
+          ],
+          "garment-boot-near": [
+            69,
+            142,
+            230,
+            255
+          ],
+          "garment-headgear": [
+            72,
+            190,
+            105,
+            255
+          ],
+          "garment-sleeve-far": [
+            33,
+            130,
+            139,
+            255
+          ],
+          "garment-sleeve-near": [
+            51,
+            192,
+            183,
+            255
+          ],
+          "garment-tunic": [
+            39,
+            150,
+            83,
+            255
+          ],
+          "identity-arm-far": [
+            198,
+            82,
+            55,
+            255
+          ],
+          "identity-arm-near": [
+            244,
+            121,
+            66,
+            255
+          ],
+          "identity-head": [
+            214,
+            55,
+            62,
+            255
+          ],
+          "identity-leg-far": [
+            180,
+            68,
+            104,
+            255
+          ],
+          "identity-leg-near": [
+            237,
+            104,
+            130,
+            255
+          ],
+          "identity-torso": [
+            174,
+            42,
+            52,
+            255
+          ]
+        },
+        "tested_frames": 8,
+        "tested_rows": 1,
+        "transition_deltas": [
+          203956,
+          221053,
+          231511,
+          215062,
+          187315,
+          234999,
+          249058,
+          266326
+        ]
+      },
+      "identity_plane": "planes/identity/watchman/watch-blue/off/carry-right.png",
+      "landmarks": "landmarks/watchman/watch-blue/off/carry-right.json",
+      "quality_proof": "proof/quality/watchman-watch-blue-off-x4.png",
+      "quality_report": "reports/quality/watchman-watch-blue-off.json",
+      "row": "rows/watchman/watch-blue/off/carry-right.png",
+      "runtime_rows": {
+        "default": "rows-runtime/default/watchman/watch-blue/off/carry-right.png",
+        "double": "rows-runtime/double/watchman/watch-blue/off/carry-right.png",
+        "native": "rows-runtime/native/watchman/watch-blue/off/carry-right.png",
+        "review": "rows-runtime/review/watchman/watch-blue/off/carry-right.png"
+      },
+      "scope": {
+        "action": "carry",
+        "attachment": "off",
+        "direction": "right",
+        "garment": "watch-blue",
+        "identity": "watchman"
+      },
+      "semantic_mask": "id-masks/watchman/watch-blue/off/carry-right.png"
+    }
+  },
+  "schema": "realm.actor-pose.a3-interchange-manifest.v1",
+  "scope": {
+    "actions": [
+      "carry"
+    ],
+    "attachments": [
+      "cargo-crate",
+      "off"
+    ],
+    "directions": [
+      "right"
+    ],
+    "flattened_frames": 64,
+    "flattened_rows": 8,
+    "frame_size": [
+      64,
+      84
+    ],
+    "garments": [
+      "ochre-work",
+      "watch-blue"
+    ],
+    "identities": [
+      "craftsperson",
+      "watchman"
+    ],
+    "root": [
+      32,
+      79
+    ],
+    "row_size": [
+      512,
+      84
+    ],
+    "runtime": "none; ordinary flattened rows plus prefiltered raster tiers are promotion artifacts",
+    "runtime_tiers": [
+      {
+        "frame_size": [
+          27,
+          35
+        ],
+        "key": "native",
+        "row_size": [
+          216,
+          35
+        ]
+      },
+      {
+        "frame_size": [
+          35,
+          46
+        ],
+        "key": "default",
+        "row_size": [
+          280,
+          46
+        ]
+      },
+      {
+        "frame_size": [
+          54,
+          70
+        ],
+        "key": "double",
+        "row_size": [
+          432,
+          70
+        ]
+      },
+      {
+        "frame_size": [
+          64,
+          84
+        ],
+        "key": "review",
+        "row_size": [
+          512,
+          84
+        ]
+      }
+    ]
+  },
+  "sources": {
+    "current_or_legacy_frame_pixels_copied": false,
+    "files": {
+      "assets/sprites/prototypes/actor-pose/output/a2-layered2d/manifest.json": {
+        "bytes": 9769,
+        "owner": "approved-reference-authority",
+        "sha256": "8deabed1518cecd1b6d0e6d0ead86a25bd29264ea3995c28d068ea0867d57432"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-ochre-work.png": {
+        "bytes": 860223,
+        "key": "ochre-work",
+        "owner": "garment",
+        "sha256": "a01506add562cfcd5bcc54fc86a64728fd7febc7bc600515bfc88b89db3f07e4"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/garment-watch-blue.png": {
+        "bytes": 702824,
+        "key": "watch-blue",
+        "owner": "garment",
+        "sha256": "f17117625526aee6a965f5d8ca51ead9abfee4fd5aa3882c7e62cb74c01b9fc6"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-craftsperson.png": {
+        "bytes": 747013,
+        "key": "craftsperson",
+        "owner": "identity",
+        "sha256": "fa6b11610b0e5cf67ae1c752a1ee7ecf39f462f0b2a74ed2e6af8af4549152bd"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a2-source/identity-watchman.png": {
+        "bytes": 768222,
+        "key": "watchman",
+        "owner": "identity",
+        "sha256": "6ffc68e673e04384f072575279fd76b0d2024b1db55efd9da3019d6a734ff2ca"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate-keyed.png": {
+        "bytes": 1250025,
+        "key": "cargo-crate",
+        "owner": "imagegen-provenance",
+        "sha256": "3654e5e74c6570b20f4346784c1cdb6382dd942677d0dc71e12976e7f111162a"
+      },
+      "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png": {
+        "bytes": 733091,
+        "key": "cargo-crate",
+        "owner": "attachment",
+        "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/a2-contract.json": {
+        "bytes": 4970,
+        "owner": "source-contract",
+        "sha256": "0ef00a3138ecab336e53f3f37b7cc421bd09f0a2ab3c90ff51992a74b86f4593"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json": {
+        "bytes": 8546,
+        "owner": "sole-pose-authority",
+        "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a3-interchange/attachments.json": {
+        "bytes": 833,
+        "owner": "attachment-source-authority",
+        "sha256": "2e47fe17743ec732780e2fd952e37c3698f02b468c07c237f9766e5e37727cfa"
+      },
+      "assets/sprites/prototypes/actor-pose/source/a3-interchange/render-profiles.json": {
+        "bytes": 1337,
+        "owner": "identity-silhouette-authority",
+        "sha256": "5521b6d34da0e2b93986606ad7fd3fcf618b8beac9f1584b2943c2aac9ddc598"
+      },
+      "scripts/actor-pose-prototype/a2_layered2d.py": {
+        "bytes": 56440,
+        "owner": "shared-compiler-source",
+        "sha256": "70129559b1a19b3d67214ff1928b8db17a962fb6edd029c39bb401b067cbda46"
+      },
+      "scripts/actor-pose-prototype/a3_factorial.py": {
+        "bytes": 43134,
+        "owner": "compiler-source",
+        "sha256": "9523b4ae5b653286a7ea62b53cb7e2d3501fd0357954a575455a15747718fefb"
+      },
+      "scripts/sprite_row_quality.py": {
+        "bytes": 14174,
+        "owner": "quality-gate-source",
+        "sha256": "f1dc8266d07dd4d58057e23d47c680226a73e9ac59da53bf456ca49694439461"
+      }
+    },
+    "network_required": false,
+    "paint_sources_transformed_by_joint_chain": true,
+    "runtime_skeletal_renderer": false,
+    "source_hash": "5adbead8422f549adc7c85353941c4e7a4cd079736308a95752733cd960c393d"
+  },
+  "stage": "right-factorial",
+  "status": "factorial-proven",
+  "verification": {
+    "byte_deterministic_second_pass": true,
+    "failures": [],
+    "mechanical_passed": true,
+    "report": "reports/factorial-gate.json"
+  }
+}

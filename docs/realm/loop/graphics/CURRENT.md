@@ -1,5 +1,54 @@
 # Current Graphics Handoff
 
+## Realm 171 A3 modular actor vertical slice — 2026-07-29
+
+- A2's reviewed right-facing carry pose is now an offline factorial compiler,
+  not a one-off character. A3 combines two independent identities
+  (`watchman`, `craftsperson`), two independent garment kits (`watch-blue`,
+  `ochre-work`), and two attachment states (`off`, `cargo-crate`) from one
+  authored eight-beat skeleton.
+- The eight resulting `512x84` rows contain 64 distinct frames. Identity
+  planes remain byte-identical across garments and attachments; garment
+  planes fit broad and lean bodies while remaining invariant across attachment
+  state; the cargo plane remains identical across every identity/garment
+  combination.
+- The new painted cargo source is project-bound with generation provenance and
+  hash locks. Its load socket is inside the attachment in all eight frames,
+  the far hand remains visible behind it, and the gripping near hand remains
+  visible in front.
+- The live candidates are flattened raster rows. The skeleton, source parts,
+  semantic masks, and landmarks are authoring/verification data only; no
+  skeletal runtime or second actor renderer was introduced.
+- Large-canvas inspection correctly rejected the first visually soft runtime
+  pass even though its structural gates were green. A3 now derives one shared
+  48-color palette across the full factorial, applies a fixed contrast and
+  saturation curve, uses binary alpha and no dithering, and emits prefiltered
+  `27x35`, `35x46`, `54x70`, and `64x84` rows. Canonical painted rows remain
+  untouched for source review.
+- Actor Muster now reviews at the largest exact compiled tier that fits each
+  cell instead of fractionally stretching a frame. This removed a false blur
+  from the review surface itself.
+- `guard/carry/right` is staged as a warning-free A3 `CANDIDATE`; candidate
+  status still excludes it from the normal atlas. The explicit
+  `?actorpreview=a3-watchman-blue-cargo` URL substitutes only that row and
+  suppresses the old procedural load overlay because this slice owns its
+  socketed crate.
+- Browser verification proves the preview row is actually used by Actor
+  Muster and by a controlled guard carrier in the settlement at the exact
+  zoom-matched tier with smoothing disabled. A second ordinary-URL page proves
+  no preview tier is loaded outside the opt-in slice.
+
+Validation run:
+
+```sh
+scripts/.venv/bin/python scripts/actor-pose-prototype/a2_layered2d.py --verify
+scripts/.venv/bin/python scripts/actor-pose-prototype/verify_a2_layered2d.py
+scripts/.venv/bin/python scripts/actor-pose-prototype/a3_factorial.py --verify
+scripts/.venv/bin/python scripts/actor-pose-prototype/verify_a3_factorial.py
+REALM_SPRITE_PYTHON=scripts/.venv/bin/python scripts/sprite-row verify
+node scripts/verify-actor-vertical-slice.mjs
+```
+
 ## Realm 170 multi-resolution actor presentation — 2026-07-29
 
 - Large-screen inspection proved that actor review art was authored at
@@ -8,8 +57,11 @@
   Art quality could not be judged honestly through that path.
 - The exact `512x84` eight-frame row remains the review/source contract.
   The compiler now emits row-isolated `27x35`, `35x46`, `54x70`, and `64x84`
-  runtime atlases. It uses `LanczosSharp`, strips changing PNG metadata, and
-  records dimensions, derivation settings, and SHA-256 hashes in
+  runtime atlases. A native-size comparison found that `LanczosSharp` created
+  isolated chroma ringing around transparent edges. The compiler now
+  normalizes hidden transparent RGB and uses a no-negative-lobes `Box` area
+  downsample plus bounded unsharp contrast restoration. It strips changing
+  PNG metadata and records every derivation setting and SHA-256 hash in
   `assets/sprites/actors-runtime-atlases.json`.
 - The renderer measures the current Canvas transform in physical pixels.
   Default zoom on a Retina display selects `35x46` at exact `2x`, while a
@@ -378,7 +430,7 @@ REALM_PORT=4713 node scripts/verify-logic.mjs
 
 ## Baseline
 
-Current baseline: `rounds/112-round-player-cleanup.md`
+Current baseline: `rounds/113-a3-modular-vertical-slice.md`
 
 The live game still uses painted PNG atlases in the canonical 2D canvas
 renderer. Actor and ambient source files remain the editable source of truth:
@@ -929,18 +981,18 @@ aligned.
 
 ## Best Next Target
 
-Execute RFC 0002's A2 interchange/handedness proof. Bake two independent
-identities by two independent garment kits from one shared walk clip. Keep
-skin/head/body identity, garment, and attachments in separate source parts;
-include one-sided pouch/sword sentinels; mirror joint transforms before
-semantic recomposition instead of mirroring a finished frame; emit body,
-identity, garment, and attachment ID masks; and match an explicit accepted
-Realm scale target.
+Extend the proven A3 source contract from right-facing carry to the complete
+guard pilot. Author the remaining directions by transforming joints and
+recomposing semantic layers—never by mirroring a finished row—and add
+one-sided equipment sentinels so handedness failures are mechanically visible.
+Then build guard idle, walk, work, and carry from the same watchman identity,
+watch-blue garment, fixed palette, root, lighting, and attachment contracts.
 
-Bake flattened review rows only. Review all four turns at `1x`, measure seams,
-occlusion, landmarks, phase, authoring time, and real-renderer `100`/`250`
-actor cost. Do not promote the partial guard carry candidates or keep B/C as a
-second authoring route.
+Keep every row a reviewable flattened `512x84` promotion unit. Exercise the
+complete guard family in Sprite Lab, Actor Muster, and controlled settlement
+fixtures before accepting any row. Once the guard family passes, use the same
+source authorities for farmer and lumber rather than preserving the current
+palette-derived identities.
 
 ## Secondary Targets
 
@@ -963,5 +1015,5 @@ second authoring route.
 
 ## Handoff Discipline
 
-At the end of the next round, write `rounds/111-<short-name>.md`, update this
+At the end of the next round, write `rounds/114-<short-name>.md`, update this
 file's Best Next Target, and move any completed backlog item to Done.

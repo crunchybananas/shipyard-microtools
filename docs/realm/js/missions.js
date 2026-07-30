@@ -2,9 +2,9 @@
 // Missions — goals and progression
 // ════════════════════════════════════════════════════════════
 
-import { G, MAP_W, MAP_H } from './state.js?realm=170';
-import { sfx as playSound, announce } from './log.js?realm=170';
-import { visualJitter } from './fx.js?realm=170';
+import { G, MAP_W, MAP_H } from './state.js?realm=171';
+import { sfx as playSound, announce } from './log.js?realm=171';
+import { visualJitter } from './fx.js?realm=171';
 
 export const missions = [
   { id:'farm1',   text:'Build a farm',                  check:()=>G.buildings.some(b=>b.type==='farm'),      done:false, reward:{wood:20} },

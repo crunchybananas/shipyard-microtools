@@ -49,6 +49,22 @@ REFERENCE = {
     "direction": "right",
 }
 
+DEFAULT_RENDER_PROFILE = {
+    "identity_leg_far_width": 7.0,
+    "identity_leg_near_width": 8.0,
+    "garment_leg_far_width": 8.0,
+    "garment_leg_near_width": 9.0,
+    "upper_arm_far_width": 6.5,
+    "upper_arm_near_width": 7.5,
+    "forearm_far_width": 6.0,
+    "forearm_near_width": 6.8,
+    "identity_torso_size": [24, 31],
+    "garment_tunic_size": [28, 34],
+    "garment_belt_size": [25, 5],
+    "identity_head_size": [23, 24],
+    "garment_headgear_size": [27, 22],
+}
+
 SEMANTIC_COLORS = {
     "identity-head": (214, 55, 62, 255),
     "identity-torso": (174, 42, 52, 255),
@@ -481,7 +497,12 @@ def source_parts(
 def compose_frame(
     parts: dict[str, Image.Image],
     pose_frame: dict[str, Any],
+    render_profile: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Image.Image], dict[str, Any]]:
+    profile = {
+        **DEFAULT_RENDER_PROFILE,
+        **(render_profile or {}),
+    }
     near = pose_frame["near"]
     far = pose_frame["far"]
     shoulders = pose_frame["shoulders"]
@@ -501,8 +522,16 @@ def compose_frame(
         garment_label = f"garment-boot-{side}"
         identity_source = parts["identity:leg"]
         garment_source = parts["garment:boot"]
-        identity_width = 7.0 if is_far else 8.0
-        garment_width = 8.0 if is_far else 9.0
+        identity_width = profile[
+            "identity_leg_far_width"
+            if is_far
+            else "identity_leg_near_width"
+        ]
+        garment_width = profile[
+            "garment_leg_far_width"
+            if is_far
+            else "garment_leg_near_width"
+        ]
         return [
             (
                 "identity",
@@ -567,7 +596,11 @@ def compose_frame(
     def upper_arm(side: str, is_far: bool) -> list[tuple[str, str, Image.Image]]:
         identity_label = f"identity-arm-{side}"
         garment_label = f"garment-sleeve-{side}"
-        width = 6.5 if is_far else 7.5
+        width = profile[
+            "upper_arm_far_width"
+            if is_far
+            else "upper_arm_near_width"
+        ]
         return [
             (
                 "identity",
@@ -597,7 +630,11 @@ def compose_frame(
 
     def forearm_and_hand(side: str, is_far: bool) -> list[tuple[str, str, Image.Image]]:
         label = f"identity-arm-{side}"
-        width = 6.0 if is_far else 6.8
+        width = profile[
+            "forearm_far_width"
+            if is_far
+            else "forearm_near_width"
+        ]
         return [
             (
                 "identity",
@@ -639,7 +676,7 @@ def compose_frame(
         "identity-torso",
         direct_piece(
             parts["identity:torso"],
-            (24, 31),
+            tuple(profile["identity_torso_size"]),
             tuple(pose_frame["torso"]),
         ),
     )
@@ -648,7 +685,7 @@ def compose_frame(
         "garment-tunic",
         direct_piece(
             parts["garment:tunic"],
-            (28, 34),
+            tuple(profile["garment_tunic_size"]),
             tuple(pose_frame["torso"]),
         ),
     )
@@ -657,7 +694,7 @@ def compose_frame(
         "garment-belt",
         direct_piece(
             parts["garment:belt"],
-            (25, 5),
+            tuple(profile["garment_belt_size"]),
             tuple(pose_frame["sockets"]["belt"]),
         ),
     )
@@ -672,7 +709,7 @@ def compose_frame(
         "identity-head",
         direct_piece(
             parts["identity:head"],
-            (23, 24),
+            tuple(profile["identity_head_size"]),
             tuple(pose_frame["head"]),
         ),
     )
@@ -681,7 +718,7 @@ def compose_frame(
         "garment-headgear",
         direct_piece(
             parts["garment:headgear"],
-            (27, 22),
+            tuple(profile["garment_headgear_size"]),
             (pose_frame["head"][0], pose_frame["head"][1] - 1),
         ),
     )

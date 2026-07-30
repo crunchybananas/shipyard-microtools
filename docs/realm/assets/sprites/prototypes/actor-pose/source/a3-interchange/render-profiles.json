@@ -1,0 +1,38 @@
+{
+  "schema": "realm.actor-pose.a3-render-profiles.v1",
+  "purpose": "Preserve visible build and silhouette identity while fitting the same independently painted garment source to different bodies.",
+  "profiles": {
+    "watchman": {
+      "build": "broad-shouldered, heavy work stance",
+      "identity_leg_far_width": 7.5,
+      "identity_leg_near_width": 8.8,
+      "garment_leg_far_width": 8.7,
+      "garment_leg_near_width": 10.0,
+      "upper_arm_far_width": 6.5,
+      "upper_arm_near_width": 7.5,
+      "forearm_far_width": 6.0,
+      "forearm_near_width": 6.8,
+      "identity_torso_size": [26, 31],
+      "garment_tunic_size": [30, 34],
+      "garment_belt_size": [27, 5],
+      "identity_head_size": [24, 24],
+      "garment_headgear_size": [28, 22]
+    },
+    "craftsperson": {
+      "build": "lean, narrow-shouldered, quick work stance",
+      "identity_leg_far_width": 6.2,
+      "identity_leg_near_width": 7.0,
+      "garment_leg_far_width": 7.1,
+      "garment_leg_near_width": 8.0,
+      "upper_arm_far_width": 5.8,
+      "upper_arm_near_width": 6.7,
+      "forearm_far_width": 5.4,
+      "forearm_near_width": 6.1,
+      "identity_torso_size": [21, 31],
+      "garment_tunic_size": [25, 34],
+      "garment_belt_size": [23, 5],
+      "identity_head_size": [21, 24],
+      "garment_headgear_size": [25, 22]
+    }
+  }
+}
