@@ -72,6 +72,9 @@ try {
     const minerProduction = Object.entries(manifest.rows).filter(
       ([key, slots]) => key.startsWith('miner/') && slots.production,
     );
+    const stonecutterProduction = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('stonecutter/') && slots.production,
+    );
     const key = 'guard/idle/down';
     const item = manifest.rows[key].production;
     const bytes = await fetch(`assets/sprites/actor-rows/${item.file}`).then(
@@ -90,6 +93,7 @@ try {
       builderProductionCount: builderProduction.length,
       blacksmithProductionCount: blacksmithProduction.length,
       minerProductionCount: minerProduction.length,
+      stonecutterProductionCount: stonecutterProduction.length,
       productionHash: item.sha256,
       fetchedProductionHash: digest,
       reviewSource: document.body.dataset.spriteReviewSource,
@@ -114,6 +118,7 @@ try {
   assert.equal(idle.builderProductionCount, 16);
   assert.equal(idle.blacksmithProductionCount, 16);
   assert.equal(idle.minerProductionCount, 16);
+  assert.equal(idle.stonecutterProductionCount, 16);
   assert.equal(idle.candidateBadges, 0);
   assert.equal(idle.reviewSource, 'accepted');
   assert.equal(idle.runtimeSource, 'accepted');
@@ -177,6 +182,7 @@ try {
       builderProduction: idle.builderProductionCount,
       blacksmithProduction: idle.blacksmithProductionCount,
       minerProduction: idle.minerProductionCount,
+      stonecutterProduction: idle.stonecutterProductionCount,
     },
     idle,
     carry,
@@ -186,7 +192,8 @@ try {
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(
     '[actor-row-candidate-browser] PASS — 224 production rows and 0 candidates; '
-    + 'all guard, farmer, lumber, builder, blacksmith, and miner rows are LOCKED and ordinary game loads no candidate assets',
+    + 'all guard, farmer, lumber, builder, blacksmith, miner, and stonecutter '
+    + 'rows are LOCKED and ordinary game loads no candidate assets',
   );
 } finally {
   await browser.close();

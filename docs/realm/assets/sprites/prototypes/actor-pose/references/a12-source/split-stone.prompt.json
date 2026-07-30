@@ -1,0 +1,38 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "split-stone",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_EguEGkjoncMiIxeIlnrTaxHg.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/ore-face-keyed.png",
+      "role": "edit target and exact four-object board and canvas reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet-keyed.png",
+      "role": "new stonecutter palette and rendering reference"
+    }
+  ],
+  "prompt": "Use case: precise-object-edit. Edit the supplied four-column ore board into exactly four isolated orthographic views of the same compact dressed-stone splitting target while preserving the exact 1536x1024 canvas, horizontal layout, spacing, approximate scale, resolution, and polish. Replace every ore-bearing rock completely. Create one compact knee-high rough-cut pale gray limestone block with a broad partly dressed top, angular broken sides, restrained chisel scoring, a clear fresh pale split face aimed toward the worker for that direction, and one small dark forged-steel splitting wedge embedded upright at the intended strike point. Keep the same block identity, dimensions, wedge design, scoring language, and mass in every view. Columns from left to right are down/front, up/back, left side, and independently authored right side. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, hard limestone clusters, warm upper-left quarry-yard light, restrained chalky wear, no photorealism, blur, dither, or soft shadow. Use pale warm limestone gray, charcoal crevices, off-white fresh chips, muted tan dust, and a compact dark steel wedge. Background must be perfectly flat solid #ff00ff with no shadows, gradients, texture, reflections, floor, labels, guides, border, text, watermark, hands, character, scenery, extra objects, or magenta inside the target. Every block must be fully separated and uncropped. Do not retain blue-gray crystals, quartz cavities, dark mine-rock identity, ore veins, gems, wood, anvils, loose rubble, extra tools, dust clouds, sparks, fantasy runes, modern machinery, or finished-row mirroring.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f505f1"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a12-source/split-stone-keyed.png",
+  "keyed_sha256": "90768f4f2d061e1e43e3810ff2860aa0898f7b9485a2ffb4aa9e0c470ebf00c6",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a12-source/split-stone.png",
+  "alpha_sha256": "444bb964e49e3c6c000345377669e02a7a2145c9a1498b7c849019ecb743b7df"
+}

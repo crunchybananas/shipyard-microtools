@@ -1,0 +1,48 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-granite-russet",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_6L2WWjIUOMZVIhPQmxivnQY1.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/garment-slate-brass-keyed.png",
+      "role": "edit target and exact modular garment-board layout reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/identity-quarrymaster-keyed.png",
+      "role": "new stonecutter identity and fit reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve followed by precise-object-edit. Edit the supplied modular Realm garment board into one coherent master stonecutter quarry-work garment while preserving the exact 1536x1024 canvas, isolated component placement, scale, resolution, gaps, and front/back/profile coverage. Create an empty pale warm-gray padded linen head wrap with a short muted-russet band and compact rear knot; a dusty limestone-gray heavy canvas jacket with a dark-russet shoulder yoke, rolled reinforced sleeves, and copper-brown edging; a warm weathered tan split-leather apron ending above the knees with crossed back straps, reinforced center panel, and aged-copper rivets; a broad dark-umber belt with copper buckle and compact wedge pouch; ash-charcoal reinforced trousers; and thick dark-brown quarry boots with leather shin wraps and pale stone-dust wear. Keep the exact modular layout: three isolated empty head-wrap components on top; isolated sleeves and front, back, and profile jacket/apron views in the middle; isolated belts below; and front, back, and side trouser/boot sources on the bottom. The head-wrap views must contain cloth only, with no face, head, skin, ears, neck, eyes, eyebrows, nose, mouth, or hair. This is a garment-parts board, not an assembled character and not an animation. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, strong material separation, warm upper-left quarry-yard light, restrained stone dust, no photorealism, blur, dither, or soft ambient shadow. Preserve the same garment construction, colors, head wrap, yoke, apron length, strap placement, belt, trousers, boots, stone-dust logic, proportions, and lighting across every view. Background must be perfectly flat solid #ff00ff with no shadows, gradients, texture, floor, labels, guides, border, text, watermark, tools, props, scenery, or magenta inside the garment. Every component must remain isolated and uncropped with clean joint cut zones. Do not retain the miner's black lamp cap, brass lamp, slate-blue jacket, coal-black bib, mining harness, or iron-capped boots.",
+  "iterations": [
+    {
+      "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_46478orZxnTFLw7HxPygeko0.png",
+      "result": "rejected because the three head-wrap components included identity anatomy"
+    },
+    {
+      "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_6L2WWjIUOMZVIhPQmxivnQY1.png",
+      "result": "accepted after a precise edit removed all face, head, skin, hair, and neck pixels from the headgear components"
+    }
+  ],
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#df03d3"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet-keyed.png",
+  "keyed_sha256": "d2d4812522f326342a8c8103d79524294ce8477c56bd487e5ce34fe445d2c800",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet.png",
+  "alpha_sha256": "11528645ab552c53c426db9543183e6309c6c6d057e3809b1f38bcd07c0a5f45"
+}

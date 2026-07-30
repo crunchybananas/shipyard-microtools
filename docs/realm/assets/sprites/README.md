@@ -114,15 +114,20 @@ miner families supersede it in production.
   slate-blue quilted workwear with a brass-lamp mining cap, a four-view
   two-ended pickaxe, a separately authored grounded ore face, and the shared
   directional cargo crate across all four actions and directions.
+- A12 compiles the stonecutter from a distinct broad, low-built quarry-master
+  identity, limestone-gray and russet padded workwear, a four-view quarry
+  sledge, a separately authored split limestone block, and the shared
+  directional cargo crate across all four actions and directions.
 - Each family emits 16 independent `512x84` rows, 128 frames, semantic and
   equipment planes, landmarks, body-only proofs, a family contact sheet, and
   four exact runtime tiers.
-- All six compilers require binary runtime alpha, a shared 48-color family
+- All seven compilers require binary runtime alpha, a shared 48-color family
   palette, stable `76px` body height, ground row `79`, clear rows `80–83`,
   distinct directions, clean row-quality reports, and a byte-identical clean
   rebuild.
-- `guard/carry`, `farmer/carry`, `lumber/carry`, `builder/carry`, and
-  `blacksmith/carry`, and `miner/carry` own their baked containers. A6
+- `guard/carry`, `farmer/carry`, `lumber/carry`, `builder/carry`,
+  `blacksmith/carry`, `miner/carry`, and `stonecutter/carry` own their baked
+  containers. A6
   supplies the nine resource-specific payloads at the same tier, frame, and
   destination rectangle; the procedural fallback is suppressed only for
   those owners.
@@ -140,12 +145,15 @@ python3 scripts/actor-pose-prototype/a10_blacksmith_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a10_blacksmith_actions.py
 python3 scripts/actor-pose-prototype/a11_miner_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a11_miner_actions.py
+python3 scripts/actor-pose-prototype/a12_stonecutter_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a12_stonecutter_actions.py
 scripts/sprite-row verify
 node scripts/verify-farmer-vertical-slice.mjs
 node scripts/verify-lumber-vertical-slice.mjs
 node scripts/verify-builder-vertical-slice.mjs
 node scripts/verify-blacksmith-vertical-slice.mjs
 node scripts/verify-miner-vertical-slice.mjs
+node scripts/verify-stonecutter-vertical-slice.mjs
 node scripts/verify-guard-cargo-browser.mjs
 ```
 

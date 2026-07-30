@@ -5,19 +5,19 @@
 // separation must now satisfy their acceptance thresholds.
 
 import assert from 'node:assert/strict';
-import runtimeContract from '../runtime-contract.json?realm=180' with { type: 'json' };
+import runtimeContract from '../runtime-contract.json?realm=181' with { type: 'json' };
 import {
   G,
   MAP_H,
   MAP_W,
   TILE,
   setSeed,
-} from '../js/state.js?realm=180';
+} from '../js/state.js?realm=181';
 import {
   findPath,
   stepEntityToward,
-} from '../js/pathfinding.js?realm=180';
-import { updateCitizens } from '../js/citizens.js?realm=180';
+} from '../js/pathfinding.js?realm=181';
+import { updateCitizens } from '../js/citizens.js?realm=181';
 
 const SQRT2 = Math.SQRT2;
 const MINIMUM_ACTOR_SEPARATION = 0.45;

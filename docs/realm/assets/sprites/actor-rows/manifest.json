@@ -8402,705 +8402,705 @@
     },
     "stonecutter/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:26Z",
-        "file": "stonecutter/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/carry-down-117cfb12804b.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
             "medianColor": [
-              95.35,
-              69.2,
-              52.8
+              111.75,
+              85.95,
+              59.2
             ],
-            "paletteDelta": 12.6
+            "paletteDelta": 5.64
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.033,
+          "maxBodyCenterJump": 2.3,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.63,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.9,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            104.3,
-            76.75,
-            57.45
+            117.15,
+            86.3,
+            57.6
           ],
-          "medianColorCount": 425.0,
-          "medianShadingRatio": 0.5852,
+          "medianColorCount": 469.0,
+          "medianShadingRatio": 0.7031,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "41c500bda2f797b604c4d6180592195669da16d72426f83251c2b5c0a0e1501d",
+        "sha256": "117cfb12804b2391057b369fb31669e5519de22940ab9d7aff7f6826a424b72b",
         "status": "accepted"
       }
     },
     "stonecutter/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:27Z",
-        "file": "stonecutter/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/carry-left-89101a70c293.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              95.75,
-              75.3,
-              57.45
+              115.75,
+              86.3,
+              59.2
             ],
-            "paletteDelta": 7.68
+            "paletteDelta": 4.02
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.092,
+          "maxBodyCenterJump": 2.23,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.05,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 6.04,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            95.35,
-            69.2,
-            52.8
+            111.75,
+            85.95,
+            59.15
           ],
-          "medianColorCount": 332.5,
-          "medianShadingRatio": 0.6212,
+          "medianColorCount": 417.5,
+          "medianShadingRatio": 0.6945,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "c2baa6352677e2e75b3df5288282b69c9e0808cb2fa08968c35a6e22c449c5ee",
+        "sha256": "89101a70c293375d120fd12c61280daaca1b31d35daccf7bb0740d922eecc1c3",
         "status": "accepted"
       }
     },
     "stonecutter/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:28Z",
-        "file": "stonecutter/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/carry-right-82b6b1fd6353.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 30.0,
             "medianColor": [
-              95.75,
-              75.3,
-              57.45
+              115.75,
+              86.3,
+              59.15
             ],
-            "paletteDelta": 7.68
+            "paletteDelta": 4.32
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.09,
+          "maxBodyCenterJump": 2.13,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.05,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 5.8,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 34.0,
           "medianColor": [
-            95.35,
-            69.2,
-            52.8
+            111.45,
+            85.85,
+            59.2
           ],
-          "medianColorCount": 332.5,
-          "medianShadingRatio": 0.6204,
+          "medianColorCount": 409.5,
+          "medianShadingRatio": 0.6969,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "c0085ad49029e78a5c0f3b4d3fa38f1853375b14ab23438ce53d684b159f2f89",
+        "sha256": "82b6b1fd635313efc81e04fdf185daf8a9ca8f1466d35934282ab0c3903cf8db",
         "status": "accepted"
       }
     },
     "stonecutter/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:27Z",
-        "file": "stonecutter/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/carry-up-d5a7d039c7cc.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 4.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 34.0,
             "medianColor": [
-              95.35,
-              69.2,
-              52.8
+              111.75,
+              85.95,
+              59.15
             ],
-            "paletteDelta": 11.05
+            "paletteDelta": 9.59
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.036,
+          "maxBodyCenterJump": 1.83,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.82,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 2.15,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            95.75,
-            75.3,
-            62.0
+            115.75,
+            91.75,
+            65.65
           ],
-          "medianColorCount": 370.0,
-          "medianShadingRatio": 0.625,
+          "medianColorCount": 423.5,
+          "medianShadingRatio": 0.6931,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d99b43b75a6094ea94680fb481e60db7e3690d683dc98667ca809907074dbbf9",
+        "sha256": "d5a7d039c7ccb6394c6d068ead78de75b90e651ae82280531e5dc5f19ffe677e",
         "status": "accepted"
       }
     },
     "stonecutter/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:17Z",
-        "file": "stonecutter/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/idle-down-1690ad379ef3.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              97.8,
-              76.6,
-              60.15
+              111.05,
+              85.85,
+              58.95
             ],
-            "paletteDelta": 7.34
+            "paletteDelta": 3.5
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.054,
+          "maxBodyCenterJump": 2.14,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.24,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.9,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            104.15,
-            79.05,
-            62.9
+            114.45,
+            85.9,
+            58.1
           ],
-          "medianColorCount": 463.5,
-          "medianShadingRatio": 0.6259,
+          "medianColorCount": 453.0,
+          "medianShadingRatio": 0.7124,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "b16ed0ca33564dd9bf79f73b9bf21fb32fbbbcb8dd14be021e8683bbb57e5659",
+        "sha256": "1690ad379ef31405463b4c0d63bdfef18241c3ce80c0fa67aab8dfe16ec3f7fe",
         "status": "accepted"
       }
     },
     "stonecutter/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:19Z",
-        "file": "stonecutter/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/idle-left-098e75ebeab4.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 30.0,
             "medianColor": [
-              97.8,
-              76.6,
-              62.9
+              114.1,
+              85.9,
+              58.9
             ],
-            "paletteDelta": 2.75
+            "paletteDelta": 3.05
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 0.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.1,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            97.8,
-            76.6,
-            60.15
+            111.05,
+            85.85,
+            58.95
           ],
-          "medianColorCount": 350.0,
-          "medianShadingRatio": 0.6649,
+          "medianColorCount": 401.0,
+          "medianShadingRatio": 0.6893,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ebdbe9c3b6eb310a08065a574e5fc4b0b465dc57ef5d94e9023c0d12cdcfdbef",
+        "sha256": "098e75ebeab403055aac84826a78143e7bbb5e8b353693d47d2edb613acf2ad0",
         "status": "accepted"
       }
     },
     "stonecutter/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:20Z",
-        "file": "stonecutter/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/idle-right-4f9b8a1a06e4.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 30.0,
             "medianColor": [
-              97.8,
-              76.6,
-              62.9
+              114.1,
+              85.9,
+              58.95
             ],
-            "paletteDelta": 2.75
+            "paletteDelta": 3.46
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 0.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.12,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            97.8,
-            76.6,
-            60.15
+            110.65,
+            85.7,
+            58.9
           ],
-          "medianColorCount": 350.0,
-          "medianShadingRatio": 0.6649,
+          "medianColorCount": 402.0,
+          "medianShadingRatio": 0.6808,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "a38a2199114eb7ff15632eb2e5fce5d051a92738b04202933d48b1a31f28c26a",
+        "sha256": "4f9b8a1a06e44c72a043848760c0078cf5086802fa47c1d8857f068fa82be953",
         "status": "accepted"
       }
     },
     "stonecutter/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:18Z",
-        "file": "stonecutter/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/idle-up-7fdd0ef76b5e.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              97.8,
-              76.6,
-              60.15
+              111.05,
+              85.85,
+              58.9
             ],
-            "paletteDelta": 7.96
+            "paletteDelta": 10.58
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.054,
+          "maxBodyCenterJump": 2.23,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.39,
-          "medianBodyHeight": 72.0,
+          "maxPaletteDrift": 1.71,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 30.0,
           "medianColor": [
-            91.75,
-            73.95,
-            64.6
+            114.1,
+            92.25,
+            66.75
           ],
-          "medianColorCount": 388.0,
-          "medianShadingRatio": 0.6719,
+          "medianColorCount": 415.0,
+          "medianShadingRatio": 0.6913,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "de54bd446e5a57107355cf4bb6e2e3778586cd995f1d9b83475dc812c091ba25",
+        "sha256": "7fdd0ef76b5e7a594480971e22f2f032eb439d220be57ebb0a77e7a601d4a48f",
         "status": "accepted"
       }
     },
     "stonecutter/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:20Z",
-        "file": "stonecutter/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/walk-down-b338ec1d835d.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              90.6,
-              67.2,
-              55.35
+              110.5,
+              85.45,
+              58.95
             ],
-            "paletteDelta": 16.49
+            "paletteDelta": 4.31
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 2.13,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.5,
-          "medianBodyHeight": 71.0,
+          "maxPaletteDrift": 2.01,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 30.0,
           "medianColor": [
-            102.45,
-            77.1,
-            61.15
+            114.7,
+            86.15,
+            58.3
           ],
-          "medianColorCount": 450.0,
-          "medianShadingRatio": 0.622,
+          "medianColorCount": 458.5,
+          "medianShadingRatio": 0.7087,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2785f0d8d479ae353b46f5b4c0f1227a28cf81977bdcfaeebc798bdbe52e742c",
+        "sha256": "b338ec1d835dd4eb5aa3e025e387b0c9935174fb5b770346e60dc897854cdf5d",
         "status": "accepted"
       }
     },
     "stonecutter/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:22Z",
-        "file": "stonecutter/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/walk-left-7b8b061114e4.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 30.0,
             "medianColor": [
-              92.7,
-              74.4,
-              61.15
+              113.9,
+              86.15,
+              58.85
             ],
-            "paletteDelta": 9.48
+            "paletteDelta": 3.47
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.094,
+          "maxBodyCenterJump": 2.46,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.03,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 6.92,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            90.6,
-            67.2,
-            55.35
+            110.5,
+            85.45,
+            58.95
           ],
-          "medianColorCount": 334.5,
-          "medianShadingRatio": 0.6812,
+          "medianColorCount": 398.0,
+          "medianShadingRatio": 0.689,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "64da9166a0863e2120204e4e0ceae3db456b8d1d82a218bcd87401f8edd7d212",
+        "sha256": "7b8b061114e4965481defe00fe6b5f495fd29589304f8736663322bf0a531898",
         "status": "accepted"
       }
     },
     "stonecutter/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:22Z",
-        "file": "stonecutter/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/walk-right-d0bd6b5cf13b.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 30.0,
             "medianColor": [
-              92.7,
-              74.4,
-              61.15
+              113.9,
+              86.15,
+              58.95
             ],
-            "paletteDelta": 9.48
+            "paletteDelta": 3.84
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.093,
+          "maxBodyCenterJump": 2.48,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.03,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 6.57,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 31.0,
           "medianColor": [
-            90.6,
-            67.2,
-            55.35
+            110.15,
+            85.35,
+            58.85
           ],
-          "medianColorCount": 334.5,
-          "medianShadingRatio": 0.6812,
+          "medianColorCount": 397.5,
+          "medianShadingRatio": 0.688,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "695fd8c2bd9a4224aafd2a104cdd1229cecca70c61d6e482656f1473997160ce",
+        "sha256": "d0bd6b5cf13bcc30084c8b3cac443285939c28fe76079b3db82301a8b16b4a51",
         "status": "accepted"
       }
     },
     "stonecutter/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:21Z",
-        "file": "stonecutter/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/walk-up-5508862f9eff.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 31.0,
             "medianColor": [
-              90.6,
-              67.2,
-              55.35
+              110.5,
+              85.45,
+              58.85
             ],
-            "paletteDelta": 11.6
+            "paletteDelta": 10.96
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.042,
+          "maxBodyCenterJump": 2.04,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.29,
-          "medianBodyHeight": 72.0,
+          "maxPaletteDrift": 2.45,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 30.0,
           "medianColor": [
-            92.7,
-            74.4,
-            64.2
+            113.9,
+            92.25,
+            66.75
           ],
-          "medianColorCount": 391.0,
-          "medianShadingRatio": 0.6655,
+          "medianColorCount": 414.5,
+          "medianShadingRatio": 0.691,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "38237d9fe9403b86f2f44213efc43df8276c2fc6e7013d991edf7ce9560e5c4b",
+        "sha256": "5508862f9eff5ece6bbd02276493f17847510d7f65f54b286c96de7da442f33e",
         "status": "accepted"
       }
     },
     "stonecutter/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:23Z",
-        "file": "stonecutter/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/work-down-c3f1fcdf57f4.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 13.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              97.85,
-              76.6,
-              60.15
+              121.6,
+              97.9,
+              70.05
             ],
-            "paletteDelta": 7.3
+            "paletteDelta": 13.48
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.032,
+          "maxBodyCenterJump": 1.5,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.24,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 4.86,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 30.0,
           "medianColor": [
-            104.15,
-            79.05,
-            62.9
+            132.75,
+            104.45,
+            73.85
           ],
-          "medianColorCount": 464.5,
-          "medianShadingRatio": 0.6259,
+          "medianColorCount": 532.5,
+          "medianShadingRatio": 0.6875,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "ae0b25f3aec4b9203fc1666e2839c789dfcd18818e5be2e0e59a8f704dc9fa2a",
+        "sha256": "c3f1fcdf57f4a65ad63e197cae053121d3725bc515ec21cc93f4cdbd216942ae",
         "status": "accepted"
       }
     },
     "stonecutter/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:25Z",
-        "file": "stonecutter/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/work-left-6023a48ba159.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
+            "bodyWidthDelta": 13.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 30.0,
             "medianColor": [
-              97.85,
-              76.6,
-              62.9
+              122.2,
+              98.45,
+              70.35
             ],
-            "paletteDelta": 2.75
+            "paletteDelta": 0.87
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 0.57,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 4.26,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 43.0,
           "medianColor": [
-            97.85,
-            76.6,
-            60.15
+            121.6,
+            97.9,
+            70.05
           ],
-          "medianColorCount": 351.5,
-          "medianShadingRatio": 0.6657,
+          "medianColorCount": 481.0,
+          "medianShadingRatio": 0.68,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "30138f2c54c92b756ba672d501d7a2848f1b77ae4452a8bd8bb02cfb8dc727a3",
+        "sha256": "6023a48ba159f7a8f94d4cc9854973c0891a9eec024b55b40942b16ecb2ac113",
         "status": "accepted"
       }
     },
     "stonecutter/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:25Z",
-        "file": "stonecutter/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/work-right-4559a7fb7427.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
+            "bodyWidthDelta": 13.0,
+            "medianBodyHeight": 76.0,
             "medianBodyWidth": 30.0,
             "medianColor": [
-              97.85,
-              76.6,
-              62.9
+              121.6,
+              97.9,
+              70.05
             ],
-            "paletteDelta": 2.75
+            "paletteDelta": 0.87
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 0.59,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.48,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 4.21,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 43.0,
           "medianColor": [
-            97.85,
-            76.6,
-            60.15
+            122.2,
+            98.45,
+            70.35
           ],
-          "medianColorCount": 351.5,
-          "medianShadingRatio": 0.6657,
+          "medianColorCount": 461.0,
+          "medianShadingRatio": 0.6727,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "bd586821c78cc59373592beb033107a59bdbcc0e91d3f48c6c4ca826734bbd8f",
+        "sha256": "4559a7fb7427e850ecf3ba142185565559d566469f284fb11b73929558e1db97",
         "status": "accepted"
       }
     },
     "stonecutter/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:55:24Z",
-        "file": "stonecutter/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer.",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T10:43:18Z",
+        "file": "production/stonecutter/work-up-9aede4357e1b.png",
+        "note": "Realm 181 complete modular quarrymaster family",
+        "provenance": "a12-modular-stonecutter-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 13.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 43.0,
             "medianColor": [
-              97.85,
-              76.6,
-              60.15
+              122.2,
+              98.45,
+              70.35
             ],
-            "paletteDelta": 8.0
+            "paletteDelta": 8.46
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 1.44,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.39,
-          "medianBodyHeight": 72.0,
+          "maxPaletteDrift": 6.96,
+          "medianBodyHeight": 76.0,
           "medianBodyWidth": 30.0,
           "medianColor": [
-            91.75,
-            73.95,
-            64.6
+            115.4,
+            93.85,
+            68.3
           ],
-          "medianColorCount": 387.0,
-          "medianShadingRatio": 0.6726,
+          "medianColorCount": 450.5,
+          "medianShadingRatio": 0.6762,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "c8bd67385efa69db76cdd1361ef0218f029de57b71b6dd2ecb3032337da408c5",
+        "sha256": "9aede4357e1b9386b47179bf8e53cc8c8fb86e989b3f9648453af75cb5124e8f",
         "status": "accepted"
       }
     },
@@ -9809,6 +9809,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T09:32:07Z",
+  "updatedAt": "2026-07-30T10:43:19Z",
   "version": 2
 }

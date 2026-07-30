@@ -15,6 +15,7 @@ export const CARGO_OWNER_ROWS = Object.freeze([
   'builder/carry',
   'blacksmith/carry',
   'miner/carry',
+  'stonecutter/carry',
 ]);
 export const CARGO_FRAMES = 8;
 

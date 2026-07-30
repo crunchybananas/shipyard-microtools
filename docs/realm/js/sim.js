@@ -13,22 +13,22 @@
 // added here MUST pass verify-core-purity + verify-determinism.
 // ════════════════════════════════════════════════════════════
 
-import { G, updateSeason, getSeasonData } from './state.js?realm=180';
-import { updateCitizens } from './citizens.js?realm=180';
-import { updateAvatar } from './avatar.js?realm=180';
-import { updateSoldiers } from './soldiers.js?realm=180';
-import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=180';
-import { updateWalkers } from './walkers.js?realm=180';
-import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=180';
-import { checkMissions } from './missions.js?realm=180';
-import { updateResearch, checkEraAdvance } from './tech.js?realm=180';
-import { updateWonder } from './wonder.js?realm=180';
-import { checkRandomEvents } from './events.js?realm=180';
-import { checkScenarioComplete } from './scenarios.js?realm=180';
-import { chronicle, announce, sfx } from './log.js?realm=180';
-import { emit } from './bus.js?realm=180';
-import { checkStoryBeats } from './story.js?realm=180';
-import { updateRaidSummary } from './raid-summary.js?realm=180';
+import { G, updateSeason, getSeasonData } from './state.js?realm=181';
+import { updateCitizens } from './citizens.js?realm=181';
+import { updateAvatar } from './avatar.js?realm=181';
+import { updateSoldiers } from './soldiers.js?realm=181';
+import { updateEnemies, updateProjectiles, updateTowers } from './combat.js?realm=181';
+import { updateWalkers } from './walkers.js?realm=181';
+import { updateProduction, checkRaids, collectTaxes, updateFires } from './economy.js?realm=181';
+import { checkMissions } from './missions.js?realm=181';
+import { updateResearch, checkEraAdvance } from './tech.js?realm=181';
+import { updateWonder } from './wonder.js?realm=181';
+import { checkRandomEvents } from './events.js?realm=181';
+import { checkScenarioComplete } from './scenarios.js?realm=181';
+import { chronicle, announce, sfx } from './log.js?realm=181';
+import { emit } from './bus.js?realm=181';
+import { checkStoryBeats } from './story.js?realm=181';
+import { updateRaidSummary } from './raid-summary.js?realm=181';
 
 // ── Day/Night clock (moved from main.js updateTime) ─────────────────
 function tickClock() {

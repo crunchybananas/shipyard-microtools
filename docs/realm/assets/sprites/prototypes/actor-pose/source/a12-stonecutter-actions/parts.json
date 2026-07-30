@@ -1,0 +1,267 @@
+{
+  "schema": "realm.actor-pose.a12-stonecutter-actions.v1",
+  "stage": "stonecutter-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "quarrymaster",
+    "path": "assets/sprites/prototypes/actor-pose/references/a12-source/identity-quarrymaster.png",
+    "sha256": "d436e2ab3920c98515b21da0ccd29e7d6b2a933a71f021ce3560d5c2e7272e66",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/identity-quarrymaster-keyed.png",
+      "sha256": "ab1f11996efc9c1bbdd4ea39014580a5a2fd8cdabae9eccb06a9283dee38164e"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a12-source/identity-quarrymaster.prompt.json",
+    "parts": {
+      "down": {
+        "head": [294, 12, 455, 228],
+        "torso": [270, 257, 574, 556],
+        "arm_screen_left": [117, 269, 248, 601],
+        "arm_screen_right": [1167, 269, 1294, 601],
+        "leg": [249, 581, 526, 986]
+      },
+      "up": {
+        "head": [580, 17, 734, 232],
+        "torso": [606, 267, 903, 556],
+        "arm_screen_left": [117, 269, 248, 601],
+        "arm_screen_right": [1167, 269, 1294, 601],
+        "leg": [587, 584, 739, 985]
+      },
+      "left": {
+        "head": [808, 17, 1005, 232],
+        "torso": [925, 256, 1107, 556],
+        "arm": [1167, 269, 1294, 601],
+        "leg": [933, 583, 1100, 987]
+      },
+      "right": {
+        "head": [808, 17, 1005, 232],
+        "torso": [925, 256, 1107, 556],
+        "arm": [1167, 269, 1294, 601],
+        "leg": [933, 583, 1100, 987]
+      }
+    }
+  },
+  "garment": {
+    "key": "granite-russet",
+    "path": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet.png",
+    "sha256": "11528645ab552c53c426db9543183e6309c6c6d057e3809b1f38bcd07c0a5f45",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet-keyed.png",
+      "sha256": "d2d4812522f326342a8c8103d79524294ce8477c56bd487e5ce34fe445d2c800"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [298, 30, 445, 141],
+        "tunic": [221, 188, 510, 556],
+        "sleeve_screen_left": [75, 234, 203, 427],
+        "sleeve_screen_right": [1110, 235, 1237, 427],
+        "belt": [224, 548, 484, 636],
+        "boot": [223, 631, 489, 983]
+      },
+      "up": {
+        "headgear": [585, 26, 730, 204],
+        "tunic": [518, 192, 804, 555],
+        "sleeve_screen_left": [75, 234, 203, 427],
+        "sleeve_screen_right": [1110, 235, 1237, 427],
+        "belt": [529, 551, 782, 631],
+        "boot": [530, 630, 785, 983]
+      },
+      "left": {
+        "headgear": [847, 28, 1029, 182],
+        "tunic": [859, 191, 1041, 554],
+        "sleeve": [1110, 235, 1237, 427],
+        "belt": [842, 548, 1050, 635],
+        "boot": [858, 630, 1027, 983]
+      },
+      "right": {
+        "headgear": [847, 28, 1029, 182],
+        "tunic": [859, 191, 1041, 554],
+        "sleeve": [1110, 235, 1237, 427],
+        "belt": [842, 548, 1050, 635],
+        "boot": [858, 630, 1027, 983]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "quarry-sledge",
+    "path": "assets/sprites/prototypes/actor-pose/references/a12-source/quarry-sledge.png",
+    "sha256": "4a19b22d397fb7f0eb21379467f5abe3b1e0f226eaac8c8b9267d1e0b895f822",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/quarry-sledge-keyed.png",
+      "sha256": "f4a86884536150b2e7bde169e384594d86f7c6414c34c2b8a33f986f9e415728"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a12-source/quarry-sledge.prompt.json",
+    "parts": {
+      "down": [96, 65, 443, 957],
+      "up": [500, 66, 838, 957],
+      "left": [908, 69, 1055, 957],
+      "right": [1193, 70, 1340, 957]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "sledge head at top, handle end at bottom",
+      "grip_fraction_from_top": 0.72,
+      "render_height": 35,
+      "occlusion": "body < sledge < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "split-stone",
+    "path": "assets/sprites/prototypes/actor-pose/references/a12-source/split-stone.png",
+    "sha256": "444bb964e49e3c6c000345377669e02a7a2145c9a1498b7c849019ecb743b7df",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/split-stone-keyed.png",
+      "sha256": "90768f4f2d061e1e43e3810ff2860aa0898f7b9485a2ffb4aa9e0c470ebf00c6"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a12-source/split-stone.prompt.json",
+    "parts": {
+      "down": [34, 366, 372, 708],
+      "up": [407, 361, 746, 703],
+      "left": [776, 361, 1114, 723],
+      "right": [1145, 361, 1467, 724]
+    },
+    "render": {
+      "down": {
+        "size": [25, 19],
+        "center": [32, 70],
+        "occlusion": "body < stone < sledge < near hand"
+      },
+      "up": {
+        "size": [25, 19],
+        "center": [32, 56],
+        "occlusion": "stone < body < sledge < near hand"
+      },
+      "left": {
+        "size": [27, 19],
+        "center": [17, 70],
+        "occlusion": "body < stone < sledge < near hand"
+      },
+      "right": {
+        "size": [27, 19],
+        "center": [47, 70],
+        "occlusion": "body < stone < sledge < near hand"
+      }
+    },
+    "authority": {
+      "ground_y": 79,
+      "strike_socket": "split_face",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and stonecutter work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and stonecutter work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "quarrymaster",
+    "build": "low, powerful quarry-master stance with broad shoulders, hips, and strong forearms",
+    "identity_leg_far_width": 7,
+    "identity_leg_near_width": 8,
+    "garment_leg_far_width": 8.2,
+    "garment_leg_near_width": 9.2,
+    "upper_arm_far_width": 6.5,
+    "upper_arm_near_width": 7.5,
+    "forearm_far_width": 6,
+    "forearm_near_width": 6.8,
+    "identity_torso_size": [27, 32],
+    "garment_tunic_size": [31, 34],
+    "garment_belt_size": [27, 5],
+    "identity_head_size": [22, 24],
+    "garment_headgear_size": [29, 22]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": ["quarry-sledge", "split-stone"],
+      "motion": "ready, set footing, draw back, raise, drive, wedge strike, rebound, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "sledge grip remains at the right-hand socket; the head travels toward the grounded split stone face at the strike beat"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "stonecutter",
+    "identity": "quarrymaster",
+    "garment": "granite-russet",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, quarry sledge, and grounded split-stone components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, sledge, and split stone are measured independently before the flattened row is accepted"
+  }
+}

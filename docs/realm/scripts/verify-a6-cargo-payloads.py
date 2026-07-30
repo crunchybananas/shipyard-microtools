@@ -65,6 +65,7 @@ def main() -> int:
             "builder/carry",
             "blacksmith/carry",
             "miner/carry",
+            "stonecutter/carry",
         ]
         or scope.get("bakedContainer") is not True
     ):

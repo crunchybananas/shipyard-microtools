@@ -1,0 +1,38 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "quarry-sledge",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_Ip2zv8GbqRdMnW8TpPUCQaG6.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/miner-pick-keyed.png",
+      "role": "edit target and exact four-view long-tool board reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a12-source/garment-granite-russet-keyed.png",
+      "role": "new stonecutter palette and rendering reference"
+    }
+  ],
+  "prompt": "Use case: precise-object-edit. Edit the supplied four-column Realm tool board into exactly four isolated views of the same practical medieval quarry stonecutter's two-handed sledgehammer while preserving the exact 1536x1024 canvas, four-object horizontal layout, spacing, vertical source orientation, resolution, and polish. Replace every mining pickaxe completely. The sledge has a long straight worn pale-ash handle and a compact but very heavy dark forged-steel double-faced rectangular head with slightly crowned striking faces, restrained iron bands around the eye, and worn pale edges. It must read immediately as a quarry sledge at roughly 30–35 pixels tall: heavier than a blacksmith hammer, longer than a construction mallet, and not a weapon. Columns from left to right are broad front view, independently worn broad reverse view, narrow left-edge profile, and independently authored narrow right-edge profile. Every sledge is vertical with the steel head at top and handle end at bottom. Keep identical construction, handle length, head mass, scale, palette, and upper-left quarry-yard light in all four views. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, readable ash and steel clusters, restrained stone-dust wear, no photorealism, blur, dither, or soft shadow. Background must be perfectly flat solid #ff00ff with no shadows, gradients, texture, floor, reflections, labels, guides, border, text, watermark, hands, character, scenery, extra objects, or magenta inside the tool. Each sledge must remain fully separated and uncropped. Do not retain a pointed pick spike, adze, axe blade, wooden mallet head, short smith hammer, fantasy warhammer, or finished-row mirroring.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#e805e0"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a12-source/quarry-sledge-keyed.png",
+  "keyed_sha256": "f4a86884536150b2e7bde169e384594d86f7c6414c34c2b8a33f986f9e415728",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a12-source/quarry-sledge.png",
+  "alpha_sha256": "4a19b22d397fb7f0eb21379467f5abe3b1e0f226eaac8c8b9267d1e0b895f822"
+}

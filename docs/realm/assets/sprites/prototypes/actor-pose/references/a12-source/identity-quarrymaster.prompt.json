@@ -1,0 +1,34 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "identity-quarrymaster",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_bBwBJZiTmO2V6pLTYy6Ww55e.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a11-source/identity-deepdelver-keyed.png",
+      "role": "edit target and exact modular identity-board layout reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve. Edit the supplied modular Realm identity board into a new master stonecutter identity while preserving its exact 1536x1024 canvas, modular component-board layout, isolated-part placement, painted resolution, generous gaps, scale, and anatomy conventions. Replace every miner identity-bearing component consistently. The subject is one sturdy middle-aged East Asian woman master quarry stonecutter with a low powerful center of gravity, broad hips and shoulders, thick muscular forearms, square working hands, strong calves, sun-warmed golden-olive skin, a broad square face, high cheekbones, straight black brows, a strong slightly flattened nose, dark brown eyes, and a small diagonal scar through the right eyebrow. Her straight black hair is cropped close at the temples and gathered into one compact braided coil at the nape with a restrained iron-gray streak above the left ear. No facial hair. Base clothing is a plain fitted muted dark-russet undershirt, charcoal work trousers, and neutral dark-brown work boots. Keep exactly three isolated heads on top; isolated left arm, front torso, back torso, profile torso, and right arm in the middle; and front, back, and side leg/boot sources on the bottom. This is a source-parts board, not an assembled character and not an animation. Render as crisp hand-painted classic 1990s strategy-game sprite source art with controlled pixel-cluster-friendly edges, hard readable clusters, warm upper-left quarry-yard light, restrained texture, no photorealism, blur, dither, or soft ambient shadow. Preserve the exact woman, facial geometry, scar, hair coil, gray streak, skin tone, base clothing, powerful proportions, and lighting across every part. Background must be perfectly flat solid #ff00ff with no shadows, gradients, texture, floor, lighting variation, border, labels, guides, text, watermark, tools, armor, props, scenery, or magenta inside the subject. Keep every component isolated and uncropped with clean neck, shoulder, elbow, wrist, hip, knee, and ankle cut zones. Do not retain the miner's male face, receding hair, beard, body identity, or blue undershirt.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#ed04e9"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a12-source/identity-quarrymaster-keyed.png",
+  "keyed_sha256": "ab1f11996efc9c1bbdd4ea39014580a5a2fd8cdabae9eccb06a9283dee38164e",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a12-source/identity-quarrymaster.png",
+  "alpha_sha256": "d436e2ab3920c98515b21da0ccd29e7d6b2a933a71f021ce3560d5c2e7272e66"
+}

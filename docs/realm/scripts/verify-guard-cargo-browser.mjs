@@ -19,7 +19,15 @@ const reportPath = join(outputDir, 'report.json');
 const resources = ['wood', 'stone', 'food', 'gold', 'iron', 'wheat', 'flour', 'planks', 'tools'];
 const directions = ['down', 'up', 'left', 'right'];
 const actions = ['idle', 'walk', 'work', 'carry'];
-const roles = ['guard', 'farmer', 'lumber', 'builder', 'blacksmith', 'miner'];
+const roles = [
+  'guard',
+  'farmer',
+  'lumber',
+  'builder',
+  'blacksmith',
+  'miner',
+  'stonecutter',
+];
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
 
@@ -48,7 +56,7 @@ try {
     actions,
     roles,
   }) => {
-    const render = await import('./js/render.js?realm=180');
+    const render = await import('./js/render.js?realm=181');
     const game = window.G;
     game.debug.pauseRendering = true;
     const events = [];
@@ -226,6 +234,7 @@ try {
       'builder/carry',
       'blacksmith/carry',
       'miner/carry',
+      'stonecutter/carry',
     ],
   );
   for (const role of roles) {
@@ -311,6 +320,11 @@ try {
     false,
     'ordinary production proof loaded an A11 preview row',
   );
+  assert.equal(
+    observed.events.some((event) => event.source.includes('/a12-stonecutter-actions/')),
+    false,
+    'ordinary production proof loaded an A12 preview row',
+  );
   assert.equal(pageErrors.length, 0, pageErrors.join('\n'));
 
   const report = {
@@ -331,8 +345,8 @@ try {
     passed: true,
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-  console.log('✓ all 9 cargo kinds draw for six modular families in four directions at exact x3 scale');
-  console.log('✓ all six modular families reset action transitions to authored frame 0');
+  console.log('✓ all 9 cargo kinds draw for seven modular families in four directions at exact x3 scale');
+  console.log('✓ all seven modular families reset action transitions to authored frame 0');
   console.log('✓ actor and cargo use identical destination rectangles with smoothing off');
   console.log(`resource proof: ${resourcesScreenshot}`);
   console.log(`transition proof: ${transitionsScreenshot}`);
