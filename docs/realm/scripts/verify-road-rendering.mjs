@@ -13,7 +13,7 @@ try {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => (
     typeof window.startNewGame === 'function'
-    && window.__realm?.actorAtlas?.().state === 'ready'
+    && window.__realm?.actorAtlas?.().tiers?.some(tier => tier.state === 'ready')
   ));
   await page.evaluate(() => window.startNewGame());
   await page.waitForTimeout(100);
@@ -90,7 +90,7 @@ try {
     };
     proto.drawImage = function (image, ...args) {
       const source = image?.currentSrc || image?.src || '';
-      if (this.canvas.id === 'game' && source.includes('actors-atlas.png')) {
+      if (this.canvas.id === 'game' && source.includes('actors-atlas')) {
         events.push('actor');
       }
       return originalDrawImage.call(this, image, ...args);
@@ -106,9 +106,11 @@ try {
 
     return {
       actorDraws: events.filter(event => event === 'actor').length,
+      actorResolution: { ...document.getElementById('game').dataset },
       edgeStrokes: events.filter(event => event === 'road-edge').length,
       firstActor: events.indexOf('actor'),
       lastRoad: events.lastIndexOf('road-surface'),
+      postfxResolution: { ...document.getElementById('postfx').dataset },
       roadSurfaces: events.filter(event => event === 'road-surface').length,
     };
   });
@@ -117,9 +119,15 @@ try {
   assert.equal(result.edgeStrokes, 12, 'shared road edges must be omitted from a four-way junction');
   assert.ok(result.actorDraws > 0, 'the founder actor must render in the road fixture');
   assert.ok(result.lastRoad < result.firstActor, 'all roads must render before the first actor');
+  assert.equal(result.actorResolution.actorAtlasTier, 'default');
+  assert.equal(result.actorResolution.actorAtlasFrame, '35x46');
+  assert.equal(result.actorResolution.actorAtlasPixelPerfect, 'true');
+  assert.equal(result.actorResolution.actorAtlasSmoothing, 'false');
+  assert.equal(result.postfxResolution.pixelRatio, result.postfxResolution.sourcePixelRatio);
 
   console.log('✓ connected roads omit shared edges');
   console.log('✓ roads render as ground before actors');
+  console.log('✓ default actor tier and post-processing preserve physical pixels');
 } finally {
   await browser.close();
   await server.stop();

@@ -1,5 +1,45 @@
 # Current Graphics Handoff
 
+## Realm 170 multi-resolution actor presentation — 2026-07-29
+
+- Large-screen inspection proved that actor review art was authored at
+  `64x84`, drawn at `27x35`, transformed again by camera zoom/device scale, and
+  then—on Retina—downsampled to half device resolution before post-processing.
+  Art quality could not be judged honestly through that path.
+- The exact `512x84` eight-frame row remains the review/source contract.
+  The compiler now emits row-isolated `27x35`, `35x46`, `54x70`, and `64x84`
+  runtime atlases. It uses `LanczosSharp`, strips changing PNG metadata, and
+  records dimensions, derivation settings, and SHA-256 hashes in
+  `assets/sprites/actors-runtime-atlases.json`.
+- The renderer measures the current Canvas transform in physical pixels.
+  Default zoom on a Retina display selects `35x46` at exact `2x`, while a
+  native-scale zoom transition selects `54x70` at exact `1x`; both disable
+  smoothing. Arbitrary zooms choose the least-destructive tier and use
+  high-quality smoothing only when no integer fit exists.
+- Post-processing now keeps full `1x`/`2x` backing resolution instead of
+  halving Retina frames before upload. The existing performance guard remains
+  the escape hatch: it may hide post-processing while leaving the sharp base
+  canvas visible.
+- The runtime publishes its active tier, projected size, integer scale, and
+  smoothing state as `data-actor-atlas-*` attributes on the game canvas.
+  Browser verification at `1440x1000`, DPR `2`, proved `35x46 @ 2x` at default
+  zoom and `54x70 @ 1x` after the common zoom transition, both unsmoothed.
+- Two consecutive clean builds produced identical SHA-256 hashes for all four
+  actor atlases. `verify-render-sharpness.mjs` and the expanded source-contract
+  verifier are now mandatory checks in `verify-realm.mjs`.
+- This fixes the rendering baseline only; it does not bless the current art
+  style. The active next phase remains a new in-game visual slice whose actor,
+  terrain, building, road, and effect sources may replace all existing art.
+
+Validation run:
+
+```sh
+node scripts/build-motion-atlases.mjs
+node scripts/verify-render-sharpness.mjs
+node scripts/verify-sprite-source-contract.mjs
+node scripts/runtime-revision.mjs --check
+```
+
 ## Offline actor pose-compiler decision — 2026-07-18
 
 - The owner correctly identified a systemic scale change: accepted guard

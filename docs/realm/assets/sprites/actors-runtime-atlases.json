@@ -1,0 +1,65 @@
+{
+  "schema": "realm.actor-runtime-atlases.v1",
+  "canonicalReviewUnit": {
+    "width": 512,
+    "rowHeight": 84,
+    "frameWidth": 64,
+    "frames": 8,
+    "actions": [
+      "idle",
+      "walk",
+      "work",
+      "carry"
+    ],
+    "directions": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ]
+  },
+  "derivation": {
+    "compiler": "scripts/build-motion-atlases.mjs",
+    "filter": "LanczosSharp",
+    "rowsResizedIndependently": true,
+    "metadataStripped": true
+  },
+  "atlases": [
+    {
+      "key": "native",
+      "file": "actors-atlas-native.png",
+      "frameWidth": 27,
+      "frameHeight": 35,
+      "width": 216,
+      "height": 7840,
+      "sha256": "bf9c6257463e2d20feb72c7f5c0db4ad81fd9a86013a385b6088fc1a892897e2"
+    },
+    {
+      "key": "default",
+      "file": "actors-atlas-default.png",
+      "frameWidth": 35,
+      "frameHeight": 46,
+      "width": 280,
+      "height": 10304,
+      "sha256": "0e245d3b5c1858a481c9ca9e867df4bd4a8f80629f884bcc61dde7d80f850d77"
+    },
+    {
+      "key": "double",
+      "file": "actors-atlas-double.png",
+      "frameWidth": 54,
+      "frameHeight": 70,
+      "width": 432,
+      "height": 15680,
+      "sha256": "ff6fe9c10c85fbc236fdb086914305ddeed99e436351edd39fffdfc2f825daac"
+    },
+    {
+      "key": "review",
+      "file": "actors-atlas.png",
+      "frameWidth": 64,
+      "frameHeight": 84,
+      "width": 512,
+      "height": 18816,
+      "sha256": "c3a92e207659fdb6816dab2230bcf8f580ed357c0b115dd116d9a803713547e1"
+    }
+  ]
+}

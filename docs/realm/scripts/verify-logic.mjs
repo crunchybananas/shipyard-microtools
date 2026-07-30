@@ -82,9 +82,9 @@ await page.evaluate(() => {
 
 // Test 0: resource delivery truthfulness — no storage/home should not deliver.
 const noStorageDelivery = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js?realm=167');
-  const ownership = await import('./js/citizen-ownership.js?realm=167');
-  const presentation = await import('./js/citizen-presentation.js?realm=167');
+  const citizens = await import('./js/citizens.js?realm=170');
+  const ownership = await import('./js/citizen-ownership.js?realm=170');
+  const presentation = await import('./js/citizen-presentation.js?realm=170');
   const before = {
     buildings: window.G.buildings,
     citizens: window.G.citizens,
@@ -163,9 +163,9 @@ rec(
 // Test 0b: route recovery — unreachable jobs/storage are blacklisted and the
 // citizen tries a reachable alternative instead of repeating the same A* miss.
 const routeRecovery = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js?realm=167');
-  const ownership = await import('./js/citizen-ownership.js?realm=167');
-  const presentation = await import('./js/citizen-presentation.js?realm=167');
+  const citizens = await import('./js/citizens.js?realm=170');
+  const ownership = await import('./js/citizen-ownership.js?realm=170');
+  const presentation = await import('./js/citizen-presentation.js?realm=170');
   const before = {
     map: window.G.map, fog: window.G.fog, buildingGrid: window.G.buildingGrid,
     buildings: window.G.buildings, citizens: window.G.citizens,
@@ -260,9 +260,9 @@ rec(
 // a transient no-job delivery gap, work checks do not drop into idle, and a
 // temporary construction assignment keeps the worker's durable profession row.
 const actorContinuity = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js?realm=167');
-  const ownership = await import('./js/citizen-ownership.js?realm=167');
-  const presentation = await import('./js/citizen-presentation.js?realm=167');
+  const citizens = await import('./js/citizens.js?realm=170');
+  const ownership = await import('./js/citizen-ownership.js?realm=170');
+  const presentation = await import('./js/citizen-presentation.js?realm=170');
   const before = {
     buildings: window.G.buildings,
     citizens: window.G.citizens,
@@ -341,8 +341,8 @@ rec(
 // husbandry buildings, and arrival clears walking immediately so a stationary
 // sprite cannot keep bobbing.
 const animalContext = await page.evaluate(async () => {
-  const animals = await import('./js/animals.js?realm=167');
-  const { TILE, MAP_W, MAP_H } = await import('./js/state.js?realm=167');
+  const animals = await import('./js/animals.js?realm=170');
+  const { TILE, MAP_W, MAP_H } = await import('./js/state.js?realm=170');
   const before = {
     map: window.G.map,
     buildingGrid: window.G.buildingGrid,
@@ -418,10 +418,10 @@ rec(
 // must keep moving to the authored point, then consume it on the reaching tick
 // without a zero-motion frame between segments.
 const waypointTransition = await page.evaluate(async () => {
-  const citizens = await import('./js/citizens.js?realm=167');
-  const ownership = await import('./js/citizen-ownership.js?realm=167');
-  const presentation = await import('./js/citizen-presentation.js?realm=167');
-  const { TILE, MAP_W, MAP_H } = await import('./js/state.js?realm=167');
+  const citizens = await import('./js/citizens.js?realm=170');
+  const ownership = await import('./js/citizen-ownership.js?realm=170');
+  const presentation = await import('./js/citizen-presentation.js?realm=170');
+  const { TILE, MAP_W, MAP_H } = await import('./js/state.js?realm=170');
   const before = {
     map: window.G.map,
     fog: window.G.fog,
@@ -517,7 +517,7 @@ rec('211: G.lastRaidDay settable', lastRaidDay.settable, `initial=${lastRaidDay.
 
 // Test 3: 212 first_sigh_seen — advance to summer day 12, force checkStoryBeats
 const sighFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   // Force gate: summer + day 12, no flag yet
   window.G.day = 12;
   window.G.season = 'summer';
@@ -533,7 +533,7 @@ rec('212: first_sigh_seen fires at summer d12', sighFire.fired, `text="${sighFir
 
 // Test 4: 199 first_cold_morning — autumn day 15
 const coldFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.day = 15;
   window.G.season = 'autumn';
   delete window.G.storyFlags.first_cold_morning;
@@ -546,7 +546,7 @@ rec('199: first_cold_morning fires at autumn d15', coldFire.fired, `text="${cold
 
 // Test 5: 207 fields_know_realm — summer day 10
 const fieldsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.day = 10;
   window.G.season = 'summer';
   delete window.G.storyFlags.fields_know_realm;
@@ -558,7 +558,7 @@ rec('207: fields_know_realm fires at summer d10', fieldsFire.fired);
 
 // Test 6: 211 sustained_peace_known — needs raidsSurvived≥1 + lastRaidDay+50 days
 const peaceFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.stats = window.G.stats || {};
   window.G.stats.raidsSurvived = 1;
   window.G.lastRaidDay = 10;
@@ -574,7 +574,7 @@ rec('211: sustained_peace_known fires d65 with raidsSurvived=1, lastRaidDay=10',
 // Test 7: 192 realm_fell after-callback — G.realmEnded set when beat fires
 // Test 7b: 278 — terminal "chronicle closes" entry pushed by after-callback
 const realmFell = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.realmEnded = false;
   window.G.population = 0;
   window.G.day = 50;
@@ -594,7 +594,7 @@ rec('278: terminal "chronicle closes" entry written + tagged requiem', realmFell
 
 // Test 8: 201 bard happiness +5 — set rival false, force ensureBard, check formula
 const bardEffect = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   // Reset state
   window.G.namedCharacters = window.G.namedCharacters || {};
   delete window.G.namedCharacters.bard;
@@ -609,7 +609,7 @@ rec('201: ensureBard creates G.namedCharacters.bard', bardEffect.bardCreated, `n
 
 // Test 22: 253 mayor_first_in_hall — mayor + year3 + townhall built
 const mayorFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureMayor();
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
@@ -731,8 +731,8 @@ rec(
 // Chronicle entries, kingdom names, and notifications are saved/user-authored
 // strings. They must remain text when rendered.
 const safeTextRendering = await page.evaluate(async () => {
-  const storyUI = await import('./js/story-ui.js?realm=167');
-  const notifications = await import('./js/notifications.js?realm=167');
+  const storyUI = await import('./js/story-ui.js?realm=170');
+  const notifications = await import('./js/notifications.js?realm=170');
   const payload = '<img id="realm-injection-probe" src=x onerror="window.__realmInjected=true">';
   window.__realmInjected = false;
   window.G.chronicle = [{
@@ -809,7 +809,7 @@ rec('261: realm-end CSS filter applies on G.realmEnded transition', filterApplie
 
 // Test: 260 — chronicle() gates on G.realmEnded (the-player [play] finding)
 const chronicleGate = await page.evaluate(async () => {
-  const { chronicle } = await import('./js/log.js?realm=167');
+  const { chronicle } = await import('./js/log.js?realm=170');
   // Establish baseline length, ensure realm not ended
   window.G.realmEnded = false;
   chronicle('test entry pre-end', 'misc');
@@ -827,8 +827,8 @@ rec('260: chronicle() gates on G.realmEnded', chronicleGate.gateHeld, `before=${
 
 // Test: 258 — townhall maxCount:1 enforced via isBuildingUnlocked
 const townhallMaxCount = await page.evaluate(async () => {
-  const tech = await import('./js/tech.js?realm=167');
-  const story = await import('./js/story.js?realm=167');
+  const tech = await import('./js/tech.js?realm=170');
+  const story = await import('./js/story.js?realm=170');
   // Ensure mayor exists so the gate's primary check passes
   story.ensureMayor('Auditor');
   // Reset any townhalls
@@ -845,7 +845,7 @@ rec('258: townhall maxCount:1 — unlocked at 0, locked at 1', townhallMaxCount.
 
 // Test: 277 absent_citizen_seat_known — inference-by-absence (3rd individual-interiority shape)
 const absentCitizenFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.day = 35;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'tavern')) {
@@ -861,7 +861,7 @@ rec('277: absent_citizen_seat_known fires d≥30 + tavern', absentCitizenFire.fi
 
 // Test: 275 child_no_elsewhere_known — POV-inversion (2nd individual-interiority shape)
 const childPOVFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensBorn = 1;
@@ -876,7 +876,7 @@ rec('275: child_no_elsewhere_known fires year3 + citizensBorn≥1', childPOVFire
 // Test: 272 storm_passed_seen — negative-space weather (4th weather-recognition use)
 // Test: 273 — beat's after: callback spawns a 'lightning' particle
 const stormPassedFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.season = 'summer';
   window.G.day = 35;
   delete window.G.storyFlags.storm_passed_seen;
@@ -893,7 +893,7 @@ rec('273: lightning particle spawned by beat after: callback', stormPassedFire.p
 
 // Test: 270 inn_confluence_seen — first multi-character beat in corpus
 const confluenceFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureMayor('Mayor Test');
   story.ensureBard('Bard Test');
   story.ensureSmith('Smith Test');
@@ -909,7 +909,7 @@ rec('270: inn_confluence_seen fires year3 + mayor + bard + smith named', conflue
 // Test: 266 summer_falling_star — ambient-entity-grammar 4th use
 // Test: 267 — beat's after: callback spawns a 'shootingstar' particle
 const fallingStarFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.season = 'summer';
   window.G.dayPhase = (window.G.dayLength || 3600) * 0.85;  // deep night
   delete window.G.storyFlags.summer_falling_star;
@@ -927,7 +927,7 @@ rec('267: shooting-star particle spawned by beat after: callback', fallingStarFi
 
 // Test: 264 — variant raid prose pools (260 [play] follow-on)
 const raidProse = await page.evaluate(async () => {
-  const raidSummary = await import('./js/raid-summary.js?realm=167');
+  const raidSummary = await import('./js/raid-summary.js?realm=170');
   // Same outcome shape (victory: kills>0, no losses), different days → different prose
   const day1 = raidSummary.pickRaidProse(10, 5, 0, 12);
   const day2 = raidSummary.pickRaidProse(11, 5, 0, 12);
@@ -947,8 +947,8 @@ rec('264: raid prose pools — 4 days span ≥3 distinct prose for same outcome'
 
 // Test: 263 chronicle_self_known — meta-self-aware (chronicle.length ≥ 100)
 const chronicleSelfFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
-  const { chronicle } = await import('./js/log.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
+  const { chronicle } = await import('./js/log.js?realm=170');
   // Pad chronicle to 100 entries
   while ((window.G.chronicle || []).length < 100) chronicle('padding entry', 'misc');
   delete window.G.storyFlags.chronicle_self_known;
@@ -961,7 +961,7 @@ rec('263: chronicle_self_known fires at chronicle.length ≥ 100', chronicleSelf
 
 // Test: 348 present_forgetting_known — single-axis (7th forgetting; PRESENT-FORGETTING-AS-EMERGING-GAP; sole-leader at 7; first sub-type at 7)
 const presentForgettingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 165;
   delete window.G.storyFlags.present_forgetting_known;
@@ -974,7 +974,7 @@ rec('348: present_forgetting_known fires year3 + d>=160', presentForgettingFire.
 
 // Test: 352 hill_gathers_fog_known — single-axis (7th land-as-agent; PRESENT-INDEPENDENT-AGENCY; ties forgetting at 7; LA temporal axis articulated → 8/9 sub-type-internal-axes formalized)
 const hillGathersFogFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.season = 'autumn';
   window.G.storyFlags.year2 = true;
   window.G.day = 55;
@@ -988,7 +988,7 @@ rec('352: hill_gathers_fog_known fires autumn + year2 + d>=50', hillGathersFogFi
 
 // Test: 354 afternoon_quiet_known — single-axis (6th habituation-recognition; RHYTHMIC-COLLECTIVE-MOMENT; HB→6; cluster-uniform sweep)
 const afternoonQuietFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.day = 85;
   delete window.G.storyFlags.afternoon_quiet_known;
@@ -1001,7 +1001,7 @@ rec('354: afternoon_quiet_known fires year2 + d>=80', afternoonQuietFire.fired, 
 
 // Test: 357 realm_equilibrium_known — single-axis (6th sustained-state-recognition; EQUILIBRIUM-AS-DEFAULT; SS axis 4→5 threshold-classes; cluster-uniform sweep)
 const realmEquilibriumFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 95;
   delete window.G.storyFlags.realm_equilibrium_known;
@@ -1014,7 +1014,7 @@ rec('357: realm_equilibrium_known fires year3 + d>=90', realmEquilibriumFire.fir
 
 // Test: 356 G.debug.disableEvents knob suppresses random-event rolls (closes 355 pessimist finding)
 const disableEventsTest = await page.evaluate(async () => {
-  const events = await import('./js/events.js?realm=167');
+  const events = await import('./js/events.js?realm=170');
   // Bypass the day<4 guard
   window.G.day = 100;
   window.G.activeEvent = null;
@@ -1043,7 +1043,7 @@ rec('356: G.debug.disableEvents suppresses event-rolls (closes 355 pessimist)', 
 
 // Test: 347 avoided_corner_known — single-axis (6th individual-interiority; AVOIDANCE-UNEXPLAINED; INTERIOR-MANIFESTATION-MODE axis articulated; 7/9 axes)
 const avoidedCornerFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 160;
   delete window.G.storyFlags.avoided_corner_known;
@@ -1056,7 +1056,7 @@ rec('347: avoided_corner_known fires year3 + d>=155', avoidedCornerFire.fired, `
 
 // Test: 346 autumn_sound_known — single-axis (6th ambient-entity-grammar; SUSTAINED-COLLECTIVE-AWARENESS-WITHOUT-NAMING; completes 2D axis)
 const autumnSoundFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.season = 'autumn';
   window.G.day = 155;
@@ -1070,7 +1070,7 @@ rec('346: autumn_sound_known fires year3 + autumn + d>=150', autumnSoundFire.fir
 
 // Test: 344 realm_begun_known — single-axis (5th early-game-mood shape; REALM-AS-CONTINUITY-UNNOTICED; CLUSTER-UNIFORM-5 milestone)
 const realmBegunFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 150;
   delete window.G.storyFlags.realm_begun_known;
@@ -1083,7 +1083,7 @@ rec('344: realm_begun_known fires year3 + d>=145', realmBegunFire.fired, `text="
 
 // Test: 343 collective_waking_known — single-axis (5th ambient-entity-grammar shape; TRANSIENT-COLLECTIVE-WITNESS)
 const collectiveWakingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.season = 'winter';
   window.G.day = 145;
@@ -1097,7 +1097,7 @@ rec('343: collective_waking_known fires year3 + winter + d>=140', collectiveWaki
 
 // Test: 342 qualifier_dropped_known — single-axis (5th naming-place shape; COLLECTIVE-RENAMING-VIA-QUALIFIER-DROP)
 const qualifierDroppedFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 140;
   delete window.G.storyFlags.qualifier_dropped_known;
@@ -1110,7 +1110,7 @@ rec('342: qualifier_dropped_known fires year3 + d>=135', qualifierDroppedFire.fi
 
 // Test: 341 first_frost_wait_known — single-axis (5th weather-recognition shape; ANTICIPATION-AS-SEASON)
 const frostWaitFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.season = 'autumn';
   window.G.day = 135;
@@ -1124,7 +1124,7 @@ rec('341: first_frost_wait_known fires year3 + autumn + d>=130', frostWaitFire.f
 
 // Test: 339 raid_routine_known — single-axis (5th sustained-state-recognition shape; THREAT-NORMALIZATION)
 const raidRoutineFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 130;
   window.G.stats = window.G.stats || {};
@@ -1139,7 +1139,7 @@ rec('339: raid_routine_known fires year3 + d>=125 + raidsSurvived>=3', raidRouti
 
 // Test: 337 cup_holding_known — single-axis (5th habituation-recognition shape; NON-CORRECTION-AS-CULTURAL-ENFORCEMENT)
 const cupHoldingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 125;
   delete window.G.storyFlags.cup_holding_known;
@@ -1152,7 +1152,7 @@ rec('337: cup_holding_known fires year3 + d>=120', cupHoldingFire.fired, `text="
 
 // Test: 336 unteach_known — single-axis (6th forgetting shape; ACTIVE-FORGETTING-AS-PEDAGOGY)
 const unteachFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 120;
   delete window.G.storyFlags.unteach_known;
@@ -1165,7 +1165,7 @@ rec('336: unteach_known fires year3 + d>=115', unteachFire.fired, `text="${untea
 
 // Test: 334 inherited_walk_known — multi-axial (5th individual-interiority BODILY-INHERITED-MEMORY + REPETITION re-use; 3rd structural form use)
 const inheritedWalkFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 115;
   delete window.G.storyFlags.inherited_walk_known;
@@ -1178,7 +1178,7 @@ rec('334: inherited_walk_known fires year3 + d>=110', inheritedWalkFire.fired, `
 
 // Test: 332 lingering_name_known — multi-axial (4th naming-place shape NAMED-AFTER-WHO-IS-GONE + REPETITION re-use; 2nd use of STRUCTURAL form)
 const lingeringNameFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 110;
   delete window.G.storyFlags.lingering_name_known;
@@ -1191,7 +1191,7 @@ rec('332: lingering_name_known fires year3 + d>=105', lingeringNameFire.fired, `
 
 // Test: 331 winter_normalized_known — single-axis surprise (4th sustained-state-recognition shape; NORMALIZATION-THROUGH-ACCUMULATION)
 const winterNormalFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.season = 'winter';
   delete window.G.storyFlags.winter_normalized_known;
@@ -1204,7 +1204,7 @@ rec('331: winter_normalized_known fires year3 + season=winter', winterNormalFire
 
 // Test: 329 bird_namer_known — single-axis surprise (4th individual-interiority shape; PRIVATE-KNOWLEDGE-WITHOUT-RECOGNITION)
 const birdNamerFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 105;
   delete window.G.storyFlags.bird_namer_known;
@@ -1217,7 +1217,7 @@ rec('329: bird_namer_known fires year3 + d>=100', birdNamerFire.fired, `text="${
 
 // Test: 327 new_road_known — single-axis surprise (3rd naming-place shape; CONTRADICTORY-NAMING-AS-INSIDER-DIRECTION)
 const newRoadFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 98;
   delete window.G.storyFlags.new_road_known;
@@ -1230,7 +1230,7 @@ rec('327: new_road_known fires year3 + d>=95', newRoadFire.fired, `text="${newRo
 
 // Test: 325 cold_corner_known — single-axis surprise (2nd naming-place shape; NAME-AS-MEASUREMENT angle)
 const coldCornerFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 92;
   delete window.G.storyFlags.cold_corner_known;
@@ -1243,7 +1243,7 @@ rec('325: cold_corner_known fires year3 + d>=90', coldCornerFire.fired, `text="$
 
 // Test: 322 recurrence_known — TRIPLE-AXIS (7th OUTSIDE CONTENTMENT + 7th STRUCTURAL REPETITION + RECURRENCE-AS-SELF-RECOGNITION angle)
 const recurrenceFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 88;
   delete window.G.storyFlags.recurrence_known;
@@ -1257,7 +1257,7 @@ rec('322: recurrence_known fires year3 + d>=85', recurrenceFire.fired, `text="${
 // Test: 319-A sea_bell_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
 // 321: gate-spread requires G.day >= 62.
 const seaBellLostFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 65;
   window.G.buildings = []; // church NOT present
@@ -1274,7 +1274,7 @@ rec('319-A+321: sea_bell_lost_known fires year3 + d>=62 + everHadBuilding.church
 
 // Test: 319-A mutual exclusion — sea_bell_lost should NOT fire if original sea_bell_known already set
 const seaBellMutexCheck = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 65;
   window.G.buildings = []; // church absent
@@ -1290,7 +1290,7 @@ rec('319-A: sea_bell_lost_known does NOT fire when sea_bell_known already set (m
 // Scenario: church destroyed pre-y3, lost fires at y3+d>=62, then church rebuilt. The
 // original gate must reject because !sea_bell_lost_known is false.
 const seaBellRebuildMutex = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 88;
   window.G.stats = window.G.stats || {};
@@ -1305,7 +1305,7 @@ rec('324: sea_bell_known does NOT fire after sea_bell_lost_known (bidirectional 
 
 // Test: 324 bidirectional mutex — church_step_worn_known should NOT fire after church_step_worn_lost_known
 const stepRebuildMutex = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 88;
   window.G.stats = window.G.stats || {};
@@ -1321,7 +1321,7 @@ rec('324: church_step_worn_known does NOT fire after church_step_worn_lost_known
 // Test: 319-B church_step_worn_lost_known — fallback for raid-destroyed church (311 [code] closure partial).
 // 321: gate-spread requires G.day >= 68.
 const stepLostFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 70;
   window.G.buildings = [];
@@ -1340,7 +1340,7 @@ rec('319-B+321: church_step_worn_lost_known fires year3 + d>=68 + everHadBuildin
 // Test: 318 empty_seat_known — TRIPLE-AXIS (6th OUTSIDE GRIEF + 6th STRUCTURAL FRAGMENT + SILENT-COLLECTIVE-ADJUSTMENT-TO-LOSS angle)
 // 321: gate-spread requires G.day >= 72.
 const emptySeatFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 75;
   window.G.stats = window.G.stats || {};
@@ -1355,7 +1355,7 @@ rec('318+321: empty_seat_known fires year3 + d>=72 + citizensDied>=2', emptySeat
 
 // Test: 314 morning_dread_known — TRIPLE-AXIS (5th OUTSIDE TERROR + 5th STRUCTURAL NEGATION + DREAD-WITHOUT-CAUSE angle)
 const dreadFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 85;
   delete window.G.storyFlags.morning_dread_known;
@@ -1369,7 +1369,7 @@ rec('314: morning_dread_known fires year3 + d>=80', dreadFire.fired, `text="${dr
 // Test: 312 tacit_norms_known — SOCIAL-NORMS habituation-recognition (4th shape; 4th structural-DIALOG-opening)
 // 313: gate-spread requires G.day >= 75 (18 days after y3 d57).
 const tacitNormsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 80;
   delete window.G.storyFlags.tacit_norms_known;
@@ -1383,7 +1383,7 @@ rec('312: tacit_norms_known fires year3 + d>=75', tacitNormsFire.fired, `text="$
 // Test: 307 path_knows_routine_known — anticipatory-agency (6th land-as-agent; 3rd structural-second-person)
 // 313: gate-spread requires G.day >= 70.
 const pathKnowsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 75;
   delete window.G.storyFlags.path_knows_routine_known;
@@ -1399,7 +1399,7 @@ rec('307: path_knows_routine_known fires year3 + d>=70', pathKnowsFire.fired, `t
 // CURRENT building absent + everHadBuilding flag set → fires (raid-survived realm).
 // 321: gate-spread requires G.day >= 58.
 const silentMorningFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 60;
   window.G.buildings = []; // 311: church NOT currently present
@@ -1416,7 +1416,7 @@ rec('305+311+321: silent_morning_known fires year3 + d>=58 + everHadBuilding.chu
 // Test: 303 wagon_track_known — IRRITATION-DOMESTICATED (4th OUTSIDE-cluster register)
 // 313: gate-spread requires G.day >= 65.
 const wagonTrackFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 70;
   delete window.G.storyFlags.wagon_track_known;
@@ -1429,7 +1429,7 @@ rec('303: wagon_track_known fires year3 + d>=65', wagonTrackFire.fired, `text="$
 
 // Test: 301 noon_bell_origin_known — ritual-persistence-without-origin (4th forgetting shape)
 const noonBellFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'church')) {
@@ -1445,7 +1445,7 @@ rec('301: noon_bell_origin_known fires year2 + church', noonBellFire.fired, `tex
 
 // Test: 297 unplaceable_sound_known — WONDER (3rd OUTSIDE-cluster register)
 const wonderFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   delete window.G.storyFlags.unplaceable_sound_known;
   story.checkStoryBeats();
@@ -1457,7 +1457,7 @@ rec('297: unplaceable_sound_known fires year2', wonderFire.fired, `text="${wonde
 
 // Test: 296 realm_laughs_known — collective-ease (2nd OUTSIDE-cluster register)
 const realmLaughsFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.happiness = 80;
   delete window.G.storyFlags.realm_laughs_known;
@@ -1470,7 +1470,7 @@ rec('296: realm_laughs_known fires year2 + happiness > 65', realmLaughsFire.fire
 
 // Test: 294 church_step_worn_known — reshaped-by-use (5th land-as-agent shape)
 const stepWornFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'church')) {
@@ -1487,7 +1487,7 @@ rec('294: church_step_worn_known fires year3 + church', stepWornFire.fired, `tex
 
 // Test: 292 bakery_door_carving_known — preservation-without-memory (3rd forgetting shape)
 const carvingFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'bakery')) {
@@ -1503,7 +1503,7 @@ rec('292: bakery_door_carving_known fires year3 + bakery', carvingFire.fired, `t
 
 // Test: 290 sea_bell_known — inheritance-vs-craft (4th land-as-agent shape)
 const seaBellFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'church')) {
@@ -1521,7 +1521,7 @@ rec('290: sea_bell_known fires year3 + church', seaBellFire.fired, `text="${seaB
 // Test: 285 phrase_misheard_known — language-drift (3rd habituation-recognition shape)
 // 313: gate-spread requires G.day >= 60.
 const phraseFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.day = 65;
   delete window.G.storyFlags.phrase_misheard_known;
@@ -1534,7 +1534,7 @@ rec('285: phrase_misheard_known fires year3 + d>=60', phraseFire.fired, `text="$
 
 // Test: 280 liminal_moment_known — rhythm-awareness (2nd habituation-recognition shape)
 const liminalFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.dayPhase = (window.G.dayLength || 3600) * 0.7;
   delete window.G.storyFlags.liminal_moment_known;
@@ -1547,7 +1547,7 @@ rec('280: liminal_moment_known fires year2 + dayPhase>0.6', liminalFire.fired, `
 
 // Test: 254 nights_blur_known — habituation-recognition (year2 + autumn|winter)
 const nightsBlurFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.season = 'autumn';
   delete window.G.storyFlags.nights_blur_known;
@@ -1560,7 +1560,7 @@ rec('254: nights_blur_known fires year2 + autumn', nightsBlurFire.fired, `text="
 
 // Test 21: 252 rival_banner_distant — rival + year3 + autumn/winter
 const rivalFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureRival();
   window.G.storyFlags.year3 = true;
   window.G.season = 'winter';
@@ -1575,7 +1575,7 @@ rec('252: rival_banner_distant fires rival + year3 + winter', rivalFire.fired, `
 
 // Test 20: 249 merchant_counts_thrice — merchant + autumn + day≥40
 const merchantFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureMerchant();
   window.G.season = 'autumn';
   window.G.day = 45;
@@ -1589,7 +1589,7 @@ rec('249: merchant_counts_thrice fires merchant + autumn d45', merchantFire.fire
 
 // Test 19: 247 teacher_pauses_slate — teacher named + year2
 const teacherFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureTeacher();
   window.G.storyFlags.year2 = true;
   delete window.G.storyFlags.teacher_pauses_slate;
@@ -1602,7 +1602,7 @@ rec('247: teacher_pauses_slate fires teacher + year2', teacherFire.fired, `text=
 
 // Test 18: 246 first_thaw_known — year2 + spring + day≥31
 const thawFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.season = 'spring';
   window.G.day = 32;
@@ -1616,7 +1616,7 @@ rec('246: first_thaw_known fires year2 + spring d32', thawFire.fired, `text="${t
 
 // Test 17: 245 smith_walks_river — smith named + day≥30 + summer/autumn
 const smithFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureSmith();
   window.G.day = 35;
   window.G.season = 'summer';
@@ -1630,7 +1630,7 @@ rec('245: smith_walks_river fires smith + d35 + summer', smithFire.fired, `text=
 
 // Test 16: 244 first-townhall chronicle beat (function-text + mayor reference)
 const townhallBeat = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureMayor();
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'townhall')) {
@@ -1647,8 +1647,8 @@ rec('244: firstTownHall fires + uses function-text + mayor reference', townhallB
 
 // Test 15: 243 townhall mayor-gated unlock
 const townhallGate = await page.evaluate(async () => {
-  const tech = await import('./js/tech.js?realm=167');
-  const story = await import('./js/story.js?realm=167');
+  const tech = await import('./js/tech.js?realm=170');
+  const story = await import('./js/story.js?realm=170');
   // 258: ensure no townhall exists so maxCount:1 doesn't shadow the mayor-gate semantics
   window.G.buildings = (window.G.buildings || []).filter(b => b.type !== 'townhall');
   // Without mayor: locked
@@ -1663,7 +1663,7 @@ rec('243: townhall locked without mayor + unlocked with mayor', townhallGate.loc
 
 // Test 14: 240 bard_unsung_song — bard named + day≥25 + spring/summer
 const bardSongFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   story.ensureBard();
   window.G.day = 30;
   window.G.season = 'summer';
@@ -1677,7 +1677,7 @@ rec('240: bard_unsung_song fires bard + d30 + summer', bardSongFire.fired, `text
 
 // Test 13: 230 full_pop_known — pop≥10 + lastUnderpopDay+60 days
 const fullPopFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.population = 12;
   window.G.maxPop = 12;
   window.G.lastUnderpopDay = 50;
@@ -1691,7 +1691,7 @@ rec('230: full_pop_known fires d115 with pop=12, lastUnderpopDay=50', fullPopFir
 
 // Test 12: 229 hearth_holds_names — year3 + citizensDied≥1
 const hearthFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year3 = true;
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensDied = 1;
@@ -1704,7 +1704,7 @@ rec('229: hearth_holds_names fires year3 + citizensDied=1', hearthFire.fired);
 
 // Test 11: 228 no_death_known — citizensDied≥1 + lastDeathDay+100 days
 const noDeathFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.stats = window.G.stats || {};
   window.G.stats.citizensDied = 1;
   window.G.lastDeathDay = 10;
@@ -1718,7 +1718,7 @@ rec('228: no_death_known fires d115 with citizensDied=1, lastDeathDay=10', noDea
 
 // Test 10: 227 well_remembers — year2 + well exists
 const wellFire = await page.evaluate(async () => {
-  const story = await import('./js/story.js?realm=167');
+  const story = await import('./js/story.js?realm=170');
   window.G.storyFlags.year2 = true;
   window.G.buildings = window.G.buildings || [];
   if (!window.G.buildings.some(b => b.type === 'well')) {
@@ -1750,7 +1750,7 @@ rec('214: founder-conditional offering pre-conditions settable', offeringPool.fo
 // Test: 311 placeBuilding sets G.stats.everHadBuilding[type] (310 [code] closure).
 // Find a buildable tile (revealed grass, not occupied) and call placeBuilding.
 const everHadCheck = await page.evaluate(async () => {
-  const econ = await import('./js/economy.js?realm=167');
+  const econ = await import('./js/economy.js?realm=170');
   window.G.stats = window.G.stats || {};
   window.G.stats.everHadBuilding = {}; // clean slate
   window.G.resources = { wood: 999, stone: 999, food: 999, gold: 999, iron: 999 };

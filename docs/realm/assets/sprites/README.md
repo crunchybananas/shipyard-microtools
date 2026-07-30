@@ -14,14 +14,46 @@ The current art direction uses painted PNG assets as the source of truth:
   overrides applied.
 - `ambient/*.png` as editable moving-prop and animal source sprites such as
   carts, boats, deer, cows, and chickens.
-- `actors-atlas.png` compiled from `actors-compiled/*.png` for the live
-  renderer.
+- `actors-atlas.png` compiled from `actors-compiled/*.png` as the full
+  `64x84` review/runtime scale.
+- `actors-atlas-native.png`, `actors-atlas-default.png`, and
+  `actors-atlas-double.png` as deterministic row-isolated runtime derivatives
+  for `27x35`, `35x46`, and `54x70` physical presentation.
+- `actors-runtime-atlases.json` as the dimensions, compiler settings,
+  provenance, and SHA-256 contract for every actor runtime scale.
 - `ambient-atlas.png` compiled from `ambient/*.png` for the live renderer.
 
 Hard rule for motion sprites: do not create or edit a single mixed actor source
 sheet. Actor source art is one PNG per actor role under `actors/`; ambient
 motion source art is one PNG per prop under `ambient/`. The atlas files are
 generated runtime artifacts only.
+
+## Runtime Actor Resolution
+
+The `512x84` row remains the editable and reviewable unit. Runtime presentation
+does not repeatedly shrink that row from `64x84` to the actor's on-screen
+footprint. `build-motion-atlases.mjs` resizes every action/direction row in
+isolation with `LanczosSharp`, strips non-visual metadata, and writes four
+hash-locked atlases:
+
+| Tier | Frame | Intended presentation |
+| --- | ---: | --- |
+| `native` | `27x35` | exact ordinary-screen 1x actor |
+| `default` | `35x46` | exact default-camera actor; exact 2x on Retina |
+| `double` | `54x70` | exact native actor at 2x / common zoom transitions |
+| `review` | `64x84` | canonical full-resolution review frame |
+
+The renderer measures the canvas transform in physical pixels and chooses the
+tier that lands closest to exact 1x/2x/3x presentation. Integer fits disable
+Canvas image smoothing. Arbitrary zooms retain high-quality smoothing rather
+than distorting the actor. The game canvas exposes the active decision through
+`data-actor-atlas-*` attributes so browser verification can prove the selected
+tier without relying on a screenshot alone.
+
+Post-processing preserves the full backing resolution through device pixel
+ratio `2`; it no longer halves every Retina frame before color grading.
+Unusually dense displays cap post-processing at `2x`, while the existing
+slow-frame guard can suspend the effect without hiding the sharp base canvas.
 
 ## Actor Row Factory
 

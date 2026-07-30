@@ -7,7 +7,8 @@
 
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFile, mkdir, readFile, readdir } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
@@ -19,6 +20,7 @@ import {
   ACTOR_ROW_MANIFEST,
   ACTOR_ATLAS_H,
   ACTOR_ATLAS_W,
+  ACTOR_RUNTIME_ATLASES,
   AMBIENT,
   AMBIENT_ATLAS_H,
   AMBIENT_ATLAS_W,
@@ -31,7 +33,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=167';
+} from '../js/sprite-source-contract.js?realm=170';
 
 const execFileAsync = promisify(execFile);
 
@@ -45,6 +47,7 @@ const ACTOR_COMPILED_DIR = join(SPRITES_DIR, ACTOR_COMPILED_DIRNAME);
 const ACTOR_ROW_MANIFEST_PATH = join(ACTOR_ROW_DIR, ACTOR_ROW_MANIFEST);
 const AMBIENT_DIR = join(ROOT, 'assets', 'sprites', 'ambient');
 const OUT_ACTORS = join(ROOT, 'assets', 'sprites', 'actors-atlas.png');
+const OUT_ACTOR_RUNTIME_MANIFEST = join(ROOT, 'assets', 'sprites', 'actors-runtime-atlases.json');
 const OUT_AMBIENT = join(ROOT, 'assets', 'sprites', 'ambient-atlas.png');
 const OUT_PROOF = join(ROOT, 'scripts', 'screenshots', 'actors-compiled-proof.png');
 
@@ -65,6 +68,10 @@ async function dimensions(path) {
   const { stdout } = await magick(['identify', '-format', '%w %h', path]);
   const [w, h] = stdout.trim().split(/\s+/).map(Number);
   return { w, h };
+}
+
+async function sha256(path) {
+  return createHash('sha256').update(await readFile(path)).digest('hex');
 }
 
 async function assertDimensions(path, expectedW, expectedH) {
@@ -171,8 +178,39 @@ async function compileActorRole(role, overrides) {
       'Over',
     );
   }
-  args.push(out);
+  args.push('-strip', out);
   await magick(args);
+}
+
+async function buildRuntimeActorAtlas(tier, actorFiles, tempDir) {
+  const out = join(SPRITES_DIR, tier.file);
+  if (tier.frameW === FRAME_W && tier.frameH === FRAME_H) return out;
+
+  // Resize each action/direction row independently. Resizing the combined
+  // sheet would make Lanczos sample across transparent row boundaries and
+  // leak a neighboring animation into the first/last pixels of a row.
+  const resizedRoles = [];
+  for (let index = 0; index < actorFiles.length; index++) {
+    const resized = join(tempDir, `${ROLES[index]}-${tier.key}.png`);
+    await magick([
+      actorFiles[index],
+      '-crop', `${ROLE_SHEET_W}x${FRAME_H}`,
+      '+repage',
+      '-filter', 'LanczosSharp',
+      '-resize', `${tier.frameW * FRAMES}x${tier.frameH}!`,
+      '-append',
+      '-strip',
+      resized,
+    ]);
+    resizedRoles.push(resized);
+  }
+  await magick([...resizedRoles, '-append', '-strip', out]);
+  await assertDimensions(
+    out,
+    tier.frameW * FRAMES,
+    tier.frameH * DIRS.length * ACTIONS.length * ROLES.length,
+  );
+  return out;
 }
 
 const ambientFiles = AMBIENT.map((key) => join(AMBIENT_DIR, `${key}.png`));
@@ -192,10 +230,54 @@ await assertExactPngSet(ACTOR_COMPILED_DIR, ROLES, 'assets/sprites/actors-compil
 const actorFiles = ROLES.map((role) => join(ACTOR_COMPILED_DIR, `${role}.png`));
 for (const path of actorFiles) await assertDimensions(path, ROLE_SHEET_W, ROLE_SHEET_H);
 
-await magick([...actorFiles, '-append', OUT_ACTORS]);
-await magick([...ambientFiles, '+append', OUT_AMBIENT]);
+await magick([...actorFiles, '-append', '-strip', OUT_ACTORS]);
+const runtimeTempDir = await mkdtemp(join(tmpdir(), 'realm-motion-atlases-'));
+try {
+  for (const tier of ACTOR_RUNTIME_ATLASES) {
+    await buildRuntimeActorAtlas(tier, actorFiles, runtimeTempDir);
+  }
+} finally {
+  await rm(runtimeTempDir, { recursive: true, force: true });
+}
+await magick([...ambientFiles, '+append', '-strip', OUT_AMBIENT]);
 await assertDimensions(OUT_ACTORS, ACTOR_ATLAS_W, ACTOR_ATLAS_H);
 await assertDimensions(OUT_AMBIENT, AMBIENT_ATLAS_W, AMBIENT_ATLAS_H);
+
+const runtimeAtlasManifest = {
+  schema: 'realm.actor-runtime-atlases.v1',
+  canonicalReviewUnit: {
+    width: ROLE_SHEET_W,
+    rowHeight: FRAME_H,
+    frameWidth: FRAME_W,
+    frames: FRAMES,
+    actions: ACTIONS,
+    directions: DIRS,
+  },
+  derivation: {
+    compiler: 'scripts/build-motion-atlases.mjs',
+    filter: 'LanczosSharp',
+    rowsResizedIndependently: true,
+    metadataStripped: true,
+  },
+  atlases: [],
+};
+for (const tier of ACTOR_RUNTIME_ATLASES) {
+  const path = join(SPRITES_DIR, tier.file);
+  runtimeAtlasManifest.atlases.push({
+    key: tier.key,
+    file: tier.file,
+    frameWidth: tier.frameW,
+    frameHeight: tier.frameH,
+    width: tier.frameW * FRAMES,
+    height: tier.frameH * DIRS.length * ACTIONS.length * ROLES.length,
+    sha256: await sha256(path),
+  });
+}
+await writeFile(
+  OUT_ACTOR_RUNTIME_MANIFEST,
+  `${JSON.stringify(runtimeAtlasManifest, null, 2)}\n`,
+  'utf8',
+);
 
 const proofRows = [
   { role: 'settler', action: 'walk', dir: 'down' },
@@ -235,11 +317,14 @@ proofArgs.push(
   '-geometry',
   '+220+610',
   '-composite',
+  '-strip',
   OUT_PROOF,
 );
 await magick(proofArgs);
 
 console.log(`[motion-atlases] compiled ${ROLES.length} actor source sheets into ${OUT_ACTORS}`);
+console.log(`[motion-atlases] compiled ${ACTOR_RUNTIME_ATLASES.length} deterministic actor runtime scale(s)`);
+console.log(`[motion-atlases] wrote ${OUT_ACTOR_RUNTIME_MANIFEST}`);
 console.log(`[motion-atlases] applied ${[...overridesByRole.values()].reduce((sum, rows) => sum + rows.length, 0)} accepted row override(s)`);
 console.log(`[motion-atlases] compiled ${AMBIENT.length} ambient source sprites into ${OUT_AMBIENT}`);
 console.log(`[motion-atlases] wrote ${OUT_PROOF}`);

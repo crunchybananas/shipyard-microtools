@@ -2,6 +2,8 @@
 // WebGL Post-Processing — bloom, color grading, film grain
 // ════════════════════════════════════════════════════════════
 
+import { postFXPixelRatio } from './render-resolution.js?realm=170';
+
 let gl, program, vao, texture, enabled = false;
 let postCanvas;
 let texReady = false;
@@ -211,14 +213,17 @@ export function resizePostFX() {
   const dpr = window.devicePixelRatio || 1;
   const w = window.innerWidth;
   const h = window.innerHeight;
-  // Bloom, grading, vignette, and grain do not need the full Retina backing
-  // resolution. Process at half device resolution, never below CSS-pixel
-  // resolution, then let the compositor upscale the result.
-  const postDpr = Math.max(1, dpr * 0.5);
+  // Preserve the source canvas' physical pixels on ordinary and Retina
+  // displays. The old half-DPR stage softened every sprite edge before the
+  // shader even ran. Cap only unusually dense displays; the runtime's
+  // existing slow-frame guard can suspend post-processing when needed.
+  const postDpr = postFXPixelRatio(dpr);
   postCanvas.width = Math.round(w * postDpr);
   postCanvas.height = Math.round(h * postDpr);
   postCanvas.style.width = w + 'px';
   postCanvas.style.height = h + 'px';
+  postCanvas.dataset.pixelRatio = String(postDpr);
+  postCanvas.dataset.sourcePixelRatio = String(dpr);
   gl.viewport(0, 0, postCanvas.width, postCanvas.height);
   if (postDpr < dpr) {
     if (!stageCanvas) {

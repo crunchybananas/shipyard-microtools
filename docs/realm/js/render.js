@@ -3,27 +3,33 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=167';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=167';
-import { makeAtlasLoader } from './atlas-loader.js?realm=167';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=167';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=170';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=170';
+import { makeAtlasLoader } from './atlas-loader.js?realm=170';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=170';
 import {
   ACTIONS as ACTOR_ACTIONS,
+  ACTOR_RUNTIME_ATLASES,
   DIRS as ACTOR_DIRS,
   FRAME_H as ACTOR_FRAME_H,
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=167';
+} from './sprite-source-contract.js?realm=170';
+import {
+  chooseActorRuntimeTier,
+  projectedActorSize,
+  shouldSmoothActorTier,
+} from './render-resolution.js?realm=170';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=167';
+} from './citizen-presentation.js?realm=170';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=167';
-import { staffingCount } from './citizen-ownership.js?realm=167';
+} from './citizen-render-cache.js?realm=170';
+import { staffingCount } from './citizen-ownership.js?realm=170';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -150,10 +156,67 @@ const _ACTOR_ATLAS_REVISION = [
   new URLSearchParams(location.search).get('v'),
   new URL(import.meta.url).searchParams.get('realm'),
 ].filter(Boolean).join('-');
-const _ACTOR_ATLAS_URL = _ACTOR_ATLAS_REVISION
-  ? `assets/sprites/actors-atlas.png?realm=${encodeURIComponent(_ACTOR_ATLAS_REVISION)}`
-  : 'assets/sprites/actors-atlas.png';
-const _loadActorAtlas = makeAtlasLoader(_ACTOR_ATLAS_URL);
+const _actorAtlasUrl = (file) => _ACTOR_ATLAS_REVISION
+  ? `assets/sprites/${file}?realm=${encodeURIComponent(_ACTOR_ATLAS_REVISION)}`
+  : `assets/sprites/${file}`;
+const _ACTOR_ATLAS_TIERS = ACTOR_RUNTIME_ATLASES.map((tier) => ({
+  ...tier,
+  load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
+}));
+let _lastActorAtlasDebugKey = '';
+
+function actorAtlasSelection(targetCtx, width, height) {
+  const projected = projectedActorSize(targetCtx, width, height);
+  const preferred = chooseActorRuntimeTier(projected, _ACTOR_ATLAS_TIERS);
+  const atlas = preferred.load();
+  if (atlas) return publishActorAtlasSelection({ ...preferred, atlas }, projected);
+
+  // Crossing a zoom/DPR boundary must not make actors disappear while a new
+  // tier decodes. Prefer any already-decoded tier as a temporary fallback.
+  for (const tier of _ACTOR_ATLAS_TIERS) {
+    if (tier === preferred || tier.load.state !== 'ready') continue;
+    const fallbackAtlas = tier.load();
+    if (!fallbackAtlas) continue;
+    return publishActorAtlasSelection({
+      ...chooseActorRuntimeTier(projected, [tier]),
+      atlas: fallbackAtlas,
+    }, projected);
+  }
+  return null;
+}
+
+function publishActorAtlasSelection(selection, projected) {
+  const debugKey = [
+    selection.key,
+    Math.round(projected.width * 10),
+    Math.round(projected.height * 10),
+    selection.pixelPerfect ? selection.integerScale : 'smooth',
+  ].join('/');
+  if (debugKey !== _lastActorAtlasDebugKey) {
+    _lastActorAtlasDebugKey = debugKey;
+    G.debug.actorAtlas = {
+      tier: selection.key,
+      frameW: selection.frameW,
+      frameH: selection.frameH,
+      projectedW: Math.round(projected.width * 10) / 10,
+      projectedH: Math.round(projected.height * 10) / 10,
+      pixelPerfect: selection.pixelPerfect,
+      integerScale: selection.pixelPerfect ? selection.integerScale : null,
+      smoothing: shouldSmoothActorTier(selection),
+    };
+    if (C) {
+      C.dataset.actorAtlasTier = selection.key;
+      C.dataset.actorAtlasFrame = `${selection.frameW}x${selection.frameH}`;
+      C.dataset.actorAtlasProjected = `${Math.round(projected.width * 10) / 10}x${Math.round(projected.height * 10) / 10}`;
+      C.dataset.actorAtlasPixelPerfect = String(selection.pixelPerfect);
+      C.dataset.actorAtlasIntegerScale = selection.pixelPerfect
+        ? String(selection.integerScale)
+        : '';
+      C.dataset.actorAtlasSmoothing = String(shouldSmoothActorTier(selection));
+    }
+  }
+  return selection;
+}
 
 export function actorVariantForCitizen(c) {
   if (c?.presentationKind === 'citizen' && ACTOR_VARIANTS.includes(c.variant)) return c.variant;
@@ -183,15 +246,22 @@ export function actorAtlasRowIndex(role, action, dir) {
   return (variantIdx * ACTOR_ACTIONS.length + actionIdx) * ACTOR_DIRS.length + dirIdx;
 }
 
-export function actorAtlasFrameRect(role, action, dir, frame = 0) {
+export function actorAtlasFrameRect(
+  role,
+  action,
+  dir,
+  frame = 0,
+  frameW = ACTOR_FRAME_W,
+  frameH = ACTOR_FRAME_H,
+) {
   const row = actorAtlasRowIndex(role, action, dir);
   if (row < 0) return null;
   const normalizedFrame = ((Math.floor(frame) % ACTOR_FRAMES) + ACTOR_FRAMES) % ACTOR_FRAMES;
   return {
-    sx: normalizedFrame * ACTOR_FRAME_W,
-    sy: row * ACTOR_FRAME_H,
-    sw: ACTOR_FRAME_W,
-    sh: ACTOR_FRAME_H,
+    sx: normalizedFrame * frameW,
+    sy: row * frameH,
+    sw: frameW,
+    sh: frameH,
     row,
     frame: normalizedFrame,
   };
@@ -206,16 +276,26 @@ export function drawActorAtlasFrame(targetCtx, {
   y,
   width = 27,
   height = 35,
-  smoothing = true,
+  smoothing,
   alpha = 1,
 } = {}) {
-  const atlas = _loadActorAtlas();
-  const source = actorAtlasFrameRect(role, action, dir, frame);
-  if (!atlas || !source || !targetCtx || !Number.isFinite(x) || !Number.isFinite(y)) return false;
+  if (!targetCtx || !Number.isFinite(x) || !Number.isFinite(y)) return false;
+  const selection = actorAtlasSelection(targetCtx, width, height);
+  if (!selection) return false;
+  const source = actorAtlasFrameRect(
+    role,
+    action,
+    dir,
+    frame,
+    selection.frameW,
+    selection.frameH,
+  );
+  if (!source) return false;
   targetCtx.save();
   targetCtx.globalAlpha *= alpha;
-  targetCtx.imageSmoothingEnabled = smoothing;
-  if (smoothing) targetCtx.imageSmoothingQuality = 'high';
+  const useSmoothing = smoothing ?? shouldSmoothActorTier(selection);
+  targetCtx.imageSmoothingEnabled = useSmoothing;
+  if (useSmoothing) targetCtx.imageSmoothingQuality = 'high';
   // Registration metadata only aligns the shared feet line. Scaling a whole
   // row from its opaque area made tool-heavy work/carry poses shrink the
   // actor's body by several visible pixels at every action transition.
@@ -225,7 +305,7 @@ export function drawActorAtlasFrame(targetCtx, {
     ? ((reg.dy || 0) + (reg.f?.[source.frame] || 0)) * (height / ACTOR_FRAME_H)
     : 0;
   targetCtx.drawImage(
-    atlas,
+    selection.atlas,
     source.sx, source.sy, source.sw, source.sh,
     x, y + ddy, width, height
   );
@@ -383,8 +463,6 @@ export function actorAnimationFrame(entity, variant, action, {
 }
 
 function drawCitizenSpriteIfReady(ctx, c, s, cy, faceScreenX, faceScreenY, facingAway, isMoving, phaseOffset) {
-  const atlas = _loadActorAtlas();
-  if (!atlas) return false;
   const variant = actorVariantForCitizen(c);
   const action = actorActionForCitizen(c, isMoving);
   const dir = actorDirection(faceScreenX, faceScreenY, facingAway);
@@ -820,7 +898,7 @@ if (typeof window !== 'undefined') {
   setTimeout(() => {
     _loadRasterAtlas();
     _loadSupportAtlas();
-    _loadActorAtlas();
+    for (const tier of _ACTOR_ATLAS_TIERS) tier.load();
     _loadNatureAtlas();
     _loadTerrainAtlas();
   }, 0);
@@ -840,8 +918,14 @@ if (typeof window !== 'undefined') {
     frames: _SUPPORT_ATLAS_FRAMES,
   });
   window.__realm.actorAtlas = () => ({
-    url: _loadActorAtlas.url,
-    state: _loadActorAtlas.state,
+    tiers: _ACTOR_ATLAS_TIERS.map((tier) => ({
+      key: tier.key,
+      frameW: tier.frameW,
+      frameH: tier.frameH,
+      url: tier.load.url,
+      state: tier.load.state,
+    })),
+    active: G.debug.actorAtlas || null,
     variants: ACTOR_VARIANTS,
     actions: ACTOR_ACTIONS,
     directions: ACTOR_DIRS,
@@ -868,7 +952,10 @@ if (typeof window !== 'undefined') {
   window.__realm.spriteCache = () => [
     { type: 'buildings-atlas-painted', state: _loadRasterAtlas.state },
     { type: 'support-atlas', state: _loadSupportAtlas.state },
-    { type: 'actors-atlas', state: _loadActorAtlas.state },
+    ..._ACTOR_ATLAS_TIERS.map((tier) => ({
+      type: `actors-atlas-${tier.key}`,
+      state: tier.load.state,
+    })),
     { type: 'nature-atlas', state: _loadNatureAtlas.state },
     { type: 'terrain-atlas', state: _loadTerrainAtlas.state },
   ];

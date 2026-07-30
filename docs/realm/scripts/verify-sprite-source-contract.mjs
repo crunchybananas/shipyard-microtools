@@ -14,6 +14,7 @@ import { promisify } from 'node:util';
 import {
   ACTOR_ATLAS_H,
   ACTOR_ATLAS_W,
+  ACTOR_RUNTIME_ATLASES,
   ACTIONS,
   ACTOR_BASE_DIRNAME,
   ACTOR_COMPILED_DIRNAME,
@@ -29,7 +30,7 @@ import {
   ROLE_SHEET_H,
   ROLE_SHEET_W,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=167';
+} from '../js/sprite-source-contract.js?realm=170';
 
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -41,6 +42,7 @@ const ACTOR_ROW_DIR = join(SPRITES_DIR, ACTOR_ROW_DIRNAME);
 const ACTOR_ROW_MANIFEST_PATH = join(ACTOR_ROW_DIR, ACTOR_ROW_MANIFEST);
 const AMBIENT_DIR = join(SPRITES_DIR, 'ambient');
 const OUT_ACTORS = join(SPRITES_DIR, 'actors-atlas.png');
+const OUT_ACTOR_RUNTIME_MANIFEST = join(SPRITES_DIR, 'actors-runtime-atlases.json');
 const OUT_AMBIENT = join(SPRITES_DIR, 'ambient-atlas.png');
 
 async function magick(args) {
@@ -135,6 +137,45 @@ async function assertAcceptedRows() {
   return accepted;
 }
 
+async function assertRuntimeAtlasManifest() {
+  const manifest = JSON.parse(await readFile(OUT_ACTOR_RUNTIME_MANIFEST, 'utf8'));
+  if (manifest.schema !== 'realm.actor-runtime-atlases.v1') {
+    throw new Error('assets/sprites/actors-runtime-atlases.json has an unsupported schema');
+  }
+  if (
+    manifest.derivation?.filter !== 'LanczosSharp'
+    || manifest.derivation?.rowsResizedIndependently !== true
+    || manifest.derivation?.metadataStripped !== true
+  ) {
+    throw new Error('runtime actor atlas derivation must preserve row isolation and deterministic metadata');
+  }
+  const byKey = new Map((manifest.atlases || []).map((atlas) => [atlas.key, atlas]));
+  if (byKey.size !== ACTOR_RUNTIME_ATLASES.length) {
+    throw new Error('runtime actor atlas manifest must list every declared tier exactly once');
+  }
+  for (const tier of ACTOR_RUNTIME_ATLASES) {
+    const recorded = byKey.get(tier.key);
+    const expectedW = tier.frameW * 8;
+    const expectedH = tier.frameH * DIRS.length * ACTIONS.length * ROLES.length;
+    if (
+      !recorded
+      || recorded.file !== tier.file
+      || recorded.frameWidth !== tier.frameW
+      || recorded.frameHeight !== tier.frameH
+      || recorded.width !== expectedW
+      || recorded.height !== expectedH
+    ) {
+      throw new Error(`runtime actor atlas manifest metadata differs for tier ${tier.key}`);
+    }
+    const digest = createHash('sha256')
+      .update(await readFile(join(SPRITES_DIR, tier.file)))
+      .digest('hex');
+    if (digest !== recorded.sha256) {
+      throw new Error(`runtime actor atlas hash differs for tier ${tier.key}; rebuild it intentionally`);
+    }
+  }
+}
+
 await assertExactPngSet(ACTOR_DIR, ROLES, 'assets/sprites/actors/');
 await assertExactPngSet(ACTOR_COMPILED_DIR, ROLES, 'assets/sprites/actors-compiled/');
 await assertExactPngSet(AMBIENT_DIR, AMBIENT, 'assets/sprites/ambient/');
@@ -149,10 +190,20 @@ for (const key of AMBIENT) {
 }
 
 await assertDimensions(OUT_ACTORS, ACTOR_ATLAS_W, ACTOR_ATLAS_H);
+for (const tier of ACTOR_RUNTIME_ATLASES) {
+  await assertDimensions(
+    join(SPRITES_DIR, tier.file),
+    tier.frameW * 8,
+    tier.frameH * DIRS.length * ACTIONS.length * ROLES.length,
+  );
+}
 await assertDimensions(OUT_AMBIENT, AMBIENT_ATLAS_W, AMBIENT_ATLAS_H);
+await assertRuntimeAtlasManifest();
 const acceptedRows = await assertAcceptedRows();
 
 console.log(`[sprite-source-contract] actors: ${ROLES.length} base + compiled role sheets, ${ROLE_SHEET_W}x${ROLE_SHEET_H} each`);
 console.log(`[sprite-source-contract] accepted row overrides: ${acceptedRows}`);
+console.log(`[sprite-source-contract] runtime actor scales: ${ACTOR_RUNTIME_ATLASES.map((tier) => `${tier.frameW}x${tier.frameH}`).join(', ')}`);
+console.log('[sprite-source-contract] runtime actor atlas provenance and hashes are current');
 console.log(`[sprite-source-contract] ambient: ${AMBIENT.length} prop sprites, ${AMBIENT_SHEET_W}x${AMBIENT_SHEET_H} each`);
 console.log('[sprite-source-contract] compiled atlases are present with expected dimensions');

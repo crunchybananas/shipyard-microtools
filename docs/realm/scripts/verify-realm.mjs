@@ -8,6 +8,8 @@ const realmRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const checks = [
   ['runtime URL revision', 'runtime-revision.mjs', '--check'],
   ['runtime module graph', 'verify-module-graph.mjs'],
+  ['render sharpness', 'verify-render-sharpness.mjs'],
+  ['sprite source contract', 'verify-sprite-source-contract.mjs'],
   ['deterministic-core purity', 'verify-core-purity.mjs'],
   ['core/FX isolation', 'verify-core-fx-isolation.mjs'],
   ['determinism', 'verify-determinism.mjs'],
