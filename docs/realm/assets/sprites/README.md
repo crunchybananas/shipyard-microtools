@@ -90,8 +90,8 @@ from the production atlas while the style is being established.
 
 This A3 output is retained as provenance for the first factorial source test.
 Its former single-row guard candidate and preview URL have been retired. The
-complete A5 guard, A7 farmer, A8 lumber, A9 builder, A10 blacksmith, and A11
-miner families supersede it in production.
+complete A5 guard, A7 farmer, A8 lumber, A9 builder, A10 blacksmith, A11
+miner, A12 stonecutter, and A13 fisher families supersede it in production.
 
 ## Complete Modular Actor Families
 
@@ -118,16 +118,20 @@ miner families supersede it in production.
   identity, limestone-gray and russet padded workwear, a four-view quarry
   sledge, a separately authored split limestone block, and the shared
   directional cargo crate across all four actions and directions.
+- A13 compiles the fisher from a distinct elderly, lean harborhand identity,
+  storm-teal weatherproof dockwear, a four-view harbor gaff, a separately
+  authored open fish creel, and the shared directional cargo crate across all
+  four actions and directions.
 - Each family emits 16 independent `512x84` rows, 128 frames, semantic and
   equipment planes, landmarks, body-only proofs, a family contact sheet, and
   four exact runtime tiers.
-- All seven compilers require binary runtime alpha, a shared 48-color family
+- All eight compilers require binary runtime alpha, a shared 48-color family
   palette, stable `76px` body height, ground row `79`, clear rows `80–83`,
   distinct directions, clean row-quality reports, and a byte-identical clean
   rebuild.
 - `guard/carry`, `farmer/carry`, `lumber/carry`, `builder/carry`,
-  `blacksmith/carry`, `miner/carry`, and `stonecutter/carry` own their baked
-  containers. A6
+  `blacksmith/carry`, `miner/carry`, `stonecutter/carry`, and `fisher/carry`
+  own their baked containers. A6
   supplies the nine resource-specific payloads at the same tier, frame, and
   destination rectangle; the procedural fallback is suppressed only for
   those owners.
@@ -147,6 +151,8 @@ python3 scripts/actor-pose-prototype/a11_miner_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a11_miner_actions.py
 python3 scripts/actor-pose-prototype/a12_stonecutter_actions.py --verify
 python3 scripts/actor-pose-prototype/verify_a12_stonecutter_actions.py
+python3 scripts/actor-pose-prototype/a13_fisher_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a13_fisher_actions.py
 scripts/sprite-row verify
 node scripts/verify-farmer-vertical-slice.mjs
 node scripts/verify-lumber-vertical-slice.mjs
@@ -154,6 +160,7 @@ node scripts/verify-builder-vertical-slice.mjs
 node scripts/verify-blacksmith-vertical-slice.mjs
 node scripts/verify-miner-vertical-slice.mjs
 node scripts/verify-stonecutter-vertical-slice.mjs
+node scripts/verify-fisher-vertical-slice.mjs
 node scripts/verify-guard-cargo-browser.mjs
 ```
 

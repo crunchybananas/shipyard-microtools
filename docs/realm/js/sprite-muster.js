@@ -5,8 +5,8 @@ import {
   FRAMES,
   ROLES,
   actorRowKey,
-} from './sprite-source-contract.js?realm=181';
-import { drawActorAtlasFrame } from './render.js?realm=181';
+} from './sprite-source-contract.js?realm=182';
+import { drawActorAtlasFrame } from './render.js?realm=182';
 
 const STATUS_STYLE = {
   accepted: { label: 'LOCKED', color: '#6dd4b8' },
@@ -114,7 +114,7 @@ async function loadManifest() {
     const response = await fetch(`assets/sprites/actor-rows/manifest.json?muster=${Date.now()}`, { cache: 'no-store' });
     if (response.ok) {
       const data = await response.json();
-      if (data?.version === 1 && data.rows) manifest = data;
+      if ([1, 2].includes(data?.version) && data.rows) manifest = data;
     }
   } catch (_error) {
     manifest = { version: 1, rows: {} };
@@ -170,6 +170,13 @@ function updateControls() {
 
 function sourceFor(role, action, dir) {
   const item = manifest.rows?.[actorRowKey(role, action, dir)] || null;
+  if (manifest.version === 2) {
+    // Candidate rows are the active review source, even when a locked
+    // production row remains available to the ordinary runtime.
+    if (item?.candidate) return STATUS_STYLE.candidate;
+    if (item?.production) return STATUS_STYLE.accepted;
+    return STATUS_STYLE.base;
+  }
   if (item?.status === 'accepted') return STATUS_STYLE.accepted;
   if (item?.status === 'candidate') return STATUS_STYLE.candidate;
   return STATUS_STYLE.base;

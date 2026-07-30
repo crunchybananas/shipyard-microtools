@@ -8,6 +8,7 @@
 // silhouette.
 
 import { chromium } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,12 +20,23 @@ import {
   FRAME_W,
   FRAMES,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=181';
+} from '../js/sprite-source-contract.js?realm=182';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const ACTOR_DIR = join(ROOT, 'assets', 'sprites', ACTOR_COMPILED_DIRNAME);
 const REPORT_PATH = join(ROOT, 'scripts', 'screenshots', 'sprite-direction-phase-report.json');
+const ACTOR_ROW_MANIFEST_PATH = join(ROOT, 'assets', 'sprites', 'actor-rows', 'manifest.json');
+const MODULAR_SEMANTIC_SOURCES = [
+  ['guard', 'a5-guard-actions'],
+  ['farmer', 'a7-farmer-actions'],
+  ['lumber', 'a8-lumber-actions'],
+  ['builder', 'a9-builder-actions'],
+  ['blacksmith', 'a10-blacksmith-actions'],
+  ['miner', 'a11-miner-actions'],
+  ['stonecutter', 'a12-stonecutter-actions'],
+  ['fisher', 'a13-fisher-actions'],
+];
 
 // A finding must be both large and unambiguous. These thresholds were
 // calibrated against the warning-free locked painted families. Low-motion
@@ -36,6 +48,101 @@ const MIN_IMPROVEMENT = 0.42;
 const MIN_COST_DROP = 0.52;
 const MAX_ALIGNED_COST = 1.35;
 const MIN_VIEW_SUPPORT = 2;
+
+function sha256(contents) {
+  return createHash('sha256').update(contents).digest('hex');
+}
+
+function sameSequence(a, b) {
+  return a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
+function isCrossProjectionPair(reference, candidate) {
+  const cardinal = new Set(['down', 'up']);
+  const side = new Set(['left', 'right']);
+  return (cardinal.has(reference) && side.has(candidate))
+    || (side.has(reference) && cardinal.has(candidate));
+}
+
+// A generated modular landmark row names the logical near/far foot and its
+// beat. The visual signals below intentionally do not: a side projection can
+// put the same logical foot on the opposite screen side, creating a strong
+// but false half-cycle match. We use these reports only after both files are
+// hash-pinned and the flattened source row is the accepted production row.
+async function loadProductionSemantics() {
+  const actorRows = JSON.parse(await readFile(ACTOR_ROW_MANIFEST_PATH, 'utf8')).rows;
+  const semanticRows = new Map();
+  for (const [role, source] of MODULAR_SEMANTIC_SOURCES) {
+    const sourceDir = join(ROOT, 'assets', 'sprites', 'prototypes', 'actor-pose', 'output', source);
+    let manifest;
+    try {
+      manifest = JSON.parse(await readFile(join(sourceDir, 'manifest.json'), 'utf8'));
+    } catch {
+      continue;
+    }
+    for (const [key, record] of Object.entries(manifest.rows || {})) {
+      const [action, dir] = key.split('/');
+      if (!ACTIONS.includes(action) || !DIRS.includes(dir) || !record.row || !record.landmarks) continue;
+      const production = actorRows[`${role}/${action}/${dir}`]?.production;
+      const rowOutput = manifest.outputs?.[record.row];
+      const landmarksOutput = manifest.outputs?.[record.landmarks];
+      if (!production || !rowOutput?.sha256 || !landmarksOutput?.sha256) continue;
+      try {
+        const [row, landmarkFile] = await Promise.all([
+          readFile(join(sourceDir, record.row)),
+          readFile(join(sourceDir, record.landmarks)),
+        ]);
+        if (sha256(row) !== rowOutput.sha256 || production.sha256 !== rowOutput.sha256) continue;
+        if (sha256(landmarkFile) !== landmarksOutput.sha256) continue;
+        const landmarks = JSON.parse(landmarkFile);
+        const frames = landmarks.frames;
+        if (!Array.isArray(frames) || frames.length !== FRAMES) continue;
+        if (!frames.every((frame, index) => (
+          frame.frame === index
+          && typeof frame.phase === 'string'
+          && frame.phase.length > 0
+          && Array.isArray(frame.contacts)
+          && frame.contacts.every((contact) => typeof contact === 'string')
+        ))) continue;
+        semanticRows.set(`${role}/${action}/${dir}`, {
+          source,
+          landmark: record.landmarks,
+          row: record.row,
+          phases: frames.map((frame) => frame.phase),
+          contacts: frames.map((frame) => frame.contacts.join('|')),
+        });
+      } catch {
+        // A missing or malformed proof is not a waiver; it simply supplies no
+        // semantic evidence to this image-based release gate.
+      }
+    }
+  }
+  return semanticRows;
+}
+
+function semanticHalfCycleProjection(comparison, semanticRows) {
+  if (comparison.bestShift !== FRAMES / 2
+    || !isCrossProjectionPair(comparison.reference, comparison.candidate)) return null;
+  const reference = semanticRows.get(comparison.reference);
+  const candidate = semanticRows.get(comparison.candidate);
+  if (!reference || !candidate
+    || new Set(reference.phases).size !== FRAMES
+    || !sameSequence(reference.phases, candidate.phases)
+    || !sameSequence(reference.contacts, candidate.contacts)) return null;
+  return {
+    reason: 'hash-pinned semantic phase/contact agreement across a half-cycle cross-projection',
+    reference: {
+      source: reference.source,
+      landmark: reference.landmark,
+      row: reference.row,
+    },
+    candidate: {
+      source: candidate.source,
+      landmark: candidate.landmark,
+      row: candidate.row,
+    },
+  };
+}
 
 function rotate(values, shift) {
   return values.map((_, frame) => values[(frame + shift + FRAMES) % FRAMES]);
@@ -173,10 +280,45 @@ function shiftedRow(row, shift) {
 }
 
 function reversedChronologyRow(row) {
+  const transitionOffsets = {
+    transition: 2,
+    lowerTransition: 2,
+    upperTransition: 2,
+    twoStepTransition: 3,
+  };
   return {
     ...row,
+    signals: Object.fromEntries(
+      Object.entries(row.signals).map(([key, values]) => {
+        // A value measured from frame N to N+1 belongs to the preceding
+        // source frame after a strip reversal. Per-frame measurements simply
+        // reverse; one- and two-step transitions rotate by one and two cells.
+        const offset = transitionOffsets[key] || 1;
+        return [key, values.map((_, frame) => (
+          values[(FRAMES - offset - frame + FRAMES) % FRAMES]
+        ))];
+      }),
+    ),
     alphaFrameSignatures: [...row.alphaFrameSignatures].reverse(),
     mirroredAlphaFrameSignatures: [...row.mirroredAlphaFrameSignatures].reverse(),
+  };
+}
+
+function reversedSideChronology(left, right) {
+  const forward = compareRows(left, right);
+  const reversed = compareRows(left, reversedChronologyRow(right));
+  const costDrop = forward.bestCost - reversed.bestCost;
+  const improvement = forward.bestCost > 1e-9 ? costDrop / forward.bestCost : 0;
+  return {
+    comparison: 'left-vs-right temporal signals with right frame order reversed',
+    forward,
+    reversed,
+    costDrop: +costDrop.toFixed(4),
+    improvement: +improvement.toFixed(4),
+    reversedChronology: reversed.channels.length >= MIN_CHANNELS
+      && improvement >= MIN_IMPROVEMENT
+      && costDrop >= MIN_COST_DROP
+      && reversed.bestCost <= MAX_ALIGNED_COST,
   };
 }
 
@@ -206,12 +348,16 @@ function exactSideChronology(left, right) {
   };
 }
 
-function auditFamily(rows) {
+function auditFamily(rows, semanticRows = new Map()) {
   const comparisons = [];
   for (let a = 0; a < DIRS.length; a++) {
     for (let b = a + 1; b < DIRS.length; b++) {
       comparisons.push(compareRows(rows.get(DIRS[a]), rows.get(DIRS[b])));
     }
+  }
+  for (const comparison of comparisons) {
+    const semanticEvidence = semanticHalfCycleProjection(comparison, semanticRows);
+    if (semanticEvidence) comparison.suppressed = semanticEvidence;
   }
 
   // One cross-view comparison can be perspective noise. Left/right are also
@@ -221,7 +367,7 @@ function auditFamily(rows) {
   // strong enough to fail when its mirrored cadence has a decisive offset.
   const viewGroup = (dir) => (dir === 'left' || dir === 'right' ? 'side' : dir);
   const support = new Map(DIRS.map((dir) => [dir, new Map()]));
-  for (const item of comparisons.filter((comparison) => comparison.decisive)) {
+  for (const item of comparisons.filter((comparison) => comparison.decisive && !comparison.suppressed)) {
     const candidateOffsets = support.get(item.candidate);
     if (!candidateOffsets.has(item.bestShift)) {
       candidateOffsets.set(item.bestShift, { evidence: [], otherViews: new Set() });
@@ -241,14 +387,18 @@ function auditFamily(rows) {
   const findings = [];
   const sidePair = comparisons.find((item) => item.reference === 'left' && item.candidate === 'right');
   const sideChronology = exactSideChronology(rows.get('left'), rows.get('right'));
-  if (sideChronology.reversedChronology) {
+  const sideSignalChronology = reversedSideChronology(rows.get('left'), rows.get('right'));
+  if (sideChronology.reversedChronology || sideSignalChronology.reversedChronology) {
+    const evidence = sideChronology.reversedChronology ? sideChronology : sideSignalChronology;
     findings.push({
       kind: 'reversed-chronology',
       dir: 'left↔right',
-      shift: sideChronology.reversedShifts[0],
+      shift: sideChronology.reversedChronology
+        ? sideChronology.reversedShifts[0]
+        : sideSignalChronology.reversed.bestShift,
       support: 1,
       supportingViews: ['side'],
-      evidence: [sideChronology],
+      evidence: [evidence],
     });
   }
   if (sidePair?.decisive) {
@@ -497,6 +647,7 @@ try {
 }
 
 const rowByKey = new Map(rows.map((row) => [`${row.role}/${row.action}/${row.dir}`, row]));
+const productionSemantics = await loadProductionSemantics();
 
 // Mutation proof: rotate each direction of one coherent, accepted painted
 // family in memory. The detector must reject all four forms of that exact
@@ -556,7 +707,11 @@ for (const role of ROLES) {
       dir,
       rowByKey.get(`${role}/${action}/${dir}`),
     ]));
-    const result = auditFamily(familyRows);
+    const familySemantics = new Map(DIRS.map((dir) => [
+      dir,
+      productionSemantics.get(`${role}/${action}/${dir}`),
+    ]).filter(([, semantic]) => semantic));
+    const result = auditFamily(familyRows, familySemantics);
     families.push({ role, action, ...result });
     for (const finding of result.findings) failures.push({ role, action, ...finding });
   }

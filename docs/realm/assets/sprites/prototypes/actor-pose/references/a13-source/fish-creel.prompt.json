@@ -1,0 +1,50 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "fish-creel",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_qWximENVCQ7ZYMfONaod4B90.png"
+  },
+  "references": [
+    {
+      "path": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_FlaW7xxBQVT5CIvTRaRrCAMa.png",
+      "role": "material-rendering and pixel-cluster style reference for the original creel generation"
+    },
+    {
+      "path": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_YRO22k3tjTLPdY2Uwe9Aui4r.png",
+      "role": "accepted four-view creel content and background-replacement edit target"
+    }
+  ],
+  "prompt": "Use case: background-extraction\nAsset type: Realm modular fish-creel source board\nInput images: Image 1 is the edit target.\nPrimary request: replace only the magenta background with a perfectly uniform flat solid #00ff00 chroma-key background. Preserve all four creels exactly: their pixels, shapes, wicker color, leather, brass, fish, open-lid angles, scale, spacing, positions, lighting, and canvas dimensions.\nConstraints: change only the background; keep exactly four isolated creels; no retouching, restyling, recoloring, resizing, moving, cropping, redrawing, added edge glow, shadow, reflection, floor, gradient, texture, labels, text, watermark, or extra objects; do not use #00ff00 anywhere inside a creel; crisp edges and generous padding.",
+  "iterations": [
+    {
+      "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_maNmXeYJfTSPApTJWAdxF5qU.png",
+      "prompt": "Use case: stylized-concept\nAsset type: Realm modular game-sprite source board for offline skeletal compilation\nInput images: Image 1 is a material-rendering and pixel-cluster style reference only; do not copy its gaff shape or layout.\nPrimary request: create one coherent four-view orthographic source board of the same small grounded harbor fish creel, shown as front/down view, rear/up view, left view, and right view. The creel is a squat oval handwoven willow basket with a dark wet leather rim and strap hardware, a partly open hinged lid, and two clearly readable freshly caught silver-blue fish resting securely inside. The fish must remain contained by the basket and never appear detached. Every view depicts exactly the same creel, materials, contents, scale, and construction.\nScene/backdrop: perfectly flat solid #ff00ff chroma-key background for local background removal.\nStyle/medium: premium hand-painted late-1990s 2D strategy-game sprite source art; crisp deliberate pixel clusters, compact readable silhouette, restrained texture, strong material separation, subtle warm top-left lighting; match Image 1's polished game-art rendering density.\nComposition/framing: four isolated orthographic views in one horizontal row with generous equal spacing and transparent-removal padding; each object fully visible and centered in its own quarter; no perspective scene, floor, grid, border, labels, or text.\nColor palette: honey-brown and umber willow, dark oxblood leather, muted brass fasteners, silver-blue fish with very restrained cool highlights; do not use #ff00ff in the objects.\nConstraints: exact same identity and proportions across all four views; front, rear, left, and right are individually authored; crisp closed silhouettes; no cast shadow, no contact shadow, no reflection, no loose droplets, no stray scales, no extra tools, no humans, no watermark. Background must be one uniform #ff00ff with no shadows, gradients, texture, floor plane, or lighting variation.\nAvoid: concept-sheet annotations, duplicate viewpoints, open empty basket, detached fish, realistic photographic rendering, smooth airbrushed edges, oversized object, clipping, merged objects, magenta contamination inside the subject.",
+      "result": "rejected because the rear/up view closed the lid and hid the catch"
+    },
+    {
+      "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_YRO22k3tjTLPdY2Uwe9Aui4r.png",
+      "prompt": "Use case: precise-object-edit\nAsset type: Realm modular game-sprite source board for offline skeletal compilation\nInput images: Image 1 is the edit target.\nPrimary request: change only the second object from the left, the rear/up-view fish creel. Open its hinged lid to the same angle and height as the first/front view, with the hinge correctly at the far/rear edge, and show the same two contained silver-blue fish inside from the rear orthographic view.\nConstraints: preserve the first, third, and fourth creels pixel-for-pixel in appearance and position; preserve the second creel's basket dimensions, materials, leather straps, buckles, lighting, scale, placement, and rear-facing construction; the fish remain contained and attached visually inside the basket; keep exactly four objects; keep the perfectly uniform flat #ff00ff background; no shadows, floor, labels, text, extra objects, loose droplets, watermark, clipping, or magenta inside any object.\nAvoid: changing any other view, closing the lid, empty basket, detached fish, duplicate front view, perspective scene, smooth repaint.",
+      "result": "accepted content; re-keyed to green because magenta despill shifted the willow palette"
+    },
+    {
+      "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_qWximENVCQ7ZYMfONaod4B90.png",
+      "result": "accepted after green-key extraction preserved the intended brown willow palette"
+    }
+  ],
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--tolerance",
+      "65"
+    ],
+    "key_color_detected": "#17f615"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a13-source/fish-creel-keyed.png",
+  "keyed_sha256": "5a5518aa73ccdf334384714c4eaa1baf535ee53368329d99d2ae86ab763a9609",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a13-source/fish-creel.png",
+  "alpha_sha256": "2b56b61742741938e06529c5a5c008b54dc6f35b1e244bdaab997590c69e6f52"
+}

@@ -365,6 +365,7 @@ def build(
                 "blacksmith/carry",
                 "miner/carry",
                 "stonecutter/carry",
+                "fisher/carry",
             ],
             "bakedContainer": True,
         },

@@ -1,8 +1,8 @@
 // Read-only diagnostics over the causal Phase 1A ownership stream.
 
-import { G } from './state.js?realm=181';
-import { onCitizenTransition } from './citizen-ownership.js?realm=181';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=181';
+import { G } from './state.js?realm=182';
+import { onCitizenTransition } from './citizen-ownership.js?realm=182';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=182';
 
 const MAX_TRANSITIONS = 2_000;
 const ledger = [];

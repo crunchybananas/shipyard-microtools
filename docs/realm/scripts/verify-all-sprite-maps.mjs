@@ -19,7 +19,7 @@ import {
   FRAMES,
   ROLES,
   actorRowKey,
-} from '../js/sprite-source-contract.js?realm=181';
+} from '../js/sprite-source-contract.js?realm=182';
 import { ensureServer } from './_serve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -190,6 +190,28 @@ const runtime = await page.evaluate(async ({ roles, actions, dirs, frameW, frame
 const musterPages = [];
 const musterRows = new Set();
 const initial = await page.evaluate(() => window.__realm.spriteMuster.report());
+const manifestSourceCounts = await page.evaluate(async () => {
+  const response = await fetch(
+    `assets/sprites/actor-rows/manifest.json?allmaps=${Date.now()}`,
+    { cache: 'no-store' },
+  );
+  const manifest = await response.json();
+  const counts = { locked: 0, candidate: 0, base: 0 };
+  for (const slots of Object.values(manifest.rows || {})) {
+    if (manifest.version === 2) {
+      if (slots?.candidate) counts.candidate++;
+      else if (slots?.production) counts.locked++;
+      else counts.base++;
+    } else if (slots?.status === 'accepted') {
+      counts.locked++;
+    } else if (slots?.status === 'candidate') {
+      counts.candidate++;
+    } else {
+      counts.base++;
+    }
+  }
+  return { version: manifest.version, counts };
+});
 for (let pageIndex = 0; pageIndex < initial.totalPages; pageIndex++) {
   const report = await page.evaluate((index) => window.__realm.spriteMuster.setPage(index), pageIndex);
   if (!report.ready) await page.waitForFunction(() => window.__realm.spriteMuster.report().ready === true);
@@ -227,6 +249,16 @@ if (lowVariety.length) failures.push(`${lowVariety.length} moving row(s) have fe
 if (mappingFailures.length) failures.push(`${mappingFailures.length} live role/action/direction mapping failure(s)`);
 if (musterRows.size !== expectedRows) failures.push(`live canvas drew ${musterRows.size}/${expectedRows} rows`);
 if (musterPages.some((item) => !item.allDrawn)) failures.push('one or more muster pages did not draw every visible row');
+if (
+  initial.sourceCounts.locked !== manifestSourceCounts.counts.locked
+  || initial.sourceCounts.candidate !== manifestSourceCounts.counts.candidate
+  || initial.sourceCounts.base !== manifestSourceCounts.counts.base
+) {
+  failures.push(
+    `Muster source counts ${JSON.stringify(initial.sourceCounts)} differ from `
+    + `manifest v${manifestSourceCounts.version} ${JSON.stringify(manifestSourceCounts.counts)}`,
+  );
+}
 if (realPageErrors.length) failures.push(`${realPageErrors.length} page error(s)`);
 
 const output = {
@@ -251,6 +283,7 @@ const output = {
     pageErrors: realPageErrors.length,
   },
   sourceCounts: initial.sourceCounts,
+  manifestSourceCounts,
   mappings: {
     roles: runtime.mappingCases,
     actions: runtime.actionCases,

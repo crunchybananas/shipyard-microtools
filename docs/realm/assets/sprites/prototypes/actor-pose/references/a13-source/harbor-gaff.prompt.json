@@ -1,0 +1,34 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "harbor-gaff",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_z7FkGJjvHYQZtENfcNHBWyrD.png"
+  },
+  "references": [
+    {
+      "path": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_FlaW7xxBQVT5CIvTRaRrCAMa.png",
+      "role": "edit target and exact four-view harbor-gaff construction, layout, scale, and orientation reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/garment-storm-teal-keyed.png",
+      "role": "canonical fisher palette and rendering reference"
+    }
+  ],
+  "prompt": "Use case: precise-object-edit\nAsset type: Realm modular actor tool source board for offline skeletal sprite compilation\nInput images: Image 1 is the edit target and exact four-view harbor-gaff construction, layout, scale, and orientation reference. Image 2 is the canonical fisher palette and rendering reference.\nPrimary request: canonically re-render exactly four isolated views of the same practical medieval harbor fishing gaff while preserving the exact 1536x1024 canvas, four-object horizontal layout, spacing, vertical orientation, resolution, and polish. The gaff has a long straight worn pale-ash pole, a single large curved dark forged-iron hook, a compact aged-copper collar, a dark-brown leather grip wrapping the lower middle, and a small copper-capped butt. It must read immediately as a working fish-landing gaff at roughly 34–38 pixels tall, not a weapon. Columns from left to right are broad front/down view, independently worn broad rear/up view, narrow left-edge profile, and independently authored broad right view. Every gaff is vertical with the hook at top and butt at bottom.\nStyle/medium: crisp hand-painted classic late-1990s 2D strategy-game sprite source art; controlled pixel-cluster-friendly edges, readable ash, iron, copper, and leather clusters, restrained salt wear, warm upper-left dockside light; no photorealism, blur, dither, or soft shadow.\nConstraints: preserve identical construction, pole length, hook curvature and mass, collar, grip, scale, palette, and lighting across all four views. Keep every gaff fully separated and uncropped. Background must be perfectly flat solid #ff00ff with no shadows, gradients, texture, floor, reflections, labels, guides, border, text, watermark, hands, character, fish, basket, scenery, extra objects, or magenta inside the tool.\nAvoid: shepherd's crook, cane, sickle, spear, harpoon, boat hook with multiple prongs, fantasy weapon, detached hook, changing handle length, finished-row mirroring, smooth concept art.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--tolerance",
+      "80"
+    ],
+    "key_color_detected": "#ee05dc"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a13-source/harbor-gaff-keyed.png",
+  "keyed_sha256": "67d5bfd599a0bdd11783dccbee47fa0f89e4de3a624912de7f77a97af56caae3",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a13-source/harbor-gaff.png",
+  "alpha_sha256": "4b34a00c362b4604706ef2098a63f03e8da2a83a06eae90ff2b69785ec8fa50b"
+}

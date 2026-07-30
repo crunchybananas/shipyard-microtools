@@ -20,19 +20,19 @@ if (process.env.REALM_SAVE_CONTINUITY_CHILD) {
   const mode = process.env.REALM_SAVE_CONTINUITY_CHILD;
   const output = process.env.REALM_SAVE_CONTINUITY_OUTPUT;
   const input = process.env.REALM_SAVE_CONTINUITY_INPUT;
-  const { G, setSeed } = await import('../js/state.js?realm=181');
-  const { generateWorld } = await import('../js/world.js?realm=181');
-  const { coreTick } = await import('../js/sim.js?realm=181');
-  const { dispatch } = await import('../js/commands.js?realm=181');
-  const { canPlace } = await import('../js/economy.js?realm=181');
-  const { initChronicle } = await import('../js/log.js?realm=181');
-  const { serializeGame, prepareSave, commitGameLoad } = await import('../js/save-state.js?realm=181');
+  const { G, setSeed } = await import('../js/state.js?realm=182');
+  const { generateWorld } = await import('../js/world.js?realm=182');
+  const { coreTick } = await import('../js/sim.js?realm=182');
+  const { dispatch } = await import('../js/commands.js?realm=182');
+  const { canPlace } = await import('../js/economy.js?realm=182');
+  const { initChronicle } = await import('../js/log.js?realm=182');
+  const { serializeGame, prepareSave, commitGameLoad } = await import('../js/save-state.js?realm=182');
   const {
     claimCitizenAssignment,
     releaseAssignmentsForBuilding,
     renameCitizen,
     transitionCitizenActivity,
-  } = await import('../js/citizen-ownership.js?realm=181');
+  } = await import('../js/citizen-ownership.js?realm=182');
 
   function findSpot(type) {
     for (let radius = 0; radius < 25; radius++) {

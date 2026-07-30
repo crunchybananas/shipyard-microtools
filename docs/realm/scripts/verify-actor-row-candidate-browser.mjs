@@ -33,16 +33,13 @@ try {
   });
 
   await page.goto(
-    `${server.gameUrl}?spritelab=1&role=guard&action=idle&dir=down`
+    `${server.gameUrl}?spritelab=1&role=fisher&action=idle&dir=down`
     + `&verifyCandidate=${Date.now()}`,
   );
   await page.waitForLoadState('domcontentloaded');
   await page.waitForFunction(() => (
-    document.body.dataset.spriteReviewSource === 'accepted'
-    && document.body.dataset.spriteRuntimeSource === 'accepted'
-    && document.body.dataset.spriteCandidateFile === undefined
-    && document.querySelectorAll('#sl-list .sl-source-badge.candidate').length === 0
-    && document.querySelectorAll('#sl-list .sl-source-badge.accepted').length === 224
+    document.body.dataset.spriteRuntimeSource === 'accepted'
+    && document.querySelectorAll('#sl-list .sl-row').length === 224
   ));
 
   const idle = await page.evaluate(async () => {
@@ -75,8 +72,15 @@ try {
     const stonecutterProduction = Object.entries(manifest.rows).filter(
       ([key, slots]) => key.startsWith('stonecutter/') && slots.production,
     );
-    const key = 'guard/idle/down';
-    const item = manifest.rows[key].production;
+    const fisherProduction = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('fisher/') && slots.production,
+    );
+    const fisherCandidates = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('fisher/') && slots.candidate,
+    );
+    const key = 'fisher/idle/down';
+    const slots = manifest.rows[key];
+    const item = slots.candidate || slots.production;
     const bytes = await fetch(`assets/sprites/actor-rows/${item.file}`).then(
       (asset) => asset.arrayBuffer(),
     );
@@ -94,6 +98,8 @@ try {
       blacksmithProductionCount: blacksmithProduction.length,
       minerProductionCount: minerProduction.length,
       stonecutterProductionCount: stonecutterProduction.length,
+      fisherProductionCount: fisherProduction.length,
+      fisherCandidateCount: fisherCandidates.length,
       productionHash: item.sha256,
       fetchedProductionHash: digest,
       reviewSource: document.body.dataset.spriteReviewSource,
@@ -110,7 +116,6 @@ try {
   });
 
   assert.equal(idle.version, 2);
-  assert.equal(idle.candidateCount, 0);
   assert.equal(idle.productionCount, 224);
   assert.equal(idle.guardProductionCount, 16);
   assert.equal(idle.farmerProductionCount, 16);
@@ -119,20 +124,27 @@ try {
   assert.equal(idle.blacksmithProductionCount, 16);
   assert.equal(idle.minerProductionCount, 16);
   assert.equal(idle.stonecutterProductionCount, 16);
-  assert.equal(idle.candidateBadges, 0);
-  assert.equal(idle.reviewSource, 'accepted');
+  assert.equal(idle.fisherProductionCount, 16);
+  assert.ok([0, 16].includes(idle.fisherCandidateCount));
+  assert.equal(idle.candidateCount, idle.fisherCandidateCount);
+  assert.equal(idle.candidateBadges, idle.candidateCount);
   assert.equal(idle.runtimeSource, 'accepted');
-  assert.equal(idle.candidateFile, null);
   assert.equal(idle.fetchedProductionHash, idle.productionHash);
-  assert.match(idle.provenance, /LOCKED/);
-  assert.match(idle.provenance, /a5-modular-guard-actions/);
+  if (idle.fisherCandidateCount) {
+    assert.equal(idle.reviewSource, 'candidate');
+    assert.notEqual(idle.candidateFile, null);
+    assert.match(idle.provenance, /CANDIDATE/);
+    assert.match(idle.provenance, /a13-modular-fisher-actions/);
+  } else {
+    assert.equal(idle.reviewSource, 'accepted');
+    assert.equal(idle.candidateFile, null);
+    assert.match(idle.provenance, /LOCKED/);
+  }
 
   await page.selectOption('#sl-action', 'carry');
   await page.selectOption('#sl-dir', 'down');
   await page.waitForFunction(() => (
-    document.body.dataset.spriteReviewSource === 'accepted'
-    && document.body.dataset.spriteRuntimeSource === 'accepted'
-    && document.body.dataset.spriteCandidateFile === undefined
+    document.body.dataset.spriteRuntimeSource === 'accepted'
   ));
   const carry = await page.evaluate(() => ({
     reviewSource: document.body.dataset.spriteReviewSource,
@@ -140,11 +152,17 @@ try {
     candidateFile: document.body.dataset.spriteCandidateFile || null,
     provenance: document.querySelector('#sl-provenance')?.textContent || '',
   }));
-  assert.equal(carry.reviewSource, 'accepted');
   assert.equal(carry.runtimeSource, 'accepted');
-  assert.equal(carry.candidateFile, null);
-  assert.match(carry.provenance, /LOCKED/);
-  assert.match(carry.provenance, /a5-modular-guard-actions/);
+  if (idle.fisherCandidateCount) {
+    assert.equal(carry.reviewSource, 'candidate');
+    assert.notEqual(carry.candidateFile, null);
+    assert.match(carry.provenance, /CANDIDATE/);
+    assert.match(carry.provenance, /a13-modular-fisher-actions/);
+  } else {
+    assert.equal(carry.reviewSource, 'accepted');
+    assert.equal(carry.candidateFile, null);
+    assert.match(carry.provenance, /LOCKED/);
+  }
   assert.equal(errors.length, 0, errors.join('\n'));
   await page.screenshot({ path: screenshotPath, fullPage: false });
 
@@ -183,6 +201,8 @@ try {
       blacksmithProduction: idle.blacksmithProductionCount,
       minerProduction: idle.minerProductionCount,
       stonecutterProduction: idle.stonecutterProductionCount,
+      fisherProduction: idle.fisherProductionCount,
+      fisherCandidates: idle.fisherCandidateCount,
     },
     idle,
     carry,
@@ -191,9 +211,8 @@ try {
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(
-    '[actor-row-candidate-browser] PASS — 224 production rows and 0 candidates; '
-    + 'all guard, farmer, lumber, builder, blacksmith, miner, and stonecutter '
-    + 'rows are LOCKED and ordinary game loads no candidate assets',
+    `[actor-row-candidate-browser] PASS — 224 production rows and ${idle.candidateCount} candidate(s); `
+    + 'A13 fisher review provenance matches its staged state and ordinary game loads no candidate assets',
   );
 } finally {
   await browser.close();

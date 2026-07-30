@@ -1,0 +1,267 @@
+{
+  "schema": "realm.actor-pose.a13-fisher-actions.v1",
+  "stage": "fisher-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "harborhand",
+    "path": "assets/sprites/prototypes/actor-pose/references/a13-source/identity-harborhand.png",
+    "sha256": "16d20cdacdeb1c96ff713d9b236bf3f2299a87fe25487ffeff9f8ad82f36fd82",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/identity-harborhand-keyed.png",
+      "sha256": "e7937375478234ef5272caab6073f355ddd556e66f3e838dca21b4a7d5fde875"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a13-source/identity-harborhand.prompt.json",
+    "parts": {
+      "down": {
+        "head": [301, 22, 446, 224],
+        "torso": [279, 261, 561, 547],
+        "arm_screen_left": [110, 269, 224, 601],
+        "arm_screen_right": [1179, 270, 1292, 598],
+        "leg": [250, 585, 515, 981]
+      },
+      "up": {
+        "head": [591, 22, 727, 220],
+        "torso": [611, 267, 892, 547],
+        "arm_screen_left": [110, 269, 224, 601],
+        "arm_screen_right": [1179, 270, 1292, 598],
+        "leg": [590, 589, 728, 981]
+      },
+      "left": {
+        "head": [815, 20, 979, 232],
+        "torso": [935, 263, 1103, 547],
+        "arm": [1179, 270, 1292, 598],
+        "leg": [938, 585, 1091, 983]
+      },
+      "right": {
+        "head": [815, 20, 979, 232],
+        "torso": [935, 263, 1103, 547],
+        "arm": [1179, 270, 1292, 598],
+        "leg": [938, 585, 1091, 983]
+      }
+    }
+  },
+  "garment": {
+    "key": "storm-teal",
+    "path": "assets/sprites/prototypes/actor-pose/references/a13-source/garment-storm-teal.png",
+    "sha256": "6437ff6f90d6a4e063a869cc32c0ea1080267339cfb9b0c8bf26c18c80da5dc1",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/garment-storm-teal-keyed.png",
+      "sha256": "d764730e1e2622f95e34437c79ba6ad80860251dd8978af259b44a511e650f98"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a13-source/garment-storm-teal.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [304, 37, 440, 140],
+        "tunic": [222, 196, 513, 557],
+        "sleeve_screen_left": [80, 245, 197, 429],
+        "sleeve_screen_right": [1112, 246, 1229, 433],
+        "belt": [229, 559, 483, 644],
+        "boot": [226, 638, 485, 983]
+      },
+      "up": {
+        "headgear": [593, 33, 724, 151],
+        "tunic": [521, 197, 801, 549],
+        "sleeve_screen_left": [80, 245, 197, 429],
+        "sleeve_screen_right": [1112, 246, 1229, 433],
+        "belt": [533, 561, 775, 631],
+        "boot": [533, 638, 777, 982]
+      },
+      "left": {
+        "headgear": [854, 37, 996, 153],
+        "tunic": [864, 193, 1036, 556],
+        "sleeve": [1112, 246, 1229, 433],
+        "belt": [840, 559, 1043, 643],
+        "boot": [856, 638, 1041, 983]
+      },
+      "right": {
+        "headgear": [854, 37, 996, 153],
+        "tunic": [864, 193, 1036, 556],
+        "sleeve": [1112, 246, 1229, 433],
+        "belt": [840, 559, 1043, 643],
+        "boot": [856, 638, 1041, 983]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "harbor-gaff",
+    "path": "assets/sprites/prototypes/actor-pose/references/a13-source/harbor-gaff.png",
+    "sha256": "4b34a00c362b4604706ef2098a63f03e8da2a83a06eae90ff2b69785ec8fa50b",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/harbor-gaff-keyed.png",
+      "sha256": "67d5bfd599a0bdd11783dccbee47fa0f89e4de3a624912de7f77a97af56caae3"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a13-source/harbor-gaff.prompt.json",
+    "parts": {
+      "down": [137, 64, 310, 965],
+      "up": [528, 65, 700, 965],
+      "left": [911, 64, 989, 965],
+      "right": [1209, 64, 1381, 965]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "gaff head at top, handle end at bottom",
+      "grip_fraction_from_top": 0.7,
+      "render_height": 38,
+      "occlusion": "body < gaff < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "workstation": {
+    "key": "fish-creel",
+    "path": "assets/sprites/prototypes/actor-pose/references/a13-source/fish-creel.png",
+    "sha256": "2b56b61742741938e06529c5a5c008b54dc6f35b1e244bdaab997590c69e6f52",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/fish-creel-keyed.png",
+      "sha256": "5a5518aa73ccdf334384714c4eaa1baf535ee53368329d99d2ae86ab763a9609"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a13-source/fish-creel.prompt.json",
+    "parts": {
+      "down": [4, 282, 411, 721],
+      "up": [409, 282, 813, 721],
+      "left": [849, 259, 1140, 721],
+      "right": [1185, 259, 1475, 721]
+    },
+    "render": {
+      "down": {
+        "size": [24, 26],
+        "center": [32, 66],
+        "occlusion": "body < creel < gaff < near hand"
+      },
+      "up": {
+        "size": [24, 26],
+        "center": [19, 59],
+        "occlusion": "creel < body < gaff < near hand"
+      },
+      "left": {
+        "size": [22, 26],
+        "center": [16, 66],
+        "occlusion": "body < creel < gaff < near hand"
+      },
+      "right": {
+        "size": [22, 26],
+        "center": [48, 66],
+        "occlusion": "body < creel < gaff < near hand"
+      }
+    },
+    "authority": {
+      "ground_y": 79,
+      "work_socket": "creel_catch",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and fisher work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and fisher work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "harborhand",
+    "build": "lean, wiry harborhand stance with long working limbs and a stable low center of gravity",
+    "identity_leg_far_width": 6,
+    "identity_leg_near_width": 7,
+    "garment_leg_far_width": 7.2,
+    "garment_leg_near_width": 8.2,
+    "upper_arm_far_width": 5.5,
+    "upper_arm_near_width": 6.5,
+    "forearm_far_width": 5,
+    "forearm_near_width": 5.8,
+    "identity_torso_size": [24, 32],
+    "garment_tunic_size": [29, 34],
+    "garment_belt_size": [26, 5],
+    "identity_head_size": [21, 24],
+    "garment_headgear_size": [27, 18]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": ["harbor-gaff", "fish-creel"],
+      "motion": "ready, sight, reach, hook, draw, lift, stow, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "gaff grip remains at the right-hand socket; the hook reaches into the grounded creel and lifts back toward the worker"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "fisher",
+    "identity": "harborhand",
+    "garment": "storm-teal",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, harbor gaff, and grounded fish-creel components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, gaff, and fish creel are measured independently before the flattened row is accepted"
+  }
+}

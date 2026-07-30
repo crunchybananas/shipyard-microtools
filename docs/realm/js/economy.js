@@ -2,22 +2,22 @@
 // Economy — resources, production, buildings, raids
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=181';
-import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=181';
-import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=181';
-import { revealAround, makeCitizen } from './world.js?realm=181';
-import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=181';
-import { spawnDust, visualJitter } from './fx.js?realm=181';
-import { emit } from './bus.js?realm=181';
-import { isBuildingUnlocked } from './tech.js?realm=181';
-import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=181';
+import { G, BUILDINGS, MAP_W, MAP_H, TILE, rng, rngInt, rngRange, randomName, resourceEmoji, getSeasonData, getDifficulty, HOUSE_TIERS } from './state.js?realm=182';
+import { getProductionMultiplier, getHappinessOffset } from './events.js?realm=182';
+import { nearestWalkableTile, stepEntityToward } from './pathfinding.js?realm=182';
+import { revealAround, makeCitizen } from './world.js?realm=182';
+import { sfx as playSound, sfxBuild as playBuildingSound, chronicle, announce as notify, announceBuild as notifyBuild } from './log.js?realm=182';
+import { spawnDust, visualJitter } from './fx.js?realm=182';
+import { emit } from './bus.js?realm=182';
+import { isBuildingUnlocked } from './tech.js?realm=182';
+import { buildingCapacity, removeBuilding } from './building-lifecycle.js?realm=182';
 import {
   citizenConstructionRequiresStaff,
   releaseCitizenAssignment,
   removeCitizenFromWorld,
   transitionCitizenActivity,
   workersForBuilding,
-} from './citizen-ownership.js?realm=181';
+} from './citizen-ownership.js?realm=182';
 
 const CONSTRUCTION_TICKS = {
   road: 45,

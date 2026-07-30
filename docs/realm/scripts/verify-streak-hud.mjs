@@ -25,7 +25,7 @@ await page.waitForTimeout(1500);
 
 // Inject conditions for both streak indicators + force a UI tick.
 const result = await page.evaluate(async () => {
-  const ui = await import('./js/ui.js?realm=181');
+  const ui = await import('./js/ui.js?realm=182');
   window.G.stats = window.G.stats || {};
   window.G.stats.raidsSurvived = 1;
   window.G.lastRaidDay = 5;

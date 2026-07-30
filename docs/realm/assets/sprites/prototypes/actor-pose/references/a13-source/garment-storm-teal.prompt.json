@@ -1,0 +1,38 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-storm-teal",
+  "generated_at": "2026-07-30",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_eN7xJQoibdBpp0JtCSzuB6Z2.png"
+  },
+  "references": [
+    {
+      "path": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_sPCaXfaROUS68eQJHaynrnpN.png",
+      "role": "edit target and exact garment construction, modular layout, scale, and palette reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/identity-harborhand-keyed.png",
+      "role": "canonical harborhand identity and fit reference"
+    }
+  ],
+  "prompt": "Use case: identity-preserve followed by precise-object-edit\nAsset type: Realm modular actor garment source board for offline skeletal sprite compilation\nInput images: Image 1 is the edit target and exact garment construction, modular layout, scale, and palette reference. Image 2 is the canonical harborhand identity and fit reference.\nPrimary request: canonically re-render the supplied board as the same coherent storm-teal harbor fisher garment while preserving the exact 1536x1024 canvas, isolated component placement, scale, gaps, and front/back/profile coverage. Keep an empty dark midnight-navy rib-knit watch cap with a muted brick-red folded band; a sea-teal waxed quilted dock jacket with rolled sleeves and a brick-red shoulder yoke and neckerchief; a salt-beige fish-cleaning apron with rope edging and restrained water/fish wear; a broad dark-umber leather belt with aged-copper buckle and compact woven net pouch; charcoal reinforced trousers; and tall dark waterproof sea boots with leather wraps. Keep exactly three isolated empty watch-cap components on top; isolated sleeves and front, back, and profile jacket/apron views in the middle; isolated belts below; and front, back, and side trouser/boot sources on the bottom. The headgear views contain cloth only—no face, head, skin, ears, neck, eyes, eyebrows, nose, mouth, beard, or hair. This is a garment-parts board, not an assembled character and not an animation.\nStyle/medium: crisp hand-painted classic late-1990s 2D strategy-game sprite source art; controlled pixel-cluster-friendly edges, hard readable clusters, strong material separation, warm upper-left dockside light, restrained salt wear; no photorealism, blur, dither, or soft ambient shadow.\nConstraints: preserve the same garment construction, colors, cap band, yoke, neckerchief, apron length, rope straps, belt, trousers, boots, proportions, cut zones, and lighting across every view. Fit the lean identity in Image 2. Every component must remain isolated and uncropped with clean joint cut zones. Background must be perfectly flat solid #ff00ff with no shadows, gradients, texture, floor, labels, guides, border, text, watermark, tools, fish, scenery, or magenta inside the garment.\nAvoid: anatomy inside clothing, assembled character, miner lamp, quarry wrap, armor, long coat, rain cape, bright cyan, modern rubber waders, extra objects, merged components, smooth concept art.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#dc04d4"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a13-source/garment-storm-teal-keyed.png",
+  "keyed_sha256": "d764730e1e2622f95e34437c79ba6ad80860251dd8978af259b44a511e650f98",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a13-source/garment-storm-teal.png",
+  "alpha_sha256": "6437ff6f90d6a4e063a869cc32c0ea1080267339cfb9b0c8bf26c18c80da5dc1"
+}

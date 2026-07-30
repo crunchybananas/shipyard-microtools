@@ -2114,705 +2114,705 @@
     },
     "fisher/carry/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:33Z",
-        "file": "fisher/carry-down.png",
-        "note": "Painted 72px row derived from locked settler carry/down via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/carry-down-fd76f5befe53.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 33.0,
             "medianColor": [
-              88.35,
-              67.6,
-              54.7
+              66.95,
+              52.7,
+              42.75
             ],
-            "paletteDelta": 11.32
+            "paletteDelta": 10.76
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.029,
+          "maxBodyCenterJump": 2.09,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.5,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.2,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            93.4,
-            75.8,
-            60.65
+            76.7,
+            56.95,
+            44.4
           ],
-          "medianColorCount": 523.5,
-          "medianShadingRatio": 0.5885,
+          "medianColorCount": 423.5,
+          "medianShadingRatio": 0.7187,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "531a64d5942685ea24db8fc73499a40c76836eceddcf05c840ff46ebb5148790",
+        "sha256": "fd76f5befe53d48376a6efc9cb1943b3d26fdefeeb970e8ff662d456295e194e",
         "status": "accepted"
       }
     },
     "fisher/carry/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:35Z",
-        "file": "fisher/carry-left.png",
-        "note": "Painted 72px row derived from locked settler carry/left via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/carry-left-e70a6237ad06.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              88.4,
-              69.55,
-              60.65
+              66.95,
+              52.7,
+              42.75
             ],
-            "paletteDelta": 6.26
+            "paletteDelta": 0.51
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.077,
+          "maxBodyCenterJump": 1.74,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.1,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.76,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
           "medianColor": [
-            88.35,
-            67.6,
-            54.7
+            67.4,
+            52.85,
+            42.95
           ],
-          "medianColorCount": 411.0,
-          "medianShadingRatio": 0.634,
+          "medianColorCount": 376.5,
+          "medianShadingRatio": 0.6861,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "04ce2319e072c85203c7b21ee1a75fe1fdcfa05a6f75e4bfdac51c91533bdd98",
+        "sha256": "e70a6237ad06f11f08fa7c2fad571ad6e9aad3a5ab1ae72edf18f4952fb34fed",
         "status": "accepted"
       }
     },
     "fisher/carry/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:35Z",
-        "file": "fisher/carry-right.png",
-        "note": "Painted 72px row derived from locked settler carry/right via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/carry-right-56f6cdb0761f.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              88.35,
-              69.55,
-              60.65
+              67.4,
+              52.85,
+              42.95
             ],
-            "paletteDelta": 6.26
+            "paletteDelta": 0.51
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.076,
+          "maxBodyCenterJump": 1.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.1,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 2.63,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 33.0,
           "medianColor": [
-            88.4,
-            67.6,
-            54.7
+            66.95,
+            52.7,
+            42.75
           ],
-          "medianColorCount": 411.0,
-          "medianShadingRatio": 0.6338,
+          "medianColorCount": 381.0,
+          "medianShadingRatio": 0.6816,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "cf864b56938753ba19d7575590c2f197513aa82a9dd45ade51b5271a48dfac8c",
+        "sha256": "56f6cdb0761fcccbebc6e48fecc43fcf35ca2a63703e61c2adaccddfa137d240",
         "status": "accepted"
       }
     },
     "fisher/carry/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:34Z",
-        "file": "fisher/carry-up.png",
-        "note": "Painted 72px row derived from locked settler carry/up via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/carry-up-50d4e2ec2530.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 5.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 33.0,
             "medianColor": [
-              88.4,
-              67.6,
-              54.7
+              67.4,
+              52.85,
+              42.95
             ],
-            "paletteDelta": 18.26
+            "paletteDelta": 8.07
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 1.46,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.9,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 0.78,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            74.6,
-            69.55,
-            66.5
+            61.65,
+            48.25,
+            39.65
           ],
-          "medianColorCount": 466.0,
-          "medianShadingRatio": 0.6392,
+          "medianColorCount": 317.5,
+          "medianShadingRatio": 0.7367,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "aa67305180ecdf9f5f48c3cda990a49e6f8c6fd5071c25dc7e8fe161094c1bde",
+        "sha256": "50d4e2ec2530d809d4b71ef396047970422124893f2b084fa6cc6365396da225",
         "status": "accepted"
       }
     },
     "fisher/idle/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:23Z",
-        "file": "fisher/idle-down.png",
-        "note": "Painted 72px row derived from locked settler idle/down via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/idle-down-ea8e742c5f7f.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              87.25,
-              75.25,
-              63.2
+              64.45,
+              52.75,
+              44.55
             ],
-            "paletteDelta": 5.12
+            "paletteDelta": 10.38
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.046,
+          "maxBodyCenterJump": 2.24,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.54,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 2.05,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            90.3,
-            77.25,
-            66.8
+            73.0,
+            57.75,
+            47.65
           ],
-          "medianColorCount": 570.5,
-          "medianShadingRatio": 0.6321,
+          "medianColorCount": 394.0,
+          "medianShadingRatio": 0.7115,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "cc9dce22bf6f7f526cc9671ca139c62bf7a39b2d599cec5b9ac798b5ea49ab08",
+        "sha256": "ea8e742c5f7faacc40e9e7364c2c22b3b7c1d52a3a8355b09acbff3dd7b725f2",
         "status": "accepted"
       }
     },
     "fisher/idle/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:25Z",
-        "file": "fisher/idle-left.png",
-        "note": "Painted 72px row derived from locked settler idle/left via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/idle-left-e57b2ef9c4bd.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              87.25,
-              75.25,
-              66.8
+              64.45,
+              52.75,
+              44.55
             ],
-            "paletteDelta": 3.6
+            "paletteDelta": 0.76
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.019,
+          "maxBodyCenterJump": 0.73,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.65,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.81,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            87.25,
-            75.25,
-            63.2
+            65.1,
+            53.1,
+            44.75
           ],
-          "medianColorCount": 442.0,
-          "medianShadingRatio": 0.6706,
+          "medianColorCount": 379.5,
+          "medianShadingRatio": 0.6816,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "f0bbe85ce1d0683b4abec0e662fb00ccb6bc5c2edaf6292d99309d527b71f82a",
+        "sha256": "e57b2ef9c4bdabda3dd68713a1b7be384683d717066fb80bd478b8b3938eca04",
         "status": "accepted"
       }
     },
     "fisher/idle/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:25Z",
-        "file": "fisher/idle-right.png",
-        "note": "Painted 72px row derived from locked settler idle/right via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/idle-right-7fe011fa493e.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.5,
             "medianColor": [
-              87.25,
-              75.25,
-              66.8
+              65.1,
+              53.1,
+              44.75
             ],
-            "paletteDelta": 3.6
+            "paletteDelta": 0.76
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.017,
+          "maxBodyCenterJump": 0.74,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.65,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.81,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            87.25,
-            75.25,
-            63.2
+            64.45,
+            52.75,
+            44.55
           ],
-          "medianColorCount": 442.0,
-          "medianShadingRatio": 0.6706,
+          "medianColorCount": 374.0,
+          "medianShadingRatio": 0.6787,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "3a42656b4bf9c29e91e5a45ac5492f8dac199b4ce7d39abbdf3ef6d83ef852ae",
+        "sha256": "7fe011fa493eed66db617cad2f54a135d752eed08913daee818765137f75b596",
         "status": "accepted"
       }
     },
     "fisher/idle/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:24Z",
-        "file": "fisher/idle-up.png",
-        "note": "Painted 72px row derived from locked settler idle/up via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/idle-up-c7a3b450f66a.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 0.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              87.25,
-              75.25,
-              63.2
+              65.1,
+              53.1,
+              44.75
             ],
-            "paletteDelta": 22.95
+            "paletteDelta": 13.85
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.047,
+          "maxBodyCenterJump": 1.58,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.0,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 0.55,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.5,
           "medianColor": [
-            67.0,
-            66.4,
-            69.4
+            54.0,
+            45.9,
+            40.65
           ],
-          "medianColorCount": 489.0,
-          "medianShadingRatio": 0.6932,
+          "medianColorCount": 288.0,
+          "medianShadingRatio": 0.7376,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "1f1ef4766c7c64cf6a559b85c26be6b6763c75f362521a4a65cb8ebeda1aa652",
+        "sha256": "c7a3b450f66a8304eabcdc59ec65715582f9b3530dc698a4fe50a02daafdac07",
         "status": "accepted"
       }
     },
     "fisher/walk/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:26Z",
-        "file": "fisher/walk-down.png",
-        "note": "Painted 72px row derived from locked settler walk/down via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/walk-down-d802479dbdc3.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              81.85,
-              65.2,
-              57.75
+              65.9,
+              54.15,
+              45.8
             ],
-            "paletteDelta": 15.03
+            "paletteDelta": 7.97
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.026,
+          "maxBodyCenterJump": 2.17,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.41,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.24,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            89.6,
-            75.85,
-            65.0
+            72.8,
+            57.65,
+            47.7
           ],
-          "medianColorCount": 559.0,
-          "medianShadingRatio": 0.6277,
+          "medianColorCount": 395.5,
+          "medianShadingRatio": 0.7103,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "0d1aa344a9cd3ba973e3487d791ccf39b010a2edf7595875993ff97dccdd2327",
+        "sha256": "d802479dbdc3e94256e983462a2ff0e752d9205405e13fb82aeef432ab9525fd",
         "status": "accepted"
       }
     },
     "fisher/walk/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:27Z",
-        "file": "fisher/walk-left.png",
-        "note": "Painted 72px row derived from locked settler walk/left via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/walk-left-8a6007fc8649.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              81.85,
-              68.05,
-              65.0
+              65.9,
+              54.15,
+              45.8
             ],
-            "paletteDelta": 7.79
+            "paletteDelta": 0.55
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.079,
+          "maxBodyCenterJump": 2.01,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.58,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 2.71,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            81.85,
-            65.2,
-            57.75
+            66.35,
+            54.4,
+            46.0
           ],
-          "medianColorCount": 416.5,
-          "medianShadingRatio": 0.6958,
+          "medianColorCount": 370.0,
+          "medianShadingRatio": 0.6755,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "c592973ddb8038f0779a61dc315018e869a90e1f17752093b078ee035f986591",
+        "sha256": "8a6007fc8649c6f596660294efd912beef20620e4c75342771d2810caaf81e74",
         "status": "accepted"
       }
     },
     "fisher/walk/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:28Z",
-        "file": "fisher/walk-right.png",
-        "note": "Painted 72px row derived from locked settler walk/right via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/walk-right-59d7431b7472.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 28.0,
             "medianColor": [
-              81.85,
-              68.05,
-              65.0
+              66.35,
+              54.4,
+              46.0
             ],
-            "paletteDelta": 7.79
+            "paletteDelta": 0.55
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 6.4,
+          "maxAlphaRatio": 1.081,
+          "maxBodyCenterJump": 1.66,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 5.58,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 2.96,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 29.0,
           "medianColor": [
-            81.85,
-            65.2,
-            57.75
+            65.9,
+            54.15,
+            45.8
           ],
-          "medianColorCount": 416.5,
-          "medianShadingRatio": 0.6958,
+          "medianColorCount": 369.0,
+          "medianShadingRatio": 0.6738,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "4387f015375ae7b3281dde5e2337ff4bb9d2c26d607dbb9bb525ab3533fa083c",
+        "sha256": "59d7431b7472a5d015266cfdff83177043cac170fe79cbca8e4b4e2bbd8340df",
         "status": "accepted"
       }
     },
     "fisher/walk/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:27Z",
-        "file": "fisher/walk-up.png",
-        "note": "Painted 72px row derived from locked settler walk/up via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/walk-up-8d82b83b56da.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 1.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 29.0,
             "medianColor": [
-              81.85,
-              65.2,
-              57.75
+              66.35,
+              54.4,
+              46.0
             ],
-            "paletteDelta": 16.94
+            "paletteDelta": 15.99
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 5.2,
+          "maxAlphaRatio": 1.034,
+          "maxBodyCenterJump": 1.57,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.46,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 0.87,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            69.55,
-            68.05,
-            69.05
+            53.95,
+            45.8,
+            40.7
           ],
-          "medianColorCount": 492.5,
-          "medianShadingRatio": 0.681,
+          "medianColorCount": 289.5,
+          "medianShadingRatio": 0.7361,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2aee50193833c49e7863a97f0448b5266d8c6af1c472d072f6368048ac9d3e44",
+        "sha256": "8d82b83b56dafb97a0a6697a723a4aa2256be2b12b70ca761df480afef86d539",
         "status": "accepted"
       }
     },
     "fisher/work/down": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:29Z",
-        "file": "fisher/work-down.png",
-        "note": "Painted 72px row derived from locked settler work/down via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/work-down-9636641eb895.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 13.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 41.0,
             "medianColor": [
-              87.25,
-              75.25,
-              63.2
+              75.2,
+              58.4,
+              44.9
             ],
-            "paletteDelta": 5.16
+            "paletteDelta": 15.28
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.053,
+          "maxBodyCenterJump": 0.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.54,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 1.91,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 28.0,
           "medianColor": [
-            90.3,
-            77.25,
-            66.85
+            88.45,
+            65.45,
+            47.75
           ],
-          "medianColorCount": 572.5,
-          "medianShadingRatio": 0.6324,
+          "medianColorCount": 524.0,
+          "medianShadingRatio": 0.7366,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "541c48157f069df6e6f308c6f2ab55c297412536c90e9d2c443f2b1569d77258",
+        "sha256": "9636641eb89512b83a1e941c700acb465cbd2e75935598694a2b1c46aebe3fa6",
         "status": "accepted"
       }
     },
     "fisher/work/left": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:31Z",
-        "file": "fisher/work-left.png",
-        "note": "Painted 72px row derived from locked settler work/left via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/work-left-a1b78cf8ffaf.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.5,
             "medianColor": [
-              87.25,
-              75.25,
-              66.85
+              75.2,
+              58.4,
+              44.9
             ],
-            "paletteDelta": 3.65
+            "paletteDelta": 0.94
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.04,
+          "maxBodyCenterJump": 0.65,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.65,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.93,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 41.0,
           "medianColor": [
-            87.25,
-            75.25,
-            63.2
+            75.7,
+            59.05,
+            45.35
           ],
-          "medianColorCount": 443.5,
-          "medianShadingRatio": 0.6708,
+          "medianColorCount": 513.5,
+          "medianShadingRatio": 0.6867,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "9e4de64b516f5833b1924591f1c6c238b558f787454c918d7a7a06a46a4e2c04",
+        "sha256": "a1b78cf8ffafe30e7b3a819b95d9bf79b3c4ce01806dce0f590574e63701a567",
         "status": "accepted"
       }
     },
     "fisher/work/right": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:32Z",
-        "file": "fisher/work-right.png",
-        "note": "Painted 72px row derived from locked settler work/right via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/work-right-5928c978d5a3.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 1.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 39.5,
             "medianColor": [
-              87.25,
-              75.25,
-              66.85
+              75.7,
+              59.05,
+              45.35
             ],
-            "paletteDelta": 3.65
+            "paletteDelta": 0.94
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 2.0,
+          "maxAlphaRatio": 1.043,
+          "maxBodyCenterJump": 0.64,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.65,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 1.97,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 41.0,
           "medianColor": [
-            87.25,
-            75.25,
-            63.2
+            75.2,
+            58.4,
+            44.9
           ],
-          "medianColorCount": 443.5,
-          "medianShadingRatio": 0.6708,
+          "medianColorCount": 488.5,
+          "medianShadingRatio": 0.6864,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "0d25fe09ac05292a910881e9c5bae545b73d6fe92db45e98fa2fe491824bc2c4",
+        "sha256": "5928c978d5a3140f5dee24ea04b62f4b77ea3a005a1894dc2cc52972ec1a9d8b",
         "status": "accepted"
       }
     },
     "fisher/work/up": {
       "production": {
-        "acceptedAt": "2026-07-01T21:49:30Z",
-        "file": "fisher/work-up.png",
-        "note": "Painted 72px row derived from locked settler work/up via deterministic tunic palette transfer (fisher teal).",
-        "provenance": "settler-derived-palette-transfer",
+        "acceptedAt": "2026-07-30T18:53:00Z",
+        "file": "production/fisher/work-up-44dcd29711fa.png",
+        "note": "Realm 182 complete modular harborhand fisher family",
+        "provenance": "a13-modular-fisher-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 1,
           "bodyWidthRange": 1,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 1.5,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 41.0,
             "medianColor": [
-              87.25,
-              75.25,
-              63.2
+              75.7,
+              59.05,
+              45.35
             ],
-            "paletteDelta": 22.97
+            "paletteDelta": 11.52
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 3.2,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 1.16,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.98,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.32,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 39.5,
           "medianColor": [
-            67.0,
-            66.4,
-            69.45
+            66.55,
+            52.8,
+            42.2
           ],
-          "medianColorCount": 487.0,
-          "medianShadingRatio": 0.6933,
+          "medianColorCount": 461.0,
+          "medianShadingRatio": 0.718,
           "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "6e2545b1efca302a7081d12b1e7975652c03e199f0f6a44e03af86cdf180a7fb",
+        "sha256": "44dcd29711fa986b1bc66b0b05e2e008bf82bdcc828c5e0ffc24a00931e6fb61",
         "status": "accepted"
       }
     },
@@ -9809,6 +9809,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T10:43:19Z",
+  "updatedAt": "2026-07-30T18:53:00Z",
   "version": 2
 }

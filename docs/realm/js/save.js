@@ -1,16 +1,16 @@
 // Engine v2 save shell. Importing this module is headless-safe: storage and
 // DOM are touched only when an exported shell function is called.
 
-import { SAVE_KEY } from './save-schema.js?realm=181';
+import { SAVE_KEY } from './save-schema.js?realm=182';
 import {
   commitGameLoad,
   inspectPreparedSave,
   prepareSave,
   serializeGame,
-} from './save-state.js?realm=181';
-import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=181';
-import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=181';
-import { resetCitizenTransitionLedger } from './citizen-inspector.js?realm=181';
+} from './save-state.js?realm=182';
+import { resetCitizenOwnershipRuntime } from './citizen-ownership.js?realm=182';
+import { resetCitizenRenderCache } from './citizen-render-cache.js?realm=182';
+import { resetCitizenTransitionLedger } from './citizen-inspector.js?realm=182';
 
 let lastLoadedSavedAt = 0;
 
