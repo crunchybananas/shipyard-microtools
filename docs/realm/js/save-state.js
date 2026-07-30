@@ -5,14 +5,14 @@ import {
   G, MAP_W, MAP_H, TILE, BUILDINGS, RESOURCE_KEYS,
   RESETTABLE_PRESENTATION_ENTITY_FIELDS, RESET_ON_LOAD_G_KEYS,
   STATE_OWNERSHIP, createResetOnLoadState, getSeed, setSeed,
-} from './state.js?realm=172';
-import { missions } from './missions.js?realm=172';
+} from './state.js?realm=173';
+import { missions } from './missions.js?realm=173';
 import {
   decodeGraphState,
   encodeGraphState,
   makeEnvelope,
   validateSave,
-} from './save-schema.js?realm=172';
+} from './save-schema.js?realm=173';
 import {
   ACTIVITY_REASONS,
   ASSIGNMENT_CLAIM_REASONS,
@@ -22,7 +22,7 @@ import {
   CITIZEN_PROFESSIONS,
   citizenStaffingCapacity,
   PROFESSION_REASONS,
-} from './citizen-ownership.js?realm=172';
+} from './citizen-ownership.js?realm=173';
 
 // These values are browser-process resources, not realm state. Every other
 // enumerable G field is persisted. Unsupported values fail serialization

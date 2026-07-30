@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=172';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=172';
-import { makeAtlasLoader } from './atlas-loader.js?realm=172';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=172';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=173';
+import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=173';
+import { makeAtlasLoader } from './atlas-loader.js?realm=173';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=173';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,21 +15,21 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=172';
+} from './sprite-source-contract.js?realm=173';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=172';
+} from './render-resolution.js?realm=173';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=172';
+} from './citizen-presentation.js?realm=173';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=172';
-import { staffingCount } from './citizen-ownership.js?realm=172';
+} from './citizen-render-cache.js?realm=173';
+import { staffingCount } from './citizen-ownership.js?realm=173';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -163,25 +163,28 @@ const _ACTOR_ATLAS_TIERS = ACTOR_RUNTIME_ATLASES.map((tier) => ({
   ...tier,
   load: makeAtlasLoader(_actorAtlasUrl(tier.file)),
 }));
-const _ACTOR_PREVIEW_ID = 'a4-guard-carry-family';
+const _ACTOR_PREVIEW_ID = 'a5-guard-actions';
 const _actorPreviewEnabled = new URLSearchParams(location.search).get('actorpreview')
   === _ACTOR_PREVIEW_ID;
 const _ACTOR_PREVIEW_SCOPE = Object.freeze({
   role: 'guard',
-  action: 'carry',
+  actions: Object.freeze(['idle', 'walk', 'work', 'carry']),
   dirs: Object.freeze(['down', 'up', 'left', 'right']),
 });
 const _ACTOR_PREVIEW_TIERS = _actorPreviewEnabled
   ? new Map(_ACTOR_ATLAS_TIERS.map((tier) => {
-      const rows = new Map(_ACTOR_PREVIEW_SCOPE.dirs.map((dir) => [
-        dir,
-        makeAtlasLoader(_actorAtlasUrl(
-          `prototypes/actor-pose/output/a4-guard-family/rows-runtime/${tier.key}`
-          + `/watchman/watch-blue/cargo-crate/carry-${dir}.png`
-        )),
-      ]));
+      const rows = new Map(_ACTOR_PREVIEW_SCOPE.actions.flatMap((action) => (
+        _ACTOR_PREVIEW_SCOPE.dirs.map((dir) => [
+          `${action}/${dir}`,
+          makeAtlasLoader(_actorAtlasUrl(
+            `prototypes/actor-pose/output/a5-guard-actions/rows-runtime/${tier.key}`
+            + `/watchman/watch-blue/${action}-${dir}.png`
+          )),
+        ])
+      )));
       // The preview is an explicit review surface, so preload its complete
-      // direction family. Normal game URLs create none of these loaders.
+      // action and direction family. Normal game URLs create none of these
+      // row-local loaders.
       for (const load of rows.values()) load();
       return [
         tier.key,
@@ -197,7 +200,7 @@ let _lastActorAtlasDebugKey = '';
 function actorPreviewMatches(role, action, dir) {
   return _actorPreviewEnabled
     && role === _ACTOR_PREVIEW_SCOPE.role
-    && action === _ACTOR_PREVIEW_SCOPE.action
+    && _ACTOR_PREVIEW_SCOPE.actions.includes(action)
     && _ACTOR_PREVIEW_SCOPE.dirs.includes(dir);
 }
 
@@ -205,7 +208,7 @@ function actorPreviewSelection(role, action, dir, atlasSelection) {
   if (!actorPreviewMatches(role, action, dir)) return null;
   const tier = _ACTOR_PREVIEW_TIERS.get(atlasSelection.key);
   if (!tier) return null;
-  const row = tier.rows.get(dir)?.();
+  const row = tier.rows.get(`${action}/${dir}`)?.();
   if (!row) return null;
   return { ...tier, row };
 }
@@ -994,8 +997,8 @@ if (typeof window !== 'undefined') {
         : ([...tier.rows.values()].some((load) => load.state === 'error')
             ? 'error'
             : 'loading'),
-      rows: [...tier.rows.entries()].map(([dir, load]) => ({
-        dir,
+      rows: [...tier.rows.entries()].map(([key, load]) => ({
+        key,
         url: load.url,
         state: load.state,
       })),
@@ -1027,8 +1030,8 @@ if (typeof window !== 'undefined') {
       state: tier.load.state,
     })),
     ...[..._ACTOR_PREVIEW_TIERS.values()].flatMap((tier) => (
-      [...tier.rows.entries()].map(([dir, load]) => ({
-        type: `actor-preview-${tier.key}-${dir}`,
+      [...tier.rows.entries()].map(([key, load]) => ({
+        type: `actor-preview-${tier.key}-${key.replace('/', '-')}`,
         state: load.state,
       }))
     )),

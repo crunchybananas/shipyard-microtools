@@ -1,0 +1,21 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "created": "2026-07-30",
+  "use_case": "stylized-concept",
+  "generator": "OpenAI image generation",
+  "temporary_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/call_cCcrZbbFTBoO1uvXhzBO6VM2.png",
+  "project_keyed_source": "assets/sprites/prototypes/actor-pose/references/a5-source/guard-short-sword-keyed.png",
+  "project_alpha_source": "assets/sprites/prototypes/actor-pose/references/a5-source/guard-short-sword.png",
+  "keyed_sha256": "aaf0b9e51fa6a12bca349c8176a5dea86fc8c81ab6924e788e8d3cd05a543b8d",
+  "alpha_sha256": "699e28f57abcc38c7212523841cc736f4046839b1ed0cbbf6f296a42a09f5daf",
+  "transparency": {
+    "tool": "remove_chroma_key.py",
+    "key": "#fb03f8",
+    "auto_key": "border",
+    "soft_matte": true,
+    "transparent_threshold": 12,
+    "opaque_threshold": 220,
+    "despill": true
+  },
+  "prompt": "Create a production source sheet for a modular 2D strategy-game sprite pipeline. Show one compact, functional late-medieval guard arming sword as exactly three isolated orthographic component views: front/down, back/up, and right-facing side. Keep one consistent steel blade, simple crossguard, brown leather grip, and dark pommel. Use crisp hand-painted late-1990s strategy-game sprite-source rendering with clear silhouettes and controlled contrast. Arrange the three complete weapons left-to-right with generous spacing on a perfectly flat #ff00ff background. Include no people, hands, scabbards, environment, shadows, labels, borders, logos, or watermark."
+}

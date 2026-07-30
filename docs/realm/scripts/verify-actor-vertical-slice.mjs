@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-// Prove the A4 four-direction modular guard family on the live game canvas
-// without promoting it into the production atlas. The opt-in URL must draw
-// each prefiltered direction row; the ordinary URL must remain untouched.
+// Prove the A5 four-action, four-direction modular guard family on the live
+// game canvas without promoting it into the production atlas. The opt-in URL
+// must draw every prefiltered row; the ordinary URL must remain untouched.
 
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -12,11 +12,12 @@ import { chromium } from '@playwright/test';
 import { ensureServer } from './_serve.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const outputDir = join(root, 'tmp', 'actor-a4-vertical-slice');
+const outputDir = join(root, 'tmp', 'actor-a5-vertical-slice');
 const screenshotPath = join(outputDir, 'live-canvas.png');
 const worldScreenshotPath = join(outputDir, 'live-world.png');
 const reportPath = join(outputDir, 'report.json');
-const previewId = 'a4-guard-carry-family';
+const previewId = 'a5-guard-actions';
+const previewActions = ['idle', 'walk', 'work', 'carry'];
 const previewDirections = ['down', 'up', 'left', 'right'];
 const server = await ensureServer();
 const browser = await chromium.launch({ headless: process.env.HEADED !== '1' });
@@ -53,7 +54,7 @@ try {
     const originalDrawImage = proto.drawImage;
     proto.drawImage = function (image, ...args) {
       const source = image?.currentSrc || image?.src || '';
-      if (source.includes('/a4-guard-family/rows-runtime/')) {
+      if (source.includes('/a5-guard-actions/rows-runtime/')) {
         events.push({
           source,
           sourceRect: args.slice(0, 4),
@@ -72,22 +73,11 @@ try {
     } finally {
       proto.drawImage = originalDrawImage;
     }
-    const response = await fetch(
-      `assets/sprites/actor-rows/manifest.json?verticalSlice=${Date.now()}`,
-      { cache: 'no-store' },
-    );
-    const manifest = await response.json();
     return {
       atlas: window.__realm.actorAtlas(),
       preview: window.__realm.actorPreview(),
       muster: window.__realm.spriteMuster.report(),
       events,
-      candidates: Object.fromEntries(
-        ['down', 'up', 'left', 'right'].map((dir) => [
-          dir,
-          manifest.rows?.[`guard/carry/${dir}`] || null,
-        ]),
-      ),
       cache: window.__realm.spriteCache(),
     };
   });
@@ -98,40 +88,39 @@ try {
   assert.equal(observed.preview.id, previewId);
   assert.deepEqual(observed.preview.scope, {
     role: 'guard',
-    action: 'carry',
+    actions: previewActions,
     dirs: previewDirections,
   });
   assert.equal(observed.preview.bakedCargo, true);
   assert.equal(observed.atlas.active?.pixelPerfect, true);
   assert.equal(observed.atlas.active?.smoothing, false);
-  assert.ok(observed.events.length > 0, 'live canvas did not draw the A4 rows');
+  assert.ok(observed.events.length >= 16, 'live canvas did not draw all A5 rows');
   assert.ok(
     observed.events.every((event) => (
-      previewDirections.some((dir) => (
-        event.source.includes(
-          `/watchman/watch-blue/cargo-crate/carry-${dir}.png`
-        )
-      ))
+      previewActions.some((action) => previewDirections.some((dir) => (
+        event.source.includes(`/watchman/watch-blue/${action}-${dir}.png`)
+      )))
       && event.sourceRect[1] === 0
       && event.sourceRect[2] === event.targetRect[2]
       && event.sourceRect[3] === event.targetRect[3]
     )),
-    'live canvas drew an unexpected, offset, or fractionally scaled A4 row',
+    'live canvas drew an unexpected, offset, or fractionally scaled A5 row',
   );
-  for (const dir of previewDirections) {
-    assert.ok(
-      observed.muster.visibleRows.some((row) => (
-        row.key === `guard/carry/${dir}`
-        && row.drawn
-        && row.status === 'CANDIDATE'
-      )),
-      `guard/carry/${dir} was not visible as a drawn candidate`,
-    );
-    assert.equal(observed.candidates[dir]?.status, 'candidate');
-    assert.equal(
-      observed.candidates[dir]?.provenance,
-      'a4-modular-directional',
-    );
+  for (const action of previewActions) {
+    for (const dir of previewDirections) {
+      assert.ok(
+        observed.muster.visibleRows.some((row) => (
+          row.key === `guard/${action}/${dir}` && row.drawn
+        )),
+        `guard/${action}/${dir} was not visible as a drawn row`,
+      );
+      assert.ok(
+        observed.events.some((event) => event.source.includes(
+          `/watchman/watch-blue/${action}-${dir}.png`
+        )),
+        `guard/${action}/${dir} did not draw from the A5 preview`,
+      );
+    }
   }
   assert.equal(pageErrors.length, 0, pageErrors.join('\n'));
 
@@ -176,10 +165,10 @@ try {
     const centerX = 32;
     const centerY = 32;
     const ownership = await import(
-      './js/citizen-ownership.js?realm=172'
+      './js/citizen-ownership.js?realm=173'
     );
     const renderCache = await import(
-      './js/citizen-render-cache.js?realm=172'
+      './js/citizen-render-cache.js?realm=173'
     );
     const citizen = game.citizens[0];
     const barracks = {
@@ -256,7 +245,7 @@ try {
     const originalDrawImage = proto.drawImage;
     proto.drawImage = function (image, ...args) {
       const source = image?.currentSrc || image?.src || '';
-      if (source.includes('/a4-guard-family/rows-runtime/')) {
+      if (source.includes('/a5-guard-actions/rows-runtime/')) {
         events.push({
           fixtureDirection,
           canvas: this.canvas.id,
@@ -320,7 +309,7 @@ try {
         event.fixtureDirection === dir
         && event.canvas === 'game'
         && event.source.includes(
-          `/watchman/watch-blue/cargo-crate/carry-${dir}.png`
+          `/watchman/watch-blue/carry-${dir}.png`
         )
         && event.source.includes('/rows-runtime/default/')
         && event.sourceRect[1] === 0
@@ -329,7 +318,7 @@ try {
         && event.targetRect[2] === 27
         && event.targetRect[3] === 35
       )),
-      `settlement view did not draw the exact A4 ${dir} carry row`,
+      `settlement view did not draw the exact A5 ${dir} carry row`,
     );
   }
   assert.equal(worldObserved.atlas.active?.tier, 'default');
@@ -338,7 +327,7 @@ try {
   assert.equal(worldErrors.length, 0, worldErrors.join('\n'));
 
   const report = {
-    schema: 'realm.actor-pose.a4-live-canvas-report.v1',
+    schema: 'realm.actor-pose.a5-live-canvas-report.v1',
     previewId,
     pageErrors,
     observed,
@@ -351,8 +340,8 @@ try {
     passed: true,
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-  console.log('✓ A4 guard carry rows drew in all four directions');
-  console.log('✓ every preview direction uses a prefiltered row-local runtime tier');
+  console.log('✓ A5 guard rows drew across four actions and four directions');
+  console.log('✓ every preview row uses a prefiltered row-local runtime tier');
   console.log('✓ an actual guard carrier draws all four zoom-matched tiers in-world');
   console.log('✓ the ordinary game URL remains on production art');
   console.log(`muster screenshot: ${screenshotPath}`);

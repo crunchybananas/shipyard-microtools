@@ -1,5 +1,62 @@
 # Current Graphics Handoff
 
+## Realm 173 A5 complete modular guard action family — 2026-07-30
+
+- The guard now has one coherent offline authoring system for all `16` runtime
+  rows: `idle`, `walk`, `work`, and `carry` in `down`, `up`, `left`, and
+  `right`. Every row uses the same hash-locked watchman identity, watch-blue
+  garment, directional painted components, `76px` body scale, `[32,79]` root,
+  lighting, palette, and eight-frame row contract.
+- Idle uses a planted eight-beat breath/weight loop. Walk retains A2's
+  grounded contact/down/pass/up chronology and adds counter-swinging arms.
+  Carry preserves A4's exact body, load socket, and corrected directional
+  crate. Work adds a planted eight-phase short-sword drill.
+- The short sword is a project-bound painted source with front, back, and side
+  views, generation prompt/provenance, keyed and transparent source hashes,
+  and explicit crop authority. It attaches only to the physical right-hand
+  socket. The gate checks socket ownership and requires the extension beat to
+  point toward each authored direction.
+- The compiler emits independent body, identity, garment, equipment,
+  semantic-mask, and landmark planes plus reviewable `512x84` rows. Body and
+  equipment are measured separately so moving sword reach cannot hide a body
+  scale defect.
+- All `128/128` frames are distinct. Every row has a `76px` median body height,
+  ground registration on row `79`, rows `80-83` clear, painted-style
+  classification, and no analyzer warnings or errors. The independent disk
+  verifier confirms all output/source hashes and a byte-identical clean
+  rebuild.
+- One shared 48-color, binary-alpha, no-dither runtime palette is applied to
+  exact `27x35`, `35x46`, `54x70`, and `64x84` tiers. Finished frames and rows
+  are never mirrored.
+- All sixteen rows remain warning-free, self-contained review outputs under
+  the A5 artifact tree. They are intentionally not written over the
+  actor-row manifest: that v1 manifest cannot retain a locked production row
+  and a replacement candidate simultaneously. The deployed atlas therefore
+  retains all `191` locked overrides and the existing A4 carry candidates
+  without a hidden base-art fallback on the next clean build.
+- `?actorpreview=a5-guard-actions` substitutes the whole action family through
+  the real renderer. Actor Muster proves `16/16` rows draw from A5. A
+  controlled settlement guard proves all four carry directions use the
+  `35x46` default tier at an exact unsmoothed draw. The ordinary URL loads zero
+  A5 preview assets and stays on production art.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a5_guard_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a5_guard_actions.py
+scripts/sprite-row verify
+node scripts/verify-sprite-source-contract.mjs
+node scripts/verify-actor-vertical-slice.mjs
+```
+
+Next target: inspect action transitions and resource-specific cargo semantics
+at close game zoom, then either promote the complete guard family together or
+revise the modular source once. Before another accepted-row replacement is
+staged, extend the review manifest so a candidate can coexist with its locked
+production source. After that decision, migrate the next actor identity rather
+than returning to unrelated row-by-row repainting.
+
 ## Realm 172 A4 four-direction guard carry family — 2026-07-29
 
 - The first modular guard family now covers `down`, `up`, `left`, and `right`

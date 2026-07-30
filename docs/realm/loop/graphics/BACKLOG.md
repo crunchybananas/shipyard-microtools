@@ -4,15 +4,15 @@ Prioritize work that changes what the player sees in the live game.
 
 ## Ready
 
-1. Finish the modular guard pilot, then migrate the remaining cast.
-   - Problem: A4 proves a coherent four-direction carry family, but the guard's
-     idle, walk, and work rows still come from older independent art. Turning
-     between actions can therefore change proportions and painting language.
-   - Push: add a handed short-sword source and sentinel checks, compile all
-     `16` guard action/direction rows from the same watchman identity,
-     watch-blue garment, pose, palette, lighting, and anchor contracts, then
-     review and promote the complete family as one unit. Migrate other roles
-     one family at a time only after this pilot is green.
+1. Resolve the complete guard candidate, then migrate the remaining cast.
+   - Problem: A5 now proves one modular identity across all `16` guard rows,
+     but the family remains opt-in candidate art until close transition review
+     decides whether the sword cadence and baked crate should ship unchanged.
+   - Push: review idle/walk/work/carry transitions and resource-specific cargo
+     semantics at close game zoom, add candidate-plus-locked coexistence to
+     the row manifest, revise the shared source once if needed, then promote
+     the complete family together. Migrate other roles one family at a time
+     only after this pilot is accepted.
    - Verify: require single-row source review, independent clean rebuilds,
      identity/garment/equipment invariants, Sprite Lab and Actor Muster review,
      exact-tier settlement captures, all `224` atlas rows, and all `1,792`
@@ -66,6 +66,17 @@ Prioritize work that changes what the player sees in the live game.
    - Verify: full build-bar screenshot after unlocking all build types.
 
 ## Done
+
+- Complete modular guard action family (round 115): generated and hash-locked
+  one directional painted short-sword source; added right-hand socket and
+  directional thrust sentinels; compiled all `16` idle/walk/work/carry
+  direction rows from the same watchman identity and watch-blue garment;
+  measured body and equipment independently; emitted exact four-tier
+  palette-bounded runtime rows; kept all sixteen in a self-contained opt-in
+  review tree so locked production rows remain reproducible; verified a
+  byte-identical clean rebuild; and proved the whole family in Actor Muster
+  plus all four carry directions through the settlement renderer while
+  ordinary URLs remain on production art.
 
 - Modular four-direction guard carry family (round 114): mapped the unused
   front/back/side components in the watchman, watch-blue, and cargo sheets;

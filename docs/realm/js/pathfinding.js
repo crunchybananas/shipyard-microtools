@@ -2,7 +2,7 @@
 // A* Pathfinding — binary heap, 8-directional, road bonus
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, MAP_W, MAP_H } from './state.js?realm=172';
+import { G, TILE, MAP_W, MAP_H } from './state.js?realm=173';
 
 class BinaryHeap {
   constructor() { this.data = []; }

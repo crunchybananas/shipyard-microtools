@@ -19,7 +19,7 @@ import {
   FRAME_W,
   FRAMES,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=172';
+} from '../js/sprite-source-contract.js?realm=173';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
