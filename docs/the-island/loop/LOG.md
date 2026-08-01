@@ -12,6 +12,38 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fires 14-15 — 2026-07-31 — the RELEASE-PRIDE AUDIT — and the push
+
+**The question the owner left:** "keep working on it until you would be proud to release
+this to the world." The audit's answer: **yes, with a clear conscience.** The full-game
+walk passes 28/28 on the final tree (both endings, real mechanics, zero console errors);
+journal↔sketch coverage 62/62; the five grades hold their identities at the beach vantage
+(the sea-fret dawn and the pink-lavender golden hour are genuinely beautiful; night is
+properly crushed with stars); L2/L3/L4 exteriors carry their casts; the L4 study reads
+warm BY DESIGN (the keeper-lamp hearth against the cold — the cold lives outside);
+phones play natively; settings exist; the audio has a bearing and a clock.
+
+**Perf honesty:** noon-beach bench 203 draws / 421k tris — consistent with the bird+prop
+population, not attributable regression (the old "72 beach" figure predates the flock/
+perched fauna). This session NET-ADDED two power levers: bloom threshold 0.85→1.05
+(less bright-area work) and driftwood mode (user-facing bloom-off + DPR cap). The deep
+perf backlog (#27 #28 #30 #31 #32 #34) remains open and honest.
+
+**What the overnight campaign shipped (fires 6-15):** #49 three optional depth-keyed
+chains · #64 audible day/night · #54 nine lampblack marks (+ the unreachable-climb and
+noon-brass-torch shipped bugs found and fixed) · #52 the tide gauge · #57 labels + drag
+affordance · the 28-assertion walk gate · #60 native touch · #63 spatial bearings ·
+#59 The Instruments. Nine issues closed, one filed (#124), #50 deferred with reasons.
+
+**PUSH:** fires 11-15 → submodule main → origin/main; parent → origin/main. The deployed
+island now carries everything above.
+
+**Awaiting the owner (unchanged in kind, grown in content):** EARS — the generative music
+(fires 1-5), now the crickets/chorus/cries (#64) and the bearings (#63); and real-hands
+play of the three #49 chains, the gauge, the labels, touch, and The Instruments.
+
+---
+
 ## loop-fire 13 — 2026-07-31 — #59: The Instruments — a settings surface at last
 
 **Shipped:** a fourth top-right tab (the gear) opens "The Instruments": look speed
