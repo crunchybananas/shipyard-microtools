@@ -42,6 +42,7 @@ export class Interactions {
 
     dom.addEventListener('pointerdown', (e) => {
       if (!this.enabled) return;
+      if (e.button !== 0) return;   // #61: only the primary button touches the world
       this._hideLabel();   // the hand is acting now; the caption yields
       // #60: a touch has no hover history — raycast at the tap point NOW, so a single
       // tap interacts and a touch-drag on the crank turns it (the branches below then

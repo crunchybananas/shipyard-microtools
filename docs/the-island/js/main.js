@@ -569,7 +569,11 @@ function beginIntro(instant = false) {
   MODE = 'intro';
   intro = { t: 0, dur: 19 };
   const skip = () => { if (intro) intro.t = intro.dur; canvas.removeEventListener('pointerdown', skip); };
-  setTimeout(() => canvas.addEventListener('pointerdown', skip), 1500);
+  // #61: on a replay ('begin again') the viewer has seen the approach — arm the skip
+  // instantly; a first-time viewer still gets a 1.5s guard against an accidental tap
+  setTimeout(() => canvas.addEventListener('pointerdown', skip), instant ? 0 : 1500);
+  // #61: the skip was undiscoverable — say it once, early, in the whisper voice
+  setTimeout(() => { if (intro && intro.t < intro.dur - 4) UI.whisper('Click, and the sea will hurry.'); }, 4000);
 }
 
 function endIntro() {

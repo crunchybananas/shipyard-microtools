@@ -30,8 +30,12 @@ export class Player {
 
     this._drag = null;
 
+    // #61: right-click used to start a look-drag AND pop the context menu — the menu
+    // steals pointerup, latching _drag. Only the primary button (or touch) may look.
+    dom.addEventListener('contextmenu', (e) => e.preventDefault());
     dom.addEventListener('pointerdown', (e) => {
       if (this.locked || this.dragCaptured) return;
+      if (e.button !== 0) return;
       this._drag = { x: e.clientX, y: e.clientY, moved: 0 };
       // #60 hold-to-walk: on touch, press and HOLD (without swiping off) walks forward
       // toward wherever you steer — the same finger drags to look mid-stride. A quick

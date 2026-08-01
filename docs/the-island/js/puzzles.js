@@ -346,6 +346,15 @@ export class Game {
         const goingUp = W.flags.climbing || W.level >= MAX_DEPTH;
         if (!goingUp) {
           // ---- DESCEND ----
+          // #124: the L3 arrival lands on the bluff, and the flooded channel's only
+          // crossing is the ruler bridge — a diver who never measured the crack would
+          // strand there. The plate itself refuses, in the keeper's terms: the ruler
+          // IS the route east (terrain.js has said so all along).
+          if (W.level === 2 && !W.flags.rulerPlaced) {
+            UI.whisper('The plate hums, and holds. Below this water the island stands split in two — and the crack has never been measured. The model still waits for its ruler.');
+            this.once('diveNeedsRuler', () => UI.addJournal('The plate would not take me deeper. Below the shallows the island is split by the chasm, and the drowned channel has no crossing — not until the crack in the model is measured and the brass bridge stands. He measured that rift a hundred times. Now it wants measuring once more, by me.'));
+            return;
+          }
           if (!this._brink) {
             this._brink = true;
             A.duckAmbient(true);

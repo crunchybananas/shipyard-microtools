@@ -12,6 +12,27 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 16 — 2026-08-01 — #124 the plate refuses the unmeasured deep · #61 UX micro-pass
+
+**Shipped (#124):** the ruler-conditional L3 strand is closed at the root: the L2→L3 dive
+now refuses until the crack is measured — "The plate hums, and holds. Below this water the
+island stands split in two — and the crack has never been measured." Once-journal names
+the chain (the ruler IS the route east, as terrain.js always said). With the ruler placed
+the brink arms exactly as before; the walk gate (which measures first) stays 28/28.
+
+**Shipped (#61):** the intro skip is discoverable — "Click, and the sea will hurry." fades
+in ~4s into the approach; the replay path arms the skip instantly (a first viewing keeps
+the 1.5s guard). And the right button is finally inert: contextmenu suppressed, only the
+primary button (or touch) starts a look-drag or touches the world — no more latched
+_drag off a right-click.
+
+**Evidence:** at L2 sans ruler the plate's two-touch arms nothing (level stays 2, brink
+false, journal once fires); with the ruler the brink arms; right-button pointerdown leaves
+_drag null while left latches; the advert whisper displays during a fresh intro; 63/63
+sketch coverage; walk 28/28. **Closes #61; #124 fix shipped (issue closes with the push).**
+
+---
+
 ## loop-fires 14-15 — 2026-07-31 — the RELEASE-PRIDE AUDIT — and the push
 
 **The question the owner left:** "keep working on it until you would be proud to release

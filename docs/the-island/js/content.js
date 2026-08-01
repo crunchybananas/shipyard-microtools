@@ -303,6 +303,8 @@ export const SKETCHES = [
   ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
   ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
   ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
+  // #124 — the plate refuses the unmeasured deep.
+  ['The plate would not take me deeper', S('<circle cx="30" cy="26" rx="0" r="11" opacity=".85"/><ellipse cx="30" cy="26" rx="11" ry="4" opacity=".5"/><path d="M52 12l8 6-6 5 9 7-5 6" opacity=".8"/><path d="M50 34h32" opacity=".4"/>')],
   // #52 — the tide gauge landmark.
   ['graduated staff, ringed at five heights', S('<path d="M48 5v31"/><ellipse cx="48" cy="31" rx="7" ry="2"/><ellipse cx="48" cy="25" rx="7" ry="2"/><ellipse cx="48" cy="19" rx="7" ry="2"/><ellipse cx="48" cy="13" rx="7" ry="2"/><ellipse cx="48" cy="7" rx="7" ry="2" opacity=".45"/><path d="M12 33q9-4 18 0M66 33q9-4 18 0" opacity=".5"/>')],
   // #54 — the lampblack tally (one shared sketch for all nine finds) + the completion.
