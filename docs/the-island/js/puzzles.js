@@ -3,7 +3,7 @@
 // instances every frame.
 
 import * as THREE from 'three';
-import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH } from './world.js';
+import { W, save, isNight, isDawn, isGolden, sunAzimuth, sunElevation, SCALE_MODEL, MAX_DEPTH, waterY } from './world.js';
 import { SPOTS, heightAt } from './terrain.js';
 import { BIRD_MELODY, BOX_MELODY, STONE_NOTES, GLYPH_CODE, GLYPHS } from './props.js';
 import { Interactions } from './interact.js';
@@ -16,6 +16,14 @@ const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
 const CLIFF = new THREE.Vector3(57.5, 14, 50);
 const CLIFF_AZ = Math.atan2(CLIFF.x - LH.x, CLIFF.z - LH.z);
+// #49: the beam turned to face the deep — the drowned hall's aisle centre. The default
+// beamAngle (2.2) sits just OUTSIDE the 0.05 window (Δ0.059): the find is never free.
+const HALL = new THREE.Vector3(4, 3, -113.25);
+const HALL_AZ = Math.atan2(HALL.x - LH.x, HALL.z - LH.z);
+// #49: the keeper's own song, finally allowed to finish — BOX_MELODY + the fallen B
+const KEEPER_SONG = [...BOX_MELODY, 5];
+// #49: the high pool's basin floor (matches props) — the water shows above it only at L4
+const POOL = { x: -75.5, z: -77.0, floor: 3.42 };
 const _kv = new THREE.Vector3();
 const _ov = new THREE.Vector3();   // scratch for the oar's world position (nested in the dory group)
 
@@ -39,10 +47,11 @@ export class Game {
     // eased animation values
     this.anim = {
       chest: 0, vault: 0, hatch: 0, boxLid: 0, innerDoor: 0,
-      beamI: 0, shaft: 0, valveSpin: 0, stoneGlow: [0, 0, 0, 0, 0],
+      beamI: 0, shaft: 0, valveSpin: 0, stoneGlow: [0, 0, 0, 0, 0, 0],
       shimmer: 0,
     };
     this.stoneSeq = [];
+    this.songSeq = [];   // #49: rolling window for the keeper's song (E G A D C + the fallen B)
     this.birdTimer = 8; // sing soon after dawn arrives
     this.boxPlaying = false;
     this._keeperLook = 0;        // eased 0..1: the figure turning to face you
@@ -149,6 +158,27 @@ export class Game {
         onClick: () => this._touchStone(i),
       });
     }
+    // the fallen sixth stone (#49): dead until the Tide-Figure's bell-note has been
+    // witnessed at L2 — the note it lost, laid back across the water. Then it hums B,
+    // and the keeper's refused song (E G A D C) can finally land its last note here.
+    if (R.stone5) I.add({
+      id: 'stoneFallen', targets: [R.stone5], label: 'a fallen stone', maxDist: 13,
+      onClick: () => {
+        if (!W.flags.tideFigureSeen) {
+          A.stoneDead();
+          this.once('fallenStone', () => {
+            UI.whisper('Fallen, and long silent. Knocking on it is like knocking on a door with no room behind it.');
+            UI.addJournal('A sixth stone lies fallen at the arc’s south edge, face down in the grass. The five standing hum when touched; this one only knocks, dead as driftwood. Where does a stone’s note go when it falls? Somewhere below the tide line, I think. The sea keeps what falls.');
+          });
+          return;
+        }
+        this.once('fallenStoneWakes', () => {
+          UI.whisper('The fallen stone hums — the very note the shape laid across the water. It came home.');
+          UI.addJournal('The fallen stone has its note back — the one the shape in the kelp laid across the bay before it sank. Six voices now, five standing and one lying down. The five refused his song once; with a sixth to land on, maybe the wrongness finally has somewhere to go.', '', 'self');
+        });
+        this._touchStone(5);
+      },
+    });
 
     // chest + ruler
     I.add({
@@ -500,6 +530,36 @@ export class Game {
       onClick: () => UI.openReader('quarters_journal'),
     });
 
+    // ---- the high pool (#49): see it dry, take it at the bottom, read it at the surface ----
+    // the glint in the crack — the phial seen but unreachable while the pool stands dry
+    if (R.poolGlint) I.add({
+      id: 'poolGlint', targets: [R.poolGlint], label: 'something bright, wedged deep', maxDist: 3.4,
+      when: () => W.level < MAX_DEPTH && !W.flags.phialTaken,
+      onClick: () => {
+        UI.whisper('Glass and brass, wedged where the floor meets the wall — a crack the width of two fingers. Water would float it free. The sea never comes this high.');
+        this.once('poolGlint', () => UI.addJournal('High on the walk to the light, a dry stone pool the sea abandoned long ago — and something bright wedged deep in its floor, past any reach of mine. Water would lift it out. But the sea never comes this high... though the further down I go, the higher the sea stands. Somewhere below, this pool is full.', '', 'self'));
+      },
+    });
+    // the phial afloat at L4 — the raised sea lifts it within reach
+    if (R.poolPhial) I.add({
+      id: 'poolPhial', targets: [R.poolPhial], label: 'a phial, afloat', maxDist: 3.2,
+      when: () => W.level >= MAX_DEPTH && !W.flags.phialTaken,
+      onClick: () => {
+        this.flag('phialTaken');
+        if (!W.inventory.includes('phial')) W.inventory.push('phial');
+        A.chime();
+        UI.whisper('The bottom of the world, and the pool is finally full. The phial rides the risen water, and your hand closes around it.');
+        UI.addJournal('At the bottom, the abandoned pool is full — the sea I descended through stands high enough to reach it at last. The phial floated free and I have it. The note inside is sodden, swollen against the glass; it will not unroll without tearing. It needs dry air. It needs the surface. So do I.', '', 'self');
+        save(this.player);
+      },
+    });
+    // the dried phial on the chart table (placed by the return beat in tick)
+    if (R.phialDesk) I.add({
+      id: 'phialDesk', targets: [R.phialDesk], label: 'the dried phial', maxDist: 2.8,
+      when: () => W.flags.phialDried,
+      onClick: () => UI.openReader('pool_phial'),
+    });
+
     // ---- the found-lens reveal: take the keeper's reading glass and his lampblack marks appear ----
     if (R.readGlass) I.add({
       id: 'readGlass', targets: [R.readGlass], label: 'a brass reading glass', maxDist: 3.4,
@@ -530,7 +590,27 @@ export class Game {
     A.stoneTone(i, 0.4, damp);
     if (damp) this.once('stonesDeep', () => UI.whisper('The stones hum lower here, as through water.'));
     this.anim.stoneGlow[i] = 1;
-    if (W.flags.birdSolved) return;
+    if (W.flags.birdSolved) {
+      // #49: after the main solve the stones stay an instrument — and once the fallen
+      // sixth is awake, the keeper's own refused song (E G A D C, the box's way) can
+      // finally land its missing last note on the B. Rolling window, no refusal:
+      // free play never punishes, the song simply completes when it completes.
+      if (W.flags.tideFigureSeen && !W.flags.keeperSong) {
+        this.songSeq.push(i);
+        if (this.songSeq.length > KEEPER_SONG.length) this.songSeq.shift();
+        if (this.songSeq.length === KEEPER_SONG.length && this.songSeq.every((v, n) => v === KEEPER_SONG[n])) {
+          this.songSeq = [];
+          this.flag('keeperSong');
+          A.addStem(6); W.stems = Math.max(W.stems, 6);
+          setTimeout(() => { A.leitStrum(); A.pluck(493.88, 0.5, 0.22, 4.5); }, 800);
+          UI.whisper('E, G, A, D, C — and the fallen B beneath them. The song he could never finish, finished. The stones do not refuse it.');
+          UI.addJournal('I played his song at the stones — the box’s way, the way his hands actually played it, wrong fourth and all — and let it land on the fallen stone’s note. The arc rang all six voices together, and the island’s own music has carried the sixth ever since. The wrongness was never the flaw to be ground out. It was the playing.', '', 'self');
+          save(this.player);
+        }
+      }
+      return;
+    }
+    if (i === 5) return;   // the fallen stone is no part of the bird's five-note lesson
     this.stoneSeq.push(i);
     const target = BIRD_MELODY;
     const n = this.stoneSeq.length;
@@ -620,8 +700,8 @@ export class Game {
     const shimmerOn = isGolden() && !F.shadowRevealed;
     ease('shimmer', shimmerOn ? 0.5 + 0.3 * Math.sin(elapsed * 2.5) : 0, 3);
 
-    // stones glow decay
-    for (let i = 0; i < 5; i++) an.stoneGlow[i] = Math.max(0, an.stoneGlow[i] - dt * 0.8);
+    // stones glow decay (six now — the fallen stone glows like its standing kin, #49)
+    for (let i = 0; i < 6; i++) an.stoneGlow[i] = Math.max(0, an.stoneGlow[i] - dt * 0.8);
 
     // the dawn bird
     if (isDawn()) {
@@ -647,6 +727,25 @@ export class Game {
       }
     }
 
+    // #49: the beam turned to face the deep — the cot journal's promise, kept. Only at L3,
+    // with the drowned hall's capitals risen through the surface, is there anything out
+    // there to CATCH the light; aim the beam down the seaward aisle and the keeper's four
+    // figures hang over the water, readable from the shoreline ridge above the old beach.
+    const hallAligned = Math.abs(angleDiff(W.beamAngle, HALL_AZ)) < 0.05;
+    this.hallLit = W.lampLit && hallAligned && W.level === 3;
+    if (this.hallLit && !F.beamDeepSeen) {
+      const dh = Math.hypot(this.player.pos.x - HALL.x, this.player.pos.z - HALL.z);
+      if (dh < 60) {
+        this.flag('beamDeepSeen');
+        A.chime();
+        UI.whisper('The risen capitals catch the beam — four figures hang over the drowned hall, the same four he wrote on the cliff.');
+        UI.addJournal(`He wrote that he would turn the light to face the deep — and he did. With the sea risen to the hall’s shoulders, the beam finds the drowned colonnade and writes on it: the same four figures as the cliff — ${GLYPH_CODE.map((g) => GLYPH_CHARS[g]).join('  ')}. One message, sent up the island and down it, to whoever would read it from either side of the water. The bluff’s brass dials answer to these figures; now the deep has said so itself.`, '', 'self');
+      } else {
+        // aimed true from the chart table but not yet walked to — name what the beam found
+        this.once('beamDeepAim', () => UI.whisper('Far out on the risen water, something catches the beam and holds it. The drowned hall is reading the light.'));
+      }
+    }
+
     // ---- proximity one-times ----
     const p = this.player.pos;
     if (!F.enteredStudy && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
@@ -667,6 +766,16 @@ export class Game {
     if (W.flags.returned && W.level <= 1 && !this._sawOarNudge && Math.hypot(p.x - (-26), p.z - (-102)) < 9) {
       this._sawOarNudge = true;
       UI.whisper('The dory, and its one unused oar. You went down and climbed back; this is the way out, when you are ready to take it.');
+    }
+    // #49 round trip closes: back at the surface with the pool phial, the study's dry
+    // air loosens the sodden note — the phial appears on the chart table, readable at last
+    if (F.phialTaken && !F.phialDried && W.level <= 1 && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
+      this.once('phialDry', () => {
+        this.flag('phialDried');
+        W.inventory = W.inventory.filter((s) => s !== 'phial');
+        UI.whisper('You set the phial from the high pool on the chart table. In the dry air of the study, the little roll of paper loosens from the glass at last.');
+        UI.addJournal('Back at the surface, I set the phial out to dry on the chart table. The note he sealed against the rising water has finally let go of the glass. It carried all the way down and all the way back up — now it can be read.', '', 'self');
+      });
     }
     if (W.level >= 2 && !this._level2Study && Math.hypot(p.x - LH.x, p.z - LH.z) < 4.8) {
       this._level2Study = true;
@@ -907,7 +1016,10 @@ export class Game {
       // you stop chasing and only watch → it settles, and lets go
       this._tideRegard = Math.min((this._tideRegard || 0) + dt, 3);
       if (this._tideRegard >= 2.6 && this.flag('tideFigureSeen')) {
-        A.chime();   // one bell-note across the water
+        // one bell-note across the water — a real note now (#49): B, the one the
+        // pentatonic never had. The fallen stone at the arc is listening for it.
+        A.pluck(493.88, 0, 0.42, 3.6);
+        A.pluck(987.77, 0.07, 0.16, 4.6);
         UI.whisper('You stop wading for it. You only watch. It settles, surfaces — and lays a single note across the water before it sinks.');
         UI.addJournal('A shape stood in the kelp and slipped off whenever I waded toward it. So I stopped, and stood, and only watched. It settled then, and surfaced, and laid one bell-note across the bay before the water took it. Some things will not be chased down — only witnessed. And that is enough to let them go.', '', 'self');
       }
@@ -997,12 +1109,37 @@ export class Game {
       if (g && !isModel) g.material.map.offset.x = (W.dials?.[i] ?? 0) / GLYPHS;
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       const shell = R[`stoneGlow${i}`];
       if (shell && !isModel) shell.material.opacity = an.stoneGlow[i] * 0.55;
       const mk = R[`stoneMark${i}`];
-      if (mk && !isModel) mk.material.opacity = 0.78 + an.stoneGlow[i] * 0.22;
+      // the fallen stone's glyph stays dark until its note comes home (#49)
+      if (mk && !isModel) mk.material.opacity = (i === 5 && !F.tideFigureSeen) ? 0 : 0.78 + an.stoneGlow[i] * 0.22;
     }
+
+    // #49 — the high pool: water only the descent brings; the glint while it's dry;
+    // the phial afloat at the bottom; the dried phial on the chart table after.
+    if (R.poolWater) {
+      const wy = waterY();
+      R.poolWater.visible = wy > 3.46;                             // POOL.floor + a film
+      R.poolWater.position.y = Math.min(wy, 3.42 + 0.62);          // never above the rim
+      if (!isModel) R.poolWater.material.opacity = 0.7 + 0.08 * Math.sin(elapsed * 1.1);
+    }
+    if (R.poolGlint) {
+      R.poolGlint.visible = !F.phialTaken && W.level < MAX_DEPTH;
+      const halo = R.poolGlint.children[1];
+      if (halo && !isModel) halo.material.opacity = 0.3 + 0.22 * Math.sin(elapsed * 2.3);
+    }
+    if (R.poolPhial) {
+      R.poolPhial.visible = !F.phialTaken && W.level >= MAX_DEPTH;
+      if (R.poolPhial.visible) {
+        R.poolPhial.position.y = Math.min(waterY(), 3.42 + 0.62) + 0.04 + Math.sin(elapsed * 0.9) * 0.015;
+        R.poolPhial.rotation.y = elapsed * 0.22;
+      }
+    }
+    if (R.phialDesk) R.phialDesk.visible = !!F.phialDried;
+    // #49 — the hall glyphs hang in the beam only while it holds the drowned hall (L3)
+    if (R.hallGlyphs) R.hallGlyphs.visible = !!this.hallLit;
 
     if (R.lampLens) {
       R.lampLens.visible = W.lensPlaced;

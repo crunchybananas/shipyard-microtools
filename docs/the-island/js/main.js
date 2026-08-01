@@ -489,7 +489,7 @@ btnContinue.addEventListener('click', () => {
   A.init();
   if (load()) {
     // stems restore from the flags that earned them, not a counter
-    const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen' };
+    const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen', 6: 'keeperSong' };
     for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
     titleEl.classList.add('fading');
     const pos = W.playerPos || new THREE.Vector3(4, 0, -104);
@@ -1446,7 +1446,7 @@ player.onFootstep = (kind, pos) => {
         beamDelta: +bd.toFixed(3),
         regions: { l2: W.regions.l2seen, l3: W.regions.l3seen, l4: W.regions.l4seen, fragments: W.regions.fragmentsFound.slice() },
         inventory: W.inventory.slice(), stems: W.stems, once: W.onceKeys.length,
-        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'tideFigureSeen', 'bellRung', 'readGlass'].filter((k) => F[k]),
+        flags: ['rulerPlaced', 'birdSolved', 'glyphsSeen', 'hatchOpen', 'plumbHung', 'dove', 'climbing', 'returned', 'keeperRose', 'carried', 'watcherSeen', 'tideFigureSeen', 'bellRung', 'readGlass', 'phialTaken', 'phialDried', 'beamDeepSeen', 'keeperSong'].filter((k) => F[k]),
       };
     },
   };

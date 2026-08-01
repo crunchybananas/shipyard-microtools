@@ -12,6 +12,48 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 6 — 2026-07-31 — #49: the corridor breaks — three optional depth-keyed chains
+
+**Shipped (the elevator becomes a loop worth riding — every chain spans ≥2 levels):**
+- **The HIGH POOL (round trip)** — a dry stone pool perched at +3.6m on the beach→study walk,
+  a keeper's phial glinting unreachable in its floor crack. The SEA-STRATA inversion IS the
+  puzzle: descending RAISES the sea, so only at L4 (+3.78) does water find the basin (floor
+  3.42) and float the phial free; it dries on the chart table back at the surface and reads as
+  a new LORE fragment — a letter addressed to the SEA itself ("whoever fishes this out of your
+  risen water — let them up"). See (any level) → take (bottom) → read (surface).
+- **The BEAM TO THE DEEP** — the cot journal's deep page kept ("Tomorrow I will turn it to
+  face the deep"): a second beam alignment (HALL_AZ, Δ0.059 from the default aim — never a
+  free find) that only CATCHES at L3, when the drowned hall's capitals rise through the
+  surface. Four glyphs hang in a row over the water — the SAME four as the cliff: a second,
+  non-linear route to the hatch code — readable from the shoreline ridge ~25m north. (First
+  build stacked them along the aisle — collinear from the ridge; spread across the hall's
+  width instead.)
+- **The SIXTH NOTE** — the Tide-Figure's resolution bell is now a real B (493.88 — the note
+  the pentatonic never had), and a sixth FALLEN stone lies at the arc's east edge: dead knock
+  (new A.stoneDead) until the figure is witnessed at L2, then it hums B (STONE_NOTES[5]) and
+  its glyph (the unused sixth figure) surfaces. Play the KEEPER'S OWN refused song — E G A D C,
+  the box's way, landing on the fallen B — and the stones accept it: stem 6 joins the score
+  (B2 drone + a slow B-bell), the final bell crowns with it, and the era bed starts resolving
+  fragments onto B. music_note's deep page made mechanical: "carry the song up wrong."
+
+**Evidence:** geometry probed in-engine BEFORE building (pool site walkable + connected at L4
+from the study region, 8.6k cells; hall ridge inside the L3 study region with a clear
+sightline; fallen stone re-sited off the drain chamber's walkable box). Headless: all three
+chains end-to-end + negative controls (wrong song refused, L1 aim lights nothing, per-level
+glint/phial/water visibility), Continue restores stem 6 + all four new flags, the model clone
+keeps stone5/pool and prunes hallGlyphs, 59/59 journal↔sketch coverage, 0 console errors.
+Screenshots: fallen stone at the arc (golden), pool dry/full (noon L1 / L4 with surf at the
+rim), hall glyphs from the ridge (night L3).
+
+**Debt:** hall-glyph decode lives in the journal (no reader fragment). Pre-existing, surfaced
+by the connectivity probe: a diver who never placed the ruler strands on the L3 bluff spawn
+(the flooded channel's only crossing is the ruler bridge) — gameplay-pass item. **Closes #49.**
+
+**Next tick suggestion:** #64 (audible day/night — on the music engine's scheduler the cricket
+bed + dawn chorus + gullCry is a one-loop-pair change).
+
+---
+
 ## loop-fires 1-5 — 2026-07-27 (night) — backlog, coherence passes, and the island learns to play itself
 
 **Shipped (owner /loop session, 5 fires, all deployed):**

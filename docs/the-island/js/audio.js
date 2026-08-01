@@ -262,6 +262,26 @@ const A = {
   },
 
   chime() { this.pluck(1046.5, 0, 0.3, 1.8); this.pluck(1318.5, 0.09, 0.22, 2.2); },
+  // the fallen stone before its note comes home (#49): a dead knock — all thump, no
+  // pitch, the sound of a door with no room behind it
+  stoneDead() {
+    if (!this._running()) return;
+    const t0 = ctx.currentTime;
+    const len = 0.12 * ctx.sampleRate;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) * (1 - i / len);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 240;
+    const g = ctx.createGain(); g.gain.value = 0.5;
+    src.connect(f).connect(g).connect(this.fx);
+    src.start(t0);
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(82, t0);
+    o.frequency.exponentialRampToValueAtTime(48, t0 + 0.16);
+    const og = ctx.createGain(); this._env(og, t0, 0.004, 0.3, 0.16);
+    o.connect(og).connect(this.fx); o.start(t0); o.stop(t0 + 0.25);
+  },
   // the five stem-earning solves answer in the island's OWN figure (#65): the
   // leitmotif strummed quickly — the final bell's crown in miniature — while the
   // ~10 ordinary solves keep the generic two-note chime.
@@ -359,6 +379,15 @@ const A = {
         }, 9100);
         break;
       }
+      case 6: { // the sixth note (#49): the keeper's song accepted — a soft B under the
+        // score (a held second against the A-root drones, longing made tonal) + a slow
+        // answering B-bell. The era bed also starts resolving fragments onto B.
+        this._stemGains[6] = drone(123.47, 0.028);   // B2 against the A2 root
+        this._sixth = setInterval(() => {
+          this.pluck(493.88, 0, 0.055, 5.0);
+        }, 12700);
+        break;
+      }
     }
   },
 
@@ -371,11 +400,11 @@ const A = {
     if (withhold) {
       this.pluck(110, 0, 0.5, 9);          // a lone tonic, no answering chord
       this.pluck(220, 0.02, 0.28, 8);
-      for (const n of [1, 2]) {            // the drones you earned fade away
+      for (const n of [1, 2, 6]) {         // the drones you earned fade away (the sixth too)
         const g = this._stemGains?.[n];
         if (g) { g.gain.cancelScheduledValues(t0); g.gain.setTargetAtTime(0.0001, t0 + 0.4, 3.2); }
       }
-      clearInterval(this._arp); clearInterval(this._pulse); clearInterval(this._shimmer);
+      clearInterval(this._arp); clearInterval(this._pulse); clearInterval(this._shimmer); clearInterval(this._sixth);
       // a single falling figure into the quiet — descent, not crown
       this.pluck(329.63, 1.3, 0.18, 6);
       this.pluck(261.63, 3.1, 0.16, 7);
@@ -407,6 +436,10 @@ const A = {
       this.pluck(1760, 2.2, 0.06, 6);
       this.pluck(2093, 2.5, 0.05, 6);
       this.pluck(2637, 2.9, 0.04, 6);
+    }
+    if (has(6)) {                                  // the sixth note answers too (#49):
+      this.pluck(493.88, 1.0, 0.2, 7);             // the song he could not finish, in the crown
+      this.pluck(987.77, 2.7, 0.06, 6);
     }
     // the rising tail — for the bell's own long farewell
     this.pluck(329.63, 1.8, 0.3, 7);
@@ -577,6 +610,11 @@ const A = {
       }
       this._bedNote(f, when, 0.10 - depth * 0.012, 5.5 + depth * 0.8);
       when += 1.6 + Math.random() * 1.4 + depth * 0.5;
+    }
+    // #49: once the keeper's song has been accepted (stem 6), the island's own music
+    // carries the sixth — fragments sometimes resolve onto the B the pentatonic never had
+    if (this.stems.includes(6) && Math.random() < 0.35) {
+      this._bedNote(493.88 * T, when, 0.075 - depth * 0.01, 6.5);
     }
   },
   _bedTick() {

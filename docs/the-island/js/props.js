@@ -13,7 +13,7 @@ import { applyRelief, getTexture } from './assets.js';
 
 export const GLYPHS = 8;
 export const GLYPH_CODE = [3, 7, 1, 5];
-export const STONE_NOTES = [261.63, 293.66, 329.63, 392.0, 440.0]; // C4 D4 E4 G4 A4
+export const STONE_NOTES = [261.63, 293.66, 329.63, 392.0, 440.0, 493.88]; // C4 D4 E4 G4 A4 — and B4, the fallen sixth (#49; never in BOX/BIRD)
 export const BOX_MELODY = [2, 3, 4, 1, 0];   // stone indices: E G A D C
 export const BIRD_MELODY = [2, 3, 4, 3, 0];  // E G A G C — the bird corrects one note
 
@@ -124,6 +124,29 @@ function radialGlowTex() {
   x.fillStyle = g; x.fillRect(0, 0, 64, 64);
   _glowTex = new THREE.CanvasTexture(c);
   return _glowTex;
+}
+
+// the keeper's stoppered phial (#49 tide-pool round trip) — a corked glass tube with a
+// rolled note inside, built twice: floating in the flooded high pool at L4 (poolPhial)
+// and lying dried-out on the chart table after the return (phialDesk). Lies on its side.
+function phialProp(name) {
+  const p = new THREE.Group();
+  p.name = name;
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.045, 0.045, 0.17, 8),
+    new THREE.MeshStandardMaterial({ color: 0xbfd8d4, transparent: true, opacity: 0.42, roughness: 0.1, metalness: 0 }));
+  p.add(body);
+  const note = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.026, 0.026, 0.13, 6),
+    new THREE.MeshStandardMaterial({ color: 0xd8cbb0, roughness: 0.95 }));
+  p.add(note);
+  const cork = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.03, 0.034, 0.045, 6),
+    new THREE.MeshStandardMaterial({ color: 0x8a6b4a, roughness: 0.9 }));
+  cork.position.y = 0.1;
+  p.add(cork);
+  p.rotation.z = Math.PI / 2 - 0.06;   // afloat / at rest on its side
+  return p;
 }
 
 // =============================================================================
@@ -730,6 +753,17 @@ export function buildWorld() {
     mk.name = 'lensMarkStudy';
     core.add(mk);
   }
+  // the phial from the high pool, set out to dry on the chart table's west margin after
+  // the climb back out (#49 round trip) — appears once its sodden note has dried
+  // (W.flags.phialDried, driven in puzzles _apply); click to finally read what he sealed.
+  {
+    const dp = phialProp('phialDesk');
+    dp.position.set(LH.x - 1.40, LH.y + 1.02, LH.z + 0.18);
+    dp.rotation.y = 0.5;
+    dp.visible = false;
+    core.add(dp);
+  }
+
   // the model sits here (filled in later with the clone)
   const modelAnchor = new THREE.Group();
   modelAnchor.name = 'modelAnchor';
@@ -1572,6 +1606,62 @@ export function buildWorld() {
       }
     }
 
+    // THE SIXTH STONE (#49 chain: the hidden sixth note) — fallen, lying face-down at the
+    // arc's south edge, half-buried in the pad. The five standing stones hum C D E G A; this
+    // one knocks dead — its note has "gone somewhere below the tide line" — until the L2
+    // Tide-Figure has been WITNESSED (it lays a single B across the water; the water carries
+    // it home). Then the fallen stone hums B (STONE_NOTES[5]) and its glyph surfaces, and the
+    // keeper's own refused song (E G A D C) can finally finish on it. Same taper-box recipe
+    // as the standing five so it reads as kin; clones to the 1:240 model like the rest.
+    {
+      // east edge of the arc (100°), continuing the circle past stone4 — clear of the
+      // drain chamber under the pad's south (its walkable box ends at x≈136) and of the
+      // reading-glass islet scatter to the north-east
+      const fa = deg(100);
+      const fx = SC.x + Math.sin(fa) * 6.5, fz = SC.z + Math.cos(fa) * 6.5;
+      const h = 3.1;
+      const g = new THREE.BoxGeometry(1.1, h, 0.7);
+      const pa = g.attributes.position;
+      for (let v = 0; v < pa.count; v++) {
+        if (pa.getY(v) > 0) {
+          pa.setX(v, pa.getX(v) * 0.6);
+          pa.setZ(v, pa.getZ(v) * 0.7);
+          pa.setY(v, pa.getY(v) + (r() - 0.5) * 0.2);
+        }
+      }
+      g.computeVertexNormals();
+      const cols = new Float32Array(pa.count * 3);
+      // a shade darker and mossier than the standing five — it fell long ago
+      const cBase = vary(C.stoneOld, r, 0.02, 0.05, 0.06).multiplyScalar(0.82);
+      for (let v = 0; v < pa.count; v++) {
+        const t = (pa.getY(v) / h) + 0.5;
+        const cc = cBase.clone().lerp(C.bone, t * 0.25);
+        cols[v * 3] = cc.r; cols[v * 3 + 1] = cc.g; cols[v * 3 + 2] = cc.b;
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      const m = new THREE.Mesh(g, matStone);
+      // lying on its side, crown pointing out of the arc, sunk into the pad
+      m.position.set(fx, heightAt(fx, fz) + 0.34, fz);
+      m.rotation.set(0, fa + Math.PI + 0.3, Math.PI / 2 - 0.12);
+      m.castShadow = true;
+      m.name = 'stone5';
+      addCollider(fx, fz, 0.9);
+      stonesGroup.add(m);
+      const shell = new THREE.Mesh(g.clone(), new THREE.MeshBasicMaterial({
+        color: 0x58f2c2, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false,
+      }));
+      shell.scale.setScalar(1.06);
+      shell.name = 'stoneGlow5';
+      m.add(shell);
+      // its glyph (the unused sixth figure) — hidden until the note comes home
+      // (opacity driven in puzzles _apply off W.flags.tideFigureSeen)
+      const gl = glyphSprite(atlas, 6, 0x9adfca, 0.78);
+      gl.position.set(0, 0.4, 0.42);
+      gl.material.opacity = 0;
+      gl.name = 'stoneMark5';
+      m.add(gl);
+    }
+
     // the song bird, visible at dawn, perched on stone 2
     const bird = new THREE.Group();
     bird.name = 'songBird';
@@ -1979,6 +2069,27 @@ export function buildWorld() {
     core.add(gp);
   }
 
+  // =================== THE HALL GLYPHS (#49: the beam turned to face the deep) =========
+  // The cot-journal's deep page promises it: "Tomorrow I will turn it to face the deep."
+  // Aim the beam at the drowned hall and — ONLY at L3, when the risen capitals break the
+  // surface to catch the light — the same four figures the keeper wrote on the cliff hang
+  // in the beam over the seaward aisle. Readable from the L3 shoreline ridge (~25 m north;
+  // sightline probed clear). A second, non-linear route to the hatch code. Visibility is
+  // driven in puzzles tick (hallLit: lamp + aim + level 3); pruned from the model clone
+  // (its parent colonnade is pruned too — the glyphs must not float over nothing).
+  {
+    const hp = new THREE.Group();
+    hp.name = 'hallGlyphs';
+    hp.visible = false;
+    const XS = [-2, 2, 6, 10];                 // spread ACROSS the hall's width — the ridge reads
+    for (let i = 0; i < 4; i++) {              // them as a row; collinear-with-the-aisle they stack
+      const gl = glyphSprite(atlas, GLYPH_CODE[i], 0xffe2a8, 3.6);
+      gl.position.set(XS[i], 4.9, -111);       // above the risen lintel line, mid-hall
+      hp.add(gl);                               // default plane faces +z — toward the north ridge
+    }
+    core.add(hp);
+  }
+
   // =================== VEGETATION ===========================================
   buildVegetation(core, r);
 
@@ -2035,6 +2146,67 @@ export function buildWorld() {
     const wx = 24, wz = -88;
     wfig.position.set(wx, heightAt(wx, wz), wz);
     core.add(wfig);
+  }
+
+  // =================== THE HIGH POOL (#49: the tide-pool round trip) ==================
+  // A dry stone pool perched ABOVE the sea on the beach→study walk (ground ~3.6 m), a
+  // brass-stoppered phial glinting unreachable in its floor crack. The SEA-STRATA
+  // inversion IS the puzzle: descending RAISES the sea — only at L4 (+3.78) does water
+  // find the basin (floor 3.42) and float the phial free. Carried up, it dries on the
+  // chart table and reads at the surface: see → take (bottom) → read (surface).
+  // Rocks + basin bake into staticStone (0 new draws); only the driven bits are named.
+  {
+    const PX = -75.5, PZ = -77.0;
+    const FLOOR = 3.42;                       // basin floor: below L4 water, above L3's
+    // the basin bowl — a squat ring wall + floor disc, sunk so the rocks seat the rim
+    // (the wall stays low: its bare top edge read as a floating arc in the first pass)
+    const wall = new THREE.CylinderGeometry(1.12, 1.3, 0.4, 12, 1, true);
+    stone.add(wall, place(PX, FLOOR + 0.12, PZ), grad(C.stoneOld, C.boneDark));
+    wall.dispose();
+    // sun-bleached dry floor — a pale basin that catches light, not a dark hole
+    const floor = new THREE.CylinderGeometry(1.12, 1.12, 0.08, 12);
+    stone.add(floor, place(PX, FLOOR, PZ), grad(C.bone, C.boneDark));
+    floor.dispose();
+    // weathered rim rocks, a closed ring leaning outward — the pool the sea abandoned
+    const pr = mulberry32(SEED ^ 0x9001);
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * TAU + pr() * 0.35;
+      const rx = PX + Math.sin(a) * 1.38, rz = PZ + Math.cos(a) * 1.38;
+      const rock = new THREE.IcosahedronGeometry(0.36 + pr() * 0.2, 1);
+      stone.add(rock, place(rx, heightAt(rx, rz) + 0.16, rz, pr() * TAU, 1, 0.75 + pr() * 0.4, 1), grad(C.stoneOld, C.bone));
+      rock.dispose();
+    }
+    addCollider(PX, PZ - 1.4, 0.5);           // solid enough to lean on, open on the south side
+    addCollider(PX - 1.4, PZ, 0.5);
+    addCollider(PX + 1.4, PZ, 0.5);
+    // the water that only the descent brings — y snaps to the live waterline in _apply,
+    // shown only when the sea stands above the basin floor (L4)
+    const pw = new THREE.Mesh(new THREE.CircleGeometry(1.1, 18),
+      new THREE.MeshBasicMaterial({ color: 0x2a6a72, transparent: true, opacity: 0.78, depthWrite: false }));
+    pw.rotation.x = -Math.PI / 2;
+    pw.position.set(PX, FLOOR + 0.1, PZ);
+    pw.name = 'poolWater';
+    pw.visible = false;
+    core.add(pw);
+    // the glint in the crack (L1–L3): the phial seen but not reached — brass catching light
+    const glint = new THREE.Group();
+    glint.name = 'poolGlint';
+    const gb = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 5),
+      new THREE.MeshStandardMaterial({ color: 0xd8b25a, emissive: 0xffc36b, emissiveIntensity: 1.6, roughness: 0.3, metalness: 0.8 }));
+    glint.add(gb);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: radialGlowTex(), color: 0xffd9a0, transparent: true, opacity: 0.55,
+      blending: THREE.AdditiveBlending, depthWrite: false }));
+    halo.scale.setScalar(0.7);
+    glint.add(halo);
+    glint.position.set(PX + 0.35, FLOOR + 0.12, PZ - 0.45);   // far half of the floor — in view
+    // from the open south approach (the near half hides behind the front rim rocks)
+    core.add(glint);
+    // the phial afloat (L4 only): the raised sea lifts it within reach
+    const phial = phialProp('poolPhial');
+    phial.position.set(PX + 0.2, FLOOR + 0.3, PZ - 0.15);
+    phial.visible = false;
+    core.add(phial);
   }
 
   // ---------- merge static bakers ----------
@@ -2546,7 +2718,7 @@ function buildVegetation(core, r) {
 // shows — pruned from the model clone to save draw calls (perf, loop #49). Each is
 // confirmed decorative / island-only-driven: gallery+jetty are exterior repeats,
 // quarters is interior furniture, vaultDrips is driven off the island ref only.
-const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain']);
+const MODEL_PRUNE = new Set(['drownedGallery', 'jetty', 'quarters', 'vaultDrips', 'vaultVista', 'watcher', 'region2', 'region3', 'region4', 'stairFoot', 'galleryHatch', 'stairRope', 'drain', 'hallGlyphs']);
 
 export function instantiateModel(core, modelAnchor) {
   const modelRoot = core.clone(true);
@@ -2636,6 +2808,8 @@ const NAMES = [
   'stone0', 'stone1', 'stone2', 'stone3', 'stone4',
   'stoneGlow0', 'stoneGlow1', 'stoneGlow2', 'stoneGlow3', 'stoneGlow4',
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
+  'stone5', 'stoneGlow5', 'stoneMark5',                                   // the fallen sixth stone (#49: the hidden sixth note)
+  'poolWater', 'poolPhial', 'poolGlint', 'phialDesk', 'hallGlyphs',       // #49: the high-pool round trip + the beam turned to the deep
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];

@@ -176,6 +176,18 @@ export const LORE = {
     journal: 'Hair-fine letters on a standing stone, shown only by the glass: “We each think we are the one who went down. We are each also the light left lit. Hold both, and climb.”',
     journalDeep: 'Below the hair-fine letters, fainter, read with the glass from the deep: count the scratches — each is someone who stood here, went down, and climbed back up far enough to add a mark and leave the glass for the next. “You think your grief is the deepest and the first. It is neither. The way down is worn smooth by everyone who climbed back. Add your mark. Leave the glass. Climb.”',
   },
+  // sealed in the high pool's phial (#49 round trip) — found glinting in the DRY pool at the
+  // surface, floated free only at the bottom (the risen sea reaches the basin at last), dried
+  // and read back at the surface study. A letter addressed to the SEA itself: the reader's
+  // arrival condition (water this high = the bottom) is baked into the fiction.
+  pool_phial: {
+    kind: 'letter', hand: 'keeper', title: 'A note sealed in a phial, dried and unrolled',
+    pages: [
+      'To the sea — because you will arrive; everything I keep comes to you in the end. I found this pool already old when I came: your work, from some year when you stood higher than anyone now believes. Then you drew back and left it to the gulls, the way you leave everything you take. I am sealing this against the day you climb back up for it.',
+      'When you stand this high again, it will mean the island is nearly done, and so am I. So here is the one thing I ask, set down while my hand is still dry: whoever fishes this out of your risen water — let them up. They will have come down a long way to be standing there. Carry them back to the surface the way you carry everything else you finally return. That is all. Keep the rest.\n\n— the keeper of the light above you',
+    ],
+    journal: 'The dried note from the phial is a letter to the SEA, sealed against the day it rose high enough to take it. He asked it one thing: that whoever fishes the phial from the risen water be let back up — carried to the surface “the way you carry everything else you finally return.”',
+  },
   // folded into the music box on the study shelf — ties the box/bird puzzle (the fourth note he
   // bends DOWN where the bird bends it UP) to his grief: the thing he could never do, that you do.
   music_note: {
@@ -265,4 +277,13 @@ export const SKETCHES = [
   ['Hair-fine letters on a standing stone', S('<path d="M38 36V13c0-4 3-6 8-6s8 2 8 6v23z"/><path d="M42 17h8M42 20h8M42 23h6" opacity=".18"/><circle cx="60" cy="24" r="6"/><path d="M64 28l9 7" opacity=".8"/>')],
   ['bends it down where the bird bends it up', S('<rect x="12" y="24" width="20" height="10" rx="2"/><circle cx="46" cy="18" r="2"/><circle cx="54" cy="15" r="2"/><circle cx="62" cy="12" r="2"/><circle cx="70" cy="22" r="2" opacity=".55"/><path d="M70 18q3-6 0-10" opacity=".4"/><circle cx="80" cy="9" r="2"/><path d="M84 6q4-2 6 1" opacity=".5"/>')],
   ['shut fast', S('<rect x="36" y="8" width="24" height="28" rx="1"/><path d="M40 14h16M40 22h16M40 30h16" opacity=".4"/><circle cx="55" cy="23" r="1.6"/><path d="M55 23v4" opacity=".7"/><path d="M30 36h36" opacity=".45"/>')],
+  // #49 — the three optional chains (the high pool, the beam to the deep, the sixth note).
+  ['sixth stone lies fallen', S('<path d="M20 32V16M30 32V13M40 32V15M50 32V12M60 32V14" opacity=".8"/><rect x="66" y="27" width="19" height="6" rx="2" transform="rotate(-9 75 30)"/><path d="M12 34h74" opacity=".35"/>')],
+  ['fallen stone has its note back', S('<rect x="30" y="26" width="20" height="6" rx="2" transform="rotate(-9 40 29)"/><path d="M56 24q5-5 0-11M63 27q9-8 0-19" opacity=".55"/><circle cx="72" cy="12" r="2.2"/><path d="M74 12V5l4 1" opacity=".7"/><path d="M12 35h72" opacity=".35"/>')],
+  ['played his song at the stones', S('<circle cx="18" cy="20" r="2"/><circle cx="29" cy="16" r="2"/><circle cx="40" cy="13" r="2"/><circle cx="51" cy="24" r="2"/><circle cx="62" cy="27" r="2"/><circle cx="78" cy="32" r="2.4"/><path d="M72 32h12" opacity=".5"/><path d="M18 18V8l4 1M78 30V20l4 1" opacity=".4"/>')],
+  ['dry stone pool the sea abandoned', S('<ellipse cx="48" cy="24" rx="22" ry="8"/><ellipse cx="48" cy="24" rx="15" ry="5" opacity=".5"/><path d="M44 27l3 2" opacity=".8"/><path d="M46 26l4 4M50 26l-4 4" opacity=".9"/><path d="M10 36q10-4 20 0M66 36q10-4 20 0" opacity=".3"/>')],
+  ['abandoned pool is full', S('<ellipse cx="48" cy="24" rx="22" ry="8"/><path d="M30 24q9 4 18 0t18 0" opacity=".7"/><g transform="rotate(-8 48 21)"><path d="M42 21h9M42 19v4M51 19v4" opacity=".9"/></g><path d="M8 12q10-4 20 0M68 12q10-4 20 0" opacity=".35"/>')],
+  ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
+  ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
+  ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
 ];
