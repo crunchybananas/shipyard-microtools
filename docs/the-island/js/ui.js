@@ -180,6 +180,13 @@ export const UI = {
   cinematic(on) { this.letterbox.classList.toggle('on', on); },
 
   showHint() {
+    // #60: a phone is not a keyboard — on coarse pointers the hint teaches the touch
+    // grammar instead of naming keys the visitor does not have
+    try {
+      if (matchMedia('(pointer: coarse)').matches) {
+        this.hint.innerHTML = 'drag to look &middot; <b>hold</b> to walk &middot; tap to touch the world';
+      }
+    } catch (_) {}
     this.hint.classList.add('show');
     setTimeout(() => this.hint.classList.remove('show'), 9000);
     this.journalTab.classList.add('show');

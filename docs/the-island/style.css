@@ -102,6 +102,11 @@ html, body {
   white-space: nowrap;
 }
 #hotlabel.show { opacity: 0.88; }
+/* #60: fingers have no cursor — the iris, its chevrons, and the dwell caption are
+   mouse furniture; on coarse pointers the tap itself is the whole gesture */
+@media (pointer: coarse) {
+  #iris, #hotlabel { display: none; }
+}
 
 /* ---------- title ---------- */
 #title-screen {

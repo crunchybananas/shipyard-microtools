@@ -12,6 +12,29 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 11 — 2026-07-31 — #60: the island answers to touch
+
+**Shipped:** phones were stranded at spawn (movement was WASD-only; the hint named keys a
+visitor doesn't have). Now the island speaks touch natively, no joystick chrome:
+- **hold to walk** — press and hold ~260ms and you stride toward wherever you steer; the
+  SAME finger drags to look mid-stride (hold-and-steer as one gesture). Release stops. A
+  decisive early swipe cancels the hold and stays a look.
+- **tap to touch the world** — a touch has no hover history, so pointerdown raycasts at
+  the tap point before the click/drag branches run: single-tap interacts, and a touch-drag
+  that lands on the crank TURNS it (the two-touch plate stays two taps, as designed).
+- **the mouse furniture retires on coarse pointers** — iris, chevrons, and dwell caption
+  are hidden; the hint teaches the touch grammar ("drag to look · hold to walk · tap to
+  touch the world"); the journal/sound/motion tabs were already touch buttons.
+
+**Evidence (CDP touch dispatch):** hold walks 4.2m and stops clean on release; swipes look
+without walking; a tap on the valve turns it; a touch-drag on the crank moves the sun 0.24h;
+phone viewport (390×844) renders beautifully with the coarse hint + hidden iris; 0 errors.
+Keyboard path untouched (the walk gate re-ran green in fire 10's form). **Closes #60.**
+
+**Next tick suggestion:** #63 spatialize the one-shots — the cries and bells deserve bearings.
+
+---
+
 ## loop-fire 10 — 2026-07-31 — #57 labels + THE FULL-GAME WALK — and the batch push
 
 **Shipped (#57):** the ~30 authored hotspot labels finally render — rest the iris on a

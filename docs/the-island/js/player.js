@@ -31,6 +31,15 @@ export class Player {
     dom.addEventListener('pointerdown', (e) => {
       if (this.locked || this.dragCaptured) return;
       this._drag = { x: e.clientX, y: e.clientY, moved: 0 };
+      // #60 hold-to-walk: on touch, press and HOLD (without swiping off) walks forward
+      // toward wherever you steer — the same finger drags to look mid-stride. A quick
+      // tap stays a tap (interactions), a swipe stays a look. Keyboard is untouched.
+      if (e.pointerType === 'touch') {
+        clearTimeout(this._holdTimer);
+        this._holdTimer = setTimeout(() => {
+          if (this._drag && !this.dragCaptured && !this.locked) this.touchWalk = true;
+        }, 260);
+      }
     });
     window.addEventListener('pointermove', (e) => {
       if (!this._drag || this.locked || this.dragCaptured) return;
@@ -39,8 +48,19 @@ export class Player {
       this._drag.moved += Math.abs(dx) + Math.abs(dy);
       this.yaw -= dx * 0.0036;
       this.pitch = clamp(this.pitch - dy * 0.0030, -1.45, 1.45);
+      // a decisive swipe before the hold lands is a LOOK, not a walk
+      if (this._drag.moved > 26 && !this.touchWalk) { clearTimeout(this._holdTimer); }
     });
-    window.addEventListener('pointerup', () => { this._drag = null; });
+    window.addEventListener('pointerup', () => {
+      this._drag = null;
+      clearTimeout(this._holdTimer);
+      this.touchWalk = false;
+    });
+    window.addEventListener('pointercancel', () => {
+      this._drag = null;
+      clearTimeout(this._holdTimer);
+      this.touchWalk = false;
+    });
 
     window.addEventListener('keydown', (e) => {
       if (e.repeat) return;
@@ -76,7 +96,7 @@ export class Player {
     if (this.locked) return;
 
     const k = this.keys;
-    const fwd = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
+    const fwd = (k.has('KeyW') || k.has('ArrowUp') || this.touchWalk ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
     const strafe = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
     const run = k.has('ShiftLeft') || k.has('ShiftRight');
     const speed = run ? 7.0 : 4.0;

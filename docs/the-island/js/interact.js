@@ -43,6 +43,15 @@ export class Interactions {
     dom.addEventListener('pointerdown', (e) => {
       if (!this.enabled) return;
       this._hideLabel();   // the hand is acting now; the caption yields
+      // #60: a touch has no hover history — raycast at the tap point NOW, so a single
+      // tap interacts and a touch-drag on the crank turns it (the branches below then
+      // see the freshly-set hover exactly as a mouse would)
+      if (e.pointerType === 'touch') {
+        this.mousePx.x = e.clientX; this.mousePx.y = e.clientY;
+        this.mouse.x = (e.clientX / innerWidth) * 2 - 1;
+        this.mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+        this.update();
+      }
       if (this.hovered && this.hovered.type === 'drag') {
         this.activeDrag = { spot: this.hovered };
         this.player.dragCaptured = true;
