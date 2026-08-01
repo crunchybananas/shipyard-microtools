@@ -511,6 +511,18 @@ html, body {
 #debug-panel #dbg-state-1.raised { color: #f0c674; }
 #debug-panel #dbg-state-2.dim { color: #7c8a96; }
 #debug-panel #dbg-hdr { font-size: 10px; display: flex; align-items: center; }
+/* the field report chip (debug-together): always visible at the panel's brow */
+#dbg-report {
+  margin-left: auto;
+  font: inherit; font-size: 10px;
+  color: var(--amber);
+  background: rgba(255, 180, 84, 0.08);
+  border: 1px solid rgba(255, 180, 84, 0.5);
+  border-radius: 4px;
+  padding: 2px 7px;
+  cursor: pointer;
+}
+#dbg-report:hover { background: rgba(255, 180, 84, 0.2); }
 #debug-panel #dbg-hide { cursor: pointer; color: #bfe6d4; padding: 1px 5px; border: 1px solid #2e3a46; border-radius: 4px; }
 #debug-panel #dbg-hide:hover { background: #28384a; }
 #debug-panel .dim { color: #6a7782; }

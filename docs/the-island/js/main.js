@@ -1478,6 +1478,63 @@ player.onFootstep = (kind, pos) => {
       w.position.set(wx, heightAt(wx, wz) || 0, wz); game._watcherRegard = 0;
       return { level: W.level, at: [+wx.toFixed(1), +wz.toFixed(1)] };
     },
+    // --- THE FIELD REPORT (debug-together, owner request 2026-08-01) ---
+    // One click captures WHAT YOU SEE: exact pose, mode, the full save payload, perf
+    // numbers — copied to the clipboard, downloaded as JSON (with a screenshot inside),
+    // and kept in a localStorage ring (abyme-reports, last 10) so an agent driving the
+    // same browser can read reports directly. applyReport() restores the whole thing:
+    // paste a report and stand exactly where the reporter stood, seeing what they saw.
+    report: (note = '', withShot = true) => {
+      save(player);
+      let shot = null;
+      if (withShot) {
+        try {
+          if (bloomPass.enabled) composer.render(); else renderer.render(scene, camera);   // no preserveDrawingBuffer: render in the same frame
+          shot = renderer.domElement.toDataURL('image/jpeg', 0.7);
+        } catch (e) { shot = null; }
+      }
+      const rep = {
+        v: 1, t: new Date().toISOString(), note,
+        pos: [player.pos.x, player.pos.y, player.pos.z].map((n) => +n.toFixed(2)),
+        yaw: +player.yaw.toFixed(3), pitch: +player.pitch.toFixed(3),
+        mode: MODE,
+        state: window.ABYME.state(),
+        perf: { fps: +fps.toFixed(0), draws: renderer.info.render.calls, tris: renderer.info.render.triangles,
+          gpuMs: gpuTimer ? +gpuTimer.ms.toFixed(1) : null, dpr: renderer.getPixelRatio() },
+        ua: navigator.userAgent,
+        save: JSON.parse(localStorage.getItem('abyme-save-v1') || 'null'),
+      };
+      const lean = JSON.stringify(rep);                     // the paste-to-chat blob (no screenshot)
+      try { navigator.clipboard?.writeText(lean); } catch (e) {}
+      try {
+        const ring = JSON.parse(localStorage.getItem('abyme-reports') || '[]');
+        ring.push(rep); while (ring.length > 10) ring.shift();
+        localStorage.setItem('abyme-reports', JSON.stringify(ring));
+      } catch (e) {}
+      try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify({ ...rep, shot }, null, 1)], { type: 'application/json' }));
+        a.download = `abyme-report-${rep.t.replace(/[:.]/g, '-')}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      } catch (e) {}
+      UI.whisper('Field report taken — copied, downloaded, and remembered.');
+      return rep;
+    },
+    applyReport: (rep) => {                              // stand where the reporter stood
+      if (typeof rep === 'string') rep = JSON.parse(rep);
+      if (rep.save) {
+        localStorage.setItem('abyme-save-v1', JSON.stringify(rep.save));
+        if (load()) {
+          const STEM_FLAGS = { 1: 'valveTurned', 2: 'rulerPlaced', 3: 'birdSolved', 4: 'hatchOpen', 5: 'glyphsSeen', 6: 'keeperSong' };
+          for (const [n, f] of Object.entries(STEM_FLAGS)) if (W.flags[f]) A.addStem(+n);
+        }
+      }
+      if (rep.pos) player.spawn(new THREE.Vector3(rep.pos[0], 0, rep.pos[2]), rep.yaw ?? 0, rep.pitch ?? 0);
+      player.locked = false; interact.enabled = true; MODE = 'play';
+      return { at: rep.pos, level: W.level, note: rep.note || '' };
+    },
+    reports: () => JSON.parse(localStorage.getItem('abyme-reports') || '[]'),
     resetFlags: () => {                                 // in-world soft reset (no reload) for replaying chains
       Object.keys(W.flags).forEach((k) => { W.flags[k] = false; });
       W.level = 1; W.tide = W.tideTarget = 1; W.stems = 0;
@@ -1632,7 +1689,7 @@ function buildDebugPanel() {
   const el = document.createElement('div');
   el.id = 'debug-panel';
   el.innerHTML = `
-    <div id="dbg-hdr"><span id="dbg-hide" title="Hide the panel — backtick (\`) toggles it back">▾ hide</span><span class="dim"> · press \` to toggle</span></div>
+    <div id="dbg-hdr"><span id="dbg-hide" title="Hide the panel — backtick (\`) toggles it back">▾ hide</span><span class="dim"> · press \` to toggle</span><button id="dbg-report" title="Capture pose + full game state + a screenshot: copied to clipboard, downloaded, remembered (F8 works anywhere)">⚑ field report</button></div>
     <div id="dbg-state-1"></div><div id="dbg-state-2"></div>
     <label class="dbg-sl">time <input type="range" id="dbg-time" min="0" max="24" step="0.05" title="Sun clock 0–24h"><span id="dbg-time-v"></span></label>
     <label class="dbg-sl">tide <input type="range" id="dbg-tide" min="0" max="2" step="0.05" title="Sea level — 0 drained · 1 high · 2 fully raised (>1 = raised strata sea)"><span id="dbg-tide-v"></span></label>
@@ -1645,7 +1702,10 @@ function buildDebugPanel() {
   if (hideBtn) hideBtn.addEventListener('click', () => { el.style.display = 'none'; });
   addEventListener('keydown', (e) => {
     if (e.code === 'Backquote') { e.preventDefault(); el.style.display = (el.style.display === 'none') ? '' : 'none'; }
+    // the field report works from ANYWHERE, panel open or not (debug-together)
+    if (e.code === 'F8') { e.preventDefault(); A.report(prompt('field report — what did you see? (one line)') || ''); }
   });
+  el.querySelector('#dbg-report')?.addEventListener('click', () => A.report(prompt('field report — what did you see? (one line)') || ''));
   const tslider = el.querySelector('#dbg-time'); tslider.value = W.time;
   tslider.addEventListener('input', () => { W.time = parseFloat(tslider.value); });
   const dslider = el.querySelector('#dbg-tide'); dslider.value = W.tide;
