@@ -114,7 +114,11 @@ const composer = new EffectComposer(renderer);
 composer.setPixelRatio(BASE_DPR);
 composer.setSize(innerWidth, innerHeight);
 composer.addPass(new RenderPass(scene, camera));
-const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 0.85); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights
+const bloomPass = new UnrealBloomPass(BLOOM_RES(), 0.68, 0.68, 1.05); // strength, radius, threshold (only bright things bloom) — WOW pass: softer, dreamier glow on the lamp/sun-sparkle/highlights.
+// threshold runs on the LINEAR pre-tonemap buffer: at 0.85 the noon sun on pale brass
+// (the valve wheel — the hub's main interactable) blew past it and the whole prop
+// torched white. 1.05 keeps every intended bloomer (emissives run 1.4-4.5) and returns
+// sunlit brass to brass. (#54 verification catch — pre-existing since the WOW pass.)
 composer.addPass(bloomPass);
 composer.addPass(new OutputPass());
 // Post-processing safety net: some browser/GPU combos render the bloom composer's half-float

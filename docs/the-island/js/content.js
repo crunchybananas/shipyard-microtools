@@ -205,6 +205,23 @@ export const LORE = {
   },
 };
 
+// ---- THE LAMPBLACK MARKS (#54: the reading-glass payoff) -----------------------------
+// The glass promised "writing everywhere" and gated exactly two planes. Now nine more
+// micro-marks hide on the working things of the keeper's life — one line each, found in
+// any order, tallied diegetically in the journal ("the third of his small true things").
+// Words live here; geometry lives in props LAMPBLACK_SITES; gates live in puzzles.
+export const LAMPBLACK = [
+  { id: 'lmValve', place: 'the brass valve',                      line: 'The sea always minded the wheel. It never once minded me.' },
+  { id: 'lmBox',   place: 'the music box',                       line: 'Wound it again. The wrong note is the only part that sounds like me.' },
+  { id: 'lmChest', place: 'the half-buried chest',               line: 'A chest keeps what you can bear to close. The rest you carry.' },
+  { id: 'lmDory',  place: 'the dory’s hull',                     line: 'One oar is enough for leaving. It was never enough for following.' },
+  { id: 'lmJetty', place: 'the jetty lantern post',              line: 'Lit for whoever rows in. Lately I light it so the water has something to hold.' },
+  { id: 'lmStair', place: 'the stair to the lamp',               line: 'Ten thousand times up. The light never once came down to meet me. That is what keeping is.' },
+  { id: 'lmBell',  place: 'the small bright bell',               line: 'A bell is a wound given a use.' },
+  { id: 'lmBuoy',  place: 'the listing bell-buoy',               line: 'I moored it over the safe water. The safe water moved. It did not.' },
+  { id: 'lmDrain', place: 'the drain wall, beside the carved line', line: 'And what the tide finds, it returns. That is the mercy nobody warns you of.' },
+];
+
 // The fragments that say MORE the deeper you read them (LORE.deepFrom). Reaching a deep
 // page records the id in W.regions.fragmentsFound and accretes a journalDeep line; reading
 // ALL of them assembles the grief→integration arc (ui.js _renderReader fires the payoff).
@@ -286,4 +303,7 @@ export const SKETCHES = [
   ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
   ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
   ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
+  // #54 — the lampblack tally (one shared sketch for all nine finds) + the completion.
+  ['Lampblack, under the glass — on', S('<circle cx="34" cy="19" r="9"/><path d="M41 26l13 10"/><path d="M30 17h8M30 21h6" opacity=".7"/><path d="M56 14h26M56 19h20M56 24h23" opacity=".2"/>')],
+  ['the last of the lampblack', S('<circle cx="26" cy="18" r="8"/><path d="M32 24l10 9"/><path d="M48 12v6M54 12v6M60 12v6M66 12v6M72 12v6" opacity=".7"/><path d="M48 24v6M54 24v6M60 24v6M66 24v6" opacity=".7"/><path d="M14 37h68" opacity=".3"/>')],
 ];

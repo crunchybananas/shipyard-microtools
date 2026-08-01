@@ -12,6 +12,48 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 8 — 2026-07-31 — #54: the glass pays off — nine lampblack marks (+2 found bugs)
+
+**Shipped:** the reading glass promised "writing everywhere" and gated exactly two planes.
+Now nine micro-marks hide on the working things of the keeper's life — the valve wheel's
+hub, the music box's face, the chest, the dory's hull, the jetty lantern post, the stair
+riser, the bell's lip (annex, L2+), the listing bell-buoy (L3 only, read across the water
+from the cliff — the glass is a glass), and the drain wall beside the carved line ("and
+what the tide finds, it returns"). One line each, found in any order, tallied diegetically
+("the third of his small true things") with a completion beat at nine. Words live in
+content.js LAMPBLACK; geometry is one table-driven pass attaching marks as CHILDREN of
+named anchors (they ride the spinning wheel, the listing buoy, the swinging bell); gates
+in puzzles (glass + per-site level keys). Re-clickable; only the first read tallies.
+
+**Two real bugs found during verification:**
+1. **The hub-Phase-B trio floated off-shore (SHIPPED bug)** — stairFoot, stairRope, and
+   galleryHatch were built with LH-absolute coordinates but parented under lhGroup, which
+   is already at LH: all three rendered at double the offset (~-170, 27, -81) — the
+   lamp-room climb was UNREACHABLE in the live game (the spiral steps bake into core and
+   were fine; only the interactive trio was displaced). Fixed with lhGroup-local coords;
+   the stair mark's world position now verifies at the study foot.
+2. **Noon bloom torched sunlit brass (SHIPPED bug)** — threshold 0.85 on the linear
+   pre-tonemap buffer let the noon sun on pale brass blow past it: the valve wheel (the
+   hub's main interactable) rendered as a white-hot ring. Threshold → 1.05: every intended
+   bloomer (emissives 1.4-4.5) keeps its glow, brass returns to brass. A/B'd 0.95/1.05/1.15
+   at noon-study and night-beam; 1.05 kept the night character best.
+
+**Evidence:** all nine refs + per-site gates assert (glass off → nothing; bell L1/L2; buoy
+L1/L3), 9/9 tally + completion once + no double-tally on re-click, opacity drives to 0.88,
+clone-safe (marks under pruned parents null; core-clone marks sub-mm), 61/61 journal↔sketch
+coverage, #49 chains re-verified green after the changes. Placement screenshots for all
+nine (three rounds of tuning: bell out of the dome radius, jetty onto the post, dory proud
+of the hull, drain clear of the wall corner). Buoy read verified reachable: the connected
+L3 region tops the cliff 2.7m out / ~18m up — camera-to-mark ≈20m < maxDist 30.
+
+**Debt:** none new. **Closes #54.** (#124 updated: with the ruler bridge the bluff and
+study L3 regions merge — the strand is ruler-conditional only.)
+
+**Next tick suggestion:** #52 remainder (L3/L4 micro-puzzle + region4 landmark) — completes
+the per-level content story.
+
+---
+
 ## loop-fire 7 — 2026-07-31 — #64: the day/night cycle is AUDIBLE (crickets, chorus, cries)
 
 **Shipped:** `night` was passed to the audio engine every frame and never read; the dawn-gull

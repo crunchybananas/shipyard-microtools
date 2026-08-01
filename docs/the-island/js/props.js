@@ -668,23 +668,26 @@ export function buildWorld() {
       stone.add(step, place(LH.x + Math.sin(ang) * rad, yy, LH.z + Math.cos(ang) * rad, ang), grad(C.woodDark, C.wood));
       step.dispose();
     }
-    // the FOOT — a bottom step + a brass newel in the study, under the oculus, where you step on
+    // the FOOT — a bottom step + a brass newel in the study, under the oculus, where you step on.
+    // lhGroup is ALREADY positioned at LH, so these three anchors use lhGroup-LOCAL coords —
+    // they were built LH-absolute and rendered at DOUBLE the offset (~-170,27,-81): the whole
+    // hub-Phase-B trio (climb foot, rope gate, descend ring) floated unreachable off-shore.
     const footAng = startAng, footR = 1.95;
-    const fx = LH.x + Math.sin(footAng) * footR, fz = LH.z + Math.cos(footAng) * footR;
-    const foot = new THREE.Group(); foot.name = 'stairFoot'; foot.position.set(fx, LH.y + 0.02, fz);
+    const flx = Math.sin(footAng) * footR, flz = Math.cos(footAng) * footR;
+    const foot = new THREE.Group(); foot.name = 'stairFoot'; foot.position.set(flx, 0.02, flz);
     const fstep = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.16, 0.7), matWood); fstep.position.y = 0.08; foot.add(fstep);
     const newel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 1.15, 8), matBrassSolid); newel.position.set(0.42, 0.6, 0.28); foot.add(newel);
     lhGroup.add(foot);
     // the rope across the foot — the gate; hangs until the lamp is lit (puzzles _apply)
     const rope = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.035, 6, 12, Math.PI), new THREE.MeshStandardMaterial({ color: 0x6b5a3a, roughness: 1 }));
     rope.rotation.x = Math.PI / 2; rope.rotation.z = footAng;
-    rope.position.set(fx, LH.y + 0.95, fz); rope.name = 'stairRope';
+    rope.position.set(flx, 0.95, flz); rope.name = 'stairRope';
     lhGroup.add(rope);
     // the DESCEND point — a brass trap-ring on the gallery, where the stair tops out
     const topAng = startAng + (N - 1) * (2.5 * TAU / N);
     const hatch = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 16), matBrassSolid);
     hatch.rotation.x = Math.PI / 2;
-    hatch.position.set(LH.x + Math.sin(topAng) * 2.0, LH.y + 20.55, LH.z + Math.cos(topAng) * 2.0);
+    hatch.position.set(Math.sin(topAng) * 2.0, 20.55, Math.cos(topAng) * 2.0);
     hatch.name = 'galleryHatch';
     lhGroup.add(hatch);
   }
@@ -2248,6 +2251,33 @@ export function buildWorld() {
   fireflies.material.uniforms.uDrift.value = 1;
   fireflies.name = 'fireflies';
 
+  // ---- the lampblack micro-marks (#54): nine more lines, written small on the working
+  // things of his life. Attached LAST — every anchor exists now — as CHILDREN of named
+  // props so they ride whatever the prop does (the wheel spins, the buoy lists, the bell
+  // swings). Same sepia-ink recipe as the two LORE marks; opacity 0 until the glass is
+  // held (driven in puzzles _apply). Geometry only — words in content.js LAMPBLACK.
+  const LAMPBLACK_SITES = [
+    { id: 'lmValve', anchor: 'valveWheel',   pos: [0, 0, 0.075],        rot: [0, 0, 0],            size: [0.24, 0.075] },
+    { id: 'lmBox',   anchor: 'musicBox',     pos: [0, -0.02, 0.155],    rot: [0, 0, 0],            size: [0.24, 0.07] },
+    { id: 'lmChest', anchor: 'chest',        pos: [0, 0.05, 0.305],     rot: [0, 0, 0],            size: [0.26, 0.08] },
+    { id: 'lmDory',  anchor: 'doryHull',     pos: [-0.62, 0.24, 0.2],   rot: [0, -Math.PI / 2, 0], size: [0.3, 0.1] },
+    { id: 'lmJetty', anchor: 'jettyLantern', pos: [0.57, -1.46, 0.1],   rot: [0, 0, 0],            size: [0.13, 0.07] },  // on the post below the arm
+    { id: 'lmStair', anchor: 'stairFoot',    pos: [0, 0.08, 0.36],      rot: [0, 0, 0],            size: [0.26, 0.08] },  // the bottom step's riser
+    { id: 'lmBell',  anchor: 'bell',         pos: [0, -0.12, -0.38],    rot: [0, Math.PI, 0],      size: [0.2, 0.07] },   // outside the dome radius
+    { id: 'lmBuoy',  anchor: 'bellBuoy',     pos: [0, 0.15, 0.57],      rot: [0, 0, 0],            size: [0.6, 0.2] },
+    { id: 'lmDrain', anchor: 'drainMark',    pos: [-0.2, -0.6, 0.002],  rot: [0, 0, 0],            size: [0.3, 0.1] },    // under the carved line, clear of the wall corner
+  ];
+  for (const s of LAMPBLACK_SITES) {
+    const a = core.getObjectByName(s.anchor);
+    if (!a) continue;
+    const mk = new THREE.Mesh(new THREE.PlaneGeometry(s.size[0], s.size[1]),
+      new THREE.MeshBasicMaterial({ color: 0x6f5630, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+    mk.position.set(...s.pos);
+    mk.rotation.set(...s.rot);
+    mk.name = s.id;
+    a.add(mk);
+  }
+
   return { core, waterMat, modelAnchor, biolume, fireflies, motes: cellarMotes, galleryGlow, l3motes, vaultDrips };
 }
 
@@ -2810,6 +2840,7 @@ const NAMES = [
   'stoneMark0', 'stoneMark1', 'stoneMark2', 'stoneMark3', 'stoneMark4',
   'stone5', 'stoneGlow5', 'stoneMark5',                                   // the fallen sixth stone (#49: the hidden sixth note)
   'poolWater', 'poolPhial', 'poolGlint', 'phialDesk', 'hallGlyphs',       // #49: the high-pool round trip + the beam turned to the deep
+  'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain',   // #54: the lampblack micro-marks
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];

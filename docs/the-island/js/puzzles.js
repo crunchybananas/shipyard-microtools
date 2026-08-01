@@ -10,7 +10,7 @@ import { Interactions } from './interact.js';
 import { UI } from './ui.js';
 import A from './audio.js';
 import { clamp, lerp, lerpAngle, TAU } from './util.js';
-import { KEEPER } from './content.js';
+import { KEEPER, LAMPBLACK } from './content.js';
 
 const GLYPH_CHARS = ['◉', '△', '〜', '꩜', '♆', '☾', '◫', '✦'];
 const LH = new THREE.Vector3(-85, 13.5, -40);
@@ -581,6 +581,39 @@ export class Game {
       when: () => W.flags.readGlass,
       onClick: () => UI.openReader('lens_mark_stone'),
     });
+    // #54 — the lampblack micro-marks: nine one-line finds tallied in the journal.
+    // Re-clickable (the line always whispers again); only the FIRST read tallies.
+    // Level-keyed gates: the bell needs the annex open, the buoy exists only at L3
+    // (region3) and is read across the water — the glass is a glass, after all.
+    const LM_GATES = {
+      lmBell: { when: () => W.level >= 2 || W.flags.returned },
+      lmBuoy: { when: () => W.level === 3, maxDist: 30 },
+    };
+    const LM_ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth'];
+    for (const m of LAMPBLACK) {
+      if (!R[m.id]) continue;
+      const gate = LM_GATES[m.id] || {};
+      I.add({
+        id: m.id, targets: [R[m.id]], label: 'lampblack, written small', maxDist: gate.maxDist ?? 3.2,
+        when: () => W.flags.readGlass && (!gate.when || gate.when()),
+        onClick: () => {
+          A.pluck(1244.5, 0, 0.13, 1.2); A.pluck(1661.2, 0.06, 0.07, 1.5);   // a soft ink-resolve
+          UI.whisper(`In lampblack, small: “${m.line}”`);
+          const key = 'lm_' + m.id;
+          if (W.readKeys.includes(key)) return;
+          W.readKeys.push(key);
+          const n = W.readKeys.filter((k) => k.startsWith('lm_')).length;
+          UI.addJournal(`Lampblack, under the glass — on ${m.place}, the ${LM_ORD[n - 1]} of his small true things: “${m.line}”`, '', 'self');
+          if (n === LAMPBLACK.length) {
+            this.once('lampblackAll', () => {
+              UI.whisper('That is all of them — the small true things, written where only patience would look.');
+              UI.addJournal('I have found the last of the lampblack — nine small true lines hidden on the working things of his life. Read together they are not a confession; they are a man keeping himself company. The big log was for the inspector; these were for whoever held the glass. That is me, now.', '', 'self');
+            });
+          }
+          save(this.player);
+        },
+      });
+    }
   }
 
   _touchStone(i) {
@@ -1086,7 +1119,8 @@ export class Game {
     // marks fade up once you hold it (legible only through the glass). Opacity lerped on the
     // real island; the marks become readable hotspots once visible.
     if (R.readGlass) { R.readGlass.visible = !F.readGlass; R.readGlass.rotation.y = 0.4 + elapsed * 0.5; }
-    for (const id of ['lensMarkStudy', 'lensMarkStone']) {
+    for (const id of ['lensMarkStudy', 'lensMarkStone',
+      'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain']) {   // #54: the nine micro-marks fade with the two LORE marks
       const mk = R[id];
       if (!mk) continue;
       if (!isModel) {
