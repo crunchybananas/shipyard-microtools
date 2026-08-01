@@ -212,6 +212,9 @@ body.title-active #hud,body.title-active #build-bar,body.title-active #missions,
 .build-btn .build-lock{position:absolute;top:3px;right:5px;font-size:0.7rem;opacity:0.85;pointer-events:none}
 .build-btn .terrain{color:var(--food);font-size:0.55rem;display:block;margin-top:0.1rem}
 .build-cat{color:rgba(255,255,255,0.55);font-weight:600;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.12em;writing-mode:vertical-lr;padding:0 0.25rem;display:flex;align-items:center;user-select:none;border-left:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.06);text-shadow:0 1px 2px rgba(0,0,0,0.55)}
+.build-cancel{display:flex;flex:0 0 72px;min-width:72px;min-height:44px;align-self:stretch;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;padding:0.5rem;background:linear-gradient(180deg,rgba(248,113,113,0.16),rgba(248,113,113,0.07));border:1px solid rgba(248,113,113,0.5);border-radius:8px;color:#fecaca;cursor:pointer;font:700 0.68rem/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 6px 16px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.06);touch-action:manipulation}
+.build-cancel:hover,.build-cancel:focus-visible{background:linear-gradient(180deg,rgba(248,113,113,0.24),rgba(248,113,113,0.12));border-color:rgba(254,202,202,0.78);outline:none}
+.build-cancel-icon{font-size:1.3rem;line-height:1}
 
 /* Mission panel */
 #missions{position:fixed;top:3rem;right:0.8rem;width:220px;background:linear-gradient(180deg,rgba(11,14,24,0.86),rgba(10,12,22,0.70));border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.7rem 0.8rem;z-index:10;backdrop-filter:blur(13px);font-size:var(--fs-sm);box-shadow:0 12px 28px rgba(0,0,0,0.24),inset 0 1px 0 rgba(255,255,255,0.06)}
@@ -722,6 +725,7 @@ body.photo-mode #wonder-chip{display:none!important}
   #hud{gap:0.45rem;font-size:0.7rem;padding:0.4rem 0.55rem}
   #day-display,#kingdom-display{display:none}
   .build-btn{min-width:56px;padding:0.35rem 0.45rem;font-size:0.62rem}
+  .build-cancel{min-width:64px;flex-basis:64px}
   .build-btn .icon{font-size:1.1rem}
   .build-sprite{width:36px;height:30px}
   #missions{width:170px;font-size:0.68rem;top:2.5rem;right:0.4rem}
@@ -1094,6 +1098,6 @@ const params = new URLSearchParams(location.search);
 const devTools = params.has('devtools') || params.has('spritelab') || params.has('spritemuster');
 document.body.classList.toggle('devtools', devTools);
 </script>
-<script type="module" src="js/main.js?realm=185"></script>
+<script type="module" src="js/main.js?realm=186"></script>
 </body>
 </html>

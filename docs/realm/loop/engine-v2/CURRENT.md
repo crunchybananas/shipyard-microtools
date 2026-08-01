@@ -4,14 +4,15 @@ Date: 2026-07-19
 
 ## 2026-08-01 focus overlay
 
-The live module revision is now Realm `185`; the Realm 165 figures below remain
+The live module revision is now Realm `186`; the Realm 165 figures below remain
 the last formal engine performance and traffic baseline, not the current module
 revision. Graphics work from 166–184 did not replace the gameplay kernel or
 close the deliberately red crowd/navigation controls. Subsequent movement work
 already present in the current tree now makes both strict traffic gates pass on
 Realm 185 with zero known fixture defects; reproduce and add a fixture for any
 remaining live crowd failure instead of treating the historical red list as
-current behavior.
+current behavior. Realm 186 changes only responsive touch build-mode input and
+its explicit Cancel affordance; it does not change engine ownership or traffic.
 
 The owner has paused production art and returned focus to gameplay, responsive
 UX, movement, and cleanup. Begin with
