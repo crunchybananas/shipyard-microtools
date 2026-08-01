@@ -10,7 +10,7 @@ import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
 const REVISION = contract.moduleRevision;
-assert.equal(REVISION, 183, 'Update this gate\'s literal browser module URLs for the new runtime revision');
+assert.equal(REVISION, 184, 'Update this gate\'s literal browser module URLs for the new runtime revision');
 const SAVE_KEY = contract.saveKey;
 const FAST_FORWARD_DAYS = 200;
 const PRESENTATION_QUEUE_LIMIT = 1_024;
@@ -24,8 +24,8 @@ function sha256(text) {
 // This runs inside the page. It intentionally derives the exclusion surface
 // from STATE_OWNERSHIP instead of maintaining a second hand-written list.
 async function captureAuthoritativeState() {
-  const stateModule = await import('./js/state.js?realm=183');
-  const missionModule = await import('./js/missions.js?realm=183');
+  const stateModule = await import('./js/state.js?realm=184');
+  const missionModule = await import('./js/missions.js?realm=184');
   const g = window.G;
   const collections = [
     ['building', 'buildings'],
@@ -141,7 +141,7 @@ try {
   await page.evaluate(() => window.setSpeed(0));
 
   const fastForward = await page.evaluate(async ({ days }) => {
-    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=183');
+    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=184');
     const g = window.G;
     const tracked = [];
     const peaks = {};
@@ -211,7 +211,7 @@ try {
   });
 
   const saved = await page.evaluate(async ({ saveKey }) => {
-    const save = await import('./js/save.js?realm=183');
+    const save = await import('./js/save.js?realm=184');
     const ok = save.saveGame();
     const raw = localStorage.getItem(saveKey);
     return {
@@ -247,8 +247,8 @@ try {
   // and re-serialization all happen in this one page task. No rAF can slip a
   // simulation tick into the exact serialized-state comparison.
   const continued = await page.evaluate(async ({ saveKey, savedAt }) => {
-    const { serializeGame } = await import('./js/save-state.js?realm=183');
-    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=183');
+    const { serializeGame } = await import('./js/save-state.js?realm=184');
+    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=184');
     const rawBefore = localStorage.getItem(saveKey);
     const expectedState = JSON.stringify(JSON.parse(rawBefore).state);
     window.loadAndStart();
@@ -300,8 +300,8 @@ try {
   });
   const renderAuthorityBefore = await page.evaluate(captureAuthoritativeState);
   const renderPurity = await page.evaluate(async () => {
-    const { serializeGame } = await import('./js/save-state.js?realm=183');
-    const state = await import('./js/state.js?realm=183');
+    const { serializeGame } = await import('./js/save-state.js?realm=184');
+    const state = await import('./js/state.js?realm=184');
     const enemy = window.G.enemies.at(-1);
     const before = JSON.stringify(serializeGame({ savedAt: 0 }).state);
     const tick = window.G.gameTick;
@@ -326,7 +326,7 @@ try {
   assert.equal(renderAuthorityAfter, renderAuthorityBefore, 'paused rendering changed authoritative state');
 
   const victory = await page.evaluate(async () => {
-    const ui = await import('./js/ui.js?realm=183');
+    const ui = await import('./js/ui.js?realm=184');
     window.G.wonder = {
       placed: true,
       stage: 3,

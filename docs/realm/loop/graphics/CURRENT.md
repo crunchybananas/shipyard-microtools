@@ -1,5 +1,57 @@
 # Current Graphics Handoff
 
+## Realm 184 settler production family — 2026-08-01
+
+- All `16` settler rows now come from one deterministic A14 modular family:
+  a young woman wayfarer identity, hearth-indigo frontier clothing, one
+  palette/lighting/root contract, four actions, and four independently
+  compiled directions.
+- The atomic promotion replaced the old mixed settler derivatives. Production
+  remains complete at `224` accepted overrides and `0` candidates, with every
+  settler row under `a14-modular-settler-actions` provenance.
+- A14 keeps image-generation authorities separate from animation: identity
+  parts, hollow garment parts, a four-view pointed hand spade, and the shared
+  cargo crate. Keyed and transparent sources, complete prompts, reference
+  roles and hashes, chroma-removal settings, crop boxes, and SHA-256 hashes are
+  checked in.
+- Visual review caught and rejected an opaque black hood interior before
+  promotion. The accepted source has true transparent face, neck, cuff, and
+  waist openings, and the clean-rebuild verifier now requires a substantial
+  hollow front hood so that regression cannot pass on dimensions alone.
+- The compiler emits `16` reviewable `512x84` rows / `128` frames plus body,
+  identity, garment, equipment, semantic, landmark, quality, palette, and
+  proof artifacts. Exact `27x35`, `35x46`, `54x70`, and `64x84` runtime tiers
+  remain binary-alpha, warning-free, palette-bounded, and byte deterministic.
+- Work reads as civilian earthwork: eight planted beats move the socketed
+  spade through brace, raise, align, drive, press, lever, and recovery while
+  handedness remains stable across all four directions.
+- `settler/carry` joins the eight earlier modular baked-container owners. A6
+  proves `9 roles × 9 resources × 4 directions = 324` production cargo pairs
+  with one frame, destination rectangle, runtime tier, and unsmoothed scale.
+- Browser gates cover every A14 row at exact `3x`, action reset and cadence,
+  an unassigned settler in all four carry directions, food payload alignment,
+  production-only atlas selection, and ordinary-world default-tier rendering.
+
+Validation run:
+
+```sh
+python3 scripts/actor-pose-prototype/a14_settler_actions.py --verify
+python3 scripts/actor-pose-prototype/verify_a14_settler_actions.py
+python3 scripts/actor-pose-prototype/a6_cargo_payloads.py --verify
+node scripts/verify-a6-cargo-payloads.mjs
+scripts/sprite-row verify
+node scripts/build-motion-atlases.mjs
+node scripts/verify-settler-vertical-slice.mjs
+node scripts/verify-guard-cargo-browser.mjs
+node scripts/verify-actor-row-candidate-browser.mjs
+node scripts/verify-realm.mjs
+```
+
+Next target: replace the rancher as the first of the five remaining older
+`71–72px` palette-derived families, then continue through trader, innkeeper,
+scholar, and forager before moving the same source discipline into world art.
+
+
 ## Realm 182 fisher production family — 2026-07-30
 
 - All `16` fisher rows now come from one deterministic A13 modular family:

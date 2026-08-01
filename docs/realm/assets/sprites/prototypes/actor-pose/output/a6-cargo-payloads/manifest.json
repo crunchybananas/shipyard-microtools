@@ -69,10 +69,10 @@
       "sha256": "906210dd38cf102c6d501cee12bd3378385c0afb939889835228a9b584001e34"
     },
     "compiler": {
-      "bytes": 14739,
+      "bytes": 14772,
       "owner": "compiler-source",
       "path": "scripts/actor-pose-prototype/a6_cargo_payloads.py",
-      "sha256": "a549205496ddddfbb721916f8ff2e8c7031782cac25a3b34e767620967394f4c"
+      "sha256": "ba82eaa4ddef833ab3084b46d94b872f8a048064c28d7844aa8b6ae5171e2921"
     },
     "contract": {
       "bytes": 3145,
@@ -921,7 +921,8 @@
       "blacksmith/carry",
       "miner/carry",
       "stonecutter/carry",
-      "fisher/carry"
+      "fisher/carry",
+      "settler/carry"
     ],
     "resources": [
       "wood",

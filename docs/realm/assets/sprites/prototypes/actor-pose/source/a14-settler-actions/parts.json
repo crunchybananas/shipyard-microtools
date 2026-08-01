@@ -1,0 +1,224 @@
+{
+  "schema": "realm.actor-pose.a14-settler-actions.v1",
+  "stage": "settler-four-action-family",
+  "frame": {
+    "width": 64,
+    "height": 84,
+    "beats": 8,
+    "root": [32, 79],
+    "ground_y": 79,
+    "clear_rows": [80, 81, 82, 83],
+    "body_height": 76,
+    "body_height_tolerance": 1
+  },
+  "identity": {
+    "key": "wayfarer",
+    "path": "assets/sprites/prototypes/actor-pose/references/a14-source/identity-wayfarer.png",
+    "sha256": "b9e522f6004141b36b867399d7de9cb525970902d3d7e2493a29298d4be1f0c7",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a14-source/identity-wayfarer-keyed.png",
+      "sha256": "4fc31d9d783fe83ce9dea37e805c66db7b3eecd1e43fa1c853b2cd84e5b87564"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a14-source/identity-wayfarer.prompt.json",
+    "parts": {
+      "down": {
+        "head": [321, 12, 481, 240],
+        "torso": [312, 276, 582, 548],
+        "arm_screen_left": [150, 279, 259, 611],
+        "arm_screen_right": [1187, 279, 1297, 611],
+        "leg": [287, 580, 559, 989]
+      },
+      "up": {
+        "head": [626, 12, 776, 268],
+        "torso": [629, 278, 890, 547],
+        "arm_screen_left": [150, 279, 259, 611],
+        "arm_screen_right": [1187, 279, 1297, 611],
+        "leg": [627, 581, 890, 988]
+      },
+      "left": {
+        "head": [859, 16, 1042, 232],
+        "torso": [946, 269, 1109, 546],
+        "arm": [1187, 279, 1297, 611],
+        "leg": [947, 577, 1103, 988]
+      },
+      "right": {
+        "head": [859, 16, 1042, 232],
+        "torso": [946, 269, 1109, 546],
+        "arm": [1187, 279, 1297, 611],
+        "leg": [947, 577, 1103, 988]
+      }
+    }
+  },
+  "garment": {
+    "key": "hearth-indigo",
+    "path": "assets/sprites/prototypes/actor-pose/references/a14-source/garment-hearth-indigo.png",
+    "sha256": "7b21158db09c4c7078c64a01d506b2171eb5d06789ec4c052987abca2c60d36a",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a14-source/garment-hearth-indigo-keyed.png",
+      "sha256": "fb0b7dad43e3b7e42b8892e0185c5e1775dd488cc5f91f833be11023f2faa098"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a14-source/garment-hearth-indigo.prompt.json",
+    "parts": {
+      "down": {
+        "headgear": [319, 15, 531, 238],
+        "tunic": [275, 239, 590, 581],
+        "sleeve_screen_left": [143, 281, 252, 530],
+        "sleeve_screen_right": [1197, 281, 1303, 530],
+        "belt": [321, 590, 549, 708],
+        "boot": [308, 707, 543, 1008]
+      },
+      "up": {
+        "headgear": [646, 16, 858, 238],
+        "tunic": [600, 240, 901, 581],
+        "sleeve_screen_left": [143, 281, 252, 530],
+        "sleeve_screen_right": [1197, 281, 1303, 530],
+        "belt": [640, 591, 860, 676],
+        "boot": [643, 707, 852, 1006]
+      },
+      "left": {
+        "headgear": [968, 20, 1131, 235],
+        "tunic": [934, 239, 1124, 576],
+        "sleeve": [1197, 281, 1303, 530],
+        "belt": [952, 590, 1118, 709],
+        "boot": [973, 708, 1105, 1005]
+      },
+      "right": {
+        "headgear": [968, 20, 1131, 235],
+        "tunic": [934, 239, 1124, 576],
+        "sleeve": [1197, 281, 1303, 530],
+        "belt": [952, 590, 1118, 709],
+        "boot": [973, 708, 1105, 1005]
+      }
+    }
+  },
+  "attachment": {
+    "key": "cargo-crate",
+    "path": "assets/sprites/prototypes/actor-pose/references/a3-source/cargo-crate.png",
+    "sha256": "7c0f8dc3df33cc43098b843e3d316f6d9e597c1ee0323ac8d00a6b7ced167b0a",
+    "parts": {
+      "down": [170, 169, 666, 602],
+      "up": [829, 180, 1277, 602],
+      "left": [1470, 193, 1766, 601],
+      "right": [1470, 193, 1766, 601]
+    },
+    "render": {
+      "down": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "up": {
+        "size": [19, 14],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "left": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "none",
+        "occlusion": "far-hand < cargo < near-hand"
+      },
+      "right": {
+        "size": [14, 15],
+        "offset": [0, 1],
+        "transform": "flip-x",
+        "occlusion": "far-hand < cargo < near-hand"
+      }
+    }
+  },
+  "tool": {
+    "key": "settler-spade",
+    "path": "assets/sprites/prototypes/actor-pose/references/a14-source/settler-spade.png",
+    "sha256": "942665e4c462d5931673fc35802922de76f4e64ef53d599213e77b2e6b96077c",
+    "generation_source": {
+      "path": "assets/sprites/prototypes/actor-pose/references/a14-source/settler-spade-keyed.png",
+      "sha256": "95fabf604b23244582d0030ac35ee0e21063d1a41cd8d15c31ad31eba768d33c"
+    },
+    "source_prompt": "assets/sprites/prototypes/actor-pose/references/a14-source/settler-spade.prompt.json",
+    "parts": {
+      "down": [163, 45, 368, 979],
+      "up": [515, 45, 720, 979],
+      "left": [861, 45, 964, 978],
+      "right": [1173, 45, 1273, 978]
+    },
+    "authority": {
+      "socket": "right_hand",
+      "source_orientation": "D grip at top, pointed blade at bottom",
+      "grip_fraction_from_top": 0.5,
+      "render_height": 38,
+      "occlusion": "body < spade < near hand",
+      "finished_frame_or_row_mirroring": false
+    }
+  },
+  "pose": {
+    "right_source": {
+      "path": "assets/sprites/prototypes/actor-pose/source/a2-layered2d/pose-spec.json",
+      "sha256": "143ef962ea5fd7d10cb66b41b667ccf0a4cb213578356badeda8398c6f21a656"
+    },
+    "directions": {
+      "right": "approved A2 joint chain and right-view source components",
+      "left": "joint-space x reflection of the A2 chain, rendered from unflipped left-facing source components; finished row mirroring is forbidden",
+      "down": "front-view authored chains with the A2 contact chronology, vertical weight track, and settler work sockets",
+      "up": "back-view authored chains with the A2 contact chronology, vertical weight track, and settler work sockets"
+    }
+  },
+  "render_profile": {
+    "key": "wayfarer",
+    "build": "lean, resilient, narrow-shouldered frontier stance with a compact grounded center of gravity",
+    "identity_leg_far_width": 6.1,
+    "identity_leg_near_width": 7.0,
+    "garment_leg_far_width": 7.2,
+    "garment_leg_near_width": 8.1,
+    "upper_arm_far_width": 5.6,
+    "upper_arm_near_width": 6.4,
+    "forearm_far_width": 5.1,
+    "forearm_near_width": 5.9,
+    "identity_torso_size": [21, 31],
+    "garment_tunic_size": [26, 34],
+    "garment_belt_size": [24, 5],
+    "identity_head_size": [20, 24],
+    "garment_headgear_size": [26, 21]
+  },
+  "actions": {
+    "idle": {
+      "equipment": "off",
+      "motion": "planted eight-beat breathing and weight loop",
+      "contacts": "both boots remain planted"
+    },
+    "walk": {
+      "equipment": "off",
+      "motion": "approved grounded A2 contact chronology with counter-swinging arms",
+      "contacts": "contact, down, pass, up with no flight frames"
+    },
+    "work": {
+      "equipment": "settler-spade",
+      "motion": "ready, brace, raise, align, drive, press, lever, recover",
+      "contacts": "both boots remain planted",
+      "handedness": "spade grip remains at the right-hand socket; the pointed blade drives toward the authored facing at soil contact"
+    },
+    "carry": {
+      "equipment": "cargo-crate",
+      "motion": "shared carry body and load-socket chronology",
+      "contacts": "contact, down, pass, up with no flight frames"
+    }
+  },
+  "scope": {
+    "role": "settler",
+    "identity": "wayfarer",
+    "garment": "hearth-indigo",
+    "actions": ["idle", "walk", "work", "carry"],
+    "directions": ["down", "up", "left", "right"],
+    "rows": 16,
+    "frames": 128
+  },
+  "authority": {
+    "source_unit": "hash-locked modular identity, garment, cargo, and spade components",
+    "animation_unit": "one 512x84 eight-frame row per action and direction",
+    "runtime": "flattened, palette-bounded, exact-size raster tiers; no live skeletal renderer",
+    "left_handedness": "left is compiled from reflected joints and independent source components before semantic compositing",
+    "scale": "76px median body height on ground row 79 with rows 80-83 clear",
+    "review": "body, cargo, and spade are measured independently before the flattened row is accepted"
+  }
+}

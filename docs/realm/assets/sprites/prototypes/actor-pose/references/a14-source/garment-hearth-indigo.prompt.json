@@ -1,0 +1,40 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "garment-hearth-indigo",
+  "generated_at": "2026-08-01",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/exec-34823bef-8948-4f41-b81d-a56b6d58d691.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a14-source/garment-hearth-indigo-separated-keyed.png",
+      "sha256": "e38d6704ebefd9db3b1f822ef97cf1a384e66c9c5ad95263c1991adfb255317d",
+      "role": "exact edit target and accepted separated hearth-indigo garment construction, component layout, palette, and fit reference"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a14-source/identity-wayfarer-keyed.png",
+      "sha256": "4fc31d9d783fe83ce9dea37e805c66db7b3eecd1e43fa1c853b2cd84e5b87564",
+      "role": "exact wayfarer identity and body-fit reference"
+    }
+  ],
+  "prompt": "Use case: precise-object-edit\nAsset type: corrected modular garment source board for offline skeletal sprite compilation\nInput images: Image 1 is the exact edit target and accepted hearth-indigo garment board. Image 2 is the exact identity and body-fit reference.\nPrimary request: Preserve the exact garment art, palette, materials, lighting, 1536x1024 canvas, component positions, separation gaps, and front/back/profile construction from Image 1. Make only a transparency-mask correction: replace every empty interior cavity of every hollow garment component with the same perfectly flat solid #ff00ff used by the outer background. The three hood/cowl openings must be fully magenta holes so the underlying face, head, hair, ears, and neck can show through. The front/back/profile tunic neck openings, sleeve cuff openings, belt interior gaps, and trouser waistband openings must also be flat magenta wherever no cloth exists. Keep all actual dark-indigo, charcoal, leather, rust, oat, seam, lining, and shaded cloth pixels unchanged. Do not erase the hood lining, garment hems, inner cloth surfaces, or contour edges.\nStyle/medium: unchanged crisp hand-painted classic late-1990s 2D strategy-game source art with hard readable contour clusters and controlled warm highlights.\nComponent invariants: identical hearth-indigo outfit, exact component count and placement, at least 24 pixels of magenta separation, no component touching or clipping.\nConstraints: clothing only; no person, face, hair, skin, mannequin, tools, cargo, shadows, floor, texture, gradient, border, labels, text, watermark, or new pieces. Both exterior background and empty holes must be one uniform #ff00ff with no lighting variation. Do not use #ff00ff on actual textile or leather.\nAvoid: redesign, changed palette, moved components, black-filled hood opening, black-filled neck hole, opaque mannequin cavity, merged pieces, soft airbrush.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#ec04e9"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a14-source/garment-hearth-indigo-keyed.png",
+  "keyed_sha256": "fb0b7dad43e3b7e42b8892e0185c5e1775dd488cc5f91f833be11023f2faa098",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a14-source/garment-hearth-indigo.png",
+  "alpha_sha256": "7b21158db09c4c7078c64a01d506b2171eb5d06789ec4c052987abca2c60d36a"
+}

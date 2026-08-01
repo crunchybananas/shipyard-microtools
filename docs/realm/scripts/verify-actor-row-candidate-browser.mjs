@@ -33,7 +33,7 @@ try {
   });
 
   await page.goto(
-    `${server.gameUrl}?spritelab=1&role=fisher&action=idle&dir=down`
+    `${server.gameUrl}?spritelab=1&role=settler&action=idle&dir=down`
     + `&verifyCandidate=${Date.now()}`,
   );
   await page.waitForLoadState('domcontentloaded');
@@ -75,10 +75,13 @@ try {
     const fisherProduction = Object.entries(manifest.rows).filter(
       ([key, slots]) => key.startsWith('fisher/') && slots.production,
     );
-    const fisherCandidates = Object.entries(manifest.rows).filter(
-      ([key, slots]) => key.startsWith('fisher/') && slots.candidate,
+    const settlerProduction = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('settler/') && slots.production,
     );
-    const key = 'fisher/idle/down';
+    const settlerCandidates = Object.entries(manifest.rows).filter(
+      ([key, slots]) => key.startsWith('settler/') && slots.candidate,
+    );
+    const key = 'settler/idle/down';
     const slots = manifest.rows[key];
     const item = slots.candidate || slots.production;
     const bytes = await fetch(`assets/sprites/actor-rows/${item.file}`).then(
@@ -99,7 +102,8 @@ try {
       minerProductionCount: minerProduction.length,
       stonecutterProductionCount: stonecutterProduction.length,
       fisherProductionCount: fisherProduction.length,
-      fisherCandidateCount: fisherCandidates.length,
+      settlerProductionCount: settlerProduction.length,
+      settlerCandidateCount: settlerCandidates.length,
       productionHash: item.sha256,
       fetchedProductionHash: digest,
       reviewSource: document.body.dataset.spriteReviewSource,
@@ -125,16 +129,17 @@ try {
   assert.equal(idle.minerProductionCount, 16);
   assert.equal(idle.stonecutterProductionCount, 16);
   assert.equal(idle.fisherProductionCount, 16);
-  assert.ok([0, 16].includes(idle.fisherCandidateCount));
-  assert.equal(idle.candidateCount, idle.fisherCandidateCount);
+  assert.equal(idle.settlerProductionCount, 16);
+  assert.ok([0, 16].includes(idle.settlerCandidateCount));
+  assert.equal(idle.candidateCount, idle.settlerCandidateCount);
   assert.equal(idle.candidateBadges, idle.candidateCount);
   assert.equal(idle.runtimeSource, 'accepted');
   assert.equal(idle.fetchedProductionHash, idle.productionHash);
-  if (idle.fisherCandidateCount) {
+  if (idle.settlerCandidateCount) {
     assert.equal(idle.reviewSource, 'candidate');
     assert.notEqual(idle.candidateFile, null);
     assert.match(idle.provenance, /CANDIDATE/);
-    assert.match(idle.provenance, /a13-modular-fisher-actions/);
+    assert.match(idle.provenance, /a14-modular-settler-actions/);
   } else {
     assert.equal(idle.reviewSource, 'accepted');
     assert.equal(idle.candidateFile, null);
@@ -153,11 +158,11 @@ try {
     provenance: document.querySelector('#sl-provenance')?.textContent || '',
   }));
   assert.equal(carry.runtimeSource, 'accepted');
-  if (idle.fisherCandidateCount) {
+  if (idle.settlerCandidateCount) {
     assert.equal(carry.reviewSource, 'candidate');
     assert.notEqual(carry.candidateFile, null);
     assert.match(carry.provenance, /CANDIDATE/);
-    assert.match(carry.provenance, /a13-modular-fisher-actions/);
+    assert.match(carry.provenance, /a14-modular-settler-actions/);
   } else {
     assert.equal(carry.reviewSource, 'accepted');
     assert.equal(carry.candidateFile, null);
@@ -202,7 +207,8 @@ try {
       minerProduction: idle.minerProductionCount,
       stonecutterProduction: idle.stonecutterProductionCount,
       fisherProduction: idle.fisherProductionCount,
-      fisherCandidates: idle.fisherCandidateCount,
+      settlerProduction: idle.settlerProductionCount,
+      settlerCandidates: idle.settlerCandidateCount,
     },
     idle,
     carry,
@@ -212,7 +218,7 @@ try {
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(
     `[actor-row-candidate-browser] PASS — 224 production rows and ${idle.candidateCount} candidate(s); `
-    + 'A13 fisher review provenance matches its staged state and ordinary game loads no candidate assets',
+    + 'A14 settler review provenance matches its staged state and ordinary game loads no candidate assets',
   );
 } finally {
   await browser.close();

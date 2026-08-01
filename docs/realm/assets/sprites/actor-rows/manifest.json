@@ -7746,657 +7746,705 @@
     },
     "settler/carry/down": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:46Z",
-        "file": "settler/carry-down.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/carry-down-d99d7e797ff3.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              91.8,
-              67.0,
-              52.7
+              86.55,
+              67.4,
+              50.3
             ],
-            "paletteDelta": 10.78
+            "paletteDelta": 8.44
           },
-          "flickerScore": 3.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 0.95,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.031,
+          "maxBodyCenterJump": 2.05,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.58,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.28,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            98.2,
-            74.45,
-            57.15
+            91.2,
+            64.15,
+            44.05
           ],
+          "medianColorCount": 449.0,
+          "medianShadingRatio": 0.7017,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "87d92180ba7de3fbb325ae6586af09e796a24f074a74856de1eb7c477e832d4b",
+        "sha256": "d99d7e797ff3d2e344cebe9a05b8e991fa686a045e763138b66f42df3d608524",
         "status": "accepted"
       }
     },
     "settler/carry/left": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:48Z",
-        "file": "settler/carry-left.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/carry-left-37b185e1209d.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              91.8,
-              68.8,
-              57.15
+              86.6,
+              64.15,
+              47.05
             ],
-            "paletteDelta": 4.8
+            "paletteDelta": 4.6
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.079,
+          "maxBodyCenterJump": 1.76,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.55,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 3.95,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            91.8,
-            67.0,
-            52.7
+            86.55,
+            67.4,
+            50.3
           ],
+          "medianColorCount": 428.0,
+          "medianShadingRatio": 0.7028,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "4cffbc3a8a4085cbce5cc331b67d8691fe49d1067ba116d157f4d4655e1324c5",
+        "sha256": "37b185e1209de41de1e2f760e9db7890519b2ce757c9fa015ae1d88cc17c2255",
         "status": "accepted"
       }
     },
     "settler/carry/right": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:48Z",
-        "file": "settler/carry-right.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/carry-right-2737304ee106.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 5,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 33.0,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              91.8,
-              68.8,
-              57.15
+              86.55,
+              64.15,
+              47.05
             ],
-            "paletteDelta": 4.8
+            "paletteDelta": 4.63
           },
-          "flickerScore": 24.0,
-          "maxAlphaRatio": 1.149,
-          "maxBodyCenterJump": 2.81,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.079,
+          "maxBodyCenterJump": 1.77,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.55,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 34.5,
+          "maxPaletteDrift": 3.77,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 32.0,
           "medianColor": [
-            91.8,
-            67.0,
-            52.7
+            86.6,
+            67.45,
+            50.3
           ],
+          "medianColorCount": 433.5,
+          "medianShadingRatio": 0.7011,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "92517e50f6d7c608165e3695528bf34612d459718dc6a9d872327f84f85a2d5c",
+        "sha256": "2737304ee1061e8e6c77c048ea5f62d04ee4009915ccd7bf654d523c8bb1a7d7",
         "status": "accepted"
       }
     },
     "settler/carry/up": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:47Z",
-        "file": "settler/carry-up.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across carry state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/carry-up-132d065eb964.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
+          "bodyHeightRange": 2,
           "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 34.5,
+            "bodyWidthDelta": 6.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 32.0,
             "medianColor": [
-              91.8,
-              67.0,
-              52.7
+              86.6,
+              67.4,
+              50.3
             ],
-            "paletteDelta": 11.52
+            "paletteDelta": 12.3
           },
-          "flickerScore": 0.0,
-          "maxAlphaRatio": 1.043,
-          "maxBodyCenterJump": 1.15,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.03,
+          "maxBodyCenterJump": 1.47,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 1.82,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 33.0,
+          "maxPaletteDrift": 1.17,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            85.25,
-            68.8,
-            62.0
+            77.45,
+            59.85,
+            47.05
           ],
+          "medianColorCount": 370.5,
+          "medianShadingRatio": 0.7038,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "10d4c993ab146a262c5426d116f529cc3da2386c34f9056820f9eebdb8689ae9",
+        "sha256": "132d065eb964f8946fb9bfef8e6f48495259b6ba89b0dc665cb05c5dbab2f645",
         "status": "accepted"
       }
     },
     "settler/idle/down": {
       "production": {
-        "acceptedAt": "2026-06-20T06:03:03Z",
-        "file": "settler/idle-down.png",
-        "note": "Front-facing imagegen idle normalized to the locked walk family 72px body height.",
-        "provenance": "imagegen-peer-action-scale-normalized",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/idle-down-bfb6f3bbf419.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              59.9
+              83.15,
+              65.6,
+              50.4
             ],
-            "paletteDelta": 5.42
+            "paletteDelta": 5.65
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.049,
+          "maxBodyCenterJump": 2.26,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.42,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 0.86,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            96.4,
-            75.8,
-            62.6
+            86.45,
+            63.65,
+            46.25
           ],
+          "medianColorCount": 457.5,
+          "medianShadingRatio": 0.6973,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "dbcb3053d702613db406ff335a4b1337153d51fa0bc5181967757e0cb276ebd7",
+        "sha256": "bfb6f3bbf419750ced782ef6cd05c586be761fc9f7e9426b47bec80e3f36656d",
         "status": "accepted"
       }
     },
     "settler/idle/left": {
       "production": {
-        "acceptedAt": "2026-06-20T06:03:04Z",
-        "file": "settler/idle-left.png",
-        "note": "Cell-wise reflected from the right-facing idle row after normalization to the locked walk family scale.",
-        "provenance": "imagegen-peer-direction-reflection",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/idle-left-c136d39c69eb.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              62.6
+              83.15,
+              63.65,
+              49.1
             ],
-            "paletteDelta": 2.7
+            "paletteDelta": 2.5
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.023,
+          "maxBodyCenterJump": 0.64,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.14,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.66,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            92.0,
-            74.15,
-            59.9
+            83.3,
+            65.65,
+            50.6
           ],
+          "medianColorCount": 454.0,
+          "medianShadingRatio": 0.6833,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "695f3b5ec48d229e658a01703d75635bc0750953f6b79030cc79629d5ea234f1",
+        "sha256": "c136d39c69ebf4d5246723a985242be00ed01d0d4a4c7e85e58fe89f7033f7c5",
         "status": "accepted"
       }
     },
     "settler/idle/right": {
       "production": {
-        "acceptedAt": "2026-06-20T06:03:04Z",
-        "file": "settler/idle-right.png",
-        "note": "Right-facing imagegen idle normalized to the locked walk family 72px body height.",
-        "provenance": "imagegen-peer-action-scale-normalized",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/idle-right-5fec78ee2457.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              62.6
+              83.3,
+              63.65,
+              49.1
             ],
-            "paletteDelta": 2.7
+            "paletteDelta": 2.35
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.02,
+          "maxBodyCenterJump": 0.73,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.14,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 0.68,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            92.0,
-            74.15,
-            59.9
+            83.15,
+            65.6,
+            50.4
           ],
+          "medianColorCount": 443.0,
+          "medianShadingRatio": 0.6755,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "45b4401ee936d158ec6cff20129628665382622c4897b27bb9c282f1a724a2cb",
+        "sha256": "5fec78ee24579c988a248f9abe5437ff344d875789c0712e0b4d99698bca92bd",
         "status": "accepted"
       }
     },
     "settler/idle/up": {
       "production": {
-        "acceptedAt": "2026-06-20T06:03:03Z",
-        "file": "settler/idle-up.png",
-        "note": "Back-facing imagegen idle normalized to the locked walk family 72px body height.",
-        "provenance": "imagegen-peer-action-scale-normalized",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/idle-up-aa781cc07a72.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              59.9
+              83.3,
+              65.6,
+              50.4
             ],
-            "paletteDelta": 15.48
+            "paletteDelta": 12.29
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.05,
+          "maxBodyCenterJump": 1.67,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.66,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 0.78,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            79.75,
-            66.0,
-            64.7
+            72.8,
+            59.35,
+            49.1
           ],
+          "medianColorCount": 356.5,
+          "medianShadingRatio": 0.7148,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "785aaae4fe63072b2e1bb81a190534925007dc091eb51be57bfd05e2ae8aa52d",
+        "sha256": "aa781cc07a7226daceb7cf388a26849cd21aa8581dbc0129b9c286937773d4ae",
         "status": "accepted"
       }
     },
     "settler/walk/down": {
       "production": {
-        "acceptedAt": "2026-06-20T06:35:37Z",
-        "file": "settler/walk-down.png",
-        "note": "Imagegen identity preserved; only the pants/boots region is reflected on alternating frames to enforce a readable front-facing two-foot gait.",
-        "provenance": "imagegen-lower-body-alternation-repair",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/walk-down-965565cb01d6.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 1,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              86.15,
-              64.45,
-              55.25
+              81.8,
+              64.4,
+              49.95
             ],
-            "paletteDelta": 14.49
+            "paletteDelta": 5.95
           },
-          "flickerScore": 5.6,
-          "maxAlphaRatio": 1.067,
-          "maxBodyCenterJump": 0.88,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.03,
+          "maxBodyCenterJump": 2.26,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.82,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.8,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            95.3,
-            74.25,
-            60.75
+            87.0,
+            64.45,
+            47.05
           ],
+          "medianColorCount": 454.5,
+          "medianShadingRatio": 0.6926,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "81f192f61a346feadf1f7e3273867b6a272e525c7d2521340637541644dc18d9",
+        "sha256": "965565cb01d6c39e40a8a5abae310ead2618cb737bf70509422397f64cb54516",
         "status": "accepted"
       }
     },
     "settler/walk/left": {
       "production": {
-        "acceptedAt": "2026-06-20T05:33:24Z",
-        "file": "settler/walk-left.png",
-        "note": "Cell-wise reflected from the clean right-facing peer after two generated left rows failed dense-width stability.",
-        "provenance": "imagegen-peer-direction-reflection",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/walk-left-f20eccf1b71a.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 4,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 29.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              86.15,
-              64.45,
-              59.25
+              81.8,
+              64.4,
+              49.45
             ],
-            "paletteDelta": 4.0
+            "paletteDelta": 0.51
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 8.8,
+          "maxAlphaRatio": 1.085,
+          "maxBodyCenterJump": 2.1,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.53,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 6.07,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            86.15,
-            64.45,
-            55.25
+            81.9,
+            64.4,
+            49.95
           ],
+          "medianColorCount": 449.5,
+          "medianShadingRatio": 0.6922,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "902ca5e65167a5832f9088efc4f391e74c1e11d2e830ed267d5fcd59b5ebf884",
+        "sha256": "f20eccf1b71a4c5f6fa7df36215ec3307c3b5f1f796f1feadbe64e54cb6bbaaf",
         "status": "accepted"
       }
     },
     "settler/walk/right": {
       "production": {
-        "acceptedAt": "2026-06-20T05:33:25Z",
-        "file": "settler/walk-right.png",
-        "note": "Right-facing frontier settler walk matched to the action identity master.",
-        "provenance": "imagegen-frontier-settler-family",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/walk-right-9fdaa70022c4.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
-          "bodyBottomRange": 5,
-          "bodyHeightRange": 4,
-          "bodyWidthRange": 9,
+          "bodyBottomRange": 0,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 4,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 1.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 29.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              86.15,
-              64.45,
-              59.25
+              81.9,
+              64.4,
+              49.45
             ],
-            "paletteDelta": 4.0
+            "paletteDelta": 0.51
           },
-          "flickerScore": 28.8,
-          "maxAlphaRatio": 1.157,
-          "maxBodyCenterJump": 3.63,
+          "flickerScore": 8.8,
+          "maxAlphaRatio": 1.088,
+          "maxBodyCenterJump": 1.7,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.53,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 28.0,
+          "maxPaletteDrift": 6.07,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            86.15,
-            64.45,
-            55.25
+            81.8,
+            64.4,
+            49.95
           ],
+          "medianColorCount": 447.0,
+          "medianShadingRatio": 0.6885,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "0f32258cfc767245fbe64b2b7ca3bd4b7f1f3f69dfd01e78e8f1ca97b324e5b3",
+        "sha256": "9fdaa70022c47c1fac37a1ff1b6c060e15b23307bf58e41b05519001c3f627ad",
         "status": "accepted"
       }
     },
     "settler/walk/up": {
       "production": {
-        "acceptedAt": "2026-06-20T06:35:38Z",
-        "file": "settler/walk-up.png",
-        "note": "Back-facing locked identity with lower-leg cadence regenerated after gait audit.",
-        "provenance": "imagegen-gait-corrected-identity-lock",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/walk-up-543831307da4.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 2,
+          "bodyWidthRange": 0,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 2.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 28.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              86.15,
-              64.45,
-              55.25
+              81.9,
+              64.4,
+              49.95
             ],
-            "paletteDelta": 10.61
+            "paletteDelta": 10.32
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.058,
-          "maxBodyCenterJump": 1.41,
+          "flickerScore": 4.0,
+          "maxAlphaRatio": 1.035,
+          "maxBodyCenterJump": 1.58,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 4.42,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 1.73,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            81.25,
-            67.35,
-            64.2
+            72.75,
+            59.65,
+            49.45
           ],
+          "medianColorCount": 354.0,
+          "medianShadingRatio": 0.7109,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "d0628fba2270a11414544d67f5dd056a2d83b1df1dcc8c98d7ce9fdb6ea4b9a4",
+        "sha256": "543831307da42d3441f76a7c42a3e86ff7935402557b63f027716c44faa73209",
         "status": "accepted"
       }
     },
     "settler/work/down": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:44Z",
-        "file": "settler/work-down.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/work-down-bc4b3772c5fd.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
           "bodyHeightRange": 1,
-          "bodyWidthRange": 2,
+          "bodyWidthRange": 5,
           "directionReference": {
-            "bodyHeightDelta": 1.0,
-            "bodyWidthDelta": 9.5,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyHeightDelta": 0.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              59.95
+              79.15,
+              61.6,
+              47.5
             ],
-            "paletteDelta": 5.39
+            "paletteDelta": 9.17
           },
-          "flickerScore": 4.4,
-          "maxAlphaRatio": 1.084,
-          "maxBodyCenterJump": 1.27,
+          "flickerScore": 8.0,
+          "maxAlphaRatio": 1.046,
+          "maxBodyCenterJump": 2.4,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.42,
-          "medianBodyHeight": 71.0,
-          "medianBodyWidth": 30.5,
+          "maxPaletteDrift": 3.02,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            96.4,
-            75.8,
-            62.6
+            87.8,
+            64.65,
+            47.35
           ],
+          "medianColorCount": 479.0,
+          "medianShadingRatio": 0.6942,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "4d78d6b5588d81d1019bccf12cb10b04da3bbc83089fbe5b26fdeb09412f0217",
+        "sha256": "bc4b3772c5fd0d64ea6487e78fb397fa6dde6f6cf40cfe5f65ca056b6dca897d",
         "status": "accepted"
       }
     },
     "settler/work/left": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:45Z",
-        "file": "settler/work-left.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/work-left-0bc5a47a7231.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              62.6
+              79.35,
+              61.8,
+              47.5
             ],
-            "paletteDelta": 2.65
+            "paletteDelta": 0.38
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.4,
+          "maxAlphaRatio": 1.028,
+          "maxBodyCenterJump": 0.74,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.2,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 4.39,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            92.0,
-            74.15,
-            59.95
+            79.15,
+            61.6,
+            47.25
           ],
+          "medianColorCount": 473.0,
+          "medianShadingRatio": 0.6871,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "decff993a76584cdb4b35db7cf62e2eb6a94baf7f1816a82f6576ed33b08b3ba",
+        "sha256": "0bc5a47a723162fef8557ffd42be0623443873acf63ebaaebc51d7b75870d006",
         "status": "accepted"
       }
     },
     "settler/work/right": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:46Z",
-        "file": "settler/work-right.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/work-right-3fbb3f6c00f2.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 3,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 2,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 30.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              62.6
+              79.15,
+              61.6,
+              47.35
             ],
-            "paletteDelta": 2.65
+            "paletteDelta": 0.32
           },
-          "flickerScore": 3.6,
-          "maxAlphaRatio": 1.054,
-          "maxBodyCenterJump": 0.85,
+          "flickerScore": 4.4,
+          "maxAlphaRatio": 1.022,
+          "maxBodyCenterJump": 0.79,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 3.2,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 21.0,
+          "maxPaletteDrift": 4.22,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            92.0,
-            74.15,
-            59.95
+            79.35,
+            61.8,
+            47.5
           ],
+          "medianColorCount": 468.5,
+          "medianShadingRatio": 0.68,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "2b0a611fb11247aa893d593523a5aad6f4325391d05b147a948d6104698e04c7",
+        "sha256": "3fbb3f6c00f2d3ecdf1a63bf0179b10166009524220ee53090438e0d5b181292",
         "status": "accepted"
       }
     },
     "settler/work/up": {
       "production": {
-        "acceptedAt": "2026-06-27T14:08:45Z",
-        "file": "settler/work-up.png",
-        "note": "Derived from locked settler frontier rows to keep default actor identity consistent across work state.",
-        "provenance": "frontier-settler-row-derivative",
+        "acceptedAt": "2026-08-01T14:50:40Z",
+        "file": "production/settler/work-up-d83354308c03.png",
+        "note": "A14 wayfarer/hearth-indigo modular settler family; deterministic sources and live vertical slice verified",
+        "provenance": "a14-modular-settler-actions",
         "quality": {
           "bodyBottomRange": 0,
-          "bodyHeightRange": 0,
-          "bodyWidthRange": 1,
+          "bodyHeightRange": 1,
+          "bodyWidthRange": 6,
           "directionReference": {
             "bodyHeightDelta": 0.0,
-            "bodyWidthDelta": 9.0,
-            "medianBodyHeight": 72.0,
-            "medianBodyWidth": 21.0,
+            "bodyWidthDelta": 0.0,
+            "medianBodyHeight": 76.0,
+            "medianBodyWidth": 26.0,
             "medianColor": [
-              92.0,
-              74.15,
-              59.95
+              79.35,
+              61.8,
+              47.35
             ],
-            "paletteDelta": 15.46
+            "paletteDelta": 5.84
           },
-          "flickerScore": 1.2,
-          "maxAlphaRatio": 1.045,
-          "maxBodyCenterJump": 0.84,
+          "flickerScore": 9.2,
+          "maxAlphaRatio": 1.043,
+          "maxBodyCenterJump": 2.1,
           "maxEdgePixels": 0,
           "maxFragmentPixels": 0,
-          "maxPaletteDrift": 2.72,
-          "medianBodyHeight": 72.0,
-          "medianBodyWidth": 30.0,
+          "maxPaletteDrift": 3.0,
+          "medianBodyHeight": 76.0,
+          "medianBodyWidth": 26.0,
           "medianColor": [
-            79.75,
-            66.0,
-            64.7
+            74.15,
+            59.95,
+            49.25
           ],
+          "medianColorCount": 389.0,
+          "medianShadingRatio": 0.7058,
+          "styleEra": "painted",
           "warnings": []
         },
-        "sha256": "c9c8534aa7734bc0bc4bef91a4bd7fcdbf6034eebc83573e9ae03763e1a5564b",
+        "sha256": "d83354308c03b24d191adf93073c329b9eb2eb0188d65403350597225d49c635",
         "status": "accepted"
       }
     },
@@ -9809,6 +9857,6 @@
       }
     }
   },
-  "updatedAt": "2026-07-30T18:53:00Z",
+  "updatedAt": "2026-08-01T14:50:40Z",
   "version": 2
 }

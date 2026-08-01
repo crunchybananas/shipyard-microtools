@@ -20,7 +20,7 @@ import {
   FRAME_W,
   FRAMES,
   ROLES,
-} from '../js/sprite-source-contract.js?realm=183';
+} from '../js/sprite-source-contract.js?realm=184';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -36,6 +36,7 @@ const MODULAR_SEMANTIC_SOURCES = [
   ['miner', 'a11-miner-actions'],
   ['stonecutter', 'a12-stonecutter-actions'],
   ['fisher', 'a13-fisher-actions'],
+  ['settler', 'a14-settler-actions'],
 ];
 
 // A finding must be both large and unambiguous. These thresholds were

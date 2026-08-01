@@ -67,6 +67,7 @@ def main() -> int:
             "miner/carry",
             "stonecutter/carry",
             "fisher/carry",
+            "settler/carry",
         ]
         or scope.get("bakedContainer") is not True
     ):
@@ -168,7 +169,7 @@ def main() -> int:
         return 1
     print(
         "[a6-cargo-verify] PASS — 9 resources / 4 directions / "
-        "36 rows / 288 frames / 4 byte-locked runtime tiers / 8 baked-container owners"
+        "36 rows / 288 frames / 4 byte-locked runtime tiers / 9 baked-container owners"
     )
     return 0
 

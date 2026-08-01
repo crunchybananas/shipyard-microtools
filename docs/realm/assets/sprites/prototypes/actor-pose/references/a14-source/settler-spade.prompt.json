@@ -1,0 +1,40 @@
+{
+  "schema": "realm.imagegen-source.v1",
+  "asset": "settler-spade",
+  "generated_at": "2026-08-01",
+  "generator": {
+    "mode": "built-in image_gen",
+    "source_output": "/Users/cloken/.codex/generated_images/019fae30-d8df-7de0-ba62-f0d2e218514f/exec-d8facf60-4934-447b-879a-7992970a7670.png"
+  },
+  "references": [
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a7-source/farmer-hoe-keyed.png",
+      "sha256": "86b9e8f876cbc5b8852689e60b97bfda54bb9867e7fc14867d88f64577ca1bc1",
+      "role": "four-view tool-board layout, component scale, rendering quality, and chroma-key reference only"
+    },
+    {
+      "path": "assets/sprites/prototypes/actor-pose/references/a13-source/harbor-gaff-keyed.png",
+      "sha256": "67d5bfd599a0bdd11783dccbee47fa0f89e4de3a624912de7f77a97af56caae3",
+      "role": "four-view tool-board layout, material lighting, edge, and chroma-key reference only"
+    }
+  ],
+  "prompt": "Use case: stylized-concept\nAsset type: modular hand-tool source board for a classic painted 2D strategy game\nInput images: Images 1 and 2 are exact layout, component scale, rendering-quality, lighting, and chroma-key references only.\nPrimary request: Create one practical frontier hand spade in four genuine orthographic views. It has a straight weathered ash-wood handle, a small dark forged-iron D grip at the top, a narrow reinforced neck, and a compact pointed iron digging blade at the bottom. It should read immediately as a civilian digging spade, not a weapon or oversized shovel.\nScene/backdrop: perfectly flat uniform solid #ff00ff chroma-key background.\nStyle/medium: match the references' high-quality painted raster game-component style, crisp dark contour clusters, controlled warm highlights, visible wood grain and hammered iron, consistent three-quarter game lighting.\nComposition/framing: exact 1536x1024 landscape board. Four isolated vertical tools arranged left to right: front view, back view, left-edge/profile view, right-edge/profile view. In every view the D grip is at the top and pointed blade at the bottom. Keep each complete, uncropped, non-overlapping, centered in its own quarter, with generous magenta padding.\nTool invariants: identical handle length, D grip, neck band, blade shape, material colors, and wear in every view; profile views must show the blade thickness and slight forward dish rather than being duplicate flat fronts.\nConstraints: tool only; no hands, person, dirt, plants, extra parts, shadow, floor, texture, gradient, border, labels, text, or watermark. Background must be one exact flat color with no lighting variation. Do not use #ff00ff within the tool. Crisp silhouette.\nAvoid: spear, polearm, axe, hoe, broad modern shovel, ornate fantasy weapon, rust flakes detached from the blade, merged tools, floating fragments, photoreal product photo, soft airbrushed edges.",
+  "postprocess": {
+    "tool": "/Users/cloken/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "arguments": [
+      "--auto-key",
+      "border",
+      "--soft-matte",
+      "--transparent-threshold",
+      "12",
+      "--opaque-threshold",
+      "220",
+      "--despill"
+    ],
+    "key_color_detected": "#f404e6"
+  },
+  "keyed_path": "assets/sprites/prototypes/actor-pose/references/a14-source/settler-spade-keyed.png",
+  "keyed_sha256": "95fabf604b23244582d0030ac35ee0e21063d1a41cd8d15c31ad31eba768d33c",
+  "alpha_path": "assets/sprites/prototypes/actor-pose/references/a14-source/settler-spade.png",
+  "alpha_sha256": "942665e4c462d5931673fc35802922de76f4e64ef53d599213e77b2e6b96077c"
+}

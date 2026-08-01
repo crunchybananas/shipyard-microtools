@@ -18,6 +18,7 @@ const checks = [
   ['A11 modular miner family', 'verify-a11-miner-actions.mjs'],
   ['A12 modular stonecutter family', 'verify-a12-stonecutter-actions.mjs'],
   ['A13 modular fisher family', 'verify-a13-fisher-actions.mjs'],
+  ['A14 modular settler family', 'verify-a14-settler-actions.mjs'],
   ['sprite source contract', 'verify-sprite-source-contract.mjs'],
   ['sprite frame structure and quality', 'audit-sprite-frames.mjs'],
   ['sprite walk gait', 'audit-walk-gait.mjs'],
@@ -49,6 +50,7 @@ const checks = [
   ['browser miner vertical slice', 'verify-miner-vertical-slice.mjs'],
   ['browser stonecutter vertical slice', 'verify-stonecutter-vertical-slice.mjs'],
   ['browser fisher vertical slice', 'verify-fisher-vertical-slice.mjs'],
+  ['browser settler vertical slice', 'verify-settler-vertical-slice.mjs'],
   ['browser modular cargo and transitions', 'verify-guard-cargo-browser.mjs'],
   ['browser logic', 'verify-logic.mjs'],
 ];
