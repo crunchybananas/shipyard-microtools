@@ -268,6 +268,19 @@ const disagreeLight = new THREE.PointLight(0xffc98a, 0, 16, 1.7);
 disagreeLight.position.set(SPOTS.hatch.x - 9, 20.6, SPOTS.hatch.y - 13.6);
 scene.add(disagreeLight);
 
+// #27: the biggest per-pixel power lever left — a light at intensity 0 still costs its
+// slot in EVERY MeshStandardMaterial's fragment light loop. Gate the nine by .visible
+// (driven each frame from the intensity applyAtmosphere just computed): the whole
+// surface chapter runs 2-4 active point lights instead of 9. Distinct visible-light
+// COUNTS mean distinct shader programs — the 9-light variant is warmed by a boot-time
+// renderer.compile() below (today's shipped program), and each smaller count compiles
+// once, almost always inside a cinematic beat (hatch, lamplit, dive). Never ADD a
+// tenth light: 9 stays the fragility ceiling (the black-screen budget).
+const POINT_LIGHTS = [studyLight, lampSpill, cellarLight, cellarFill, keeperLamp, jettyLamp, vaultGlow, vaultFill, disagreeLight];
+renderer.compile(scene, camera);         // #27: warm the full 9-light program (today's shipped shader) before gating begins
+renderer.shadowMap.autoUpdate = false;   // #28: the shadow pass redraws only when applyAtmosphere marks it dirty
+renderer.shadowMap.needsUpdate = true;   // …starting with one honest first draw
+
 // ---------------- gulls ----------------
 const gulls = [];
 {
@@ -1002,6 +1015,10 @@ function tickFinale(dt) {
 // ---------------- per-frame: grade → everything ----------------
 const _sunV = new THREE.Vector3();
 const _moonV = new THREE.Vector3();
+// #28 shadow-freeze state: where the map was last drawn from
+const _shadowAt = new THREE.Vector3(1e9, 0, 0);
+const _shadowSun = new THREE.Vector3(0, 1, 0);
+let _shadowHatch = null, _shadowLevel = null, _shadowTop = null;
 const MOONLIGHT = new THREE.Color(0x9fb8d9);
 const swayMats = ['grass', 'canopies']
   .map((n) => core.children.find((o) => o.name === n)?.material)
@@ -1239,6 +1256,25 @@ function applyAtmosphere(elapsed, dt) {
       refs.jettyHalo.scale.setScalar(lerp(1.2, 2.5, night) * flick);
     }
     if (refs.jettyLantern) refs.jettyLantern.material.emissiveIntensity = lerp(1.0, 2.8, night) * flick;
+  }
+
+  // #27: lights leave the shader entirely while dark (see POINT_LIGHTS note)
+  for (const L of POINT_LIGHTS) L.visible = L.intensity > 0.01;
+
+  // #28: freeze the 1024² shadow pass while nothing it can see has changed — no dynamic
+  // object casts, so the map only needs redrawing when the shadow CAMERA moves (it rides
+  // the player), the sun swings (>~0.15°), the big toggles flip, or a cinematic owns the
+  // frame. Standing still reading lore no longer redraws ~110k caster tris every frame.
+  const shadowDirty =
+    MODE !== 'play' ||
+    camera.position.distanceToSquared(_shadowAt) > 0.25 ||
+    _sunV.angleTo(_shadowSun) > 0.0026 ||
+    W.flags.hatchOpen !== _shadowHatch || W.level !== _shadowLevel || W.atTop !== _shadowTop;
+  if (shadowDirty) {
+    renderer.shadowMap.needsUpdate = true;
+    _shadowAt.copy(camera.position);
+    _shadowSun.copy(_sunV);
+    _shadowHatch = W.flags.hatchOpen; _shadowLevel = W.level; _shadowTop = W.atTop;
   }
 
   // iris cursor only exists while playing

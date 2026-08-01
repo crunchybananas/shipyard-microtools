@@ -12,6 +12,30 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 19 — 2026-08-01 — the POWER pair: #27 lights leave the shader · #28 shadows freeze
+
+**Shipped (#27):** a point light at intensity 0 still costs its slot in every
+MeshStandardMaterial's fragment loop — nine slots of mostly dead math for the whole
+surface chapter. Now the nine are gated by `.visible = intensity > 0.01` each frame:
+the surface runs TWO active lights (study + jetty), the shipped 9-light program is
+warmed by a boot `renderer.compile()`, and each smaller light-count variant compiles
+once, almost always inside a cinematic beat (hatch, lamplit, dive). The ceiling stays
+nine — nothing here licenses a tenth.
+
+**Shipped (#28):** `shadowMap.autoUpdate=false`; applyAtmosphere marks the pass dirty
+only when the shadow camera actually moved (it rides the player, >0.5m), the sun swung
+>~0.15°, the big toggles flipped (hatch/level/atTop), or a cinematic owns the frame
+(MODE!=='play' — the dive's world-scaling keeps live shadows). Standing still reading
+lore no longer redraws ~110k caster tris per frame. No dynamic object casts, so nothing
+visibly changes — verified by before/after screenshots at two vantages (tree + grass
+shadows present, following the move).
+
+**Numbers (bench pose, median of 6, ±1.5ms timer):** noon surface **11.89 → 9.54ms
+(-20%)**; noon hatchOpen 12.29 → 10.44; night lamp+hatch 12.4 → 11.7. The standing
+policy honoured in its own currency. Walk 28/28; 0 errors. **Closes #27, #28.**
+
+---
+
 ## loop-fire 18 — 2026-08-01 — #55 the inspector's tide ledger · #76 DEEP_SETS
 
 **Shipped (#55):** the drain's carved line kept its whisper, and beside it the annex — the
