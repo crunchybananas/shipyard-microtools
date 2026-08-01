@@ -415,6 +415,22 @@ export class Game {
       onClick: () => { if (this.onClimb) this.onClimb(false); },
     });
 
+    // #52 — the tide gauge: a look-read landmark. Clicking names the CURRENT ring;
+    // the first read journals the whole instrument (he surveyed these heights).
+    if (R.tideGauge) I.add({
+      id: 'tideGauge', targets: [R.tideGauge, R.gaugeTop].filter(Boolean), label: 'a graduated staff', maxDist: 36,
+      onClick: () => {
+        A.crankTick();
+        UI.whisper({
+          1: 'Five rings. The lowest sits at the old high-water. The rest climb into air no tide should own — and the top ring is fresh-cut, still pale.',
+          2: 'The water stands at the second ring, exact as a promise kept.',
+          3: 'The third ring, to the inch. Whoever set these knew.',
+          4: 'The fourth ring. One remains above the water — fresh-cut, pale, and waiting.',
+        }[Math.min(W.level, 4)] || 'The rings keep their count.');
+        this.once('tideGauge', () => UI.addJournal('Off the low shore stands a graduated staff, ringed at five heights. The lowest is the sea I woke beside; the next three I have since stood BESIDE, one dive at a time, the water meeting each ring to the inch. The fifth is new-cut and pale, set above everything — measured, and not yet met. He did not guess these heights. He surveyed them, the way you survey a grief you know is still rising.', '', 'self'));
+      },
+    });
+
     // hub Phase C — the drain's one carved line (the first tunnel's lore beat)
     I.add({
       id: 'drainMark', targets: [R.drainMark], label: 'a line carved in the wall', maxDist: 2.6,

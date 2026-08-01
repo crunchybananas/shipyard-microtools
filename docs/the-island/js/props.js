@@ -2212,6 +2212,47 @@ export function buildWorld() {
     core.add(phial);
   }
 
+  // =================== THE TIDE GAUGE (#52: region4's landmark) =======================
+  // A graduated staff on the lower foreshore, ringed at the EXACT absolute waterlines of
+  // the descent — 0 (L1 high water), +1.47 (L2), +2.73 (L3), +3.78 (L4) — and one ring
+  // above them all, fresh-cut and pale, for the level that does not exist yet. At L1 the
+  // rings climb into air no tide should own (a quiet mystery, like the high pool); each
+  // dive the water meets the next ring to the inch; at L4 one dry ring remains. The
+  // keeper's logbook line ("I marked the old line on the third step, and the new one has
+  // gone over it") made monumental. Visible from the beach walk and the L4 pool ridge
+  // (~19m); the shaft is the named click target (a look-read, maxDist ~34 in puzzles).
+  {
+    const GX = -64, GZ = -93;
+    const gy = heightAt(GX, GZ);
+    const rootY = gy - 0.5, topY = 5.65;   // rooted below the sand, crown above the unmet ring
+    // the shaft — named + clickable (kept OUT of the bakers); weathered iron-dark
+    const shaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.09, 0.13, topY - rootY, 8),
+      new THREE.MeshStandardMaterial({ color: 0x4a4640, roughness: 0.85, metalness: 0.25, flatShading: true }));
+    shaft.position.set(GX, (rootY + topY) / 2, GZ);
+    shaft.name = 'tideGauge';
+    shaft.castShadow = true;
+    core.add(shaft);
+    // the four met waterline rings — brass-dark collars at ABSOLUTE heights
+    const ringGeo = new THREE.TorusGeometry(0.21, 0.045, 6, 14);
+    for (const ry of [0, 1.47, 2.73, 3.78]) {
+      const rg = ringGeo.clone(); rg.rotateX(Math.PI / 2);
+      brass.add(rg, place(GX, ry, GZ), grad(C.brassDark, C.brassDark));
+      rg.dispose();
+    }
+    // the fifth ring — fresh-cut, pale, set above everything; measured, not yet met
+    const top = new THREE.Mesh(new THREE.TorusGeometry(0.21, 0.045, 6, 14),
+      new THREE.MeshStandardMaterial({ color: 0xd8d2c2, roughness: 0.55, metalness: 0.15, flatShading: true }));
+    top.rotation.x = Math.PI / 2;
+    top.position.set(GX, 4.83, GZ);
+    top.name = 'gaugeTop';
+    core.add(top);
+    // a small crossbar vane at the crown, seaward — it reads as an instrument, not a post
+    const vane = new THREE.BoxGeometry(0.5, 0.05, 0.05);
+    brass.add(vane, place(GX, 5.5, GZ, 0.9), grad(C.brassDark, C.brass));
+    vane.dispose();
+  }
+
   // ---------- merge static bakers ----------
   const stoneMesh = new THREE.Mesh(stone.build(), matStone);
   stoneMesh.castShadow = true;
@@ -2841,6 +2882,7 @@ const NAMES = [
   'stone5', 'stoneGlow5', 'stoneMark5',                                   // the fallen sixth stone (#49: the hidden sixth note)
   'poolWater', 'poolPhial', 'poolGlint', 'phialDesk', 'hallGlyphs',       // #49: the high-pool round trip + the beam turned to the deep
   'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain',   // #54: the lampblack micro-marks
+  'tideGauge', 'gaugeTop',                                                 // #52: the tide gauge — the descent's waterlines made monumental
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];

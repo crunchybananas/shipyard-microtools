@@ -303,6 +303,8 @@ export const SKETCHES = [
   ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
   ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
   ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
+  // #52 — the tide gauge landmark.
+  ['graduated staff, ringed at five heights', S('<path d="M48 5v31"/><ellipse cx="48" cy="31" rx="7" ry="2"/><ellipse cx="48" cy="25" rx="7" ry="2"/><ellipse cx="48" cy="19" rx="7" ry="2"/><ellipse cx="48" cy="13" rx="7" ry="2"/><ellipse cx="48" cy="7" rx="7" ry="2" opacity=".45"/><path d="M12 33q9-4 18 0M66 33q9-4 18 0" opacity=".5"/>')],
   // #54 — the lampblack tally (one shared sketch for all nine finds) + the completion.
   ['Lampblack, under the glass — on', S('<circle cx="34" cy="19" r="9"/><path d="M41 26l13 10"/><path d="M30 17h8M30 21h6" opacity=".7"/><path d="M56 14h26M56 19h20M56 24h23" opacity=".2"/>')],
   ['the last of the lampblack', S('<circle cx="26" cy="18" r="8"/><path d="M32 24l10 9"/><path d="M48 12v6M54 12v6M60 12v6M66 12v6M72 12v6" opacity=".7"/><path d="M48 24v6M54 24v6M60 24v6M66 24v6" opacity=".7"/><path d="M14 37h68" opacity=".3"/>')],

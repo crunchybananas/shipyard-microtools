@@ -12,6 +12,37 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 9 — 2026-07-31 — #52 complete: the tide gauge — the descent's waterlines, surveyed
+
+**Shipped:** region4's missing landmark, and the whole SEA-STRATA mechanic in one prop: a
+graduated staff on the low foreshore at (-64,-93), ringed at the EXACT absolute waterlines
+of the descent — 0 (the sea you woke beside), +1.47 (L2), +2.73 (L3), +3.78 (L4) — and a
+fifth ring above them all, fresh-cut and pale: measured, not yet met (the L5 the ERA_CASTS
+already author). At L1 the rings climb into air no tide should own (a quiet mystery, kin
+to the high pool's); each dive the water meets the next ring to the inch; at L4 the staff
+rises from open water with one pale ring left. Click-read from up to 36m names the current
+ring per level; the once-journal lands the logbook line made monumental ("he did not guess
+these heights — he surveyed them, the way you survey a grief you know is still rising").
+
+**The region kits now (the issue's minimum):** region3 = Watcher encounter + cairn readable
++ bell-buoy landmark/sound-nav + the risen colonnade & beam-glyph puzzle (#49). region4 =
+keeper twist encounter + source-note readable + the high-pool climax (#49's L4 beat) + the
+tide gauge landmark. The L3/L4 micro-puzzles are #49's beam-to-the-deep and pool round trip.
+
+**Evidence:** ring heights assert against LEVELS tides (gaugeTop at 4.83 exactly); per-level
+click whispers; once-journal + 62/62 sketch coverage; clones to the 1:240 chart-table model
+(a centimetre staff on the table — the survey inside the survey). Screenshots L1 (rings in
+dry air over the swash, the fresh ring catching the sun) and L4 from the pool ridge (the
+staff nearly drowned, one measurement left) — both land the design.
+
+**Debt:** the "LEVELS as the real manifest (fragments[]+builder hook)" suggestion from #52
+is architecture — folded into the #69-73 cluster, not needed for the kit. **Closes #52.**
+
+**Next tick suggestion:** fire 10 = #57 hotspot labels + the full-game regression walk,
+then the batch push.
+
+---
+
 ## loop-fire 8 — 2026-07-31 — #54: the glass pays off — nine lampblack marks (+2 found bugs)
 
 **Shipped:** the reading glass promised "writing everywhere" and gated exactly two planes.
