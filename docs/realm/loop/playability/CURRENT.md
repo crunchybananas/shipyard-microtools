@@ -2,7 +2,7 @@
 
 Date updated: 2026-08-01
 
-Current live checkpoint: Realm `185`
+Current live checkpoint: Realm `186`
 
 Production graphics are intentionally paused at
 [`../graphics/PAUSE_AND_RESUME.md`](../graphics/PAUSE_AND_RESUME.md). The active
@@ -36,14 +36,24 @@ tick-1200 forced-spawn point, then proves the state is absent from New Game,
 Save, reload, and Continue. The full 47-check Realm 185 suite passes. See
 [`rounds/001-balloon-retirement.md`](rounds/001-balloon-retirement.md).
 
+## Completed Responsive Slice: Phone Build Mode
+
+Round 002 established a fresh desktop, tablet, and `390x844` evidence set, then
+fixed the first coherent surface: touch build-mode lifecycle and gesture
+arbitration. A selected build now exposes a reachable 44px-or-larger Cancel
+control. A tap places, a one-finger drag pans without placing, and pinch zoom
+does not place or leave the camera dragging. Ordinary building selection still
+works after Cancel. The focused phone gate is part of the Realm release suite.
+See [`rounds/002-responsive-build-mode.md`](rounds/002-responsive-build-mode.md).
+
 ## Ranked Work Now
 
-1. **Responsive UX baseline.** Play the complete opening flow at desktop,
-   tablet, and `390x844`; audit HUD density, build-bar reachability, tutorial
-   obstruction, panel overflow, touch targets, canvas resize, camera gestures,
-   and keyboard-only affordances. Capture specific frames and fix one coherent
-   surface at a time. The old mobile audit concluded “usable, not designed”; do
-   not assume later additions preserved even that baseline.
+1. **Responsive UX continuation.** Remove the invisible advisor hit target that
+   can block phone title actions after the tip fades. Then restore ordinary
+   keyboard focus by retiring the global Tab interception, correct the tutorial
+   step contracts, make tablet HUD overflow legible, resolve phone minimap/build
+   bar overlap, and raise the remaining undersized touch targets. Keep shipping
+   one reproduced surface at a time from the Round 002 queue.
 2. **Crowd-safe NPC movement.** Reproduce remaining player-visible miner or
    town-crowd failures before changing the kernel. On Realm 185, both strict
    navigation gates are green with zero known fixture defects: weighted route
@@ -74,7 +84,7 @@ node scripts/verify-realm.mjs
 ```
 
 The traffic fixtures remain the promotion gates for movement changes. Their
-strict modes both pass on Realm 185, while the Realm 165 measurements remain
+strict modes both pass on Realm 186, while the Realm 165 measurements remain
 the last formal performance baseline. Read `../engine-v2/CURRENT.md` before
 changing ownership, save, or navigation surfaces.
 

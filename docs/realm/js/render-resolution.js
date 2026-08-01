@@ -2,7 +2,7 @@
 // The canonical actor art stays 64x84; these helpers only choose the closest
 // deterministic runtime derivative for the current physical-pixel footprint.
 
-import { ACTOR_RUNTIME_ATLASES } from './sprite-source-contract.js?realm=185';
+import { ACTOR_RUNTIME_ATLASES } from './sprite-source-contract.js?realm=186';
 
 const INTEGER_SCALE_EPSILON = 0.055;
 const MAX_POSTFX_DPR = 2;

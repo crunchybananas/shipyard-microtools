@@ -2,14 +2,14 @@
 // Input — mouse, keyboard, touch, camera
 // ════════════════════════════════════════════════════════════
 
-import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=185';
-import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=185';
-import { canAfford } from './economy.js?realm=185';
-import { dispatch } from './commands.js?realm=185';
-import { notify } from './notifications.js?realm=185';
-import { initAudio } from './audio.js?realm=185';
-import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=185';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=185';
+import { G, BUILDINGS, MAP_W, MAP_H, TW, TH } from './state.js?realm=186';
+import { screenToWorld, toScreen, toggleFPS } from './render.js?realm=186';
+import { canAfford } from './economy.js?realm=186';
+import { dispatch } from './commands.js?realm=186';
+import { notify } from './notifications.js?realm=186';
+import { initAudio } from './audio.js?realm=186';
+import { renderBuildBar, updateUI, showInfoPanel, hideInfoPanel, setSpeed, renderMissions } from './ui.js?realm=186';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=186';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -175,8 +175,50 @@ function tryPlaceAt(tx, ty) {
 export function setupInput(canvas) {
   const C = canvas;
   let touchDist = 0;
+  let touchStart = null;
+  let touchMoved = false;
+  const TOUCH_DRAG_THRESHOLD = 8;
 
   C.addEventListener('contextmenu', e => e.preventDefault());
+
+  function handlePrimaryTap(clientX, clientY) {
+    if (G.selectedBuild) {
+      const t = pickTile(clientX, clientY);
+      if (!t) return true;
+      tryPlaceAt(t.x, t.y);
+      G._lastPaintTile = { x: t.x, y: t.y };
+      return true;
+    }
+
+    // Citizens render in front of buildings, so they win overlapping taps.
+    const cit = findCitizenAtClick(clientX, clientY);
+    if (cit) {
+      G.selectedBuilding = null;
+      G.selectedCitizenId = cit.actorId;
+      showCitizenPanel(cit);
+      return true;
+    }
+    const b = findBuildingAtClick(clientX, clientY);
+    if (b) {
+      G.selectedBuilding = b;
+      G.selectedCitizenId = null;
+      showInfoPanel(b);
+      return true;
+    }
+
+    G.selectedBuilding = null;
+    G.selectedCitizenId = null;
+    hideInfoPanel();
+    // Follow mode (Phase 3d): a ground tap walks the founder there.
+    if (G._followAvatar && G.avatar) {
+      const t = pickTile(clientX, clientY);
+      if (t) {
+        dispatch({ type: 'AVATAR_GOTO', x: t.x, y: t.y });
+        return true;
+      }
+    }
+    return false;
+  }
 
   function onMouseDown(e) {
     if (e.target !== C) return;
@@ -214,45 +256,8 @@ export function setupInput(canvas) {
       return;
     }
 
-    // Left-click build
-    if (e.button === 0 && G.selectedBuild) {
-      const t = pickTile(e.clientX, e.clientY);
-      if (!t) return;
-      tryPlaceAt(t.x, t.y);
-      G._lastPaintTile = { x: t.x, y: t.y };
-      return;
-    }
-
-    // Left-click select citizen or building
-    if (e.button === 0 && !G.selectedBuild) {
-      // Check citizens first (they render in front of buildings)
-      const cit = findCitizenAtClick(e.clientX, e.clientY);
-      if (cit) {
-        G.selectedBuilding = null;
-        G.selectedCitizenId = cit.actorId;
-        showCitizenPanel(cit);
-        return;
-      }
-      const b = findBuildingAtClick(e.clientX, e.clientY);
-      if (b) {
-        G.selectedBuilding = b;
-        G.selectedCitizenId = null;
-        showInfoPanel(b);
-        return;
-      } else {
-        G.selectedBuilding = null;
-        G.selectedCitizenId = null;
-        hideInfoPanel();
-        // Follow mode (Phase 3d): a ground click walks the founder there.
-        if (G._followAvatar && G.avatar) {
-          const t = pickTile(e.clientX, e.clientY);
-          if (t) {
-            dispatch({ type: 'AVATAR_GOTO', x: t.x, y: t.y });
-            return; // don't also start a camera drag
-          }
-        }
-      }
-    }
+    // Left-click build, select, or issue a founder follow command.
+    if (e.button === 0 && handlePrimaryTap(e.clientX, e.clientY)) return;
 
     // Pan
     G.dragging = true;
@@ -312,35 +317,46 @@ export function setupInput(canvas) {
   // Touch
   C.addEventListener('touchstart', e => {
     if (e.target !== C) return;
+    e.preventDefault();
     initAudio();
     if (e.touches.length === 1) {
       const t = e.touches[0];
-      if (G.selectedBuild) {
-        const tile = pickTile(t.clientX, t.clientY);
-        if (tile && dispatch({ type: 'PLACE_BUILDING', building: G.selectedBuild, x: tile.x, y: tile.y }).ok) {
-          renderBuildBar(); renderMissions(); updateUI();
-        }
-        return;
-      }
-      G.dragging = true;
+      // Do not place on touchstart: that makes a build-selected drag place a
+      // second building before the player has a chance to pan. Defer the tap
+      // action until touchend and promote it to a camera drag after a small
+      // movement threshold.
+      touchStart = { x: t.clientX, y: t.clientY };
+      touchMoved = false;
+      G.dragging = false;
       G.dragStart = { x: t.clientX, y: t.clientY };
       G.camStart = { x: G.camera.x, y: G.camera.y };
     }
     if (e.touches.length === 2) {
+      touchStart = null;
+      touchMoved = true;
+      G.dragging = false;
       touchDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY,
       );
     }
-  });
+  }, { passive: false });
 
   C.addEventListener('touchmove', e => {
     e.preventDefault();
-    if (e.touches.length === 1 && G.dragging) {
+    if (e.touches.length === 1 && touchStart) {
       const t = e.touches[0];
-      G.camera.x = G.camStart.x - (t.clientX - G.dragStart.x) / G.camera.zoom;
-      G.camera.y = G.camStart.y - (t.clientY - G.dragStart.y) / G.camera.zoom;
-      G.hoveredTile = pickTile(t.clientX, t.clientY);
+      const dx = t.clientX - touchStart.x;
+      const dy = t.clientY - touchStart.y;
+      if (!touchMoved && Math.hypot(dx, dy) >= TOUCH_DRAG_THRESHOLD) {
+        touchMoved = true;
+        G.dragging = true;
+      }
+      if (touchMoved) {
+        G.camera.x = G.camStart.x - (t.clientX - G.dragStart.x) / G.camera.zoom;
+        G.camera.y = G.camStart.y - (t.clientY - G.dragStart.y) / G.camera.zoom;
+        G.hoveredTile = pickTile(t.clientX, t.clientY);
+      }
     }
     if (e.touches.length === 2) {
       const d = Math.hypot(
@@ -352,7 +368,22 @@ export function setupInput(canvas) {
     }
   }, { passive: false });
 
-  C.addEventListener('touchend', () => { G.dragging = false; });
+  C.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (e.touches.length === 0 && touchStart && !touchMoved) {
+      handlePrimaryTap(touchStart.x, touchStart.y);
+    }
+    if (e.touches.length === 0) {
+      touchStart = null;
+      touchMoved = false;
+      G.dragging = false;
+    }
+  }, { passive: false });
+  C.addEventListener('touchcancel', () => {
+    touchStart = null;
+    touchMoved = false;
+    G.dragging = false;
+  });
 
   // Keyboard
   document.addEventListener('keydown', e => {

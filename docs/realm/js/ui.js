@@ -2,22 +2,22 @@
 // UI — HUD, build bar, info panels, tooltips
 // ════════════════════════════════════════════════════════════
 
-import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=185';
-import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=185';
-import { getWonderReport } from './wonder.js?realm=185';
-import { panCameraTo } from './render.js?realm=185';
-import { dispatch } from './commands.js?realm=185';
-import { missions } from './missions.js?realm=185';
-import { getActiveScenario } from './scenarios.js?realm=185';
-import { saveGame, loadGame } from './save.js?realm=185';
-import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=185';
-import { notify } from './notifications.js?realm=185';
-import { TRADE_PARTNERS } from './trade.js?realm=185';
+import { resourceEmoji, G, BUILDINGS, getSeasonData, DIFFICULTY, HOUSE_TIERS } from './state.js?realm=186';
+import { canAfford, getRaidCountdown, getHouseTierReport, computePrestige } from './economy.js?realm=186';
+import { getWonderReport } from './wonder.js?realm=186';
+import { panCameraTo } from './render.js?realm=186';
+import { dispatch } from './commands.js?realm=186';
+import { missions } from './missions.js?realm=186';
+import { getActiveScenario } from './scenarios.js?realm=186';
+import { saveGame, loadGame } from './save.js?realm=186';
+import { isBuildingUnlocked, TECHS, canResearch, getResearchProgress, ERAS, getEraProgress } from './tech.js?realm=186';
+import { notify } from './notifications.js?realm=186';
+import { TRADE_PARTNERS } from './trade.js?realm=186';
 import {
   citizenStaffingCapacity,
   staffingCount,
-} from './citizen-ownership.js?realm=185';
-import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=185';
+} from './citizen-ownership.js?realm=186';
+import { buildCurrentCitizenPresentations } from './citizen-presentation.js?realm=186';
 
 const escapeHtml = value => String(value).replace(
   /[&<>"']/g,
@@ -384,6 +384,19 @@ export function renderBuildBar() {
   if (!bar) return;
   bar.innerHTML = '';
   _visibleBuildKeys = [];
+  if (G.selectedBuild) {
+    const cancel = document.createElement('button');
+    cancel.className = 'build-cancel';
+    cancel.type = 'button';
+    cancel.setAttribute('aria-label', 'Cancel building placement');
+    cancel.innerHTML = '<span class="build-cancel-icon" aria-hidden="true">✕</span><span>Cancel</span>';
+    cancel.onclick = () => {
+      G.selectedBuild = null;
+      G._lastPaintTile = null;
+      renderBuildBar();
+    };
+    bar.appendChild(cancel);
+  }
   const terrainNames = { 1:'Sand', 3:'Forest', 4:'Stone', 5:'Iron' };
   for (const cat of CATEGORIES) {
     const unlockedKeys = cat.keys.filter(key => BUILDINGS[key] && isBuildingUnlocked(key));
@@ -430,8 +443,9 @@ export function renderBuildBar() {
       btn.onclick = () => {
         // Always select on click — don't toggle off when clicking the same
         // button again (that was causing "House button doesn't work" confusion
-        // after placing a building, since selectedBuild was still 'house').
-        // Deselect via Escape key or by clicking the build bar category label.
+        // after placing a building, since selectedBuild was still 'house'). The
+        // explicit Cancel control is the touch-visible way out of build mode;
+        // Escape remains the keyboard equivalent.
         G.selectedBuild = key;
         G.selectedBuilding = null;
         hideInfoPanel();

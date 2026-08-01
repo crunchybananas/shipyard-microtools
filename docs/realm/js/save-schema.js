@@ -4,7 +4,7 @@
 // event-bus dependencies. The repository contract is the single source for
 // every epoch/version value.
 
-import contract from '../runtime-contract.json?realm=185' with { type: 'json' };
+import contract from '../runtime-contract.json?realm=186' with { type: 'json' };
 
 export const SAVE_KEY = contract.saveKey;
 export const SAVE_SCHEMA = contract.saveSchema;
