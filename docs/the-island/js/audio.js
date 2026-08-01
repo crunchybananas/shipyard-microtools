@@ -89,6 +89,19 @@ const A = {
     this.rain.gain.gain.value = 0;
     this.rain.out.connect(this.amb);
 
+    // ---- crickets: the night's own bed (#64) ----
+    // one loop node pair: high bandpass noise, its gain pulsed ~13Hz by an LFO so it
+    // trills instead of hissing. Driven in update() — night, surface level, outdoors.
+    this.crickets = this._noiseLoop('white', 4300, 'bandpass', 9);
+    this.crickets.gain.gain.value = 0;
+    this.crickets.out.connect(this.amb);
+    this.cricketLfo = ctx.createOscillator();
+    this.cricketLfo.frequency.value = 13;
+    this.cricketLfoG = ctx.createGain();
+    this.cricketLfoG.gain.value = 0;                       // depth follows the bed level (update)
+    this.cricketLfo.connect(this.cricketLfoG).connect(this.crickets.gain.gain);
+    this.cricketLfo.start();
+
     // ---- interior room tone ----
     this.room = this._noiseLoop('brown', 130);
     this.room.gain.gain.value = 0;
@@ -189,6 +202,21 @@ const A = {
     this.wind.filt.frequency.setTargetAtTime(550 + s.altitude * 26, t, 0.5);
     // room tone indoors
     this.room.gain.gain.setTargetAtTime(s.interior ? 0.16 : 0.0, t, 0.25);
+    // crickets (#64): night, surface only — the drowned levels do not gain new life.
+    // Base gain + LFO depth move together so the trill scales with the bed.
+    const cricketBase = (s.night ?? 0) * ((s.level ?? 1) <= 1 ? 1 : 0) * (s.interior ? 0.2 : 1) * 0.045;
+    this.crickets.gain.gain.setTargetAtTime(cricketBase, t, 2.2);
+    this.cricketLfoG.gain.setTargetAtTime(cricketBase * 0.75, t, 2.2);
+    // dawn chorus (#64): scattered distant chirps, unscheduled and unrepeating — the
+    // island waking. Never indoors, never below the surface; the stones' puzzle bird
+    // (BIRD_MELODY, vol 0.35) always reads over these 0.05-0.10 far-field calls.
+    if ((s.dawn ?? 0) > 0 && (s.level ?? 1) <= 1 && !s.interior) {
+      this._chorusT = (this._chorusT ?? 1.5) - dt;
+      if (this._chorusT <= 0) {
+        this._chorusT = 0.9 + Math.random() * 2.8;
+        this.chirp(460 + Math.random() * 430, 0, 0.05 + Math.random() * 0.05);
+      }
+    }
   },
 
   // the brink of a dive: the world holds its breath. Surf and wind pull back
@@ -220,6 +248,46 @@ const A = {
     car.connect(g).connect(this.music);
     car.start(t0); mod.start(t0);
     car.stop(t0 + decay + 0.2); mod.stop(t0 + decay + 0.2);
+  },
+
+  // a gull cries (#64) — two-syllable "kee-yaa": sawtooth through a swept bandpass,
+  // the second syllable falling. vol is pre-scaled by the caller for distance.
+  gullCry(vol = 0.2) {
+    if (!this._running()) return;
+    const t0 = ctx.currentTime;
+    for (const [at, f0, f1, dur, v] of [[0, 1240, 990, 0.14, 0.7], [0.18, 1120, 640, 0.3, 1]]) {
+      const o = ctx.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f0, t0 + at);
+      o.frequency.exponentialRampToValueAtTime(f1, t0 + at + dur);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 3.4;
+      bp.frequency.setValueAtTime(f0 * 1.5, t0 + at);
+      bp.frequency.exponentialRampToValueAtTime(f1 * 1.4, t0 + at + dur);
+      const g = ctx.createGain(); this._env(g, t0 + at, 0.02, vol * v, dur);
+      o.connect(bp).connect(g).connect(this.fx);
+      o.start(t0 + at); o.stop(t0 + at + dur + 0.12);
+    }
+  },
+
+  // a crow caws (#64) — one or two harsh flat pulses, the lone voice of an island
+  // gone quiet. Rasp comes from a fast square tremolo chopping the sawtooth.
+  crowCaw(vol = 0.2, double = Math.random() < 0.45) {
+    if (!this._running()) return;
+    const t0 = ctx.currentTime;
+    const pulses = double ? [0, 0.26] : [0];
+    for (const at of pulses) {
+      const o = ctx.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(640, t0 + at);
+      o.frequency.exponentialRampToValueAtTime(470, t0 + at + 0.18);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 1.6;
+      const trem = ctx.createOscillator(); trem.type = 'square'; trem.frequency.value = 26;
+      const tg = ctx.createGain(); tg.gain.value = 0.5;
+      const tbase = ctx.createGain(); tbase.gain.value = 0.55;
+      trem.connect(tg).connect(tbase.gain);
+      const g = ctx.createGain(); this._env(g, t0 + at, 0.015, vol, 0.2);
+      o.connect(bp).connect(tbase).connect(g).connect(this.fx);
+      o.start(t0 + at); o.stop(t0 + at + 0.3);
+      trem.start(t0 + at); trem.stop(t0 + at + 0.3);
+    }
   },
 
   // the bird sings a note — formant chirp

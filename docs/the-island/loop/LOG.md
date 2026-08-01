@@ -12,6 +12,33 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 7 — 2026-07-31 — #64: the day/night cycle is AUDIBLE (crickets, chorus, cries)
+
+**Shipped:** `night` was passed to the audio engine every frame and never read; the dawn-gull
+perch beat and all thirteen gulls were silent. Now the clock has a voice: a cricket bed (ONE
+noise-loop pair — bandpass 4.3kHz trilled by a 13Hz LFO) rises with `s.night` at the surface
+and only there — the drowned levels gain no new life; a scattered dawn chorus (unscheduled
+far chirps, 0.9–3.7s apart, always under the stones' 0.35-vol puzzle bird) wakes the island
+through the dawn window; and the birds cry — `gullCry()` (two-syllable kee-yaa, swept
+bandpass) on perched-gull startles, sparse distance-scaled calls from the wheeling flock
+(~one per half-minute), and one announcing cry as the dawn percher takes the rail;
+`crowCaw()` (tremolo-chopped rasp) on crow startles + the rare lone caw within earshot —
+the "island gone quiet" line the crows were built for, finally made literal.
+
+**Evidence:** structural verification on a RUNNING ctx (autoplay-allowed headless): cricket
+gain 0.0445 at night-L1 (target 0.045) with LFO depth tracking, 0.003→0 at L3 and 0.0002 at
+noon; 4 chorus chirps in a 9s dawn window; perch-rail cry fires; per-species startle cries
+fire on proximity; one-shots throw-free; 0 console errors. Steady-state cost: exactly the
+one loop node pair the audit priced (+1 LFO osc).
+
+**Debt:** none added; #63 (spatialize one-shots) would give these cries real bearings — the
+natural next audio tick. **Closes #64.**
+
+**Next tick suggestion:** #54 (reading-glass payoff) — highest story-per-effort left on the
+lore board.
+
+---
+
 ## loop-fire 6 — 2026-07-31 — #49: the corridor breaks — three optional depth-keyed chains
 
 **Shipped (the elevator becomes a loop worth riding — every chain spans ≥2 levels):**

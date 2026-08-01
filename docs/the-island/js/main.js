@@ -398,7 +398,7 @@ const perched = [];
     const g = mk();
     g.position.set(x, h, z);
     g.rotation.y = (rngP() - 0.5) * 1.7;     // facing roughly seaward (yaw 0 = −z), spread
-    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0 };
+    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngP() * TAU, flush: 0, cool: 0, species: 'gull' };
     scene.add(g);
     perched.push(g);
     placed++;
@@ -427,7 +427,7 @@ const perched = [];
     const g = mkCrow();
     g.position.set(x, h, z);
     g.rotation.y = rngC() * TAU;
-    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0 };
+    g.userData = { px: x, py: h, pz: z, yaw: g.rotation.y, ph: rngC() * TAU, flush: 0, cool: 0, species: 'crow' };
     scene.add(g);
     perched.push(g);
     pc++;
@@ -1267,12 +1267,23 @@ function applyAtmosphere(elapsed, dt) {
 // east side, facing the sun — wings folded, riding the keeper's view
 const GULL_PERCH = new THREE.Vector3(LH.x + 3.05, LH.y + 21.95, LH.z);
 let perchT = 0;
+let perchCried = false;   // #64: one cry as the dawn percher takes the rail
 
 function tickGulls(elapsed, dt) {
   const day = 1 - clamp((-sunElevation(W.time) - 0.02) / 0.15, 0, 1);
   const wantPerch = isDawn() && MODE !== 'dive';
   perchT = clamp(perchT + (wantPerch ? dt / 4.5 : -dt / 3), 0, 1);
   const settle = easeInOut(perchT);
+  // #64: the wheeling flock finally has a voice — sparse far cries by day, surface only
+  // (~one across the flock every half-minute; distance to the gyre scales the volume)
+  if (day > 0.5 && MODE === 'play' && W.level === 1 && Math.random() < dt * 0.033) {
+    const g = gulls[(Math.random() * gulls.length) | 0];
+    const d = Math.hypot(g.position.x - player.pos.x, g.position.z - player.pos.z);
+    A.gullCry(clamp(0.26 * (1 - d / 220), 0.03, 0.26));
+  }
+  // #64: the dawn percher announces the rail (the keeper's-view beat gets its sound)
+  if (settle > 0.6 && !perchCried && MODE === 'play') { perchCried = true; A.gullCry(0.18); }
+  if (settle < 0.2) perchCried = false;
   for (const g of gulls) {
     g.visible = day > 0.3 && MODE !== 'dive';
     if (!g.visible) continue;
@@ -1307,7 +1318,15 @@ function tickPerched(elapsed, dt) {
       g.visible = true; g.rotation.x = 0;
       g.position.set(u.px, u.py + Math.sin(elapsed * 1.5 + u.ph) * 0.012, u.pz);
       g.rotation.y = u.yaw + Math.sin(elapsed * 0.45 + u.ph) * 0.18;
-      if (d < 3.6) u.flush = 0.001;                        // startle → flush
+      // #64: the lone caw of an island gone quiet — rare, and only within earshot
+      if (u.species === 'crow' && d < 60 && Math.random() < dt * 0.008) {
+        A.crowCaw(clamp(0.22 * (1 - d / 70), 0.04, 0.22));
+      }
+      if (d < 3.6) {
+        u.flush = 0.001;                                   // startle → flush
+        // #64: the burst-up finally makes a sound — a close startled cry
+        if (u.species === 'crow') A.crowCaw(0.3, true); else A.gullCry(0.3);
+      }
     } else if (u.flush < 1) {
       // flush: a quick climb up + away (flew off)
       u.flush = Math.min(1, u.flush + dt / 0.9);
@@ -1730,6 +1749,8 @@ renderer.setAnimationLoop((tMs) => {
     altitude: player.pos.y,
     interior: player.interior(),
     night: isNight() ? 1 : 0,
+    dawn: isDawn() ? 1 : 0,     // #64: the dawn chorus window
+    level: W.level,             // #64: crickets/chorus are surface life — the deep stays thinned
     mist: mistCur,
   });
 
