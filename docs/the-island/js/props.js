@@ -1812,6 +1812,25 @@ export function buildWorld() {
     const mark = glyphSprite(atlas, 4, 0x9adfca, 1.3);
     mark.position.set(cx - hw + 0.12, my, cz); mark.name = 'drainMark';
     drain.add(mark);
+    // #55: the INSPECTOR'S TIDE LEDGER — water-swollen, wedged where the west wall meets
+    // the floor. The district's official record of the rising sea, filed to a cabinet
+    // that floods: the drainFlood plane rises past this shelf with depth, so the ledger
+    // drowns as you carry the grief deeper — the tide countersigning it, literally.
+    {
+      const ledger = new THREE.Group();
+      ledger.name = 'drainLedger';
+      const cover = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.11, 0.5),
+        new THREE.MeshStandardMaterial({ color: 0x3c4448, roughness: 0.95, flatShading: true }));
+      ledger.add(cover);
+      const leaves = new THREE.Mesh(new THREE.BoxGeometry(0.33, 0.085, 0.47),
+        new THREE.MeshStandardMaterial({ color: 0xb9b2a0, roughness: 1, flatShading: true }));
+      leaves.position.set(0.012, 0.014, 0);
+      leaves.rotation.z = 0.1;                       // swollen, the block sprung open
+      ledger.add(leaves);
+      ledger.position.set(cx - hw + 0.34, fy + 0.09, cz - 1.35);
+      ledger.rotation.set(0, 0.35, 0.16);           // wedged, not shelved
+      drain.add(ledger);
+    }
   }
 
   // =================== THE GIANT RULER (bridges the chasm) ==================
@@ -2904,6 +2923,7 @@ const NAMES = [
   'lmValve', 'lmBox', 'lmChest', 'lmDory', 'lmJetty', 'lmStair', 'lmBell', 'lmBuoy', 'lmDrain',   // #54: the lampblack micro-marks
   'tideGauge', 'gaugeTop',                                                 // #52: the tide gauge — the descent's waterlines made monumental
   'tinyCompanion',                                                         // #53: the second figure on the model's beach, once carried
+  'drainLedger',                                                           // #55: the inspector's tide ledger, wedged in the drain
   'region2', 'region3', 'region4', 'tideFigure', 'drownedGallery', 'kelpSlate', 'bluffCairn', 'sourceNote', 'fishShadows', 'bellBuoy',   // SEA-STRATA shells + L2/L3/L4 encounters, fragments, L2 fish-shadows & the L3 bell-buoy (loop #117/#121/#127/#132/#134/#135/#143, #52)
   'trunks', 'canopies', 'canopies2', 'grass',   // SEA-STRATA L4: stripped on the real island at the cold bottom (loop #129); 2 canopy silhouettes (#139)
 ];

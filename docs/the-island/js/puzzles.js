@@ -486,6 +486,13 @@ export class Game {
       when: () => true,
       onClick: () => UI.whisper('A line cut low into the wet stone, in the keeper’s hand: “what you bury, the tide still finds.”'),
     });
+    // #55 — the inspector's tide ledger, wedged where the wall meets the floor: the
+    // DISTRICT's voice, its official hand cracking; it drowns as you descend (the
+    // drainFlood rises past its shelf — filed to a cabinet that floods).
+    if (R.drainLedger) I.add({
+      id: 'drainLedger', targets: [R.drainLedger], label: 'a water-swollen ledger', maxDist: 2.6,
+      onClick: () => UI.openReader('drain_ledger'),
+    });
 
     // the bell — the END at the bottom (descent / accept the loop). Struck below, it
     // withholds; struck at the surface it keeps the golden parade. The OTHER terminal

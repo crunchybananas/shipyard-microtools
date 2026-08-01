@@ -188,6 +188,23 @@ export const LORE = {
     ],
     journal: 'The dried note from the phial is a letter to the SEA, sealed against the day it rose high enough to take it. He asked it one thing: that whoever fishes the phial from the risen water be let back up — carried to the surface “the way you carry everything else you finally return.”',
   },
+  // the inspector's tide ledger (#55), wedged in the drain — the INSTITUTIONAL record of
+  // the rising sea, its official hand cracking. A written artifact, not a speaking voice
+  // (the keeper stays the game's only I/you); it countersigns his instruments from outside:
+  // the gauge's rings, the logbook's third step, the buoy's channel.
+  drain_ledger: {
+    kind: 'book', hand: 'inspector', title: 'A tide ledger, water-swollen',
+    pages: [
+      'DISTRICT OF LIGHTS — QUARTERLY RETURN. Station: the island. Keeper: [the ink has run]. Mean high water: RISEN — see appendix. Appendix: missing. Remarks: the keeper’s figures disagree with the printed tables. The keeper’s figures are carefully made. The printed tables are reprinted each year unchanged. One of these is a record; the other is a habit.',
+      'SECOND QUARTER. Mean high water: risen again. The boat-store stair is wet at the third step at neap. I have signed the return, and I note here, unofficially, between one damp page and the next: no one reads these. I file them to a cabinet that floods. The keeper alone measures as if measuring mattered — his rings on the channel staff are the only honest instrument in this district. I have recommended him for commendation and expect nothing.',
+    ],
+    deepFrom: 3,
+    deep: [
+      '(the last leaf, unlined — the official hand abandoned) They will close the station before they will reprint the tables. When the water reaches the archive, the district will finally agree with the keeper — all at once, and by drowning. I have left this ledger where the tide can countersign it. What you bury, the tide still finds. What you file, it finds sooner.',
+    ],
+    journal: 'A tide ledger, water-swollen, wedged where the drain wall meets the floor — the district’s official record of the rising sea. The printed tables never changed; his figures did. “One of these is a record; the other is a habit.”',
+    journalDeep: 'The ledger’s last leaf, read from the deep, drops the official hand: they would close the station before reprinting the tables — when the water reaches the archive, the district will agree with him all at once, and by drowning. He left it where the tide could countersign it. “What you file, it finds sooner.”',
+  },
   // on the MODEL's own chart table (#53) — a margin the width of a fingernail, read only by
   // someone bent over a model with a glass: which is exactly what HE was when he wrote it.
   // The recursion speaks to the next hand down.
@@ -233,11 +250,17 @@ export const LAMPBLACK = [
   { id: 'lmDrain', place: 'the drain wall, beside the carved line', line: 'And what the tide finds, it returns. That is the mercy nobody warns you of.' },
 ];
 
-// The fragments that say MORE the deeper you read them (LORE.deepFrom). Reaching a deep
-// page records the id in W.regions.fragmentsFound and accretes a journalDeep line; reading
-// ALL of them assembles the grief→integration arc (ui.js _renderReader fires the payoff).
-// Spread across the descent: the stone bares at L2, logbook+cot turn at L3, the box at L4.
-export const DEEP_FRAGMENTS = ['stone_inscription', 'keeper_logbook', 'quarters_journal', 'music_note'];
+// The CANONICAL deep-read arc (#76: DEEP_SETS): the fragments that say MORE the deeper
+// you read them, grouped by the depth their cold page bares at. Counts are DERIVED —
+// nothing downstream may assume "four" — so a new deep fragment is one line here.
+// (Other fragments with deepFrom pages — the bottle, the coat, the lens marks — stay
+// BONUS reads outside the arc, acknowledged but untallied, as shipped.)
+export const DEEP_SETS = {
+  2: ['stone_inscription'],                                  // the tide bares the stone
+  3: ['keeper_logbook', 'quarters_journal', 'drain_ledger'], // the hands turn colder (+#55)
+  4: ['music_note'],                                         // the fold gives up its inside
+};
+export const DEEP_FRAGMENTS = Object.values(DEEP_SETS).flat();
 
 // ---- journal marginalia (SKETCHES) -----------------------------------------
 // A small ink sketch for each journal entry, matched by words the entry contains — so
@@ -276,7 +299,7 @@ export const SKETCHES = [
   ['wax slate tangled', S('<path d="M30 31c-6-6-9-14-8-23" opacity=".45"/><path d="M70 32c5-7 7-15 5-24" opacity=".45"/><rect x="36" y="9" width="24" height="23" rx="2"/><path d="M41 15h14M41 20h14M41 25h9" opacity=".7"/>')],
   ['cairn on the L3 bluff', S('<ellipse cx="48" cy="33" rx="17" ry="4.5"/><ellipse cx="46" cy="26" rx="12.5" ry="4"/><ellipse cx="49" cy="20" rx="8.5" ry="3.5"/><circle cx="48" cy="13" r="3"/><path d="M48 10v-3" opacity=".5"/>')],
   ['weighted with a stone on the cold floor', S('<path d="M30 26l28-7 3 10-28 7z"/><path d="M58 19l-7 2 3 7" opacity=".55"/><path d="M35 24l16-4M35 28l13-3" opacity=".4"/><ellipse cx="38" cy="28" rx="4" ry="3"/><path d="M18 35h60" opacity=".35"/>')],
-  ['All four said more', S('<circle cx="48" cy="11" r="4.5"/><path d="M48 15v9"/><path d="M48 17l-9 5M48 17l9 5"/><path d="M40 23q-14 9 8 13t8-13" opacity=".6"/><path d="M12 36h72" opacity=".3"/>')],
+  ['said more the deeper I read', S('<circle cx="48" cy="11" r="4.5"/><path d="M48 15v9"/><path d="M48 17l-9 5M48 17l9 5"/><path d="M40 23q-14 9 8 13t8-13" opacity=".6"/><path d="M12 36h72" opacity=".3"/>')],
   // the DEEP-READ marginalia (loop #145) — the colder hand each fragment turns from below.
   ['the logbook’s last page turns colder', S('<path d="M48 11c-7-4-15-4-22 0v20c7-4 15-4 22 0 7-4 15-4 22 0V11c-7-4-15-4-22 0z" opacity=".6"/><path d="M48 11v20" opacity=".45"/><path d="M48 30v8M44 35l4 4 4-4" opacity=".75"/>')],
   ['the cot-journal turns', S('<path d="M40 11h16l-2 7H42z"/><path d="M44 18v5h8v-5" opacity=".7"/><path d="M48 23v3M43 26l5 9 5-9z" opacity=".6"/><path d="M30 15l9 4M66 15l-9 4" opacity=".4"/>')],
@@ -314,6 +337,9 @@ export const SKETCHES = [
   ['set the phial out to dry', S('<path d="M14 32h68" opacity=".7"/><g transform="rotate(-90 48 27) translate(0 2)"><path d="M44 14v14q0 3 4 3t4-3V14z"/><path d="M46 14h4v-4h-4z" opacity=".7"/></g><path d="M42 12q2-4 0-7M52 12q2-4 0-7M62 14q2-4 0-7" opacity=".4"/>')],
   ['turn the light to face the deep', S('<path d="M16 30V10l4-5 4 5v20" opacity=".85"/><path d="M20 10h0M16 16h8" opacity=".45"/><path d="M26 10l40 14M26 13l40 20" opacity=".55"/><path d="M60 34V22M70 34V24M80 34V23" opacity=".8"/><path d="M52 28q16 5 34 0" opacity=".4"/>')],
   ['letter to the SEA', S('<path d="M26 12h38l6 5v13H26z" opacity=".8"/><path d="M64 12v5h6" opacity=".6"/><path d="M31 19h24M31 24h18" opacity=".45"/><path d="M12 36q9-4 18 0t18 0t18 0t12 0" opacity=".55"/>')],
+  // #55 — the inspector's tide ledger.
+  ['tide ledger, water-swollen', S('<path d="M28 30l24-5 2 8-24 5z" opacity=".85"/><path d="M52 25l-5 1 1.5 7" opacity=".6"/><path d="M33 29l14-3M34 33l11-2" opacity=".35"/><path d="M60 14h16M60 18h12M60 22h16" opacity=".3"/><path d="M12 36q10 4 20 0t20 0t20 0" opacity=".45"/>')],
+  ['the tide could countersign', S('<path d="M26 12h36v18H26z" opacity=".7"/><path d="M30 17h20M30 21h26" opacity=".35"/><path d="M32 26q6-4 10 0t10 0" opacity=".85"/><path d="M12 36q10 4 20 0t20 0t20 0" opacity=".5"/>')],
   // #53 — the model's micro-finds (lean all the way in).
   ['a letter to the next hand down', S('<rect x="26" y="10" width="44" height="22" rx="1" opacity=".6"/><rect x="36" y="15" width="24" height="12" rx="1" opacity=".8"/><rect x="42" y="18" width="12" height="6" rx="0.5"/><circle cx="76" cy="28" r="6"/><path d="M80 32l8 6" opacity=".8"/>')],
   ['The invitation goes all the way down', S('<g transform="rotate(-8 40 24)"><path d="M36 30V18q0-3 3-4v-3h3v3q3 1 3 4v12z"/></g><g transform="rotate(-8 62 27) scale(0.55) translate(50 20)"><path d="M36 30V18q0-3 3-4v-3h3v3q3 1 3 4v12z" opacity=".7"/></g><path d="M14 34h68" opacity=".4"/><circle cx="22" cy="14" r="5" opacity=".5"/>')],

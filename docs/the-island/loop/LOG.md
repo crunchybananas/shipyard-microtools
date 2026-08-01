@@ -12,6 +12,33 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 18 — 2026-08-01 — #55 the inspector's tide ledger · #76 DEEP_SETS
+
+**Shipped (#55):** the drain's carved line kept its whisper, and beside it the annex — the
+DISTRICT — finally speaks on paper: a water-swollen tide ledger wedged where the wall meets
+the floor, the institutional record of the rising sea in an official hand that cracks
+("The printed tables are reprinted each year unchanged. One of these is a record; the
+other is a habit."). It countersigns the keeper's instruments from outside — the gauge's
+rings on the channel staff, the logbook's wet third step — and its deep leaf (L3+) drops
+the officialese entirely: "They will close the station before they will reprint the
+tables… I have left this ledger where the tide can countersign it." And the tide DOES:
+the drainFlood plane rises past the ledger's shelf with depth — filed to a cabinet that
+floods, literally. A written artifact, not a voice: the keeper stays the game's only I/you.
+
+**Shipped (#76):** the deep-read arc un-welds from "four": DEEP_SETS groups the canonical
+fragments by the depth their cold page bares at (L2 the stone · L3 logbook+cot+ledger ·
+L4 the box), DEEP_FRAGMENTS derives from it, the interstitial whispers are count-agnostic
+(first / middle / one-remains), and the shipped integration payoff stays the meta-close
+with its number removed ("Every one of them said more the deeper I read it" — the sketch
+matcher updated so old saves keep their marginalia). Bonus deep pages (bottle, coat, lens
+marks) stay outside the tally, as designed.
+
+**Evidence:** ledger reads + tallies at L3; after four of five the one-remains cue queues;
+the fifth fires the integration exactly once with the new text; model clone prunes the
+ledger with its drain; 69/69 sketch coverage; walk 28/28. **Closes #55, #76.**
+
+---
+
 ## loop-fire 17 — 2026-08-01 — THE FIELD REPORT (debug-together) · #53 the model's own secrets
 
 **Shipped (owner request, same morning):** debug-together. **⚑ field report** — the chip at

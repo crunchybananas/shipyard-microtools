@@ -100,17 +100,14 @@ export const UI = {
       W.regions.fragmentsFound.push(r.id);
       this.addJournal(r.lore.journalDeep, '', 'keeper');
       if (DEEP_FRAGMENTS.includes(r.id)) {
-        // the canonical set — a count-aware cue that the deep-read is a SYSTEM accreting toward
-        // something (poetic, not gamey); 1..N-1 here, the close is _maybeIntegrate's own whisper.
+        // the canonical set — a count-AGNOSTIC cue (#76: no prose may assume "four") that the
+        // deep-read is a SYSTEM accreting; the close is _maybeIntegrate's own whisper.
         const deep = DEEP_FRAGMENTS.filter((id) => W.regions.fragmentsFound.includes(id)).length;
         if (deep < DEEP_FRAGMENTS.length) {
-          const lines = [
-            '',
-            'It said more this time — because you came back to it from further down. Others here will do the same, if you return to them deeper.',
-            'Another turns its colder hand. The deeper readings are starting to rhyme with one another.',
-            'Three of them have shown their deepest pages now. One more, and they will want to be laid side by side.',
-          ];
-          this.whisper(lines[deep] || lines[1], 5200);
+          this.whisper(
+            deep === 1 ? 'It said more this time — because you came back to it from further down. Others here will do the same, if you return to them deeper.'
+            : deep === DEEP_FRAGMENTS.length - 1 ? 'One remains unread from below. Then they will want to be laid side by side.'
+            : 'Another turns its colder hand. The deeper readings are starting to rhyme with one another.', 5200);
         }
         this._maybeIntegrate();
       } else {
@@ -126,7 +123,7 @@ export const UI = {
     if (W.onceKeys.includes('deepIntegrated')) return;
     if (!DEEP_FRAGMENTS.every((id) => W.regions.fragmentsFound.includes(id))) return;
     W.onceKeys.push('deepIntegrated');
-    this.addJournal('All four said more the deeper I read them. Laid end to end they stop being his story and become the shape of the thing: whoever washes up is who went down; there is no bottom but the one you make; the wrong note is not the flaw but the playing; turn the light to face the deep — and climb back toward it carrying what you found. One person, holding both ends of the same rope. That is the whole of it.', '', 'self');
+    this.addJournal('Every one of them said more the deeper I read it. Laid end to end they stop being his story and become the shape of the thing: whoever washes up is who went down; there is no bottom but the one you make; the wrong note is not the flaw but the playing; turn the light to face the deep — and climb back toward it carrying what you found. One person, holding both ends of the same rope. That is the whole of it.', '', 'self');
     this.whisper('The fragments close like a hand. There was only ever one of you — the one who fell, and the one who keeps the light. Hold both, and climb.', 6000);
   },
 
