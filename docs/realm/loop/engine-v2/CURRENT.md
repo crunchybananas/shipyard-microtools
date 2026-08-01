@@ -2,6 +2,19 @@
 
 Date: 2026-07-19
 
+## 2026-08-01 focus overlay
+
+The live module revision is now Realm `184`; the Realm 165 figures below remain
+the last formal engine performance and traffic baseline, not the current module
+revision. Graphics work from 166–184 did not replace the gameplay kernel or
+close the deliberately red crowd/navigation controls.
+
+The owner has paused production art and returned focus to gameplay, responsive
+UX, movement, and cleanup. Begin with
+[`../playability/CURRENT.md`](../playability/CURRENT.md). Keep the live world on
+the canonical two-dimensional Canvas2D renderer; the old 3D/diorama path is not
+an active engine option.
+
 Active checkpoint: **Phase 1A citizen ownership promoted on realm 165; RFC 0002
 sprite work paused at owner review of one Realm-owned carry/right row**
 

@@ -97,9 +97,23 @@ When flagging a graphic issue, always attach:
 For graphics-only work, read `graphics/LOOP.md` after this manifest.
 That directory is the current handoff system for painted bitmap art,
 canonical 2D visual audits, construction/upgrade state, walls, actors,
-and no-SVG live rendering. Use `graphics/CURRENT.md` as the first handoff
-and write one `graphics/rounds/NNN-*.md` entry at the end of each
-graphics round.
+and no-SVG live rendering. While the art push is paused, use
+`graphics/PAUSE_AND_RESUME.md` as the first handoff, then
+`graphics/CURRENT.md`, and write one `graphics/rounds/NNN-*.md` entry at the
+end of each graphics round.
+
+### Current owner focus — 2026-08-01
+
+Production graphics are deliberately paused at Realm 184. The restartable art
+process and exact pause state live in `graphics/PAUSE_AND_RESUME.md`; do not
+resume the graphics backlog from old journal momentum alone.
+
+Active work has shifted to ordinary-game playability, responsive UX, crowd
+movement, and removal of old or surprising behavior. Read
+`playability/LOOP.md` and `playability/CURRENT.md` before that work. The live
+world remains canonical 2D Canvas rendering with painted raster atlases;
+WebGL2 is post-processing only, and the retired 3D renderer is not an active
+axis.
 
 ## Constraints
 

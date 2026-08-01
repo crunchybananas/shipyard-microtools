@@ -1,5 +1,12 @@
 # Graphics Automation Handoff
 
+## Owner Pause — 2026-08-01
+
+Do not renew or reschedule this graphics automation while the owner is focused
+on gameplay, responsive UX, movement, and cleanup. The graphics restart point
+is `PAUSE_AND_RESUME.md`, and A15 rancher is intentionally dormant until an
+explicit request to resume production art.
+
 ## Current Automation State
 
 Automation ID: `tonight-graphics-polish-loop`
@@ -20,8 +27,9 @@ fire again unless the schedule is updated.
 
 ## What To Do After Restart
 
-Use the app automation tool, if available, to update the existing
-automation rather than creating a new duplicate.
+Only after the owner explicitly resumes graphics, use the app automation tool,
+if available, to update the existing automation rather than creating a new
+duplicate.
 
 Recommended update:
 

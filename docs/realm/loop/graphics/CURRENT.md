@@ -1,5 +1,16 @@
 # Current Graphics Handoff
 
+## Paused after Realm 184 — 2026-08-01
+
+Production graphics are deliberately paused while project focus returns to
+gameplay, responsive UX, crowd movement, and general cleanup. The canonical
+restart process is [`PAUSE_AND_RESUME.md`](PAUSE_AND_RESUME.md); the active
+non-art handoff is [`../playability/CURRENT.md`](../playability/CURRENT.md).
+
+Do not resume from the historical queue or start A15 automatically. When the
+owner explicitly returns to graphics, confirm the then-current runtime
+contracts and continue with one complete rancher family.
+
 ## Realm 184 settler production family — 2026-08-01
 
 - All `16` settler rows now come from one deterministic A14 modular family:

@@ -3,18 +3,24 @@
 Purpose: keep every graphics round small, visual, verified, and easy
 for the next round to continue.
 
+Status: **paused by owner direction on 2026-08-01 at Realm 184**. Resume only
+when the owner explicitly returns to production art. At that point read
+`PAUSE_AND_RESUME.md` before the files below; A15 rancher is the recorded
+restart target.
+
 This loop is for art/rendering/assets only. Gameplay support changes are
 allowed only when a graphics feature cannot be verified without them.
 
 ## Start Of Round
 
 1. Read this file.
-2. Read `CURRENT.md`.
-3. Read the newest file in `rounds/`.
-4. If this is an automation wake, skim `AUTOMATION_HANDOFF.md` for any
+2. Read `PAUSE_AND_RESUME.md`.
+3. Read `CURRENT.md`.
+4. Read the newest file in `rounds/`.
+5. If this is an automation wake, skim `AUTOMATION_HANDOFF.md` for any
    scheduler notes or current user constraints.
-5. Pick one target from `BACKLOG.md`.
-6. State the target in one sentence before editing.
+6. Pick one target from `BACKLOG.md`.
+7. State the target in one sentence before editing.
 
 Do not start by surveying the whole system. Stay in this Realm folder
 unless the user explicitly asks otherwise.

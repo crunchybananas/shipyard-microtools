@@ -2,20 +2,21 @@
 
 Prioritize work that changes what the player sees in the live game.
 
+Status: **paused at Realm 184**. See `PAUSE_AND_RESUME.md`. Do not pull from
+this queue until the owner explicitly resumes production graphics.
+
 ## Ready
 
-1. Resolve the complete guard candidate, then migrate the remaining cast.
-   - Problem: A5 now proves one modular identity across all `16` guard rows,
-     but the family remains opt-in candidate art until close transition review
-     decides whether the sword cadence and baked crate should ship unchanged.
-   - Push: review idle/walk/work/carry transitions and resource-specific cargo
-     semantics at close game zoom, revise the shared source once if needed,
-     then use the v2 manifest's atomic family promotion. Migrate other roles
-     one family at a time only after this pilot is accepted.
-   - Verify: require single-row source review, independent clean rebuilds,
-     identity/garment/equipment invariants, Sprite Lab and Actor Muster review,
-     exact-tier settlement captures, all `224` atlas rows, and all `1,792`
-     runtime frames.
+1. Build A15 rancher when graphics resumes.
+   - Problem: rancher is the first of five remaining older palette-derived
+     families and no longer matches the nine modular production roles.
+   - Push: create one distinct identity, hollow garment set, directional ranch
+     equipment/workstation authority, and all `16` action/direction rows using
+     the process in `PAUSE_AND_RESUME.md`; promote only as one atomic family.
+   - Verify: require source provenance, independent clean rebuilds,
+     identity/garment/equipment invariants, exact runtime tiers, a rancher
+     browser vertical slice, production-only atlas requests, cargo semantics,
+     all `224` atlas rows, and the full Realm release gate.
 
 2. Service walker art integration.
    - Problem: `G.walkers` still draws small procedural walkers in
