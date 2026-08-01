@@ -12,6 +12,26 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 20 — 2026-08-01 — hygiene: nine shipped issues CLOSED — and the push
+
+**The ledger squared:** nine issues that shipped across the past two months but never
+closed are now closed with code-grounded evidence: #12 (the ascent — walked nightly),
+#14 (the keeper's voice layer), #16 (the drowned gallery), #19 (the deep grades /
+ERA casts), #22 (the finale fork + the withhold), #24 (the jetty + dory threshold),
+#10 (MISSION's story-first amendment, adopted), #4 (the hybrid voiced layer), #7
+(harness friction — superseded by walk.mjs + the field report). The open board now
+tells the truth: tree LOD (#6), perf remainder (#30 #31 #32 #34), graphics passes
+(#44 #48), content migration (#75), the arch cluster (#69-73 #77), owner-gated voices
+(#50), and the process/story trackers (#11 #23 + epics #8 #25).
+
+**This morning's session (fires 16-20):** #124 root-fixed · #61 · the FIELD REPORT
+(debug-together, owner request) · #53 · #55 · #76 · #27+#28 (bench -20% GPU) — seven
+issues closed by work, nine by hygiene, every fire walk-gated 28/28.
+
+**PUSH (fires 16-20):** submodule main → origin/main; parent → origin/main.
+
+---
+
 ## loop-fire 19 — 2026-08-01 — the POWER pair: #27 lights leave the shader · #28 shadows freeze
 
 **Shipped (#27):** a point light at intensity 0 still costs its slot in every
