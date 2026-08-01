@@ -636,7 +636,10 @@ export class Game {
     // SEA-STRATA depth response (#51): the deep air carries the hum damped — darker,
     // a shade flat, longer — and says so once
     const damp = W.level > 1 ? Math.min(1, 0.45 + 0.2 * (W.level - 2)) : 0;
-    A.stoneTone(i, 0.4, damp);
+    // #63: the hum comes FROM its stone — play the arc by ear and the ear can find it
+    const st = this.refs[`stone${i}`];
+    if (st) { st.getWorldPosition(_kv); A.stoneTone(i, 0.4, damp, { x: _kv.x, z: _kv.z, ref: 16 }); }
+    else A.stoneTone(i, 0.4, damp);
     if (damp) this.once('stonesDeep', () => UI.whisper('The stones hum lower here, as through water.'));
     this.anim.stoneGlow[i] = 1;
     if (W.flags.birdSolved) {
@@ -691,7 +694,7 @@ export class Game {
     if (d > 38) return;
     BIRD_MELODY.forEach((stoneIdx, n) => {
       setTimeout(() => {
-        A.chirp(STONE_NOTES[stoneIdx]);
+        A.chirp(STONE_NOTES[stoneIdx], 0, 0.35, { x: stonesPos.x, z: stonesPos.z, ref: 24 });   // #63: from the arc
         this.anim.stoneGlow[stoneIdx] = Math.max(this.anim.stoneGlow[stoneIdx], 0.5);
       }, n * 650);
     });
@@ -967,8 +970,8 @@ export class Game {
       this._buoyT = 0; this._buoyRing = (this._buoyRing || 0) + 1;
       const d = Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12);
       const vol = Math.max(0.06, 0.34 * (1 - d / 160));
-      A.pluck(174.6, 0, vol, 3.6);              // F3 — a sea-bell's low toll, waterlogged-long
-      A.pluck(352.8, 0.03, vol * 0.35, 2.4);    // detuned octave shimmer over it
+      A.pluck(174.6, 0, vol, 3.6, { x: 52.3, z: 12.5, ref: 60 });           // F3 — a sea-bell's low toll, from the channel (#63)
+      A.pluck(352.8, 0.03, vol * 0.35, 2.4, { x: 52.3, z: 12.5, ref: 60 });   // detuned octave shimmer over it
     }
     if (Math.hypot(this.player.pos.x - 52, this.player.pos.z - 12) < 26) {
       this.once('bellBuoySeen', () => {
@@ -1067,8 +1070,9 @@ export class Game {
       if (this._tideRegard >= 2.6 && this.flag('tideFigureSeen')) {
         // one bell-note across the water — a real note now (#49): B, the one the
         // pentatonic never had. The fallen stone at the arc is listening for it.
-        A.pluck(493.88, 0, 0.42, 3.6);
-        A.pluck(987.77, 0.07, 0.16, 4.6);
+        // #63: laid from where the figure stands, literally across the water
+        A.pluck(493.88, 0, 0.42, 3.6, { x: f.position.x, z: f.position.z, ref: 30 });
+        A.pluck(987.77, 0.07, 0.16, 4.6, { x: f.position.x, z: f.position.z, ref: 30 });
         UI.whisper('You stop wading for it. You only watch. It settles, surfaces — and lays a single note across the water before it sinks.');
         UI.addJournal('A shape stood in the kelp and slipped off whenever I waded toward it. So I stopped, and stood, and only watched. It settled then, and surfaced, and laid one bell-note across the bay before the water took it. Some things will not be chased down — only witnessed. And that is enough to let them go.', '', 'self');
       }

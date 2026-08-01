@@ -12,6 +12,30 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 12 — 2026-07-31 — #63: sound gets a BEARING (flat-DSP spatialization)
+
+**Shipped:** in a game where sound is a puzzle language, every world sound played
+dead-centre. Now an `_at(x,z)` helper (bearing-vs-facing → StereoPanner, distance →
+soft-rolloff gain; per-shot nodes, so steady-state DSP stays exactly flat — no HRTF)
+gives the one-shots their places: the stones hum FROM their stones (play the arc by ear
+and the ear can find each voice — including the fallen sixth), the bird sings from the
+arc, the bell-buoy tolls from the channel (ref 60m — a far bell), the Tide-Figure's B is
+laid from where the figure stands (the "one bell-note across the water" comment is now
+literally true), the gulls cry from their wheel, the crows from their perches, and the
+dawn chorus arrives from random bearings 14-40m out — around you, not inside your head.
+The player pose rides the existing `A.update(s)` bag (px/pz/yaw).
+
+**Evidence:** deterministic math asserts — east source pans +1.0 at gain 0.64, west -1.0,
+ahead 0.0; a quarter-turn re-bears a west source to 0.0; 54m at ref 18 gives exactly
+18/72 = 0.25; all five positional one-shots fire throw-free on a running ctx; the
+full-game walk re-ran **28/28** after the wiring. Fixed in passing: the fire-7 cries'
+loop variable shadowed the new `at` param (renamed before it could bite). The app is left
+MUTED (abyme-muted=1) per the owner's goodnight. **Closes #63.**
+
+**Next tick suggestion:** #59 settings tab + a Bender voice pass for the new beats (#50).
+
+---
+
 ## loop-fire 11 — 2026-07-31 — #60: the island answers to touch
 
 **Shipped:** phones were stranded at spawn (movement was WASD-only; the hint named keys a

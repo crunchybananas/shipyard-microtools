@@ -1283,10 +1283,10 @@ function tickGulls(elapsed, dt) {
   if (day > 0.5 && MODE === 'play' && W.level === 1 && Math.random() < dt * 0.033) {
     const g = gulls[(Math.random() * gulls.length) | 0];
     const d = Math.hypot(g.position.x - player.pos.x, g.position.z - player.pos.z);
-    A.gullCry(clamp(0.26 * (1 - d / 220), 0.03, 0.26));
+    A.gullCry(clamp(0.26 * (1 - d / 220), 0.03, 0.26), { x: g.position.x, z: g.position.z, ref: 40 });   // #63: from the bird itself
   }
   // #64: the dawn percher announces the rail (the keeper's-view beat gets its sound)
-  if (settle > 0.6 && !perchCried && MODE === 'play') { perchCried = true; A.gullCry(0.18); }
+  if (settle > 0.6 && !perchCried && MODE === 'play') { perchCried = true; A.gullCry(0.18, { x: GULL_PERCH.x, z: GULL_PERCH.z, ref: 40 }); }
   if (settle < 0.2) perchCried = false;
   for (const g of gulls) {
     g.visible = day > 0.3 && MODE !== 'dive';
@@ -1324,12 +1324,12 @@ function tickPerched(elapsed, dt) {
       g.rotation.y = u.yaw + Math.sin(elapsed * 0.45 + u.ph) * 0.18;
       // #64: the lone caw of an island gone quiet — rare, and only within earshot
       if (u.species === 'crow' && d < 60 && Math.random() < dt * 0.008) {
-        A.crowCaw(clamp(0.22 * (1 - d / 70), 0.04, 0.22));
+        A.crowCaw(clamp(0.22 * (1 - d / 70), 0.04, 0.22), undefined, { x: u.px, z: u.pz, ref: 30 });   // #63
       }
       if (d < 3.6) {
         u.flush = 0.001;                                   // startle → flush
         // #64: the burst-up finally makes a sound — a close startled cry
-        if (u.species === 'crow') A.crowCaw(0.3, true); else A.gullCry(0.3);
+        if (u.species === 'crow') A.crowCaw(0.3, true, { x: u.px, z: u.pz, ref: 20 }); else A.gullCry(0.3, { x: u.px, z: u.pz, ref: 20 });   // #63
       }
     } else if (u.flush < 1) {
       // flush: a quick climb up + away (flew off)
@@ -1755,6 +1755,7 @@ renderer.setAnimationLoop((tMs) => {
     night: isNight() ? 1 : 0,
     dawn: isDawn() ? 1 : 0,     // #64: the dawn chorus window
     level: W.level,             // #64: crickets/chorus are surface life — the deep stays thinned
+    px: player.pos.x, pz: player.pos.z, yaw: player.yaw,   // #63: the spatial pose — one-shots pan from this
     mist: mistCur,
   });
 

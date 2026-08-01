@@ -181,6 +181,8 @@ const A = {
       return;
     }
     if (this._unlockFn) this._removeUnlock();   // running: the unlock job is done
+    // spatial pose cache (#63): every world-anchored one-shot pans from this
+    this._px = s.px ?? this._px; this._pz = s.pz ?? this._pz; this._pyaw = s.yaw ?? this._pyaw;
     const t = ctx.currentTime;
     const k = 0.08; // smoothing
     // walls close in (#67): one shared lowpass over the whole ambient bed swings
@@ -214,7 +216,11 @@ const A = {
       this._chorusT = (this._chorusT ?? 1.5) - dt;
       if (this._chorusT <= 0) {
         this._chorusT = 0.9 + Math.random() * 2.8;
-        this.chirp(460 + Math.random() * 430, 0, 0.05 + Math.random() * 0.05);
+        // each call comes from somewhere real (#63): a random bearing 14-40m out,
+        // so the dawn arrives around you instead of inside your head
+        const a = Math.random() * Math.PI * 2, d = 14 + Math.random() * 26;
+        this.chirp(460 + Math.random() * 430, 0, 0.05 + Math.random() * 0.05,
+          { x: this._px + Math.sin(a) * d, z: this._pz + Math.cos(a) * d, ref: 30 });
       }
     }
   },
@@ -234,8 +240,31 @@ const A = {
     node.gain.exponentialRampToValueAtTime(0.0001, t0 + a + dec);
   },
 
+  // ---- spatial one-shots (#63): sound gets a BEARING, kept flat (no HRTF) ----
+  // The player pose is cached each frame from update(s); _at() turns a world (x,z)
+  // into stereo pan (bearing vs facing) + distance gain (soft rolloff, ref metres to
+  // half-volume-ish). _out() builds a per-shot gain→StereoPanner chain onto the given
+  // bus — nodes live only as long as the shot, so steady-state DSP stays exactly flat.
+  _px: 0, _pz: 0, _pyaw: 0,
+  _at(x, z, ref = 18) {
+    const dx = x - this._px, dz = z - this._pz;
+    const d = Math.hypot(dx, dz) || 1e-4;
+    // camera at yaw faces (-sin,-cos); its right hand is (cos,-sin) — project the bearing
+    const pan = (dx * Math.cos(this._pyaw) - dz * Math.sin(this._pyaw)) / d;
+    return { pan: clamp(pan, -1, 1), gain: ref / (ref + d) };
+  },
+  _out(at, bus) {
+    bus = bus || this.fx;
+    if (!at || !ctx.createStereoPanner) return bus;
+    const { pan, gain } = this._at(at.x, at.z, at.ref);
+    const g = ctx.createGain(); g.gain.value = gain;
+    const p = ctx.createStereoPanner(); p.pan.value = pan;
+    g.connect(p).connect(bus);
+    return g;
+  },
+
   // FM bell-pluck — the music box voice
-  pluck(freq, when = 0, vol = 0.5, decay = 1.4) {
+  pluck(freq, when = 0, vol = 0.5, decay = 1.4, at = null) {
     if (!this._running()) return;
     const t0 = ctx.currentTime + when;
     const car = ctx.createOscillator(); car.frequency.value = freq;
@@ -245,53 +274,53 @@ const A = {
     mod.connect(mg).connect(car.frequency);
     const g = ctx.createGain();
     this._env(g, t0, 0.006, vol, decay);
-    car.connect(g).connect(this.music);
+    car.connect(g).connect(this._out(at, this.music));
     car.start(t0); mod.start(t0);
     car.stop(t0 + decay + 0.2); mod.stop(t0 + decay + 0.2);
   },
 
   // a gull cries (#64) — two-syllable "kee-yaa": sawtooth through a swept bandpass,
   // the second syllable falling. vol is pre-scaled by the caller for distance.
-  gullCry(vol = 0.2) {
+  gullCry(vol = 0.2, at = null) {
     if (!this._running()) return;
     const t0 = ctx.currentTime;
-    for (const [at, f0, f1, dur, v] of [[0, 1240, 990, 0.14, 0.7], [0.18, 1120, 640, 0.3, 1]]) {
+    for (const [syl, f0, f1, dur, v] of [[0, 1240, 990, 0.14, 0.7], [0.18, 1120, 640, 0.3, 1]]) {
       const o = ctx.createOscillator(); o.type = 'sawtooth';
-      o.frequency.setValueAtTime(f0, t0 + at);
-      o.frequency.exponentialRampToValueAtTime(f1, t0 + at + dur);
+      o.frequency.setValueAtTime(f0, t0 + syl);
+      o.frequency.exponentialRampToValueAtTime(f1, t0 + syl + dur);
       const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 3.4;
-      bp.frequency.setValueAtTime(f0 * 1.5, t0 + at);
-      bp.frequency.exponentialRampToValueAtTime(f1 * 1.4, t0 + at + dur);
-      const g = ctx.createGain(); this._env(g, t0 + at, 0.02, vol * v, dur);
-      o.connect(bp).connect(g).connect(this.fx);
-      o.start(t0 + at); o.stop(t0 + at + dur + 0.12);
+      bp.frequency.setValueAtTime(f0 * 1.5, t0 + syl);
+      bp.frequency.exponentialRampToValueAtTime(f1 * 1.4, t0 + syl + dur);
+      const g = ctx.createGain(); this._env(g, t0 + syl, 0.02, vol * v, dur);
+      o.connect(bp).connect(g).connect(this._out(at));
+      o.start(t0 + syl); o.stop(t0 + syl + dur + 0.12);
     }
   },
 
   // a crow caws (#64) — one or two harsh flat pulses, the lone voice of an island
   // gone quiet. Rasp comes from a fast square tremolo chopping the sawtooth.
-  crowCaw(vol = 0.2, double = Math.random() < 0.45) {
+  crowCaw(vol = 0.2, double = Math.random() < 0.45, at = null) {
     if (!this._running()) return;
     const t0 = ctx.currentTime;
     const pulses = double ? [0, 0.26] : [0];
-    for (const at of pulses) {
+    for (const syl of pulses) {
       const o = ctx.createOscillator(); o.type = 'sawtooth';
-      o.frequency.setValueAtTime(640, t0 + at);
-      o.frequency.exponentialRampToValueAtTime(470, t0 + at + 0.18);
+      o.frequency.setValueAtTime(640, t0 + syl);
+      o.frequency.exponentialRampToValueAtTime(470, t0 + syl + 0.18);
       const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 1.6;
       const trem = ctx.createOscillator(); trem.type = 'square'; trem.frequency.value = 26;
       const tg = ctx.createGain(); tg.gain.value = 0.5;
       const tbase = ctx.createGain(); tbase.gain.value = 0.55;
       trem.connect(tg).connect(tbase.gain);
-      const g = ctx.createGain(); this._env(g, t0 + at, 0.015, vol, 0.2);
-      o.connect(bp).connect(tbase).connect(g).connect(this.fx);
-      o.start(t0 + at); o.stop(t0 + at + 0.3);
-      trem.start(t0 + at); trem.stop(t0 + at + 0.3);
+      const g = ctx.createGain(); this._env(g, t0 + syl, 0.015, vol, 0.2);
+      o.connect(bp).connect(tbase).connect(g).connect(this._out(at));
+      o.start(t0 + syl); o.stop(t0 + syl + 0.3);
+      trem.start(t0 + syl); trem.stop(t0 + syl + 0.3);
     }
   },
 
   // the bird sings a note — formant chirp
-  chirp(freq, when = 0, vol = 0.35) {
+  chirp(freq, when = 0, vol = 0.35, at = null) {
     if (!this._running()) return;
     const t0 = ctx.currentTime + when;
     const o = ctx.createOscillator();
@@ -303,13 +332,13 @@ const A = {
     f.type = 'bandpass'; f.frequency.value = freq * 2.2; f.Q.value = 4;
     const g = ctx.createGain();
     this._env(g, t0, 0.012, vol, 0.22);
-    o.connect(f).connect(g).connect(this.fx);
+    o.connect(f).connect(g).connect(this._out(at));
     o.start(t0); o.stop(t0 + 0.45);
   },
 
   // a standing stone hums. damp 0..1 (#51): the deep's version — darker filter, a shade
   // flat, quieter and longer, the hum arriving as through water.
-  stoneTone(i, vol = 0.4, damp = 0) {
+  stoneTone(i, vol = 0.4, damp = 0, at = null) {
     if (!this._running()) return;
     const freq = (STONE_NOTES[i] / 2) * (1 - damp * 0.028); // an octave down: monoliths, not chimes
     const t0 = ctx.currentTime;
@@ -326,7 +355,7 @@ const A = {
       o.connect(f).connect(g);
       o.start(t0); o.stop(t0 + 2.6 + damp);
     }
-    g.connect(this.fx);
+    g.connect(this._out(at));
   },
 
   chime() { this.pluck(1046.5, 0, 0.3, 1.8); this.pluck(1318.5, 0.09, 0.22, 2.2); },
