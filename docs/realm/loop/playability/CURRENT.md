@@ -1,8 +1,8 @@
 # Current Playability And Cleanup Handoff
 
-Date opened: 2026-08-01
+Date updated: 2026-08-01
 
-Starting live checkpoint: Realm `184`
+Current live checkpoint: Realm `185`
 
 Production graphics are intentionally paused at
 [`../graphics/PAUSE_AND_RESUME.md`](../graphics/PAUSE_AND_RESUME.md). The active
@@ -19,28 +19,24 @@ old or surprising behavior that no longer fits the game.
   The later engine roadmap allows a GPU comparison only after renderer purity
   and a feature-equivalent measured benchmark.
 
-## First Cleanup Target: Retire The Hot-Air Balloon Completely
+## Completed Cleanup: Hot-Air Balloon Retirement
 
-The balloon seen in the live game is not coming from a hidden 3D engine. It is
-old procedural Canvas decoration:
+Round 001 removed the legacy procedural hot-air balloon completely. The live
+updater, balloon renderer, screen-space shadow renderer, imports, calls, state
+initializer, and save allowlist entry are gone.
 
-- `updateBalloons` and `renderBalloons` in `js/enhancements.js` date to loop 6;
-- `renderBalloonShadows` is a later loop-89 screen renderer;
-- `js/main.js` still updates it;
-- `js/render.js` still draws it;
-- `js/state.js` and `js/save-state.js` still include balloon state.
+The save decision is an intentional clean cut with no compatibility slot and
+no save-version bump. Balloon state was resettable presentation state and was
+already excluded from serialized saves, so valid Realm 184 saves remain valid
+while no current New Game, Save, Load, or Continue surface carries the field.
 
-Removal should delete the spawn/update/draw/shadow path and its imports/calls,
-then make an explicit save-contract decision. Do not merely make the balloon
-transparent or lower its spawn chance. Acceptance evidence:
+The browser gate now fails if any of the five live source surfaces retain the
+retired token. It also runs ordinary daytime play at `4x` through the old
+tick-1200 forced-spawn point, then proves the state is absent from New Game,
+Save, reload, and Continue. The full 47-check Realm 185 suite passes. See
+[`rounds/001-balloon-retirement.md`](rounds/001-balloon-retirement.md).
 
-- no live or saved-state balloon references unless an intentionally documented
-  save-compatibility slot is retained;
-- deterministic New Game, Save, Load, and Continue pass;
-- daytime live play at accelerated speed shows no balloon or balloon shadow;
-- the full Realm release suite passes.
-
-## Ranked Work After The Balloon
+## Ranked Work Now
 
 1. **Responsive UX baseline.** Play the complete opening flow at desktop,
    tablet, and `390x844`; audit HUD density, build-bar reachability, tutorial
@@ -48,12 +44,13 @@ transparent or lower its spawn chance. Acceptance evidence:
    and keyboard-only affordances. Capture specific frames and fix one coherent
    surface at a time. The old mobile audit concluded “usable, not designed”; do
    not assume later additions preserved even that baseline.
-2. **Crowd-safe NPC movement.** Continue Engine v2 Phase 2 with the miner
-   lifecycle and make the existing red navigation controls pass: weighted
-   route cost, dynamic-obstacle invalidation, head-on/doorway pass-through,
-   intersection capacity, mixed-actor overlap, deterministic yielding, and
-   bounded recovery. This is the durable answer to NPCs walking into one
-   another; cosmetic separation is not.
+2. **Crowd-safe NPC movement.** Reproduce remaining player-visible miner or
+   town-crowd failures before changing the kernel. On Realm 185, both strict
+   navigation gates are green with zero known fixture defects: weighted route
+   cost, dynamic-obstacle invalidation, head-on/doorway separation,
+   intersection capacity, and mixed-actor separation all pass. Extend the
+   deterministic fixtures for any new live failure; cosmetic separation is
+   not a substitute for a movement invariant.
 3. **Gameplay-friction playthrough.** Run a fresh peaceful settlement through
    the tutorial, first production chain, housing growth, first research, and
    save/continue. Rank moments where the player lacks feedback or where a click
@@ -76,11 +73,10 @@ node scripts/runtime-revision.mjs --check
 node scripts/verify-realm.mjs
 ```
 
-The default traffic checks preserve repeatable baselines; their strict
-correctness modes remain the promotion gates for the movement replacement.
-Read `../engine-v2/CURRENT.md` before changing ownership, save, or navigation
-surfaces because its Realm 165 measurements remain the last formal performance
-and traffic baseline even though the live module revision is now 184.
+The traffic fixtures remain the promotion gates for movement changes. Their
+strict modes both pass on Realm 185, while the Realm 165 measurements remain
+the last formal performance baseline. Read `../engine-v2/CURRENT.md` before
+changing ownership, save, or navigation surfaces.
 
 ## Definition Of Progress
 

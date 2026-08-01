@@ -10,12 +10,28 @@ import { ensureServer } from './_serve.mjs';
 
 const contract = JSON.parse(await readFile(new URL('../runtime-contract.json', import.meta.url), 'utf8'));
 const REVISION = contract.moduleRevision;
-assert.equal(REVISION, 184, 'Update this gate\'s literal browser module URLs for the new runtime revision');
+assert.equal(REVISION, 185, 'Update this gate\'s literal browser module URLs for the new runtime revision');
 const SAVE_KEY = contract.saveKey;
 const FAST_FORWARD_DAYS = 200;
 const PRESENTATION_QUEUE_LIMIT = 1_024;
 const COMFORTABLE_SAVE_LIMIT_BYTES = 1_000_000;
 const CONSERVATIVE_LOCAL_STORAGE_QUOTA_BYTES = 5 * 1024 * 1024;
+const RETIRED_AMBIENT_TOKEN = ['ball', 'oon'].join('');
+
+for (const relativePath of [
+  '../js/enhancements.js',
+  '../js/main.js',
+  '../js/render.js',
+  '../js/save-state.js',
+  '../js/state.js',
+]) {
+  const source = await readFile(new URL(relativePath, import.meta.url), 'utf8');
+  assert.equal(
+    source.toLowerCase().includes(RETIRED_AMBIENT_TOKEN),
+    false,
+    `${relativePath} retained the retired ambient system`,
+  );
+}
 
 function sha256(text) {
   return createHash('sha256').update(text).digest('hex');
@@ -24,8 +40,8 @@ function sha256(text) {
 // This runs inside the page. It intentionally derives the exclusion surface
 // from STATE_OWNERSHIP instead of maintaining a second hand-written list.
 async function captureAuthoritativeState() {
-  const stateModule = await import('./js/state.js?realm=184');
-  const missionModule = await import('./js/missions.js?realm=184');
+  const stateModule = await import('./js/state.js?realm=185');
+  const missionModule = await import('./js/missions.js?realm=185');
   const g = window.G;
   const collections = [
     ['building', 'buildings'],
@@ -138,10 +154,41 @@ try {
   await page.locator('#kingdom-name-input').fill('Browser Gate Realm');
   await page.locator('#title-screen .title-btn.primary').click();
   await page.waitForFunction(() => !document.body.classList.contains('title-active') && window.G?.day >= 1);
-  await page.evaluate(() => window.setSpeed(0));
+
+  const newGameState = await page.evaluate(() => ({
+    hasRetiredAmbientState: Object.hasOwn(window.G, ['ball', 'oons'].join('')),
+    tick: window.G.gameTick,
+    dayFraction: window.G.dayPhase / window.G.dayLength,
+  }));
+  assert.equal(newGameState.hasRetiredAmbientState, false, 'New Game initialized retired ambient state');
+  assert.ok(newGameState.dayFraction > 0.15 && newGameState.dayFraction < 0.65, 'New Game did not begin in daytime');
+
+  // Exercise the ordinary shell at 4× through the old tick-1200 spawn point.
+  // A fixed low random value would have forced the retired system to appear.
+  await page.evaluate(() => {
+    window.__browserSaveShellOriginalRandom = Math.random;
+    Math.random = () => 0.1;
+    window.setSpeed(4);
+  });
+  await page.waitForFunction(() => window.G?.gameTick >= 1220, null, { timeout: 15_000 });
+  const acceleratedDay = await page.evaluate(() => {
+    window.setSpeed(0);
+    Math.random = window.__browserSaveShellOriginalRandom;
+    delete window.__browserSaveShellOriginalRandom;
+    return {
+      hasRetiredAmbientState: Object.hasOwn(window.G, ['ball', 'oons'].join('')),
+      tick: window.G.gameTick,
+      dayFraction: window.G.dayPhase / window.G.dayLength,
+      paused: window.G.speed === 0,
+    };
+  });
+  assert.equal(acceleratedDay.hasRetiredAmbientState, false, 'accelerated daytime play revived retired ambient state');
+  assert.ok(acceleratedDay.tick >= 1220, 'accelerated daytime proof did not cross the old spawn tick');
+  assert.ok(acceleratedDay.dayFraction > 0.15 && acceleratedDay.dayFraction < 0.65, 'accelerated proof left daytime');
+  assert.equal(acceleratedDay.paused, true);
 
   const fastForward = await page.evaluate(async ({ days }) => {
-    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=184');
+    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=185');
     const g = window.G;
     const tracked = [];
     const peaks = {};
@@ -211,7 +258,7 @@ try {
   });
 
   const saved = await page.evaluate(async ({ saveKey }) => {
-    const save = await import('./js/save.js?realm=184');
+    const save = await import('./js/save.js?realm=185');
     const ok = save.saveGame();
     const raw = localStorage.getItem(saveKey);
     return {
@@ -232,6 +279,7 @@ try {
   );
   const savedEnvelope = JSON.parse(saved.raw);
   const savedStateText = JSON.stringify(savedEnvelope.state);
+  assert.equal(savedStateText.includes(RETIRED_AMBIENT_TOKEN), false, 'save retained retired ambient state');
   const authorityBefore = await page.evaluate(captureAuthoritativeState);
 
   await page.reload();
@@ -247,8 +295,8 @@ try {
   // and re-serialization all happen in this one page task. No rAF can slip a
   // simulation tick into the exact serialized-state comparison.
   const continued = await page.evaluate(async ({ saveKey, savedAt }) => {
-    const { serializeGame } = await import('./js/save-state.js?realm=184');
-    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=184');
+    const { serializeGame } = await import('./js/save-state.js?realm=185');
+    const { STATE_OWNERSHIP } = await import('./js/state.js?realm=185');
     const rawBefore = localStorage.getItem(saveKey);
     const expectedState = JSON.stringify(JSON.parse(rawBefore).state);
     window.loadAndStart();
@@ -266,6 +314,7 @@ try {
       paused: window.G.speed === 0,
       sentinelReset: !window.G.particles.some(item => item?.text === 'browser-shell-reset-sentinel'),
       selectedBuildReset: window.G.selectedBuild === null,
+      retiredAmbientStateAbsent: !Object.hasOwn(window.G, ['ball', 'oons'].join('')),
       queueLengths,
       toast: document.getElementById('toast')?.textContent || '',
       feedItems: document.getElementById('activity-feed')?.children.length || 0,
@@ -280,6 +329,7 @@ try {
   assert.equal(continued.paused, true, 'Continue did not restore the paused speed');
   assert.equal(continued.sentinelReset, true, 'Continue revived a stale presentation descriptor');
   assert.equal(continued.selectedBuildReset, true, 'Continue revived stale shell selection');
+  assert.equal(continued.retiredAmbientStateAbsent, true, 'Continue revived retired ambient state');
   assert.equal(continued.queueLengths.particles, 0, 'Continue did not reset the particle queue');
   assert.match(continued.toast, /Where we left off/);
   assert.ok(continued.feedItems <= 5, `welcome feed retained ${continued.feedItems} items`);
@@ -300,8 +350,8 @@ try {
   });
   const renderAuthorityBefore = await page.evaluate(captureAuthoritativeState);
   const renderPurity = await page.evaluate(async () => {
-    const { serializeGame } = await import('./js/save-state.js?realm=184');
-    const state = await import('./js/state.js?realm=184');
+    const { serializeGame } = await import('./js/save-state.js?realm=185');
+    const state = await import('./js/state.js?realm=185');
     const enemy = window.G.enemies.at(-1);
     const before = JSON.stringify(serializeGame({ savedAt: 0 }).state);
     const tick = window.G.gameTick;
@@ -326,7 +376,7 @@ try {
   assert.equal(renderAuthorityAfter, renderAuthorityBefore, 'paused rendering changed authoritative state');
 
   const victory = await page.evaluate(async () => {
-    const ui = await import('./js/ui.js?realm=184');
+    const ui = await import('./js/ui.js?realm=185');
     window.G.wonder = {
       placed: true,
       stage: 3,
@@ -354,6 +404,7 @@ try {
 
   const quotaPercent = (saved.bytes / CONSERVATIVE_LOCAL_STORAGE_QUOTA_BYTES) * 100;
   console.log(`✓ real New Game paused and fastForward(${FAST_FORWARD_DAYS}) reached day ${fastForward.day}, tick ${fastForward.tick}`);
+  console.log(`✓ 4× daytime play crossed tick ${acceleratedDay.tick} with the retired ambient state absent`);
   console.log(`✓ presentation queues bounded: peak ${peakQueue[0]}=${peakQueue[1]}, particles reset to ${fastForward.finalLengths.particles}`);
   console.log(`✓ saveGame() wrote ${saved.bytes.toLocaleString()} bytes (${quotaPercent.toFixed(2)}% of a conservative 5 MiB quota)`);
   console.log(`✓ reload/Continue preserved exact serialized state and authoritative hash ${sha256(authorityAfter).slice(0, 20)}…`);

@@ -3,10 +3,10 @@
 // (minimap lives in ./minimap.js)
 // ════════════════════════════════════════════════════════════
 
-import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=184';
-import { renderBoats, renderFlocks, renderBalloons, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=184';
-import { makeAtlasLoader } from './atlas-loader.js?realm=184';
-import { ACTOR_REGISTRATION } from './actor-registration.js?realm=184';
+import { G, TILE, TILE_COLORS, BUILDINGS, TW, TH, MAP_W, MAP_H, getSeasonData, getDaylight } from './state.js?realm=185';
+import { renderBoats, renderFlocks, renderAurora, renderWolves, renderGlowMushrooms, renderGroundMist, renderLanterns, renderCarts, renderRainbow, renderHawks, renderConstellations, renderPuddles, renderBonfire, renderFootprints, renderLensFlare, renderSnowmen, renderBlossoms, drawAmbientSprite, enhRenderWorld, enhRenderScreen } from './enhancements.js?realm=185';
+import { makeAtlasLoader } from './atlas-loader.js?realm=185';
+import { ACTOR_REGISTRATION } from './actor-registration.js?realm=185';
 import {
   ACTIONS as ACTOR_ACTIONS,
   ACTOR_RUNTIME_ATLASES,
@@ -15,7 +15,7 @@ import {
   FRAME_W as ACTOR_FRAME_W,
   FRAMES as ACTOR_FRAMES,
   ROLES as ACTOR_VARIANTS,
-} from './sprite-source-contract.js?realm=184';
+} from './sprite-source-contract.js?realm=185';
 import {
   CARGO_DIRECTIONS,
   CARGO_FRAMES,
@@ -24,21 +24,21 @@ import {
   CARGO_RUNTIME_ATLASES,
   cargoOwnerRow,
   cargoRowIndex,
-} from './cargo-source-contract.js?realm=184';
+} from './cargo-source-contract.js?realm=185';
 import {
   chooseActorRuntimeTier,
   projectedActorSize,
   shouldSmoothActorTier,
-} from './render-resolution.js?realm=184';
+} from './render-resolution.js?realm=185';
 import {
   buildCurrentCitizenPresentations,
   presentationActionForActivity,
-} from './citizen-presentation.js?realm=184';
+} from './citizen-presentation.js?realm=185';
 import {
   citizenRenderRecord,
   pruneCitizenRenderCache,
-} from './citizen-render-cache.js?realm=184';
-import { staffingCount } from './citizen-ownership.js?realm=184';
+} from './citizen-render-cache.js?realm=185';
+import { staffingCount } from './citizen-ownership.js?realm=185';
 
 let C, ctx;
 let logicalW, logicalH;
@@ -3769,8 +3769,6 @@ export function render() {
 
   // ── Migrating flocks (loop 5+) ──────────────────────────────
   renderFlocks(ctx, logicalW, logicalH);
-  // ── Hot air balloons (loop 6+) ──────────────────────────────
-  renderBalloons(ctx);
 
   // ── Rain overlay (screen space) ───────────────────────────────
   // Loop 32 (render S3): denser rain during storm, varied droplet lengths,
