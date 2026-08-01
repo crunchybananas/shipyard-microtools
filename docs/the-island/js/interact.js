@@ -187,6 +187,10 @@ export class Interactions {
       }, 700);
     }
     if (spot && !spot.noGlint) {
+      // size-aware glint (#44 catch): a fixed 1.6 emissive reads as a catch-light on a
+      // fist-sized ruler and as a FLOODLIT SLAB on a 3.4m standing stone. Scale by the
+      // spot's measured bounding radius — small things pop, monuments merely warm.
+      const glintI = Math.min(1.5, Math.max(0.14, 0.65 / Math.max(spot._cullR ?? 0.5, 0.3)));
       for (const t of spot.targets) {
         t.traverse((o) => {
           if (!(o.material && o.material.emissive !== undefined)) return;
@@ -197,8 +201,12 @@ export class Interactions {
           const mat = o.material;
           if (!this._glinted.has(mat)) {
             this._glinted.set(mat, { hex: mat.emissive.getHex(), intensity: mat.emissiveIntensity ?? 1 });
-            if (mat.emissive.r + mat.emissive.g + mat.emissive.b < 0.01) mat.emissive.setHex(0xffb454);
-            mat.emissiveIntensity = Math.max(0.25, (mat.emissiveIntensity ?? 1) * 1.6);
+            if (mat.emissive.r + mat.emissive.g + mat.emissive.b < 0.01) {
+              mat.emissive.setHex(0xffb454);
+              mat.emissiveIntensity = glintI;                                   // glint-from-dark: size-scaled
+            } else {
+              mat.emissiveIntensity = Math.max(0.25, (mat.emissiveIntensity ?? 1) * 1.6);   // already-lit props keep the boost
+            }
           }
         });
       }

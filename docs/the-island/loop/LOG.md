@@ -12,6 +12,36 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 21 — 2026-08-01 — #44 graphics micro-pass (+ the field-report prompt fix, + a glint catch)
+
+**Shipped (the owner's live bug, first):** the ⚑ field report read as dead — embedded
+browser panes swallow `prompt()` silently, killing the click handler before report() ran.
+Dropped the prompt (the note travels by chat); hot-patched the owner's RUNNING page and
+proved it with a simulated click (ring 1→2) before committing.
+
+**Shipped (#44, all five):**
+- **lamp-room glass fresnel** — face-on stays near-clear for the beam; edge-on the pane
+  glints into existence instead of reading as a hole (onBeforeCompile alpha).
+- **oblique canopy dapple** — xz-only sampling stretched to vertical streaks on the cone
+  sides (height never varied the sample); shearing y into both axes tilts the projection
+  so every face gets true 2D dapple.
+- **the beam answers the mist** — one uMist multiply (+55% at full fog): the
+  lighthouse-in-fog image, and it is glorious (see the verification shot).
+- **green-flash scrub gate** — an upper bound on the per-frame elevation delta: a debug
+  slider jumping hours no longer fires the flash; a real crank flick still does.
+- **the songbird is a bird** — the dawn-clue actor upgraded from cone+sphere to the
+  merged vertex-coloured recipe (slate mantle, warm breast, cocked tail, real beak),
+  one draw, quartering toward the arc's centre.
+
+**Found while verifying:** the hover glint at fixed 1.6 emissive floodlit a 3.4m standing
+stone into a cream slab. Now size-aware — scaled by the spot's measured bounding radius
+(small things pop at up to 1.5, monuments merely warm at ~0.3); already-emissive props
+keep their boost. **Walk 28/28** (bell/oar harness margins widened +4s for the new
+shader variants' first-compile hitches — the game was correct, the gate was tight).
+**Closes #44.**
+
+---
+
 ## loop-fire 20 — 2026-08-01 — hygiene: nine shipped issues CLOSED — and the push
 
 **The ledger squared:** nine issues that shipped across the past two months but never

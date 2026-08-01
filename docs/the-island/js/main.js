@@ -1096,8 +1096,10 @@ function applyAtmosphere(elapsed, dt) {
   const el = sunElevation(W.time);
   const night = clamp((-el - 0.02) / 0.18, 0, 1);
 
-  // green flash: the sun crossing the sea while time is being wound
-  if (Math.sign(el) !== Math.sign(prevEl) && Math.abs(el - prevEl) > 0.00012) flash = 1;
+  // green flash: the sun crossing the sea while time is being wound. The upper bound
+  // (#44) gates SCRUBS out: a debug-slider jump crosses the horizon by whole hours in
+  // one frame and used to fire the flash absurdly — a real crank flick stays under it.
+  if (Math.sign(el) !== Math.sign(prevEl) && Math.abs(el - prevEl) > 0.00012 && Math.abs(el - prevEl) < 0.2) flash = 1;
   prevEl = el;
   flash = Math.max(0, flash - dt * 0.6);
 
@@ -1309,7 +1311,10 @@ function applyAtmosphere(elapsed, dt) {
 
   // beams + sway
   for (const r of [refs.beamCone, refs.shaftBeam]) {
-    if (r?.material?.uniforms) r.material.uniforms.uTime.value = elapsed;
+    if (r?.material?.uniforms) {
+      r.material.uniforms.uTime.value = elapsed;
+      if (r.material.uniforms.uMist) r.material.uniforms.uMist.value = mistCur;   // #44: the shaft brightens in fog
+    }
   }
   for (const m of swayMats) {
     const sh = m.userData.shader;

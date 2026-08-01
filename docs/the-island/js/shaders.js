@@ -459,6 +459,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       uColor: { value: new THREE.Color(color) },
       uTime: { value: 0 },
       uFlip: { value: 0 }, // 0: source at uv.y=0 (beam apex); 1: source at uv.y=1 (shaft top)
+      uMist: { value: 0 }, // #44: mist is scattering medium — the shaft brightens in fog (the lighthouse-in-fog image)
     },
     vertexShader: /* glsl */`
       varying vec2 vUv;
@@ -476,6 +477,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
       uniform vec3 uColor;
       uniform float uTime;
       uniform float uFlip;
+      uniform float uMist;
       varying vec2 vUv;
       varying vec3 vN;
       varying vec3 vW;
@@ -488,7 +490,7 @@ export function makeBeamMaterial(color = 0xfff0c0) {
         // glancing fragments fade: the open cone's silhouette walls were
         // reading as two hard streaks — face-on light fills the body
         float facing = smoothstep(0.02, 0.32, abs(dot(normalize(vN), normalize(cameraPosition - vW))));
-        float a = along * uIntensity * shimmer * 0.5 * facing;
+        float a = along * uIntensity * shimmer * 0.5 * facing * (1.0 + uMist * 0.55);
         a += (hash21(gl_FragCoord.xy) - 0.5) / 255.0; // dither the additive ramp: kills the beam's banded rings at night
         gl_FragColor = vec4(uColor, a);
         #include <tonemapping_fragment>

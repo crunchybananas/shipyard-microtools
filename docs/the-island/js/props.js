@@ -44,6 +44,14 @@ const matGlass = new THREE.MeshStandardMaterial({
   color: 0xcfe8ea, transparent: true, opacity: 0.16, roughness: 0.08, metalness: 0.1,
   side: THREE.DoubleSide, depthWrite: false,
 });
+// #44: fresnel alpha — face-on the lamp-room glass stays near-clear (the beam must read
+// through it), but edge-on the pane GLINTS into existence instead of vanishing to a hole.
+matGlass.onBeforeCompile = (sh) => {
+  sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `#include <dithering_fragment>
+    float glFres = pow(1.0 - abs(dot(normalize(vViewPosition), normalize(vNormal))), 3.0);
+    gl_FragColor.a = min(0.85, gl_FragColor.a + glFres * 0.5);
+  `);
+};
 // the STUDY WINDOW glaze — distinct from the lamp-room glass (matGlass, which must stay near-clear so
 // the beam reads). At 0.16 opacity the window looked like an open HOLE (owner-flagged); this pane has
 // real presence: ~0.46 opacity + a cool tint so it's visibly glazed, and roughness 0.05 so the low sun
@@ -1665,17 +1673,31 @@ export function buildWorld() {
       m.add(gl);
     }
 
-    // the song bird, visible at dawn, perched on stone 2
+    // the song bird, visible at dawn, perched on stone 2 — the dawn-clue ACTOR deserves
+    // better than a cone and a sphere (#44): the same merged vertex-coloured recipe as
+    // the shore gulls, songbird proportions — slate-blue mantle, warm breast, real tail
+    // and beak. One draw, clones to the model like the rest of the stones.
     const bird = new THREE.Group();
     bird.name = 'songBird';
-    const body = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.3, 6), new THREE.MeshStandardMaterial({ color: 0x3a4e63, flatShading: true }));
-    body.rotation.x = Math.PI / 2.4;
-    bird.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 5), new THREE.MeshStandardMaterial({ color: 0x4a6278, flatShading: true }));
-    head.position.set(0, 0.12, 0.12);
-    bird.add(head);
+    {
+      const bb = new Baker();
+      const M4 = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), E4 = new THREE.Euler(), V4 = new THREE.Vector3(), S4 = new THREE.Vector3();
+      const part = (geo, col, x, y, z, rx = 0, sx = 1, sy = 1, sz = 1) => {
+        bb.add(geo, M4.compose(V4.set(x, y, z), Q4.setFromEuler(E4.set(rx, 0, 0)), S4.set(sx, sy, sz)), col);
+        geo.dispose();
+      };
+      const slate = new THREE.Color(0x3a4e63), breast = new THREE.Color(0xb98a58),
+        dark = new THREE.Color(0x27364a), beakC = new THREE.Color(0x3c444e);
+      part(new THREE.SphereGeometry(0.095, 10, 8), breast, 0, 0.10, 0.02, 0, 1, 0.85, 1.4);   // body, breast forward
+      part(new THREE.SphereGeometry(0.09, 10, 7), slate, 0, 0.15, -0.02, 0, 0.94, 0.55, 1.32); // mantle / folded wings
+      part(new THREE.ConeGeometry(0.05, 0.19, 6), dark, 0, 0.10, -0.2, -1.8);                  // tail, cocked up
+      part(new THREE.SphereGeometry(0.062, 10, 8), slate, 0, 0.21, 0.11);                      // head
+      part(new THREE.ConeGeometry(0.017, 0.07, 6), beakC, 0, 0.205, 0.18, Math.PI / 2);        // beak
+      bird.add(new THREE.Mesh(bb.build(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0.05 })));
+    }
     const s2 = stonesGroup.getObjectByName('stone2');
     bird.position.copy(s2.position).add(new THREE.Vector3(0, 2.6, 0));
+    bird.rotation.y = 0.6;   // quartering toward the arc's centre, where the listener stands
     stonesGroup.add(bird);
 
     // THE READING GLASS — a hidden found-item half-buried on the islet among the stones. Take it
@@ -2485,7 +2507,11 @@ function buildVegetation(core, r) {
       .replace('void main() {', 'uniform vec3 uHaze;\nuniform sampler2D uFoliage;\nuniform float uFolAmt;\nuniform float uFolScale;\nvarying vec3 vLPos;\nvoid main() {')
       .replace('#include <color_fragment>', `
         #include <color_fragment>
-        float folL = dot(texture2D(uFoliage, vLPos.xz * uFolScale).rgb, vec3(0.299, 0.587, 0.114));
+        // oblique projection (#44): xz alone stretches to VERTICAL STREAKS on the cone's
+        // sides (height never varies the sample there) — shearing y into both axes at
+        // different rates tilts the projection so every face gets true 2D dapple
+        vec2 folUv = vec2(vLPos.x + vLPos.y * 0.37, vLPos.z + vLPos.y * 0.61) * uFolScale;
+        float folL = dot(texture2D(uFoliage, folUv).rgb, vec3(0.299, 0.587, 0.114));
         diffuseColor.rgb *= mix(1.0, folL * 1.9, uFolAmt);
       `)
       .replace('#include <fog_fragment>', `
