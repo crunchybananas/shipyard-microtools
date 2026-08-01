@@ -125,7 +125,7 @@ composer.addPass(new OutputPass());
 // buffers as solid black while a direct render is perfect — a foreground-only black screen with
 // NO js error. `?safe` forces a direct (no-bloom) render; the loop also SELF-TESTS this once
 // (below) and auto-falls-back if the composer comes back black, so the game is never stuck black.
-if (new URLSearchParams(location.search).has('safe')) bloomPass.enabled = false;
+if (new URLSearchParams(location.search).has('safe')) { bloomPass.enabled = false; bloomPass.dead = true; }   // dead: settings (#59) must never re-enable it
 let bloomSelfTested = false, bloomTestN = 0;
 
 addEventListener('resize', () => {
@@ -451,6 +451,45 @@ const game = new Game({
 });
 
 UI.init();
+
+// ---------------- settings (#59): the keeper's instruments, adjusted ----------------
+// Device preferences, not save state (like abyme-muted): look speed, invert-Y, volume,
+// and DRIFTWOOD mode — a net power cut (no bloom pass + capped DPR) for warm laps and
+// old machines. Persisted as one JSON blob; applied on boot and on every change.
+{
+  const KEY = 'abyme-settings';
+  const defs = { sens: 1, invertY: false, vol: 1, drift: false };
+  let cfg = defs;
+  try { cfg = { ...defs, ...(JSON.parse(localStorage.getItem(KEY)) || {}) }; } catch (_) {}
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (_) {} };
+  const apply = () => {
+    player.sens = cfg.sens;
+    player.invertY = !!cfg.invertY;
+    A.setVolume(cfg.vol);
+    bloomPass.enabled = !cfg.drift && !bloomPass.dead;               // driftwood: render direct (never resurrect a dead composer)
+    renderer.setPixelRatio(cfg.drift ? Math.min(BASE_DPR, 1.0) : BASE_DPR);
+    composer.setPixelRatio(cfg.drift ? Math.min(BASE_DPR, 1.0) : BASE_DPR);
+    composer.setSize(innerWidth, innerHeight);
+    const r = BLOOM_RES();
+    bloomPass.setSize(r.x, r.y);                                     // keep the half-res blur on toggle
+  };
+  const tab = document.getElementById('settings-tab');
+  const panel = document.getElementById('settings');
+  const sens = document.getElementById('set-sens');
+  const inv = document.getElementById('set-invert');
+  const vol = document.getElementById('set-vol');
+  const drift = document.getElementById('set-drift');
+  if (tab && panel) {
+    sens.value = cfg.sens; inv.checked = !!cfg.invertY; vol.value = cfg.vol; drift.checked = !!cfg.drift;
+    tab.addEventListener('click', () => panel.classList.toggle('hidden'));
+    sens.addEventListener('input', () => { cfg.sens = +sens.value; apply(); persist(); });
+    inv.addEventListener('change', () => { cfg.invertY = inv.checked; apply(); persist(); });
+    vol.addEventListener('input', () => { cfg.vol = +vol.value; apply(); persist(); });
+    drift.addEventListener('change', () => { cfg.drift = drift.checked; apply(); persist(); });
+  }
+  apply();
+  window.ABYME_SETTINGS = { get: () => ({ ...cfg }), set: (k, v) => { cfg[k] = v; apply(); persist(); } };
+}
 
 // ---------------- modes ----------------
 let MODE = 'title';
@@ -1779,6 +1818,7 @@ renderer.setAnimationLoop((tMs) => {
       bloomSelfTested = true;
       if (mid() < 8) {                                // composer returned black while direct was bright
         bloomPass.enabled = false;
+        bloomPass.dead = true;                        // settings (#59) must never re-enable a broken composer
         console.warn('[ABYME] post-processing returned a black frame on this device — bloom disabled, rendering direct.');
       }
     }

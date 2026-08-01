@@ -20,6 +20,8 @@ export class Player {
     this.dragCaptured = false;   // true while a drag-hotspot owns the pointer
 
     this.keys = new Set();
+    this.sens = 1;          // #59: look-speed multiplier (settings)
+    this.invertY = false;   // #59: invert the sky
     this.bobPhase = 0;
     this.bobAmp = 0;
     this._stuckT = 0;            // seconds fully pinned while pushing (wedge net)
@@ -46,8 +48,8 @@ export class Player {
       const dx = e.clientX - this._drag.x, dy = e.clientY - this._drag.y;
       this._drag.x = e.clientX; this._drag.y = e.clientY;
       this._drag.moved += Math.abs(dx) + Math.abs(dy);
-      this.yaw -= dx * 0.0036;
-      this.pitch = clamp(this.pitch - dy * 0.0030, -1.45, 1.45);
+      this.yaw -= dx * 0.0036 * this.sens;
+      this.pitch = clamp(this.pitch - dy * 0.0030 * this.sens * (this.invertY ? -1 : 1), -1.45, 1.45);
       // a decisive swipe before the hold lands is a LOOK, not a walk
       if (this._drag.moved > 26 && !this.touchWalk) { clearTimeout(this._holdTimer); }
     });

@@ -12,6 +12,34 @@ Newest entry first. Every iteration appends one entry using this template:
 
 ---
 
+## loop-fire 13 — 2026-07-31 — #59: The Instruments — a settings surface at last
+
+**Shipped:** a fourth top-right tab (the gear) opens "The Instruments": look speed
+(0.5-2×), invert the sky, volume (a real master fader over MASTER_LEVEL — mute stays the
+M toggle), and **driftwood mode** — a net power CUT (no bloom pass + DPR capped at 1.0)
+"a gentler flame — softer glow, fewer pixels, kinder to the battery." One JSON blob in
+localStorage (abyme-settings), device preference not save state, applied at boot and on
+every change. Correctness guard: `bloomPass.dead` — the ?safe param and the black-composer
+self-test now mark the pass dead, so un-toggling driftwood can never resurrect a composer
+the device already proved broken.
+
+**#50 (non-keeper voices) deliberately DEFERRED, not attempted:** the SPINE holds the
+keeper as the game's only I/you; inventing new speaking voices overnight is owner-taste,
+canon-sensitive territory. Tonight's audio axis moved plenty without it (#64 crickets/
+chorus/cries, #63 bearings); a Bender voice run stays a one-session job once the owner
+picks who else may speak.
+
+**Evidence:** tab shows with its siblings; panel opens; sens 1.6 + invert flow into the
+player; driftwood kills bloom + caps DPR and full restores both; volume persists; all four
+survive a reload; settings wiped after testing so the owner's device starts clean.
+Screenshot: the panel over the wake-up beach, amber on dark, the note in the whisper
+voice. **Closes #59.**
+
+**Next tick suggestion:** the release-pride audit (multi-grade beauty pass, perf ledger,
+walk gate) → the fire-15 push.
+
+---
+
 ## loop-fire 12 — 2026-07-31 — #63: sound gets a BEARING (flat-DSP spatialization)
 
 **Shipped:** in a game where sound is a puzzle language, every world sound played

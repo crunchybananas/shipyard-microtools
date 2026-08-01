@@ -34,11 +34,17 @@ const A = {
     return q.has('mute') || q.has('debug');
   })(),
 
+  _vol: 1,   // #59: master volume multiplier (device preference, applied over MASTER_LEVEL)
+  setVolume(v) {
+    this._vol = Math.max(0, Math.min(1, v));
+    if (this.master && !this.muted) this.master.gain.value = MASTER_LEVEL * this._vol;
+  },
+
   setMuted(m) {
     this.muted = !!m;
     localStorage.setItem('abyme-muted', this.muted ? '1' : '0');
     if (!this.master) return;
-    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL * this._vol;
     // mute used to be a volume knob only: six noise loops + the stem LFOs kept
     // rendering at gain 0 (#68). Halt the whole graph instead. Unmute resumes
     // through the same autoplay-safe path as #62 — the toggle itself is a
@@ -51,7 +57,7 @@ const A = {
     if (this.ready) return;
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     this.master = ctx.createGain();
-    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL;
+    this.master.gain.value = this.muted ? 0 : MASTER_LEVEL * this._vol;
     this.diveFilter = ctx.createBiquadFilter();
     this.diveFilter.type = 'lowpass';
     this.diveFilter.frequency.value = 19000;

@@ -192,6 +192,7 @@ export const UI = {
     this.journalTab.classList.add('show');
     this.soundTab.classList.add('show');
     this.motionTab.classList.add('show');
+    document.getElementById('settings-tab')?.classList.add('show');   // #59
   },
 
   // ---- journal ----
