@@ -413,16 +413,36 @@ export function buildWorld() {
     stone.add(geo, new THREE.Matrix4().makeTranslation(LH.x, LH.y + baseH - 0.65, LH.z), grad(C.bone, C.bone));
     geo.dispose();
   }
+  // partial wall pieces must sit ON the wall's own taper (radius at height y), or their
+  // open arc ends step off the neighbouring full-height arcs as visible seam slits
+  const wallRAt = (y) => baseR + 0.15 * (1 - y / baseH);
   // the window gets a sill and a header — it is a window, not a breach
   {
     const [w0, w1] = gaps[1];
     const len = w1 - w0;
-    const sill = new THREE.CylinderGeometry(baseR, baseR + 0.15, 1.15, 8, 1, true, w0, len);
+    const sill = new THREE.CylinderGeometry(wallRAt(1.15), wallRAt(0), 1.15, 8, 1, true, w0, len);
     stone.add(sill, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 0.575, LH.z), grad(C.boneDark, C.bone));
     sill.dispose();
-    const header = new THREE.CylinderGeometry(baseR, baseR, 0.55, 8, 1, true, w0, len);
+    const header = new THREE.CylinderGeometry(wallRAt(3.375), wallRAt(2.825), 0.55, 8, 1, true, w0, len);
     stone.add(header, new THREE.Matrix4().makeTranslation(LH.x, LH.y + 3.1, LH.z), grad(C.bone, C.bone));
     header.dispose();
+  }
+  // OPENINGS RIGHT-SIZED (owner: "the door and glass look awkward"): the door and window
+  // wall gaps are ~2.3-2.7m breaches — storefront-scale on a small keeper's drum. Curved
+  // stone INFILL segments (the wall's own recipe, taper-matched) narrow each to a human
+  // opening; the door also gets a transom band so the doorway is ~1.1 x 2.55m.
+  {
+    const infill = (a0deg, a1deg, y0, y1) => {
+      const a0 = deg(a0deg), len = deg(a1deg - a0deg);
+      const geo = new THREE.CylinderGeometry(wallRAt(y1), wallRAt(y0), y1 - y0, Math.max(6, Math.round(len * 16)), 1, true, a0, len);
+      stone.add(geo, place(0, (y0 + y1) / 2, 0).clone().premultiply(new THREE.Matrix4().makeTranslation(LH.x, LH.y, LH.z)), grad(C.boneDark, C.bone));
+      geo.dispose();
+    };
+    infill(151, 159.5, 0, baseH - 1.3);            // beach door: side cheeks…
+    infill(170.5, 179, 0, baseH - 1.3);
+    infill(159.5, 170.5, 2.62, baseH - 1.3);       // …and the transom over the leaf
+    infill(95, 103.5, 1.15, 2.825);                // window: side cheeks between sill and header
+    infill(116.5, 125, 1.15, 2.825);
   }
   // floor + ceiling ring (oculus for the light shaft)
   {
@@ -502,28 +522,64 @@ export function buildWorld() {
     const lampGlass = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.05, 2.4, 24, 1, true), matGlass);
     lampGlass.position.set(0, 22.05, 0);
     lhGroup.add(lampGlass);
-    // the study window: a GLAZED pane + a cross of glazing bars, so it reads as a window and not a hole
+    // the study window, right-sized (owner fix): the old 2.6m flat sheet chorded the whole
+    // curved 30° breach — its edges sank into the wall and it read as a shopfront. The
+    // infills narrow the opening to ~13°; this is now a keeper's window: a wooden frame
+    // box, a centred four-pane glazing cross, and a pane whose 13° chord deviates from
+    // the wall by under 4cm — no more seams cutting the stone.
     const winGroup = new THREE.Group();
     const wa = deg(110);
-    winGroup.position.set(Math.sin(wa) * (baseR - 0.05), 2.0, Math.cos(wa) * (baseR - 0.05));
+    winGroup.position.set(Math.sin(wa) * (baseR - 0.02), 1.99, Math.cos(wa) * (baseR - 0.02));
     winGroup.rotation.y = wa;
     winGroup.name = 'studyWindow';
-    const winGlass = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.7), matWinGlass);
+    const winGlass = new THREE.Mesh(new THREE.PlaneGeometry(1.16, 1.58), matWinGlass);
     winGroup.add(winGlass);
-    const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.78, 0.09), matWinFrame); vBar.position.z = 0.05; winGroup.add(vBar);
-    const hBar = new THREE.Mesh(new THREE.BoxGeometry(2.68, 0.07, 0.09), matWinFrame); hBar.position.z = 0.05; winGroup.add(hBar);
+    // frame box: jambs, head and stool in weathered wood, proud of the glass
+    const frame = (w, h, x, y) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.14), matWood);
+      b.position.set(x, y, 0.03); winGroup.add(b);
+    };
+    frame(0.09, 1.74, -0.62, 0); frame(0.09, 1.74, 0.62, 0);   // jambs
+    frame(1.33, 0.09, 0, 0.83); frame(1.33, 0.11, 0, -0.84);   // head + stool
+    const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.055, 1.6, 0.08), matWinFrame); vBar.position.z = 0.045; winGroup.add(vBar);
+    const hBar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.055, 0.08), matWinFrame); hBar.position.z = 0.045; winGroup.add(hBar);
     lhGroup.add(winGroup);
   }
-  // the study door, forever ajar
+  // the study door, forever ajar — right-sized (owner fix): the old leaf was a 1.9x3.4m
+  // unframed slab filling a floor-to-lintel breach. The infills narrow the doorway to
+  // ~1.1 x 2.55m; this is a battened keeper's door in a wooden frame, hinged at the
+  // north jamb, standing open into the study.
   {
-    const door = new THREE.Mesh(new THREE.BoxGeometry(1.9, 3.4, 0.12), matWood);
-    const da = deg(165);
+    const da0 = deg(159.5), da1 = deg(170.5);      // the narrowed doorway's edges
+    // frame: jambs against the stone cheeks + a lintel board under the transom
+    const jamb = (az) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.55, 0.18), matWood);
+      b.position.set(Math.sin(az) * (baseR - 0.02), 1.275, Math.cos(az) * (baseR - 0.02));
+      b.rotation.y = az + Math.PI / 2;
+      lhGroup.add(b);
+    };
+    jamb(da0); jamb(da1);
+    const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.14, 0.12, 0.2), matWood);
+    const mid = (da0 + da1) / 2;
+    lintel.position.set(Math.sin(mid) * (baseR - 0.02), 2.58, Math.cos(mid) * (baseR - 0.02));
+    lintel.rotation.y = mid;
+    lhGroup.add(lintel);
+    // the leaf: planked door + three battens + a brass pull, hinged at the north jamb
     const hingeOff = new THREE.Group();
-    hingeOff.position.set(Math.sin(da - deg(10)) * baseR, 1.7, Math.cos(da - deg(10)) * baseR);
-    hingeOff.rotation.y = da + deg(48); // ajar
-    door.position.x = 0.95;
-    hingeOff.add(door);
+    hingeOff.position.set(Math.sin(da1) * (baseR - 0.05), 1.26, Math.cos(da1) * (baseR - 0.05));
+    hingeOff.rotation.y = da1 - Math.PI / 2 + deg(52);   // closed = -90° from the jamb azimuth; +52° = ajar into the study
     hingeOff.name = 'studyDoor';
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.98, 2.44, 0.085), matWood);
+    door.position.x = 0.49;
+    hingeOff.add(door);
+    for (const by of [-0.82, 0, 0.82]) {           // battens
+      const bat = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.11, 0.03), matWood);
+      bat.position.set(0.49, by, 0.06);
+      hingeOff.add(bat);
+    }
+    const pull = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.016, 6, 12), matBrassSolid);
+    pull.position.set(0.88, -0.06, 0.07);
+    hingeOff.add(pull);
     lhGroup.add(hingeOff);
   }
 

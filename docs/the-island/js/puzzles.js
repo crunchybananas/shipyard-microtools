@@ -480,6 +480,18 @@ export class Game {
       when: () => W.level === 4,               // exists only at the L4 source (region4)
       onClick: () => UI.openReader('source_note'),
     });
+    // the annex door, LOCKED at the surface pre-descent (owner: "the chamber next to the
+    // tower doesn't let me walk in" — it is designed to open one level down, but a shut
+    // door with no answer reads as a bug). Clicking the closed leaf now says so, in the
+    // keeper's terms; the door opens at L2+ and stays open once returned (gameplay pass).
+    if (R.innerDoor) I.add({
+      id: 'innerDoorLocked', targets: [R.innerDoor], label: 'a shut door', maxDist: 3.0,
+      when: () => W.level < 2 && !W.flags.returned,
+      onClick: () => {
+        UI.whisper('Locked — not from this side. Whatever holds it shut is further down than the latch.');
+        this.once('annexLocked', () => UI.addJournal('A door off the study, shut fast. The latch turns and nothing moves — it is not held from this side. Some rooms in this house open only from further down.'));
+      },
+    });
     if (R.quartersJournal) I.add({
       id: 'quartersJournal', targets: [R.quartersJournal], label: 'a journal on the cot', maxDist: 2.6,
       // the quarters open one level down (the old `>= 1` gate was a no-op that let the

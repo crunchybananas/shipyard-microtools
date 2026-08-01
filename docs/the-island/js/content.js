@@ -264,4 +264,5 @@ export const SKETCHES = [
   ['lampblack on the chart too small', S('<rect x="26" y="8" width="34" height="24" rx="1" opacity=".6"/><path d="M30 14h20M30 18h24M30 22h16" opacity=".2"/><circle cx="56" cy="24" r="7"/><path d="M61 29l10 8" /><path d="M52 24h8" opacity=".7"/>')],
   ['Hair-fine letters on a standing stone', S('<path d="M38 36V13c0-4 3-6 8-6s8 2 8 6v23z"/><path d="M42 17h8M42 20h8M42 23h6" opacity=".18"/><circle cx="60" cy="24" r="6"/><path d="M64 28l9 7" opacity=".8"/>')],
   ['bends it down where the bird bends it up', S('<rect x="12" y="24" width="20" height="10" rx="2"/><circle cx="46" cy="18" r="2"/><circle cx="54" cy="15" r="2"/><circle cx="62" cy="12" r="2"/><circle cx="70" cy="22" r="2" opacity=".55"/><path d="M70 18q3-6 0-10" opacity=".4"/><circle cx="80" cy="9" r="2"/><path d="M84 6q4-2 6 1" opacity=".5"/>')],
+  ['shut fast', S('<rect x="36" y="8" width="24" height="28" rx="1"/><path d="M40 14h16M40 22h16M40 30h16" opacity=".4"/><circle cx="55" cy="23" r="1.6"/><path d="M55 23v4" opacity=".7"/><path d="M30 36h36" opacity=".45"/>')],
 ];

@@ -231,8 +231,9 @@ function ringBlockedGaps(x0, z0, x1, z1, cx, cz, r, gaps) {
   }
   return true;                                       // crossed solid wall
 }
-// the drum's two openings: the beach door (az 153..177°) and the annex doorway (az 5..25°)
-const LH_GAPS = [[deg(153), deg(177)], [deg(5), deg(25)]];
+// the drum's two openings: the beach door (az 160..170° — matches the right-sized visual
+// doorway + its jambs, was 153..177 when the breach was wall-wide) and the annex doorway (az 5..25°)
+const LH_GAPS = [[deg(160), deg(170)], [deg(5), deg(25)]];
 
 export function wallBlocked(x0, z0, x1, z1) {
   // up on the lamp-room gallery: the only wall is the balcony rail (keeps you from the 20m drop)
